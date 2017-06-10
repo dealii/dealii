@@ -213,6 +213,21 @@ public:
  * Base class for multigrid smoothers. Does nothing but defining the interface
  * used by multigrid methods.
  *
+ * The smoother interface provides two methods, a smooth() method and an
+ * apply() method. The multigrid preconditioner interfaces distinguish between
+ * the two for efficiency reasons: Upon entry to the preconditioner operations,
+ * the vector @p u needs to be set to zero and smoothing starts by a simple
+ * application of the smoother on the @p rhs vector. This method is provided by
+ * the apply() method of this class. It is the same as first setting @p u to
+ * zero and then calling smooth(), but for many classes the separate apply()
+ * interface is more efficient because it can skip one matrix-vector product.
+ *
+ * In the multigrid preconditioner interfaces, the apply() method is used for
+ * the pre-smoothing operation because the previous content in the solution
+ * vector needs to be overwritten for a new incoming residual. On the other
+ * hand, all subsequent operations need to smooth the content already present
+ * in the vector @p u given the right hand side, which is done by smooth().
+ *
  * @author Guido Kanschat, 2002
  */
 template <typename VectorType>
@@ -223,17 +238,41 @@ public:
    * Virtual destructor.
    */
   virtual ~MGSmootherBase();
+
   /**
    * Release matrices.
    */
   virtual void clear() = 0;
 
   /**
-   * Smoothing function. This is the function used in multigrid methods.
+   * Smoothing function that smooths the content in @p u given the right hand
+   * side vector @p rhs. This is the function used in multigrid methods.
    */
   virtual void smooth (const unsigned int level,
                        VectorType         &u,
                        const VectorType   &rhs) const = 0;
+
+  /**
+   * As opposed to the smooth() function, this function applies the action of
+   * the smoothing, overwriting the previous content in the vector u. This
+   * function must be equivalent to the following code
+   * @code
+   * u = 0;
+   * smooth(level, u, rhs);
+   * @endcode
+   * but can usually be implemented more efficiently than the former. If a
+   * particular smoother does not override the apply() method, the default
+   * implementation as described here is used.
+   *
+   * In the multigrid preconditioner interfaces, the apply() method is used for
+   * the pre-smoothing operation because the previous content in the solution
+   * vector needs to be overwritten for a new incoming residual. On the other
+   * hand, all subsequent operations need to smooth the content already present
+   * in the vector @p u given the right hand side, which is done by smooth().
+   */
+  virtual void apply (const unsigned int level,
+                      VectorType         &u,
+                      const VectorType   &rhs) const;
 };
 
 /*@}*/

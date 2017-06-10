@@ -1,0 +1,7 @@
+Improved: The multigrid smoothers now provide an additional apply() method that
+specializes the smoothing for the case the input vector is set to zero. This
+method is used in the Multigrid class and saves one matrix-vector product,
+which can speed up the multigrid algorithm by up to 10 percent, depending on
+the cost of the smoother.
+<br>
+(Martin Kronbichler, 2017/06/07)

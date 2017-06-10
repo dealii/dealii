@@ -35,13 +35,9 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Implementation of the multigrid method.
- *
- * @warning multigrid on locally refined meshes only works with
- * <b>discontinuous finite elements</b> right now. It is not clear, whether
- * the paradigm of local smoothing we use is applicable to continuous elements
- * with hanging nodes; in fact, most people you meet on conferences seem to
- * deny this.
+ * Implementation of the multigrid method. The implementation supports both
+ * continuous and discontinuous elements and follows the procedure described in
+ * the @ref mg_paper "multigrid paper by Janssen and Kanschat".
  *
  * The function which starts a multigrid cycle on the finest level is cycle().
  * Depending on the cycle type chosen with the constructor (see enum Cycle),

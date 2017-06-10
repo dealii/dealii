@@ -2221,15 +2221,9 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
   if (is_initialized == false)
     estimate_eigenvalues(src);
 
-  if (!dst.all_zero())
-    {
-      matrix_ptr->vmult (update2, dst);
-      internal::PreconditionChebyshev::vector_updates
-      (src, *data.preconditioner, false, 0., 1./theta, update1, update2, update3, dst);
-    }
-  else
-    internal::PreconditionChebyshev::vector_updates
-    (src, *data.preconditioner, true, 0., 1./theta, update1, update2, update3, dst);
+  matrix_ptr->vmult (update2, dst);
+  internal::PreconditionChebyshev::vector_updates
+  (src, *data.preconditioner, false, 0., 1./theta, update1, update2, update3, dst);
 
   do_chebyshev_loop(dst, src);
 }
@@ -2247,15 +2241,9 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
   if (is_initialized == false)
     estimate_eigenvalues(src);
 
-  if (!dst.all_zero())
-    {
-      matrix_ptr->Tvmult (update2, dst);
-      internal::PreconditionChebyshev::vector_updates
-      (src, *data.preconditioner, false, 0., 1./theta, update1, update2, update3, dst);
-    }
-  else
-    internal::PreconditionChebyshev::vector_updates
-    (src, *data.preconditioner, true, 0., 1./theta, update1, update2, update3, dst);
+  matrix_ptr->Tvmult (update2, dst);
+  internal::PreconditionChebyshev::vector_updates
+  (src, *data.preconditioner, false, 0., 1./theta, update1, update2, update3, dst);
 
   do_transpose_chebyshev_loop(dst, src);
 }
