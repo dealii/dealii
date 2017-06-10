@@ -37,6 +37,11 @@ std::ofstream logfile("output");
 #include <deal.II/base/function_lib.h>
 
 
+void output_double_number(double input,const std::string &text)
+{
+  deallog<<text<< input<<std::endl;
+}
+
 template <int dim, int fe_degree, typename Number>
 void
 mass_operator (const MatrixFree<dim,Number>  &data,
@@ -127,9 +132,9 @@ void test (const FiniteElement<dim> &fe,
   // accumulate differently. Beware of this strange solver setting when seeing
   // "failure" in the output
   SolverControl control(n_iterations, 0);
-  typename SolverCG<>::AdditionalData data;
-  data.compute_condition_number = true;
-  SolverCG<> solver(control,data);
+  SolverCG<> solver(control);
+  solver.connect_condition_number_slot(
+    std::bind(output_double_number,std::placeholders::_1,"Condition number estimate: "));
   try
     {
       solver.solve(mf, out, in, PreconditionIdentity());

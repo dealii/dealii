@@ -31,6 +31,23 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/precondition.h>
 
+void output_double_number(double input,const std::string &text)
+{
+  deallog<<text<< input<<std::endl;
+}
+
+template<class NUMBER>
+void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string &text)
+{
+  deallog<< text;
+  for (unsigned int j = 0; j < eigenvalues.size(); ++j)
+    {
+      deallog<< ' ' << eigenvalues.at(j);
+    }
+  deallog << std::endl;
+}
+
+
 template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve (SolverType         &solver,
@@ -82,8 +99,12 @@ int main()
   GrowingVectorMemory<> mem;
   SolverControl control(100, 1.e-3);
   SolverControl verbose_control(100, 1.e-3, true);
-  SolverCG<>::AdditionalData data(false, true, true, true);
-  SolverCG<> cg(control, mem, data);
+  SolverCG<> cg(control, mem);
+  cg.connect_condition_number_slot(
+    std::bind(output_double_number,std::placeholders::_1,"Condition number estimate: "),true);
+  cg.connect_eigenvalues_slot(
+    std::bind(output_eigenvalues<double>,std::placeholders::_1,"Final Eigenvalues: "));
+
 
   for (unsigned int size=4; size <= 30; size *= 3)
     {
