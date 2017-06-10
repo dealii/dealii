@@ -24,6 +24,8 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
+
+#include <boost/io/ios_state.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <fstream>
@@ -2264,6 +2266,14 @@ ParameterHandler::print_parameters (std::ostream     &out,
                                     const OutputStyle style) const
 {
   AssertThrow (out, ExcIO());
+
+  // we'll have to print some text that is padded with spaces;
+  // set the appropriate fill character, but also make sure that
+  // we will restore the previous setting (and all other stream
+  // flags) when we exit this function
+  boost::io::ios_flags_saver restore_flags(out);
+  boost::io::basic_ios_fill_saver<char> restore_fill_state(out);
+  out.fill(' ');
 
   // we treat XML and JSON is one step via BOOST, whereas all of the others are
   // done recursively in our own code. take care of the two special formats
