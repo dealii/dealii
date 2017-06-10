@@ -1,0 +1,5 @@
+Fixed: The ParameterHandler::print_parameters() function
+used the previously set fill character of the output stream, but it
+should have filled with spaces instead. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2017/06/07)
