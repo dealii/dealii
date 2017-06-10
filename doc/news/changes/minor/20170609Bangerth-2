@@ -1,0 +1,11 @@
+Changed: ParameterHandler::print_parameters() was at times looking at
+individual bits instead of just the declared values
+of ParameterHandler::OutputStyle. This presumably allowed for calling that
+function with a combination of the OutputStyle flags, for reasons that no
+longer seem particularly relevant nor obvious.
+<br>
+This possibility has now been removed from the current implementation of
+the function, but is for the moment retained for the (deprecated) function
+ParameterHandler::print_parameters_section().
+<br>
+(Wolfgang Bangerth, 2017/06/09)
