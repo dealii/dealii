@@ -227,9 +227,9 @@ protected:
    * Perform one block relaxation step.
    *
    * Depending on the arguments @p dst and @p pref, this performs an SOR step
-   * (both reference the same vector) of a Jacobi step (both are different
+   * (both reference the same vector) or a Jacobi step (both are different
    * vectors). For the Jacobi step, the calling function must copy @p dst to
-   * @p pref after this.
+   * @p prev after this.
    */
   void do_step (
     VectorType       &dst,
@@ -340,6 +340,18 @@ public:
   void Tstep (VectorType &dst, const VectorType &rhs) const;
 
   /**
+   * Implements a vmult() operation, which for this class first sets the dst()
+   * vector to zero before calling the step() method.
+   */
+  void vmult (VectorType &dst, const VectorType &rhs) const;
+
+  /**
+   * Implements a transpose vmult operation, which for this class first sets
+   * the dst() vector to zero before calling the Tstep() method.
+   */
+  void Tvmult (VectorType &dst, const VectorType &rhs) const;
+
+  /**
    * Return the memory allocated in this object.
    */
   std::size_t memory_consumption() const;
@@ -426,6 +438,18 @@ public:
    * Perform one step of the transposed SOR iteration.
    */
   void Tstep (VectorType &dst, const VectorType &rhs) const;
+
+  /**
+   * Implements a vmult() operation, which for this class first sets the dst()
+   * vector to zero before calling the step() method.
+   */
+  void vmult (VectorType &dst, const VectorType &rhs) const;
+
+  /**
+   * Implements a transpose vmult operation, which for this class first sets
+   * the dst() vector to zero before calling the Tstep() method.
+   */
+  void Tvmult (VectorType &dst, const VectorType &rhs) const;
 };
 
 
@@ -505,6 +529,18 @@ public:
    * Perform one step of the transposed SSOR iteration.
    */
   void Tstep (VectorType &dst, const VectorType &rhs) const;
+
+  /**
+   * Implements a vmult() operation, which for this class first sets the dst()
+   * vector to zero before calling the step() method.
+   */
+  void vmult (VectorType &dst, const VectorType &rhs) const;
+
+  /**
+   * Implements a transpose vmult operation, which for this class first sets
+   * the dst() vector to zero before calling the Tstep() method.
+   */
+  void Tvmult (VectorType &dst, const VectorType &rhs) const;
 };
 
 

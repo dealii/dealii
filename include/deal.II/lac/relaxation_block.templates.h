@@ -299,6 +299,32 @@ void RelaxationBlockJacobi<MatrixType, InverseNumberType, VectorType>::Tstep
 }
 
 
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockJacobi<MatrixType, InverseNumberType, VectorType>::vmult
+(VectorType       &dst,
+ const VectorType &src) const
+{
+  GrowingVectorMemory<VectorType> mem;
+  typename VectorMemory<VectorType>::Pointer aux = mem;
+  dst = 0;
+  aux->reinit(dst);
+  this->do_step(dst, *aux, src, false);
+}
+
+
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockJacobi<MatrixType, InverseNumberType, VectorType>::Tvmult
+(VectorType       &dst,
+ const VectorType &src) const
+{
+  GrowingVectorMemory<VectorType> mem;
+  typename VectorMemory<VectorType>::Pointer aux = mem;
+  dst = 0;
+  aux->reinit(dst);
+  this->do_step(dst, *aux, src, true);
+}
+
+
 //----------------------------------------------------------------------//
 
 template <typename MatrixType, typename InverseNumberType, typename VectorType>
@@ -315,6 +341,26 @@ void RelaxationBlockSOR<MatrixType, InverseNumberType, VectorType>::Tstep
 (VectorType       &dst,
  const VectorType &src) const
 {
+  this->do_step(dst, dst, src, true);
+}
+
+
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockSOR<MatrixType, InverseNumberType, VectorType>::vmult
+(VectorType &dst,
+ const VectorType &src) const
+{
+  dst = 0;
+  this->do_step(dst, dst, src, false);
+}
+
+
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockSOR<MatrixType, InverseNumberType, VectorType>::Tvmult
+(VectorType       &dst,
+ const VectorType &src) const
+{
+  dst = 0;
   this->do_step(dst, dst, src, true);
 }
 
@@ -336,6 +382,28 @@ void RelaxationBlockSSOR<MatrixType, InverseNumberType, VectorType>::Tstep
 (VectorType       &dst,
  const VectorType &src) const
 {
+  this->do_step(dst, dst, src, true);
+  this->do_step(dst, dst, src, false);
+}
+
+
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockSSOR<MatrixType, InverseNumberType, VectorType>::vmult
+(VectorType       &dst,
+ const VectorType &src) const
+{
+  dst = 0;
+  this->do_step(dst, dst, src, false);
+  this->do_step(dst, dst, src, true);
+}
+
+
+template <typename MatrixType, typename InverseNumberType, typename VectorType>
+void RelaxationBlockSSOR<MatrixType, InverseNumberType, VectorType>::Tvmult
+(VectorType       &dst,
+ const VectorType &src) const
+{
+  dst = 0;
   this->do_step(dst, dst, src, true);
   this->do_step(dst, dst, src, false);
 }
