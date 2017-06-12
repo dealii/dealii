@@ -673,35 +673,6 @@ public:
              const Vector<Number> &V);
 
   /**
-   * Scaling and multiple addition.
-   *
-   * This function is deprecated.
-   *
-   * @dealiiOperationIsMultithreaded
-   */
-  void sadd (const Number          s,
-             const Number          a,
-             const Vector<Number> &V,
-             const Number          b,
-             const Vector<Number> &W) DEAL_II_DEPRECATED;
-
-  /**
-   * Scaling and multiple addition.  <tt>*this = s*(*this)+a*V + b*W +
-   * c*X</tt>.
-   *
-   * This function is deprecated.
-   *
-   * @dealiiOperationIsMultithreaded
-   */
-  void sadd (const Number          s,
-             const Number          a,
-             const Vector<Number> &V,
-             const Number          b,
-             const Vector<Number> &W,
-             const Number          c,
-             const Vector<Number> &X) DEAL_II_DEPRECATED;
-
-  /**
    * Scale each element of the vector by a constant value.
    *
    * @dealiiOperationIsMultithreaded
@@ -744,27 +715,6 @@ public:
    */
   template <typename Number2>
   void equ (const Number a, const Vector<Number2> &u);
-
-  /**
-   * Assignment <tt>*this = a*u + b*v</tt>.
-   *
-   * This function is deprecated.
-   *
-   * @dealiiOperationIsMultithreaded
-   */
-  void equ (const Number a, const Vector<Number> &u,
-            const Number b, const Vector<Number> &v) DEAL_II_DEPRECATED;
-
-  /**
-   * Assignment <tt>*this = a*u + b*v + b*w</tt>.
-   *
-   * This function is deprecated.
-   *
-   * @dealiiOperationIsMultithreaded
-   */
-  void equ (const Number a, const Vector<Number> &u,
-            const Number b, const Vector<Number> &v,
-            const Number c, const Vector<Number> &w) DEAL_II_DEPRECATED;
 
   /**
    * Compute the elementwise ratio of the two given vectors, that is let

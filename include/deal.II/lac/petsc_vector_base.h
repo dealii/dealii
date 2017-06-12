@@ -594,31 +594,6 @@ namespace PETScWrappers
                const VectorBase     &V);
 
     /**
-     * Scaling and multiple addition.
-     *
-     * This function is deprecated.
-     */
-    void sadd (const PetscScalar s,
-               const PetscScalar a,
-               const VectorBase     &V,
-               const PetscScalar b,
-               const VectorBase     &W) DEAL_II_DEPRECATED;
-
-    /**
-     * Scaling and multiple addition. <tt>*this = s*(*this)+a*V + b*W +
-     * c*X</tt>.
-     *
-     * This function is deprecated.
-     */
-    void sadd (const PetscScalar s,
-               const PetscScalar a,
-               const VectorBase     &V,
-               const PetscScalar b,
-               const VectorBase     &W,
-               const PetscScalar c,
-               const VectorBase     &X) DEAL_II_DEPRECATED;
-
-    /**
      * Scale each element of this vector by the corresponding element in the
      * argument. This function is mostly meant to simulate multiplication (and
      * immediate re-assignment) by a diagonal scaling matrix.
@@ -629,14 +604,6 @@ namespace PETScWrappers
      * Assignment <tt>*this = a*V</tt>.
      */
     void equ (const PetscScalar a, const VectorBase &V);
-
-    /**
-     * Assignment <tt>*this = a*V + b*W</tt>.
-     *
-     * This function is deprecated.
-     */
-    void equ (const PetscScalar a, const VectorBase &V,
-              const PetscScalar b, const VectorBase &W) DEAL_II_DEPRECATED;
 
     /**
      * Compute the elementwise ratio of the two given vectors, that is let

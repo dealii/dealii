@@ -679,37 +679,6 @@ void Vector<Number>::sadd (const Number x,
 
 
 template <typename Number>
-void Vector<Number>::sadd (const Number x, const Number a,
-                           const Vector<Number> &v, const Number b,
-                           const Vector<Number> &w)
-{
-  AssertIsFinite(x);
-  AssertIsFinite(a);
-  AssertIsFinite(b);
-
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-  Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
-
-  internal::VectorOperations::Vectorization_sadd_xavbw<Number> vector_sadd(val, v.val, w.val, x,
-      a, b);
-  internal::VectorOperations::parallel_for(vector_sadd,0,vec_size,thread_loop_partitioner);
-}
-
-
-template <typename Number>
-void Vector<Number>::sadd (const Number x, const Number a,
-                           const Vector<Number> &v, const Number b,
-                           const Vector<Number> &w, const Number c,
-                           const Vector<Number> &y)
-{
-  sadd (x, a, v, b, w);
-  add (c, y);
-}
-
-
-
-template <typename Number>
 void Vector<Number>::scale (const Vector<Number> &s)
 {
   Assert (vec_size!=0, ExcEmptyObject());
@@ -769,38 +738,6 @@ void Vector<Number>::equ (const Number a,
     val[i] = a * Number(u.val[i]);
 }
 
-
-
-template <typename Number>
-void Vector<Number>::equ (const Number a, const Vector<Number> &u,
-                          const Number b, const Vector<Number> &v)
-{
-  AssertIsFinite(a);
-  AssertIsFinite(b);
-
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-
-  internal::VectorOperations::Vectorization_equ_aubv<Number> vector_equ(val, u.val, v.val, a, b);
-  internal::VectorOperations::parallel_for(vector_equ,0,vec_size,thread_loop_partitioner);
-}
-
-
-template <typename Number>
-void Vector<Number>::equ (const Number a, const Vector<Number> &u,
-                          const Number b, const Vector<Number> &v,
-                          const Number c, const Vector<Number> &w)
-{
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-  Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
-
-  internal::VectorOperations::Vectorization_equ_aubvcw<Number> vector_equ(val, u.val, v.val, w.val,
-      a, b, c);
-  internal::VectorOperations::parallel_for(vector_equ,0,vec_size,thread_loop_partitioner);
-}
 
 
 template <typename Number>
