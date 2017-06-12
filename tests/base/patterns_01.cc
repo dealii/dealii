@@ -34,12 +34,10 @@ int main()
   // description and verify that the
   // result is the same as what we
   // started out with
-  Patterns::Integer *pattern2 = Patterns::Integer::create (desc);
+  std::unique_ptr<Patterns::Integer> pattern2 = Patterns::Integer::create (desc);
 
   AssertThrow (pattern2 != nullptr, ExcInternalError());
   AssertThrow (desc == pattern2->description(), ExcInternalError());
 
   deallog << desc << std::endl;
-
-  delete pattern2;
 }

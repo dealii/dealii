@@ -1,0 +1,5 @@
+Fixed: Patterns derived from PatternBase now return 
+std::unique_ptr<PatternBase> in their clone() and 
+create() functions.
+<br>
+(Luca Heltai, 2017/06/12)
