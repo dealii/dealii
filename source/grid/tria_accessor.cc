@@ -1349,7 +1349,7 @@ TriaAccessor<structdim, dim, spacedim>
   // b = vertex * Kb
   Tensor<1,spacedim> b = point;
   for (unsigned int v=0; v<GeometryInfo<structdim>::vertices_per_cell; ++v)
-    b -= this->vertex(v) * TransformR2UAffine<structdim>::Kb[v];
+    b -= vertices[v] * TransformR2UAffine<structdim>::Kb[v];
 
   DerivativeForm<1,spacedim,structdim> A_inv = A.covariant_form().transpose();
   return Point<structdim>(apply_transformation(A_inv, b));
