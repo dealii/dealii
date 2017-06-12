@@ -2804,6 +2804,70 @@ GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p,
 }
 
 
+
+template <>
+inline
+unsigned int
+GeometryInfo<1>::line_to_cell_vertices (const unsigned int line,
+                                        const unsigned int vertex)
+{
+  (void)line;
+  Assert (line<lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
+  Assert (vertex<2, ExcIndexRange(vertex, 0, 2));
+
+  return vertex;
+}
+
+
+template <>
+inline
+unsigned int
+GeometryInfo<2>::line_to_cell_vertices (const unsigned int line,
+                                        const unsigned int vertex)
+{
+  static const unsigned int cell_vertices[4][2] = {{0,2},{1,3},{0,1},{2,3}};
+  return cell_vertices[line][vertex];
+}
+
+
+
+template <>
+inline
+unsigned int
+GeometryInfo<3>::line_to_cell_vertices (const unsigned int line,
+                                        const unsigned int vertex)
+{
+  Assert (line<lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
+  Assert (vertex<2, ExcIndexRange(vertex, 0, 2));
+
+  static const unsigned
+  vertices[lines_per_cell][2] = {{0, 2},  // bottom face
+    {1, 3},
+    {0, 1},
+    {2, 3},
+    {4, 6},  // top face
+    {5, 7},
+    {4, 5},
+    {6, 7},
+    {0, 4},  // connects of bottom
+    {1, 5},  //   top face
+    {2, 6},
+    {3, 7}
+  };
+  return vertices[line][vertex];
+}
+
+
+template <>
+inline
+unsigned int
+GeometryInfo<4>::line_to_cell_vertices (const unsigned int,
+                                        const unsigned int)
+{
+  Assert(false, ExcNotImplemented());
+  return numbers::invalid_unsigned_int;
+}
+
 #endif // DOXYGEN
 DEAL_II_NAMESPACE_CLOSE
 

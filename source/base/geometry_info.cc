@@ -1106,16 +1106,16 @@ GeometryInfo<2>::child_cell_on_face (const RefinementCase<2> &ref_case,
   subcells[2][RefinementCase<2>::isotropic_refinement][faces_per_cell][max_children_per_face] =
   {
     {
-      // Normal orientation (face_filp = false)
+      // Normal orientation (face_flip = false)
       {{0,0},{1,1},{0,1},{0,1}},          // cut_x
       {{0,1},{0,1},{0,0},{1,1}},          // cut_y
-      {{0,2},{1,3},{0,1},{2,3}}           // cut_z
+      {{0,2},{1,3},{0,1},{2,3}}           // cut_xy, i.e., isotropic
     },
     {
       // Flipped orientation (face_flip = true)
       {{0,0},{1,1},{1,0},{1,0}},          // cut_x
       {{1,0},{1,0},{0,0},{1,1}},          // cut_y
-      {{2,0},{3,1},{1,0},{3,2}}           // cut_z
+      {{2,0},{3,1},{1,0},{3,2}}           // cut_xy, i.e., isotropic
     }
   };
 
@@ -1408,65 +1408,6 @@ GeometryInfo<4>::child_cell_on_face (const RefinementCase<4> &,
   return invalid_unsigned_int;
 }
 
-
-
-template <>
-unsigned int
-GeometryInfo<1>::line_to_cell_vertices (const unsigned int line,
-                                        const unsigned int vertex)
-{
-  (void)line;
-  Assert (line<lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
-  Assert (vertex<2, ExcIndexRange(vertex, 0, 2));
-
-  return vertex;
-}
-
-
-template <>
-unsigned int
-GeometryInfo<2>::line_to_cell_vertices (const unsigned int line,
-                                        const unsigned int vertex)
-{
-  return child_cell_on_face(RefinementCase<2>::isotropic_refinement, line, vertex);
-}
-
-
-
-template <>
-unsigned int
-GeometryInfo<3>::line_to_cell_vertices (const unsigned int line,
-                                        const unsigned int vertex)
-{
-  Assert (line<lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
-  Assert (vertex<2, ExcIndexRange(vertex, 0, 2));
-
-  static const unsigned
-  vertices[lines_per_cell][2] = {{0, 2},  // bottom face
-    {1, 3},
-    {0, 1},
-    {2, 3},
-    {4, 6},  // top face
-    {5, 7},
-    {4, 5},
-    {6, 7},
-    {0, 4},  // connects of bottom
-    {1, 5},  //   top face
-    {2, 6},
-    {3, 7}
-  };
-  return vertices[line][vertex];
-}
-
-
-template <>
-unsigned int
-GeometryInfo<4>::line_to_cell_vertices (const unsigned int,
-                                        const unsigned int)
-{
-  Assert(false, ExcNotImplemented());
-  return invalid_unsigned_int;
-}
 
 
 template <>
