@@ -116,7 +116,7 @@ public:
    * transformation F. That is to say if $DF$ is square, it computes
    * $\det(DF)$, in case DF is not square returns $\sqrt{\det(DF^T * DF)}$.
    */
-  double determinant () const;
+  Number determinant () const;
 
   /**
    * Assuming that the current object stores the Jacobian of a mapping
@@ -325,8 +325,7 @@ DerivativeForm<order,dim,spacedim,Number>::norm () const
 
 template <int order, int dim, int spacedim, typename Number>
 inline
-double
-DerivativeForm<order,dim,spacedim,Number>::determinant () const
+Number DerivativeForm<order, dim, spacedim, Number>::determinant() const
 {
   Assert( order==1, ExcMessage("Only for order == 1."));
   if (dim == spacedim)
@@ -337,7 +336,7 @@ DerivativeForm<order,dim,spacedim,Number>::determinant () const
   else
     {
       Assert( spacedim>dim, ExcMessage("Only for spacedim>dim."));
-      const DerivativeForm<1,spacedim,dim> DF_t = this->transpose();
+      const DerivativeForm<1,spacedim,dim,Number> DF_t = this->transpose();
       Tensor<2,dim,Number> G; //First fundamental form
       for (unsigned int i=0; i<dim; ++i)
         for (unsigned int j=0; j<dim; ++j)
