@@ -536,6 +536,7 @@ namespace internal
        * Implementation of the function of some name in the mother class.
        */
       template <int dim, int spacedim>
+      inline
       static
       unsigned int
       line_index (const TriaAccessor<1, dim, spacedim> &,
@@ -550,6 +551,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       unsigned int
       line_index (const TriaAccessor<2, dim, spacedim> &accessor,
@@ -560,6 +562,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       unsigned int
       line_index (const TriaAccessor<3, dim, spacedim> &accessor,
@@ -612,6 +615,7 @@ namespace internal
        * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
+      inline
       static
       unsigned int
       quad_index (const TriaAccessor<structdim, dim, spacedim> &,
@@ -626,6 +630,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       unsigned int
       quad_index (const TriaAccessor<3, dim, spacedim> &accessor,
@@ -643,6 +648,7 @@ namespace internal
        * Implementation of the function of some name in the mother class
        */
       template <int structdim, int dim, int spacedim>
+      inline
       static
       bool
       face_orientation (const TriaAccessor<structdim, dim, spacedim> &,
@@ -659,6 +665,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       bool
       face_orientation (const TriaAccessor<3, dim, spacedim> &accessor,
@@ -674,6 +681,7 @@ namespace internal
        * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
+      inline
       static
       bool
       face_flip (const TriaAccessor<structdim, dim, spacedim> &,
@@ -696,6 +704,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       bool
       face_flip (const TriaAccessor<3, dim, spacedim> &accessor,
@@ -720,6 +729,7 @@ namespace internal
        * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
+      inline
       static
       bool
       face_rotation (const TriaAccessor<structdim, dim, spacedim> &,
@@ -736,6 +746,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       bool
       face_rotation (const TriaAccessor<3, dim, spacedim> &accessor,
@@ -758,6 +769,7 @@ namespace internal
        * Implementation of the function of some name in the mother class.
        */
       template <int dim, int spacedim>
+      inline
       static
       bool
       line_orientation (const TriaAccessor<1, dim, spacedim> &,
@@ -768,6 +780,7 @@ namespace internal
 
 
       template <int spacedim>
+      inline
       static
       bool
       line_orientation (const TriaAccessor<2, 2, spacedim> &,
@@ -779,6 +792,7 @@ namespace internal
 
 
       template <int spacedim>
+      inline
       static
       bool
       line_orientation (const TriaAccessor<2, 3, spacedim> &accessor,
@@ -792,6 +806,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       bool
       line_orientation (const TriaAccessor<3, dim, spacedim> &accessor,
@@ -893,6 +908,7 @@ namespace internal
        * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
+      inline
       static
       void
       set_face_orientation (const TriaAccessor<structdim, dim, spacedim> &,
@@ -904,6 +920,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       void
       set_face_orientation (const TriaAccessor<3, dim, spacedim> &accessor,
@@ -930,6 +947,7 @@ namespace internal
        * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
+      inline
       static
       void
       set_face_flip (const TriaAccessor<structdim, dim, spacedim> &,
@@ -941,6 +959,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       void
       set_face_flip (const TriaAccessor<3, dim, spacedim> &accessor,
@@ -966,6 +985,7 @@ namespace internal
        * Implementation of the function of some name in the mother class.
        */
       template <int structdim, int dim, int spacedim>
+      inline
       static
       void
       set_face_rotation (const TriaAccessor<structdim, dim, spacedim> &,
@@ -977,6 +997,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       void
       set_face_rotation (const TriaAccessor<3, dim, spacedim> &accessor,
@@ -1000,6 +1021,7 @@ namespace internal
        * Implementation of the function of some name in the mother class.
        */
       template <int dim, int spacedim>
+      inline
       static
       void
       set_line_orientation (const TriaAccessor<1, dim, spacedim> &,
@@ -1011,6 +1033,7 @@ namespace internal
 
 
       template <int spacedim>
+      inline
       static
       void
       set_line_orientation (const TriaAccessor<2, 2, spacedim> &,
@@ -1024,6 +1047,7 @@ namespace internal
 
 
       template <int spacedim>
+      inline
       static
       void
       set_line_orientation (const TriaAccessor<2, 3, spacedim> &accessor,
@@ -1047,6 +1071,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       void
       set_line_orientation (const TriaAccessor<3, dim, spacedim> &,
@@ -1063,6 +1088,7 @@ namespace internal
        * Implementation of the function of same name in the enclosing class.
        */
       template <int dim, int spacedim>
+      inline
       static
       unsigned int
       vertex_index (const TriaAccessor<1,dim,spacedim> &accessor,
@@ -1073,6 +1099,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       unsigned int
       vertex_index (const TriaAccessor<2,dim,spacedim> &accessor,
@@ -1096,6 +1123,7 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      inline
       static
       unsigned int
       vertex_index (const TriaAccessor<3,dim,spacedim> &accessor,
@@ -1162,6 +1190,7 @@ TriaAccessor<structdim,dim,spacedim>::vertex_iterator (const unsigned int i) con
 
 
 template <int structdim, int dim, int spacedim>
+inline
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::
 vertex_index (const unsigned int corner) const
@@ -1175,6 +1204,7 @@ vertex_index (const unsigned int corner) const
 
 
 template <int structdim, int dim, int spacedim>
+inline
 Point<spacedim> &
 TriaAccessor<structdim, dim, spacedim>::vertex (const unsigned int i) const
 {
