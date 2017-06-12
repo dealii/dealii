@@ -74,9 +74,9 @@ namespace Patterns
 
 
 
-  PatternBase *pattern_factory (const std::string &description)
+  std::unique_ptr<PatternBase> pattern_factory(const std::string &description)
   {
-    PatternBase *p;
+    std::unique_ptr<PatternBase> p;
 
     p = Integer::create(description);
     if (p != nullptr)
@@ -116,7 +116,7 @@ namespace Patterns
 
     Assert(false, ExcNotImplemented());
 
-    return nullptr;
+    return p;
   }
 
 
@@ -241,15 +241,14 @@ namespace Patterns
 
 
 
-  PatternBase *
-  Integer::clone () const
+  std::unique_ptr<PatternBase> Integer::clone() const
   {
-    return new Integer(lower_bound, upper_bound);
+    return std::unique_ptr<PatternBase>(new Integer(lower_bound, upper_bound));
   }
 
 
 
-  Integer *Integer::create (const std::string &description)
+  std::unique_ptr<Integer> Integer::create(const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -263,20 +262,20 @@ namespace Patterns
             is.ignore(strlen(description_init) + strlen(" range "));
 
             if (!(is >> lower_bound))
-              return new Integer();
+              return std::unique_ptr<Integer>(new Integer());
 
             is.ignore(strlen("..."));
 
             if (!(is >> upper_bound))
-              return new Integer();
+              return std::unique_ptr<Integer>(new Integer());
 
-            return new Integer(lower_bound, upper_bound);
+            return std::unique_ptr<Integer>(new Integer(lower_bound, upper_bound));
           }
         else
-          return new Integer();
+          return std::unique_ptr<Integer>(new Integer());
       }
     else
-      return nullptr;
+      return std::unique_ptr<Integer>();
   }
 
 
@@ -404,25 +403,24 @@ namespace Patterns
   }
 
 
-  PatternBase *
-  Double::clone () const
+  std::unique_ptr<PatternBase> Double::clone() const
   {
-    return new Double(lower_bound, upper_bound);
+    return std::unique_ptr<PatternBase>(new Double(lower_bound, upper_bound));
   }
 
 
 
-  Double *Double::create (const std::string &description)
+  std::unique_ptr<Double> Double::create (const std::string &description)
   {
     const std::string description_init_str = description_init;
     if (description.compare(0, description_init_str.size(), description_init_str) != 0)
-      return nullptr;
+      return std::unique_ptr<Double>();
     if (*description.rbegin() != ']')
-      return nullptr;
+      return std::unique_ptr<Double>();
 
     std::string temp = description.substr(description_init_str.size());
     if (temp == "]")
-      return new Double(1.0, -1.0); // return an invalid range
+      return std::unique_ptr<Double>(new Double(1.0, -1.0)); // return an invalid range
 
     if (temp.find("...") != std::string::npos)
       temp.replace(temp.find("..."), 3, " ");
@@ -437,7 +435,7 @@ namespace Patterns
       {
         // parse lower bound and give up if not a double
         if (!(is >> lower_bound))
-          return nullptr;
+          return std::unique_ptr<Double>();
       }
 
     // ignore failure here and assume we got MAX_DOUBLE as upper bound:
@@ -445,7 +443,7 @@ namespace Patterns
     if (is.fail())
       upper_bound = max_double_value;
 
-    return new Double(lower_bound, upper_bound);
+    return std::unique_ptr<Double>(new Double(lower_bound, upper_bound));
   }
 
 
@@ -530,10 +528,9 @@ namespace Patterns
 
 
 
-  PatternBase *
-  Selection::clone () const
+  std::unique_ptr<PatternBase> Selection::clone() const
   {
-    return new Selection(sequence);
+    return std::unique_ptr<PatternBase>(new Selection(sequence));
   }
 
 
@@ -546,7 +543,7 @@ namespace Patterns
 
 
 
-  Selection *Selection::create (const std::string &description)
+  std::unique_ptr<Selection> Selection::create(const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -555,10 +552,10 @@ namespace Patterns
         sequence.erase(0, std::strlen(description_init) + 1);
         sequence.erase(sequence.length()-2, 2);
 
-        return new Selection(sequence);
+        return std::unique_ptr<Selection>(new Selection(sequence));
       }
     else
-      return nullptr;
+      return std::unique_ptr<Selection>();
   }
 
 
@@ -686,10 +683,9 @@ namespace Patterns
 
 
 
-  PatternBase *
-  List::clone () const
+  std::unique_ptr<PatternBase> List::clone() const
   {
-    return new List(*pattern, min_elements, max_elements, separator);
+    return std::unique_ptr<PatternBase>(new List(*pattern, min_elements, max_elements, separator));
   }
 
 
@@ -703,7 +699,7 @@ namespace Patterns
 
 
 
-  List *List::create (const std::string &description)
+  std::unique_ptr<List> List::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -719,11 +715,11 @@ namespace Patterns
 
         is.ignore(strlen(" of length "));
         if (!(is >> min_elements))
-          return new List(*base_pattern);
+          return std::unique_ptr<List>(new List(*base_pattern));
 
         is.ignore(strlen("..."));
         if (!(is >> max_elements))
-          return new List(*base_pattern, min_elements);
+          return std::unique_ptr<List>(new List(*base_pattern, min_elements));
 
         is.ignore(strlen(" separated by <"));
         std::string separator;
@@ -732,10 +728,10 @@ namespace Patterns
         else
           separator = ",";
 
-        return new List(*base_pattern, min_elements, max_elements, separator);
+        return std::unique_ptr<List>(new List(*base_pattern, min_elements, max_elements, separator));
       }
     else
-      return nullptr;
+      return std::unique_ptr<List>();
   }
 
 
@@ -895,12 +891,11 @@ namespace Patterns
 
 
 
-  PatternBase *
-  Map::clone () const
+  std::unique_ptr<PatternBase> Map::clone() const
   {
-    return new Map(*key_pattern, *value_pattern,
-                   min_elements, max_elements,
-                   separator);
+    return std::unique_ptr<PatternBase>(new Map(*key_pattern, *value_pattern,
+                                                min_elements, max_elements,
+                                                separator));
   }
 
 
@@ -915,7 +910,7 @@ namespace Patterns
 
 
 
-  Map *Map::create (const std::string &description)
+  std::unique_ptr<Map> Map::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -939,11 +934,11 @@ namespace Patterns
 
         is.ignore(strlen(" of length "));
         if (!(is >> min_elements))
-          return new Map(*key_pattern, *value_pattern);
+          return std::unique_ptr<Map>(new Map(*key_pattern, *value_pattern));
 
         is.ignore(strlen("..."));
         if (!(is >> max_elements))
-          return new Map(*key_pattern, *value_pattern, min_elements);
+          return std::unique_ptr<Map>(new Map(*key_pattern, *value_pattern, min_elements));
 
         is.ignore(strlen(" separated by <"));
         std::string separator;
@@ -952,12 +947,12 @@ namespace Patterns
         else
           separator = ",";
 
-        return new Map(*key_pattern, *value_pattern,
-                       min_elements, max_elements,
-                       separator);
+        return std::unique_ptr<Map>(new Map(*key_pattern, *value_pattern,
+                                            min_elements, max_elements,
+                                            separator));
       }
     else
-      return nullptr;
+      return std::unique_ptr<Map>();
   }
 
 
@@ -1077,10 +1072,9 @@ namespace Patterns
 
 
 
-  PatternBase *
-  MultipleSelection::clone () const
+  std::unique_ptr<PatternBase> MultipleSelection::clone() const
   {
-    return new MultipleSelection(sequence);
+    return std::unique_ptr<PatternBase>(new MultipleSelection(sequence));
   }
 
 
@@ -1093,7 +1087,7 @@ namespace Patterns
 
 
 
-  MultipleSelection *MultipleSelection::create (const std::string &description)
+  std::unique_ptr<MultipleSelection> MultipleSelection::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -1102,10 +1096,10 @@ namespace Patterns
         sequence.erase(0, std::strlen(description_init) + 1);
         sequence.erase(sequence.length()-2, 2);
 
-        return new MultipleSelection(sequence);
+        return std::unique_ptr<MultipleSelection>(new MultipleSelection(sequence));
       }
     else
-      return nullptr;
+      return std::unique_ptr<MultipleSelection>();
   }
 
 
@@ -1148,20 +1142,19 @@ namespace Patterns
 
 
 
-  PatternBase *
-  Bool::clone () const
+  std::unique_ptr<PatternBase> Bool::clone() const
   {
-    return new Bool();
+    return std::unique_ptr<PatternBase>(new Bool());
   }
 
 
 
-  Bool *Bool::create (const std::string &description)
+  std::unique_ptr<Bool> Bool::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
-      return new Bool();
+      return std::unique_ptr<Bool>(new Bool());
     else
-      return nullptr;
+      return std::unique_ptr<Bool>();
   }
 
 
@@ -1209,20 +1202,19 @@ namespace Patterns
 
 
 
-  PatternBase *
-  Anything::clone () const
+  std::unique_ptr<PatternBase> Anything::clone() const
   {
-    return new Anything();
+    return std::unique_ptr<PatternBase>(new Anything());
   }
 
 
 
-  Anything *Anything::create (const std::string &description)
+  std::unique_ptr<Anything> Anything::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
-      return new Anything();
+      return std::unique_ptr<Anything>(new Anything());
     else
-      return nullptr;
+      return std::unique_ptr<Anything>();
   }
 
 
@@ -1278,15 +1270,14 @@ namespace Patterns
 
 
 
-  PatternBase *
-  FileName::clone () const
+  std::unique_ptr<PatternBase> FileName::clone() const
   {
-    return new FileName(file_type);
+    return std::unique_ptr<PatternBase>(new FileName(file_type));
   }
 
 
 
-  FileName *FileName::create (const std::string &description)
+  std::unique_ptr<FileName> FileName::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
       {
@@ -1303,10 +1294,10 @@ namespace Patterns
         else
           type = output;
 
-        return new FileName(type);
+        return std::unique_ptr<FileName>(new FileName(type));
       }
     else
-      return nullptr;
+      return std::unique_ptr<FileName>();
   }
 
 
@@ -1353,20 +1344,19 @@ namespace Patterns
 
 
 
-  PatternBase *
-  DirectoryName::clone () const
+  std::unique_ptr<PatternBase> DirectoryName::clone() const
   {
-    return new DirectoryName();
+    return std::unique_ptr<PatternBase>(new DirectoryName());
   }
 
 
 
-  DirectoryName *DirectoryName::create (const std::string &description)
+  std::unique_ptr<DirectoryName> DirectoryName::create (const std::string &description)
   {
     if (description.compare(0, std::strlen(description_init), description_init) == 0)
-      return new DirectoryName();
+      return std::unique_ptr<DirectoryName>(new DirectoryName());
     else
-      return nullptr;
+      return std::unique_ptr<DirectoryName>();
   }
 
 }   // end namespace Patterns

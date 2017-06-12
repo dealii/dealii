@@ -107,7 +107,7 @@ namespace Patterns
      * Ownership of the objects returned by this function is passed to the
      * caller of this function.
      */
-    virtual PatternBase *clone () const = 0;
+    virtual std::unique_ptr<PatternBase> clone () const = 0;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -130,7 +130,7 @@ namespace Patterns
   /**
    * Return pointer to the correct derived class based on description.
    */
-  PatternBase *pattern_factory (const std::string &description);
+  std::unique_ptr<PatternBase> pattern_factory (const std::string &description);
 
   /**
    * Test for the string being an integer. If bounds are given to the
@@ -193,14 +193,14 @@ namespace Patterns
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual PatternBase *clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
      * Creates new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static Integer *create (const std::string &description);
+    static std::unique_ptr<Integer> create (const std::string &description);
 
   private:
     /**
@@ -285,7 +285,7 @@ namespace Patterns
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual PatternBase *clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
      * Creates a new object on the heap using @p new if the given
@@ -294,7 +294,7 @@ namespace Patterns
      * of the returned object is transferred to the caller of this function,
      * which should be freed using @p delete.
      */
-    static Double *create (const std::string &description);
+    static std::unique_ptr<Double> create(const std::string &description);
 
   private:
     /**
@@ -355,7 +355,7 @@ namespace Patterns
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual PatternBase *clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -368,7 +368,7 @@ namespace Patterns
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static Selection *create (const std::string &description);
+    static std::unique_ptr<Selection> create (const std::string &description);
 
   private:
     /**
@@ -436,14 +436,14 @@ namespace Patterns
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual PatternBase *clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
      * Creates new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static List *create (const std::string &description);
+    static std::unique_ptr<List> create (const std::string &description);
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -551,14 +551,14 @@ namespace Patterns
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual PatternBase *clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
      * Creates new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static Map *create (const std::string &description);
+    static std::unique_ptr<Map> create (const std::string &description);
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -645,14 +645,14 @@ namespace Patterns
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual PatternBase *clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
      * Creates new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static MultipleSelection *create (const std::string &description);
+    static std::unique_ptr<MultipleSelection> create (const std::string &description);
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -709,14 +709,14 @@ namespace Patterns
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual PatternBase *clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
      * Creates new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static Bool *create (const std::string &description);
+    static std::unique_ptr<Bool> create(const std::string &description);
 
   private:
     /**
@@ -754,14 +754,14 @@ namespace Patterns
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual PatternBase *clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
      * Creates new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static Anything *create (const std::string &description);
+    static std::unique_ptr<Anything> create(const std::string &description);
 
   private:
     /**
@@ -827,7 +827,7 @@ namespace Patterns
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual PatternBase *clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
      * file type flag
@@ -839,7 +839,7 @@ namespace Patterns
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static FileName *create (const std::string &description);
+    static std::unique_ptr<FileName> create (const std::string &description);
 
   private:
     /**
@@ -886,14 +886,14 @@ namespace Patterns
      * heap. Ownership of that object is transferred to the caller of this
      * function.
      */
-    virtual PatternBase *clone () const;
+    virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
      * Creates new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
-    static DirectoryName *create (const std::string &description);
+    static std::unique_ptr<DirectoryName> create(const std::string &description);
 
   private:
     /**
