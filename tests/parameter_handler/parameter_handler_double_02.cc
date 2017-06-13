@@ -26,14 +26,13 @@
 void test(const std::string &desc)
 {
   deallog << desc << " -> ";
-  Patterns::Double *c = Patterns::Double::create(desc);
+  std::unique_ptr<dealii::Patterns::Double> c = Patterns::Double::create(desc);
   if (!c)
     {
       deallog << "NULL" << std::endl;
       return;
     }
   deallog << c->description() << std::endl;
-  delete c;
 }
 
 
