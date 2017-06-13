@@ -1454,6 +1454,14 @@ public:
               const bool  diagonal_first = true) const;
 
   /**
+   * Print the matrix to the given stream in the "Matrix Market" format.
+   * Each entry with an absolute value less than threshold is ignored.
+   */
+  template <class StreamType>
+  void print_matrix_market(StreamType &out,
+                           const double threshold = 0.0) const;
+
+  /**
    * Print the matrix in the usual format, i.e. as a matrix and not as a list
    * of nonzero elements. For better readability, elements not in the matrix
    * are displayed as empty space, while matrix elements which are explicitly
@@ -2354,8 +2362,6 @@ SparseMatrix<number>::end (const size_type r)
 
   return iterator(this, cols->rowstart[r+1]);
 }
-
-
 
 template <typename number>
 template <class StreamType>

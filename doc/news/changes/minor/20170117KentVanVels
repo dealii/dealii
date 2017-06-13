@@ -1,0 +1,5 @@
+New: There is now a sparse_matrix member function that allows one to output
+matrices in the Matrix Market format.  This format is an NIST defined standard
+and is suitable for importing into other libraries and programs.
+<br>
+(Kent Van Vels 2017/01/17)
