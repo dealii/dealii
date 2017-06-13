@@ -272,7 +272,7 @@ namespace MeshWorker
      * The memory used by this object.
      */
     std::size_t memory_consumption () const;
-  protected:
+  //protected:
     AnyData data;
   };
 

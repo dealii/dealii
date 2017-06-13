@@ -341,7 +341,7 @@ public:
   typedef MatrixBlock<MatrixType> value_type;
 
   /**
-   * The pointer type used for storing the objects. We use a shard pointer,
+   * The pointer type used for storing the objects. We use a shared pointer,
    * such that they get deleted automatically when not used anymore.
    */
   typedef std_cxx11::shared_ptr<value_type> ptr_type;
@@ -423,6 +423,13 @@ public:
    * The type of object stored.
    */
   typedef MGLevelObject<MatrixBlock<MatrixType> > value_type;
+
+  /**
+   * The pointer type used for storing the objects. We use a shard pointer,
+   * such that they get deleted automatically when not used anymore.
+   */
+  typedef std_cxx11::shared_ptr<value_type> ptr_type;
+
   /**
    * Constructor, determining which matrices should be stored.
    *
@@ -485,12 +492,12 @@ public:
   /**
    * Access a constant reference to the matrix block at position <i>i</i>.
    */
-  const value_type &block(size_type i) const;
+  const value_type & block(size_type i) const;
 
   /**
    * Access a reference to the matrix block at position <i>i</i>.
    */
-  value_type &block(size_type i);
+  value_type & block(size_type i);
 
   /**
    * Access a constant reference to the edge matrix block at position
@@ -838,7 +845,6 @@ MatrixBlockVector<MatrixType>::reinit (const BlockSparsityPattern &sparsity)
     }
 }
 
-
 template <typename MatrixType>
 inline void
 MatrixBlockVector<MatrixType>::clear (bool really_clean)
@@ -854,8 +860,6 @@ MatrixBlockVector<MatrixType>::clear (bool really_clean)
     }
 }
 
-
-
 template <typename MatrixType>
 inline const MatrixBlock<MatrixType> &
 MatrixBlockVector<MatrixType>::block (size_type i) const
@@ -870,7 +874,6 @@ MatrixBlockVector<MatrixType>::block (size_type i)
 {
   return *this->entry<ptr_type>(i);
 }
-
 
 template <typename MatrixType>
 inline MatrixType &
@@ -900,27 +903,42 @@ MGMatrixBlockVector<MatrixType>::size () const
   return matrices.size();
 }
 
-
 template <typename MatrixType>
 inline void
 MGMatrixBlockVector<MatrixType>::add(
-  size_type row, size_type column,
-  const std::string &name)
+				     size_type row,
+				     size_type column,
+				     const std::string &name)
 {
-  MGLevelObject<MatrixBlock<MatrixType> > p(0, 1);
-  p[0].row = row;
-  p[0].column = column;
+  ptr_type p_mat(new value_type(0,1));
 
-  matrices.add(p, name);
+  p_mat->operator[](0).row = row;
+  p_mat->operator[](0).column = column;
+
+  matrices.add(p_mat, name);
   if (edge_matrices)
     {
-      matrices_in.add(p, name);
-      matrices_out.add(p, name);
+      ptr_type p_in(new value_type(0,1));
+      p_in->operator[](0).row = row;
+      p_in->operator[](0).column = column;
+      matrices_in.add(p_in, name);
+      
+      ptr_type p_out(new value_type(0,1));
+      p_out->operator[](0).row = row;
+      p_out->operator[](0).column = column;      
+      matrices_out.add(p_out, name);
     }
   if (edge_flux_matrices)
     {
-      flux_matrices_up.add(p, name);
-      flux_matrices_down.add(p, name);
+      ptr_type p_up(new value_type(0,1));
+      p_up->operator[](0).row = row;
+      p_up->operator[](0).column = column;
+      flux_matrices_up.add(p_up, name);
+
+      ptr_type p_down(new value_type(0,1));
+      p_down->operator[](0).row = row;
+      p_down->operator[](0).column = column;
+      flux_matrices_down.add(p_down, name);
     }
 }
 
@@ -929,15 +947,16 @@ template <typename MatrixType>
 inline const MGLevelObject<MatrixBlock<MatrixType> > &
 MGMatrixBlockVector<MatrixType>::block(size_type i) const
 {
-  return *matrices.read<const MGLevelObject<MatrixType>* >(i);
+  return *matrices.read<const ptr_type >(i);  
 }
 
 
 template <typename MatrixType>
-inline MGLevelObject<MatrixBlock<MatrixType> > &
+inline
+MGLevelObject<MatrixBlock<MatrixType> > &
 MGMatrixBlockVector<MatrixType>::block(size_type i)
 {
-  return *matrices.entry<MGLevelObject<MatrixType>* >(i);
+  return *matrices.read<ptr_type >(i);  
 }
 
 
@@ -945,7 +964,7 @@ template <typename MatrixType>
 inline const MGLevelObject<MatrixBlock<MatrixType> > &
 MGMatrixBlockVector<MatrixType>::block_in(size_type i) const
 {
-  return *matrices_in.read<const MGLevelObject<MatrixType>* >(i);
+  return *matrices_in.read<const ptr_type >(i);  
 }
 
 
@@ -953,7 +972,7 @@ template <typename MatrixType>
 inline MGLevelObject<MatrixBlock<MatrixType> > &
 MGMatrixBlockVector<MatrixType>::block_in(size_type i)
 {
-  return *matrices_in.entry<MGLevelObject<MatrixType>* >(i);
+  return *matrices_in.entry<ptr_type >(i);
 }
 
 
@@ -961,7 +980,7 @@ template <typename MatrixType>
 inline const MGLevelObject<MatrixBlock<MatrixType> > &
 MGMatrixBlockVector<MatrixType>::block_out(size_type i) const
 {
-  return *matrices_out.read<const MGLevelObject<MatrixType>* >(i);
+  return *matrices_out.read<const ptr_type >(i);
 }
 
 
@@ -969,39 +988,37 @@ template <typename MatrixType>
 inline MGLevelObject<MatrixBlock<MatrixType> > &
 MGMatrixBlockVector<MatrixType>::block_out(size_type i)
 {
-  return *matrices_out.entry<MGLevelObject<MatrixType>* >(i);
+  return *matrices_out.entry<ptr_type >(i);
 }
-
 
 template <typename MatrixType>
 inline const MGLevelObject<MatrixBlock<MatrixType> > &
 MGMatrixBlockVector<MatrixType>::block_up(size_type i) const
 {
-  return *flux_matrices_up.read<const MGLevelObject<MatrixType>* >(i);
+  return *flux_matrices_up.read<const ptr_type >(i);
 }
 
 
 template <typename MatrixType>
-inline MGLevelObject<MatrixBlock<MatrixType> > &
+inline MGLevelObject<MatrixBlock<MatrixType> > & 
 MGMatrixBlockVector<MatrixType>::block_up(size_type i)
 {
-  return *flux_matrices_up.entry<MGLevelObject<MatrixType>* >(i);
+  return *flux_matrices_up.entry<ptr_type >(i);
 }
-
 
 template <typename MatrixType>
 inline const MGLevelObject<MatrixBlock<MatrixType> > &
 MGMatrixBlockVector<MatrixType>::block_down(size_type i) const
 {
-  return *flux_matrices_down.read<const MGLevelObject<MatrixType>* >(i);
+  return *flux_matrices_down.read<const ptr_type >(i);
 }
 
 
 template <typename MatrixType>
-inline MGLevelObject<MatrixBlock<MatrixType> > &
+inline MGLevelObject<MatrixBlock<MatrixType> > & 
 MGMatrixBlockVector<MatrixType>::block_down(size_type i)
 {
-  return *flux_matrices_down.entry<MGLevelObject<MatrixType>* >(i);
+  return *flux_matrices_down.entry<ptr_type >(i);
 }
 
 
@@ -1024,6 +1041,7 @@ MGMatrixBlockVector<MatrixType>::reinit_matrix(const MGLevelObject<BlockSparsity
         }
     }
 }
+
 
 
 template <typename MatrixType>
@@ -1073,18 +1091,16 @@ MGMatrixBlockVector<MatrixType>::reinit_edge_flux
           block_down(i)[level].column = col;
           internal::reinit(block_down(i)[level], sparsity[level]);
         }
-
     }
 }
-
 
 template <typename MatrixType>
 inline void
 MGMatrixBlockVector<MatrixType>::clear_object (AnyData &mo)
 {
   for (size_type i=0; i<mo.size(); ++i)
-    {
-      MGLevelObject<MatrixBlock<MatrixType> > &o = mo.entry<MGLevelObject<MatrixType>* >(i);
+    {      
+      MGLevelObject<MatrixBlock<MatrixType> > &o = *mo.entry<ptr_type >(i);
       for (size_type level = o.min_level(); level <= o.max_level(); ++level)
         o[level].matrix.clear();
     }

@@ -646,12 +646,14 @@ private:
    * The matrix <i>U</i> in the singular value decomposition
    * <i>USV<sup>T</sup></i>.
    */
+ public:
   std_cxx11::shared_ptr<LAPACKFullMatrix<number> > svd_u;
 
   /**
    * The matrix <i>V<sup>T</sup></i> in the singular value decomposition
    * <i>USV<sup>T</sup></i>.
    */
+ public:
   std_cxx11::shared_ptr<LAPACKFullMatrix<number> > svd_vt;
 };
 

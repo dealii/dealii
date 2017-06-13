@@ -549,7 +549,12 @@ namespace MeshWorker
     (const DOFINFO &info)
     {
       for (unsigned int i=0; i<residuals.size(); ++i)
-        assemble(*residuals(i), info.vector(i), info.indices);
+	{
+	  VectorType* res = residuals.template entry<VectorType*>(i);
+	  assemble(*res,
+		   info.vector(i), 
+		   info.indices); 
+	}
     }
 
 
@@ -562,8 +567,15 @@ namespace MeshWorker
     {
       for (unsigned int i=0; i<residuals.size(); ++i)
         {
-          assemble(*residuals(i), info1.vector(i), info1.indices);
-          assemble(*residuals(i), info2.vector(i), info2.indices);
+	  VectorType* res = residuals.template entry<VectorType*>(i);
+	  assemble(*res,
+	  	   info1.vector(i),
+	  	   info1.indices);
+
+	  assemble(*res,
+	  	   info2.vector(i),
+	  	   info2.indices);
+	  
         }
     }
 
@@ -791,7 +803,7 @@ namespace MeshWorker
               // our local matrices
               const unsigned int jcell = this->block_info->local().local_to_global(block_row, j);
               const unsigned int kcell = this->block_info->local().local_to_global(block_col, k);
-
+	      
               // The global dof
               // indices to assemble
               // in. Since we may
@@ -815,7 +827,7 @@ namespace MeshWorker
                   if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
                       !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
                     {
-                      if (mg_constrained_dofs->set_boundary_values())
+                      if (mg_constrained_dofs->have_boundary_indices())
                         {
                           if ((!mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
                                !mg_constrained_dofs->is_boundary_index(level2, kglobal))
@@ -841,6 +853,7 @@ namespace MeshWorker
                 }
             }
     }
+
 
 
     template <typename MatrixType, typename number>
@@ -885,13 +898,13 @@ namespace MeshWorker
                 global.add(jglobal, kglobal, local(j,k));
               else
                 {
-                  if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
-                      !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
-                    {
+                  // if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
+                  //     !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
+                  //   {
                       if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
                           !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
                         global.add(jglobal, kglobal, local(j,k));
-                    }
+		      //}
                 }
             }
     }
@@ -938,13 +951,13 @@ namespace MeshWorker
                 global.add(jglobal, kglobal, local(j,k));
               else
                 {
-                  if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
-                      !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
-                    {
+                  // if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
+                  //     !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
+                  //   {
                       if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
                           !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
                         global.add(jglobal, kglobal, local(j,k));
-                    }
+		      //}
                 }
             }
     }
@@ -991,13 +1004,13 @@ namespace MeshWorker
                 global.add(jglobal, kglobal, local(k,j));
               else
                 {
-                  if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
-                      !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
-                    {
+                  // if (!mg_constrained_dofs->non_refinement_edge_index(level1, jglobal) &&
+                  //     !mg_constrained_dofs->non_refinement_edge_index(level2, kglobal))
+                  //   {
                       if (!mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
                           !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
                         global.add(jglobal, kglobal, local(k,j));
-                    }
+		      //}
                 }
             }
     }
@@ -1050,7 +1063,7 @@ namespace MeshWorker
                   if (mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
                       !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
                     {
-                      if (mg_constrained_dofs->set_boundary_values())
+                      if (mg_constrained_dofs->have_boundary_indices())
                         {
                           if ((!mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
                                !mg_constrained_dofs->is_boundary_index(level2, kglobal))
@@ -1115,7 +1128,7 @@ namespace MeshWorker
                   if (mg_constrained_dofs->at_refinement_edge(level1, jglobal) &&
                       !mg_constrained_dofs->at_refinement_edge(level2, kglobal))
                     {
-                      if (mg_constrained_dofs->set_boundary_values())
+                      if (mg_constrained_dofs->have_boundary_indices())
                         {
                           if ((!mg_constrained_dofs->is_boundary_index(level1, jglobal) &&
                                !mg_constrained_dofs->is_boundary_index(level2, kglobal))
@@ -1179,7 +1192,7 @@ namespace MeshWorker
 
       for (unsigned int i=0; i<matrices->size(); ++i)
         {
-          MGLevelObject<MatrixBlock<MatrixType> > &o = matrices->block(i);
+          MGLevelObject<MatrixBlock<MatrixType> > o = matrices->block(i);
 
           // Row and column index of
           // the block we are dealing with
@@ -1229,6 +1242,142 @@ namespace MeshWorker
             }
         }
     }
+
+template<typename MatrixType, typename VectorType, typename number>
+  class SystemLocalBlocksToGlobalBlocks
+  {
+  public:
+    
+    SystemLocalBlocksToGlobalBlocks(number threshold = 1.e-12);
+
+    inline void
+    initialize(const BlockInfo* block_info,
+	       MatrixBlockVector<MatrixType> & matrices,
+	       AnyData & SystemRHSs);
+
+    void initialize(const ConstraintMatrix &constraints);
+    
+    
+    template <class DOFINFO>
+    void
+    initialize_info(DOFINFO &info, bool face) const;
+
+    template<class DOFINFO>
+    void
+    assemble(const DOFINFO &info);
+    
+    template<class DOFINFO>
+    void
+    assemble(const DOFINFO &info1,
+	     const DOFINFO &info2);
+
+  private:
+
+    void
+    assemble(MatrixBlock<MatrixType> &global_Mat,
+	     VectorType &global_Vec,
+	     const FullMatrix<number> &local_Mat,
+	     const BlockVector<number> &loval_Vec,
+	     const unsigned int block_row,
+	     const unsigned int block_col,
+	     const std::vector<types::global_dof_index> &dof1,
+	     const std::vector<types::global_dof_index> &dof2);
+    
+    ResidualLocalBlocksToGlobalBlocks<VectorType> assembleResidual;
+    MatrixLocalBlocksToGlobalBlocks<MatrixType, number> assembleMatrix;
+  };
+
+template< typename MatrixType, typename VectorType, typename number>
+inline
+SystemLocalBlocksToGlobalBlocks<MatrixType, VectorType,number>
+  ::SystemLocalBlocksToGlobalBlocks(number threshold)  
+  : assembleMatrix(threshold)
+{}
+
+
+template <typename MatrixType, typename VectorType, typename number>
+inline
+void
+SystemLocalBlocksToGlobalBlocks<MatrixType,VectorType,number>::initialize
+( const BlockInfo *b,
+  MatrixBlockVector<MatrixType> &m,
+  AnyData &res)
+{
+  assembleResidual.initialize(b, res);
+  assembleMatrix.initialize(b, m);
+}
+
+template<typename MatrixType, typename VectorType, typename number>
+inline
+void
+SystemLocalBlocksToGlobalBlocks<MatrixType,VectorType,number>::initialize
+(const ConstraintMatrix &constraints)
+{
+  assembleResidual.initialize(constraints);
+  assembleMatrix.initialize(constraints);
+}
+
+template <typename MatrixType, typename VectorType, typename number>
+template <class DOFINFO>
+inline
+void
+SystemLocalBlocksToGlobalBlocks<MatrixType,VectorType, number>::initialize_info
+(DOFINFO &info,
+ bool face) const
+{  
+  assembleMatrix.initialize_info(info,face);
+  assembleResidual.initialize_info(info, face);
+}
+
+template <typename MatrixType, typename VectorType, typename number>
+inline
+void
+SystemLocalBlocksToGlobalBlocks<MatrixType,VectorType,number>::assemble
+(MatrixBlock<MatrixType> &global_Mat,
+ VectorType &global_Vec,
+ const FullMatrix<number> &local_Mat,
+ const BlockVector<number> &local_Vec, 
+ const unsigned int block_row,
+ const unsigned int block_col,
+ const std::vector<types::global_dof_index> &dof1,
+ const std::vector<types::global_dof_index> &dof2)
+{
+  assembleResidual.assemble(global_Vec,
+			    local_Vec,
+			    dof1);
+
+  assembleMatrix.assemble(global_Mat,
+			  local_Mat,
+			  block_row,
+			  block_col,
+			  dof1,
+			  dof2);
+}
+
+
+template <typename MatrixType, typename VectorType, typename number>
+template <class DOFINFO>
+inline
+void
+SystemLocalBlocksToGlobalBlocks<MatrixType,VectorType,number>::assemble
+(const DOFINFO &info)
+{
+  assembleResidual.assemble(info);
+  assembleMatrix.assemble(info);
+}
+
+template <typename MatrixType, typename VectorType, typename number>
+template <class DOFINFO>
+inline
+void
+SystemLocalBlocksToGlobalBlocks<MatrixType,VectorType,number>::assemble
+(const DOFINFO &info1,
+ const DOFINFO &info2)
+{
+  assembleResidual.assemble(info1,info2);
+  assembleMatrix.assemble(info1,info2);
+}
+
   }
 }
 
