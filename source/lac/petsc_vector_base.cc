@@ -561,18 +561,6 @@ namespace PETScWrappers
 
 
   VectorBase::real_type
-  VectorBase::normalize () const
-  {
-    real_type d;
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecNormalize (vector, &d);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return d;
-  }
-
-
-  VectorBase::real_type
   VectorBase::min ()  const
   {
     PetscInt  p;
@@ -598,65 +586,6 @@ namespace PETScWrappers
   }
 
 
-  VectorBase &
-  VectorBase::abs ()
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-
-    const PetscErrorCode ierr = VecAbs (vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
-
-
-
-  VectorBase &
-  VectorBase::conjugate ()
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-
-    const PetscErrorCode ierr = VecConjugate (vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
-
-
-
-  VectorBase &
-  VectorBase::mult ()
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-
-    const PetscErrorCode ierr = VecPointwiseMult (vector,vector,vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
-
-
-  VectorBase &
-  VectorBase::mult (const VectorBase &v)
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecPointwiseMult (vector,vector,v);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
-
-
-  VectorBase &
-  VectorBase::mult (const VectorBase &u,
-                    const VectorBase &v)
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    const PetscErrorCode ierr = VecPointwiseMult (vector,u,v);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    return *this;
-  }
 
   bool
   VectorBase::all_zero () const
@@ -811,14 +740,6 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::add (const VectorBase &v)
-  {
-    *this += v;
-  }
-
-
-
-  void
   VectorBase::add (const PetscScalar a,
                    const VectorBase &v)
   {
@@ -882,59 +803,6 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::sadd (const PetscScalar s,
-                    const PetscScalar a,
-                    const VectorBase     &v,
-                    const PetscScalar b,
-                    const VectorBase     &w)
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    AssertIsFinite(s);
-    AssertIsFinite(a);
-    AssertIsFinite(b);
-
-    // there is no operation like MAXPAY, so
-    // do it in two steps
-    *this *= s;
-
-    const PetscScalar weights[2] = {a,b};
-    Vec               addends[2] = {v.vector,w.vector};
-
-    const PetscErrorCode ierr = VecMAXPY (vector, 2, weights, addends);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-  }
-
-
-
-  void
-  VectorBase::sadd (const PetscScalar s,
-                    const PetscScalar a,
-                    const VectorBase     &v,
-                    const PetscScalar b,
-                    const VectorBase     &w,
-                    const PetscScalar c,
-                    const VectorBase     &x)
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    AssertIsFinite(s);
-    AssertIsFinite(a);
-    AssertIsFinite(b);
-    AssertIsFinite(c);
-
-    // there is no operation like MAXPAY, so
-    // do it in two steps
-    *this *= s;
-
-    const PetscScalar weights[3] = {a,b,c};
-    Vec               addends[3] = {v.vector, w.vector, x.vector};
-
-    const PetscErrorCode ierr = VecMAXPY (vector, 3, weights, addends);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-  }
-
-
-
-  void
   VectorBase::scale (const VectorBase &factors)
   {
     Assert (!has_ghost_elements(), ExcGhostsPresent());
@@ -962,30 +830,6 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     *this *= a;
-  }
-
-
-
-  void
-  VectorBase::equ (const PetscScalar a,
-                   const VectorBase &v,
-                   const PetscScalar b,
-                   const VectorBase &w)
-  {
-    Assert (!has_ghost_elements(), ExcGhostsPresent());
-    AssertIsFinite(a);
-    AssertIsFinite(b);
-
-    Assert (size() == v.size(),
-            ExcDimensionMismatch (size(), v.size()));
-
-    // there is no simple operation for this
-    // in PETSc. there are multiple ways to
-    // emulate it, we choose this one:
-    const PetscErrorCode ierr = VecCopy (v.vector, vector);
-    AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-    sadd (a, b, w);
   }
 
 

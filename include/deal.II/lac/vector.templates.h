@@ -612,8 +612,10 @@ template <typename Number>
 Vector<Number> &Vector<Number>::operator += (const Vector<Number> &v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
+  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  add (v);
+  internal::VectorOperations::Vectorization_add_v<Number> vector_add(val, v.val);
+  internal::VectorOperations::parallel_for(vector_add,0,vec_size,thread_loop_partitioner);
   return *this;
 }
 
@@ -639,18 +641,6 @@ void Vector<Number>::add (const Number v)
   Assert (vec_size!=0, ExcEmptyObject());
 
   internal::VectorOperations::Vectorization_add_factor<Number> vector_add(val, v);
-  internal::VectorOperations::parallel_for(vector_add,0,vec_size,thread_loop_partitioner);
-}
-
-
-
-template <typename Number>
-void Vector<Number>::add (const Vector<Number> &v)
-{
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-
-  internal::VectorOperations::Vectorization_add_v<Number> vector_add(val, v.val);
   internal::VectorOperations::parallel_for(vector_add,0,vec_size,thread_loop_partitioner);
 }
 
@@ -684,37 +674,6 @@ void Vector<Number>::sadd (const Number x,
 
   internal::VectorOperations::Vectorization_sadd_xv<Number> vector_sadd(val, v.val, x);
   internal::VectorOperations::parallel_for(vector_sadd,0,vec_size,thread_loop_partitioner);
-}
-
-
-
-template <typename Number>
-void Vector<Number>::sadd (const Number x, const Number a,
-                           const Vector<Number> &v, const Number b,
-                           const Vector<Number> &w)
-{
-  AssertIsFinite(x);
-  AssertIsFinite(a);
-  AssertIsFinite(b);
-
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-  Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
-
-  internal::VectorOperations::Vectorization_sadd_xavbw<Number> vector_sadd(val, v.val, w.val, x,
-      a, b);
-  internal::VectorOperations::parallel_for(vector_sadd,0,vec_size,thread_loop_partitioner);
-}
-
-
-template <typename Number>
-void Vector<Number>::sadd (const Number x, const Number a,
-                           const Vector<Number> &v, const Number b,
-                           const Vector<Number> &w, const Number c,
-                           const Vector<Number> &y)
-{
-  sadd (x, a, v, b, w);
-  add (c, y);
 }
 
 
@@ -779,38 +738,6 @@ void Vector<Number>::equ (const Number a,
     val[i] = a * Number(u.val[i]);
 }
 
-
-
-template <typename Number>
-void Vector<Number>::equ (const Number a, const Vector<Number> &u,
-                          const Number b, const Vector<Number> &v)
-{
-  AssertIsFinite(a);
-  AssertIsFinite(b);
-
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-
-  internal::VectorOperations::Vectorization_equ_aubv<Number> vector_equ(val, u.val, v.val, a, b);
-  internal::VectorOperations::parallel_for(vector_equ,0,vec_size,thread_loop_partitioner);
-}
-
-
-template <typename Number>
-void Vector<Number>::equ (const Number a, const Vector<Number> &u,
-                          const Number b, const Vector<Number> &v,
-                          const Number c, const Vector<Number> &w)
-{
-  Assert (vec_size!=0, ExcEmptyObject());
-  Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
-  Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
-  Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
-
-  internal::VectorOperations::Vectorization_equ_aubvcw<Number> vector_equ(val, u.val, v.val, w.val,
-      a, b, c);
-  internal::VectorOperations::parallel_for(vector_equ,0,vec_size,thread_loop_partitioner);
-}
 
 
 template <typename Number>

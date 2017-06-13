@@ -859,13 +859,6 @@ public:
   void add (const value_type s);
 
   /**
-   * U+=V. Simple vector addition, equal to the <tt>operator +=</tt>.
-   *
-   * This function is deprecated use the <tt>operator +=</tt> instead.
-   */
-  void add (const BlockVectorBase &V) DEAL_II_DEPRECATED;
-
-  /**
    * U+=a*V. Simple addition of a scaled vector.
    */
   void add (const value_type a, const BlockVectorBase &V);
@@ -1816,14 +1809,6 @@ void BlockVectorBase<VectorType>::add (const value_type a)
     {
       components[i].add(a);
     }
-}
-
-
-
-template <class VectorType>
-void BlockVectorBase<VectorType>::add (const BlockVectorBase<VectorType> &v)
-{
-  *this += v;
 }
 
 

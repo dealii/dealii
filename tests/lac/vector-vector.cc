@@ -134,18 +134,12 @@ void check_vectors (Vector<number1> &d1, Vector<number2> &d2)
   d2.sadd (2., .5, d1);
   print (d2);
 
-  d1.sadd (2, 2, d2, 2, d3);
-  print (d1);
-
   d1 *= 4.;
   print (d1);
 
   deallog << "equ" << std::endl;
 
   d2.equ (.25, d1);
-  print (d2);
-
-  d2.equ (.25, d1, 2, d3);
   print (d2);
 
   d1.ratio (d1, d2);

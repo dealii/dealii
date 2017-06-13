@@ -520,14 +520,6 @@ namespace PETScWrappers
                              const VectorBase &W);
 
     /**
-     * Normalize vector by dividing by the $l_2$-norm of the vector. Return
-     * the vector norm before normalization.
-     *
-     * This function is deprecated.
-     */
-    real_type normalize () const DEAL_II_DEPRECATED;
-
-    /**
      * Return the value of the vector element with the largest negative value.
      */
     real_type min () const;
@@ -536,46 +528,6 @@ namespace PETScWrappers
      * Return the value of the vector element with the largest positive value.
      */
     real_type max () const;
-
-    /**
-     * Replace every element in a vector with its absolute value.
-     *
-     * This function is deprecated.
-     */
-    VectorBase &abs () DEAL_II_DEPRECATED;
-
-    /**
-     * Conjugate a vector.
-     *
-     * This function is deprecated.
-     */
-    VectorBase &conjugate () DEAL_II_DEPRECATED;
-
-    /**
-     * A collective piecewise multiply operation on <code>this</code> vector
-     * with itself. TODO: The model for this function should be similar to add
-     * ().
-     *
-     * This function is deprecated.
-     */
-    VectorBase &mult () DEAL_II_DEPRECATED;
-
-    /**
-     * Same as above, but a collective piecewise multiply operation of
-     * <code>this</code> vector with <b>v</b>.
-     *
-     * This function is deprecated.
-     */
-    VectorBase &mult (const VectorBase &v) DEAL_II_DEPRECATED;
-
-    /**
-     * Same as above, but a collective piecewise multiply operation of
-     * <b>u</b> with <b>v</b>.
-     *
-     * This function is deprecated.
-     */
-    VectorBase &mult (const VectorBase &u,
-                      const VectorBase &v) DEAL_II_DEPRECATED;
 
     /**
      * Return whether the vector contains only elements with value zero. This
@@ -618,13 +570,6 @@ namespace PETScWrappers
     void add (const PetscScalar s);
 
     /**
-     * Simple vector addition, equal to the <tt>operator +=</tt>.
-     *
-     * @deprecated Use the <tt>operator +=</tt> instead.
-     */
-    void add (const VectorBase &V) DEAL_II_DEPRECATED;
-
-    /**
      * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
      */
     void add (const PetscScalar a, const VectorBase &V);
@@ -649,31 +594,6 @@ namespace PETScWrappers
                const VectorBase     &V);
 
     /**
-     * Scaling and multiple addition.
-     *
-     * This function is deprecated.
-     */
-    void sadd (const PetscScalar s,
-               const PetscScalar a,
-               const VectorBase     &V,
-               const PetscScalar b,
-               const VectorBase     &W) DEAL_II_DEPRECATED;
-
-    /**
-     * Scaling and multiple addition. <tt>*this = s*(*this)+a*V + b*W +
-     * c*X</tt>.
-     *
-     * This function is deprecated.
-     */
-    void sadd (const PetscScalar s,
-               const PetscScalar a,
-               const VectorBase     &V,
-               const PetscScalar b,
-               const VectorBase     &W,
-               const PetscScalar c,
-               const VectorBase     &X) DEAL_II_DEPRECATED;
-
-    /**
      * Scale each element of this vector by the corresponding element in the
      * argument. This function is mostly meant to simulate multiplication (and
      * immediate re-assignment) by a diagonal scaling matrix.
@@ -684,14 +604,6 @@ namespace PETScWrappers
      * Assignment <tt>*this = a*V</tt>.
      */
     void equ (const PetscScalar a, const VectorBase &V);
-
-    /**
-     * Assignment <tt>*this = a*V + b*W</tt>.
-     *
-     * This function is deprecated.
-     */
-    void equ (const PetscScalar a, const VectorBase &V,
-              const PetscScalar b, const VectorBase &W) DEAL_II_DEPRECATED;
 
     /**
      * Compute the elementwise ratio of the two given vectors, that is let

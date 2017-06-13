@@ -1,0 +1,4 @@
+Changed: The deprecated member functions add(), normalize(), conjugate(),
+abs(), sadd(), equ() and mult() in the vector classes have been removed.
+<br>
+(Daniel Arndt, 2017/06/12)
