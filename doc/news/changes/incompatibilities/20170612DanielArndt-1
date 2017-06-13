@@ -1,0 +1,5 @@
+Changed: The deprecated data in SolverCG::AdditionalData
+and SolverGMRES::AdditionalData::compute_eigenvalues have been removed.
+Use the respective connect_* member functions instead.
+<br>
+(Daniel Arndt, 2017/06/12)
