@@ -274,7 +274,7 @@ namespace Utilities
 
   std::vector<std::string>
   split_string_list (const std::string &s,
-                     const char         delimiter)
+                     const std::string &delimiter)
   {
     // keep the currently remaining part of the input string in 'tmp' and
     // keep chopping elements of the list off the front
@@ -292,7 +292,6 @@ namespace Utilities
     // there was space after the last delimiter. this matches what's
     // discussed in the documentation
     std::vector<std::string> split_list;
-    split_list.reserve (std::count (tmp.begin(), tmp.end(), delimiter)+1);
     while (tmp.length() != 0)
       {
         std::string name;
@@ -301,7 +300,7 @@ namespace Utilities
         if (name.find(delimiter) != std::string::npos)
           {
             name.erase (name.find(delimiter), std::string::npos);
-            tmp.erase (0, tmp.find(delimiter)+1);
+            tmp.erase (0, tmp.find(delimiter)+delimiter.size());
           }
         else
           tmp = "";
@@ -318,6 +317,15 @@ namespace Utilities
     return split_list;
   }
 
+
+  std::vector<std::string>
+  split_string_list (const std::string &s,
+                     const char delimiter)
+  {
+    std::string d = ",";
+    d[0] = delimiter;
+    return split_string_list(s,d);
+  }
 
 
   std::vector<std::string>
