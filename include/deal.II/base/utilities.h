@@ -132,6 +132,7 @@ namespace Utilities
   std::vector<double>
   string_to_double (const std::vector<std::string> &s);
 
+
   /**
    * Given a string that contains text separated by a @p delimiter, split it
    * into its components; for each component, remove leading and trailing
@@ -176,7 +177,17 @@ namespace Utilities
    */
   std::vector<std::string>
   split_string_list (const std::string &s,
-                     const char         delimiter = ',');
+                     const std::string &delimiter = ",");
+
+
+  /**
+   * Specializatin of split_string_list() for the case where the delimiter
+   * is a single char.
+   */
+  std::vector<std::string>
+  split_string_list (const std::string &s,
+                     const char delimiter);
+
 
   /**
    * Take a text, usually a documentation or something, and try to break it

@@ -65,6 +65,18 @@ void test ()
                  ExcInternalError());
   }
 
+  {
+    const char *p = "alpha;; beta;; gamma ";
+    AssertThrow (Utilities::split_string_list (p, ";;").size() == 3,
+                 ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p, ";;")[0] == "alpha",
+                 ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p, ";;")[1] == "beta",
+                 ExcInternalError());
+    AssertThrow (Utilities::split_string_list (p, ";;")[2] == "gamma",
+                 ExcInternalError());
+  }
+
   deallog << Utilities::generate_normal_random_number (13, 44) << ' ';
   deallog << Utilities::generate_normal_random_number (13, 44) << ' ';
   deallog << Utilities::generate_normal_random_number (13, 44) << ' ';
