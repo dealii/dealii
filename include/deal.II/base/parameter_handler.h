@@ -498,8 +498,9 @@ namespace Patterns
    * pattern given to the constructor. For each entry of the map, parameters
    * have to be entered in the form <code>key: value</code>. In other words, a
    * map is described in the form <code>key1: value1, key2: value2, key3:
-   * value3, ...</code>. A constructor argument allows to choose a delimiter
-   * between pairs other than the comma.
+   * value3, ...</code>. Two constructor arguments allow to choose a delimiter
+   * between pairs other than the comma, and a delimeter between key and value
+   * other than column.
    *
    * With two additional parameters, the number of elements this list has to
    * have can be specified. If none is specified, the map may have zero or
@@ -519,15 +520,16 @@ namespace Patterns
      * Constructor. Take the given parameter as the specification of valid
      * elements of the list.
      *
-     * The three other arguments can be used to denote minimal and maximal
-     * allowable lengths of the list as well as the separator used to delimit
-     * pairs of the map.
+     * The four other arguments can be used to denote minimal and maximal
+     * allowable lengths of the list as well as the separators used to delimit
+     * pairs of the map and the symbol used to separate keys and values.
      */
     Map (const PatternBase  &key_pattern,
          const PatternBase  &value_pattern,
          const unsigned int  min_elements = 0,
          const unsigned int  max_elements = max_int_value,
-         const std::string  &separator = ",");
+         const std::string  &separator = ",",
+         const std::string  &key_value_separator = ":");
 
     /**
      * Copy constructor.
@@ -601,6 +603,12 @@ namespace Patterns
      * Separator between elements of the list.
      */
     const std::string separator;
+
+
+    /**
+     * Separator between keys and values.
+     */
+    const std::string key_value_separator;
 
     /**
      * Initial part of description

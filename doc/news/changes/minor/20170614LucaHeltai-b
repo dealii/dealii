@@ -1,0 +1,5 @@
+New: Patterns::Map now accepts a new optional parameter,
+that allows to specify also the separator between 
+key-value pairs.
+<br>
+(Luca Heltai, 2017/06/14)

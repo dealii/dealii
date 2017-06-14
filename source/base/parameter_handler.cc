@@ -96,6 +96,10 @@ namespace Patterns
     if (p != nullptr )
       return p;
 
+    p = Map::create(description);
+    if (p != nullptr )
+      return p;
+
     p = MultipleSelection::create(description);
     if (p != nullptr )
       return p;
@@ -650,7 +654,7 @@ namespace Patterns
         std::ostringstream description;
 
         description << description_init
-                    << " list of <" << pattern->description(style) << ">"
+                    << " of <" << pattern->description(style) << ">"
                     << " of length " << min_elements << "..." << max_elements
                     << " (inclusive)";
         if (separator != ",")
@@ -708,7 +712,7 @@ namespace Patterns
         int min_elements, max_elements;
 
         std::istringstream is(description);
-        is.ignore(strlen(description_init) + strlen(" list of <"));
+        is.ignore(strlen(description_init) + strlen(" of <"));
 
         std::string str;
         std::getline(is, str, '>');
@@ -723,9 +727,9 @@ namespace Patterns
         if (!(is >> max_elements))
           return std::unique_ptr<List>(new List(*base_pattern, min_elements));
 
-        is.ignore(strlen(" separated by <"));
+        is.ignore(strlen(" (inclusive) separated by <"));
         std::string separator;
-        if (!is)
+        if (is)
           std::getline(is, separator, '>');
         else
           separator = ",";
@@ -748,21 +752,26 @@ namespace Patterns
             const PatternBase  &p_value,
             const unsigned int  min_elements,
             const unsigned int  max_elements,
-            const std::string  &separator)
+            const std::string  &separator,
+            const std::string  &key_value_separator)
     :
     key_pattern (p_key.clone()),
     value_pattern (p_value.clone()),
     min_elements (min_elements),
     max_elements (max_elements),
-    separator (separator)
+    separator (separator),
+    key_value_separator(key_value_separator)
   {
     Assert (min_elements <= max_elements,
             ExcInvalidRange (min_elements, max_elements));
     Assert (separator.size() > 0,
             ExcMessage ("The separator must have a non-zero length."));
-    Assert (separator != ":",
-            ExcMessage ("The separator can not be a colon ':' since that "
-                        "is the separator between the two elements of <key:value> pairs"));
+    Assert (key_value_separator.size() > 0,
+            ExcMessage ("The key_value_separator must have a non-zero length."));
+    Assert (separator != key_value_separator,
+            ExcMessage ("The separator can not be the same of the key_value_separator "
+                        "since that is used as the separator between the two elements "
+                        "of <key:value> pairs"));
   }
 
 
@@ -773,7 +782,8 @@ namespace Patterns
     value_pattern (other.value_pattern->clone()),
     min_elements (other.min_elements),
     max_elements (other.max_elements),
-    separator (other.separator)
+    separator (other.separator),
+    key_value_separator(other.key_value_separator)
   {}
 
 
@@ -781,61 +791,25 @@ namespace Patterns
   bool Map::match (const std::string &test_string_list) const
   {
     std::string tmp = test_string_list;
-    std::vector<std::string> split_list;
-
-    // first split the input list at comma sites
-    while (tmp.length() != 0)
-      {
-        std::string map_entry;
-        map_entry = tmp;
-
-        if (map_entry.find(separator) != std::string::npos)
-          {
-            map_entry.erase (map_entry.find(separator), std::string::npos);
-            tmp.erase (0, tmp.find(separator)+separator.size());
-          }
-        else
-          tmp = "";
-
-        while ((map_entry.length() != 0) &&
-               (std::isspace (map_entry[0])))
-          map_entry.erase (0,1);
-
-        while (std::isspace (map_entry[map_entry.length()-1]))
-          map_entry.erase (map_entry.length()-1, 1);
-
-        split_list.push_back (map_entry);
-      }
-
+    std::vector<std::string> split_list =
+      Utilities::split_string_list(test_string_list, separator);
     if ((split_list.size() < min_elements) ||
         (split_list.size() > max_elements))
       return false;
 
-    // check the different possibilities
-    for (std::vector<std::string>::const_iterator
-         test_string = split_list.begin();
-         test_string != split_list.end(); ++test_string)
+    for (auto &key_value_pair : split_list)
       {
-        // separate key and value from the test_string
-        if (test_string->find(":") == std::string::npos)
+        std::vector<std::string> pair =
+          Utilities::split_string_list(key_value_pair, key_value_separator);
+
+        // Check that we have in fact two mathces
+        if (pair.size() != 2)
           return false;
-
-        // we know now that there is a ':', so split the string there
-        // and trim spaces
-        std::string key = *test_string;
-        key.erase (key.find(":"), std::string::npos);
-        while ((key.length() > 0) && (std::isspace (key[key.length()-1])))
-          key.erase (key.length()-1, 1);
-
-        std::string value = *test_string;
-        value.erase (0, value.find(":")+1);
-        while ((value.length() > 0) && (std::isspace (value[0])))
-          value.erase (0, 1);
 
         // then verify that the patterns are satisfied
-        if (key_pattern->match (key) == false)
+        if (key_pattern->match (pair[0]) == false)
           return false;
-        if (value_pattern->match (value) == false)
+        if (value_pattern->match (pair[1]) == false)
           return false;
       }
 
@@ -853,8 +827,9 @@ namespace Patterns
         std::ostringstream description;
 
         description << description_init
-                    << " map of <"
-                    << key_pattern->description(style) << ":"
+                    << " of <"
+                    << key_pattern->description(style) << ">"
+                    << key_value_separator << "<"
                     << value_pattern->description(style) << ">"
                     << " of length " << min_elements << "..." << max_elements
                     << " (inclusive)";
@@ -869,7 +844,9 @@ namespace Patterns
       {
         std::ostringstream description;
 
-        description << "A key-value map of "
+        description << "A key"
+                    << key_value_separator
+                    << "value map of "
                     << min_elements << " to " << max_elements
                     << " elements ";
         if (separator != ",")
@@ -897,7 +874,7 @@ namespace Patterns
   {
     return std::unique_ptr<PatternBase>(new Map(*key_pattern, *value_pattern,
                                                 min_elements, max_elements,
-                                                separator));
+                                                separator, key_value_separator));
   }
 
 
@@ -907,7 +884,8 @@ namespace Patterns
     return (sizeof(*this) +
             MemoryConsumption::memory_consumption (*key_pattern) +
             MemoryConsumption::memory_consumption (*value_pattern) +
-            MemoryConsumption::memory_consumption (separator));
+            MemoryConsumption::memory_consumption (separator)+
+            MemoryConsumption::memory_consumption (key_value_separator));
   }
 
 
@@ -919,17 +897,17 @@ namespace Patterns
         int min_elements, max_elements;
 
         std::istringstream is(description);
-        is.ignore(strlen(description_init) + strlen(" map of <"));
+        is.ignore(strlen(description_init) + strlen(" of <"));
 
-        std::string str;
-        std::getline(is, str, '>');
+        std::string key;
+        std::getline(is, key, '>');
+
+        std::string key_value_separator;
+        std::getline(is, key_value_separator, '<');
 
         // split 'str' into key and value
-        std::string key = str;
-        key.erase (key.find(":"), std::string::npos);
-
-        std::string value = str;
-        value.erase (0, value.find(":")+1);
+        std::string value;
+        std::getline(is, value, '>');
 
         std::shared_ptr<PatternBase> key_pattern (pattern_factory(key));
         std::shared_ptr<PatternBase> value_pattern (pattern_factory(value));
@@ -942,16 +920,16 @@ namespace Patterns
         if (!(is >> max_elements))
           return std::unique_ptr<Map>(new Map(*key_pattern, *value_pattern, min_elements));
 
-        is.ignore(strlen(" separated by <"));
+        is.ignore(strlen(" (inclusive) separated by <"));
         std::string separator;
-        if (!is)
+        if (is)
           std::getline(is, separator, '>');
         else
           separator = ",";
 
         return std::unique_ptr<Map>(new Map(*key_pattern, *value_pattern,
                                             min_elements, max_elements,
-                                            separator));
+                                            separator, key_value_separator));
       }
     else
       return std::unique_ptr<Map>();
