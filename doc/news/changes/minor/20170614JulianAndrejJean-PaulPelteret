@@ -1,0 +1,5 @@
+Fixed: The passing of additional settings to
+TrilinosWrappers::SolverBase from derived solvers
+was never completed. This has now been corrected. 
+<br>
+(Julian Andrej, Jean-Paul Pelteret, 2017/06/14)

@@ -47,19 +47,23 @@ namespace TrilinosWrappers
 
 
 
-  SolverBase::SolverBase (SolverControl  &cn)
+  SolverBase::SolverBase (SolverControl        &cn,
+                          const AdditionalData &data)
     :
     solver_name    (gmres),
-    solver_control (cn)
+    solver_control (cn),
+    additional_data (data)
   {}
 
 
 
   SolverBase::SolverBase (const enum SolverBase::SolverName  solver_name,
-                          SolverControl                     &cn)
+                          SolverControl                     &cn,
+                          const AdditionalData              &data)
     :
     solver_name    (solver_name),
-    solver_control (cn)
+    solver_control (cn),
+    additional_data (data)
   {}
 
 
@@ -605,7 +609,8 @@ namespace TrilinosWrappers
   SolverCG::SolverCG (SolverControl        &cn,
                       const AdditionalData &data)
     :
-    SolverBase (cn),
+    SolverBase (cn,
+                SolverBase::AdditionalData(data.output_solver_details)),
     additional_data (data.output_solver_details)
   {
     solver_name = cg;
@@ -627,7 +632,9 @@ namespace TrilinosWrappers
   SolverGMRES::SolverGMRES (SolverControl        &cn,
                             const AdditionalData &data)
     :
-    SolverBase (cn),
+    SolverBase (cn,
+                SolverBase::AdditionalData(data.output_solver_details,
+                                           data.restart_parameter)),
     additional_data (data.output_solver_details,
                      data.restart_parameter)
   {
@@ -649,7 +656,8 @@ namespace TrilinosWrappers
   SolverBicgstab::SolverBicgstab (SolverControl        &cn,
                                   const AdditionalData &data)
     :
-    SolverBase (cn),
+    SolverBase (cn,
+                SolverBase::AdditionalData(data.output_solver_details)),
     additional_data (data.output_solver_details)
   {
     solver_name = bicgstab;
@@ -670,7 +678,8 @@ namespace TrilinosWrappers
   SolverCGS::SolverCGS (SolverControl        &cn,
                         const AdditionalData &data)
     :
-    SolverBase (cn),
+    SolverBase (cn,
+                SolverBase::AdditionalData(data.output_solver_details)),
     additional_data (data.output_solver_details)
   {
     solver_name = cgs;
@@ -690,7 +699,8 @@ namespace TrilinosWrappers
   SolverTFQMR::SolverTFQMR (SolverControl        &cn,
                             const AdditionalData &data)
     :
-    SolverBase (cn),
+    SolverBase (cn,
+                SolverBase::AdditionalData(data.output_solver_details)),
     additional_data (data.output_solver_details)
   {
     solver_name = tfqmr;

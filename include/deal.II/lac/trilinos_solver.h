@@ -132,14 +132,16 @@ namespace TrilinosWrappers
     /**
      * Constructor. Takes the solver control object and creates the solver.
      */
-    SolverBase (SolverControl  &cn);
+    SolverBase (SolverControl        &cn,
+                const AdditionalData &data = AdditionalData());
 
     /**
      * Second constructor. This constructor takes an enum object that
      * specifies the solver name and sets the appropriate Krylov method.
      */
     SolverBase (const enum SolverName  solver_name,
-                SolverControl         &cn);
+                SolverControl         &cn,
+                const AdditionalData  &data = AdditionalData());
 
     /**
      * Destructor.
