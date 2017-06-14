@@ -694,12 +694,14 @@ namespace
     // https://en.wikipedia.org/wiki/Transfinite_interpolation
     // S(u,v) = (1-v)c_1(u)+v c_3(u) + (1-u)c_2(v) + u c_4(v) -
     //   [(1-u)(1-v)P_0 + u(1-v) P_1 + (1-u)v P_2 + uv P_3]
+    const std::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell> vertices
+    {{cell.vertex(0), cell.vertex(1), cell.vertex(2), cell.vertex(3)}};
 
     Point<spacedim> new_point;
     if (cell_is_flat)
       for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
         new_point += GeometryInfo<2>::d_linear_shape_function(chart_point, v) *
-                     cell.vertex(v);
+                     vertices[v];
     else
       {
         // We subtract the contribution of the vertices (second line in formula).
@@ -733,8 +735,8 @@ namespace
               }
             else
               {
-                points[0] = cell.vertex(GeometryInfo<2>::line_to_cell_vertices(line,0));
-                points[1] = cell.vertex(GeometryInfo<2>::line_to_cell_vertices(line,1));
+                points[0] = vertices[GeometryInfo<2>::line_to_cell_vertices(line,0)];
+                points[1] = vertices[GeometryInfo<2>::line_to_cell_vertices(line,1)];
                 weights[0] = 1. - line_point;
                 weights[1] = line_point;
                 new_point += my_weight *
@@ -744,7 +746,7 @@ namespace
 
         // subtract contribution from the vertices (second line in formula)
         for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-          new_point += weights_vertices[v] * cell.vertex(v);
+          new_point += weights_vertices[v] * vertices[v];
       }
 
     return new_point;
@@ -1009,16 +1011,22 @@ TransfiniteInterpolationManifold<dim,spacedim>
       if (&cell->get_manifold() != this)
         continue;
 
+      std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell> vertices;
+      for (unsigned int vertex_n = 0; vertex_n < GeometryInfo<dim>::vertices_per_cell; ++vertex_n)
+        {
+          vertices[vertex_n] = cell->vertex(vertex_n);
+        }
+
       // cheap check: if any of the points is not inside a circle around the
       // center of the loop, we can skip the expensive part below (this assumes
       // that the manifold does not deform the grid too much)
       Point<spacedim> center;
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-        center += cell->vertex(v);
+        center += vertices[v];
       center *= 1./GeometryInfo<dim>::vertices_per_cell;
       double radius_square = 0.;
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-        radius_square = std::max(radius_square, (center-cell->vertex(v)).norm_square());
+        radius_square = std::max(radius_square, (center-vertices[v]).norm_square());
       bool inside_circle = true;
       for (unsigned int i=0; i<points.size(); ++i)
         if ((center-points[i]).norm_square() > radius_square * 1.5)
