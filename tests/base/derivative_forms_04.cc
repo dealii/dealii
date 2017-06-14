@@ -31,7 +31,8 @@ void test()
       }
 
   // output the determinants of these objects
-  deallog << "det(dF): " << dF.determinant() << std::endl;
+  deallog << "det(dF): " << dF.determinant().real() << " "
+          << dF.determinant().imag() << std::endl;
 }
 
 int main()
