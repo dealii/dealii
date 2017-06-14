@@ -602,42 +602,16 @@ namespace Patterns
 
   bool List::match (const std::string &test_string_list) const
   {
-    std::string tmp = test_string_list;
-    std::vector<std::string> split_list;
-
-    // first split the input list
-    while (tmp.length() != 0)
-      {
-        std::string name;
-        name = tmp;
-
-        if (name.find(separator) != std::string::npos)
-          {
-            name.erase (name.find(separator), std::string::npos);
-            tmp.erase (0, tmp.find(separator)+separator.size());
-          }
-        else
-          tmp = "";
-
-        while ((name.length() != 0) &&
-               (std::isspace (name[0])))
-          name.erase (0,1);
-
-        while (std::isspace (name[name.length()-1]))
-          name.erase (name.length()-1, 1);
-
-        split_list.push_back (name);
-      }
+    std::vector<std::string> split_list =
+      Utilities::split_string_list(test_string_list, separator);
 
     if ((split_list.size() < min_elements) ||
         (split_list.size() > max_elements))
       return false;
 
     // check the different possibilities
-    for (std::vector<std::string>::const_iterator
-         test_string = split_list.begin();
-         test_string != split_list.end(); ++test_string)
-      if (pattern->match (*test_string) == false)
+    for (auto &string : split_list)
+      if (pattern->match (string) == false)
         return false;
 
     return true;
