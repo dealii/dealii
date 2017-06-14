@@ -114,25 +114,19 @@ namespace TrilinosWrappers
        * base class for all solvers.
        */
       explicit
-      AdditionalData (const bool         output_solver_details   = false,
-                      const unsigned int gmres_restart_parameter = 30);
+      AdditionalData (const bool         output_solver_details   = false);
 
       /**
        * Enables/disables the output of solver details (residual in each
        * iterations etc.).
        */
       const bool output_solver_details;
-
-      /**
-       * Restart parameter for GMRES solver.
-       */
-      const unsigned int gmres_restart_parameter;
     };
 
     /**
      * Constructor. Takes the solver control object and creates the solver.
      */
-    SolverBase (SolverControl  &cn);
+    SolverBase (SolverControl  &cn, const AdditionalData &data);
 
     /**
      * Second constructor. This constructor takes an enum object that
@@ -364,24 +358,8 @@ namespace TrilinosWrappers
   class SolverCG : public SolverBase
   {
   public:
-    /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
 
-    struct AdditionalData
-    {
-      /**
-       * Set the additional data field to the desired output format.
-       */
-      explicit
-      AdditionalData (const bool output_solver_details = false);
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
-    };
+    using SolverBase::AdditionalData;
 
     /**
      * Constructor. In contrast to deal.II's own solvers, there is no need to
@@ -392,12 +370,6 @@ namespace TrilinosWrappers
      */
     SolverCG (SolverControl        &cn,
               const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
   };
 
 
@@ -411,23 +383,6 @@ namespace TrilinosWrappers
   class SolverCGS : public SolverBase
   {
   public:
-    /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {
-      /**
-       * Set the additional data field to the desired output format.
-       */
-      explicit
-      AdditionalData (const bool output_solver_details = false);
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
-    };
 
     /**
      * Constructor. In contrast to deal.II's own solvers, there is no need to
@@ -438,12 +393,6 @@ namespace TrilinosWrappers
      */
     SolverCGS (SolverControl        &cn,
                const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
   };
 
 
@@ -457,30 +406,6 @@ namespace TrilinosWrappers
   class SolverGMRES : public SolverBase
   {
   public:
-    /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {
-      /**
-       * Constructor. By default, set the number of temporary vectors to 30,
-       * i.e. do a restart every 30 iterations.
-       */
-      explicit
-      AdditionalData (const bool         output_solver_details = false,
-                      const unsigned int restart_parameter = 30);
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
-
-      /**
-       * Maximum number of tmp vectors.
-       */
-      unsigned int restart_parameter;
-    };
 
     /**
      * Constructor. In contrast to deal.II's own solvers, there is no need to
@@ -491,12 +416,6 @@ namespace TrilinosWrappers
      */
     SolverGMRES (SolverControl        &cn,
                  const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
   };
 
 
@@ -511,23 +430,6 @@ namespace TrilinosWrappers
   class SolverBicgstab : public SolverBase
   {
   public:
-    /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {
-      /**
-       * Set the additional data field to the desired output format.
-       */
-      explicit
-      AdditionalData (const bool output_solver_details = false);
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
-    };
 
     /**
      * Constructor. In contrast to deal.II's own solvers, there is no need to
@@ -538,12 +440,6 @@ namespace TrilinosWrappers
      */
     SolverBicgstab (SolverControl        &cn,
                     const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
   };
 
 
@@ -557,24 +453,6 @@ namespace TrilinosWrappers
    */
   class SolverTFQMR : public SolverBase
   {
-  public:
-    /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {
-      /**
-       * Set the additional data field to the desired output format.
-       */
-      explicit
-      AdditionalData (const bool output_solver_details = false);
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
-    };
 
     /**
      * Constructor. In contrast to deal.II's own solvers, there is no need to
@@ -585,12 +463,6 @@ namespace TrilinosWrappers
      */
     SolverTFQMR (SolverControl        &cn,
                  const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
   };
 
 
