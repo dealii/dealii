@@ -1,0 +1,6 @@
+New: Utilities::split_string_list() now has a 
+version that allows to pass a string instead of a 
+character. With this it is possible to split on 
+double chars, for example: "alpha ;; beta ;; gamma".
+<br>
+(Luca Heltai, 2017/06/14)
