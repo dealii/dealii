@@ -43,6 +43,7 @@ SET(_src
   fe_rannacher_turek.cc
   fe_raviart_thomas.cc
   fe_raviart_thomas_nodal.cc
+  fe_rt_bubbles.cc
   fe_series.cc
   fe_system.cc
   fe_enriched.cc
@@ -89,6 +90,7 @@ SET(_inst
   fe_rannacher_turek.inst.in
   fe_raviart_thomas.inst.in
   fe_raviart_thomas_nodal.inst.in
+  fe_rt_bubbles.inst.in
   fe_system.inst.in
   fe_enriched.inst.in
   fe_tools.inst.in
