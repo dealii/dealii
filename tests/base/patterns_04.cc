@@ -37,12 +37,12 @@ test(const Patterns::PatternBase &p)
 
   AssertThrow(desc == p2->description(),
               ExcInternalError("Cloned pattern does not have the same "
-                               "description of the original pattern!"));
+                               "description as the original pattern!"));
 
   AssertThrow(desc == p3->description(),
               ExcInternalError("Pattern created using factory "
                                "does not have the same "
-                               "description of the original pattern!"));
+                               "description as the original pattern!"));
 }
 
 
