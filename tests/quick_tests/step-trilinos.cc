@@ -85,8 +85,8 @@ void LaplaceProblem::setup_system ()
   DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints, false);
 
   A.reinit (dsp);
-  b.reinit (dof_handler.n_dofs());
-  x.reinit (dof_handler.n_dofs());
+  b.reinit (complete_index_set(dof_handler.n_dofs()));
+  x.reinit (complete_index_set(dof_handler.n_dofs()));
 
   // some output
   output_table.add_value ("cells", triangulation.n_active_cells());
