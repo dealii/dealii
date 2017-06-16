@@ -2386,7 +2386,7 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
             // the documentation, and then the actual entry; break the
             // documentation into readable chunks such that the whole
             // thing is at most 78 characters wide
-            if ((!(style & 128)) &&
+            if ((style == Text) &&
                 !p->second.get<std::string>("documentation").empty())
               {
                 if (first_entry == false)
@@ -2417,7 +2417,7 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
 
             // finally print the default value, but only if it differs
             // from the actual value
-            if ((!(style & 64)) && value != p->second.get<std::string>("default_value"))
+            if ((style == Text) && value != p->second.get<std::string>("default_value"))
               {
                 out << std::setw(longest_value-value.length()+1) << ' '
                     << "# ";
@@ -2612,7 +2612,7 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
 
     if ((style != Description)
         &&
-        (!(style & 128))
+        (style != ShortText)
         &&
         (n_parameters != 0)
         &&
