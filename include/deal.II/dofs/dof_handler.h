@@ -1003,11 +1003,6 @@ private:
                     const unsigned int dof_number,
                     const types::global_dof_index index);
 
-    /**
-     * Exception.
-     */
-    DeclException0 (ExcNoMemory);
-
   private:
     /**
      * Coarsest level for which this object stores DoF indices.
