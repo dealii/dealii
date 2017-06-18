@@ -460,13 +460,6 @@ namespace internal
               next_free_dof
                 = Implementation::distribute_mg_dofs_on_cell (dof_handler, cell, next_free_dof);
 
-//                                               // update the cache used
-//                                               // for cell dof indices
-//              for (typename DoFHandler<dim,spacedim>::level_cell_iterator
-//                     cell = dof_handler.begin(); cell != dof_handler.end(); ++cell)
-//                if (cell->subdomain_id() != numbers::artificial_subdomain_id)
-//                  cell->update_cell_dof_indices_cache ();
-
           // finally restore the user flags
           const_cast<dealii::Triangulation<dim,spacedim> &>(tria).load_user_flags(user_flags);
 
