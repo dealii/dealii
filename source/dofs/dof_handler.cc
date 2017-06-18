@@ -1557,18 +1557,18 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
   coarsest_level = cl;
   finest_level   = fl;
 
-  if (cl > fl)
-    return;
+  if (coarsest_level <= finest_level)
+    {
+      const unsigned int n_levels = finest_level - coarsest_level + 1;
+      const unsigned int n_indices = n_levels * dofs_per_vertex;
 
-  const unsigned int n_levels = finest_level - coarsest_level + 1;
-  const unsigned int n_indices = n_levels * dofs_per_vertex;
+      indices = new types::global_dof_index[n_indices];
+      std::fill (indices, indices+n_indices, DoFHandler<dim,spacedim>::invalid_dof_index);
 
-  indices = new types::global_dof_index[n_indices];
-  std::fill (indices, indices+n_indices, DoFHandler<dim,spacedim>::invalid_dof_index);
-
-  indices_offset = new types::global_dof_index[n_levels];
-  for (unsigned int i = 0; i < n_levels; ++i)
-    indices_offset[i] = i * dofs_per_vertex;
+      indices_offset = new types::global_dof_index[n_levels];
+      for (unsigned int i = 0; i < n_levels; ++i)
+        indices_offset[i] = i * dofs_per_vertex;
+    }
 }
 
 
