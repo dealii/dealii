@@ -1035,13 +1035,19 @@ private:
     types::global_dof_index *indices_offset;
   };
 
-  void clear_mg_space ();
-
   /**
-   * Free all used memory.
+   * Free all memory used for non-multigrid data structures.
    */
   void clear_space ();
 
+  /**
+   * Free all memory used for multigrid data structures.
+   */
+  void clear_mg_space ();
+
+  /**
+   * Allocate space that will be used by distribute_dofs().
+   */
   void reserve_space ();
 
   template <int structdim>

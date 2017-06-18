@@ -1404,7 +1404,7 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
       const_cast<Triangulation<3> &>(this->get_triangulation()).load_user_flags (user_flags);
     }
 
-  //HEX DoFs
+  // HEX DoFs
   for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
        i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
@@ -1479,14 +1479,15 @@ void DoFHandler<dim,spacedim>::clear_space ()
   number_cache.clear ();
 }
 
+
+
 template<int dim, int spacedim>
 template<int structdim>
 types::global_dof_index
-DoFHandler<dim, spacedim>::get_dof_index (
-  const unsigned int obj_level,
-  const unsigned int obj_index,
-  const unsigned int fe_index,
-  const unsigned int local_index) const
+DoFHandler<dim, spacedim>::get_dof_index (const unsigned int obj_level,
+                                          const unsigned int obj_index,
+                                          const unsigned int fe_index,
+                                          const unsigned int local_index) const
 {
   return internal::DoFHandler::Implementation::get_dof_index (*this, *this->mg_levels[obj_level],
                                                               *this->mg_faces, obj_index,
@@ -1494,18 +1495,37 @@ DoFHandler<dim, spacedim>::get_dof_index (
                                                               internal::int2type<structdim> ());
 }
 
+
+
 template<int dim, int spacedim>
 template<int structdim>
-void DoFHandler<dim, spacedim>::set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index) const
+void DoFHandler<dim, spacedim>::set_dof_index (const unsigned int obj_level,
+                                               const unsigned int obj_index,
+                                               const unsigned int fe_index,
+                                               const unsigned int local_index,
+                                               const types::global_dof_index global_index) const
 {
-  internal::DoFHandler::Implementation::set_dof_index (*this, *this->mg_levels[obj_level], *this->mg_faces, obj_index, fe_index, local_index, global_index, internal::int2type<structdim> ());
+  internal::DoFHandler::Implementation::set_dof_index (*this,
+                                                       *this->mg_levels[obj_level],
+                                                       *this->mg_faces,
+                                                       obj_index,
+                                                       fe_index,
+                                                       local_index,
+                                                       global_index,
+                                                       internal::int2type<structdim> ());
 }
+
 
 
 template<int dim, int spacedim>
-DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs (): coarsest_level (numbers::invalid_unsigned_int), finest_level (0), indices (nullptr), indices_offset (nullptr)
-{
-}
+DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs ()
+  :
+  coarsest_level (numbers::invalid_unsigned_int),
+  finest_level (0),
+  indices (nullptr),
+  indices_offset (nullptr)
+{}
+
 
 
 template<int dim, int spacedim>
@@ -1515,8 +1535,12 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::~MGVertexDoFs ()
   delete[] indices_offset;
 }
 
+
+
 template<int dim, int spacedim>
-void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl, const unsigned int fl, const unsigned int dofs_per_vertex)
+void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
+                                                    const unsigned int fl,
+                                                    const unsigned int dofs_per_vertex)
 {
   if (indices != nullptr)
     {
@@ -1531,7 +1555,7 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl, const
     }
 
   coarsest_level = cl;
-  finest_level = fl;
+  finest_level   = fl;
 
   if (cl > fl)
     return;
@@ -1548,11 +1572,15 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl, const
     indices_offset[i] = i * dofs_per_vertex;
 }
 
+
+
 template<int dim, int spacedim>
 unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_coarsest_level () const
 {
   return coarsest_level;
 }
+
+
 
 template<int dim, int spacedim>
 unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_finest_level () const
