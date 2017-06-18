@@ -176,8 +176,6 @@ namespace internal
         renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers,
                        dealii::DoFHandler<dim,spacedim> &dof_handler,
                        NumberCache &number_cache) const;
-      private:
-
       };
 
 
