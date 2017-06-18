@@ -1219,113 +1219,111 @@ namespace internal
 
       namespace
       {
+        /**
+         * A structure that allows the transfer of DoF indices from one processor
+         * to another. It corresponds to a packed buffer that stores a list of
+         * cells (in the form of a list of coarse mesh index -- i.e., the tree_index
+         * of the cell, and a corresponding list of quadrants within these trees),
+         * and a long array of DoF indices.
+         *
+         * The list of DoF indices stores first the number of indices for the
+         * first cell (=tree index and quadrant), then the indices for that cell,
+         * then the number of indices of the second cell, then the actual indices
+         * of the second cell, etc.
+         *
+         * The DoF indices array may or may not be used by algorithms using this
+         * class.
+         */
         template <int dim>
-        struct types
+        struct CellDataTransferBuffer
         {
+          std::vector<unsigned int>                                           tree_index;
+          std::vector<typename dealii::internal::p4est::types<dim>::quadrant> quadrants;
+          std::vector<dealii::types::global_dof_index>                        dofs;
 
-          /**
-           * A structure that allows the transfer of DoF indices from one processor
-           * to another. It corresponds to a packed buffer that stores a list of
-           * cells (in the form of a list of coarse mesh index -- i.e., the tree_index
-           * of the cell, and a corresponding list of quadrants within these trees),
-           * and a long array of DoF indices.
-           *
-           * The list of DoF indices stores first the number of indices for the
-           * first cell (=tree index and quadrant), then the indices for that cell,
-           * then the number of indices of the second cell, then the actual indices
-           * of the second cell, etc.
-           */
-          struct CellDataTransferBuffer
+
+          unsigned int bytes_for_buffer () const
           {
-            std::vector<unsigned int>                                           tree_index;
-            std::vector<typename dealii::internal::p4est::types<dim>::quadrant> quadrants;
-            std::vector<dealii::types::global_dof_index>                        dofs;
+            return (sizeof(unsigned int)*2 +
+                    tree_index.size() * sizeof(unsigned int) +
+                    quadrants.size() * sizeof(typename dealii::internal::p4est
+                                              ::types<dim>::quadrant) +
+                    dofs.size() * sizeof(dealii::types::global_dof_index));
+          }
 
 
-            unsigned int bytes_for_buffer () const
-            {
-              return (sizeof(unsigned int)*2 +
-                      tree_index.size() * sizeof(unsigned int) +
-                      quadrants.size() * sizeof(typename dealii::internal::p4est
-                                                ::types<dim>::quadrant) +
-                      dofs.size() * sizeof(dealii::types::global_dof_index));
-            }
+          void pack_data (std::vector<char> &buffer) const
+          {
+            buffer.resize(bytes_for_buffer());
 
+            char *ptr = &buffer[0];
 
-            void pack_data (std::vector<char> &buffer) const
-            {
-              buffer.resize(bytes_for_buffer());
+            const unsigned int num_cells = tree_index.size();
+            std::memcpy(ptr, &num_cells, sizeof(unsigned int));
+            ptr += sizeof(unsigned int);
 
-              char *ptr = &buffer[0];
+            const unsigned int num_dofs = dofs.size();
+            std::memcpy(ptr, &num_dofs, sizeof(unsigned int));
+            ptr += sizeof(unsigned int);
 
-              const unsigned int num_cells = tree_index.size();
-              std::memcpy(ptr, &num_cells, sizeof(unsigned int));
-              ptr += sizeof(unsigned int);
+            std::memcpy(ptr,
+                        &tree_index[0],
+                        num_cells*sizeof(unsigned int));
+            ptr += num_cells*sizeof(unsigned int);
 
-              const unsigned int num_dofs = dofs.size();
-              std::memcpy(ptr, &num_dofs, sizeof(unsigned int));
-              ptr += sizeof(unsigned int);
+            std::memcpy(ptr,
+                        &quadrants[0],
+                        num_cells * sizeof(typename dealii::internal::p4est::
+                                           types<dim>::quadrant));
+            ptr += num_cells*sizeof(typename dealii::internal::p4est::types<dim>::
+                                    quadrant);
 
+            if (num_dofs>0)
               std::memcpy(ptr,
-                          &tree_index[0],
-                          num_cells*sizeof(unsigned int));
-              ptr += num_cells*sizeof(unsigned int);
+                          &dofs[0],
+                          dofs.size() * sizeof(dealii::types::global_dof_index));
+            ptr += dofs.size() * sizeof(dealii::types::global_dof_index);
 
-              std::memcpy(ptr,
-                          &quadrants[0],
-                          num_cells * sizeof(typename dealii::internal::p4est::
-                                             types<dim>::quadrant));
-              ptr += num_cells*sizeof(typename dealii::internal::p4est::types<dim>::
-                                      quadrant);
-
-              if (num_dofs>0)
-                std::memcpy(ptr,
-                            &dofs[0],
-                            dofs.size() * sizeof(dealii::types::global_dof_index));
-              ptr += dofs.size() * sizeof(dealii::types::global_dof_index);
-
-              Assert (ptr == &buffer[0]+buffer.size(),
-                      ExcInternalError());
-            }
+            Assert (ptr == &buffer[0]+buffer.size(),
+                    ExcInternalError());
+          }
 
 
-            void unpack_data(const std::vector<char> &buffer)
-            {
-              const char *ptr = &buffer[0];
-              unsigned int num_cells;
-              memcpy(&num_cells, ptr, sizeof(unsigned int));
-              ptr+=sizeof(unsigned int);
+          void unpack_data(const std::vector<char> &buffer)
+          {
+            const char *ptr = &buffer[0];
+            unsigned int num_cells;
+            memcpy(&num_cells, ptr, sizeof(unsigned int));
+            ptr+=sizeof(unsigned int);
 
-              unsigned int num_dofs;
-              memcpy(&num_dofs, ptr, sizeof(unsigned int));
-              ptr+=sizeof(unsigned int);
+            unsigned int num_dofs;
+            memcpy(&num_dofs, ptr, sizeof(unsigned int));
+            ptr+=sizeof(unsigned int);
 
-              tree_index.resize(num_cells);
-              std::memcpy(&tree_index[0],
+            tree_index.resize(num_cells);
+            std::memcpy(&tree_index[0],
+                        ptr,
+                        num_cells*sizeof(unsigned int));
+            ptr += num_cells*sizeof(unsigned int);
+
+            quadrants.resize(num_cells);
+            std::memcpy(&quadrants[0],
+                        ptr,
+                        num_cells * sizeof(typename dealii::internal::p4est::
+                                           types<dim>::quadrant));
+            ptr += num_cells*sizeof(typename dealii::internal::p4est::types<dim>::
+                                    quadrant);
+
+            dofs.resize(num_dofs);
+            if (num_dofs>0)
+              std::memcpy(&dofs[0],
                           ptr,
-                          num_cells*sizeof(unsigned int));
-              ptr += num_cells*sizeof(unsigned int);
+                          dofs.size() * sizeof(dealii::types::global_dof_index));
+            ptr += dofs.size() * sizeof(dealii::types::global_dof_index);
 
-              quadrants.resize(num_cells);
-              std::memcpy(&quadrants[0],
-                          ptr,
-                          num_cells * sizeof(typename dealii::internal::p4est::
-                                             types<dim>::quadrant));
-              ptr += num_cells*sizeof(typename dealii::internal::p4est::types<dim>::
-                                      quadrant);
-
-              dofs.resize(num_dofs);
-              if (num_dofs>0)
-                std::memcpy(&dofs[0],
-                            ptr,
-                            dofs.size() * sizeof(dealii::types::global_dof_index));
-              ptr += dofs.size() * sizeof(dealii::types::global_dof_index);
-
-              Assert (ptr == &buffer[0]+buffer.size(),
-                      ExcInternalError());
-            }
-
-          };
+            Assert (ptr == &buffer[0]+buffer.size(),
+                    ExcInternalError());
+          }
 
         };
 
@@ -1338,7 +1336,7 @@ namespace internal
                                      const typename DoFHandler<dim,spacedim>::level_cell_iterator &dealii_cell,
                                      const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
                                      const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &vertices_with_ghost_neighbors,
-                                     std::map<dealii::types::subdomain_id, typename types<dim>::CellDataTransferBuffer> &needs_to_get_cell)
+                                     std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>> &needs_to_get_cell)
         {
           // see if we have to recurse...
           if (dealii_cell->has_children())
@@ -1409,11 +1407,11 @@ namespace internal
                       // already exists),
                       // or create such
                       // an object
-                      typename std::map<dealii::types::subdomain_id, typename types<dim>::CellDataTransferBuffer>::iterator
-                      p
-                        = needs_to_get_cell.insert (std::make_pair(subdomain,
-                                                                   typename types<dim>::CellDataTransferBuffer()))
-                          .first;
+                      typename std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>::iterator
+                          p
+                          = needs_to_get_cell.insert (std::make_pair(subdomain,
+                                                                     CellDataTransferBuffer<dim>()))
+                            .first;
 
                       p->second.tree_index.push_back(tree_index);
                       p->second.quadrants.push_back(p4est_cell);
@@ -1435,7 +1433,7 @@ namespace internal
           const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
           const typename DoFHandler<dim,spacedim>::level_cell_iterator &dealii_cell,
           const typename dealii::internal::p4est::types<dim>::quadrant &quadrant,
-          typename types<dim>::CellDataTransferBuffer &cell_info)
+          CellDataTransferBuffer<dim> &cell_data_transfer_buffer)
         {
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
             {
@@ -1447,10 +1445,10 @@ namespace internal
               local_dof_indices (dealii_cell->get_fe().dofs_per_cell);
               dealii_cell->get_mg_dof_indices (local_dof_indices);
 
-              cell_info.dofs.push_back(dealii_cell->get_fe().dofs_per_cell);
-              cell_info.dofs.insert(cell_info.dofs.end(),
-                                    local_dof_indices.begin(),
-                                    local_dof_indices.end());
+              cell_data_transfer_buffer.dofs.push_back(dealii_cell->get_fe().dofs_per_cell);
+              cell_data_transfer_buffer.dofs.insert(cell_data_transfer_buffer.dofs.end(),
+                                                    local_dof_indices.begin(),
+                                                    local_dof_indices.end());
               return; // we are done
             }
 
@@ -1467,7 +1465,7 @@ namespace internal
           for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
             get_mg_dofindices_recursively<dim,spacedim> (tria, p4est_child[c],
                                                          dealii_cell->child(c),
-                                                         quadrant, cell_info);
+                                                         quadrant, cell_data_transfer_buffer);
         }
 
 
@@ -1477,7 +1475,7 @@ namespace internal
                                                const unsigned int tree_index,
                                                const typename DoFHandler<dim,spacedim>::level_cell_iterator &dealii_cell,
                                                const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
-                                               std::map<dealii::types::subdomain_id, typename types<dim>::CellDataTransferBuffer> &neighbor_cell_list)
+                                               std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>> &neighbor_cell_list)
         {
           // recurse...
           if (dealii_cell->has_children())
@@ -1497,10 +1495,8 @@ namespace internal
 
           if (dealii_cell->user_flag_set() && dealii_cell->level_subdomain_id() != tria.locally_owned_subdomain())
             {
-              typename types<dim>::CellDataTransferBuffer &cell_info = neighbor_cell_list[dealii_cell->level_subdomain_id()];
-
-              cell_info.tree_index.push_back(tree_index);
-              cell_info.quadrants.push_back(p4est_cell);
+              neighbor_cell_list[dealii_cell->level_subdomain_id()].tree_index.push_back(tree_index);
+              neighbor_cell_list[dealii_cell->level_subdomain_id()].quadrants.push_back(p4est_cell);
             }
         }
 
@@ -1580,12 +1576,12 @@ namespace internal
         {
           // build list of cells to request for each neighbor
           std::set<dealii::types::subdomain_id> level_ghost_owners = tria.level_ghost_owners();
-          typedef std::map<dealii::types::subdomain_id, typename types<dim>::CellDataTransferBuffer> cellmap_t;
+          typedef std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>> cellmap_t;
           cellmap_t neighbor_cell_list;
           for (std::set<dealii::types::subdomain_id>::iterator it = level_ghost_owners.begin();
                it != level_ghost_owners.end();
                ++it)
-            neighbor_cell_list.insert(std::make_pair(*it, typename types<dim>::CellDataTransferBuffer()));
+            neighbor_cell_list.insert(std::make_pair(*it, CellDataTransferBuffer<dim>()));
 
           for (typename DoFHandler<dim,spacedim>::level_cell_iterator
                cell = dof_handler.begin(0);
@@ -1634,7 +1630,7 @@ namespace internal
           for (unsigned int idx=0; idx<level_ghost_owners.size(); ++idx)
             {
               std::vector<char> receive;
-              typename types<dim>::CellDataTransferBuffer cell_data_transfer_buffer;
+              CellDataTransferBuffer<dim> cell_data_transfer_buffer;
 
               MPI_Status status;
               int len;
@@ -1682,7 +1678,7 @@ namespace internal
           for (unsigned int idx=0; idx<level_ghost_owners.size(); ++idx)
             {
               std::vector<char> receive;
-              typename types<dim>::CellDataTransferBuffer cell_data_transfer_buffer;
+              CellDataTransferBuffer<dim> cell_data_transfer_buffer;
 
               MPI_Status status;
               int len;
@@ -1856,8 +1852,8 @@ namespace internal
           // dof_indices for the
           // interested neighbors
           typedef
-          std::map<dealii::types::subdomain_id, typename types<dim>::CellDataTransferBuffer>
-          cellmap_t;
+          std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>
+              cellmap_t;
           cellmap_t needs_to_get_cells;
 
           for (typename DoFHandler<dim,spacedim>::level_cell_iterator
@@ -1961,7 +1957,7 @@ namespace internal
                               tr->get_communicator(), &status);
               AssertThrowMPI(ierr);
 
-              typename types<dim>::CellDataTransferBuffer cell_data_transfer_buffer;
+              CellDataTransferBuffer<dim> cell_data_transfer_buffer;
               cell_data_transfer_buffer.unpack_data(receive);
               unsigned int cells = cell_data_transfer_buffer.tree_index.size();
               dealii::types::global_dof_index *dofs = cell_data_transfer_buffer.dofs.data();
