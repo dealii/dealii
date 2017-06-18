@@ -310,9 +310,25 @@ public:
   DoFHandler ( const Triangulation<dim,spacedim> &tria);
 
   /**
+   * Copy constructor. DoFHandler objects are large and expensive.
+   * They should not be copied, in particular not by accident, but
+   * rather deliberately constructed. As a consequence, this constructor
+   * is explicitly removed from the interface of this class.
+   */
+  DoFHandler (const DoFHandler &) = delete;
+
+  /**
    * Destructor.
    */
   virtual ~DoFHandler ();
+
+  /**
+   * Copy operator. DoFHandler objects are large and expensive.
+   * They should not be copied, in particular not by accident, but
+   * rather deliberately constructed. As a consequence, this operator
+   * is explicitly removed from the interface of this class.
+   */
+  DoFHandler &operator = (const DoFHandler &) = delete;
 
   /**
    * Assign a Triangulation and a FiniteElement to the DoFHandler and compute
@@ -890,22 +906,6 @@ public:
 
 
 private:
-  /**
-   * Copy constructor. I can see no reason why someone might want to use it,
-   * so I don't provide it. Since this class has pointer members, making it
-   * private prevents the compiler to provide it's own, incorrect one if
-   * anyone chose to copy such an object.
-   */
-  DoFHandler (const DoFHandler &);
-
-  /**
-   * Copy operator. I can see no reason why someone might want to use it, so I
-   * don't provide it. Since this class has pointer members, making it private
-   * prevents the compiler to provide it's own, incorrect one if anyone chose
-   * to copy such an object.
-   */
-  DoFHandler &operator = (const DoFHandler &);
-
 
   /**
    * An object containing information on the block structure.
