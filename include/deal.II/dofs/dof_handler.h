@@ -1022,6 +1022,9 @@ private:
     /**
      * A pointer to an array where we store the indices of the DoFs that live
      * on the various levels this vertex exists on.
+     *
+     * The starting offset of the DoFs that belong to a @p level are given by
+     * <code>indices_offset[level-coarsest_level]</code>.
      */
     types::global_dof_index *indices;
 
@@ -1029,6 +1032,10 @@ private:
      * This array stores, for each level starting with coarsest_level, the
      * offset in the <code>indices</code> array where the DoF indices for each
      * level are stored.
+     *
+     * We need to explicitly store this offset because this class does not
+     * store how many degrees of freedom the finite element has per vertex,
+     * and consequently cannot compute the offset on the fly.
      */
     types::global_dof_index *indices_offset;
   };
