@@ -34,10 +34,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-//TODO[WB]: do not use a plain pointer for DoFHandler::faces, but rather an
-//unique_ptr or some such thing. alternatively, why not use the DoFFaces object
-//right away?
-
 template<int dim, int spacedim>
 const unsigned int DoFHandler<dim,spacedim>::dimension;
 
@@ -280,8 +276,7 @@ namespace internal
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
-            dof_handler.levels
-            .push_back (new internal::DoFHandler::DoFLevel<1>);
+            dof_handler.levels.emplace_back (new internal::DoFHandler::DoFLevel<1>);
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
@@ -307,7 +302,7 @@ namespace internal
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
-            dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<2>);
+            dof_handler.levels.emplace_back (new internal::DoFHandler::DoFLevel<2>);
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
@@ -320,7 +315,7 @@ namespace internal
                      DoFHandler<2,spacedim>::invalid_dof_index);
           }
 
-        dof_handler.faces = new internal::DoFHandler::DoFFaces<2>;
+        dof_handler.faces.reset (new internal::DoFHandler::DoFFaces<2>);
         // avoid access to n_raw_lines when there are no cells
         if (dof_handler.tria->n_cells() > 0)
           {
@@ -343,7 +338,7 @@ namespace internal
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
-            dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<3>);
+            dof_handler.levels.emplace_back (new internal::DoFHandler::DoFLevel<3>);
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
@@ -355,7 +350,7 @@ namespace internal
                      dof_handler.selected_fe->dofs_per_cell,
                      DoFHandler<3,spacedim>::invalid_dof_index);
           }
-        dof_handler.faces = new internal::DoFHandler::DoFFaces<3>;
+        dof_handler.faces.reset (new internal::DoFHandler::DoFFaces<3>);
 
         // avoid access to n_raw_lines when there are no cells
         if (dof_handler.tria->n_cells() > 0)
@@ -384,7 +379,7 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
+            dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<1>);
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines (i) * dofs_per_line, DoFHandler<1>::invalid_dof_index);
           }
 
@@ -440,11 +435,11 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
+            dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<2>);
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads (i) * fe.dofs_per_quad, DoFHandler<2>::invalid_dof_index);
           }
 
-        dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<2>;
+        dof_handler.mg_faces.reset (new internal::DoFHandler::DoFFaces<2>);
         dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<2>::invalid_dof_index);
 
         const unsigned int &n_vertices = tria.n_vertices ();
@@ -499,11 +494,11 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
+            dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<3>);
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_hexs (i) * fe.dofs_per_hex, DoFHandler<3>::invalid_dof_index);
           }
 
-        dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<3>;
+        dof_handler.mg_faces.reset (new internal::DoFHandler::DoFFaces<3>);
         dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<3>::invalid_dof_index);
         dof_handler.mg_faces->quads.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads () * fe.dofs_per_quad, DoFHandler<3>::invalid_dof_index);
 
@@ -678,9 +673,7 @@ template<int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler ()
   :
   tria(nullptr, typeid(*this).name()),
-  selected_fe(nullptr, typeid(*this).name()),
-  faces(nullptr),
-  mg_faces (nullptr)
+  selected_fe(nullptr, typeid(*this).name())
 {}
 
 
@@ -1144,21 +1137,21 @@ void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spa
     block_info_object.initialize (*this, true, false);
 }
 
+
+
 template<int dim, int spacedim>
 void DoFHandler<dim, spacedim>::reserve_space ()
 {
   //TODO: move this to distribute_mg_dofs and remove function
 }
 
+
+
 template<int dim, int spacedim>
 void DoFHandler<dim, spacedim>::clear_mg_space ()
 {
-  for (unsigned int i = 0; i < mg_levels.size (); ++i)
-    delete mg_levels[i];
-
   mg_levels.clear ();
-  delete mg_faces;
-  mg_faces = nullptr;
+  mg_faces.reset ();
 
   std::vector<MGVertexDoFs> tmp;
 
@@ -1477,12 +1470,8 @@ DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
 template<int dim, int spacedim>
 void DoFHandler<dim,spacedim>::clear_space ()
 {
-  for (unsigned int i=0; i<levels.size(); ++i)
-    delete levels[i];
-  levels.resize (0);
-
-  delete faces;
-  faces = nullptr;
+  levels.clear ();
+  faces.reset ();
 
   std::vector<types::global_dof_index> tmp;
   std::swap (vertex_dofs, tmp);

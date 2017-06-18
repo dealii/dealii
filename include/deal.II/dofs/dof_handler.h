@@ -1070,18 +1070,18 @@ private:
    * Space to store the DoF numbers for the different levels. Analogous to the
    * <tt>levels[]</tt> tree of the Triangulation objects.
    */
-  std::vector<dealii::internal::DoFHandler::DoFLevel<dim>*> levels;
+  std::vector<std::unique_ptr<dealii::internal::DoFHandler::DoFLevel<dim> > > levels;
 
-  std::vector<dealii::internal::DoFHandler::DoFLevel<dim>*> mg_levels;
+  std::vector<std::unique_ptr<dealii::internal::DoFHandler::DoFLevel<dim> > > mg_levels;
 
   /**
    * Space to store DoF numbers of faces. They are not stored in
    * <tt>levels</tt> since faces are not organized hierarchically, but in a
    * flat array.
    */
-  dealii::internal::DoFHandler::DoFFaces<dim> *faces;
+  std::unique_ptr<dealii::internal::DoFHandler::DoFFaces<dim> > faces;
 
-  dealii::internal::DoFHandler::DoFFaces<dim> *mg_faces;
+  std::unique_ptr<dealii::internal::DoFHandler::DoFFaces<dim> > mg_faces;
 
   /**
    * Make accessor objects friends.
@@ -1300,11 +1300,8 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
   // pointer object still points to something useful, that object is not
   // destroyed and we end up with a memory leak. consequently, first delete
   // previous content before re-loading stuff
-  for (unsigned int i=0; i<levels.size(); ++i)
-    delete levels[i];
-  levels.resize (0);
-  delete faces;
-  faces = nullptr;
+  levels.clear();
+  faces.reset();
 
   ar &levels;
   ar &faces;
