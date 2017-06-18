@@ -1564,8 +1564,7 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
   const unsigned int n_indices = n_levels * dofs_per_vertex;
 
   indices = new types::global_dof_index[n_indices];
-  for (unsigned int i = 0; i < n_indices; ++i)
-    indices[i] = DoFHandler<dim, spacedim>::invalid_dof_index;
+  std::fill (indices, indices+n_indices, DoFHandler<dim,spacedim>::invalid_dof_index);
 
   indices_offset = new types::global_dof_index[n_levels];
   for (unsigned int i = 0; i < n_levels; ++i)
