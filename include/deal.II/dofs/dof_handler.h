@@ -933,7 +933,7 @@ private:
    * An object that describes how degrees of freedom should be distributed and
    * renumbered.
    */
-  std::shared_ptr<dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
+  std::unique_ptr<dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
 
   /**
    * A structure that contains all sorts of numbers that characterize the
