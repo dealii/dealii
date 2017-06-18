@@ -1239,7 +1239,7 @@ namespace internal
         {
           std::vector<unsigned int>                                           tree_index;
           std::vector<typename dealii::internal::p4est::types<dim>::quadrant> quadrants;
-          std::vector<dealii::types::global_dof_index>                        dofs;
+          std::vector<dealii::types::global_dof_index>                        dof_numbers_and_indices;
 
 
           unsigned int bytes_for_buffer () const
@@ -1248,7 +1248,7 @@ namespace internal
                     tree_index.size() * sizeof(unsigned int) +
                     quadrants.size() * sizeof(typename dealii::internal::p4est
                                               ::types<dim>::quadrant) +
-                    dofs.size() * sizeof(dealii::types::global_dof_index));
+                    dof_numbers_and_indices.size() * sizeof(dealii::types::global_dof_index));
           }
 
 
@@ -1262,7 +1262,7 @@ namespace internal
             std::memcpy(ptr, &num_cells, sizeof(unsigned int));
             ptr += sizeof(unsigned int);
 
-            const unsigned int num_dofs = dofs.size();
+            const unsigned int num_dofs = dof_numbers_and_indices.size();
             std::memcpy(ptr, &num_dofs, sizeof(unsigned int));
             ptr += sizeof(unsigned int);
 
@@ -1280,9 +1280,9 @@ namespace internal
 
             if (num_dofs>0)
               std::memcpy(ptr,
-                          &dofs[0],
-                          dofs.size() * sizeof(dealii::types::global_dof_index));
-            ptr += dofs.size() * sizeof(dealii::types::global_dof_index);
+                          &dof_numbers_and_indices[0],
+                          dof_numbers_and_indices.size() * sizeof(dealii::types::global_dof_index));
+            ptr += dof_numbers_and_indices.size() * sizeof(dealii::types::global_dof_index);
 
             Assert (ptr == &buffer[0]+buffer.size(),
                     ExcInternalError());
@@ -1314,12 +1314,12 @@ namespace internal
             ptr += num_cells*sizeof(typename dealii::internal::p4est::types<dim>::
                                     quadrant);
 
-            dofs.resize(num_dofs);
+            dof_numbers_and_indices.resize(num_dofs);
             if (num_dofs>0)
-              std::memcpy(&dofs[0],
+              std::memcpy(&dof_numbers_and_indices[0],
                           ptr,
-                          dofs.size() * sizeof(dealii::types::global_dof_index));
-            ptr += dofs.size() * sizeof(dealii::types::global_dof_index);
+                          dof_numbers_and_indices.size() * sizeof(dealii::types::global_dof_index));
+            ptr += dof_numbers_and_indices.size() * sizeof(dealii::types::global_dof_index);
 
             Assert (ptr == &buffer[0]+buffer.size(),
                     ExcInternalError());
@@ -1408,10 +1408,10 @@ namespace internal
                       p->second.tree_index.push_back(tree_index);
                       p->second.quadrants.push_back(p4est_cell);
 
-                      p->second.dofs.push_back(dealii_cell->get_fe().dofs_per_cell);
-                      p->second.dofs.insert(p->second.dofs.end(),
-                                            local_dof_indices.begin(),
-                                            local_dof_indices.end());
+                      p->second.dof_numbers_and_indices.push_back(dealii_cell->get_fe().dofs_per_cell);
+                      p->second.dof_numbers_and_indices.insert(p->second.dof_numbers_and_indices.end(),
+                                                               local_dof_indices.begin(),
+                                                               local_dof_indices.end());
 
                     }
                 }
@@ -1437,10 +1437,10 @@ namespace internal
               local_dof_indices (dealii_cell->get_fe().dofs_per_cell);
               dealii_cell->get_mg_dof_indices (local_dof_indices);
 
-              cell_data_transfer_buffer.dofs.push_back(dealii_cell->get_fe().dofs_per_cell);
-              cell_data_transfer_buffer.dofs.insert(cell_data_transfer_buffer.dofs.end(),
-                                                    local_dof_indices.begin(),
-                                                    local_dof_indices.end());
+              cell_data_transfer_buffer.dof_numbers_and_indices.push_back(dealii_cell->get_fe().dofs_per_cell);
+              cell_data_transfer_buffer.dof_numbers_and_indices.insert(cell_data_transfer_buffer.dof_numbers_and_indices.end(),
+                                                                       local_dof_indices.begin(),
+                                                                       local_dof_indices.end());
               return; // we are done
             }
 
@@ -1686,7 +1686,7 @@ namespace internal
                 continue;
 
               // set the dof indices for each cell
-              dealii::types::global_dof_index *dofs = cell_data_transfer_buffer.dofs.data();
+              dealii::types::global_dof_index *dofs = cell_data_transfer_buffer.dof_numbers_and_indices.data();
               for (unsigned int c=0; c<cell_data_transfer_buffer.tree_index.size(); ++c, dofs+=1+dofs[0])
                 {
                   typename DoFHandler<dim,spacedim>::level_cell_iterator
@@ -1941,7 +1941,7 @@ namespace internal
               CellDataTransferBuffer<dim> cell_data_transfer_buffer;
               cell_data_transfer_buffer.unpack_data(receive);
               unsigned int cells = cell_data_transfer_buffer.tree_index.size();
-              dealii::types::global_dof_index *dofs = cell_data_transfer_buffer.dofs.data();
+              dealii::types::global_dof_index *dofs = cell_data_transfer_buffer.dof_numbers_and_indices.data();
 
               // the dofs pointer contains for each cell the number of
               // dofs on that cell (dofs[0]) followed by the dof
