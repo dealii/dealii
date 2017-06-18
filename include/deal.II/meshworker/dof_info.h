@@ -171,7 +171,7 @@ namespace MeshWorker
      * constructor is not recommended, but it is needed for the arrays in
      * DoFInfoBox.
      */
-    DoFInfo () = default;
+    DoFInfo ();
 
     /// Set up local block indices
     void set_block_indices ();
@@ -271,6 +271,16 @@ namespace MeshWorker
   };
 
 //----------------------------------------------------------------------//
+
+  template <int dim, int spacedim, typename number>
+  DoFInfo<dim, spacedim, number>::DoFInfo()
+    :
+    face_number(numbers::invalid_unsigned_int),
+    sub_number(numbers::invalid_unsigned_int),
+    level_cell(false)
+  {}
+
+
 
   template <int dim, int spacedim, typename number>
   DoFInfo<dim,spacedim,number>::DoFInfo(const DoFHandler<dim,spacedim> &dof_handler)
