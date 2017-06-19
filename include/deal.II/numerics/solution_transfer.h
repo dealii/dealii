@@ -288,10 +288,15 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann, 1999, Oliver Kayser-Herold and Wolfgang Bangerth,
  * 2006, Wolfgang Bangerth 2014
  */
-template<int dim, typename VectorType=Vector<double>,
-         typename DoFHandlerType=DoFHandler<dim> >
+template<int dim,
+         typename VectorType = Vector<double>,
+         typename DoFHandlerType = DoFHandler<dim> >
 class SolutionTransfer
 {
+  static_assert (dim == DoFHandlerType::dimension,
+                 "The dimension explicitly provided as a template "
+                 "argument, and the dimension of the DoFHandlerType "
+                 "template argument must match.");
 public:
 
   /**
