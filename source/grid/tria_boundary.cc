@@ -537,8 +537,6 @@ normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
   for (unsigned int i=0; i<facedim; ++i)
     xi[i] = 1./2;
 
-  FE_Q<facedim> linear_fe(1);
-
   const double eps = 1e-12;
   Tensor<1,spacedim> grad_F[facedim];
   unsigned int iteration = 0;
@@ -546,13 +544,14 @@ normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
     {
       Point<spacedim> F;
       for (unsigned int v=0; v<GeometryInfo<facedim>::vertices_per_cell; ++v)
-        F += face->vertex(v) * linear_fe.shape_value(v, xi);
+        F += face->vertex(v) * GeometryInfo<facedim>::d_linear_shape_function(xi, v);
 
       for (unsigned int i=0; i<facedim; ++i)
         {
           grad_F[i] = 0;
           for (unsigned int v=0; v<GeometryInfo<facedim>::vertices_per_cell; ++v)
-            grad_F[i] += face->vertex(v) * linear_fe.shape_grad(v, xi)[i];
+            grad_F[i] += face->vertex(v) *
+                         GeometryInfo<facedim>::d_linear_shape_function_gradient(xi, v)[i];
         }
 
       Tensor<1,facedim> J;
@@ -879,4 +878,3 @@ project_to_surface (const typename Triangulation<dim, spacedim>::hex_iterator &,
 #include "tria_boundary.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-
