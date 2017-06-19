@@ -443,6 +443,27 @@ namespace internal
               fe.get_prolongation_matrix(c)(renumbering[j],renumbering[i]);
     }
 
+    namespace
+    {
+      /**
+       * Helper function for setup_transfer. Checks for identity constrained dofs
+       * and replace with the indices of the dofs to which they are constrained
+       */
+      void replace (const MGConstrainedDoFs              *mg_constrained_dofs,
+                    const unsigned int                   level,
+                    std::vector<types::global_dof_index> &dof_indices)
+      {
+        if (mg_constrained_dofs != nullptr &&
+            mg_constrained_dofs->get_level_constraint_matrix(level).n_constraints() > 0)
+          for (auto &ind : dof_indices)
+            if (mg_constrained_dofs->get_level_constraint_matrix(level).is_identity_constrained(ind))
+              {
+                Assert(mg_constrained_dofs->get_level_constraint_matrix(level).get_constraint_entries(ind)->size() == 1,
+                       ExcInternalError());
+                ind = mg_constrained_dofs->get_level_constraint_matrix(level).get_constraint_entries(ind)->front().first;
+              }
+      }
+    }
 
     // Sets up most of the internal data structures of the MGTransferMatrixFree
     // class
@@ -564,6 +585,8 @@ namespace internal
                     continue;
                   cell->child(c)->get_mg_dof_indices(local_dof_indices);
 
+                  replace(mg_constrained_dofs, level, local_dof_indices);
+
                   const IndexSet &owned_level_dofs = mg_dof.locally_owned_mg_dofs(level);
                   for (unsigned int i=0; i<local_dof_indices.size(); ++i)
                     if (!owned_level_dofs.is_element(local_dof_indices[i]))
@@ -619,6 +642,8 @@ namespace internal
               if (level == 1 && !cell_is_remote)
                 {
                   cell->get_mg_dof_indices(local_dof_indices);
+
+                  replace(mg_constrained_dofs, level-1, local_dof_indices);
 
                   const IndexSet &owned_level_dofs_l0 = mg_dof.locally_owned_mg_dofs(0);
                   for (unsigned int i=0; i<local_dof_indices.size(); ++i)

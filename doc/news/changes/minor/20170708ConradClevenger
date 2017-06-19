@@ -1,0 +1,5 @@
+New: MGConstrainedDoFs object now stores information for periodicity 
+constraints which is used during the multigrid transfer by 
+MGTransferMatrixFree and MGTransferPrebuilt.
+<br>
+(Conrad Clevenger, Martin Kronbichler, 2017/07/08)

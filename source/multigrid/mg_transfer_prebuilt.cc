@@ -123,6 +123,27 @@ void MGTransferPrebuilt<VectorType>::restrict_and_add (const unsigned int from_l
 }
 
 
+namespace
+{
+  /**
+   * Helper function for build_matrices. Checks for identity constrained dofs
+   * and replace with the indices of the dofs to which they are constrained
+   */
+  void replace (const MGConstrainedDoFs              *mg_constrained_dofs,
+                const unsigned int                   level,
+                std::vector<types::global_dof_index> &dof_indices)
+  {
+    if (mg_constrained_dofs != nullptr &&
+        mg_constrained_dofs->get_level_constraint_matrix(level).n_constraints() > 0)
+      for (auto &ind : dof_indices)
+        if (mg_constrained_dofs->get_level_constraint_matrix(level).is_identity_constrained(ind))
+          {
+            Assert(mg_constrained_dofs->get_level_constraint_matrix(level).get_constraint_entries(ind)->size() == 1,
+                   ExcInternalError());
+            ind = mg_constrained_dofs->get_level_constraint_matrix(level).get_constraint_entries(ind)->front().first;
+          }
+  }
+}
 
 template <typename VectorType>
 template <int dim, int spacedim>
@@ -195,6 +216,8 @@ void MGTransferPrebuilt<VectorType>::build_matrices
           {
             cell->get_mg_dof_indices (dof_indices_parent);
 
+            replace(this->mg_constrained_dofs, level, dof_indices_parent);
+
             Assert(cell->n_children()==GeometryInfo<dim>::max_children_per_cell,
                    ExcNotImplemented());
             for (unsigned int child=0; child<cell->n_children(); ++child)
@@ -207,6 +230,8 @@ void MGTransferPrebuilt<VectorType>::build_matrices
                 Assert (prolongation.n() != 0, ExcNoProlongation());
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
+
+                replace(this->mg_constrained_dofs, level+1, dof_indices_child);
 
                 // now tag the entries in the
                 // matrix which will be used
@@ -241,6 +266,8 @@ void MGTransferPrebuilt<VectorType>::build_matrices
           {
             cell->get_mg_dof_indices (dof_indices_parent);
 
+            replace(this->mg_constrained_dofs, level, dof_indices_parent);
+
             Assert(cell->n_children()==GeometryInfo<dim>::max_children_per_cell,
                    ExcNotImplemented());
             for (unsigned int child=0; child<cell->n_children(); ++child)
@@ -258,6 +285,8 @@ void MGTransferPrebuilt<VectorType>::build_matrices
                         prolongation(i,j) = 0.;
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
+
+                replace(this->mg_constrained_dofs, level+1, dof_indices_child);
 
                 // now set the entries in the matrix
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
