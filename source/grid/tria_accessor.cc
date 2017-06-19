@@ -1205,10 +1205,6 @@ template <int structdim, int dim, int spacedim>
 Point<spacedim>
 TriaAccessor<structdim, dim, spacedim>::intermediate_point (const Point<structdim> &coordinates) const
 {
-  // We use an FE_Q<structdim>(1) to extract the "weights" of each
-  // vertex, used to get a point from the manifold.
-  static FE_Q<structdim> fe(1);
-
   // Surrounding points and weights.
   std::vector<Point<spacedim> > p(GeometryInfo<structdim>::vertices_per_cell);
   std::vector<double>   w(GeometryInfo<structdim>::vertices_per_cell);
@@ -1216,7 +1212,7 @@ TriaAccessor<structdim, dim, spacedim>::intermediate_point (const Point<structdi
   for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
     {
       p[i] = this->vertex(i);
-      w[i] = fe.shape_value(i, coordinates);
+      w[i] = GeometryInfo<structdim>::d_linear_shape_function(coordinates, i);
     }
 
   return this->get_manifold().get_new_point(p, w);
