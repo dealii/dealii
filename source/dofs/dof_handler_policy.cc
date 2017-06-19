@@ -1252,9 +1252,10 @@ namespace internal
           }
 
 
-          void pack_data (std::vector<char> &buffer) const
+          std::vector<char>
+          pack_data () const
           {
-            buffer.resize(bytes_for_buffer());
+            std::vector<char> buffer (bytes_for_buffer());
 
             char *ptr = &buffer[0];
 
@@ -1286,6 +1287,8 @@ namespace internal
 
             Assert (ptr == &buffer[0]+buffer.size(),
                     ExcInternalError());
+
+            return buffer;
           }
 
 
@@ -1604,7 +1607,7 @@ namespace internal
               // pack all the data into the buffer for this recipient
               // and send it. keep data around till we can make sure
               // that the packet has been received
-              it->second.pack_data (sendbuffers[idx]);
+              sendbuffers[idx] = it->second.pack_data ();
               const int ierr = MPI_Isend(sendbuffers[idx].data(), sendbuffers[idx].size(),
                                          MPI_BYTE, it->first,
                                          1100101, tria.get_communicator(), &requests[idx]);
@@ -1655,7 +1658,7 @@ namespace internal
                 }
 
               // send reply
-              cell_data_transfer_buffer.pack_data(reply_buffers[idx]);
+              reply_buffers[idx] = cell_data_transfer_buffer.pack_data();
               ierr = MPI_Isend(&(reply_buffers[idx])[0], reply_buffers[idx].size(),
                                MPI_BYTE, status.MPI_SOURCE,
                                1100102, tria.get_communicator(), &reply_requests[idx]);
@@ -1863,11 +1866,10 @@ namespace internal
 
           // sending
           std::vector<std::vector<char> > sendbuffers (needs_to_get_cells.size());
-          std::vector<std::vector<char> >::iterator buffer = sendbuffers.begin();
           std::vector<MPI_Request> requests (needs_to_get_cells.size());
 
-          unsigned int idx=0;
-
+          unsigned int                              idx    = 0;
+          std::vector<std::vector<char> >::iterator buffer = sendbuffers.begin();
           for (typename cellmap_t::iterator it=needs_to_get_cells.begin();
                it!=needs_to_get_cells.end();
                ++it, ++buffer, ++idx)
@@ -1881,7 +1883,7 @@ namespace internal
               // pack all the data into the buffer for this recipient
               // and send it. keep data around till we can make sure
               // that the packet has been received
-              it->second.pack_data (*buffer);
+              *buffer = it->second.pack_data ();
               const int ierr = MPI_Isend(&(*buffer)[0], buffer->size(),
                                          MPI_BYTE, it->first,
                                          123, tr->get_communicator(), &requests[idx]);
