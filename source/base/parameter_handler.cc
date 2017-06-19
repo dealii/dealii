@@ -602,7 +602,7 @@ namespace Patterns
 
   bool List::match (const std::string &test_string_list) const
   {
-    std::vector<std::string> split_list =
+    const std::vector<std::string> split_list =
       Utilities::split_string_list(test_string_list, separator);
 
     if ((split_list.size() < min_elements) ||
@@ -610,7 +610,7 @@ namespace Patterns
       return false;
 
     // check the different possibilities
-    for (auto &string : split_list)
+    for (const std::string &string : split_list)
       if (pattern->match (string) == false)
         return false;
 
