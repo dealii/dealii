@@ -112,9 +112,17 @@ namespace parallel
      * @ingroup distributed
      * @author Timo Heister, 2009-2011
      */
-    template<int dim, typename VectorType, typename DoFHandlerType=DoFHandler<dim> >
+    template <int dim,
+              typename VectorType,
+              typename DoFHandlerType = DoFHandler<dim> >
     class SolutionTransfer
     {
+#ifndef DEAL_II_MSVC
+      static_assert (dim == DoFHandlerType::dimension,
+                     "The dimension explicitly provided as a template "
+                     "argument, and the dimension of the DoFHandlerType "
+                     "template argument must match.");
+#endif
     public:
       /**
        * Constructor, takes the current DoFHandler as argument.
