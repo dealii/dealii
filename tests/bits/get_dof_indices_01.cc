@@ -75,7 +75,7 @@ void test ()
               << ", DoFs=";
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
         {
-          Assert (local_dof_indices[i] != DoFHandler<dim>::invalid_dof_index,
+          Assert (local_dof_indices[i] != numbers::invalid_dof_index,
                   ExcInternalError());
           deallog << local_dof_indices[i] << ' ';
         }

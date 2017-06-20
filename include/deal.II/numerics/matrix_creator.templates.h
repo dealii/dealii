@@ -1538,7 +1538,7 @@ namespace MatrixCreator
               types::global_dof_index max_element = static_cast<types::global_dof_index>(0);
               for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
                    i!=dof_to_boundary_mapping.end(); ++i)
-                if ((*i != hp::DoFHandler<dim,spacedim>::invalid_dof_index) &&
+                if ((*i != numbers::invalid_dof_index) &&
                     (*i > max_element))
                   max_element = *i;
               Assert (max_element  == matrix.n()-1, ExcInternalError());

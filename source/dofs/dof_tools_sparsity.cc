@@ -332,7 +332,7 @@ namespace DoFTools
         types::global_dof_index max_element = 0;
         for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
              i!=dof_to_boundary_mapping.end(); ++i)
-          if ((*i != DoFHandlerType::invalid_dof_index) &&
+          if ((*i != numbers::invalid_dof_index) &&
               (*i > max_element))
             max_element = *i;
         AssertDimension (max_element, sparsity.n_rows()-1);
@@ -425,7 +425,7 @@ namespace DoFTools
         types::global_dof_index max_element = 0;
         for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
              i!=dof_to_boundary_mapping.end(); ++i)
-          if ((*i != DoFHandlerType::invalid_dof_index) &&
+          if ((*i != numbers::invalid_dof_index) &&
               (*i > max_element))
             max_element = *i;
         AssertDimension (max_element, sparsity.n_rows()-1);

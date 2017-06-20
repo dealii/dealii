@@ -92,12 +92,12 @@ namespace GridTools
  * freedom. The map_dof_to_boundary_indices() function does exactly this: it
  * provides a vector with as many entries as there are degrees of freedom on
  * the whole domain, with each entry being the number in the numbering of the
- * boundary or DoFHandler::invalid_dof_index if the dof is not on the
+ * boundary or numbers::invalid_dof_index if the dof is not on the
  * boundary.
  *
  * With this vector, one can get, for any given degree of freedom, a unique
  * number among those DoFs that sit on the boundary; or, if your DoF was
- * interior to the domain, the result would be DoFHandler::invalid_dof_index.
+ * interior to the domain, the result would be numbers::invalid_dof_index.
  * We need this mapping, for example, to build the mass matrix on the boundary
  * (for this, see make_boundary_sparsity_pattern() function, the corresponding
  * section below, as well as the MatrixCreator namespace documentation).
@@ -116,10 +116,10 @@ namespace GridTools
  * intermixed.
  *
  * Degrees of freedom on the boundary but not on one of the specified boundary
- * parts are given the index DoFHandler::invalid_dof_index, as if they were in
+ * parts are given the index numbers::invalid_dof_index, as if they were in
  * the interior. If no boundary indicator was given or if no face of a cell
  * has a boundary indicator contained in the given list, the vector of new
- * indices consists solely of DoFHandler::invalid_dof_index.
+ * indices consists solely of numbers::invalid_dof_index.
  *
  * (As a side note, for corner cases: The question what a degree of freedom on
  * the boundary is, is not so easy.  It should really be a degree of freedom
@@ -2128,7 +2128,7 @@ namespace DoFTools
    * <tt>mapping[dof]</tt> gives the index of the degree of freedom with
    * global number @p dof in the list of degrees of freedom on the boundary.
    * If the degree of freedom requested is not on the boundary, the value of
-   * <tt>mapping[dof]</tt> is @p invalid_dof_index. This function is mainly
+   * <tt>mapping[dof]</tt> is numbers::invalid_dof_index. This function is mainly
    * used when setting up matrices and vectors on the boundary from the trial
    * functions, which have global numbers, while the matrices and vectors use
    * numbers of the trial functions local to the boundary.

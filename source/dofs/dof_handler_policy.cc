@@ -79,18 +79,18 @@ namespace internal
           if (dof_handler.get_fe().dofs_per_vertex > 0)
             for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
               {
-                if (cell->vertex_dof_index (v,0) == DoFHandler<1,spacedim>::invalid_dof_index)
+                if (cell->vertex_dof_index (v,0) == numbers::invalid_dof_index)
                   for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
                     {
                       Assert ((cell->vertex_dof_index (v,d) ==
-                               DoFHandler<1,spacedim>::invalid_dof_index),
+                               numbers::invalid_dof_index),
                               ExcInternalError());
                       cell->set_vertex_dof_index (v, d, next_free_dof++);
                     }
                 else
                   for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
                     Assert ((cell->vertex_dof_index (v,d) !=
-                             DoFHandler<1,spacedim>::invalid_dof_index),
+                             numbers::invalid_dof_index),
                             ExcInternalError());
               }
 
@@ -115,7 +115,7 @@ namespace internal
             for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
               // check whether dofs for this vertex have been distributed
               // (checking the first dof should be good enough)
-              if (cell->vertex_dof_index(vertex, 0) == DoFHandler<2,spacedim>::invalid_dof_index)
+              if (cell->vertex_dof_index(vertex, 0) == numbers::invalid_dof_index)
                 for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
                   cell->set_vertex_dof_index (vertex, d, next_free_dof++);
 
@@ -128,7 +128,7 @@ namespace internal
 
                 // distribute dofs if necessary: check whether line dof is already
                 // numbered (checking the first dof should be good enough)
-                if (line->dof_index(0) == DoFHandler<2,spacedim>::invalid_dof_index)
+                if (line->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
                   for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_line; ++d)
                     line->set_dof_index (d, next_free_dof++);
@@ -157,7 +157,7 @@ namespace internal
             for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
               // check whether dofs for this vertex have been distributed
               // (checking the first dof should be good enough)
-              if (cell->vertex_dof_index(vertex, 0) == DoFHandler<3,spacedim>::invalid_dof_index)
+              if (cell->vertex_dof_index(vertex, 0) == numbers::invalid_dof_index)
                 for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
                   cell->set_vertex_dof_index (vertex, d, next_free_dof++);
 
@@ -170,7 +170,7 @@ namespace internal
 
                 // distribute dofs if necessary: check whether line dof is already
                 // numbered (checking the first dof should be good enough)
-                if (line->dof_index(0) == DoFHandler<3,spacedim>::invalid_dof_index)
+                if (line->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
                   for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_line; ++d)
                     line->set_dof_index (d, next_free_dof++);
@@ -185,7 +185,7 @@ namespace internal
 
                 // distribute dofs if necessary: check whether line dof is already
                 // numbered (checking the first dof should be good enough)
-                if (quad->dof_index(0) == DoFHandler<3,spacedim>::invalid_dof_index)
+                if (quad->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
                   for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_quad; ++d)
                     quad->set_dof_index (d, next_free_dof++);
@@ -335,7 +335,7 @@ namespace internal
               // check whether dofs for this
               // vertex have been distributed
               // (only check the first dof)
-              if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == DoFHandler<2>::invalid_dof_index)
+              if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == numbers::invalid_dof_index)
                 for (unsigned int d=0; d<cell->get_fe().dofs_per_vertex; ++d)
                   cell->set_mg_vertex_dof_index (cell->level(), vertex, d, next_free_dof++);
 
@@ -348,7 +348,7 @@ namespace internal
                 // distribute dofs if necessary:
                 // check whether line dof is already
                 // numbered (check only first dof)
-                if (line->mg_dof_index(cell->level(), 0) == DoFHandler<2>::invalid_dof_index)
+                if (line->mg_dof_index(cell->level(), 0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
                   for (unsigned int d=0; d<cell->get_fe().dofs_per_line; ++d)
                     line->set_mg_dof_index (cell->level(), d, next_free_dof++);
@@ -382,7 +382,7 @@ namespace internal
               // check whether dofs for this
               // vertex have been distributed
               // (only check the first dof)
-              if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == DoFHandler<3>::invalid_dof_index)
+              if (cell->mg_vertex_dof_index(cell->level(), vertex, 0) == numbers::invalid_dof_index)
                 for (unsigned int d=0; d<cell->get_fe().dofs_per_vertex; ++d)
                   cell->set_mg_vertex_dof_index (cell->level(), vertex, d, next_free_dof++);
 
@@ -395,7 +395,7 @@ namespace internal
                 // distribute dofs if necessary:
                 // check whether line dof is already
                 // numbered (check only first dof)
-                if (line->mg_dof_index(cell->level(), 0) == DoFHandler<3>::invalid_dof_index)
+                if (line->mg_dof_index(cell->level(), 0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
                   for (unsigned int d=0; d<cell->get_fe().dofs_per_line; ++d)
                     line->set_mg_dof_index (cell->level(), d, next_free_dof++);
@@ -410,7 +410,7 @@ namespace internal
                 // distribute dofs if necessary:
                 // check whether line dof is already
                 // numbered (check only first dof)
-                if (quad->mg_dof_index(cell->level(), 0) == DoFHandler<3>::invalid_dof_index)
+                if (quad->mg_dof_index(cell->level(), 0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
                   for (unsigned int d=0; d<cell->get_fe().dofs_per_quad; ++d)
                     quad->set_mg_dof_index (cell->level(), d, next_free_dof++);
@@ -510,7 +510,7 @@ namespace internal
           for (std::vector<types::global_dof_index>::iterator
                i=dof_handler.vertex_dofs.begin();
                i!=dof_handler.vertex_dofs.end(); ++i)
-            if (*i != DoFHandler<1,spacedim>::invalid_dof_index)
+            if (*i != numbers::invalid_dof_index)
               *i = new_numbers[*i];
             else if (check_validity)
               // if index is invalid_dof_index: check if this one
@@ -525,7 +525,7 @@ namespace internal
             for (std::vector<types::global_dof_index>::iterator
                  i=dof_handler.levels[level]->dof_object.dofs.begin();
                  i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
-              if (*i != DoFHandler<1,spacedim>::invalid_dof_index)
+              if (*i != numbers::invalid_dof_index)
                 *i = new_numbers[*i];
 
           // update the cache used for cell dof indices
@@ -560,9 +560,9 @@ namespace internal
                 {
                   const dealii::types::global_dof_index idx = i->get_index (level, d);
                   if (check_validity)
-                    Assert(idx != DoFHandler<1>::invalid_dof_index, ExcInternalError ());
+                    Assert(idx != numbers::invalid_dof_index, ExcInternalError ());
 
-                  if (idx != DoFHandler<1>::invalid_dof_index)
+                  if (idx != numbers::invalid_dof_index)
                     i->set_index (level, d,
                                   (indices.n_elements() == 0)?
                                   (new_numbers[idx]) :
@@ -575,7 +575,7 @@ namespace internal
                i!=dof_handler.mg_levels[level]->dof_object.dofs.end();
                ++i)
             {
-              if (*i != DoFHandler<1>::invalid_dof_index)
+              if (*i != numbers::invalid_dof_index)
                 {
                   Assert(*i<new_numbers.size(), ExcInternalError());
                   *i = (indices.n_elements() == 0)?
@@ -604,7 +604,7 @@ namespace internal
           for (std::vector<types::global_dof_index>::iterator
                i=dof_handler.vertex_dofs.begin();
                i!=dof_handler.vertex_dofs.end(); ++i)
-            if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
+            if (*i != numbers::invalid_dof_index)
               *i = (indices.n_elements() == 0)?
                    (new_numbers[*i]) :
                    (new_numbers[indices.index_within_set(*i)]);
@@ -620,7 +620,7 @@ namespace internal
           for (std::vector<types::global_dof_index>::iterator
                i=dof_handler.faces->lines.dofs.begin();
                i!=dof_handler.faces->lines.dofs.end(); ++i)
-            if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
+            if (*i != numbers::invalid_dof_index)
               *i = ((indices.n_elements() == 0) ?
                     new_numbers[*i] :
                     new_numbers[indices.index_within_set(*i)]);
@@ -630,7 +630,7 @@ namespace internal
               for (std::vector<types::global_dof_index>::iterator
                    i=dof_handler.levels[level]->dof_object.dofs.begin();
                    i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
-                if (*i != DoFHandler<2,spacedim>::invalid_dof_index)
+                if (*i != numbers::invalid_dof_index)
                   *i = ((indices.n_elements() == 0) ?
                         new_numbers[*i] :
                         new_numbers[indices.index_within_set(*i)]);
@@ -666,9 +666,9 @@ namespace internal
                 {
                   const dealii::types::global_dof_index idx = i->get_index (level, d);
                   if (check_validity)
-                    Assert(idx != DoFHandler<2>::invalid_dof_index, ExcInternalError ());
+                    Assert(idx != numbers::invalid_dof_index, ExcInternalError ());
 
-                  if (idx != DoFHandler<1>::invalid_dof_index)
+                  if (idx != numbers::invalid_dof_index)
                     i->set_index (level, d/*, dof_handler.get_fe().dofs_per_vertex*/,
                                   ((indices.n_elements() == 0) ?
                                    new_numbers[idx] :
@@ -701,9 +701,9 @@ namespace internal
                         {
                           const dealii::types::global_dof_index idx = cell->line(l)->mg_dof_index(level, d);
                           if (check_validity)
-                            Assert(idx != DoFHandler<2>::invalid_dof_index, ExcInternalError ());
+                            Assert(idx != numbers::invalid_dof_index, ExcInternalError ());
 
-                          if (idx != DoFHandler<1>::invalid_dof_index)
+                          if (idx != numbers::invalid_dof_index)
                             cell->line(l)->set_mg_dof_index (level, d, ((indices.n_elements() == 0) ?
                                                                         new_numbers[idx] :
                                                                         new_numbers[indices.index_within_set(idx)]));
@@ -717,7 +717,7 @@ namespace internal
           for (std::vector<types::global_dof_index>::iterator i=dof_handler.mg_levels[level]->dof_object.dofs.begin();
                i!=dof_handler.mg_levels[level]->dof_object.dofs.end(); ++i)
             {
-              if (*i != DoFHandler<2>::invalid_dof_index)
+              if (*i != numbers::invalid_dof_index)
                 {
                   Assert(*i<new_numbers.size(), ExcInternalError());
                   *i = ((indices.n_elements() == 0) ?
@@ -746,7 +746,7 @@ namespace internal
           for (std::vector<types::global_dof_index>::iterator
                i=dof_handler.vertex_dofs.begin();
                i!=dof_handler.vertex_dofs.end(); ++i)
-            if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
+            if (*i != numbers::invalid_dof_index)
               *i = ((indices.n_elements() == 0) ?
                     new_numbers[*i] :
                     new_numbers[indices.index_within_set(*i)]);
@@ -762,14 +762,14 @@ namespace internal
           for (std::vector<types::global_dof_index>::iterator
                i=dof_handler.faces->lines.dofs.begin();
                i!=dof_handler.faces->lines.dofs.end(); ++i)
-            if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
+            if (*i != numbers::invalid_dof_index)
               *i = ((indices.n_elements() == 0) ?
                     new_numbers[*i] :
                     new_numbers[indices.index_within_set(*i)]);
           for (std::vector<types::global_dof_index>::iterator
                i=dof_handler.faces->quads.dofs.begin();
                i!=dof_handler.faces->quads.dofs.end(); ++i)
-            if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
+            if (*i != numbers::invalid_dof_index)
               *i = ((indices.n_elements() == 0) ?
                     new_numbers[*i] :
                     new_numbers[indices.index_within_set(*i)]);
@@ -779,7 +779,7 @@ namespace internal
               for (std::vector<types::global_dof_index>::iterator
                    i=dof_handler.levels[level]->dof_object.dofs.begin();
                    i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
-                if (*i != DoFHandler<3,spacedim>::invalid_dof_index)
+                if (*i != numbers::invalid_dof_index)
                   *i = ((indices.n_elements() == 0) ?
                         new_numbers[*i] :
                         new_numbers[indices.index_within_set(*i)]);
@@ -815,9 +815,9 @@ namespace internal
                 {
                   const dealii::types::global_dof_index idx = i->get_index (level, d);
                   if (check_validity)
-                    Assert(idx != DoFHandler<3>::invalid_dof_index, ExcInternalError ());
+                    Assert(idx != numbers::invalid_dof_index, ExcInternalError ());
 
-                  if (idx != DoFHandler<3>::invalid_dof_index)
+                  if (idx != numbers::invalid_dof_index)
                     i->set_index (level, d,
                                   ((indices.n_elements() == 0) ?
                                    new_numbers[idx] :
@@ -850,9 +850,9 @@ namespace internal
                         {
                           const dealii::types::global_dof_index idx = cell->line(l)->mg_dof_index(level, d);
                           if (check_validity)
-                            Assert(idx != DoFHandler<3>::invalid_dof_index, ExcInternalError ());
+                            Assert(idx != numbers::invalid_dof_index, ExcInternalError ());
 
-                          if (idx != DoFHandler<3>::invalid_dof_index)
+                          if (idx != numbers::invalid_dof_index)
                             cell->line(l)->set_mg_dof_index (level, d, ((indices.n_elements() == 0) ?
                                                                         new_numbers[idx] :
                                                                         new_numbers[indices.index_within_set(idx)]));
@@ -876,9 +876,9 @@ namespace internal
                         {
                           const dealii::types::global_dof_index idx = cell->quad(l)->mg_dof_index(level, d);
                           if (check_validity)
-                            Assert(idx != DoFHandler<3>::invalid_dof_index, ExcInternalError ());
+                            Assert(idx != numbers::invalid_dof_index, ExcInternalError ());
 
-                          if (idx != DoFHandler<1>::invalid_dof_index)
+                          if (idx != numbers::invalid_dof_index)
                             cell->quad(l)->set_mg_dof_index (level, d, ((indices.n_elements() == 0) ?
                                                                         new_numbers[idx] :
                                                                         new_numbers[indices.index_within_set(idx)]));
@@ -893,7 +893,7 @@ namespace internal
           for (std::vector<types::global_dof_index>::iterator i=dof_handler.mg_levels[level]->dof_object.dofs.begin();
                i!=dof_handler.mg_levels[level]->dof_object.dofs.end(); ++i)
             {
-              if (*i != DoFHandler<3>::invalid_dof_index)
+              if (*i != numbers::invalid_dof_index)
                 {
                   Assert(*i<new_numbers.size(), ExcInternalError());
                   *i = ((indices.n_elements() == 0) ?
@@ -1551,10 +1551,10 @@ namespace internal
 
               bool complete = true;
               for (unsigned int i=0; i<dof_indices.size(); ++i)
-                if (dofs[i] != DoFHandler<dim,spacedim>::invalid_dof_index)
+                if (dofs[i] != numbers::invalid_dof_index)
                   {
                     Assert((dof_indices[i] ==
-                            (DoFHandler<dim,spacedim>::invalid_dof_index))
+                            (numbers::invalid_dof_index))
                            ||
                            (dof_indices[i]==dofs[i]),
                            ExcInternalError());
@@ -1797,10 +1797,10 @@ namespace internal
 
               bool complete = true;
               for (unsigned int i=0; i<dof_indices.size(); ++i)
-                if (dofs[i] != DoFHandler<dim,spacedim>::invalid_dof_index)
+                if (dofs[i] != numbers::invalid_dof_index)
                   {
                     Assert((dof_indices[i] ==
-                            (DoFHandler<dim,spacedim>::invalid_dof_index))
+                            (numbers::invalid_dof_index))
                            ||
                            (dof_indices[i]==dofs[i]),
                            ExcInternalError());
@@ -1949,7 +1949,7 @@ namespace internal
                       if (local_dof_indices.end() !=
                           std::find (local_dof_indices.begin(),
                                      local_dof_indices.end(),
-                                     DoFHandler<dim,spacedim>::invalid_dof_index))
+                                     numbers::invalid_dof_index))
                         cell->set_user_flag();
                       else
                         cell->clear_user_flag();
@@ -2119,9 +2119,9 @@ namespace internal
                 local_dof_indices.resize (cell->get_fe().dofs_per_cell);
                 cell->get_dof_indices (local_dof_indices);
                 for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-                  if (local_dof_indices[i] != DoFHandler<dim,spacedim>::invalid_dof_index)
+                  if (local_dof_indices[i] != numbers::invalid_dof_index)
                     renumbering[local_dof_indices[i]]
-                      = DoFHandler<dim,spacedim>::invalid_dof_index;
+                      = numbers::invalid_dof_index;
               }
         }
 
@@ -2130,7 +2130,7 @@ namespace internal
         number_cache.n_locally_owned_dofs = 0;
         for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
              it!=renumbering.end(); ++it)
-          if (*it != DoFHandler<dim,spacedim>::invalid_dof_index)
+          if (*it != numbers::invalid_dof_index)
             *it = number_cache.n_locally_owned_dofs++;
 
         //* 3. communicate local dofcount and shift ids to make them
@@ -2153,7 +2153,7 @@ namespace internal
                                  static_cast<dealii::types::global_dof_index>(0));
         for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
              it!=renumbering.end(); ++it)
-          if (*it != DoFHandler<dim,spacedim>::invalid_dof_index)
+          if (*it != numbers::invalid_dof_index)
             (*it) += shift;
 
         // now re-enumerate all dofs to this shifted and condensed
@@ -2254,7 +2254,7 @@ namespace internal
                 if (local_dof_indices.end() !=
                     std::find (local_dof_indices.begin(),
                                local_dof_indices.end(),
-                               DoFHandler<dim,spacedim>::invalid_dof_index))
+                               numbers::invalid_dof_index))
                   {
                     if (cell->is_ghost())
                       {
@@ -2348,9 +2348,9 @@ namespace internal
                       local_dof_indices.resize (cell->get_fe().dofs_per_cell);
                       cell->get_mg_dof_indices (local_dof_indices);
                       for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-                        if (local_dof_indices[i] != DoFHandler<dim,spacedim>::invalid_dof_index)
+                        if (local_dof_indices[i] != numbers::invalid_dof_index)
                           renumbering[local_dof_indices[i]]
-                            = DoFHandler<dim,spacedim>::invalid_dof_index;
+                            = numbers::invalid_dof_index;
                     }
               }
 
@@ -2359,7 +2359,7 @@ namespace internal
             level_number_cache.n_locally_owned_dofs = 0;
             for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
                  it!=renumbering.end(); ++it)
-              if (*it != DoFHandler<dim,spacedim>::invalid_dof_index)
+              if (*it != numbers::invalid_dof_index)
                 *it = level_number_cache.n_locally_owned_dofs++;
 
             //* 3. communicate local dofcount and shift ids to make
@@ -2382,7 +2382,7 @@ namespace internal
                                      static_cast<dealii::types::global_dof_index>(0));
             for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
                  it!=renumbering.end(); ++it)
-              if (*it != DoFHandler<dim,spacedim>::invalid_dof_index)
+              if (*it != numbers::invalid_dof_index)
                 (*it) += shift;
 
             // now re-enumerate all dofs to this shifted and condensed
@@ -2515,7 +2515,7 @@ namespace internal
                 if (local_dof_indices.end() !=
                     std::find (local_dof_indices.begin(),
                                local_dof_indices.end(),
-                               DoFHandler<dim,spacedim>::invalid_dof_index))
+                               numbers::invalid_dof_index))
                   {
                     Assert(false, ExcMessage ("not all DoFs got distributed!"));
                   }
@@ -2648,14 +2648,14 @@ namespace internal
                 cell->get_dof_indices (local_dof_indices);
                 for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
                   {
-                    if (local_dof_indices[i] == DoFHandler<dim,spacedim>::invalid_dof_index)
+                    if (local_dof_indices[i] == numbers::invalid_dof_index)
                       continue;
 
                     if (!dof_handler.locally_owned_dofs().is_element(local_dof_indices[i]))
                       {
                         //this DoF is not owned by us, so set it to invalid.
                         local_dof_indices[i]
-                          = DoFHandler<dim,spacedim>::invalid_dof_index;
+                          = numbers::invalid_dof_index;
                       }
                   }
 

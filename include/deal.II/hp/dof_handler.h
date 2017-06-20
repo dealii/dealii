@@ -226,8 +226,10 @@ namespace hp
      *
      * Please note that you should not rely on it having a certain value, but
      * rather take its symbolic name.
+     *
+     * @deprecated Use numbers::invalid_dof_index instead.
      */
-    static const types::global_dof_index invalid_dof_index = numbers::invalid_dof_index;
+    static const types::global_dof_index invalid_dof_index DEAL_II_DEPRECATED = numbers::invalid_dof_index;
 
     /**
      * The default index of the finite element to be used on a given cell. For
