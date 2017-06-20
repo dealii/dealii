@@ -687,6 +687,58 @@ namespace internal
       }
 
 
+      template<int dim, int spacedim>
+      static
+      types::global_dof_index
+      mg_vertex_dof_index (const dealii::DoFHandler<dim,spacedim> &dof_handler,
+                           const int                       level,
+                           const unsigned int              vertex_index,
+                           const unsigned int              i)
+      {
+        return dof_handler.mg_vertex_dofs[vertex_index].get_index (level, i);
+      }
+
+
+      template<int dim, int spacedim>
+      static
+      types::global_dof_index
+      mg_vertex_dof_index (const dealii::hp::DoFHandler<dim,spacedim> &,
+                           const int,
+                           const unsigned int,
+                           const unsigned int)
+      {
+        Assert (false, ExcMessage ("hp::DoFHandler does not implement multilevel DoFs."));
+        return numbers::invalid_dof_index;
+      }
+
+
+      template<int dim, int spacedim>
+      static
+      void
+      set_mg_vertex_dof_index (dealii::DoFHandler<dim,spacedim> &dof_handler,
+                               const int                       level,
+                               const unsigned int              vertex_index,
+                               const unsigned int              i,
+                               types::global_dof_index         index)
+      {
+        return dof_handler.mg_vertex_dofs[vertex_index].set_index (level, i, index);
+      }
+
+
+      template<int dim, int spacedim>
+      static
+      void
+      set_mg_vertex_dof_index (dealii::hp::DoFHandler<dim,spacedim> &,
+                               const int,
+                               const unsigned int,
+                               const unsigned int,
+                               types::global_dof_index)
+      {
+        Assert (false, ExcMessage ("hp::DoFHandler does not implement multilevel DoFs."));
+      }
+
+
+
       template <int structdim, int dim, int spacedim>
       static
       bool
@@ -1668,9 +1720,17 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::mg_vertex_dof_index (co
 {
   (void)fe_index;
   Assert (this->dof_handler != nullptr, ExcInvalidObject ());
-  Assert (vertex < GeometryInfo<structdim>::vertices_per_cell, ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
-  Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex, ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
-  return this->dof_handler->mg_vertex_dofs[this->vertex_index (vertex)].get_index (level, i);
+  Assert (vertex < GeometryInfo<structdim>::vertices_per_cell,
+          ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
+  Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex,
+          ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
+
+  return
+    dealii::internal::DoFAccessor::Implementation::mg_vertex_dof_index
+    (*this->dof_handler,
+     level,
+     this->vertex_index(vertex),
+     i);
 }
 
 
@@ -1703,9 +1763,18 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_vertex_dof_index
 {
   (void)fe_index;
   Assert (this->dof_handler != nullptr, ExcInvalidObject ());
-  Assert (vertex < GeometryInfo<structdim>::vertices_per_cell, ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
-  Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex, ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
-  this->dof_handler->mg_vertex_dofs[this->vertex_index (vertex)].set_index (level, i, index);
+  Assert (vertex < GeometryInfo<structdim>::vertices_per_cell,
+          ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
+  Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex,
+          ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
+
+  return
+    dealii::internal::DoFAccessor::Implementation::set_mg_vertex_dof_index
+    (*this->dof_handler,
+     level,
+     this->vertex_index(vertex),
+     i,
+     index);
 }
 
 

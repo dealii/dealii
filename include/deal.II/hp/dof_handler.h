@@ -734,15 +734,6 @@ namespace hp
      */
     DoFHandler &operator = (const DoFHandler &);
 
-    class MGVertexDoFs
-    {
-    public:
-      MGVertexDoFs ();
-      ~MGVertexDoFs ();
-      types::global_dof_index get_index (const unsigned int level, const unsigned int dof_number) const;
-      void set_index (const unsigned int level, const unsigned int dof_number, const types::global_dof_index index);
-    };
-
     /**
      * Free all used memory.
      */
@@ -865,8 +856,6 @@ namespace hp
      * class.
      */
     std::vector<types::global_dof_index>      vertex_dofs_offsets;
-
-    std::vector<MGVertexDoFs> mg_vertex_dofs;  // we should really remove this field!
 
     /**
      * Array to store the information if a cell on some level has children or
@@ -1049,41 +1038,6 @@ namespace hp
   {
     return *tria;
   }
-
-
-
-  template<int dim, int spacedim>
-  inline
-  DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs()
-  {
-    Assert (false, ExcNotImplemented ());
-  }
-
-  template<int dim, int spacedim>
-  inline
-  DoFHandler<dim, spacedim>::MGVertexDoFs::~MGVertexDoFs()
-  {
-    Assert (false, ExcNotImplemented ());
-  }
-
-  template<int dim, int spacedim>
-  inline
-  types::global_dof_index DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (const unsigned int,
-      const unsigned int) const
-  {
-    Assert (false, ExcNotImplemented ());
-    return invalid_dof_index;
-  }
-
-  template<int dim, int spacedim>
-  inline
-  void DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (const unsigned int,
-                                                           const unsigned int,
-                                                           types::global_dof_index)
-  {
-    Assert (false, ExcNotImplemented ());
-  }
-
 
 #endif
 
