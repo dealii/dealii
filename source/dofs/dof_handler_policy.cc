@@ -537,6 +537,9 @@ namespace internal
                           const unsigned int                                  level,
                           const bool                                          check_validity)
         {
+          Assert (level<dof_handler.get_triangulation().n_levels(),
+                  ExcInternalError());
+
           for (typename std::vector<typename DoFHandler<1,spacedim>::MGVertexDoFs>::iterator
                i=dof_handler.mg_vertex_dofs.begin();
                i!=dof_handler.mg_vertex_dofs.end();
@@ -642,8 +645,8 @@ namespace internal
                           const unsigned int                                  level,
                           const bool                                          check_validity)
         {
-          if (level>=dof_handler.get_triangulation().n_levels())
-            return;
+          Assert (level<dof_handler.get_triangulation().n_levels(),
+                  ExcInternalError());
 
           for (typename std::vector<typename DoFHandler<2,spacedim>::MGVertexDoFs>::iterator i=dof_handler.mg_vertex_dofs.begin();
                i!=dof_handler.mg_vertex_dofs.end(); ++i)
@@ -791,8 +794,9 @@ namespace internal
                           const unsigned int                                  level,
                           const bool                                          check_validity)
         {
-          if (level>=dof_handler.get_triangulation().n_levels())
-            return;
+          Assert (level<dof_handler.get_triangulation().n_levels(),
+                  ExcInternalError());
+
           for (typename std::vector<typename DoFHandler<3,spacedim>::MGVertexDoFs>::iterator i=dof_handler.mg_vertex_dofs.begin();
                i!=dof_handler.mg_vertex_dofs.end(); ++i)
             // if the present vertex lives on the present level
@@ -2268,15 +2272,23 @@ namespace internal
         const unsigned int
         n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
 
-        unsigned int n_levels = Utilities::MPI::max(dof_handler.get_triangulation().n_levels(), tr->get_communicator());
-
+        // loop over all levels that exist globally (across all
+        // processors), even if the current processor does not in fact
+        // have any cells on that level or if the local part of the
+        // Triangulation has fewer levels. we need to do this because
+        // we need to communicate across all processors on all levels
+        const unsigned int n_levels = Utilities::MPI::max(dof_handler.get_triangulation().n_levels(),
+                                                          tr->get_communicator());
         for (unsigned int level = 0; level < n_levels; ++level)
           {
             NumberCache &number_cache = number_caches[level];
 
             //* 1. distribute on own subdomain
             const unsigned int n_initial_local_dofs =
-              Implementation::distribute_dofs_on_level(0, tr->locally_owned_subdomain(), dof_handler, level);
+              Implementation::distribute_dofs_on_level(0,
+                                                       tr->locally_owned_subdomain(),
+                                                       dof_handler,
+                                                       level);
 
             //* 2. iterate over ghostcells and kill dofs that are not
             // owned by us
@@ -2284,7 +2296,7 @@ namespace internal
             for (dealii::types::global_dof_index i=0; i<renumbering.size(); ++i)
               renumbering[i] = i;
 
-            if (level<tr->n_levels())
+            if (level < tr->n_levels())
               {
                 std::vector<dealii::types::global_dof_index> local_dof_indices;
 
@@ -2345,9 +2357,16 @@ namespace internal
 
             // now re-enumerate all dofs to this shifted and condensed
             // numbering form.  we renumber some dofs as invalid, so
-            // choose the nocheck-version.
-            Implementation::renumber_mg_dofs (renumbering, IndexSet(0),
-                                              dof_handler, level, false);
+            // choose the nocheck-version of the function
+            //
+            // of course there is nothing for us to renumber if the
+            // level we are currently dealing with doesn't even exist
+            // within the current triangulation, so skip renumbering
+            // in that case
+            if (level < tr->n_levels())
+              Implementation::renumber_mg_dofs (renumbering, IndexSet(0),
+                                                dof_handler, level,
+                                                false);
 
             // now a little bit of housekeeping
             number_cache.n_global_dofs
