@@ -310,9 +310,25 @@ public:
   DoFHandler ( const Triangulation<dim,spacedim> &tria);
 
   /**
+   * Copy constructor. DoFHandler objects are large and expensive.
+   * They should not be copied, in particular not by accident, but
+   * rather deliberately constructed. As a consequence, this constructor
+   * is explicitly removed from the interface of this class.
+   */
+  DoFHandler (const DoFHandler &) = delete;
+
+  /**
    * Destructor.
    */
   virtual ~DoFHandler ();
+
+  /**
+   * Copy operator. DoFHandler objects are large and expensive.
+   * They should not be copied, in particular not by accident, but
+   * rather deliberately constructed. As a consequence, this operator
+   * is explicitly removed from the interface of this class.
+   */
+  DoFHandler &operator = (const DoFHandler &) = delete;
 
   /**
    * Assign a Triangulation and a FiniteElement to the DoFHandler and compute
@@ -890,22 +906,6 @@ public:
 
 
 private:
-  /**
-   * Copy constructor. I can see no reason why someone might want to use it,
-   * so I don't provide it. Since this class has pointer members, making it
-   * private prevents the compiler to provide it's own, incorrect one if
-   * anyone chose to copy such an object.
-   */
-  DoFHandler (const DoFHandler &);
-
-  /**
-   * Copy operator. I can see no reason why someone might want to use it, so I
-   * don't provide it. Since this class has pointer members, making it private
-   * prevents the compiler to provide it's own, incorrect one if anyone chose
-   * to copy such an object.
-   */
-  DoFHandler &operator = (const DoFHandler &);
-
 
   /**
    * An object containing information on the block structure.
@@ -933,7 +933,7 @@ private:
    * An object that describes how degrees of freedom should be distributed and
    * renumbered.
    */
-  std::shared_ptr<dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
+  std::unique_ptr<dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
 
   /**
    * A structure that contains all sorts of numbers that characterize the
@@ -1003,11 +1003,6 @@ private:
                     const unsigned int dof_number,
                     const types::global_dof_index index);
 
-    /**
-     * Exception.
-     */
-    DeclException0 (ExcNoMemory);
-
   private:
     /**
      * Coarsest level for which this object stores DoF indices.
@@ -1022,6 +1017,9 @@ private:
     /**
      * A pointer to an array where we store the indices of the DoFs that live
      * on the various levels this vertex exists on.
+     *
+     * The starting offset of the DoFs that belong to a @p level are given by
+     * <code>indices_offset[level-coarsest_level]</code>.
      */
     types::global_dof_index *indices;
 
@@ -1029,17 +1027,27 @@ private:
      * This array stores, for each level starting with coarsest_level, the
      * offset in the <code>indices</code> array where the DoF indices for each
      * level are stored.
+     *
+     * We need to explicitly store this offset because this class does not
+     * store how many degrees of freedom the finite element has per vertex,
+     * and consequently cannot compute the offset on the fly.
      */
     types::global_dof_index *indices_offset;
   };
 
-  void clear_mg_space ();
-
   /**
-   * Free all used memory.
+   * Free all memory used for non-multigrid data structures.
    */
   void clear_space ();
 
+  /**
+   * Free all memory used for multigrid data structures.
+   */
+  void clear_mg_space ();
+
+  /**
+   * Allocate space that will be used by distribute_dofs().
+   */
   void reserve_space ();
 
   template <int structdim>
@@ -1070,18 +1078,18 @@ private:
    * Space to store the DoF numbers for the different levels. Analogous to the
    * <tt>levels[]</tt> tree of the Triangulation objects.
    */
-  std::vector<dealii::internal::DoFHandler::DoFLevel<dim>*> levels;
+  std::vector<std::unique_ptr<dealii::internal::DoFHandler::DoFLevel<dim> > > levels;
 
-  std::vector<dealii::internal::DoFHandler::DoFLevel<dim>*> mg_levels;
+  std::vector<std::unique_ptr<dealii::internal::DoFHandler::DoFLevel<dim> > > mg_levels;
 
   /**
    * Space to store DoF numbers of faces. They are not stored in
    * <tt>levels</tt> since faces are not organized hierarchically, but in a
    * flat array.
    */
-  dealii::internal::DoFHandler::DoFFaces<dim> *faces;
+  std::unique_ptr<dealii::internal::DoFHandler::DoFFaces<dim> > faces;
 
-  dealii::internal::DoFHandler::DoFFaces<dim> *mg_faces;
+  std::unique_ptr<dealii::internal::DoFHandler::DoFFaces<dim> > mg_faces;
 
   /**
    * Make accessor objects friends.
@@ -1300,11 +1308,8 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
   // pointer object still points to something useful, that object is not
   // destroyed and we end up with a memory leak. consequently, first delete
   // previous content before re-loading stuff
-  for (unsigned int i=0; i<levels.size(); ++i)
-    delete levels[i];
-  levels.resize (0);
-  delete faces;
-  faces = nullptr;
+  levels.clear();
+  faces.reset();
 
   ar &levels;
   ar &faces;

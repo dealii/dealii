@@ -34,10 +34,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-//TODO[WB]: do not use a plain pointer for DoFHandler::faces, but rather an
-//unique_ptr or some such thing. alternatively, why not use the DoFFaces object
-//right away?
-
 template<int dim, int spacedim>
 const unsigned int DoFHandler<dim,spacedim>::dimension;
 
@@ -280,8 +276,7 @@ namespace internal
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
-            dof_handler.levels
-            .push_back (new internal::DoFHandler::DoFLevel<1>);
+            dof_handler.levels.emplace_back (new internal::DoFHandler::DoFLevel<1>);
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
@@ -307,7 +302,7 @@ namespace internal
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
-            dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<2>);
+            dof_handler.levels.emplace_back (new internal::DoFHandler::DoFLevel<2>);
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
@@ -320,7 +315,7 @@ namespace internal
                      DoFHandler<2,spacedim>::invalid_dof_index);
           }
 
-        dof_handler.faces = new internal::DoFHandler::DoFFaces<2>;
+        dof_handler.faces.reset (new internal::DoFHandler::DoFFaces<2>);
         // avoid access to n_raw_lines when there are no cells
         if (dof_handler.tria->n_cells() > 0)
           {
@@ -343,7 +338,7 @@ namespace internal
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
-            dof_handler.levels.push_back (new internal::DoFHandler::DoFLevel<3>);
+            dof_handler.levels.emplace_back (new internal::DoFHandler::DoFLevel<3>);
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
@@ -355,7 +350,7 @@ namespace internal
                      dof_handler.selected_fe->dofs_per_cell,
                      DoFHandler<3,spacedim>::invalid_dof_index);
           }
-        dof_handler.faces = new internal::DoFHandler::DoFFaces<3>;
+        dof_handler.faces.reset (new internal::DoFHandler::DoFFaces<3>);
 
         // avoid access to n_raw_lines when there are no cells
         if (dof_handler.tria->n_cells() > 0)
@@ -384,7 +379,7 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
+            dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<1>);
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines (i) * dofs_per_line, DoFHandler<1>::invalid_dof_index);
           }
 
@@ -440,11 +435,11 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
+            dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<2>);
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads (i) * fe.dofs_per_quad, DoFHandler<2>::invalid_dof_index);
           }
 
-        dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<2>;
+        dof_handler.mg_faces.reset (new internal::DoFHandler::DoFFaces<2>);
         dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<2>::invalid_dof_index);
 
         const unsigned int &n_vertices = tria.n_vertices ();
@@ -499,11 +494,11 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
+            dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<3>);
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_hexs (i) * fe.dofs_per_hex, DoFHandler<3>::invalid_dof_index);
           }
 
-        dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<3>;
+        dof_handler.mg_faces.reset (new internal::DoFHandler::DoFFaces<3>);
         dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<3>::invalid_dof_index);
         dof_handler.mg_faces->quads.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads () * fe.dofs_per_quad, DoFHandler<3>::invalid_dof_index);
 
@@ -678,9 +673,7 @@ template<int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler ()
   :
   tria(nullptr, typeid(*this).name()),
-  selected_fe(nullptr, typeid(*this).name()),
-  faces(nullptr),
-  mg_faces (nullptr)
+  selected_fe(nullptr, typeid(*this).name())
 {}
 
 
@@ -1144,21 +1137,21 @@ void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spa
     block_info_object.initialize (*this, true, false);
 }
 
+
+
 template<int dim, int spacedim>
 void DoFHandler<dim, spacedim>::reserve_space ()
 {
   //TODO: move this to distribute_mg_dofs and remove function
 }
 
+
+
 template<int dim, int spacedim>
 void DoFHandler<dim, spacedim>::clear_mg_space ()
 {
-  for (unsigned int i = 0; i < mg_levels.size (); ++i)
-    delete mg_levels[i];
-
   mg_levels.clear ();
-  delete mg_faces;
-  mg_faces = nullptr;
+  mg_faces.reset ();
 
   std::vector<MGVertexDoFs> tmp;
 
@@ -1411,7 +1404,7 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
       const_cast<Triangulation<3> &>(this->get_triangulation()).load_user_flags (user_flags);
     }
 
-  //HEX DoFs
+  // HEX DoFs
   for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
        i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
@@ -1477,12 +1470,8 @@ DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
 template<int dim, int spacedim>
 void DoFHandler<dim,spacedim>::clear_space ()
 {
-  for (unsigned int i=0; i<levels.size(); ++i)
-    delete levels[i];
-  levels.resize (0);
-
-  delete faces;
-  faces = nullptr;
+  levels.clear ();
+  faces.reset ();
 
   std::vector<types::global_dof_index> tmp;
   std::swap (vertex_dofs, tmp);
@@ -1490,14 +1479,15 @@ void DoFHandler<dim,spacedim>::clear_space ()
   number_cache.clear ();
 }
 
+
+
 template<int dim, int spacedim>
 template<int structdim>
 types::global_dof_index
-DoFHandler<dim, spacedim>::get_dof_index (
-  const unsigned int obj_level,
-  const unsigned int obj_index,
-  const unsigned int fe_index,
-  const unsigned int local_index) const
+DoFHandler<dim, spacedim>::get_dof_index (const unsigned int obj_level,
+                                          const unsigned int obj_index,
+                                          const unsigned int fe_index,
+                                          const unsigned int local_index) const
 {
   return internal::DoFHandler::Implementation::get_dof_index (*this, *this->mg_levels[obj_level],
                                                               *this->mg_faces, obj_index,
@@ -1505,18 +1495,37 @@ DoFHandler<dim, spacedim>::get_dof_index (
                                                               internal::int2type<structdim> ());
 }
 
+
+
 template<int dim, int spacedim>
 template<int structdim>
-void DoFHandler<dim, spacedim>::set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index) const
+void DoFHandler<dim, spacedim>::set_dof_index (const unsigned int obj_level,
+                                               const unsigned int obj_index,
+                                               const unsigned int fe_index,
+                                               const unsigned int local_index,
+                                               const types::global_dof_index global_index) const
 {
-  internal::DoFHandler::Implementation::set_dof_index (*this, *this->mg_levels[obj_level], *this->mg_faces, obj_index, fe_index, local_index, global_index, internal::int2type<structdim> ());
+  internal::DoFHandler::Implementation::set_dof_index (*this,
+                                                       *this->mg_levels[obj_level],
+                                                       *this->mg_faces,
+                                                       obj_index,
+                                                       fe_index,
+                                                       local_index,
+                                                       global_index,
+                                                       internal::int2type<structdim> ());
 }
+
 
 
 template<int dim, int spacedim>
-DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs (): coarsest_level (numbers::invalid_unsigned_int), finest_level (0), indices (nullptr), indices_offset (nullptr)
-{
-}
+DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs ()
+  :
+  coarsest_level (numbers::invalid_unsigned_int),
+  finest_level (0),
+  indices (nullptr),
+  indices_offset (nullptr)
+{}
+
 
 
 template<int dim, int spacedim>
@@ -1526,8 +1535,12 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::~MGVertexDoFs ()
   delete[] indices_offset;
 }
 
+
+
 template<int dim, int spacedim>
-void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl, const unsigned int fl, const unsigned int dofs_per_vertex)
+void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
+                                                    const unsigned int fl,
+                                                    const unsigned int dofs_per_vertex)
 {
   if (indices != nullptr)
     {
@@ -1542,32 +1555,31 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl, const
     }
 
   coarsest_level = cl;
-  finest_level = fl;
+  finest_level   = fl;
 
-  if (cl > fl)
-    return;
+  if (coarsest_level <= finest_level)
+    {
+      const unsigned int n_levels = finest_level - coarsest_level + 1;
+      const unsigned int n_indices = n_levels * dofs_per_vertex;
 
-  const unsigned int n_levels = finest_level - coarsest_level + 1;
-  const unsigned int n_indices = n_levels * dofs_per_vertex;
+      indices = new types::global_dof_index[n_indices];
+      std::fill (indices, indices+n_indices, DoFHandler<dim,spacedim>::invalid_dof_index);
 
-  indices = new types::global_dof_index[n_indices];
-  Assert (indices != nullptr, ExcNoMemory ());
-
-  for (unsigned int i = 0; i < n_indices; ++i)
-    indices[i] = DoFHandler<dim, spacedim>::invalid_dof_index;
-
-  indices_offset = new types::global_dof_index[n_levels];
-  Assert (indices != nullptr, ExcNoMemory ());
-
-  for (unsigned int i = 0; i < n_levels; ++i)
-    indices_offset[i] = i * dofs_per_vertex;
+      indices_offset = new types::global_dof_index[n_levels];
+      for (unsigned int i = 0; i < n_levels; ++i)
+        indices_offset[i] = i * dofs_per_vertex;
+    }
 }
+
+
 
 template<int dim, int spacedim>
 unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_coarsest_level () const
 {
   return coarsest_level;
 }
+
+
 
 template<int dim, int spacedim>
 unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_finest_level () const

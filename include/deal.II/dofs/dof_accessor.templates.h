@@ -2793,9 +2793,7 @@ namespace internal
 
 
       // implementation for the case of
-      // hp::DoFHandler objects. it's
-      // not implemented there, for no
-      // space dimension
+      // hp::DoFHandler objects.
       template <int dim, int spacedim, bool level_dof_access>
       static
       void
@@ -2805,7 +2803,7 @@ namespace internal
         if (accessor.has_children())
           return;
 
-        const unsigned int dofs_per_cell   = accessor.get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell = accessor.get_fe().dofs_per_cell;
 
         // make sure the cache is at least
         // as big as we need it when
@@ -2823,6 +2821,9 @@ namespace internal
                 ->cell_dof_indices_cache.size(),
                 ExcInternalError());
 
+        // call the get_dof_indices() function of DoFAccessor, which goes through all the
+        // parts of the cell to get the indices by hand. the corresponding function
+        // of DoFCellAccessor can then later use the cache
         std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
         static_cast<const dealii::DoFAccessor<dim,dealii::hp::DoFHandler<dim,spacedim>,level_dof_access> &>
         (accessor).get_dof_indices (dof_indices, accessor.active_fe_index());
