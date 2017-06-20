@@ -89,7 +89,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::DoFAccessor
   Assert (false, ExcMessage("You are trying to assign iterators that are incompatible. "
                             "Reasons for incompatibility are that they point to different "
                             "types of DoFHandlers (e.g., dealii::DoFHandler and "
-                            "dealii::hp::DoFHandler) or that the refer to objects of "
+                            "dealii::hp::DoFHandler) or that they refer to objects of "
                             "different dimensionality (e.g., assigning a line iterator "
                             "to a quad iterator)."));
 }
