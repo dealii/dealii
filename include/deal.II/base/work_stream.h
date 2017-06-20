@@ -1071,7 +1071,7 @@ namespace WorkStream
             // essentially apply parallel_for. because parallel_for
             // requires subdividing the range for which operator- is
             // necessary between iterators, it is often inefficient to
-            // apply it directory to cell ranges and similar iterator
+            // apply it directly to cell ranges and similar iterator
             // types for which operator- is expensive or, in fact,
             // nonexistent. rather, in that case, we simply copy the
             // iterators into a large array and use operator- on
