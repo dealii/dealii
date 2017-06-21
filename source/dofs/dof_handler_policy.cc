@@ -2280,7 +2280,7 @@ namespace internal
         const unsigned int n_levels = tr->n_global_levels();
         for (unsigned int level = 0; level < n_levels; ++level)
           {
-            NumberCache &number_cache = number_caches[level];
+            NumberCache &level_number_cache = number_caches[level];
 
             //* 1. distribute on own subdomain
             const unsigned int n_initial_local_dofs =
@@ -2325,27 +2325,27 @@ namespace internal
 
 
             // make indices consecutive
-            number_cache.n_locally_owned_dofs = 0;
+            level_number_cache.n_locally_owned_dofs = 0;
             for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
                  it!=renumbering.end(); ++it)
               if (*it != DoFHandler<dim,spacedim>::invalid_dof_index)
-                *it = number_cache.n_locally_owned_dofs++;
+                *it = level_number_cache.n_locally_owned_dofs++;
 
             //* 3. communicate local dofcount and shift ids to make
             // them unique
-            number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
+            level_number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
 
-            int ierr = MPI_Allgather ( &number_cache.n_locally_owned_dofs,
+            int ierr = MPI_Allgather ( &level_number_cache.n_locally_owned_dofs,
                                        1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                                       &number_cache.n_locally_owned_dofs_per_processor[0],
+                                       &level_number_cache.n_locally_owned_dofs_per_processor[0],
                                        1, DEAL_II_DOF_INDEX_MPI_TYPE,
                                        tr->get_communicator());
             AssertThrowMPI(ierr);
 
             const dealii::types::global_dof_index
-            shift = std::accumulate (number_cache
+            shift = std::accumulate (level_number_cache
                                      .n_locally_owned_dofs_per_processor.begin(),
-                                     number_cache
+                                     level_number_cache
                                      .n_locally_owned_dofs_per_processor.begin()
                                      + tr->locally_owned_subdomain(),
                                      static_cast<dealii::types::global_dof_index>(0));
@@ -2368,43 +2368,43 @@ namespace internal
                                                 false);
 
             // now a little bit of housekeeping
-            number_cache.n_global_dofs
-              = std::accumulate (number_cache
+            level_number_cache.n_global_dofs
+              = std::accumulate (level_number_cache
                                  .n_locally_owned_dofs_per_processor.begin(),
-                                 number_cache
+                                 level_number_cache
                                  .n_locally_owned_dofs_per_processor.end(),
                                  static_cast<dealii::types::global_dof_index>(0));
 
-            number_cache.locally_owned_dofs = IndexSet(number_cache.n_global_dofs);
-            number_cache.locally_owned_dofs
+            level_number_cache.locally_owned_dofs = IndexSet(level_number_cache.n_global_dofs);
+            level_number_cache.locally_owned_dofs
             .add_range(shift,
-                       shift+number_cache.n_locally_owned_dofs);
-            number_cache.locally_owned_dofs.compress();
+                       shift+level_number_cache.n_locally_owned_dofs);
+            level_number_cache.locally_owned_dofs.compress();
 
             // fill global_dof_indexsets
-            number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
+            level_number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
             {
               dealii::types::global_dof_index lshift = 0;
               for (unsigned int i=0; i<n_cpus; ++i)
                 {
-                  number_cache.locally_owned_dofs_per_processor[i]
-                    = IndexSet(number_cache.n_global_dofs);
-                  number_cache.locally_owned_dofs_per_processor[i]
+                  level_number_cache.locally_owned_dofs_per_processor[i]
+                    = IndexSet(level_number_cache.n_global_dofs);
+                  level_number_cache.locally_owned_dofs_per_processor[i]
                   .add_range(lshift,
                              lshift +
-                             number_cache.n_locally_owned_dofs_per_processor[i]);
-                  lshift += number_cache.n_locally_owned_dofs_per_processor[i];
+                             level_number_cache.n_locally_owned_dofs_per_processor[i]);
+                  lshift += level_number_cache.n_locally_owned_dofs_per_processor[i];
                 }
             }
-            Assert(number_cache.locally_owned_dofs_per_processor
+            Assert(level_number_cache.locally_owned_dofs_per_processor
                    [tr->locally_owned_subdomain()].n_elements()
                    ==
-                   number_cache.n_locally_owned_dofs,
+                   level_number_cache.n_locally_owned_dofs,
                    ExcInternalError());
-            Assert(!number_cache.locally_owned_dofs_per_processor
+            Assert(!level_number_cache.locally_owned_dofs_per_processor
                    [tr->locally_owned_subdomain()].n_elements()
                    ||
-                   number_cache.locally_owned_dofs_per_processor
+                   level_number_cache.locally_owned_dofs_per_processor
                    [tr->locally_owned_subdomain()].nth_index_in_set(0)
                    == shift,
                    ExcInternalError());
