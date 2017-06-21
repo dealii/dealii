@@ -28,6 +28,15 @@
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #include <set>
 #include <algorithm>
 #include <numeric>
@@ -1252,82 +1261,104 @@ namespace internal
           }
 
 
+          /**
+           * Write the data of this object to a stream for the purpose of
+           * serialization.
+           */
+          template <class Archive>
+          void save (Archive &ar,
+                     const unsigned int /*version*/) const
+          {
+            // we would like to directly serialize the 'quadrants' vector,
+            // but the element type is internal to p4est and does not
+            // know how to serialize itself. consequently, first copy it over
+            // to an array of bytes, and then serialize that
+            std::vector<char> quadrants_as_chars (sizeof(quadrants[0]) * quadrants.size());
+            std::memcpy(&quadrants_as_chars[0],
+                        &quadrants[0],
+                        quadrants_as_chars.size());
+
+            // now serialize everything
+            ar &quadrants_as_chars
+            &tree_index
+            &dof_numbers_and_indices;
+          }
+
+          /**
+           * Read the data of this object from a stream for the purpose of
+           * serialization. Throw away the previous content.
+           */
+          template <class Archive>
+          void load (Archive &ar,
+                     const unsigned int /*version*/)
+          {
+            // undo the copying trick from the 'save' function
+            std::vector<char> quadrants_as_chars;
+            ar &quadrants_as_chars
+            &tree_index
+            &dof_numbers_and_indices;
+
+            quadrants.resize (quadrants_as_chars.size() / sizeof(quadrants[0]));
+            std::memcpy(&quadrants[0],
+                        &quadrants_as_chars[0],
+                        quadrants_as_chars.size());
+          }
+
+          BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+
+          /**
+           * Pack the data that corresponds to this object into a buffer in
+           * the form of a vector of chars and return it.
+           */
           std::vector<char>
           pack_data () const
           {
-            std::vector<char> buffer (bytes_for_buffer());
+            // set up a buffer and then use it as the target of a compressing
+            // stream into which we serialize the current object
+            std::vector<char> buffer;
+            {
+              boost::iostreams::filtering_ostream out;
+              out.push(boost::iostreams::gzip_compressor
+                       (boost::iostreams::gzip_params
+                        (boost::iostreams::gzip::best_compression)));
+              out.push(boost::iostreams::back_inserter(buffer));
 
-            char *ptr = &buffer[0];
+              boost::archive::binary_oarchive archive(out);
 
-            const unsigned int num_cells = tree_index.size();
-            std::memcpy(ptr, &num_cells, sizeof(unsigned int));
-            ptr += sizeof(unsigned int);
-
-            const unsigned int num_dofs = dof_numbers_and_indices.size();
-            std::memcpy(ptr, &num_dofs, sizeof(unsigned int));
-            ptr += sizeof(unsigned int);
-
-            std::memcpy(ptr,
-                        &tree_index[0],
-                        num_cells*sizeof(unsigned int));
-            ptr += num_cells*sizeof(unsigned int);
-
-            std::memcpy(ptr,
-                        &quadrants[0],
-                        num_cells * sizeof(typename dealii::internal::p4est::
-                                           types<dim>::quadrant));
-            ptr += num_cells*sizeof(typename dealii::internal::p4est::types<dim>::
-                                    quadrant);
-
-            if (num_dofs>0)
-              std::memcpy(ptr,
-                          &dof_numbers_and_indices[0],
-                          dof_numbers_and_indices.size() * sizeof(dealii::types::global_dof_index));
-            ptr += dof_numbers_and_indices.size() * sizeof(dealii::types::global_dof_index);
-
-            Assert (ptr == &buffer[0]+buffer.size(),
-                    ExcInternalError());
+              archive << *this;
+              out.flush();
+            }
 
             return buffer;
           }
 
 
-          void unpack_data(const std::vector<char> &buffer)
+          /**
+           * Given a buffer in the form of an array of chars, unpack it and
+           * restore the current object to the state that it was when
+           * it was packed into said buffer by the pack_data() function.
+           */
+          void unpack_data (const std::vector<char> &buffer)
           {
-            const char *ptr = &buffer[0];
-            unsigned int num_cells;
-            memcpy(&num_cells, ptr, sizeof(unsigned int));
-            ptr+=sizeof(unsigned int);
+            std::string decompressed_buffer;
 
-            unsigned int num_dofs;
-            memcpy(&num_dofs, ptr, sizeof(unsigned int));
-            ptr+=sizeof(unsigned int);
+            // first decompress the buffer
+            {
+              boost::iostreams::filtering_ostream decompressing_stream;
+              decompressing_stream.push(boost::iostreams::gzip_decompressor());
+              decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
 
-            tree_index.resize(num_cells);
-            std::memcpy(&tree_index[0],
-                        ptr,
-                        num_cells*sizeof(unsigned int));
-            ptr += num_cells*sizeof(unsigned int);
+              for (const auto p : buffer)
+                decompressing_stream << p;
+            }
 
-            quadrants.resize(num_cells);
-            std::memcpy(&quadrants[0],
-                        ptr,
-                        num_cells * sizeof(typename dealii::internal::p4est::
-                                           types<dim>::quadrant));
-            ptr += num_cells*sizeof(typename dealii::internal::p4est::types<dim>::
-                                    quadrant);
+            // then restore the object from the buffer
+            std::istringstream in(decompressed_buffer);
+            boost::archive::binary_iarchive archive(in);
 
-            dof_numbers_and_indices.resize(num_dofs);
-            if (num_dofs>0)
-              std::memcpy(&dof_numbers_and_indices[0],
-                          ptr,
-                          dof_numbers_and_indices.size() * sizeof(dealii::types::global_dof_index));
-            ptr += dof_numbers_and_indices.size() * sizeof(dealii::types::global_dof_index);
-
-            Assert (ptr == &buffer[0]+buffer.size(),
-                    ExcInternalError());
+            archive >> *this;
           }
-
         };
 
 
