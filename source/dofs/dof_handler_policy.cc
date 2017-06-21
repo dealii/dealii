@@ -546,6 +546,9 @@ namespace internal
                           const unsigned int                                  level,
                           const bool                                          check_validity)
         {
+          Assert (level<dof_handler.get_triangulation().n_levels(),
+                  ExcInternalError());
+
           for (typename std::vector<typename DoFHandler<1,spacedim>::MGVertexDoFs>::iterator
                i=dof_handler.mg_vertex_dofs.begin();
                i!=dof_handler.mg_vertex_dofs.end();
@@ -651,8 +654,8 @@ namespace internal
                           const unsigned int                                  level,
                           const bool                                          check_validity)
         {
-          if (level>=dof_handler.get_triangulation().n_levels())
-            return;
+          Assert (level<dof_handler.get_triangulation().n_levels(),
+                  ExcInternalError());
 
           for (typename std::vector<typename DoFHandler<2,spacedim>::MGVertexDoFs>::iterator i=dof_handler.mg_vertex_dofs.begin();
                i!=dof_handler.mg_vertex_dofs.end(); ++i)
@@ -800,8 +803,9 @@ namespace internal
                           const unsigned int                                  level,
                           const bool                                          check_validity)
         {
-          if (level>=dof_handler.get_triangulation().n_levels())
-            return;
+          Assert (level<dof_handler.get_triangulation().n_levels(),
+                  ExcInternalError());
+
           for (typename std::vector<typename DoFHandler<3,spacedim>::MGVertexDoFs>::iterator i=dof_handler.mg_vertex_dofs.begin();
                i!=dof_handler.mg_vertex_dofs.end(); ++i)
             // if the present vertex lives on the present level
@@ -2299,15 +2303,22 @@ namespace internal
         const unsigned int
         n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
 
-        unsigned int n_levels = Utilities::MPI::max(dof_handler.get_triangulation().n_levels(), tr->get_communicator());
-
+        // loop over all levels that exist globally (across all
+        // processors), even if the current processor does not in fact
+        // have any cells on that level or if the local part of the
+        // Triangulation has fewer levels. we need to do this because
+        // we need to communicate across all processors on all levels
+        const unsigned int n_levels = tr->n_global_levels();
         for (unsigned int level = 0; level < n_levels; ++level)
           {
-            NumberCache &number_cache = number_caches[level];
+            NumberCache &level_number_cache = number_caches[level];
 
             //* 1. distribute on own subdomain
             const unsigned int n_initial_local_dofs =
-              Implementation::distribute_dofs_on_level(0, tr->locally_owned_subdomain(), dof_handler, level);
+              Implementation::distribute_dofs_on_level(0,
+                                                       tr->locally_owned_subdomain(),
+                                                       dof_handler,
+                                                       level);
 
             //* 2. iterate over ghostcells and kill dofs that are not
             // owned by us
@@ -2315,7 +2326,7 @@ namespace internal
             for (dealii::types::global_dof_index i=0; i<renumbering.size(); ++i)
               renumbering[i] = i;
 
-            if (level<tr->n_levels())
+            if (level < tr->n_levels())
               {
                 std::vector<dealii::types::global_dof_index> local_dof_indices;
 
@@ -2345,27 +2356,27 @@ namespace internal
 
 
             // make indices consecutive
-            number_cache.n_locally_owned_dofs = 0;
+            level_number_cache.n_locally_owned_dofs = 0;
             for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
                  it!=renumbering.end(); ++it)
               if (*it != DoFHandler<dim,spacedim>::invalid_dof_index)
-                *it = number_cache.n_locally_owned_dofs++;
+                *it = level_number_cache.n_locally_owned_dofs++;
 
             //* 3. communicate local dofcount and shift ids to make
             // them unique
-            number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
+            level_number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
 
-            int ierr = MPI_Allgather ( &number_cache.n_locally_owned_dofs,
+            int ierr = MPI_Allgather ( &level_number_cache.n_locally_owned_dofs,
                                        1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                                       &number_cache.n_locally_owned_dofs_per_processor[0],
+                                       &level_number_cache.n_locally_owned_dofs_per_processor[0],
                                        1, DEAL_II_DOF_INDEX_MPI_TYPE,
                                        tr->get_communicator());
             AssertThrowMPI(ierr);
 
             const dealii::types::global_dof_index
-            shift = std::accumulate (number_cache
+            shift = std::accumulate (level_number_cache
                                      .n_locally_owned_dofs_per_processor.begin(),
-                                     number_cache
+                                     level_number_cache
                                      .n_locally_owned_dofs_per_processor.begin()
                                      + tr->locally_owned_subdomain(),
                                      static_cast<dealii::types::global_dof_index>(0));
@@ -2376,48 +2387,55 @@ namespace internal
 
             // now re-enumerate all dofs to this shifted and condensed
             // numbering form.  we renumber some dofs as invalid, so
-            // choose the nocheck-version.
-            Implementation::renumber_mg_dofs (renumbering, IndexSet(0),
-                                              dof_handler, level, false);
+            // choose the nocheck-version of the function
+            //
+            // of course there is nothing for us to renumber if the
+            // level we are currently dealing with doesn't even exist
+            // within the current triangulation, so skip renumbering
+            // in that case
+            if (level < tr->n_levels())
+              Implementation::renumber_mg_dofs (renumbering, IndexSet(0),
+                                                dof_handler, level,
+                                                false);
 
             // now a little bit of housekeeping
-            number_cache.n_global_dofs
-              = std::accumulate (number_cache
+            level_number_cache.n_global_dofs
+              = std::accumulate (level_number_cache
                                  .n_locally_owned_dofs_per_processor.begin(),
-                                 number_cache
+                                 level_number_cache
                                  .n_locally_owned_dofs_per_processor.end(),
                                  static_cast<dealii::types::global_dof_index>(0));
 
-            number_cache.locally_owned_dofs = IndexSet(number_cache.n_global_dofs);
-            number_cache.locally_owned_dofs
+            level_number_cache.locally_owned_dofs = IndexSet(level_number_cache.n_global_dofs);
+            level_number_cache.locally_owned_dofs
             .add_range(shift,
-                       shift+number_cache.n_locally_owned_dofs);
-            number_cache.locally_owned_dofs.compress();
+                       shift+level_number_cache.n_locally_owned_dofs);
+            level_number_cache.locally_owned_dofs.compress();
 
             // fill global_dof_indexsets
-            number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
+            level_number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
             {
               dealii::types::global_dof_index lshift = 0;
               for (unsigned int i=0; i<n_cpus; ++i)
                 {
-                  number_cache.locally_owned_dofs_per_processor[i]
-                    = IndexSet(number_cache.n_global_dofs);
-                  number_cache.locally_owned_dofs_per_processor[i]
+                  level_number_cache.locally_owned_dofs_per_processor[i]
+                    = IndexSet(level_number_cache.n_global_dofs);
+                  level_number_cache.locally_owned_dofs_per_processor[i]
                   .add_range(lshift,
                              lshift +
-                             number_cache.n_locally_owned_dofs_per_processor[i]);
-                  lshift += number_cache.n_locally_owned_dofs_per_processor[i];
+                             level_number_cache.n_locally_owned_dofs_per_processor[i]);
+                  lshift += level_number_cache.n_locally_owned_dofs_per_processor[i];
                 }
             }
-            Assert(number_cache.locally_owned_dofs_per_processor
+            Assert(level_number_cache.locally_owned_dofs_per_processor
                    [tr->locally_owned_subdomain()].n_elements()
                    ==
-                   number_cache.n_locally_owned_dofs,
+                   level_number_cache.n_locally_owned_dofs,
                    ExcInternalError());
-            Assert(!number_cache.locally_owned_dofs_per_processor
+            Assert(!level_number_cache.locally_owned_dofs_per_processor
                    [tr->locally_owned_subdomain()].n_elements()
                    ||
-                   number_cache.locally_owned_dofs_per_processor
+                   level_number_cache.locally_owned_dofs_per_processor
                    [tr->locally_owned_subdomain()].nth_index_in_set(0)
                    == shift,
                    ExcInternalError());
