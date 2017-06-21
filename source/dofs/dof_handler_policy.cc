@@ -2277,8 +2277,7 @@ namespace internal
         // have any cells on that level or if the local part of the
         // Triangulation has fewer levels. we need to do this because
         // we need to communicate across all processors on all levels
-        const unsigned int n_levels = Utilities::MPI::max(dof_handler.get_triangulation().n_levels(),
-                                                          tr->get_communicator());
+        const unsigned int n_levels = tr->n_global_levels();
         for (unsigned int level = 0; level < n_levels; ++level)
           {
             NumberCache &number_cache = number_caches[level];
