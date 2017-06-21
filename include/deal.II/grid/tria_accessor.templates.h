@@ -511,6 +511,15 @@ InvalidAccessor<structdim, dim, spacedim>::operator -- () const
 
 
 
+template <int structdim, int dim, int spacedim>
+types::manifold_id
+InvalidAccessor<structdim, dim, spacedim>::manifold_id () const
+{
+  return numbers::invalid_manifold_id;
+}
+
+
+
 /*------------------------ Functions: TriaAccessor ---------------------------*/
 
 

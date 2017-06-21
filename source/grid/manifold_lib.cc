@@ -630,7 +630,9 @@ TransfiniteInterpolationManifold<dim,spacedim>::TransfiniteInterpolationManifold
   :
   triangulation(nullptr),
   level_coarse (-1)
-{}
+{
+  AssertThrow(dim > 1, ExcNotImplemented());
+}
 
 
 
@@ -675,7 +677,7 @@ namespace
   Point<AccessorType::space_dimension>
   compute_transfinite_interpolation(const AccessorType &cell,
                                     const Point<1> &chart_point,
-                                    const bool      cell_is_flat)
+                                    const bool      /*cell_is_flat*/)
   {
     return cell.vertex(0) * (1.-chart_point[0]) + cell.vertex(1) * chart_point[0];
   }

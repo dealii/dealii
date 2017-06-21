@@ -558,6 +558,11 @@ public:
    * has children.
    */
   bool has_children () const;
+
+  /**
+   * Dummy function that always returns numbers::invalid_manifold_id.
+   */
+  types::manifold_id manifold_id () const;
 };
 
 
