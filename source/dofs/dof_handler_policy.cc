@@ -908,13 +908,6 @@ namespace internal
 
 
 
-      /* --------------------- class PolicyBase ---------------- */
-
-      template <int dim, int spacedim>
-      PolicyBase<dim,spacedim>::~PolicyBase ()
-      {}
-
-
       /* --------------------- class Sequential ---------------- */
 
 

@@ -59,7 +59,7 @@ namespace internal
         /**
          * Destructor.
          */
-        virtual ~PolicyBase ();
+        virtual ~PolicyBase () = default;
 
         /**
          * Distribute degrees of freedom on the object given as first
