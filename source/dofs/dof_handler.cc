@@ -659,13 +659,13 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
       (&tria)
       != nullptr)
-    policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>());
+    policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>(*this));
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
            (&tria)
            == nullptr)
-    policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>());
+    policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>(*this));
   else
-    policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>());
+    policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>(*this));
 }
 
 
@@ -682,14 +682,19 @@ DoFHandler<dim,spacedim>::~DoFHandler ()
 {
   // release allocated memory
   clear ();
+
+  // also release the policy. this needs to happen before the
+  // current object disappears because the policy objects
+  // store references to the DoFhandler object they work on
+  policy.reset ();
 }
 
 
 template<int dim, int spacedim>
 void
-DoFHandler<dim,spacedim>::initialize(
-  const Triangulation<dim,spacedim> &t,
-  const FiniteElement<dim,spacedim> &fe)
+DoFHandler<dim,spacedim>::
+initialize(const Triangulation<dim,spacedim> &t,
+           const FiniteElement<dim,spacedim> &fe)
 {
   tria = &t;
   faces = nullptr;
@@ -701,13 +706,13 @@ DoFHandler<dim,spacedim>::initialize(
   if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
       (&t)
       != nullptr)
-    policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>());
+    policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>(*this));
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
            (&t)
            == nullptr)
-    policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>());
+    policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>(*this));
   else
-    policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>());
+    policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>(*this));
 
   distribute_dofs(fe);
 }
@@ -1093,7 +1098,7 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
   internal::DoFHandler::Implementation::reserve_space (*this);
 
   // hand things off to the policy
-  policy->distribute_dofs (*this,number_cache);
+  policy->distribute_dofs (number_cache);
 
   // initialize the block info object
   // only if this is a sequential
@@ -1127,7 +1132,7 @@ void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spa
   else
     mg_number_cache.resize(dist_tr->n_global_levels());
 
-  policy->distribute_mg_dofs (*this, mg_number_cache);
+  policy->distribute_mg_dofs (mg_number_cache);
 
   // initialize the block info object
   // only if this is a sequential
@@ -1216,7 +1221,7 @@ DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_ind
               ExcMessage ("New DoF index is not less than the total number of dofs."));
 #endif
 
-  policy->renumber_dofs (new_numbers, *this,number_cache);
+  policy->renumber_dofs (new_numbers, number_cache);
 }
 
 

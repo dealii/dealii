@@ -911,11 +911,20 @@ namespace internal
       /* --------------------- class Sequential ---------------- */
 
 
+
+      template <int dim, int spacedim>
+      Sequential<dim,spacedim>::
+      Sequential (dealii::DoFHandler<dim,spacedim> &dof_handler)
+        :
+        dof_handler (dof_handler)
+      {}
+
+
+
       template <int dim, int spacedim>
       void
       Sequential<dim,spacedim>::
-      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler,
-                       NumberCache &number_cache_current ) const
+      distribute_dofs (NumberCache &number_cache_current) const
       {
         const types::global_dof_index n_dofs =
           Implementation::distribute_dofs (0,
@@ -949,8 +958,7 @@ namespace internal
       template <int dim, int spacedim>
       void
       Sequential<dim,spacedim>::
-      distribute_mg_dofs (DoFHandler<dim,spacedim> &dof_handler,
-                          std::vector<NumberCache> &number_caches) const
+      distribute_mg_dofs (std::vector<NumberCache> &number_caches) const
       {
         std::vector<bool> user_flags;
 
@@ -978,7 +986,6 @@ namespace internal
       void
       Sequential<dim,spacedim>::
       renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
-                     dealii::DoFHandler<dim,spacedim> &dof_handler,
                      NumberCache &number_cache_current) const
       {
         Implementation::renumber_dofs (new_numbers, IndexSet(0),
@@ -1009,22 +1016,33 @@ namespace internal
 
       /* --------------------- class ParallelShared ---------------- */
 
+
+      template <int dim, int spacedim>
+      ParallelShared<dim,spacedim>::
+      ParallelShared (dealii::DoFHandler<dim,spacedim> &dof_handler)
+        :
+        Sequential<dim,spacedim> (dof_handler)
+      {}
+
+
+
+
+
       template <int dim, int spacedim>
       void
       ParallelShared<dim,spacedim>::
-      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler,
-                       NumberCache &number_cache) const
+      distribute_dofs (NumberCache &number_cache) const
       {
         // If the underlying shared::Tria allows artificial cells, we need to do
         // some tricks here to make Sequential algorithms play nicely.
         // Namely, we first restore the original partition (without artificial cells)
         // and then turn artificial cells on at the end of this function.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()));
+          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&this->dof_handler.get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
         typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
-        cell = dof_handler.get_triangulation().begin_active(),
-        endc = dof_handler.get_triangulation().end();
+        cell = this->dof_handler.get_triangulation().begin_active(),
+        endc = this->dof_handler.get_triangulation().end();
         std::vector<types::subdomain_id> current_subdomain_ids(tr->n_active_cells());
         const std::vector<types::subdomain_id> &true_subdomain_ids = tr->get_true_subdomain_ids_of_cells();
         if (tr->with_artificial_cells())
@@ -1036,8 +1054,8 @@ namespace internal
 
         // let the sequential algorithm do its magic, then sort DoF indices
         // by subdomain
-        Sequential<dim,spacedim>::distribute_dofs (dof_handler,number_cache);
-        DoFRenumbering::subdomain_wise (dof_handler);
+        this->Sequential<dim,spacedim>::distribute_dofs (number_cache);
+        DoFRenumbering::subdomain_wise (this->dof_handler);
 
         // dofrenumbering will reset subdomains, this is ugly but we need to do it again:
         cell = tr->begin_active();
@@ -1045,12 +1063,12 @@ namespace internal
           for (unsigned int index=0; cell != endc; cell++, index++)
             cell->set_subdomain_id(true_subdomain_ids[index]);
 
-        number_cache.locally_owned_dofs_per_processor = DoFTools::locally_owned_dofs_per_subdomain (dof_handler);
-        number_cache.locally_owned_dofs = number_cache.locally_owned_dofs_per_processor[dof_handler.get_triangulation().locally_owned_subdomain()];
+        number_cache.locally_owned_dofs_per_processor = DoFTools::locally_owned_dofs_per_subdomain (this->dof_handler);
+        number_cache.locally_owned_dofs = number_cache.locally_owned_dofs_per_processor[this->dof_handler.get_triangulation().locally_owned_subdomain()];
         number_cache.n_locally_owned_dofs_per_processor.resize (number_cache.locally_owned_dofs_per_processor.size());
         for (unsigned int i = 0; i < number_cache.n_locally_owned_dofs_per_processor.size(); i++)
           number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements();
-        number_cache.n_locally_owned_dofs = number_cache.n_locally_owned_dofs_per_processor[dof_handler.get_triangulation().locally_owned_subdomain()];
+        number_cache.n_locally_owned_dofs = number_cache.n_locally_owned_dofs_per_processor[this->dof_handler.get_triangulation().locally_owned_subdomain()];
 
         // restore current subdomain ids
         cell = tr->begin_active();
@@ -1064,11 +1082,10 @@ namespace internal
       template <int dim, int spacedim>
       void
       ParallelShared<dim,spacedim>::
-      distribute_mg_dofs (DoFHandler<dim,spacedim> &dof_handler,
-                          std::vector<NumberCache> &number_caches) const
+      distribute_mg_dofs (std::vector<NumberCache> &number_caches) const
       {
         // first, call the sequential function to distribute dofs
-        Sequential<dim,spacedim>::distribute_mg_dofs (dof_handler, number_caches);
+        this->Sequential<dim,spacedim>::distribute_mg_dofs (number_caches);
         // now we need to update the number cache. This part is not yet implemented.
         AssertThrow(false,ExcNotImplemented());
       }
@@ -1079,25 +1096,23 @@ namespace internal
       void
       ParallelShared<dim,spacedim>::
       renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
-                     dealii::DoFHandler<dim,spacedim>           &dof_handler,
                      NumberCache                                &number_cache) const
       {
 
 #ifndef DEAL_II_WITH_MPI
         (void)new_numbers;
-        (void)dof_handler;
         (void)number_cache;
         Assert (false, ExcNotImplemented());
 #else
         // Similar to distribute_dofs() we need to have a special treatment in
         // case artificial cells are present.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()));
+          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&this->dof_handler.get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
         typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
-        cell = dof_handler.get_triangulation().begin_active(),
-        endc = dof_handler.get_triangulation().end();
+        cell = this->dof_handler.get_triangulation().begin_active(),
+        endc = this->dof_handler.get_triangulation().end();
         std::vector<types::subdomain_id> current_subdomain_ids(tr->n_active_cells());
         const std::vector<types::subdomain_id> &true_subdomain_ids = tr->get_true_subdomain_ids_of_cells();
         if (tr->with_artificial_cells())
@@ -1107,22 +1122,22 @@ namespace internal
               cell->set_subdomain_id(true_subdomain_ids[index]);
             }
 
-        std::vector<types::global_dof_index> global_gathered_numbers (dof_handler.n_dofs (), 0);
+        std::vector<types::global_dof_index> global_gathered_numbers (this->dof_handler.n_dofs (), 0);
         // as we call DoFRenumbering::subdomain_wise (dof_handler) from distribute_dofs(),
         // we need to support sequential-like input.
         // Distributed-like input from, for example, component_wise renumbering is also supported.
-        if (new_numbers.size () == dof_handler.n_dofs ())
+        if (new_numbers.size () == this->dof_handler.n_dofs ())
           {
             global_gathered_numbers = new_numbers;
           }
         else
           {
-            Assert(new_numbers.size() == dof_handler.locally_owned_dofs().n_elements(),
+            Assert(new_numbers.size() == this->dof_handler.locally_owned_dofs().n_elements(),
                    ExcInternalError());
             const unsigned int n_cpu = Utilities::MPI::n_mpi_processes (tr->get_communicator ());
-            std::vector<types::global_dof_index> gathered_new_numbers (dof_handler.n_dofs (), 0);
+            std::vector<types::global_dof_index> gathered_new_numbers (this->dof_handler.n_dofs (), 0);
             Assert(Utilities::MPI::this_mpi_process (tr->get_communicator ()) ==
-                   dof_handler.get_triangulation().locally_owned_subdomain (),
+                   this->dof_handler.get_triangulation().locally_owned_subdomain (),
                    ExcInternalError())
 
             // gather new numbers among processors into one vector
@@ -1165,8 +1180,8 @@ namespace internal
             // flag_1 and flag_2 are
             // used to control that there is a
             // one-to-one relation between old and new DoFs.
-            std::vector<unsigned int> flag_1 (dof_handler.n_dofs (), 0);
-            std::vector<unsigned int> flag_2 (dof_handler.n_dofs (), 0);
+            std::vector<unsigned int> flag_1 (this->dof_handler.n_dofs (), 0);
+            std::vector<unsigned int> flag_2 (this->dof_handler.n_dofs (), 0);
             for (unsigned int i = 0; i < n_cpu; i++)
               {
                 const IndexSet &iset =
@@ -1176,8 +1191,8 @@ namespace internal
                   {
                     const types::global_dof_index target = iset.nth_index_in_set (ind);
                     const types::global_dof_index value  = gathered_new_numbers[shift + ind];
-                    Assert(target < dof_handler.n_dofs(), ExcInternalError());
-                    Assert(value  < dof_handler.n_dofs(), ExcInternalError());
+                    Assert(target < this->dof_handler.n_dofs(), ExcInternalError());
+                    Assert(value  < this->dof_handler.n_dofs(), ExcInternalError());
                     global_gathered_numbers[target] = value;
                     flag_1[target]++;
                     flag_2[value]++;
@@ -1195,12 +1210,12 @@ namespace internal
                    ExcInternalError());
           }
 
-        Sequential<dim, spacedim>::renumber_dofs (global_gathered_numbers, dof_handler, number_cache);
+        this->Sequential<dim, spacedim>::renumber_dofs (global_gathered_numbers, number_cache);
         // correct number_cache:
         number_cache.locally_owned_dofs_per_processor =
-          DoFTools::locally_owned_dofs_per_subdomain (dof_handler);
+          DoFTools::locally_owned_dofs_per_subdomain (this->dof_handler);
         number_cache.locally_owned_dofs =
-          number_cache.locally_owned_dofs_per_processor[dof_handler.get_triangulation().locally_owned_subdomain ()];
+          number_cache.locally_owned_dofs_per_processor[this->dof_handler.get_triangulation().locally_owned_subdomain ()];
         // sequential renumbering returns a vector of size 1 here,
         // correct this:
         number_cache.n_locally_owned_dofs_per_processor.resize(number_cache.locally_owned_dofs_per_processor.size());
@@ -1209,7 +1224,7 @@ namespace internal
           number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements ();
 
         number_cache.n_locally_owned_dofs =
-          number_cache.n_locally_owned_dofs_per_processor[dof_handler.get_triangulation().locally_owned_subdomain ()];
+          number_cache.n_locally_owned_dofs_per_processor[this->dof_handler.get_triangulation().locally_owned_subdomain ()];
 
         // restore artificial cells
         cell = tr->begin_active();
@@ -2060,15 +2075,25 @@ namespace internal
 
 
       template <int dim, int spacedim>
+      ParallelDistributed<dim,spacedim>::
+      ParallelDistributed (dealii::DoFHandler<dim,spacedim> &dof_handler)
+        :
+        dof_handler (dof_handler)
+      {}
+
+
+
+
+
+
+      template <int dim, int spacedim>
       void
       ParallelDistributed<dim, spacedim>::
-      distribute_dofs (DoFHandler<dim,spacedim> &dof_handler,
-                       NumberCache &number_cache_current) const
+      distribute_dofs (NumberCache &number_cache_current) const
       {
         NumberCache number_cache;
 
 #ifndef DEAL_II_WITH_P4EST
-        (void)dof_handler;
         Assert (false, ExcNotImplemented());
 #else
 
@@ -2271,11 +2296,9 @@ namespace internal
       template <int dim, int spacedim>
       void
       ParallelDistributed<dim, spacedim>::
-      distribute_mg_dofs (DoFHandler<dim,spacedim> &dof_handler,
-                          std::vector<NumberCache> &number_caches) const
+      distribute_mg_dofs (std::vector<NumberCache> &number_caches) const
       {
 #ifndef DEAL_II_WITH_P4EST
-        (void)dof_handler;
         (void)number_caches;
         Assert (false, ExcNotImplemented());
 #else
@@ -2524,11 +2547,9 @@ namespace internal
       void
       ParallelDistributed<dim, spacedim>::
       renumber_dofs (const std::vector<dealii::types::global_dof_index> &new_numbers,
-                     dealii::DoFHandler<dim,spacedim> &dof_handler,
                      NumberCache &number_cache_current) const
       {
         (void)new_numbers;
-        (void)dof_handler;
 
         Assert (new_numbers.size() == dof_handler.locally_owned_dofs().n_elements(),
                 ExcInternalError());
