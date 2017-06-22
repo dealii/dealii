@@ -916,7 +916,7 @@ namespace internal
       Sequential<dim,spacedim>::
       Sequential (dealii::DoFHandler<dim,spacedim> &dof_handler)
         :
-        dof_handler (dof_handler)
+        dof_handler (&dof_handler)
       {}
 
 
@@ -929,7 +929,7 @@ namespace internal
         const types::global_dof_index n_dofs =
           Implementation::distribute_dofs (0,
                                            numbers::invalid_subdomain_id,
-                                           dof_handler);
+                                           *dof_handler);
 
         // now set the elements of the
         // number cache appropriately
@@ -962,12 +962,13 @@ namespace internal
       {
         std::vector<bool> user_flags;
 
-        dof_handler.get_triangulation().save_user_flags (user_flags);
-        const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler.get_triangulation()).clear_user_flags ();
+        dof_handler->get_triangulation().save_user_flags (user_flags);
+        const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler->get_triangulation()).clear_user_flags ();
 
-        for (unsigned int level = 0; level < dof_handler.get_triangulation().n_levels(); ++level)
+        for (unsigned int level = 0; level < dof_handler->get_triangulation().n_levels(); ++level)
           {
-            types::global_dof_index next_free_dof = Implementation::distribute_dofs_on_level(0, numbers::invalid_subdomain_id, dof_handler, level);
+            types::global_dof_index next_free_dof = Implementation::distribute_dofs_on_level(0, numbers::invalid_subdomain_id,
+                                                    *dof_handler, level);
 
             number_caches[level].n_global_dofs = next_free_dof;
             number_caches[level].n_locally_owned_dofs = next_free_dof;
@@ -977,7 +978,7 @@ namespace internal
             number_caches[level].n_locally_owned_dofs_per_processor.resize(1);
             number_caches[level].n_locally_owned_dofs_per_processor[0] = next_free_dof;
           }
-        const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler.get_triangulation()).load_user_flags (user_flags);
+        const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler->get_triangulation()).load_user_flags (user_flags);
       }
 
 
@@ -989,12 +990,12 @@ namespace internal
                      NumberCache &number_cache_current) const
       {
         Implementation::renumber_dofs (new_numbers, IndexSet(0),
-                                       dof_handler, true);
+                                       *dof_handler, true);
 
         // in the sequential case, the number cache should not have changed but we
         // have to set the elements of the structure appropriately anyway
         NumberCache number_cache;
-        number_cache.n_global_dofs        = dof_handler.n_dofs();
+        number_cache.n_global_dofs        = dof_handler->n_dofs();
         number_cache.n_locally_owned_dofs = number_cache.n_global_dofs;
 
         number_cache.locally_owned_dofs
@@ -1038,11 +1039,11 @@ namespace internal
         // Namely, we first restore the original partition (without artificial cells)
         // and then turn artificial cells on at the end of this function.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&this->dof_handler.get_triangulation()));
+          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
         typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
-        cell = this->dof_handler.get_triangulation().begin_active(),
-        endc = this->dof_handler.get_triangulation().end();
+        cell = this->dof_handler->get_triangulation().begin_active(),
+        endc = this->dof_handler->get_triangulation().end();
         std::vector<types::subdomain_id> current_subdomain_ids(tr->n_active_cells());
         const std::vector<types::subdomain_id> &true_subdomain_ids = tr->get_true_subdomain_ids_of_cells();
         if (tr->with_artificial_cells())
@@ -1055,7 +1056,7 @@ namespace internal
         // let the sequential algorithm do its magic, then sort DoF indices
         // by subdomain
         this->Sequential<dim,spacedim>::distribute_dofs (number_cache);
-        DoFRenumbering::subdomain_wise (this->dof_handler);
+        DoFRenumbering::subdomain_wise (*this->dof_handler);
 
         // dofrenumbering will reset subdomains, this is ugly but we need to do it again:
         cell = tr->begin_active();
@@ -1063,12 +1064,12 @@ namespace internal
           for (unsigned int index=0; cell != endc; cell++, index++)
             cell->set_subdomain_id(true_subdomain_ids[index]);
 
-        number_cache.locally_owned_dofs_per_processor = DoFTools::locally_owned_dofs_per_subdomain (this->dof_handler);
-        number_cache.locally_owned_dofs = number_cache.locally_owned_dofs_per_processor[this->dof_handler.get_triangulation().locally_owned_subdomain()];
+        number_cache.locally_owned_dofs_per_processor = DoFTools::locally_owned_dofs_per_subdomain (*this->dof_handler);
+        number_cache.locally_owned_dofs = number_cache.locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain()];
         number_cache.n_locally_owned_dofs_per_processor.resize (number_cache.locally_owned_dofs_per_processor.size());
         for (unsigned int i = 0; i < number_cache.n_locally_owned_dofs_per_processor.size(); i++)
           number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements();
-        number_cache.n_locally_owned_dofs = number_cache.n_locally_owned_dofs_per_processor[this->dof_handler.get_triangulation().locally_owned_subdomain()];
+        number_cache.n_locally_owned_dofs = number_cache.n_locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain()];
 
         // restore current subdomain ids
         cell = tr->begin_active();
@@ -1107,12 +1108,12 @@ namespace internal
         // Similar to distribute_dofs() we need to have a special treatment in
         // case artificial cells are present.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&this->dof_handler.get_triangulation()));
+          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
         typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
-        cell = this->dof_handler.get_triangulation().begin_active(),
-        endc = this->dof_handler.get_triangulation().end();
+        cell = this->dof_handler->get_triangulation().begin_active(),
+        endc = this->dof_handler->get_triangulation().end();
         std::vector<types::subdomain_id> current_subdomain_ids(tr->n_active_cells());
         const std::vector<types::subdomain_id> &true_subdomain_ids = tr->get_true_subdomain_ids_of_cells();
         if (tr->with_artificial_cells())
@@ -1122,22 +1123,22 @@ namespace internal
               cell->set_subdomain_id(true_subdomain_ids[index]);
             }
 
-        std::vector<types::global_dof_index> global_gathered_numbers (this->dof_handler.n_dofs (), 0);
-        // as we call DoFRenumbering::subdomain_wise (dof_handler) from distribute_dofs(),
+        std::vector<types::global_dof_index> global_gathered_numbers (this->dof_handler->n_dofs (), 0);
+        // as we call DoFRenumbering::subdomain_wise (*dof_handler) from distribute_dofs(),
         // we need to support sequential-like input.
         // Distributed-like input from, for example, component_wise renumbering is also supported.
-        if (new_numbers.size () == this->dof_handler.n_dofs ())
+        if (new_numbers.size () == this->dof_handler->n_dofs ())
           {
             global_gathered_numbers = new_numbers;
           }
         else
           {
-            Assert(new_numbers.size() == this->dof_handler.locally_owned_dofs().n_elements(),
+            Assert(new_numbers.size() == this->dof_handler->locally_owned_dofs().n_elements(),
                    ExcInternalError());
             const unsigned int n_cpu = Utilities::MPI::n_mpi_processes (tr->get_communicator ());
-            std::vector<types::global_dof_index> gathered_new_numbers (this->dof_handler.n_dofs (), 0);
+            std::vector<types::global_dof_index> gathered_new_numbers (this->dof_handler->n_dofs (), 0);
             Assert(Utilities::MPI::this_mpi_process (tr->get_communicator ()) ==
-                   this->dof_handler.get_triangulation().locally_owned_subdomain (),
+                   this->dof_handler->get_triangulation().locally_owned_subdomain (),
                    ExcInternalError())
 
             // gather new numbers among processors into one vector
@@ -1180,8 +1181,8 @@ namespace internal
             // flag_1 and flag_2 are
             // used to control that there is a
             // one-to-one relation between old and new DoFs.
-            std::vector<unsigned int> flag_1 (this->dof_handler.n_dofs (), 0);
-            std::vector<unsigned int> flag_2 (this->dof_handler.n_dofs (), 0);
+            std::vector<unsigned int> flag_1 (this->dof_handler->n_dofs (), 0);
+            std::vector<unsigned int> flag_2 (this->dof_handler->n_dofs (), 0);
             for (unsigned int i = 0; i < n_cpu; i++)
               {
                 const IndexSet &iset =
@@ -1191,8 +1192,8 @@ namespace internal
                   {
                     const types::global_dof_index target = iset.nth_index_in_set (ind);
                     const types::global_dof_index value  = gathered_new_numbers[shift + ind];
-                    Assert(target < this->dof_handler.n_dofs(), ExcInternalError());
-                    Assert(value  < this->dof_handler.n_dofs(), ExcInternalError());
+                    Assert(target < this->dof_handler->n_dofs(), ExcInternalError());
+                    Assert(value  < this->dof_handler->n_dofs(), ExcInternalError());
                     global_gathered_numbers[target] = value;
                     flag_1[target]++;
                     flag_2[value]++;
@@ -1213,9 +1214,9 @@ namespace internal
         this->Sequential<dim, spacedim>::renumber_dofs (global_gathered_numbers, number_cache);
         // correct number_cache:
         number_cache.locally_owned_dofs_per_processor =
-          DoFTools::locally_owned_dofs_per_subdomain (this->dof_handler);
+          DoFTools::locally_owned_dofs_per_subdomain (*this->dof_handler);
         number_cache.locally_owned_dofs =
-          number_cache.locally_owned_dofs_per_processor[this->dof_handler.get_triangulation().locally_owned_subdomain ()];
+          number_cache.locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain ()];
         // sequential renumbering returns a vector of size 1 here,
         // correct this:
         number_cache.n_locally_owned_dofs_per_processor.resize(number_cache.locally_owned_dofs_per_processor.size());
@@ -1224,7 +1225,7 @@ namespace internal
           number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements ();
 
         number_cache.n_locally_owned_dofs =
-          number_cache.n_locally_owned_dofs_per_processor[this->dof_handler.get_triangulation().locally_owned_subdomain ()];
+          number_cache.n_locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain ()];
 
         // restore artificial cells
         cell = tr->begin_active();
@@ -2078,7 +2079,7 @@ namespace internal
       ParallelDistributed<dim,spacedim>::
       ParallelDistributed (dealii::DoFHandler<dim,spacedim> &dof_handler)
         :
-        dof_handler (dof_handler)
+        dof_handler (&dof_handler)
       {}
 
 
@@ -2100,7 +2101,7 @@ namespace internal
         parallel::distributed::Triangulation< dim, spacedim > *tr
           = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (const_cast<dealii::Triangulation< dim, spacedim >*>
-              (&dof_handler.get_triangulation())));
+              (&dof_handler->get_triangulation())));
         Assert (tr != nullptr, ExcInternalError());
 
         const unsigned int
@@ -2109,7 +2110,7 @@ namespace internal
         //* 1. distribute on own subdomain
         const dealii::types::global_dof_index n_initial_local_dofs =
           Implementation::distribute_dofs (0, tr->locally_owned_subdomain(),
-                                           dof_handler);
+                                           *dof_handler);
 
         //* 2. iterate over ghostcells and kill dofs that are not
         // owned by us
@@ -2121,8 +2122,8 @@ namespace internal
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
           typename DoFHandler<dim,spacedim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
+          cell = dof_handler->begin_active(),
+          endc = dof_handler->end();
 
           for (; cell != endc; ++cell)
             if (cell->is_ghost() &&
@@ -2178,7 +2179,7 @@ namespace internal
         // numbering form.  we renumber some dofs as invalid, so
         // choose the nocheck-version.
         Implementation::renumber_dofs (renumbering, IndexSet(0),
-                                       dof_handler, false);
+                                       *dof_handler, false);
 
         // now a little bit of housekeeping
         number_cache.n_global_dofs
@@ -2230,8 +2231,8 @@ namespace internal
         tr->clear_user_flags ();
 
         // mark all own cells for transfer
-        for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof_handler.begin_active();
-             cell != dof_handler.end(); ++cell)
+        for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof_handler->begin_active();
+             cell != dof_handler->end(); ++cell)
           if (!cell->is_artificial())
             cell->set_user_flag();
 
@@ -2246,12 +2247,12 @@ namespace internal
         // Send and receive cells. After this, only the local cells
         // are marked, that received new data. This has to be
         // communicated in a second communication step.
-        communicate_dof_indices_on_marked_cells (dof_handler,
+        communicate_dof_indices_on_marked_cells (*dof_handler,
                                                  vertices_with_ghost_neighbors,
                                                  tr->coarse_cell_to_p4est_tree_permutation,
                                                  tr->p4est_tree_to_coarse_cell_permutation);
 
-        communicate_dof_indices_on_marked_cells (dof_handler,
+        communicate_dof_indices_on_marked_cells (*dof_handler,
                                                  vertices_with_ghost_neighbors,
                                                  tr->coarse_cell_to_p4est_tree_permutation,
                                                  tr->p4est_tree_to_coarse_cell_permutation);
@@ -2263,8 +2264,8 @@ namespace internal
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-          for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof_handler.begin_active();
-               cell != dof_handler.end(); ++cell)
+          for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof_handler->begin_active();
+               cell != dof_handler->end(); ++cell)
             if (!cell->is_artificial())
               {
                 local_dof_indices.resize (cell->get_fe().dofs_per_cell);
@@ -2306,7 +2307,7 @@ namespace internal
         parallel::distributed::Triangulation< dim, spacedim > *tr
           = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (const_cast<dealii::Triangulation< dim, spacedim >*>
-              (&dof_handler.get_triangulation())));
+              (&dof_handler->get_triangulation())));
         Assert (tr != nullptr, ExcInternalError());
 
         AssertThrow(
@@ -2333,7 +2334,7 @@ namespace internal
             const unsigned int n_initial_local_dofs =
               Implementation::distribute_dofs_on_level(0,
                                                        tr->locally_owned_subdomain(),
-                                                       dof_handler,
+                                                       *dof_handler,
                                                        level);
 
             //* 2. iterate over ghostcells and kill dofs that are not
@@ -2347,8 +2348,8 @@ namespace internal
                 std::vector<dealii::types::global_dof_index> local_dof_indices;
 
                 typename DoFHandler<dim,spacedim>::level_cell_iterator
-                cell = dof_handler.begin(level),
-                endc = dof_handler.end(level);
+                cell = dof_handler->begin(level),
+                endc = dof_handler->end(level);
 
                 for (; cell != endc; ++cell)
                   if (cell->level_subdomain_id()!=numbers::artificial_subdomain_id &&
@@ -2411,7 +2412,7 @@ namespace internal
             // in that case
             if (level < tr->n_levels())
               Implementation::renumber_mg_dofs (renumbering, IndexSet(0),
-                                                dof_handler, level,
+                                                *dof_handler, level,
                                                 false);
 
             // now a little bit of housekeeping
@@ -2471,8 +2472,8 @@ namespace internal
           // mark all ghost cells for transfer
           {
             typename DoFHandler<dim,spacedim>::level_cell_iterator
-            cell, endc = dof_handler.end();
-            for (cell = dof_handler.begin(); cell != endc; ++cell)
+            cell, endc = dof_handler->end();
+            for (cell = dof_handler->begin(); cell != endc; ++cell)
               if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id
                   && !cell->is_locally_owned_on_level())
                 cell->set_user_flag();
@@ -2482,7 +2483,7 @@ namespace internal
           // managed to get every DoF, remove the user_flag, otherwise we
           // will request them again in the step below.
           communicate_mg_ghost_cells(*tr,
-                                     dof_handler,
+                                     *dof_handler,
                                      tr->coarse_cell_to_p4est_tree_permutation,
                                      tr->p4est_tree_to_coarse_cell_permutation);
 
@@ -2494,7 +2495,7 @@ namespace internal
           // Phase 2, only request the cells that were not completed
           // in Phase 1.
           communicate_mg_ghost_cells(*tr,
-                                     dof_handler,
+                                     *dof_handler,
                                      tr->coarse_cell_to_p4est_tree_permutation,
                                      tr->p4est_tree_to_coarse_cell_permutation);
 
@@ -2502,8 +2503,8 @@ namespace internal
           // make sure we have removed all flags:
           {
             typename DoFHandler<dim,spacedim>::level_cell_iterator
-            cell, endc = dof_handler.end();
-            for (cell = dof_handler.begin(); cell != endc; ++cell)
+            cell, endc = dof_handler->end();
+            for (cell = dof_handler->begin(); cell != endc; ++cell)
               if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id
                   && !cell->is_locally_owned_on_level())
                 Assert(cell->user_flag_set()==false, ExcInternalError());
@@ -2521,9 +2522,9 @@ namespace internal
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
           typename DoFHandler<dim,spacedim>::level_cell_iterator
-          cell, endc = dof_handler.end();
+          cell, endc = dof_handler->end();
 
-          for (cell = dof_handler.begin(); cell != endc; ++cell)
+          for (cell = dof_handler->begin(); cell != endc; ++cell)
             if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id)
               {
                 local_dof_indices.resize (cell->get_fe().dofs_per_cell);
@@ -2551,7 +2552,7 @@ namespace internal
       {
         (void)new_numbers;
 
-        Assert (new_numbers.size() == dof_handler.locally_owned_dofs().n_elements(),
+        Assert (new_numbers.size() == dof_handler->locally_owned_dofs().n_elements(),
                 ExcInternalError());
 
         NumberCache number_cache;
@@ -2567,13 +2568,13 @@ namespace internal
         // we still need to go through this function, but we can skip this
         // calculation.
 
-        number_cache.locally_owned_dofs = IndexSet (dof_handler.n_dofs());
-        if (dof_handler.locally_owned_dofs().n_elements()>0)
+        number_cache.locally_owned_dofs = IndexSet (dof_handler->n_dofs());
+        if (dof_handler->locally_owned_dofs().n_elements()>0)
           {
             std::vector<dealii::types::global_dof_index> new_numbers_sorted (new_numbers);
             std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
             std::vector<dealii::types::global_dof_index>::const_iterator it = new_numbers_sorted.begin();
-            const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
+            const unsigned int n_blocks = dof_handler->get_fe().n_blocks();
             std::vector<std::pair<dealii::types::global_dof_index,unsigned int> > block_indices(n_blocks);
             block_indices[0].first = *it++;
             block_indices[0].second = 1;
@@ -2641,19 +2642,19 @@ namespace internal
         // also check with the number of locally owned degrees of freedom that
         // the DoFHandler object still stores
         Assert (number_cache.locally_owned_dofs.n_elements() ==
-                dof_handler.n_locally_owned_dofs(),
+                dof_handler->n_locally_owned_dofs(),
                 ExcInternalError());
 
         // then also set this number in our own copy
-        number_cache.n_locally_owned_dofs = dof_handler.n_locally_owned_dofs();
+        number_cache.n_locally_owned_dofs = dof_handler->n_locally_owned_dofs();
 
         // mark not locally active DoFs as invalid
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
           typename DoFHandler<dim,spacedim>::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
+          cell = dof_handler->begin_active(),
+          endc = dof_handler->end();
 
           for (; cell != endc; ++cell)
             if (!cell->is_artificial())
@@ -2665,7 +2666,7 @@ namespace internal
                     if (local_dof_indices[i] == numbers::invalid_dof_index)
                       continue;
 
-                    if (!dof_handler.locally_owned_dofs().is_element(local_dof_indices[i]))
+                    if (!dof_handler->locally_owned_dofs().is_element(local_dof_indices[i]))
                       {
                         //this DoF is not owned by us, so set it to invalid.
                         local_dof_indices[i]
@@ -2679,10 +2680,10 @@ namespace internal
 
 
         // renumber. Skip when there is nothing to do because we own no DoF.
-        if (dof_handler.locally_owned_dofs().n_elements() > 0)
+        if (dof_handler->locally_owned_dofs().n_elements() > 0)
           Implementation::renumber_dofs (new_numbers,
-                                         dof_handler.locally_owned_dofs(),
-                                         dof_handler,
+                                         dof_handler->locally_owned_dofs(),
+                                         *dof_handler,
                                          false);
 
         // communication
@@ -2690,7 +2691,7 @@ namespace internal
           parallel::distributed::Triangulation< dim, spacedim > *tr
             = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
                (const_cast<dealii::Triangulation< dim, spacedim >*>
-                (&dof_handler.get_triangulation())));
+                (&dof_handler->get_triangulation())));
           Assert (tr != nullptr, ExcInternalError());
 
           std::vector<bool> user_flags;
@@ -2699,8 +2700,8 @@ namespace internal
 
           // mark all own cells for transfer
           typename DoFHandler<dim,spacedim>::active_cell_iterator
-          cell, endc = dof_handler.end();
-          for (cell = dof_handler.begin_active(); cell != endc; ++cell)
+          cell, endc = dof_handler->end();
+          for (cell = dof_handler->begin_active(); cell != endc; ++cell)
             if (!cell->is_artificial())
               cell->set_user_flag();
 
@@ -2714,12 +2715,12 @@ namespace internal
           // Send and receive cells. After this, only the local cells are
           // marked, that received new data. This has to be communicated in a
           // second communication step.
-          communicate_dof_indices_on_marked_cells (dof_handler,
+          communicate_dof_indices_on_marked_cells (*dof_handler,
                                                    vertices_with_ghost_neighbors,
                                                    tr->coarse_cell_to_p4est_tree_permutation,
                                                    tr->p4est_tree_to_coarse_cell_permutation);
 
-          communicate_dof_indices_on_marked_cells (dof_handler,
+          communicate_dof_indices_on_marked_cells (*dof_handler,
                                                    vertices_with_ghost_neighbors,
                                                    tr->coarse_cell_to_p4est_tree_permutation,
                                                    tr->p4est_tree_to_coarse_cell_permutation);

@@ -131,7 +131,7 @@ namespace internal
         /**
          * The DoFHandler object on which this policy object works.
          */
-        dealii::DoFHandler<dim,spacedim> &dof_handler;
+        SmartPointer<dealii::DoFHandler<dim,spacedim> > dof_handler;
       };
 
       /**
@@ -219,7 +219,7 @@ namespace internal
         /**
          * The DoFHandler object on which this policy object works.
          */
-        dealii::DoFHandler<dim,spacedim> &dof_handler;
+        SmartPointer<dealii::DoFHandler<dim,spacedim> > dof_handler;
       };
     }
   }
