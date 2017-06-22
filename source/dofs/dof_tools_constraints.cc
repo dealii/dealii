@@ -3202,7 +3202,7 @@ namespace DoFTools
 
     // first construct the inverse mapping of weight_mapping
     std::vector<types::global_dof_index> inverse_weight_mapping (n_global_parm_dofs,
-        DoFHandler<dim,spacedim>::invalid_dof_index);
+        numbers::invalid_dof_index);
     for (types::global_dof_index i=0; i<weight_mapping.size(); ++i)
       {
         const types::global_dof_index parameter_dof = weight_mapping[i];
@@ -3210,7 +3210,7 @@ namespace DoFTools
         if (parameter_dof != numbers::invalid_dof_index)
           {
             Assert (parameter_dof < n_global_parm_dofs, ExcInternalError());
-            Assert ((inverse_weight_mapping[parameter_dof] == DoFHandler<dim,spacedim>::invalid_dof_index),
+            Assert ((inverse_weight_mapping[parameter_dof] == numbers::invalid_dof_index),
                     ExcInternalError());
 
             inverse_weight_mapping[parameter_dof] = i;

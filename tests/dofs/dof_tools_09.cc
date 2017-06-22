@@ -36,7 +36,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   boundary_ids.insert (0);
   DoFTools::map_dof_to_boundary_indices (dof_handler, map);
   for (unsigned int i=0; i<map.size(); ++i)
-    deallog << (map[i] == DoFHandler<dim>::invalid_dof_index ?
+    deallog << (map[i] == numbers::invalid_dof_index ?
                 -1 : static_cast<signed int>(map[i]))
             << " ";
   deallog << std::endl;
@@ -45,7 +45,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   boundary_ids.insert (1);
   DoFTools::map_dof_to_boundary_indices (dof_handler, map);
   for (unsigned int i=0; i<map.size(); ++i)
-    deallog << (map[i] == DoFHandler<dim>::invalid_dof_index ?
+    deallog << (map[i] == numbers::invalid_dof_index ?
                 -1 : static_cast<signed int>(map[i]))
             << " ";
   deallog << std::endl;

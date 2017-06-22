@@ -105,7 +105,7 @@ void test()
             std::sort(local_dof_indices.begin(), local_dof_indices.end());
 
             //macros are evil...
-            types::global_dof_index invalid_dofindex = DoFHandler<dim,dim>::invalid_dof_index;
+            types::global_dof_index invalid_dofindex = numbers::invalid_dof_index;
             Assert((*local_dof_indices.rbegin())!=invalid_dofindex, ExcInternalError());
 
           }

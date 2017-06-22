@@ -124,7 +124,7 @@ namespace DoFRenumbering
                    const bool       use_constraints)
     {
       std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(),
-                                                       DoFHandlerType::invalid_dof_index);
+                                                       numbers::invalid_dof_index);
       compute_Cuthill_McKee(renumbering, dof_handler, reversed_numbering,
                             use_constraints);
 
@@ -168,7 +168,7 @@ namespace DoFRenumbering
         new_dof_indices[index_map[inv_perm[c]]] = c;
 
       Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
-                         DoFHandlerType::invalid_dof_index) == new_dof_indices.end(),
+                         numbers::invalid_dof_index) == new_dof_indices.end(),
               ExcInternalError());
     }
 
@@ -181,7 +181,7 @@ namespace DoFRenumbering
                    const bool       use_constraints)
     {
       std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(),
-                                                       DoFHandlerType::invalid_dof_index);
+                                                       numbers::invalid_dof_index);
       compute_king_ordering(renumbering, dof_handler, reversed_numbering,
                             use_constraints);
 
@@ -221,7 +221,7 @@ namespace DoFRenumbering
         new_dof_indices[index_map[inv_perm[c]]] = c;
 
       Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
-                         DoFHandlerType::invalid_dof_index) == new_dof_indices.end(),
+                         numbers::invalid_dof_index) == new_dof_indices.end(),
               ExcInternalError());
     }
 
@@ -234,7 +234,7 @@ namespace DoFRenumbering
                     const bool       use_constraints)
     {
       std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(),
-                                                       DoFHandlerType::invalid_dof_index);
+                                                       numbers::invalid_dof_index);
       compute_minimum_degree(renumbering, dof_handler, reversed_numbering,
                              use_constraints);
 
@@ -353,7 +353,7 @@ namespace DoFRenumbering
                  const std::vector<types::global_dof_index> &starting_indices)
   {
     std::vector<types::global_dof_index> renumbering(dof_handler.locally_owned_dofs().n_elements(),
-                                                     DoFHandlerType::invalid_dof_index);
+                                                     numbers::invalid_dof_index);
     compute_Cuthill_McKee(renumbering, dof_handler, reversed_numbering,
                           use_constraints, starting_indices);
 
@@ -502,7 +502,7 @@ namespace DoFRenumbering
                   const std::vector<unsigned int> &component_order_arg)
   {
     std::vector<types::global_dof_index> renumbering (dof_handler.n_locally_owned_dofs(),
-                                                      DoFHandler<dim>::invalid_dof_index);
+                                                      numbers::invalid_dof_index);
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator
     start = dof_handler.begin_active();
@@ -547,7 +547,7 @@ namespace DoFRenumbering
   {
 //TODO: Merge with previous function
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(),
-                                                      hp::DoFHandler<dim>::invalid_dof_index);
+                                                      numbers::invalid_dof_index);
 
     typename hp::DoFHandler<dim>::active_cell_iterator
     start = dof_handler.begin_active();
@@ -580,7 +580,7 @@ namespace DoFRenumbering
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(level),
-                                                      DoFHandlerType::invalid_dof_index);
+                                                      numbers::invalid_dof_index);
 
     typename DoFHandlerType::level_cell_iterator start =dof_handler.begin(level);
     typename DoFHandlerType::level_cell_iterator end = dof_handler.end(level);
@@ -845,7 +845,7 @@ namespace DoFRenumbering
   block_wise (DoFHandler<dim,spacedim> &dof_handler)
   {
     std::vector<types::global_dof_index> renumbering (dof_handler.n_locally_owned_dofs(),
-                                                      DoFHandler<dim>::invalid_dof_index);
+                                                      numbers::invalid_dof_index);
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator
     start = dof_handler.begin_active();
@@ -883,7 +883,7 @@ namespace DoFRenumbering
   block_wise (hp::DoFHandler<dim,spacedim> &dof_handler)
   {
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(),
-                                                      hp::DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                      numbers::invalid_dof_index);
 
     typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
     start = dof_handler.begin_active();
@@ -914,7 +914,7 @@ namespace DoFRenumbering
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(level),
-                                                      DoFHandler<dim, spacedim>::invalid_dof_index);
+                                                      numbers::invalid_dof_index);
 
     typename DoFHandler<dim, spacedim>::level_cell_iterator
     start =dof_handler.begin(level);
@@ -1165,7 +1165,7 @@ namespace DoFRenumbering
                     {
                       // this is a locally owned DoF, assign new number if not assigned a number yet
                       unsigned int idx = locally_owned.index_within_set (local_dof_indices[i]);
-                      if (new_indices[idx] == DoFHandler<dim>::invalid_dof_index)
+                      if (new_indices[idx] == numbers::invalid_dof_index)
                         {
                           new_indices[idx] = locally_owned.nth_index_in_set (next_free);
                           next_free++;
@@ -1185,7 +1185,7 @@ namespace DoFRenumbering
   hierarchical (DoFHandler<dim> &dof_handler)
   {
     std::vector<types::global_dof_index> renumbering (dof_handler.n_locally_owned_dofs(),
-                                                      DoFHandler<dim>::invalid_dof_index);
+                                                      numbers::invalid_dof_index);
 
     typename DoFHandler<dim>::level_cell_iterator cell;
 
@@ -1260,7 +1260,7 @@ namespace DoFRenumbering
                            const std::vector<bool> &selected_dofs)
   {
     std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(),
-                                                     DoFHandlerType::invalid_dof_index);
+                                                     numbers::invalid_dof_index);
     compute_sort_selected_dofs_back(renumbering, dof_handler, selected_dofs);
 
     dof_handler.renumber_dofs(renumbering);
@@ -1278,7 +1278,7 @@ namespace DoFRenumbering
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(level),
-                                                     DoFHandlerType::invalid_dof_index);
+                                                     numbers::invalid_dof_index);
     compute_sort_selected_dofs_back(renumbering, dof_handler, selected_dofs, level);
 
     dof_handler.renumber_dofs(level, renumbering);
@@ -1849,7 +1849,7 @@ namespace DoFRenumbering
   random (DoFHandlerType &dof_handler)
   {
     std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(),
-                                                     DoFHandlerType::invalid_dof_index);
+                                                     numbers::invalid_dof_index);
     compute_random(renumbering, dof_handler);
 
     dof_handler.renumber_dofs(renumbering);
@@ -1892,7 +1892,7 @@ namespace DoFRenumbering
   subdomain_wise (DoFHandlerType &dof_handler)
   {
     std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(),
-                                                     DoFHandlerType::invalid_dof_index);
+                                                     numbers::invalid_dof_index);
     compute_subdomain_wise(renumbering, dof_handler);
 
     dof_handler.renumber_dofs(renumbering);

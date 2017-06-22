@@ -54,7 +54,7 @@ namespace internal
   template <int dim, int spacedim>
   const types::global_dof_index *dummy ()
   {
-    return &dealii::DoFHandler<dim,spacedim>::invalid_dof_index;
+    return &dealii::numbers::invalid_dof_index;
   }
 }
 
@@ -272,7 +272,7 @@ namespace internal
         dof_handler.vertex_dofs
         .resize(dof_handler.tria->n_vertices() *
                 dof_handler.selected_fe->dofs_per_vertex,
-                DoFHandler<1,spacedim>::invalid_dof_index);
+                numbers::invalid_dof_index);
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
@@ -281,12 +281,12 @@ namespace internal
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
                      dof_handler.selected_fe->dofs_per_line,
-                     DoFHandler<1,spacedim>::invalid_dof_index);
+                     numbers::invalid_dof_index);
 
             dof_handler.levels.back()->cell_dof_indices_cache
             .resize (dof_handler.tria->n_raw_cells(i) *
                      dof_handler.selected_fe->dofs_per_cell,
-                     DoFHandler<1,spacedim>::invalid_dof_index);
+                     numbers::invalid_dof_index);
           }
       }
 
@@ -298,7 +298,7 @@ namespace internal
         dof_handler.vertex_dofs
         .resize(dof_handler.tria->n_vertices() *
                 dof_handler.selected_fe->dofs_per_vertex,
-                DoFHandler<2,spacedim>::invalid_dof_index);
+                numbers::invalid_dof_index);
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
@@ -307,12 +307,12 @@ namespace internal
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
                      dof_handler.selected_fe->dofs_per_quad,
-                     DoFHandler<2,spacedim>::invalid_dof_index);
+                     numbers::invalid_dof_index);
 
             dof_handler.levels.back()->cell_dof_indices_cache
             .resize (dof_handler.tria->n_raw_cells(i) *
                      dof_handler.selected_fe->dofs_per_cell,
-                     DoFHandler<2,spacedim>::invalid_dof_index);
+                     numbers::invalid_dof_index);
           }
 
         dof_handler.faces.reset (new internal::DoFHandler::DoFFaces<2>);
@@ -322,7 +322,7 @@ namespace internal
             dof_handler.faces->lines.dofs
             .resize (dof_handler.tria->n_raw_lines() *
                      dof_handler.selected_fe->dofs_per_line,
-                     DoFHandler<2,spacedim>::invalid_dof_index);
+                     numbers::invalid_dof_index);
           }
       }
 
@@ -334,7 +334,7 @@ namespace internal
         dof_handler.vertex_dofs
         .resize(dof_handler.tria->n_vertices() *
                 dof_handler.selected_fe->dofs_per_vertex,
-                DoFHandler<3,spacedim>::invalid_dof_index);
+                numbers::invalid_dof_index);
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
           {
@@ -343,12 +343,12 @@ namespace internal
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
                      dof_handler.selected_fe->dofs_per_hex,
-                     DoFHandler<3,spacedim>::invalid_dof_index);
+                     numbers::invalid_dof_index);
 
             dof_handler.levels.back()->cell_dof_indices_cache
             .resize (dof_handler.tria->n_raw_cells(i) *
                      dof_handler.selected_fe->dofs_per_cell,
-                     DoFHandler<3,spacedim>::invalid_dof_index);
+                     numbers::invalid_dof_index);
           }
         dof_handler.faces.reset (new internal::DoFHandler::DoFFaces<3>);
 
@@ -358,11 +358,11 @@ namespace internal
             dof_handler.faces->lines.dofs
             .resize (dof_handler.tria->n_raw_lines() *
                      dof_handler.selected_fe->dofs_per_line,
-                     DoFHandler<3,spacedim>::invalid_dof_index);
+                     numbers::invalid_dof_index);
             dof_handler.faces->quads.dofs
             .resize (dof_handler.tria->n_raw_quads() *
                      dof_handler.selected_fe->dofs_per_quad,
-                     DoFHandler<3,spacedim>::invalid_dof_index);
+                     numbers::invalid_dof_index);
           }
       }
 
@@ -380,7 +380,7 @@ namespace internal
         for (unsigned int i = 0; i < n_levels; ++i)
           {
             dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<1>);
-            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines (i) * dofs_per_line, DoFHandler<1>::invalid_dof_index);
+            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines (i) * dofs_per_line, numbers::invalid_dof_index);
           }
 
         const unsigned int &n_vertices = tria.n_vertices ();
@@ -436,11 +436,11 @@ namespace internal
         for (unsigned int i = 0; i < n_levels; ++i)
           {
             dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<2>);
-            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads (i) * fe.dofs_per_quad, DoFHandler<2>::invalid_dof_index);
+            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads (i) * fe.dofs_per_quad, numbers::invalid_dof_index);
           }
 
         dof_handler.mg_faces.reset (new internal::DoFHandler::DoFFaces<2>);
-        dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<2>::invalid_dof_index);
+        dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, numbers::invalid_dof_index);
 
         const unsigned int &n_vertices = tria.n_vertices ();
 
@@ -495,12 +495,12 @@ namespace internal
         for (unsigned int i = 0; i < n_levels; ++i)
           {
             dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<3>);
-            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_hexs (i) * fe.dofs_per_hex, DoFHandler<3>::invalid_dof_index);
+            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_hexs (i) * fe.dofs_per_hex, numbers::invalid_dof_index);
           }
 
         dof_handler.mg_faces.reset (new internal::DoFHandler::DoFFaces<3>);
-        dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<3>::invalid_dof_index);
-        dof_handler.mg_faces->quads.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads () * fe.dofs_per_quad, DoFHandler<3>::invalid_dof_index);
+        dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, numbers::invalid_dof_index);
+        dof_handler.mg_faces->quads.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads () * fe.dofs_per_quad, numbers::invalid_dof_index);
 
         const unsigned int &n_vertices = tria.n_vertices ();
 
@@ -1255,7 +1255,7 @@ void DoFHandler<1>::renumber_dofs (const unsigned int level,
   for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
        i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
-      if (*i != DoFHandler<1>::invalid_dof_index)
+      if (*i != numbers::invalid_dof_index)
         {
           Assert(*i<new_numbers.size(), ExcInternalError());
           *i = new_numbers[*i];
@@ -1315,7 +1315,7 @@ void DoFHandler<2>::renumber_dofs (const unsigned int  level,
   for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
        i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
-      if (*i != DoFHandler<2>::invalid_dof_index)
+      if (*i != numbers::invalid_dof_index)
         {
           Assert(*i<new_numbers.size(), ExcInternalError());
           *i = new_numbers[*i];
@@ -1408,7 +1408,7 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
   for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
        i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
-      if (*i != DoFHandler<3>::invalid_dof_index)
+      if (*i != numbers::invalid_dof_index)
         {
           Assert(*i<new_numbers.size(), ExcInternalError());
           *i = new_numbers[*i];
@@ -1563,7 +1563,7 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
       const unsigned int n_indices = n_levels * dofs_per_vertex;
 
       indices = new types::global_dof_index[n_indices];
-      std::fill (indices, indices+n_indices, DoFHandler<dim,spacedim>::invalid_dof_index);
+      std::fill (indices, indices+n_indices, numbers::invalid_dof_index);
 
       indices_offset = new types::global_dof_index[n_levels];
       for (unsigned int i = 0; i < n_levels; ++i)

@@ -2961,7 +2961,7 @@ namespace VectorTools
         }
       // fill in boundary values
       for (unsigned int i=0; i<dof_to_boundary_mapping.size(); ++i)
-        if (dof_to_boundary_mapping[i] != DoFHandler<dim,spacedim>::invalid_dof_index
+        if (dof_to_boundary_mapping[i] != numbers::invalid_dof_index
             && ! excluded_dofs[dof_to_boundary_mapping[i]])
           {
             AssertIsFinite(boundary_projection(dof_to_boundary_mapping[i]));

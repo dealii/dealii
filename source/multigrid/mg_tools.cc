@@ -1239,7 +1239,7 @@ namespace MGTools
     local_dofs.reserve (DoFTools::max_dofs_per_face(dof));
     std::fill (local_dofs.begin (),
                local_dofs.end (),
-               DoFHandler<dim,spacedim>::invalid_dof_index);
+               numbers::invalid_dof_index);
 
     // First, deal with the simpler case when we have to identify all boundary dofs
     if (component_mask.n_selected_components(n_components) == n_components)

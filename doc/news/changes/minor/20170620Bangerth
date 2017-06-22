@@ -1,0 +1,5 @@
+Deprecated: The static member variables DoFHandler::invalid_dof_index
+and hp::DoFHandler::invalid_dof_index are now deprecated. Use
+numbers::invalid_dof_index instead.
+<br>
+(Wolfgang Bangerth, 2017/06/20)

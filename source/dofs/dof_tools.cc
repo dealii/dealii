@@ -1901,7 +1901,7 @@ namespace DoFTools
   {
     mapping.clear ();
     mapping.insert (mapping.end(), dof_handler.n_dofs(),
-                    DoFHandlerType::invalid_dof_index);
+                    numbers::invalid_dof_index);
 
     std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (max_dofs_per_face(dof_handler));
@@ -1924,7 +1924,7 @@ namespace DoFTools
             cell->face(f)->get_dof_indices (dofs_on_face,
                                             cell->active_fe_index());
             for (unsigned int i=0; i<dofs_per_face; ++i)
-              if (mapping[dofs_on_face[i]] == DoFHandlerType::invalid_dof_index)
+              if (mapping[dofs_on_face[i]] == numbers::invalid_dof_index)
                 mapping[dofs_on_face[i]] = next_boundary_index++;
           }
 
@@ -1944,7 +1944,7 @@ namespace DoFTools
 
     mapping.clear ();
     mapping.insert (mapping.end(), dof_handler.n_dofs(),
-                    DoFHandlerType::invalid_dof_index);
+                    numbers::invalid_dof_index);
 
     // return if there is nothing to do
     if (boundary_ids.size() == 0)
@@ -1965,7 +1965,7 @@ namespace DoFTools
             dofs_on_face.resize (dofs_per_face);
             cell->face(f)->get_dof_indices (dofs_on_face, cell->active_fe_index());
             for (unsigned int i=0; i<dofs_per_face; ++i)
-              if (mapping[dofs_on_face[i]] == DoFHandlerType::invalid_dof_index)
+              if (mapping[dofs_on_face[i]] == numbers::invalid_dof_index)
                 mapping[dofs_on_face[i]] = next_boundary_index++;
           }
 

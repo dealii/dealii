@@ -302,7 +302,7 @@ namespace internal
           // set up the linked lists for
           // each of the vertices
           dof_handler.vertex_dofs.resize (vertex_slots_needed,
-                                          DoFHandler<dim,spacedim>::invalid_dof_index);
+                                          numbers::invalid_dof_index);
           for (unsigned int v=0; v<dof_handler.tria->n_vertices(); ++v)
             if (dof_handler.tria->vertex_used(v) == true)
               {
@@ -363,7 +363,7 @@ namespace internal
           if (fe.dofs_per_vertex > 0)
             for (unsigned int vertex=0; vertex<GeometryInfo<1>::vertices_per_cell; ++vertex)
               if (cell->vertex_dof_index(vertex, 0, fe_index) ==
-                  DoFHandler<dim,spacedim>::invalid_dof_index)
+                  numbers::invalid_dof_index)
                 for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
                   cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
 
@@ -372,7 +372,7 @@ namespace internal
           if (fe.dofs_per_line > 0)
             {
               Assert ((cell->dof_index(0, fe_index) ==
-                       DoFHandler<dim,spacedim>::invalid_dof_index),
+                       numbers::invalid_dof_index),
                       ExcInternalError());
 
               for (unsigned int d=0; d<fe.dofs_per_line; ++d, ++next_free_dof)
@@ -408,7 +408,7 @@ namespace internal
           if (fe.dofs_per_vertex > 0)
             for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
               if (cell->vertex_dof_index(vertex, 0, fe_index) ==
-                  DoFHandler<dim,spacedim>::invalid_dof_index)
+                  numbers::invalid_dof_index)
                 for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
                   cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
 
@@ -424,7 +424,7 @@ namespace internal
                 line = cell->line(l);
 
                 if (line->dof_index(0,fe_index) ==
-                    DoFHandler<dim,spacedim>::invalid_dof_index)
+                    numbers::invalid_dof_index)
                   for (unsigned int d=0; d<fe.dofs_per_line; ++d, ++next_free_dof)
                     line->set_dof_index (d, next_free_dof, fe_index);
               }
@@ -435,7 +435,7 @@ namespace internal
           if (fe.dofs_per_quad > 0)
             {
               Assert ((cell->dof_index(0, fe_index) ==
-                       DoFHandler<dim,spacedim>::invalid_dof_index),
+                       numbers::invalid_dof_index),
                       ExcInternalError());
 
               for (unsigned int d=0; d<fe.dofs_per_quad; ++d, ++next_free_dof)
@@ -471,7 +471,7 @@ namespace internal
           if (fe.dofs_per_vertex > 0)
             for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
               if (cell->vertex_dof_index(vertex, 0, fe_index) ==
-                  DoFHandler<dim,spacedim>::invalid_dof_index)
+                  numbers::invalid_dof_index)
                 for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
                   cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
 
@@ -487,7 +487,7 @@ namespace internal
                 line = cell->line(l);
 
                 if (line->dof_index(0,fe_index) ==
-                    DoFHandler<dim,spacedim>::invalid_dof_index)
+                    numbers::invalid_dof_index)
                   for (unsigned int d=0; d<fe.dofs_per_line; ++d, ++next_free_dof)
                     line->set_dof_index (d, next_free_dof, fe_index);
               }
@@ -500,7 +500,7 @@ namespace internal
                 quad = cell->quad(q);
 
                 if (quad->dof_index(0,fe_index) ==
-                    DoFHandler<dim,spacedim>::invalid_dof_index)
+                    numbers::invalid_dof_index)
                   for (unsigned int d=0; d<fe.dofs_per_quad; ++d, ++next_free_dof)
                     quad->set_dof_index (d, next_free_dof, fe_index);
               }
@@ -511,7 +511,7 @@ namespace internal
           if (fe.dofs_per_hex > 0)
             {
               Assert ((cell->dof_index(0, fe_index) ==
-                       DoFHandler<dim,spacedim>::invalid_dof_index),
+                       numbers::invalid_dof_index),
                       ExcInternalError());
 
               for (unsigned int d=0; d<fe.dofs_per_hex; ++d, ++next_free_dof)
@@ -621,10 +621,10 @@ namespace internal
 
               dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
-                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                        numbers::invalid_dof_index);
               dof_handler.levels[level]->cell_dof_indices_cache
                 = std::vector<types::global_dof_index> (cache_size,
-                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                        numbers::invalid_dof_index);
             }
 
           // safety check: make sure that
@@ -750,10 +750,10 @@ namespace internal
 
               dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
-                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                        numbers::invalid_dof_index);
               dof_handler.levels[level]->cell_dof_indices_cache
                 = std::vector<types::global_dof_index> (cache_size,
-                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                        numbers::invalid_dof_index);
             }
 
           // safety check: make sure that
@@ -894,7 +894,7 @@ namespace internal
                                            (unsigned int)(-1));
             dof_handler.faces->lines.dofs
               = std::vector<types::global_dof_index> (n_line_slots,
-                                                      DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                      numbers::invalid_dof_index);
 
             // with the memory now
             // allocated, loop over the
@@ -1127,10 +1127,10 @@ namespace internal
 
               dof_handler.levels[level]->dof_indices
                 = std::vector<types::global_dof_index> (next_free_dof,
-                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                        numbers::invalid_dof_index);
               dof_handler.levels[level]->cell_dof_indices_cache
                 = std::vector<types::global_dof_index> (cache_size,
-                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                        numbers::invalid_dof_index);
             }
 
           // safety check: make sure that
@@ -1276,7 +1276,7 @@ namespace internal
                      (unsigned int)(-1));
                 dof_handler.faces->quads.dofs
                   = std::vector<types::global_dof_index> (n_quad_slots,
-                                                          DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                          numbers::invalid_dof_index);
               }
 
             // with the memory now
@@ -1500,7 +1500,7 @@ namespace internal
               // set up the linked lists for
               // each of the lines
               dof_handler.faces->lines.dofs.resize (line_slots_needed,
-                                                    DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                    numbers::invalid_dof_index);
               for (unsigned int line=0; line<dof_handler.tria->n_raw_lines(); ++line)
                 if (line_is_used[line] == true)
                   {
