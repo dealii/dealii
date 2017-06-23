@@ -83,17 +83,13 @@ namespace internal
         distribute_mg_dofs () const = 0;
 
         /**
-         * Renumber degrees of freedom as specified by the first argument. The
-         * reference to the NumberCache of the DoFHandler object has to be
-         * passed in a second argument. It could then be modified to make
-         * DoFHandler related functions work properly when called within the
-         * policies classes. The updated NumberCache is written to that
-         * argument.
+         * Renumber degrees of freedom as specified by the first argument.
+         *
+         * Return an updated NumberCache for the DoFHandler after renumbering.
          */
         virtual
-        void
-        renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
-                       NumberCache &number_cache) const = 0;
+        NumberCache
+        renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const = 0;
       };
 
 
@@ -124,9 +120,8 @@ namespace internal
 
         // documentation is inherited
         virtual
-        void
-        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers,
-                       NumberCache &number_cache) const;
+        NumberCache
+        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
 
       protected:
         /**
@@ -175,13 +170,12 @@ namespace internal
          * The input argument @p new_numbers may either have as many entries
          * as there are global degrees of freedom (i.e. dof_handler.n_dofs() )
          * or dof_handler.locally_owned_dofs().n_elements(). Therefore it can
-         * be utilised with renumbering functions implemented for the
+         * be utilized with renumbering functions implemented for the
          * parallel::distributed case.
          */
         virtual
-        void
-        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers,
-                       NumberCache &number_cache) const;
+        NumberCache
+        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
       };
 
 
@@ -212,9 +206,8 @@ namespace internal
 
         // documentation is inherited
         virtual
-        void
-        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers,
-                       NumberCache &number_cache) const;
+        NumberCache
+        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
 
       private:
         /**

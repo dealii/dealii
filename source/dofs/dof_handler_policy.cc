@@ -995,10 +995,9 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      void
+      NumberCache
       Sequential<dim,spacedim>::
-      renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
-                     NumberCache &number_cache_current) const
+      renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const
       {
         Implementation::renumber_dofs (new_numbers, IndexSet(0),
                                        *dof_handler, true);
@@ -1022,7 +1021,7 @@ namespace internal
         number_cache.locally_owned_dofs_per_processor
           = std::vector<IndexSet> (1,
                                    number_cache.locally_owned_dofs);
-        number_cache_current = std::move(number_cache);
+        return number_cache;
       }
 
 
@@ -1195,7 +1194,7 @@ namespace internal
         // version of the function because we do things on all
         // cells and all cells have their subdomain ids and DoFs
         // correctly set
-        this->Sequential<dim, spacedim>::renumber_dofs (new_dof_indices, number_cache);
+        number_cache = this->Sequential<dim, spacedim>::renumber_dofs (new_dof_indices);
 
 
         // update the number cache. for this, we first have to find the subdomain
@@ -1296,16 +1295,15 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      void
+      NumberCache
       ParallelShared<dim,spacedim>::
-      renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
-                     NumberCache                                &number_cache) const
+      renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const
       {
 
 #ifndef DEAL_II_WITH_MPI
         (void)new_numbers;
-        (void)number_cache;
         Assert (false, ExcNotImplemented());
+        return NumberCache();
 #else
         // Similar to distribute_dofs() we need to have a special treatment in
         // case artificial cells are present.
@@ -1387,8 +1385,8 @@ namespace internal
             std::vector<unsigned int> flag_2 (this->dof_handler->n_dofs (), 0);
             for (unsigned int i = 0; i < n_cpu; i++)
               {
-                const IndexSet &iset =
-                  number_cache.locally_owned_dofs_per_processor[i];
+                const IndexSet iset =
+                  this->dof_handler->locally_owned_dofs_per_processor()[i];
                 for (types::global_dof_index ind = 0;
                      ind < iset.n_elements (); ind++)
                   {
@@ -1413,7 +1411,8 @@ namespace internal
                    ExcInternalError());
           }
 
-        this->Sequential<dim, spacedim>::renumber_dofs (global_gathered_numbers, number_cache);
+        NumberCache number_cache
+          = this->Sequential<dim, spacedim>::renumber_dofs (global_gathered_numbers);
         // correct number_cache:
         number_cache.locally_owned_dofs_per_processor =
           DoFTools::locally_owned_dofs_per_subdomain (*this->dof_handler);
@@ -1434,6 +1433,8 @@ namespace internal
         if (tr->with_artificial_cells())
           for (unsigned int index=0; cell != endc; cell++, index++)
             cell->set_subdomain_id(current_subdomain_ids[index]);
+
+        return number_cache;
 #endif
       }
 
@@ -2751,10 +2752,9 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      void
+      NumberCache
       ParallelDistributed<dim, spacedim>::
-      renumber_dofs (const std::vector<dealii::types::global_dof_index> &new_numbers,
-                     NumberCache &number_cache_current) const
+      renumber_dofs (const std::vector<dealii::types::global_dof_index> &new_numbers) const
       {
         (void)new_numbers;
 
@@ -2983,7 +2983,7 @@ namespace internal
         }
 #endif
 
-        number_cache_current = std::move(number_cache);
+        return number_cache;
       }
     }
   }

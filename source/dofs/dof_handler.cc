@@ -1215,7 +1215,7 @@ DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_ind
               ExcMessage ("New DoF index is not less than the total number of dofs."));
 #endif
 
-  policy->renumber_dofs (new_numbers, number_cache);
+  number_cache = policy->renumber_dofs (new_numbers);
 }
 
 
