@@ -126,6 +126,9 @@ namespace types
    *
    * There is a special value, numbers::invalid_material_id that is used to
    * indicate an invalid value of this type.
+   *
+   * @see
+   * @ref GlossMaterialId "Glossary entry on material indicators"
    */
   typedef unsigned char material_id;
 }
