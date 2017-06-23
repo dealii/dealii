@@ -40,6 +40,18 @@ namespace internal
       NumberCache ();
 
       /**
+       * Move constructor. Simply move all members of the referenced
+       * object to the current object.
+       */
+      NumberCache (NumberCache &&) = default;
+
+      /**
+       * Move assignment operator. Simply move all members of the referenced
+       * object to the current object.
+       */
+      NumberCache &operator= (NumberCache &&) = default;
+
+      /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */

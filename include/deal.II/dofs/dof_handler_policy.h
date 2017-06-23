@@ -70,8 +70,8 @@ namespace internal
          * argument.
          */
         virtual
-        void
-        distribute_dofs (NumberCache &number_cache) const = 0;
+        NumberCache
+        distribute_dofs () const = 0;
 
         /**
          * Distribute the multigrid dofs on each level of the DoFHandler
@@ -113,8 +113,8 @@ namespace internal
 
         // documentation is inherited
         virtual
-        void
-        distribute_dofs (NumberCache &number_cache) const;
+        NumberCache
+        distribute_dofs () const;
 
         // documentation is inherited
         virtual
@@ -158,8 +158,8 @@ namespace internal
          * number_cache.locally_owned_dofs are updated consistently.
          */
         virtual
-        void
-        distribute_dofs (NumberCache &number_cache) const;
+        NumberCache
+        distribute_dofs () const;
 
         /**
          * This function is not yet implemented.
@@ -201,8 +201,8 @@ namespace internal
 
         // documentation is inherited
         virtual
-        void
-        distribute_dofs (NumberCache &number_cache) const;
+        NumberCache
+        distribute_dofs () const;
 
         // documentation is inherited
         virtual

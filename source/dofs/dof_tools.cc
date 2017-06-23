@@ -1422,9 +1422,11 @@ namespace DoFTools
            ExcDimensionMismatch(subdomain_association.size(),
                                 dof_handler.n_dofs()));
 
-    Assert(dof_handler.n_dofs() > 0,
-           ExcMessage("Number of DoF is not positive. "
-                      "This could happen when the function is called before NumberCache is written."));
+    // catch an error that happened in some versions of the shared tria
+    // distribute_dofs() function where we were trying to call this
+    // function at a point in time when not all internal DoFHandler
+    // structures were quite set up yet.
+    Assert(dof_handler.n_dofs() > 0, ExcInternalError());
 
     // In case this function is executed with parallel::shared::Triangulation
     // with possibly artifical cells, we need to take "true" subdomain IDs (i.e. without

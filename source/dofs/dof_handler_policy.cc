@@ -922,9 +922,9 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      void
+      NumberCache
       Sequential<dim,spacedim>::
-      distribute_dofs (NumberCache &number_cache_current) const
+      distribute_dofs () const
       {
         const types::global_dof_index n_dofs =
           Implementation::distribute_dofs (0,
@@ -950,7 +950,8 @@ namespace internal
         number_cache.locally_owned_dofs_per_processor
           = std::vector<IndexSet> (1,
                                    number_cache.locally_owned_dofs);
-        number_cache_current = number_cache;
+
+        return number_cache;
       }
 
 
@@ -1011,7 +1012,7 @@ namespace internal
         number_cache.locally_owned_dofs_per_processor
           = std::vector<IndexSet> (1,
                                    number_cache.locally_owned_dofs);
-        number_cache_current = number_cache;
+        number_cache_current = std::move(number_cache);
       }
 
 
@@ -1027,55 +1028,243 @@ namespace internal
 
 
 
+      namespace
+      {
+        /**
+         * This function is a variation of DoFTools::get_dof_subdomain_association()
+         * with the exception that it is (i) specialized for
+         * parallel::shared::Triangulation objects, and (ii) does not assume that the
+         * internal number cache of the DoFHandler has already been set up. In can,
+         * consequently, be called at a point when we are still distributing degrees
+         * of freedom.
+         */
+        template <class DoFHandlerType>
+        std::vector<types::subdomain_id>
+        get_dof_subdomain_association (const DoFHandlerType          &dof_handler,
+                                       const types::global_dof_index  n_dofs,
+                                       const unsigned int             n_procs)
+        {
+          std::vector<types::subdomain_id> subdomain_association (n_dofs,
+                                                                  numbers::invalid_subdomain_id);
+          std::vector<types::global_dof_index> local_dof_indices;
+          local_dof_indices.reserve (DoFTools::max_dofs_per_cell(dof_handler));
+
+          // pseudo-randomly assign variables which lie on the interface between
+          // subdomains to each of the two or more
+          bool coin_flip = true;
+
+          // loop over all cells and record which subdomain a DoF belongs to.
+          // toss a coin in case it is on an interface
+          typename DoFHandlerType::active_cell_iterator
+          cell = dof_handler.begin_active(),
+          endc = dof_handler.end();
+          for (; cell!=endc; ++cell)
+            {
+              // get the owner of the cell; note that we have made sure above that
+              // all cells are either locally owned or ghosts (not artificial), so
+              // this call will always yield the true owner
+              const types::subdomain_id subdomain_id = cell->subdomain_id();
+              const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+              local_dof_indices.resize (dofs_per_cell);
+              cell->get_dof_indices (local_dof_indices);
+
+              // set subdomain ids. if dofs already have their values set then
+              // they must be on partition interfaces. in that case randomly
+              // assign them to either the previous association or the current
+              // one, where we take "random" to be "once this way once that way"
+              for (unsigned int i=0; i<dofs_per_cell; ++i)
+                if (subdomain_association[local_dof_indices[i]] ==
+                    numbers::invalid_subdomain_id)
+                  subdomain_association[local_dof_indices[i]] = subdomain_id;
+                else
+                  {
+                    if (coin_flip == true)
+                      subdomain_association[local_dof_indices[i]] = subdomain_id;
+                    coin_flip = !coin_flip;
+                  }
+            }
+
+          Assert (std::find (subdomain_association.begin(),
+                             subdomain_association.end(),
+                             numbers::invalid_subdomain_id)
+                  == subdomain_association.end(),
+                  ExcInternalError());
+
+          Assert (*std::max_element (subdomain_association.begin(),
+                                     subdomain_association.end())
+                  < n_procs,
+                  ExcInternalError());
+
+          return subdomain_association;
+        }
+
+      }
 
 
       template <int dim, int spacedim>
-      void
+      NumberCache
       ParallelShared<dim,spacedim>::
-      distribute_dofs (NumberCache &number_cache) const
+      distribute_dofs () const
       {
-        // If the underlying shared::Tria allows artificial cells, we need to do
-        // some tricks here to make Sequential algorithms play nicely.
-        // Namely, we first restore the original partition (without artificial cells)
-        // and then turn artificial cells on at the end of this function.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
-        typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
-        cell = this->dof_handler->get_triangulation().begin_active(),
-        endc = this->dof_handler->get_triangulation().end();
-        std::vector<types::subdomain_id> current_subdomain_ids(tr->n_active_cells());
-        const std::vector<types::subdomain_id> &true_subdomain_ids = tr->get_true_subdomain_ids_of_cells();
+
+        const unsigned int n_procs = Utilities::MPI::n_mpi_processes(tr->get_communicator());
+
+        // If the underlying shared::Tria allows artificial cells,
+        // then save the current set of subdomain ids, and set
+        // subdomain ids to the "true" owner of each cell. we later
+        // restore these flags
+        std::vector<types::subdomain_id> saved_subdomain_ids;
         if (tr->with_artificial_cells())
-          for (unsigned int index=0; cell != endc; cell++, index++)
+          {
+            saved_subdomain_ids.resize (tr->n_active_cells());
+
+            typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
+            cell = this->dof_handler->get_triangulation().begin_active(),
+            endc = this->dof_handler->get_triangulation().end();
+
+            const std::vector<types::subdomain_id> &true_subdomain_ids
+              = tr->get_true_subdomain_ids_of_cells();
+
+            for (unsigned int index=0; cell != endc; ++cell, ++index)
+              {
+                saved_subdomain_ids[index] = cell->subdomain_id();
+                cell->set_subdomain_id(true_subdomain_ids[index]);
+              }
+          }
+
+        // first let the sequential algorithm do its magic. it is going to
+        // enumerate DoFs on all cells, regardless of owner
+        NumberCache number_cache
+          = this->Sequential<dim,spacedim>::distribute_dofs ();
+
+        // then re-enumerate them based on their subdomain association.
+        // for this, we first have to identify for each current DoF
+        // index which subdomain they belong to. ideally, we would
+        // like to call DoFRenumbering::subdomain_wise(), but
+        // because the NumberCache of the current DoFHandler is not
+        // fully set up yet, we can't quite do that. also, that
+        // function has to deal with other kinds of triangulations as
+        // well, whereas we here know what kind of triangulation
+        // we have and can simplify the code accordingly
+        const unsigned int n_dofs = number_cache.n_global_dofs;
+        std::vector<types::global_dof_index> new_dof_indices (n_dofs,
+                                                              numbers::invalid_dof_index);
+        {
+          // first get the association of each dof with a subdomain and
+          // determine the total number of subdomain ids used
+          const std::vector<types::subdomain_id> subdomain_association
+            = get_dof_subdomain_association (*this->dof_handler, n_dofs, n_procs);
+
+          // then renumber the subdomains by first looking at those belonging
+          // to subdomain 0, then those of subdomain 1, etc. note that the
+          // algorithm is stable, i.e. if two dofs i,j have i<j and belong to
+          // the same subdomain, then they will be in this order also after
+          // reordering
+          types::global_dof_index next_free_index = 0;
+          for (types::subdomain_id subdomain=0; subdomain<n_procs; ++subdomain)
+            for (types::global_dof_index i=0; i<n_dofs; ++i)
+              if (subdomain_association[i] == subdomain)
+                {
+                  Assert (new_dof_indices[i] == numbers::invalid_dof_index,
+                          ExcInternalError());
+                  new_dof_indices[i] = next_free_index;
+                  ++next_free_index;
+                }
+
+          // we should have numbered all dofs
+          Assert (next_free_index == n_dofs, ExcInternalError());
+          Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
+                             numbers::invalid_dof_index)
+                  == new_dof_indices.end(),
+                  ExcInternalError());
+        }
+        // finally do the renumbering. we can use the sequential
+        // version of the function because we do things on all
+        // cells and all cells have their subdomain ids and DoFs
+        // correctly set
+        this->Sequential<dim, spacedim>::renumber_dofs (new_dof_indices, number_cache);
+
+
+        // update the number cache. for this, we first have to find the subdomain
+        // association for each DoF again following renumbering, from which we
+        // can then compute the IndexSets of locally owned DoFs for all processors.
+        // all other fields then follow from this
+        //
+        // given the way we enumerate degrees of freedom, the locally owned
+        // ranges must all be contiguous and consecutive. this makes filling
+        // the IndexSets cheap. an assertion at the top verifies that this
+        // assumption is true
+        const std::vector<types::subdomain_id> subdomain_association
+          = get_dof_subdomain_association (*this->dof_handler, n_dofs, n_procs);
+
+        for (unsigned int i=1; i<n_dofs; ++i)
+          Assert (subdomain_association[i] >= subdomain_association[i-1],
+                  ExcInternalError());
+
+        {
+          number_cache.locally_owned_dofs_per_processor.clear();
+          number_cache.locally_owned_dofs_per_processor.resize (n_procs,
+                                                                IndexSet(n_dofs));
+
+          // we know that the set of subdomain indices is contiguous from
+          // the assertion above; find the start and end index for each
+          // processor, taking into account that sometimes a processor
+          // may not in fact have any DoFs at all. we do the latter
+          // by just identifying contiguous ranges of subdomain_ids
+          // and filling IndexSets for those subdomains; subdomains
+          // that don't appear will lead to IndexSets that are simply
+          // never touched and remain empty as initialized above.
+          unsigned int start_index = 0;
+          unsigned int end_index   = 0;
+          while (start_index < n_dofs)
             {
-              current_subdomain_ids[index] = cell->subdomain_id();
-              cell->set_subdomain_id(true_subdomain_ids[index]);
+              while ((end_index) < n_dofs &&
+                     (subdomain_association[end_index] == subdomain_association[start_index]))
+                ++end_index;
+
+              // we've now identified a range of same indices. set that
+              // range in the corresponding IndexSet
+              if (end_index > start_index)
+                {
+                  const unsigned int subdomain_owner = subdomain_association[start_index];
+                  number_cache.locally_owned_dofs_per_processor[subdomain_owner]
+                  .add_range (start_index, end_index);
+                }
+
+              // then move on to thinking about the next range
+              start_index = end_index;
             }
+        }
 
-        // let the sequential algorithm do its magic, then sort DoF indices
-        // by subdomain
-        this->Sequential<dim,spacedim>::distribute_dofs (number_cache);
-        DoFRenumbering::subdomain_wise (*this->dof_handler);
+        // from this, calculate all of the other number cache fields
+        number_cache.locally_owned_dofs
+          = number_cache.locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain()];
+        number_cache.n_locally_owned_dofs_per_processor
+        .resize (number_cache.locally_owned_dofs_per_processor.size());
+        for (unsigned int i=0; i<number_cache.n_locally_owned_dofs_per_processor.size(); ++i)
+          number_cache.n_locally_owned_dofs_per_processor[i]
+            = number_cache.locally_owned_dofs_per_processor[i].n_elements();
+        number_cache.n_locally_owned_dofs
+          = number_cache.n_locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain()];
 
-        // dofrenumbering will reset subdomains, this is ugly but we need to do it again:
-        cell = tr->begin_active();
+        number_cache.n_global_dofs = n_dofs;
+
+
+        // finally, restore current subdomain ids
         if (tr->with_artificial_cells())
-          for (unsigned int index=0; cell != endc; cell++, index++)
-            cell->set_subdomain_id(true_subdomain_ids[index]);
+          {
+            typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator
+            cell = this->dof_handler->get_triangulation().begin_active(),
+            endc = this->dof_handler->get_triangulation().end();
 
-        number_cache.locally_owned_dofs_per_processor = DoFTools::locally_owned_dofs_per_subdomain (*this->dof_handler);
-        number_cache.locally_owned_dofs = number_cache.locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain()];
-        number_cache.n_locally_owned_dofs_per_processor.resize (number_cache.locally_owned_dofs_per_processor.size());
-        for (unsigned int i = 0; i < number_cache.n_locally_owned_dofs_per_processor.size(); i++)
-          number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements();
-        number_cache.n_locally_owned_dofs = number_cache.n_locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain()];
+            for (unsigned int index=0; cell != endc; ++cell, ++index)
+              cell->set_subdomain_id(saved_subdomain_ids[index]);
+          }
 
-        // restore current subdomain ids
-        cell = tr->begin_active();
-        if (tr->with_artificial_cells())
-          for (unsigned int index=0; cell != endc; cell++, index++)
-            cell->set_subdomain_id(current_subdomain_ids[index]);
+        return number_cache;
       }
 
 
@@ -2088,9 +2277,9 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      void
+      NumberCache
       ParallelDistributed<dim, spacedim>::
-      distribute_dofs (NumberCache &number_cache_current) const
+      distribute_dofs () const
       {
         NumberCache number_cache;
 
@@ -2289,7 +2478,7 @@ namespace internal
 #endif // DEBUG
 #endif // DEAL_II_WITH_P4EST
 
-        number_cache_current = number_cache;
+        return number_cache;
       }
 
 
@@ -2777,7 +2966,7 @@ namespace internal
         }
 #endif
 
-        number_cache_current = number_cache;
+        number_cache_current = std::move(number_cache);
       }
     }
   }
