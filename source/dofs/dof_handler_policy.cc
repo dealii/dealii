@@ -957,29 +957,40 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      void
+      std::vector<NumberCache>
       Sequential<dim,spacedim>::
-      distribute_mg_dofs (std::vector<NumberCache> &number_caches) const
+      distribute_mg_dofs () const
       {
         std::vector<bool> user_flags;
-
         dof_handler->get_triangulation().save_user_flags (user_flags);
+
         const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler->get_triangulation()).clear_user_flags ();
 
+        std::vector<NumberCache> number_caches;
+        number_caches.reserve (dof_handler->get_triangulation().n_levels());
         for (unsigned int level = 0; level < dof_handler->get_triangulation().n_levels(); ++level)
           {
-            types::global_dof_index next_free_dof = Implementation::distribute_dofs_on_level(0, numbers::invalid_subdomain_id,
-                                                    *dof_handler, level);
+            const types::global_dof_index next_free_dof
+              = Implementation::distribute_dofs_on_level(0, numbers::invalid_subdomain_id,
+                                                         *dof_handler, level);
 
-            number_caches[level].n_global_dofs = next_free_dof;
-            number_caches[level].n_locally_owned_dofs = next_free_dof;
-            number_caches[level].locally_owned_dofs = complete_index_set(next_free_dof);
-            number_caches[level].locally_owned_dofs_per_processor.resize(1);
-            number_caches[level].locally_owned_dofs_per_processor[0] = complete_index_set(next_free_dof);
-            number_caches[level].n_locally_owned_dofs_per_processor.resize(1);
-            number_caches[level].n_locally_owned_dofs_per_processor[0] = next_free_dof;
+            // set up the number cache of this level
+            NumberCache number_cache;
+            number_cache.n_global_dofs = next_free_dof;
+            number_cache.n_locally_owned_dofs = next_free_dof;
+            number_cache.locally_owned_dofs = complete_index_set(next_free_dof);
+            number_cache.locally_owned_dofs_per_processor.resize(1);
+            number_cache.locally_owned_dofs_per_processor[0] = complete_index_set(next_free_dof);
+            number_cache.n_locally_owned_dofs_per_processor.resize(1);
+            number_cache.n_locally_owned_dofs_per_processor[0] = next_free_dof;
+
+            // then push the current level's number cache onto the array
+            number_caches.emplace_back (number_cache);
           }
+
         const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler->get_triangulation()).load_user_flags (user_flags);
+
+        return number_caches;
       }
 
 
@@ -1270,14 +1281,17 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      void
+      std::vector<NumberCache>
       ParallelShared<dim,spacedim>::
-      distribute_mg_dofs (std::vector<NumberCache> &number_caches) const
+      distribute_mg_dofs () const
       {
         // first, call the sequential function to distribute dofs
-        this->Sequential<dim,spacedim>::distribute_mg_dofs (number_caches);
+        std::vector<NumberCache> number_caches
+          = this->Sequential<dim,spacedim>::distribute_mg_dofs ();
         // now we need to update the number cache. This part is not yet implemented.
-        AssertThrow(false,ExcNotImplemented());
+        Assert(false,ExcNotImplemented());
+
+        return number_caches;
       }
 
 
@@ -2484,13 +2498,13 @@ namespace internal
 
 
       template <int dim, int spacedim>
-      void
+      std::vector<NumberCache>
       ParallelDistributed<dim, spacedim>::
-      distribute_mg_dofs (std::vector<NumberCache> &number_caches) const
+      distribute_mg_dofs () const
       {
 #ifndef DEAL_II_WITH_P4EST
-        (void)number_caches;
         Assert (false, ExcNotImplemented());
+        return std::vector<NumberCache>();
 #else
 
         parallel::distributed::Triangulation< dim, spacedim > *tr
@@ -2515,9 +2529,11 @@ namespace internal
         // Triangulation has fewer levels. we need to do this because
         // we need to communicate across all processors on all levels
         const unsigned int n_levels = tr->n_global_levels();
+        std::vector<NumberCache> number_caches;
+        number_caches.reserve(n_levels);
         for (unsigned int level = 0; level < n_levels; ++level)
           {
-            NumberCache &level_number_cache = number_caches[level];
+            NumberCache level_number_cache;
 
             //* 1. distribute on own subdomain
             const unsigned int n_initial_local_dofs =
@@ -2646,6 +2662,7 @@ namespace internal
                    == shift,
                    ExcInternalError());
 
+            number_caches.emplace_back (level_number_cache);
           }
 
 
@@ -2728,6 +2745,8 @@ namespace internal
               }
         }
 #endif // DEBUG
+
+        return number_caches;
 
 #endif // DEAL_II_WITH_P4EST
       }

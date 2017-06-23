@@ -1126,13 +1126,7 @@ void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spa
   clear_mg_space();
 
   internal::DoFHandler::Implementation::reserve_space_mg (*this);
-  const parallel::distributed::Triangulation<dim,spacedim> *dist_tr = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&*tria);
-  if (!dist_tr)
-    mg_number_cache.resize((*tria).n_levels());
-  else
-    mg_number_cache.resize(dist_tr->n_global_levels());
-
-  policy->distribute_mg_dofs (mg_number_cache);
+  mg_number_cache = policy->distribute_mg_dofs ();
 
   // initialize the block info object
   // only if this is a sequential

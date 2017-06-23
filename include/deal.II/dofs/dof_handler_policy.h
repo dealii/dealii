@@ -75,11 +75,12 @@ namespace internal
 
         /**
          * Distribute the multigrid dofs on each level of the DoFHandler
-         * associated with this policy object.
+         * associated with this policy object. Return a vector of number
+         * caches for all of the levels.
          */
         virtual
-        void
-        distribute_mg_dofs (std::vector<NumberCache> &number_caches) const = 0;
+        std::vector<NumberCache>
+        distribute_mg_dofs () const = 0;
 
         /**
          * Renumber degrees of freedom as specified by the first argument. The
@@ -118,8 +119,8 @@ namespace internal
 
         // documentation is inherited
         virtual
-        void
-        distribute_mg_dofs (std::vector<NumberCache> &number_caches) const;
+        std::vector<NumberCache>
+        distribute_mg_dofs () const;
 
         // documentation is inherited
         virtual
@@ -165,8 +166,8 @@ namespace internal
          * This function is not yet implemented.
          */
         virtual
-        void
-        distribute_mg_dofs (std::vector<NumberCache> &number_caches) const;
+        std::vector<NumberCache>
+        distribute_mg_dofs () const;
 
         /**
          * Renumber degrees of freedom as specified by the first argument.
@@ -206,8 +207,8 @@ namespace internal
 
         // documentation is inherited
         virtual
-        void
-        distribute_mg_dofs (std::vector<NumberCache> &number_caches) const;
+        std::vector<NumberCache>
+        distribute_mg_dofs () const;
 
         // documentation is inherited
         virtual
