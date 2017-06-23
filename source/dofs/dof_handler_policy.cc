@@ -434,8 +434,7 @@ namespace internal
         template <int dim, int spacedim>
         static
         unsigned int
-        distribute_dofs_on_level (const unsigned int        offset,
-                                  const types::subdomain_id level_subdomain_id,
+        distribute_dofs_on_level (const types::subdomain_id level_subdomain_id,
                                   DoFHandler<dim,spacedim> &dof_handler,
                                   const unsigned int level)
         {
@@ -457,7 +456,7 @@ namespace internal
           tria.save_user_flags(user_flags);
           const_cast<dealii::Triangulation<dim,spacedim> &>(tria).clear_user_flags ();
 
-          unsigned int next_free_dof = offset;
+          unsigned int next_free_dof = 0;
           typename DoFHandler<dim,spacedim>::level_cell_iterator
           cell = dof_handler.begin(level),
           endc = dof_handler.end(level);
@@ -971,7 +970,7 @@ namespace internal
         for (unsigned int level = 0; level < dof_handler->get_triangulation().n_levels(); ++level)
           {
             const types::global_dof_index next_free_dof
-              = Implementation::distribute_dofs_on_level(0, numbers::invalid_subdomain_id,
+              = Implementation::distribute_dofs_on_level(numbers::invalid_subdomain_id,
                                                          *dof_handler, level);
 
             // set up the number cache of this level
@@ -2537,8 +2536,7 @@ namespace internal
 
             //* 1. distribute on own subdomain
             const unsigned int n_initial_local_dofs =
-              Implementation::distribute_dofs_on_level(0,
-                                                       tr->locally_owned_subdomain(),
+              Implementation::distribute_dofs_on_level(tr->locally_owned_subdomain(),
                                                        *dof_handler,
                                                        level);
 
