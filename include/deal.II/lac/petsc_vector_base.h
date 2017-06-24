@@ -257,7 +257,7 @@ namespace PETScWrappers
 
     /**
      * Initialize a Vector from a PETSc Vec object. Note that we do not copy
-     * the vector and we do not attain ownership, so we do not destroy the
+     * the vector and we do not obtain ownership, so we do not destroy the
      * PETSc object in the destructor.
      */
     explicit VectorBase (const Vec &v);
@@ -711,7 +711,7 @@ namespace PETScWrappers
      * it got created by this class and determines if it gets destructed in
      * the destructor.
      */
-    bool attained_ownership;
+    bool obtained_ownership;
 
     /**
      * Collective set or add operation: This function is invoked by the

@@ -156,8 +156,7 @@ build_one_patch (const cell_iterator                                            
             {
               const Point<dimension> v = (*cell)->vertex(vertex);
 
-              // make sure that the radial variable does attain negative
-              // values
+              // make sure that the radial variable is nonnegative
               Assert (v(0) >= 0, ExcRadialVariableHasNegativeValues(v(0)));
 
               // now set the vertices of the patch

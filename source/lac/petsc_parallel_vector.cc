@@ -134,7 +134,7 @@ namespace PETScWrappers
     void
     Vector::clear ()
     {
-      attained_ownership = true;
+      obtained_ownership = true;
       VectorBase::clear ();
 
       create_vector(0, 0);
