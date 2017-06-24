@@ -52,6 +52,30 @@ namespace internal
       NumberCache (NumberCache &&) = default;
 
       /**
+       * Create a NumberCache object that corresponds to a sequential
+       * DoFHandler object in which a single processor stores all
+       * degrees of freedom.
+       */
+      NumberCache (const types::global_dof_index n_global_dofs);
+
+
+      /**
+       * Create a NumberCache object that corresponds to a parallel
+       * DoFHandler object with as many processors as the size of the
+       * given argument, in which each processor stores the degrees
+       * of freedom indicated in the corresponding element of the
+       * vector passed as first argument. The second argument indicates
+       * the rank among all participating processors the current
+       * processor has, so that we can set the @p locally_owned_dofs
+       * and @p n_locally_owned_dofs fields.
+       *
+       * All other fields stored by the current object can be and are computed
+       * from the argument.
+       */
+      NumberCache (const std::vector<IndexSet> &locally_owned_dofs_per_processor,
+                   const unsigned int           my_rank);
+
+      /**
        * Copy operator. Simply copy all members of the referenced
        * object to the current object.
        */
