@@ -40,6 +40,30 @@ namespace internal
       NumberCache ();
 
       /**
+       * Copy constructor. Simply copy all members of the referenced
+       * object to the current object.
+       */
+      NumberCache (const NumberCache &) = default;
+
+      /**
+       * Move constructor. Simply move all members of the referenced
+       * object to the current object.
+       */
+      NumberCache (NumberCache &&) = default;
+
+      /**
+       * Copy operator. Simply copy all members of the referenced
+       * object to the current object.
+       */
+      NumberCache &operator= (const NumberCache &) = default;
+
+      /**
+       * Move assignment operator. Simply move all members of the referenced
+       * object to the current object.
+       */
+      NumberCache &operator= (NumberCache &&) = default;
+
+      /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */

@@ -1950,8 +1950,6 @@ namespace internal
      const unsigned int                                             fe_index)
     {
       const DoFHandlerType &handler = accessor.get_dof_handler();
-      Assert(handler.n_dofs(level) != numbers::invalid_dof_index,
-             ExcNotInitialized());
 
       const FiniteElement<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe
         = handler.get_fe ()[fe_index];
@@ -1976,8 +1974,6 @@ namespace internal
                              const unsigned int fe_index)
     {
       const DoFHandlerType &handler = accessor.get_dof_handler();
-      Assert(handler.n_dofs(level) != numbers::invalid_dof_index,
-             ExcNotInitialized());
 
       const FiniteElement<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe
         = handler.get_fe ()[fe_index];
@@ -2007,8 +2003,6 @@ namespace internal
      const unsigned int                                             fe_index)
     {
       const DoFHandlerType &handler = accessor.get_dof_handler();
-      Assert(handler.n_dofs(level) != numbers::invalid_dof_index,
-             ExcNotInitialized());
 
       const FiniteElement<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe
         = handler.get_fe ()[fe_index];
