@@ -887,6 +887,7 @@ IndexSet complete_index_set (const unsigned int N)
 {
   IndexSet is (N);
   is.add_range(0, N);
+  is.compress();
   return is;
 }
 

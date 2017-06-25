@@ -1,0 +1,4 @@
+Changed: The complete_index_set() function now returns a compressed
+version of the IndexSet that contains all indices.
+<br>
+(Wolfgang Bangerth, 2017/06/24)
