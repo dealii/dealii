@@ -17,6 +17,7 @@
 //TODO [TH]: renumber DoFs for multigrid is not done yet
 
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/work_stream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/grid/tria.h>
@@ -54,6 +55,85 @@ namespace internal
       // of namespace internal::DoFHandler in
       // the following
       using dealii::DoFHandler;
+
+
+
+      namespace
+      {
+        /**
+         * Update the cache used for cell dof indices on all (non-artificial)
+         * active cells of the given DoFHandler.
+         */
+        template <typename DoFHandlerType>
+        void
+        update_all_active_cell_dof_indices_caches (const DoFHandlerType &dof_handler)
+        {
+          typename DoFHandlerType::active_cell_iterator
+          beginc = dof_handler.begin_active(),
+          endc   = dof_handler.end();
+
+          auto worker
+            = [] (const typename DoFHandlerType::active_cell_iterator &cell,
+                  void *,
+                  void *)
+          {
+            if (!cell->is_artificial())
+              cell->update_cell_dof_indices_cache ();
+          };
+
+          // parallelize filling all of the cell caches. by using
+          // WorkStream, we make sure that we only run through the
+          // range of iterators once, whereas a parallel_for loop
+          // for example has to split the range multiple times,
+          // which is expensive because cell iterators are not
+          // random access iterators with a cheap operator-
+          WorkStream::run (beginc, endc,
+                           worker,
+                           /* copier */ std::function<void (void *)>(),
+                           /* scratch_data */ nullptr,
+                           /* copy_data */ nullptr,
+                           2*MultithreadInfo::n_threads(),
+                           /* chunk_size = */ 32);
+        }
+
+
+        /**
+         * Update the cache used for cell dof indices on all (non-artificial)
+         * level (multigrid) cells of the given DoFHandler.
+         */
+        template <typename DoFHandlerType>
+        void
+        update_all_level_cell_dof_indices_caches (const DoFHandlerType &dof_handler)
+        {
+          typename DoFHandlerType::level_cell_iterator
+          beginc = dof_handler.begin(),
+          endc   = dof_handler.end();
+
+          auto worker
+            = [] (const typename DoFHandlerType::level_cell_iterator &cell,
+                  void *,
+                  void *)
+          {
+            cell->update_cell_dof_indices_cache ();
+          };
+
+          // parallelize filling all of the cell caches. by using
+          // WorkStream, we make sure that we only run through the
+          // range of iterators once, whereas a parallel_for loop
+          // for example has to split the range multiple times,
+          // which is expensive because cell iterators are not
+          // random access iterators with a cheap operator-
+          WorkStream::run (beginc, endc,
+                           worker,
+                           /* copier */ std::function<void (void *)>(),
+                           /* scratch_data */ nullptr,
+                           /* copy_data */ nullptr,
+                           2*MultithreadInfo::n_threads(),
+                           /* chunk_size = */ 32);
+        }
+      }
+
+
 
       struct Implementation
       {
@@ -230,10 +310,7 @@ namespace internal
                                                            cell,
                                                            next_free_dof);
 
-          // update the cache used for cell dof indices
-          for (cell = dof_handler.begin_active(); cell != endc; ++cell)
-            if (!cell->is_artificial())
-              cell->update_cell_dof_indices_cache ();
+          update_all_active_cell_dof_indices_caches (dof_handler);
 
           return next_free_dof;
         }
@@ -527,10 +604,7 @@ namespace internal
                 *i = new_numbers[*i];
 
           // update the cache used for cell dof indices
-          for (typename DoFHandler<1,spacedim>::level_cell_iterator
-               cell = dof_handler.begin();
-               cell != dof_handler.end(); ++cell)
-            cell->update_cell_dof_indices_cache ();
+          update_all_level_cell_dof_indices_caches(dof_handler);
         }
 
 
@@ -635,10 +709,7 @@ namespace internal
             }
 
           // update the cache used for cell dof indices
-          for (typename DoFHandler<2,spacedim>::level_cell_iterator
-               cell = dof_handler.begin();
-               cell != dof_handler.end(); ++cell)
-            cell->update_cell_dof_indices_cache ();
+          update_all_level_cell_dof_indices_caches (dof_handler);
         }
 
 
@@ -784,10 +855,7 @@ namespace internal
             }
 
           // update the cache used for cell dof indices
-          for (typename DoFHandler<3,spacedim>::level_cell_iterator
-               cell = dof_handler.begin();
-               cell != dof_handler.end(); ++cell)
-            cell->update_cell_dof_indices_cache ();
+          update_all_level_cell_dof_indices_caches (dof_handler);
         }
 
 
@@ -984,7 +1052,7 @@ namespace internal
       ParallelShared<dim,spacedim>::
       ParallelShared (dealii::DoFHandler<dim,spacedim> &dof_handler)
         :
-        Sequential<dim,spacedim> (dof_handler)
+        dof_handler (&dof_handler)
       {}
 
 
@@ -1098,8 +1166,9 @@ namespace internal
 
         // first let the sequential algorithm do its magic. it is going to
         // enumerate DoFs on all cells, regardless of owner
-        NumberCache sequential_number_cache
-          = this->Sequential<dim,spacedim>::distribute_dofs ();
+        const types::global_dof_index n_dofs =
+          Implementation::distribute_dofs (numbers::invalid_subdomain_id,
+                                           *this->dof_handler);
 
         // then re-enumerate them based on their subdomain association.
         // for this, we first have to identify for each current DoF
@@ -1110,7 +1179,6 @@ namespace internal
         // function has to deal with other kinds of triangulations as
         // well, whereas we here know what kind of triangulation
         // we have and can simplify the code accordingly
-        const unsigned int n_dofs = sequential_number_cache.n_global_dofs;
         std::vector<types::global_dof_index> new_dof_indices (n_dofs,
                                                               numbers::invalid_dof_index);
         {
@@ -1146,10 +1214,8 @@ namespace internal
         // version of the function because we do things on all
         // cells and all cells have their subdomain ids and DoFs
         // correctly set
-        //
-        // the return value is not of interest to us here
-        this->Sequential<dim, spacedim>::renumber_dofs (new_dof_indices);
-
+        Implementation::renumber_dofs (new_dof_indices, IndexSet(0),
+                                       *this->dof_handler, true);
 
         // update the number cache. for this, we first have to find the subdomain
         // association for each DoF again following renumbering, from which we
@@ -1224,13 +1290,12 @@ namespace internal
       ParallelShared<dim,spacedim>::
       distribute_mg_dofs () const
       {
-        // first, call the sequential function to distribute dofs
-        const std::vector<NumberCache> number_caches
-          = this->Sequential<dim,spacedim>::distribute_mg_dofs ();
-        // now we need to update the number cache. This part is not yet implemented.
+        // this is not currently implemented; the algorithm should work
+        // as above, though: first call the sequential numbering
+        // algorithm, then re-enumerate subdomain-wise
         Assert(false,ExcNotImplemented());
 
-        return number_caches;
+        return std::vector<NumberCache>();
       }
 
 
@@ -1355,7 +1420,8 @@ namespace internal
         // let the sequential algorithm do its magic; ignore the
         // return type, but reconstruct the number cache based on
         // which DoFs each process owns
-        this->Sequential<dim, spacedim>::renumber_dofs (global_gathered_numbers);
+        Implementation::renumber_dofs (global_gathered_numbers, IndexSet(0),
+                                       *this->dof_handler, true);
 
         const NumberCache number_cache (DoFTools::locally_owned_dofs_per_subdomain (*this->dof_handler),
                                         this->dof_handler->get_triangulation().locally_owned_subdomain ());
@@ -2173,15 +2239,8 @@ namespace internal
           }
 #endif
 
-          // update dofindices
-          {
-            typename DoFHandler<dim,spacedim>::active_cell_iterator
-            cell, endc = dof_handler.end();
-
-            for (cell = dof_handler.begin_active(); cell != endc; ++cell)
-              if (!cell->is_artificial())
-                cell->update_cell_dof_indices_cache();
-          }
+          // update dof index caches on all cells
+          update_all_active_cell_dof_indices_caches (dof_handler);
 
           // have a barrier so that sends between two calls to this
           // function are not mixed up.

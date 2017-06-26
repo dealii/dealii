@@ -135,7 +135,7 @@ namespace internal
        * parallel::shared::Triangulation object.
        */
       template <int dim, int spacedim>
-      class ParallelShared : public Sequential<dim,spacedim>
+      class ParallelShared : public PolicyBase<dim,spacedim>
       {
       public:
         /**
@@ -176,6 +176,12 @@ namespace internal
         virtual
         NumberCache
         renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
+
+      private:
+        /**
+         * The DoFHandler object on which this policy object works.
+         */
+        SmartPointer<dealii::DoFHandler<dim,spacedim> > dof_handler;
       };
 
 
