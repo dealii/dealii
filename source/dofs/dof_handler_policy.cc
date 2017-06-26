@@ -1052,7 +1052,7 @@ namespace internal
       ParallelShared<dim,spacedim>::
       ParallelShared (dealii::DoFHandler<dim,spacedim> &dof_handler)
         :
-        Sequential<dim,spacedim> (dof_handler)
+        dof_handler (&dof_handler)
       {}
 
 
@@ -1166,8 +1166,9 @@ namespace internal
 
         // first let the sequential algorithm do its magic. it is going to
         // enumerate DoFs on all cells, regardless of owner
-        NumberCache sequential_number_cache
-          = this->Sequential<dim,spacedim>::distribute_dofs ();
+        const types::global_dof_index n_dofs =
+          Implementation::distribute_dofs (numbers::invalid_subdomain_id,
+                                           *this->dof_handler);
 
         // then re-enumerate them based on their subdomain association.
         // for this, we first have to identify for each current DoF
@@ -1178,7 +1179,6 @@ namespace internal
         // function has to deal with other kinds of triangulations as
         // well, whereas we here know what kind of triangulation
         // we have and can simplify the code accordingly
-        const unsigned int n_dofs = sequential_number_cache.n_global_dofs;
         std::vector<types::global_dof_index> new_dof_indices (n_dofs,
                                                               numbers::invalid_dof_index);
         {
@@ -1214,10 +1214,8 @@ namespace internal
         // version of the function because we do things on all
         // cells and all cells have their subdomain ids and DoFs
         // correctly set
-        //
-        // the return value is not of interest to us here
-        this->Sequential<dim, spacedim>::renumber_dofs (new_dof_indices);
-
+        Implementation::renumber_dofs (new_dof_indices, IndexSet(0),
+                                       *this->dof_handler, true);
 
         // update the number cache. for this, we first have to find the subdomain
         // association for each DoF again following renumbering, from which we
@@ -1292,13 +1290,12 @@ namespace internal
       ParallelShared<dim,spacedim>::
       distribute_mg_dofs () const
       {
-        // first, call the sequential function to distribute dofs
-        const std::vector<NumberCache> number_caches
-          = this->Sequential<dim,spacedim>::distribute_mg_dofs ();
-        // now we need to update the number cache. This part is not yet implemented.
+        // this is not currently implemented; the algorithm should work
+        // as above, though: first call the sequential numbering
+        // algorithm, then re-enumerate subdomain-wise
         Assert(false,ExcNotImplemented());
 
-        return number_caches;
+        return std::vector<NumberCache>();
       }
 
 
@@ -1423,7 +1420,8 @@ namespace internal
         // let the sequential algorithm do its magic; ignore the
         // return type, but reconstruct the number cache based on
         // which DoFs each process owns
-        this->Sequential<dim, spacedim>::renumber_dofs (global_gathered_numbers);
+        Implementation::renumber_dofs (global_gathered_numbers, IndexSet(0),
+                                       *this->dof_handler, true);
 
         const NumberCache number_cache (DoFTools::locally_owned_dofs_per_subdomain (*this->dof_handler),
                                         this->dof_handler->get_triangulation().locally_owned_subdomain ());
