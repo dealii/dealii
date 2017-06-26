@@ -210,14 +210,13 @@ namespace internal
         template <int dim, int spacedim>
         static
         types::global_dof_index
-        distribute_dofs (const types::global_dof_index offset,
-                         const types::subdomain_id     subdomain_id,
+        distribute_dofs (const types::subdomain_id     subdomain_id,
                          DoFHandler<dim,spacedim>     &dof_handler)
         {
           Assert (dof_handler.get_triangulation().n_levels() > 0,
                   ExcMessage("Empty triangulation"));
 
-          types::global_dof_index next_free_dof = offset;
+          types::global_dof_index next_free_dof = 0;
           typename DoFHandler<dim,spacedim>::active_cell_iterator
           cell = dof_handler.begin_active(),
           endc = dof_handler.end();
@@ -926,8 +925,7 @@ namespace internal
       distribute_dofs () const
       {
         const types::global_dof_index n_dofs =
-          Implementation::distribute_dofs (0,
-                                           numbers::invalid_subdomain_id,
+          Implementation::distribute_dofs (numbers::invalid_subdomain_id,
                                            *dof_handler);
 
         // return a sequential, complete index set
@@ -2246,7 +2244,7 @@ namespace internal
 
         //* 1. distribute on own subdomain
         const dealii::types::global_dof_index n_initial_local_dofs =
-          Implementation::distribute_dofs (0, tr->locally_owned_subdomain(),
+          Implementation::distribute_dofs (tr->locally_owned_subdomain(),
                                            *dof_handler);
 
         //* 2. iterate over ghostcells and kill dofs that are not
