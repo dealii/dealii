@@ -1005,6 +1005,7 @@ namespace internal
                                        const types::global_dof_index  n_dofs,
                                        const unsigned int             n_procs)
         {
+          (void)n_procs;
           std::vector<types::subdomain_id> subdomain_association (n_dofs,
                                                                   numbers::invalid_subdomain_id);
           std::vector<types::global_dof_index> local_dof_indices;
@@ -1058,8 +1059,8 @@ namespace internal
 
           return subdomain_association;
         }
-
       }
+
 
 
       template <int dim, int spacedim>
