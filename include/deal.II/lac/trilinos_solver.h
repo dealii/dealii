@@ -370,19 +370,13 @@ namespace TrilinosWrappers
      * Standardized data struct to pipe additional data to the solver.
      */
 
-    struct AdditionalData
+    struct AdditionalData : public SolverBase::AdditionalData
     {
       /**
        * Set the additional data field to the desired output format.
        */
       explicit
       AdditionalData (const bool output_solver_details = false);
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
     };
 
     /**
@@ -416,19 +410,13 @@ namespace TrilinosWrappers
     /**
      * Standardized data struct to pipe additional data to the solver.
      */
-    struct AdditionalData
+    struct AdditionalData : public SolverBase::AdditionalData
     {
       /**
        * Set the additional data field to the desired output format.
        */
       explicit
       AdditionalData (const bool output_solver_details = false);
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
     };
 
     /**
@@ -462,7 +450,7 @@ namespace TrilinosWrappers
     /**
      * Standardized data struct to pipe additional data to the solver.
      */
-    struct AdditionalData
+    struct AdditionalData : public SolverBase::AdditionalData
     {
       /**
        * Constructor. By default, set the number of temporary vectors to 30,
@@ -471,17 +459,6 @@ namespace TrilinosWrappers
       explicit
       AdditionalData (const bool         output_solver_details = false,
                       const unsigned int restart_parameter = 30);
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
-
-      /**
-       * Maximum number of tmp vectors.
-       */
-      unsigned int restart_parameter;
     };
 
     /**
@@ -516,19 +493,13 @@ namespace TrilinosWrappers
     /**
      * Standardized data struct to pipe additional data to the solver.
      */
-    struct AdditionalData
+    struct AdditionalData : public SolverBase::AdditionalData
     {
       /**
        * Set the additional data field to the desired output format.
        */
       explicit
       AdditionalData (const bool output_solver_details = false);
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
     };
 
     /**
@@ -563,19 +534,13 @@ namespace TrilinosWrappers
     /**
      * Standardized data struct to pipe additional data to the solver.
      */
-    struct AdditionalData
+    struct AdditionalData : public SolverBase::AdditionalData
     {
       /**
        * Set the additional data field to the desired output format.
        */
       explicit
       AdditionalData (const bool output_solver_details = false);
-
-      /**
-       * Enables/disables the output of solver details (residual in each
-       * iterations etc.).
-       */
-      bool output_solver_details;
     };
 
     /**
