@@ -17,6 +17,7 @@
 //TODO [TH]: renumber DoFs for multigrid is not done yet
 
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/work_stream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/grid/tria.h>
@@ -68,11 +69,31 @@ namespace internal
         update_all_active_cell_dof_indices_caches (const DoFHandlerType &dof_handler)
         {
           typename DoFHandlerType::active_cell_iterator
-          cell = dof_handler.begin_active(),
-          endc = dof_handler.end();
-          for (; cell != endc; ++cell)
+          beginc = dof_handler.begin_active(),
+          endc   = dof_handler.end();
+
+          auto worker
+            = [] (const typename DoFHandlerType::active_cell_iterator &cell,
+                  void *,
+                  void *)
+          {
             if (!cell->is_artificial())
               cell->update_cell_dof_indices_cache ();
+          };
+
+          // parallelize filling all of the cell caches. by using
+          // WorkStream, we make sure that we only run through the
+          // range of iterators once, whereas a parallel_for loop
+          // for example has to split the range multiple times,
+          // which is expensive because cell iterators are not
+          // random access iterators with a cheap operator-
+          WorkStream::run (beginc, endc,
+                           worker,
+                           /* copier */ std::function<void (void *)>(),
+                           /* scratch_data */ nullptr,
+                           /* copy_data */ nullptr,
+                           2*MultithreadInfo::n_threads(),
+                           /* chunk_size = */ 32);
         }
 
 
@@ -85,11 +106,30 @@ namespace internal
         update_all_level_cell_dof_indices_caches (const DoFHandlerType &dof_handler)
         {
           typename DoFHandlerType::level_cell_iterator
-          cell = dof_handler.begin(),
-          endc = dof_handler.end();
+          beginc = dof_handler.begin(),
+          endc   = dof_handler.end();
 
-          for (; cell != endc; ++cell)
+          auto worker
+            = [] (const typename DoFHandlerType::level_cell_iterator &cell,
+                  void *,
+                  void *)
+          {
             cell->update_cell_dof_indices_cache ();
+          };
+
+          // parallelize filling all of the cell caches. by using
+          // WorkStream, we make sure that we only run through the
+          // range of iterators once, whereas a parallel_for loop
+          // for example has to split the range multiple times,
+          // which is expensive because cell iterators are not
+          // random access iterators with a cheap operator-
+          WorkStream::run (beginc, endc,
+                           worker,
+                           /* copier */ std::function<void (void *)>(),
+                           /* scratch_data */ nullptr,
+                           /* copy_data */ nullptr,
+                           2*MultithreadInfo::n_threads(),
+                           /* chunk_size = */ 32);
         }
       }
 
