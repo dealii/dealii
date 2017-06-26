@@ -210,14 +210,13 @@ namespace internal
         template <int dim, int spacedim>
         static
         types::global_dof_index
-        distribute_dofs (const types::global_dof_index offset,
-                         const types::subdomain_id     subdomain_id,
+        distribute_dofs (const types::subdomain_id     subdomain_id,
                          DoFHandler<dim,spacedim>     &dof_handler)
         {
           Assert (dof_handler.get_triangulation().n_levels() > 0,
                   ExcMessage("Empty triangulation"));
 
-          types::global_dof_index next_free_dof = offset;
+          types::global_dof_index next_free_dof = 0;
           typename DoFHandler<dim,spacedim>::active_cell_iterator
           cell = dof_handler.begin_active(),
           endc = dof_handler.end();
@@ -926,31 +925,11 @@ namespace internal
       distribute_dofs () const
       {
         const types::global_dof_index n_dofs =
-          Implementation::distribute_dofs (0,
-                                           numbers::invalid_subdomain_id,
+          Implementation::distribute_dofs (numbers::invalid_subdomain_id,
                                            *dof_handler);
 
-        // now set the elements of the
-        // number cache appropriately
-        NumberCache number_cache;
-        number_cache.n_global_dofs        = n_dofs;
-        number_cache.n_locally_owned_dofs = number_cache.n_global_dofs;
-
-        number_cache.locally_owned_dofs
-          = IndexSet (number_cache.n_global_dofs);
-        number_cache.locally_owned_dofs.add_range (0,
-                                                   number_cache.n_global_dofs);
-        number_cache.locally_owned_dofs.compress();
-
-        number_cache.n_locally_owned_dofs_per_processor
-          = std::vector<types::global_dof_index> (1,
-                                                  number_cache.n_global_dofs);
-
-        number_cache.locally_owned_dofs_per_processor
-          = std::vector<IndexSet> (1,
-                                   number_cache.locally_owned_dofs);
-
-        return number_cache;
+        // return a sequential, complete index set
+        return NumberCache (n_dofs);
       }
 
 
@@ -969,22 +948,13 @@ namespace internal
         number_caches.reserve (dof_handler->get_triangulation().n_levels());
         for (unsigned int level = 0; level < dof_handler->get_triangulation().n_levels(); ++level)
           {
-            const types::global_dof_index next_free_dof
+            // first distribute dofs on this level
+            const types::global_dof_index n_level_dofs
               = Implementation::distribute_dofs_on_level(numbers::invalid_subdomain_id,
                                                          *dof_handler, level);
 
-            // set up the number cache of this level
-            NumberCache number_cache;
-            number_cache.n_global_dofs = next_free_dof;
-            number_cache.n_locally_owned_dofs = next_free_dof;
-            number_cache.locally_owned_dofs = complete_index_set(next_free_dof);
-            number_cache.locally_owned_dofs_per_processor.resize(1);
-            number_cache.locally_owned_dofs_per_processor[0] = complete_index_set(next_free_dof);
-            number_cache.n_locally_owned_dofs_per_processor.resize(1);
-            number_cache.n_locally_owned_dofs_per_processor[0] = next_free_dof;
-
-            // then push the current level's number cache onto the array
-            number_caches.emplace_back (number_cache);
+            // then add a complete, sequential index set
+            number_caches.emplace_back (NumberCache(n_level_dofs));
           }
 
         const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler->get_triangulation()).load_user_flags (user_flags);
@@ -1002,26 +972,8 @@ namespace internal
         Implementation::renumber_dofs (new_numbers, IndexSet(0),
                                        *dof_handler, true);
 
-        // in the sequential case, the number cache should not have changed but we
-        // have to set the elements of the structure appropriately anyway
-        NumberCache number_cache;
-        number_cache.n_global_dofs        = dof_handler->n_dofs();
-        number_cache.n_locally_owned_dofs = number_cache.n_global_dofs;
-
-        number_cache.locally_owned_dofs
-          = IndexSet (number_cache.n_global_dofs);
-        number_cache.locally_owned_dofs.add_range (0,
-                                                   number_cache.n_global_dofs);
-        number_cache.locally_owned_dofs.compress();
-
-        number_cache.n_locally_owned_dofs_per_processor
-          = std::vector<types::global_dof_index> (1,
-                                                  number_cache.n_global_dofs);
-
-        number_cache.locally_owned_dofs_per_processor
-          = std::vector<IndexSet> (1,
-                                   number_cache.locally_owned_dofs);
-        return number_cache;
+        // return a sequential, complete index set
+        return NumberCache (new_numbers.size());
       }
 
 
@@ -1146,7 +1098,7 @@ namespace internal
 
         // first let the sequential algorithm do its magic. it is going to
         // enumerate DoFs on all cells, regardless of owner
-        NumberCache number_cache
+        NumberCache sequential_number_cache
           = this->Sequential<dim,spacedim>::distribute_dofs ();
 
         // then re-enumerate them based on their subdomain association.
@@ -1158,7 +1110,7 @@ namespace internal
         // function has to deal with other kinds of triangulations as
         // well, whereas we here know what kind of triangulation
         // we have and can simplify the code accordingly
-        const unsigned int n_dofs = number_cache.n_global_dofs;
+        const unsigned int n_dofs = sequential_number_cache.n_global_dofs;
         std::vector<types::global_dof_index> new_dof_indices (n_dofs,
                                                               numbers::invalid_dof_index);
         {
@@ -1194,7 +1146,9 @@ namespace internal
         // version of the function because we do things on all
         // cells and all cells have their subdomain ids and DoFs
         // correctly set
-        number_cache = this->Sequential<dim, spacedim>::renumber_dofs (new_dof_indices);
+        //
+        // the return value is not of interest to us here
+        this->Sequential<dim, spacedim>::renumber_dofs (new_dof_indices);
 
 
         // update the number cache. for this, we first have to find the subdomain
@@ -1213,11 +1167,9 @@ namespace internal
           Assert (subdomain_association[i] >= subdomain_association[i-1],
                   ExcInternalError());
 
-        {
-          number_cache.locally_owned_dofs_per_processor.clear();
-          number_cache.locally_owned_dofs_per_processor.resize (n_procs,
+        std::vector<IndexSet> locally_owned_dofs_per_processor (n_procs,
                                                                 IndexSet(n_dofs));
-
+        {
           // we know that the set of subdomain indices is contiguous from
           // the assertion above; find the start and end index for each
           // processor, taking into account that sometimes a processor
@@ -1239,7 +1191,7 @@ namespace internal
               if (end_index > start_index)
                 {
                   const unsigned int subdomain_owner = subdomain_association[start_index];
-                  number_cache.locally_owned_dofs_per_processor[subdomain_owner]
+                  locally_owned_dofs_per_processor[subdomain_owner]
                   .add_range (start_index, end_index);
                 }
 
@@ -1247,20 +1199,6 @@ namespace internal
               start_index = end_index;
             }
         }
-
-        // from this, calculate all of the other number cache fields
-        number_cache.locally_owned_dofs
-          = number_cache.locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain()];
-        number_cache.n_locally_owned_dofs_per_processor
-        .resize (number_cache.locally_owned_dofs_per_processor.size());
-        for (unsigned int i=0; i<number_cache.n_locally_owned_dofs_per_processor.size(); ++i)
-          number_cache.n_locally_owned_dofs_per_processor[i]
-            = number_cache.locally_owned_dofs_per_processor[i].n_elements();
-        number_cache.n_locally_owned_dofs
-          = number_cache.n_locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain()];
-
-        number_cache.n_global_dofs = n_dofs;
-
 
         // finally, restore current subdomain ids
         if (tr->with_artificial_cells())
@@ -1273,7 +1211,10 @@ namespace internal
               cell->set_subdomain_id(saved_subdomain_ids[index]);
           }
 
-        return number_cache;
+        // return a NumberCache object made up from the sets of locally
+        // owned DoFs
+        return NumberCache(locally_owned_dofs_per_processor,
+                           this->dof_handler->get_triangulation().locally_owned_subdomain ());
       }
 
 
@@ -1284,7 +1225,7 @@ namespace internal
       distribute_mg_dofs () const
       {
         // first, call the sequential function to distribute dofs
-        std::vector<NumberCache> number_caches
+        const std::vector<NumberCache> number_caches
           = this->Sequential<dim,spacedim>::distribute_mg_dofs ();
         // now we need to update the number cache. This part is not yet implemented.
         Assert(false,ExcNotImplemented());
@@ -1411,22 +1352,13 @@ namespace internal
                    ExcInternalError());
           }
 
-        NumberCache number_cache
-          = this->Sequential<dim, spacedim>::renumber_dofs (global_gathered_numbers);
-        // correct number_cache:
-        number_cache.locally_owned_dofs_per_processor =
-          DoFTools::locally_owned_dofs_per_subdomain (*this->dof_handler);
-        number_cache.locally_owned_dofs =
-          number_cache.locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain ()];
-        // sequential renumbering returns a vector of size 1 here,
-        // correct this:
-        number_cache.n_locally_owned_dofs_per_processor.resize(number_cache.locally_owned_dofs_per_processor.size());
-        for (unsigned int i = 0;
-             i < number_cache.n_locally_owned_dofs_per_processor.size (); i++)
-          number_cache.n_locally_owned_dofs_per_processor[i] = number_cache.locally_owned_dofs_per_processor[i].n_elements ();
+        // let the sequential algorithm do its magic; ignore the
+        // return type, but reconstruct the number cache based on
+        // which DoFs each process owns
+        this->Sequential<dim, spacedim>::renumber_dofs (global_gathered_numbers);
 
-        number_cache.n_locally_owned_dofs =
-          number_cache.n_locally_owned_dofs_per_processor[this->dof_handler->get_triangulation().locally_owned_subdomain ()];
+        const NumberCache number_cache (DoFTools::locally_owned_dofs_per_subdomain (*this->dof_handler),
+                                        this->dof_handler->get_triangulation().locally_owned_subdomain ());
 
         // restore artificial cells
         cell = tr->begin_active();
@@ -2312,7 +2244,7 @@ namespace internal
 
         //* 1. distribute on own subdomain
         const dealii::types::global_dof_index n_initial_local_dofs =
-          Implementation::distribute_dofs (0, tr->locally_owned_subdomain(),
+          Implementation::distribute_dofs (tr->locally_owned_subdomain(),
                                            *dof_handler);
 
         //* 2. iterate over ghostcells and kill dofs that are not
@@ -2575,7 +2507,7 @@ namespace internal
                     }
               }
 
-
+// TODO: make this code simpler with the new constructors of NumberCache
             // make indices consecutive
             level_number_cache.n_locally_owned_dofs = 0;
             for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
