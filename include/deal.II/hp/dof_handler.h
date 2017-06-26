@@ -250,9 +250,25 @@ namespace hp
     DoFHandler (const Triangulation<dim,spacedim> &tria);
 
     /**
+     * Copy constructor. DoFHandler objects are large and expensive.
+     * They should not be copied, in particular not by accident, but
+     * rather deliberately constructed. As a consequence, this constructor
+     * is explicitly removed from the interface of this class.
+     */
+    DoFHandler (const DoFHandler &) = delete;
+
+    /**
      * Destructor.
      */
     virtual ~DoFHandler ();
+
+    /**
+     * Copy operator. DoFHandler objects are large and expensive.
+     * They should not be copied, in particular not by accident, but
+     * rather deliberately constructed. As a consequence, this operator
+     * is explicitly removed from the interface of this class.
+     */
+    DoFHandler &operator = (const DoFHandler &) = delete;
 
     /**
      * Go through the triangulation and "distribute" the degrees of freedoms
@@ -721,31 +737,22 @@ namespace hp
   private:
 
     /**
-     * Copy constructor. I can see no reason why someone might want to use it,
-     * so I don't provide it. Since this class has pointer members, making it
-     * private prevents the compiler to provide it's own, incorrect one if
-     * anyone chose to copy such an object.
-     */
-    DoFHandler (const DoFHandler &);
-
-    /**
-     * Copy operator. I can see no reason why someone might want to use it, so
-     * I don't provide it. Since this class has pointer members, making it
-     * private prevents the compiler to provide it's own, incorrect one if
-     * anyone chose to copy such an object.
-     */
-    DoFHandler &operator = (const DoFHandler &);
-
-    /**
      * Free all used memory.
      */
     void clear_space ();
 
-    template<int structdim>
-    types::global_dof_index get_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index) const;
+    template <int structdim>
+    types::global_dof_index get_dof_index (const unsigned int obj_level,
+                                           const unsigned int obj_index,
+                                           const unsigned int fe_index,
+                                           const unsigned int local_index) const;
 
-    template<int structdim>
-    void set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index) const;
+    template <int structdim>
+    void set_dof_index (const unsigned int obj_level,
+                        const unsigned int obj_index,
+                        const unsigned int fe_index,
+                        const unsigned int local_index,
+                        const types::global_dof_index global_index) const;
 
     /**
      * Create default tables for the active_fe_indices in the
@@ -814,13 +821,13 @@ namespace hp
      * Space to store the DoF numbers for the different levels. Analogous to
      * the <tt>levels[]</tt> tree of the Triangulation objects.
      */
-    std::vector<dealii::internal::hp::DoFLevel *> levels;
+    std::vector<std::unique_ptr<dealii::internal::hp::DoFLevel> > levels;
 
     /**
      * Space to store the DoF numbers for the faces. Analogous to the
      * <tt>faces</tt> pointer of the Triangulation objects.
      */
-    dealii::internal::hp::DoFIndicesOnFaces<dim> *faces;
+    std::unique_ptr<dealii::internal::hp::DoFIndicesOnFaces<dim> > faces;
 
     /**
      * A structure that contains all sorts of numbers that characterize the
@@ -865,7 +872,7 @@ namespace hp
      * refinement, i.e. from between when pre_refinement_action is called and
      * when post_refinement_action runs.
      */
-    std::vector<std::vector<bool> *> has_children;
+    std::vector<std::unique_ptr<std::vector<bool> > > has_children;
 
     /**
      * A list of connections with which this object connects to the
