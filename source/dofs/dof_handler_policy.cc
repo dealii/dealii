@@ -55,6 +55,46 @@ namespace internal
       // the following
       using dealii::DoFHandler;
 
+
+
+      namespace
+      {
+        /**
+         * Update the cache used for cell dof indices on all (non-artificial)
+         * active cells of the given DoFHandler.
+         */
+        template <typename DoFHandlerType>
+        void
+        update_all_active_cell_dof_indices_caches (const DoFHandlerType &dof_handler)
+        {
+          typename DoFHandlerType::active_cell_iterator
+          cell = dof_handler.begin_active(),
+          endc = dof_handler.end();
+          for (; cell != endc; ++cell)
+            if (!cell->is_artificial())
+              cell->update_cell_dof_indices_cache ();
+        }
+
+
+        /**
+         * Update the cache used for cell dof indices on all (non-artificial)
+         * level (multigrid) cells of the given DoFHandler.
+         */
+        template <typename DoFHandlerType>
+        void
+        update_all_level_cell_dof_indices_caches (const DoFHandlerType &dof_handler)
+        {
+          typename DoFHandlerType::level_cell_iterator
+          cell = dof_handler.begin(),
+          endc = dof_handler.end();
+
+          for (; cell != endc; ++cell)
+            cell->update_cell_dof_indices_cache ();
+        }
+      }
+
+
+
       struct Implementation
       {
 
@@ -230,10 +270,7 @@ namespace internal
                                                            cell,
                                                            next_free_dof);
 
-          // update the cache used for cell dof indices
-          for (cell = dof_handler.begin_active(); cell != endc; ++cell)
-            if (!cell->is_artificial())
-              cell->update_cell_dof_indices_cache ();
+          update_all_active_cell_dof_indices_caches (dof_handler);
 
           return next_free_dof;
         }
@@ -527,10 +564,7 @@ namespace internal
                 *i = new_numbers[*i];
 
           // update the cache used for cell dof indices
-          for (typename DoFHandler<1,spacedim>::level_cell_iterator
-               cell = dof_handler.begin();
-               cell != dof_handler.end(); ++cell)
-            cell->update_cell_dof_indices_cache ();
+          update_all_level_cell_dof_indices_caches(dof_handler);
         }
 
 
@@ -635,10 +669,7 @@ namespace internal
             }
 
           // update the cache used for cell dof indices
-          for (typename DoFHandler<2,spacedim>::level_cell_iterator
-               cell = dof_handler.begin();
-               cell != dof_handler.end(); ++cell)
-            cell->update_cell_dof_indices_cache ();
+          update_all_level_cell_dof_indices_caches (dof_handler);
         }
 
 
@@ -784,10 +815,7 @@ namespace internal
             }
 
           // update the cache used for cell dof indices
-          for (typename DoFHandler<3,spacedim>::level_cell_iterator
-               cell = dof_handler.begin();
-               cell != dof_handler.end(); ++cell)
-            cell->update_cell_dof_indices_cache ();
+          update_all_level_cell_dof_indices_caches (dof_handler);
         }
 
 
@@ -2173,15 +2201,8 @@ namespace internal
           }
 #endif
 
-          // update dofindices
-          {
-            typename DoFHandler<dim,spacedim>::active_cell_iterator
-            cell, endc = dof_handler.end();
-
-            for (cell = dof_handler.begin_active(); cell != endc; ++cell)
-              if (!cell->is_artificial())
-                cell->update_cell_dof_indices_cache();
-          }
+          // update dof index caches on all cells
+          update_all_active_cell_dof_indices_caches (dof_handler);
 
           // have a barrier so that sends between two calls to this
           // function are not mixed up.
