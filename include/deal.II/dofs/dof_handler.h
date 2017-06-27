@@ -1139,6 +1139,8 @@ DoFHandler<dim,spacedim>::has_level_dofs() const
   return mg_number_cache.size()>0;
 }
 
+
+
 template <int dim, int spacedim>
 inline
 bool
@@ -1147,6 +1149,8 @@ DoFHandler<dim,spacedim>::has_active_dofs() const
   return number_cache.n_global_dofs>0;
 }
 
+
+
 template <int dim, int spacedim>
 inline
 types::global_dof_index
@@ -1154,6 +1158,8 @@ DoFHandler<dim,spacedim>::n_dofs () const
 {
   return number_cache.n_global_dofs;
 }
+
+
 
 template<int dim, int spacedim>
 inline
@@ -1165,12 +1171,14 @@ types::global_dof_index DoFHandler<dim, spacedim>::n_dofs (const unsigned int le
 }
 
 
+
 template <int dim, int spacedim>
 unsigned int
 DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
 {
   return number_cache.n_locally_owned_dofs;
 }
+
 
 
 template <int dim, int spacedim>
@@ -1180,13 +1188,18 @@ DoFHandler<dim, spacedim>::locally_owned_dofs() const
   return number_cache.locally_owned_dofs;
 }
 
+
+
 template <int dim, int spacedim>
 const IndexSet &
 DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
 {
-  Assert(level < this->get_triangulation().n_global_levels(), ExcMessage("invalid level in locally_owned_mg_dofs"));
+  Assert(level < this->get_triangulation().n_global_levels(),
+         ExcMessage("invalid level in locally_owned_mg_dofs"));
   return mg_number_cache[level].locally_owned_dofs;
 }
+
+
 
 template <int dim, int spacedim>
 const std::vector<types::global_dof_index> &
@@ -1196,12 +1209,15 @@ DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
 }
 
 
+
 template <int dim, int spacedim>
 const std::vector<IndexSet> &
 DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor () const
 {
   return number_cache.locally_owned_dofs_per_processor;
 }
+
+
 
 template <int dim, int spacedim>
 const std::vector<IndexSet> &
@@ -1212,12 +1228,14 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor (const unsigned i
 }
 
 
+
 template <int dim, int spacedim>
 inline
 const FiniteElement<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_fe () const
 {
-  Assert(selected_fe!=nullptr, ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
+  Assert(selected_fe!=nullptr,
+         ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
   return *selected_fe;
 }
 
@@ -1241,6 +1259,7 @@ DoFHandler<dim,spacedim>::block_info () const
 {
   return block_info_object;
 }
+
 
 
 template <int dim, int spacedim>
@@ -1275,6 +1294,7 @@ namespace internal
 }
 
 
+
 template <int dim, int spacedim>
 template <class Archive>
 void DoFHandler<dim,spacedim>::save (Archive &ar,
@@ -1295,6 +1315,7 @@ void DoFHandler<dim,spacedim>::save (Archive &ar,
 
   ar &n_cells &fe_name &policy_name;
 }
+
 
 
 template <int dim, int spacedim>
@@ -1340,27 +1361,31 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
 }
 
 
-template<int dim, int spacedim>
+
+
+template <int dim, int spacedim>
 inline
-types::global_dof_index DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (
-  const unsigned int level,
-  const unsigned int dof_number) const
+types::global_dof_index
+DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (const unsigned int level,
+                                                    const unsigned int dof_number) const
 {
   Assert ((level >= coarsest_level) && (level <= finest_level), ExcInvalidLevel (level));
   return indices[indices_offset[level - coarsest_level] + dof_number];
 }
 
 
+
 template<int dim, int spacedim>
 inline
-void DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (
-  const unsigned int level,
-  const unsigned int dof_number,
-  const types::global_dof_index index)
+void
+DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (const unsigned int level,
+                                                    const unsigned int dof_number,
+                                                    const types::global_dof_index index)
 {
   Assert ((level >= coarsest_level) && (level <= finest_level), ExcInvalidLevel (level));
   indices[indices_offset[level - coarsest_level] + dof_number] = index;
 }
+
 
 #endif // DOXYGEN
 
