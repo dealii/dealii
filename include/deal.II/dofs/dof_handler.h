@@ -1272,7 +1272,7 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, co
 namespace internal
 {
   /**
-   * returns a string representing the dynamic type of the given argument.
+   * Return a string representing the dynamic type of the given argument.
    * This is basically the same what typeid(...).name() does, but it turns out
    * this is broken on Intel 13+.
    *

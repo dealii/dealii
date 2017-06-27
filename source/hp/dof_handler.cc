@@ -20,6 +20,7 @@
 #include <deal.II/hp/dof_level.h>
 #include <deal.II/hp/dof_faces.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler_policy.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_levels.h>

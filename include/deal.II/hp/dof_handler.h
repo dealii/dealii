@@ -41,6 +41,17 @@ template <int dim, int spacedim> class Triangulation;
 
 namespace internal
 {
+  namespace DoFHandler
+  {
+    struct Implementation;
+
+    namespace Policy
+    {
+      template <int dim, int spacedim> class PolicyBase;
+      struct Implementation;
+    }
+  }
+
   namespace hp
   {
     class DoFLevel;
@@ -734,7 +745,12 @@ namespace hp
      */
     SmartPointer<const hp::FECollection<dim,spacedim>,hp::DoFHandler<dim,spacedim> > finite_elements;
 
-  private:
+    /**
+     * An object that describes how degrees of freedom should be distributed and
+     * renumbered.
+     */
+    std::unique_ptr<dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> > policy;
+
 
     /**
      * Free all used memory.
@@ -919,9 +935,25 @@ namespace hp
     // then just hand everything over to the other function that does the work
     return n_boundary_dofs(boundary_ids_only);
   }
+}
 
 
+namespace internal
+{
+  /**
+   * Return a string representing the dynamic type of the given argument.
+   * This is basically the same what typeid(...).name() does, but it turns out
+   * this is broken on Intel 13+.
+   *
+   * Defined in source/dofs/dof_handler.cc.
+   */
+  template <int dim, int spacedim>
+  std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy);
+}
 
+
+namespace hp
+{
   template <int dim, int spacedim>
   template <class Archive>
   void DoFHandler<dim, spacedim>::save(Archive &ar, unsigned int) const
@@ -934,11 +966,15 @@ namespace hp
     ar &has_children;
 
     // write out the number of triangulation cells and later check during
-    // loading that this number is indeed correct;
+    // loading that this number is indeed correct; same with something that
+    // identifies the policy
     unsigned int n_cells = tria->n_cells();
+    std::string  policy_name = dealii::internal::policy_to_string(*policy);
 
-    ar &n_cells;
+    ar &n_cells &policy_name;
   }
+
+
 
   template <int dim, int spacedim>
   template <class Archive>
@@ -968,12 +1004,20 @@ namespace hp
     // these are the checks that correspond to the last block in the save()
     // function
     unsigned int n_cells;
+    std::string  policy_name;
 
-    ar &n_cells;
+    ar &n_cells &policy_name;
 
-    AssertThrow(n_cells == tria->n_cells(),
-                ExcMessage("The object being loaded into does not match the triangulation "
-                           "that has been stored previously."));
+    AssertThrow (n_cells == tria->n_cells(),
+                 ExcMessage ("The object being loaded into does not match the triangulation "
+                             "that has been stored previously."));
+    AssertThrow (policy_name == dealii::internal::policy_to_string(*policy),
+                 ExcMessage (std::string ("The policy currently associated with this DoFHandler (")
+                             + dealii::internal::policy_to_string(*policy)
+                             +std::string(") does not match the one that was associated with the "
+                                          "DoFHandler previously stored (")
+                             + policy_name
+                             + ")."));
   }
 
   template <int dim, int spacedim>
