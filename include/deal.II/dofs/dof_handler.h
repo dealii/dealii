@@ -309,7 +309,7 @@ public:
   /**
    * Constructor. Take @p tria as the triangulation to work on.
    */
-  DoFHandler ( const Triangulation<dim,spacedim> &tria);
+  DoFHandler (const Triangulation<dim,spacedim> &tria);
 
   /**
    * Copy constructor. DoFHandler objects are large and expensive.
@@ -1058,7 +1058,7 @@ private:
                                          const unsigned int fe_index,
                                          const unsigned int local_index) const;
 
-  template<int structdim>
+  template <int structdim>
   void set_dof_index (const unsigned int obj_level,
                       const unsigned int obj_index,
                       const unsigned int fe_index,

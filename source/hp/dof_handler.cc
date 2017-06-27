@@ -571,7 +571,7 @@ namespace internal
 
             for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
               {
-                dof_handler.levels.push_back (new internal::hp::DoFLevel);
+                dof_handler.levels.emplace_back (new internal::hp::DoFLevel);
                 std::swap (active_fe_backup[level],
                            dof_handler.levels[level]->active_fe_indices);
               }
@@ -699,11 +699,11 @@ namespace internal
 
             for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
               {
-                dof_handler.levels.push_back (new internal::hp::DoFLevel);
+                dof_handler.levels.emplace_back (new internal::hp::DoFLevel);
                 std::swap (active_fe_backup[level],
                            dof_handler.levels[level]->active_fe_indices);
               }
-            dof_handler.faces = new internal::hp::DoFIndicesOnFaces<2>;
+            dof_handler.faces.reset (new internal::hp::DoFIndicesOnFaces<2>);
           }
 
           // QUAD (CELL) DOFs
@@ -1076,11 +1076,11 @@ namespace internal
 
             for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
               {
-                dof_handler.levels.push_back (new internal::hp::DoFLevel);
+                dof_handler.levels.emplace_back (new internal::hp::DoFLevel);
                 std::swap (active_fe_backup[level],
                            dof_handler.levels[level]->active_fe_indices);
               }
-            dof_handler.faces = new internal::hp::DoFIndicesOnFaces<3>;
+            dof_handler.faces.reset (new internal::hp::DoFIndicesOnFaces<3>);
           }
 
           // HEX (CELL) DOFs
@@ -3148,7 +3148,7 @@ namespace hp
     // Create sufficiently many
     // hp::DoFLevels.
     while (levels.size () < tria->n_levels ())
-      levels.push_back (new dealii::internal::hp::DoFLevel);
+      levels.emplace_back (new dealii::internal::hp::DoFLevel);
 
     // then make sure that on each
     // level we have the appropriate
@@ -3199,8 +3199,7 @@ namespace hp
     for (unsigned int i=0; i<levels.size(); ++i)
       {
         const unsigned int cells_on_level = tria->n_raw_cells(i);
-        std::vector<bool> *has_children_level =
-          new std::vector<bool> (cells_on_level);
+        std::unique_ptr<std::vector<bool> > has_children_level(new std::vector<bool> (cells_on_level));
 
         // Check for each cell, if it has children. in 1d,
         // we don't store refinement cases, so use the 'children'
@@ -3220,7 +3219,7 @@ namespace hp
                                      std::placeholders::_1,
                                      static_cast<unsigned char>(RefinementCase<dim>::no_refinement)));
 
-        has_children.push_back (has_children_level);
+        has_children.emplace_back (std::move(has_children_level));
       }
   }
 
@@ -3235,13 +3234,13 @@ namespace hp
     // Normally only one level is added, but if this Triangulation
     // is created by copy_triangulation, it can be more than one level.
     while (levels.size () < tria->n_levels ())
-      levels.push_back (new dealii::internal::hp::DoFLevel);
+      levels.emplace_back (new dealii::internal::hp::DoFLevel);
 
     // Coarsening can lead to the loss
     // of levels. Hence remove them.
     while (levels.size () > tria->n_levels ())
       {
-        delete levels[levels.size ()-1];
+        // drop the last element. that also releases the memory pointed to
         levels.pop_back ();
       }
 
@@ -3306,11 +3305,6 @@ namespace hp
       }
 
     // Free buffer objects
-    std::vector<std::vector<bool> *>::iterator children_level;
-    for (children_level = has_children.begin ();
-         children_level != has_children.end ();
-         ++children_level)
-      delete (*children_level);
     has_children.clear ();
   }
 
@@ -3344,11 +3338,8 @@ namespace hp
   template<int dim, int spacedim>
   void DoFHandler<dim,spacedim>::clear_space ()
   {
-    for (unsigned int i=0; i<levels.size(); ++i)
-      delete levels[i];
-    levels.resize (0);
-    delete faces;
-    faces = nullptr;
+    levels.clear ();
+    faces.reset ();
 
     {
       std::vector<types::global_dof_index> tmp;
