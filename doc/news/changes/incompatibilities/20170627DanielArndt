@@ -1,0 +1,6 @@
+Changed: Timer::print_data doesn't restrict its output to the first MPI process
+anymore but leaves such a choice to the stream given.
+Timer::get_data returns zero values instead of invalid values if stop() was not
+called before.
+<br>
+(Daniel Arndt, 2017/06/27)
