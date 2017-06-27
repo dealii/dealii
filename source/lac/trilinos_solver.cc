@@ -601,7 +601,7 @@ namespace TrilinosWrappers
   SolverCG::AdditionalData::
   AdditionalData (const bool output_solver_details)
     :
-    output_solver_details (output_solver_details)
+    SolverBase::AdditionalData (output_solver_details)
   {}
 
 
@@ -609,9 +609,8 @@ namespace TrilinosWrappers
   SolverCG::SolverCG (SolverControl        &cn,
                       const AdditionalData &data)
     :
-    SolverBase (cn,
-                SolverBase::AdditionalData(data.output_solver_details)),
-    additional_data (data.output_solver_details)
+    SolverBase (cn, data),
+    additional_data (data)
   {
     solver_name = cg;
   }
@@ -623,8 +622,8 @@ namespace TrilinosWrappers
   AdditionalData (const bool output_solver_details,
                   const unsigned int restart_parameter)
     :
-    output_solver_details (output_solver_details),
-    restart_parameter (restart_parameter)
+    SolverBase::AdditionalData (output_solver_details,
+                                restart_parameter)
   {}
 
 
@@ -632,11 +631,8 @@ namespace TrilinosWrappers
   SolverGMRES::SolverGMRES (SolverControl        &cn,
                             const AdditionalData &data)
     :
-    SolverBase (cn,
-                SolverBase::AdditionalData(data.output_solver_details,
-                                           data.restart_parameter)),
-    additional_data (data.output_solver_details,
-                     data.restart_parameter)
+    SolverBase (cn, data),
+    additional_data (data)
   {
     solver_name = gmres;
   }
@@ -647,7 +643,7 @@ namespace TrilinosWrappers
   SolverBicgstab::AdditionalData::
   AdditionalData (const bool output_solver_details)
     :
-    output_solver_details (output_solver_details)
+    SolverBase::AdditionalData (output_solver_details)
   {}
 
 
@@ -656,9 +652,8 @@ namespace TrilinosWrappers
   SolverBicgstab::SolverBicgstab (SolverControl        &cn,
                                   const AdditionalData &data)
     :
-    SolverBase (cn,
-                SolverBase::AdditionalData(data.output_solver_details)),
-    additional_data (data.output_solver_details)
+    SolverBase (cn, data),
+    additional_data (data)
   {
     solver_name = bicgstab;
   }
@@ -669,18 +664,16 @@ namespace TrilinosWrappers
   SolverCGS::AdditionalData::
   AdditionalData (const bool output_solver_details)
     :
-    output_solver_details (output_solver_details)
+    SolverBase::AdditionalData (output_solver_details)
   {}
-
 
 
 
   SolverCGS::SolverCGS (SolverControl        &cn,
                         const AdditionalData &data)
     :
-    SolverBase (cn,
-                SolverBase::AdditionalData(data.output_solver_details)),
-    additional_data (data.output_solver_details)
+    SolverBase (cn, data),
+    additional_data (data)
   {
     solver_name = cgs;
   }
@@ -691,7 +684,7 @@ namespace TrilinosWrappers
   SolverTFQMR::AdditionalData::
   AdditionalData (const bool output_solver_details)
     :
-    output_solver_details (output_solver_details)
+    SolverBase::AdditionalData (output_solver_details)
   {}
 
 
@@ -699,9 +692,8 @@ namespace TrilinosWrappers
   SolverTFQMR::SolverTFQMR (SolverControl        &cn,
                             const AdditionalData &data)
     :
-    SolverBase (cn,
-                SolverBase::AdditionalData(data.output_solver_details)),
-    additional_data (data.output_solver_details)
+    SolverBase (cn, data),
+    additional_data (data)
   {
     solver_name = tfqmr;
   }

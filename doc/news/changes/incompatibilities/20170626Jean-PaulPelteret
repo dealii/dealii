@@ -1,0 +1,6 @@
+Changed: The restart_parameter member variable of
+TrilinosWrappers::SolverGMRES::AdditionalData has been removed.
+This value is now stored as gmres_restart_parameter in the base class
+TrilinosWrappers::SolverBase::AdditionalData.
+<br>
+(Jean-Paul Pelteret, 2017/06/26)
