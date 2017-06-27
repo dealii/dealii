@@ -717,7 +717,7 @@ namespace hp
                     << "You tried to do something on level " << arg1
                     << ", but this level is empty.");
 
-  protected:
+  private:
 
     /**
      * Address of the triangulation to work on.
@@ -985,6 +985,7 @@ namespace hp
   }
 
 
+
   template <int dim, int spacedim>
   inline
   types::global_dof_index
@@ -992,6 +993,7 @@ namespace hp
   {
     return numbers::invalid_dof_index;
   }
+
 
 
   template <int dim, int spacedim>
@@ -1002,6 +1004,7 @@ namespace hp
   }
 
 
+
   template <int dim, int spacedim>
   const IndexSet &
   DoFHandler<dim, spacedim>::locally_owned_dofs() const
@@ -1010,12 +1013,14 @@ namespace hp
   }
 
 
+
   template <int dim, int spacedim>
   const std::vector<types::global_dof_index> &
   DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
   {
     return number_cache.n_locally_owned_dofs_per_processor;
   }
+
 
 
   template <int dim, int spacedim>
