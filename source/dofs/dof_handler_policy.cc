@@ -56,6 +56,10 @@ namespace internal
       // the following
       using dealii::DoFHandler;
 
+      namespace hp
+      {
+        using dealii::hp::DoFHandler;
+      }
 
 
       namespace
@@ -281,23 +285,70 @@ namespace internal
         }
 
 
+
+        // same for the hp::DoFHandler
+        template <int spacedim>
+        static
+        types::global_dof_index
+        distribute_dofs_on_cell (const hp::DoFHandler<1,spacedim>                                &dof_handler,
+                                 const typename hp::DoFHandler<1,spacedim>::active_cell_iterator &cell,
+                                 types::global_dof_index                                          next_free_dof)
+        {
+          (void)dof_handler;
+          (void)cell;
+          (void)next_free_dof;
+          return 0;
+        }
+
+
+
+        template <int spacedim>
+        static
+        types::global_dof_index
+        distribute_dofs_on_cell (const hp::DoFHandler<2,spacedim>                                &dof_handler,
+                                 const typename hp::DoFHandler<2,spacedim>::active_cell_iterator &cell,
+                                 types::global_dof_index                                          next_free_dof)
+        {
+          (void)dof_handler;
+          (void)cell;
+          (void)next_free_dof;
+          return 0;
+        }
+
+
+
+        template <int spacedim>
+        static
+        types::global_dof_index
+        distribute_dofs_on_cell (const hp::DoFHandler<3,spacedim>                                &dof_handler,
+                                 const typename hp::DoFHandler<3,spacedim>::active_cell_iterator &cell,
+                                 types::global_dof_index                                          next_free_dof)
+        {
+          (void)dof_handler;
+          (void)cell;
+          (void)next_free_dof;
+          return 0;
+        }
+
+
+
         /**
          * Distribute degrees of freedom on all cells, or on cells with the
          * correct subdomain_id if the corresponding argument is not equal to
          * numbers::invalid_subdomain_id. Return the total number of dofs
          * distributed.
          */
-        template <int dim, int spacedim>
+        template <typename DoFHandlerType>
         static
         types::global_dof_index
         distribute_dofs (const types::subdomain_id     subdomain_id,
-                         DoFHandler<dim,spacedim>     &dof_handler)
+                         DoFHandlerType               &dof_handler)
         {
           Assert (dof_handler.get_triangulation().n_levels() > 0,
                   ExcMessage("Empty triangulation"));
 
           types::global_dof_index next_free_dof = 0;
-          typename DoFHandler<dim,spacedim>::active_cell_iterator
+          typename DoFHandlerType::active_cell_iterator
           cell = dof_handler.begin_active(),
           endc = dof_handler.end();
 
@@ -483,13 +534,62 @@ namespace internal
 
 
 
-        template <int dim, int spacedim>
+        // same for the hp::DoFHandler
+        template <int spacedim>
+        static
+        types::global_dof_index
+        distribute_mg_dofs_on_cell (const hp::DoFHandler<1,spacedim>                                &dof_handler,
+                                    const typename hp::DoFHandler<1,spacedim>::active_cell_iterator &cell,
+                                    types::global_dof_index                                          next_free_dof)
+        {
+          (void)dof_handler;
+          (void)cell;
+          (void)next_free_dof;
+          return 0;
+        }
+
+
+
+        template <int spacedim>
+        static
+        types::global_dof_index
+        distribute_mg_dofs_on_cell (const hp::DoFHandler<2,spacedim>                                &dof_handler,
+                                    const typename hp::DoFHandler<2,spacedim>::active_cell_iterator &cell,
+                                    types::global_dof_index                                          next_free_dof)
+        {
+          (void)dof_handler;
+          (void)cell;
+          (void)next_free_dof;
+          return 0;
+        }
+
+
+
+        template <int spacedim>
+        static
+        types::global_dof_index
+        distribute_mg_dofs_on_cell (const hp::DoFHandler<3,spacedim>                                &dof_handler,
+                                    const typename hp::DoFHandler<3,spacedim>::active_cell_iterator &cell,
+                                    types::global_dof_index                                          next_free_dof)
+        {
+          (void)dof_handler;
+          (void)cell;
+          (void)next_free_dof;
+          return 0;
+        }
+
+
+
+        template <typename DoFHandlerType>
         static
         types::global_dof_index
         distribute_dofs_on_level (const types::subdomain_id level_subdomain_id,
-                                  DoFHandler<dim,spacedim> &dof_handler,
+                                  DoFHandlerType           &dof_handler,
                                   const unsigned int        level)
         {
+          const unsigned int dim      = DoFHandlerType::dimension;
+          const unsigned int spacedim = DoFHandlerType::space_dimension;
+
           const dealii::Triangulation<dim,spacedim> &tria
             = dof_handler.get_triangulation();
           Assert (tria.n_levels() > 0, ExcMessage("Empty triangulation"));
@@ -942,6 +1042,32 @@ namespace internal
             }
         }
 
+
+
+        template <int dim, int spacedim>
+        static
+        void
+        renumber_dofs (const std::vector<types::global_dof_index> &/*new_numbers*/,
+                       const IndexSet                             &/*indices*/,
+                       hp::DoFHandler<dim,spacedim>               &/*dof_handler*/,
+                       const bool                                  /*check_validity*/)
+        {
+          Assert (false, ExcNotImplemented());
+        }
+
+
+
+        template <int dim, int spacedim>
+        static
+        void
+        renumber_mg_dofs (const std::vector<dealii::types::global_dof_index> &/*new_numbers*/,
+                          const IndexSet                                     &/*indices*/,
+                          hp::DoFHandler<dim,spacedim>                       &/*dof_handler*/,
+                          const unsigned int                                  /*level*/,
+                          const bool                                          /*check_validity*/)
+        {
+          Assert (false, ExcNotImplemented());
+        }
 
       };
 
