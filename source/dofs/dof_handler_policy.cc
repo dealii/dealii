@@ -951,18 +951,18 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
-      Sequential<dim,spacedim>::
-      Sequential (dealii::DoFHandler<dim,spacedim> &dof_handler)
+      template <typename DoFHandlerType>
+      Sequential<DoFHandlerType>::
+      Sequential (DoFHandlerType &dof_handler)
         :
         dof_handler (&dof_handler)
       {}
 
 
 
-      template <int dim, int spacedim>
+      template <typename DoFHandlerType>
       NumberCache
-      Sequential<dim,spacedim>::
+      Sequential<DoFHandlerType>::
       distribute_dofs () const
       {
         const types::global_dof_index n_dofs =
@@ -975,15 +975,16 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <typename DoFHandlerType>
       std::vector<NumberCache>
-      Sequential<dim,spacedim>::
+      Sequential<DoFHandlerType>::
       distribute_mg_dofs () const
       {
         std::vector<bool> user_flags;
         dof_handler->get_triangulation().save_user_flags (user_flags);
 
-        const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler->get_triangulation()).clear_user_flags ();
+        const_cast<dealii::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension>&>
+        (dof_handler->get_triangulation()).clear_user_flags ();
 
         std::vector<NumberCache> number_caches;
         number_caches.reserve (dof_handler->get_triangulation().n_levels());
@@ -998,16 +999,17 @@ namespace internal
             number_caches.emplace_back (NumberCache(n_level_dofs));
           }
 
-        const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler->get_triangulation()).load_user_flags (user_flags);
+        const_cast<dealii::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension>&>
+        (dof_handler->get_triangulation()).load_user_flags (user_flags);
 
         return number_caches;
       }
 
 
 
-      template <int dim, int spacedim>
+      template <typename DoFHandlerType>
       NumberCache
-      Sequential<dim,spacedim>::
+      Sequential<DoFHandlerType>::
       renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const
       {
         Implementation::renumber_dofs (new_numbers, IndexSet(0),

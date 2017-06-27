@@ -97,8 +97,8 @@ namespace internal
        * This class implements the default policy for sequential operations,
        * i.e. for the case where all cells get degrees of freedom.
        */
-      template <int dim, int spacedim>
-      class Sequential : public PolicyBase<dim,spacedim>
+      template <typename DoFHandlerType>
+      class Sequential : public PolicyBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
       {
       public:
         /**
@@ -106,7 +106,7 @@ namespace internal
          * @param dof_handler The DoFHandler object upon which this
          *   policy class is supposed to work.
          */
-        Sequential (dealii::DoFHandler<dim,spacedim> &dof_handler);
+        Sequential (DoFHandlerType &dof_handler);
 
         // documentation is inherited
         virtual
@@ -127,7 +127,7 @@ namespace internal
         /**
          * The DoFHandler object on which this policy object works.
          */
-        SmartPointer<dealii::DoFHandler<dim,spacedim> > dof_handler;
+        SmartPointer<DoFHandlerType> dof_handler;
       };
 
       /**
