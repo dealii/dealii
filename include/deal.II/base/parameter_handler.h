@@ -202,10 +202,22 @@ namespace Patterns
 
     /**
      * Convert a compatible value type to a string. The value type should
-     * be store as a pointer in the boost::any object.
+     * be stored as a pointer in the boost::any object.
      *
      * Derived patterns can use this function to convert a compatible type
-     * to a string matching this pattern.
+     * to a string matching this pattern. A snippet implementation taken from
+     * Patterns::Integer is given below:
+     *
+     * @code
+     * std::string Integer::any_to_string(const boost::any &v) const {
+     *  if (v.type() == typeid(const int *))
+     *    return (std::to_string(*(boost::any_cast<const int *>(v))));
+     *  else {
+     *    // Handle errors here
+     *    return std::string();
+     *  }
+     * }
+     * @endcode
      *
      * This class expects the boost::any object to store a pointer to a
      * value type that is compatible with this pattern.  If this is not the
