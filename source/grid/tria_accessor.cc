@@ -1511,8 +1511,8 @@ bool CellAccessor<3>::point_inside (const Point<3> &p) const
 // 1) project point onto manifold and
 // 2) transform to the unit cell with a Q1 mapping
 // 3) then check if inside unit cell
-template<int dim, int spacedim>
-template<int dim_,int spacedim_ >
+template <int dim, int spacedim>
+template <int dim_,int spacedim_ >
 bool CellAccessor<dim,spacedim>::
 point_inside_codim(const Point<spacedim_> &p) const
 {

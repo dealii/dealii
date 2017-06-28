@@ -270,7 +270,7 @@ test_simple(DoFHandler<dim> &mgdofs)
 }
 
 
-template<int dim>
+template <int dim>
 void
 test(const FiniteElement<dim> &fe)
 {

@@ -471,7 +471,7 @@ public:
    * This function requires that the type <tt>T2</tt> is convertible to
    * <tt>T</tt>.
    */
-  template<typename T2>
+  template <typename T2>
   TableBase<N,T> &operator = (const TableBase<N,T2> &src);
 
   /**

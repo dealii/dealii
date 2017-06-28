@@ -32,7 +32,7 @@
 #include <iomanip>
 
 
-template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 double
 check_solve (SolverType         &solver,
              const MatrixType   &A,

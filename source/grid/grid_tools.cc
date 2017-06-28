@@ -638,7 +638,7 @@ namespace GridTools
     transform (Rotate2d(angle), triangulation);
   }
 
-  template<int dim>
+  template <int dim>
   void
   rotate (const double      angle,
           const unsigned int axis,
@@ -1122,7 +1122,7 @@ namespace GridTools
   }
 
 
-  template<int dim, template<int, int> class MeshType, int spacedim>
+  template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
   std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
 #else
@@ -1264,7 +1264,7 @@ next_cell:
 
   namespace
   {
-    template <int dim, template<int, int> class MeshType, int spacedim>
+    template <int dim, template <int, int> class MeshType, int spacedim>
     void find_active_cell_around_point_internal
     (const MeshType<dim,spacedim> &mesh,
 #ifndef _MSC_VER
@@ -1320,7 +1320,7 @@ next_cell:
     }
   }
 
-  template <int dim, template<int, int> class MeshType, int spacedim>
+  template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
   typename MeshType<dim, spacedim>::active_cell_iterator
 #else
@@ -1586,7 +1586,7 @@ next_cell:
   namespace
   {
 
-    template<class MeshType>
+    template <class MeshType>
     bool
     contains_locally_owned_cells (const std::vector<typename MeshType::active_cell_iterator> &cells)
     {
@@ -1599,7 +1599,7 @@ next_cell:
       return false;
     }
 
-    template<class MeshType>
+    template <class MeshType>
     bool
     contains_artificial_cells (const std::vector<typename MeshType::active_cell_iterator> &cells)
     {
@@ -1871,7 +1871,7 @@ next_cell:
 
 
 
-  template< class MeshType>
+  template < class MeshType>
   std::pair< Point<MeshType::space_dimension>, Point<MeshType::space_dimension> >
   compute_bounding_box
   ( const MeshType                                                                    &mesh,
@@ -3906,7 +3906,7 @@ next_cell:
    *   matrix.point1 + offset - point2
    * is parallel to the unit vector in <direction>
    */
-  template<int spacedim>
+  template <int spacedim>
   inline bool orthogonal_equality (const Point<spacedim>    &point1,
                                    const Point<spacedim>    &point2,
                                    const int                 direction,
@@ -3953,9 +3953,9 @@ next_cell:
    * documentation of make_periodicity_constraints and
    * collect_periodic_faces for details
    */
-  template<int dim> struct OrientationLookupTable {};
+  template <int dim> struct OrientationLookupTable {};
 
-  template<> struct OrientationLookupTable<1>
+  template <> struct OrientationLookupTable<1>
   {
     typedef std::array<unsigned int, GeometryInfo<1>::vertices_per_face> MATCH_T;
     static inline std::bitset<3> lookup (const MATCH_T &)
@@ -3965,7 +3965,7 @@ next_cell:
     }
   };
 
-  template<> struct OrientationLookupTable<2>
+  template <> struct OrientationLookupTable<2>
   {
     typedef std::array<unsigned int, GeometryInfo<2>::vertices_per_face> MATCH_T;
     static inline std::bitset<3> lookup (const MATCH_T &matching)
@@ -3986,7 +3986,7 @@ next_cell:
     }
   };
 
-  template<> struct OrientationLookupTable<3>
+  template <> struct OrientationLookupTable<3>
   {
     typedef std::array<unsigned int, GeometryInfo<3>::vertices_per_face> MATCH_T;
     static inline std::bitset<3> lookup (const MATCH_T &matching)
@@ -4021,7 +4021,7 @@ next_cell:
 
 
 
-  template<typename FaceIterator>
+  template <typename FaceIterator>
   inline bool
   orthogonal_equality (std::bitset<3>     &orientation,
                        const FaceIterator &face1,
@@ -4069,7 +4069,7 @@ next_cell:
 
 
 
-  template<typename FaceIterator>
+  template <typename FaceIterator>
   inline bool
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,
@@ -4087,7 +4087,7 @@ next_cell:
   /*
    * Internally used in collect_periodic_faces
    */
-  template<typename CellIterator>
+  template <typename CellIterator>
   void
   match_periodic_face_pairs
   (std::set<std::pair<CellIterator, unsigned int> > &pairs1,
@@ -4150,7 +4150,7 @@ next_cell:
 
 
 
-  template<typename MeshType>
+  template <typename MeshType>
   void
   collect_periodic_faces
   (const MeshType                        &mesh,
@@ -4211,7 +4211,7 @@ next_cell:
 
 
 
-  template<typename MeshType>
+  template <typename MeshType>
   void
   collect_periodic_faces
   (const MeshType                        &mesh,
@@ -4357,7 +4357,7 @@ next_cell:
       }
   }
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   std::pair<unsigned int, double>
   get_longest_direction(typename Triangulation<dim, spacedim>::active_cell_iterator cell)
   {
@@ -4387,7 +4387,7 @@ next_cell:
   }
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   remove_hanging_nodes( Triangulation<dim,spacedim> &tria,
                         const bool isotropic,
@@ -4422,7 +4422,7 @@ next_cell:
       }
   }
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   remove_anisotropy(  Triangulation<dim,spacedim> &tria,
                       const double max_ratio,
@@ -4453,7 +4453,7 @@ next_cell:
   }
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void regularize_corner_cells (Triangulation<dim,spacedim> &tria,
                                 const double limit_angle_fraction)
   {

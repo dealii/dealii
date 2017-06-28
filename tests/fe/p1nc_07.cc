@@ -33,7 +33,7 @@
 
 
 
-template<int dim>
+template <int dim>
 Point<dim> affine (const Point<dim> &p)
 {
   Point<dim> q = p;
@@ -48,7 +48,7 @@ Point<dim> affine (const Point<dim> &p)
 
 
 
-template<int dim>
+template <int dim>
 void
 check()
 {

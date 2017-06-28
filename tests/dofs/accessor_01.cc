@@ -51,7 +51,7 @@ void test_in_dim(const DoFHandlerType &d1, const DoFHandlerType &d2)
 }
 
 
-template<int dim>
+template <int dim>
 void init_tria (Triangulation<dim> &tr)
 {
   GridGenerator::hyper_cube(tr);
@@ -59,7 +59,7 @@ void init_tria (Triangulation<dim> &tr)
 }
 
 
-template<int dim>
+template <int dim>
 void init_dofs (DoFHandler<dim> &dof,
                 const Triangulation<dim> &tr,
                 const FiniteElement<dim> &fe)

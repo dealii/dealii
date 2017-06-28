@@ -603,7 +603,7 @@ namespace internal
 
 
 
-    template<int dim, typename Number>
+    template <int dim, typename Number>
     void
     MappingInfo<dim,Number>::evaluate_on_cell (const dealii::Triangulation<dim> &tria,
                                                const std::pair<unsigned int,unsigned int> *cells,

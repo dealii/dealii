@@ -29,7 +29,7 @@ namespace Functions
 {
 
 
-  template<int dim>
+  template <int dim>
   double
   SquareFunction<dim>::value (const Point<dim>   &p,
                               const unsigned int) const
@@ -38,7 +38,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   SquareFunction<dim>::vector_value (const Point<dim>   &p,
                                      Vector<double>     &values) const
@@ -48,7 +48,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   SquareFunction<dim>::value_list (const std::vector<Point<dim> > &points,
                                    std::vector<double>            &values,
@@ -65,7 +65,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   double
   SquareFunction<dim>::laplacian (const Point<dim> &,
                                   const unsigned int) const
@@ -74,7 +74,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   SquareFunction<dim>::laplacian_list (const std::vector<Point<dim> > &points,
                                        std::vector<double>            &values,
@@ -89,7 +89,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   Tensor<1,dim>
   SquareFunction<dim>::gradient (const Point<dim>   &p,
                                  const unsigned int) const
@@ -98,7 +98,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   SquareFunction<dim>::vector_gradient (
     const Point<dim> &p,
@@ -110,7 +110,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void
   SquareFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
                                       std::vector<Tensor<1,dim> >    &gradients,
@@ -127,7 +127,7 @@ namespace Functions
 //////////////////////////////////////////////////////////////////////
 
 
-  template<int dim>
+  template <int dim>
   double
   Q1WedgeFunction<dim>::value (const Point<dim>   &p,
                                const unsigned int) const
@@ -138,7 +138,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void
   Q1WedgeFunction<dim>::value_list (const std::vector<Point<dim> > &points,
                                     std::vector<double>            &values,
@@ -156,7 +156,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   Q1WedgeFunction<dim>::vector_value_list (
     const std::vector<Point<dim> > &points,
@@ -175,7 +175,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   double
   Q1WedgeFunction<dim>::laplacian (const Point<dim> &,
                                    const unsigned int) const
@@ -185,7 +185,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   Q1WedgeFunction<dim>::laplacian_list (const std::vector<Point<dim> > &points,
                                         std::vector<double>            &values,
@@ -201,7 +201,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   Tensor<1,dim>
   Q1WedgeFunction<dim>::gradient (const Point<dim>   &p,
                                   const unsigned int) const
@@ -215,7 +215,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void
   Q1WedgeFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
                                        std::vector<Tensor<1,dim> >    &gradients,
@@ -233,7 +233,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   Q1WedgeFunction<dim>::vector_gradient_list (
     const std::vector<Point<dim> > &points,
@@ -256,14 +256,14 @@ namespace Functions
 //////////////////////////////////////////////////////////////////////
 
 
-  template<int dim>
+  template <int dim>
   PillowFunction<dim>::PillowFunction (const double offset)
     :
     offset(offset)
   {}
 
 
-  template<int dim>
+  template <int dim>
   double
   PillowFunction<dim>::value (const Point<dim>   &p,
                               const unsigned int) const
@@ -282,7 +282,7 @@ namespace Functions
     return 0.;
   }
 
-  template<int dim>
+  template <int dim>
   void
   PillowFunction<dim>::value_list (const std::vector<Point<dim> > &points,
                                    std::vector<double>            &values,
@@ -313,7 +313,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   double
   PillowFunction<dim>::laplacian (const Point<dim>   &p,
                                   const unsigned int) const
@@ -334,7 +334,7 @@ namespace Functions
     return 0.;
   }
 
-  template<int dim>
+  template <int dim>
   void
   PillowFunction<dim>::laplacian_list (const std::vector<Point<dim> > &points,
                                        std::vector<double>            &values,
@@ -365,7 +365,7 @@ namespace Functions
       }
   }
 
-  template<int dim>
+  template <int dim>
   Tensor<1,dim>
   PillowFunction<dim>::gradient (const Point<dim>   &p,
                                  const unsigned int) const
@@ -391,7 +391,7 @@ namespace Functions
     return result;
   }
 
-  template<int dim>
+  template <int dim>
   void
   PillowFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
                                       std::vector<Tensor<1,dim> >    &gradients,
@@ -433,7 +433,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   double
   CosineFunction<dim>::value (const Point<dim>   &p,
                               const unsigned int) const
@@ -452,7 +452,7 @@ namespace Functions
     return 0.;
   }
 
-  template<int dim>
+  template <int dim>
   void
   CosineFunction<dim>::value_list (const std::vector<Point<dim> > &points,
                                    std::vector<double>            &values,
@@ -466,7 +466,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CosineFunction<dim>::vector_value_list (
     const std::vector<Point<dim> > &points,
@@ -484,7 +484,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   double
   CosineFunction<dim>::laplacian (const Point<dim>   &p,
                                   const unsigned int) const
@@ -503,7 +503,7 @@ namespace Functions
     return 0.;
   }
 
-  template<int dim>
+  template <int dim>
   void
   CosineFunction<dim>::laplacian_list (const std::vector<Point<dim> > &points,
                                        std::vector<double>            &values,
@@ -516,7 +516,7 @@ namespace Functions
       values[i] = laplacian(points[i]);
   }
 
-  template<int dim>
+  template <int dim>
   Tensor<1,dim>
   CosineFunction<dim>::gradient (const Point<dim>   &p,
                                  const unsigned int) const
@@ -542,7 +542,7 @@ namespace Functions
     return result;
   }
 
-  template<int dim>
+  template <int dim>
   void
   CosineFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
                                       std::vector<Tensor<1,dim> >    &gradients,
@@ -574,7 +574,7 @@ namespace Functions
       }
   }
 
-  template<int dim>
+  template <int dim>
   SymmetricTensor<2,dim>
   CosineFunction<dim>::hessian (const Point<dim>   &p,
                                 const unsigned int) const
@@ -621,7 +621,7 @@ namespace Functions
     return result;
   }
 
-  template<int dim>
+  template <int dim>
   void
   CosineFunction<dim>::hessian_list (const std::vector<Point<dim> >       &points,
                                      std::vector<SymmetricTensor<2,dim> > &hessians,
@@ -683,7 +683,7 @@ namespace Functions
   {}
 
 
-  template<int dim>
+  template <int dim>
   double
   CosineGradFunction<dim>::value (
     const Point<dim>   &p,
@@ -707,7 +707,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CosineGradFunction<dim>::vector_value (
     const Point<dim> &p,
@@ -734,7 +734,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CosineGradFunction<dim>::value_list (
     const std::vector<Point<dim> > &points,
@@ -768,7 +768,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CosineGradFunction<dim>::vector_value_list (
     const std::vector<Point<dim> > &points,
@@ -801,7 +801,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   double
   CosineGradFunction<dim>::laplacian (
     const Point<dim>   &p,
@@ -811,7 +811,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   Tensor<1,dim>
   CosineGradFunction<dim>::gradient (
     const Point<dim> &p,
@@ -844,7 +844,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CosineGradFunction<dim>::gradient_list (
     const std::vector<Point<dim> > &points,
@@ -884,7 +884,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CosineGradFunction<dim>::vector_gradient_list (
     const std::vector<Point<dim> > &points,
@@ -940,7 +940,7 @@ namespace Functions
 
 //////////////////////////////////////////////////////////////////////
 
-  template<int dim>
+  template <int dim>
   double
   ExpFunction<dim>::value (const Point<dim>   &p,
                            const unsigned int) const
@@ -959,7 +959,7 @@ namespace Functions
     return 0.;
   }
 
-  template<int dim>
+  template <int dim>
   void
   ExpFunction<dim>::value_list (const std::vector<Point<dim> > &points,
                                 std::vector<double>            &values,
@@ -988,7 +988,7 @@ namespace Functions
       }
   }
 
-  template<int dim>
+  template <int dim>
   double
   ExpFunction<dim>::laplacian (const Point<dim>   &p,
                                const unsigned int) const
@@ -1007,7 +1007,7 @@ namespace Functions
     return 0.;
   }
 
-  template<int dim>
+  template <int dim>
   void
   ExpFunction<dim>::laplacian_list (const std::vector<Point<dim> > &points,
                                     std::vector<double>            &values,
@@ -1036,7 +1036,7 @@ namespace Functions
       }
   }
 
-  template<int dim>
+  template <int dim>
   Tensor<1,dim>
   ExpFunction<dim>::gradient (const Point<dim>   &p,
                               const unsigned int) const
@@ -1062,7 +1062,7 @@ namespace Functions
     return result;
   }
 
-  template<int dim>
+  template <int dim>
   void
   ExpFunction<dim>::gradient_list (const std::vector<Point<dim> > &points,
                                    std::vector<Tensor<1,dim> >    &gradients,
@@ -1687,7 +1687,7 @@ namespace Functions
 
 //////////////////////////////////////////////////////////////////////
 
-  template<int dim>
+  template <int dim>
   JumpFunction<dim>::JumpFunction(const Point<dim> &direction,
                                   const double      steepness)
     :
@@ -1711,7 +1711,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   double
   JumpFunction<dim>::value (const Point<dim>   &p,
                             const unsigned int) const
@@ -1722,7 +1722,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void
   JumpFunction<dim>::value_list (const std::vector<Point<dim> > &p,
                                  std::vector<double>          &values,
@@ -1739,7 +1739,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   double
   JumpFunction<dim>::laplacian (const Point<dim>   &p,
                                 const unsigned int) const
@@ -1750,7 +1750,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   JumpFunction<dim>::laplacian_list (const std::vector<Point<dim> > &p,
                                      std::vector<double>          &values,
@@ -1771,7 +1771,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   Tensor<1,dim>
   JumpFunction<dim>::gradient (const Point<dim>   &p,
                                const unsigned int) const
@@ -1786,7 +1786,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void
   JumpFunction<dim>::gradient_list (const std::vector<Point<dim> > &p,
                                     std::vector<Tensor<1,dim> >  &gradients,
@@ -2163,7 +2163,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void
   Monomial<dim>::value_list (const std::vector<Point<dim> > &points,
                              std::vector<double>            &values,

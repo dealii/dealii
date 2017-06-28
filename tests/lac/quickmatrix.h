@@ -7,7 +7,7 @@
  * The diagonal is scaled to 1, resulting in an effective mesh width of 1/2.
  */
 
-template<typename number>
+template <typename number>
 class QuickMatrix
 {
 public:
@@ -27,13 +27,13 @@ protected:
 };
 
 
-template<typename number>
+template <typename number>
 QuickMatrix<number>::QuickMatrix(unsigned int nx, unsigned int ny)
   :
   nx(nx), ny(ny)
 {}
 
-template<typename number>
+template <typename number>
 template <typename number2>
 void
 QuickMatrix<number>::vmult(Vector<number2> &d,

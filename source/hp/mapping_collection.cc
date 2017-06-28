@@ -23,13 +23,13 @@ DEAL_II_NAMESPACE_OPEN
 namespace hp
 {
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   MappingCollection<dim,spacedim>::MappingCollection ()
   {}
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   MappingCollection<dim,spacedim>::
   MappingCollection (const Mapping<dim,spacedim> &mapping)
   {
@@ -39,7 +39,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   MappingCollection<dim,spacedim>::
   MappingCollection (const MappingCollection<dim,spacedim> &mapping_collection)
     :
@@ -60,7 +60,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   std::size_t
   MappingCollection<dim,spacedim>::memory_consumption () const
   {
@@ -70,7 +70,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   MappingCollection<dim,spacedim>::push_back (const Mapping<dim,spacedim> &new_mapping)
   {
@@ -92,7 +92,7 @@ namespace hp
      * reference to a static object that will be constructed the first time
      * this function is called.
      */
-    template<int dim, int spacedim>
+    template <int dim, int spacedim>
     MappingQGeneric<dim,spacedim> &
     get_static_mapping_q1()
     {
@@ -101,7 +101,7 @@ namespace hp
     }
   }
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   MappingCollection<dim,spacedim>
   StaticMappingQ1<dim,spacedim>::mapping_collection
     = MappingCollection<dim,spacedim>(get_static_mapping_q1<dim,spacedim>());

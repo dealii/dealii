@@ -33,7 +33,7 @@
 #include <fstream>
 #include <string>
 
-template<int dim>
+template <int dim>
 void
 check_function_consistency(
   const Function<dim> &f,
@@ -73,7 +73,7 @@ check_function_consistency(
 }
 
 
-template<int dim>
+template <int dim>
 void
 check_function_derivative(const Functions::FlowFunction<dim> &f,
                           unsigned int sub,

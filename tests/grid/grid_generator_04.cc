@@ -27,7 +27,7 @@
 #include <iomanip>
 
 
-template<int dim>
+template <int dim>
 void test(std::ostream &out)
 {
   GridOut go;

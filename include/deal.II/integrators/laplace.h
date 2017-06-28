@@ -48,7 +48,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
-    template<int dim>
+    template <int dim>
     void cell_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
@@ -527,7 +527,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2012
      */
-    template<int dim>
+    template <int dim>
     void
     ip_residual(
       Vector<double> &result1,
@@ -594,7 +594,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2012
      */
-    template<int dim>
+    template <int dim>
     void
     ip_residual(
       Vector<double> &result1,

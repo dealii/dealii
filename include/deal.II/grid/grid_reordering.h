@@ -672,17 +672,17 @@ public:
 
 
 // declaration of explicit specializations
-template<>
+template <>
 void
 GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &all_vertices,
                                                      std::vector<CellData<2> >    &cells);
 
-template<>
+template <>
 void
 GridReordering<2,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &all_vertices,
                                                        std::vector<CellData<2> >    &cells);
 
-template<>
+template <>
 void
 GridReordering<3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &all_vertices,
                                                      std::vector<CellData<3> >    &cells);

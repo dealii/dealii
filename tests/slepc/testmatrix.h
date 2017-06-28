@@ -75,7 +75,7 @@ FDDiagMatrix::diag_structure(SP &structure) const
 }
 
 
-template<typename MatrixType>
+template <typename MatrixType>
 inline
 void
 FDDiagMatrix::diag(MatrixType &A) const
@@ -91,7 +91,7 @@ FDDiagMatrix::diag(MatrixType &A) const
     }
 }
 
-template<typename number>
+template <typename number>
 inline
 void
 FDDiagMatrix::gnuplot_print(std::ostream &s, const Vector<number> &V) const
@@ -168,7 +168,7 @@ FD1DLaplaceMatrix::three_point_structure(SP &structure) const
 }
 
 
-template<typename MatrixType>
+template <typename MatrixType>
 inline
 void
 FD1DLaplaceMatrix::three_point(MatrixType &A) const

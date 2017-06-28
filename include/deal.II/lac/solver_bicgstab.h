@@ -129,7 +129,7 @@ public:
   /**
    * Solve primal problem only.
    */
-  template<typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename PreconditionerType>
   void
   solve (const MatrixType         &A,
          VectorType               &x,
@@ -254,7 +254,7 @@ private:
    * The iteration loop itself. The function returns a structure indicating
    * what happened in this function.
    */
-  template<typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename PreconditionerType>
   IterationResult
   iterate(const MatrixType         &A,
           const PreconditionerType &precondition);
@@ -266,7 +266,7 @@ private:
 #ifndef DOXYGEN
 
 
-template<typename VectorType>
+template <typename VectorType>
 SolverBicgstab<VectorType>::IterationResult::IterationResult
 (const bool                 breakdown,
  const SolverControl::State state,
@@ -280,7 +280,7 @@ SolverBicgstab<VectorType>::IterationResult::IterationResult
 {}
 
 
-template<typename VectorType>
+template <typename VectorType>
 SolverBicgstab<VectorType>::SolverBicgstab (SolverControl            &cn,
                                             VectorMemory<VectorType> &mem,
                                             const AdditionalData     &data)
@@ -291,7 +291,7 @@ SolverBicgstab<VectorType>::SolverBicgstab (SolverControl            &cn,
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 SolverBicgstab<VectorType>::SolverBicgstab (SolverControl        &cn,
                                             const AdditionalData &data)
   :
@@ -317,7 +317,7 @@ SolverBicgstab<VectorType>::SolverBicgstab (SolverControl        &cn,
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 SolverBicgstab<VectorType>::~SolverBicgstab ()
 {}
 
@@ -353,7 +353,7 @@ SolverBicgstab<VectorType>::start (const MatrixType &A)
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 void
 SolverBicgstab<VectorType>::print_vectors(const unsigned int,
                                           const VectorType &,
@@ -363,8 +363,8 @@ SolverBicgstab<VectorType>::print_vectors(const unsigned int,
 
 
 
-template<typename VectorType>
-template<typename MatrixType, typename PreconditionerType>
+template <typename VectorType>
+template <typename MatrixType, typename PreconditionerType>
 typename SolverBicgstab<VectorType>::IterationResult
 SolverBicgstab<VectorType>::iterate(const MatrixType         &A,
                                     const PreconditionerType &precondition)
@@ -450,8 +450,8 @@ SolverBicgstab<VectorType>::iterate(const MatrixType         &A,
 }
 
 
-template<typename VectorType>
-template<typename MatrixType, typename PreconditionerType>
+template <typename VectorType>
+template <typename MatrixType, typename PreconditionerType>
 void
 SolverBicgstab<VectorType>::solve(const MatrixType         &A,
                                   VectorType               &x,

@@ -31,7 +31,7 @@
 #include <fstream>
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim,spacedim> tr(MPI_COMM_WORLD);

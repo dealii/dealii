@@ -187,7 +187,7 @@ normal_vector (const Triangulation<2, 2>::face_iterator &face,
 
 
 
-template<>
+template <>
 Tensor<1,3>
 Manifold<3, 3>::
 normal_vector (const Triangulation<3, 3>::face_iterator &face,

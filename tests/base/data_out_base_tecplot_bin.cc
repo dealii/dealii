@@ -50,7 +50,7 @@ void check(DataOutBase::TecplotFlags flags,
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void check_all()
 {
   char name[100];

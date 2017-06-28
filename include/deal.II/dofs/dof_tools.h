@@ -665,7 +665,7 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template<typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void
   make_flux_sparsity_pattern (const DoFHandlerType &dof_handler,
                               SparsityPatternType  &sparsity_pattern);
@@ -678,7 +678,7 @@ namespace DoFTools
    *
    * @ingroup constraints
    */
-  template<typename DoFHandlerType, typename SparsityPatternType>
+  template <typename DoFHandlerType, typename SparsityPatternType>
   void
   make_flux_sparsity_pattern (const DoFHandlerType      &dof_handler,
                               SparsityPatternType       &sparsity_pattern,
@@ -1081,7 +1081,7 @@ namespace DoFTools
    *
    * @author Matthias Maier, 2012 - 2015
    */
-  template<typename FaceIterator>
+  template <typename FaceIterator>
   void
   make_periodicity_constraints
   (const FaceIterator                          &face_1,
@@ -1117,7 +1117,7 @@ namespace DoFTools
    *
    * @author Daniel Arndt, Matthias Maier, 2013 - 2015
    */
-  template<typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   make_periodicity_constraints
   (const std::vector<GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator> >
@@ -1158,7 +1158,7 @@ namespace DoFTools
    *
    * @author Matthias Maier, 2012
    */
-  template<typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   make_periodicity_constraints
   (const DoFHandlerType     &dof_handler,
@@ -1194,7 +1194,7 @@ namespace DoFTools
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions"
    * for further information.
    */
-  template<typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   make_periodicity_constraints
   (const DoFHandlerType     &dof_handler,

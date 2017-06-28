@@ -40,7 +40,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   // 0 components is not okay

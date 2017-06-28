@@ -698,7 +698,7 @@ compute (const Point<dim>            &p,
 
 
 
-template<int dim>
+template <int dim>
 unsigned int
 AnisotropicPolynomials<dim>::n() const
 {

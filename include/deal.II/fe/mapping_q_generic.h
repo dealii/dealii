@@ -700,7 +700,7 @@ protected:
 
 #ifndef DOXYGEN
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 inline
 const double &
 MappingQGeneric<dim,spacedim>::InternalData::shape (const unsigned int qpoint,
@@ -714,7 +714,7 @@ MappingQGeneric<dim,spacedim>::InternalData::shape (const unsigned int qpoint,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 inline
 double &
 MappingQGeneric<dim,spacedim>::InternalData::shape (const unsigned int qpoint,
@@ -727,7 +727,7 @@ MappingQGeneric<dim,spacedim>::InternalData::shape (const unsigned int qpoint,
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 inline
 const Tensor<1,dim> &
 MappingQGeneric<dim,spacedim>::InternalData::derivative (const unsigned int qpoint,
@@ -741,7 +741,7 @@ MappingQGeneric<dim,spacedim>::InternalData::derivative (const unsigned int qpoi
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 inline
 Tensor<1,dim> &
 MappingQGeneric<dim,spacedim>::InternalData::derivative (const unsigned int qpoint,

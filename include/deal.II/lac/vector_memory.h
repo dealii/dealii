@@ -67,7 +67,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Guido Kanschat, 1998-2003
  */
-template<typename VectorType = dealii::Vector<double> >
+template <typename VectorType = dealii::Vector<double> >
 class VectorMemory : public Subscriptor
 {
 public:
@@ -169,7 +169,7 @@ public:
  * This class allocates and deletes vectors as needed from the global heap,
  * i.e. performs no specially adapted actions for memory management.
  */
-template<typename VectorType = dealii::Vector<double> >
+template <typename VectorType = dealii::Vector<double> >
 class PrimitiveVectorMemory : public VectorMemory<VectorType>
 {
 public:
@@ -232,7 +232,7 @@ public:
  *
  * @author Guido Kanschat, 1999, 2007
  */
-template<typename VectorType = dealii::Vector<double> >
+template <typename VectorType = dealii::Vector<double> >
 class GrowingVectorMemory : public VectorMemory<VectorType>
 {
 public:

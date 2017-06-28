@@ -34,7 +34,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<int dim, typename Number>
+template <int dim, typename Number>
 MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree ()
   :
   fe_degree(0),
@@ -45,7 +45,7 @@ MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree ()
 
 
 
-template<int dim, typename Number>
+template <int dim, typename Number>
 MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree (const MGConstrainedDoFs &mg_c)
   :
   fe_degree(0),

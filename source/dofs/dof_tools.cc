@@ -484,7 +484,7 @@ namespace DoFTools
 
 
 
-  template<typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   extract_level_dofs (const unsigned int    level,
                       const DoFHandlerType &dof,
@@ -536,7 +536,7 @@ namespace DoFTools
 
 
 
-  template<typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   extract_level_dofs (const unsigned int    level,
                       const DoFHandlerType &dof,
@@ -2081,7 +2081,7 @@ namespace DoFTools
   }
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   map_dofs_to_support_points(const hp::MappingCollection<dim, spacedim> &mapping,
                              const hp::DoFHandler<dim, spacedim>        &dof_handler,
@@ -2121,7 +2121,7 @@ namespace DoFTools
   }
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   map_dofs_to_support_points(const hp::MappingCollection<dim, spacedim> &mapping,
                              const hp::DoFHandler<dim, spacedim>        &dof_handler,
@@ -2181,7 +2181,7 @@ namespace DoFTools
   }
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   convert_couplings_to_blocks
   (const DoFHandler<dim,spacedim>  &dof_handler,
@@ -2207,7 +2207,7 @@ namespace DoFTools
   }
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   convert_couplings_to_blocks (const hp::DoFHandler<dim,spacedim> &dof_handler,
                                const Table<2, Coupling>           &table,

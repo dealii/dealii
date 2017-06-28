@@ -266,7 +266,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2011
      */
-    template<int dim>
+    template <int dim>
     void
     u_dot_n_matrix (
       FullMatrix<double> &M,
@@ -303,7 +303,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2011
      */
-    template<int dim, typename number>
+    template <int dim, typename number>
     void
     u_dot_n_residual (
       Vector<number> &result,
@@ -339,7 +339,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2013
      */
-    template<int dim, typename number>
+    template <int dim, typename number>
     void
     u_times_n_residual (
       Vector<number> &result,
@@ -374,7 +374,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2011
      */
-    template<int dim>
+    template <int dim>
     void
     u_dot_n_matrix (
       FullMatrix<double> &M11,
@@ -473,7 +473,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2011
      */
-    template<int dim>
+    template <int dim>
     void
     u_dot_n_jump_matrix (
       FullMatrix<double> &M11,

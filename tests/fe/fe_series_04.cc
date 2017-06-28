@@ -54,7 +54,7 @@ bfloat(C(3)), nouns;
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 class LegendreFunction : public Function<dim>
 {
 public:
@@ -67,7 +67,7 @@ public:
                        const unsigned int component = 0 ) const;
 };
 
-template<int dim>
+template <int dim>
 double LegendreFunction<dim>::value(const Point<dim> &point,
                                     const unsigned int ) const
 {
@@ -79,7 +79,7 @@ double LegendreFunction<dim>::value(const Point<dim> &point,
 }
 
 
-template<int dim>
+template <int dim>
 void test(const LegendreFunction<dim> &func,
           const unsigned int poly_degree)
 {

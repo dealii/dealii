@@ -25,16 +25,16 @@
 #include <fstream>
 #include <iomanip>
 
-template<int dim>
+template <int dim>
 Point<dim> trans_func(Point<dim> &p);
 
-template<>
+template <>
 Point<2> trans_func(Point<2> &p)
 {
   Point<2> r(p(0)+p(1)*p(1),p(1));
   return r;
 }
-template<>
+template <>
 Point<3> trans_func(Point<3> &p)
 {
   Point<3> r(p(0)+p(1)*p(1),p(1),p(2));

@@ -33,7 +33,7 @@
 using namespace Polynomials;
 
 
-template<int dim, class PolynomialType>
+template <int dim, class PolynomialType>
 void check_poly(const Point<dim>     &x,
                 const PolynomialType &p)
 {

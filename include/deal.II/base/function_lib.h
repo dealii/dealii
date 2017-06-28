@@ -48,7 +48,7 @@ namespace Functions
    * @ingroup functions
    * @author: Guido Kanschat, 1999
    */
-  template<int dim>
+  template <int dim>
   class SquareFunction : public Function<dim>
   {
   public:
@@ -82,7 +82,7 @@ namespace Functions
    * @ingroup functions
    * @author: Guido Kanschat, 2000
    */
-  template<int dim>
+  template <int dim>
   class Q1WedgeFunction : public Function<dim>
   {
   public:
@@ -137,7 +137,7 @@ namespace Functions
    * @ingroup functions
    * @author: Guido Kanschat, 1999
    */
-  template<int dim>
+  template <int dim>
   class PillowFunction : public Function<dim>
   {
   public:
@@ -199,7 +199,7 @@ namespace Functions
    * @ingroup functions
    * @author Guido Kanschat, 1999
    */
-  template<int dim>
+  template <int dim>
   class CosineFunction : public Function<dim>
   {
   public:
@@ -260,7 +260,7 @@ namespace Functions
    * @ingroup functions
    * @author Guido Kanschat, 2010
    */
-  template<int dim>
+  template <int dim>
   class CosineGradFunction : public Function<dim>
   {
   public:
@@ -302,7 +302,7 @@ namespace Functions
    * @ingroup functions
    * @author Guido Kanschat, 1999
    */
-  template<int dim>
+  template <int dim>
   class ExpFunction : public Function<dim>
   {
   public:
@@ -527,7 +527,7 @@ namespace Functions
    * @ingroup functions
    * @author: Guido Kanschat, 2000
    */
-  template<int dim>
+  template <int dim>
   class JumpFunction : public Function<dim>
   {
   public:
@@ -888,7 +888,7 @@ namespace Functions
    * @ingroup functions
    * @author Guido Kanschat, 2001, 2002
    */
-  template<int dim>
+  template <int dim>
   class CutOffFunctionLinfty : public CutOffFunctionBase<dim>
   {
   public:
@@ -933,7 +933,7 @@ namespace Functions
    * @ingroup functions
    * @author Guido Kanschat, 2001, 2002
    */
-  template<int dim>
+  template <int dim>
   class CutOffFunctionW1 : public CutOffFunctionBase<dim>
   {
   public:
@@ -980,7 +980,7 @@ namespace Functions
    * @ingroup functions
    * @author Guido Kanschat, 2001, 2002
    */
-  template<int dim>
+  template <int dim>
   class CutOffFunctionCinfty : public CutOffFunctionBase<dim>
   {
   public:

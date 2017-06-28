@@ -180,7 +180,7 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
 /*
  * Print out the face vertices as well as the orientation of a match:
  */
-template<typename FaceIterator>
+template <typename FaceIterator>
 void print_match(const FaceIterator &face_1,
                  const FaceIterator &face_2,
                  const std::bitset<3> &orientation)

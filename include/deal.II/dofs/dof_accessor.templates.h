@@ -687,7 +687,7 @@ namespace internal
       }
 
 
-      template<int dim, int spacedim>
+      template <int dim, int spacedim>
       static
       types::global_dof_index
       mg_vertex_dof_index (const dealii::DoFHandler<dim,spacedim> &dof_handler,
@@ -699,7 +699,7 @@ namespace internal
       }
 
 
-      template<int dim, int spacedim>
+      template <int dim, int spacedim>
       static
       types::global_dof_index
       mg_vertex_dof_index (const dealii::hp::DoFHandler<dim,spacedim> &,
@@ -712,7 +712,7 @@ namespace internal
       }
 
 
-      template<int dim, int spacedim>
+      template <int dim, int spacedim>
       static
       void
       set_mg_vertex_dof_index (dealii::DoFHandler<dim,spacedim> &dof_handler,
@@ -725,7 +725,7 @@ namespace internal
       }
 
 
-      template<int dim, int spacedim>
+      template <int dim, int spacedim>
       static
       void
       set_mg_vertex_dof_index (dealii::hp::DoFHandler<dim,spacedim> &,
@@ -1244,7 +1244,7 @@ namespace internal
       }
 
 
-      template<int dim, int spacedim>
+      template <int dim, int spacedim>
       static
       types::global_dof_index
       get_vertex_dof_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
@@ -1302,7 +1302,7 @@ namespace internal
        * Return the number of different finite elements that are active on a
        * given vertex.
        */
-      template<int dim, int spacedim>
+      template <int dim, int spacedim>
       static
       unsigned int
       n_active_vertex_fe_indices (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
@@ -1349,7 +1349,7 @@ namespace internal
        * Return the fe index of the n-th finite element active on a given
        * vertex.
        */
-      template<int dim, int spacedim>
+      template <int dim, int spacedim>
       static
       unsigned int
       nth_active_vertex_fe_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
@@ -1406,7 +1406,7 @@ namespace internal
        * Return whether a particular finite element index is active on the
        * specified vertex.
        */
-      template<int dim, int spacedim>
+      template <int dim, int spacedim>
       static
       bool
       fe_is_active_on_vertex (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
@@ -1456,7 +1456,7 @@ namespace internal
           }
       }
 
-      template<typename DoFHandlerType, bool level_dof_access>
+      template <typename DoFHandlerType, bool level_dof_access>
       static
       void set_mg_dof_indices (const dealii::DoFAccessor<1,DoFHandlerType,level_dof_access> &,
                                const int,
@@ -1468,7 +1468,7 @@ namespace internal
 
 
 
-      template<typename DoFHandlerType, bool level_dof_access>
+      template <typename DoFHandlerType, bool level_dof_access>
       static
       void set_mg_dof_indices (dealii::DoFAccessor<2, DoFHandlerType,level_dof_access> &accessor,
                                const int level,
@@ -1495,7 +1495,7 @@ namespace internal
 
 
 
-      template<typename DoFHandlerType, bool level_dof_access>
+      template <typename DoFHandlerType, bool level_dof_access>
       static
       void set_mg_dof_indices
       (const dealii::DoFAccessor<3, DoFHandlerType,level_dof_access>      &accessor,
@@ -1614,7 +1614,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::dof_index (const unsigned int 
 }
 
 
-template<int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, typename DoFHandlerType, bool level_dof_access>
 inline
 types::global_dof_index
 DoFAccessor<structdim, DoFHandlerType,level_dof_access>::mg_dof_index (const int level,
@@ -1710,7 +1710,7 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::vertex_dof_index
 }
 
 
-template<int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, typename DoFHandlerType, bool level_dof_access>
 inline
 types::global_dof_index
 DoFAccessor<structdim, DoFHandlerType,level_dof_access>::mg_vertex_dof_index (const int level,
@@ -1751,7 +1751,7 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_vertex_dof_index (c
 }
 
 
-template<int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, typename DoFHandlerType, bool level_dof_access>
 inline
 void
 DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_vertex_dof_index
@@ -1778,7 +1778,7 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_vertex_dof_index
 }
 
 
-template<int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, typename DoFHandlerType, bool level_dof_access>
 inline
 void
 DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_dof_index
@@ -1942,7 +1942,7 @@ namespace internal
 
 
 
-    template<typename DoFHandlerType, bool level_dof_access>
+    template <typename DoFHandlerType, bool level_dof_access>
     void get_mg_dof_indices
     (const dealii::DoFAccessor<1, DoFHandlerType,level_dof_access> &accessor,
      const int                                                      level,
@@ -1967,7 +1967,7 @@ namespace internal
 
 
 
-    template<typename DoFHandlerType, bool level_dof_access>
+    template <typename DoFHandlerType, bool level_dof_access>
     void get_mg_dof_indices (const dealii::DoFAccessor<2, DoFHandlerType,level_dof_access> &accessor,
                              const int level,
                              std::vector<types::global_dof_index> &dof_indices,
@@ -1995,7 +1995,7 @@ namespace internal
 
 
 
-    template<typename DoFHandlerType, bool level_dof_access>
+    template <typename DoFHandlerType, bool level_dof_access>
     void get_mg_dof_indices
     (const dealii::DoFAccessor<3, DoFHandlerType,level_dof_access> &accessor,
      const int                                                      level,
@@ -2100,7 +2100,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::get_dof_indices
 
 
 
-template<int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, typename DoFHandlerType, bool level_dof_access>
 inline
 void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::get_mg_dof_indices
 (const int                             level,
@@ -2152,7 +2152,7 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::get_mg_dof_indices
 }
 
 
-template<int structdim, typename DoFHandlerType, bool level_dof_access>
+template <int structdim, typename DoFHandlerType, bool level_dof_access>
 inline
 void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_dof_indices
 (const int                                   level,
@@ -2218,7 +2218,7 @@ namespace internal
     }
 
 
-    template<bool level_dof_access>
+    template <bool level_dof_access>
     inline
     typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<2,2>, level_dof_access>::quad_iterator
     get_quad(const dealii::Triangulation<2,2> *,
@@ -2229,7 +2229,7 @@ namespace internal
       return typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<2,2>, level_dof_access>::line_iterator();
     }
 
-    template<bool level_dof_access>
+    template <bool level_dof_access>
     inline
     typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<2,3>, level_dof_access>::quad_iterator
     get_quad(const dealii::Triangulation<2,3> *,
@@ -2240,7 +2240,7 @@ namespace internal
       return typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<2,3>, level_dof_access>::line_iterator();
     }
 
-    template<bool level_dof_access>
+    template <bool level_dof_access>
     inline
     typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<2,2>, level_dof_access>::quad_iterator
     get_quad(const dealii::Triangulation<2,2> *,
@@ -2251,7 +2251,7 @@ namespace internal
       return typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<2,2>, level_dof_access>::line_iterator();
     }
 
-    template<bool level_dof_access>
+    template <bool level_dof_access>
     inline
     typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<2,3>, level_dof_access>::quad_iterator
     get_quad(const dealii::Triangulation<2,3> *,
@@ -3585,7 +3585,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::get_dof_indices
 
 
 
-template<typename DoFHandlerType, bool level_dof_access>
+template <typename DoFHandlerType, bool level_dof_access>
 inline
 void DoFCellAccessor<DoFHandlerType,level_dof_access>::get_mg_dof_indices
 (std::vector<types::global_dof_index> &dof_indices) const
@@ -3595,7 +3595,7 @@ void DoFCellAccessor<DoFHandlerType,level_dof_access>::get_mg_dof_indices
 
 
 
-template<typename DoFHandlerType, bool level_dof_access>
+template <typename DoFHandlerType, bool level_dof_access>
 inline
 void DoFCellAccessor<DoFHandlerType,level_dof_access>::set_mg_dof_indices
 (const std::vector<types::global_dof_index> &dof_indices)
@@ -3605,7 +3605,7 @@ void DoFCellAccessor<DoFHandlerType,level_dof_access>::set_mg_dof_indices
 
 
 
-template<typename DoFHandlerType, bool level_dof_access>
+template <typename DoFHandlerType, bool level_dof_access>
 inline
 void DoFCellAccessor<DoFHandlerType,level_dof_access>::get_active_or_mg_dof_indices
 (std::vector<types::global_dof_index> &dof_indices) const

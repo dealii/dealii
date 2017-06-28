@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Uwe Koecher, 2017
  */
-template<typename T>
+template <typename T>
 struct is_serial_vector;
 
 

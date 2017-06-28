@@ -37,7 +37,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void
 check(const FiniteElement<dim> &fe1,
       const FiniteElement<dim> &fe2)

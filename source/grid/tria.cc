@@ -11991,7 +11991,7 @@ Triangulation<dim,spacedim>::update_periodic_face_map ()
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 Triangulation<dim, spacedim>::clear_despite_subscriptions()
 {
@@ -13553,7 +13553,7 @@ Triangulation<dim, spacedim>::memory_consumption () const
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList () noexcept
 {
   // don't do anything here. the compiler will automatically convert

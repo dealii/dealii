@@ -43,7 +43,7 @@
 #include <deal.II/fe/mapping_q_eulerian.h>
 #include <deal.II/fe/mapping_fe_field.h>
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test(const unsigned int refs,
           const unsigned int degree,
           const unsigned int subdivisions)

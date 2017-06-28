@@ -40,7 +40,7 @@
 #include <fstream>
 #include <cstdlib>
 
-template<int dim>
+template <int dim>
 class MyFunction : public Function<dim>
 {
 public:
@@ -58,7 +58,7 @@ public:
   };
 };
 
-template<int dim>
+template <int dim>
 void test(std::ostream & /*out*/)
 {
   MyFunction<dim> func;

@@ -40,7 +40,7 @@
 #include <fstream>
 #include <sstream>
 
-template<int dim>
+template <int dim>
 void test()
 {
   Assert (dim == 3, ExcNotImplemented());

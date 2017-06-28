@@ -108,7 +108,7 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename PreconditionerType>
   void
   solve (const MatrixType         &A,
          VectorType               &x,
@@ -118,7 +118,7 @@ public:
   /**
    * Solve $A^Tx=b$ for $x$.
    */
-  template<typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename PreconditionerType>
   void
   Tsolve (const MatrixType         &A,
           VectorType               &x,

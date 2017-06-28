@@ -48,7 +48,7 @@ Additional Information:
 
 #include <fstream>
 
-template<int dim>
+template <int dim>
 void output(parallel::distributed::Triangulation<dim> &tr)
 {
   const std::string filename = ("mesh." +
@@ -81,7 +81,7 @@ void output(parallel::distributed::Triangulation<dim> &tr)
 
 }
 
-template<int dim>
+template <int dim>
 void test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

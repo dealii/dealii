@@ -56,7 +56,7 @@ void print_formatted (const FullMatrix<number> &A,
 
 
 
-template<int dim>
+template <int dim>
 void test_embedding (const FiniteElement<dim> &fe)
 {
   const std::string refine_case_names[8]=
@@ -98,7 +98,7 @@ void test_embedding (const FiniteElement<dim> &fe)
 }
 
 
-template<int dim>
+template <int dim>
 void test_projection (const FiniteElement<dim> &fe1,
                       const FiniteElement<dim> &fe2,
                       std::ostream &out)
@@ -120,7 +120,7 @@ void test_projection (const FiniteElement<dim> &fe1,
 }
 
 
-template<int dim>
+template <int dim>
 void test_projection (std::ostream &out)
 {
   FE_DGQ<dim> q0(0);

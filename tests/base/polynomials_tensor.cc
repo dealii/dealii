@@ -30,7 +30,7 @@
 
 using namespace std;
 
-template<int dim, class PolynomialType>
+template <int dim, class PolynomialType>
 void check_point (const Point<dim>     &x,
                   const PolynomialType &p)
 {
@@ -58,7 +58,7 @@ void check_point (const Point<dim>     &x,
 }
 
 
-template<int dim>
+template <int dim>
 void check_bdm ()
 {
   Point<dim> x;
@@ -79,7 +79,7 @@ void check_bdm ()
   check_point(x, p4);
 }
 
-template<int dim>
+template <int dim>
 void check_rt ()
 {
   Point<dim> x;

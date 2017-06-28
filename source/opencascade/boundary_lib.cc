@@ -286,7 +286,7 @@ namespace OpenCASCADE
     tolerance(tolerance)
   {}
 
-  template<>
+  template <>
   Point<2>
   NURBSPatchManifold<2, 3>::
   pull_back(const Point<3> &space_point) const
@@ -302,7 +302,7 @@ namespace OpenCASCADE
     return Point<2>(u,v);
   }
 
-  template<>
+  template <>
   Point<3>
   NURBSPatchManifold<2, 3>::
   push_forward(const Point<2> &chart_point) const
@@ -310,7 +310,7 @@ namespace OpenCASCADE
     return ::dealii::OpenCASCADE::push_forward(face, chart_point[0], chart_point[1]);
   }
 
-  template<>
+  template <>
   DerivativeForm<1,2,3>
   NURBSPatchManifold<2, 3>::
   push_forward_gradient(const Point<2> &chart_point) const
@@ -332,7 +332,7 @@ namespace OpenCASCADE
     return DX;
   }
 
-  template<>
+  template <>
   std::tuple<double, double, double, double>
   NURBSPatchManifold<2, 3>::
   get_uv_bounds() const

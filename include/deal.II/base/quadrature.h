@@ -325,7 +325,7 @@ private:
 // -------------------  inline and template functions ----------------
 
 
-template<int dim>
+template <int dim>
 inline
 unsigned int
 Quadrature<dim>::size () const

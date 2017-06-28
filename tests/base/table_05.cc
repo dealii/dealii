@@ -25,7 +25,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/table.h>
 
-template<int dim>
+template <int dim>
 void test()
 {
   dealii::TableIndices<dim> new_size;

@@ -143,7 +143,7 @@ namespace FETools
    * While the first vector is checked to have the correct size, the second
    * one is reinitialized for convenience.
    */
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void compute_component_wise(
     const FiniteElement<dim,spacedim>                &fe,
     std::vector<unsigned int>               &renumbering,
@@ -164,7 +164,7 @@ namespace FETools
    * indicates the index which this degree of freedom receives in a numbering
    * scheme, where the first block is numbered completely before the second.
    */
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void compute_block_renumbering (
     const FiniteElement<dim,spacedim>  &fe,
     std::vector<types::global_dof_index> &renumbering,

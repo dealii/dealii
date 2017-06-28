@@ -36,7 +36,7 @@
 #include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
-template<typename SolverType, typename MatrixType, typename VectorType>
+template <typename SolverType, typename MatrixType, typename VectorType>
 void
 check_solve( SolverType &solver,
              const unsigned int solver_number,

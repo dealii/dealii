@@ -166,7 +166,7 @@ test_simple(DoFHandler<dim> &dofs, bool faces)
 }
 
 
-template<int dim>
+template <int dim>
 void
 test(const FiniteElement<dim> &fe)
 {

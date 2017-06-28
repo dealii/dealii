@@ -55,7 +55,7 @@ using namespace dealii;
 // uncomment when debugging
 // #define DATA_OUT_FE_ENRICHED
 
-template<int dim>
+template <int dim>
 class EnrichmentFunction : public Function<dim>
 {
 public:
@@ -81,7 +81,7 @@ public:
 };
 
 
-template<int dim>
+template <int dim>
 void test3()
 {
   deallog << "FEValues.get_function_values()"<<std::endl;

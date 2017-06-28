@@ -45,7 +45,7 @@ Point<dim> point(double x=0, double y=0, double z=0)
 
 // The simplest test case is to create a parallelepiped grid with a
 // number of subdivisions and output the result.
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void check (bool subdivide)
 {
   deallog << "dim " << dim << " spacedim " << spacedim << std::endl;

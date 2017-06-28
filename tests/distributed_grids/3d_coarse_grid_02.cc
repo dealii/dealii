@@ -31,7 +31,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void test(const char *filename)
 {
   const char *p = strrchr(filename,'/');

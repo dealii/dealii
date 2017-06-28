@@ -20,7 +20,7 @@
 #include <deal.II/base/derivative_form.h>
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   DerivativeForm<1,dim,spacedim> dF;

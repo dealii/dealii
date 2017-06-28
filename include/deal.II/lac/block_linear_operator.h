@@ -30,7 +30,7 @@ namespace internal
 {
   namespace BlockLinearOperator
   {
-    template<typename PayloadBlockType = internal::LinearOperator::EmptyPayload>
+    template <typename PayloadBlockType = internal::LinearOperator::EmptyPayload>
     class EmptyBlockPayload;
   }
 }
@@ -184,7 +184,7 @@ public:
    * an object @p op for which the conversion function
    * <code>block_operator</code> is defined.
    */
-  template<typename Op>
+  template <typename Op>
   BlockLinearOperator(const Op &op)
   {
     *this = block_operator<Range, Domain, BlockPayload, Op>(op);
@@ -195,7 +195,7 @@ public:
    * LinearOperator. This constructor calls the corresponding block_operator()
    * specialization.
    */
-  template<size_t m, size_t n>
+  template <size_t m, size_t n>
   BlockLinearOperator(const std::array<std::array<BlockType, n>, m> &ops)
   {
     *this = block_operator<m, n, Range, Domain, BlockPayload>(ops);
@@ -206,7 +206,7 @@ public:
    * @p ops of LinearOperator. This constructor calls the corresponding
    * block_operator() specialization.
    */
-  template<size_t m>
+  template <size_t m>
   BlockLinearOperator(const std::array<BlockType, m> &ops)
   {
     *this = block_diagonal_operator<m, Range, Domain, BlockPayload>(ops);
@@ -386,7 +386,7 @@ namespace internal
      *
      * @ingroup LAOperators
      */
-    template<typename PayloadBlockType>
+    template <typename PayloadBlockType>
     class EmptyBlockPayload
     {
     public:

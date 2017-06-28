@@ -169,7 +169,7 @@ namespace internal
      * in the use cases for this class, but be careful when using it in other
      * contexts.
      */
-    template<typename Number>
+    template <typename Number>
     struct FPArrayComparator
     {
       FPArrayComparator (const Number scaling);

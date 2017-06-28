@@ -38,7 +38,7 @@
     deallog << # el << '<' << dim << ">(" << deg << ')' << std::endl; \
     print_matrix(tr ## dim, l, fe, #el); }
 
-template<int dim>
+template <int dim>
 inline void
 print_matrix(Triangulation<dim> &tr,
              unsigned int level,

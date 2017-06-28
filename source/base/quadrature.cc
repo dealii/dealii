@@ -285,7 +285,7 @@ Quadrature<dim>::memory_consumption () const
 
 
 //---------------------------------------------------------------------------
-template<int dim>
+template <int dim>
 QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx)
   : Quadrature<dim>(qx.size())
 {
@@ -301,7 +301,7 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx)
 
 
 
-template<int dim>
+template <int dim>
 QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
                                 const Quadrature<1> &qy)
   : Quadrature<dim>(qx.size()
@@ -321,7 +321,7 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
 
 
 
-template<int dim>
+template <int dim>
 QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
                                 const Quadrature<1> &qy,
                                 const Quadrature<1> &qz)
@@ -1526,7 +1526,7 @@ QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature)
 }
 
 
-// template<>
+// template <>
 // void
 // QIterated<1>::fill(Quadrature<1>& dst,
 //                 const Quadrature<1> &base_quadrature,

@@ -31,7 +31,7 @@
 
 #include <fstream>
 
-template<int dim>
+template <int dim>
 void pack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
                     const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
                     void *data)
@@ -61,7 +61,7 @@ void pack_function (const typename parallel::distributed::Triangulation<dim,dim>
   ++some_number;
 }
 
-template<int dim>
+template <int dim>
 void unpack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
                       const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,
                       const void *data)
@@ -88,7 +88,7 @@ void unpack_function (const typename parallel::distributed::Triangulation<dim,di
 }
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

@@ -17,7 +17,7 @@
 
 using namespace dealii;
 
-template<typename T>
+template <typename T>
 struct EqualityWithSizeofTest
 {
   EqualityWithSizeofTest()
@@ -34,7 +34,7 @@ struct EqualityWithSizeofTest
 };
 
 
-template<typename T>
+template <typename T>
 struct EqualityWithSizeofTest<T *>
 {
   EqualityWithSizeofTest()

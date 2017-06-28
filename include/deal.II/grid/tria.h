@@ -51,7 +51,7 @@ template <int dim, int spacedim> class Manifold;
 
 namespace GridTools
 {
-  template<typename CellIterator>  struct PeriodicFacePair;
+  template <typename CellIterator>  struct PeriodicFacePair;
 }
 
 template <int, int, int> class TriaAccessor;
@@ -2042,12 +2042,12 @@ public:
    * functions below. It takes an iterator range and returns the sum of
    * values.
    */
-  template<typename T>
+  template <typename T>
   struct CellWeightSum
   {
     typedef T result_type;
 
-    template<typename InputIterator>
+    template <typename InputIterator>
     T operator()(InputIterator first, InputIterator last) const
     {
       return std::accumulate (first, last, T());

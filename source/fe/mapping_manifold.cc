@@ -41,12 +41,12 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 MappingManifold<dim,spacedim>::InternalData::InternalData ()
 {}
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 std::size_t
 MappingManifold<dim,spacedim>::InternalData::memory_consumption () const
 {
@@ -173,19 +173,19 @@ initialize_face (const UpdateFlags      update_flags,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 MappingManifold<dim,spacedim>::MappingManifold ()
 {}
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 MappingManifold<dim,spacedim>::MappingManifold (const MappingManifold<dim,spacedim> &)
 {}
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Mapping<dim,spacedim> *
 MappingManifold<dim,spacedim>::clone () const
 {
@@ -194,7 +194,7 @@ MappingManifold<dim,spacedim>::clone () const
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Point<dim>
 MappingManifold<dim,spacedim>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &,
@@ -206,7 +206,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Point<spacedim>
 MappingManifold<dim,spacedim>::
 transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -237,7 +237,7 @@ class MappingManifold<3,4>
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 UpdateFlags
 MappingManifold<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 {
@@ -304,7 +304,7 @@ MappingManifold<dim,spacedim>::requires_update_flags (const UpdateFlags in) cons
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 typename MappingManifold<dim,spacedim>::InternalData *
 MappingManifold<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                          const Quadrature<dim> &q) const
@@ -317,7 +317,7 @@ MappingManifold<dim,spacedim>::get_data (const UpdateFlags update_flags,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 typename MappingManifold<dim,spacedim>::InternalData *
 MappingManifold<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
                                               const Quadrature<dim-1> &quadrature) const
@@ -332,7 +332,7 @@ MappingManifold<dim,spacedim>::get_face_data (const UpdateFlags        update_fl
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 typename MappingManifold<dim,spacedim>::InternalData *
 MappingManifold<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                  const Quadrature<dim-1>& quadrature) const
@@ -356,7 +356,7 @@ namespace internal
      * are no Manifolds associated to faces. The mapping argument is
      * only used to help the compiler infer dim and spacedim.
      */
-    template<int spacedim>
+    template <int spacedim>
     const dealii::Manifold<1, spacedim> &
     get_face_manifold(const MappingManifold<1,spacedim> &,
                       const typename dealii::Triangulation<1,spacedim>::cell_iterator &cell,
@@ -371,7 +371,7 @@ namespace internal
      * Some specialization for face Manifolds. The mapping argument is
      * only used to help the compiler infer dim and spacedim.
      */
-    template<int dim, int spacedim>
+    template <int dim, int spacedim>
     const dealii::Manifold<dim,spacedim> &
     get_face_manifold(const MappingManifold<dim,spacedim> &,
                       const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -501,7 +501,7 @@ namespace internal
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 CellSimilarity::Similarity
 MappingManifold<dim,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -809,7 +809,7 @@ namespace internal
      * using the 'data_set' to differentiate whether we will
      * work on a face (and if so, which one) or subface.
      */
-    template<int dim, int spacedim>
+    template <int dim, int spacedim>
     void
     do_fill_fe_face_values (const dealii::MappingManifold<dim,spacedim>                       &mapping,
                             const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -840,7 +840,7 @@ namespace internal
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingManifold<dim,spacedim>::
 fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -869,7 +869,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingManifold<dim,spacedim>::
 fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1188,7 +1188,7 @@ namespace
 
 
 
-  template<int dim, int spacedim, int rank>
+  template <int dim, int spacedim, int rank>
   void
   transform_differential_forms(const ArrayView<const DerivativeForm<rank, dim,spacedim> >   &input,
                                const MappingType                                             mapping_type,
@@ -1221,7 +1221,7 @@ namespace
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingManifold<dim,spacedim>::
 transform (const ArrayView<const Tensor<1, dim> >                  &input,
@@ -1234,7 +1234,7 @@ transform (const ArrayView<const Tensor<1, dim> >                  &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingManifold<dim,spacedim>::
 transform (const ArrayView<const DerivativeForm<1, dim,spacedim> >  &input,
@@ -1247,7 +1247,7 @@ transform (const ArrayView<const DerivativeForm<1, dim,spacedim> >  &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingManifold<dim,spacedim>::
 transform (const ArrayView<const Tensor<2, dim> >                  &input,
@@ -1273,7 +1273,7 @@ transform (const ArrayView<const Tensor<2, dim> >                  &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingManifold<dim,spacedim>::
 transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
@@ -1322,7 +1322,7 @@ transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingManifold<dim,spacedim>::
 transform (const ArrayView<const  Tensor<3,dim> >                  &input,

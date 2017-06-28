@@ -37,7 +37,7 @@
 #include <fstream>
 
 
-template<int dim>
+template <int dim>
 class MySquareFunction : public Function<dim>
 {
 public:
@@ -67,7 +67,7 @@ get_q_face ()
   return q;
 }
 
-template<>
+template <>
 Quadrature<0> &
 get_q_face <1>()
 {

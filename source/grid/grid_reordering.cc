@@ -1100,7 +1100,7 @@ GridReordering<dim,spacedim>::reorder_cells (std::vector<CellData<dim> > &cells,
 
 
 
-template<>
+template <>
 void
 GridReordering<1>::invert_all_cells_of_negative_grid(const std::vector<Point<1> > &,
                                                      std::vector<CellData<1> > &)
@@ -1110,7 +1110,7 @@ GridReordering<1>::invert_all_cells_of_negative_grid(const std::vector<Point<1> 
 
 
 
-template<>
+template <>
 void
 GridReordering<1,2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &,
                                                        std::vector<CellData<1> > &)
@@ -1120,7 +1120,7 @@ GridReordering<1,2>::invert_all_cells_of_negative_grid(const std::vector<Point<2
 
 
 
-template<>
+template <>
 void
 GridReordering<1,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &,
                                                        std::vector<CellData<1> > &)
@@ -1129,7 +1129,7 @@ GridReordering<1,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3
 }
 
 
-template<>
+template <>
 void
 GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &all_vertices,
                                                      std::vector<CellData<2> >    &cells)
@@ -1185,7 +1185,7 @@ GridReordering<2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> 
 
 
 
-template<>
+template <>
 void
 GridReordering<2,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &,
                                                        std::vector<CellData<2> > &)
@@ -1195,7 +1195,7 @@ GridReordering<2,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3
 
 
 
-template<>
+template <>
 void
 GridReordering<3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &all_vertices,
                                                      std::vector<CellData<3> > &cells)

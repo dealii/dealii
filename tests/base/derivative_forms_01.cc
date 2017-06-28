@@ -26,7 +26,7 @@
 typedef typename Sacado::Fad::DFad<double> Sdouble;
 typedef typename Sacado::Fad::DFad<Sdouble> SSdouble;
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   Tensor<1,dim,SSdouble> x;

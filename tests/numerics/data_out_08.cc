@@ -40,7 +40,7 @@
 #include <deal.II/fe/fe_dgq.h>
 
 
-template<int dim>
+template <int dim>
 class FilteredDataOut : public DataOut<dim>
 {
 public:

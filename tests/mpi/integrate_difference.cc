@@ -52,7 +52,7 @@ public:
 };
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);

@@ -237,7 +237,7 @@ namespace internal
      * @ingroup dofs
      * @author Tobias Leicht, 2006
      */
-    template<int dim>
+    template <int dim>
     class DoFIndicesOnFaces;
 
 
@@ -248,7 +248,7 @@ namespace internal
      * @ingroup hp
      * @author Tobias Leicht, 2006
      */
-    template<>
+    template <>
     class DoFIndicesOnFaces<1>
     {
     public:
@@ -274,7 +274,7 @@ namespace internal
      * @ingroup hp
      * @author Tobias Leicht, 2006
      */
-    template<>
+    template <>
     class DoFIndicesOnFaces<2>
     {
     public:
@@ -305,7 +305,7 @@ namespace internal
      * @ingroup hp
      * @author Tobias Leicht, 2006
      */
-    template<>
+    template <>
     class DoFIndicesOnFaces<3>
     {
     public:

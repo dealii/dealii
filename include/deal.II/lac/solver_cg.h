@@ -486,7 +486,7 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 boost::signals2::connection
 SolverCG<VectorType>::connect_coefficients_slot
 (const std::function<void(double,double)> &slot)
@@ -496,7 +496,7 @@ SolverCG<VectorType>::connect_coefficients_slot
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 boost::signals2::connection
 SolverCG<VectorType>::connect_condition_number_slot
 (const std::function<void(double)> &slot,
@@ -514,7 +514,7 @@ SolverCG<VectorType>::connect_condition_number_slot
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 boost::signals2::connection
 SolverCG<VectorType>::connect_eigenvalues_slot
 (const std::function<void (const std::vector<double> &)> &slot,

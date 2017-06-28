@@ -46,9 +46,9 @@ using namespace dealii;
 // mesh, uncomment the following macro definition.
 // #define __WRITE_VTU__
 
-template<int dim> class Location;
+template <int dim> class Location;
 
-template<int dim>
+template <int dim>
 class TriaTest
 {
 private:
@@ -68,7 +68,7 @@ private:
 };
 
 // Equip class Point<dim> with operator < in order to sort the cell center coordinates.
-template<int dim>
+template <int dim>
 class Location: public Point<dim>
 {
 public:
@@ -172,7 +172,7 @@ int main (int argc, char *argv[])
   return (0);
 }
 
-template<int dim>
+template <int dim>
 TriaTest<dim>::TriaTest(const typename dealii::Triangulation<dim>::MeshSmoothing smoothing_option)
   :
   mpi_communicator(MPI_COMM_WORLD),
@@ -200,7 +200,7 @@ TriaTest<dim>::TriaTest(const typename dealii::Triangulation<dim>::MeshSmoothing
   // triangulation.refine_global(1);
 }
 
-template<int dim>
+template <int dim>
 void TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
                         std::set<Location<dim> > &position_list)
 {
@@ -272,7 +272,7 @@ void TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
   return;
 }
 
-template<int dim>
+template <int dim>
 void TriaTest<dim>::write_vtu(const unsigned int counter) const
 {
 #ifdef __WRITE_VTU__

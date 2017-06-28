@@ -45,7 +45,7 @@ using namespace dealii;
 using namespace dealii::Physics;
 using namespace dealii::Physics::Elasticity;
 
-template<int dim>
+template <int dim>
 void
 test_kinematic_tensors ()
 {

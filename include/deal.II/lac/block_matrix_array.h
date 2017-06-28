@@ -272,7 +272,7 @@ protected:
      * Constructor initializing all data fields. A PointerMatrix object is
      * generated for <tt>matrix</tt>.
      */
-    template<typename MatrixType>
+    template <typename MatrixType>
     Entry (const MatrixType &matrix,
            size_type row,
            size_type col,

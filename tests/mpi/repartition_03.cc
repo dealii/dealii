@@ -31,7 +31,7 @@
 
 #include <fstream>
 
-template<int dim>
+template <int dim>
 void print_cells(parallel::distributed::Triangulation<dim> &tr)
 {
   for (typename Triangulation<dim>::active_cell_iterator
@@ -41,7 +41,7 @@ void print_cells(parallel::distributed::Triangulation<dim> &tr)
       deallog << cell->id() << std::endl;
 }
 
-template<int dim>
+template <int dim>
 void test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

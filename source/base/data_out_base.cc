@@ -459,7 +459,7 @@ namespace DataOutBase
 // DataOutFilter class member functions
 //----------------------------------------------------------------------//
 
-template<int dim>
+template <int dim>
 void DataOutBase::DataOutFilter::write_point(const unsigned int &index, const Point<dim> &p)
 {
   Map3DPoint::const_iterator  it;
@@ -514,7 +514,7 @@ void DataOutBase::DataOutFilter::fill_cell_data(const unsigned int &local_node_o
     }
 }
 
-template<int dim>
+template <int dim>
 void
 DataOutBase::DataOutFilter::write_cell(
   unsigned int index,
@@ -679,7 +679,7 @@ namespace
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   static
   void
   compute_sizes(const std::vector<DataOutBase::Patch<dim, spacedim> > &patches,
@@ -701,7 +701,7 @@ namespace
    *
    * @ingroup output
    */
-  template<typename FlagsType>
+  template <typename FlagsType>
   class StreamBase
   {
   public:
@@ -836,7 +836,7 @@ namespace
      * some output formats require
      * this number to be printed.
      */
-    template<typename data>
+    template <typename data>
     void write_dataset (const unsigned int       index,
                         const std::vector<data> &values);
   };
@@ -956,7 +956,7 @@ namespace
      * some output formats require
      * this number to be printed.
      */
-    template<typename data>
+    template <typename data>
     void write_dataset (const unsigned int       index,
                         const std::vector<data> &values);
   };
@@ -1071,7 +1071,7 @@ namespace
   {}
 
 
-  template<int dim>
+  template <int dim>
   void
   DXStream::write_point (const unsigned int,
                          const Point<dim> &p)
@@ -1094,7 +1094,7 @@ namespace
 
 
 
-  template<int dim>
+  template <int dim>
   void
   DXStream::write_cell (unsigned int,
                         unsigned int start,
@@ -1134,7 +1134,7 @@ namespace
 
 
 
-  template<typename data>
+  template <typename data>
   inline
   void
   DXStream::write_dataset (const unsigned int,
@@ -1164,7 +1164,7 @@ namespace
   {}
 
 
-  template<int dim>
+  template <int dim>
   void
   GmvStream::write_point (const unsigned int,
                           const Point<dim> &p)
@@ -1176,7 +1176,7 @@ namespace
 
 
 
-  template<int dim>
+  template <int dim>
   void
   GmvStream::write_cell (unsigned int,
                          unsigned int s,
@@ -1215,7 +1215,7 @@ namespace
   {}
 
 
-  template<int dim>
+  template <int dim>
   void
   TecplotStream::write_point (const unsigned int,
                               const Point<dim> &p)
@@ -1227,7 +1227,7 @@ namespace
 
 
 
-  template<int dim>
+  template <int dim>
   void
   TecplotStream::write_cell (unsigned int,
                              unsigned int s,
@@ -1263,7 +1263,7 @@ namespace
   {}
 
 
-  template<int dim>
+  template <int dim>
   void
   UcdStream::write_point (const unsigned int index,
                           const Point<dim> &p)
@@ -1281,7 +1281,7 @@ namespace
 
 
 
-  template<int dim>
+  template <int dim>
   void
   UcdStream::write_cell (unsigned int index,
                          unsigned int start,
@@ -1319,7 +1319,7 @@ namespace
 
 
 
-  template<typename data>
+  template <typename data>
   inline
   void
   UcdStream::write_dataset (const unsigned int index,
@@ -1342,7 +1342,7 @@ namespace
   {}
 
 
-  template<int dim>
+  template <int dim>
   void
   VtkStream::write_point (const unsigned int,
                           const Point<dim> &p)
@@ -1357,7 +1357,7 @@ namespace
 
 
 
-  template<int dim>
+  template <int dim>
   void
   VtkStream::write_cell (unsigned int,
                          unsigned int start,
@@ -1392,7 +1392,7 @@ namespace
   {}
 
 
-  template<int dim>
+  template <int dim>
   void
   VtuStream::write_point (const unsigned int,
                           const Point<dim> &p)
@@ -1429,7 +1429,7 @@ namespace
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   VtuStream::write_cell (unsigned int,
                          unsigned int start,

@@ -474,7 +474,7 @@ namespace Step27
   std::pair<bool,unsigned int>
   predicate_ind(const TableIndices<dim> &ind);
 
-  template<>
+  template <>
   std::pair<bool,unsigned int>
   predicate_ind<2>(const TableIndices<2> &ind)
   {

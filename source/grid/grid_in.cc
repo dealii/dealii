@@ -94,7 +94,7 @@ void GridIn<dim, spacedim>::attach_triangulation (Triangulation<dim, spacedim> &
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 {
   Assert((dim == 2)||(dim == 3), ExcNotImplemented());
@@ -381,7 +381,7 @@ void GridIn<dim, spacedim>::read_vtk(std::istream &in)
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void GridIn<dim, spacedim>::read_unv(std::istream &in)
 {
   Assert(tria != nullptr, ExcNoTriangulationSelected());

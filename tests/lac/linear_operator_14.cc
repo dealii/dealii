@@ -50,7 +50,7 @@
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 void build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
                          TrilinosWrappers::MPI::BlockVector  &vector,
                          const FE_Q<dim>                     &fe_test,

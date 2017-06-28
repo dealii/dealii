@@ -125,7 +125,7 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename PreconditionerType>
   void
   solve (const MatrixType         &A,
          VectorType               &x,
@@ -198,7 +198,7 @@ private:
    * The iteration loop itself. The function returns a structure indicating
    * what happened in this function.
    */
-  template<typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename PreconditionerType>
   IterationResult
   iterate (const MatrixType         &A,
            const PreconditionerType &precondition);
@@ -214,7 +214,7 @@ private:
 
 #ifndef DOXYGEN
 
-template<class VectorType>
+template <class VectorType>
 SolverQMRS<VectorType>::IterationResult::IterationResult (const SolverControl::State state,
                                                           const double               last_residual)
   :
@@ -223,7 +223,7 @@ SolverQMRS<VectorType>::IterationResult::IterationResult (const SolverControl::S
 {}
 
 
-template<class VectorType>
+template <class VectorType>
 SolverQMRS<VectorType>::SolverQMRS (SolverControl            &cn,
                                     VectorMemory<VectorType> &mem,
                                     const AdditionalData     &data)
@@ -234,7 +234,7 @@ SolverQMRS<VectorType>::SolverQMRS (SolverControl            &cn,
 
 
 
-template<class VectorType>
+template <class VectorType>
 SolverQMRS<VectorType>::SolverQMRS(SolverControl        &cn,
                                    const AdditionalData &data)
   :
@@ -244,7 +244,7 @@ SolverQMRS<VectorType>::SolverQMRS(SolverControl        &cn,
 
 
 
-template<class VectorType>
+template <class VectorType>
 double
 SolverQMRS<VectorType>::criterion()
 {
@@ -253,7 +253,7 @@ SolverQMRS<VectorType>::criterion()
 
 
 
-template<class VectorType>
+template <class VectorType>
 void
 SolverQMRS<VectorType>::print_vectors(const unsigned int,
                                       const VectorType &,
@@ -263,8 +263,8 @@ SolverQMRS<VectorType>::print_vectors(const unsigned int,
 
 
 
-template<class VectorType>
-template<typename MatrixType, typename PreconditionerType>
+template <class VectorType>
+template <typename MatrixType, typename PreconditionerType>
 void
 SolverQMRS<VectorType>::solve (const MatrixType         &A,
                                VectorType               &x,
@@ -321,8 +321,8 @@ SolverQMRS<VectorType>::solve (const MatrixType         &A,
 
 
 
-template<class VectorType>
-template<typename MatrixType, typename PreconditionerType>
+template <class VectorType>
+template <typename MatrixType, typename PreconditionerType>
 typename SolverQMRS<VectorType>::IterationResult
 SolverQMRS<VectorType>::iterate(const MatrixType         &A,
                                 const PreconditionerType &precondition)

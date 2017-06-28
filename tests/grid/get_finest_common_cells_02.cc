@@ -26,7 +26,7 @@
 #include <fstream>
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   // create 2 triangulations with the

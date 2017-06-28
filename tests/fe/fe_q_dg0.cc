@@ -878,7 +878,7 @@ namespace Step22
   }
 
   //squared l^2 norm of divergence of velocity
-  template<int dim>
+  template <int dim>
   void StokesProblem<dim>::divergence_velocity
   (const BlockVector<double> &calc_solution,
    Vector<double>         &output_vector,

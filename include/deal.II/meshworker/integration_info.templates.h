@@ -26,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MeshWorker
 {
-  template<int dim, int sdim>
+  template <int dim, int sdim>
   void
   IntegrationInfo<dim,sdim>::initialize_data(
     const std::shared_ptr<VectorDataBase<dim,sdim> > &data)
@@ -75,7 +75,7 @@ namespace MeshWorker
   }
 
 
-  template<int dim, int sdim>
+  template <int dim, int sdim>
   void
   IntegrationInfo<dim,sdim>::clear()
   {
@@ -84,7 +84,7 @@ namespace MeshWorker
 
 
 
-  template<int dim, int sdim>
+  template <int dim, int sdim>
   template <typename number>
   void
   IntegrationInfo<dim,sdim>::fill_local_data(const DoFInfo<dim, sdim, number> &info, bool split_fevalues)
@@ -124,7 +124,7 @@ namespace MeshWorker
   }
 
 
-  template<int dim, int sdim>
+  template <int dim, int sdim>
   std::size_t
   IntegrationInfo<dim,sdim>::memory_consumption () const
   {
@@ -138,7 +138,7 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-  template<int dim, int sdim>
+  template <int dim, int sdim>
   IntegrationInfoBox<dim,sdim>::IntegrationInfoBox()
   {
     cell_flags = update_default;
@@ -148,7 +148,7 @@ namespace MeshWorker
   }
 
 
-  template<int dim, int sdim>
+  template <int dim, int sdim>
   void
   IntegrationInfoBox<dim,sdim>::initialize_update_flags (bool neighbor_geometry)
   {
@@ -193,7 +193,7 @@ namespace MeshWorker
   }
 
 
-  template<int dim, int sdim>
+  template <int dim, int sdim>
   std::size_t
   IntegrationInfoBox<dim,sdim>::memory_consumption () const
   {

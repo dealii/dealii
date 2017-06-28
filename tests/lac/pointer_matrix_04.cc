@@ -21,7 +21,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 
-template<typename number>
+template <typename number>
 void
 checkConstructor4(const FullMatrix<number> &A, char *name)
 {

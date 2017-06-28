@@ -25,7 +25,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Functions
 {
-  template<int dim>
+  template <int dim>
   CutOffFunctionBase<dim>::CutOffFunctionBase (const double r,
                                                const Point<dim> p,
                                                const unsigned int n_components,
@@ -38,7 +38,7 @@ namespace Functions
   {}
 
 
-  template<int dim>
+  template <int dim>
   void
   CutOffFunctionBase<dim>::new_center (const Point<dim> &p)
   {
@@ -46,7 +46,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CutOffFunctionBase<dim>::new_radius (const double r)
   {
@@ -55,7 +55,7 @@ namespace Functions
 
 //////////////////////////////////////////////////////////////////////
 
-  template<int dim>
+  template <int dim>
   CutOffFunctionLinfty<dim>::CutOffFunctionLinfty (const double r,
                                                    const Point<dim> p,
                                                    const unsigned int n_components,
@@ -65,7 +65,7 @@ namespace Functions
   {}
 
 
-  template<int dim>
+  template <int dim>
   double
   CutOffFunctionLinfty<dim>::value (const Point<dim>   &p,
                                     const unsigned int component) const
@@ -78,7 +78,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CutOffFunctionLinfty<dim>::value_list (const std::vector<Point<dim> > &points,
                                          std::vector<double>            &values,
@@ -100,7 +100,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CutOffFunctionLinfty<dim>::vector_value_list (
     const std::vector<Point<dim> > &points,
@@ -124,7 +124,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   CutOffFunctionW1<dim>::CutOffFunctionW1 (const double     r,
                                            const Point<dim> p,
                                            const unsigned int n_components,
@@ -134,7 +134,7 @@ namespace Functions
   {}
 
 
-  template<int dim>
+  template <int dim>
   double
   CutOffFunctionW1<dim>::value (const Point<dim>   &p,
                                 const unsigned int component) const
@@ -150,7 +150,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CutOffFunctionW1<dim>::value_list (const std::vector<Point<dim> > &points,
                                      std::vector<double>            &values,
@@ -173,7 +173,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void
   CutOffFunctionW1<dim>::vector_value_list (
     const std::vector<Point<dim> > &points,
@@ -198,7 +198,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   CutOffFunctionCinfty<dim>::CutOffFunctionCinfty (const double     r,
                                                    const Point<dim> p,
                                                    const unsigned int n_components,
@@ -208,7 +208,7 @@ namespace Functions
   {}
 
 
-  template<int dim>
+  template <int dim>
   double
   CutOffFunctionCinfty<dim>::value (const Point<dim>   &p,
                                     const unsigned int component) const
@@ -228,7 +228,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CutOffFunctionCinfty<dim>::value_list (const std::vector<Point<dim> > &points,
                                          std::vector<double>            &values,
@@ -260,7 +260,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void
   CutOffFunctionCinfty<dim>::vector_value_list (
     const std::vector<Point<dim> > &points,
@@ -293,7 +293,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   Tensor<1,dim>
   CutOffFunctionCinfty<dim>::gradient (const Point<dim>   &p,
                                        const unsigned int) const

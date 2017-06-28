@@ -57,7 +57,7 @@ namespace Physics
        *
        * @param[in] angle The rotation angle (about the z-axis) in radians
        */
-      template<typename Number>
+      template <typename Number>
       Tensor<2,2,Number>
       rotation_matrix_2d (const Number &angle);
 
@@ -90,7 +90,7 @@ namespace Physics
        * @param[in] axis  A unit vector that defines the axis of rotation
        * @param[in] angle The rotation angle in radians
        */
-      template<typename Number>
+      template <typename Number>
       Tensor<2,3,Number>
       rotation_matrix_3d (const Point<3,Number> &axis,
                           const Number          &angle);
@@ -780,7 +780,7 @@ namespace Physics
      *
      * @dealiiHolzapfelA{75,2.55} @dealiiWriggersA{23,3.11}
      */
-    template<int dim, typename Number>
+    template <int dim, typename Number>
     Tensor<1,dim,Number>
     nansons_formula (const Tensor<1,dim,Number> &N,
                      const Tensor<2,dim,Number> &F);
@@ -908,7 +908,7 @@ namespace internal
 
 
 
-template<typename Number>
+template <typename Number>
 Tensor<2,2,Number>
 Physics::Transformations::Rotations::rotation_matrix_2d (const Number &angle)
 {
@@ -925,7 +925,7 @@ Physics::Transformations::Rotations::rotation_matrix_2d (const Number &angle)
 
 
 
-template<typename Number>
+template <typename Number>
 Tensor<2,3,Number>
 Physics::Transformations::Rotations::rotation_matrix_3d (const Point<3,Number> &axis,
                                                          const Number          &angle)
@@ -1287,7 +1287,7 @@ Physics::Transformations::Piola::pull_back (const SymmetricTensor<4,dim,Number> 
 
 
 
-template<int dim, typename Number>
+template <int dim, typename Number>
 inline Tensor<1,dim,Number>
 Physics::Transformations::nansons_formula (const Tensor<1,dim,Number> &N,
                                            const Tensor<2,dim,Number> &F)

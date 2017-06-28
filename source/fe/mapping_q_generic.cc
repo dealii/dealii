@@ -67,7 +67,7 @@ namespace internal
       // expanded before the compiler eliminates code due to the 'if (dim ==
       // spacedim)' statement (see the body of the general
       // transform_real_to_unit_cell).
-      template<int spacedim>
+      template <int spacedim>
       Point<1>
       transform_real_to_unit_cell
       (const std::array<Point<spacedim>, GeometryInfo<1>::vertices_per_cell> &vertices,
@@ -79,7 +79,7 @@ namespace internal
 
 
 
-      template<int spacedim>
+      template <int spacedim>
       Point<2>
       transform_real_to_unit_cell
       (const std::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell> &vertices,
@@ -175,7 +175,7 @@ namespace internal
 
 
 
-      template<int spacedim>
+      template <int spacedim>
       Point<3>
       transform_real_to_unit_cell
       (const std::array<Point<spacedim>, GeometryInfo<3>::vertices_per_cell> &/*vertices*/,
@@ -590,7 +590,7 @@ namespace internal
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 MappingQGeneric<dim,spacedim>::InternalData::InternalData (const unsigned int polynomial_degree)
   :
   polynomial_degree (polynomial_degree),
@@ -600,7 +600,7 @@ MappingQGeneric<dim,spacedim>::InternalData::InternalData (const unsigned int po
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 std::size_t
 MappingQGeneric<dim,spacedim>::InternalData::memory_consumption () const
 {
@@ -764,7 +764,7 @@ initialize_face (const UpdateFlags      update_flags,
 
 
 
-template<>
+template <>
 void
 MappingQGeneric<1,1>::InternalData::
 compute_shape_function_values (const std::vector<Point<1> > &unit_points)
@@ -782,7 +782,7 @@ compute_shape_function_values (const std::vector<Point<1> > &unit_points)
     }
 }
 
-template<>
+template <>
 void
 MappingQGeneric<2,2>::InternalData::
 compute_shape_function_values (const std::vector<Point<2> > &unit_points)
@@ -800,7 +800,7 @@ compute_shape_function_values (const std::vector<Point<2> > &unit_points)
     }
 }
 
-template<>
+template <>
 void
 MappingQGeneric<3,3>::InternalData::
 compute_shape_function_values (const std::vector<Point<3> > &unit_points)
@@ -818,7 +818,7 @@ compute_shape_function_values (const std::vector<Point<3> > &unit_points)
     }
 }
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQGeneric<dim,spacedim>::InternalData::
 compute_shape_function_values (const std::vector<Point<dim> > &unit_points)
@@ -841,7 +841,7 @@ namespace
    * For the definition of the <tt>support_point_weights_on_quad(hex)</tt> please
    * refer to equation (8) of the `mapping' report.
    */
-  template<int dim>
+  template <int dim>
   Table<2,double>
   compute_laplace_vector(const unsigned int polynomial_degree)
   {
@@ -1092,7 +1092,7 @@ namespace
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p)
   :
   polynomial_degree(p),
@@ -1107,7 +1107,7 @@ MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p)
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 MappingQGeneric<dim,spacedim>::MappingQGeneric (const MappingQGeneric<dim,spacedim> &mapping)
   :
   polynomial_degree(mapping.polynomial_degree),
@@ -1120,7 +1120,7 @@ MappingQGeneric<dim,spacedim>::MappingQGeneric (const MappingQGeneric<dim,spaced
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Mapping<dim,spacedim> *
 MappingQGeneric<dim,spacedim>::clone () const
 {
@@ -1130,7 +1130,7 @@ MappingQGeneric<dim,spacedim>::clone () const
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 unsigned int
 MappingQGeneric<dim,spacedim>::get_degree() const
 {
@@ -1139,7 +1139,7 @@ MappingQGeneric<dim,spacedim>::get_degree() const
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Point<spacedim>
 MappingQGeneric<dim,spacedim>::
 transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1189,7 +1189,7 @@ namespace
    * support points (stored in data.mapping_support_points), compute
    * the mapped location of that point in real space.
    */
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   Point<spacedim>
   compute_mapped_location_of_point (const typename MappingQGeneric<dim,spacedim>::InternalData &data)
   {
@@ -1508,7 +1508,7 @@ namespace
 // use template specialization to make sure we pick up the right function to
 // call:
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Point<dim>
 MappingQGeneric<dim,spacedim>::
 transform_real_to_unit_cell_internal
@@ -1521,7 +1521,7 @@ transform_real_to_unit_cell_internal
   return Point<dim>();
 }
 
-template<>
+template <>
 Point<1>
 MappingQGeneric<1,1>::
 transform_real_to_unit_cell_internal
@@ -1547,7 +1547,7 @@ transform_real_to_unit_cell_internal
   return do_transform_real_to_unit_cell_internal<1>(cell, p, initial_p_unit, *mdata);
 }
 
-template<>
+template <>
 Point<2>
 MappingQGeneric<2, 2>::
 transform_real_to_unit_cell_internal
@@ -1573,7 +1573,7 @@ transform_real_to_unit_cell_internal
   return do_transform_real_to_unit_cell_internal<2>(cell, p, initial_p_unit, *mdata);
 }
 
-template<>
+template <>
 Point<3>
 MappingQGeneric<3, 3>::
 transform_real_to_unit_cell_internal
@@ -1599,7 +1599,7 @@ transform_real_to_unit_cell_internal
   return do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, *mdata);
 }
 
-template<>
+template <>
 Point<1>
 MappingQGeneric<1, 2>::
 transform_real_to_unit_cell_internal
@@ -1625,7 +1625,7 @@ transform_real_to_unit_cell_internal
   return do_transform_real_to_unit_cell_internal_codim1<1>(cell, p, initial_p_unit, *mdata);
 }
 
-template<>
+template <>
 Point<2>
 MappingQGeneric<2, 3>::
 transform_real_to_unit_cell_internal
@@ -1651,7 +1651,7 @@ transform_real_to_unit_cell_internal
   return do_transform_real_to_unit_cell_internal_codim1<2>(cell, p, initial_p_unit, *mdata);
 }
 
-template<>
+template <>
 Point<1>
 MappingQGeneric<1, 3>::
 transform_real_to_unit_cell_internal
@@ -1665,7 +1665,7 @@ transform_real_to_unit_cell_internal
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Point<dim>
 MappingQGeneric<dim,spacedim>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1797,7 +1797,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 UpdateFlags
 MappingQGeneric<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 {
@@ -1857,7 +1857,7 @@ MappingQGeneric<dim,spacedim>::requires_update_flags (const UpdateFlags in) cons
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 typename MappingQGeneric<dim,spacedim>::InternalData *
 MappingQGeneric<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                          const Quadrature<dim> &q) const
@@ -1870,7 +1870,7 @@ MappingQGeneric<dim,spacedim>::get_data (const UpdateFlags update_flags,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 typename MappingQGeneric<dim,spacedim>::InternalData *
 MappingQGeneric<dim,spacedim>::get_face_data (const UpdateFlags        update_flags,
                                               const Quadrature<dim-1> &quadrature) const
@@ -1885,7 +1885,7 @@ MappingQGeneric<dim,spacedim>::get_face_data (const UpdateFlags        update_fl
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 typename MappingQGeneric<dim,spacedim>::InternalData *
 MappingQGeneric<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                                  const Quadrature<dim-1>& quadrature) const
@@ -2445,7 +2445,7 @@ namespace internal
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 CellSimilarity::Similarity
 MappingQGeneric<dim,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -2801,7 +2801,7 @@ namespace internal
      * using the 'data_set' to differentiate whether we will
      * work on a face (and if so, which one) or subface.
      */
-    template<int dim, int spacedim>
+    template <int dim, int spacedim>
     void
     do_fill_fe_face_values (const dealii::MappingQGeneric<dim,spacedim>                             &mapping,
                             const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -2853,7 +2853,7 @@ namespace internal
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQGeneric<dim,spacedim>::
 fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -2897,7 +2897,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQGeneric<dim,spacedim>::
 fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -3231,7 +3231,7 @@ namespace
 
 
 
-  template<int dim, int spacedim, int rank>
+  template <int dim, int spacedim, int rank>
   void
   transform_differential_forms(const ArrayView<const DerivativeForm<rank, dim,spacedim> >   &input,
                                const MappingType                                             mapping_type,
@@ -3264,7 +3264,7 @@ namespace
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQGeneric<dim,spacedim>::
 transform (const ArrayView<const Tensor<1, dim> >                  &input,
@@ -3277,7 +3277,7 @@ transform (const ArrayView<const Tensor<1, dim> >                  &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQGeneric<dim,spacedim>::
 transform (const ArrayView<const DerivativeForm<1, dim,spacedim> >  &input,
@@ -3290,7 +3290,7 @@ transform (const ArrayView<const DerivativeForm<1, dim,spacedim> >  &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQGeneric<dim,spacedim>::
 transform (const ArrayView<const Tensor<2, dim> >                  &input,
@@ -3316,7 +3316,7 @@ transform (const ArrayView<const Tensor<2, dim> >                  &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQGeneric<dim,spacedim>::
 transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
@@ -3365,7 +3365,7 @@ transform (const ArrayView<const  DerivativeForm<2, dim, spacedim> > &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQGeneric<dim,spacedim>::
 transform (const ArrayView<const  Tensor<3,dim> >                  &input,
@@ -3615,7 +3615,7 @@ add_quad_support_points(const typename Triangulation<dim,spacedim>::cell_iterato
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 std::vector<Point<spacedim> >
 MappingQGeneric<dim,spacedim>::
 compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const

@@ -113,13 +113,13 @@ public:
   /**
    * Return a compact and fast binary representation of this CellId.
    */
-  template<int dim>
+  template <int dim>
   binary_type to_binary() const;
 
   /**
    * Return a cell_iterator to the cell represented by this CellId.
    */
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   typename Triangulation<dim,spacedim>::cell_iterator
   to_cell(const Triangulation<dim,spacedim> &tria) const;
 

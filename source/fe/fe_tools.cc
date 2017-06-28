@@ -1321,7 +1321,7 @@ namespace FETools
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void compute_component_wise(
     const FiniteElement<dim,spacedim> &element,
     std::vector<unsigned int> &renumbering,
@@ -1363,7 +1363,7 @@ namespace FETools
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void compute_block_renumbering (
     const FiniteElement<dim,spacedim> &element,
     std::vector<types::global_dof_index> &renumbering,
@@ -1611,7 +1611,7 @@ namespace FETools
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   FullMatrix<double>
   compute_node_matrix(const FiniteElement<dim,spacedim> &fe)
   {
@@ -1666,7 +1666,7 @@ namespace FETools
 
 
   /*
-    template<>
+    template <>
     void
     compute_embedding_matrices(const FiniteElement<1,2> &,
                                std::vector<std::vector<FullMatrix<double> > > &,
@@ -1676,7 +1676,7 @@ namespace FETools
     }
 
 
-    template<>
+    template <>
     void
     compute_embedding_matrices(const FiniteElement<1,3> &,
                                std::vector<std::vector<FullMatrix<double> > > &,
@@ -1687,7 +1687,7 @@ namespace FETools
 
 
 
-    template<>
+    template <>
     void
     compute_embedding_matrices(const FiniteElement<2,3>&,
                                std::vector<std::vector<FullMatrix<double> > >&,
@@ -1700,7 +1700,7 @@ namespace FETools
 
   namespace
   {
-    template<int dim, typename number, int spacedim>
+    template <int dim, typename number, int spacedim>
     void
     compute_embedding_for_shape_function (
       const unsigned int i,
@@ -1758,7 +1758,7 @@ namespace FETools
 
 
 
-    template<int dim, typename number, int spacedim>
+    template <int dim, typename number, int spacedim>
     void
     compute_embedding_matrices_for_refinement_case (
       const FiniteElement<dim, spacedim> &fe,

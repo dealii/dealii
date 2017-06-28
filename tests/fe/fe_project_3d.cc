@@ -163,7 +163,7 @@ static const Point<3> vertices_rectangular[] =
 static const unsigned n_vertices = sizeof(vertices_rectangular) / sizeof(vertices_rectangular[0]);
 static const unsigned n_cells = 8;
 
-template<int dim>
+template <int dim>
 class VectorFunction : public Function<dim>
 {
 public:
@@ -173,7 +173,7 @@ public:
   virtual Tensor< 1, dim >  gradient (const Point< dim > &p, const unsigned int component=0) const;
 };
 
-template<>
+template <>
 double VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 {
   Assert (component < 3, ExcIndexRange (component, 0, 2));
@@ -195,14 +195,14 @@ double VectorFunction<3>::value(const Point<3> &p, const unsigned int component)
   return val;
 }
 
-template<int dim>
+template <int dim>
 void VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   for (int i = 0; i < dim; ++i)
     values(i) = value(p, i);
 }
 
-template<>
+template <>
 Tensor<1, 3> VectorFunction<3>::gradient(const Point<3> &p, const unsigned int component) const
 {
   const double PI = numbers::PI;

@@ -24,7 +24,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<int,int> class FEValuesBase;
+template <int,int> class FEValuesBase;
 
 namespace MeshWorker
 {

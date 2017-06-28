@@ -58,7 +58,7 @@ void write_mesh (const parallel::shared::Triangulation<dim,spacedim> &tria,
 
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   parallel::shared::Triangulation<dim>

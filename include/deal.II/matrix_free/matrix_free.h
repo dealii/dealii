@@ -1761,47 +1761,47 @@ reinit(const Mapping<dim>                                    &mapping,
 // helper functions to select the blocks and template magic.
 namespace internal
 {
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   bool update_ghost_values_start_block (const VectorStruct &vec,
                                         const unsigned int channel,
                                         internal::bool2type<true>);
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   void reset_ghost_values_block (const VectorStruct &vec,
                                  const bool          zero_out_ghosts,
                                  internal::bool2type<true>);
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   void update_ghost_values_finish_block (const VectorStruct &vec,
                                          internal::bool2type<true>);
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   void compress_start_block (const VectorStruct &vec,
                              const unsigned int channel,
                              internal::bool2type<true>);
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   void compress_finish_block (const VectorStruct &vec,
                               internal::bool2type<true>);
 
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   bool update_ghost_values_start_block (const VectorStruct &,
                                         const unsigned int,
                                         internal::bool2type<false>)
   {
     return false;
   }
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   void reset_ghost_values_block (const VectorStruct &,
                                  const bool,
                                  internal::bool2type<false>)
   {}
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   void update_ghost_values_finish_block (const VectorStruct &,
                                          internal::bool2type<false>)
   {}
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   void compress_start_block (const VectorStruct &,
                              const unsigned int,
                              internal::bool2type<false>)
   {}
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   void compress_finish_block (const VectorStruct &,
                               internal::bool2type<false>)
   {}
@@ -1810,7 +1810,7 @@ namespace internal
 
   // returns true if the vector was in a state without ghost values before,
   // i.e., we need to zero out ghosts in the very end
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   inline
   bool update_ghost_values_start (const VectorStruct &vec,
                                   const unsigned int channel = 0)
@@ -1822,7 +1822,7 @@ namespace internal
 
 
 
-  template<typename Number>
+  template <typename Number>
   inline
   bool update_ghost_values_start (const LinearAlgebra::distributed::Vector<Number> &vec,
                                   const unsigned int                  channel = 0)
@@ -1858,7 +1858,7 @@ namespace internal
 
 
 
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   inline
   bool update_ghost_values_start_block (const VectorStruct &vec,
                                         const unsigned int channel,
@@ -1875,7 +1875,7 @@ namespace internal
   // if the input vector did not have ghosts imported, clear them here again
   // in order to avoid subsequent operations e.g. in linear solvers to work
   // with ghosts all the time
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   inline
   void reset_ghost_values (const VectorStruct &vec,
                            const bool          zero_out_ghosts)
@@ -1886,7 +1886,7 @@ namespace internal
 
 
 
-  template<typename Number>
+  template <typename Number>
   inline
   void reset_ghost_values (const LinearAlgebra::distributed::Vector<Number> &vec,
                            const bool zero_out_ghosts)
@@ -1919,7 +1919,7 @@ namespace internal
 
 
 
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   inline
   void reset_ghost_values_block (const VectorStruct &vec,
                                  const bool          zero_out_ghosts,
@@ -2091,7 +2091,7 @@ namespace internal
 
   namespace partition
   {
-    template<typename Worker>
+    template <typename Worker>
     class CellWork : public tbb::task
     {
     public:
@@ -2128,7 +2128,7 @@ namespace internal
 
 
 
-    template<typename Worker>
+    template <typename Worker>
     class PartitionWork : public tbb::task
     {
     public:
@@ -2256,7 +2256,7 @@ namespace internal
     };
 
 
-    template<typename Worker>
+    template <typename Worker>
     class PartitionWork : public tbb::task
     {
     public:
@@ -2294,7 +2294,7 @@ namespace internal
   } // end of namespace color
 
 
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   class MPIComDistribute : public tbb::task
   {
   public:
@@ -2315,7 +2315,7 @@ namespace internal
 
 
 
-  template<typename VectorStruct>
+  template <typename VectorStruct>
   class MPIComCompress : public tbb::task
   {
   public:

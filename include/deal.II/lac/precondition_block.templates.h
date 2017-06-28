@@ -29,7 +29,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<typename MatrixType, typename inverse_type>
+template <typename MatrixType, typename inverse_type>
 PreconditionBlock<MatrixType, inverse_type>::AdditionalData::
 AdditionalData (const size_type block_size,
                 const double    relaxation,

@@ -38,7 +38,7 @@
 #include <sstream>
 #include <fstream>
 
-template<int dim>
+template <int dim>
 Tensor<1,dim> ones ()
 {
   Tensor<1,dim> result;
@@ -47,7 +47,7 @@ Tensor<1,dim> ones ()
   return result;
 }
 
-template<int dim>
+template <int dim>
 void test (const Triangulation<dim> &tr,
            const FiniteElement<dim> &fe,
            const double tolerance)
@@ -143,7 +143,7 @@ void test (const Triangulation<dim> &tr,
 
 
 
-template<int dim>
+template <int dim>
 void test_hyper_ball(const double tolerance)
 {
   Triangulation<dim> tr;

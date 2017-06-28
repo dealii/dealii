@@ -26,7 +26,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <cmath>
 
-template<int dim>
+template <int dim>
 void check_line(Quadrature<1> &quadrature)
 {
   Point<dim> p1;
@@ -54,7 +54,7 @@ void check_line(Quadrature<1> &quadrature)
   deallog << "length: " << s << std::endl;
 }
 
-template<int dim>
+template <int dim>
 void check_face(Quadrature<1> &q1)
 {
   deallog << "Checking dim " << dim
@@ -86,7 +86,7 @@ void check_face(Quadrature<1> &q1)
       }
 }
 
-template<int dim>
+template <int dim>
 void check_faces (Quadrature<1> &q1)
 {
   const unsigned int nq = q1.size();

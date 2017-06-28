@@ -84,7 +84,7 @@ void flatten_triangulation( Triangulation<dim> &tria_in, Triangulation<dim> &tri
 // eps image of the mesh so we can see the nodes are at the right
 // place.
 
-template<int dim>
+template <int dim>
 void mesh_info(const Triangulation<dim> &tria,
                const std::string        &filename)
 {

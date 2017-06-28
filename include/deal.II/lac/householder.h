@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 // forward declarations
-template<typename number> class Vector;
+template <typename number> class Vector;
 
 
 /*! @addtogroup Matrix2
@@ -52,7 +52,7 @@ template<typename number> class Vector;
  *
  * @author Guido Kanschat, 2005
  */
-template<typename number>
+template <typename number>
 class Householder : private FullMatrix<number>
 {
 public:
@@ -69,13 +69,13 @@ public:
   /**
    * Create an object holding the QR-decomposition of a matrix.
    */
-  template<typename number2>
+  template <typename number2>
   Householder (const FullMatrix<number2> &);
 
   /**
    * Compute the QR-decomposition of another matrix.
    */
-  template<typename number2>
+  template <typename number2>
   void
   initialize (const FullMatrix<number2> &);
 
@@ -89,14 +89,14 @@ public:
    * problem. It will be changed during the algorithm and is unusable on
    * return.
    */
-  template<typename number2>
+  template <typename number2>
   double least_squares (Vector<number2> &dst,
                         const Vector<number2> &src) const;
 
   /**
    * This function does the same as the one for BlockVectors.
    */
-  template<typename number2>
+  template <typename number2>
   double least_squares (BlockVector<number2> &dst,
                         const BlockVector<number2> &src) const;
 
@@ -104,10 +104,10 @@ public:
    * A wrapper to least_squares(), implementing the standard MatrixType
    * interface.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult (VectorType &dst, const VectorType &src) const;
 
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult (VectorType &dst, const VectorType &src) const;
 
 

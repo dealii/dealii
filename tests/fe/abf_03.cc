@@ -25,7 +25,7 @@
 
 
 
-template<unsigned int dim>
+template <unsigned int dim>
 void test (const unsigned int degree)
 {
   FE_ABF<dim> fe(degree);

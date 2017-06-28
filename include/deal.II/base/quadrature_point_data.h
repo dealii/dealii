@@ -86,7 +86,7 @@ public:
    * @pre The type @p T needs to either equal @p DataType, or be a class derived
    * from @p DataType. @p T needs to be default constructible.
    */
-  template<typename T=DataType>
+  template <typename T=DataType>
   void initialize(const CellIteratorType &cell,
                   const unsigned int number_of_data_points_per_cell);
 
@@ -95,7 +95,7 @@ public:
    * until, but not including, @p cell_end for all locally owned cells, i.e.
    * for which `cell->is_locally_owned()==true` .
    */
-  template<typename T=DataType>
+  template <typename T=DataType>
   void initialize(const CellIteratorType &cell_start,
                   const CellIteratorType &cell_end,
                   const unsigned int number_of_data_points_per_cell);
@@ -126,7 +126,7 @@ public:
    *
    * @pre The type @p T needs to match the class provided to initialize() .
    */
-  template<typename T=DataType>
+  template <typename T=DataType>
   std::vector<std::shared_ptr<T> > get_data(const CellIteratorType &cell);
 
   /**
@@ -139,7 +139,7 @@ public:
    *
    * @pre The type @p T needs to match the class provided to initialize() .
    */
-  template<typename T=DataType>
+  template <typename T=DataType>
   std::vector<std::shared_ptr<const T> > get_data(const CellIteratorType &cell) const;
 
 private:
@@ -496,7 +496,7 @@ CellDataStorage<CellIteratorType,DataType>::
 
 
 template <typename CellIteratorType, typename DataType>
-template<typename T>
+template <typename T>
 void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorType &cell,
                                                             const unsigned int n_q_points)
 {
@@ -517,7 +517,7 @@ void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorTy
 
 
 template <typename CellIteratorType, typename DataType>
-template<typename T>
+template <typename T>
 void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorType &cell_start,
                                                             const CellIteratorType &cell_end,
                                                             const unsigned int number)
@@ -623,7 +623,7 @@ CellDataStorage<CellIteratorType,DataType>::get_data(const CellIteratorType &cel
  * whereas the second index represents different values stored at each
  * quadrature point in the DataType class.
  */
-template<typename CellIteratorType, typename DataType>
+template <typename CellIteratorType, typename DataType>
 void pack_cell_data
 (const CellIteratorType &cell,
  const CellDataStorage<CellIteratorType,DataType> *data_storage,
@@ -656,7 +656,7 @@ void pack_cell_data
 /*
  * the opposite of the pack function above.
  */
-template<typename CellIteratorType, typename DataType>
+template <typename CellIteratorType, typename DataType>
 void unpack_to_cell_data
 (const CellIteratorType &cell,
  const FullMatrix<double> &values_at_qp,
@@ -688,7 +688,7 @@ namespace parallel
 {
   namespace distributed
   {
-    template<int dim, typename DataType>
+    template <int dim, typename DataType>
     ContinuousQuadratureDataTransfer<dim,DataType>::ContinuousQuadratureDataTransfer
     (const FiniteElement<dim> &projection_fe_,
      const Quadrature<dim> &lhs_quadrature,
@@ -720,13 +720,13 @@ namespace parallel
 
 
 
-    template<int dim, typename DataType>
+    template <int dim, typename DataType>
     ContinuousQuadratureDataTransfer<dim,DataType>::~ContinuousQuadratureDataTransfer()
     {}
 
 
 
-    template<int dim, typename DataType>
+    template <int dim, typename DataType>
     void ContinuousQuadratureDataTransfer<dim,DataType>::prepare_for_coarsening_and_refinement
     (parallel::distributed::Triangulation<dim> &tr_,
      CellDataStorage<CellIteratorType,DataType> &data_storage_)
@@ -767,7 +767,7 @@ namespace parallel
 
 
 
-    template<int dim, typename DataType>
+    template <int dim, typename DataType>
     void ContinuousQuadratureDataTransfer<dim,DataType>::interpolate ()
     {
       triangulation->notify_ready_to_unpack(offset,
@@ -784,7 +784,7 @@ namespace parallel
 
 
 
-    template<int dim, typename DataType>
+    template <int dim, typename DataType>
     void ContinuousQuadratureDataTransfer<dim,DataType>::pack_function
     (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
      const typename parallel::distributed::Triangulation<dim,dim>::CellStatus /*status*/,
@@ -802,7 +802,7 @@ namespace parallel
 
 
 
-    template<int dim, typename DataType>
+    template <int dim, typename DataType>
     void ContinuousQuadratureDataTransfer<dim,DataType>::
     unpack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,
                      const typename parallel::distributed::Triangulation<dim,dim>::CellStatus status,

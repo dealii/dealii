@@ -245,7 +245,7 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename PreconditionerType>
   void
   solve (const MatrixType         &A,
          VectorType               &x,
@@ -476,7 +476,7 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename PreconditionerType>
   void
   solve (const MatrixType         &A,
          VectorType               &x,
@@ -708,7 +708,7 @@ SolverGMRES<VectorType>::modified_gram_schmidt
 
 
 
-template<class VectorType>
+template <class VectorType>
 inline void
 SolverGMRES<VectorType>::compute_eigs_and_cond
 (const FullMatrix<double>                     &H_orig,
@@ -754,8 +754,8 @@ SolverGMRES<VectorType>::compute_eigs_and_cond
 
 
 
-template<class VectorType>
-template<typename MatrixType, typename PreconditionerType>
+template <class VectorType>
+template <typename MatrixType, typename PreconditionerType>
 void
 SolverGMRES<VectorType>::solve (const MatrixType         &A,
                                 VectorType               &x,
@@ -1056,7 +1056,7 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
 
 
 
-template<class VectorType>
+template <class VectorType>
 boost::signals2::connection
 SolverGMRES<VectorType>::connect_condition_number_slot
 (const std::function<void(double)> &slot,
@@ -1074,7 +1074,7 @@ SolverGMRES<VectorType>::connect_condition_number_slot
 
 
 
-template<class VectorType>
+template <class VectorType>
 boost::signals2::connection
 SolverGMRES<VectorType>::connect_eigenvalues_slot
 (const std::function<void (const std::vector<std::complex<double> > &)> &slot,
@@ -1092,7 +1092,7 @@ SolverGMRES<VectorType>::connect_eigenvalues_slot
 
 
 
-template<class VectorType>
+template <class VectorType>
 boost::signals2::connection
 SolverGMRES<VectorType>::connect_hessenberg_slot
 (const std::function<void (const FullMatrix<double> &)> &slot,
@@ -1110,7 +1110,7 @@ SolverGMRES<VectorType>::connect_hessenberg_slot
 
 
 
-template<class VectorType>
+template <class VectorType>
 boost::signals2::connection
 SolverGMRES<VectorType>::connect_krylov_space_slot
 (const std::function<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> &slot)
@@ -1120,7 +1120,7 @@ SolverGMRES<VectorType>::connect_krylov_space_slot
 
 
 
-template<class VectorType>
+template <class VectorType>
 double
 SolverGMRES<VectorType>::criterion ()
 {
@@ -1154,8 +1154,8 @@ SolverFGMRES<VectorType>::SolverFGMRES (SolverControl        &cn,
 
 
 
-template<class VectorType>
-template<typename MatrixType, typename PreconditionerType>
+template <class VectorType>
+template <typename MatrixType, typename PreconditionerType>
 void
 SolverFGMRES<VectorType>::solve (const MatrixType         &A,
                                  VectorType               &x,

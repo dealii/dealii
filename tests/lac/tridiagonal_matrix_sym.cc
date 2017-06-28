@@ -38,7 +38,7 @@
 
 
 // Symmetric matrix with constant diagonals [-1,2,-1]
-template<typename number>
+template <typename number>
 void
 matrix1(TridiagonalMatrix<number> &M)
 {
@@ -55,7 +55,7 @@ matrix1(TridiagonalMatrix<number> &M)
 
 
 // Symmetric matrix with increasing diagonals
-template<typename number>
+template <typename number>
 void
 matrix4(TridiagonalMatrix<number> &M)
 {
@@ -69,7 +69,7 @@ matrix4(TridiagonalMatrix<number> &M)
 }
 
 
-template<typename number>
+template <typename number>
 void
 check_vmult(TridiagonalMatrix<number> &M)
 {
@@ -124,7 +124,7 @@ check_vmult(TridiagonalMatrix<number> &M)
 }
 
 
-template<typename number>
+template <typename number>
 void
 check(unsigned int size)
 {

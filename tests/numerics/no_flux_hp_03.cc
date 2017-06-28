@@ -32,7 +32,7 @@
 #include <fstream>
 
 
-template<int dim>
+template <int dim>
 void test (const Triangulation<dim> &tr,
            const hp::FECollection<dim> &fe)
 {
@@ -53,7 +53,7 @@ void test (const Triangulation<dim> &tr,
 
 
 
-template<int dim>
+template <int dim>
 void test_hyper_sphere()
 {
   Triangulation<dim> tr;

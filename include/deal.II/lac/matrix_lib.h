@@ -23,9 +23,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<typename number> class Vector;
-template<typename number> class BlockVector;
-template<typename number> class SparseMatrix;
+template <typename number> class Vector;
+template <typename number> class BlockVector;
+template <typename number> class SparseMatrix;
 
 /*! @addtogroup Matrix2
  *@{

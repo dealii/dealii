@@ -80,9 +80,9 @@ class DoNothingAssembler
 public:
   template <class DOFINFO>
   void initialize_info(DOFINFO &info, bool face) const {}
-  template<class DOFINFO>
+  template <class DOFINFO>
   void assemble(const DOFINFO &info) {}
-  template<class DOFINFO>
+  template <class DOFINFO>
   void assemble(const DOFINFO &info1,
                 const DOFINFO &info2) {}
 
@@ -130,7 +130,7 @@ test_simple(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 //     lctrl);
 }
 
-template<int dim>
+template <int dim>
 void test_loop(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
 {
   deallog << "* own_cells=" << lctrl.own_cells
@@ -141,7 +141,7 @@ void test_loop(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
   test_simple(dofs, lctrl);
 }
 
-template<int dim>
+template <int dim>
 void
 test()
 {

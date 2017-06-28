@@ -47,7 +47,7 @@
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 class EnrichmentFunction : public Function<dim>
 {
 public:
@@ -72,7 +72,7 @@ public:
   }
 };
 
-template<int dim>
+template <int dim>
 void test_base()
 {
   deallog << "Test basic functions:"<<std::endl;

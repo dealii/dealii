@@ -129,7 +129,7 @@ compare_shapes (const FiniteElement<dim> &other,
 }
 
 
-template<int dim>
+template <int dim>
 void
 test (unsigned int degree)
 {

@@ -3465,7 +3465,7 @@ namespace parallel
 
 
 
-    template<int dim, int spacedim>
+    template <int dim, int spacedim>
     std::vector<bool>
     Triangulation<dim,spacedim>
     ::mark_locally_active_vertices_on_level (const int level) const
@@ -3520,7 +3520,7 @@ namespace parallel
 
 
 
-    template<int dim, int spacedim>
+    template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::add_periodicity
     (const std::vector<GridTools::PeriodicFacePair<cell_iterator> > &

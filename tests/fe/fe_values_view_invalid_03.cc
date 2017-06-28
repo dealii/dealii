@@ -31,7 +31,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void test (const Triangulation<dim> &tr,
            const FiniteElement<dim> &fe)
 {
@@ -62,7 +62,7 @@ ok:
 
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   Triangulation<dim> tr;

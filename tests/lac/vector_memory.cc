@@ -24,7 +24,7 @@
 
 using namespace dealii;
 
-template<typename VectorType>
+template <typename VectorType>
 void
 test_leak()
 {
@@ -34,7 +34,7 @@ test_leak()
 }
 
 
-template<typename VectorType>
+template <typename VectorType>
 void
 test_stat()
 {

@@ -259,7 +259,7 @@ public:
    * writes to @p n_components blocks of the block vector starting at the
    * index @p first_index. For non-block vectors, @p first_index is ignored.
    */
-  template<typename VectorType>
+  template <typename VectorType>
   void distribute_local_to_global (VectorType        &dst,
                                    const unsigned int first_index = 0) const;
 
@@ -289,7 +289,7 @@ public:
    * writes to @p n_components blocks of the block vector starting at the
    * index @p first_index. For non-block vectors, @p first_index is ignored.
    */
-  template<typename VectorType>
+  template <typename VectorType>
   void set_dof_values (VectorType        &dst,
                        const unsigned int first_index = 0) const;
 
@@ -678,7 +678,7 @@ protected:
    * @p distribute_local_to_global, and @p set_dof_values. It performs the
    * operation for several vectors at a time.
    */
-  template<typename VectorType, typename VectorOperation>
+  template <typename VectorType, typename VectorOperation>
   void read_write_operation (const VectorOperation &operation,
                              VectorType            *vectors[]) const;
 
@@ -689,7 +689,7 @@ protected:
    * function DoFAccessor::read_dof_values. Note that if vectorization is
    * enabled, the DoF values for several cells are set.
    */
-  template<typename VectorType>
+  template <typename VectorType>
   void read_dof_values_plain (const VectorType *src_data[]);
 
   /**
@@ -2958,7 +2958,7 @@ namespace internal
 
 
 template <int dim, int n_components_, typename Number>
-template<typename VectorType, typename VectorOperation>
+template <typename VectorType, typename VectorOperation>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
@@ -3303,7 +3303,7 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 template <int dim, int n_components_, typename Number>
-template<typename VectorType>
+template <typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
@@ -3328,7 +3328,7 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 template <int dim, int n_components_, typename Number>
-template<typename VectorType>
+template <typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
@@ -3348,7 +3348,7 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 template <int dim, int n_components_, typename Number>
-template<typename VectorType>
+template <typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
@@ -3372,7 +3372,7 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 template <int dim, int n_components_, typename Number>
-template<typename VectorType>
+template <typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>
@@ -3396,7 +3396,7 @@ FEEvaluationBase<dim,n_components_,Number>
 
 
 template <int dim, int n_components_, typename Number>
-template<typename VectorType>
+template <typename VectorType>
 inline
 void
 FEEvaluationBase<dim,n_components_,Number>

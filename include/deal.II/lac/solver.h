@@ -493,7 +493,7 @@ Solver<VectorType>::StateCombiner::operator ()(const Iterator begin,
 }
 
 
-template<class VectorType>
+template <class VectorType>
 inline
 Solver<VectorType>::Solver (SolverControl        &solver_control,
                             VectorMemory<VectorType> &vector_memory)
@@ -512,7 +512,7 @@ Solver<VectorType>::Solver (SolverControl        &solver_control,
 
 
 
-template<class VectorType>
+template <class VectorType>
 inline
 Solver<VectorType>::Solver (SolverControl &solver_control)
   :
@@ -531,7 +531,7 @@ Solver<VectorType>::Solver (SolverControl &solver_control)
 
 
 
-template<class VectorType>
+template <class VectorType>
 inline
 boost::signals2::connection
 Solver<VectorType>::

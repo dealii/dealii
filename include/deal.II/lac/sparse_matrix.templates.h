@@ -167,7 +167,7 @@ namespace internal
   {
     typedef types::global_dof_index size_type;
 
-    template<typename T>
+    template <typename T>
     void zero_subrange (const size_type begin,
                         const size_type end,
                         T *dst)

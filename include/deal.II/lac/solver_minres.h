@@ -99,7 +99,7 @@ public:
   /**
    * Solve the linear system $Ax=b$ for x.
    */
-  template<typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename PreconditionerType>
   void
   solve (const MatrixType         &A,
          VectorType               &x,
@@ -154,7 +154,7 @@ protected:
 
 #ifndef DOXYGEN
 
-template<class VectorType>
+template <class VectorType>
 SolverMinRes<VectorType>::SolverMinRes (SolverControl            &cn,
                                         VectorMemory<VectorType> &mem,
                                         const AdditionalData &)
@@ -164,7 +164,7 @@ SolverMinRes<VectorType>::SolverMinRes (SolverControl            &cn,
 
 
 
-template<class VectorType>
+template <class VectorType>
 SolverMinRes<VectorType>::SolverMinRes (SolverControl        &cn,
                                         const AdditionalData &)
   :
@@ -180,13 +180,13 @@ SolverMinRes<VectorType>::SolverMinRes (SolverControl        &cn,
 {}
 
 
-template<class VectorType>
+template <class VectorType>
 SolverMinRes<VectorType>::~SolverMinRes ()
 {}
 
 
 
-template<class VectorType>
+template <class VectorType>
 double
 SolverMinRes<VectorType>::criterion()
 {
@@ -194,7 +194,7 @@ SolverMinRes<VectorType>::criterion()
 }
 
 
-template<class VectorType>
+template <class VectorType>
 void
 SolverMinRes<VectorType>::print_vectors(const unsigned int,
                                         const VectorType &,
@@ -204,8 +204,8 @@ SolverMinRes<VectorType>::print_vectors(const unsigned int,
 
 
 
-template<class VectorType>
-template<typename MatrixType, typename PreconditionerType>
+template <class VectorType>
+template <typename MatrixType, typename PreconditionerType>
 void
 SolverMinRes<VectorType>::solve (const MatrixType         &A,
                                  VectorType               &x,

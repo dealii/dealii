@@ -130,13 +130,13 @@ namespace MeshWorker
       /**
        * Assemble the local residuals into the global residuals.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info);
 
       /**
        * Assemble both local residuals into the global residuals.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
     private:
@@ -227,13 +227,13 @@ namespace MeshWorker
       /**
        * Assemble the local matrices into the global matrices.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info);
 
       /**
        * Assemble all local matrices into the global matrices.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
 
@@ -351,13 +351,13 @@ namespace MeshWorker
       /**
        * Assemble the local matrices into the global matrices.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info);
 
       /**
        * Assemble all local matrices into the global matrices.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
 

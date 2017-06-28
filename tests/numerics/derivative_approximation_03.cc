@@ -41,7 +41,7 @@ using namespace std;
 const double a=4,b=5;
 
 
-template<int dim>
+template <int dim>
 class MyFunction : public Function<dim>
 {
 public:

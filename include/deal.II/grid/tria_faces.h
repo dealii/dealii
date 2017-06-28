@@ -45,7 +45,7 @@ namespace internal
      * @author Tobias Leicht, 2006
      */
 
-    template<int dim>
+    template <int dim>
     class TriaFaces
     {
     private:
@@ -64,7 +64,7 @@ namespace internal
      * <tt>dim@>=2</tt> the use of TriaFaces is reasonable, for <tt>dim=1</tt>
      * the class is empty.
      */
-    template<>
+    template <>
     class TriaFaces<1>
     {
 
@@ -87,7 +87,7 @@ namespace internal
     /**
      * In <tt>dim=2</tt> the cells are quads, the faces accordingly are lines.
      */
-    template<>
+    template <>
     class TriaFaces<2>
     {
     public:
@@ -116,7 +116,7 @@ namespace internal
      * In <tt>dim=3</tt> the cells are hexes, the faces accordingly are quads.
      * In addition to that we also have to enable the storage of lines.
      */
-    template<>
+    template <>
     class TriaFaces<3>
     {
     public:

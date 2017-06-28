@@ -38,7 +38,7 @@
 #include <vector>
 
 
-template<int dim>
+template <int dim>
 class MyFunction : public Function<dim>
 {
 public:

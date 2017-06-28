@@ -41,7 +41,7 @@
   deallog.pop(); \
   residuals.push_back(control.last_value())
 
-template<typename MatrixType>
+template <typename MatrixType>
 void
 check_vmult_quadratic (std::vector<double> &residuals,
                        const MatrixType    &A,

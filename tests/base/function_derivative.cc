@@ -30,7 +30,7 @@
 #include <string>
 
 
-template<int dim>
+template <int dim>
 void
 check_derivative_order(const std::vector<Tensor<1,dim> > &gradients,
                        FunctionDerivative<dim> &df,
@@ -67,7 +67,7 @@ check_derivative_order(const std::vector<Tensor<1,dim> > &gradients,
 }
 
 
-template<int dim>
+template <int dim>
 void
 check_hessian_order(const std::vector<double> &values,
                     FunctionDerivative<dim> &df,
@@ -113,7 +113,7 @@ check_hessian_order(const std::vector<double> &values,
 }
 
 
-template<int dim>
+template <int dim>
 void
 check_sine(unsigned int nquad)
 {

@@ -50,14 +50,14 @@ class SparsityPattern;
 
 namespace internal
 {
-  template<int dim, int spacedim, class MeshType>
+  template <int dim, int spacedim, class MeshType>
   class ActiveCellIterator
   {
   public:
     typedef typename MeshType::active_cell_iterator type;
   };
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   class ActiveCellIterator<dim, spacedim, dealii::DoFHandler<dim, spacedim> >
   {
   public:
@@ -68,7 +68,7 @@ namespace internal
 #endif
   };
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   class ActiveCellIterator<dim, spacedim, dealii::hp::DoFHandler<dim, spacedim> >
   {
   public:
@@ -284,7 +284,7 @@ namespace GridTools
    *
    * @note Implemented for dim=1, 2, and 3.
    */
-  template<int dim>
+  template <int dim>
   void
   rotate (const double          angle,
           const unsigned int    axis,
@@ -424,7 +424,7 @@ namespace GridTools
    *
    * @author Mauro Bardelloni, Luca Heltai, Andrea Mola, 2016
    */
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   remove_hanging_nodes( Triangulation<dim,spacedim> &tria,
                         const bool isotropic = false,
@@ -455,7 +455,7 @@ namespace GridTools
    *
    * @author Mauro Bardelloni, Luca Heltai, Andrea Mola, 2016
    */
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   remove_anisotropy(  Triangulation<dim,spacedim> &tria,
                       const double max_ratio = 1.6180339887,
@@ -610,7 +610,7 @@ namespace GridTools
    * right thing with anisotropically refined meshes. It needs to be checked
    * for this case.
    */
-  template<int dim, template <int, int> class MeshType, int spacedim>
+  template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
   std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
 #else
@@ -736,7 +736,7 @@ namespace GridTools
    * evaluating the solution) may not be possible and you will have to decide
    * what to do in that case.
    */
-  template <int dim, template<int, int> class MeshType, int spacedim>
+  template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
   std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim> >
 #else
@@ -824,7 +824,7 @@ namespace GridTools
    * An example of a custom predicate is one that checks for a given material
    * id
    * @code
-   * template<int dim>
+   * template <int dim>
    * bool
    * pred_mat_id(const typename Triangulation<dim>::active_cell_iterator & cell)
    * {
@@ -1004,7 +1004,7 @@ namespace GridTools
    * For a description of how predicate works,
    * see compute_active_cell_halo_layer()
    */
-  template<class MeshType>
+  template <class MeshType>
   std::pair< Point<MeshType::space_dimension>, Point<MeshType::space_dimension> >
   compute_bounding_box
   ( const MeshType                                                                    &mesh,
@@ -1052,7 +1052,7 @@ namespace GridTools
    *
    * @author Mauro Bardelloni, Luca Heltai, Andrea Mola, 2016
    */
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   std::pair<unsigned int, double>
   get_longest_direction(typename Triangulation<dim, spacedim>::active_cell_iterator cell);
 
@@ -1565,7 +1565,7 @@ namespace GridTools
    * constraints and a periodic p4est forest with respect to two 'periodic'
    * cell faces.
    */
-  template<typename CellIterator>
+  template <typename CellIterator>
   struct PeriodicFacePair
   {
     /**
@@ -1667,7 +1667,7 @@ namespace GridTools
    *
    * @author Matthias Maier, 2012
    */
-  template<typename FaceIterator>
+  template <typename FaceIterator>
   bool
   orthogonal_equality (std::bitset<3>     &orientation,
                        const FaceIterator &face1,
@@ -1681,7 +1681,7 @@ namespace GridTools
   /**
    * Same function as above, but doesn't return the actual orientation
    */
-  template<typename FaceIterator>
+  template <typename FaceIterator>
   bool
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,

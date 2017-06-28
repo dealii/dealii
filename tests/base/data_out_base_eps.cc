@@ -71,7 +71,7 @@ void check_cont(unsigned int ncells,
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void check_all(std::ostream &log)
 {
 #if SEPARATE_FILES == 0

@@ -33,7 +33,7 @@
 
 #include <fstream>
 
-template<int dim>
+template <int dim>
 void test()
 {
   parallel::shared::Triangulation<dim> shared_tria(MPI_COMM_WORLD,typename Triangulation<dim>::MeshSmoothing

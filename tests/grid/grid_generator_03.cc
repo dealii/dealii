@@ -68,7 +68,7 @@ template <> Table<3,types::material_id> material_ids<3>()
 
 
 
-template<int dim>
+template <int dim>
 void test(std::ostream &out)
 {
   Point<dim> p1;

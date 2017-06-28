@@ -57,7 +57,7 @@ namespace internal
     return true;
   }
 
-  template<int dim, class DOFINFO, class A>
+  template <int dim, class DOFINFO, class A>
   void assemble(const MeshWorker::DoFInfoBox<dim, DOFINFO> &dinfo, A *assembler)
   {
     dinfo.assemble(*assembler);
@@ -171,7 +171,7 @@ namespace MeshWorker
    * @author Guido Kanschat
    * @date 2010
    */
-  template<class INFOBOX, class DOFINFO, int dim, int spacedim, class ITERATOR>
+  template <class INFOBOX, class DOFINFO, int dim, int spacedim, class ITERATOR>
   void cell_action(
     ITERATOR cell,
     DoFInfoBox<dim, DOFINFO> &dof_info,
@@ -379,7 +379,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009
    */
-  template<int dim, int spacedim, class DOFINFO, class INFOBOX, class ASSEMBLER, class ITERATOR>
+  template <int dim, int spacedim, class DOFINFO, class INFOBOX, class ASSEMBLER, class ITERATOR>
   void loop(ITERATOR begin,
             typename identity<ITERATOR>::type end,
             DOFINFO &dinfo,
@@ -429,7 +429,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009
    */
-  template<int dim, int spacedim, class ITERATOR, class ASSEMBLER>
+  template <int dim, int spacedim, class ITERATOR, class ASSEMBLER>
   void integration_loop(ITERATOR begin,
                         typename identity<ITERATOR>::type end,
                         DoFInfo<dim, spacedim> &dof_info,

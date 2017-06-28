@@ -25,7 +25,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void print_info(Triangulation<dim,spacedim> &tria)
 {
   typename Triangulation<dim,spacedim>::active_cell_iterator cell;

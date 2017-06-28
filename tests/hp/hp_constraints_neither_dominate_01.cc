@@ -77,7 +77,7 @@ const double eps = 1e-10;
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 void test2cells(const unsigned int p1=2,
                 const unsigned int p2=1)
 {

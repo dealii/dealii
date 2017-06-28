@@ -1032,7 +1032,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   inline
   const hp::FECollection<dim,spacedim> &
   DoFHandler<dim,spacedim>::get_fe () const
@@ -1045,7 +1045,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   inline
   const Triangulation<dim,spacedim> &
   DoFHandler<dim,spacedim>::get_triangulation () const

@@ -39,7 +39,7 @@
 #include <deal.II/lac/solver_qmrs.h>
 #include <deal.II/lac/precondition.h>
 
-template<typename SolverType, typename MatrixType, typename VectorType>
+template <typename SolverType, typename MatrixType, typename VectorType>
 void
 check_solve (const MatrixType &A,
              VectorType       &u,

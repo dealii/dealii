@@ -94,7 +94,7 @@ private:
   ConvergenceTable     convergence_table;
 };
 // EXACT SOLUTION CLASS
-template<int dim>
+template <int dim>
 class ExactSolution : public Function<dim>
 {
 public:
@@ -130,7 +130,7 @@ private:
 template <int dim> const double RightHandSide<dim>::bc_constant = 0.1;
 
 // DEFINE EXACT SOLUTION MEMBERS
-template<int dim>
+template <int dim>
 double ExactSolution<dim>::value(const Point<dim> &p,
                                  const unsigned int component) const
 {
@@ -148,7 +148,7 @@ double ExactSolution<dim>::value(const Point<dim> &p,
   return val;
 
 }
-template<int dim>
+template <int dim>
 void ExactSolution<dim>::vector_value(const Point<dim> &p,
                                       Vector<double> &result) const
 {
@@ -237,7 +237,7 @@ MaxwellProblem<dim>::~MaxwellProblem ()
   dof_handler.clear ();
 }
 
-template<int dim>
+template <int dim>
 double MaxwellProblem<dim>::dotprod(const Tensor<1,dim> &A, const Tensor<1,dim> &B) const
 {
   double return_val = 0;
@@ -248,7 +248,7 @@ double MaxwellProblem<dim>::dotprod(const Tensor<1,dim> &A, const Tensor<1,dim> 
   return return_val;
 }
 
-template<int dim>
+template <int dim>
 double MaxwellProblem<dim>::dotprod(const Tensor<1,dim> &A, const Vector<double> &B) const
 {
   double return_val = 0;
@@ -362,7 +362,7 @@ void MaxwellProblem<dim>::solve ()
   constraints.distribute (solution);
 
 }
-template<int dim>
+template <int dim>
 void MaxwellProblem<dim>::process_solution(const unsigned int cycle)
 {
   const ExactSolution<dim> exact_solution;

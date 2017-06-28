@@ -38,7 +38,7 @@
 #include <cstdlib>
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim>

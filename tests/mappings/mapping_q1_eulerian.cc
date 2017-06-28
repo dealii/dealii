@@ -31,7 +31,7 @@
 
 
 
-template<int dim>
+template <int dim>
 inline void
 show_values(FiniteElement<dim> &fe,
             const char *name)
@@ -87,7 +87,7 @@ show_values(FiniteElement<dim> &fe,
 
 
 
-template<int dim>
+template <int dim>
 void show_values()
 {
   FE_Q<dim> q1(1);

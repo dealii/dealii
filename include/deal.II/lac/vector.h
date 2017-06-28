@@ -59,7 +59,7 @@ namespace TrilinosWrappers
 }
 #endif
 
-template<typename number> class LAPACKFullMatrix;
+template <typename number> class LAPACKFullMatrix;
 
 template <typename> class BlockVector;
 

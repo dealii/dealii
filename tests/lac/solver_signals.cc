@@ -45,7 +45,7 @@ void output_coefficients(double alpha,double beta)
   deallog<<"alpha: "<< alpha << " beta: "<< beta << std::endl;
 }
 
-template<class NUMBER>
+template <class NUMBER>
 void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string &text)
 {
   deallog<< text;
@@ -56,7 +56,7 @@ void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string
   deallog << std::endl;
 }
 
-template<class NUMBER>
+template <class NUMBER>
 void output_hessenberg_matrix(const FullMatrix<NUMBER> &H,const std::string &text)
 {
   deallog << text << std::endl;
@@ -68,7 +68,7 @@ void output_hessenberg_matrix(const FullMatrix<NUMBER> &H,const std::string &tex
     }
 }
 
-template<class NUMBER>
+template <class NUMBER>
 void output_arnoldi_vectors_norms(const internal::SolverGMRES::TmpVectors<Vector<NUMBER> > &tmp_vector,const std::string &text)
 {
   deallog << text << std::endl;
@@ -76,7 +76,7 @@ void output_arnoldi_vectors_norms(const internal::SolverGMRES::TmpVectors<Vector
     deallog << tmp_vector[i].l2_norm() << std::endl;
 }
 
-template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve(SolverType         &solver,
             const MatrixType   &A,

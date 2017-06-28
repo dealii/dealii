@@ -47,7 +47,7 @@ void check(DataOutBase::VtkFlags flags,
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void check_all(std::ostream &log)
 {
   for (unsigned int i = 0; i < 4; ++i)

@@ -37,7 +37,7 @@
 
 // Call this function with a system consisting of several copies of
 // the SAME element
-template<int dim>
+template <int dim>
 void vector_values(const FiniteElement<dim> &fe)
 {
   Assert(fe.n_base_elements() == 1, ExcNotImplemented());
@@ -85,7 +85,7 @@ void vector_values(const FiniteElement<dim> &fe)
   deallog.pop();
 }
 
-template<int dim>
+template <int dim>
 void test_vectors()
 {
   FE_Q<dim> q1(1);

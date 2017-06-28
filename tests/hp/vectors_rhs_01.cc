@@ -44,7 +44,7 @@
 #include <fstream>
 
 
-template<int dim>
+template <int dim>
 class MySquareFunction : public Function<dim>
 {
 public:

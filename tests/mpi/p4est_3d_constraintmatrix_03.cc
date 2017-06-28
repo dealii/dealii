@@ -53,7 +53,7 @@ const double T1 = 2.0;
 
 
 
-template<int dim>
+template <int dim>
 class FilteredDataOut : public DataOut<dim>
 {
 public:
@@ -129,7 +129,7 @@ TemperatureInitialValues<dim>::vector_value (const Point<dim> &p,
 }
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);

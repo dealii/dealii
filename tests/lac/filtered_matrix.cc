@@ -26,7 +26,7 @@
 #include <fstream>
 
 
-template<typename VectorType>
+template <typename VectorType>
 void test (const FilteredMatrix<VectorType> &M)
 {
   deallog << "Iterator";

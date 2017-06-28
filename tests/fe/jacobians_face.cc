@@ -26,7 +26,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 
-template<int dim>
+template <int dim>
 void test()
 {
   Triangulation<dim> tria;

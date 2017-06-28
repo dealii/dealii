@@ -30,7 +30,7 @@ namespace internal
 {
   namespace Triangulation
   {
-    template<class G>
+    template <class G>
     void
     TriaObjects<G>::reserve_space (const unsigned int new_objects_in_pairs,
                                    const unsigned int new_objects_single)
@@ -307,7 +307,7 @@ namespace internal
     }
 
 
-    template<>
+    template <>
     void
     TriaObjects<TriaObject<1> >::monitor_memory (const unsigned int) const
     {
@@ -326,7 +326,7 @@ namespace internal
     }
 
 
-    template<>
+    template <>
     void
     TriaObjects<TriaObject<2> >::monitor_memory (const unsigned int) const
     {
@@ -426,7 +426,7 @@ namespace internal
     }
 
 
-    template<typename G>
+    template <typename G>
     std::size_t
     TriaObjects<G>::memory_consumption () const
     {

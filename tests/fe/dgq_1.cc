@@ -32,7 +32,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void
 test(const unsigned int degree1,
      const unsigned int degree2)

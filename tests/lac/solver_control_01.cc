@@ -33,7 +33,7 @@
 #include <deal.II/lac/solver_relaxation.h>
 #include <deal.II/lac/precondition.h>
 
-template<typename MatrixType, typename VectorType, class PRECONDITION>
+template <typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve (SolverControl       &solver_control,
              const MatrixType    &A,

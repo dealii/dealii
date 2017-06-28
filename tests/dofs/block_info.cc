@@ -72,7 +72,7 @@ void test_grid(const Triangulation<dim> &tr,
 }
 
 
-template<int dim>
+template <int dim>
 void test_fe (const FiniteElement<dim> &fe)
 {
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);

@@ -375,7 +375,7 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-  template<typename FlagsType>
+  template <typename FlagsType>
   struct OutputFlagsBase
   {
     /**
@@ -406,17 +406,17 @@ namespace DataOutBase
   };
 
 
-  template<typename FlagsType>
+  template <typename FlagsType>
   void OutputFlagsBase<FlagsType>::declare_parameters (ParameterHandler &)
   {}
 
 
-  template<typename FlagsType>
+  template <typename FlagsType>
   void OutputFlagsBase<FlagsType>::parse_parameters (const ParameterHandler &)
   {}
 
 
-  template<typename FlagsType>
+  template <typename FlagsType>
   std::size_t OutputFlagsBase<FlagsType>::memory_consumption () const
   {
     return sizeof(FlagsType);
@@ -1207,13 +1207,13 @@ namespace DataOutBase
      * the point already exists and we are filtering redundant values, the
      * provided index will internally refer to another recorded point.
      */
-    template<int dim>
+    template <int dim>
     void write_point(const unsigned int &index, const Point<dim> &p);
 
     /**
      * Record a deal.II cell in the internal reordered format.
      */
-    template<int dim>
+    template <int dim>
     void write_cell(unsigned int index, unsigned int start, unsigned int d1, unsigned int d2, unsigned int d3);
 
     /**
@@ -2482,7 +2482,7 @@ public:
    * Set the flags to be used for output. This method expects <tt>flags</tt>
    * to be a member of one of the child classes of <tt>OutputFlagsBase</tt>.
    */
-  template<typename FlagType>
+  template <typename FlagType>
   void set_flags (const FlagType &flags);
 
 

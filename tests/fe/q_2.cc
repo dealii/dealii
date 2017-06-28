@@ -32,7 +32,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void
 test(const FE_Q<dim> &fe_q)
 {

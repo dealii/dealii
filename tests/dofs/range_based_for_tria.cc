@@ -29,7 +29,7 @@
 #include <string>
 
 
-template<int dim>
+template <int dim>
 void check()
 {
   Triangulation<dim> tr;

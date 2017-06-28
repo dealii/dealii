@@ -61,7 +61,7 @@ bool equal (const FullMatrix<double> &m1,
 }
 
 
-template<int dim>
+template <int dim>
 void test (const Triangulation<dim> &tr)
 {
   FE_Q<dim> fe(2);

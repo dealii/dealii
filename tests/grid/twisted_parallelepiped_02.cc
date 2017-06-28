@@ -31,7 +31,7 @@
  * this function is called for invalid input.
  */
 
-template<int dim>
+template <int dim>
 void check_parallelepiped (std::ofstream &logfile)
 {
   // Data structure defining dim coordinates that make up a

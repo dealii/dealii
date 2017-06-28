@@ -585,7 +585,7 @@ namespace TrilinosWrappers
 
 
 
-  template<typename SparsityPatternType>
+  template <typename SparsityPatternType>
   void
   SparsityPattern::reinit (const IndexSet            &row_parallel_partitioning,
                            const IndexSet            &col_parallel_partitioning,
@@ -603,7 +603,7 @@ namespace TrilinosWrappers
 
 
 
-  template<typename SparsityPatternType>
+  template <typename SparsityPatternType>
   void
   SparsityPattern::reinit (const IndexSet            &parallel_partitioning,
                            const SparsityPatternType &nontrilinos_sparsity_pattern,

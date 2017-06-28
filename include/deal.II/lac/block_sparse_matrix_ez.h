@@ -48,7 +48,7 @@ template <typename Number> class BlockVector;
  * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2002, 2003
  */
-template<typename Number>
+template <typename Number>
 class BlockSparseMatrixEZ : public Subscriptor
 {
 public:

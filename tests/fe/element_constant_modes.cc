@@ -27,7 +27,7 @@
 #include <string>
 
 
-template<int dim>
+template <int dim>
 void print_constant_modes(const FiniteElement<dim> &fe)
 {
   deallog << "Testing " << fe.get_name() << std::endl;
@@ -43,7 +43,7 @@ void print_constant_modes(const FiniteElement<dim> &fe)
 }
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   print_constant_modes(FE_Q<dim>(1));

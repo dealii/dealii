@@ -485,7 +485,7 @@ namespace internal
      * A helper class used internally in linear_operator.h. Specialization for
      * BlockVector<number>.
      */
-    template<typename number>
+    template <typename number>
     class ReinitHelper<BlockVector<number> >
     {
     public:

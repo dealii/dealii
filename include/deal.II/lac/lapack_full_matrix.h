@@ -30,10 +30,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
-template<typename number> class Vector;
-template<typename number> class BlockVector;
-template<typename number> class FullMatrix;
-template<typename number> class SparseMatrix;
+template <typename number> class Vector;
+template <typename number> class BlockVector;
+template <typename number> class FullMatrix;
+template <typename number> class SparseMatrix;
 
 
 /**
@@ -184,7 +184,7 @@ public:
    * The final two arguments allow to enter a multiple of the source or its
    * transpose.
    */
-  template<typename MatrixType>
+  template <typename MatrixType>
   void fill (const MatrixType &src,
              const size_type dst_offset_i = 0,
              const size_type dst_offset_j = 0,

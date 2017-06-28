@@ -395,7 +395,7 @@ public:
 
 #ifndef DOXYGEN
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 inline
 void
 MappingManifold<dim,spacedim>::InternalData::store_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const

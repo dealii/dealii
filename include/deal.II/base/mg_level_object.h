@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup data
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2005, 2010
  */
-template<class Object>
+template <class Object>
 class MGLevelObject : public Subscriptor
 {
 public:
@@ -157,7 +157,7 @@ private:
 /* ------------------------------------------------------------------- */
 
 
-template<class Object>
+template <class Object>
 MGLevelObject<Object>::MGLevelObject(const unsigned int min,
                                      const unsigned int max)
   :
@@ -167,7 +167,7 @@ MGLevelObject<Object>::MGLevelObject(const unsigned int min,
 }
 
 
-template<class Object>
+template <class Object>
 Object &
 MGLevelObject<Object>::operator[] (const unsigned int i)
 {
@@ -177,7 +177,7 @@ MGLevelObject<Object>::operator[] (const unsigned int i)
 }
 
 
-template<class Object>
+template <class Object>
 const Object &
 MGLevelObject<Object>::operator[] (const unsigned int i) const
 {
@@ -187,7 +187,7 @@ MGLevelObject<Object>::operator[] (const unsigned int i) const
 }
 
 
-template<class Object>
+template <class Object>
 void
 MGLevelObject<Object>::resize (const unsigned int new_minlevel,
                                const unsigned int new_maxlevel)
@@ -205,7 +205,7 @@ MGLevelObject<Object>::resize (const unsigned int new_minlevel,
 }
 
 
-template<class Object>
+template <class Object>
 MGLevelObject<Object> &
 MGLevelObject<Object>::operator = (const double d)
 {
@@ -216,7 +216,7 @@ MGLevelObject<Object>::operator = (const double d)
 }
 
 
-template<class Object>
+template <class Object>
 void
 MGLevelObject<Object>::clear () // DEPRECATED
 {
@@ -225,7 +225,7 @@ MGLevelObject<Object>::clear () // DEPRECATED
 }
 
 
-template<class Object>
+template <class Object>
 void
 MGLevelObject<Object>::clear_elements ()
 {
@@ -235,7 +235,7 @@ MGLevelObject<Object>::clear_elements ()
 }
 
 
-template<class Object>
+template <class Object>
 unsigned int
 MGLevelObject<Object>::min_level () const
 {
@@ -243,7 +243,7 @@ MGLevelObject<Object>::min_level () const
 }
 
 
-template<class Object>
+template <class Object>
 unsigned int
 MGLevelObject<Object>::max_level () const
 {
@@ -251,7 +251,7 @@ MGLevelObject<Object>::max_level () const
 }
 
 
-template<class Object>
+template <class Object>
 std::size_t
 MGLevelObject<Object>::memory_consumption () const
 {

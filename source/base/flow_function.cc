@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace Functions
 {
 
-  template<int dim>
+  template <int dim>
   FlowFunction<dim>::FlowFunction()
     :
     Function<dim>(dim+1),
@@ -37,12 +37,12 @@ namespace Functions
   {}
 
 
-  template<int dim>
+  template <int dim>
   FlowFunction<dim>::~FlowFunction()
   {}
 
 
-  template<int dim>
+  template <int dim>
   void
   FlowFunction<dim>::pressure_adjustment(double p)
   {
@@ -50,7 +50,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void FlowFunction<dim>::vector_value_list (
     const std::vector<Point<dim> > &points,
     std::vector<Vector<double> >   &values) const
@@ -75,7 +75,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void FlowFunction<dim>::vector_value (
     const Point<dim> &point,
     Vector<double> &value) const
@@ -99,7 +99,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   double FlowFunction<dim>::value (
     const Point<dim> &point,
     const unsigned int comp) const
@@ -121,7 +121,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void FlowFunction<dim>::vector_gradient_list (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<Tensor<1,dim> > > &values) const
@@ -146,7 +146,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void FlowFunction<dim>::vector_laplacian_list (
     const std::vector<Point<dim> > &points,
     std::vector<Vector<double> > &values) const
@@ -171,7 +171,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   std::size_t
   FlowFunction<dim>::memory_consumption () const
   {
@@ -182,7 +182,7 @@ namespace Functions
 
 //----------------------------------------------------------------------//
 
-  template<int dim>
+  template <int dim>
   PoisseuilleFlow<dim>::PoisseuilleFlow(const double r,
                                         const double Re)
     :
@@ -192,12 +192,12 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   PoisseuilleFlow<dim>::~PoisseuilleFlow()
   {}
 
 
-  template<int dim>
+  template <int dim>
   void PoisseuilleFlow<dim>::vector_values (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<double> > &values) const
@@ -232,7 +232,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void PoisseuilleFlow<dim>::vector_gradients (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<Tensor<1,dim> > > &values) const
@@ -263,7 +263,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void PoisseuilleFlow<dim>::vector_laplacians (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<double> > &values) const
@@ -281,19 +281,19 @@ namespace Functions
 
 //----------------------------------------------------------------------//
 
-  template<int dim>
+  template <int dim>
   StokesCosine<dim>::StokesCosine(const double nu, const double r)
     :
     viscosity(nu), reaction(r)
   {}
 
 
-  template<int dim>
+  template <int dim>
   StokesCosine<dim>::~StokesCosine()
   {}
 
 
-  template<int dim>
+  template <int dim>
   void
   StokesCosine<dim>::set_parameters(const double nu, const double r)
   {
@@ -302,7 +302,7 @@ namespace Functions
   }
 
 
-  template<int dim>
+  template <int dim>
   void StokesCosine<dim>::vector_values (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<double> > &values) const
@@ -349,7 +349,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void StokesCosine<dim>::vector_gradients (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<Tensor<1,dim> > > &values) const
@@ -413,7 +413,7 @@ namespace Functions
 
 
 
-  template<int dim>
+  template <int dim>
   void StokesCosine<dim>::vector_laplacians (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<double> > &values) const

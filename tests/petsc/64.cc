@@ -30,7 +30,7 @@
 #include <vector>
 
 
-template<typename MatrixType>
+template <typename MatrixType>
 void test (MatrixType &m)
 {
   m.add(0,0,1);

@@ -40,7 +40,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<typename number>
+template <typename number>
 void
 ConstraintMatrix::condense (SparseMatrix<number> &uncondensed) const
 {
@@ -60,7 +60,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed) const
 
 
 
-template<class VectorType>
+template <class VectorType>
 void
 ConstraintMatrix::condense (const VectorType &vec_ghosted,
                             VectorType       &vec) const
@@ -118,7 +118,7 @@ ConstraintMatrix::condense (VectorType &vec) const
 
 
 
-template<typename number, class VectorType>
+template <typename number, class VectorType>
 void
 ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                             VectorType           &vec) const
@@ -513,7 +513,7 @@ namespace internal
     {
       typedef types::global_dof_index size_type;
 
-      template<class VEC>
+      template <class VEC>
       void set_zero_parallel(const std::vector<size_type> &cm, VEC &vec, size_type shift = 0)
       {
         Assert(!vec.has_ghost_elements(), ExcInternalError());
@@ -534,7 +534,7 @@ namespace internal
           }
       }
 
-      template<typename Number>
+      template <typename Number>
       void set_zero_parallel(const std::vector<size_type> &cm, LinearAlgebra::distributed::Vector<Number> &vec, size_type shift = 0)
       {
         for (typename std::vector<size_type>::const_iterator it = cm.begin();
@@ -554,14 +554,14 @@ namespace internal
         vec.zero_out_ghosts();
       }
 
-      template<class VEC>
+      template <class VEC>
       void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, internal::bool2type<false>)
       {
         set_zero_parallel(cm, vec, 0);
       }
 
       // in parallel for BlockVectors
-      template<class VEC>
+      template <class VEC>
       void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, internal::bool2type<true>)
       {
         size_type start_shift = 0;
@@ -572,7 +572,7 @@ namespace internal
           }
       }
 
-      template<class VEC>
+      template <class VEC>
       void set_zero_serial(const std::vector<size_type> &cm, VEC &vec)
       {
         for (typename std::vector<size_type>::const_iterator it = cm.begin();
@@ -580,7 +580,7 @@ namespace internal
           vec(*it) = 0.;
       }
 
-      template<class VEC>
+      template <class VEC>
       void set_zero_all(const std::vector<size_type> &cm, VEC &vec)
       {
         set_zero_in_parallel<VEC>(cm, vec, internal::bool2type<IsBlockVector<VEC>::value>());
@@ -588,13 +588,13 @@ namespace internal
       }
 
 
-      template<class T>
+      template <class T>
       void set_zero_all(const std::vector<size_type> &cm, dealii::Vector<T> &vec)
       {
         set_zero_serial(cm, vec);
       }
 
-      template<class T>
+      template <class T>
       void set_zero_all(const std::vector<size_type> &cm, dealii::BlockVector<T> &vec)
       {
         set_zero_serial(cm, vec);
@@ -1592,7 +1592,7 @@ namespace internals
   // resolves constraints of one column at the innermost loop. goes through
   // the origin of each global entry and finds out which data we need to
   // collect.
-  template<typename LocalType>
+  template <typename LocalType>
   static inline
   LocalType resolve_matrix_entry (const GlobalRowsFromLocal   &global_rows,
                                   const GlobalRowsFromLocal &global_cols,
@@ -2179,7 +2179,7 @@ make_sorted_row_list (const std::vector<size_type> &local_dof_indices,
 
 
 // Resolve the constraints from the vector and apply inhomogeneities.
-template< typename LocalType>
+template < typename LocalType>
 inline
 LocalType
 ConstraintMatrix::

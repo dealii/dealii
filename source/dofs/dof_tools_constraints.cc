@@ -2066,7 +2066,7 @@ namespace DoFTools
     // Build up a (possibly rotated) interpolation matrix that is used in
     // set_periodicity_constraints with the help of user supplied matrix
     // and first_vector_components.
-    template<int dim, int spacedim>
+    template <int dim, int spacedim>
     FullMatrix<double> compute_transformation(
       const FiniteElement<dim, spacedim> &fe,
       const FullMatrix<double>           &matrix,
@@ -2382,7 +2382,7 @@ namespace DoFTools
 
 
 
-  template<typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   make_periodicity_constraints
   (const std::vector<GridTools::PeriodicFacePair<typename DoFHandlerType::cell_iterator> >
@@ -2428,7 +2428,7 @@ namespace DoFTools
   // High level interface variants:
 
 
-  template<typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   make_periodicity_constraints (const DoFHandlerType     &dof_handler,
                                 const types::boundary_id  b_id1,
@@ -2459,7 +2459,7 @@ namespace DoFTools
 
 
 
-  template<typename DoFHandlerType>
+  template <typename DoFHandlerType>
   void
   make_periodicity_constraints (const DoFHandlerType            &dof_handler,
                                 const types::boundary_id         b_id,

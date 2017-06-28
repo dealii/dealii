@@ -471,7 +471,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2013
      */
-    template<int dim, typename number>
+    template <int dim, typename number>
     void
     ip_residual(
       Vector<number> &result1,

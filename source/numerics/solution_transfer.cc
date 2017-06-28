@@ -35,7 +35,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 SolutionTransfer<dim, VectorType, DoFHandlerType>::
 SolutionTransfer(const DoFHandlerType &dof)
   :
@@ -55,7 +55,7 @@ SolutionTransfer(const DoFHandlerType &dof)
 
 
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 SolutionTransfer<dim, VectorType, DoFHandlerType>::~SolutionTransfer()
 {
   clear ();
@@ -63,7 +63,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::~SolutionTransfer()
 
 
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 void SolutionTransfer<dim, VectorType, DoFHandlerType>::clear ()
 {
   indices_on_cell.clear();
@@ -75,7 +75,7 @@ void SolutionTransfer<dim, VectorType, DoFHandlerType>::clear ()
 
 
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 void SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinement()
 {
   Assert(prepared_for!=pure_refinement, ExcAlreadyPrepForRef());
@@ -112,7 +112,7 @@ void SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinem
 
 
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 void
 SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate
 (const VectorType &in,
@@ -239,7 +239,7 @@ namespace internal
 
 
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 void
 SolutionTransfer<dim, VectorType, DoFHandlerType>::
 prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
@@ -392,7 +392,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
 
 
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 void
 SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_coarsening_and_refinement
 (const VectorType &in)
@@ -403,7 +403,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_coarsening_and_re
 
 
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 void SolutionTransfer<dim, VectorType, DoFHandlerType>::
 interpolate (const std::vector<VectorType> &all_in,
              std::vector<VectorType>       &all_out) const
@@ -534,7 +534,7 @@ interpolate (const std::vector<VectorType> &all_in,
 
 
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 void SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate
 (const VectorType &in,
  VectorType       &out) const
@@ -555,7 +555,7 @@ void SolutionTransfer<dim, VectorType, DoFHandlerType>::interpolate
 
 
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 std::size_t
 SolutionTransfer<dim, VectorType, DoFHandlerType>::memory_consumption () const
 {
@@ -572,7 +572,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::memory_consumption () const
 
 
 
-template<int dim, typename VectorType, typename DoFHandlerType>
+template <int dim, typename VectorType, typename DoFHandlerType>
 std::size_t
 SolutionTransfer<dim, VectorType, DoFHandlerType>::Pointerstruct::memory_consumption () const
 {

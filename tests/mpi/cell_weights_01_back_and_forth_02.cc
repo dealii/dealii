@@ -43,7 +43,7 @@ cell_weight_1(const typename parallel::distributed::Triangulation<dim>::cell_ite
   return current_cell_weight++;
 }
 
-template<int dim>
+template <int dim>
 void test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
