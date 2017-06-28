@@ -42,7 +42,6 @@
 #include <deal.II/lac/solver_relaxation.h>
 #include <deal.II/lac/solver_richardson.h>
 #include <deal.II/lac/solver_selector.h>
-#include <deal.II/lac/iterative_inverse.h>
 #ifdef DEAL_II_WITH_UMFPACK
 #include <deal.II/lac/sparse_direct.h>
 #endif
@@ -398,21 +397,6 @@ int main()
       const Vector<double> x = lo_A_inv*b;
     }
 #endif
-//    { // See #1673 and #1784
-//      deallog << "IterativeInverse" << std::endl;
-//
-//      PreconditionJacobi< SparseMatrix<double> > preconditioner;
-//      preconditioner.initialize(A);
-//
-//      ReductionControl solver_control (10, 1.e-30, 1.e-2);
-//      IterativeInverse< Vector<double> > A_inv;
-//      A_inv.initialize(A,preconditioner);
-//      A_inv.solver.select("cg");
-//      A_inv.solver.set_control(solver_control);
-//
-//      const auto lo_A_inv = linear_operator(A_inv);
-//      const Vector<double> x = lo_A_inv*b;
-//    }
     deallog.pop();
 
 
