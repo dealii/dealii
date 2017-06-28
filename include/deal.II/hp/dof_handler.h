@@ -910,6 +910,7 @@ namespace hp
      */
     template <int> friend class dealii::internal::hp::DoFIndicesOnFacesOrEdges;
     friend struct dealii::internal::hp::DoFHandler::Implementation;
+    friend struct dealii::internal::DoFHandler::Policy::Implementation;
   };
 
 
