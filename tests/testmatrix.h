@@ -173,7 +173,7 @@ FDMatrix::nine_point_structure(SP &structure) const
 
 
 
-template<typename MatrixType>
+template <typename MatrixType>
 void
 FDMatrix::nine_point(MatrixType &A, bool) const
 {
@@ -229,7 +229,7 @@ FDMatrix::nine_point(MatrixType &A, bool) const
     }
 }
 
-template<typename MatrixType>
+template <typename MatrixType>
 inline
 void
 FDMatrix::five_point(MatrixType &A, bool nonsymmetric) const
@@ -273,7 +273,7 @@ FDMatrix::five_point(MatrixType &A, bool nonsymmetric) const
 
 
 
-template<typename MatrixType>
+template <typename MatrixType>
 inline
 void
 FDMatrix::upwind(MatrixType &A, bool back) const
@@ -295,7 +295,7 @@ FDMatrix::upwind(MatrixType &A, bool back) const
     }
 }
 
-template<typename number>
+template <typename number>
 inline
 void
 FDMatrix::gnuplot_print(std::ostream &s, const Vector<number> &V) const

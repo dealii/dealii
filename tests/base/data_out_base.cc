@@ -63,7 +63,7 @@ write_patches(const std::vector<DataOutBase::Patch<dim,spacedim> > &patches,
 //    WRITE(eps);
 }
 
-template<int dim>
+template <int dim>
 struct PatchInfo
 {
   static double vertices[GeometryInfo<dim>::vertices_per_cell][3];
@@ -198,7 +198,7 @@ create_patches(std::vector<DataOutBase::Patch<dim,spacedim> > &patches)
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test(std::ostream &out)
 {
   std::vector<DataOutBase::Patch<dim, spacedim> > patches;

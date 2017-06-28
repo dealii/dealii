@@ -213,8 +213,8 @@ public:
    * object @p op for which the conversion function
    * <code>linear_operator</code> is defined.
    */
-  template<typename Op,
-           typename = typename std::enable_if<!std::is_base_of<LinearOperator<Range, Domain, Payload>, Op>::value>::type>
+  template <typename Op,
+            typename = typename std::enable_if<!std::is_base_of<LinearOperator<Range, Domain, Payload>, Op>::value>::type>
   LinearOperator (const Op &op)
   {
     *this = linear_operator<Range, Domain, Payload, Op>(op);
@@ -872,7 +872,7 @@ namespace internal
      * This class is specialized for more complicated data structures, such as
      * TrilinosWrappers::MPI::Vector, etc.
      */
-    template<typename Vector>
+    template <typename Vector>
     class ReinitHelper
     {
     public:

@@ -26,7 +26,7 @@
 using namespace dealii;
 
 
-template<typename MATRIX>
+template <typename MATRIX>
 void out_matrix_size(const MATRIX &M,
                      const std::string &name)
 {

@@ -32,7 +32,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 MappingQ<dim,spacedim>::InternalData::InternalData ()
   :
   use_mapping_q1_on_current_cell(false)
@@ -40,7 +40,7 @@ MappingQ<dim,spacedim>::InternalData::InternalData ()
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 std::size_t
 MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 {
@@ -52,7 +52,7 @@ MappingQ<dim,spacedim>::InternalData::memory_consumption () const
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
                                   const bool use_mapping_q_on_all_cells)
   :
@@ -83,7 +83,7 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
   :
   polynomial_degree (mapping.polynomial_degree),
@@ -102,7 +102,7 @@ MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 unsigned int
 MappingQ<dim,spacedim>::get_degree() const
 {
@@ -121,7 +121,7 @@ MappingQ<dim,spacedim>::preserves_vertex_locations () const
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 UpdateFlags
 MappingQ<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 {
@@ -132,7 +132,7 @@ MappingQ<dim,spacedim>::requires_update_flags (const UpdateFlags in) const
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 typename MappingQ<dim,spacedim>::InternalData *
 MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
                                   const Quadrature<dim> &quadrature) const
@@ -156,7 +156,7 @@ MappingQ<dim,spacedim>::get_data (const UpdateFlags update_flags,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 typename MappingQ<dim,spacedim>::InternalData *
 MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
                                        const Quadrature<dim-1>& quadrature) const
@@ -180,7 +180,7 @@ MappingQ<dim,spacedim>::get_face_data (const UpdateFlags update_flags,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 typename MappingQ<dim,spacedim>::InternalData *
 MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
                                           const Quadrature<dim-1>& quadrature) const
@@ -205,7 +205,7 @@ MappingQ<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
 
 // Note that the CellSimilarity flag is modifiable, since MappingQ can need to
 // recalculate data even when cells are similar.
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 CellSimilarity::Similarity
 MappingQ<dim,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -260,7 +260,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
 fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -301,7 +301,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
 fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -346,7 +346,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
 transform (const ArrayView<const Tensor<1,dim> >                  &input,
@@ -370,7 +370,7 @@ transform (const ArrayView<const Tensor<1,dim> >                  &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
 transform (const ArrayView<const DerivativeForm<1, dim, spacedim> >  &input,
@@ -394,7 +394,7 @@ transform (const ArrayView<const DerivativeForm<1, dim, spacedim> >  &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
 transform (const ArrayView<const Tensor<2, dim> >                 &input,
@@ -418,7 +418,7 @@ transform (const ArrayView<const Tensor<2, dim> >                 &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingQ<dim,spacedim>::
 transform (const ArrayView<const DerivativeForm<2, dim,spacedim> >  &input,
@@ -442,7 +442,7 @@ transform (const ArrayView<const DerivativeForm<2, dim,spacedim> >  &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void MappingQ<dim,spacedim>::
 transform (const ArrayView<const Tensor<3, dim> >                 &input,
            const MappingType                                       mapping_type,
@@ -465,7 +465,7 @@ transform (const ArrayView<const Tensor<3, dim> >                 &input,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Point<spacedim>
 MappingQ<dim,spacedim>::
 transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -482,7 +482,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Point<dim>
 MappingQ<dim,spacedim>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -500,7 +500,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Mapping<dim,spacedim> *
 MappingQ<dim,spacedim>::clone () const
 {

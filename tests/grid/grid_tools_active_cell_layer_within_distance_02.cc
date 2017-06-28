@@ -35,7 +35,7 @@
 #include <vector>
 #include <cmath>
 
-template<int dim>
+template <int dim>
 bool
 pred_mat_id(const typename Triangulation<dim>::active_cell_iterator &cell)
 {

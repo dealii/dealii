@@ -371,7 +371,7 @@ namespace internal
 {
   namespace ChunkSparseMatrix
   {
-    template<typename T>
+    template <typename T>
     void zero_subrange (const unsigned int begin,
                         const unsigned int end,
                         T *dst)

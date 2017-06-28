@@ -33,7 +33,7 @@
 //
 // This test is modified from tria_signals_04.
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 class SignalListener
 {
 public:
@@ -81,7 +81,7 @@ private:
 };
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;

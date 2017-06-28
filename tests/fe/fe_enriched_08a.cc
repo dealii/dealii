@@ -49,7 +49,7 @@ const double eps = 1e-10;
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 void test2cellsFESystem(const unsigned int p_feq=2,
                         const unsigned int p_feen=1)
 {

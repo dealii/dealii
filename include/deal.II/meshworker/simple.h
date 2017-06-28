@@ -104,7 +104,7 @@ namespace MeshWorker
       /**
        * Assemble both local residuals into the global residuals.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
     protected:
@@ -194,14 +194,14 @@ namespace MeshWorker
        * Assemble the local matrices associated with a single cell into the
        * global matrix.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info);
 
       /**
        * Assemble all local matrices associated with an interior face in the
        * info objects into the global matrix.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
     protected:
@@ -291,14 +291,14 @@ namespace MeshWorker
       /**
        * Assemble the matrix DoFInfo::M1[0] into the global matrix.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info);
 
       /**
        * Assemble both local matrices in the info objects into the global
        * matrices.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
     private:
@@ -449,14 +449,14 @@ namespace MeshWorker
       /**
        * Assemble the matrix DoFInfo::M1[0] into the global matrix.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info);
 
       /**
        * Assemble both local matrices in the info objects into the global
        * matrix.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
 

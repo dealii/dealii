@@ -42,7 +42,7 @@
 std::ofstream logfile("output");
 
 
-template<int dim>
+template <int dim>
 void check (const unsigned int n)
 {
   deallog << "n=" << n << std::endl;

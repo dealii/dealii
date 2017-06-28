@@ -36,7 +36,7 @@
 #include <fstream>
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   Triangulation<dim> triangulation (Triangulation<dim>::limit_level_difference_at_vertices);

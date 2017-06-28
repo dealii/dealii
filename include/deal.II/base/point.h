@@ -430,7 +430,7 @@ Point<dim,Number>::operator - () const
 
 
 template <int dim, typename Number>
-template<typename OtherNumber>
+template <typename OtherNumber>
 inline
 Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
 Point<dim,Number>::operator * (const OtherNumber factor) const
@@ -444,7 +444,7 @@ Point<dim,Number>::operator * (const OtherNumber factor) const
 
 
 template <int dim, typename Number>
-template<typename OtherNumber>
+template <typename OtherNumber>
 inline
 Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
 Point<dim,Number>::operator / (const OtherNumber factor) const

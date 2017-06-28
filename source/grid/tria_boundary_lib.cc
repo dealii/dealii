@@ -90,7 +90,7 @@ get_new_point_on_line (const typename Triangulation<dim,spacedim>::line_iterator
 
 
 
-template<>
+template <>
 Point<3>
 CylinderBoundary<3>::
 get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
@@ -110,7 +110,7 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
                     point_on_axis);
 }
 
-template<>
+template <>
 Point<3>
 CylinderBoundary<2,3>::
 get_new_point_on_quad (const Triangulation<2,3>::quad_iterator &quad) const
@@ -271,7 +271,7 @@ CylinderBoundary<dim,spacedim>::get_radius () const
 
 //======================================================================//
 
-template<int dim>
+template <int dim>
 ConeBoundary<dim>::ConeBoundary (const double radius_0,
                                  const double radius_1,
                                  const Point<dim> x_0,
@@ -285,7 +285,7 @@ ConeBoundary<dim>::ConeBoundary (const double radius_0,
 
 
 
-template<int dim>
+template <int dim>
 double ConeBoundary<dim>::get_radius (Point<dim> x) const
 {
   for (unsigned int i = 0; i < dim; ++i)
@@ -297,7 +297,7 @@ double ConeBoundary<dim>::get_radius (Point<dim> x) const
 
 
 
-template<int dim>
+template <int dim>
 void
 ConeBoundary<dim>::
 get_intermediate_points_between_points (const Point<dim> &p0,
@@ -327,7 +327,7 @@ get_intermediate_points_between_points (const Point<dim> &p0,
     }
 }
 
-template<int dim>
+template <int dim>
 Point<dim>
 ConeBoundary<dim>::
 get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
@@ -366,7 +366,7 @@ get_new_point_on_quad (const Triangulation<3>::quad_iterator &quad) const
 
 
 
-template<int dim>
+template <int dim>
 Point<dim>
 ConeBoundary<dim>::
 get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const
@@ -378,7 +378,7 @@ get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &) const
 
 
 
-template<int dim>
+template <int dim>
 void
 ConeBoundary<dim>::
 get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterator &line,
@@ -393,7 +393,7 @@ get_intermediate_points_on_line (const typename Triangulation<dim>::line_iterato
 
 
 
-template<>
+template <>
 void
 ConeBoundary<3>::
 get_intermediate_points_on_quad (const Triangulation<3>::quad_iterator &quad,
@@ -441,7 +441,7 @@ get_intermediate_points_on_quad (const typename Triangulation<dim>::quad_iterato
 
 
 
-template<>
+template <>
 void
 ConeBoundary<1>::
 get_normals_at_vertices (const Triangulation<1>::face_iterator &,
@@ -452,7 +452,7 @@ get_normals_at_vertices (const Triangulation<1>::face_iterator &,
 
 
 
-template<int dim>
+template <int dim>
 void
 ConeBoundary<dim>::
 get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
@@ -1400,7 +1400,7 @@ TorusBoundary<2,3>::get_surf_norm(const Point<3> &p) const
 
 
 
-template<>
+template <>
 void
 TorusBoundary<2,3>::
 get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator   &line,
@@ -1451,7 +1451,7 @@ get_intermediate_points_on_line (const Triangulation<2, 3>::line_iterator   &lin
 
 
 
-template<>
+template <>
 void
 TorusBoundary<2,3>::
 get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &quad,
@@ -1511,7 +1511,7 @@ get_intermediate_points_on_quad (const Triangulation< 2, 3 >::quad_iterator &qua
 
 
 
-template<>
+template <>
 void
 TorusBoundary<2,3>::
 get_normals_at_vertices (const Triangulation<2,3 >::face_iterator &face,

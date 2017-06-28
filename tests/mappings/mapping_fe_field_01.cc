@@ -42,7 +42,7 @@
 
 #define PRECISION 2
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test(const unsigned int degree)
 {
   deallog << "dim = " << dim << ", spacedim = " << spacedim << std::endl;

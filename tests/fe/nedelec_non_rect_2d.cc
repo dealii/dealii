@@ -73,7 +73,7 @@ using namespace dealii;
 
 namespace polytest
 {
-  template<int dim>
+  template <int dim>
   class SimplePolynomial : public Function<dim>
   {
   public:
@@ -85,7 +85,7 @@ namespace polytest
                          std::vector<Vector<double> >   &values) const;
 
   };
-  template<int dim>
+  template <int dim>
   void SimplePolynomial<dim>::vector_value_list (const std::vector<Point<dim> > &points,
                                                  std::vector<Vector<double> >   &values) const
   {
@@ -103,7 +103,7 @@ namespace polytest
 
   }
 
-  template<int dim>
+  template <int dim>
   void SimplePolynomial<dim>::rhs_value_list (const std::vector<Point<dim> > &points,
                                               std::vector<Vector<double> >   &values) const
   {
@@ -121,7 +121,7 @@ namespace polytest
 
   }
 
-  template<int dim>
+  template <int dim>
   class polytest
   {
   public:
@@ -151,7 +151,7 @@ namespace polytest
 
   };
 
-  template<int dim>
+  template <int dim>
   polytest<dim>::polytest (unsigned int degree)
     :
     p_order(degree),
@@ -166,7 +166,7 @@ namespace polytest
     dof_handler.clear ();
   }
 
-  template<int dim>
+  template <int dim>
   void polytest<dim>::setup_system()
   {
     dof_handler.distribute_dofs (fe);
@@ -192,7 +192,7 @@ namespace polytest
     system_matrix.reinit (sparsity_pattern);
   }
 
-  template<int dim>
+  template <int dim>
   void polytest<dim>::assemble_system()
   {
     const QGauss<dim> test_quad(quad_order);
@@ -266,7 +266,7 @@ namespace polytest
       }
   }
 
-  template<int dim>
+  template <int dim>
   void polytest<dim>::solve()
   {
     SparseDirectUMFPACK direct;
@@ -276,7 +276,7 @@ namespace polytest
     constraints.distribute (solution);
   }
 
-  template<int dim>
+  template <int dim>
   void polytest<dim>::output_error()
   {
     SimplePolynomial<dim> exact_solution;
@@ -288,7 +288,7 @@ namespace polytest
     deallog << "p=" << p_order << " L2_error: " << L2_error << std::endl;
   }
 
-  template<int dim>
+  template <int dim>
   void polytest<dim>::run()
   {
     GridGenerator::hyper_cube (tria, -1.2, 1.3);

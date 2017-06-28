@@ -43,7 +43,7 @@
 #include <fstream>
 
 
-template<int dim>
+template <int dim>
 void test (const Triangulation<dim> &tr)
 {
   FE_Q<dim> fe(2);

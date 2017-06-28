@@ -22,7 +22,7 @@
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition.h>
 
-template<class NUMBER>
+template <class NUMBER>
 void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string &text)
 {
   deallog<< text;

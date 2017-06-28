@@ -82,7 +82,7 @@ namespace Maxwell
   using namespace dealii;
 
   // Dirichlet BCs / exact solution:.
-  template<int dim>
+  template <int dim>
   class ExactSolution : public Function<dim>
   {
   public:
@@ -96,7 +96,7 @@ namespace Maxwell
                          std::vector<Vector<double> > &value_list);
   };
 
-  template<int dim>
+  template <int dim>
   ExactSolution<dim>::ExactSolution()
     :
     Function<dim> (dim)
@@ -191,7 +191,7 @@ namespace Maxwell
   {
     dof_handler.clear ();
   }
-  template<int dim>
+  template <int dim>
   double MaxwellProblem<dim>::calcErrorHcurlNorm()
   {
     QGauss<dim>  quadrature_formula(quad_order);
@@ -385,7 +385,7 @@ namespace Maxwell
     constraints.distribute (solution);
 
   }
-  template<int dim>
+  template <int dim>
   void MaxwellProblem<dim>::process_solution(const unsigned int cycle)
   {
 

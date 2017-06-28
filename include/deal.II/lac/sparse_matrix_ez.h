@@ -26,8 +26,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<typename number> class Vector;
-template<typename number> class FullMatrix;
+template <typename number> class Vector;
+template <typename number> class FullMatrix;
 
 /**
  * @addtogroup Matrix1
@@ -1392,7 +1392,7 @@ SparseMatrixEZ<number>::end (const size_type r) const
   return result;
 }
 
-template<typename number>
+template <typename number>
 template <typename MatrixType>
 inline
 SparseMatrixEZ<number> &
@@ -1417,7 +1417,7 @@ SparseMatrixEZ<number>::copy_from (const MatrixType &M, const bool elide_zero_va
   return *this;
 }
 
-template<typename number>
+template <typename number>
 template <typename MatrixType>
 inline
 void
@@ -1445,7 +1445,7 @@ SparseMatrixEZ<number>::add (const number      factor,
 
 
 
-template<typename number>
+template <typename number>
 template <typename MatrixTypeA, typename MatrixTypeB>
 inline void
 SparseMatrixEZ<number>::conjugate_add (const MatrixTypeA &A,

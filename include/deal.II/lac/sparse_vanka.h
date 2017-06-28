@@ -127,7 +127,7 @@ template <typename number> class SparseBlockVanka;
  * @author Guido Kanschat, Wolfgang Bangerth; 1999, 2000; extension for full
  * compatibility with LinearOperator class: Jean-Paul Pelteret, 2015
  */
-template<typename number>
+template <typename number>
 class SparseVanka
 {
 public:
@@ -227,7 +227,7 @@ public:
    * Do the preconditioning. This function takes the residual in @p src and
    * returns the resulting update vector in @p dst.
    */
-  template<typename number2>
+  template <typename number2>
   void vmult (Vector<number2>       &dst,
               const Vector<number2> &src) const;
 
@@ -235,7 +235,7 @@ public:
    * Apply transpose preconditioner. This function takes the residual in @p
    * src  and returns the resulting update vector in @p dst.
    */
-  template<typename number2>
+  template <typename number2>
   void Tvmult (Vector<number2>       &dst,
                const Vector<number2> &src) const;
 
@@ -279,7 +279,7 @@ protected:
    * The @p vmult of this class of course calls this function with a null
    * pointer
    */
-  template<typename number2>
+  template <typename number2>
   void apply_preconditioner (Vector<number2>         &dst,
                              const Vector<number2>   &src,
                              const std::vector<bool> *const dof_mask = nullptr) const;
@@ -502,7 +502,7 @@ private:
  *
  * @author Wolfgang Bangerth, 2000
  */
-template<typename number>
+template <typename number>
 class SparseBlockVanka : public SparseVanka<number>
 {
 public:
@@ -540,7 +540,7 @@ public:
   /**
    * Apply the preconditioner.
    */
-  template<typename number2>
+  template <typename number2>
   void vmult (Vector<number2>       &dst,
               const Vector<number2> &src) const;
 
@@ -579,7 +579,7 @@ private:
 
 #ifndef DOXYGEN
 
-template<typename number>
+template <typename number>
 inline typename SparseVanka<number>::size_type
 SparseVanka<number>::m () const
 {
@@ -587,7 +587,7 @@ SparseVanka<number>::m () const
   return _m;
 }
 
-template<typename number>
+template <typename number>
 inline typename SparseVanka<number>::size_type
 SparseVanka<number>::n () const
 {
@@ -595,8 +595,8 @@ SparseVanka<number>::n () const
   return _n;
 }
 
-template<typename number>
-template<typename number2>
+template <typename number>
+template <typename number2>
 inline void
 SparseVanka<number>::Tvmult (Vector<number2>       &/*dst*/,
                              const Vector<number2> &/*src*/) const

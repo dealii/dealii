@@ -35,7 +35,7 @@
 #include <vector>
 
 
-template<int dim>
+template <int dim>
 double
 value(const Point<dim> &p)
 {
@@ -48,7 +48,7 @@ value(const Point<dim> &p)
 
 namespace
 {
-  template<int dim>
+  template <int dim>
   struct Scratch
   {
     Scratch(const FiniteElement<dim> &fe, const Quadrature<dim> &quadrature) :
@@ -97,7 +97,7 @@ zero_element(std::vector<double> &dst,
 }
 
 
-template<int dim>
+template <int dim>
 void
 mass_assembler(const typename Triangulation<dim>::active_cell_iterator &cell,
                Scratch<dim> &data, CopyData &copy_data)

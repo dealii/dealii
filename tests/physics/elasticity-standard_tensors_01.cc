@@ -34,7 +34,7 @@ const double c01 = 20.0;
 // where I1 = I1(C), I2 = I2(C)
 // Then dI1/dC = I and dI2/dC = I1.I - C
 // and S = 2 dpsi/dC
-template<int dim>
+template <int dim>
 SymmetricTensor<2,dim>
 get_S (const Tensor<2,dim> &F)
 {
@@ -46,7 +46,7 @@ get_S (const Tensor<2,dim> &F)
 // For isotropic media, tau = 2.b.dpsi/db == 2.dpsi/db . b
 // where b = F.F^{T}, I1(b) == I1(C) and
 //  I2(b) == I2(C)
-template<int dim>
+template <int dim>
 SymmetricTensor<2,dim>
 get_tau (const Tensor<2,dim> &F)
 {
@@ -58,7 +58,7 @@ get_tau (const Tensor<2,dim> &F)
   return symmetrize(static_cast< Tensor<2,dim> >(tmp)*static_cast< Tensor<2,dim> >(b));
 }
 
-template<int dim>
+template <int dim>
 void
 test_standard_tensors ()
 {

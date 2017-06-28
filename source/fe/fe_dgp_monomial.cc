@@ -66,7 +66,7 @@ namespace
   };
 
 
-  template<int dim>
+  template <int dim>
   void generate_unit_points (const unsigned int,
                              std::vector<Point<dim> > &);
 

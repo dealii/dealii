@@ -37,7 +37,7 @@
 
 using namespace dealii;
 
-template<int dim,int spacedim>
+template <int dim,int spacedim>
 class TestIntegrator : public MeshWorker::LocalIntegrator<dim,spacedim>
 {
 public:
@@ -59,7 +59,7 @@ public:
   {};
 };
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   MappingQ1<dim,spacedim> mapping;

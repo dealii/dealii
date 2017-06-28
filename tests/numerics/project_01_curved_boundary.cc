@@ -61,7 +61,7 @@ public:
 };
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   HyperBallBoundary<dim> boundary;

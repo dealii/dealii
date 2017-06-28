@@ -223,7 +223,7 @@ const unsigned int GeometryInfo<4>::vertex_to_face
 };
 
 
-template<int dim>
+template <int dim>
 unsigned int
 GeometryInfo<dim>::n_children(const RefinementCase<dim> &ref_case)
 {
@@ -234,7 +234,7 @@ GeometryInfo<dim>::n_children(const RefinementCase<dim> &ref_case)
 }
 
 
-template<>
+template <>
 unsigned int
 GeometryInfo<1>::n_subfaces(const internal::SubfaceCase<1> &)
 {
@@ -244,7 +244,7 @@ GeometryInfo<1>::n_subfaces(const internal::SubfaceCase<1> &)
 
 
 
-template<>
+template <>
 unsigned int
 GeometryInfo<2>::n_subfaces(const internal::SubfaceCase<2> &subface_case)
 {
@@ -253,7 +253,7 @@ GeometryInfo<2>::n_subfaces(const internal::SubfaceCase<2> &subface_case)
 
 
 
-template<>
+template <>
 unsigned int
 GeometryInfo<3>::n_subfaces(const internal::SubfaceCase<3> &subface_case)
 {
@@ -263,7 +263,7 @@ GeometryInfo<3>::n_subfaces(const internal::SubfaceCase<3> &subface_case)
 }
 
 
-template<>
+template <>
 double
 GeometryInfo<1>::subface_ratio(const internal::SubfaceCase<1> &,
                                const unsigned int)
@@ -272,7 +272,7 @@ GeometryInfo<1>::subface_ratio(const internal::SubfaceCase<1> &,
 }
 
 
-template<>
+template <>
 double
 GeometryInfo<2>::subface_ratio(const internal::SubfaceCase<2> &subface_case,
                                const unsigned int)
@@ -314,7 +314,7 @@ GeometryInfo<2>::subface_ratio(const internal::SubfaceCase<2> &subface_case,
 }
 
 
-template<>
+template <>
 double
 GeometryInfo<3>::subface_ratio(const internal::SubfaceCase<3> &subface_case,
                                const unsigned int subface_no)
@@ -374,7 +374,7 @@ GeometryInfo<3>::subface_ratio(const internal::SubfaceCase<3> &subface_case,
 
 
 
-template<>
+template <>
 RefinementCase<0>
 GeometryInfo<1>::face_refinement_case(const RefinementCase<1> &,
                                       const unsigned int,
@@ -388,7 +388,7 @@ GeometryInfo<1>::face_refinement_case(const RefinementCase<1> &,
 }
 
 
-template<>
+template <>
 RefinementCase<1>
 GeometryInfo<2>::face_refinement_case(const RefinementCase<2> &cell_refinement_case,
                                       const unsigned int face_no,
@@ -430,7 +430,7 @@ GeometryInfo<2>::face_refinement_case(const RefinementCase<2> &cell_refinement_c
 }
 
 
-template<>
+template <>
 RefinementCase<2>
 GeometryInfo<3>::face_refinement_case(const RefinementCase<3> &cell_refinement_case,
                                       const unsigned int face_no,
@@ -523,7 +523,7 @@ GeometryInfo<3>::face_refinement_case(const RefinementCase<3> &cell_refinement_c
 
 
 
-template<>
+template <>
 RefinementCase<1>
 GeometryInfo<1>::line_refinement_case(const RefinementCase<1> &cell_refinement_case,
                                       const unsigned int line_no)
@@ -540,7 +540,7 @@ GeometryInfo<1>::line_refinement_case(const RefinementCase<1> &cell_refinement_c
 }
 
 
-template<>
+template <>
 RefinementCase<1>
 GeometryInfo<2>::line_refinement_case(const RefinementCase<2> &cell_refinement_case,
                                       const unsigned int line_no)
@@ -550,7 +550,7 @@ GeometryInfo<2>::line_refinement_case(const RefinementCase<2> &cell_refinement_c
 }
 
 
-template<>
+template <>
 RefinementCase<1>
 GeometryInfo<3>::line_refinement_case(const RefinementCase<3> &cell_refinement_case,
                                       const unsigned int line_no)
@@ -586,7 +586,7 @@ GeometryInfo<3>::line_refinement_case(const RefinementCase<3> &cell_refinement_c
 
 
 
-template<>
+template <>
 RefinementCase<1>
 GeometryInfo<1>::min_cell_refinement_case_for_face_refinement(const RefinementCase<0> &,
     const unsigned int,
@@ -601,7 +601,7 @@ GeometryInfo<1>::min_cell_refinement_case_for_face_refinement(const RefinementCa
 }
 
 
-template<>
+template <>
 RefinementCase<2>
 GeometryInfo<2>::min_cell_refinement_case_for_face_refinement(const RefinementCase<1> &face_refinement_case,
     const unsigned int face_no,
@@ -622,7 +622,7 @@ GeometryInfo<2>::min_cell_refinement_case_for_face_refinement(const RefinementCa
 }
 
 
-template<>
+template <>
 RefinementCase<3>
 GeometryInfo<3>::min_cell_refinement_case_for_face_refinement(const RefinementCase<2> &face_refinement_case,
     const unsigned int face_no,
@@ -688,7 +688,7 @@ GeometryInfo<3>::min_cell_refinement_case_for_face_refinement(const RefinementCa
 
 
 
-template<>
+template <>
 RefinementCase<1>
 GeometryInfo<1>::min_cell_refinement_case_for_line_refinement(const unsigned int line_no)
 {
@@ -699,7 +699,7 @@ GeometryInfo<1>::min_cell_refinement_case_for_line_refinement(const unsigned int
 }
 
 
-template<>
+template <>
 RefinementCase<2>
 GeometryInfo<2>::min_cell_refinement_case_for_line_refinement(const unsigned int line_no)
 {
@@ -712,7 +712,7 @@ GeometryInfo<2>::min_cell_refinement_case_for_line_refinement(const unsigned int
 }
 
 
-template<>
+template <>
 RefinementCase<3>
 GeometryInfo<3>::min_cell_refinement_case_for_line_refinement(const unsigned int line_no)
 {
@@ -1471,7 +1471,7 @@ GeometryInfo<3>::face_to_cell_lines (const unsigned int face,
 
 
 
-template<int dim>
+template <int dim>
 unsigned int
 GeometryInfo<dim>::face_to_cell_lines (const unsigned int,
                                        const unsigned int,

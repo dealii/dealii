@@ -111,7 +111,7 @@ private:
 
 #ifndef DOXYGEN
 
-template<typename Number>
+template <typename Number>
 inline Number
 FunctionTime<Number>::get_time () const
 {

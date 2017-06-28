@@ -54,7 +54,7 @@
 
 std::ofstream logfile("output");
 
-template<int spacedim>
+template <int spacedim>
 class BEM
 {
 

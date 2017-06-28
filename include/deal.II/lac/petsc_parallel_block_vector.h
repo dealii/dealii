@@ -523,7 +523,7 @@ namespace internal
      * A helper class used internally in linear_operator.h. Specialization for
      * PETScWrappers::MPI::BlockVector.
      */
-    template<>
+    template <>
     class ReinitHelper<PETScWrappers::MPI::BlockVector>
     {
     public:

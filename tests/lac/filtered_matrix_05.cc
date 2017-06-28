@@ -20,7 +20,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 
-template<typename number>
+template <typename number>
 void
 checkApply_Constraints(FullMatrix<number> &A, Vector<number> &V,
                        bool matrix_is_symmetric = false)

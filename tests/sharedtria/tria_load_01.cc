@@ -28,7 +28,7 @@
 #include <sstream>
 #include <fstream>
 
-template<int dim>
+template <int dim>
 void test()
 {
   Triangulation<dim> tr1;

@@ -278,7 +278,7 @@ private:
 
 
 
-template<typename MatrixType, typename Number>
+template <typename MatrixType, typename Number>
 class MGCoarseIterative : public MGCoarseGridBase<LinearAlgebra::distributed::Vector<Number> >
 {
 public:

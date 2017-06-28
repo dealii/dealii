@@ -87,7 +87,7 @@ namespace internal
 // Enable the EnableIfScalar type trait for VectorizedArray<Number> such
 // that it can be used as a Number type in Tensor<rank,dim,Number>, etc.
 
-template<typename Number>
+template <typename Number>
 struct EnableIfScalar<VectorizedArray<Number> >
 {
   typedef VectorizedArray<typename EnableIfScalar<Number>::type> type;
@@ -877,7 +877,7 @@ vectorized_transpose_and_store(const bool                     add_into,
 /**
  * Specialization for float and AVX512.
  */
-template<>
+template <>
 class VectorizedArray<float>
 {
 public:
@@ -1648,7 +1648,7 @@ vectorized_transpose_and_store(const bool                     add_into,
 /**
  * Specialization for float and AVX.
  */
-template<>
+template <>
 class VectorizedArray<float>
 {
 public:

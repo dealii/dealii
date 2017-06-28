@@ -160,7 +160,7 @@ MappingC1<2>::MappingC1Generic::add_line_support_points (const Triangulation<2>:
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingC1<dim,spacedim>::MappingC1Generic::add_line_support_points (const typename Triangulation<dim>::cell_iterator &,
     std::vector<Point<dim> > &) const
@@ -194,7 +194,7 @@ MappingC1<2>::MappingC1Generic::add_quad_support_points (const Triangulation<2>:
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 MappingC1<dim,spacedim>::MappingC1Generic::add_quad_support_points (const typename Triangulation<dim>::cell_iterator &,
     std::vector<Point<dim> > &) const
@@ -204,7 +204,7 @@ MappingC1<dim,spacedim>::MappingC1Generic::add_quad_support_points (const typena
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Mapping<dim, spacedim> *
 MappingC1<dim,spacedim>::clone () const
 {

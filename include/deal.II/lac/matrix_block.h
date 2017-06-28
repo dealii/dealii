@@ -236,7 +236,7 @@ public:
    * MatrixType. No index computations are done, thus, the vectors need to
    * have sizes matching #matrix.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult (VectorType &w, const VectorType &v) const;
 
   /**
@@ -244,7 +244,7 @@ public:
    * MatrixType. No index computations are done, thus, the vectors need to
    * have sizes matching #matrix.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult_add (VectorType &w, const VectorType &v) const;
 
   /**
@@ -252,7 +252,7 @@ public:
    * MatrixType. No index computations are done, thus, the vectors need to
    * have sizes matching #matrix.
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult (VectorType &w, const VectorType &v) const;
 
   /**
@@ -260,7 +260,7 @@ public:
    * MatrixType. No index computations are done, thus, the vectors need to
    * have sizes matching #matrix.
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult_add (VectorType &w, const VectorType &v) const;
 
   /**

@@ -693,7 +693,7 @@ QGaussLog<1>::get_quadrature_weights(const unsigned int n)
 }
 
 
-template<>
+template <>
 QGaussLogR<1>::QGaussLogR(const unsigned int n,
                           const Point<1> origin,
                           const double alpha,
@@ -765,7 +765,7 @@ QGaussLogR<1>::QGaussLogR(const unsigned int n,
 }
 
 
-template<>
+template <>
 unsigned int QGaussOneOverR<2>::quad_size(const Point<2> singularity,
                                           const unsigned int n)
 {
@@ -784,7 +784,7 @@ unsigned int QGaussOneOverR<2>::quad_size(const Point<2> singularity,
   return (8*n*n);
 }
 
-template<>
+template <>
 QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
                                   const Point<2> singularity,
                                   const bool factor_out_singularity) :
@@ -834,7 +834,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
 }
 
 
-template<>
+template <>
 QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
                                   const unsigned int vertex_index,
                                   const bool factor_out_singularity) :

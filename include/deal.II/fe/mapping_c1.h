@@ -38,7 +38,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Wolfgang Bangerth, 2001, 2015
  */
-template<int dim, int spacedim=dim>
+template <int dim, int spacedim=dim>
 class MappingC1 : public MappingQ<dim,spacedim>
 {
 public:

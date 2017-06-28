@@ -42,7 +42,7 @@
 using namespace std;
 
 
-template<int dim>
+template <int dim>
 void refine_mesh (Triangulation<dim> &triangulation)
 {
   bool cell_refined = false;

@@ -308,13 +308,13 @@ namespace TrilinosWrappers
      * The solve function is used to set properly the Epetra_LinearProblem,
      * once it is done this function solves the linear problem.
      */
-    template<typename Preconditioner>
+    template <typename Preconditioner>
     void do_solve(const Preconditioner &preconditioner);
 
     /**
      * A function that sets the preconditioner that the solver will apply
      */
-    template<typename Preconditioner>
+    template <typename Preconditioner>
     void set_preconditioner (AztecOO              &solver,
                              const Preconditioner &preconditioner);
 

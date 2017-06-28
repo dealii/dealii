@@ -100,7 +100,7 @@ double zvalue (const double x, const double y)
   return (xh * exp(-xh*xh - yh*yh)) / 10.;
 }
 
-template<int dim>
+template <int dim>
 class Geometry: public ChartManifold<dim>
 {
 public:
@@ -108,7 +108,7 @@ public:
   virtual Point<dim> push_forward(const Point<dim> &chart_point) const;
 };
 
-template<int dim>
+template <int dim>
 Point<dim> Geometry<dim>::pull_back(const Point<dim> &space_point) const
 {
   const double d = space_point[dim - 1];
@@ -128,7 +128,7 @@ Point<dim> Geometry<dim>::pull_back(const Point<dim> &space_point) const
   return p;
 }
 
-template<int dim>
+template <int dim>
 Point<dim> Geometry<dim>::push_forward(const Point<dim> &chart_point) const
 {
   const double d_hat = chart_point[dim - 1];
@@ -150,7 +150,7 @@ Point<dim> Geometry<dim>::push_forward(const Point<dim> &chart_point) const
 
 
 
-template<int dim>
+template <int dim>
 class TranscendentalManufacturedSolution : public Function<dim>
 {
 public:

@@ -49,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup output
  * @author Guido Kanschat, 2000
  */
-template<int dim, typename SolverType, class VectorType = Vector<double> >
+template <int dim, typename SolverType, class VectorType = Vector<double> >
 class DoFPrintSolverStep : public SolverType
 {
 public:
@@ -87,7 +87,7 @@ private:
 
 /* ----------------------- template functions --------------- */
 
-template<int dim, typename SolverType, class VectorType>
+template <int dim, typename SolverType, class VectorType>
 DoFPrintSolverStep<dim, SolverType, VectorType>::DoFPrintSolverStep
 (SolverControl            &control,
  VectorMemory<VectorType> &mem,
@@ -99,7 +99,7 @@ DoFPrintSolverStep<dim, SolverType, VectorType>::DoFPrintSolverStep
 {}
 
 
-template<int dim, typename SolverType, class VectorType>
+template <int dim, typename SolverType, class VectorType>
 void
 DoFPrintSolverStep<dim, SolverType, VectorType>::print_vectors
 (const unsigned int  step,

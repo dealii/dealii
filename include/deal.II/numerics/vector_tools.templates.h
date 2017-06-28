@@ -368,8 +368,8 @@ namespace VectorTools
   }
 
 
-  template<int dim, int spacedim, typename VectorType,
-           template <int,int> class DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType,
+            template <int,int> class DoFHandlerType>
   void
   interpolate_based_on_material_id
   (const Mapping<dim,spacedim>        &mapping,
@@ -3539,7 +3539,7 @@ namespace VectorTools
     // This function computes the
     // projection of the boundary
     // function on edges for 3D.
-    template<typename cell_iterator>
+    template <typename cell_iterator>
     void
     compute_edge_projection (const cell_iterator &cell,
                              const unsigned int   face,
@@ -3685,7 +3685,7 @@ namespace VectorTools
     // dummy implementation of above
     // function for all other
     // dimensions
-    template<int dim, typename cell_iterator>
+    template <int dim, typename cell_iterator>
     void
     compute_edge_projection (const cell_iterator &,
                              const unsigned int,
@@ -3703,7 +3703,7 @@ namespace VectorTools
     // projection of the boundary
     // function on the interior of
     // faces.
-    template<int dim, typename cell_iterator>
+    template <int dim, typename cell_iterator>
     void
     compute_face_projection_curl_conforming (const cell_iterator &cell,
                                              const unsigned int   face,
@@ -4494,7 +4494,7 @@ namespace VectorTools
 
   namespace internals
   {
-    template<typename cell_iterator>
+    template <typename cell_iterator>
     void
     compute_edge_projection_l2 (const cell_iterator &cell,
                                 const unsigned int   face,
@@ -4722,7 +4722,7 @@ namespace VectorTools
     }
 
 
-    template<int dim, typename cell_iterator>
+    template <int dim, typename cell_iterator>
     void
     compute_edge_projection_l2 (const cell_iterator &,
                                 const unsigned int,
@@ -4738,7 +4738,7 @@ namespace VectorTools
       Assert (false, ExcInternalError ());
     }
 
-    template<int dim, typename cell_iterator>
+    template <int dim, typename cell_iterator>
     void
     compute_face_projection_curl_conforming_l2
     (const cell_iterator   &cell,
@@ -5471,7 +5471,7 @@ namespace VectorTools
     }
 
     // dummy implementation of above function for all other dimensions
-    template<int dim, typename cell_iterator>
+    template <int dim, typename cell_iterator>
     void
     compute_face_projection_div_conforming (const cell_iterator &,
                                             const unsigned int,
@@ -5486,7 +5486,7 @@ namespace VectorTools
 
     // This function computes the projection of the boundary function on the
     // boundary in 3d.
-    template<typename cell_iterator>
+    template <typename cell_iterator>
     void
     compute_face_projection_div_conforming
     (const cell_iterator                       &cell,
@@ -5565,7 +5565,7 @@ namespace VectorTools
     // dummy implementation of above
     // function for all other
     // dimensions
-    template<int dim, typename cell_iterator>
+    template <int dim, typename cell_iterator>
     void
     compute_face_projection_div_conforming (const cell_iterator &,
                                             const unsigned int,
@@ -6779,13 +6779,13 @@ namespace VectorTools
 
     namespace
     {
-      template<typename number>
+      template <typename number>
       double mean_to_double(const number &mean_value)
       {
         return mean_value;
       }
 
-      template<typename number>
+      template <typename number>
       double mean_to_double(const std::complex<number> &mean_value)
       {
         // we need to return double as a norm, but mean value is a complex
@@ -7918,8 +7918,8 @@ namespace VectorTools
   }
 
 
-  template<int dim, int spacedim, template <int,int> class DoFHandlerType,
-           typename VectorType>
+  template <int dim, int spacedim, template <int,int> class DoFHandlerType,
+            typename VectorType>
   void get_position_vector(const DoFHandlerType<dim,spacedim> &dh,
                            VectorType                         &vector,
                            const ComponentMask                &mask)

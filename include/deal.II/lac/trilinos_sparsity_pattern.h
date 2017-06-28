@@ -368,7 +368,7 @@ namespace TrilinosWrappers
      * parallel, this function uses an ad-hoc partitioning of the rows and
      * columns.
      */
-    template<typename SparsityPatternType>
+    template <typename SparsityPatternType>
     void
     copy_from (const SparsityPatternType &nontrilinos_sparsity_pattern);
 
@@ -563,7 +563,7 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
-    template<typename SparsityPatternType>
+    template <typename SparsityPatternType>
     void
     reinit (const Epetra_Map          &row_parallel_partitioning,
             const Epetra_Map          &col_parallel_partitioning,
@@ -580,7 +580,7 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
-    template<typename SparsityPatternType>
+    template <typename SparsityPatternType>
     void
     reinit (const Epetra_Map          &parallel_partitioning,
             const SparsityPatternType &nontrilinos_sparsity_pattern,
@@ -795,7 +795,7 @@ namespace TrilinosWrappers
      * constructed. This feature is only implemented for input sparsity
      * patterns of type DynamicSparsityPattern.
      */
-    template<typename SparsityPatternType>
+    template <typename SparsityPatternType>
     void
     reinit (const IndexSet            &row_parallel_partitioning,
             const IndexSet            &col_parallel_partitioning,
@@ -811,7 +811,7 @@ namespace TrilinosWrappers
      * that is not fully constructed. This feature is only implemented for
      * input sparsity patterns of type DynamicSparsityPattern.
      */
-    template<typename SparsityPatternType>
+    template <typename SparsityPatternType>
     void
     reinit (const IndexSet            &parallel_partitioning,
             const SparsityPatternType &nontrilinos_sparsity_pattern,

@@ -118,7 +118,7 @@ public:
    * SolverName was specified in the constructor.
    *
    */
-  template<class Matrix, class Preconditioner>
+  template <class Matrix, class Preconditioner>
   void solve (const Matrix         &A,
               VectorType           &x,
               const VectorType     &b,
@@ -256,7 +256,7 @@ SolverSelector<VectorType>::select(const std::string &name)
 
 
 template <typename VectorType>
-template<class Matrix, class Preconditioner>
+template <class Matrix, class Preconditioner>
 void
 SolverSelector<VectorType>::solve (const Matrix         &A,
                                    VectorType           &x,

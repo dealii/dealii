@@ -22,7 +22,7 @@
 
 
 // Fill a tensor with values:
-template<int rank, int dim>
+template <int rank, int dim>
 struct FillTensor
 {
   static void fill_tensor(Tensor<rank, dim> &tensor, int base)
@@ -32,7 +32,7 @@ struct FillTensor
   }
 };
 
-template<int dim>
+template <int dim>
 struct FillTensor<1, dim>
 {
   static void fill_tensor(Tensor<1, dim> &tensor, int base)
@@ -45,7 +45,7 @@ struct FillTensor<1, dim>
 
 
 // Print a tensor of arbitrary rank to the console:
-template<int rank, int dim>
+template <int rank, int dim>
 struct PrintTensor
 {
   static void print_tensor(const Tensor<rank, dim> &tensor)
@@ -58,7 +58,7 @@ struct PrintTensor
   }
 };
 
-template<int dim>
+template <int dim>
 struct PrintTensor<1, dim>
 {
   static void print_tensor(const Tensor<1, dim> &tensor)

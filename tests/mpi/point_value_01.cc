@@ -43,7 +43,7 @@
 #include <fstream>
 #include <iostream>
 
-template<int dim>
+template <int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);

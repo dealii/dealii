@@ -198,7 +198,7 @@ MGTransferBlockBase::memory_consumption () const
 
 //----------------------------------------------------------------------//
 
-template<typename number>
+template <typename number>
 MGTransferSelect<number>::MGTransferSelect ()
   :
   selected_component (0),
@@ -206,7 +206,7 @@ MGTransferSelect<number>::MGTransferSelect ()
 {}
 
 
-template<typename number>
+template <typename number>
 MGTransferSelect<number>::MGTransferSelect (const ConstraintMatrix &c)
   :
   selected_component (0),

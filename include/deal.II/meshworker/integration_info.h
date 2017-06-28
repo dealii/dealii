@@ -70,7 +70,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009
    */
-  template<int dim, int spacedim = dim>
+  template <int dim, int spacedim = dim>
   class IntegrationInfo
   {
   private:
@@ -188,7 +188,7 @@ namespace MeshWorker
      * Use the finite element functions in #global_data and fill the vectors
      * #values, #gradients and #hessians.
      */
-    template<typename number>
+    template <typename number>
     void fill_local_data(const DoFInfo<dim, spacedim, number> &info, bool split_fevalues);
 
     /**
@@ -551,7 +551,7 @@ namespace MeshWorker
 
 //----------------------------------------------------------------------//
 
-  template<int dim, int sdim>
+  template <int dim, int sdim>
   inline
   IntegrationInfo<dim,sdim>::IntegrationInfo()
     :
@@ -562,7 +562,7 @@ namespace MeshWorker
   {}
 
 
-  template<int dim, int sdim>
+  template <int dim, int sdim>
   inline
   IntegrationInfo<dim,sdim>::IntegrationInfo(const IntegrationInfo<dim,sdim> &other)
     :
@@ -599,7 +599,7 @@ namespace MeshWorker
 
 
 
-  template<int dim, int sdim>
+  template <int dim, int sdim>
   template <class FEVALUES>
   inline void
   IntegrationInfo<dim,sdim>::initialize(

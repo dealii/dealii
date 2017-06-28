@@ -97,7 +97,7 @@
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 class MyFunction : public dealii::Function<dim>
 {
 public:
@@ -112,7 +112,7 @@ private:
   const double k;
 };
 
-template<int dim>
+template <int dim>
 MyFunction<dim>::MyFunction(const double k)
   :
   dealii::Function<dim>(1),
@@ -121,7 +121,7 @@ MyFunction<dim>::MyFunction(const double k)
 
 }
 
-template<int dim>
+template <int dim>
 double MyFunction<dim>::value(const dealii::Point<dim> &point,
                               const unsigned int ) const
 {
@@ -133,14 +133,14 @@ double MyFunction<dim>::value(const dealii::Point<dim> &point,
     return k * x;
 }
 
-template<int dim>
+template <int dim>
 double MyFunction<dim>::get_k() const
 {
   return k;
 }
 
 // neuman bc
-template<int dim>
+template <int dim>
 class NeumanBC : public dealii::Function<dim>
 {
 public:
@@ -155,7 +155,7 @@ private:
   const double c;
 };
 
-template<int dim>
+template <int dim>
 NeumanBC<dim>::NeumanBC(const double c)
   :
   dealii::Function<dim>(1),
@@ -163,14 +163,14 @@ NeumanBC<dim>::NeumanBC(const double c)
 {
 }
 
-template<int dim>
+template <int dim>
 double NeumanBC<dim>::value(const dealii::Point<dim> &point,
                             const unsigned int ) const
 {
   return c;
 }
 
-template<int dim>
+template <int dim>
 double NeumanBC<dim>::get_c() const
 {
   return c;
@@ -178,17 +178,17 @@ double NeumanBC<dim>::get_c() const
 
 // helper function to get diagonal and
 // area of the squared element with lenght h
-template<int dim>
+template <int dim>
 void get_h_area(double &h, double &a, const double L);
 
-template<>
+template <>
 void get_h_area<2>(double &h, double &a, const double L)
 {
   h = L;
   a = L;
 }
 
-template<>
+template <>
 void get_h_area<3>(double &h, double &a, const double L)
 {
   h = std::sqrt(2.0)*L;
@@ -197,17 +197,17 @@ void get_h_area<3>(double &h, double &a, const double L)
 
 // helper function to get diagonal and area of the
 // h-refined face.
-template<int dim>
+template <int dim>
 void get_h_area_sub(double &h, double &a, const double L);
 
-template<>
+template <>
 void get_h_area_sub<2>(double &h, double &a, const double L)
 {
   h = L/2;
   a = L/2;
 }
 
-template<>
+template <>
 void get_h_area_sub<3>(double &h, double &a, const double L)
 {
   h = std::sqrt(2.0)*L/2;
@@ -215,7 +215,7 @@ void get_h_area_sub<3>(double &h, double &a, const double L)
 }
 
 // output for inspection
-template<int dim>
+template <int dim>
 void output(const std::string          name,
             const Triangulation<dim>  &triangulation,
             const hp::DoFHandler<dim> &dof_handler,
@@ -246,7 +246,7 @@ void output(const std::string          name,
 }
 
 // case 1)
-template<int dim>
+template <int dim>
 void test_neumann(const NeumanBC<dim> &func)
 {
   deallog << "NeumanBC case:"<<std::endl;
@@ -326,7 +326,7 @@ void test_neumann(const NeumanBC<dim> &func)
 }
 
 // case 2)
-template<int dim>
+template <int dim>
 void test_regular(const MyFunction<dim> &func)
 {
   deallog << std::endl;
@@ -438,7 +438,7 @@ void test_regular(const MyFunction<dim> &func)
 }
 
 // case 3)
-template<int dim>
+template <int dim>
 void test_irregular(const MyFunction<dim> &func)
 {
   deallog << std::endl;
@@ -586,7 +586,7 @@ void test_irregular(const MyFunction<dim> &func)
   dof_handler.clear();
 }
 
-template<int dim>
+template <int dim>
 class MySecondFunction : public dealii::Function<dim>
 {
 public:
@@ -596,7 +596,7 @@ public:
                        const unsigned int component = 0 ) const;
 };
 
-template<int dim>
+template <int dim>
 MySecondFunction<dim>::MySecondFunction()
   :
   dealii::Function<dim>(1)
@@ -604,7 +604,7 @@ MySecondFunction<dim>::MySecondFunction()
 
 }
 
-template<int dim>
+template <int dim>
 double MySecondFunction<dim>::value(const dealii::Point<dim> &point,
                                     const unsigned int ) const
 {
@@ -616,7 +616,7 @@ double MySecondFunction<dim>::value(const dealii::Point<dim> &point,
   return (1.-x)*(1.-y)*(1.-y)+std::pow(1.0-y,4)*std::exp(-x);
 }
 
-template<int dim>
+template <int dim>
 void test(const MySecondFunction<dim> &func)
 {
   deallog << std::endl;

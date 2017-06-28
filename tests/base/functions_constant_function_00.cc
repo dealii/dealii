@@ -171,7 +171,7 @@ void test_constructor(const unsigned int n_component,
 }
 
 // test different number of vector components
-template<int dim, typename Number>
+template <int dim, typename Number>
 void test_n_components(const std::vector<NUMBER> &component_data)
 {
 #define N_COMPONENT_CASE 3

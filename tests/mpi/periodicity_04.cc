@@ -163,7 +163,7 @@ void generate_grid(parallel::distributed::Triangulation<3> &triangulation, int o
   triangulation.create_triangulation(vertices, cells, SubCellData());
 }
 
-template<int dim>
+template <int dim>
 void check
 (const unsigned int  orientation,
  bool                reverse)

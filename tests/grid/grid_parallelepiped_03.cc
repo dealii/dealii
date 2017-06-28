@@ -36,7 +36,7 @@ std::ofstream logfile ("output");
 
 // The simplest test case is to create a parallelepiped grid with a
 // number of subdivisions and output the result.
-template<int dim>
+template <int dim>
 void check_subdivided_parallelepiped (bool colorize, bool log)
 {
   // Data structure defining dim coordinates that make up a

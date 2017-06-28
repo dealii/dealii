@@ -34,7 +34,7 @@
 /**
  * Check if user pointers are the same as entered below
  */
-template<int dim>
+template <int dim>
 void
 check_user_pointers(Triangulation<dim> &tr)
 {
@@ -83,7 +83,7 @@ check_user_pointers(Triangulation<dim> &tr)
 /**
  * Check if user indices are the same as entered below
  */
-template<int dim>
+template <int dim>
 void
 check_user_indices(Triangulation<dim> &tr)
 {
@@ -130,7 +130,7 @@ check_user_indices(Triangulation<dim> &tr)
 }
 
 
-template<int dim>
+template <int dim>
 void
 user_pointers(Triangulation<dim> &tr)
 {
@@ -192,7 +192,7 @@ user_pointers(Triangulation<dim> &tr)
 }
 
 
-template<int dim>
+template <int dim>
 void
 user_indices(Triangulation<dim> &tr)
 {

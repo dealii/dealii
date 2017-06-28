@@ -36,7 +36,7 @@ void output_double_number(double input,const std::string &text)
   deallog<<text<< input<<std::endl;
 }
 
-template<class NUMBER>
+template <class NUMBER>
 void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string &text)
 {
   deallog<< text;
@@ -48,7 +48,7 @@ void output_eigenvalues(const std::vector<NUMBER> &eigenvalues,const std::string
 }
 
 
-template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve (SolverType         &solver,
              const MatrixType   &A,
@@ -68,7 +68,7 @@ check_solve (SolverType         &solver,
     }
 }
 
-template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_Tsolve (SolverType         &solver,
               const MatrixType   &A,

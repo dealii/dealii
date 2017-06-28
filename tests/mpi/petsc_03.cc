@@ -30,7 +30,7 @@
 #include <fstream>
 //#include <mpi.h>
 
-template<class v>
+template <class v>
 void testit()
 {
   GrowingVectorMemory<v> m;

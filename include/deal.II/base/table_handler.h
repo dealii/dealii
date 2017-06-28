@@ -600,7 +600,7 @@ protected:
      */
     template <class Archive>
     void save(Archive &ar, const unsigned int version) const;
-    template<class Archive>
+    template <class Archive>
     void load(Archive &ar, const unsigned int version);
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
@@ -908,7 +908,7 @@ TableHandler::Column::save(Archive &ar, const unsigned int /*version*/) const
 
 
 
-template<class Archive>
+template <class Archive>
 void
 TableHandler::Column::load(Archive &ar, const unsigned int /*version*/)
 {

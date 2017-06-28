@@ -61,7 +61,7 @@ using namespace dealii;
 /**
  * Coulomb potential
  */
-template<int dim>
+template <int dim>
 class PotentialFunction : public Function<dim>
 {
 public:
@@ -73,7 +73,7 @@ public:
                        const unsigned int component = 0 ) const;
 };
 
-template<int dim>
+template <int dim>
 double PotentialFunction<dim>::value(const Point<dim> &p,
                                      const unsigned int ) const
 {
@@ -82,7 +82,7 @@ double PotentialFunction<dim>::value(const Point<dim> &p,
   return -1.0 / std::sqrt(p.square());
 }
 
-template<int dim>
+template <int dim>
 class EnrichmentFunction : public Function<dim>
 {
 public:
@@ -443,7 +443,7 @@ namespace Step36
     mass_matrix.compress (VectorOperation::add);
   }
 
-  template<int dim>
+  template <int dim>
   std::pair<unsigned int, double>
   EigenvalueProblem<dim>::solve()
   {

@@ -29,7 +29,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<typename number>
+template <typename number>
 SparseVanka<number>::SparseVanka()
   :
   matrix (),
@@ -43,7 +43,7 @@ SparseVanka<number>::SparseVanka()
 
 }
 
-template<typename number>
+template <typename number>
 SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
                                  const std::vector<bool>    &selected_dofs,
                                  const bool                  conserve_mem,
@@ -65,7 +65,7 @@ SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
 }
 
 
-template<typename number>
+template <typename number>
 SparseVanka<number>::~SparseVanka()
 {
   typename std::vector<SmartPointer<FullMatrix<float>,SparseVanka<number> > >::iterator i;
@@ -78,7 +78,7 @@ SparseVanka<number>::~SparseVanka()
 }
 
 
-template<typename number>
+template <typename number>
 void
 SparseVanka<number>::initialize(const SparseMatrix<number> &M,
                                 const AdditionalData       &additional_data)
@@ -220,8 +220,8 @@ SparseVanka<number>::compute_inverse (const size_type         row,
 }
 
 
-template<typename number>
-template<typename number2>
+template <typename number>
+template <typename number2>
 void
 SparseVanka<number>::vmult (Vector<number2>       &dst,
                             const Vector<number2> &src) const
@@ -237,8 +237,8 @@ SparseVanka<number>::vmult (Vector<number2>       &dst,
 }
 
 
-template<typename number>
-template<typename number2>
+template <typename number>
+template <typename number2>
 void
 SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
                                            const Vector<number2>   &src,

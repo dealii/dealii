@@ -43,7 +43,7 @@ public:
   /**
   * Apply preconditioner.
   */
-  template<typename VectorType>
+  template <typename VectorType>
   void vmult (VectorType &, const VectorType &) const;
 
   /**
@@ -53,12 +53,12 @@ public:
    * the same as
    * vmult().
    */
-  template<typename VectorType>
+  template <typename VectorType>
   void Tvmult (VectorType &, const VectorType &) const;
   /**
    * Apply preconditioner, adding to the previous value.
    */
-  template<typename VectorType>
+  template <typename VectorType>
   void vmult_add (VectorType &, const VectorType &) const;
 
   /**
@@ -68,7 +68,7 @@ public:
    * the same as
    * vmult_add().
    */
-  template<typename VectorType>
+  template <typename VectorType>
   void Tvmult_add (VectorType &, const VectorType &) const;
 
 private:
@@ -78,31 +78,31 @@ private:
 
 //----------------------------------------------------------------------//
 
-template<typename number>
+template <typename number>
 ScalingMatrix<number>::ScalingMatrix(number factor)
   :
   factor(factor)
 {}
 
 
-template<typename number>
-template<typename VectorType>
+template <typename number>
+template <typename VectorType>
 inline void
 ScalingMatrix<number>::vmult (VectorType &dst, const VectorType &src) const
 {
   dst.equ(factor, src);
 }
 
-template<typename number>
-template<typename VectorType>
+template <typename number>
+template <typename VectorType>
 inline void
 ScalingMatrix<number>::Tvmult (VectorType &dst, const VectorType &src) const
 {
   dst.equ(factor, src);
 }
 
-template<typename number>
-template<typename VectorType>
+template <typename number>
+template <typename VectorType>
 inline void
 ScalingMatrix<number>::vmult_add (VectorType &dst, const VectorType &src) const
 {
@@ -111,8 +111,8 @@ ScalingMatrix<number>::vmult_add (VectorType &dst, const VectorType &src) const
 
 
 
-template<typename number>
-template<typename VectorType>
+template <typename number>
+template <typename VectorType>
 inline void
 ScalingMatrix<number>::Tvmult_add (VectorType &dst, const VectorType &src) const
 {
@@ -121,7 +121,7 @@ ScalingMatrix<number>::Tvmult_add (VectorType &dst, const VectorType &src) const
 
 //----------------------------------------------------------------------//
 
-template<typename MatrixType, class RELAX>
+template <typename MatrixType, class RELAX>
 void check_smoother(const MGLevelObject<MatrixType> &m,
                     const MGLevelObject<RELAX> &r)
 {

@@ -59,7 +59,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup memory
  * @author Guido Kanschat, Wolfgang Bangerth, 1998 - 2009
  */
-template<typename T, typename P = void>
+template <typename T, typename P = void>
 class SmartPointer
 {
 public:

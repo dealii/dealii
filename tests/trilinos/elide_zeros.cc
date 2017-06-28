@@ -94,7 +94,7 @@ namespace LinearAdvectionTest
 {
   using namespace dealii;
 
-  template<int dim>
+  template <int dim>
   class AdvectionProblem
   {
   public:
@@ -129,7 +129,7 @@ namespace LinearAdvectionTest
 
 
 
-  template<int dim>
+  template <int dim>
   AdvectionProblem<dim>::AdvectionProblem()
     : n_mpi_processes (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD)),
       this_mpi_process (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)),
@@ -147,7 +147,7 @@ namespace LinearAdvectionTest
                                               p0, p1);
   }
 
-  template<int dim>
+  template <int dim>
   void AdvectionProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs(fe);
@@ -175,7 +175,7 @@ namespace LinearAdvectionTest
 
 
 
-  template<int dim>
+  template <int dim>
   void AdvectionProblem<dim>::calculate_flux_terms
   (const TriaActiveIterator<DoFCellAccessor<DoFHandler<dim>, false> > &current_cell,
    FEFaceValues<dim> &current_face_values,
@@ -200,7 +200,7 @@ namespace LinearAdvectionTest
   }
 
 
-  template<int dim>
+  template <int dim>
   void AdvectionProblem<dim>::assemble_system()
   {
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
@@ -294,7 +294,7 @@ namespace LinearAdvectionTest
   }
 
 
-  template<int dim>
+  template <int dim>
   void AdvectionProblem<dim>::run()
   {
     setup_system();

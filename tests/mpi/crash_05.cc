@@ -50,7 +50,7 @@
 #include <numeric>
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);

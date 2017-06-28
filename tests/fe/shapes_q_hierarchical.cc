@@ -24,7 +24,7 @@
 #define PRECISION 8
 
 
-template<int dim>
+template <int dim>
 void plot_FE_Q_Hierarchical_shape_functions()
 {
   MappingQGeneric<dim> m(1);

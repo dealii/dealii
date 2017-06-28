@@ -26,7 +26,7 @@
 #include <deal.II/fe/mapping_q1.h>
 
 
-template<int dim>
+template <int dim>
 void test_real_to_unit_cell()
 {
   deallog << "dim=" << dim << std::endl;

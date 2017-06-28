@@ -95,7 +95,7 @@ void test_2d_3d (std::vector<FiniteElement<1> *> &fe_datas)
 
 
 
-template<int dim>
+template <int dim>
 void test_fe_datas()
 {
   std::vector<FiniteElement<dim> *> fe_datas;

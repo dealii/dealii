@@ -34,10 +34,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 const unsigned int DoFHandler<dim,spacedim>::dimension;
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 const unsigned int DoFHandler<dim,spacedim>::space_dimension;
 
 template <int dim, int spacedim>
@@ -62,7 +62,7 @@ namespace internal
 
 namespace internal
 {
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy)
   {
     std::string policy_name;
@@ -366,7 +366,7 @@ namespace internal
           }
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       void reserve_space_mg (DoFHandler<1, spacedim> &dof_handler)
       {
@@ -422,7 +422,7 @@ namespace internal
             }
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       void reserve_space_mg (DoFHandler<2, spacedim> &dof_handler)
       {
@@ -481,7 +481,7 @@ namespace internal
             }
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       void reserve_space_mg (DoFHandler<3, spacedim> &dof_handler)
       {
@@ -543,7 +543,7 @@ namespace internal
 
 
 
-      template<int spacedim>
+      template <int spacedim>
       static
       types::global_dof_index
       get_dof_index (
@@ -558,7 +558,7 @@ namespace internal
         return mg_level.dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       types::global_dof_index
       get_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &, internal::DoFHandler::DoFFaces<2> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<1>)
@@ -566,7 +566,7 @@ namespace internal
         return mg_faces.lines.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       types::global_dof_index
       get_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &mg_level, internal::DoFHandler::DoFFaces<2> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<2>)
@@ -574,7 +574,7 @@ namespace internal
         return mg_level.dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       types::global_dof_index
       get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<1>)
@@ -582,7 +582,7 @@ namespace internal
         return mg_faces.lines.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       types::global_dof_index
       get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<2>)
@@ -590,7 +590,7 @@ namespace internal
         return mg_faces.quads.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       types::global_dof_index
       get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &mg_level, internal::DoFHandler::DoFFaces<3> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<3>)
@@ -598,42 +598,42 @@ namespace internal
         return mg_level.dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       void set_dof_index (const DoFHandler<1, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<1> &mg_level, internal::DoFHandler::DoFFaces<1> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<1>)
       {
         mg_level.dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &, internal::DoFHandler::DoFFaces<2> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<1>)
       {
         mg_faces.lines.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &mg_level, internal::DoFHandler::DoFFaces<2> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<2>)
       {
         mg_level.dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<1>)
       {
         mg_faces.lines.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<2>)
       {
         mg_faces.quads.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
-      template<int spacedim>
+      template <int spacedim>
       static
       void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &mg_level, internal::DoFHandler::DoFFaces<3> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<3>)
       {
@@ -645,7 +645,7 @@ namespace internal
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   :
   tria(&tria, typeid(*this).name()),
@@ -669,7 +669,7 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler ()
   :
   tria(nullptr, typeid(*this).name()),
@@ -690,7 +690,7 @@ DoFHandler<dim,spacedim>::~DoFHandler ()
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void
 DoFHandler<dim,spacedim>::
 initialize(const Triangulation<dim,spacedim> &t,
@@ -969,7 +969,7 @@ types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const std::set<types::
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
 {
   std::set<int> boundary_dofs;
@@ -1043,7 +1043,7 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &b
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 std::size_t
 DoFHandler<dim,spacedim>::memory_consumption () const
 {
@@ -1073,7 +1073,7 @@ DoFHandler<dim,spacedim>::memory_consumption () const
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &ff)
 {
   selected_fe = &ff;
@@ -1109,7 +1109,7 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe)
 {
   (void)fe;
@@ -1138,7 +1138,7 @@ void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spa
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void DoFHandler<dim, spacedim>::reserve_space ()
 {
   //TODO: move this to distribute_mg_dofs and remove function
@@ -1146,7 +1146,7 @@ void DoFHandler<dim, spacedim>::reserve_space ()
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void DoFHandler<dim, spacedim>::clear_mg_space ()
 {
   mg_levels.clear ();
@@ -1160,7 +1160,7 @@ void DoFHandler<dim, spacedim>::clear_mg_space ()
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void DoFHandler<dim,spacedim>::initialize_local_block_info ()
 {
   block_info_object.initialize_local(*this);
@@ -1168,7 +1168,7 @@ void DoFHandler<dim,spacedim>::initialize_local_block_info ()
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void DoFHandler<dim,spacedim>::clear ()
 {
   // release lock to old fe
@@ -1228,7 +1228,7 @@ DoFHandler<dim,spacedim>::renumber_dofs (const unsigned int,
 }
 
 
-template<>
+template <>
 void DoFHandler<1>::renumber_dofs (const unsigned int level,
                                    const std::vector<types::global_dof_index> &new_numbers)
 {
@@ -1264,7 +1264,7 @@ void DoFHandler<1>::renumber_dofs (const unsigned int level,
 
 
 
-template<>
+template <>
 void DoFHandler<2>::renumber_dofs (const unsigned int  level,
                                    const std::vector<types::global_dof_index>  &new_numbers)
 {
@@ -1324,7 +1324,7 @@ void DoFHandler<2>::renumber_dofs (const unsigned int  level,
 
 
 
-template<>
+template <>
 void DoFHandler<3>::renumber_dofs (const unsigned int  level,
                                    const std::vector<types::global_dof_index>  &new_numbers)
 {
@@ -1466,7 +1466,7 @@ DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void DoFHandler<dim,spacedim>::clear_space ()
 {
   levels.clear ();
@@ -1480,8 +1480,8 @@ void DoFHandler<dim,spacedim>::clear_space ()
 
 
 
-template<int dim, int spacedim>
-template<int structdim>
+template <int dim, int spacedim>
+template <int structdim>
 types::global_dof_index
 DoFHandler<dim, spacedim>::get_dof_index (const unsigned int obj_level,
                                           const unsigned int obj_index,
@@ -1496,8 +1496,8 @@ DoFHandler<dim, spacedim>::get_dof_index (const unsigned int obj_level,
 
 
 
-template<int dim, int spacedim>
-template<int structdim>
+template <int dim, int spacedim>
+template <int structdim>
 void DoFHandler<dim, spacedim>::set_dof_index (const unsigned int obj_level,
                                                const unsigned int obj_index,
                                                const unsigned int fe_index,
@@ -1516,7 +1516,7 @@ void DoFHandler<dim, spacedim>::set_dof_index (const unsigned int obj_level,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs ()
   :
   coarsest_level (numbers::invalid_unsigned_int),
@@ -1527,7 +1527,7 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs ()
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 DoFHandler<dim, spacedim>::MGVertexDoFs::~MGVertexDoFs ()
 {
   delete[] indices;
@@ -1536,7 +1536,7 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::~MGVertexDoFs ()
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
                                                     const unsigned int fl,
                                                     const unsigned int dofs_per_vertex)
@@ -1572,7 +1572,7 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_coarsest_level () const
 {
   return coarsest_level;
@@ -1580,7 +1580,7 @@ unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_coarsest_level () cons
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_finest_level () const
 {
   return finest_level;

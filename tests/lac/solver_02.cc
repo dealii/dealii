@@ -32,7 +32,7 @@
 #include <deal.II/lac/precondition.h>
 #include <deal.II/base/point.h>
 
-template<typename SolverType>
+template <typename SolverType>
 void test()
 {
   const unsigned int size = 3;

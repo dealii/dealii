@@ -547,7 +547,7 @@ private:
 
 //--------------------------------Iterators--------------------------------------//
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 FilteredMatrix<VectorType>::Accessor::Accessor
 (const FilteredMatrix<VectorType> *matrix,
@@ -562,7 +562,7 @@ FilteredMatrix<VectorType>::Accessor::Accessor
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 types::global_dof_index
 FilteredMatrix<VectorType>::Accessor::row() const
@@ -572,7 +572,7 @@ FilteredMatrix<VectorType>::Accessor::row() const
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 types::global_dof_index
 FilteredMatrix<VectorType>::Accessor::column() const
@@ -582,7 +582,7 @@ FilteredMatrix<VectorType>::Accessor::column() const
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 double
 FilteredMatrix<VectorType>::Accessor::value() const
@@ -592,7 +592,7 @@ FilteredMatrix<VectorType>::Accessor::value() const
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 void
 FilteredMatrix<VectorType>::Accessor::advance()
@@ -604,7 +604,7 @@ FilteredMatrix<VectorType>::Accessor::advance()
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 FilteredMatrix<VectorType>::const_iterator::const_iterator
 (const FilteredMatrix<VectorType> *matrix,
@@ -615,7 +615,7 @@ FilteredMatrix<VectorType>::const_iterator::const_iterator
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 typename FilteredMatrix<VectorType>::const_iterator &
 FilteredMatrix<VectorType>::const_iterator::operator++ ()

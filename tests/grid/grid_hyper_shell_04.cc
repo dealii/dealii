@@ -36,7 +36,7 @@
 std::ofstream logfile("output");
 
 
-template<int dim>
+template <int dim>
 void check (double r1, double r2, unsigned int n)
 {
   Point<dim> center;

@@ -1655,7 +1655,7 @@ namespace MatrixFreeOperators
 
   namespace
   {
-    template<typename Number>
+    template <typename Number>
     bool
     non_negative(const VectorizedArray<Number> &n)
     {

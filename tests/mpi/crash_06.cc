@@ -41,7 +41,7 @@
 #include <numeric>
 
 
-template<int dim>
+template <int dim>
 void test(FiniteElement<dim> &fe)
 {
   deallog << "dim=" << dim << std::endl;

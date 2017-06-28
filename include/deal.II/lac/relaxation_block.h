@@ -273,9 +273,9 @@ private:
  * @author Guido Kanschat
  * @date 2010
  */
-template<typename MatrixType,
-         typename InverseNumberType = typename MatrixType::value_type,
-         typename VectorType = Vector<double> >
+template <typename MatrixType,
+          typename InverseNumberType = typename MatrixType::value_type,
+          typename VectorType = Vector<double> >
 class RelaxationBlockJacobi : public virtual Subscriptor,
   protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
@@ -373,9 +373,9 @@ public:
  * @author Guido Kanschat
  * @date 2010
  */
-template<typename MatrixType,
-         typename InverseNumberType = typename MatrixType::value_type,
-         typename VectorType = Vector<double> >
+template <typename MatrixType,
+          typename InverseNumberType = typename MatrixType::value_type,
+          typename VectorType = Vector<double> >
 class RelaxationBlockSOR : public virtual Subscriptor,
   protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {
@@ -468,9 +468,9 @@ public:
  * @author Guido Kanschat
  * @date 2010
  */
-template<typename MatrixType,
-         typename InverseNumberType = typename MatrixType::value_type,
-         typename VectorType = Vector<double> >
+template <typename MatrixType,
+          typename InverseNumberType = typename MatrixType::value_type,
+          typename VectorType = Vector<double> >
 class RelaxationBlockSSOR : public virtual Subscriptor,
   protected RelaxationBlock<MatrixType, InverseNumberType, VectorType>
 {

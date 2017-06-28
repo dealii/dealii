@@ -44,7 +44,7 @@ double zvalue (const double x, const double y)
   return (xh * exp(-xh*xh - yh*yh)) / 10.;
 }
 
-template<int dim>
+template <int dim>
 class Geometry: public ChartManifold<dim>
 {
 public:
@@ -52,7 +52,7 @@ public:
   virtual Point<dim> push_forward(const Point<dim> &chart_point) const;
 };
 
-template<int dim>
+template <int dim>
 Point<dim> Geometry<dim>::pull_back(const Point<dim> &space_point) const
 {
   const double d = space_point[dim - 1];
@@ -72,7 +72,7 @@ Point<dim> Geometry<dim>::pull_back(const Point<dim> &space_point) const
   return p;
 }
 
-template<int dim>
+template <int dim>
 Point<dim> Geometry<dim>::push_forward(const Point<dim> &chart_point) const
 {
   const double d_hat = chart_point[dim - 1];
@@ -92,7 +92,7 @@ Point<dim> Geometry<dim>::push_forward(const Point<dim> &chart_point) const
   return p;
 }
 
-template<int dim>
+template <int dim>
 class VectorFunction : public Function<dim>
 {
 public:
@@ -104,26 +104,26 @@ public:
   virtual void vector_value(const Point<dim> &p, Vector<double> &values) const;
 };
 
-template<>
+template <>
 double VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 {
   return (1 - p(0)*p(0)) * (1 - p(1)*p(1)) * (1 - p(2)*p(2));
 }
 
-template<>
+template <>
 double VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
 {
   return (1 - p(0)*p(0)) * (1 - p(1)*p(1));
 }
 
-template<int dim>
+template <int dim>
 void VectorFunction<dim>::value(const Point<dim> &p, Vector<double> &values) const
 {
   for (unsigned i = 0; i < values.size(); ++i)
     values[i] = value(p, i);
 }
 
-template<int dim>
+template <int dim>
 void VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   for (int i = 0; i < dim; ++i)

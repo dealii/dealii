@@ -65,7 +65,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009
    */
-  template<int dim, int spacedim = dim, typename number = double>
+  template <int dim, int spacedim = dim, typename number = double>
   class DoFInfo : public LocalResults<number>
   {
   public:
@@ -330,7 +330,7 @@ namespace MeshWorker
   }
 
 
-  template<int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename number>
   template <class DHFaceIterator>
   inline void
   DoFInfo<dim,spacedim,number>::set_face(
@@ -343,7 +343,7 @@ namespace MeshWorker
   }
 
 
-  template<int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename number>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
   DoFInfo<dim,spacedim,number>::reinit(
@@ -366,7 +366,7 @@ namespace MeshWorker
   }
 
 
-  template<int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename number>
   template <class DHFaceIterator>
   inline void
   DoFInfo<dim,spacedim,number>::set_subface(
@@ -380,7 +380,7 @@ namespace MeshWorker
   }
 
 
-  template<int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename number>
   template <class DHCellIterator, class DHFaceIterator>
   inline void
   DoFInfo<dim,spacedim,number>::reinit(
@@ -404,7 +404,7 @@ namespace MeshWorker
   }
 
 
-  template<int dim, int spacedim, typename number>
+  template <int dim, int spacedim, typename number>
   inline const BlockIndices &
   DoFInfo<dim,spacedim,number>::local_indices() const
   {

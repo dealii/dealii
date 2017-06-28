@@ -36,14 +36,14 @@
 
 #include <fstream>
 
-template<int dim>
+template <int dim>
 void output(parallel::distributed::Triangulation<dim> &tr, std::ostream &stream)
 {
   GridOut out;
   out.write_vtk(tr, stream);
 }
 
-template<int dim>
+template <int dim>
 void test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

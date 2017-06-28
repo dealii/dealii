@@ -43,7 +43,7 @@
 
 #include <deal.II/grid/grid_out.h>
 
-template<int dim>
+template <int dim>
 class MyFunction : public Function<dim>
 {
 public:
@@ -61,7 +61,7 @@ public:
   };
 };
 
-template<int dim>
+template <int dim>
 void test(std::ostream & /*out*/)
 {
   MyFunction<dim> func;

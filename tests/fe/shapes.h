@@ -26,7 +26,7 @@ char fname[50];
 //
 // x (y) (z) value[0]+1 value[1]+1 ...
 ////////////////////////////////////////////////////////////////////////////
-template<int dim>
+template <int dim>
 inline void
 plot_shape_functions(Mapping<dim> &mapping,
                      FiniteElement<dim> &finel,
@@ -98,7 +98,7 @@ plot_shape_functions(Mapping<dim> &mapping,
 
 
 
-template<int dim>
+template <int dim>
 inline void
 plot_face_shape_functions(
   Mapping<dim> &mapping,
@@ -270,7 +270,7 @@ plot_face_shape_functions(
 }
 
 
-template<>
+template <>
 void plot_face_shape_functions (Mapping<1> &, FiniteElement<1> &, const char *, UpdateFlags)
 {}
 
@@ -370,7 +370,7 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
 
 
 
-template<int dim>
+template <int dim>
 void test_compute_functions (const Mapping<dim> &mapping,
                              const FiniteElement<dim> &fe,
                              const char *)

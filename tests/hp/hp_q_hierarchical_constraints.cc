@@ -28,7 +28,7 @@
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 void test(const bool apply_constrains, const unsigned int hp)
 {
   Triangulation<dim>   triangulation;

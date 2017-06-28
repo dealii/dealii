@@ -31,7 +31,7 @@
 using namespace dealii;
 
 
-template<typename quadrature_type, unsigned short startn>
+template <typename quadrature_type, unsigned short startn>
 void check_quadrature (double *);
 void check_GRC_right(double *);
 
@@ -95,7 +95,7 @@ int main()
 }
 
 
-template<typename quadrature_type,unsigned short startn>
+template <typename quadrature_type,unsigned short startn>
 void check_quadrature(double *exact_monomials)
 {
 

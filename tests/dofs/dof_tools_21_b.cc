@@ -193,7 +193,7 @@ void generate_grid(Triangulation<3> &triangulation, int orientation)
  * Print out all face DoFs and support points as well as the actual
  * matching via make_periodicity_constraints
  */
-template<int dim>
+template <int dim>
 void print_matching(DoFHandler<dim> &dof_handler, bool constrain_only_velocity = false)
 {
   const FiniteElement<dim> &fe = dof_handler.get_fe();

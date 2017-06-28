@@ -33,7 +33,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<int dim, class T> class Table;
+template <int dim, class T> class Table;
 template <typename> class FullMatrix;
 class SparsityPattern;
 class DynamicSparsityPattern;
@@ -595,7 +595,7 @@ public:
    * See the general documentation of this class for more detailed
    * information.
    */
-  template<typename number>
+  template <typename number>
   void condense (SparseMatrix<number> &matrix) const;
 
   /**
@@ -640,7 +640,7 @@ public:
    * See the general documentation of this class for more detailed
    * information.
    */
-  template<typename number, class VectorType>
+  template <typename number, class VectorType>
   void condense (SparseMatrix<number> &matrix,
                  VectorType           &vector) const;
 

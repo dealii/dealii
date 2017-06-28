@@ -32,7 +32,7 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/numerics/vector_tools.h>
 
-template<int dim>
+template <int dim>
 void test()
 {
   Triangulation<dim> tria;

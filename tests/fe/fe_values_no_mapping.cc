@@ -46,7 +46,7 @@ private:
   const unsigned int q;
 };
 
-template<int dim>
+template <int dim>
 void test()
 {
   Triangulation<dim> tria;

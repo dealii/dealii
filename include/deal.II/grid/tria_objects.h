@@ -601,7 +601,7 @@ namespace internal
     }
 
 
-    template<typename G>
+    template <typename G>
     inline
     bool
     TriaObjects<G>::
@@ -611,7 +611,7 @@ namespace internal
     }
 
 
-    template<typename G>
+    template <typename G>
     inline
     void *&
     TriaObjects<G>::user_pointer (const unsigned int i)
@@ -625,7 +625,7 @@ namespace internal
     }
 
 
-    template<typename G>
+    template <typename G>
     inline
     const void *
     TriaObjects<G>::user_pointer (const unsigned int i) const
@@ -639,7 +639,7 @@ namespace internal
     }
 
 
-    template<typename G>
+    template <typename G>
     inline
     unsigned int &
     TriaObjects<G>::user_index (const unsigned int i)
@@ -653,7 +653,7 @@ namespace internal
     }
 
 
-    template<typename G>
+    template <typename G>
     inline
     void
     TriaObjects<G>::clear_user_data (const unsigned int i)
@@ -674,7 +674,7 @@ namespace internal
     {}
 
 
-    template<typename G>
+    template <typename G>
     inline
     unsigned int TriaObjects<G>::user_index (const unsigned int i) const
     {
@@ -687,7 +687,7 @@ namespace internal
     }
 
 
-    template<typename G>
+    template <typename G>
     inline
     void TriaObjects<G>::clear_user_data ()
     {
@@ -697,7 +697,7 @@ namespace internal
     }
 
 
-    template<typename G>
+    template <typename G>
     inline
     void TriaObjects<G>::clear_user_flags ()
     {
@@ -705,7 +705,7 @@ namespace internal
     }
 
 
-    template<typename G>
+    template <typename G>
     template <class Archive>
     void
     TriaObjects<G>::UserData::serialize (Archive &ar,
@@ -862,7 +862,7 @@ namespace internal
 
 // declaration of explicit specializations
 
-    template<>
+    template <>
     void
     TriaObjects<TriaObject<2> >::monitor_memory (const unsigned int) const;
 

@@ -52,7 +52,7 @@ DEAL_II_NAMESPACE_OPEN
  * <code>operator[](unsigned int)</code> that returns a (const or non-const)
  * reference of <code>value_type</code>:
  * @code
- *   template<...>
+ *   template <...>
  *   class T
  *   {
  *     typedef ... value_type;
@@ -214,7 +214,7 @@ namespace TensorAccessors
    *
    * @author Matthias Maier, 2015
    */
-  template<int rank, typename T, typename ArrayType> typename
+  template <int rank, typename T, typename ArrayType> typename
   ReturnType<rank, T>::value_type &
   extract(T &t, const ArrayType &indices)
   {
@@ -331,7 +331,7 @@ namespace TensorAccessors
      * StoreIndex and ReorderedIndexView that return rvalues, we have to
      * return by value.
      */
-    template<typename T>
+    template <typename T>
     struct ReferenceType
     {
       typedef T &type;
@@ -538,10 +538,10 @@ namespace TensorAccessors
     // Straightforward recursion implemented by specializing ExtractHelper
     // for position == rank. We use the type trait ReturnType<rank, T> to
     // have an idea what the final type will be.
-    template<int position, int rank>
+    template <int position, int rank>
     struct ExtractHelper
     {
-      template<typename T, typename ArrayType>
+      template <typename T, typename ArrayType>
       inline
       static
       typename ReturnType<rank - position, T>::value_type &
@@ -556,10 +556,10 @@ namespace TensorAccessors
 
     // For position == rank there is nothing to extract, just return the
     // object.
-    template<int rank>
+    template <int rank>
     struct ExtractHelper<rank, rank>
     {
-      template<typename T, typename ArrayType>
+      template <typename T, typename ArrayType>
       inline
       static
       T &extract(T &t,
@@ -589,7 +589,7 @@ namespace TensorAccessors
     class Contract
     {
     public:
-      template<typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3>
       inline DEAL_II_ALWAYS_INLINE static
       void contract(T1 &result, const T2 &left, const T3 &right)
       {
@@ -617,7 +617,7 @@ namespace TensorAccessors
     class Contract<no_contr, no_contr, rank_2, dim>
     {
     public:
-      template<typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3>
       inline DEAL_II_ALWAYS_INLINE static
       void contract(T1 &result, const T2 &left, const T3 &right)
       {
@@ -645,7 +645,7 @@ namespace TensorAccessors
     class Contract<no_contr, no_contr, no_contr, dim>
     {
     public:
-      template<typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3>
       inline DEAL_II_ALWAYS_INLINE static
       void contract(T1 &result, const T2 &left, const T3 &right)
       {
@@ -661,7 +661,7 @@ namespace TensorAccessors
     class Contract2
     {
     public:
-      template<typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3>
       inline DEAL_II_ALWAYS_INLINE static
       T1 contract2(const T2 &left, const T3 &right)
       {
@@ -679,7 +679,7 @@ namespace TensorAccessors
     class Contract2<0, dim>
     {
     public:
-      template<typename T1, typename T2, typename T3>
+      template <typename T1, typename T2, typename T3>
       inline DEAL_II_ALWAYS_INLINE static
       T1 contract2(const T2 &left, const T3 &right)
       {
@@ -706,7 +706,7 @@ namespace TensorAccessors
     class Contract3
     {
     public:
-      template<typename T1, typename T2, typename T3, typename T4>
+      template <typename T1, typename T2, typename T3, typename T4>
       static inline
       T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
       {
@@ -732,7 +732,7 @@ namespace TensorAccessors
     class Contract3<0, rank_2, dim>
     {
     public:
-      template<typename T1, typename T2, typename T3, typename T4>
+      template <typename T1, typename T2, typename T3, typename T4>
       static inline
       T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
       {
@@ -750,7 +750,7 @@ namespace TensorAccessors
     class Contract3<0, 0, dim>
     {
     public:
-      template<typename T1, typename T2, typename T3, typename T4>
+      template <typename T1, typename T2, typename T3, typename T4>
       static inline
       T1 contract3(const T2 &left, const T3 &middle, const T4 &right)
       {

@@ -24,7 +24,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include "../tests.h"
 
-template<int dim>
+template <int dim>
 void
 test()
 {

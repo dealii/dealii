@@ -60,7 +60,7 @@ const unsigned int patches = 10;
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 class EnrichmentFunction : public Function<dim>
 {
 public:
@@ -157,7 +157,7 @@ void check_consistency(const Point<dim>    &p,
                 ExcInternalError());
 }
 
-template<int dim>
+template <int dim>
 void test(const FiniteElement<dim> &fe1,
           const FiniteElement<dim> &fe2,
           const Quadrature<dim>    &volume_quad,

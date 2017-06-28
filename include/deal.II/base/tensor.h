@@ -181,25 +181,25 @@ public:
   /**
    * Test for equality of two tensors.
    */
-  template<typename OtherNumber>
+  template <typename OtherNumber>
   bool operator == (const Tensor<0,dim,OtherNumber> &rhs) const;
 
   /**
    * Test for inequality of two tensors.
    */
-  template<typename OtherNumber>
+  template <typename OtherNumber>
   bool operator != (const Tensor<0,dim,OtherNumber> &rhs) const;
 
   /**
    * Add another scalar
    */
-  template<typename OtherNumber>
+  template <typename OtherNumber>
   Tensor<0,dim,Number> &operator += (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
    * Subtract another scalar.
    */
-  template<typename OtherNumber>
+  template <typename OtherNumber>
   Tensor<0,dim,Number> &operator -= (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
@@ -207,13 +207,13 @@ public:
    *
    * @ingroup CUDAWrappers
    */
-  template<typename OtherNumber>
+  template <typename OtherNumber>
   DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number> &operator *= (const OtherNumber factor);
 
   /**
    * Divide the scalar by <tt>factor</tt>.
    */
-  template<typename OtherNumber>
+  template <typename OtherNumber>
   Tensor<0,dim,Number> &operator /= (const OtherNumber factor);
 
   /**
@@ -1619,9 +1619,9 @@ scalar_product (const Tensor<rank, dim, Number> &left,
  * @relates Tensor
  * @author Matthias Maier, 2015, Jean-Paul Pelteret 2017
  */
-template <template<int, int, typename> class TensorT1,
-          template<int, int, typename> class TensorT2,
-          template<int, int, typename> class TensorT3,
+template <template <int, int, typename> class TensorT1,
+          template <int, int, typename> class TensorT2,
+          template <int, int, typename> class TensorT3,
           int rank_1, int rank_2, int dim,
           typename T1, typename T2, typename T3>
 typename ProductType<T1, typename ProductType<T2, T3>::type>::type

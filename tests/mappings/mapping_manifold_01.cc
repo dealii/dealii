@@ -25,7 +25,7 @@
 #include <deal.II/fe/mapping_manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;

@@ -32,7 +32,7 @@
 std::ofstream logfile("output");
 
 
-template<int dim>
+template <int dim>
 void check_rect1 (unsigned int n, bool color, bool log)
 {
   Point<dim> left;

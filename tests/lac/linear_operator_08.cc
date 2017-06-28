@@ -50,8 +50,8 @@
 using namespace dealii;
 
 
-template<class PRECONDITIONER, typename MatrixType, typename VectorType,
-         class ADDITIONAL_DATA = typename PRECONDITIONER::AdditionalData>
+template <class PRECONDITIONER, typename MatrixType, typename VectorType,
+          class ADDITIONAL_DATA = typename PRECONDITIONER::AdditionalData>
 void
 test_preconditioner_block (const MatrixType &A,
                            const VectorType &b,
@@ -88,7 +88,7 @@ test_preconditioner_block (const MatrixType &A,
 // For Vector <double>
 // Cannot use more generic function as Vector <double>
 // does not define vector_type
-template<class PRECONDITIONER>
+template <class PRECONDITIONER>
 void
 test_preconditioner (const SparseMatrix<double> &A,
                      const Vector<double> &b,
@@ -130,7 +130,7 @@ test_preconditioner (const SparseMatrix<double> &A,
   }
 }
 
-template<typename SolverType>
+template <typename SolverType>
 void
 test_solver (const SparseMatrix<double> &A,
              const Vector<double> &b)
@@ -194,14 +194,14 @@ public:
                               matrix.n_block_cols());
   }
 
-  template<typename VectorType>
+  template <typename VectorType>
   void
   vmult(VectorType &dst, const VectorType &src) const
   {
     dst = src;
   }
 
-  template<typename VectorType>
+  template <typename VectorType>
   void
   Tvmult(VectorType &dst, const VectorType &src) const
   {

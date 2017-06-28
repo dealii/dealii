@@ -55,7 +55,7 @@ void print_formatted (const FullMatrix<number> &A,
 
 
 
-template<int dim>
+template <int dim>
 void test_embedding (const FiniteElement<dim> &fe)
 {
   const unsigned int n = fe.dofs_per_cell;
@@ -85,7 +85,7 @@ void test_embedding (const FiniteElement<dim> &fe)
 }
 
 
-template<int dim>
+template <int dim>
 void test_projection (const FiniteElement<dim> &fe1,
                       const FiniteElement<dim> &fe2,
                       std::ostream &out)
@@ -107,7 +107,7 @@ void test_projection (const FiniteElement<dim> &fe1,
 }
 
 
-template<int dim>
+template <int dim>
 void test_projection (std::ostream &out)
 {
   FE_DGQ<dim> q0(0);
@@ -152,7 +152,7 @@ void test_projection (std::ostream &out)
 }
 
 
-template<int dim>
+template <int dim>
 void test_renumbering(const FiniteElement<dim> &fe)
 {
   std::vector<unsigned int> v(fe.dofs_per_cell);
@@ -175,7 +175,7 @@ void test_renumbering(const FiniteElement<dim> &fe)
 }
 
 
-template<int dim>
+template <int dim>
 void test_renumbering()
 {
   deallog.push("Renumber");

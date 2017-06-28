@@ -51,14 +51,14 @@ std::string output_name(const unsigned int subdomain)
          ".vtu";
 }
 
-template<int dim>
+template <int dim>
 bool
 pred_d(const typename DoFHandler<dim>::active_cell_iterator &cell)
 {
   return (cell->center()(0) < 0.49);
 }
 
-template<int dim>
+template <int dim>
 bool
 pred_r(const typename Triangulation<dim>::active_cell_iterator &cell)
 {

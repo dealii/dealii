@@ -66,7 +66,7 @@ double f_x(double x_m)
   return y_m;
 }
 
-template<int dim>
+template <int dim>
 class PushForward : public Function<dim>
 {
 public:
@@ -98,7 +98,7 @@ private:
 };
 
 
-template<int dim>
+template <int dim>
 double PushForward<dim>::value(const Point<dim> &p,const unsigned int component) const
 {
   double result = 0;
@@ -124,7 +124,7 @@ double PushForward<dim>::value(const Point<dim> &p,const unsigned int component)
   return result;
 }
 
-template<int dim>
+template <int dim>
 class PullBack : public Function<dim>
 {
 public:
@@ -152,7 +152,7 @@ private:
   const double y_FoR;
 };
 
-template<int dim>
+template <int dim>
 double PullBack<dim>::value(const Point<dim> &p,const unsigned int component) const
 {
   double result = 0;

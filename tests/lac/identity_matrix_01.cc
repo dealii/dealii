@@ -26,7 +26,7 @@
 #include <iomanip>
 #include <cmath>
 
-template<typename number>
+template <typename number>
 void
 check_vmult()
 {

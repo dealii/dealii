@@ -26,7 +26,7 @@
 
 #include <numeric>
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   deallog << "dim=" << dim << ", spacedim=" << spacedim << std::endl;

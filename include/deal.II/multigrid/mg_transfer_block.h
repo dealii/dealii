@@ -214,7 +214,7 @@ public:
    * This function is a front-end for the same function in
    * MGTransferBlockBase.
    */
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void build_matrices (const DoFHandler<dim,spacedim> &dof,
                        const DoFHandler<dim,spacedim> &mg_dof,
                        const std::vector<bool> &selected);
@@ -336,7 +336,7 @@ public:
    * @arg mg_selected: Number of the component for which the transfer matrices
    * should be built.
    */
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void build_matrices (const DoFHandler<dim,spacedim> &dof,
                        const DoFHandler<dim,spacedim> &mg_dof,
                        unsigned int selected);

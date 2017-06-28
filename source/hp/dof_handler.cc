@@ -225,7 +225,7 @@ namespace internal
          * same in all space
          * dimensions.
          */
-        template<int dim, int spacedim>
+        template <int dim, int spacedim>
         static
         void
         reserve_space_vertices (DoFHandler<dim,spacedim> &dof_handler)
@@ -1648,18 +1648,18 @@ namespace internal
 
 namespace hp
 {
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   const unsigned int DoFHandler<dim,spacedim>::dimension;
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   const types::global_dof_index DoFHandler<dim,spacedim>::invalid_dof_index;
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   const unsigned int DoFHandler<dim,spacedim>::default_fe_index;
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
     :
     tria(&tria, typeid(*this).name()),
@@ -1688,7 +1688,7 @@ namespace hp
   }
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   DoFHandler<dim,spacedim>::~DoFHandler ()
   {
     // unsubscribe as a listener to refinement
@@ -1959,7 +1959,7 @@ namespace hp
   }
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
   {
     Assert (finite_elements != nullptr, ExcNoFESelected());
@@ -1997,7 +1997,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   types::global_dof_index
   DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
   {
@@ -2061,7 +2061,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   std::size_t
   DoFHandler<dim,spacedim>::memory_consumption () const
   {
@@ -2083,7 +2083,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
   compute_vertex_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const
@@ -2217,7 +2217,7 @@ namespace hp
   {}
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
   compute_line_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const
@@ -2569,7 +2569,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::distribute_dofs (const hp::FECollection<dim,spacedim> &ff)
   {
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
@@ -2731,7 +2731,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::clear ()
   {
     // release lock to old fe
@@ -2743,7 +2743,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_index> &new_numbers)
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
@@ -2792,7 +2792,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
   renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
@@ -2834,7 +2834,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
   renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
@@ -2884,7 +2884,7 @@ namespace hp
 
 
 //TODO: Merge the following three functions -- they are identical
-  template<>
+  template <>
   void
   DoFHandler<2,2>::
   renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
@@ -2936,7 +2936,7 @@ namespace hp
 
 
 
-  template<>
+  template <>
   void
   DoFHandler<2,3>::
   renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
@@ -2987,7 +2987,7 @@ namespace hp
   }
 
 
-  template<>
+  template <>
   void
   DoFHandler<3,3>::
   renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
@@ -3038,7 +3038,7 @@ namespace hp
   }
 
 
-  template<>
+  template <>
   void
   DoFHandler<3,3>::
   renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
@@ -3142,7 +3142,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::create_active_fe_table ()
   {
     // Create sufficiently many
@@ -3225,7 +3225,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::post_refinement_action ()
   {
@@ -3335,7 +3335,7 @@ namespace hp
   }
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::clear_space ()
   {
     levels.clear ();

@@ -278,7 +278,7 @@ protected:
    * Copies the passed SparseMatrix onto this object. This object's sparsity
    * pattern remains unchanged.
    */
-  template<typename somenumber>
+  template <typename somenumber>
   void copy_from (const SparseMatrix<somenumber> &matrix);
 
   /**

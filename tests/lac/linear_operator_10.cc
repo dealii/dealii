@@ -31,7 +31,7 @@
 
 using namespace dealii;
 
-template<typename VECTOR>
+template <typename VECTOR>
 void
 print (const VECTOR &vec)
 {
@@ -43,8 +43,8 @@ print (const VECTOR &vec)
 }
 
 
-template<class PRECONDITIONER, class MATRIX, class VECTOR,
-         class ADDITIONAL_DATA = typename PRECONDITIONER::AdditionalData>
+template <class PRECONDITIONER, class MATRIX, class VECTOR,
+          class ADDITIONAL_DATA = typename PRECONDITIONER::AdditionalData>
 void
 test_preconditioner (const MATRIX &A,
                      const VECTOR &b,
@@ -145,7 +145,7 @@ test_preconditioner (const MATRIX &A,
   deallog.pop();
 }
 
-template<class SOLVER, class MATRIX, class VECTOR>
+template <class SOLVER, class MATRIX, class VECTOR>
 void
 test_solver (const MATRIX &A,
              const VECTOR &b)

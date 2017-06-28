@@ -32,7 +32,7 @@
 // This test is based on tria_signals_02. The difference is here we have random
 // and mix refinement and coarsening.
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 class SignalListener
 {
 public:
@@ -80,7 +80,7 @@ private:
 };
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;

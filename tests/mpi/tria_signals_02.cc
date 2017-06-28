@@ -29,7 +29,7 @@
 // calls and then compare the result against n_active_cells reported by Tria
 // object. Absolute value change in n_active_cells is not concerned in this test.
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 class SignalListener
 {
 public:
@@ -77,7 +77,7 @@ private:
 };
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;

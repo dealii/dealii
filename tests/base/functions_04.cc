@@ -33,7 +33,7 @@
 
 #include "functions.h"
 
-template<int dim>
+template <int dim>
 void
 check_function(const Functions::FlowFunction<dim> &f,
                unsigned int sub,

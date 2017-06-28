@@ -23,14 +23,14 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<int dim>
+template <int dim>
 PolynomialsNedelec<dim>::PolynomialsNedelec (const unsigned int k) :
   my_degree (k), polynomial_space (create_polynomials (k)),
   n_pols (compute_n_pols (k))
 {
 }
 
-template<int dim>
+template <int dim>
 std::vector<std::vector< Polynomials::Polynomial<double> > >
 PolynomialsNedelec<dim>::create_polynomials (const unsigned int k)
 {
@@ -48,7 +48,7 @@ PolynomialsNedelec<dim>::create_polynomials (const unsigned int k)
 // Compute the values, gradients
 // and double gradients of the
 // polynomial at the given point.
-template<int dim>
+template <int dim>
 void
 PolynomialsNedelec<dim>::compute (const Point<dim> &unit_point,
                                   std::vector<Tensor<1,dim> > &values,
@@ -1383,7 +1383,7 @@ PolynomialsNedelec<dim>::compute (const Point<dim> &unit_point,
 }
 
 
-template<int dim>
+template <int dim>
 unsigned int
 PolynomialsNedelec<dim>::compute_n_pols (unsigned int k)
 {

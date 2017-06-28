@@ -47,7 +47,7 @@
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 class EnrichmentFunction : public Function<dim>
 {
 public:

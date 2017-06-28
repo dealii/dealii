@@ -106,27 +106,27 @@ public:
   /**
    * Apply preconditioner.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner. Since this is the identity, this function
    * is the same as vmult().
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply preconditioner, adding to the previous value.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult_add (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner, adding. Since this is the identity, this
    * function is the same as vmult_add().
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult_add (VectorType &, const VectorType &) const;
 
   /**
@@ -229,26 +229,26 @@ public:
   /**
    * Apply preconditioner.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner. Since this is the identity, this function
    * is the same as vmult().
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult (VectorType &, const VectorType &) const;
   /**
    * Apply preconditioner, adding to the previous value.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult_add (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner, adding. Since this is the identity, this
    * function is the same as vmult_add().
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult_add (VectorType &, const VectorType &) const;
 
   /**
@@ -334,7 +334,7 @@ private:
  *
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
-template<typename MatrixType = SparseMatrix<double>, class VectorType = Vector<double> >
+template <typename MatrixType = SparseMatrix<double>, class VectorType = Vector<double> >
 class PreconditionUseMatrix : public Subscriptor
 {
 public:
@@ -380,7 +380,7 @@ private:
  * @author Guido Kanschat, 2000; extension for full compatibility with
  * LinearOperator class: Jean-Paul Pelteret, 2015
  */
-template<typename MatrixType = SparseMatrix<double> >
+template <typename MatrixType = SparseMatrix<double> >
 class PreconditionRelaxation : public Subscriptor
 {
 public:
@@ -484,26 +484,26 @@ public:
   /**
    * Apply preconditioner.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner. Since this is a symmetric preconditioner,
    * this function is the same as vmult().
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult (VectorType &, const VectorType &) const;
 
   /**
    * Perform one step of the preconditioned Richardson iteration.
    */
-  template<class VectorType>
+  template <class VectorType>
   void step (VectorType &x, const VectorType &rhs) const;
 
   /**
    * Perform one transposed step of the preconditioned Richardson iteration.
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tstep (VectorType &x, const VectorType &rhs) const;
 };
 
@@ -566,25 +566,25 @@ public:
   /**
    * Apply preconditioner.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner.
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult (VectorType &, const VectorType &) const;
 
   /**
    * Perform one step of the preconditioned Richardson iteration.
    */
-  template<class VectorType>
+  template <class VectorType>
   void step (VectorType &x, const VectorType &rhs) const;
 
   /**
    * Perform one transposed step of the preconditioned Richardson iteration.
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tstep (VectorType &x, const VectorType &rhs) const;
 };
 
@@ -648,27 +648,27 @@ public:
   /**
    * Apply preconditioner.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner. Since this is a symmetric preconditioner,
    * this function is the same as vmult().
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult (VectorType &, const VectorType &) const;
 
 
   /**
    * Perform one step of the preconditioned Richardson iteration
    */
-  template<class VectorType>
+  template <class VectorType>
   void step (VectorType &x, const VectorType &rhs) const;
 
   /**
    * Perform one transposed step of the preconditioned Richardson iteration.
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tstep (VectorType &x, const VectorType &rhs) const;
 
 private:
@@ -789,13 +789,13 @@ public:
   /**
    * Apply preconditioner.
    */
-  template<class VectorType>
+  template <class VectorType>
   void vmult (VectorType &, const VectorType &) const;
 
   /**
    * Apply transpose preconditioner.
    */
-  template<class VectorType>
+  template <class VectorType>
   void Tvmult (VectorType &, const VectorType &) const;
 private:
   /**
@@ -1160,7 +1160,7 @@ PreconditionIdentity::initialize (const MatrixType &matrix,
 }
 
 
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionIdentity::vmult (VectorType &dst, const VectorType &src) const
 {
@@ -1169,14 +1169,14 @@ PreconditionIdentity::vmult (VectorType &dst, const VectorType &src) const
 
 
 
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionIdentity::Tvmult (VectorType &dst, const VectorType &src) const
 {
   dst = src;
 }
 
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionIdentity::vmult_add (VectorType &dst, const VectorType &src) const
 {
@@ -1185,7 +1185,7 @@ PreconditionIdentity::vmult_add (VectorType &dst, const VectorType &src) const
 
 
 
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionIdentity::Tvmult_add (VectorType &dst, const VectorType &src) const
 {
@@ -1250,7 +1250,7 @@ PreconditionRichardson::initialize
 
 
 
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionRichardson::vmult (VectorType &dst, const VectorType &src) const
 {
@@ -1263,7 +1263,7 @@ PreconditionRichardson::vmult (VectorType &dst, const VectorType &src) const
 
 
 
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionRichardson::Tvmult (VectorType &dst, const VectorType &src) const
 {
@@ -1274,7 +1274,7 @@ PreconditionRichardson::Tvmult (VectorType &dst, const VectorType &src) const
   dst.equ(relaxation,src);
 }
 
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionRichardson::vmult_add (VectorType &dst, const VectorType &src) const
 {
@@ -1287,7 +1287,7 @@ PreconditionRichardson::vmult_add (VectorType &dst, const VectorType &src) const
 
 
 
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionRichardson::Tvmult_add (VectorType &dst, const VectorType &src) const
 {
@@ -1350,7 +1350,7 @@ PreconditionRelaxation<MatrixType>::n () const
 //---------------------------------------------------------------------------
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionJacobi<MatrixType>::vmult (VectorType &dst, const VectorType &src) const
 {
@@ -1365,7 +1365,7 @@ PreconditionJacobi<MatrixType>::vmult (VectorType &dst, const VectorType &src) c
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionJacobi<MatrixType>::Tvmult (VectorType &dst, const VectorType &src) const
 {
@@ -1380,7 +1380,7 @@ PreconditionJacobi<MatrixType>::Tvmult (VectorType &dst, const VectorType &src) 
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionJacobi<MatrixType>::step (VectorType &dst, const VectorType &src) const
 {
@@ -1395,7 +1395,7 @@ PreconditionJacobi<MatrixType>::step (VectorType &dst, const VectorType &src) co
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionJacobi<MatrixType>::Tstep (VectorType &dst, const VectorType &src) const
 {
@@ -1411,7 +1411,7 @@ PreconditionJacobi<MatrixType>::Tstep (VectorType &dst, const VectorType &src) c
 //---------------------------------------------------------------------------
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionSOR<MatrixType>::vmult (VectorType &dst, const VectorType &src) const
 {
@@ -1426,7 +1426,7 @@ PreconditionSOR<MatrixType>::vmult (VectorType &dst, const VectorType &src) cons
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionSOR<MatrixType>::Tvmult (VectorType &dst, const VectorType &src) const
 {
@@ -1441,7 +1441,7 @@ PreconditionSOR<MatrixType>::Tvmult (VectorType &dst, const VectorType &src) con
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionSOR<MatrixType>::step (VectorType &dst, const VectorType &src) const
 {
@@ -1456,7 +1456,7 @@ PreconditionSOR<MatrixType>::step (VectorType &dst, const VectorType &src) const
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionSOR<MatrixType>::Tstep (VectorType &dst, const VectorType &src) const
 {
@@ -1507,7 +1507,7 @@ PreconditionSSOR<MatrixType>::initialize (const MatrixType                     &
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionSSOR<MatrixType>::vmult (VectorType &dst, const VectorType &src) const
 {
@@ -1522,7 +1522,7 @@ PreconditionSSOR<MatrixType>::vmult (VectorType &dst, const VectorType &src) con
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionSSOR<MatrixType>::Tvmult (VectorType &dst, const VectorType &src) const
 {
@@ -1537,7 +1537,7 @@ PreconditionSSOR<MatrixType>::Tvmult (VectorType &dst, const VectorType &src) co
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionSSOR<MatrixType>::step (VectorType &dst, const VectorType &src) const
 {
@@ -1552,7 +1552,7 @@ PreconditionSSOR<MatrixType>::step (VectorType &dst, const VectorType &src) cons
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionSSOR<MatrixType>::Tstep (VectorType &dst, const VectorType &src) const
 {
@@ -1610,7 +1610,7 @@ PreconditionPSOR<MatrixType>::vmult (VectorType &dst, const VectorType &src) con
 
 
 template <typename MatrixType>
-template<class VectorType>
+template <class VectorType>
 inline void
 PreconditionPSOR<MatrixType>::Tvmult (VectorType &dst, const VectorType &src) const
 {
@@ -1640,7 +1640,7 @@ PreconditionPSOR<MatrixType>::AdditionalData::AdditionalData
 //---------------------------------------------------------------------------
 
 
-template<typename MatrixType, class VectorType>
+template <typename MatrixType, class VectorType>
 PreconditionUseMatrix<MatrixType,VectorType>::PreconditionUseMatrix(const MatrixType   &M,
     const function_ptr method)
   :
@@ -1649,7 +1649,7 @@ PreconditionUseMatrix<MatrixType,VectorType>::PreconditionUseMatrix(const Matrix
 
 
 
-template<typename MatrixType, class VectorType>
+template <typename MatrixType, class VectorType>
 void
 PreconditionUseMatrix<MatrixType,VectorType>::vmult (VectorType       &dst,
                                                      const VectorType &src) const
@@ -1659,7 +1659,7 @@ PreconditionUseMatrix<MatrixType,VectorType>::vmult (VectorType       &dst,
 
 //---------------------------------------------------------------------------
 
-template<typename MatrixType>
+template <typename MatrixType>
 inline
 PreconditionRelaxation<MatrixType>::AdditionalData::
 AdditionalData (const double relaxation)
@@ -1790,7 +1790,7 @@ namespace internal
       mutable Number *dst;
     };
 
-    template<typename Number>
+    template <typename Number>
     struct VectorUpdatesRange : public parallel::ParallelForInteger
     {
       VectorUpdatesRange(const VectorUpdater<Number> &updater,

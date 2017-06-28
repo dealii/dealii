@@ -29,7 +29,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   for (unsigned int t=0; t<2; ++t)

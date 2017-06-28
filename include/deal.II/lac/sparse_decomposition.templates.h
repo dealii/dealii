@@ -27,7 +27,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template<typename number>
+template <typename number>
 SparseLUDecomposition<number>::SparseLUDecomposition()
   :
   SparseMatrix<number>(),
@@ -37,14 +37,14 @@ SparseLUDecomposition<number>::SparseLUDecomposition()
 
 
 
-template<typename number>
+template <typename number>
 SparseLUDecomposition<number>::~SparseLUDecomposition()
 {
   clear();
 }
 
 
-template<typename number>
+template <typename number>
 void SparseLUDecomposition<number>::clear()
 {
   std::vector<const size_type *> tmp;
@@ -61,7 +61,7 @@ void SparseLUDecomposition<number>::clear()
 
 
 
-template<typename number>
+template <typename number>
 template <typename somenumber>
 void SparseLUDecomposition<number>::initialize (
   const SparseMatrix<somenumber> &matrix,
@@ -130,7 +130,7 @@ void SparseLUDecomposition<number>::initialize (
 
 
 
-template<typename number>
+template <typename number>
 void
 SparseLUDecomposition<number>::prebuild_lower_bound()
 {

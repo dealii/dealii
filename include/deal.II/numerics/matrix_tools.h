@@ -37,9 +37,9 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim> class Quadrature;
 
 
-template<typename number> class Vector;
-template<typename number> class FullMatrix;
-template<typename number> class SparseMatrix;
+template <typename number> class Vector;
+template <typename number> class FullMatrix;
+template <typename number> class SparseMatrix;
 
 template <typename number> class BlockSparseMatrix;
 template <typename Number> class BlockVector;

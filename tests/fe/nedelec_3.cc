@@ -37,7 +37,7 @@
 
 
 
-template<int dim>
+template <int dim>
 inline void
 check (const unsigned int p)
 {

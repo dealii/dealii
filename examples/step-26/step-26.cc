@@ -76,7 +76,7 @@ namespace Step26
   // that the <code>refine_mesh</code> function takes arguments for the
   // minimal and maximal mesh refinement level. The purpose of this is
   // discussed in the introduction.
-  template<int dim>
+  template <int dim>
   class HeatEquation
   {
   public:
@@ -122,7 +122,7 @@ namespace Step26
   // right hand side is chosen as discussed at the end of the
   // introduction. For boundary values, we choose zero values, but this is
   // easily changed below.
-  template<int dim>
+  template <int dim>
   class RightHandSide : public Function<dim>
   {
   public:
@@ -141,7 +141,7 @@ namespace Step26
 
 
 
-  template<int dim>
+  template <int dim>
   double RightHandSide<dim>::value (const Point<dim> &p,
                                     const unsigned int component) const
   {
@@ -172,7 +172,7 @@ namespace Step26
 
 
 
-  template<int dim>
+  template <int dim>
   class BoundaryValues : public Function<dim>
   {
   public:
@@ -182,7 +182,7 @@ namespace Step26
 
 
 
-  template<int dim>
+  template <int dim>
   double BoundaryValues<dim>::value (const Point<dim> &/*p*/,
                                      const unsigned int component) const
   {
@@ -201,7 +201,7 @@ namespace Step26
   // on the right hand side was set to 0.2 above, so we resolve each
   // period with 100 time steps) and chooses the Crank Nicolson method
   // by setting $\theta=1/2$.
-  template<int dim>
+  template <int dim>
   HeatEquation<dim>::HeatEquation ()
     :
     fe(1),
@@ -226,7 +226,7 @@ namespace Step26
   // that defaults to an empty object). This is because we are going to
   // condense the constraints in run() after combining the matrices for the
   // current time-step.
-  template<int dim>
+  template <int dim>
   void HeatEquation<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
@@ -273,7 +273,7 @@ namespace Step26
   //
   // The next function is the one that solves the actual linear system
   // for a single time step. There is nothing surprising here:
-  template<int dim>
+  template <int dim>
   void HeatEquation<dim>::solve_time_step()
   {
     SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
@@ -296,7 +296,7 @@ namespace Step26
   // @sect4{<code>HeatEquation::output_results</code>}
   //
   // Neither is there anything new in generating graphical output:
-  template<int dim>
+  template <int dim>
   void HeatEquation<dim>::output_results() const
   {
     DataOut<dim> data_out;
@@ -440,7 +440,7 @@ namespace Step26
   // as here. Instead of trying to justify the occurrence here,
   // let's first look at the code and we'll come back to the issue
   // at the end of function.
-  template<int dim>
+  template <int dim>
   void HeatEquation<dim>::run()
   {
     const unsigned int initial_global_refinement = 2;

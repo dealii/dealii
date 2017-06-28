@@ -26,7 +26,7 @@
 #define PRECISION 8
 
 
-template<int dim>
+template <int dim>
 void plot_FE_Bernstein_shape_functions()
 {
   MappingQGeneric<dim> m(1);

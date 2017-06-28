@@ -38,7 +38,7 @@
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 void test()
 {
   parallel::distributed::Triangulation<dim>

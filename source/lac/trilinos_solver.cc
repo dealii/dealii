@@ -433,7 +433,7 @@ namespace TrilinosWrappers
   }
 
 
-  template<typename Preconditioner>
+  template <typename Preconditioner>
   void
   SolverBase::do_solve(const Preconditioner &preconditioner)
   {
@@ -568,7 +568,7 @@ namespace TrilinosWrappers
 
 
 
-  template<>
+  template <>
   void
   SolverBase::set_preconditioner(AztecOO                &solver,
                                  const PreconditionBase &preconditioner)
@@ -586,7 +586,7 @@ namespace TrilinosWrappers
   }
 
 
-  template<>
+  template <>
   void
   SolverBase::set_preconditioner(AztecOO               &solver,
                                  const Epetra_Operator &preconditioner)

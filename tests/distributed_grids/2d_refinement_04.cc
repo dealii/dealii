@@ -39,7 +39,7 @@
 #include <cstdlib>
 
 
-template<int dim>
+template <int dim>
 void test(std::ostream & /*out*/)
 {
   for (unsigned int i=0; i<GeometryInfo<dim>::max_children_per_cell; ++i)

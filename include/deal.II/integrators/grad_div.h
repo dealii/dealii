@@ -290,7 +290,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2016
      */
-    template<int dim>
+    template <int dim>
     void
     ip_residual(
       Vector<double> &result1,

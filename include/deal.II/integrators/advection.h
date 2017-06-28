@@ -71,7 +71,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2012
      */
-    template<int dim>
+    template <int dim>
     void cell_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,

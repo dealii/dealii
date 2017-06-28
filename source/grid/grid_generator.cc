@@ -84,7 +84,7 @@ namespace GridGenerator
 
 
 
-    template<int spacedim>
+    template <int spacedim>
     void
     colorize_subdivided_hyper_rectangle (Triangulation<1,spacedim> &tria,
                                          const Point<spacedim> &,
@@ -584,7 +584,7 @@ namespace GridGenerator
 
 
 
-  template<>
+  template <>
   void
   torus<2,3> (Triangulation<2,3>  &tria,
               const double R,
@@ -722,7 +722,7 @@ namespace GridGenerator
     tria.set_all_manifold_ids(0);
   }
 
-  template<>
+  template <>
   void
   torus<3,3> (Triangulation<3,3>  &tria,
               const double R,
@@ -776,7 +776,7 @@ namespace GridGenerator
 
 
 
-  template<>
+  template <>
   void
   parallelogram (Triangulation<3> &,
                  const Point<3>   ( &/*corners*/)[3],
@@ -785,7 +785,7 @@ namespace GridGenerator
     Assert (false, ExcNotImplemented());
   }
 
-  template<>
+  template <>
   void
   parallelogram (Triangulation<1> &,
                  const Point<1>   ( &/*corners*/)[1],
@@ -795,7 +795,7 @@ namespace GridGenerator
   }
 
 // Implementation for 2D only
-  template<>
+  template <>
   void
   parallelogram (Triangulation<2>  &tria,
                  const Point<2> (&corners)[2],
@@ -811,7 +811,7 @@ namespace GridGenerator
 
 
 
-  template<int dim>
+  template <int dim>
   void
   parallelepiped (Triangulation<dim>  &tria,
                   const Point<dim>   (&corners) [dim],
@@ -827,7 +827,7 @@ namespace GridGenerator
                                colorize);
   }
 
-  template<int dim>
+  template <int dim>
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
                              const unsigned int      n_subdivisions,
@@ -846,7 +846,7 @@ namespace GridGenerator
                                colorize);
   }
 
-  template<int dim>
+  template <int dim>
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
 #ifndef _MSC_VER

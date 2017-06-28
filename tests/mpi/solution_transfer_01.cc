@@ -47,7 +47,7 @@
 #include <sstream>
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   parallel::distributed::Triangulation<2> tria(MPI_COMM_WORLD,

@@ -36,7 +36,7 @@
 
 #include <fstream>
 
-template<int dim>
+template <int dim>
 void output(const parallel::distributed::Triangulation<dim> &tr,
             const std::string                               &filename,
             const bool                                      view_levels,
@@ -61,7 +61,7 @@ void output(const parallel::distributed::Triangulation<dim> &tr,
     AssertThrow(false, ExcNotImplemented());
 }
 
-template<int dim>
+template <int dim>
 void test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

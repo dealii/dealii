@@ -34,7 +34,7 @@ void print (const Vector<number> &v)
   deallog << std::endl;
 }
 
-template<typename T>
+template <typename T>
 void fill( T &a)
 {
   for (unsigned int i=0; i<a.size(); ++i)

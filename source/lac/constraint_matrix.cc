@@ -1446,7 +1446,7 @@ namespace internals
 {
 #define SCRATCH_INITIALIZER(Number,Name)                                \
   ConstraintMatrixData<Number>::ScratchData scratch_data_initializer_##Name; \
-  template<> Threads::ThreadLocalStorage<ConstraintMatrixData<Number>::ScratchData> \
+  template <> Threads::ThreadLocalStorage<ConstraintMatrixData<Number>::ScratchData> \
   ConstraintMatrixData<Number>::scratch_data(scratch_data_initializer_##Name)
 
   SCRATCH_INITIALIZER(double,double);

@@ -47,7 +47,7 @@
 #include <sstream>
 
 
-template<int dim>
+template <int dim>
 class FilteredDataOut : public DataOut<dim>
 {
 public:
@@ -92,7 +92,7 @@ private:
 
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

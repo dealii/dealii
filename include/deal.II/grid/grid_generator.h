@@ -884,7 +884,7 @@ namespace GridGenerator
    * and 6 in 3d). If @p colorize is set to false, then flat faces get the
    * number 0 and the hole gets number 1.
    */
-  template<int dim>
+  template <int dim>
   void hyper_cube_with_cylindrical_hole (
     Triangulation<dim> &triangulation,
     const double        inner_radius = .25,

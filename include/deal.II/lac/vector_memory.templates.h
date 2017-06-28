@@ -93,7 +93,7 @@ GrowingVectorMemory<VectorType>::GrowingVectorMemory (const size_type initial_si
 }
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 GrowingVectorMemory<VectorType>::~GrowingVectorMemory()
 {
@@ -110,7 +110,7 @@ GrowingVectorMemory<VectorType>::~GrowingVectorMemory()
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 VectorType *
 GrowingVectorMemory<VectorType>::alloc ()
@@ -140,7 +140,7 @@ GrowingVectorMemory<VectorType>::alloc ()
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 void
 GrowingVectorMemory<VectorType>::free(const VectorType *const v)
@@ -161,7 +161,7 @@ GrowingVectorMemory<VectorType>::free(const VectorType *const v)
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 void
 GrowingVectorMemory<VectorType>::release_unused_memory ()
@@ -187,7 +187,7 @@ GrowingVectorMemory<VectorType>::release_unused_memory ()
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 inline
 std::size_t
 GrowingVectorMemory<VectorType>::memory_consumption () const

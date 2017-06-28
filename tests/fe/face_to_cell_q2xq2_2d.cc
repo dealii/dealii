@@ -26,7 +26,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
-template<int dim>
+template <int dim>
 void test()
 {
   FESystem<dim> fe(FE_Q<dim>(2), 1,

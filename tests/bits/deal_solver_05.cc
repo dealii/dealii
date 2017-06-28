@@ -36,7 +36,7 @@
 #include <deal.II/lac/precondition.h>
 #include <typeinfo>
 
-template<typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
+template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
 void
 check_solve(SolverType          &solver,
             const SolverControl &solver_control,

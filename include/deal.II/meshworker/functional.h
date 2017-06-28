@@ -62,13 +62,13 @@ namespace MeshWorker
       /**
        * Assemble the local values into the global vectors.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info);
 
       /**
        * Assemble both local values into the global vectors.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
 
@@ -131,13 +131,13 @@ namespace MeshWorker
       /**
        * Assemble the local values into the global vectors.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info);
 
       /**
        * Assemble both local values into the global vectors.
        */
-      template<class DOFINFO>
+      template <class DOFINFO>
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
 

@@ -102,7 +102,7 @@ struct less_than_key
 //  |-----| 2  |
 //  |1 |1 |    |
 //  ------------
-template<int dim>
+template <int dim>
 void test2cells(const FiniteElement<dim> &fe_0,
                 const FiniteElement<dim> &fe_1,
                 const FiniteElement<dim> &fe_2,

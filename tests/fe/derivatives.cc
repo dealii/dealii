@@ -32,7 +32,7 @@
 #include <string>
 
 
-template<int dim>
+template <int dim>
 inline void
 plot_derivatives(Mapping<dim> &mapping,
                  FiniteElement<dim> &finel,
@@ -78,7 +78,7 @@ plot_derivatives(Mapping<dim> &mapping,
 
 
 
-template<int dim>
+template <int dim>
 void plot_FE_Q_shape_functions()
 {
   MappingQGeneric<dim> m(1);
@@ -109,7 +109,7 @@ void plot_FE_Q_shape_functions()
 }
 
 
-template<int dim>
+template <int dim>
 void plot_FE_DGQ_shape_functions()
 {
   MappingQGeneric<dim> m(1);

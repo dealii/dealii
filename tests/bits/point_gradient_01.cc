@@ -36,7 +36,7 @@
 #include <iomanip>
 
 
-template<int dim>
+template <int dim>
 class MySquareFunction : public Function<dim>
 {
 public:
@@ -72,7 +72,7 @@ public:
 };
 
 
-template<int dim>
+template <int dim>
 class MyExpFunction : public Function<dim>
 {
 public:

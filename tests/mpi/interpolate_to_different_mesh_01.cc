@@ -38,7 +38,7 @@ public:
   }
 };
 
-template<int dim>
+template <int dim>
 void setup(DoFHandler<dim> &dh,
            FE_Q<dim> &fe,
            LA::MPI::Vector &vec,
@@ -51,7 +51,7 @@ void setup(DoFHandler<dim> &dh,
   lr_vec.reinit(locally_relevant, MPI_COMM_WORLD);
 }
 
-template<int dim>
+template <int dim>
 void output(DoFHandler<dim> &dh, LA::MPI::Vector &v, unsigned int loop, const std::string filename_)
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
@@ -86,7 +86,7 @@ void output(DoFHandler<dim> &dh, LA::MPI::Vector &v, unsigned int loop, const st
     }
 }
 
-template<int dim>
+template <int dim>
 void test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

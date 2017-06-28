@@ -869,7 +869,7 @@ namespace Step34
   // as an argument is the index of the unit support point where the
   // singularity is located.
 
-  template<>
+  template <>
   const Quadrature<2> &BEMProblem<3>::get_singular_quadrature(
     const DoFHandler<2,3>::active_cell_iterator &,
     const unsigned int index) const
@@ -887,7 +887,7 @@ namespace Step34
   }
 
 
-  template<>
+  template <>
   const Quadrature<1> &BEMProblem<2>::get_singular_quadrature(
     const DoFHandler<1,2>::active_cell_iterator &cell,
     const unsigned int index) const

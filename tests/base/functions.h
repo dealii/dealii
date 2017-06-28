@@ -23,7 +23,7 @@
 // quadrature points in each direction, and the threshold above which
 // we consider values unequal
 
-template<int dim>
+template <int dim>
 void
 check_function_value_consistency(
   const Function<dim> &f,
@@ -60,7 +60,7 @@ check_function_value_consistency(
 }
 
 // Same for gradients
-template<int dim>
+template <int dim>
 void
 check_function_gradient_consistency(
   const Function<dim> &f,
@@ -148,7 +148,7 @@ DerivativeTestFunction<dim>::vector_value_list (
 }
 
 
-template<int dim>
+template <int dim>
 void DerivativeTestFunction<dim>::vector_value (
   const Point<dim> &point,
   Vector<double> &value) const
@@ -157,7 +157,7 @@ void DerivativeTestFunction<dim>::vector_value (
 }
 
 
-template<int dim>
+template <int dim>
 double DerivativeTestFunction<dim>::value (
   const Point<dim> &point,
   const unsigned int comp) const
@@ -169,7 +169,7 @@ double DerivativeTestFunction<dim>::value (
 
 
 // Check whether the difference quotients converge to the gradient
-template<int dim>
+template <int dim>
 void
 check_gradient(
   const Function<dim> &f,

@@ -280,7 +280,7 @@ PolynomialSpace<dim>::PolynomialSpace (const std::vector<Pol> &pols)
 }
 
 
-template<int dim>
+template <int dim>
 inline
 unsigned int
 PolynomialSpace<dim>::n() const
@@ -290,7 +290,7 @@ PolynomialSpace<dim>::n() const
 
 
 
-template<int dim>
+template <int dim>
 inline
 unsigned int
 PolynomialSpace<dim>::degree() const

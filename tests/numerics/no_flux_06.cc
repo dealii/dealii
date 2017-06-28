@@ -37,7 +37,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void test_hyper_cube()
 {
   Triangulation<dim> tr;

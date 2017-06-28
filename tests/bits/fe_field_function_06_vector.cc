@@ -52,7 +52,7 @@ public:
 
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   const HyperBallBoundary<dim> boundary_description;

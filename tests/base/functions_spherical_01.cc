@@ -24,7 +24,7 @@
 
 
 // reference function f(x) = exp (-Z*r)
-template<int dim>
+template <int dim>
 class ExpFunc : public Function<dim>
 {
 public:
@@ -75,7 +75,7 @@ private:
 
 
 // same as above but using Functions::Spherical
-template<int dim>
+template <int dim>
 class ExpFunc2 : public Functions::Spherical<dim>
 {
 public:

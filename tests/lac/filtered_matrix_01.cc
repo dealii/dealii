@@ -20,7 +20,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 
-template<typename number>
+template <typename number>
 void
 checkVmult(FullMatrix<number> &A, Vector<number> &V,
            bool expect_constrained_source = false)

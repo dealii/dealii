@@ -38,7 +38,7 @@
 std::ofstream logfile("output");
 
 
-template<int dim>
+template <int dim>
 void check_file (const std::string name,
                  typename GridIn<dim>::Format format)
 {

@@ -36,7 +36,7 @@
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 class LegendreFunction : public Function<dim>
 {
 public:
@@ -77,7 +77,7 @@ double Lh(const Point<dim>  &x_q,
   return res;
 }
 
-template<>
+template <>
 double LegendreFunction<2>::value(const dealii::Point<2> &point,
                                   const unsigned int ) const
 {
@@ -90,7 +90,7 @@ double LegendreFunction<2>::value(const dealii::Point<2> &point,
   return f;
 }
 
-template<>
+template <>
 double LegendreFunction<3>::value(const dealii::Point<3> &point,
                                   const unsigned int ) const
 {
@@ -136,7 +136,7 @@ void resize(Table<3,double> &coeff, const unsigned int N)
 
 
 
-template<int dim>
+template <int dim>
 void test(const LegendreFunction<dim> &func,
           const unsigned int poly_degree)
 {

@@ -2166,7 +2166,7 @@ namespace internal
      * A helper class used internally in linear_operator.h. Specialization for
      * TrilinosWrappers::MPI::Vector.
      */
-    template<>
+    template <>
     class ReinitHelper<TrilinosWrappers::MPI::Vector>
     {
     public:

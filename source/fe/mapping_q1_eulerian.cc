@@ -96,7 +96,7 @@ get_vertices
 
 
 
-template<int dim, class VectorType, int spacedim>
+template <int dim, class VectorType, int spacedim>
 std::vector<Point<spacedim> >
 MappingQ1Eulerian<dim,VectorType,spacedim>::
 compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
@@ -124,7 +124,7 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::clone () const
 
 
 
-template<int dim, class VectorType, int spacedim>
+template <int dim, class VectorType, int spacedim>
 CellSimilarity::Similarity
 MappingQ1Eulerian<dim,VectorType,spacedim>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,

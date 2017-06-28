@@ -42,7 +42,7 @@
 
 
 
-template<int dim>
+template <int dim>
 inline void
 plot_faces(Mapping<dim> &mapping,
            FiniteElement<dim> &fe,
@@ -87,7 +87,7 @@ plot_faces(Mapping<dim> &mapping,
 
 
 
-template<int dim>
+template <int dim>
 inline void
 plot_subfaces(Mapping<dim> &mapping,
               FiniteElement<dim> &fe,
@@ -137,7 +137,7 @@ plot_subfaces(Mapping<dim> &mapping,
 }
 
 
-template<int dim>
+template <int dim>
 void mapping_test()
 {
   deallog << "dim=" << dim << std::endl;

@@ -338,7 +338,7 @@ private:
    */
   unsigned int debug;
 
-  template<int dim, class OtherVectorType, class TRANSFER> friend class PreconditionMG;
+  template <int dim, class OtherVectorType, class TRANSFER> friend class PreconditionMG;
 };
 
 
@@ -354,7 +354,7 @@ private:
  *
  * @author Guido Kanschat, 1999, 2000, 2001, 2002
  */
-template<int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, class TRANSFER>
 class PreconditionMG : public Subscriptor
 {
 public:
@@ -377,7 +377,7 @@ public:
    *
    * This is the operator used by LAC iterative solvers.
    */
-  template<class OtherVectorType>
+  template <class OtherVectorType>
   void vmult (OtherVectorType       &dst,
               const OtherVectorType &src) const;
 
@@ -385,7 +385,7 @@ public:
    * Preconditioning operator. Calls the @p vcycle function of the @p MG
    * object passed to the constructor.
    */
-  template<class OtherVectorType>
+  template <class OtherVectorType>
   void vmult_add (OtherVectorType       &dst,
                   const OtherVectorType &src) const;
 
@@ -394,7 +394,7 @@ public:
    *
    * Not implemented, but the definition may be needed.
    */
-  template<class OtherVectorType>
+  template <class OtherVectorType>
   void Tvmult (OtherVectorType       &dst,
                const OtherVectorType &src) const;
 
@@ -403,7 +403,7 @@ public:
    *
    * Not implemented, but the definition may be needed.
    */
-  template<class OtherVectorType>
+  template <class OtherVectorType>
   void Tvmult_add (OtherVectorType       &dst,
                    const OtherVectorType &src) const;
 
@@ -533,7 +533,7 @@ Multigrid<VectorType>::get_minlevel () const
 /* --------------------------- inline functions --------------------- */
 
 
-template<int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, class TRANSFER>
 PreconditionMG<dim, VectorType, TRANSFER>
 ::PreconditionMG(const DoFHandler<dim>  &dof_handler,
                  Multigrid<VectorType>  &mg,
@@ -544,15 +544,15 @@ PreconditionMG<dim, VectorType, TRANSFER>
   transfer(&transfer)
 {}
 
-template<int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, class TRANSFER>
 inline bool
 PreconditionMG<dim, VectorType, TRANSFER>::empty () const
 {
   return false;
 }
 
-template<int dim, typename VectorType, class TRANSFER>
-template<class OtherVectorType>
+template <int dim, typename VectorType, class TRANSFER>
+template <class OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::vmult
 (OtherVectorType       &dst,
@@ -569,7 +569,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult
 }
 
 
-template<int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, class TRANSFER>
 IndexSet
 PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_range_indices() const
 {
@@ -577,7 +577,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_range_indices() const
 }
 
 
-template<int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, class TRANSFER>
 IndexSet
 PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices() const
 {
@@ -585,7 +585,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices() const
 }
 
 
-template<int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, class TRANSFER>
 MPI_Comm
 PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
 {
@@ -598,8 +598,8 @@ PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
 }
 
 
-template<int dim, typename VectorType, class TRANSFER>
-template<class OtherVectorType>
+template <int dim, typename VectorType, class TRANSFER>
+template <class OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::vmult_add
 (OtherVectorType       &dst,
@@ -615,8 +615,8 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult_add
 }
 
 
-template<int dim, typename VectorType, class TRANSFER>
-template<class OtherVectorType>
+template <int dim, typename VectorType, class TRANSFER>
+template <class OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::Tvmult
 (OtherVectorType &,
@@ -626,8 +626,8 @@ PreconditionMG<dim, VectorType, TRANSFER>::Tvmult
 }
 
 
-template<int dim, typename VectorType, class TRANSFER>
-template<class OtherVectorType>
+template <int dim, typename VectorType, class TRANSFER>
+template <class OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add
 (OtherVectorType &,

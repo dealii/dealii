@@ -736,7 +736,7 @@ public:
    *
    * The type of boundary_ids equals typename FunctionMap<spacedim,number>::type .
    */
-  template<typename number>
+  template <typename number>
   types::global_dof_index
   n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const;
 
@@ -1161,7 +1161,7 @@ DoFHandler<dim,spacedim>::n_dofs () const
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 inline
 types::global_dof_index DoFHandler<dim, spacedim>::n_dofs (const unsigned int level) const
 {
@@ -1289,7 +1289,7 @@ namespace internal
    *
    * Defined in dof_handler.cc.
    */
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy);
 }
 
@@ -1375,7 +1375,7 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (const unsigned int level,
 
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 inline
 void
 DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (const unsigned int level,

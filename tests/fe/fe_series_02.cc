@@ -39,7 +39,7 @@ using namespace dealii;
 /**
  * A 1D function given by input legendre coefficients
  */
-template<int dim>
+template <int dim>
 class LegendreFunction : public Function<dim>
 {
 public:
@@ -62,7 +62,7 @@ private:
   const std::vector<double> coefficients;
 };
 
-template<int dim>
+template <int dim>
 double LegendreFunction<dim>::value(const dealii::Point<dim> &point,
                                     const unsigned int ) const
 {
@@ -83,7 +83,7 @@ double LegendreFunction<dim>::value(const dealii::Point<dim> &point,
   return f;
 }
 
-template<int dim>
+template <int dim>
 void test(const LegendreFunction<dim> &func,
           const unsigned int poly_degree)
 {

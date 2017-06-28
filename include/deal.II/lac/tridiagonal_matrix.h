@@ -26,7 +26,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
-template<typename number> class Vector;
+template <typename number> class Vector;
 
 
 /*! @addtogroup Matrix1
@@ -45,7 +45,7 @@ template<typename number> class Vector;
  * @ingroup Matrix1
  * @author Guido Kanschat, 2005, 2006
  */
-template<typename number>
+template <typename number>
 class TridiagonalMatrix
 {
 public:
@@ -295,7 +295,7 @@ private:
 //---------------------------------------------------------------------------
 #ifndef DOXYGEN
 
-template<typename number>
+template <typename number>
 types::global_dof_index
 TridiagonalMatrix<number>::m() const
 {
@@ -304,7 +304,7 @@ TridiagonalMatrix<number>::m() const
 
 
 
-template<typename number>
+template <typename number>
 types::global_dof_index
 TridiagonalMatrix<number>::n() const
 {
@@ -312,7 +312,7 @@ TridiagonalMatrix<number>::n() const
 }
 
 
-template<typename number>
+template <typename number>
 inline
 number
 TridiagonalMatrix<number>::operator()(size_type i, size_type j) const
@@ -340,7 +340,7 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j) const
 }
 
 
-template<typename number>
+template <typename number>
 inline
 number &
 TridiagonalMatrix<number>::operator()(size_type i, size_type j)

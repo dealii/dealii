@@ -39,7 +39,7 @@ Mapping<dim, spacedim>::get_vertices (
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 Point<dim-1>
 Mapping<dim,spacedim>::
 project_real_point_to_unit_point_on_face (

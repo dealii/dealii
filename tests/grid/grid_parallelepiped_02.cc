@@ -41,7 +41,7 @@ std::ofstream logfile ("output");
 // grid), this test is not entirely trivial.
 //
 // Here is the implementation in nd:
-template<int dim>
+template <int dim>
 void check_nd_parallelepiped_by_comparison (bool log)
 {
 

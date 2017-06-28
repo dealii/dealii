@@ -204,7 +204,7 @@ namespace TrilinosWrappers
     /**
      * The specialization for a const Accessor.
      */
-    template<>
+    template <>
     class Accessor<true> : public AccessorBase
     {
     public:
@@ -244,7 +244,7 @@ namespace TrilinosWrappers
     /**
      * The specialization for a mutable Accessor.
      */
-    template<>
+    template <>
     class Accessor<false> : public AccessorBase
     {
       class Reference
@@ -587,7 +587,7 @@ namespace TrilinosWrappers
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
      */
-    template<typename SparsityPatternType>
+    template <typename SparsityPatternType>
     void reinit (const SparsityPatternType &sparsity_pattern);
 
     /**
@@ -749,7 +749,7 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
-    template<typename SparsityPatternType>
+    template <typename SparsityPatternType>
     void reinit (const Epetra_Map          &parallel_partitioning,
                  const SparsityPatternType &sparsity_pattern,
                  const bool                 exchange_data = false) DEAL_II_DEPRECATED;
@@ -768,7 +768,7 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
-    template<typename SparsityPatternType>
+    template <typename SparsityPatternType>
     void reinit (const Epetra_Map          &row_parallel_partitioning,
                  const Epetra_Map          &col_parallel_partitioning,
                  const SparsityPatternType &sparsity_pattern,
@@ -911,7 +911,7 @@ namespace TrilinosWrappers
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
      */
-    template<typename SparsityPatternType>
+    template <typename SparsityPatternType>
     void reinit (const IndexSet            &parallel_partitioning,
                  const SparsityPatternType &sparsity_pattern,
                  const MPI_Comm            &communicator  = MPI_COMM_WORLD,
@@ -929,7 +929,7 @@ namespace TrilinosWrappers
      * This is a collective operation that needs to be called on all
      * processors in order to avoid a dead lock.
      */
-    template<typename SparsityPatternType>
+    template <typename SparsityPatternType>
     void reinit (const IndexSet            &row_parallel_partitioning,
                  const IndexSet            &col_parallel_partitioning,
                  const SparsityPatternType &sparsity_pattern,
@@ -1488,7 +1488,7 @@ namespace TrilinosWrappers
      * running on one processor, since the matrix object is inherently
      * distributed. Otherwise, an exception will be thrown.
      */
-    template<typename VectorType>
+    template <typename VectorType>
     void vmult (VectorType       &dst,
                 const VectorType &src) const;
 
@@ -1538,7 +1538,7 @@ namespace TrilinosWrappers
      * distributed. Otherwise, an exception will be thrown.
      *
      */
-    template<typename VectorType>
+    template <typename VectorType>
     void vmult_add (VectorType       &dst,
                     const VectorType &src) const;
 

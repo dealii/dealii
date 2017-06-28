@@ -50,21 +50,21 @@ void f_post_refinement ()
   return;
 }
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void f_pre_coarsening_on_cell (const typename Triangulation<dim, spacedim>::cell_iterator &)
 {
   ++signal_counter_pre_coarsening_on_cell;
   return;
 }
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void f_post_refinement_on_cell (const typename Triangulation<dim, spacedim>::cell_iterator &)
 {
   ++signal_counter_post_refinement_on_cell;
   return;
 }
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void f_copy (const Triangulation<dim, spacedim> &)
 {
   ++signal_counter_copy;
@@ -84,7 +84,7 @@ void f_any_change ()
 }
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   signal_counter_create = 0;

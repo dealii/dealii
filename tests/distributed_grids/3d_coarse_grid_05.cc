@@ -131,7 +131,7 @@ void create_disconnected_mesh (Triangulation<dim> &tria)
 
 
 
-template<int dim>
+template <int dim>
 void test(std::ostream & /*out*/)
 {
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);

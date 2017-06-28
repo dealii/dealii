@@ -50,7 +50,7 @@ namespace hp
    *
    * @author Oliver Kayser-Herold, 2005
    */
-  template<int dim, int spacedim=dim>
+  template <int dim, int spacedim=dim>
   class MappingCollection : public Subscriptor
   {
   public:
@@ -133,7 +133,7 @@ namespace hp
    * collection can then be used in all of those places where such a
    * collection is needed.
    */
-  template<int dim, int spacedim=dim>
+  template <int dim, int spacedim=dim>
   struct StaticMappingQ1
   {
   public:
@@ -146,7 +146,7 @@ namespace hp
 
   /* --------------- inline functions ------------------- */
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   inline
   unsigned int
   MappingCollection<dim,spacedim>::size () const
@@ -156,7 +156,7 @@ namespace hp
 
 
 
-  template<int dim, int spacedim>
+  template <int dim, int spacedim>
   inline
   const Mapping<dim,spacedim> &
   MappingCollection<dim,spacedim>::operator[] (const unsigned int index) const

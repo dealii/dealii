@@ -46,7 +46,7 @@ ddf2: (subst(srule2,expand(ddf)));
 
 
 
-template<int dim>
+template <int dim>
 class RefFunc : public Function<dim>
 {
 public:
@@ -119,7 +119,7 @@ private:
 
 
 // same as above but using Functions::Spherical
-template<int dim>
+template <int dim>
 class SphFunc : public Functions::Spherical<dim>
 {
 public:

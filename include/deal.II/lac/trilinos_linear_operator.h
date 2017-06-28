@@ -42,7 +42,7 @@ namespace TrilinosWrappers
 
     namespace BlockLinearOperator
     {
-      template<typename PayloadBlockType>
+      template <typename PayloadBlockType>
       class TrilinosBlockPayload;
     }
   }

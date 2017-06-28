@@ -1598,7 +1598,7 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template<int dim>
+  template <int dim>
   void project_boundary_values_div_conforming
   (const DoFHandler<dim>      &dof_handler,
    const unsigned int          first_vector_component,
@@ -1615,7 +1615,7 @@ namespace VectorTools
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  template<int dim>
+  template <int dim>
   void project_boundary_values_div_conforming
   (const hp::DoFHandler<dim>             &dof_handler,
    const unsigned int                     first_vector_component,

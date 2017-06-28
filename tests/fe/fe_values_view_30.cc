@@ -38,7 +38,7 @@
 
 #include <fstream>
 
-template<int dim>
+template <int dim>
 class VectorFunction : public Function<dim>
 {
 public:
@@ -47,7 +47,7 @@ public:
   virtual void vector_value(const Point<dim> &p, Vector<double> &values) const;
 };
 
-template<>
+template <>
 double VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
 {
   Assert (component < 2,  ExcIndexRange (component, 0, 1));
@@ -66,7 +66,7 @@ double VectorFunction<2>::value(const Point<2> &p, const unsigned int component)
   return val;
 }
 
-template<>
+template <>
 double VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 {
   Assert (component < 3, ExcIndexRange (component, 0, 2));
@@ -88,14 +88,14 @@ double VectorFunction<3>::value(const Point<3> &p, const unsigned int component)
   return val;
 }
 
-template<int dim>
+template <int dim>
 void VectorFunction<dim>::vector_value(const Point<dim> &p, Vector<double> &values) const
 {
   for (int i = 0; i < dim; ++i)
     values(i) = value(p, i);
 }
 
-template<int dim>
+template <int dim>
 void test (const Triangulation<dim> &tr,
            const FiniteElement<dim> &fe)
 {
@@ -158,7 +158,7 @@ void test (const Triangulation<dim> &tr,
 
 
 
-template<int dim>
+template <int dim>
 void test_hyper_sphere()
 {
   Triangulation<dim> tr;

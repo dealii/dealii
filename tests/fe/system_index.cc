@@ -31,7 +31,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void
 check_fe(const FiniteElement<dim> &fe)
 {
@@ -123,7 +123,7 @@ check_fe(const FiniteElement<dim> &fe)
 
 
 
-template<int dim>
+template <int dim>
 void check()
 {
   FE_DGQ<dim> co(0);

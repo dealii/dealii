@@ -92,7 +92,7 @@ transform_grid (Triangulation<2> &tria,
 
 
 
-template<int dim>
+template <int dim>
 void
 plot_shape_functions(const unsigned int degree)
 {

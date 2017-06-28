@@ -29,7 +29,7 @@ using namespace dealii;
 //
 
 
-template<int dim>
+template <int dim>
 void test_vertices()
 {
   deallog << dim << "D:" << std::endl;
@@ -60,7 +60,7 @@ void test_vertices()
 }
 
 
-template<int dim>
+template <int dim>
 void test_lines()
 {
   deallog << dim << "D:" << std::endl;

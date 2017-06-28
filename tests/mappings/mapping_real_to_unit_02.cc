@@ -33,7 +33,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void test2()
 {
   const HyperBallBoundary<dim> boundary_description;

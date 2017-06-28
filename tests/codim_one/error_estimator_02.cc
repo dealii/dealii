@@ -40,7 +40,7 @@
 
 
 // function is x^2+2xy
-template<int dim>
+template <int dim>
 class MyFunction : public Function<dim>
 {
 public:
@@ -62,7 +62,7 @@ public:
 
 
 // normal derivative of function above is 0 except for x=1, y=1 with n=(0,1,0)
-template<int dim>
+template <int dim>
 class MyNormalDerivative : public Function<dim>
 {
 public:
@@ -97,7 +97,7 @@ get_q_face ()
   return q;
 }
 
-template<>
+template <>
 Quadrature<0> &
 get_q_face <1>()
 {

@@ -326,7 +326,7 @@ namespace Utilities
    * This function simply makes the assumption that the sequence is sorted,
    * and we simply don't do the additional check.
    */
-  template<typename Iterator, typename T>
+  template <typename Iterator, typename T>
   Iterator
   lower_bound (Iterator  first,
                Iterator  last,
@@ -338,7 +338,7 @@ namespace Utilities
    * compare individual elements of the sequence of objects pointed to by the
    * iterators.
    */
-  template<typename Iterator, typename T, typename Comp>
+  template <typename Iterator, typename T, typename Comp>
   Iterator
   lower_bound (Iterator   first,
                Iterator   last,
@@ -618,7 +618,7 @@ namespace Utilities
 
 
 
-  template<typename Iterator, typename T>
+  template <typename Iterator, typename T>
   inline
   Iterator
   lower_bound (Iterator  first,
@@ -631,7 +631,7 @@ namespace Utilities
 
 
 
-  template<typename Iterator, typename T, typename Comp>
+  template <typename Iterator, typename T, typename Comp>
   inline
   Iterator
   lower_bound (Iterator    first,

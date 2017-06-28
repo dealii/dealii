@@ -32,7 +32,7 @@
 #include <deal.II/fe/fe_bernstein.h>
 //#include "../../include/fe_bernstein.h"
 
-template<int dim>
+template <int dim>
 inline void
 plot_derivatives(Mapping<dim> &mapping,
                  FiniteElement<dim> &finel,
@@ -78,7 +78,7 @@ plot_derivatives(Mapping<dim> &mapping,
 
 
 
-template<int dim>
+template <int dim>
 void plot_FE_Bernstein_shape_functions()
 {
   MappingQGeneric<dim> m(1);

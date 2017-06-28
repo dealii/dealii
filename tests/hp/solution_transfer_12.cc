@@ -46,7 +46,7 @@
 // - FE_Q_Hierarchical
 // - manual interpolation as there is no general interpolation implemented
 //   for this FE currently, thus VectorTools::interpolate can't be used.
-template<int dim>
+template <int dim>
 class MyFunction : public Function<dim>
 {
 public:

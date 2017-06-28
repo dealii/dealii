@@ -177,7 +177,7 @@ namespace mg
    * @author Guido Kanschat,
    * @date 2003, 2009, 2010
    */
-  template<class RelaxationType, typename VectorType>
+  template <class RelaxationType, typename VectorType>
   class SmootherRelaxation : public MGLevelObject<RelaxationType>, public MGSmoother<VectorType>
   {
   public:
@@ -282,7 +282,7 @@ namespace mg
  *
  * @author Guido Kanschat, 2003
  */
-template<typename MatrixType, class RelaxationType, typename VectorType>
+template <typename MatrixType, class RelaxationType, typename VectorType>
 class MGSmootherRelaxation : public MGSmoother<VectorType>
 {
 public:
@@ -431,7 +431,7 @@ private:
  *
  * @author Guido Kanschat, 2009
  */
-template<typename MatrixType, typename PreconditionerType, typename VectorType>
+template <typename MatrixType, typename PreconditionerType, typename VectorType>
 class MGSmootherPrecondition : public MGSmoother<VectorType>
 {
 public:

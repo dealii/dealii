@@ -64,7 +64,7 @@ namespace internal
      *
      * @author Tobias Leicht, 2006
      */
-    template<int dim>
+    template <int dim>
     class DoFFaces
     {
       /**
@@ -81,7 +81,7 @@ namespace internal
      *
      * @author Tobias Leicht, 2006
      */
-    template<>
+    template <>
     class DoFFaces<1>
     {
     public:
@@ -106,7 +106,7 @@ namespace internal
      *
      * @author Tobias Leicht, 2006
      */
-    template<>
+    template <>
     class DoFFaces<2>
     {
     public:
@@ -136,7 +136,7 @@ namespace internal
      *
      * @author Tobias Leicht, 2006
      */
-    template<>
+    template <>
     class DoFFaces<3>
     {
     public:

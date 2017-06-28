@@ -54,7 +54,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData::InternalData
 (const FiniteElement<dim,spacedim> &fe,
  const ComponentMask                mask)
@@ -67,7 +67,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData::InternalDa
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 std::size_t
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData::memory_consumption () const
 {
@@ -77,7 +77,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData::memory_con
 
 
 
-template<int dim, int spacedim, typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 double &
 MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::shape
 (const unsigned int qpoint,
@@ -90,7 +90,7 @@ MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::shape
 }
 
 
-template<int dim, int spacedim, typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 const Tensor<1,dim> &
 MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::derivative
 (const unsigned int qpoint,
@@ -104,7 +104,7 @@ MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::derivative
 
 
 
-template<int dim, int spacedim, typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 Tensor<1,dim> &
 MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::derivative
 (const unsigned int qpoint,
@@ -199,7 +199,7 @@ MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::fourth_der
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
 (const DoFHandlerType            &euler_dof_handler,
  const VectorType    &euler_vector,
@@ -222,7 +222,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
 (const MappingFEField<dim,spacedim,VectorType,DoFHandlerType> &mapping)
   :
@@ -235,7 +235,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
 
 
 
-template<int dim, int spacedim, typename DoFHandlerType, typename VectorType>
+template <int dim, int spacedim, typename DoFHandlerType, typename VectorType>
 inline
 const double &
 MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::InternalData::shape
@@ -259,7 +259,7 @@ MappingFEField<dim,spacedim,DoFHandlerType,VectorType>::preserves_vertex_locatio
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 compute_shapes_virtual (const std::vector<Point<dim> >                    &unit_points,
@@ -292,7 +292,7 @@ compute_shapes_virtual (const std::vector<Point<dim> >                    &unit_
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 UpdateFlags
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::requires_update_flags (const UpdateFlags in) const
 {
@@ -351,7 +351,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::requires_update_flags (c
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::compute_data
 (const UpdateFlags      update_flags,
@@ -403,7 +403,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::compute_data
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::compute_face_data
 (const UpdateFlags      update_flags,
@@ -473,7 +473,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::compute_face_data
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 typename
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_data (const UpdateFlags      update_flags,
@@ -487,7 +487,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_data (const UpdateFl
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 typename Mapping<dim,spacedim>::InternalDataBase *
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_face_data
 (const UpdateFlags        update_flags,
@@ -502,7 +502,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_face_data
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 typename Mapping<dim,spacedim>::InternalDataBase *
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_subface_data
 (const UpdateFlags        update_flags,
@@ -1215,7 +1215,7 @@ namespace internal
    * 'data_set' to differentiate whether we will work on a face (and if so,
    * which one) or subface.
    */
-  template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+  template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
   void
   do_fill_fe_face_values (const dealii::Mapping<dim,spacedim>                               &mapping,
                           const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1294,7 +1294,7 @@ namespace internal
 
 // Note that the CellSimilarity flag is modifiable, since MappingFEField can need to
 // recalculate data even when cells are similar.
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 CellSimilarity::Similarity
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1474,7 +1474,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1507,7 +1507,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1544,7 +1544,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
 namespace
 {
-  template<int dim, int spacedim, int rank, typename VectorType, typename DoFHandlerType>
+  template <int dim, int spacedim, int rank, typename VectorType, typename DoFHandlerType>
   void
   transform_fields(const ArrayView<const Tensor<rank,dim> >                &input,
                    const MappingType                                        mapping_type,
@@ -1606,7 +1606,7 @@ namespace
   }
 
 
-  template<int dim, int spacedim, int rank, typename VectorType, typename DoFHandlerType>
+  template <int dim, int spacedim, int rank, typename VectorType, typename DoFHandlerType>
   void
   transform_differential_forms
   (const ArrayView<const DerivativeForm<rank, dim,spacedim> >  &input,
@@ -1642,7 +1642,7 @@ namespace
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const ArrayView<const Tensor<1,dim> >                  &input,
@@ -1657,7 +1657,7 @@ transform (const ArrayView<const Tensor<1,dim> >                  &input,
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const ArrayView<const DerivativeForm<1, dim, spacedim> > &input,
@@ -1672,7 +1672,7 @@ transform (const ArrayView<const DerivativeForm<1, dim, spacedim> > &input,
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const ArrayView<const Tensor<2, dim> >                 &input,
@@ -1690,7 +1690,7 @@ transform (const ArrayView<const Tensor<2, dim> >                 &input,
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const ArrayView<const DerivativeForm<2, dim, spacedim> >  &input,
@@ -1739,7 +1739,7 @@ transform (const ArrayView<const DerivativeForm<2, dim, spacedim> >  &input,
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform (const ArrayView<const Tensor<3,dim> >                  &input,
@@ -1759,7 +1759,7 @@ transform (const ArrayView<const Tensor<3,dim> >                  &input,
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 Point<spacedim>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1778,7 +1778,7 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 Point<spacedim>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 do_transform_unit_to_real_cell (const InternalData &data) const
@@ -1797,7 +1797,7 @@ do_transform_unit_to_real_cell (const InternalData &data) const
 
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 Point<dim>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -1840,7 +1840,7 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 Point<dim>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 do_transform_real_to_unit_cell
@@ -1948,7 +1948,7 @@ failure:
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 unsigned int
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_degree() const
 {
@@ -1956,7 +1956,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_degree() const
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 ComponentMask
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_component_mask() const
 {
@@ -1964,7 +1964,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_component_mask() con
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 Mapping<dim,spacedim> *
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::clone () const
 {
@@ -1972,7 +1972,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::clone () const
 }
 
 
-template<int dim, int spacedim, typename VectorType, typename DoFHandlerType>
+template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 void
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::update_internal_dofs
 (const typename Triangulation<dim,spacedim>::cell_iterator  &cell,

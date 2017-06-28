@@ -42,7 +42,7 @@
 
 // a linear function that should be transferred exactly with Q1 and Q2
 // elements
-template<int dim>
+template <int dim>
 class MyFunction : public Function<dim>
 {
 public:

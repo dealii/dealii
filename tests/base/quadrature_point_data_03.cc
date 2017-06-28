@@ -38,7 +38,7 @@
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 class MyFunction : public Function<dim>
 {
 public:
@@ -105,7 +105,7 @@ DeclException3 (ExcWrongValue,
 /**
  * Loop over quadrature points and check that value is the same as given by the function.
  */
-template<int dim>
+template <int dim>
 void check_qph(parallel::distributed::Triangulation<dim> &tr,
                const CellDataStorage<typename Triangulation<dim,dim>::cell_iterator,MyDataBase> &manager,
                const Quadrature<dim> &rhs_quadrature,
@@ -140,7 +140,7 @@ void check_qph(parallel::distributed::Triangulation<dim> &tr,
   dof_handler.clear();
 }
 
-template<int dim>
+template <int dim>
 void test()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

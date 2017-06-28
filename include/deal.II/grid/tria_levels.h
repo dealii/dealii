@@ -212,7 +212,7 @@ namespace internal
      * instead of TriaObjects. Refer to the documentation of the general class
      * template for details.
      */
-    template<>
+    template <>
     class TriaLevel<3>
     {
     public:

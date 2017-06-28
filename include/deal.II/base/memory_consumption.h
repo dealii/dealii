@@ -237,7 +237,7 @@ namespace MemoryConsumption
    * @note This returns the size of the pointer, not the size of the object
    * pointed to.
    */
-  template<typename T>
+  template <typename T>
   inline
   std::size_t
   memory_consumption (const T *const);
@@ -388,7 +388,7 @@ namespace MemoryConsumption
 
 
 
-  template<typename T>
+  template <typename T>
   inline
   std::size_t
   memory_consumption(const T *const)

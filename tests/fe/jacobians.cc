@@ -190,7 +190,7 @@ void do_test(const Triangulation<dim> &tria,
 
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   Triangulation<dim> tria;

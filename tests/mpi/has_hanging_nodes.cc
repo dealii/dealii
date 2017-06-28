@@ -68,7 +68,7 @@ using namespace dealii;
 
 //#define DISTRIBUTED
 
-template<int dim>
+template <int dim>
 void test_int(const unsigned int n_global = 0,
               const unsigned int n_local = 0)
 {

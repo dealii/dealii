@@ -32,7 +32,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void
 check()
 {

@@ -127,7 +127,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Luca Heltai, 2009
  */
-template<typename Number>
+template <typename Number>
 class VectorView : public Vector<Number>
 {
 public:
@@ -232,7 +232,7 @@ public:
 
 #ifndef DOXYGEN
 
-template<typename Number>
+template <typename Number>
 inline
 VectorView<Number>::VectorView(const size_type new_size, Number *ptr)
 {
@@ -243,7 +243,7 @@ VectorView<Number>::VectorView(const size_type new_size, Number *ptr)
 
 
 
-template<typename Number>
+template <typename Number>
 inline
 VectorView<Number>::VectorView(const size_type new_size, const Number *ptr)
 {
@@ -254,7 +254,7 @@ VectorView<Number>::VectorView(const size_type new_size, const Number *ptr)
 
 
 
-template<typename Number>
+template <typename Number>
 inline
 VectorView<Number>::~VectorView()
 {
@@ -266,7 +266,7 @@ VectorView<Number>::~VectorView()
 }
 
 
-template<typename Number>
+template <typename Number>
 inline
 void VectorView<Number>::reinit(const size_type N,
                                 const bool omit_zeroing_entries)
@@ -278,7 +278,7 @@ void VectorView<Number>::reinit(const size_type N,
 }
 
 
-template<typename Number>
+template <typename Number>
 inline
 void VectorView<Number>::reinit(const size_type new_size, Number *ptr)
 {
@@ -288,7 +288,7 @@ void VectorView<Number>::reinit(const size_type new_size, Number *ptr)
 }
 
 
-template<typename Number>
+template <typename Number>
 inline
 void VectorView<Number>::reinit(const size_type new_size, const Number *ptr)
 {
@@ -298,7 +298,7 @@ void VectorView<Number>::reinit(const size_type new_size, const Number *ptr)
 }
 
 
-template<typename Number>
+template <typename Number>
 inline
 void VectorView<Number>::swap(Vector<Number> &)
 {

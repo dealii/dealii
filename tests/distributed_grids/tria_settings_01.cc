@@ -34,7 +34,7 @@
 
 #include <fstream>
 
-template<int dim>
+template <int dim>
 void testit(parallel::distributed::Triangulation<dim> &tr)
 {
   GridGenerator::hyper_cube(tr);
@@ -55,7 +55,7 @@ void testit(parallel::distributed::Triangulation<dim> &tr)
 }
 
 
-template<int dim>
+template <int dim>
 void test(std::ostream & /*out*/)
 {
   {

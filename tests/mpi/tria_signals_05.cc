@@ -33,7 +33,7 @@
 // that p4est is doing mesh smoothing beyond class Triangulation. The case setup
 // is borrowed from tests/distributed_grids/2d_refinement_10.
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 class SignalListener
 {
 public:
@@ -81,7 +81,7 @@ private:
 };
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;

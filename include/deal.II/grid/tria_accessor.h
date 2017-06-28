@@ -1553,7 +1553,7 @@ private:
  * @ingroup Accessors
  * @author Bruno Turcksin, 2015
  */
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 class TriaAccessor<0, dim, spacedim>
 {
 public:
@@ -3207,7 +3207,7 @@ protected:
    * partial templates. we use this auxiliary function that is then called
    * from point_inside.
    */
-  template<int dim_,int spacedim_ >
+  template <int dim_,int spacedim_ >
   bool point_inside_codim(const Point<spacedim_> &p) const;
 
 

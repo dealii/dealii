@@ -44,7 +44,7 @@
 #include <iomanip>
 #include <map>
 
-template<int dim>
+template <int dim>
 void check_parallelepiped (bool colorize, bool log, const unsigned int (&subd)[dim])
 {
   deallog << "* checking dim=" << dim

@@ -42,7 +42,7 @@
 #include <iomanip>
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test(std::ostream &out)
 {
   Triangulation<dim,spacedim>   triangulation;

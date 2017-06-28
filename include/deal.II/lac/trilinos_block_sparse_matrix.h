@@ -595,7 +595,7 @@ namespace TrilinosWrappers
        *
        * @ingroup TrilinosWrappers
        */
-      template<typename PayloadBlockType>
+      template <typename PayloadBlockType>
       class TrilinosBlockPayload
       {
       public:

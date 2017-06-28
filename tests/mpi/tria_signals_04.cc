@@ -33,7 +33,7 @@
 // smoothing flags enabled. Also increase refine fraction to one third to prevent
 // refine flags getting smoothed out.
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 class SignalListener
 {
 public:
@@ -81,7 +81,7 @@ private:
 };
 
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   typedef parallel::distributed::Triangulation<dim, spacedim> TriaType;

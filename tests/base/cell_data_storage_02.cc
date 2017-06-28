@@ -37,7 +37,7 @@
 
 using namespace dealii;
 
-template<int dim>
+template <int dim>
 class MyFunction : public Function<dim>
 {
 public:
@@ -72,7 +72,7 @@ DeclException3 (ExcWrongValue,
                 << arg1 <<" != "<< arg2 << " with delta = " << arg3 );
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   const MyFunction<dim> my_func;

@@ -29,7 +29,7 @@
 
 
 
-template<int dim>
+template <int dim>
 void test ()
 {
   for (unsigned int degree=0; degree<9-2*dim; ++degree)

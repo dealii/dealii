@@ -89,7 +89,7 @@ void create_triangulation(const unsigned int case_no,
 }
 
 
-template<int dim>
+template <int dim>
 void test()
 {
   Triangulation<dim> tria;

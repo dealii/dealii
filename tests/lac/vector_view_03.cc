@@ -23,7 +23,7 @@
 #include <fstream>
 #include <iomanip>
 
-template<typename number>
+template <typename number>
 void
 checkReinit3(const Vector<number> &V)
 {

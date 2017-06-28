@@ -92,7 +92,7 @@ void make_grid (Triangulation<2> &triangulation)
 }
 
 
-template<int dim>
+template <int dim>
 void test(const Triangulation<dim> &tria,
           const Mapping<dim> &mapping,
           const FiniteElement<dim> &fe1,

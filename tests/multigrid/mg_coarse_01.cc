@@ -408,7 +408,7 @@ namespace Step50
       }
   }
 
-  template<typename VECTOR>
+  template <typename VECTOR>
   class MGCoarseAMG : public MGCoarseGridBase<VECTOR>
   {
   public:

@@ -23,7 +23,7 @@
 #include <fstream>
 #include <iomanip>
 
-template<typename number, typename size_type>
+template <typename number, typename size_type>
 void
 checkReinit1(const size_type N, const bool fast = false)
 {

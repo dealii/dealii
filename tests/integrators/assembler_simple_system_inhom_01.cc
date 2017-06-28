@@ -441,7 +441,7 @@ void RHSIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &,
 /*
  * Main class
  */
-template<int dim>
+template <int dim>
 class MeshWorkerConstraintMatrixTest
 {
 public:
@@ -476,7 +476,7 @@ private:
 };
 
 
-template<int dim>
+template <int dim>
 MeshWorkerConstraintMatrixTest<dim>::MeshWorkerConstraintMatrixTest(const FiniteElement<dim> &fe) :
   mapping(),
   dof_handler(triangulation),
@@ -499,7 +499,7 @@ MeshWorkerConstraintMatrixTest<dim>::~MeshWorkerConstraintMatrixTest ()
 }
 
 
-template<int dim>
+template <int dim>
 void MeshWorkerConstraintMatrixTest<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
@@ -534,7 +534,7 @@ void MeshWorkerConstraintMatrixTest<dim>::setup_system()
 /*
  * Assemble with SystemSimple
  */
-template<int dim>
+template <int dim>
 void MeshWorkerConstraintMatrixTest<dim>::assemble_system_MeshWorker()
 {
 
@@ -567,7 +567,7 @@ void MeshWorkerConstraintMatrixTest<dim>::assemble_system_MeshWorker()
 /*
  * Assemble matrix and vector seperately
  */
-template<int dim>
+template <int dim>
 void MeshWorkerConstraintMatrixTest<dim>::assemble_MeshWorker()
 {
 
@@ -634,7 +634,7 @@ void MeshWorkerConstraintMatrixTest<dim>::createInhomConstraints()
 }
 
 
-template<int dim>
+template <int dim>
 void MeshWorkerConstraintMatrixTest<dim>::run()
 {
   setup_system();

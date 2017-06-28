@@ -41,7 +41,7 @@
 #define PRECISION 2
 
 
-template<int dim>
+template <int dim>
 inline void
 plot_transformation(Mapping<dim> &mapping,
                     FiniteElement<dim> &fe,
@@ -81,7 +81,7 @@ plot_transformation(Mapping<dim> &mapping,
 
 
 
-template<int dim>
+template <int dim>
 inline void
 plot_faces(Mapping<dim> &mapping,
            FiniteElement<dim> &fe,
@@ -125,7 +125,7 @@ plot_faces(Mapping<dim> &mapping,
 
 
 
-template<int dim>
+template <int dim>
 inline void
 plot_subfaces(Mapping<dim> &mapping,
               FiniteElement<dim> &fe,
@@ -171,7 +171,7 @@ plot_subfaces(Mapping<dim> &mapping,
 
 
 
-template<>
+template <>
 inline void
 plot_faces(Mapping<1> &,
            FiniteElement<1> &,
@@ -181,7 +181,7 @@ plot_faces(Mapping<1> &,
 
 
 
-template<>
+template <>
 inline void
 plot_subfaces(Mapping<1> &,
               FiniteElement<1> &,
@@ -191,7 +191,7 @@ plot_subfaces(Mapping<1> &,
 
 
 
-template<int dim>
+template <int dim>
 inline void
 compute_area(Mapping<dim> &mapping,
              FiniteElement<dim> &fe,
@@ -210,7 +210,7 @@ compute_area(Mapping<dim> &mapping,
 }
 
 
-template<int dim>
+template <int dim>
 void create_triangulations(std::vector<Triangulation<dim> *> &,
                            std::vector<Boundary<dim> *> &,
                            std::vector<double> &)
@@ -224,7 +224,7 @@ std::vector<std::vector<unsigned int> > show;
 unsigned int mapping_size;
 
 
-template<>
+template <>
 void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
                            std::vector<Boundary<1> *> &,
                            std::vector<double> &exact_areas)
@@ -241,7 +241,7 @@ void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
 
 
 
-template<>
+template <>
 void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
                            std::vector<Boundary<2> *> &boundary_ptr,
                            std::vector<double> &exact_areas)
@@ -355,7 +355,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
 
 
 
-template<>
+template <>
 void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
                            std::vector<Boundary<3> *> &boundary_ptr,
                            std::vector<double> &exact_areas)
@@ -424,7 +424,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
 }
 
 
-template<int dim>
+template <int dim>
 void mapping_test()
 {
   deallog << "dim=" << dim << std::endl;

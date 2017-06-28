@@ -44,7 +44,7 @@ void logvec (const std::vector<types::global_dof_index> &v, const std::vector<ty
 }
 
 
-template<int dim>
+template <int dim>
 void test_renumbering(const FiniteElement<dim> &fe)
 {
   std::vector<types::global_dof_index> v(fe.dofs_per_cell);
@@ -59,7 +59,7 @@ void test_renumbering(const FiniteElement<dim> &fe)
 }
 
 
-template<int dim>
+template <int dim>
 void test_renumbering()
 {
   deallog.push("Renumber");
