@@ -47,8 +47,8 @@ Timer::Timer()
   start_wall_time (0.),
   cumulative_time (0.),
   cumulative_wall_time (0.),
-  last_lap_time (0.),
-  last_lap_cpu_time(0.),
+  last_lap_time (numbers::signaling_nan<double>()),
+  last_lap_cpu_time(numbers::signaling_nan<double>()),
   running (false)
 #ifdef DEAL_II_WITH_MPI
   ,
@@ -57,8 +57,8 @@ Timer::Timer()
 #endif
 {
 #ifdef DEAL_II_WITH_MPI
-  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = 0.;
-  mpi_data.min_index = mpi_data.max_index = 0;
+  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
+  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
   mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
   mpi_total_data.min_index = mpi_total_data.max_index = 0;
 #endif
@@ -79,15 +79,15 @@ Timer::Timer(MPI_Comm mpi_communicator,
   start_wall_time (0.),
   cumulative_time (0.),
   cumulative_wall_time (0.),
-  last_lap_time (0.),
-  last_lap_cpu_time (0.),
+  last_lap_time (numbers::signaling_nan<double>()),
+  last_lap_cpu_time (numbers::signaling_nan<double>()),
   running (false),
   mpi_communicator (mpi_communicator),
   sync_wall_time(sync_wall_time_)
 {
 #ifdef DEAL_II_WITH_MPI
-  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = 0.;
-  mpi_data.min_index = mpi_data.max_index = 0;
+  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
+  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
   mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
   mpi_total_data.min_index = mpi_total_data.max_index = 0;
 #endif
@@ -312,14 +312,14 @@ double Timer::last_wall_time () const
 
 void Timer::reset ()
 {
-  last_lap_time = 0.;
-  last_lap_cpu_time = 0.;
+  last_lap_time = numbers::signaling_nan<double>();
+  last_lap_cpu_time = numbers::signaling_nan<double>();
   cumulative_time = 0.;
   cumulative_wall_time = 0.;
   running         = false;
 #ifdef DEAL_II_WITH_MPI
-  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = 0.;
-  mpi_data.min_index = mpi_data.max_index = 0;
+  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
+  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
   mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
   mpi_total_data.min_index = mpi_total_data.max_index = 0;
 #endif

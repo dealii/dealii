@@ -50,8 +50,6 @@ int main ()
   AssertThrow(old_wall_time > 0., ExcInternalError());
   const double old_cpu_time = t.wall_time();
   AssertThrow(old_cpu_time > 0., ExcInternalError());
-  AssertThrow(t.last_wall_time() == 0., ExcInternalError());
-  AssertThrow(t.last_cpu_time() == 0, ExcInternalError());
 
   burn(50);
   AssertThrow(t.stop() > 0., ExcInternalError());
@@ -64,8 +62,6 @@ int main ()
   t.reset();
   AssertThrow(t.wall_time() == 0., ExcInternalError());
   AssertThrow(t.cpu_time()== 0., ExcInternalError());
-  AssertThrow(t.last_wall_time() == 0., ExcInternalError());
-  AssertThrow(t.last_cpu_time() == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }

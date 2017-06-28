@@ -47,10 +47,7 @@ test_timer(Timer &t)
   AssertThrow(old_wall_time > 0., ExcInternalError());
   const double old_cpu_time = t.wall_time();
   AssertThrow(old_cpu_time > 0., ExcInternalError());
-  AssertThrow(t.last_wall_time() == 0., ExcInternalError());
-  AssertThrow(t.last_cpu_time() == 0., ExcInternalError());
-  AssertThrow(t.get_data().min == 0., ExcInternalError());
-  AssertThrow(t.get_total_data().min == 0., ExcInternalError());
+  AssertThrow(t.get_total_data().max == 0., ExcInternalError());
 
   burn(50);
   AssertThrow(t.stop() > 0., ExcInternalError());
@@ -65,10 +62,7 @@ test_timer(Timer &t)
   t.reset();
   AssertThrow(t.wall_time() == 0., ExcInternalError());
   AssertThrow(t.cpu_time()== 0., ExcInternalError());
-  AssertThrow(t.last_wall_time() == 0., ExcInternalError());
-  AssertThrow(t.last_cpu_time() == 0., ExcInternalError());
-  AssertThrow(t.get_data().min == 0., ExcInternalError());
-  AssertThrow(t.get_total_data().min == 0, ExcInternalError());
+  AssertThrow(t.get_total_data().max == 0, ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
