@@ -130,11 +130,11 @@ namespace Patterns
 
     /**
      * Convert a compatible value type to a string. If the type is not
-     * compatible, an excepion ExcIncompatibleType is thrown.
+     * compatible, an exception ExcIncompatibleType is thrown.
      *
      * Internally, this function wraps the value in a boost::any object
      * and calls the virtual function any_to_string(). Derived patterns
-     * should implement any_to_string for this function to work properly.
+     * need to implement any_to_string for this function to work properly.
      *
      * An example usage is here:
      *
@@ -162,10 +162,12 @@ namespace Patterns
      * An example usage is here:
      *
      * @code
-     * int a;
+     * int a = 0;
      * Patterns::Integer p;
      *
      * p.to_value("5", a);
+     *
+     * std::cout << a << std::endl; // This prints 5.
      * @endcode
      */
     template<class T>
