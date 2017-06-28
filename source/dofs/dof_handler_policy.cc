@@ -325,9 +325,9 @@ namespace internal
          */
         template <int dim, int spacedim>
         static
-        unsigned int
+        types::global_dof_index
         distribute_mg_dofs_on_cell (const typename DoFHandler<dim,spacedim>::level_cell_iterator &cell,
-                                    unsigned int   next_free_dof,
+                                    types::global_dof_index   next_free_dof,
                                     const internal::int2type<1> &)
         {
           // distribute dofs of vertices
@@ -378,9 +378,9 @@ namespace internal
 
         template <int dim, int spacedim>
         static
-        unsigned int
+        types::global_dof_index
         distribute_mg_dofs_on_cell (const typename DoFHandler<dim,spacedim>::level_cell_iterator &cell,
-                                    unsigned int   next_free_dof,
+                                    types::global_dof_index   next_free_dof,
                                     const internal::int2type<2> &)
         {
           if (cell->get_fe().dofs_per_vertex > 0)
@@ -424,9 +424,9 @@ namespace internal
 
         template <int dim, int spacedim>
         static
-        unsigned int
+        types::global_dof_index
         distribute_mg_dofs_on_cell (const typename DoFHandler<dim,spacedim>::level_cell_iterator &cell,
-                                    unsigned int   next_free_dof,
+                                    types::global_dof_index   next_free_dof,
                                     const internal::int2type<3> &)
         {
           if (cell->get_fe().dofs_per_vertex > 0)
@@ -485,7 +485,7 @@ namespace internal
 
         template <int dim, int spacedim>
         static
-        unsigned int
+        types::global_dof_index
         distribute_dofs_on_level (const types::subdomain_id level_subdomain_id,
                                   DoFHandler<dim,spacedim> &dof_handler,
                                   const unsigned int        level)
@@ -504,7 +504,7 @@ namespace internal
           tria.save_user_flags(user_flags);
           const_cast<dealii::Triangulation<dim,spacedim> &>(tria).clear_user_flags ();
 
-          unsigned int next_free_dof = 0;
+          types::global_dof_index next_free_dof = 0;
           typename DoFHandler<dim,spacedim>::level_cell_iterator
           cell = dof_handler.begin(level),
           endc = dof_handler.end(level);
