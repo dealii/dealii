@@ -167,8 +167,8 @@ public:
   double wall_time () const;
 
   /**
-   * Access to the wall time for the currently running lap without stopping
-   * the timer.
+   * Access to the wall time since the timer has been stopped the last time.
+   * The timer is not stopped by this function.
    * The elapsed time is returned in units of seconds.
    */
   double last_wall_time() const;
@@ -180,20 +180,18 @@ public:
   double cpu_time() const;
 
   /**
-   * Access to the wall time for the currently running lap without stopping
-   * the timer.
+   * Access to the CPU time since the timer has been stopped the last time.
+   * The timer is not stopped by this function.
    * The elapsed time is returned in units of seconds.
    */
   double last_cpu_time() const;
 
   /**
-   * Return the last lap time; the time taken between the last
-   * start()/stop()
-   * call.
+   * Returns the wall time taken between the last start()/stop() call.
    *
    * @deprecated Use last_wall_time() instead.
    */
-  double get_lap_time () const;
+  double get_lap_time () const DEAL_II_DEPRECATED;
 
 private:
 
@@ -235,12 +233,12 @@ private:
   double              cumulative_wall_time;
 
   /**
-   * Stores the last lap wall time; the time between the last start()/stop() cycle.
+   * Stores the wall time between the last start()/stop() cycle.
    */
   double              last_lap_time;
 
   /**
-   * Stores the last lap cpu time; the time between the last start()/stop() cycle.
+   * Stores the CPU time between the last start()/stop() cycle.
    */
   double              last_lap_cpu_time;
 
