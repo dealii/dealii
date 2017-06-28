@@ -113,8 +113,7 @@ extern "C" {
  * by default. Note that (P)Arpack supports other transformations, but currently
  * this class implements only shift-and-invert mode.
  *
- * The <code>OP</code> can be specified either using auxiliary Shift class together
- * with IterativeInverse or by using LinearOperator
+ * The <code>OP</code> can be specified by using a LinearOperator:
  * @code
  *   const double shift = 5.0;
  *   const auto op_A = linear_operator<vector_t>(A);

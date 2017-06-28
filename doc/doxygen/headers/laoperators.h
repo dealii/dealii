@@ -94,12 +94,6 @@
  * encapsulation of individual linear operators into blocked linear
  * operator variants.
  *
- * @note The LinearOperator facility obsoletes some of the @ref Matrix2
- * "derived matrix" classes, such as BlockDiagonalMatrix, IterativeInverse,
- * ProductMatrix, ScaledMatrix, ProductSparseMatrix,
- * InverseMatrixRichardson, SchurMatrix, ShiftedMatrix,
- * ShiftedMatrixGeneralized, TransposeMatrix
- *
  * @note As explained below, when using LinearOperator as <code>res = op_a*x</code>
  * a PackagedOperation class instance is generated behind-the-curtains.
  * Consequently, the user program has to include header files for both classes
