@@ -3044,51 +3044,20 @@ namespace hp
   renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                           dealii::internal::int2type<3>)
   {
-    const unsigned int dim = 3;
-    const unsigned int spacedim = 3;
-
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
     renumber_dofs_internal (new_numbers, internal::int2type<2>());
 
-    // save user flags on hexes so we
-    // can use them to mark hexes
-    // we've already treated
-    std::vector<bool> saved_hex_user_flags;
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .save_user_flags_hex (saved_hex_user_flags);
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .clear_user_flags_hex ();
-
-    // we're in 3d, so hexes are also
-    // cells. stick with the same
-    // kind of notation as in the
-    // previous functions, though
+    // we're in 3d, so hexes are also cells. by design, we only visit each cell once
     for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
-      if (cell->user_flag_set() == false)
-        {
-          const hex_iterator hex = cell;
-          hex->set_user_flag();
+      {
+        const unsigned int fe_index = cell->active_fe_index ();
 
-          const unsigned int n_active_fe_indices
-            = hex->n_active_fe_indices ();
-
-          for (unsigned int f=0; f<n_active_fe_indices; ++f)
-            {
-              const unsigned int fe_index
-                = hex->nth_active_fe_index (f);
-
-              for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_hex; ++d)
-                hex->set_dof_index (d,
-                                    new_numbers[hex->dof_index(d,fe_index)],
-                                    fe_index);
-            }
-        }
-
-    // at the end, restore the user
-    // flags for the hexs
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .load_user_flags_hex (saved_hex_user_flags);
+        for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_hex; ++d)
+          cell->set_dof_index (d,
+                               new_numbers[cell->dof_index(d,fe_index)],
+                               fe_index);
+      }
   }
 
 
