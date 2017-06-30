@@ -1,0 +1,6 @@
+New: The Timer class now has new functions Timer::get_total_data(),
+Timer::print_total_data, Timer::last_wall_time, Timer::cpu_time and 
+Timer::last_cpu_time() to access information about the total run as 
+well as the last lap.
+<br>
+(Daniel Arndt, 2017/06/23)

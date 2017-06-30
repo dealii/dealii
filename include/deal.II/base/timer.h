@@ -95,24 +95,37 @@ public:
    * time for the MPI operations are not included in the timing but may slow
    * down your program.
    *
-   * This constructor is only available if the deal.II compiler is an MPI
-   * compiler.
+   * This constructor is only available if deal.II is compiled with MPI support.
    */
   Timer (MPI_Comm mpi_communicator,
          const bool sync_wall_time = false);
 
   /**
-   * Return a reference to the data structure with global timing information.
-   * Filled after calling stop().
+   * Return a reference to the data structure with global timing information
+   * for the last lap. Filled after calling stop().
    */
   const Utilities::MPI::MinMaxAvg &get_data() const;
 
   /**
-   * Prints the data to the given stream.
+   * Return a reference to the data structure with global timing information
+   * for the total run.
+   * Filled after calling stop().
+   */
+  const Utilities::MPI::MinMaxAvg &get_total_data() const;
+
+  /**
+   * Prints the data returned by get_data(), i.e. for the last lap,
+   * to the given stream.
    */
   template <class StreamType>
   void print_data(StreamType &stream) const;
 
+  /**
+   * Prints the data returned by get_total_data(), i.e. for the total run,
+   * to the given stream.
+   */
+  template <class StreamType>
+  void print_total_data(StreamType &stream) const;
 
 #endif
 
@@ -140,22 +153,45 @@ public:
   void restart();
 
   /**
-   * Access to the current CPU time without disturbing time measurement. The
-   * elapsed time is returned in units of seconds.
+   * Access to the current CPU time without stopping the timer.
+   * The elapsed time is returned in units of seconds.
+   *
+   * @deprecated Use cpu_time() instead.
    */
-  double operator() () const;
+  double operator() () const DEAL_II_DEPRECATED;
 
   /**
-   * Access to the current wall time without disturbing time measurement. The
-   * elapsed time is returned in units of seconds.
+   * Access to the current total wall time without stopping the timer.
+   * The elapsed time is returned in units of seconds.
    */
   double wall_time () const;
 
   /**
-   * Return the last lap time; the time taken between the last start()/stop()
-   * call.
+   * Access to the wall time since the timer has been stopped the last time.
+   * The timer is not stopped by this function.
+   * The elapsed time is returned in units of seconds.
    */
-  double get_lap_time () const;
+  double last_wall_time() const;
+
+  /**
+   * Access to the current total wall time without stopping the timer.
+   * The elapsed time is returned in units of seconds.
+   */
+  double cpu_time() const;
+
+  /**
+   * Access to the CPU time since the timer has been stopped the last time.
+   * The timer is not stopped by this function.
+   * The elapsed time is returned in units of seconds.
+   */
+  double last_cpu_time() const;
+
+  /**
+   * Returns the wall time taken between the last start()/stop() call.
+   *
+   * @deprecated Use last_wall_time() instead.
+   */
+  double get_lap_time () const DEAL_II_DEPRECATED;
 
 private:
 
@@ -197,9 +233,14 @@ private:
   double              cumulative_wall_time;
 
   /**
-   * Stores the last lap time; the time between the last start()/stop() cycle.
+   * Stores the wall time between the last start()/stop() cycle.
    */
   double              last_lap_time;
+
+  /**
+   * Stores the CPU time between the last start()/stop() cycle.
+   */
+  double              last_lap_cpu_time;
 
   /**
    * Store whether the timer is presently running.
@@ -221,9 +262,17 @@ private:
    * A structure for parallel wall time measurement that includes the minimum
    * time recorded among all processes, the maximum time as well as the
    * average time defined as the sum of all individual times divided by the
-   * number of MPI processes in the MPI_Comm.
+   * number of MPI processes in the MPI_Comm for the last lap.
    */
   Utilities::MPI::MinMaxAvg mpi_data;
+
+  /**
+   * A structure for parallel wall time measurement that includes the minimum
+   * time recorded among all processes, the maximum time as well as the
+   * average time defined as the sum of all individual times divided by the
+   * number of MPI processes in the MPI_Comm for the total run time.
+   */
+  Utilities::MPI::MinMaxAvg mpi_total_data;
 #endif
 };
 
@@ -732,18 +781,37 @@ Timer::get_data() const
 
 
 
+inline
+const Utilities::MPI::MinMaxAvg &
+Timer::get_total_data() const
+{
+  return mpi_total_data;
+}
+
+
+
 template <class StreamType>
 inline
 void
 Timer::print_data(StreamType &stream) const
 {
-  unsigned int my_id = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
-  if (my_id==0)
-    stream << mpi_data.max << " wall,"
-           << " max @" << mpi_data.max_index
-           << ", min=" << mpi_data.min << " @" << mpi_data.min_index
-           << ", avg=" << mpi_data.avg
-           << std::endl;
+  const Utilities::MPI::MinMaxAvg statistic = get_data();
+  stream << statistic.max << " wall,"
+         << " max @" << statistic.max_index << ", min=" << statistic.min << " @"
+         << statistic.min_index << ", avg=" << statistic.avg << std::endl;
+}
+
+
+
+template <class StreamType>
+inline
+void
+Timer::print_total_data(StreamType &stream) const
+{
+  const Utilities::MPI::MinMaxAvg statistic = get_total_data();
+  stream << statistic.max << " wall,"
+         << " max @" << statistic.max_index << ", min=" << statistic.min << " @"
+         << statistic.min_index << ", avg=" << statistic.avg << std::endl;
 }
 
 #endif

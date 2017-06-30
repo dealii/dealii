@@ -47,7 +47,8 @@ Timer::Timer()
   start_wall_time (0.),
   cumulative_time (0.),
   cumulative_wall_time (0.),
-  last_lap_time (0.),
+  last_lap_time (numbers::signaling_nan<double>()),
+  last_lap_cpu_time(numbers::signaling_nan<double>()),
   running (false)
 #ifdef DEAL_II_WITH_MPI
   ,
@@ -58,6 +59,8 @@ Timer::Timer()
 #ifdef DEAL_II_WITH_MPI
   mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
   mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
+  mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
+  mpi_total_data.min_index = mpi_total_data.max_index = 0;
 #endif
 
   start();
@@ -76,7 +79,8 @@ Timer::Timer(MPI_Comm mpi_communicator,
   start_wall_time (0.),
   cumulative_time (0.),
   cumulative_wall_time (0.),
-  last_lap_time (0.),
+  last_lap_time (numbers::signaling_nan<double>()),
+  last_lap_cpu_time (numbers::signaling_nan<double>()),
   running (false),
   mpi_communicator (mpi_communicator),
   sync_wall_time(sync_wall_time_)
@@ -84,6 +88,8 @@ Timer::Timer(MPI_Comm mpi_communicator,
 #ifdef DEAL_II_WITH_MPI
   mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
   mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
+  mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
+  mpi_total_data.min_index = mpi_total_data.max_index = 0;
 #endif
 
   start();
@@ -175,13 +181,13 @@ double Timer::stop ()
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-      cumulative_time += dtime - start_time;
+      last_lap_cpu_time = dtime - start_time;
 
       rusage usage_children;
       getrusage (RUSAGE_CHILDREN, &usage_children);
       const double dtime_children =
         usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
-      cumulative_time += dtime_children - start_time_children;
+      last_lap_cpu_time += dtime_children - start_time_children;
 
       struct timeval wall_timer;
       gettimeofday(&wall_timer, nullptr);
@@ -189,37 +195,34 @@ double Timer::stop ()
                       - start_wall_time;
 #elif defined(DEAL_II_MSVC)
       last_lap_time = windows::wall_clock() - start_wall_time;
-      cumulative_time += windows::cpu_clock() - start_time;
+      last_lap_cpu_time = windows::cpu_clock() - start_time;
 #else
 #  error Unsupported platform. Porting not finished.
 #endif
 
 #ifdef DEAL_II_WITH_MPI
+      this->mpi_data = Utilities::MPI::min_max_avg (last_lap_time,
+                                                    mpi_communicator);
       if (sync_wall_time && Utilities::MPI::job_supports_mpi())
         {
-          this->mpi_data
-            = Utilities::MPI::min_max_avg (last_lap_time, mpi_communicator);
           last_lap_time = this->mpi_data.max;
-          cumulative_wall_time += last_lap_time;
+          last_lap_cpu_time = Utilities::MPI::min_max_avg (last_lap_cpu_time,
+                                                           mpi_communicator).max;
         }
-      else
+      cumulative_wall_time += last_lap_time;
+      cumulative_time += last_lap_cpu_time;
+      this->mpi_total_data = Utilities::MPI::min_max_avg (cumulative_wall_time,
+                                                          mpi_communicator);
 #endif
-        cumulative_wall_time += last_lap_time;
+      cumulative_wall_time += last_lap_time;
+      cumulative_time += last_lap_cpu_time;
     }
   return cumulative_time;
 }
 
 
 
-double Timer::get_lap_time() const
-{
-  // time already has the difference between the last start()/stop() cycle.
-  return Utilities::MPI::max (last_lap_time, mpi_communicator);
-}
-
-
-
-double Timer::operator() () const
+double Timer::cpu_time() const
 {
   if (running)
     {
@@ -257,6 +260,27 @@ double Timer::operator() () const
 
 
 
+double Timer::last_cpu_time() const
+{
+  return last_lap_cpu_time;
+}
+
+
+
+double Timer::get_lap_time() const
+{
+  return last_lap_time;
+}
+
+
+
+double Timer::operator() () const
+{
+  return cpu_time();
+}
+
+
+
 double Timer::wall_time () const
 {
   if (running)
@@ -279,12 +303,26 @@ double Timer::wall_time () const
 
 
 
+double Timer::last_wall_time () const
+{
+  return last_lap_time;
+}
+
+
+
 void Timer::reset ()
 {
-  last_lap_time = 0.;
+  last_lap_time = numbers::signaling_nan<double>();
+  last_lap_cpu_time = numbers::signaling_nan<double>();
   cumulative_time = 0.;
   cumulative_wall_time = 0.;
   running         = false;
+#ifdef DEAL_II_WITH_MPI
+  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
+  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
+  mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
+  mpi_total_data.min_index = mpi_total_data.max_index = 0;
+#endif
 }
 
 
