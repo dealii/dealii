@@ -628,27 +628,20 @@ namespace internal
 
 
         /**
-         * Implementation of DoFHandler::renumber_dofs()
+         * The part of the renumber_dofs() functionality that is dimension
+         * independent because it renumbers the DoF indices on vertices
+         * (which exist for all dimensions).
          *
-         * If the second argument has any elements set, elements of
-         * the then the vector of new numbers do not relate to the old
-         * DoF number but instead to the index of the old DoF number
-         * within the set of locally owned DoFs.
-         *
-         * (The IndexSet argument is not used in 1d because we only need
-         * it for parallel meshes and 1d doesn't support that right now.)
+         * See renumber_dofs() for the meaning of the arguments.
          */
-        template <int spacedim>
+        template <int dim, int spacedim>
         static
         void
-        renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
-                       const IndexSet                             &indices,
-                       DoFHandler<1,spacedim>                     &dof_handler,
-                       const bool                                  check_validity)
+        renumber_vertex_dofs (const std::vector<types::global_dof_index> &new_numbers,
+                              const IndexSet                             &indices,
+                              DoFHandler<dim,spacedim>                   &dof_handler,
+                              const bool                                  check_validity)
         {
-          (void)indices;
-          Assert (indices == IndexSet(0), ExcNotImplemented());
-
           // we can not use cell iterators in this function since then
           // we would renumber the dofs on the interface of two cells
           // more than once. Anyway, this way it's not only more
@@ -659,7 +652,9 @@ namespace internal
                i=dof_handler.vertex_dofs.begin();
                i!=dof_handler.vertex_dofs.end(); ++i)
             if (*i != numbers::invalid_dof_index)
-              *i = new_numbers[*i];
+              *i = (indices.size() == 0)?
+                   (new_numbers[*i]) :
+                   (new_numbers[indices.index_within_set(*i)]);
             else if (check_validity)
               // if index is invalid_dof_index: check if this one
               // really is unused
@@ -668,16 +663,144 @@ namespace internal
                                    dof_handler.selected_fe->dofs_per_vertex)
                       == false,
                       ExcInternalError ());
+        }
 
+
+
+        /**
+         * The part of the renumber_dofs() functionality that is dimension
+         * independent because it renumbers the DoF indices on cell interiors
+         * (which exist for all dimensions).
+         *
+         * See renumber_dofs() for the meaning of the arguments.
+         */
+        template <int dim, int spacedim>
+        static
+        void
+        renumber_cell_dofs (const std::vector<types::global_dof_index> &new_numbers,
+                            const IndexSet                             &indices,
+                            DoFHandler<dim,spacedim>                   &dof_handler)
+        {
           for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
             for (std::vector<types::global_dof_index>::iterator
                  i=dof_handler.levels[level]->dof_object.dofs.begin();
                  i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
               if (*i != numbers::invalid_dof_index)
-                *i = new_numbers[*i];
+                *i = ((indices.size() == 0) ?
+                      new_numbers[*i] :
+                      new_numbers[indices.index_within_set(*i)]);
+        }
+
+
+
+        /**
+         * The part of the renumber_dofs() functionality that operates on faces.
+         * This part is dimension dependent and so needs to be implemented in
+         * three separate specializations of the function.
+         *
+         * See renumber_dofs() for the meaning of the arguments.
+         */
+        template <int spacedim>
+        static
+        void
+        renumber_face_dofs (const std::vector<types::global_dof_index> &/*new_numbers*/,
+                            const IndexSet                             &/*indices*/,
+                            DoFHandler<1,spacedim>                     &/*dof_handler*/)
+        {
+          // nothing to do in 1d since there are no separate faces
+        }
+
+
+
+        template <int spacedim>
+        static
+        void
+        renumber_face_dofs (const std::vector<types::global_dof_index> &new_numbers,
+                            const IndexSet                             &indices,
+                            DoFHandler<2,spacedim>                     &dof_handler)
+        {
+          // treat dofs on lines
+          for (std::vector<types::global_dof_index>::iterator
+               i=dof_handler.faces->lines.dofs.begin();
+               i!=dof_handler.faces->lines.dofs.end(); ++i)
+            if (*i != numbers::invalid_dof_index)
+              *i = ((indices.size() == 0) ?
+                    new_numbers[*i] :
+                    new_numbers[indices.index_within_set(*i)]);
+        }
+
+
+
+        template <int spacedim>
+        static
+        void
+        renumber_face_dofs (const std::vector<types::global_dof_index> &new_numbers,
+                            const IndexSet                             &indices,
+                            DoFHandler<3,spacedim>                     &dof_handler)
+        {
+          // treat dofs on lines
+          for (std::vector<types::global_dof_index>::iterator
+               i=dof_handler.faces->lines.dofs.begin();
+               i!=dof_handler.faces->lines.dofs.end(); ++i)
+            if (*i != numbers::invalid_dof_index)
+              *i = ((indices.size() == 0) ?
+                    new_numbers[*i] :
+                    new_numbers[indices.index_within_set(*i)]);
+
+          // treat dofs on quads
+          for (std::vector<types::global_dof_index>::iterator
+               i=dof_handler.faces->quads.dofs.begin();
+               i!=dof_handler.faces->quads.dofs.end(); ++i)
+            if (*i != numbers::invalid_dof_index)
+              *i = ((indices.size() == 0) ?
+                    new_numbers[*i] :
+                    new_numbers[indices.index_within_set(*i)]);
+        }
+
+
+
+
+        /**
+         * Implementation of DoFHandler::renumber_dofs()
+         *
+         * If the second argument has any elements set, elements of
+         * the then the vector of new numbers do not relate to the old
+         * DoF number but instead to the index of the old DoF number
+         * within the set of locally owned DoFs.
+         *
+         * (The IndexSet argument is not used in 1d because we only need
+         * it for parallel meshes and 1d doesn't support that right now.)
+         */
+        template <int dim, int spacedim>
+        static
+        void
+        renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
+                       const IndexSet                             &indices,
+                       DoFHandler<dim,spacedim>                   &dof_handler,
+                       const bool                                  check_validity)
+        {
+          if (dim == 1)
+            Assert (indices == IndexSet(0), ExcNotImplemented());
+
+          renumber_vertex_dofs (new_numbers, indices, dof_handler, check_validity);
+          renumber_face_dofs (new_numbers, indices, dof_handler);
+          renumber_cell_dofs (new_numbers, indices, dof_handler);
 
           // update the cache used for cell dof indices
           update_all_level_cell_dof_indices_caches(dof_handler);
+        }
+
+
+
+        template <int dim, int spacedim>
+        static
+        void
+        renumber_dofs (const std::vector<types::global_dof_index> &/*new_numbers*/,
+                       const IndexSet                             &/*indices*/,
+                       hp::DoFHandler<dim,spacedim>               &/*dof_handler*/,
+                       const bool                                  /*check_validity*/)
+        {
+          Assert (false, ExcNotImplemented());
         }
 
 
@@ -728,61 +851,6 @@ namespace internal
                        (new_numbers[indices.index_within_set(*i)]);
                 }
             }
-        }
-
-
-
-        template <int spacedim>
-        static
-        void
-        renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
-                       const IndexSet                             &indices,
-                       DoFHandler<2,spacedim>                     &dof_handler,
-                       const bool                                  check_validity)
-        {
-          // we can not use cell iterators in this function since then
-          // we would renumber the dofs on the interface of two cells
-          // more than once. Anyway, this way it's not only more
-          // correct but also faster; note, however, that dof numbers
-          // may be invalid_dof_index, namely when the appropriate
-          // vertex/line/etc is unused
-          for (std::vector<types::global_dof_index>::iterator
-               i=dof_handler.vertex_dofs.begin();
-               i!=dof_handler.vertex_dofs.end(); ++i)
-            if (*i != numbers::invalid_dof_index)
-              *i = (indices.size() == 0)?
-                   (new_numbers[*i]) :
-                   (new_numbers[indices.index_within_set(*i)]);
-            else if (check_validity)
-              // if index is invalid_dof_index: check if this one
-              // really is unused
-              Assert (dof_handler.get_triangulation()
-                      .vertex_used((i-dof_handler.vertex_dofs.begin()) /
-                                   dof_handler.selected_fe->dofs_per_vertex)
-                      == false,
-                      ExcInternalError ());
-
-          for (std::vector<types::global_dof_index>::iterator
-               i=dof_handler.faces->lines.dofs.begin();
-               i!=dof_handler.faces->lines.dofs.end(); ++i)
-            if (*i != numbers::invalid_dof_index)
-              *i = ((indices.size() == 0) ?
-                    new_numbers[*i] :
-                    new_numbers[indices.index_within_set(*i)]);
-
-          for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
-            {
-              for (std::vector<types::global_dof_index>::iterator
-                   i=dof_handler.levels[level]->dof_object.dofs.begin();
-                   i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
-                if (*i != numbers::invalid_dof_index)
-                  *i = ((indices.size() == 0) ?
-                        new_numbers[*i] :
-                        new_numbers[indices.index_within_set(*i)]);
-            }
-
-          // update the cache used for cell dof indices
-          update_all_level_cell_dof_indices_caches (dof_handler);
         }
 
 
@@ -867,68 +935,6 @@ namespace internal
                         new_numbers[indices.index_within_set(*i)]);
                 }
             }
-        }
-
-
-
-        template <int spacedim>
-        static
-        void
-        renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
-                       const IndexSet                             &indices,
-                       DoFHandler<3,spacedim>                     &dof_handler,
-                       const bool                                  check_validity)
-        {
-          // we can not use cell iterators in this function since then
-          // we would renumber the dofs on the interface of two cells
-          // more than once. Anyway, this way it's not only more
-          // correct but also faster; note, however, that dof numbers
-          // may be invalid_dof_index, namely when the appropriate
-          // vertex/line/etc is unused
-          for (std::vector<types::global_dof_index>::iterator
-               i=dof_handler.vertex_dofs.begin();
-               i!=dof_handler.vertex_dofs.end(); ++i)
-            if (*i != numbers::invalid_dof_index)
-              *i = ((indices.size() == 0) ?
-                    new_numbers[*i] :
-                    new_numbers[indices.index_within_set(*i)]);
-            else if (check_validity)
-              // if index is invalid_dof_index: check if this one
-              // really is unused
-              Assert (dof_handler.get_triangulation()
-                      .vertex_used((i-dof_handler.vertex_dofs.begin()) /
-                                   dof_handler.selected_fe->dofs_per_vertex)
-                      == false,
-                      ExcInternalError ());
-
-          for (std::vector<types::global_dof_index>::iterator
-               i=dof_handler.faces->lines.dofs.begin();
-               i!=dof_handler.faces->lines.dofs.end(); ++i)
-            if (*i != numbers::invalid_dof_index)
-              *i = ((indices.size() == 0) ?
-                    new_numbers[*i] :
-                    new_numbers[indices.index_within_set(*i)]);
-          for (std::vector<types::global_dof_index>::iterator
-               i=dof_handler.faces->quads.dofs.begin();
-               i!=dof_handler.faces->quads.dofs.end(); ++i)
-            if (*i != numbers::invalid_dof_index)
-              *i = ((indices.size() == 0) ?
-                    new_numbers[*i] :
-                    new_numbers[indices.index_within_set(*i)]);
-
-          for (unsigned int level=0; level<dof_handler.levels.size(); ++level)
-            {
-              for (std::vector<types::global_dof_index>::iterator
-                   i=dof_handler.levels[level]->dof_object.dofs.begin();
-                   i!=dof_handler.levels[level]->dof_object.dofs.end(); ++i)
-                if (*i != numbers::invalid_dof_index)
-                  *i = ((indices.size() == 0) ?
-                        new_numbers[*i] :
-                        new_numbers[indices.index_within_set(*i)]);
-            }
-
-          // update the cache used for cell dof indices
-          update_all_level_cell_dof_indices_caches (dof_handler);
         }
 
 
@@ -1040,19 +1046,6 @@ namespace internal
                         new_numbers[indices.index_within_set(*i)]);
                 }
             }
-        }
-
-
-
-        template <int dim, int spacedim>
-        static
-        void
-        renumber_dofs (const std::vector<types::global_dof_index> &/*new_numbers*/,
-                       const IndexSet                             &/*indices*/,
-                       hp::DoFHandler<dim,spacedim>               &/*dof_handler*/,
-                       const bool                                  /*check_validity*/)
-        {
-          Assert (false, ExcNotImplemented());
         }
 
 
