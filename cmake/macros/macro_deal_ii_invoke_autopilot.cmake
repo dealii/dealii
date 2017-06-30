@@ -168,7 +168,9 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean
     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target runclean
     COMMAND ${CMAKE_COMMAND} -E remove_directory CMakeFiles
-    COMMAND ${CMAKE_COMMAND} -E remove CMakeCache.txt cmake_install.cmake Makefile
+    COMMAND ${CMAKE_COMMAND} -E remove
+      CMakeCache.txt cmake_install.cmake Makefile
+      build.ninja rules.ninja .ninja_deps .ninja_log
     COMMENT "distclean invoked"
     )
 
