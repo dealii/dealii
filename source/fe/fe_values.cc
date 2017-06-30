@@ -3614,7 +3614,10 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   // codimension one case.
   if (dim != spacedim-1)
     Assert ((update_flags & update_normal_vectors) == false,
-            (typename FEValuesBase<dim,spacedim>::ExcInvalidUpdateFlag()));
+            ExcMessage ("You can only pass the 'update_normal_vectors' "
+                        "flag to FEFaceValues or FESubfaceValues objects "
+                        "unless the triangulation is embedded in a higher "
+                        "dimensional space."));
 
   const UpdateFlags flags = this->compute_update_flags (update_flags);
 
