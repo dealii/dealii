@@ -169,7 +169,7 @@ void test ()
   dof_1.distribute_dofs (fe);
   dof_2.distribute_dofs (fe);
 
-  // right now, both DoFHandlers are the same. Renumber one of the them
+  // right now, both DoFHandlers are the same. Renumber one of them
   DoFRenumbering::Cuthill_McKee (dof_1);
 
   verify (dof_1, dof_2);
