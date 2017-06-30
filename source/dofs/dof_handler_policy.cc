@@ -20,6 +20,7 @@
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -782,9 +783,23 @@ namespace internal
           if (dim == 1)
             Assert (indices == IndexSet(0), ExcNotImplemented());
 
-          renumber_vertex_dofs (new_numbers, indices, dof_handler, check_validity);
-          renumber_face_dofs (new_numbers, indices, dof_handler);
-          renumber_cell_dofs (new_numbers, indices, dof_handler);
+          // renumber DoF indices on vertices, cells, and faces. this
+          // can be done in parallel because the respective functions
+          // work on separate data structures
+          Threads::TaskGroup<> tasks;
+          tasks += Threads::new_task ([&]()
+          {
+            renumber_vertex_dofs (new_numbers, indices, dof_handler, check_validity);
+          });
+          tasks += Threads::new_task ([&]()
+          {
+            renumber_face_dofs (new_numbers, indices, dof_handler);
+          });
+          tasks += Threads::new_task ([&]()
+          {
+            renumber_cell_dofs (new_numbers, indices, dof_handler);
+          });
+          tasks.join_all ();
 
           // update the cache used for cell dof indices
           update_all_level_cell_dof_indices_caches(dof_handler);
