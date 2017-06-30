@@ -1123,10 +1123,6 @@ private:
 template <> types::global_dof_index DoFHandler<1>::n_boundary_dofs () const;
 template <> types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &) const;
 
-template <> void DoFHandler<1>::renumber_dofs(unsigned int,const std::vector<types::global_dof_index>  &new_numbers);
-template <> void DoFHandler<2>::renumber_dofs(unsigned int,const std::vector<types::global_dof_index>  &new_numbers);
-template <> void DoFHandler<3>::renumber_dofs(unsigned int,const std::vector<types::global_dof_index>  &new_numbers);
-
 
 /* ----------------------- Inline functions ---------------------------------- */
 
