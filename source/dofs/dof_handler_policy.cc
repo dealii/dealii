@@ -1169,6 +1169,21 @@ namespace internal
       }
 
 
+
+      template <typename DoFHandlerType>
+      NumberCache
+      Sequential<DoFHandlerType>::
+      renumber_mg_dofs (const unsigned int                          level,
+                        const std::vector<types::global_dof_index> &new_numbers) const
+      {
+        Implementation::renumber_mg_dofs (new_numbers, IndexSet(0),
+                                          *dof_handler, level, true);
+
+        // return a sequential, complete index set
+        return NumberCache (new_numbers.size());
+      }
+
+
       /* --------------------- class ParallelShared ---------------- */
 
 
@@ -1418,10 +1433,12 @@ namespace internal
         // this is not currently implemented; the algorithm should work
         // as above, though: first call the sequential numbering
         // algorithm, then re-enumerate subdomain-wise
-        Assert(false,ExcNotImplemented());
+        Assert(false, ExcNotImplemented());
 
         return std::vector<NumberCache>();
       }
+
+
 
 
 
@@ -1560,6 +1577,22 @@ namespace internal
         return number_cache;
 #endif
       }
+
+
+
+      template <int dim, int spacedim>
+      NumberCache
+      ParallelShared<dim,spacedim>::
+      renumber_mg_dofs (const unsigned int                          /*level*/,
+                        const std::vector<types::global_dof_index> &/*new_numbers*/) const
+      {
+        // multigrid is not currently implemented for shared triangulations
+        Assert(false, ExcNotImplemented());
+
+        return NumberCache ();
+      }
+
+
 
       /* --------------------- class ParallelDistributed ---------------- */
 
@@ -3101,6 +3134,24 @@ namespace internal
 
         return number_cache;
       }
+
+
+
+      template <int dim, int spacedim>
+      NumberCache
+      ParallelDistributed<dim,spacedim>::
+      renumber_mg_dofs (const unsigned int                          /*level*/,
+                        const std::vector<types::global_dof_index> &/*new_numbers*/) const
+      {
+        // this is not currently implemented, but should be simple to do by
+        // just calling the function like in the sequential case just with
+        // an appropriate index set argument
+        Assert(false, ExcNotImplemented());
+
+        return NumberCache ();
+      }
+
+
     }
   }
 }

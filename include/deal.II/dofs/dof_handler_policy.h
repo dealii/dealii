@@ -90,6 +90,19 @@ namespace internal
         virtual
         NumberCache
         renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const = 0;
+
+        /**
+         * Renumber multilevel degrees of freedom on one level of a multigrid
+         * hierarchy. The second argument specifies the set of new DoF
+         * indices.
+         *
+         * Return an updated NumberCache for the specified level of the
+         * DoFHandler after renumbering.
+         */
+        virtual
+        NumberCache
+        renumber_mg_dofs (const unsigned int                          level,
+                          const std::vector<types::global_dof_index> &new_numbers) const = 0;
       };
 
 
@@ -123,12 +136,20 @@ namespace internal
         NumberCache
         renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
 
+        // documentation is inherited
+        virtual
+        NumberCache
+        renumber_mg_dofs (const unsigned int                          level,
+                          const std::vector<types::global_dof_index> &new_numbers) const;
+
       protected:
         /**
          * The DoFHandler object on which this policy object works.
          */
         SmartPointer<DoFHandlerType> dof_handler;
       };
+
+
 
       /**
        * This class implements the policy for operations when we use a
@@ -177,6 +198,12 @@ namespace internal
         NumberCache
         renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
 
+        // documentation is inherited
+        virtual
+        NumberCache
+        renumber_mg_dofs (const unsigned int                          level,
+                          const std::vector<types::global_dof_index> &new_numbers) const;
+
       private:
         /**
          * The DoFHandler object on which this policy object works.
@@ -214,6 +241,12 @@ namespace internal
         virtual
         NumberCache
         renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
+
+        // documentation is inherited
+        virtual
+        NumberCache
+        renumber_mg_dofs (const unsigned int                          level,
+                          const std::vector<types::global_dof_index> &new_numbers) const;
 
       private:
         /**
