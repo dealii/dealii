@@ -653,9 +653,7 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   faces(nullptr),
   mg_faces (nullptr)
 {
-  // decide whether we need a
-  // sequential or a parallel
-  // distributed policy
+  // decide whether we need a sequential or a parallel distributed policy
   if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
       (&tria)
       != nullptr)

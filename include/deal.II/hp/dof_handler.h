@@ -811,29 +811,6 @@ namespace hp
     compute_quad_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const;
 
     /**
-     * Renumber the objects with the given and all lower structural
-     * dimensions, i.e. renumber vertices by giving a template argument of
-     * zero to the int2type argument, lines and vertices with one, etc.
-     *
-     * Note that in contrast to the public renumber_dofs() function, these
-     * internal functions do not ensure that the new DoFs are contiguously
-     * numbered. The function may therefore also be used to assign different
-     * DoFs the same number, for example to unify hp DoFs corresponding to
-     * different finite elements but co-located on the same entity.
-     */
-    void renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
-                                 dealii::internal::int2type<0>);
-
-    void renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
-                                 dealii::internal::int2type<1>);
-
-    void renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
-                                 dealii::internal::int2type<2>);
-
-    void renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
-                                 dealii::internal::int2type<3>);
-
-    /**
      * Space to store the DoF numbers for the different levels. Analogous to
      * the <tt>levels[]</tt> tree of the Triangulation objects.
      */
