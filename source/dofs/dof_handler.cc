@@ -1521,8 +1521,7 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs ()
   :
   coarsest_level (numbers::invalid_unsigned_int),
   finest_level (0),
-  indices (nullptr),
-  indices_offset (nullptr)
+  indices (nullptr)
 {}
 
 
@@ -1531,7 +1530,6 @@ template <int dim, int spacedim>
 DoFHandler<dim, spacedim>::MGVertexDoFs::~MGVertexDoFs ()
 {
   delete[] indices;
-  delete[] indices_offset;
 }
 
 
@@ -1539,7 +1537,7 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::~MGVertexDoFs ()
 template <int dim, int spacedim>
 void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
                                                     const unsigned int fl,
-                                                    const unsigned int dofs_per_vertex)
+                                                    const unsigned int n_dofs_per_vertex)
 {
   if (indices != nullptr)
     {
@@ -1547,14 +1545,9 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
       indices = nullptr;
     }
 
-  if (indices_offset != nullptr)
-    {
-      delete[] indices_offset;
-      indices_offset = nullptr;
-    }
-
-  coarsest_level = cl;
-  finest_level   = fl;
+  coarsest_level  = cl;
+  finest_level    = fl;
+  dofs_per_vertex = n_dofs_per_vertex;
 
   if (coarsest_level <= finest_level)
     {
@@ -1563,10 +1556,6 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
 
       indices = new types::global_dof_index[n_indices];
       std::fill (indices, indices+n_indices, numbers::invalid_dof_index);
-
-      indices_offset = new types::global_dof_index[n_levels];
-      for (unsigned int i = 0; i < n_levels; ++i)
-        indices_offset[i] = i * dofs_per_vertex;
     }
 }
 
