@@ -66,7 +66,7 @@ namespace internal
   std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy)
   {
     std::string policy_name;
-    if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dim,spacedim>*>(&policy))
+    if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dealii::DoFHandler<dim,spacedim> >*>(&policy))
       policy_name = "Policy::Sequential<";
     else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>*>(&policy))
       policy_name = "Policy::ParallelDistributed<";
@@ -663,7 +663,7 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
            (&tria)
            == nullptr)
-    policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>(*this));
+    policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
   else
     policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>(*this));
 }
@@ -710,7 +710,7 @@ initialize(const Triangulation<dim,spacedim> &t,
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
            (&t)
            == nullptr)
-    policy.reset (new internal::DoFHandler::Policy::Sequential<dim,spacedim>(*this));
+    policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
   else
     policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>(*this));
 
@@ -1221,200 +1221,16 @@ DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_ind
 
 template <int dim, int spacedim>
 void
-DoFHandler<dim,spacedim>::renumber_dofs (const unsigned int,
-                                         const std::vector<types::global_dof_index> &)
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <>
-void DoFHandler<1>::renumber_dofs (const unsigned int level,
-                                   const std::vector<types::global_dof_index> &new_numbers)
+DoFHandler<dim,spacedim>::renumber_dofs (const unsigned int                          level,
+                                         const std::vector<types::global_dof_index> &new_numbers)
 {
   Assert(mg_levels.size()>0 && levels.size()>0,
          ExcMessage("You need to distribute active and level DoFs before you can renumber level DoFs."));
-  Assert (new_numbers.size() == n_dofs(level), DoFHandler<1>::ExcRenumberingIncomplete());
+  AssertIndexRange(level, levels.size());
+  Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
 
-  // note that we can not use cell iterators
-  // in this function since then we would
-  // renumber the dofs on the interface of
-  // two cells more than once. Anyway, this
-  // ways it's not only more correct but also
-  // faster
-  for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
-       i!=mg_vertex_dofs.end(); ++i)
-    // if the present vertex lives on
-    // the present level
-    if ((i->get_coarsest_level() <= level) &&
-        (i->get_finest_level() >= level))
-      for (unsigned int d=0; d<this->get_fe().dofs_per_vertex; ++d)
-        i->set_index (level, d, new_numbers[i->get_index (level, d)]);
-
-  for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
-       i!=mg_levels[level]->dof_object.dofs.end(); ++i)
-    {
-      if (*i != numbers::invalid_dof_index)
-        {
-          Assert(*i<new_numbers.size(), ExcInternalError());
-          *i = new_numbers[*i];
-        }
-    }
+  mg_number_cache[level] = policy->renumber_mg_dofs (level, new_numbers);
 }
-
-
-
-template <>
-void DoFHandler<2>::renumber_dofs (const unsigned int  level,
-                                   const std::vector<types::global_dof_index>  &new_numbers)
-{
-  Assert(mg_levels.size()>0 && levels.size()>0,
-         ExcMessage("You need to distribute active and level DoFs before you can renumber level DoFs."));
-  Assert (new_numbers.size() == n_dofs(level),
-          DoFHandler<2>::ExcRenumberingIncomplete());
-
-  for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
-       i!=mg_vertex_dofs.end(); ++i)
-    // if the present vertex lives on
-    // the present level
-    if ((i->get_coarsest_level() <= level) &&
-        (i->get_finest_level() >= level))
-      for (unsigned int d=0; d<this->get_fe().dofs_per_vertex; ++d)
-        i->set_index (level, d, new_numbers[i->get_index (level, d)]);
-
-  if (this->get_fe().dofs_per_line > 0)
-    {
-      // save user flags as they will be modified
-      std::vector<bool> user_flags;
-      this->get_triangulation().save_user_flags(user_flags);
-      const_cast<Triangulation<2> &>(this->get_triangulation()).clear_user_flags ();
-
-      // flag all lines adjacent to cells of the current
-      // level, as those lines logically belong to the same
-      // level as the cell, at least for for isotropic
-      // refinement
-      level_cell_iterator cell, endc = end(level);
-      for (cell = begin(level); cell != endc; ++cell)
-        for (unsigned int line=0; line < GeometryInfo<2>::faces_per_cell; ++line)
-          cell->face(line)->set_user_flag();
-
-      for (cell_iterator cell = begin(); cell != end(); ++cell)
-        for (unsigned int l=0; l<GeometryInfo<2>::lines_per_cell; ++l)
-          if (cell->line(l)->user_flag_set())
-            {
-              for (unsigned int d=0; d<this->get_fe().dofs_per_line; ++d)
-                cell->line(l)->set_mg_dof_index (level, d,
-                                                 new_numbers[cell->line(l)->mg_dof_index(level, d)]);
-              cell->line(l)->clear_user_flag();
-            }
-      // finally, restore user flags
-      const_cast<Triangulation<2> &>(this->get_triangulation()).load_user_flags (user_flags);
-    }
-
-  for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
-       i!=mg_levels[level]->dof_object.dofs.end(); ++i)
-    {
-      if (*i != numbers::invalid_dof_index)
-        {
-          Assert(*i<new_numbers.size(), ExcInternalError());
-          *i = new_numbers[*i];
-        }
-    }
-}
-
-
-
-template <>
-void DoFHandler<3>::renumber_dofs (const unsigned int  level,
-                                   const std::vector<types::global_dof_index>  &new_numbers)
-{
-  Assert(mg_levels.size()>0 && levels.size()>0,
-         ExcMessage("You need to distribute active and level DoFs before you can renumber level DoFs."));
-  Assert (new_numbers.size() == n_dofs(level),
-          DoFHandler<3>::ExcRenumberingIncomplete());
-
-  for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
-       i!=mg_vertex_dofs.end(); ++i)
-    // if the present vertex lives on
-    // the present level
-    if ((i->get_coarsest_level() <= level) &&
-        (i->get_finest_level() >= level))
-      for (unsigned int d=0; d<this->get_fe().dofs_per_vertex; ++d)
-        i->set_index (level, d, new_numbers[i->get_index (level, d)]);
-
-  // LINE DoFs
-  if (this->get_fe().dofs_per_line > 0)
-    {
-      // save user flags as they will be modified
-      std::vector<bool> user_flags;
-      this->get_triangulation().save_user_flags(user_flags);
-      const_cast<Triangulation<3> &>(this->get_triangulation()).clear_user_flags ();
-
-      // flag all lines adjacent to cells of the current
-      // level, as those lines logically belong to the same
-      // level as the cell, at least for for isotropic
-      // refinement
-      level_cell_iterator cell, endc = end(level);
-      for (cell = begin(level) ; cell != endc ; ++cell)
-        for (unsigned int line=0; line < GeometryInfo<3>::lines_per_cell; ++line)
-          cell->line(line)->set_user_flag();
-
-
-      for (cell = begin(level); cell != endc; ++cell)
-        for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
-          if (cell->line(l)->user_flag_set())
-            {
-              for (unsigned int d=0; d<this->get_fe().dofs_per_line; ++d)
-                cell->line(l)->set_mg_dof_index (level, d,
-                                                 new_numbers[cell->line(l)->mg_dof_index(level, d)]);
-              cell->line(l)->clear_user_flag();
-            }
-      // finally, restore user flags
-      const_cast<Triangulation<3> &>(this->get_triangulation()).load_user_flags (user_flags);
-    }
-
-  // QUAD DoFs
-  if (this->get_fe().dofs_per_quad > 0)
-    {
-      // save user flags as they will be modified
-      std::vector<bool> user_flags;
-      this->get_triangulation().save_user_flags(user_flags);
-      const_cast<Triangulation<3> &>(this->get_triangulation()).clear_user_flags ();
-
-      // flag all quads adjacent to cells of the current
-      // level, as those lines logically belong to the same
-      // level as the cell, at least for for isotropic
-      // refinement
-      level_cell_iterator cell, endc = end(level);
-      for (cell = begin(level) ; cell != endc; ++cell)
-        for (unsigned int quad=0; quad < GeometryInfo<3>::faces_per_cell; ++quad)
-          cell->face(quad)->set_user_flag();
-
-      for (cell = begin(level); cell != endc; ++cell)
-        for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
-          if (cell->quad(q)->user_flag_set())
-            {
-              for (unsigned int d=0; d<this->get_fe().dofs_per_quad; ++d)
-                cell->quad(q)->set_mg_dof_index (level, d,
-                                                 new_numbers[cell->quad(q)->mg_dof_index(level, d)]);
-              cell->quad(q)->clear_user_flag();
-            }
-      // finally, restore user flags
-      const_cast<Triangulation<3> &>(this->get_triangulation()).load_user_flags (user_flags);
-    }
-
-  // HEX DoFs
-  for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
-       i!=mg_levels[level]->dof_object.dofs.end(); ++i)
-    {
-      if (*i != numbers::invalid_dof_index)
-        {
-          Assert(*i<new_numbers.size(), ExcInternalError());
-          *i = new_numbers[*i];
-        }
-    }
-}
-
 
 
 

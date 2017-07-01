@@ -90,6 +90,19 @@ namespace internal
         virtual
         NumberCache
         renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const = 0;
+
+        /**
+         * Renumber multilevel degrees of freedom on one level of a multigrid
+         * hierarchy. The second argument specifies the set of new DoF
+         * indices.
+         *
+         * Return an updated NumberCache for the specified level of the
+         * DoFHandler after renumbering.
+         */
+        virtual
+        NumberCache
+        renumber_mg_dofs (const unsigned int                          level,
+                          const std::vector<types::global_dof_index> &new_numbers) const = 0;
       };
 
 
@@ -97,8 +110,8 @@ namespace internal
        * This class implements the default policy for sequential operations,
        * i.e. for the case where all cells get degrees of freedom.
        */
-      template <int dim, int spacedim>
-      class Sequential : public PolicyBase<dim,spacedim>
+      template <typename DoFHandlerType>
+      class Sequential : public PolicyBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
       {
       public:
         /**
@@ -106,7 +119,7 @@ namespace internal
          * @param dof_handler The DoFHandler object upon which this
          *   policy class is supposed to work.
          */
-        Sequential (dealii::DoFHandler<dim,spacedim> &dof_handler);
+        Sequential (DoFHandlerType &dof_handler);
 
         // documentation is inherited
         virtual
@@ -123,12 +136,20 @@ namespace internal
         NumberCache
         renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
 
+        // documentation is inherited
+        virtual
+        NumberCache
+        renumber_mg_dofs (const unsigned int                          level,
+                          const std::vector<types::global_dof_index> &new_numbers) const;
+
       protected:
         /**
          * The DoFHandler object on which this policy object works.
          */
-        SmartPointer<dealii::DoFHandler<dim,spacedim> > dof_handler;
+        SmartPointer<DoFHandlerType> dof_handler;
       };
+
+
 
       /**
        * This class implements the policy for operations when we use a
@@ -177,6 +198,12 @@ namespace internal
         NumberCache
         renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
 
+        // documentation is inherited
+        virtual
+        NumberCache
+        renumber_mg_dofs (const unsigned int                          level,
+                          const std::vector<types::global_dof_index> &new_numbers) const;
+
       private:
         /**
          * The DoFHandler object on which this policy object works.
@@ -214,6 +241,12 @@ namespace internal
         virtual
         NumberCache
         renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers) const;
+
+        // documentation is inherited
+        virtual
+        NumberCache
+        renumber_mg_dofs (const unsigned int                          level,
+                          const std::vector<types::global_dof_index> &new_numbers) const;
 
       private:
         /**
