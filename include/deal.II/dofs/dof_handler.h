@@ -966,11 +966,6 @@ private:
     MGVertexDoFs ();
 
     /**
-     * Destructor.
-     */
-    ~MGVertexDoFs ();
-
-    /**
      * A function that is called to allocate the necessary amount of memory to
      * store the indices of the DoFs that live on this vertex for the given
      * (inclusive) range of levels.
@@ -1032,7 +1027,7 @@ private:
      * The starting offset of the DoFs that belong to a @p level are given by
      * <code>dofs_per_vertex * (level-coarsest_level)</code>.
      */
-    types::global_dof_index *indices;
+    std::unique_ptr<types::global_dof_index[]> indices;
   };
 
   /**
