@@ -118,9 +118,6 @@ void test ()
   {
     std::vector<std::complex<double> > lambda(number_of_eigenvalues);
 
-    SolverControl solver_control     (dof_handler.n_dofs(), 1e-9,/*log_history*/false,/*log_results*/false);
-    SolverControl solver_control_lin (dof_handler.n_dofs(), 1e-10,/*log_history*/false,/*log_results*/false);
-
     // set up iterative inverse
     static ReductionControl inner_control_c(dof_handler.n_dofs(), 0.0, 1.e-13);
 
@@ -137,6 +134,9 @@ void test ()
     additional_data(num_arnoldi_vectors,
                     PArpackSolver<LinearAlgebra::distributed::Vector<double> >::largest_magnitude,
                     true);
+
+    SolverControl solver_control(
+      dof_handler.n_dofs(), 1e-9, /*log_history*/ false, /*log_results*/ false);
 
     PArpackSolver<LinearAlgebra::distributed::Vector<double>> eigensolver(
       solver_control, mpi_communicator, additional_data);

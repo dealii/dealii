@@ -276,9 +276,6 @@ void test ()
     for (unsigned int i=0; i < eigenvalues.size(); i++)
       eigenfunctions[i] = 0.;
 
-    SolverControl solver_control     (dof_handler.n_dofs(), 1e-9,/*log_history*/false,/*log_results*/false);
-    SolverControl solver_control_lin (dof_handler.n_dofs(), 1e-10,/*log_history*/false,/*log_results*/false);
-
     static ReductionControl inner_control_c(/*maxiter*/stiffness_matrix.m(),
                                                        /*tolerance (global)*/ 0.0,
                                                        /*reduce (w.r.t. initial)*/ 1.e-13);
@@ -300,6 +297,9 @@ void test ()
     additional_data(num_arnoldi_vectors,
                     PArpackSolver<TrilinosWrappers::MPI::Vector>::largest_magnitude,
                     true);
+
+    SolverControl solver_control(
+      dof_handler.n_dofs(), 1e-9, /*log_history*/ false, /*log_results*/ false);
 
     PArpackSolver<TrilinosWrappers::MPI::Vector> eigensolver (solver_control,
                                                               mpi_communicator,
