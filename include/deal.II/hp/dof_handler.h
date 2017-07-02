@@ -990,10 +990,10 @@ namespace hp
                  ExcMessage ("The object being loaded into does not match the triangulation "
                              "that has been stored previously."));
     AssertThrow (policy_name == dealii::internal::policy_to_string(*policy),
-                 ExcMessage (std::string ("The policy currently associated with this DoFHandler (")
+                 ExcMessage ("The policy currently associated with this DoFHandler ("
                              + dealii::internal::policy_to_string(*policy)
-                             +std::string(") does not match the one that was associated with the "
-                                          "DoFHandler previously stored (")
+                             + ") does not match the one that was associated with the "
+                             "DoFHandler previously stored ("
                              + policy_name
                              + ")."));
   }
