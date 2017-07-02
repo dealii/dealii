@@ -203,6 +203,11 @@ public:
 
   /**
    * Auxiliary class to represent <code>A-sigma*B</code> operator.
+   *
+   * @deprecated: Use LinearOperator to create a shifted operator by hand:
+   * <code>
+   *   const auto shift = linear_operator(A) - sigma * linear_operator(B);
+   * </code>
    */
   template <typename MatrixType>
   class Shift : public dealii::Subscriptor
@@ -245,7 +250,8 @@ public:
     const MatrixType &A;
     const MatrixType &B;
     const double sigma;
-  };
+
+  } DEAL_II_DEPRECATED;
 
   /**
    * Standardized data struct to pipe additional data to the solver, should it
