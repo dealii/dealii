@@ -138,7 +138,7 @@ void test ()
     SolverControl solver_control(
       dof_handler.n_dofs(), 1e-9, /*log_history*/ false, /*log_results*/ false);
 
-    PArpackSolver<LinearAlgebra::distributed::Vector<double>> eigensolver(
+    PArpackSolver<LinearAlgebra::distributed::Vector<double> > eigensolver(
       solver_control, mpi_communicator, additional_data);
 
     eigensolver.reinit(eigenfunctions[0]);
