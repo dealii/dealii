@@ -1473,6 +1473,47 @@ struct is_serial_vector< LinearAlgebra::distributed::Vector< Number > > : std::f
 };
 
 
+namespace internal
+{
+  namespace LinearOperator
+  {
+    template <typename> class ReinitHelper;
+
+    /**
+     * A helper class used internally in linear_operator.h. Specialization for
+     * LinearAlgebra::distributed::Vector<Number>.
+     */
+    template <typename Number>
+    class ReinitHelper<LinearAlgebra::distributed::Vector<Number>>
+    {
+    public:
+      template <typename Matrix>
+      static
+      void reinit_range_vector (const Matrix &matrix,
+                                LinearAlgebra::distributed::Vector<Number> &v,
+                                bool omit_zeroing_entries)
+      {
+        matrix.initialize_dof_vector(v);
+        if (!omit_zeroing_entries)
+          v = Number();
+      }
+
+      template <typename Matrix>
+      static
+      void reinit_domain_vector(const Matrix &matrix,
+                                LinearAlgebra::distributed::Vector<Number> &v,
+                                bool omit_zeroing_entries)
+      {
+        matrix.initialize_dof_vector(v);
+        if (!omit_zeroing_entries)
+          v = Number();
+      }
+    };
+
+  } /* namespace LinearOperator */
+} /* namespace internal */
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
