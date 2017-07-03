@@ -1541,6 +1541,17 @@ void
 FullMatrix<number>::left_invert (const FullMatrix<number2> &A)
 {
   Assert (!A.empty(), ExcEmptyMatrix());
+
+  // If the matrix is square, simply do a
+  // standard inversion
+  if (A.m() == A.n())
+    {
+      FullMatrix<number2> left_inv(A.n(),A.m());
+      left_inv.invert(A);
+      *this = std::move(left_inv);
+      return;
+    }
+
   Assert(A.m()>A.n(), ExcDimensionMismatch(A.m(), A.n()));
   Assert(this->m()==A.n(), ExcDimensionMismatch(this->m(), A.n()));
   Assert(this->n()==A.m(), ExcDimensionMismatch(this->n(), A.m()));
@@ -1569,6 +1580,17 @@ void
 FullMatrix<number>::right_invert (const FullMatrix<number2> &A)
 {
   Assert (!A.empty(), ExcEmptyMatrix());
+
+  // If the matrix is square, simply do a
+  // standard inversion
+  if (A.m() == A.n())
+    {
+      FullMatrix<number2> right_inv(A.n(),A.m());
+      right_inv.invert(A);
+      *this = std::move(right_inv);
+      return;
+    }
+
   Assert(A.n()>A.m(), ExcDimensionMismatch(A.n(), A.m()));
   Assert(this->m()==A.n(), ExcDimensionMismatch(this->m(), A.n()));
   Assert(this->n()==A.m(), ExcDimensionMismatch(this->n(), A.m()));
