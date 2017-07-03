@@ -657,6 +657,36 @@ LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
 
 
 template <typename number>
+number
+LAPACKFullMatrix<number>::determinant() const
+{
+  Assert(this->n_rows() == this->n_cols(), LACExceptions::ExcNotQuadratic());
+
+  // LAPACK doesn't offer a function to compute a matrix determinant.
+  // This is due to the difficulty in maintaining numerical accuracy, as the
+  // calculations are likely to overflow or underflow. See
+  // http://www.netlib.org/lapack/faq.html#_are_there_routines_in_lapack_to_compute_determinants
+  //
+  // However, after a PLU decomposition one can compute this by multiplication
+  // of the diagonal entries with one another. One must take into consideration
+  // the number of permutations (row swaps) stored in the P matrix.
+  //
+  // See the implementations in the blaze library (detNxN)
+  // https://bitbucket.org/blaze-lib/blaze
+  // and also
+  // https://dualm.wordpress.com/2012/01/06/computing-determinant-in-fortran/
+  // http://icl.cs.utk.edu/lapack-forum/viewtopic.php?p=341&#p336
+  // for further information.
+  Assert(state == lu, ExcState(state));
+  Assert(ipiv.size() == this->n_rows(), ExcInternalError());
+  number det = 1.0;
+  for (size_type i=0; i<this->n_rows(); ++i)
+    det *= ( ipiv[i] == int(i+1) ? this->el(i,i) : -this->el(i,i) );
+  return det;
+}
+
+
+template <typename number>
 void
 LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
                                               const bool left)

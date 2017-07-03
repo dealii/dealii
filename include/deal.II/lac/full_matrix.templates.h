@@ -1165,6 +1165,52 @@ FullMatrix<number>::operator == (const FullMatrix<number> &M) const
 }
 
 
+namespace internal
+{
+  namespace
+  {
+    // LAPACKFullMatrix is not implemented for
+    // complex numbers or long doubles
+    template<typename number, typename = void>
+    struct Determinant
+    {
+      static number value (const FullMatrix<number> &A)
+      {
+        AssertThrow(false, ExcNotImplemented());
+        return 0.0;
+      }
+    };
+
+
+    // LAPACKFullMatrix is only implemented for
+    // floats and doubles
+    template<typename number>
+    struct Determinant<number, typename std::enable_if<
+      std::is_same<number,float>::value ||
+      std::is_same<number,double>::value
+      >::type>
+    {
+#ifdef DEAL_II_WITH_LAPACK
+      static number value (const FullMatrix<number> &A)
+      {
+        LAPACKFullMatrix<number> lp_A (A.m(), A.n());
+        lp_A = A;
+        lp_A.compute_lu_factorization();
+        return lp_A.determinant();
+      }
+#else
+      static number value (const FullMatrix<number> &A)
+      {
+        AssertThrow(false, ExcNeedsLAPACK());
+        return 0.0;
+      }
+#endif
+    };
+
+  }
+}
+
+
 template <typename number>
 number
 FullMatrix<number>::determinant () const
@@ -1188,8 +1234,7 @@ FullMatrix<number>::determinant () const
                +(*this)(2,0)*(*this)(0,1)*(*this)(1,2)
                -(*this)(2,0)*(*this)(0,2)*(*this)(1,1));
     default:
-      Assert (false, ExcNotImplemented());
-      return 0;
+      return internal::Determinant<number>::value(*this);
     };
 }
 
