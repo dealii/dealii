@@ -1924,91 +1924,92 @@ namespace hp
     // work on
     for (unsigned int vertex_index=0; vertex_index<get_triangulation().n_vertices();
          ++vertex_index)
-      {
-        const unsigned int n_active_fe_indices
-          = dealii::internal::DoFAccessor::Implementation::
-            n_active_vertex_fe_indices (*this, vertex_index);
-        if (n_active_fe_indices > 1)
-          {
-            const unsigned int
-            first_fe_index
-              = dealii::internal::DoFAccessor::Implementation::
-                nth_active_vertex_fe_index (*this, vertex_index, 0);
+      if (get_triangulation().get_used_vertices()[vertex_index] == true)
+        {
+          const unsigned int n_active_fe_indices
+            = dealii::internal::DoFAccessor::Implementation::
+              n_active_vertex_fe_indices (*this, vertex_index);
+          if (n_active_fe_indices > 1)
+            {
+              const unsigned int
+              first_fe_index
+                = dealii::internal::DoFAccessor::Implementation::
+                  nth_active_vertex_fe_index (*this, vertex_index, 0);
 
-            // loop over all the
-            // other FEs with which
-            // we want to identify
-            // the DoF indices of
-            // the first FE of
-            for (unsigned int f=1; f<n_active_fe_indices; ++f)
-              {
-                const unsigned int
-                other_fe_index
-                  = dealii::internal::DoFAccessor::Implementation::
-                    nth_active_vertex_fe_index (*this, vertex_index, f);
+              // loop over all the
+              // other FEs with which
+              // we want to identify
+              // the DoF indices of
+              // the first FE of
+              for (unsigned int f=1; f<n_active_fe_indices; ++f)
+                {
+                  const unsigned int
+                  other_fe_index
+                    = dealii::internal::DoFAccessor::Implementation::
+                      nth_active_vertex_fe_index (*this, vertex_index, f);
 
-                // make sure the
-                // entry in the
-                // equivalence
-                // table exists
-                dealii::internal::hp::ensure_existence_of_dof_identities<0>
-                (get_fe()[first_fe_index],
-                 get_fe()[other_fe_index],
-                 vertex_dof_identities[first_fe_index][other_fe_index]);
+                  // make sure the
+                  // entry in the
+                  // equivalence
+                  // table exists
+                  dealii::internal::hp::ensure_existence_of_dof_identities<0>
+                  (get_fe()[first_fe_index],
+                   get_fe()[other_fe_index],
+                   vertex_dof_identities[first_fe_index][other_fe_index]);
 
-                // then loop
-                // through the
-                // identities we
-                // have. first get
-                // the global
-                // numbers of the
-                // dofs we want to
-                // identify and
-                // make sure they
-                // are not yet
-                // constrained to
-                // anything else,
-                // except for to
-                // each other. use
-                // the rule that we
-                // will always
-                // constrain the
-                // dof with the
-                // higher fe
-                // index to the
-                // one with the
-                // lower, to avoid
-                // circular
-                // reasoning.
-                dealii::internal::hp::DoFIdentities &identities
-                  = *vertex_dof_identities[first_fe_index][other_fe_index];
-                for (unsigned int i=0; i<identities.size(); ++i)
-                  {
-                    const types::global_dof_index lower_dof_index
-                      = dealii::internal::DoFAccessor::Implementation::
-                        get_vertex_dof_index (*this,
-                                              vertex_index,
-                                              first_fe_index,
-                                              identities[i].first);
-                    const types::global_dof_index higher_dof_index
-                      = dealii::internal::DoFAccessor::Implementation::
-                        get_vertex_dof_index (*this,
-                                              vertex_index,
-                                              other_fe_index,
-                                              identities[i].second);
+                  // then loop
+                  // through the
+                  // identities we
+                  // have. first get
+                  // the global
+                  // numbers of the
+                  // dofs we want to
+                  // identify and
+                  // make sure they
+                  // are not yet
+                  // constrained to
+                  // anything else,
+                  // except for to
+                  // each other. use
+                  // the rule that we
+                  // will always
+                  // constrain the
+                  // dof with the
+                  // higher fe
+                  // index to the
+                  // one with the
+                  // lower, to avoid
+                  // circular
+                  // reasoning.
+                  dealii::internal::hp::DoFIdentities &identities
+                    = *vertex_dof_identities[first_fe_index][other_fe_index];
+                  for (unsigned int i=0; i<identities.size(); ++i)
+                    {
+                      const types::global_dof_index lower_dof_index
+                        = dealii::internal::DoFAccessor::Implementation::
+                          get_vertex_dof_index (*this,
+                                                vertex_index,
+                                                first_fe_index,
+                                                identities[i].first);
+                      const types::global_dof_index higher_dof_index
+                        = dealii::internal::DoFAccessor::Implementation::
+                          get_vertex_dof_index (*this,
+                                                vertex_index,
+                                                other_fe_index,
+                                                identities[i].second);
 
-                    Assert ((new_dof_indices[higher_dof_index] ==
-                             numbers::invalid_dof_index)
-                            ||
-                            (new_dof_indices[higher_dof_index] ==
-                             lower_dof_index),
-                            ExcInternalError());
+                      Assert ((new_dof_indices[higher_dof_index] ==
+                               numbers::invalid_dof_index)
+                              ||
+                              (new_dof_indices[higher_dof_index] ==
+                               lower_dof_index),
+                              ExcInternalError());
 
-                    new_dof_indices[higher_dof_index] = lower_dof_index;
-                  }
-              }
-          }
-      }
+                      new_dof_indices[higher_dof_index] = lower_dof_index;
+                    }
+                }
+            }
+        }
   }
 
 
