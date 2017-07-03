@@ -289,14 +289,41 @@ namespace internal
         template <int spacedim>
         static
         types::global_dof_index
-        distribute_dofs_on_cell (const hp::DoFHandler<1,spacedim>                                &dof_handler,
+        distribute_dofs_on_cell (const hp::DoFHandler<1,spacedim> &,
                                  const typename hp::DoFHandler<1,spacedim>::active_cell_iterator &cell,
                                  types::global_dof_index                                          next_free_dof)
         {
-          (void)dof_handler;
-          (void)cell;
-          (void)next_free_dof;
-          return 0;
+          const unsigned int dim = 1;
+
+          const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
+          const unsigned int                 fe_index = cell->active_fe_index ();
+
+          // number dofs on vertices. to do so, check whether dofs for
+          // this vertex have been distributed and for the present fe
+          // (only check the first dof), and if this isn't the case
+          // distribute new ones there
+          if (fe.dofs_per_vertex > 0)
+            for (unsigned int vertex=0; vertex<GeometryInfo<1>::vertices_per_cell; ++vertex)
+              if (cell->vertex_dof_index(vertex, 0, fe_index) ==
+                  numbers::invalid_dof_index)
+                for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
+                  cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
+
+          // finally for the line. this one shouldn't be numbered yet
+          if (fe.dofs_per_line > 0)
+            {
+              Assert ((cell->dof_index(0, fe_index) ==
+                       numbers::invalid_dof_index),
+                      ExcInternalError());
+
+              for (unsigned int d=0; d<fe.dofs_per_line; ++d, ++next_free_dof)
+                cell->set_dof_index (d, next_free_dof, fe_index);
+            }
+
+          // note that this cell has been processed
+          cell->set_user_flag ();
+
+          return next_free_dof;
         }
 
 
@@ -304,14 +331,57 @@ namespace internal
         template <int spacedim>
         static
         types::global_dof_index
-        distribute_dofs_on_cell (const hp::DoFHandler<2,spacedim>                                &dof_handler,
+        distribute_dofs_on_cell (const hp::DoFHandler<2,spacedim> &,
                                  const typename hp::DoFHandler<2,spacedim>::active_cell_iterator &cell,
                                  types::global_dof_index                                          next_free_dof)
         {
-          (void)dof_handler;
-          (void)cell;
-          (void)next_free_dof;
-          return 0;
+          const unsigned int dim = 2;
+
+          const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
+          const unsigned int                 fe_index = cell->active_fe_index ();
+
+          // number dofs on vertices. to do so, check whether dofs for
+          // this vertex have been distributed and for the present fe
+          // (only check the first dof), and if this isn't the case
+          // distribute new ones there
+          if (fe.dofs_per_vertex > 0)
+            for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
+              if (cell->vertex_dof_index(vertex, 0, fe_index) ==
+                  numbers::invalid_dof_index)
+                for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
+                  cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
+
+          // next the sides. do the same as above: check whether the
+          // line is already numbered for the present fe_index, and if
+          // not do it
+          if (fe.dofs_per_line > 0)
+            for (unsigned int l=0; l<GeometryInfo<2>::lines_per_cell; ++l)
+              {
+                typename hp::DoFHandler<dim,spacedim>::line_iterator
+                line = cell->line(l);
+
+                if (line->dof_index(0,fe_index) ==
+                    numbers::invalid_dof_index)
+                  for (unsigned int d=0; d<fe.dofs_per_line; ++d, ++next_free_dof)
+                    line->set_dof_index (d, next_free_dof, fe_index);
+              }
+
+
+          // finally for the quad. this one shouldn't be numbered yet
+          if (fe.dofs_per_quad > 0)
+            {
+              Assert ((cell->dof_index(0, fe_index) ==
+                       numbers::invalid_dof_index),
+                      ExcInternalError());
+
+              for (unsigned int d=0; d<fe.dofs_per_quad; ++d, ++next_free_dof)
+                cell->set_dof_index (d, next_free_dof, fe_index);
+            }
+
+          // note that this cell has been processed
+          cell->set_user_flag ();
+
+          return next_free_dof;
         }
 
 
@@ -319,14 +389,70 @@ namespace internal
         template <int spacedim>
         static
         types::global_dof_index
-        distribute_dofs_on_cell (const hp::DoFHandler<3,spacedim>                                &dof_handler,
+        distribute_dofs_on_cell (const hp::DoFHandler<3,spacedim> &,
                                  const typename hp::DoFHandler<3,spacedim>::active_cell_iterator &cell,
                                  types::global_dof_index                                          next_free_dof)
         {
-          (void)dof_handler;
-          (void)cell;
-          (void)next_free_dof;
-          return 0;
+          const unsigned int dim = 3;
+
+          const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
+          const unsigned int                 fe_index = cell->active_fe_index ();
+
+          // number dofs on vertices. to do so, check whether dofs for
+          // this vertex have been distributed and for the present fe
+          // (only check the first dof), and if this isn't the case
+          // distribute new ones there
+          if (fe.dofs_per_vertex > 0)
+            for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
+              if (cell->vertex_dof_index(vertex, 0, fe_index) ==
+                  numbers::invalid_dof_index)
+                for (unsigned int d=0; d<fe.dofs_per_vertex; ++d, ++next_free_dof)
+                  cell->set_vertex_dof_index (vertex, d, next_free_dof, fe_index);
+
+          // next the four lines. do the same as above: check whether
+          // the line is already numbered for the present fe_index,
+          // and if not do it
+          if (fe.dofs_per_line > 0)
+            for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
+              {
+                typename hp::DoFHandler<dim,spacedim>::line_iterator
+                line = cell->line(l);
+
+                if (line->dof_index(0,fe_index) ==
+                    numbers::invalid_dof_index)
+                  for (unsigned int d=0; d<fe.dofs_per_line; ++d, ++next_free_dof)
+                    line->set_dof_index (d, next_free_dof, fe_index);
+              }
+
+          // same for quads
+          if (fe.dofs_per_quad > 0)
+            for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
+              {
+                typename hp::DoFHandler<dim,spacedim>::quad_iterator
+                quad = cell->quad(q);
+
+                if (quad->dof_index(0,fe_index) ==
+                    numbers::invalid_dof_index)
+                  for (unsigned int d=0; d<fe.dofs_per_quad; ++d, ++next_free_dof)
+                    quad->set_dof_index (d, next_free_dof, fe_index);
+              }
+
+
+          // finally for the hex. this one shouldn't be numbered yet
+          if (fe.dofs_per_hex > 0)
+            {
+              Assert ((cell->dof_index(0, fe_index) ==
+                       numbers::invalid_dof_index),
+                      ExcInternalError());
+
+              for (unsigned int d=0; d<fe.dofs_per_hex; ++d, ++next_free_dof)
+                cell->set_dof_index (d, next_free_dof, fe_index);
+            }
+
+          // note that this cell has been processed
+          cell->set_user_flag ();
+
+          return next_free_dof;
         }
 
 
