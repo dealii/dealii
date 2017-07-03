@@ -14,8 +14,6 @@
 // ---------------------------------------------------------------------
 
 
-//TODO [TH]: renumber DoFs for multigrid is not done yet
-
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/utilities.h>
