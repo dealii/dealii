@@ -67,7 +67,6 @@
 // of transparency.
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
-#include <deal.II/lac/iterative_inverse.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>

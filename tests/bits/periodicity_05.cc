@@ -35,7 +35,6 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/precondition.h>
-#include <deal.II/lac/iterative_inverse.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/sparse_direct.h>
