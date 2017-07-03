@@ -1398,8 +1398,16 @@ namespace internal
         Implementation::renumber_dofs (new_numbers, IndexSet(0),
                                        *dof_handler, true);
 
-        // return a sequential, complete index set
-        return NumberCache (new_numbers.size());
+        // return a sequential, complete index set. take into account that the
+        // number of DoF indices may in fact be smaller than there were before
+        // if some previously separately numbered dofs have been identified.
+        // this is, for example, what the hp::DoFHandler does: it first
+        // enumerates all DoFs on cells independently, and then unifies
+        // some located at vertices or faces; this leaves us with fewer
+        // DoFs than there were before, so use the largest index as
+        // the one to determine the size of the index space
+        return NumberCache (*std::max_element(new_numbers.begin(),
+                                              new_numbers.end()) + 1);
       }
 
 

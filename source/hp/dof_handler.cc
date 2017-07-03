@@ -2691,10 +2691,7 @@ namespace hp
 
     // finally, do the renumbering and set the number of actually
     // used dof indices
-    policy->renumber_dofs (new_dof_indices);
-
-    // now set the elements of the number cache appropriately
-    number_cache = dealii::internal::DoFHandler::NumberCache (next_free_dof);
+    number_cache = policy->renumber_dofs (new_dof_indices);
 
     Assert ((dynamic_cast<const parallel::shared::Triangulation< dim, spacedim >*>
              (&this->get_triangulation())
