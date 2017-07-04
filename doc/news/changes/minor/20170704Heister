@@ -1,0 +1,3 @@
+Fixed: TrilinosWrappers::PreconditionBlock* classes now work correctly if one of the processors does not own any rows.
+<br>
+(Timo Heister, 2017/07/04)
