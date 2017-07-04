@@ -1272,7 +1272,7 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const std::map<types::boundary_id, co
 namespace internal
 {
   /**
-   * returns a string representing the dynamic type of the given argument.
+   * Return a string representing the dynamic type of the given argument.
    * This is basically the same what typeid(...).name() does, but it turns out
    * this is broken on Intel 13+.
    *
@@ -1341,10 +1341,10 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
                ExcMessage ("The finite element associated with this DoFHandler does not match "
                            "the one that was associated with the DoFHandler previously stored."));
   AssertThrow (policy_name == internal::policy_to_string(*policy),
-               ExcMessage (std::string ("The policy currently associated with this DoFHandler (")
+               ExcMessage ("The policy currently associated with this DoFHandler ("
                            + internal::policy_to_string(*policy)
-                           +std::string(") does not match the one that was associated with the "
-                                        "DoFHandler previously stored (")
+                           + ") does not match the one that was associated with the "
+                           "DoFHandler previously stored ("
                            + policy_name
                            + ")."));
 }

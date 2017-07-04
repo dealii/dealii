@@ -759,6 +759,255 @@ namespace internal
 
 
 
+        template <int dim, int spacedim>
+        static
+        void
+        renumber_vertex_dofs (const std::vector<types::global_dof_index> &new_numbers,
+                              const IndexSet                             &indices,
+                              hp::DoFHandler<dim,spacedim>               &dof_handler,
+                              const bool                                  check_validity)
+        {
+          for (unsigned int vertex_index=0; vertex_index<dof_handler.get_triangulation().n_vertices();
+               ++vertex_index)
+            {
+              const unsigned int n_active_fe_indices
+                = dealii::internal::DoFAccessor::Implementation::
+                  n_active_vertex_fe_indices (dof_handler, vertex_index);
+
+              for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                {
+                  const unsigned int fe_index
+                    = dealii::internal::DoFAccessor::Implementation::
+                      nth_active_vertex_fe_index (dof_handler, vertex_index, f);
+
+                  for (unsigned int d=0; d<dof_handler.get_fe()[fe_index].dofs_per_vertex; ++d)
+                    {
+                      const types::global_dof_index old_dof_index
+                        = dealii::internal::DoFAccessor::Implementation::
+                          get_vertex_dof_index(dof_handler,
+                                               vertex_index,
+                                               fe_index,
+                                               d);
+                      if (old_dof_index != numbers::invalid_dof_index)
+                        dealii::internal::DoFAccessor::Implementation::
+                        set_vertex_dof_index (dof_handler,
+                                              vertex_index,
+                                              fe_index,
+                                              d,
+                                              (indices.size() == 0)?
+                                              (new_numbers[old_dof_index]) :
+                                              (new_numbers[indices.index_within_set(old_dof_index)]));
+                      else if (check_validity)
+                        // if index is invalid_dof_index: check if this one
+                        // really is unused
+                        Assert (dof_handler.get_triangulation()
+                                .vertex_used(vertex_index)
+                                == false,
+                                ExcInternalError ());
+                    }
+                }
+            }
+        }
+
+
+
+        template <int dim, int spacedim>
+        static
+        void
+        renumber_cell_dofs (const std::vector<types::global_dof_index> &new_numbers,
+                            const IndexSet                             &indices,
+                            hp::DoFHandler<dim,spacedim>               &dof_handler)
+        {
+          for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
+               cell = dof_handler.begin_active();
+               cell!=dof_handler.end(); ++cell)
+            {
+              const unsigned int fe_index = cell->active_fe_index ();
+
+              for (unsigned int d=0; d<dof_handler.get_fe()[fe_index].template n_dofs_per_object<dim>(); ++d)
+                {
+                  const types::global_dof_index old_dof_index = cell->dof_index(d,fe_index);
+                  if (old_dof_index != numbers::invalid_dof_index)
+                    cell->set_dof_index (d,
+                                         (indices.size() == 0)?
+                                         (new_numbers[old_dof_index]) :
+                                         (new_numbers[indices.index_within_set(old_dof_index)]),
+                                         fe_index);
+                }
+            }
+        }
+
+
+
+        template <int spacedim>
+        static
+        void
+        renumber_face_dofs (const std::vector<types::global_dof_index> &/*new_numbers*/,
+                            const IndexSet                             &/*indices*/,
+                            hp::DoFHandler<1,spacedim>                 &/*dof_handler*/)
+        {
+          // nothing to do in 1d since there are no separate faces -- we've already
+          // taken care of this when dealing with the vertices
+        }
+
+
+
+        template <int spacedim>
+        static
+        void
+        renumber_face_dofs (const std::vector<types::global_dof_index> &new_numbers,
+                            const IndexSet                             &indices,
+                            hp::DoFHandler<2,spacedim>                 &dof_handler)
+        {
+          const unsigned int dim = 2;
+
+          // deal with DoFs on lines
+          {
+            // save user flags on lines so we can use them to mark lines
+            // we've already treated
+            std::vector<bool> saved_line_user_flags;
+            const_cast<dealii::Triangulation<dim,spacedim>&>(dof_handler.get_triangulation())
+            .save_user_flags_line (saved_line_user_flags);
+            const_cast<dealii::Triangulation<dim,spacedim>&>(dof_handler.get_triangulation())
+            .clear_user_flags_line ();
+
+            for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
+                 cell = dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
+              for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+                if (cell->line(l)->user_flag_set() == false)
+                  {
+                    const typename hp::DoFHandler<dim,spacedim>::line_iterator line = cell->line(l);
+                    line->set_user_flag();
+
+                    const unsigned int n_active_fe_indices
+                      = line->n_active_fe_indices ();
+
+                    for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                      {
+                        const unsigned int fe_index
+                          = line->nth_active_fe_index (f);
+
+                        for (unsigned int d=0; d<dof_handler.get_fe()[fe_index].dofs_per_line; ++d)
+                          {
+                            const types::global_dof_index old_dof_index = line->dof_index(d,fe_index);
+                            if (old_dof_index != numbers::invalid_dof_index)
+                              line->set_dof_index (d,
+                                                   (indices.size() == 0)?
+                                                   (new_numbers[old_dof_index]) :
+                                                   (new_numbers[indices.index_within_set(old_dof_index)]),
+                                                   fe_index);
+                          }
+                      }
+                  }
+
+            // at the end, restore the user
+            // flags for the lines
+            const_cast<dealii::Triangulation<dim,spacedim>&>(dof_handler.get_triangulation())
+            .load_user_flags_line (saved_line_user_flags);
+          }
+        }
+
+
+
+        template <int spacedim>
+        static
+        void
+        renumber_face_dofs (const std::vector<types::global_dof_index> &new_numbers,
+                            const IndexSet                             &indices,
+                            hp::DoFHandler<3,spacedim>                 &dof_handler)
+        {
+          const unsigned int dim = 3;
+
+          // deal with DoFs on lines
+          {
+            // save user flags on lines so we can use them to mark lines
+            // we've already treated
+            std::vector<bool> saved_line_user_flags;
+            const_cast<dealii::Triangulation<dim,spacedim>&>(dof_handler.get_triangulation())
+            .save_user_flags_line (saved_line_user_flags);
+            const_cast<dealii::Triangulation<dim,spacedim>&>(dof_handler.get_triangulation())
+            .clear_user_flags_line ();
+
+            for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
+                 cell = dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
+              for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+                if (cell->line(l)->user_flag_set() == false)
+                  {
+                    const typename hp::DoFHandler<dim,spacedim>::line_iterator line = cell->line(l);
+                    line->set_user_flag();
+
+                    const unsigned int n_active_fe_indices
+                      = line->n_active_fe_indices ();
+
+                    for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                      {
+                        const unsigned int fe_index
+                          = line->nth_active_fe_index (f);
+
+                        for (unsigned int d=0; d<dof_handler.get_fe()[fe_index].dofs_per_line; ++d)
+                          {
+                            const types::global_dof_index old_dof_index = line->dof_index(d,fe_index);
+                            if (old_dof_index != numbers::invalid_dof_index)
+                              line->set_dof_index (d,
+                                                   (indices.size() == 0)?
+                                                   (new_numbers[old_dof_index]) :
+                                                   (new_numbers[indices.index_within_set(old_dof_index)]),
+                                                   fe_index);
+                          }
+                      }
+                  }
+
+            // at the end, restore the user
+            // flags for the lines
+            const_cast<dealii::Triangulation<dim,spacedim>&>(dof_handler.get_triangulation())
+            .load_user_flags_line (saved_line_user_flags);
+          }
+
+          // then deal with dofs on quads
+          {
+            std::vector<bool> saved_quad_user_flags;
+            const_cast<dealii::Triangulation<dim,spacedim>&>(dof_handler.get_triangulation())
+            .save_user_flags_quad (saved_quad_user_flags);
+            const_cast<dealii::Triangulation<dim,spacedim>&>(dof_handler.get_triangulation())
+            .clear_user_flags_quad ();
+
+            for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
+                 cell = dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
+              for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
+                if (cell->quad(q)->user_flag_set() == false)
+                  {
+                    const typename hp::DoFHandler<dim,spacedim>::quad_iterator quad = cell->quad(q);
+                    quad->set_user_flag();
+
+                    const unsigned int n_active_fe_indices
+                      = quad->n_active_fe_indices ();
+
+                    for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                      {
+                        const unsigned int fe_index
+                          = quad->nth_active_fe_index (f);
+
+                        for (unsigned int d=0; d<dof_handler.get_fe()[fe_index].dofs_per_quad; ++d)
+                          {
+                            const types::global_dof_index old_dof_index = quad->dof_index(d,fe_index);
+                            if (old_dof_index != numbers::invalid_dof_index)
+                              quad->set_dof_index (d,
+                                                   (indices.size() == 0)?
+                                                   (new_numbers[old_dof_index]) :
+                                                   (new_numbers[indices.index_within_set(old_dof_index)]),
+                                                   fe_index);
+                          }
+                      }
+                  }
+
+            // at the end, restore the user flags for the quads
+            const_cast<dealii::Triangulation<dim,spacedim>&>(dof_handler.get_triangulation())
+            .load_user_flags_quad (saved_quad_user_flags);
+          }
+        }
+
+
+
 
         /**
          * Implementation of DoFHandler::renumber_dofs()
@@ -771,15 +1020,15 @@ namespace internal
          * (The IndexSet argument is not used in 1d because we only need
          * it for parallel meshes and 1d doesn't support that right now.)
          */
-        template <int dim, int spacedim>
+        template <typename DoFHandlerType>
         static
         void
         renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
                        const IndexSet                             &indices,
-                       DoFHandler<dim,spacedim>                   &dof_handler,
+                       DoFHandlerType                             &dof_handler,
                        const bool                                  check_validity)
         {
-          if (dim == 1)
+          if (DoFHandlerType::dimension == 1)
             Assert (indices == IndexSet(0), ExcNotImplemented());
 
           // renumber DoF indices on vertices, cells, and faces. this
@@ -802,19 +1051,6 @@ namespace internal
 
           // update the cache used for cell dof indices
           update_all_level_cell_dof_indices_caches(dof_handler);
-        }
-
-
-
-        template <int dim, int spacedim>
-        static
-        void
-        renumber_dofs (const std::vector<types::global_dof_index> &/*new_numbers*/,
-                       const IndexSet                             &/*indices*/,
-                       hp::DoFHandler<dim,spacedim>               &/*dof_handler*/,
-                       const bool                                  /*check_validity*/)
-        {
-          Assert (false, ExcNotImplemented());
         }
 
 

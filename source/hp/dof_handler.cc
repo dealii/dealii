@@ -20,6 +20,7 @@
 #include <deal.II/hp/dof_level.h>
 #include <deal.II/hp/dof_faces.h>
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_handler_policy.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_levels.h>
@@ -1671,6 +1672,19 @@ namespace hp
             ExcMessage ("The given triangulation is parallel distributed but "
                         "this class does not currently support this."));
 
+    // decide whether we need a sequential or a parallel distributed policy
+//    if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
+//        (&tria)
+//        != nullptr)
+//      policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>(*this));
+//    else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
+//             (&tria)
+//             == nullptr)
+    policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
+//    else
+//      policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>(*this));
+
+
     create_active_fe_table ();
 
     tria_listeners.push_back
@@ -2675,47 +2689,21 @@ namespace hp
                 ExcInternalError());
       }
 
-    // finally, do the renumbering
-    // and set the number of actually
+    // finally, do the renumbering and set the number of actually
     // used dof indices
-    renumber_dofs_internal (new_dof_indices, dealii::internal::int2type<dim>());
+    policy->renumber_dofs (new_dof_indices);
 
-    // now set the elements of the
-    // number cache appropriately
-    number_cache.n_global_dofs        = next_free_dof;
-    number_cache.n_locally_owned_dofs = number_cache.n_global_dofs;
+    // now set the elements of the number cache appropriately
+    number_cache = dealii::internal::DoFHandler::NumberCache (next_free_dof);
 
-    if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim >*>
-        (&this->get_triangulation())
-        == nullptr)
-      {
-        number_cache.locally_owned_dofs
-          = IndexSet (number_cache.n_global_dofs);
-        number_cache.locally_owned_dofs.add_range (0,
-                                                   number_cache.n_global_dofs);
-        Assert (number_cache.n_global_dofs < std::numeric_limits<unsigned int>::max (),
-                ExcMessage ("Global number of degrees of freedom is too large."));
-        number_cache.n_locally_owned_dofs_per_processor
-          = std::vector<types::global_dof_index> (1,
-                                                  (types::global_dof_index) number_cache.n_global_dofs);
-      }
-    else
-      {
-        AssertThrow(false, ExcNotImplemented() );
-        //number_cache.locally_owned_dofs = dealii::DoFTools::locally_owned_dofs_with_subdomain(this,tria->locally_owned_subdomain() );
-        //TODO: update n_locally_owned_dofs_per_processor as well
-      }
-
-    number_cache.locally_owned_dofs_per_processor
-      = std::vector<IndexSet> (1,
-                               number_cache.locally_owned_dofs);
-
-    // update the cache used for cell dof indices and compress the data on the levels. do
-    // the latter on separate tasks to gain parallelism, starting with the highest
-    // level (there is most to do there, so start it first)
-    for (active_cell_iterator cell = begin_active();
-         cell != end(); ++cell)
-      cell->update_cell_dof_indices_cache ();
+    Assert ((dynamic_cast<const parallel::shared::Triangulation< dim, spacedim >*>
+             (&this->get_triangulation())
+             == nullptr),
+            ExcNotImplemented());
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
+             (&this->get_triangulation())
+             == nullptr),
+            ExcNotImplemented());
 
     {
       Threads::TaskGroup<> tg;
@@ -2773,12 +2761,7 @@ namespace hp
     }
 
     // do the renumbering
-    renumber_dofs_internal (new_numbers, dealii::internal::int2type<dim>());
-
-    // update the cache used for cell dof indices
-    for (active_cell_iterator cell = begin_active();
-         cell != end(); ++cell)
-      cell->update_cell_dof_indices_cache ();
+    number_cache = policy->renumber_dofs(new_numbers);
 
     // now re-compress the dof indices
     {
@@ -2788,276 +2771,6 @@ namespace hp
                                  *levels[level], *finite_elements);
       tg.join_all ();
     }
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  DoFHandler<dim,spacedim>::
-  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
-                          dealii::internal::int2type<0>)
-  {
-    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
-
-    for (unsigned int vertex_index=0; vertex_index<get_triangulation().n_vertices();
-         ++vertex_index)
-      {
-        const unsigned int n_active_fe_indices
-          = dealii::internal::DoFAccessor::Implementation::
-            n_active_vertex_fe_indices (*this, vertex_index);
-
-        for (unsigned int f=0; f<n_active_fe_indices; ++f)
-          {
-            const unsigned int fe_index
-              = dealii::internal::DoFAccessor::Implementation::
-                nth_active_vertex_fe_index (*this, vertex_index, f);
-
-            for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_vertex; ++d)
-              {
-                const types::global_dof_index vertex_dof_index
-                  = dealii::internal::DoFAccessor::Implementation::
-                    get_vertex_dof_index(*this,
-                                         vertex_index,
-                                         fe_index,
-                                         d);
-                dealii::internal::DoFAccessor::Implementation::
-                set_vertex_dof_index (*this,
-                                      vertex_index,
-                                      fe_index,
-                                      d,
-                                      new_numbers[vertex_dof_index]);
-              }
-          }
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
-  void
-  DoFHandler<dim,spacedim>::
-  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
-                          dealii::internal::int2type<1>)
-  {
-    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
-
-    renumber_dofs_internal (new_numbers, internal::int2type<0>());
-
-    // save user flags on lines so we
-    // can use them to mark lines
-    // we've already treated
-    std::vector<bool> saved_line_user_flags;
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .save_user_flags_line (saved_line_user_flags);
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .clear_user_flags_line ();
-
-    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
-      for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
-        if (cell->line(l)->user_flag_set() == false)
-          {
-            const line_iterator line = cell->line(l);
-            line->set_user_flag();
-
-            const unsigned int n_active_fe_indices
-              = line->n_active_fe_indices ();
-
-            for (unsigned int f=0; f<n_active_fe_indices; ++f)
-              {
-                const unsigned int fe_index
-                  = line->nth_active_fe_index (f);
-
-                for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_line; ++d)
-                  line->set_dof_index (d,
-                                       new_numbers[line->dof_index(d,fe_index)],
-                                       fe_index);
-              }
-          }
-
-    // at the end, restore the user
-    // flags for the lines
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .load_user_flags_line (saved_line_user_flags);
-  }
-
-
-
-//TODO: Merge the following three functions -- they are identical
-  template <>
-  void
-  DoFHandler<2,2>::
-  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
-                          dealii::internal::int2type<2>)
-  {
-    const unsigned int dim = 2;
-    const unsigned int spacedim = 2;
-
-    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
-
-    renumber_dofs_internal (new_numbers, internal::int2type<1>());
-
-    // save user flags on quads so we
-    // can use them to mark quads
-    // we've already treated
-    std::vector<bool> saved_quad_user_flags;
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .save_user_flags_quad (saved_quad_user_flags);
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .clear_user_flags_quad ();
-
-    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
-      for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
-        if (cell->quad(q)->user_flag_set() == false)
-          {
-            const quad_iterator quad = cell->quad(q);
-            quad->set_user_flag();
-
-            const unsigned int n_active_fe_indices
-              = quad->n_active_fe_indices ();
-
-            for (unsigned int f=0; f<n_active_fe_indices; ++f)
-              {
-                const unsigned int fe_index
-                  = quad->nth_active_fe_index (f);
-
-                for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
-                  quad->set_dof_index (d,
-                                       new_numbers[quad->dof_index(d,fe_index)],
-                                       fe_index);
-              }
-          }
-
-    // at the end, restore the user
-    // flags for the quads
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .load_user_flags_quad (saved_quad_user_flags);
-  }
-
-
-
-  template <>
-  void
-  DoFHandler<2,3>::
-  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
-                          dealii::internal::int2type<2>)
-  {
-    const unsigned int dim = 2;
-    const unsigned int spacedim = 3;
-
-    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
-
-    renumber_dofs_internal (new_numbers, internal::int2type<1>());
-
-    // save user flags on quads so we
-    // can use them to mark quads
-    // we've already treated
-    std::vector<bool> saved_quad_user_flags;
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .save_user_flags_quad (saved_quad_user_flags);
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .clear_user_flags_quad ();
-
-    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
-      for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
-        if (cell->quad(q)->user_flag_set() == false)
-          {
-            const quad_iterator quad = cell->quad(q);
-            quad->set_user_flag();
-
-            const unsigned int n_active_fe_indices
-              = quad->n_active_fe_indices ();
-
-            for (unsigned int f=0; f<n_active_fe_indices; ++f)
-              {
-                const unsigned int fe_index
-                  = quad->nth_active_fe_index (f);
-
-                for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
-                  quad->set_dof_index (d,
-                                       new_numbers[quad->dof_index(d,fe_index)],
-                                       fe_index);
-              }
-          }
-
-    // at the end, restore the user
-    // flags for the quads
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .load_user_flags_quad (saved_quad_user_flags);
-  }
-
-
-  template <>
-  void
-  DoFHandler<3,3>::
-  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
-                          dealii::internal::int2type<2>)
-  {
-    const unsigned int dim = 3;
-    const unsigned int spacedim = 3;
-
-    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
-
-    renumber_dofs_internal (new_numbers, internal::int2type<1>());
-
-    // save user flags on quads so we
-    // can use them to mark quads
-    // we've already treated
-    std::vector<bool> saved_quad_user_flags;
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .save_user_flags_quad (saved_quad_user_flags);
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .clear_user_flags_quad ();
-
-    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
-      for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
-        if (cell->quad(q)->user_flag_set() == false)
-          {
-            const quad_iterator quad = cell->quad(q);
-            quad->set_user_flag();
-
-            const unsigned int n_active_fe_indices
-              = quad->n_active_fe_indices ();
-
-            for (unsigned int f=0; f<n_active_fe_indices; ++f)
-              {
-                const unsigned int fe_index
-                  = quad->nth_active_fe_index (f);
-
-                for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_quad; ++d)
-                  quad->set_dof_index (d,
-                                       new_numbers[quad->dof_index(d,fe_index)],
-                                       fe_index);
-              }
-          }
-
-    // at the end, restore the user
-    // flags for the quads
-    const_cast<dealii::Triangulation<dim,spacedim>&>(*tria)
-    .load_user_flags_quad (saved_quad_user_flags);
-  }
-
-
-  template <>
-  void
-  DoFHandler<3,3>::
-  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
-                          dealii::internal::int2type<3>)
-  {
-    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
-
-    renumber_dofs_internal (new_numbers, internal::int2type<2>());
-
-    // we're in 3d, so hexes are also cells. by design, we only visit each cell once
-    for (active_cell_iterator cell = begin_active(); cell!=end(); ++cell)
-      {
-        const unsigned int fe_index = cell->active_fe_index ();
-
-        for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_hex; ++d)
-          cell->set_dof_index (d,
-                               new_numbers[cell->dof_index(d,fe_index)],
-                               fe_index);
-      }
   }
 
 
