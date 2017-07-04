@@ -134,6 +134,146 @@ namespace internal
                            2*MultithreadInfo::n_threads(),
                            /* chunk_size = */ 32);
         }
+
+
+        typedef
+        std::vector<std::pair<unsigned int, unsigned int> > DoFIdentities;
+
+
+        /**
+         * Make sure that the given @p
+         * identities pointer points to a
+         * valid array. If the pointer is
+         * zero beforehand, create an
+         * entry with the correct
+         * data. If it is nonzero, don't
+         * touch it.
+         *
+         * @p structdim denotes the
+         * dimension of the objects on
+         * which identities are to be
+         * represented, i.e. zero for
+         * vertices, one for lines, etc.
+         */
+        template <int structdim, int dim, int spacedim>
+        void
+        ensure_existence_of_dof_identities (const FiniteElement<dim,spacedim> &fe1,
+                                            const FiniteElement<dim,spacedim> &fe2,
+                                            std::shared_ptr<DoFIdentities> &identities)
+        {
+          // see if we need to fill this
+          // entry, or whether it already
+          // exists
+          if (identities.get() == nullptr)
+            {
+              switch (structdim)
+                {
+                case 0:
+                {
+                  identities =
+                    std::shared_ptr<DoFIdentities>
+                    (new DoFIdentities(fe1.hp_vertex_dof_identities(fe2)));
+                  break;
+                }
+
+                case 1:
+                {
+                  identities =
+                    std::shared_ptr<DoFIdentities>
+                    (new DoFIdentities(fe1.hp_line_dof_identities(fe2)));
+                  break;
+                }
+
+                case 2:
+                {
+                  identities =
+                    std::shared_ptr<DoFIdentities>
+                    (new DoFIdentities(fe1.hp_quad_dof_identities(fe2)));
+                  break;
+                }
+
+                default:
+                  Assert (false, ExcNotImplemented());
+                }
+
+              // double check whether the
+              // newly created entries
+              // make any sense at all
+              for (unsigned int i=0; i<identities->size(); ++i)
+                {
+                  Assert ((*identities)[i].first < fe1.template n_dofs_per_object<structdim>(),
+                          ExcInternalError());
+                  Assert ((*identities)[i].second < fe2.template n_dofs_per_object<structdim>(),
+                          ExcInternalError());
+                }
+            }
+        }
+
+
+
+        /**
+         * For an object, such as a line
+         * or a quad iterator, determine
+         * the fe_index of the most
+         * dominating finite element that
+         * lives on this object.
+         *
+         * Return numbers::invalid_unsigned_int if we couldn't find one.
+         */
+        template <int dim, int spacedim, typename iterator>
+        unsigned int
+        get_most_dominating_fe_index (const iterator &object)
+        {
+          unsigned int dominating_fe_index = 0;
+          for (; dominating_fe_index<object->n_active_fe_indices();
+               ++dominating_fe_index)
+            {
+              const FiniteElement<dim, spacedim> &this_fe
+                = object->get_fe (object->nth_active_fe_index(dominating_fe_index));
+
+              FiniteElementDomination::Domination
+              domination = FiniteElementDomination::either_element_can_dominate;
+              for (unsigned int other_fe_index=0;
+                   other_fe_index<object->n_active_fe_indices();
+                   ++other_fe_index)
+                if (other_fe_index != dominating_fe_index)
+                  {
+                    const FiniteElement<dim, spacedim>
+                    &that_fe
+                      = object->get_fe (object->nth_active_fe_index(other_fe_index));
+
+                    domination = domination &
+                                 this_fe.compare_for_face_domination(that_fe);
+                  }
+
+              // see if this element is
+              // able to dominate all the
+              // other ones, and if so
+              // take it
+              if ((domination == FiniteElementDomination::this_element_dominates)
+                  ||
+                  (domination == FiniteElementDomination::either_element_can_dominate)
+                  ||
+                  (domination == FiniteElementDomination::no_requirements))
+                break;
+            }
+
+          // check that we have
+          // found one such fe
+          if (dominating_fe_index != object->n_active_fe_indices())
+            {
+              // return the finite element
+              // index used on it. note
+              // that only a single fe can
+              // be active on such subfaces
+              return object->nth_active_fe_index(dominating_fe_index);
+            }
+          else
+            {
+              // if we couldn't find the most dominating object
+              return numbers::invalid_unsigned_int;
+            }
+        }
       }
 
 
@@ -458,6 +598,500 @@ namespace internal
 
 
         /**
+         * Compute identities between DoFs located on vertices. Called from
+         * distribute_dofs().
+         */
+        template <int dim, int spacedim>
+        static
+        void
+        compute_vertex_dof_identities (hp::DoFHandler<dim,spacedim> &dof_handler,
+                                       std::vector<types::global_dof_index> &new_dof_indices)
+        {
+          // Note: we may wish to have something here similar to what
+          // we do for lines and quads, namely that we only identify
+          // dofs for any fe towards the most dominating one. however,
+          // it is not clear whether this is actually necessary for
+          // vertices at all, I can't think of a finite element that
+          // would make that necessary...
+          dealii::Table<2,std::shared_ptr<DoFIdentities> >
+          vertex_dof_identities (dof_handler.get_fe().size(),
+                                 dof_handler.get_fe().size());
+
+          // loop over all vertices and see which one we need to work
+          // on
+          for (unsigned int vertex_index=0; vertex_index<dof_handler.get_triangulation().n_vertices();
+               ++vertex_index)
+            if (dof_handler.get_triangulation().get_used_vertices()[vertex_index] == true)
+              {
+                const unsigned int n_active_fe_indices
+                  = dealii::internal::DoFAccessor::Implementation::
+                    n_active_vertex_fe_indices (dof_handler, vertex_index);
+                if (n_active_fe_indices > 1)
+                  {
+                    const unsigned int
+                    first_fe_index
+                      = dealii::internal::DoFAccessor::Implementation::
+                        nth_active_vertex_fe_index (dof_handler, vertex_index, 0);
+
+                    // loop over all the other FEs with which we want
+                    // to identify the DoF indices of the first FE of
+                    for (unsigned int f=1; f<n_active_fe_indices; ++f)
+                      {
+                        const unsigned int
+                        other_fe_index
+                          = dealii::internal::DoFAccessor::Implementation::
+                            nth_active_vertex_fe_index (dof_handler, vertex_index, f);
+
+                        // make sure the entry in the equivalence
+                        // table exists
+                        ensure_existence_of_dof_identities<0>
+                        (dof_handler.get_fe()[first_fe_index],
+                         dof_handler.get_fe()[other_fe_index],
+                         vertex_dof_identities[first_fe_index][other_fe_index]);
+
+                        // then loop through the identities we
+                        // have. first get the global numbers of the
+                        // dofs we want to identify and make sure they
+                        // are not yet constrained to anything else,
+                        // except for to each other. use the rule that
+                        // we will always constrain the dof with the
+                        // higher fe index to the one with the lower,
+                        // to avoid circular reasoning.
+                        DoFIdentities &identities
+                          = *vertex_dof_identities[first_fe_index][other_fe_index];
+                        for (unsigned int i=0; i<identities.size(); ++i)
+                          {
+                            const types::global_dof_index lower_dof_index
+                              = dealii::internal::DoFAccessor::Implementation::
+                                get_vertex_dof_index (dof_handler,
+                                                      vertex_index,
+                                                      first_fe_index,
+                                                      identities[i].first);
+                            const types::global_dof_index higher_dof_index
+                              = dealii::internal::DoFAccessor::Implementation::
+                                get_vertex_dof_index (dof_handler,
+                                                      vertex_index,
+                                                      other_fe_index,
+                                                      identities[i].second);
+
+                            Assert ((new_dof_indices[higher_dof_index] ==
+                                     numbers::invalid_dof_index)
+                                    ||
+                                    (new_dof_indices[higher_dof_index] ==
+                                     lower_dof_index),
+                                    ExcInternalError());
+
+                            new_dof_indices[higher_dof_index] = lower_dof_index;
+                          }
+                      }
+                  }
+              }
+        }
+
+
+        /**
+         * Compute identities between DoFs located on lines. Called from
+         * distribute_dofs().
+         */
+        template <int spacedim>
+        static
+        void
+        compute_line_dof_identities (hp::DoFHandler<1,spacedim> &,
+                                     std::vector<types::global_dof_index> &)
+        {}
+
+
+        template <int dim, int spacedim>
+        static
+        void
+        compute_line_dof_identities (hp::DoFHandler<dim,spacedim>         &dof_handler,
+                                     std::vector<types::global_dof_index> &new_dof_indices)
+        {
+          // we will mark lines that we have already treated, so first save and clear
+          // the user flags on lines and later restore them
+          std::vector<bool> user_flags;
+          dof_handler.get_triangulation().save_user_flags_line(user_flags);
+          const_cast<dealii::Triangulation<dim,spacedim> &>(dof_handler.get_triangulation()).clear_user_flags_line ();
+
+          // An implementation of the algorithm described in the hp paper, including
+          // the modification mentioned later in the "complications in 3-d" subsections
+          //
+          // as explained there, we do something only if there are exactly 2 finite
+          // elements associated with an object. if there is only one, then there is
+          // nothing to do anyway, and if there are 3 or more, then we can get into
+          // trouble. note that this only happens for lines in 3d and higher, and for
+          // quads only in 4d and higher, so this isn't a particularly frequent case
+          //
+          // there is one case, however, that we would like to handle (see, for
+          // example, the hp/crash_15 testcase): if we have FESystem(FE_Q(2),FE_DGQ(i))
+          // elements for a bunch of values 'i', then we should be able to handle this
+          // because we can simply unify *all* dofs, not only a some. so what we do
+          // is to first treat all pairs of finite elements that have *identical* dofs,
+          // and then only deal with those that are not identical of which we can
+          // handle at most 2
+          dealii::Table<2,std::shared_ptr<DoFIdentities> >
+          line_dof_identities (dof_handler.finite_elements->size(),
+                               dof_handler.finite_elements->size());
+
+          for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
+               cell=dof_handler.begin_active();
+               cell!=dof_handler.end(); ++cell)
+            for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+              if (cell->line(l)->user_flag_set() == false)
+                {
+                  const typename hp::DoFHandler<dim,spacedim>::line_iterator line = cell->line(l);
+                  line->set_user_flag ();
+
+                  unsigned int unique_sets_of_dofs
+                    = line->n_active_fe_indices();
+
+                  // do a first loop over all sets of dofs and do identity
+                  // uniquification
+                  for (unsigned int f=0; f<line->n_active_fe_indices(); ++f)
+                    for (unsigned int g=f+1; g<line->n_active_fe_indices(); ++g)
+                      {
+                        const unsigned int fe_index_1 = line->nth_active_fe_index (f),
+                                           fe_index_2 = line->nth_active_fe_index (g);
+
+                        if (((*dof_handler.finite_elements)[fe_index_1].dofs_per_line
+                             ==
+                             (*dof_handler.finite_elements)[fe_index_2].dofs_per_line)
+                            &&
+                            ((*dof_handler.finite_elements)[fe_index_1].dofs_per_line > 0))
+                          {
+                            ensure_existence_of_dof_identities<1>
+                            ((*dof_handler.finite_elements)[fe_index_1],
+                             (*dof_handler.finite_elements)[fe_index_2],
+                             line_dof_identities[fe_index_1][fe_index_2]);
+                            // see if these sets of dofs are identical. the first
+                            // condition for this is that indeed there are n identities
+                            if (line_dof_identities[fe_index_1][fe_index_2]->size()
+                                ==
+                                (*dof_handler.finite_elements)[fe_index_1].dofs_per_line)
+                              {
+                                unsigned int i=0;
+                                for (; i<(*dof_handler.finite_elements)[fe_index_1].dofs_per_line; ++i)
+                                  if (((*(line_dof_identities[fe_index_1][fe_index_2]))[i].first != i)
+                                      &&
+                                      ((*(line_dof_identities[fe_index_1][fe_index_2]))[i].second != i))
+                                    // not an identity
+                                    break;
+
+                                if (i == (*dof_handler.finite_elements)[fe_index_1].dofs_per_line)
+                                  {
+                                    // The line dofs (i.e., the ones interior to a line) of these two finite elements are identical.
+                                    // Note that there could be situations when one element still dominates another, e.g.:
+                                    // FE_Q(2) x FE_Nothing(dominate) vs
+                                    // FE_Q(2) x FE_Q(1)
+
+                                    --unique_sets_of_dofs;
+
+                                    for (unsigned int j=0; j<(*dof_handler.finite_elements)[fe_index_1].dofs_per_line; ++j)
+                                      {
+                                        const types::global_dof_index master_dof_index
+                                          = line->dof_index (j, fe_index_1);
+                                        const types::global_dof_index slave_dof_index
+                                          = line->dof_index (j, fe_index_2);
+
+                                        // if master dof was already constrained,
+                                        // constrain to that one, otherwise constrain
+                                        // slave to master
+                                        if (new_dof_indices[master_dof_index] !=
+                                            numbers::invalid_dof_index)
+                                          {
+                                            Assert (new_dof_indices[new_dof_indices[master_dof_index]] ==
+                                                    numbers::invalid_dof_index,
+                                                    ExcInternalError());
+
+                                            new_dof_indices[slave_dof_index]
+                                              = new_dof_indices[master_dof_index];
+                                          }
+                                        else
+                                          {
+                                            Assert ((new_dof_indices[master_dof_index] ==
+                                                     numbers::invalid_dof_index)
+                                                    ||
+                                                    (new_dof_indices[slave_dof_index] ==
+                                                     master_dof_index),
+                                                    ExcInternalError());
+
+                                            new_dof_indices[slave_dof_index] = master_dof_index;
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      }
+
+                  // if at this point, there is only one unique set of dofs left, then
+                  // we have taken care of everything above. if there are two, then we
+                  // need to deal with them here. if there are more, then we punt, as
+                  // described in the paper (and mentioned above)
+                  //TODO: The check for 'dim==2' was inserted by intuition. It fixes
+                  // the previous problems with step-27 in 3D. But an explanation
+                  // for this is still required, and what we do here is not what we
+                  // describe in the paper!.
+                  if ((unique_sets_of_dofs == 2) && (dim == 2))
+                    {
+                      // find out which is the most dominating finite element of the
+                      // ones that are used on this line
+                      const unsigned int most_dominating_fe_index
+                        = get_most_dominating_fe_index<dim,spacedim> (line);
+
+                      // if we found the most dominating element, then use this to eliminate some of
+                      // the degrees of freedom by identification. otherwise, the code that computes
+                      // hanging node constraints will have to deal with it by computing
+                      // appropriate constraints along this face/edge
+                      if (most_dominating_fe_index != numbers::invalid_unsigned_int)
+                        {
+                          const unsigned int n_active_fe_indices
+                            = line->n_active_fe_indices ();
+
+                          // loop over the indices of all the finite elements that are not
+                          // dominating, and identify their dofs to the most dominating
+                          // one
+                          for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                            if (line->nth_active_fe_index (f) !=
+                                most_dominating_fe_index)
+                              {
+                                const unsigned int
+                                other_fe_index = line->nth_active_fe_index (f);
+
+                                ensure_existence_of_dof_identities<1>
+                                ((*dof_handler.finite_elements)[most_dominating_fe_index],
+                                 (*dof_handler.finite_elements)[other_fe_index],
+                                 line_dof_identities[most_dominating_fe_index][other_fe_index]);
+
+                                DoFIdentities &identities
+                                  = *line_dof_identities[most_dominating_fe_index][other_fe_index];
+                                for (unsigned int i=0; i<identities.size(); ++i)
+                                  {
+                                    const types::global_dof_index master_dof_index
+                                      = line->dof_index (identities[i].first, most_dominating_fe_index);
+                                    const types::global_dof_index slave_dof_index
+                                      = line->dof_index (identities[i].second, other_fe_index);
+
+                                    Assert ((new_dof_indices[master_dof_index] ==
+                                             numbers::invalid_dof_index)
+                                            ||
+                                            (new_dof_indices[slave_dof_index] ==
+                                             master_dof_index),
+                                            ExcInternalError());
+
+                                    new_dof_indices[slave_dof_index] = master_dof_index;
+                                  }
+                              }
+                        }
+                    }
+                }
+
+          // finally restore the user flags
+          const_cast<dealii::Triangulation<dim,spacedim> &>(dof_handler.get_triangulation())
+          .load_user_flags_line(user_flags);
+        }
+
+
+
+        /**
+         * Compute identities between DoFs located on quads. Called from
+         * distribute_dofs().
+         */
+        template <int dim, int spacedim>
+        static
+        void
+        compute_quad_dof_identities (hp::DoFHandler<dim,spacedim> &,
+                                     std::vector<types::global_dof_index> &)
+        {
+          // this function should only be called for dim<3 where there are
+          // no quad dof identies. for dim>=3, the specialization below should
+          // take care of it
+          Assert (dim < 3, ExcInternalError());
+        }
+
+
+        static
+        void
+        compute_quad_dof_identities (hp::DoFHandler<3,3>                  &dof_handler,
+                                     std::vector<types::global_dof_index> &new_dof_indices)
+        {
+          const int dim = 3;
+          const int spacedim = 3;
+
+          // we will mark quads that we have already treated, so first
+          // save and clear the user flags on quads and later restore
+          // them
+          std::vector<bool> user_flags;
+          dof_handler.get_triangulation().save_user_flags_quad(user_flags);
+          const_cast<dealii::Triangulation<dim,spacedim> &>(dof_handler.get_triangulation()).clear_user_flags_quad ();
+
+          // An implementation of the algorithm described in the hp
+          // paper, including the modification mentioned later in the
+          // "complications in 3-d" subsections
+          //
+          // as explained there, we do something only if there are
+          // exactly 2 finite elements associated with an object. if
+          // there is only one, then there is nothing to do anyway,
+          // and if there are 3 or more, then we can get into
+          // trouble. note that this only happens for lines in 3d and
+          // higher, and for quads only in 4d and higher, so this
+          // isn't a particularly frequent case
+          dealii::Table<2,std::shared_ptr<DoFIdentities> >
+          quad_dof_identities (dof_handler.finite_elements->size(),
+                               dof_handler.finite_elements->size());
+
+          for (hp::DoFHandler<dim,spacedim>::active_cell_iterator
+               cell=dof_handler.begin_active();
+               cell!=dof_handler.end(); ++cell)
+            for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
+              if ((cell->quad(q)->user_flag_set() == false)
+                  &&
+                  (cell->quad(q)->n_active_fe_indices() == 2))
+                {
+                  const hp::DoFHandler<dim,spacedim>::quad_iterator quad = cell->quad(q);
+                  quad->set_user_flag ();
+
+                  // find out which is the most dominating finite
+                  // element of the ones that are used on this quad
+                  const unsigned int most_dominating_fe_index
+                    = get_most_dominating_fe_index<dim,spacedim> (quad);
+
+                  // if we found the most dominating element, then use
+                  // this to eliminate some of the degrees of freedom
+                  // by identification. otherwise, the code that
+                  // computes hanging node constraints will have to
+                  // deal with it by computing appropriate constraints
+                  // along this face/edge
+                  if (most_dominating_fe_index != numbers::invalid_unsigned_int)
+                    {
+                      const unsigned int n_active_fe_indices
+                        = quad->n_active_fe_indices ();
+
+                      // loop over the indices of all the finite
+                      // elements that are not dominating, and
+                      // identify their dofs to the most dominating
+                      // one
+                      for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                        if (quad->nth_active_fe_index (f) !=
+                            most_dominating_fe_index)
+                          {
+                            const unsigned int
+                            other_fe_index = quad->nth_active_fe_index (f);
+
+                            ensure_existence_of_dof_identities<2>
+                            ((*dof_handler.finite_elements)[most_dominating_fe_index],
+                             (*dof_handler.finite_elements)[other_fe_index],
+                             quad_dof_identities[most_dominating_fe_index][other_fe_index]);
+
+                            DoFIdentities &identities
+                              = *quad_dof_identities[most_dominating_fe_index][other_fe_index];
+                            for (unsigned int i=0; i<identities.size(); ++i)
+                              {
+                                const types::global_dof_index master_dof_index
+                                  = quad->dof_index (identities[i].first, most_dominating_fe_index);
+                                const types::global_dof_index slave_dof_index
+                                  = quad->dof_index (identities[i].second, other_fe_index);
+
+                                Assert ((new_dof_indices[master_dof_index] ==
+                                         numbers::invalid_dof_index)
+                                        ||
+                                        (new_dof_indices[slave_dof_index] ==
+                                         master_dof_index),
+                                        ExcInternalError());
+
+                                new_dof_indices[slave_dof_index] = master_dof_index;
+                              }
+                          }
+                    }
+                }
+
+          // finally restore the user flags
+          const_cast<dealii::Triangulation<dim,spacedim> &>(dof_handler.get_triangulation())
+          .load_user_flags_quad(user_flags);
+        }
+
+
+
+        /**
+         * Once degrees of freedom have been distributed on all cells, see if
+         * we can identify DoFs on neighboring cells. This function does nothing
+         * on regular DoFHandlers, but goes through vertices, lines, and quads
+         * for hp::DoFHandler objects.
+         *
+         * Return the final number of degrees of freedom, which is the old one
+         * minus however many were identified
+         */
+        template <int dim, int spacedim>
+        static
+        unsigned int
+        unify_dof_indices (const DoFHandler<dim,spacedim> &,
+                           const unsigned int              n_dofs_before_identification)
+        {
+          return n_dofs_before_identification;
+        }
+
+
+
+        template <int dim, int spacedim>
+        static
+        unsigned int
+        unify_dof_indices (hp::DoFHandler<dim,spacedim> &dof_handler,
+                           const unsigned int            n_dofs_before_identification)
+        {
+          std::vector<types::global_dof_index>
+          constrained_indices (n_dofs_before_identification, numbers::invalid_dof_index);
+
+          compute_vertex_dof_identities (dof_handler, constrained_indices);
+          compute_line_dof_identities (dof_handler, constrained_indices);
+          compute_quad_dof_identities (dof_handler, constrained_indices);
+
+          // loop over all dofs and assign
+          // new numbers to those which are
+          // not constrained
+          std::vector<types::global_dof_index>
+          new_dof_indices (n_dofs_before_identification, numbers::invalid_dof_index);
+          types::global_dof_index next_free_dof = 0;
+          for (types::global_dof_index i=0; i<n_dofs_before_identification; ++i)
+            if (constrained_indices[i] == numbers::invalid_dof_index)
+              {
+                new_dof_indices[i] = next_free_dof;
+                ++next_free_dof;
+              }
+
+          // then loop over all those that
+          // are constrained and record the
+          // new dof number for those:
+          for (types::global_dof_index i=0; i<n_dofs_before_identification; ++i)
+            if (constrained_indices[i] != numbers::invalid_dof_index)
+              {
+                Assert (new_dof_indices[constrained_indices[i]] !=
+                        numbers::invalid_dof_index,
+                        ExcInternalError());
+
+                new_dof_indices[i] = new_dof_indices[constrained_indices[i]];
+              }
+
+          for (types::global_dof_index i=0; i<n_dofs_before_identification; ++i)
+            {
+              Assert (new_dof_indices[i] != numbers::invalid_dof_index,
+                      ExcInternalError());
+              Assert (new_dof_indices[i] < next_free_dof,
+                      ExcInternalError());
+            }
+
+          // finally, do the renumbering and set the number of actually
+          // used dof indices
+          renumber_dofs (new_dof_indices,
+                         IndexSet(0),
+                         dof_handler,
+                         true);
+
+
+          return next_free_dof;
+        }
+
+
+
+        /**
          * Distribute degrees of freedom on all cells, or on cells with the
          * correct subdomain_id if the corresponding argument is not equal to
          * numbers::invalid_subdomain_id. Return the total number of dofs
@@ -472,6 +1106,7 @@ namespace internal
           Assert (dof_handler.get_triangulation().n_levels() > 0,
                   ExcMessage("Empty triangulation"));
 
+          // Step 1: distribute dofs on all cells
           types::global_dof_index next_free_dof = 0;
           typename DoFHandlerType::active_cell_iterator
           cell = dof_handler.begin_active(),
@@ -486,10 +1121,17 @@ namespace internal
                                                            cell,
                                                            next_free_dof);
 
+          // Step 2: unify dof indices in case this is an hp DoFHandler
+          next_free_dof = unify_dof_indices (dof_handler, next_free_dof);
+
           update_all_active_cell_dof_indices_caches (dof_handler);
 
           return next_free_dof;
         }
+
+
+
+        /* -------------- distribute_mg_dofs functionality ------------- */
 
 
         /**
