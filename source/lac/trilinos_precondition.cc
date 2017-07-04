@@ -283,10 +283,15 @@ namespace TrilinosWrappers
   {
     // release memory before reallocation
     preconditioner.reset ();
+
+    // Block relaxation setup fails if we have no locally owned rows. As a work-around
+    // we just pretend to use point relaxation on those processors:
     preconditioner.reset (Ifpack().Create
-                          ("block relaxation",
-                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                           0));
+                          (
+                            (matrix.trilinos_matrix().NumMyRows()==0) ?
+                            "point relaxation" : "block relaxation",
+                            const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+                            0));
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
@@ -343,10 +348,15 @@ namespace TrilinosWrappers
                                      const AdditionalData &additional_data)
   {
     preconditioner.reset ();
+
+    // Block relaxation setup fails if we have no locally owned rows. As a work-around
+    // we just pretend to use point relaxation on those processors:
     preconditioner.reset (Ifpack().Create
-                          ("block relaxation",
-                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                           additional_data.overlap));
+                          (
+                            (matrix.trilinos_matrix().NumMyRows()==0) ?
+                            "point relaxation" : "block relaxation",
+                            const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+                            additional_data.overlap));
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
@@ -404,10 +414,15 @@ namespace TrilinosWrappers
                                     const AdditionalData &additional_data)
   {
     preconditioner.reset ();
+
+    // Block relaxation setup fails if we have no locally owned rows. As a work-around
+    // we just pretend to use point relaxation on those processors:
     preconditioner.reset (Ifpack().Create
-                          ("block relaxation",
-                           const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
-                           additional_data.overlap));
+                          (
+                            (matrix.trilinos_matrix().NumMyRows()==0) ?
+                            "point relaxation" : "block relaxation",
+                            const_cast<Epetra_CrsMatrix *>(&matrix.trilinos_matrix()),
+                            additional_data.overlap));
 
     Ifpack_Preconditioner *ifpack = static_cast<Ifpack_Preconditioner *>
                                     (preconditioner.get());
