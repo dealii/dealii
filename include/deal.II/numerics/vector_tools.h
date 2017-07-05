@@ -1981,23 +1981,66 @@ namespace VectorTools
   /**
    * Create a right hand side vector for a point source at point @p p. In
    * other words, it creates a vector $F$ so that $F_i = \int_\Omega
-   * \delta(x-p) \phi_i(x) dx$. Prior content of the given @p rhs_vector
-   * vector is deleted.
+   * \delta(x-p) \varphi_i(x) dx$ where $\varphi_i$ are the shape functions
+   * described by @p dof_handler and @p p is the point at which the delta
+   * function is located. Prior content of the given @p rhs_vector
+   * vector is deleted. This function is for the case of a scalar finite
+   * element.
    *
-   * See the general documentation of this namespace for further information.
+   * It is worth noting that delta functions do not exist in reality, and
+   * consequently, using this function does not model any real situation. This
+   * is, because no real object is able to focus an infinite force density
+   * at an infinitesimally small part of the domain. Rather, all real
+   * devices will spread out the force over a finite area. Only if this
+   * area is so small that it cannot be resolved by any mesh does it make
+   * sense to model the situation in a way that uses a delta function with
+   * the same overall force. On the other hand, a situation that is probably
+   * more fruitfully simulated with a delta function is the electric potential
+   * of a point source; in this case, the solution is known to have a
+   * logarithmic singularity (in 2d) or a $\frac{1}{r}$ singularity (in 3d),
+   * neither of which is bounded.
+   *
+   * Mathematically, the use of delta functions typically leads to exact
+   * solutions to which the numerically obtained, approximate solution does
+   * not converge. This is because, taking the Laplace equation as an example,
+   * the error between exact and numerical solution can be bounded by the
+   * expression
+   * @f{align*}{
+   *   \| u-u_h \|_{L_2} \le C h \| \nabla u \|_{L_2}
+   * @f}
+   * but when using a delta function on the right hand side, the term
+   * $\| \nabla u \|_{L_2} = |u|_{H^1}$ is not finite. This can be seen
+   * by using the a-priori bound for solutions of the Laplace equation
+   * $-\Delta u = f$ that states that $|u|_{H^1} \le \|f\|_{H^{-1}}$.
+   * When using a delta function as right hand side, $f(x)=\delta(x-p)$,
+   * one would need to take the $H^{-1}$ norm of a delta function, which
+   * however is not finite because $\delta(\cdot-p) \not\in H^{-1}$.
+   *
+   * The consequence of all of this is that the exact solution of the
+   * Laplace equation with a delta function on the right hand side --
+   * i.e., the <i>Green's function</i> -- has a singularity at $p$ that
+   * is so strong that it cannot be resolved by a finite element
+   * solution, and consequently finite element approximations do not
+   * converge towards the exact solution in any of the usual norms.
+   *
+   * All of this is also the case for all of the other usual second-order
+   * partial differential equations in dimensions two or higher. (Because
+   * in dimension two and higher, $H^1$ functions are not necessarily
+   * continuous, and consequently the delta function is not in the dual
+   * space $H^{-1}$.)
    */
   template <int dim, int spacedim>
   void create_point_source_vector(const Mapping<dim,spacedim>    &mapping,
-                                  const DoFHandler<dim,spacedim> &dof,
+                                  const DoFHandler<dim,spacedim> &dof_handler,
                                   const Point<spacedim>          &p,
                                   Vector<double>                 &rhs_vector);
 
   /**
    * Call the create_point_source_vector() function, see above, with
-   * <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * an implied default $Q_1$ mapping object.
    */
   template <int dim, int spacedim>
-  void create_point_source_vector(const DoFHandler<dim,spacedim> &dof,
+  void create_point_source_vector(const DoFHandler<dim,spacedim> &dof_handler,
                                   const Point<spacedim>          &p,
                                   Vector<double>                 &rhs_vector);
 
@@ -2006,18 +2049,18 @@ namespace VectorTools
    */
   template <int dim, int spacedim>
   void create_point_source_vector(const hp::MappingCollection<dim,spacedim> &mapping,
-                                  const hp::DoFHandler<dim,spacedim>        &dof,
+                                  const hp::DoFHandler<dim,spacedim>        &dof_handler,
                                   const Point<spacedim>                     &p,
                                   Vector<double>                            &rhs_vector);
 
   /**
    * Like the previous set of functions, but for hp objects. The function uses
-   * the default Q1 mapping object. Note that if your hp::DoFHandler uses any
+   * an implied default $Q_1$ mapping object. Note that if your hp::DoFHandler uses any
    * active fe index other than zero, then you need to call the function above
    * that provides a mapping object for each active fe index.
    */
   template <int dim, int spacedim>
-  void create_point_source_vector(const hp::DoFHandler<dim,spacedim> &dof,
+  void create_point_source_vector(const hp::DoFHandler<dim,spacedim> &dof_handler,
                                   const Point<spacedim>              &p,
                                   Vector<double>                     &rhs_vector);
 
@@ -2029,28 +2072,29 @@ namespace VectorTools
    * components of the shape functions). It computes a right hand side that
    * corresponds to a forcing function that is equal to a delta function times
    * a given direction. In other words, it creates a vector $F$ so that $F_i =
-   * \int_\Omega [\mathbf d \delta(x-p)] \cdot \phi_i(x) dx$. Note here that
-   * $\phi_i$ is a vector-valued function. $\mathbf d$ is the given direction
+   * \int_\Omega [\mathbf d \delta(x-p)] \cdot \varphi_i(x) dx$. Note here that
+   * $\varphi_i$ is a vector-valued function. $\mathbf d$ is the given direction
    * of the source term $\mathbf d \delta(x-p)$ and corresponds to the @p
    * direction argument to be passed to this function.
    *
    * Prior content of the given @p rhs_vector vector is deleted.
    *
-   * See the general documentation of this namespace for further information.
+   * See the discussion of the first create_point_source_vector() variant for
+   * more on the use of delta functions.
    */
   template <int dim, int spacedim>
   void create_point_source_vector(const Mapping<dim,spacedim>    &mapping,
-                                  const DoFHandler<dim,spacedim> &dof,
+                                  const DoFHandler<dim,spacedim> &dof_handler,
                                   const Point<spacedim>          &p,
                                   const Point<dim>               &direction,
                                   Vector<double>                 &rhs_vector);
 
   /**
    * Call the create_point_source_vector() function for vector-valued finite
-   * elements, see above, with <tt>mapping=MappingQGeneric@<dim@>(1)</tt>.
+   * elements, see above, with an implied default $Q_1$ mapping object.
    */
   template <int dim, int spacedim>
-  void create_point_source_vector(const DoFHandler<dim,spacedim> &dof,
+  void create_point_source_vector(const DoFHandler<dim,spacedim> &dof_handler,
                                   const Point<spacedim>          &p,
                                   const Point<dim>               &direction,
                                   Vector<double>                 &rhs_vector);
@@ -2060,19 +2104,19 @@ namespace VectorTools
    */
   template <int dim, int spacedim>
   void create_point_source_vector(const hp::MappingCollection<dim,spacedim> &mapping,
-                                  const hp::DoFHandler<dim,spacedim>        &dof,
+                                  const hp::DoFHandler<dim,spacedim>        &dof_handler,
                                   const Point<spacedim>                     &p,
                                   const Point<dim>                          &direction,
                                   Vector<double>                            &rhs_vector);
 
   /**
    * Like the previous set of functions, but for hp objects. The function uses
-   * the default Q1 mapping object. Note that if your hp::DoFHandler uses any
+   * an implied default $Q_1$ mapping object. Note that if your hp::DoFHandler uses any
    * active fe index other than zero, then you need to call the function above
    * that provides a mapping object for each active fe index.
    */
   template <int dim, int spacedim>
-  void create_point_source_vector(const hp::DoFHandler<dim,spacedim> &dof,
+  void create_point_source_vector(const hp::DoFHandler<dim,spacedim> &dof_handler,
                                   const Point<spacedim>              &p,
                                   const Point<dim>                   &direction,
                                   Vector<double>                     &rhs_vector);
