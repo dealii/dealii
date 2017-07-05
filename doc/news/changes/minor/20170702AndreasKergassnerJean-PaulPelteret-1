@@ -1,0 +1,5 @@
+Fixed: FullMatrix::determinant() is now implemented for square matrices
+of size greater than 3. In this case, it is computed through the 
+LU decomposition of the matrix using LAPACK.
+<br>
+(Andreas Kergassner, Jean-Paul Pelteret, 2017/07/02)

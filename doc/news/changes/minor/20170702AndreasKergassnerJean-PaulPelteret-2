@@ -1,0 +1,4 @@
+Fixed: FullMatrix::left_invert() and FullMatrix::right_invert() no longer
+fail when the matrix is square.
+<br>
+(Andreas Kergassner, Jean-Paul Pelteret, 2017/07/02)

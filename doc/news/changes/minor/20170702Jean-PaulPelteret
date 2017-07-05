@@ -1,0 +1,4 @@
+New: The determinant of a LAPACKMatrix can now be computed via a 
+call to LAPACKMatrix::determinant().
+<br>
+(Jean-Paul Pelteret, 2017/07/02)

@@ -405,6 +405,13 @@ public:
   void compute_lu_factorization ();
 
   /**
+   * Compute the determinant of a matrix. As it requires the LU factorization of
+   * the matrix, this function can only be called after
+   * compute_lu_factorization() has been called.
+   */
+  number determinant () const;
+
+  /**
    * Invert the matrix by first computing an LU factorization with the LAPACK
    * function Xgetrf and then building the actual inverse using Xgetri.
    */
