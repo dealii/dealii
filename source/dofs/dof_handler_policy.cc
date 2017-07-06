@@ -603,10 +603,11 @@ namespace internal
          */
         template <int dim, int spacedim>
         static
-        void
-        compute_vertex_dof_identities (hp::DoFHandler<dim,spacedim> &dof_handler,
-                                       std::vector<types::global_dof_index> &new_dof_indices)
+        std::map<types::global_dof_index, types::global_dof_index>
+        compute_vertex_dof_identities (hp::DoFHandler<dim,spacedim> &dof_handler)
         {
+          std::map<types::global_dof_index, types::global_dof_index> dof_identities;
+
           // Note: we may wish to have something here similar to what
           // we do for lines and quads, namely that we only identify
           // dofs for any fe towards the most dominating one. however,
@@ -674,18 +675,19 @@ namespace internal
                                                       other_fe_index,
                                                       identities[i].second);
 
-                            Assert ((new_dof_indices[higher_dof_index] ==
-                                     numbers::invalid_dof_index)
+                            Assert ((dof_identities.find(higher_dof_index) == dof_identities.end())
                                     ||
-                                    (new_dof_indices[higher_dof_index] ==
+                                    (dof_identities[higher_dof_index] ==
                                      lower_dof_index),
                                     ExcInternalError());
 
-                            new_dof_indices[higher_dof_index] = lower_dof_index;
+                            dof_identities[higher_dof_index] = lower_dof_index;
                           }
                       }
                   }
               }
+
+          return dof_identities;
         }
 
 
@@ -695,18 +697,20 @@ namespace internal
          */
         template <int spacedim>
         static
-        void
-        compute_line_dof_identities (hp::DoFHandler<1,spacedim> &,
-                                     std::vector<types::global_dof_index> &)
-        {}
+        std::map<types::global_dof_index, types::global_dof_index>
+        compute_line_dof_identities (hp::DoFHandler<1,spacedim> &)
+        {
+          return std::map<types::global_dof_index, types::global_dof_index>();
+        }
 
 
         template <int dim, int spacedim>
         static
-        void
-        compute_line_dof_identities (hp::DoFHandler<dim,spacedim>         &dof_handler,
-                                     std::vector<types::global_dof_index> &new_dof_indices)
+        std::map<types::global_dof_index, types::global_dof_index>
+        compute_line_dof_identities (hp::DoFHandler<dim,spacedim> &dof_handler)
         {
+          std::map<types::global_dof_index, types::global_dof_index> dof_identities;
+
           // we will mark lines that we have already treated, so first save and clear
           // the user flags on lines and later restore them
           std::vector<bool> user_flags;
@@ -796,26 +800,24 @@ namespace internal
                                         // if master dof was already constrained,
                                         // constrain to that one, otherwise constrain
                                         // slave to master
-                                        if (new_dof_indices[master_dof_index] !=
-                                            numbers::invalid_dof_index)
+                                        if (dof_identities.find(master_dof_index) != dof_identities.end())
                                           {
-                                            Assert (new_dof_indices[new_dof_indices[master_dof_index]] ==
-                                                    numbers::invalid_dof_index,
+                                            Assert (dof_identities.find(dof_identities[master_dof_index])
+                                                    == dof_identities.end(),
                                                     ExcInternalError());
 
-                                            new_dof_indices[slave_dof_index]
-                                              = new_dof_indices[master_dof_index];
+                                            dof_identities[slave_dof_index]
+                                              = dof_identities[master_dof_index];
                                           }
                                         else
                                           {
-                                            Assert ((new_dof_indices[master_dof_index] ==
-                                                     numbers::invalid_dof_index)
+                                            Assert ((dof_identities.find(master_dof_index) == dof_identities.end())
                                                     ||
-                                                    (new_dof_indices[slave_dof_index] ==
+                                                    (dof_identities[slave_dof_index] ==
                                                      master_dof_index),
                                                     ExcInternalError());
 
-                                            new_dof_indices[slave_dof_index] = master_dof_index;
+                                            dof_identities[slave_dof_index] = master_dof_index;
                                           }
                                       }
                                   }
@@ -871,14 +873,13 @@ namespace internal
                                     const types::global_dof_index slave_dof_index
                                       = line->dof_index (identities[i].second, other_fe_index);
 
-                                    Assert ((new_dof_indices[master_dof_index] ==
-                                             numbers::invalid_dof_index)
+                                    Assert ((dof_identities.find(master_dof_index) == dof_identities.end())
                                             ||
-                                            (new_dof_indices[slave_dof_index] ==
+                                            (dof_identities[slave_dof_index] ==
                                              master_dof_index),
                                             ExcInternalError());
 
-                                    new_dof_indices[slave_dof_index] = master_dof_index;
+                                    dof_identities[slave_dof_index] = master_dof_index;
                                   }
                               }
                         }
@@ -888,6 +889,8 @@ namespace internal
           // finally restore the user flags
           const_cast<dealii::Triangulation<dim,spacedim> &>(dof_handler.get_triangulation())
           .load_user_flags_line(user_flags);
+
+          return dof_identities;
         }
 
 
@@ -898,24 +901,27 @@ namespace internal
          */
         template <int dim, int spacedim>
         static
-        void
-        compute_quad_dof_identities (hp::DoFHandler<dim,spacedim> &,
-                                     std::vector<types::global_dof_index> &)
+        std::map<types::global_dof_index, types::global_dof_index>
+        compute_quad_dof_identities (hp::DoFHandler<dim,spacedim> &)
         {
           // this function should only be called for dim<3 where there are
           // no quad dof identies. for dim>=3, the specialization below should
           // take care of it
           Assert (dim < 3, ExcInternalError());
+
+          return std::map<types::global_dof_index, types::global_dof_index>();
         }
 
 
         static
-        void
-        compute_quad_dof_identities (hp::DoFHandler<3,3>                  &dof_handler,
-                                     std::vector<types::global_dof_index> &new_dof_indices)
+        std::map<types::global_dof_index, types::global_dof_index>
+        compute_quad_dof_identities (hp::DoFHandler<3,3> &dof_handler)
         {
           const int dim = 3;
           const int spacedim = 3;
+
+          std::map<types::global_dof_index, types::global_dof_index> dof_identities;
+
 
           // we will mark quads that we have already treated, so first
           // save and clear the user flags on quads and later restore
@@ -991,14 +997,13 @@ namespace internal
                                 const types::global_dof_index slave_dof_index
                                   = quad->dof_index (identities[i].second, other_fe_index);
 
-                                Assert ((new_dof_indices[master_dof_index] ==
-                                         numbers::invalid_dof_index)
+                                Assert ((dof_identities.find(master_dof_index) == dof_identities.end())
                                         ||
-                                        (new_dof_indices[slave_dof_index] ==
+                                        (dof_identities[slave_dof_index] ==
                                          master_dof_index),
                                         ExcInternalError());
 
-                                new_dof_indices[slave_dof_index] = master_dof_index;
+                                dof_identities[slave_dof_index] = master_dof_index;
                               }
                           }
                     }
@@ -1007,6 +1012,8 @@ namespace internal
           // finally restore the user flags
           const_cast<dealii::Triangulation<dim,spacedim> &>(dof_handler.get_triangulation())
           .load_user_flags_quad(user_flags);
+
+          return dof_identities;
         }
 
 
@@ -1037,21 +1044,34 @@ namespace internal
         unify_dof_indices (hp::DoFHandler<dim,spacedim> &dof_handler,
                            const unsigned int            n_dofs_before_identification)
         {
-          std::vector<types::global_dof_index>
-          constrained_indices (n_dofs_before_identification, numbers::invalid_dof_index);
+          std::map<types::global_dof_index, types::global_dof_index>
+          constrained_vertex_indices, constrained_line_indices, constrained_quad_indices;
 
-          compute_vertex_dof_identities (dof_handler, constrained_indices);
-          compute_line_dof_identities (dof_handler, constrained_indices);
-          compute_quad_dof_identities (dof_handler, constrained_indices);
+          constrained_vertex_indices = compute_vertex_dof_identities (dof_handler);
+          constrained_line_indices = compute_line_dof_identities (dof_handler);
+          constrained_quad_indices = compute_quad_dof_identities (dof_handler);
 
-          // loop over all dofs and assign
-          // new numbers to those which are
-          // not constrained
+          // create a vector that contains the new DoF indices; first preset the
+          // ones that are identities as determined above, then enumerate the rest
           std::vector<types::global_dof_index>
           new_dof_indices (n_dofs_before_identification, numbers::invalid_dof_index);
+
+          for (const auto &constrained_dof_indices :
+          {
+            &constrained_vertex_indices,
+            &constrained_line_indices,
+            &constrained_quad_indices
+          })
+          for (const auto &p : *constrained_dof_indices)
+            {
+              Assert (new_dof_indices[p.first] == numbers::invalid_dof_index,
+                      ExcInternalError());
+              new_dof_indices[p.first] = p.second;
+            }
+
           types::global_dof_index next_free_dof = 0;
           for (types::global_dof_index i=0; i<n_dofs_before_identification; ++i)
-            if (constrained_indices[i] == numbers::invalid_dof_index)
+            if (new_dof_indices[i] == numbers::invalid_dof_index)
               {
                 new_dof_indices[i] = next_free_dof;
                 ++next_free_dof;
@@ -1060,15 +1080,19 @@ namespace internal
           // then loop over all those that
           // are constrained and record the
           // new dof number for those:
-          for (types::global_dof_index i=0; i<n_dofs_before_identification; ++i)
-            if (constrained_indices[i] != numbers::invalid_dof_index)
-              {
-                Assert (new_dof_indices[constrained_indices[i]] !=
-                        numbers::invalid_dof_index,
-                        ExcInternalError());
+          for (const auto &constrainted_dof_indices :
+          {
+            &constrained_vertex_indices,
+            &constrained_line_indices,
+            &constrained_quad_indices
+          })
+          for (const auto &p : *constrainted_dof_indices)
+            {
+              Assert (new_dof_indices[p.first] != numbers::invalid_dof_index,
+                      ExcInternalError());
 
-                new_dof_indices[i] = new_dof_indices[constrained_indices[i]];
-              }
+              new_dof_indices[p.first] = new_dof_indices[p.second];
+            }
 
           for (types::global_dof_index i=0; i<n_dofs_before_identification; ++i)
             {
