@@ -496,23 +496,23 @@ namespace DoFRenumbering
 
 
 
-  template <int dim, int spacedim>
+  template <typename DoFHandlerType>
   void
-  component_wise (DoFHandler<dim,spacedim>        &dof_handler,
+  component_wise (DoFHandlerType                  &dof_handler,
                   const std::vector<unsigned int> &component_order_arg)
   {
     std::vector<types::global_dof_index> renumbering (dof_handler.n_locally_owned_dofs(),
                                                       numbers::invalid_dof_index);
 
-    typename DoFHandler<dim,spacedim>::active_cell_iterator
+    typename DoFHandlerType::active_cell_iterator
     start = dof_handler.begin_active();
-    const typename DoFHandler<dim,spacedim>::level_cell_iterator
+    const typename DoFHandlerType::level_cell_iterator
     end = dof_handler.end();
 
     const types::global_dof_index result =
-      compute_component_wise<dim,spacedim,
-      typename DoFHandler<dim,spacedim>::active_cell_iterator,
-      typename DoFHandler<dim,spacedim>::level_cell_iterator>
+      compute_component_wise<DoFHandlerType::dimension,DoFHandlerType::space_dimension,
+      typename DoFHandlerType::active_cell_iterator,
+      typename DoFHandlerType::level_cell_iterator>
       (renumbering, start, end, component_order_arg, false);
     if (result == 0)
       return;
@@ -529,40 +529,6 @@ namespace DoFRenumbering
             ((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs())
              &&
              (result <= dof_handler.n_dofs())),
-            ExcRenumberingIncomplete());
-
-    dof_handler.renumber_dofs (renumbering);
-
-    // for (unsigned int level=0;level<dof_handler.get_triangulation().n_levels();++level)
-    //   if (dof_handler.n_dofs(level) != numbers::invalid_dof_index)
-    //  component_wise(dof_handler, level, component_order_arg);
-  }
-
-
-
-  template <int dim>
-  void
-  component_wise (hp::DoFHandler<dim>             &dof_handler,
-                  const std::vector<unsigned int> &component_order_arg)
-  {
-//TODO: Merge with previous function
-    std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(),
-                                                      numbers::invalid_dof_index);
-
-    typename hp::DoFHandler<dim>::active_cell_iterator
-    start = dof_handler.begin_active();
-    const typename hp::DoFHandler<dim>::level_cell_iterator
-    end = dof_handler.end();
-
-    const types::global_dof_index result =
-      compute_component_wise<hp::DoFHandler<dim>::dimension,hp::DoFHandler<dim>::space_dimension,
-      typename hp::DoFHandler<dim>::active_cell_iterator,
-      typename hp::DoFHandler<dim>::level_cell_iterator>
-      (renumbering, start, end, component_order_arg, false);
-
-    if (result == 0) return;
-
-    Assert (result == dof_handler.n_dofs(),
             ExcRenumberingIncomplete());
 
     dof_handler.renumber_dofs (renumbering);

@@ -43,8 +43,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
      const std::vector<types::global_dof_index>&);
 
     template
-    void component_wise<deal_II_dimension,deal_II_space_dimension>
+    void component_wise<DoFHandler<deal_II_dimension,deal_II_space_dimension> >
     (DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
+     const std::vector<unsigned int>&);
+
+    template
+    void component_wise<hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> >
+    (hp::DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
      const std::vector<unsigned int>&);
 
     template
@@ -148,11 +153,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
      const bool,
      const bool,
      const std::vector<types::global_dof_index>&);
-
-    template
-    void component_wise
-    (hp::DoFHandler<deal_II_dimension>&,
-     const std::vector<unsigned int>&);
 
     template
     void component_wise
