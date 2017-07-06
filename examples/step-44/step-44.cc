@@ -57,6 +57,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition_selector.h>
 #include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_selector.h>
 #include <deal.II/lac/sparse_direct.h>
 #include <deal.II/lac/constraint_matrix.h>
 
@@ -67,7 +68,6 @@
 // of transparency.
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/packaged_operation.h>
-#include <deal.II/lac/iterative_inverse.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>

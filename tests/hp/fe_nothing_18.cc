@@ -34,7 +34,6 @@
 #include <deal.II/lac/solver_cg.h>         //CG solver
 #include <deal.II/lac/precondition.h>      //and a preconditioner
 #include <deal.II/lac/constraint_matrix.h> //conform hanging nodes DoF to certain constrains to make the solution continuous
-#include <deal.II/lac/iterative_inverse.h> //need for Schur matrix
 #include <deal.II/grid/tria.h>             //triangulation class
 #include <deal.II/grid/grid_generator.h>   //standard functions to generate grid
 #include <deal.II/grid/grid_refinement.h>

@@ -36,7 +36,7 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/matrix_free/operators.h>
-#include <deal.II/lac/iterative_inverse.h>
+#include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/numerics/vector_tools.h>
 
@@ -118,28 +118,29 @@ void test ()
   {
     std::vector<std::complex<double> > lambda(number_of_eigenvalues);
 
-    SolverControl solver_control     (dof_handler.n_dofs(), 1e-9,/*log_history*/false,/*log_results*/false);
-    SolverControl solver_control_lin (dof_handler.n_dofs(), 1e-10,/*log_history*/false,/*log_results*/false);
-
-
-    PreconditionIdentity preconditioner;
-    IterativeInverse<LinearAlgebra::distributed::Vector<double> > shift_and_invert;
-    shift_and_invert.initialize(laplace,preconditioner);
-    shift_and_invert.solver.select("cg");
+    // set up iterative inverse
     static ReductionControl inner_control_c(dof_handler.n_dofs(), 0.0, 1.e-13);
-    shift_and_invert.solver.set_control(inner_control_c);
+
+    typedef LinearAlgebra::distributed::Vector<double> VectorType;
+    SolverCG<VectorType> solver_c(inner_control_c);
+    PreconditionIdentity preconditioner;
+    const auto shift_and_invert =
+      inverse_operator(linear_operator<VectorType>(laplace),
+                       solver_c,
+                       preconditioner);
 
     const unsigned int num_arnoldi_vectors = 2*eigenvalues.size() + 2;
-
     PArpackSolver<LinearAlgebra::distributed::Vector<double> >::AdditionalData
     additional_data(num_arnoldi_vectors,
                     PArpackSolver<LinearAlgebra::distributed::Vector<double> >::largest_magnitude,
                     true);
 
-    PArpackSolver<LinearAlgebra::distributed::Vector<double> > eigensolver
-    (solver_control,
-     mpi_communicator,
-     additional_data);
+    SolverControl solver_control(
+      dof_handler.n_dofs(), 1e-9, /*log_history*/ false, /*log_results*/ false);
+
+    PArpackSolver<LinearAlgebra::distributed::Vector<double> > eigensolver(
+      solver_control, mpi_communicator, additional_data);
+
     eigensolver.reinit(eigenfunctions[0]);
     // make sure initial vector is orthogonal to the space due to constraints
     {

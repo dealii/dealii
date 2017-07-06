@@ -37,7 +37,7 @@
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-#include <deal.II/lac/iterative_inverse.h>
+#include <deal.II/lac/linear_operator.h>
 
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_precondition.h>
@@ -50,6 +50,7 @@
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/lac/parpack_solver.h>
+#include <deal.II/lac/solver_gmres.h>
 
 #include <fstream>
 #include <iostream>
@@ -285,18 +286,21 @@ void test ()
     for (unsigned int i=0; i < eigenvalues.size(); i++)
       eigenfunctions[i] = 0.;
 
-    SolverControl solver_control     (dof_handler.n_dofs(), 1e-9,/*log_history*/false,/*log_results*/false);
-    SolverControl solver_control_lin (dof_handler.n_dofs(), 1e-10,/*log_history*/false,/*log_results*/false);
 
-    PArpackSolver<TrilinosWrappers::MPI::Vector>::Shift<TrilinosWrappers::SparseMatrix> shifted_matrix(stiffness_matrix,mass_matrix,shift);
-    TrilinosWrappers::PreconditionIdentity preconditioner;
-    IterativeInverse<TrilinosWrappers::MPI::Vector > shift_and_invert;
-    shift_and_invert.initialize(shifted_matrix,preconditioner);
-    shift_and_invert.solver.select("gmres");
     static ReductionControl inner_control_c(/*maxiter*/stiffness_matrix.m(),
                                                        /*tolerance (global)*/ 0.0,
                                                        /*reduce (w.r.t. initial)*/ 1.e-13);
-    shift_and_invert.solver.set_control(inner_control_c);
+
+    typedef TrilinosWrappers::MPI::Vector VectorType;
+    SolverGMRES<VectorType> solver_c(inner_control_c);
+    TrilinosWrappers::PreconditionIdentity preconditioner;
+
+    const auto shifted_matrix =
+      linear_operator<VectorType>(stiffness_matrix) -
+      shift * linear_operator<VectorType>(mass_matrix);
+
+    const auto shift_and_invert =
+      inverse_operator(shifted_matrix, solver_c, preconditioner);
 
     const unsigned int num_arnoldi_vectors = 2*eigenvalues.size() + 2;
 
@@ -304,6 +308,9 @@ void test ()
     additional_data(num_arnoldi_vectors,
                     PArpackSolver<TrilinosWrappers::MPI::Vector>::largest_real_part,
                     false);
+
+    SolverControl solver_control(
+      dof_handler.n_dofs(), 1e-9, /*log_history*/ false, /*log_results*/ false);
 
     PArpackSolver<TrilinosWrappers::MPI::Vector> eigensolver (solver_control,
                                                               mpi_communicator,
