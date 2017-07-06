@@ -699,19 +699,13 @@ initialize(const Triangulation<dim,spacedim> &t,
   faces = nullptr;
   number_cache.n_global_dofs = 0;
 
-  // decide whether we need a
-  // sequential or a parallel
-  // distributed policy
-  if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
-      (&t)
-      != nullptr)
+  // decide whether we need a sequential or a parallel distributed policy
+  if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&t) != nullptr)
     policy.reset (new internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >(*this));
-  else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
-           (&t)
-           == nullptr)
-    policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
-  else
+  else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&t) != nullptr)
     policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>(*this));
+  else
+    policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
 
   distribute_dofs(fe);
 }

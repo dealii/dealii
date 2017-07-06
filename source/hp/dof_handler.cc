@@ -1095,17 +1095,15 @@ namespace hp
                         "this class does not currently support this."));
 
     // decide whether we need a sequential or a parallel distributed policy
-//    if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
-//        (&tria)
-//        != nullptr)
-//      policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>(*this));
-//    else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
-//             (&tria)
-//             == nullptr)
-    policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
-//    else
-//      policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>(*this));
-
+    if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&*this->tria) != nullptr)
+      policy.reset (new internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >(*this));
+    else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&*this->tria) != nullptr)
+      //policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>(*this));
+      {
+        Assert (false, ExcNotImplemented());
+      }
+    else
+      policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
 
     create_active_fe_table ();
 
@@ -1588,10 +1586,6 @@ namespace hp
     /////////////////////////////////
 
 
-    Assert ((dynamic_cast<const parallel::shared::Triangulation< dim, spacedim >*>
-             (&this->get_triangulation())
-             == nullptr),
-            ExcNotImplemented());
     Assert ((dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
              (&this->get_triangulation())
              == nullptr),
