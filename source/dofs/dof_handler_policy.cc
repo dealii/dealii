@@ -1044,12 +1044,30 @@ namespace internal
         unify_dof_indices (hp::DoFHandler<dim,spacedim> &dof_handler,
                            const unsigned int            n_dofs_before_identification)
         {
+          // compute the constraints that correspond to unifying
+          // dof indices on vertices, lines, and quads. do so
+          // in parallel
           std::map<types::global_dof_index, types::global_dof_index>
           constrained_vertex_indices, constrained_line_indices, constrained_quad_indices;
 
-          constrained_vertex_indices = compute_vertex_dof_identities (dof_handler);
-          constrained_line_indices = compute_line_dof_identities (dof_handler);
-          constrained_quad_indices = compute_quad_dof_identities (dof_handler);
+          {
+            Threads::TaskGroup<> tasks;
+
+            tasks += Threads::new_task ([&]()
+            {
+              constrained_vertex_indices = compute_vertex_dof_identities (dof_handler);
+            });
+            tasks += Threads::new_task ([&]()
+            {
+              constrained_line_indices = compute_line_dof_identities (dof_handler);
+            });
+            tasks += Threads::new_task ([&]()
+            {
+              constrained_quad_indices = compute_quad_dof_identities (dof_handler);
+            });
+
+            tasks.join_all ();
+          }
 
           // create a vector that contains the new DoF indices; first preset the
           // ones that are identities as determined above, then enumerate the rest
