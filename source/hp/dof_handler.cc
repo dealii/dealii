@@ -63,9 +63,8 @@ namespace internal
   {
     namespace DoFHandler
     {
-      // access class
-      // dealii::hp::DoFHandler instead of
-      // namespace internal::hp::DoFHandler, etc
+      // access class dealii::hp::DoFHandler instead of namespace
+      // internal::hp::DoFHandler, etc
       using dealii::hp::DoFHandler;
 
       /**
@@ -75,29 +74,20 @@ namespace internal
       struct Implementation
       {
         /**
-         * Do that part of reserving
-         * space that pertains to
-         * vertices, since this is the
-         * same in all space
-         * dimensions.
+         * Do that part of reserving space that pertains to vertices,
+         * since this is the same in all space dimensions.
          */
         template <int dim, int spacedim>
         static
         void
         reserve_space_vertices (DoFHandler<dim,spacedim> &dof_handler)
         {
-          // The final step is allocating
-          // memory is to set up vertex dof
-          // information. since vertices
-          // are sequentially numbered,
-          // what we do first is to set up
-          // an array in which we record
-          // whether a vertex is associated
-          // with any of the given fe's, by
-          // setting a bit. in a later
-          // step, we then actually
-          // allocate memory for the
-          // required dofs
+          // The final step is allocating memory is to set up vertex
+          // dof information. since vertices are sequentially
+          // numbered, what we do first is to set up an array in which
+          // we record whether a vertex is associated with any of the
+          // given fe's, by setting a bit. in a later step, we then
+          // actually allocate memory for the required dofs
           std::vector<std::vector<bool> >
           vertex_fe_association (dof_handler.finite_elements->size(),
                                  std::vector<bool> (dof_handler.tria->n_vertices(), false));
@@ -108,13 +98,9 @@ namespace internal
               vertex_fe_association[cell->active_fe_index()][cell->vertex_index(v)]
                 = true;
 
-          // in debug mode, make sure
-          // that each vertex is
-          // associated with at least one
-          // fe (note that except for
-          // unused vertices, all
-          // vertices are actually
-          // active)
+          // in debug mode, make sure that each vertex is associated
+          // with at least one fe (note that except for unused
+          // vertices, all vertices are actually active)
 #ifdef DEBUG
           for (unsigned int v=0; v<dof_handler.tria->n_vertices(); ++v)
             if (dof_handler.tria->vertex_used(v) == true)
@@ -127,17 +113,11 @@ namespace internal
               }
 #endif
 
-          // next count how much memory
-          // we actually need. for each
-          // vertex, we need one slot per
-          // fe to store the fe_index,
-          // plus dofs_per_vertex for
-          // this fe. in addition, we
-          // need one slot as the end
-          // marker for the
-          // fe_indices. at the same time
-          // already fill the
-          // vertex_dofs_offsets field
+          // next count how much memory we actually need. for each
+          // vertex, we need one slot per fe to store the fe_index,
+          // plus dofs_per_vertex for this fe. in addition, we need
+          // one slot as the end marker for the fe_indices. at the
+          // same time already fill the vertex_dofs_offsets field
           dof_handler.vertex_dofs_offsets.resize (dof_handler.tria->n_vertices(),
                                                   numbers::invalid_dof_index);
 
@@ -153,10 +133,8 @@ namespace internal
                 ++vertex_slots_needed;
               }
 
-          // now allocate the space we
-          // have determined we need, and
-          // set up the linked lists for
-          // each of the vertices
+          // now allocate the space we have determined we need, and
+          // set up the linked lists for each of the vertices
           dof_handler.vertex_dofs.resize (vertex_slots_needed,
                                           numbers::invalid_dof_index);
           for (unsigned int v=0; v<dof_handler.tria->n_vertices(); ++v)
@@ -166,17 +144,12 @@ namespace internal
                 for (unsigned int fe=0; fe<dof_handler.finite_elements->size(); ++fe)
                   if (vertex_fe_association[fe][v] == true)
                     {
-                      // if this vertex
-                      // uses this fe,
-                      // then set the
-                      // fe_index and
-                      // move the pointer
-                      // ahead
+                      // if this vertex uses this fe, then set the
+                      // fe_index and move the pointer ahead
                       dof_handler.vertex_dofs[pointer] = fe;
                       pointer += (*dof_handler.finite_elements)[fe].dofs_per_vertex + 1;
                     }
-                // finally place the end
-                // marker
+                // finally place the end marker
                 dof_handler.vertex_dofs[pointer] = numbers::invalid_dof_index;
               }
         }
@@ -184,13 +157,10 @@ namespace internal
 
 
         /**
-         * Reserve enough space in the
-         * <tt>levels[]</tt> objects to store the
-         * numbers of the degrees of freedom
-         * needed for the given element. The
-         * given element is that one which
-         * was selected when calling
-         * @p distribute_dofs the last time.
+         * Reserve enough space in the <tt>levels[]</tt> objects to
+         * store the numbers of the degrees of freedom needed for the
+         * given element. The given element is that one which was
+         * selected when calling @p distribute_dofs the last time.
          */
         template <int spacedim>
         static
@@ -211,9 +181,8 @@ namespace internal
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
                   ExcInternalError ());
 
-          // Release all space except the
-          // active_fe_indices field which
-          // we have to backup before
+          // Release all space except the active_fe_indices field
+          // which we have to backup before
           {
             std::vector<std::vector<DoFLevel::active_fe_index_type> >
             active_fe_backup(dof_handler.levels.size ());
@@ -221,10 +190,8 @@ namespace internal
               std::swap (dof_handler.levels[level]->active_fe_indices,
                          active_fe_backup[level]);
 
-            // delete all levels and set them up
-            // newly, since vectors are
-            // troublesome if you want to change
-            // their size
+            // delete all levels and set them up newly, since vectors
+            // are troublesome if you want to change their size
             dof_handler.clear_space ();
 
             for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
@@ -237,20 +204,14 @@ namespace internal
 
           // LINE (CELL) DOFs
 
-          // count how much space we need
-          // on each level for the cell
-          // dofs and set the
-          // dof_*_offsets
-          // data. initially set the latter
-          // to an invalid index, and only
-          // later set it to something
-          // reasonable for active dof_handler.cells
+          // count how much space we need on each level for the cell
+          // dofs and set the dof_*_offsets data. initially set the
+          // latter to an invalid index, and only later set it to
+          // something reasonable for active dof_handler.cells
           //
-          // note that for dof_handler.cells, the
-          // situation is simpler than for
-          // other (lower dimensional)
-          // objects since exactly one
-          // finite element is used for it
+          // note that for dof_handler.cells, the situation is simpler
+          // than for other (lower dimensional) objects since exactly
+          // one finite element is used for it
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               dof_handler.levels[level]->dof_offsets
@@ -285,12 +246,9 @@ namespace internal
                                                         numbers::invalid_dof_index);
             }
 
-          // safety check: make sure that
-          // the number of DoFs we
-          // allocated is actually correct
-          // (above we have also set the
-          // dof_*_offsets field, so
-          // we couldn't use this simpler
+          // safety check: make sure that the number of DoFs we
+          // allocated is actually correct (above we have also set the
+          // dof_*_offsets field, so we couldn't use this simpler
           // algorithm)
 #ifdef DEBUG
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
@@ -339,9 +297,8 @@ namespace internal
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
                   ExcInternalError ());
 
-          // Release all space except the
-          // active_fe_indices field which
-          // we have to backup before
+          // Release all space except the active_fe_indices field
+          // which we have to backup before
           {
             std::vector<std::vector<DoFLevel::active_fe_index_type> >
             active_fe_backup(dof_handler.levels.size ());
@@ -349,10 +306,8 @@ namespace internal
               std::swap (dof_handler.levels[level]->active_fe_indices,
                          active_fe_backup[level]);
 
-            // delete all levels and set them up
-            // newly, since vectors are
-            // troublesome if you want to change
-            // their size
+            // delete all levels and set them up newly, since vectors
+            // are troublesome if you want to change their size
             dof_handler.clear_space ();
 
             for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
@@ -366,20 +321,14 @@ namespace internal
 
           // QUAD (CELL) DOFs
 
-          // count how much space we need
-          // on each level for the cell
-          // dofs and set the
-          // dof_*_offsets
-          // data. initially set the latter
-          // to an invalid index, and only
-          // later set it to something
-          // reasonable for active dof_handler.cells
+          // count how much space we need on each level for the cell
+          // dofs and set the dof_*_offsets data. initially set the
+          // latter to an invalid index, and only later set it to
+          // something reasonable for active dof_handler.cells
           //
-          // note that for dof_handler.cells, the
-          // situation is simpler than for
-          // other (lower dimensional)
-          // objects since exactly one
-          // finite element is used for it
+          // note that for dof_handler.cells, the situation is simpler
+          // than for other (lower dimensional) objects since exactly
+          // one finite element is used for it
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               dof_handler.levels[level]->dof_offsets
@@ -414,12 +363,9 @@ namespace internal
                                                         numbers::invalid_dof_index);
             }
 
-          // safety check: make sure that
-          // the number of DoFs we
-          // allocated is actually correct
-          // (above we have also set the
-          // dof_*_offsets field, so
-          // we couldn't use this simpler
+          // safety check: make sure that the number of DoFs we
+          // allocated is actually correct (above we have also set the
+          // dof_*_offsets field, so we couldn't use this simpler
           // algorithm)
 #ifdef DEBUG
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
@@ -447,29 +393,19 @@ namespace internal
 
           // LINE DOFS
           //
-          // same here: count line dofs,
-          // then allocate as much space as
-          // we need and prime the linked
-          // list for lines (see the
-          // description in hp::DoFLevel)
-          // with the indices we will
-          // need. note that our task is
-          // more complicated since two
-          // adjacent dof_handler.cells may have
-          // different active_fe_indices,
-          // in which case we need to
-          // allocate *two* sets of line
-          // dofs for the same line
+          // same here: count line dofs, then allocate as much space
+          // as we need and prime the linked list for lines (see the
+          // description in hp::DoFLevel) with the indices we will
+          // need. note that our task is more complicated since two
+          // adjacent dof_handler.cells may have different
+          // active_fe_indices, in which case we need to allocate
+          // *two* sets of line dofs for the same line
           //
-          // the way we do things is that
-          // we loop over all active dof_handler.cells
-          // (these are the ones that have
-          // DoFs only anyway) and all
-          // their dof_handler.faces. We note in the
-          // user flags whether we have
-          // previously visited a face and
-          // if so skip it (consequently,
-          // we have to save and later
+          // the way we do things is that we loop over all active
+          // dof_handler.cells (these are the ones that have DoFs only
+          // anyway) and all their dof_handler.faces. We note in the
+          // user flags whether we have previously visited a face and
+          // if so skip it (consequently, we have to save and later
           // restore the line flags)
           {
             std::vector<bool> saved_line_user_flags;
@@ -478,10 +414,8 @@ namespace internal
             const_cast<dealii::Triangulation<dim,spacedim>&>(*dof_handler.tria)
             .clear_user_flags_line ();
 
-            // an array to hold how many
-            // slots (see the hp::DoFLevel
-            // class) we will have to store
-            // on each level
+            // an array to hold how many slots (see the hp::DoFLevel
+            // class) we will have to store on each level
             unsigned int n_line_slots = 0;
 
             for (typename HpDoFHandler<dim,spacedim>::active_cell_iterator
@@ -489,18 +423,13 @@ namespace internal
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
                   {
-                    // ok, face has not been
-                    // visited. so we need to
-                    // allocate space for it. let's
-                    // see how much we need: we need
-                    // one set if a) there is no
-                    // neighbor behind this face, or
-                    // b) the neighbor is either
-                    // coarser or finer than we are,
-                    // or c) the neighbor is neither
-                    // coarser nor finer, but has
-                    // happens to have the same
-                    // active_fe_index:
+                    // ok, face has not been visited. so we need to
+                    // allocate space for it. let's see how much we
+                    // need: we need one set if a) there is no
+                    // neighbor behind this face, or b) the neighbor
+                    // is either coarser or finer than we are, or c)
+                    // the neighbor is neither coarser nor finer, but
+                    // has happens to have the same active_fe_index:
                     if (cell->at_boundary(face)
                         ||
                         cell->face(face)->has_children()
@@ -510,21 +439,13 @@ namespace internal
                         (!cell->at_boundary(face)
                          &&
                          (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
-                      // ok, one set of
-                      // dofs. that makes
-                      // one index, 1 times
-                      // dofs_per_line
-                      // dofs, and one stop
-                      // index
+                      // ok, one set of dofs. that makes one index, 1
+                      // times dofs_per_line dofs, and one stop index
                       n_line_slots
                       += (*dof_handler.finite_elements)[cell->active_fe_index()].dofs_per_line + 2;
 
-                    // otherwise we do
-                    // indeed need two
-                    // sets, i.e. two
-                    // indices, two sets of
-                    // dofs, and one stop
-                    // index:
+                    // otherwise we do indeed need two sets, i.e. two
+                    // indices, two sets of dofs, and one stop index:
                     else
                       n_line_slots
                       += ((*dof_handler.finite_elements)[cell->active_fe_index()].dofs_per_line
@@ -534,19 +455,14 @@ namespace internal
                           +
                           3);
 
-                    // mark this face as
-                    // visited
+                    // mark this face as visited
                     cell->face(face)->set_user_flag ();
                   }
 
-            // now that we know how many
-            // line dofs we will have to
-            // have on each level, allocate
-            // the memory. note that we
-            // allocate offsets for all
-            // lines, though only the
-            // active ones will have a
-            // non-invalid value later on
+            // now that we know how many line dofs we will have to
+            // have on each level, allocate the memory. note that we
+            // allocate offsets for all lines, though only the active
+            // ones will have a non-invalid value later on
             dof_handler.faces->lines.dof_offsets
               = std::vector<unsigned int> (dof_handler.tria->n_raw_lines(),
                                            (unsigned int)(-1));
@@ -554,11 +470,9 @@ namespace internal
               = std::vector<types::global_dof_index> (n_line_slots,
                                                       numbers::invalid_dof_index);
 
-            // with the memory now
-            // allocated, loop over the
-            // dof_handler.cells again and prime the
-            // _offset values as well as
-            // the fe_index fields
+            // with the memory now allocated, loop over the
+            // dof_handler.cells again and prime the _offset values as
+            // well as the fe_index fields
             const_cast<dealii::Triangulation<dim,spacedim>&>(*dof_handler.tria)
             .clear_user_flags_line ();
 
@@ -569,8 +483,7 @@ namespace internal
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
                   {
-                    // same decision tree
-                    // as before
+                    // same decision tree as before
                     if (cell->at_boundary(face)
                         ||
                         cell->face(face)->has_children()
@@ -585,33 +498,19 @@ namespace internal
                         ->lines.dof_offsets[cell->face(face)->index()]
                           = next_free_line_slot;
 
-                        // set first slot
-                        // for this line to
-                        // active_fe_index
-                        // of this face
+                        // set first slot for this line to
+                        // active_fe_index of this face
                         dof_handler.faces
                         ->lines.dofs[next_free_line_slot]
                           = cell->active_fe_index();
 
-                        // the next
-                        // dofs_per_line
-                        // indices remain
-                        // unset for the
-                        // moment (i.e. at
-                        // invalid_dof_index).
-                        // following this
-                        // comes the stop
-                        // index, which
-                        // also is
-                        // invalid_dof_index
-                        // and therefore
-                        // does not have to
-                        // be explicitly
-                        // set
+                        // the next dofs_per_line indices remain unset
+                        // for the moment (i.e. at invalid_dof_index).
+                        // following this comes the stop index, which
+                        // also is invalid_dof_index and therefore
+                        // does not have to be explicitly set
 
-                        // finally, mark
-                        // those slots as
-                        // used
+                        // finally, mark those slots as used
                         next_free_line_slot
                         += (*dof_handler.finite_elements)[cell->active_fe_index()].dofs_per_line + 2;
                       }
@@ -621,24 +520,16 @@ namespace internal
                         ->lines.dof_offsets[cell->face(face)->index()]
                           = next_free_line_slot;
 
-                        // set first slot
-                        // for this line to
-                        // active_fe_index
-                        // of this face
+                        // set first slot for this line to
+                        // active_fe_index of this face
                         dof_handler.faces
                         ->lines.dofs[next_free_line_slot]
                           = cell->active_fe_index();
 
-                        // the next
-                        // dofs_per_line
-                        // indices remain
-                        // unset for the
-                        // moment (i.e. at
-                        // invalid_dof_index).
+                        // the next dofs_per_line indices remain unset
+                        // for the moment (i.e. at invalid_dof_index).
                         //
-                        // then comes the
-                        // fe_index for the
-                        // neighboring
+                        // then comes the fe_index for the neighboring
                         // cell:
                         dof_handler.faces
                         ->lines.dofs[next_free_line_slot
@@ -647,24 +538,14 @@ namespace internal
                                      +
                                      1]
                           = cell->neighbor(face)->active_fe_index();
-                        // then again a set
-                        // of dofs that we
-                        // need not set
-                        // right now
+                        // then again a set of dofs that we need not
+                        // set right now
                         //
-                        // following this
-                        // comes the stop
-                        // index, which
-                        // also is
-                        // invalid_dof_index
-                        // and therefore
-                        // does not have to
-                        // be explicitly
-                        // set
+                        // following this comes the stop index, which
+                        // also is invalid_dof_index and therefore
+                        // does not have to be explicitly set
 
-                        // finally, mark
-                        // those slots as
-                        // used
+                        // finally, mark those slots as used
                         next_free_line_slot
                         += ((*dof_handler.finite_elements)[cell->active_fe_index()].dofs_per_line
                             +
@@ -674,20 +555,16 @@ namespace internal
                             3);
                       }
 
-                    // mark this face as
-                    // visited
+                    // mark this face as visited
                     cell->face(face)->set_user_flag ();
                   }
 
-            // we should have moved the
-            // cursor for each level to the
-            // total number of dofs on that
-            // level. check that
+            // we should have moved the cursor for each level to the
+            // total number of dofs on that level. check that
             Assert (next_free_line_slot == n_line_slots,
                     ExcInternalError());
 
-            // at the end, restore the user
-            // flags for the lines
+            // at the end, restore the user flags for the lines
             const_cast<dealii::Triangulation<dim,spacedim>&>(*dof_handler.tria)
             .load_user_flags_line (saved_line_user_flags);
           }
@@ -716,9 +593,8 @@ namespace internal
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
                   ExcInternalError ());
 
-          // Release all space except the
-          // active_fe_indices field which
-          // we have to backup before
+          // Release all space except the active_fe_indices field
+          // which we have to backup before
           {
             std::vector<std::vector<DoFLevel::active_fe_index_type> >
             active_fe_backup(dof_handler.levels.size ());
@@ -726,10 +602,8 @@ namespace internal
               std::swap (dof_handler.levels[level]->active_fe_indices,
                          active_fe_backup[level]);
 
-            // delete all levels and set them up
-            // newly, since vectors are
-            // troublesome if you want to change
-            // their size
+            // delete all levels and set them up newly, since vectors
+            // are troublesome if you want to change their size
             dof_handler.clear_space ();
 
             for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
@@ -743,20 +617,14 @@ namespace internal
 
           // HEX (CELL) DOFs
 
-          // count how much space we need
-          // on each level for the cell
-          // dofs and set the
-          // dof_*_offsets
-          // data. initially set the latter
-          // to an invalid index, and only
-          // later set it to something
-          // reasonable for active dof_handler.cells
+          // count how much space we need on each level for the cell
+          // dofs and set the dof_*_offsets data. initially set the
+          // latter to an invalid index, and only later set it to
+          // something reasonable for active dof_handler.cells
           //
-          // note that for dof_handler.cells, the
-          // situation is simpler than for
-          // other (lower dimensional)
-          // objects since exactly one
-          // finite element is used for it
+          // note that for dof_handler.cells, the situation is simpler
+          // than for other (lower dimensional) objects since exactly
+          // one finite element is used for it
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               dof_handler.levels[level]->dof_offsets
@@ -791,12 +659,9 @@ namespace internal
                                                         numbers::invalid_dof_index);
             }
 
-          // safety check: make sure that
-          // the number of DoFs we
-          // allocated is actually correct
-          // (above we have also set the
-          // dof_*_offsets field, so
-          // we couldn't use this simpler
+          // safety check: make sure that the number of DoFs we
+          // allocated is actually correct (above we have also set the
+          // dof_*_offsets field, so we couldn't use this simpler
           // algorithm)
 #ifdef DEBUG
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
@@ -824,29 +689,19 @@ namespace internal
 
           // QUAD DOFS
           //
-          // same here: count quad dofs,
-          // then allocate as much space as
-          // we need and prime the linked
-          // list for quad (see the
-          // description in hp::DoFLevel)
-          // with the indices we will
-          // need. note that our task is
-          // more complicated since two
-          // adjacent dof_handler.cells may have
-          // different active_fe_indices,
-          // in which case we need to
-          // allocate *two* sets of line
-          // dofs for the same line
+          // same here: count quad dofs, then allocate as much space
+          // as we need and prime the linked list for quad (see the
+          // description in hp::DoFLevel) with the indices we will
+          // need. note that our task is more complicated since two
+          // adjacent dof_handler.cells may have different
+          // active_fe_indices, in which case we need to allocate
+          // *two* sets of line dofs for the same line
           //
-          // the way we do things is that
-          // we loop over all active dof_handler.cells
-          // (these are the ones that have
-          // DoFs only anyway) and all
-          // their dof_handler.faces. We note in the
-          // user flags whether we have
-          // previously visited a face and
-          // if so skip it (consequently,
-          // we have to save and later
+          // the way we do things is that we loop over all active
+          // dof_handler.cells (these are the ones that have DoFs only
+          // anyway) and all their dof_handler.faces. We note in the
+          // user flags whether we have previously visited a face and
+          // if so skip it (consequently, we have to save and later
           // restore the line flags)
           {
             std::vector<bool> saved_quad_user_flags;
@@ -855,8 +710,7 @@ namespace internal
             const_cast<dealii::Triangulation<dim,spacedim>&>(*dof_handler.tria)
             .clear_user_flags_quad ();
 
-            // examine, how how many
-            // slots (see the hp::DoFLevel
+            // examine, how how many slots (see the hp::DoFLevel
             // class) we will have to store
             unsigned int n_quad_slots = 0;
 
@@ -865,21 +719,13 @@ namespace internal
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
                   {
-                    // ok, face has not been
-                    // visited. so we need to
-                    // allocate space for
-                    // it. let's see how much
-                    // we need: we need one
-                    // set if a) there is no
-                    // neighbor behind this
-                    // face, or b) the
-                    // neighbor is not on the
-                    // same level or further
-                    // refined, or c) the
-                    // neighbor is on the
-                    // same level, but
-                    // happens to have the
-                    // same active_fe_index:
+                    // ok, face has not been visited. so we need to
+                    // allocate space for it. let's see how much we
+                    // need: we need one set if a) there is no
+                    // neighbor behind this face, or b) the neighbor
+                    // is not on the same level or further refined, or
+                    // c) the neighbor is on the same level, but
+                    // happens to have the same active_fe_index:
                     if (cell->at_boundary(face)
                         ||
                         cell->face(face)->has_children()
@@ -889,21 +735,13 @@ namespace internal
                         (!cell->at_boundary(face)
                          &&
                          (cell->active_fe_index() == cell->neighbor(face)->active_fe_index())))
-                      // ok, one set of
-                      // dofs. that makes
-                      // one index, 1 times
-                      // dofs_per_quad
-                      // dofs, and one stop
-                      // index
+                      // ok, one set of dofs. that makes one index, 1
+                      // times dofs_per_quad dofs, and one stop index
                       n_quad_slots
                       += (*dof_handler.finite_elements)[cell->active_fe_index()].dofs_per_quad + 2;
 
-                    // otherwise we do
-                    // indeed need two
-                    // sets, i.e. two
-                    // indices, two sets of
-                    // dofs, and one stop
-                    // index:
+                    // otherwise we do indeed need two sets, i.e. two
+                    // indices, two sets of dofs, and one stop index:
                     else
                       n_quad_slots
                       += ((*dof_handler.finite_elements)[cell->active_fe_index()].dofs_per_quad
@@ -913,19 +751,14 @@ namespace internal
                           +
                           3);
 
-                    // mark this face as
-                    // visited
+                    // mark this face as visited
                     cell->face(face)->set_user_flag ();
                   }
 
-            // now that we know how many
-            // quad dofs we will have to
-            // have,  allocate
-            // the memory. note that we
-            // allocate offsets for all
-            // quads, though only the
-            // active ones will have a
-            // non-invalid value later on
+            // now that we know how many quad dofs we will have to
+            // have, allocate the memory. note that we allocate
+            // offsets for all quads, though only the active ones will
+            // have a non-invalid value later on
             if (true)
               {
                 dof_handler.faces->quads.dof_offsets
@@ -937,11 +770,9 @@ namespace internal
                                                           numbers::invalid_dof_index);
               }
 
-            // with the memory now
-            // allocated, loop over the
-            // dof_handler.cells again and prime the
-            // _offset values as well as
-            // the fe_index fields
+            // with the memory now allocated, loop over the
+            // dof_handler.cells again and prime the _offset values as
+            // well as the fe_index fields
             const_cast<dealii::Triangulation<dim,spacedim>&>(*dof_handler.tria)
             .clear_user_flags_quad ();
 
@@ -952,8 +783,7 @@ namespace internal
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (! cell->face(face)->user_flag_set())
                   {
-                    // same decision tree
-                    // as before
+                    // same decision tree as before
                     if (cell->at_boundary(face)
                         ||
                         cell->face(face)->has_children()
@@ -968,33 +798,19 @@ namespace internal
                         ->quads.dof_offsets[cell->face(face)->index()]
                           = next_free_quad_slot;
 
-                        // set first slot
-                        // for this quad to
-                        // active_fe_index
-                        // of this face
+                        // set first slot for this quad to
+                        // active_fe_index of this face
                         dof_handler.faces
                         ->quads.dofs[next_free_quad_slot]
                           = cell->active_fe_index();
 
-                        // the next
-                        // dofs_per_quad
-                        // indices remain
-                        // unset for the
-                        // moment (i.e. at
-                        // invalid_dof_index).
-                        // following this
-                        // comes the stop
-                        // index, which
-                        // also is
-                        // invalid_dof_index
-                        // and therefore
-                        // does not have to
-                        // be explicitly
-                        // set
+                        // the next dofs_per_quad indices remain unset
+                        // for the moment (i.e. at invalid_dof_index).
+                        // following this comes the stop index, which
+                        // also is invalid_dof_index and therefore
+                        // does not have to be explicitly set
 
-                        // finally, mark
-                        // those slots as
-                        // used
+                        // finally, mark those slots as used
                         next_free_quad_slot
                         += (*dof_handler.finite_elements)[cell->active_fe_index()].dofs_per_quad + 2;
                       }
@@ -1004,24 +820,16 @@ namespace internal
                         ->quads.dof_offsets[cell->face(face)->index()]
                           = next_free_quad_slot;
 
-                        // set first slot
-                        // for this quad to
-                        // active_fe_index
-                        // of this face
+                        // set first slot for this quad to
+                        // active_fe_index of this face
                         dof_handler.faces
                         ->quads.dofs[next_free_quad_slot]
                           = cell->active_fe_index();
 
-                        // the next
-                        // dofs_per_quad
-                        // indices remain
-                        // unset for the
-                        // moment (i.e. at
-                        // invalid_dof_index).
+                        // the next dofs_per_quad indices remain unset
+                        // for the moment (i.e. at invalid_dof_index).
                         //
-                        // then comes the
-                        // fe_index for the
-                        // neighboring
+                        // then comes the fe_index for the neighboring
                         // cell:
                         dof_handler.faces
                         ->quads.dofs[next_free_quad_slot
@@ -1030,24 +838,14 @@ namespace internal
                                      +
                                      1]
                           = cell->neighbor(face)->active_fe_index();
-                        // then again a set
-                        // of dofs that we
-                        // need not set
-                        // right now
+                        // then again a set of dofs that we need not
+                        // set right now
                         //
-                        // following this
-                        // comes the stop
-                        // index, which
-                        // also is
-                        // invalid_dof_index
-                        // and therefore
-                        // does not have to
-                        // be explicitly
-                        // set
+                        // following this comes the stop index, which
+                        // also is invalid_dof_index and therefore
+                        // does not have to be explicitly set
 
-                        // finally, mark
-                        // those slots as
-                        // used
+                        // finally, mark those slots as used
                         next_free_quad_slot
                         += ((*dof_handler.finite_elements)[cell->active_fe_index()].dofs_per_quad
                             +
@@ -1057,19 +855,16 @@ namespace internal
                             3);
                       }
 
-                    // mark this face as
-                    // visited
+                    // mark this face as visited
                     cell->face(face)->set_user_flag ();
                   }
 
-            // we should have moved the
-            // cursor to the total number
-            // of dofs. check that
+            // we should have moved the cursor to the total number of
+            // dofs. check that
             Assert (next_free_quad_slot == n_quad_slots,
                     ExcInternalError());
 
-            // at the end, restore the user
-            // flags for the quads
+            // at the end, restore the user flags for the quads
             const_cast<dealii::Triangulation<dim,spacedim>&>(*dof_handler.tria)
             .load_user_flags_quad (saved_quad_user_flags);
           }
@@ -1077,25 +872,18 @@ namespace internal
 
           // LINE DOFS
 
-          // the situation here is pretty
-          // much like with vertices: there
-          // can be an arbitrary number of
-          // finite elements associated
-          // with each line.
+          // the situation here is pretty much like with vertices:
+          // there can be an arbitrary number of finite elements
+          // associated with each line.
           //
-          // the algorithm we use is
-          // somewhat similar to what we do
-          // in reserve_space_vertices()
+          // the algorithm we use is somewhat similar to what we do in
+          // reserve_space_vertices()
           if (true)
             {
-              // what we do first is to set up
-              // an array in which we record
-              // whether a line is associated
-              // with any of the given fe's, by
-              // setting a bit. in a later
-              // step, we then actually
-              // allocate memory for the
-              // required dofs
+              // what we do first is to set up an array in which we
+              // record whether a line is associated with any of the
+              // given fe's, by setting a bit. in a later step, we
+              // then actually allocate memory for the required dofs
               std::vector<std::vector<bool> >
               line_fe_association (dof_handler.finite_elements->size(),
                                    std::vector<bool> (dof_handler.tria->n_raw_lines(),
@@ -1108,15 +896,10 @@ namespace internal
                   line_fe_association[cell->active_fe_index()][cell->line_index(l)]
                     = true;
 
-              // first check which of the
-              // lines is used at all,
-              // i.e. is associated with a
-              // finite element. we do this
-              // since not all lines may
-              // actually be used, in which
-              // case we do not have to
-              // allocate any memory at
-              // all
+              // first check which of the lines is used at all,
+              // i.e. is associated with a finite element. we do this
+              // since not all lines may actually be used, in which
+              // case we do not have to allocate any memory at all
               std::vector<bool> line_is_used (dof_handler.tria->n_raw_lines(), false);
               for (unsigned int line=0; line<dof_handler.tria->n_raw_lines(); ++line)
                 for (unsigned int fe=0; fe<dof_handler.finite_elements->size(); ++fe)
@@ -1126,17 +909,11 @@ namespace internal
                       break;
                     }
 
-              // next count how much memory
-              // we actually need. for each
-              // line, we need one slot per
-              // fe to store the fe_index,
-              // plus dofs_per_line for
-              // this fe. in addition, we
-              // need one slot as the end
-              // marker for the
-              // fe_indices. at the same
-              // time already fill the
-              // line_dofs_offsets field
+              // next count how much memory we actually need. for each
+              // line, we need one slot per fe to store the fe_index,
+              // plus dofs_per_line for this fe. in addition, we need
+              // one slot as the end marker for the fe_indices. at the
+              // same time already fill the line_dofs_offsets field
               dof_handler.faces->lines.dof_offsets
               .resize (dof_handler.tria->n_raw_lines(),
                        numbers::invalid_unsigned_int);
@@ -1153,10 +930,8 @@ namespace internal
                     ++line_slots_needed;
                   }
 
-              // now allocate the space we
-              // have determined we need, and
-              // set up the linked lists for
-              // each of the lines
+              // now allocate the space we have determined we need,
+              // and set up the linked lists for each of the lines
               dof_handler.faces->lines.dofs.resize (line_slots_needed,
                                                     numbers::invalid_dof_index);
               for (unsigned int line=0; line<dof_handler.tria->n_raw_lines(); ++line)
@@ -1166,17 +941,12 @@ namespace internal
                     for (unsigned int fe=0; fe<dof_handler.finite_elements->size(); ++fe)
                       if (line_fe_association[fe][line] == true)
                         {
-                          // if this line
-                          // uses this fe,
-                          // then set the
-                          // fe_index and
-                          // move the
-                          // pointer ahead
+                          // if this line uses this fe, then set the
+                          // fe_index and move the pointer ahead
                           dof_handler.faces->lines.dofs[pointer] = fe;
                           pointer += (*dof_handler.finite_elements)[fe].dofs_per_line + 1;
                         }
-                    // finally place the end
-                    // marker
+                    // finally place the end marker
                     dof_handler.faces->lines.dofs[pointer] = numbers::invalid_dof_index;
                   }
             }
@@ -1189,8 +959,7 @@ namespace internal
 
 
         /**
-         * Implement the function of same name
-         * in the mother class.
+         * Implement the function of same name in the mother class.
          */
         template <int spacedim>
         static
@@ -1210,8 +979,7 @@ namespace internal
         unsigned int
         max_couplings_between_dofs (const DoFHandler<2,spacedim> &dof_handler)
         {
-          // get these numbers by drawing pictures
-          // and counting...
+          // get these numbers by drawing pictures and counting...
           // example:
           //   |     |     |
           // --x-----x--x--X--
@@ -1226,11 +994,10 @@ namespace internal
           //   |     |     |
           // x = vertices connected with center vertex *;
           //   = total of 19
-          // (the X vertices are connected with * if
-          // the vertices adjacent to X are hanging
-          // nodes)
-          // count lines -> 28 (don't forget to count
-          // mother and children separately!)
+          //
+          // (the X vertices are connected with * if the vertices
+          // adjacent to X are hanging nodes) count lines -> 28 (don't
+          // forget to count mother and children separately!)
           types::global_dof_index max_couplings;
           switch (dof_handler.tria->max_adjacent_cells())
             {
@@ -1273,13 +1040,11 @@ namespace internal
         max_couplings_between_dofs (const DoFHandler<3,spacedim> &dof_handler)
         {
 //TODO:[?] Invent significantly better estimates than the ones in this function
-          // doing the same thing here is a rather
-          // complicated thing, compared to the 2d
-          // case, since it is hard to draw pictures
-          // with several refined hexahedra :-) so I
-          // presently only give a coarse estimate
-          // for the case that at most 8 hexes meet
-          // at each vertex
+          // doing the same thing here is a rather complicated thing,
+          // compared to the 2d case, since it is hard to draw
+          // pictures with several refined hexahedra :-) so I
+          // presently only give a coarse estimate for the case that
+          // at most 8 hexes meet at each vertex
           //
           // can anyone give better estimate here?
           const unsigned int max_adjacent_cells = dof_handler.tria->max_adjacent_cells();
@@ -1362,8 +1127,8 @@ namespace hp
   template <int dim, int spacedim>
   DoFHandler<dim,spacedim>::~DoFHandler ()
   {
-    // unsubscribe as a listener to refinement
-    // of the underlying triangulation
+    // unsubscribe as a listener to refinement of the underlying
+    // triangulation
     for (unsigned int i=0; i<tria_listeners.size(); ++i)
       tria_listeners[i].disconnect ();
     tria_listeners.clear ();
@@ -1550,9 +1315,7 @@ namespace hp
   {
     Assert (finite_elements != nullptr, ExcNoFESelected());
 
-    // check that only boundary
-    // indicators 0 and 1 are allowed
-    // in 1d
+    // check that only boundary indicators 0 and 1 are allowed in 1d
     for (std::set<types::boundary_id>::const_iterator i=boundary_ids.begin();
          i!=boundary_ids.end(); ++i)
       Assert ((*i == 0) || (*i == 1),
@@ -1639,16 +1402,11 @@ namespace hp
     std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
 
-    // loop over all faces to check
-    // whether they are at a
-    // boundary. note that we need not
-    // take special care of single
-    // lines in 3d (using
-    // @p{cell->has_boundary_lines}),
-    // since we do not support
-    // boundaries of dimension dim-2,
-    // and so every boundary line is
-    // also part of a boundary face.
+    // loop over all faces to check whether they are at a
+    // boundary. note that we need not take special care of single
+    // lines in 3d (using @p{cell->has_boundary_lines}), since we do
+    // not support boundaries of dimension dim-2, and so every
+    // boundary line is also part of a boundary face.
     typename HpDoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
                                                               endc = this->end();
     for (; cell!=endc; ++cell)
@@ -1676,9 +1434,8 @@ namespace hp
     Assert (boundary_ids.find (numbers::internal_face_boundary_id) == boundary_ids.end(),
             ExcInvalidBoundaryIndicator());
 
-    // same as above, but with
-    // additional checks for set of
-    // boundary indicators
+    // same as above, but with additional checks for set of boundary
+    // indicators
     std::set<types::global_dof_index> boundary_dofs;
     std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
@@ -1764,13 +1521,10 @@ namespace hp
            ExcDimensionMismatch(active_fe_indices.size(), get_triangulation().n_active_cells()));
 
     create_active_fe_table ();
-    // we could set the values directly, since
-    // they are stored as protected data of
-    // this object, but for simplicity we use
-    // the cell-wise access. this way we also
-    // have to pass some debug-mode tests which
-    // we would have to duplicate ourselves
-    // otherwise
+    // we could set the values directly, since they are stored as
+    // protected data of this object, but for simplicity we use the
+    // cell-wise access. this way we also have to pass some debug-mode
+    // tests which we would have to duplicate ourselves otherwise
     active_cell_iterator cell=begin_active(),
                          endc=end();
     for (unsigned int i=0; cell!=endc; ++cell, ++i)
@@ -1784,10 +1538,9 @@ namespace hp
   {
     active_fe_indices.resize(get_triangulation().n_active_cells());
 
-    // we could try to extract the values directly, since
-    // they are stored as protected data of
-    // this object, but for simplicity we use
-    // the cell-wise access.
+    // we could try to extract the values directly, since they are
+    // stored as protected data of this object, but for simplicity we
+    // use the cell-wise access.
     active_cell_iterator cell=begin_active(),
                          endc=end();
     for (unsigned int i=0; cell!=endc; ++cell, ++i)
@@ -1803,15 +1556,12 @@ namespace hp
 
     finite_elements = &ff;
 
-    // This call ensures that the
-    // active_fe_indices vectors are
+    // This call ensures that the active_fe_indices vectors are
     // initialized correctly.
     create_active_fe_table ();
 
-    // up front make sure that the fe
-    // collection is large enough to
-    // cover all fe indices presently
-    // in use on the mesh
+    // up front make sure that the fe collection is large enough to
+    // cover all fe indices presently in use on the mesh
     for (active_cell_iterator cell = begin_active(); cell != end(); ++cell)
       Assert (cell->active_fe_index() < finite_elements->size(),
               ExcInvalidFEIndex (cell->active_fe_index(),
@@ -1821,14 +1571,10 @@ namespace hp
     // then allocate space for all the other tables
     dealii::internal::hp::DoFHandler::Implementation::reserve_space (*this);
 
-    // Clear user flags because we will
-    // need them. But first we save
-    // them and make sure that we
-    // restore them later such that at
-    // the end of this function the
-    // Triangulation will be in the
-    // same state as it was at the
-    // beginning of this function.
+    // Clear user flags because we will need them. But first we save
+    // them and make sure that we restore them later such that at the
+    // end of this function the Triangulation will be in the same
+    // state as it was at the beginning of this function.
     std::vector<bool> user_flags;
     tria->save_user_flags(user_flags);
     const_cast<Triangulation<dim,spacedim> &>(*tria).clear_user_flags ();
@@ -1882,8 +1628,7 @@ namespace hp
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 #ifdef DEBUG
-    // assert that the new indices are
-    // consecutively numbered
+    // assert that the new indices are consecutively numbered
     if (true)
       {
         std::vector<types::global_dof_index> tmp(new_numbers);
@@ -1895,8 +1640,8 @@ namespace hp
       }
 #endif
 
-    // uncompress the internal storage scheme of dofs on cells
-    // so that we can access dofs in turns. uncompress in parallel, starting
+    // uncompress the internal storage scheme of dofs on cells so that
+    // we can access dofs in turns. uncompress in parallel, starting
     // with the most expensive levels (the highest ones)
     {
       Threads::TaskGroup<> tg;
@@ -1946,19 +1691,15 @@ namespace hp
                 +
                 2*finite_elements->max_dofs_per_line());
       case 3:
-        // we need to take refinement of
-        // one boundary face into consideration
-        // here; in fact, this function returns
-        // what #max_coupling_between_dofs<2>
-        // returns
+        // we need to take refinement of one boundary face into
+        // consideration here; in fact, this function returns what
+        // #max_coupling_between_dofs<2> returns
         //
-        // we assume here, that only four faces
-        // meet at the boundary; this assumption
-        // is not justified and needs to be
-        // fixed some time. fortunately, omitting
-        // it for now does no harm since the
-        // matrix will cry foul if its requirements
-        // are not satisfied
+        // we assume here, that only four faces meet at the boundary;
+        // this assumption is not justified and needs to be fixed some
+        // time. fortunately, omitting it for now does no harm since
+        // the matrix will cry foul if its requirements are not
+        // satisfied
         return (19*finite_elements->max_dofs_per_vertex() +
                 28*finite_elements->max_dofs_per_line() +
                 8*finite_elements->max_dofs_per_quad());
@@ -1973,16 +1714,12 @@ namespace hp
   template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::create_active_fe_table ()
   {
-    // Create sufficiently many
-    // hp::DoFLevels.
+    // Create sufficiently many hp::DoFLevels.
     while (levels.size () < tria->n_levels ())
       levels.emplace_back (new dealii::internal::hp::DoFLevel);
 
-    // then make sure that on each
-    // level we have the appropriate
-    // size of active_fe_indices;
-    // preset them to zero, i.e. the
-    // default FE
+    // then make sure that on each level we have the appropriate size
+    // of active_fe_indices; preset them to zero, i.e. the default FE
     for (unsigned int level=0; level<levels.size(); ++level)
       {
         if (levels[level]->active_fe_indices.size () == 0)
@@ -1990,14 +1727,9 @@ namespace hp
                                                    0);
         else
           {
-            // Either the
-            // active_fe_indices have
-            // size zero because they
-            // were just created, or
-            // the correct
-            // size. Other sizes
-            // indicate that
-            // something went wrong.
+            // Either the active_fe_indices have size zero because
+            // they were just created, or the correct size. Other
+            // sizes indicate that something went wrong.
             Assert (levels[level]->active_fe_indices.size () ==
                     tria->n_raw_cells(level),
                     ExcInternalError ());
@@ -2019,19 +1751,17 @@ namespace hp
   {
     create_active_fe_table ();
 
-    // Remember if the cells already have
-    // children. That will make the transfer
-    // of the active_fe_index to the finer
-    // levels easier.
+    // Remember if the cells already have children. That will make the
+    // transfer of the active_fe_index to the finer levels easier.
     Assert (has_children.size () == 0, ExcInternalError ());
     for (unsigned int i=0; i<levels.size(); ++i)
       {
         const unsigned int cells_on_level = tria->n_raw_cells(i);
         std::unique_ptr<std::vector<bool> > has_children_level(new std::vector<bool> (cells_on_level));
 
-        // Check for each cell, if it has children. in 1d,
-        // we don't store refinement cases, so use the 'children'
-        // vector instead
+        // Check for each cell, if it has children. in 1d, we don't
+        // store refinement cases, so use the 'children' vector
+        // instead
         if (dim == 1)
           std::transform (tria->levels[i]->cells.children.begin (),
                           tria->levels[i]->cells.children.end (),
@@ -2064,8 +1794,7 @@ namespace hp
     while (levels.size () < tria->n_levels ())
       levels.emplace_back (new dealii::internal::hp::DoFLevel);
 
-    // Coarsening can lead to the loss
-    // of levels. Hence remove them.
+    // Coarsening can lead to the loss of levels. Hence remove them.
     while (levels.size () > tria->n_levels ())
       {
         // drop the last element. that also releases the memory pointed to
@@ -2074,25 +1803,16 @@ namespace hp
 
     Assert(levels.size () == tria->n_levels (), ExcInternalError());
 
-    // Resize active_fe_indices
-    // vectors. use zero indicator to
-    // extend
+    // Resize active_fe_indices vectors. use zero indicator to extend
     for (unsigned int i=0; i<levels.size(); ++i)
       levels[i]->active_fe_indices.resize (tria->n_raw_cells(i), 0);
 
-    // if a finite element collection
-    // has already been set, then
-    // actually try to set
-    // active_fe_indices for child
-    // cells of refined cells to the
-    // active_fe_index of the mother
-    // cell. if no finite element
-    // collection has been assigned
-    // yet, then all indicators are
-    // zero anyway, and there is no
-    // point trying to set anything
-    // (besides, we would trip over
-    // an assertion in
+    // if a finite element collection has already been set, then
+    // actually try to set active_fe_indices for child cells of
+    // refined cells to the active_fe_index of the mother cell. if no
+    // finite element collection has been assigned yet, then all
+    // indicators are zero anyway, and there is no point trying to set
+    // anything (besides, we would trip over an assertion in
     // set_active_fe_index)
     if (finite_elements != nullptr)
       {
@@ -2105,17 +1825,14 @@ namespace hp
             // children before refinement (the has_children array is
             // set in pre-refinement action)
             //
-            // Note: Although one level is added to
-            // the DoFHandler levels, when the
-            // triangulation got one, for the buffer
-            // has_children this new level is not
-            // required, because the cells on the
-            // finest level never have children. Hence
-            // cell->has_children () will always return
-            // false on that level, which would cause
-            // shortcut evaluation of the following
-            // expression. Thus an index error in
-            // has_children should never occur.
+            // Note: Although one level is added to the DoFHandler
+            // levels, when the triangulation got one, for the buffer
+            // has_children this new level is not required, because
+            // the cells on the finest level never have
+            // children. Hence cell->has_children () will always
+            // return false on that level, which would cause shortcut
+            // evaluation of the following expression. Thus an index
+            // error in has_children should never occur.
             if (cell->has_children () &&
                 !(*has_children [cell->level ()])[cell->index ()])
               {
