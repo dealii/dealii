@@ -1174,7 +1174,7 @@ namespace internal
     template<typename number, typename = void>
     struct Determinant
     {
-      static number value (const FullMatrix<number> &A)
+      static number value (const FullMatrix<number> &)
       {
         AssertThrow(false, ExcNotImplemented());
         return 0.0;
