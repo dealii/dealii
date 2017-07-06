@@ -2217,9 +2217,9 @@ namespace internal
       /* --------------------- class ParallelShared ---------------- */
 
 
-      template <int dim, int spacedim>
-      ParallelShared<dim,spacedim>::
-      ParallelShared (dealii::DoFHandler<dim,spacedim> &dof_handler)
+      template <class DoFHandlerType>
+      ParallelShared<DoFHandlerType>::
+      ParallelShared (DoFHandlerType &dof_handler)
         :
         dof_handler (&dof_handler)
       {}
@@ -2300,11 +2300,14 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <class DoFHandlerType>
       NumberCache
-      ParallelShared<dim,spacedim>::
+      ParallelShared<DoFHandlerType>::
       distribute_dofs () const
       {
+        const unsigned int dim      = DoFHandlerType::dimension;
+        const unsigned int spacedim = DoFHandlerType::space_dimension;
+
         const parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
@@ -2455,9 +2458,9 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <class DoFHandlerType>
       std::vector<NumberCache>
-      ParallelShared<dim,spacedim>::
+      ParallelShared<DoFHandlerType>::
       distribute_mg_dofs () const
       {
         // this is not currently implemented; the algorithm should work
@@ -2472,9 +2475,9 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <class DoFHandlerType>
       NumberCache
-      ParallelShared<dim,spacedim>::
+      ParallelShared<DoFHandlerType>::
       renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const
       {
 
@@ -2483,6 +2486,9 @@ namespace internal
         Assert (false, ExcNotImplemented());
         return NumberCache();
 #else
+        const unsigned int dim      = DoFHandlerType::dimension;
+        const unsigned int spacedim = DoFHandlerType::space_dimension;
+
         // Similar to distribute_dofs() we need to have a special treatment in
         // case artificial cells are present.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
@@ -2610,9 +2616,9 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <class DoFHandlerType>
       NumberCache
-      ParallelShared<dim,spacedim>::
+      ParallelShared<DoFHandlerType>::
       renumber_mg_dofs (const unsigned int                          /*level*/,
                         const std::vector<types::global_dof_index> &/*new_numbers*/) const
       {
