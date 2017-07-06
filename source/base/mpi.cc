@@ -345,6 +345,10 @@ namespace Utilities
       ierr = PetscInitialize(&argc, &argv, nullptr, nullptr);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 #  endif
+
+      // Disable PETSc exception handling. This just prints a large wall
+      // of text that is not particularly helpful for what we do:
+      PetscPopSignalHandler();
 #endif
 
 #ifdef DEAL_II_WITH_P4EST
