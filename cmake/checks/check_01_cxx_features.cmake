@@ -442,12 +442,44 @@ ELSE()
 ENDIF()
 
 #
-# Enable c++17's [[fallthrough]] attribute.
+# Try to enable a fallthrough attribute. This is a language feature in C++17,
+# but a compiler extension in earlier language versions: check both
+# possibilities here.
 #
 IF(DEAL_II_WITH_CXX17)
   SET(DEAL_II_FALLTHROUGH "[[fallthrough]]")
 ELSE()
-  SET(DEAL_II_FALLTHROUGH " ")
+  # see if the current compiler configuration supports the GCC extension
+  # __attribute__((fallthrough)) syntax instead
+  PUSH_CMAKE_REQUIRED("-Werror")
+  PUSH_CMAKE_REQUIRED("-Wextra")
+  PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    int main()
+    {
+      int i = 42;
+      int j = 10;
+      switch(i)
+        {
+        case 1:
+          ++j;
+          __attribute__((fallthrough));
+        case 2:
+          ++j;
+          __attribute__((fallthrough));
+        default:
+          break;
+        }
+    }
+    "
+    DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
+  RESET_CMAKE_REQUIRED()
+  IF(DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
+    SET(DEAL_II_FALLTHROUGH "__attribute__((fallthrough))")
+  ELSE()
+    SET(DEAL_II_FALLTHROUGH " ")
+  ENDIF()
 ENDIF()
 
 
