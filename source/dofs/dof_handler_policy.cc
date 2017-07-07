@@ -913,12 +913,12 @@ namespace internal
         }
 
 
+        template <int spacedim>
         static
         std::map<types::global_dof_index, types::global_dof_index>
-        compute_quad_dof_identities (hp::DoFHandler<3,3> &dof_handler)
+        compute_quad_dof_identities (hp::DoFHandler<3,spacedim> &dof_handler)
         {
           const int dim = 3;
-          const int spacedim = 3;
 
           std::map<types::global_dof_index, types::global_dof_index> dof_identities;
 
@@ -945,7 +945,7 @@ namespace internal
           quad_dof_identities (dof_handler.finite_elements->size(),
                                dof_handler.finite_elements->size());
 
-          for (hp::DoFHandler<dim,spacedim>::active_cell_iterator
+          for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
                cell=dof_handler.begin_active();
                cell!=dof_handler.end(); ++cell)
             for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
@@ -953,7 +953,7 @@ namespace internal
                   &&
                   (cell->quad(q)->n_active_fe_indices() == 2))
                 {
-                  const hp::DoFHandler<dim,spacedim>::quad_iterator quad = cell->quad(q);
+                  const typename hp::DoFHandler<dim,spacedim>::quad_iterator quad = cell->quad(q);
                   quad->set_user_flag ();
 
                   // find out which is the most dominating finite
@@ -1047,24 +1047,27 @@ namespace internal
           // compute the constraints that correspond to unifying
           // dof indices on vertices, lines, and quads. do so
           // in parallel
-          std::map<types::global_dof_index, types::global_dof_index>
-          constrained_vertex_indices, constrained_line_indices, constrained_quad_indices;
+          std::map<types::global_dof_index, types::global_dof_index> all_constrained_indices[dim];
 
           {
             Threads::TaskGroup<> tasks;
 
             tasks += Threads::new_task ([&]()
             {
-              constrained_vertex_indices = compute_vertex_dof_identities (dof_handler);
+              all_constrained_indices[0] = compute_vertex_dof_identities (dof_handler);
             });
-            tasks += Threads::new_task ([&]()
-            {
-              constrained_line_indices = compute_line_dof_identities (dof_handler);
-            });
-            tasks += Threads::new_task ([&]()
-            {
-              constrained_quad_indices = compute_quad_dof_identities (dof_handler);
-            });
+
+            if (dim > 1)
+              tasks += Threads::new_task ([&]()
+              {
+                all_constrained_indices[1] = compute_line_dof_identities (dof_handler);
+              });
+
+            if (dim > 2)
+              tasks += Threads::new_task ([&]()
+              {
+                all_constrained_indices[2] = compute_quad_dof_identities (dof_handler);
+              });
 
             tasks.join_all ();
           }
@@ -1074,18 +1077,13 @@ namespace internal
           std::vector<types::global_dof_index>
           new_dof_indices (n_dofs_before_identification, numbers::invalid_dof_index);
 
-          for (const auto &constrained_dof_indices :
-          {
-            &constrained_vertex_indices,
-            &constrained_line_indices,
-            &constrained_quad_indices
-          })
-          for (const auto &p : *constrained_dof_indices)
-            {
-              Assert (new_dof_indices[p.first] == numbers::invalid_dof_index,
-                      ExcInternalError());
-              new_dof_indices[p.first] = p.second;
-            }
+          for (const auto &constrained_dof_indices : all_constrained_indices)
+            for (const auto &p : constrained_dof_indices)
+              {
+                Assert (new_dof_indices[p.first] == numbers::invalid_dof_index,
+                        ExcInternalError());
+                new_dof_indices[p.first] = p.second;
+              }
 
           types::global_dof_index next_free_dof = 0;
           for (types::global_dof_index i=0; i<n_dofs_before_identification; ++i)
@@ -1095,22 +1093,16 @@ namespace internal
                 ++next_free_dof;
               }
 
-          // then loop over all those that
-          // are constrained and record the
+          // then loop over all those that are constrained and record the
           // new dof number for those:
-          for (const auto &constrainted_dof_indices :
-          {
-            &constrained_vertex_indices,
-            &constrained_line_indices,
-            &constrained_quad_indices
-          })
-          for (const auto &p : *constrainted_dof_indices)
-            {
-              Assert (new_dof_indices[p.first] != numbers::invalid_dof_index,
-                      ExcInternalError());
+          for (const auto &constrained_dof_indices : all_constrained_indices)
+            for (const auto &p : constrained_dof_indices)
+              {
+                Assert (new_dof_indices[p.first] != numbers::invalid_dof_index,
+                        ExcInternalError());
 
-              new_dof_indices[p.first] = new_dof_indices[p.second];
-            }
+                new_dof_indices[p.first] = new_dof_indices[p.second];
+              }
 
           for (types::global_dof_index i=0; i<n_dofs_before_identification; ++i)
             {
