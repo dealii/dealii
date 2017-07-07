@@ -66,7 +66,8 @@ namespace internal
   std::string policy_to_string(const dealii::internal::DoFHandler::Policy::PolicyBase<dim,spacedim> &policy)
   {
     std::string policy_name;
-    if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dealii::DoFHandler<dim,spacedim> >*>(&policy))
+    if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dealii::DoFHandler<dim,spacedim> >*>(&policy)
+        || dynamic_cast<const typename dealii::internal::DoFHandler::Policy::Sequential<dealii::hp::DoFHandler<dim,spacedim> >*>(&policy))
       policy_name = "Policy::Sequential<";
     else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>*>(&policy))
       policy_name = "Policy::ParallelDistributed<";
