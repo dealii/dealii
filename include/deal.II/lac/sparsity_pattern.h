@@ -38,6 +38,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 class SparsityPattern;
+class DynamicSparsityPattern;
 class ChunkSparsityPattern;
 template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
@@ -630,15 +631,16 @@ public:
                   const ForwardIterator end);
 
   /**
-   * Copy data from an object of type DynamicSparsityPattern. Although not a
-   * compressed sparsity pattern, this function is also instantiated if the
-   * argument is of type SparsityPattern (i.e., the current class). Previous
-   * content of this object is lost, and the sparsity pattern is in compressed
-   * mode afterwards.
+   * Copy data from a DynamicSparsityPattern. Previous content of this object
+   * is lost, and the sparsity pattern is in compressed mode afterwards.
    */
-  template <typename SparsityPatternType>
-  void copy_from (const SparsityPatternType &dsp);
+  void copy_from (const DynamicSparsityPattern &dsp);
 
+  /**
+   * Copy data from a SparsityPattern. Previous content of this object is
+   * lost, and the sparsity pattern is in compressed mode afterwards.
+   */
+  void copy_from (const SparsityPattern &sp);
 
   /**
    * Take a full matrix and use its nonzero entries to generate a sparse
