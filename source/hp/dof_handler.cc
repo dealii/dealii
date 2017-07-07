@@ -1620,18 +1620,34 @@ namespace hp
   template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_index> &new_numbers)
   {
-    Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
+    Assert(levels.size()>0, ExcMessage("You need to distribute DoFs before you can renumber them."));
+
+    Assert (new_numbers.size() == n_locally_owned_dofs(),
+            ExcRenumberingIncomplete());
+
 #ifdef DEBUG
-    // assert that the new indices are consecutively numbered
-    if (true)
+    // assert that the new indices are
+    // consecutively numbered if we are
+    // working on a single
+    // processor. this doesn't need to
+    // hold in the case of a parallel
+    // mesh since we map the interval
+    // [0...n_dofs()) into itself but
+    // only globally, not on each
+    // processor
+    if (n_locally_owned_dofs() == n_dofs())
       {
         std::vector<types::global_dof_index> tmp(new_numbers);
         std::sort (tmp.begin(), tmp.end());
         std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
-        types::global_dof_index                              i = 0;
+        types::global_dof_index i = 0;
         for (; p!=tmp.end(); ++p, ++i)
           Assert (*p == i, ExcNewNumbersNotConsecutive(i));
       }
+    else
+      for (types::global_dof_index i=0; i<new_numbers.size(); ++i)
+        Assert (new_numbers[i] < n_dofs(),
+                ExcMessage ("New DoF index is not less than the total number of dofs."));
 #endif
 
     // uncompress the internal storage scheme of dofs on cells so that
