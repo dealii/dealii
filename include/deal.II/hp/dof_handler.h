@@ -790,27 +790,6 @@ namespace hp
     void post_refinement_action ();
 
     /**
-     * Compute identities between DoFs located on vertices. Called from
-     * distribute_dofs().
-     */
-    void
-    compute_vertex_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const;
-
-    /**
-     * Compute identities between DoFs located on lines. Called from
-     * distribute_dofs().
-     */
-    void
-    compute_line_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const;
-
-    /**
-     * Compute identities between DoFs located on quads. Called from
-     * distribute_dofs().
-     */
-    void
-    compute_quad_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const;
-
-    /**
      * Space to store the DoF numbers for the different levels. Analogous to
      * the <tt>levels[]</tt> tree of the Triangulation objects.
      */
