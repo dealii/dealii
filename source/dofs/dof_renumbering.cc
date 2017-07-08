@@ -510,9 +510,7 @@ namespace DoFRenumbering
     end = dof_handler.end();
 
     const types::global_dof_index result =
-      compute_component_wise<DoFHandlerType::dimension,DoFHandlerType::space_dimension,
-      typename DoFHandlerType::active_cell_iterator,
-      typename DoFHandlerType::level_cell_iterator>
+      compute_component_wise<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
       (renumbering, start, end, component_order_arg, false);
     if (result == 0)
       return;
@@ -552,8 +550,7 @@ namespace DoFRenumbering
     typename DoFHandlerType::level_cell_iterator end = dof_handler.end(level);
 
     const types::global_dof_index result =
-      compute_component_wise<DoFHandlerType::dimension, DoFHandlerType::space_dimension,
-      typename DoFHandlerType::level_cell_iterator, typename DoFHandlerType::level_cell_iterator>
+      compute_component_wise<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
       (renumbering, start, end, component_order_arg, true);
 
     if (result == 0) return;
@@ -567,13 +564,13 @@ namespace DoFRenumbering
 
 
 
-  template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
+  template <int dim, int spacedim, typename CellIterator>
   types::global_dof_index
-  compute_component_wise (std::vector<types::global_dof_index> &new_indices,
-                          const ITERATOR    &start,
-                          const ENDITERATOR &end,
-                          const std::vector<unsigned int> &component_order_arg,
-                          bool is_level_operation)
+  compute_component_wise (std::vector<types::global_dof_index>        &new_indices,
+                          const CellIterator                          &start,
+                          const typename identity<CellIterator>::type &end,
+                          const std::vector<unsigned int>             &component_order_arg,
+                          const bool                                   is_level_operation)
   {
     const hp::FECollection<dim,spacedim>
     fe_collection (start->get_dof_handler().get_fe ());
@@ -653,7 +650,7 @@ namespace DoFRenumbering
     // take care of that
     std::vector<std::vector<types::global_dof_index> >
     component_to_dof_map (fe_collection.n_components());
-    for (ITERATOR cell=start; cell!=end; ++cell)
+    for (CellIterator cell=start; cell!=end; ++cell)
       {
         if (is_level_operation)
           {

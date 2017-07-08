@@ -639,13 +639,13 @@ namespace DoFRenumbering
    * Does not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
-  template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
+  template <int dim, int spacedim, typename CellIterator>
   types::global_dof_index
-  compute_component_wise (std::vector<types::global_dof_index> &new_dof_indices,
-                          const ITERATOR &start,
-                          const ENDITERATOR &end,
-                          const std::vector<unsigned int> &target_component,
-                          bool is_level_operation);
+  compute_component_wise (std::vector<types::global_dof_index>        &new_dof_indices,
+                          const CellIterator                          &start,
+                          const typename identity<CellIterator>::type &end,
+                          const std::vector<unsigned int>             &target_component,
+                          const bool                                   is_level_operation);
 
   /**
    * @}
