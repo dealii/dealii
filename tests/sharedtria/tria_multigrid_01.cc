@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id: 3d_refinement_01.cc 31349 2013-10-20 19:07:06Z maier $
 //
 // Copyright (C) 2008 - 2015 by the deal.II authors
 //
@@ -28,9 +27,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_out.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/numerics/data_out.h>
 
 #include <fstream>
 
