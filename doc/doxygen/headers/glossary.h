@@ -940,7 +940,7 @@
  *
  * The concept of ghost cells has no meaning for triangulations that
  * store the entire mesh on each processor, i.e. the
- * dealii::Triangulation class.
+ * Triangulation and the parallel::shared::Triangulation classes.
  * </dd>
  *
  *
