@@ -130,6 +130,26 @@ source files.
   handle run time errors (like I/O failures) which must be on
   in any case, not only in debug mode.</li>
 
+<li> Sometimes it makes sense to implement a class by using several
+  non-member functions that are not part of the public interface and are only
+  meant to be called in the current source file. Such free functions should be
+  put in an anonymous namespace structured in the following way:
+  <code>
+  <pre>
+  namespace internal
+  {
+    namespace ClassName
+    {
+      namespace
+      {
+        // free functions go here
+      }
+    }
+  }
+  </pre>
+  </code>
+  where <code>ClassName</code> is the name of the calling class.
+
 <li> Classes and types generally are named using uppercase letters to denote
   word beginnings (e.g. TriaIterator) &mdash; sometimes called
   <a href="http://en.wikipedia.org/wiki/Camel_case"><i>camel
