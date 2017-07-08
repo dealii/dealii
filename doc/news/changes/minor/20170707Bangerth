@@ -1,0 +1,6 @@
+New: The DoFRenumbering::component_wise() function was available for
+all dimensions and space dimensions for regular DoFHandler objects,
+but only for dimension == space_dimension for hp::DoFHandler. This is
+now fixed.
+<br>
+(Wolfgang Bangerth, 2017/07/07)

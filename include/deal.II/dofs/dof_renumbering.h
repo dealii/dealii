@@ -614,21 +614,12 @@ namespace DoFRenumbering
    * For finite elements with only one component, or a single non-primitive
    * base element, this function is the identity operation.
    */
-  template <int dim, int spacedim>
+  template <typename DoFHandlerType>
   void
-  component_wise (DoFHandler<dim,spacedim>        &dof_handler,
+  component_wise (DoFHandlerType                  &dof_handler,
                   const std::vector<unsigned int> &target_component
                   = std::vector<unsigned int>());
 
-
-  /**
-   * Sort the degrees of freedom by component. It does the same thing as the
-   * above function.
-   */
-  template <int dim>
-  void
-  component_wise (hp::DoFHandler<dim>             &dof_handler,
-                  const std::vector<unsigned int> &target_component = std::vector<unsigned int> ());
 
   /**
    * Sort the degrees of freedom by component. It does the same thing as the
