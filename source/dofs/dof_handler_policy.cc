@@ -141,19 +141,14 @@ namespace internal
 
 
         /**
-         * Make sure that the given @p
-         * identities pointer points to a
-         * valid array. If the pointer is
-         * zero beforehand, create an
-         * entry with the correct
-         * data. If it is nonzero, don't
-         * touch it.
+         * Make sure that the given @p identities pointer points to a
+         * valid array. If the pointer is zero beforehand, create an
+         * entry with the correct data. If it is nonzero, don't touch
+         * it.
          *
-         * @p structdim denotes the
-         * dimension of the objects on
-         * which identities are to be
-         * represented, i.e. zero for
-         * vertices, one for lines, etc.
+         * @p structdim denotes the dimension of the objects on which
+         * identities are to be represented, i.e. zero for vertices,
+         * one for lines, etc.
          */
         template <int structdim, int dim, int spacedim>
         void
@@ -161,8 +156,7 @@ namespace internal
                                             const FiniteElement<dim,spacedim> &fe2,
                                             std::shared_ptr<DoFIdentities> &identities)
         {
-          // see if we need to fill this
-          // entry, or whether it already
+          // see if we need to fill this entry, or whether it already
           // exists
           if (identities.get() == nullptr)
             {
@@ -196,9 +190,8 @@ namespace internal
                   Assert (false, ExcNotImplemented());
                 }
 
-              // double check whether the
-              // newly created entries
-              // make any sense at all
+              // double check whether the newly created entries make
+              // any sense at all
               for (unsigned int i=0; i<identities->size(); ++i)
                 {
                   Assert ((*identities)[i].first < fe1.template n_dofs_per_object<structdim>(),
@@ -212,10 +205,8 @@ namespace internal
 
 
         /**
-         * For an object, such as a line
-         * or a quad iterator, determine
-         * the fe_index of the most
-         * dominating finite element that
+         * For an object, such as a line or a quad iterator, determine
+         * the fe_index of the most dominating finite element that
          * lives on this object.
          *
          * Return numbers::invalid_unsigned_int if we couldn't find one.
@@ -246,10 +237,8 @@ namespace internal
                                  this_fe.compare_for_face_domination(that_fe);
                   }
 
-              // see if this element is
-              // able to dominate all the
-              // other ones, and if so
-              // take it
+              // see if this element is able to dominate all the other
+              // ones, and if so take it
               if ((domination == FiniteElementDomination::this_element_dominates)
                   ||
                   (domination == FiniteElementDomination::either_element_can_dominate)
@@ -258,14 +247,11 @@ namespace internal
                 break;
             }
 
-          // check that we have
-          // found one such fe
+          // check that we have found one such fe
           if (dominating_fe_index != object->n_active_fe_indices())
             {
-              // return the finite element
-              // index used on it. note
-              // that only a single fe can
-              // be active on such subfaces
+              // return the finite element index used on it. note that
+              // only a single fe can be active on such subfaces
               return object->nth_active_fe_index(dominating_fe_index);
             }
           else
