@@ -1,0 +1,7 @@
+Changed: The DoFRenumbering::compute_component_wise() function used to
+take two template arguments that denote iterator types, one for the
+begin and one for the end iterator. This has been changed: It now only
+takes an iterator type argument for the begin iterator, and the end
+iterator is automatically casted to that same type.
+<br>
+(Wolfgang Bangerth, 2017/07/08)
