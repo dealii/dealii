@@ -482,33 +482,32 @@ SparsityPattern::compress ()
 
 
 
-template <typename SparsityPatternType>
 void
-SparsityPattern::copy_from (const SparsityPatternType &dsp)
+SparsityPattern::copy_from (const SparsityPattern &sp)
 {
   // first determine row lengths for each row. if the matrix is quadratic,
   // then we might have to add an additional entry for the diagonal, if that
   // is not yet present. as we have to call compress anyway later on, don't
   // bother to check whether that diagonal entry is in a certain row or not
-  const bool do_diag_optimize = (dsp.n_rows() == dsp.n_cols());
-  std::vector<unsigned int> row_lengths (dsp.n_rows());
-  for (size_type i=0; i<dsp.n_rows(); ++i)
+  const bool do_diag_optimize = (sp.n_rows() == sp.n_cols());
+  std::vector<unsigned int> row_lengths (sp.n_rows());
+  for (size_type i=0; i<sp.n_rows(); ++i)
     {
-      row_lengths[i] = dsp.row_length(i);
-      if (do_diag_optimize && !dsp.exists(i,i))
+      row_lengths[i] = sp.row_length(i);
+      if (do_diag_optimize && !sp.exists(i,i))
         ++row_lengths[i];
     }
-  reinit (dsp.n_rows(), dsp.n_cols(), row_lengths);
+  reinit (sp.n_rows(), sp.n_cols(), row_lengths);
 
   // now enter all the elements into the matrix, if there are any. note that
   // if the matrix is quadratic, then we already have the diagonal element
   // preallocated
   if (n_rows() != 0 && n_cols() != 0)
-    for (size_type row = 0; row<dsp.n_rows(); ++row)
+    for (size_type row = 0; row<sp.n_rows(); ++row)
       {
         size_type *cols = &colnums[rowstart[row]] + (do_diag_optimize ? 1 : 0);
-        typename SparsityPatternType::iterator col_num = dsp.begin (row),
-                                               end_row = dsp.end (row);
+        typename SparsityPattern::iterator col_num = sp.begin (row),
+                                           end_row = sp.end (row);
 
         for (; col_num != end_row; ++col_num)
           {
@@ -519,8 +518,8 @@ SparsityPattern::copy_from (const SparsityPatternType &dsp)
       }
 
   // do not need to compress the sparsity pattern since we already have
-  // allocated the right amount of data, and the SparsityPatternType data is sorted,
-  // too.
+  // allocated the right amount of data, and the SparsityPattern data is
+  // sorted, too.
   compressed = true;
 }
 
@@ -531,7 +530,6 @@ SparsityPattern::copy_from (const SparsityPatternType &dsp)
 // entries. DynamicSparsityPattern::iterator can show quadratic complexity in
 // case many rows are empty and the begin() method needs to jump to the next
 // free row. Otherwise, the code is exactly the same as above.
-template <>
 void
 SparsityPattern::copy_from (const DynamicSparsityPattern &dsp)
 {
@@ -1038,7 +1036,6 @@ SparsityPattern::memory_consumption () const
 
 
 // explicit instantiations
-template void SparsityPattern::copy_from<SparsityPattern> (const SparsityPattern &);
 template void SparsityPattern::copy_from<float> (const FullMatrix<float> &);
 template void SparsityPattern::copy_from<double> (const FullMatrix<double> &);
 
