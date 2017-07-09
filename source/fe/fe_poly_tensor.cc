@@ -23,109 +23,116 @@
 #include <deal.II/fe/fe_poly_tensor.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_cartesian.h>
+#include <deal.II/grid/tria.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace
+namespace internal
 {
-//---------------------------------------------------------------------------
-// Utility method, which is used to determine the change of sign for
-// the DoFs on the faces of the given cell.
-//---------------------------------------------------------------------------
-
-  /**
-   * On noncartesian grids, the sign of the DoFs associated with the faces of
-   * the elements has to be changed in some cases.  This procedure implements an
-   * algorithm, which determines the DoFs, which need this sign change for a
-   * given cell.
-   */
-  void
-  get_face_sign_change_rt (const Triangulation<1>::cell_iterator &,
-                           const unsigned int,
-                           std::vector<double>                   &face_sign)
+  namespace FE_PolyTensor
   {
-    // nothing to do in 1d
-    std::fill (face_sign.begin (), face_sign.end (), 1.0);
-  }
+    namespace
+    {
+      //---------------------------------------------------------------------------
+      // Utility method, which is used to determine the change of sign for
+      // the DoFs on the faces of the given cell.
+      //---------------------------------------------------------------------------
 
-
-
-  void
-  get_face_sign_change_rt (const Triangulation<2>::cell_iterator &cell,
-                           const unsigned int                     dofs_per_face,
-                           std::vector<double>                   &face_sign)
-  {
-    const unsigned int dim = 2;
-    const unsigned int spacedim = 2;
-
-    // Default is no sign
-    // change. I.e. multiply by one.
-    std::fill (face_sign.begin (), face_sign.end (), 1.0);
-
-    for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2;
-         f < GeometryInfo<dim>::faces_per_cell; ++f)
+      /**
+       * On noncartesian grids, the sign of the DoFs associated with the faces of
+       * the elements has to be changed in some cases.  This procedure implements an
+       * algorithm, which determines the DoFs, which need this sign change for a
+       * given cell.
+       */
+      void
+      get_face_sign_change_rt (const dealii::Triangulation<1>::cell_iterator &,
+                               const unsigned int,
+                               std::vector<double>                           &face_sign)
       {
-        Triangulation<dim,spacedim>::face_iterator face = cell->face (f);
-        if (!face->at_boundary ())
+        // nothing to do in 1d
+        std::fill (face_sign.begin (), face_sign.end (), 1.0);
+      }
+
+
+
+      void
+      get_face_sign_change_rt (const dealii::Triangulation<2>::cell_iterator &cell,
+                               const unsigned int                             dofs_per_face,
+                               std::vector<double>                           &face_sign)
+      {
+        const unsigned int dim = 2;
+        const unsigned int spacedim = 2;
+
+        // Default is no sign
+        // change. I.e. multiply by one.
+        std::fill (face_sign.begin (), face_sign.end (), 1.0);
+
+        for (unsigned int f = GeometryInfo<dim>::faces_per_cell / 2;
+             f < GeometryInfo<dim>::faces_per_cell; ++f)
           {
-            const unsigned int nn = cell->neighbor_face_no(f);
+            dealii::Triangulation<dim,spacedim>::face_iterator face = cell->face (f);
+            if (!face->at_boundary ())
+              {
+                const unsigned int nn = cell->neighbor_face_no(f);
 
-            if (nn < GeometryInfo<dim>::faces_per_cell / 2)
-              for (unsigned int j = 0; j < dofs_per_face; ++j)
-                {
-                  Assert (f * dofs_per_face + j < face_sign.size(),
-                          ExcInternalError());
+                if (nn < GeometryInfo<dim>::faces_per_cell / 2)
+                  for (unsigned int j = 0; j < dofs_per_face; ++j)
+                    {
+                      Assert (f * dofs_per_face + j < face_sign.size(),
+                              ExcInternalError());
 
-//TODO: This is probably only going to work for those elements for which all dofs are face dofs
-                  face_sign[f * dofs_per_face + j] = -1.0;
-                }
+                      //TODO: This is probably only going to work for those elements for which all dofs are face dofs
+                      face_sign[f * dofs_per_face + j] = -1.0;
+                    }
+              }
           }
       }
-  }
 
 
 
-  void
-  get_face_sign_change_rt (const Triangulation<3>::cell_iterator &/*cell*/,
-                           const unsigned int                     /*dofs_per_face*/,
-                           std::vector<double>                   &face_sign)
-  {
-    std::fill (face_sign.begin (), face_sign.end (), 1.0);
-//TODO: think about what it would take here
-  }
+      void
+      get_face_sign_change_rt (const dealii::Triangulation<3>::cell_iterator &/*cell*/,
+                               const unsigned int                             /*dofs_per_face*/,
+                               std::vector<double>                           &face_sign)
+      {
+        std::fill (face_sign.begin (), face_sign.end (), 1.0);
+        //TODO: think about what it would take here
+      }
 
-  void
-  get_face_sign_change_nedelec (const Triangulation<1>::cell_iterator &/*cell*/,
-                                const unsigned int                     /*dofs_per_face*/,
-                                std::vector<double>                   &face_sign)
-  {
-    // nothing to do in 1d
-    std::fill (face_sign.begin (), face_sign.end (), 1.0);
-  }
-
-
-
-  void
-  get_face_sign_change_nedelec (const Triangulation<2>::cell_iterator &/*cell*/,
-                                const unsigned int                     /*dofs_per_face*/,
-                                std::vector<double>                   &face_sign)
-  {
-    std::fill (face_sign.begin (), face_sign.end (), 1.0);
-//TODO: think about what it would take here
-  }
+      void
+      get_face_sign_change_nedelec (const dealii::Triangulation<1>::cell_iterator &/*cell*/,
+                                    const unsigned int                             /*dofs_per_face*/,
+                                    std::vector<double>                           &face_sign)
+      {
+        // nothing to do in 1d
+        std::fill (face_sign.begin (), face_sign.end (), 1.0);
+      }
 
 
-  void
-  get_face_sign_change_nedelec (const Triangulation<3>::cell_iterator &cell,
-                                const unsigned int                     /*dofs_per_face*/,
-                                std::vector<double>                   &face_sign)
-  {
-    const unsigned int dim = 3;
-    std::fill (face_sign.begin (), face_sign.end (), 1.0);
-//TODO: This is probably only going to work for those elements for which all dofs are face dofs
-    for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
-      if (!(cell->line_orientation (l)))
-        face_sign[l] = -1.0;
+
+      void
+      get_face_sign_change_nedelec (const dealii::Triangulation<2>::cell_iterator &/*cell*/,
+                                    const unsigned int                             /*dofs_per_face*/,
+                                    std::vector<double>                           &face_sign)
+      {
+        std::fill (face_sign.begin (), face_sign.end (), 1.0);
+        //TODO: think about what it would take here
+      }
+
+
+      void
+      get_face_sign_change_nedelec (const dealii::Triangulation<3>::cell_iterator &cell,
+                                    const unsigned int                             /*dofs_per_face*/,
+                                    std::vector<double>                           &face_sign)
+      {
+        const unsigned int dim = 3;
+        std::fill (face_sign.begin (), face_sign.end (), 1.0);
+        //TODO: This is probably only going to work for those elements for which all dofs are face dofs
+        for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+          if (!(cell->line_orientation (l)))
+            face_sign[l] = -1.0;
+      }
+    }
   }
 }
 
@@ -335,9 +342,9 @@ fill_fe_values
   std::fill( fe_data.sign_change.begin(), fe_data.sign_change.end(), 1.0 );
 
   if (mapping_type == mapping_raviart_thomas)
-    get_face_sign_change_rt (cell, this->dofs_per_face, fe_data.sign_change);
+    internal::FE_PolyTensor::get_face_sign_change_rt (cell, this->dofs_per_face, fe_data.sign_change);
   else if (mapping_type == mapping_nedelec)
-    get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
+    internal::FE_PolyTensor::get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
 
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
@@ -816,10 +823,10 @@ fill_fe_face_values
   std::fill( fe_data.sign_change.begin(), fe_data.sign_change.end(), 1.0 );
 
   if (mapping_type == mapping_raviart_thomas)
-    get_face_sign_change_rt (cell, this->dofs_per_face, fe_data.sign_change);
+    internal::FE_PolyTensor::get_face_sign_change_rt (cell, this->dofs_per_face, fe_data.sign_change);
 
   else if (mapping_type == mapping_nedelec)
-    get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
+    internal::FE_PolyTensor::get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
@@ -1295,10 +1302,10 @@ fill_fe_subface_values
   std::fill( fe_data.sign_change.begin(), fe_data.sign_change.end(), 1.0 );
 
   if (mapping_type == mapping_raviart_thomas)
-    get_face_sign_change_rt (cell, this->dofs_per_face, fe_data.sign_change);
+    internal::FE_PolyTensor::get_face_sign_change_rt (cell, this->dofs_per_face, fe_data.sign_change);
 
   else if (mapping_type == mapping_nedelec)
-    get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
+    internal::FE_PolyTensor::get_face_sign_change_nedelec (cell, this->dofs_per_face, fe_data.sign_change);
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {

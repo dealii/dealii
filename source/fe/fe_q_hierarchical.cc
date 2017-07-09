@@ -28,23 +28,29 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace
+namespace internal
 {
-  /**
-   * A function which maps  in[i] to i,i.e. output[in[i]] = i;
-   */
-  inline
-  std::vector<unsigned int>
-  invert_numbering (const std::vector<unsigned int> &in)
+  namespace FE_Q_Hierarchical
   {
-    std::vector<unsigned int> out (in.size());
-    for (unsigned int i=0; i<in.size(); ++i)
+    namespace
+    {
+      /**
+       * A function which maps  in[i] to i,i.e. output[in[i]] = i;
+       */
+      inline
+      std::vector<unsigned int>
+      invert_numbering (const std::vector<unsigned int> &in)
       {
-        Assert (in[i] < out.size(),
-                dealii::ExcIndexRange(in[i],0,out.size()));
-        out[in[i]]=i;
+        std::vector<unsigned int> out (in.size());
+        for (unsigned int i=0; i<in.size(); ++i)
+          {
+            Assert (in[i] < out.size(),
+                    dealii::ExcIndexRange(in[i],0,out.size()));
+            out[in[i]]=i;
+          }
+        return out;
       }
-    return out;
+    }
   }
 }
 
@@ -1812,8 +1818,8 @@ FE_Q_Hierarchical<dim>::
 face_fe_q_hierarchical_to_hierarchic_numbering (const unsigned int degree)
 {
   FiniteElementData<dim-1> fe_data(FE_Q_Hierarchical<dim-1>::get_dpo_vector(degree),1,degree);
-  return invert_numbering(FE_Q_Hierarchical<dim-1>::
-                          hierarchic_to_fe_q_hierarchical_numbering (fe_data));
+  return internal::FE_Q_Hierarchical::invert_numbering
+         (FE_Q_Hierarchical<dim-1>::hierarchic_to_fe_q_hierarchical_numbering (fe_data));
 }
 
 

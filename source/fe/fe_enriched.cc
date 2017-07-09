@@ -22,93 +22,99 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace
+namespace internal
 {
-  /**
-   * Auxiliary function to create multiplicity vector from input enrichment functions.
-   */
-  template <typename T>
-  std::vector<unsigned int>
-  build_multiplicities(const std::vector<std::vector<T > > &functions )
+  namespace FE_Enriched
   {
-    std::vector<unsigned int> multiplicities;
-    multiplicities.push_back(1); // the first one is non-enriched FE
-    for (unsigned int i = 0; i < functions.size(); i++)
-      multiplicities.push_back(functions[i].size());
-
-    return multiplicities;
-  }
-
-
-  /**
-   * Auxiliary function to build FiniteElement's vector
-   */
-  template <int dim, int spacedim>
-  std::vector< const FiniteElement< dim, spacedim > * >
-  build_fes(const FiniteElement<dim,spacedim> *fe_base,
-            const std::vector<const FiniteElement<dim,spacedim> * > &fe_enriched)
-  {
-    std::vector< const FiniteElement< dim, spacedim > * > fes;
-    fes.push_back(fe_base);
-    for (unsigned int i = 0; i < fe_enriched.size(); i++)
-      fes.push_back(fe_enriched[i]);
-
-    return fes;
-  }
-
-
-  /**
-   * Auxiliary function which check consistency of the input parameters.
-   * Returns true if everything is ok.
-   */
-  template <int dim, int spacedim>
-  bool
-  consistency_check (const std::vector< const FiniteElement< dim, spacedim > * > &fes,
-                     const std::vector< unsigned int > &multiplicities,
-                     const std::vector<std::vector<std::function<const Function<spacedim> *(const typename Triangulation<dim, spacedim>::cell_iterator &) > > > &functions)
-  {
-    AssertThrow(fes.size() > 0,
-                ExcMessage("FEs size should be >=1"));
-    AssertThrow(fes.size() == multiplicities.size(),
-                ExcMessage("FEs and multiplicities should have the same size"));
-
-    AssertThrow (functions.size() == fes.size() - 1,
-                 ExcDimensionMismatch(functions.size(), fes.size()-1));
-
-    AssertThrow(multiplicities[0] == 1,
-                ExcMessage("First multiplicity should be 1"));
-
-    const unsigned int n_comp_base = fes[0]->n_components();
-
-    // start from fe=1 as 0th is always non-enriched FE.
-    for (unsigned int fe=1; fe < fes.size(); fe++)
+    namespace
+    {
+      /**
+       * Auxiliary function to create multiplicity vector from input enrichment functions.
+       */
+      template <typename T>
+      std::vector<unsigned int>
+      build_multiplicities(const std::vector<std::vector<T > > &functions )
       {
-        const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(fes[fe]);
-        if (fe_nothing)
-          AssertThrow (fe_nothing->is_dominating(),
-                       ExcMessage("Only dominating FE_Nothing can be used in FE_Enriched"));
+        std::vector<unsigned int> multiplicities;
+        multiplicities.push_back(1); // the first one is non-enriched FE
+        for (unsigned int i = 0; i < functions.size(); i++)
+          multiplicities.push_back(functions[i].size());
 
-        AssertThrow (fes[fe]->n_components() == n_comp_base,
-                     ExcMessage("All elements must have the same number of components"));
+        return multiplicities;
       }
-    return true;
-  }
 
 
-  /**
-   * Auxiliary function which determines whether the FiniteElement will be enriched.
-   */
-  template <int dim, int spacedim>
-  bool
-  check_if_enriched (const std::vector< const FiniteElement< dim, spacedim > * > &fes)
-  {
-    // start from fe=1 as 0th is always non-enriched FE.
-    for (unsigned int fe=1; fe < fes.size(); fe++)
-      if (dynamic_cast<const FE_Nothing<dim>*>(fes[fe]) == nullptr)
-        // this is not FE_Nothing => there will be enrichment
+      /**
+       * Auxiliary function to build FiniteElement's vector
+       */
+      template <int dim, int spacedim>
+      std::vector< const FiniteElement< dim, spacedim > * >
+      build_fes(const FiniteElement<dim,spacedim> *fe_base,
+                const std::vector<const FiniteElement<dim,spacedim> * > &fe_enriched)
+      {
+        std::vector< const FiniteElement< dim, spacedim > * > fes;
+        fes.push_back(fe_base);
+        for (unsigned int i = 0; i < fe_enriched.size(); i++)
+          fes.push_back(fe_enriched[i]);
+
+        return fes;
+      }
+
+
+      /**
+       * Auxiliary function which check consistency of the input parameters.
+       * Returns true if everything is ok.
+       */
+      template <int dim, int spacedim>
+      bool
+      consistency_check (const std::vector< const FiniteElement< dim, spacedim > * > &fes,
+                         const std::vector< unsigned int > &multiplicities,
+                         const std::vector<std::vector<std::function<const Function<spacedim> *(const typename dealii::Triangulation<dim, spacedim>::cell_iterator &) > > > &functions)
+      {
+        AssertThrow(fes.size() > 0,
+                    ExcMessage("FEs size should be >=1"));
+        AssertThrow(fes.size() == multiplicities.size(),
+                    ExcMessage("FEs and multiplicities should have the same size"));
+
+        AssertThrow (functions.size() == fes.size() - 1,
+                     ExcDimensionMismatch(functions.size(), fes.size()-1));
+
+        AssertThrow(multiplicities[0] == 1,
+                    ExcMessage("First multiplicity should be 1"));
+
+        const unsigned int n_comp_base = fes[0]->n_components();
+
+        // start from fe=1 as 0th is always non-enriched FE.
+        for (unsigned int fe=1; fe < fes.size(); fe++)
+          {
+            const FE_Nothing<dim> *fe_nothing = dynamic_cast<const FE_Nothing<dim>*>(fes[fe]);
+            if (fe_nothing)
+              AssertThrow (fe_nothing->is_dominating(),
+                           ExcMessage("Only dominating FE_Nothing can be used in FE_Enriched"));
+
+            AssertThrow (fes[fe]->n_components() == n_comp_base,
+                         ExcMessage("All elements must have the same number of components"));
+          }
         return true;
+      }
 
-    return false;
+
+      /**
+       * Auxiliary function which determines whether the FiniteElement will be enriched.
+       */
+      template <int dim, int spacedim>
+      bool
+      check_if_enriched (const std::vector< const FiniteElement< dim, spacedim > * > &fes)
+      {
+        // start from fe=1 as 0th is always non-enriched FE.
+        for (unsigned int fe=1; fe < fes.size(); fe++)
+          if (dynamic_cast<const FE_Nothing<dim>*>(fes[fe]) == nullptr)
+            // this is not FE_Nothing => there will be enrichment
+            return true;
+
+        return false;
+      }
+    }
   }
 }
 
@@ -149,8 +155,8 @@ FE_Enriched<dim,spacedim>::FE_Enriched (const FiniteElement<dim,spacedim> *fe_ba
                                         const std::vector<const FiniteElement<dim,spacedim> * > &fe_enriched,
                                         const std::vector<std::vector<std::function<const Function<spacedim> *(const typename Triangulation<dim, spacedim>::cell_iterator &) > > > &functions)
   :
-  FE_Enriched<dim,spacedim> (build_fes(fe_base,fe_enriched),
-                             build_multiplicities(functions),
+  FE_Enriched<dim,spacedim> (internal::FE_Enriched::build_fes(fe_base,fe_enriched),
+                             internal::FE_Enriched::build_multiplicities(functions),
                              functions)
 {}
 
@@ -164,11 +170,11 @@ FE_Enriched<dim,spacedim>::FE_Enriched (const std::vector< const FiniteElement< 
                                FETools::Compositing::compute_restriction_is_additive_flags(fes,multiplicities),
                                FETools::Compositing::compute_nonzero_components(fes,multiplicities,false)),
   enrichments(functions),
-  is_enriched(check_if_enriched(fes)),
+  is_enriched(internal::FE_Enriched::check_if_enriched(fes)),
   fe_system(fes,multiplicities)
 {
   // descriptive error are thrown within the function.
-  Assert(consistency_check(fes,multiplicities,functions),
+  Assert(internal::FE_Enriched::consistency_check(fes,multiplicities,functions),
          ExcInternalError());
 
   initialize(fes, multiplicities);
