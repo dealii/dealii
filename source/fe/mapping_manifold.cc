@@ -352,37 +352,6 @@ namespace internal
   namespace
   {
     /**
-     * Some specialization for face Manifolds. In one dimension, there
-     * are no Manifolds associated to faces. The mapping argument is
-     * only used to help the compiler infer dim and spacedim.
-     */
-    template <int spacedim>
-    const dealii::Manifold<1, spacedim> &
-    get_face_manifold(const MappingManifold<1,spacedim> &,
-                      const typename dealii::Triangulation<1,spacedim>::cell_iterator &cell,
-                      const unsigned int &)
-    {
-      return cell->get_manifold();
-    }
-
-
-
-    /**
-     * Some specialization for face Manifolds. The mapping argument is
-     * only used to help the compiler infer dim and spacedim.
-     */
-    template <int dim, int spacedim>
-    const dealii::Manifold<dim,spacedim> &
-    get_face_manifold(const MappingManifold<dim,spacedim> &,
-                      const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
-                      const unsigned int face_no)
-    {
-      return cell->face(face_no)->get_manifold();
-    }
-
-
-
-    /**
      * Compute the locations of quadrature points on the object described by
      * the first argument (and the cell for which the mapping support points
      * have already been set), but only if the update_flags of the @p data
@@ -822,7 +791,7 @@ namespace internal
     {
       data.store_vertices(cell);
 
-      data.manifold = &get_face_manifold(mapping, cell, face_no);
+      data.manifold = &cell->face(face_no)->get_manifold();
 
       maybe_compute_q_points<dim,spacedim> (data_set,
                                             data,

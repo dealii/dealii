@@ -1,0 +1,3 @@
+Changed: In 1D, the face values calculated by <code>MappingManifold</code> now use the manifold attached to the relevant vertex instead of the manifold on the current face.
+<br>
+(David Wells, 2017/07/08)
