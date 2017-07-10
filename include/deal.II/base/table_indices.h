@@ -57,7 +57,7 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from one.
    */
-  TableIndices (const unsigned int index0);
+  explicit TableIndices (const unsigned int index0);
 
   /**
    * Constructor. This is the appropriate constructor for an
