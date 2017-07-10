@@ -68,7 +68,7 @@ namespace internal
       Assert (position < 2, ExcIndexRange (position, 0, 2));
 
       if (position == 0)
-        return TableIndices<2>(new_index);
+        return TableIndices<2>(new_index, numbers::invalid_unsigned_int);
       else
         return TableIndices<2>(previous_indices[0], new_index);
     }
@@ -91,14 +91,20 @@ namespace internal
       switch (position)
         {
         case 0:
-          return TableIndices<4>(new_index);
+          return TableIndices<4>(new_index,
+                                 numbers::invalid_unsigned_int,
+                                 numbers::invalid_unsigned_int,
+                                 numbers::invalid_unsigned_int);
         case 1:
           return TableIndices<4>(previous_indices[0],
-                                 new_index);
+                                 new_index,
+                                 numbers::invalid_unsigned_int,
+                                 numbers::invalid_unsigned_int);
         case 2:
           return TableIndices<4>(previous_indices[0],
                                  previous_indices[1],
-                                 new_index);
+                                 new_index,
+                                 numbers::invalid_unsigned_int);
         case 3:
           return TableIndices<4>(previous_indices[0],
                                  previous_indices[1],
@@ -1656,13 +1662,45 @@ SymmetricTensor<rank,dim,Number>::operator ()
 
 
 
+namespace internal
+{
+  namespace SymmetricTensor
+  {
+    template <int rank>
+    TableIndices<rank>
+    get_partially_filled_indices (const unsigned int row,
+                                  const internal::int2type<2> &)
+    {
+      return TableIndices<rank> (row,
+                                 numbers::invalid_unsigned_int);
+
+    }
+
+
+    template <int rank>
+    TableIndices<rank>
+    get_partially_filled_indices (const unsigned int row,
+                                  const internal::int2type<4> &)
+    {
+      return TableIndices<rank> (row,
+                                 numbers::invalid_unsigned_int,
+                                 numbers::invalid_unsigned_int,
+                                 numbers::invalid_unsigned_int);
+
+    }
+  }
+}
+
+
 template <int rank, int dim, typename Number>
 internal::SymmetricTensorAccessors::Accessor<rank,dim,true,rank-1,Number>
 SymmetricTensor<rank,dim,Number>::operator [] (const unsigned int row) const
 {
   return
     internal::SymmetricTensorAccessors::
-    Accessor<rank,dim,true,rank-1,Number> (*this, TableIndices<rank> (row));
+    Accessor<rank,dim,true,rank-1,Number> (*this,
+                                           internal::SymmetricTensor::get_partially_filled_indices<rank> (row,
+                                               internal::int2type<rank>()));
 }
 
 
@@ -1673,7 +1711,9 @@ SymmetricTensor<rank,dim,Number>::operator [] (const unsigned int row)
 {
   return
     internal::SymmetricTensorAccessors::
-    Accessor<rank,dim,false,rank-1,Number> (*this, TableIndices<rank> (row));
+    Accessor<rank,dim,false,rank-1,Number> (*this,
+                                            internal::SymmetricTensor::get_partially_filled_indices<rank> (row,
+                                                internal::int2type<rank>()));
 }
 
 
