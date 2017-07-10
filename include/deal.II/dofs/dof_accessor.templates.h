@@ -695,7 +695,8 @@ namespace internal
                            const unsigned int              vertex_index,
                            const unsigned int              i)
       {
-        return dof_handler.mg_vertex_dofs[vertex_index].get_index (level, i);
+        return dof_handler.mg_vertex_dofs[vertex_index].get_index (level, i,
+                                                                   dof_handler.get_fe().dofs_per_vertex);
       }
 
 
@@ -721,7 +722,9 @@ namespace internal
                                const unsigned int              i,
                                types::global_dof_index         index)
       {
-        return dof_handler.mg_vertex_dofs[vertex_index].set_index (level, i, index);
+        return dof_handler.mg_vertex_dofs[vertex_index].set_index (level, i,
+                                                                   dof_handler.get_fe().dofs_per_vertex,
+                                                                   index);
       }
 
 

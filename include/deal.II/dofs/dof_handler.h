@@ -990,14 +990,16 @@ private:
      */
     types::global_dof_index
     get_index (const unsigned int level,
-               const unsigned int dof_number) const;
+               const unsigned int dof_number,
+               const unsigned int dofs_per_vertex) const;
 
     /**
      * Set the index of the <code>dof_number</code>th degree of freedom for
      * the given level stored for the current vertex to <code>index</code>.
      */
-    void set_index (const unsigned int level,
-                    const unsigned int dof_number,
+    void set_index (const unsigned int            level,
+                    const unsigned int            dof_number,
+                    const unsigned int            dofs_per_vertex,
                     const types::global_dof_index index);
 
   private:
@@ -1012,20 +1014,13 @@ private:
     unsigned int finest_level;
 
     /**
-     * The number of degrees of freedom per vertex. We need to store
-     * this because every object of this kind stores the indices on
-     * all relevant levels in one array, and the starting offset for
-     * a particular level is determined by that level's index times
-     * the number of degrees of freedom per vertex.
-     */
-    unsigned int dofs_per_vertex;
-
-    /**
      * A pointer to an array where we store the indices of the DoFs that live
      * on the various levels this vertex exists on.
      *
      * The starting offset of the DoFs that belong to a @p level are given by
-     * <code>dofs_per_vertex * (level-coarsest_level)</code>.
+     * <code>dofs_per_vertex * (level-coarsest_level)</code>. @p dofs_per_vertex
+     * must therefore be passed as an argument to the functions that set or
+     * read an index.
      */
     std::unique_ptr<types::global_dof_index[]> indices;
   };
@@ -1356,7 +1351,8 @@ template <int dim, int spacedim>
 inline
 types::global_dof_index
 DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (const unsigned int level,
-                                                    const unsigned int dof_number) const
+                                                    const unsigned int dof_number,
+                                                    const unsigned int dofs_per_vertex) const
 {
   Assert ((level >= coarsest_level) && (level <= finest_level), ExcInvalidLevel (level));
   return indices[dofs_per_vertex * (level - coarsest_level) + dof_number];
@@ -1367,8 +1363,9 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (const unsigned int level,
 template <int dim, int spacedim>
 inline
 void
-DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (const unsigned int level,
-                                                    const unsigned int dof_number,
+DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (const unsigned int            level,
+                                                    const unsigned int            dof_number,
+                                                    const unsigned int            dofs_per_vertex,
                                                     const types::global_dof_index index)
 {
   Assert ((level >= coarsest_level) && (level <= finest_level), ExcInvalidLevel (level));
