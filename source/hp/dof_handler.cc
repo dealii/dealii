@@ -1245,154 +1245,6 @@ namespace hp
 //------------------------------------------------------------------
 
 
-  template <>
-  types::global_dof_index DoFHandler<1>::n_boundary_dofs () const
-  {
-    Assert (finite_elements != nullptr, ExcNoFESelected());
-
-    DoFHandler<1,1>::cell_iterator cell;
-    types::global_dof_index n = 0;
-
-    // search left-most cell
-    cell = this->begin_active();
-    while (!cell->at_boundary(0))
-      cell = cell->neighbor(0);
-    n += cell->get_fe().dofs_per_vertex;
-
-    // same with right-most cell
-    cell = this->begin_active();
-    while (!cell->at_boundary(1))
-      cell = cell->neighbor(1);
-    n += cell->get_fe().dofs_per_vertex;
-
-    return n;
-  }
-
-
-
-  template <>
-  template <typename number>
-  types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::map<types::boundary_id, const Function<1,number>*> &boundary_ids) const
-  {
-    Assert (finite_elements != nullptr, ExcNoFESelected());
-
-    // check that only boundary
-    // indicators 0 and 1 are allowed
-    // in 1d
-    for (typename std::map<types::boundary_id, const Function<1,number>*>::const_iterator i=boundary_ids.begin();
-         i!=boundary_ids.end(); ++i)
-      Assert ((i->first == 0) || (i->first == 1),
-              ExcInvalidBoundaryIndicator());
-
-    DoFHandler<1,1>::active_cell_iterator cell;
-    types::global_dof_index n = 0;
-
-    // search left-most cell
-    if (boundary_ids.find (0) != boundary_ids.end())
-      {
-        cell = this->begin_active();
-        while (!cell->at_boundary(0))
-          cell = cell->neighbor(0);
-        n += cell->get_fe().dofs_per_vertex;
-      }
-
-    // same with right-most cell
-    if (boundary_ids.find (1) != boundary_ids.end())
-      {
-        cell = this->begin_active();
-        while (!cell->at_boundary(1))
-          cell = cell->neighbor(1);
-        n += cell->get_fe().dofs_per_vertex;
-      }
-
-    return n;
-  }
-
-
-
-  template <>
-  types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const
-  {
-    Assert (finite_elements != nullptr, ExcNoFESelected());
-
-    // check that only boundary indicators 0 and 1 are allowed in 1d
-    for (std::set<types::boundary_id>::const_iterator i=boundary_ids.begin();
-         i!=boundary_ids.end(); ++i)
-      Assert ((*i == 0) || (*i == 1),
-              ExcInvalidBoundaryIndicator());
-
-    DoFHandler<1,1>::active_cell_iterator cell;
-    types::global_dof_index n = 0;
-
-    // search left-most cell
-    if (boundary_ids.find (0) != boundary_ids.end())
-      {
-        cell = this->begin_active();
-        while (!cell->at_boundary(0))
-          cell = cell->neighbor(0);
-        n += cell->get_fe().dofs_per_vertex;
-      }
-
-    // same with right-most cell
-    if (boundary_ids.find (1) != boundary_ids.end())
-      {
-        cell = this->begin_active();
-        while (!cell->at_boundary(1))
-          cell = cell->neighbor(1);
-        n += cell->get_fe().dofs_per_vertex;
-      }
-
-    return n;
-  }
-
-
-  template <>
-  types::global_dof_index DoFHandler<1,2>::n_boundary_dofs () const
-  {
-    Assert(false,ExcNotImplemented());
-    return 0;
-  }
-
-  template <>
-  template <typename number>
-  types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const std::map<types::boundary_id, const Function<2,number>*> &) const
-  {
-    Assert(false,ExcNotImplemented());
-    return 0;
-  }
-
-  template <>
-  types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const std::set<types::boundary_id> &) const
-  {
-    Assert(false,ExcNotImplemented());
-    return 0;
-  }
-
-
-
-  template <>
-  types::global_dof_index DoFHandler<1,3>::n_boundary_dofs () const
-  {
-    Assert(false,ExcNotImplemented());
-    return 0;
-  }
-
-  template <>
-  template <typename number>
-  types::global_dof_index DoFHandler<1,3>::n_boundary_dofs (const std::map<types::boundary_id, const Function<3,number>*> &) const
-  {
-    Assert(false,ExcNotImplemented());
-    return 0;
-  }
-
-  template <>
-  types::global_dof_index DoFHandler<1,3>::n_boundary_dofs (const std::set<types::boundary_id> &) const
-  {
-    Assert(false,ExcNotImplemented());
-    return 0;
-  }
-
-
   template <int dim, int spacedim>
   types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
   {
@@ -1420,7 +1272,7 @@ namespace hp
                                             cell->active_fe_index());
             for (unsigned int i=0; i<dofs_per_face; ++i)
               boundary_dofs.insert(dofs_on_face[i]);
-          };
+          }
     return boundary_dofs.size();
   }
 
@@ -1455,7 +1307,7 @@ namespace hp
                                             cell->active_fe_index());
             for (unsigned int i=0; i<dofs_per_face; ++i)
               boundary_dofs.insert(dofs_on_face[i]);
-          };
+          }
     return boundary_dofs.size();
   }
 
