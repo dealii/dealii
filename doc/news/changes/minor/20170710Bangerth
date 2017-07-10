@@ -1,0 +1,7 @@
+Fixed: The DoFHandler::n_boundary_dofs() and
+hp::DoFHandler::n_boundary_dofs() functions did not take into account
+that a one-dimensional triangulation may consist of more than one
+segment (and then may have more than two vertices on the
+boundary). This is now fixed.
+<br>
+(Wolfgang Bangerth, 2017/07/10)

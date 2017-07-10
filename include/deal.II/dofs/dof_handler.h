@@ -731,18 +731,21 @@ public:
    * Return the number of degrees of freedom located on those parts of the
    * boundary which have a boundary indicator listed in the given set. The
    * reason that a @p map rather than a @p set is used is the same as
-   * described in the section on the @p make_boundary_sparsity_pattern
-   * function.
+   * described in the documentation of that variant of
+   * DoFTools::make_boundary_sparsity_pattern() that takes a map.
+   * To this end, the type of the @p boundary_ids argument is the same
+   * as typename FunctionMap<spacedim,number>::type.
    *
-   * The type of boundary_ids equals typename FunctionMap<spacedim,number>::type .
+   * There is, however, another overload of this function that takes
+   * a @p set argument (see below).
    */
   template <typename number>
   types::global_dof_index
   n_boundary_dofs (const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_ids) const;
 
   /**
-   * Same function, but with different data type of the argument, which is
-   * here simply a list of the boundary indicators under consideration.
+   * Return the number of degrees of freedom located on those parts of the
+   * boundary which have a boundary indicator listed in the given set. The
    */
   types::global_dof_index
   n_boundary_dofs (const std::set<types::boundary_id> &boundary_ids) const;
@@ -1109,13 +1112,7 @@ private:
 
 
 
-/* -------------- declaration of explicit specializations ------------- */
-
 #ifndef DOXYGEN
-
-template <> types::global_dof_index DoFHandler<1>::n_boundary_dofs () const;
-template <> types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &) const;
-
 
 /* ----------------------- Inline functions ---------------------------------- */
 
