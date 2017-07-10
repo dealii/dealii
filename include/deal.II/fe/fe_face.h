@@ -262,6 +262,50 @@ public:
   virtual bool hp_constraints_are_implemented () const;
 
   /**
+   * If, on a vertex, several finite elements are active, the hp code first
+   * assigns the degrees of freedom of each of these FEs different global
+   * indices. It then calls this function to find out which of them should get
+   * identical values, and consequently can receive the same global DoF index.
+   * This function therefore returns a list of identities between DoFs of the
+   * present finite element object with the DoFs of @p fe_other, which is a
+   * reference to a finite element object representing one of the other finite
+   * elements active on this particular vertex. The function computes which of
+   * the degrees of freedom of the two finite element objects are equivalent,
+   * both numbered between zero and the corresponding value of dofs_per_vertex
+   * of the two finite elements. The first index of each pair denotes one of
+   * the vertex dofs of the present element, whereas the second is the
+   * corresponding index of the other finite element.
+   *
+   * This being a discontinuous element, the set of such constraints is of
+   * course empty.
+   */
+  virtual
+  std::vector<std::pair<unsigned int, unsigned int> >
+  hp_vertex_dof_identities (const FiniteElement<1, spacedim> &fe_other) const;
+
+  /**
+   * Same as hp_vertex_dof_indices(), except that the function treats degrees
+   * of freedom on lines.
+   *
+   * This being a discontinuous element, the set of such constraints is of
+   * course empty.
+   */
+  virtual
+  std::vector<std::pair<unsigned int, unsigned int> >
+  hp_line_dof_identities (const FiniteElement<1, spacedim> &fe_other) const;
+
+  /**
+   * Same as hp_vertex_dof_indices(), except that the function treats degrees
+   * of freedom on quads.
+   *
+   * This being a discontinuous element, the set of such constraints is of
+   * course empty.
+   */
+  virtual
+  std::vector<std::pair<unsigned int, unsigned int> >
+  hp_quad_dof_identities (const FiniteElement<1, spacedim> &fe_other) const;
+
+  /**
    * Return whether this element dominates the one given as argument when they
    * meet at a common face, whether it is the other way around, whether
    * neither dominates, or if either could dominate.
