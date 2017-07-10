@@ -1,0 +1,10 @@
+Changed: The TableIndices class had a single constructor that just
+took as many indices as one wanted, and padded any unassigned indices
+with numbers::invalid_unsigned_int. This invited mistakes and indeed
+led to difficult to track down errors.
+<br>
+This constructor is therefore now deprecated, and has been replaced by
+a series of constructors with between one and five arguments that can
+be used for objects of type TableIndices<1> to TableIndices<5>.
+<br>
+(Wolfgang Bangerth, 2017/07/10)
