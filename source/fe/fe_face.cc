@@ -767,57 +767,11 @@ FE_FaceP<dim,spacedim>::get_dpo_vector (const unsigned int deg)
 
 
 
-
 template <int dim, int spacedim>
 bool
 FE_FaceP<dim,spacedim>::hp_constraints_are_implemented () const
 {
   return true;
-}
-
-
-
-template <int dim, int spacedim>
-std::vector<std::pair<unsigned int, unsigned int> >
-FE_FaceP<dim, spacedim>::
-hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &/*fe_other*/) const
-{
-  // this element is discontinuous, so by definition there can
-  // be no identities between its dofs and those of any neighbor
-  // (of whichever type the neighbor may be -- after all, we have
-  // no face dofs on this side to begin with)
-  return
-    std::vector<std::pair<unsigned int, unsigned int> > ();
-}
-
-
-
-template <int dim, int spacedim>
-std::vector<std::pair<unsigned int, unsigned int> >
-FE_FaceP<dim, spacedim>::
-hp_line_dof_identities (const FiniteElement<dim, spacedim> &/*fe_other*/) const
-{
-  // this element is discontinuous, so by definition there can
-  // be no identities between its dofs and those of any neighbor
-  // (of whichever type the neighbor may be -- after all, we have
-  // no face dofs on this side to begin with)
-  return
-    std::vector<std::pair<unsigned int, unsigned int> > ();
-}
-
-
-
-template <int dim, int spacedim>
-std::vector<std::pair<unsigned int, unsigned int> >
-FE_FaceP<dim, spacedim>::
-hp_quad_dof_identities (const FiniteElement<dim, spacedim> &/*fe_other*/) const
-{
-  // this element is discontinuous, so by definition there can
-  // be no identities between its dofs and those of any neighbor
-  // (of whichever type the neighbor may be -- after all, we have
-  // no face dofs on this side to begin with)
-  return
-    std::vector<std::pair<unsigned int, unsigned int> > ();
 }
 
 
