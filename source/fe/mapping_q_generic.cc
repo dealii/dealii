@@ -18,6 +18,7 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/table.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/lac/full_matrix.h>
@@ -42,26 +43,28 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
-{
-  template <int dim>
-  std::vector<unsigned int>
-  get_dpo_vector (const unsigned int degree)
-  {
-    std::vector<unsigned int> dpo(dim+1, 1U);
-    for (unsigned int i=1; i<dpo.size(); ++i)
-      dpo[i]=dpo[i-1]*(degree-1);
-    return dpo;
-  }
-}
-
 namespace internal
 {
+  namespace MappingQGeneric
+  {
+    namespace
+    {
+      template <int dim>
+      std::vector<unsigned int>
+      get_dpo_vector (const unsigned int degree)
+      {
+        std::vector<unsigned int> dpo(dim+1, 1U);
+        for (unsigned int i=1; i<dpo.size(); ++i)
+          dpo[i]=dpo[i-1]*(degree-1);
+        return dpo;
+      }
+    }
+  }
+
   namespace MappingQ1
   {
     namespace
     {
-
       // These are left as templates on the spatial dimension (even though dim
       // == spacedim must be true for them to make sense) because templates are
       // expanded before the compiler eliminates code due to the 'if (dim ==
@@ -205,9 +208,9 @@ namespace internal
         // then also construct the mapping from lexicographic to the Qp shape function numbering
         const std::vector<unsigned int>
         renumber (FETools::
-                  lexicographic_to_hierarchic_numbering (
-                    FiniteElementData<dim> (get_dpo_vector<dim>(data.polynomial_degree), 1,
-                                            data.polynomial_degree)));
+                  lexicographic_to_hierarchic_numbering
+                  (FiniteElementData<dim> (internal::MappingQGeneric::get_dpo_vector<dim>
+                                           (data.polynomial_degree), 1, data.polynomial_degree)));
 
         std::vector<double> values;
         std::vector<Tensor<1,dim> > grads;
@@ -830,265 +833,1136 @@ compute_shape_function_values (const std::vector<Point<dim> > &unit_points)
 }
 
 
-namespace
+namespace internal
 {
-  /**
-   * Compute the <tt>support_point_weights_on_quad(hex)</tt> arrays.
-   *
-   * Called by the <tt>compute_support_point_weights_on_quad(hex)</tt> functions if the
-   * data is not yet hardcoded.
-   *
-   * For the definition of the <tt>support_point_weights_on_quad(hex)</tt> please
-   * refer to equation (8) of the `mapping' report.
-   */
-  template <int dim>
-  Table<2,double>
-  compute_laplace_vector(const unsigned int polynomial_degree)
+  namespace MappingQGeneric
   {
-    Table<2,double> lvs;
-
-    Assert(lvs.n_rows()==0, ExcInternalError());
-    Assert(dim==2 || dim==3, ExcNotImplemented());
-
-    // for degree==1, we shouldn't have to compute any support points, since all
-    // of them are on the vertices
-    Assert(polynomial_degree>1, ExcInternalError());
-
-    const unsigned int n_inner = Utilities::fixed_power<dim>(polynomial_degree-1);
-    const unsigned int n_outer = (dim==1) ? 2 :
-                                 ((dim==2) ?
-                                  4+4*(polynomial_degree-1) :
-                                  8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1));
-
-
-    // compute the shape gradients at the quadrature points on the unit cell
-    const QGauss<dim> quadrature(polynomial_degree+1);
-    const unsigned int n_q_points=quadrature.size();
-
-    typename MappingQGeneric<dim>::InternalData quadrature_data(polynomial_degree);
-    quadrature_data.shape_derivatives.resize(quadrature_data.n_shape_functions *
-                                             n_q_points);
-    quadrature_data.compute_shape_function_values(quadrature.get_points());
-
-    // Compute the stiffness matrix of the inner dofs
-    FullMatrix<long double> S(n_inner);
-    for (unsigned int point=0; point<n_q_points; ++point)
-      for (unsigned int i=0; i<n_inner; ++i)
-        for (unsigned int j=0; j<n_inner; ++j)
-          {
-            long double res = 0.;
-            for (unsigned int l=0; l<dim; ++l)
-              res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
-                     (long double)quadrature_data.derivative(point, n_outer+j)[l];
-
-            S(i,j) += res * (long double)quadrature.weight(point);
-          }
-
-    // Compute the components of T to be the product of gradients of inner and
-    // outer shape functions.
-    FullMatrix<long double> T(n_inner, n_outer);
-    for (unsigned int point=0; point<n_q_points; ++point)
-      for (unsigned int i=0; i<n_inner; ++i)
-        for (unsigned int k=0; k<n_outer; ++k)
-          {
-            long double res = 0.;
-            for (unsigned int l=0; l<dim; ++l)
-              res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
-                     (long double)quadrature_data.derivative(point, k)[l];
-
-            T(i,k) += res *(long double)quadrature.weight(point);
-          }
-
-    FullMatrix<long double> S_1(n_inner);
-    S_1.invert(S);
-
-    FullMatrix<long double> S_1_T(n_inner, n_outer);
-
-    // S:=S_1*T
-    S_1.mmult(S_1_T,T);
-
-    // Resize and initialize the lvs
-    lvs.reinit (n_inner, n_outer);
-    for (unsigned int i=0; i<n_inner; ++i)
-      for (unsigned int k=0; k<n_outer; ++k)
-        lvs(i,k) = -S_1_T(i,k);
-
-    return lvs;
-  }
-
-
-  /**
-   * This function is needed by the constructor of
-   * <tt>MappingQ<dim,spacedim></tt> for <tt>dim=</tt> 2 and 3.
-   *
-   * For <tt>degree<4</tt> this function sets the @p support_point_weights_on_quad to
-   * the hardcoded data. For <tt>degree>=4</tt> and MappingQ<2> this vector is
-   * computed.
-   *
-   * For the definition of the @p support_point_weights_on_quad please refer to
-   * equation (8) of the `mapping' report.
-   */
-  Table<2,double>
-  compute_support_point_weights_on_quad(const unsigned int polynomial_degree)
-  {
-    Table<2,double> loqvs;
-
-    // we are asked to compute weights for interior support points, but
-    // there are no interior points if degree==1
-    if (polynomial_degree == 1)
-      return loqvs;
-
-    const unsigned int n_inner_2d=(polynomial_degree-1)*(polynomial_degree-1);
-    const unsigned int n_outer_2d=4+4*(polynomial_degree-1);
-
-    // first check whether we have precomputed the values for some polynomial
-    // degree; the sizes of arrays is n_inner_2d*n_outer_2d
-    if (polynomial_degree == 2)
+    namespace
+    {
+      /**
+       * Compute the <tt>support_point_weights_on_quad(hex)</tt> arrays.
+       *
+       * Called by the <tt>compute_support_point_weights_on_quad(hex)</tt> functions if the
+       * data is not yet hardcoded.
+       *
+       * For the definition of the <tt>support_point_weights_on_quad(hex)</tt> please
+       * refer to equation (8) of the `mapping' report.
+       */
+      template <int dim>
+      dealii::Table<2,double>
+      compute_laplace_vector(const unsigned int polynomial_degree)
       {
-        // (checked these values against the output of compute_laplace_vector
-        // again, and found they're indeed right -- just in case someone wonders
-        // where they come from -- WB)
-        static const double loqv2[1*8]
-          = {1/16., 1/16., 1/16., 1/16., 3/16., 3/16., 3/16., 3/16.};
-        Assert (sizeof(loqv2)/sizeof(loqv2[0]) ==
-                n_inner_2d * n_outer_2d,
-                ExcInternalError());
+        dealii::Table<2,double> lvs;
 
-        // copy and return
-        loqvs.reinit(n_inner_2d, n_outer_2d);
-        for (unsigned int unit_point=0; unit_point<n_inner_2d; ++unit_point)
-          for (unsigned int k=0; k<n_outer_2d; ++k)
-            loqvs[unit_point][k] = loqv2[unit_point*n_outer_2d+k];
-      }
-    else
-      {
-        // not precomputed, then do so now
-        loqvs = compute_laplace_vector<2>(polynomial_degree);
-      }
+        Assert(lvs.n_rows()==0, ExcInternalError());
+        Assert(dim==2 || dim==3, ExcNotImplemented());
 
-    // the sum of weights of the points at the outer rim should be one. check
-    // this
-    for (unsigned int unit_point=0; unit_point<loqvs.n_rows(); ++unit_point)
-      Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
-                                       loqvs[unit_point].end(),0.)-1)<1e-13*polynomial_degree,
-             ExcInternalError());
+        // for degree==1, we shouldn't have to compute any support points, since all
+        // of them are on the vertices
+        Assert(polynomial_degree>1, ExcInternalError());
 
-    return loqvs;
-  }
+        const unsigned int n_inner = Utilities::fixed_power<dim>(polynomial_degree-1);
+        const unsigned int n_outer = (dim==1) ? 2 :
+                                     ((dim==2) ?
+                                      4+4*(polynomial_degree-1) :
+                                      8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1));
 
 
+        // compute the shape gradients at the quadrature points on the unit cell
+        const QGauss<dim> quadrature(polynomial_degree+1);
+        const unsigned int n_q_points=quadrature.size();
 
-  /**
-   * This function is needed by the constructor of <tt>MappingQ<3></tt>.
-   *
-   * For <tt>degree==2</tt> this function sets the @p support_point_weights_on_hex to
-   * the hardcoded data. For <tt>degree>2</tt> this vector is computed.
-   *
-   * For the definition of the @p support_point_weights_on_hex please refer to
-   * equation (8) of the `mapping' report.
-   */
-  Table<2,double>
-  compute_support_point_weights_on_hex(const unsigned int polynomial_degree)
-  {
-    Table<2,double> lohvs;
+        typename dealii::MappingQGeneric<dim>::InternalData quadrature_data(polynomial_degree);
+        quadrature_data.shape_derivatives.resize(quadrature_data.n_shape_functions *
+                                                 n_q_points);
+        quadrature_data.compute_shape_function_values(quadrature.get_points());
 
-    // we are asked to compute weights for interior support points, but
-    // there are no interior points if degree==1
-    if (polynomial_degree == 1)
-      return lohvs;
+        // Compute the stiffness matrix of the inner dofs
+        FullMatrix<long double> S(n_inner);
+        for (unsigned int point=0; point<n_q_points; ++point)
+          for (unsigned int i=0; i<n_inner; ++i)
+            for (unsigned int j=0; j<n_inner; ++j)
+              {
+                long double res = 0.;
+                for (unsigned int l=0; l<dim; ++l)
+                  res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
+                         (long double)quadrature_data.derivative(point, n_outer+j)[l];
 
-    const unsigned int n_inner = Utilities::fixed_power<3>(polynomial_degree-1);
-    const unsigned int n_outer = 8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1);
+                S(i,j) += res * (long double)quadrature.weight(point);
+              }
 
-    // first check whether we have precomputed the values for some polynomial
-    // degree; the sizes of arrays is n_inner_2d*n_outer_2d
-    if (polynomial_degree == 2)
-      {
-        static const double lohv2[26]
-          = {1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128.,
-             7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192.,
-             7/192., 7/192., 7/192., 7/192.,
-             1/12., 1/12., 1/12., 1/12., 1/12., 1/12.
-            };
+        // Compute the components of T to be the product of gradients of inner and
+        // outer shape functions.
+        FullMatrix<long double> T(n_inner, n_outer);
+        for (unsigned int point=0; point<n_q_points; ++point)
+          for (unsigned int i=0; i<n_inner; ++i)
+            for (unsigned int k=0; k<n_outer; ++k)
+              {
+                long double res = 0.;
+                for (unsigned int l=0; l<dim; ++l)
+                  res += (long double)quadrature_data.derivative(point, n_outer+i)[l] *
+                         (long double)quadrature_data.derivative(point, k)[l];
 
-        // copy and return
-        lohvs.reinit(n_inner, n_outer);
-        for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
+                T(i,k) += res *(long double)quadrature.weight(point);
+              }
+
+        FullMatrix<long double> S_1(n_inner);
+        S_1.invert(S);
+
+        FullMatrix<long double> S_1_T(n_inner, n_outer);
+
+        // S:=S_1*T
+        S_1.mmult(S_1_T,T);
+
+        // Resize and initialize the lvs
+        lvs.reinit (n_inner, n_outer);
+        for (unsigned int i=0; i<n_inner; ++i)
           for (unsigned int k=0; k<n_outer; ++k)
-            lohvs[unit_point][k] = lohv2[unit_point*n_outer+k];
+            lvs(i,k) = -S_1_T(i,k);
+
+        return lvs;
       }
-    else
+
+
+
+      /**
+       * This function is needed by the constructor of
+       * <tt>MappingQ<dim,spacedim></tt> for <tt>dim=</tt> 2 and 3.
+       *
+       * For <tt>degree<4</tt> this function sets the @p support_point_weights_on_quad to
+       * the hardcoded data. For <tt>degree>=4</tt> and MappingQ<2> this vector is
+       * computed.
+       *
+       * For the definition of the @p support_point_weights_on_quad please refer to
+       * equation (8) of the `mapping' report.
+       */
+      dealii::Table<2,double>
+      compute_support_point_weights_on_quad(const unsigned int polynomial_degree)
       {
-        // not precomputed, then do so now
-        lohvs = compute_laplace_vector<3>(polynomial_degree);
+        dealii::Table<2,double> loqvs;
+
+        // we are asked to compute weights for interior support points, but
+        // there are no interior points if degree==1
+        if (polynomial_degree == 1)
+          return loqvs;
+
+        const unsigned int n_inner_2d=(polynomial_degree-1)*(polynomial_degree-1);
+        const unsigned int n_outer_2d=4+4*(polynomial_degree-1);
+
+        // first check whether we have precomputed the values for some polynomial
+        // degree; the sizes of arrays is n_inner_2d*n_outer_2d
+        if (polynomial_degree == 2)
+          {
+            // (checked these values against the output of compute_laplace_vector
+            // again, and found they're indeed right -- just in case someone wonders
+            // where they come from -- WB)
+            static const double loqv2[1*8]
+              = {1/16., 1/16., 1/16., 1/16., 3/16., 3/16., 3/16., 3/16.};
+            Assert (sizeof(loqv2)/sizeof(loqv2[0]) ==
+                    n_inner_2d * n_outer_2d,
+                    ExcInternalError());
+
+            // copy and return
+            loqvs.reinit(n_inner_2d, n_outer_2d);
+            for (unsigned int unit_point=0; unit_point<n_inner_2d; ++unit_point)
+              for (unsigned int k=0; k<n_outer_2d; ++k)
+                loqvs[unit_point][k] = loqv2[unit_point*n_outer_2d+k];
+          }
+        else
+          {
+            // not precomputed, then do so now
+            loqvs = compute_laplace_vector<2>(polynomial_degree);
+          }
+
+        // the sum of weights of the points at the outer rim should be one. check
+        // this
+        for (unsigned int unit_point=0; unit_point<loqvs.n_rows(); ++unit_point)
+          Assert(std::fabs(std::accumulate(loqvs[unit_point].begin(),
+                                           loqvs[unit_point].end(),0.)-1)<1e-13*polynomial_degree,
+                 ExcInternalError());
+
+        return loqvs;
       }
 
-    // the sum of weights of the points at the outer rim should be one. check
-    // this
-    for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
-      Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
-                                       lohvs[unit_point].end(),0.) - 1)<1e-13*polynomial_degree,
-             ExcInternalError());
 
-    return lohvs;
-  }
 
-  /**
-   * This function collects the output of
-   * compute_support_point_weights_on_{quad,hex} in a single data structure.
-   */
-  std::vector<Table<2,double> >
-  compute_support_point_weights_perimeter_to_interior(const unsigned int polynomial_degree,
-                                                      const unsigned int dim)
-  {
-    Assert(dim > 0 && dim <= 3, ExcImpossibleInDim(dim));
-    std::vector<Table<2,double> > output(dim);
-    if (polynomial_degree <= 1)
-      return output;
+      /**
+       * This function is needed by the constructor of <tt>MappingQ<3></tt>.
+       *
+       * For <tt>degree==2</tt> this function sets the @p support_point_weights_on_hex to
+       * the hardcoded data. For <tt>degree>2</tt> this vector is computed.
+       *
+       * For the definition of the @p support_point_weights_on_hex please refer to
+       * equation (8) of the `mapping' report.
+       */
+      dealii::Table<2,double>
+      compute_support_point_weights_on_hex(const unsigned int polynomial_degree)
+      {
+        dealii::Table<2,double> lohvs;
 
-    // fill the 1D interior weights
-    QGaussLobatto<1> quadrature(polynomial_degree+1);
-    output[0].reinit(polynomial_degree-1, GeometryInfo<1>::vertices_per_cell);
-    for (unsigned int q=0; q<polynomial_degree-1; ++q)
-      for (unsigned int i=0; i<GeometryInfo<1>::vertices_per_cell; ++i)
-        output[0](q,i) = GeometryInfo<1>::d_linear_shape_function(quadrature.point(q+1),
-                                                                  i);
+        // we are asked to compute weights for interior support points, but
+        // there are no interior points if degree==1
+        if (polynomial_degree == 1)
+          return lohvs;
 
-    if (dim > 1)
-      output[1] = compute_support_point_weights_on_quad(polynomial_degree);
+        const unsigned int n_inner = Utilities::fixed_power<3>(polynomial_degree-1);
+        const unsigned int n_outer = 8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1);
 
-    if (dim > 2)
-      output[2] = compute_support_point_weights_on_hex(polynomial_degree);
+        // first check whether we have precomputed the values for some polynomial
+        // degree; the sizes of arrays is n_inner_2d*n_outer_2d
+        if (polynomial_degree == 2)
+          {
+            static const double lohv2[26]
+              = {1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128., 1/128.,
+                 7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192., 7/192.,
+                 7/192., 7/192., 7/192., 7/192.,
+                 1/12., 1/12., 1/12., 1/12., 1/12., 1/12.
+                };
 
-    return output;
-  }
+            // copy and return
+            lohvs.reinit(n_inner, n_outer);
+            for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
+              for (unsigned int k=0; k<n_outer; ++k)
+                lohvs[unit_point][k] = lohv2[unit_point*n_outer+k];
+          }
+        else
+          {
+            // not precomputed, then do so now
+            lohvs = compute_laplace_vector<3>(polynomial_degree);
+          }
 
-  /**
-   * Collects all interior points for the various dimensions.
-   */
-  template <int dim>
-  Table<2,double>
-  compute_support_point_weights_cell(const unsigned int polynomial_degree)
-  {
-    Assert(dim > 0 && dim <= 3, ExcImpossibleInDim(dim));
-    if (polynomial_degree <= 1)
-      return Table<2,double>();
+        // the sum of weights of the points at the outer rim should be one. check
+        // this
+        for (unsigned int unit_point=0; unit_point<n_inner; ++unit_point)
+          Assert(std::fabs(std::accumulate(lohvs[unit_point].begin(),
+                                           lohvs[unit_point].end(),0.) - 1)<1e-13*polynomial_degree,
+                 ExcInternalError());
 
-    QGaussLobatto<dim> quadrature(polynomial_degree+1);
-    std::vector<unsigned int> h2l(quadrature.size());
-    FETools::hierarchic_to_lexicographic_numbering<dim>(polynomial_degree, h2l);
+        return lohvs;
+      }
 
-    Table<2,double> output(quadrature.size() - GeometryInfo<dim>::vertices_per_cell,
-                           GeometryInfo<dim>::vertices_per_cell);
-    for (unsigned int q=0; q<output.size(0); ++q)
-      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-        output(q,i) = GeometryInfo<dim>::d_linear_shape_function(quadrature.point(h2l[q+GeometryInfo<dim>::vertices_per_cell]),
-                                                                 i);
 
-    return output;
+
+      /**
+       * This function collects the output of
+       * compute_support_point_weights_on_{quad,hex} in a single data structure.
+       */
+      std::vector<dealii::Table<2,double> >
+      compute_support_point_weights_perimeter_to_interior(const unsigned int polynomial_degree,
+                                                          const unsigned int dim)
+      {
+        Assert(dim > 0 && dim <= 3, ExcImpossibleInDim(dim));
+        std::vector<dealii::Table<2,double> > output(dim);
+        if (polynomial_degree <= 1)
+          return output;
+
+        // fill the 1D interior weights
+        QGaussLobatto<1> quadrature(polynomial_degree+1);
+        output[0].reinit(polynomial_degree-1, GeometryInfo<1>::vertices_per_cell);
+        for (unsigned int q=0; q<polynomial_degree-1; ++q)
+          for (unsigned int i=0; i<GeometryInfo<1>::vertices_per_cell; ++i)
+            output[0](q,i) = GeometryInfo<1>::d_linear_shape_function(quadrature.point(q+1),
+                                                                      i);
+
+        if (dim > 1)
+          output[1] = compute_support_point_weights_on_quad(polynomial_degree);
+
+        if (dim > 2)
+          output[2] = compute_support_point_weights_on_hex(polynomial_degree);
+
+        return output;
+      }
+
+      /**
+       * Collects all interior points for the various dimensions.
+       */
+      template <int dim>
+      dealii::Table<2,double>
+      compute_support_point_weights_cell(const unsigned int polynomial_degree)
+      {
+        Assert(dim > 0 && dim <= 3, ExcImpossibleInDim(dim));
+        if (polynomial_degree <= 1)
+          return dealii::Table<2,double>();
+
+        QGaussLobatto<dim> quadrature(polynomial_degree+1);
+        std::vector<unsigned int> h2l(quadrature.size());
+        FETools::hierarchic_to_lexicographic_numbering<dim>(polynomial_degree, h2l);
+
+        dealii::Table<2,double> output(quadrature.size() - GeometryInfo<dim>::vertices_per_cell,
+                                       GeometryInfo<dim>::vertices_per_cell);
+        for (unsigned int q=0; q<output.size(0); ++q)
+          for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+            output(q,i) = GeometryInfo<dim>::d_linear_shape_function(quadrature.point(h2l[q+GeometryInfo<dim>::vertices_per_cell]),
+                                                                     i);
+
+        return output;
+      }
+
+
+
+      /**
+       * Using the relative weights of the shape functions evaluated at
+       * one point on the reference cell (and stored in data.shape_values
+       * and accessed via data.shape(0,i)) and the locations of mapping
+       * support points (stored in data.mapping_support_points), compute
+       * the mapped location of that point in real space.
+       */
+      template <int dim, int spacedim>
+      Point<spacedim>
+      compute_mapped_location_of_point
+      (const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data)
+      {
+        AssertDimension (data.shape_values.size(),
+                         data.mapping_support_points.size());
+
+        // use now the InternalData to compute the point in real space.
+        Point<spacedim> p_real;
+        for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
+          p_real += data.mapping_support_points[i] * data.shape(0,i);
+
+        return p_real;
+      }
+
+
+
+      /**
+       * Implementation of transform_real_to_unit_cell for dim==spacedim
+       */
+      template <int dim>
+      Point<dim>
+      do_transform_real_to_unit_cell_internal
+      (const typename dealii::Triangulation<dim,dim>::cell_iterator &cell,
+       const Point<dim>                                             &p,
+       const Point<dim>                                             &initial_p_unit,
+       typename dealii::MappingQGeneric<dim,dim>::InternalData      &mdata)
+      {
+        const unsigned int spacedim = dim;
+
+        const unsigned int n_shapes=mdata.shape_values.size();
+        (void)n_shapes;
+        Assert(n_shapes!=0, ExcInternalError());
+        AssertDimension (mdata.shape_derivatives.size(), n_shapes);
+
+        std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
+        AssertDimension (points.size(), n_shapes);
+
+
+        // Newton iteration to solve
+        //    f(x)=p(x)-p=0
+        // where we are looking for 'x' and p(x) is the forward transformation
+        // from unit to real cell. We solve this using a Newton iteration
+        //    x_{n+1}=x_n-[f'(x)]^{-1}f(x)
+        // The start value is set to be the linear approximation to the cell
+
+        // The shape values and derivatives of the mapping at this point are
+        // previously computed.
+
+        Point<dim> p_unit = initial_p_unit;
+
+        mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
+
+        Point<spacedim> p_real = compute_mapped_location_of_point<dim,spacedim>(mdata);
+        Tensor<1,spacedim> f = p_real-p;
+
+        // early out if we already have our point
+        if (f.norm_square() < 1e-24 * cell->diameter() * cell->diameter())
+          return p_unit;
+
+        // we need to compare the position of the computed p(x) against the given
+        // point 'p'. We will terminate the iteration and return 'x' if they are
+        // less than eps apart. The question is how to choose eps -- or, put maybe
+        // more generally: in which norm we want these 'p' and 'p(x)' to be eps
+        // apart.
+        //
+        // the question is difficult since we may have to deal with very elongated
+        // cells where we may achieve 1e-12*h for the distance of these two points
+        // in the 'long' direction, but achieving this tolerance in the 'short'
+        // direction of the cell may not be possible
+        //
+        // what we do instead is then to terminate iterations if
+        //    \| p(x) - p \|_A < eps
+        // where the A-norm is somehow induced by the transformation of the cell.
+        // in particular, we want to measure distances relative to the sizes of
+        // the cell in its principal directions.
+        //
+        // to define what exactly A should be, note that to first order we have
+        // the following (assuming that x* is the solution of the problem, i.e.,
+        // p(x*)=p):
+        //    p(x) - p = p(x) - p(x*)
+        //             = -grad p(x) * (x*-x) + higher order terms
+        // This suggest to measure with a norm that corresponds to
+        //    A = {[grad p(x]^T [grad p(x)]}^{-1}
+        // because then
+        //    \| p(x) - p \|_A  \approx  \| x - x* \|
+        // Consequently, we will try to enforce that
+        //    \| p(x) - p \|_A  =  \| f \|  <=  eps
+        //
+        // Note that using this norm is a bit dangerous since the norm changes
+        // in every iteration (A isn't fixed by depends on xk). However, if the
+        // cell is not too deformed (it may be stretched, but not twisted) then
+        // the mapping is almost linear and A is indeed constant or nearly so.
+        const double eps = 1.e-11;
+        const unsigned int newton_iteration_limit = 20;
+
+        unsigned int newton_iteration = 0;
+        double last_f_weighted_norm;
+        do
+          {
+#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
+            std::cout << "Newton iteration " << newton_iteration << std::endl;
+#endif
+
+            // f'(x)
+            Tensor<2,spacedim> df;
+            for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
+              {
+                const Tensor<1,dim> &grad_transform=mdata.derivative(0,k);
+                const Point<spacedim> &point=points[k];
+
+                for (unsigned int i=0; i<spacedim; ++i)
+                  for (unsigned int j=0; j<dim; ++j)
+                    df[i][j]+=point[i]*grad_transform[j];
+              }
+
+            // Solve  [f'(x)]d=f(x)
+            AssertThrow(determinant(df) > 0,
+                        (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+            Tensor<2,spacedim> df_inverse = invert(df);
+            const Tensor<1,spacedim> delta = df_inverse * static_cast<const Tensor<1,spacedim>&>(f);
+
+#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
+            std::cout << "   delta=" << delta  << std::endl;
+#endif
+
+            // do a line search
+            double step_length = 1;
+            do
+              {
+                // update of p_unit. The spacedim-th component of transformed point
+                // is simply ignored in codimension one case. When this component is
+                // not zero, then we are projecting the point to the surface or
+                // curve identified by the cell.
+                Point<dim> p_unit_trial = p_unit;
+                for (unsigned int i=0; i<dim; ++i)
+                  p_unit_trial[i] -= step_length * delta[i];
+
+                // shape values and derivatives
+                // at new p_unit point
+                mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit_trial));
+
+                // f(x)
+                Point<spacedim> p_real_trial = internal::MappingQGeneric::compute_mapped_location_of_point<dim,spacedim>(mdata);
+                const Tensor<1,spacedim> f_trial = p_real_trial-p;
+
+#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
+                std::cout << "     step_length=" << step_length << std::endl
+                          << "       ||f ||   =" << f.norm() << std::endl
+                          << "       ||f*||   =" << f_trial.norm() << std::endl
+                          << "       ||f*||_A =" << (df_inverse * f_trial).norm() << std::endl;
+#endif
+
+                // see if we are making progress with the current step length
+                // and if not, reduce it by a factor of two and try again
+                //
+                // strictly speaking, we should probably use the same norm as we use
+                // for the outer algorithm. in practice, line search is just a
+                // crutch to find a "reasonable" step length, and so using the l2
+                // norm is probably just fine
+                if (f_trial.norm() < f.norm())
+                  {
+                    p_real = p_real_trial;
+                    p_unit = p_unit_trial;
+                    f = f_trial;
+                    break;
+                  }
+                else if (step_length > 0.05)
+                  step_length /= 2;
+                else
+                  AssertThrow (false,
+                               (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+              }
+            while (true);
+
+            ++newton_iteration;
+            if (newton_iteration > newton_iteration_limit)
+              AssertThrow (false,
+                           (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+            last_f_weighted_norm = (df_inverse * f).norm();
+          }
+        while (last_f_weighted_norm > eps);
+
+        return p_unit;
+      }
+
+
+
+      /**
+       * Implementation of transform_real_to_unit_cell for dim==spacedim-1
+       */
+      template <int dim>
+      Point<dim>
+      do_transform_real_to_unit_cell_internal_codim1
+      (const typename dealii::Triangulation<dim,dim+1>::cell_iterator &cell,
+       const Point<dim+1>                                             &p,
+       const Point<dim>                                               &initial_p_unit,
+       typename dealii::MappingQGeneric<dim,dim+1>::InternalData      &mdata)
+      {
+        const unsigned int spacedim = dim+1;
+
+        const unsigned int n_shapes=mdata.shape_values.size();
+        (void)n_shapes;
+        Assert(n_shapes!=0, ExcInternalError());
+        Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
+        Assert(mdata.shape_second_derivatives.size()==n_shapes, ExcInternalError());
+
+        std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
+        Assert(points.size()==n_shapes, ExcInternalError());
+
+        Point<spacedim> p_minus_F;
+
+        Tensor<1,spacedim>  DF[dim];
+        Tensor<1,spacedim>  D2F[dim][dim];
+
+        Point<dim> p_unit = initial_p_unit;
+        Point<dim> f;
+        Tensor<2,dim>  df;
+
+        // Evaluate first and second derivatives
+        mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
+
+        for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
+          {
+            const Tensor<1,dim>   &grad_phi_k = mdata.derivative(0,k);
+            const Tensor<2,dim>   &hessian_k  = mdata.second_derivative(0,k);
+            const Point<spacedim> &point_k = points[k];
+
+            for (unsigned int j=0; j<dim; ++j)
+              {
+                DF[j] += grad_phi_k[j] * point_k;
+                for (unsigned int l=0; l<dim; ++l)
+                  D2F[j][l] += hessian_k[j][l] * point_k;
+              }
+          }
+
+        p_minus_F = p;
+        p_minus_F -= compute_mapped_location_of_point<dim,spacedim>(mdata);
+
+
+        for (unsigned int j=0; j<dim; ++j)
+          f[j] = DF[j] * p_minus_F;
+
+        for (unsigned int j=0; j<dim; ++j)
+          {
+            f[j] = DF[j] * p_minus_F;
+            for (unsigned int l=0; l<dim; ++l)
+              df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
+          }
+
+
+        const double eps = 1.e-12*cell->diameter();
+        const unsigned int loop_limit = 10;
+
+        unsigned int loop=0;
+
+        while (f.norm()>eps && loop++<loop_limit)
+          {
+            // Solve  [df(x)]d=f(x)
+            const Tensor<1,dim> d = invert(df) * static_cast<const Tensor<1,dim>&>(f);
+            p_unit -= d;
+
+            for (unsigned int j=0; j<dim; ++j)
+              {
+                DF[j].clear();
+                for (unsigned int l=0; l<dim; ++l)
+                  D2F[j][l].clear();
+              }
+
+            mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
+
+            for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
+              {
+                const Tensor<1,dim>   &grad_phi_k = mdata.derivative(0,k);
+                const Tensor<2,dim>   &hessian_k  = mdata.second_derivative(0,k);
+                const Point<spacedim> &point_k = points[k];
+
+                for (unsigned int j=0; j<dim; ++j)
+                  {
+                    DF[j] += grad_phi_k[j] * point_k;
+                    for (unsigned int l=0; l<dim; ++l)
+                      D2F[j][l] += hessian_k[j][l] * point_k;
+                  }
+              }
+
+            //TODO: implement a line search here in much the same way as for
+            // the corresponding function above that does so for dim==spacedim
+            p_minus_F = p;
+            p_minus_F -= compute_mapped_location_of_point<dim,spacedim>(mdata);
+
+            for (unsigned int j=0; j<dim; ++j)
+              {
+                f[j] = DF[j] * p_minus_F;
+                for (unsigned int l=0; l<dim; ++l)
+                  df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
+              }
+
+          }
+
+
+        // Here we check that in the last execution of while the first
+        // condition was already wrong, meaning the residual was below
+        // eps. Only if the first condition failed, loop will have been
+        // increased and tested, and thus have reached the limit.
+        AssertThrow (loop<loop_limit, (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+
+        return p_unit;
+      }
+
+      /**
+       * Compute the locations of quadrature points on the object described by
+       * the first argument (and the cell for which the mapping support points
+       * have already been set), but only if the update_flags of the @p data
+       * argument indicate so.
+       */
+      template <int dim, int spacedim>
+      void
+      maybe_compute_q_points
+      (const typename QProjector<dim>::DataSetDescriptor                   data_set,
+       const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
+       std::vector<Point<spacedim> >                                      &quadrature_points)
+      {
+        const UpdateFlags update_flags = data.update_each;
+
+        if (update_flags & update_quadrature_points)
+          {
+            for (unsigned int point=0; point<quadrature_points.size(); ++point)
+              {
+                const double *shape = &data.shape(point+data_set,0);
+                Point<spacedim> result = (shape[0] *
+                                          data.mapping_support_points[0]);
+                for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    result[i] += shape[k] * data.mapping_support_points[k][i];
+                quadrature_points[point] = result;
+              }
+          }
+      }
+
+
+      /**
+       * Update the co- and contravariant matrices as well as their determinant, for the cell
+       * described stored in the data object, but only if the update_flags of the @p data
+       * argument indicate so.
+       *
+       * Skip the computation if possible as indicated by the first argument.
+       */
+      template <int dim, int spacedim>
+      void
+      maybe_update_Jacobians
+      (const CellSimilarity::Similarity                                    cell_similarity,
+       const typename dealii::QProjector<dim>::DataSetDescriptor           data_set,
+       const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data)
+      {
+        const UpdateFlags update_flags = data.update_each;
+
+        if (update_flags & update_contravariant_transformation)
+          // if the current cell is just a
+          // translation of the previous one, no
+          // need to recompute jacobians...
+          if (cell_similarity != CellSimilarity::translation)
+            {
+              const unsigned int n_q_points = data.contravariant.size();
+
+              std::fill(data.contravariant.begin(), data.contravariant.end(),
+                        DerivativeForm<1,dim,spacedim>());
+
+              Assert (data.n_shape_functions > 0, ExcInternalError());
+              const Tensor<1,spacedim> *supp_pts =
+                &data.mapping_support_points[0];
+
+              for (unsigned int point=0; point<n_q_points; ++point)
+                {
+                  const Tensor<1,dim> *data_derv =
+                    &data.derivative(point+data_set, 0);
+
+                  double result [spacedim][dim];
+
+                  // peel away part of sum to avoid zeroing the
+                  // entries and adding for the first time
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      result[i][j] = data_derv[0][j] * supp_pts[0][i];
+                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        result[i][j] += data_derv[k][j] * supp_pts[k][i];
+
+                  // write result into contravariant data. for
+                  // j=dim in the case dim<spacedim, there will
+                  // never be any nonzero data that arrives in
+                  // here, so it is ok anyway because it was
+                  // initialized to zero at the initialization
+                  for (unsigned int i=0; i<spacedim; ++i)
+                    for (unsigned int j=0; j<dim; ++j)
+                      data.contravariant[point][i][j] = result[i][j];
+                }
+            }
+
+        if (update_flags & update_covariant_transformation)
+          if (cell_similarity != CellSimilarity::translation)
+            {
+              const unsigned int n_q_points = data.contravariant.size();
+              for (unsigned int point=0; point<n_q_points; ++point)
+                {
+                  data.covariant[point] = (data.contravariant[point]).covariant_form();
+                }
+            }
+
+        if (update_flags & update_volume_elements)
+          if (cell_similarity != CellSimilarity::translation)
+            {
+              const unsigned int n_q_points = data.contravariant.size();
+              for (unsigned int point=0; point<n_q_points; ++point)
+                data.volume_elements[point] = data.contravariant[point].determinant();
+            }
+
+      }
+
+      /**
+       * Update the Hessian of the transformation from unit to real cell, the
+       * Jacobian gradients.
+       *
+       * Skip the computation if possible as indicated by the first argument.
+       */
+      template <int dim, int spacedim>
+      void
+      maybe_update_jacobian_grads
+      (const CellSimilarity::Similarity                                    cell_similarity,
+       const typename QProjector<dim>::DataSetDescriptor                   data_set,
+       const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
+       std::vector<DerivativeForm<2,dim,spacedim> >                       &jacobian_grads)
+      {
+        const UpdateFlags update_flags = data.update_each;
+        if (update_flags & update_jacobian_grads)
+          {
+            const unsigned int n_q_points = jacobian_grads.size();
+
+            if (cell_similarity != CellSimilarity::translation)
+              {
+                for (unsigned int point=0; point<n_q_points; ++point)
+                  {
+                    const Tensor<2,dim> *second =
+                      &data.second_derivative(point+data_set, 0);
+                    double result [spacedim][dim][dim];
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          result[i][j][l] = (second[0][j][l] *
+                                             data.mapping_support_points[0][i]);
+                    for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                      for (unsigned int i=0; i<spacedim; ++i)
+                        for (unsigned int j=0; j<dim; ++j)
+                          for (unsigned int l=0; l<dim; ++l)
+                            result[i][j][l]
+                            += (second[k][j][l]
+                                *
+                                data.mapping_support_points[k][i]);
+
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          jacobian_grads[point][i][j][l] = result[i][j][l];
+                  }
+              }
+          }
+      }
+
+      /**
+       * Update the Hessian of the transformation from unit to real cell, the
+       * Jacobian gradients, pushed forward to the real cell coordinates.
+       *
+       * Skip the computation if possible as indicated by the first argument.
+       */
+      template <int dim, int spacedim>
+      void
+      maybe_update_jacobian_pushed_forward_grads
+      (const CellSimilarity::Similarity                                    cell_similarity,
+       const typename QProjector<dim>::DataSetDescriptor                   data_set,
+       const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
+       std::vector<Tensor<3,spacedim> >                                   &jacobian_pushed_forward_grads)
+      {
+        const UpdateFlags update_flags = data.update_each;
+        if (update_flags & update_jacobian_pushed_forward_grads)
+          {
+            const unsigned int n_q_points = jacobian_pushed_forward_grads.size();
+
+            if (cell_similarity != CellSimilarity::translation)
+              {
+                double tmp[spacedim][spacedim][spacedim];
+                for (unsigned int point=0; point<n_q_points; ++point)
+                  {
+                    const Tensor<2,dim> *second =
+                      &data.second_derivative(point+data_set, 0);
+                    double result [spacedim][dim][dim];
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          result[i][j][l] = (second[0][j][l] *
+                                             data.mapping_support_points[0][i]);
+                    for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                      for (unsigned int i=0; i<spacedim; ++i)
+                        for (unsigned int j=0; j<dim; ++j)
+                          for (unsigned int l=0; l<dim; ++l)
+                            result[i][j][l]
+                            += (second[k][j][l]
+                                *
+                                data.mapping_support_points[k][i]);
+
+                    // first push forward the j-components
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          {
+                            tmp[i][j][l] = result[i][0][l] *
+                                           data.covariant[point][j][0];
+                            for (unsigned int jr=1; jr<dim; ++jr)
+                              {
+                                tmp[i][j][l] += result[i][jr][l] *
+                                                data.covariant[point][j][jr];
+                              }
+                          }
+
+                    // now, pushing forward the l-components
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        for (unsigned int l=0; l<spacedim; ++l)
+                          {
+                            jacobian_pushed_forward_grads[point][i][j][l] = tmp[i][j][0] *
+                                                                            data.covariant[point][l][0];
+                            for (unsigned int lr=1; lr<dim; ++lr)
+                              {
+                                jacobian_pushed_forward_grads[point][i][j][l] += tmp[i][j][lr] *
+                                                                                 data.covariant[point][l][lr];
+                              }
+
+                          }
+                  }
+              }
+          }
+      }
+
+      /**
+       * Update the third derivatives of the transformation from unit to real cell, the
+       * Jacobian hessians.
+       *
+       * Skip the computation if possible as indicated by the first argument.
+       */
+      template <int dim, int spacedim>
+      void
+      maybe_update_jacobian_2nd_derivatives
+      (const CellSimilarity::Similarity                                    cell_similarity,
+       const typename QProjector<dim>::DataSetDescriptor                   data_set,
+       const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
+       std::vector<DerivativeForm<3,dim,spacedim> >                       &jacobian_2nd_derivatives)
+      {
+        const UpdateFlags update_flags = data.update_each;
+        if (update_flags & update_jacobian_2nd_derivatives)
+          {
+            const unsigned int n_q_points = jacobian_2nd_derivatives.size();
+
+            if (cell_similarity != CellSimilarity::translation)
+              {
+                for (unsigned int point=0; point<n_q_points; ++point)
+                  {
+                    const Tensor<3,dim> *third =
+                      &data.third_derivative(point+data_set, 0);
+                    double result [spacedim][dim][dim][dim];
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            result[i][j][l][m] = (third[0][j][l][m] *
+                                                  data.mapping_support_points[0][i]);
+                    for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                      for (unsigned int i=0; i<spacedim; ++i)
+                        for (unsigned int j=0; j<dim; ++j)
+                          for (unsigned int l=0; l<dim; ++l)
+                            for (unsigned int m=0; m<dim; ++m)
+                              result[i][j][l][m]
+                              += (third[k][j][l][m]
+                                  *
+                                  data.mapping_support_points[k][i]);
+
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            jacobian_2nd_derivatives[point][i][j][l][m] = result[i][j][l][m];
+                  }
+              }
+          }
+      }
+
+      /**
+       * Update the Hessian of the Hessian of the transformation from unit
+       * to real cell, the Jacobian Hessian gradients, pushed forward to the
+       * real cell coordinates.
+       *
+       * Skip the computation if possible as indicated by the first argument.
+       */
+      template <int dim, int spacedim>
+      void
+      maybe_update_jacobian_pushed_forward_2nd_derivatives
+      (const CellSimilarity::Similarity                                    cell_similarity,
+       const typename QProjector<dim>::DataSetDescriptor                   data_set,
+       const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
+       std::vector<Tensor<4,spacedim> >                                   &jacobian_pushed_forward_2nd_derivatives)
+      {
+        const UpdateFlags update_flags = data.update_each;
+        if (update_flags & update_jacobian_pushed_forward_2nd_derivatives)
+          {
+            const unsigned int n_q_points = jacobian_pushed_forward_2nd_derivatives.size();
+
+            if (cell_similarity != CellSimilarity::translation)
+              {
+                double tmp[spacedim][spacedim][spacedim][spacedim];
+                for (unsigned int point=0; point<n_q_points; ++point)
+                  {
+                    const Tensor<3,dim> *third =
+                      &data.third_derivative(point+data_set, 0);
+                    double result [spacedim][dim][dim][dim];
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            result[i][j][l][m] = (third[0][j][l][m] *
+                                                  data.mapping_support_points[0][i]);
+                    for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                      for (unsigned int i=0; i<spacedim; ++i)
+                        for (unsigned int j=0; j<dim; ++j)
+                          for (unsigned int l=0; l<dim; ++l)
+                            for (unsigned int m=0; m<dim; ++m)
+                              result[i][j][l][m]
+                              += (third[k][j][l][m]
+                                  *
+                                  data.mapping_support_points[k][i]);
+
+                    // push forward the j-coordinate
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            {
+                              jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
+                                = result[i][0][l][m]*
+                                  data.covariant[point][j][0];
+                              for (unsigned int jr=1; jr<dim; ++jr)
+                                jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
+                                += result[i][jr][l][m]*
+                                   data.covariant[point][j][jr];
+                            }
+
+                    // push forward the l-coordinate
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        for (unsigned int l=0; l<spacedim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            {
+                              tmp[i][j][l][m]
+                                = jacobian_pushed_forward_2nd_derivatives[point][i][j][0][m]*
+                                  data.covariant[point][l][0];
+                              for (unsigned int lr=1; lr<dim; ++lr)
+                                tmp[i][j][l][m]
+                                += jacobian_pushed_forward_2nd_derivatives[point][i][j][lr][m]*
+                                   data.covariant[point][l][lr];
+                            }
+
+                    // push forward the m-coordinate
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        for (unsigned int l=0; l<spacedim; ++l)
+                          for (unsigned int m=0; m<spacedim; ++m)
+                            {
+                              jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
+                                = tmp[i][j][l][0]*
+                                  data.covariant[point][m][0];
+                              for (unsigned int mr=1; mr<dim; ++mr)
+                                jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
+                                += tmp[i][j][l][mr]*
+                                   data.covariant[point][m][mr];
+                            }
+                  }
+              }
+          }
+      }
+
+      /**
+       * Update the fourth derivatives of the transformation from unit to real cell, the
+       * Jacobian hessian gradients.
+       *
+       * Skip the computation if possible as indicated by the first argument.
+       */
+      template <int dim, int spacedim>
+      void
+      maybe_update_jacobian_3rd_derivatives
+      (const CellSimilarity::Similarity                                    cell_similarity,
+       const typename QProjector<dim>::DataSetDescriptor                   data_set,
+       const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
+       std::vector<DerivativeForm<4,dim,spacedim> >                       &jacobian_3rd_derivatives)
+      {
+        const UpdateFlags update_flags = data.update_each;
+        if (update_flags & update_jacobian_3rd_derivatives)
+          {
+            const unsigned int n_q_points = jacobian_3rd_derivatives.size();
+
+            if (cell_similarity != CellSimilarity::translation)
+              {
+                for (unsigned int point=0; point<n_q_points; ++point)
+                  {
+                    const Tensor<4,dim> *fourth =
+                      &data.fourth_derivative(point+data_set, 0);
+                    double result [spacedim][dim][dim][dim][dim];
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            for (unsigned int n=0; n<dim; ++n)
+                              result[i][j][l][m][n] = (fourth[0][j][l][m][n] *
+                                                       data.mapping_support_points[0][i]);
+                    for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                      for (unsigned int i=0; i<spacedim; ++i)
+                        for (unsigned int j=0; j<dim; ++j)
+                          for (unsigned int l=0; l<dim; ++l)
+                            for (unsigned int m=0; m<dim; ++m)
+                              for (unsigned int n=0; n<dim; ++n)
+                                result[i][j][l][m][n]
+                                += (fourth[k][j][l][m][n]
+                                    *
+                                    data.mapping_support_points[k][i]);
+
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            for (unsigned int n=0; n<dim; ++n)
+                              jacobian_3rd_derivatives[point][i][j][l][m][n] = result[i][j][l][m][n];
+                  }
+              }
+          }
+      }
+
+      /**
+       * Update the Hessian gradient of the transformation from unit to real cell, the
+       * Jacobian Hessians, pushed forward to the real cell coordinates.
+       *
+       * Skip the computation if possible as indicated by the first argument.
+       */
+      template <int dim, int spacedim>
+      void
+      maybe_update_jacobian_pushed_forward_3rd_derivatives
+      (const CellSimilarity::Similarity                                    cell_similarity,
+       const typename QProjector<dim>::DataSetDescriptor                   data_set,
+       const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
+       std::vector<Tensor<5,spacedim> >                                   &jacobian_pushed_forward_3rd_derivatives)
+      {
+        const UpdateFlags update_flags = data.update_each;
+        if (update_flags & update_jacobian_pushed_forward_3rd_derivatives)
+          {
+            const unsigned int n_q_points = jacobian_pushed_forward_3rd_derivatives.size();
+
+            if (cell_similarity != CellSimilarity::translation)
+              {
+                double tmp[spacedim][spacedim][spacedim][spacedim][spacedim];
+                for (unsigned int point=0; point<n_q_points; ++point)
+                  {
+                    const Tensor<4,dim> *fourth =
+                      &data.fourth_derivative(point+data_set, 0);
+                    double result [spacedim][dim][dim][dim][dim];
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            for (unsigned int n=0; n<dim; ++n)
+                              result[i][j][l][m][n] = (fourth[0][j][l][m][n] *
+                                                       data.mapping_support_points[0][i]);
+                    for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                      for (unsigned int i=0; i<spacedim; ++i)
+                        for (unsigned int j=0; j<dim; ++j)
+                          for (unsigned int l=0; l<dim; ++l)
+                            for (unsigned int m=0; m<dim; ++m)
+                              for (unsigned int n=0; n<dim; ++n)
+                                result[i][j][l][m][n]
+                                += (fourth[k][j][l][m][n]
+                                    *
+                                    data.mapping_support_points[k][i]);
+
+                    // push-forward the j-coordinate
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        for (unsigned int l=0; l<dim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            for (unsigned int n=0; n<dim; ++n)
+                              {
+                                tmp[i][j][l][m][n] = result[i][0][l][m][n] *
+                                                     data.covariant[point][j][0];
+                                for (unsigned int jr=1; jr<dim; ++jr)
+                                  tmp[i][j][l][m][n] += result[i][jr][l][m][n] *
+                                                        data.covariant[point][j][jr];
+                              }
+
+                    // push-forward the l-coordinate
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        for (unsigned int l=0; l<spacedim; ++l)
+                          for (unsigned int m=0; m<dim; ++m)
+                            for (unsigned int n=0; n<dim; ++n)
+                              {
+                                jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
+                                  = tmp[i][j][0][m][n] *
+                                    data.covariant[point][l][0];
+                                for (unsigned int lr=1; lr<dim; ++lr)
+                                  jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
+                                  += tmp[i][j][lr][m][n] *
+                                     data.covariant[point][l][lr];
+                              }
+
+                    // push-forward the m-coordinate
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        for (unsigned int l=0; l<spacedim; ++l)
+                          for (unsigned int m=0; m<spacedim; ++m)
+                            for (unsigned int n=0; n<dim; ++n)
+                              {
+                                tmp[i][j][l][m][n]
+                                  = jacobian_pushed_forward_3rd_derivatives[point][i][j][l][0][n] *
+                                    data.covariant[point][m][0];
+                                for (unsigned int mr=1; mr<dim; ++mr)
+                                  tmp[i][j][l][m][n]
+                                  += jacobian_pushed_forward_3rd_derivatives[point][i][j][l][mr][n] *
+                                     data.covariant[point][m][mr];
+                              }
+
+                    // push-forward the n-coordinate
+                    for (unsigned int i=0; i<spacedim; ++i)
+                      for (unsigned int j=0; j<spacedim; ++j)
+                        for (unsigned int l=0; l<spacedim; ++l)
+                          for (unsigned int m=0; m<spacedim; ++m)
+                            for (unsigned int n=0; n<spacedim; ++n)
+                              {
+                                jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
+                                  = tmp[i][j][l][m][0] *
+                                    data.covariant[point][n][0];
+                                for (unsigned int nr=1; nr<dim; ++nr)
+                                  jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
+                                  += tmp[i][j][l][m][nr] *
+                                     data.covariant[point][n][nr];
+                              }
+                  }
+              }
+          }
+      }
+    }
   }
 }
-
 
 
 
@@ -1098,8 +1972,8 @@ MappingQGeneric<dim,spacedim>::MappingQGeneric (const unsigned int p)
   polynomial_degree(p),
   line_support_points(this->polynomial_degree+1),
   fe_q(dim == 3 ? new FE_Q<dim>(this->polynomial_degree) : nullptr),
-  support_point_weights_perimeter_to_interior (compute_support_point_weights_perimeter_to_interior(this->polynomial_degree, dim)),
-  support_point_weights_cell (compute_support_point_weights_cell<dim>(this->polynomial_degree))
+  support_point_weights_perimeter_to_interior (internal::MappingQGeneric::compute_support_point_weights_perimeter_to_interior(this->polynomial_degree, dim)),
+  support_point_weights_cell (internal::MappingQGeneric::compute_support_point_weights_cell<dim>(this->polynomial_degree))
 {
   Assert (p >= 1, ExcMessage ("It only makes sense to create polynomial mappings "
                               "with a polynomial degree greater or equal to one."));
@@ -1154,9 +2028,9 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
   // then also construct the mapping from lexicographic to the Qp shape function numbering
   const std::vector<unsigned int>
   renumber (FETools::
-            lexicographic_to_hierarchic_numbering (
-              FiniteElementData<dim> (get_dpo_vector<dim>(polynomial_degree), 1,
-                                      polynomial_degree)));
+            lexicographic_to_hierarchic_numbering
+            (FiniteElementData<dim> (internal::MappingQGeneric::get_dpo_vector<dim>
+                                     (polynomial_degree), 1, polynomial_degree)));
 
   const std::vector<Point<spacedim> > support_points
     = this->compute_mapping_support_points(cell);
@@ -1179,326 +2053,6 @@ transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_it
 template <>
 class MappingQGeneric<3,4>
 {};
-
-namespace
-{
-  /**
-   * Using the relative weights of the shape functions evaluated at
-   * one point on the reference cell (and stored in data.shape_values
-   * and accessed via data.shape(0,i)) and the locations of mapping
-   * support points (stored in data.mapping_support_points), compute
-   * the mapped location of that point in real space.
-   */
-  template <int dim, int spacedim>
-  Point<spacedim>
-  compute_mapped_location_of_point (const typename MappingQGeneric<dim,spacedim>::InternalData &data)
-  {
-    AssertDimension (data.shape_values.size(),
-                     data.mapping_support_points.size());
-
-    // use now the InternalData to compute the point in real space.
-    Point<spacedim> p_real;
-    for (unsigned int i=0; i<data.mapping_support_points.size(); ++i)
-      p_real += data.mapping_support_points[i] * data.shape(0,i);
-
-    return p_real;
-  }
-
-
-  /**
-   * Implementation of transform_real_to_unit_cell for dim==spacedim
-   */
-  template <int dim>
-  Point<dim>
-  do_transform_real_to_unit_cell_internal
-  (const typename Triangulation<dim,dim>::cell_iterator &cell,
-   const Point<dim>                                     &p,
-   const Point<dim>                                     &initial_p_unit,
-   typename MappingQGeneric<dim,dim>::InternalData      &mdata)
-  {
-    const unsigned int spacedim = dim;
-
-    const unsigned int n_shapes=mdata.shape_values.size();
-    (void)n_shapes;
-    Assert(n_shapes!=0, ExcInternalError());
-    AssertDimension (mdata.shape_derivatives.size(), n_shapes);
-
-    std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
-    AssertDimension (points.size(), n_shapes);
-
-
-    // Newton iteration to solve
-    //    f(x)=p(x)-p=0
-    // where we are looking for 'x' and p(x) is the forward transformation
-    // from unit to real cell. We solve this using a Newton iteration
-    //    x_{n+1}=x_n-[f'(x)]^{-1}f(x)
-    // The start value is set to be the linear approximation to the cell
-
-    // The shape values and derivatives of the mapping at this point are
-    // previously computed.
-
-    Point<dim> p_unit = initial_p_unit;
-
-    mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
-
-    Point<spacedim> p_real = compute_mapped_location_of_point<dim,spacedim>(mdata);
-    Tensor<1,spacedim> f = p_real-p;
-
-    // early out if we already have our point
-    if (f.norm_square() < 1e-24 * cell->diameter() * cell->diameter())
-      return p_unit;
-
-    // we need to compare the position of the computed p(x) against the given
-    // point 'p'. We will terminate the iteration and return 'x' if they are
-    // less than eps apart. The question is how to choose eps -- or, put maybe
-    // more generally: in which norm we want these 'p' and 'p(x)' to be eps
-    // apart.
-    //
-    // the question is difficult since we may have to deal with very elongated
-    // cells where we may achieve 1e-12*h for the distance of these two points
-    // in the 'long' direction, but achieving this tolerance in the 'short'
-    // direction of the cell may not be possible
-    //
-    // what we do instead is then to terminate iterations if
-    //    \| p(x) - p \|_A < eps
-    // where the A-norm is somehow induced by the transformation of the cell.
-    // in particular, we want to measure distances relative to the sizes of
-    // the cell in its principal directions.
-    //
-    // to define what exactly A should be, note that to first order we have
-    // the following (assuming that x* is the solution of the problem, i.e.,
-    // p(x*)=p):
-    //    p(x) - p = p(x) - p(x*)
-    //             = -grad p(x) * (x*-x) + higher order terms
-    // This suggest to measure with a norm that corresponds to
-    //    A = {[grad p(x]^T [grad p(x)]}^{-1}
-    // because then
-    //    \| p(x) - p \|_A  \approx  \| x - x* \|
-    // Consequently, we will try to enforce that
-    //    \| p(x) - p \|_A  =  \| f \|  <=  eps
-    //
-    // Note that using this norm is a bit dangerous since the norm changes
-    // in every iteration (A isn't fixed by depends on xk). However, if the
-    // cell is not too deformed (it may be stretched, but not twisted) then
-    // the mapping is almost linear and A is indeed constant or nearly so.
-    const double eps = 1.e-11;
-    const unsigned int newton_iteration_limit = 20;
-
-    unsigned int newton_iteration = 0;
-    double last_f_weighted_norm;
-    do
-      {
-#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-        std::cout << "Newton iteration " << newton_iteration << std::endl;
-#endif
-
-        // f'(x)
-        Tensor<2,spacedim> df;
-        for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
-          {
-            const Tensor<1,dim> &grad_transform=mdata.derivative(0,k);
-            const Point<spacedim> &point=points[k];
-
-            for (unsigned int i=0; i<spacedim; ++i)
-              for (unsigned int j=0; j<dim; ++j)
-                df[i][j]+=point[i]*grad_transform[j];
-          }
-
-        // Solve  [f'(x)]d=f(x)
-        AssertThrow(determinant(df) > 0,
-                    (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
-        Tensor<2,spacedim> df_inverse = invert(df);
-        const Tensor<1,spacedim> delta = df_inverse * static_cast<const Tensor<1,spacedim>&>(f);
-
-#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-        std::cout << "   delta=" << delta  << std::endl;
-#endif
-
-        // do a line search
-        double step_length = 1;
-        do
-          {
-            // update of p_unit. The spacedim-th component of transformed point
-            // is simply ignored in codimension one case. When this component is
-            // not zero, then we are projecting the point to the surface or
-            // curve identified by the cell.
-            Point<dim> p_unit_trial = p_unit;
-            for (unsigned int i=0; i<dim; ++i)
-              p_unit_trial[i] -= step_length * delta[i];
-
-            // shape values and derivatives
-            // at new p_unit point
-            mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit_trial));
-
-            // f(x)
-            Point<spacedim> p_real_trial = compute_mapped_location_of_point<dim,spacedim>(mdata);
-            const Tensor<1,spacedim> f_trial = p_real_trial-p;
-
-#ifdef DEBUG_TRANSFORM_REAL_TO_UNIT_CELL
-            std::cout << "     step_length=" << step_length << std::endl
-                      << "       ||f ||   =" << f.norm() << std::endl
-                      << "       ||f*||   =" << f_trial.norm() << std::endl
-                      << "       ||f*||_A =" << (df_inverse * f_trial).norm() << std::endl;
-#endif
-
-            // see if we are making progress with the current step length
-            // and if not, reduce it by a factor of two and try again
-            //
-            // strictly speaking, we should probably use the same norm as we use
-            // for the outer algorithm. in practice, line search is just a
-            // crutch to find a "reasonable" step length, and so using the l2
-            // norm is probably just fine
-            if (f_trial.norm() < f.norm())
-              {
-                p_real = p_real_trial;
-                p_unit = p_unit_trial;
-                f = f_trial;
-                break;
-              }
-            else if (step_length > 0.05)
-              step_length /= 2;
-            else
-              AssertThrow (false,
-                           (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
-          }
-        while (true);
-
-        ++newton_iteration;
-        if (newton_iteration > newton_iteration_limit)
-          AssertThrow (false,
-                       (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
-        last_f_weighted_norm = (df_inverse * f).norm();
-      }
-    while (last_f_weighted_norm > eps);
-
-    return p_unit;
-  }
-
-
-
-  /**
-   * Implementation of transform_real_to_unit_cell for dim==spacedim-1
-   */
-  template <int dim>
-  Point<dim>
-  do_transform_real_to_unit_cell_internal_codim1
-  (const typename Triangulation<dim,dim+1>::cell_iterator &cell,
-   const Point<dim+1>                                       &p,
-   const Point<dim>                                         &initial_p_unit,
-   typename MappingQGeneric<dim,dim+1>::InternalData       &mdata)
-  {
-    const unsigned int spacedim = dim+1;
-
-    const unsigned int n_shapes=mdata.shape_values.size();
-    (void)n_shapes;
-    Assert(n_shapes!=0, ExcInternalError());
-    Assert(mdata.shape_derivatives.size()==n_shapes, ExcInternalError());
-    Assert(mdata.shape_second_derivatives.size()==n_shapes, ExcInternalError());
-
-    std::vector<Point<spacedim> > &points=mdata.mapping_support_points;
-    Assert(points.size()==n_shapes, ExcInternalError());
-
-    Point<spacedim> p_minus_F;
-
-    Tensor<1,spacedim>  DF[dim];
-    Tensor<1,spacedim>  D2F[dim][dim];
-
-    Point<dim> p_unit = initial_p_unit;
-    Point<dim> f;
-    Tensor<2,dim>  df;
-
-    // Evaluate first and second derivatives
-    mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
-
-    for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
-      {
-        const Tensor<1,dim>   &grad_phi_k = mdata.derivative(0,k);
-        const Tensor<2,dim>   &hessian_k  = mdata.second_derivative(0,k);
-        const Point<spacedim> &point_k = points[k];
-
-        for (unsigned int j=0; j<dim; ++j)
-          {
-            DF[j] += grad_phi_k[j] * point_k;
-            for (unsigned int l=0; l<dim; ++l)
-              D2F[j][l] += hessian_k[j][l] * point_k;
-          }
-      }
-
-    p_minus_F = p;
-    p_minus_F -= compute_mapped_location_of_point<dim,spacedim>(mdata);
-
-
-    for (unsigned int j=0; j<dim; ++j)
-      f[j] = DF[j] * p_minus_F;
-
-    for (unsigned int j=0; j<dim; ++j)
-      {
-        f[j] = DF[j] * p_minus_F;
-        for (unsigned int l=0; l<dim; ++l)
-          df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
-      }
-
-
-    const double eps = 1.e-12*cell->diameter();
-    const unsigned int loop_limit = 10;
-
-    unsigned int loop=0;
-
-    while (f.norm()>eps && loop++<loop_limit)
-      {
-        // Solve  [df(x)]d=f(x)
-        const Tensor<1,dim> d = invert(df) * static_cast<const Tensor<1,dim>&>(f);
-        p_unit -= d;
-
-        for (unsigned int j=0; j<dim; ++j)
-          {
-            DF[j].clear();
-            for (unsigned int l=0; l<dim; ++l)
-              D2F[j][l].clear();
-          }
-
-        mdata.compute_shape_function_values(std::vector<Point<dim> > (1, p_unit));
-
-        for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
-          {
-            const Tensor<1,dim>   &grad_phi_k = mdata.derivative(0,k);
-            const Tensor<2,dim>   &hessian_k  = mdata.second_derivative(0,k);
-            const Point<spacedim> &point_k = points[k];
-
-            for (unsigned int j=0; j<dim; ++j)
-              {
-                DF[j] += grad_phi_k[j] * point_k;
-                for (unsigned int l=0; l<dim; ++l)
-                  D2F[j][l] += hessian_k[j][l] * point_k;
-              }
-          }
-
-        //TODO: implement a line search here in much the same way as for
-        // the corresponding function above that does so for dim==spacedim
-        p_minus_F = p;
-        p_minus_F -= compute_mapped_location_of_point<dim,spacedim>(mdata);
-
-        for (unsigned int j=0; j<dim; ++j)
-          {
-            f[j] = DF[j] * p_minus_F;
-            for (unsigned int l=0; l<dim; ++l)
-              df[j][l] = -DF[j]*DF[l] + D2F[j][l] * p_minus_F;
-          }
-
-      }
-
-
-    // Here we check that in the last execution of while the first
-    // condition was already wrong, meaning the residual was below
-    // eps. Only if the first condition failed, loop will have been
-    // increased and tested, and thus have reached the limit.
-    AssertThrow (loop<loop_limit, (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
-
-    return p_unit;
-  }
-
-
-}
 
 
 
@@ -1544,7 +2098,7 @@ transform_real_to_unit_cell_internal
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal<1>(cell, p, initial_p_unit, *mdata);
+  return internal::MappingQGeneric::do_transform_real_to_unit_cell_internal<1>(cell, p, initial_p_unit, *mdata);
 }
 
 template <>
@@ -1570,7 +2124,7 @@ transform_real_to_unit_cell_internal
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal<2>(cell, p, initial_p_unit, *mdata);
+  return internal::MappingQGeneric::do_transform_real_to_unit_cell_internal<2>(cell, p, initial_p_unit, *mdata);
 }
 
 template <>
@@ -1596,7 +2150,7 @@ transform_real_to_unit_cell_internal
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, *mdata);
+  return internal::MappingQGeneric::do_transform_real_to_unit_cell_internal<3>(cell, p, initial_p_unit, *mdata);
 }
 
 template <>
@@ -1622,7 +2176,7 @@ transform_real_to_unit_cell_internal
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal_codim1<1>(cell, p, initial_p_unit, *mdata);
+  return internal::MappingQGeneric::do_transform_real_to_unit_cell_internal_codim1<1>(cell, p, initial_p_unit, *mdata);
 }
 
 template <>
@@ -1648,7 +2202,7 @@ transform_real_to_unit_cell_internal
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
-  return do_transform_real_to_unit_cell_internal_codim1<2>(cell, p, initial_p_unit, *mdata);
+  return internal::MappingQGeneric::do_transform_real_to_unit_cell_internal_codim1<2>(cell, p, initial_p_unit, *mdata);
 }
 
 template <>
@@ -1900,551 +2454,6 @@ MappingQGeneric<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
 
 
 
-namespace internal
-{
-  namespace
-  {
-    /**
-     * Compute the locations of quadrature points on the object described by
-     * the first argument (and the cell for which the mapping support points
-     * have already been set), but only if the update_flags of the @p data
-     * argument indicate so.
-     */
-    template <int dim, int spacedim>
-    void
-    maybe_compute_q_points (const typename QProjector<dim>::DataSetDescriptor                 data_set,
-                            const typename dealii::MappingQGeneric<dim,spacedim>::InternalData      &data,
-                            std::vector<Point<spacedim> >                                     &quadrature_points)
-    {
-      const UpdateFlags update_flags = data.update_each;
-
-      if (update_flags & update_quadrature_points)
-        {
-          for (unsigned int point=0; point<quadrature_points.size(); ++point)
-            {
-              const double *shape = &data.shape(point+data_set,0);
-              Point<spacedim> result = (shape[0] *
-                                        data.mapping_support_points[0]);
-              for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                for (unsigned int i=0; i<spacedim; ++i)
-                  result[i] += shape[k] * data.mapping_support_points[k][i];
-              quadrature_points[point] = result;
-            }
-        }
-    }
-
-
-    /**
-     * Update the co- and contravariant matrices as well as their determinant, for the cell
-     * described stored in the data object, but only if the update_flags of the @p data
-     * argument indicate so.
-     *
-     * Skip the computation if possible as indicated by the first argument.
-     */
-    template <int dim, int spacedim>
-    void
-    maybe_update_Jacobians (const CellSimilarity::Similarity                                   cell_similarity,
-                            const typename dealii::QProjector<dim>::DataSetDescriptor          data_set,
-                            const typename dealii::MappingQGeneric<dim,spacedim>::InternalData      &data)
-    {
-      const UpdateFlags update_flags = data.update_each;
-
-      if (update_flags & update_contravariant_transformation)
-        // if the current cell is just a
-        // translation of the previous one, no
-        // need to recompute jacobians...
-        if (cell_similarity != CellSimilarity::translation)
-          {
-            const unsigned int n_q_points = data.contravariant.size();
-
-            std::fill(data.contravariant.begin(), data.contravariant.end(),
-                      DerivativeForm<1,dim,spacedim>());
-
-            Assert (data.n_shape_functions > 0, ExcInternalError());
-            const Tensor<1,spacedim> *supp_pts =
-              &data.mapping_support_points[0];
-
-            for (unsigned int point=0; point<n_q_points; ++point)
-              {
-                const Tensor<1,dim> *data_derv =
-                  &data.derivative(point+data_set, 0);
-
-                double result [spacedim][dim];
-
-                // peel away part of sum to avoid zeroing the
-                // entries and adding for the first time
-                for (unsigned int i=0; i<spacedim; ++i)
-                  for (unsigned int j=0; j<dim; ++j)
-                    result[i][j] = data_derv[0][j] * supp_pts[0][i];
-                for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      result[i][j] += data_derv[k][j] * supp_pts[k][i];
-
-                // write result into contravariant data. for
-                // j=dim in the case dim<spacedim, there will
-                // never be any nonzero data that arrives in
-                // here, so it is ok anyway because it was
-                // initialized to zero at the initialization
-                for (unsigned int i=0; i<spacedim; ++i)
-                  for (unsigned int j=0; j<dim; ++j)
-                    data.contravariant[point][i][j] = result[i][j];
-              }
-          }
-
-      if (update_flags & update_covariant_transformation)
-        if (cell_similarity != CellSimilarity::translation)
-          {
-            const unsigned int n_q_points = data.contravariant.size();
-            for (unsigned int point=0; point<n_q_points; ++point)
-              {
-                data.covariant[point] = (data.contravariant[point]).covariant_form();
-              }
-          }
-
-      if (update_flags & update_volume_elements)
-        if (cell_similarity != CellSimilarity::translation)
-          {
-            const unsigned int n_q_points = data.contravariant.size();
-            for (unsigned int point=0; point<n_q_points; ++point)
-              data.volume_elements[point] = data.contravariant[point].determinant();
-          }
-
-    }
-
-    /**
-     * Update the Hessian of the transformation from unit to real cell, the
-     * Jacobian gradients.
-     *
-     * Skip the computation if possible as indicated by the first argument.
-     */
-    template <int dim, int spacedim>
-    void
-    maybe_update_jacobian_grads (const CellSimilarity::Similarity                                   cell_similarity,
-                                 const typename QProjector<dim>::DataSetDescriptor                  data_set,
-                                 const typename dealii::MappingQGeneric<dim,spacedim>::InternalData      &data,
-                                 std::vector<DerivativeForm<2,dim,spacedim> >                      &jacobian_grads)
-    {
-      const UpdateFlags update_flags = data.update_each;
-      if (update_flags & update_jacobian_grads)
-        {
-          const unsigned int n_q_points = jacobian_grads.size();
-
-          if (cell_similarity != CellSimilarity::translation)
-            {
-              for (unsigned int point=0; point<n_q_points; ++point)
-                {
-                  const Tensor<2,dim> *second =
-                    &data.second_derivative(point+data_set, 0);
-                  double result [spacedim][dim][dim];
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        result[i][j][l] = (second[0][j][l] *
-                                           data.mapping_support_points[0][i]);
-                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                    for (unsigned int i=0; i<spacedim; ++i)
-                      for (unsigned int j=0; j<dim; ++j)
-                        for (unsigned int l=0; l<dim; ++l)
-                          result[i][j][l]
-                          += (second[k][j][l]
-                              *
-                              data.mapping_support_points[k][i]);
-
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        jacobian_grads[point][i][j][l] = result[i][j][l];
-                }
-            }
-        }
-    }
-
-    /**
-     * Update the Hessian of the transformation from unit to real cell, the
-     * Jacobian gradients, pushed forward to the real cell coordinates.
-     *
-     * Skip the computation if possible as indicated by the first argument.
-     */
-    template <int dim, int spacedim>
-    void
-    maybe_update_jacobian_pushed_forward_grads (const CellSimilarity::Similarity                                   cell_similarity,
-                                                const typename QProjector<dim>::DataSetDescriptor                  data_set,
-                                                const typename dealii::MappingQGeneric<dim,spacedim>::InternalData      &data,
-                                                std::vector<Tensor<3,spacedim> >                      &jacobian_pushed_forward_grads)
-    {
-      const UpdateFlags update_flags = data.update_each;
-      if (update_flags & update_jacobian_pushed_forward_grads)
-        {
-          const unsigned int n_q_points = jacobian_pushed_forward_grads.size();
-
-          if (cell_similarity != CellSimilarity::translation)
-            {
-              double tmp[spacedim][spacedim][spacedim];
-              for (unsigned int point=0; point<n_q_points; ++point)
-                {
-                  const Tensor<2,dim> *second =
-                    &data.second_derivative(point+data_set, 0);
-                  double result [spacedim][dim][dim];
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        result[i][j][l] = (second[0][j][l] *
-                                           data.mapping_support_points[0][i]);
-                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                    for (unsigned int i=0; i<spacedim; ++i)
-                      for (unsigned int j=0; j<dim; ++j)
-                        for (unsigned int l=0; l<dim; ++l)
-                          result[i][j][l]
-                          += (second[k][j][l]
-                              *
-                              data.mapping_support_points[k][i]);
-
-                  // first push forward the j-components
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<spacedim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        {
-                          tmp[i][j][l] = result[i][0][l] *
-                                         data.covariant[point][j][0];
-                          for (unsigned int jr=1; jr<dim; ++jr)
-                            {
-                              tmp[i][j][l] += result[i][jr][l] *
-                                              data.covariant[point][j][jr];
-                            }
-                        }
-
-                  // now, pushing forward the l-components
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<spacedim; ++j)
-                      for (unsigned int l=0; l<spacedim; ++l)
-                        {
-                          jacobian_pushed_forward_grads[point][i][j][l] = tmp[i][j][0] *
-                                                                          data.covariant[point][l][0];
-                          for (unsigned int lr=1; lr<dim; ++lr)
-                            {
-                              jacobian_pushed_forward_grads[point][i][j][l] += tmp[i][j][lr] *
-                                                                               data.covariant[point][l][lr];
-                            }
-
-                        }
-                }
-            }
-        }
-    }
-
-    /**
-     * Update the third derivatives of the transformation from unit to real cell, the
-     * Jacobian hessians.
-     *
-     * Skip the computation if possible as indicated by the first argument.
-     */
-    template <int dim, int spacedim>
-    void
-    maybe_update_jacobian_2nd_derivatives (const CellSimilarity::Similarity                              cell_similarity,
-                                           const typename QProjector<dim>::DataSetDescriptor             data_set,
-                                           const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
-                                           std::vector<DerivativeForm<3,dim,spacedim> >                 &jacobian_2nd_derivatives)
-    {
-      const UpdateFlags update_flags = data.update_each;
-      if (update_flags & update_jacobian_2nd_derivatives)
-        {
-          const unsigned int n_q_points = jacobian_2nd_derivatives.size();
-
-          if (cell_similarity != CellSimilarity::translation)
-            {
-              for (unsigned int point=0; point<n_q_points; ++point)
-                {
-                  const Tensor<3,dim> *third =
-                    &data.third_derivative(point+data_set, 0);
-                  double result [spacedim][dim][dim][dim];
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        for (unsigned int m=0; m<dim; ++m)
-                          result[i][j][l][m] = (third[0][j][l][m] *
-                                                data.mapping_support_points[0][i]);
-                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                    for (unsigned int i=0; i<spacedim; ++i)
-                      for (unsigned int j=0; j<dim; ++j)
-                        for (unsigned int l=0; l<dim; ++l)
-                          for (unsigned int m=0; m<dim; ++m)
-                            result[i][j][l][m]
-                            += (third[k][j][l][m]
-                                *
-                                data.mapping_support_points[k][i]);
-
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        for (unsigned int m=0; m<dim; ++m)
-                          jacobian_2nd_derivatives[point][i][j][l][m] = result[i][j][l][m];
-                }
-            }
-        }
-    }
-
-    /**
-     * Update the Hessian of the Hessian of the transformation from unit
-     * to real cell, the Jacobian Hessian gradients, pushed forward to the
-     * real cell coordinates.
-     *
-     * Skip the computation if possible as indicated by the first argument.
-     */
-    template <int dim, int spacedim>
-    void
-    maybe_update_jacobian_pushed_forward_2nd_derivatives (const CellSimilarity::Similarity                                   cell_similarity,
-                                                          const typename QProjector<dim>::DataSetDescriptor                  data_set,
-                                                          const typename dealii::MappingQGeneric<dim,spacedim>::InternalData      &data,
-                                                          std::vector<Tensor<4,spacedim> >                      &jacobian_pushed_forward_2nd_derivatives)
-    {
-      const UpdateFlags update_flags = data.update_each;
-      if (update_flags & update_jacobian_pushed_forward_2nd_derivatives)
-        {
-          const unsigned int n_q_points = jacobian_pushed_forward_2nd_derivatives.size();
-
-          if (cell_similarity != CellSimilarity::translation)
-            {
-              double tmp[spacedim][spacedim][spacedim][spacedim];
-              for (unsigned int point=0; point<n_q_points; ++point)
-                {
-                  const Tensor<3,dim> *third =
-                    &data.third_derivative(point+data_set, 0);
-                  double result [spacedim][dim][dim][dim];
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        for (unsigned int m=0; m<dim; ++m)
-                          result[i][j][l][m] = (third[0][j][l][m] *
-                                                data.mapping_support_points[0][i]);
-                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                    for (unsigned int i=0; i<spacedim; ++i)
-                      for (unsigned int j=0; j<dim; ++j)
-                        for (unsigned int l=0; l<dim; ++l)
-                          for (unsigned int m=0; m<dim; ++m)
-                            result[i][j][l][m]
-                            += (third[k][j][l][m]
-                                *
-                                data.mapping_support_points[k][i]);
-
-                  // push forward the j-coordinate
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<spacedim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        for (unsigned int m=0; m<dim; ++m)
-                          {
-                            jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
-                              = result[i][0][l][m]*
-                                data.covariant[point][j][0];
-                            for (unsigned int jr=1; jr<dim; ++jr)
-                              jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
-                              += result[i][jr][l][m]*
-                                 data.covariant[point][j][jr];
-                          }
-
-                  // push forward the l-coordinate
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<spacedim; ++j)
-                      for (unsigned int l=0; l<spacedim; ++l)
-                        for (unsigned int m=0; m<dim; ++m)
-                          {
-                            tmp[i][j][l][m]
-                              = jacobian_pushed_forward_2nd_derivatives[point][i][j][0][m]*
-                                data.covariant[point][l][0];
-                            for (unsigned int lr=1; lr<dim; ++lr)
-                              tmp[i][j][l][m]
-                              += jacobian_pushed_forward_2nd_derivatives[point][i][j][lr][m]*
-                                 data.covariant[point][l][lr];
-                          }
-
-                  // push forward the m-coordinate
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<spacedim; ++j)
-                      for (unsigned int l=0; l<spacedim; ++l)
-                        for (unsigned int m=0; m<spacedim; ++m)
-                          {
-                            jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
-                              = tmp[i][j][l][0]*
-                                data.covariant[point][m][0];
-                            for (unsigned int mr=1; mr<dim; ++mr)
-                              jacobian_pushed_forward_2nd_derivatives[point][i][j][l][m]
-                              += tmp[i][j][l][mr]*
-                                 data.covariant[point][m][mr];
-                          }
-                }
-            }
-        }
-    }
-
-    /**
-         * Update the fourth derivatives of the transformation from unit to real cell, the
-         * Jacobian hessian gradients.
-         *
-         * Skip the computation if possible as indicated by the first argument.
-         */
-    template <int dim, int spacedim>
-    void
-    maybe_update_jacobian_3rd_derivatives (const CellSimilarity::Similarity                              cell_similarity,
-                                           const typename QProjector<dim>::DataSetDescriptor             data_set,
-                                           const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
-                                           std::vector<DerivativeForm<4,dim,spacedim> >                 &jacobian_3rd_derivatives)
-    {
-      const UpdateFlags update_flags = data.update_each;
-      if (update_flags & update_jacobian_3rd_derivatives)
-        {
-          const unsigned int n_q_points = jacobian_3rd_derivatives.size();
-
-          if (cell_similarity != CellSimilarity::translation)
-            {
-              for (unsigned int point=0; point<n_q_points; ++point)
-                {
-                  const Tensor<4,dim> *fourth =
-                    &data.fourth_derivative(point+data_set, 0);
-                  double result [spacedim][dim][dim][dim][dim];
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        for (unsigned int m=0; m<dim; ++m)
-                          for (unsigned int n=0; n<dim; ++n)
-                            result[i][j][l][m][n] = (fourth[0][j][l][m][n] *
-                                                     data.mapping_support_points[0][i]);
-                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                    for (unsigned int i=0; i<spacedim; ++i)
-                      for (unsigned int j=0; j<dim; ++j)
-                        for (unsigned int l=0; l<dim; ++l)
-                          for (unsigned int m=0; m<dim; ++m)
-                            for (unsigned int n=0; n<dim; ++n)
-                              result[i][j][l][m][n]
-                              += (fourth[k][j][l][m][n]
-                                  *
-                                  data.mapping_support_points[k][i]);
-
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        for (unsigned int m=0; m<dim; ++m)
-                          for (unsigned int n=0; n<dim; ++n)
-                            jacobian_3rd_derivatives[point][i][j][l][m][n] = result[i][j][l][m][n];
-                }
-            }
-        }
-    }
-
-    /**
-     * Update the Hessian gradient of the transformation from unit to real cell, the
-     * Jacobian Hessians, pushed forward to the real cell coordinates.
-     *
-     * Skip the computation if possible as indicated by the first argument.
-     */
-    template <int dim, int spacedim>
-    void
-    maybe_update_jacobian_pushed_forward_3rd_derivatives (const CellSimilarity::Similarity                                   cell_similarity,
-                                                          const typename QProjector<dim>::DataSetDescriptor                  data_set,
-                                                          const typename dealii::MappingQGeneric<dim,spacedim>::InternalData      &data,
-                                                          std::vector<Tensor<5,spacedim> >                      &jacobian_pushed_forward_3rd_derivatives)
-    {
-      const UpdateFlags update_flags = data.update_each;
-      if (update_flags & update_jacobian_pushed_forward_3rd_derivatives)
-        {
-          const unsigned int n_q_points = jacobian_pushed_forward_3rd_derivatives.size();
-
-          if (cell_similarity != CellSimilarity::translation)
-            {
-              double tmp[spacedim][spacedim][spacedim][spacedim][spacedim];
-              for (unsigned int point=0; point<n_q_points; ++point)
-                {
-                  const Tensor<4,dim> *fourth =
-                    &data.fourth_derivative(point+data_set, 0);
-                  double result [spacedim][dim][dim][dim][dim];
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        for (unsigned int m=0; m<dim; ++m)
-                          for (unsigned int n=0; n<dim; ++n)
-                            result[i][j][l][m][n] = (fourth[0][j][l][m][n] *
-                                                     data.mapping_support_points[0][i]);
-                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                    for (unsigned int i=0; i<spacedim; ++i)
-                      for (unsigned int j=0; j<dim; ++j)
-                        for (unsigned int l=0; l<dim; ++l)
-                          for (unsigned int m=0; m<dim; ++m)
-                            for (unsigned int n=0; n<dim; ++n)
-                              result[i][j][l][m][n]
-                              += (fourth[k][j][l][m][n]
-                                  *
-                                  data.mapping_support_points[k][i]);
-
-                  // push-forward the j-coordinate
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<spacedim; ++j)
-                      for (unsigned int l=0; l<dim; ++l)
-                        for (unsigned int m=0; m<dim; ++m)
-                          for (unsigned int n=0; n<dim; ++n)
-                            {
-                              tmp[i][j][l][m][n] = result[i][0][l][m][n] *
-                                                   data.covariant[point][j][0];
-                              for (unsigned int jr=1; jr<dim; ++jr)
-                                tmp[i][j][l][m][n] += result[i][jr][l][m][n] *
-                                                      data.covariant[point][j][jr];
-                            }
-
-                  // push-forward the l-coordinate
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<spacedim; ++j)
-                      for (unsigned int l=0; l<spacedim; ++l)
-                        for (unsigned int m=0; m<dim; ++m)
-                          for (unsigned int n=0; n<dim; ++n)
-                            {
-                              jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
-                                = tmp[i][j][0][m][n] *
-                                  data.covariant[point][l][0];
-                              for (unsigned int lr=1; lr<dim; ++lr)
-                                jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
-                                += tmp[i][j][lr][m][n] *
-                                   data.covariant[point][l][lr];
-                            }
-
-                  // push-forward the m-coordinate
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<spacedim; ++j)
-                      for (unsigned int l=0; l<spacedim; ++l)
-                        for (unsigned int m=0; m<spacedim; ++m)
-                          for (unsigned int n=0; n<dim; ++n)
-                            {
-                              tmp[i][j][l][m][n]
-                                = jacobian_pushed_forward_3rd_derivatives[point][i][j][l][0][n] *
-                                  data.covariant[point][m][0];
-                              for (unsigned int mr=1; mr<dim; ++mr)
-                                tmp[i][j][l][m][n]
-                                += jacobian_pushed_forward_3rd_derivatives[point][i][j][l][mr][n] *
-                                   data.covariant[point][m][mr];
-                            }
-
-                  // push-forward the n-coordinate
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<spacedim; ++j)
-                      for (unsigned int l=0; l<spacedim; ++l)
-                        for (unsigned int m=0; m<spacedim; ++m)
-                          for (unsigned int n=0; n<spacedim; ++n)
-                            {
-                              jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
-                                = tmp[i][j][l][m][0] *
-                                  data.covariant[point][n][0];
-                              for (unsigned int nr=1; nr<dim; ++nr)
-                                jacobian_pushed_forward_3rd_derivatives[point][i][j][l][m][n]
-                                += tmp[i][j][l][m][nr] *
-                                   data.covariant[point][n][nr];
-                            }
-                }
-            }
-        }
-    }
-  }
-}
-
-
-
-
 template <int dim, int spacedim>
 CellSimilarity::Similarity
 MappingQGeneric<dim,spacedim>::
@@ -2481,12 +2490,14 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity computed_cell_similarity =
     (polynomial_degree == 1 ? cell_similarity : CellSimilarity::none);
 
-  internal::maybe_compute_q_points<dim,spacedim> (QProjector<dim>::DataSetDescriptor::cell (),
-                                                  data,
-                                                  output_data.quadrature_points);
-  internal::maybe_update_Jacobians<dim,spacedim> (computed_cell_similarity,
-                                                  QProjector<dim>::DataSetDescriptor::cell (),
-                                                  data);
+  internal::MappingQGeneric::maybe_compute_q_points<dim,spacedim>
+  (QProjector<dim>::DataSetDescriptor::cell (),
+   data,
+   output_data.quadrature_points);
+  internal::MappingQGeneric::maybe_update_Jacobians<dim,spacedim>
+  (computed_cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell (),
+   data);
 
   const UpdateFlags update_flags = data.update_each;
   const std::vector<double> &weights=quadrature.get_weights();
@@ -2599,35 +2610,41 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
           output_data.inverse_jacobians[point] = data.covariant[point].transpose();
     }
 
-  internal::maybe_update_jacobian_grads<dim,spacedim> (computed_cell_similarity,
-                                                       QProjector<dim>::DataSetDescriptor::cell (),
-                                                       data,
-                                                       output_data.jacobian_grads);
+  internal::MappingQGeneric::maybe_update_jacobian_grads<dim,spacedim>
+  (computed_cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell (),
+   data,
+   output_data.jacobian_grads);
 
-  internal::maybe_update_jacobian_pushed_forward_grads<dim,spacedim> (computed_cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell (),
-      data,
-      output_data.jacobian_pushed_forward_grads);
+  internal::MappingQGeneric::maybe_update_jacobian_pushed_forward_grads<dim,spacedim>
+  (computed_cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell (),
+   data,
+   output_data.jacobian_pushed_forward_grads);
 
-  internal::maybe_update_jacobian_2nd_derivatives<dim,spacedim> (computed_cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell (),
-      data,
-      output_data.jacobian_2nd_derivatives);
+  internal::MappingQGeneric::maybe_update_jacobian_2nd_derivatives<dim,spacedim>
+  (computed_cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell (),
+   data,
+   output_data.jacobian_2nd_derivatives);
 
-  internal::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim> (computed_cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell (),
-      data,
-      output_data.jacobian_pushed_forward_2nd_derivatives);
+  internal::MappingQGeneric::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim>
+  (computed_cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell (),
+   data,
+   output_data.jacobian_pushed_forward_2nd_derivatives);
 
-  internal::maybe_update_jacobian_3rd_derivatives<dim,spacedim> (computed_cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell (),
-      data,
-      output_data.jacobian_3rd_derivatives);
+  internal::MappingQGeneric::maybe_update_jacobian_3rd_derivatives<dim,spacedim>
+  (computed_cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell (),
+   data,
+   output_data.jacobian_3rd_derivatives);
 
-  internal::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (computed_cell_similarity,
-      QProjector<dim>::DataSetDescriptor::cell (),
-      data,
-      output_data.jacobian_pushed_forward_3rd_derivatives);
+  internal::MappingQGeneric::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim>
+  (computed_cell_similarity,
+   QProjector<dim>::DataSetDescriptor::cell (),
+   data,
+   output_data.jacobian_pushed_forward_3rd_derivatives);
 
   return computed_cell_similarity;
 }
@@ -2639,214 +2656,217 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
 namespace internal
 {
-  namespace
+  namespace MappingQGeneric
   {
-    /**
-     * Depending on what information is called for in the update flags of the
-     * @p data object, compute the various pieces of information that is required
-     * by the fill_fe_face_values() and fill_fe_subface_values() functions.
-     * This function simply unifies the work that would be done by
-     * those two functions.
-     *
-     * The resulting data is put into the @p output_data argument.
-     */
-    template <int dim, int spacedim>
-    void
-    maybe_compute_face_data (const dealii::MappingQGeneric<dim,spacedim> &mapping,
-                             const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
-                             const unsigned int               face_no,
-                             const unsigned int               subface_no,
-                             const unsigned int               n_q_points,
-                             const std::vector<double>        &weights,
-                             const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
-                             internal::FEValues::MappingRelatedData<dim,spacedim>         &output_data)
+    namespace
     {
-      const UpdateFlags update_flags = data.update_each;
+      /**
+       * Depending on what information is called for in the update flags of the
+       * @p data object, compute the various pieces of information that is required
+       * by the fill_fe_face_values() and fill_fe_subface_values() functions.
+       * This function simply unifies the work that would be done by
+       * those two functions.
+       *
+       * The resulting data is put into the @p output_data argument.
+       */
+      template <int dim, int spacedim>
+      void
+      maybe_compute_face_data (const dealii::MappingQGeneric<dim,spacedim> &mapping,
+                               const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+                               const unsigned int               face_no,
+                               const unsigned int               subface_no,
+                               const unsigned int               n_q_points,
+                               const std::vector<double>        &weights,
+                               const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &data,
+                               internal::FEValues::MappingRelatedData<dim,spacedim>         &output_data)
+      {
+        const UpdateFlags update_flags = data.update_each;
 
-      if (update_flags & (update_boundary_forms |
-                          update_normal_vectors |
-                          update_jacobians      |
-                          update_JxW_values      |
-                          update_inverse_jacobians))
-        {
-          if (update_flags & update_boundary_forms)
-            AssertDimension (output_data.boundary_forms.size(), n_q_points);
-          if (update_flags & update_normal_vectors)
-            AssertDimension (output_data.normal_vectors.size(), n_q_points);
-          if (update_flags & update_JxW_values)
-            AssertDimension (output_data.JxW_values.size(), n_q_points);
+        if (update_flags & (update_boundary_forms |
+                            update_normal_vectors |
+                            update_jacobians      |
+                            update_JxW_values      |
+                            update_inverse_jacobians))
+          {
+            if (update_flags & update_boundary_forms)
+              AssertDimension (output_data.boundary_forms.size(), n_q_points);
+            if (update_flags & update_normal_vectors)
+              AssertDimension (output_data.normal_vectors.size(), n_q_points);
+            if (update_flags & update_JxW_values)
+              AssertDimension (output_data.JxW_values.size(), n_q_points);
 
-          Assert (data.aux.size()+1 >= dim, ExcInternalError());
+            Assert (data.aux.size()+1 >= dim, ExcInternalError());
 
-          // first compute some common data that is used for evaluating
-          // all of the flags below
+            // first compute some common data that is used for evaluating
+            // all of the flags below
 
-          // map the unit tangentials to the real cell. checking for d!=dim-1
-          // eliminates compiler warnings regarding unsigned int expressions <
-          // 0.
-          for (unsigned int d=0; d!=dim-1; ++d)
-            {
-              Assert (face_no+GeometryInfo<dim>::faces_per_cell*d <
-                      data.unit_tangentials.size(),
-                      ExcInternalError());
-              Assert (data.aux[d].size() <=
-                      data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d].size(),
-                      ExcInternalError());
-
-              mapping.transform (make_array_view(data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d]),
-                                 mapping_contravariant,
-                                 data,
-                                 make_array_view(data.aux[d]));
-            }
-
-          if (update_flags & update_boundary_forms)
-            {
-              // if dim==spacedim, we can use the unit tangentials to compute the
-              // boundary form by simply taking the cross product
-              if (dim == spacedim)
-                {
-                  for (unsigned int i=0; i<n_q_points; ++i)
-                    switch (dim)
-                      {
-                      case 1:
-                        // in 1d, we don't have access to any of the data.aux
-                        // fields (because it has only dim-1 components), but we
-                        // can still compute the boundary form by simply
-                        // looking at the number of the face
-                        output_data.boundary_forms[i][0] = (face_no == 0 ?
-                                                            -1 : +1);
-                        break;
-                      case 2:
-                        output_data.boundary_forms[i] =
-                          cross_product_2d(data.aux[0][i]);
-                        break;
-                      case 3:
-                        output_data.boundary_forms[i] =
-                          cross_product_3d(data.aux[0][i], data.aux[1][i]);
-                        break;
-                      default:
-                        Assert(false, ExcNotImplemented());
-                      }
-                }
-              else //(dim < spacedim)
-                {
-                  // in the codim-one case, the boundary form results from the
-                  // cross product of all the face tangential vectors and the cell
-                  // normal vector
-                  //
-                  // to compute the cell normal, use the same method used in
-                  // fill_fe_values for cells above
-                  AssertDimension (data.contravariant.size(), n_q_points);
-
-                  for (unsigned int point=0; point<n_q_points; ++point)
-                    {
-                      if (dim==1)
-                        {
-                          // J is a tangent vector
-                          output_data.boundary_forms[point] = data.contravariant[point].transpose()[0];
-                          output_data.boundary_forms[point] /=
-                            (face_no == 0 ? -1. : +1.) * output_data.boundary_forms[point].norm();
-                        }
-
-                      if (dim==2)
-                        {
-                          const DerivativeForm<1,spacedim,dim> DX_t =
-                            data.contravariant[point].transpose();
-
-                          Tensor<1, spacedim> cell_normal =
-                            cross_product_3d(DX_t[0], DX_t[1]);
-                          cell_normal /= cell_normal.norm();
-
-                          // then compute the face normal from the face tangent
-                          // and the cell normal:
-                          output_data.boundary_forms[point] =
-                            cross_product_3d(data.aux[0][point], cell_normal);
-                        }
-                    }
-                }
-            }
-
-          if (update_flags & update_JxW_values)
-            for (unsigned int i=0; i<output_data.boundary_forms.size(); ++i)
+            // map the unit tangentials to the real cell. checking for d!=dim-1
+            // eliminates compiler warnings regarding unsigned int expressions <
+            // 0.
+            for (unsigned int d=0; d!=dim-1; ++d)
               {
-                output_data.JxW_values[i] = output_data.boundary_forms[i].norm() * weights[i];
+                Assert (face_no+GeometryInfo<dim>::faces_per_cell*d <
+                        data.unit_tangentials.size(),
+                        ExcInternalError());
+                Assert (data.aux[d].size() <=
+                        data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d].size(),
+                        ExcInternalError());
 
-                if (subface_no != numbers::invalid_unsigned_int)
+                mapping.transform (make_array_view(data.unit_tangentials[face_no+GeometryInfo<dim>::faces_per_cell*d]),
+                                   mapping_contravariant,
+                                   data,
+                                   make_array_view(data.aux[d]));
+              }
+
+            if (update_flags & update_boundary_forms)
+              {
+                // if dim==spacedim, we can use the unit tangentials to compute the
+                // boundary form by simply taking the cross product
+                if (dim == spacedim)
                   {
-                    const double area_ratio = GeometryInfo<dim>::subface_ratio(cell->subface_case(face_no),
-                                                                               subface_no);
-                    output_data.JxW_values[i] *= area_ratio;
+                    for (unsigned int i=0; i<n_q_points; ++i)
+                      switch (dim)
+                        {
+                        case 1:
+                          // in 1d, we don't have access to any of the data.aux
+                          // fields (because it has only dim-1 components), but we
+                          // can still compute the boundary form by simply
+                          // looking at the number of the face
+                          output_data.boundary_forms[i][0] = (face_no == 0 ?
+                                                              -1 : +1);
+                          break;
+                        case 2:
+                          output_data.boundary_forms[i] =
+                            cross_product_2d(data.aux[0][i]);
+                          break;
+                        case 3:
+                          output_data.boundary_forms[i] =
+                            cross_product_3d(data.aux[0][i], data.aux[1][i]);
+                          break;
+                        default:
+                          Assert(false, ExcNotImplemented());
+                        }
+                  }
+                else //(dim < spacedim)
+                  {
+                    // in the codim-one case, the boundary form results from the
+                    // cross product of all the face tangential vectors and the cell
+                    // normal vector
+                    //
+                    // to compute the cell normal, use the same method used in
+                    // fill_fe_values for cells above
+                    AssertDimension (data.contravariant.size(), n_q_points);
+
+                    for (unsigned int point=0; point<n_q_points; ++point)
+                      {
+                        if (dim==1)
+                          {
+                            // J is a tangent vector
+                            output_data.boundary_forms[point] = data.contravariant[point].transpose()[0];
+                            output_data.boundary_forms[point] /=
+                              (face_no == 0 ? -1. : +1.) * output_data.boundary_forms[point].norm();
+                          }
+
+                        if (dim==2)
+                          {
+                            const DerivativeForm<1,spacedim,dim> DX_t =
+                              data.contravariant[point].transpose();
+
+                            Tensor<1, spacedim> cell_normal =
+                              cross_product_3d(DX_t[0], DX_t[1]);
+                            cell_normal /= cell_normal.norm();
+
+                            // then compute the face normal from the face tangent
+                            // and the cell normal:
+                            output_data.boundary_forms[point] =
+                              cross_product_3d(data.aux[0][point], cell_normal);
+                          }
+                      }
                   }
               }
 
-          if (update_flags & update_normal_vectors)
-            for (unsigned int i=0; i<output_data.normal_vectors.size(); ++i)
-              output_data.normal_vectors[i] = Point<spacedim>(output_data.boundary_forms[i] /
-                                                              output_data.boundary_forms[i].norm());
+            if (update_flags & update_JxW_values)
+              for (unsigned int i=0; i<output_data.boundary_forms.size(); ++i)
+                {
+                  output_data.JxW_values[i] = output_data.boundary_forms[i].norm() * weights[i];
 
-          if (update_flags & update_jacobians)
-            for (unsigned int point=0; point<n_q_points; ++point)
-              output_data.jacobians[point] = data.contravariant[point];
+                  if (subface_no != numbers::invalid_unsigned_int)
+                    {
+                      const double area_ratio = GeometryInfo<dim>::subface_ratio(cell->subface_case(face_no),
+                                                                                 subface_no);
+                      output_data.JxW_values[i] *= area_ratio;
+                    }
+                }
 
-          if (update_flags & update_inverse_jacobians)
-            for (unsigned int point=0; point<n_q_points; ++point)
-              output_data.inverse_jacobians[point] = data.covariant[point].transpose();
-        }
-    }
+            if (update_flags & update_normal_vectors)
+              for (unsigned int i=0; i<output_data.normal_vectors.size(); ++i)
+                output_data.normal_vectors[i] = Point<spacedim>(output_data.boundary_forms[i] /
+                                                                output_data.boundary_forms[i].norm());
+
+            if (update_flags & update_jacobians)
+              for (unsigned int point=0; point<n_q_points; ++point)
+                output_data.jacobians[point] = data.contravariant[point];
+
+            if (update_flags & update_inverse_jacobians)
+              for (unsigned int point=0; point<n_q_points; ++point)
+                output_data.inverse_jacobians[point] = data.covariant[point].transpose();
+          }
+      }
 
 
-    /**
-     * Do the work of MappingQGeneric::fill_fe_face_values() and
-     * MappingQGeneric::fill_fe_subface_values() in a generic way,
-     * using the 'data_set' to differentiate whether we will
-     * work on a face (and if so, which one) or subface.
-     */
-    template <int dim, int spacedim>
-    void
-    do_fill_fe_face_values (const dealii::MappingQGeneric<dim,spacedim>                             &mapping,
-                            const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
-                            const unsigned int                                                 face_no,
-                            const unsigned int                                                 subface_no,
-                            const typename QProjector<dim>::DataSetDescriptor                  data_set,
-                            const Quadrature<dim-1>                                           &quadrature,
-                            const typename dealii::MappingQGeneric<dim,spacedim>::InternalData      &data,
-                            internal::FEValues::MappingRelatedData<dim,spacedim>              &output_data)
-    {
-      maybe_compute_q_points<dim,spacedim> (data_set,
-                                            data,
-                                            output_data.quadrature_points);
-      maybe_update_Jacobians<dim,spacedim> (CellSimilarity::none,
-                                            data_set,
-                                            data);
-      maybe_update_jacobian_grads<dim,spacedim> (CellSimilarity::none,
-                                                 data_set,
-                                                 data,
-                                                 output_data.jacobian_grads);
-      maybe_update_jacobian_pushed_forward_grads<dim,spacedim> (CellSimilarity::none,
-                                                                data_set,
-                                                                data,
-                                                                output_data.jacobian_pushed_forward_grads);
-      maybe_update_jacobian_2nd_derivatives<dim,spacedim> (CellSimilarity::none,
-                                                           data_set,
-                                                           data,
-                                                           output_data.jacobian_2nd_derivatives);
-      maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim> (CellSimilarity::none,
-          data_set,
-          data,
-          output_data.jacobian_pushed_forward_2nd_derivatives);
-      maybe_update_jacobian_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
-                                                           data_set,
-                                                           data,
-                                                           output_data.jacobian_3rd_derivatives);
-      maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
-          data_set,
-          data,
-          output_data.jacobian_pushed_forward_3rd_derivatives);
+      /**
+       * Do the work of MappingQGeneric::fill_fe_face_values() and
+       * MappingQGeneric::fill_fe_subface_values() in a generic way,
+       * using the 'data_set' to differentiate whether we will
+       * work on a face (and if so, which one) or subface.
+       */
+      template <int dim, int spacedim>
+      void
+      do_fill_fe_face_values (const dealii::MappingQGeneric<dim,spacedim>                             &mapping,
+                              const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+                              const unsigned int                                                 face_no,
+                              const unsigned int                                                 subface_no,
+                              const typename QProjector<dim>::DataSetDescriptor                  data_set,
+                              const Quadrature<dim-1>                                           &quadrature,
+                              const typename dealii::MappingQGeneric<dim,spacedim>::InternalData      &data,
+                              internal::FEValues::MappingRelatedData<dim,spacedim>              &output_data)
+      {
+        maybe_compute_q_points<dim,spacedim> (data_set,
+                                              data,
+                                              output_data.quadrature_points);
+        maybe_update_Jacobians<dim,spacedim> (CellSimilarity::none,
+                                              data_set,
+                                              data);
+        maybe_update_jacobian_grads<dim,spacedim> (CellSimilarity::none,
+                                                   data_set,
+                                                   data,
+                                                   output_data.jacobian_grads);
+        maybe_update_jacobian_pushed_forward_grads<dim,spacedim> (CellSimilarity::none,
+                                                                  data_set,
+                                                                  data,
+                                                                  output_data.jacobian_pushed_forward_grads);
+        maybe_update_jacobian_2nd_derivatives<dim,spacedim> (CellSimilarity::none,
+                                                             data_set,
+                                                             data,
+                                                             output_data.jacobian_2nd_derivatives);
+        maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim> (CellSimilarity::none,
+            data_set,
+            data,
+            output_data.jacobian_pushed_forward_2nd_derivatives);
+        maybe_update_jacobian_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
+                                                             data_set,
+                                                             data,
+                                                             output_data.jacobian_3rd_derivatives);
+        maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim> (CellSimilarity::none,
+            data_set,
+            data,
+            output_data.jacobian_pushed_forward_3rd_derivatives);
 
-      maybe_compute_face_data (mapping,
-                               cell, face_no, subface_no, quadrature.size(),
-                               quadrature.get_weights(), data,
-                               output_data);
+        maybe_compute_face_data (mapping,
+                                 cell, face_no, subface_no, quadrature.size(),
+                                 quadrature.get_weights(), data,
+                                 output_data);
+      }
     }
   }
 }
@@ -2883,16 +2903,17 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
       data.cell_of_current_support_points = cell;
     }
 
-  internal::do_fill_fe_face_values (*this,
-                                    cell, face_no, numbers::invalid_unsigned_int,
-                                    QProjector<dim>::DataSetDescriptor::face (face_no,
-                                        cell->face_orientation(face_no),
-                                        cell->face_flip(face_no),
-                                        cell->face_rotation(face_no),
-                                        quadrature.size()),
-                                    quadrature,
-                                    data,
-                                    output_data);
+  internal::MappingQGeneric::do_fill_fe_face_values
+  (*this,
+   cell, face_no, numbers::invalid_unsigned_int,
+   QProjector<dim>::DataSetDescriptor::face (face_no,
+                                             cell->face_orientation(face_no),
+                                             cell->face_flip(face_no),
+                                             cell->face_rotation(face_no),
+                                             quadrature.size()),
+   quadrature,
+   data,
+   output_data);
 }
 
 
@@ -2928,337 +2949,363 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
       data.cell_of_current_support_points = cell;
     }
 
-  internal::do_fill_fe_face_values (*this,
-                                    cell, face_no, subface_no,
-                                    QProjector<dim>::DataSetDescriptor::subface (face_no, subface_no,
-                                        cell->face_orientation(face_no),
-                                        cell->face_flip(face_no),
-                                        cell->face_rotation(face_no),
-                                        quadrature.size(),
-                                        cell->subface_case(face_no)),
-                                    quadrature,
-                                    data,
-                                    output_data);
+  internal::MappingQGeneric::do_fill_fe_face_values
+  (*this,
+   cell, face_no, subface_no,
+   QProjector<dim>::DataSetDescriptor::subface (face_no, subface_no,
+                                                cell->face_orientation(face_no),
+                                                cell->face_flip(face_no),
+                                                cell->face_rotation(face_no),
+                                                quadrature.size(),
+                                                cell->subface_case(face_no)),
+   quadrature,
+   data,
+   output_data);
 }
 
 
 
-namespace
+namespace internal
 {
-  template <int dim, int spacedim, int rank>
-  void
-  transform_fields(const ArrayView<const Tensor<rank,dim> >               &input,
-                   const MappingType                                       mapping_type,
-                   const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                   const ArrayView<Tensor<rank,spacedim> >                &output)
+  namespace MappingQGeneric
   {
-    AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
-            ExcInternalError());
-    const typename MappingQGeneric<dim,spacedim>::InternalData
-    &data = static_cast<const typename MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
-
-    switch (mapping_type)
+    namespace
+    {
+      // We cannot query a manifold from the faces of a 1D elements (i.e.,
+      // vertices), which is why we add a specialization for the 3D case here
+      template <typename Iterator>
+      bool check_identical_manifolds_of_quads(const Iterator &)
       {
-      case mapping_contravariant:
-      {
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-
-        for (unsigned int i=0; i<output.size(); ++i)
-          output[i] = apply_transformation(data.contravariant[i], input[i]);
-
-        return;
-      }
-
-      case mapping_piola:
-      {
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-        Assert (data.update_each & update_volume_elements,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
-        Assert (rank==1, ExcMessage("Only for rank 1"));
-        if (rank!=1)
-          return;
-
-        for (unsigned int i=0; i<output.size(); ++i)
-          {
-            output[i] = apply_transformation(data.contravariant[i], input[i]);
-            output[i] /= data.volume_elements[i];
-          }
-        return;
-      }
-      //We still allow this operation as in the
-      //reference cell Derivatives are Tensor
-      //rather than DerivativeForm
-      case mapping_covariant:
-      {
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
-
-        for (unsigned int i=0; i<output.size(); ++i)
-          output[i] = apply_transformation(data.covariant[i], input[i]);
-
-        return;
-      }
-
-      default:
         Assert(false, ExcNotImplemented());
+        return true;
       }
-  }
 
-
-  template <int dim, int spacedim, int rank>
-  void
-  transform_gradients(const ArrayView<const Tensor<rank,dim> >                &input,
-                      const MappingType                                        mapping_type,
-                      const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
-                      const ArrayView<Tensor<rank,spacedim> >                 &output)
-  {
-    AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
-            ExcInternalError());
-    const typename MappingQGeneric<dim,spacedim>::InternalData
-    &data = static_cast<const typename MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
-
-    switch (mapping_type)
+      bool check_identical_manifolds_of_quads(const dealii::Triangulation<3,3>::cell_iterator &cell)
       {
-      case mapping_contravariant_gradient:
-      {
-        Assert (data.update_each & update_covariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-        Assert (rank==2, ExcMessage("Only for rank 2"));
+        for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
+          if (&cell->face(f)->get_manifold() != &cell->get_manifold())
+            return false;
+        return true;
+      }
 
-        for (unsigned int i=0; i<output.size(); ++i)
+
+
+      template <int dim, int spacedim, int rank>
+      void
+      transform_fields(const ArrayView<const Tensor<rank,dim> >               &input,
+                       const MappingType                                       mapping_type,
+                       const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                       const ArrayView<Tensor<rank,spacedim> >                &output)
+      {
+        AssertDimension (input.size(), output.size());
+        Assert ((dynamic_cast<const typename dealii::MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
+                ExcInternalError());
+        const typename dealii::MappingQGeneric<dim,spacedim>::InternalData
+        &data = static_cast<const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
+
+        switch (mapping_type)
           {
-            DerivativeForm<1,spacedim,dim> A =
-              apply_transformation(data.contravariant[i], transpose(input[i]) );
-            output[i] = apply_transformation(data.covariant[i], A.transpose() );
+          case mapping_contravariant:
+          {
+            Assert (data.update_each & update_contravariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+
+            for (unsigned int i=0; i<output.size(); ++i)
+              output[i] = apply_transformation(data.contravariant[i], input[i]);
+
+            return;
           }
 
-        return;
-      }
-
-      case mapping_covariant_gradient:
-      {
-        Assert (data.update_each & update_covariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
-        Assert (rank==2, ExcMessage("Only for rank 2"));
-
-        for (unsigned int i=0; i<output.size(); ++i)
+          case mapping_piola:
           {
-            DerivativeForm<1,spacedim,dim> A =
-              apply_transformation(data.covariant[i], transpose(input[i]) );
-            output[i] = apply_transformation(data.covariant[i], A.transpose() );
+            Assert (data.update_each & update_contravariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+            Assert (data.update_each & update_volume_elements,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+            Assert (rank==1, ExcMessage("Only for rank 1"));
+            if (rank!=1)
+              return;
+
+            for (unsigned int i=0; i<output.size(); ++i)
+              {
+                output[i] = apply_transformation(data.contravariant[i], input[i]);
+                output[i] /= data.volume_elements[i];
+              }
+            return;
+          }
+          //We still allow this operation as in the
+          //reference cell Derivatives are Tensor
+          //rather than DerivativeForm
+          case mapping_covariant:
+          {
+            Assert (data.update_each & update_contravariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+
+            for (unsigned int i=0; i<output.size(); ++i)
+              output[i] = apply_transformation(data.covariant[i], input[i]);
+
+            return;
           }
 
-        return;
+          default:
+            Assert(false, ExcNotImplemented());
+          }
       }
 
-      case mapping_piola_gradient:
+
+      template <int dim, int spacedim, int rank>
+      void
+      transform_gradients(const ArrayView<const Tensor<rank,dim> >                &input,
+                          const MappingType                                        mapping_type,
+                          const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
+                          const ArrayView<Tensor<rank,spacedim> >                 &output)
       {
-        Assert (data.update_each & update_covariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-        Assert (data.update_each & update_volume_elements,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
-        Assert (rank==2, ExcMessage("Only for rank 2"));
+        AssertDimension (input.size(), output.size());
+        Assert ((dynamic_cast<const typename dealii::MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
+                ExcInternalError());
+        const typename dealii::MappingQGeneric<dim,spacedim>::InternalData
+        &data = static_cast<const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
 
-        for (unsigned int i=0; i<output.size(); ++i)
+        switch (mapping_type)
           {
-            DerivativeForm<1,spacedim,dim> A =
-              apply_transformation(data.covariant[i], input[i] );
-            Tensor<2,spacedim> T =
-              apply_transformation(data.contravariant[i], A.transpose() );
+          case mapping_contravariant_gradient:
+          {
+            Assert (data.update_each & update_covariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+            Assert (data.update_each & update_contravariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+            Assert (rank==2, ExcMessage("Only for rank 2"));
 
-            output[i] = transpose(T);
-            output[i] /= data.volume_elements[i];
+            for (unsigned int i=0; i<output.size(); ++i)
+              {
+                DerivativeForm<1,spacedim,dim> A =
+                  apply_transformation(data.contravariant[i], transpose(input[i]) );
+                output[i] = apply_transformation(data.covariant[i], A.transpose() );
+              }
+
+            return;
           }
 
-        return;
+          case mapping_covariant_gradient:
+          {
+            Assert (data.update_each & update_covariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+            Assert (rank==2, ExcMessage("Only for rank 2"));
+
+            for (unsigned int i=0; i<output.size(); ++i)
+              {
+                DerivativeForm<1,spacedim,dim> A =
+                  apply_transformation(data.covariant[i], transpose(input[i]) );
+                output[i] = apply_transformation(data.covariant[i], A.transpose() );
+              }
+
+            return;
+          }
+
+          case mapping_piola_gradient:
+          {
+            Assert (data.update_each & update_covariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+            Assert (data.update_each & update_contravariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+            Assert (data.update_each & update_volume_elements,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+            Assert (rank==2, ExcMessage("Only for rank 2"));
+
+            for (unsigned int i=0; i<output.size(); ++i)
+              {
+                DerivativeForm<1,spacedim,dim> A =
+                  apply_transformation(data.covariant[i], input[i] );
+                Tensor<2,spacedim> T =
+                  apply_transformation(data.contravariant[i], A.transpose() );
+
+                output[i] = transpose(T);
+                output[i] /= data.volume_elements[i];
+              }
+
+            return;
+          }
+
+          default:
+            Assert(false, ExcNotImplemented());
+          }
       }
 
-      default:
-        Assert(false, ExcNotImplemented());
-      }
-  }
 
 
 
-
-  template <int dim, int spacedim>
-  void
-  transform_hessians(const ArrayView<const Tensor<3,dim> >                  &input,
-                     const MappingType                                       mapping_type,
-                     const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
-                     const ArrayView<Tensor<3,spacedim> >                   &output)
-  {
-    AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
-            ExcInternalError());
-    const typename MappingQGeneric<dim,spacedim>::InternalData
-    &data = static_cast<const typename MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
-
-    switch (mapping_type)
+      template <int dim, int spacedim>
+      void
+      transform_hessians(const ArrayView<const Tensor<3,dim> >                  &input,
+                         const MappingType                                       mapping_type,
+                         const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+                         const ArrayView<Tensor<3,spacedim> >                   &output)
       {
-      case mapping_contravariant_hessian:
-      {
-        Assert (data.update_each & update_covariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+        AssertDimension (input.size(), output.size());
+        Assert ((dynamic_cast<const typename dealii::MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
+                ExcInternalError());
+        const typename dealii::MappingQGeneric<dim,spacedim>::InternalData
+        &data = static_cast<const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
 
-        for (unsigned int q=0; q<output.size(); ++q)
-          for (unsigned int i=0; i<spacedim; ++i)
-            {
-              double tmp1[dim][dim];
-              for (unsigned int J=0; J<dim; ++J)
-                for (unsigned int K=0; K<dim; ++K)
-                  {
-                    tmp1[J][K] = data.contravariant[q][i][0] * input[q][0][J][K];
-                    for (unsigned int I=1; I<dim; ++I)
-                      tmp1[J][K] += data.contravariant[q][i][I] * input[q][I][J][K];
-                  }
-              for (unsigned int j=0; j<spacedim; ++j)
+        switch (mapping_type)
+          {
+          case mapping_contravariant_hessian:
+          {
+            Assert (data.update_each & update_covariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+            Assert (data.update_each & update_contravariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+
+            for (unsigned int q=0; q<output.size(); ++q)
+              for (unsigned int i=0; i<spacedim; ++i)
                 {
-                  double tmp2[dim];
-                  for (unsigned int K=0; K<dim; ++K)
+                  double tmp1[dim][dim];
+                  for (unsigned int J=0; J<dim; ++J)
+                    for (unsigned int K=0; K<dim; ++K)
+                      {
+                        tmp1[J][K] = data.contravariant[q][i][0] * input[q][0][J][K];
+                        for (unsigned int I=1; I<dim; ++I)
+                          tmp1[J][K] += data.contravariant[q][i][I] * input[q][I][J][K];
+                      }
+                  for (unsigned int j=0; j<spacedim; ++j)
                     {
-                      tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
-                      for (unsigned int J=1; J<dim; ++J)
-                        tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
-                    }
-                  for (unsigned int k=0; k<spacedim; ++k)
-                    {
-                      output[q][i][j][k] = data.covariant[q][k][0] * tmp2[0];
-                      for (unsigned int K=1; K<dim; ++K)
-                        output[q][i][j][k] += data.covariant[q][k][K] * tmp2[K];
+                      double tmp2[dim];
+                      for (unsigned int K=0; K<dim; ++K)
+                        {
+                          tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
+                          for (unsigned int J=1; J<dim; ++J)
+                            tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
+                        }
+                      for (unsigned int k=0; k<spacedim; ++k)
+                        {
+                          output[q][i][j][k] = data.covariant[q][k][0] * tmp2[0];
+                          for (unsigned int K=1; K<dim; ++K)
+                            output[q][i][j][k] += data.covariant[q][k][K] * tmp2[K];
+                        }
                     }
                 }
-            }
-        return;
-      }
+            return;
+          }
 
-      case mapping_covariant_hessian:
-      {
-        Assert (data.update_each & update_covariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+          case mapping_covariant_hessian:
+          {
+            Assert (data.update_each & update_covariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
 
-        for (unsigned int q=0; q<output.size(); ++q)
-          for (unsigned int i=0; i<spacedim; ++i)
-            {
-              double tmp1[dim][dim];
-              for (unsigned int J=0; J<dim; ++J)
-                for (unsigned int K=0; K<dim; ++K)
-                  {
-                    tmp1[J][K] = data.covariant[q][i][0] * input[q][0][J][K];
-                    for (unsigned int I=1; I<dim; ++I)
-                      tmp1[J][K] += data.covariant[q][i][I] * input[q][I][J][K];
-                  }
-              for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int q=0; q<output.size(); ++q)
+              for (unsigned int i=0; i<spacedim; ++i)
                 {
-                  double tmp2[dim];
-                  for (unsigned int K=0; K<dim; ++K)
+                  double tmp1[dim][dim];
+                  for (unsigned int J=0; J<dim; ++J)
+                    for (unsigned int K=0; K<dim; ++K)
+                      {
+                        tmp1[J][K] = data.covariant[q][i][0] * input[q][0][J][K];
+                        for (unsigned int I=1; I<dim; ++I)
+                          tmp1[J][K] += data.covariant[q][i][I] * input[q][I][J][K];
+                      }
+                  for (unsigned int j=0; j<spacedim; ++j)
                     {
-                      tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
-                      for (unsigned int J=1; J<dim; ++J)
-                        tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
-                    }
-                  for (unsigned int k=0; k<spacedim; ++k)
-                    {
-                      output[q][i][j][k] = data.covariant[q][k][0] * tmp2[0];
-                      for (unsigned int K=1; K<dim; ++K)
-                        output[q][i][j][k] += data.covariant[q][k][K] * tmp2[K];
+                      double tmp2[dim];
+                      for (unsigned int K=0; K<dim; ++K)
+                        {
+                          tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
+                          for (unsigned int J=1; J<dim; ++J)
+                            tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
+                        }
+                      for (unsigned int k=0; k<spacedim; ++k)
+                        {
+                          output[q][i][j][k] = data.covariant[q][k][0] * tmp2[0];
+                          for (unsigned int K=1; K<dim; ++K)
+                            output[q][i][j][k] += data.covariant[q][k][K] * tmp2[K];
+                        }
                     }
                 }
-            }
 
-        return;
-      }
+            return;
+          }
 
-      case mapping_piola_hessian:
-      {
-        Assert (data.update_each & update_covariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
-        Assert (data.update_each & update_volume_elements,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
+          case mapping_piola_hessian:
+          {
+            Assert (data.update_each & update_covariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+            Assert (data.update_each & update_contravariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_contravariant_transformation"));
+            Assert (data.update_each & update_volume_elements,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_volume_elements"));
 
-        for (unsigned int q=0; q<output.size(); ++q)
-          for (unsigned int i=0; i<spacedim; ++i)
-            {
-              double factor[dim];
-              for (unsigned int I=0; I<dim; ++I)
-                factor[I] = data.contravariant[q][i][I] / data.volume_elements[q];
-              double tmp1[dim][dim];
-              for (unsigned int J=0; J<dim; ++J)
-                for (unsigned int K=0; K<dim; ++K)
-                  {
-                    tmp1[J][K] = factor[0] * input[q][0][J][K];
-                    for (unsigned int I=1; I<dim; ++I)
-                      tmp1[J][K] += factor[I] * input[q][I][J][K];
-                  }
-              for (unsigned int j=0; j<spacedim; ++j)
+            for (unsigned int q=0; q<output.size(); ++q)
+              for (unsigned int i=0; i<spacedim; ++i)
                 {
-                  double tmp2[dim];
-                  for (unsigned int K=0; K<dim; ++K)
+                  double factor[dim];
+                  for (unsigned int I=0; I<dim; ++I)
+                    factor[I] = data.contravariant[q][i][I] / data.volume_elements[q];
+                  double tmp1[dim][dim];
+                  for (unsigned int J=0; J<dim; ++J)
+                    for (unsigned int K=0; K<dim; ++K)
+                      {
+                        tmp1[J][K] = factor[0] * input[q][0][J][K];
+                        for (unsigned int I=1; I<dim; ++I)
+                          tmp1[J][K] += factor[I] * input[q][I][J][K];
+                      }
+                  for (unsigned int j=0; j<spacedim; ++j)
                     {
-                      tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
-                      for (unsigned int J=1; J<dim; ++J)
-                        tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
-                    }
-                  for (unsigned int k=0; k<spacedim; ++k)
-                    {
-                      output[q][i][j][k] = data.covariant[q][k][0] * tmp2[0];
-                      for (unsigned int K=1; K<dim; ++K)
-                        output[q][i][j][k] += data.covariant[q][k][K] * tmp2[K];
+                      double tmp2[dim];
+                      for (unsigned int K=0; K<dim; ++K)
+                        {
+                          tmp2[K] = data.covariant[q][j][0] * tmp1[0][K];
+                          for (unsigned int J=1; J<dim; ++J)
+                            tmp2[K] += data.covariant[q][j][J] * tmp1[J][K];
+                        }
+                      for (unsigned int k=0; k<spacedim; ++k)
+                        {
+                          output[q][i][j][k] = data.covariant[q][k][0] * tmp2[0];
+                          for (unsigned int K=1; K<dim; ++K)
+                            output[q][i][j][k] += data.covariant[q][k][K] * tmp2[K];
+                        }
                     }
                 }
-            }
 
-        return;
+            return;
+          }
+
+          default:
+            Assert(false, ExcNotImplemented());
+          }
       }
 
-      default:
-        Assert(false, ExcNotImplemented());
-      }
-  }
 
 
 
-
-  template <int dim, int spacedim, int rank>
-  void
-  transform_differential_forms(const ArrayView<const DerivativeForm<rank, dim,spacedim> >   &input,
-                               const MappingType                                             mapping_type,
-                               const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
-                               const ArrayView<Tensor<rank+1, spacedim> >                   &output)
-  {
-    AssertDimension (input.size(), output.size());
-    Assert ((dynamic_cast<const typename MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
-            ExcInternalError());
-    const typename MappingQGeneric<dim,spacedim>::InternalData
-    &data = static_cast<const typename MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
-
-    switch (mapping_type)
+      template <int dim, int spacedim, int rank>
+      void
+      transform_differential_forms(const ArrayView<const DerivativeForm<rank, dim,spacedim> >   &input,
+                                   const MappingType                                             mapping_type,
+                                   const typename Mapping<dim,spacedim>::InternalDataBase       &mapping_data,
+                                   const ArrayView<Tensor<rank+1, spacedim> >                   &output)
       {
-      case mapping_covariant:
-      {
-        Assert (data.update_each & update_contravariant_transformation,
-                typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
+        AssertDimension (input.size(), output.size());
+        Assert ((dynamic_cast<const typename dealii::MappingQGeneric<dim,spacedim>::InternalData *>(&mapping_data) != nullptr),
+                ExcInternalError());
+        const typename dealii::MappingQGeneric<dim,spacedim>::InternalData
+        &data = static_cast<const typename dealii::MappingQGeneric<dim,spacedim>::InternalData &>(mapping_data);
 
-        for (unsigned int i=0; i<output.size(); ++i)
-          output[i] = apply_transformation(data.covariant[i], input[i]);
+        switch (mapping_type)
+          {
+          case mapping_covariant:
+          {
+            Assert (data.update_each & update_contravariant_transformation,
+                    typename FEValuesBase<dim>::ExcAccessToUninitializedField("update_covariant_transformation"));
 
-        return;
+            for (unsigned int i=0; i<output.size(); ++i)
+              output[i] = apply_transformation(data.covariant[i], input[i]);
+
+            return;
+          }
+          default:
+            Assert(false, ExcNotImplemented());
+          }
       }
-      default:
-        Assert(false, ExcNotImplemented());
-      }
+    }
   }
 }
 
@@ -3272,7 +3319,7 @@ transform (const ArrayView<const Tensor<1, dim> >                  &input,
            const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
            const ArrayView<Tensor<1, spacedim> >                   &output) const
 {
-  transform_fields(input, mapping_type, mapping_data, output);
+  internal::MappingQGeneric::transform_fields(input, mapping_type, mapping_data, output);
 }
 
 
@@ -3285,7 +3332,7 @@ transform (const ArrayView<const DerivativeForm<1, dim,spacedim> >  &input,
            const typename Mapping<dim,spacedim>::InternalDataBase   &mapping_data,
            const ArrayView<Tensor<2, spacedim> >                    &output) const
 {
-  transform_differential_forms(input, mapping_type, mapping_data, output);
+  internal::MappingQGeneric::transform_differential_forms(input, mapping_type, mapping_data, output);
 }
 
 
@@ -3301,13 +3348,13 @@ transform (const ArrayView<const Tensor<2, dim> >                  &input,
   switch (mapping_type)
     {
     case mapping_contravariant:
-      transform_fields(input, mapping_type, mapping_data, output);
+      internal::MappingQGeneric::transform_fields(input, mapping_type, mapping_data, output);
       return;
 
     case mapping_piola_gradient:
     case mapping_contravariant_gradient:
     case mapping_covariant_gradient:
-      transform_gradients(input, mapping_type, mapping_data, output);
+      internal::MappingQGeneric::transform_gradients(input, mapping_type, mapping_data, output);
       return;
     default:
       Assert(false, ExcNotImplemented());
@@ -3378,33 +3425,11 @@ transform (const ArrayView<const  Tensor<3,dim> >                  &input,
     case mapping_piola_hessian:
     case mapping_contravariant_hessian:
     case mapping_covariant_hessian:
-      transform_hessians(input, mapping_type, mapping_data, output);
+      internal::MappingQGeneric::transform_hessians(input, mapping_type, mapping_data, output);
       return;
     default:
       Assert(false, ExcNotImplemented());
     }
-}
-
-
-
-namespace
-{
-  // We cannot query a manifold from the faces of a 1D elements (i.e.,
-  // vertices), which is why we add a specialization for the 3D case here
-  template <typename Iterator>
-  bool check_identical_manifolds_of_quads(const Iterator &)
-  {
-    Assert(false, ExcNotImplemented());
-    return true;
-  }
-
-  bool check_identical_manifolds_of_quads(const Triangulation<3,3>::cell_iterator &cell)
-  {
-    for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
-      if (&cell->face(f)->get_manifold() != &cell->get_manifold())
-        return false;
-    return true;
-  }
 }
 
 
@@ -3642,7 +3667,7 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
               if (&cell->line(l)->get_manifold() != &cell->get_manifold())
                 all_manifold_ids_are_equal = false;
           if (dim == 3)
-            if (check_identical_manifolds_of_quads(cell) == false)
+            if (internal::MappingQGeneric::check_identical_manifolds_of_quads(cell) == false)
               all_manifold_ids_are_equal = false;
         }
 
