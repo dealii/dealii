@@ -31,10 +31,16 @@ namespace parallel
   namespace distributed
   {
     /**
-     * Collection of functions controlling refinement and coarsening of
-     * parallel::distributed::Triangulation objects. This namespace provides
-     * similar functionality to the dealii::GridRefinement namespace, except
-     * that it works for meshes that are parallel and distributed.
+     * This namespace provides a collection of functions that aid in refinement
+     * and coarsening of triangulations. Despite the name of the namespace, the
+     * functions do not actually <i>refine</i> the triangulation, but only
+     * <i>mark cells for refinement or coarsening</i>. In other words, they
+     * perform the "mark" part of the typical "solve-estimate-mark-refine"
+     * cycle of the adaptive finite element loop.
+     *
+     * In contrast to the functions in namespace dealii::GridRefinement,
+     * the functions in the current namespace are intended for distributed
+     * meshes, i.e., objects of type parallel::distributed::Triangulation.
      *
      * @ingroup grid
      * @author Wolfgang Bangerth, 2009
