@@ -1,0 +1,3 @@
+Changed: In 1D, MappingQGeneric now considers a cell to have multiple manifolds if the manifold attached to the cell does not match one of the manifolds attached to a face (i.e., vertex).
+<br>
+(David Wells, 2017/07/10)

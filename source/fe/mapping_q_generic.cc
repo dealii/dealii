@@ -2971,25 +2971,6 @@ namespace internal
   {
     namespace
     {
-      // We cannot query a manifold from the faces of a 1D elements (i.e.,
-      // vertices), which is why we add a specialization for the 3D case here
-      template <typename Iterator>
-      bool check_identical_manifolds_of_quads(const Iterator &)
-      {
-        Assert(false, ExcNotImplemented());
-        return true;
-      }
-
-      bool check_identical_manifolds_of_quads(const dealii::Triangulation<3,3>::cell_iterator &cell)
-      {
-        for (unsigned int f=0; f<GeometryInfo<3>::faces_per_cell; ++f)
-          if (&cell->face(f)->get_manifold() != &cell->get_manifold())
-            return false;
-        return true;
-      }
-
-
-
       template <int dim, int spacedim, int rank>
       void
       transform_fields(const ArrayView<const Tensor<rank,dim> >               &input,
@@ -3662,13 +3643,14 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
       if (all_manifold_ids_are_equal &&
           dynamic_cast<const TransfiniteInterpolationManifold<dim,spacedim>*>(&cell->get_manifold()) == nullptr)
         {
-          if (dim > 1)
+          for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+            if (&cell->face(f)->get_manifold() != &cell->get_manifold())
+              all_manifold_ids_are_equal = false;
+
+          if (dim == 3)
             for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
               if (&cell->line(l)->get_manifold() != &cell->get_manifold())
                 all_manifold_ids_are_equal = false;
-          if (dim == 3)
-            if (internal::MappingQGeneric::check_identical_manifolds_of_quads(cell) == false)
-              all_manifold_ids_are_equal = false;
         }
 
       if (all_manifold_ids_are_equal)
