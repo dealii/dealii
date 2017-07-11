@@ -1895,12 +1895,15 @@ namespace internal
                 (i->get_finest_level() >= level))
               for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
                 {
-                  const dealii::types::global_dof_index idx = i->get_index (level, d);
+                  const dealii::types::global_dof_index idx
+                    = i->get_index (level, d, dof_handler.get_fe().dofs_per_vertex);
+
                   if (check_validity)
                     Assert(idx != numbers::invalid_dof_index, ExcInternalError ());
 
                   if (idx != numbers::invalid_dof_index)
                     i->set_index (level, d,
+                                  dof_handler.get_fe().dofs_per_vertex,
                                   (indices.size() == 0)?
                                   (new_numbers[idx]) :
                                   (new_numbers[indices.index_within_set(idx)]));

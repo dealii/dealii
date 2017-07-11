@@ -1262,11 +1262,10 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs ()
 template <int dim, int spacedim>
 void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
                                                     const unsigned int fl,
-                                                    const unsigned int n_dofs_per_vertex)
+                                                    const unsigned int dofs_per_vertex)
 {
   coarsest_level  = cl;
   finest_level    = fl;
-  dofs_per_vertex = n_dofs_per_vertex;
 
   if (coarsest_level <= finest_level)
     {
