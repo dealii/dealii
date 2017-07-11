@@ -1,0 +1,6 @@
+Changed: The SynchronousIteartors::iterators member variable has been
+made private, as mentioned in the changelog of the previous
+release. It can be accessed via SynchronousIterators::operator*(),
+however.
+<br>
+(Wolfgang Bangerth, 2017/07/11)
