@@ -89,7 +89,7 @@ namespace parallel
       {
         for (typename Range::const_iterator p=range.begin();
              p != range.end(); ++p)
-          apply (f, p.iterators);
+          apply (f, *p);
       }
 
     private:
