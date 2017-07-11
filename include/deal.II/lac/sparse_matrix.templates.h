@@ -76,7 +76,7 @@ SparseMatrix<number>::SparseMatrix (SparseMatrix<number> &&m)
   :
   Subscriptor(std::move(m)),
   cols(m.cols),
-  val(m.val),
+  val(std::move(m.val)),
   max_len(m.max_len)
 {
   m.cols = nullptr;
@@ -107,7 +107,7 @@ SparseMatrix<number> &
 SparseMatrix<number>::operator = (SparseMatrix<number> &&m)
 {
   cols = m.cols;
-  val = m.val;
+  val = std::move(m.val);
   max_len = m.max_len;
 
   m.cols = nullptr;
@@ -154,9 +154,6 @@ template <typename number>
 SparseMatrix<number>::~SparseMatrix ()
 {
   cols = nullptr;
-
-  if (val != nullptr)
-    delete[] val;
 }
 
 
@@ -205,7 +202,7 @@ SparseMatrix<number>::operator = (const double d)
                                   std::bind(&internal::SparseMatrix::template
                                             zero_subrange<number>,
                                             std::placeholders::_1, std::placeholders::_2,
-                                            val),
+                                            val.get()),
                                   grain_size);
   else if (matrix_size > 0)
     std::memset (&val[0], 0, matrix_size*sizeof(number));
@@ -242,9 +239,7 @@ SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
 
   if (cols->empty())
     {
-      if (val != nullptr)
-        delete[] val;
-      val = nullptr;
+      val.reset ();
       max_len = 0;
       return;
     }
@@ -252,9 +247,7 @@ SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
   const std::size_t N = cols->n_nonzero_elements();
   if (N > max_len || max_len == 0)
     {
-      if (val != nullptr)
-        delete[] val;
-      val = new number[N];
+      val.reset (new number[N]);
       max_len = N;
     }
 
@@ -268,8 +261,7 @@ void
 SparseMatrix<number>::clear ()
 {
   cols = nullptr;
-  if (val) delete[] val;
-  val = nullptr;
+  val.reset ();
   max_len = 0;
 }
 
@@ -764,7 +756,7 @@ SparseMatrix<number>::vmult (OutVector &dst,
                                 std::bind (&internal::SparseMatrix::vmult_on_subrange
                                            <number,InVector,OutVector>,
                                            std::placeholders::_1, std::placeholders::_2,
-                                           val,
+                                           val.get(),
                                            cols->rowstart,
                                            cols->colnums,
                                            std::cref(src),
@@ -819,7 +811,7 @@ SparseMatrix<number>::vmult_add (OutVector &dst,
                                 std::bind (&internal::SparseMatrix::vmult_on_subrange
                                            <number,InVector,OutVector>,
                                            std::placeholders::_1, std::placeholders::_2,
-                                           val,
+                                           val.get(),
                                            cols->rowstart,
                                            cols->colnums,
                                            std::cref(src),
@@ -905,7 +897,7 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber> &v) const
     (std::bind (&internal::SparseMatrix::matrix_norm_sqr_on_subrange
                 <number,Vector<somenumber> >,
                 std::placeholders::_1, std::placeholders::_2,
-                val, cols->rowstart, cols->colnums,
+                val.get(), cols->rowstart, cols->colnums,
                 std::cref(v)),
      0, m(),
      internal::SparseMatrix::minimum_parallel_grain_size);
@@ -968,7 +960,7 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber> &u,
     (std::bind (&internal::SparseMatrix::matrix_scalar_product_on_subrange
                 <number,Vector<somenumber> >,
                 std::placeholders::_1, std::placeholders::_2,
-                val, cols->rowstart, cols->colnums,
+                val.get(), cols->rowstart, cols->colnums,
                 std::cref(u),
                 std::cref(v)),
      0, m(),
@@ -1355,7 +1347,7 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
                (std::bind (&internal::SparseMatrix::residual_sqr_on_subrange
                            <number,Vector<somenumber>,Vector<somenumber> >,
                            std::placeholders::_1, std::placeholders::_2,
-                           val, cols->rowstart, cols->colnums,
+                           val.get(), cols->rowstart, cols->colnums,
                            std::cref(u),
                            std::cref(b),
                            std::ref(dst)),
@@ -2005,8 +1997,7 @@ SparseMatrix<number>::block_read (std::istream &in)
   AssertThrow (c == '[', ExcIO());
 
   // reallocate space
-  delete[] val;
-  val  = new number[max_len];
+  val.reset (new number[max_len]);
 
   // then read data
   in.read (reinterpret_cast<char *>(&val[0]),

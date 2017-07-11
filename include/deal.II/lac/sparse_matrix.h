@@ -25,6 +25,9 @@
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/vector.h>
 
+#include <memory>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class Vector;
@@ -1593,12 +1596,13 @@ private:
   SmartPointer<const SparsityPattern,SparseMatrix<number> > cols;
 
   /**
-   * Array of values for all the nonzero entries. The position within the
-   * matrix, i.e.  the row and column number for a given entry can only be
-   * deduced using the sparsity pattern. The same holds for the more common
-   * operation of finding an entry by its coordinates.
+   * Array of values for all the nonzero entries. The position of an
+   * entry within the matrix, i.e., the row and column number for a
+   * given value in this array can only be deduced using the sparsity
+   * pattern. The same holds for the more common operation of finding
+   * an entry by its coordinates.
    */
-  number *val;
+  std::unique_ptr<number[]> val;
 
   /**
    * Allocated size of #val. This can be larger than the actually used part if
