@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2016 by the deal.II authors
+// Copyright (C) 1998 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -94,8 +94,7 @@ int main()
   SolverBicgstab<> bicgstab(control, mem);
   SolverRichardson<> rich(control, mem);
   SolverQMRS<> qmrs(control, mem);
-  SolverFIRE<>::AdditionalData fire_data(0.1, 1, 1);
-  SolverFIRE<> fire(control, mem, fire_data);
+  SolverFIRE<> fire(control, mem);
 
   for (unsigned int size=4; size <= 30; size *= 3)
     {
