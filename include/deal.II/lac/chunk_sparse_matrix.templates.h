@@ -213,7 +213,7 @@ namespace internal
       const size_type irregular_col = n/chunk_size;
 
       typename OutVector::iterator dst_ptr = dst.begin()+chunk_size*begin_row;
-      const number *val_ptr= &values[rowstart[begin_row]*chunk_size*chunk_size];
+      const number    *val_ptr    = &values[rowstart[begin_row]*chunk_size*chunk_size];
       const size_type *colnum_ptr = &colnums[rowstart[begin_row]];
       for (unsigned int chunk_row=begin_row; chunk_row<last_regular_row;
            ++chunk_row)
@@ -360,9 +360,6 @@ template <typename number>
 ChunkSparseMatrix<number>::~ChunkSparseMatrix ()
 {
   cols = nullptr;
-
-  if (val != nullptr)
-    delete[] val;
 }
 
 
@@ -411,7 +408,7 @@ ChunkSparseMatrix<number>::operator = (const double d)
                                   std::bind(&internal::ChunkSparseMatrix::template
                                             zero_subrange<number>,
                                             std::placeholders::_1, std::placeholders::_2,
-                                            val),
+                                            val.get()),
                                   grain_size);
   else if (matrix_size > 0)
     std::memset (&val[0], 0, matrix_size*sizeof(number));
@@ -448,9 +445,7 @@ ChunkSparseMatrix<number>::reinit (const ChunkSparsityPattern &sparsity)
 
   if (cols->empty())
     {
-      if (val != nullptr)
-        delete[] val;
-      val = nullptr;
+      val.reset ();
       max_len = 0;
       return;
     }
@@ -462,9 +457,7 @@ ChunkSparseMatrix<number>::reinit (const ChunkSparsityPattern &sparsity)
                       chunk_size * chunk_size;
   if (N > max_len || max_len == 0)
     {
-      if (val != nullptr)
-        delete[] val;
-      val = new number[N];
+      val.reset (new number[N]);
       max_len = N;
     }
 
@@ -481,8 +474,7 @@ void
 ChunkSparseMatrix<number>::clear ()
 {
   cols = nullptr;
-  if (val) delete[] val;
-  val = nullptr;
+  val.reset ();
   max_len = 0;
 }
 
@@ -721,7 +713,7 @@ ChunkSparseMatrix<number>::vmult_add (OutVector &dst,
                                            <number,InVector,OutVector>,
                                            std::cref(*cols),
                                            std::placeholders::_1, std::placeholders::_2,
-                                           val,
+                                           val.get(),
                                            cols->sparsity_pattern.rowstart,
                                            cols->sparsity_pattern.colnums,
                                            std::cref(src),
@@ -758,7 +750,7 @@ ChunkSparseMatrix<number>::Tvmult_add (OutVector &dst,
 
   // like in vmult_add, but don't keep an iterator into dst around since we're
   // not traversing it sequentially this time
-  const number    *val_ptr    = val;
+  const number    *val_ptr    = val.get();
   const size_type *colnum_ptr = cols->sparsity_pattern.colnums;
 
   for (size_type chunk_row=0; chunk_row<n_regular_chunk_rows; ++chunk_row)
@@ -852,7 +844,7 @@ ChunkSparseMatrix<number>::matrix_norm_square (const Vector<somenumber> &v) cons
        n_chunk_rows-1 :
        n_chunk_rows);
 
-  const number    *val_ptr    = val;
+  const number    *val_ptr    = val.get();
   const size_type *colnum_ptr = cols->sparsity_pattern.colnums;
   typename Vector<somenumber>::const_iterator v_ptr = v.begin();
 
@@ -960,7 +952,7 @@ ChunkSparseMatrix<number>::matrix_scalar_product (const Vector<somenumber> &u,
        n_chunk_rows-1 :
        n_chunk_rows);
 
-  const number    *val_ptr    = val;
+  const number    *val_ptr    = val.get();
   const size_type *colnum_ptr = cols->sparsity_pattern.colnums;
   typename Vector<somenumber>::const_iterator u_ptr = u.begin();
 
@@ -1162,7 +1154,7 @@ ChunkSparseMatrix<number>::residual (Vector<somenumber>       &dst,
        n_chunk_rows-1 :
        n_chunk_rows);
 
-  const number       *val_ptr    = val;
+  const number    *val_ptr    = val.get();
   const size_type *colnum_ptr = cols->sparsity_pattern.colnums;
   typename Vector<somenumber>::iterator dst_ptr = dst.begin();
 
@@ -1617,8 +1609,7 @@ ChunkSparseMatrix<number>::block_read (std::istream &in)
   AssertThrow (c == '[', ExcIO());
 
   // reallocate space
-  delete[] val;
-  val  = new number[max_len];
+  val.reset (new number[max_len]);
 
   // then read data
   in.read (reinterpret_cast<char *>(&val[0]),

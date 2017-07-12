@@ -62,7 +62,7 @@ void SparseILU<number>::initialize (const SparseMatrix<somenumber> &matrix,
   const std::size_t *const ia    = sparsity.rowstart;
   const size_type *const ja      = sparsity.colnums;
 
-  number *luval = this->SparseMatrix<number>::val;
+  number *luval = this->SparseMatrix<number>::val.get();
 
   const size_type N = this->m();
   size_type jrow = 0;
@@ -174,7 +174,7 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
       const size_type *const first_after_diagonal = this->prebuilt_lower_bound[row];
 
       somenumber dst_row = dst(row);
-      const number *luval = this->SparseMatrix<number>::val +
+      const number *luval = this->SparseMatrix<number>::val.get() +
                             (rowstart - column_numbers);
       for (const size_type *col=rowstart; col!=first_after_diagonal; ++col, ++luval)
         dst_row -= *luval * dst(*col);
@@ -198,7 +198,7 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
       const size_type *const first_after_diagonal = this->prebuilt_lower_bound[row];
 
       somenumber dst_row = dst(row);
-      const number *luval = this->SparseMatrix<number>::val +
+      const number *luval = this->SparseMatrix<number>::val.get() +
                             (first_after_diagonal - column_numbers);
       for (const size_type *col=first_after_diagonal; col!=rowend; ++col, ++luval)
         dst_row -= *luval * dst(*col);
@@ -251,7 +251,7 @@ void SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
       const size_type *const first_after_diagonal = this->prebuilt_lower_bound[row];
 
       const somenumber dst_row = dst (row);
-      const number *luval = this->SparseMatrix<number>::val +
+      const number *luval = this->SparseMatrix<number>::val.get() +
                             (first_after_diagonal - column_numbers);
       for (const size_type *col=first_after_diagonal; col!=rowend; ++col, ++luval)
         tmp(*col) += *luval * dst_row;
@@ -278,7 +278,7 @@ void SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
       const size_type *const first_after_diagonal = this->prebuilt_lower_bound[row];
 
       const somenumber dst_row = dst (row);
-      const number *luval = this->SparseMatrix<number>::val +
+      const number *luval = this->SparseMatrix<number>::val.get() +
                             (rowstart - column_numbers);
       for (const size_type *col=rowstart; col!=first_after_diagonal; ++col, ++luval)
         tmp(*col) += *luval * dst_row;
