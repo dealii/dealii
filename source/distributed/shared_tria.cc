@@ -290,16 +290,6 @@ namespace parallel
   namespace shared
   {
     template <int dim, int spacedim>
-    Triangulation<dim,spacedim>::Triangulation ()
-      :
-      dealii::parallel::Triangulation<dim,spacedim>(MPI_COMM_SELF)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-
-
-
-    template <int dim, int spacedim>
     bool
     Triangulation<dim,spacedim>::with_artificial_cells() const
     {

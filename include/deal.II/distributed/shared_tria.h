@@ -266,13 +266,19 @@ namespace parallel
      * parallel::shared::Triangulation objects throughout the library even if
      * it is disabled.
      *
-     * Since the constructor of this class is private, no such objects can
-     * actually be created if MPI is not available.
+     * Since the constructor of this class is deleted, no such objects
+     * can actually be created as this would be pointless given that
+     * MPI is not available.
      */
     template <int dim, int spacedim = dim>
     class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>
     {
     public:
+      /**
+       * Constructor. Deleted to make sure that objects of this type cannot be
+       * constructed (see also the class documentation).
+       */
+      Triangulation () = delete;
 
       /**
        * A dummy function to return empty vector.
@@ -283,12 +289,8 @@ namespace parallel
        * A dummy function which always returns true.
        */
       bool with_artificial_cells() const;
-    private:
-      /**
-       * Constructor.
-       */
-      Triangulation ();
 
+    private:
       /**
        * A dummy vector.
        */
