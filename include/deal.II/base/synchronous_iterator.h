@@ -72,6 +72,7 @@ struct SynchronousIterators
    */
   Iterators &operator* ();
 
+private:
   /**
    * Storage for the iterators represented by the current class.
    */
