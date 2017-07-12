@@ -312,9 +312,9 @@ namespace internal
                 const TableIndices<rank> &previous_indices);
 
       /**
-       * Copy constructor. Not needed, and invisible, so private.
+       * Copy constructor.
        */
-      Accessor (const Accessor &a);
+      Accessor (const Accessor &) = default;
 
     public:
 
@@ -395,14 +395,14 @@ namespace internal
                 const TableIndices<rank> &previous_indices);
 
       /**
-       * Default constructor. Not needed, and invisible, so private.
+       * Default constructor. Not needed, so deleted.
        */
-      Accessor ();
+      Accessor () = delete;
 
       /**
-       * Copy constructor. Not needed, and invisible, so private.
+       * Copy constructor.
        */
-      Accessor (const Accessor &a);
+      Accessor (const Accessor &) = default;
 
     public:
 
@@ -852,15 +852,6 @@ namespace internal
     {}
 
 
-    template <int rank, int dim, bool constness, int P, typename Number>
-    Accessor<rank,dim,constness,P,Number>::
-    Accessor (const Accessor &a)
-      :
-      tensor (a.tensor),
-      previous_indices (a.previous_indices)
-    {}
-
-
 
     template <int rank, int dim, bool constness, int P, typename Number>
     Accessor<rank,dim,constness,P-1,Number>
@@ -889,16 +880,6 @@ namespace internal
       :
       tensor (tensor),
       previous_indices (previous_indices)
-    {}
-
-
-
-    template <int rank, int dim, bool constness, typename Number>
-    Accessor<rank,dim,constness,1,Number>::
-    Accessor (const Accessor &a)
-      :
-      tensor (a.tensor),
-      previous_indices (a.previous_indices)
     {}
 
 
