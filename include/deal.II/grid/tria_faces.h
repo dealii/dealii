@@ -48,12 +48,12 @@ namespace internal
     template <int dim>
     class TriaFaces
     {
-    private:
+    public:
       /**
-       * Make the constructor private so no one can use this general template.
-       * Only the specializations should be used.
+       * Constructor. This constructor is deleted to prevent the use of this template,
+       * as only the specializations should be used
        */
-      TriaFaces();
+      TriaFaces() = delete;
     };
 
 
