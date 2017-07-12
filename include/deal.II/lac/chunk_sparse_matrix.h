@@ -24,6 +24,9 @@
 #include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/exceptions.h>
 
+#include <memory>
+
+
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class Vector;
@@ -1325,12 +1328,13 @@ private:
   SmartPointer<const ChunkSparsityPattern,ChunkSparseMatrix<number> > cols;
 
   /**
-   * Array of values for all the nonzero entries. The position within the
-   * matrix, i.e.  the row and column number for a given entry can only be
-   * deduced using the sparsity pattern. The same holds for the more common
-   * operation of finding an entry by its coordinates.
+   * Array of values for all the nonzero entries. The position of an
+   * entry within the matrix, i.e., the row and column number for a
+   * given value in this array can only be deduced using the sparsity
+   * pattern. The same holds for the more common operation of finding
+   * an entry by its coordinates.
    */
-  number *val;
+  std::unique_ptr<number[]> val;
 
   /**
    * Allocated size of #val. This can be larger than the actually used part if
@@ -1495,8 +1499,8 @@ ChunkSparseMatrix<number>::operator *= (const number factor)
   // the padding elements in chunks that overlap the boundaries of the actual
   // matrix -- but since multiplication with a number does not violate the
   // invariant of keeping these elements at zero nothing can happen
-  number             *val_ptr    = val;
-  const number *const end_ptr    = val +
+  number             *val_ptr    = val.get();
+  const number *const end_ptr    = val.get() +
                                    cols->sparsity_pattern.n_nonzero_elements()
                                    *
                                    chunk_size * chunk_size;
@@ -1525,8 +1529,8 @@ ChunkSparseMatrix<number>::operator /= (const number factor)
   // the padding elements in chunks that overlap the boundaries of the actual
   // matrix -- but since multiplication with a number does not violate the
   // invariant of keeping these elements at zero nothing can happen
-  number             *val_ptr    = val;
-  const number *const end_ptr    = val +
+  number             *val_ptr    = val.get();
+  const number *const end_ptr    = val.get() +
                                    cols->sparsity_pattern.n_nonzero_elements()
                                    *
                                    chunk_size * chunk_size;
