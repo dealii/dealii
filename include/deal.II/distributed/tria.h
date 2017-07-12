@@ -1029,18 +1029,19 @@ namespace parallel
      * parallel::distributed::Triangulation objects throughout the library
      * even if it is disabled.
      *
-     * Since the constructor of this class is private, no such objects can
-     * actually be created if we don't have p4est available.
+     * Since the constructor of this class is deleted, no such objects
+     * can actually be created as this would be pointless given that
+     * p4est is not available.
      */
     template <int dim, int spacedim = dim>
     class Triangulation : public dealii::parallel::Triangulation<dim,spacedim>
     {
-    private:
+    public:
       /**
-       * Constructor.
+       * Constructor. Deleted to make sure that objects of this type cannot be
+       * constructed (see also the class documentation).
        */
-      Triangulation ();
-
+      Triangulation () = delete;
     };
   }
 }
