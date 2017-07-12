@@ -48,6 +48,12 @@ class MultithreadInfo
 {
 public:
   /**
+   * Constructor. This constructor is deleted because no instance of
+   * this class needs to be constructed (all members are static).
+   */
+  MultithreadInfo () = delete;
+
+  /**
    * The number of CPUs in the system. At the moment detection of CPUs is only
    * implemented on Linux, FreeBSD, and Mac computers.  It is one if detection
    * failed or is not implemented on your system.
@@ -96,13 +102,6 @@ public:
   static bool is_running_single_threaded ();
 
 private:
-
-
-  /**
-   * Constructor made private because no instance of this class needs to be
-   * constructed as all members are static.
-   */
-  MultithreadInfo ();
 
   /**
    * Private function to determine the number of CPUs. Implementation for
