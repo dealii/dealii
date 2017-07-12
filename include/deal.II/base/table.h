@@ -166,9 +166,9 @@ namespace internal
                 const iterator    data);
 
       /**
-       * Default constructor. Not needed, and invisible, so private.
+       * Default constructor. Not needed, and invisible, so deleted.
        */
-      Accessor ();
+      Accessor () = delete;
 
     public:
 
@@ -269,9 +269,9 @@ namespace internal
                 const iterator    data);
 
       /**
-       * Default constructor. Not needed, so private.
+       * Default constructor. Not needed, so deleted.
        */
-      Accessor ();
+      Accessor () = delete;
 
     public:
       /**
@@ -1706,21 +1706,6 @@ namespace internal
 
     template <int N, typename T, bool C, unsigned int P>
     inline
-    Accessor<N,T,C,P>::Accessor ()
-      :
-      table (*static_cast<const TableType *>(0)),
-      data (0)
-    {
-      // accessor objects are only
-      // temporary objects, so should
-      // not need to be copied around
-      Assert (false, ExcInternalError());
-    }
-
-
-
-    template <int N, typename T, bool C, unsigned int P>
-    inline
     Accessor<N,T,C,P-1>
     Accessor<N,T,C,P>::operator [] (const unsigned int i) const
     {
@@ -1755,21 +1740,6 @@ namespace internal
       table (table),
       data (data)
     {}
-
-
-
-    template <int N, typename T, bool C>
-    inline
-    Accessor<N,T,C,1>::Accessor ()
-      :
-      table (*static_cast<const TableType *>(0)),
-      data (0)
-    {
-      // accessor objects are only
-      // temporary objects, so should
-      // not need to be copied around
-      Assert (false, ExcInternalError());
-    }
 
 
 
