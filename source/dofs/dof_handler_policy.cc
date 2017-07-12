@@ -141,19 +141,14 @@ namespace internal
 
 
         /**
-         * Make sure that the given @p
-         * identities pointer points to a
-         * valid array. If the pointer is
-         * zero beforehand, create an
-         * entry with the correct
-         * data. If it is nonzero, don't
-         * touch it.
+         * Make sure that the given @p identities pointer points to a
+         * valid array. If the pointer is zero beforehand, create an
+         * entry with the correct data. If it is nonzero, don't touch
+         * it.
          *
-         * @p structdim denotes the
-         * dimension of the objects on
-         * which identities are to be
-         * represented, i.e. zero for
-         * vertices, one for lines, etc.
+         * @p structdim denotes the dimension of the objects on which
+         * identities are to be represented, i.e. zero for vertices,
+         * one for lines, etc.
          */
         template <int structdim, int dim, int spacedim>
         void
@@ -161,8 +156,7 @@ namespace internal
                                             const FiniteElement<dim,spacedim> &fe2,
                                             std::shared_ptr<DoFIdentities> &identities)
         {
-          // see if we need to fill this
-          // entry, or whether it already
+          // see if we need to fill this entry, or whether it already
           // exists
           if (identities.get() == nullptr)
             {
@@ -196,9 +190,8 @@ namespace internal
                   Assert (false, ExcNotImplemented());
                 }
 
-              // double check whether the
-              // newly created entries
-              // make any sense at all
+              // double check whether the newly created entries make
+              // any sense at all
               for (unsigned int i=0; i<identities->size(); ++i)
                 {
                   Assert ((*identities)[i].first < fe1.template n_dofs_per_object<structdim>(),
@@ -212,10 +205,8 @@ namespace internal
 
 
         /**
-         * For an object, such as a line
-         * or a quad iterator, determine
-         * the fe_index of the most
-         * dominating finite element that
+         * For an object, such as a line or a quad iterator, determine
+         * the fe_index of the most dominating finite element that
          * lives on this object.
          *
          * Return numbers::invalid_unsigned_int if we couldn't find one.
@@ -246,10 +237,8 @@ namespace internal
                                  this_fe.compare_for_face_domination(that_fe);
                   }
 
-              // see if this element is
-              // able to dominate all the
-              // other ones, and if so
-              // take it
+              // see if this element is able to dominate all the other
+              // ones, and if so take it
               if ((domination == FiniteElementDomination::this_element_dominates)
                   ||
                   (domination == FiniteElementDomination::either_element_can_dominate)
@@ -258,14 +247,11 @@ namespace internal
                 break;
             }
 
-          // check that we have
-          // found one such fe
+          // check that we have found one such fe
           if (dominating_fe_index != object->n_active_fe_indices())
             {
-              // return the finite element
-              // index used on it. note
-              // that only a single fe can
-              // be active on such subfaces
+              // return the finite element index used on it. note that
+              // only a single fe can be active on such subfaces
               return object->nth_active_fe_index(dominating_fe_index);
             }
           else
@@ -913,12 +899,12 @@ namespace internal
         }
 
 
+        template <int spacedim>
         static
         std::map<types::global_dof_index, types::global_dof_index>
-        compute_quad_dof_identities (hp::DoFHandler<3,3> &dof_handler)
+        compute_quad_dof_identities (hp::DoFHandler<3,spacedim> &dof_handler)
         {
           const int dim = 3;
-          const int spacedim = 3;
 
           std::map<types::global_dof_index, types::global_dof_index> dof_identities;
 
@@ -945,7 +931,7 @@ namespace internal
           quad_dof_identities (dof_handler.finite_elements->size(),
                                dof_handler.finite_elements->size());
 
-          for (hp::DoFHandler<dim,spacedim>::active_cell_iterator
+          for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
                cell=dof_handler.begin_active();
                cell!=dof_handler.end(); ++cell)
             for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
@@ -953,7 +939,7 @@ namespace internal
                   &&
                   (cell->quad(q)->n_active_fe_indices() == 2))
                 {
-                  const hp::DoFHandler<dim,spacedim>::quad_iterator quad = cell->quad(q);
+                  const typename hp::DoFHandler<dim,spacedim>::quad_iterator quad = cell->quad(q);
                   quad->set_user_flag ();
 
                   // find out which is the most dominating finite
@@ -1047,24 +1033,27 @@ namespace internal
           // compute the constraints that correspond to unifying
           // dof indices on vertices, lines, and quads. do so
           // in parallel
-          std::map<types::global_dof_index, types::global_dof_index>
-          constrained_vertex_indices, constrained_line_indices, constrained_quad_indices;
+          std::map<types::global_dof_index, types::global_dof_index> all_constrained_indices[dim];
 
           {
             Threads::TaskGroup<> tasks;
 
             tasks += Threads::new_task ([&]()
             {
-              constrained_vertex_indices = compute_vertex_dof_identities (dof_handler);
+              all_constrained_indices[0] = compute_vertex_dof_identities (dof_handler);
             });
-            tasks += Threads::new_task ([&]()
-            {
-              constrained_line_indices = compute_line_dof_identities (dof_handler);
-            });
-            tasks += Threads::new_task ([&]()
-            {
-              constrained_quad_indices = compute_quad_dof_identities (dof_handler);
-            });
+
+            if (dim > 1)
+              tasks += Threads::new_task ([&]()
+              {
+                all_constrained_indices[1] = compute_line_dof_identities (dof_handler);
+              });
+
+            if (dim > 2)
+              tasks += Threads::new_task ([&]()
+              {
+                all_constrained_indices[2] = compute_quad_dof_identities (dof_handler);
+              });
 
             tasks.join_all ();
           }
@@ -1074,18 +1063,13 @@ namespace internal
           std::vector<types::global_dof_index>
           new_dof_indices (n_dofs_before_identification, numbers::invalid_dof_index);
 
-          for (const auto &constrained_dof_indices :
-          {
-            &constrained_vertex_indices,
-            &constrained_line_indices,
-            &constrained_quad_indices
-          })
-          for (const auto &p : *constrained_dof_indices)
-            {
-              Assert (new_dof_indices[p.first] == numbers::invalid_dof_index,
-                      ExcInternalError());
-              new_dof_indices[p.first] = p.second;
-            }
+          for (const auto &constrained_dof_indices : all_constrained_indices)
+            for (const auto &p : constrained_dof_indices)
+              {
+                Assert (new_dof_indices[p.first] == numbers::invalid_dof_index,
+                        ExcInternalError());
+                new_dof_indices[p.first] = p.second;
+              }
 
           types::global_dof_index next_free_dof = 0;
           for (types::global_dof_index i=0; i<n_dofs_before_identification; ++i)
@@ -1095,22 +1079,16 @@ namespace internal
                 ++next_free_dof;
               }
 
-          // then loop over all those that
-          // are constrained and record the
+          // then loop over all those that are constrained and record the
           // new dof number for those:
-          for (const auto &constrainted_dof_indices :
-          {
-            &constrained_vertex_indices,
-            &constrained_line_indices,
-            &constrained_quad_indices
-          })
-          for (const auto &p : *constrainted_dof_indices)
-            {
-              Assert (new_dof_indices[p.first] != numbers::invalid_dof_index,
-                      ExcInternalError());
+          for (const auto &constrained_dof_indices : all_constrained_indices)
+            for (const auto &p : constrained_dof_indices)
+              {
+                Assert (new_dof_indices[p.first] != numbers::invalid_dof_index,
+                        ExcInternalError());
 
-              new_dof_indices[p.first] = new_dof_indices[p.second];
-            }
+                new_dof_indices[p.first] = new_dof_indices[p.second];
+              }
 
           for (types::global_dof_index i=0; i<n_dofs_before_identification; ++i)
             {
@@ -2242,9 +2220,9 @@ namespace internal
       /* --------------------- class ParallelShared ---------------- */
 
 
-      template <int dim, int spacedim>
-      ParallelShared<dim,spacedim>::
-      ParallelShared (dealii::DoFHandler<dim,spacedim> &dof_handler)
+      template <class DoFHandlerType>
+      ParallelShared<DoFHandlerType>::
+      ParallelShared (DoFHandlerType &dof_handler)
         :
         dof_handler (&dof_handler)
       {}
@@ -2325,11 +2303,14 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <class DoFHandlerType>
       NumberCache
-      ParallelShared<dim,spacedim>::
+      ParallelShared<DoFHandlerType>::
       distribute_dofs () const
       {
+        const unsigned int dim      = DoFHandlerType::dimension;
+        const unsigned int spacedim = DoFHandlerType::space_dimension;
+
         const parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
@@ -2480,9 +2461,9 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <class DoFHandlerType>
       std::vector<NumberCache>
-      ParallelShared<dim,spacedim>::
+      ParallelShared<DoFHandlerType>::
       distribute_mg_dofs () const
       {
         // this is not currently implemented; the algorithm should work
@@ -2497,9 +2478,9 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <class DoFHandlerType>
       NumberCache
-      ParallelShared<dim,spacedim>::
+      ParallelShared<DoFHandlerType>::
       renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const
       {
 
@@ -2508,6 +2489,9 @@ namespace internal
         Assert (false, ExcNotImplemented());
         return NumberCache();
 #else
+        const unsigned int dim      = DoFHandlerType::dimension;
+        const unsigned int spacedim = DoFHandlerType::space_dimension;
+
         // Similar to distribute_dofs() we need to have a special treatment in
         // case artificial cells are present.
         const parallel::shared::Triangulation<dim, spacedim> *tr =
@@ -2635,9 +2619,9 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <class DoFHandlerType>
       NumberCache
-      ParallelShared<dim,spacedim>::
+      ParallelShared<DoFHandlerType>::
       renumber_mg_dofs (const unsigned int                          /*level*/,
                         const std::vector<types::global_dof_index> &/*new_numbers*/) const
       {

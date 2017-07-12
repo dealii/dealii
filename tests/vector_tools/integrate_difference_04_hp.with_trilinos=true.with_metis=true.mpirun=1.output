@@ -1,0 +1,20 @@
+
+DEAL:0::Hdiv_seminorm:
+DEAL:0::computed: 3.05512 expected: 3.05505 difference: 6.81923e-05
+DEAL:0::L2_norm:
+DEAL:0::computed: 1.95390 expected: 1.95363 difference: 0.000266581
+DEAL:0::H1_seminorm:
+DEAL:0::computed: 2.70821 expected: 2.70801 difference: 0.000192324
+DEAL:0::H1_norm:
+DEAL:0::computed: 3.33947 expected: 3.33916 difference: 0.000311941
+DEAL:0::L1_norm:
+DEAL:0::computed: 2.91688 expected: 2.91667 difference: 0.000208333
+DEAL:0::Linfty_norm:
+DEAL:0::computed: 3.00000 expected: 3.00000 difference: 0.00000
+DEAL:0::mean:
+DEAL:0::computed: -2.91688 expected: -2.91667 difference: 0.000208333
+DEAL:0::Lp_norm:
+DEAL:0::computed: 1.80879 expected: 1.80849 difference: 0.000304641
+DEAL:0::W1p_seminorm:
+DEAL:0::computed: 2.31582 expected: 2.31560 difference: 0.000216381
+DEAL:0::OK

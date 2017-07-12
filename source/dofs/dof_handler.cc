@@ -71,7 +71,7 @@ namespace internal
       policy_name = "Policy::Sequential<";
     else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>*>(&policy))
       policy_name = "Policy::ParallelDistributed<";
-    else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelShared<dim,spacedim>*>(&policy))
+    else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelShared<dealii::DoFHandler<dim,spacedim> >*>(&policy))
       policy_name = "Policy::ParallelShared<";
     else
       AssertThrow(false, ExcNotImplemented());
@@ -658,7 +658,7 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
       (&tria)
       != nullptr)
-    policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>(*this));
+    policy.reset (new internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >(*this));
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
            (&tria)
            == nullptr)
@@ -699,19 +699,13 @@ initialize(const Triangulation<dim,spacedim> &t,
   faces = nullptr;
   number_cache.n_global_dofs = 0;
 
-  // decide whether we need a
-  // sequential or a parallel
-  // distributed policy
-  if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
-      (&t)
-      != nullptr)
-    policy.reset (new internal::DoFHandler::Policy::ParallelShared<dim,spacedim>(*this));
-  else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
-           (&t)
-           == nullptr)
-    policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
-  else
+  // decide whether we need a sequential or a parallel distributed policy
+  if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&t) != nullptr)
+    policy.reset (new internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >(*this));
+  else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&t) != nullptr)
     policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>(*this));
+  else
+    policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
 
   distribute_dofs(fe);
 }
