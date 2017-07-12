@@ -83,7 +83,7 @@ DEAL_II_NAMESPACE_OPEN
  * Energy-Minimization in Atomic-to-Continuum Scale-Bridging Methods </a> by
  * Eidel et al. 2011.
  *
- * @author Vishal Boddu 2017
+ * @author Vishal Boddu, Denis Davydov, 2017
  */
 template<typename VectorType = Vector<double> >
 class SolverFIRE : public Solver<VectorType>
@@ -150,8 +150,6 @@ public:
    * the objective function's gradient (with respect to the variables) when
    * passed in as first argument based on the second argument-- the state of
    * variables.
-   *
-   * @author Vishal Boddu, Denis Davydov, 2017
    */
   template<typename PreconditionerType = DiagonalMatrix<VectorType>>
   void solve
