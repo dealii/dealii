@@ -18,7 +18,6 @@
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/solver_richardson.h>
 
 DEAL_II_NAMESPACE_OPEN
