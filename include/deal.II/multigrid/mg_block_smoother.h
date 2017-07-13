@@ -18,12 +18,12 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/lac/pointer_matrix.h>
-#include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/multigrid/mg_smoother.h>
 #include <deal.II/base/mg_level_object.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/linear_operator.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/multigrid/mg_smoother.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -114,12 +114,12 @@ private:
   /**
    * Pointer to the matrices.
    */
-  MGLevelObject<PointerMatrix<MatrixType, BlockVector<number> > > matrices;
+  MGLevelObject<LinearOperator<BlockVector<number> > > matrices;
 
   /**
    * Pointer to the matrices.
    */
-  MGLevelObject<PointerMatrix<RelaxationType, BlockVector<number> > > smoothers;
+  MGLevelObject<LinearOperator<BlockVector<number> > > smoothers;
 
   /**
    * Reverse?
@@ -174,8 +174,8 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::clear ()
                max_level=matrices.max_level();
   for (; i<=max_level; ++i)
     {
-      smoothers[i] = nullptr;
-      matrices[i] = nullptr;
+      smoothers[i] = LinearOperator<BlockVector<number> >();
+      matrices[i] = LinearOperator<BlockVector<number> >();
     }
 }
 
@@ -194,8 +194,8 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::initialize (const MGMatrixT
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = &m[i];
-      smoothers[i] = &s[i];
+      matrices[i] = linear_operator<BlockVector<number> >(m[i]);
+      smoothers[i] = linear_operator<BlockVector<number> >(s[i]);
     }
 }
 
