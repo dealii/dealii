@@ -200,21 +200,25 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::initialize (const MGMatrixT
 
       matrices[i] = LinearOperator<BlockVector<number>>();
       matrices[i].vmult = [&m, i](BlockVector<number> &v,
-                                  const BlockVector<number> &u) {
+                                  const BlockVector<number> &u)
+      {
         m[i].vmult(v, u);
       };
       matrices[i].Tvmult = [&m, i](BlockVector<number> &v,
-                                   const BlockVector<number> &u) {
+                                   const BlockVector<number> &u)
+      {
         m[i].Tvmult(v, u);
       };
 
       smoothers[i] = LinearOperator<BlockVector<number>>();
       smoothers[i].vmult = [&s, i](BlockVector<number> &v,
-                                   const BlockVector<number> &u) {
+                                   const BlockVector<number> &u)
+      {
         s[i].vmult(v, u);
       };
       smoothers[i].Tvmult = [&s, i](BlockVector<number> &v,
-                                    const BlockVector<number> &u) {
+                                    const BlockVector<number> &u)
+      {
         s[i].Tvmult(v, u);
       };
     }
