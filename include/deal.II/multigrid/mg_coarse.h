@@ -18,8 +18,9 @@
 
 
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/matrix_lib.h>
 #include <deal.II/lac/householder.h>
+#include <deal.II/lac/linear_operator.h>
+#include <deal.II/lac/matrix_lib.h>
 #include <deal.II/multigrid/mg_base.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -143,14 +144,14 @@ private:
   SmartPointer<SolverType,MGCoarseGridLACIteration<SolverType,VectorType> > solver;
 
   /**
-   * Reference to the matrix.
+   * LinearOperator wrapping a reference to the matrix.
    */
-  PointerMatrixBase<VectorType> *matrix;
+  LinearOperator<VectorType> matrix;
 
   /**
-   * Reference to the preconditioner.
+   * LinearOperator wrapping a reference to the preconditioner.
    */
-  PointerMatrixBase<VectorType> *precondition;
+  LinearOperator<VectorType> precondition;
 
 } DEAL_II_DEPRECATED;
 
@@ -375,8 +376,8 @@ MGCoarseGridLACIteration<SolverType, VectorType>
   :
   solver(&s, typeid(*this).name())
 {
-  matrix = new PointerMatrix<MatrixType, VectorType>(&m);
-  precondition = new PointerMatrix<PreconditionerType, VectorType>(&p);
+  matrix = linear_operator<VectorType>(m);
+  precondition = linear_operator<VectorType>(p);
 }
 
 
@@ -399,10 +400,10 @@ MGCoarseGridLACIteration<SolverType, VectorType>
   solver = &s;
   if (matrix)
     delete matrix;
-  matrix = new PointerMatrix<MatrixType, VectorType>(&m);
+  matrix = linear_operator<VectorType>(m);
   if (precondition)
     delete precondition;
-  precondition = new PointerMatrix<PreconditionerType, VectorType>(&p);
+  precondition = linear_operator<VectorType>(p);
 }
 
 
@@ -412,12 +413,9 @@ MGCoarseGridLACIteration<SolverType, VectorType>
 ::clear()
 {
   solver = nullptr;
-  if (matrix)
-    delete matrix;
-  matrix = nullptr;
-  if (precondition)
-    delete precondition;
-  precondition = nullptr;
+  matrix = LinearOperator<VectorType>();
+  precondition = LinearOperator<VectorType>();
+
 }
 
 
@@ -429,9 +427,7 @@ MGCoarseGridLACIteration<SolverType, VectorType>
               const VectorType   &src) const
 {
   Assert(solver!=nullptr, ExcNotInitialized());
-  Assert(matrix!=nullptr, ExcNotInitialized());
-  Assert(precondition!=nullptr, ExcNotInitialized());
-  solver->solve(*matrix, dst, src, *precondition);
+  solver->solve(matrix, dst, src, precondition);
 }
 
 
@@ -443,7 +439,7 @@ MGCoarseGridLACIteration<SolverType, VectorType>
 {
   if (matrix)
     delete matrix;
-  matrix = new PointerMatrix<MatrixType, VectorType>(&m);
+  matrix = linear_operator<VectorType>(m);
 }
 
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
@@ -525,9 +521,7 @@ MGCoarseGridIterativeSolver<VectorType, SolverType, MatrixType, PreconditionerTy
               const VectorType   &src) const
 {
   Assert(solver!=nullptr, ExcNotInitialized());
-  Assert(matrix!=nullptr, ExcNotInitialized());
-  Assert(preconditioner!=nullptr, ExcNotInitialized());
-  solver->solve(*matrix, dst, src, *preconditioner);
+  solver->solve(matrix, dst, src, preconditioner);
 }
 
 
