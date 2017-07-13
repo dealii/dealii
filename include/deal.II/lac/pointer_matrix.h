@@ -45,6 +45,8 @@ template <typename number, typename BlockVectorType> class BlockMatrixArray;
  * classes in the same context, as long as they apply to the same vector
  * class.
  *
+ * @deprecated Use LinearOperator instead
+ *
  * @author Guido Kanschat, 2000, 2001, 2002
  */
 template <typename VectorType>
@@ -96,7 +98,7 @@ public:
    */
   virtual void Tvmult_add (VectorType       &dst,
                            const VectorType &src) const = 0;
-};
+} DEAL_II_DEPRECATED;
 
 
 /**
@@ -106,6 +108,8 @@ public:
  * The main purpose for the existence of this class is its base class, which
  * only has a vector as template argument. Therefore, this interface provides
  * an abstract base class for matrices.
+ *
+ * @deprecated Use LinearOperator instead
  *
  * @author Guido Kanschat 2000, 2001, 2002
  */
@@ -192,7 +196,7 @@ private:
    * The pointer to the actual matrix.
    */
   SmartPointer<const MatrixType,PointerMatrix<MatrixType,VectorType> > m;
-};
+} DEAL_II_DEPRECATED;
 
 
 /**
@@ -206,6 +210,8 @@ private:
  * This class differs form PointerMatrix by its additional VectorMemory object
  * and by the fact that it implements the functions vmult_add() and
  * Tvmult_add() only using vmult() and Tvmult() of the MatrixType.
+ *
+ * @deprecated Use LinearOperator instead
  *
  * @author Guido Kanschat 2006
  */
@@ -312,7 +318,7 @@ private:
    * The pointer to the actual matrix.
    */
   SmartPointer<const MatrixType,PointerMatrixAux<MatrixType,VectorType> > m;
-};
+} DEAL_II_DEPRECATED;
 
 
 
@@ -323,6 +329,8 @@ private:
  * Implements a matrix with image dimension 1 by using the scalar product
  * (#vmult()) and scalar multiplication (#Tvmult()) functions of the Vector
  * class.
+ *
+ * @deprecated Use LinearOperator instead
  *
  * @author Guido Kanschat, 2006
  */
@@ -423,7 +431,7 @@ private:
    * The pointer to the actual matrix.
    */
   SmartPointer<const Vector<number>,PointerMatrixVector<number> > m;
-};
+} DEAL_II_DEPRECATED;
 
 
 
