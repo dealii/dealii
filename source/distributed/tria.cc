@@ -3932,22 +3932,6 @@ namespace parallel
 }
 
 
-#else // DEAL_II_WITH_P4EST
-
-namespace parallel
-{
-  namespace distributed
-  {
-    template <int dim, int spacedim>
-    Triangulation<dim,spacedim>::Triangulation ()
-      :
-      dealii::parallel::Triangulation<dim,spacedim>(MPI_COMM_SELF)
-    {
-      Assert (false, ExcNotImplemented());
-    }
-  }
-}
-
 #endif // DEAL_II_WITH_P4EST
 
 

@@ -1581,8 +1581,8 @@ public:
   /**
    * Copy constructor.
    *
-   * You should really use the @p copy_triangulation function, so we declare
-   * this function but let it throw an internal error. The reason for this is
+   * You should really use the @p copy_triangulation function, so this
+   * constructor is deleted. The reason for this is
    * that we may want to use triangulation objects in collections. However,
    * C++ containers require that the objects stored in them are copyable, so
    * we need to provide a copy constructor. On the other hand, copying
@@ -1593,7 +1593,7 @@ public:
    * Finally, through the exception, one easily finds the places where code
    * has to be changed to avoid copies.
    */
-  Triangulation (const Triangulation<dim, spacedim> &t);
+  Triangulation (const Triangulation<dim, spacedim> &) = delete;
 
   /**
    * Move constructor.

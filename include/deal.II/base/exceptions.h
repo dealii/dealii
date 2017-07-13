@@ -58,6 +58,12 @@ public:
   virtual ~ExceptionBase () noexcept;
 
   /**
+   * Copy operator. This operator is deleted since exception objects
+   * are not copyable.
+   */
+  ExceptionBase operator= (const ExceptionBase &) = delete;
+
+  /**
    * Set the file name and line of where the exception appeared as well as the
    * violated condition and the name of the exception as a char pointer. This
    * function also populates the stacktrace.
@@ -142,11 +148,6 @@ protected:
 #endif
 
 private:
-  /**
-   * Copy operator. Made private since it is not used and not implemented.
-   */
-  ExceptionBase operator= (const ExceptionBase &exc);
-
   /**
    * Internal function that generates the c_string. Called by what().
    */

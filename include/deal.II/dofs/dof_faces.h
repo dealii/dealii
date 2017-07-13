@@ -67,12 +67,12 @@ namespace internal
     template <int dim>
     class DoFFaces
     {
+    public:
       /**
-       * Make the constructor private to prevent the use of this template,
-       * only the specializations should be used
+       * Constructor. This constructor is deleted to prevent the use of this template,
+       * as only the specializations should be used
        */
-    private:
-      DoFFaces();
+      DoFFaces() = delete;
     };
 
     /**

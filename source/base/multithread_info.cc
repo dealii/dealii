@@ -189,11 +189,6 @@ bool MultithreadInfo::is_running_single_threaded()
 }
 
 
-MultithreadInfo::MultithreadInfo ()
-{}
-
-
-
 std::size_t
 MultithreadInfo::memory_consumption ()
 {

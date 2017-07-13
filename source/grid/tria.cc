@@ -8968,25 +8968,6 @@ Triangulation (const MeshSmoothing smooth_grid,
 }
 
 
-template <int dim, int spacedim>
-Triangulation<dim, spacedim>::
-Triangulation (const Triangulation<dim, spacedim> &other)
-// do not set any subscriptors;
-// anyway, calling this constructor
-// is an error!
-  :
-  Subscriptor(),
-  signals (),
-  anisotropic_refinement(false),
-  check_for_distorted_cells(other.check_for_distorted_cells)
-{
-  Assert (false, ExcMessage ("You are not allowed to call this constructor "
-                             "because copying Triangulation objects is not "
-                             "allowed. Use Triangulation::copy_triangulation() "
-                             "instead."));
-}
-
-
 
 template <int dim, int spacedim>
 Triangulation<dim, spacedim>::

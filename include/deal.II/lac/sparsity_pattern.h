@@ -401,7 +401,7 @@ public:
    * amounts of computing time. However, copy constructors are needed if one
    * wants to place a SparsityPattern in a container, e.g., to write such
    * statements like <tt>v.push_back (SparsityPattern());</tt>, with
-   * <tt>v</tt> a vector of SparsityPattern objects.
+   * <tt>v</tt> a std::vector of SparsityPattern objects.
    *
    * Usually, it is sufficient to use the explicit keyword to disallow
    * unwanted temporaries, but this does not work for <tt>std::vector</tt>s.
