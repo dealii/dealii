@@ -18,12 +18,12 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/smartpointer.h>
-#include <deal.II/lac/pointer_matrix.h>
-#include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/block_vector.h>
-#include <deal.II/multigrid/mg_smoother.h>
 #include <deal.II/base/mg_level_object.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/linear_operator.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/multigrid/mg_smoother.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -114,12 +114,12 @@ private:
   /**
    * Pointer to the matrices.
    */
-  MGLevelObject<PointerMatrix<MatrixType, BlockVector<number> > > matrices;
+  MGLevelObject<LinearOperator<BlockVector<number> > > matrices;
 
   /**
    * Pointer to the matrices.
    */
-  MGLevelObject<PointerMatrix<RelaxationType, BlockVector<number> > > smoothers;
+  MGLevelObject<LinearOperator<BlockVector<number> > > smoothers;
 
   /**
    * Reverse?
@@ -174,8 +174,8 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::clear ()
                max_level=matrices.max_level();
   for (; i<=max_level; ++i)
     {
-      smoothers[i] = nullptr;
-      matrices[i] = nullptr;
+      smoothers[i] = LinearOperator<BlockVector<number> >();
+      matrices[i] = LinearOperator<BlockVector<number> >();
     }
 }
 
@@ -194,8 +194,33 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::initialize (const MGMatrixT
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = &m[i];
-      smoothers[i] = &s[i];
+      // Workaround: The matrix objects supplied to this class do not
+      // expose information how to reinitialize a vector. Therefore,
+      // populate vmult and Tvmult by hand...
+
+      matrices[i] = LinearOperator<BlockVector<number>>();
+      matrices[i].vmult = [&m, i](BlockVector<number> &v,
+                                  const BlockVector<number> &u)
+      {
+        m[i].vmult(v, u);
+      };
+      matrices[i].Tvmult = [&m, i](BlockVector<number> &v,
+                                   const BlockVector<number> &u)
+      {
+        m[i].Tvmult(v, u);
+      };
+
+      smoothers[i] = LinearOperator<BlockVector<number>>();
+      smoothers[i].vmult = [&s, i](BlockVector<number> &v,
+                                   const BlockVector<number> &u)
+      {
+        s[i].vmult(v, u);
+      };
+      smoothers[i].Tvmult = [&s, i](BlockVector<number> &v,
+                                    const BlockVector<number> &u)
+      {
+        s[i].Tvmult(v, u);
+      };
     }
 }
 

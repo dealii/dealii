@@ -16,11 +16,11 @@
 #ifndef dealii__mg_matrix_h
 #define dealii__mg_matrix_h
 
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/pointer_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/multigrid/mg_base.h>
 #include <deal.II/base/mg_level_object.h>
+#include <deal.II/lac/linear_operator.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/multigrid/mg_base.h>
 
 #include <memory>
 
@@ -33,8 +33,8 @@ namespace mg
 {
   /**
    * Multilevel matrix. This matrix stores an MGLevelObject of
-   * PointerMatrixBase objects. It implements the interface defined in
-   * MGMatrixBase, so that it can be used as a matrix in Multigrid.
+   * LinearOpetors. It implements the interface defined in MGMatrixBase, so
+   * that it can be used as a matrix in Multigrid.
    *
    * @author Guido Kanschat
    * @date 2002, 2010
@@ -72,7 +72,7 @@ namespace mg
     /**
      * Access matrix on a level.
      */
-    const PointerMatrixBase<VectorType> &operator[] (unsigned int level) const;
+    const LinearOperator<VectorType> &operator[] (unsigned int level) const;
 
     virtual void vmult (const unsigned int level, VectorType &dst, const VectorType &src) const;
     virtual void vmult_add (const unsigned int level, VectorType &dst, const VectorType &src) const;
@@ -86,7 +86,7 @@ namespace mg
      */
     std::size_t memory_consumption () const;
   private:
-    MGLevelObject<std::shared_ptr<PointerMatrixBase<VectorType> > > matrices;
+    MGLevelObject<LinearOperator<VectorType> > matrices;
   };
 
 }
@@ -183,9 +183,23 @@ namespace mg
   Matrix<VectorType>::initialize (const MGLevelObject<MatrixType> &p)
   {
     matrices.resize(p.min_level(), p.max_level());
-    for (unsigned int level=p.min_level(); level <= p.max_level(); ++level)
-      matrices[level] = std::shared_ptr<PointerMatrixBase<VectorType> >
-                        (new_pointer_matrix_base(p[level], VectorType()));
+    for (unsigned int level = p.min_level(); level <= p.max_level(); ++level)
+      {
+        // Workaround: The matrix objects supplied to this class do not
+        // expose information how to reinitialize a vector. Therefore,
+        // populate vmult and Tvmult by hand...
+        matrices[level] = LinearOperator<VectorType>();
+        matrices[level].vmult = [&p, level](
+                                  VectorType &v, const VectorType &u)
+        {
+          p[level].vmult(v, u);
+        };
+        matrices[level].Tvmult = [&p, level](
+                                   VectorType &v, const VectorType &u)
+        {
+          p[level].Tvmult(v, u);
+        };
+      }
   }
 
 
@@ -212,10 +226,10 @@ namespace mg
 
   template <typename VectorType>
   inline
-  const PointerMatrixBase<VectorType> &
+  const LinearOperator<VectorType> &
   Matrix<VectorType>::operator[] (unsigned int level) const
   {
-    return *matrices[level];
+    return matrices[level];
   }
 
 
@@ -226,7 +240,7 @@ namespace mg
                              VectorType         &dst,
                              const VectorType   &src) const
   {
-    matrices[level]->vmult(dst, src);
+    matrices[level].vmult(dst, src);
   }
 
 
@@ -237,7 +251,7 @@ namespace mg
                                  VectorType         &dst,
                                  const VectorType   &src) const
   {
-    matrices[level]->vmult_add(dst, src);
+    matrices[level].vmult_add(dst, src);
   }
 
 
@@ -248,7 +262,7 @@ namespace mg
                               VectorType         &dst,
                               const VectorType   &src) const
   {
-    matrices[level]->Tvmult(dst, src);
+    matrices[level].Tvmult(dst, src);
   }
 
 
@@ -259,7 +273,7 @@ namespace mg
                                   VectorType         &dst,
                                   const VectorType   &src) const
   {
-    matrices[level]->Tvmult_add(dst, src);
+    matrices[level].Tvmult_add(dst, src);
   }
 
 

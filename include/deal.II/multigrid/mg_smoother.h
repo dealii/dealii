@@ -18,11 +18,11 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/smartpointer.h>
-#include <deal.II/lac/pointer_matrix.h>
+#include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/multigrid/mg_base.h>
-#include <deal.II/base/mg_level_object.h>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -395,7 +395,7 @@ private:
   /**
    * Pointer to the matrices.
    */
-  MGLevelObject<PointerMatrix<MatrixType, VectorType> > matrices;
+  MGLevelObject<LinearOperator<VectorType> > matrices;
 
 };
 
@@ -547,7 +547,7 @@ private:
   /**
    * Pointer to the matrices.
    */
-  MGLevelObject<PointerMatrix<MatrixType, VectorType> > matrices;
+  MGLevelObject<LinearOperator<VectorType> > matrices;
 
 };
 
@@ -786,7 +786,7 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::clear ()
   unsigned int i=matrices.min_level(),
                max_level=matrices.max_level();
   for (; i<=max_level; ++i)
-    matrices[i]=nullptr;
+    matrices[i] = LinearOperator<VectorType>();
 }
 
 
@@ -805,7 +805,7 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = &m[i];
+      matrices[i] = linear_operator<VectorType>(m[i]);
       smoothers[i].initialize(m[i], data);
     }
 }
@@ -830,7 +830,7 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = &m[i];
+      matrices[i] = linear_operator<VectorType>(m[i]);
       smoothers[i].initialize(m[i], data[i]);
     }
 }
@@ -989,7 +989,7 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::clear ()
   unsigned int i=matrices.min_level(),
                max_level=matrices.max_level();
   for (; i<=max_level; ++i)
-    matrices[i]=nullptr;
+    matrices[i]=LinearOperator<VectorType>();
 }
 
 
@@ -1009,7 +1009,7 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = &m[i];
+      matrices[i] = linear_operator<VectorType>(m[i]);
       smoothers[i].initialize(m[i], data);
     }
 }
