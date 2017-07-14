@@ -187,6 +187,9 @@ template <class VectorType> class FilteredMatrixBlock;
  * not need to serialize calls to @p vmult or @p residual .
  *
  * @author Wolfgang Bangerth 2001, Luca Heltai 2006, Guido Kanschat 2007, 2008
+ *
+ * @deprecated Use LinearOperator instead. See the documentation of
+ * constrained_linear_operator().
  */
 template <typename VectorType>
 class FilteredMatrix : public Subscriptor
@@ -539,7 +542,7 @@ private:
    * FilteredMatrixBlock accesses pre_filter() and post_filter().
    */
   friend class FilteredMatrixBlock<VectorType>;
-};
+} DEAL_II_DEPRECATED;
 
 /*@}*/
 /*---------------------- Inline functions -----------------------------------*/
