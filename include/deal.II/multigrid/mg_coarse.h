@@ -376,8 +376,11 @@ MGCoarseGridLACIteration<SolverType, VectorType>
   :
   solver(&s, typeid(*this).name())
 {
-  matrix = linear_operator<VectorType>(m);
-  precondition = linear_operator<VectorType>(m, p);
+  // Workaround: Unfortunately, not every "m" object has a rich enough
+  // interface to populate reinit_(domain|range)_vector. Thus, supply an
+  // empty LinearOperator exemplar.
+  matrix = linear_operator<VectorType>(LinearOperator<VectorType>(), m);
+  precondition = linear_operator<VectorType>(matrix, p);
 }
 
 
@@ -398,8 +401,11 @@ MGCoarseGridLACIteration<SolverType, VectorType>
               const PreconditionerType &p)
 {
   solver = &s;
-  matrix = linear_operator<VectorType>(m);
-  precondition = linear_operator<VectorType>(m, p);
+  // Workaround: Unfortunately, not every "m" object has a rich enough
+  // interface to populate reinit_(domain|range)_vector. Thus, supply an
+  // empty LinearOperator exemplar.
+  matrix = linear_operator<VectorType>(LinearOperator<VectorType>(), m);
+  precondition = linear_operator<VectorType>(matrix, p);
 }
 
 
@@ -433,7 +439,10 @@ void
 MGCoarseGridLACIteration<SolverType, VectorType>
 ::set_matrix(const MatrixType &m)
 {
-  matrix = linear_operator<VectorType>(m);
+  // Workaround: Unfortunately, not every "m" object has a rich enough
+  // interface to populate reinit_(domain|range)_vector. Thus, supply an
+  // empty LinearOperator exemplar.
+  matrix = linear_operator<VectorType>(LinearOperator<VectorType>(), m);
 }
 
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS

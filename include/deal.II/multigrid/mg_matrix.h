@@ -185,20 +185,11 @@ namespace mg
     matrices.resize(p.min_level(), p.max_level());
     for (unsigned int level = p.min_level(); level <= p.max_level(); ++level)
       {
-        // Workaround: The matrix objects supplied to this class do not
-        // expose information how to reinitialize a vector. Therefore,
-        // populate vmult and Tvmult by hand...
-        matrices[level] = LinearOperator<VectorType>();
-        matrices[level].vmult = [&p, level](
-                                  VectorType &v, const VectorType &u)
-        {
-          p[level].vmult(v, u);
-        };
-        matrices[level].Tvmult = [&p, level](
-                                   VectorType &v, const VectorType &u)
-        {
-          p[level].Tvmult(v, u);
-        };
+        // Workaround: Unfortunately, not every "p[level]" object has a
+        // rich enough interface to populate reinit_(domain|range)_vector.
+        // Thus, apply an empty LinearOperator exemplar.
+        matrices[level] =
+          linear_operator<VectorType>(LinearOperator<VectorType>(), p[level]);
       }
   }
 
