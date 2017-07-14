@@ -1,0 +1,9 @@
+Deprecated: A number of classes have been deprecated in favor of the
+LinearOperator concept:
+<ul>
+  <li>PointerMatrix, PointerMatrixAux
+</ul>
+Use the LinearOperator class instead, see the module on
+@ref LAOperators "linear operators" for more details.
+<br>
+(Matthias Maier, 2017/07/14)
