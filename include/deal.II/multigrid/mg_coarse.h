@@ -515,7 +515,9 @@ MGCoarseGridIterativeSolver<VectorType, SolverType, MatrixType, PreconditionerTy
               const VectorType   &src) const
 {
   Assert(solver!=nullptr, ExcNotInitialized());
-  solver->solve(matrix, dst, src, preconditioner);
+  Assert(matrix!=nullptr, ExcNotInitialized());
+  Assert(preconditioner!=nullptr, ExcNotInitialized());
+  solver->solve(*matrix, dst, src, *preconditioner);
 }
 
 
