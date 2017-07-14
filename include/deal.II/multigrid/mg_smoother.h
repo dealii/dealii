@@ -1036,7 +1036,7 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = &m[i];
+      matrices[i] = linear_operator<VectorType>(m[i]);
       smoothers[i].initialize(m[i], data[i]);
     }
 }
