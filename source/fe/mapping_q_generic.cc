@@ -22,6 +22,7 @@
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/tensor_product_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary.h>
@@ -32,6 +33,7 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q_generic.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/matrix_free/tensor_product_kernels.h>
 
 #include <cmath>
 #include <algorithm>
@@ -852,9 +854,6 @@ namespace internal
       dealii::Table<2,double>
       compute_laplace_vector(const unsigned int polynomial_degree)
       {
-        dealii::Table<2,double> lvs;
-
-        Assert(lvs.n_rows()==0, ExcInternalError());
         Assert(dim==2 || dim==3, ExcNotImplemented());
 
         // for degree==1, we shouldn't have to compute any support points, since all
@@ -867,8 +866,10 @@ namespace internal
                                       4+4*(polynomial_degree-1) :
                                       8+12*(polynomial_degree-1)+6*(polynomial_degree-1)*(polynomial_degree-1));
 
+        dealii::Table<2,double> lvs(n_inner, n_outer);
 
-        // compute the shape gradients at the quadrature points on the unit cell
+        // compute the shape gradients at the quadrature points on the unit
+        // cell
         const QGauss<dim> quadrature(polynomial_degree+1);
         const unsigned int n_q_points=quadrature.size();
 
@@ -876,6 +877,10 @@ namespace internal
         quadrature_data.shape_derivatives.resize(quadrature_data.n_shape_functions *
                                                  n_q_points);
         quadrature_data.compute_shape_function_values(quadrature.get_points());
+
+#ifndef DEAL_II_WITH_LAPACK
+
+        // Slow implementation: matrix-based method
 
         // Compute the stiffness matrix of the inner dofs
         FullMatrix<long double> S(n_inner);
@@ -891,8 +896,8 @@ namespace internal
                 S(i,j) += res * (long double)quadrature.weight(point);
               }
 
-        // Compute the components of T to be the product of gradients of inner and
-        // outer shape functions.
+        // Compute the components of T to be the product of gradients of inner
+        // and outer shape functions.
         FullMatrix<long double> T(n_inner, n_outer);
         for (unsigned int point=0; point<n_q_points; ++point)
           for (unsigned int i=0; i<n_inner; ++i)
@@ -919,6 +924,92 @@ namespace internal
         for (unsigned int i=0; i<n_inner; ++i)
           for (unsigned int k=0; k<n_outer; ++k)
             lvs(i,k) = -S_1_T(i,k);
+
+#else
+
+        // Fast implementation in case we have LAPACK: inversion with fast
+        // diagonalization method
+
+        QGauss<1> gauss_1d(polynomial_degree+1);
+        FE_Q<1> fe_1d(polynomial_degree);
+        AlignedVector<double> value_1d((polynomial_degree-1)*(polynomial_degree+1));
+        AlignedVector<double> derivative_1d((polynomial_degree-1)*(polynomial_degree+1));
+        for (unsigned int i=0; i<polynomial_degree-1; ++i)
+          for (unsigned int q=0; q<polynomial_degree+1; ++q)
+            {
+              value_1d[i*(polynomial_degree+1)+q] = fe_1d.shape_value(i+2, gauss_1d.point(q));
+              derivative_1d[i*(polynomial_degree+1)+q] = fe_1d.shape_grad(i+2, gauss_1d.point(q))[0];
+            }
+
+        // compute 1d mass and Laplace matrix
+        FullMatrix<double> mass_1d(polynomial_degree-1, polynomial_degree-1);
+        FullMatrix<double> lapl_1d(mass_1d);
+        for (unsigned int i=0; i<mass_1d.m(); ++i)
+          for (unsigned int j=0; j<mass_1d.n(); ++j)
+            for (unsigned int q=0; q<polynomial_degree+1; ++q)
+              {
+                mass_1d(i,j) += value_1d[i*(polynomial_degree+1)+q] *
+                                value_1d[j*(polynomial_degree+1)+q] * gauss_1d.weight(q);
+                lapl_1d(i,j) += derivative_1d[i*(polynomial_degree+1)+q] *
+                                derivative_1d[j*(polynomial_degree+1)+q] * gauss_1d.weight(q);
+              }
+
+        // set up tensor product matrix and compute the inverse
+        TensorProductMatrixSymmetricSum<dim,double> tensor_product_matrix;
+        tensor_product_matrix.reinit(mass_1d, lapl_1d);
+
+        internal::EvaluatorTensorProduct<internal::evaluate_general,dim,-1,0,double>
+        eval_rhs(value_1d, derivative_1d, value_1d,
+                 polynomial_degree-2, polynomial_degree+1);
+
+        std::vector<double> tmp_rhs(dim*n_q_points), rl1(n_q_points),
+            rl2(n_q_points);
+        for (unsigned int k=0; k<n_outer; ++k)
+          {
+            // compute the right hand side as the the respective quadrature
+            // data of the outer shape functions tested by the inner shape
+            // functions
+
+            for (unsigned int q=0; q<n_q_points; ++q)
+              for (unsigned int d=0; d<dim; ++d)
+                tmp_rhs[q+d*n_q_points] = quadrature_data.derivative(q, k)[d] *
+                                          quadrature.weight(q);
+
+            // this code to multiply by the gradients of the unit cell test
+            // functions and integrate over the unit cell is similar to what
+            // is in include/deal.II/matrix_free/evaluation_kernels.h but the
+            // function in that file would require us to provide an
+            // internal::MatrixFreeFunctions::ShapeInfo class which is not
+            // available here. There are not too many steps, so write out the
+            // tensor product operations manually.
+            if (dim == 3)
+              {
+                eval_rhs.template gradients<0,false,false>(&tmp_rhs[0], &rl1[0]);
+                eval_rhs.template values<1,false,false> (&rl1[0], &rl2[0]);
+                eval_rhs.template values<0,false,false> (&tmp_rhs[n_q_points], &rl1[0]);
+                eval_rhs.template gradients<1,false,true>(&rl1[0], &rl2[0]);
+                eval_rhs.template values<2,false,false> (&rl2[0], &tmp_rhs[0]);
+                eval_rhs.template values<0,false,false> (&tmp_rhs[2*n_q_points], &rl1[0]);
+                eval_rhs.template values<1,false,false> (&rl1[0], &rl2[0]);
+                eval_rhs.template gradients<2,false,true> (&rl2[0], &tmp_rhs[0]);
+              }
+            else if (dim == 2)
+              {
+                eval_rhs.template gradients<0,false,false>(&tmp_rhs[0], &rl1[0]);
+                eval_rhs.template values<1,false,false> (&rl1[0], &tmp_rhs[0]);
+                eval_rhs.template values<0,false,false> (&tmp_rhs[n_q_points], &rl1[0]);
+                eval_rhs.template gradients<1,false,true>(&rl1[0], &tmp_rhs[0]);
+              }
+            else
+              Assert(false, ExcNotImplemented());
+
+            tensor_product_matrix.apply_inverse(&rl1[0], &tmp_rhs[0]);
+
+            for (unsigned int i=0; i<n_inner; ++i)
+              lvs(i,k) = -rl1[i];
+          }
+
+#endif // #else case of ifndef DEAL_II_WITH_LAPACK
 
         return lvs;
       }

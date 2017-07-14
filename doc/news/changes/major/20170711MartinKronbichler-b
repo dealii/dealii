@@ -1,0 +1,6 @@
+Improved: The constructor of MappingQGeneric used a naive inversion of a cell
+Poisson matrix, which became very slow for high approximation degrees in
+3D. The implementation has been switched to the fast diagonalization method
+implemented by TensorProductMatrixSymmetricSum.
+<br>
+(Martin Kronbichler, 2017/07/11)

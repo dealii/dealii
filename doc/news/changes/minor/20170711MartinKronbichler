@@ -1,0 +1,9 @@
+New: A new class TensorProductMatrixSymmetricSum that represents a tensor
+product of a mass and derivative matrix has been added. It implements both the
+matrix-vector operation (TensorProductMatrixSymmetricSum::vmult()) as well as
+the inverse operation (TensorProductMatrixSymmetricSum::apply_inverse())
+operation in tensorial form with optimal complexity of
+<tt>size<sup>dim+1</sup></tt> operations. The inverse operation uses the fast
+diagonalization method.
+<br>
+(Martin Kronbichler, 2017/07/11)
