@@ -377,7 +377,7 @@ MGCoarseGridLACIteration<SolverType, VectorType>
   solver(&s, typeid(*this).name())
 {
   matrix = linear_operator<VectorType>(m);
-  precondition = linear_operator<VectorType>(p);
+  precondition = linear_operator<VectorType>(m, p);
 }
 
 
@@ -398,12 +398,8 @@ MGCoarseGridLACIteration<SolverType, VectorType>
               const PreconditionerType &p)
 {
   solver = &s;
-  if (matrix)
-    delete matrix;
   matrix = linear_operator<VectorType>(m);
-  if (precondition)
-    delete precondition;
-  precondition = linear_operator<VectorType>(p);
+  precondition = linear_operator<VectorType>(m, p);
 }
 
 
@@ -437,8 +433,6 @@ void
 MGCoarseGridLACIteration<SolverType, VectorType>
 ::set_matrix(const MatrixType &m)
 {
-  if (matrix)
-    delete matrix;
   matrix = linear_operator<VectorType>(m);
 }
 
