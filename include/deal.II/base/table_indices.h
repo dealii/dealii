@@ -34,6 +34,8 @@ DEAL_II_NAMESPACE_OPEN
  * It is used in tensorial objects like the TableBase and SymmetricTensor
  * classes to represent a nested choice of indices.
  *
+ * @tparam N The number of indices stored in each object.
+ *
  * @ingroup data
  * @author Wolfgang Bangerth, Matthias Maier, 2002, 2015
  */
@@ -43,9 +45,69 @@ class TableIndices
 public:
 
   /**
-   * Default constructor. It sets all indices to zero.
+   * Default constructor. This constructor sets all indices to zero.
    */
   TableIndices();
+
+  /**
+   * Constructor. This is the appropriate constructor for an
+   * object of type TableIndices<1> and initializes the single
+   * index with @p index0.
+   *
+   * This constructor will result in a compiler error if
+   * the template argument @p N is different from one.
+   */
+  explicit TableIndices (const unsigned int index0);
+
+  /**
+   * Constructor. This is the appropriate constructor for an
+   * object of type TableIndices<2> and initializes the
+   * indices stored by this object by the given arguments.
+   *
+   * This constructor will result in a compiler error if
+   * the template argument @p N is different from two.
+   */
+  TableIndices (const unsigned int index0,
+                const unsigned int index1);
+
+  /**
+   * Constructor. This is the appropriate constructor for an
+   * object of type TableIndices<3> and initializes the
+   * indices stored by this object by the given arguments.
+   *
+   * This constructor will result in a compiler error if
+   * the template argument @p N is different from three.
+   */
+  TableIndices (const unsigned int index0,
+                const unsigned int index1,
+                const unsigned int index2);
+
+  /**
+   * Constructor. This is the appropriate constructor for an
+   * object of type TableIndices<4> and initializes the
+   * indices stored by this object by the given arguments.
+   *
+   * This constructor will result in a compiler error if
+   * the template argument @p N is different from four.
+   */
+  TableIndices (const unsigned int index0,
+                const unsigned int index1,
+                const unsigned int index2,
+                const unsigned int index3);
+
+  /**
+   * Constructor. This is the appropriate constructor for an
+   * object of type TableIndices<5> and initializes the
+   * indices stored by this object by the given arguments.
+   *
+   * This constructor will result in a compiler error if
+   * the template argument @p N is different from five.
+   */
+  TableIndices (const unsigned int index0,
+                const unsigned int index1,
+                const unsigned int index2,
+                const unsigned int index3,
+                const unsigned int index4);
 
   /**
    * Convenience constructor that takes up to 9 arguments. It can be used to
@@ -58,17 +120,18 @@ public:
    *
    * Note that only the first <tt>N</tt> arguments are actually used.
    *
-   * @tparam N The number of indices stored in each object.
+   * @deprecated Use the constructor with the appropriate number of arguments
+   *   to initialize the @p N indices instead.
    */
   TableIndices (const unsigned int index0,
-                const unsigned int index1 = numbers::invalid_unsigned_int,
-                const unsigned int index2 = numbers::invalid_unsigned_int,
-                const unsigned int index3 = numbers::invalid_unsigned_int,
-                const unsigned int index4 = numbers::invalid_unsigned_int,
-                const unsigned int index5 = numbers::invalid_unsigned_int,
+                const unsigned int index1,
+                const unsigned int index2,
+                const unsigned int index3,
+                const unsigned int index4,
+                const unsigned int index5,
                 const unsigned int index6 = numbers::invalid_unsigned_int,
                 const unsigned int index7 = numbers::invalid_unsigned_int,
-                const unsigned int index8 = numbers::invalid_unsigned_int);
+                const unsigned int index8 = numbers::invalid_unsigned_int) DEAL_II_DEPRECATED;
 
   /**
    * Read-only access the value of the <tt>i</tt>th index.
@@ -123,6 +186,77 @@ TableIndices<N>::TableIndices()
   for (unsigned int i=0; i<N; ++i)
     indices[i] = 0;
 }
+
+
+
+template <int N>
+TableIndices<N>::TableIndices(const unsigned int index0)
+{
+  static_assert (N==1,
+                 "This constructor is only available for TableIndices<1> objects.");
+  indices[0] = index0;
+}
+
+
+
+template <int N>
+TableIndices<N>::TableIndices(const unsigned int index0,
+                              const unsigned int index1)
+{
+  static_assert (N==2,
+                 "This constructor is only available for TableIndices<2> objects.");
+  indices[0] = index0;
+  indices[1] = index1;
+}
+
+
+
+template <int N>
+TableIndices<N>::TableIndices(const unsigned int index0,
+                              const unsigned int index1,
+                              const unsigned int index2)
+{
+  static_assert (N==3,
+                 "This constructor is only available for TableIndices<3> objects.");
+  indices[0] = index0;
+  indices[1] = index1;
+  indices[2] = index2;
+}
+
+
+
+template <int N>
+TableIndices<N>::TableIndices(const unsigned int index0,
+                              const unsigned int index1,
+                              const unsigned int index2,
+                              const unsigned int index3)
+{
+  static_assert (N==4,
+                 "This constructor is only available for TableIndices<4> objects.");
+  indices[0] = index0;
+  indices[1] = index1;
+  indices[2] = index2;
+  indices[3] = index3;
+}
+
+
+
+template <int N>
+TableIndices<N>::TableIndices(const unsigned int index0,
+                              const unsigned int index1,
+                              const unsigned int index2,
+                              const unsigned int index3,
+                              const unsigned int index4)
+{
+  static_assert (N==5,
+                 "This constructor is only available for TableIndices<5> objects.");
+  indices[0] = index0;
+  indices[1] = index1;
+  indices[2] = index2;
+  indices[3] = index3;
+  indices[4] = index4;
+}
+
 
 
 template <int N>
