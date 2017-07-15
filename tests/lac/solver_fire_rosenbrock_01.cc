@@ -1,0 +1,130 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 1998 - 2017 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+#include "../tests.h"
+#include <fstream>
+#include <iomanip>
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
+#include <deal.II/lac/solver_control.h>
+#include <deal.II/lac/solver_fire.h>
+
+
+
+// Test to verify correctness of SolverFIRE::sovle()
+// The objective function is the extended Rosenbrock function.
+// The Rosenbrock function is a non-convex function used as a test problem
+// for optimization algorithms introduced by Howard H. Rosenbrock.
+//
+// f(X) = f(x_0, x_1, ..., x_{N-1})
+//
+//      = \sum_{i=0}^{\frac{N}{2} -1}
+//
+//        \left[
+//                  a ( x_{2i}^2 - x_{2i+1} )^2
+//                  +
+//                  b ( x_{2i}   - 1        )^2
+//        \right],
+//
+//   where N is even and a = 100 and b = 1.
+//
+// DOI: 10.1007/BF02196600
+
+
+using vector_t = typename dealii::Vector<double>;
+
+
+double compute (vector_t &G, const vector_t &X)
+{
+  AssertThrow (X.size() % 2 == 0,
+               ExcInternalError());
+
+  double value = 0.;
+
+  // Value of the objective function.
+  for (unsigned int i = 0; i < X.size()/2; ++i)
+    value += 100 *
+             dealii::Utilities::fixed_power<2>( X(2*i) * X(2*i) - X(2*i+1) )
+             +
+             dealii::Utilities::fixed_power<2>( X(2*i)          -       1  );
+
+  // Gradient of the objective function.
+  for (unsigned int i = 0; i < X.size()/2; ++i)
+    {
+      G(2*i)   = ( X(2*i) * X(2*i) - X(2*i+1) ) * X(2*i) * 400
+                 +
+                 ( X(2*i)          -       1  ) *            2;
+
+      G(2*i+1) = ( X(2*i) * X(2*i) - X(2*i+1) ) *         -200;
+    }
+
+  return value;
+}
+
+
+
+void check_value (const unsigned int N,
+                  const double       tol)
+{
+  AssertThrow (N % 2 == 0,
+               ExcInternalError());
+
+  vector_t X (N);
+
+  // Use this to initialize DiagonalMatrix
+  X = 1.;
+
+  // Create inverse diagonal matrix.
+  DiagonalMatrix<vector_t> inv_mass;
+  inv_mass.reinit(X);
+
+  // Set initial guess.
+  for (unsigned int i=0; i < N/2; i++)
+    {
+      X(2*i)   = -1.2;
+      X(2*i+1) =  1.0;
+    }
+
+  auto additional_data =
+    SolverFIRE<vector_t>::AdditionalData(0.1, 1, 1);
+
+  SolverControl solver_control (1e5, tol);
+
+  SolverFIRE<vector_t> fire (solver_control, additional_data);
+
+  fire.solve(compute, X, inv_mass);
+
+  deallog << "FIRE::Solution vector: ";
+
+  X.print(deallog);
+}
+
+
+
+int main ()
+{
+  std::ofstream logfile("output");
+//  logfile.setf(std::ios::fixed);
+  deallog << std::setprecision(4);
+  deallog.attach(logfile);
+  deallog.threshold_double(1.e-10);
+
+  check_value( 2, 1e-14);
+  check_value(10, 1e-14);
+  check_value(20, 1e-14);
+
+}

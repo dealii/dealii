@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2016 by the deal.II authors
+// Copyright (C) 1998 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,6 +26,7 @@
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_fire.h>
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/solver_minres.h>
 #include <deal.II/lac/solver_bicgstab.h>
@@ -93,6 +94,7 @@ int main()
   SolverBicgstab<> bicgstab(control, mem);
   SolverRichardson<> rich(control, mem);
   SolverQMRS<> qmrs(control, mem);
+  SolverFIRE<> fire(control, mem);
 
   for (unsigned int size=4; size <= 30; size *= 3)
     {
@@ -165,6 +167,10 @@ int main()
           check_solve(gmresright,A,u,f,prec_no);
 //    check_solve(minres,A,u,f,prec_no);
           check_solve(qmrs,A,u,f,prec_no);
+
+          control.set_max_steps(50);
+          check_solve(fire,A,u,f,prec_no);
+
           control.set_max_steps(100);
 
           deallog.pop();
@@ -178,6 +184,7 @@ int main()
           check_solve(gmres,A,u,f,prec_no);
           check_solve(gmresright,A,u,f,prec_no);
           check_solve(qmrs,A,u,f,prec_no);
+          check_solve(fire,A,u,f,prec_no);
           rich.set_omega(1.);
 
           deallog.pop();
@@ -191,6 +198,7 @@ int main()
           check_solve(gmres,A,u,f,prec_richardson);
           check_solve(gmresright,A,u,f,prec_richardson);
           check_solve(qmrs,A,u,f,prec_richardson);
+          check_solve(fire,A,u,f,prec_richardson);
           rich.set_omega(1.);
 
           deallog.pop();
@@ -204,6 +212,7 @@ int main()
           check_solve(gmres,A,u,f,prec_ssor);
           check_solve(gmresright,A,u,f,prec_ssor);
           check_solve(qmrs,A,u,f,prec_ssor);
+          check_solve(fire,A,u,f,prec_ssor);
 
           deallog.pop();
 
@@ -215,6 +224,7 @@ int main()
           check_solve(bicgstab,A,u,f,prec_sor);
           check_solve(gmres,A,u,f,prec_sor);
           check_solve(gmresright,A,u,f,prec_sor);
+          check_solve(fire,A,u,f,prec_sor);
 
           deallog.pop();
 
@@ -226,6 +236,7 @@ int main()
           check_solve(bicgstab,A,u,f,prec_psor);
           check_solve(gmres,A,u,f,prec_psor);
           check_solve(gmresright,A,u,f,prec_psor);
+          check_solve(fire,A,u,f,prec_psor);
 
           deallog.pop();
         }

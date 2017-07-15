@@ -1,0 +1,4 @@
+New: SolverFIRE implements FIRE (Fast Inertial Relaxation Engine) for solving
+the problem of minimization of a given objective function.
+<br>
+(Vishal Boddu, Denis Davydov 2017/07/11)
