@@ -1,0 +1,5 @@
+Improved: linear_operator gained an overload that directly takes a
+LinearOperator as exemplar object to directly copy the
+reinit_(domain|range)_vector functions from.
+<br>
+(Matthias Maier, 2017/07/14)

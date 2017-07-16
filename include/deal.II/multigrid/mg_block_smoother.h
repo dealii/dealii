@@ -194,33 +194,12 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::initialize (const MGMatrixT
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      // Workaround: The matrix objects supplied to this class do not
-      // expose information how to reinitialize a vector. Therefore,
-      // populate vmult and Tvmult by hand...
-
-      matrices[i] = LinearOperator<BlockVector<number>>();
-      matrices[i].vmult = [&m, i](BlockVector<number> &v,
-                                  const BlockVector<number> &u)
-      {
-        m[i].vmult(v, u);
-      };
-      matrices[i].Tvmult = [&m, i](BlockVector<number> &v,
-                                   const BlockVector<number> &u)
-      {
-        m[i].Tvmult(v, u);
-      };
-
-      smoothers[i] = LinearOperator<BlockVector<number>>();
-      smoothers[i].vmult = [&s, i](BlockVector<number> &v,
-                                   const BlockVector<number> &u)
-      {
-        s[i].vmult(v, u);
-      };
-      smoothers[i].Tvmult = [&s, i](BlockVector<number> &v,
-                                    const BlockVector<number> &u)
-      {
-        s[i].Tvmult(v, u);
-      };
+      // Workaround: Unfortunately, not every "m[i]" object has a
+      // rich enough interface to populate reinit_(domain|range)_vector.
+      // Thus, apply an empty LinearOperator exemplar.
+      matrices[i] = linear_operator<BlockVector<number> >(
+                      LinearOperator<BlockVector<number> >(), m[i]);
+      smoothers[i] = linear_operator<BlockVector<number> >(matrices[i], s[i]);
     }
 }
 

@@ -805,7 +805,11 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = linear_operator<VectorType>(m[i]);
+      // Workaround: Unfortunately, not every "m[i]" object has a rich
+      // enough interface to populate reinit_(domain|range)_vector. Thus,
+      // apply an empty LinearOperator exemplar.
+      matrices[i] =
+        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
       smoothers[i].initialize(m[i], data);
     }
 }
@@ -830,7 +834,11 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = linear_operator<VectorType>(m[i]);
+      // Workaround: Unfortunately, not every "m[i]" object has a rich
+      // enough interface to populate reinit_(domain|range)_vector. Thus,
+      // apply an empty LinearOperator exemplar.
+      matrices[i] =
+        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
       smoothers[i].initialize(m[i], data[i]);
     }
 }
@@ -852,7 +860,11 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = &(m[i].block(row, col));
+      // Workaround: Unfortunately, not every "m[i]" object has a rich
+      // enough interface to populate reinit_(domain|range)_vector. Thus,
+      // apply an empty LinearOperator exemplar.
+      matrices[i] = linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                                m[i].block(row, col));
       smoothers[i].initialize(m[i].block(row, col), data);
     }
 }
@@ -879,7 +891,11 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = &(m[i].block(row, col));
+      // Workaround: Unfortunately, not every "m[i]" object has a rich
+      // enough interface to populate reinit_(domain|range)_vector. Thus,
+      // apply an empty LinearOperator exemplar.
+      matrices[i] = linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                                m[i].block(row, col));
       smoothers[i].initialize(m[i].block(row, col), data[i]);
     }
 }
@@ -1009,7 +1025,11 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = linear_operator<VectorType>(m[i]);
+      // Workaround: Unfortunately, not every "m[i]" object has a rich
+      // enough interface to populate reinit_(domain|range)_vector. Thus,
+      // apply an empty LinearOperator exemplar.
+      matrices[i] =
+        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
       smoothers[i].initialize(m[i], data);
     }
 }
@@ -1036,7 +1056,11 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize
 
   for (unsigned int i=min; i<=max; ++i)
     {
-      matrices[i] = &m[i];
+      // Workaround: Unfortunately, not every "m[i]" object has a rich
+      // enough interface to populate reinit_(domain|range)_vector. Thus,
+      // apply an empty LinearOperator exemplar.
+      matrices[i] =
+        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
       smoothers[i].initialize(m[i], data[i]);
     }
 }

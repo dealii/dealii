@@ -1291,6 +1291,45 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
 }
 
 
+
+/**
+ * @relates LinearOperator
+ *
+ * Variant of above function that takes a LinearOperator @p
+ * operator_exemplar as an additional reference.
+ * The reinit_domain_vector and reinit_range_vector function are copied
+ * from the @p operator_exemplar object.
+ *
+ * The reference @p matrix is used to construct vmult, Tvmult, etc.
+ *
+ * This variant can, for example, be used to encapsulate preconditioners (that
+ * typically do not expose any information about the underlying matrix).
+ *
+ * @author Matthias Maier, 2017
+ *
+ * @ingroup LAOperators
+ */
+template <typename Range,
+          typename Domain,
+          typename Payload,
+          typename Matrix>
+LinearOperator<Range, Domain, Payload>
+linear_operator(const LinearOperator<Range, Domain, Payload> &operator_exemplar,
+                const Matrix &matrix)
+{
+  // Initialise the payload based on the LinearOperator exemplar
+  auto return_op = operator_exemplar;
+
+  typename std::conditional<
+  has_vmult_add_and_Tvmult_add<Range, Domain, Matrix>::type::value,
+                               MatrixInterfaceWithVmultAdd<Range, Domain, Payload>,
+                               MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>::type().
+                               operator()(return_op, matrix);
+
+  return return_op;
+}
+
+
 //@}
 
 
