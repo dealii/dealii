@@ -300,37 +300,43 @@ get_new_point (const std::vector<Point<spacedim> > &vertices,
 // CylindricalManifold
 // ============================================================
 
-namespace
+namespace internal
 {
-  // helper function to compute a vector orthogonal to a given one.
-  template <int spacedim>
-  Point<spacedim>
-  compute_normal(const Tensor<1,spacedim> &vector)
+  namespace CylindricalManifold
   {
-    AssertThrow(vector.norm() != 0.,
-                ExcMessage("The direction parameter must not be zero!"));
-    Point<3> normal;
-    if (std::abs(vector[0]) >= std::abs(vector[1])
-        && std::abs(vector[0]) >= std::abs(vector[2]))
+    namespace
+    {
+      // helper function to compute a vector orthogonal to a given one.
+      template <int spacedim>
+      Point<spacedim>
+      compute_normal(const Tensor<1,spacedim> &vector)
       {
-        normal[1]=-1.;
-        normal[2]=-1.;
-        normal[0]=(vector[1]+vector[2])/vector[0];
+        AssertThrow(vector.norm() != 0.,
+                    ExcMessage("The direction parameter must not be zero!"));
+        Point<3> normal;
+        if (std::abs(vector[0]) >= std::abs(vector[1])
+            && std::abs(vector[0]) >= std::abs(vector[2]))
+          {
+            normal[1]=-1.;
+            normal[2]=-1.;
+            normal[0]=(vector[1]+vector[2])/vector[0];
+          }
+        else if (std::abs(vector[1]) >= std::abs(vector[0])
+                 && std::abs(vector[1]) >= std::abs(vector[2]))
+          {
+            normal[0]=-1.;
+            normal[2]=-1.;
+            normal[1]=(vector[0]+vector[2])/vector[1];
+          }
+        else
+          {
+            normal[0]=-1.;
+            normal[1]=-1.;
+            normal[2]=(vector[0]+vector[1])/vector[2];
+          }
+        return normal;
       }
-    else if (std::abs(vector[1]) >= std::abs(vector[0])
-             && std::abs(vector[1]) >= std::abs(vector[2]))
-      {
-        normal[0]=-1.;
-        normal[2]=-1.;
-        normal[1]=(vector[0]+vector[2])/vector[1];
-      }
-    else
-      {
-        normal[0]=-1.;
-        normal[1]=-1.;
-        normal[2]=(vector[0]+vector[1])/vector[2];
-      }
-    return normal;
+    }
   }
 }
 
@@ -351,7 +357,7 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const Point<spacedim> &d
                                                         const Point<spacedim> &point_on_axis_,
                                                         const double tolerance) :
   ChartManifold<dim,3,3>(Tensor<1,3>({0,2.*numbers::PI,0})),
-              normal_direction(compute_normal(direction_)),
+              normal_direction(internal::CylindricalManifold::compute_normal(direction_)),
               direction (direction_/direction_.norm()),
               point_on_axis (point_on_axis_),
               tolerance(tolerance)
