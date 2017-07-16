@@ -1072,18 +1072,32 @@ namespace DoFRenumbering
    * @}
    */
 
+
+
+  /**
+   * Exception
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg (ExcDoFHandlerNotInitialized,
+                    "The DoFHandler on which this function should work has not "
+                    "been initialized, i.e., it doesn't appear that DoF indices "
+                    "have been distributed on it.");
+
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
   DeclException0 (ExcRenumberingIncomplete);
+
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
   DeclException0 (ExcInvalidComponentOrder);
+
   /**
    * The function is only implemented for Discontinuous Galerkin Finite
    * elements.

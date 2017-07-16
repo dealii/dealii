@@ -2047,9 +2047,13 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::get_dof_indices
 (std::vector<types::global_dof_index> &dof_indices,
  const unsigned int                    fe_index) const
 {
-  Assert (this->dof_handler != nullptr, ExcNotInitialized());
+  Assert (this->dof_handler != nullptr,
+          ExcMessage("This accessor object has not been associated "
+                     "with any DoFHandler object."));
   Assert (static_cast<unsigned int>(this->level()) < this->dof_handler->levels.size(),
-          ExcMessage ("DoFHandler not initialized"));
+          ExcMessage ("The DoFHandler to which this accessor points has not "
+                      "been initialized, i.e., it doesn't appear that DoF indices "
+                      "have been distributed on it."));
 
   switch (structdim)
     {
