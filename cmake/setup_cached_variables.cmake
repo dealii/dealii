@@ -34,6 +34,7 @@
 #     DEAL_II_ALLOW_PLATFORM_INTROSPECTION
 #     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
 #     DEAL_II_SETUP_COVERAGE
+#     DEAL_II_UNITY_BUILD
 #     BUILD_SHARED_LIBS
 #     DEAL_II_PREFER_STATIC_LIBS
 #     DEAL_II_STATIC_EXECUTABLE
@@ -157,6 +158,11 @@ OPTION(DEAL_II_SETUP_COVERAGE
   OFF
   )
 MARK_AS_ADVANCED(DEAL_II_SETUP_COVERAGE)
+
+OPTION(DEAL_II_UNITY_BUILD
+  "Compile the library by concatenating together source files to form a few large targets instead of many small ones. This lowers total compilation wall time by about 25%."
+  OFF)
+MARK_AS_ADVANCED(DEAL_II_UNITY_BUILD)
 
 SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
   "Build a shared library"

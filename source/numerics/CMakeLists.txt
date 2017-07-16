@@ -15,39 +15,43 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+SET(_unity_include_src
   data_out.cc
+  data_out_faces.cc
+  data_out_stack.cc
+  data_out_rotation.cc
+  data_postprocessor.cc
+  dof_output_operator.cc
+  histogram.cc
+  matrix_tools_once.cc
+  matrix_tools.cc
+  time_dependent.cc
+  vector_tools_boundary.cc
+  vector_tools_constraints.cc
+  vector_tools_mean_value.cc
+  vector_tools_point_gradient.cc
+  vector_tools_rhs.cc
+  )
+
+SET(_separate_src
   data_out_dof_data.cc
   data_out_dof_data_codim.cc
-  data_out_faces.cc
-  data_out_rotation.cc
-  data_out_stack.cc
-  data_postprocessor.cc
   derivative_approximation.cc
-  dof_output_operator.cc
   error_estimator_1d.cc
   error_estimator.cc
   error_estimator_inst2.cc
   fe_field_function.cc
-  histogram.cc
   matrix_creator.cc
   matrix_creator_inst2.cc
   matrix_creator_inst3.cc
-  matrix_tools_once.cc
-  matrix_tools.cc
   point_value_history.cc
   solution_transfer.cc
   solution_transfer_inst2.cc
   solution_transfer_inst3.cc
   solution_transfer_inst4.cc
-  time_dependent.cc
-  vector_tools_boundary.cc
-  vector_tools_constraints.cc
   vector_tools_integrate_difference.cc
   vector_tools_interpolate.cc
-  vector_tools_mean_value.cc
   vector_tools_point_value.cc
-  vector_tools_point_gradient.cc
   vector_tools_project.cc
   vector_tools_project_inst2.cc
   vector_tools_project_inst3.cc
@@ -55,7 +59,15 @@ SET(_src
   vector_tools_project_codim.cc
   vector_tools_project_qp.cc
   vector_tools_project_qpmf.cc
-  vector_tools_rhs.cc
+  )
+
+# determined by profiling
+SET(_n_includes_per_unity_file 8)
+
+SETUP_SOURCE_LIST("${_unity_include_src}"
+  "${_separate_src}"
+  ${_n_includes_per_unity_file}
+  _src
   )
 
 SET(_inst

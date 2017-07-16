@@ -15,14 +15,13 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+SET(_unity_include_src
   cell_id.cc
   grid_generator.cc
   grid_in.cc
   grid_out.cc
   grid_refinement.cc
   grid_reordering.cc
-  grid_tools.cc
   intergrid_map.cc
   manifold.cc
   manifold_lib.cc
@@ -30,10 +29,23 @@ SET(_src
   tria_accessor.cc
   tria_boundary.cc
   tria_boundary_lib.cc
-  tria.cc
   tria_faces.cc
   tria_levels.cc
   tria_objects.cc
+  )
+
+SET(_separate_src
+  grid_tools.cc
+  tria.cc
+  )
+
+# include all files in the unity file
+SET(_n_includes_per_unity_file 20)
+
+SETUP_SOURCE_LIST("${_unity_include_src}"
+  "${_separate_src}"
+  ${_n_includes_per_unity_file}
+  _src
   )
 
 SET(_inst

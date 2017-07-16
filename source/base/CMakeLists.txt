@@ -15,7 +15,12 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+#
+# All source/base files are sufficiently small that they may be added to the
+# unity build file (see the developer documentation on DEAL_II_UNITY_BUILD
+# for more information).
+#
+SET(_unity_include_src
   auto_derivative_function.cc
   conditional_ostream.cc
   config.cc
@@ -73,6 +78,18 @@ SET(_src
   timer.cc
   time_stepping.cc
   utilities.cc
+  )
+
+SET(_separate_src
+  )
+
+# determined by profiling
+SET(_n_includes_per_unity_file 29)
+
+SETUP_SOURCE_LIST("${_unity_include_src}"
+  "${_separate_src}"
+  ${_n_includes_per_unity_file}
+  _src
   )
 
 SET(_inst

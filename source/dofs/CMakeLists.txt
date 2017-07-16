@@ -15,20 +15,32 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+SET(_unity_include_src
   block_info.cc
+  dof_faces.cc
+  dof_handler.cc
+  dof_objects.cc
+  number_cache.cc
+  )
+
+SET(_separate_src
   dof_accessor.cc
   dof_accessor_get.cc
   dof_accessor_set.cc
-  dof_faces.cc
-  dof_handler.cc
   dof_handler_policy.cc
-  dof_objects.cc
   dof_renumbering.cc
   dof_tools.cc
   dof_tools_constraints.cc
   dof_tools_sparsity.cc
-  number_cache.cc
+  )
+
+# concatenate all unity inclusion files in one file
+SET(_n_includes_per_unity_file 15)
+
+SETUP_SOURCE_LIST("${_unity_include_src}"
+  "${_separate_src}"
+  ${_n_includes_per_unity_file}
+  _src
   )
 
 SET(_inst

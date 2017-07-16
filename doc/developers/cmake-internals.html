@@ -28,6 +28,7 @@
         <li><a href="#findmodules"><code>./cmake/modules/Find*.cmake</code></a></li>
 	<li><a href="#configure"><code>./cmake/configure/configure_*.cmake</code></a></li>
 	<li><a href="#variables">Global variables controlling the build process</a></li>
+	<li><a href="#unity-build">The unity build subsystem</a></li>
       </ol>
     </li>
     <li>Target definition and installation
@@ -604,6 +605,30 @@ DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt;        (an option)
   </ul>
 </p>
 
+<a name="unity-build"></a>
+<h3>The unity build subsystem</h3>
+<p>
+  For a general description of this feature see
+  the <a href="../readme.html#optional-compilation">deal.II Readme
+  entry</a>. Many of the various <code>CMakeLists.txt</code> files split their
+  source files into two lists: one list of files that are relatively cheap to
+  compile, which are concatenated into the unity build files, and a list of
+  files that are more expensive to compile, which are not included in the unity
+  files. For example: most of the finite element classes take about 5-10 seconds
+  to compile while the <code>FEValues</code> instantiation files each take about
+  60 seconds. In addition, many <code>CMakeLists.txt</code> files define a
+  variable <code>_n_includes_per_unity_file</code> which specifies how many
+  files should be concatenated into each unity file.
+</p>
+
+<p>
+  A disadvantage to this approach is that it requires profiling the build in two
+  places: the time and memory usage of all source files must be measured and the
+  variable <code>_n_includes_per_unity_file</code> should be set so that the
+  unity build files are not overly expensive in terms of memory and wall
+  time. The current values were chosen so that the unity files, with GCC,
+  require about 30 to 60 seconds of wall time and about 2 GB of memory.
+</p>
 
 <h2>Target definition and installation</h2>
 <a name="config.h.in"></a>

@@ -15,7 +15,7 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+SET(_unity_include_src
   block_mask.cc
   component_mask.cc
   fe_abf.cc
@@ -47,22 +47,34 @@ SET(_src
   fe_system.cc
   fe_enriched.cc
   fe_tools.cc
-  fe_tools_interpolate.cc
-  fe_tools_extrapolate.cc
   fe_trace.cc
-  fe_values.cc
-  fe_values_inst2.cc
   mapping_c1.cc
   mapping_cartesian.cc
   mapping.cc
-  mapping_fe_field.cc
-  mapping_fe_field_inst2.cc
   mapping_q_generic.cc
   mapping_q1.cc
   mapping_q1_eulerian.cc
   mapping_q.cc
   mapping_q_eulerian.cc
   mapping_manifold.cc
+  )
+
+SET(_separate_src
+  fe_values.cc
+  fe_values_inst2.cc
+  mapping_fe_field.cc
+  mapping_fe_field_inst2.cc
+  fe_tools_interpolate.cc
+  fe_tools_extrapolate.cc
+  )
+
+# determined by profiling
+SET(_n_includes_per_unity_file 15)
+
+SETUP_SOURCE_LIST("${_unity_include_src}"
+  "${_separate_src}"
+  ${_n_includes_per_unity_file}
+  _src
   )
 
 SET(_inst
