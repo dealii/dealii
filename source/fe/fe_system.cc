@@ -30,18 +30,21 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace
+namespace internal
 {
-  bool IsNonZero (unsigned int i)
+  namespace FESystem
   {
-    return i>0;
+    namespace
+    {
+      unsigned int count_nonzeros(const std::vector<unsigned int> &vec)
+      {
+        return std::count_if(vec.begin(), vec.end(), [](const unsigned int i)
+        {
+          return i > 0;
+        });
+      }
+    }
   }
-
-  unsigned int count_nonzeros(const std::vector<unsigned int> &vec)
-  {
-    return std::count_if(vec.begin(), vec.end(), IsNonZero);
-  }
-
 }
 /* ----------------------- FESystem::InternalData ------------------- */
 
@@ -275,7 +278,7 @@ FESystem<dim,spacedim>::FESystem (
   FiniteElement<dim,spacedim> (FETools::Compositing::multiply_dof_numbers(fes, multiplicities),
                                FETools::Compositing::compute_restriction_is_additive_flags (fes, multiplicities),
                                FETools::Compositing::compute_nonzero_components(fes, multiplicities)),
-  base_elements(count_nonzeros(multiplicities))
+  base_elements(internal::FESystem::count_nonzeros(multiplicities))
 {
   initialize(fes, multiplicities);
 }
@@ -1458,7 +1461,7 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
           ExcDimensionMismatch (fes.size(), multiplicities.size()) );
   Assert (fes.size() > 0,
           ExcMessage ("Need to pass at least one finite element."));
-  Assert (count_nonzeros(multiplicities) > 0,
+  Assert (internal::FESystem::count_nonzeros(multiplicities) > 0,
           ExcMessage("You only passed FiniteElements with multiplicity 0."));
 
   // Note that we need to skip every fe with multiplicity 0 in the following block of code

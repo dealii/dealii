@@ -25,19 +25,25 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
+namespace internal
 {
-  std::vector<Point<1> >
-  get_QGaussLobatto_points (const unsigned int degree)
+  namespace FE_Q
   {
-    if (degree > 0)
-      return QGaussLobatto<1>(degree+1).get_points();
-    else
+    namespace
+    {
+      std::vector<Point<1> >
+      get_QGaussLobatto_points (const unsigned int degree)
       {
-        typedef FE_Q_Base<TensorProductPolynomials<1>, 1, 1> FEQ;
-        AssertThrow(false, FEQ::ExcFEQCannotHaveDegree0());
+        if (degree > 0)
+          return QGaussLobatto<1>(degree+1).get_points();
+        else
+          {
+            typedef FE_Q_Base<TensorProductPolynomials<1>, 1, 1> FEQ;
+            AssertThrow(false, FEQ::ExcFEQCannotHaveDegree0());
+          }
+        return std::vector<Point<1> >();
       }
-    return std::vector<Point<1> >();
+    }
   }
 }
 
@@ -47,13 +53,13 @@ template <int dim, int spacedim>
 FE_Q<dim,spacedim>::FE_Q (const unsigned int degree)
   :
   FE_Q_Base<TensorProductPolynomials<dim>, dim, spacedim>
-  (TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(get_QGaussLobatto_points(degree))),
+  (TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(internal::FE_Q::get_QGaussLobatto_points(degree))),
    FiniteElementData<dim>(this->get_dpo_vector(degree),
                           1, degree,
                           FiniteElementData<dim>::H1),
    std::vector<bool> (1, false))
 {
-  this->initialize(get_QGaussLobatto_points(degree));
+  this->initialize(internal::FE_Q::get_QGaussLobatto_points(degree));
 }
 
 

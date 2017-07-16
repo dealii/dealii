@@ -27,25 +27,31 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
+namespace internal
 {
-  std::vector<Point<1> >
-  get_QGaussLobatto_points (const unsigned int degree)
+  namespace FE_FaceQ
   {
-    if (degree > 0)
-      return QGaussLobatto<1>(degree+1).get_points();
-    else
-      return std::vector<Point<1> >(1, Point<1>(0.5));
+    namespace
+    {
+      std::vector<Point<1> >
+      get_QGaussLobatto_points (const unsigned int degree)
+      {
+        if (degree > 0)
+          return QGaussLobatto<1>(degree+1).get_points();
+        else
+          return std::vector<Point<1> >(1, Point<1>(0.5));
+      }
+    }
   }
 }
 
 template <int dim, int spacedim>
 FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
   :
-  FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim> (
-    TensorProductPolynomials<dim-1>(Polynomials::generate_complete_Lagrange_basis(get_QGaussLobatto_points(degree))),
-    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-    std::vector<bool>(1,true))
+  FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim>
+  (TensorProductPolynomials<dim-1>(Polynomials::generate_complete_Lagrange_basis(internal::FE_FaceQ::get_QGaussLobatto_points(degree))),
+   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+   std::vector<bool>(1,true))
 {
   // initialize unit face support points
   const unsigned int codim = dim-1;
@@ -56,7 +62,7 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
       this->unit_face_support_points[0][d] = 0.5;
   else
     {
-      std::vector<Point<1> > points = get_QGaussLobatto_points(degree);
+      std::vector<Point<1> > points = internal::FE_FaceQ::get_QGaussLobatto_points(degree);
 
       unsigned int k=0;
       for (unsigned int iz=0; iz <= ((codim>2) ? this->degree : 0) ; ++iz)

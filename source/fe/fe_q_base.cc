@@ -35,66 +35,69 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace FE_Q_Helper
+namespace internal
 {
-  namespace
+  namespace FE_Q_Base
   {
-    // get the renumbering for faces
-    template <int dim>
-    inline
-    std::vector<unsigned int>
-    face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
+    namespace
     {
-      std::vector<unsigned int> dpo(dim, 1U);
-      for (unsigned int i=1; i<dpo.size(); ++i)
-        dpo[i]=dpo[i-1]*(degree-1);
-      const dealii::FiniteElementData<dim-1> face_data(dpo,1,degree);
-      std::vector<unsigned int> face_renumber (face_data.dofs_per_cell);
-      FETools::lexicographic_to_hierarchic_numbering (face_data, face_renumber);
-      return face_renumber;
-    }
+      // get the renumbering for faces
+      template <int dim>
+      inline
+      std::vector<unsigned int>
+      face_lexicographic_to_hierarchic_numbering (const unsigned int degree)
+      {
+        std::vector<unsigned int> dpo(dim, 1U);
+        for (unsigned int i=1; i<dpo.size(); ++i)
+          dpo[i]=dpo[i-1]*(degree-1);
+        const dealii::FiniteElementData<dim-1> face_data(dpo,1,degree);
+        std::vector<unsigned int> face_renumber (face_data.dofs_per_cell);
+        FETools::lexicographic_to_hierarchic_numbering (face_data, face_renumber);
+        return face_renumber;
+      }
 
-    // dummy specialization for dim == 1 to avoid linker errors
-    template <>
-    inline
-    std::vector<unsigned int>
-    face_lexicographic_to_hierarchic_numbering<1> (const unsigned int)
-    {
-      return std::vector<unsigned int>();
-    }
-
-
-
-    // in get_restriction_matrix() and get_prolongation_matrix(), want to undo
-    // tensorization on inner loops for performance reasons. this clears a
-    // dim-array
-    template <int dim>
-    inline
-    void
-    zero_indices (unsigned int (&indices)[dim])
-    {
-      for (unsigned int d=0; d<dim; ++d)
-        indices[d] = 0;
-    }
+      // dummy specialization for dim == 1 to avoid linker errors
+      template <>
+      inline
+      std::vector<unsigned int>
+      face_lexicographic_to_hierarchic_numbering<1> (const unsigned int)
+      {
+        return std::vector<unsigned int>();
+      }
 
 
 
-    // in get_restriction_matrix() and get_prolongation_matrix(), want to undo
-    // tensorization on inner loops for performance reasons. this increments
-    // tensor product indices
-    template <int dim>
-    inline
-    void
-    increment_indices (unsigned int       (&indices)[dim],
-                       const unsigned int   dofs1d)
-    {
-      ++indices[0];
-      for (int d=0; d<dim-1; ++d)
-        if (indices[d]==dofs1d)
-          {
-            indices[d] = 0;
-            indices[d+1]++;
-          }
+      // in get_restriction_matrix() and get_prolongation_matrix(), want to undo
+      // tensorization on inner loops for performance reasons. this clears a
+      // dim-array
+      template <int dim>
+      inline
+      void
+      zero_indices (unsigned int (&indices)[dim])
+      {
+        for (unsigned int d=0; d<dim; ++d)
+          indices[d] = 0;
+      }
+
+
+
+      // in get_restriction_matrix() and get_prolongation_matrix(), want to undo
+      // tensorization on inner loops for performance reasons. this increments
+      // tensor product indices
+      template <int dim>
+      inline
+      void
+      increment_indices (unsigned int       (&indices)[dim],
+                         const unsigned int   dofs1d)
+      {
+        ++indices[0];
+        for (int d=0; d<dim-1; ++d)
+          if (indices[d]==dofs1d)
+            {
+              indices[d] = 0;
+              indices[d+1]++;
+            }
+      }
     }
   }
 }
@@ -205,7 +208,7 @@ struct FE_Q_Base<PolynomialType,xdim,xspacedim>::Implementation
     const std::vector<unsigned int> &index_map_inverse =
       fe.poly_space.get_numbering_inverse();
     const std::vector<unsigned int> face_index_map =
-      FE_Q_Helper::face_lexicographic_to_hierarchic_numbering<dim>(q_deg);
+      internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(q_deg);
     Assert(std::abs(fe.poly_space.compute_value(index_map_inverse[0],Point<dim>())
                     - 1.) < 1e-14,
            ExcInternalError());
@@ -329,7 +332,7 @@ struct FE_Q_Base<PolynomialType,xdim,xspacedim>::Implementation
     const std::vector<unsigned int> &index_map_inverse =
       fe.poly_space.get_numbering_inverse();
     const std::vector<unsigned int> face_index_map =
-      FE_Q_Helper::face_lexicographic_to_hierarchic_numbering<dim>(q_deg);
+      internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(q_deg);
     Assert(std::abs(fe.poly_space.compute_value(index_map_inverse[0],Point<dim>())
                     - 1.) < 1e-14,
            ExcInternalError());
@@ -928,7 +931,7 @@ void FE_Q_Base<PolynomialType,dim,spacedim>::initialize_unit_face_support_points
 
   // find renumbering of faces and assign from values of quadrature
   std::vector<unsigned int> face_index_map =
-    FE_Q_Helper::face_lexicographic_to_hierarchic_numbering<dim>(q_degree);
+    internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(q_degree);
   Quadrature<1> support_1d(points);
   Quadrature<codim> support_quadrature(support_1d);
   this->unit_face_support_points.resize(support_quadrature.size());
@@ -1284,11 +1287,11 @@ FE_Q_Base<PolynomialType,dim,spacedim>
       // now expand from 1D info. block innermost dimension (x_0) in order to
       // avoid difficult checks at innermost loop
       unsigned int j_indices[dim];
-      FE_Q_Helper::zero_indices<dim> (j_indices);
+      internal::FE_Q_Base::zero_indices<dim> (j_indices);
       for (unsigned int j=0; j<q_dofs_per_cell; j+=dofs1d)
         {
           unsigned int i_indices[dim];
-          FE_Q_Helper::zero_indices<dim> (i_indices);
+          internal::FE_Q_Base::zero_indices<dim> (i_indices);
           for (unsigned int i=0; i<q_dofs_per_cell; i+=dofs1d)
             {
               double val_extra_dim = 1.;
@@ -1308,10 +1311,10 @@ FE_Q_Base<PolynomialType,dim,spacedim>
 
               // update indices that denote the tensor product position. a bit
               // fuzzy and therefore not done for innermost x_0 direction
-              FE_Q_Helper::increment_indices<dim> (i_indices, dofs1d);
+              internal::FE_Q_Base::increment_indices<dim> (i_indices, dofs1d);
             }
           Assert (i_indices[dim-1] == 1, ExcInternalError());
-          FE_Q_Helper::increment_indices<dim> (j_indices, dofs1d);
+          internal::FE_Q_Base::increment_indices<dim> (j_indices, dofs1d);
         }
 
       // the discontinuous node is simply mapped on the discontinuous node on
@@ -1428,7 +1431,7 @@ FE_Q_Base<PolynomialType,dim,spacedim>
                       this->poly_space.compute_value(index_map_inverse[j], point);
                   }
               unsigned int j_indices[dim];
-              FE_Q_Helper::zero_indices<dim> (j_indices);
+              internal::FE_Q_Base::zero_indices<dim> (j_indices);
               double sum_check = 0;
               for (unsigned int j = 0; j<q_dofs_per_cell; j += dofs1d)
                 {
@@ -1454,7 +1457,7 @@ FE_Q_Base<PolynomialType,dim,spacedim>
                         my_restriction(mother_dof,child_dof)=val;
                       sum_check += val;
                     }
-                  FE_Q_Helper::increment_indices<dim> (j_indices, dofs1d);
+                  internal::FE_Q_Base::increment_indices<dim> (j_indices, dofs1d);
                 }
               Assert (std::fabs(sum_check-1) <
                       std::max(eps, 5e-16*std::sqrt(this->dofs_per_cell)),

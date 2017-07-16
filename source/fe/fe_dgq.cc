@@ -30,15 +30,21 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
+namespace internal
 {
-  std::vector<Point<1> >
-  get_QGaussLobatto_points (const unsigned int degree)
+  namespace FE_DGQ
   {
-    if (degree > 0)
-      return QGaussLobatto<1>(degree+1).get_points();
-    else
-      return std::vector<Point<1> >(1, Point<1>(0.5));
+    namespace
+    {
+      std::vector<Point<1> >
+      get_QGaussLobatto_points (const unsigned int degree)
+      {
+        if (degree > 0)
+          return QGaussLobatto<1>(degree+1).get_points();
+        else
+          return std::vector<Point<1> >(1, Point<1>(0.5));
+      }
+    }
   }
 }
 
@@ -48,14 +54,15 @@ template <int dim, int spacedim>
 FE_DGQ<dim, spacedim>::FE_DGQ (const unsigned int degree)
   :
   FE_Poly<TensorProductPolynomials<dim>, dim, spacedim>
-  (TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis(get_QGaussLobatto_points(degree))),
+  (TensorProductPolynomials<dim>(Polynomials::generate_complete_Lagrange_basis
+                                 (internal::FE_DGQ::get_QGaussLobatto_points(degree))),
    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, true),
    std::vector<ComponentMask>(FiniteElementData<dim>(get_dpo_vector(degree),1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
   // Compute support points, which are the tensor product of the Lagrange
   // interpolation points in the constructor.
-  Quadrature<dim> support_quadrature(get_QGaussLobatto_points(degree));
+  Quadrature<dim> support_quadrature(internal::FE_DGQ::get_QGaussLobatto_points(degree));
   Assert (support_quadrature.get_points().size() > 0,
           (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints ()));
   this->unit_support_points = support_quadrature.get_points();
@@ -872,7 +879,8 @@ FE_DGQLegendre<dim,spacedim>::clone() const
 template <int dim, int spacedim>
 FE_DGQHermite<dim,spacedim>::FE_DGQHermite (const unsigned int degree)
   : FE_DGQ<dim,spacedim>(degree < 3 ?
-                         Polynomials::generate_complete_Lagrange_basis(get_QGaussLobatto_points(degree))
+                         Polynomials::generate_complete_Lagrange_basis
+                         (internal::FE_DGQ::get_QGaussLobatto_points(degree))
                          :
                          Polynomials::HermiteInterpolation::generate_complete_basis(degree))
 {}

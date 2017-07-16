@@ -249,48 +249,54 @@ FE_BDM<dim>::get_ria_vector (const unsigned int deg)
 }
 
 
-namespace
+namespace internal
 {
-  // This function sets up the values of the polynomials we want to
-  // take moments with in the quadrature points. In fact, we multiply
-  // thos by the weights, such that the sum of function values and
-  // test_values over quadrature points yields the interpolated degree
-  // of freedom.
-  template <int dim>
-  void
-  initialize_test_values (std::vector<std::vector<double> > &test_values,
-                          const Quadrature<dim> &quadrature,
-                          const unsigned int deg)
+  namespace FE_BDM
   {
-    PolynomialsP<dim> poly(deg);
-    std::vector<Tensor<1,dim> > dummy1;
-    std::vector<Tensor<2,dim> > dummy2;
-    std::vector<Tensor<3,dim> > dummy3;
-    std::vector<Tensor<4,dim> > dummy4;
-
-    test_values.resize(quadrature.size());
-
-    for (unsigned int k=0; k<quadrature.size(); ++k)
+    namespace
+    {
+      // This function sets up the values of the polynomials we want to
+      // take moments with in the quadrature points. In fact, we multiply
+      // thos by the weights, such that the sum of function values and
+      // test_values over quadrature points yields the interpolated degree
+      // of freedom.
+      template <int dim>
+      void
+      initialize_test_values (std::vector<std::vector<double> > &test_values,
+                              const Quadrature<dim> &quadrature,
+                              const unsigned int deg)
       {
-        test_values[k].resize(poly.n());
-        poly.compute(quadrature.point(k), test_values[k], dummy1, dummy2,
-                     dummy3, dummy4);
-        for (unsigned int i=0; i < poly.n(); ++i)
+        PolynomialsP<dim> poly(deg);
+        std::vector<Tensor<1,dim> > dummy1;
+        std::vector<Tensor<2,dim> > dummy2;
+        std::vector<Tensor<3,dim> > dummy3;
+        std::vector<Tensor<4,dim> > dummy4;
+
+        test_values.resize(quadrature.size());
+
+        for (unsigned int k=0; k<quadrature.size(); ++k)
           {
-            test_values[k][i] *= quadrature.weight(k);
+            test_values[k].resize(poly.n());
+            poly.compute(quadrature.point(k), test_values[k], dummy1, dummy2,
+                         dummy3, dummy4);
+            for (unsigned int i=0; i < poly.n(); ++i)
+              {
+                test_values[k][i] *= quadrature.weight(k);
+              }
           }
       }
-  }
 
-  // This specialization only serves to avoid error messages. Nothing
-  // useful can be computed in dimension zero and thus the vector
-  // length stays zero.
-  template <>
-  void
-  initialize_test_values (std::vector<std::vector<double> > &,
-                          const Quadrature<0> &,
-                          const unsigned int)
-  {}
+      // This specialization only serves to avoid error messages. Nothing
+      // useful can be computed in dimension zero and thus the vector
+      // length stays zero.
+      template <>
+      void
+      initialize_test_values (std::vector<std::vector<double> > &,
+                              const Quadrature<0> &,
+                              const unsigned int)
+      {}
+    }
+  }
 }
 
 
@@ -333,7 +339,7 @@ FE_BDM<dim>::initialize_support_points (const unsigned int deg)
   // point values on faces in 2D. In 3D, this is impossible, since the
   // moments are only taken with respect to PolynomialsP.
   if (dim>2)
-    initialize_test_values(test_values_face, face_points, deg);
+    internal::FE_BDM::initialize_test_values(test_values_face, face_points, deg);
 
   if (deg<=1) return;
 
@@ -347,7 +353,7 @@ FE_BDM<dim>::initialize_support_points (const unsigned int deg)
   // the test functions in the
   // interior quadrature points
 
-  initialize_test_values(test_values_cell, cell_points, deg-2);
+  internal::FE_BDM::initialize_test_values(test_values_cell, cell_points, deg-2);
 }
 
 
@@ -356,4 +362,3 @@ FE_BDM<dim>::initialize_support_points (const unsigned int deg)
 #include "fe_bdm.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-

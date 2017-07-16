@@ -19,10 +19,16 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace
+namespace internal
 {
-  const char *
-  zero_dof_message = "This element has no shape functions.";
+  namespace FE_Nothing
+  {
+    namespace
+    {
+      const char *
+      zero_dof_message = "This element has no shape functions.";
+    }
+  }
 }
 
 
@@ -85,8 +91,8 @@ double
 FE_Nothing<dim,spacedim>::shape_value (const unsigned int /*i*/,
                                        const Point<dim> & /*p*/) const
 {
-  (void)zero_dof_message;
-  Assert(false,ExcMessage(zero_dof_message));
+  (void)internal::FE_Nothing::zero_dof_message;
+  Assert(false,ExcMessage(internal::FE_Nothing::zero_dof_message));
   return 0;
 }
 
@@ -306,4 +312,3 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> & /*source_f
 
 
 DEAL_II_NAMESPACE_CLOSE
-
