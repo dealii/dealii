@@ -279,7 +279,7 @@ void RelaxationBlockJacobi<MatrixType, InverseNumberType, VectorType>::step
  const VectorType &src) const
 {
   GrowingVectorMemory<VectorType> mem;
-  typename VectorMemory<VectorType>::Pointer aux = mem;
+  typename VectorMemory<VectorType>::Pointer aux(mem);
   aux->reinit(dst, false);
   *aux = dst;
   this->do_step(dst, *aux, src, false);
@@ -292,7 +292,7 @@ void RelaxationBlockJacobi<MatrixType, InverseNumberType, VectorType>::Tstep
  const VectorType &src) const
 {
   GrowingVectorMemory<VectorType> mem;
-  typename VectorMemory<VectorType>::Pointer aux = mem;
+  typename VectorMemory<VectorType>::Pointer aux(mem);
   aux->reinit(dst, false);
   *aux = dst;
   this->do_step(dst, *aux, src, true);
@@ -305,7 +305,7 @@ void RelaxationBlockJacobi<MatrixType, InverseNumberType, VectorType>::vmult
  const VectorType &src) const
 {
   GrowingVectorMemory<VectorType> mem;
-  typename VectorMemory<VectorType>::Pointer aux = mem;
+  typename VectorMemory<VectorType>::Pointer aux(mem);
   dst = 0;
   aux->reinit(dst);
   this->do_step(dst, *aux, src, false);
@@ -318,7 +318,7 @@ void RelaxationBlockJacobi<MatrixType, InverseNumberType, VectorType>::Tvmult
  const VectorType &src) const
 {
   GrowingVectorMemory<VectorType> mem;
-  typename VectorMemory<VectorType>::Pointer aux = mem;
+  typename VectorMemory<VectorType>::Pointer aux(mem);
   dst = 0;
   aux->reinit(dst);
   this->do_step(dst, *aux, src, true);
