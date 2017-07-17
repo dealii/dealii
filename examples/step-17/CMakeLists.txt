@@ -43,7 +43,10 @@ IF(NOT DEAL_II_WITH_PETSC OR DEAL_II_PETSC_WITH_COMPLEX) # keep in one line
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_PETSC = ON
     DEAL_II_PETSC_WITH_COMPLEX = OFF
-However, the deal.II library found at ${DEAL_II_PATH} was configured with options that conflict with these requirements."
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
+    DEAL_II_WITH_PETSC = ${DEAL_II_WITH_PETSC}
+    DEAL_II_PETSC_WITH_COMPLEX = ${DEAL_II_PETSC_WITH_COMPLEX}
+which conflict with the requirements."
     )
 ENDIF()
 

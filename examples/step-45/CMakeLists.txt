@@ -43,7 +43,11 @@ Error! This tutorial requires a deal.II library that was configured with the fol
     DEAL_II_WITH_MPI = ON
     DEAL_II_WITH_P4EST = ON
     DEAL_II_WITH_TRILINOS = ON
-However, the deal.II library found at ${DEAL_II_PATH} was configured with options that conflict with these requirements."
+However, the deal.II library found at ${DEAL_II_PATH} was configured with these options
+    DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}
+    DEAL_II_WITH_P4EST = ${DEAL_II_WITH_P4EST}
+    DEAL_II_WITH_TRILINOS = ${DEAL_II_WITH_TRILINOS}
+which conflict with the requirements."
     )
 ENDIF()
 
