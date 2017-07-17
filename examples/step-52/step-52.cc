@@ -271,7 +271,7 @@ namespace Step52
 
 
 
-  // @sect4{<code>Diffusion:evaluate_diffusion</code>}
+  // @sect4{<code>Diffusion::evaluate_diffusion</code>}
   //
   // Next, we evaluate the weak form of the diffusion equation at a given time
   // $t$ and for a given vector $y$. In other words, as outlined in the
