@@ -1098,7 +1098,7 @@ namespace hp
     if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&*this->tria) != nullptr)
       policy.reset (new internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >(*this));
     else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&*this->tria) != nullptr)
-      //policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<dim,spacedim>(*this));
+      //policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >(*this));
       {
         Assert (false, ExcNotImplemented());
       }

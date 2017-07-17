@@ -58,7 +58,7 @@ namespace internal
   {
     namespace Policy
     {
-      template <int, int> class ParallelDistributed;
+      template <typename> class ParallelDistributed;
     }
   }
 }
@@ -890,7 +890,7 @@ namespace parallel
       std::vector<bool>
       mark_locally_active_vertices_on_level(const int level) const;
 
-      template <int, int> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
+      template <typename> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
 
       template <int,int,class> friend class dealii::FETools::internal::ExtrapolateImplementation;
     };

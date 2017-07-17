@@ -216,8 +216,8 @@ namespace internal
        * This class implements the policy for operations when we use a
        * parallel::distributed::Triangulation object.
        */
-      template <int dim, int spacedim>
-      class ParallelDistributed : public PolicyBase<dim,spacedim>
+      template <typename DoFHandlerType>
+      class ParallelDistributed : public PolicyBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
       {
       public:
         /**
@@ -225,7 +225,7 @@ namespace internal
          * @param dof_handler The DoFHandler object upon which this
          *   policy class is supposed to work.
          */
-        ParallelDistributed (dealii::DoFHandler<dim,spacedim> &dof_handler);
+        ParallelDistributed (DoFHandlerType &dof_handler);
 
         // documentation is inherited
         virtual
@@ -252,7 +252,7 @@ namespace internal
         /**
          * The DoFHandler object on which this policy object works.
          */
-        SmartPointer<dealii::DoFHandler<dim,spacedim> > dof_handler;
+        SmartPointer<DoFHandlerType> dof_handler;
       };
     }
   }
