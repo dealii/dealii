@@ -1227,7 +1227,9 @@ inline
 const Triangulation<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_triangulation () const
 {
-  Assert(tria != nullptr, ExcNotInitialized());
+  Assert(tria != nullptr,
+         ExcMessage("This DoFHandler object has not been associated "
+                    "with a triangulation."));
   return *tria;
 }
 

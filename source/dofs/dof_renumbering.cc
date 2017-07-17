@@ -474,7 +474,7 @@ namespace DoFRenumbering
                       const std::vector<types::global_dof_index> &starting_indices)
   {
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
-           ExcNotInitialized());
+           ExcDoFHandlerNotInitialized());
 
     // make the connection graph
     DynamicSparsityPattern dsp (dof_handler.n_dofs(level),
@@ -541,7 +541,7 @@ namespace DoFRenumbering
                   const std::vector<unsigned int> &component_order_arg)
   {
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
-           ExcNotInitialized());
+           ExcDoFHandlerNotInitialized());
 
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(level),
                                                       numbers::invalid_dof_index);
@@ -874,7 +874,7 @@ namespace DoFRenumbering
   block_wise (DoFHandler<dim,spacedim> &dof_handler, const unsigned int level)
   {
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
-           ExcNotInitialized());
+           ExcDoFHandlerNotInitialized());
 
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(level),
                                                       numbers::invalid_dof_index);
@@ -1238,7 +1238,7 @@ namespace DoFRenumbering
                            const unsigned int       level)
   {
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
-           ExcNotInitialized());
+           ExcDoFHandlerNotInitialized());
 
     std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(level),
                                                      numbers::invalid_dof_index);
@@ -1295,7 +1295,7 @@ namespace DoFRenumbering
                                    const unsigned int                    level)
   {
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
-           ExcNotInitialized());
+           ExcDoFHandlerNotInitialized());
 
     const unsigned int n_dofs = dof_handler.n_dofs(level);
     Assert (selected_dofs.size() == n_dofs,
@@ -1419,7 +1419,7 @@ namespace DoFRenumbering
    const typename std::vector<typename DoFHandlerType::level_cell_iterator> &cells)
   {
     Assert(dof.n_dofs(level) != numbers::invalid_dof_index,
-           ExcNotInitialized());
+           ExcDoFHandlerNotInitialized());
 
     std::vector<types::global_dof_index> renumbering(dof.n_dofs(level));
     std::vector<types::global_dof_index> reverse(dof.n_dofs(level));
