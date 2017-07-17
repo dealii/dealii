@@ -105,9 +105,9 @@ namespace Algorithms
     AnyData src2;
 
     AnyData out1;
-    out1.add<VectorType *>(aux, "Solution");
+    out1.add<VectorType *>(aux.get(), "Solution");
     // The data provided to the inner solver
-    src2.add<const VectorType *>(aux, "Previous time");
+    src2.add<const VectorType *>(aux.get(), "Previous time");
     src2.add<const VectorType *>(&solution, "Previous iterate");
     src2.add<const double *>(&d_implicit.time, "Time");
     src2.add<const double *>(&d_implicit.step, "Timestep");

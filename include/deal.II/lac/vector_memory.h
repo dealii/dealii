@@ -25,6 +25,7 @@
 
 #include <vector>
 #include <iostream>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -105,12 +106,13 @@ public:
                    "vector has not actually been allocated by the same pool before.");
 
   //@}
+
   /**
    * A class that looks like a pointer for all practical purposes and that
    * upon construction time allocates a vector from a VectorMemory object
-   * (or an object of a derived class) that is passed to the constructor.
-   * The destructor then automatically returns the vector's ownership to
-   * the same VectorMemory object.
+   * (or an object of a class derived from VectorMemory) that is passed
+   * to the constructor of this class. The destructor then automatically
+   * returns the vector's ownership to the same VectorMemory object.
    *
    * Pointers of this type are therefore safe in the sense that they automatically
    * call VectorMemory::free() when they are destroyed, whether that happens
@@ -118,45 +120,27 @@ public:
    * exception unwinding. These kinds of object thus relieve the user from
    * using vector management functions explicitly.
    *
+   * In many senses, this class acts like <code>std::unique_ptr</code> in that
+   * it is the unique owner of a chunk of memory that it frees upon destruction.
+   * The main differences to <code>std::unique_ptr</code> are (i) that it
+   * allocates memory from a memory pool upon construction, and (ii) that the
+   * memory is not destroyed using `operator delete` but returned to the
+   * VectorMemory pool.
+   *
    * @author Guido Kanschat, 2009
    */
-  class Pointer
+  class Pointer : public std::unique_ptr<VectorType, std::function<void (VectorType *)> >
   {
   public:
     /**
      * Constructor, automatically allocating a vector from @p mem.
      */
     Pointer(VectorMemory<VectorType> &mem);
+
     /**
      * Destructor, automatically releasing the vector from the memory #pool.
      */
-    ~Pointer();
-
-    /**
-     * Conversion to regular pointer.
-     */
-    operator VectorType *() const;
-
-    /**
-     * Dereferencing operator.
-     */
-    VectorType &operator * () const;
-
-    /**
-     * Dereferencing operator.
-     */
-    VectorType *operator -> () const;
-
-  private:
-    /**
-     * The memory pool used.
-     */
-    SmartPointer<VectorMemory<VectorType>,Pointer> pool;
-
-    /**
-     * The pointer to the vector.
-     */
-    VectorType *v;
+    ~Pointer() = default;
   };
 };
 
@@ -368,47 +352,12 @@ template <typename VectorType>
 inline
 VectorMemory<VectorType>::Pointer::Pointer(VectorMemory<VectorType> &mem)
   :
-  pool(&mem, typeid(*this).name()), v(nullptr)
+  std::unique_ptr<VectorType, std::function<void (VectorType *)> >
+  (mem.alloc(), [&mem](VectorType *v)
 {
-  v = pool->alloc();
-}
-
-
-template <typename VectorType>
-inline
-VectorMemory<VectorType>::Pointer::~Pointer()
-{
-  try
-    {
-      pool->free(v);
-    }
-  catch (...)
-    {}
-}
-
-
-template <typename VectorType>
-inline
-VectorMemory<VectorType>::Pointer::operator VectorType *() const
-{
-  return v;
-}
-
-
-template <typename VectorType>
-inline
-VectorType &VectorMemory<VectorType>::Pointer::operator * () const
-{
-  return *v;
-}
-
-
-template <typename VectorType>
-inline
-VectorType *VectorMemory<VectorType>::Pointer::operator -> () const
-{
-  return v;
-}
+  mem.free(v);
+})
+{}
 
 
 #endif // DOXYGEN
