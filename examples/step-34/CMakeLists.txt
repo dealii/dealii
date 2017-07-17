@@ -39,9 +39,9 @@ ENDIF()
 #
 IF(NOT DEAL_II_WITH_MUPARSER) # keep in one line
   MESSAGE(FATAL_ERROR "
-Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
+Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_MUPARSER = ON
-One or all of these are OFF in your installation but are required for this tutorial step."
+However, the deal.II library found at ${DEAL_II_PATH} was configured with options that conflict with these requirements."
     )
 ENDIF()
 

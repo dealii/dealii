@@ -39,7 +39,7 @@ ENDIF()
 #
 IF(NOT (DEAL_II_WITH_PETSC OR DEAL_II_WITH_TRILINOS) OR NOT DEAL_II_WITH_P4EST OR DEAL_II_PETSC_WITH_COMPLEX) # keep in one line
   MESSAGE(FATAL_ERROR "
-Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
+Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_PETSC = ON
     DEAL_II_WITH_P4EST = ON
     DEAL_II_PETSC_WITH_COMPLEX = OFF
