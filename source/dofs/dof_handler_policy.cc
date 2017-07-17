@@ -3500,13 +3500,30 @@ namespace internal
         const unsigned int
         n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
 
-        //* 1. distribute on own subdomain
+        /*
+           The following algorithm has a number of stages that are all documented
+           in the paper that describes the parallel::distributed functionality:
+
+           1/ locally enumerate dofs on locally owned cells
+           2/ un-numerate those that are on interfaces with ghost
+              cells and that we don't own based on the tie-breaking
+              criterion; re-enumerate the remaining ones. the
+              end result are that we only enumerate locally owned
+              DoFs
+           3/ shift indices so that each processor has a unique
+              range of indices
+           4/ for all locally owned cells that are ghost
+              cells somewhere else, send our own DoF indices
+              to the appropriate set of other processors
+         */
+
+        // --------- Phase 1: enumerate dofs on locally owned cells
         const dealii::types::global_dof_index n_initial_local_dofs =
           Implementation::distribute_dofs (tr->locally_owned_subdomain(),
                                            *dof_handler);
 
-        //* 2. iterate over ghostcells and kill dofs that are not
-        // owned by us
+        // --------- Phase 2: un-numerate dofs on interfaces to ghost cells
+        //                    that we don't own; re-enumerate the remaining ones
         std::vector<dealii::types::global_dof_index> renumbering(n_initial_local_dofs);
         for (unsigned int i=0; i<renumbering.size(); ++i)
           renumbering[i] = i;
@@ -3538,15 +3555,15 @@ namespace internal
         }
 
 
-        // make indices consecutive
+        // make the remaining indices consecutive
         number_cache.n_locally_owned_dofs = 0;
         for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
              it!=renumbering.end(); ++it)
           if (*it != numbers::invalid_dof_index)
             *it = number_cache.n_locally_owned_dofs++;
 
-        //* 3. communicate local dofcount and shift ids to make them
-        // unique
+        // --------- Phase 3: shift indices so that each processor has a unique
+        //                    range of indices
         number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
 
         const int ierr = MPI_Allgather ( &number_cache.n_locally_owned_dofs,
@@ -3616,9 +3633,10 @@ namespace internal
                == shift,
                ExcInternalError());
 
-        //* 4. send dofids of cells that are ghostcells on other
-        // machines
 
+        // --------- Phase 4: for all locally owned cells that are ghost
+        //                    cells somewhere else, send our own DoF indices
+        //                    to the appropriate set of other processors
         std::vector<bool> user_flags;
         tr->save_user_flags(user_flags);
         tr->clear_user_flags ();
