@@ -72,7 +72,8 @@ namespace internal
     else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dealii::DoFHandler<dim,spacedim> >*>(&policy)
              || dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelDistributed<dealii::hp::DoFHandler<dim,spacedim> >*>(&policy))
       policy_name = "Policy::ParallelDistributed<";
-    else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelShared<dealii::DoFHandler<dim,spacedim> >*>(&policy))
+    else if (dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelShared<dealii::DoFHandler<dim,spacedim> >*>(&policy)
+             || dynamic_cast<const typename dealii::internal::DoFHandler::Policy::ParallelShared<dealii::hp::DoFHandler<dim,spacedim> >*>(&policy))
       policy_name = "Policy::ParallelShared<";
     else
       AssertThrow(false, ExcNotImplemented());
