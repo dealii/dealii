@@ -214,14 +214,6 @@ SparsityPattern::SparsityPattern (const SparsityPattern &original,
 
 
 
-SparsityPattern::~SparsityPattern ()
-{
-  if (rowstart != nullptr)  delete[] rowstart;
-  if (colnums != nullptr)   delete[] colnums;
-}
-
-
-
 SparsityPattern &
 SparsityPattern::operator = (const SparsityPattern &s)
 {
@@ -265,14 +257,14 @@ SparsityPattern::reinit (const size_type m,
   // delete empty matrices
   if ((m==0) || (n==0))
     {
-      if (rowstart)  delete[] rowstart;
-      if (colnums)   delete[] colnums;
-      rowstart = nullptr;
-      colnums = nullptr;
+      rowstart.reset();
+      colnums.reset();
+
       max_vec_len = max_dim = rows = cols = 0;
       // if dimension is zero: ignore max_per_row
       max_row_length = 0;
       compressed = false;
+
       return;
     }
 
@@ -301,14 +293,8 @@ SparsityPattern::reinit (const size_type m,
   if (vec_len == 0)
     {
       vec_len = 1;
-      if (colnums)
-        {
-          delete[] colnums;
-          colnums = nullptr;
-        }
-
       max_vec_len = vec_len;
-      colnums = new size_type[max_vec_len];
+      colnums.reset (new size_type[max_vec_len]);
     }
 
   max_row_length = (row_lengths.size() == 0 ?
@@ -328,27 +314,15 @@ SparsityPattern::reinit (const size_type m,
   // and try to delete the memory a second time.
   if (rows > max_dim)
     {
-      if (rowstart)
-        {
-          delete[] rowstart;
-          rowstart = nullptr;
-        }
-
       max_dim = rows;
-      rowstart = new std::size_t[max_dim+1];
+      rowstart.reset (new std::size_t[max_dim+1]);
     }
 
   // allocate memory for the column numbers if necessary
   if (vec_len > max_vec_len)
     {
-      if (colnums)
-        {
-          delete[] colnums;
-          colnums = nullptr;
-        }
-
       max_vec_len = vec_len;
-      colnums = new size_type[max_vec_len];
+      colnums.reset (new size_type[max_vec_len]);
     }
 
   // set the rowstart array
@@ -398,7 +372,7 @@ SparsityPattern::compress ()
                      &colnums[rowstart[rows]],
                      std::bind(std::not_equal_to<size_type>(), std::placeholders::_1, invalid_entry));
   // now allocate the respective memory
-  size_type *new_colnums = new size_type[nonzero_elements];
+  std::unique_ptr<size_type[]> new_colnums (new size_type[nonzero_elements]);
 
 
   // reserve temporary storage to store the entries of one row
@@ -470,9 +444,9 @@ SparsityPattern::compress ()
   // set iterator-past-the-end
   rowstart[rows] = next_row_start;
 
-  // set colnums to the newly allocated array and delete the old one
-  delete[] colnums;
-  colnums = new_colnums;
+  // set colnums to the newly allocated array and delete previous content
+  // in the process
+  colnums = std::move(new_colnums);
 
   // store the size
   max_vec_len = nonzero_elements;
@@ -1000,13 +974,8 @@ SparsityPattern::block_read (std::istream &in)
   AssertThrow (c == '[', ExcIO());
 
   // reallocate space
-  if (rowstart)
-    delete[] rowstart;
-  if (colnums)
-    delete[] colnums;
-
-  rowstart = new std::size_t[max_dim+1];
-  colnums  = new size_type[max_vec_len];
+  rowstart.reset (new std::size_t[max_dim+1]);
+  colnums.reset (new size_type[max_vec_len]);
 
   // then read data
   in.read (reinterpret_cast<char *>(&rowstart[0]),

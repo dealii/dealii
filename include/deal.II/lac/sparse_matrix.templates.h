@@ -612,7 +612,7 @@ SparseMatrix<number>::add (const size_type  row,
   // unsorted case: first, search all the
   // indices to find out which values we
   // actually need to add.
-  const size_type *const my_cols = cols->colnums;
+  const size_type *const my_cols = cols->colnums.get();
   size_type index = cols->rowstart[row];
   const size_type next_row_index = cols->rowstart[row+1];
 
@@ -671,7 +671,7 @@ SparseMatrix<number>::set (const size_type  row,
   // First, search all the indices to find
   // out which values we actually need to
   // set.
-  const size_type *my_cols = cols->colnums;
+  const size_type *my_cols = cols->colnums.get();
   std::size_t index = cols->rowstart[row], next_index = index;
   const std::size_t next_row_index = cols->rowstart[row+1];
 
@@ -757,8 +757,8 @@ SparseMatrix<number>::vmult (OutVector &dst,
                                            <number,InVector,OutVector>,
                                            std::placeholders::_1, std::placeholders::_2,
                                            val.get(),
-                                           cols->rowstart,
-                                           cols->colnums,
+                                           cols->rowstart.get(),
+                                           cols->colnums.get(),
                                            std::cref(src),
                                            std::ref(dst),
                                            false),
@@ -812,8 +812,8 @@ SparseMatrix<number>::vmult_add (OutVector &dst,
                                            <number,InVector,OutVector>,
                                            std::placeholders::_1, std::placeholders::_2,
                                            val.get(),
-                                           cols->rowstart,
-                                           cols->colnums,
+                                           cols->rowstart.get(),
+                                           cols->colnums.get(),
                                            std::cref(src),
                                            std::ref(dst),
                                            true),
@@ -897,7 +897,9 @@ SparseMatrix<number>::matrix_norm_square (const Vector<somenumber> &v) const
     (std::bind (&internal::SparseMatrix::matrix_norm_sqr_on_subrange
                 <number,Vector<somenumber> >,
                 std::placeholders::_1, std::placeholders::_2,
-                val.get(), cols->rowstart, cols->colnums,
+                val.get(),
+                cols->rowstart.get(),
+                cols->colnums.get(),
                 std::cref(v)),
      0, m(),
      internal::SparseMatrix::minimum_parallel_grain_size);
@@ -960,7 +962,9 @@ SparseMatrix<number>::matrix_scalar_product (const Vector<somenumber> &u,
     (std::bind (&internal::SparseMatrix::matrix_scalar_product_on_subrange
                 <number,Vector<somenumber> >,
                 std::placeholders::_1, std::placeholders::_2,
-                val.get(), cols->rowstart, cols->colnums,
+                val.get(),
+                cols->rowstart.get(),
+                cols->colnums.get(),
                 std::cref(u),
                 std::cref(v)),
      0, m(),
@@ -1347,7 +1351,9 @@ SparseMatrix<number>::residual (Vector<somenumber>       &dst,
                (std::bind (&internal::SparseMatrix::residual_sqr_on_subrange
                            <number,Vector<somenumber>,Vector<somenumber> >,
                            std::placeholders::_1, std::placeholders::_2,
-                           val.get(), cols->rowstart, cols->colnums,
+                           val.get(),
+                           cols->rowstart.get(),
+                           cols->colnums.get(),
                            std::cref(u),
                            std::cref(b),
                            std::ref(dst)),
