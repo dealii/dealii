@@ -1,0 +1,4 @@
+New: The hp::DoFHandler class can now work with shared triangulations
+of type parallel::shared::Triangulation.
+<br>
+(Wolfgang Bangerth, 2017/07/17)
