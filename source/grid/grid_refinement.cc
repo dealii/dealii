@@ -35,102 +35,101 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
+namespace internal
 {
-  namespace internal
+  namespace GridRefinement
   {
-    template <typename number>
-    inline
-    number
-    max_element (const Vector<number> &criteria)
+    namespace
     {
-      return *std::max_element(criteria.begin(), criteria.end());
-    }
+      template <typename number>
+      inline
+      number
+      max_element (const dealii::Vector<number> &criteria)
+      {
+        return *std::max_element(criteria.begin(), criteria.end());
+      }
 
 
-    template <typename number>
-    inline
-    number
-    min_element (const Vector<number> &criteria)
-    {
-      return *std::min_element(criteria.begin(), criteria.end());
-    }
+      template <typename number>
+      inline
+      number
+      min_element (const dealii::Vector<number> &criteria)
+      {
+        return *std::min_element(criteria.begin(), criteria.end());
+      }
 
-    // Silence a (bogus) warning in clang-3.6 about the following four
-    // functions being unused:
-    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+      // Silence a (bogus) warning in clang-3.6 about the following four
+      // functions being unused:
+      DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 #ifdef DEAL_II_WITH_TRILINOS
-    inline
-    TrilinosScalar
-    max_element (const TrilinosWrappers::MPI::Vector &criteria)
-    {
-      TrilinosScalar m = 0;
-      criteria.trilinos_vector().MaxValue(&m);
-      return m;
-    }
+      inline
+      TrilinosScalar
+      max_element (const dealii::TrilinosWrappers::MPI::Vector &criteria)
+      {
+        TrilinosScalar m = 0;
+        criteria.trilinos_vector().MaxValue(&m);
+        return m;
+      }
 
 
-    inline
-    TrilinosScalar
-    min_element (const TrilinosWrappers::MPI::Vector &criteria)
-    {
-      TrilinosScalar m = 0;
-      criteria.trilinos_vector().MinValue(&m);
-      return m;
-    }
+      inline
+      TrilinosScalar
+      min_element (const dealii::TrilinosWrappers::MPI::Vector &criteria)
+      {
+        TrilinosScalar m = 0;
+        criteria.trilinos_vector().MinValue(&m);
+        return m;
+      }
 #endif
 
-    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+      DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
-  } /* namespace internal */
-
-
-  template <typename VectorType>
-  typename constraint_and_return_value<!IsBlockVector<VectorType>::value,
-           typename VectorType::value_type>::type
-           min_element (const VectorType &criteria)
-  {
-    return internal::min_element (criteria);
-  }
+      template <typename VectorType>
+      typename constraint_and_return_value<!IsBlockVector<VectorType>::value,
+               typename VectorType::value_type>::type
+               min_element (const VectorType &criteria)
+      {
+        return min_element (criteria);
+      }
 
 
-  template <typename VectorType>
-  typename constraint_and_return_value<!IsBlockVector<VectorType>::value,
-           typename VectorType::value_type>::type
-           max_element (const VectorType &criteria)
-  {
-    return internal::max_element (criteria);
-  }
+      template <typename VectorType>
+      typename constraint_and_return_value<!IsBlockVector<VectorType>::value,
+               typename VectorType::value_type>::type
+               max_element (const VectorType &criteria)
+      {
+        return max_element (criteria);
+      }
 
 
-  template <typename VectorType>
-  typename constraint_and_return_value<IsBlockVector<VectorType>::value,
-           typename VectorType::value_type>::type
-           min_element (const VectorType &criteria)
-  {
-    typename VectorType::value_type t = internal::min_element(criteria.block(0));
-    for (unsigned int b=1; b<criteria.n_blocks(); ++b)
-      t = std::min (t, internal::min_element(criteria.block(b)));
+      template <typename VectorType>
+      typename constraint_and_return_value<IsBlockVector<VectorType>::value,
+               typename VectorType::value_type>::type
+               min_element (const VectorType &criteria)
+      {
+        typename VectorType::value_type t = min_element(criteria.block(0));
+        for (unsigned int b=1; b<criteria.n_blocks(); ++b)
+          t = std::min (t, min_element(criteria.block(b)));
 
-    return t;
-  }
+        return t;
+      }
 
 
-  template <typename VectorType>
-  typename constraint_and_return_value<IsBlockVector<VectorType>::value,
-           typename VectorType::value_type>::type
-           max_element (const VectorType &criteria)
-  {
-    typename VectorType::value_type t = internal::max_element(criteria.block(0));
-    for (unsigned int b=1; b<criteria.n_blocks(); ++b)
-      t = std::max (t, internal::max_element(criteria.block(b)));
+      template <typename VectorType>
+      typename constraint_and_return_value<IsBlockVector<VectorType>::value,
+               typename VectorType::value_type>::type
+               max_element (const VectorType &criteria)
+      {
+        typename VectorType::value_type t = max_element(criteria.block(0));
+        for (unsigned int b=1; b<criteria.n_blocks(); ++b)
+          t = std::max (t, max_element(criteria.block(b)));
 
-    return t;
-  }
-
-}
-
+        return t;
+      }
+    }
+  } /* namespace GridRefinement */
+} /* namespace internal */
 
 
 template <int dim, class VectorType, int spacedim>
@@ -439,7 +438,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
   // threshold if it equals the
   // largest indicator and the
   // top_fraction!=1
-  if ((top_threshold == max_element(criteria)) &&
+  if ((top_threshold == internal::GridRefinement::max_element(criteria)) &&
       (top_fraction != 1))
     top_threshold *= 0.999;
 
@@ -447,10 +446,10 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
     bottom_threshold = 0.999*top_threshold;
 
   // actually flag cells
-  if (top_threshold < max_element(criteria))
+  if (top_threshold < internal::GridRefinement::max_element(criteria))
     refine (tria, criteria, top_threshold, pp - tmp.begin());
 
-  if (bottom_threshold > min_element(criteria))
+  if (bottom_threshold > internal::GridRefinement::min_element(criteria))
     coarsen (tria, criteria, bottom_threshold);
 }
 
