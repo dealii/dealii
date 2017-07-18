@@ -14,9 +14,9 @@ namespace internal
       template <int dim, int spacedim>
       typename dealii::Triangulation<dim,spacedim>::cell_iterator
       cell_from_quad
-      (typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation,
-       typename dealii::internal::p4est::types<dim>::topidx treeidx,
-       typename dealii::internal::p4est::types<dim>::quadrant &quad)
+      (const dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation,
+       const typename dealii::internal::p4est::types<dim>::topidx treeidx,
+       const typename dealii::internal::p4est::types<dim>::quadrant &quad)
       {
         int i, l = quad.level;
         dealii::types::global_dof_index dealii_index =
@@ -54,7 +54,7 @@ namespace internal
           (info->sides.array);
         FindGhosts<dim,spacedim> *fg = static_cast<FindGhosts<dim,spacedim> *>(user_data);
         sc_array_t *subids = fg->subids;
-        typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
+        const dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
         int nsubs;
         dealii::types::subdomain_id *subdomain_ids;
         std::map<unsigned int, std::set<dealii::types::subdomain_id> >
@@ -116,7 +116,7 @@ namespace internal
           (info->sides.array);
         FindGhosts<dim,spacedim> *fg = static_cast<FindGhosts<dim,spacedim> *>(user_data);
         sc_array_t *subids = fg->subids;
-        typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
+        const dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
         int nsubs;
         dealii::types::subdomain_id *subdomain_ids;
         std::map<unsigned int, std::set<dealii::types::subdomain_id> >
@@ -187,7 +187,7 @@ namespace internal
           (info->sides.array);
         FindGhosts<dim,spacedim> *fg = static_cast<FindGhosts<dim,spacedim> *>(user_data);
         sc_array_t *subids = fg->subids;
-        typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
+        const dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
         int nsubs;
         dealii::types::subdomain_id *subdomain_ids;
         std::map<unsigned int, std::set<dealii::types::subdomain_id> >

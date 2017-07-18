@@ -572,9 +572,9 @@ namespace internal
     template <int dim, int spacedim>
     struct FindGhosts
     {
-      typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation;
-      sc_array_t                                                          *subids;
-      std::map<unsigned int, std::set<dealii::types::subdomain_id> >      *vertices_with_ghost_neighbors;
+      const typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation;
+      sc_array_t                                                                *subids;
+      std::map<unsigned int, std::set<dealii::types::subdomain_id> >            *vertices_with_ghost_neighbors;
     };
 
 

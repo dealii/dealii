@@ -3637,10 +3637,9 @@ namespace internal
 
           // add each ghostcell's subdomain to the vertex and keep track
           // of interesting neighbors
-          std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-          vertices_with_ghost_neighbors;
-
-          triangulation->fill_vertices_with_ghost_neighbors (vertices_with_ghost_neighbors);
+          const std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+          vertices_with_ghost_neighbors
+            = triangulation->compute_vertices_with_ghost_neighbors ();
 
 
           // Send and receive cells. After this, only the local cells
@@ -4112,10 +4111,9 @@ namespace internal
 
           // add each ghostcells' subdomain to the vertex and keep track of
           // interesting neighbors
-          std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-          vertices_with_ghost_neighbors;
-
-          tr->fill_vertices_with_ghost_neighbors (vertices_with_ghost_neighbors);
+          const std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+          vertices_with_ghost_neighbors
+            = tr->compute_vertices_with_ghost_neighbors ();
 
           // Send and receive cells. After this, only the local cells are
           // marked, that received new data. This has to be communicated in a

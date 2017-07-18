@@ -858,14 +858,12 @@ namespace parallel
       get_cell_weights();
 
       /**
-       * Fills a map that, for each vertex, lists all the processors whose
+       * Return a map that, for each vertex, lists all the processors whose
        * subdomains are adjacent to that vertex. Used by
        * DoFHandler::Policy::ParallelDistributed.
        */
-      void
-      fill_vertices_with_ghost_neighbors
-      (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-       &vertices_with_ghost_neighbors);
+      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      compute_vertices_with_ghost_neighbors () const;
 
       /**
        * Fills a map that, for each vertex, lists all the processors whose
@@ -989,10 +987,8 @@ namespace parallel
        * Like above, this method, which is only implemented for dim = 2 or 3,
        * needs a stub because it is used in dof_handler_policy.cc
        */
-      void
-      fill_vertices_with_ghost_neighbors
-      (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-       &vertices_with_ghost_neighbors);
+      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      compute_vertices_with_ghost_neighbors () const;
 
       /**
        * Like above, this method, which is only implemented for dim = 2 or 3,

@@ -3382,13 +3382,12 @@ namespace parallel
      * This is achieved via the p4est_iterate/p8est_iterate tool
      */
     template <int dim, int spacedim>
-    void
-    Triangulation<dim,spacedim>::
-    fill_vertices_with_ghost_neighbors
-    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &vertices_with_ghost_neighbors)
+    std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+    Triangulation<dim,spacedim>::compute_vertices_with_ghost_neighbors () const
     {
       Assert (dim>1, ExcNotImplemented());
+
+      std::map<unsigned int, std::set<dealii::types::subdomain_id> > vertices_with_ghost_neighbors;
 
       dealii::internal::p4est::FindGhosts<dim,spacedim> fg;
       fg.subids = sc_array_new (sizeof (dealii::types::subdomain_id));
@@ -3400,6 +3399,8 @@ namespace parallel
           static_cast<void *>(&fg));
 
       sc_array_destroy (fg.subids);
+
+      return vertices_with_ghost_neighbors;
     }
 
 
@@ -3900,13 +3901,12 @@ namespace parallel
     }
 
     template <int spacedim>
-    void
+    std::map<unsigned int, std::set<dealii::types::subdomain_id> >
     Triangulation<1,spacedim>::
-    fill_vertices_with_ghost_neighbors
-    (std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &/*vertices_with_ghost_neighbors*/)
+    compute_vertices_with_ghost_neighbors () const
     {
       Assert (false, ExcNotImplemented());
+      return std::map<unsigned int, std::set<dealii::types::subdomain_id> >();
     }
 
     template <int spacedim>
