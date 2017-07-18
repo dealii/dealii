@@ -3483,8 +3483,6 @@ namespace internal
       ParallelDistributed<DoFHandlerType>::
       distribute_dofs () const
       {
-        NumberCache number_cache;
-
 #ifndef DEAL_II_WITH_P4EST
         Assert (false, ExcNotImplemented());
 #else
@@ -3524,19 +3522,18 @@ namespace internal
 
         // --------- Phase 2: un-numerate dofs on interfaces to ghost cells
         //                    that we don't own; re-enumerate the remaining ones
+
+        // start with the identity permutation of indices
         std::vector<dealii::types::global_dof_index> renumbering(n_initial_local_dofs);
-        for (unsigned int i=0; i<renumbering.size(); ++i)
+        for (dealii::types::global_dof_index i=0; i<renumbering.size(); ++i)
           renumbering[i] = i;
 
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-          typename DoFHandlerType::active_cell_iterator
-          cell = dof_handler->begin_active(),
-          endc = dof_handler->end();
-
-          for (; cell != endc; ++cell)
-            if (cell->is_ghost() &&
+          for (auto cell : dof_handler->active_cell_iterators())
+            if (cell->is_ghost()
+                &&
                 (cell->subdomain_id() < triangulation->locally_owned_subdomain()))
               {
                 // we found a neighboring ghost cell whose subdomain
@@ -3547,43 +3544,39 @@ namespace internal
                 // the interface)
                 local_dof_indices.resize (cell->get_fe().dofs_per_cell);
                 cell->get_dof_indices (local_dof_indices);
-                for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-                  if (local_dof_indices[i] != numbers::invalid_dof_index)
-                    renumbering[local_dof_indices[i]]
+                for (auto &local_dof_index : local_dof_indices)
+                  if (local_dof_index != numbers::invalid_dof_index)
+                    renumbering[local_dof_index]
                       = numbers::invalid_dof_index;
               }
         }
 
 
         // make the remaining indices consecutive
-        number_cache.n_locally_owned_dofs = 0;
-        for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
-             it!=renumbering.end(); ++it)
-          if (*it != numbers::invalid_dof_index)
-            *it = number_cache.n_locally_owned_dofs++;
+        dealii::types::global_dof_index n_locally_owned_dofs = 0;
+        for (auto &new_index : renumbering)
+          if (new_index != numbers::invalid_dof_index)
+            new_index = n_locally_owned_dofs++;
 
         // --------- Phase 3: shift indices so that each processor has a unique
         //                    range of indices
-        number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
+        std::vector<dealii::types::global_dof_index> n_locally_owned_dofs_per_processor(n_cpus);
 
-        const int ierr = MPI_Allgather ( &number_cache.n_locally_owned_dofs,
+        const int ierr = MPI_Allgather ( &n_locally_owned_dofs,
                                          1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                                         &number_cache.n_locally_owned_dofs_per_processor[0],
+                                         &n_locally_owned_dofs_per_processor[0],
                                          1, DEAL_II_DOF_INDEX_MPI_TYPE,
                                          triangulation->get_communicator());
         AssertThrowMPI(ierr);
 
         const dealii::types::global_dof_index
-        shift = std::accumulate (number_cache
-                                 .n_locally_owned_dofs_per_processor.begin(),
-                                 number_cache
-                                 .n_locally_owned_dofs_per_processor.begin()
-                                 + triangulation->locally_owned_subdomain(),
-                                 static_cast<dealii::types::global_dof_index>(0));
-        for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
-             it!=renumbering.end(); ++it)
-          if (*it != numbers::invalid_dof_index)
-            (*it) += shift;
+        my_shift = std::accumulate (n_locally_owned_dofs_per_processor.begin(),
+                                    n_locally_owned_dofs_per_processor.begin()
+                                    + triangulation->locally_owned_subdomain(),
+                                    static_cast<dealii::types::global_dof_index>(0));
+        for (auto &new_index : renumbering)
+          if (new_index != numbers::invalid_dof_index)
+            new_index += my_shift;
 
         // now re-enumerate all dofs to this shifted and condensed
         // numbering form.  we renumber some dofs as invalid, so
@@ -3592,34 +3585,26 @@ namespace internal
                                        *dof_handler, false);
 
         // now a little bit of housekeeping
-        number_cache.n_global_dofs
-          = std::accumulate (number_cache
-                             .n_locally_owned_dofs_per_processor.begin(),
-                             number_cache
-                             .n_locally_owned_dofs_per_processor.end(),
-                             static_cast<dealii::types::global_dof_index>(0));
+        const dealii::types::global_dof_index n_global_dofs
+          = std::accumulate (n_locally_owned_dofs_per_processor.begin(),
+                             n_locally_owned_dofs_per_processor.end(),
+                             dealii::types::global_dof_index(0));
 
-        number_cache.locally_owned_dofs = IndexSet(number_cache.n_global_dofs);
-        number_cache.locally_owned_dofs
-        .add_range(shift,
-                   shift+number_cache.n_locally_owned_dofs);
-        number_cache.locally_owned_dofs.compress();
-
-        // fill global_dof_indexsets
-        number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
+        std::vector<IndexSet> locally_owned_dofs_per_processor (n_cpus,
+                                                                IndexSet(n_global_dofs));
         {
-          dealii::types::global_dof_index lshift = 0;
+          dealii::types::global_dof_index current_shift = 0;
           for (unsigned int i=0; i<n_cpus; ++i)
             {
-              number_cache.locally_owned_dofs_per_processor[i]
-                = IndexSet(number_cache.n_global_dofs);
-              number_cache.locally_owned_dofs_per_processor[i]
-              .add_range(lshift,
-                         lshift +
-                         number_cache.n_locally_owned_dofs_per_processor[i]);
-              lshift += number_cache.n_locally_owned_dofs_per_processor[i];
+              locally_owned_dofs_per_processor[i]
+              .add_range(current_shift,
+                         current_shift +
+                         n_locally_owned_dofs_per_processor[i]);
+              current_shift += n_locally_owned_dofs_per_processor[i];
             }
         }
+        NumberCache number_cache (locally_owned_dofs_per_processor,
+                                  triangulation->locally_owned_subdomain());
         Assert(number_cache.locally_owned_dofs_per_processor
                [triangulation->locally_owned_subdomain()].n_elements()
                ==
@@ -3630,53 +3615,56 @@ namespace internal
                ||
                number_cache.locally_owned_dofs_per_processor
                [triangulation->locally_owned_subdomain()].nth_index_in_set(0)
-               == shift,
+               == my_shift,
                ExcInternalError());
 
+        // this ends the phase where we enumerate degrees of freedom on
+        // each processor. what is missing is communicating DoF indices
+        // on ghost cells
 
         // --------- Phase 4: for all locally owned cells that are ghost
         //                    cells somewhere else, send our own DoF indices
         //                    to the appropriate set of other processors
-        std::vector<bool> user_flags;
-        triangulation->save_user_flags(user_flags);
-        triangulation->clear_user_flags ();
+        {
+          std::vector<bool> user_flags;
+          triangulation->save_user_flags(user_flags);
+          triangulation->clear_user_flags ();
 
-        // mark all own cells for transfer
-        for (typename DoFHandlerType::active_cell_iterator cell = dof_handler->begin_active();
-             cell != dof_handler->end(); ++cell)
-          if (!cell->is_artificial())
-            cell->set_user_flag();
+          // mark all own cells for transfer
+          for (auto cell : dof_handler->active_cell_iterators())
+            if (!cell->is_artificial())
+              cell->set_user_flag();
 
-        // add each ghostcell's subdomain to the vertex and keep track
-        // of interesting neighbors
-        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-        vertices_with_ghost_neighbors;
+          // add each ghostcell's subdomain to the vertex and keep track
+          // of interesting neighbors
+          std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+          vertices_with_ghost_neighbors;
 
-        triangulation->fill_vertices_with_ghost_neighbors (vertices_with_ghost_neighbors);
+          triangulation->fill_vertices_with_ghost_neighbors (vertices_with_ghost_neighbors);
 
 
-        // Send and receive cells. After this, only the local cells
-        // are marked, that received new data. This has to be
-        // communicated in a second communication step.
-        communicate_dof_indices_on_marked_cells (*dof_handler,
-                                                 vertices_with_ghost_neighbors,
-                                                 triangulation->coarse_cell_to_p4est_tree_permutation,
-                                                 triangulation->p4est_tree_to_coarse_cell_permutation);
+          // Send and receive cells. After this, only the local cells
+          // are marked, that received new data. This has to be
+          // communicated in a second communication step.
+          communicate_dof_indices_on_marked_cells (*dof_handler,
+                                                   vertices_with_ghost_neighbors,
+                                                   triangulation->coarse_cell_to_p4est_tree_permutation,
+                                                   triangulation->p4est_tree_to_coarse_cell_permutation);
 
-        communicate_dof_indices_on_marked_cells (*dof_handler,
-                                                 vertices_with_ghost_neighbors,
-                                                 triangulation->coarse_cell_to_p4est_tree_permutation,
-                                                 triangulation->p4est_tree_to_coarse_cell_permutation);
+          communicate_dof_indices_on_marked_cells (*dof_handler,
+                                                   vertices_with_ghost_neighbors,
+                                                   triangulation->coarse_cell_to_p4est_tree_permutation,
+                                                   triangulation->p4est_tree_to_coarse_cell_permutation);
 
-        triangulation->load_user_flags(user_flags);
+          triangulation->load_user_flags(user_flags);
+        }
 
 #ifdef DEBUG
         // check that we are really done
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-          for (typename DoFHandlerType::active_cell_iterator cell = dof_handler->begin_active();
-               cell != dof_handler->end(); ++cell)
+          for (auto cell : dof_handler->active_cell_iterators())
             if (!cell->is_artificial())
               {
                 local_dof_indices.resize (cell->get_fe().dofs_per_cell);
@@ -3846,16 +3834,16 @@ namespace internal
             // fill global_dof_indexsets
             level_number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
             {
-              dealii::types::global_dof_index lshift = 0;
+              dealii::types::global_dof_index current_shift = 0;
               for (unsigned int i=0; i<n_cpus; ++i)
                 {
                   level_number_cache.locally_owned_dofs_per_processor[i]
                     = IndexSet(level_number_cache.n_global_dofs);
                   level_number_cache.locally_owned_dofs_per_processor[i]
-                  .add_range(lshift,
-                             lshift +
+                  .add_range(current_shift,
+                             current_shift +
                              level_number_cache.n_locally_owned_dofs_per_processor[i]);
-                  lshift += level_number_cache.n_locally_owned_dofs_per_processor[i];
+                  current_shift += level_number_cache.n_locally_owned_dofs_per_processor[i];
                 }
             }
             Assert(level_number_cache.locally_owned_dofs_per_processor
