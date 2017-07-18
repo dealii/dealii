@@ -3276,12 +3276,12 @@ namespace internal
           Assert (false, ExcNotImplemented());
 #else
 
-          const parallel::distributed::Triangulation< dim, spacedim > *tr
+          const parallel::distributed::Triangulation<dim, spacedim> *triangulation
             = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
                (&dof_handler.get_triangulation()));
-          Assert (tr != nullptr, ExcInternalError());
+          Assert (triangulation != nullptr, ExcInternalError());
 
-          // now collect cells and their dof_indices for the
+          // first, collect cells and their dof_indices to send to
           // interested neighbors
           typedef
           std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>
@@ -3297,7 +3297,7 @@ namespace internal
               internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
               fill_dofindices_recursively<dim,spacedim>
-              (*tr,
+              (*triangulation,
                coarse_cell_to_p4est_tree_permutation[cell->index()],
                cell,
                p4est_coarse_cell,
@@ -3306,9 +3306,9 @@ namespace internal
             }
 
 
-          // sending
+          // step 1: send data to all owners of ghost cells
           std::vector<std::vector<char> > sendbuffers (needs_to_get_cells.size());
-          std::vector<MPI_Request> requests (needs_to_get_cells.size());
+          std::vector<MPI_Request> send_requests (needs_to_get_cells.size());
 
           unsigned int                              idx    = 0;
           std::vector<std::vector<char> >::iterator buffer = sendbuffers.begin();
@@ -3316,11 +3316,10 @@ namespace internal
                it!=needs_to_get_cells.end();
                ++it, ++buffer, ++idx)
             {
-              const unsigned int num_cells = it->second.tree_index.size();
-              (void)num_cells;
-
-              Assert(num_cells==it->second.quadrants.size(), ExcInternalError());
-              Assert(num_cells>0, ExcInternalError());
+              Assert(it->second.tree_index.size() > 0,
+                     ExcInternalError());
+              Assert(it->second.tree_index.size() == it->second.quadrants.size(),
+                     ExcInternalError());
 
               // pack all the data into the buffer for this recipient
               // and send it. keep data around till we can make sure
@@ -3328,7 +3327,8 @@ namespace internal
               *buffer = it->second.pack_data ();
               const int ierr = MPI_Isend(&(*buffer)[0], buffer->size(),
                                          MPI_BYTE, it->first,
-                                         123, tr->get_communicator(), &requests[idx]);
+                                         123, triangulation->get_communicator(),
+                                         &send_requests[idx]);
               AssertThrowMPI(ierr);
             }
 
@@ -3365,13 +3365,13 @@ namespace internal
           }
 
 
-          //* 5. receive ghostcelldata
+          // step 2: receive ghost cell data
           std::vector<char> receive;
           for (unsigned int i=0; i<senders.size(); ++i)
             {
               MPI_Status status;
               int len;
-              int ierr = MPI_Probe(MPI_ANY_SOURCE, 123, tr->get_communicator(), &status);
+              int ierr = MPI_Probe(MPI_ANY_SOURCE, 123, triangulation->get_communicator(), &status);
               AssertThrowMPI(ierr);
               ierr = MPI_Get_count(&status, MPI_BYTE, &len);
               AssertThrowMPI(ierr);
@@ -3379,7 +3379,7 @@ namespace internal
 
               char *ptr = &receive[0];
               ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                              tr->get_communicator(), &status);
+                              triangulation->get_communicator(), &status);
               AssertThrowMPI(ierr);
 
               CellDataTransferBuffer<dim> cell_data_transfer_buffer;
@@ -3392,7 +3392,7 @@ namespace internal
               // indices itself.
               for (unsigned int c=0; c<cells; ++c, dofs+=1+dofs[0])
                 {
-                  typename DoFHandler<dim,spacedim>::level_cell_iterator
+                  const typename DoFHandler<dim,spacedim>::level_cell_iterator
                   cell (&dof_handler.get_triangulation(),
                         0,
                         p4est_tree_to_coarse_cell_permutation[cell_data_transfer_buffer.tree_index[c]],
@@ -3403,7 +3403,7 @@ namespace internal
 
                   Assert(cell->get_fe().dofs_per_cell==dofs[0], ExcInternalError());
 
-                  set_dofindices_recursively<dim,spacedim> (*tr,
+                  set_dofindices_recursively<dim,spacedim> (*triangulation,
                                                             p4est_coarse_cell,
                                                             cell,
                                                             cell_data_transfer_buffer.quadrants[c],
@@ -3411,33 +3411,36 @@ namespace internal
                 }
             }
 
-          // complete all sends, so that we can safely destroy the
+          // finally update the cell DoF indices caches to make sure
+          // our internal data structures are consistent
+          update_all_active_cell_dof_indices_caches (dof_handler);
+
+
+          // wait for all Isends to complete, so that we can safely destroy the
           // buffers.
-          if (requests.size() > 0)
+          if (send_requests.size() > 0)
             {
-              const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+              const int ierr = MPI_Waitall(send_requests.size(), &send_requests[0],
+                                           MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
             }
 
 
 #ifdef DEBUG
           {
-            // check all msgs got sent and received
+            // check that all messages got sent and received
             unsigned int sum_send=0;
             unsigned int sum_recv=0;
             unsigned int sent=needs_to_get_cells.size();
             unsigned int recv=senders.size();
 
-            int ierr = MPI_Allreduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
+            int ierr = MPI_Allreduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, triangulation->get_communicator());
             AssertThrowMPI(ierr);
-            ierr = MPI_Allreduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
+            ierr = MPI_Allreduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, triangulation->get_communicator());
             AssertThrowMPI(ierr);
             Assert(sum_send==sum_recv, ExcInternalError());
           }
 #endif
-
-          // update dof index caches on all cells
-          update_all_active_cell_dof_indices_caches (dof_handler);
 
           // have a barrier so that sends between two calls to this
           // function are not mixed up.
@@ -3445,11 +3448,14 @@ namespace internal
           // this is necessary because above we just see if there are
           // messages and then receive them, without discriminating
           // where they come from and whether they were sent in phase
-          // 1 or 2. the need for a global communication step like
-          // this barrier could be avoided by receiving messages
-          // specifically from those processors from which we expect
-          // messages, and by using different tags for phase 1 and 2
-          const int ierr = MPI_Barrier(tr->get_communicator());
+          // 1 or 2 (the function is called twice in a row). the need
+          // for a global communication step like this barrier could
+          // be avoided by receiving messages specifically from those
+          // processors from which we expect messages, and by using
+          // different tags for phase 1 and 2, but the cost of a
+          // barrier is negligible compared to everything else we do
+          // here
+          const int ierr = MPI_Barrier(triangulation->get_communicator());
           AssertThrowMPI(ierr);
 #endif
         }
@@ -3635,8 +3641,8 @@ namespace internal
             if (!cell->is_artificial())
               cell->set_user_flag();
 
-          // add each ghostcell's subdomain to the vertex and keep track
-          // of interesting neighbors
+          // figure out which cells are ghost cells on which we have
+          // to exchange DoF indices
           const std::map<unsigned int, std::set<dealii::types::subdomain_id> >
           vertices_with_ghost_neighbors
             = triangulation->compute_vertices_with_ghost_neighbors ();
@@ -3645,6 +3651,9 @@ namespace internal
           // Send and receive cells. After this, only the local cells
           // are marked, that received new data. This has to be
           // communicated in a second communication step.
+          //
+          // as explained in the 'distributed' paper, this has to be
+          // done twice
           communicate_dof_indices_on_marked_cells (*dof_handler,
                                                    vertices_with_ghost_neighbors,
                                                    triangulation->coarse_cell_to_p4est_tree_permutation,
