@@ -597,9 +597,11 @@ namespace Utilities
   inline
   T fixed_power (const T n)
   {
-    Assert (N>0, ExcNotImplemented());
+    Assert (N>=0, ExcNotImplemented());
     switch (N)
       {
+      case 0:
+        return 1;
       case 1:
         return n;
       case 2:

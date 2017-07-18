@@ -260,7 +260,8 @@ namespace DataOutBase
      * Numbers of neighbors of a patch.  OpenDX format requires neighbor
      * information for advanced output. Here the neighborship relationship of
      * patches is stored. During output, this must be transformed into
-     * neighborship of sub-grid cells.
+     * neighborship of sub-grid cells. For dim==0 we still allow one
+     * neighbor, to avoid compiler warnings about zero-sized arrays.
      */
     unsigned int neighbors[dim > 0
                            ?
@@ -2826,47 +2827,57 @@ private:
 
 
 /**
- * A class to store relevant data to use when writing the light data XDMF
- * file. This should only contain valid data on the root node which writes the
- * files, the rest of the nodes will have valid set to false. The XDMF file in
- * turn points to heavy data files (such as HDF5) where the actual simulation
- * data is stored. This allows flexibility in arranging the data, and also
+ * A class to store relevant data to use when writing a lightweight XDMF
+ * file. The XDMF file in turn points to heavy data files (such as HDF5)
+ * where the actual simulation data is stored.
+ * This allows flexibility in arranging the data, and also
  * allows the mesh to be separated from the point data.
  */
 class XDMFEntry
 {
-private:
-  /// Whether this entry is valid and contains data to be written
-  bool                                valid;
-  /// The name of the HDF5 heavy data solution and/or mesh files this entry references
-  std::string                         h5_sol_filename, h5_mesh_filename;
-  /// The simulation time associated with this entry
-  double                              entry_time;
-  /// The number of nodes, cells and dimensionality associated with the data
-  unsigned int                        num_nodes, num_cells, dimension;
-  /// The attributes associated with this entry and their dimension
-  std::map<std::string, unsigned int> attribute_dims;
-
-  /// Small function to create indentation for XML file
-  std::string indent(const unsigned int indent_level) const
-  {
-    std::string res = "";
-    for (unsigned int i=0; i<indent_level; ++i) res += "  ";
-    return res;
-  }
-
 public:
-  XDMFEntry() : valid(false) {};
-  XDMFEntry(const std::string filename, const double time, const unsigned int nodes, const unsigned int cells, const unsigned int dim) : valid(true), h5_sol_filename(filename), h5_mesh_filename(filename), entry_time(time), num_nodes(nodes), num_cells(cells), dimension(dim) {};
-  XDMFEntry(const std::string mesh_filename, const std::string solution_filename, const double time, const unsigned int nodes, const unsigned int cells, const unsigned int dim) : valid(true), h5_sol_filename(solution_filename), h5_mesh_filename(mesh_filename), entry_time(time), num_nodes(nodes), num_cells(cells), dimension(dim) {};
+  /**
+   * Default constructor that creates an invalid object.
+   */
+  XDMFEntry();
+
+  /**
+   * Simplified constructor that calls the complete constructor for
+   * cases where <code>solution_filename == mesh_filename</code>, and
+   * <code>dim==spacedim</code>.
+   */
+  XDMFEntry(const std::string filename,
+            const double time,
+            const unsigned int nodes,
+            const unsigned int cells,
+            const unsigned int dim);
+
+  /**
+   * Simplified constructor that calls the complete constructor for
+   * cases where <code>dim==spacedim</code>.
+   */
+  XDMFEntry(const std::string mesh_filename,
+            const std::string solution_filename,
+            const double time,
+            const unsigned int nodes,
+            const unsigned int cells,
+            const unsigned int dim);
+
+  /**
+   * Constructor that sets all members to provided parameters.
+   */
+  XDMFEntry(const std::string mesh_filename,
+            const std::string solution_filename,
+            const double time,
+            const unsigned int nodes,
+            const unsigned int cells,
+            const unsigned int dim,
+            const unsigned int spacedim);
 
   /**
    * Record an attribute and associated dimensionality.
    */
-  void add_attribute(const std::string &attr_name, const unsigned int dimension)
-  {
-    attribute_dims[attr_name] = dimension;
-  }
+  void add_attribute(const std::string &attr_name, const unsigned int dimension);
 
   /**
    * Read or write the data of this object for serialization
@@ -2884,9 +2895,58 @@ public:
     &attribute_dims;
   }
 
-  /// Get the XDMF content associated with this entry.
-  /// If the entry is not valid, this returns an empty string.
+  /**
+   * Get the XDMF content associated with this entry.
+   * If the entry is not valid, this returns an empty string.
+   */
   std::string get_xdmf_content(const unsigned int indent_level) const;
+
+private:
+  /**
+   * Whether this entry is valid and contains data to be written.
+   */
+  const bool valid;
+
+  /**
+   * The name of the HDF5 heavy data solution file this entry references.
+   */
+  const std::string h5_sol_filename;
+
+  /**
+   * The name of the HDF5 mesh file this entry references.
+   */
+  const std::string h5_mesh_filename;
+
+  /**
+   * The simulation time associated with this entry.
+   */
+  const double entry_time;
+
+  /**
+   * The number of data nodes.
+   */
+  const unsigned int num_nodes;
+
+  /**
+   * The number of data cells.
+   */
+  const unsigned int num_cells;
+
+  /**
+   * The dimension associated with the data.
+   */
+  const unsigned int dimension;
+
+  /**
+   * The dimension of the space the data lives in.
+   * Note that dimension <= space_dimension.
+   */
+  const unsigned int space_dimension;
+
+  /**
+   * The attributes associated with this entry and their dimension.
+   */
+  std::map<std::string, unsigned int> attribute_dims;
 };
 
 

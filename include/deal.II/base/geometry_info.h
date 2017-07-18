@@ -928,6 +928,40 @@ struct GeometryInfo<0>
    * Number of hexahedra of a cell.
    */
   static const unsigned int hexes_per_cell    = 0;
+
+  /**
+   * Rearrange vertices for UCD output.  For a cell being written in UCD
+   * format, each entry in this field contains the number of a vertex in
+   * <tt>deal.II</tt> that corresponds to the UCD numbering at this location.
+   *
+   * Typical example: write a cell and arrange the vertices, such that UCD
+   * understands them.
+   *
+   * @code
+   * for (i=0; i< n_vertices; ++i)
+   *   out << cell->vertex(ucd_to_deal[i]);
+   * @endcode
+   *
+   * As the vertex numbering in deal.II versions <= 5.1 happened to coincide
+   * with the UCD numbering, this field can also be used like a
+   * old_to_lexicographic mapping.
+   */
+  static constexpr unsigned int ucd_to_deal[vertices_per_cell] = {0};
+
+  /**
+   * Rearrange vertices for OpenDX output.  For a cell being written in OpenDX
+   * format, each entry in this field contains the number of a vertex in
+   * <tt>deal.II</tt> that corresponds to the DX numbering at this location.
+   *
+   * Typical example: write a cell and arrange the vertices, such that OpenDX
+   * understands them.
+   *
+   * @code
+   * for (i=0; i< n_vertices; ++i)
+   *   out << cell->vertex(dx_to_deal[i]);
+   * @endcode
+   */
+  static constexpr unsigned int dx_to_deal[vertices_per_cell] = {0};
 };
 
 
