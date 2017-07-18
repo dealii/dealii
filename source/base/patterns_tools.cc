@@ -43,11 +43,18 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PatternsTools
 {
-
-
   std::string default_list_separator(unsigned int rank)
   {
     static std::array<std::string, 5> seps = {{" ",  ","  ,  ";"  ,  "|"  ,   "%"}};
+    AssertThrow(rank < seps.size(), ExcMessage("I don't know what to use for such "
+                                               "high rank. Bailing out."));
+    return seps[rank];
+  }
+
+
+  std::string default_map_separator(unsigned int rank)
+  {
+    static std::array<std::string, 5> seps = {{" ",  ":"  ,  "="  ,  "@"  ,   "#"}};
     AssertThrow(rank < seps.size(), ExcMessage("I don't know what to use for such "
                                                "high rank. Bailing out."));
     return seps[rank];

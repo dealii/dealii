@@ -76,6 +76,7 @@ namespace PatternsTools
   struct RankInfo
   {
     typedef std::integral_constant<int, 0>::type vector_rank_type;
+    typedef std::integral_constant<int, 0>::type map_rank_type;
   };
 
 
@@ -92,6 +93,15 @@ namespace PatternsTools
    */
   std::string default_list_separator(unsigned int);
 
+
+
+  /**
+   * Return the default map separator for an object with the given map rank.
+   *
+   * This function helps in constructing patterns for non elementary types,
+   * like for example std::map<unsigned int, std::map<unsigned int, double>>
+   */
+  std::string default_map_separator(unsigned int);
 
 
   /**
@@ -114,14 +124,14 @@ namespace PatternsTools
      * passed to perform the conversion, or create and use a default one.
      */
     static std::string to_string(const T &s,
-                                 std::unique_ptr<PatternBase> p = Convert<T>::to_pattern()) = delete;
+                                 const std::unique_ptr<PatternBase> &p = Convert<T>::to_pattern()) = delete;
 
 
     /**
      * Convert a string to a value, using the given pattern, or a default one.
      */
     static T to_value(const std::string &s,
-                      std::unique_ptr<PatternBase> p = Convert<T>::to_pattern()) = delete;
+                      const std::unique_ptr<PatternBase> &p = Convert<T>::to_pattern()) = delete;
   };
 
   /**
@@ -150,17 +160,18 @@ namespace PatternsTools
 
     static std::unique_ptr<PatternBase> to_pattern()
     {
-      if(std::is_integral<T>::value)
+      if (std::is_integral<T>::value)
         return std_cxx14::make_unique<Integer>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
-      else if(std::is_floating_point<T>::value)
+      else if (std::is_floating_point<T>::value)
         return std_cxx14::make_unique<Double>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
-      else {
-        AssertThrow(false, ExcNotImplemented());
-        return std::unique_ptr<PatternBase>();
+      else
+        {
+          AssertThrow(false, ExcNotImplemented());
+          return std::unique_ptr<PatternBase>();
         }
     }
 
-    static std::string to_string(const T &value, std::unique_ptr<PatternBase> p = Convert<T>::to_pattern())
+    static std::string to_string(const T &value, const std::unique_ptr<PatternBase> &p = Convert<T>::to_pattern())
     {
       std::stringstream str;
       str << value;
@@ -169,7 +180,7 @@ namespace PatternsTools
     }
 
     static T to_value(const std::string &s,
-                      std::unique_ptr<PatternBase> p = Convert<T>::to_pattern())
+                      const std::unique_ptr<PatternBase> &p = Convert<T>::to_pattern())
     {
       AssertThrow(p->match(s), ExcNoMatch(s, *p));
       std::istringstream is(s);
@@ -186,9 +197,21 @@ namespace PatternsTools
   struct RankInfo<Container<T,Allocator>>
   {
     typedef typename std::integral_constant<int, RankInfo<T>::vector_rank_type::value+1>::type vector_rank_type;
+    typedef typename std::integral_constant<int, 0>::type map_rank_type;
   };
 
 
+
+  // Rank of map types
+  template<template <class _Key, class _T, class _Compare, class _Alloc> class MapType,
+           class Key, class Val, class Compare, class Alloc>
+  struct RankInfo<MapType<Key, Val, Compare, Alloc>>
+  {
+    typedef typename std::integral_constant<int, std::max(RankInfo<Key>::vector_rank_type::value,
+                                                          RankInfo<Val>::vector_rank_type::value)+1>::type vector_rank_type;
+    typedef typename std::integral_constant<int, std::max(RankInfo<Key>::map_rank_type::value,
+                                                          RankInfo<Val>::map_rank_type::value)+1>::type map_rank_type;
+  };
 
 
 
@@ -197,13 +220,13 @@ namespace PatternsTools
   {
     static std::unique_ptr<PatternBase> to_pattern()
     {
-      return std_cxx14::make_unique<List>(*Convert<Container<T,Allocator>>::to_pattern(),
-                                          0, std::numeric_limits<int>::max,
+      return std_cxx14::make_unique<List>(*Convert<T>::to_pattern(),
+                                          0, std::numeric_limits<unsigned int>::max(),
                                           default_list_separator(RankInfo<Container<T,Allocator>>::vector_rank_type::value));
     }
 
     static std::string to_string(const Container<T,Allocator> &t,
-                                 std::unique_ptr<PatternBase> pattern = Convert<Container<T,Allocator>>::to_pattern())
+                                 const std::unique_ptr<PatternBase> &pattern = Convert<Container<T,Allocator>>::to_pattern())
     {
 
       auto p = dynamic_cast<const Patterns::List *>(pattern.get());
@@ -230,7 +253,7 @@ namespace PatternsTools
      * Convert a string to a value, using the given pattern, or a default one.
      */
     static Container<T,Allocator>  to_value(const std::string &s,
-                                            std::unique_ptr<PatternBase> pattern = Convert<Container<T,Allocator>>::to_pattern())
+                                            const std::unique_ptr<PatternBase> &pattern = Convert<Container<T,Allocator>>::to_pattern())
     {
 
       AssertThrow(pattern->match(s), ExcMessage("No match for " + s +
@@ -251,6 +274,78 @@ namespace PatternsTools
   };
 
 
+  template<template <class _Key, class _T, class _Compare, class _Alloc> class MapType,
+           class Key, class Val, class Compare, class Alloc>
+  struct Convert<MapType<Key, Val, Compare, Alloc>>
+  {
+    typedef MapType<Key, Val, Compare, Alloc> type;
+
+    static std::unique_ptr<PatternBase> to_pattern()
+    {
+      return std_cxx14::make_unique<Map>(*Convert<Key>::to_pattern(),
+                                         *Convert<Val>::to_pattern(),
+                                         0, std::numeric_limits<unsigned int>::max(),
+                                         default_list_separator(RankInfo<MapType<Key, Val, Compare, Alloc>>::vector_rank_type::value),
+                                         default_map_separator(RankInfo<MapType<Key, Val, Compare, Alloc>>::map_rank_type::value)
+                                        );
+    }
+
+    static std::string to_string(const type &t,
+                                 std::unique_ptr<PatternBase> pattern = Convert<type>::to_pattern())
+    {
+
+      auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
+      AssertThrow(p, ExcMessage("I need a Map pattern to convert a string to a List type."));
+      auto key_p = p->get_key_pattern().clone();
+      auto val_p = p->get_value_pattern().clone();
+      std::vector<std::string> vec(t.size());
+
+      unsigned int i=0;
+      for (auto &ti : t)
+        vec[i++] =
+          Convert<Key>::to_string(ti.first, key_p) +
+          p->get_key_value_separator()+
+          Convert<Val>::to_string(ti.second, val_p);
+
+      std::string s;
+      if (vec.size() > 0)
+        s = vec[0];
+      for (unsigned int i=1; i<vec.size(); ++i)
+        s += p->get_separator() + " " + vec[i];
+
+      Assert(p->match(s), ExcMessage("No match for " + s +
+                                     " with pattern " + p->description()));
+      return s;
+    }
+
+    /**
+     * Convert a string to a value, using the given pattern, or a default one.
+     */
+    static type  to_value(const std::string &s,
+                          std::unique_ptr<PatternBase> pattern = Convert<type>::to_pattern())
+    {
+
+      AssertThrow(pattern->match(s), ExcMessage("No match for " + s +
+                                                " using pattern " + pattern->description()));
+
+      auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
+      AssertThrow(p, ExcMessage("I need a Map pattern to convert a string to a List type."));
+
+      auto key_p = p->get_key_pattern().clone();
+      auto val_p = p->get_value_pattern().clone();
+      type t;
+
+      auto v = Utilities::split_string_list(s,p->get_separator());
+      for (auto str : v)
+        {
+          auto key_val = Utilities::split_string_list(str, p->get_key_value_separator());
+          AssertDimension(key_val.size(), 2);
+          t[Convert<Key>::to_value(key_val[0], key_p)] = Convert<Val>::to_value(key_val[1]);
+        }
+
+      return t;
+    }
+  };
 
 }
 
