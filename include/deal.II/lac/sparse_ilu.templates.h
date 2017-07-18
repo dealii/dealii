@@ -59,8 +59,8 @@ void SparseILU<number>::initialize (const SparseMatrix<somenumber> &matrix,
   // translating in essence the algorithm given at the end of section 10.3.2,
   // using the names of variables used there
   const SparsityPattern     &sparsity = this->get_sparsity_pattern();
-  const std::size_t *const ia    = sparsity.rowstart;
-  const size_type *const ja      = sparsity.colnums;
+  const std::size_t *const ia    = sparsity.rowstart.get();
+  const size_type *const ja      = sparsity.colnums.get();
 
   number *luval = this->SparseMatrix<number>::val.get();
 
@@ -147,9 +147,9 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
 
   const size_type N=dst.size();
   const std::size_t *const rowstart_indices
-    = this->get_sparsity_pattern().rowstart;
+    = this->get_sparsity_pattern().rowstart.get();
   const size_type *const column_numbers
-    = this->get_sparsity_pattern().colnums;
+    = this->get_sparsity_pattern().colnums.get();
 
   // solve LUx=b in two steps:
   // first Ly = b, then
@@ -221,9 +221,9 @@ void SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
 
   const size_type N=dst.size();
   const std::size_t *const rowstart_indices
-    = this->get_sparsity_pattern().rowstart;
+    = this->get_sparsity_pattern().rowstart.get();
   const size_type *const column_numbers
-    = this->get_sparsity_pattern().colnums;
+    = this->get_sparsity_pattern().colnums.get();
 
   // solve (LU)'x=b in two steps:
   // first U'y = b, then

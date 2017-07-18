@@ -714,8 +714,8 @@ ChunkSparseMatrix<number>::vmult_add (OutVector &dst,
                                            std::cref(*cols),
                                            std::placeholders::_1, std::placeholders::_2,
                                            val.get(),
-                                           cols->sparsity_pattern.rowstart,
-                                           cols->sparsity_pattern.colnums,
+                                           cols->sparsity_pattern.rowstart.get(),
+                                           cols->sparsity_pattern.colnums.get(),
                                            std::cref(src),
                                            std::ref(dst)),
                                 internal::SparseMatrix::minimum_parallel_grain_size/cols->chunk_size+1);
@@ -751,7 +751,7 @@ ChunkSparseMatrix<number>::Tvmult_add (OutVector &dst,
   // like in vmult_add, but don't keep an iterator into dst around since we're
   // not traversing it sequentially this time
   const number    *val_ptr    = val.get();
-  const size_type *colnum_ptr = cols->sparsity_pattern.colnums;
+  const size_type *colnum_ptr = cols->sparsity_pattern.colnums.get();
 
   for (size_type chunk_row=0; chunk_row<n_regular_chunk_rows; ++chunk_row)
     {
@@ -845,7 +845,7 @@ ChunkSparseMatrix<number>::matrix_norm_square (const Vector<somenumber> &v) cons
        n_chunk_rows);
 
   const number    *val_ptr    = val.get();
-  const size_type *colnum_ptr = cols->sparsity_pattern.colnums;
+  const size_type *colnum_ptr = cols->sparsity_pattern.colnums.get();
   typename Vector<somenumber>::const_iterator v_ptr = v.begin();
 
   for (size_type chunk_row=0; chunk_row<n_regular_chunk_rows; ++chunk_row)
@@ -953,7 +953,7 @@ ChunkSparseMatrix<number>::matrix_scalar_product (const Vector<somenumber> &u,
        n_chunk_rows);
 
   const number    *val_ptr    = val.get();
-  const size_type *colnum_ptr = cols->sparsity_pattern.colnums;
+  const size_type *colnum_ptr = cols->sparsity_pattern.colnums.get();
   typename Vector<somenumber>::const_iterator u_ptr = u.begin();
 
   for (size_type chunk_row=0; chunk_row<n_regular_chunk_rows; ++chunk_row)
@@ -1155,7 +1155,7 @@ ChunkSparseMatrix<number>::residual (Vector<somenumber>       &dst,
        n_chunk_rows);
 
   const number    *val_ptr    = val.get();
-  const size_type *colnum_ptr = cols->sparsity_pattern.colnums;
+  const size_type *colnum_ptr = cols->sparsity_pattern.colnums.get();
   typename Vector<somenumber>::iterator dst_ptr = dst.begin();
 
   for (size_type chunk_row=0; chunk_row<n_regular_chunk_rows; ++chunk_row)

@@ -135,9 +135,9 @@ void
 SparseLUDecomposition<number>::prebuild_lower_bound()
 {
   const size_type *const
-  column_numbers = this->get_sparsity_pattern().colnums;
+  column_numbers = this->get_sparsity_pattern().colnums.get();
   const std::size_t *const
-  rowstart_indices = this->get_sparsity_pattern().rowstart;
+  rowstart_indices = this->get_sparsity_pattern().rowstart.get();
   const size_type N = this->m();
 
   prebuilt_lower_bound.resize (N);
