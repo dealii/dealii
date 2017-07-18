@@ -97,14 +97,18 @@ TimeDependent::insert_timestep (const TimeStepBase *position,
   else
     {
       // inner time step
-      std::vector<SmartPointer<TimeStepBase,TimeDependent> >::iterator insert_position
+      const std::vector<SmartPointer<TimeStepBase,TimeDependent> >::iterator insert_position
         = std::find(timesteps.begin(), timesteps.end(), position);
+      // check iterators again to satisfy coverity: both insert_position and
+      // insert_position - 1 must be valid iterators
+      Assert(insert_position != timesteps.begin() &&
+             insert_position != timesteps.end(), ExcInternalError());
 
       (*(insert_position-1))->set_next_timestep (new_timestep);
       new_timestep->set_previous_timestep (*(insert_position-1));
       new_timestep->set_next_timestep (*insert_position);
       (*insert_position)->set_previous_timestep (new_timestep);
-    };
+    }
 
   // finally enter it into the
   // array
