@@ -31,8 +31,22 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <type_traits>
 #include <sstream>
+#include <deque>
+#include <forward_list>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <stack>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
+#include <type_traits>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -72,7 +86,7 @@ namespace PatternsTools
    * compatible with the List type. Adding more compatible types is a matter
    * of adding a specialization of this struct for the given type.
    */
-  template<class T>
+  template<class T, class Enable=void>
   struct RankInfo
   {
     typedef std::integral_constant<int, 0>::type vector_rank_type;
@@ -192,41 +206,76 @@ namespace PatternsTools
     }
   };
 
-  // Rank of vector types
-  template<template <class T1, class A1> class Container, class T, class Allocator>
-  struct RankInfo<Container<T,Allocator>>
+  //specialize a type for all of the STL containers and maps
+  namespace internal
   {
-    typedef typename std::integral_constant<int, RankInfo<T>::vector_rank_type::value+1>::type vector_rank_type;
+    template <typename T>       struct is_stl_container:std::false_type {};
+    template <typename T, std::size_t N> struct is_stl_container<std::array    <T,N>>    :std::true_type {};
+    template <typename... Args> struct is_stl_container<std::vector            <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_container<std::deque             <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_container<std::list              <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_container<std::forward_list      <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_container<std::set               <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_container<std::multiset          <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_container<std::unordered_set     <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_container<std::unordered_multiset<Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_container<std::stack             <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_container<std::queue             <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_container<std::priority_queue    <Args...>>:std::true_type {};
+
+    template <typename T>       struct is_stl_map:std::false_type {};
+    template <typename... Args> struct is_stl_map<std::map               <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_map<std::multimap          <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_map<std::unordered_map     <Args...>>:std::true_type {};
+    template <typename... Args> struct is_stl_map<std::unordered_multimap<Args...>>:std::true_type {};
+  }
+
+  //type trait to use the implementation type traits as well as decay the type
+  template <typename T> struct is_stl_container
+  {
+    static constexpr bool const value = internal::is_stl_container<std::decay_t<T>>::value;
+  };
+
+
+  template <typename T> struct is_stl_map
+  {
+    static constexpr bool const value = internal::is_stl_map<std::decay_t<T>>::value;
+  };
+
+
+  // Rank of vector types
+  template<class T>
+  struct RankInfo<T, typename std::enable_if<is_stl_container<T>::value>::type >
+  {
+    typedef typename std::integral_constant<int, RankInfo<typename T::value_type>::vector_rank_type::value+1>::type vector_rank_type;
     typedef typename std::integral_constant<int, 0>::type map_rank_type;
   };
 
 
-
-  // Rank of map types
-  template<template <class _Key, class _T, class _Compare, class _Alloc> class MapType,
-           class Key, class Val, class Compare, class Alloc>
-  struct RankInfo<MapType<Key, Val, Compare, Alloc>>
+  // Rank of vector types
+  template<class T>
+  struct RankInfo<T, typename std::enable_if<is_stl_map<T>::value>::type >
   {
-    typedef typename std::integral_constant<int, std::max(RankInfo<Key>::vector_rank_type::value,
-                                                          RankInfo<Val>::vector_rank_type::value)+1>::type vector_rank_type;
-    typedef typename std::integral_constant<int, std::max(RankInfo<Key>::map_rank_type::value,
-                                                          RankInfo<Val>::map_rank_type::value)+1>::type map_rank_type;
+    typedef typename std::integral_constant<int, std::max(RankInfo<typename T::key_type>::vector_rank_type::value,
+                                                          RankInfo<typename T::value_type>::vector_rank_type::value)+1>::type vector_rank_type;
+    typedef typename std::integral_constant<int, std::max(RankInfo<typename T::key_type>::map_rank_type::value,
+                                                          RankInfo<typename T::value_type>::map_rank_type::value)+1>::type map_rank_type;
   };
 
 
 
-  template<template <class T1, class A1> class Container, class T, class Allocator>
-  struct Convert<Container<T,Allocator>>
+  template<class T>
+  struct Convert<T, typename std::enable_if<is_stl_container<T>::value>::type>
   {
     static std::unique_ptr<PatternBase> to_pattern()
     {
-      return std_cxx14::make_unique<List>(*Convert<T>::to_pattern(),
+      return std_cxx14::make_unique<List>(*Convert<typename T::value_type>::to_pattern(),
                                           0, std::numeric_limits<unsigned int>::max(),
-                                          default_list_separator(RankInfo<Container<T,Allocator>>::vector_rank_type::value));
+                                          default_list_separator(RankInfo<T>::vector_rank_type::value));
     }
 
-    static std::string to_string(const Container<T,Allocator> &t,
-                                 const std::unique_ptr<PatternBase> &pattern = Convert<Container<T,Allocator>>::to_pattern())
+    static std::string to_string(const T &t,
+                                 const std::unique_ptr<PatternBase> &pattern = Convert<T>::to_pattern())
     {
 
       auto p = dynamic_cast<const Patterns::List *>(pattern.get());
@@ -236,7 +285,7 @@ namespace PatternsTools
 
       unsigned int i=0;
       for (auto &ti : t)
-        vec[i++] = Convert<T>::to_string(ti, base_p);
+        vec[i++] = Convert<typename T::value_type>::to_string(ti, base_p);
 
       std::string s;
       if (vec.size() > 0)
@@ -252,8 +301,8 @@ namespace PatternsTools
     /**
      * Convert a string to a value, using the given pattern, or a default one.
      */
-    static Container<T,Allocator>  to_value(const std::string &s,
-                                            const std::unique_ptr<PatternBase> &pattern = Convert<Container<T,Allocator>>::to_pattern())
+    static T to_value(const std::string &s,
+                      const std::unique_ptr<PatternBase> &pattern = Convert<T>::to_pattern())
     {
 
       AssertThrow(pattern->match(s), ExcMessage("No match for " + s +
@@ -263,35 +312,32 @@ namespace PatternsTools
       AssertThrow(p, ExcMessage("I need a List pattern to convert a string to a List type."));
 
       auto base_p = p->get_base_pattern().clone();
-      Container<T,Allocator> t;
+      T t;
 
       auto v = Utilities::split_string_list(s,p->get_separator());
       for (auto str : v)
-        t.insert(t.end(), Convert<T>::to_value(str, base_p));
+        t.insert(t.end(), Convert<typename T::value_type>::to_value(str, base_p));
 
       return t;
     }
   };
 
 
-  template<template <class _Key, class _T, class _Compare, class _Alloc> class MapType,
-           class Key, class Val, class Compare, class Alloc>
-  struct Convert<MapType<Key, Val, Compare, Alloc>>
+  template <class T>
+  struct Convert<T, typename std::enable_if<is_stl_map<T>::value>::type>
   {
-    typedef MapType<Key, Val, Compare, Alloc> type;
-
     static std::unique_ptr<PatternBase> to_pattern()
     {
-      return std_cxx14::make_unique<Map>(*Convert<Key>::to_pattern(),
-                                         *Convert<Val>::to_pattern(),
+      return std_cxx14::make_unique<Map>(*Convert<typename T::key_type>::to_pattern(),
+                                         *Convert<typename T::mapped_type>::to_pattern(),
                                          0, std::numeric_limits<unsigned int>::max(),
-                                         default_list_separator(RankInfo<MapType<Key, Val, Compare, Alloc>>::vector_rank_type::value),
-                                         default_map_separator(RankInfo<MapType<Key, Val, Compare, Alloc>>::map_rank_type::value)
+                                         default_list_separator(RankInfo<T>::vector_rank_type::value),
+                                         default_map_separator(RankInfo<T>::map_rank_type::value)
                                         );
     }
 
-    static std::string to_string(const type &t,
-                                 std::unique_ptr<PatternBase> pattern = Convert<type>::to_pattern())
+    static std::string to_string(const T &t,
+                                 const std::unique_ptr<PatternBase> &pattern = Convert<T>::to_pattern())
     {
 
       auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
@@ -303,9 +349,9 @@ namespace PatternsTools
       unsigned int i=0;
       for (auto &ti : t)
         vec[i++] =
-          Convert<Key>::to_string(ti.first, key_p) +
+          Convert<typename T::key_type>::to_string(ti.first, key_p) +
           p->get_key_value_separator()+
-          Convert<Val>::to_string(ti.second, val_p);
+          Convert<typename T::mapped_type>::to_string(ti.second, val_p);
 
       std::string s;
       if (vec.size() > 0)
@@ -321,8 +367,8 @@ namespace PatternsTools
     /**
      * Convert a string to a value, using the given pattern, or a default one.
      */
-    static type  to_value(const std::string &s,
-                          std::unique_ptr<PatternBase> pattern = Convert<type>::to_pattern())
+    static T  to_value(const std::string &s,
+                       const std::unique_ptr<PatternBase> &pattern = Convert<T>::to_pattern())
     {
 
       AssertThrow(pattern->match(s), ExcMessage("No match for " + s +
@@ -333,14 +379,15 @@ namespace PatternsTools
 
       auto key_p = p->get_key_pattern().clone();
       auto val_p = p->get_value_pattern().clone();
-      type t;
+      T t;
 
       auto v = Utilities::split_string_list(s,p->get_separator());
       for (auto str : v)
         {
           auto key_val = Utilities::split_string_list(str, p->get_key_value_separator());
           AssertDimension(key_val.size(), 2);
-          t[Convert<Key>::to_value(key_val[0], key_p)] = Convert<Val>::to_value(key_val[1]);
+          t[Convert<typename T::key_type>::to_value(key_val[0], key_p)] =
+            Convert<typename T::mapped_type>::to_value(key_val[1]);
         }
 
       return t;
