@@ -37,7 +37,6 @@ DEAL_II_NAMESPACE_OPEN
 class LogStream;
 class MultipleParameterLoop;
 
-
 /**
  * Namespace for a few classes that act as patterns for the ParameterHandler
  * class. These classes implement an interface that checks whether a parameter
@@ -413,6 +412,17 @@ namespace Patterns
           const unsigned int  min_elements = 0,
           const unsigned int  max_elements = max_int_value,
           const std::string  &separator = ",");
+
+
+    /**
+     * Return the internally stored separator.
+     */
+    const std::string &get_separator() const;
+
+    /**
+     * Return the internally stored base pattern.
+     */
+    const PatternBase &get_base_pattern() const;
 
     /**
      * Copy constructor.

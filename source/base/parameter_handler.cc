@@ -599,6 +599,19 @@ namespace Patterns
   {}
 
 
+  const std::string &List::get_separator() const
+  {
+    return separator;
+  }
+
+
+
+  const PatternBase &List::get_base_pattern() const
+  {
+    return *pattern;
+  }
+
+
 
   bool List::match (const std::string &test_string_list) const
   {
