@@ -924,6 +924,32 @@ namespace Patterns
 
 
 
+  const PatternBase &Map::get_key_pattern() const
+  {
+    return *key_pattern;
+  }
+
+
+
+  const PatternBase &Map::get_value_pattern() const
+  {
+    return *value_pattern;
+  }
+
+
+
+  const std::string &Map::get_separator() const
+  {
+    return separator;
+  }
+
+
+  const std::string &Map::get_key_value_separator() const
+  {
+    return key_value_separator;
+  }
+
+
   const char *MultipleSelection::description_init = "[MultipleSelection";
 
 

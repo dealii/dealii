@@ -579,6 +579,26 @@ namespace Patterns
     std::size_t memory_consumption () const;
 
     /**
+     * Return a reference to the key pattern.
+     */
+    const PatternBase &get_key_pattern() const;
+
+    /**
+     * Return a reference to the value pattern.
+     */
+    const PatternBase &get_value_pattern() const;
+
+    /**
+     * Return the separator of the map entries.
+     */
+    const std::string &get_separator() const;
+
+    /**
+     * Return the key-value separator.
+     */
+    const std::string &get_key_value_separator() const;
+
+    /**
      * @addtogroup Exceptions
      * @{
      */
