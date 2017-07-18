@@ -45,6 +45,7 @@ SET(_src
   parsed_function.cc
   partitioner.cc
   path_search.cc
+  patterns_tools.cc
   polynomial.cc
   polynomials_abf.cc
   polynomials_adini.cc
