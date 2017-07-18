@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
 
 //TODO[WB]: various functions here could be simplified by using namespace Utilities
 
-namespace Patterns
+namespace PatternsTools
 {
 
 
