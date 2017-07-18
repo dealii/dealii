@@ -3410,13 +3410,13 @@ namespace parallel
      * on the given multigrid level
      */
     template <int dim, int spacedim>
-    void
+    std::map<unsigned int, std::set<dealii::types::subdomain_id> >
     Triangulation<dim,spacedim>::
-    fill_level_vertices_with_ghost_neighbors
-    (const int level,
-     std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &vertices_with_ghost_neighbors)
+    compute_level_vertices_with_ghost_neighbors (const int level) const
     {
+      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      vertices_with_ghost_neighbors;
+
       const std::vector<bool> locally_active_vertices =
         mark_locally_active_vertices_on_level(level);
       cell_iterator cell = this->begin(level),
@@ -3462,14 +3462,16 @@ namespace parallel
                 }
             }
         }
+
+      return vertices_with_ghost_neighbors;
     }
 
 
 
     template <int dim, int spacedim>
     std::vector<bool>
-    Triangulation<dim,spacedim>
-    ::mark_locally_active_vertices_on_level (const int level) const
+    Triangulation<dim,spacedim>::
+    mark_locally_active_vertices_on_level (const int level) const
     {
       Assert (dim>1, ExcNotImplemented());
 
@@ -3910,14 +3912,13 @@ namespace parallel
     }
 
     template <int spacedim>
-    void
+    std::map<unsigned int, std::set<dealii::types::subdomain_id> >
     Triangulation<1,spacedim>::
-    fill_level_vertices_with_ghost_neighbors
-    (const unsigned int /*level*/,
-     std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-     &/*vertices_with_ghost_neighbors*/)
+    compute_level_vertices_with_ghost_neighbors (const unsigned int /*level*/) const
     {
       Assert (false, ExcNotImplemented());
+
+      return std::map<unsigned int, std::set<dealii::types::subdomain_id> >();
     }
 
     template <int spacedim>

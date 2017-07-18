@@ -866,15 +866,12 @@ namespace parallel
       compute_vertices_with_ghost_neighbors () const;
 
       /**
-       * Fills a map that, for each vertex, lists all the processors whose
+       * Return a map that, for each vertex, lists all the processors whose
        * subdomains are adjacent to that vertex on the given level for the
        * multigrid hierarchy. Used by DoFHandler::Policy::ParallelDistributed.
        */
-      void
-      fill_level_vertices_with_ghost_neighbors
-      (const int level,
-       std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-       &vertices_with_ghost_neighbors);
+      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      compute_level_vertices_with_ghost_neighbors (const int level) const;
 
       /**
        * This method returns a bit vector of length tria.n_vertices()
@@ -994,11 +991,8 @@ namespace parallel
        * Like above, this method, which is only implemented for dim = 2 or 3,
        * needs a stub because it is used in dof_handler_policy.cc
        */
-      void
-      fill_level_vertices_with_ghost_neighbors
-      (const unsigned int level,
-       std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-       &vertices_with_ghost_neighbors);
+      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      compute_level_vertices_with_ghost_neighbors (const unsigned int level) const;
 
       /**
        * Like above, this method, which is only implemented for dim = 2 or 3,
