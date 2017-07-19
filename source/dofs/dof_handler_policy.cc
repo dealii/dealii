@@ -3984,7 +3984,12 @@ namespace internal
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        NumberCache number_cache;
+        parallel::distributed::Triangulation< dim, spacedim > *triangulation
+          = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
+             (const_cast<dealii::Triangulation< dim, spacedim >*>
+              (&dof_handler->get_triangulation())));
+        Assert (triangulation != nullptr, ExcInternalError());
+
 
         // First figure out the new set of locally owned DoF indices.
         // If we own no DoFs, we still need to go through this function,
@@ -3994,19 +3999,17 @@ namespace internal
         // efficient if the set of indices is already sorted because
         // it can then insert ranges instead of individual elements.
         // consequently, pre-sort the array of new indices
-        number_cache.n_locally_owned_dofs = dof_handler->n_locally_owned_dofs();
-        number_cache.locally_owned_dofs = IndexSet (dof_handler->n_dofs());
+        IndexSet my_locally_owned_dofs (dof_handler->n_dofs());
         if (dof_handler->n_locally_owned_dofs() > 0)
           {
             std::vector<dealii::types::global_dof_index> new_numbers_sorted = new_numbers;
             std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
 
-            number_cache.locally_owned_dofs.add_indices (new_numbers_sorted.begin(),
-                                                         new_numbers_sorted.end());
-            number_cache.locally_owned_dofs.compress();
+            my_locally_owned_dofs.add_indices (new_numbers_sorted.begin(),
+                                               new_numbers_sorted.end());
+            my_locally_owned_dofs.compress();
 
-            Assert (number_cache.locally_owned_dofs.n_elements() ==
-                    new_numbers.size(),
+            Assert (my_locally_owned_dofs.n_elements() == new_numbers.size(),
                     ExcInternalError());
           }
 
@@ -4091,23 +4094,33 @@ namespace internal
           triangulation->load_user_flags(user_flags);
         }
 
-          // * Create global_dof_indexsets by transferring our own owned_dofs
-          // to every other machine.
-          const unsigned int n_cpus = Utilities::MPI::n_mpi_processes (triangulation->get_communicator());
-
-          // Serialize our IndexSet and determine size.
+        // the last step is to update the NumberCache, including knowing which
+        // processor owns which DoF index. this requires communication.
+        //
+        // this step is substantially more complicated than it is in
+        // distribute_dofs() because the IndexSets of locally owned DoFs
+        // after renumbering may not be contiguous any more. for
+        // distribute_dofs() it was enough to exchange the starting
+        // indices for each processor and the global number of DoFs,
+        // but here we actually have to serialize the IndexSet
+        // objects and shop them across the network.
+        const unsigned int n_cpus = Utilities::MPI::n_mpi_processes (triangulation->get_communicator());
+        std::vector<IndexSet> locally_owned_dofs_per_processor(n_cpus,
+                                                               IndexSet(dof_handler->n_dofs()));
+        {
+          // Serialize our IndexSet
           std::ostringstream oss;
-          number_cache.locally_owned_dofs.block_write(oss);
-          std::string oss_str=oss.str();
-          std::vector<char> my_data(oss_str.begin(), oss_str.end());
-          unsigned int my_size = oss_str.size();
+          my_locally_owned_dofs.block_write(oss);
+          std::string oss_str = oss.str();
+          std::vector<char> my_data (oss_str.begin(), oss_str.end());
 
           // determine maximum size of IndexSet
           const unsigned int max_size
-            = Utilities::MPI::max (my_size, triangulation->get_communicator());
+            = Utilities::MPI::max (oss_str.size(), triangulation->get_communicator());
 
-          // as we are reading past the end, we need to increase the size of
-          // the local buffer. This is filled with zeros.
+          // as the MPI_Allgather call will be reading max_size elements, and
+          // as this may be past the end of my_data, we need to increase the
+          // size of the local buffer. This is filled with zeros.
           my_data.resize(max_size);
 
           std::vector<char> buffer(max_size*n_cpus);
@@ -4116,32 +4129,22 @@ namespace internal
                                          triangulation->get_communicator());
           AssertThrowMPI(ierr);
 
-          number_cache.locally_owned_dofs_per_processor.resize (n_cpus);
-          number_cache.n_locally_owned_dofs_per_processor.resize (n_cpus);
           for (unsigned int i=0; i<n_cpus; ++i)
-            {
-              std::stringstream strstr;
-              strstr.write(&buffer[i*max_size], max_size);
-              // This does not read the whole buffer, when the size is smaller
-              // than max_size. Therefore we need to create a new stringstream
-              // in each iteration (resetting would be fine too).
-              number_cache.locally_owned_dofs_per_processor[i]
-              .block_read(strstr);
-              number_cache.n_locally_owned_dofs_per_processor[i]
-                = number_cache.locally_owned_dofs_per_processor[i].n_elements();
-            }
+            if (i == Utilities::MPI::this_mpi_process (triangulation->get_communicator()))
+              locally_owned_dofs_per_processor[i] = my_locally_owned_dofs;
+            else
+              {
+                // copy the data previously received into a stringstream
+                // object and then read the IndexSet from it
+                std::stringstream strstr;
+                strstr.write(&buffer[i*max_size], max_size);
 
-          number_cache.n_global_dofs
-            = std::accumulate (number_cache
-                               .n_locally_owned_dofs_per_processor.begin(),
-                               number_cache
-                               .n_locally_owned_dofs_per_processor.end(),
-                               static_cast<dealii::types::global_dof_index>(0));
-
-          triangulation->load_user_flags(user_flags);
+                locally_owned_dofs_per_processor[i].block_read(strstr);
+              }
         }
 
-        return number_cache;
+        return NumberCache (locally_owned_dofs_per_processor,
+                            Utilities::MPI::this_mpi_process (triangulation->get_communicator()));
 #endif
       }
 
