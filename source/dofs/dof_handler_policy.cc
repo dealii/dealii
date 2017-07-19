@@ -4050,15 +4050,15 @@ namespace internal
 
         // communication
         {
-          parallel::distributed::Triangulation< dim, spacedim > *tr
+          parallel::distributed::Triangulation< dim, spacedim > *triangulation
             = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
                (const_cast<dealii::Triangulation< dim, spacedim >*>
                 (&dof_handler->get_triangulation())));
-          Assert (tr != nullptr, ExcInternalError());
+          Assert (triangulation != nullptr, ExcInternalError());
 
           std::vector<bool> user_flags;
-          tr->save_user_flags(user_flags);
-          tr->clear_user_flags ();
+          triangulation->save_user_flags(user_flags);
+          triangulation->clear_user_flags ();
 
           // mark all own cells for transfer
           typename DoFHandlerType::active_cell_iterator
@@ -4071,25 +4071,25 @@ namespace internal
           // interesting neighbors
           const std::map<unsigned int, std::set<dealii::types::subdomain_id> >
           vertices_with_ghost_neighbors
-            = tr->compute_vertices_with_ghost_neighbors ();
+            = triangulation->compute_vertices_with_ghost_neighbors ();
 
           // Send and receive cells. After this, only the local cells are
           // marked, that received new data. This has to be communicated in a
           // second communication step.
           communicate_dof_indices_on_marked_cells (*dof_handler,
                                                    vertices_with_ghost_neighbors,
-                                                   tr->coarse_cell_to_p4est_tree_permutation,
-                                                   tr->p4est_tree_to_coarse_cell_permutation);
+                                                   triangulation->coarse_cell_to_p4est_tree_permutation,
+                                                   triangulation->p4est_tree_to_coarse_cell_permutation);
 
           communicate_dof_indices_on_marked_cells (*dof_handler,
                                                    vertices_with_ghost_neighbors,
-                                                   tr->coarse_cell_to_p4est_tree_permutation,
-                                                   tr->p4est_tree_to_coarse_cell_permutation);
+                                                   triangulation->coarse_cell_to_p4est_tree_permutation,
+                                                   triangulation->p4est_tree_to_coarse_cell_permutation);
 
 
           // * Create global_dof_indexsets by transferring our own owned_dofs
           // to every other machine.
-          const unsigned int n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
+          const unsigned int n_cpus = Utilities::MPI::n_mpi_processes (triangulation->get_communicator());
 
           // Serialize our IndexSet and determine size.
           std::ostringstream oss;
@@ -4100,7 +4100,7 @@ namespace internal
 
           // determine maximum size of IndexSet
           const unsigned int max_size
-            = Utilities::MPI::max (my_size, tr->get_communicator());
+            = Utilities::MPI::max (my_size, triangulation->get_communicator());
 
           // as we are reading past the end, we need to increase the size of
           // the local buffer. This is filled with zeros.
@@ -4109,7 +4109,7 @@ namespace internal
           std::vector<char> buffer(max_size*n_cpus);
           const int ierr = MPI_Allgather(&my_data[0], max_size, MPI_BYTE,
                                          &buffer[0], max_size, MPI_BYTE,
-                                         tr->get_communicator());
+                                         triangulation->get_communicator());
           AssertThrowMPI(ierr);
 
           number_cache.locally_owned_dofs_per_processor.resize (n_cpus);
@@ -4134,7 +4134,7 @@ namespace internal
                                .n_locally_owned_dofs_per_processor.end(),
                                static_cast<dealii::types::global_dof_index>(0));
 
-          tr->load_user_flags(user_flags);
+          triangulation->load_user_flags(user_flags);
         }
 
         return number_cache;
