@@ -4010,31 +4010,34 @@ namespace internal
                     ExcInternalError());
           }
 
-        // mark not locally active DoFs as invalid
+        // delete all knowledge of DoF indices that are not locally
+        // owned. we do so by getting DoF indices on cells, checking
+        // whether they are locally owned, if not, setting them to
+        // an invalid value, and then setting them again on the current
+        // cell
+        //
+        // DoFs we (i) know about, and (ii) don't own locally must be located
+        // either on ghost cells, or on the interface between a locally
+        // owned cell and a ghost cell. In any case, it is sufficient
+        // to kill them only from the ghost side cell, so loop only over
+        // ghost cells
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-          typename DoFHandlerType::active_cell_iterator
-          cell = dof_handler->begin_active(),
-          endc = dof_handler->end();
-
-          for (; cell != endc; ++cell)
-            if (!cell->is_artificial())
+          for (auto cell : dof_handler->active_cell_iterators())
+            if (cell->is_ghost())
               {
                 local_dof_indices.resize (cell->get_fe().dofs_per_cell);
                 cell->get_dof_indices (local_dof_indices);
-                for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-                  {
-                    if (local_dof_indices[i] == numbers::invalid_dof_index)
-                      continue;
 
-                    if (!dof_handler->locally_owned_dofs().is_element(local_dof_indices[i]))
-                      {
-                        //this DoF is not owned by us, so set it to invalid.
-                        local_dof_indices[i]
-                          = numbers::invalid_dof_index;
-                      }
-                  }
+                for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+                  // delete a DoF index if it has not already been deleted
+                  // (e.g., by visiting a neighboring cell, if it is on the
+                  // boundary), and if we don't own it
+                  if ((local_dof_indices[i] != numbers::invalid_dof_index)
+                      &&
+                      (!dof_handler->locally_owned_dofs().is_element(local_dof_indices[i])))
+                    local_dof_indices[i] = numbers::invalid_dof_index;
 
                 cell->set_dof_indices (local_dof_indices);
               }
