@@ -3276,12 +3276,12 @@ namespace internal
           Assert (false, ExcNotImplemented());
 #else
 
-          const parallel::distributed::Triangulation< dim, spacedim > *tr
+          const parallel::distributed::Triangulation<dim, spacedim> *triangulation
             = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
                (&dof_handler.get_triangulation()));
-          Assert (tr != nullptr, ExcInternalError());
+          Assert (triangulation != nullptr, ExcInternalError());
 
-          // now collect cells and their dof_indices for the
+          // first, collect cells and their dof_indices to send to
           // interested neighbors
           typedef
           std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>
@@ -3297,7 +3297,7 @@ namespace internal
               internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
               fill_dofindices_recursively<dim,spacedim>
-              (*tr,
+              (*triangulation,
                coarse_cell_to_p4est_tree_permutation[cell->index()],
                cell,
                p4est_coarse_cell,
@@ -3306,9 +3306,9 @@ namespace internal
             }
 
 
-          // sending
+          // step 1: send data to all owners of ghost cells
           std::vector<std::vector<char> > sendbuffers (needs_to_get_cells.size());
-          std::vector<MPI_Request> requests (needs_to_get_cells.size());
+          std::vector<MPI_Request> send_requests (needs_to_get_cells.size());
 
           unsigned int                              idx    = 0;
           std::vector<std::vector<char> >::iterator buffer = sendbuffers.begin();
@@ -3316,11 +3316,10 @@ namespace internal
                it!=needs_to_get_cells.end();
                ++it, ++buffer, ++idx)
             {
-              const unsigned int num_cells = it->second.tree_index.size();
-              (void)num_cells;
-
-              Assert(num_cells==it->second.quadrants.size(), ExcInternalError());
-              Assert(num_cells>0, ExcInternalError());
+              Assert(it->second.tree_index.size() > 0,
+                     ExcInternalError());
+              Assert(it->second.tree_index.size() == it->second.quadrants.size(),
+                     ExcInternalError());
 
               // pack all the data into the buffer for this recipient
               // and send it. keep data around till we can make sure
@@ -3328,7 +3327,8 @@ namespace internal
               *buffer = it->second.pack_data ();
               const int ierr = MPI_Isend(&(*buffer)[0], buffer->size(),
                                          MPI_BYTE, it->first,
-                                         123, tr->get_communicator(), &requests[idx]);
+                                         123, triangulation->get_communicator(),
+                                         &send_requests[idx]);
               AssertThrowMPI(ierr);
             }
 
@@ -3365,13 +3365,13 @@ namespace internal
           }
 
 
-          //* 5. receive ghostcelldata
+          // step 2: receive ghost cell data
           std::vector<char> receive;
           for (unsigned int i=0; i<senders.size(); ++i)
             {
               MPI_Status status;
               int len;
-              int ierr = MPI_Probe(MPI_ANY_SOURCE, 123, tr->get_communicator(), &status);
+              int ierr = MPI_Probe(MPI_ANY_SOURCE, 123, triangulation->get_communicator(), &status);
               AssertThrowMPI(ierr);
               ierr = MPI_Get_count(&status, MPI_BYTE, &len);
               AssertThrowMPI(ierr);
@@ -3379,7 +3379,7 @@ namespace internal
 
               char *ptr = &receive[0];
               ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
-                              tr->get_communicator(), &status);
+                              triangulation->get_communicator(), &status);
               AssertThrowMPI(ierr);
 
               CellDataTransferBuffer<dim> cell_data_transfer_buffer;
@@ -3392,7 +3392,7 @@ namespace internal
               // indices itself.
               for (unsigned int c=0; c<cells; ++c, dofs+=1+dofs[0])
                 {
-                  typename DoFHandler<dim,spacedim>::level_cell_iterator
+                  const typename DoFHandler<dim,spacedim>::level_cell_iterator
                   cell (&dof_handler.get_triangulation(),
                         0,
                         p4est_tree_to_coarse_cell_permutation[cell_data_transfer_buffer.tree_index[c]],
@@ -3403,7 +3403,7 @@ namespace internal
 
                   Assert(cell->get_fe().dofs_per_cell==dofs[0], ExcInternalError());
 
-                  set_dofindices_recursively<dim,spacedim> (*tr,
+                  set_dofindices_recursively<dim,spacedim> (*triangulation,
                                                             p4est_coarse_cell,
                                                             cell,
                                                             cell_data_transfer_buffer.quadrants[c],
@@ -3411,33 +3411,29 @@ namespace internal
                 }
             }
 
-          // complete all sends, so that we can safely destroy the
+          // finally update the cell DoF indices caches to make sure
+          // our internal data structures are consistent
+          update_all_active_cell_dof_indices_caches (dof_handler);
+
+
+          // wait for all Isends to complete, so that we can safely destroy the
           // buffers.
-          if (requests.size() > 0)
+          if (send_requests.size() > 0)
             {
-              const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+              const int ierr = MPI_Waitall(send_requests.size(), &send_requests[0],
+                                           MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
             }
 
 
-#ifdef DEBUG
-          {
-            // check all msgs got sent and received
-            unsigned int sum_send=0;
-            unsigned int sum_recv=0;
-            unsigned int sent=needs_to_get_cells.size();
-            unsigned int recv=senders.size();
 
-            int ierr = MPI_Allreduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
-            AssertThrowMPI(ierr);
-            ierr = MPI_Allreduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, tr->get_communicator());
-            AssertThrowMPI(ierr);
-            Assert(sum_send==sum_recv, ExcInternalError());
-          }
-#endif
-
-          // update dof index caches on all cells
-          update_all_active_cell_dof_indices_caches (dof_handler);
+          // check that all messages got sent and received
+          Assert (Utilities::MPI::sum (needs_to_get_cells.size(),
+                                       triangulation->get_communicator())
+                  ==
+                  Utilities::MPI::sum (senders.size(),
+                                       triangulation->get_communicator()),
+                  ExcInternalError());
 
           // have a barrier so that sends between two calls to this
           // function are not mixed up.
@@ -3445,11 +3441,14 @@ namespace internal
           // this is necessary because above we just see if there are
           // messages and then receive them, without discriminating
           // where they come from and whether they were sent in phase
-          // 1 or 2. the need for a global communication step like
-          // this barrier could be avoided by receiving messages
-          // specifically from those processors from which we expect
-          // messages, and by using different tags for phase 1 and 2
-          const int ierr = MPI_Barrier(tr->get_communicator());
+          // 1 or 2 (the function is called twice in a row). the need
+          // for a global communication step like this barrier could
+          // be avoided by receiving messages specifically from those
+          // processors from which we expect messages, and by using
+          // different tags for phase 1 and 2, but the cost of a
+          // barrier is negligible compared to everything else we do
+          // here
+          const int ierr = MPI_Barrier(triangulation->get_communicator());
           AssertThrowMPI(ierr);
 #endif
         }
@@ -3466,9 +3465,9 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
-      ParallelDistributed<dim,spacedim>::
-      ParallelDistributed (dealii::DoFHandler<dim,spacedim> &dof_handler)
+      template <typename DoFHandlerType>
+      ParallelDistributed<DoFHandlerType>::
+      ParallelDistributed (DoFHandlerType &dof_handler)
         :
         dof_handler (&dof_handler)
       {}
@@ -3478,47 +3477,63 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <typename DoFHandlerType>
       NumberCache
-      ParallelDistributed<dim, spacedim>::
+      ParallelDistributed<DoFHandlerType>::
       distribute_dofs () const
       {
-        NumberCache number_cache;
-
 #ifndef DEAL_II_WITH_P4EST
         Assert (false, ExcNotImplemented());
 #else
+        const unsigned int dim      = DoFHandlerType::dimension;
+        const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        parallel::distributed::Triangulation< dim, spacedim > *tr
+        parallel::distributed::Triangulation< dim, spacedim > *triangulation
           = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (const_cast<dealii::Triangulation< dim, spacedim >*>
               (&dof_handler->get_triangulation())));
-        Assert (tr != nullptr, ExcInternalError());
+        Assert (triangulation != nullptr, ExcInternalError());
 
         const unsigned int
-        n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
+        n_cpus = Utilities::MPI::n_mpi_processes (triangulation->get_communicator());
 
-        //* 1. distribute on own subdomain
+        /*
+           The following algorithm has a number of stages that are all documented
+           in the paper that describes the parallel::distributed functionality:
+
+           1/ locally enumerate dofs on locally owned cells
+           2/ un-numerate those that are on interfaces with ghost
+              cells and that we don't own based on the tie-breaking
+              criterion; re-enumerate the remaining ones. the
+              end result are that we only enumerate locally owned
+              DoFs
+           3/ shift indices so that each processor has a unique
+              range of indices
+           4/ for all locally owned cells that are ghost
+              cells somewhere else, send our own DoF indices
+              to the appropriate set of other processors
+         */
+
+        // --------- Phase 1: enumerate dofs on locally owned cells
         const dealii::types::global_dof_index n_initial_local_dofs =
-          Implementation::distribute_dofs (tr->locally_owned_subdomain(),
+          Implementation::distribute_dofs (triangulation->locally_owned_subdomain(),
                                            *dof_handler);
 
-        //* 2. iterate over ghostcells and kill dofs that are not
-        // owned by us
+        // --------- Phase 2: un-numerate dofs on interfaces to ghost cells
+        //                    that we don't own; re-enumerate the remaining ones
+
+        // start with the identity permutation of indices
         std::vector<dealii::types::global_dof_index> renumbering(n_initial_local_dofs);
-        for (unsigned int i=0; i<renumbering.size(); ++i)
+        for (dealii::types::global_dof_index i=0; i<renumbering.size(); ++i)
           renumbering[i] = i;
 
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-          typename DoFHandler<dim,spacedim>::active_cell_iterator
-          cell = dof_handler->begin_active(),
-          endc = dof_handler->end();
-
-          for (; cell != endc; ++cell)
-            if (cell->is_ghost() &&
-                (cell->subdomain_id() < tr->locally_owned_subdomain()))
+          for (auto cell : dof_handler->active_cell_iterators())
+            if (cell->is_ghost()
+                &&
+                (cell->subdomain_id() < triangulation->locally_owned_subdomain()))
               {
                 // we found a neighboring ghost cell whose subdomain
                 // is "stronger" than our own subdomain
@@ -3528,43 +3543,39 @@ namespace internal
                 // the interface)
                 local_dof_indices.resize (cell->get_fe().dofs_per_cell);
                 cell->get_dof_indices (local_dof_indices);
-                for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-                  if (local_dof_indices[i] != numbers::invalid_dof_index)
-                    renumbering[local_dof_indices[i]]
+                for (auto &local_dof_index : local_dof_indices)
+                  if (local_dof_index != numbers::invalid_dof_index)
+                    renumbering[local_dof_index]
                       = numbers::invalid_dof_index;
               }
         }
 
 
-        // make indices consecutive
-        number_cache.n_locally_owned_dofs = 0;
-        for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
-             it!=renumbering.end(); ++it)
-          if (*it != numbers::invalid_dof_index)
-            *it = number_cache.n_locally_owned_dofs++;
+        // make the remaining indices consecutive
+        dealii::types::global_dof_index n_locally_owned_dofs = 0;
+        for (auto &new_index : renumbering)
+          if (new_index != numbers::invalid_dof_index)
+            new_index = n_locally_owned_dofs++;
 
-        //* 3. communicate local dofcount and shift ids to make them
-        // unique
-        number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
+        // --------- Phase 3: shift indices so that each processor has a unique
+        //                    range of indices
+        std::vector<dealii::types::global_dof_index> n_locally_owned_dofs_per_processor(n_cpus);
 
-        const int ierr = MPI_Allgather ( &number_cache.n_locally_owned_dofs,
+        const int ierr = MPI_Allgather ( &n_locally_owned_dofs,
                                          1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                                         &number_cache.n_locally_owned_dofs_per_processor[0],
+                                         &n_locally_owned_dofs_per_processor[0],
                                          1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                                         tr->get_communicator());
+                                         triangulation->get_communicator());
         AssertThrowMPI(ierr);
 
         const dealii::types::global_dof_index
-        shift = std::accumulate (number_cache
-                                 .n_locally_owned_dofs_per_processor.begin(),
-                                 number_cache
-                                 .n_locally_owned_dofs_per_processor.begin()
-                                 + tr->locally_owned_subdomain(),
-                                 static_cast<dealii::types::global_dof_index>(0));
-        for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
-             it!=renumbering.end(); ++it)
-          if (*it != numbers::invalid_dof_index)
-            (*it) += shift;
+        my_shift = std::accumulate (n_locally_owned_dofs_per_processor.begin(),
+                                    n_locally_owned_dofs_per_processor.begin()
+                                    + triangulation->locally_owned_subdomain(),
+                                    static_cast<dealii::types::global_dof_index>(0));
+        for (auto &new_index : renumbering)
+          if (new_index != numbers::invalid_dof_index)
+            new_index += my_shift;
 
         // now re-enumerate all dofs to this shifted and condensed
         // numbering form.  we renumber some dofs as invalid, so
@@ -3573,90 +3584,88 @@ namespace internal
                                        *dof_handler, false);
 
         // now a little bit of housekeeping
-        number_cache.n_global_dofs
-          = std::accumulate (number_cache
-                             .n_locally_owned_dofs_per_processor.begin(),
-                             number_cache
-                             .n_locally_owned_dofs_per_processor.end(),
-                             static_cast<dealii::types::global_dof_index>(0));
+        const dealii::types::global_dof_index n_global_dofs
+          = std::accumulate (n_locally_owned_dofs_per_processor.begin(),
+                             n_locally_owned_dofs_per_processor.end(),
+                             dealii::types::global_dof_index(0));
 
-        number_cache.locally_owned_dofs = IndexSet(number_cache.n_global_dofs);
-        number_cache.locally_owned_dofs
-        .add_range(shift,
-                   shift+number_cache.n_locally_owned_dofs);
-        number_cache.locally_owned_dofs.compress();
-
-        // fill global_dof_indexsets
-        number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
+        std::vector<IndexSet> locally_owned_dofs_per_processor (n_cpus,
+                                                                IndexSet(n_global_dofs));
         {
-          dealii::types::global_dof_index lshift = 0;
+          dealii::types::global_dof_index current_shift = 0;
           for (unsigned int i=0; i<n_cpus; ++i)
             {
-              number_cache.locally_owned_dofs_per_processor[i]
-                = IndexSet(number_cache.n_global_dofs);
-              number_cache.locally_owned_dofs_per_processor[i]
-              .add_range(lshift,
-                         lshift +
-                         number_cache.n_locally_owned_dofs_per_processor[i]);
-              lshift += number_cache.n_locally_owned_dofs_per_processor[i];
+              locally_owned_dofs_per_processor[i]
+              .add_range(current_shift,
+                         current_shift +
+                         n_locally_owned_dofs_per_processor[i]);
+              current_shift += n_locally_owned_dofs_per_processor[i];
             }
         }
+        NumberCache number_cache (locally_owned_dofs_per_processor,
+                                  triangulation->locally_owned_subdomain());
         Assert(number_cache.locally_owned_dofs_per_processor
-               [tr->locally_owned_subdomain()].n_elements()
+               [triangulation->locally_owned_subdomain()].n_elements()
                ==
                number_cache.n_locally_owned_dofs,
                ExcInternalError());
         Assert(!number_cache.locally_owned_dofs_per_processor
-               [tr->locally_owned_subdomain()].n_elements()
+               [triangulation->locally_owned_subdomain()].n_elements()
                ||
                number_cache.locally_owned_dofs_per_processor
-               [tr->locally_owned_subdomain()].nth_index_in_set(0)
-               == shift,
+               [triangulation->locally_owned_subdomain()].nth_index_in_set(0)
+               == my_shift,
                ExcInternalError());
 
-        //* 4. send dofids of cells that are ghostcells on other
-        // machines
+        // this ends the phase where we enumerate degrees of freedom on
+        // each processor. what is missing is communicating DoF indices
+        // on ghost cells
 
-        std::vector<bool> user_flags;
-        tr->save_user_flags(user_flags);
-        tr->clear_user_flags ();
+        // --------- Phase 4: for all locally owned cells that are ghost
+        //                    cells somewhere else, send our own DoF indices
+        //                    to the appropriate set of other processors
+        {
+          std::vector<bool> user_flags;
+          triangulation->save_user_flags(user_flags);
+          triangulation->clear_user_flags ();
 
-        // mark all own cells for transfer
-        for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof_handler->begin_active();
-             cell != dof_handler->end(); ++cell)
-          if (!cell->is_artificial())
-            cell->set_user_flag();
+          // mark all own cells for transfer
+          for (auto cell : dof_handler->active_cell_iterators())
+            if (!cell->is_artificial())
+              cell->set_user_flag();
 
-        // add each ghostcell's subdomain to the vertex and keep track
-        // of interesting neighbors
-        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-        vertices_with_ghost_neighbors;
-
-        tr->fill_vertices_with_ghost_neighbors (vertices_with_ghost_neighbors);
+          // figure out which cells are ghost cells on which we have
+          // to exchange DoF indices
+          const std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+          vertices_with_ghost_neighbors
+            = triangulation->compute_vertices_with_ghost_neighbors ();
 
 
-        // Send and receive cells. After this, only the local cells
-        // are marked, that received new data. This has to be
-        // communicated in a second communication step.
-        communicate_dof_indices_on_marked_cells (*dof_handler,
-                                                 vertices_with_ghost_neighbors,
-                                                 tr->coarse_cell_to_p4est_tree_permutation,
-                                                 tr->p4est_tree_to_coarse_cell_permutation);
+          // Send and receive cells. After this, only the local cells
+          // are marked, that received new data. This has to be
+          // communicated in a second communication step.
+          //
+          // as explained in the 'distributed' paper, this has to be
+          // done twice
+          communicate_dof_indices_on_marked_cells (*dof_handler,
+                                                   vertices_with_ghost_neighbors,
+                                                   triangulation->coarse_cell_to_p4est_tree_permutation,
+                                                   triangulation->p4est_tree_to_coarse_cell_permutation);
 
-        communicate_dof_indices_on_marked_cells (*dof_handler,
-                                                 vertices_with_ghost_neighbors,
-                                                 tr->coarse_cell_to_p4est_tree_permutation,
-                                                 tr->p4est_tree_to_coarse_cell_permutation);
+          communicate_dof_indices_on_marked_cells (*dof_handler,
+                                                   vertices_with_ghost_neighbors,
+                                                   triangulation->coarse_cell_to_p4est_tree_permutation,
+                                                   triangulation->p4est_tree_to_coarse_cell_permutation);
 
-        tr->load_user_flags(user_flags);
+          triangulation->load_user_flags(user_flags);
+        }
 
 #ifdef DEBUG
         // check that we are really done
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-          for (typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof_handler->begin_active();
-               cell != dof_handler->end(); ++cell)
+          for (auto cell : dof_handler->active_cell_iterators())
             if (!cell->is_artificial())
               {
                 local_dof_indices.resize (cell->get_fe().dofs_per_cell);
@@ -3685,38 +3694,40 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <typename DoFHandlerType>
       std::vector<NumberCache>
-      ParallelDistributed<dim, spacedim>::
+      ParallelDistributed<DoFHandlerType>::
       distribute_mg_dofs () const
       {
 #ifndef DEAL_II_WITH_P4EST
         Assert (false, ExcNotImplemented());
         return std::vector<NumberCache>();
 #else
+        const unsigned int dim      = DoFHandlerType::dimension;
+        const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        parallel::distributed::Triangulation< dim, spacedim > *tr
+        parallel::distributed::Triangulation< dim, spacedim > *triangulation
           = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (const_cast<dealii::Triangulation< dim, spacedim >*>
               (&dof_handler->get_triangulation())));
-        Assert (tr != nullptr, ExcInternalError());
+        Assert (triangulation != nullptr, ExcInternalError());
 
         AssertThrow(
-          (tr->settings & parallel::distributed::Triangulation< dim, spacedim >::construct_multigrid_hierarchy),
+          (triangulation->settings & parallel::distributed::Triangulation< dim, spacedim >::construct_multigrid_hierarchy),
           ExcMessage("Multigrid DoFs can only be distributed on a parallel "
                      "Triangulation if the flag construct_multigrid_hierarchy "
                      "is set in the constructor."));
 
 
         const unsigned int
-        n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
+        n_cpus = Utilities::MPI::n_mpi_processes (triangulation->get_communicator());
 
         // loop over all levels that exist globally (across all
         // processors), even if the current processor does not in fact
         // have any cells on that level or if the local part of the
         // Triangulation has fewer levels. we need to do this because
         // we need to communicate across all processors on all levels
-        const unsigned int n_levels = tr->n_global_levels();
+        const unsigned int n_levels = triangulation->n_global_levels();
         std::vector<NumberCache> number_caches;
         number_caches.reserve(n_levels);
         for (unsigned int level = 0; level < n_levels; ++level)
@@ -3725,7 +3736,7 @@ namespace internal
 
             //* 1. distribute on own subdomain
             const unsigned int n_initial_local_dofs =
-              Implementation::distribute_dofs_on_level(tr->locally_owned_subdomain(),
+              Implementation::distribute_dofs_on_level(triangulation->locally_owned_subdomain(),
                                                        *dof_handler,
                                                        level);
 
@@ -3735,17 +3746,17 @@ namespace internal
             for (dealii::types::global_dof_index i=0; i<renumbering.size(); ++i)
               renumbering[i] = i;
 
-            if (level < tr->n_levels())
+            if (level < triangulation->n_levels())
               {
                 std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-                typename DoFHandler<dim,spacedim>::level_cell_iterator
+                typename DoFHandlerType::level_cell_iterator
                 cell = dof_handler->begin(level),
                 endc = dof_handler->end(level);
 
                 for (; cell != endc; ++cell)
                   if (cell->level_subdomain_id()!=numbers::artificial_subdomain_id &&
-                      (cell->level_subdomain_id() < tr->locally_owned_subdomain()))
+                      (cell->level_subdomain_id() < triangulation->locally_owned_subdomain()))
                     {
                       // we found a neighboring ghost cell whose
                       // subdomain is "stronger" than our own
@@ -3779,7 +3790,7 @@ namespace internal
                                        1, DEAL_II_DOF_INDEX_MPI_TYPE,
                                        &level_number_cache.n_locally_owned_dofs_per_processor[0],
                                        1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                                       tr->get_communicator());
+                                       triangulation->get_communicator());
             AssertThrowMPI(ierr);
 
             const dealii::types::global_dof_index
@@ -3787,7 +3798,7 @@ namespace internal
                                      .n_locally_owned_dofs_per_processor.begin(),
                                      level_number_cache
                                      .n_locally_owned_dofs_per_processor.begin()
-                                     + tr->locally_owned_subdomain(),
+                                     + triangulation->locally_owned_subdomain(),
                                      static_cast<dealii::types::global_dof_index>(0));
             for (std::vector<dealii::types::global_dof_index>::iterator it=renumbering.begin();
                  it!=renumbering.end(); ++it)
@@ -3802,7 +3813,7 @@ namespace internal
             // level we are currently dealing with doesn't even exist
             // within the current triangulation, so skip renumbering
             // in that case
-            if (level < tr->n_levels())
+            if (level < triangulation->n_levels())
               Implementation::renumber_mg_dofs (renumbering, IndexSet(0),
                                                 *dof_handler, level,
                                                 false);
@@ -3824,28 +3835,28 @@ namespace internal
             // fill global_dof_indexsets
             level_number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
             {
-              dealii::types::global_dof_index lshift = 0;
+              dealii::types::global_dof_index current_shift = 0;
               for (unsigned int i=0; i<n_cpus; ++i)
                 {
                   level_number_cache.locally_owned_dofs_per_processor[i]
                     = IndexSet(level_number_cache.n_global_dofs);
                   level_number_cache.locally_owned_dofs_per_processor[i]
-                  .add_range(lshift,
-                             lshift +
+                  .add_range(current_shift,
+                             current_shift +
                              level_number_cache.n_locally_owned_dofs_per_processor[i]);
-                  lshift += level_number_cache.n_locally_owned_dofs_per_processor[i];
+                  current_shift += level_number_cache.n_locally_owned_dofs_per_processor[i];
                 }
             }
             Assert(level_number_cache.locally_owned_dofs_per_processor
-                   [tr->locally_owned_subdomain()].n_elements()
+                   [triangulation->locally_owned_subdomain()].n_elements()
                    ==
                    level_number_cache.n_locally_owned_dofs,
                    ExcInternalError());
             Assert(!level_number_cache.locally_owned_dofs_per_processor
-                   [tr->locally_owned_subdomain()].n_elements()
+                   [triangulation->locally_owned_subdomain()].n_elements()
                    ||
                    level_number_cache.locally_owned_dofs_per_processor
-                   [tr->locally_owned_subdomain()].nth_index_in_set(0)
+                   [triangulation->locally_owned_subdomain()].nth_index_in_set(0)
                    == shift,
                    ExcInternalError());
 
@@ -3859,12 +3870,12 @@ namespace internal
         // can be incomplete,
         {
           std::vector<bool> user_flags;
-          tr->save_user_flags(user_flags);
-          tr->clear_user_flags ();
+          triangulation->save_user_flags(user_flags);
+          triangulation->clear_user_flags ();
 
           // mark all ghost cells for transfer
           {
-            typename DoFHandler<dim,spacedim>::level_cell_iterator
+            typename DoFHandlerType::level_cell_iterator
             cell, endc = dof_handler->end();
             for (cell = dof_handler->begin(); cell != endc; ++cell)
               if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id
@@ -3875,27 +3886,27 @@ namespace internal
           // Phase 1. Request all marked cells from corresponding owners. If we
           // managed to get every DoF, remove the user_flag, otherwise we
           // will request them again in the step below.
-          communicate_mg_ghost_cells(*tr,
+          communicate_mg_ghost_cells(*triangulation,
                                      *dof_handler,
-                                     tr->coarse_cell_to_p4est_tree_permutation,
-                                     tr->p4est_tree_to_coarse_cell_permutation);
+                                     triangulation->coarse_cell_to_p4est_tree_permutation,
+                                     triangulation->p4est_tree_to_coarse_cell_permutation);
 
           // This barrier is crucial so that messages between phases
           // 1&2 don't mix.
-          const int ierr = MPI_Barrier(tr->get_communicator());
+          const int ierr = MPI_Barrier(triangulation->get_communicator());
           AssertThrowMPI(ierr);
 
           // Phase 2, only request the cells that were not completed
           // in Phase 1.
-          communicate_mg_ghost_cells(*tr,
+          communicate_mg_ghost_cells(*triangulation,
                                      *dof_handler,
-                                     tr->coarse_cell_to_p4est_tree_permutation,
-                                     tr->p4est_tree_to_coarse_cell_permutation);
+                                     triangulation->coarse_cell_to_p4est_tree_permutation,
+                                     triangulation->p4est_tree_to_coarse_cell_permutation);
 
 #ifdef DEBUG
           // make sure we have removed all flags:
           {
-            typename DoFHandler<dim,spacedim>::level_cell_iterator
+            typename DoFHandlerType::level_cell_iterator
             cell, endc = dof_handler->end();
             for (cell = dof_handler->begin(); cell != endc; ++cell)
               if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id
@@ -3904,7 +3915,7 @@ namespace internal
           }
 #endif
 
-          tr->load_user_flags(user_flags);
+          triangulation->load_user_flags(user_flags);
         }
 
 
@@ -3914,7 +3925,7 @@ namespace internal
         // check that we are really done
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
-          typename DoFHandler<dim,spacedim>::level_cell_iterator
+          typename DoFHandlerType::level_cell_iterator
           cell, endc = dof_handler->end();
 
           for (cell = dof_handler->begin(); cell != endc; ++cell)
@@ -3939,9 +3950,9 @@ namespace internal
       }
 
 
-      template <int dim, int spacedim>
+      template <typename DoFHandlerType>
       NumberCache
-      ParallelDistributed<dim, spacedim>::
+      ParallelDistributed<DoFHandlerType>::
       renumber_dofs (const std::vector<dealii::types::global_dof_index> &new_numbers) const
       {
         (void)new_numbers;
@@ -3954,7 +3965,8 @@ namespace internal
 #ifndef DEAL_II_WITH_P4EST
         Assert (false, ExcNotImplemented());
 #else
-
+        const unsigned int dim      = DoFHandlerType::dimension;
+        const unsigned int spacedim = DoFHandlerType::space_dimension;
 
         // calculate new IndexSet. First try to find out if the new indices
         // are contiguous blocks. This avoids inserting each index
@@ -4046,7 +4058,7 @@ namespace internal
         {
           std::vector<dealii::types::global_dof_index> local_dof_indices;
 
-          typename DoFHandler<dim,spacedim>::active_cell_iterator
+          typename DoFHandlerType::active_cell_iterator
           cell = dof_handler->begin_active(),
           endc = dof_handler->end();
 
@@ -4093,7 +4105,7 @@ namespace internal
           tr->clear_user_flags ();
 
           // mark all own cells for transfer
-          typename DoFHandler<dim,spacedim>::active_cell_iterator
+          typename DoFHandlerType::active_cell_iterator
           cell, endc = dof_handler->end();
           for (cell = dof_handler->begin_active(); cell != endc; ++cell)
             if (!cell->is_artificial())
@@ -4101,10 +4113,9 @@ namespace internal
 
           // add each ghostcells' subdomain to the vertex and keep track of
           // interesting neighbors
-          std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-          vertices_with_ghost_neighbors;
-
-          tr->fill_vertices_with_ghost_neighbors (vertices_with_ghost_neighbors);
+          const std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+          vertices_with_ghost_neighbors
+            = tr->compute_vertices_with_ghost_neighbors ();
 
           // Send and receive cells. After this, only the local cells are
           // marked, that received new data. This has to be communicated in a
@@ -4176,9 +4187,9 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
+      template <typename DoFHandlerType>
       NumberCache
-      ParallelDistributed<dim,spacedim>::
+      ParallelDistributed<DoFHandlerType>::
       renumber_mg_dofs (const unsigned int                          /*level*/,
                         const std::vector<types::global_dof_index> &/*new_numbers*/) const
       {
