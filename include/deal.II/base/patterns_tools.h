@@ -352,6 +352,13 @@ namespace PatternsTools
     template <int dim, class Number>
     struct RankInfo<Point<dim,Number>>:RankInfo<Tensor<1,dim,Number>> {};
 
+    // Rank of complex types
+    template <class Number>
+    struct RankInfo<std::complex<Number>>
+    {
+      static constexpr int list_rank = RankInfo<Number>::list_rank+1;
+      static constexpr int map_rank = RankInfo<Number>::map_rank;
+    };
   }
 
 
@@ -558,6 +565,59 @@ namespace PatternsTools
       return T(Convert<Tensor<1,dim,Number>>::to_value(s,pattern));
     }
   };
+
+
+
+  template<class Number>
+  struct Convert<std::complex<Number>>
+  {
+    typedef std::complex<Number> T;
+
+    static std::unique_ptr<PatternBase> to_pattern()
+    {
+      return std_cxx14::make_unique<List>(*Convert<typename T::value_type>::to_pattern(),
+                                          2, 2,
+                                          internal::default_list_separator[internal::RankInfo<T>::list_rank]);
+    }
+
+    static std::string to_string(const T &t,
+                                 const std::unique_ptr<PatternBase> &pattern = Convert<T>::to_pattern())
+    {
+
+      auto p = dynamic_cast<const Patterns::List *>(pattern.get());
+      AssertThrow(p, ExcMessage("I need a List pattern to convert a string to a List type."));
+      auto base_p = p->get_base_pattern().clone();
+      std::string s =
+        Convert<typename T::value_type>::to_string(t.real(), base_p) +
+        p->get_separator() + " " +
+        Convert<typename T::value_type>::to_string(t.imag(), base_p);
+
+      AssertThrow(pattern->match(s), ExcNoMatch(s, *p));
+      return s;
+    }
+
+    /**
+     * Convert a string to a value, using the given pattern, or a default one.
+     */
+    static T to_value(const std::string &s,
+                      const std::unique_ptr<PatternBase> &pattern = Convert<T>::to_pattern())
+    {
+
+      AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
+
+      auto p = dynamic_cast<const Patterns::List *>(pattern.get());
+      AssertThrow(p, ExcMessage("I need a List pattern to convert a string to a List type."));
+
+      auto base_p = p->get_base_pattern().clone();
+
+      auto v = Utilities::split_string_list(s,p->get_separator());
+      AssertDimension(v.size(), 2);
+      T t(Convert<typename T::value_type>::to_value(v[0], base_p),
+          Convert<typename T::value_type>::to_value(v[1], base_p));
+      return t;
+    }
+  };
+
 
 
   template <class ParameterType>
