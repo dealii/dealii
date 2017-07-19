@@ -4108,15 +4108,24 @@ namespace internal
         std::vector<IndexSet> locally_owned_dofs_per_processor(n_cpus,
                                                                IndexSet(dof_handler->n_dofs()));
         {
-          // Serialize our IndexSet
-          std::ostringstream oss;
-          my_locally_owned_dofs.block_write(oss);
-          std::string oss_str = oss.str();
-          std::vector<char> my_data (oss_str.begin(), oss_str.end());
+          // serialize our own IndexSet
+          std::vector<char> my_data;
+          {
+            boost::iostreams::filtering_ostream out;
+            out.push(boost::iostreams::gzip_compressor
+                     (boost::iostreams::gzip_params
+                      (boost::iostreams::gzip::best_compression)));
+            out.push(boost::iostreams::back_inserter(my_data));
+
+            boost::archive::binary_oarchive archive(out);
+
+            archive << my_locally_owned_dofs;
+            out.flush();
+          }
 
           // determine maximum size of IndexSet
           const unsigned int max_size
-            = Utilities::MPI::max (oss_str.size(), triangulation->get_communicator());
+            = Utilities::MPI::max (my_data.size(), triangulation->get_communicator());
 
           // as the MPI_Allgather call will be reading max_size elements, and
           // as this may be past the end of my_data, we need to increase the
@@ -4136,10 +4145,22 @@ namespace internal
               {
                 // copy the data previously received into a stringstream
                 // object and then read the IndexSet from it
-                std::stringstream strstr;
-                strstr.write(&buffer[i*max_size], max_size);
+                std::string decompressed_buffer;
 
-                locally_owned_dofs_per_processor[i].block_read(strstr);
+                // first decompress the buffer
+                {
+                  boost::iostreams::filtering_ostream decompressing_stream;
+                  decompressing_stream.push(boost::iostreams::gzip_decompressor());
+                  decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
+
+                  decompressing_stream.write(&buffer[i*max_size], max_size);
+                }
+
+                // then restore the object from the buffer
+                std::istringstream in(decompressed_buffer);
+                boost::archive::binary_iarchive archive(in);
+
+                archive >> locally_owned_dofs_per_processor[i];
               }
         }
 
