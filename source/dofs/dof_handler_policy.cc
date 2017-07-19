@@ -4051,34 +4051,33 @@ namespace internal
                                          *dof_handler,
                                          false);
 
-        // communication
+        // communicate newly assigned DoF indices to other processors
+        // and get the same information for our own ghost cells.
+        //
+        // this is the same as phase 4 in the distribute_dofs() algorithm
         {
-          parallel::distributed::Triangulation< dim, spacedim > *triangulation
-            = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
-               (const_cast<dealii::Triangulation< dim, spacedim >*>
-                (&dof_handler->get_triangulation())));
-          Assert (triangulation != nullptr, ExcInternalError());
-
           std::vector<bool> user_flags;
           triangulation->save_user_flags(user_flags);
           triangulation->clear_user_flags ();
 
           // mark all own cells for transfer
-          typename DoFHandlerType::active_cell_iterator
-          cell, endc = dof_handler->end();
-          for (cell = dof_handler->begin_active(); cell != endc; ++cell)
+          for (auto cell : dof_handler->active_cell_iterators())
             if (!cell->is_artificial())
               cell->set_user_flag();
 
-          // add each ghostcells' subdomain to the vertex and keep track of
-          // interesting neighbors
+          // figure out which cells are ghost cells on which we have
+          // to exchange DoF indices
           const std::map<unsigned int, std::set<dealii::types::subdomain_id> >
           vertices_with_ghost_neighbors
             = triangulation->compute_vertices_with_ghost_neighbors ();
 
-          // Send and receive cells. After this, only the local cells are
-          // marked, that received new data. This has to be communicated in a
-          // second communication step.
+
+          // Send and receive cells. After this, only the local cells
+          // are marked, that received new data. This has to be
+          // communicated in a second communication step.
+          //
+          // as explained in the 'distributed' paper, this has to be
+          // done twice
           communicate_dof_indices_on_marked_cells (*dof_handler,
                                                    vertices_with_ghost_neighbors,
                                                    triangulation->coarse_cell_to_p4est_tree_permutation,
@@ -4089,6 +4088,8 @@ namespace internal
                                                    triangulation->coarse_cell_to_p4est_tree_permutation,
                                                    triangulation->p4est_tree_to_coarse_cell_permutation);
 
+          triangulation->load_user_flags(user_flags);
+        }
 
           // * Create global_dof_indexsets by transferring our own owned_dofs
           // to every other machine.
