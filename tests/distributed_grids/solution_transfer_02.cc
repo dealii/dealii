@@ -84,7 +84,7 @@ void test(std::ostream & /*out*/)
 
   Vector<double> solution(dofh.n_dofs());
   VectorTools::interpolate (mapping,
-                            * static_cast<dealii::DoFHandler<dim>* >(&dofh),
+                            dofh,
                             func,
                             solution);
 
