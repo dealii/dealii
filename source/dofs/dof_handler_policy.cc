@@ -3426,21 +3426,14 @@ namespace internal
             }
 
 
-#ifdef DEBUG
-          {
-            // check that all messages got sent and received
-            unsigned int sum_send=0;
-            unsigned int sum_recv=0;
-            unsigned int sent=needs_to_get_cells.size();
-            unsigned int recv=senders.size();
 
-            int ierr = MPI_Allreduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, triangulation->get_communicator());
-            AssertThrowMPI(ierr);
-            ierr = MPI_Allreduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, triangulation->get_communicator());
-            AssertThrowMPI(ierr);
-            Assert(sum_send==sum_recv, ExcInternalError());
-          }
-#endif
+          // check that all messages got sent and received
+          Assert (Utilities::MPI::sum (needs_to_get_cells.size(),
+                                       triangulation->get_communicator())
+                  ==
+                  Utilities::MPI::sum (senders.size(),
+                                       triangulation->get_communicator()),
+                  ExcInternalError());
 
           // have a barrier so that sends between two calls to this
           // function are not mixed up.
