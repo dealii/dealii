@@ -196,7 +196,8 @@ namespace PatternsTools
 
 
 // ---------------------- inline and template functions --------------------
-namespace PatternsTools {
+namespace PatternsTools
+{
   namespace internal
   {
     /**
