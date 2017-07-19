@@ -3974,102 +3974,41 @@ namespace internal
       {
         (void)new_numbers;
 
-        Assert (new_numbers.size() == dof_handler->locally_owned_dofs().n_elements(),
+        Assert (new_numbers.size() == dof_handler->n_locally_owned_dofs(),
                 ExcInternalError());
-
-        NumberCache number_cache;
 
 #ifndef DEAL_II_WITH_P4EST
         Assert (false, ExcNotImplemented());
+        return NumberCache();
 #else
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        // calculate new IndexSet. First try to find out if the new indices
-        // are contiguous blocks. This avoids inserting each index
-        // individually into the IndexSet, which is slow.  If we own no DoFs,
-        // we still need to go through this function, but we can skip this
-        // calculation.
+        NumberCache number_cache;
 
-        number_cache.locally_owned_dofs = IndexSet (dof_handler->n_dofs());
-        if (dof_handler->locally_owned_dofs().n_elements()>0)
-          {
-            std::vector<dealii::types::global_dof_index> new_numbers_sorted (new_numbers);
-            std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
-            std::vector<dealii::types::global_dof_index>::const_iterator it = new_numbers_sorted.begin();
-            const unsigned int n_blocks = dof_handler->get_fe().n_blocks();
-            std::vector<std::pair<dealii::types::global_dof_index,unsigned int> > block_indices(n_blocks);
-            block_indices[0].first = *it++;
-            block_indices[0].second = 1;
-            unsigned int current_block = 0, n_filled_blocks = 1;
-            for ( ; it != new_numbers_sorted.end(); ++it)
-              {
-                bool done = false;
-
-                // search from the current block onwards whether the next
-                // index is shifted by one from the previous one.
-                for (unsigned int i=0; i<n_filled_blocks; ++i)
-                  if (*it == block_indices[current_block].first
-                      +block_indices[current_block].second)
-                    {
-                      block_indices[current_block].second++;
-                      done = true;
-                      break;
-                    }
-                  else
-                    {
-                      if (current_block == n_filled_blocks-1)
-                        current_block = 0;
-                      else
-                        ++current_block;
-                    }
-
-                // could not find any contiguous range: need to add a new
-                // block if possible. Abort otherwise, which will add all
-                // elements individually to the IndexSet.
-                if (done == false)
-                  {
-                    if (n_filled_blocks < n_blocks)
-                      {
-                        block_indices[n_filled_blocks].first = *it;
-                        block_indices[n_filled_blocks].second = 1;
-                        current_block = n_filled_blocks;
-                        ++n_filled_blocks;
-                      }
-                    else
-                      break;
-                  }
-              }
-
-            // check whether all indices could be assigned to blocks. If yes,
-            // we can add the block ranges to the IndexSet, otherwise we need
-            // to go through the indices once again and add each element
-            // individually
-            unsigned int sum = 0;
-            for (unsigned int i=0; i<n_filled_blocks; ++i)
-              sum += block_indices[i].second;
-            if (sum == new_numbers.size())
-              for (unsigned int i=0; i<n_filled_blocks; ++i)
-                number_cache.locally_owned_dofs.add_range (block_indices[i].first,
-                                                           block_indices[i].first+
-                                                           block_indices[i].second);
-            else
-              number_cache.locally_owned_dofs.add_indices(new_numbers_sorted.begin(),
-                                                          new_numbers_sorted.end());
-          }
-
-
-        number_cache.locally_owned_dofs.compress();
-        Assert (number_cache.locally_owned_dofs.n_elements() == new_numbers.size(),
-                ExcInternalError());
-        // also check with the number of locally owned degrees of freedom that
-        // the DoFHandler object still stores
-        Assert (number_cache.locally_owned_dofs.n_elements() ==
-                dof_handler->n_locally_owned_dofs(),
-                ExcInternalError());
-
-        // then also set this number in our own copy
+        // First figure out the new set of locally owned DoF indices.
+        // If we own no DoFs, we still need to go through this function,
+        // but we can skip this calculation.
+        //
+        // The IndexSet::add_indices() function is substantially more
+        // efficient if the set of indices is already sorted because
+        // it can then insert ranges instead of individual elements.
+        // consequently, pre-sort the array of new indices
         number_cache.n_locally_owned_dofs = dof_handler->n_locally_owned_dofs();
+        number_cache.locally_owned_dofs = IndexSet (dof_handler->n_dofs());
+        if (dof_handler->n_locally_owned_dofs() > 0)
+          {
+            std::vector<dealii::types::global_dof_index> new_numbers_sorted = new_numbers;
+            std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
+
+            number_cache.locally_owned_dofs.add_indices (new_numbers_sorted.begin(),
+                                                         new_numbers_sorted.end());
+            number_cache.locally_owned_dofs.compress();
+
+            Assert (number_cache.locally_owned_dofs.n_elements() ==
+                    new_numbers.size(),
+                    ExcInternalError());
+          }
 
         // mark not locally active DoFs as invalid
         {
@@ -4197,9 +4136,9 @@ namespace internal
 
           tr->load_user_flags(user_flags);
         }
-#endif
 
         return number_cache;
+#endif
       }
 
 
