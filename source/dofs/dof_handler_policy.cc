@@ -2220,7 +2220,7 @@ namespace internal
       /* --------------------- class ParallelShared ---------------- */
 
 
-      template <class DoFHandlerType>
+      template <typename DoFHandlerType>
       ParallelShared<DoFHandlerType>::
       ParallelShared (DoFHandlerType &dof_handler)
         :
@@ -2239,7 +2239,7 @@ namespace internal
          * consequently, be called at a point when we are still distributing degrees
          * of freedom.
          */
-        template <class DoFHandlerType>
+        template <typename DoFHandlerType>
         std::vector<types::subdomain_id>
         get_dof_subdomain_association (const DoFHandlerType          &dof_handler,
                                        const types::global_dof_index  n_dofs,
@@ -2303,7 +2303,7 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <typename DoFHandlerType>
       NumberCache
       ParallelShared<DoFHandlerType>::
       distribute_dofs () const
@@ -2461,7 +2461,7 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <typename DoFHandlerType>
       std::vector<NumberCache>
       ParallelShared<DoFHandlerType>::
       distribute_mg_dofs () const
@@ -2478,7 +2478,7 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <typename DoFHandlerType>
       NumberCache
       ParallelShared<DoFHandlerType>::
       renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const
@@ -2619,7 +2619,7 @@ namespace internal
 
 
 
-      template <class DoFHandlerType>
+      template <typename DoFHandlerType>
       NumberCache
       ParallelShared<DoFHandlerType>::
       renumber_mg_dofs (const unsigned int                          /*level*/,
@@ -3004,10 +3004,10 @@ namespace internal
 
 
 
-        template <int dim, int spacedim>
+        template <int dim, int spacedim, typename DoFHandlerType>
         void
         communicate_mg_ghost_cells(const typename parallel::distributed::Triangulation<dim,spacedim> &tria,
-                                   DoFHandler<dim,spacedim> &dof_handler,
+                                   DoFHandlerType  &dof_handler,
                                    const std::vector<dealii::types::global_dof_index> &coarse_cell_to_p4est_tree_permutation,
                                    const std::vector<dealii::types::global_dof_index> &p4est_tree_to_coarse_cell_permutation)
         {
@@ -3020,7 +3020,7 @@ namespace internal
                ++it)
             neighbor_cell_list.insert(std::make_pair(*it, CellDataTransferBuffer<dim>()));
 
-          for (typename DoFHandler<dim,spacedim>::level_cell_iterator
+          for (typename DoFHandlerType::level_cell_iterator
                cell = dof_handler.begin(0);
                cell != dof_handler.end(0);
                ++cell)
@@ -3083,7 +3083,7 @@ namespace internal
               // store the dof indices for each cell
               for (unsigned int c=0; c<cell_data_transfer_buffer.tree_index.size(); ++c)
                 {
-                  typename DoFHandler<dim,spacedim>::level_cell_iterator
+                  typename DoFHandlerType::level_cell_iterator
                   cell (&dof_handler.get_triangulation(),
                         0,
                         p4est_tree_to_coarse_cell_permutation[cell_data_transfer_buffer.tree_index[c]],
@@ -3134,7 +3134,7 @@ namespace internal
               dealii::types::global_dof_index *dofs = cell_data_transfer_buffer.dof_numbers_and_indices.data();
               for (unsigned int c=0; c<cell_data_transfer_buffer.tree_index.size(); ++c, dofs+=1+dofs[0])
                 {
-                  typename DoFHandler<dim,spacedim>::level_cell_iterator
+                  typename DoFHandlerType::level_cell_iterator
                   cell (&tria,
                         0,
                         p4est_tree_to_coarse_cell_permutation[cell_data_transfer_buffer.tree_index[c]],
@@ -3182,12 +3182,25 @@ namespace internal
 
 
 
-        template <int dim, int spacedim>
+        template <int spacedim>
+        void
+        communicate_mg_ghost_cells(const typename parallel::distributed::Triangulation<1,spacedim> &,
+                                   hp::DoFHandler<1,spacedim> &,
+                                   const std::vector<dealii::types::global_dof_index> &,
+                                   const std::vector<dealii::types::global_dof_index> &)
+        {
+          Assert (false, ExcNotImplemented());
+        }
+
+
+
+
+        template <int dim, int spacedim, typename CellIteratorType>
         void
         set_dofindices_recursively (
           const parallel::distributed::Triangulation<dim,spacedim> &tria,
           const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
-          const typename DoFHandler<dim,spacedim>::level_cell_iterator &dealii_cell,
+          const CellIteratorType                                       &dealii_cell,
           const typename dealii::internal::p4est::types<dim>::quadrant &quadrant,
           dealii::types::global_dof_index *dofs)
         {
@@ -3217,17 +3230,11 @@ namespace internal
                   complete=false;
 
               if (!complete)
-                const_cast
-                <typename DoFHandler<dim,spacedim>::level_cell_iterator &>
-                (dealii_cell)->set_user_flag();
+                const_cast<CellIteratorType &>(dealii_cell)->set_user_flag();
               else
-                const_cast
-                <typename DoFHandler<dim,spacedim>::level_cell_iterator &>
-                (dealii_cell)->clear_user_flag();
+                const_cast<CellIteratorType &>(dealii_cell)->clear_user_flag();
 
-              const_cast
-              <typename DoFHandler<dim,spacedim>::level_cell_iterator &>
-              (dealii_cell)->set_dof_indices(dof_indices);
+              const_cast<CellIteratorType &>(dealii_cell)->set_dof_indices(dof_indices);
 
               return;
             }
@@ -3243,9 +3250,9 @@ namespace internal
           internal::p4est::init_quadrant_children<dim>(p4est_cell, p4est_child);
 
           for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
-            set_dofindices_recursively<dim,spacedim> (tria, p4est_child[c],
-                                                      dealii_cell->child(c),
-                                                      quadrant, dofs);
+            set_dofindices_recursively (tria, p4est_child[c],
+                                        dealii_cell->child(c),
+                                        quadrant, dofs);
         }
 
 
@@ -3263,10 +3270,23 @@ namespace internal
 
 
 
-        template <int dim, int spacedim>
+        template <int spacedim>
         void
         communicate_dof_indices_on_marked_cells
-        (const DoFHandler<dim,spacedim> &dof_handler,
+        (const hp::DoFHandler<1,spacedim> &,
+         const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &,
+         const std::vector<dealii::types::global_dof_index> &,
+         const std::vector<dealii::types::global_dof_index> &)
+        {
+          Assert (false, ExcNotImplemented());
+        }
+
+
+
+        template <typename DoFHandlerType>
+        void
+        communicate_dof_indices_on_marked_cells
+        (const DoFHandlerType &dof_handler,
          const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &vertices_with_ghost_neighbors,
          const std::vector<dealii::types::global_dof_index> &coarse_cell_to_p4est_tree_permutation,
          const std::vector<dealii::types::global_dof_index> &p4est_tree_to_coarse_cell_permutation)
@@ -3275,6 +3295,8 @@ namespace internal
           (void)vertices_with_ghost_neighbors;
           Assert (false, ExcNotImplemented());
 #else
+          const unsigned int dim      = DoFHandlerType::dimension;
+          const unsigned int spacedim = DoFHandlerType::space_dimension;
 
           const parallel::distributed::Triangulation<dim, spacedim> *triangulation
             = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
@@ -3288,7 +3310,7 @@ namespace internal
               cellmap_t;
           cellmap_t needs_to_get_cells;
 
-          for (typename DoFHandler<dim,spacedim>::level_cell_iterator
+          for (typename DoFHandlerType::level_cell_iterator
                cell = dof_handler.begin(0);
                cell != dof_handler.end(0);
                ++cell)
@@ -3338,7 +3360,7 @@ namespace internal
           std::set<dealii::types::subdomain_id> senders;
           {
             std::vector<dealii::types::global_dof_index> local_dof_indices;
-            typename DoFHandler<dim,spacedim>::active_cell_iterator
+            typename DoFHandlerType::active_cell_iterator
             cell, endc = dof_handler.end();
 
             for (cell = dof_handler.begin_active(); cell != endc; ++cell)
@@ -3392,7 +3414,7 @@ namespace internal
               // indices itself.
               for (unsigned int c=0; c<cells; ++c, dofs+=1+dofs[0])
                 {
-                  const typename DoFHandler<dim,spacedim>::level_cell_iterator
+                  const typename DoFHandlerType::level_cell_iterator
                   cell (&dof_handler.get_triangulation(),
                         0,
                         p4est_tree_to_coarse_cell_permutation[cell_data_transfer_buffer.tree_index[c]],
@@ -3403,11 +3425,11 @@ namespace internal
 
                   Assert(cell->get_fe().dofs_per_cell==dofs[0], ExcInternalError());
 
-                  set_dofindices_recursively<dim,spacedim> (*triangulation,
-                                                            p4est_coarse_cell,
-                                                            cell,
-                                                            cell_data_transfer_buffer.quadrants[c],
-                                                            (dofs+1));
+                  set_dofindices_recursively (*triangulation,
+                                              p4est_coarse_cell,
+                                              cell,
+                                              cell_data_transfer_buffer.quadrants[c],
+                                              (dofs+1));
                 }
             }
 
