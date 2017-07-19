@@ -100,6 +100,8 @@ public:
   /**
    * Build this quadrature formula as the tensor product of a formula in a
    * dimension one less than the present and a formula in one dimension.
+   * This constructor assumes (and tests) that constant functions are integrated
+   * exactly, i.e. the sum of the quadrature weights is one.
    *
    * <tt>SubQuadrature<dim>::type</tt> expands to <tt>Quadrature<dim-1></tt>.
    */
@@ -117,6 +119,10 @@ public:
    * In order to avoid a conflict with the copy constructor in 1d, we let the
    * argument be a 0d quadrature formula for dim==1, and a 1d quadrature
    * formula for all other space dimensions.
+   *
+   * This constructor does not require that constant functions are integrated
+   * exactly. Therefore, it is appropriate if the one-dimensional formula
+   * is defined with respect to a weighting function.
    */
   explicit Quadrature (const Quadrature<dim != 1 ? 1 : 0> &quadrature_1d);
 

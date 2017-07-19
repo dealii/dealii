@@ -1181,7 +1181,7 @@ QGaussChebyshev<1>::QGaussChebyshev(const unsigned int n)
 template <int dim>
 QGaussChebyshev<dim>::QGaussChebyshev (const unsigned int n)
   :
-  Quadrature<dim> (QGaussChebyshev<dim-1>(n), QGaussChebyshev<1>(n))
+  Quadrature<dim> (QGaussChebyshev<1>(n))
 {}
 
 
@@ -1249,7 +1249,7 @@ QGaussRadauChebyshev<1>::get_quadrature_weights(const unsigned int n,
 
 template <>
 QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n,
-                                              QGaussRadauChebyshev<1>::EndPoint ep)
+                                              EndPoint ep)
   :
   Quadrature<1> (n),
   ep (ep)
@@ -1267,22 +1267,11 @@ QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n,
 }
 
 
-template <>
-QGaussRadauChebyshev<2>::QGaussRadauChebyshev (const unsigned int n,
-                                               EndPoint ep)
-  :
-  Quadrature<2> (QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep)),
-                 QGaussRadauChebyshev<1>(n, static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
-  ep (ep)
-{}
-
-
 template <int dim>
 QGaussRadauChebyshev<dim>::QGaussRadauChebyshev (const unsigned int n,
                                                  EndPoint ep)
   :
-  Quadrature<dim> (QGaussRadauChebyshev<dim-1>(n,static_cast<typename QGaussRadauChebyshev<dim-1>::EndPoint>(ep)),
-                   QGaussRadauChebyshev<1>(n,static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
+  Quadrature<dim> (QGaussRadauChebyshev<1>(n,static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep))),
   ep (ep)
 {}
 
@@ -1346,7 +1335,7 @@ QGaussLobattoChebyshev<1>::QGaussLobattoChebyshev(const unsigned int n)
 template <int dim>
 QGaussLobattoChebyshev<dim>::QGaussLobattoChebyshev (const unsigned int n)
   :
-  Quadrature<dim> (QGaussLobattoChebyshev<dim-1>(n), QGaussLobattoChebyshev<1>(n))
+  Quadrature<dim> (QGaussLobattoChebyshev<1>(n))
 {}
 
 // explicit specialization
