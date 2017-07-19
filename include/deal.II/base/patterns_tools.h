@@ -192,6 +192,11 @@ namespace PatternsTools
                   << "The string " << arg1 << " does not match the pattern \""
                   << arg2.description() << "\"");
   //@}
+}
+
+
+// ---------------------- inline and template functions --------------------
+namespace PatternsTools {
   namespace internal
   {
     /**
@@ -226,12 +231,8 @@ namespace PatternsTools
       static constexpr int map_rank = 0;
     };
   }
-}
 
-// ---------------------- inline and template functions --------------------
-
-namespace PatternsTools
-{
+  // Arithmetic types
   template<class T>
   struct Convert<T, typename std::enable_if<std::is_arithmetic<T>::value>::type>
   {
@@ -320,6 +321,7 @@ namespace PatternsTools
     static constexpr bool const value = internal::is_stl_map<std::decay_t<T>>::value;
   };
 
+
   namespace internal
   {
     // Rank of vector types
@@ -362,6 +364,7 @@ namespace PatternsTools
   }
 
 
+  // stl containers
   template<class T>
   struct Convert<T, typename std::enable_if<is_stl_container<T>::value>::type>
   {
@@ -420,6 +423,7 @@ namespace PatternsTools
   };
 
 
+  // stl maps
   template <class T>
   struct Convert<T, typename std::enable_if<is_stl_map<T>::value>::type>
   {
@@ -487,6 +491,7 @@ namespace PatternsTools
   };
 
 
+  // Tensors
   template<int rank, int dim, class Number>
   struct Convert<Tensor<rank,dim,Number>>
   {
@@ -542,6 +547,7 @@ namespace PatternsTools
   };
 
 
+  // Points
   template<int dim, class Number>
   struct Convert<Point<dim,Number>>
   {
@@ -567,7 +573,7 @@ namespace PatternsTools
   };
 
 
-
+  // Complex numbers
   template<class Number>
   struct Convert<std::complex<Number>>
   {
@@ -618,6 +624,32 @@ namespace PatternsTools
     }
   };
 
+
+  // Strings
+  template<>
+  struct Convert<std::string>
+  {
+    typedef std::string T;
+
+    static std::unique_ptr<PatternBase> to_pattern()
+    {
+      return std_cxx14::make_unique<Anything>();
+    }
+
+    static std::string to_string(const T &t,
+                                 const std::unique_ptr<PatternBase> &pattern = Convert<T>::to_pattern())
+    {
+      AssertThrow(pattern->match(t), ExcNoMatch(t,*pattern));
+      return t;
+    }
+
+    static T to_value(const std::string &s,
+                      const std::unique_ptr<PatternBase> &pattern = Convert<T>::to_pattern())
+    {
+      AssertThrow(pattern->match(s), ExcNoMatch(s,*pattern));
+      return s;
+    }
+  };
 
 
   template <class ParameterType>
