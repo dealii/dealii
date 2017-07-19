@@ -2845,8 +2845,18 @@ Table<6,T>::Table (const unsigned int size1,
                    const unsigned int size5,
                    const unsigned int size6)
   :
-  TableBase<6,T> (TableIndices<6> (size1, size2, size3, size4, size5, size6))
-{}
+  TableBase<6,T> ()
+{
+  TableIndices<6> table_indices;
+  table_indices[0] = size1;
+  table_indices[1] = size2;
+  table_indices[2] = size3;
+  table_indices[3] = size4;
+  table_indices[4] = size5;
+  table_indices[5] = size6;
+
+  TableBase<6,T>::reinit(table_indices);
+}
 
 
 
@@ -2980,8 +2990,19 @@ Table<7,T>::Table (const unsigned int size1,
                    const unsigned int size6,
                    const unsigned int size7)
   :
-  TableBase<7,T> (TableIndices<7> (size1, size2, size3, size4, size5, size6, size7))
-{}
+  TableBase<7,T> ()
+{
+  TableIndices<7> table_indices;
+  table_indices[0] = size1;
+  table_indices[1] = size2;
+  table_indices[2] = size3;
+  table_indices[3] = size4;
+  table_indices[4] = size5;
+  table_indices[5] = size6;
+  table_indices[6] = size7;
+
+  TableBase<7,T>::reinit(table_indices);
+}
 
 
 
