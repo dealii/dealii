@@ -305,7 +305,8 @@ namespace Patterns
     std::istringstream str(test_string);
 
     double d;
-    if (!(str >> d))
+    str >> d;
+    if (str.fail())
       return false;
 
     if (!has_only_whitespace (str))
