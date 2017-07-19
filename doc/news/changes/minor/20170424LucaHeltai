@@ -1,0 +1,5 @@
+New: Added a new function Patterns::default_pattern<T>() that 
+returns an std::unique_ptr to a Patterns::PatternBase that can
+be used to tranform the type T from and to a string. 
+<br>
+(Luca Heltai, 2017/04/24)

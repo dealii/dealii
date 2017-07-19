@@ -1,0 +1,8 @@
+New: The new functions Patterns::PatternBase::to_value() and
+Patterns::PatternBase::to_string() allow one to convert from 
+a string satisfying a specific pattern to a compatible type 
+and viceversa.
+This will allow in the future a much more user friendly solution
+to declare and parse parameters.
+<br>
+(Luca Heltai, 2017/04/19)
