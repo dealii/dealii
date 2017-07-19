@@ -69,12 +69,11 @@ namespace internal
 namespace MeshWorker
 {
   /**
-   * Collection of parameters for execution of MeshWorker loops.
+   * Collection of parameters to control the execution of MeshWorker loops.
    */
   class LoopControl
   {
   public:
-
     /**
      * Constructor.
      */
@@ -89,6 +88,7 @@ namespace MeshWorker
      * Loop over cells owned by this process. Defaults to <code>true</code>.
      */
     bool own_cells;
+
     /**
      * Loop over cells not owned by this process. Defaults to
      * <code>false</code>.
@@ -117,27 +117,32 @@ namespace MeshWorker
     };
 
     /**
-     * Loop over faces between a locally owned cell and a ghost cell: - never:
-     * do not assembly these faces - one: only one of the processes will
-     * assemble these faces ( from the finer side or the process with the
-     * lower mpi rank) - both: both processes will assemble these faces Note
-     * that these faces are never assembled from both sides on a single
-     * process. Default is one.
+     * Control for looping over faces between a locally owned cell and a ghost cell:
+     *
+     * - never: Do not assembly these faces.
+     * - one: Only one of the processes will assemble these faces (from the
+     *   finer side or the process with the lower MPI rank).
+     * - both: Both processes will assemble these faces. Note that these faces
+     *   are never assembled from both sides on a single process.
+     *
+     * The default is <code>one</code>.
      */
     FaceOption faces_to_ghost;
 
     /**
-     * Loop over faces between two locally owned cells: - never: do not
-     * assemble face terms - one: assemble once (always coming from the finer
-     * side) - both: assemble each face twice (not implemented for hanging
-     * nodes!) Default is one.
+     * Control for looping over faces between two locally owned cells:
+     *
+     * - never: Do not assemble face terms.
+     * - one: Assemble once (always coming from the finer side).
+     * - both: Assemble each face twice (not implemented for hanging nodes!).
+     *
+     * The default is <code>one</code>.
      */
     FaceOption own_faces;
 
-
     /**
-     * Flag to determine if cells integrals should be done before or after
-     * face integrals. Default is t
+     * A flag to determine if cells integrals should be done before or after
+     * face integrals. The default is <code>true</code>.
      */
     bool cells_first;
   };
