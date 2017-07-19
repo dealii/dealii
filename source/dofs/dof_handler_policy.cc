@@ -2774,11 +2774,11 @@ namespace internal
 
 
 
-        template <int dim, int spacedim>
+        template <int dim, int spacedim, typename CellIteratorType>
         void
-        fill_dofindices_recursively (const typename parallel::distributed::Triangulation<dim,spacedim> &tria,
+        get_dof_indices_recursively (const typename parallel::distributed::Triangulation<dim,spacedim> &tria,
                                      const unsigned int tree_index,
-                                     const typename DoFHandler<dim,spacedim>::level_cell_iterator &dealii_cell,
+                                     const CellIteratorType &dealii_cell,
                                      const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
                                      const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &vertices_with_ghost_neighbors,
                                      std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>> &needs_to_get_cell)
@@ -2792,76 +2792,76 @@ namespace internal
 
 
               for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
-                fill_dofindices_recursively<dim,spacedim>(tria,
-                                                          tree_index,
-                                                          dealii_cell->child(c),
-                                                          p4est_child[c],
-                                                          vertices_with_ghost_neighbors,
-                                                          needs_to_get_cell);
-              return;
+                get_dof_indices_recursively (tria,
+                                             tree_index,
+                                             dealii_cell->child(c),
+                                             p4est_child[c],
+                                             vertices_with_ghost_neighbors,
+                                             needs_to_get_cell);
             }
-
-          // we're at a leaf cell. see if the cell is flagged as
-          // interesting. note that we have only flagged our own cells
-          // before
-          if (dealii_cell->user_flag_set() && !dealii_cell->is_ghost())
+          else
             {
-              Assert (!dealii_cell->is_artificial(), ExcInternalError());
-
-              // check each vertex if it is interesting and push
-              // dofindices if yes
-              std::set<dealii::types::subdomain_id> send_to;
-              for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+              // we're at a leaf cell. see if the cell is flagged as
+              // interesting. note that we have only flagged our own cells
+              // before
+              if (dealii_cell->user_flag_set() && !dealii_cell->is_ghost())
                 {
-                  const std::map<unsigned int, std::set<dealii::types::subdomain_id> >::const_iterator
-                  neighbor_subdomains_of_vertex
-                    = vertices_with_ghost_neighbors.find (dealii_cell->vertex_index(v));
+                  Assert (!dealii_cell->is_artificial(), ExcInternalError());
 
-                  if (neighbor_subdomains_of_vertex ==
-                      vertices_with_ghost_neighbors.end())
-                    continue;
-
-                  Assert(neighbor_subdomains_of_vertex->second.size()!=0,
-                         ExcInternalError());
-
-                  send_to.insert(neighbor_subdomains_of_vertex->second.begin(),
-                                 neighbor_subdomains_of_vertex->second.end());
-                }
-
-              if (send_to.size() > 0)
-                {
-                  // this cell's dof_indices need to be sent to
-                  // someone
-                  std::vector<dealii::types::global_dof_index>
-                  local_dof_indices (dealii_cell->get_fe().dofs_per_cell);
-                  dealii_cell->get_dof_indices (local_dof_indices);
-
-                  for (std::set<dealii::types::subdomain_id>::iterator it=send_to.begin();
-                       it!=send_to.end(); ++it)
+                  // check each vertex if it is interesting and push
+                  // DoF indices if so
+                  std::set<dealii::types::subdomain_id> send_to;
+                  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
                     {
-                      const dealii::types::subdomain_id subdomain = *it;
+                      const std::map<unsigned int, std::set<dealii::types::subdomain_id> >::const_iterator
+                      neighbor_subdomains_of_vertex
+                        = vertices_with_ghost_neighbors.find (dealii_cell->vertex_index(v));
 
-                      // get an iterator to what needs to be sent to
-                      // that subdomain (if already exists), or create
-                      // such an object
-                      typename std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>::iterator
-                          p
-                          = needs_to_get_cell.insert (std::make_pair(subdomain,
-                                                                     CellDataTransferBuffer<dim>()))
-                            .first;
+                      if (neighbor_subdomains_of_vertex ==
+                          vertices_with_ghost_neighbors.end())
+                        continue;
 
-                      p->second.tree_index.push_back(tree_index);
-                      p->second.quadrants.push_back(p4est_cell);
+                      Assert(neighbor_subdomains_of_vertex->second.size()!=0,
+                             ExcInternalError());
 
-                      p->second.dof_numbers_and_indices.push_back(dealii_cell->get_fe().dofs_per_cell);
-                      p->second.dof_numbers_and_indices.insert(p->second.dof_numbers_and_indices.end(),
-                                                               local_dof_indices.begin(),
-                                                               local_dof_indices.end());
+                      send_to.insert(neighbor_subdomains_of_vertex->second.begin(),
+                                     neighbor_subdomains_of_vertex->second.end());
+                    }
 
+                  if (send_to.size() > 0)
+                    {
+                      // this cell's dof_indices need to be sent to
+                      // someone
+                      std::vector<dealii::types::global_dof_index>
+                      local_dof_indices (dealii_cell->get_fe().dofs_per_cell);
+                      dealii_cell->get_dof_indices (local_dof_indices);
+
+                      for (auto recipient_subdomain : send_to)
+                        {
+                          // get an iterator to what needs to be sent to
+                          // that subdomain (if already exists), or create
+                          // such an object
+                          typename std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>::iterator
+                              p
+                              = needs_to_get_cell.insert (std::make_pair(recipient_subdomain,
+                                                                         CellDataTransferBuffer<dim>()))
+                                .first;
+
+                          p->second.tree_index.push_back(tree_index);
+                          p->second.quadrants.push_back(p4est_cell);
+
+                          p->second.dof_numbers_and_indices.push_back(dealii_cell->get_fe().dofs_per_cell);
+                          p->second.dof_numbers_and_indices.insert(p->second.dof_numbers_and_indices.end(),
+                                                                   local_dof_indices.begin(),
+                                                                   local_dof_indices.end());
+
+                        }
                     }
                 }
             }
         }
+
+
 
         template <int dim, int spacedim>
         void
@@ -3197,12 +3197,11 @@ namespace internal
 
         template <int dim, int spacedim, typename CellIteratorType>
         void
-        set_dofindices_recursively (
-          const parallel::distributed::Triangulation<dim,spacedim> &tria,
-          const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
-          const CellIteratorType                                       &dealii_cell,
-          const typename dealii::internal::p4est::types<dim>::quadrant &quadrant,
-          dealii::types::global_dof_index *dofs)
+        set_dof_indices_recursively (const parallel::distributed::Triangulation<dim,spacedim> &tria,
+                                     const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
+                                     const CellIteratorType                                       &dealii_cell,
+                                     const typename dealii::internal::p4est::types<dim>::quadrant &quadrant,
+                                     dealii::types::global_dof_index *dofs)
         {
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
             {
@@ -3230,29 +3229,25 @@ namespace internal
                   complete=false;
 
               if (!complete)
-                const_cast<CellIteratorType &>(dealii_cell)->set_user_flag();
+                dealii_cell->set_user_flag();
               else
-                const_cast<CellIteratorType &>(dealii_cell)->clear_user_flag();
+                dealii_cell->clear_user_flag();
 
               const_cast<CellIteratorType &>(dealii_cell)->set_dof_indices(dof_indices);
-
-              return;
             }
+          else if (dealii_cell->has_children()
+                   &&
+                   internal::p4est::quadrant_is_ancestor<dim> (p4est_cell, quadrant))
+            {
+              typename dealii::internal::p4est::types<dim>::quadrant
+              p4est_child[GeometryInfo<dim>::max_children_per_cell];
+              internal::p4est::init_quadrant_children<dim>(p4est_cell, p4est_child);
 
-          if (! dealii_cell->has_children())
-            return;
-
-          if (! internal::p4est::quadrant_is_ancestor<dim> (p4est_cell, quadrant))
-            return;
-
-          typename dealii::internal::p4est::types<dim>::quadrant
-          p4est_child[GeometryInfo<dim>::max_children_per_cell];
-          internal::p4est::init_quadrant_children<dim>(p4est_cell, p4est_child);
-
-          for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
-            set_dofindices_recursively (tria, p4est_child[c],
-                                        dealii_cell->child(c),
-                                        quadrant, dofs);
+              for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+                set_dof_indices_recursively (tria, p4est_child[c],
+                                             dealii_cell->child(c),
+                                             quadrant, dofs);
+            }
         }
 
 
@@ -3318,13 +3313,12 @@ namespace internal
               typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
               internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
-              fill_dofindices_recursively<dim,spacedim>
-              (*triangulation,
-               coarse_cell_to_p4est_tree_permutation[cell->index()],
-               cell,
-               p4est_coarse_cell,
-               vertices_with_ghost_neighbors,
-               needs_to_get_cells);
+              get_dof_indices_recursively (*triangulation,
+                                           coarse_cell_to_p4est_tree_permutation[cell->index()],
+                                           cell,
+                                           p4est_coarse_cell,
+                                           vertices_with_ghost_neighbors,
+                                           needs_to_get_cells);
             }
 
 
@@ -3411,7 +3405,8 @@ namespace internal
 
               // the dofs pointer contains for each cell the number of
               // dofs on that cell (dofs[0]) followed by the dof
-              // indices itself.
+              // indices themselves. this is repeated for all cells
+              // in the buffer
               for (unsigned int c=0; c<cells; ++c, dofs+=1+dofs[0])
                 {
                   const typename DoFHandlerType::level_cell_iterator
@@ -3425,11 +3420,11 @@ namespace internal
 
                   Assert(cell->get_fe().dofs_per_cell==dofs[0], ExcInternalError());
 
-                  set_dofindices_recursively (*triangulation,
-                                              p4est_coarse_cell,
-                                              cell,
-                                              cell_data_transfer_buffer.quadrants[c],
-                                              (dofs+1));
+                  set_dof_indices_recursively (*triangulation,
+                                               p4est_coarse_cell,
+                                               cell,
+                                               cell_data_transfer_buffer.quadrants[c],
+                                               (dofs+1));
                 }
             }
 
