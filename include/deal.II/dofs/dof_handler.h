@@ -1286,7 +1286,15 @@ void DoFHandler<dim,spacedim>::save (Archive &ar,
   ar &block_info_object;
   ar &vertex_dofs;
   ar &number_cache;
-  ar &levels;
+
+  // some versions of gcc have trouble with loading vectors of
+  // std::unique_ptr objects because std::unique_ptr does not
+  // have a copy constructor. do it one level at a time
+  unsigned int n_levels = levels.size();
+  ar &n_levels;
+  for (unsigned int i = 0; i < levels.size(); ++i)
+    ar &levels[i];
+
   ar &faces;
 
   // write out the number of triangulation cells and later check during
@@ -1317,7 +1325,19 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
   levels.clear();
   faces.reset();
 
-  ar &levels;
+  // some versions of gcc have trouble with loading vectors of
+  // std::unique_ptr objects because std::unique_ptr does not
+  // have a copy constructor. do it one level at a time
+  unsigned int size;
+  ar &size;
+  levels.resize(size);
+  for (unsigned int i = 0; i < levels.size(); ++i)
+    {
+      std::unique_ptr<internal::DoFHandler::DoFLevel<dim>> level;
+      ar &level;
+      levels[i] = std::move(level);
+    }
+
   ar &faces;
 
   // these are the checks that correspond to the last block in the save()
