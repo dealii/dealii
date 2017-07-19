@@ -1,0 +1,10 @@
+
+DEAL::QGaussChebyshev<1>: OK
+DEAL::QGaussRadauChebyshev<1>: OK
+DEAL::QGaussLobattoChebyshev<1>: OK
+DEAL::QGaussChebyshev<2>: OK
+DEAL::QGaussRadauChebyshev<2>: OK
+DEAL::QGaussLobattoChebyshev<2>: OK
+DEAL::QGaussChebyshev<3>: OK
+DEAL::QGaussRadauChebyshev<3>: OK
+DEAL::QGaussLobattoChebyshev<3>: OK
