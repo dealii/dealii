@@ -18,14 +18,14 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/std_cxx14/memory.h>
 
 #include <boost/core/demangle.hpp>
-#include <boost/any.hpp>
-
 
 #include <map>
 #include <vector>
@@ -147,6 +147,22 @@ namespace PatternsTools
     static T to_value(const std::string &s,
                       const std::unique_ptr<PatternBase> &p = Convert<T>::to_pattern()) = delete;
   };
+
+  /**
+   * Declare a new entry in @p prm with name @p entry, set its default value
+   * to the content of the variable @p parameter, and create an action
+   * that will fill @p parameter with updated values when a file is parsed,
+   * or the entry is set to a new value.
+   *
+   * By default, the pattern to use is obtained by calling the function
+   * PatternsTools::Convert<T>::to_pattern(), but a custom one can be used.
+   */
+  template <class ParameterType>
+  void add_parameter(const std::string           &entry,
+                     ParameterType               &parameter,
+                     ParameterHandler            &prm,
+                     const std::string           &documentation = std::string(),
+                     const Patterns::PatternBase &pattern = *Convert<ParameterType>::to_pattern());
 
   /**
    * @addtogroup Exceptions
