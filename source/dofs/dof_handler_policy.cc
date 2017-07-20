@@ -2760,8 +2760,7 @@ namespace internal
               decompressing_stream.push(boost::iostreams::gzip_decompressor());
               decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
 
-              for (const auto p : buffer)
-                decompressing_stream << p;
+              decompressing_stream.write (&buffer[0], buffer.size());
             }
 
             // then restore the object from the buffer
