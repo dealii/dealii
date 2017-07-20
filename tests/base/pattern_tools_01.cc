@@ -15,7 +15,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/patterns_tools.h>
+#include <deal.II/base/pattern_tools.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/numbers.h>
@@ -26,11 +26,12 @@
 using namespace dealii;
 using namespace PatternTools;
 
-// Try conversion on container types
+// Try conversion on elementary types
 
 template<class T>
 void test(T t)
 {
+  deallog << "Type     : " << boost::core::demangle(typeid(T).name()) << std::endl;
   auto p = Convert<T>::to_pattern();
   deallog << "Pattern  : " << p->description() << std::endl;
   auto s = Convert<T>::to_string(t);
@@ -49,17 +50,11 @@ int main()
   std::string         t3 = "Ciao";
   double              t4 = 4.0;
 
-  std::vector<int                > t10(2, t0);
-  std::vector<unsigned int       > t11(2, t1);
-  std::vector<types::boundary_id > t12(2, t2);
-  std::vector<std::string        > t13(2, t3);
-  std::vector<double             > t14(2, t4);
-
-  test(t10);
-  test(t11);
-  test(t12);
-  test(t13);
-  test(t14);
+  test(t0);
+  test(t1);
+  test(t2);
+  test(t3);
+  test(t4);
 
   return 0;
 }

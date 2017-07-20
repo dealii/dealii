@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__patterns_tools_h
-#define dealii__patterns_tools_h
+#ifndef dealii__pattern_tools_h
+#define dealii__pattern_tools_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

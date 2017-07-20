@@ -15,7 +15,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/patterns_tools.h>
+#include <deal.II/base/pattern_tools.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/numbers.h>
@@ -26,7 +26,7 @@
 using namespace dealii;
 using namespace PatternTools;
 
-// Try conversion on non elementary types
+// Try conversion on container types
 
 template<class T>
 void test(T t)
@@ -43,37 +43,23 @@ int main()
 {
   initlog();
 
-  Point<1> t0(1);
-  Point<2> t1(2,3);
-  Point<3> t2(3,4,5);
+  int                 t0 = 1;
+  unsigned int        t1 = 2;
+  types::boundary_id  t2 = 3;
+  std::string         t3 = "Ciao";
+  double              t4 = 4.0;
 
-  Tensor<1,1> t3;
-  Tensor<1,2> t4;
-  Tensor<1,3> t5;
+  std::vector<int                > t10(2, t0);
+  std::vector<unsigned int       > t11(2, t1);
+  std::vector<types::boundary_id > t12(2, t2);
+  std::vector<std::string        > t13(2, t3);
+  std::vector<double             > t14(2, t4);
 
-  Tensor<2,1> t32;
-  Tensor<2,2> t42;
-  Tensor<2,3> t52;
-
-  Tensor<3,1> t33;
-  Tensor<3,2> t43;
-  Tensor<3,3> t53;
-
-  std::complex<double> t6(1,2);
-
-  test(t0);
-  test(t1);
-  test(t2);
-  test(t3);
-  test(t4);
-  test(t5);
-  test(t6);
-  test(t32);
-  test(t42);
-  test(t52);
-  test(t33);
-  test(t43);
-  test(t53);
+  test(t10);
+  test(t11);
+  test(t12);
+  test(t13);
+  test(t14);
 
   return 0;
 }

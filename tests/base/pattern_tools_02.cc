@@ -15,7 +15,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/patterns_tools.h>
+#include <deal.II/base/pattern_tools.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/numbers.h>
@@ -26,7 +26,7 @@
 using namespace dealii;
 using namespace PatternTools;
 
-// Try conversion on complex map types
+// Try conversion on non elementary types
 
 template<class T>
 void test(T t)
@@ -43,30 +43,37 @@ int main()
 {
   initlog();
 
-  Point<3>                          t0(1,2,3);
-  std::complex<double>              t1(4,5);
-  std::vector<Point<3>>             t2(2,t0);
-  std::vector<std::complex<double>> t3(2,t1);
+  Point<1> t0(1);
+  Point<2> t1(2,3);
+  Point<3> t2(3,4,5);
 
-  std::map<unsigned int, Point<3>                          > t10;
-  std::map<unsigned int, std::complex<double>              > t11;
-  std::map<unsigned int, std::vector<Point<3>>             > t12;
-  std::map<unsigned int, std::vector<std::complex<double>> > t13;
+  Tensor<1,1> t3;
+  Tensor<1,2> t4;
+  Tensor<1,3> t5;
 
-  t10[0] = t0;
-  t11[0] = t1;
-  t12[0] = t2;
-  t13[0] = t3;
+  Tensor<2,1> t32;
+  Tensor<2,2> t42;
+  Tensor<2,3> t52;
 
-  t10[2] = t0;
-  t11[2] = t1;
-  t12[2] = t2;
-  t13[2] = t3;
+  Tensor<3,1> t33;
+  Tensor<3,2> t43;
+  Tensor<3,3> t53;
 
-  test(t10);
-  test(t11);
-  test(t12);
-  test(t13);
+  std::complex<double> t6(1,2);
+
+  test(t0);
+  test(t1);
+  test(t2);
+  test(t3);
+  test(t4);
+  test(t5);
+  test(t6);
+  test(t32);
+  test(t42);
+  test(t52);
+  test(t33);
+  test(t43);
+  test(t53);
 
   return 0;
 }

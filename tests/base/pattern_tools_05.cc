@@ -15,7 +15,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/patterns_tools.h>
+#include <deal.II/base/pattern_tools.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/numbers.h>
@@ -26,7 +26,7 @@
 using namespace dealii;
 using namespace PatternTools;
 
-// Try conversion on map types
+// Try conversion on complex map types
 
 template<class T>
 void test(T t)
@@ -43,35 +43,30 @@ int main()
 {
   initlog();
 
-  int                 t0 = 1;
-  unsigned int        t1 = 2;
-  types::boundary_id  t2 = 3;
-  std::string         t3 = "Ciao";
-  double              t4 = 4.0;
+  Point<3>                          t0(1,2,3);
+  std::complex<double>              t1(4,5);
+  std::vector<Point<3>>             t2(2,t0);
+  std::vector<std::complex<double>> t3(2,t1);
 
-  std::map<unsigned int, int                > t10;
-  std::map<unsigned int, unsigned int       > t11;
-  std::map<unsigned int, types::boundary_id > t12;
-  std::map<unsigned int, std::string        > t13;
-  std::map<unsigned int, double             > t14;
+  std::map<unsigned int, Point<3>                          > t10;
+  std::map<unsigned int, std::complex<double>              > t11;
+  std::map<unsigned int, std::vector<Point<3>>             > t12;
+  std::map<unsigned int, std::vector<std::complex<double>> > t13;
 
   t10[0] = t0;
   t11[0] = t1;
   t12[0] = t2;
   t13[0] = t3;
-  t14[0] = t4;
 
   t10[2] = t0;
   t11[2] = t1;
   t12[2] = t2;
   t13[2] = t3;
-  t14[2] = t4;
 
   test(t10);
   test(t11);
   test(t12);
   test(t13);
-  test(t14);
 
   return 0;
 }
