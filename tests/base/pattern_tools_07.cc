@@ -24,7 +24,7 @@
 #include <memory>
 
 using namespace dealii;
-using namespace PatternTools;
+using namespace Patterns::Tools;
 
 // Try conversion on arbitrary container types
 

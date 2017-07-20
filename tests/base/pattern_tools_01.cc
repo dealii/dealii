@@ -15,7 +15,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/pattern_tools.h>
+#include <deal.II/base/patterns.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/numbers.h>
@@ -24,7 +24,7 @@
 #include <memory>
 
 using namespace dealii;
-using namespace PatternTools;
+using namespace Patterns::Tools;
 
 // Try conversion on elementary types
 
