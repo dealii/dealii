@@ -1,0 +1,5 @@
+Fixed: The ghost layer computation for the case when periodic boundary
+conditions were set on all boundaries in 3D missed some cells leading to a
+deadlock when used on 43 MPI ranks or more. This is now fixed.
+<br>
+(Martin Kronbichler, 2017/07/20)
