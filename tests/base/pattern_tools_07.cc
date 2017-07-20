@@ -15,7 +15,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/patterns_tools.h>
+#include <deal.II/base/patterns.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/numbers.h>

@@ -1,0 +1,26 @@
+
+DEAL::List of int         : -1, -1
+DEAL::List of unsigned int: 2, 2, 2
+DEAL::List of double      : 3.140000, 3.140000, 3.140000, 3.140000
+DEAL::List of string      : bar, bar
+DEAL::Point<3>            : 3.000000, 2.000000, 1.000000
+DEAL::std::complex        : 2.000000, 1.000000
+DEAL::List of lists of int         : 1, 1, 1; 1, 1, 1
+DEAL::List of lists of unsigned int: 2, 2, 2; 2, 2, 2
+DEAL::List of lists of double      : 3.140000, 3.140000, 3.140000; 3.140000, 3.140000, 3.140000
+DEAL::List of lists of string      : foo, foo, foo; foo, foo, foo
+DEAL::List of Point<3>             : 4.000000, 3.000000, 2.000000; 4.000000, 3.000000, 2.000000
+DEAL::List of std::complex         : 1.000000, 3.000000; 1.000000, 3.000000
+DEAL::=============================
+DEAL::List of int         : 1, 2, 3
+DEAL::List of unsigned int: 3, 4, 5
+DEAL::List of double      : 5.000000, 6.000000, 7.000000
+DEAL::List of string      : 8, 9, 8.5
+DEAL::Point<3>            : 8.000000, 9.000000, 8.500000
+DEAL::std::complex        : 2.000000, 9.000000
+DEAL::List of lists of int         : 1, 2, 3; 1, 2, 3
+DEAL::List of lists of unsigned int: 3, 4, 5; 3, 4, 5
+DEAL::List of lists of double      : 5.000000, 6.000000, 7.000000; 5.000000, 6.000000, 7.000000
+DEAL::List of lists of string      : 8, 9, 8.5; 8, 9, 8.5
+DEAL::List of Point<3>             : 8.000000, 9.000000, 8.500000; 8.000000, 9.000000, 8.500000
+DEAL::List of std::complex         : 1.000000, 2.000000; 6.000000, 7.000000

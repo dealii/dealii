@@ -1,0 +1,53 @@
+
+DEAL:parameters::A Point<1>: 5.000000
+DEAL:parameters::A Point<2>: 6.000000, 7.000000
+DEAL:parameters::A Point<3>: 8.000000, 9.000000, 10.000000
+DEAL:parameters::A complex: 3.000000, 4.000000
+DEAL:parameters::A double: 2.000000
+DEAL:parameters::A list of Point<1>: 5.000000; 5.000000
+DEAL:parameters::A list of Point<2>: 6.000000, 7.000000; 6.000000, 7.000000
+DEAL:parameters::A list of Point<3>: 8.000000, 9.000000, 10.000000; 8.000000, 9.000000, 10.000000
+DEAL:parameters::A list of complexes: 3.000000, 4.000000; 3.000000, 4.000000
+DEAL:parameters::A list of doubles: 2.000000, 2.000000
+DEAL:parameters::A list of signed integers: -1, -1
+DEAL:parameters::A list of strings: foo, foo
+DEAL:parameters::A list of unsigned integers: 1, 1
+DEAL:parameters::A signed integer: -1
+DEAL:parameters::A string: foo
+DEAL:parameters::An unsigned integer: 1
+DEAL::After ParameterHandler::set ==========================
+DEAL::
+DEAL:parameters::A Point<1>: 7.0
+DEAL:parameters::A Point<2>: 8.0, 9.0
+DEAL:parameters::A Point<3>: 10.0, 11.0, 12.0
+DEAL:parameters::A complex: 5.0, 6.0
+DEAL:parameters::A double: 4.0
+DEAL:parameters::A list of Point<1>: 1.0; 2.0
+DEAL:parameters::A list of Point<2>: 3.0, 4.0;  5.0,6.0
+DEAL:parameters::A list of Point<3>: 7.0, 8.0, 9.0;  10.0, 11.0, 12.0
+DEAL:parameters::A list of complexes: 1.0,2.0; 3.0,4.0
+DEAL:parameters::A list of doubles: 9.0,10.0
+DEAL:parameters::A list of signed integers: -3,-4
+DEAL:parameters::A list of strings: foo, bar
+DEAL:parameters::A list of unsigned integers: 6,7
+DEAL:parameters::A signed integer: -2
+DEAL:parameters::A string: bar
+DEAL:parameters::An unsigned integer: 3
+DEAL::Actual variables            ==========================
+DEAL::
+DEAL::Values: -2
+DEAL::Values: 3
+DEAL::Values: 4.00000
+DEAL::Values: (5.00000,6.00000)
+DEAL::Values: bar
+DEAL::Values: 7.00000
+DEAL::Values: 8.00000 9.00000
+DEAL::Values: 10.0000 11.0000 12.0000
+DEAL::Vector values: -3, -4
+DEAL::Vector values: 6, 7
+DEAL::Vector values: 9.00000, 10.0000
+DEAL::Vector values: (1.00000,2.00000), (3.00000,4.00000)
+DEAL::Vector values: foo, bar
+DEAL::Vector values: 1.00000, 2.00000
+DEAL::Vector values: 3.00000 4.00000, 5.00000 6.00000
+DEAL::Vector values: 7.00000 8.00000 9.00000, 10.0000 11.0000 12.0000

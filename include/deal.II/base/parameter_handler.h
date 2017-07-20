@@ -1004,6 +1004,22 @@ public:
                    const std::function<void (const std::string &value)> &action);
 
   /**
+   * Declare a new entry name @p entry, set its default value to the content of
+   * the variable @p parameter, and create an action that will fill @p
+   * parameter with updated values when a file is parsed, or the entry is set
+   * to a new value.
+   *
+   * By default, the pattern to use is obtained by calling the function
+   * Patterns::Tools::Convert<T>::to_pattern(), but a custom one can be used.
+   */
+  template <class ParameterType>
+  void add_parameter(const std::string &entry,
+                     ParameterType &parameter,
+                     const std::string &documentation = std::string(),
+                     const Patterns::PatternBase &pattern =
+                       *Patterns::Tools::Convert<ParameterType>::to_pattern());
+
+  /**
    * Create an alias for an existing entry. This provides a way to refer to a
    * parameter in the input file using an alternate name. The alias will be in
    * the current section, and the referenced entry needs to be an existing
@@ -1886,6 +1902,7 @@ private:
 };
 
 
+// ---------------------- inline and template functions --------------------
 template <class Archive>
 inline
 void
@@ -1925,6 +1942,35 @@ ParameterHandler::load (Archive &ar, const unsigned int)
     patterns.push_back (std::shared_ptr<const Patterns::PatternBase>(Patterns::pattern_factory(descriptions[j])));
 }
 
+
+template <class ParameterType>
+void ParameterHandler::add_parameter(const std::string &entry,
+                                     ParameterType &parameter,
+                                     const std::string &documentation,
+                                     const Patterns::PatternBase &pattern)
+{
+
+  static_assert(std::is_const<ParameterType>::value == false,
+                "You tried to add a parameter using a type "
+                "that is const. Use a non-const type.");
+
+  declare_entry(entry,
+                Patterns::Tools::Convert<ParameterType>::to_string(
+                  parameter, pattern.clone()),
+                pattern,
+                documentation);
+
+  std::string path = get_current_full_path(entry);
+  const unsigned int pattern_index
+    = entries->get<unsigned int> (path + path_separator + "pattern");
+
+  auto action = [ &, pattern_index](const std::string &val)
+  {
+    parameter =
+      Patterns::Tools::Convert<ParameterType>::to_value(val, patterns[pattern_index]->clone());
+  };
+  add_action(entry, action);
+}
 
 DEAL_II_NAMESPACE_CLOSE
 
