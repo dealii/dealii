@@ -24,7 +24,7 @@
 #include <memory>
 
 using namespace dealii;
-using namespace PatternsTools;
+using namespace PatternTools;
 
 // Try conversion on elementary types
 
