@@ -20,6 +20,9 @@ DEAL::To value : 0.000000, 0.000000, 0.000000
 DEAL::Pattern  : [List of <[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]> of length 2...2 (inclusive)]
 DEAL::To String: 1.000000, 2.000000
 DEAL::To value : 1.000000, 2.000000
+DEAL::Pattern  : [Map of <[Integer range -2147483648...2147483647 (inclusive)]>:<[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]> of length 1...1 (inclusive)]
+DEAL::To String: 1:2.000000
+DEAL::To value : 1:2.000000
 DEAL::Pattern  : [List of <[List of <[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]> of length 1...1 (inclusive)]> of length 1...1 (inclusive) separated by <;>]
 DEAL::To String: 0.000000
 DEAL::To value : 0.000000

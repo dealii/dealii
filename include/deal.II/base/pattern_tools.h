@@ -128,6 +128,8 @@ namespace PatternTools
    * The second template parameter is used internally to allow for advanced
    * SFINAE (substitution failure is not an error) tricks used to specialise
    * this class for arbitrary STL containers and maps.
+   *
+   * @author Luca Heltai, 2017
    */
   template <class T, class Enable = void>
   struct Convert
@@ -136,6 +138,10 @@ namespace PatternTools
     /**
      * Return a std::unique_ptr to a Pattern that can be used to interpret a
      * string as the type of the template argument, and the other way around.
+     *
+     * While the current function (in the general Convert template) is deleted,
+     * it is implemented and available in the specializations of the Convert
+     * class template for particular kinds of template arguments @p T.
      */
     static std::unique_ptr<Patterns::PatternBase> to_pattern() = delete;
 
@@ -144,7 +150,9 @@ namespace PatternTools
      * pattern passed to perform the conversion, or create and use a default
      * one.
      *
-     * The created string is
+     * While the current function (in the general Convert template) is deleted,
+     * it is implemented and available in the specializations of the Convert
+     * class template for particular kinds of template arguments @p T.
      */
     static std::string to_string(const T &s,
                                  const std::unique_ptr<Patterns::PatternBase>
@@ -153,6 +161,10 @@ namespace PatternTools
     /**
      * Convert a string to a value, using the given pattern. Use the pattern
      * passed to perform the conversion, or create and use a default one.
+     *
+     * While the current function (in the general Convert template) is deleted,
+     * it is implemented and available in the specializations of the Convert
+     * class template for particular kinds of template arguments @p T.
      */
     static T to_value(const std::string &s,
                       const std::unique_ptr<Patterns::PatternBase> &p =
@@ -217,10 +229,10 @@ namespace PatternTools
      * map. A class with map_rank::value = 0 is either a List compatible
      * class, or an elementary type.
      *
-     * Elementary types are not compatible with Patterns::List, but
-     * non elementary types, like Point(), or std::complex<double>, are
-     * compatible with the List type. Adding more compatible types is a matter
-     * of adding a specialization of this struct for the given type.
+     * Elementary types are not compatible with Patterns::List, but non
+     * elementary types, like Point(), or std::complex<double>, are compatible
+     * with the List type. Adding more compatible types is a matter of adding a
+     * specialization of this struct for the given type.
      *
      * @author Luca Heltai, 2017
      */
@@ -275,6 +287,13 @@ namespace PatternTools
         }
       else
         is >> value;
+
+      // If someone passes "123 abc" to the function, the method yelds an
+      // integer 123 alright, but the space terminates the read from the string
+      // although there is more to come. This case, however, is checked for in
+      // the call p->match(s) at the beginning of this function, and would
+      // throw earlier. Here it is safe to assume that if we didn't fail the
+      // conversion with the operator >>, then we are good to go.
       AssertThrow(!is.fail(),
                   ExcMessage("Failed to convert from \"" + s +
                              "\" to the type \"" +
@@ -368,6 +387,13 @@ namespace PatternTools
       static constexpr int list_rank = RankInfo<Number>::list_rank + 1;
       static constexpr int map_rank = RankInfo<Number>::map_rank;
     };
+
+    template <class Key, class Value>
+    struct RankInfo<std::pair<Key,Value>>
+    {
+      static constexpr int list_rank = std::max(RankInfo<Key>::list_rank, RankInfo<Value>::list_rank);
+      static constexpr int map_rank = std::max(RankInfo<Key>::map_rank, RankInfo<Value>::map_rank)+1;
+    };
   }
 
   // stl containers
@@ -412,9 +438,6 @@ namespace PatternTools
       return s;
     }
 
-    /**
-     * Convert a string to a value, using the given pattern, or a default one.
-     */
     static T to_value(const std::string &s,
                       const std::unique_ptr<Patterns::PatternBase> &pattern =
                         Convert<T>::to_pattern())
@@ -463,7 +486,6 @@ namespace PatternTools
                                  const std::unique_ptr<Patterns::PatternBase>
                                  &pattern = Convert<T>::to_pattern())
     {
-
       auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
       AssertThrow(
         p,
@@ -703,6 +725,48 @@ namespace PatternTools
     {
       AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
       return s;
+    }
+  };
+
+
+  // Pairs
+  template <class Key, class Value>
+  struct Convert<std::pair<Key,Value>>
+  {
+    typedef std::pair<Key,Value> T;
+
+    static std::unique_ptr<Patterns::PatternBase> to_pattern()
+    {
+      static_assert(internal::RankInfo<T>::map_rank > 0,
+                    "Cannot use this class for non Map-compatible types.");
+      return std_cxx14::make_unique<Patterns::Map>(
+               *Convert<Key>::to_pattern(),
+               *Convert<Value>::to_pattern(),
+               1, 1,
+               // We keep the same list separator of the previous level, as this is
+               // a map with only 1 possible entry
+               internal::default_list_separator[internal::RankInfo<T>::list_rank],
+               internal::default_map_separator[internal::RankInfo<T>::map_rank - 1]);
+    }
+
+    static std::string to_string(const T &t,
+                                 const std::unique_ptr<Patterns::PatternBase>
+                                 &pattern = Convert<T>::to_pattern())
+    {
+      std::unordered_map<Key, Value> m;
+      m.insert(t);
+      std:: string s = Convert<decltype(m)>::to_string(m, pattern);
+      AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
+      return s;
+    }
+
+    static T to_value(const std::string &s,
+                      const std::unique_ptr<Patterns::PatternBase> &pattern =
+                        Convert<T>::to_pattern())
+    {
+      std::unordered_map<Key, Value> m;
+      m = Convert<decltype(m)>::to_value(s, pattern);
+      return *m.begin();
     }
   };
 

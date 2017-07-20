@@ -60,6 +60,7 @@ int main()
   Tensor<3,3> t53;
 
   std::complex<double> t6(1,2);
+  auto t7 = std::make_pair(1, 2.0);
 
   test(t0);
   test(t1);
@@ -68,6 +69,7 @@ int main()
   test(t4);
   test(t5);
   test(t6);
+  test(t7);
   test(t32);
   test(t42);
   test(t52);
