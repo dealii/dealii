@@ -287,6 +287,18 @@ public:
    */
   template <bool level_dof_access2>
   DoFAccessor(const DoFAccessor<structdim, DoFHandlerType, level_dof_access2> &);
+
+  /**
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
+   * by @p b to the object pointed to by @p a. However, the result of
+   * dereferencing an iterator is not an object but an accessor; consequently,
+   * this operation is not useful for iterators on DoF handler objects.
+   * Consequently, this operator is declared as deleted and can not be used.
+   */
+  DoFAccessor<structdim,DoFHandlerType, level_dof_access> &
+  operator = (const DoFAccessor<structdim,DoFHandlerType, level_dof_access> &da) = delete;
+
   /**
    * @}
    */
@@ -670,18 +682,6 @@ protected:
   template <int, class, bool> friend class DoFAccessor;
 
 private:
-  /**
-   * Copy operator. This is normally used in a context like <tt>iterator a,b;
-   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
-   * by @p b to the object pointed to by @p a. However, the result of
-   * dereferencing an iterator is not an object but an accessor; consequently,
-   * this operation is not useful for iterators on triangulations. We declare
-   * this function here private, thus it may not be used from outside.
-   * Furthermore it is not implemented and will give a linker error if used
-   * anyway.
-   */
-  DoFAccessor<structdim,DoFHandlerType, level_dof_access> &
-  operator = (const DoFAccessor<structdim,DoFHandlerType, level_dof_access> &da);
 
   /**
    * Make the DoFHandler class a friend so that it can call the set_xxx()
@@ -802,6 +802,17 @@ public:
   DoFAccessor (const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &);
 
   /**
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
+   * by @p b to the object pointed to by @p a. However, the result of
+   * dereferencing an iterator is not an object but an accessor; consequently,
+   * this operation is not useful for iterators on DoF handler objects.
+   * Consequently, this operator is declared as deleted and can not be used.
+   */
+  DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access> &
+  operator = (const DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access> &da) = delete;
+
+  /**
    * @}
    */
 
@@ -810,12 +821,6 @@ public:
    */
   const DoFHandlerType<1,spacedim> &
   get_dof_handler () const;
-
-  /**
-   * Copy operator.
-   */
-  DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access> &
-  operator = (const DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access> &da);
 
   /**
    * Implement the copy operator needed for the iterator classes.
@@ -1227,6 +1232,17 @@ public:
   template <int dim2, class DoFHandlerType2, bool level_dof_access2>
   explicit
   DoFCellAccessor (const DoFAccessor<dim2, DoFHandlerType2, level_dof_access2> &);
+
+  /**
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
+   * by @p b to the object pointed to by @p a. However, the result of
+   * dereferencing an iterator is not an object but an accessor; consequently,
+   * this operation is not useful for iterators on DoF handler objects.
+   * Consequently, this operator is declared as deleted and can not be used.
+   */
+  DoFCellAccessor<DoFHandlerType, level_dof_access> &
+  operator = (const DoFCellAccessor<DoFHandlerType, level_dof_access> &da) = delete;
 
   /**
    * @}
@@ -1716,18 +1732,6 @@ public:
   void update_cell_dof_indices_cache () const;
 
 private:
-  /**
-   * Copy operator. This is normally used in a context like <tt>iterator a,b;
-   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
-   * by @p b to the object pointed to by @p a. However, the result of
-   * dereferencing an iterator is not an object but an accessor; consequently,
-   * this operation is not useful for iterators on triangulations. We declare
-   * this function here private, thus it may not be used from outside.
-   * Furthermore it is not implemented and will give a linker error if used
-   * anyway.
-   */
-  DoFCellAccessor<DoFHandlerType, level_dof_access> &
-  operator = (const DoFCellAccessor<DoFHandlerType, level_dof_access> &da);
 
   /**
    * Make the DoFHandler class a friend so that it can call the

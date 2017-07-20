@@ -294,6 +294,16 @@ protected:
   TriaAccessorBase (const TriaAccessorBase &);
 
   /**
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
+   * by @p b to the object pointed to by @p a. However, the result of
+   * dereferencing an iterator is not an object but an accessor; consequently,
+   * this operation is not useful for iterators on triangulations.
+   * Consequently, this operator is declared as deleted and can not be used.
+   */
+  void operator = (const TriaAccessorBase *) = delete;
+
+  /**
    * Copy operator. Since this is only called from iterators, do not return
    * anything, since the iterator will return itself.
    *
@@ -316,16 +326,6 @@ protected:
   bool operator < (const TriaAccessorBase &other) const;
 
 protected:
-  /**
-   * Copy operator. This is normally used in a context like <tt>iterator a,b;
-   * *a=*b;</tt>. Since the meaning is to copy the object pointed to by @p b
-   * to the object pointed to by @p a and since accessors are not real but
-   * virtual objects, this operation is not useful for iterators on
-   * triangulations. We declare this function here private, thus it may not be
-   * used from outside. Furthermore it is not implemented and will give a
-   * linker error if used anyway.
-   */
-  void operator = (const TriaAccessorBase *);
 
   /**
    * Compare for equality.
@@ -622,6 +622,16 @@ public:
    */
   template <int structdim2, int dim2, int spacedim2>
   TriaAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &);
+
+  /**
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
+   * by @p b to the object pointed to by @p a. However, the result of
+   * dereferencing an iterator is not an object but an accessor; consequently,
+   * this operation is not useful for iterators on triangulations.
+   * Consequently, this operator is declared as deleted and can not be used.
+   */
+  void operator = (const TriaAccessor &) = delete;
 
   /**
    * Test for the element being used or not.  The return value is @p true for
@@ -1517,17 +1527,6 @@ private:
   void clear_children () const;
 
 private:
-  /**
-   * Copy operator. This is normally used in a context like <tt>iterator a,b;
-   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
-   * by @p b to the object pointed to by @p a. However, the result of
-   * dereferencing an iterator is not an object but an accessor; consequently,
-   * this operation is not useful for iterators on triangulations. We declare
-   * this function here private, thus it may not be used from outside.
-   * Furthermore it is not implemented and will give a linker error if used
-   * anyway.
-   */
-  void operator = (const TriaAccessor &);
 
   template <int, int> friend class Triangulation;
 
@@ -2417,6 +2416,16 @@ public:
   CellAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &);
 
   /**
+   * Copy operator. These operators are usually used in a context like <tt>iterator a,b;
+   * *a=*b;</tt>. Presumably, the intent here is to copy the object pointed to
+   * by @p b to the object pointed to by @p a. However, the result of
+   * dereferencing an iterator is not an object but an accessor; consequently,
+   * this operation is not useful for iterators on triangulations.
+   * Consequently, this operator is declared as deleted and can not be used.
+   */
+  void operator = (const CellAccessor<dim, spacedim> &) = delete;
+
+  /**
    * @}
    */
 
@@ -3231,16 +3240,6 @@ private:
    * @ref GlossDirectionFlag.
    */
   void set_direction_flag (const bool new_direction_flag) const;
-  /**
-   * Copy operator. This is normally used in a context like <tt>iterator a,b;
-   * *a=*b;</tt>. Since the meaning is to copy the object pointed to by @p b
-   * to the object pointed to by @p a and since accessors are not real but
-   * virtual objects, this operation is not useful for iterators on
-   * triangulations. We declare this function here private, thus it may not be
-   * used from outside.  Furthermore it is not implemented and will give a
-   * linker error if used anyway.
-   */
-  void operator = (const CellAccessor<dim, spacedim> &);
 
   template <int, int> friend class Triangulation;
 
