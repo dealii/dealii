@@ -1211,36 +1211,36 @@ namespace Patterns
       const std::array<std::string, 4> default_map_separator {{":"  ,  "="  ,  "@"  ,   "#"}};
 
       //specialize a type for all of the STL containers and maps
-      template <typename T>       struct is_stl_container : std::false_type {};
-      template <typename T, std::size_t N> struct is_stl_container<std::array    <T,N>>     : std::true_type {};
-      template <typename... Args> struct is_stl_container<std::vector            <Args...>> : std::true_type {};
-      template <typename... Args> struct is_stl_container<std::deque             <Args...>> : std::true_type {};
-      template <typename... Args> struct is_stl_container<std::list              <Args...>> : std::true_type {};
-      template <typename... Args> struct is_stl_container<std::set               <Args...>> : std::true_type {};
-      template <typename... Args> struct is_stl_container<std::multiset          <Args...>> : std::true_type {};
-      template <typename... Args> struct is_stl_container<std::unordered_set     <Args...>> : std::true_type {};
-      template <typename... Args> struct is_stl_container<std::unordered_multiset<Args...>> : std::true_type {};
+      template <typename T>       struct is_list_compatible : std::false_type {};
+      template <typename T, std::size_t N> struct is_list_compatible<std::array    <T,N>>     : std::true_type {};
+      template <typename... Args> struct is_list_compatible<std::vector            <Args...>> : std::true_type {};
+      template <typename... Args> struct is_list_compatible<std::deque             <Args...>> : std::true_type {};
+      template <typename... Args> struct is_list_compatible<std::list              <Args...>> : std::true_type {};
+      template <typename... Args> struct is_list_compatible<std::set               <Args...>> : std::true_type {};
+      template <typename... Args> struct is_list_compatible<std::multiset          <Args...>> : std::true_type {};
+      template <typename... Args> struct is_list_compatible<std::unordered_set     <Args...>> : std::true_type {};
+      template <typename... Args> struct is_list_compatible<std::unordered_multiset<Args...>> : std::true_type {};
 
-      template <typename T>       struct is_stl_map : std::false_type {};
-      template <typename... Args> struct is_stl_map<std::map               <Args...>> : std::true_type {};
-      template <typename... Args> struct is_stl_map<std::multimap          <Args...>> : std::true_type {};
-      template <typename... Args> struct is_stl_map<std::unordered_map     <Args...>> : std::true_type {};
-      template <typename... Args> struct is_stl_map<std::unordered_multimap<Args...>> : std::true_type {};
+      template <typename T>       struct is_map_compatible : std::false_type {};
+      template <typename... Args> struct is_map_compatible<std::map               <Args...>> : std::true_type {};
+      template <typename... Args> struct is_map_compatible<std::multimap          <Args...>> : std::true_type {};
+      template <typename... Args> struct is_map_compatible<std::unordered_map     <Args...>> : std::true_type {};
+      template <typename... Args> struct is_map_compatible<std::unordered_multimap<Args...>> : std::true_type {};
     }
 
     // type trait to use the implementation type traits as well as decay the type
     template <typename T>
-    struct is_stl_container
+    struct is_list_compatible
     {
       static constexpr bool const value =
-        internal::is_stl_container<typename std::decay<T>::type>::value;
+        internal::is_list_compatible<typename std::decay<T>::type>::value;
     };
 
     template <typename T>
-    struct is_stl_map
+    struct is_map_compatible
     {
       static constexpr bool const value =
-        internal::is_stl_map<typename std::decay<T>::type>::value;
+        internal::is_map_compatible<typename std::decay<T>::type>::value;
     };
 
     namespace internal
@@ -1248,7 +1248,7 @@ namespace Patterns
       // Rank of vector types
       template <class T>
       struct RankInfo<T,
-        typename std::enable_if<is_stl_container<T>::value>::type>
+        typename std::enable_if<is_list_compatible<T>::value>::type>
       {
         static constexpr int list_rank =
           RankInfo<typename T::value_type>::list_rank + 1;
@@ -1258,7 +1258,7 @@ namespace Patterns
 
       // Rank of map types
       template <class T>
-      struct RankInfo<T, typename std::enable_if<is_stl_map<T>::value>::type>
+      struct RankInfo<T, typename std::enable_if<is_map_compatible<T>::value>::type>
       {
         static constexpr int list_rank =
           std::max(internal::RankInfo<typename T::key_type>::list_rank,
@@ -1301,7 +1301,7 @@ namespace Patterns
 
     // stl containers
     template <class T>
-    struct Convert<T, typename std::enable_if<is_stl_container<T>::value>::type>
+    struct Convert<T, typename std::enable_if<is_list_compatible<T>::value>::type>
     {
       static std::unique_ptr<Patterns::PatternBase> to_pattern()
       {
@@ -1320,10 +1320,8 @@ namespace Patterns
       {
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(
-          p,
-          ExcMessage(
-            "I need a List pattern to convert a string to a List type."));
+        AssertThrow(p, ExcMessage("I need a List pattern to convert a "
+                                  "string to a List type."));
         auto base_p = p->get_base_pattern().clone();
         std::vector<std::string> vec(t.size());
 
@@ -1349,10 +1347,8 @@ namespace Patterns
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(
-          p,
-          ExcMessage(
-            "I need a List pattern to convert a string to a List type."));
+        AssertThrow(p,ExcMessage("I need a List pattern to convert a string "
+                                 "to a List type."));
 
         auto base_p = p->get_base_pattern().clone();
         T t;
@@ -1368,7 +1364,7 @@ namespace Patterns
 
     // stl maps
     template <class T>
-    struct Convert<T, typename std::enable_if<is_stl_map<T>::value>::type>
+    struct Convert<T, typename std::enable_if<is_map_compatible<T>::value>::type>
     {
       static std::unique_ptr<Patterns::PatternBase> to_pattern()
       {
@@ -1390,9 +1386,8 @@ namespace Patterns
                                    &pattern = Convert<T>::to_pattern())
       {
         auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
-        AssertThrow(
-          p,
-          ExcMessage("I need a Map pattern to convert a string to a List type."));
+        AssertThrow(p, ExcMessage("I need a Map pattern to convert a string to "
+                                  "a Map compatbile type."));
         auto key_p = p->get_key_pattern().clone();
         auto val_p = p->get_value_pattern().clone();
         std::vector<std::string> vec(t.size());
@@ -1422,9 +1417,8 @@ namespace Patterns
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
 
         auto p = dynamic_cast<const Patterns::Map *>(pattern.get());
-        AssertThrow(
-          p,
-          ExcMessage("I need a Map pattern to convert a string to a List type."));
+        AssertThrow(p, ExcMessage("I need a Map pattern to convert a "
+                                  "string to a Map compatible type."));
 
         auto key_p = p->get_key_pattern().clone();
         auto val_p = p->get_value_pattern().clone();
@@ -1467,10 +1461,8 @@ namespace Patterns
       {
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(
-          p,
-          ExcMessage(
-            "I need a List pattern to convert a string to a List type."));
+        AssertThrow(p,ExcMessage("I need a List pattern to convert a string "
+                                 "to a List compatbile type."));
         auto base_p = p->get_base_pattern().clone();
         std::vector<std::string> vec(dim);
 
@@ -1495,10 +1487,8 @@ namespace Patterns
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(
-          p,
-          ExcMessage(
-            "I need a List pattern to convert a string to a List type."));
+        AssertThrow(p,ExcMessage("I need a List pattern to convert a string "
+                                 "to a List compatbile type."));
 
         auto base_p = p->get_base_pattern().clone();
         T t;
@@ -1563,10 +1553,9 @@ namespace Patterns
       {
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(
-          p,
-          ExcMessage(
-            "I need a List pattern to convert a string to a List type."));
+        AssertThrow(p,ExcMessage("I need a List pattern to convert a string "
+                                 "to a List compatbile type."));
+
         auto base_p = p->get_base_pattern().clone();
         std::string s =
           Convert<typename T::value_type>::to_string(t.real(), base_p) +
@@ -1588,10 +1577,8 @@ namespace Patterns
         AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
 
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
-        AssertThrow(
-          p,
-          ExcMessage(
-            "I need a List pattern to convert a string to a List type."));
+        AssertThrow(p,ExcMessage("I need a List pattern to convert a string "
+                                 "to a List compatbile type."));
 
         auto base_p = p->get_base_pattern().clone();
 

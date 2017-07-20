@@ -1,5 +1,5 @@
-New: The new namespace Patterns::Tools contain now some 
-utilities that can be used to Convert from complicated types
+New: The new namespace Patterns::Tools contains 
+utilities that can be used to convert from complicated types
 to strings and vice versa. These tools have been put to use
 in the method ParameterHandler::add_parameter() that allows
 users to perform in one single call the operations 
