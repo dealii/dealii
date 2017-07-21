@@ -3491,32 +3491,43 @@ namespace parallel
       typename std::map<std::pair<cell_iterator, unsigned int>,
                std::pair<std::pair<cell_iterator,unsigned int>, std::bitset<3> > >::const_iterator it;
 
-      for (it = this->get_periodic_face_map().begin(); it!= this->get_periodic_face_map().end(); ++it)
-        {
-          const cell_iterator &cell_1 = it->first.first;
-          const unsigned int face_no_1 = it->first.second;
-          const cell_iterator &cell_2 = it->second.first.first;
-          const unsigned int face_no_2 = it->second.first.second;
-          const std::bitset<3> &face_orientation = it->second.second;
+      // When a connectivity in the code below is detected, the assignment
+      // 'marked_vertices[v1] = marked_vertices[v2] = true' makes sure that
+      // the information about the periodicity propagates back to vertices on
+      // cells that are not owned locally. However, in the worst case we want
+      // to connect to a vertex that is 'dim' hops away from the locally owned
+      // cell. Depending on the order of the periodic face map, we might
+      // connect to that point by chance or miss it. However, after looping
+      // through all the periodict directions (which are at most as many as
+      // the number of space dimensions) we can be sure that all connections
+      // to vertices have been created.
+      for (unsigned int repetition=0; repetition<dim; ++repetition)
+        for (it = this->get_periodic_face_map().begin(); it!= this->get_periodic_face_map().end(); ++it)
+          {
+            const cell_iterator &cell_1 = it->first.first;
+            const unsigned int face_no_1 = it->first.second;
+            const cell_iterator &cell_2 = it->second.first.first;
+            const unsigned int face_no_2 = it->second.first.second;
+            const std::bitset<3> &face_orientation = it->second.second;
 
-          if (cell_1->level() == level &&
-              cell_2->level() == level)
-            {
-              for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
-                {
-                  // take possible non-standard orientation of faces into account
-                  const unsigned int vface0 =
-                    GeometryInfo<dim>::standard_to_real_face_vertex(v,face_orientation[0],
-                                                                    face_orientation[1],
-                                                                    face_orientation[2]);
-                  if (marked_vertices[cell_1->face(face_no_1)->vertex_index(vface0)] ||
-                      marked_vertices[cell_2->face(face_no_2)->vertex_index(v)])
-                    marked_vertices[cell_1->face(face_no_1)->vertex_index(vface0)]
-                      = marked_vertices[cell_2->face(face_no_2)->vertex_index(v)]
-                        = true;
-                }
-            }
-        }
+            if (cell_1->level() == level &&
+                cell_2->level() == level)
+              {
+                for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
+                  {
+                    // take possible non-standard orientation of faces into account
+                    const unsigned int vface0 =
+                      GeometryInfo<dim>::standard_to_real_face_vertex(v,face_orientation[0],
+                                                                      face_orientation[1],
+                                                                      face_orientation[2]);
+                    if (marked_vertices[cell_1->face(face_no_1)->vertex_index(vface0)] ||
+                        marked_vertices[cell_2->face(face_no_2)->vertex_index(v)])
+                      marked_vertices[cell_1->face(face_no_1)->vertex_index(vface0)]
+                        = marked_vertices[cell_2->face(face_no_2)->vertex_index(v)]
+                          = true;
+                  }
+              }
+          }
 
       return marked_vertices;
     }
