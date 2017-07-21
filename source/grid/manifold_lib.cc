@@ -276,8 +276,8 @@ get_tangent_vector (const Point<spacedim> &p1,
 template <int dim, int spacedim>
 Point<spacedim>
 SphericalManifold<dim,spacedim>::
-get_new_point (const std::vector<Point<spacedim> > &vertices,
-               const std::vector<double> &weights) const
+get_new_point (const ArrayView<const Point<spacedim>> &vertices,
+               const ArrayView<const double>          &weights) const
 {
   const unsigned int n_points = vertices.size();
 
@@ -368,8 +368,8 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const Point<spacedim> &d
 template <int dim, int spacedim>
 Point<spacedim>
 CylindricalManifold<dim,spacedim>::
-get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
-               const std::vector<double>           &weights) const
+get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
+               const ArrayView<const double>          &weights) const
 {
   // First check if the average in space lies on the axis.
   Point<spacedim> middle;
@@ -536,11 +536,12 @@ DerivativeForm<1,chartdim, spacedim>
 FunctionManifold<dim,spacedim,chartdim>::push_forward_gradient(const Point<chartdim> &chart_point) const
 {
   DerivativeForm<1, chartdim, spacedim> DF;
-  std::vector<Tensor<1, chartdim> > gradients(spacedim);
-  push_forward_function->vector_gradient(chart_point, gradients);
   for (unsigned int i=0; i<spacedim; ++i)
-    for (unsigned int j=0; j<chartdim; ++j)
-      DF[i][j] = gradients[i][j];
+    {
+      const auto gradient = push_forward_function->gradient(chart_point, i);
+      for (unsigned int j=0; j<chartdim; ++j)
+        DF[i][j] = gradient[j];
+    }
   return DF;
 }
 
@@ -724,8 +725,12 @@ namespace
 
         // add the contribution from the lines around the cell (first line in
         // formula)
-        std::vector<double> weights(GeometryInfo<2>::vertices_per_face);
-        std::vector<Point<spacedim> > points(GeometryInfo<2>::vertices_per_face);
+        std::array<double, GeometryInfo<2>::vertices_per_face> weights;
+        std::array<Point<spacedim>, GeometryInfo<2>::vertices_per_face> points;
+        // note that the views are immutable, but the arrays are not
+        const auto weights_view = make_array_view(weights.begin(), weights.end());
+        const auto points_view = make_array_view(points.begin(), points.end());
+
         for (unsigned int line=0; line<GeometryInfo<2>::lines_per_cell; ++line)
           {
             const double my_weight = line%2 ? chart_point[line/2] : 1-chart_point[line/2];
@@ -748,7 +753,8 @@ namespace
                 weights[0] = 1. - line_point;
                 weights[1] = line_point;
                 new_point += my_weight *
-                             cell.line(line)->get_manifold().get_new_point(points, weights);
+                             cell.line(line)->get_manifold().get_new_point(points_view,
+                                                                           weights_view);
               }
           }
 
@@ -790,8 +796,12 @@ namespace
           weights_lines[line] = 0;
 
         // start with the contributions of the faces
-        std::vector<double> weights;
-        std::vector<Point<spacedim> > points;
+        std::array<double, GeometryInfo<2>::vertices_per_cell> weights;
+        std::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell> points;
+        // note that the views are immutable, but the arrays are not
+        const auto weights_view = make_array_view(weights.begin(), weights.end());
+        const auto points_view = make_array_view(points.begin(), points.end());
+
         for (unsigned int face=0; face<GeometryInfo<3>::faces_per_cell; ++face)
           {
             Point<2> quad_point(chart_point[(face/2+1)%3], chart_point[(face/2+2)%3]);
@@ -817,15 +827,14 @@ namespace
               }
             else
               {
-                points.resize(GeometryInfo<2>::vertices_per_cell);
-                weights.resize(GeometryInfo<2>::vertices_per_cell);
                 for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
                   {
                     points[v] = cell.vertex(GeometryInfo<3>::face_to_cell_vertices(face,v));
                     weights[v] = GeometryInfo<2>::d_linear_shape_function(quad_point, v);
                   }
                 new_point += my_weight *
-                             cell.face(face)->get_manifold().get_new_point(points, weights);
+                             cell.face(face)->get_manifold().get_new_point(points_view,
+                                                                           weights_view);
               }
           }
 
@@ -860,14 +869,13 @@ namespace
               }
             else
               {
-                points.resize(2);
-                weights.resize(2);
                 points[0] = cell.vertex(GeometryInfo<3>::line_to_cell_vertices(line,0));
                 points[1] = cell.vertex(GeometryInfo<3>::line_to_cell_vertices(line,1));
                 weights[0] = 1. - line_point;
                 weights[1] = line_point;
                 new_point -= my_weight *
-                             cell.line(line)->get_manifold().get_new_point(points, weights);
+                             cell.line(line)->get_manifold().get_new_point(points_view,
+                                                                           weights_view);
               }
           }
 
@@ -995,7 +1003,7 @@ TransfiniteInterpolationManifold<dim,spacedim>
 template <int dim, int spacedim>
 std::array<unsigned int, 10>
 TransfiniteInterpolationManifold<dim,spacedim>
-::get_possible_cells_around_points(const std::vector<Point<spacedim> > &points) const
+::get_possible_cells_around_points(const ArrayView<const Point<spacedim>> &points) const
 {
   // The methods to identify cells around points in GridTools are all written
   // for the active cells, but we are here looking at some cells at the coarse
@@ -1012,7 +1020,7 @@ TransfiniteInterpolationManifold<dim,spacedim>
   typename Triangulation<dim,spacedim>::cell_iterator
   cell = triangulation->begin(level_coarse),
   endc = triangulation->end(level_coarse);
-  std::vector<std::pair<double, unsigned int> > distances_and_cells;
+  boost::container::small_vector<std::pair<double, unsigned int>, 200> distances_and_cells;
   for ( ; cell != endc; ++cell)
     {
       // only consider cells where the current manifold is attached
@@ -1069,14 +1077,14 @@ TransfiniteInterpolationManifold<dim,spacedim>
 
 
 template <int dim, int spacedim>
-std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
-    std::vector<Point<dim> > >
-    TransfiniteInterpolationManifold<dim, spacedim>
-    ::compute_chart_points (const std::vector<Point<spacedim> > &surrounding_points) const
+typename Triangulation<dim,spacedim>::cell_iterator
+TransfiniteInterpolationManifold<dim, spacedim>
+::compute_chart_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+                        ArrayView<Point<dim>>                   chart_points) const
 {
-  std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
-      std::vector<Point<dim> > > chart_points;
-  chart_points.second.resize(surrounding_points.size());
+  Assert(surrounding_points.size() == chart_points.size(),
+         ExcMessage("The chart points array view must be as large as the "
+                    "surrounding points array view."));
 
   std::array<unsigned int,10> nearby_cells =
     get_possible_cells_around_points(surrounding_points);
@@ -1092,11 +1100,11 @@ std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
       bool inside_unit_cell = true;
       for (unsigned int i=0; i<surrounding_points.size(); ++i)
         {
-          chart_points.second[i] = pull_back(cell, surrounding_points[i]);
+          chart_points[i] = pull_back(cell, surrounding_points[i]);
 
           // Tolerance 1e-6 chosen that the method also works with
           // SphericalManifold
-          if (GeometryInfo<dim>::is_inside_unit_cell(chart_points.second[i],
+          if (GeometryInfo<dim>::is_inside_unit_cell(chart_points[i],
                                                      1e-6) == false)
             {
               inside_unit_cell = false;
@@ -1105,16 +1113,14 @@ std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
         }
       if (inside_unit_cell == true)
         {
-          chart_points.first = cell;
-          return chart_points;
+          return cell;
         }
     }
 
   // a valid inversion should have returned a point above.
   AssertThrow(false,
               (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
-  chart_points.second.clear();
-  return chart_points;
+  return typename Triangulation<dim,spacedim>::cell_iterator();
 }
 
 
@@ -1122,16 +1128,17 @@ std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
 template <int dim, int spacedim>
 Point<spacedim>
 TransfiniteInterpolationManifold<dim, spacedim>
-::get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
-                 const std::vector<double>           &weights) const
+::get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
+                 const ArrayView<const double>          &weights) const
 {
-  const std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
-        std::vector<Point<dim> > > chart_points =
-          compute_chart_points(surrounding_points);
+  boost::container::small_vector<Point<dim>, 100> chart_points(surrounding_points.size());
+  ArrayView<Point<dim>> chart_points_view = make_array_view(chart_points.begin(),
+                                                            chart_points.end());
+  const auto cell = compute_chart_points(surrounding_points, chart_points_view);
 
-  const Point<dim> p_chart = chart_manifold.get_new_point(chart_points.second,weights);
+  const Point<dim> p_chart = chart_manifold.get_new_point (chart_points_view, weights);
 
-  return push_forward(chart_points.first, p_chart);
+  return push_forward(cell, p_chart);
 }
 
 
@@ -1139,23 +1146,26 @@ TransfiniteInterpolationManifold<dim, spacedim>
 template <int dim, int spacedim>
 void
 TransfiniteInterpolationManifold<dim,spacedim>::
-add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
-                const Table<2,double>               &weights,
-                std::vector<Point<spacedim> >       &new_points) const
+add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+                const Table<2,double>                  &weights,
+                ArrayView<Point<spacedim> >             new_points) const
 {
   Assert(weights.size(0) > 0, ExcEmptyObject());
   AssertDimension(surrounding_points.size(), weights.size(1));
 
-  const std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
-        std::vector<Point<dim> > > chart_points =
-          compute_chart_points(surrounding_points);
+  boost::container::small_vector<Point<dim>, 100> chart_points(surrounding_points.size());
+  ArrayView<Point<dim>> chart_points_view = make_array_view(chart_points.begin(),
+                                                            chart_points.end());
+  const auto cell = compute_chart_points(surrounding_points, chart_points_view);
 
-  std::vector<Point<dim> > new_points_on_chart;
-  new_points_on_chart.reserve(weights.size(0));
-  chart_manifold.add_new_points(chart_points.second, weights, new_points_on_chart);
+  boost::container::small_vector<Point<dim>, 100> new_points_on_chart(weights.size(0));
+  chart_manifold.add_new_points(chart_points_view,
+                                weights,
+                                make_array_view(new_points_on_chart.begin(),
+                                                new_points_on_chart.end()));
 
   for (unsigned int row=0; row<weights.size(0); ++row)
-    new_points.push_back(push_forward(chart_points.first, new_points_on_chart[row]));
+    new_points[row] = push_forward(cell, new_points_on_chart[row]);
 }
 
 

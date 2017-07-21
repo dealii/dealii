@@ -1051,10 +1051,11 @@ namespace
     else
       {
         TriaRawIterator<TriaAccessor<structdim, dim, spacedim> > it(obj);
-        const std::pair<std::vector<Point<spacedim> >,
-              std::vector<double> > points_and_weights = Manifolds::get_default_points_and_weights(it, use_laplace);
-        return obj.get_manifold().get_new_point(points_and_weights.first,
-                                                points_and_weights.second);
+        const auto points_and_weights = Manifolds::get_default_points_and_weights(it, use_laplace);
+        return obj.get_manifold().get_new_point(make_array_view(points_and_weights.first.begin(),
+                                                                points_and_weights.first.end()),
+                                                make_array_view(points_and_weights.second.begin(),
+                                                                points_and_weights.second.end()));
       }
   }
 }
@@ -1206,8 +1207,8 @@ Point<spacedim>
 TriaAccessor<structdim, dim, spacedim>::intermediate_point (const Point<structdim> &coordinates) const
 {
   // Surrounding points and weights.
-  std::vector<Point<spacedim> > p(GeometryInfo<structdim>::vertices_per_cell);
-  std::vector<double>   w(GeometryInfo<structdim>::vertices_per_cell);
+  std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell> p;
+  std::array<double, GeometryInfo<structdim>::vertices_per_cell> w;
 
   for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
     {
@@ -1215,7 +1216,8 @@ TriaAccessor<structdim, dim, spacedim>::intermediate_point (const Point<structdi
       w[i] = GeometryInfo<structdim>::d_linear_shape_function(coordinates, i);
     }
 
-  return this->get_manifold().get_new_point(p, w);
+  return this->get_manifold().get_new_point(make_array_view(p.begin(), p.end()),
+                                            make_array_view(w.begin(), w.end()));
 }
 
 

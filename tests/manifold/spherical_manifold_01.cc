@@ -158,9 +158,12 @@ main()
     weights[1] = 1.0/3.0;
     weights[2] = 1.0/3.0;
 
-    Point<3> Q = manifold.get_new_point(points1, weights);
-    Point<3> S = manifold.get_new_point(points2, weights);
-    Point<3> T = manifold.get_new_point(points3, weights);
+    Point<3> Q = manifold.get_new_point(make_array_view(points1),
+                                        make_array_view(weights));
+    Point<3> S = manifold.get_new_point(make_array_view(points2),
+                                        make_array_view(weights));
+    Point<3> T = manifold.get_new_point(make_array_view(points3),
+                                        make_array_view(weights));
 
     Point<3> P5(0.707107, 0.707107, 0.0);
     Point<3> P4(0.0, 0.0, 1.0);
@@ -177,6 +180,3 @@ main()
   // Quadrature (const std::vector< Point< dim > > &points, const std::vector< double > &weights);
   return 0;
 }
-
-
-

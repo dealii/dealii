@@ -3810,11 +3810,21 @@ add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterat
             }
           else
             {
-              tmp_points.resize(2);
-              tmp_points[0] = cell->vertex(GeometryInfo<dim>::line_to_cell_vertices(line_no, 0));
-              tmp_points[1] = cell->vertex(GeometryInfo<dim>::line_to_cell_vertices(line_no, 1));
-              manifold.add_new_points(tmp_points,
-                                      support_point_weights_perimeter_to_interior[0], a);
+              const std::array<Point<spacedim>, 2> vertices
+              {
+                {
+                  cell->vertex(GeometryInfo<dim>::line_to_cell_vertices(line_no, 0)),
+                  cell->vertex(GeometryInfo<dim>::line_to_cell_vertices(line_no, 1))
+                }
+              };
+
+              const std::size_t n_rows = support_point_weights_perimeter_to_interior[0].size(0);
+              a.resize(a.size() + n_rows);
+              auto a_view = make_array_view(a.end() - n_rows, a.end());
+              manifold.add_new_points(make_array_view(vertices.begin(),
+                                                      vertices.end()),
+                                      support_point_weights_perimeter_to_interior[0],
+                                      a_view);
             }
         }
     }
@@ -3890,7 +3900,9 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
           // extract the points surrounding a quad from the points
           // already computed. First get the 4 vertices and then the points on
           // the four lines
-          tmp_points.resize(4 + 4*(polynomial_degree-1));
+          boost::container::small_vector<Point<3>, 200>
+          tmp_points(GeometryInfo<2>::vertices_per_cell
+                     + GeometryInfo<2>::lines_per_cell*(polynomial_degree-1));
           for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
             tmp_points[v] = a[GeometryInfo<3>::face_to_cell_vertices(face_no,v)];
           if (polynomial_degree > 1)
@@ -3900,9 +3912,14 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
                   a[GeometryInfo<3>::vertices_per_cell +
                     (polynomial_degree-1)*
                     GeometryInfo<3>::face_to_cell_lines(face_no,line) + i];
-          face->get_manifold().add_new_points (tmp_points,
+
+          const std::size_t n_rows = support_point_weights_perimeter_to_interior[1].size(0);
+          a.resize(a.size() + n_rows);
+          auto a_view = make_array_view(a.end() - n_rows, a.end());
+          face->get_manifold().add_new_points (make_array_view(tmp_points.begin(),
+                                                               tmp_points.end()),
                                                support_point_weights_perimeter_to_interior[1],
-                                               a);
+                                               a_view);
         }
     }
 }
@@ -3924,9 +3941,10 @@ add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
     }
   else
     {
-      std::vector<Point<3> > vertices;
+      std::array<Point<3>, GeometryInfo<2>::vertices_per_cell> vertices;
       for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
-        vertices.push_back(cell->vertex(i));
+        vertices[i] = cell->vertex(i);
+
       Table<2,double> weights(Utilities::fixed_power<2>(polynomial_degree-1),
                               GeometryInfo<2>::vertices_per_cell);
       for (unsigned int q=0, q2=0; q2<polynomial_degree-1; ++q2)
@@ -3938,7 +3956,13 @@ add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
               weights(q,i) = GeometryInfo<2>::d_linear_shape_function(point, i);
           }
       // TODO: use all surrounding points once Boundary path is removed
-      cell->get_manifold().add_new_points(vertices, weights, a);
+      const std::size_t n_rows = weights.size(0);
+      a.resize(a.size() + n_rows);
+      auto a_view = make_array_view(a.end() - n_rows, a.end());
+      cell->get_manifold().add_new_points(make_array_view(vertices.begin(),
+                                                          vertices.end()),
+                                          weights,
+                                          a_view);
     }
 }
 
@@ -3989,8 +4013,13 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
 
       if (all_manifold_ids_are_equal)
         {
-          std::vector<Point<spacedim> > vertices(a);
-          cell->get_manifold().add_new_points(vertices, support_point_weights_cell, a);
+          const std::size_t n_rows = support_point_weights_cell.size(0);
+          a.resize(a.size() + n_rows);
+          auto a_view = make_array_view(a.end() - n_rows, a.end());
+          cell->get_manifold().add_new_points(make_array_view(a.begin(),
+                                                              a.end() - n_rows),
+                                              support_point_weights_cell,
+                                              a_view);
         }
       else
         switch (dim)
@@ -4008,10 +4037,13 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
               add_quad_support_points(cell, a);
             else
               {
-                std::vector<Point<spacedim> > tmp_points(a);
-                cell->get_manifold().add_new_points(tmp_points,
+                const std::size_t n_rows = support_point_weights_perimeter_to_interior[1].size(0);
+                a.resize(a.size() + n_rows);
+                auto a_view = make_array_view(a.end() - n_rows, a.end());
+                cell->get_manifold().add_new_points(make_array_view(a.begin(),
+                                                                    a.end() - n_rows),
                                                     support_point_weights_perimeter_to_interior[1],
-                                                    a);
+                                                    a_view);
               }
             break;
 
@@ -4022,10 +4054,13 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
 
             // then compute the interior points
             {
-              std::vector<Point<spacedim> > tmp_points(a);
-              cell->get_manifold().add_new_points(tmp_points,
+              const std::size_t n_rows = support_point_weights_perimeter_to_interior[2].size(0);
+              a.resize(a.size() + n_rows);
+              auto a_view = make_array_view(a.end() - n_rows, a.end());
+              cell->get_manifold().add_new_points(make_array_view(a.begin(),
+                                                                  a.end() - n_rows),
                                                   support_point_weights_perimeter_to_interior[2],
-                                                  a);
+                                                  a_view);
             }
             break;
 

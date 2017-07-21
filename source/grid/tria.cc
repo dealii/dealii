@@ -4044,15 +4044,20 @@ namespace internal
                       // as returned by the underlying manifold
                       // object.
                       {
-                        std::vector<Point<spacedim> > ps(2);
-                        std::vector<double> ws(2, 0.5);
-                        ps[0] = cell->face(boundary_face)
-                                ->child(0)->vertex(1);
-                        ps[1] = cell->face(GeometryInfo<dim>
-                                           ::opposite_face[boundary_face])
-                                ->child(0)->vertex(1);
+                        const std::array<Point<spacedim>, 2> ps
+                        {
+                          {
+                            cell->face(boundary_face)->child(0)->vertex(1),
+                            cell->face(GeometryInfo<dim>::opposite_face[boundary_face])
+                            ->child(0)->vertex(1)
+                          }
+                        };
+                        const std::array<double, 2> ws {{0.5, 0.5}};
                         triangulation.vertices[next_unused_vertex]
-                          = cell->get_manifold().get_new_point(ps,ws);
+                          = cell->get_manifold().get_new_point(make_array_view(ps.begin(),
+                                                                               ps.end()),
+                                                               make_array_view(ws.begin(),
+                                                                               ws.end()));
                       }
                   }
               }

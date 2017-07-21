@@ -87,8 +87,8 @@ namespace OpenCASCADE
      * algorithms.
      */
     virtual Point<spacedim>
-    project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
-                         const Point<spacedim> &candidate) const;
+    project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
+                         const Point<spacedim>                  &candidate) const;
 
 
   private:
@@ -149,8 +149,8 @@ namespace OpenCASCADE
      * projection algorithms.
      */
     virtual Point<spacedim>
-    project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
-                         const Point<spacedim> &candidate) const;
+    project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
+                         const Point<spacedim>                  &candidate) const;
 
   private:
     /**
@@ -236,8 +236,8 @@ namespace OpenCASCADE
      * exception is thrown.
      */
     virtual Point<spacedim>
-    project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
-                         const Point<spacedim> &candidate) const;
+    project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
+                         const Point<spacedim>                  &candidate) const;
 
   private:
     /**

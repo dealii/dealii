@@ -22,6 +22,8 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_parser.h>
 
+#include <boost/container/small_vector.hpp>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -233,8 +235,8 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point (const std::vector<Point<spacedim> > &vertices,
-                 const std::vector<double> &weights) const;
+  get_new_point (const ArrayView<const Point<spacedim>> &vertices,
+                 const ArrayView<const double>          &weights) const override;
 
   /**
    * The center of the spherical coordinate system.
@@ -303,12 +305,12 @@ public:
    * the base class for a detailed description of what this function does.
    */
   virtual Point<spacedim>
-  get_new_point(const std::vector<Point<spacedim> > &surrounding_points,
-                const std::vector<double>           &weights) const override;
+  get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
+                 const ArrayView<const double>          &weights) const override;
 
 protected:
   /**
-   * A vector orthogonal to direcetion.
+   * A vector orthogonal to the normal direction.
    */
   const Tensor<1,spacedim> normal_direction;
 
@@ -617,11 +619,10 @@ private:
  * the case for PolarManifold but not for Spherical manifold, so be careful
  * when using the latter. In case the quality of the manifold is not good
  * enough, upon mesh refinement it may happen that the transformation to a
- * chart inside the get_new_point() or add_new_points() methods produces points
- * that are outside the unit cell. Then this class throws an exception of
- * type Manifold@<dim,spacedim@>::ExcTransformationFailed. In that case,
- * the mesh should be refined before attaching this class, as done in the
- * following example:
+ * chart inside the get_new_point() or add_new_points() methods produces
+ * points that are outside the unit cell. Then this class throws an exception
+ * of type Mapping::ExcTransformationFailed. In that case, the mesh should be
+ * refined before attaching this class, as done in the following example:
  *
  * @code
  * SphericalManifold<dim> spherical_manifold;
@@ -696,17 +697,14 @@ public:
    */
   virtual
   Point<spacedim>
-  get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
-                 const std::vector<double>           &weights) const;
+  get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
+                 const ArrayView<const double>          &weights) const override;
 
   /**
-   * Compute a new set of points that interpolate between the given points
-   * @p surrounding_points. @p weights is a table with as many columns as
-   * @p surrounding_points.size(). The number of rows in @p weights determines
-   * how many new points will be computed and appended to the last input
-   * argument @p new_points. After exit of this function, the size of
-   * @p new_points equals the size at entry plus the number of rows in
-   * @p weights.
+   * Compute a new set of points that interpolate between the given points @p
+   * surrounding_points. @p weights is a table with as many columns as @p
+   * surrounding_points.size(). The number of columns in @p weights must match
+   * the length of @p new_points.
    *
    * The implementation in this class overrides the method in the base class
    * and computes the new point by a transfinite interpolation. The first step
@@ -723,9 +721,9 @@ public:
    */
   virtual
   void
-  add_new_points (const std::vector<Point<spacedim> > &surrounding_points,
-                  const Table<2,double>               &weights,
-                  std::vector<Point<spacedim> >       &new_points) const;
+  add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+                  const Table<2,double>                  &weights,
+                  ArrayView<Point<spacedim>>              new_points) const;
 
 private:
   /**
@@ -739,16 +737,18 @@ private:
    * 10 entries of a the indices <tt>cell->index()</tt>.
    */
   std::array<unsigned int, 10>
-  get_possible_cells_around_points(const std::vector<Point<spacedim> > &surrounding_points) const;
+  get_possible_cells_around_points(const ArrayView<const Point<spacedim>> &surrounding_points) const;
 
   /**
-   * Finalizes the identification of the correct chart and returns the location
-   * of the surrounding points on the chart. This method internally calls
-   * @p get_possible_cells_around_points().
+   * Finalizes the identification of the correct chart and populates @p
+   * chart_points with the pullbacks of the surrounding points. This method
+   * internally calls @p get_possible_cells_around_points().
+   *
+   * Returns an iterator to the cell on which the chart is defined.
    */
-  std::pair<typename Triangulation<dim,spacedim>::cell_iterator,
-      std::vector<Point<dim> > >
-      compute_chart_points(const std::vector<Point<spacedim> > &surrounding_points) const;
+  typename Triangulation<dim,spacedim>::cell_iterator
+  compute_chart_points(const ArrayView<const Point<spacedim>> &surrounding_points,
+                       ArrayView<Point<dim>>                   chart_points) const;
 
   /**
    * Pull back operation into the unit coordinates on the given coarse cell.
