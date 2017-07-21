@@ -2836,7 +2836,7 @@ namespace internal
                       local_dof_indices (dealii_cell->get_fe().dofs_per_cell);
                       dealii_cell->get_dof_indices (local_dof_indices);
 
-                      for (auto recipient_subdomain : send_to)
+                      for (const auto recipient_subdomain : send_to)
                         {
                           // get an iterator to what needs to be sent to
                           // that subdomain (if already exists), or create
@@ -3191,7 +3191,6 @@ namespace internal
         {
           Assert (false, ExcNotImplemented());
         }
-
 
 
 
