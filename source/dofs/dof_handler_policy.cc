@@ -67,7 +67,7 @@ namespace internal
          * Update the cache used for cell dof indices on all (non-artificial)
          * active cells of the given DoFHandler.
          */
-        template <typename DoFHandlerType>
+        template <class DoFHandlerType>
         void
         update_all_active_cell_dof_indices_caches (const DoFHandlerType &dof_handler)
         {
@@ -104,7 +104,7 @@ namespace internal
          * Update the cache used for cell dof indices on all (non-artificial)
          * level (multigrid) cells of the given DoFHandler.
          */
-        template <typename DoFHandlerType>
+        template <class DoFHandlerType>
         void
         update_all_level_cell_dof_indices_caches (const DoFHandlerType &dof_handler)
         {
@@ -1117,7 +1117,7 @@ namespace internal
          * numbers::invalid_subdomain_id. Return the total number of dofs
          * distributed.
          */
-        template <typename DoFHandlerType>
+        template <class DoFHandlerType>
         static
         types::global_dof_index
         distribute_dofs (const types::subdomain_id     subdomain_id,
@@ -1367,7 +1367,7 @@ namespace internal
 
 
 
-        template <typename DoFHandlerType>
+        template <class DoFHandlerType>
         static
         types::global_dof_index
         distribute_dofs_on_level (const types::subdomain_id level_subdomain_id,
@@ -1808,7 +1808,7 @@ namespace internal
          * (The IndexSet argument is not used in 1d because we only need
          * it for parallel meshes and 1d doesn't support that right now.)
          */
-        template <typename DoFHandlerType>
+        template <class DoFHandlerType>
         static
         void
         renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
@@ -2125,7 +2125,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       Sequential<DoFHandlerType>::
       Sequential (DoFHandlerType &dof_handler)
         :
@@ -2134,7 +2134,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       NumberCache
       Sequential<DoFHandlerType>::
       distribute_dofs () const
@@ -2149,7 +2149,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       std::vector<NumberCache>
       Sequential<DoFHandlerType>::
       distribute_mg_dofs () const
@@ -2181,7 +2181,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       NumberCache
       Sequential<DoFHandlerType>::
       renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const
@@ -2203,7 +2203,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       NumberCache
       Sequential<DoFHandlerType>::
       renumber_mg_dofs (const unsigned int                          level,
@@ -2220,7 +2220,7 @@ namespace internal
       /* --------------------- class ParallelShared ---------------- */
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       ParallelShared<DoFHandlerType>::
       ParallelShared (DoFHandlerType &dof_handler)
         :
@@ -2239,7 +2239,7 @@ namespace internal
          * consequently, be called at a point when we are still distributing degrees
          * of freedom.
          */
-        template <typename DoFHandlerType>
+        template <class DoFHandlerType>
         std::vector<types::subdomain_id>
         get_dof_subdomain_association (const DoFHandlerType          &dof_handler,
                                        const types::global_dof_index  n_dofs,
@@ -2303,7 +2303,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       NumberCache
       ParallelShared<DoFHandlerType>::
       distribute_dofs () const
@@ -2461,7 +2461,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       std::vector<NumberCache>
       ParallelShared<DoFHandlerType>::
       distribute_mg_dofs () const
@@ -2478,7 +2478,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       NumberCache
       ParallelShared<DoFHandlerType>::
       renumber_dofs (const std::vector<types::global_dof_index> &new_numbers) const
@@ -2619,7 +2619,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       NumberCache
       ParallelShared<DoFHandlerType>::
       renumber_mg_dofs (const unsigned int                          /*level*/,
@@ -3004,7 +3004,7 @@ namespace internal
 
 
 
-        template <int dim, int spacedim, typename DoFHandlerType>
+        template <int dim, int spacedim, class DoFHandlerType>
         void
         communicate_mg_ghost_cells(const typename parallel::distributed::Triangulation<dim,spacedim> &tria,
                                    DoFHandlerType  &dof_handler,
@@ -3278,7 +3278,7 @@ namespace internal
 
 
 
-        template <typename DoFHandlerType>
+        template <class DoFHandlerType>
         void
         communicate_dof_indices_on_marked_cells
         (const DoFHandlerType &dof_handler,
@@ -3482,7 +3482,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       ParallelDistributed<DoFHandlerType>::
       ParallelDistributed (DoFHandlerType &dof_handler)
         :
@@ -3494,7 +3494,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       NumberCache
       ParallelDistributed<DoFHandlerType>::
       distribute_dofs () const
@@ -3711,7 +3711,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       std::vector<NumberCache>
       ParallelDistributed<DoFHandlerType>::
       distribute_mg_dofs () const
@@ -3967,7 +3967,7 @@ namespace internal
       }
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       NumberCache
       ParallelDistributed<DoFHandlerType>::
       renumber_dofs (const std::vector<dealii::types::global_dof_index> &new_numbers) const
@@ -4171,7 +4171,7 @@ namespace internal
 
 
 
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       NumberCache
       ParallelDistributed<DoFHandlerType>::
       renumber_mg_dofs (const unsigned int                          /*level*/,

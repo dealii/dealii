@@ -110,7 +110,7 @@ namespace internal
        * This class implements the default policy for sequential operations,
        * i.e. for the case where all cells get degrees of freedom.
        */
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       class Sequential : public PolicyBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
       {
       public:
@@ -155,7 +155,7 @@ namespace internal
        * This class implements the policy for operations when we use a
        * parallel::shared::Triangulation object.
        */
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       class ParallelShared : public PolicyBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
       {
       public:
@@ -216,7 +216,7 @@ namespace internal
        * This class implements the policy for operations when we use a
        * parallel::distributed::Triangulation object.
        */
-      template <typename DoFHandlerType>
+      template <class DoFHandlerType>
       class ParallelDistributed : public PolicyBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
       {
       public:
