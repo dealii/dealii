@@ -1154,7 +1154,9 @@ namespace Patterns
 
       static std::unique_ptr<Patterns::PatternBase> to_pattern()
       {
-        if (std::is_integral<T>::value)
+        if (std::is_same<T,bool>::value)
+          return std_cxx14::make_unique<Patterns::Bool>();
+        else if (std::is_integral<T>::value)
           return std_cxx14::make_unique<Patterns::Integer>(
                    std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
         else if (std::is_floating_point<T>::value)
@@ -1169,6 +1171,8 @@ namespace Patterns
         std::string str;
         if (std::is_same<T, unsigned char>() || std::is_same<T, char>())
           str = std::to_string((int)value);
+        else  if (std::is_same<T,bool>::value)
+          str = value ? "true" : "false";
         else
           str = std::to_string(value);
         AssertThrow(p->match(str), ExcNoMatch(str, *p));
@@ -1180,27 +1184,32 @@ namespace Patterns
                           Convert<T>::to_pattern())
       {
         AssertThrow(p->match(s), ExcNoMatch(s, *p));
-        std::istringstream is(s);
         T value;
-        if (std::is_same<T, unsigned char>::value || std::is_same<T, char>::value)
-          {
-            int i;
-            is >> i;
-            value = i;
-          }
+        if (std::is_same<T,bool>::value)
+          value = (s == "true");
         else
-          is >> value;
+          {
+            std::istringstream is(s);
+            if (std::is_same<T, unsigned char>::value || std::is_same<T, char>::value)
+              {
+                int i;
+                is >> i;
+                value = i;
+              }
+            else
+              is >> value;
 
-        // If someone passes "123 abc" to the function, the method yelds an
-        // integer 123 alright, but the space terminates the read from the string
-        // although there is more to come. This case, however, is checked for in
-        // the call p->match(s) at the beginning of this function, and would
-        // throw earlier. Here it is safe to assume that if we didn't fail the
-        // conversion with the operator >>, then we are good to go.
-        AssertThrow(!is.fail(),
-                    ExcMessage("Failed to convert from \"" + s +
-                               "\" to the type \"" +
-                               boost::core::demangle(typeid(T).name()) + "\""));
+            // If someone passes "123 abc" to the function, the method yelds an
+            // integer 123 alright, but the space terminates the read from the string
+            // although there is more to come. This case, however, is checked for in
+            // the call p->match(s) at the beginning of this function, and would
+            // throw earlier. Here it is safe to assume that if we didn't fail the
+            // conversion with the operator >>, then we are good to go.
+            AssertThrow(!is.fail(),
+                        ExcMessage("Failed to convert from \"" + s +
+                                   "\" to the type \"" +
+                                   boost::core::demangle(typeid(T).name()) + "\""));
+          }
         return value;
       }
     };
@@ -1318,7 +1327,6 @@ namespace Patterns
                                    const std::unique_ptr<Patterns::PatternBase>
                                    &pattern = Convert<T>::to_pattern())
       {
-
         auto p = dynamic_cast<const Patterns::List *>(pattern.get());
         AssertThrow(p, ExcMessage("I need a List pattern to convert a "
                                   "string to a List type."));

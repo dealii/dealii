@@ -18,3 +18,11 @@ DEAL::Type     : double
 DEAL::Pattern  : [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
 DEAL::To String: 4.000000
 DEAL::To value : 4.000000
+DEAL::Type     : bool
+DEAL::Pattern  : [Bool]
+DEAL::To String: true
+DEAL::To value : true
+DEAL::Type     : float
+DEAL::Pattern  : [Double -3.40282e+38...3.40282e+38 (inclusive)]
+DEAL::To String: 5.500000
+DEAL::To value : 5.500000

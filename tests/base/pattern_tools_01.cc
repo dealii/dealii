@@ -49,12 +49,16 @@ int main()
   types::boundary_id  t2 = 3;
   std::string         t3 = "Ciao";
   double              t4 = 4.0;
+  bool                t5 = true;
+  float               t6 = 5.5;
 
   test(t0);
   test(t1);
   test(t2);
   test(t3);
   test(t4);
+  test(t5);
+  test(t6);
 
   return 0;
 }
