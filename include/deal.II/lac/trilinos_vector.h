@@ -905,17 +905,49 @@ namespace TrilinosWrappers
       operator[] (const size_type index) const;
 
       /**
-       * A collective get operation: instead of getting individual elements of a
-       * vector, this function allows to get a whole set of elements at once.
-       * The indices of the elements to be read are stated in the first
-       * argument, the corresponding values are returned in the second.
+       * Instead of getting individual elements of a vector via operator(),
+       * this function allows getting a whole set of elements at once. The
+       * indices of the elements to be read are stated in the first argument, the
+       * corresponding values are returned in the second.
+       *
+       * If the current vector is called @p v, then this function is the equivalent
+       * to the code
+       * @code
+       *   for (unsigned int i=0; i<indices.size(); ++i)
+       *     values[i] = v[indices[i]];
+       * @endcode
+       *
+       * @pre The sizes of the @p indices and @p values arrays must be identical.
        */
       void extract_subvector_to (const std::vector<size_type> &indices,
                                  std::vector<TrilinosScalar> &values) const;
 
       /**
-       * Just as the above, but with pointers.  Useful in minimizing copying of
-       * data around.
+       * Instead of getting individual elements of a vector via operator(),
+       * this function allows getting a whole set of elements at once. In
+       * contrast to the previous function, this function obtains the
+       * indices of the elements by dereferencing all elements of the iterator
+       * range provided by the first two arguments, and puts the vector
+       * values into memory locations obtained by dereferencing a range
+       * of iterators starting at the location pointed to by the third
+       * argument.
+       *
+       * If the current vector is called @p v, then this function is the equivalent
+       * to the code
+       * @code
+       *   ForwardIterator indices_p = indices_begin;
+       *   OutputIterator  values_p  = values_begin;
+       *   while (indices_p != indices_end)
+       *   {
+       *     *values_p = v[*indices_p];
+       *     ++indices_p;
+       *     ++values_p;
+       *   }
+       * @endcode
+       *
+       * @pre It must be possible to write into as many memory locations
+       *   starting at @p values_begin as there are iterators between
+       *   @p indices_begin and @p indices_end.
        */
       template <typename ForwardIterator, typename OutputIterator>
       void extract_subvector_to (ForwardIterator          indices_begin,

@@ -1527,7 +1527,7 @@ namespace TrilinosWrappers
      *
      * This initialization routine is useful in cases where the operator to be
      * preconditioned is not a TrilinosWrappers::SparseMatrix object but still
-     * allows to get a copy of the entries in each of the locally owned matrix
+     * allows getting a copy of the entries in each of the locally owned matrix
      * rows (method ExtractMyRowCopy) and implements a matrix-vector product
      * (methods Multiply or Apply). An example are operators which provide
      * faster matrix-vector multiplications than possible with matrix entries
