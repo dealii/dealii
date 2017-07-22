@@ -198,6 +198,17 @@ public:
   ConstraintMatrix (ConstraintMatrix &&constraint_matrix) = default;
 
   /**
+   * Copy operator. Like for many other large objects, this operator
+   * is deleted to avoid its inadvertent use in places such as
+   * accidentally declaring a @p ConstraintMatrix object as a
+   * function argument by value, rather than by reference.
+   *
+   * However, you can use the copy_from() function to explicitly
+   * copy ConstraintMatrix objects.
+   */
+  ConstraintMatrix &operator= (const ConstraintMatrix &) = delete;
+
+  /**
    * Move assignment operator
    */
   ConstraintMatrix &operator= (ConstraintMatrix &&constraint_matrix) = default;
@@ -1431,12 +1442,6 @@ private:
                         const Vector<LocalType>              &local_vector,
                         const std::vector<size_type>         &local_dof_indices,
                         const FullMatrix<LocalType>          &local_matrix) const;
-
-  /**
-   * The assignment operator is not implemented for performance reasons. You
-   * can clear() or reinit() and merge() manually if needed.
-   */
-  ConstraintMatrix &operator= (const ConstraintMatrix &other);
 };
 
 
