@@ -433,8 +433,31 @@ namespace PETScWrappers
                                std::vector<PetscScalar> &values) const;
 
     /**
-     * Just as the above, but with pointers. Useful in minimizing copying of
-     * data around.
+     * Instead of getting individual elements of a vector via operator(),
+     * this function allows getting a whole set of elements at once. In
+     * contrast to the previous function, this function obtains the
+     * indices of the elements by dereferencing all elements of the iterator
+     * range provided by the first two arguments, and puts the vector
+     * values into memory locations obtained by dereferencing a range
+     * of iterators starting at the location pointed to by the third
+     * argument.
+     *
+     * If the current vector is called @p v, then this function is the equivalent
+     * to the code
+     * @code
+     *   ForwardIterator indices_p = indices_begin;
+     *   OutputIterator  values_p  = values_begin;
+     *   while (indices_p != indices_end)
+     *   {
+     *     *values_p = v[*indices_p];
+     *     ++indices_p;
+     *     ++values_p;
+     *   }
+     * @endcode
+     *
+     * @pre It must be possible to write into as many memory locations
+     *   starting at @p values_begin as there are iterators between
+     *   @p indices_begin and @p indices_end.
      */
     template <typename ForwardIterator, typename OutputIterator>
     void extract_subvector_to (const ForwardIterator    indices_begin,
