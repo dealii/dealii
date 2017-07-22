@@ -567,10 +567,19 @@ public:
   Number &operator[] (const size_type i);
 
   /**
-   * A collective get operation: instead of getting individual elements of a
-   * vector, this function allows to get a whole set of elements at once. The
+   * Instead of getting individual elements of a vector via operator(),
+   * this function allows getting a whole set of elements at once. The
    * indices of the elements to be read are stated in the first argument, the
    * corresponding values are returned in the second.
+   *
+   * If the current vector is called @p v, then this function is the equivalent
+   * to the code
+   * @code
+   *   for (unsigned int i=0; i<indices.size(); ++i)
+   *     values[i] = v[indices[i]];
+   * @endcode
+   *
+   * @pre The sizes of the @p indices and @p values arrays must be identical.
    */
   template <typename OtherNumber>
   void extract_subvector_to (const std::vector<size_type> &indices,
