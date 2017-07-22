@@ -969,20 +969,11 @@ namespace hp
     tria(&tria, typeid(*this).name()),
     faces (nullptr)
   {
-    Assert ((dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
-             (&tria)
-             == nullptr),
-            ExcMessage ("The given triangulation is parallel distributed but "
-                        "this class does not currently support this."));
-
-    // decide whether we need a sequential or a parallel distributed policy
+    // decide whether we need a sequential or a parallel shared/distributed policy
     if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&*this->tria) != nullptr)
       policy.reset (new internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >(*this));
     else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&*this->tria) != nullptr)
-      //policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >(*this));
-      {
-        Assert (false, ExcNotImplemented());
-      }
+      policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >(*this));
     else
       policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
 
