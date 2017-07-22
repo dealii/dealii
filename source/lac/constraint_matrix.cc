@@ -52,6 +52,17 @@ const Table<2,bool> ConstraintMatrix::default_empty_table = Table<2,bool>();
 
 
 
+void
+ConstraintMatrix::copy_from (const ConstraintMatrix &other)
+{
+  lines       = other.lines;
+  lines_cache = other.lines_cache;
+  local_lines = other.local_lines;
+  sorted      = other.sorted;
+}
+
+
+
 bool
 ConstraintMatrix::check_zero_weight (const std::pair<size_type, double> &p)
 {

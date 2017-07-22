@@ -203,6 +203,14 @@ public:
   ConstraintMatrix &operator= (ConstraintMatrix &&constraint_matrix) = default;
 
   /**
+   * Copy the given object to the current one.
+   *
+   * This function exists because @p operator=() is explicitly
+   * disabled.
+   */
+  void copy_from (const ConstraintMatrix &other);
+
+  /**
    * clear() the ConstraintMatrix object and supply an IndexSet with lines
    * that may be constrained. This function is only relevant in the
    * distributed case to supply a different IndexSet. Otherwise this routine
