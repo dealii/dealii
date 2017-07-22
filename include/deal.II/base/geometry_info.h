@@ -946,7 +946,7 @@ struct GeometryInfo<0>
    * with the UCD numbering, this field can also be used like a
    * old_to_lexicographic mapping.
    */
-  static constexpr unsigned int ucd_to_deal[vertices_per_cell] = {0};
+  static const unsigned int ucd_to_deal[vertices_per_cell];
 
   /**
    * Rearrange vertices for OpenDX output.  For a cell being written in OpenDX
@@ -961,7 +961,7 @@ struct GeometryInfo<0>
    *   out << cell->vertex(dx_to_deal[i]);
    * @endcode
    */
-  static constexpr unsigned int dx_to_deal[vertices_per_cell] = {0};
+  static const unsigned int dx_to_deal[vertices_per_cell];
 };
 
 
