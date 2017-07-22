@@ -1237,7 +1237,8 @@ namespace hp
     active_cell_iterator cell=begin_active(),
                          endc=end();
     for (unsigned int i=0; cell!=endc; ++cell, ++i)
-      cell->set_active_fe_index(active_fe_indices[i]);
+      if (cell->is_locally_owned())
+        cell->set_active_fe_index(active_fe_indices[i]);
   }
 
 
@@ -1253,7 +1254,7 @@ namespace hp
     active_cell_iterator cell=begin_active(),
                          endc=end();
     for (unsigned int i=0; cell!=endc; ++cell, ++i)
-      active_fe_indices[i]=cell->active_fe_index();
+      active_fe_indices[i] = cell->active_fe_index();
   }
 
 
@@ -1603,9 +1604,14 @@ namespace hp
                 // cell->active_fe_index() since that function is not
                 // allowed for inactive cells, but we can access this
                 // information from the DoFLevels directly
+                //
+                // we don't have to set the active_fe_index for ghost
+                // cells -- these will be exchanged automatically
+                // upon distribute_dofs()
                 for (unsigned int i = 0; i < cell->n_children(); ++i)
-                  cell->child (i)->set_active_fe_index
-                  (levels[cell->level()]->active_fe_index (cell->index()));
+                  if (cell->child (i)->is_locally_owned())
+                    cell->child (i)->set_active_fe_index
+                    (levels[cell->level()]->active_fe_index (cell->index()));
               }
           }
       }
