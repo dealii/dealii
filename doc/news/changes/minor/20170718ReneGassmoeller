@@ -1,0 +1,6 @@
+New: DataOutBase now supports writing zero-dimensional
+data in a higher spatial dimension (e.g. vertices, quadrature points, particles)
+for a number of output formats (vtu,vtk,gnuplot,hdf5). A consequence of the
+change is that HDF5 now in general supports output for dim<spacedim.
+<br>
+(Rene Gassmoeller, 2017/07/18)

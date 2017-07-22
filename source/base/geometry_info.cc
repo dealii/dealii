@@ -106,6 +106,8 @@ GeometryInfo<4>::opposite_face[faces_per_cell]
   = { 1, 0, 3, 2, 5, 4, 7, 6 };
 
 
+const unsigned int GeometryInfo<0>::ucd_to_deal[GeometryInfo<0>::vertices_per_cell]
+  = {0};
 
 template <>
 const unsigned int GeometryInfo<1>::ucd_to_deal[GeometryInfo<1>::vertices_per_cell]
@@ -139,6 +141,9 @@ const unsigned int GeometryInfo<4>::ucd_to_deal[GeometryInfo<4>::vertices_per_ce
        invalid_unsigned_int
     };
 
+
+const unsigned int GeometryInfo<0>::dx_to_deal[GeometryInfo<0>::vertices_per_cell]
+  = {0};
 
 template <>
 const unsigned int GeometryInfo<1>::dx_to_deal[GeometryInfo<1>::vertices_per_cell]
@@ -1827,6 +1832,7 @@ alternating_form_at_vertices
 }
 
 
+template struct GeometryInfo<0>;
 template struct GeometryInfo<1>;
 template struct GeometryInfo<2>;
 template struct GeometryInfo<3>;

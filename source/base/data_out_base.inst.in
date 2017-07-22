@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+for (deal_II_dimension : OUTPUT_DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
 {
 #if deal_II_dimension <= deal_II_space_dimension
     template class DataOutInterface<deal_II_dimension, deal_II_space_dimension>;
@@ -130,6 +130,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
                                 const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                                 const Deal_II_IntermediateFlags                          &flags,
                                 std::ostream                            &out);
+
+    template
+    void
+    write_hdf5_parallel (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &patches,
+                         const DataOutFilter &data_filter,
+                         const std::string &filename,
+                         MPI_Comm comm);
     \}
 #endif
 }

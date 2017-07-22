@@ -526,17 +526,20 @@ DataOutBase::DataOutFilter::write_cell(
   unsigned int base_entry = index * GeometryInfo<dim>::vertices_per_cell;
   vertices_per_cell = GeometryInfo<dim>::vertices_per_cell;
   internal_add_cell(base_entry+0, start);
-  internal_add_cell(base_entry+1, start+d1);
-  if (dim>=2)
+  if (dim>=1)
     {
-      internal_add_cell(base_entry+2, start+d2+d1);
-      internal_add_cell(base_entry+3, start+d2);
-      if (dim>=3)
+      internal_add_cell(base_entry+1, start+d1);
+      if (dim>=2)
         {
-          internal_add_cell(base_entry+4, start+d3);
-          internal_add_cell(base_entry+5, start+d3+d1);
-          internal_add_cell(base_entry+6, start+d3+d2+d1);
-          internal_add_cell(base_entry+7, start+d3+d2);
+          internal_add_cell(base_entry+2, start+d2+d1);
+          internal_add_cell(base_entry+3, start+d2);
+          if (dim>=3)
+            {
+              internal_add_cell(base_entry+4, start+d3);
+              internal_add_cell(base_entry+5, start+d3+d1);
+              internal_add_cell(base_entry+6, start+d3+d2+d1);
+              internal_add_cell(base_entry+7, start+d3+d2);
+            }
         }
     }
 }
@@ -581,7 +584,7 @@ namespace
 
   const char *ucd_cell_type[4] =
   {
-    "", "line", "quad", "hex"
+    "pt", "line", "quad", "hex"
   };
 
   const char *tecplot_cell_type[4] =
@@ -602,7 +605,7 @@ namespace
   // choice avoids a -Warray-bounds check warning
   const unsigned int vtk_cell_type[5] =
   {
-    0, 3, 9, 12, static_cast<unsigned int>(-1)
+    1, 3, 9, 12, static_cast<unsigned int>(-1)
   };
 
 //----------------------------------------------------------------------//
@@ -1104,19 +1107,22 @@ namespace
   {
     int nodes[1<<dim];
     nodes[GeometryInfo<dim>::dx_to_deal[0]] = start;
-    nodes[GeometryInfo<dim>::dx_to_deal[1]] = start+d1;
-    if (dim>=2)
+    if (dim>=1)
       {
-        // Add shifted line in y direction
-        nodes[GeometryInfo<dim>::dx_to_deal[2]] = start+d2;
-        nodes[GeometryInfo<dim>::dx_to_deal[3]] = start+d2+d1;
-        if (dim>=3)
+        nodes[GeometryInfo<dim>::dx_to_deal[1]] = start+d1;
+        if (dim>=2)
           {
-            // Add shifted quad in z direction
-            nodes[GeometryInfo<dim>::dx_to_deal[4]] = start+d3;
-            nodes[GeometryInfo<dim>::dx_to_deal[5]] = start+d3+d1;
-            nodes[GeometryInfo<dim>::dx_to_deal[6]] = start+d3+d2;
-            nodes[GeometryInfo<dim>::dx_to_deal[7]] = start+d3+d2+d1;
+            // Add shifted line in y direction
+            nodes[GeometryInfo<dim>::dx_to_deal[2]] = start+d2;
+            nodes[GeometryInfo<dim>::dx_to_deal[3]] = start+d2+d1;
+            if (dim>=3)
+              {
+                // Add shifted quad in z direction
+                nodes[GeometryInfo<dim>::dx_to_deal[4]] = start+d3;
+                nodes[GeometryInfo<dim>::dx_to_deal[5]] = start+d3+d1;
+                nodes[GeometryInfo<dim>::dx_to_deal[6]] = start+d3+d2;
+                nodes[GeometryInfo<dim>::dx_to_deal[7]] = start+d3+d2+d1;
+              }
           }
       }
 
@@ -1189,18 +1195,21 @@ namespace
     const unsigned int start=s+1;
     stream << gmv_cell_type[dim] << '\n';
 
-    stream << start << '\t'
-           << start+d1;
-    if (dim>=2)
+    stream << start;
+    if (dim>=1)
       {
-        stream << '\t' << start+d2+d1
-               << '\t' << start+d2;
-        if (dim>=3)
+        stream << '\t' << start+d1;
+        if (dim>=2)
           {
-            stream << '\t' << start+d3
-                   << '\t' << start+d3+d1
-                   << '\t' << start+d3+d2+d1
-                   << '\t' << start+d3+d2;
+            stream << '\t' << start+d2+d1
+                   << '\t' << start+d2;
+            if (dim>=3)
+              {
+                stream << '\t' << start+d3
+                       << '\t' << start+d3+d1
+                       << '\t' << start+d3+d2+d1
+                       << '\t' << start+d3+d2;
+              }
           }
       }
     stream << '\n';
@@ -1237,18 +1246,21 @@ namespace
   {
     const unsigned int start = s+1;
 
-    stream << start << '\t'
-           << start+d1;
-    if (dim>=2)
+    stream << start;
+    if (dim >=1)
       {
-        stream << '\t' << start+d2+d1
-               << '\t' << start+d2;
-        if (dim>=3)
+        stream << '\t' << start+d1;
+        if (dim>=2)
           {
-            stream << '\t' << start+d3
-                   << '\t' << start+d3+d1
-                   << '\t' << start+d3+d2+d1
-                   << '\t' << start+d3+d2;
+            stream << '\t' << start+d2+d1
+                   << '\t' << start+d2;
+            if (dim>=3)
+              {
+                stream << '\t' << start+d3
+                       << '\t' << start+d3+d1
+                       << '\t' << start+d3+d2+d1
+                       << '\t' << start+d3+d2;
+              }
           }
       }
     stream << '\n';
@@ -1291,19 +1303,22 @@ namespace
   {
     int nodes[1<<dim];
     nodes[GeometryInfo<dim>::ucd_to_deal[0]] = start;
-    nodes[GeometryInfo<dim>::ucd_to_deal[1]] = start+d1;
-    if (dim>=2)
+    if (dim>=1)
       {
-        // Add shifted line in y direction
-        nodes[GeometryInfo<dim>::ucd_to_deal[2]] = start+d2;
-        nodes[GeometryInfo<dim>::ucd_to_deal[3]] = start+d2+d1;
-        if (dim>=3)
+        nodes[GeometryInfo<dim>::ucd_to_deal[1]] = start+d1;
+        if (dim>=2)
           {
-            // Add shifted quad in z direction
-            nodes[GeometryInfo<dim>::ucd_to_deal[4]] = start+d3;
-            nodes[GeometryInfo<dim>::ucd_to_deal[5]] = start+d3+d1;
-            nodes[GeometryInfo<dim>::ucd_to_deal[6]] = start+d3+d2;
-            nodes[GeometryInfo<dim>::ucd_to_deal[7]] = start+d3+d2+d1;
+            // Add shifted line in y direction
+            nodes[GeometryInfo<dim>::ucd_to_deal[2]] = start+d2;
+            nodes[GeometryInfo<dim>::ucd_to_deal[3]] = start+d2+d1;
+            if (dim>=3)
+              {
+                // Add shifted quad in z direction
+                nodes[GeometryInfo<dim>::ucd_to_deal[4]] = start+d3;
+                nodes[GeometryInfo<dim>::ucd_to_deal[5]] = start+d3+d1;
+                nodes[GeometryInfo<dim>::ucd_to_deal[6]] = start+d3+d2;
+                nodes[GeometryInfo<dim>::ucd_to_deal[7]] = start+d3+d2+d1;
+              }
           }
       }
 
@@ -1366,20 +1381,23 @@ namespace
                          unsigned int d3)
   {
     stream << GeometryInfo<dim>::vertices_per_cell << '\t'
-           << start << '\t'
-           << start+d1;
-    if (dim>=2)
-      {
-        stream << '\t' << start+d2+d1
-               << '\t' << start+d2;
-        if (dim>=3)
-          {
-            stream << '\t' << start+d3
-                   << '\t' << start+d3+d1
-                   << '\t' << start+d3+d2+d1
-                   << '\t' << start+d3+d2;
-          }
-      }
+           << start;
+    if (dim>=1)
+      stream << '\t' << start+d1;
+    {
+      if (dim>=2)
+        {
+          stream << '\t' << start+d2+d1
+                 << '\t' << start+d2;
+          if (dim>=3)
+            {
+              stream << '\t' << start+d3
+                     << '\t' << start+d3+d1
+                     << '\t' << start+d3+d2+d1
+                     << '\t' << start+d3+d2;
+            }
+        }
+    }
     stream << '\n';
   }
 
@@ -1438,34 +1456,41 @@ namespace
                          unsigned int d3)
   {
 #if !defined(DEAL_II_WITH_ZLIB)
-    stream << start << '\t'
-           << start+d1;
-    if (dim>=2)
+    stream << start;
+    if (dim>=1)
       {
-        stream << '\t' << start+d2+d1
-               << '\t' << start+d2;
-        if (dim>=3)
+        stream << '\t'
+               << start+d1;
+        if (dim>=2)
           {
-            stream << '\t' << start+d3
-                   << '\t' << start+d3+d1
-                   << '\t' << start+d3+d2+d1
-                   << '\t' << start+d3+d2;
+            stream << '\t' << start+d2+d1
+                   << '\t' << start+d2;
+            if (dim>=3)
+              {
+                stream << '\t' << start+d3
+                       << '\t' << start+d3+d1
+                       << '\t' << start+d3+d2+d1
+                       << '\t' << start+d3+d2;
+              }
           }
       }
     stream << '\n';
 #else
     cells.push_back (start);
-    cells.push_back (start+d1);
-    if (dim>=2)
+    if (dim >=1)
       {
-        cells.push_back (start+d2+d1);
-        cells.push_back (start+d2);
-        if (dim>=3)
+        cells.push_back (start+d1);
+        if (dim>=2)
           {
-            cells.push_back (start+d3);
-            cells.push_back (start+d3+d1);
-            cells.push_back (start+d3+d2+d1);
-            cells.push_back (start+d3+d2);
+            cells.push_back (start+d2+d1);
+            cells.push_back (start+d2);
+            if (dim>=3)
+              {
+                cells.push_back (start+d3);
+                cells.push_back (start+d3+d1);
+                cells.push_back (start+d3+d2+d1);
+                cells.push_back (start+d3+d2);
+              }
           }
       }
 #endif
@@ -2564,6 +2589,10 @@ namespace DataOutBase
                   const UcdFlags                          &flags,
                   std::ostream                            &out)
   {
+    // Note that while in theory dim==0 should be implemented,
+    // this is not tested, therefore currently not allowed.
+    AssertThrow (dim>0, ExcNotImplemented());
+
     AssertThrow (out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
@@ -2655,6 +2684,9 @@ namespace DataOutBase
                  const DXFlags                           &flags,
                  std::ostream                            &out)
   {
+    // Point output is currently not implemented.
+    AssertThrow (dim>0, ExcNotImplemented());
+
     AssertThrow (out, ExcIO());
 
 #ifndef DEAL_II_WITH_MPI
@@ -2768,6 +2800,13 @@ namespace DataOutBase
                     const unsigned int nx = i1*dx;
                     const unsigned int ny = i2*dy;
                     const unsigned int nz = i3*dz;
+
+                    // There are no neighbors for dim==0.
+                    // Note that this case is caught by the
+                    // AssertThrow at the beginning of this function anyway.
+                    // This condition avoids compiler warnings.
+                    if (dim<1)
+                      continue;
 
                     out << '\n';
                     // Direction -x
@@ -3898,6 +3937,12 @@ namespace DataOutBase
                   const GmvFlags                          &flags,
                   std::ostream                            &out)
   {
+    // The gmv format does not support cells that only consist
+    // of a single point. It does support the output of point data
+    // using the keyword 'tracers' instead of 'nodes' and 'cells',
+    // but this output format is currently not implemented.
+    AssertThrow (dim>0, ExcNotImplemented());
+
     Assert(dim<=3, ExcNotImplemented());
     AssertThrow (out, ExcIO());
 
@@ -4054,6 +4099,11 @@ namespace DataOutBase
                       std::ostream                            &out)
   {
     AssertThrow (out, ExcIO());
+
+    // The FEBLOCK or FEPOINT formats of tecplot only allows full elements
+    // (e.g. triangles), not single points. Other tecplot format allow
+    // point output, but they are currently not implemented.
+    AssertThrow (dim>0, ExcNotImplemented());
 
 #ifndef DEAL_II_WITH_MPI
     // verify that there are indeed
@@ -4296,6 +4346,10 @@ namespace DataOutBase
                              const TecplotFlags                      &flags,
                              std::ostream                            &out)
   {
+    // The FEBLOCK or FEPOINT formats of tecplot only allows full elements
+    // (e.g. triangles), not single points. Other tecplot format allow
+    // point output, but they are currently not implemented.
+    AssertThrow (dim>0, ExcNotImplemented());
 
 #ifndef DEAL_II_HAVE_TECPLOT
 
@@ -6508,7 +6562,7 @@ create_xdmf_entry (const DataOutBase::DataOutFilter &data_filter,
   // Output the XDMF file only on the root process
   if (myrank == 0)
     {
-      XDMFEntry       entry(h5_mesh_filename, h5_solution_filename, cur_time, global_node_cell_count[0], global_node_cell_count[1], dim);
+      XDMFEntry       entry(h5_mesh_filename, h5_solution_filename, cur_time, global_node_cell_count[0], global_node_cell_count[1], dim, spacedim);
       unsigned int  n_data_sets = data_filter.n_data_sets();
 
       // The vector names generated here must match those generated in the HDF5 file
@@ -6532,7 +6586,7 @@ write_xdmf_file (const std::vector<XDMFEntry> &entries,
                  const std::string &filename,
                  MPI_Comm comm) const
 {
-  int             myrank;
+  int myrank;
 
 #ifdef DEAL_II_WITH_MPI
   const int ierr = MPI_Comm_rank(comm, &myrank);
@@ -6567,54 +6621,6 @@ write_xdmf_file (const std::vector<XDMFEntry> &entries,
 }
 
 
-/*
- * Get the XDMF content associated with this entry.
- * If the entry is not valid, this returns an empty string.
- */
-std::string XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
-{
-  std::stringstream   ss;
-  std::map<std::string, unsigned int>::const_iterator     it;
-
-  if (!valid) return "";
-
-  ss << indent(indent_level+0) << "<Grid Name=\"mesh\" GridType=\"Uniform\">\n";
-  ss << indent(indent_level+1) << "<Time Value=\"" << entry_time << "\"/>\n";
-  ss << indent(indent_level+1) << "<Geometry GeometryType=\"" << (dimension == 2 ? "XY" : "XYZ" ) << "\">\n";
-  ss << indent(indent_level+2) << "<DataItem Dimensions=\"" << num_nodes << " " << dimension << "\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">\n";
-  ss << indent(indent_level+3) << h5_mesh_filename << ":/nodes\n";
-  ss << indent(indent_level+2) << "</DataItem>\n";
-  ss << indent(indent_level+1) << "</Geometry>\n";
-  // If we have cells defined, use a quadrilateral (2D) or hexahedron (3D) topology
-  if (num_cells > 0)
-    {
-      ss << indent(indent_level+1) << "<Topology TopologyType=\"" << (dimension == 2 ? "Quadrilateral" : "Hexahedron") << "\" NumberOfElements=\"" << num_cells << "\">\n";
-      ss << indent(indent_level+2) << "<DataItem Dimensions=\"" << num_cells << " " << (2 << (dimension-1)) << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
-      ss << indent(indent_level+3) << h5_mesh_filename << ":/cells\n";
-      ss << indent(indent_level+2) << "</DataItem>\n";
-      ss << indent(indent_level+1) << "</Topology>\n";
-    }
-  else
-    {
-      // Otherwise, we assume the points are isolated in space and use a Polyvertex topology
-      ss << indent(indent_level+1) << "<Topology TopologyType=\"Polyvertex\" NumberOfElements=\"" << num_nodes << "\">\n";
-      ss << indent(indent_level+1) << "</Topology>\n";
-    }
-
-  for (it=attribute_dims.begin(); it!=attribute_dims.end(); ++it)
-    {
-      ss << indent(indent_level+1) << "<Attribute Name=\"" << it->first << "\" AttributeType=\"" << (it->second > 1 ? "Vector" : "Scalar") << "\" Center=\"Node\">\n";
-      // Vectors must have 3 elements even for 2D models
-      ss << indent(indent_level+2) << "<DataItem Dimensions=\"" << num_nodes << " " << (it->second > 1 ? 3 : 1) << "\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">\n";
-      ss << indent(indent_level+3) << h5_sol_filename << ":/" << it->first << "\n";
-      ss << indent(indent_level+2) << "</DataItem>\n";
-      ss << indent(indent_level+1) << "</Attribute>\n";
-    }
-
-  ss << indent(indent_level+0) << "</Grid>\n";
-
-  return ss.str();
-}
 
 /*
  * Write the data in this DataOutInterface to a DataOutFilter object.
@@ -6766,6 +6772,11 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
                                        const std::string &solution_filename,
                                        MPI_Comm comm)
 {
+
+  AssertThrow(spacedim>=2,
+              ExcMessage("DataOutBase was asked to write HDF5 output for a space dimension of 1. "
+                         "HDF5 only supports datasets that live in 2 or 3 dimensions."));
+
   int ierr;
   (void)ierr;
 #ifndef DEAL_II_WITH_HDF5
@@ -6861,8 +6872,9 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
       AssertThrow(h5_mesh_file_id >= 0, ExcIO());
 
       // Create the dataspace for the nodes and cells
+      // HDF5 only supports 2- or 3-dimensional coordinates
       node_ds_dim[0] = global_node_cell_count[0];
-      node_ds_dim[1] = dim;
+      node_ds_dim[1] = (spacedim<2) ? 2 : spacedim;
       node_dataspace = H5Screate_simple(2, node_ds_dim, NULL);
       AssertThrow(node_dataspace >= 0, ExcIO());
 
@@ -6892,10 +6904,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
       AssertThrow(status >= 0, ExcIO());
 
       // Create the data subset we'll use to read from memory
+      // HDF5 only supports 2- or 3-dimensional coordinates
       count[0] = local_node_cell_count[0];
-      count[1] = dim;
+      count[1] = (spacedim<2) ? 2 : spacedim;
+
       offset[0] = global_node_cell_offsets[0];
       offset[1] = 0;
+
       node_memory_dataspace = H5Screate_simple(2, count, NULL);
       AssertThrow(node_memory_dataspace >= 0, ExcIO());
 
@@ -7543,6 +7558,156 @@ std::vector<std::tuple<unsigned int, unsigned int, std::string> >
 DataOutReader<dim,spacedim>::get_vector_data_ranges () const
 {
   return vector_data_ranges;
+}
+
+
+
+// ---------------------------------------------- XDMFEntry ----------
+
+XDMFEntry::XDMFEntry()
+  :
+  valid(false),
+  h5_sol_filename(""),
+  h5_mesh_filename(""),
+  entry_time(0.0),
+  num_nodes(numbers::invalid_unsigned_int),
+  num_cells(numbers::invalid_unsigned_int),
+  dimension(numbers::invalid_unsigned_int),
+  space_dimension(numbers::invalid_unsigned_int)
+{}
+
+
+
+XDMFEntry::XDMFEntry(const std::string filename,
+                     const double time,
+                     const unsigned int nodes,
+                     const unsigned int cells,
+                     const unsigned int dim)
+  :
+  XDMFEntry(filename,
+            filename,
+            time,
+            nodes,
+            cells,
+            dim,
+            dim)
+{}
+
+
+
+XDMFEntry::XDMFEntry(const std::string mesh_filename,
+                     const std::string solution_filename,
+                     const double time,
+                     const unsigned int nodes,
+                     const unsigned int cells,
+                     const unsigned int dim)
+  :
+  XDMFEntry(mesh_filename,
+            solution_filename,
+            time,
+            nodes,
+            cells,
+            dim,
+            dim)
+{}
+
+
+
+XDMFEntry::XDMFEntry(const std::string mesh_filename,
+                     const std::string solution_filename,
+                     const double time,
+                     const unsigned int nodes,
+                     const unsigned int cells,
+                     const unsigned int dim,
+                     const unsigned int spacedim)
+  :
+  valid(true),
+  h5_sol_filename(solution_filename),
+  h5_mesh_filename(mesh_filename),
+  entry_time(time),
+  num_nodes(nodes),
+  num_cells(cells),
+  dimension(dim),
+  space_dimension(spacedim)
+{}
+
+
+
+void
+XDMFEntry::add_attribute(const std::string &attr_name, const unsigned int dimension)
+{
+  attribute_dims[attr_name] = dimension;
+}
+
+
+
+namespace
+{
+  /**
+   * Small function to create indentation for XML file.
+   */
+  std::string indent(const unsigned int indent_level)
+  {
+    std::string res = "";
+    for (unsigned int i=0; i<indent_level; ++i)
+      res += "  ";
+    return res;
+  }
+}
+
+
+
+std::string XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
+{
+  if (!valid)
+    return "";
+
+  std::stringstream   ss;
+  ss << indent(indent_level+0) << "<Grid Name=\"mesh\" GridType=\"Uniform\">\n";
+  ss << indent(indent_level+1) << "<Time Value=\"" << entry_time << "\"/>\n";
+  ss << indent(indent_level+1) << "<Geometry GeometryType=\"" << (space_dimension <= 2 ? "XY" : "XYZ" ) << "\">\n";
+  ss << indent(indent_level+2) << "<DataItem Dimensions=\"" << num_nodes << " " << (space_dimension <= 2 ? 2 : space_dimension) << "\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">\n";
+  ss << indent(indent_level+3) << h5_mesh_filename << ":/nodes\n";
+  ss << indent(indent_level+2) << "</DataItem>\n";
+  ss << indent(indent_level+1) << "</Geometry>\n";
+  // If we have cells defined, use the topology corresponding to the dimension
+  if (num_cells > 0)
+    {
+      if (dimension == 0)
+        ss << indent(indent_level+1) << "<Topology TopologyType=\"" << "Polyvertex"   << "\" NumberOfElements=\"" << num_cells << "\" NodesPerElement=\"1\">\n";
+      else if (dimension == 1)
+        ss << indent(indent_level+1) << "<Topology TopologyType=\"" << "Polyline"     << "\" NumberOfElements=\"" << num_cells << "\" NodesPerElement=\"2\">\n";
+      else if (dimension == 2)
+        ss << indent(indent_level+1) << "<Topology TopologyType=\"" << "Quadrilateral"<< "\" NumberOfElements=\"" << num_cells << "\">\n";
+      else if (dimension == 3)
+        ss << indent(indent_level+1) << "<Topology TopologyType=\"" << "Hexahedron"   << "\" NumberOfElements=\"" << num_cells << "\">\n";
+
+      ss << indent(indent_level+2) << "<DataItem Dimensions=\"" << num_cells << " " << (1 << dimension) << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
+      ss << indent(indent_level+3) << h5_mesh_filename << ":/cells\n";
+      ss << indent(indent_level+2) << "</DataItem>\n";
+      ss << indent(indent_level+1) << "</Topology>\n";
+    }
+  // Otherwise, we assume the points are isolated in space and use a Polyvertex topology
+  else
+    {
+      ss << indent(indent_level+1) << "<Topology TopologyType=\"Polyvertex\" NumberOfElements=\"" << num_nodes << "\">\n";
+      ss << indent(indent_level+1) << "</Topology>\n";
+    }
+
+  for (std::map<std::string, unsigned int>::const_iterator it=attribute_dims.begin();
+       it!=attribute_dims.end(); ++it)
+    {
+      ss << indent(indent_level+1) << "<Attribute Name=\"" << it->first << "\" AttributeType=\"" << (it->second > 1 ? "Vector" : "Scalar") << "\" Center=\"Node\">\n";
+      // Vectors must have 3 elements even for 2D models
+      ss << indent(indent_level+2) << "<DataItem Dimensions=\"" << num_nodes << " " << (it->second > 1 ? 3 : 1) << "\" NumberType=\"Float\" Precision=\"8\" Format=\"HDF\">\n";
+      ss << indent(indent_level+3) << h5_sol_filename << ":/" << it->first << "\n";
+      ss << indent(indent_level+2) << "</DataItem>\n";
+      ss << indent(indent_level+1) << "</Attribute>\n";
+    }
+
+  ss << indent(indent_level+0) << "</Grid>\n";
+
+  return ss.str();
 }
 
 

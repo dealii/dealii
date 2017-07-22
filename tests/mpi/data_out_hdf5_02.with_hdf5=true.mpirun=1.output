@@ -1,0 +1,359 @@
+
+DEAL:0::
+==============================
+02.xdmf
+==============================
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="4 2" NumberType="Float" Precision="8" Format="HDF">
+            02.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Polyvertex" NumberOfElements="4" NodesPerElement="1">
+          <DataItem Dimensions="4 1" NumberType="UInt" Format="HDF">
+            02.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="i" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="4 1" NumberType="Float" Precision="8" Format="HDF">
+            02.h5:/i
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x1" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="4 1" NumberType="Float" Precision="8" Format="HDF">
+            02.h5:/x1
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x2" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="4 1" NumberType="Float" Precision="8" Format="HDF">
+            02.h5:/x2
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x3" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="4 1" NumberType="Float" Precision="8" Format="HDF">
+            02.h5:/x3
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x4" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="4 1" NumberType="Float" Precision="8" Format="HDF">
+            02.h5:/x4
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
+
+DEAL:0::
+==============================
+12.xdmf
+==============================
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="14 2" NumberType="Float" Precision="8" Format="HDF">
+            12.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Polyline" NumberOfElements="10" NodesPerElement="2">
+          <DataItem Dimensions="10 2" NumberType="UInt" Format="HDF">
+            12.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="i" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="14 1" NumberType="Float" Precision="8" Format="HDF">
+            12.h5:/i
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x1" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="14 1" NumberType="Float" Precision="8" Format="HDF">
+            12.h5:/x1
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x2" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="14 1" NumberType="Float" Precision="8" Format="HDF">
+            12.h5:/x2
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x3" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="14 1" NumberType="Float" Precision="8" Format="HDF">
+            12.h5:/x3
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x4" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="14 1" NumberType="Float" Precision="8" Format="HDF">
+            12.h5:/x4
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
+
+DEAL:0::
+==============================
+22.xdmf
+==============================
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XY">
+          <DataItem Dimensions="54 2" NumberType="Float" Precision="8" Format="HDF">
+            22.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Quadrilateral" NumberOfElements="30">
+          <DataItem Dimensions="30 4" NumberType="UInt" Format="HDF">
+            22.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="i" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="54 1" NumberType="Float" Precision="8" Format="HDF">
+            22.h5:/i
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x1" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="54 1" NumberType="Float" Precision="8" Format="HDF">
+            22.h5:/x1
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x2" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="54 1" NumberType="Float" Precision="8" Format="HDF">
+            22.h5:/x2
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x3" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="54 1" NumberType="Float" Precision="8" Format="HDF">
+            22.h5:/x3
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x4" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="54 1" NumberType="Float" Precision="8" Format="HDF">
+            22.h5:/x4
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
+
+DEAL:0::
+==============================
+03.xdmf
+==============================
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XYZ">
+          <DataItem Dimensions="4 3" NumberType="Float" Precision="8" Format="HDF">
+            03.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Polyvertex" NumberOfElements="4" NodesPerElement="1">
+          <DataItem Dimensions="4 1" NumberType="UInt" Format="HDF">
+            03.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="i" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="4 1" NumberType="Float" Precision="8" Format="HDF">
+            03.h5:/i
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x1" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="4 1" NumberType="Float" Precision="8" Format="HDF">
+            03.h5:/x1
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x2" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="4 1" NumberType="Float" Precision="8" Format="HDF">
+            03.h5:/x2
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x3" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="4 1" NumberType="Float" Precision="8" Format="HDF">
+            03.h5:/x3
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x4" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="4 1" NumberType="Float" Precision="8" Format="HDF">
+            03.h5:/x4
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
+
+DEAL:0::
+==============================
+13.xdmf
+==============================
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XYZ">
+          <DataItem Dimensions="14 3" NumberType="Float" Precision="8" Format="HDF">
+            13.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Polyline" NumberOfElements="10" NodesPerElement="2">
+          <DataItem Dimensions="10 2" NumberType="UInt" Format="HDF">
+            13.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="i" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="14 1" NumberType="Float" Precision="8" Format="HDF">
+            13.h5:/i
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x1" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="14 1" NumberType="Float" Precision="8" Format="HDF">
+            13.h5:/x1
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x2" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="14 1" NumberType="Float" Precision="8" Format="HDF">
+            13.h5:/x2
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x3" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="14 1" NumberType="Float" Precision="8" Format="HDF">
+            13.h5:/x3
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x4" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="14 1" NumberType="Float" Precision="8" Format="HDF">
+            13.h5:/x4
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
+
+DEAL:0::
+==============================
+23.xdmf
+==============================
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XYZ">
+          <DataItem Dimensions="54 3" NumberType="Float" Precision="8" Format="HDF">
+            23.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Quadrilateral" NumberOfElements="30">
+          <DataItem Dimensions="30 4" NumberType="UInt" Format="HDF">
+            23.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="i" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="54 1" NumberType="Float" Precision="8" Format="HDF">
+            23.h5:/i
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x1" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="54 1" NumberType="Float" Precision="8" Format="HDF">
+            23.h5:/x1
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x2" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="54 1" NumberType="Float" Precision="8" Format="HDF">
+            23.h5:/x2
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x3" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="54 1" NumberType="Float" Precision="8" Format="HDF">
+            23.h5:/x3
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x4" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="54 1" NumberType="Float" Precision="8" Format="HDF">
+            23.h5:/x4
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
+
+DEAL:0::
+==============================
+33.xdmf
+==============================
+<?xml version="1.0" ?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="CellTime" GridType="Collection" CollectionType="Temporal">
+      <Grid Name="mesh" GridType="Uniform">
+        <Time Value="0"/>
+        <Geometry GeometryType="XYZ">
+          <DataItem Dimensions="224 3" NumberType="Float" Precision="8" Format="HDF">
+            33.h5:/nodes
+          </DataItem>
+        </Geometry>
+        <Topology TopologyType="Hexahedron" NumberOfElements="100">
+          <DataItem Dimensions="100 8" NumberType="UInt" Format="HDF">
+            33.h5:/cells
+          </DataItem>
+        </Topology>
+        <Attribute Name="i" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="224 1" NumberType="Float" Precision="8" Format="HDF">
+            33.h5:/i
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x1" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="224 1" NumberType="Float" Precision="8" Format="HDF">
+            33.h5:/x1
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x2" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="224 1" NumberType="Float" Precision="8" Format="HDF">
+            33.h5:/x2
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x3" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="224 1" NumberType="Float" Precision="8" Format="HDF">
+            33.h5:/x3
+          </DataItem>
+        </Attribute>
+        <Attribute Name="x4" AttributeType="Scalar" Center="Node">
+          <DataItem Dimensions="224 1" NumberType="Float" Precision="8" Format="HDF">
+            33.h5:/x4
+          </DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
+
+DEAL:0::

@@ -152,7 +152,10 @@ SPARSITY_PATTERNS := { SparsityPattern;
 // all supported logical dimensions
 DIMENSIONS := { 1; 2; 3 }
 
-// all supported spacial dimensions
+// all supported output dimensions
+OUTPUT_DIMENSIONS := { 0; 1; 2; 3 }
+
+// all supported spatial dimensions
 SPACE_DIMENSIONS := { 1; 2; 3 }
 
 // all ranks used for instantiating tensors
