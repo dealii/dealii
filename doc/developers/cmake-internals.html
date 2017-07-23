@@ -630,6 +630,16 @@ DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt;        (an option)
   require about 30 to 60 seconds of wall time and about 2 GB of memory.
 </p>
 
+<p>
+  If you want to add a new file to one of the <code>CMakeLists.txt</code> files
+  then you should place it in either the <code>_unity_include_src</code> or
+  the <code>_separate_src</code> list (not both). If the new file only takes a
+  few seconds to compile then it should be placed in the former category (so
+  that it may be built in a unity file) and otherwise it should be in the
+  latter. If you are not sure where a new file belongs then placing it in
+  the <code>_separate_src</code> list is the conservative choice.
+</p>
+
 <h2>Target definition and installation</h2>
 <a name="config.h.in"></a>
 <h3> <code>./include/deal.II/base/config.h.in</code> </h3>
@@ -654,56 +664,77 @@ done by hand. Please note:
   All parts of the library are organized into logical object libraries
   with their respective sources lying under
   <code>./source/&lt;foo&gt;</code>, or
-  <code>./bundled/&lt;foo&gt;/&lt;...&gt;</code>. The actual setup of
-  an object library happens within that subdirectories with the help of
-  two macros:
+  <code>./bundled/&lt;foo&gt;/&lt;...&gt;</code>. The actual setup of an object
+  library happens within that subdirectories with the help of a few macros. More
+  documentation on the unity build subsystem is
+  available <a href="#unity-build">here</a>.
 <pre class="cmake">
 #
-# Glob for all header files associated with the object target:
-# As this list is only for cosmetic reasons, so that associated header
-# files show up in IDEs, we don't manage an explicit list (with the
-# trade-off to have to run "make rebuild_cache" when a new header file
-# emerges...)
+# A list of source files that, if DEAL_II_UNITY_BUILD=ON, will be concatenated
+# into a few unity files:
 #
-FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/dofs/*.h
+SET(_unity_include_src
+  block_info.cc
+  dof_faces.cc
+  ...
   )
 
 #
-# A list of source files forming the object target:
+# A list of source files that are always compiled individually:
 #
-SET(_src
+SET(_separate_src
+  dof_accessor.cc
+  dof_accessor_get.cc
   ...
-  dof_tools.cc
+  )
+
+#
+# The number of files, if DEAL_II_UNITY_BUILD=ON, to include in each unity
+# file. This number is determined empirically by timing the build. The macro
+# SETUP_SOURCE_LIST calls the macro SETUP_UNITY_TARGET which will generate unity
+# files that each contain no more than _n_includes_per_unity_file files. If
+# DEAL_II_UNITY_BUILD=OFF then this variable is never read.
+#
+SET(_n_includes_per_unity_file 15)
+
+#
+# A macro that handles setting up the list of source files to compile in the
+# _src variable and handles the unity build logic:
+#
+SETUP_SOURCE_LIST("${_unity_include_src}"
+  "${_separate_src}"
+  ${_n_includes_per_unity_file}
+  _src
   )
 
 #
 # A list of instantiations that must be expanded:
 #
 SET(_inst
+  block_info.inst.in
   ...
-  dof_tools.inst.in
   )
 
 #
-# The following macro will set up an obj_dofs.debug and
-# obj_dofs.release target  with appropriate compile flags and
-# definitions for a simultaneous build of debug and release library.
-# Furthermore, the object name will be stored in
-#   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_(debug/release)
-# so that it is available in global scope.
+# The following macro will set up an obj_dofs_debug and
+# obj_dofs_release targets with appropriate compile flags and
+# definitions.
 #
 # Header files and instantiation files (${_header}, ${_inst}) are added
 # for cosmetic reasons, so that they show up in IDEs.
 #
+FILE(GLOB _header
+  ${CMAKE_SOURCE_DIR}/include/deal.II/dofs/*.h
+  )
+
 DEAL_II_ADD_LIBRARY(obj_dofs OBJECT ${_src} ${_header} ${_inst})
 
 #
-# This macro will set up an obj_dofs.inst target for expanding all
-# files listed in ${inst_in_files}. Appropriate target dependencies
-# will be added to obj_dofs.debug and obj_dofs.release.
+# This macro will set up a target for each of the files listed in
+# ${_inst}. Appropriate target dependencies will be added to obj_dofs_debug and
+# obj_dofs_release.
 #
-EXPAND_INSTANTIATIONS(obj_dofs "${inst_in_files}")
+EXPAND_INSTANTIATIONS(obj_dofs "${_inst}")
 </pre>
 </p>
 
