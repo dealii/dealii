@@ -1778,6 +1778,41 @@ public:
    * The function in essence reads the entire file into a stream and
    * then calls the other parse_input() function with that stream. See
    * there for more information.
+   *
+   * Previous versions of deal.II included a similar function named
+   * <code>read_input</code> which, if the parameter file could not be found
+   * by PathSearch::find, would not modify the calling ParameterHandler (i.e.,
+   * the parameters would all be set to their default values) and would
+   * (optionally) create a parameter file with default values. In order to
+   * obtain that behavior one should catch the PathSearch::ExcFileNotFound
+   * exception and then optionally call ParameterHandler::print_parameters,
+   * e.g.,
+   *
+   * @code
+   * const std::string filename = "parameters.prm";
+   * const bool print_default_prm_file = true;
+   * try
+   *   {
+   *     parameter_handler.parse_input (filename);
+   *   }
+   * catch (const PathSearch::ExcFileNotFound &)
+   *   {
+   *     std::cerr << "ParameterHandler::parse_input: could not open file <"
+   *               << filename
+   *               << "> for reading."
+   *               << std::endl;
+   *     if (print_default_prm_file)
+   *       {
+   *         std::cerr << "Trying to make file <"
+   *                   << filename
+   *                   << "> with default values for you."
+   *                   << std::endl;
+   *         std::ofstream output (filename);
+   *         parameter_handler.print_parameters (output,
+   *                                             ParameterHandler::OutputStyle::Text);
+   *       }
+   *   }
+   * @endcode
    */
   virtual void parse_input (const std::string &filename,
                             const std::string &last_line = "");
