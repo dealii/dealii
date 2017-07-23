@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/utilities.h>
 
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -48,6 +49,8 @@ class MultipleParameterLoop;
  */
 namespace Patterns
 {
+  template <typename T>
+  class DefaultPattern;
 
   /**
    * Base class to declare common interface. The purpose of this class is
@@ -151,6 +154,8 @@ namespace Patterns
   class Integer : public PatternBase
   {
   public:
+    typedef int value_type;
+
     /**
      * Minimal integer value. If the numeric_limits class is available use
      * this information to obtain the extremal values, otherwise set it so
@@ -189,6 +194,32 @@ namespace Patterns
     virtual std::string description (const OutputStyle style=Machine) const;
 
     /**
+     * Convert a value of the kind that this pattern requires (as described
+     * by the local value_type typedef) and convert it to a string.
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    std::string to_string (const value_type value) const
+    {
+      return std::to_string(value);
+    };
+
+    /**
+     * Convert a string to a variable of the kind that this pattern encodes
+     * (as described by the local value_type typedef).
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    value_type  to_value (const std::string &s) const
+    {
+      return Utilities::string_to_int(s);
+    };
+
+    /**
      * Return a copy of the present object, which is newly allocated on the
      * heap. Ownership of that object is transferred to the caller of this
      * function.
@@ -225,6 +256,37 @@ namespace Patterns
     static const char *description_init;
   };
 
+
+  template <>
+  class DefaultPattern<int>
+  {
+  public:
+    static Integer create()
+    {
+      return Integer();
+    };
+  };
+
+  template <>
+  class DefaultPattern<unsigned int>
+  {
+  public:
+    static Integer create()
+    {
+      return Integer();
+    }; // TODO: set bounds
+  };
+
+  template <>
+  class DefaultPattern<char>
+  {
+  public:
+    static Integer create()
+    {
+      return Integer();  // TODO: set bounds;
+    }
+  };
+
   /**
    * Test for the string being a <tt>double</tt>. If bounds are given to the
    * constructor, then the integer given also needs to be within the interval
@@ -245,10 +307,12 @@ namespace Patterns
   class Double : public PatternBase
   {
   public:
+    typedef double value_type;
+
     /**
-     * Minimal double value used as default value, taken from
-     * <tt>std::numeric_limits</tt>.
-     */
+    * Minimal double value used as default value, taken from
+    * <tt>std::numeric_limits</tt>.
+    */
     static const double min_double_value;
 
     /**
@@ -279,6 +343,26 @@ namespace Patterns
      * into this description.
      */
     virtual std::string description (const OutputStyle style=Machine) const;
+
+    /**
+     * Convert a value of the kind that this pattern requires (as described
+     * by the local value_type typedef) and convert it to a string.
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    std::string to_string (const value_type value) const;
+
+    /**
+     * Convert a string to a variable of the kind that this pattern encodes
+     * (as described by the local value_type typedef).
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    value_type  to_value (const std::string &s) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -319,6 +403,22 @@ namespace Patterns
     static const char *description_init;
   };
 
+
+  template <>
+  class DefaultPattern<double>
+  {
+  public:
+    static Double create();
+  };
+
+  template <>
+  class DefaultPattern<float>
+  {
+  public:
+    static Double create();
+  };
+
+
   /**
    * Test for the string being one of a sequence of values given like a
    * regular expression. For example, if the string given to the constructor
@@ -331,6 +431,8 @@ namespace Patterns
   class Selection : public PatternBase
   {
   public:
+    typedef std::string value_type;
+
     /**
      * Constructor. Take the given parameter as the specification of valid
      * strings.
@@ -349,6 +451,26 @@ namespace Patterns
      * constructor.
      */
     virtual std::string description (const OutputStyle style=Machine) const;
+
+    /**
+     * Convert a value of the kind that this pattern requires (as described
+     * by the local value_type typedef) and convert it to a string.
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    std::string to_string (const value_type value) const;
+
+    /**
+     * Convert a string to a variable of the kind that this pattern encodes
+     * (as described by the local value_type typedef).
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    value_type  to_value (const std::string &s) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -394,6 +516,9 @@ namespace Patterns
   class List : public PatternBase
   {
   public:
+
+    typedef std::vector<std::string> value_type;
+
     /**
      * Maximal integer value. If the numeric_limits class is available use
      * this information to obtain the extremal values, otherwise set it so
@@ -430,6 +555,66 @@ namespace Patterns
      * match.
      */
     virtual std::string description (const OutputStyle style=Machine) const;
+
+    /**
+     * Convert a value of the kind that this pattern requires (as described
+     * by the local value_type typedef) and convert it to a string.
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    std::string to_string (const value_type value) const
+    {
+      std::string s;
+      for (unsigned int i=0; i<value.size(); ++i)
+        {
+          s += std::string(value[i]);
+          if (i != value.size()-1)
+            s += ", ";
+        }
+      return s;
+    }
+
+    /**
+     * Convert a string to a variable of the kind that this pattern encodes
+     * (as described by the local value_type typedef).
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    value_type  to_value (const std::string &s) const
+    {
+      std::string tmp = s;
+      std::vector<std::string> split_list;
+
+      // first split the input list
+      while (tmp.length() != 0)
+        {
+          std::string name;
+          name = tmp;
+
+          if (name.find(separator) != std::string::npos)
+            {
+              name.erase (name.find(separator), std::string::npos);
+              tmp.erase (0, tmp.find(separator)+separator.size());
+            }
+          else
+            tmp = "";
+
+          while ((name.length() != 0) &&
+                 (std::isspace (name[0])))
+            name.erase (0,1);
+
+          while (std::isspace (name[name.length()-1]))
+            name.erase (name.length()-1, 1);
+
+          split_list.push_back (name);
+        }
+
+      return split_list;
+    }
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -492,6 +677,19 @@ namespace Patterns
   };
 
 
+  template <typename T>
+  class DefaultPattern<std::vector<T> >
+  {
+  public:
+    static List create()
+    {
+      return List(DefaultPattern<T>::create());
+    }
+  };
+
+
+
+
   /**
    * This pattern matches a list of comma-separated values each of which
    * denotes a pair of key and value. Both key and value have to match a
@@ -509,6 +707,8 @@ namespace Patterns
   class Map : public PatternBase
   {
   public:
+    typedef std::map<std::string,std::string> value_type;
+
     /**
      * Maximal integer value. If the numeric_limits class is available use
      * this information to obtain the extremal values, otherwise set it so
@@ -547,6 +747,26 @@ namespace Patterns
      * match.
      */
     virtual std::string description (const OutputStyle style=Machine) const;
+
+    /**
+     * Convert a value of the kind that this pattern requires (as described
+     * by the local value_type typedef) and convert it to a string.
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    std::string to_string (const value_type value) const;
+
+    /**
+     * Convert a string to a variable of the kind that this pattern encodes
+     * (as described by the local value_type typedef).
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    value_type  to_value (const std::string &s) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -617,6 +837,14 @@ namespace Patterns
   };
 
 
+  template <typename T, typename U>
+  class DefaultPattern<std::map<T, U> >
+  {
+  public:
+    static Map create();
+  };
+
+
   /**
    * This class is much like the Selection class, but it allows the input to
    * be a comma-separated list of values which each have to be given in the
@@ -630,9 +858,11 @@ namespace Patterns
   class MultipleSelection : public PatternBase
   {
   public:
+    typedef std::vector<std::string> value_type;
+
     /**
-     * Constructor. @p seq is a list of valid options separated by "|".
-     */
+    * Constructor. @p seq is a list of valid options separated by "|".
+    */
     MultipleSelection (const std::string &seq);
 
     /**
@@ -647,6 +877,26 @@ namespace Patterns
      * constructor.
      */
     virtual std::string description (const OutputStyle style=Machine) const;
+
+    /**
+     * Convert a value of the kind that this pattern requires (as described
+     * by the local value_type typedef) and convert it to a string.
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    std::string to_string (const value_type value) const;
+
+    /**
+     * Convert a string to a variable of the kind that this pattern encodes
+     * (as described by the local value_type typedef).
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    value_type  to_value (const std::string &s) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -701,6 +951,8 @@ namespace Patterns
   class Bool : public Selection
   {
   public:
+    typedef bool value_type;
+
     /**
      * Constructor.
      */
@@ -711,6 +963,26 @@ namespace Patterns
      * match.
      */
     virtual std::string description (const OutputStyle style=Machine) const;
+
+    /**
+     * Convert a value of the kind that this pattern requires (as described
+     * by the local value_type typedef) and convert it to a string.
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    std::string to_string (const value_type value) const;
+
+    /**
+     * Convert a string to a variable of the kind that this pattern encodes
+     * (as described by the local value_type typedef).
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    value_type  to_value (const std::string &s) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -739,6 +1011,8 @@ namespace Patterns
   class Anything : public PatternBase
   {
   public:
+    typedef std::string value_type;
+
     /**
      * Constructor. (Allow for at least one non-virtual function in this
      * class, as otherwise sometimes no virtual table is emitted.)
@@ -756,6 +1030,26 @@ namespace Patterns
      * match. Here, this is the string <tt>"[Anything]"</tt>.
      */
     virtual std::string description (const OutputStyle style=Machine) const;
+
+    /**
+     * Convert a value of the kind that this pattern requires (as described
+     * by the local value_type typedef) and convert it to a string.
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    std::string to_string (const value_type value) const;
+
+    /**
+     * Convert a string to a variable of the kind that this pattern encodes
+     * (as described by the local value_type typedef).
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    value_type  to_value (const std::string &s) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -779,6 +1073,18 @@ namespace Patterns
   };
 
 
+  template <>
+  class DefaultPattern<std::string>
+  {
+  public:
+    static Anything create()
+    {
+      return Anything();
+    }
+  };
+
+
+
   /**
    * A pattern that can be used to indicate when a parameter is intended to be
    * the name of a file. By itself, this class does not check whether the
@@ -796,10 +1102,12 @@ namespace Patterns
   class FileName : public PatternBase
   {
   public:
+    typedef std::string value_type;
+
     /**
-     * Files can be used for input or output. This can be specified in the
-     * constructor by choosing the flag <tt>type</tt>.
-     */
+    * Files can be used for input or output. This can be specified in the
+    * constructor by choosing the flag <tt>type</tt>.
+    */
     enum FileType
     {
       /**
@@ -829,6 +1137,26 @@ namespace Patterns
      * match. Here, this is the string <tt>"[Filename]"</tt>.
      */
     virtual std::string description (const OutputStyle style=Machine) const;
+
+    /**
+     * Convert a value of the kind that this pattern requires (as described
+     * by the local value_type typedef) and convert it to a string.
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    std::string to_string (const value_type value) const;
+
+    /**
+     * Convert a string to a variable of the kind that this pattern encodes
+     * (as described by the local value_type typedef).
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    value_type  to_value (const std::string &s) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -872,6 +1200,8 @@ namespace Patterns
   class DirectoryName : public PatternBase
   {
   public:
+    typedef std::string value_type;
+
     /**
      * Constructor.
      */
@@ -888,6 +1218,26 @@ namespace Patterns
      * match. Here, this is the string <tt>"[Filename]"</tt>.
      */
     virtual std::string description (const OutputStyle style=Machine) const;
+
+    /**
+     * Convert a value of the kind that this pattern requires (as described
+     * by the local value_type typedef) and convert it to a string.
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    std::string to_string (const value_type value) const;
+
+    /**
+     * Convert a string to a variable of the kind that this pattern encodes
+     * (as described by the local value_type typedef).
+     *
+     * The given value will be matched against the current pattern to make
+     * sure that it satisfies the constraints imposed (such as minimal and
+     * maximal values).
+     */
+    value_type  to_value (const std::string &s) const;
 
     /**
      * Return a copy of the present object, which is newly allocated on the
@@ -1911,6 +2261,24 @@ public:
    */
   void add_action (const std::string &entry,
                    const std::function<void (const std::string &value)> &action);
+
+  template <typename ParameterType, typename PatternType>
+  void add_parameter (const std::string &entry,
+                      ParameterType     &parameter,
+                      const std::string &documentation = std::string(),
+                      const PatternType &pattern = Patterns::DefaultPattern<ParameterType>::create())
+  {
+    static_assert(std::is_const<ParameterType>::value == false,
+                  "You tried to add a parameter using a type "
+                  "that is const. Use a non-const type.");
+
+    declare_entry(entry, pattern.to_string(parameter), pattern, documentation);
+    add_action(entry,
+               [&parameter,pattern] (const std::string &s)
+    {
+      parameter = pattern.to_value(s);
+    });
+  }
 
   /**
    * Create an alias for an existing entry. This provides a way to refer to a
