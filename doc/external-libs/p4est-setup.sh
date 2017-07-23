@@ -20,6 +20,13 @@
 
 # This program comes with ABSOLUTELY NO WARRANTY.
 
+# error message when zlib is not found
+MISSING_ZLIB_MESSAGE="deal.II requires that p4est be built with zlib support. Please \
+either ensure that zlib is installed in a standard location or add appropriate \
+flags to LDFLAGS and CPPFLAGS to both calls to configure to describe where zlib's \
+shared object files and headers are (e.g., LDFLAGS=\"-L/path/to/shared-objects/\" \
+and CPPFLAGS=\"-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL -I/path/to/headers/\")."
+
 # unpack under current directory
 UNPACK=`pwd`
 
@@ -114,6 +121,9 @@ cd "$BUILD_FAST"
         "$@" > config.output || bdie "Error in configure"
 make -C sc -j 8 > make.output || bdie "Error in make sc"
 make -j 8 >> make.output || bdie "Error in make p4est"
+# ensure that we built p4est with zlib
+grep -q 'P4EST_HAVE_ZLIB *1' "$BUILD_FAST/src/p4est_config.h" \
+    || bdie "$MISSING_ZLIB_MESSAGE"
 make install >> make.output || bdie "Error in make install"
 echo "FAST version installed in $INSTALL_FAST"
 
@@ -128,6 +138,9 @@ cd "$BUILD_DEBUG"
         "$@" > config.output || bdie "Error in configure"
 make -C sc -j 8 > make.output || bdie "Error in make sc"
 make -j 8 >> make.output || bdie "Error in make p4est"
+# ensure that we built p4est with zlib
+grep -q 'P4EST_HAVE_ZLIB *1' "$BUILD_DEBUG/src/p4est_config.h" \
+    || bdie "$MISSING_ZLIB_MESSAGE"
 make install >> make.output || bdie "Error in make install"
 echo "DEBUG version installed in $INSTALL_DEBUG"
 echo
