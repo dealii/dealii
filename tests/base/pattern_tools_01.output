@@ -1,0 +1,28 @@
+
+DEAL::Type     : int
+DEAL::Pattern  : [Integer range -2147483648...2147483647 (inclusive)]
+DEAL::To String: 1
+DEAL::To value : 1
+DEAL::Type     : unsigned int
+DEAL::Pattern  : [Integer]
+DEAL::To String: 2
+DEAL::To value : 2
+DEAL::Type     : unsigned char
+DEAL::Pattern  : [Integer range 0...255 (inclusive)]
+DEAL::To String: 3
+DEAL::To value : 3
+DEAL::Pattern  : [Anything]
+DEAL::To String: Ciao
+DEAL::To value : Ciao
+DEAL::Type     : double
+DEAL::Pattern  : [Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]
+DEAL::To String: 4.000000
+DEAL::To value : 4.000000
+DEAL::Type     : bool
+DEAL::Pattern  : [Bool]
+DEAL::To String: true
+DEAL::To value : true
+DEAL::Type     : float
+DEAL::Pattern  : [Double -3.40282e+38...3.40282e+38 (inclusive)]
+DEAL::To String: 5.500000
+DEAL::To value : 5.500000

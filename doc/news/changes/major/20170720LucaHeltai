@@ -1,0 +1,11 @@
+New: The new namespace Patterns::Tools contains 
+utilities that can be used to convert from complicated types
+to strings and vice versa. These tools have been put to use
+in the method ParameterHandler::add_parameter() that allows
+users to perform in one single call the operations 
+ParameterHandler::declare_parameter(), 
+ParameterHandler::get() and to convert the string to a valid
+value stored in the variable that is given as a parameter to 
+ParameterHandler::add_parameter().
+<br>
+(Luca Heltai, 2017/07/20)

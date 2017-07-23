@@ -44,6 +44,7 @@ SET(_src
   parameter_handler.cc
   parsed_function.cc
   partitioner.cc
+  patterns.cc
   path_search.cc
   polynomial.cc
   polynomials_abf.cc

@@ -1,0 +1,22 @@
+
+DEAL::Pattern  : [List of <[Integer]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 0, 1
+DEAL::To value : 0, 1
+DEAL::Pattern  : [List of <[Integer]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 1, 2
+DEAL::To value : 1, 2
+DEAL::Pattern  : [List of <[Integer]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 2, 3
+DEAL::To value : 2, 3
+DEAL::Pattern  : [List of <[Integer]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 3, 4
+DEAL::To value : 3, 4
+DEAL::Pattern  : [List of <[Integer]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 4, 5
+DEAL::To value : 4, 5
+DEAL::Pattern  : [List of <[Integer]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 5, 6
+DEAL::To value : 6, 5
+DEAL::Pattern  : [List of <[Integer]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 6, 7
+DEAL::To value : 7, 6

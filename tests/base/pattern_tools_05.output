@@ -1,0 +1,13 @@
+
+DEAL::Pattern  : [Map of <[Integer]>:<[List of <[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]> of length 3...3 (inclusive)]> of length 0...4294967295 (inclusive) separated by <;>]
+DEAL::To String: 0:1.000000, 2.000000, 3.000000; 2:1.000000, 2.000000, 3.000000
+DEAL::To value : 0:1.000000, 2.000000, 3.000000; 2:1.000000, 2.000000, 3.000000
+DEAL::Pattern  : [Map of <[Integer]>:<[List of <[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]> of length 2...2 (inclusive)]> of length 0...4294967295 (inclusive) separated by <;>]
+DEAL::To String: 0:4.000000, 5.000000; 2:4.000000, 5.000000
+DEAL::To value : 0:4.000000, 5.000000; 2:4.000000, 5.000000
+DEAL::Pattern  : [Map of <[Integer]>:<[List of <[List of <[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]> of length 3...3 (inclusive)]> of length 0...4294967295 (inclusive) separated by <;>]> of length 0...4294967295 (inclusive) separated by <|>]
+DEAL::To String: 0:1.000000, 2.000000, 3.000000; 1.000000, 2.000000, 3.000000| 2:1.000000, 2.000000, 3.000000; 1.000000, 2.000000, 3.000000
+DEAL::To value : 0:1.000000, 2.000000, 3.000000; 1.000000, 2.000000, 3.000000| 2:1.000000, 2.000000, 3.000000; 1.000000, 2.000000, 3.000000
+DEAL::Pattern  : [Map of <[Integer]>:<[List of <[List of <[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]> of length 2...2 (inclusive)]> of length 0...4294967295 (inclusive) separated by <;>]> of length 0...4294967295 (inclusive) separated by <|>]
+DEAL::To String: 0:4.000000, 5.000000; 4.000000, 5.000000| 2:4.000000, 5.000000; 4.000000, 5.000000
+DEAL::To value : 0:4.000000, 5.000000; 4.000000, 5.000000| 2:4.000000, 5.000000; 4.000000, 5.000000

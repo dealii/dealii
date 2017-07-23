@@ -1,0 +1,9 @@
+
+DEAL:parameters::A map: 2:3.000000, 3:1.000000
+DEAL::After ParameterHandler::set ==========================
+DEAL::
+DEAL:parameters::A map: 1:2.0, 3:4.0
+DEAL::Actual variables            ==========================
+DEAL::
+DEAL::1:2.00000
+DEAL::3:4.00000

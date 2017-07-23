@@ -1,0 +1,16 @@
+
+DEAL::Pattern  : [List of <[Integer range -2147483648...2147483647 (inclusive)]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 1, 1
+DEAL::To value : 1, 1
+DEAL::Pattern  : [List of <[Integer]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 2, 2
+DEAL::To value : 2, 2
+DEAL::Pattern  : [List of <[Integer range 0...255 (inclusive)]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 3, 3
+DEAL::To value : 3, 3
+DEAL::Pattern  : [List of <[Anything]> of length 0...4294967295 (inclusive)]
+DEAL::To String: Ciao, Ciao
+DEAL::To value : Ciao, Ciao
+DEAL::Pattern  : [List of <[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]> of length 0...4294967295 (inclusive)]
+DEAL::To String: 4.000000, 4.000000
+DEAL::To value : 4.000000, 4.000000
