@@ -579,6 +579,9 @@ public:
  * $R^{dim}$, for <code>spacedim@>dim</code> the triangulation is of a
  * manifold embedded in a higher dimensional space).
  *
+ * There is a specialization of this class for the case where
+ * @p structdim equals zero, i.e., for vertices of a triangulation.
+ *
  * @ingroup Accessors
  * @author Wolfgang Bangerth and others, 1998, 2000, 2008
  */
@@ -1540,14 +1543,19 @@ private:
 
 
 /**
- * Specialization of <code>TriaAccessor<structdim, dim, spacedim></code>. This
- * class represent vertices in a triangulation of dimensionality
+ * This class is a specialization of <code>TriaAccessor<structdim, dim, spacedim></code>
+ * for the case that @p structdim is zero. This
+ * class represents vertices in a triangulation of dimensionality
  * <code>dim</code> (i.e. 1 for a triangulation of lines, 2 for a
  * triangulation of quads, and 3 for a triangulation of hexes) that is
  * embedded in a space of dimensionality <code>spacedim</code> (for
  * <code>spacedim==dim</code> the triangulation represents a domain in
  * ${\mathbb R}^\text{dim}$, for <code>spacedim@>dim</code> the triangulation
  * is of a manifold embedded in a higher dimensional space).
+ *
+ * There is a further specialization of this class for the case that
+ * @p dim equals one, i.e., for vertices of a one-dimensional triangulation,
+ * since in that case vertices are also faces.
  *
  * @ingroup Accessors
  * @author Bruno Turcksin, 2015
@@ -1892,10 +1900,17 @@ private:
 
 
 /**
- * A class that represents an access to a face in 1d -- i.e. to a point. This
- * is not a full fledged access from which you can build an iterator: for
- * example, you can't iterate from one such point to the next. Point also
- * don't have children, and they don't have neighbors.
+ * This class is a specialization of <code>TriaAccessor<structdim, dim, spacedim></code>
+ * for the case that @p structdim is zero and @p dim is one. This
+ * class represents vertices in a one-dimensional triangulation that is
+ * embedded in a space of dimensionality <code>spacedim</code> (for
+ * <code>spacedim==dim==1</code> the triangulation represents a domain in
+ * ${\mathbb R}^\text{dim}$, for <code>spacedim@>dim==1</code> the triangulation
+ * is of a manifold embedded in a higher dimensional space).
+ *
+ * The current specialization of the TriaAccessor<0,dim,spacedim> class
+ * for vertices of a one-dimensional triangulation exists
+ * since in the @p dim == 1 case vertices are also faces.
  *
  * @ingroup Accessors
  * @author Wolfgang Bangerth, 2010
