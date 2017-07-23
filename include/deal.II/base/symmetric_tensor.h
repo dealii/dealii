@@ -22,6 +22,10 @@
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
 
+#include <array>
+#include <algorithm>
+#include <functional>
+
 DEAL_II_NAMESPACE_OPEN
 
 template <int rank, int dim, typename Number=double> class SymmetricTensor;
@@ -2318,6 +2322,161 @@ Number second_invariant (const SymmetricTensor<2,3,Number> &t)
           - t[0][1]*t[0][1] - t[0][2]*t[0][2] - t[1][2]*t[1][2]);
 }
 
+
+
+/**
+ * Return the eigenvalues of a symmetric tensor of rank 2.
+ *
+ * @relates SymmetricTensor
+ * @author Jean-Paul Pelteret, 2017
+ */
+template <typename Number>
+std::array<Number,1>
+eigenvalues (const SymmetricTensor<2,1,Number> &T)
+{
+  return { {T[0][0]} };
+}
+
+
+
+/**
+ * Return the eigenvalues of a symmetric tensor of rank 2.
+ * The array of eigenvalues is sorted in descending order.
+ *
+ * For 2x2 tensors, the eigenvalues of tensor $T$ are the roots of
+ * <a href="https://en.wikipedia.org/wiki/Eigenvalue_algorithm#2.C3.972_matrices">the characteristic polynomial</a>
+ * $0 = \lambda^{2} - \lambda*tr(T) + det(T)$
+ * as given by
+ * $\lambda = \frac{tr(T) \pm \sqrt{tr^{2}(T) - 4*det(T)}}{2}$.
+ *
+ * @warning The algorithm employed here determines the eigenvalues by
+ * computing the roots of the characteristic polynomial. In the case that there
+ * exists a common root (the eigenvalues are equal), the computation is
+ * <a href="https://scicomp.stackexchange.com/q/23686">subject to round-off errors</a>
+ * of order $\sqrt{\epsilon}$.
+ *
+ * @relates SymmetricTensor
+ * @author Jean-Paul Pelteret, 2017
+ */
+template <typename Number>
+std::array<Number,2>
+eigenvalues (const SymmetricTensor<2,2,Number> &T)
+{
+  const Number upp_tri_sq = T[0][1]*T[0][1];
+  if (upp_tri_sq == Number(0.0))
+    {
+      // The tensor is diagonal
+      std::array<Number,2> eig_vals =
+      {
+        {T[0][0], T[1][1]}
+      };
+
+      // Sort from largest to smallest.
+      std::sort(eig_vals.begin(), eig_vals.end(), std::greater<Number>());
+      return eig_vals;
+    }
+  else
+    {
+      const Number tr_T = trace(T);
+      const Number det_T = determinant(T);
+      const Number descrim = tr_T*tr_T - 4.0*det_T;
+      Assert(descrim > Number(0.0), ExcMessage("The roots of the characteristic polynomial are complex valued."));
+      const Number sqrt_desc = std::sqrt(descrim);
+
+      std::array<Number,2> eig_vals =
+      {
+        {
+          0.5*(tr_T + sqrt_desc),
+          0.5*(tr_T - sqrt_desc)
+        }
+      };
+      Assert(eig_vals[0] >= eig_vals[1], ExcMessage("The eigenvalue ordering is incorrect."));
+      return eig_vals;
+    }
+}
+
+
+
+/**
+ * Return the eigenvalues of a symmetric tensor of rank 2.
+ * The array of eigenvalues is sorted in descending order.
+ *
+ * For 3x3 tensors, the eigenvalues of tensor $T$ are the roots of
+ * <a href="https://en.wikipedia.org/wiki/Eigenvalue_algorithm#3.C3.973_matrices">the characteristic polynomial</a>
+ * $0 = \lambda^{3} - \lambda^{2}*tr(T) - \frac{1}{2} \lambda (tr(T^{2}) - tr^{2}(T)) - det(T)$.
+ *
+ * @warning The algorithm employed here determines the eigenvalues by
+ * computing the roots of the characteristic polynomial. In the case that there
+ * exists a common root (the eigenvalues are equal), the computation is
+ * <a href="https://scicomp.stackexchange.com/q/23686">subject to round-off errors</a>
+ * of order $\sqrt{\epsilon}$.
+ *
+ * @relates SymmetricTensor
+ * @author Jean-Paul Pelteret, 2017
+ */
+template <typename Number>
+std::array<Number,3>
+eigenvalues (const SymmetricTensor<2,3,Number> &T)
+{
+  const Number upp_tri_sq = T[0][1]*T[0][1] + T[0][2]*T[0][2] + T[1][2]*T[1][2];
+  if (upp_tri_sq == Number(0.0))
+    {
+      // The tensor is diagonal
+      std::array<Number,3> eig_vals
+      = { {T[0][0], T[1][1], T[2][2]} };
+
+      // Sort from largest to smallest.
+      std::sort(eig_vals.begin(), eig_vals.end(), std::greater<Number>());
+      return eig_vals;
+    }
+  else
+    {
+      // Perform an affine change to T, and solve a different
+      // characteristic equation that has a trigonometric solution.
+      // Decompose T = p*B + q*I , and set q = tr(T)/3
+      // and p = (tr((T - q.I)^{2})/6)^{1/2} . Then solve the equation
+      // 0 = det(\lambda*I - B) = \lambda^{3} - 3*\lambda - det(B)
+      // which has the solution
+      // \lambda = 2*cos(1/3 * acos(det(B)/2) +2/3*pi*k ) ; k = 0,1,2
+      // when substituting  \lambda = 2.cos(theta) and using trig identities.
+      const Number tr_T = trace(T);
+      const Number q = tr_T/3.0;
+      const Number tmp1 = (  T[0][0] - q)*(T[0][0] - q)
+                          + (T[1][1] - q)*(T[1][1] - q)
+                          + (T[2][2] - q)*(T[2][2] - q)
+                          + 2.0 * upp_tri_sq;
+      const Number p = std::sqrt(tmp1/6.0);
+      const SymmetricTensor<2,3,Number> B = (1.0/p)*(T - q*unit_symmetric_tensor<3,Number>());
+      const Number tmp_2 = determinant(B)/2.0;
+
+      // The value of tmp_2 should be within [-1,1], however
+      // floating point errors might place it slightly outside
+      // this range. It is therefore necessary to correct for it
+      const Number phi =
+        (tmp_2 <= -1.0 ? M_PI/3.0 :
+         (tmp_2 >= 1.0 ? 0.0 :
+          std::acos(tmp_2)/3.0));
+
+      // Due to the trigonometric solution, the computed eigenvalues
+      // should be predictably in the order eig1 >= eig2 >= eig3...
+      std::array<Number,3> eig_vals
+      = { {
+          q + 2.0*p *std::cos(phi),
+          0.0,
+          q + 2.0*p *std::cos(phi + (2.0/3.0*M_PI))
+        }
+      };
+      // Use the identity tr(T) = eig1 + eig2 + eig3
+      eig_vals[1] = tr_T - eig_vals[0] - eig_vals[2];
+
+      // ... however, when equal roots exist then floating point
+      // errors may make this no longer be the case.
+      // Sort from largest to smallest.
+      std::sort(eig_vals.begin(), eig_vals.end(), std::greater<Number>());
+
+      return eig_vals;
+    }
+}
 
 
 
