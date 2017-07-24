@@ -31,6 +31,7 @@ namespace NonMatching
     AssertDimension (normals.size(), points.size());
     for (auto normal : normals)
       {
+        (void)normal;
         Assert(std::abs(normal.norm() - 1.0) < 1e-9,
                ExcMessage("Normal is not normalized."));
       }
