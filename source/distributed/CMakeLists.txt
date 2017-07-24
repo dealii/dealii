@@ -15,13 +15,25 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+SET(_unity_include_src
   grid_refinement.cc
   solution_transfer.cc
   tria.cc
   tria_base.cc
   shared_tria.cc
   p4est_wrappers.cc
+  )
+
+SET(_separate_src
+  )
+
+# concatenate all unity inclusion files in one file
+SET(_n_includes_per_unity_file 15)
+
+SETUP_SOURCE_LIST("${_unity_include_src}"
+  "${_separate_src}"
+  ${_n_includes_per_unity_file}
+  _src
   )
 
 SET(_inst

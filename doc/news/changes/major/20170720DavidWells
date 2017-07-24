@@ -1,0 +1,2 @@
+New: The cmake configuration now supports unity builds with the option <code>-DDEAL_II_UNITY_BUILD=ON</code>. This option speeds up the build by about 10 to 25%.
+<br> (David Wells, 2017/07/20)

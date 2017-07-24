@@ -32,7 +32,8 @@
 	<li>  <a href="#documentation">Configuring and building the documentation</a></li>
 	<li>  <a href="#configuration-options">Configuration options</a>
 	  <ol>
-	    <li> <a href="#optional">Selecting optional behavior</a></li>
+	    <li> <a href="#optional-compilation">Selecting optional compilation features</a></li>
+	    <li> <a href="#optional">Selecting optional library features</a></li>
 	    <li> <a href="#optional-software">Optional interfaces to
 		other software packages</a></li>
 	    <li> <a href="#conf-details">More information on configuring
@@ -333,7 +334,7 @@
     <pre>
       cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
     </pre>
-    
+
     <p>
       For this to succeed, you will need <a href="http://www.perl.org/"
 					    target="_top">Perl 5.x</a>,
@@ -342,7 +343,7 @@
       the <a href="http://www.graphviz.org" target="_top">GraphViz</a>
       package) to be installed.
     </p>
-  
+
     <p>
       The documentation contains links to pictures (e.g., for the
       tutorial programs) that are by default stored online at the
@@ -351,7 +352,7 @@
       the <code>contrib/utilities/makeofflinedoc.sh</code> script in
       an installed documentation directory to download all images.
     </p>
-    
+
     <p> Finally, the default for locally installed documentation is to
       render formulas as images. You can force formulas to be
       displayed via the MathJax system by
@@ -398,8 +399,21 @@
       options.
     </p>
 
+    <a name="optional-compilation"/>
+      <h4>Selecting optional compilation features</h4>
+      <ul>
+        <p>
+          <li> <i>Unity build</i>: deal.II may be compiled with a unity build;
+            that is, one may configure the build process so that the library is
+            compiled as a few large files instead of many small ones. The unity
+            build feature may be enabled by passing
+            the <code>-DDEAL_II_UNITY_BUILD=ON</code> argument
+            to <code>cmake</code>. This feature is disabled by default.
+          </p>
+      </ul>
+
     <a name="optional"/>
-      <h4>Selecting optional behavior</h4>
+      <h4>Selecting optional library features</h4>
 
     <ul>
       <li>
@@ -543,7 +557,7 @@
       <dd>
 	<p>
 	  The <a href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a>
-	  provides a wide range of mathematical routines such as random number 
+	  provides a wide range of mathematical routines such as random number
 	  generators, special functions and least-squares fitting.
 	  <a href="http://www.gnu.org/software/gsl/">GSL</a> should be
 	  readily packaged by most Linux distributions.  (Don't forget
@@ -619,11 +633,11 @@
 	from the official website, as well as with the OpenCASCADE
 	Community Edition (OCE, available at
 	<a href="https://github.com/tpaviot/oce">https://github.com/tpaviot/oce</a>),
-	which offers a cmake 
+	which offers a cmake
 	interface for its compilation. Alternatively, you can
 	install one of the many external applications that ship with
-	OpenCASCADE internally (for example 
-	<a href="http://www.salome-platform.org/">SALOME</a>, or 
+	OpenCASCADE internally (for example
+	<a href="http://www.salome-platform.org/">SALOME</a>, or
 	<a href="http://www.freecadweb.org/">FreeCAD</a>). Further
 	installation instructions can be
 	found <a href="external-libs/opencascade.html"
@@ -786,7 +800,7 @@
       greater control over what exactly is configured or built than just the
       outline above. If you want to learn more about this, take a look
       <a href="users/cmake.html">here</a>. You might also be interested in
-      <a href="users/cmakelists.html">CMake for user projects</a> or 
+      <a href="users/cmakelists.html">CMake for user projects</a> or
       <a href="developers/cmake-internals.html">build system internals</a>.
     </p>
 

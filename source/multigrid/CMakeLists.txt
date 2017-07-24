@@ -15,16 +15,28 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(_src
+SET(_unity_include_src
   mg_base.cc
   mg_level_global_transfer.cc
-  mg_tools.cc
   mg_transfer_block.cc
   mg_transfer_component.cc
   mg_transfer_internal.cc
-  mg_transfer_matrix_free.cc
   mg_transfer_prebuilt.cc
   multigrid.cc
+  )
+
+SET(_separate_src
+  mg_tools.cc
+  mg_transfer_matrix_free.cc
+  )
+
+# concatenate all unity inclusion files in one file
+SET(_n_includes_per_unity_file 15)
+
+SETUP_SOURCE_LIST("${_unity_include_src}"
+  "${_separate_src}"
+  ${_n_includes_per_unity_file}
+  _src
   )
 
 SET(_inst
