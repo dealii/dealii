@@ -1832,7 +1832,6 @@ alternating_form_at_vertices
 }
 
 
-template struct GeometryInfo<0>;
 template struct GeometryInfo<1>;
 template struct GeometryInfo<2>;
 template struct GeometryInfo<3>;
