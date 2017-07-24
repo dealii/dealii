@@ -3499,6 +3499,7 @@ namespace internal
       {
 #ifndef DEAL_II_WITH_P4EST
         Assert (false, ExcNotImplemented());
+        return NumberCache();
 #else
         const unsigned int dim      = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
@@ -3702,9 +3703,8 @@ namespace internal
               }
         }
 #endif // DEBUG
-#endif // DEAL_II_WITH_P4EST
-
         return number_cache;
+#endif // DEAL_II_WITH_P4EST
       }
 
 
