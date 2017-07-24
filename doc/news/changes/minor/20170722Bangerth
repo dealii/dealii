@@ -1,0 +1,4 @@
+New: There is now a function ConstraintMatrix::copy_from() that allows
+copying objects of type ConstraintMatrix.
+<br>
+(Wolfgang Bangerth, 2017/07/27)
