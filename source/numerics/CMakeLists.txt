@@ -95,5 +95,6 @@ FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/numerics/*.h
   )
 
+SET(_disable_unity_build_obj_numerics TRUE)
 DEAL_II_ADD_LIBRARY(obj_numerics OBJECT ${_src} ${_header} ${_inst})
 EXPAND_INSTANTIATIONS(obj_numerics "${_inst}")

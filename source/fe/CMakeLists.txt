@@ -116,5 +116,6 @@ FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/fe/*.h
   )
 
+SET(_disable_unity_build_obj_fe TRUE)
 DEAL_II_ADD_LIBRARY(obj_fe OBJECT ${_src} ${_header} ${_inst})
 EXPAND_INSTANTIATIONS(obj_fe "${_inst}")

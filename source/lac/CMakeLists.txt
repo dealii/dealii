@@ -144,5 +144,6 @@ FILE(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/lac/*.h
   )
 
+SET(_disable_unity_build_obj_lac TRUE)
 DEAL_II_ADD_LIBRARY(obj_lac OBJECT ${_src} ${_header} ${_inst})
 EXPAND_INSTANTIATIONS(obj_lac "${_inst}")

@@ -81,6 +81,12 @@ MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
 
     ADD_DEPENDENCIES(${_target}_${_build_lowercase} ${_target}_inst)
 
+    IF(TARGET ${_target}_${_build_lowercase}_pch)
+      ADD_DEPENDENCIES(${_target}_${_build_lowercase}_pch ${_target}_inst)
+    ENDIF()
+    IF(TARGET ${_target}_${_build_lowercase}_unity)
+      ADD_DEPENDENCIES(${_target}_${_build_lowercase}_unity ${_target}_inst)
+    ENDIF()
     IF(TARGET ${_target}_${_build_lowercase}_cuda)
       ADD_DEPENDENCIES(${_target}_${_build_lowercase}_cuda ${_target}_inst)
     ENDIF()

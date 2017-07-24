@@ -41,6 +41,10 @@ MACRO(DEAL_II_INSOURCE_SETUP_TARGET _target _build)
       ${DEAL_II_INCLUDE_DIRS}
     )
 
+  IF(DEAL_II_USE_COTIRE)
+    cotire(${_target})
+  ENDIF()
+
 GET_PROPERTY(_type TARGET ${_target} PROPERTY TYPE)
 IF(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
   TARGET_LINK_LIBRARIES(${_target}
