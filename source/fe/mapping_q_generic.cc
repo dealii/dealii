@@ -91,8 +91,8 @@ namespace internal
        const Point<spacedim> &p)
       {
         Assert(spacedim == 2, ExcInternalError());
-        const double x = p(0);
-        const double y = p(1);
+        const long double x = p(0);
+        const long double y = p(1);
 
         const double x0 = vertices[0](0);
         const double x1 = vertices[1](0);
@@ -104,19 +104,19 @@ namespace internal
         const double y2 = vertices[2](1);
         const double y3 = vertices[3](1);
 
-        const double a = (x1 - x3)*(y0 - y2) - (x0 - x2)*(y1 - y3);
-        const double b = -(x0 - x1 - x2 + x3)*y + (x - 2*x1 + x3)*y0 - (x - 2*x0 + x2)*y1
-                         - (x - x1)*y2 + (x - x0)*y3;
-        const double c = (x0 - x1)*y - (x - x1)*y0 + (x - x0)*y1;
+        const long double a = (x1 - x3)*(y0 - y2) - (x0 - x2)*(y1 - y3);
+        const long double b = -(x0 - x1 - x2 + x3)*y + (x - 2*x1 + x3)*y0 - (x - 2*x0 + x2)*y1
+                              - (x - x1)*y2 + (x - x0)*y3;
+        const long double c = (x0 - x1)*y - (x - x1)*y0 + (x - x0)*y1;
 
-        const double discriminant = b*b - 4*a*c;
+        const long double discriminant = b*b - 4*a*c;
         // exit if the point is not in the cell (this is the only case where the
         // discriminant is negative)
         AssertThrow (discriminant > 0.0,
                      (typename Mapping<spacedim,spacedim>::ExcTransformationFailed()));
 
-        double eta1;
-        double eta2;
+        long double eta1;
+        long double eta2;
         // special case #1: if a is zero, then use the linear formula
         if (a == 0.0 && b != 0.0)
           {
@@ -139,31 +139,31 @@ namespace internal
             eta2 = (-b + std::sqrt(discriminant)) / (2*a);
           }
         // pick the one closer to the center of the cell.
-        const double eta = (std::abs(eta1 - 0.5) < std::abs(eta2 - 0.5)) ? eta1 : eta2;
+        const long double eta = (std::abs(eta1 - 0.5) < std::abs(eta2 - 0.5)) ? eta1 : eta2;
 
         /*
          * There are two ways to compute xi from eta, but either one may have a
          * zero denominator.
          */
-        const double subexpr0 = -eta*x2 + x0*(eta - 1);
-        const double xi_denominator0 = eta*x3 - x1*(eta - 1) + subexpr0;
+        const long double subexpr0 = -eta*x2 + x0*(eta - 1);
+        const long double xi_denominator0 = eta*x3 - x1*(eta - 1) + subexpr0;
         const double max_x = std::max(std::max(std::abs(x0), std::abs(x1)),
                                       std::max(std::abs(x2), std::abs(x3)));
 
         if (std::abs(xi_denominator0) > 1e-10*max_x)
           {
-            const double xi = (x + subexpr0)/xi_denominator0;
+            const long double xi = (x + subexpr0)/xi_denominator0;
             return Point<2>(xi, eta);
           }
         else
           {
             const double max_y = std::max(std::max(std::abs(y0), std::abs(y1)),
                                           std::max(std::abs(y2), std::abs(y3)));
-            const double subexpr1 = -eta*y2 + y0*(eta - 1);
-            const double xi_denominator1 = eta*y3 - y1*(eta - 1) + subexpr1;
+            const long double subexpr1 = -eta*y2 + y0*(eta - 1);
+            const long double xi_denominator1 = eta*y3 - y1*(eta - 1) + subexpr1;
             if (std::abs(xi_denominator1) > 1e-10*max_y)
               {
-                const double xi = (subexpr1 + y)/xi_denominator1;
+                const long double xi = (subexpr1 + y)/xi_denominator1;
                 return Point<2>(xi, eta);
               }
             else // give up and try Newton iteration
