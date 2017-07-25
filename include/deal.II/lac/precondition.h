@@ -1931,9 +1931,14 @@ namespace internal
       // Choose a high-frequency mode consisting of numbers between 0 and 1
       // that is cheap to compute (cheaper than random numbers) but avoids
       // obviously re-occurring numbers in multi-component systems by choosing
-      // a period of 11
+      // a period of 11.
+      // Make initial guess robust with respect to number of processors
+      // by operating on the global index.
+      types::global_dof_index first_local_range = 0;
+      if (!vector.locally_owned_elements().is_empty())
+        first_local_range = vector.locally_owned_elements().nth_index_in_set(0);
       for (unsigned int i=0; i<vector.local_size(); ++i)
-        vector.local_element(i) = i%11;
+        vector.local_element(i) = (i+first_local_range)%11;
 
       const Number mean_value = vector.mean_value();
       vector.add(-mean_value);
