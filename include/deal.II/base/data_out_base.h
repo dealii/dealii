@@ -2905,43 +2905,43 @@ private:
   /**
    * Whether this entry is valid and contains data to be written.
    */
-  const bool valid;
+  bool valid;
 
   /**
    * The name of the HDF5 heavy data solution file this entry references.
    */
-  const std::string h5_sol_filename;
+  std::string h5_sol_filename;
 
   /**
    * The name of the HDF5 mesh file this entry references.
    */
-  const std::string h5_mesh_filename;
+  std::string h5_mesh_filename;
 
   /**
    * The simulation time associated with this entry.
    */
-  const double entry_time;
+  double entry_time;
 
   /**
    * The number of data nodes.
    */
-  const unsigned int num_nodes;
+  unsigned int num_nodes;
 
   /**
    * The number of data cells.
    */
-  const unsigned int num_cells;
+  unsigned int num_cells;
 
   /**
    * The dimension associated with the data.
    */
-  const unsigned int dimension;
+  unsigned int dimension;
 
   /**
    * The dimension of the space the data lives in.
    * Note that dimension <= space_dimension.
    */
-  const unsigned int space_dimension;
+  unsigned int space_dimension;
 
   /**
    * The attributes associated with this entry and their dimension.
