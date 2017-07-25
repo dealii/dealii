@@ -670,6 +670,22 @@ public:
     std::vector<CellData<dim> > &original_cells);
 };
 
+#ifndef DOXYGEN
+// specialize the 1D versions to do nothing
+template <int spacedim>
+class GridReordering<1, spacedim>
+{
+public:
+  static void reorder_cells (std::vector<CellData<1> > &/*original_cells*/,
+                             const bool                 /*use_new_style_ordering*/ = false)
+  {}
+
+  static void invert_all_cells_of_negative_grid
+  (const std::vector<Point<spacedim> > &/*all_vertices*/,
+   std::vector<CellData<1> >           &/*cells*/)
+  {}
+};
+
 
 // declaration of explicit specializations
 template <>
@@ -686,6 +702,7 @@ template <>
 void
 GridReordering<3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &all_vertices,
                                                      std::vector<CellData<3> >    &cells);
+#endif // ifndef DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
