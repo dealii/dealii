@@ -21,7 +21,6 @@ SET(_unity_include_src
   grid_in.cc
   grid_out.cc
   grid_refinement.cc
-  grid_reordering.cc
   intergrid_map.cc
   manifold.cc
   manifold_lib.cc
@@ -35,6 +34,7 @@ SET(_unity_include_src
   )
 
 SET(_separate_src
+  grid_reordering.cc
   grid_tools.cc
   tria.cc
   )

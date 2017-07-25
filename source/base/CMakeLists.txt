@@ -25,7 +25,6 @@ SET(_unity_include_src
   conditional_ostream.cc
   config.cc
   convergence_table.cc
-  data_out_base.cc
   event.cc
   exceptions.cc
   flow_function.cc
@@ -81,6 +80,7 @@ SET(_unity_include_src
   )
 
 SET(_separate_src
+  data_out_base.cc
   )
 
 # determined by profiling
