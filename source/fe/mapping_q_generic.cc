@@ -123,19 +123,20 @@ namespace internal
             eta1 = -c/b;
             eta2 = -c/b;
           }
-        // special case #2: if c is very small or the square root of the
-        // discriminant is nearly b.
-        else if (std::abs(c) < 1e-12*std::abs(b)
-                 || std::abs(std::sqrt(discriminant) - b) <= 1e-14*std::abs(b))
+        // special case #2: a is zero for parallelograms and very small for
+        // near-parallelograms:
+        else if (std::abs(a) < 1e-8*std::abs(b))
+          {
+            // if both a and c are very small then the root should be near
+            // zero: this first case will capture that
+            eta1 = 2*c / (-b - std::sqrt(discriminant));
+            eta2 = 2*c / (-b + std::sqrt(discriminant));
+          }
+        // finally, use the plain version:
+        else
           {
             eta1 = (-b - std::sqrt(discriminant)) / (2*a);
             eta2 = (-b + std::sqrt(discriminant)) / (2*a);
-          }
-        // finally, use the numerically stable version of the quadratic formula:
-        else
-          {
-            eta1 = 2*c / (-b - std::sqrt(discriminant));
-            eta2 = 2*c / (-b + std::sqrt(discriminant));
           }
         // pick the one closer to the center of the cell.
         const double eta = (std::abs(eta1 - 0.5) < std::abs(eta2 - 0.5)) ? eta1 : eta2;
