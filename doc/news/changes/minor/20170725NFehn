@@ -1,0 +1,4 @@
+Initialization of Chebyshev smoother: Make initial guess robust with 
+respect to number of processors by operating on the global index.
+<br>
+(Niklas Fehn, 2017/07/25)
