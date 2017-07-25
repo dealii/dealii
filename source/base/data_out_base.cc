@@ -6542,7 +6542,7 @@ create_xdmf_entry (const DataOutBase::DataOutFilter &data_filter,
   (void)comm;
   AssertThrow(false, ExcMessage ("XDMF support requires HDF5 to be turned on."));
 #endif
-  AssertThrow(dim == 2 || dim == 3, ExcMessage ("XDMF only supports 2 or 3 dimensions."));
+  AssertThrow(spacedim == 2 || spacedim == 3, ExcMessage ("XDMF only supports 2 or 3 space dimensions."));
 
   local_node_cell_count[0] = data_filter.n_nodes();
   local_node_cell_count[1] = data_filter.n_cells();
