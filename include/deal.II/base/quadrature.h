@@ -221,6 +221,26 @@ public:
   template <class Archive>
   void serialize (Archive &ar, const unsigned int version);
 
+  /**
+   * This quadrature object is a tensor product in case the tensor product
+   * is formed by the first $size^(1/dim)$ quadrature points.
+   * Return if this is the case.
+   */
+  bool is_tensor_product() const;
+
+  /**
+   * In case the quadrature formula is a tensor product, this function
+   * returns the one-dimensional basis object.
+   * Otherwise, calling this function is not allowed.
+   *
+   * Each time this function is called the constructor for the
+   * one-dimensional Quadrature is called and a copy returned.
+   *
+   * The weights for the one-dimensional formula are rescaled
+   * but they are not modified in case the sum is zero or infinite.
+   */
+  Quadrature<1> get_tensor_basis() const;
+
 protected:
   /**
    * List of quadrature points. To be filled by the constructors of derived
@@ -233,6 +253,12 @@ protected:
    * constructors of derived classes.
    */
   std::vector<double>      weights;
+
+  /**
+   * This quadrature object is a tensor product in case the tensor product
+   * is formed by the first $size^(1/dim)$ quadrature points
+   */
+  bool is_tensor_product_flag;
 };
 
 
@@ -377,6 +403,16 @@ const std::vector<double> &
 Quadrature<dim>::get_weights () const
 {
   return weights;
+}
+
+
+
+template <int dim>
+inline
+bool
+Quadrature<dim>::is_tensor_product () const
+{
+  return is_tensor_product_flag;
 }
 
 
