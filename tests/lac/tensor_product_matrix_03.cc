@@ -85,7 +85,7 @@ void do_test()
 int main()
 {
   initlog();
-  deallog.threshold_double(1e-3);
+  deallog.threshold_double(5e-3);
 
   do_test<1,1>();
   do_test<1,2>();
