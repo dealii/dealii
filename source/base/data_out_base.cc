@@ -6554,6 +6554,7 @@ create_xdmf_entry (const DataOutBase::DataOutFilter &data_filter,
   ierr = MPI_Allreduce(local_node_cell_count, global_node_cell_count, 2, MPI_UNSIGNED, MPI_SUM, comm);
   AssertThrowMPI(ierr);
 #else
+  (void)comm;
   myrank = 0;
   global_node_cell_count[0] = local_node_cell_count[0];
   global_node_cell_count[1] = local_node_cell_count[1];
@@ -6780,8 +6781,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   int ierr;
   (void)ierr;
 #ifndef DEAL_II_WITH_HDF5
-  // throw an exception, but first make
-  // sure the compiler does not warn about
+  // throw an exception, but first make sure the compiler does not warn about
   // the now unused function arguments
   (void)data_filter;
   (void)write_mesh_file;
@@ -6791,21 +6791,16 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
 #else
 #ifndef DEAL_II_WITH_MPI
-  // verify that there are indeed
-  // patches to be written out. most
-  // of the times, people just forget
-  // to call build_patches when there
-  // are no patches, so a warning is
-  // in order. that said, the
-  // assertion is disabled if we
-  // support MPI since then it can
-  // happen that on the coarsest
-  // mesh, a processor simply has no
-  // cells it actually owns, and in
-  // that case it is legit if there
-  // are no patches
+  // verify that there are indeed patches to be written out.
+  // most of the times, people just forget to call build_patches when there
+  // are no patches, so a warning is in order. that said, the assertion is
+  // disabled if we support MPI since then it can happen that on the coarsest
+  // mesh, a processor simply has no cells it actually owns, and in that case
+  // it is legit if there are no patches
   Assert (data_filter.n_nodes() > 0, ExcNoPatches());
-#else
+  (void)comm;
+#endif
+
   hid_t           h5_mesh_file_id=-1, h5_solution_file_id, file_plist_id, plist_id;
   hid_t           node_dataspace, node_dataset, node_file_dataspace, node_memory_dataspace;
   hid_t           cell_dataspace, cell_dataset, cell_file_dataspace, cell_memory_dataspace;
@@ -6852,6 +6847,8 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   global_node_cell_offsets[0] -= local_node_cell_count[0];
   global_node_cell_offsets[1] -= local_node_cell_count[1];
 #else
+  global_node_cell_count[0] = local_node_cell_count[0];
+  global_node_cell_count[1] = local_node_cell_count[1];
   global_node_cell_offsets[0] = global_node_cell_offsets[1] = 0;
 #endif
 
@@ -7050,7 +7047,6 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   // Close the file
   status = H5Fclose(h5_solution_file_id);
   AssertThrow(status >= 0, ExcIO());
-#endif
 #endif
 }
 

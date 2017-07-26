@@ -1,0 +1,4 @@
+Fixed: DataOutBase::write_hdf5_parallel() can also be used in case deal.II 
+and HDF5 are not compiled with MPI support.
+<br>
+(Daniel Arndt, 2017/07/26)
