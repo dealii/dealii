@@ -328,10 +328,11 @@ private:
 
   /**
    * The muParser objects for each thread (and one for each component). We are
-   * storing unique_ptr so that we don't need to include the definition of
+   * storing shared_ptr so that we don't need to include the definition of
    * mu::Parser in this header.
    */
-  mutable Threads::ThreadLocalStorage<std::vector<std::unique_ptr<mu::Parser> > > fp;
+  // std::unique_ptr does not compile with gcc-5.4
+  mutable Threads::ThreadLocalStorage<std::vector<std::shared_ptr<mu::Parser> > > fp;
 
   /**
    * An array to keep track of all the constants, required to initialize fp in

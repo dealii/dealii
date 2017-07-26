@@ -1,0 +1,3 @@
+Fixed: FunctionParser uses shared_ptr instead of unique_ptr in order to fix compilation issues with gcc-5.4.
+<br>
+(Alberto Sartori, 2017/07/26)
