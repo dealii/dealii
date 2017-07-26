@@ -389,6 +389,125 @@ set_component_to_block_map (const std::vector<unsigned int> &map)
 
 /* --------- MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector> ------- */
 
+/*
+ * internal functions for LA::d::Vector and LA::d::BlockVector
+ */
+namespace internal
+{
+  template<typename Number>
+  inline
+  LinearAlgebra::distributed::Vector<Number> &get_block(LinearAlgebra::distributed::Vector<Number> &vec, const unsigned int )
+  {
+    return vec;
+  }
+
+  template<typename Number>
+  inline
+  LinearAlgebra::distributed::Vector<Number> &get_block(LinearAlgebra::distributed::BlockVector<Number> &vec, const unsigned int b)
+  {
+    return vec.block(b);
+  }
+
+  template<typename Number>
+  inline
+  const LinearAlgebra::distributed::Vector<Number> &get_block(const LinearAlgebra::distributed::Vector<Number> &vec, const unsigned int )
+  {
+    return vec;
+  }
+
+  template<typename Number>
+  inline
+  const LinearAlgebra::distributed::Vector<Number> &get_block(const LinearAlgebra::distributed::BlockVector<Number> &vec, const unsigned int b)
+  {
+    return vec.block(b);
+  }
+
+
+  template<typename Number>
+  inline
+  unsigned int get_n_blocks(const LinearAlgebra::distributed::Vector<Number> &vec)
+  {
+    return 1;
+  }
+
+  template<typename Number>
+  inline
+  unsigned int get_n_blocks(const LinearAlgebra::distributed::BlockVector<Number> &vec)
+  {
+    return vec.n_blocks();
+  }
+
+
+  template <int dim, int spacedim, typename VectorType, typename VectorType2>
+  void
+  copy_to_mg (const dealii::DoFHandler<dim,spacedim>  &mg_dof_handler,
+              MGLevelObject<VectorType>               &dst,
+              const VectorType2                       &src,
+              const bool                              perform_plain_copy,
+              const std::vector<unsigned int>         &component_to_block_map,
+              VectorType                              &ghosted_global_vector,
+              const std::vector<std::vector<std::pair<unsigned int, unsigned int > > > &copy_indices,
+              const std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_level_mine)
+  {
+    typedef typename VectorType::value_type Number;
+    typedef typename VectorType2::value_type Number2;
+    AssertIndexRange(dst.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
+    AssertIndexRange(dst.min_level(), dst.max_level()+1);
+    reinit_vector(mg_dof_handler, component_to_block_map, dst);
+    const unsigned int n_blocks = get_n_blocks(src);
+
+    if (perform_plain_copy)
+      {
+        // In this case, we can simply copy the local range (in parallel by
+        // VectorView)
+        for (unsigned int b = 0; b < n_blocks; ++b)
+          {
+            AssertDimension(get_block(dst[dst.max_level()],b).local_size(),
+                            get_block(src,b).local_size());
+            VectorView<Number>  dst_view (get_block(src,b).local_size(), get_block(dst[dst.max_level()],b).begin());
+            VectorView<Number2> src_view (get_block(src,b).local_size(), get_block(src,b).begin());
+            static_cast<dealii::Vector<Number> &>(dst_view) = static_cast<dealii::Vector<Number2> &>(src_view);
+          }
+        return;
+      }
+
+    // the ghosted vector should already have the correct local size (but
+    // different parallel layout)
+    for (unsigned int b = 0; b < n_blocks; ++b)
+      AssertDimension(get_block(ghosted_global_vector,b).local_size(),
+                      get_block(src,b).local_size());
+
+    // copy the source vector to the temporary vector that we hold for the
+    // purpose of data exchange
+    ghosted_global_vector = src;
+    ghosted_global_vector.update_ghost_values();
+
+    for (unsigned int level=dst.max_level()+1; level != dst.min_level();)
+      {
+        --level;
+
+        typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator dof_pair_iterator;
+        VectorType &dst_level = dst[level];
+
+        for (unsigned int b = 0; b < n_blocks; ++b)
+          {
+            // first copy local unknowns
+            for (dof_pair_iterator i = copy_indices[level].begin();
+                 i != copy_indices[level].end(); ++i)
+              get_block(dst_level,b).local_element(i->second) = get_block(ghosted_global_vector,b).local_element(i->first);
+
+            // Do the same for the indices where the level index is local, but the
+            // global index is not
+            for (dof_pair_iterator i = copy_indices_level_mine[level].begin();
+                 i != copy_indices_level_mine[level].end(); ++i)
+              get_block(dst_level,b).local_element(i->second) = get_block(ghosted_global_vector,b).local_element(i->first);
+          }
+
+        dst_level.compress(VectorOperation::insert);
+      }
+  }
+}
+
 template <typename Number>
 template <int dim, typename Number2, int spacedim>
 void
@@ -397,50 +516,15 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_to_mg
  MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &dst,
  const LinearAlgebra::distributed::Vector<Number2>          &src) const
 {
-  AssertIndexRange(dst.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
-  AssertIndexRange(dst.min_level(), dst.max_level()+1);
-  reinit_vector(mg_dof_handler, component_to_block_map, dst);
-
-  if (perform_plain_copy)
-    {
-      // In this case, we can simply copy the local range (in parallel by
-      // VectorView)
-      AssertDimension(dst[dst.max_level()].local_size(), src.local_size());
-      VectorView<Number>  dst_view (src.local_size(), dst[dst.max_level()].begin());
-      VectorView<Number2> src_view (src.local_size(), src.begin());
-      static_cast<Vector<Number> &>(dst_view) = static_cast<Vector<Number2> &>(src_view);
-      return;
-    }
-
-  // the ghosted vector should already have the correct local size (but
-  // different parallel layout)
-  AssertDimension(ghosted_global_vector.local_size(), src.local_size());
-
-  // copy the source vector to the temporary vector that we hold for the
-  // purpose of data exchange
-  ghosted_global_vector = src;
-  ghosted_global_vector.update_ghost_values();
-
-  for (unsigned int level=dst.max_level()+1; level != dst.min_level();)
-    {
-      --level;
-
-      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator dof_pair_iterator;
-      LinearAlgebra::distributed::Vector<Number> &dst_level = dst[level];
-
-      // first copy local unknowns
-      for (dof_pair_iterator i = copy_indices[level].begin();
-           i != copy_indices[level].end(); ++i)
-        dst_level.local_element(i->second) = ghosted_global_vector.local_element(i->first);
-
-      // Do the same for the indices where the level index is local, but the
-      // global index is not
-      for (dof_pair_iterator i = copy_indices_level_mine[level].begin();
-           i != copy_indices_level_mine[level].end(); ++i)
-        dst_level.local_element(i->second) = ghosted_global_vector.local_element(i->first);
-
-      dst_level.compress(VectorOperation::insert);
-    }
+  internal::copy_to_mg(
+    mg_dof_handler,
+    dst,
+    src,
+    perform_plain_copy,
+    component_to_block_map,
+    ghosted_global_vector,
+    copy_indices,
+    copy_indices_level_mine);
 }
 
 
@@ -571,59 +655,16 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<Number> >::copy_to
  MGLevelObject<LinearAlgebra::distributed::BlockVector<Number> > &dst,
  const LinearAlgebra::distributed::BlockVector<Number2>          &src) const
 {
-  AssertIndexRange(dst.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
-  AssertIndexRange(dst.min_level(), dst.max_level()+1);
-  reinit_vector(mg_dof_handler, dst);
-  AssertDimension(dst.n_blocks(), src.n_blocks());
-  const unsigned int n_blocks = dst.n_blocks();
-
-  if (perform_plain_copy)
-    {
-      // In this case, we can simply copy the local range (in parallel by
-      // VectorView)
-      for (unsigned int b = 0; b < n_blocks; ++b)
-        {
-          AssertDimension(dst[dst.max_level()].block[b].local_size(), src.block[b].local_size());
-          VectorView<Number>  dst_view (src.block[b].local_size(), dst[dst.max_level()].block[b].begin());
-          VectorView<Number2> src_view (src.block[b].local_size(), src.block[b].begin());
-          static_cast<Vector<Number> &>(dst_view) = static_cast<Vector<Number2> &>(src_view);
-        }
-      return;
-    }
-
-  // the ghosted vector should already have the correct local size (but
-  // different parallel layout)
-  for (unsigned int b = 0; b < dst.n_blocks(); ++b)
-    AssertDimension(ghosted_global_vector.block[b].local_size(), src.block[b].local_size());
-
-  // copy the source vector to the temporary vector that we hold for the
-  // purpose of data exchange
-  ghosted_global_vector = src;
-  ghosted_global_vector.update_ghost_values();
-
-  for (unsigned int level=dst.max_level()+1; level != dst.min_level();)
-    {
-      --level;
-
-      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator dof_pair_iterator;
-      LinearAlgebra::distributed::BlockVector<Number> &dst_level = dst[level];
-
-      for (unsigned int b = 0; b < n_blocks; ++b)
-        {
-          // first copy local unknowns
-          for (dof_pair_iterator i = copy_indices[level].begin();
-               i != copy_indices[level].end(); ++i)
-            dst_level.block[b].local_element(i->second) = ghosted_global_vector.block[b].local_element(i->first);
-
-          // Do the same for the indices where the level index is local, but the
-          // global index is not
-          for (dof_pair_iterator i = copy_indices_level_mine[level].begin();
-               i != copy_indices_level_mine[level].end(); ++i)
-            dst_level.block[b].local_element(i->second) = ghosted_global_vector.block[b].local_element(i->first);
-        }
-
-      dst_level.compress(VectorOperation::insert);
-    }
+  std::vector<unsigned int> component_to_block_map;
+  internal::copy_to_mg
+  (mg_dof_handler,
+   dst,
+   src,
+   perform_plain_copy,
+   component_to_block_map,
+   ghosted_global_vector,
+   copy_indices,
+   copy_indices_level_mine);
 }
 
 
