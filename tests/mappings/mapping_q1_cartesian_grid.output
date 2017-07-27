@@ -1,0 +1,9 @@
+
+DEAL::Refine case = 1
+DEAL::Number of active cells: 100
+DEAL::Refine case = 2
+DEAL::Number of active cells: 25
+DEAL::Refine case = 3
+DEAL::Number of active cells: 100
+DEAL::Refine case = 4
+DEAL::Number of active cells: 256

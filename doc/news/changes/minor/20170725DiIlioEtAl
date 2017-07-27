@@ -1,0 +1,4 @@
+Fixed: MappingQGeneric::transform_real_to_unit_cell had a bug where, for certain
+parallelograms, a problem with subtracting nearly equal floating point numbers
+ruined most of the digits of accuracy in the coordinate transformation.
+<br> (Giovanni Di Ilio, David Wells, Jean-Paul Pelteret, 2017/07/25)
