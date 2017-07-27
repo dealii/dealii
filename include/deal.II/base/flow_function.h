@@ -205,7 +205,16 @@ namespace Functions
 
 
   /**
-   * The solution to Stokes' equations on an L-shaped domain.
+   * A singular solution to Stokes' equations on a 2d L-shaped domain.
+   *
+   * This function satisfies $-\triangle \mathbf{u} + \nabla p = 0$ and
+   * represents a typical singular solution around a reentrant corner of an
+   * L-shaped domain that can be created using GridGenerator::hyper_L(). The
+   * velocity vanishes on the two faces of the re-entrant corner and
+   * $\nabla\mathbf{u}$ and $p$ are singular at the origin while they are
+   * smooth in the rest of the domain because they can be written as a product
+   * of a smooth function and the term $r^{\lambda-1}$ where $r$ is the radius
+   * and $\lambda \approx 0.54448$ is a fixed parameter.
    *
    * Taken from Houston, Sch&ouml;tzau, Wihler, proceeding ENUMATH 2003.
    *
@@ -235,9 +244,10 @@ namespace Functions
     double Psi_3(double phi) const;
     /// The 4th derivative of Psi()
     double Psi_4(double phi) const;
-    /// The angle of the reentrant corner
+    /// The angle of the reentrant corner, set to 3*pi/2
     const double omega;
-    /// The exponent of the radius
+    /// The exponent of the radius, computed as the solution to
+    /// $\sin(\lambda\omega)+\lambda*sin(\omega)=0$
     static const double lambda;
     /// Cosine of lambda times omega
     const double coslo;
