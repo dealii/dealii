@@ -104,7 +104,7 @@ template <int dim>
 Quadrature<dim>::Quadrature (const std::vector<Point<dim> > &points)
   :
   quadrature_points(points),
-  weights(points.size(), std::atof("Inf")),
+  weights(points.size(), std::numeric_limits<double>::infinity()),
   is_tensor_product_flag (dim==1)
 {
   Assert(weights.size() == points.size(),
