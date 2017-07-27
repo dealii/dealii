@@ -26,6 +26,7 @@
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/mg_transfer_internal.h>
+#include <deal.II/multigrid/mg_transfer.templates.h> // internal block/non-block functions
 
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
@@ -375,70 +376,76 @@ void MGTransferMatrixFree<dim,VectorType>
       const unsigned int n_chunks = cell+vec_size > n_owned_level_cells[to_level-1] ?
                                     n_owned_level_cells[to_level-1] - cell : vec_size;
 
-      // read from source vector
-      for (unsigned int v=0; v<n_chunks; ++v)
+      // FIXME: for starters, try a simple loop over blocks. In reality,
+      // one has to do work on several blocks of vectors at a time.
+      for (unsigned int b = 0; b < internal::get_n_blocks(dst); ++b)
         {
-          const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
-                                     (parent_child_connect[to_level-1][cell+v].second,
-                                      fe_degree+1-element_is_continuous, fe_degree);
-          const unsigned int *indices = &level_dof_indices[to_level-1][parent_child_connect[to_level-1][cell+v].first*n_child_cell_dofs+shift];
-          for (unsigned int c=0, m=0; c<n_components; ++c)
+          // read from source vector
+          for (unsigned int v=0; v<n_chunks; ++v)
             {
-              for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
-                for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
-                  for (unsigned int i=0; i<degree_size; ++i, ++m)
-                    evaluation_data[m][v] =
-                      src.local_element(indices[c*n_scalar_cell_dofs +
+              const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
+                                         (parent_child_connect[to_level-1][cell+v].second,
+                                          fe_degree+1-element_is_continuous, fe_degree);
+              const unsigned int *indices = &level_dof_indices[to_level-1][parent_child_connect[to_level-1][cell+v].first*n_child_cell_dofs+shift];
+              for (unsigned int c=0, m=0; c<n_components; ++c)
+                {
+                  for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
+                    for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
+                      for (unsigned int i=0; i<degree_size; ++i, ++m)
+                        evaluation_data[m][v] =
+                          internal::get_block(src,b).
+                          local_element(indices[c*n_scalar_cell_dofs +
                                                 k*n_child_dofs_1d*n_child_dofs_1d+
                                                 j*n_child_dofs_1d+i]);
 
-              // apply Dirichlet boundary conditions on parent cell
-              for (std::vector<unsigned short>::const_iterator i=dirichlet_indices[to_level-1][cell+v].begin(); i!=dirichlet_indices[to_level-1][cell+v].end(); ++i)
-                evaluation_data[*i][v] = 0.;
+                  // apply Dirichlet boundary conditions on parent cell
+                  for (std::vector<unsigned short>::const_iterator i=dirichlet_indices[to_level-1][cell+v].begin(); i!=dirichlet_indices[to_level-1][cell+v].end(); ++i)
+                    evaluation_data[*i][v] = 0.;
+                }
             }
-        }
 
-      AssertDimension(prolongation_matrix_1d.size(),
-                      degree_size * n_child_dofs_1d);
-      // perform tensorized operation
-      if (element_is_continuous)
-        {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*fe_degree+1);
-          perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
-                                                           n_child_cell_dofs,
-                                                           n_components,
-                                                           evaluation_data);
-          weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[to_level-1][(cell/vec_size)*three_to_dim],
-                                                  n_components, fe_degree,
-                                                  &evaluation_data[2*n_child_cell_dofs]);
-        }
-      else
-        {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*(fe_degree+1));
-          perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
-                                                           n_child_cell_dofs,
-                                                           n_components,
-                                                           evaluation_data);
-        }
+          AssertDimension(prolongation_matrix_1d.size(),
+                          degree_size * n_child_dofs_1d);
+          // perform tensorized operation
+          if (element_is_continuous)
+            {
+              typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
+              Evaluator evaluator(prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  fe_degree,
+                                  2*fe_degree+1);
+              perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
+                                                               n_child_cell_dofs,
+                                                               n_components,
+                                                               evaluation_data);
+              weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[to_level-1][(cell/vec_size)*three_to_dim],
+                                                      n_components, fe_degree,
+                                                      &evaluation_data[2*n_child_cell_dofs]);
+            }
+          else
+            {
+              typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
+              Evaluator evaluator(prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  fe_degree,
+                                  2*(fe_degree+1));
+              perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
+                                                               n_child_cell_dofs,
+                                                               n_components,
+                                                               evaluation_data);
+            }
 
-      // write into dst vector
-      const unsigned int *indices = &level_dof_indices[to_level][cell*
-                                                                 n_child_cell_dofs];
-      for (unsigned int v=0; v<n_chunks; ++v)
-        {
-          for (unsigned int i=0; i<n_child_cell_dofs; ++i)
-            dst.local_element(indices[i]) += evaluation_data[2*n_child_cell_dofs+i][v];
-          indices += n_child_cell_dofs;
+          // write into dst vector
+          const unsigned int *indices = &level_dof_indices[to_level][cell*
+                                                                     n_child_cell_dofs];
+          for (unsigned int v=0; v<n_chunks; ++v)
+            {
+              for (unsigned int i=0; i<n_child_cell_dofs; ++i)
+                internal::get_block(dst,b).local_element(indices[i]) += evaluation_data[2*n_child_cell_dofs+i][v];
+              indices += n_child_cell_dofs;
+            }
         }
     }
 }
@@ -465,74 +472,80 @@ void MGTransferMatrixFree<dim,VectorType>
       const unsigned int n_chunks = cell+vec_size > n_owned_level_cells[from_level-1] ?
                                     n_owned_level_cells[from_level-1] - cell : vec_size;
 
-      // read from source vector
-      {
-        const unsigned int *indices = &level_dof_indices[from_level][cell*
-                                      n_child_cell_dofs];
-        for (unsigned int v=0; v<n_chunks; ++v)
+      // FIXME: for starters, try a simple loop over blocks. In reality,
+      // one has to do work on several blocks of vectors at a time.
+      for (unsigned int b = 0; b < internal::get_n_blocks(dst); ++b)
+        {
+          // read from source vector
           {
-            for (unsigned int i=0; i<n_child_cell_dofs; ++i)
-              evaluation_data[i][v] = src.local_element(indices[i]);
-            indices += n_child_cell_dofs;
+            const unsigned int *indices = &level_dof_indices[from_level][cell*
+                                          n_child_cell_dofs];
+            for (unsigned int v=0; v<n_chunks; ++v)
+              {
+                for (unsigned int i=0; i<n_child_cell_dofs; ++i)
+                  evaluation_data[i][v] = internal::get_block(src,b).local_element(indices[i]);
+                indices += n_child_cell_dofs;
+              }
           }
-      }
 
-      AssertDimension(prolongation_matrix_1d.size(),
-                      degree_size * n_child_dofs_1d);
-      // perform tensorized operation
-      if (element_is_continuous)
-        {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*fe_degree+1);
-          weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[from_level-1][(cell/vec_size)*three_to_dim],
-                                                  n_components, fe_degree,
-                                                  &evaluation_data[0]);
-          perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
-                                                            n_child_cell_dofs,
-                                                            n_components,
-                                                            evaluation_data);
-        }
-      else
-        {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*(fe_degree+1));
-          perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
-                                                            n_child_cell_dofs,
-                                                            n_components,
-                                                            evaluation_data);
-        }
-
-      // write into dst vector
-      for (unsigned int v=0; v<n_chunks; ++v)
-        {
-          const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
-                                     (parent_child_connect[from_level-1][cell+v].second,
-                                      fe_degree+1-element_is_continuous, fe_degree);
-          AssertIndexRange(parent_child_connect[from_level-1][cell+v].first*
-                           n_child_cell_dofs+n_child_cell_dofs-1,
-                           level_dof_indices[from_level-1].size());
-          const unsigned int *indices = &level_dof_indices[from_level-1][parent_child_connect[from_level-1][cell+v].first*n_child_cell_dofs+shift];
-          for (unsigned int c=0, m=0; c<n_components; ++c)
+          AssertDimension(prolongation_matrix_1d.size(),
+                          degree_size * n_child_dofs_1d);
+          // perform tensorized operation
+          if (element_is_continuous)
             {
-              // apply Dirichlet boundary conditions on parent cell
-              for (std::vector<unsigned short>::const_iterator i=dirichlet_indices[from_level-1][cell+v].begin(); i!=dirichlet_indices[from_level-1][cell+v].end(); ++i)
-                evaluation_data[2*n_child_cell_dofs+(*i)][v] = 0.;
+              typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
+              Evaluator evaluator(prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  fe_degree,
+                                  2*fe_degree+1);
+              weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[from_level-1][(cell/vec_size)*three_to_dim],
+                                                      n_components, fe_degree,
+                                                      &evaluation_data[0]);
+              perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
+                                                                n_child_cell_dofs,
+                                                                n_components,
+                                                                evaluation_data);
+            }
+          else
+            {
+              typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
+              Evaluator evaluator(prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  fe_degree,
+                                  2*(fe_degree+1));
+              perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
+                                                                n_child_cell_dofs,
+                                                                n_components,
+                                                                evaluation_data);
+            }
 
-              for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
-                for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
-                  for (unsigned int i=0; i<degree_size; ++i, ++m)
-                    dst.local_element(indices[c*n_scalar_cell_dofs +
-                                              k*n_child_dofs_1d*n_child_dofs_1d+
-                                              j*n_child_dofs_1d+i])
-                    += evaluation_data[2*n_child_cell_dofs+m][v];
+          // write into dst vector
+          for (unsigned int v=0; v<n_chunks; ++v)
+            {
+              const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
+                                         (parent_child_connect[from_level-1][cell+v].second,
+                                          fe_degree+1-element_is_continuous, fe_degree);
+              AssertIndexRange(parent_child_connect[from_level-1][cell+v].first*
+                               n_child_cell_dofs+n_child_cell_dofs-1,
+                               level_dof_indices[from_level-1].size());
+              const unsigned int *indices = &level_dof_indices[from_level-1][parent_child_connect[from_level-1][cell+v].first*n_child_cell_dofs+shift];
+              for (unsigned int c=0, m=0; c<n_components; ++c)
+                {
+                  // apply Dirichlet boundary conditions on parent cell
+                  for (std::vector<unsigned short>::const_iterator i=dirichlet_indices[from_level-1][cell+v].begin(); i!=dirichlet_indices[from_level-1][cell+v].end(); ++i)
+                    evaluation_data[2*n_child_cell_dofs+(*i)][v] = 0.;
+
+                  for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
+                    for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
+                      for (unsigned int i=0; i<degree_size; ++i, ++m)
+                        internal::get_block(dst,b)
+                        .local_element(indices[c*n_scalar_cell_dofs +
+                                               k*n_child_dofs_1d*n_child_dofs_1d+
+                                               j*n_child_dofs_1d+i])
+                        += evaluation_data[2*n_child_cell_dofs+m][v];
+                }
             }
         }
     }
