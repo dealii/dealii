@@ -64,7 +64,7 @@ DEAL_II_NAMESPACE_OPEN
  * std::vector::operator[] is non-@p const.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2015
+ * @author Wolfgang Bangerth, 2015, David Wells, 2017
  */
 template <typename ElementType>
 class ArrayView
@@ -346,6 +346,54 @@ make_array_view (std::vector<ElementType> &vector,
                       "create would lead to a view that extends beyond the end "
                       "of the given vector."));
   return ArrayView<ElementType> (&vector[starting_index], size_of_view);
+}
+
+
+/**
+ * Create an ArrayView that takes a pair of iterators as arguments. The type
+ * of the ArrayView is inferred from the value type of the iterator (e.g., the
+ * view created from two const iterators will have a const type).
+ *
+ * @warning The iterators @begin and @p end must bound (in the usual half-open
+ * way) a contiguous in memory range of values. This function is intended for
+ * use with iterators into containers like
+ * <code>boost::container::small_vector</code> or <code>std::vector</code> and
+ * will not work correctly with, e.g.,
+ * <code>boost::container::stable_vector</code> or <code>std::deque</code>.
+ *
+ * @relates ArrayView
+ */
+template <typename Iterator>
+ArrayView<typename std::remove_reference<typename std::iterator_traits<Iterator>::reference>::type>
+make_array_view (const Iterator begin, const Iterator end)
+{
+  static_assert(std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
+                typename std::random_access_iterator_tag>::value,
+                "The provided iterator should be a random access iterator.");
+  Assert(begin <= end,
+         ExcMessage("The beginning of the array view should be before the end."));
+  // the reference type, not the value type, knows the constness of the iterator
+  return ArrayView<typename std::remove_reference
+         <typename std::iterator_traits<Iterator>::reference>::type>
+         (&*begin, end - begin);
+}
+
+/**
+ * Create a view from a pair of pointers. <code>ElementType</code> may be
+ * const-qualified.
+ *
+ * @warning The pointers @p begin and @p end must bound (in the usual
+ * half-open way) a contiguous in memory range of values.
+ *
+ * @relates ArrayView
+ */
+template <typename ElementType>
+ArrayView<ElementType>
+make_array_view (ElementType *const begin, ElementType *const end)
+{
+  Assert(begin <= end,
+         ExcMessage("The beginning of the array view should be before the end."));
+  return ArrayView<ElementType>(begin, end - begin);
 }
 
 
