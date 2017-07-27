@@ -246,14 +246,14 @@ private:
 
 
 template <int dim, typename MatrixType>
-class MGTransferPrebuiltMF : public MGTransferMatrixFree<dim, typename MatrixType::value_type>
+class MGTransferPrebuiltMF : public MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<typename MatrixType::value_type>>
 {
 public:
   MGTransferPrebuiltMF(const MGLevelObject<MatrixType> &laplace,
                        const MGConstrainedDoFs &mg_constrained_dofs)
     :
-    MGTransferMatrixFree<dim, typename MatrixType::value_type>(mg_constrained_dofs),
-    laplace_operator (laplace)
+    MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<typename MatrixType::value_type>>(mg_constrained_dofs),
+        laplace_operator (laplace)
   {};
 
   /**

@@ -45,13 +45,18 @@ DEAL_II_NAMESPACE_OPEN
  * of one of these elements. Systems with different elements or other elements
  * are currently not implemented.
  *
- * @author Martin Kronbichler
- * @date 2016
+ * This class only supports LinearAlgebra::distributed::Vector and
+ * LinearAlgebra::distributed::BlockVector. For the latter case, the
+ * same transfer will be done for each block.
+ *
+ * @author Martin Kronbichler, Denis Davydov
+ * @date 2016, 2017
  */
-template <int dim, typename Number>
-class MGTransferMatrixFree : public MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >
+template <int dim, typename VectorType = LinearAlgebra::distributed::Vector<double>>
+class MGTransferMatrixFree : public MGLevelGlobalTransfer<VectorType>
 {
 public:
+  typedef typename VectorType::value_type Number;
   /**
    * Constructor without constraint matrices. Use this constructor only with
    * discontinuous finite elements or with no local refinement.
@@ -98,9 +103,9 @@ public:
    * @param dst has as many elements as there are degrees of freedom on the
    * finer level.
    */
-  virtual void prolongate (const unsigned int                           to_level,
-                           LinearAlgebra::distributed::Vector<Number>       &dst,
-                           const LinearAlgebra::distributed::Vector<Number> &src) const;
+  virtual void prolongate (const unsigned int  to_level,
+                           VectorType         &dst,
+                           const VectorType   &src) const;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -121,8 +126,8 @@ public:
    * coarser level.
    */
   virtual void restrict_and_add (const unsigned int from_level,
-                                 LinearAlgebra::distributed::Vector<Number>       &dst,
-                                 const LinearAlgebra::distributed::Vector<Number> &src) const;
+                                 VectorType         &dst,
+                                 const VectorType   &src) const;
 
   /**
    * Finite element does not provide prolongation matrices.
@@ -220,17 +225,17 @@ private:
    * Performs templated prolongation operation
    */
   template <int degree>
-  void do_prolongate_add(const unsigned int                           to_level,
-                         LinearAlgebra::distributed::Vector<Number>       &dst,
-                         const LinearAlgebra::distributed::Vector<Number> &src) const;
+  void do_prolongate_add(const unsigned int   to_level,
+                         VectorType           &dst,
+                         const VectorType     &src) const;
 
   /**
    * Performs templated restriction operation
    */
   template <int degree>
-  void do_restrict_add(const unsigned int                           from_level,
-                       LinearAlgebra::distributed::Vector<Number>       &dst,
-                       const LinearAlgebra::distributed::Vector<Number> &src) const;
+  void do_restrict_add(const unsigned int   from_level,
+                       VectorType           &dst,
+                       const VectorType     &src) const;
 };
 
 

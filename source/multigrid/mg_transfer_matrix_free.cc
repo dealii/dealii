@@ -34,8 +34,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim, typename Number>
-MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree ()
+template <int dim, typename VectorType>
+MGTransferMatrixFree<dim,VectorType>::MGTransferMatrixFree ()
   :
   fe_degree(0),
   element_is_continuous(false),
@@ -45,8 +45,8 @@ MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree ()
 
 
 
-template <int dim, typename Number>
-MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree (const MGConstrainedDoFs &mg_c)
+template <int dim, typename VectorType>
+MGTransferMatrixFree<dim,VectorType>::MGTransferMatrixFree (const MGConstrainedDoFs &mg_c)
   :
   fe_degree(0),
   element_is_continuous(false),
@@ -58,14 +58,14 @@ MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree (const MGConstrainedDoFs 
 
 
 
-template <int dim, typename Number>
-MGTransferMatrixFree<dim,Number>::~MGTransferMatrixFree ()
+template <int dim, typename VectorType>
+MGTransferMatrixFree<dim,VectorType>::~MGTransferMatrixFree ()
 {}
 
 
 
-template <int dim, typename Number>
-void MGTransferMatrixFree<dim,Number>::initialize_constraints
+template <int dim, typename VectorType>
+void MGTransferMatrixFree<dim,VectorType>::initialize_constraints
 (const MGConstrainedDoFs &mg_c)
 {
   this->mg_constrained_dofs = &mg_c;
@@ -73,10 +73,10 @@ void MGTransferMatrixFree<dim,Number>::initialize_constraints
 
 
 
-template <int dim, typename Number>
-void MGTransferMatrixFree<dim,Number>::clear ()
+template <int dim, typename VectorType>
+void MGTransferMatrixFree<dim,VectorType>::clear ()
 {
-  this->MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::clear();
+  this->MGLevelGlobalTransfer<VectorType>::clear();
   fe_degree = 0;
   element_is_continuous = false;
   n_components = 0;
@@ -91,10 +91,11 @@ void MGTransferMatrixFree<dim,Number>::clear ()
 }
 
 
-template <int dim, typename Number>
-void MGTransferMatrixFree<dim,Number>::build
+template <int dim, typename VectorType>
+void MGTransferMatrixFree<dim,VectorType>::build
 (const DoFHandler<dim,dim>  &mg_dof)
 {
+  typedef typename VectorType::value_type Number;
   this->fill_and_communicate_copy_indices(mg_dof);
 
   std::vector<std::vector<Number> > weights_unvectorized;
@@ -149,11 +150,11 @@ void MGTransferMatrixFree<dim,Number>::build
 
 
 
-template <int dim, typename Number>
-void MGTransferMatrixFree<dim,Number>
-::prolongate (const unsigned int                           to_level,
-              LinearAlgebra::distributed::Vector<Number>       &dst,
-              const LinearAlgebra::distributed::Vector<Number> &src) const
+template <int dim, typename VectorType>
+void MGTransferMatrixFree<dim,VectorType>
+::prolongate (const unsigned int  to_level,
+              VectorType          &dst,
+              const VectorType    &src) const
 {
   Assert ((to_level >= 1) && (to_level<=level_dof_indices.size()),
           ExcIndexRange (to_level, 1, level_dof_indices.size()+1));
@@ -213,11 +214,11 @@ void MGTransferMatrixFree<dim,Number>
 
 
 
-template <int dim, typename Number>
-void MGTransferMatrixFree<dim,Number>
-::restrict_and_add (const unsigned int                           from_level,
-                    LinearAlgebra::distributed::Vector<Number>       &dst,
-                    const LinearAlgebra::distributed::Vector<Number> &src) const
+template <int dim, typename VectorType>
+void MGTransferMatrixFree<dim,VectorType>
+::restrict_and_add (const unsigned int from_level,
+                    VectorType         &dst,
+                    const VectorType   &src) const
 {
   Assert ((from_level >= 1) && (from_level<=level_dof_indices.size()),
           ExcIndexRange (from_level, 1, level_dof_indices.size()+1));
@@ -354,13 +355,14 @@ namespace
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 template <int degree>
-void MGTransferMatrixFree<dim,Number>
-::do_prolongate_add (const unsigned int                           to_level,
-                     LinearAlgebra::distributed::Vector<Number>       &dst,
-                     const LinearAlgebra::distributed::Vector<Number> &src) const
+void MGTransferMatrixFree<dim,VectorType>
+::do_prolongate_add (const unsigned int  to_level,
+                     VectorType          &dst,
+                     const VectorType    &src) const
 {
+  typedef typename VectorType::value_type Number;
   const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
   const unsigned int degree_size = (degree > -1 ? degree : fe_degree) + 1;
   const unsigned int n_child_dofs_1d = 2*degree_size - element_is_continuous;
@@ -443,13 +445,14 @@ void MGTransferMatrixFree<dim,Number>
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 template <int degree>
-void MGTransferMatrixFree<dim,Number>
-::do_restrict_add (const unsigned int                           from_level,
-                   LinearAlgebra::distributed::Vector<Number>       &dst,
-                   const LinearAlgebra::distributed::Vector<Number> &src) const
+void MGTransferMatrixFree<dim,VectorType>
+::do_restrict_add (const unsigned int   from_level,
+                   VectorType           &dst,
+                   const VectorType     &src) const
 {
+  typedef typename VectorType::value_type Number;
   const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
   const unsigned int degree_size = (degree > -1 ? degree : fe_degree) + 1;
   const unsigned int n_child_dofs_1d = 2*degree_size - element_is_continuous;
@@ -537,11 +540,11 @@ void MGTransferMatrixFree<dim,Number>
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 std::size_t
-MGTransferMatrixFree<dim,Number>::memory_consumption() const
+MGTransferMatrixFree<dim,VectorType>::memory_consumption() const
 {
-  std::size_t memory = MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::memory_consumption();
+  std::size_t memory = MGLevelGlobalTransfer<VectorType>::memory_consumption();
   memory += MemoryConsumption::memory_consumption(level_dof_indices);
   memory += MemoryConsumption::memory_consumption(parent_child_connect);
   memory += MemoryConsumption::memory_consumption(n_owned_level_cells);

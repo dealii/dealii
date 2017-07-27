@@ -374,14 +374,14 @@ private:
 
 
 template <int dim, typename LAPLACEOPERATOR>
-class MGTransferMF : public MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>
+class MGTransferMF : public MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type>>
 {
 public:
   MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace,
                const MGConstrainedDoFs &mg_constrained_dofs)
     :
-    MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>(mg_constrained_dofs),
-    laplace_operator (laplace)
+    MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type>>(mg_constrained_dofs),
+        laplace_operator (laplace)
   {
   }
 
