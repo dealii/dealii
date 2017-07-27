@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
