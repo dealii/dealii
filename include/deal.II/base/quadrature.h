@@ -222,24 +222,17 @@ public:
   void serialize (Archive &ar, const unsigned int version);
 
   /**
-   * This quadrature object is a tensor product in case the tensor product
-   * is formed by the first $size^(1/dim)$ quadrature points.
-   * Return if this is the case.
+   * This function returns true if the quadrature object is a tensor product
+   * of one-dimensional formulas.
    */
   bool is_tensor_product() const;
 
   /**
    * In case the quadrature formula is a tensor product, this function
-   * returns the one-dimensional basis object.
+   * returns the one-dimensional basis objects.
    * Otherwise, calling this function is not allowed.
-   *
-   * Each time this function is called the constructor for the
-   * one-dimensional Quadrature is called and a copy returned.
-   *
-   * The weights for the one-dimensional formula are rescaled
-   * but they are not modified in case the sum is zero or infinite.
    */
-  Quadrature<1> get_tensor_basis() const;
+  const std::vector<Quadrature<1>> &get_tensor_basis() const;
 
 protected:
   /**
@@ -255,10 +248,18 @@ protected:
   std::vector<double>      weights;
 
   /**
-   * This quadrature object is a tensor product in case the tensor product
-   * is formed by the first $size^(1/dim)$ quadrature points
+   * Indicates if this object represents quadrature formula that is a tensor
+   * product of one-dimensional formulas.
+   * This flag is set if dim==1 or the constructors taking a Quadrature<1>
+   * (and possibly a Quadrature<dim-1> object) is called.
    */
   bool is_tensor_product_flag;
+
+  /**
+   * Stores the one-dimensional tensor basis objects in case this object
+   * can be represented by a tensor product.
+   */
+  std::vector<Quadrature<1> > tensor_basis;
 };
 
 

@@ -29,8 +29,8 @@ DEAL::QGaussChebyshev<2>: true
 DEAL::QGaussRadauChebyshev<2>: true
 DEAL::QGaussLobattoChebyshev<2>: true
 DEAL::QSorted<2>: false
-DEAL::QTelles<2>: false
-DEAL::QAnisotropic<2>: false
+DEAL::QTelles<2>: true
+DEAL::QAnisotropic<2>: true
 DEAL::QGaussOneOverR<2>: false
 DEAL::Quadrature<3>: false
 DEAL::QIterated<3>: true
@@ -45,5 +45,5 @@ DEAL::QGaussChebyshev<3>: true
 DEAL::QGaussRadauChebyshev<3>: true
 DEAL::QGaussLobattoChebyshev<3>: true
 DEAL::QSorted<3>: false
-DEAL::QTelles<3>: false
-DEAL::QAnisotropic<3>: false
+DEAL::QTelles<3>: true
+DEAL::QAnisotropic<3>: true

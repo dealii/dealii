@@ -1,6 +1,6 @@
 New: The Quadrature class has a new boolean is_tensor_product_flag
 to indicate if the represented quadrature formula is in fact a
-tensor product of (identical) 1D formulas. The corresponding 1D object
+tensor product of 1D formulas. The corresponding 1D objects
 can be queried using Quadrature::get_tensor_basis().
 <br>
 (Daniel Arndt, 2017/07/26)
