@@ -77,6 +77,16 @@ public:
   typedef ElementType value_type;
 
   /**
+   * A typedef for iterators pointing into the array.
+   */
+  typedef value_type *iterator;
+
+  /**
+   * A typedef for const iterators pointing into the array.
+   */
+  typedef const ElementType *const_iterator;
+
+  /**
    * Default constructor. Creates an invalid view that does not point to
    * anything at all.
    */
@@ -122,6 +132,26 @@ public:
   std::size_t size() const;
 
   /**
+   * Return an iterator pointing to the beginning of the array view.
+   */
+  iterator begin();
+
+  /**
+   * Return an iterator pointing to one past the end of the array view.
+   */
+  iterator end();
+
+  /**
+   * Return a constant iterator pointing to the beginning of the array view.
+   */
+  const_iterator begin() const;
+
+  /**
+   * Return a constant iterator pointing to one past the end of the array view.
+   */
+  const_iterator end() const;
+
+  /**
    * Return a reference to the $i$th element of the range represented by the
    * current object.
    *
@@ -137,12 +167,12 @@ private:
    * A pointer to the first element of the range of locations in memory that
    * this object represents.
    */
-  value_type  *const starting_element;
+  value_type *const starting_element;
 
   /**
    * The length of the array this object represents.
    */
-  const std::size_t  n_elements;
+  const std::size_t n_elements;
 
   friend class ArrayView<const ElementType>;
 };
@@ -189,6 +219,40 @@ std::size_t
 ArrayView<ElementType>::size() const
 {
   return n_elements;
+}
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::iterator
+ArrayView<ElementType>::begin()
+{
+  return starting_element;
+}
+
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::iterator
+ArrayView<ElementType>::end()
+{
+  return starting_element + n_elements;
+}
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::const_iterator
+ArrayView<ElementType>::begin() const
+{
+  return starting_element;
+}
+
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::const_iterator
+ArrayView<ElementType>::end() const
+{
+  return starting_element + n_elements;
 }
 
 
