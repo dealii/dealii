@@ -1,0 +1,10 @@
+New: The eigenvectors of a rank-2 symmetric tensor can now be computed using one
+of three approaches through the eigenvectors() function. The three algorithms
+that have been implemented are:
+1. The QL algorithm with implicit shifting.
+2. A hybrid algorithm that preferentially uses an analytical algorithm
+and falls back to the QL algorithm if the calculations are deemed
+inaccurate.
+3. The Jacobi algorithm.
+<br>
+(Joachim Kopp, Jean-Paul Pelteret, Ester Comellas, 2017/07/27)
