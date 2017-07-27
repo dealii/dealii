@@ -20,8 +20,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table.h>
 
-#include <boost/type_traits/remove_cv.hpp>
-
+#include <type_traits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -114,7 +113,7 @@ public:
    * non-@p const view to a @p const view, akin to converting a non-@p const
    * pointer to a @p const pointer.
    */
-  ArrayView (const ArrayView<typename boost::remove_cv<value_type>::type> &view);
+  ArrayView (const ArrayView<typename std::remove_cv<value_type>::type> &view);
 
   /**
    * Return the size (in elements) of the view of memory this object
@@ -176,7 +175,7 @@ ArrayView<ElementType>::ArrayView(value_type        *starting_element,
 
 template <typename ElementType>
 inline
-ArrayView<ElementType>::ArrayView(const ArrayView<typename boost::remove_cv<value_type>::type> &view)
+ArrayView<ElementType>::ArrayView(const ArrayView<typename std::remove_cv<value_type>::type> &view)
   :
   starting_element (view.starting_element),
   n_elements(view.n_elements)
