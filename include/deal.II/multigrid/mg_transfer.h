@@ -563,7 +563,7 @@ protected:
   /**
    * The MGConstrainedDoFs of the level systems.
    */
-  SmartPointer<const MGConstrainedDoFs, MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> > > mg_constrained_dofs;
+  SmartPointer<const MGConstrainedDoFs, MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<Number> > > mg_constrained_dofs;
 
   /**
    * In the function copy_to_mg, we need to access ghosted entries of the

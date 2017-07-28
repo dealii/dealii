@@ -131,11 +131,12 @@ namespace
   /**
    * Adjust vectors on all levels to correct size.  Here, we just count the
    * numbers of degrees of freedom on each level and @p reinit each level
-   * vector to this length.
+   * vector of the block vector to this length.
    */
   template <int dim, typename number, int spacedim>
   void
   reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
+                 const std::vector<unsigned int> &,
                  MGLevelObject<LinearAlgebra::distributed::BlockVector<number> > &v)
   {
     const parallel::Triangulation<dim,spacedim> *tria =
@@ -143,7 +144,7 @@ namespace
        (&mg_dof.get_triangulation()));
 
     for (unsigned int level=v.min_level(); level<=v.max_level(); ++level)
-      for (unsigned int block=0; block < v.n_blocks(); ++block)
+      for (unsigned int block=0; block < v[level].n_blocks(); ++block)
         {
           if (v[level].block(block).size() != mg_dof.locally_owned_mg_dofs(level).size() ||
               v[level].block(block).local_size() != mg_dof.locally_owned_mg_dofs(level).n_elements())
@@ -454,7 +455,8 @@ namespace internal
     AssertIndexRange(dst.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
     AssertIndexRange(dst.min_level(), dst.max_level()+1);
     reinit_vector(mg_dof_handler, component_to_block_map, dst);
-    const unsigned int n_blocks = get_n_blocks(src);
+    const unsigned int n_blocks = internal::get_n_blocks(src);
+    AssertDimension(internal::get_n_blocks(ghosted_global_vector), n_blocks);
 
     if (perform_plain_copy)
       {
@@ -464,8 +466,8 @@ namespace internal
           {
             AssertDimension(get_block(dst[dst.max_level()],b).local_size(),
                             get_block(src,b).local_size());
-            VectorView<Number>  dst_view (get_block(src,b).local_size(), get_block(dst[dst.max_level()],b).begin());
-            VectorView<Number2> src_view (get_block(src,b).local_size(), get_block(src,b).begin());
+            VectorView<Number>  dst_view (internal::get_block(src,b).local_size(), internal::get_block(dst[dst.max_level()],b).begin());
+            VectorView<Number2> src_view (internal::get_block(src,b).local_size(), internal::get_block(src,b).begin());
             static_cast<dealii::Vector<Number> &>(dst_view) = static_cast<dealii::Vector<Number2> &>(src_view);
           }
         return;
@@ -494,13 +496,13 @@ namespace internal
             // first copy local unknowns
             for (dof_pair_iterator i = copy_indices[level].begin();
                  i != copy_indices[level].end(); ++i)
-              get_block(dst_level,b).local_element(i->second) = get_block(ghosted_global_vector,b).local_element(i->first);
+              internal::get_block(dst_level,b).local_element(i->second) = internal::get_block(ghosted_global_vector,b).local_element(i->first);
 
             // Do the same for the indices where the level index is local, but the
             // global index is not
             for (dof_pair_iterator i = copy_indices_level_mine[level].begin();
                  i != copy_indices_level_mine[level].end(); ++i)
-              get_block(dst_level,b).local_element(i->second) = get_block(ghosted_global_vector,b).local_element(i->first);
+              internal::get_block(dst_level,b).local_element(i->second) = internal::get_block(ghosted_global_vector,b).local_element(i->first);
           }
 
         dst_level.compress(VectorOperation::insert);
@@ -525,7 +527,10 @@ namespace internal
     (void)mg_dof_handler;
     AssertIndexRange(src.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
     AssertIndexRange(src.min_level(), src.max_level()+1);
-    const unsigned int n_blocks =  get_n_blocks(dst);
+    const unsigned int n_blocks = internal::get_n_blocks(dst);
+    for (unsigned int level=src.min_level(); level<=src.max_level(); ++level)
+      AssertDimension(internal::get_n_blocks(ghosted_level_vector[level]), n_blocks);
+
     if (perform_plain_copy)
       {
         // In this case, we can simply copy the local range (in parallel by
@@ -534,9 +539,9 @@ namespace internal
         dst.zero_out_ghosts();
         for (unsigned int b = 0; b < n_blocks; ++b)
           {
-            AssertDimension(get_block(dst,b).local_size(), get_block(src[src.max_level()],b).local_size());
-            VectorView<Number2> dst_view (get_block(dst,b).local_size(), get_block(dst,b).begin());
-            VectorView<Number>  src_view (get_block(dst,b).local_size(), get_block(src[src.max_level()],b).begin());
+            AssertDimension(internal::get_block(dst,b).local_size(), internal::get_block(src[src.max_level()],b).local_size());
+            VectorView<Number2> dst_view (internal::get_block(dst,b).local_size(), internal::get_block(dst,b).begin());
+            VectorView<Number>  src_view (internal::get_block(dst,b).local_size(), internal::get_block(src[src.max_level()],b).begin());
             static_cast<dealii::Vector<Number2> &>(dst_view) = static_cast<dealii::Vector<Number> &>(src_view);
           }
         return;
@@ -554,8 +559,8 @@ namespace internal
         // the ghosted vector should already have the correct local size (but
         // different parallel layout)
         for (unsigned int b = 0; b < n_blocks; ++b)
-          AssertDimension(get_block(ghosted_level_vector[level],b).local_size(),
-                          get_block(src[level],b).local_size());
+          AssertDimension(internal::get_block(ghosted_level_vector[level],b).local_size(),
+                          internal::get_block(src[level],b).local_size());
 
         // the first time around, we copy the source vector to the temporary
         // vector that we hold for the purpose of data exchange
@@ -568,13 +573,13 @@ namespace internal
             // first copy local unknowns
             for (dof_pair_iterator i = copy_indices[level].begin();
                  i != copy_indices[level].end(); ++i)
-              get_block(dst,b).local_element(i->first) = get_block(ghosted_vector,b).local_element(i->second);
+              internal::get_block(dst,b).local_element(i->first) = internal::get_block(ghosted_vector,b).local_element(i->second);
 
             // Do the same for the indices where the level index is local, but the
             // global index is not
             for (dof_pair_iterator i = copy_indices_global_mine[level].begin();
                  i != copy_indices_global_mine[level].end(); ++i)
-              get_block(dst,b).local_element(i->first) = get_block(ghosted_vector,b).local_element(i->second);
+              internal::get_block(dst,b).local_element(i->first) = internal::get_block(ghosted_vector,b).local_element(i->second);
           }
       }
     dst.compress(VectorOperation::insert);
@@ -584,7 +589,7 @@ namespace internal
 
   template <int dim, int spacedim, typename VectorType, typename VectorType2>
   void
-  copy_from_mg_add (const dealii::DoFHandler<dim,spacedim>  &mg_dof_handler,
+  copy_from_mg_add (const dealii::DoFHandler<dim,spacedim>  &/*mg_dof_handler*/,
                     VectorType2                             &dst,
                     const MGLevelObject<VectorType>         &src,
                     const bool                              perform_plain_copy,
@@ -597,6 +602,8 @@ namespace internal
     typedef typename VectorType2::value_type Number2;
 
     const unsigned int n_blocks = get_n_blocks(dst);
+    for (unsigned int level=src.min_level(); level<=src.max_level(); ++level)
+      AssertDimension(internal::get_n_blocks(ghosted_level_vector[level]), n_blocks);
 
     // For non-DG: degrees of freedom in the refinement face may need special
     // attention, since they belong to the coarse level, but have fine level
@@ -610,8 +617,8 @@ namespace internal
         // the ghosted vector should already have the correct local size (but
         // different parallel layout)
         for (unsigned int b = 0; b < n_blocks; ++b)
-          AssertDimension(get_block(ghosted_level_vector[level],b).local_size(),
-                          get_block(src[level],b).local_size());
+          AssertDimension(internal::get_block(ghosted_level_vector[level],b).local_size(),
+                          internal::get_block(src[level],b).local_size());
 
         // the first time around, we copy the source vector to the temporary
         // vector that we hold for the purpose of data exchange
@@ -624,13 +631,13 @@ namespace internal
             // first add local unknowns
             for (dof_pair_iterator i= copy_indices[level].begin();
                  i != copy_indices[level].end(); ++i)
-              get_block(dst,b).local_element(i->first) += get_block(ghosted_vector,b).local_element(i->second);
+              internal::get_block(dst,b).local_element(i->first) += internal::get_block(ghosted_vector,b).local_element(i->second);
 
             // Do the same for the indices where the level index is local, but the
             // global index is not
             for (dof_pair_iterator i= copy_indices_global_mine[level].begin();
                  i != copy_indices_global_mine[level].end(); ++i)
-              get_block(dst,b).local_element(i->first) += get_block(ghosted_vector,b).local_element(i->second);
+              internal::get_block(dst,b).local_element(i->first) += internal::get_block(ghosted_vector,b).local_element(i->second);
           }
       }
     dst.compress(VectorOperation::add);
