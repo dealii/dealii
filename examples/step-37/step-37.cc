@@ -1075,7 +1075,7 @@ namespace Step37
     mg.set_edge_matrices(mg_interface, mg_interface);
 
     PreconditionMG<dim, LinearAlgebra::distributed::Vector<float>,
-                   MGTransferMatrixFree<dim,float> >
+                   MGTransferMatrixFree<dim,LinearAlgebra::distributed::Vector<float>>>
                    preconditioner(dof_handler, mg, mg_transfer);
 
     // The setup of the multigrid routines is quite easy and one cannot see
