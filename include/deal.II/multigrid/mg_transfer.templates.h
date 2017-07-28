@@ -456,7 +456,6 @@ namespace internal
     AssertIndexRange(dst.min_level(), dst.max_level()+1);
     reinit_vector(mg_dof_handler, component_to_block_map, dst);
     const unsigned int n_blocks = internal::get_n_blocks(src);
-    AssertDimension(internal::get_n_blocks(ghosted_global_vector), n_blocks);
 
     if (perform_plain_copy)
       {
@@ -473,6 +472,7 @@ namespace internal
         return;
       }
 
+    AssertDimension(internal::get_n_blocks(ghosted_global_vector), n_blocks);
     // the ghosted vector should already have the correct local size (but
     // different parallel layout)
     for (unsigned int b = 0; b < n_blocks; ++b)
@@ -528,8 +528,6 @@ namespace internal
     AssertIndexRange(src.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
     AssertIndexRange(src.min_level(), src.max_level()+1);
     const unsigned int n_blocks = internal::get_n_blocks(dst);
-    for (unsigned int level=src.min_level(); level<=src.max_level(); ++level)
-      AssertDimension(internal::get_n_blocks(ghosted_level_vector[level]), n_blocks);
 
     if (perform_plain_copy)
       {
@@ -554,6 +552,8 @@ namespace internal
     dst = 0;
     for (unsigned int level=src.min_level(); level<=src.max_level(); ++level)
       {
+        AssertDimension(internal::get_n_blocks(ghosted_level_vector[level]), n_blocks);
+
         typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator dof_pair_iterator;
 
         // the ghosted vector should already have the correct local size (but
@@ -602,8 +602,6 @@ namespace internal
     typedef typename VectorType2::value_type Number2;
 
     const unsigned int n_blocks = get_n_blocks(dst);
-    for (unsigned int level=src.min_level(); level<=src.max_level(); ++level)
-      AssertDimension(internal::get_n_blocks(ghosted_level_vector[level]), n_blocks);
 
     // For non-DG: degrees of freedom in the refinement face may need special
     // attention, since they belong to the coarse level, but have fine level
@@ -612,6 +610,8 @@ namespace internal
     dst.zero_out_ghosts();
     for (unsigned int level=src.min_level(); level<=src.max_level(); ++level)
       {
+        AssertDimension(internal::get_n_blocks(ghosted_level_vector[level]), n_blocks);
+
         typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator dof_pair_iterator;
 
         // the ghosted vector should already have the correct local size (but
