@@ -13,7 +13,16 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+// Required for instantiation of template functions
+#ifdef DEAL_II_WITH_TRILINOS
+#include "Sacado.hpp"
+#include <deal.II/base/sacado_product_type.h>
+#endif
+
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/symmetric_tensor.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 

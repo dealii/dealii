@@ -80,7 +80,7 @@ check_vector (const int index,
 };
 
 void
-test_dim_1 (const enum EigenvectorMethod method,
+test_dim_1 (const enum SymmetricTensorEigenvectorMethod method,
             const double e1, const double tol = 1e-12)
 {
   const unsigned int dim = 1;
@@ -93,7 +93,7 @@ test_dim_1 (const enum EigenvectorMethod method,
 }
 
 void
-test_dim_2 (const enum EigenvectorMethod method,
+test_dim_2 (const enum SymmetricTensorEigenvectorMethod method,
             const double e1, Tensor<1,2> v1,
             const double e2, const double tol = 1e-12)
 {
@@ -118,7 +118,7 @@ test_dim_2 (const enum EigenvectorMethod method,
 }
 
 void
-test_dim_3 (const enum EigenvectorMethod method,
+test_dim_3 (const enum SymmetricTensorEigenvectorMethod method,
             const double e1, Tensor<1,3> v1,
             const double e2, Tensor<1,3> v2,
             const double e3, const double tol = 1e-12)
@@ -155,7 +155,7 @@ test_dim_3 (const enum EigenvectorMethod method,
 }
 
 
-void run_tests(const enum EigenvectorMethod method)
+void run_tests(const enum SymmetricTensorEigenvectorMethod method)
 {
   // Dim = 1
   {
@@ -207,7 +207,9 @@ void run_tests(const enum EigenvectorMethod method)
     // Non-diagonal (large difference)
     deallog.push("Test 2e");
     {
-      const double tol = (method == dealii::ql_implicit_shifts ? 1e-11 : 1e-12);
+      const double tol = (
+                           method == SymmetricTensorEigenvectorMethod::ql_implicit_shifts
+                           ? 1e-11 : 1e-12);
       test_dim_2(method,
                  7.2956e8, Tensor<1,2>({3,2}),
                  -5.284e3, tol );
@@ -270,7 +272,11 @@ void run_tests(const enum EigenvectorMethod method)
     // Non-diagonal (1 large difference)
     deallog.push("Test 3f");
     {
-      const double tol = (method == dealii::hybrid ? 1e-9 : (method == dealii::ql_implicit_shifts ? 1e-10 : 5e-11));
+      const double tol = (
+                           method == SymmetricTensorEigenvectorMethod::hybrid ?
+                           1e-9 :
+                           (method == SymmetricTensorEigenvectorMethod::ql_implicit_shifts ?
+                            1e-10 : 5e-11));
       test_dim_3(method,
                  7.2956e8, Tensor<1,3>({3,2,5}),
                  -4.856e3, Tensor<1,3>({-0.2,3,1}),
@@ -281,7 +287,11 @@ void run_tests(const enum EigenvectorMethod method)
     // Non-diagonal (2 large difference)
     deallog.push("Test 3g");
     {
-      const double tol = (method == dealii::hybrid ? 1e-8 : (method == dealii::ql_implicit_shifts ? 1e-7 : 2.5e-10));
+      const double tol = (
+                           method == SymmetricTensorEigenvectorMethod::hybrid ?
+                           1e-8 :
+                           (method == SymmetricTensorEigenvectorMethod::ql_implicit_shifts ?
+                            1e-7 : 2.5e-10));
       test_dim_3(method,
                  9.274e7, Tensor<1,3>({2,-0.7,1.4}),
                  2.59343, Tensor<1,3>({0.5,-0.22,-1.42}),
@@ -298,14 +308,14 @@ int main()
   initlog();
 
   deallog.push("Hybrid");
-  run_tests(dealii::hybrid);
+  run_tests(SymmetricTensorEigenvectorMethod::hybrid);
   deallog.pop();
 
   deallog.push("QL");
-  run_tests(dealii::ql_implicit_shifts);
+  run_tests(SymmetricTensorEigenvectorMethod::ql_implicit_shifts);
   deallog.pop();
 //
   deallog.push("Jacobi");
-  run_tests(dealii::jacobi);
+  run_tests(SymmetricTensorEigenvectorMethod::jacobi);
   deallog.pop();
 }
