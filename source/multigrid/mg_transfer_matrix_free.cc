@@ -103,6 +103,11 @@ void MGTransferMatrixFree<dim,VectorType>::build
 
   internal::MGTransfer::ElementInfo<Number> elem_info;
 
+  // ghosted_level_vector of the base class can be block vector which is
+  // used in copy_from_mg transfer. In the setup_transfer() below, we
+  // always need non-ghosted auxiliary vector
+  // FIXME: don't introduce auxiliary vector for non-block case.
+  MGLevelObject<LinearAlgebra::distributed::Vector<Number>> ghosted_level_vector;
   internal::MGTransfer::setup_transfer<dim,Number>(mg_dof,
                                                    this->mg_constrained_dofs,
                                                    elem_info,
@@ -112,7 +117,20 @@ void MGTransferMatrixFree<dim,VectorType>::build
                                                    dirichlet_indices,
                                                    weights_unvectorized,
                                                    this->copy_indices_global_mine,
-                                                   this->ghosted_level_vector);
+                                                   ghosted_level_vector);
+
+  // resize and reinit a possibly block vector:
+  const unsigned int max_level = ghosted_level_vector.max_level();
+  if (this->ghosted_level_vector.max_level() != max_level)
+    this->ghosted_level_vector.resize(0, max_level);
+
+  for (unsigned int l = 0; l <= max_level; ++l)
+    for (unsigned int b = 0; b < internal::get_n_blocks(this->ghosted_level_vector[l]); ++b)
+      {
+        internal::get_block(this->ghosted_level_vector[l],b).reinit(ghosted_level_vector[l]);
+        internal::get_block(this->ghosted_level_vector[l],b) = ghosted_level_vector[l];
+      }
+
   // unpack element info data
   fe_degree                = elem_info.fe_degree;
   element_is_continuous    = elem_info.element_is_continuous;
@@ -160,10 +178,13 @@ void MGTransferMatrixFree<dim,VectorType>
   Assert ((to_level >= 1) && (to_level<=level_dof_indices.size()),
           ExcIndexRange (to_level, 1, level_dof_indices.size()+1));
 
-  AssertDimension(this->ghosted_level_vector[to_level].local_size(),
-                  dst.local_size());
-  AssertDimension(this->ghosted_level_vector[to_level-1].local_size(),
-                  src.local_size());
+  for (unsigned int b = 0; b < internal::get_n_blocks(dst); ++b)
+    {
+      AssertDimension(internal::get_block(this->ghosted_level_vector[to_level],b).local_size(),
+                      internal::get_block(dst,b).local_size());
+      AssertDimension(internal::get_block(this->ghosted_level_vector[to_level-1],b).local_size(),
+                      internal::get_block(src,b).local_size());
+    }
 
   this->ghosted_level_vector[to_level-1] = src;
   this->ghosted_level_vector[to_level-1].update_ghost_values();
@@ -224,10 +245,13 @@ void MGTransferMatrixFree<dim,VectorType>
   Assert ((from_level >= 1) && (from_level<=level_dof_indices.size()),
           ExcIndexRange (from_level, 1, level_dof_indices.size()+1));
 
-  AssertDimension(this->ghosted_level_vector[from_level].local_size(),
-                  src.local_size());
-  AssertDimension(this->ghosted_level_vector[from_level-1].local_size(),
-                  dst.local_size());
+  for (unsigned int b = 0; b < internal::get_n_blocks(dst); ++b)
+    {
+      AssertDimension(internal::get_block(this->ghosted_level_vector[from_level],b).local_size(),
+                      internal::get_block(src,b).local_size());
+      AssertDimension(internal::get_block(this->ghosted_level_vector[from_level-1],b).local_size(),
+                      internal::get_block(dst,b).local_size());
+    }
 
   this->ghosted_level_vector[from_level] = src;
   this->ghosted_level_vector[from_level].update_ghost_values();
