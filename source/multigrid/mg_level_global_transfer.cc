@@ -306,6 +306,25 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::fill_and_com
 
 
 template <typename Number>
+template <int dim, int spacedim>
+void
+MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<Number> >::fill_and_communicate_copy_indices
+(const DoFHandler<dim,spacedim> &mg_dof)
+{
+  internal_fill_and_communicate_copy_indices(
+    mg_dof,
+    this->mg_constrained_dofs,
+    this->ghosted_level_vector,
+    this->ghosted_global_vector,
+    this->copy_indices,
+    this->copy_indices_level_mine,
+    this->copy_indices_global_mine,
+    this->perform_plain_copy);
+}
+
+
+
+template <typename Number>
 void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::clear()
 {
@@ -318,6 +337,23 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::clear()
   ghosted_global_vector.reinit(0);
   ghosted_level_vector.resize(0, 0);
 }
+
+
+
+// FIXME: this is exact duplicate...
+template <typename Number>
+void
+MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<Number> >::clear()
+{
+  sizes.resize(0);
+  copy_indices.clear();
+  copy_indices_global_mine.clear();
+  copy_indices_level_mine.clear();
+  mg_constrained_dofs = nullptr;
+  ghosted_global_vector.reinit(0);
+  ghosted_level_vector.resize(0, 0);
+}
+
 
 
 
@@ -366,6 +402,25 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::memory_consu
 }
 
 
+// FIXME: exact copy
+template <typename Number>
+std::size_t
+MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<Number> >::memory_consumption () const
+{
+  std::size_t result = sizeof(*this);
+  result += MemoryConsumption::memory_consumption(sizes);
+  result += MemoryConsumption::memory_consumption(copy_indices);
+  result += MemoryConsumption::memory_consumption(copy_indices_global_mine);
+  result += MemoryConsumption::memory_consumption(copy_indices_level_mine);
+  result += ghosted_global_vector.memory_consumption();
+  for (unsigned int i=ghosted_level_vector.min_level();
+       i<=ghosted_level_vector.max_level(); ++i)
+    result += ghosted_level_vector[i].memory_consumption();
+
+  return result;
+}
+
+
 
 // explicit instantiation
 #include "mg_level_global_transfer.inst"
@@ -373,6 +428,7 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::memory_consu
 // create an additional instantiation currently not supported by the automatic
 // template instantiation scheme
 template class MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<float> >;
-
+template class MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<float> >;
+template class MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<double> >;
 
 DEAL_II_NAMESPACE_CLOSE

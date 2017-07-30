@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/base/mg_level_object.h>

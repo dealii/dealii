@@ -18,4 +18,5 @@
 for (deal_II_dimension : DIMENSIONS; S1 : REAL_SCALARS)
 {
     template class MGTransferMatrixFree< deal_II_dimension, LinearAlgebra::distributed::Vector<S1> >;
+    template class MGTransferMatrixFree< deal_II_dimension, LinearAlgebra::distributed::BlockVector<S1> >;
 }
