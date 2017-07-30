@@ -11,7 +11,7 @@ DEAL::QWeddle<1>: true
 DEAL::QGaussChebyshev<1>: true
 DEAL::QGaussRadauChebyshev<1>: true
 DEAL::QGaussLobattoChebyshev<1>: true
-DEAL::QSorted<1>: true
+DEAL::QSorted<1>: false
 DEAL::QTelles<1>: true
 DEAL::QAnisotropic<1>: true
 DEAL::QGaussLog<1>: true

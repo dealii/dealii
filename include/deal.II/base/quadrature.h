@@ -22,6 +22,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <vector>
 #include <array>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -130,7 +131,7 @@ public:
   /**
    * Copy constructor.
    */
-  Quadrature (const Quadrature<dim> &q) = default;
+  Quadrature (const Quadrature<dim> &q);
 
   /**
    * Move constructor. Construct a new quadrature object by transferring the
@@ -170,7 +171,7 @@ public:
    * Assignment operator. Copies contents of #weights and #quadrature_points
    * as well as size.
    */
-  Quadrature &operator = (const Quadrature<dim> &) = default;
+  Quadrature &operator = (const Quadrature<dim> &);
 
   /**
    * Test for equality of two quadratures.
@@ -261,7 +262,7 @@ protected:
    * Stores the one-dimensional tensor basis objects in case this object
    * can be represented by a tensor product.
    */
-  typename std::conditional<dim==1, int, std::array<Quadrature<1>,dim>>::type tensor_basis;
+  std::unique_ptr<std::array<Quadrature<1>,dim>> tensor_basis;
 };
 
 

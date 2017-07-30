@@ -76,7 +76,7 @@ print_is_tensor_product()
   deallog << "QGaussLobattoChebyshev<" << dim << ">: "
           << q_11.is_tensor_product() << std::endl;
 
-  QSorted<dim> q_16(QGauss<dim>(2));
+  QSorted<dim> q_16(QGauss<dim>(3));
   deallog << "QSorted<" << dim << ">: "
           << q_16.is_tensor_product() << std::endl;
 
