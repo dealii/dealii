@@ -28,7 +28,7 @@ template <int dim>
 void
 print_is_tensor_product()
 {
-  Quadrature<dim> q_0;
+  Quadrature<dim> q_0 (1);
   deallog << "Quadrature<" << dim << ">: "
           << q_0.is_tensor_product() << std::endl;
 
@@ -76,7 +76,7 @@ print_is_tensor_product()
   deallog << "QGaussLobattoChebyshev<" << dim << ">: "
           << q_11.is_tensor_product() << std::endl;
 
-  QSorted<dim> q_16(q_0);
+  QSorted<dim> q_16(QGauss<dim>(2));
   deallog << "QSorted<" << dim << ">: "
           << q_16.is_tensor_product() << std::endl;
 
@@ -90,7 +90,7 @@ int main()
   initlog();
   deallog << std::boolalpha;
 
-  Quadrature<1> q;
+  QGauss<1> q(1);
 
   print_is_tensor_product<1>();
   QAnisotropic<1> q_1(q);
@@ -103,7 +103,7 @@ int main()
   print_is_tensor_product<2>();
   QAnisotropic<2> q_2(q, q);
   deallog << "QAnisotropic<2>: " << q_2.is_tensor_product() << std::endl;
-  QGaussOneOverR<2> q_15(1, Point<2>());
+  QGaussOneOverR<2> q_15(2, Point<2>());
   deallog << "QGaussOneOverR<2>: " << q_15.is_tensor_product() << std::endl;
 
   print_is_tensor_product<3>();

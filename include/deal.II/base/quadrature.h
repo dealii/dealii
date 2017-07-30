@@ -21,6 +21,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/subscriptor.h>
 #include <vector>
+#include <array>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -129,7 +130,7 @@ public:
   /**
    * Copy constructor.
    */
-  Quadrature (const Quadrature<dim> &q);
+  Quadrature (const Quadrature<dim> &q) = default;
 
   /**
    * Move constructor. Construct a new quadrature object by transferring the
@@ -163,13 +164,13 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Quadrature ();
+  virtual ~Quadrature () = default;
 
   /**
    * Assignment operator. Copies contents of #weights and #quadrature_points
    * as well as size.
    */
-  Quadrature &operator = (const Quadrature<dim> &);
+  Quadrature &operator = (const Quadrature<dim> &) = default;
 
   /**
    * Test for equality of two quadratures.
@@ -232,7 +233,8 @@ public:
    * returns the one-dimensional basis objects.
    * Otherwise, calling this function is not allowed.
    */
-  const std::vector<Quadrature<1>> &get_tensor_basis() const;
+  typename std::conditional<dim==1, std::array<Quadrature<1>, dim>,const std::array<Quadrature<1>,dim>&>::type
+  get_tensor_basis() const;
 
 protected:
   /**
@@ -259,7 +261,7 @@ protected:
    * Stores the one-dimensional tensor basis objects in case this object
    * can be represented by a tensor product.
    */
-  std::vector<Quadrature<1> > tensor_basis;
+  typename std::conditional<dim==1, int, std::array<Quadrature<1>,dim>>::type tensor_basis;
 };
 
 
@@ -442,8 +444,6 @@ Quadrature<0>::Quadrature (const Quadrature<-1> &,
                            const Quadrature<1> &);
 template <>
 Quadrature<0>::Quadrature (const Quadrature<1> &);
-template <>
-Quadrature<0>::~Quadrature ();
 
 template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &,
