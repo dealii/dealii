@@ -13,13 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/utilities.h>
+#include <deal.II/base/array_view.h>
+#include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>

@@ -20,8 +20,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table.h>
 
-#include <boost/type_traits/remove_cv.hpp>
-
+#include <type_traits>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -65,7 +64,7 @@ DEAL_II_NAMESPACE_OPEN
  * std::vector::operator[] is non-@p const.
  *
  * @ingroup data
- * @author Wolfgang Bangerth, 2015
+ * @author Wolfgang Bangerth, 2015, David Wells, 2017
  */
 template <typename ElementType>
 class ArrayView
@@ -76,6 +75,16 @@ public:
    * i.e., the type of the element it "stores" or points to.
    */
   typedef ElementType value_type;
+
+  /**
+   * A typedef for iterators pointing into the array.
+   */
+  typedef value_type *iterator;
+
+  /**
+   * A typedef for const iterators pointing into the array.
+   */
+  typedef const ElementType *const_iterator;
 
   /**
    * Default constructor. Creates an invalid view that does not point to
@@ -114,13 +123,33 @@ public:
    * non-@p const view to a @p const view, akin to converting a non-@p const
    * pointer to a @p const pointer.
    */
-  ArrayView (const ArrayView<typename boost::remove_cv<value_type>::type> &view);
+  ArrayView (const ArrayView<typename std::remove_cv<value_type>::type> &view);
 
   /**
    * Return the size (in elements) of the view of memory this object
    * represents.
    */
   std::size_t size() const;
+
+  /**
+   * Return an iterator pointing to the beginning of the array view.
+   */
+  iterator begin();
+
+  /**
+   * Return an iterator pointing to one past the end of the array view.
+   */
+  iterator end();
+
+  /**
+   * Return a constant iterator pointing to the beginning of the array view.
+   */
+  const_iterator begin() const;
+
+  /**
+   * Return a constant iterator pointing to one past the end of the array view.
+   */
+  const_iterator end() const;
 
   /**
    * Return a reference to the $i$th element of the range represented by the
@@ -138,12 +167,12 @@ private:
    * A pointer to the first element of the range of locations in memory that
    * this object represents.
    */
-  value_type  *const starting_element;
+  value_type *const starting_element;
 
   /**
    * The length of the array this object represents.
    */
-  const std::size_t  n_elements;
+  const std::size_t n_elements;
 
   friend class ArrayView<const ElementType>;
 };
@@ -176,7 +205,7 @@ ArrayView<ElementType>::ArrayView(value_type        *starting_element,
 
 template <typename ElementType>
 inline
-ArrayView<ElementType>::ArrayView(const ArrayView<typename boost::remove_cv<value_type>::type> &view)
+ArrayView<ElementType>::ArrayView(const ArrayView<typename std::remove_cv<value_type>::type> &view)
   :
   starting_element (view.starting_element),
   n_elements(view.n_elements)
@@ -190,6 +219,40 @@ std::size_t
 ArrayView<ElementType>::size() const
 {
   return n_elements;
+}
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::iterator
+ArrayView<ElementType>::begin()
+{
+  return starting_element;
+}
+
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::iterator
+ArrayView<ElementType>::end()
+{
+  return starting_element + n_elements;
+}
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::const_iterator
+ArrayView<ElementType>::begin() const
+{
+  return starting_element;
+}
+
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::const_iterator
+ArrayView<ElementType>::end() const
+{
+  return starting_element + n_elements;
 }
 
 
@@ -283,6 +346,54 @@ make_array_view (std::vector<ElementType> &vector,
                       "create would lead to a view that extends beyond the end "
                       "of the given vector."));
   return ArrayView<ElementType> (&vector[starting_index], size_of_view);
+}
+
+
+/**
+ * Create an ArrayView that takes a pair of iterators as arguments. The type
+ * of the ArrayView is inferred from the value type of the iterator (e.g., the
+ * view created from two const iterators will have a const type).
+ *
+ * @warning The iterators @begin and @p end must bound (in the usual half-open
+ * way) a contiguous in memory range of values. This function is intended for
+ * use with iterators into containers like
+ * <code>boost::container::small_vector</code> or <code>std::vector</code> and
+ * will not work correctly with, e.g.,
+ * <code>boost::container::stable_vector</code> or <code>std::deque</code>.
+ *
+ * @relates ArrayView
+ */
+template <typename Iterator>
+ArrayView<typename std::remove_reference<typename std::iterator_traits<Iterator>::reference>::type>
+make_array_view (const Iterator begin, const Iterator end)
+{
+  static_assert(std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
+                typename std::random_access_iterator_tag>::value,
+                "The provided iterator should be a random access iterator.");
+  Assert(begin <= end,
+         ExcMessage("The beginning of the array view should be before the end."));
+  // the reference type, not the value type, knows the constness of the iterator
+  return ArrayView<typename std::remove_reference
+         <typename std::iterator_traits<Iterator>::reference>::type>
+         (&*begin, end - begin);
+}
+
+/**
+ * Create a view from a pair of pointers. <code>ElementType</code> may be
+ * const-qualified.
+ *
+ * @warning The pointers @p begin and @p end must bound (in the usual
+ * half-open way) a contiguous in memory range of values.
+ *
+ * @relates ArrayView
+ */
+template <typename ElementType>
+ArrayView<ElementType>
+make_array_view (ElementType *const begin, ElementType *const end)
+{
+  Assert(begin <= end,
+         ExcMessage("The beginning of the array view should be before the end."));
+  return ArrayView<ElementType>(begin, end - begin);
 }
 
 

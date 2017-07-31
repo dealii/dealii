@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/polynomials_bdm.h>
