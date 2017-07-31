@@ -939,6 +939,13 @@ QSorted<dim>::QSorted(const Quadrature<dim> &quad) :
                       std::placeholders::_1,
                       std::placeholders::_2));
 
+  // At this point, the variable is_tensor_product_flag is set
+  // to the respective value of the given Quadrature in the base
+  // class copy constructor.
+  // We only call a quadrature formula 'tensor product'
+  // if the quadrature points are also sorted lexicographically.
+  // In particular, any reordering destroys that property
+  // and we might need to modify the variable accordingly.
   for (unsigned int i=0; i<quad.size(); ++i)
     {
       this->weights[i]           = quad.weight(permutation[i]);

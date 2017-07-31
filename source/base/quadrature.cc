@@ -349,7 +349,7 @@ Quadrature<1>::get_tensor_basis () const
           ExcMessage("This function only makes sense if "
                      "this object represents a tensor product!"));
 
-  return std::array<Quadrature<1>, 1> {*this};
+  return std::array<Quadrature<1>, 1> {{*this}};
 }
 
 
@@ -397,7 +397,7 @@ QAnisotropic<2>::QAnisotropic(const Quadrature<1> &qx,
       }
   Assert (k==this->size(), ExcInternalError());
   this->is_tensor_product_flag = true;
-  const std::array<Quadrature<1>, 2> q_array = {qx, qy};
+  const std::array<Quadrature<1>, 2> q_array {{qx, qy}};
   this->tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, 2>>(q_array);
 }
 
@@ -432,7 +432,7 @@ QAnisotropic<3>::QAnisotropic(const Quadrature<1> &qx,
         }
   Assert (k==this->size(), ExcInternalError());
   this->is_tensor_product_flag = true;
-  const std::array<Quadrature<1>, 3> q_array = {qx, qy, qz};
+  const std::array<Quadrature<1>, 3> q_array {{qx, qy, qz}};
   this->tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, 3>>(q_array);
 }
 

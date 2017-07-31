@@ -225,7 +225,8 @@ public:
 
   /**
    * This function returns true if the quadrature object is a tensor product
-   * of one-dimensional formulas.
+   * of one-dimensional formulas and the quadrature points are sorted
+   * lexicographically.
    */
   bool is_tensor_product() const;
 
@@ -254,7 +255,8 @@ protected:
    * Indicates if this object represents quadrature formula that is a tensor
    * product of one-dimensional formulas.
    * This flag is set if dim==1 or the constructors taking a Quadrature<1>
-   * (and possibly a Quadrature<dim-1> object) is called.
+   * (and possibly a Quadrature<dim-1> object) is called. This implies
+   * that the quadrature points are sorted lexicographically.
    */
   bool is_tensor_product_flag;
 
