@@ -108,6 +108,17 @@ void MGTransferMatrixFree<dim,VectorType>::build
   // always need non-ghosted auxiliary vector
   // FIXME: don't introduce auxiliary vector for non-block case.
   MGLevelObject<LinearAlgebra::distributed::Vector<Number>> ghosted_level_vector;
+  {
+    const unsigned int max_level = this->ghosted_level_vector.max_level();
+    const unsigned int min_level = this->ghosted_level_vector.min_level();
+    ghosted_level_vector.resize(min_level, max_level);
+    for (unsigned int l = min_level; l <= max_level; ++l)
+      {
+        ghosted_level_vector[l].reinit(internal::get_block(this->ghosted_level_vector[l],0));
+        ghosted_level_vector[l] = internal::get_block(this->ghosted_level_vector[l],0);
+      }
+  }
+
   internal::MGTransfer::setup_transfer<dim,Number>(mg_dof,
                                                    this->mg_constrained_dofs,
                                                    elem_info,
@@ -120,16 +131,18 @@ void MGTransferMatrixFree<dim,VectorType>::build
                                                    ghosted_level_vector);
 
   // resize and reinit a possibly block vector:
-  const unsigned int max_level = ghosted_level_vector.max_level();
-  if (this->ghosted_level_vector.max_level() != max_level)
-    this->ghosted_level_vector.resize(0, max_level);
+  {
+    const unsigned int max_level = ghosted_level_vector.max_level();
+    const unsigned int min_level = ghosted_level_vector.min_level();
+    this->ghosted_level_vector.resize(min_level, max_level);
 
-  for (unsigned int l = 0; l <= max_level; ++l)
-    for (unsigned int b = 0; b < internal::get_n_blocks(this->ghosted_level_vector[l]); ++b)
-      {
-        internal::get_block(this->ghosted_level_vector[l],b).reinit(ghosted_level_vector[l]);
-        internal::get_block(this->ghosted_level_vector[l],b) = ghosted_level_vector[l];
-      }
+    for (unsigned int l = min_level; l <= max_level; ++l)
+      for (unsigned int b = 0; b < internal::get_n_blocks(this->ghosted_level_vector[l]); ++b)
+        {
+          internal::get_block(this->ghosted_level_vector[l],b).reinit(ghosted_level_vector[l]);
+          internal::get_block(this->ghosted_level_vector[l],b) = ghosted_level_vector[l];
+        }
+  }
 
   // unpack element info data
   fe_degree                = elem_info.fe_degree;
