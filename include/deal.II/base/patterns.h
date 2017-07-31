@@ -1303,8 +1303,8 @@ namespace Patterns
       template <class Key, class Value>
       struct RankInfo<std::pair<Key,Value>>
       {
-        static constexpr int list_rank = std::max(RankInfo<Key>::list_rank, RankInfo<Value>::list_rank);
-        static constexpr int map_rank = std::max(RankInfo<Key>::map_rank, RankInfo<Value>::map_rank)+1;
+        static constexpr int list_rank = std_cxx14::max(RankInfo<Key>::list_rank, RankInfo<Value>::list_rank);
+        static constexpr int map_rank = std_cxx14::max(RankInfo<Key>::map_rank, RankInfo<Value>::map_rank)+1;
       };
     }
 
