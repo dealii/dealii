@@ -1,0 +1,123 @@
+
+DEAL::No scaling:
+DEAL::Degree 1
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 1.00000 @ -0.100000
+DEAL:: Input norm: 6.16127
+DEAL:: Exact norm: 37.4711
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 2
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 1.00000 @ -0.100000
+DEAL:: Input norm: 5.92779
+DEAL:: Exact norm: 586.339
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 3
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 1.00000 @ -0.100000
+DEAL:: Input norm: 5.89974
+DEAL:: Exact norm: 10657.5
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 4
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 1.00000 @ -0.100000
+DEAL:: Input norm: 5.60617
+DEAL:: Exact norm: 157052.
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 10
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 1.00000 @ -0.100000
+DEAL:: Input norm: 5.36039
+DEAL:: Exact norm: 5.05476e+12
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0.00146484
+DEAL::Lower scaling:
+DEAL::Degree 1
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: -10.0000 @ -0.100000
+DEAL:: Input norm: 6.43748
+DEAL:: Exact norm: 3.99850
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 2
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 199.000 @ -0.100000
+DEAL:: Input norm: 5.74697
+DEAL:: Exact norm: 2.70598
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 3
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: -3970.00 @ -0.100000
+DEAL:: Input norm: 5.64201
+DEAL:: Exact norm: 2.34171
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 4
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 79201.0 @ -0.100000
+DEAL:: Input norm: 5.70416
+DEAL:: Exact norm: 1.92446
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 10
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 4.99312e+12 @ -0.100000
+DEAL:: Input norm: 5.64307
+DEAL:: Exact norm: 0.989370
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 30
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 4.97938e+38 @ -0.100000
+DEAL:: Input norm: 5.82031
+DEAL:: Exact norm: 0.745548
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Upper scaling:
+DEAL::Degree 1
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 10.0000 @ 0.100000
+DEAL:: Input norm: 5.51882
+DEAL:: Exact norm: 3.18201
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 2
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 199.000 @ 0.100000
+DEAL:: Input norm: 5.83880
+DEAL:: Exact norm: 2.78386
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 3
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 3970.00 @ 0.100000
+DEAL:: Input norm: 5.49421
+DEAL:: Exact norm: 2.11010
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 4
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 79201.0 @ 0.100000
+DEAL:: Input norm: 5.55782
+DEAL:: Exact norm: 1.56672
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 10
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 4.99312e+12 @ 0.100000
+DEAL:: Input norm: 5.85002
+DEAL:: Exact norm: 1.24742
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0
+DEAL::Degree 30
+DEAL:: Modes inside/outside: 10 90
+DEAL:: Scaling: 4.97938e+38 @ 0.100000
+DEAL:: Input norm: 6.25978
+DEAL:: Exact norm: 0.896899
+DEAL:: Filter [-0.0100000,0.0100000]
+DEAL:: Error: 0

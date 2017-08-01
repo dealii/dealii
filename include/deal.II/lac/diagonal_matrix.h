@@ -179,8 +179,11 @@ public:
                    const VectorType &src) const;
 
   /**
-   * Initialize vector @p dst. This is a part of the interface required
-   * by linear operator.
+   * Initialize vector @p dst to have the same size and partition as
+   * @p diagonal member of this class.
+   *
+   * This is a part of the interface required
+   * by linear_operator().
    */
   void initialize_dof_vector(VectorType &dst) const;
 
