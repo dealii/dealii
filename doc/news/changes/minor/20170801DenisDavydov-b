@@ -1,0 +1,3 @@
+Fixed: DiagonalMatrix<VectorType> can now be used as a linear operator.
+<br>
+(Denis Davydov, 2017/08/01)
