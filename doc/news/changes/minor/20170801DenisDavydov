@@ -1,0 +1,4 @@
+New: Extend pArpack solver to cover mode 1 (standard eigenvalue problem) and
+mode 2 (generalized eigenvalue problem without spectral transformation).
+<br>
+(Denis Davydov, 2017/08/01)

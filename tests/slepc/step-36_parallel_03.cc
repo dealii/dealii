@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Solve for smallest eigenvalues of Laplace operator in Step-36 tutorial
+// same as step-36_parallel_02, but solve SHEP
 
 #include "../tests.h"
 
@@ -284,18 +284,13 @@ void test (std::string solver_name,
                                                                     mpi_communicator);
       }
 
-    SLEPcWrappers::TransformationShiftInvert::AdditionalData additional_data(4.0);
-    SLEPcWrappers::TransformationShiftInvert spectral_transformation(mpi_communicator,additional_data);
-    spectral_transformation.set_solver(linear_solver);
-    eigensolver->set_transformation(spectral_transformation);
     // Set the initial vector. This is optional, if not done the initial vector is set to random values
     eigensolver->set_initial_space(eigenfunctions);
 
-    eigensolver->set_which_eigenpairs (EPS_SMALLEST_REAL);
-    eigensolver->set_problem_type (EPS_GHEP);
+    eigensolver->set_which_eigenpairs (EPS_LARGEST_REAL);
+    eigensolver->set_problem_type (EPS_HEP);
 
     eigensolver->solve (stiffness_matrix,
-                        mass_matrix,
                         eigenvalues,
                         eigenfunctions,
                         eigenfunctions.size());
@@ -311,17 +306,15 @@ void test (std::string solver_name,
     delete eigensolver;
 
     // make sure that we have eigenvectors and they are mass-orthonormal:
-    // a) (A*x_i-\lambda*B*x_i).L2() == 0
-    // b) x_j*B*x_i=\delta_{ij}
+    // a) (A*x_i-\lambda*x_i).L2() == 0
+    // b) x_j*x_i=\delta_{ij}
     {
       const double precision = 1e-5;
-      PETScWrappers::MPI::Vector Ax(eigenfunctions[0]), Bx(eigenfunctions[0]);
+      PETScWrappers::MPI::Vector Ax(eigenfunctions[0]);
       for (unsigned int i=0; i < eigenfunctions.size(); ++i)
         {
-          mass_matrix.vmult(Bx,eigenfunctions[i]);
-
           for (unsigned int j=0; j < eigenfunctions.size(); j++)
-            Assert( std::abs( eigenfunctions[j] * Bx - (i==j))< precision,
+            Assert( std::abs( eigenfunctions[j] * eigenfunctions[i] - (i==j))< precision,
                     ExcMessage("Eigenvectors " +
                                Utilities::int_to_string(i) +
                                " and " +
@@ -329,7 +322,7 @@ void test (std::string solver_name,
                                " are not orthonormal!"));
 
           stiffness_matrix.vmult(Ax,eigenfunctions[i]);
-          Ax.add(-1.0*eigenvalues[i],Bx);
+          Ax.add(-1.0*eigenvalues[i],eigenfunctions[i]);
           Assert (Ax.l2_norm() < precision,
                   ExcMessage(Utilities::to_string(Ax.l2_norm())));
         }

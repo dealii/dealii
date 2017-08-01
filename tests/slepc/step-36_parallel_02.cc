@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Solve for smallest eigenvalues of Laplace operator in Step-36 tutorial
+// same as step-36_parallel, but solve for largest eigenvalues of GHEP
 
 #include "../tests.h"
 
@@ -284,14 +284,10 @@ void test (std::string solver_name,
                                                                     mpi_communicator);
       }
 
-    SLEPcWrappers::TransformationShiftInvert::AdditionalData additional_data(4.0);
-    SLEPcWrappers::TransformationShiftInvert spectral_transformation(mpi_communicator,additional_data);
-    spectral_transformation.set_solver(linear_solver);
-    eigensolver->set_transformation(spectral_transformation);
     // Set the initial vector. This is optional, if not done the initial vector is set to random values
     eigensolver->set_initial_space(eigenfunctions);
 
-    eigensolver->set_which_eigenpairs (EPS_SMALLEST_REAL);
+    eigensolver->set_which_eigenpairs (EPS_LARGEST_REAL);
     eigensolver->set_problem_type (EPS_GHEP);
 
     eigensolver->solve (stiffness_matrix,
