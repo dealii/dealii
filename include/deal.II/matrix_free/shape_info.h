@@ -24,8 +24,6 @@
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/fe/fe.h>
 
-#include <deal.II/matrix_free/helper_functions.h>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -190,40 +188,29 @@ namespace internal
       AlignedVector<VectorizedArray<Number> > shape_hessians_collocation_eo;
 
       /**
-       * Stores the indices from cell DoFs to face DoFs. The rows go through
-       * the <tt>2*dim</tt> faces, and the columns the DoFs on the faces.
+       * Collects all data of 1D shape values evaluated at the point 0 and 1
+       * (the vertices) in one data structure. Sorting is first the values,
+       * then gradients, then second derivatives.
        */
-      dealii::Table<2,unsigned int>  face_indices;
-
-      /**
-       * Stores one-dimensional values of shape functions evaluated in zero
-       * and one, i.e., on the one-dimensional faces. Not vectorized.
-       */
-      std::vector<Number>    face_value[2];
-
-      /**
-       * Stores one-dimensional gradients of shape functions evaluated in zero
-       * and one, i.e., on the one-dimensional faces. Not vectorized.
-       */
-      std::vector<Number>    face_gradient[2];
+      AlignedVector<VectorizedArray<Number> > shape_data_on_face[2];
 
       /**
        * Stores one-dimensional values of shape functions on subface. Since
-       * there are two subfaces, store two variants. Not vectorized.
+       * there are two subfaces, store two variants.
        */
-      std::vector<Number>    subface_value[2];
+      AlignedVector<VectorizedArray<Number> > values_within_subface[2];
 
       /**
-       * Non-vectorized version of shape values. Needed when evaluating face
-       * info.
+       * Stores one-dimensional gradients of shape functions on subface. Since
+       * there are two subfaces, store two variants.
        */
-      std::vector<Number>    shape_values_number;
+      AlignedVector<VectorizedArray<Number> > gradients_within_subface[2];
 
       /**
-       * Non-vectorized version of shape gradients. Needed when evaluating
-       * face info.
+       * Stores one-dimensional gradients of shape functions on subface. Since
+       * there are two subfaces, store two variants.
        */
-      std::vector<Number>    shape_gradient_number;
+      AlignedVector<VectorizedArray<Number> > hessians_within_subface[2];
 
       /**
        * Renumbering from deal.II's numbering of cell degrees of freedom to
@@ -266,6 +253,43 @@ namespace internal
       unsigned int dofs_per_face;
 
       /**
+       * Indicates whether the basis functions are nodal in 0 and 1, i.e., the
+       * end points of the unit cell.
+       */
+      bool nodal_at_cell_boundaries;
+
+      /**
+       * For nodal cells, we might get around by simply loading the indices to
+       * the degrees of freedom that act on a particular face, rather than the
+       * whole set of indices that is then interpolated down to the
+       * element. This array stores this indirect addressing.
+       *
+       * The first table index runs through the faces of a cell, and the
+       * second runs through the nodal degrees of freedom of the face, using
+       * @p dofs_per_face entries.
+       *
+       * @note This object is only filled in case @p nodal_at_cell_boundaries
+       * evaluates to @p true.
+       */
+      dealii::Table<2,unsigned int> face_to_cell_index_nodal;
+
+      /**
+       * For Hermite-type basis functions, the @p face_to_cell_index_nodal for
+       * the values on a face of the cell is used together with a respective
+       * slot in the derivative. In the lexicographic ordering, this index is
+       * in the next "layer" of degrees of freedom. This array stores the
+       * indirect addressing of both the values and the gradient.
+       *
+       * The first table index runs through the faces of a cell, and the
+       * second runs through the pairs of the nodal degrees of freedom of the
+       * face and the derivatives, using <code>2*dofs_per_face</code> entries.
+       *
+       * @note This object is only filled in case @p element_type evaluates to
+       * @p tensor_symmetric_hermite.
+       */
+      dealii::Table<2,unsigned int> face_to_cell_index_hermite;
+
+      /**
        * Check whether we have symmetries in the shape values. In that case,
        * also fill the shape_???_eo fields.
        */
@@ -297,7 +321,8 @@ namespace internal
       n_q_points (0),
       dofs_per_cell (0),
       n_q_points_face (0),
-      dofs_per_face (0)
+      dofs_per_face (0),
+      nodal_at_cell_boundaries (false)
     {
       reinit (quad, fe_in, base_element_number);
     }

@@ -780,7 +780,7 @@ namespace MatrixFreeOperators
     FullMatrix<double> shapes_1d(fe_degree+1, fe_degree+1);
     for (unsigned int i=0, c=0; i<shapes_1d.m(); ++i)
       for (unsigned int j=0; j<shapes_1d.n(); ++j, ++c)
-        shapes_1d(i,j) = fe_eval.get_shape_info().shape_values_number[c];
+        shapes_1d(i,j) = fe_eval.get_shape_info().shape_values[c][0];
     shapes_1d.gauss_jordan();
     const unsigned int stride = (fe_degree+2)/2;
     inverse_shape.resize(stride*(fe_degree+1));
