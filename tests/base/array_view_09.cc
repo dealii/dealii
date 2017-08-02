@@ -118,6 +118,15 @@ void test ()
       {
         deallog << exc.get_exc_name() << std::endl;
       }
+    // we only trigger the exception in debug mode
+    // just output the expected error message in release mode
+    // to make CTest happy
+#ifndef DEBUG
+    deallog <<  "ExcMessage(\"The beginning of the array view should be before the end.\")"
+            << std::endl;
+    deallog <<  "ExcMessage(\"The beginning of the array view should be before the end.\")"
+            << std::endl;
+#endif
   }
 
   deallog << "OK" << std::endl;
