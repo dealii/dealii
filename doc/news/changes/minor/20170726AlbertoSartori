@@ -1,3 +1,5 @@
-Fixed: FunctionParser uses shared_ptr instead of unique_ptr in order to fix compilation issues with gcc-5.4.
+Fixed: The FunctionParser class demonstrated an incompatibility with
+(very) old versions of the Threading Building Blocks used in
+deal.II. This is now worked around.
 <br>
-(Alberto Sartori, 2017/07/26)
+(Alberto Sartori, Wolfgang Bangerth, 2017/07/26)
