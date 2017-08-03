@@ -948,14 +948,9 @@ namespace hp
     // pointer object still points to something useful, that object is not
     // destroyed and we end up with a memory leak. consequently, first delete
     // previous content before re-loading stuff
-    for (unsigned int i = 0; i<levels.size(); ++i)
-      delete levels[i];
-    for (unsigned int i = 0; i<has_children.size(); ++i)
-      delete has_children[i];
-    levels.resize(0);
-    has_children.resize(0);
-    delete faces;
-    faces = 0;
+    levels.clear ();
+    has_children.clear ();
+    faces.reset ();
 
     ar &levels;
     ar &faces;
