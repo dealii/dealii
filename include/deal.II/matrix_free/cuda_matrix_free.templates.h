@@ -461,7 +461,7 @@ namespace CUDAWrappers
     unsigned int size_shape_values = n_dofs_1d*n_q_points_1d*sizeof(Number);
 
     cudaError_t cuda_error = cudaMemcpyToSymbol(internal::global_shape_values,
-                                                &shape_info.shape_values_number[0],
+                                                &shape_info.shape_values[0],
                                                 size_shape_values,
                                                 0,
                                                 cudaMemcpyHostToDevice);
@@ -470,7 +470,7 @@ namespace CUDAWrappers
     if (update_flags & update_gradients)
       {
         cuda_error = cudaMemcpyToSymbol(internal::global_shape_gradients,
-                                        &shape_info.shape_gradient_number[0],
+                                        &shape_info.shape_gradient[0],
                                         size_shape_values,
                                         0,
                                         cudaMemcpyHostToDevice);

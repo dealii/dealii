@@ -40,6 +40,21 @@ namespace internal
 
     // ----------------- actual ShapeInfo functions --------------------
 
+    namespace
+    {
+      template <typename Number>
+      Number get_first_array_element(const Number a)
+      {
+        return a;
+      }
+
+      template <typename Number>
+      Number get_first_array_element(const VectorizedArray<Number> a)
+      {
+        return a[0];
+      }
+    }
+
     template <typename Number>
     ShapeInfo<Number>::ShapeInfo ()
       :
@@ -159,8 +174,8 @@ namespace internal
         if (fe->has_support_points())
           unit_point = fe->get_unit_support_points()[scalar_lexicographic[0]];
         Assert(fe->dofs_per_cell == 0 ||
-               std::fabs(fe->shape_value(scalar_lexicographic[0],
-                                         unit_point)-1) < 1e-13,
+               std::abs(fe->shape_value(scalar_lexicographic[0],
+                                        unit_point)-1) < 1e-13,
                ExcInternalError("Could not decode 1D shape functions for the "
                                 "element " + fe->get_name()));
       }
@@ -191,9 +206,6 @@ namespace internal
           const unsigned int my_i = scalar_lexicographic[i];
           for (unsigned int q=0; q<n_q_points_1d; ++q)
             {
-              // fill both vectors with
-              // VectorizedArray<Number>::n_array_elements copies for the
-              // shape information and non-vectorized fields
               Point<dim> q_point = unit_point;
               q_point[0] = quad.get_points()[q][0];
 
@@ -271,10 +283,10 @@ namespace internal
               // check if we are a Hermite type
               element_type = tensor_symmetric_hermite;
               for (unsigned int i=1; i<n_dofs_1d; ++i)
-                if (std::abs(this->shape_data_on_face[0][i][0]) > 1e-12)
+                if (std::abs(get_first_array_element(shape_data_on_face[0][i])) > 1e-12)
                   element_type = tensor_symmetric;
               for (unsigned int i=2; i<n_dofs_1d; ++i)
-                if (std::abs(this->shape_data_on_face[0][n_dofs_1d+i][0]) > 1e-12)
+                if (std::abs(get_first_array_element(shape_data_on_face[0][n_dofs_1d+i])) > 1e-12)
                   element_type = tensor_symmetric;
             }
         }
@@ -283,8 +295,8 @@ namespace internal
 
       nodal_at_cell_boundaries = true;
       for (unsigned int i=1; i<n_dofs_1d; ++i)
-        if (std::abs(this->shape_data_on_face[0][i][0]) > 1e-13 ||
-            std::abs(this->shape_data_on_face[1][i-1][0]) > 1e-13)
+        if (std::abs(get_first_array_element(shape_data_on_face[0][i])) > 1e-13 ||
+            std::abs(get_first_array_element(shape_data_on_face[1][i-1])) > 1e-13)
           nodal_at_cell_boundaries = false;
 
       if (nodal_at_cell_boundaries == true)
@@ -371,11 +383,10 @@ namespace internal
       const unsigned int n_dofs_1d = fe_degree + 1;
       for (unsigned int i=0; i<(n_dofs_1d+1)/2; ++i)
         for (unsigned int j=0; j<n_q_points_1d; ++j)
-          if (std::fabs(shape_values[i*n_q_points_1d+j][0] -
-                        shape_values[(n_dofs_1d-i)*n_q_points_1d
-                                     -j-1][0]) >
+          if (std::abs(get_first_array_element(shape_values[i*n_q_points_1d+j] -
+                                               shape_values[(n_dofs_1d-i)*n_q_points_1d-j-1])) >
               std::max(zero_tol, zero_tol*
-                       std::abs(shape_values[i*n_q_points_1d+j][0])))
+                       std::abs(get_first_array_element(shape_values[i*n_q_points_1d+j]))))
             return false;
 
       // shape values should be zero at x=0.5 for all basis functions except
@@ -383,11 +394,11 @@ namespace internal
       if (n_q_points_1d%2 == 1 && n_dofs_1d%2 == 1)
         {
           for (unsigned int i=0; i<n_dofs_1d/2; ++i)
-            if (std::fabs(shape_values[i*n_q_points_1d+
-                                       n_q_points_1d/2][0]) > zero_tol)
+            if (std::abs(get_first_array_element(shape_values[i*n_q_points_1d+
+                                                              n_q_points_1d/2])) > zero_tol)
               return false;
-          if (std::fabs(shape_values[(n_dofs_1d/2)*n_q_points_1d+
-                                     n_q_points_1d/2][0]-1.)> zero_tol)
+          if (std::abs(get_first_array_element(shape_values[(n_dofs_1d/2)*n_q_points_1d+
+                                                            n_q_points_1d/2])-1.)> zero_tol)
             return false;
         }
 
@@ -397,13 +408,14 @@ namespace internal
       const double zero_tol_gradient = zero_tol * std::sqrt(fe_degree+1.)*(fe_degree+1);
       for (unsigned int i=0; i<(n_dofs_1d+1)/2; ++i)
         for (unsigned int j=0; j<n_q_points_1d; ++j)
-          if (std::fabs(shape_gradients[i*n_q_points_1d+j][0] +
-                        shape_gradients[(n_dofs_1d-i)*n_q_points_1d-
-                                        j-1][0]) > zero_tol_gradient)
+          if (std::abs(get_first_array_element(shape_gradients[i*n_q_points_1d+j] +
+                                               shape_gradients[(n_dofs_1d-i)*n_q_points_1d-
+                                                               j-1])) > zero_tol_gradient)
             return false;
       if (n_dofs_1d%2 == 1 && n_q_points_1d%2 == 1)
-        if (std::fabs(shape_gradients[(n_dofs_1d/2)*n_q_points_1d+
-                                      (n_q_points_1d/2)][0]) > zero_tol_gradient)
+        if (std::abs(get_first_array_element(shape_gradients[(n_dofs_1d/2)*n_q_points_1d+
+                                                             (n_q_points_1d/2)]))
+            > zero_tol_gradient)
           return false;
 
       // symmetry for Hessian. Multiply tolerance by degree^3 of the element
@@ -411,9 +423,9 @@ namespace internal
       const double zero_tol_hessian = zero_tol * (fe_degree+1)*(fe_degree+1)*(fe_degree+1);
       for (unsigned int i=0; i<(n_dofs_1d+1)/2; ++i)
         for (unsigned int j=0; j<n_q_points_1d; ++j)
-          if (std::fabs(shape_hessians[i*n_q_points_1d+j][0] -
-                        shape_hessians[(n_dofs_1d-i)*n_q_points_1d-
-                                       j-1][0]) > zero_tol_hessian)
+          if (std::abs(get_first_array_element(shape_hessians[i*n_q_points_1d+j] -
+                                               shape_hessians[(n_dofs_1d-i)*n_q_points_1d-
+                                                              j-1])) > zero_tol_hessian)
             return false;
 
       const unsigned int stride = (n_q_points_1d+1)/2;
@@ -424,25 +436,25 @@ namespace internal
         for (unsigned int q=0; q<stride; ++q)
           {
             shape_values_eo[i*stride+q] =
-              Number(0.5) * (shape_values[i*n_q_points_1d+q] +
-                             shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
+              0.5 * (shape_values[i*n_q_points_1d+q] +
+                     shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
             shape_values_eo[(fe_degree-i)*stride+q] =
-              Number(0.5) * (shape_values[i*n_q_points_1d+q] -
-                             shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
+              0.5 * (shape_values[i*n_q_points_1d+q] -
+                     shape_values[i*n_q_points_1d+n_q_points_1d-1-q]);
 
             shape_gradients_eo[i*stride+q] =
-              Number(0.5) * (shape_gradients[i*n_q_points_1d+q] +
-                             shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
+              0.5 * (shape_gradients[i*n_q_points_1d+q] +
+                     shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
             shape_gradients_eo[(fe_degree-i)*stride+q] =
-              Number(0.5) * (shape_gradients[i*n_q_points_1d+q] -
-                             shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
+              0.5 * (shape_gradients[i*n_q_points_1d+q] -
+                     shape_gradients[i*n_q_points_1d+n_q_points_1d-1-q]);
 
             shape_hessians_eo[i*stride+q] =
-              Number(0.5) * (shape_hessians[i*n_q_points_1d+q] +
-                             shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
+              0.5 * (shape_hessians[i*n_q_points_1d+q] +
+                     shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
             shape_hessians_eo[(fe_degree-i)*stride+q] =
-              Number(0.5) * (shape_hessians[i*n_q_points_1d+q] -
-                             shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
+              0.5 * (shape_hessians[i*n_q_points_1d+q] -
+                     shape_hessians[i*n_q_points_1d+n_q_points_1d-1-q]);
           }
       if (fe_degree % 2 == 0)
         for (unsigned int q=0; q<stride; ++q)
@@ -475,13 +487,12 @@ namespace internal
         for (unsigned int j=0; j<n_points_1d; ++j)
           if (i!=j)
             {
-              if (std::fabs(shape_values[i*n_points_1d+j][0])>zero_tol)
+              if (std::abs(get_first_array_element(shape_values[i*n_points_1d+j]))>zero_tol)
                 return false;
             }
           else
             {
-              if (std::fabs(shape_values[i*n_points_1d+
-                                         j][0]-1.)>zero_tol)
+              if (std::abs(get_first_array_element(shape_values[i*n_points_1d+j])-1.)>zero_tol)
                 return false;
             }
       return true;

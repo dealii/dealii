@@ -841,11 +841,11 @@ public:
   /**
    * Return the unit cell information for given hp index.
    */
-  const internal::MatrixFreeFunctions::ShapeInfo<Number> &
-  get_shape_info (const unsigned int fe_component = 0,
-                  const unsigned int quad_index   = 0,
-                  const unsigned int hp_active_fe_index = 0,
-                  const unsigned int hp_active_quad_index = 0) const;
+  const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>> &
+      get_shape_info (const unsigned int fe_component = 0,
+                      const unsigned int quad_index   = 0,
+                      const unsigned int hp_active_fe_index = 0,
+                      const unsigned int hp_active_quad_index = 0) const;
 
   /**
    * Obtains a scratch data object for internal use. Make sure to release it
@@ -980,7 +980,7 @@ private:
   /**
    * Contains shape value information on the unit cell.
    */
-  Table<4,internal::MatrixFreeFunctions::ShapeInfo<Number> > shape_info;
+  Table<4,internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>>> shape_info;
 
   /**
    * Describes how the cells are gone through. With the cell level (first
@@ -1452,11 +1452,11 @@ MatrixFree<dim,Number>::get_ghost_set(const unsigned int dof_index) const
 
 template <int dim, typename Number>
 inline
-const internal::MatrixFreeFunctions::ShapeInfo<Number> &
-MatrixFree<dim,Number>::get_shape_info (const unsigned int index_fe,
-                                        const unsigned int index_quad,
-                                        const unsigned int active_fe_index,
-                                        const unsigned int active_quad_index) const
+const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number>> &
+    MatrixFree<dim,Number>::get_shape_info (const unsigned int index_fe,
+                                            const unsigned int index_quad,
+                                            const unsigned int active_fe_index,
+                                            const unsigned int active_quad_index) const
 {
   AssertIndexRange (index_fe, shape_info.size(0));
   AssertIndexRange (index_quad, shape_info.size(1));

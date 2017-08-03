@@ -20,7 +20,6 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/vectorization.h>
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/fe/fe.h>
 
@@ -132,7 +131,7 @@ namespace internal
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
        */
-      AlignedVector<VectorizedArray<Number> > shape_values;
+      AlignedVector<Number> shape_values;
 
       /**
        * Stores the shape gradients of the 1D finite element evaluated on all
@@ -141,7 +140,7 @@ namespace internal
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
        */
-      AlignedVector<VectorizedArray<Number> > shape_gradients;
+      AlignedVector<Number> shape_gradients;
 
       /**
        * Stores the shape Hessians of the 1D finite element evaluated on all
@@ -150,67 +149,67 @@ namespace internal
        * this array is <tt>n_dofs_1d * n_q_points_1d</tt> and quadrature
        * points are the index running fastest.
        */
-      AlignedVector<VectorizedArray<Number> > shape_hessians;
+      AlignedVector<Number> shape_hessians;
 
       /**
        * Stores the shape values in a different format, namely the so-called
        * even-odd scheme where the symmetries in shape_values are used for
        * faster evaluation.
        */
-      AlignedVector<VectorizedArray<Number> > shape_values_eo;
+      AlignedVector<Number> shape_values_eo;
 
       /**
        * Stores the shape gradients in a different format, namely the so-
        * called even-odd scheme where the symmetries in shape_gradients are
        * used for faster evaluation.
        */
-      AlignedVector<VectorizedArray<Number> > shape_gradients_eo;
+      AlignedVector<Number> shape_gradients_eo;
 
       /**
        * Stores the shape second derivatives in a different format, namely the
        * so-called even-odd scheme where the symmetries in shape_hessians are
        * used for faster evaluation.
        */
-      AlignedVector<VectorizedArray<Number> > shape_hessians_eo;
+      AlignedVector<Number> shape_hessians_eo;
 
       /**
        * Stores the shape gradients of the shape function space associated to
        * the quadrature (collocation), given by FE_DGQ<1>(Quadrature<1>). For
        * faster evaluation only the even-odd format is necessary.
        */
-      AlignedVector<VectorizedArray<Number> > shape_gradients_collocation_eo;
+      AlignedVector<Number> shape_gradients_collocation_eo;
 
       /**
        * Stores the shape hessians of the shape function space associated to
        * the quadrature (collocation), given by FE_DGQ<1>(Quadrature<1>). For
        * faster evaluation only the even-odd format is necessary.
        */
-      AlignedVector<VectorizedArray<Number> > shape_hessians_collocation_eo;
+      AlignedVector<Number> shape_hessians_collocation_eo;
 
       /**
        * Collects all data of 1D shape values evaluated at the point 0 and 1
        * (the vertices) in one data structure. Sorting is first the values,
        * then gradients, then second derivatives.
        */
-      AlignedVector<VectorizedArray<Number> > shape_data_on_face[2];
+      AlignedVector<Number> shape_data_on_face[2];
 
       /**
        * Stores one-dimensional values of shape functions on subface. Since
        * there are two subfaces, store two variants.
        */
-      AlignedVector<VectorizedArray<Number> > values_within_subface[2];
+      AlignedVector<Number> values_within_subface[2];
 
       /**
        * Stores one-dimensional gradients of shape functions on subface. Since
        * there are two subfaces, store two variants.
        */
-      AlignedVector<VectorizedArray<Number> > gradients_within_subface[2];
+      AlignedVector<Number> gradients_within_subface[2];
 
       /**
        * Stores one-dimensional gradients of shape functions on subface. Since
        * there are two subfaces, store two variants.
        */
-      AlignedVector<VectorizedArray<Number> > hessians_within_subface[2];
+      AlignedVector<Number> hessians_within_subface[2];
 
       /**
        * Renumbering from deal.II's numbering of cell degrees of freedom to
@@ -259,14 +258,36 @@ namespace internal
       bool nodal_at_cell_boundaries;
 
       /**
-       * For nodal cells, we might get around by simply loading the indices to
-       * the degrees of freedom that act on a particular face, rather than the
-       * whole set of indices that is then interpolated down to the
-       * element. This array stores this indirect addressing.
+       * For nodal basis functions with nodes located at the boundary of the
+       * unit cell, face integrals that involve only the values of the shape
+       * functions (approximations of first derivatives in DG) do not need to
+       * load all degrees of freedom of the cell but rather only the degrees
+       * of freedom located on the face. While it would also be possible to
+       * compute these indices on the fly, we choose to simplify the code and
+       * store the indirect addressing in this class.
        *
        * The first table index runs through the faces of a cell, and the
        * second runs through the nodal degrees of freedom of the face, using
        * @p dofs_per_face entries.
+       *
+       * The indices stored in this member variable are as follows. Consider
+       * for example a 2D element of degree 3 with the following degrees of
+       * freedom in lexicographic numbering:
+       * @code
+       * 12   13   14   15
+       * 8    9    10   11
+       * 4    5     6    7
+       * 0    1     2    3
+       * @endcode
+       *
+       * The first row stores the indices on the face with index 0, i.e., the
+       * numbers <code>0, 4, 8, 12</code>, the second row holds the indices
+       * <code>3, 7, 11, 15</code> for face 1, the third row holds the indices
+       * <code>0, 1, 2, 3</code> for face 2, and the last (fourth) row holds
+       * the indices <code>12, 13, 14, 15</code>. Similarly, the indices are
+       * stored in 3D. (Note that the y faces in 3D use indices reversed in
+       * terms of the lexicographic numbers due to the orientation of the
+       * coordinate system.)
        *
        * @note This object is only filled in case @p nodal_at_cell_boundaries
        * evaluates to @p true.
@@ -274,15 +295,39 @@ namespace internal
       dealii::Table<2,unsigned int> face_to_cell_index_nodal;
 
       /**
-       * For Hermite-type basis functions, the @p face_to_cell_index_nodal for
-       * the values on a face of the cell is used together with a respective
-       * slot in the derivative. In the lexicographic ordering, this index is
-       * in the next "layer" of degrees of freedom. This array stores the
-       * indirect addressing of both the values and the gradient.
+       * The @p face_to_cell_index_nodal provides a shortcut for the
+       * evaluation of values on the faces. For Hermite-type basis functions,
+       * one can go one step further and also use shortcuts to get derivatives
+       * more cheaply where only two layers of degrees of freedom contribute
+       * to the derivative on the face. In the lexicographic ordering, the
+       * respective indices is in the next "layer" of degrees of freedom as
+       * compared to the nodal values. This array stores the indirect
+       * addressing of both the values and the gradient.
        *
        * The first table index runs through the faces of a cell, and the
        * second runs through the pairs of the nodal degrees of freedom of the
        * face and the derivatives, using <code>2*dofs_per_face</code> entries.
+       *
+       * The indices stored in this member variable are as follows. Consider
+       * for example a 2D element of degree 3 with the following degrees of
+       * freedom in lexicographic numbering:
+       * @code
+       * 20   21   22   23   24
+       * 15   16   17   18   19
+       * 10   11   12   13   14
+       * 5    6     7    8    9
+       * 0    1     2    3    4
+       * @endcode
+       *
+       * The first row stores the indices for values and gradients on the face
+       * with index 0, i.e., the numbers <code>0, 1, 5, 6, 10, 11, 15, 16, 20,
+       * 21</code>, the second row holds the indices <code>4, 3, 9, 8, 14, 13,
+       * 19, 18, 24, 23</code> for face 1, the third row holds the indices
+       * <code>0, 5, 1, 6, 2, 7, 3, 8, 4, 9</code> for face 2, and the last
+       * (fourth) row holds the indices <code>20, 15, 21, 16, 22, 17, 23, 18,
+       * 24, 19</code>. Similarly, the indices are stored in 3D. (Note that
+       * the y faces in 3D use indices reversed in terms of the lexicographic
+       * numbers due to the orientation of the coordinate system.)
        *
        * @note This object is only filled in case @p element_type evaluates to
        * @p tensor_symmetric_hermite.
