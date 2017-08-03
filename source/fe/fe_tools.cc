@@ -2917,13 +2917,10 @@ namespace FETools
   void
   hierarchic_to_lexicographic_numbering (unsigned int degree, std::vector<unsigned int> &h2l)
   {
-    // number of support points in each
-    // direction
+    // number of support points in each direction
     const unsigned int n = degree+1;
 
-    unsigned int dofs_per_cell = n;
-    for (unsigned int i=1; i<dim; ++i)
-      dofs_per_cell *= n;
+    const unsigned int dofs_per_cell = Utilities::fixed_power<dim>(n);
 
     // Assert size maches degree
     AssertDimension (h2l.size(), dofs_per_cell);
