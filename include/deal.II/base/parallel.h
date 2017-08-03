@@ -718,9 +718,9 @@ namespace parallel
        */
       ~TBBPartitioner()
       {
-        Assert(in_use == false,
-               ExcInternalError("A vector partitioner goes out of scope, but "
-                                "it appears to be still in use."));
+        AssertNothrow(in_use == false,
+                      ExcInternalError("A vector partitioner goes out of scope, but "
+                                       "it appears to be still in use."));
       }
 
       /**
