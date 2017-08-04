@@ -1503,7 +1503,28 @@ public:
   typedef TriaIterator      <TriaAccessor<dim-1, dim, spacedim> > face_iterator;
   typedef TriaActiveIterator<TriaAccessor<dim-1, dim, spacedim> > active_face_iterator;
 
+  /**
+   * A typedef that defines an iterator type to iterate over
+   * vertices of a mesh.  The concept of iterators is discussed at
+   * length in the
+   * @ref Iterators "iterators documentation module".
+   *
+   * @ingroup Iterators
+   */
   typedef TriaIterator      <dealii::TriaAccessor<0, dim, spacedim> > vertex_iterator;
+
+  /**
+   * A typedef that defines an iterator type to iterate over
+   * vertices of a mesh.  The concept of iterators is discussed at
+   * length in the
+   * @ref Iterators "iterators documentation module".
+   *
+   * This typedef is in fact identical to the @p vertex_iterator typedef
+   * above since all vertices in a mesh are active (i.e., are a vertex of
+   * an active cell).
+   *
+   * @ingroup Iterators
+   */
   typedef TriaActiveIterator<dealii::TriaAccessor<0, dim, spacedim> > active_vertex_iterator;
 
   typedef typename IteratorSelector::line_iterator        line_iterator;
