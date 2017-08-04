@@ -1,0 +1,6 @@
+New: MappingQGeneric uses tensorized evaluation for maybe_update_Jacobians,
+maybe_compute_q_points and maybe_update_jacobian_grads in case
+the Quadrature object represents a tensor product of identical
+one-dimensional quadrature formulas.
+<br>
+(Daniel Arndt, 2017/08/04)
