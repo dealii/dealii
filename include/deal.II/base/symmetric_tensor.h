@@ -22,6 +22,10 @@
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
 
+#include <array>
+#include <algorithm>
+#include <functional>
+
 DEAL_II_NAMESPACE_OPEN
 
 template <int rank, int dim, typename Number=double> class SymmetricTensor;
@@ -2318,6 +2322,431 @@ Number second_invariant (const SymmetricTensor<2,3,Number> &t)
           - t[0][1]*t[0][1] - t[0][2]*t[0][2] - t[1][2]*t[1][2]);
 }
 
+
+
+/**
+ * Return the eigenvalues of a symmetric 1x1 tensor of rank 2.
+ * The (single) entry of the tensor is, of course, equal to the (single)
+ * eigenvalue.
+ *
+ * @relates SymmetricTensor
+ * @author Jean-Paul Pelteret, 2017
+ */
+template <typename Number>
+std::array<Number,1>
+eigenvalues (const SymmetricTensor<2,1,Number> &T);
+
+
+
+/**
+ * Return the eigenvalues of a symmetric 2x2 tensor of rank 2.
+ * The array of eigenvalues is sorted in descending order.
+ *
+ * For 2x2 tensors, the eigenvalues of tensor $T$ are the roots of
+ * <a href="https://en.wikipedia.org/wiki/Eigenvalue_algorithm#2.C3.972_matrices">the characteristic polynomial</a>
+ * $0 = \lambda^{2} - \lambda\textrm{tr}(T) + \textrm{det}(T)$
+ * as given by
+ * $\lambda = \frac{\textrm{tr}(T) \pm \sqrt{[\textrm{tr}(T)]^{2} - 4\textrm{det}(T)}}{2}$.
+ *
+ * @warning The algorithm employed here determines the eigenvalues by
+ * computing the roots of the characteristic polynomial. In the case that there
+ * exists a common root (the eigenvalues are equal), the computation is
+ * <a href="https://scicomp.stackexchange.com/q/23686">subject to round-off errors</a>
+ * of order $\sqrt{\epsilon}$.
+ * As an alternative, the eigenvectors() function provides a more robust, but costly,
+ * method to compute the eigenvalues of a symmetric tensor.
+ *
+ * @relates SymmetricTensor
+ * @author Jean-Paul Pelteret, 2017
+ */
+template <typename Number>
+std::array<Number,2>
+eigenvalues (const SymmetricTensor<2,2,Number> &T);
+
+
+
+/**
+ * Return the eigenvalues of a symmetric 3x3 tensor of rank 2.
+ * The array of eigenvalues is sorted in descending order.
+ *
+ * For 3x3 tensors, the eigenvalues of tensor $T$ are the roots of
+ * <a href="https://en.wikipedia.org/wiki/Eigenvalue_algorithm#3.C3.973_matrices">the characteristic polynomial</a>
+ * $0 = \lambda^{3} - \lambda^{2}\textrm{tr}(T) - \frac{1}{2} \lambda (\textrm{tr}(T^{2}) - [\textrm{tr}(T)]^{2}) - \textrm{det}(T)$.
+ *
+ * @warning The algorithm employed here determines the eigenvalues by
+ * computing the roots of the characteristic polynomial. In the case that there
+ * exists a common root (the eigenvalues are equal), the computation is
+ * <a href="https://scicomp.stackexchange.com/q/23686">subject to round-off errors</a>
+ * of order $\sqrt{\epsilon}$.
+ * As an alternative, the eigenvectors() function provides a more robust, but costly,
+ * method to compute the eigenvalues of a symmetric tensor.
+ *
+ * @relates SymmetricTensor
+ * @author Jean-Paul Pelteret, 2017
+ */
+template <typename Number>
+std::array<Number,3>
+eigenvalues (const SymmetricTensor<2,3,Number> &T);
+
+
+
+namespace internal
+{
+  /**
+   * A namespace for functions and classes that are internal to how the
+   * SymmetricTensor class (and its associate functions) works.
+   */
+  namespace SymmetricTensor
+  {
+    /**
+     * Tridiagonalize a rank-2 symmetric tensor using the Householder method.
+     * The specialized algorithm implemented here is given in
+     * @code{.bib}
+     * @Article{Kopp2008,
+     *   title        = {Efficient numerical diagonalization of hermitian 3x3 matrices},
+     *   author       = {Kopp, J.},
+     *   journal      = {International Journal of Modern Physics C},
+     *   year         = {2008},
+     *   volume       = {19},
+     *   number       = {3},
+     *   pages        = {523--548},
+     *   doi          = {10.1142/S0129183108012303},
+     *   eprinttype   = {arXiv},
+     *   eprint       = {physics/0610206v3},
+     *   eprintclass  = {physics.comp-ph},
+     *   url          = {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
+     * }
+     * @endcode
+     * and is based off of the generic algorithm presented in section 11.3.2 of
+     * @code{.bib}
+     * @Book{Press2007,
+     *   title        = {Numerical recipes 3rd edition: The art of scientific computing},
+     *   author       = {Press, W. H.},
+     *   journal      = {Cambridge university press},
+     *   year         = {2007}
+     * }
+     * @endcode
+     *
+     * @param[in]  A This tensor to be tridiagonalized
+     * @param[out] Q The orthogonal matrix effecting the transformation
+     * @param[out] d The diagonal elements of the tridiagonal matrix
+     * @param[out] e The off-diagonal elements of the tridiagonal matrix
+     *
+     * @author Joachim Kopp, Jean-Paul Pelteret, 2017
+     */
+    template <int dim, typename Number>
+    void
+    tridiagonalize (const dealii::SymmetricTensor<2,dim,Number> &A,
+                    dealii::Tensor<2,dim,Number>                &Q,
+                    std::array<Number,dim>                      &d,
+                    std::array<Number,dim-1>                    &e);
+
+
+
+    /**
+     * Compute the eigenvalues and eigenvectors of a real-valued rank-2
+     * symmetric tensor using the QL algorithm with implicit shifts.
+     * The specialized algorithm implemented here is given in
+     * @code{.bib}
+     * @Article{Kopp2008,
+     *   title        = {Efficient numerical diagonalization of hermitian 3x3 matrices},
+     *   author       = {Kopp, J.},
+     *   journal      = {International Journal of Modern Physics C},
+     *   year         = {2008},
+     *   volume       = {19},
+     *   number       = {3},
+     *   pages        = {523--548},
+     *   doi          = {10.1142/S0129183108012303},
+     *   eprinttype   = {arXiv},
+     *   eprint       = {physics/0610206v3},
+     *   eprintclass  = {physics.comp-ph},
+     *   url          = {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
+     * }
+     * @endcode
+     * and is based off of the generic algorithm presented in section 11.4.3 of
+     * @code{.bib}
+     * @Book{Press2007,
+     *   title        = {Numerical recipes 3rd edition: The art of scientific computing},
+     *   author       = {Press, W. H.},
+     *   journal      = {Cambridge university press},
+     *   year         = {2007}
+     * }
+     * @endcode
+     *
+     * @param[in] A The tensor of which the eigenvectors and eigenvalues are
+     * to be computed.
+     *
+     * @return An array containing the eigenvectors and the associated eigenvalues.
+     * The array is not sorted in any particular order.
+     *
+     * @author Joachim Kopp, Jean-Paul Pelteret, 2017
+     */
+    template <int dim, typename Number>
+    std::array<std::pair<Number, Tensor<1,dim,Number> >,dim>
+    ql_implicit_shifts (const dealii::SymmetricTensor<2,dim,Number> &A);
+
+
+
+    /**
+     * Compute the eigenvalues and eigenvectors of a real-valued rank-2
+     * symmetric tensor using the Jacobi algorithm.
+     * The specialized algorithm implemented here is given in
+     * @code{.bib}
+     * @Article{Kopp2008,
+     *   title        = {Efficient numerical diagonalization of hermitian 3x3 matrices},
+     *   author       = {Kopp, J.},
+     *   journal      = {International Journal of Modern Physics C},
+     *   year         = {2008},
+     *   volume       = {19},
+     *   number       = {3},
+     *   pages        = {523--548},
+     *   doi          = {10.1142/S0129183108012303},
+     *   eprinttype   = {arXiv},
+     *   eprint       = {physics/0610206v3},
+     *   eprintclass  = {physics.comp-ph},
+     *   url          = {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
+     * }
+     * @endcode
+     * and is based off of the generic algorithm presented in section 11.4.3 of
+     * @code{.bib}
+     * @Book{Press2007,
+     *   title        = {Numerical recipes 3rd edition: The art of scientific computing},
+     *   author       = {Press, W. H.},
+     *   journal      = {Cambridge university press},
+     *   year         = {2007}
+     * }
+     * @endcode
+     *
+     * @param[in] A The tensor of which the eigenvectors and eigenvalues are
+     * to be computed.
+     *
+     * @return An array containing the eigenvectors and the associated eigenvalues.
+     * The array is not sorted in any particular order.
+     *
+     * @author Joachim Kopp, Jean-Paul Pelteret, 2017
+     */
+    template <int dim, typename Number>
+    std::array<std::pair<Number, Tensor<1,dim,Number> >,dim>
+    jacobi (dealii::SymmetricTensor<2,dim,Number> A);
+
+
+
+    /**
+     * Compute the eigenvalues and eigenvectors of a real-valued rank-2
+     * symmetric 2x2 tensor using the characteristic equation to compute eigenvalues
+     * and an analytical approach based on the cross-product for the eigenvectors.
+     * If the computations are deemed too inaccurate then the method falls
+     * back to ql_implicit_shifts.
+     *
+     * @param[in] A The tensor of which the eigenvectors and eigenvalues are
+     * to be computed.
+     *
+     * @return An array containing the eigenvectors and the associated eigenvalues.
+     * The array is not sorted in any particular order.
+     *
+     * @author Joachim Kopp, Jean-Paul Pelteret, 2017
+     */
+    template <typename Number>
+    std::array<std::pair<Number, Tensor<1,2,Number> >,2>
+    hybrid (const dealii::SymmetricTensor<2,2,Number> &A);
+
+
+
+    /**
+     * Compute the eigenvalues and eigenvectors of a real-valued rank-2
+     * symmetric 3x3 tensor using the characteristic equation to compute eigenvalues
+     * and an analytical approach based on the cross-product for the eigenvectors.
+     * If the computations are deemed too inaccurate then the method falls
+     * back to ql_implicit_shifts.
+     * The specialized algorithm implemented here is given in
+     * @code{.bib}
+     * @Article{Kopp2008,
+     *   title        = {Efficient numerical diagonalization of hermitian 3x3 matrices},
+     *   author       = {Kopp, J.},
+     *   journal      = {International Journal of Modern Physics C},
+     *   year         = {2008},
+     *   volume       = {19},
+     *   number       = {3},
+     *   pages        = {523--548},
+     *   doi          = {10.1142/S0129183108012303},
+     *   eprinttype   = {arXiv},
+     *   eprint       = {physics/0610206v3},
+     *   eprintclass  = {physics.comp-ph},
+     *   url          = {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
+     * }
+     * @endcode
+     *
+     * @param[in] A The tensor of which the eigenvectors and eigenvalues are
+     * to be computed.
+     *
+     * @return An array containing the eigenvectors and the associated eigenvalues.
+     * The array is not sorted in any particular order.
+     *
+     * @author Joachim Kopp, Jean-Paul Pelteret, 2017
+     */
+    template <typename Number>
+    std::array<std::pair<Number, Tensor<1,3,Number> >,3>
+    hybrid (const dealii::SymmetricTensor<2,3,Number> &A);
+
+    namespace
+    {
+
+      /**
+       * A struct that is used to sort arrays of pairs of eign=envalues and
+       * eigenvectors. Sorting is performed in in descending order of eigenvalue.
+       */
+      template<int dim, typename Number>
+      struct SortEigenValuesVectors
+      {
+        typedef std::pair<Number, Tensor<1,dim,Number> > EigValsVecs;
+        bool operator() (const EigValsVecs &lhs,
+                         const EigValsVecs &rhs)
+        {
+          return lhs.first > rhs.first;
+        }
+      };
+
+    }
+
+  } // namespace SymmetricTensor
+
+} // namespace internal
+
+
+
+// The line below is to ensure that doxygen puts the full description
+// of this global enumeration into the documentation
+// See https://stackoverflow.com/a/1717984
+/** @file */
+/**
+ * An enumeration for the algorithm to be employed when performing
+ * the computation of normalized eigenvectors and their corresponding
+ * eigenvalues by the eigenvalues() and eigenvectors() methods operating on
+ * SymmetricTensor objects.
+ *
+ * The specialized algorithms utilized in computing the eigenvectors are
+ * presented in
+ * @code{.bib}
+ * @Article{Kopp2008,
+ *   title        = {Efficient numerical diagonalization of hermitian 3x3 matrices},
+ *   author       = {Kopp, J.},
+ *   journal      = {International Journal of Modern Physics C},
+ *   year         = {2008},
+ *   volume       = {19},
+ *   number       = {3},
+ *   pages        = {523--548},
+ *   doi          = {10.1142/S0129183108012303},
+ *   eprinttype   = {arXiv},
+ *   eprint       = {physics/0610206v3},
+ *   eprintclass  = {physics.comp-ph},
+ *   url          = {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
+ * }
+ * @endcode
+ */
+enum struct SymmetricTensorEigenvectorMethod
+{
+  /**
+   * A hybrid approach that preferentially uses the characteristic equation to
+   * compute eigenvalues and an analytical approach based on the cross-product
+   * for the eigenvectors. If the computations are deemed too inaccurate then
+   * the method falls back to ql_implicit_shifts.
+   *
+   * This method potentially offers the quickest computation if the pathological
+   * case is not encountered.
+   */
+  hybrid,
+  /**
+   * The iterative QL algorithm with implicit shifts applied after
+   * tridiagonalisation of the tensor using the householder method.
+   *
+   * This method offers a compromise between speed of computation and its
+   * robustness. This method is particularly useful when the elements
+   * of $T$ have greatly varying magnitudes, which would typically lead to a
+   * loss of accuracy when computing the smaller eigenvalues.
+   */
+  ql_implicit_shifts,
+  /**
+   * The iterative Jacobi algorithm.
+   *
+   * This method offers is the most robust of the available options, with
+   * reliable results obtained for even the most pathological cases. It is,
+   * however, the slowest algorithm of all of those implemented.
+   */
+  jacobi
+};
+
+
+
+/**
+ * Return the eigenvalues and eigenvectors of a symmetric 1x1 tensor of rank 2.
+ *
+ * @relates SymmetricTensor
+ * @author Jean-Paul Pelteret, 2017
+ */
+template <typename Number>
+std::array<std::pair<Number, Tensor<1,1,Number> >,1>
+eigenvectors (const SymmetricTensor<2,1,Number>           &T,
+              const enum SymmetricTensorEigenvectorMethod /*method*/ = SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
+{
+  return { {std::make_pair(T[0][0], Tensor<1,1,Number>({1.0}))} };
+}
+
+
+
+/**
+ * Return the eigenvalues and eigenvectors of a real-valued rank-2 symmetric
+ * tensor $T$. The array of matched eigenvalue and eigenvector pairs is sorted
+ * in descending order (determined by the eigenvalues).
+ *
+ * The specialized algorithms utilized in computing the eigenvectors are
+ * presented in
+ * @code{.bib}
+ * @Article{Kopp2008,
+ *   title        = {Efficient numerical diagonalization of hermitian 3x3 matrices},
+ *   author       = {Kopp, J.},
+ *   journal      = {International Journal of Modern Physics C},
+ *   year         = {2008},
+ *   volume       = {19},
+ *   number       = {3},
+ *   pages        = {523--548},
+ *   doi          = {10.1142/S0129183108012303},
+ *   eprinttype   = {arXiv},
+ *   eprint       = {physics/0610206v3},
+ *   eprintclass  = {physics.comp-ph},
+ *   url          = {https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html}
+ * }
+ * @endcode
+ *
+ * @relates SymmetricTensor
+ * @author Joachim Kopp, Jean-Paul Pelteret, 2017
+ */
+template <int dim, typename Number>
+std::array<std::pair<Number, Tensor<1,dim,Number> >,dim>
+eigenvectors (const SymmetricTensor<2,dim,Number>         &T,
+              const enum SymmetricTensorEigenvectorMethod  method = SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
+{
+  std::array<std::pair<Number, Tensor<1,dim,Number> >,dim> eig_vals_vecs;
+
+  switch (method)
+    {
+    case SymmetricTensorEigenvectorMethod::hybrid:
+      eig_vals_vecs = internal::SymmetricTensor::hybrid(T);
+      break;
+    case SymmetricTensorEigenvectorMethod::ql_implicit_shifts:
+      eig_vals_vecs = internal::SymmetricTensor::ql_implicit_shifts(T);
+      break;
+    case SymmetricTensorEigenvectorMethod::jacobi:
+      eig_vals_vecs = internal::SymmetricTensor::jacobi(T);
+      break;
+    default:
+      AssertThrow(false, ExcNotImplemented());
+    }
+
+  // Sort in descending order before output.
+  std::sort(eig_vals_vecs.begin(), eig_vals_vecs.end(),
+            internal::SymmetricTensor::SortEigenValuesVectors<dim,Number>());
+  return eig_vals_vecs;
+}
 
 
 

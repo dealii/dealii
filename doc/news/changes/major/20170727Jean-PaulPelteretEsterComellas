@@ -1,0 +1,4 @@
+New: The eigenvalues of a rank-2 symmetric tensor can now be computed using an
+analytical approach via the eigenvalues() function.
+<br>
+(Jean-Paul Pelteret, Ester Comellas, 2017/07/27)
