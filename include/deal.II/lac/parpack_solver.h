@@ -108,10 +108,17 @@ extern "C" {
  * eigenvector/eigenvalue pairs to solve for. Here, <code>lambda</code> is a
  * vector that will contain the eigenvalues computed, <code>x</code> a vector
  * of objects of type <code>V</code> that will contain the eigenvectors
- * computed. <code>OP</code> is an inverse operation for the matrix <code>A -
+ * computed.
+ *
+ * Currently, only three modes of (P)Arpack are implemented. In mode 3 (default),
+ * <code>OP</code> is an inverse operation for the matrix <code>A -
  * sigma * B</code>, where <code> sigma </code> is a shift value, set to zero
- * by default. Note that (P)Arpack supports other transformations, but currently
- * this class implements only shift-and-invert mode.
+ * by default. Whereas in mode 2, <code>OP</code> is an inverse of <code>M</code>.
+ * Finally, mode 1 corresponds to standard eigenvalue problem without
+ * spectral transformation $Ax=\lambda x$.
+ * The mode can be specified via AdditionalData object. Note that for
+ * shift-and-invert (mode=3), the sought eigenpairs are those after the
+ * spectral transformation is applied.
  *
  * The <code>OP</code> can be specified by using a LinearOperator:
  * @code
@@ -125,9 +132,6 @@ extern "C" {
  *   const auto op_shift_invert = inverse_operator(op_shift, cg, PreconditionIdentity ());
  * @endcode
  *
- * Through the AdditionalData the user can specify some of the parameters to
- * be set.
- *
  * The class is intended to be used with MPI and can work on arbitrary vector
  * and matrix distributed classes.  Both symmetric and non-symmetric
  * <code>A</code> are supported.
@@ -137,7 +141,7 @@ extern "C" {
  * also how to set the parameters appropriately please take a look into the
  * PARPACK manual.
  *
- * @author Denis Davydov, 2015.
+ * @author Denis Davydov, 2015, 2017
  */
 template <typename VectorType>
 class PArpackSolver : public Subscriptor
@@ -261,10 +265,12 @@ public:
     const unsigned int number_of_arnoldi_vectors;
     const WhichEigenvalues eigenvalue_of_interest;
     const bool symmetric;
+    const int mode;
     AdditionalData(
       const unsigned int number_of_arnoldi_vectors = 15,
       const WhichEigenvalues eigenvalue_of_interest = largest_magnitude,
-      const bool symmetric = false);
+      const bool symmetric = false,
+      const int mode = 3);
   };
 
   /**
@@ -307,6 +313,9 @@ public:
    * Set shift @p sigma for shift-and-invert spectral transformation.
    *
    * If this function is not called, the shift is assumed to be zero.
+   *
+   * @note only relevant for <code>mode=3</code> (see the general documentation of this
+   * class for a definition of what the different modes are).
    */
   void set_shift(const std::complex<double> sigma);
 
@@ -314,6 +323,10 @@ public:
    * Solve the generalized eigensprectrum problem $A x=\lambda B x$ by calling
    * the <code>pd(n/s)eupd</code> and <code>pd(n/s)aupd</code> functions of
    * PARPACK.
+   *
+   * In <code>mode=3</code>, @p inverse should correspond to $[A-\sigma B]^{-1}$,
+   * whereas in <code>mode=2</code> it should represent $B^{-1}$. For
+   * <code>mode=1</code> both @p B and @p inverse are ignored.
    */
   template <typename MatrixType1,
             typename MatrixType2, typename INVERSE>
@@ -537,11 +550,13 @@ template <typename VectorType>
 PArpackSolver<VectorType>::AdditionalData::
 AdditionalData (const unsigned int     number_of_arnoldi_vectors,
                 const WhichEigenvalues eigenvalue_of_interest,
-                const bool             symmetric)
+                const bool             symmetric,
+                const int              mode)
   :
   number_of_arnoldi_vectors(number_of_arnoldi_vectors),
   eigenvalue_of_interest(eigenvalue_of_interest),
-  symmetric(symmetric)
+  symmetric(symmetric),
+  mode(mode)
 {
   //Check for possible options for symmetric problems
   if (symmetric)
@@ -555,6 +570,8 @@ AdditionalData (const unsigned int     number_of_arnoldi_vectors,
       Assert(eigenvalue_of_interest!=smallest_imaginary_part,
              ExcMessage("'smallest imaginary part' can only be used for non-symmetric problems!"));
     }
+  Assert (mode >= 1 && mode <= 3,
+          ExcMessage("Currently, only modes 1, 2 and 3 are supported."));
 }
 
 template <typename VectorType>
@@ -676,7 +693,7 @@ void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs,
 template <typename VectorType>
 template <typename MatrixType1,typename MatrixType2, typename INVERSE>
 void PArpackSolver<VectorType>::solve
-(const MatrixType1                  &/*system_matrix*/,
+(const MatrixType1                  &system_matrix,
  const MatrixType2                  &mass_matrix,
  const INVERSE                      &inverse,
  std::vector<std::complex<double> > &eigenvalues,
@@ -709,11 +726,8 @@ void PArpackSolver<VectorType>::solve
   Assert (additional_data.number_of_arnoldi_vectors > 2*n_eigenvalues+1,
           PArpackExcSmallNumberofArnoldiVectors(
             additional_data.number_of_arnoldi_vectors, n_eigenvalues));
-  // ARPACK mode for dnaupd, here only
-  //  Mode 3:  K*x = lambda*M*x, K symmetric, M symmetric positive semi-definite
-  //c           ===> OP = (inv[K - sigma*M])*M  and  B = M.
-  //c           ===> Shift-and-Invert mode
-  int mode = 3;
+
+  int mode = additional_data.mode;
 
   // reverse communication parameter
   // must be zero on the first call to pdnaupd
@@ -721,7 +735,9 @@ void PArpackSolver<VectorType>::solve
 
   // 'G' generalized eigenvalue problem
   // 'I' standard eigenvalue problem
-  char bmat[2] = "G";
+  char bmat[2];
+  bmat[0] = (mode == 1 ) ? 'I' : 'G';
+  bmat[1] = '\0';
 
   // Specify the eigenvalues of interest, possible parameters:
   // "LA" algebraically largest
@@ -781,9 +797,9 @@ void PArpackSolver<VectorType>::solve
   iparam[3] = 1;
 
   // Sets the mode of dsaupd:
-  // 1 is exact shifting,
-  // 2 is user-supplied shifts,
-  // 3 is shift-invert mode,
+  // 1 is A*x=lambda*x, OP = A, B = I
+  // 2 is A*x = lambda*M*x, OP = inv[M]*A, B = M
+  // 3 is shift-invert mode, OP = inv[A-sigma*M]*M, B = M
   // 4 is buckling mode,
   // 5 is Cayley mode.
 
@@ -815,191 +831,156 @@ void PArpackSolver<VectorType>::solve
                  &resid[0], &ncv, &v[0], &ldv, &iparam[0], &ipntr[0],
                  &workd[0], &workl[0], &lworkl, &info);
 
+      AssertThrow (info == 0, PArpackExcInfoPdnaupd(info));
+
+      // if we converge, we shall not modify anything in work arrays!
       if (ido == 99)
         break;
 
-      switch (mode)
-        {
-//        OP = (inv[K - sigma*M])*M
-        case 3:
-        {
-          switch (ido)
-            {
-            case -1:
-              // compute  Y = OP * X  where
-              // IPNTR(1) is the pointer into WORKD for X,
-              // IPNTR(2) is the pointer into WORKD for Y.
-            {
-              const int shift_x = ipntr[0]-1;
-              const int shift_y = ipntr[1]-1;
-              Assert (shift_x>=0, dealii::ExcInternalError() );
-              Assert (shift_x+nloc <= (int)workd.size(), dealii::ExcInternalError() );
-              Assert (shift_y>=0, dealii::ExcInternalError() );
-              Assert (shift_y+nloc <= (int)workd.size(), dealii::ExcInternalError() );
+      // IPNTR(1) is the pointer into WORKD for X,
+      // IPNTR(2) is the pointer into WORKD for Y.
+      const int shift_x = ipntr[0]-1;
+      const int shift_y = ipntr[1]-1;
+      Assert (shift_x>=0, dealii::ExcInternalError() );
+      Assert (shift_x+nloc <= (int)workd.size(), dealii::ExcInternalError() );
+      Assert (shift_y>=0, dealii::ExcInternalError() );
+      Assert (shift_y+nloc <= (int)workd.size(), dealii::ExcInternalError() );
 
-              src = 0.0;
-              src.add (nloc,
-                       &local_indices[0],
-                       &workd[0]+shift_x );
-              src.compress (VectorOperation::add);
+      src = 0.;
 
-              // multiplication with mass matrix M
+      // switch based on both ido and mode
+      if ((ido == -1) ||
+          (ido == 1 && mode<3))
+        // compute  Y = OP * X
+        {
+          src.add (nloc,
+                   &local_indices[0],
+                   &workd[0]+shift_x );
+          src.compress (VectorOperation::add);
+
+          if (mode == 3)
+            // OP = inv[K - sigma*M]*M
+            {
               mass_matrix.vmult(tmp, src);
-              // solving linear system
               inverse.vmult(dst,tmp);
-
-              // store the result
-              dst.extract_subvector_to (local_indices.begin(),
-                                        local_indices.end(),
-                                        &workd[0]+shift_y  );
             }
-            break;
-
-            case  1:
-              // compute  Y = OP * X where
-              // IPNTR(1) is the pointer into WORKD for X,
-              // IPNTR(2) is the pointer into WORKD for Y.
-              // In mode 3,4 and 5, the vector B * X is already
-              // available in WORKD(ipntr(3)).  It does not
-              // need to be recomputed in forming OP * X.
+          else if (mode == 2)
+            // OP = inv[M]*K
             {
-              const int shift_x   = ipntr[0]-1;
-              const int shift_y   = ipntr[1]-1;
-              const int shift_b_x = ipntr[2]-1;
-
-              Assert (shift_x>=0, dealii::ExcInternalError() );
-              Assert (shift_x+nloc <= (int)workd.size(), dealii::ExcInternalError() );
-              Assert (shift_y>=0, dealii::ExcInternalError() );
-              Assert (shift_y+nloc <= (int)workd.size(), dealii::ExcInternalError() );
-              Assert (shift_b_x>=0, dealii::ExcInternalError() );
-              Assert (shift_b_x+nloc <= (int)workd.size(), dealii::ExcInternalError() );
-              Assert (shift_y>=0, dealii::ExcInternalError() );
-              Assert (shift_y+nloc <= (int)workd.size(), dealii::ExcInternalError() );
-
-              src = 0.0; // B*X
-              src.add (nloc,
-                       &local_indices[0],
-                       &workd[0]+shift_b_x );
-
-              tmp = 0.0; // X
-              tmp.add (nloc,
-                       &local_indices[0],
-                       &workd[0]+shift_x);
-
-              src.compress (VectorOperation::add);
-              tmp.compress (VectorOperation::add);
-
-              // solving linear system
-              inverse.vmult(dst,src);
-
-              // store the result
-              dst.extract_subvector_to (local_indices.begin(),
+              system_matrix.vmult(tmp, src);
+              // store M*X in X
+              tmp.extract_subvector_to (local_indices.begin(),
                                         local_indices.end(),
-                                        &workd[0]+shift_y  );
-
+                                        &workd[0]+shift_x);
+              inverse.vmult(dst,tmp);
             }
-            break;
-
-            case  2:
-              // compute  Y = B * X  where
-              // IPNTR(1) is the pointer into WORKD for X,
-              // IPNTR(2) is the pointer into WORKD for Y.
+          else if (mode == 1)
             {
+              system_matrix.vmult(dst, src);
+            }
+          else
+            AssertThrow (false, PArpackExcMode(mode));
 
-              const int shift_x = ipntr[0]-1;
-              const int shift_y = ipntr[1]-1;
-              Assert (shift_x>=0, dealii::ExcInternalError() );
-              Assert (shift_x+nloc <= (int)workd.size(), dealii::ExcInternalError() );
-              Assert (shift_y>=0, dealii::ExcInternalError() );
-              Assert (shift_y+nloc <= (int)workd.size(), dealii::ExcInternalError() );
+        }
+      else if (ido == 1 && mode >= 3)
+        // compute  Y = OP * X for mode 3, 4 and 5, where
+        // the vector B * X is already available in WORKD(ipntr(3)).
+        {
+          const int shift_b_x = ipntr[2]-1;
+          Assert (shift_b_x>=0, dealii::ExcInternalError() );
+          Assert (shift_b_x+nloc <= (int)workd.size(), dealii::ExcInternalError() );
 
-              src = 0.0;
-              src.add (nloc,
-                       &local_indices[0],
-                       &workd[0]+shift_x );
-              src.compress (VectorOperation::add);
+          // B*X
+          src.add (nloc,
+                   &local_indices[0],
+                   &workd[0]+shift_b_x );
+          src.compress (VectorOperation::add);
 
-              // Multiplication with mass matrix M
+          // solving linear system
+          Assert (mode == 3, ExcNotImplemented());
+          inverse.vmult(dst,src);
+        }
+      else if (ido == 2)
+        // compute  Y = B * X
+        {
+          src.add (nloc,
+                   &local_indices[0],
+                   &workd[0]+shift_x );
+          src.compress (VectorOperation::add);
+
+          // Multiplication with mass matrix M
+          if (mode == 1)
+            {
+              dst = src;
+            }
+          else
+            // mode 2,3 and 5 have B=M
+            {
               mass_matrix.vmult(dst, src);
-
-              // store the result
-              dst.extract_subvector_to (local_indices.begin(),
-                                        local_indices.end(),
-                                        &workd[0]+shift_y);
-
-            }
-            break;
-
-            default:
-              AssertThrow (false, PArpackExcIdo(ido));
-              break;
             }
         }
-        break;
-        default:
-          AssertThrow (false, PArpackExcMode(mode));
-          break;
-        }
-    }
-
-  if (info<0)
-    {
-      AssertThrow (false, PArpackExcInfoPdnaupd(info));
-    }
-  else
-    {
-      // 1 - compute eigenvectors,
-      // 0 - only eigenvalues
-      int rvec = 1;
-
-      // which eigenvectors
-      char howmany[4] = "All";
-
-      std::vector<double> eigenvalues_real (n_eigenvalues+1, 0.);
-      std::vector<double> eigenvalues_im (n_eigenvalues+1, 0.);
-
-      // call of ARPACK pdneupd routine
-      if (additional_data.symmetric)
-        pdseupd_(&mpi_communicator_fortran, &rvec, howmany, &select[0], &eigenvalues_real[0],
-                 &z[0], &ldz, &sigmar,
-                 bmat, &n_inside_arpack, which, &nev, &tol,
-                 &resid[0], &ncv, &v[0], &ldv,
-                 &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
       else
-        pdneupd_(&mpi_communicator_fortran, &rvec, howmany, &select[0], &eigenvalues_real[0],
-                 &eigenvalues_im[0], &v[0], &ldz, &sigmar, &sigmai,
-                 &workev[0], bmat, &n_inside_arpack, which, &nev, &tol,
-                 &resid[0], &ncv, &v[0], &ldv,
-                 &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
+        AssertThrow (false, PArpackExcIdo(ido));
+      // Note: IDO = 3 does not appear to be required for currently
+      // implemented modes
 
-      if (info == 1)
-        {
-          AssertThrow (false, PArpackExcInfoMaxIt(control().max_steps()));
-        }
-      else if (info == 3)
-        {
-          AssertThrow (false, PArpackExcNoShifts(1));
-        }
-      else if (info!=0)
-        {
-          AssertThrow (false, PArpackExcInfoPdneupd(info));
-        }
+      // store the result
+      dst.extract_subvector_to (local_indices.begin(),
+                                local_indices.end(),
+                                &workd[0]+shift_y);
+    } // end of pd*aupd_ loop
 
-      for (int i=0; i<nev; ++i)
-        {
-          eigenvectors[i] = 0.0;
-          Assert (i*nloc + nloc <= (int)v.size(), dealii::ExcInternalError() );
+  // 1 - compute eigenvectors,
+  // 0 - only eigenvalues
+  int rvec = 1;
 
-          eigenvectors[i].add (nloc,
-                               &local_indices[0],
-                               &v[i*nloc] );
-          eigenvectors[i].compress (VectorOperation::add);
-        }
+  // which eigenvectors
+  char howmany[4] = "All";
 
-      for (size_type i=0; i<n_eigenvalues; ++i)
-        eigenvalues[i] = std::complex<double> (eigenvalues_real[i],
-                                               eigenvalues_im[i]);
+  std::vector<double> eigenvalues_real (n_eigenvalues+1, 0.);
+  std::vector<double> eigenvalues_im (n_eigenvalues+1, 0.);
+
+  // call of ARPACK pdneupd routine
+  if (additional_data.symmetric)
+    pdseupd_(&mpi_communicator_fortran, &rvec, howmany, &select[0], &eigenvalues_real[0],
+             &z[0], &ldz, &sigmar,
+             bmat, &n_inside_arpack, which, &nev, &tol,
+             &resid[0], &ncv, &v[0], &ldv,
+             &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
+  else
+    pdneupd_(&mpi_communicator_fortran, &rvec, howmany, &select[0], &eigenvalues_real[0],
+             &eigenvalues_im[0], &v[0], &ldz, &sigmar, &sigmai,
+             &workev[0], bmat, &n_inside_arpack, which, &nev, &tol,
+             &resid[0], &ncv, &v[0], &ldv,
+             &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
+
+  if (info == 1)
+    {
+      AssertThrow (false, PArpackExcInfoMaxIt(control().max_steps()));
     }
+  else if (info == 3)
+    {
+      AssertThrow (false, PArpackExcNoShifts(1));
+    }
+  else if (info!=0)
+    {
+      AssertThrow (false, PArpackExcInfoPdneupd(info));
+    }
+
+  for (int i=0; i<nev; ++i)
+    {
+      eigenvectors[i] = 0.0;
+      Assert (i*nloc + nloc <= (int)v.size(), dealii::ExcInternalError() );
+
+      eigenvectors[i].add (nloc,
+                           &local_indices[0],
+                           &v[i*nloc] );
+      eigenvectors[i].compress (VectorOperation::add);
+    }
+
+  for (size_type i=0; i<n_eigenvalues; ++i)
+    eigenvalues[i] = std::complex<double> (eigenvalues_real[i],
+                                           eigenvalues_im[i]);
 
   // Throw an error if the solver did not converge.
   AssertThrow (iparam[4] >= (int)n_eigenvalues,
