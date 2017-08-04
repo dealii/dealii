@@ -655,7 +655,7 @@ public:
    * Pointer to the @p ith vertex bounding this object. Throw an exception if
    * <code>dim=1</code>.
    */
-  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
+  TriaIterator<TriaAccessor<0,dim,spacedim> >
   vertex_iterator (const unsigned int i) const;
 
   /**

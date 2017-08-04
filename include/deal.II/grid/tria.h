@@ -1503,8 +1503,8 @@ public:
   typedef TriaIterator      <TriaAccessor<dim-1, dim, spacedim> > face_iterator;
   typedef TriaActiveIterator<TriaAccessor<dim-1, dim, spacedim> > active_face_iterator;
 
-  typedef typename IteratorSelector::vertex_iterator        vertex_iterator;
-  typedef typename IteratorSelector::active_vertex_iterator active_vertex_iterator;
+  typedef TriaIterator      <dealii::TriaAccessor<0, dim, spacedim> > vertex_iterator;
+  typedef TriaActiveIterator<dealii::TriaAccessor<0, dim, spacedim> > active_vertex_iterator;
 
   typedef typename IteratorSelector::line_iterator        line_iterator;
   typedef typename IteratorSelector::active_line_iterator active_line_iterator;
@@ -3245,12 +3245,12 @@ private:
    * Since users should never have to access these internal properties of how
    * we store data, these iterator types are made private.
    */
-  typedef TriaRawIterator   <CellAccessor<dim,spacedim>         > raw_cell_iterator;
-  typedef TriaRawIterator   <TriaAccessor<dim-1, dim, spacedim> > raw_face_iterator;
-  typedef typename IteratorSelector::raw_vertex_iterator          raw_vertex_iterator;
-  typedef typename IteratorSelector::raw_line_iterator            raw_line_iterator;
-  typedef typename IteratorSelector::raw_quad_iterator            raw_quad_iterator;
-  typedef typename IteratorSelector::raw_hex_iterator             raw_hex_iterator;
+  typedef TriaRawIterator<CellAccessor<dim,spacedim>         >     raw_cell_iterator;
+  typedef TriaRawIterator<TriaAccessor<dim-1, dim, spacedim> >     raw_face_iterator;
+  typedef TriaRawIterator<dealii::TriaAccessor<0, dim, spacedim> > raw_vertex_iterator;
+  typedef typename IteratorSelector::raw_line_iterator             raw_line_iterator;
+  typedef typename IteratorSelector::raw_quad_iterator             raw_quad_iterator;
+  typedef typename IteratorSelector::raw_hex_iterator              raw_hex_iterator;
 
   /**
    * Iterator to the first cell, used or not, on level @p level. If a level

@@ -1189,11 +1189,10 @@ TriaAccessor<structdim,dim,spacedim>::used () const
 
 template <int structdim, int dim, int spacedim>
 inline
-typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
+TriaIterator<TriaAccessor<0,dim,spacedim> >
 TriaAccessor<structdim,dim,spacedim>::vertex_iterator (const unsigned int i) const
 {
-  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::vertex_iterator
-         (this->tria, 0, vertex_index (i));
+  return TriaIterator<TriaAccessor<0,dim,spacedim> >(this->tria, 0, vertex_index (i));
 }
 
 
