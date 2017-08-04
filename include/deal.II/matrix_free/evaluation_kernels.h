@@ -376,7 +376,8 @@ namespace internal
                                    : (Eval::dofs_per_cell > Eval::n_q_points ?
                                       Eval::dofs_per_cell : Eval::n_q_points);
     const unsigned int max_stack_size = 100;
-    VectorizedArray<Number>  temp_data[(temp_size > 0 && temp_size < max_stack_size) ? 2*temp_size : 1];
+    AlignedVector<VectorizedArray<Number>>  temp_data;
+    temp_data.resize_fast((temp_size > 0 && temp_size < max_stack_size) ? 2*temp_size : 1);
     VectorizedArray<Number> *temp1;
     VectorizedArray<Number> *temp2;
     if (temp_size == 0)

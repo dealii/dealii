@@ -30,6 +30,7 @@
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/evaluation_kernels.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
+#include <deal.II/matrix_free/evaluation_selector.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -5338,66 +5339,10 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   Assert(this->matrix_info != nullptr ||
          this->mapped_geometry->is_initialized(), ExcNotInitialized());
 
-  // Run time selection of algorithm matching the element type. Since some
-  // template combinations do not work for fe_degree==-1, create safe template
-  // values for the calls below.
-  const unsigned int fe_degree_nonnegative = fe_degree != -1 ? fe_degree : 0;
-  const unsigned int n_q_points_1d_positive = n_q_points_1d > 0 ? n_q_points_1d : 1;
-  const unsigned int n_q_points_1d_adjusted = fe_degree == -1 ? 0 : n_q_points_1d;
-  if (fe_degree >= 0 &&
-      fe_degree+1 == n_q_points_1d &&
-      this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_collocation)
-    {
-      internal::FEEvaluationImplCollocation<dim, fe_degree_nonnegative, n_components_, Number>
-      ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
-                 this->gradients_quad, this->hessians_quad, this->scratch_data,
-                 evaluate_values, evaluate_gradients, evaluate_hessians);
-    }
-  else if (fe_degree >= 0 &&
-           fe_degree+1 == n_q_points_1d &&
-           this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric)
-    {
-      internal::FEEvaluationImplTransformToCollocation<dim, fe_degree_nonnegative, n_components_, Number>
-      ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
-                 this->gradients_quad, this->hessians_quad, this->scratch_data,
-                 evaluate_values, evaluate_gradients, evaluate_hessians);
-    }
-  else if (fe_degree >= 0 &&
-           this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric)
-    {
-      internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric,
-               dim, fe_degree_nonnegative, n_q_points_1d_positive, n_components_, Number>
-               ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
-                          this->gradients_quad, this->hessians_quad, this->scratch_data,
-                          evaluate_values, evaluate_gradients, evaluate_hessians);
-    }
-  else if (this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
-    {
-      internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-               dim, fe_degree, n_q_points_1d_adjusted, n_components_, Number>
-               ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
-                          this->gradients_quad, this->hessians_quad, this->scratch_data,
-                          evaluate_values, evaluate_gradients, evaluate_hessians);
-    }
-  else if (this->data->element_type == internal::MatrixFreeFunctions::truncated_tensor)
-    {
-      internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
-               dim, fe_degree, n_q_points_1d_adjusted, n_components_, Number>
-               ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
-                          this->gradients_quad, this->hessians_quad, this->scratch_data,
-                          evaluate_values, evaluate_gradients, evaluate_hessians);
-    }
-  else if (fe_degree == -1 ||
-           this->data->element_type == internal::MatrixFreeFunctions::tensor_general)
-    {
-      internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-               dim, fe_degree, n_q_points_1d_adjusted, n_components_, Number>
-               ::evaluate(*this->data, &this->values_dofs[0], this->values_quad,
-                          this->gradients_quad, this->hessians_quad, this->scratch_data,
-                          evaluate_values, evaluate_gradients, evaluate_hessians);
-    }
-  else
-    AssertThrow(false, ExcNotImplemented());
+  SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>
+  ::evaluate (*this->data, &this->values_dofs[0], this->values_quad,
+              this->gradients_quad, this->hessians_quad, this->scratch_data,
+              evaluate_values, evaluate_gradients, evaluate_hessians);
 
 #ifdef DEBUG
   if (evaluate_values == true)
@@ -5428,66 +5373,10 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   Assert(this->matrix_info != nullptr ||
          this->mapped_geometry->is_initialized(), ExcNotInitialized());
 
-  // Run time selection of algorithm matching the element type. Since some
-  // template combinations do not work for fe_degree==-1, create safe template
-  // values for the calls below.
-  const unsigned int fe_degree_nonnegative = fe_degree != -1 ? fe_degree : 0;
-  const unsigned int n_q_points_1d_positive = n_q_points_1d > 0 ? n_q_points_1d : 1;
-  const unsigned int n_q_points_1d_adjusted = fe_degree == -1 ? 0 : n_q_points_1d;
-  if (fe_degree >= 0 &&
-      fe_degree+1 == n_q_points_1d &&
-      this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_collocation)
-    {
-      internal::FEEvaluationImplCollocation<dim, fe_degree_nonnegative, n_components_, Number>
-      ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
-                  this->gradients_quad, this->scratch_data,
-                  integrate_values, integrate_gradients);
-    }
-  else if (fe_degree >= 0 &&
-           fe_degree+1 == n_q_points_1d &&
-           this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric)
-    {
-      internal::FEEvaluationImplTransformToCollocation<dim, fe_degree_nonnegative, n_components_, Number>
-      ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
-                  this->gradients_quad, this->scratch_data,
-                  integrate_values, integrate_gradients);
-    }
-  else if (fe_degree >= 0 &&
-           this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric)
-    {
-      internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric,
-               dim, fe_degree_nonnegative, n_q_points_1d_positive, n_components_, Number>
-               ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
-                           this->gradients_quad, this->scratch_data,
-                           integrate_values, integrate_gradients);
-    }
-  else if (this->data->element_type == internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0)
-    {
-      internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_symmetric_plus_dg0,
-               dim, fe_degree, n_q_points_1d_adjusted, n_components_, Number>
-               ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
-                           this->gradients_quad, this->scratch_data,
-                           integrate_values, integrate_gradients);
-    }
-  else if (this->data->element_type == internal::MatrixFreeFunctions::truncated_tensor)
-    {
-      internal::FEEvaluationImpl<internal::MatrixFreeFunctions::truncated_tensor,
-               dim, fe_degree, n_q_points_1d_adjusted, n_components_, Number>
-               ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
-                           this->gradients_quad, this->scratch_data,
-                           integrate_values, integrate_gradients);
-    }
-  else if (fe_degree == -1 ||
-           this->data->element_type == internal::MatrixFreeFunctions::tensor_general)
-    {
-      internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general,
-               dim, fe_degree, n_q_points_1d_adjusted, n_components_, Number>
-               ::integrate(*this->data, &this->values_dofs[0], this->values_quad,
-                           this->gradients_quad, this->scratch_data,
-                           integrate_values, integrate_gradients);
-    }
-  else
-    AssertThrow(false, ExcNotImplemented());
+  SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>
+  ::integrate (*this->data, &this->values_dofs[0], this->values_quad,
+               this->gradients_quad, this->scratch_data,
+               integrate_values, integrate_gradients);
 
 #ifdef DEBUG
   this->dof_values_initialized = true;
