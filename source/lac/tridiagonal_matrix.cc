@@ -240,7 +240,7 @@ TridiagonalMatrix<double>::compute_eigenvalues()
   stev (&N, &nn, &*diagonal.begin(), &*right.begin(), nullptr, &one, nullptr, &info);
   Assert(info == 0, ExcInternalError());
 
-  state = eigenvalues;
+  state = LAPACKSupport::eigenvalues;
 #else
   Assert(false, ExcNeedsLAPACK());
 #endif
@@ -251,7 +251,7 @@ template <typename number>
 number
 TridiagonalMatrix<number>::eigenvalue(const size_type i) const
 {
-  Assert(state == eigenvalues, ExcState(state));
+  Assert(state == LAPACKSupport::eigenvalues, ExcState(state));
   Assert(i<n(), ExcIndexRange(i,0,n()));
   return diagonal[i];
 }
