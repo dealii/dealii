@@ -174,6 +174,12 @@ public:
   Quadrature &operator = (const Quadrature<dim> &);
 
   /**
+   * Move assignment operator. Moves all data from another quadrature object
+   * to this object.
+   */
+  Quadrature &operator = (Quadrature<dim> &&) = default;
+
+  /**
    * Test for equality of two quadratures.
    */
   bool operator == (const Quadrature<dim> &p) const;
