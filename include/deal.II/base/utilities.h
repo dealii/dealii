@@ -601,7 +601,7 @@ namespace Utilities
     switch (N)
       {
       case 0:
-        return 1;
+        return dealii::internal::NumberType<T>::value(1);
       case 1:
         return n;
       case 2:
