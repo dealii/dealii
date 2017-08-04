@@ -66,7 +66,6 @@ SET(_unity_include_src
   quadrature_lib.cc
   quadrature_selector.cc
   subscriptor.cc
-  symmetric_tensor.cc
   table_handler.cc
   tensor_function.cc
   tensor_product_polynomials.cc
@@ -81,6 +80,7 @@ SET(_unity_include_src
 
 SET(_separate_src
   data_out_base.cc
+  symmetric_tensor.cc
   )
 
 # determined by profiling
