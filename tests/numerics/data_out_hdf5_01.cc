@@ -49,12 +49,12 @@ test ()
   DataOutBase::DataOutFilter data_filter
   (DataOutBase::DataOutFilterFlags (false, false));
   data_out.write_filtered_data (data_filter);
-  data_out.write_hdf5_parallel (data_filter, "out.h5", MPI_COMM_WORLD);
+  data_out.write_hdf5_parallel (data_filter, "out.h5", MPI_COMM_SELF);
   std::vector<XDMFEntry> xdmf_entries;
   xdmf_entries.push_back
-  (data_out.create_xdmf_entry (data_filter, "out.h5", 0, MPI_COMM_WORLD));
+  (data_out.create_xdmf_entry (data_filter, "out.h5", 0, MPI_COMM_SELF));
 
-  data_out.write_xdmf_file (xdmf_entries, "out.xdmf", MPI_COMM_WORLD);
+  data_out.write_xdmf_file (xdmf_entries, "out.xdmf", MPI_COMM_SELF);
 
   deallog << "ok" << std::endl;
 
@@ -62,19 +62,15 @@ test ()
   // Sadly hdf5 is binary and we can not use hd5dump because it might
   // not be in the path. At least we can look at the xdmf
   // and make sure that the h5 file is created:
-  if (0==Utilities::MPI::this_mpi_process (MPI_COMM_WORLD))
-    {
-      cat_file("out.xdmf");
-      std::ifstream f("out.h5");
-      AssertThrow(f.good(), ExcIO());
-    }
+  cat_file("out.xdmf");
+  std::ifstream f("out.h5");
+  AssertThrow(f.good(), ExcIO());
 }
 
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  initlog();
 
   try
     {

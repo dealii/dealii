@@ -107,7 +107,7 @@ void check()
 
   std::string output_basename = std::to_string(dim) + std::to_string(spacedim);
 
-  DataOutBase::write_hdf5_parallel(patches, data_filter, output_basename+".h5", MPI_COMM_WORLD);
+  DataOutBase::write_hdf5_parallel(patches, data_filter, output_basename+".h5", MPI_COMM_SELF);
 
   const double current_time = 0.0;
   XDMFEntry       entry(output_basename+".h5", output_basename+".h5", current_time, data_filter.n_nodes(), data_filter.n_cells(), dim, spacedim);
@@ -144,12 +144,9 @@ void check()
           << "\n=============================="
           << std::endl;
 
-  if (0==Utilities::MPI::this_mpi_process (MPI_COMM_WORLD))
-    {
-      cat_file((output_basename+".xdmf").c_str());
-      std::ifstream f((output_basename+".h5").c_str());
-      AssertThrow(f.good(), ExcIO());
-    }
+  cat_file((output_basename+".xdmf").c_str());
+  std::ifstream f((output_basename+".h5").c_str());
+  AssertThrow(f.good(), ExcIO());
 
   deallog << std::flush;
 }
@@ -158,8 +155,7 @@ void check()
 
 int main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-  MPILogInitAll log;
+  initlog();
 
   try
     {
