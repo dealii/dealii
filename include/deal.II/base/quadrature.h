@@ -21,6 +21,8 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/subscriptor.h>
 #include <vector>
+#include <array>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -163,7 +165,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Quadrature ();
+  virtual ~Quadrature () = default;
 
   /**
    * Assignment operator. Copies contents of #weights and #quadrature_points
@@ -221,6 +223,21 @@ public:
   template <class Archive>
   void serialize (Archive &ar, const unsigned int version);
 
+  /**
+   * This function returns true if the quadrature object is a tensor product
+   * of one-dimensional formulas and the quadrature points are sorted
+   * lexicographically.
+   */
+  bool is_tensor_product() const;
+
+  /**
+   * In case the quadrature formula is a tensor product, this function
+   * returns the one-dimensional basis objects.
+   * Otherwise, calling this function is not allowed.
+   */
+  typename std::conditional<dim==1, std::array<Quadrature<1>, dim>,const std::array<Quadrature<1>,dim>&>::type
+  get_tensor_basis() const;
+
 protected:
   /**
    * List of quadrature points. To be filled by the constructors of derived
@@ -233,6 +250,21 @@ protected:
    * constructors of derived classes.
    */
   std::vector<double>      weights;
+
+  /**
+   * Indicates if this object represents quadrature formula that is a tensor
+   * product of one-dimensional formulas.
+   * This flag is set if dim==1 or the constructors taking a Quadrature<1>
+   * (and possibly a Quadrature<dim-1> object) is called. This implies
+   * that the quadrature points are sorted lexicographically.
+   */
+  bool is_tensor_product_flag;
+
+  /**
+   * Stores the one-dimensional tensor basis objects in case this object
+   * can be represented by a tensor product.
+   */
+  std::unique_ptr<std::array<Quadrature<1>,dim>> tensor_basis;
 };
 
 
@@ -382,6 +414,16 @@ Quadrature<dim>::get_weights () const
 
 
 template <int dim>
+inline
+bool
+Quadrature<dim>::is_tensor_product () const
+{
+  return is_tensor_product_flag;
+}
+
+
+
+template <int dim>
 template <class Archive>
 inline
 void
@@ -405,8 +447,6 @@ Quadrature<0>::Quadrature (const Quadrature<-1> &,
                            const Quadrature<1> &);
 template <>
 Quadrature<0>::Quadrature (const Quadrature<1> &);
-template <>
-Quadrature<0>::~Quadrature ();
 
 template <>
 Quadrature<1>::Quadrature (const Quadrature<0> &,

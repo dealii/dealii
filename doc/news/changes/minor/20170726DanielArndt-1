@@ -1,0 +1,6 @@
+New: Quadrature::is_tensor_product() returns if the corresponding quadrature
+formula can be represented as a tensor product and the quadrature points are 
+sorted lexicographically. The corresponding 1D objects can be queried using 
+Quadrature::get_tensor_basis().
+<br>
+(Daniel Arndt, 2017/07/26)
