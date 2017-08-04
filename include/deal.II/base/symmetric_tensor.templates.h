@@ -245,7 +245,7 @@ namespace internal
       std::array<Number,dim>   w;
       // The off-diagonal elements of the tridiagonal
       std::array<Number,dim-1> ee;
-      tridiagonalize(A, Q, w, ee);
+      tridiagonalize<dim,Number>(A, Q, w, ee);
 
       // Number of iterations
       const unsigned int max_n_it = 30;
