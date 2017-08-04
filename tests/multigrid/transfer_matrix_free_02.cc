@@ -94,7 +94,7 @@ void check(const unsigned int fe_degree)
       transfer_ref.build_matrices(mgdof);
 
       // build matrix-free transfer
-      MGTransferMatrixFree<dim, Number> transfer(mg_constrained_dofs);
+      MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<Number>> transfer(mg_constrained_dofs);
       transfer.build(mgdof);
 
       // check prolongation for all levels using random vector

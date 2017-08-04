@@ -45,6 +45,13 @@ for (deal_II_dimension : DIMENSIONS)
     template
     void MGLevelGlobalTransfer< LinearAlgebra::distributed::Vector<float> >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
         const DoFHandler<deal_II_dimension,deal_II_dimension> &mg_dof);
+    template
+    void MGLevelGlobalTransfer< LinearAlgebra::distributed::BlockVector<float> >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
+        const DoFHandler<deal_II_dimension,deal_II_dimension> &mg_dof);
+    template
+    void MGLevelGlobalTransfer< LinearAlgebra::distributed::BlockVector<double> >::fill_and_communicate_copy_indices<deal_II_dimension,deal_II_dimension>(
+        const DoFHandler<deal_II_dimension,deal_II_dimension> &mg_dof);
+
 }
 
 for (deal_II_dimension : DIMENSIONS; S1, S2 : REAL_SCALARS)
@@ -58,6 +65,17 @@ for (deal_II_dimension : DIMENSIONS; S1, S2 : REAL_SCALARS)
     template void
     MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<S1> >::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, LinearAlgebra::distributed::Vector<S2>&,
             const MGLevelObject<LinearAlgebra::distributed::Vector<S1> >&) const;
+
+    template void
+    MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<S1> >::copy_to_mg (
+        const DoFHandler<deal_II_dimension>&, MGLevelObject<LinearAlgebra::distributed::BlockVector<S1> >&, const LinearAlgebra::distributed::BlockVector<S2>&) const;
+    template void
+    MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<S1> >::copy_from_mg (const DoFHandler<deal_II_dimension>&, LinearAlgebra::distributed::BlockVector<S2>&,
+            const MGLevelObject<LinearAlgebra::distributed::BlockVector<S1> >&) const;
+    template void
+    MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<S1> >::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, LinearAlgebra::distributed::BlockVector<S2>&,
+            const MGLevelObject<LinearAlgebra::distributed::BlockVector<S1> >&) const;
+
 }
 
 for(deal_II_dimension : DIMENSIONS)

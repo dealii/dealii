@@ -162,7 +162,7 @@ void do_test (const DoFHandler<dim>  &dof)
       mg_matrices[level].compute_diagonal();
     }
 
-  MGTransferMatrixFree<dim,double> mg_transfer(mg_constrained_dofs);
+  MGTransferMatrixFree<dim> mg_transfer(mg_constrained_dofs);
   mg_transfer.build(dof);
 
   MGCoarseIterative<LevelMatrixType,number> mg_coarse;
@@ -193,7 +193,7 @@ void do_test (const DoFHandler<dim>  &dof)
                                                             mg_smoother,
                                                             mg_smoother);
   PreconditionMG<dim, LinearAlgebra::distributed::Vector<double>,
-                 MGTransferMatrixFree<dim,double> >
+                 MGTransferMatrixFree<dim> >
                  preconditioner(dof, mg, mg_transfer);
 
   {

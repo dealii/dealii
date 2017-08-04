@@ -50,14 +50,14 @@ std::ofstream logfile("output");
 using namespace dealii::MatrixFreeOperators;
 
 template <int dim, typename LAPLACEOPERATOR>
-class MGTransferMF : public MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>
+class MGTransferMF : public MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type>>
 {
 public:
   MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace,
                const MGConstrainedDoFs &mg_constrained_dofs)
     :
-    MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>(mg_constrained_dofs),
-    laplace_operator (laplace)
+    MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type>>(mg_constrained_dofs),
+        laplace_operator (laplace)
   {
   }
 
@@ -75,8 +75,8 @@ public:
     for (unsigned int level=dst.min_level();
          level<=dst.max_level(); ++level)
       laplace_operator[level].initialize_dof_vector(dst[level]);
-    MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>::
-    copy_to_mg(mg_dof_handler, dst, src);
+    MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<typename LAPLACEOPERATOR::value_type>>::
+        copy_to_mg(mg_dof_handler, dst, src);
   }
 
 private:

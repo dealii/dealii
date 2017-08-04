@@ -952,7 +952,7 @@ namespace Step37
   void LaplaceProblem<dim>::solve ()
   {
     Timer time;
-    MGTransferMatrixFree<dim,float> mg_transfer(mg_constrained_dofs);
+    MGTransferMatrixFree<dim,LinearAlgebra::distributed::Vector<float>> mg_transfer(mg_constrained_dofs);
     mg_transfer.build(dof_handler);
     setup_time += time.wall_time();
     time_details << "MG build transfer time     (CPU/wall) " << time()
@@ -1075,7 +1075,7 @@ namespace Step37
     mg.set_edge_matrices(mg_interface, mg_interface);
 
     PreconditionMG<dim, LinearAlgebra::distributed::Vector<float>,
-                   MGTransferMatrixFree<dim,float> >
+                   MGTransferMatrixFree<dim,LinearAlgebra::distributed::Vector<float>>>
                    preconditioner(dof_handler, mg, mg_transfer);
 
     // The setup of the multigrid routines is quite easy and one cannot see

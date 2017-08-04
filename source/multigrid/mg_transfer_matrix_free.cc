@@ -26,6 +26,7 @@
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/mg_transfer_internal.h>
+#include <deal.II/multigrid/mg_transfer.templates.h> // internal block/non-block functions
 
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
@@ -34,8 +35,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim, typename Number>
-MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree ()
+template <int dim, typename VectorType>
+MGTransferMatrixFree<dim,VectorType>::MGTransferMatrixFree ()
   :
   fe_degree(0),
   element_is_continuous(false),
@@ -45,8 +46,8 @@ MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree ()
 
 
 
-template <int dim, typename Number>
-MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree (const MGConstrainedDoFs &mg_c)
+template <int dim, typename VectorType>
+MGTransferMatrixFree<dim,VectorType>::MGTransferMatrixFree (const MGConstrainedDoFs &mg_c)
   :
   fe_degree(0),
   element_is_continuous(false),
@@ -58,14 +59,14 @@ MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree (const MGConstrainedDoFs 
 
 
 
-template <int dim, typename Number>
-MGTransferMatrixFree<dim,Number>::~MGTransferMatrixFree ()
+template <int dim, typename VectorType>
+MGTransferMatrixFree<dim,VectorType>::~MGTransferMatrixFree ()
 {}
 
 
 
-template <int dim, typename Number>
-void MGTransferMatrixFree<dim,Number>::initialize_constraints
+template <int dim, typename VectorType>
+void MGTransferMatrixFree<dim,VectorType>::initialize_constraints
 (const MGConstrainedDoFs &mg_c)
 {
   this->mg_constrained_dofs = &mg_c;
@@ -73,10 +74,10 @@ void MGTransferMatrixFree<dim,Number>::initialize_constraints
 
 
 
-template <int dim, typename Number>
-void MGTransferMatrixFree<dim,Number>::clear ()
+template <int dim, typename VectorType>
+void MGTransferMatrixFree<dim,VectorType>::clear ()
 {
-  this->MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::clear();
+  this->MGLevelGlobalTransfer<VectorType>::clear();
   fe_degree = 0;
   element_is_continuous = false;
   n_components = 0;
@@ -91,15 +92,32 @@ void MGTransferMatrixFree<dim,Number>::clear ()
 }
 
 
-template <int dim, typename Number>
-void MGTransferMatrixFree<dim,Number>::build
+template <int dim, typename VectorType>
+void MGTransferMatrixFree<dim,VectorType>::build
 (const DoFHandler<dim,dim>  &mg_dof)
 {
+  typedef typename VectorType::value_type Number;
   this->fill_and_communicate_copy_indices(mg_dof);
 
   std::vector<std::vector<Number> > weights_unvectorized;
 
   internal::MGTransfer::ElementInfo<Number> elem_info;
+
+  // ghosted_level_vector of the base class can be block vector which is
+  // used in copy_from_mg transfer. In the setup_transfer() below, we
+  // always need non-ghosted auxiliary vector
+  // FIXME: don't introduce auxiliary vector for non-block case.
+  MGLevelObject<LinearAlgebra::distributed::Vector<Number>> ghosted_level_vector;
+  {
+    const unsigned int max_level = this->ghosted_level_vector.max_level();
+    const unsigned int min_level = this->ghosted_level_vector.min_level();
+    ghosted_level_vector.resize(min_level, max_level);
+    for (unsigned int l = min_level; l <= max_level; ++l)
+      {
+        ghosted_level_vector[l].reinit(internal::get_block(this->ghosted_level_vector[l],0));
+        ghosted_level_vector[l] = internal::get_block(this->ghosted_level_vector[l],0);
+      }
+  }
 
   internal::MGTransfer::setup_transfer<dim,Number>(mg_dof,
                                                    this->mg_constrained_dofs,
@@ -110,7 +128,22 @@ void MGTransferMatrixFree<dim,Number>::build
                                                    dirichlet_indices,
                                                    weights_unvectorized,
                                                    this->copy_indices_global_mine,
-                                                   this->ghosted_level_vector);
+                                                   ghosted_level_vector);
+
+  // resize and reinit a possibly block vector:
+  {
+    const unsigned int max_level = ghosted_level_vector.max_level();
+    const unsigned int min_level = ghosted_level_vector.min_level();
+    this->ghosted_level_vector.resize(min_level, max_level);
+
+    for (unsigned int l = min_level; l <= max_level; ++l)
+      for (unsigned int b = 0; b < internal::get_n_blocks(this->ghosted_level_vector[l]); ++b)
+        {
+          internal::get_block(this->ghosted_level_vector[l],b).reinit(ghosted_level_vector[l]);
+          internal::get_block(this->ghosted_level_vector[l],b) = ghosted_level_vector[l];
+        }
+  }
+
   // unpack element info data
   fe_degree                = elem_info.fe_degree;
   element_is_continuous    = elem_info.element_is_continuous;
@@ -149,19 +182,22 @@ void MGTransferMatrixFree<dim,Number>::build
 
 
 
-template <int dim, typename Number>
-void MGTransferMatrixFree<dim,Number>
-::prolongate (const unsigned int                           to_level,
-              LinearAlgebra::distributed::Vector<Number>       &dst,
-              const LinearAlgebra::distributed::Vector<Number> &src) const
+template <int dim, typename VectorType>
+void MGTransferMatrixFree<dim,VectorType>
+::prolongate (const unsigned int  to_level,
+              VectorType          &dst,
+              const VectorType    &src) const
 {
   Assert ((to_level >= 1) && (to_level<=level_dof_indices.size()),
           ExcIndexRange (to_level, 1, level_dof_indices.size()+1));
 
-  AssertDimension(this->ghosted_level_vector[to_level].local_size(),
-                  dst.local_size());
-  AssertDimension(this->ghosted_level_vector[to_level-1].local_size(),
-                  src.local_size());
+  for (unsigned int b = 0; b < internal::get_n_blocks(dst); ++b)
+    {
+      AssertDimension(internal::get_block(this->ghosted_level_vector[to_level],b).local_size(),
+                      internal::get_block(dst,b).local_size());
+      AssertDimension(internal::get_block(this->ghosted_level_vector[to_level-1],b).local_size(),
+                      internal::get_block(src,b).local_size());
+    }
 
   this->ghosted_level_vector[to_level-1] = src;
   this->ghosted_level_vector[to_level-1].update_ghost_values();
@@ -213,19 +249,22 @@ void MGTransferMatrixFree<dim,Number>
 
 
 
-template <int dim, typename Number>
-void MGTransferMatrixFree<dim,Number>
-::restrict_and_add (const unsigned int                           from_level,
-                    LinearAlgebra::distributed::Vector<Number>       &dst,
-                    const LinearAlgebra::distributed::Vector<Number> &src) const
+template <int dim, typename VectorType>
+void MGTransferMatrixFree<dim,VectorType>
+::restrict_and_add (const unsigned int from_level,
+                    VectorType         &dst,
+                    const VectorType   &src) const
 {
   Assert ((from_level >= 1) && (from_level<=level_dof_indices.size()),
           ExcIndexRange (from_level, 1, level_dof_indices.size()+1));
 
-  AssertDimension(this->ghosted_level_vector[from_level].local_size(),
-                  src.local_size());
-  AssertDimension(this->ghosted_level_vector[from_level-1].local_size(),
-                  dst.local_size());
+  for (unsigned int b = 0; b < internal::get_n_blocks(dst); ++b)
+    {
+      AssertDimension(internal::get_block(this->ghosted_level_vector[from_level],b).local_size(),
+                      internal::get_block(src,b).local_size());
+      AssertDimension(internal::get_block(this->ghosted_level_vector[from_level-1],b).local_size(),
+                      internal::get_block(dst,b).local_size());
+    }
 
   this->ghosted_level_vector[from_level] = src;
   this->ghosted_level_vector[from_level].update_ghost_values();
@@ -354,13 +393,14 @@ namespace
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 template <int degree>
-void MGTransferMatrixFree<dim,Number>
-::do_prolongate_add (const unsigned int                           to_level,
-                     LinearAlgebra::distributed::Vector<Number>       &dst,
-                     const LinearAlgebra::distributed::Vector<Number> &src) const
+void MGTransferMatrixFree<dim,VectorType>
+::do_prolongate_add (const unsigned int  to_level,
+                     VectorType          &dst,
+                     const VectorType    &src) const
 {
+  typedef typename VectorType::value_type Number;
   const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
   const unsigned int degree_size = (degree > -1 ? degree : fe_degree) + 1;
   const unsigned int n_child_dofs_1d = 2*degree_size - element_is_continuous;
@@ -373,83 +413,90 @@ void MGTransferMatrixFree<dim,Number>
       const unsigned int n_chunks = cell+vec_size > n_owned_level_cells[to_level-1] ?
                                     n_owned_level_cells[to_level-1] - cell : vec_size;
 
-      // read from source vector
-      for (unsigned int v=0; v<n_chunks; ++v)
+      // FIXME: for starters, try a simple loop over blocks. In reality,
+      // one has to do work on several blocks of vectors at a time.
+      for (unsigned int b = 0; b < internal::get_n_blocks(dst); ++b)
         {
-          const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
-                                     (parent_child_connect[to_level-1][cell+v].second,
-                                      fe_degree+1-element_is_continuous, fe_degree);
-          const unsigned int *indices = &level_dof_indices[to_level-1][parent_child_connect[to_level-1][cell+v].first*n_child_cell_dofs+shift];
-          for (unsigned int c=0, m=0; c<n_components; ++c)
+          // read from source vector
+          for (unsigned int v=0; v<n_chunks; ++v)
             {
-              for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
-                for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
-                  for (unsigned int i=0; i<degree_size; ++i, ++m)
-                    evaluation_data[m][v] =
-                      src.local_element(indices[c*n_scalar_cell_dofs +
+              const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
+                                         (parent_child_connect[to_level-1][cell+v].second,
+                                          fe_degree+1-element_is_continuous, fe_degree);
+              const unsigned int *indices = &level_dof_indices[to_level-1][parent_child_connect[to_level-1][cell+v].first*n_child_cell_dofs+shift];
+              for (unsigned int c=0, m=0; c<n_components; ++c)
+                {
+                  for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
+                    for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
+                      for (unsigned int i=0; i<degree_size; ++i, ++m)
+                        evaluation_data[m][v] =
+                          internal::get_block(src,b).
+                          local_element(indices[c*n_scalar_cell_dofs +
                                                 k*n_child_dofs_1d*n_child_dofs_1d+
                                                 j*n_child_dofs_1d+i]);
 
-              // apply Dirichlet boundary conditions on parent cell
-              for (std::vector<unsigned short>::const_iterator i=dirichlet_indices[to_level-1][cell+v].begin(); i!=dirichlet_indices[to_level-1][cell+v].end(); ++i)
-                evaluation_data[*i][v] = 0.;
+                  // apply Dirichlet boundary conditions on parent cell
+                  for (std::vector<unsigned short>::const_iterator i=dirichlet_indices[to_level-1][cell+v].begin(); i!=dirichlet_indices[to_level-1][cell+v].end(); ++i)
+                    evaluation_data[*i][v] = 0.;
+                }
             }
-        }
 
-      AssertDimension(prolongation_matrix_1d.size(),
-                      degree_size * n_child_dofs_1d);
-      // perform tensorized operation
-      if (element_is_continuous)
-        {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*fe_degree+1);
-          perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
-                                                           n_child_cell_dofs,
-                                                           n_components,
-                                                           evaluation_data);
-          weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[to_level-1][(cell/vec_size)*three_to_dim],
-                                                  n_components, fe_degree,
-                                                  &evaluation_data[2*n_child_cell_dofs]);
-        }
-      else
-        {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*(fe_degree+1));
-          perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
-                                                           n_child_cell_dofs,
-                                                           n_components,
-                                                           evaluation_data);
-        }
+          AssertDimension(prolongation_matrix_1d.size(),
+                          degree_size * n_child_dofs_1d);
+          // perform tensorized operation
+          if (element_is_continuous)
+            {
+              typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
+              Evaluator evaluator(prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  fe_degree,
+                                  2*fe_degree+1);
+              perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
+                                                               n_child_cell_dofs,
+                                                               n_components,
+                                                               evaluation_data);
+              weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[to_level-1][(cell/vec_size)*three_to_dim],
+                                                      n_components, fe_degree,
+                                                      &evaluation_data[2*n_child_cell_dofs]);
+            }
+          else
+            {
+              typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
+              Evaluator evaluator(prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  fe_degree,
+                                  2*(fe_degree+1));
+              perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
+                                                               n_child_cell_dofs,
+                                                               n_components,
+                                                               evaluation_data);
+            }
 
-      // write into dst vector
-      const unsigned int *indices = &level_dof_indices[to_level][cell*
-                                                                 n_child_cell_dofs];
-      for (unsigned int v=0; v<n_chunks; ++v)
-        {
-          for (unsigned int i=0; i<n_child_cell_dofs; ++i)
-            dst.local_element(indices[i]) += evaluation_data[2*n_child_cell_dofs+i][v];
-          indices += n_child_cell_dofs;
+          // write into dst vector
+          const unsigned int *indices = &level_dof_indices[to_level][cell*
+                                                                     n_child_cell_dofs];
+          for (unsigned int v=0; v<n_chunks; ++v)
+            {
+              for (unsigned int i=0; i<n_child_cell_dofs; ++i)
+                internal::get_block(dst,b).local_element(indices[i]) += evaluation_data[2*n_child_cell_dofs+i][v];
+              indices += n_child_cell_dofs;
+            }
         }
     }
 }
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 template <int degree>
-void MGTransferMatrixFree<dim,Number>
-::do_restrict_add (const unsigned int                           from_level,
-                   LinearAlgebra::distributed::Vector<Number>       &dst,
-                   const LinearAlgebra::distributed::Vector<Number> &src) const
+void MGTransferMatrixFree<dim,VectorType>
+::do_restrict_add (const unsigned int   from_level,
+                   VectorType           &dst,
+                   const VectorType     &src) const
 {
+  typedef typename VectorType::value_type Number;
   const unsigned int vec_size = VectorizedArray<Number>::n_array_elements;
   const unsigned int degree_size = (degree > -1 ? degree : fe_degree) + 1;
   const unsigned int n_child_dofs_1d = 2*degree_size - element_is_continuous;
@@ -462,74 +509,80 @@ void MGTransferMatrixFree<dim,Number>
       const unsigned int n_chunks = cell+vec_size > n_owned_level_cells[from_level-1] ?
                                     n_owned_level_cells[from_level-1] - cell : vec_size;
 
-      // read from source vector
-      {
-        const unsigned int *indices = &level_dof_indices[from_level][cell*
-                                      n_child_cell_dofs];
-        for (unsigned int v=0; v<n_chunks; ++v)
+      // FIXME: for starters, try a simple loop over blocks. In reality,
+      // one has to do work on several blocks of vectors at a time.
+      for (unsigned int b = 0; b < internal::get_n_blocks(dst); ++b)
+        {
+          // read from source vector
           {
-            for (unsigned int i=0; i<n_child_cell_dofs; ++i)
-              evaluation_data[i][v] = src.local_element(indices[i]);
-            indices += n_child_cell_dofs;
+            const unsigned int *indices = &level_dof_indices[from_level][cell*
+                                          n_child_cell_dofs];
+            for (unsigned int v=0; v<n_chunks; ++v)
+              {
+                for (unsigned int i=0; i<n_child_cell_dofs; ++i)
+                  evaluation_data[i][v] = internal::get_block(src,b).local_element(indices[i]);
+                indices += n_child_cell_dofs;
+              }
           }
-      }
 
-      AssertDimension(prolongation_matrix_1d.size(),
-                      degree_size * n_child_dofs_1d);
-      // perform tensorized operation
-      if (element_is_continuous)
-        {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*fe_degree+1);
-          weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[from_level-1][(cell/vec_size)*three_to_dim],
-                                                  n_components, fe_degree,
-                                                  &evaluation_data[0]);
-          perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
-                                                            n_child_cell_dofs,
-                                                            n_components,
-                                                            evaluation_data);
-        }
-      else
-        {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*(fe_degree+1));
-          perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
-                                                            n_child_cell_dofs,
-                                                            n_components,
-                                                            evaluation_data);
-        }
-
-      // write into dst vector
-      for (unsigned int v=0; v<n_chunks; ++v)
-        {
-          const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
-                                     (parent_child_connect[from_level-1][cell+v].second,
-                                      fe_degree+1-element_is_continuous, fe_degree);
-          AssertIndexRange(parent_child_connect[from_level-1][cell+v].first*
-                           n_child_cell_dofs+n_child_cell_dofs-1,
-                           level_dof_indices[from_level-1].size());
-          const unsigned int *indices = &level_dof_indices[from_level-1][parent_child_connect[from_level-1][cell+v].first*n_child_cell_dofs+shift];
-          for (unsigned int c=0, m=0; c<n_components; ++c)
+          AssertDimension(prolongation_matrix_1d.size(),
+                          degree_size * n_child_dofs_1d);
+          // perform tensorized operation
+          if (element_is_continuous)
             {
-              // apply Dirichlet boundary conditions on parent cell
-              for (std::vector<unsigned short>::const_iterator i=dirichlet_indices[from_level-1][cell+v].begin(); i!=dirichlet_indices[from_level-1][cell+v].end(); ++i)
-                evaluation_data[2*n_child_cell_dofs+(*i)][v] = 0.;
+              typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
+              Evaluator evaluator(prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  fe_degree,
+                                  2*fe_degree+1);
+              weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[from_level-1][(cell/vec_size)*three_to_dim],
+                                                      n_components, fe_degree,
+                                                      &evaluation_data[0]);
+              perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
+                                                                n_child_cell_dofs,
+                                                                n_components,
+                                                                evaluation_data);
+            }
+          else
+            {
+              typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
+              Evaluator evaluator(prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  prolongation_matrix_1d,
+                                  fe_degree,
+                                  2*(fe_degree+1));
+              perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
+                                                                n_child_cell_dofs,
+                                                                n_components,
+                                                                evaluation_data);
+            }
 
-              for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
-                for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
-                  for (unsigned int i=0; i<degree_size; ++i, ++m)
-                    dst.local_element(indices[c*n_scalar_cell_dofs +
-                                              k*n_child_dofs_1d*n_child_dofs_1d+
-                                              j*n_child_dofs_1d+i])
-                    += evaluation_data[2*n_child_cell_dofs+m][v];
+          // write into dst vector
+          for (unsigned int v=0; v<n_chunks; ++v)
+            {
+              const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
+                                         (parent_child_connect[from_level-1][cell+v].second,
+                                          fe_degree+1-element_is_continuous, fe_degree);
+              AssertIndexRange(parent_child_connect[from_level-1][cell+v].first*
+                               n_child_cell_dofs+n_child_cell_dofs-1,
+                               level_dof_indices[from_level-1].size());
+              const unsigned int *indices = &level_dof_indices[from_level-1][parent_child_connect[from_level-1][cell+v].first*n_child_cell_dofs+shift];
+              for (unsigned int c=0, m=0; c<n_components; ++c)
+                {
+                  // apply Dirichlet boundary conditions on parent cell
+                  for (std::vector<unsigned short>::const_iterator i=dirichlet_indices[from_level-1][cell+v].begin(); i!=dirichlet_indices[from_level-1][cell+v].end(); ++i)
+                    evaluation_data[2*n_child_cell_dofs+(*i)][v] = 0.;
+
+                  for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
+                    for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
+                      for (unsigned int i=0; i<degree_size; ++i, ++m)
+                        internal::get_block(dst,b)
+                        .local_element(indices[c*n_scalar_cell_dofs +
+                                               k*n_child_dofs_1d*n_child_dofs_1d+
+                                               j*n_child_dofs_1d+i])
+                        += evaluation_data[2*n_child_cell_dofs+m][v];
+                }
             }
         }
     }
@@ -537,11 +590,11 @@ void MGTransferMatrixFree<dim,Number>
 
 
 
-template <int dim, typename Number>
+template <int dim, typename VectorType>
 std::size_t
-MGTransferMatrixFree<dim,Number>::memory_consumption() const
+MGTransferMatrixFree<dim,VectorType>::memory_consumption() const
 {
-  std::size_t memory = MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::memory_consumption();
+  std::size_t memory = MGLevelGlobalTransfer<VectorType>::memory_consumption();
   memory += MemoryConsumption::memory_consumption(level_dof_indices);
   memory += MemoryConsumption::memory_consumption(parent_child_connect);
   memory += MemoryConsumption::memory_consumption(n_owned_level_cells);

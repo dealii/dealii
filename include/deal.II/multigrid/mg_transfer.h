@@ -441,6 +441,147 @@ protected:
 
 
 /**
+ * Implementation of transfer between the global vectors and the multigrid
+ * levels for use in the derived class MGTransferBlockMatrixFree.
+ * This class is a specialization for the case of
+ * LinearAlgebra::distributed::BlockVector that requires a few different calling
+ * routines as compared to the %parallel vectors in the PETScWrappers and
+ * TrilinosWrappers namespaces.
+ *
+ * It is assumed that each block in the vector spans the whole index space of the
+ * DoFHandler object. In other words, this class would do exactly the same as
+ * what MGLevelGlobalTransfer does for each block in BlockVector.
+ *
+ * @author Denis Davydov
+ * @date 2017
+ */
+template <typename Number>
+class MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<Number> > : public MGTransferBase<LinearAlgebra::distributed::BlockVector<Number> >
+{
+public:
+
+  /**
+   * Reset the object to the state it had right after the default constructor.
+   */
+  void clear ();
+
+  /**
+   * Transfer from a vector on the global grid to vectors defined on each of
+   * the levels separately, i.a. an @p MGVector.
+   */
+  template <int dim, typename Number2, int spacedim>
+  void
+  copy_to_mg (const DoFHandler<dim,spacedim>                                  &dof,
+              MGLevelObject<LinearAlgebra::distributed::BlockVector<Number> > &dst,
+              const LinearAlgebra::distributed::BlockVector<Number2>          &src) const;
+
+  /**
+   * Transfer from multi-level vector to normal vector.
+   *
+   * Copies data from active portions of an MGVector into the respective
+   * positions of a <tt>Vector<number></tt>. In order to keep the result
+   * consistent, constrained degrees of freedom are set to zero.
+   */
+  template <int dim, typename Number2, int spacedim>
+  void
+  copy_from_mg (const DoFHandler<dim,spacedim>                                        &dof,
+                LinearAlgebra::distributed::BlockVector<Number2>                      &dst,
+                const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number> > &src) const;
+
+  /**
+   * Add a multi-level vector to a normal vector.
+   *
+   * Works as the previous function, but probably not for continuous elements.
+   */
+  template <int dim, typename Number2, int spacedim>
+  void
+  copy_from_mg_add (const DoFHandler<dim,spacedim>                                        &dof,
+                    LinearAlgebra::distributed::BlockVector<Number2>                      &dst,
+                    const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number> > &src) const;
+
+  /**
+   * Memory used by this object.
+   */
+  std::size_t memory_consumption () const;
+
+  /**
+   * Print the copy index fields for debugging purposes.
+   */
+  void print_indices(std::ostream &os) const;
+
+protected:
+
+  /**
+   * Internal function to @p fill copy_indices*. Called by derived classes.
+   */
+  template <int dim, int spacedim>
+  void fill_and_communicate_copy_indices(const DoFHandler<dim,spacedim> &dof);
+
+  /**
+   * Sizes of the multi-level vectors.
+   */
+  std::vector<types::global_dof_index> sizes;
+
+  /**
+   * Mapping for the copy_to_mg() and copy_from_mg() functions. Here only
+   * index pairs locally owned is stored.
+   *
+   * The data is organized as follows: one vector per level. Each element of
+   * these vectors contains first the global index, then the level index.
+   */
+  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  copy_indices;
+
+  /**
+   * Additional degrees of freedom for the copy_to_mg() function. These are
+   * the ones where the global degree of freedom is locally owned and the
+   * level degree of freedom is not.
+   *
+   * Organization of the data is like for @p copy_indices_mine.
+   */
+  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  copy_indices_global_mine;
+
+  /**
+   * Additional degrees of freedom for the copy_from_mg() function. These are
+   * the ones where the level degree of freedom is locally owned and the
+   * global degree of freedom is not.
+   *
+   * Organization of the data is like for @p copy_indices_mine.
+   */
+  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  copy_indices_level_mine;
+
+  /**
+   * Stores whether the copy operation from the global to the level vector is
+   * actually a plain copy to the finest level. This means that the grid has
+   * no adaptive refinement and the numbering on the finest multigrid level is
+   * the same as in the global case.
+   */
+  bool perform_plain_copy;
+
+  /**
+   * The MGConstrainedDoFs of the level systems.
+   */
+  SmartPointer<const MGConstrainedDoFs, MGLevelGlobalTransfer<LinearAlgebra::distributed::BlockVector<Number> > > mg_constrained_dofs;
+
+  /**
+   * In the function copy_to_mg, we need to access ghosted entries of the
+   * global vector for inserting into the level vectors. This vector is
+   * populated with those entries.
+   */
+  mutable LinearAlgebra::distributed::BlockVector<Number> ghosted_global_vector;
+
+  /**
+   * In the function copy_from_mg, we access all level vectors with certain
+   * ghost entries for inserting the result into a global vector.
+   */
+  mutable MGLevelObject<LinearAlgebra::distributed::BlockVector<Number> > ghosted_level_vector;
+};
+
+
+
+/**
  * Implementation of the MGTransferBase interface for which the transfer
  * operations are prebuilt upon construction of the object of this class as
  * matrices. This is the fast way, since it only needs to build the operation
