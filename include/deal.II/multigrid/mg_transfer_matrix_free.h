@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/base/mg_level_object.h>
@@ -234,7 +235,227 @@ private:
 };
 
 
+/**
+ * Implementation of the MGTransferBase interface for which the transfer
+ * operations is implemented in a matrix-free way based on the interpolation
+ * matrices of the underlying finite element. This requires considerably less
+ * memory than MGTransferPrebuilt and can also be considerably faster than
+ * that variant.
+ *
+ * This class works with LinearAlgebra::distributed::BlockVector and
+ * performs exactly the same transfer operations for each block as
+ * MGTransferMatrixFree. This implies that each block should cover the
+ * same index space of DoFs and have the same partitioning.
+ *
+ * @author Denis Davydov
+ * @date 2017
+ */
+template <int dim, typename Number>
+class MGTransferBlockMatrixFree : public MGTransferBase<LinearAlgebra::distributed::BlockVector<Number>>
+{
+public:
+  /**
+   * Constructor without constraint matrices. Use this constructor only with
+   * discontinuous finite elements or with no local refinement.
+   */
+  MGTransferBlockMatrixFree ();
+
+  /**
+   * Constructor with constraints. Equivalent to the default constructor
+   * followed by initialize_constraints().
+   */
+  MGTransferBlockMatrixFree (const MGConstrainedDoFs &mg_constrained_dofs);
+
+  /**
+   * Destructor.
+   */
+  virtual ~MGTransferBlockMatrixFree ();
+
+  /**
+   * Initialize the constraints to be used in build().
+   */
+  void initialize_constraints (const MGConstrainedDoFs &mg_constrained_dofs);
+
+  /**
+   * Reset the object to the state it had right after the default constructor.
+   */
+  void clear ();
+
+  /**
+   * Actually build the information for the prolongation for each level.
+   */
+  void build (const DoFHandler<dim,dim> &mg_dof);
+
+  /**
+   * Prolongate a vector from level <tt>to_level-1</tt> to level
+   * <tt>to_level</tt> using the embedding matrices of the underlying finite
+   * element. The previous content of <tt>dst</tt> is overwritten.
+   *
+   * @param to_level The index of the level to prolongate to, which is the
+   * level of @p dst.
+   *
+   * @param src is a vector with as many elements as there are degrees of
+   * freedom on the coarser level involved.
+   *
+   * @param dst has as many elements as there are degrees of freedom on the
+   * finer level.
+   */
+  virtual void prolongate (const unsigned int                                    to_level,
+                           LinearAlgebra::distributed::BlockVector<Number>       &dst,
+                           const LinearAlgebra::distributed::BlockVector<Number> &src) const;
+
+  /**
+   * Restrict a vector from level <tt>from_level</tt> to level
+   * <tt>from_level-1</tt> using the transpose operation of the prolongate()
+   * method. If the region covered by cells on level <tt>from_level</tt> is
+   * smaller than that of level <tt>from_level-1</tt> (local refinement), then
+   * some degrees of freedom in <tt>dst</tt> are active and will not be
+   * altered. For the other degrees of freedom, the result of the restriction
+   * is added.
+   *
+   * @param from_level The index of the level to restrict from, which is the
+   * level of @p src.
+   *
+   * @param src is a vector with as many elements as there are degrees of
+   * freedom on the finer level involved.
+   *
+   * @param dst has as many elements as there are degrees of freedom on the
+   * coarser level.
+   */
+  virtual void restrict_and_add (const unsigned int from_level,
+                                 LinearAlgebra::distributed::BlockVector<Number>       &dst,
+                                 const LinearAlgebra::distributed::BlockVector<Number> &src) const;
+
+  /**
+   * Transfer from a block-vector on the global grid to block-vectors defined on each of the levels separately.
+   *
+   * This function will initialize @dst accordingly if needed as required by the Multigrid class.
+   */
+  template <typename Number2, int spacedim>
+  void
+  copy_to_mg (const DoFHandler<dim,spacedim> &mg_dof,
+              MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
+              const LinearAlgebra::distributed::BlockVector<Number2>         &src) const;
+
+  /**
+   * Transfer from multi-level block-vector to normal vector.
+   */
+  template <typename Number2, int spacedim>
+  void
+  copy_from_mg (const DoFHandler<dim,spacedim>                                       &mg_dof,
+                LinearAlgebra::distributed::BlockVector<Number2>                     &dst,
+                const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src) const;
+
+  /**
+   * Memory used by this object.
+   */
+  std::size_t memory_consumption () const;
+
+private:
+
+  /**
+   * A non-block matrix-free version of transfer operation.
+   */
+  MGTransferMatrixFree<dim,Number> matrix_free_transfer;
+};
+
+
 /*@}*/
+
+
+//------------------------ templated functions -------------------------
+#ifndef DOXYGEN
+
+template <int dim, typename Number>
+template <typename Number2, int spacedim>
+void
+MGTransferBlockMatrixFree<dim,Number>::
+copy_to_mg (const DoFHandler<dim,spacedim> &mg_dof,
+            MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
+            const LinearAlgebra::distributed::BlockVector<Number2>         &src) const
+{
+  const unsigned int n_blocks  = src.n_blocks();
+  const unsigned int min_level = dst.min_level();
+  const unsigned int max_level = dst.max_level();
+
+  // this function is normally called within the Multigrid class with
+  // dst == defect level block vector. At first run this vector is not
+  // initialized. Do this below:
+  {
+    const parallel::Triangulation<dim,spacedim> *tria =
+      (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
+       (&mg_dof.get_triangulation()));
+
+    for (unsigned int level = min_level; level <= max_level; ++level)
+      {
+        dst[level].reinit(n_blocks);
+        bool collect_size = false;
+        for (unsigned int b = 0; b < n_blocks; ++b)
+          {
+            LinearAlgebra::distributed::Vector<Number> &v = dst[level].block(b);
+            if (v.size() != mg_dof.locally_owned_mg_dofs(level).size() ||
+                v.local_size() != mg_dof.locally_owned_mg_dofs(level).n_elements())
+              {
+                v.reinit(mg_dof.locally_owned_mg_dofs(level), tria != nullptr ?
+                         tria->get_communicator() : MPI_COMM_SELF);
+                collect_size = true;
+              }
+            else
+              v = 0.;
+          }
+        if (collect_size)
+          dst[level].collect_sizes ();
+      }
+  }
+
+  // FIXME: this a quite ugly as we need a temporary object:
+  MGLevelObject<LinearAlgebra::distributed::Vector<Number>> dst_non_block(min_level, max_level);
+
+  for (unsigned int b = 0; b < n_blocks; ++b)
+    {
+      for (unsigned int l = min_level; l <= max_level; ++l)
+        dst_non_block[l].reinit(dst[l].block(b));
+
+      matrix_free_transfer.copy_to_mg(mg_dof, dst_non_block, src.block(b));
+
+      for (unsigned int l = min_level; l <= max_level; ++l)
+        dst[l].block(b) = dst_non_block[l];
+    }
+}
+
+template <int dim, typename Number>
+template <typename Number2, int spacedim>
+void
+MGTransferBlockMatrixFree<dim,Number>::
+copy_from_mg (const DoFHandler<dim,spacedim>                        &mg_dof,
+              LinearAlgebra::distributed::BlockVector<Number2>      &dst,
+              const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src) const
+{
+  const unsigned int n_blocks  = dst.n_blocks();
+  const unsigned int min_level = src.min_level();
+  const unsigned int max_level = src.max_level();
+
+  for (unsigned int l = min_level; l <= max_level; ++l)
+    AssertDimension(src[l].n_blocks(), dst.n_blocks());
+
+  // FIXME: this a quite ugly as we need a temporary object:
+  MGLevelObject<LinearAlgebra::distributed::Vector<Number>> src_non_block(min_level, max_level);
+
+  for (unsigned int b = 0; b < n_blocks; ++b)
+    {
+      for (unsigned int l = min_level; l <= max_level; ++l)
+        {
+          src_non_block[l].reinit(src[l].block(b));
+          src_non_block[l] = src[l].block(b);
+        }
+
+      matrix_free_transfer.copy_from_mg(mg_dof, dst.block(b), src_non_block);
+    }
+}
+
+
+
+#endif // DOXYGEN
 
 
 DEAL_II_NAMESPACE_CLOSE

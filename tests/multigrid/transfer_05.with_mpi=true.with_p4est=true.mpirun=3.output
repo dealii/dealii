@@ -1,0 +1,367 @@
+
+DEAL::FE: FE_Q<2>(1)
+DEAL::no. cells: 88
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::
+DEAL::no. cells: 250
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l6: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l6: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l6: 0.00000
+DEAL::
+DEAL::no. cells: 510
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::
+DEAL::FE: FE_Q<2>(3)
+DEAL::no. cells: 34
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::
+DEAL::no. cells: 88
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::
+DEAL::no. cells: 141
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::
+DEAL::FE: FE_Q<3>(1)
+DEAL::no. cells: 15
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::
+DEAL::no. cells: 694
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::
+DEAL::no. cells: 1791
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::
+DEAL::FE: FE_Q<3>(3)
+DEAL::no. cells: 1
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::
+DEAL::no. cells: 15
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::
+DEAL::no. cells: 223
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::
+DEAL::FE: FE_Q<2>(2)
+DEAL::no. cells: 88
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::
+DEAL::no. cells: 250
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l6: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l6: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l6: 0.00000
+DEAL::
+DEAL::no. cells: 510
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::
+DEAL::FE: FE_Q<3>(2)
+DEAL::no. cells: 15
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::
+DEAL::no. cells: 694
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l5: 0.00000
+DEAL::
+DEAL::no. cells: 1791
+DEAL::Diff copy_from_mg b0: 0.00000
+DEAL::Diff copy_from_mg b1: 0.00000
+DEAL::Diff copy_from_mg b2: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::Diff copy_to_mg   l0: 0.00000
+DEAL::Diff copy_to_mg   l1: 0.00000
+DEAL::Diff copy_to_mg   l2: 0.00000
+DEAL::Diff copy_to_mg   l3: 0.00000
+DEAL::Diff copy_to_mg   l4: 0.00000
+DEAL::
