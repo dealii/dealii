@@ -28,34 +28,40 @@ for (deal_II_dimension : DIMENSIONS; number : REAL_SCALARS)
     \{
     template
     void
-    tridiagonalize (const dealii::SymmetricTensor<2,deal_II_dimension,number> &,
-                    dealii::Tensor<2,deal_II_dimension,number>                &,
-                    std::array<number,deal_II_dimension>                      &,
-                    std::array<number,deal_II_dimension-1>                    &);
+    tridiagonalize<deal_II_dimension, number>
+    (const dealii::SymmetricTensor<2,deal_II_dimension,number> &,
+     dealii::Tensor<2,deal_II_dimension,number>                &,
+     std::array<number,deal_II_dimension>                      &,
+     std::array<number,deal_II_dimension-1>                    &);
 
     template
     std::array<std::pair<number, Tensor<1,deal_II_dimension,number> >,deal_II_dimension>
-    ql_implicit_shifts (const dealii::SymmetricTensor<2,deal_II_dimension,number> &);
+    ql_implicit_shifts<deal_II_dimension, number>
+    (const dealii::SymmetricTensor<2,deal_II_dimension,number> &);
 
     template
     std::array<std::pair<number, Tensor<1,deal_II_dimension,number> >,deal_II_dimension>
-    jacobi (dealii::SymmetricTensor<2,deal_II_dimension,number>);
+    jacobi<deal_II_dimension, number>
+    (dealii::SymmetricTensor<2,deal_II_dimension,number>);
 
 #ifdef DEAL_II_WITH_TRILINOS
     template
     void
-    tridiagonalize (const dealii::SymmetricTensor<2,deal_II_dimension,Sacado::Fad::DFad<number> > &,
-                    dealii::Tensor<2,deal_II_dimension,Sacado::Fad::DFad<number> >                &,
-                    std::array<Sacado::Fad::DFad<number>,deal_II_dimension>                       &,
-                    std::array<Sacado::Fad::DFad<number>,deal_II_dimension-1>                     &);
+    tridiagonalize<deal_II_dimension,Sacado::Fad::DFad<number> >
+    (const dealii::SymmetricTensor<2,deal_II_dimension,Sacado::Fad::DFad<number> > &,
+     dealii::Tensor<2,deal_II_dimension,Sacado::Fad::DFad<number> >                &,
+     std::array<Sacado::Fad::DFad<number>,deal_II_dimension>                       &,
+     std::array<Sacado::Fad::DFad<number>,deal_II_dimension-1>                     &);
 
     template
     std::array<std::pair<Sacado::Fad::DFad<number>, Tensor<1,deal_II_dimension,Sacado::Fad::DFad<number> > >,deal_II_dimension>
-    ql_implicit_shifts (const dealii::SymmetricTensor<2,deal_II_dimension,Sacado::Fad::DFad<number> > &);
+    ql_implicit_shifts<deal_II_dimension,Sacado::Fad::DFad<number> >
+    (const dealii::SymmetricTensor<2,deal_II_dimension,Sacado::Fad::DFad<number> > &);
 
     template
     std::array<std::pair<Sacado::Fad::DFad<number>, Tensor<1,deal_II_dimension,Sacado::Fad::DFad<number> > >,deal_II_dimension>
-    jacobi (dealii::SymmetricTensor<2,deal_II_dimension,Sacado::Fad::DFad<number> >);
+    jacobi<deal_II_dimension,Sacado::Fad::DFad<number> >
+    (dealii::SymmetricTensor<2,deal_II_dimension,Sacado::Fad::DFad<number> >);
 #endif
     \}
     \}
