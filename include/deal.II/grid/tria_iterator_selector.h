@@ -80,8 +80,6 @@ namespace internal
       typedef TriaRawIterator   <dealii::InvalidAccessor<3,1,spacedim> > raw_hex_iterator;
       typedef TriaIterator      <dealii::InvalidAccessor<3,1,spacedim> > hex_iterator;
       typedef TriaActiveIterator<dealii::InvalidAccessor<3,1,spacedim> > active_hex_iterator;
-
-      typedef raw_line_iterator raw_cell_iterator;
     };
 
 
@@ -136,8 +134,6 @@ namespace internal
       typedef TriaRawIterator   <dealii::InvalidAccessor<3,2,spacedim> > raw_hex_iterator;
       typedef TriaIterator      <dealii::InvalidAccessor<3,2,spacedim> > hex_iterator;
       typedef TriaActiveIterator<dealii::InvalidAccessor<3,2,spacedim> > active_hex_iterator;
-
-      typedef raw_quad_iterator raw_cell_iterator;
     };
 
 
@@ -176,8 +172,6 @@ namespace internal
       typedef TriaRawIterator   <dealii::CellAccessor<3, spacedim> > raw_hex_iterator;
       typedef TriaIterator      <dealii::CellAccessor<3, spacedim> > hex_iterator;
       typedef TriaActiveIterator<dealii::CellAccessor<3, spacedim> > active_hex_iterator;
-
-      typedef raw_hex_iterator raw_cell_iterator;
     };
 
   }
