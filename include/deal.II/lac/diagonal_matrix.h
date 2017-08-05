@@ -179,6 +179,15 @@ public:
                    const VectorType &src) const;
 
   /**
+   * Initialize vector @p dst to have the same size and partition as
+   * @p diagonal member of this class.
+   *
+   * This is a part of the interface required
+   * by linear_operator().
+   */
+  void initialize_dof_vector(VectorType &dst) const;
+
+  /**
    * Return the memory consumption of this object.
    */
   std::size_t memory_consumption () const;
@@ -217,6 +226,15 @@ void
 DiagonalMatrix<VectorType>::reinit(const VectorType &vec)
 {
   diagonal = vec;
+}
+
+
+
+template <typename VectorType>
+void
+DiagonalMatrix<VectorType>::initialize_dof_vector(VectorType &dst) const
+{
+  dst.reinit(diagonal);
 }
 
 

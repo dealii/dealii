@@ -1,0 +1,4 @@
+New: add Utilities::LinearAlgebra::Lanczos_largest_eigenvalue() to estimate the largest
+eigenvalue of a symmetric linear operator using k-steps of Lanczos algorithm.
+<br>
+(Denis Davydov, 2017/08/01)
