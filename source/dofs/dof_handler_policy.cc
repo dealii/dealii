@@ -2805,7 +2805,7 @@ namespace internal
               // before
               if (dealii_cell->user_flag_set() && !dealii_cell->is_ghost())
                 {
-                  Assert (!dealii_cell->is_artificial(), ExcInternalError());
+                  Assert (dealii_cell->is_locally_owned(), ExcInternalError());
 
                   // check each vertex if it is interesting and push
                   // DoF indices if so
