@@ -783,11 +783,9 @@ namespace internal
         // a problem
         Assert ((dim==structdim
                  ?
-                 typename
-                 internal::Triangulation::Iterators<dim,spacedim>::
-                 raw_cell_iterator (&dof_handler.get_triangulation(),
-                                    obj_level,
-                                    obj_index)->used()
+                 TriaRawIterator<dealii::CellAccessor<dim,spacedim> > (&dof_handler.get_triangulation(),
+                     obj_level,
+                     obj_index)->used()
                  :
                  (structdim==1
                   ?
@@ -835,11 +833,9 @@ namespace internal
         // a problem
         Assert ((dim==structdim
                  ?
-                 typename
-                 internal::Triangulation::Iterators<dim,spacedim>::
-                 raw_cell_iterator (&dof_handler.get_triangulation(),
-                                    obj_level,
-                                    obj_index)->used()
+                 TriaRawIterator<dealii::CellAccessor<dim,spacedim> > (&dof_handler.get_triangulation(),
+                     obj_level,
+                     obj_index)->used()
                  :
                  (structdim==1
                   ?
