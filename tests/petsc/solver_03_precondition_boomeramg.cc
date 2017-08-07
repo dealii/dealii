@@ -32,39 +32,10 @@
 #include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
-template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
-void
-check_solve(SolverType          &solver,
-            const SolverControl &solver_control,
-            const MatrixType    &A,
-            VectorType          &u,
-            VectorType          &f,
-            const PRECONDITION  &P)
-{
-  deallog << "Solver type: " << typeid(solver).name() << std::endl;
-
-  u = 0.;
-  f = 1.;
-  try
-    {
-      solver.solve(A,u,f,P);
-    }
-  catch (std::exception &e)
-    {
-      deallog << e.what() << std::endl;
-      abort ();
-    }
-
-  deallog << "Solver stopped after " << solver_control.last_step()
-          << " iterations" << std::endl;
-}
-
 
 int main(int argc, char **argv)
 {
   initlog();
-  deallog << std::setprecision(4);
-  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   {
@@ -89,7 +60,12 @@ int main(int argc, char **argv)
 
     PETScWrappers::SolverCG solver(control);
     PETScWrappers::PreconditionBoomerAMG preconditioner(A);
-    check_solve (solver, control, A,u,f, preconditioner);
+
+    deallog << "Solver type: " << typeid(solver).name() << std::endl;
+
+    check_solver_within_range(
+      solver.solve(A, u, f, preconditioner),
+      control.last_step(), 3, 5);
   }
 
 }
