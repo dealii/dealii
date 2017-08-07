@@ -329,9 +329,10 @@ namespace OpenCASCADE
    * optional parameter is used as a relative tolerance when comparing
    * objects.
    */
-  bool point_compare(const Point<3> &p1, const Point<3> &p2,
-                     const Tensor<1,3> &direction=Tensor<1,3>(),
-                     const double tolerance=1e-10);
+  bool point_compare(const Point<3>    &p1,
+                     const Point<3>    &p2,
+                     const Tensor<1,3> &direction = Tensor<1,3>(),
+                     const double       tolerance = 1e-10);
 
 
   /**

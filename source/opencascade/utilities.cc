@@ -21,8 +21,6 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
 
-#include <boost/bind.hpp>
-
 #include <cstdio>
 #include <iostream>
 #include <set>
@@ -178,9 +176,10 @@ namespace OpenCASCADE
     return Point<3>(p.X(), p.Y(), p.Z());
   }
 
-  bool point_compare(const Point<3> &p1, const Point<3> &p2,
+  bool point_compare(const Point<3>    &p1,
+                     const Point<3>    &p2,
                      const Tensor<1,3> &direction,
-                     const double tolerance)
+                     const double       tolerance)
   {
     const double rel_tol=std::max(tolerance, std::max(p1.norm(), p2.norm())*tolerance);
     if (direction.norm() > 0.0)
@@ -440,7 +439,10 @@ namespace OpenCASCADE
     if (direction*direction > 0)
       {
         std::sort(curve_points.begin(), curve_points.end(),
-                  boost::bind(&OpenCASCADE::point_compare, _1, _2, direction, tolerance));
+                  [&](const Point<3> &p1, const Point<3> &p2)
+        {
+          return OpenCASCADE::point_compare(p1, p2, direction, tolerance);
+        });
       }
 
     // set up array of vertices
