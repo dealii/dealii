@@ -107,7 +107,7 @@ namespace types
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  typedef unsigned char boundary_id;
+  typedef unsigned int boundary_id;
 
   /**
    * The type used to denote manifold indicators associated with every object
@@ -130,7 +130,7 @@ namespace types
    * @see
    * @ref GlossMaterialId "Glossary entry on material indicators"
    */
-  typedef unsigned char material_id;
+  typedef unsigned int material_id;
 }
 
 /**
