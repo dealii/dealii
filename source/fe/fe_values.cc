@@ -472,7 +472,7 @@ namespace FEValuesViews
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const Number value = dof_values[shape_function];
+            const Number &value = dof_values[shape_function];
             if (value == Number() )
               continue;
 
@@ -506,7 +506,7 @@ namespace FEValuesViews
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const Number value = dof_values[shape_function];
+            const Number &value = dof_values[shape_function];
             if (value == Number() )
               continue;
 
@@ -538,7 +538,7 @@ namespace FEValuesViews
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const Number value = dof_values[shape_function];
+            const Number &value = dof_values[shape_function];
             if (value == Number())
               continue;
 
@@ -575,7 +575,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values[shape_function];
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -625,7 +625,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values[shape_function];
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -679,7 +679,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values[shape_function];
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -731,7 +731,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values[shape_function];
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -791,7 +791,7 @@ namespace FEValuesViews
                 // shape function is zero for the selected components
                 continue;
 
-              const Number value = dof_values[shape_function];
+              const Number &value = dof_values[shape_function];
 
               if (value == Number())
                 continue;
@@ -851,7 +851,7 @@ namespace FEValuesViews
                 // shape function is zero for the selected components
                 continue;
 
-              const Number value = dof_values[shape_function];
+              const Number &value = dof_values[shape_function];
 
               if (value == Number())
                 continue;
@@ -974,7 +974,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values[shape_function];
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -1028,7 +1028,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values[shape_function];
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -1082,7 +1082,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values[shape_function];
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -1170,7 +1170,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values[shape_function];
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -1226,7 +1226,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values[shape_function];
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -1306,7 +1306,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<1,dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
   }
 
 
@@ -1329,7 +1330,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<2,dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_hessians, shape_function_data, hessians);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_hessians, shape_function_data, hessians);
   }
 
 
@@ -1352,7 +1354,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_laplacians<dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
   }
 
 
@@ -1375,7 +1378,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<3,dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
   }
 
 
@@ -1398,7 +1402,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_values, shape_function_data, values);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1422,7 +1427,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<1,dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
   }
 
 
@@ -1445,7 +1451,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_symmetric_gradients<dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_gradients, shape_function_data,
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_gradients, shape_function_data,
      symmetric_gradients);
   }
 
@@ -1470,7 +1477,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
   }
 
   template <int dim, int spacedim>
@@ -1491,7 +1499,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values (fe_function, dof_values);
     internal::do_function_curls<dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_gradients, shape_function_data, curls);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, curls);
   }
 
 
@@ -1513,7 +1522,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<2,dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_hessians, shape_function_data, hessians);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_hessians, shape_function_data, hessians);
   }
 
 
@@ -1539,7 +1549,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_laplacians<dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
   }
 
 
@@ -1561,7 +1572,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<3,dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
   }
 
 
@@ -1584,7 +1596,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_values, shape_function_data, values);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1608,7 +1621,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
   }
 
   template <int dim, int spacedim>
@@ -1629,7 +1643,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_values, shape_function_data, values);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1653,7 +1668,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell), fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
+    (ArrayView<const typename InputVector::value_type>(&dof_values[0], fe_values->dofs_per_cell),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
   }
 }
 
@@ -2373,7 +2389,7 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
           if (value == Number())
             continue;
 
@@ -2448,7 +2464,7 @@ namespace internal
     // access the shape_gradients/hessians data stored contiguously
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-        const Number value = dof_values_ptr[shape_func];
+        const Number &value = dof_values_ptr[shape_func];
         if (value == Number())
           continue;
 
@@ -2507,7 +2523,7 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
           if (value == Number())
             continue;
 
@@ -2633,7 +2649,7 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
           if (value == Number())
             continue;
 
