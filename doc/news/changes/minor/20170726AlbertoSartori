@@ -1,0 +1,5 @@
+Fixed: The FunctionParser class demonstrated an incompatibility with
+(very) old versions of the Threading Building Blocks used in
+deal.II. This is now worked around.
+<br>
+(Alberto Sartori, Wolfgang Bangerth, 2017/07/26)
