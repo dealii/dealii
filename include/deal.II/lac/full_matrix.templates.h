@@ -1199,7 +1199,7 @@ namespace internal
         return lp_A.determinant();
       }
 #else
-      static number value (const FullMatrix<number> &A)
+      static number value (const FullMatrix<number> &)
       {
         AssertThrow(false, ExcNeedsLAPACK());
         return 0.0;
