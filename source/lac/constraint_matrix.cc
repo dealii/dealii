@@ -97,6 +97,13 @@ ConstraintMatrix::ConstraintLine::memory_consumption () const
 
 
 
+const ConstraintMatrix::LineRange ConstraintMatrix::get_lines() const
+{
+  return boost::make_iterator_range(lines.begin(), lines.end());
+}
+
+
+
 void
 ConstraintMatrix::add_lines (const std::set<size_type> &lines)
 {

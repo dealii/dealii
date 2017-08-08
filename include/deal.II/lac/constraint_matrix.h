@@ -26,6 +26,8 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_element_access.h>
 
+#include <boost/range/iterator_range.hpp>
+
 #include <vector>
 #include <set>
 #include <utility>
@@ -1177,6 +1179,28 @@ public:
     std::size_t memory_consumption () const;
   };
 
+
+  /**
+   * Typedef for the iterator type that is used in the LineRange container.
+   */
+  typedef std::vector<ConstraintLine>::const_iterator const_iterator;
+
+
+  /**
+   * Typedef for the return type used by get_lines().
+   */
+  typedef boost::iterator_range<const_iterator> LineRange;
+
+
+  /**
+   * Return a range object containing (const) iterators to all line entries
+   * stored in the ConstraintMatrix. Such a range is useful to initialize
+   * range-based for loops as supported by C++11.
+   *
+   * @return A range object for the half open range <code>[this->begin(),
+   * this->end())</code> of line entries.
+   */
+  const LineRange get_lines() const;
 
 
   /**
