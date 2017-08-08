@@ -122,7 +122,7 @@ void run()
   dof_handler.distribute_dofs (fe);
 
   ConstraintMatrix constraints;
-  std::set<unsigned char> no_normal_flux_boundaries;
+  std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (6);
   VectorTools::compute_no_normal_flux_constraints
   (dof_handler, 0,

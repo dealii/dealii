@@ -45,13 +45,13 @@ int main()
 
   int                 t0 = 1;
   unsigned int        t1 = 2;
-  types::boundary_id  t2 = 3;
+  unsigned char       t2 = 3;
   std::string         t3 = "Ciao";
   double              t4 = 4.0;
 
   std::map<unsigned int, int                > t10;
   std::map<unsigned int, unsigned int       > t11;
-  std::map<unsigned int, types::boundary_id > t12;
+  std::map<unsigned int, unsigned char      > t12;
   std::map<unsigned int, std::string        > t13;
   std::map<unsigned int, double             > t14;
 
