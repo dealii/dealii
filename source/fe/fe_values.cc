@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/quadrature.h>
@@ -455,8 +456,8 @@ namespace FEValuesViews
     // ------------------------- scalar functions --------------------------
     template <int dim, int spacedim, typename Number>
     void
-    do_function_values (const ::dealii::Vector<Number> &dof_values,
-                        const Table<2,double>          &shape_values,
+    do_function_values (const ArrayView<Number> &dof_values,
+                        const Table<2,double> &shape_values,
                         const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                         std::vector<typename ProductType<Number,double>::type>            &values)
     {
@@ -471,7 +472,7 @@ namespace FEValuesViews
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const Number value = dof_values(shape_function);
+            const Number &value = dof_values[shape_function];
             if (value == Number() )
               continue;
 
@@ -488,7 +489,7 @@ namespace FEValuesViews
     // the order of the derivative (= rank of gradient/Hessian tensor)
     template <int order, int dim, int spacedim, typename Number>
     void
-    do_function_derivatives (const ::dealii::Vector<Number> &dof_values,
+    do_function_derivatives (const ArrayView<Number> &dof_values,
                              const Table<2,dealii::Tensor<order,spacedim> > &shape_derivatives,
                              const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,dealii::Tensor<order,spacedim> >::type> &derivatives)
@@ -505,7 +506,7 @@ namespace FEValuesViews
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const Number value = dof_values(shape_function);
+            const Number &value = dof_values[shape_function];
             if (value == Number() )
               continue;
 
@@ -521,7 +522,7 @@ namespace FEValuesViews
 
     template <int dim, int spacedim, typename Number>
     void
-    do_function_laplacians (const ::dealii::Vector<Number> &dof_values,
+    do_function_laplacians (const ArrayView<Number> &dof_values,
                             const Table<2,dealii::Tensor<2,spacedim> > &shape_hessians,
                             const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                             std::vector<typename ProductType<Number,double>::type>           &laplacians)
@@ -537,7 +538,7 @@ namespace FEValuesViews
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
-            const Number value = dof_values(shape_function);
+            const Number &value = dof_values[shape_function];
             if (value == Number())
               continue;
 
@@ -553,7 +554,7 @@ namespace FEValuesViews
     // ----------------------------- vector part ---------------------------
 
     template <int dim, int spacedim, typename Number>
-    void do_function_values (const ::dealii::Vector<Number> &dof_values,
+    void do_function_values (const ArrayView<Number> &dof_values,
                              const Table<2,double>          &shape_values,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &values)
@@ -574,7 +575,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values(shape_function);
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -602,7 +603,7 @@ namespace FEValuesViews
 
     template <int order, int dim, int spacedim, typename Number>
     void
-    do_function_derivatives (const ::dealii::Vector<Number> &dof_values,
+    do_function_derivatives (const ArrayView<Number> &dof_values,
                              const Table<2,dealii::Tensor<order,spacedim> > &shape_derivatives,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,dealii::Tensor<order+1,spacedim> >::type> &derivatives)
@@ -624,7 +625,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values(shape_function);
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -656,7 +657,7 @@ namespace FEValuesViews
 
     template <int dim, int spacedim, typename Number>
     void
-    do_function_symmetric_gradients (const ::dealii::Vector<Number> &dof_values,
+    do_function_symmetric_gradients (const ArrayView<Number> &dof_values,
                                      const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                                      const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                                      std::vector<typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type> &symmetric_gradients)
@@ -678,7 +679,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values(shape_function);
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -709,7 +710,7 @@ namespace FEValuesViews
 
     template <int dim, int spacedim, typename Number>
     void
-    do_function_divergences (const ::dealii::Vector<Number> &dof_values,
+    do_function_divergences (const ArrayView<Number> &dof_values,
                              const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,double>::type> &divergences)
@@ -730,7 +731,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values(shape_function);
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -759,7 +760,7 @@ namespace FEValuesViews
 
     template <int dim, int spacedim, typename Number>
     void
-    do_function_curls (const ::dealii::Vector<Number> &dof_values,
+    do_function_curls (const ArrayView<Number> &dof_values,
                        const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                        const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                        std::vector<typename ProductType<Number,typename dealii::internal::CurlType<spacedim>::type>::type> &curls)
@@ -790,7 +791,7 @@ namespace FEValuesViews
                 // shape function is zero for the selected components
                 continue;
 
-              const Number value = dof_values (shape_function);
+              const Number &value = dof_values[shape_function];
 
               if (value == Number())
                 continue;
@@ -850,7 +851,7 @@ namespace FEValuesViews
                 // shape function is zero for the selected components
                 continue;
 
-              const Number value = dof_values (shape_function);
+              const Number &value = dof_values[shape_function];
 
               if (value == Number())
                 continue;
@@ -951,7 +952,7 @@ namespace FEValuesViews
 
     template <int dim, int spacedim, typename Number>
     void
-    do_function_laplacians (const ::dealii::Vector<Number> &dof_values,
+    do_function_laplacians (const ArrayView<Number> &dof_values,
                             const Table<2,dealii::Tensor<2,spacedim> > &shape_hessians,
                             const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                             std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &laplacians)
@@ -973,7 +974,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values(shape_function);
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -1005,7 +1006,7 @@ namespace FEValuesViews
 
     template <int dim, int spacedim, typename Number>
     void
-    do_function_values (const ::dealii::Vector<Number> &dof_values,
+    do_function_values (const ArrayView<Number> &dof_values,
                         const dealii::Table<2,double>          &shape_values,
                         const std::vector<typename SymmetricTensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
                         std::vector<typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type> &values)
@@ -1027,7 +1028,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values(shape_function);
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -1059,7 +1060,7 @@ namespace FEValuesViews
 
     template <int dim, int spacedim, typename Number>
     void
-    do_function_divergences (const ::dealii::Vector<Number> &dof_values,
+    do_function_divergences (const ArrayView<Number> &dof_values,
                              const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                              const std::vector<typename SymmetricTensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &divergences)
@@ -1081,7 +1082,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values(shape_function);
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -1147,7 +1148,7 @@ namespace FEValuesViews
 
     template <int dim, int spacedim, typename Number>
     void
-    do_function_values (const ::dealii::Vector<Number> &dof_values,
+    do_function_values (const ArrayView<Number> &dof_values,
                         const dealii::Table<2,double>          &shape_values,
                         const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
                         std::vector<typename ProductType<Number,dealii::Tensor<2,spacedim> >::type> &values)
@@ -1169,7 +1170,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values(shape_function);
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -1203,7 +1204,7 @@ namespace FEValuesViews
 
     template <int dim, int spacedim, typename Number>
     void
-    do_function_divergences (const ::dealii::Vector<Number> &dof_values,
+    do_function_divergences (const ArrayView<Number> &dof_values,
                              const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                              const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &divergences)
@@ -1225,7 +1226,7 @@ namespace FEValuesViews
             // shape function is zero for the selected components
             continue;
 
-          const Number value = dof_values(shape_function);
+          const Number &value = dof_values[shape_function];
           if (value == Number())
             continue;
 
@@ -1281,7 +1282,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_values, shape_function_data, values);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1304,7 +1306,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<1,dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
   }
 
 
@@ -1327,7 +1330,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<2,dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_hessians, shape_function_data, hessians);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_hessians, shape_function_data, hessians);
   }
 
 
@@ -1350,7 +1354,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_laplacians<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
   }
 
 
@@ -1373,7 +1378,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<3,dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
   }
 
 
@@ -1396,7 +1402,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_values, shape_function_data, values);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1420,7 +1427,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<1,dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
   }
 
 
@@ -1443,7 +1451,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_symmetric_gradients<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_gradients, shape_function_data,
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data,
      symmetric_gradients);
   }
 
@@ -1468,7 +1477,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
   }
 
   template <int dim, int spacedim>
@@ -1489,7 +1499,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values (fe_function, dof_values);
     internal::do_function_curls<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_gradients, shape_function_data, curls);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, curls);
   }
 
 
@@ -1511,7 +1522,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<2,dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_hessians, shape_function_data, hessians);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_hessians, shape_function_data, hessians);
   }
 
 
@@ -1537,7 +1549,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_laplacians<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
   }
 
 
@@ -1559,7 +1572,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<3,dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
   }
 
 
@@ -1582,7 +1596,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_values, shape_function_data, values);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1606,7 +1621,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
   }
 
   template <int dim, int spacedim>
@@ -1627,7 +1643,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_values, shape_function_data, values);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_values, shape_function_data, values);
   }
 
 
@@ -1651,7 +1668,8 @@ namespace FEValuesViews
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-    (dof_values, fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
   }
 }
 
@@ -2371,7 +2389,7 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
           if (value == Number())
             continue;
 
@@ -2446,7 +2464,7 @@ namespace internal
     // access the shape_gradients/hessians data stored contiguously
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
-        const Number value = dof_values_ptr[shape_func];
+        const Number &value = dof_values_ptr[shape_func];
         if (value == Number())
           continue;
 
@@ -2505,7 +2523,7 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
           if (value == Number())
             continue;
 
@@ -2631,7 +2649,7 @@ namespace internal
     for (unsigned int mc = 0; mc < component_multiple; ++mc)
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
-          const Number value = dof_values_ptr[shape_func+mc*dofs_per_cell];
+          const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
           if (value == Number())
             continue;
 
