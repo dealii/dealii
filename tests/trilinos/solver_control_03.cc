@@ -33,36 +33,6 @@
 #include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
-template <typename MatrixType, typename VectorType, class PRECONDITION>
-void
-check_solve (SolverControl       &solver_control,
-             const MatrixType    &A,
-             VectorType          &u,
-             VectorType          &f,
-             const PRECONDITION  &P,
-             const bool           expected_result)
-{
-  TrilinosWrappers::SolverCG solver(solver_control);
-
-  u = 0.;
-  f = 1.;
-  bool success = false;
-  try
-    {
-      solver.solve(A,u,f,P);
-      deallog << "Success. ";
-      success = true;
-    }
-  catch (std::exception &e)
-    {
-      deallog << "Failure. ";
-    }
-
-  deallog << "Solver stopped after " << solver_control.last_step()
-          << " iterations" << std::endl;
-  Assert(success == expected_result, ExcMessage("Incorrect result."));
-}
-
 
 int main(int argc, char **argv)
 {
@@ -103,15 +73,21 @@ int main(int argc, char **argv)
     deallog.push("Abs tol");
     {
       // Expects success
-      IterationNumberControl solver_control(2000, 1.e-3);
-      check_solve (solver_control, A,u,f, preconditioner, true);
+      IterationNumberControl control(2000, 1.e-3);
+      TrilinosWrappers::SolverCG solver(control);
+      check_solver_within_range(solver.solve(A,u,f,preconditioner),
+                                control.last_step(), 42, 44);
     }
     deallog.pop();
+
+    u = 0.;
     deallog.push("Iterations");
     {
       // Expects success
-      IterationNumberControl solver_control(20, 1.e-3);
-      check_solve (solver_control, A,u,f, preconditioner, true);
+      IterationNumberControl control(20, 1.e-3);
+      TrilinosWrappers::SolverCG solver(control);
+      check_solver_within_range(solver.solve(A,u,f,preconditioner),
+                                control.last_step(), 19, 21);
     }
     deallog.pop();
   }
