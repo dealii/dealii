@@ -1,0 +1,4 @@
+Changed: ConstraintMatrix::ConstraintLine is now a public member class
+definition.
+<br>
+(Matthias Maier, 2017/08/08)
