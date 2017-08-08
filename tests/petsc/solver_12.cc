@@ -31,26 +31,6 @@
 #include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
-template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>
-void
-check_solve(SolverType          &solver,
-            const SolverControl &solver_control,
-            const MatrixType    &A,
-            VectorType          &u,
-            VectorType          &f,
-            const PRECONDITION  &P)
-{
-  deallog << "Solver type: " << typeid(solver).name() << std::endl;
-
-  u = 0.;
-  f = 1.;
-
-  solver.solve(A,u,f,P);
-
-  deallog << "Solver stopped after " << solver_control.last_step()
-          << " iterations" << std::endl;
-}
-
 
 int main(int argc, char **argv)
 {
@@ -82,10 +62,15 @@ int main(int argc, char **argv)
     PETScWrappers::SolverPreOnly solver(control);
 
     PETScWrappers::PreconditionJacobi preconditioner(A);
-    check_solve (solver, control, A,u,f, preconditioner);
+    deallog << "Solver type: " << typeid(solver).name() << std::endl;
+    check_solver_within_range(solver.solve(A,u,f,preconditioner),
+                              control.last_step(), 1, 11);
 
     //run twice because this errored out at some point
-    check_solve (solver, control, A,u,f, preconditioner);
+    u = 0.;
+    deallog << "Solver type: " << typeid(solver).name() << std::endl;
+    check_solver_within_range(solver.solve(A,u,f,preconditioner),
+                              control.last_step(), 1, 1);
   }
 
 }
