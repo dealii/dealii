@@ -56,7 +56,7 @@ namespace internal
    * A class whose specialization is used to define what type the curl of a
    * vector valued function corresponds to.
    */
-  template <int dim>
+  template <int dim, class NumberType=double>
   struct CurlType;
 
   /**
@@ -65,10 +65,10 @@ namespace internal
    *
    * In 1d, the curl is a scalar.
    */
-  template <>
-  struct CurlType<1>
+  template <class NumberType>
+  struct CurlType<1, NumberType>
   {
-    typedef Tensor<1,1>     type;
+    typedef Tensor<1,1,NumberType>     type;
   };
 
   /**
@@ -77,10 +77,10 @@ namespace internal
    *
    * In 2d, the curl is a scalar.
    */
-  template <>
-  struct CurlType<2>
+  template <class NumberType>
+  struct CurlType<2,NumberType>
   {
-    typedef Tensor<1,1>     type;
+    typedef Tensor<1,1,NumberType>     type;
   };
 
   /**
@@ -89,10 +89,10 @@ namespace internal
    *
    * In 3d, the curl is a vector.
    */
-  template <>
-  struct CurlType<3>
+  template <class NumberType>
+  struct CurlType<3,NumberType>
   {
-    typedef Tensor<1,3>     type;
+    typedef Tensor<1,3,NumberType>     type;
   };
 }
 
