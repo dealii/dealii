@@ -1134,10 +1134,11 @@ public:
     typedef std::vector<std::pair<size_type,double> > Entries;
 
     /**
-     * Number of this line. Since only very few lines are stored, we can not
-     * assume a specific order and have to store the line number explicitly.
+     * Global DoF index of this line. Since only very few lines are stored,
+     * we can not assume a specific order and have to store the index
+     * explicitly.
      */
-    size_type line;
+    size_type index;
 
     /**
      * Row numbers and values of the entries in this line.
@@ -1504,7 +1505,7 @@ ConstraintMatrix::add_line (const size_type line)
 
   // push a new line to the end of the list
   lines.emplace_back ();
-  lines.back().line = line;
+  lines.back().index = line;
   lines.back().inhomogeneity = 0.;
   lines_cache[line_index] = lines.size()-1;
 }
@@ -1538,7 +1539,7 @@ ConstraintMatrix::add_entry (const size_type line,
   Assert (!local_lines.size() || local_lines.is_element(column),
           ExcColumnNotStoredHere(line, column));
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
-  Assert (line_ptr->line == line, ExcInternalError());
+  Assert (line_ptr->index == line, ExcInternalError());
   for (ConstraintLine::Entries::const_iterator
        p=line_ptr->entries.begin();
        p != line_ptr->entries.end(); ++p)
