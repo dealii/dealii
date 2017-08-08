@@ -31,7 +31,6 @@ using namespace Patterns::Tools;
 template<class T>
 void test(T t)
 {
-  deallog << "Type     : " << boost::core::demangle(typeid(T).name()) << std::endl;
   auto p = Convert<T>::to_pattern();
   deallog << "Pattern  : " << p->description() << std::endl;
   auto s = Convert<T>::to_string(t);
