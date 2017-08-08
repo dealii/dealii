@@ -146,8 +146,6 @@ namespace Step37
                const unsigned int col) const;
     void set_diagonal (const Vector<number> &diagonal);
 
-    std::size_t memory_consumption () const;
-
   private:
     void local_apply (const MatrixFree<dim,number>    &data,
                       Vector<double>                      &dst,
@@ -343,19 +341,6 @@ namespace Step37
 
     diagonal_is_available = true;
   }
-
-
-
-  template <int dim, int fe_degree, typename number>
-  std::size_t
-  LaplaceOperator<dim,fe_degree,number>::memory_consumption () const
-  {
-    return (data.memory_consumption () +
-            coefficient.memory_consumption() +
-            diagonal_values.memory_consumption() +
-            MemoryConsumption::memory_consumption(diagonal_is_available));
-  }
-
 
 
 
@@ -597,11 +582,6 @@ namespace Step37
                    MGTransferPrebuilt<Vector<double> > >
                    preconditioner(dof_handler, mg, mg_transfer);
 
-    const std::size_t multigrid_memory
-      = (mg_matrices.memory_consumption() +
-         mg_transfer.memory_consumption() +
-         coarse_matrix.memory_consumption());
-
     SolverControl           solver_control (1000, 1e-12*system_rhs.l2_norm());
     SolverCG<>              cg (solver_control);
 
@@ -657,4 +637,3 @@ int main ()
 
   return 0;
 }
-
