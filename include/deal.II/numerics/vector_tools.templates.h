@@ -345,7 +345,8 @@ namespace VectorTools
 
             // count, how often we have
             // added to this dof
-            Assert (touch_count[local_dof_indices[j]] < numbers::internal_face_boundary_id,
+            Assert (touch_count[local_dof_indices[j]]
+                    < std::numeric_limits<decltype(touch_count)::value_type>::max(),
                     ExcInternalError());
             ++touch_count[local_dof_indices[j]];
           }
