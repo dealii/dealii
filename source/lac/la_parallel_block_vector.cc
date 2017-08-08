@@ -37,11 +37,8 @@ namespace LinearAlgebra
 #define TEMPL_COPY_CONSTRUCTOR(S1,S2)                                   \
   template BlockVector<S1>& BlockVector<S1>::operator=<S2> (const BlockVector<S2> &)
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
     TEMPL_COPY_CONSTRUCTOR(double,float);
     TEMPL_COPY_CONSTRUCTOR(float,double);
-
-#endif
 
 #undef TEMPL_COPY_CONSTRUCTOR
   }

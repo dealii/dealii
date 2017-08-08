@@ -61,7 +61,6 @@ BlockVector<Number>::BlockVector (const BlockVector<Number> &v)
 }
 
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
 template <typename Number>
 template <typename OtherNumber>
@@ -71,7 +70,6 @@ BlockVector<Number>::BlockVector (const BlockVector<OtherNumber> &v)
   *this = v;
 }
 
-#endif
 
 
 #ifdef DEAL_II_WITH_TRILINOS

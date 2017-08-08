@@ -32,15 +32,11 @@ namespace LinearAlgebra
 #define TEMPL_COPY_CONSTRUCTOR(S1,S2)                                   \
   template Vector<S1>& Vector<S1>::operator=<S2> (const Vector<S2> &)
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
     TEMPL_COPY_CONSTRUCTOR(double,float);
     TEMPL_COPY_CONSTRUCTOR(float,double);
 
-
     TEMPL_COPY_CONSTRUCTOR(std::complex<double>,std::complex<float>);
     TEMPL_COPY_CONSTRUCTOR(std::complex<float>,std::complex<double>);
-
-#endif
 
 #undef TEMPL_COPY_CONSTRUCTOR
   }

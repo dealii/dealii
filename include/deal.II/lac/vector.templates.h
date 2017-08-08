@@ -75,7 +75,6 @@ Vector<Number>::Vector (Vector<Number> &&v)
 
 
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 template <typename Number>
 template <typename OtherNumber>
 Vector<Number>::Vector (const Vector<OtherNumber> &v)
@@ -91,7 +90,7 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
       *this = v;
     }
 }
-#endif
+
 
 
 #ifdef DEAL_II_WITH_PETSC

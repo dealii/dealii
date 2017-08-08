@@ -93,7 +93,6 @@ namespace LinearAlgebra
     }
 
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
 
     template <typename Number>
     template <typename OtherNumber>
@@ -102,8 +101,6 @@ namespace LinearAlgebra
       reinit (v, true);
       *this = v;
     }
-
-#endif
 
 
 
