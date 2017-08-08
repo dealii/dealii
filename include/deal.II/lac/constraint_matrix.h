@@ -1120,6 +1120,64 @@ public:
    * @}
    */
 
+
+
+  /**
+   * This class represents one line of a constraint matrix.
+   */
+  struct ConstraintLine
+  {
+    /**
+     * A data type in which we store the list of entries that make up the
+     * homogenous part of a constraint.
+     */
+    typedef std::vector<std::pair<size_type,double> > Entries;
+
+    /**
+     * Number of this line. Since only very few lines are stored, we can not
+     * assume a specific order and have to store the line number explicitly.
+     */
+    size_type line;
+
+    /**
+     * Row numbers and values of the entries in this line.
+     *
+     * For the reason why we use a vector instead of a map and the
+     * consequences thereof, the same applies as what is said for
+     * ConstraintMatrix::lines.
+     */
+    Entries entries;
+
+    /**
+     * Value of the inhomogeneity.
+     */
+    double inhomogeneity;
+
+    /**
+     * This operator is a bit weird and unintuitive: it compares the line
+     * numbers of two lines. We need this to sort the lines; in fact we could
+     * do this using a comparison predicate.  However, this way, it is easier,
+     * albeit unintuitive since two lines really have no god-given order
+     * relation.
+     */
+    bool operator < (const ConstraintLine &) const;
+
+    /**
+     * This operator is likewise weird: it checks whether the line indices of
+     * the two operands are equal, irrespective of the fact that the contents
+     * of the line may be different.
+     */
+    bool operator == (const ConstraintLine &) const;
+
+    /**
+     * Determine an estimate for the memory consumption (in bytes) of this
+     * object.
+     */
+    std::size_t memory_consumption () const;
+  };
+
+
+
   /**
    * Exception
    *
@@ -1226,60 +1284,6 @@ public:
                   << "another DoF also knows about this constraint?");
 
 private:
-
-  /**
-   * This class represents one line of a constraint matrix.
-   */
-  struct ConstraintLine
-  {
-    /**
-     * A data type in which we store the list of entries that make up the
-     * homogenous part of a constraint.
-     */
-    typedef std::vector<std::pair<size_type,double> > Entries;
-
-    /**
-     * Number of this line. Since only very few lines are stored, we can not
-     * assume a specific order and have to store the line number explicitly.
-     */
-    size_type line;
-
-    /**
-     * Row numbers and values of the entries in this line.
-     *
-     * For the reason why we use a vector instead of a map and the
-     * consequences thereof, the same applies as what is said for
-     * ConstraintMatrix::lines.
-     */
-    Entries entries;
-
-    /**
-     * Value of the inhomogeneity.
-     */
-    double inhomogeneity;
-
-    /**
-     * This operator is a bit weird and unintuitive: it compares the line
-     * numbers of two lines. We need this to sort the lines; in fact we could
-     * do this using a comparison predicate.  However, this way, it is easier,
-     * albeit unintuitive since two lines really have no god-given order
-     * relation.
-     */
-    bool operator < (const ConstraintLine &) const;
-
-    /**
-     * This operator is likewise weird: it checks whether the line indices of
-     * the two operands are equal, irrespective of the fact that the contents
-     * of the line may be different.
-     */
-    bool operator == (const ConstraintLine &) const;
-
-    /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object.
-     */
-    std::size_t memory_consumption () const;
-  };
 
   /**
    * Store the lines of the matrix.  Entries are usually appended in an
