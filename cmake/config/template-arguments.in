@@ -12,6 +12,17 @@ REAL_SCALARS    := { double; float }
 COMPLEX_SCALARS := { std::complex<double>;
                      std::complex<float> }
 
+// differentiable scalar types
+DIFFERENTIABLE_REAL_SCALARS := {
+		    @DEAL_II_EXPAND_TRILINOS_SACADO_TYPES@;
+		    } 
+
+// all possible scalar types
+ALL_SCALAR_TYPES := {
+    double; float ; std::complex<double>; std::complex<float>;
+    @DEAL_II_EXPAND_TRILINOS_SACADO_TYPES@;
+}
+
 // scalar types that have a corresponding MPI datatype and that we can
 // therefore use in calls like MPI_Allreduce
 MPI_SCALARS     := { int;
@@ -115,6 +126,11 @@ VECTORS_WITH_MATRIX := { Vector<double>;
                          @DEAL_II_EXPAND_EPETRA_VECTOR@;
                        }
 
+// General container types
+GENERAL_CONTAINER_TYPES := {std::vector;
+                            ArrayView
+                       }
+
 // DoFHandler and hp::DoFHandler templates
 DOFHANDLER_TEMPLATES := { DoFHandler;
                           hp::DoFHandler }
@@ -165,3 +181,4 @@ RANKS := { 1; 2; 3; 4 }
 OUTPUT_FLAG_TYPES := { DXFlags; UcdFlags; GnuplotFlags; PovrayFlags; EpsFlags;
                        GmvFlags; TecplotFlags; VtkFlags; SvgFlags;
                        Deal_II_IntermediateFlags }
+
