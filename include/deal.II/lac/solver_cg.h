@@ -22,8 +22,8 @@
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/subscriptor.h>
+
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -278,7 +278,6 @@ SolverCG<VectorType>::cleanup()
   this->memory.free(Vr);
   this->memory.free(Vp);
   this->memory.free(Vz);
-  deallog.pop();
 }
 
 
@@ -344,8 +343,6 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
                              const PreconditionerType &precondition)
 {
   SolverControl::State conv=SolverControl::iterate;
-
-  deallog.push("cg");
 
   // Memory allocation
   Vr = this->memory.alloc();

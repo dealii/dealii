@@ -20,10 +20,11 @@
 #include <deal.II/base/config.h>
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
-#include <deal.II/base/logstream.h>
-#include <cmath>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/signaling_nan.h>
+
+#include <cmath>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -212,8 +213,6 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
                                  const VectorType         &b,
                                  const PreconditionerType &precondition)
 {
-  deallog.push("minres");
-
   // Memory allocation
   Vu0  = this->memory.alloc();
   Vu1  = this->memory.alloc();
@@ -374,8 +373,6 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
   this->memory.free(Vm0);
   this->memory.free(Vm1);
   this->memory.free(Vm2);
-  // Output
-  deallog.pop ();
 
   // in case of failure: throw exception
   AssertThrow(conv == SolverControl::success,

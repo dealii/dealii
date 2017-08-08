@@ -20,7 +20,6 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
@@ -684,11 +683,7 @@ SolverGMRES<VectorType>::modified_gram_schmidt
         return norm_vv;
 
       else
-        {
-          re_orthogonalize = true;
-          deallog << "Re-orthogonalization enabled at step "
-                  << accumulated_iterations << std::endl;
-        }
+        re_orthogonalize = true;
     }
 
   if (re_orthogonalize == true)
@@ -769,7 +764,6 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
 //TODO:[?] Check, why there are two different start residuals.
 //TODO:[GK] Make sure the parameter in the constructor means maximum basis size
 
-  deallog.push("GMRES");
   const unsigned int n_tmp_vectors = additional_data.max_n_tmp_vectors;
 
   // Generate an object where basis vectors are stored.
@@ -876,8 +870,6 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
         }
       else
         {
-          deallog << "default_res=" << rho << std::endl;
-
           if (left_precondition)
             {
               A.vmult(*r,x);
@@ -957,8 +949,6 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
             }
           else
             {
-              deallog << "default_res=" << rho << std::endl;
-
               dealii::Vector<double> h_(dim);
               *x_=x;
               *gamma_=gamma;
@@ -1045,8 +1035,6 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
 
       delete gamma_;
     }
-
-  deallog.pop();
 
   // in case of failure: throw exception
   AssertThrow(iteration_state == SolverControl::success,
@@ -1162,8 +1150,6 @@ SolverFGMRES<VectorType>::solve (const MatrixType         &A,
                                  const VectorType         &b,
                                  const PreconditionerType &precondition)
 {
-  deallog.push("FGMRES");
-
   SolverControl::State iteration_state = SolverControl::iterate;
 
   const unsigned int basis_size = additional_data.max_basis_size;
@@ -1249,7 +1235,6 @@ SolverFGMRES<VectorType>::solve (const MatrixType         &A,
 
   this->memory.free(aux);
 
-  deallog.pop();
   // in case of failure: throw exception
   if (iteration_state != SolverControl::success)
     AssertThrow(false, SolverControl::NoConvergence (accumulated_iterations,

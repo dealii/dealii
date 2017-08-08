@@ -19,8 +19,6 @@
 #include <deal.II/base/config.h>
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
-#include <deal.II/base/logstream.h>
-#include <cmath>
 #include <deal.II/base/subscriptor.h>
 
 #include <cmath>
@@ -271,8 +269,6 @@ SolverQMRS<VectorType>::solve (const MatrixType         &A,
                                const VectorType         &b,
                                const PreconditionerType &precondition)
 {
-  deallog.push("QMRS");
-
   // Memory allocation
   Vv  = this->memory.alloc();
   Vp  = this->memory.alloc();
@@ -296,8 +292,6 @@ SolverQMRS<VectorType>::solve (const MatrixType         &A,
 
   do
     {
-      if (step > 0)
-        deallog << "Restart step " << step << std::endl;
       state = iterate(A, precondition);
     }
   while (state.state == SolverControl::iterate);
@@ -308,9 +302,6 @@ SolverQMRS<VectorType>::solve (const MatrixType         &A,
   this->memory.free(Vq);
   this->memory.free(Vt);
   this->memory.free(Vd);
-
-  // Output
-  deallog.pop();
 
   // in case of failure: throw exception
   AssertThrow(state.state == SolverControl::success,
