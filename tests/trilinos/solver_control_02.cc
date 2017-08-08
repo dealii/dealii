@@ -33,36 +33,6 @@
 #include <deal.II/lac/vector_memory.h>
 #include <typeinfo>
 
-template <typename MatrixType, typename VectorType, class PRECONDITION>
-void
-check_solve (SolverControl       &solver_control,
-             const MatrixType    &A,
-             VectorType          &u,
-             VectorType          &f,
-             const PRECONDITION  &P,
-             const bool           expected_result)
-{
-  TrilinosWrappers::SolverCG solver(solver_control);
-
-  u = 0.;
-  f = 1.;
-  bool success = false;
-  try
-    {
-      solver.solve(A,u,f,P);
-      deallog << "Success. ";
-      success = true;
-    }
-  catch (std::exception &e)
-    {
-      deallog << "Failure. ";
-    }
-
-  deallog << "Solver stopped after " << solver_control.last_step()
-          << " iterations" << std::endl;
-  Assert(success == expected_result, ExcMessage("Incorrect result."));
-}
-
 
 int main(int argc, char **argv)
 {
@@ -103,22 +73,32 @@ int main(int argc, char **argv)
     deallog.push("Rel tol");
     {
       // Expects success
-      ReductionControl solver_control(2000, 1.e-30, 1e-6);
-      check_solve (solver_control, A,u,f, preconditioner, true);
+      ReductionControl control(2000, 1.e-30, 1e-6);
+      TrilinosWrappers::SolverCG solver(control);
+      check_solver_within_range(solver.solve(A,u,f,preconditioner),
+                                control.last_step(), 49, 51);
     }
     deallog.pop();
+
+    u = 0.;
     deallog.push("Abs tol");
     {
       // Expects success
-      ReductionControl solver_control(2000, 1.e-3, 1e-9);
-      check_solve (solver_control, A,u,f, preconditioner, true);
+      ReductionControl control(2000, 1.e-3, 1e-9);
+      TrilinosWrappers::SolverCG solver(control);
+      check_solver_within_range(solver.solve(A,u,f,preconditioner),
+                                control.last_step(), 42, 44);
     }
     deallog.pop();
+
+    u = 0.;
     deallog.push("Iterations");
     {
       // Expects failure
-      ReductionControl solver_control(20, 1.e-30, 1e-6);
-      check_solve (solver_control, A,u,f, preconditioner, false);
+      ReductionControl control(20, 1.e-30, 1e-6);
+      TrilinosWrappers::SolverCG solver(control);
+      check_solver_within_range(solver.solve(A,u,f,preconditioner),
+                                control.last_step(), 0, 19);
     }
     deallog.pop();
   }
