@@ -1713,6 +1713,15 @@ public:
   void get_function_values (const InputVector &fe_function,
                             std::vector<typename InputVector::value_type> &values) const;
 
+
+  /**
+   * Same as above, using local dof values.
+   */
+  template <class InputVector>
+  void get_function_values_from_local_vector (const InputVector &fe_function,
+                                              std::vector<typename InputVector::value_type> &values) const;
+
+
   /**
    * This function does the same as the other get_function_values(), but
    * applied to multi-component (vector-valued) elements. The meaning of the
