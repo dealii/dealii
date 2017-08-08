@@ -13,11 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/particle/particle.h>
+#include <deal.II/particles/particle.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Particle
+namespace Particles
 {
   template <int dim>
   Particle<dim>::Particle ()
@@ -92,8 +92,6 @@ namespace Particle
     data = static_cast<const void *> (pdata);
   }
 
-#ifdef DEAL_II_WITH_CXX11
-
   template <int dim>
   Particle<dim>::Particle (Particle<dim> &&particle)
     :
@@ -149,7 +147,6 @@ namespace Particle
       }
     return *this;
   }
-#endif
 
   template <int dim>
   Particle<dim>::~Particle ()

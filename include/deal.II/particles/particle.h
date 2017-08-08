@@ -13,10 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__particle_particle_h
-#define dealii__particle_particle_h
+#ifndef dealii__particles_particle_h
+#define dealii__particles_particle_h
 
-#include <deal.II/particle/property_pool.h>
+#include <deal.II/particles/property_pool.h>
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/types.h>
@@ -26,7 +26,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Particle
+/**
+ * A namespace that contains all classes that are related to the particle
+ * implementation, in particular the fundamental <code>Particle</code> class.
+ */
+namespace Particles
 {
   /**
    * A namespace for all type definitions related to particles.
@@ -53,7 +57,7 @@ namespace Particle
      * An identifier that denotes the MPI type associated with
      * types::global_dof_index.
      */
-#  define ASPECT_PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#  define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
 #else
     /**
      * The type used for indices of particles. While in
@@ -72,7 +76,7 @@ namespace Particle
      * An identifier that denotes the MPI type associated with
      * types::global_dof_index.
      */
-#  define ASPECT_PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED
+#  define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED
 #endif
   }
 
@@ -98,14 +102,14 @@ namespace Particle
 
     /**
      * Constructor for Particle, creates a particle with the specified
-     * ID at the specified location. Note that Aspect
-     * does not check for duplicate particle IDs so the generator must
+     * ID at the specified location. Note that deal.II
+     * does not check for duplicate particle IDs so the user must
      * make sure the IDs are unique over all processes.
      *
-     * @param[in] new_location Initial location of particle.
-     * @param[in] new_reference_location Initial location of the particle
+     * @param new_location Initial location of particle.
+     * @param new_reference_location Initial location of the particle
      * in the coordinate system of the reference cell.
-     * @param[in] new_id Globally unique ID number of particle.
+     * @param new_id Globally unique ID number of particle.
      */
     Particle (const Point<dim> &new_location,
               const Point<dim> &new_reference_location,
@@ -195,8 +199,7 @@ namespace Particle
     get_location () const;
 
     /**
-     * Set the reference location of this particle. Note that this does not
-     * check whether this is a valid location in the simulation domain.
+     * Set the reference location of this particle.
      *
      * @param [in] new_loc The new reference location for this particle.
      */
@@ -204,17 +207,13 @@ namespace Particle
     set_reference_location (const Point<dim> &new_loc);
 
     /**
-     * Get the reference location of this particle in its current cell.
-     *
-     * @return The reference location of this particle.
+     * Return the reference location of this particle in its current cell.
      */
     const Point<dim> &
     get_reference_location () const;
 
     /**
-     * Get the ID number of this particle.
-     *
-     * @return The id of this particle.
+     * Return the ID number of this particle.
      */
     types::particle_index
     get_id () const;
@@ -268,8 +267,6 @@ namespace Particle
 
     /**
      * Current particle location in the reference cell.
-     * Storing this reduces the number of times we need to compute this
-     * location, which takes a significant amount of computing time.
      */
     Point<dim>             reference_location;
 

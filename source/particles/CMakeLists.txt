@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 by the deal.II authors
+## Copyright (C) 2017 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -26,7 +26,7 @@ SET(_inst
   )
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/particle/*.h
+  ${CMAKE_SOURCE_DIR}/include/deal.II/particles/*.h
   )
 
 DEAL_II_ADD_LIBRARY(obj_particle OBJECT ${_src} ${_header} ${_inst})

@@ -16,7 +16,7 @@
 
 for (deal_II_dimension : DIMENSIONS)
 {
-    namespace Particle
+    namespace Particles
     \{
     template
     class Particle <deal_II_dimension>;

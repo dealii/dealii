@@ -18,7 +18,7 @@
 // check the creation and destruction of particles
 
 #include "../tests.h"
-#include <deal.II/particle/particle.h>
+#include <deal.II/particles/particle.h>
 #include <fstream>
 #include <iomanip>
 
@@ -27,7 +27,7 @@ template <int dim>
 void test ()
 {
   {
-    Particle::Particle<dim> particle;
+    Particles::Particle<dim> particle;
 
     deallog << "Particle location: " << particle.get_location() << std::endl;
 

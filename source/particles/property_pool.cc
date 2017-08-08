@@ -14,14 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/particle/property_pool.h>
-#include <deal.II/particle/particle.h>
+#include <deal.II/particles/property_pool.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Particle
+namespace Particles
 {
-  const PropertyPool::Handle PropertyPool::invalid_handle = NULL;
+  const typename PropertyPool::Handle PropertyPool::invalid_handle = NULL;
 
 
   PropertyPool::PropertyPool (const unsigned int n_properties_per_slot)
@@ -52,6 +51,7 @@ namespace Particle
   {
     return ArrayView<double>(handle, n_properties);
   }
+
 
 
   void

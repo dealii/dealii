@@ -13,14 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__particle_property_pool_h
-#define dealii__particle_property_pool_h
+#ifndef dealii__particles_property_pool_h
+#define dealii__particles_property_pool_h
 
 #include <deal.II/base/array_view.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace Particle
+namespace Particles
 {
   /**
    * This class manages the memory space in which particles store their
