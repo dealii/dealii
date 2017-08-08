@@ -129,8 +129,6 @@ namespace LinearAlgebra
        */
       BlockVector (const BlockVector<Number> &V);
 
-
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
       /**
        * Copy constructor taking a BlockVector of another data type. This will
        * fail if there is no conversion path from <tt>OtherNumber</tt> to
@@ -146,7 +144,6 @@ namespace LinearAlgebra
       template <typename OtherNumber>
       explicit
       BlockVector (const BlockVector<OtherNumber> &v);
-#endif
 
       /**
        * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>

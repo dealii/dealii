@@ -114,8 +114,6 @@ public:
    */
   BlockVector (BlockVector<Number> &&/*v*/) = default;
 
-
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
   /**
    * Copy constructor taking a BlockVector of another data type. This will
    * fail if there is no conversion path from <tt>OtherNumber</tt> to
@@ -131,8 +129,6 @@ public:
   template <typename OtherNumber>
   explicit
   BlockVector (const BlockVector<OtherNumber> &v);
-#endif
-
 
 #ifdef DEAL_II_WITH_TRILINOS
   /**

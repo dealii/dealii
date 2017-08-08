@@ -183,7 +183,6 @@ public:
    */
   Vector (Vector<Number> &&v);
 
-#ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
   /**
    * Copy constructor taking a vector of another data type. This will fail if
    * there is no conversion path from @p OtherNumber to @p Number. Note that
@@ -199,7 +198,6 @@ public:
   template <typename OtherNumber>
   explicit
   Vector (const Vector<OtherNumber> &v);
-#endif
 
 #ifdef DEAL_II_WITH_PETSC
   /**
