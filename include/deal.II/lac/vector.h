@@ -967,14 +967,6 @@ private:
 
 
 //------------------------ declarations for explicit specializations
-
-#ifdef DEAL_II_BOOST_BIND_COMPILER_BUG
-template <>
-Vector<std::complex<float> > &
-Vector<std::complex<float> >::operator= (const std::complex<float> s);
-#endif
-
-
 template <>
 Vector<int>::real_type
 Vector<int>::lp_norm (const real_type) const;

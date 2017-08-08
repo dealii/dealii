@@ -256,38 +256,6 @@ ENDIF()
 
 
 #
-# On Mac OS X, gcc appears to have a bug that prevents us from
-# compiling a bit of code that involves boost::bind. Check for
-# that.
-#
-# - Wolfgang Bangerth, Matthias Maier, rewritten 2012
-#
-IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  CHECK_CXX_COMPILER_BUG(
-    "
-    #include <complex>
-    #include <iostream>
-    #include \"${BOOST_FOLDER}/include/boost/bind.hpp\"
-
-    template<typename number>
-    void bug_function (number test)
-    {
-      std::cout << test << std::endl;
-    }
-    int main()
-    {
-      std::complex<float> float_val (1., 2.);
-      boost::bind(&bug_function<std::complex<float> >,
-                  float_val)();
-      return 0;
-    }
-    "
-    DEAL_II_BOOST_BIND_COMPILER_BUG
-    )
-ENDIF()
-
-
-#
 # Microsoft Visual C++ has a bug where the resulting object
 # from calling std::bind does not have a const operator(),
 # so we cannot pass such objects as const references as we
