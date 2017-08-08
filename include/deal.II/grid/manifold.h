@@ -740,7 +740,7 @@ public:
   void
   add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                   const Table<2,double>                  &weights,
-                  ArrayView<Point<spacedim>>              new_points) const;
+                  ArrayView<Point<spacedim>>              new_points) const override;
 
   /**
    * Project to FlatManifold. This is the identity function for flat,
@@ -752,7 +752,7 @@ public:
   virtual
   Point<spacedim>
   project_to_manifold (const ArrayView<const Point<spacedim>> &points,
-                       const Point<spacedim>                  &candidate) const;
+                       const Point<spacedim>                  &candidate) const override;
 
   /**
    * Return a vector that, at $\mathbf x_1$, is tangential to
@@ -778,7 +778,7 @@ public:
   virtual
   Tensor<1,spacedim>
   get_tangent_vector (const Point<spacedim> &x1,
-                      const Point<spacedim> &x2) const;
+                      const Point<spacedim> &x2) const override;
 
   /**
    * Return the periodicity of this Manifold.
@@ -966,7 +966,7 @@ public:
   void
   add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                   const Table<2,double>                  &weights,
-                  ArrayView<Point<spacedim>>              new_points) const;
+                  ArrayView<Point<spacedim>>              new_points) const override;
   /**
    * Pull back the given point in spacedim to the Euclidean chartdim
    * dimensional space.
@@ -1065,7 +1065,7 @@ public:
   virtual
   Tensor<1,spacedim>
   get_tangent_vector (const Point<spacedim> &x1,
-                      const Point<spacedim> &x2) const;
+                      const Point<spacedim> &x2) const override;
 
   /**
    * Return the periodicity associated with the submanifold.

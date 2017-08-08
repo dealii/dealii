@@ -218,7 +218,7 @@ public:
   Point<spacedim>
   get_intermediate_point(const Point<spacedim> &p1,
                          const Point<spacedim> &p2,
-                         const double w) const;
+                         const double w) const override;
 
   /**
    * Compute the derivative of the get_intermediate_point() function
@@ -227,7 +227,7 @@ public:
   virtual
   Tensor<1,spacedim>
   get_tangent_vector (const Point<spacedim> &x1,
-                      const Point<spacedim> &x2) const;
+                      const Point<spacedim> &x2) const override;
 
   /**
    * Return a point on the spherical manifold which is intermediate
@@ -723,7 +723,7 @@ public:
   void
   add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                   const Table<2,double>                  &weights,
-                  ArrayView<Point<spacedim>>              new_points) const;
+                  ArrayView<Point<spacedim>>              new_points) const override;
 
 private:
   /**
