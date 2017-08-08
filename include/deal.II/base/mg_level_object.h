@@ -137,6 +137,19 @@ public:
   unsigned int max_level () const;
 
   /**
+   * Apply the action @p action to every object stored in here. The
+   * parameter @p action is expected to be a function object that accepts
+   * the syntax
+   * <code>
+   *   action(const unsigned int level, Object &object);
+   * </code>
+   * This means this function can accept a lambda, a std::function, or a plain
+   * function pointer.
+   */
+  template <typename ActionFunctionObjectType>
+  void apply (ActionFunctionObjectType action);
+
+  /**
    * Memory used by this object.
    */
   std::size_t memory_consumption () const;
@@ -248,6 +261,17 @@ unsigned int
 MGLevelObject<Object>::max_level () const
 {
   return minlevel + objects.size() - 1;
+}
+
+template<class Object>
+template <typename ActionFunctionObjectType>
+void
+MGLevelObject<Object>::apply (ActionFunctionObjectType action)
+{
+  for (unsigned int lvl = min_level(); lvl <= max_level(); ++lvl)
+    {
+      action (lvl, (*this)[lvl]);
+    }
 }
 
 
