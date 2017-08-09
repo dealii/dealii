@@ -21,9 +21,11 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/vectorization.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/matrix_free/shape_info.h>
 
 #include <array>
 #include <cmath>
@@ -447,6 +449,48 @@ public:
      * FE_Q<1>(this->degree).
      */
     QGaussLobatto<1> line_support_points;
+
+    /**
+      * In case the quadrature rule given represents a tensor product
+      * we need to store the evaluations of the 1d polynomials at the
+      * the 1d quadrature quadrature points. That is what this variable is for.
+      */
+    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<double>> shape_info;
+
+    /**
+     * In case the quadrature rule given represents a tensor product
+     * we need to store temporary data in this object.
+     */
+    mutable AlignedVector<VectorizedArray<double> > scratch;
+
+    /**
+     * In case the quadrature rule given represents a tensor product
+     * the values at the mapped support points are stored in this object.
+     */
+    mutable AlignedVector<VectorizedArray<double> > values_dofs;
+
+    /**
+     * In case the quadrature rule given represents a tensor product
+     * the values at the quadrature points are stored in this object.
+     */
+    mutable AlignedVector<VectorizedArray<double> > values_quad;
+
+    /**
+     * In case the quadrature rule given represents a tensor product
+     * the gradients at the quadrature points are stored in this object.
+     */
+    mutable AlignedVector<VectorizedArray<double> > gradients_quad;
+
+    /**
+     * In case the quadrature rule given represents a tensor product
+     * the hessians at the quadrature points are stored in this object.
+     */
+    mutable AlignedVector<VectorizedArray<double> > hessians_quad;
+
+    /**
+     * Indicates whether the given Quadrature object is a tensor product.
+     */
+    bool tensor_product_quadrature;
 
     /**
      * Tensors of covariant transformation at each of the quadrature points.

@@ -35,6 +35,8 @@
 #include <deal.II/fe/mapping_q_generic.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
+#include <deal.II/matrix_free/shape_info.h>
+#include <deal.II/matrix_free/evaluation_kernels.h>
 
 #include <cmath>
 #include <algorithm>
@@ -680,8 +682,57 @@ initialize (const UpdateFlags      update_flags,
       (update_jacobian_3rd_derivatives | update_jacobian_pushed_forward_3rd_derivatives) )
     shape_fourth_derivatives.resize(n_shape_functions * n_q_points);
 
+  const std::vector<Point<dim> > &ref_q_points = q.get_points();
   // now also fill the various fields with their correct values
-  compute_shape_function_values (q.get_points());
+  compute_shape_function_values (ref_q_points);
+
+  tensor_product_quadrature = q.is_tensor_product();
+
+  if (dim>1)
+    {
+      // find out if the one-dimensional formula is the same
+      // in all directions
+      if (tensor_product_quadrature)
+        {
+          const std::array<Quadrature<1>, dim> quad_array = q.get_tensor_basis();
+          for (unsigned int i=1; i<dim && tensor_product_quadrature; ++i)
+            {
+              if (quad_array[i-1].size() != quad_array[i].size())
+                {
+                  tensor_product_quadrature = false;
+                  break;
+                }
+              else
+                {
+                  const std::vector<Point<1>> &points_1 = quad_array[i-1].get_points();
+                  const std::vector<Point<1>> &points_2 = quad_array[i].get_points();
+                  const std::vector<double> &weights_1 = quad_array[i-1].get_weights();
+                  const std::vector<double> &weights_2 = quad_array[i].get_weights();
+                  for (unsigned int j=0; j<quad_array[i].size(); ++j)
+                    {
+                      if (std::abs(points_1[j][0]-points_2[j][0])>1.e-10
+                          || std::abs(weights_1[j]-weights_2[j])>1.e-10)
+                        tensor_product_quadrature = false;
+                      break;
+                    }
+                }
+            }
+
+          if (tensor_product_quadrature)
+            {
+              const FE_Q<dim> fe(polynomial_degree);
+              shape_info.reinit(q.get_tensor_basis()[0], fe);
+
+              const unsigned int n_shape_values = fe.n_dofs_per_cell();
+              const unsigned int max_size = std::max(n_q_points,n_shape_values);
+              const unsigned int vec_length = VectorizedArray<double>::n_array_elements;
+              const unsigned int n_comp = 1+ (spacedim-1)/vec_length;
+
+              scratch.resize((dim-1)*max_size);
+              values_dofs.resize(n_comp*n_shape_values);
+            }
+        }
+    }
 }
 
 
@@ -694,6 +745,22 @@ initialize_face (const UpdateFlags      update_flags,
                  const unsigned int     n_original_q_points)
 {
   initialize (update_flags, q, n_original_q_points);
+
+  if (dim>1 && tensor_product_quadrature)
+    {
+      const unsigned int facedim = dim > 1 ? dim-1 : 1;
+      const FE_Q<facedim> fe(polynomial_degree);
+      shape_info.reinit(q.get_tensor_basis()[0], fe);
+
+      const unsigned int n_shape_values = fe.n_dofs_per_cell();
+      const unsigned int n_q_points = q.size();
+      const unsigned int max_size = std::max(n_q_points,n_shape_values);
+      const unsigned int vec_length = VectorizedArray<double>::n_array_elements;
+      const unsigned int n_comp = 1+ (spacedim-1)/vec_length;
+
+      scratch.resize((dim-1)*max_size);
+      values_dofs.resize(n_comp*n_shape_values);
+    }
 
   if (dim > 1)
     {
@@ -1527,18 +1594,67 @@ namespace internal
 
         if (update_flags & update_quadrature_points)
           {
-            for (unsigned int point=0; point<quadrature_points.size(); ++point)
+            if (dim>1 && data.tensor_product_quadrature)
               {
-                const double *shape = &data.shape(point+data_set,0);
-                Point<spacedim> result = (shape[0] *
-                                          data.mapping_support_points[0]);
-                for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    result[i] += shape[k] * data.mapping_support_points[k][i];
-                quadrature_points[point] = result;
+                Assert(data.shape_info.n_q_points > 0, ExcInternalError());
+
+                const unsigned int n_shape_values = data.n_shape_functions;
+                const unsigned int n_q_points = quadrature_points.size();
+                const unsigned int vec_length = VectorizedArray<double>::n_array_elements;
+                const unsigned int n_comp = 1+ (spacedim-1)/vec_length;
+
+                Assert (data.shape_info.n_q_points == quadrature_points.size(),
+                        ExcDimensionMismatch(data.shape_info.n_q_points, quadrature_points.size()));
+
+                data.values_dofs.resize(n_comp*n_shape_values);
+                VectorizedArray<double> *values_dofs_ptr[n_comp];
+                data.values_quad.resize(n_comp*n_q_points);
+                VectorizedArray<double> *values_quad_ptr[n_comp];
+
+                for (unsigned int c=0; c<n_comp; ++c)
+                  {
+                    values_dofs_ptr[c] = &(data.values_dofs[c*n_shape_values]);
+                    values_quad_ptr[c] = &(data.values_quad[c*n_q_points]);
+                  }
+
+                const std::vector<unsigned int> &renumber_to_lexicographic
+                  = data.shape_info.lexicographic_numbering;
+                for (unsigned int i=0; i<n_shape_values; ++i)
+                  for (unsigned int d=0; d<spacedim; ++d)
+                    {
+                      const unsigned int in_comp = d%vec_length;
+                      const unsigned int out_comp = d/vec_length;
+                      data.values_dofs[out_comp*n_shape_values+i][in_comp]
+                        = data.mapping_support_points[renumber_to_lexicographic[i]][d];
+                    }
+
+                internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general, dim, -1, 0, n_comp, double>::evaluate
+                (data.shape_info, &(values_dofs_ptr[0]), &(values_quad_ptr[0]), nullptr, nullptr,
+                 &(data.scratch[0]), true, false, false);
+
+                for (unsigned int out_comp=0; out_comp<n_comp; ++out_comp)
+                  for (unsigned int i=0; i<n_q_points; ++i)
+                    for (unsigned int in_comp=0;
+                         in_comp<vec_length && in_comp<spacedim-out_comp*vec_length; ++in_comp)
+                      quadrature_points[i][out_comp*vec_length+in_comp]
+                        = data.values_quad[out_comp*n_q_points+i][in_comp];
+              }
+            else
+              {
+                for (unsigned int point=0; point<quadrature_points.size(); ++point)
+                  {
+                    const double *shape = &data.shape(point+data_set,0);
+                    Point<spacedim> result = (shape[0] *
+                                              data.mapping_support_points[0]);
+                    for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                      for (unsigned int i=0; i<spacedim; ++i)
+                        result[i] += shape[k] * data.mapping_support_points[k][i];
+                    quadrature_points[point] = result;
+                  }
               }
           }
       }
+
 
 
       /**
@@ -1569,34 +1685,90 @@ namespace internal
                         DerivativeForm<1,dim,spacedim>());
 
               Assert (data.n_shape_functions > 0, ExcInternalError());
-              const Tensor<1,spacedim> *supp_pts =
-                &data.mapping_support_points[0];
 
-              for (unsigned int point=0; point<n_q_points; ++point)
+              if (dim>1 && data.tensor_product_quadrature)
                 {
-                  const Tensor<1,dim> *data_derv =
-                    &data.derivative(point+data_set, 0);
+                  const unsigned int n_shape_values = data.n_shape_functions;
+                  const unsigned int vec_length = VectorizedArray<double>::n_array_elements;
+                  const unsigned int n_comp = 1+ (spacedim-1)/vec_length;
 
-                  double result [spacedim][dim];
+                  Assert (data.shape_info.n_q_points == data.contravariant.size(),
+                          ExcDimensionMismatch(data.shape_info.n_q_points, data.contravariant.size()));
 
-                  // peel away part of sum to avoid zeroing the
-                  // entries and adding for the first time
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      result[i][j] = data_derv[0][j] * supp_pts[0][i];
-                  for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                    for (unsigned int i=0; i<spacedim; ++i)
+                  data.values_dofs.resize(n_comp*n_shape_values);
+                  VectorizedArray<double> *values_dofs_ptr[n_comp];
+                  data.gradients_quad.resize (n_comp*n_q_points*dim);
+                  VectorizedArray<double> *gradients_quad_ptr[n_comp][dim];
+
+                  // transform data appropriately
+                  const std::vector<unsigned int> &renumber_to_lexicographic
+                    = data.shape_info.lexicographic_numbering;
+                  for (unsigned int i=0; i<n_shape_values; ++i)
+                    for (unsigned int d=0; d<spacedim; ++d)
+                      {
+                        const unsigned int in_comp = d%vec_length;
+                        const unsigned int out_comp = d/vec_length;
+                        data.values_dofs[out_comp*n_shape_values+i][in_comp]
+                          = data.mapping_support_points[renumber_to_lexicographic[i]][d];
+                      }
+
+                  for (unsigned int c=0; c<n_comp; ++c)
+                    {
+                      values_dofs_ptr[c] = &(data.values_dofs[c*n_shape_values]);
                       for (unsigned int j=0; j<dim; ++j)
-                        result[i][j] += data_derv[k][j] * supp_pts[k][i];
+                        gradients_quad_ptr[c][j] = &(data.gradients_quad[(c*dim+j)*n_q_points]);
+                    }
 
-                  // write result into contravariant data. for
-                  // j=dim in the case dim<spacedim, there will
-                  // never be any nonzero data that arrives in
-                  // here, so it is ok anyway because it was
-                  // initialized to zero at the initialization
-                  for (unsigned int i=0; i<spacedim; ++i)
-                    for (unsigned int j=0; j<dim; ++j)
-                      data.contravariant[point][i][j] = result[i][j];
+                  internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general, dim, -1, 0, n_comp, double>::evaluate
+                  (data.shape_info, &(values_dofs_ptr[0]), nullptr, &(gradients_quad_ptr[0]), nullptr,
+                   &(data.scratch[0]), false, true, false);
+
+                  // We need to reinterpret the data after evaluate has been applied.
+                  for (unsigned int out_comp=0; out_comp<n_comp; ++out_comp)
+                    for (unsigned int point=0; point<n_q_points; ++point)
+                      for (unsigned int j=0; j<dim; ++j)
+                        for (unsigned int in_comp=0;
+                             in_comp<vec_length && in_comp<spacedim-out_comp*vec_length; ++in_comp)
+                          {
+                            const unsigned int total_number = point*dim+j;
+                            const unsigned int new_comp = total_number/n_q_points;
+                            const unsigned int new_point = total_number % n_q_points;
+                            data.contravariant[new_point][out_comp*vec_length+in_comp][new_comp]
+                              = data.gradients_quad[(out_comp*n_q_points+point)*dim+j][in_comp];
+                          }
+                }
+              else // no tensor product
+                {
+                  Assert (data.n_shape_functions > 0, ExcInternalError());
+                  const Tensor<1,spacedim> *supp_pts =
+                    &data.mapping_support_points[0];
+
+                  for (unsigned int point=0; point<n_q_points; ++point)
+                    {
+                      const Tensor<1,dim> *data_derv =
+                        &data.derivative(point+data_set, 0);
+
+                      double result [spacedim][dim];
+
+                      // peel away part of sum to avoid zeroing the
+                      // entries and adding for the first time
+                      for (unsigned int i=0; i<spacedim; ++i)
+                        for (unsigned int j=0; j<dim; ++j)
+                          result[i][j] = data_derv[0][j] * supp_pts[0][i];
+                      for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                        for (unsigned int i=0; i<spacedim; ++i)
+                          for (unsigned int j=0; j<dim; ++j)
+                            result[i][j] += data_derv[k][j] * supp_pts[k][i];
+
+                      // write result into contravariant data. for
+                      // j=dim in the case dim<spacedim, there will
+                      // never be any nonzero data that arrives in
+                      // here, so it is ok anyway because it was
+                      // initialized to zero at the initialization
+                      for (unsigned int i=0; i<spacedim; ++i)
+                        for (unsigned int j=0; j<dim; ++j)
+                          data.contravariant[point][i][j] = result[i][j];
+                    }
                 }
             }
 
@@ -1641,29 +1813,92 @@ namespace internal
 
             if (cell_similarity != CellSimilarity::translation)
               {
-                for (unsigned int point=0; point<n_q_points; ++point)
+                if (dim>1 && data.tensor_product_quadrature)
                   {
-                    const Tensor<2,dim> *second =
-                      &data.second_derivative(point+data_set, 0);
-                    double result [spacedim][dim][dim];
-                    for (unsigned int i=0; i<spacedim; ++i)
-                      for (unsigned int j=0; j<dim; ++j)
-                        for (unsigned int l=0; l<dim; ++l)
-                          result[i][j][l] = (second[0][j][l] *
-                                             data.mapping_support_points[0][i]);
-                    for (unsigned int k=1; k<data.n_shape_functions; ++k)
-                      for (unsigned int i=0; i<spacedim; ++i)
-                        for (unsigned int j=0; j<dim; ++j)
-                          for (unsigned int l=0; l<dim; ++l)
-                            result[i][j][l]
-                            += (second[k][j][l]
-                                *
-                                data.mapping_support_points[k][i]);
+                    const unsigned int n_shape_values = data.n_shape_functions;
+                    const unsigned int vec_length = VectorizedArray<double>::n_array_elements;
+                    const unsigned int n_comp = 1+ (spacedim-1)/vec_length;
+                    const unsigned int n_hessians = (dim*(dim+1))/2;
 
-                    for (unsigned int i=0; i<spacedim; ++i)
-                      for (unsigned int j=0; j<dim; ++j)
-                        for (unsigned int l=0; l<dim; ++l)
-                          jacobian_grads[point][i][j][l] = result[i][j][l];
+                    Assert (data.shape_info.n_q_points == jacobian_grads.size(),
+                            ExcDimensionMismatch(data.shape_info.n_q_points, jacobian_grads.size()));
+
+                    data.values_dofs.resize(n_comp*n_shape_values);
+                    VectorizedArray<double> *values_dofs_ptr[n_comp];
+                    data.hessians_quad.resize(n_comp*n_q_points*n_hessians);
+                    VectorizedArray<double> *hessians_quad_ptr[n_comp][n_hessians];
+
+                    // transform data appropriately
+                    const std::vector<unsigned int> &renumber_to_lexicographic
+                      = data.shape_info.lexicographic_numbering;
+                    for (unsigned int i=0; i<n_shape_values; ++i)
+                      for (unsigned int d=0; d<spacedim; ++d)
+                        {
+                          const unsigned int in_comp = d%vec_length;
+                          const unsigned int out_comp = d/vec_length;
+                          data.values_dofs[out_comp*n_shape_values+i][in_comp]
+                            = data.mapping_support_points[renumber_to_lexicographic[i]][d];
+                        }
+
+                    for (unsigned int c=0; c<n_comp; ++c)
+                      {
+                        values_dofs_ptr[c] = &(data.values_dofs[c*n_shape_values]);
+                        for (unsigned int j=0; j<n_hessians; ++j)
+                          hessians_quad_ptr[c][j] = &(data.hessians_quad[(c*n_hessians+j)*n_q_points]);
+                      }
+
+                    internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general, dim, -1, 0, n_comp, double>::evaluate
+                    (data.shape_info, &(values_dofs_ptr[0]), nullptr, nullptr, &(hessians_quad_ptr[0]),
+                     &(data.scratch[0]), false, false, true);
+
+                    constexpr int desymmetrize_3d [6][2] = {{0,0},{1,1},{2,2},{0,1},{0,2},{1,2}};
+                    constexpr int desymmetrize_2d [3][2] = {{0,0},{1,1},{0,1}};
+
+                    // We need to reinterpret the data after evaluate has been applied.
+                    for (unsigned int out_comp=0; out_comp<n_comp; ++out_comp)
+                      for (unsigned int point=0; point<n_q_points; ++point)
+                        for (unsigned int j=0; j<n_hessians; ++j)
+                          for (unsigned int in_comp=0;
+                               in_comp<vec_length && in_comp<spacedim-out_comp*vec_length; ++in_comp)
+                            {
+                              const unsigned int total_number = point*n_hessians+j;
+                              const unsigned int new_point = total_number % n_q_points;
+                              const unsigned int new_hessian_comp = total_number/n_q_points;
+                              const unsigned int new_hessian_comp_i = dim==2 ? desymmetrize_2d[new_hessian_comp][0]
+                                                                      : desymmetrize_3d[new_hessian_comp][0];
+                              const unsigned int new_hessian_comp_j = dim==2 ? desymmetrize_2d[new_hessian_comp][1]
+                                                                      : desymmetrize_3d[new_hessian_comp][1];
+                              const double value = data.hessians_quad[(out_comp*n_q_points+point)*n_hessians+j][in_comp];
+                              jacobian_grads[new_point][out_comp*vec_length+in_comp][new_hessian_comp_i][new_hessian_comp_j] = value;
+                              jacobian_grads[new_point][out_comp*vec_length+in_comp][new_hessian_comp_j][new_hessian_comp_i] = value;
+                            }
+                  }
+                else
+                  {
+                    for (unsigned int point=0; point<n_q_points; ++point)
+                      {
+                        const Tensor<2,dim> *second =
+                          &data.second_derivative(point+data_set, 0);
+                        double result [spacedim][dim][dim];
+                        for (unsigned int i=0; i<spacedim; ++i)
+                          for (unsigned int j=0; j<dim; ++j)
+                            for (unsigned int l=0; l<dim; ++l)
+                              result[i][j][l] = (second[0][j][l] *
+                                                 data.mapping_support_points[0][i]);
+                        for (unsigned int k=1; k<data.n_shape_functions; ++k)
+                          for (unsigned int i=0; i<spacedim; ++i)
+                            for (unsigned int j=0; j<dim; ++j)
+                              for (unsigned int l=0; l<dim; ++l)
+                                result[i][j][l]
+                                += (second[k][j][l]
+                                    *
+                                    data.mapping_support_points[k][i]);
+
+                        for (unsigned int i=0; i<spacedim; ++i)
+                          for (unsigned int j=0; j<dim; ++j)
+                            for (unsigned int l=0; l<dim; ++l)
+                              jacobian_grads[point][i][j][l] = result[i][j][l];
+                      }
                   }
               }
           }
