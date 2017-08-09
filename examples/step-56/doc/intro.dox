@@ -44,7 +44,7 @@ detailed description of the difference between the two can be found in
 step-22, but in summary, the deformation tensor is more physical as
 well as more expensive).
 
-<h3> Linear Solver and Preconditioning Issues </h3>
+<h3> Linear %Solver and Preconditioning Issues </h3>
 
 The weak form of
 the discrete equations naturally leads to the following linear system
@@ -182,7 +182,7 @@ case by first distributing degrees of freedom on both, and then using
 the same sequence of DoFRenumbering operations on both.
 
 
-<h3> Differences from Step-22 </h3>
+<h3> Differences from the Step 22 tutorial </h3>
  
 The main difference between step-56 and step-22 is that we use block
 solvers instead of the Schur Complement approach used in
