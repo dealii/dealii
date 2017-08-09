@@ -609,9 +609,7 @@ private:
 
 #ifndef DOXYGEN
 
-// declaration of explicit specializations of member variables, if the
-// compiler allows us to do that (the standard says we must)
-#ifndef DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
+// declaration of explicit specializations of member variables
 template <>
 const double *const FE_DGPNonparametric<1,1>::Matrices::embedding[][GeometryInfo<1>::max_children_per_cell];
 
@@ -647,7 +645,6 @@ const double *const FE_DGPNonparametric<3,3>::Matrices::projection_matrices[][Ge
 
 template <>
 const unsigned int FE_DGPNonparametric<3,3>::Matrices::n_projection_matrices;
-#endif
 
 #endif // DOXYGEN
 
