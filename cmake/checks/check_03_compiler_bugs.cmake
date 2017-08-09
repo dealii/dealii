@@ -45,23 +45,6 @@ ENDIF()
 
 
 #
-# gcc 4.4 has an interesting problem in that it doesn't
-# care for one of BOOST signals2's header files and produces
-# dozens of pages of error messages of the form
-#   warning: invoking macro BOOST_PP_CAT argument 1: \
-#   empty macro arguments are undefined in ISO C90 and ISO C++98
-# This can be avoided by not using -pedantic for this compiler.
-# For all other versions, we use this flag, however.
-#
-# - Wolfgang Bangerth, Matthias Maier, rewritten 2012
-#
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-   CMAKE_CXX_COMPILER_VERSION MATCHES "4.4.")
-  STRIP_FLAG(DEAL_II_CXX_FLAGS "-pedantic")
-ENDIF()
-
-
-#
 # In some cases, we would like to name partial specializations
 # as friends. However, the standard forbids us to do so. But
 # then, we can declare the general template as a friend, and
