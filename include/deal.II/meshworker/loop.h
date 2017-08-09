@@ -28,8 +28,6 @@
 
 #include <functional>
 
-#define DEAL_II_MESHWORKER_PARALLEL 1
-
 DEAL_II_NAMESPACE_OPEN
 
 template <typename> class TriaActiveIterator;
@@ -407,23 +405,12 @@ namespace MeshWorker
       }
 
     // Loop over all cells
-#ifdef DEAL_II_MESHWORKER_PARALLEL
     WorkStream::run(begin, end,
                     std::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>,
                               std::placeholders::_1, std::placeholders::_3, std::placeholders::_2,
                               cell_worker, boundary_worker, face_worker, lctrl),
                     std::bind(&internal::assemble<dim,DOFINFO,ASSEMBLER>, std::placeholders::_1, &assembler),
                     info, dof_info);
-#else
-    for (ITERATOR cell = begin; cell != end; ++cell)
-      {
-        cell_action<INFOBOX,DOFINFO,dim,spacedim>(cell, dof_info,
-                                                  info, cell_worker,
-                                                  boundary_worker, face_worker,
-                                                  lctrl);
-        dof_info.assemble(assembler);
-      }
-#endif
   }
 
 
