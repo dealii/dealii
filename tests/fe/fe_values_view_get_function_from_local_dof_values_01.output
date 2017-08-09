@@ -1,0 +1,10 @@
+
+DEAL:Float:Scalar::OK
+DEAL:Float:Vector::OK
+DEAL:Float:SymmetricTensor::OK
+DEAL:Float:Tensor::OK
+DEAL:Double:Scalar::OK
+DEAL:Double:Vector::OK
+DEAL:Double:SymmetricTensor::OK
+DEAL:Double:Tensor::OK
+DEAL::OK
