@@ -712,8 +712,11 @@ initialize (const UpdateFlags      update_flags,
                     {
                       if (std::abs(points_1[j][0]-points_2[j][0])>1.e-10
                           || std::abs(weights_1[j]-weights_2[j])>1.e-10)
-                        tensor_product_quadrature = false;
-                      break;
+                        {
+                          tensor_product_quadrature = false;
+                          break;
+                        }
+
                     }
                 }
             }
