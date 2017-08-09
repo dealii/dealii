@@ -238,6 +238,17 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
 }
 
 
+for (VEC : GENERAL_CONTAINER_TYPES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS;
+        Number : ALL_SCALAR_TYPES)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+    template
+    void FEValuesBase<deal_II_dimension,deal_II_space_dimension>::get_function_values_from_local_vector<VEC<Number>>
+            (const VEC<Number>&, std::vector<Number>&) const;
+#endif
+}
+
+
 // instantiations for VEC=IndexSet
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)

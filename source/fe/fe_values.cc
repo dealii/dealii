@@ -2710,18 +2710,32 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   std::vector<typename InputVector::value_type> &values) const
 {
   typedef typename InputVector::value_type Number;
-  Assert (this->update_flags & update_values,
-          ExcAccessToUninitializedField("update_values"));
-  AssertDimension (fe->n_components(), 1);
-  Assert (present_cell.get() != nullptr,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   AssertDimension (fe_function.size(),
                    present_cell->n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_values (dof_values.begin(), this->finite_element_output.shape_values,
+  get_function_values_from_local_vector(make_array_view(dof_values.begin(), dof_values.end()),
+                                        values);
+}
+
+
+template <int dim, int spacedim>
+template <class InputVector>
+void FEValuesBase<dim,spacedim>::get_function_values_from_local_vector (
+  const InputVector   &fe_function,
+  std::vector<typename InputVector::value_type> &values) const
+{
+  typedef typename InputVector::value_type Number;
+  Assert (this->update_flags & update_values,
+          ExcAccessToUninitializedField("update_values"));
+  AssertDimension (fe->n_components(), 1);
+  Assert (present_cell.get() != nullptr,
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
+  AssertDimension (fe_function.size(), dofs_per_cell);
+
+  internal::do_function_values (fe_function.begin(), this->finite_element_output.shape_values,
                                 values);
 }
 
