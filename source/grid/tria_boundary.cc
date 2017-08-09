@@ -861,8 +861,8 @@ project_to_surface (const typename Triangulation<dim, spacedim>::hex_iterator &,
 template <int dim, int spacedim>
 Point<spacedim>
 StraightBoundary<dim, spacedim>::
-project_to_manifold(const std::vector<Point<spacedim> > &surrounding_points,
-                    const Point<spacedim> &trial_point) const
+project_to_manifold(const std::vector<Point<spacedim> > &/*surrounding_points*/,
+                    const Point<spacedim> &/*trial_point*/) const
 {
   Assert(false, ExcNotImplemented());
   return Point<spacedim>();

@@ -1002,7 +1002,7 @@ public:
    * This function exists for backward compatibility and calls get_manifold()
    * internally.
    */
-  const Boundary<dim,spacedim> &get_boundary () const;
+  const Boundary<dim,spacedim> &get_boundary () const DEAL_II_DEPRECATED;
 
   /**
    * Return a constant reference to the manifold object used for this object.

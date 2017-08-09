@@ -519,6 +519,7 @@ InvalidAccessor<structdim, dim, spacedim>::manifold_id () const
 }
 
 
+template <int structdim, int dim, int spacedim>
 inline
 Point<spacedim> &
 InvalidAccessor<structdim, dim, spacedim>::vertex (const unsigned int) const
@@ -536,7 +537,7 @@ InvalidAccessor<structdim, dim, spacedim>::vertex (const unsigned int) const
 template <int structdim, int dim, int spacedim>
 inline
 typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
-InvalidAccessor<structdim, dim, spacedim>::line (const unsigned int i) const
+InvalidAccessor<structdim, dim, spacedim>::line (const unsigned int /*i*/) const
 {
   // nothing to do here. we could
   // throw an exception but we can't
@@ -552,7 +553,7 @@ InvalidAccessor<structdim, dim, spacedim>::line (const unsigned int i) const
 template <int structdim, int dim, int spacedim>
 inline
 typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
-InvalidAccessor<structdim, dim, spacedim>::quad (const unsigned int i) const
+InvalidAccessor<structdim, dim, spacedim>::quad (const unsigned int /*i*/) const
 {
   // nothing to do here. we could
   // throw an exception but we can't
