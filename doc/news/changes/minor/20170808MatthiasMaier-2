@@ -1,0 +1,5 @@
+Improved: ConstraintMatrix now has a member function
+ConstraintMatrix::get_lines() that returns a range object that allows
+iteration over all constraint entries.
+<br>
+(Matthias Maier, 2017/08/08)

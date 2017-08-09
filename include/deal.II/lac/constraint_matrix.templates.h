@@ -87,7 +87,7 @@ ConstraintMatrix::condense (const VectorType &vec_ghosted,
               ExcMessage ("Inhomogeneous constraint cannot be condensed "
                           "without any matrix specified."));
 
-      const typename VectorType::value_type old_value = vec_ghosted(constraint_line->line);
+      const typename VectorType::value_type old_value = vec_ghosted(constraint_line->index);
       for (size_type q=0; q!=constraint_line->entries.size(); ++q)
         if (vec.in_local_range(constraint_line->entries[q].first) == true)
           vec(constraint_line->entries[q].first)
@@ -101,8 +101,8 @@ ConstraintMatrix::condense (const VectorType &vec_ghosted,
   for (std::vector<ConstraintLine>::const_iterator
        constraint_line = lines.begin();
        constraint_line!=lines.end(); ++constraint_line)
-    if (vec.in_local_range(constraint_line->line) == true)
-      vec(constraint_line->line) = 0.;
+    if (vec.in_local_range(constraint_line->index) == true)
+      vec(constraint_line->index) = 0.;
 
   vec.compress(VectorOperation::insert);
 }
@@ -152,7 +152,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                                      numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = c;
+    distribute[lines[c].index] = c;
 
   const size_type n_rows = sparsity.n_rows();
   for (size_type row=0; row<n_rows; ++row)
@@ -290,7 +290,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                 vec(lines[distribute[row]].entries[q].first)
                 += (vec(row) * lines[distribute[row]].entries[q].second);
 
-              vec(lines[distribute[row]].line) = 0.;
+              vec(lines[distribute[row]].index) = 0.;
             }
         }
     }
@@ -350,7 +350,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                                      numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = c;
+    distribute[lines[c].index] = c;
 
   const size_type n_rows = sparsity.n_rows();
   for (size_type row=0; row<n_rows; ++row)
@@ -492,7 +492,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
                 vec(lines[distribute[row]].entries[q].first)
                 += (vec(row) * lines[distribute[row]].entries[q].second);
 
-              vec(lines[distribute[row]].line) = 0.;
+              vec(lines[distribute[row]].index) = 0.;
             }
         }
     }
@@ -612,7 +612,7 @@ ConstraintMatrix::set_zero (VectorType &vec) const
   // above. therefore, copy the content which is cheap
   std::vector<size_type> constrained_lines(lines.size());
   for (unsigned int i=0; i<lines.size(); ++i)
-    constrained_lines[i] = lines[i].line;
+    constrained_lines[i] = lines[i].index;
   internal::ConstraintMatrix::set_zero_all(constrained_lines, vec);
 }
 
@@ -875,7 +875,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
       typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
       for (constraint_iterator it = lines.begin();
            it != lines.end(); ++it)
-        if (vec_owned_elements.is_element(it->line))
+        if (vec_owned_elements.is_element(it->index))
           for (unsigned int i=0; i<it->entries.size(); ++i)
             if (!vec_owned_elements.is_element(it->entries[i].first))
               needed_elements.add_index(it->entries[i].first);
@@ -888,7 +888,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
 
       for (constraint_iterator it = lines.begin();
            it != lines.end(); ++it)
-        if (vec_owned_elements.is_element(it->line))
+        if (vec_owned_elements.is_element(it->index))
           {
             typename VectorType::value_type
             new_value = it->inhomogeneity;
@@ -898,7 +898,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
                                ghosted_vector, it->entries[i].first)) *
                             it->entries[i].second);
             AssertIsFinite(new_value);
-            internal::ElementAccess<VectorType>::set(new_value, it->line, vec);
+            internal::ElementAccess<VectorType>::set(new_value, it->index, vec);
           }
 
       // now compress to communicate the entries that we added to
@@ -917,7 +917,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
       for (; next_constraint != lines.end(); ++next_constraint)
         {
           // fill entry in line
-          // next_constraint.line by adding the
+          // next_constraint.index by adding the
           // different contributions
           typename VectorType::value_type
           new_value = next_constraint->inhomogeneity;
@@ -927,7 +927,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
                              vec, next_constraint->entries[i].first))*
                           next_constraint->entries[i].second);
           AssertIsFinite(new_value);
-          internal::ElementAccess<VectorType>::set(new_value, next_constraint->line,
+          internal::ElementAccess<VectorType>::set(new_value, next_constraint->index,
                                                    vec);
         }
     }

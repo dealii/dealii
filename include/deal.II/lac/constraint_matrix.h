@@ -26,6 +26,8 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_element_access.h>
 
+#include <boost/range/iterator_range.hpp>
+
 #include <vector>
 #include <set>
 #include <utility>
@@ -1120,6 +1122,87 @@ public:
    * @}
    */
 
+
+
+  /**
+   * This class represents one line of a constraint matrix.
+   */
+  struct ConstraintLine
+  {
+    /**
+     * A data type in which we store the list of entries that make up the
+     * homogenous part of a constraint.
+     */
+    typedef std::vector<std::pair<size_type,double> > Entries;
+
+    /**
+     * Global DoF index of this line. Since only very few lines are stored,
+     * we can not assume a specific order and have to store the index
+     * explicitly.
+     */
+    size_type index;
+
+    /**
+     * Row numbers and values of the entries in this line.
+     *
+     * For the reason why we use a vector instead of a map and the
+     * consequences thereof, the same applies as what is said for
+     * ConstraintMatrix::lines.
+     */
+    Entries entries;
+
+    /**
+     * Value of the inhomogeneity.
+     */
+    double inhomogeneity;
+
+    /**
+     * This operator is a bit weird and unintuitive: it compares the line
+     * numbers of two lines. We need this to sort the lines; in fact we could
+     * do this using a comparison predicate.  However, this way, it is easier,
+     * albeit unintuitive since two lines really have no god-given order
+     * relation.
+     */
+    bool operator < (const ConstraintLine &) const;
+
+    /**
+     * This operator is likewise weird: it checks whether the line indices of
+     * the two operands are equal, irrespective of the fact that the contents
+     * of the line may be different.
+     */
+    bool operator == (const ConstraintLine &) const;
+
+    /**
+     * Determine an estimate for the memory consumption (in bytes) of this
+     * object.
+     */
+    std::size_t memory_consumption () const;
+  };
+
+
+  /**
+   * Typedef for the iterator type that is used in the LineRange container.
+   */
+  typedef std::vector<ConstraintLine>::const_iterator const_iterator;
+
+
+  /**
+   * Typedef for the return type used by get_lines().
+   */
+  typedef boost::iterator_range<const_iterator> LineRange;
+
+
+  /**
+   * Return a range object containing (const) iterators to all line entries
+   * stored in the ConstraintMatrix. Such a range is useful to initialize
+   * range-based for loops as supported by C++11.
+   *
+   * @return A range object for the half open range <code>[this->begin(),
+   * this->end())</code> of line entries.
+   */
+  const LineRange get_lines() const;
+
+
   /**
    * Exception
    *
@@ -1226,60 +1309,6 @@ public:
                   << "another DoF also knows about this constraint?");
 
 private:
-
-  /**
-   * This class represents one line of a constraint matrix.
-   */
-  struct ConstraintLine
-  {
-    /**
-     * A data type in which we store the list of entries that make up the
-     * homogenous part of a constraint.
-     */
-    typedef std::vector<std::pair<size_type,double> > Entries;
-
-    /**
-     * Number of this line. Since only very few lines are stored, we can not
-     * assume a specific order and have to store the line number explicitly.
-     */
-    size_type line;
-
-    /**
-     * Row numbers and values of the entries in this line.
-     *
-     * For the reason why we use a vector instead of a map and the
-     * consequences thereof, the same applies as what is said for
-     * ConstraintMatrix::lines.
-     */
-    Entries entries;
-
-    /**
-     * Value of the inhomogeneity.
-     */
-    double inhomogeneity;
-
-    /**
-     * This operator is a bit weird and unintuitive: it compares the line
-     * numbers of two lines. We need this to sort the lines; in fact we could
-     * do this using a comparison predicate.  However, this way, it is easier,
-     * albeit unintuitive since two lines really have no god-given order
-     * relation.
-     */
-    bool operator < (const ConstraintLine &) const;
-
-    /**
-     * This operator is likewise weird: it checks whether the line indices of
-     * the two operands are equal, irrespective of the fact that the contents
-     * of the line may be different.
-     */
-    bool operator == (const ConstraintLine &) const;
-
-    /**
-     * Determine an estimate for the memory consumption (in bytes) of this
-     * object.
-     */
-    std::size_t memory_consumption () const;
-  };
 
   /**
    * Store the lines of the matrix.  Entries are usually appended in an
@@ -1500,7 +1529,7 @@ ConstraintMatrix::add_line (const size_type line)
 
   // push a new line to the end of the list
   lines.emplace_back ();
-  lines.back().line = line;
+  lines.back().index = line;
   lines.back().inhomogeneity = 0.;
   lines_cache[line_index] = lines.size()-1;
 }
@@ -1534,7 +1563,7 @@ ConstraintMatrix::add_entry (const size_type line,
   Assert (!local_lines.size() || local_lines.is_element(column),
           ExcColumnNotStoredHere(line, column));
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
-  Assert (line_ptr->line == line, ExcInternalError());
+  Assert (line_ptr->index == line, ExcInternalError());
   for (ConstraintLine::Entries::const_iterator
        p=line_ptr->entries.begin();
        p != line_ptr->entries.end(); ++p)

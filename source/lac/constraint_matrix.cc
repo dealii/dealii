@@ -74,7 +74,7 @@ ConstraintMatrix::check_zero_weight (const std::pair<size_type, double> &p)
 bool
 ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 {
-  return line < a.line;
+  return index < a.index;
 }
 
 
@@ -82,7 +82,7 @@ ConstraintMatrix::ConstraintLine::operator < (const ConstraintLine &a) const
 bool
 ConstraintMatrix::ConstraintLine::operator == (const ConstraintLine &a) const
 {
-  return line == a.line;
+  return index == a.index;
 }
 
 
@@ -90,9 +90,16 @@ ConstraintMatrix::ConstraintLine::operator == (const ConstraintLine &a) const
 std::size_t
 ConstraintMatrix::ConstraintLine::memory_consumption () const
 {
-  return (MemoryConsumption::memory_consumption (line) +
+  return (MemoryConsumption::memory_consumption (index) +
           MemoryConsumption::memory_consumption (entries) +
           MemoryConsumption::memory_consumption (inhomogeneity));
+}
+
+
+
+const ConstraintMatrix::LineRange ConstraintMatrix::get_lines() const
+{
+  return boost::make_iterator_range(lines.begin(), lines.end());
 }
 
 
@@ -135,7 +142,7 @@ ConstraintMatrix::add_entries
   Assert (is_constrained(line), ExcLineInexistant(line));
 
   ConstraintLine *line_ptr = &lines[lines_cache[calculate_line_index(line)]];
-  Assert (line_ptr->line == line, ExcInternalError());
+  Assert (line_ptr->index == line, ExcInternalError());
 
   // if in debug mode, check whether an entry for this column already
   // exists and if its the same as the one entered at present
@@ -174,13 +181,13 @@ void ConstraintMatrix::add_selected_constraints
   if (constraints.n_constraints() == 0)
     return;
 
-  Assert (filter.size() > constraints.lines.back().line,
+  Assert (filter.size() > constraints.lines.back().index,
           ExcMessage ("Filter needs to be larger than constraint matrix size."));
   for (std::vector<ConstraintLine>::const_iterator line=constraints.lines.begin();
        line!=constraints.lines.end(); ++line)
-    if (filter.is_element(line->line))
+    if (filter.is_element(line->index))
       {
-        const size_type row = filter.index_within_set (line->line);
+        const size_type row = filter.index_within_set (line->index);
         add_line (row);
         set_inhomogeneity (row, line->inhomogeneity);
         for (size_type i=0; i<line->entries.size(); ++i)
@@ -208,14 +215,14 @@ void ConstraintMatrix::close ()
     size_type counter = 0;
     for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
          line!=lines.end(); ++line, ++counter)
-      new_lines[calculate_line_index(line->line)] = counter;
+      new_lines[calculate_line_index(line->index)] = counter;
     std::swap (lines_cache, new_lines);
   }
 
   // in debug mode: check whether we really set the pointers correctly.
   for (size_type i=0; i<lines_cache.size(); ++i)
     if (lines_cache[i] != numbers::invalid_size_type)
-      Assert (i == calculate_line_index(lines[lines_cache[i]].line),
+      Assert (i == calculate_line_index(lines[lines_cache[i]].index),
               ExcInternalError());
 
   // first, strip zero entries, as we have to do that only once
@@ -295,12 +302,12 @@ void ConstraintMatrix::close ()
                 const size_type  dof_index = line->entries[entry].first;
                 const double     weight = line->entries[entry].second;
 
-                Assert (dof_index != line->line,
+                Assert (dof_index != line->index,
                         ExcMessage ("Cycle in constraints detected!"));
 
                 const ConstraintLine *constrained_line =
                   &lines[lines_cache[calculate_line_index(dof_index)]];
-                Assert (constrained_line->line == dof_index,
+                Assert (constrained_line->index == dof_index,
                         ExcInternalError());
 
                 // now we have to replace an entry by its expansion. we do
@@ -471,7 +478,7 @@ void ConstraintMatrix::close ()
           // make sure that entry->first is not the index of a line itself
           const bool is_circle = is_constrained(entry->first);
           Assert (is_circle == false,
-                  ExcDoFConstrainedToConstrainedDoF(line->line, entry->first));
+                  ExcDoFConstrainedToConstrainedDoF(line->index, entry->first));
         }
 #endif
 
@@ -559,7 +566,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
     for (std::vector<ConstraintLine>::const_iterator line = lines.begin();
          line != lines.end(); ++line)
       {
-        size_type local_line_no = calculate_line_index(line->line);
+        size_type local_line_no = calculate_line_index(line->index);
         if (local_line_no >= lines_cache.size())
           lines_cache.resize(local_line_no+1, numbers::invalid_size_type);
         lines_cache[local_line_no] = index++;
@@ -569,7 +576,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
     for (std::vector<ConstraintLine>::const_iterator line = other_constraints.lines.begin();
          line != other_constraints.lines.end(); ++line)
       {
-        const size_type local_line_no = calculate_line_index(line->line);
+        const size_type local_line_no = calculate_line_index(line->index);
         if (local_line_no >= lines_cache.size())
           {
             lines_cache.resize(local_line_no+1, numbers::invalid_size_type);
@@ -590,7 +597,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
               {
               case no_conflicts_allowed:
                 AssertThrow (false,
-                             ExcDoFIsConstrainedFromBothObjects (line->line));
+                             ExcDoFIsConstrainedFromBothObjects (line->index));
                 break;
 
               case left_object_wins:
@@ -611,7 +618,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
     // check that we set the pointers correctly
     for (size_type i=0; i<lines_cache.size(); ++i)
       if (lines_cache[i] != numbers::invalid_size_type)
-        Assert (i == calculate_line_index(lines[lines_cache[i]].line),
+        Assert (i == calculate_line_index(lines[lines_cache[i]].index),
                 ExcInternalError());
   }
 
@@ -639,7 +646,7 @@ void ConstraintMatrix::shift (const size_type offset)
   for (std::vector<ConstraintLine>::iterator i = lines.begin();
        i != lines.end(); ++i)
     {
-      i->line += offset;
+      i->index += offset;
       for (ConstraintLine::Entries::iterator
            j = i->entries.begin();
            j != i->entries.end(); ++j)
@@ -651,7 +658,7 @@ void ConstraintMatrix::shift (const size_type offset)
   // are still linked correctly
   for (size_type i=0; i<lines_cache.size(); ++i)
     Assert(lines_cache[i] == numbers::invalid_size_type ||
-           calculate_line_index(lines[lines_cache[i]].line) == i,
+           calculate_line_index(lines[lines_cache[i]].index) == i,
            ExcInternalError());
 #endif
 }
@@ -703,7 +710,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
                                     numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = c;
+    distribute[lines[c].index] = c;
 
   const size_type n_rows = sparsity.n_rows();
   for (size_type row=0; row<n_rows; ++row)
@@ -787,7 +794,7 @@ void ConstraintMatrix::condense (DynamicSparsityPattern &sparsity) const
                                     numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = c;
+    distribute[lines[c].index] = c;
 
   const size_type n_rows = sparsity.n_rows();
   for (size_type row=0; row<n_rows; ++row)
@@ -887,7 +894,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
                                      numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = c;
+    distribute[lines[c].index] = c;
 
   const size_type n_rows = sparsity.n_rows();
   for (size_type row=0; row<n_rows; ++row)
@@ -998,7 +1005,7 @@ void ConstraintMatrix::condense (BlockDynamicSparsityPattern &sparsity) const
                                      numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
-    distribute[lines[c].line] = static_cast<signed int>(c);
+    distribute[lines[c].index] = static_cast<signed int>(c);
 
   const size_type n_rows = sparsity.n_rows();
   for (size_type row=0; row<n_rows; ++row)
@@ -1094,7 +1101,7 @@ bool ConstraintMatrix::is_identity_constrained (const size_type index) const
     return false;
 
   const ConstraintLine &p = lines[lines_cache[calculate_line_index(index)]];
-  Assert (p.line == index, ExcInternalError());
+  Assert (p.index == index, ExcInternalError());
 
   // return if an entry for this line was found and if it has only one
   // entry equal to 1.0
@@ -1109,7 +1116,7 @@ bool ConstraintMatrix::are_identity_constrained (const size_type index1,
   if (is_constrained(index1) == true)
     {
       const ConstraintLine &p = lines[lines_cache[calculate_line_index(index1)]];
-      Assert (p.line == index1, ExcInternalError());
+      Assert (p.index == index1, ExcInternalError());
 
       // return if an entry for this line was found and if it has only one
       // entry equal to 1.0 and that one is index2
@@ -1120,7 +1127,7 @@ bool ConstraintMatrix::are_identity_constrained (const size_type index1,
   else if (is_constrained(index2) == true)
     {
       const ConstraintLine &p = lines[lines_cache[calculate_line_index(index2)]];
-      Assert (p.line == index2, ExcInternalError());
+      Assert (p.index == index2, ExcInternalError());
 
       // return if an entry for this line was found and if it has only one
       // entry equal to 1.0 and that one is index1
@@ -1169,13 +1176,13 @@ void ConstraintMatrix::print (std::ostream &out) const
       if (lines[i].entries.size() > 0)
         {
           for (size_type j=0; j<lines[i].entries.size(); ++j)
-            out << "    " << lines[i].line
+            out << "    " << lines[i].index
                 << " " << lines[i].entries[j].first
                 << ":  " << lines[i].entries[j].second << "\n";
 
           // print out inhomogeneity.
           if (lines[i].inhomogeneity != 0)
-            out << "    " << lines[i].line
+            out << "    " << lines[i].index
                 << ": " << lines[i].inhomogeneity << "\n";
         }
       else
@@ -1184,11 +1191,11 @@ void ConstraintMatrix::print (std::ostream &out) const
         // combination of other dofs
         {
           if (lines[i].inhomogeneity != 0)
-            out << "    " << lines[i].line
+            out << "    " << lines[i].index
                 << " = " << lines[i].inhomogeneity
                 << "\n";
           else
-            out << "    " << lines[i].line << " = 0\n";
+            out << "    " << lines[i].index << " = 0\n";
         }
     }
 
@@ -1207,12 +1214,12 @@ ConstraintMatrix::write_dot (std::ostream &out) const
       // same concept as in the previous function
       if (lines[i].entries.size() > 0)
         for (size_type j=0; j<lines[i].entries.size(); ++j)
-          out << "  " << lines[i].line << "->" << lines[i].entries[j].first
+          out << "  " << lines[i].index << "->" << lines[i].entries[j].first
               << "; // weight: "
               << lines[i].entries[j].second
               << "\n";
       else
-        out << "  " << lines[i].line << "\n";
+        out << "  " << lines[i].index << "\n";
     }
   out << "}" << std::endl;
 }
