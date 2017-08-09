@@ -728,6 +728,16 @@ $ ctest [...] -V -S ../tests/run_testsuite.cmake
     </p>
 
     <p>
+      <b>Note:</b>
+      For also building the tests in parallel you have to provide suitable flags
+      using MAKEOPTS as well, i.e. you would typically use
+<pre>
+$ ctest -DMAKEOPTS="-j N" -j N [...] -V -S ../tests/run_testsuite.cmake
+</pre>
+      for compiling the library and running the tests in parallel.
+    </p>
+
+    <p>
       It is possible to run tests and submit results for an already installed library by
 <pre>
 mkdir build && cd build
