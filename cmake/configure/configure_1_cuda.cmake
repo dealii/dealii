@@ -28,6 +28,10 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
   # FIXME Restructure this call into a ./modules/FindCUDA.cmake file and
   # use DEAL_II_PACKAGE_HANDLE
   #
+  IF("${CMAKE_VERSION}" VERSION_LESS "3.8" )
+    MESSAGE(FATAL_ERROR "CUDA feature requires CMake version 3.8 or later")
+  ENDIF()
+
   FIND_PACKAGE(CUDA)
   MARK_AS_ADVANCED(
     CUDA_HOST_COMPILER
