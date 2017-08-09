@@ -1,0 +1,4 @@
+Fixed: Debugged and fixed a long standing linker error due to missing
+instantiations of ShapeInfo::reinit variants.
+<br>
+(Jean-Paul Pelteret, Matthias Maier, Daniel Arndt, 2017/08/09)
