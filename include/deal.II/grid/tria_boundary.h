@@ -449,13 +449,6 @@ StraightBoundary<3,3>::
 get_intermediate_points_on_quad (const Triangulation<3,3>::quad_iterator &quad,
                                  std::vector<Point<3> > &points) const;
 
-template <>
-Point<3>
-StraightBoundary<1,3>::
-project_to_surface (const Triangulation<1, 3>::quad_iterator &quad,
-                    const Point<3>  &y) const;
-
-
 #endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
