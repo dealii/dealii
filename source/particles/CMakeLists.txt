@@ -23,6 +23,7 @@ SET(_src
 
 SET(_inst
   particle.inst.in
+  property_pool.inst.in
   )
 
 FILE(GLOB _header

@@ -22,13 +22,11 @@
 #include <deal.II/base/types.h>
 #include <deal.II/base/array_view.h>
 
-#include <boost/serialization/vector.hpp>
-
 DEAL_II_NAMESPACE_OPEN
 
 /**
  * A namespace that contains all classes that are related to the particle
- * implementation, in particular the fundamental <code>Particle</code> class.
+ * implementation, in particular the fundamental Particle class.
  */
 namespace Particles
 {
@@ -83,14 +81,15 @@ namespace Particles
   /**
    * Base class of particles - represents a particle with position,
    * an ID number and a variable number of properties. This class
-   * can be extended to include data related to a particle by the property
-   * manager.
+   * can be extended to include arbitrary data related to a particle by
+   * attaching a property pool class to the particle.
    *
    *
    * @ingroup Particle
+   * @author Rene Gassmoeller, 2017
    *
    */
-  template <int dim>
+  template <int dim, int spacedim=dim, typename PropertyType = double>
   class Particle
   {
   public:
@@ -102,18 +101,18 @@ namespace Particles
 
     /**
      * Constructor for Particle, creates a particle with the specified
-     * ID at the specified location. Note that deal.II
-     * does not check for duplicate particle IDs so the user must
+     * ID at the specified location. Note that there is no
+     * check for duplicate particle IDs so the user must
      * make sure the IDs are unique over all processes.
      *
-     * @param new_location Initial location of particle.
-     * @param new_reference_location Initial location of the particle
+     * @param[in] location Initial location of particle.
+     * @param[in] reference_location Initial location of the particle
      * in the coordinate system of the reference cell.
-     * @param new_id Globally unique ID number of particle.
+     * @param[in] id Globally unique ID number of particle.
      */
-    Particle (const Point<dim> &new_location,
-              const Point<dim> &new_reference_location,
-              const types::particle_index new_id);
+    Particle (const Point<spacedim> &location,
+              const Point<dim> &reference_location,
+              const types::particle_index id);
 
     /**
      * Copy-Constructor for Particle, creates a particle with exactly the
@@ -122,12 +121,12 @@ namespace Particles
      * for registering and freeing this memory in the property pool this
      * constructor registers a new chunk, and copies the properties.
      */
-    Particle (const Particle<dim> &particle);
+    Particle (const Particle<dim,spacedim,PropertyType> &particle);
 
     /**
      * Constructor for Particle, creates a particle from a data vector.
-     * This constructor is usually called after sending a particle to a
-     * different process.
+     * This constructor is usually called after serializing a particle by
+     * calling the write_data function.
      *
      * @param[in,out] begin_data A pointer to a memory location from which
      * to read the information that completely describes a particle. This
@@ -138,30 +137,29 @@ namespace Particles
      * allocate the property data used by this particle.
      */
     Particle (const void *&begin_data,
-              PropertyPool &new_property_pool);
+              PropertyPool<PropertyType> &new_property_pool);
 
     /**
      * Move constructor for Particle, creates a particle from an existing
-     * one by stealing its state.
+     * one by stealing its state and properties.
      */
-    Particle (Particle<dim> &&particle);
+    Particle (Particle<dim,spacedim,PropertyType> &&particle);
 
     /**
      * Copy assignment operator.
      */
-    Particle<dim> &operator=(const Particle<dim> &particle);
+    Particle<dim,spacedim,PropertyType> &operator=(const Particle<dim,spacedim,PropertyType> &particle);
 
     /**
      * Move assignment operator.
      */
-    Particle<dim> &operator=(Particle<dim> &&particle);
+    Particle<dim,spacedim,PropertyType> &operator=(Particle<dim,spacedim,PropertyType> &&particle);
 
     /**
      * Destructor. Releases the property handle if it is valid, and
      * therefore frees that memory space for other particles. (Note:
-     * the memory is managed by the property_pool, and the memory is not
-     * deallocated by this function, it is kept in reserve for other
-     * particles).
+     * the memory is managed by the property pool, and the pool is responsible
+     * for what happens to the memory.
      */
     ~Particle ();
 
@@ -185,26 +183,27 @@ namespace Particles
      * Set the location of this particle. Note that this does not check
      * whether this is a valid location in the simulation domain.
      *
-     * @param [in] new_loc The new location for this particle.
+     * @param [in] new_location The new location for this particle.
      */
     void
-    set_location (const Point<dim> &new_loc);
+    set_location (const Point<spacedim> &new_location);
 
     /**
      * Get the location of this particle.
      *
      * @return The location of this particle.
      */
-    const Point<dim> &
+    const Point<spacedim> &
     get_location () const;
 
     /**
      * Set the reference location of this particle.
      *
-     * @param [in] new_loc The new reference location for this particle.
+     * @param [in] new_reference_location The new reference location for
+     * this particle.
      */
     void
-    set_reference_location (const Point<dim> &new_loc);
+    set_reference_location (const Point<dim> &new_reference_location);
 
     /**
      * Return the reference location of this particle in its current cell.
@@ -221,28 +220,35 @@ namespace Particles
     /**
      * Tell the particle where to store its properties (even if it does not
      * own properties). Usually this is only done once per particle, but
-     * since the particle generator does not know about the properties
-     * we want to do it not at construction time. Another use for this
+     * since the particle does not know about the properties
+     * we do not want to do it at construction time. Another use for this
      * function is after particle transfer to a new process.
      */
     void
-    set_property_pool(PropertyPool &property_pool);
+    set_property_pool(PropertyPool<PropertyType> &property_pool);
+
+    /**
+     * Returns whether this particle has a valid property pool and a valid
+     * handle to properties.
+     */
+    bool
+    has_properties () const;
 
     /**
      * Set the properties of this particle.
      *
-     * @param [in] new_properties A vector containing the
-     * new properties for this particle.
+     * @param [in] new_properties An ArrayView of the new
+     * properties that will be copied into the property pool.
      */
     void
-    set_properties (const std::vector<double> &new_properties);
+    set_properties (const ArrayView<const PropertyType> &new_properties);
 
     /**
      * Get write-access to properties of this particle.
      *
      * @return An ArrayView of the properties of this particle.
      */
-    const ArrayView<double>
+    const ArrayView<PropertyType>
     get_properties ();
 
     /**
@@ -250,7 +256,7 @@ namespace Particles
      *
      * @return An ArrayView of the properties of this particle.
      */
-    const ArrayView<const double>
+    const ArrayView<const PropertyType>
     get_properties () const;
 
     /**
@@ -263,7 +269,7 @@ namespace Particles
     /**
      * Current particle location.
      */
-    Point<dim>             location;
+    Point<spacedim>             location;
 
     /**
      * Current particle location in the reference cell.
@@ -279,19 +285,19 @@ namespace Particles
      * A pointer to the property pool. Necessary to translate from the
      * handle to the actual memory locations.
      */
-    PropertyPool *property_pool;
+    PropertyPool<PropertyType> *property_pool;
 
     /**
-     * A handle to all particle properties
+     * A handle to all particle properties.
      */
-    PropertyPool::Handle properties;
+    typename PropertyPool<PropertyType>::Handle properties;
   };
 
   /* -------------------------- inline and template functions ---------------------- */
 
-  template <int dim>
+  template <int dim, int spacedim, typename PropertyType>
   template <class Archive>
-  void Particle<dim>::serialize (Archive &ar, const unsigned int)
+  void Particle<dim,spacedim,PropertyType>::serialize (Archive &ar, const unsigned int)
   {
     ar &location
     & id

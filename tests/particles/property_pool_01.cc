@@ -15,25 +15,27 @@
 
 
 
-// check the creation and destruction of particles
+// check the creation, simplest usage, and destruction of a property pool
 
 #include "../tests.h"
-#include <deal.II/particles/particle.h>
+#include <deal.II/particles/property_pool.h>
+#include <fstream>
+#include <iomanip>
 
 
-template <int dim>
+template <typename PropertyType>
 void test ()
 {
   {
-    Particles::Particle<dim> particle;
+    Particles::PropertyPool<PropertyType> pool;
 
-    deallog << "Particle location: " << particle.get_location() << std::endl;
+    typename Particles::PropertyPool<PropertyType>::Handle handle = pool.allocate_properties_array();
 
-    Point<dim> position;
-    position(0) = 1.0;
-    particle.set_location(position);
+    pool.get_properties(handle)[0] = 2.5;
 
-    deallog << "Particle location: " << particle.get_location() << std::endl;
+    deallog << "Pool properties: " << pool.get_properties(handle)[0] << std::endl;
+
+    pool.deallocate_properties_array(handle);
   }
 
   deallog << "OK" << std::endl;
@@ -44,6 +46,6 @@ void test ()
 int main ()
 {
   initlog();
-  test<2>();
-  test<3>();
+  test<double>();
+  test<float>();
 }

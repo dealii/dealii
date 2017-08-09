@@ -23,12 +23,22 @@ DEAL_II_NAMESPACE_OPEN
 namespace Particles
 {
   /**
-   * This class manages the memory space in which particles store their
-   * properties. Because this is dynamic memory and every particle needs the
-   * same amount it is more efficient to let this be handled by a central
-   * manager that does not need to allocate/deallocate memory every time a
-   * particle is constructed/destroyed.
+   * This class manages a memory space in which particles store their
+   * properties. Because this is dynamic memory and often every particle
+   * needs the same amount, it is more efficient to let this be handled by a
+   * central manager that does not need to allocate/deallocate memory every
+   * time a particle is constructed/destroyed.
+   * The current implementation uses simple new/delete allocation for every
+   * block. Additionally, the current implementation
+   * assumes the same number of properties per particle, but of course the
+   * PropertyType could contain a pointer to dynamically allocated memory
+   * with varying sizes per particle (this memory would not be managed by this
+   * class).
+   * Because PropertyPool only returns handles it could be enhanced internally
+   * (e.g. to allow for varying number of properties per handle) without
+   * affecting its interface.
    */
+  template <typename PropertyType = double>
   class PropertyPool
   {
   public:
@@ -37,7 +47,7 @@ namespace Particles
      * uniquely identifies the slot of memory that is reserved for this
      * particle.
      */
-    typedef double *Handle;
+    typedef PropertyType *Handle;
 
     /**
      * Define a default (invalid) value for handles.
@@ -46,33 +56,37 @@ namespace Particles
 
     /**
      * Constructor. Stores the number of properties per reserved slot.
+     * By default this class assumes the template parameter PropertyType
+     * completely describes all properties of the particle.
      */
-    PropertyPool (const unsigned int n_properties_per_slot);
+    PropertyPool (const unsigned int n_properties_per_slot = 1);
 
     /**
      * Returns a new handle that allows accessing the reserved block
-     * of memory.
+     * of memory. The returned memory block is not initialized.
      */
     Handle allocate_properties_array ();
 
     /**
      * Mark the properties corresponding to the handle @p handle as
-     * deleted. After calling this function calling get_properties() with
-     * the freed handle causes undefined behavior.
+     * deleted. After calling this function @p handle is invalid and
+     * can not longer be used to access properties.
      */
-    void deallocate_properties_array (const Handle handle);
+    void deallocate_properties_array (Handle &handle);
 
     /**
      * Return an ArrayView to the properties that correspond to the given
-     * handle @p handle.
+     * handle @p handle. This function allows read-write access to the
+     * underlying properties.
      */
-    ArrayView<double> get_properties (const Handle handle);
+    const ArrayView<PropertyType> get_properties (const Handle handle);
 
     /**
-     * Reserves the dynamic memory needed for storing the properties of
-     * @p size particles.
+     * Return an ArrayView to the properties that correspond to the given
+     * handle @p handle. This function only allows read access to the underlying
+     * properties.
      */
-    void reserve(const std::size_t size);
+    const ArrayView<const PropertyType> get_properties (const Handle handle) const;
 
   private:
     /**
