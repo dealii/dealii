@@ -108,7 +108,6 @@ void test ()
   out_data.add<Vector<double>*>(&solution, "solution");
 
   newton.control.set_reduction(1.e-20);
-  newton.control.log_history(true);
   newton.debug_vectors = true;
   newton(out_data, in_data);
   deallog << " square root " << (*out_data.read<Vector<double>*>(0))(0) << std::endl;
