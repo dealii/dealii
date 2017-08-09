@@ -1,0 +1,5 @@
+Fixed: Creation of coverage information via 
+compiling with 'DEAL_II_SETUP_COVERAGE=ON'
+and 'ctest -S ../tests/run_coverage.cmake' works again.
+<br>
+(Matthias Maier, Daniel Arndt, 2017/08/09)

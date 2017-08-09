@@ -188,8 +188,8 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
     # Enable test coverage
     #
     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-fno-elide-constructors")
-    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-ftest-coverage -fprofile-arcs")
-    ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS_DEBUG "-ftest-coverage -fprofile-arcs")
+    ADD_FLAGS(DEAL_II_CXX_FLAGS_DEBUG "-ftest-coverage -fprofile-arcs")
+    ADD_FLAGS(DEAL_II_LINKER_FLAGS_DEBUG "-ftest-coverage -fprofile-arcs")
   ENDIF()
 
 ENDIF()
