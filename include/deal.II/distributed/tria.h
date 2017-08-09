@@ -866,14 +866,6 @@ namespace parallel
       compute_vertices_with_ghost_neighbors () const;
 
       /**
-       * Return a map that, for each vertex, lists all the processors whose
-       * subdomains are adjacent to that vertex on the given level for the
-       * multigrid hierarchy. Used by DoFHandler::Policy::ParallelDistributed.
-       */
-      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-      compute_level_vertices_with_ghost_neighbors (const int level) const;
-
-      /**
        * This method returns a bit vector of length tria.n_vertices()
        * indicating the locally active vertices on a level, i.e., the vertices
        * touched by the locally owned level cells for use in geometric
