@@ -139,6 +139,19 @@ for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimensi
 }
 
 
+for (VEC : GENERAL_CONTAINER_TYPES;
+        Number : ALL_SCALAR_TYPES;
+        deal_II_dimension : DIMENSIONS;
+        deal_II_space_dimension :  SPACE_DIMENSIONS)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+    template
+    void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
+    ::get_function_values_from_local_dof_values<VEC<Number>>
+            (const VEC<Number>&, std::vector<typename OutputType<Number>::value_type>&) const;
+#endif
+}
+
 
 for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
 {

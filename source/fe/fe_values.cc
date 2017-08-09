@@ -39,6 +39,8 @@
 #include <iomanip>
 #include <memory>
 
+#include <deal.II/base/sacado_product_type.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -459,7 +461,7 @@ namespace FEValuesViews
     do_function_values (const ArrayView<Number> &dof_values,
                         const Table<2,double> &shape_values,
                         const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                        std::vector<typename ProductType<Number,double>::type>            &values)
+                        std::vector<typename ProductType<typename std::remove_cv<Number>::type,double>::type>            &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1281,6 +1283,24 @@ namespace FEValuesViews
     // get function values of dofs on this cell and call internal worker function
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
+    internal::do_function_values<dim,spacedim>
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_values, shape_function_data, values);
+  }
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim,spacedim>::
+  get_function_values_from_local_dof_values (const InputVector &dof_values,
+                                             std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const
+  {
+    Assert (fe_values->update_flags & update_values,
+            (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_values")));
+    Assert (fe_values->present_cell.get() != nullptr,
+            ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    AssertDimension (dof_values.size(), fe_values->dofs_per_cell);
+
     internal::do_function_values<dim,spacedim>
     (make_array_view(dof_values.begin(), dof_values.end()),
      fe_values->finite_element_output.shape_values, shape_function_data, values);
