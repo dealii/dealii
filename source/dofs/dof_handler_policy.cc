@@ -2662,16 +2662,6 @@ namespace internal
           std::vector<dealii::types::global_dof_index>                        dof_numbers_and_indices;
 
 
-          unsigned int bytes_for_buffer () const
-          {
-            return (sizeof(unsigned int)*2 +
-                    tree_indices.size() * sizeof(unsigned int) +
-                    quadrants.size() * sizeof(typename dealii::internal::p4est
-                                              ::types<dim>::quadrant) +
-                    dof_numbers_and_indices.size() * sizeof(dealii::types::global_dof_index));
-          }
-
-
           /**
            * Write the data of this object to a stream for the purpose of
            * serialization.
