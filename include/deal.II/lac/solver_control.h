@@ -277,31 +277,6 @@ public:
   double step_reduction(unsigned int step) const;
 
   /**
-   * Log each iteration step. Use @p log_frequency for skipping steps.
-   */
-  void log_history (const bool);
-
-  /**
-   * Return the @p log_history flag.
-   */
-  bool log_history () const;
-
-  /**
-   * Set logging frequency.
-   */
-  unsigned int log_frequency (unsigned int);
-
-  /**
-   * Log start and end step.
-   */
-  void log_result (const bool);
-
-  /**
-   * Return the @p log_result flag.
-   */
-  bool log_result () const;
-
-  /**
    * This exception is thrown if a function operating on the vector of history
    * data of a SolverControl object id called, but storage of history data was
    * not enabled by enable_history_data().
@@ -357,23 +332,6 @@ protected:
    * Until the first residual is known it is 0.
    */
   double       failure_residual;
-
-  /**
-   * Log convergence history to @p deallog.
-   */
-  bool         m_log_history;
-
-  /**
-   * Log only every nth step.
-   */
-  unsigned int m_log_frequency;
-
-  /**
-   * Log iteration result to @p deallog.  If true, after finishing the
-   * iteration, a statement about failure or success together with @p lstep
-   * and @p lvalue are logged.
-   */
-  bool         m_log_result;
 
   /**
    * Control over the storage of history data. Set by enable_history_data().
@@ -652,35 +610,6 @@ SolverControl::set_tolerance (const double t)
   double old = tol;
   tol = t;
   return old;
-}
-
-
-inline void
-SolverControl::log_history (const bool newval)
-{
-  m_log_history = newval;
-}
-
-
-
-inline bool
-SolverControl::log_history () const
-{
-  return m_log_history;
-}
-
-
-inline void
-SolverControl::log_result (const bool newval)
-{
-  m_log_result = newval;
-}
-
-
-inline bool
-SolverControl::log_result () const
-{
-  return m_log_result;
 }
 
 
