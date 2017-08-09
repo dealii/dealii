@@ -223,37 +223,6 @@ CHECK_CXX_COMPILER_BUG(
   )
 
 
-#
-# Check for GCC bug 36052, see
-#   http://gcc.gnu.org/bugzilla/show_bug.cgi?id=36052
-#
-# - Wolfgang Bangerth, Matthias Maier, rewritten 2012
-#
-
-CHECK_CXX_COMPILER_BUG(
-  "
-  struct S {
-      typedef double value_type;
-  };
-
-  template <typename T> struct Traits {
-      typedef const typename T::value_type dereference_type;
-  };
-
-  template <class BlockVectorType> struct ConstIterator {
-      typedef typename Traits<BlockVectorType>::dereference_type dereference_type;
-
-      dereference_type operator * () const  { return 0; }
-  };
-  template class ConstIterator<S>;
-  int main(){return 0;}
-  "
-  DEAL_II_TYPE_QUALIFIER_BUG)
-
-IF(DEAL_II_TYPE_QUALIFIER_BUG)
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-ignored-qualifiers)
-ENDIF()
-
 
 #
 # On Mac OS X, gcc appears to have a bug that prevents us from
