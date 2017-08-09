@@ -3405,69 +3405,6 @@ namespace parallel
 
 
 
-    /**
-     * Determine the neighboring subdomains that are adjacent to each vertex
-     * on the given multigrid level
-     */
-    template <int dim, int spacedim>
-    std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-    Triangulation<dim,spacedim>::
-    compute_level_vertices_with_ghost_neighbors (const int level) const
-    {
-      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-      vertices_with_ghost_neighbors;
-
-      const std::vector<bool> locally_active_vertices =
-        mark_locally_active_vertices_on_level(level);
-      cell_iterator cell = this->begin(level),
-                    endc = this->end(level);
-      for ( ; cell != endc; ++cell)
-        if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id
-            && cell->level_subdomain_id() != this->locally_owned_subdomain())
-          for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-            if (locally_active_vertices[cell->vertex_index(v)])
-              vertices_with_ghost_neighbors[cell->vertex_index(v)]
-              .insert (cell->level_subdomain_id());
-
-      //now for the vertices on periodic faces
-      typename std::map<std::pair<cell_iterator, unsigned int>,
-               std::pair<std::pair<cell_iterator,unsigned int>, std::bitset<3> > >::const_iterator it;
-
-      for (it = this->get_periodic_face_map().begin(); it!= this->get_periodic_face_map().end(); ++it)
-        {
-          const cell_iterator &cell_1 = it->first.first;
-          const unsigned int face_no_1 = it->first.second;
-          const cell_iterator &cell_2 = it->second.first.first;
-          const unsigned int face_no_2 = it->second.first.second;
-          const std::bitset<3> face_orientation = it->second.second;
-
-          if (cell_1->level() == level &&
-              cell_2->level() == level)
-            {
-              for (unsigned int v=0; v<GeometryInfo<dim-1>::vertices_per_cell; ++v)
-                {
-                  // take possible non-standard orientation of faces into account
-                  const unsigned int vface0 =
-                    GeometryInfo<dim>::standard_to_real_face_vertex(v,face_orientation[0],
-                                                                    face_orientation[1],
-                                                                    face_orientation[2]);
-                  const unsigned int idx0 = cell_1->face(face_no_1)->vertex_index(vface0);
-                  const unsigned int idx1 = cell_2->face(face_no_2)->vertex_index(v);
-                  if (vertices_with_ghost_neighbors.find(idx0) != vertices_with_ghost_neighbors.end())
-                    vertices_with_ghost_neighbors[idx1].insert(vertices_with_ghost_neighbors[idx0].begin(),
-                                                               vertices_with_ghost_neighbors[idx0].end());
-                  if (vertices_with_ghost_neighbors.find(idx1) != vertices_with_ghost_neighbors.end())
-                    vertices_with_ghost_neighbors[idx0].insert(vertices_with_ghost_neighbors[idx1].begin(),
-                                                               vertices_with_ghost_neighbors[idx1].end());
-                }
-            }
-        }
-
-      return vertices_with_ghost_neighbors;
-    }
-
-
-
     template <int dim, int spacedim>
     std::vector<bool>
     Triangulation<dim,spacedim>::
