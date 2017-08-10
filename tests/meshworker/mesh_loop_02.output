@@ -1,0 +1,162 @@
+
+DEAL::CELLS ONLY
+DEAL::
+DEAL::Cell worker on : 1.1
+DEAL::Cell worker on : 1.2
+DEAL::Cell worker on : 1.3
+DEAL::Cell worker on : 2.0
+DEAL::Cell worker on : 2.1
+DEAL::Cell worker on : 2.2
+DEAL::Cell worker on : 2.3
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::BOUNDARY ONLY
+DEAL::
+DEAL::Boundary worker on : 1.1, Face : 1
+DEAL::Boundary worker on : 1.1, Face : 2
+DEAL::Boundary worker on : 1.2, Face : 0
+DEAL::Boundary worker on : 1.2, Face : 3
+DEAL::Boundary worker on : 1.3, Face : 1
+DEAL::Boundary worker on : 1.3, Face : 3
+DEAL::Boundary worker on : 2.0, Face : 0
+DEAL::Boundary worker on : 2.0, Face : 2
+DEAL::Boundary worker on : 2.1, Face : 2
+DEAL::Boundary worker on : 2.2, Face : 0
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::CELLS AND BOUNDARY
+DEAL::
+DEAL::Boundary worker on : 1.1, Face : 1
+DEAL::Boundary worker on : 1.1, Face : 2
+DEAL::Cell worker on : 1.1
+DEAL::Boundary worker on : 1.2, Face : 0
+DEAL::Boundary worker on : 1.2, Face : 3
+DEAL::Cell worker on : 1.2
+DEAL::Boundary worker on : 1.3, Face : 1
+DEAL::Boundary worker on : 1.3, Face : 3
+DEAL::Cell worker on : 1.3
+DEAL::Boundary worker on : 2.0, Face : 0
+DEAL::Boundary worker on : 2.0, Face : 2
+DEAL::Cell worker on : 2.0
+DEAL::Boundary worker on : 2.1, Face : 2
+DEAL::Cell worker on : 2.1
+DEAL::Boundary worker on : 2.2, Face : 0
+DEAL::Cell worker on : 2.2
+DEAL::Cell worker on : 2.3
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::CELLS FIRST AND BOUNDARY
+DEAL::
+DEAL::Cell worker on : 1.1
+DEAL::Boundary worker on : 1.1, Face : 1
+DEAL::Boundary worker on : 1.1, Face : 2
+DEAL::Cell worker on : 1.2
+DEAL::Boundary worker on : 1.2, Face : 0
+DEAL::Boundary worker on : 1.2, Face : 3
+DEAL::Cell worker on : 1.3
+DEAL::Boundary worker on : 1.3, Face : 1
+DEAL::Boundary worker on : 1.3, Face : 3
+DEAL::Cell worker on : 2.0
+DEAL::Boundary worker on : 2.0, Face : 0
+DEAL::Boundary worker on : 2.0, Face : 2
+DEAL::Cell worker on : 2.1
+DEAL::Boundary worker on : 2.1, Face : 2
+DEAL::Cell worker on : 2.2
+DEAL::Boundary worker on : 2.2, Face : 0
+DEAL::Cell worker on : 2.3
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::ONLY FACES ONCE
+DEAL::
+DEAL::Face worker on : 1.1, Neighbor cell : 1.3, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 1.2, Neighbor cell : 1.3, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.0, Neighbor cell : 2.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.0, Neighbor cell : 2.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.1, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 0
+DEAL::Face worker on : 2.1, Neighbor cell : 2.3, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.2, Neighbor cell : 2.3, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.2, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 0
+DEAL::Face worker on : 2.3, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 1
+DEAL::Face worker on : 2.3, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 1
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::ONLY FACES BOTH
+DEAL::
+DEAL::Face worker on : 1.1, Neighbor cell : 1.3, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 1.2, Neighbor cell : 1.3, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 1.3, Neighbor cell : 1.2, Face : 0, Neighbor Face : 1, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 1.3, Neighbor cell : 1.1, Face : 2, Neighbor Face : 3, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.0, Neighbor cell : 2.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.0, Neighbor cell : 2.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.1, Neighbor cell : 2.0, Face : 0, Neighbor Face : 1, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.1, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 0
+DEAL::Face worker on : 1.1, Neighbor cell : 2.1, Face : 0, Neighbor Face : 1, Subface: 0, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.1, Neighbor cell : 2.3, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.2, Neighbor cell : 2.3, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.2, Neighbor cell : 2.0, Face : 2, Neighbor Face : 3, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.2, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 0
+DEAL::Face worker on : 1.2, Neighbor cell : 2.2, Face : 2, Neighbor Face : 3, Subface: 0, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.3, Neighbor cell : 2.2, Face : 0, Neighbor Face : 1, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.3, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 1
+DEAL::Face worker on : 1.1, Neighbor cell : 2.3, Face : 0, Neighbor Face : 1, Subface: 1, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.3, Neighbor cell : 2.1, Face : 2, Neighbor Face : 3, Subface: 4294967295, Neighbor Subface: 4294967295
+DEAL::Face worker on : 2.3, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 1
+DEAL::Face worker on : 1.2, Neighbor cell : 2.3, Face : 2, Neighbor Face : 3, Subface: 1, Neighbor Subface: 4294967295
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::CELLS FIRST AND BOUNDARY
+DEAL::
+DEAL::Cell worker on : 1.1
+DEAL::Boundary worker on : 1.1, Face : 1
+DEAL::Boundary worker on : 1.1, Face : 2
+DEAL::Cell worker on : 1.2
+DEAL::Boundary worker on : 1.2, Face : 0
+DEAL::Boundary worker on : 1.2, Face : 3
+DEAL::Cell worker on : 1.3
+DEAL::Boundary worker on : 1.3, Face : 1
+DEAL::Boundary worker on : 1.3, Face : 3
+DEAL::Cell worker on : 2.0
+DEAL::Boundary worker on : 2.0, Face : 0
+DEAL::Boundary worker on : 2.0, Face : 2
+DEAL::Cell worker on : 2.1
+DEAL::Boundary worker on : 2.1, Face : 2
+DEAL::Cell worker on : 2.2
+DEAL::Boundary worker on : 2.2, Face : 0
+DEAL::Cell worker on : 2.3
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
+DEAL::Copyer
