@@ -1,0 +1,8 @@
+New: All of the FEValuesViews classes now have a set of functions
+named get_function_*_from_local_dof_values that return the function
+values, gradients etc. from a local vector of degree-of-freedom
+values. They also now contain a data structure called OutputType
+that that provides the output type for the product of the value
+and derivatives of basis functions of the view and any number type.
+<br>
+(Jean-Paul Pelteret, Luca Heltai, 2017/08/10)
