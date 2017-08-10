@@ -88,8 +88,7 @@ namespace internal
             std::vector<std::vector<DoFLevel::active_fe_index_type> >
             active_fe_backup(dof_handler.levels.size ());
             for (unsigned int level = 0; level<dof_handler.levels.size (); ++level)
-              std::swap (dof_handler.levels[level]->active_fe_indices,
-                         active_fe_backup[level]);
+              active_fe_backup[level] = std::move(dof_handler.levels[level]->active_fe_indices);
 
             // delete all levels and set them up newly, since vectors
             // are troublesome if you want to change their size
@@ -98,8 +97,7 @@ namespace internal
             for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
               {
                 dof_handler.levels.emplace_back (new internal::hp::DoFLevel);
-                std::swap (active_fe_backup[level],
-                           dof_handler.levels[level]->active_fe_indices);
+                dof_handler.levels[level]->active_fe_indices = std::move(active_fe_backup[level]);
               }
 
             if (dim > 1)
@@ -1648,15 +1646,8 @@ namespace hp
     levels.clear ();
     faces.reset ();
 
-    {
-      std::vector<types::global_dof_index> tmp;
-      std::swap (vertex_dofs, tmp);
-    }
-
-    {
-      std::vector<types::global_dof_index> tmp;
-      std::swap (vertex_dofs_offsets, tmp);
-    }
+    vertex_dofs = std::move(std::vector<types::global_dof_index>());
+    vertex_dofs_offsets = std::move (std::vector<types::global_dof_index>());
   }
 }
 
