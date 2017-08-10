@@ -16,11 +16,8 @@
 
 #include "../tests.h"
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/base/logstream.h>
 
 #include <vector>
-#include <iomanip>
-#include <fstream>
 #include <string>
 
 //TODO: Several functions are commented out since implementations are missing
@@ -209,20 +206,11 @@ void test(std::ostream &out)
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
+  initlog();
+  auto &logfile = deallog.get_file_stream();
 
-//TODO: write_eps says ExcNotImplemented
-//  test<1,1>(logfile);
   test<1,2>(logfile);
-//TODO: Instantiations missing (linker error)
-//  test<1,3>(logfile);
   test<2,2>(logfile);
   test<2,3>(logfile);
   test<3,3>(logfile);
-//    test<1,4>(logfile);
-//    test<2,4>(logfile);
-//    test<3,4>(logfile);
-//    test<4,4>(logfile);
 }

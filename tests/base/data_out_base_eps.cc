@@ -16,13 +16,10 @@
 
 #include "../tests.h"
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function_lib.h>
 
 #include <vector>
-#include <iomanip>
-#include <fstream>
 #include <string>
 
 #include "patches.h"
@@ -114,10 +111,8 @@ void check_all(std::ostream &log)
 
 int main()
 {
-  std::ofstream logfile("output");
-//  check_all<1,1>(logfile);
-//  check_all<1,2>(logfile);
+  initlog();
+  auto &logfile = deallog.get_file_stream();
   check_all<2,2>(logfile);
   check_all<2,3>(logfile);
-//  check_all<3,3>(logfile);
 }
