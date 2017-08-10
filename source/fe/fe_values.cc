@@ -1557,6 +1557,26 @@ namespace FEValuesViews
   template <class InputVector>
   void
   Vector<dim,spacedim>::
+  get_function_gradients_from_local_dof_values (const InputVector &dof_values,
+                                                std::vector<typename OutputType<typename InputVector::value_type>::gradient_type> &gradients) const
+  {
+    Assert (fe_values->update_flags & update_gradients,
+            (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_gradients")));
+    Assert (fe_values->present_cell.get() != nullptr,
+            ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    AssertDimension (dof_values.size(), fe_values->dofs_per_cell);
+
+    internal::do_function_derivatives<1,dim,spacedim>
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, gradients);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim,spacedim>::
   get_function_symmetric_gradients (const InputVector &fe_function,
                                     std::vector<typename ProductType<symmetric_gradient_type,typename InputVector::value_type>::type> &symmetric_gradients) const
   {
