@@ -519,6 +519,40 @@ InvalidAccessor<structdim, dim, spacedim>::manifold_id () const
 }
 
 
+template <int structdim, int dim, int spacedim>
+inline
+Point<spacedim> &
+InvalidAccessor<structdim, dim, spacedim>::vertex (const unsigned int) const
+{
+  // nothing to do here. we could throw an exception but we can't get here
+  // without first creating an object which would have already thrown
+  static Point<spacedim> invalid_vertex;
+  return invalid_vertex;
+}
+
+
+template <int structdim, int dim, int spacedim>
+inline
+typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+InvalidAccessor<structdim, dim, spacedim>::line (const unsigned int) const
+{
+  // nothing to do here. we could throw an exception but we can't get here
+  // without first creating an object which would have already thrown
+  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator();
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+inline
+typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+InvalidAccessor<structdim, dim, spacedim>::quad (const unsigned int) const
+{
+  // nothing to do here. we could throw an exception but we can't get here
+  // without first creating an object which would have already thrown
+  return dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator();
+}
+
 
 /*------------------------ Functions: TriaAccessor ---------------------------*/
 
