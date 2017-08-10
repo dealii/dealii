@@ -1,0 +1,4 @@
+Changed: The types::boundary_id and types::material_id types have been changed
+from unsigned char to unsigned int. 
+<br>
+(Jean-Paul Pelteret, 2017/08/07)

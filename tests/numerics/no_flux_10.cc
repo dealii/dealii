@@ -191,7 +191,7 @@ void run()
     deallog << "Face=" << f << ", boundary_id="
             << (int)triangulation.begin_active()->face(f)->boundary_id() << std::endl;
 
-  std::set<unsigned char> no_normal_flux_boundaries;
+  std::set<types::boundary_id> no_normal_flux_boundaries;
   no_normal_flux_boundaries.insert (0);
   no_normal_flux_boundaries.insert (2);
   VectorTools::compute_no_normal_flux_constraints

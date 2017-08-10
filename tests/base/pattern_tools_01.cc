@@ -45,7 +45,7 @@ int main()
 
   int                 t0 = 1;
   unsigned int        t1 = 2;
-  types::boundary_id  t2 = 3;
+  unsigned char       t2 = 3;
   std::string         t3 = "Ciao";
   double              t4 = 4.0;
   bool                t5 = true;
