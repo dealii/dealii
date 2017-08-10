@@ -301,6 +301,7 @@ _Pragma("GCC diagnostic ignored \"-Wmisleading-indentation\"")   \
 _Pragma("GCC diagnostic ignored \"-Wundef\"")                    \
 _Pragma("GCC diagnostic ignored \"-Wnon-virtual-dtor\"")         \
 _Pragma("GCC diagnostic ignored \"-Wimplicit-fallthrough\"")     \
+_Pragma("GCC diagnostic ignored \"-Wint-in-bool-context\"")      \
 _Pragma("GCC diagnostic warning \"-Wpragmas\"")
 
 #  define DEAL_II_ENABLE_EXTRA_DIAGNOSTICS                       \
