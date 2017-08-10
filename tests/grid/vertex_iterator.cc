@@ -23,7 +23,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <fstream>
 
 
 void test ()

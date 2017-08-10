@@ -37,7 +37,6 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/fe/mapping_q_eulerian.h>
 
-#include <fstream>
 #include <iostream>
 
 namespace Step38

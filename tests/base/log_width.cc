@@ -17,9 +17,6 @@
 // test that we can set the width of LogStream objects
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <iomanip>
 #include <limits>
 
 int main ()

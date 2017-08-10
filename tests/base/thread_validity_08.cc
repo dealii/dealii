@@ -18,8 +18,6 @@
 
 #include "../tests.h"
 #include <atomic>
-#include <iomanip>
-#include <fstream>
 #include <unistd.h>
 
 #include <deal.II/base/thread_management.h>

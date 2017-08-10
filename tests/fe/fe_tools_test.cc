@@ -19,7 +19,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/lac/vector.h>
@@ -39,8 +38,6 @@
 #include <deal.II/numerics/data_out.h>
 
 // This is needed for C++ output:
-#include <fstream>
-#include <cmath>
 
 const double pi=std::acos(-1.);
 

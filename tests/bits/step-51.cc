@@ -20,8 +20,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
 std::ofstream logfile("output");
 
 
@@ -50,9 +48,6 @@ std::ofstream logfile("output");
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 
 
 namespace Step51

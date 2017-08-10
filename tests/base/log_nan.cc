@@ -18,11 +18,7 @@
 // list. the test should actually output "nan", but prints "0"
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <iomanip>
 #include <limits>
-#include <fenv.h>
 
 int main ()
 {

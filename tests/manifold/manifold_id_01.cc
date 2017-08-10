@@ -13,8 +13,6 @@
 // For each element it should output 255 (invalid manifold_id)
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 
 // all include files you need here

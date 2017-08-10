@@ -18,7 +18,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/grid/tria.h>             //triangulation class
 #include <deal.II/grid/grid_generator.h>   //standard functions to generate grid
@@ -29,7 +28,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/q_collection.h>
-#include <fstream>
 #include <iostream>
 
 template <int dim>

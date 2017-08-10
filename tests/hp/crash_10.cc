@@ -19,7 +19,6 @@
 // of writing the time
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -34,7 +33,6 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
-#include <fstream>
 
 std::ofstream logfile("output");
 

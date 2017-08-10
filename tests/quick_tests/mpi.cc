@@ -17,7 +17,6 @@
 // be executed with exactly two threads.
 
 #include <deal.II/grid/tria.h>
-#include <stdio.h>
 #include <sched.h>
 #include <mpi.h>
 #include <iostream>

@@ -19,7 +19,6 @@
 // compare partition against p4est
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -28,7 +27,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <fstream>
 
 template <int dim>
 void compare_meshes (parallel::shared::Triangulation<dim> &shared_tria, parallel::distributed::Triangulation<dim> &p4est_tria)

@@ -64,7 +64,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 
-#include <fstream>
 #include <iostream>
 #include <sstream>
 

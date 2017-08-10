@@ -20,7 +20,6 @@
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_full_matrix.h>
-#include <fstream>
 #include <iostream>
 
 // Simply take an already intialised full matrix, fill in some of the

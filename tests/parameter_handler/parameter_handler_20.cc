@@ -19,9 +19,7 @@
 // we should generate an error instead.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
 
 void check (const char *content)
 {

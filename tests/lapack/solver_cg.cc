@@ -17,12 +17,8 @@
 // Check eigenvalue capabilities of SolverCG
 
 #include "../tests.h"
-#include <cmath>
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 #include "../testmatrix.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix.templates.h>
 #include <deal.II/lac/vector.h>

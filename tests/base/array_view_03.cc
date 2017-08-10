@@ -17,7 +17,6 @@
 // test for class ArrayView. check make_array_view for whole vectors
 
 #include "../tests.h"
-#include <iomanip>
 
 #include <deal.II/base/array_view.h>
 

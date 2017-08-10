@@ -16,7 +16,6 @@
 // test Volume of a Ball
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
@@ -36,7 +35,6 @@
 #include <deal.II/matrix_free/fe_evaluation.h>
 
 #include <iostream>
-#include <fstream>
 #include <sstream>
 
 using namespace dealii;

@@ -28,11 +28,9 @@
 // x_j's so that we can verify the correctness analytically
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-#include <fstream>
 #include <sstream>
 
 

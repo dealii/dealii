@@ -22,11 +22,9 @@
 #include "../tests.h"
 
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-#include <fstream>
 #include <iostream>
 #include <complex>
 

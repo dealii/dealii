@@ -18,10 +18,7 @@
 // check DynamicSparsityPattern::max_entries_per_row
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <iomanip>
-#include <fstream>
 
 
 void test ()

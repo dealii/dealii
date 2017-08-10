@@ -29,8 +29,6 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
-#include <cmath>
-#include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>

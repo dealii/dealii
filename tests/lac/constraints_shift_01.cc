@@ -18,7 +18,6 @@
 // initialized with an IndexSet object
 
 #include "../tests.h"
-#include <fstream>
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/constraint_matrix.h>

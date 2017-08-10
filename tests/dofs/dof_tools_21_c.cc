@@ -15,7 +15,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
@@ -29,7 +28,6 @@
 #include <iostream>
 #include <utility>
 
-#include <fstream>
 std::ofstream logfile("output");
 
 using namespace dealii;

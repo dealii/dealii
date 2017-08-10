@@ -20,11 +20,9 @@
 // like _01, but with an inhomogeneity
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-#include <fstream>
 #include <sstream>
 
 

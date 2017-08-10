@@ -13,8 +13,6 @@
 // boundary description to it. Refine globally twice and output the mesh.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 
 // all include files you need here

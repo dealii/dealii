@@ -18,11 +18,8 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/matrix_out.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
-#include <fstream>
-#include <iomanip>
 
 int main (int argc, char **argv)
 {

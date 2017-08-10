@@ -18,10 +18,8 @@
 // of the RHS function in parallel
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/point.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -36,12 +34,9 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
-#include <fstream>
 #include <sstream>
-#include <iomanip>
 #include <list>
 #include <set>
-#include <cstdio>
 
 
 std::string output_name(const unsigned int subdomain)

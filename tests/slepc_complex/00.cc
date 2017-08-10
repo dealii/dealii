@@ -21,9 +21,7 @@
 
 #include "../tests.h"
 #include <deal.II/lac/slepc_solver.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/numbers.h>
-#include <fstream>
 #include <iostream>
 
 

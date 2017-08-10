@@ -22,8 +22,6 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_out.h>
 
-#include <fstream>
-#include <cmath>
 
 using namespace dealii;
 

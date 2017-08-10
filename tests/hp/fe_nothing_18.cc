@@ -19,11 +19,9 @@
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/base/quadrature_lib.h>   //needed for assembling the matrix using quadrature on each cell
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/vector.h>
@@ -58,9 +56,7 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/q_collection.h>
-#include <fstream>
 #include <iostream>
-#include <cmath>                           //sqrt and fabs functions
 #include <memory> //smart pointers
 #include <algorithm> //min,max
 

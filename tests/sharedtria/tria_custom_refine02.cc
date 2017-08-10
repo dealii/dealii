@@ -18,7 +18,6 @@
 // tests that the correct cells are set to artificial in multigrid
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -27,7 +26,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <fstream>
 
 template <int dim>
 void mypartition(parallel::shared::Triangulation<dim> &tria)

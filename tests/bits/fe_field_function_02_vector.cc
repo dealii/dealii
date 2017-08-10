@@ -21,7 +21,6 @@
 // based on a thread-local variable instead of the single cache.
 
 #include "../tests.h"
-#include <fstream>
 
 // all include files you need here
 #include <deal.II/numerics/fe_field_function.h>

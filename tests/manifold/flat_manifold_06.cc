@@ -12,8 +12,6 @@
 // Test direction vector of flat manifold with periodicity
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/manifold.h>
 
 

@@ -23,13 +23,9 @@
 // exception as well
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/table.h>
-#include <fstream>
-#include <iomanip>
 #include <limits>
-#include <fenv.h>
 
 
 template <typename T>

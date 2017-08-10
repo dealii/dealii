@@ -18,7 +18,6 @@
 
 #include "../tests.h"
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/point.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -28,12 +27,9 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 
-#include <fstream>
 #include <sstream>
-#include <iomanip>
 #include <list>
 #include <set>
-#include <cstdio>
 
 
 template <int dim>

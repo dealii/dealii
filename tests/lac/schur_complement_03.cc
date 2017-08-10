@@ -16,7 +16,6 @@
  * Author: Wolfgang Bangerth, Texas A&M University, 2008
  */
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/block_vector.h>
@@ -49,7 +48,6 @@
 #include <deal.II/lac/packaged_operation.h>
 #include <deal.II/lac/schur_complement.h>
 #include <iostream>
-#include <fstream>
 #include <sstream>
 namespace Step22
 {

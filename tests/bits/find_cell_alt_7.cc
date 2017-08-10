@@ -19,7 +19,6 @@
 // close to the boundary
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -30,7 +29,6 @@
 
 #include <deal.II/fe/mapping_q.h>
 
-#include <fstream>
 
 
 void check (Triangulation<2> &tria)

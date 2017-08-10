@@ -25,7 +25,6 @@
 
 #include "../tests.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
 
@@ -53,7 +52,6 @@
 
 #include <deal.II/lac/parpack_solver.h>
 
-#include <fstream>
 #include <iostream>
 
 // test Parpack on Step-36 with Trilinos algebra

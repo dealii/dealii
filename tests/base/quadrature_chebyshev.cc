@@ -21,12 +21,8 @@
 
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <cmath>
 
 using namespace dealii;
 

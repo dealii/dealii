@@ -18,10 +18,8 @@
 // check Utilities::MPI::sum() for dealii::Vector, but with input=output
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
-#include <fstream>
 
 void test()
 {

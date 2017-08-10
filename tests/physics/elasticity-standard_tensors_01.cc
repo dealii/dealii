@@ -19,10 +19,7 @@
 #include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/physics/elasticity/standard_tensors.h>
-#include <fstream>
-#include <iomanip>
 
 using namespace dealii::Physics::Elasticity;
 

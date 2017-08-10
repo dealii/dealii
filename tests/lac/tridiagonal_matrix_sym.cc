@@ -27,14 +27,9 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/tridiagonal_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include <fstream>
-#include <iomanip>
-#include <iomanip>
-#include <cmath>
 
 
 // Symmetric matrix with constant diagonals [-1,2,-1]

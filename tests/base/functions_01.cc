@@ -18,7 +18,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/job_identifier.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function_lib.h>
@@ -29,8 +28,6 @@
 #include "functions.h"
 
 #include <vector>
-#include <iomanip>
-#include <fstream>
 #include <string>
 
 #define CHECK(F) { deallog << #F << std::endl;  \

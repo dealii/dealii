@@ -19,7 +19,6 @@
 // (unused cells). Check that this works now.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/grid/tria.h>
@@ -31,9 +30,6 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_accessor.h>
 
-#include <fstream>
-#include <iomanip>
-#include <iomanip>
 #include <algorithm>
 
 using namespace std;

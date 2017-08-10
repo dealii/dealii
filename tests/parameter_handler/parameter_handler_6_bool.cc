@@ -18,10 +18,7 @@
 // test ParameterHandler::set(., bool) which was broken, see bug #49
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
-#include <iomanip>
 
 
 int main ()

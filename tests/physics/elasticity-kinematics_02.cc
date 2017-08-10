@@ -17,13 +17,11 @@
 
 #include "../tests.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/physics/elasticity/kinematics.h>
 #include <deal.II/physics/elasticity/standard_tensors.h>
 #include <deal.II/base/vectorization.h>
 #include <deal.II/base/tensor.h>
 
-#include <cmath>
 
 using namespace dealii;
 using namespace dealii::Physics;

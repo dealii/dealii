@@ -16,8 +16,6 @@
 // Test that a Manifold constructed using only the projection works.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 
 // all include files you need here

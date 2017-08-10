@@ -37,8 +37,6 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/fe/fe_values.h>
-#include <fstream>
-#include <iomanip>
 
 
 template <int dim>

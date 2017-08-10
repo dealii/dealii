@@ -31,7 +31,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function_lib.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -47,7 +46,6 @@
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/numerics/matrix_tools.h>
 
-#include <fstream>
 
 
 

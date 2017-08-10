@@ -19,10 +19,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
-#include <fstream>
-#include <iomanip>
 
 
 template <int dim>

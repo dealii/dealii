@@ -28,7 +28,6 @@ std::ofstream logfile("output");
 
 #include "matrix_vector_mf.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>

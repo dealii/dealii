@@ -23,10 +23,8 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/lac/sparse_ilu.h>
-#include <fstream>
 
 
 

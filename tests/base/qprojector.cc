@@ -17,14 +17,10 @@
 // Test projection onto lines
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/geometry_info.h>
-#include <cmath>
 
 template <int dim>
 void check_line(Quadrature<1> &quadrature)

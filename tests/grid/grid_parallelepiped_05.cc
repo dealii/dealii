@@ -24,13 +24,8 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/logstream.h>
-#include <cmath>
-#include <cstdlib>
 
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 
 template <int dim>
 Point<dim> point(double x=0, double y=0, double z=0)

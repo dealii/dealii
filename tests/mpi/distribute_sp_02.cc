@@ -18,7 +18,6 @@
 // check SparsityTools::distribute_sparsity_pattern for BlockDynamicSP
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/base/index_set.h>
@@ -26,7 +25,6 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 
-#include <fstream>
 
 
 void test_mpi()

@@ -32,7 +32,6 @@
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -40,8 +39,6 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <fstream>
-#include <cmath>
 #include <vector>
 
 using namespace dealii;

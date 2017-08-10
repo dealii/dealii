@@ -20,7 +20,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/lac/vector.h>
-#include <fstream>
 
 using namespace dealii;
 

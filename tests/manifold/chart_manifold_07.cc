@@ -12,8 +12,6 @@
 // Test direction vector on a cylinder surface
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/manifold.h>
 
 

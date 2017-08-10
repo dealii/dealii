@@ -23,8 +23,6 @@
 
 #include "../tests.h"
 #include <deal.II/lac/block_vector.h>
-#include <fstream>
-#include <iomanip>
 
 
 void test (BlockVector<double> &v)

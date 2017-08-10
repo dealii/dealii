@@ -18,15 +18,12 @@
 // vectors
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <fstream>
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <numeric>
 #include <utility>
-#include <cmath>
 
 template <typename number>
 bool operator == (const PETScWrappers::MPI::BlockVector &v1,

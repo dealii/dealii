@@ -20,7 +20,6 @@
 // the finest level. Then also look into the result of restriction
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function_lib.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/grid/tria.h>

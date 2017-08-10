@@ -22,7 +22,6 @@
 // function with hp:: arguments
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -35,7 +34,6 @@
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 
 #include <deal.II/fe/mapping_q1.h>
 

@@ -43,7 +43,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/solution_transfer.h>
 
-#include <fstream>
 
 using namespace dealii;
 

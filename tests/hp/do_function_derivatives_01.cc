@@ -18,11 +18,9 @@
 // FEValues::get_function_* had a problem when using FE_Nothing
 
 #include "../tests.h"
-#include <fstream>
 #include <sstream>
 #include <iostream>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/grid/tria.h>

@@ -20,12 +20,9 @@
 
 #include "../tests.h"
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
 #include <vector>
-#include <iomanip>
-#include <fstream>
 #include <string>
 
 #include "patches.h"

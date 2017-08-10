@@ -25,7 +25,6 @@ char logname[] = "output";
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 
@@ -42,7 +41,6 @@ char logname[] = "output";
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 #include <vector>
 
 

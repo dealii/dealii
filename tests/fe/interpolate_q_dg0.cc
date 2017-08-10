@@ -15,10 +15,8 @@
 
 
 #include "interpolate_common.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 
-#include <fstream>
 
 // FE_Q_DG0<dim>::interpolate(...)
 

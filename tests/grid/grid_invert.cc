@@ -19,9 +19,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_reordering.h>
-#include <deal.II/base/logstream.h>
 
-#include <fstream>
 #include <string>
 
 std::ofstream logfile("output");

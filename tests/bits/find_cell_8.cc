@@ -21,7 +21,6 @@
 // fail for all revisions <= 25704M.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -29,7 +28,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 
-#include <fstream>
 
 void create_coarse_grid(Triangulation<2> &coarse_grid)
 {

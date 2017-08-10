@@ -17,7 +17,6 @@
 // Check that MGTransferMatrixFree::build works correctly by comparing the
 // build on an already existing transfer system with a freshly constructed one
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function_lib.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/grid/tria.h>

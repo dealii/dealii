@@ -24,7 +24,6 @@
 
 #include "../tests.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
 
@@ -52,7 +51,6 @@
 #include <deal.II/lac/parpack_solver.h>
 #include <deal.II/lac/solver_gmres.h>
 
-#include <fstream>
 #include <iostream>
 
 const unsigned int dim = 2;//run in 2d to save time

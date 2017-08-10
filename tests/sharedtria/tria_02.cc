@@ -17,7 +17,6 @@
 // create a shared tria mesh with artificial cells and refine it
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/shared_tria.h>
@@ -27,7 +26,6 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <fstream>
 
 template <int dim, int spacedim>
 void write_mesh (const parallel::shared::Triangulation<dim,spacedim> &tria,

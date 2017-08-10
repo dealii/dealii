@@ -17,13 +17,11 @@
 // Test properties of FilteredMatrix and iterators
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/matrix_lib.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/vector.h>
-#include <fstream>
 
 
 template <typename VectorType>

@@ -21,10 +21,8 @@
 // table
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 #include <string>
 
 #define PRECISION 2

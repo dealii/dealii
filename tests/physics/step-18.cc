@@ -22,7 +22,6 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/utilities.h>
@@ -56,10 +55,8 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/grid/filtered_iterator.h>
-#include <fstream>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
 namespace Step18
 {
   using namespace dealii;

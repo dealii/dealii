@@ -31,7 +31,6 @@
  */
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/grid/tria.h>
@@ -45,7 +44,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/derivative_approximation.h>
 
-#include <fstream>
 #include <sstream>
 
 

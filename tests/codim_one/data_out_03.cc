@@ -19,8 +19,6 @@
 // if dim<spacedim even if a mapping was explicitly requested.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 
 #include <deal.II/grid/tria.h>

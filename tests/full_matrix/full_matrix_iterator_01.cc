@@ -19,8 +19,6 @@
 
 #include "../tests.h"
 #include <deal.II/lac/full_matrix.h>
-#include <fstream>
-#include <iomanip>
 
 
 void test ()

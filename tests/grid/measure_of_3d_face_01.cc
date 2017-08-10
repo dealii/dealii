@@ -23,8 +23,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <fstream>
-#include <iomanip>
 
 
 // move backward two adjacent vertices of the top face up by one

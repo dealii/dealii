@@ -22,7 +22,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -35,7 +34,6 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/dofs/dof_accessor.h>
 
-#include <fstream>
 
 
 

@@ -21,11 +21,9 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/hp/q_collection.h>
 
-#include <fstream>
 
 
 template <int dim>

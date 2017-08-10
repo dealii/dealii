@@ -25,8 +25,6 @@
 // work so well.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>

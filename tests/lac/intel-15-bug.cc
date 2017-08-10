@@ -19,11 +19,7 @@
 // so the test passes.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
-#include <cmath>
-#include <fstream>
-#include <iomanip>
 #include <deal.II/base/parallel.h>
 
 typedef int size_type;

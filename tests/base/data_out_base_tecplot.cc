@@ -16,13 +16,9 @@
 
 #include "../tests.h"
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/base/logstream.h>
 
 #include <vector>
-#include <iomanip>
-#include <fstream>
 #include <string>
-#include <stdio.h>
 
 #include "patches.h"
 

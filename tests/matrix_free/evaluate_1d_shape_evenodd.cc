@@ -23,7 +23,6 @@
 
 #include "../tests.h"
 #include <iostream>
-#include <fstream>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 

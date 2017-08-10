@@ -25,17 +25,14 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 
 #define PRECISION 2
 
-#include <fstream>
 
 std::ofstream logfile ("output");
 
 char buf[1000];
 
-#include <fstream>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
@@ -67,7 +64,6 @@ char buf[1000];
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/mapping_q1_eulerian.h>
 
-#include <fstream>
 
 
 template <int dim>

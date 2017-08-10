@@ -16,7 +16,6 @@
 // Check the function all_zero
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/la_vector.h>
 
 

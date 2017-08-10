@@ -18,8 +18,6 @@
 // create a torus mesh and refine it.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 // all include files you need here
 
@@ -28,7 +26,6 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 
-#include <fstream>
 #include <string>
 
 std::ofstream logfile("output");

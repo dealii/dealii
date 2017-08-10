@@ -97,7 +97,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/lac/vector.h>
 
-#include <fstream>
 #include <string>
 
 

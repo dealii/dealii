@@ -24,10 +24,8 @@
 // interior_dofs ones.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_bdm.h>
 
-#include <fstream>
 #include <string>
 
 

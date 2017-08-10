@@ -24,7 +24,6 @@
 #include <deal.II/base/tensor.h>
 
 #include <array>
-#include <fstream>
 
 /*
  * Verify that the correct exception (ExcGridHasInvalidCell) is thrown when

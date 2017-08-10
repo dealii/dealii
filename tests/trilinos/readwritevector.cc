@@ -17,12 +17,10 @@
 
 #include "../tests.h"
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-#include <fstream>
 #include <vector>
 
 void test()

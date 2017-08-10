@@ -38,7 +38,6 @@ const bool errors = false;
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <vector>
-#include <fstream>
 #include <string>
 
 

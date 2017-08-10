@@ -17,10 +17,8 @@
 
 #include "../tests.h"
 #include "../testmatrix.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparse_matrix.h>
 
-//#include <fstream>
 
 void graph_laplacian(const SparsityPattern &sparsity,
                      SparseMatrix<double> &matrix)

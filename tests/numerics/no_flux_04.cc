@@ -23,7 +23,6 @@
 // whether the result looks alright
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
@@ -37,7 +36,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <fstream>
 
 
 // a function that shows something useful on the surface of a sphere

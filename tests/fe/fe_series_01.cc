@@ -31,9 +31,7 @@ plot2d([f,fs(0),fs(1),fs(2),fs(3)],[x,0,1]);
 
 #include "../tests.h"
 #include <iostream>
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_series.h>
 #include <deal.II/base/quadrature_lib.h>
 

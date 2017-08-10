@@ -19,11 +19,8 @@
 // GeometricUtilities::Coordinates::from_spherical.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/geometric_utilities.h>
 
-#include <fstream>
-#include <cstdlib>
 
 using namespace dealii;
 using namespace dealii::GeometricUtilities::Coordinates;

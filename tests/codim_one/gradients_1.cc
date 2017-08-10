@@ -22,8 +22,6 @@
 // compared with the exact one in the <1,2> case.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <string>
 
 // all include files needed for the program
@@ -44,7 +42,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <cmath>
 
 
 

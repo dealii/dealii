@@ -17,7 +17,6 @@
 // test kinematic tensor definitions
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/symmetric_tensor.h>
@@ -38,8 +37,6 @@
 #include <deal.II/physics/elasticity/kinematics.h>
 #include <deal.II/physics/transformations.h>
 
-#include <fstream>
-#include <iomanip>
 
 using namespace dealii;
 using namespace dealii::Physics;

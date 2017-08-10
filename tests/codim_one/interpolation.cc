@@ -18,8 +18,6 @@
 // interpolation of constant function on the surface of a hyperxosphere
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 // all include files needed for the program
 
@@ -38,7 +36,6 @@
 
 #include <deal.II/base/function.h>
 
-#include <fstream>
 #include <string>
 
 std::ofstream logfile("output");

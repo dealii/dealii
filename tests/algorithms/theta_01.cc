@@ -16,7 +16,6 @@
 
 // See documentation of ThetaTimestepping for documentation of this example
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 

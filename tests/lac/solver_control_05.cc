@@ -19,10 +19,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <cmath>
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 #include <deal.II/lac/solver_control.h>
 
 

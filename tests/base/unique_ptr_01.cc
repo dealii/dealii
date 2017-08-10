@@ -17,8 +17,6 @@
 
 #include "../tests.h"
 #include <memory>
-#include <fstream>
-#include <iomanip>
 
 // counter for how many objects of type X there are
 int counter = 0;

@@ -17,9 +17,7 @@
 
 #include "../tests.h"
 #include <deal.II/algorithms/any_data.h>
-#include <deal.II/base/logstream.h>
 
-#include <fstream>
 
 double d1 = 17.;
 

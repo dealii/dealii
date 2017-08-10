@@ -20,8 +20,6 @@
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/chunk_sparse_matrix.h>
-#include <fstream>
-#include <iomanip>
 #include <vector>
 
 

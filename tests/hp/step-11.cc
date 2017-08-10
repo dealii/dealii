@@ -20,13 +20,10 @@
 
 #include "../tests.h"
 
-#include <deal.II/base/logstream.h>
-#include <fstream>
 std::ofstream logfile("output");
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/table_handler.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -51,8 +48,6 @@ std::ofstream logfile("output");
 
 #include <algorithm>
 #include <iostream>
-#include <iomanip>
-#include <cmath>
 
 
 template <int dim>

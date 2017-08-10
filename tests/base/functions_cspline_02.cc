@@ -19,7 +19,6 @@
 
 
 #include "../tests.h"
-#include <cmath>
 #include <deal.II/base/function_cspline.h>
 
 template <int dim>

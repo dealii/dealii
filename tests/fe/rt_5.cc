@@ -18,10 +18,8 @@
 // Just output the restriction matrices of the RT element
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 
-#include <fstream>
 #include <string>
 
 #define PRECISION 8

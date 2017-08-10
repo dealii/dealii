@@ -19,8 +19,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
 std::ofstream logfile("output");
 
 #include <deal.II/base/quadrature_lib.h>
@@ -47,7 +45,6 @@ std::ofstream logfile("output");
 #include <deal.II/base/timer.h>
 
 #include <iostream>
-#include <fstream>
 
 
 template <int dim>

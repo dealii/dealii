@@ -49,8 +49,6 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
-#include <fstream>
-#include <iomanip>
 
 using namespace dealii;
 

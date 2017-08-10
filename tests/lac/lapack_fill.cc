@@ -18,7 +18,6 @@
 #include "../tests.h"
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
-#include <fstream>
 
 // A.fill() produced an ExcIndexRange(r,0,m()) exception with
 // the additional Information: Index 6 is not in [0,3[.

@@ -19,11 +19,7 @@
 // lose more than 1 decimal also for 200000 vector entries)
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
-#include <cmath>
-#include <fstream>
-#include <iomanip>
 
 
 

@@ -18,7 +18,6 @@
 // recursively refine a 2d mesh to a very high level
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -28,7 +27,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/base/utilities.h>
 
-#include <fstream>
 #include <ostream>
 
 template <int dim>

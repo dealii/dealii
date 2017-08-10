@@ -18,14 +18,10 @@
 #include "../tests.h"
 
 #include <deal.II/base/data_out_base.h>
-#include <deal.II/base/logstream.h>
 
 #include <vector>
 #include <string>
-#include <iomanip>
-#include <fstream>
 #include <string>
-#include <stdio.h>
 
 double cell_coordinates [3][8] =
 {

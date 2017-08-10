@@ -17,14 +17,11 @@
 // plot PolynomialsRaviartThomas on the reference cell
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <vector>
-#include <iomanip>
-#include <fstream>
 
 using namespace std;
 

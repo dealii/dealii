@@ -22,7 +22,6 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/graph_coloring.h>
@@ -47,7 +46,6 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/fe_values.h>
 
-#include <fstream>
 #include <iostream>
 #include <complex>
 

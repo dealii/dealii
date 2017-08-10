@@ -22,8 +22,6 @@
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <fstream>
-#include <iomanip>
 
 
 void test ()

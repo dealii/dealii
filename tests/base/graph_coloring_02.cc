@@ -20,7 +20,6 @@
 
 
 #include "../tests.h"
-#include <fstream>
 #include <vector>
 
 #include <deal.II/base/graph_coloring.h>

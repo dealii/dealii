@@ -16,15 +16,12 @@
 // Tests 3D polynomials_BDM grad grad at a collection of points on the unit square
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/job_identifier.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/polynomials_bdm.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <vector>
-#include <iomanip>
-#include <fstream>
 
 using namespace std;
 

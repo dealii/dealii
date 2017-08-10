@@ -17,10 +17,8 @@
 // Test the different FEValuesBase::get_function_values
 
 #include "../tests.h"
-#include <fstream>
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/lac/vector.h>
 

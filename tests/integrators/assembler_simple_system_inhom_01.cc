@@ -59,7 +59,6 @@
 #include <deal.II/meshworker/loop.h>
 
 #include <iostream>
-#include <fstream>
 
 #include <deal.II/lac/constraint_matrix.h>
 

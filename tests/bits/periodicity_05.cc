@@ -19,11 +19,8 @@
 // constraints
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor_function.h>
@@ -65,7 +62,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/solution_transfer.h>
 
-#include <fstream>
 #include <sstream>
 #include <iostream>
 #include <vector>

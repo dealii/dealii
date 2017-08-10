@@ -17,7 +17,6 @@
 // check mg transfer in parallel, especially communication of copy_indices
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
@@ -38,9 +37,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-#include <fstream>
-#include <iomanip>
-#include <iomanip>
 #include <algorithm>
 
 using namespace std;

@@ -20,7 +20,6 @@
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/vector.h>
 
-#include <fstream>
 
 using namespace dealii;
 

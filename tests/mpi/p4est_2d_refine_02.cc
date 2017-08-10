@@ -18,7 +18,6 @@
 // refine bottom-left cell after one global refinement of a square in 2d and check p4est-output
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -29,7 +28,6 @@
 #include <deal.II/base/utilities.h>
 
 
-#include <fstream>
 
 template <class TRIA>
 void check (TRIA &tr)

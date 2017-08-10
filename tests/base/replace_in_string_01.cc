@@ -17,10 +17,6 @@
 // test Utilities::replace_in_string
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 
 #include <deal.II/base/utilities.h>
 

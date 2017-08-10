@@ -19,7 +19,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -34,9 +33,7 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <fstream>
 #include <numeric>
-#include <cstdlib>
 
 
 template <int dim>

@@ -19,9 +19,6 @@
 // successfully but not run
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <cstdlib>
 
 
 int main ()

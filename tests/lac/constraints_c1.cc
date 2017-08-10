@@ -31,8 +31,6 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <iostream>
-#include <iomanip>
-#include <fstream>
 
 using namespace dealii;
 

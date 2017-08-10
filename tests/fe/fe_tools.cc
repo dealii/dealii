@@ -18,10 +18,7 @@
 
 #include "../tests.h"
 #include <iostream>
-#include <iomanip>
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>

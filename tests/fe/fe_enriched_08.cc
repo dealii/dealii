@@ -43,7 +43,6 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <fstream>
 #include <iostream>
 
 const double eps = 1e-10;

@@ -19,8 +19,6 @@
 // y on the set [0,1]x[0,1]. dim = 2 only.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
 // all include files needed for the program
@@ -28,7 +26,6 @@
 #include <deal.II/base/geometry_info.h>
 
 
-#include <fstream>
 #include <string>
 
 #include <math.h>

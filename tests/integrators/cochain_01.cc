@@ -20,7 +20,6 @@
 #include "../tests.h"
 #include "../test_grids.h"
 
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/lac/matrix_block.h>
 #include <deal.II/lac/sparse_matrix.h>

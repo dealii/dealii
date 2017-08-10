@@ -20,14 +20,12 @@
 // that was fixed in 29940.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 
-#include <fstream>
 
 
 void test ()

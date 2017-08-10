@@ -23,7 +23,6 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <fstream>
 #include <iostream>
 #include <vector>
 #include <deal.II/base/index_set.h>

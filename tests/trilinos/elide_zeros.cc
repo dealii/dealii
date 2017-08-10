@@ -87,7 +87,6 @@
 
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 
-#include <fstream>
 #include <iostream>
 
 namespace LinearAdvectionTest

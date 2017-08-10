@@ -34,9 +34,7 @@
 
 #include <deal.II/numerics/data_out_rotation.h>
 #include <deal.II/numerics/data_postprocessor.h>
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 
 
 std::ofstream logfile("output");

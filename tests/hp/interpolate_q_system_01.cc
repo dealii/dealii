@@ -20,7 +20,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 
@@ -38,7 +37,6 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/hp/q_collection.h>
 
-#include <fstream>
 #include <vector>
 
 

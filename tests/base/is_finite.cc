@@ -17,11 +17,7 @@
 // check numbers::is_finite
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <iomanip>
 #include <limits>
-#include <fenv.h>
 
 
 template <typename T>

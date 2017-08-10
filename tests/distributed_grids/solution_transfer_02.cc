@@ -19,7 +19,6 @@
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -37,8 +36,6 @@
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/base/function.h>
 
-#include <fstream>
-#include <cstdlib>
 
 template <int dim>
 class MyFunction : public Function<dim>

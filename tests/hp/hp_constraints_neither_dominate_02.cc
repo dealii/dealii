@@ -20,7 +20,6 @@
 // Check continuity across the face by evaluating the
 // field from both sides.
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/conditional_ostream.h>
@@ -67,7 +66,6 @@
 
 #include "../tests.h"
 
-#include <fstream>
 #include <iostream>
 
 //#define DEBUG_OUTPUT_VTK

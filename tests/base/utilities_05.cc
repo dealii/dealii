@@ -17,10 +17,6 @@
 // Utilities::get_integer_at_position
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 #include <sstream>
 
 #include <deal.II/base/utilities.h>

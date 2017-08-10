@@ -18,7 +18,6 @@
 #include "../tests.h"
 #include "../testmatrix.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_solver.h>

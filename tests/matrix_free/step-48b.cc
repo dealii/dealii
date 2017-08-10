@@ -19,7 +19,6 @@
 
 #include "../tests.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
 #include <deal.II/lac/vector.h>
@@ -37,9 +36,7 @@
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
 
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 
 
 namespace Step48

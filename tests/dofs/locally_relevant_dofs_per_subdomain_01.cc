@@ -18,7 +18,6 @@
 // using a refined shared triangulation
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/shared_tria.h>
@@ -33,7 +32,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/dofs/dof_tools.h>
 
-#include <fstream>
 
 template <int dim, int spacedim>
 void write_mesh (const parallel::shared::Triangulation<dim,spacedim> &tria,

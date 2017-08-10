@@ -17,10 +17,6 @@
 // verify that Utilities::string_to_double actually catches errors
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 #include <sstream>
 
 #include <deal.II/base/utilities.h>

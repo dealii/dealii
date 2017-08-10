@@ -17,9 +17,6 @@
 // test by Brian: check some of the scaling operations on matrices
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
-#include <cstdlib>
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>

@@ -15,8 +15,6 @@
 // manifold at the end as well, to check proper destruction of the classes.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 
 // all include files you need here

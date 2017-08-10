@@ -17,7 +17,6 @@
 // test rotation matrix definitions
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/symmetric_tensor.h>
@@ -25,8 +24,6 @@
 
 #include <deal.II/physics/transformations.h>
 
-#include <fstream>
-#include <iomanip>
 
 using namespace dealii;
 using namespace dealii::Physics;

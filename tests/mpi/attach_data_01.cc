@@ -18,7 +18,6 @@
 // check register_data_attach and notify_ready_to_unpack
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -29,7 +28,6 @@
 #include <deal.II/base/utilities.h>
 
 
-#include <fstream>
 
 template <int dim>
 void pack_function (const typename parallel::distributed::Triangulation<dim,dim>::cell_iterator &cell,

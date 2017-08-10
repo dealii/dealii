@@ -28,11 +28,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/base/logstream.h>
 
-#include <cmath>
-#include <cstdlib>
-#include <fstream>
 
 
 // 1: continuous refinement of the unit square always in the middle

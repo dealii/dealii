@@ -22,8 +22,6 @@
 // functions
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
 #include <deal.II/base/thread_management.h>
 

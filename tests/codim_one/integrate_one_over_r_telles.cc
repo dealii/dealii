@@ -17,8 +17,6 @@
 // integrates the function *f(x,y)/R, where f(x,y) is a power of x and
 // y on the set [0,1]x[0,1]. dim = 2 only.
 
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
 // all include files needed for the program
@@ -26,7 +24,6 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 #include <string>
 
 #include <math.h>

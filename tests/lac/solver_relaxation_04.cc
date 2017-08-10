@@ -17,7 +17,6 @@
 // Compare overlapping block Jacobi relaxation with different
 // permutations of the blocks. All output diffs should be zero.
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
@@ -27,9 +26,6 @@
 
 #include "../tests.h"
 #include "../testmatrix.h"
-#include <cmath>
-#include <fstream>
-#include <iomanip>
 
 
 template <typename SolverType, typename MatrixType, typename VectorType, class PRECONDITION>

@@ -21,7 +21,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>
@@ -31,7 +30,6 @@
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/numerics/fe_field_function.h>
 
-#include <fstream>
 
 
 

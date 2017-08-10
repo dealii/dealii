@@ -18,10 +18,7 @@
 //   Like parameter_handler_03, but use a MultipleSelection pattern that starts with a space; eat that space
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
-#include <iomanip>
 
 
 int main ()

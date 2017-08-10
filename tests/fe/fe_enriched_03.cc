@@ -42,7 +42,6 @@
 
 #include <deal.II/lac/vector.h>
 
-#include <fstream>
 #include <iostream>
 
 using namespace dealii;

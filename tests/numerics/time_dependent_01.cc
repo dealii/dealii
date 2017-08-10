@@ -21,9 +21,7 @@
 #include "../tests.h"
 #include <deal.II/numerics/time_dependent.h>
 
-#include <fstream>
 #include <algorithm>
-#include <cmath>
 
 
 std::ofstream logfile("output");

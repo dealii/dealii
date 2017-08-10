@@ -25,8 +25,6 @@
 // vertices are randomly mixed between cells.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>

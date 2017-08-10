@@ -17,10 +17,7 @@
 // test rand function
 
 #include "../tests.h"
-#include <fstream>
-#include <iomanip>
 #include <map>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/point.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/base/function_parser.h>

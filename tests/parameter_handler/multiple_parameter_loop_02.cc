@@ -18,9 +18,7 @@
 // check the MultipleParameterLoop class
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
 
 
 // Take the example from the

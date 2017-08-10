@@ -18,11 +18,8 @@
 // BlockSparsityPattern::column_number is broken
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 
-#include <iomanip>
-#include <fstream>
 
 int main()
 {

@@ -19,7 +19,6 @@
 
 #include "../tests.h"
 #include <sstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
@@ -32,7 +31,6 @@
 
 
 
-#include <fstream>
 #include <string>
 
 #define PRECISION 5

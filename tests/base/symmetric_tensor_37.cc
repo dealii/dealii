@@ -19,10 +19,7 @@
 #include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/logstream.h>
 
-#include <fstream>
-#include <iomanip>
 
 // Although not strictly required, in this test it is expected that T1 or T3
 // (or both) are a symmetric tensor

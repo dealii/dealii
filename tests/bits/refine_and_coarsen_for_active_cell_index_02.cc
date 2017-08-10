@@ -20,7 +20,6 @@
 #include "../tests.h"
 
 #include <deal.II/base/geometry_info.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -28,7 +27,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <fstream>
 
 
 

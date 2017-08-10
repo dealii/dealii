@@ -24,10 +24,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/std_cxx11/shared_ptr.h>
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <cmath>
-#include <iomanip>
 
 
 int main ()

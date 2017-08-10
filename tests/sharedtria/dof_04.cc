@@ -18,7 +18,6 @@
 // check number cache for shared_tria with artifical cells and renumbering
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/distributed/shared_tria.h>
@@ -32,8 +31,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
 
-#include <fstream>
-#include <cstdlib>
 #include <numeric>
 
 

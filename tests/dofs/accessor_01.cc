@@ -25,7 +25,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>
-#include <fstream>
 
 
 template <class ACCESSOR>

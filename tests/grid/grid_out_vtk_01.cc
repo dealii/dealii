@@ -26,10 +26,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/base/logstream.h>
 
-#include <fstream>
-#include <iomanip>
 
 
 template <int dim, int spacedim>

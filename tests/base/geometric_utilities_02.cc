@@ -19,12 +19,9 @@
 // GeometricUtilities::Coordinates::from_spherical.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/geometric_utilities.h>
 #include <deal.II/base/exceptions.h>
 
-#include <fstream>
-#include <cstdlib>
 
 DeclException3(DifferentComponent,
                int,

@@ -18,14 +18,10 @@
 //
 // check on the Polynomial::operator -=
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/polynomial.h>
 
 #include <iostream>
 #include <vector>
-#include <fstream>
-#include <iomanip>
-#include <cmath>
 
 using namespace dealii;
 

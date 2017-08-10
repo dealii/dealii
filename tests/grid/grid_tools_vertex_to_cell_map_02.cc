@@ -17,7 +17,6 @@
 // Test vertex_to_cell_map for 3D problem with hanging nodes.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>

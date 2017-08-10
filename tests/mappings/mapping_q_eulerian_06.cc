@@ -19,8 +19,6 @@
 // are moved
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 // all include files you need here
 
@@ -33,7 +31,6 @@
 #include <deal.II/fe/mapping_q_eulerian.h>
 #include <deal.II/base/quadrature_lib.h>
 
-#include <fstream>
 #include <string>
 
 std::ofstream logfile("output");

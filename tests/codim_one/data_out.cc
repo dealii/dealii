@@ -18,8 +18,6 @@
 // output the vertex numbering in a vtk file
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 // all include files needed for the program
 
@@ -38,7 +36,6 @@
 
 #include <deal.II/base/function.h>
 
-#include <fstream>
 #include <string>
 
 std::ofstream logfile("output");

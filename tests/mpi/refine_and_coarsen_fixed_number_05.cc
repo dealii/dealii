@@ -18,7 +18,6 @@
 // like _05 but with indicators that span several orders of magnitude
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/lac/vector.h>
@@ -32,7 +31,6 @@
 #include <deal.II/base/utilities.h>
 
 
-#include <fstream>
 
 
 void test()

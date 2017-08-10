@@ -22,7 +22,6 @@
 #include "../tests.h"
 #include "mesh_3d.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -33,7 +32,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <fstream>
 
 
 void check_this (Triangulation<3> &tria)

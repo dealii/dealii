@@ -18,7 +18,6 @@
 // check GriOut::write_mesh_per_processor_as_vtu()
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/grid/tria.h>
@@ -34,7 +33,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 
 template <int dim>
 void output(const parallel::distributed::Triangulation<dim> &tr,

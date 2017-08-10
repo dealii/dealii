@@ -25,7 +25,6 @@
 
 #ifdef DEAL_II_WITH_CXX11
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -39,7 +38,6 @@
 
 #include <deal.II/base/quadrature_point_data.h>
 
-#include <fstream>
 
 using namespace dealii;
 

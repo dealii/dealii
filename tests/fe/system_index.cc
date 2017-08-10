@@ -17,15 +17,12 @@
 // Test the various index conversion methods
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 
-#include <fstream>
 #include <string>
-#include <iomanip>
 
 #define PRECISION 5
 

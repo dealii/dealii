@@ -21,10 +21,7 @@
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include "../testmatrix.h"
-#include <cmath>
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>

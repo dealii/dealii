@@ -18,7 +18,6 @@
 // take example from https://www.gnu.org/software/gsl/manual/html_node/Interpolation-Example-programs.html
 
 #include "../tests.h"
-#include <cmath>
 #include <deal.II/base/function_cspline.h>
 
 template <int dim>

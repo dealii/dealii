@@ -18,9 +18,7 @@
 
 // Test curl related functions in integrators/maxwell.h
 
-#include <deal.II/base/logstream.h>
 #include <cstring>
-#include <fstream>
 #include <iostream>
 
 #include <deal.II/grid/grid_generator.h>

@@ -17,7 +17,6 @@
 // test for class ArrayView
 
 #include "../tests.h"
-#include <iomanip>
 
 #include <deal.II/base/array_view.h>
 

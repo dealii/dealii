@@ -21,14 +21,11 @@
 #include <deal.II/meshworker/assembler.h>
 #include <deal.II/meshworker/loop.h>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_dgp.h>
 
-#include <fstream>
 #include <functional>
-#include <iomanip>
 
 using namespace dealii;
 

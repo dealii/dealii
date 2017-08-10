@@ -18,9 +18,7 @@
 // check Utilities::MPI::sum() for arrays
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
-#include <fstream>
 
 void test()
 {

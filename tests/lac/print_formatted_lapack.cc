@@ -20,8 +20,6 @@
 
 #include <deal.II/lac/lapack_full_matrix.h>
 
-#include <iomanip>
-#include <fstream>
 
 int main()
 {

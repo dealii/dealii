@@ -17,11 +17,9 @@
 
 // copied from bits/step-11 with slight modifications to make it run faster
 
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/table_handler.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -45,9 +43,6 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <algorithm>
-#include <iomanip>
-#include <iomanip>
-#include <cmath>
 
 using namespace dealii;
 

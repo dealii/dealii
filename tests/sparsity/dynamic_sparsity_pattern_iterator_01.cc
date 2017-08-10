@@ -19,8 +19,6 @@
 
 #include "../tests.h"
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <fstream>
-#include <iomanip>
 
 
 void test ()

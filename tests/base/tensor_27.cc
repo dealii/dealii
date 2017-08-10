@@ -34,9 +34,6 @@ inv(t3)
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <iomanip>
 
 int main ()
 {

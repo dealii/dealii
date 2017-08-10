@@ -49,8 +49,6 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/base/multithread_info.h>
-#include <fstream>
-#include <cmath>
 #include <iostream>
 #include <vector>
 using namespace dealii;

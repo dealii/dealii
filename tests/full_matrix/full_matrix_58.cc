@@ -19,10 +19,8 @@
 // sparse matrix. make sure this now works
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/full_matrix.h>
-#include <fstream>
 
 
 int main ()

@@ -18,12 +18,9 @@
 
 #include "../tests.h"
 
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/lac/sparse_matrix_ez.h>
 
-#include <iomanip>
-#include <fstream>
 
 int main()
 {

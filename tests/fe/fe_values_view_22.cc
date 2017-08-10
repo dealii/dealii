@@ -16,7 +16,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
@@ -35,7 +34,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 #include <iostream>
 
 using namespace dealii;

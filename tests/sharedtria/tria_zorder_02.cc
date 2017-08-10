@@ -18,7 +18,6 @@
 // Unlike tria_zorder_01, this test does not need p4est library
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -27,7 +26,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <fstream>
 
 template <int dim>
 void test()

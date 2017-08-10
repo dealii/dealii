@@ -30,7 +30,6 @@
 #include <deal.II/hp/fe_collection.h>
 
 #include <iostream>
-#include <cmath>
 
 using namespace dealii;
 

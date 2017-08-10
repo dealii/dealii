@@ -19,9 +19,6 @@
 #include "../tests.h"
 #include <deal.II/base/mg_level_object.h>
 
-#include <fstream>
-#include <iomanip>
-#include <iomanip>
 #include <algorithm>
 
 using namespace std;

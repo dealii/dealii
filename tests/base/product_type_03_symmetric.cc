@@ -17,10 +17,6 @@
 // like _03 but for SymmetricTensor
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 #include <typeinfo>
 #include <complex>
 

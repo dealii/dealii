@@ -47,7 +47,6 @@
 #include <deal.II/lac/packaged_operation.h>
 #include <deal.II/lac/constrained_linear_operator.h>
 
-#include <fstream>
 #include <iostream>
 
 using namespace dealii;

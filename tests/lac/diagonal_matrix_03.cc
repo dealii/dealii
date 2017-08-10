@@ -19,7 +19,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/diagonal_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/linear_operator.h>
