@@ -22,8 +22,6 @@
 #   DEAL_II_WITH_CXX17
 #
 #   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE
-#   DEAL_II_HAVE_ISNAN
-#   DEAL_II_HAVE_UNDERSCORE_ISNAN
 #   DEAL_II_HAVE_ISFINITE
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
@@ -496,30 +494,6 @@ CHECK_CXX_SOURCE_COMPILES(
   int main(){ std::is_trivially_copyable<int> bob; }
   "
   DEAL_II_HAVE_CXX11_IS_TRIVIALLY_COPYABLE)
-
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #include <cmath>
-  int main(){ double d=0; std::isnan (d); return 0; }
-  "
-  DEAL_II_HAVE_STD_ISNAN)
-
-
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #include <cmath>
-  int main(){ double d=0; isnan (d); return 0; }
-  "
-  DEAL_II_HAVE_ISNAN)
-
-
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #include <cmath>
-  int main(){ double d=0; _isnan (d); return 0; }
-  "
-  DEAL_II_HAVE_UNDERSCORE_ISNAN)
-
 
 CHECK_CXX_SOURCE_COMPILES(
   "

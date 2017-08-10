@@ -93,7 +93,7 @@ SolverControl::check (const unsigned int step,
     }
 
   if ((step >= maxsteps) ||
-      numbers::is_nan(check_value) ||
+      std::isnan(check_value) ||
       (check_failure && (check_value > failure_residual))
      )
     {
