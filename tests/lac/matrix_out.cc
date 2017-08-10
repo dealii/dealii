@@ -16,21 +16,14 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/matrix_out.h>
 #include <deal.II/lac/full_matrix.h>
-#include <fstream>
-#include <iomanip>
 
 int main ()
 {
-  std::ofstream logfile("output");
-  logfile << std::fixed;
-  logfile << std::setprecision(2);
-  deallog << std::fixed;
-  deallog << std::setprecision(2);
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
+  initlog();
+
+  auto &logfile = deallog.get_file_stream();
 
   // test for a square full matrix
   if (true)

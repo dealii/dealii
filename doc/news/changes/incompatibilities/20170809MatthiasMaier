@@ -1,0 +1,4 @@
+Changed: DataOutBase (and derived classes) no longer sets floating point
+output precision of ostreams.
+<br>
+(Matthias Maier, 2017/08/09)

@@ -3590,8 +3590,6 @@ namespace DataOutBase
       return;
 #endif
 
-    const unsigned int old_precision = out.precision();
-
     // set up an array of cells to be
     // written later. this array holds the
     // cells of all the patches as
@@ -3850,12 +3848,6 @@ namespace DataOutBase
           << '\n';
       // set fine lines
       out << flags.line_width << " setlinewidth" << '\n';
-      // allow only five digits
-      // for output (instead of the
-      // default six); this should suffice
-      // even for fine grids, but reduces
-      // the file size significantly
-      out << std::setprecision (5);
     }
 
     // check if min and max
@@ -3920,9 +3912,7 @@ namespace DataOutBase
               << '\n';
       }
     out << "showpage" << '\n';
-    // make sure everything now gets to
-    // disk
-    out << std::setprecision(old_precision);
+
     out.flush ();
 
     AssertThrow (out, ExcIO());
