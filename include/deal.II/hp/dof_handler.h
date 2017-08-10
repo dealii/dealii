@@ -838,7 +838,7 @@ namespace hp
      *
      * The format used here, in the form of a linked list, is the same as used
      * for the arrays used in the internal::hp::DoFLevel hierarchy. Starting
-     * indices into this array are provided by the vertex_dofs_offsets field.
+     * indices into this array are provided by the vertex_dof_offsets field.
      *
      * Access to this field is generally through the
      * DoFAccessor::get_vertex_dof_index() and
@@ -859,7 +859,7 @@ namespace hp
      * functions, encapsulating the actual data format used to the present
      * class.
      */
-    std::vector<types::global_dof_index>      vertex_dofs_offsets;
+    std::vector<unsigned int>      vertex_dof_offsets;
 
     /**
      * Array to store the information if a cell on some level has children or
@@ -939,7 +939,7 @@ namespace hp
   void DoFHandler<dim, spacedim>::save(Archive &ar, unsigned int) const
   {
     ar &vertex_dofs;
-    ar &vertex_dofs_offsets;
+    ar &vertex_dof_offsets;
     ar &number_cache;
     ar &levels;
     ar &faces;
@@ -961,7 +961,7 @@ namespace hp
   void DoFHandler<dim, spacedim>::load(Archive &ar, unsigned int)
   {
     ar &vertex_dofs;
-    ar &vertex_dofs_offsets;
+    ar &vertex_dof_offsets;
     ar &number_cache;
 
     // boost::serialization can restore pointers just fine, but if the
