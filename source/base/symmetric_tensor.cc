@@ -17,7 +17,11 @@
 
 // Required for instantiation of template functions
 #ifdef DEAL_II_WITH_TRILINOS
-#include "Sacado.hpp"
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#  include <Sacado.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #include <deal.II/base/sacado_product_type.h>
 #endif
 

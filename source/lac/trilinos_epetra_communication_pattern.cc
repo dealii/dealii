@@ -20,7 +20,11 @@
 #ifdef DEAL_II_WITH_MPI
 
 #include <deal.II/base/index_set.h>
-#include "Epetra_Map.h"
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#  include <Epetra_Map.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN

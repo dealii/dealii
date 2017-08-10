@@ -35,9 +35,9 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Map.h>
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
-#    include "mpi.h"
+#    include <mpi.h>
 #  else
-#    include "Epetra_SerialComm.h"
+#    include <Epetra_SerialComm.h>
 #  endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
