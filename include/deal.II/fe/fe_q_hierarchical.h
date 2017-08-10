@@ -41,6 +41,9 @@ DEAL_II_NAMESPACE_OPEN
  * This class is not implemented for the codimension one case (<tt>spacedim !=
  * dim</tt>).
  *
+ * @note: Hanging node constraints are currently not implemented for this
+ * element.
+ *
  * <h3>Implementation</h3>
  *
  * The constructor creates a TensorProductPolynomials object that includes the
