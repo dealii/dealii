@@ -1688,6 +1688,27 @@ namespace FEValuesViews
   }
 
 
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim,spacedim>::
+  get_function_curls_from_local_dof_values(const InputVector &dof_values,
+                                           std::vector<typename OutputType<typename InputVector::value_type>::curl_type> &curls) const
+  {
+    Assert (fe_values->update_flags & update_gradients,
+            (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_gradients")));
+    Assert (fe_values->present_cell.get () != nullptr,
+            ExcMessage ("FEValues object is not reinited to any cell"));
+    AssertDimension (dof_values.size(), fe_values->dofs_per_cell);
+
+    internal::do_function_curls<dim,spacedim>
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, curls);
+  }
+
+
+
   template <int dim, int spacedim>
   template <class InputVector>
   void

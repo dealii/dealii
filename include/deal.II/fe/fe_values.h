@@ -982,6 +982,13 @@ namespace FEValuesViews
                              std::vector<typename ProductType<curl_type,typename InputVector::value_type>::type> &curls) const;
 
     /**
+     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_curls_from_local_dof_values (const InputVector &dof_values,
+                                                   std::vector<typename OutputType<typename InputVector::value_type>::curl_type> &curls) const;
+
+    /**
      * Return the Hessians of the selected vector components of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
