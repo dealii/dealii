@@ -1401,6 +1401,26 @@ namespace FEValuesViews
     typedef dealii::Tensor<1, spacedim> divergence_type;
 
     /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the Tensor view and any @p Number type.
+     */
+    template <typename Number>
+    struct OutputType
+    {
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * values of the view the Tensor class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Tensor<2,dim,spacedim>::value_type>::type value_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * divergences of the view the Tensor class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Tensor<2,dim,spacedim>::divergence_type>::type divergence_type;
+    };
+
+    /**
      * A structure where for each shape function we pre-compute a bunch of
      * data that will make later accesses much cheaper.
      */
@@ -1521,6 +1541,30 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_values (const InputVector &fe_function,
                               std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
+
+    /**
+     * Same as above, but using a vector of local degree-of-freedom values.
+     *
+     * The @p dof_values vector must have a length equal to number of DoFs on
+     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
+     * @p i. The fundamental prerequisite for the @p InputVector is that it must
+     * be possible to create an ArrayView from it; this is satisfied by the
+     * @p std::vector class.
+     *
+     * The DoF values typically would be obtained in the following way:
+     * @code
+     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
+     * cell->get_dof_values(solution, local_dof_values);
+     * @endcode
+     * or, for a generic @p Number type,
+     * @code
+     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
+     * cell->get_dof_values(solution, local_dof_values.begin(), local_dof_values.end());
+     * @endcode
+     */
+    template <class InputVector>
+    void get_function_values_from_local_dof_values (const InputVector &dof_values,
+                                                    std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const;
 
 
     /**

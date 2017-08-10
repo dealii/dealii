@@ -1963,6 +1963,26 @@ namespace FEValuesViews
   template <class InputVector>
   void
   Tensor<2, dim, spacedim>::
+  get_function_values_from_local_dof_values (const InputVector &dof_values,
+                                             std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const
+  {
+    Assert(fe_values->update_flags & update_values,
+           (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_values")));
+    Assert(fe_values->present_cell.get() != nullptr,
+           ExcMessage("FEValues object is not reinit'ed to any cell"));
+    AssertDimension (dof_values.size(), fe_values->dofs_per_cell);
+
+    internal::do_function_values<dim,spacedim>
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_values, shape_function_data, values);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Tensor<2, dim, spacedim>::
   get_function_divergences(const InputVector &fe_function,
                            std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const
   {
