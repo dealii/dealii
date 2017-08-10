@@ -923,6 +923,14 @@ namespace FEValuesViews
                                       std::vector<typename ProductType<symmetric_gradient_type,typename InputVector::value_type>::type> &symmetric_gradients) const;
 
     /**
+     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void
+    get_function_symmetric_gradients_from_local_dof_values (const InputVector &dof_values,
+                                                            std::vector<typename OutputType<typename InputVector::value_type>::symmetric_gradient_type> &symmetric_gradients) const;
+
+    /**
      * Return the divergence of the selected vector components of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
