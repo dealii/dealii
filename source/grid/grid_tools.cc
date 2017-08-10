@@ -2807,8 +2807,6 @@ next_cell:
     return max_diameter;
   }
 
-
-
   namespace internal
   {
     namespace FixUpDistortedChildCells
@@ -3108,12 +3106,10 @@ next_cell:
                 else
                   gradient[d]
                     = ((objective_function (object,
-                                            manifold->project_to_manifold(object,
-                                                                          object_mid_point + h))
+                                            project_to_object(object, object_mid_point + h))
                         -
                         objective_function (object,
-                                            manifold->project_to_manifold(object,
-                                                                          object_mid_point - h)))
+                                            project_to_object(object, object_mid_point - h)))
                        /
                        eps);
               }
@@ -3147,8 +3143,7 @@ next_cell:
                                 gradient;
 
             if (respect_manifold == true)
-              object_mid_point = manifold->project_to_manifold(object,
-                                                               object_mid_point);
+              object_mid_point = project_to_object(object, object_mid_point);
 
             // compute current value of the
             // objective function

@@ -15,7 +15,7 @@
 
 
 
-// test StraightBoundary::project_to_surface for lines
+// test GridTools::project_to_object for lines
 
 
 
@@ -101,9 +101,9 @@ void test ()
         {
           deallog << "    Line " << e << ", projected point=";
           if (dim > 1)
-            deallog << boundary.project_to_surface (cell->line(e), trial_point);
+            deallog << GridTools::project_to_object (cell->line(e), trial_point);
           else
-            deallog << boundary.project_to_surface (cell, trial_point);
+            deallog << GridTools::project_to_object (cell, trial_point);
 
           deallog << "  (line is from ";
           if (dim > 1)
