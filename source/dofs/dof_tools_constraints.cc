@@ -1723,6 +1723,32 @@ namespace DoFTools
   }
 
 
+  namespace internal
+  {
+    template <int dim, int spacedim>
+    void check_if_fe_supports_hanging_nodes(const FiniteElement<dim,spacedim> &fe)
+    {
+      Assert(fe.constraints_are_implemented(),
+             ExcNotImplemented("This finite element does not support hanging node constraints!"));
+    }
+
+
+    template <int dim, int spacedim>
+    void check_if_fe_supports_hanging_nodes(const DoFHandler<dim,spacedim> &dof_handler)
+    {
+      check_if_fe_supports_hanging_nodes(dof_handler.get_fe());
+    }
+
+    template <int dim, int spacedim>
+    void check_if_fe_supports_hanging_nodes(const hp::DoFHandler<dim,spacedim> &dof_handler)
+    {
+      for (unsigned int idx = 0; idx < dof_handler.get_fe().size(); ++idx)
+        {
+          check_if_fe_supports_hanging_nodes(dof_handler.get_fe()[idx]);
+        }
+    }
+  }
+
 
 
   template <typename DoFHandlerType>
@@ -1730,6 +1756,12 @@ namespace DoFTools
   make_hanging_node_constraints (const DoFHandlerType &dof_handler,
                                  ConstraintMatrix     &constraints)
   {
+#ifdef DEBUG
+    {
+      internal::check_if_fe_supports_hanging_nodes (dof_handler);
+    }
+#endif
+
     // Decide whether to use the new or old make_hanging_node_constraints
     // function. If all the FiniteElement or all elements in a FECollection
     // support the new face constraint matrix, the new code will be used.

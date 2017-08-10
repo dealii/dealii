@@ -1,0 +1,3 @@
+Changed: make_hanging_node_constraints() now checks if all finite elements support the computation of constraints and fails otherwise.
+<br>
+(Timo Heister, 2017/08/10)
