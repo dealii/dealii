@@ -33,7 +33,8 @@ struct CopyData {};
 using namespace MeshWorker;
 
 template<int dim, int spacedim>
-void test() {
+void test()
+{
   Triangulation<dim,spacedim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
@@ -50,25 +51,29 @@ void test() {
 
 
 
-  auto cell_worker = [] (const Iterator &cell, ScratchData &s, CopyData &c) {
+  auto cell_worker = [] (const Iterator &cell, ScratchData &s, CopyData &c)
+  {
     deallog << "Cell worker on : " << cell << std::endl;
   };
 
-  auto boundary_worker = [] (const Iterator &cell, const unsigned int &f, ScratchData &, CopyData &) {
+  auto boundary_worker = [] (const Iterator &cell, const unsigned int &f, ScratchData &, CopyData &)
+  {
     deallog << "Boundary worker on : " << cell << ", Face : "<< f << std::endl;
   };
 
   auto face_worker = []
-      (const Iterator &cell, const unsigned int & f, const unsigned int &sf,
-       const Iterator &ncell, const unsigned int &nf, const unsigned int & nsf,
-        ScratchData &s, CopyData &c) {
-        deallog << "Face worker on : " << cell << ", Neighbor cell : "  << ncell
-                << ", Face : "<< f << ", Neighbor Face : " << nf
-                << ", Subface: " << sf
-                << ", Neighbor Subface: " << nsf << std::endl;
+                     (const Iterator &cell, const unsigned int &f, const unsigned int &sf,
+                      const Iterator &ncell, const unsigned int &nf, const unsigned int &nsf,
+                      ScratchData &s, CopyData &c)
+  {
+    deallog << "Face worker on : " << cell << ", Neighbor cell : "  << ncell
+            << ", Face : "<< f << ", Neighbor Face : " << nf
+            << ", Subface: " << sf
+            << ", Neighbor Subface: " << nsf << std::endl;
   };
 
-  auto copyer = [](const CopyData &) {
+  auto copyer = [](const CopyData &)
+  {
     deallog << "Copyer" << std::endl;
   };
 

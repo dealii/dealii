@@ -46,7 +46,7 @@ namespace MeshWorker
             class CellWorker, class Copyer,
             class ScratchData, class CopyData,
             class BoundaryWorker, class FaceWorker>
-  void mesh_loop(const Iterator & begin,
+  void mesh_loop(const Iterator &begin,
                  const typename identity<Iterator>::type &end,
 
 //                 const std::function<void (const Iterator &, ScratchData &, CopyData &)> &cell_worker,
@@ -72,8 +72,8 @@ namespace MeshWorker
                  BoundaryWorker boundary_worker = BoundaryWorker(),
                  FaceWorker face_worker = FaceWorker(),
 
-                 const unsigned int 	queue_length = 2*MultithreadInfo::n_threads(),
-                 const unsigned int 	chunk_size = 8)
+                 const unsigned int   queue_length = 2*MultithreadInfo::n_threads(),
+                 const unsigned int   chunk_size = 8)
   {
     auto cell_action = [&] (const Iterator &cell, ScratchData &scratch, CopyData &copy)
     {
@@ -88,9 +88,10 @@ namespace MeshWorker
 
       if ((!ignore_subdomain) && (csid == numbers::artificial_subdomain_id))
         return;
-      if( (flags & (assemble_cells_first)) &&
-         ( ((flags & (assemble_own_cells)) && own_cell)
-           || ( (flags & assemble_ghost_cells) && !own_cell) ) )
+
+      if ( (flags & (assemble_cells_first)) &&
+           ( ((flags & (assemble_own_cells)) && own_cell)
+             || ( (flags & assemble_ghost_cells) && !own_cell) ) )
         cell_worker(cell, scratch, copy);
 
       if (flags & assemble_own_faces)
@@ -158,7 +159,8 @@ namespace MeshWorker
                                 neighbor, neighbor_face_no.first, neighbor_face_no.second,
                                 scratch, copy);
 
-                    if(flags & assemble_own_interior_faces_both) {
+                    if (flags & assemble_own_interior_faces_both)
+                      {
                         face_worker(neighbor, neighbor_face_no.first, neighbor_face_no.second,
                                     cell, face_no, numbers::invalid_unsigned_int,
                                     scratch, copy);
