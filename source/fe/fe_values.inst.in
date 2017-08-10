@@ -149,6 +149,11 @@ for (VEC : GENERAL_CONTAINER_TYPES;
     void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
     ::get_function_values_from_local_dof_values<VEC<Number>>
             (const VEC<Number>&, std::vector<typename OutputType<Number>::value_type>&) const;
+
+    template
+    void FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>
+    ::get_function_gradients_from_local_dof_values<VEC<Number>>
+            (const VEC<Number>&, std::vector<typename OutputType<Number>::gradient_type>&) const;
 #endif
 }
 

@@ -375,6 +375,13 @@ namespace FEValuesViews
                                  std::vector<typename ProductType<gradient_type,typename InputVector::value_type>::type> &gradients) const;
 
     /**
+     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_gradients_from_local_dof_values (const InputVector &dof_values,
+                                                       std::vector<typename OutputType<typename InputVector::value_type>::gradient_type> &gradients) const;
+
+    /**
      * Return the Hessians of the selected scalar component of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
