@@ -1211,7 +1211,7 @@ namespace FEValuesViews
     do_function_divergences (const ArrayView<Number> &dof_values,
                              const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                              const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &divergences)
+                             std::vector<typename Tensor<2,dim,spacedim>::template OutputType<Number>::divergence_type> &divergences)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1219,7 +1219,7 @@ namespace FEValuesViews
       AssertDimension (divergences.size(), n_quadrature_points);
 
       std::fill (divergences.begin(), divergences.end(),
-                 typename ProductType<Number,dealii::Tensor<1,spacedim> >::type());
+                 typename Tensor<2,dim,spacedim>::template OutputType<Number>::divergence_type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1997,6 +1997,26 @@ namespace FEValuesViews
     // on this cell
     dealii::Vector<typename InputVector::value_type> dof_values(fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
+    internal::do_function_divergences<dim,spacedim>
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Tensor<2, dim, spacedim>::
+  get_function_divergences_from_local_dof_values (const InputVector &dof_values,
+                                                  std::vector<typename OutputType<typename InputVector::value_type>::divergence_type> &divergences) const
+  {
+    Assert(fe_values->update_flags & update_gradients,
+           (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_gradients")));
+    Assert(fe_values->present_cell.get() != nullptr,
+           ExcMessage("FEValues object is not reinit'ed to any cell"));
+    AssertDimension (dof_values.size(), fe_values->dofs_per_cell);
+
     internal::do_function_divergences<dim,spacedim>
     (make_array_view(dof_values.begin(), dof_values.end()),
      fe_values->finite_element_output.shape_gradients, shape_function_data, divergences);
