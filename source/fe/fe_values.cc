@@ -1380,6 +1380,26 @@ namespace FEValuesViews
   template <class InputVector>
   void
   Scalar<dim,spacedim>::
+  get_function_hessians_from_local_dof_values(const InputVector &dof_values,
+                                              std::vector<typename OutputType<typename InputVector::value_type>::hessian_type> &hessians) const
+  {
+    Assert (fe_values->update_flags & update_hessians,
+            (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_hessians")));
+    Assert (fe_values->present_cell.get() != nullptr,
+            ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    AssertDimension (dof_values.size(), fe_values->dofs_per_cell);
+
+    internal::do_function_derivatives<2,dim,spacedim>
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_hessians, shape_function_data, hessians);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Scalar<dim,spacedim>::
   get_function_laplacians (const InputVector &fe_function,
                            std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &laplacians) const
   {
