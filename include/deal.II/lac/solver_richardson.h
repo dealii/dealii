@@ -18,7 +18,6 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/base/subscriptor.h>
@@ -241,8 +240,6 @@ SolverRichardson<VectorType>::solve (const MatrixType         &A,
   VectorType &d  = *Vd;
   d.reinit(x);
 
-  deallog.push("Richardson");
-
   try
     {
       // Main loop
@@ -274,13 +271,12 @@ SolverRichardson<VectorType>::solve (const MatrixType         &A,
     {
       this->memory.free(Vr);
       this->memory.free(Vd);
-      deallog.pop();
+
       throw;
     }
   // Deallocate Memory
   this->memory.free(Vr);
   this->memory.free(Vd);
-  deallog.pop();
 
   // in case of failure: throw exception
   if (conv != SolverControl::success)
@@ -311,8 +307,6 @@ SolverRichardson<VectorType>::Tsolve (const MatrixType         &A,
   VectorType &d  = *Vd;
   d.reinit(x);
 
-  deallog.push("RichardsonT");
-
   try
     {
       // Main loop
@@ -339,14 +333,14 @@ SolverRichardson<VectorType>::Tsolve (const MatrixType         &A,
     {
       this->memory.free(Vr);
       this->memory.free(Vd);
-      deallog.pop();
+
       throw;
     }
 
   // Deallocate Memory
   this->memory.free(Vr);
   this->memory.free(Vd);
-  deallog.pop();
+
   // in case of failure: throw exception
   if (conv != SolverControl::success)
     AssertThrow(false, SolverControl::NoConvergence (iter, last_criterion));

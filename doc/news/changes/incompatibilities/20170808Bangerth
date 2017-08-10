@@ -1,0 +1,9 @@
+Removed: Many of the linear solver classes used the
+<code>deallog</code> object to output information about the progress
+of the iteration. The same was true for the SolverControl class.
+This has now been removed since the information was
+not usually very useful, and is also available on demand using the
+various member functions of class SolverControl as well as the signals
+of the solver classes.
+<br>
+(Wolfgang Bangerth, 2017/08/08)

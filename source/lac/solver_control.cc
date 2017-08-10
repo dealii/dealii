@@ -40,9 +40,6 @@ SolverControl::SolverControl (const unsigned int maxiter,
   check_failure(false),
   relative_failure_residual(0),
   failure_residual(0),
-  m_log_history(m_log_history),
-  m_log_frequency(1),
-  m_log_result(m_log_result),
   history_data_enabled(false)
 {}
 
@@ -65,9 +62,6 @@ SolverControl::check (const unsigned int step,
       initial_val = check_value;
     }
 
-  if (m_log_history && ((step % m_log_frequency) == 0))
-    deallog << "Check " << step << "\t" << check_value << std::endl;
-
   lstep  = step;
   lvalue = check_value;
 
@@ -75,9 +69,6 @@ SolverControl::check (const unsigned int step,
     {
       if (check_failure)
         failure_residual=relative_failure_residual*check_value;
-
-      if (m_log_result)
-        deallog << "Starting value " << check_value << std::endl;
     }
 
   if (history_data_enabled)
@@ -85,9 +76,6 @@ SolverControl::check (const unsigned int step,
 
   if (check_value <= tol)
     {
-      if (m_log_result)
-        deallog << "Convergence step " << step
-                << " value " << check_value << std::endl;
       lcheck = success;
       return success;
     }
@@ -97,9 +85,6 @@ SolverControl::check (const unsigned int step,
       (check_failure && (check_value > failure_residual))
      )
     {
-      if (m_log_result)
-        deallog << "Failure step " << step
-                << " value " << check_value << std::endl;
       lcheck = failure;
       return failure;
     }
@@ -135,17 +120,6 @@ unsigned int
 SolverControl::last_step() const
 {
   return lstep;
-}
-
-
-unsigned int
-SolverControl::log_frequency (unsigned int f)
-{
-  if (f==0)
-    f = 1;
-  unsigned int old = m_log_frequency;
-  m_log_frequency = f;
-  return old;
 }
 
 
@@ -210,9 +184,6 @@ SolverControl::declare_parameters (ParameterHandler &param)
 {
   param.declare_entry ("Max steps", "100", Patterns::Integer());
   param.declare_entry ("Tolerance", "1.e-10", Patterns::Double());
-  param.declare_entry ("Log history", "false", Patterns::Bool());
-  param.declare_entry ("Log frequency", "1", Patterns::Integer());
-  param.declare_entry ("Log result", "true", Patterns::Bool());
 }
 
 
@@ -220,9 +191,6 @@ void SolverControl::parse_parameters (ParameterHandler &param)
 {
   set_max_steps (param.get_integer("Max steps"));
   set_tolerance (param.get_double("Tolerance"));
-  log_history (param.get_bool("Log history"));
-  log_result (param.get_bool("Log result"));
-  log_frequency (param.get_integer("Log frequency"));
 }
 
 /*----------------------- ReductionControl ---------------------------------*/
@@ -282,9 +250,6 @@ ReductionControl::check (const unsigned int step,
   // residual already was zero
   if (check_value <= reduced_tol)
     {
-      if (m_log_result)
-        deallog << "Convergence step " << step
-                << " value " << check_value << std::endl;
       lstep  = step;
       lvalue = check_value;
 
@@ -336,9 +301,6 @@ IterationNumberControl::check (const unsigned int step,
   // success in that case. Otherwise, go on to the check of the base class.
   if (step >= this->maxsteps)
     {
-      if (m_log_result)
-        deallog << "Convergence step " << step
-                << " value " << check_value << std::endl;
       lstep  = step;
       lvalue = check_value;
 

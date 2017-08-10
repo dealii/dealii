@@ -18,7 +18,6 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/diagonal_matrix.h>
 #include <deal.II/lac/solver.h>
 
@@ -251,8 +250,6 @@ SolverFIRE<VectorType>::solve
  VectorType                                                    &x,
  const PreconditionerType                                      &inverse_mass_matrix)
 {
-  deallog.push("FIRE");
-
   // FIRE algorithm constants
   const double DELAYSTEP       = 5;
   const double TIMESTEP_GROW   = 1.1;
@@ -360,8 +357,6 @@ SolverFIRE<VectorType>::solve
       print_vectors(iter, x, velocities, gradients);
 
     } // While we need to iterate.
-
-  deallog.pop();
 
   // In the case of failure: throw exception.
   if (conv != SolverControl::success)

@@ -3,8 +3,6 @@ DEAL::Cycle 0:
 DEAL::   Number of active cells: 20
 DEAL::   Total number of cells: 20
 DEAL::   Number of degrees of freedom: 25
-DEAL:cg::Starting value 0.51
-DEAL:cg::Convergence step 13 value 0
 DEAL::   13 CG iterations needed to obtain convergence.
 %!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
@@ -65,8 +63,6 @@ DEAL::Cycle 1:
 DEAL::   Number of active cells: 80
 DEAL::   Total number of cells: 100
 DEAL::   Number of degrees of freedom: 89
-DEAL:cg::Starting value 0.32
-DEAL:cg::Convergence step 17 value 0
 DEAL::   17 CG iterations needed to obtain convergence.
 %!PS-Adobe-2.0 EPSF-1.2
 %%Title: deal.II Output
@@ -247,27 +243,19 @@ DEAL::Cycle 2:
 DEAL::   Number of active cells: 320
 DEAL::   Total number of cells: 420
 DEAL::   Number of degrees of freedom: 337
-DEAL:cg::Starting value 0.18
-DEAL:cg::Convergence step 29 value 0
 DEAL::   29 CG iterations needed to obtain convergence.
 DEAL::Cycle 3:
 DEAL::   Number of active cells: 1280
 DEAL::   Total number of cells: 1700
 DEAL::   Number of degrees of freedom: 1313
-DEAL:cg::Starting value 0.092
-DEAL:cg::Convergence step 51 value 0
 DEAL::   51 CG iterations needed to obtain convergence.
 DEAL::Cycle 4:
 DEAL::   Number of active cells: 5120
 DEAL::   Total number of cells: 6820
 DEAL::   Number of degrees of freedom: 5185
-DEAL:cg::Starting value 0.047
-DEAL:cg::Convergence step 94 value 0
 DEAL::   94 CG iterations needed to obtain convergence.
 DEAL::Cycle 5:
 DEAL::   Number of active cells: 20480
 DEAL::   Total number of cells: 27300
 DEAL::   Number of degrees of freedom: 20609
-DEAL:cg::Starting value 0.024
-DEAL:cg::Convergence step 180 value 0
 DEAL::   180 CG iterations needed to obtain convergence.

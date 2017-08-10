@@ -18,12 +18,13 @@
 
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
-#include <cmath>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/signaling_nan.h>
+
+#include <cmath>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -458,7 +459,6 @@ SolverBicgstab<VectorType>::solve(const MatrixType         &A,
                                   const VectorType         &b,
                                   const PreconditionerType &precondition)
 {
-  deallog.push("Bicgstab");
   Vr    = this->memory.alloc();
   Vr->reinit(x, true);
   Vrbar = this->memory.alloc();
@@ -484,8 +484,6 @@ SolverBicgstab<VectorType>::solve(const MatrixType         &A,
   // iterate while the inner iteration returns a breakdown
   do
     {
-      if (step != 0)
-        deallog << "Restart step " << step << std::endl;
       if (start(A) == SolverControl::success)
         {
           state.state = SolverControl::success;
@@ -503,8 +501,6 @@ SolverBicgstab<VectorType>::solve(const MatrixType         &A,
   this->memory.free(Vz);
   this->memory.free(Vt);
   this->memory.free(Vv);
-
-  deallog.pop();
 
   // in case of failure: throw exception
   AssertThrow(state.state == SolverControl::success,

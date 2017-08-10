@@ -2,23 +2,15 @@
 DEAL::Solving with Q1 elements, adaptive refinement
 DEAL::=============================================
 DEAL::
-DEAL:cg::Starting value 2.6
-DEAL:cg::Convergence step 4 value 0
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       4
 DEAL::   Number of degrees of freedom: 9
-DEAL:cg::Starting value 5.0
-DEAL:cg::Convergence step 10 value 0
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       13
 DEAL::   Number of degrees of freedom: 22
-DEAL:cg::Starting value 4.7
-DEAL:cg::Convergence step 14 value 0
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       31
 DEAL::   Number of degrees of freedom: 46
-DEAL:cg::Starting value 3.5
-DEAL:cg::Convergence step 17 value 0
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       64
 DEAL::   Number of degrees of freedom: 87
@@ -190,23 +182,15 @@ DEAL::
 DEAL::Solving with Q1 elements, global refinement
 DEAL::===========================================
 DEAL::
-DEAL:cg::Starting value 2.6
-DEAL:cg::Convergence step 4 value 0
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       4
 DEAL::   Number of degrees of freedom: 9
-DEAL:cg::Starting value 5.0
-DEAL:cg::Convergence step 11 value 0
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       16
 DEAL::   Number of degrees of freedom: 25
-DEAL:cg::Starting value 3.7
-DEAL:cg::Convergence step 16 value 0
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       64
 DEAL::   Number of degrees of freedom: 81
-DEAL:cg::Starting value 2.3
-DEAL:cg::Convergence step 25 value 0
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       256
 DEAL::   Number of degrees of freedom: 289
@@ -263,23 +247,15 @@ DEAL::
 DEAL::Solving with Q2 elements, global refinement
 DEAL::===========================================
 DEAL::
-DEAL:cg::Starting value 11.
-DEAL:cg::Convergence step 12 value 0
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       4
 DEAL::   Number of degrees of freedom: 25
-DEAL:cg::Starting value 3.8
-DEAL:cg::Convergence step 19 value 0
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       16
 DEAL::   Number of degrees of freedom: 81
-DEAL:cg::Starting value 2.6
-DEAL:cg::Convergence step 34 value 0
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       64
 DEAL::   Number of degrees of freedom: 289
-DEAL:cg::Starting value 1.4
-DEAL:cg::Convergence step 64 value 0
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       256
 DEAL::   Number of degrees of freedom: 1089

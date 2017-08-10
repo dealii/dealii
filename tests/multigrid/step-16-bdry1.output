@@ -4,94 +4,62 @@ DEAL::   Number of active cells:       4
 DEAL::Number of degrees of freedom: 9   L0: 4   L1: 9
 DEAL::   Number of degrees of freedom: 9 (by level: 4, 9)
 DEAL::assemble_multigrid 
-DEAL:cg::Starting value 1.36931
-DEAL:cg::Convergence step 4 value 8.55703e-14
 DEAL::   4 CG iterations needed to obtain convergence.
 DEAL::assemble_multigrid (mesh_worker)
-DEAL:cg::Starting value 1.36931
-DEAL:cg::Convergence step 4 value 8.55703e-14
 DEAL::   4 CG iterations needed to obtain convergence.
 DEAL::Cycle 1:
 DEAL::   Number of active cells:       16
 DEAL::Number of degrees of freedom: 25   L0: 4   L1: 9   L2: 25
 DEAL::   Number of degrees of freedom: 25 (by level: 4, 9, 25)
 DEAL::assemble_multigrid 
-DEAL:cg::Starting value 0.843171
-DEAL:cg::Convergence step 6 value 9.78112e-15
 DEAL::   6 CG iterations needed to obtain convergence.
 DEAL::assemble_multigrid (mesh_worker)
-DEAL:cg::Starting value 0.843171
-DEAL:cg::Convergence step 6 value 9.78112e-15
 DEAL::   6 CG iterations needed to obtain convergence.
 DEAL::Cycle 2:
 DEAL::   Number of active cells:       28
 DEAL::Number of degrees of freedom: 41   L0: 4   L1: 9   L2: 25   L3: 25
 DEAL::   Number of degrees of freedom: 41 (by level: 4, 9, 25, 25)
 DEAL::assemble_multigrid 
-DEAL:cg::Starting value 0.737526
-DEAL:cg::Convergence step 8 value 8.81541e-15
 DEAL::   8 CG iterations needed to obtain convergence.
 DEAL::assemble_multigrid (mesh_worker)
-DEAL:cg::Starting value 0.737526
-DEAL:cg::Convergence step 8 value 8.81541e-15
 DEAL::   8 CG iterations needed to obtain convergence.
 DEAL::Cycle 3:
 DEAL::   Number of active cells:       40
 DEAL::Number of degrees of freedom: 57   L0: 4   L1: 9   L2: 25   L3: 25   L4: 25
 DEAL::   Number of degrees of freedom: 57 (by level: 4, 9, 25, 25, 25)
 DEAL::assemble_multigrid 
-DEAL:cg::Starting value 0.730417
-DEAL:cg::Convergence step 8 value 9.36194e-14
 DEAL::   8 CG iterations needed to obtain convergence.
 DEAL::assemble_multigrid (mesh_worker)
-DEAL:cg::Starting value 0.730417
-DEAL:cg::Convergence step 8 value 9.36194e-14
 DEAL::   8 CG iterations needed to obtain convergence.
 DEAL::Cycle 4:
 DEAL::   Number of active cells:       52
 DEAL::Number of degrees of freedom: 73   L0: 4   L1: 9   L2: 25   L3: 25   L4: 25   L5: 25
 DEAL::   Number of degrees of freedom: 73 (by level: 4, 9, 25, 25, 25, 25)
 DEAL::assemble_multigrid 
-DEAL:cg::Starting value 0.729970
-DEAL:cg::Convergence step 8 value 2.81558e-13
 DEAL::   8 CG iterations needed to obtain convergence.
 DEAL::assemble_multigrid (mesh_worker)
-DEAL:cg::Starting value 0.729970
-DEAL:cg::Convergence step 8 value 2.81558e-13
 DEAL::   8 CG iterations needed to obtain convergence.
 DEAL::Cycle 5:
 DEAL::   Number of active cells:       160
 DEAL::Number of degrees of freedom: 201   L0: 4   L1: 9   L2: 25   L3: 65   L4: 65   L5: 65   L6: 65
 DEAL::   Number of degrees of freedom: 201 (by level: 4, 9, 25, 65, 65, 65, 65)
 DEAL::assemble_multigrid 
-DEAL:cg::Starting value 0.492333
-DEAL:cg::Convergence step 9 value 5.07798e-13
 DEAL::   9 CG iterations needed to obtain convergence.
 DEAL::assemble_multigrid (mesh_worker)
-DEAL:cg::Starting value 0.492333
-DEAL:cg::Convergence step 9 value 5.07798e-13
 DEAL::   9 CG iterations needed to obtain convergence.
 DEAL::Cycle 6:
 DEAL::   Number of active cells:       304
 DEAL::Number of degrees of freedom: 357   L0: 4   L1: 9   L2: 25   L3: 81   L4: 81   L5: 81   L6: 81   L7: 153
 DEAL::   Number of degrees of freedom: 357 (by level: 4, 9, 25, 81, 81, 81, 81, 153)
 DEAL::assemble_multigrid 
-DEAL:cg::Starting value 0.404672
-DEAL:cg::Convergence step 8 value 5.14673e-13
 DEAL::   8 CG iterations needed to obtain convergence.
 DEAL::assemble_multigrid (mesh_worker)
-DEAL:cg::Starting value 0.404672
-DEAL:cg::Convergence step 8 value 5.14673e-13
 DEAL::   8 CG iterations needed to obtain convergence.
 DEAL::Cycle 7:
 DEAL::   Number of active cells:       676
 DEAL::Number of degrees of freedom: 761   L0: 4   L1: 9   L2: 25   L3: 81   L4: 81   L5: 81   L6: 121   L7: 209   L8: 465
 DEAL::   Number of degrees of freedom: 761 (by level: 4, 9, 25, 81, 81, 81, 121, 209, 465)
 DEAL::assemble_multigrid 
-DEAL:cg::Starting value 0.404553
-DEAL:cg::Convergence step 9 value 6.34913e-14
 DEAL::   9 CG iterations needed to obtain convergence.
 DEAL::assemble_multigrid (mesh_worker)
-DEAL:cg::Starting value 0.404553
-DEAL:cg::Convergence step 9 value 6.34913e-14
 DEAL::   9 CG iterations needed to obtain convergence.
