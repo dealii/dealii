@@ -563,6 +563,23 @@ public:
    * Dummy function that always returns numbers::invalid_manifold_id.
    */
   types::manifold_id manifold_id () const;
+
+  /**
+   * Dummy function to extract vertices.
+   */
+  Point<spacedim> &vertex (const unsigned int i) const;
+
+  /**
+   * Dummy function to extract lines.
+   */
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+  line (const unsigned int i) const;
+
+  /**
+   * Dummy function to extract quads.
+   */
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+  quad (const unsigned int i) const;
 };
 
 
@@ -985,7 +1002,7 @@ public:
    * This function exists for backward compatibility and calls get_manifold()
    * internally.
    */
-  const Boundary<dim,spacedim> &get_boundary () const;
+  const Boundary<dim,spacedim> &get_boundary () const DEAL_II_DEPRECATED;
 
   /**
    * Return a constant reference to the manifold object used for this object.

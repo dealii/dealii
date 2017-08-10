@@ -1786,12 +1786,13 @@ public:
    * Return a constant reference to a boundary object used for this
    * triangulation.  Number is the same as in @p set_boundary
    *
+   * @deprecated Use the get_manifold() method instead.
    * @ingroup boundary
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const Boundary<dim,spacedim> &get_boundary (const types::manifold_id number) const;
+  const Boundary<dim,spacedim> &get_boundary (const types::manifold_id number) const DEAL_II_DEPRECATED;
 
   /**
    * Return a constant reference to a Manifold object used for this

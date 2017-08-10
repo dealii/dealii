@@ -162,11 +162,13 @@ public:
    * smoothing algorithms are used with a particular boundary object. The
    * default implementation of this function throws an exception of type
    * ExcPureFunctionCalled.
+   *
+   * @deprecated Use Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::line_iterator &line,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const DEAL_II_DEPRECATED;
 
   /**
    * Same function as above but for a point that is to be projected onto the
@@ -175,11 +177,13 @@ public:
    * If spacedim<=2, then the surface represented by the quad iterator is the
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
+   *
+   * @deprecated Use Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const DEAL_II_DEPRECATED;
 
   /**
    * Same function as above but for a point that is to be projected onto the
@@ -188,11 +192,13 @@ public:
    * If spacedim<=3, then the manifold represented by the hex iterator is the
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
+   *
+   * @deprecated Use Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::hex_iterator &hex,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const DEAL_II_DEPRECATED;
 
 protected:
   /**
@@ -323,11 +329,16 @@ public:
    * If spacedim==1, then the line represented by the line iterator is the
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
+   *
+   * The default implementation of this function calls internally the
+   * project_to_manifold() function.
+   *
+   * @deprecated Use directly Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::line_iterator &line,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const DEAL_II_DEPRECATED;
 
   /**
    * Same function as above but for a point that is to be projected onto the
@@ -339,11 +350,16 @@ public:
    * If spacedim<=2, then the surface represented by the quad iterator is the
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
+   *
+   * The default implementation of this function calls internally the
+   * project_to_manifold() function.
+   *
+   * @deprecated Use directly Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::quad_iterator &quad,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const  DEAL_II_DEPRECATED;
 
   /**
    * Same function as above but for a point that is to be projected onto the
@@ -356,11 +372,31 @@ public:
    * If spacedim<=3, then the manifold represented by the hex iterator is the
    * entire space (i.e. it is a cell, not a part of the boundary), and the
    * returned point equals the given input point.
+   *
+   * The default implementation of this function calls internally the
+   * project_to_manifold() function.
+   *
+   * @deprecated Use directly Manifold::project_to_manifold() instead.
    */
   virtual
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::hex_iterator &hex,
-                      const Point<spacedim> &candidate) const;
+                      const Point<spacedim> &candidate) const  DEAL_II_DEPRECATED;
+
+  /**
+   * Given a candidate point and a collection of surrounding points on the,
+   * Manifold, return a point that lies on the Manifold described by this object.
+   * This function is used in some mesh smoothing algorithms that try to move
+   * around points in order to improve the mesh quality but need to ensure
+   * that points that were on a Manifold remain on the Manifold.
+   *
+   * The point returned is the projection of the candidate point onto the
+   * Manifold.
+   */
+  virtual
+  Point<spacedim>
+  project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
+                       const Point<spacedim> &candidate) const;
 };
 
 
@@ -412,13 +448,6 @@ void
 StraightBoundary<3,3>::
 get_intermediate_points_on_quad (const Triangulation<3,3>::quad_iterator &quad,
                                  std::vector<Point<3> > &points) const;
-
-template <>
-Point<3>
-StraightBoundary<1,3>::
-project_to_surface (const Triangulation<1, 3>::quad_iterator &quad,
-                    const Point<3>  &y) const;
-
 
 #endif // DOXYGEN
 

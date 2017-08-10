@@ -423,6 +423,31 @@ public:
                                        const Point<spacedim> &candidate) const;
 
   /**
+   * Given a point and a general mesh iterator, project the point on the
+   * Manifold, making sure it lies on the geometry with respect to the
+   * surrounding points associated with the manifold.
+   *
+   * This method calls internally the project_to_manifold() function, passing
+   * as arguments the vertices of the @p iterator argument, along with the
+   * @p candidate point.
+   *
+   * @param[in] iterator A mesh iterator that points to either a line, quad,
+   *   or hex.
+   * @param[in] candidate A candidate point to project on the iterator, respecting
+   *   the geometry.
+   * @tparam MeshIteratorType An iterator type that corresponds to either
+   *   Triangulation::cell_iterator (or variants such as
+   *   Triangulation::active_cell_iterator or DoFHandler::cell_iterator) or
+   *   that is the result of statements such as
+   *   <code>cell-@>face(f)</code> or <code>cell-@>line(l)</code>.
+   */
+  template<typename MeshIteratorType>
+  Point<spacedim>
+  project_to_manifold (const MeshIteratorType &iterator,
+                       const Point<spacedim> &candidate) const;
+
+
+  /**
    * Backward compatibility interface.  Return the point which shall become
    * the new middle vertex of the two children of a regular line. In 2D, this
    * line is a line at the boundary, while in 3d, it is bounding a face at the
@@ -1234,6 +1259,17 @@ namespace Manifolds
     return points_weights;
   }
 }
+
+template <int dim, int spacedim>
+template <typename MeshIteratorType>
+Point<spacedim>
+Manifold<dim,spacedim>::project_to_manifold(const MeshIteratorType &iterator,
+                                            const Point<spacedim> &candidate) const
+{
+  return project_to_manifold(Manifolds::get_default_quadrature(iterator).get_points(),
+                             candidate);
+}
+
 
 #endif // DOXYGEN
 

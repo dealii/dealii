@@ -76,7 +76,7 @@ void test ()
 
           deallog << "    Quad " << e << ", projected point=";
 
-          const Point<dim> p = boundary.project_to_surface (quad, trial_point);
+          const Point<dim> p = GridTools::project_to_object (quad, trial_point);
           deallog << p;
           deallog << "  (quad is from ";
           deallog << quad->vertex(0);

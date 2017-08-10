@@ -512,12 +512,58 @@ InvalidAccessor<structdim, dim, spacedim>::operator -- () const
 
 
 template <int structdim, int dim, int spacedim>
+inline
 types::manifold_id
 InvalidAccessor<structdim, dim, spacedim>::manifold_id () const
 {
   return numbers::invalid_manifold_id;
 }
 
+
+template <int structdim, int dim, int spacedim>
+inline
+Point<spacedim> &
+InvalidAccessor<structdim, dim, spacedim>::vertex (const unsigned int) const
+{
+  // nothing to do here. we could
+  // throw an exception but we can't
+  // get here without first creating
+  // an object which would have
+  // already thrown
+  static Point<spacedim> p;
+  return p;
+}
+
+
+template <int structdim, int dim, int spacedim>
+inline
+typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+InvalidAccessor<structdim, dim, spacedim>::line (const unsigned int /*i*/) const
+{
+  // nothing to do here. we could
+  // throw an exception but we can't
+  // get here without first creating
+  // an object which would have
+  // already thrown
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator line;
+  return line;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+inline
+typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+InvalidAccessor<structdim, dim, spacedim>::quad (const unsigned int /*i*/) const
+{
+  // nothing to do here. we could
+  // throw an exception but we can't
+  // get here without first creating
+  // an object which would have
+  // already thrown
+  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator quad;
+  return quad;
+}
 
 
 /*------------------------ Functions: TriaAccessor ---------------------------*/
