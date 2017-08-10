@@ -778,7 +778,6 @@ namespace Patterns
 
   bool Map::match (const std::string &test_string_list) const
   {
-    std::string tmp = test_string_list;
     std::vector<std::string> split_list =
       Utilities::split_string_list(test_string_list, separator);
     if ((split_list.size() < min_elements) ||
