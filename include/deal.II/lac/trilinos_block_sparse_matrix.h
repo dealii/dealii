@@ -369,8 +369,8 @@ namespace TrilinosWrappers
     void vmult (VectorType1       &dst,
                 const VectorType2 &src,
                 const bool         transpose,
-                const dealii::internal::bool2type<true>,
-                const dealii::internal::bool2type<true>) const;
+                const std::integral_constant<bool, true>,
+                const std::integral_constant<bool, true>) const;
 
     /**
      * Internal version of (T)vmult where the source vector is a block vector
@@ -380,8 +380,8 @@ namespace TrilinosWrappers
     void vmult (VectorType1       &dst,
                 const VectorType2 &src,
                 const bool         transpose,
-                const dealii::internal::bool2type<false>,
-                const dealii::internal::bool2type<true>) const;
+                const std::integral_constant<bool, false>,
+                const std::integral_constant<bool, true>) const;
 
     /**
      * Internal version of (T)vmult where the source vector is a non-block
@@ -391,8 +391,8 @@ namespace TrilinosWrappers
     void vmult (VectorType1       &dst,
                 const VectorType2 &src,
                 const bool         transpose,
-                const dealii::internal::bool2type<true>,
-                const dealii::internal::bool2type<false>) const;
+                const std::integral_constant<bool, true>,
+                const std::integral_constant<bool, false>) const;
 
     /**
      * Internal version of (T)vmult where both source vector and the
@@ -403,8 +403,8 @@ namespace TrilinosWrappers
     void vmult (VectorType1       &dst,
                 const VectorType2 &src,
                 const bool         transpose,
-                const dealii::internal::bool2type<false>,
-                const dealii::internal::bool2type<false>) const;
+                const std::integral_constant<bool, false>,
+                const std::integral_constant<bool, false>) const;
   };
 
 
@@ -455,8 +455,8 @@ namespace TrilinosWrappers
                             const VectorType2 &src) const
   {
     vmult(dst, src, false,
-          dealii::internal::bool2type<IsBlockVector<VectorType1>::value>(),
-          dealii::internal::bool2type<IsBlockVector<VectorType2>::value>());
+          std::integral_constant<bool, IsBlockVector<VectorType1>::value>(),
+          std::integral_constant<bool, IsBlockVector<VectorType2>::value>());
   }
 
 
@@ -468,8 +468,8 @@ namespace TrilinosWrappers
                              const VectorType2 &src) const
   {
     vmult(dst, src, true,
-          dealii::internal::bool2type<IsBlockVector<VectorType1>::value>(),
-          dealii::internal::bool2type<IsBlockVector<VectorType2>::value>());
+          std::integral_constant<bool, IsBlockVector<VectorType1>::value>(),
+          std::integral_constant<bool, IsBlockVector<VectorType2>::value>());
   }
 
 
@@ -480,8 +480,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult (VectorType1       &dst,
                             const VectorType2 &src,
                             const bool         transpose,
-                            dealii::internal::bool2type<true>,
-                            dealii::internal::bool2type<true>) const
+                            std::integral_constant<bool, true>,
+                            std::integral_constant<bool, true>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_block_block (dst, src);
@@ -498,8 +498,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult (VectorType1       &dst,
                             const VectorType2 &src,
                             const bool         transpose,
-                            dealii::internal::bool2type<false>,
-                            dealii::internal::bool2type<true>) const
+                            std::integral_constant<bool, false>,
+                            std::integral_constant<bool, true>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_nonblock_block (dst, src);
@@ -515,8 +515,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult (VectorType1       &dst,
                             const VectorType2 &src,
                             const bool         transpose,
-                            dealii::internal::bool2type<true>,
-                            dealii::internal::bool2type<false>) const
+                            std::integral_constant<bool, true>,
+                            std::integral_constant<bool, false>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_block_nonblock (dst, src);
@@ -532,8 +532,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult (VectorType1       &dst,
                             const VectorType2 &src,
                             const bool         transpose,
-                            dealii::internal::bool2type<false>,
-                            dealii::internal::bool2type<false>) const
+                            std::integral_constant<bool, false>,
+                            std::integral_constant<bool, false>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_nonblock_nonblock (dst, src);

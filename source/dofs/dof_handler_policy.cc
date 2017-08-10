@@ -1166,7 +1166,7 @@ namespace internal
         types::global_dof_index
         distribute_mg_dofs_on_cell (const typename DoFHandler<dim,spacedim>::level_cell_iterator &cell,
                                     types::global_dof_index   next_free_dof,
-                                    const internal::int2type<1> &)
+                                    const std::integral_constant<int, 1> &)
         {
           // distribute dofs of vertices
           if (cell->get_fe().dofs_per_vertex > 0)
@@ -1219,7 +1219,7 @@ namespace internal
         types::global_dof_index
         distribute_mg_dofs_on_cell (const typename DoFHandler<dim,spacedim>::level_cell_iterator &cell,
                                     types::global_dof_index   next_free_dof,
-                                    const internal::int2type<2> &)
+                                    const std::integral_constant<int, 2> &)
         {
           if (cell->get_fe().dofs_per_vertex > 0)
             // number dofs on vertices
@@ -1265,7 +1265,7 @@ namespace internal
         types::global_dof_index
         distribute_mg_dofs_on_cell (const typename DoFHandler<dim,spacedim>::level_cell_iterator &cell,
                                     types::global_dof_index   next_free_dof,
-                                    const internal::int2type<3> &)
+                                    const std::integral_constant<int, 3> &)
         {
           if (cell->get_fe().dofs_per_vertex > 0)
             // number dofs on vertices
@@ -1402,7 +1402,7 @@ namespace internal
                 (cell->level_subdomain_id() == level_subdomain_id))
               next_free_dof
                 = Implementation::distribute_mg_dofs_on_cell<dim,spacedim> (cell, next_free_dof,
-                    internal::int2type<dim>());
+                    std::integral_constant<int, dim>());
 
           // finally restore the user flags
           const_cast<dealii::Triangulation<dim,spacedim> &>(tria).load_user_flags(user_flags);

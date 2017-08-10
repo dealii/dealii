@@ -556,7 +556,7 @@ namespace internal
         const unsigned int obj_index,
         const unsigned int fe_index,
         const unsigned int local_index,
-        const int2type<1>)
+        const std::integral_constant<int, 1>)
       {
         return mg_level.dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
@@ -564,7 +564,7 @@ namespace internal
       template <int spacedim>
       static
       types::global_dof_index
-      get_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &, internal::DoFHandler::DoFFaces<2> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<1>)
+      get_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &, internal::DoFHandler::DoFFaces<2> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 1>)
       {
         return mg_faces.lines.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
@@ -572,7 +572,7 @@ namespace internal
       template <int spacedim>
       static
       types::global_dof_index
-      get_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &mg_level, internal::DoFHandler::DoFFaces<2> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<2>)
+      get_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &mg_level, internal::DoFHandler::DoFFaces<2> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 2>)
       {
         return mg_level.dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
@@ -580,7 +580,7 @@ namespace internal
       template <int spacedim>
       static
       types::global_dof_index
-      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<1>)
+      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 1>)
       {
         return mg_faces.lines.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
@@ -588,7 +588,7 @@ namespace internal
       template <int spacedim>
       static
       types::global_dof_index
-      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<2>)
+      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 2>)
       {
         return mg_faces.quads.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
@@ -596,49 +596,49 @@ namespace internal
       template <int spacedim>
       static
       types::global_dof_index
-      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &mg_level, internal::DoFHandler::DoFFaces<3> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<3>)
+      get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &mg_level, internal::DoFHandler::DoFFaces<3> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const std::integral_constant<int, 3>)
       {
         return mg_level.dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<1, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<1> &mg_level, internal::DoFHandler::DoFFaces<1> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<1>)
+      void set_dof_index (const DoFHandler<1, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<1> &mg_level, internal::DoFHandler::DoFFaces<1> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 1>)
       {
         mg_level.dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &, internal::DoFHandler::DoFFaces<2> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<1>)
+      void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &, internal::DoFHandler::DoFFaces<2> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 1>)
       {
         mg_faces.lines.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &mg_level, internal::DoFHandler::DoFFaces<2> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<2>)
+      void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &mg_level, internal::DoFHandler::DoFFaces<2> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 2>)
       {
         mg_level.dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<1>)
+      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 1>)
       {
         mg_faces.lines.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<2>)
+      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 2>)
       {
         mg_faces.quads.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
 
       template <int spacedim>
       static
-      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &mg_level, internal::DoFHandler::DoFFaces<3> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const int2type<3>)
+      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &mg_level, internal::DoFHandler::DoFFaces<3> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index, const std::integral_constant<int, 3>)
       {
         mg_level.dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
       }
@@ -1221,7 +1221,7 @@ DoFHandler<dim, spacedim>::get_dof_index (const unsigned int obj_level,
   return internal::DoFHandler::Implementation::get_dof_index (*this, *this->mg_levels[obj_level],
                                                               *this->mg_faces, obj_index,
                                                               fe_index, local_index,
-                                                              internal::int2type<structdim> ());
+                                                              std::integral_constant<int, structdim> ());
 }
 
 
@@ -1241,7 +1241,7 @@ void DoFHandler<dim, spacedim>::set_dof_index (const unsigned int obj_level,
                                                        fe_index,
                                                        local_index,
                                                        global_index,
-                                                       internal::int2type<structdim> ());
+                                                       std::integral_constant<int, structdim> ());
 }
 
 

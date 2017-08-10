@@ -825,8 +825,8 @@ namespace parallel
        *
        * This function exists in 2d and 3d variants.
        */
-      void copy_new_triangulation_to_p4est (dealii::internal::int2type<2>);
-      void copy_new_triangulation_to_p4est (dealii::internal::int2type<3>);
+      void copy_new_triangulation_to_p4est (std::integral_constant<int, 2>);
+      void copy_new_triangulation_to_p4est (std::integral_constant<int, 3>);
 
       /**
        * Copy the local part of the refined forest from p4est into the

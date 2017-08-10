@@ -1399,7 +1399,7 @@ private:
                               MatrixType                   &global_matrix,
                               VectorType                   &global_vector,
                               bool                          use_inhomogeneities_for_rhs,
-                              internal::bool2type<false>) const;
+                              std::integral_constant<bool, false>) const;
 
   /**
    * This function actually implements the local_to_global function for block
@@ -1413,7 +1413,7 @@ private:
                               MatrixType                   &global_matrix,
                               VectorType                   &global_vector,
                               bool                          use_inhomogeneities_for_rhs,
-                              internal::bool2type<true>) const;
+                              std::integral_constant<bool, true>) const;
 
   /**
    * This function actually implements the local_to_global function for
@@ -1425,7 +1425,7 @@ private:
                                SparsityPatternType          &sparsity_pattern,
                                const bool                    keep_constrained_entries,
                                const Table<2,bool>          &dof_mask,
-                               internal::bool2type<false>) const;
+                               std::integral_constant<bool, false>) const;
 
   /**
    * This function actually implements the local_to_global function for block
@@ -1437,7 +1437,7 @@ private:
                                SparsityPatternType          &sparsity_pattern,
                                const bool                    keep_constrained_entries,
                                const Table<2,bool>          &dof_mask,
-                               internal::bool2type<true>) const;
+                               std::integral_constant<bool, true>) const;
 
   /**
    * Internal helper function for distribute_local_to_global function.
@@ -1888,7 +1888,7 @@ distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>   
   Vector<typename MatrixType::value_type> dummy(0);
   distribute_local_to_global (local_matrix, dummy, local_dof_indices,
                               global_matrix, dummy, false,
-                              dealii::internal::bool2type<IsBlockMatrix<MatrixType>::value>());
+                              std::integral_constant<bool, IsBlockMatrix<MatrixType>::value>());
 }
 
 
@@ -1909,7 +1909,7 @@ distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>   
   // the actual implementation follows in the cm.templates.h file.
   distribute_local_to_global (local_matrix, local_vector, local_dof_indices,
                               global_matrix, global_vector, use_inhomogeneities_for_rhs,
-                              dealii::internal::bool2type<IsBlockMatrix<MatrixType>::value>());
+                              std::integral_constant<bool, IsBlockMatrix<MatrixType>::value>());
 }
 
 
@@ -1928,7 +1928,7 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
   // the actual implementation follows in the cm.templates.h file.
   add_entries_local_to_global (local_dof_indices, sparsity_pattern,
                                keep_constrained_entries, dof_mask,
-                               internal::bool2type<IsBlockMatrix<SparsityPatternType>::value>());
+                               std::integral_constant<bool, IsBlockMatrix<SparsityPatternType>::value>());
 }
 
 

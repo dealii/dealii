@@ -219,7 +219,7 @@ namespace internal
                      const unsigned int                      obj_index,
                      const unsigned int                      fe_index,
                      const unsigned int                      local_index,
-                     dealii::internal::int2type<1>)
+                     std::integral_constant<int, 1>)
       {
         return dof_handler.levels[obj_level]->dof_object.
                get_dof_index (dof_handler,
@@ -237,7 +237,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<1>,
+                     std::integral_constant<int, 1>,
                      const types::global_dof_index              global_index)
       {
         dof_handler.levels[obj_level]->dof_object.
@@ -257,7 +257,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<1>)
+                     std::integral_constant<int, 1>)
       {
         (void)obj_level;
         // faces have no levels
@@ -278,7 +278,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<1>,
+                     std::integral_constant<int, 1>,
                      const types::global_dof_index              global_index)
       {
         (void)obj_level;
@@ -301,7 +301,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<2>)
+                     std::integral_constant<int, 2>)
       {
         return dof_handler.levels[obj_level]->dof_object.
                get_dof_index (dof_handler,
@@ -319,7 +319,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<2>,
+                     std::integral_constant<int, 2>,
                      const types::global_dof_index              global_index)
       {
         dof_handler.levels[obj_level]->dof_object.
@@ -339,7 +339,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<1>)
+                     std::integral_constant<int, 1>)
       {
         (void)obj_level;
         // faces have no levels
@@ -360,7 +360,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<1>,
+                     std::integral_constant<int, 1>,
                      const types::global_dof_index              global_index)
       {
         (void)obj_level;
@@ -384,7 +384,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<2>)
+                     std::integral_constant<int, 2>)
       {
         (void)obj_level;
         // faces have no levels
@@ -405,7 +405,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<2>,
+                     std::integral_constant<int, 2>,
                      const types::global_dof_index              global_index)
       {
         (void)obj_level;
@@ -429,7 +429,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<3>)
+                     std::integral_constant<int, 3>)
       {
         return dof_handler.levels[obj_level]->dof_object.
                get_dof_index (dof_handler,
@@ -447,7 +447,7 @@ namespace internal
                      const unsigned int              obj_index,
                      const unsigned int              fe_index,
                      const unsigned int              local_index,
-                     dealii::internal::int2type<3>,
+                     std::integral_constant<int, 3>,
                      const types::global_dof_index              global_index)
       {
         dof_handler.levels[obj_level]->dof_object.
@@ -467,7 +467,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<1> &)
+                     const std::integral_constant<int, 1> &)
       {
         return dof_handler.levels[obj_level]->
                get_dof_index (obj_index,
@@ -484,7 +484,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<1> &,
+                     const std::integral_constant<int, 1> &,
                      const types::global_dof_index       global_index)
       {
         dof_handler.levels[obj_level]->
@@ -503,7 +503,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<1> &)
+                     const std::integral_constant<int, 1> &)
       {
         return dof_handler.faces->lines.
                get_dof_index (dof_handler,
@@ -522,7 +522,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<1> &,
+                     const std::integral_constant<int, 1> &,
                      const types::global_dof_index       global_index)
       {
         dof_handler.faces->lines.
@@ -543,7 +543,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<2> &)
+                     const std::integral_constant<int, 2> &)
       {
         return dof_handler.levels[obj_level]->
                get_dof_index (obj_index,
@@ -560,7 +560,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<2> &,
+                     const std::integral_constant<int, 2> &,
                      const types::global_dof_index       global_index)
       {
         dof_handler.levels[obj_level]->
@@ -579,7 +579,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<1> &)
+                     const std::integral_constant<int, 1> &)
       {
         return dof_handler.faces->lines.
                get_dof_index (dof_handler,
@@ -598,7 +598,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<1> &,
+                     const std::integral_constant<int, 1> &,
                      const types::global_dof_index       global_index)
       {
         dof_handler.faces->lines.
@@ -619,7 +619,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<2> &)
+                     const std::integral_constant<int, 2> &)
       {
         return dof_handler.faces->quads.
                get_dof_index (dof_handler,
@@ -638,7 +638,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<2> &,
+                     const std::integral_constant<int, 2> &,
                      const types::global_dof_index       global_index)
       {
         dof_handler.faces->quads.
@@ -659,7 +659,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<3> &)
+                     const std::integral_constant<int, 3> &)
       {
         return dof_handler.levels[obj_level]->
                get_dof_index (obj_index,
@@ -676,7 +676,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const dealii::internal::int2type<3> &,
+                     const std::integral_constant<int, 3> &,
                      const types::global_dof_index       global_index)
       {
         dof_handler.levels[obj_level]->
@@ -749,7 +749,7 @@ namespace internal
                           const unsigned int,
                           const unsigned int,
                           const unsigned int fe_index,
-                          const dealii::internal::int2type<structdim> &)
+                          const std::integral_constant<int, structdim> &)
       {
         return (fe_index == 0);
       }
@@ -762,7 +762,7 @@ namespace internal
       n_active_fe_indices (const dealii::DoFHandler<dim,spacedim> &dof_handler,
                            const unsigned int obj_level,
                            const unsigned int obj_index,
-                           const dealii::internal::int2type<structdim> &)
+                           const std::integral_constant<int, structdim> &)
       {
         (void)dof_handler;
         (void)obj_level;
@@ -811,7 +811,7 @@ namespace internal
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const unsigned int n,
-                           const dealii::internal::int2type<structdim> &)
+                           const std::integral_constant<int, structdim> &)
       {
         (void)dof_handler;
         (void)obj_level;
@@ -862,7 +862,7 @@ namespace internal
                           const unsigned int obj_level,
                           const unsigned int obj_index,
                           const unsigned int fe_index,
-                          const dealii::internal::int2type<1> &)
+                          const std::integral_constant<int, 1> &)
       {
         return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
                                                                  fe_index);
@@ -875,7 +875,7 @@ namespace internal
       n_active_fe_indices (const dealii::hp::DoFHandler<1,spacedim> &,
                            const unsigned int /*obj_level*/,
                            const unsigned int /*obj_index*/,
-                           const dealii::internal::int2type<1> &)
+                           const std::integral_constant<int, 1> &)
       {
         // on a cell, the number of active elements is one
         return 1;
@@ -890,7 +890,7 @@ namespace internal
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const unsigned int n,
-                           const dealii::internal::int2type<1> &)
+                           const std::integral_constant<int, 1> &)
       {
         (void)n;
         Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
@@ -905,7 +905,7 @@ namespace internal
                           const unsigned int obj_level,
                           const unsigned int obj_index,
                           const unsigned int fe_index,
-                          const dealii::internal::int2type<1> &)
+                          const std::integral_constant<int, 1> &)
       {
         return dof_handler.faces->lines.fe_index_is_active(dof_handler,
                                                            obj_index,
@@ -920,7 +920,7 @@ namespace internal
       n_active_fe_indices (const dealii::hp::DoFHandler<2,spacedim> &dof_handler,
                            const unsigned int,
                            const unsigned int obj_index,
-                           const dealii::internal::int2type<1> &)
+                           const std::integral_constant<int, 1> &)
       {
         return dof_handler.faces->lines.n_active_fe_indices (dof_handler,
                                                              obj_index);
@@ -934,7 +934,7 @@ namespace internal
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const unsigned int n,
-                           const dealii::internal::int2type<1> &)
+                           const std::integral_constant<int, 1> &)
       {
         return dof_handler.faces->lines.nth_active_fe_index (dof_handler,
                                                              obj_level,
@@ -951,7 +951,7 @@ namespace internal
                           const unsigned int obj_level,
                           const unsigned int obj_index,
                           const unsigned int fe_index,
-                          const dealii::internal::int2type<2> &)
+                          const std::integral_constant<int, 2> &)
       {
         return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
                                                                  fe_index);
@@ -964,7 +964,7 @@ namespace internal
       n_active_fe_indices (const dealii::hp::DoFHandler<2,spacedim> &,
                            const unsigned int /*obj_level*/,
                            const unsigned int /*obj_index*/,
-                           const dealii::internal::int2type<2> &)
+                           const std::integral_constant<int, 2> &)
       {
         // on a cell, the number of active elements is one
         return 1;
@@ -979,7 +979,7 @@ namespace internal
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const unsigned int n,
-                           const dealii::internal::int2type<2> &)
+                           const std::integral_constant<int, 2> &)
       {
         (void)n;
         Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
@@ -995,7 +995,7 @@ namespace internal
                           const unsigned int obj_level,
                           const unsigned int obj_index,
                           const unsigned int fe_index,
-                          const dealii::internal::int2type<1> &)
+                          const std::integral_constant<int, 1> &)
       {
         return dof_handler.faces->lines.fe_index_is_active(dof_handler,
                                                            obj_index,
@@ -1010,7 +1010,7 @@ namespace internal
       n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
                            const unsigned int,
                            const unsigned int obj_index,
-                           const dealii::internal::int2type<1> &)
+                           const std::integral_constant<int, 1> &)
       {
         return dof_handler.faces->lines.n_active_fe_indices (dof_handler,
                                                              obj_index);
@@ -1025,7 +1025,7 @@ namespace internal
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const unsigned int n,
-                           const dealii::internal::int2type<1> &)
+                           const std::integral_constant<int, 1> &)
       {
         return dof_handler.faces->lines.nth_active_fe_index (dof_handler,
                                                              obj_level,
@@ -1042,7 +1042,7 @@ namespace internal
                           const unsigned int obj_level,
                           const unsigned int obj_index,
                           const unsigned int fe_index,
-                          const dealii::internal::int2type<2> &)
+                          const std::integral_constant<int, 2> &)
       {
         return dof_handler.faces->quads.fe_index_is_active(dof_handler,
                                                            obj_index,
@@ -1057,7 +1057,7 @@ namespace internal
                           const unsigned int obj_level,
                           const unsigned int obj_index,
                           const unsigned int fe_index,
-                          const dealii::internal::int2type<3> &)
+                          const std::integral_constant<int, 3> &)
       {
         return dof_handler.levels[obj_level]->fe_index_is_active(obj_index,
                                                                  fe_index);
@@ -1070,7 +1070,7 @@ namespace internal
       n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &dof_handler,
                            const unsigned int,
                            const unsigned int obj_index,
-                           const dealii::internal::int2type<2> &)
+                           const std::integral_constant<int, 2> &)
       {
         return dof_handler.faces->quads.n_active_fe_indices (dof_handler,
                                                              obj_index);
@@ -1085,7 +1085,7 @@ namespace internal
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const unsigned int n,
-                           const dealii::internal::int2type<2> &)
+                           const std::integral_constant<int, 2> &)
       {
         return dof_handler.faces->quads.nth_active_fe_index (dof_handler,
                                                              obj_level,
@@ -1101,7 +1101,7 @@ namespace internal
       n_active_fe_indices (const dealii::hp::DoFHandler<3,spacedim> &,
                            const unsigned int /*obj_level*/,
                            const unsigned int /*obj_index*/,
-                           const dealii::internal::int2type<3> &)
+                           const std::integral_constant<int, 3> &)
       {
         // on a cell, the number of active elements is one
         return 1;
@@ -1116,7 +1116,7 @@ namespace internal
                            const unsigned int obj_level,
                            const unsigned int obj_index,
                            const unsigned int n,
-                           const dealii::internal::int2type<3> &)
+                           const std::integral_constant<int, 3> &)
       {
         (void)n;
         Assert (n==0, ExcMessage("On cells, there can only be one active FE index"));
@@ -1609,7 +1609,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::dof_index (const unsigned int 
          this->present_index,
          fe_index,
          i,
-         dealii::internal::int2type<dim>());
+         std::integral_constant<int, dim>());
 }
 
 
@@ -1636,7 +1636,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::set_dof_index (const unsigned 
       this->present_index,
       fe_index,
       i,
-      dealii::internal::int2type<dim>(),
+      std::integral_constant<int, dim>(),
       index);
 }
 
@@ -1653,7 +1653,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::n_active_fe_indices () const
     n_active_fe_indices (*this->dof_handler,
                          this->level(),
                          this->present_index,
-                         dealii::internal::int2type<dim>());
+                         std::integral_constant<int, dim>());
 }
 
 
@@ -1670,7 +1670,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::nth_active_fe_index (const uns
                          this->level(),
                          this->present_index,
                          n,
-                         dealii::internal::int2type<dim>());
+                         std::integral_constant<int, dim>());
 }
 
 
@@ -1687,7 +1687,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::fe_index_is_active (const unsi
                         this->level(),
                         this->present_index,
                         fe_index,
-                        dealii::internal::int2type<dim>());
+                        std::integral_constant<int, dim>());
 }
 
 
@@ -3512,7 +3512,7 @@ namespace internal
     TriaIterator<dealii::DoFAccessor<DoFHandlerType::dimension-1,DoFHandlerType,level_dof_access> >
     get_face (const dealii::DoFCellAccessor<DoFHandlerType,level_dof_access> &cell,
               const unsigned int i,
-              const dealii::internal::int2type<1>)
+              const std::integral_constant<int, 1>)
     {
       dealii::DoFAccessor<0, DoFHandlerType,level_dof_access>
       a (&cell.get_triangulation(),
@@ -3536,7 +3536,7 @@ namespace internal
     TriaIterator<dealii::DoFAccessor<DoFHandlerType::dimension-1,DoFHandlerType,level_dof_access> >
     get_face (const dealii::DoFCellAccessor<DoFHandlerType,level_dof_access> &cell,
               const unsigned int i,
-              const dealii::internal::int2type<2>)
+              const std::integral_constant<int, 2>)
     {
       return cell.line(i);
     }
@@ -3547,7 +3547,7 @@ namespace internal
     TriaIterator<dealii::DoFAccessor<DoFHandlerType::dimension-1,DoFHandlerType,level_dof_access> >
     get_face (const dealii::DoFCellAccessor<DoFHandlerType,level_dof_access> &cell,
               const unsigned int i,
-              const dealii::internal::int2type<3>)
+              const std::integral_constant<int, 3>)
     {
       return cell.quad(i);
     }
@@ -3563,7 +3563,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::face (const unsigned int i) co
   Assert (i<GeometryInfo<dim>::faces_per_cell, ExcIndexRange (i, 0, GeometryInfo<dim>::faces_per_cell));
 
   const unsigned int dim = DoFHandlerType::dimension;
-  return dealii::internal::DoFCellAccessor::get_face (*this, i, dealii::internal::int2type<dim>());
+  return dealii::internal::DoFCellAccessor::get_face (*this, i, std::integral_constant<int, dim>());
 }
 
 

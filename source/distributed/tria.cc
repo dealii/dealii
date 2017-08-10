@@ -1343,7 +1343,7 @@ namespace parallel
 
       setup_coarse_cell_to_p4est_tree_permutation ();
 
-      copy_new_triangulation_to_p4est (dealii::internal::int2type<dim>());
+      copy_new_triangulation_to_p4est (std::integral_constant<int, dim>());
 
       try
         {
@@ -1997,7 +1997,7 @@ namespace parallel
 
     template <>
     void
-    Triangulation<2,2>::copy_new_triangulation_to_p4est (dealii::internal::int2type<2>)
+    Triangulation<2,2>::copy_new_triangulation_to_p4est (std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2, spacedim = 2;
       Assert (this->n_cells(0) > 0, ExcInternalError());
@@ -2068,7 +2068,7 @@ namespace parallel
     // specialize the dim template argument, but let spacedim open
     template <>
     void
-    Triangulation<2,3>::copy_new_triangulation_to_p4est (dealii::internal::int2type<2>)
+    Triangulation<2,3>::copy_new_triangulation_to_p4est (std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2, spacedim = 3;
       Assert (this->n_cells(0) > 0, ExcInternalError());
@@ -2137,7 +2137,7 @@ namespace parallel
 
     template <>
     void
-    Triangulation<3,3>::copy_new_triangulation_to_p4est (dealii::internal::int2type<3>)
+    Triangulation<3,3>::copy_new_triangulation_to_p4est (std::integral_constant<int, 3>)
     {
       const int dim = 3, spacedim = 3;
       Assert (this->n_cells(0) > 0, ExcInternalError());
@@ -3693,7 +3693,7 @@ namespace parallel
           setup_coarse_cell_to_p4est_tree_permutation ();
         }
 
-      copy_new_triangulation_to_p4est (dealii::internal::int2type<dim>());
+      copy_new_triangulation_to_p4est (std::integral_constant<int, dim>());
 
       try
         {

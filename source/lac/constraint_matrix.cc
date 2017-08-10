@@ -1323,7 +1323,7 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
                                                       MatrixType                      &, \
                                                       VectorType                      &, \
                                                       bool                             , \
-                                                      internal::bool2type<false>) const
+                                                      std::integral_constant<bool, false>) const
 #define MATRIX_FUNCTIONS(MatrixType) \
   template void ConstraintMatrix:: \
   distribute_local_to_global<MatrixType,Vector<MatrixType::value_type> > (const FullMatrix<MatrixType::value_type>        &, \
@@ -1332,7 +1332,7 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
       MatrixType                      &, \
       Vector<MatrixType::value_type>                  &, \
       bool                             , \
-      internal::bool2type<false>) const
+      std::integral_constant<bool, false>) const
 #define BLOCK_MATRIX_VECTOR_FUNCTIONS(MatrixType, VectorType)   \
   template void ConstraintMatrix:: \
   distribute_local_to_global<MatrixType,VectorType > (const FullMatrix<MatrixType::value_type>        &, \
@@ -1341,7 +1341,7 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
                                                       MatrixType                      &, \
                                                       VectorType                      &, \
                                                       bool                             , \
-                                                      internal::bool2type<true>) const
+                                                      std::integral_constant<bool, true>) const
 #define BLOCK_MATRIX_FUNCTIONS(MatrixType)      \
   template void ConstraintMatrix:: \
   distribute_local_to_global<MatrixType,Vector<MatrixType::value_type> > (const FullMatrix<MatrixType::value_type>        &, \
@@ -1350,7 +1350,7 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
       MatrixType                      &, \
       Vector<MatrixType::value_type>                  &, \
       bool                             , \
-      internal::bool2type<true>) const
+      std::integral_constant<bool, true>) const
 
 MATRIX_FUNCTIONS(SparseMatrix<double>);
 MATRIX_FUNCTIONS(SparseMatrix<float>);
@@ -1395,7 +1395,7 @@ BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrapp
       SparsityPatternType &,                                                         \
       const bool,                                                                    \
       const Table<2,bool> &,                                                         \
-      internal::bool2type<false>) const;                                             \
+      std::integral_constant<bool, false>) const;                                             \
   template void ConstraintMatrix::add_entries_local_to_global<SparsityPatternType> ( \
       const std::vector<ConstraintMatrix::size_type> &,                              \
       const std::vector<ConstraintMatrix::size_type> &,                              \
@@ -1408,7 +1408,7 @@ BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrapp
       SparsityPatternType &,                                                         \
       const bool,                                                                    \
       const Table<2,bool> &,                                                         \
-      internal::bool2type<true>) const;                                              \
+      std::integral_constant<bool, true>) const;                                              \
   template void ConstraintMatrix::add_entries_local_to_global<SparsityPatternType> ( \
       const std::vector<ConstraintMatrix::size_type> &,                              \
       const std::vector<ConstraintMatrix::size_type> &,                              \

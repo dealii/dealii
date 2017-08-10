@@ -1,0 +1,4 @@
+Deprecated: internal::bool2type and int2type has been depreated
+in favor of std::intergral_constant.
+<br>
+(Daniel Arndt, 2017/08/10)

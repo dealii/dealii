@@ -1654,7 +1654,7 @@ namespace internal
     template <int rank>
     TableIndices<rank>
     get_partially_filled_indices (const unsigned int row,
-                                  const internal::int2type<2> &)
+                                  const std::integral_constant<int, 2> &)
     {
       return TableIndices<rank> (row,
                                  numbers::invalid_unsigned_int);
@@ -1665,7 +1665,7 @@ namespace internal
     template <int rank>
     TableIndices<rank>
     get_partially_filled_indices (const unsigned int row,
-                                  const internal::int2type<4> &)
+                                  const std::integral_constant<int, 4> &)
     {
       return TableIndices<rank> (row,
                                  numbers::invalid_unsigned_int,
@@ -1685,7 +1685,7 @@ SymmetricTensor<rank,dim,Number>::operator [] (const unsigned int row) const
     internal::SymmetricTensorAccessors::
     Accessor<rank,dim,true,rank-1,Number> (*this,
                                            internal::SymmetricTensor::get_partially_filled_indices<rank> (row,
-                                               internal::int2type<rank>()));
+                                               std::integral_constant<int, rank>()));
 }
 
 
@@ -1698,7 +1698,7 @@ SymmetricTensor<rank,dim,Number>::operator [] (const unsigned int row)
     internal::SymmetricTensorAccessors::
     Accessor<rank,dim,false,rank-1,Number> (*this,
                                             internal::SymmetricTensor::get_partially_filled_indices<rank> (row,
-                                                internal::int2type<rank>()));
+                                                std::integral_constant<int, rank>()));
 }
 
 
@@ -1990,7 +1990,7 @@ namespace internal
       TableIndices<2>
       unrolled_to_component_indices
       (const unsigned int i,
-       const int2type<2> &)
+       const std::integral_constant<int, 2> &)
       {
         Assert ((i < dealii::SymmetricTensor<2,dim,double>::n_independent_components),
                 ExcIndexRange(i, 0, dealii::SymmetricTensor<2,dim,double>::n_independent_components));
@@ -2054,7 +2054,7 @@ namespace internal
       TableIndices<rank>
       unrolled_to_component_indices
       (const unsigned int i,
-       const int2type<rank> &)
+       const std::integral_constant<int, rank> &)
       {
         (void)i;
         Assert ((i < dealii::SymmetricTensor<rank,dim,double>::n_independent_components),
@@ -2075,7 +2075,7 @@ SymmetricTensor<rank,dim,Number>::unrolled_to_component_indices
 {
   return
     internal::SymmetricTensor::unrolled_to_component_indices<dim> (i,
-        internal::int2type<rank>());
+        std::integral_constant<int, rank>());
 }
 
 
