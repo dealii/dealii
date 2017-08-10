@@ -463,6 +463,14 @@ namespace FEValuesViews
                                          std::vector<typename ProductType<third_derivative_type,
                                          typename InputVector::value_type>::type> &third_derivatives) const;
 
+    /**
+     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_third_derivatives_from_local_dof_values (const InputVector &dof_values,
+                                                               std::vector<typename OutputType<typename InputVector::value_type>::third_derivative_type> &third_derivatives) const;
+
+
   private:
     /**
      * A pointer to the FEValuesBase object we operate on.
