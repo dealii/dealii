@@ -1829,6 +1829,26 @@ namespace FEValuesViews
   template <int dim, int spacedim>
   template <class InputVector>
   void
+  Vector<dim,spacedim>::
+  get_function_third_derivatives_from_local_dof_values(const InputVector &dof_values,
+                                                       std::vector<typename OutputType<typename InputVector::value_type>::third_derivative_type> &third_derivatives) const
+  {
+    Assert (fe_values->update_flags & update_3rd_derivatives,
+            (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_3rd_derivatives")));
+    Assert (fe_values->present_cell.get() != nullptr,
+            ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    AssertDimension (dof_values.size(), fe_values->dofs_per_cell);
+
+    internal::do_function_derivatives<3,dim,spacedim>
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_3rd_derivatives, shape_function_data, third_derivatives);
+  }
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
   SymmetricTensor<2, dim, spacedim>::
   get_function_values(const InputVector &fe_function,
                       std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const
