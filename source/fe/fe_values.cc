@@ -959,7 +959,7 @@ namespace FEValuesViews
     do_function_laplacians (const ArrayView<Number> &dof_values,
                             const Table<2,dealii::Tensor<2,spacedim> > &shape_hessians,
                             const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                            std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &laplacians)
+                            std::vector<typename Vector<dim,spacedim>::template OutputType<Number>::laplacian_type> &laplacians)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -967,7 +967,7 @@ namespace FEValuesViews
       AssertDimension (laplacians.size(), n_quadrature_points);
 
       std::fill (laplacians.begin(), laplacians.end(),
-                 typename ProductType<Number,dealii::Tensor<1,spacedim> >::type());
+                 typename Vector<dim,spacedim>::template OutputType<Number>::laplacian_type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1773,6 +1773,29 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<typename InputVector::value_type> dof_values (fe_values->dofs_per_cell);
     fe_values->present_cell->get_interpolated_dof_values(fe_function, dof_values);
+    internal::do_function_laplacians<dim,spacedim>
+    (make_array_view(dof_values.begin(), dof_values.end()),
+     fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
+  }
+
+
+
+
+  template <int dim, int spacedim>
+  template <class InputVector>
+  void
+  Vector<dim,spacedim>::
+  get_function_laplacians_from_local_dof_values(const InputVector &dof_values,
+                                                std::vector<typename OutputType<typename InputVector::value_type>::laplacian_type> &laplacians) const
+  {
+    Assert (fe_values->update_flags & update_hessians,
+            (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_hessians")));
+    Assert (laplacians.size() == fe_values->n_quadrature_points,
+            ExcDimensionMismatch(laplacians.size(), fe_values->n_quadrature_points));
+    Assert (fe_values->present_cell.get() != nullptr,
+            ExcMessage ("FEValues object is not reinit'ed to any cell"));
+    AssertDimension (dof_values.size(), fe_values->dofs_per_cell);
+
     internal::do_function_laplacians<dim,spacedim>
     (make_array_view(dof_values.begin(), dof_values.end()),
      fe_values->finite_element_output.shape_hessians, shape_function_data, laplacians);
