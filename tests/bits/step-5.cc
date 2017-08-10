@@ -19,10 +19,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
-std::ofstream logfile("output");
-
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -327,22 +323,10 @@ void LaplaceProblem<dim>::run ()
 
 int main ()
 {
-  deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
-
+  initlog();
 
   LaplaceProblem<2> laplace_problem_2d;
   laplace_problem_2d.run ();
-
-  /*
-    Coefficient<2>    coefficient;
-    std::vector<Point<2> > points (2);
-    std::vector<double>    coefficient_values (1);
-    coefficient.value_list (points, coefficient_values);
-  */
 
   return 0;
 }

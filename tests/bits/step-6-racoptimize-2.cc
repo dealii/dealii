@@ -379,42 +379,10 @@ void LaplaceProblem<dim>::run ()
 
 int main ()
 {
-  deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
+  initlog();
 
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
-
-  try
-    {
-
-      LaplaceProblem<2> laplace_problem_2d;
-      laplace_problem_2d.run ();
-    }
-  catch (std::exception &exc)
-    {
-      deallog << std::endl << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
-      deallog << "Exception on processing: " << std::endl
-              << exc.what() << std::endl
-              << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
-
-      return 1;
-    }
-  catch (...)
-    {
-      deallog << std::endl << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
-      deallog << "Unknown exception!" << std::endl
-              << "Aborting!" << std::endl
-              << "----------------------------------------------------"
-              << std::endl;
-      return 1;
-    }
+  LaplaceProblem<2> laplace_problem_2d;
+  laplace_problem_2d.run();
 
   return 0;
 }
