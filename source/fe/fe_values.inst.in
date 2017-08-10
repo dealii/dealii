@@ -186,6 +186,11 @@ for (VEC : GENERAL_CONTAINER_TYPES;
     void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
     ::get_function_symmetric_gradients_from_local_dof_values<VEC<Number>>
             (const VEC<Number>&, std::vector<typename OutputType<Number>::symmetric_gradient_type>&) const;
+
+    template
+    void FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>
+    ::get_function_divergences_from_local_dof_values<VEC<Number>>
+            (const VEC<Number>&, std::vector<typename OutputType<Number>::divergence_type>&) const;
 #endif
 }
 
