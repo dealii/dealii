@@ -1,0 +1,6 @@
+Removed: The reproducible test functionality has been removed from deallog.
+This includes <code>test_mode()</code>, <code>threshold_double()</code>,
+and <code>threshold_float()</code>. Use numdiff, or other tools that can do
+output comparison with small numerical differences instead.
+<br>
+(Matthias Maier, 2017/08/10)
