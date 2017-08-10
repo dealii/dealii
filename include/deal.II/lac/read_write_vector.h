@@ -32,7 +32,11 @@
 #ifdef DEAL_II_WITH_TRILINOS
 #include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
-#include "Epetra_MultiVector.h"
+
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#  include <Epetra_MultiVector.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
 #endif
 
 DEAL_II_NAMESPACE_OPEN
