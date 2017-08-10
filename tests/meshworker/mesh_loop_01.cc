@@ -22,6 +22,7 @@
 
 #include <fstream>
 
+using namespace MeshWorker;
 
 int main()
 {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2016 by the deal.II authors
+// Copyright (C) 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__mesh_loop_h
-#define dealii__mesh_loop_h
+#ifndef dealii__mesh_worker_mesh_loop_h
+#define dealii__mesh_worker_mesh_loop_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/work_stream.h>
@@ -42,51 +42,44 @@ namespace MeshWorker
    * @ingroup MeshWorker
    * @author Luca Heltai, 2017
    */
-  template <class Iterator,
-            class CellWorker, class Copyer,
-            class ScratchData, class CopyData,
-            class BoundaryWorker, class FaceWorker>
-  void mesh_loop(const Iterator &begin,
-                 const typename identity<Iterator>::type &end,
+  template <class CellIteratorType,
+            class ScratchData, class CopyData>
+  void mesh_loop(const CellIteratorType &begin,
+                 const typename identity<CellIteratorType>::type &end,
 
-//                 const std::function<void (const Iterator &, ScratchData &, CopyData &)> &cell_worker,
-//                 const std::function<void (const CopyData &)> &copyer,
-                 CellWorker cell_worker,
-                 Copyer copyer,
+                 const typename identity<std::function<void (const CellIteratorType &, ScratchData &, CopyData &)>>::type &cell_worker,
+                 const typename identity<std::function<void (const CopyData &)>>::type &copyer,
 
                  ScratchData &scratch_data,
                  CopyData &copy_data,
 
                  const AssembleFlags flags = assemble_own_cells,
 
-//                 const std::function<void (const Iterator &, const unsigned int&, ScratchData &, CopyData &)> &boundary_worker=
-//                  std::function<void (const Iterator &, const unsigned int&, ScratchData &, CopyData &)>(),
+                 const typename identity<std::function<void (const CellIteratorType &, const unsigned int&, ScratchData &, CopyData &)>>::type &boundary_worker=
+                  std::function<void (const CellIteratorType &, const unsigned int&, ScratchData &, CopyData &)>(),
 
-//                 const std::function<void (const Iterator &, const unsigned int &, const unsigned int &,
-//                                           const Iterator &, const unsigned int &, const unsigned int &,
-//                                           ScratchData &, CopyData &)> &face_worker=
-//                  std::function<void (const Iterator &, unsigned int, unsigned int,
-//                                      const Iterator &, unsigned int, unsigned int,
-//                                      ScratchData &, CopyData &)>(),
-
-                 BoundaryWorker boundary_worker = BoundaryWorker(),
-                 FaceWorker face_worker = FaceWorker(),
+                 const typename identity<std::function<void (const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                           const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                           ScratchData &, CopyData &)>>::type &face_worker=
+                  std::function<void (const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                      const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                      ScratchData &, CopyData &)>(),
 
                  const unsigned int   queue_length = 2*MultithreadInfo::n_threads(),
                  const unsigned int   chunk_size = 8)
   {
-    auto cell_action = [&] (const Iterator &cell, ScratchData &scratch, CopyData &copy)
+    auto cell_action = [&] (const CellIteratorType &cell, ScratchData &scratch, CopyData &copy)
     {
       const bool ignore_subdomain = (cell->get_triangulation().locally_owned_subdomain()
                                      == numbers::invalid_subdomain_id);
 
-      types::subdomain_id csid = /*(cell->is_level_cell())
+      types::subdomain_id current_subdomain_id = /*(cell->is_level_cell())
                                  ? cell->level_subdomain_id()
                                  : */cell->subdomain_id();
 
-      const bool own_cell = ignore_subdomain || (csid == cell->get_triangulation().locally_owned_subdomain());
+      const bool own_cell = ignore_subdomain || (current_subdomain_id == cell->get_triangulation().locally_owned_subdomain());
 
-      if ((!ignore_subdomain) && (csid == numbers::artificial_subdomain_id))
+      if ((!ignore_subdomain) && (current_subdomain_id == numbers::artificial_subdomain_id))
         return;
 
       if ( (flags & (assemble_cells_first)) &&
@@ -95,9 +88,9 @@ namespace MeshWorker
         cell_worker(cell, scratch, copy);
 
       if (flags & assemble_own_faces)
-        for (unsigned int face_no=0; face_no < GeometryInfo<Iterator::AccessorType::Container::dimension>::faces_per_cell; ++face_no)
+        for (unsigned int face_no=0; face_no < GeometryInfo<CellIteratorType::AccessorType::Container::dimension>::faces_per_cell; ++face_no)
           {
-            typename Iterator::AccessorType::Container::face_iterator face = cell->face(face_no);
+            typename CellIteratorType::AccessorType::Container::face_iterator face = cell->face(face_no);
             if (cell->at_boundary(face_no) && !cell->has_periodic_neighbor(face_no))
               {
                 // only integrate boundary faces of own cells
@@ -109,17 +102,17 @@ namespace MeshWorker
             else if (flags & assemble_own_interior_faces)
               {
                 // Interior face
-                TriaIterator<typename Iterator::AccessorType> neighbor = cell->neighbor_or_periodic_neighbor(face_no);
+                TriaIterator<typename CellIteratorType::AccessorType> neighbor = cell->neighbor_or_periodic_neighbor(face_no);
 
-                types::subdomain_id neighbid = numbers::artificial_subdomain_id;
+                types::subdomain_id neighbor_subdomain_id = numbers::artificial_subdomain_id;
 //                if (neighbor->is_level_cell())
 //                  neighbid = neighbor->level_subdomain_id();
                 //subdomain id is only valid for active cells
                 /*else */if (neighbor->active())
-                  neighbid = neighbor->subdomain_id();
+                  neighbor_subdomain_id = neighbor->subdomain_id();
 
                 const bool own_neighbor = ignore_subdomain ||
-                                          (neighbid == cell->get_triangulation().locally_owned_subdomain());
+                                          (neighbor_subdomain_id == cell->get_triangulation().locally_owned_subdomain());
 
                 // skip all faces between two ghost cells
                 if (!own_cell && !own_neighbor)
@@ -152,7 +145,7 @@ namespace MeshWorker
                       = periodic_neighbor?
                         cell->periodic_neighbor_of_coarser_periodic_neighbor(face_no):
                         cell->neighbor_of_coarser_neighbor(face_no);
-                    const typename Iterator::AccessorType::Container::face_iterator nface
+                    const typename CellIteratorType::AccessorType::Container::face_iterator nface
                       = neighbor->face(neighbor_face_no.first);
 
                     face_worker(cell, face_no, numbers::invalid_unsigned_int,
@@ -171,9 +164,7 @@ namespace MeshWorker
                     // If iterator is active and neighbor is refined, skip
                     // internal face.
                     if (internal::is_active_iterator(cell) && neighbor->has_children())
-                      {
-                        continue;
-                      }
+                      continue;
 
                     // Now neighbor is on same level, double-check this:
                     Assert(cell->level()==neighbor->level(), ExcInternalError());
@@ -197,7 +188,7 @@ namespace MeshWorker
                     // face.
                     if (own_cell && !own_neighbor
                         && (flags & assemble_ghost_faces_once)
-                        && (neighbid < csid))
+                        && (neighbor_subdomain_id < current_subdomain_id))
                       continue;
 
                     const unsigned int neighbor_face_no = periodic_neighbor?
