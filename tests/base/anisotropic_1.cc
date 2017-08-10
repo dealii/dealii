@@ -117,8 +117,7 @@ void check_poly(const Point<dim>      &x,
 
 
       // finally output values, gradients, etc, to make sure that they are
-      // not only consistent, but also correct. Multiply them somewhat to
-      // make them significant despite our two-post-dot-digits limit
+      // not only consistent, but also correct.
       values1[k] *= std::pow(10., dim);
       gradients1[k] *= std::pow(10., dim);
 
