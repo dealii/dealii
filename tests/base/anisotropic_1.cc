@@ -52,78 +52,72 @@ void check_poly(const Point<dim>      &x,
     {
       // Check if compute_value is ok
       double val1 = p.compute_value(k,x);
-      if (std::fabs(val1 - values1[k]) > 5.0E-16)
+      if (std::fabs(val1 - values1[k]) > 5.0E-12)
         deallog << 'P' << k << ": values differ " << val1 << " != "
                 << values1[k] << std::endl;
       double val2 = q.compute_value(k,x);
-      if (std::fabs(val2 - values2[k]) > 5.0E-16)
+      if (std::fabs(val2 - values2[k]) > 5.0E-12)
         deallog << 'Q' << k << ": values differ " << val2 << " != "
                 << values2[k] << std::endl;
-      if (std::fabs(val2 - val1) > 5.0E-16)
+      if (std::fabs(val2 - val1) > 5.0E-12)
         deallog << "PQ" << k << ": values differ " << val1 << " != "
                 << val2 << std::endl;
 
       // Check if compute_grad is ok
       Tensor<1,dim> grad1 = p.template compute_derivative<1>(k,x);
-      if (grad1 != gradients1[k])
+      if ((grad1 - gradients1[k]).norm() > 5.0E-12)
         deallog << 'P' << k << ": gradients differ " << grad1 << " != "
                 << gradients1[k] << std::endl;
       Tensor<1,dim> grad2 = q.template compute_derivative<1>(k,x);
-      if (grad2 != gradients2[k])
+      if ((grad2 - gradients2[k]).norm() > 5.0E-12)
         deallog << 'Q' << k << ": gradients differ " << grad1 << " != "
                 << gradients2[k] << std::endl;
-      if (grad2 != grad1)
+      if ((grad2 - grad1).norm() > 5.0E-12)
         deallog << "PQ" << k << ": gradients differ " << grad1 << " != "
                 << grad2 << std::endl;
 
       // Check if compute_grad_grad is ok
       Tensor<2,dim> grad_grad1 = p.template compute_derivative<2>(k,x);
-      if (grad_grad1 != second1[k])
+      if ((grad_grad1 - second1[k]).norm() > 5.0E-12)
         deallog << 'P' << k << ": second derivatives differ " << grad_grad1 << " != "
                 << second1[k] << std::endl;
       Tensor<2,dim> grad_grad2 = q.template compute_derivative<2>(k,x);
-      if (grad_grad2 != second2[k])
+      if ((grad_grad2 - second2[k]).norm() > 5.0E-12)
         deallog << 'Q' << k << ": second derivatives differ " << grad_grad2 << " != "
                 << second2[k] << std::endl;
-      if (grad_grad2 != grad_grad1)
+      if ((grad_grad2 - grad_grad1).norm() > 5.0E-12)
         deallog << "PQ" << k << ": second derivatives differ " << grad_grad1 << " != "
                 << grad_grad2 << std::endl;
 
       // Check if third derivative is ok
       Tensor<3,dim> third_derivative1 = p.template compute_derivative<3>(k,x);
-      if (third_derivative1 != third1[k])
+      if ((third_derivative1 - third1[k]).norm() > 5.0E-12)
         deallog << 'P' << k << ": third derivatives differ " << third_derivative1 << " != "
                 << third1[k] << std::endl;
       Tensor<3,dim> third_derivative2 = q.template compute_derivative<3>(k,x);
-      if (third_derivative2 != third2[k])
+      if ((third_derivative2 - third2[k]).norm() > 5.0E-12)
         deallog << 'Q' << k << ": third derivatives differ " << third_derivative2 << " != "
                 << third2[k] << std::endl;
-      if (third_derivative2 != third_derivative1)
+      if ((third_derivative2 - third_derivative1).norm() > 5.0E-12)
         deallog << "PQ" << k << ": third derivatives differ " << third_derivative1 << " != "
                 << third_derivative2 << std::endl;
 
       // Check if third derivative is ok
       Tensor<4,dim> fourth_derivative1 = p.template compute_derivative<4>(k,x);
-      if (fourth_derivative1 != fourth1[k])
+      if ((fourth_derivative1 - fourth1[k]).norm() > 5.0E-12)
         deallog << 'P' << k << ": fourth derivatives differ " << fourth_derivative1 << " != "
                 << fourth1[k] << std::endl;
       Tensor<4,dim> fourth_derivative2 = q.template compute_derivative<4>(k,x);
-      if (fourth_derivative2 != fourth2[k])
+      if ((fourth_derivative2 - fourth2[k]).norm() > 5.0E-12)
         deallog << 'Q' << k << ": fourth derivatives differ " << fourth_derivative2 << " != "
                 << fourth2[k] << std::endl;
-      if (fourth_derivative2 != fourth_derivative1)
+      if ((fourth_derivative2 - fourth_derivative1).norm() > 5.0E-12)
         deallog << "PQ" << k << ": fourth derivatives differ " << fourth_derivative1 << " != "
                 << fourth_derivative2 << std::endl;
 
 
-      // finally output values,
-      // gradients, etc, to make sure
-      // that they are not only
-      // consistent, but also
-      // correct. Multiply them
-      // somewhat to make them
-      // significant despite our
-      // two-post-dot-digits limit
+      // finally output values, gradients, etc, to make sure that they are
+      // not only consistent, but also correct.
       values1[k] *= std::pow(10., dim);
       gradients1[k] *= std::pow(10., dim);
 
@@ -184,10 +178,7 @@ check_dimensions (const std::vector<Polynomial<double> > &p)
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(2);
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
+  initlog();
 
   deallog.push("Lagrange");
   std::vector<Polynomial<double> > p;

@@ -157,18 +157,7 @@ void check ()
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(2);
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
-
-//   deallog.push("Lagrange");
-//   check<LagrangeEquidistant> ();
-//   deallog.pop();
-
-//   deallog.push("Legendre");
-//   check<Legendre> ();
-//   deallog.pop();
+  initlog();
 
   deallog.push("Hierarchical");
   check<Hierarchical> ();
