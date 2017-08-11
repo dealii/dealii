@@ -134,29 +134,3 @@ DEAL::Copyer
 DEAL::Copyer
 DEAL::Copyer
 DEAL::Copyer
-DEAL::CELLS FIRST AND BOUNDARY
-DEAL::
-DEAL::Cell worker on : 1.1
-DEAL::Boundary worker on : 1.1, Face : 1
-DEAL::Boundary worker on : 1.1, Face : 2
-DEAL::Cell worker on : 1.2
-DEAL::Boundary worker on : 1.2, Face : 0
-DEAL::Boundary worker on : 1.2, Face : 3
-DEAL::Cell worker on : 1.3
-DEAL::Boundary worker on : 1.3, Face : 1
-DEAL::Boundary worker on : 1.3, Face : 3
-DEAL::Cell worker on : 2.0
-DEAL::Boundary worker on : 2.0, Face : 0
-DEAL::Boundary worker on : 2.0, Face : 2
-DEAL::Cell worker on : 2.1
-DEAL::Boundary worker on : 2.1, Face : 2
-DEAL::Cell worker on : 2.2
-DEAL::Boundary worker on : 2.2, Face : 0
-DEAL::Cell worker on : 2.3
-DEAL::Copyer
-DEAL::Copyer
-DEAL::Copyer
-DEAL::Copyer
-DEAL::Copyer
-DEAL::Copyer
-DEAL::Copyer

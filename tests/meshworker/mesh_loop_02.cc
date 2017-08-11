@@ -114,16 +114,6 @@ void test()
   mesh_loop(cell, endc, cell_worker, copyer, scratch, copy,
             assemble_own_interior_faces_both,
             boundary_worker, face_worker);
-
-
-
-
-  deallog << "CELLS FIRST AND BOUNDARY" << std::endl << std::endl;
-
-  mesh_loop(cell, endc, cell_worker, copyer, scratch, copy,
-            assemble_own_cells | assemble_cells_first | assemble_boundary_faces,
-            boundary_worker, face_worker);
-
 }
 
 

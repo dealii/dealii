@@ -55,15 +55,15 @@ namespace MeshWorker
 
                  const AssembleFlags flags = assemble_own_cells,
 
-                 const typename identity<std::function<void (const CellIteratorType &, const unsigned int&, ScratchData &, CopyData &)>>::type &boundary_worker=
-                  std::function<void (const CellIteratorType &, const unsigned int&, ScratchData &, CopyData &)>(),
+                 const typename identity<std::function<void (const CellIteratorType &, const unsigned int &, ScratchData &, CopyData &)>>::type &boundary_worker=
+                   std::function<void (const CellIteratorType &, const unsigned int &, ScratchData &, CopyData &)>(),
 
                  const typename identity<std::function<void (const CellIteratorType &, const unsigned int &, const unsigned int &,
-                                           const CellIteratorType &, const unsigned int &, const unsigned int &,
-                                           ScratchData &, CopyData &)>>::type &face_worker=
-                  std::function<void (const CellIteratorType &, const unsigned int &, const unsigned int &,
-                                      const CellIteratorType &, const unsigned int &, const unsigned int &,
-                                      ScratchData &, CopyData &)>(),
+                                                             const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                                             ScratchData &, CopyData &)>>::type &face_worker=
+                   std::function<void (const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                       const CellIteratorType &, const unsigned int &, const unsigned int &,
+                                       ScratchData &, CopyData &)>(),
 
                  const unsigned int   queue_length = 2*MultithreadInfo::n_threads(),
                  const unsigned int   chunk_size = 8)

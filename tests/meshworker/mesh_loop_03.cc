@@ -79,9 +79,7 @@ void test()
 
   deallog << "CELLS ONLY" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copyer, scratch, copy,
-            assemble_own_cells,
-            boundary_worker, face_worker);
+  mesh_loop(cell, endc, cell_worker, copyer, scratch, copy);
 
 
   deallog << "CELLS ONLY WORKSTREAM" << std::endl << std::endl;
