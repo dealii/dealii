@@ -17,13 +17,7 @@
 //check method Tmmult of FullMatrix, symmetric case
 
 #include "../tests.h"
-#include <cmath>
-#include <fstream>
-#include <iomanip>
-#include <iomanip>
-#include <cstdlib>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/full_matrix.h>
 
 const double entries_A[9] = { 1,2,3,4,5,6,7,8,9 };

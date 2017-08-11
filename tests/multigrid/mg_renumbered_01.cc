@@ -13,10 +13,10 @@
 //
 // ---------------------------------------------------------------------
 
+#include "../tests.h"
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/constraint_matrix.h>
@@ -56,7 +56,6 @@
 #include <deal.II/multigrid/mg_smoother.h>
 #include <deal.II/multigrid/mg_matrix.h>
 
-#include <fstream>
 #include <sstream>
 
 using namespace dealii;
@@ -476,10 +475,8 @@ void LaplaceProblem<dim>::run ()
 
 int main ()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   LaplaceProblem<2> laplace_problem_2d(1);
   laplace_problem_2d.run ();

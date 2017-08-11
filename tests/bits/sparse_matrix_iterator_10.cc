@@ -23,8 +23,6 @@
 #include "../tests.h"
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <fstream>
-#include <iomanip>
 
 
 void test ()

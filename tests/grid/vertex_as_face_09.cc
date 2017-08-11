@@ -26,7 +26,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 
-#include <fstream>
 
 
 void test ()

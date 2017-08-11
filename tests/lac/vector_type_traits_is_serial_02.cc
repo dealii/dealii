@@ -20,8 +20,6 @@
 #include "../tests.h"
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
-#include <fstream>
-#include <iomanip>
 
 void test ()
 {

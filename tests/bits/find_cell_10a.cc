@@ -23,13 +23,10 @@
 
 #include "../tests.h"
 
-#include <stdio.h>
-#include <cstdlib>
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -42,7 +39,6 @@
 
 
 #include <iostream>
-#include <fstream>
 #include <list>
 #include <string>
 #include <sstream>

@@ -27,7 +27,6 @@
 #include "../tests.h"
 #include <deal.II/fe/fe_q.h>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/polynomial.h>
@@ -50,8 +49,6 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 
-#include <fstream>
-#include <iomanip>
 
 template <int dim>
 class TestFunction : public Function<dim>

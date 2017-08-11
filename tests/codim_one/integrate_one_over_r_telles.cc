@@ -1,6 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id: integrate_one_over_r.cc 30338 2013-08-18 22:02:27Z heltai $
-//
 // Copyright (C) 2005 - 2015 by the deal.II authors
 //
 // This file is part of the deal.II library.
@@ -14,11 +12,11 @@
 //
 // ---------------------------------------------------------------------
 
+#include "../tests.h"
+
 // integrates the function *f(x,y)/R, where f(x,y) is a power of x and
 // y on the set [0,1]x[0,1]. dim = 2 only.
 
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
 // all include files needed for the program
@@ -26,10 +24,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 #include <string>
-
-#include <math.h>
 
 using namespace std;
 using namespace dealii;
@@ -42,12 +37,10 @@ exact_integral_one_over_r (
   const unsigned int i, const unsigned int j,
   const unsigned int vertex_index);
 
-ofstream logfile("output");
-
 int
 main ()
 {
-  deallog.attach(logfile);
+  initlog();
   deallog << std::fixed;
 
   deallog << endl

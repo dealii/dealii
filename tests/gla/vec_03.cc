@@ -21,9 +21,7 @@
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 #include <vector>
 
 #include "gla.h"

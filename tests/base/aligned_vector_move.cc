@@ -17,8 +17,6 @@
 // test for C++11 move operations on AlignedVector<unsigned int>
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
 #include <deal.II/base/aligned_vector.h>
 

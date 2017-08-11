@@ -14,7 +14,6 @@
  * ---------------------------------------------------------------------
  */
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -25,7 +24,6 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 #include <iostream>
 
 using namespace dealii;

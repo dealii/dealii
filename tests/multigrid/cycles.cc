@@ -21,7 +21,6 @@
  */
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -29,7 +28,6 @@
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_matrix.h>
 
-#include <fstream>
 
 #define N 3
 typedef Vector<double> VectorType;

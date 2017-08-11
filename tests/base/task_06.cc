@@ -18,8 +18,6 @@
 // task scheduler object is running on each thread we create
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 #include <unistd.h>
 
 #include <deal.II/base/thread_management.h>

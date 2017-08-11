@@ -18,7 +18,6 @@
 // Test DoFTools::map_dofs_to_support_points for parallel DoFHandlers
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -26,7 +25,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q_generic.h>
 
-#include <fstream>
 
 
 template <int dim>

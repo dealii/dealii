@@ -40,8 +40,6 @@
 #include <deal.II/integrators/laplace.h>
 
 
-#include <fstream>
-#include <iomanip>
 
 
 template <int dim>

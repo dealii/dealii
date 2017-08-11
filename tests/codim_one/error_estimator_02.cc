@@ -21,7 +21,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
@@ -36,7 +35,6 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <fstream>
 
 
 // function is x^2+2xy

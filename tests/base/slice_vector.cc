@@ -15,11 +15,8 @@
 
 #include "../tests.h"
 #include <deal.II/base/vector_slice.h>
-#include <deal.II/base/logstream.h>
 
 #include <vector>
-#include <fstream>
-#include <iomanip>
 
 void f(const std::vector<int> &v)
 {

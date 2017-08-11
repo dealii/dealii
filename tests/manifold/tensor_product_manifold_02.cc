@@ -18,8 +18,6 @@
 // a manually constructed cylinder hull.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 
 #include <deal.II/grid/tensor_product_manifold.h>

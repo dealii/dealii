@@ -25,7 +25,6 @@
 #include <deal.II/grid/tria.h>
 
 #include <iostream>
-#include <fstream>
 
 using namespace dealii;
 

@@ -16,10 +16,6 @@
 
 // test ProductType with sacado
 
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 #include <typeinfo>
 
 #include <deal.II/base/tensor.h>

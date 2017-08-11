@@ -22,7 +22,6 @@
 
 #include <deal.II/matrix_free/shape_info.h>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
@@ -30,7 +29,6 @@
 #include <deal.II/fe/fe_q_dg0.h>
 #include <deal.II/fe/fe_system.h>
 
-#include <fstream>
 #include <iostream>
 
 std::ofstream logfile("output");

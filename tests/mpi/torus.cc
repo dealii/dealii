@@ -56,7 +56,6 @@
 #include <deal.II/numerics/data_out.h>
 
 #include <iostream>
-#include <fstream>
 
 
 typedef parallel::distributed::Triangulation<2,3>::cell_iterator cell_iterator;

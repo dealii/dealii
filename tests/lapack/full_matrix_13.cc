@@ -17,10 +17,8 @@
 // Tests LAPACKFullMatrix::operator*= and operator/=
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/lapack_full_matrix.h>
 
-#include <fstream>
 #include <iostream>
 
 

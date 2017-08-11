@@ -18,7 +18,6 @@
 #include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
 
-#include <fstream>
 #include <iostream>
 #include <cassert>
 

@@ -19,11 +19,9 @@
 // in a couple of places when using FE_Nothing and FESystem.
 
 #include "../tests.h"
-#include <fstream>
 #include <sstream>
 #include <iostream>
 
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/grid/tria.h>
 

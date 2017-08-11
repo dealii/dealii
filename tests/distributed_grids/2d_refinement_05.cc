@@ -22,7 +22,6 @@
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -33,9 +32,7 @@
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/intergrid_map.h>
 
-#include <fstream>
 #include <ostream>
-#include <cstdlib>
 
 
 template <int dim>

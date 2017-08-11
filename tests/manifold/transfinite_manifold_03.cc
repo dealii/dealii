@@ -13,8 +13,6 @@
 // computing some areas
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/mapping_q_generic.h>
 #include <deal.II/fe/fe_nothing.h>

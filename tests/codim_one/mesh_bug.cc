@@ -18,8 +18,6 @@
 // a short (a few lines) description of what the program does
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 // all include files you need here
 

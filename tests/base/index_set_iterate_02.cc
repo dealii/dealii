@@ -17,10 +17,6 @@
 // test IndexSet::at()
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 
 #include <deal.II/base/index_set.h>
 

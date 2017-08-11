@@ -17,10 +17,6 @@
 // test Utilities::fixed_power on VectorizedArray, similar to utilities_02
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 
 #include <deal.II/base/vectorization.h>
 #include <deal.II/base/utilities.h>

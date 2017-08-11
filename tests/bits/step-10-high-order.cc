@@ -21,8 +21,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
 std::ofstream logfile("output");
 
 
@@ -41,9 +39,6 @@ std::ofstream logfile("output");
 
 #include <deal.II/fe/mapping_q.h>
 
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 
 const long double pi = 3.141592653589793238462643;
 

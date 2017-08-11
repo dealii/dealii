@@ -23,7 +23,6 @@
 // University of Basel
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/grid_generator.h>
@@ -37,8 +36,6 @@
 #include <deal.II/fe/fe_base.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/dofs/dof_renumbering.h>
-#include <iomanip>
-#include <fstream>
 
 
 template <int dim>

@@ -23,13 +23,8 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/logstream.h>
-#include <cmath>
-#include <cstdlib>
 
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 
 // Output
 std::ofstream logfile ("output");

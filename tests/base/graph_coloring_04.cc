@@ -19,10 +19,8 @@
 
 
 #include "../tests.h"
-#include <fstream>
 #include <vector>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/graph_coloring.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>

@@ -20,11 +20,8 @@
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/table_handler.h>
 #include <deal.II/base/convergence_table.h>
-#include <deal.II/base/logstream.h>
 
 #include <vector>
-#include <iomanip>
-#include <fstream>
 #include <string>
 
 

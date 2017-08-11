@@ -19,11 +19,7 @@
 
 #include "../tests.h"
 #include "../testmatrix.h"
-#include <cmath>
-#include <fstream>
 #include <iostream>
-#include <iomanip>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>

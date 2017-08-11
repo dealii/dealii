@@ -18,8 +18,6 @@
 // like grid_in_out but write in gnuplot format
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>

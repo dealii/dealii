@@ -27,11 +27,8 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <deal.II/base/logstream.h>
 
 /// to generate random numbers
-#include <cstdlib>
-#include <fstream>
 
 using namespace dealii;
 

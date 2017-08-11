@@ -19,7 +19,6 @@
 
 #include "../tests.h"
 #include "../testmatrix.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix_ez.h>
@@ -31,8 +30,6 @@
 #include <deal.II/lac/sparse_matrix_ez.templates.h>
 #include <deal.II/lac/precondition_block.templates.h>
 
-#include <fstream>
-#include <cstdio>
 
 
 #define PREC_CHECK(solver, method, precond) \

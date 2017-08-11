@@ -64,7 +64,6 @@ x * Cheb2(3,L(ev)) / Cheb2(3,L(aL));
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/diagonal_matrix.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/utilities.h>

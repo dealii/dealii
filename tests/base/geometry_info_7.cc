@@ -18,11 +18,8 @@
 // check GeometryInfo::alternating_form_at_vertices for the faces of cells
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/geometry_info.h>
 
-#include <fstream>
-#include <cstdlib>
 
 
 template <int dim>

@@ -21,8 +21,6 @@
 // member functions that the correct one is called
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
 #include <deal.II/base/thread_management.h>
 

@@ -22,7 +22,6 @@ char logname[] = "output";
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -30,8 +29,6 @@ char logname[] = "output";
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <fstream>
-#include <iomanip>
 #include <vector>
 
 

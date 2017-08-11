@@ -18,13 +18,11 @@
 // check ConstraintMatrix::set_zero(Vector) for parallel distributed vectors
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 
-#include <fstream>
 
 
 void test ()

@@ -20,10 +20,7 @@
 
 #include "../tests.h"
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/base/logstream.h>
 
-#include <fstream>
-#include <iomanip>
 
 
 std::ofstream logfile("output");

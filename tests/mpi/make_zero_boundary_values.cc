@@ -18,14 +18,12 @@
 // Test DoFTools::make_zero_boundary_constraints for parallel DoFHandlers
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 
 
 template <int dim>

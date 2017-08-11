@@ -17,7 +17,6 @@
 // save a tria mesh and load it
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -26,7 +25,6 @@
 #include <boost/archive/text_iarchive.hpp>
 
 #include <sstream>
-#include <fstream>
 
 template <int dim>
 void test()

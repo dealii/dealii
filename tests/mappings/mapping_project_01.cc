@@ -23,8 +23,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <iostream>
-#include <fstream>
-#include <cmath>
 
 using namespace dealii;
 void dim2_grid ()

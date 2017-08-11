@@ -44,7 +44,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_values.h>
@@ -55,7 +54,6 @@
 #include <deal.II/base/function.h>
 
 #include <vector>
-#include <fstream>
 #include <string>
 
 

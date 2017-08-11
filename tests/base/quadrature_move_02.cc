@@ -15,8 +15,6 @@
 
 
 #include "../tests.h"
-#include <fstream>
-#include <cmath>
 
 #include <deal.II/base/quadrature_lib.h>
 

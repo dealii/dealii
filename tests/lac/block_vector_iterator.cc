@@ -16,15 +16,11 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/block_vector.h>
-#include <fstream>
-#include <iomanip>
 #include <vector>
 #include <algorithm>
 #include <numeric>
 #include <utility>
-#include <cmath>
 #include <functional>
 
 template <typename number>

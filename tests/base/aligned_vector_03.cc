@@ -17,9 +17,6 @@
 // test for AlignedVector<bool>
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 
 #include <deal.II/base/aligned_vector.h>
 

@@ -20,13 +20,10 @@
 // classes: PolynomialsBDM, PolynomialsRaviartThomas
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/polynomials_bdm.h>
 #include <deal.II/base/polynomials_raviart_thomas.h>
 
 #include <vector>
-#include <iomanip>
-#include <fstream>
 
 using namespace std;
 

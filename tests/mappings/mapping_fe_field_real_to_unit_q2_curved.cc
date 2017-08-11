@@ -40,7 +40,6 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/grid/grid_out.h>
-#include <fstream>
 
 using namespace dealii;
 

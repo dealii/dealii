@@ -18,13 +18,11 @@
 
 #include "../tests.h"
 #include "../testmatrix.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/solver_selector.h>
 
-#include <fstream>
 
 template <typename MatrixType, typename VectorType>
 void

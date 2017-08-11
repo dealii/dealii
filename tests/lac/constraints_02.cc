@@ -17,7 +17,6 @@
 #include "../tests.h"
 #include  <deal.II/lac/constraint_matrix.h>
 
-#include <fstream>
 #include <vector>
 
 void test()

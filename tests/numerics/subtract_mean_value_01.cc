@@ -22,8 +22,6 @@
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_vector.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <fstream>
-#include <iomanip>
 #include <vector>
 
 template <class VectorType>

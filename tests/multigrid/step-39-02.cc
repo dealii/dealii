@@ -52,7 +52,6 @@
 #include <deal.II/numerics/data_out.h>
 
 #include <iostream>
-#include <fstream>
 
 namespace Step39
 {

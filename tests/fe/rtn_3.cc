@@ -22,7 +22,6 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 
 #include <vector>
-#include <fstream>
 #include <string>
 
 #define PRECISION 8

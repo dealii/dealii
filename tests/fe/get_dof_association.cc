@@ -18,7 +18,6 @@
 
 #include "../tests.h"
 #include <iostream>
-#include <fstream>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_nedelec.h>

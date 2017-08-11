@@ -20,7 +20,6 @@
 #include "../tests.h"
 #include "../test_grids.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/integrators/laplace.h>
 

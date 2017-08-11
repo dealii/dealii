@@ -20,12 +20,8 @@
 
 #include "../tests.h"
 #include "../testmatrix.h"
-#include <cmath>
 #include <complex>
-#include <fstream>
-#include <iomanip>
 #include <string>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>

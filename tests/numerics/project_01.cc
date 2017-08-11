@@ -31,7 +31,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/dofs/dof_accessor.h>
 
-#include <fstream>
 
 
 // define the multi-linear function x or x*y or x*y*z that we will

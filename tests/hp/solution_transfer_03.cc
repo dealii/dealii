@@ -23,7 +23,6 @@
 // Triangulation::execute_c_and_r but the error is completely unhelpful
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/grid/tria.h>
 

@@ -20,7 +20,6 @@
 // correctly
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/numerics/vector_tools.h>
 

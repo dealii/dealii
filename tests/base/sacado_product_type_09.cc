@@ -16,8 +16,6 @@
 
 // test scalar_product between tensors and symmetric tensors with Sacado
 
-#include <iomanip>
-#include <fstream>
 
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/sacado_product_type.h>

@@ -22,9 +22,7 @@
 #include "../tests.h"
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/base/index_set.h>
-#include <fstream>
 #include <iostream>
-#include <iomanip>
 #include <vector>
 
 #include <deal.II/lac/full_matrix.h>

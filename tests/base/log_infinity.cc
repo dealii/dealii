@@ -17,9 +17,6 @@
 // similar to log_nan, but test for infinities
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <iomanip>
 #include <limits>
 
 int main ()

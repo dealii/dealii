@@ -18,9 +18,7 @@
 // ensure that we end up in a defined state after a pattern is not matched
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
 
 
 std::string input = "set test_1 = 1\n"

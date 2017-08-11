@@ -19,7 +19,6 @@
 //
 // problematic cases: 2d: 6 and 13 procs, 3d 20 procs (original bug report from Martin)
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/grid/tria_accessor.h>

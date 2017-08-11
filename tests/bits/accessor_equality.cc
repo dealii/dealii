@@ -17,8 +17,6 @@
 // test for equality of accessor objects
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/dofs/dof_handler.h>

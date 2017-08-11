@@ -17,10 +17,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/timer.h>
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <cmath>
-#include <iomanip>
 
 // burn computer time
 

@@ -20,7 +20,6 @@
 // code also works. turns out, all was fine
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -31,8 +30,6 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_values.h>
-#include <iomanip>
-#include <fstream>
 
 
 template <int dim>

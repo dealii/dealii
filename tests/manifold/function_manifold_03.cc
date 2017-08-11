@@ -12,8 +12,6 @@
 // Test a simple parabolic manifold, including gradients and tangent vector
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 
 // all include files you need here

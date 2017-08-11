@@ -21,11 +21,9 @@
 // result doesn't change
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_dgp_monomial.h>
 #include <deal.II/fe/fe_tools.h>
 
-#include <fstream>
 #include <string>
 
 #define PRECISION 5

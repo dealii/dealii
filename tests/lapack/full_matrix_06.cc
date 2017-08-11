@@ -17,13 +17,11 @@
 // Tests generalized eigenvalues of FullMatrix
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <float.h>
-#include <fstream>
 #include <iostream>
 #include <vector>
 

@@ -1,6 +1,5 @@
 #include "../tests.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_generator.h>
@@ -15,7 +14,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-#include <fstream>
 #include <iostream>
 
 /* A test to check that the resulting FE space is continuous

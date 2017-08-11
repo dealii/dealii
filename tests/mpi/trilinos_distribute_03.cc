@@ -19,11 +19,9 @@
 // if one vector owns all DoFs, then distribute() hangs.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-#include <fstream>
 #include <sstream>
 
 

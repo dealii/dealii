@@ -23,7 +23,6 @@
 // testcase by Jason Sheldon
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/quadrature_lib.h>
 
@@ -61,9 +60,6 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/tria.h>
 
-#include <fstream>
-#include <cmath>
-#include <cstdlib>
 
 
 std::ofstream logfile("output");

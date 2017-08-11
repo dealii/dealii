@@ -19,7 +19,6 @@
 // same result as DoFTools::extract_dofs_with_subdomain_association()
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -35,7 +34,6 @@
 
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 
 
 template <int dim>

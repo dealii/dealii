@@ -34,7 +34,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/dofs/dof_accessor.h>
 
-#include <fstream>
 
 
 // define a function that is zero within the square

@@ -19,8 +19,6 @@
 
 #include "../tests.h"
 #include <deal.II/lac/vector.h>
-#include <fstream>
-#include <iomanip>
 
 
 void test (Vector<std::complex<double> > &v)

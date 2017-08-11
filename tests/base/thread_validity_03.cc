@@ -21,8 +21,6 @@
 // can't be copied aren't called on copies
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
 #include <deal.II/base/thread_management.h>
 

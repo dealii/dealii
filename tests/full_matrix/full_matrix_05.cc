@@ -17,13 +17,7 @@
 // check method FullMatrix::extract_submatrix_from
 
 #include "../tests.h"
-#include <cmath>
-#include <fstream>
-#include <iomanip>
-#include <iomanip>
-#include <cstdlib>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/full_matrix.h>
 
 void test ()

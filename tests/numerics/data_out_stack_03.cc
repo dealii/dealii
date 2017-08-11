@@ -24,10 +24,7 @@
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_out_stack.h>
-#include <fstream>
-#include <iomanip>
 
-#include <deal.II/base/logstream.h>
 
 
 

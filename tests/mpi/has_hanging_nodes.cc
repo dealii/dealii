@@ -18,7 +18,6 @@
 // Test has_hanging_nodes() in sequential and parallel triangulations
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
@@ -61,7 +60,6 @@
 #include <deal.II/lac/sparsity_tools.h>
 
 
-#include <fstream>
 #include <iostream>
 
 using namespace dealii;

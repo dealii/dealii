@@ -62,7 +62,6 @@
 #include <deal.II/physics/elasticity/standard_tensors.h>
 
 #include <iostream>
-#include <fstream>
 namespace Step44
 {
   using namespace dealii;

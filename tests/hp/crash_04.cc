@@ -19,7 +19,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -28,7 +27,6 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/numerics/derivative_approximation.h>
 
-#include <fstream>
 
 
 template <int dim>

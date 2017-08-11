@@ -40,7 +40,6 @@ ddf2: (subst(srule2,expand(ddf)));
  */
 
 #include "../tests.h"
-#include <cmath>
 #include <deal.II/base/function_spherical.h>
 #include <deal.II/base/geometric_utilities.h>
 

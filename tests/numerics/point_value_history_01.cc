@@ -45,7 +45,6 @@
 
 #include <deal.II/numerics/point_value_history.h>
 
-#include <fstream>
 
 using namespace dealii;
 

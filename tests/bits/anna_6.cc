@@ -45,7 +45,6 @@ author: Anna Schneebeli, February 2003
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/grid/tria.h>
@@ -68,8 +67,6 @@ author: Anna Schneebeli, February 2003
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
-#include <iomanip>
 
 
 template <int dim>

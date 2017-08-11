@@ -18,9 +18,6 @@
 
 #include "../tests.h"
 #include "../testmatrix.h"
-#include <cmath>
-#include <fstream>
-#include <iomanip>
 #include <deal.II/lac/tensor_product_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>

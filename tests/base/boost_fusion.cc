@@ -20,9 +20,6 @@
 // reminder that we can't do this again in the future
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 
 #include <boost/math/special_functions/erf.hpp>
 

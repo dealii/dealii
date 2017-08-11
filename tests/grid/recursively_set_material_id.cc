@@ -19,13 +19,10 @@
 // set the material_id for two of its children, not all
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <fstream>
-#include <iomanip>
 
 
 

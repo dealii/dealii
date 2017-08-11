@@ -18,11 +18,8 @@
 // check GeometryInfo::face_to_cell_vertices
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/geometry_info.h>
 
-#include <fstream>
-#include <cstdlib>
 
 
 template <int dim>

@@ -14,7 +14,6 @@
  * ---------------------------------------------------------------------
  */
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/table_handler.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -37,7 +36,6 @@
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_precondition.h>
 
-#include <fstream>
 #include <iostream>
 
 using namespace dealii;

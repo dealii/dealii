@@ -19,8 +19,6 @@
 
 #include "../tests.h"
 #include <iostream>
-#include <fstream>
-#include <cstdlib>
 
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>

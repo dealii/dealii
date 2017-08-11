@@ -22,7 +22,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>

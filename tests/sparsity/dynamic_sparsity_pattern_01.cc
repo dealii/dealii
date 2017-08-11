@@ -19,10 +19,7 @@
 // n_cols() in passing
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <iomanip>
-#include <fstream>
 
 
 void test ()

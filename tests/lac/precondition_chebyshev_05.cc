@@ -18,7 +18,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -27,10 +26,6 @@
 #include "../testmatrix.h"
 #include <deal.II/lac/vector.h>
 
-#include <fstream>
-#include <iomanip>
-#include <iomanip>
-#include <cmath>
 
 
 

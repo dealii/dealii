@@ -25,8 +25,6 @@
 // won't hurt to have this test anyway.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>

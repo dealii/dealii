@@ -17,9 +17,7 @@
 // test Fourier expansion in 2D for a given vector of local DoF values.
 #include "../tests.h"
 #include <iostream>
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_series.h>
 #include <deal.II/base/quadrature_lib.h>
 

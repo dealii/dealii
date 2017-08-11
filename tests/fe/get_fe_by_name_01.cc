@@ -15,8 +15,6 @@
 
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_tools.h>
 

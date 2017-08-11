@@ -19,7 +19,6 @@
 // transfer_matrix_free_02 but using two components (and fewer meshes).
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/distributed/tria.h>

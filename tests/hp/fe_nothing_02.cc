@@ -19,7 +19,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_q.h>
@@ -37,7 +36,6 @@
 #include <deal.II/hp/fe_values.h>
 
 
-#include <fstream>
 
 
 template <int dim>

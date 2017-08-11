@@ -17,8 +17,6 @@
 // test parallel::transform
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
 #include <deal.II/base/parallel.h>
 #include <deal.II/lac/vector.h>

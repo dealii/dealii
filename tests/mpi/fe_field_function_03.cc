@@ -27,7 +27,6 @@ Additional information:
  */
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -51,7 +50,6 @@ Additional information:
 #include <deal.II/numerics/fe_field_function.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <fstream>
 
 
 template <int dim>

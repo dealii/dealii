@@ -20,9 +20,7 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/distributed/solution_transfer.h>
-#include <fstream>
 #include <deal.II/base/conditional_ostream.h>
-#include <cmath>
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/lac/sparsity_tools.h>
 

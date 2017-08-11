@@ -21,7 +21,6 @@
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_sparse_matrix.h>
-#include <fstream>
 #include <iostream>
 
 

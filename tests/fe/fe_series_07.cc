@@ -18,9 +18,7 @@
 
 #include "../tests.h"
 #include <iostream>
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_series.h>
 
 using namespace dealii;

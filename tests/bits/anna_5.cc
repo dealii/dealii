@@ -19,7 +19,6 @@
 
 #include "../tests.h"
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <fstream>
 
 int main ()
 {

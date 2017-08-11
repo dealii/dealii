@@ -17,8 +17,6 @@
 // test parallel::accumulate_from_subranges
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
 #include <deal.II/base/parallel.h>
 

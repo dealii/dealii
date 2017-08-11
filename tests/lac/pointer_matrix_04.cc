@@ -16,7 +16,6 @@
 // check PointerMatrix:checkConstructor4
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/pointer_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>

@@ -21,8 +21,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
-#include <fstream>
-#include <iomanip>
 
 #define PRECISION 5
 

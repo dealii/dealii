@@ -15,12 +15,10 @@
 
 
 #include "interpolate_common.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_raviart_thomas.h>
 
-#include <fstream>
 
 // FE_RaviartThomasNodal<dim>::interpolate(...)
 

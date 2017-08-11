@@ -20,7 +20,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/distributed/tria.h>
@@ -31,7 +30,6 @@
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 
 
 template <int dim>

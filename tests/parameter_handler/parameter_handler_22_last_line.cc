@@ -18,9 +18,7 @@
 // check that setting last_line parameter does indeed terminate parsing.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
 
 void check (const char *p, std::string last_line)
 {

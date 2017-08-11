@@ -15,9 +15,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
 
 /*
  * Test that ParameterHandler does *not* join lines for things like

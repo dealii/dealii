@@ -17,11 +17,7 @@
 // check that LinearAlgebra::Vector::add_and_dot works correctly
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/la_vector.h>
-#include <cmath>
-#include <fstream>
-#include <iomanip>
 
 
 

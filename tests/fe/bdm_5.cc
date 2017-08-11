@@ -18,10 +18,8 @@
 // Just output the restriction matrices of the BDM element
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/fe/fe_bdm.h>
 
-#include <fstream>
 #include <string>
 
 #define PRECISION 8

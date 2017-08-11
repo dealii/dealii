@@ -17,9 +17,6 @@
 // BlockSparseMatrix::clear used to forget to reset all sizes to zero
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
-#include <cstdlib>
 
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/dofs/dof_tools.h>

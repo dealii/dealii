@@ -20,8 +20,6 @@
 
 
 #include "../tests.h"
-#include <fstream>
-#include <iomanip>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>

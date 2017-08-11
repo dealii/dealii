@@ -31,10 +31,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
 
-#include <fstream>
 #include <iostream>
-#include <cmath>
-#include <deal.II/base/logstream.h>
 
 std::ofstream logfile("output");
 

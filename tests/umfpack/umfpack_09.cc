@@ -19,9 +19,6 @@
 // for a BlockSparseMatrix<double> instead of SparseMatrix<double> matrix
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
-#include <cstdlib>
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>

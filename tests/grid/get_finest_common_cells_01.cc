@@ -23,7 +23,6 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/grid/tria_accessor.h>
 
-#include <fstream>
 
 
 template <int dim>

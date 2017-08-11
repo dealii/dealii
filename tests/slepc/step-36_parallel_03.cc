@@ -17,7 +17,6 @@
 
 #include "../tests.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
 
@@ -44,7 +43,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/lac/vector.h>
 
-#include <fstream>
 #include <iostream>
 
 // test parallel (MPI) version of Step-36

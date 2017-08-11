@@ -19,11 +19,9 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/fe/fe_dgp_monomial.h>
 
-#include <fstream>
 
 
 template <int dim>

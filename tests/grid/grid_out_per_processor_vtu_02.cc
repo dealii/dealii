@@ -18,7 +18,6 @@
 // differs from subdomain_id for a particular cell
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/grid/tria.h>
@@ -35,7 +34,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/fe/fe_q.h>
 
-#include <fstream>
 
 template <int dim>
 void output(const parallel::shared::Triangulation<dim> &tr,

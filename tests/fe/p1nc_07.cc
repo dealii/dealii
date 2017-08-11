@@ -18,7 +18,6 @@
 // check the P1NC element's gradient on a parallelogram
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -28,7 +27,6 @@
 
 #include <deal.II/fe/fe_p1nc.h>
 
-#include <fstream>
 #include <string>
 
 

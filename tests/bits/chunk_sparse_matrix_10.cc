@@ -19,7 +19,6 @@
 
 #include "../tests.h"
 #include <deal.II/lac/chunk_sparse_matrix.h>
-#include <fstream>
 
 
 void test (const unsigned int chunk_size)

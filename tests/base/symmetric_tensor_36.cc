@@ -19,13 +19,10 @@
 #include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/logstream.h>
 
 #include <type_traits>
 
 #include <complex>
-#include <fstream>
-#include <iomanip>
 
 // Some number types cannot be converted to floats/doubles;
 // for example, complex numbers cannot be converted to primitive numbers

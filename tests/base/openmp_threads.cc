@@ -19,7 +19,6 @@
 
 #include "../tests.h"
 
-#include <cstdlib>
 
 int main()
 {

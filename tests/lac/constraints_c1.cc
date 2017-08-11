@@ -23,16 +23,13 @@
 // This is because it contains a cycle. The test now checks that this
 // is detected.
 
+#include "../tests.h"
 
 #include <deal.II/base/job_identifier.h>
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/dofs/dof_tools.h>
-
-#include <iostream>
-#include <iomanip>
-#include <fstream>
 
 using namespace dealii;
 
@@ -169,10 +166,7 @@ run(const FiniteElement<dim> &fe)
 int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
-
-  const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   FE_Q<2> fe(3);
   run(fe);

@@ -21,9 +21,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/std_cxx14/algorithm.h>
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <iomanip>
 
 constexpr bool comp (const int &a, const int &b)
 {

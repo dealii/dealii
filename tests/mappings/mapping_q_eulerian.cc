@@ -40,7 +40,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_q.h>
-#include <fstream>
 #include <iostream>
 
 #include <deal.II/fe/mapping_q_eulerian.h>

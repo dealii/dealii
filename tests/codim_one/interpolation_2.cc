@@ -18,8 +18,6 @@
 // calculates the surface of a sphere
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 // all include files needed for the program
 
@@ -38,7 +36,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_lib.h>
 
-#include <fstream>
 #include <string>
 
 

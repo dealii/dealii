@@ -22,11 +22,9 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 
 #define PRECISION 8
 
-#include <fstream>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>

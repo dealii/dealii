@@ -24,7 +24,6 @@
 //[t500u:16597] [22] ./p4est_3d_refine_02/exe(_Z4testILi3EEvv+0x109) [0x410f1c]
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/distributed/tria.h>
@@ -34,7 +33,6 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/base/utilities.h>
 
-#include <fstream>
 #include <ostream>
 
 template <int dim>

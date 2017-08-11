@@ -17,12 +17,10 @@
 // Tests vector multiplication and eigenvalues of LAPACKFullMatrix
 // copy-paste of lapack/full_matrix_01
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include <fstream>
 #include <iostream>
 
 /*

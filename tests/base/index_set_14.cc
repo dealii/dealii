@@ -17,10 +17,6 @@
 // test IndexSet::operator &
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 #include <stdlib.h>
 
 #include <deal.II/base/index_set.h>

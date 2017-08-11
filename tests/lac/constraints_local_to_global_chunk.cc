@@ -24,7 +24,6 @@
 #include "../tests.h"
 
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/chunk_sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -39,7 +38,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-#include <fstream>
 #include <iostream>
 #include <complex>
 

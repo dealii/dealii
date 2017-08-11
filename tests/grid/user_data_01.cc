@@ -23,9 +23,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/base/logstream.h>
 
-#include <fstream>
 #include <string>
 
 

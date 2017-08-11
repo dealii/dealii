@@ -11,9 +11,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
-#include <fstream>
 #include <deal.II/base/conditional_ostream.h>
-#include <cmath>
 #include <deal.II/lac/generic_linear_algebra.h>
 
 #include "../tests.h"

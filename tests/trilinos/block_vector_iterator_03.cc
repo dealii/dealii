@@ -19,15 +19,12 @@
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
-#include <fstream>
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <numeric>
 #include <utility>
-#include <cmath>
 
 template <typename number>
 bool operator == (const TrilinosWrappers::MPI::BlockVector &v1,

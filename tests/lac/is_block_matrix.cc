@@ -16,7 +16,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
@@ -24,8 +23,6 @@
 #include <deal.II/lac/block_sparse_matrix_ez.h>
 #include <deal.II/lac/constraint_matrix.h>
 
-#include <fstream>
-#include <iomanip>
 #include <algorithm>
 
 

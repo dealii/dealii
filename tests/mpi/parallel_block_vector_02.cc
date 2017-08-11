@@ -21,7 +21,6 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
-#include <fstream>
 #include <iostream>
 #include <vector>
 

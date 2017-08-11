@@ -19,12 +19,9 @@
 #include "../tests.h"
 #include "serialization.h"
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/logstream.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <sstream>
-#include <fstream>
-#include <iomanip>
 
 
 

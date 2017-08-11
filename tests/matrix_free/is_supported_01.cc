@@ -16,8 +16,6 @@
 // Test the ouput of MatrixFree::is_supported for various FiniteElements
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/fe/fe_q_iso_q1.h>
 #include <deal.II/fe/fe_q.h>

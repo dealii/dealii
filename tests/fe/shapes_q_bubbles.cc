@@ -18,7 +18,6 @@
 #include "shapes.h"
 #include <deal.II/fe/fe_q_bubbles.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <fstream>
 #include <string>
 
 #define PRECISION 7

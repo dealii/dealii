@@ -18,11 +18,6 @@
 // because largest_range was not serialized/reset.
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
-#include <cstdio>
 #include <stdlib.h>
 
 #include <deal.II/base/index_set.h>

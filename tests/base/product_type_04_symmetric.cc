@@ -18,10 +18,6 @@
 // like that of the tensor and the integer-converted-to-double
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 #include <typeinfo>
 #include <complex>
 

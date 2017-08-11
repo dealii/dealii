@@ -17,12 +17,8 @@
 // check that internal::VectorOperations::parallel_reduce works for start-end
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/vector_operations_internal.h>
-#include <cmath>
-#include <fstream>
-#include <iomanip>
 
 
 

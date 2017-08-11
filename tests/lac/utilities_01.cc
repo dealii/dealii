@@ -21,11 +21,7 @@
 #include "../tests.h"
 #include "../testmatrix.h"
 #include "../slepc/testmatrix.h"
-#include <cmath>
-#include <fstream>
 #include <iostream>
-#include <iomanip>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/petsc_compatibility.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>

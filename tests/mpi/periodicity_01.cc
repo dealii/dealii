@@ -59,7 +59,6 @@
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
 
-#include <fstream>
 #include <iostream>
 
 namespace Step40

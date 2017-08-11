@@ -15,9 +15,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
 
 // header for chdir is platform dependent; when the day comes that we support
 // Windows in the test suite then conditionally include direction.h

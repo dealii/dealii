@@ -24,7 +24,6 @@
 #include <deal.II/fe/mapping_cartesian.h>
 #include <deal.II/fe/mapping_q.h>
 
-#include <fstream>
 #include <iostream>
 
 // Test that MappingQ1 works on Cartesian grids. This is a regression test for

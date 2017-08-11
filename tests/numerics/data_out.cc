@@ -37,9 +37,7 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_out_rotation.h>
 #include <deal.II/numerics/data_out_faces.h>
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 
 
 std::ofstream logfile("output");

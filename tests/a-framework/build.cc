@@ -18,9 +18,6 @@
 // test the testsuite framework. this test is supposed to miscompile
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <cstdlib>
 
 
 int main ()

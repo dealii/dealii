@@ -35,9 +35,7 @@
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_postprocessor.h>
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 
 
 std::ofstream logfile("output");

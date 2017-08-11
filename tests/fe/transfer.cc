@@ -15,7 +15,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -30,7 +29,6 @@
 #include <deal.II/multigrid/mg_transfer.h>
 
 #include <vector>
-#include <fstream>
 #include <string>
 
 

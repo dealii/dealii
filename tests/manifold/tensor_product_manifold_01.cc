@@ -17,8 +17,6 @@
 // Test TensorProductManifold
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/grid/tensor_product_manifold.h>
 #include <deal.II/grid/manifold_lib.h>

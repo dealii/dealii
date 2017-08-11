@@ -17,7 +17,6 @@
 // that didn't work for a few days
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/grid/tria.h>
 
@@ -35,7 +34,6 @@
 #include <deal.II/numerics/solution_transfer.h>
 
 #include <iostream>
-#include <fstream>
 
 using namespace dealii;
 

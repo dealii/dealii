@@ -18,10 +18,8 @@
 // the middle of strings, so the output file is almost empty.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 
-#include <fstream>
 
 using namespace dealii;
 

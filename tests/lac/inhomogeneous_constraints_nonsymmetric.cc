@@ -23,7 +23,6 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -41,7 +40,6 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
-#include <fstream>
 #include <iostream>
 #include <complex>
 

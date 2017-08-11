@@ -18,9 +18,7 @@
 // check Utilities::MPI::min_max_avg()
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
-#include <fstream>
 
 void print_it(Utilities::MPI::MinMaxAvg &result)
 {

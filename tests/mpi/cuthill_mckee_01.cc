@@ -19,7 +19,6 @@
 // DoFRenumbering::Cuthill_McKee also works on empty processors
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -28,7 +27,6 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/fe/fe_q.h>
-#include <fstream>
 
 using namespace dealii;
 template <int dim>

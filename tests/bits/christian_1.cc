@@ -29,8 +29,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out_stack.h>
-#include <fstream>
-#include <iomanip>
 
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/dofs/dof_handler.h>

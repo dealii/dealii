@@ -20,7 +20,6 @@
 //                          coupling, flux_coupling, subdomain_id)
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/point.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/fe/fe_system.h>
@@ -32,12 +31,9 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <fstream>
 #include <sstream>
-#include <iomanip>
 #include <list>
 #include <set>
-#include <cstdio>
 
 
 void test ()

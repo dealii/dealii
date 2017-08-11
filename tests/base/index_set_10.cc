@@ -17,10 +17,6 @@
 // test indexing in IndexSet variables for a contiguous range
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 
 #include <deal.II/base/index_set.h>
 

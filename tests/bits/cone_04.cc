@@ -18,10 +18,8 @@
 // check ConeBoundary<3>::normal_vector()
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 
-#include <fstream>
 
 
 

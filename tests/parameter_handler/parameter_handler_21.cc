@@ -18,9 +18,7 @@
 // check the Patterns::MultipleSelection
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
 #include <sstream>
 
 void check (const char *defaults, const char *defined, const char *input)

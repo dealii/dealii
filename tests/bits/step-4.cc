@@ -19,8 +19,6 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
 std::ofstream logfile("output");
 
 
@@ -44,11 +42,8 @@ std::ofstream logfile("output");
 #include <deal.II/lac/precondition.h>
 
 #include <deal.II/numerics/data_out.h>
-#include <fstream>
-#include <iomanip>
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 
 
 

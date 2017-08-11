@@ -20,7 +20,6 @@
 #include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_full_matrix.h>
-#include <fstream>
 #include <iostream>
 #include <vector>
 

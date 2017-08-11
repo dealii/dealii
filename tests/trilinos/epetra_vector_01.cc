@@ -18,7 +18,6 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
-#include <fstream>
 #include <iostream>
 #include <vector>
 

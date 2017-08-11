@@ -17,11 +17,9 @@
 // Investigate a seeming inconsistency in MGConstrainedDoFs at the boundary
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/numbers.h>
 
@@ -64,7 +62,6 @@
 #include <deal.II/meshworker/output.h>
 #include <deal.II/meshworker/loop.h>
 
-#include <fstream>
 #include <sstream>
 
 using namespace dealii;

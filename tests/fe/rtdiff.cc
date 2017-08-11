@@ -25,14 +25,12 @@
 // point-wise.
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/mapping_cartesian.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <fstream>
 
 // This function copied from FERaviartThomasNodal. nodes is the
 // element having the support points and the value of other in these

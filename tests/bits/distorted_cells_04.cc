@@ -18,7 +18,6 @@
 // like _03, but catch the exception and pass it to GridTools::fix_up_distorted_child_cells
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -32,7 +31,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <fstream>
 
 
 template <int dim>

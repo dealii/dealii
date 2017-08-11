@@ -17,7 +17,6 @@
 // test that a default-constructed ArrayView can actually be copied
 
 #include "../tests.h"
-#include <iomanip>
 
 #include <deal.II/base/array_view.h>
 

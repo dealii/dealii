@@ -18,8 +18,6 @@
 // computes points in real space starting from some quadrature points on the unit element
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 // all include files you need here
 
@@ -34,7 +32,6 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 
-#include <fstream>
 #include <string>
 
 std::ofstream logfile("output");

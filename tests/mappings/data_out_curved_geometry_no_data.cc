@@ -23,7 +23,6 @@
 // based on a testcase by Sebastian Gonzalez-Pintor
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -41,7 +40,6 @@
 
 #include <deal.II/numerics/data_out.h>
 
-#include <fstream>
 
 
 int main ()

@@ -20,7 +20,6 @@
 
 #include "../tests.h"
 #include <deal.II/lac/solver_selector.h>
-#include <fstream>
 
 DEAL_II_NAMESPACE_OPEN
 // instantiation here

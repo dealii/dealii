@@ -22,7 +22,6 @@
 
 #include "../tests.h"
 #include <deal.II/lac/sparse_matrix.h>
-#include <fstream>
 
 
 void test ()

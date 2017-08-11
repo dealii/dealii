@@ -17,10 +17,6 @@
 // test IndexSet::index_within_set () for an empty index set
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 
 #include <deal.II/base/index_set.h>
 

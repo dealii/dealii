@@ -21,12 +21,10 @@
 // result doesn't change
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_tools.h>
 
-#include <fstream>
 #include <string>
 
 #define PRECISION 5

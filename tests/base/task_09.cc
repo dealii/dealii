@@ -23,10 +23,8 @@
 
 #include "../tests.h"
 #include <chrono>
-#include <fstream>
 #include <thread>
 
-#include <cstdlib>
 
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/multithread_info.h>

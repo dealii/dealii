@@ -18,8 +18,6 @@
 // calculates the measure of the surface of a hypersphere
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 // all include files needed for the program
 
@@ -34,7 +32,6 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 
-#include <fstream>
 #include <string>
 
 std::ofstream logfile("output");

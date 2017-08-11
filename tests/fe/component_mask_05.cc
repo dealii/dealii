@@ -23,8 +23,6 @@
 #include "../tests.h"
 #include <deal.II/fe/component_mask.h>
 
-#include <fstream>
-#include <iomanip>
 
 
 

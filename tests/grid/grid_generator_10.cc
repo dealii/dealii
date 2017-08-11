@@ -18,14 +18,11 @@
 // Test GridReordering<3>::reorder_cells
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_reordering.h>
 
-#include <fstream>
-#include <iomanip>
 
 
 void

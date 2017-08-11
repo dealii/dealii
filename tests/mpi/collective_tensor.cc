@@ -18,10 +18,8 @@
 // check Utilities::MPI::sum() for tensor objects
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
-#include <fstream>
 
 void test()
 {

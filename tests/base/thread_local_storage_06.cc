@@ -18,8 +18,6 @@
 // initialize the thread local storage
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 #include <unistd.h>
 
 #include <deal.II/base/thread_management.h>

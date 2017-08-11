@@ -21,7 +21,6 @@
 #include <deal.II/meshworker/assembler.h>
 #include <deal.II/meshworker/loop.h>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/grid/grid_generator.h>
@@ -31,9 +30,7 @@
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_system.h>
 
-#include <fstream>
 #include <functional>
-#include <iomanip>
 
 using namespace dealii;
 

@@ -23,7 +23,6 @@
 
 #include "matrix_vector_mf.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
 #include <deal.II/lac/la_parallel_vector.h>

@@ -18,7 +18,6 @@
 // compared to radially symmetric fucntion.
 
 #include "../tests.h"
-#include <cmath>
 #include <deal.II/base/function_spherical.h>
 #include <deal.II/base/geometric_utilities.h>
 

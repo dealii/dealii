@@ -16,9 +16,7 @@
 // Check that pop_back() for `IndexSet` works properly
 
 #include "../tests.h"
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/index_set.h>
 
 int main()

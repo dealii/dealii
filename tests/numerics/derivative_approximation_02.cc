@@ -17,7 +17,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 
@@ -34,8 +33,6 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_values.h>
-#include <fstream>
-#include <iomanip>
 #include <vector>
 using namespace std;
 

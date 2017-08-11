@@ -25,7 +25,6 @@ char logname[] = "output";
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/lac/vector.h>
@@ -47,7 +46,6 @@ char logname[] = "output";
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <fstream>
 #include <iostream>
 
 #include <deal.II/fe/fe_q.h>

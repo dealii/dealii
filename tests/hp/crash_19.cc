@@ -20,14 +20,11 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
 std::ofstream logfile("output");
 
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/table_handler.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/lac/vector.h>
@@ -52,7 +49,6 @@ std::ofstream logfile("output");
 #include <deal.II/numerics/error_estimator.h>
 
 #include <iostream>
-#include <fstream>
 #include <list>
 #include <sstream>
 

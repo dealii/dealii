@@ -23,8 +23,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/mapping_q.h>
-#include <fstream>
-#include <iomanip>
 
 
 template <int dim, int spacedim>

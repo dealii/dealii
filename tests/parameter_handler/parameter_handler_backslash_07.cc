@@ -15,9 +15,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
 
 /*
  * If a parameter file line ends in a '\', then the whitespace at at the

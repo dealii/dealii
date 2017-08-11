@@ -12,8 +12,6 @@
 // Test that the flat manifold does what it should. This time on faces.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 
 // all include files you need here

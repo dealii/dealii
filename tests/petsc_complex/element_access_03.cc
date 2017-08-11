@@ -19,7 +19,6 @@
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/base/numbers.h>
 
-#include <fstream>
 #include <iostream>
 #include <cassert>
 

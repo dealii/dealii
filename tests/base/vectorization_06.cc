@@ -17,7 +17,6 @@
 // test gather and scatter operations of vectorized array
 
 #include "../tests.h"
-#include <iomanip>
 #include <limits>
 
 #include <deal.II/base/vectorization.h>

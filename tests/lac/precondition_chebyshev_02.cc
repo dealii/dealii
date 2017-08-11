@@ -20,15 +20,10 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include <fstream>
-#include <iomanip>
-#include <iomanip>
-#include <cmath>
 
 
 class DiagonalMatrixManual

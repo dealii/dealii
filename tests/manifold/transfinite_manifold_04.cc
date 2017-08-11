@@ -13,8 +13,6 @@
 // interpolation on a test that is similar to transfinite_manifold_01.cc
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>

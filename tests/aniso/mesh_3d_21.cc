@@ -21,7 +21,6 @@
 #include "../tests.h"
 #include "../grid/mesh_3d.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>
@@ -35,7 +34,6 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
 
-#include <fstream>
 
 // declare these global in order to reduce time needed upon construction of
 // these objects which is considerable

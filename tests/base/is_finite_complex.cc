@@ -17,11 +17,9 @@
 // check numbers::is_finite for complex arguments
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <iomanip>
+
 #include <limits>
-#include <fenv.h>
+#include <cfenv>
 
 
 template <typename T>

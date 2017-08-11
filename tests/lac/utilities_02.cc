@@ -30,7 +30,6 @@
 
 #include "../tests.h"
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/distributed/tria.h>
@@ -61,7 +60,6 @@
 #include <deal.II/lac/parpack_solver.h>
 #endif
 
-#include <fstream>
 #include <iostream>
 
 

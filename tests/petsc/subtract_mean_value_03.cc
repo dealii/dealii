@@ -21,8 +21,6 @@
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <fstream>
-#include <iomanip>
 #include <vector>
 
 template <class VectorType>

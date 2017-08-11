@@ -25,12 +25,9 @@
 // phase of the moon :-)
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/block_vector.h>
-#include <fstream>
-#include <iomanip>
 #include <algorithm>
 
 

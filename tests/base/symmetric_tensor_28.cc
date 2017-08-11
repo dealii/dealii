@@ -19,9 +19,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/symmetric_tensor.h>
-#include <deal.II/base/logstream.h>
-#include <fstream>
-#include <iomanip>
 
 
 template <int dim>

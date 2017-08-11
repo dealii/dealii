@@ -36,8 +36,6 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
 #include <metis.h>
-#include <fstream>
-#include <iomanip>
 
 
 void partition (const SparsityPattern     &sparsity_pattern,

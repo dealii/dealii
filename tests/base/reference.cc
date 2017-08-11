@@ -21,11 +21,8 @@
 
 
 #include "../tests.h"
-#include <fstream>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>
-#include <deal.II/base/logstream.h>
-#include <iomanip>
 #include <iostream>
 #include <vector>
 

@@ -18,7 +18,6 @@
 // (otherwise the same as vectorization_05)
 
 #include "../tests.h"
-#include <iomanip>
 #include <limits>
 
 #include <deal.II/base/vectorization.h>

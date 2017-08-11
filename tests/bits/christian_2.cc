@@ -22,8 +22,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/numerics/data_out_stack.h>
-#include <fstream>
-#include <iomanip>
 
 
 int main()

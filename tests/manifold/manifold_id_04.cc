@@ -13,8 +13,6 @@
 // that the ids are correctly inherited from one cell onward.
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 
 // all include files you need here

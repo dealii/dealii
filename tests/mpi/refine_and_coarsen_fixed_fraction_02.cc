@@ -24,7 +24,6 @@
 // refine_and_coarsen_fixed_number)
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/lac/vector.h>
@@ -37,7 +36,6 @@
 #include <deal.II/base/utilities.h>
 
 
-#include <fstream>
 
 
 void test()

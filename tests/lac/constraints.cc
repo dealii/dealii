@@ -31,11 +31,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/base/logstream.h>
 
-#include <fstream>
-#include <cmath>
-#include <cstdlib>
 
 
 std::ofstream logfile("output");

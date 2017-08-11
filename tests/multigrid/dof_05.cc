@@ -18,7 +18,6 @@
 // meshes when used in parallel
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>

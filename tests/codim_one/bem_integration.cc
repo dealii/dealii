@@ -19,8 +19,6 @@
 
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 
 // all include files you need here
 
@@ -48,7 +46,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/base/smartpointer.h>
 
-#include <cmath>
 #include <iostream>
 #include <math.h>
 #include <string>

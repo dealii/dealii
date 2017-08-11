@@ -20,9 +20,7 @@
 // http://code.google.com/p/dealii/issues/detail?id=126
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
 
 void check (const char *content, double &v1, double &v2)
 {

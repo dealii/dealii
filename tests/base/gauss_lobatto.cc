@@ -17,12 +17,8 @@
 // check points and weights for Gauss-Lobatto quadrature formula
 
 #include "../tests.h"
-#include <iomanip>
-#include <fstream>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <cmath>
 
 
 int main()

@@ -22,7 +22,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
-#include <stdio.h>
 
 #if defined(__linux__)
 #include <sched.h>

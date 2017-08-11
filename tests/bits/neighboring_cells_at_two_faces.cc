@@ -15,15 +15,12 @@
 
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_reordering.h>
 
-#include <fstream>
-#include <iomanip>
 
 
 // generate two degenerate quads which reduce to the form of triangles, where

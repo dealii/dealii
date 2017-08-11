@@ -18,8 +18,6 @@
 // like grid_in_out but test persistent triangulation
 
 #include "../tests.h"
-#include <fstream>
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/persistent_tria.h>

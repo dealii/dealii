@@ -19,7 +19,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <fstream>
 #include <string>
 
 #define PRECISION 8

@@ -18,7 +18,6 @@
 // test FETools::interpolation_difference
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -39,7 +38,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 
-#include <fstream>
 
 
 

@@ -18,8 +18,6 @@
 
 #include "../tests.h"
 
-#include <fstream>
-#include <iomanip>
 
 #include <Epetra_Map.h>
 #include <Epetra_MpiComm.h>

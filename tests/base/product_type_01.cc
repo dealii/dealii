@@ -17,10 +17,6 @@
 // test ProductType
 
 #include "../tests.h"
-#include <iomanip>
-#include <iomanip>
-#include <fstream>
-#include <cmath>
 #include <typeinfo>
 #include <complex>
 

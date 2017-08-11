@@ -31,7 +31,6 @@ While distributing the constraint for DoF 41, it turns out that one of the proce
  */
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/grid/tria.h>
@@ -44,7 +43,6 @@ While distributing the constraint for DoF 41, it turns out that one of the proce
 #include <deal.II/base/function.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <fstream>
 #include <sstream>
 
 

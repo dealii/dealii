@@ -19,9 +19,7 @@
 // happens if such an include statement fails
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
-#include <fstream>
 
 void check (const char *p)
 {

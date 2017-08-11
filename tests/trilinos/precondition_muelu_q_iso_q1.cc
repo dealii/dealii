@@ -35,8 +35,6 @@
 #include <deal.II/base/function.h>
 #include <deal.II/grid/tria.h>
 
-#include <fstream>
-#include <iomanip>
 
 
 template <int dim>

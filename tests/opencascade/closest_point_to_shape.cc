@@ -16,7 +16,6 @@
 
 #include <deal.II/opencascade/utilities.h>
 
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_out.h>

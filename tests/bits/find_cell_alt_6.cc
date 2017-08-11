@@ -29,7 +29,6 @@
 // x--x--x-----x
 
 #include "../tests.h"
-#include <deal.II/base/logstream.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -39,7 +38,6 @@
 
 #include <deal.II/fe/mapping_q1.h>
 
-#include <fstream>
 
 
 

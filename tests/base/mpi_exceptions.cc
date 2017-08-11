@@ -19,7 +19,6 @@
 
 #include "../tests.h"
 #include <deal.II/base/exceptions.h>
-#include <fstream>
 
 #include <mpi.h>
 

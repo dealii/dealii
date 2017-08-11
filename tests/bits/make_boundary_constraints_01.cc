@@ -35,8 +35,6 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/fe/fe_q.h>
-#include <fstream>
-#include <iomanip>
 
 
 template <int dim>

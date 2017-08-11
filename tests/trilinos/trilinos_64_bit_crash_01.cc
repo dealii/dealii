@@ -22,9 +22,6 @@
 
 
 #include "../tests.h"
-#include <fstream>
-#include <iomanip>
-#include <deal.II/base/logstream.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 
