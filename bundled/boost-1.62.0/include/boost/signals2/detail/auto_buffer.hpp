@@ -304,6 +304,7 @@ namespace detail
             (*this).~auto_buffer();
             buffer_   = new_buffer;
             members_.capacity_ = new_capacity;
+            size_ = std::max(static_cast<decltype(size_)>(0),size_);
             BOOST_ASSERT( size_ <= members_.capacity_ );
         }
 
