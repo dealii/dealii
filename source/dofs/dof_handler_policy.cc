@@ -1126,20 +1126,22 @@ namespace internal
           Assert (dof_handler.get_triangulation().n_levels() > 0,
                   ExcMessage("Empty triangulation"));
 
-          // Step 1: distribute dofs on all cells
+          // Step 1: distribute dofs on all cells, but definitely
+          // exclude artificial cells
           types::global_dof_index next_free_dof = 0;
           typename DoFHandlerType::active_cell_iterator
           cell = dof_handler.begin_active(),
           endc = dof_handler.end();
 
           for (; cell != endc; ++cell)
-            if ((subdomain_id == numbers::invalid_subdomain_id)
-                ||
-                (cell->subdomain_id() == subdomain_id))
-              next_free_dof
-                = Implementation::distribute_dofs_on_cell (dof_handler,
-                                                           cell,
-                                                           next_free_dof);
+            if (! cell->is_artificial())
+              if ((subdomain_id == numbers::invalid_subdomain_id)
+                  ||
+                  (cell->subdomain_id() == subdomain_id))
+                next_free_dof
+                  = Implementation::distribute_dofs_on_cell (dof_handler,
+                                                             cell,
+                                                             next_free_dof);
 
           // Step 2: unify dof indices in case this is an hp DoFHandler
           next_free_dof = unify_dof_indices (dof_handler, next_free_dof);
