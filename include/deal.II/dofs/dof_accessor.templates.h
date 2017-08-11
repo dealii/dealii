@@ -1174,7 +1174,7 @@ namespace internal
                               (*dof_handler.finite_elements)[fe_index].dofs_per_vertex));
         Assert (fe_index < dof_handler.finite_elements->size(),
                 ExcInternalError());
-        Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
+        Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
                 numbers::invalid_dof_index,
                 ExcMessage ("This vertex is unused and has no DoFs associated with it"));
 
@@ -1185,7 +1185,7 @@ namespace internal
         // part. trigger an exception if
         // we can't find a set for this
         // particular fe_index
-        const types::global_dof_index starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+        const unsigned int starting_offset = dof_handler.vertex_dof_offsets[vertex_index];
         types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
         while (true)
           {
@@ -1260,10 +1260,10 @@ namespace internal
         Assert (local_index < (*dof_handler.finite_elements)[fe_index].dofs_per_vertex,
                 ExcIndexRange(local_index, 0,
                               (*dof_handler.finite_elements)[fe_index].dofs_per_vertex));
-        Assert (vertex_index < dof_handler.vertex_dofs_offsets.size(),
+        Assert (vertex_index < dof_handler.vertex_dof_offsets.size(),
                 ExcIndexRange (vertex_index, 0,
-                               dof_handler.vertex_dofs_offsets.size()));
-        Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
+                               dof_handler.vertex_dof_offsets.size()));
+        Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
                 numbers::invalid_dof_index,
                 ExcMessage ("This vertex is unused and has no DoFs associated with it"));
 
@@ -1274,7 +1274,7 @@ namespace internal
         // part. trigger an exception if
         // we can't find a set for this
         // particular fe_index
-        const types::global_dof_index starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+        const unsigned int starting_offset = dof_handler.vertex_dof_offsets[vertex_index];
         const types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
         while (true)
           {
@@ -1312,13 +1312,13 @@ namespace internal
                             "this DoFHandler"));
 
         // if this vertex is unused, return 0
-        if (dof_handler.vertex_dofs_offsets[vertex_index] == numbers::invalid_dof_index)
+        if (dof_handler.vertex_dof_offsets[vertex_index] == numbers::invalid_dof_index)
           return 0;
 
         // hop along the list of index
         // sets and count the number of
         // hops
-        const types::global_dof_index starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+        const unsigned int starting_offset = dof_handler.vertex_dof_offsets[vertex_index];
         const types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
 
         Assert (*pointer != numbers::invalid_dof_index,
@@ -1363,14 +1363,14 @@ namespace internal
                                                                 vertex_index)));
         // make sure we don't ask on
         // unused vertices
-        Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
+        Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
                 numbers::invalid_dof_index,
                 ExcInternalError());
 
         // hop along the list of index
         // sets and count the number of
         // hops
-        const types::global_dof_index starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+        const unsigned int starting_offset = dof_handler.vertex_dof_offsets[vertex_index];
         const types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
 
         Assert (*pointer != numbers::invalid_dof_index,
@@ -1423,14 +1423,14 @@ namespace internal
 
         // make sure we don't ask on
         // unused vertices
-        Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
+        Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
                 numbers::invalid_dof_index,
                 ExcInternalError());
 
         // hop along the list of index
         // sets and see whether we find
         // the given index
-        const types::global_dof_index starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+        const unsigned int starting_offset = dof_handler.vertex_dof_offsets[vertex_index];
         const types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
 
         Assert (*pointer != numbers::invalid_dof_index,

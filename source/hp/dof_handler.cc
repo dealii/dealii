@@ -169,16 +169,16 @@ namespace internal
           // vertex, we need one slot per fe to store the fe_index,
           // plus dofs_per_vertex for this fe. in addition, we need
           // one slot as the end marker for the fe_indices. at the
-          // same time already fill the vertex_dofs_offsets field
-          dof_handler.vertex_dofs_offsets.resize (dof_handler.tria->n_vertices(),
-                                                  numbers::invalid_dof_index);
+          // same time already fill the vertex_dof_offsets field
+          dof_handler.vertex_dof_offsets.resize (dof_handler.tria->n_vertices(),
+                                                 numbers::invalid_dof_index);
 
           unsigned int vertex_slots_needed = 0;
           for (unsigned int v=0; v<dof_handler.tria->n_vertices(); ++v)
             if (dof_handler.tria->vertex_used(v) == true)
               if (locally_used_vertices[v] == true)
                 {
-                  dof_handler.vertex_dofs_offsets[v] = vertex_slots_needed;
+                  dof_handler.vertex_dof_offsets[v] = vertex_slots_needed;
 
                   for (unsigned int fe=0; fe<dof_handler.finite_elements->size(); ++fe)
                     if (vertex_fe_association[fe][v] == true)
@@ -196,7 +196,7 @@ namespace internal
             if (dof_handler.tria->vertex_used(v) == true)
               if (locally_used_vertices[v] == true)
                 {
-                  unsigned int current_index = dof_handler.vertex_dofs_offsets[v];
+                  unsigned int current_index = dof_handler.vertex_dof_offsets[v];
                   for (unsigned int fe=0; fe<dof_handler.finite_elements->size(); ++fe)
                     if (vertex_fe_association[fe][v] == true)
                       {
@@ -1150,7 +1150,7 @@ namespace hp
                        MemoryConsumption::memory_consumption (*faces) +
                        MemoryConsumption::memory_consumption (number_cache) +
                        MemoryConsumption::memory_consumption (vertex_dofs) +
-                       MemoryConsumption::memory_consumption (vertex_dofs_offsets) +
+                       MemoryConsumption::memory_consumption (vertex_dof_offsets) +
                        MemoryConsumption::memory_consumption (has_children));
     for (unsigned int i=0; i<levels.size(); ++i)
       mem += MemoryConsumption::memory_consumption (*levels[i]);
@@ -1647,7 +1647,7 @@ namespace hp
     faces.reset ();
 
     vertex_dofs = std::move(std::vector<types::global_dof_index>());
-    vertex_dofs_offsets = std::move (std::vector<types::global_dof_index>());
+    vertex_dof_offsets = std::move (std::vector<types::global_dof_index>());
   }
 }
 
