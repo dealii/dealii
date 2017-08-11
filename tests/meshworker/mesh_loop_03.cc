@@ -72,19 +72,19 @@ void test()
             << ", Neighbor Subface: " << nsf << std::endl;
   };
 
-  auto copyer = [](const CopyData &)
+  auto copier = [](const CopyData &)
   {
-    deallog << "Copyer" << std::endl;
+    deallog << "copier" << std::endl;
   };
 
   deallog << "CELLS ONLY" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copyer, scratch, copy);
+  mesh_loop(cell, endc, cell_worker, copier, scratch, copy);
 
 
   deallog << "CELLS ONLY WORKSTREAM" << std::endl << std::endl;
 
-  WorkStream::run(cell, endc, cell_worker, copyer, scratch, copy);
+  WorkStream::run(cell, endc, cell_worker, copier, scratch, copy);
 
 
 }

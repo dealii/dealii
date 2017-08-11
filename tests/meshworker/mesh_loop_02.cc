@@ -71,47 +71,47 @@ void test()
             << ", Neighbor Subface: " << nsf << std::endl;
   };
 
-  auto copyer = [](const CopyData &)
+  auto copier = [](const CopyData &)
   {
-    deallog << "Copyer" << std::endl;
+    deallog << "copier" << std::endl;
   };
 
   deallog << "CELLS ONLY" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copyer, scratch, copy,
+  mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
             assemble_own_cells,
             boundary_worker, face_worker);
 
 
   deallog << "BOUNDARY ONLY" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copyer, scratch, copy,
+  mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
             assemble_boundary_faces,
             boundary_worker, face_worker);
 
   deallog << "CELLS AND BOUNDARY" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copyer, scratch, copy,
+  mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
             assemble_own_cells | assemble_boundary_faces,
             boundary_worker, face_worker);
 
   deallog << "CELLS FIRST AND BOUNDARY" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copyer, scratch, copy,
+  mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
             assemble_own_cells | assemble_cells_first | assemble_boundary_faces,
             boundary_worker, face_worker);
 
 
   deallog << "ONLY FACES ONCE" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copyer, scratch, copy,
+  mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
             assemble_own_interior_faces_once,
             boundary_worker, face_worker);
 
 
   deallog << "ONLY FACES BOTH" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copyer, scratch, copy,
+  mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
             assemble_own_interior_faces_both,
             boundary_worker, face_worker);
 }

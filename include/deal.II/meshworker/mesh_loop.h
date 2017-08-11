@@ -48,7 +48,7 @@ namespace MeshWorker
                  const typename identity<CellIteratorType>::type &end,
 
                  const typename identity<std::function<void (const CellIteratorType &, ScratchData &, CopyData &)>>::type &cell_worker,
-                 const typename identity<std::function<void (const CopyData &)>>::type &copyer,
+                 const typename identity<std::function<void (const CopyData &)>>::type &copier,
 
                  ScratchData &scratch_data,
                  CopyData &copy_data,
@@ -214,7 +214,7 @@ namespace MeshWorker
 
     // Loop over all cells
     WorkStream::run(begin, end,
-                    cell_action, copyer,
+                    cell_action, copier,
                     scratch_data, copy_data,
                     queue_length, chunk_size);
   }
