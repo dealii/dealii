@@ -176,11 +176,7 @@ public:
    * procedure.
    *
    * The iteration is also aborted if the residual becomes a denormalized
-   * value (@p NaN). Note, however, that this check is only performed if the
-   * @p isnan function is provided by the operating system, which is not
-   * always true. CMake checks this with the 'check_01_cxx_features.cmake'
-   * test and sets the flag @p DEAL_II_HAVE_ISNAN in the include file
-   * <tt>deal.II/base/config.h</tt> if this function was found.
+   * value (@p NaN).
    *
    * <tt>check()</tt> additionally preserves @p step and @p check_value. These
    * values are accessible by <tt>last_value()</tt> and <tt>last_step()</tt>.

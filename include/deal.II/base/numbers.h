@@ -141,8 +141,11 @@ namespace numbers
    *
    * If none of the functions detecting NaN is available, this function
    * returns false.
+   *
+   * @deprecated This function has been deprecated in favor of the C++11
+   * function <code>std::isnan</code>.
    */
-  bool is_nan (const double x);
+  bool is_nan (const double x) DEAL_II_DEPRECATED;
 
   /**
    * Return @p true if the given value is a finite floating point number, i.e.
@@ -283,21 +286,13 @@ namespace numbers
 
   inline bool is_nan (const double x)
   {
-#ifdef DEAL_II_HAVE_STD_ISNAN
     return std::isnan(x);
-#elif defined(DEAL_II_HAVE_ISNAN)
-    return isnan(x);
-#elif defined(DEAL_II_HAVE_UNDERSCORE_ISNAN)
-    return _isnan(x);
-#else
-    return false;
-#endif
   }
 
   inline bool is_finite (const double x)
   {
 #ifdef DEAL_II_HAVE_ISFINITE
-    return !is_nan(x) && std::isfinite (x);
+    return !std::isnan(x) && std::isfinite (x);
 #else
     // Check against infinities. Note
     // that if x is a NaN, then both
