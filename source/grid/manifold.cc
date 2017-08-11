@@ -122,18 +122,12 @@ add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
 {
   AssertDimension(surrounding_points.size(), weights.size(1));
 
-  const std::size_t n_points = surrounding_points.size();
-  // TODO find a better dimension-dependent estimate for the size of this
-  // vector
-  boost::container::small_vector<double, 20> local_weights(n_points);
   for (unsigned int row=0; row<weights.size(0); ++row)
     {
-      for (unsigned int i=0; i<n_points; ++i)
-        local_weights[i] = weights(row,i);
       new_points[row] = get_new_point(make_array_view(surrounding_points.begin(),
                                                       surrounding_points.end()),
-                                      make_array_view(local_weights.begin(),
-                                                      local_weights.end()));
+                                      make_array_view(weights,
+                                                      row));
     }
 }
 
