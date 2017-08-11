@@ -17,7 +17,9 @@
 // check numbers::is_finite for complex arguments
 
 #include "../tests.h"
+
 #include <limits>
+#include <cfenv>
 
 
 template <typename T>

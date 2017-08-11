@@ -18,6 +18,8 @@
 //
 // check on the Polynomial::operator -=
 
+#include "../tests.h"
+
 #include <deal.II/base/polynomial.h>
 
 #include <iostream>
@@ -28,9 +30,8 @@ using namespace dealii;
 
 int main ()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   //      subtract two equal polynomials up to order p_dim
   //      the result evaluated at an arbitrary point

@@ -18,7 +18,9 @@
 // list. the test should actually output "nan", but prints "0"
 
 #include "../tests.h"
+
 #include <limits>
+#include <cfenv>
 
 int main ()
 {

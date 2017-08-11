@@ -18,8 +18,7 @@
 
 // Test curl related functions in integrators/maxwell.h
 
-#include <cstring>
-#include <iostream>
+#include "../tests.h"
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
@@ -96,10 +95,7 @@ void TestMaxwellCurl(Triangulation<dim> &tr)
 
 int main()
 {
-  const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
+  initlog();
 
   Triangulation<3> tr;
   make_grid(tr);

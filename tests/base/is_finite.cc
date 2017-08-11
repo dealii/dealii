@@ -17,7 +17,9 @@
 // check numbers::is_finite
 
 #include "../tests.h"
+
 #include <limits>
+#include <cfenv>
 
 
 template <typename T>

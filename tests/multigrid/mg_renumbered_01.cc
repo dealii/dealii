@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include "../tests.h"
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -474,10 +475,8 @@ void LaplaceProblem<dim>::run ()
 
 int main ()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::setprecision(4);
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   LaplaceProblem<2> laplace_problem_2d(1);
   laplace_problem_2d.run ();
