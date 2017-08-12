@@ -1,0 +1,3 @@
+New: parallel::GridTools::exchange_cell_data_to_ghosts() to exchange ghost data.
+<br>
+(Timo Heister, 2017/08/12)

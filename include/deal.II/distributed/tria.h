@@ -858,11 +858,10 @@ namespace parallel
       get_cell_weights();
 
       /**
-       * Return a map that, for each vertex, lists all the processors whose
-       * subdomains are adjacent to that vertex. Used by
-       * DoFHandler::Policy::ParallelDistributed.
+       * Override the implementation in parallel::Triangulation because
+       * we can ask p4est about ghost neighbors across periodic boundaries.
        */
-      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      virtual std::map<unsigned int, std::set<dealii::types::subdomain_id> >
       compute_vertices_with_ghost_neighbors () const;
 
       /**
