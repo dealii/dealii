@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__distribute_grid_refinement_h
-#define dealii__distribute_grid_refinement_h
+#ifndef dealii__distributed_grid_refinement_h
+#define dealii__distributed_grid_refinement_h
 
 
 #include <deal.II/base/config.h>
