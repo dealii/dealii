@@ -1024,6 +1024,17 @@ namespace GridTools
   vertex_to_cell_map(const Triangulation<dim,spacedim> &triangulation);
 
   /**
+   * Returns a vector that contains a tensor for every vertex-cell combination
+   * of the output of GridTools::vertex_to_cell_map() (which is expected as
+   * input parameter for this function). Each tensor represents a geometric
+   * vector from the vertex to the respective cell center.
+   *
+   * @author Rene Gassmoeller, Luca Heltai, 2017.
+   */
+  template <int dim, int spacedim>
+  std::vector<std::vector<Tensor<1,spacedim> > >
+  vertex_to_cell_centers_directions(const Triangulation<dim,spacedim> &mesh,
+                                    const std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> > &vertex_to_cells);
 
 
   /**

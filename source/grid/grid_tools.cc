@@ -1458,6 +1458,31 @@ next_cell:
     return best_cell;
   }
 
+  template <int dim,int spacedim>
+  std::vector<std::vector<Tensor<1,spacedim> > >
+  vertex_to_cell_centers_directions(const Triangulation<dim,spacedim> &mesh,
+                                    const std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> > &vertex_to_cells)
+  {
+    const std::vector<Point<spacedim> > &vertices = mesh.get_vertices();
+    const unsigned int n_vertices = vertex_to_cells.size();
+
+    std::vector<std::vector<Tensor<1,spacedim> > > vertex_to_cell_centers(n_vertices);
+    for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
+      if (mesh.vertex_used(vertex))
+        {
+          const unsigned int n_neighbor_cells = vertex_to_cells[vertex].size();
+          vertex_to_cell_centers[vertex].resize(n_neighbor_cells);
+
+          typename std::set<typename Triangulation<dim,spacedim>::active_cell_iterator>::iterator it = vertex_to_cells[vertex].begin();
+          for (unsigned int cell=0; cell<n_neighbor_cells; ++cell,++it)
+            {
+              vertex_to_cell_centers[vertex][cell] = (*it)->center() - vertices[vertex];
+              vertex_to_cell_centers[vertex][cell] /= vertex_to_cell_centers[vertex][cell].norm();
+            }
+        }
+    return vertex_to_cell_centers;
+  }
+
 
 
   template <int dim, int spacedim>
