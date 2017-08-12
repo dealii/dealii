@@ -942,7 +942,7 @@ namespace internal
           // version often enough, we need to have all tasks but the last one
           // to be divisible by the vectorization length
           accumulate_regular(op, n_chunks, index, outer_results,
-                             internal::bool2type<Operation::vectorizes>());
+                             std::integral_constant<bool, Operation::vectorizes>());
 
           // now work on the remainder, i.e., the last up to 32 values. Use
           // switch statement with fall-through to work on these values.
@@ -1039,7 +1039,7 @@ namespace internal
                        size_type       &n_chunks,
                        size_type       &index,
                        ResultType (&outer_results)[vector_accumulation_recursion_threshold],
-                       internal::bool2type<false>)
+                       std::integral_constant<bool, false>)
     {
       // note that each chunk is chosen to have a width of 32, thereby the index
       // is incremented by 4*8 for each @p i.
@@ -1076,7 +1076,7 @@ namespace internal
                        size_type       &n_chunks,
                        size_type       &index,
                        Number (&outer_results)[vector_accumulation_recursion_threshold],
-                       internal::bool2type<true>)
+                       std::integral_constant<bool, true>)
     {
       // we start from @p index and workout @p n_chunks each of size 32.
       // in order employ SIMD and work on @p nvecs at a time, we split this

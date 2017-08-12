@@ -441,7 +441,7 @@ namespace internal
         std::memset ((void *)(destination_+begin), 0, (end-begin)*sizeof(T));
       else
         copy_construct_or_assign(begin, end,
-                                 ::dealii::internal::bool2type<initialize_memory>());
+                                 std::integral_constant<bool, initialize_memory>());
     }
 
   private:
@@ -452,7 +452,7 @@ namespace internal
     // copy assignment operation
     void copy_construct_or_assign(const std::size_t begin,
                                   const std::size_t end,
-                                  ::dealii::internal::bool2type<false>) const
+                                  std::integral_constant<bool, false>) const
     {
       for (std::size_t i=begin; i<end; ++i)
         destination_[i] = element_;
@@ -461,7 +461,7 @@ namespace internal
     // copy constructor (memory initialization)
     void copy_construct_or_assign(const std::size_t begin,
                                   const std::size_t end,
-                                  ::dealii::internal::bool2type<true>) const
+                                  std::integral_constant<bool, true>) const
     {
       for (std::size_t i=begin; i<end; ++i)
         new (&destination_[i]) T(element_);

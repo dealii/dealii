@@ -555,14 +555,14 @@ namespace internal
       }
 
       template <class VEC>
-      void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, internal::bool2type<false>)
+      void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, std::integral_constant<bool, false>)
       {
         set_zero_parallel(cm, vec, 0);
       }
 
       // in parallel for BlockVectors
       template <class VEC>
-      void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, internal::bool2type<true>)
+      void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, std::integral_constant<bool, true>)
       {
         size_type start_shift = 0;
         for (size_type j=0; j<vec.n_blocks(); ++j)
@@ -583,7 +583,7 @@ namespace internal
       template <class VEC>
       void set_zero_all(const std::vector<size_type> &cm, VEC &vec)
       {
-        set_zero_in_parallel<VEC>(cm, vec, internal::bool2type<IsBlockVector<VEC>::value>());
+        set_zero_in_parallel<VEC>(cm, vec, std::integral_constant<bool, IsBlockVector<VEC>::value>());
         vec.compress(VectorOperation::insert);
       }
 
@@ -748,7 +748,7 @@ namespace internal
                                        const IndexSet                      &/*locally_owned_elements*/,
                                        const IndexSet                      &needed_elements,
                                        TrilinosWrappers::MPI::Vector       &output,
-                                       const internal::bool2type<false>     /*is_block_vector*/)
+                                       const std::integral_constant<bool, false>     /*is_block_vector*/)
     {
       Assert(!vec.has_ghost_elements(),
              ExcGhostsPresent());
@@ -771,7 +771,7 @@ namespace internal
                                        const IndexSet                   &locally_owned_elements,
                                        const IndexSet                   &needed_elements,
                                        PETScWrappers::MPI::Vector       &output,
-                                       const internal::bool2type<false>  /*is_block_vector*/)
+                                       const std::integral_constant<bool, false>  /*is_block_vector*/)
     {
       output.reinit (locally_owned_elements, needed_elements, vec.get_mpi_communicator());
       output = vec;
@@ -784,7 +784,7 @@ namespace internal
                                        const IndexSet                              &locally_owned_elements,
                                        const IndexSet                              &needed_elements,
                                        LinearAlgebra::distributed::Vector<number>       &output,
-                                       const internal::bool2type<false>             /*is_block_vector*/)
+                                       const std::integral_constant<bool, false>             /*is_block_vector*/)
     {
       // TODO: the in vector might already have all elements. need to find a
       // way to efficiently avoid the copy then
@@ -803,7 +803,7 @@ namespace internal
                                        const IndexSet                   &/*locally_owned_elements*/,
                                        const IndexSet                   &/*needed_elements*/,
                                        Vector                           &/*output*/,
-                                       const internal::bool2type<false>  /*is_block_vector*/)
+                                       const std::integral_constant<bool, false>  /*is_block_vector*/)
     {
       Assert (false, ExcMessage ("We shouldn't even get here!"));
     }
@@ -816,7 +816,7 @@ namespace internal
                                        const IndexSet                  &locally_owned_elements,
                                        const IndexSet                  &needed_elements,
                                        VectorType                      &output,
-                                       const internal::bool2type<true>  /*is_block_vector*/)
+                                       const std::integral_constant<bool, true>  /*is_block_vector*/)
     {
       output.reinit (vec.n_blocks());
 
@@ -827,7 +827,7 @@ namespace internal
                                              locally_owned_elements.get_view (block_start, block_start+vec.block(b).size()),
                                              needed_elements.get_view (block_start, block_start+vec.block(b).size()),
                                              output.block(b),
-                                             internal::bool2type<false>());
+                                             std::integral_constant<bool, false>());
           block_start += vec.block(b).size();
         }
 
@@ -884,7 +884,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
       internal::import_vector_with_ghost_elements (vec,
                                                    vec_owned_elements, needed_elements,
                                                    ghosted_vector,
-                                                   internal::bool2type<IsBlockVector<VectorType>::value>());
+                                                   std::integral_constant<bool, IsBlockVector<VectorType>::value>());
 
       for (constraint_iterator it = lines.begin();
            it != lines.end(); ++it)
@@ -2233,7 +2233,7 @@ ConstraintMatrix::distribute_local_to_global (
   MatrixType                      &global_matrix,
   VectorType                      &global_vector,
   bool                            use_inhomogeneities_for_rhs,
-  internal::bool2type<false>) const
+  std::integral_constant<bool, false>) const
 {
   // check whether we work on real vectors or we just used a dummy when
   // calling the other function above.
@@ -2376,7 +2376,7 @@ distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &
                             MatrixType                   &global_matrix,
                             VectorType                   &global_vector,
                             bool                          use_inhomogeneities_for_rhs,
-                            internal::bool2type<true>) const
+                            std::integral_constant<bool, true>) const
 {
   const bool use_vectors = (local_vector.size() == 0 &&
                             global_vector.size() == 0) ? false : true;
@@ -2563,7 +2563,7 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
                              SparsityPatternType          &sparsity_pattern,
                              const bool                    keep_constrained_entries,
                              const Table<2,bool>          &dof_mask,
-                             internal::bool2type<false> ) const
+                             std::integral_constant<bool, false> ) const
 {
   Assert (sparsity_pattern.n_rows() == sparsity_pattern.n_cols(), ExcNotQuadratic());
 
@@ -2716,7 +2716,7 @@ add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
                              SparsityPatternType          &sparsity_pattern,
                              const bool                    keep_constrained_entries,
                              const Table<2,bool>          &dof_mask,
-                             internal::bool2type<true> ) const
+                             std::integral_constant<bool, true> ) const
 {
   // just as the other add_entries_local_to_global function, but now
   // specialized for block matrices.

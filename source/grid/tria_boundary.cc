@@ -709,7 +709,7 @@ namespace internal
   Point<spacedim>
   compute_projection (const Iterator        &object,
                       const Point<spacedim> &y,
-                      internal::int2type<dim>)
+                      std::integral_constant<int, dim>)
   {
     // let's look at this for
     // simplicity for a quad (dim==2)
@@ -806,7 +806,7 @@ namespace internal
   Point<1>
   compute_projection (const Iterator &,
                       const Point<1> &y,
-                      /* it's a quad: */internal::int2type<2>)
+                      /* it's a quad: */std::integral_constant<int, 2>)
   {
     return y;
   }
@@ -816,7 +816,7 @@ namespace internal
   Point<2>
   compute_projection (const Iterator &,
                       const Point<2> &y,
-                      /* it's a quad: */internal::int2type<2>)
+                      /* it's a quad: */std::integral_constant<int, 2>)
   {
     return y;
   }
@@ -846,7 +846,7 @@ project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &
     return y;
   else
     return internal::compute_projection (quad, y,
-                                         /* it's a quad */internal::int2type<2>());
+                                         /* it's a quad */std::integral_constant<int, 2>());
 }
 
 

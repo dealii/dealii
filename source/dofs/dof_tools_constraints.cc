@@ -565,7 +565,7 @@ namespace DoFTools
     void
     make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1> &,
                                             ConstraintMatrix &,
-                                            dealii::internal::int2type<1>)
+                                            std::integral_constant<int, 1>)
     {
       // nothing to do for regular dof handlers in 1d
     }
@@ -586,7 +586,7 @@ namespace DoFTools
     void
     make_oldstyle_hanging_node_constraints (const dealii::hp::DoFHandler<1> &/*dof_handler*/,
                                             ConstraintMatrix        &/*constraints*/,
-                                            dealii::internal::int2type<1>)
+                                            std::integral_constant<int, 1>)
     {
       // we may have to compute constraints for vertices. gotta think about
       // that a bit more
@@ -607,7 +607,7 @@ namespace DoFTools
     void
     make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1,2> &,
                                             ConstraintMatrix &,
-                                            dealii::internal::int2type<1>)
+                                            std::integral_constant<int, 1>)
     {
       // nothing to do for regular dof handlers in 1d
     }
@@ -623,7 +623,7 @@ namespace DoFTools
     void
     make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1,3> &,
                                             ConstraintMatrix &,
-                                            dealii::internal::int2type<1>)
+                                            std::integral_constant<int, 1>)
     {
       // nothing to do for regular dof handlers in 1d
     }
@@ -644,7 +644,7 @@ namespace DoFTools
 //     void
 //     make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1,2> &,
 //                                          ConstraintMatrix    &,
-//                                          dealii::internal::int2type<1>)
+//                                          std::integral_constant<int, 1>)
 //     {
 //                                     // nothing to do for regular
 //                                     // dof handlers in 1d
@@ -654,7 +654,7 @@ namespace DoFTools
 //     void
 //     make_oldstyle_hanging_node_constraints (const dealii::hp::DoFHandler<1,2> &/*dof_handler*/,
 //                                          ConstraintMatrix        &/*constraints*/,
-//                                          dealii::internal::int2type<1>)
+//                                          std::integral_constant<int, 1>)
 //     {
 //                                     // we may have to compute
 //                                     // constraints for
@@ -671,7 +671,7 @@ namespace DoFTools
     void
     make_oldstyle_hanging_node_constraints (const DoFHandlerType &dof_handler,
                                             ConstraintMatrix     &constraints,
-                                            dealii::internal::int2type<2>)
+                                            std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2;
 
@@ -809,7 +809,7 @@ namespace DoFTools
     void
     make_oldstyle_hanging_node_constraints (const DoFHandlerType &dof_handler,
                                             ConstraintMatrix     &constraints,
-                                            dealii::internal::int2type<3>)
+                                            std::integral_constant<int, 3>)
     {
       const unsigned int dim = 3;
 
@@ -1742,7 +1742,7 @@ namespace DoFTools
       internal::
       make_oldstyle_hanging_node_constraints (dof_handler,
                                               constraints,
-                                              dealii::internal::int2type<DoFHandlerType::dimension>());
+                                              std::integral_constant<int, DoFHandlerType::dimension>());
   }
 
 

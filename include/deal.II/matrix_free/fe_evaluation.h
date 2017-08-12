@@ -2703,7 +2703,7 @@ namespace internal
     void process_dof_gather (const unsigned int      *indices,
                              VectorType              &vec,
                              VectorizedArray<Number> &res,
-                             internal::bool2type<true>) const
+                             std::integral_constant<bool, true>) const
     {
       res.gather(vec.begin(), indices);
     }
@@ -2714,7 +2714,7 @@ namespace internal
     void process_dof_gather (const unsigned int      *indices,
                              VectorType              &vec,
                              VectorizedArray<Number> &res,
-                             internal::bool2type<false>) const
+                             std::integral_constant<bool, false>) const
     {
       for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
         res[v] = vector_access(const_cast<const VectorType &>(vec), indices[v]);
@@ -2773,7 +2773,7 @@ namespace internal
     void process_dof_gather (const unsigned int      *indices,
                              VectorType              &vec,
                              VectorizedArray<Number> &res,
-                             internal::bool2type<true>) const
+                             std::integral_constant<bool, true>) const
     {
       // TODO: enable scatter path when indices are fixed
       //#if DEAL_II_COMPILER_VECTORIZATION_LEVEL < 3
@@ -2795,7 +2795,7 @@ namespace internal
     void process_dof_gather (const unsigned int      *indices,
                              VectorType              &vec,
                              VectorizedArray<Number> &res,
-                             internal::bool2type<false>) const
+                             std::integral_constant<bool, false>) const
     {
       for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
         vector_access(vec, indices[v]) += res[v];
@@ -2851,7 +2851,7 @@ namespace internal
     void process_dof_gather (const unsigned int      *indices,
                              VectorType              &vec,
                              VectorizedArray<Number> &res,
-                             internal::bool2type<true>) const
+                             std::integral_constant<bool, true>) const
     {
       res.scatter(indices, vec.begin());
     }
@@ -2860,7 +2860,7 @@ namespace internal
     void process_dof_gather (const unsigned int      *indices,
                              VectorType              &vec,
                              VectorizedArray<Number> &res,
-                             internal::bool2type<false>) const
+                             std::integral_constant<bool, false>) const
     {
       for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
         vector_access(vec, indices[v]) = res[v];
@@ -3083,7 +3083,7 @@ FEEvaluationBase<dim,n_components_,Number>
                 for (unsigned int comp=0; comp<n_components; ++comp)
                   operation.process_dof_gather(dof_indices+ind,
                                                *src[comp], values_dofs[comp][j],
-                                               dealii::internal::bool2type<types_are_equal<typename VectorType::value_type,Number>::value>());
+                                               std::integral_constant<bool, types_are_equal<typename VectorType::value_type,Number>::value>());
             }
         }
 
@@ -3226,7 +3226,7 @@ FEEvaluationBase<dim,n_components_,Number>
                 for (unsigned int j=0; j<dofs_per_cell; ++j, ind += VectorizedArray<Number>::n_array_elements)
                   operation.process_dof_gather(dof_indices+ind,
                                                *src[0], values_dofs[comp][j],
-                                               dealii::internal::bool2type<types_are_equal<typename VectorType::value_type,Number>::value>());
+                                               std::integral_constant<bool, types_are_equal<typename VectorType::value_type,Number>::value>());
             }
         }
 

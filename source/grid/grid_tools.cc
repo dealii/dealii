@@ -2930,7 +2930,7 @@ next_cell:
       Point<Iterator::AccessorType::space_dimension>
       get_face_midpoint (const Iterator &object,
                          const unsigned int f,
-                         dealii::internal::int2type<1>)
+                         std::integral_constant<int, 1>)
       {
         return object->vertex(f);
       }
@@ -2946,7 +2946,7 @@ next_cell:
       Point<Iterator::AccessorType::space_dimension>
       get_face_midpoint (const Iterator &object,
                          const unsigned int f,
-                         dealii::internal::int2type<2>)
+                         std::integral_constant<int, 2>)
       {
         return object->line(f)->center();
       }
@@ -2962,7 +2962,7 @@ next_cell:
       Point<Iterator::AccessorType::space_dimension>
       get_face_midpoint (const Iterator &object,
                          const unsigned int f,
-                         dealii::internal::int2type<3>)
+                         std::integral_constant<int, 3>)
       {
         return object->face(f)->center();
       }
@@ -3009,11 +3009,11 @@ next_cell:
             diameter = std::min (diameter,
                                  get_face_midpoint
                                  (object, f,
-                                  dealii::internal::int2type<structdim>())
+                                  std::integral_constant<int, structdim>())
                                  .distance (get_face_midpoint
                                             (object,
                                              e,
-                                             dealii::internal::int2type<structdim>())));
+                                             std::integral_constant<int, structdim>())));
 
         return diameter;
       }
@@ -3265,8 +3265,8 @@ next_cell:
 
 
       void fix_up_faces (const dealii::Triangulation<1,1>::cell_iterator &,
-                         dealii::internal::int2type<1>,
-                         dealii::internal::int2type<1>)
+                         std::integral_constant<int, 1>,
+                         std::integral_constant<int, 1>)
       {
         // nothing to do for the faces of
         // cells in 1d
@@ -3279,8 +3279,8 @@ next_cell:
       // mid-points
       template <int structdim, int spacedim>
       void fix_up_faces (const typename dealii::Triangulation<structdim,spacedim>::cell_iterator &cell,
-                         dealii::internal::int2type<structdim>,
-                         dealii::internal::int2type<spacedim>)
+                         std::integral_constant<int, structdim>,
+                         std::integral_constant<int, spacedim>)
       {
         // see if we first can fix up
         // some of the faces of this
@@ -3356,8 +3356,8 @@ next_cell:
 
         internal::FixUpDistortedChildCells
         ::fix_up_faces (cell,
-                        dealii::internal::int2type<dim>(),
-                        dealii::internal::int2type<spacedim>());
+                        std::integral_constant<int, dim>(),
+                        std::integral_constant<int, spacedim>());
 
         // fix up the object. we need to
         // respect the manifold if the cell is

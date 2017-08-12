@@ -1700,7 +1700,7 @@ namespace DoFRenumbering
       {
         // dispatch to
         // dimension-dependent functions
-        return compare (c1, c2, dealii::internal::int2type<dim>());
+        return compare (c1, c2, std::integral_constant<int, dim>());
       }
 
     private:
@@ -1710,7 +1710,7 @@ namespace DoFRenumbering
       template <class DHCellIterator, int xdim>
       bool compare (const DHCellIterator &c1,
                     const DHCellIterator &c2,
-                    dealii::internal::int2type<xdim>) const
+                    std::integral_constant<int, xdim>) const
       {
         const Tensor<1,dim> v1 = c1->center() - center;
         const Tensor<1,dim> v2 = c2->center() - center;
@@ -1727,7 +1727,7 @@ namespace DoFRenumbering
       template <class DHCellIterator>
       bool compare (const DHCellIterator &,
                     const DHCellIterator &,
-                    dealii::internal::int2type<1>) const
+                    std::integral_constant<int, 1>) const
       {
         Assert (dim >= 2,
                 ExcMessage ("This operation only makes sense for dim>=2."));

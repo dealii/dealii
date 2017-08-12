@@ -821,7 +821,7 @@ namespace internal
     ArrayElementType &
     subscript (ArrayElementType *values,
                const unsigned int i,
-               dealii::internal::int2type<dim>)
+               std::integral_constant<int, dim>)
     {
       Assert (i<dim, ExcIndexRange(i, 0, dim));
       return values[i];
@@ -833,7 +833,7 @@ namespace internal
     ArrayElementType &
     subscript (ArrayElementType *,
                const unsigned int,
-               dealii::internal::int2type<0>)
+               std::integral_constant<int, 0>)
     {
       Assert(false, ExcMessage("Cannot access elements of an object of type Tensor<rank,0,Number>."));
       static ArrayElementType t;
@@ -849,7 +849,7 @@ DEAL_II_CUDA_HOST_DEV
 typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i)
 {
-  return dealii::internal::TensorSubscriptor::subscript(values, i, dealii::internal::int2type<dim>());
+  return dealii::internal::TensorSubscriptor::subscript(values, i, std::integral_constant<int, dim>());
 }
 
 
@@ -859,7 +859,7 @@ DEAL_II_CUDA_HOST_DEV
 const typename Tensor<rank_,dim,Number>::value_type &
 Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
 {
-  return dealii::internal::TensorSubscriptor::subscript(values, i, dealii::internal::int2type<dim>());
+  return dealii::internal::TensorSubscriptor::subscript(values, i, std::integral_constant<int, dim>());
 }
 
 

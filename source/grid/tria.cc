@@ -672,8 +672,8 @@ namespace
   template <int dim>
   bool
   has_distorted_children (const typename Triangulation<dim,dim>::cell_iterator &cell,
-                          internal::int2type<dim>,
-                          internal::int2type<dim>)
+                          std::integral_constant<int, dim>,
+                          std::integral_constant<int, dim>)
   {
     Assert (cell->has_children(), ExcInternalError());
 
@@ -707,8 +707,8 @@ namespace
   template <int dim, int spacedim>
   bool
   has_distorted_children (const typename Triangulation<dim,spacedim>::cell_iterator &,
-                          internal::int2type<dim>,
-                          internal::int2type<spacedim>)
+                          std::integral_constant<int, dim>,
+                          std::integral_constant<int, spacedim>)
   {
     return false;
   }
@@ -4906,8 +4906,8 @@ namespace internal
                   if ((check_for_distorted_cells == true)
                       &&
                       has_distorted_children (cell,
-                                              internal::int2type<dim>(),
-                                              internal::int2type<spacedim>()))
+                                              std::integral_constant<int, dim>(),
+                                              std::integral_constant<int, spacedim>()))
                     cells_with_distorted_children.distorted_cells.push_back (cell);
                   // inform all listeners that cell refinement is done
                   triangulation.signals.post_refinement_on_cell(cell);
@@ -8557,8 +8557,8 @@ namespace internal
                   if ((check_for_distorted_cells == true)
                       &&
                       has_distorted_children (hex,
-                                              internal::int2type<dim>(),
-                                              internal::int2type<spacedim>()))
+                                              std::integral_constant<int, dim>(),
+                                              std::integral_constant<int, spacedim>()))
                     cells_with_distorted_children.distorted_cells.push_back (hex);
 
                   // note that the refinement flag was already cleared

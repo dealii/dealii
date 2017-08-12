@@ -254,21 +254,25 @@ namespace internal
    * still select which of the different <code>X::f()</code> we want based on
    * the <code>subdim</code> template argument.
    *
+   * @deprecated Use std::integral_constant<int, N> instead.
+   *
    * @author Wolfgang Bangerth, 2006
    */
   template <int N>
   struct int2type
-  {};
+  {} DEAL_II_DEPRECATED;
 
 
   /**
    * The equivalent of the int2type class for boolean arguments.
    *
+   * @deprecated Use std::integral_constant<bool, B> instead.
+   *
    * @author Wolfgang Bangerth, 2009
    */
   template <bool B>
   struct bool2type
-  {};
+  {} DEAL_II_DEPRECATED;
 }
 
 
