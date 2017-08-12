@@ -304,7 +304,9 @@ namespace detail
             (*this).~auto_buffer();
             buffer_   = new_buffer;
             members_.capacity_ = new_capacity;
-            size_ = std::max(static_cast<decltype(size_)>(0),size_);
+            // Make sure size_ is initialized. After calling the dectructor
+            // the size should be zero.
+            size_ = 0;
             BOOST_ASSERT( size_ <= members_.capacity_ );
         }
 
