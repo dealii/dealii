@@ -1,0 +1,159 @@
+
+DEAL:0::dim = 2
+DEAL:0::pack 0_2:01 1.00000
+DEAL:0::pack 0_2:02 2.00000
+DEAL:0::pack 0_2:03 3.00000
+DEAL:0::unpack 0_2:10 1 from 1
+DEAL:0::unpack 0_2:12 2 from 1
+DEAL:0::unpack 0_2:20 4 from 1
+DEAL:0::unpack 0_2:21 5 from 1
+DEAL:0::unpack 0_2:30 1 from 2
+DEAL:0::dim = 3
+DEAL:0::pack 0_2:03 1.00000
+DEAL:0::pack 0_2:04 2.00000
+DEAL:0::pack 0_2:05 3.00000
+DEAL:0::pack 0_2:06 4.00000
+DEAL:0::pack 0_2:07 5.00000
+DEAL:0::pack 0_2:12 6.00000
+DEAL:0::pack 0_2:13 7.00000
+DEAL:0::pack 0_2:14 8.00000
+DEAL:0::pack 0_2:15 9.00000
+DEAL:0::pack 0_2:16 10.0000
+DEAL:0::pack 0_2:17 11.0000
+DEAL:0::pack 0_2:21 12.0000
+DEAL:0::pack 0_2:23 13.0000
+DEAL:0::pack 0_2:24 14.0000
+DEAL:0::pack 0_2:25 15.0000
+DEAL:0::pack 0_2:26 16.0000
+DEAL:0::pack 0_2:27 17.0000
+DEAL:0::unpack 0_2:30 1 from 1
+DEAL:0::unpack 0_2:31 2 from 1
+DEAL:0::unpack 0_2:32 3 from 1
+DEAL:0::unpack 0_2:34 4 from 1
+DEAL:0::unpack 0_2:35 5 from 1
+DEAL:0::unpack 0_2:36 6 from 1
+DEAL:0::unpack 0_2:40 8 from 1
+DEAL:0::unpack 0_2:41 9 from 1
+DEAL:0::unpack 0_2:42 10 from 1
+DEAL:0::unpack 0_2:43 11 from 1
+DEAL:0::unpack 0_2:50 1 from 2
+DEAL:0::unpack 0_2:51 2 from 2
+DEAL:0::unpack 0_2:52 3 from 2
+DEAL:0::unpack 0_2:53 4 from 2
+DEAL:0::unpack 0_2:60 7 from 2
+DEAL:0::unpack 0_2:61 8 from 2
+DEAL:0::unpack 0_2:62 9 from 2
+DEAL:0::unpack 0_2:63 10 from 2
+DEAL:0::unpack 0_2:70 13 from 2
+DEAL:0::unpack 0_2:71 14 from 2
+DEAL:0::unpack 0_2:72 15 from 2
+
+DEAL:1::dim = 2
+DEAL:1::pack 0_2:10 1.00000
+DEAL:1::pack 0_2:12 2.00000
+DEAL:1::pack 0_2:13 3.00000
+DEAL:1::pack 0_2:20 4.00000
+DEAL:1::pack 0_2:21 5.00000
+DEAL:1::pack 0_2:23 6.00000
+DEAL:1::unpack 0_2:01 1 from 0
+DEAL:1::unpack 0_2:02 2 from 0
+DEAL:1::unpack 0_2:03 3 from 0
+DEAL:1::unpack 0_2:30 1 from 2
+DEAL:1::unpack 0_2:31 2 from 2
+DEAL:1::unpack 0_2:32 3 from 2
+DEAL:1::dim = 3
+DEAL:1::pack 0_2:30 1.00000
+DEAL:1::pack 0_2:31 2.00000
+DEAL:1::pack 0_2:32 3.00000
+DEAL:1::pack 0_2:34 4.00000
+DEAL:1::pack 0_2:35 5.00000
+DEAL:1::pack 0_2:36 6.00000
+DEAL:1::pack 0_2:37 7.00000
+DEAL:1::pack 0_2:40 8.00000
+DEAL:1::pack 0_2:41 9.00000
+DEAL:1::pack 0_2:42 10.0000
+DEAL:1::pack 0_2:43 11.0000
+DEAL:1::pack 0_2:45 12.0000
+DEAL:1::pack 0_2:46 13.0000
+DEAL:1::pack 0_2:47 14.0000
+DEAL:1::unpack 0_2:03 1 from 0
+DEAL:1::unpack 0_2:04 2 from 0
+DEAL:1::unpack 0_2:05 3 from 0
+DEAL:1::unpack 0_2:06 4 from 0
+DEAL:1::unpack 0_2:07 5 from 0
+DEAL:1::unpack 0_2:12 6 from 0
+DEAL:1::unpack 0_2:13 7 from 0
+DEAL:1::unpack 0_2:14 8 from 0
+DEAL:1::unpack 0_2:16 10 from 0
+DEAL:1::unpack 0_2:17 11 from 0
+DEAL:1::unpack 0_2:21 12 from 0
+DEAL:1::unpack 0_2:23 13 from 0
+DEAL:1::unpack 0_2:24 14 from 0
+DEAL:1::unpack 0_2:25 15 from 0
+DEAL:1::unpack 0_2:27 17 from 0
+DEAL:1::unpack 0_2:50 1 from 2
+DEAL:1::unpack 0_2:52 3 from 2
+DEAL:1::unpack 0_2:53 4 from 2
+DEAL:1::unpack 0_2:54 5 from 2
+DEAL:1::unpack 0_2:56 6 from 2
+DEAL:1::unpack 0_2:60 7 from 2
+DEAL:1::unpack 0_2:61 8 from 2
+DEAL:1::unpack 0_2:63 10 from 2
+DEAL:1::unpack 0_2:64 11 from 2
+DEAL:1::unpack 0_2:65 12 from 2
+DEAL:1::unpack 0_2:70 13 from 2
+DEAL:1::unpack 0_2:71 14 from 2
+DEAL:1::unpack 0_2:72 15 from 2
+DEAL:1::unpack 0_2:73 16 from 2
+DEAL:1::unpack 0_2:74 17 from 2
+
+
+DEAL:2::dim = 2
+DEAL:2::pack 0_2:30 1.00000
+DEAL:2::pack 0_2:31 2.00000
+DEAL:2::pack 0_2:32 3.00000
+DEAL:2::unpack 0_2:03 3 from 0
+DEAL:2::unpack 0_2:12 2 from 1
+DEAL:2::unpack 0_2:13 3 from 1
+DEAL:2::unpack 0_2:21 5 from 1
+DEAL:2::unpack 0_2:23 6 from 1
+DEAL:2::dim = 3
+DEAL:2::pack 0_2:50 1.00000
+DEAL:2::pack 0_2:51 2.00000
+DEAL:2::pack 0_2:52 3.00000
+DEAL:2::pack 0_2:53 4.00000
+DEAL:2::pack 0_2:54 5.00000
+DEAL:2::pack 0_2:56 6.00000
+DEAL:2::pack 0_2:60 7.00000
+DEAL:2::pack 0_2:61 8.00000
+DEAL:2::pack 0_2:62 9.00000
+DEAL:2::pack 0_2:63 10.0000
+DEAL:2::pack 0_2:64 11.0000
+DEAL:2::pack 0_2:65 12.0000
+DEAL:2::pack 0_2:70 13.0000
+DEAL:2::pack 0_2:71 14.0000
+DEAL:2::pack 0_2:72 15.0000
+DEAL:2::pack 0_2:73 16.0000
+DEAL:2::pack 0_2:74 17.0000
+DEAL:2::unpack 0_2:05 3 from 0
+DEAL:2::unpack 0_2:06 4 from 0
+DEAL:2::unpack 0_2:07 5 from 0
+DEAL:2::unpack 0_2:14 8 from 0
+DEAL:2::unpack 0_2:15 9 from 0
+DEAL:2::unpack 0_2:16 10 from 0
+DEAL:2::unpack 0_2:17 11 from 0
+DEAL:2::unpack 0_2:24 14 from 0
+DEAL:2::unpack 0_2:25 15 from 0
+DEAL:2::unpack 0_2:26 16 from 0
+DEAL:2::unpack 0_2:27 17 from 0
+DEAL:2::unpack 0_2:34 4 from 1
+DEAL:2::unpack 0_2:35 5 from 1
+DEAL:2::unpack 0_2:36 6 from 1
+DEAL:2::unpack 0_2:37 7 from 1
+DEAL:2::unpack 0_2:41 9 from 1
+DEAL:2::unpack 0_2:42 10 from 1
+DEAL:2::unpack 0_2:43 11 from 1
+DEAL:2::unpack 0_2:45 12 from 1
+DEAL:2::unpack 0_2:46 13 from 1
+DEAL:2::unpack 0_2:47 14 from 1
+
