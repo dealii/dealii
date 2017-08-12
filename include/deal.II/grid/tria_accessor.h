@@ -2614,6 +2614,11 @@ public:
   unsigned int neighbor_face_no (const unsigned int neighbor) const;
 
   /**
+   * Compatibility interface with DoFCellAccessor. Returns always false.
+   */
+  static bool is_level_cell();
+
+  /**
    * @}
    */
   /**

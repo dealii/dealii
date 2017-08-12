@@ -73,9 +73,9 @@ namespace MeshWorker
       const bool ignore_subdomain = (cell->get_triangulation().locally_owned_subdomain()
                                      == numbers::invalid_subdomain_id);
 
-      types::subdomain_id current_subdomain_id = /*(cell->is_level_cell())
-                                 ? cell->level_subdomain_id()
-                                 : */cell->subdomain_id();
+      types::subdomain_id current_subdomain_id = (cell->is_level_cell()
+                                                  ? cell->level_subdomain_id()
+                                                  : cell->subdomain_id());
 
       const bool own_cell = ignore_subdomain || (current_subdomain_id == cell->get_triangulation().locally_owned_subdomain());
 
@@ -105,10 +105,10 @@ namespace MeshWorker
                 TriaIterator<typename CellIteratorType::AccessorType> neighbor = cell->neighbor_or_periodic_neighbor(face_no);
 
                 types::subdomain_id neighbor_subdomain_id = numbers::artificial_subdomain_id;
-//                if (neighbor->is_level_cell())
-//                  neighbid = neighbor->level_subdomain_id();
+                if (neighbor->is_level_cell())
+                  neighbor_subdomain_id = neighbor->level_subdomain_id();
                 //subdomain id is only valid for active cells
-                /*else */if (neighbor->active())
+                else if (neighbor->active())
                   neighbor_subdomain_id = neighbor->subdomain_id();
 
                 const bool own_neighbor = ignore_subdomain ||
