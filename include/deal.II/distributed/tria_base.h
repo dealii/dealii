@@ -153,8 +153,7 @@ namespace parallel
 
     /**
      * Return a map that, for each vertex, lists all the processors whose
-     * subdomains are adjacent to that vertex. Used by
-     * DoFHandler::Policy::ParallelDistributed.
+     * subdomains are adjacent to that vertex.
      */
     virtual std::map<unsigned int, std::set<dealii::types::subdomain_id> >
     compute_vertices_with_ghost_neighbors () const;
