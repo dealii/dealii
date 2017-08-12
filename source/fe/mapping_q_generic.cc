@@ -604,7 +604,8 @@ MappingQGeneric<dim,spacedim>::InternalData::InternalData (const unsigned int po
   :
   polynomial_degree (polynomial_degree),
   n_shape_functions (Utilities::fixed_power<dim>(polynomial_degree+1)),
-  line_support_points(QGaussLobatto<1>(polynomial_degree+1))
+  line_support_points(QGaussLobatto<1>(polynomial_degree+1)),
+  tensor_product_quadrature(false)
 {}
 
 
