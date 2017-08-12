@@ -1647,7 +1647,7 @@ namespace hp
     faces.reset ();
 
     vertex_dofs = std::move(std::vector<types::global_dof_index>());
-    vertex_dof_offsets = std::move (std::vector<types::global_dof_index>());
+    vertex_dof_offsets = std::move (std::vector<unsigned int>());
   }
 }
 
