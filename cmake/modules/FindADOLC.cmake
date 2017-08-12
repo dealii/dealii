@@ -16,7 +16,7 @@
 # Note: This file is adapted from https://raw.githubusercontent.com/joaoleal/CppADCodeGen/master/cmake/FindADOLC.cmake
 
 #
-# - Try to find Adolc
+# Try to find Adolc
 #
 # This module exports
 #
