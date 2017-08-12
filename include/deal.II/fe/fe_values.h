@@ -56,7 +56,7 @@ namespace internal
    * A class whose specialization is used to define what type the curl of a
    * vector valued function corresponds to.
    */
-  template <int dim>
+  template <int dim, class NumberType=double>
   struct CurlType;
 
   /**
@@ -65,10 +65,10 @@ namespace internal
    *
    * In 1d, the curl is a scalar.
    */
-  template <>
-  struct CurlType<1>
+  template <class NumberType>
+  struct CurlType<1, NumberType>
   {
-    typedef Tensor<1,1>     type;
+    typedef Tensor<1,1,NumberType>     type;
   };
 
   /**
@@ -77,10 +77,10 @@ namespace internal
    *
    * In 2d, the curl is a scalar.
    */
-  template <>
-  struct CurlType<2>
+  template <class NumberType>
+  struct CurlType<2,NumberType>
   {
-    typedef Tensor<1,1>     type;
+    typedef Tensor<1,1,NumberType>     type;
   };
 
   /**
@@ -89,10 +89,10 @@ namespace internal
    *
    * In 3d, the curl is a vector.
    */
-  template <>
-  struct CurlType<3>
+  template <class NumberType>
+  struct CurlType<3,NumberType>
   {
-    typedef Tensor<1,3>     type;
+    typedef Tensor<1,3,NumberType>     type;
   };
 }
 
@@ -164,6 +164,44 @@ namespace FEValuesViews
      * Third derivative is a <code>Tensor@<3,dim@></code>.
      */
     typedef dealii::Tensor<3,spacedim> third_derivative_type;
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the Scalar view and any @p Number type.
+     */
+    template <typename Number>
+    struct OutputType
+    {
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * values of the view the Scalar class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Scalar<dim,spacedim>::value_type>::type value_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * gradients of the view the Scalar class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Scalar<dim,spacedim>::gradient_type>::type gradient_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * laplacians of the view the Scalar class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Scalar<dim,spacedim>::value_type>::type laplacian_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * hessians of the view the Scalar class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Scalar<dim,spacedim>::hessian_type>::type hessian_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * third derivatives of the view the Scalar class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Scalar<dim,spacedim>::third_derivative_type>::type third_derivative_type;
+    };
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
@@ -292,6 +330,30 @@ namespace FEValuesViews
                               std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
     /**
+     * Same as above, but using a vector of local degree-of-freedom values.
+     *
+     * The @p dof_values vector must have a length equal to number of DoFs on
+     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
+     * @p i. The fundamental prerequisite for the @p InputVector is that it must
+     * be possible to create an ArrayView from it; this is satisfied by the
+     * @p std::vector class.
+     *
+     * The DoF values typically would be obtained in the following way:
+     * @code
+     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
+     * cell->get_dof_values(solution, local_dof_values);
+     * @endcode
+     * or, for a generic @p Number type,
+     * @code
+     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
+     * cell->get_dof_values(solution, local_dof_values.begin(), local_dof_values.end());
+     * @endcode
+     */
+    template <class InputVector>
+    void get_function_values_from_local_dof_values (const InputVector &dof_values,
+                                                    std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const;
+
+    /**
      * Return the gradients of the selected scalar component of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -313,6 +375,13 @@ namespace FEValuesViews
                                  std::vector<typename ProductType<gradient_type,typename InputVector::value_type>::type> &gradients) const;
 
     /**
+     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_gradients_from_local_dof_values (const InputVector &dof_values,
+                                                       std::vector<typename OutputType<typename InputVector::value_type>::gradient_type> &gradients) const;
+
+    /**
      * Return the Hessians of the selected scalar component of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -332,6 +401,14 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
                                 std::vector<typename ProductType<hessian_type,typename InputVector::value_type>::type> &hessians) const;
+
+    /**
+     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_hessians_from_local_dof_values (const InputVector &dof_values,
+                                                      std::vector<typename OutputType<typename InputVector::value_type>::hessian_type> &hessians) const;
+
 
     /**
      * Return the Laplacians of the selected scalar component of the finite
@@ -356,6 +433,14 @@ namespace FEValuesViews
                                   std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &laplacians) const;
 
     /**
+     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_laplacians_from_local_dof_values (const InputVector &dof_values,
+                                                        std::vector<typename OutputType<typename InputVector::value_type>::laplacian_type> &laplacians) const;
+
+
+    /**
      * Return the third derivatives of the selected scalar component of the
      * finite element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -377,6 +462,14 @@ namespace FEValuesViews
     void get_function_third_derivatives (const InputVector &fe_function,
                                          std::vector<typename ProductType<third_derivative_type,
                                          typename InputVector::value_type>::type> &third_derivatives) const;
+
+    /**
+     * @copydoc FEValuesViews::Scalar::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_third_derivatives_from_local_dof_values (const InputVector &dof_values,
+                                                               std::vector<typename OutputType<typename InputVector::value_type>::third_derivative_type> &third_derivatives) const;
+
 
   private:
     /**
@@ -488,6 +581,62 @@ namespace FEValuesViews
      * finite element, the third derivative is a <code>Tensor@<4,dim@></code>.
      */
     typedef dealii::Tensor<4,spacedim>          third_derivative_type;
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the Vector view and any @p Number type.
+     */
+    template <typename Number>
+    struct OutputType
+    {
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * values of the view the Vector class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Vector<dim,spacedim>::value_type>::type value_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * gradients of the view the Vector class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Vector<dim,spacedim>::gradient_type>::type gradient_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * symmetric gradients of the view the Vector class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Vector<dim,spacedim>::symmetric_gradient_type>::type symmetric_gradient_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * divergences of the view the Vector class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Vector<dim,spacedim>::divergence_type>::type divergence_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * laplacians of the view the Vector class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Vector<dim,spacedim>::value_type>::type laplacian_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * curls of the view the Vector class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Vector<dim,spacedim>::curl_type>::type curl_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * hessians of the view the Vector class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Vector<dim,spacedim>::hessian_type>::type hessian_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * third derivatives of the view the Vector class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Vector<dim,spacedim>::third_derivative_type>::type third_derivative_type;
+    };
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
@@ -694,6 +843,30 @@ namespace FEValuesViews
                               std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
     /**
+     * Same as above, but using a vector of local degree-of-freedom values.
+     *
+     * The @p dof_values vector must have a length equal to number of DoFs on
+     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
+     * @p i. The fundamental prerequisite for the @p InputVector is that it must
+     * be possible to create an ArrayView from it; this is satisfied by the
+     * @p std::vector class.
+     *
+     * The DoF values typically would be obtained in the following way:
+     * @code
+     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
+     * cell->get_dof_values(solution, local_dof_values);
+     * @endcode
+     * or, for a generic @p Number type,
+     * @code
+     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
+     * cell->get_dof_values(solution, local_dof_values.begin(), local_dof_values.end());
+     * @endcode
+     */
+    template <class InputVector>
+    void get_function_values_from_local_dof_values (const InputVector &dof_values,
+                                                    std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const;
+
+    /**
      * Return the gradients of the selected vector components of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -713,6 +886,13 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_gradients (const InputVector &fe_function,
                                  std::vector<typename ProductType<gradient_type,typename InputVector::value_type>::type> &gradients) const;
+
+    /**
+     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_gradients_from_local_dof_values (const InputVector &dof_values,
+                                                       std::vector<typename OutputType<typename InputVector::value_type>::gradient_type> &gradients) const;
 
     /**
      * Return the symmetrized gradients of the selected vector components of
@@ -743,6 +923,14 @@ namespace FEValuesViews
                                       std::vector<typename ProductType<symmetric_gradient_type,typename InputVector::value_type>::type> &symmetric_gradients) const;
 
     /**
+     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void
+    get_function_symmetric_gradients_from_local_dof_values (const InputVector &dof_values,
+                                                            std::vector<typename OutputType<typename InputVector::value_type>::symmetric_gradient_type> &symmetric_gradients) const;
+
+    /**
      * Return the divergence of the selected vector components of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -763,6 +951,13 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
                                    std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const;
+
+    /**
+     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_divergences_from_local_dof_values (const InputVector &dof_values,
+                                                         std::vector<typename OutputType<typename InputVector::value_type>::divergence_type> &divergences) const;
 
     /**
      * Return the curl of the selected vector components of the finite element
@@ -787,6 +982,13 @@ namespace FEValuesViews
                              std::vector<typename ProductType<curl_type,typename InputVector::value_type>::type> &curls) const;
 
     /**
+     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_curls_from_local_dof_values (const InputVector &dof_values,
+                                                   std::vector<typename OutputType<typename InputVector::value_type>::curl_type> &curls) const;
+
+    /**
      * Return the Hessians of the selected vector components of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -806,6 +1008,13 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_hessians (const InputVector &fe_function,
                                 std::vector<typename ProductType<hessian_type,typename InputVector::value_type>::type> &hessians) const;
+
+    /**
+     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_hessians_from_local_dof_values (const InputVector &dof_values,
+                                                      std::vector<typename OutputType<typename InputVector::value_type>::hessian_type> &hessians) const;
 
     /**
      * Return the Laplacians of the selected vector components of the finite
@@ -830,6 +1039,13 @@ namespace FEValuesViews
                                   std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &laplacians) const;
 
     /**
+     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_laplacians_from_local_dof_values (const InputVector &dof_values,
+                                                        std::vector<typename OutputType<typename InputVector::value_type>::laplacian_type> &laplacians) const;
+
+    /**
      * Return the third derivatives of the selected scalar component of the
      * finite element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -851,6 +1067,13 @@ namespace FEValuesViews
     void get_function_third_derivatives (const InputVector &fe_function,
                                          std::vector<typename ProductType<third_derivative_type,
                                          typename InputVector::value_type>::type> &third_derivatives) const;
+
+    /**
+     * @copydoc FEValuesViews::Vector::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_third_derivatives_from_local_dof_values (const InputVector &dof_values,
+                                                               std::vector<typename OutputType<typename InputVector::value_type>::third_derivative_type> &third_derivatives) const;
 
   private:
     /**
@@ -920,6 +1143,26 @@ namespace FEValuesViews
      * divergence.
      */
     typedef dealii::Tensor<1, spacedim> divergence_type;
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the SymmetricTensor view and any @p Number type.
+     */
+    template <typename Number>
+    struct OutputType
+    {
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * values of the view the SymmetricTensor class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename SymmetricTensor<2,dim,spacedim>::value_type>::type value_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * divergences of the view the SymmetricTensor class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename SymmetricTensor<2,dim,spacedim>::divergence_type>::type divergence_type;
+    };
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
@@ -1044,6 +1287,31 @@ namespace FEValuesViews
                               std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
     /**
+     * Same as above, but using a vector of local degree-of-freedom values.
+     *
+     * The @p dof_values vector must have a length equal to number of DoFs on
+     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
+     * @p i. The fundamental prerequisite for the @p InputVector is that it must
+     * be possible to create an ArrayView from it; this is satisfied by the
+     * @p std::vector class.
+     *
+     * The DoF values typically would be obtained in the following way:
+     * @code
+     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
+     * cell->get_dof_values(solution, local_dof_values);
+     * @endcode
+     * or, for a generic @p Number type,
+     * @code
+     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
+     * cell->get_dof_values(solution, local_dof_values.begin(), local_dof_values.end());
+     * @endcode
+     */
+    template <class InputVector>
+    void get_function_values_from_local_dof_values (const InputVector &dof_values,
+                                                    std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const;
+
+
+    /**
      * Return the divergence of the selected vector components of the finite
      * element function characterized by <tt>fe_function</tt> at the
      * quadrature points of the cell, face or subface selected the last time
@@ -1067,6 +1335,13 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
                                    std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const;
+
+    /**
+     * @copydoc FEValuesViews::SymmetricTensor<2,dim,spacedim>::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_divergences_from_local_dof_values (const InputVector &dof_values,
+                                                         std::vector<typename OutputType<typename InputVector::value_type>::divergence_type> &divergences) const;
 
   private:
     /**
@@ -1124,6 +1399,26 @@ namespace FEValuesViews
      * Data type for taking the divergence of a tensor: a vector.
      */
     typedef dealii::Tensor<1, spacedim> divergence_type;
+
+    /**
+     * A struct that provides the output type for the product of the value
+     * and derivatives of basis functions of the Tensor view and any @p Number type.
+     */
+    template <typename Number>
+    struct OutputType
+    {
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * values of the view the Tensor class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Tensor<2,dim,spacedim>::value_type>::type value_type;
+
+      /**
+       * A typedef for the data type of the product of a @p Number and the
+       * divergences of the view the Tensor class.
+       */
+      typedef typename ProductType<typename std::remove_cv<Number>::type, typename Tensor<2,dim,spacedim>::divergence_type>::type divergence_type;
+    };
 
     /**
      * A structure where for each shape function we pre-compute a bunch of
@@ -1247,6 +1542,30 @@ namespace FEValuesViews
     void get_function_values (const InputVector &fe_function,
                               std::vector<typename ProductType<value_type,typename InputVector::value_type>::type> &values) const;
 
+    /**
+     * Same as above, but using a vector of local degree-of-freedom values.
+     *
+     * The @p dof_values vector must have a length equal to number of DoFs on
+     * a cell, and  each entry @p dof_values[i] is the value of the local DoF
+     * @p i. The fundamental prerequisite for the @p InputVector is that it must
+     * be possible to create an ArrayView from it; this is satisfied by the
+     * @p std::vector class.
+     *
+     * The DoF values typically would be obtained in the following way:
+     * @code
+     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
+     * cell->get_dof_values(solution, local_dof_values);
+     * @endcode
+     * or, for a generic @p Number type,
+     * @code
+     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
+     * cell->get_dof_values(solution, local_dof_values.begin(), local_dof_values.end());
+     * @endcode
+     */
+    template <class InputVector>
+    void get_function_values_from_local_dof_values (const InputVector &dof_values,
+                                                    std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const;
+
 
     /**
      * Return the divergence of the selected vector components of the finite
@@ -1272,6 +1591,14 @@ namespace FEValuesViews
     template <class InputVector>
     void get_function_divergences (const InputVector &fe_function,
                                    std::vector<typename ProductType<divergence_type,typename InputVector::value_type>::type> &divergences) const;
+
+    /**
+     * @copydoc FEValuesViews::Tensor<2,dim,spacedim>::get_function_values_from_local_dof_values()
+     */
+    template <class InputVector>
+    void get_function_divergences_from_local_dof_values (const InputVector &dof_values,
+                                                         std::vector<typename OutputType<typename InputVector::value_type>::divergence_type> &values) const;
+
 
   private:
     /**
