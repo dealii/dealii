@@ -3602,6 +3602,10 @@ next_cell:
         const typename Triangulation<dim,spacedim>::cell_iterator
         cell = *cell_ptr;
 
+        Assert(!cell->active(),
+               ExcMessage("This function is only valid for a list of cells that "
+                          "have children (i.e., no cell in the list may be active)."));
+
         internal::FixUpDistortedChildCells
         ::fix_up_faces (cell,
                         std::integral_constant<int, dim>(),
