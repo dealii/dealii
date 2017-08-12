@@ -1461,6 +1461,28 @@ next_cell:
 
 
   template <int dim, int spacedim>
+  unsigned int
+  get_closest_vertex_of_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell,
+                             const Point<spacedim> &position)
+  {
+    double minimum_distance = std::numeric_limits<double>::max();
+    unsigned int closest_vertex = numbers::invalid_unsigned_int;
+
+    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+      {
+        const double vertex_distance = position.distance(cell->vertex(v));
+        if (vertex_distance < minimum_distance)
+          {
+            closest_vertex = v;
+            minimum_distance = vertex_distance;
+          }
+      }
+    return closest_vertex;
+  }
+
+
+
+  template <int dim, int spacedim>
   std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<dim> >
   find_active_cell_around_point (const hp::MappingCollection<dim,spacedim>   &mapping,
                                  const hp::DoFHandler<dim,spacedim> &mesh,

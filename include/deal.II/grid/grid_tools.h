@@ -1024,6 +1024,20 @@ namespace GridTools
   vertex_to_cell_map(const Triangulation<dim,spacedim> &triangulation);
 
   /**
+
+
+  /**
+   * Returns the local vertex index of cell @p cell that is closest to
+   * the given location @p position.
+   *
+   * @author Rene Gassmoeller, Luca Heltai, 2017.
+   */
+  template <int dim, int spacedim>
+  unsigned int
+  get_closest_vertex_of_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell,
+                             const Point<spacedim> &position);
+
+  /**
    * Compute a globally unique index for each vertex and hanging node
    * associated with a locally owned active cell. The vertices of a ghost cell
    * that are hanging nodes of a locally owned cells have a global index.
