@@ -539,7 +539,7 @@ public:
   /**
    * Default constructor. Creates a tensor with all entries equal to zero.
    */
-  SymmetricTensor () = default;
+  SymmetricTensor ();
 
   /**
    * Constructor. Generate a symmetric tensor from a general one. Assumes that
@@ -580,12 +580,20 @@ public:
   SymmetricTensor (const SymmetricTensor<rank,dim,OtherNumber> &initializer);
 
   /**
+   * Assignment operator from symmetric tensors with different underlying scalar type.
+   * This obviously requires that the @p OtherNumber type is convertible to
+   * @p Number.
+   */
+  template <typename OtherNumber>
+  SymmetricTensor &operator = (const SymmetricTensor<rank,dim,OtherNumber> &rhs);
+
+  /**
    * This operator assigns a scalar to a tensor. To avoid confusion with what
    * exactly it means to assign a scalar value to a tensor, zero is the only
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
    */
-  SymmetricTensor &operator = (const Number d);
+  SymmetricTensor &operator = (const Number &d);
 
   /**
    * Convert the present symmetric tensor into a full tensor with the same
@@ -606,35 +614,27 @@ public:
   /**
    * Add another tensor.
    */
-  SymmetricTensor &operator += (const SymmetricTensor &);
+  template <typename OtherNumber>
+  SymmetricTensor &operator += (const SymmetricTensor<rank,dim,OtherNumber> &);
 
   /**
    * Subtract another tensor.
    */
-  SymmetricTensor &operator -= (const SymmetricTensor &);
+  template <typename OtherNumber>
+  SymmetricTensor &operator -= (const SymmetricTensor<rank,dim,OtherNumber> &);
 
   /**
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
    * <tt>factor</tt>.
    */
-  SymmetricTensor &operator *= (const Number factor);
+  template <typename OtherNumber>
+  SymmetricTensor &operator *= (const OtherNumber &factor);
 
   /**
-   * Scale the vector by <tt>1/factor</tt>.
+   * Scale the tensor by <tt>1/factor</tt>.
    */
-  SymmetricTensor &operator /= (const Number factor);
-
-  /**
-   * Add two tensors. If possible, you should use <tt>operator +=</tt> instead
-   * since this does not need the creation of a temporary.
-   */
-  SymmetricTensor   operator + (const SymmetricTensor &s) const;
-
-  /**
-   * Subtract two tensors. If possible, you should use <tt>operator -=</tt>
-   * instead since this does not need the creation of a temporary.
-   */
-  SymmetricTensor   operator - (const SymmetricTensor &s) const;
+  template <typename OtherNumber>
+  SymmetricTensor &operator /= (const OtherNumber &factor);
 
   /**
    * Unary minus operator. Negate all entries of a tensor.
@@ -915,6 +915,17 @@ namespace internal
 
 template <int rank, int dim, typename Number>
 inline
+SymmetricTensor<rank,dim,Number>::SymmetricTensor ()
+{
+  // Some auto-differentiable numbers need explicit
+  // zero initialization.
+  for (unsigned int i=0; i<base_tensor_type::dimension; ++i)
+    data[i] = internal::NumberType<Number>::value(0.0);
+}
+
+
+template <int rank, int dim, typename Number>
+inline
 SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Tensor<2,dim,Number> &t)
 {
   Assert (rank == 2, ExcNotImplemented());
@@ -985,14 +996,27 @@ SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Number (&array) [n_inde
 
 
 template <int rank, int dim, typename Number>
+template <typename OtherNumber>
 inline
 SymmetricTensor<rank,dim,Number> &
-SymmetricTensor<rank,dim,Number>::operator = (const Number d)
+SymmetricTensor<rank,dim,Number>::operator = (const SymmetricTensor<rank,dim,OtherNumber> &t)
 {
-  Assert (d==Number(), ExcMessage ("Only assignment with zero is allowed"));
+  for (unsigned int i=0; i<base_tensor_type::dimension; ++i)
+    data[i] = t.data[i];
+  return *this;
+}
+
+
+
+template <int rank, int dim, typename Number>
+inline
+SymmetricTensor<rank,dim,Number> &
+SymmetricTensor<rank,dim,Number>::operator = (const Number &d)
+{
+  Assert (d==internal::NumberType<Number>::value(0.0), ExcMessage ("Only assignment with zero is allowed"));
   (void) d;
 
-  data = 0;
+  data = internal::NumberType<Number>::value(0.0);
 
   return *this;
 }
@@ -1082,10 +1106,11 @@ SymmetricTensor<rank,dim,Number>::operator !=
 
 
 template <int rank, int dim, typename Number>
+template <typename OtherNumber>
 inline
 SymmetricTensor<rank,dim,Number> &
 SymmetricTensor<rank,dim,Number>::operator +=
-(const SymmetricTensor<rank,dim,Number> &t)
+(const SymmetricTensor<rank,dim,OtherNumber> &t)
 {
   data += t.data;
   return *this;
@@ -1094,10 +1119,11 @@ SymmetricTensor<rank,dim,Number>::operator +=
 
 
 template <int rank, int dim, typename Number>
+template <typename OtherNumber>
 inline
 SymmetricTensor<rank,dim,Number> &
 SymmetricTensor<rank,dim,Number>::operator -=
-(const SymmetricTensor<rank,dim,Number> &t)
+(const SymmetricTensor<rank,dim,OtherNumber> &t)
 {
   data -= t.data;
   return *this;
@@ -1106,9 +1132,10 @@ SymmetricTensor<rank,dim,Number>::operator -=
 
 
 template <int rank, int dim, typename Number>
+template <typename OtherNumber>
 inline
 SymmetricTensor<rank,dim,Number> &
-SymmetricTensor<rank,dim,Number>::operator *= (const Number d)
+SymmetricTensor<rank,dim,Number>::operator *= (const OtherNumber &d)
 {
   data *= d;
   return *this;
@@ -1117,36 +1144,13 @@ SymmetricTensor<rank,dim,Number>::operator *= (const Number d)
 
 
 template <int rank, int dim, typename Number>
+template <typename OtherNumber>
 inline
 SymmetricTensor<rank,dim,Number> &
-SymmetricTensor<rank,dim,Number>::operator /= (const Number d)
+SymmetricTensor<rank,dim,Number>::operator /= (const OtherNumber &d)
 {
   data /= d;
   return *this;
-}
-
-
-
-template <int rank, int dim, typename Number>
-inline
-SymmetricTensor<rank,dim,Number>
-SymmetricTensor<rank,dim,Number>::operator + (const SymmetricTensor &t) const
-{
-  SymmetricTensor tmp = *this;
-  tmp.data += t.data;
-  return tmp;
-}
-
-
-
-template <int rank, int dim, typename Number>
-inline
-SymmetricTensor<rank,dim,Number>
-SymmetricTensor<rank,dim,Number>::operator - (const SymmetricTensor &t) const
-{
-  SymmetricTensor tmp = *this;
-  tmp.data -= t.data;
-  return tmp;
 }
 
 
@@ -2093,6 +2097,54 @@ SymmetricTensor<rank,dim,Number>::serialize(Archive &ar, const unsigned int)
 #endif // DOXYGEN
 
 /* ----------------- Non-member functions operating on tensors. ------------ */
+
+
+/**
+ * Addition of two symmetric tensors of equal rank. The result is another
+ * SymmetricTensor that has a number type that is compatible with the
+ * operation.
+ *
+ * If possible (e.g. when @p Number and @p OtherNumber are of the same type,
+ * or if the result of <code>Number() + OtherNumber()</code> is another @p Number),
+ * you should use <tt>operator +=</tt> instead since this does not require the
+ * creation of a temporary variable.
+ *
+ * @relates SymmetricTensor
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+SymmetricTensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+operator+(const SymmetricTensor<rank, dim, Number>      &left,
+          const SymmetricTensor<rank, dim, OtherNumber> &right)
+{
+  SymmetricTensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp = left;
+  tmp += right;
+  return tmp;
+}
+
+
+/**
+ * Subtraction of two symmetric tensors of equal rank. The result is another
+ * SymmetricTensor that has a number type that is compatible with the
+ * operation.
+ *
+ * If possible (e.g. when @p Number and @p OtherNumber are of the same type,
+ * or if the result of <code>Number() + OtherNumber()</code> is another @p Number),
+ * you should use <tt>operator +=</tt> instead since this does not require the
+ * creation of a temporary variable.
+ *
+ * @relates SymmetricTensor
+ */
+template <int rank, int dim, typename Number, typename OtherNumber>
+inline
+SymmetricTensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
+operator-(const SymmetricTensor<rank, dim, Number>      &left,
+          const SymmetricTensor<rank, dim, OtherNumber> &right)
+{
+  SymmetricTensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tmp = left;
+  tmp -= right;
+  return tmp;
+}
 
 
 /**
