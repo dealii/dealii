@@ -33,9 +33,6 @@ DEAL_II_NAMESPACE_OPEN
  * class chooses them such that the discretized boundary is globally
  * continuously differentiable.
  *
- * To use this class, make sure that the Boundary::get_normals_at_vertices()
- * function is implemented for the user's boundary object.
- *
  * @author Wolfgang Bangerth, 2001, 2015
  */
 template <int dim, int spacedim=dim>
