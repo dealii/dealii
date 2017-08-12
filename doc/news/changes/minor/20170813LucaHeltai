@@ -1,0 +1,5 @@
+New: A new version of GridTools::find_active_cell_around_point()
+has been added that exploits local maps constructed 
+using standard GridTools utilities.
+<br>
+(Rene Gassmoeller, Luca Heltai, 2017/08/13)

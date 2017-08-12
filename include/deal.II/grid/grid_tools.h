@@ -748,6 +748,28 @@ namespace GridTools
                                  const std::vector<bool>      &marked_vertices = std::vector<bool>());
 
   /**
+   * A version of the previous function that exploits an already existing
+   * map between vertices and cells, constructed using the function
+   * GridTools::vertex_to_cell_map, a map of vertex_to_cell_centers, obtained
+   * through GridTools::vertex_to_cells_center_directions, and a guess `cell_hint`.
+   *
+   * @author Luca Heltai, Rene Gassmoeller, 2017
+   */
+  template <int dim, template <int, int> class MeshType, int spacedim>
+#ifndef _MSC_VER
+  std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim> >
+#else
+  std::pair<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type, Point<dim> >
+#endif
+  find_active_cell_around_point (const Mapping<dim,spacedim>                                                          &mapping,
+                                 const MeshType<dim,spacedim>                                                         &mesh,
+                                 const Point<spacedim>                                                                &p,
+                                 const std::vector<std::set<typename MeshType<dim,spacedim>::active_cell_iterator > > &vertex_to_cell_map,
+                                 const std::vector<std::vector<Tensor<1,spacedim> > >                                 &vertex_to_cell_centers,
+                                 const typename MeshType<dim, spacedim>::active_cell_iterator                         &cell_hint=typename MeshType<dim, spacedim>::active_cell_iterator(),
+                                 const std::vector<bool>                                                              &marked_vertices = std::vector<bool>());
+
+  /**
    * A version of the previous function where we use that mapping on a given
    * cell that corresponds to the active finite element index of that cell.
    * This is obviously only useful for hp problems, since the active finite
@@ -1024,10 +1046,16 @@ namespace GridTools
   vertex_to_cell_map(const Triangulation<dim,spacedim> &triangulation);
 
   /**
-   * Returns a vector that contains a tensor for every vertex-cell combination
-   * of the output of GridTools::vertex_to_cell_map() (which is expected as
-   * input parameter for this function). Each tensor represents a geometric
-   * vector from the vertex to the respective cell center.
+   * Returns a vector of normalized tensors for each vertex-cell combination of
+   * the output of GridTools::vertex_to_cell_map() (which is expected as input
+   * parameter for this function). Each tensor represents a geometric vector
+   * from the vertex to the respective cell center.
+   *
+   * An assertion will be thrown if the size of the input vector is not equal to
+   * the number of vertices of the triangulation.
+   *
+   * result[v][c] is a unit Tensor for vertex index v, indicating the direction of
+   * the center of the c-th cell with respect to the vertex v.
    *
    * @author Rene Gassmoeller, Luca Heltai, 2017.
    */
@@ -1045,8 +1073,8 @@ namespace GridTools
    */
   template <int dim, int spacedim>
   unsigned int
-  get_closest_vertex_of_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell,
-                             const Point<spacedim> &position);
+  find_closest_vertex_of_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell,
+                              const Point<spacedim> &position);
 
   /**
    * Compute a globally unique index for each vertex and hanging node

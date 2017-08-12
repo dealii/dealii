@@ -1466,6 +1466,9 @@ next_cell:
     const std::vector<Point<spacedim> > &vertices = mesh.get_vertices();
     const unsigned int n_vertices = vertex_to_cells.size();
 
+    AssertDimension(vertices.size(), n_vertices);
+
+
     std::vector<std::vector<Tensor<1,spacedim> > > vertex_to_cell_centers(n_vertices);
     for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
       if (mesh.vertex_used(vertex))
@@ -1484,18 +1487,137 @@ next_cell:
   }
 
 
+  namespace
+  {
+    template <int spacedim>
+    bool
+    compare_point_association(const unsigned int a,
+                              const unsigned int b,
+                              const Tensor<1,spacedim> &point_direction,
+                              const std::vector<Tensor<1,spacedim> > &center_directions)
+    {
+      const double scalar_product_a = center_directions[a] * point_direction;
+      const double scalar_product_b = center_directions[b] * point_direction;
+
+      // The function is supposed to return if a is before b. We are looking
+      // for the alignment of point direction and center direction, therefore
+      // return if the scalar product of a is larger.
+      return (scalar_product_a > scalar_product_b);
+    }
+  }
+
+  template <int dim, template <int, int> class MeshType, int spacedim>
+#ifndef _MSC_VER
+  std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim> >
+#else
+  std::pair<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type, Point<dim> >
+#endif
+  find_active_cell_around_point (const Mapping<dim,spacedim>                                                    &mapping,
+                                 const MeshType<dim,spacedim>                                                   &mesh,
+                                 const Point<spacedim>                                                          &p,
+                                 const std::vector<std::set<typename MeshType<dim,spacedim>::active_cell_iterator > > &vertex_to_cells,
+                                 const std::vector<std::vector<Tensor<1,spacedim> > >                            &vertex_to_cell_centers,
+                                 const typename MeshType<dim, spacedim>::active_cell_iterator                    &cell_hint ,
+                                 const std::vector<bool>                                                         &marked_vertices)
+  {
+    std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim> > cell_and_position;
+
+    bool found_cell = false;
+
+    unsigned int closest_vertex_index = 0;
+    Tensor<1,spacedim> vertex_to_point;
+    auto current_cell = cell_hint;
+
+    while (found_cell == false)
+      {
+        // First look at the vertices of the cell cell_hint. If it's an
+        // invalid cell, then query for the closest global vertex
+        if (current_cell.state() == IteratorState::valid)
+          {
+            const unsigned int closest_vertex = find_closest_vertex_of_cell<dim,spacedim>(current_cell , p);
+            vertex_to_point = p - current_cell ->vertex(closest_vertex);
+            closest_vertex_index = current_cell ->vertex_index(closest_vertex);
+          }
+        else
+          {
+            closest_vertex_index = GridTools::find_closest_vertex(mesh,p,marked_vertices);
+            vertex_to_point = p - mesh.get_vertices()[closest_vertex_index];
+          }
+
+        vertex_to_point /= vertex_to_point.norm();
+        const unsigned int n_neighbor_cells = vertex_to_cells[closest_vertex_index].size();
+
+        // Create a corresponding map of vectors from vertex to cell center
+        std::vector<unsigned int> neighbor_permutation(n_neighbor_cells);
+
+        for (unsigned int i=0; i<n_neighbor_cells; ++i)
+          neighbor_permutation[i] = i;
+
+        auto comp = [&](const unsigned int a, const unsigned int b) -> bool
+        {
+          return compare_point_association<spacedim>(a,b,vertex_to_point,vertex_to_cell_centers[closest_vertex_index]);
+        };
+
+        std::sort(neighbor_permutation.begin(),
+                  neighbor_permutation.end(),
+                  comp);
+
+        // Search all of the cells adjacent to the closest vertex of the cell hint
+        // Most likely we will find the point in them.
+        for (unsigned int i=0; i<n_neighbor_cells; ++i)
+          {
+            try
+              {
+                auto cell = vertex_to_cells[closest_vertex_index].begin();
+                std::advance(cell,neighbor_permutation[i]);
+                const Point<dim> p_unit = mapping.transform_real_to_unit_cell(*cell, p);
+                if (GeometryInfo<dim>::is_inside_unit_cell(p_unit))
+                  {
+                    cell_and_position.first = *cell;
+                    cell_and_position.second = p_unit;
+                    found_cell = true;
+                    break;
+                  }
+              }
+            catch (typename Mapping<dim>::ExcTransformationFailed &)
+              {}
+          }
+
+        if (found_cell == true)
+          return cell_and_position;
+
+        // The first time around, we check for vertices in the hint_cell. If that
+        // does not work, we set the cell iterator to an invalid one, and look
+        // for a global vertex close to the point. If that does not work, we are in
+        // trouble, and just throw an exception.
+        //
+        // If we got here, then we did not find the point. If the
+        // current_cell.state() here is not IteratorState::valid, it means that
+        // the user did not provide a hint_cell, and at the beginning of the
+        // while loop we performed an actual global search on the mesh
+        // vertices. Not finding the point then means the point is outside the
+        // domain.
+        AssertThrow(current_cell.state() == IteratorState::valid,
+                    ExcPointNotFound<spacedim>(p));
+
+        current_cell = typename MeshType<dim,spacedim>::active_cell_iterator();
+      }
+    return cell_and_position;
+  }
+
+
 
   template <int dim, int spacedim>
   unsigned int
-  get_closest_vertex_of_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell,
-                             const Point<spacedim> &position)
+  find_closest_vertex_of_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell,
+                              const Point<spacedim> &position)
   {
-    double minimum_distance = std::numeric_limits<double>::max();
-    unsigned int closest_vertex = numbers::invalid_unsigned_int;
+    double minimum_distance = position.distance_square(cell->vertex(0));
+    unsigned int closest_vertex = 0;
 
-    for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+    for (unsigned int v=1; v<GeometryInfo<dim>::vertices_per_cell; ++v)
       {
-        const double vertex_distance = position.distance(cell->vertex(v));
+        const double vertex_distance = position.distance_square(cell->vertex(v));
         if (vertex_distance < minimum_distance)
           {
             closest_vertex = v;
