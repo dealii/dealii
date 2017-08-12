@@ -259,6 +259,14 @@ namespace parallel
   Triangulation<dim,spacedim>::
   compute_vertices_with_ghost_neighbors () const
   {
+    // TODO: we are not treating periodic neighbors correctly here. If we do
+    // we can remove the overriding implementation for p::d::Triangulation
+    // that is currently using a p4est callback to get correct ghost neighbors
+    // over periodic faces.
+    Assert(this->periodic_face_pairs_level_0.size()==0,
+           ExcNotImplemented());
+
+
     std::vector<bool> vertex_of_own_cell(this->n_vertices(), false);
 
     for (auto cell : this->active_cell_iterators())
