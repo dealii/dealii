@@ -1,12 +1,15 @@
-Refinement cycle 0
-   Number of active cells: 16
-   Number of degrees of freedom: 187 (162+25)
-   Assembling...
-   Solving...  9 outer CG Schur complement iterations for pressure
 
-Refinement cycle 1
-   Number of active cells: 40
-   Number of degrees of freedom: 441 (386+55)
-   Assembling...
-   Solving...  11 outer CG Schur complement iterations for pressure
-
+DEAL::Refinement cycle 0
+DEAL::   Number of active cells: 16
+DEAL::   Number of degrees of freedom: 187 (162+25)
+DEAL::   Assembling...
+DEAL::   Solving...
+DEAL::  9 outer CG Schur complement iterations for pressure
+DEAL::
+DEAL::Refinement cycle 1
+DEAL::   Number of active cells: 40
+DEAL::   Number of degrees of freedom: 441 (386+55)
+DEAL::   Assembling...
+DEAL::   Solving...
+DEAL::  11 outer CG Schur complement iterations for pressure
+DEAL::

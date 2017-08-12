@@ -12,9 +12,10 @@
  * the top level of the deal.II distribution.
  *
  * ---------------------------------------------------------------------
- *
- * Author: Wolfgang Bangerth, Texas A&M University, 2008
  */
+
+#include "../tests.h"
+
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/utilities.h>
@@ -49,6 +50,7 @@
 #include <deal.II/lac/schur_complement.h>
 #include <iostream>
 #include <sstream>
+
 namespace Step22
 {
   using namespace dealii;
@@ -62,7 +64,6 @@ namespace Step22
     void setup_dofs ();
     void assemble_system ();
     void solve ();
-    void output_results (const unsigned int refinement_cycle) const;
     void refine_mesh ();
     const unsigned int   degree;
     Triangulation<dim>   triangulation;
@@ -74,6 +75,7 @@ namespace Step22
     BlockVector<double> solution;
     BlockVector<double> system_rhs;
   };
+
   template <int dim>
   class BoundaryValues : public Function<dim>
   {
@@ -84,6 +86,7 @@ namespace Step22
     virtual void vector_value (const Point<dim> &p,
                                Vector<double>   &value) const;
   };
+
   template <int dim>
   double
   BoundaryValues<dim>::value (const Point<dim>  &p,
@@ -95,6 +98,7 @@ namespace Step22
       return (p[0] < 0 ? -1 : (p[0] > 0 ? 1 : 0));
     return 0;
   }
+
   template <int dim>
   void
   BoundaryValues<dim>::vector_value (const Point<dim> &p,
@@ -103,6 +107,7 @@ namespace Step22
     for (unsigned int c=0; c<this->n_components; ++c)
       values(c) = BoundaryValues<dim>::value (p, c);
   }
+
   template <int dim>
   class RightHandSide : public Function<dim>
   {
@@ -113,6 +118,7 @@ namespace Step22
     virtual void vector_value (const Point<dim> &p,
                                Vector<double>   &value) const;
   };
+
   template <int dim>
   double
   RightHandSide<dim>::value (const Point<dim>  &/*p*/,
@@ -120,6 +126,7 @@ namespace Step22
   {
     return 0;
   }
+
   template <int dim>
   void
   RightHandSide<dim>::vector_value (const Point<dim> &p,
@@ -128,6 +135,7 @@ namespace Step22
     for (unsigned int c=0; c<this->n_components; ++c)
       values(c) = RightHandSide<dim>::value (p, c);
   }
+
   template <int dim>
   StokesProblem<dim>::StokesProblem (const unsigned int degree)
     :
@@ -137,6 +145,7 @@ namespace Step22
         FE_Q<dim>(degree), 1),
     dof_handler (triangulation)
   {}
+
   template <int dim>
   void StokesProblem<dim>::setup_dofs ()
   {
@@ -162,13 +171,13 @@ namespace Step22
     DoFTools::count_dofs_per_block (dof_handler, dofs_per_block, block_component);
     const unsigned int n_u = dofs_per_block[0],
                        n_p = dofs_per_block[1];
-    std::cout << "   Number of active cells: "
-              << triangulation.n_active_cells()
-              << std::endl
-              << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
-              << " (" << n_u << '+' << n_p << ')'
-              << std::endl;
+    deallog << "   Number of active cells: "
+            << triangulation.n_active_cells()
+            << std::endl
+            << "   Number of degrees of freedom: "
+            << dof_handler.n_dofs()
+            << " (" << n_u << '+' << n_p << ')'
+            << std::endl;
     {
       BlockDynamicSparsityPattern dsp (2,2);
       dsp.block(0,0).reinit (n_u, n_u);
@@ -189,6 +198,7 @@ namespace Step22
     system_rhs.block(1).reinit (n_p);
     system_rhs.collect_sizes ();
   }
+
   template <int dim>
   void StokesProblem<dim>::assemble_system ()
   {
@@ -213,6 +223,7 @@ namespace Step22
     std::vector<SymmetricTensor<2,dim> > symgrad_phi_u (dofs_per_cell);
     std::vector<double>                  div_phi_u   (dofs_per_cell);
     std::vector<double>                  phi_p       (dofs_per_cell);
+
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -257,6 +268,7 @@ namespace Step22
                                                 system_matrix, system_rhs);
       }
   }
+
   template <int dim>
   void StokesProblem<dim>::solve ()
   {
@@ -305,35 +317,12 @@ namespace Step22
     x = postprocess_schur_solution (A_inv,B,y,f);
 
     constraints.distribute (solution);
-    std::cout << "  "
-              << solver_control_S.last_step()
-              << " outer CG Schur complement iterations for pressure"
-              << std::endl;
+    deallog << "  "
+            << solver_control_S.last_step()
+            << " outer CG Schur complement iterations for pressure"
+            << std::endl;
   }
-  template <int dim>
-  void
-  StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
-  {
-    std::vector<std::string> solution_names (dim, "velocity");
-    solution_names.push_back ("pressure");
-    std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation
-    (dim, DataComponentInterpretation::component_is_part_of_vector);
-    data_component_interpretation
-    .push_back (DataComponentInterpretation::component_is_scalar);
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, solution_names,
-                              DataOut<dim>::type_dof_data,
-                              data_component_interpretation);
-    data_out.build_patches ();
-    std::ostringstream filename;
-    filename << "solution-"
-             << Utilities::int_to_string (refinement_cycle, 2)
-             << ".vtk";
-    std::ofstream output (filename.str().c_str());
-    data_out.write_vtk (output);
-  }
+
   template <int dim>
   void
   StokesProblem<dim>::refine_mesh ()
@@ -351,12 +340,13 @@ namespace Step22
                                                      0.3, 0.0);
     triangulation.execute_coarsening_and_refinement ();
   }
+
   template <int dim>
   void StokesProblem<dim>::run ()
   {
     {
       std::vector<unsigned int> subdivisions (dim, 1);
-//      subdivisions[0] = 4;
+
       const Point<dim> bottom_left = (dim == 2 ?
                                       Point<dim>(-2,-1) :
                                       Point<dim>(-2,0,-1));
@@ -378,50 +368,24 @@ namespace Step22
     for (unsigned int refinement_cycle = 0; refinement_cycle<2;
          ++refinement_cycle)
       {
-        std::cout << "Refinement cycle " << refinement_cycle << std::endl;
+        deallog << "Refinement cycle " << refinement_cycle << std::endl;
         if (refinement_cycle > 0)
           refine_mesh ();
         setup_dofs ();
-        std::cout << "   Assembling..." << std::endl << std::flush;
+        deallog << "   Assembling..." << std::endl;
         assemble_system ();
-        std::cout << "   Solving..." << std::flush;
+        deallog << "   Solving..." << std::endl;
         solve ();
-        //output_results (refinement_cycle);
-        std::cout << std::endl;
+        deallog << std::endl;
       }
   }
 }
 int main ()
 {
-  try
-    {
-      using namespace dealii;
-      using namespace Step22;
-      StokesProblem<2> flow_problem(1);
-      flow_problem.run ();
-    }
-  catch (std::exception &exc)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Exception on processing: " << std::endl
-                << exc.what() << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
-    }
-  catch (...)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Unknown exception!" << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
-    }
-  return 0;
+  initlog();
+  deallog.depth_file(1);
+
+  using namespace Step22;
+  StokesProblem<2> flow_problem(1);
+  flow_problem.run ();
 }
