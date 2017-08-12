@@ -1773,11 +1773,11 @@ namespace internal
   void update_ghost_values_finish_block (const VectorStruct &vec,
                                          std::integral_constant<bool, true>);
   template <typename VectorStruct>
-  void compress_start_block (const VectorStruct &vec,
+  void compress_start_block (VectorStruct       &vec,
                              const unsigned int channel,
                              std::integral_constant<bool, true>);
   template <typename VectorStruct>
-  void compress_finish_block (const VectorStruct &vec,
+  void compress_finish_block (VectorStruct &vec,
                               std::integral_constant<bool, true>);
 
   template <typename VectorStruct>
@@ -1797,12 +1797,12 @@ namespace internal
                                          std::integral_constant<bool, false>)
   {}
   template <typename VectorStruct>
-  void compress_start_block (const VectorStruct &,
+  void compress_start_block (VectorStruct &,
                              const unsigned int,
                              std::integral_constant<bool, false>)
   {}
   template <typename VectorStruct>
-  void compress_finish_block (const VectorStruct &,
+  void compress_finish_block (VectorStruct &,
                               std::integral_constant<bool, false>)
   {}
 
