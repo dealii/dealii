@@ -11,245 +11,8 @@ namespace internal
   {
     namespace
     {
-      template <int dim, int spacedim>
-      typename dealii::Triangulation<dim,spacedim>::cell_iterator
-      cell_from_quad
-      (const dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation,
-       const typename dealii::internal::p4est::types<dim>::topidx treeidx,
-       const typename dealii::internal::p4est::types<dim>::quadrant &quad)
-      {
-        int i, l = quad.level;
-        dealii::types::global_dof_index dealii_index =
-          triangulation->get_p4est_tree_to_coarse_cell_permutation()[treeidx];
-
-        for (i = 0; i < l; i++)
-          {
-            typename dealii::Triangulation<dim,spacedim>::cell_iterator cell (triangulation, i, dealii_index);
-            const int child_id = dealii::internal::p4est::functions<dim>::quadrant_ancestor_id (&quad, i + 1);
-            Assert (cell->has_children (), ExcMessage ("p4est quadrant does not correspond to a cell!"));
-            dealii_index = cell->child_index(child_id);
-          }
-
-        typename dealii::Triangulation<dim,spacedim>::cell_iterator out_cell (triangulation, l, dealii_index);
-
-        return out_cell;
-      }
 
 
-      /** At a corner (vertex), determine if any of the neighboring cells are
-       * ghosts.  If there are, find out their subdomain ids, and if this is a
-       * local vertex, then add these subdomain ids to the map
-       * vertices_with_ghost_neighbors of that index
-       */
-      template <int dim, int spacedim>
-      void
-      find_ghosts_corner
-      (typename dealii::internal::p4est::iter<dim>::corner_info *info,
-       void *user_data)
-      {
-        int i, j;
-        int nsides = info->sides.elem_count;
-        typename dealii::internal::p4est::iter<dim>::corner_side *sides =
-          (typename dealii::internal::p4est::iter<dim>::corner_side *)
-          (info->sides.array);
-        FindGhosts<dim,spacedim> *fg = static_cast<FindGhosts<dim,spacedim> *>(user_data);
-        sc_array_t *subids = fg->subids;
-        const dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
-        int nsubs;
-        dealii::types::subdomain_id *subdomain_ids;
-        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-        *vertices_with_ghost_neighbors = fg->vertices_with_ghost_neighbors;
-
-        subids->elem_count = 0;
-        for (i = 0; i < nsides; i++)
-          {
-            if (sides[i].is_ghost)
-              {
-                typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].quad));
-                Assert (cell->is_ghost(), ExcMessage ("ghost quad did not find ghost cell"));
-                dealii::types::subdomain_id *subid =
-                  static_cast<dealii::types::subdomain_id *>(sc_array_push (subids));
-                *subid = cell->subdomain_id();
-              }
-          }
-
-        if (!subids->elem_count)
-          {
-            return;
-          }
-
-        nsubs = (int) subids->elem_count;
-        subdomain_ids = (dealii::types::subdomain_id *) (subids->array);
-
-        for (i = 0; i < nsides; i++)
-          {
-            if (!sides[i].is_ghost)
-              {
-                typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].quad));
-
-                Assert (!cell->is_ghost(), ExcMessage ("local quad found ghost cell"));
-
-                for (j = 0; j < nsubs; j++)
-                  {
-                    (*vertices_with_ghost_neighbors)[cell->vertex_index(sides[i].corner)]
-                    .insert (subdomain_ids[j]);
-                  }
-              }
-          }
-
-        subids->elem_count = 0;
-      }
-
-      /** Similar to find_ghosts_corner, but for the hanging vertex in the
-       * middle of an edge
-       */
-      template <int dim, int spacedim>
-      void
-      find_ghosts_edge
-      (typename dealii::internal::p4est::iter<dim>::edge_info *info,
-       void *user_data)
-      {
-        int i, j, k;
-        int nsides = info->sides.elem_count;
-        typename dealii::internal::p4est::iter<dim>::edge_side *sides =
-          (typename dealii::internal::p4est::iter<dim>::edge_side *)
-          (info->sides.array);
-        FindGhosts<dim,spacedim> *fg = static_cast<FindGhosts<dim,spacedim> *>(user_data);
-        sc_array_t *subids = fg->subids;
-        const dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
-        int nsubs;
-        dealii::types::subdomain_id *subdomain_ids;
-        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-        *vertices_with_ghost_neighbors = fg->vertices_with_ghost_neighbors;
-
-        subids->elem_count = 0;
-        for (i = 0; i < nsides; i++)
-          {
-            if (sides[i].is_hanging)
-              {
-                for (j = 0; j < 2; j++)
-                  {
-                    if (sides[i].is.hanging.is_ghost[j])
-                      {
-                        typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].is.hanging.quad[j]));
-                        dealii::types::subdomain_id *subid =
-                          static_cast<dealii::types::subdomain_id *>(sc_array_push (subids));
-                        *subid = cell->subdomain_id();
-                      }
-                  }
-              }
-          }
-
-        if (!subids->elem_count)
-          {
-            return;
-          }
-
-        nsubs = (int) subids->elem_count;
-        subdomain_ids = (dealii::types::subdomain_id *) (subids->array);
-
-        for (i = 0; i < nsides; i++)
-          {
-            if (sides[i].is_hanging)
-              {
-                for (j = 0; j < 2; j++)
-                  {
-                    if (!sides[i].is.hanging.is_ghost[j])
-                      {
-                        typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].is.hanging.quad[j]));
-
-                        for (k = 0; k < nsubs; k++)
-                          {
-                            (*vertices_with_ghost_neighbors)[cell->vertex_index(p8est_edge_corners[sides[i].edge][1^j])]
-                            .insert (subdomain_ids[k]);
-                          }
-                      }
-                  }
-              }
-          }
-
-        subids->elem_count = 0;
-      }
-
-      /** Similar to find_ghosts_corner, but for the hanging vertex in the
-       * middle of a face
-       */
-      template <int dim, int spacedim>
-      void
-      find_ghosts_face
-      (typename dealii::internal::p4est::iter<dim>::face_info *info,
-       void *user_data)
-      {
-        int i, j, k;
-        int nsides = info->sides.elem_count;
-        typename dealii::internal::p4est::iter<dim>::face_side *sides =
-          (typename dealii::internal::p4est::iter<dim>::face_side *)
-          (info->sides.array);
-        FindGhosts<dim,spacedim> *fg = static_cast<FindGhosts<dim,spacedim> *>(user_data);
-        sc_array_t *subids = fg->subids;
-        const dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation = fg->triangulation;
-        int nsubs;
-        dealii::types::subdomain_id *subdomain_ids;
-        std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-        *vertices_with_ghost_neighbors = fg->vertices_with_ghost_neighbors;
-        int limit = (dim == 2) ? 2 : 4;
-
-        subids->elem_count = 0;
-        for (i = 0; i < nsides; i++)
-          {
-            if (sides[i].is_hanging)
-              {
-                for (j = 0; j < limit; j++)
-                  {
-                    if (sides[i].is.hanging.is_ghost[j])
-                      {
-                        typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].is.hanging.quad[j]));
-                        dealii::types::subdomain_id *subid =
-                          static_cast<dealii::types::subdomain_id *>(sc_array_push (subids));
-                        *subid = cell->subdomain_id();
-                      }
-                  }
-              }
-          }
-
-        if (!subids->elem_count)
-          {
-            return;
-          }
-
-        nsubs = (int) subids->elem_count;
-        subdomain_ids = (dealii::types::subdomain_id *) (subids->array);
-
-        for (i = 0; i < nsides; i++)
-          {
-            if (sides[i].is_hanging)
-              {
-                for (j = 0; j < limit; j++)
-                  {
-                    if (!sides[i].is.hanging.is_ghost[j])
-                      {
-                        typename dealii::parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = cell_from_quad (triangulation, sides[i].treeid, *(sides[i].is.hanging.quad[j]));
-
-                        for (k = 0; k < nsubs; k++)
-                          {
-                            if (dim == 2)
-                              {
-                                (*vertices_with_ghost_neighbors)[cell->vertex_index(p4est_face_corners[sides[i].face][(limit - 1)^j])]
-                                .insert (subdomain_ids[k]);
-                              }
-                            else
-                              {
-                                (*vertices_with_ghost_neighbors)[cell->vertex_index(p8est_face_corners[sides[i].face][(limit - 1)^j])]
-                                .insert (subdomain_ids[k]);
-                              }
-                          }
-                      }
-                  }
-              }
-          }
-
-        subids->elem_count = 0;
-      }
     }
 
 
@@ -436,16 +199,7 @@ namespace internal
     size_t (&functions<2>::connectivity_memory_used) (types<2>::connectivity *p4est)
       = p4est_connectivity_memory_used;
 
-    template <int spacedim>
-    void functions<2>::iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
-                               dealii::internal::p4est::types<2>::ghost *parallel_ghost,
-                               void *user_data)
-    {
-      p4est_iterate (parallel_forest, parallel_ghost, user_data,
-                     nullptr,
-                     find_ghosts_face<2,spacedim>,
-                     find_ghosts_corner<2,spacedim>);
-    }
+
 
     const unsigned int functions<2>::max_level;
 
@@ -638,20 +392,85 @@ namespace internal
     size_t (&functions<3>::connectivity_memory_used) (types<3>::connectivity *p4est)
       = p8est_connectivity_memory_used;
 
-    template <int spacedim>
-    void functions<3>::iterate(dealii::internal::p4est::types<3>::forest *parallel_forest,
-                               dealii::internal::p4est::types<3>::ghost *parallel_ghost,
-                               void *user_data)
-    {
-      p8est_iterate (parallel_forest, parallel_ghost, user_data,
-                     nullptr,
-                     find_ghosts_face<3,spacedim>,
-                     find_ghosts_edge<3,spacedim>,
-                     find_ghosts_corner<3,spacedim>);
-    }
-
     const unsigned int functions<3>::max_level;
 
+    template <int dim>
+    void iterate(typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
+                 typename dealii::internal::p4est::types<dim>::ghost *parallel_ghost,
+                 std::function<void (typename dealii::internal::p4est::iter<dim>::face_info *info)> face_callback,
+                 std::function<void (typename dealii::internal::p4est::iter<dim>::edge_info *info)> edge_callback,
+                 std::function<void (typename dealii::internal::p4est::iter<dim>::corner_info *info)> corner_callback)
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+    template <>
+    void iterate<2>(typename dealii::internal::p4est::types<2>::forest *parallel_forest,
+                    typename dealii::internal::p4est::types<2>::ghost *parallel_ghost,
+                    std::function<void (typename dealii::internal::p4est::iter<2>::face_info *info)> face_callback,
+                    std::function<void (typename dealii::internal::p4est::iter<3>::edge_info *info)> /*edge_callback*/,
+                    std::function<void (typename dealii::internal::p4est::iter<2>::corner_info *info)> corner_callback)
+    {
+      struct user_data_t
+      {
+        std::function<void (typename dealii::internal::p4est::iter<2>::face_info *info)> face_callback;
+        std::function<void (typename dealii::internal::p4est::iter<2>::corner_info *info)> corner_callback;
+
+      } user_data;
+      user_data.face_callback = face_callback;
+      user_data.corner_callback = corner_callback;
+
+      p4est_iterate (parallel_forest, parallel_ghost, &user_data,
+                     nullptr,
+                     [] (typename dealii::internal::p4est::iter<2>::face_info *info, void *user_data)
+      {
+        auto my_user_data = static_cast<user_data_t *> (user_data);
+        my_user_data->face_callback(info);
+      },
+      [] (typename dealii::internal::p4est::iter<2>::corner_info *info, void *user_data)
+      {
+        auto my_user_data = static_cast<user_data_t *> (user_data);
+        my_user_data->corner_callback(info);
+      });
+    }
+
+    template <>
+    void iterate<3>(typename dealii::internal::p4est::types<3>::forest *parallel_forest,
+                    typename dealii::internal::p4est::types<3>::ghost *parallel_ghost,
+                    std::function<void (typename dealii::internal::p4est::iter<3>::face_info *info)> face_callback,
+                    std::function<void (typename dealii::internal::p4est::iter<3>::edge_info *info)> edge_callback,
+                    std::function<void (typename dealii::internal::p4est::iter<3>::corner_info *info)> corner_callback)
+    {
+      struct user_data_t
+      {
+        std::function<void (typename dealii::internal::p4est::iter<3>::face_info *info)> face_callback;
+        std::function<void (typename dealii::internal::p4est::iter<3>::edge_info *info)> edge_callback;
+        std::function<void (typename dealii::internal::p4est::iter<3>::corner_info *info)> corner_callback;
+
+      } user_data;
+      user_data.face_callback = face_callback;
+      user_data.edge_callback = edge_callback;
+      user_data.corner_callback = corner_callback;
+
+      p8est_iterate (parallel_forest, parallel_ghost, &user_data,
+                     nullptr,
+                     [] (typename dealii::internal::p4est::iter<3>::face_info *info, void *user_data)
+      {
+        auto my_user_data = static_cast<user_data_t *> (user_data);
+        my_user_data->face_callback(info);
+      },
+      [] (typename dealii::internal::p4est::iter<3>::edge_info *info, void *user_data)
+      {
+        auto my_user_data = static_cast<user_data_t *> (user_data);
+        my_user_data->edge_callback(info);
+      },
+      [] (typename dealii::internal::p4est::iter<3>::corner_info *info, void *user_data)
+      {
+        auto my_user_data = static_cast<user_data_t *> (user_data);
+        my_user_data->corner_callback(info);
+      });
+
+    }
 
 
 
