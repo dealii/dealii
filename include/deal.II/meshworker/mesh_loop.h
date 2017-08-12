@@ -37,7 +37,68 @@ template <typename> class TriaActiveIterator;
 namespace MeshWorker
 {
   /**
-   * A low level work function of this namespace.
+   * This function extends the WorkStream concept by externalising most of the
+   * work that is required to assemble face terms (for example in discontinuous
+   * Galerkin methods) or boundary terms.
+   *
+   * For uniformly refined meshes, it would be relatively easy to use
+   * WorkStream::run() with a `cell_worker` that also loops over faces, and
+   * takes care of assembling face terms depending on the current and neighbor
+   * cell. All user codes that do these loops would then need to insert
+   * manually the logic that identifies, for every face of the current cell,
+   * the neighboring cell, and the face index on the neighboring cell that
+   * corresponds to the current face.
+   *
+   * This is more complicated if local refinement is enabled and the current or
+   * neighbor cells have hanging nodes. In this case it is also necessary to
+   * identify the corresponding subface on either the current or the neighbor
+   * faces.
+   *
+   * This method externalises that logic (which is independent from user codes)
+   * and separates the assembly of face terms (internal faces, boundary faces,
+   * or faces between different subdomain ids on parallel computations) from
+   * the assembling of cells, allowing the user to specify two additional
+   * workers (a `cell_worker`, a `boundary_worker`, and a `face_worker`) that
+   * are called automatically in each `cell`, according to the specific
+   * AssembleFlags `flags` that are passed. The `cell_worker` is passed the
+   * cell identifier, a ScratchData object, and a CopyData object, following
+   * the same principles of WorkStream::run. Internally the function passes to
+   * `boundary_worker`, in addition to the above, also a `face_no` paramater
+   * that identifies the face on which the integration should be performed. The
+   * `face_worker` instead need to identify univoquely the current face both on
+   * the cell, and on the neighboring cell, and it is therefore called with six
+   * arguments (three for each cell: the actual cell, the face index, and
+   * the subface_index. If no subface integration is needed, then the
+   * subface_index is numbers::invalid_unsigned_int) in addition to the usual
+   * ScratchData and CopyData objects.
+   *
+   * If the flag AssembleFlags::assemble_own_cells is passed, then the default
+   * behaviour is to first loop over faces and do the work there, and then
+   * compute the actual work on the cell.
+   *
+   * It is possible to perform the integration on the cells before working on
+   * faces, by adding the flag AssembleFlags::assemble_cells_first.
+   *
+   * If the flag AssembleFlags::assemble_own_interior_faces_once is specified,
+   * then each interior face is visited only once, and the `face_worker` is
+   * assumed to integrate all face terms at once.
+   *
+   * This method is equivalent to the WorkStream::run() method when
+   * AssembleFlags contains only `assemble_own_cells`, and can be used as a
+   * drop-in replacement for that method.
+   *
+   * The two data types ScratchData and CopyData need to have a working copy
+   * constructor. ScratchData is only used in the worker function, while CopyData is
+   * the object passed from the worker to the copier.
+   *
+   * The queue_length argument indicates the number of items that can be live at any
+   * given time. Each item consists of chunk_size elements of the input stream that
+   * will be worked on by the worker and copier functions one after the other on the
+   * same thread.
+   *
+   * If your data objects are large, or their constructors are expensive, it is
+   * helpful to keep in mind that queue_length copies of the ScratchData object
+   * and queue_length*chunk_size copies of the CopyData object are generated.
    *
    * @ingroup MeshWorker
    * @author Luca Heltai, 2017
