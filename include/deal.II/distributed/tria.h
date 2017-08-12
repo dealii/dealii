@@ -862,7 +862,7 @@ namespace parallel
        * subdomains are adjacent to that vertex. Used by
        * DoFHandler::Policy::ParallelDistributed.
        */
-      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      virtual std::map<unsigned int, std::set<dealii::types::subdomain_id> >
       compute_vertices_with_ghost_neighbors () const;
 
       /**

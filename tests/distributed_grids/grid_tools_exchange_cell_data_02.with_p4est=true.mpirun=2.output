@@ -1,0 +1,87 @@
+
+DEAL:0::dim = 2
+DEAL:0::pack 0_2:02 1
+DEAL:0::pack 0_2:03 2
+DEAL:0::pack 0_2:12 3
+DEAL:0::pack 0_2:13 4
+DEAL:0::unpack 0_2:20 1 from 1
+DEAL:0::unpack 0_2:21 2 from 1
+DEAL:0::unpack 0_2:30 3 from 1
+DEAL:0::unpack 0_2:31 4 from 1
+DEAL:0::dim = 3
+DEAL:0::pack 0_2:04 1
+DEAL:0::pack 0_2:05 2
+DEAL:0::pack 0_2:06 3
+DEAL:0::pack 0_2:07 4
+DEAL:0::pack 0_2:14 5
+DEAL:0::pack 0_2:15 6
+DEAL:0::pack 0_2:16 7
+DEAL:0::pack 0_2:17 8
+DEAL:0::pack 0_2:24 9
+DEAL:0::pack 0_2:25 10
+DEAL:0::pack 0_2:26 11
+DEAL:0::pack 0_2:27 12
+DEAL:0::pack 0_2:34 13
+DEAL:0::pack 0_2:35 14
+DEAL:0::pack 0_2:36 15
+DEAL:0::pack 0_2:37 16
+DEAL:0::unpack 0_2:40 1 from 1
+DEAL:0::unpack 0_2:41 2 from 1
+DEAL:0::unpack 0_2:42 3 from 1
+DEAL:0::unpack 0_2:43 4 from 1
+DEAL:0::unpack 0_2:50 5 from 1
+DEAL:0::unpack 0_2:51 6 from 1
+DEAL:0::unpack 0_2:52 7 from 1
+DEAL:0::unpack 0_2:53 8 from 1
+DEAL:0::unpack 0_2:60 9 from 1
+DEAL:0::unpack 0_2:61 10 from 1
+DEAL:0::unpack 0_2:62 11 from 1
+DEAL:0::unpack 0_2:63 12 from 1
+DEAL:0::unpack 0_2:70 13 from 1
+DEAL:0::unpack 0_2:71 14 from 1
+DEAL:0::unpack 0_2:72 15 from 1
+DEAL:0::unpack 0_2:73 16 from 1
+
+DEAL:1::dim = 2
+DEAL:1::pack 0_2:20 1
+DEAL:1::pack 0_2:21 2
+DEAL:1::pack 0_2:30 3
+DEAL:1::pack 0_2:31 4
+DEAL:1::unpack 0_2:02 1 from 0
+DEAL:1::unpack 0_2:03 2 from 0
+DEAL:1::unpack 0_2:12 3 from 0
+DEAL:1::unpack 0_2:13 4 from 0
+DEAL:1::dim = 3
+DEAL:1::pack 0_2:40 1
+DEAL:1::pack 0_2:41 2
+DEAL:1::pack 0_2:42 3
+DEAL:1::pack 0_2:43 4
+DEAL:1::pack 0_2:50 5
+DEAL:1::pack 0_2:51 6
+DEAL:1::pack 0_2:52 7
+DEAL:1::pack 0_2:53 8
+DEAL:1::pack 0_2:60 9
+DEAL:1::pack 0_2:61 10
+DEAL:1::pack 0_2:62 11
+DEAL:1::pack 0_2:63 12
+DEAL:1::pack 0_2:70 13
+DEAL:1::pack 0_2:71 14
+DEAL:1::pack 0_2:72 15
+DEAL:1::pack 0_2:73 16
+DEAL:1::unpack 0_2:04 1 from 0
+DEAL:1::unpack 0_2:05 2 from 0
+DEAL:1::unpack 0_2:06 3 from 0
+DEAL:1::unpack 0_2:07 4 from 0
+DEAL:1::unpack 0_2:14 5 from 0
+DEAL:1::unpack 0_2:15 6 from 0
+DEAL:1::unpack 0_2:16 7 from 0
+DEAL:1::unpack 0_2:17 8 from 0
+DEAL:1::unpack 0_2:24 9 from 0
+DEAL:1::unpack 0_2:25 10 from 0
+DEAL:1::unpack 0_2:26 11 from 0
+DEAL:1::unpack 0_2:27 12 from 0
+DEAL:1::unpack 0_2:34 13 from 0
+DEAL:1::unpack 0_2:35 14 from 0
+DEAL:1::unpack 0_2:36 15 from 0
+DEAL:1::unpack 0_2:37 16 from 0
+
