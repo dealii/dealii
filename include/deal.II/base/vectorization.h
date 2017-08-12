@@ -2707,6 +2707,25 @@ vectorized_transpose_and_store(const bool                    add_into,
 
 
 /**
+ * Relational operator == for VectorizedArray
+ *
+ * @relates VectorizedArray
+ */
+template <typename Number>
+inline DEAL_II_ALWAYS_INLINE
+bool
+operator == (const VectorizedArray<Number> &lhs,
+             const VectorizedArray<Number> &rhs)
+{
+  for (unsigned int i=0; i<VectorizedArray<Number>::n_array_elements; ++i)
+    if (lhs[i] != rhs[i])
+      return false;
+
+  return true;
+}
+
+
+/**
  * Addition of two vectorized arrays with operator +.
  *
  * @relates VectorizedArray
