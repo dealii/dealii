@@ -15,14 +15,13 @@
 
 
 
-// test StraightBoundary::project_to_surface for lines
+// test GridTools::project_to_object for lines
 
 
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
@@ -82,7 +81,6 @@ void test ()
   deallog << "dim=" << dim << std::endl;
 
   Triangulation<dim> tria;
-  StraightBoundary<dim> boundary;
 
   for (unsigned int case_no=0; case_no<2; ++case_no)
     {
@@ -98,9 +96,9 @@ void test ()
         {
           deallog << "    Line " << e << ", projected point=";
           if (dim > 1)
-            deallog << boundary.project_to_surface (cell->line(e), trial_point);
+            deallog << GridTools::project_to_object (cell->line(e), trial_point);
           else
-            deallog << boundary.project_to_surface (cell, trial_point);
+            deallog << GridTools::project_to_object (cell, trial_point);
 
           deallog << "  (line is from ";
           if (dim > 1)
