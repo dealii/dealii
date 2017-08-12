@@ -263,7 +263,7 @@ namespace parallel
     // we can remove the overriding implementation for p::d::Triangulation
     // that is currently using a p4est callback to get correct ghost neighbors
     // over periodic faces.
-    Assert(this->periodic_face_pairs_level_0.size()==0,
+    Assert(this->get_periodic_face_map().size()==0,
            ExcNotImplemented());
 
 
