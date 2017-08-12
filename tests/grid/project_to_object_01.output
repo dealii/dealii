@@ -1,0 +1,235 @@
+
+DEAL::testing cross derivative 0
+DEAL::2.08262e-05
+DEAL::2.61032e-06
+DEAL::3.26714e-07
+DEAL::4.08654e-08
+DEAL::5.10984e-09
+DEAL::testing cross derivative 1
+DEAL::2.10357e-05
+DEAL::2.62342e-06
+DEAL::3.27533e-07
+DEAL::4.09167e-08
+DEAL::5.11266e-09
+DEAL::testing cross derivative 2
+DEAL::5.75514e-06
+DEAL::7.19207e-07
+DEAL::8.98876e-08
+DEAL::1.12350e-08
+DEAL::1.40439e-09
+DEAL::
+DEAL::Project the arithmetic mean of two vertices on a circular
+DEAL::arc. The result should be the geodesic midpoint:
+DEAL::
+DEAL::vertex 0 distance from origin: 2.00000
+DEAL::vertex 1 distance from origin: 2.00000
+DEAL::trial point distance from origin: 1.79445
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point:        1.99383 0.156918
+DEAL::true geodesic midpoint: 1.99383 0.156918
+DEAL::
+DEAL::Project the convex combination of two vertices:
+DEAL::projected point:          1.98114 0.274025
+DEAL::Convex combination point: 1.98114 0.274025
+DEAL::Distance:                 5.55112e-17
+DEAL::
+DEAL::Check that projecting with spacedim == structdim
+DEAL::is the identity map:
+DEAL::
+DEAL::trial point:     0.417941 4.24242e+09
+DEAL::projected point: 0.417941 4.24242e+09
+DEAL::
+DEAL::Project a vertex onto the geodesic:
+DEAL::
+DEAL::vertex distance from origin:          2.00000
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point: 2.00000 0.00000
+DEAL::actual vertex:   2.00000 0.00000
+DEAL::Test for robustness by projecting points with nonunique
+DEAL::minimizers. The output here has been eyeballed as decent.
+DEAL::0.768956, 1.00000, 1.84627
+DEAL::1.00000, 1.22465e-16, 0.00000
+DEAL::3.00000, 0.00000, 0.00000
+DEAL::2.00000, 1.00000, 0.00000
+DEAL::-1.84627, 1.00000, 0.768956
+DEAL::6.12323e-17, 1.22465e-16, 1.00000
+DEAL::1.83697e-16, 0.00000, 3.00000
+DEAL::1.22465e-16, 1.00000, 2.00000
+DEAL::-2.00000, 1.00000, 2.44929e-16
+DEAL::-1.00000, 1.22465e-16, 1.22465e-16
+DEAL::-3.00000, 0.00000, 3.67394e-16
+DEAL::-2.00000, 1.00000, 2.44929e-16
+DEAL::1.84627, 1.00000, -0.768956
+DEAL::-1.83697e-16, 1.22465e-16, -1.00000
+DEAL::-5.51091e-16, 0.00000, -3.00000
+DEAL::-3.67394e-16, 1.00000, -2.00000
+DEAL::=====================================================
+DEAL::Number of global refinements: 4
+DEAL::=====================================================
+DEAL::
+DEAL::Project a reweighed center onto a face in 3D:
+DEAL::
+DEAL::vertex 0 distance from origin: 2.00000
+DEAL::vertex 1 distance from origin: 2.00000
+DEAL::trial point distance from origin: 2.19658
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point:    -1.12085 -1.12085 -1.21959
+DEAL::true line midpoint: -1.12085 -1.12085 -1.21959
+DEAL::distance: 8.01926e-07
+DEAL::
+DEAL::Check that projecting with spacedim == structdim is the identity map:
+DEAL::
+DEAL::trial point:     0.417941 4.24242e+09 1.00000
+DEAL::projected point: 0.417941 4.24242e+09 1.00000
+DEAL::
+DEAL::Project a vertex:
+DEAL::
+DEAL::vertex 0 distance from origin:        2.00000
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point: -1.15470 -1.15470 -1.15470
+DEAL::actual vertex:   -1.15470 -1.15470 -1.15470
+DEAL::distance:        0.00000
+DEAL::
+DEAL::Project a point near a vertex:
+DEAL::
+DEAL::vertex 0 distance from origin:        2.00000
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point: -1.15464 -1.15473 -1.15473
+DEAL::trial point:     -1.15464 -1.15473 -1.15473
+DEAL::distance:        3.63867e-13
+DEAL::
+DEAL::Project a weighed face point onto the same face in 3D:
+DEAL::
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::Error:                                4.74583e-11
+DEAL::
+DEAL::Project a point offset from the face onto the face in 3D:
+DEAL::
+DEAL::trial point distance from origin:     2.20000
+DEAL::projected point distance from origin: 2.00000
+DEAL::Error (vs. going along the normal):   3.01973e-06
+DEAL::
+DEAL::Project a weighed line point onto the same line in 3D:
+DEAL::
+DEAL::trial point:                          -1.20701 -1.04223 -1.20701
+DEAL::projected point:                      -1.20701 -1.04223 -1.20701
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::Error:                                3.28543e-10
+DEAL::=====================================================
+DEAL::Number of global refinements: 5
+DEAL::=====================================================
+DEAL::
+DEAL::Project a reweighed center onto a face in 3D:
+DEAL::
+DEAL::vertex 0 distance from origin: 2.00000
+DEAL::vertex 1 distance from origin: 2.00000
+DEAL::trial point distance from origin: 2.19917
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point:    -1.13839 -1.13839 -1.18664
+DEAL::true line midpoint: -1.13839 -1.13839 -1.18665
+DEAL::distance: 2.27995e-06
+DEAL::
+DEAL::Check that projecting with spacedim == structdim is the identity map:
+DEAL::
+DEAL::trial point:     0.417941 4.24242e+09 1.00000
+DEAL::projected point: 0.417941 4.24242e+09 1.00000
+DEAL::
+DEAL::Project a vertex:
+DEAL::
+DEAL::vertex 0 distance from origin:        2.00000
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point: -1.15470 -1.15470 -1.15470
+DEAL::actual vertex:   -1.15470 -1.15470 -1.15470
+DEAL::distance:        0.00000
+DEAL::
+DEAL::Project a point near a vertex:
+DEAL::
+DEAL::vertex 0 distance from origin:        2.00000
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point: -1.15467 -1.15472 -1.15472
+DEAL::trial point:     -1.15467 -1.15472 -1.15472
+DEAL::distance:        4.50346e-11
+DEAL::
+DEAL::Project a weighed face point onto the same face in 3D:
+DEAL::
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::Error:                                3.98773e-06
+DEAL::
+DEAL::Project a point offset from the face onto the face in 3D:
+DEAL::
+DEAL::trial point distance from origin:     2.20000
+DEAL::projected point distance from origin: 2.00000
+DEAL::Error (vs. going along the normal):   2.12114e-05
+DEAL::
+DEAL::Project a weighed line point onto the same line in 3D:
+DEAL::
+DEAL::trial point:                          -1.18152 -1.09909 -1.18152
+DEAL::projected point:                      -1.18152 -1.09909 -1.18152
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::Error:                                2.35082e-08
+DEAL::=====================================================
+DEAL::Number of global refinements: 6
+DEAL::=====================================================
+DEAL::
+DEAL::Project a reweighed center onto a face in 3D:
+DEAL::
+DEAL::vertex 0 distance from origin: 2.00000
+DEAL::vertex 1 distance from origin: 2.00000
+DEAL::trial point distance from origin: 2.19979
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point:    -1.14670 -1.14670 -1.17054
+DEAL::true line midpoint: -1.14670 -1.14670 -1.17054
+DEAL::distance: 1.03418e-07
+DEAL::
+DEAL::Check that projecting with spacedim == structdim is the identity map:
+DEAL::
+DEAL::trial point:     0.417941 4.24242e+09 1.00000
+DEAL::projected point: 0.417941 4.24242e+09 1.00000
+DEAL::
+DEAL::Project a vertex:
+DEAL::
+DEAL::vertex 0 distance from origin:        2.00000
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point: -1.15470 -1.15470 -1.15470
+DEAL::actual vertex:   -1.15470 -1.15470 -1.15470
+DEAL::distance:        0.00000
+DEAL::
+DEAL::Project a point near a vertex:
+DEAL::
+DEAL::vertex 0 distance from origin:        2.00000
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::projected point: -1.15469 -1.15471 -1.15471
+DEAL::trial point:     -1.15469 -1.15471 -1.15471
+DEAL::distance:        3.78080e-10
+DEAL::
+DEAL::Project a weighed face point onto the same face in 3D:
+DEAL::
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::Error:                                0.000830302
+DEAL::
+DEAL::Project a point offset from the face onto the face in 3D:
+DEAL::
+DEAL::trial point distance from origin:     2.20000
+DEAL::projected point distance from origin: 2.00000
+DEAL::Error (vs. going along the normal):   0.00114132
+DEAL::
+DEAL::Project a weighed line point onto the same line in 3D:
+DEAL::
+DEAL::trial point:                          -1.16828 -1.12706 -1.16828
+DEAL::projected point:                      -1.16828 -1.12706 -1.16828
+DEAL::trial point distance from origin:     2.00000
+DEAL::projected point distance from origin: 2.00000
+DEAL::Error:                                1.14617e-07
+DEAL::OK

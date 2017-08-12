@@ -3269,75 +3269,45 @@ next_cell:
 
 
       /**
-       * Try to fix up a single cell. Return
-       * whether we succeeded with this.
-       *
-       * The second argument indicates
-       * whether we need to respect the
-       * manifold/boundary on which this
-       * object lies when moving around its
-       * mid-point.
+       * Try to fix up a single cell by moving around its midpoint. Return whether we succeeded with this.
        */
       template <typename Iterator>
       bool
-      fix_up_object (const Iterator &object,
-                     const bool respect_manifold)
+      fix_up_object (const Iterator &object)
       {
-        const Boundary<Iterator::AccessorType::dimension,
-              Iterator::AccessorType::space_dimension>
-              *manifold = (respect_manifold ?
-                           &object->get_boundary() :
-                           nullptr);
-
         const unsigned int structdim = Iterator::AccessorType::structure_dimension;
         const unsigned int spacedim  = Iterator::AccessorType::space_dimension;
 
-        // right now we can only deal
-        // with cells that have been
-        // refined isotropically
-        // because that is the only
-        // case where we have a cell
-        // mid-point that can be moved
-        // around without having to
-        // consider boundary
-        // information
+        // right now we can only deal with cells that have been refined
+        // isotropically because that is the only case where we have a cell
+        // mid-point that can be moved around without having to consider
+        // boundary information
         Assert (object->has_children(), ExcInternalError());
         Assert (object->refinement_case() == RefinementCase<structdim>::isotropic_refinement,
                 ExcNotImplemented());
 
-        // get the current location of
-        // the object mid-vertex:
+        // get the current location of the object mid-vertex:
         Point<spacedim> object_mid_point
           = object->child(0)->vertex (GeometryInfo<structdim>::max_children_per_cell-1);
 
-        // now do a few steepest descent
-        // steps to reduce the objective
-        // function. compute the diameter in
-        // the helper function above
+        // now do a few steepest descent steps to reduce the objective
+        // function. compute the diameter in the helper function above
         unsigned int iteration = 0;
         const double diameter = minimal_diameter (object);
 
-        // current value of objective
-        // function and initial delta
+        // current value of objective function and initial delta
         double current_value = objective_function (object, object_mid_point);
         double initial_delta = 0;
 
         do
           {
-            // choose a step length
-            // that is initially 1/4
-            // of the child objects'
-            // diameter, and a sequence
-            // whose sum does not
-            // converge (to avoid
-            // premature termination of
-            // the iteration)
+            // choose a step length that is initially 1/4 of the child
+            // objects' diameter, and a sequence whose sum does not converge
+            // (to avoid premature termination of the iteration)
             const double step_length = diameter / 4 / (iteration + 1);
 
-            // compute the objective
-            // function's derivative using a
-            // two-sided difference formula
-            // with eps=step_length/10
+            // compute the objective function's derivative using a two-sided
+            // difference formula with eps=step_length/10
             Tensor<1,spacedim> gradient;
             for (unsigned int d=0; d<spacedim; ++d)
               {
@@ -3346,68 +3316,35 @@ next_cell:
                 Tensor<1,spacedim> h;
                 h[d] = eps/2;
 
-                if (respect_manifold == false)
-                  gradient[d]
-                    = ((objective_function (object, object_mid_point + h)
-                        -
-                        objective_function (object, object_mid_point - h))
-                       /
-                       eps);
-                else
-                  gradient[d]
-                    = ((objective_function (object,
-                                            manifold->project_to_surface(object,
-                                                                         object_mid_point + h))
-                        -
-                        objective_function (object,
-                                            manifold->project_to_surface(object,
-                                                                         object_mid_point - h)))
-                       /
-                       eps);
+                gradient[d] = (objective_function (object,
+                                                   project_to_object(object, object_mid_point + h))
+                               -
+                               objective_function (object,
+                                                   project_to_object(object, object_mid_point - h)))
+                              /eps;
               }
 
-            // sometimes, the
-            // (unprojected) gradient
-            // is perpendicular to
-            // the manifold, but we
-            // can't go there if
-            // respect_manifold==true. in
-            // that case, gradient=0,
-            // and we simply need to
-            // quite the loop here
+            // there is nowhere to go
             if (gradient.norm() == 0)
               break;
 
-            // so we need to go in
-            // direction -gradient. the
-            // optimal value of the
-            // objective function is
-            // zero, so assuming that
-            // the model is quadratic
-            // we would have to go
-            // -2*val/||gradient|| in
-            // this direction, make
-            // sure we go at most
-            // step_length into this
+            // We need to go in direction -gradient. the optimal value of the
+            // objective function is zero, so assuming that the model is
+            // quadratic we would have to go -2*val/||gradient|| in this
+            // direction, make sure we go at most step_length into this
             // direction
             object_mid_point -= std::min(2 * current_value / (gradient*gradient),
-                                         step_length / gradient.norm()) *
-                                gradient;
+                                         step_length / gradient.norm()) * gradient;
+            object_mid_point = project_to_object(object, object_mid_point);
 
-            if (respect_manifold == true)
-              object_mid_point = manifold->project_to_surface(object,
-                                                              object_mid_point);
-
-            // compute current value of the
-            // objective function
+            // compute current value of the objective function
             const double previous_value = current_value;
             current_value = objective_function (object, object_mid_point);
 
             if (iteration == 0)
               initial_delta = (previous_value - current_value);
 
-            // stop if we aren't moving much
-            // any more
+            // stop if we aren't moving much any more
             if ((iteration >= 1) &&
                 ((previous_value - current_value < 0)
                  ||
@@ -3516,18 +3453,15 @@ next_cell:
                          std::integral_constant<int, 1>,
                          std::integral_constant<int, 1>)
       {
-        // nothing to do for the faces of
-        // cells in 1d
+        // nothing to do for the faces of cells in 1d
       }
 
 
 
-      // possibly fix up the faces of
-      // a cell by moving around its
-      // mid-points
-      template <int structdim, int spacedim>
-      void fix_up_faces (const typename dealii::Triangulation<structdim,spacedim>::cell_iterator &cell,
-                         std::integral_constant<int, structdim>,
+      // possibly fix up the faces of a cell by moving around its mid-points
+      template <int dim, int spacedim>
+      void fix_up_faces (const typename dealii::Triangulation<dim,spacedim>::cell_iterator &cell,
+                         std::integral_constant<int, dim>,
                          std::integral_constant<int, spacedim>)
       {
         // see if we first can fix up
@@ -3555,15 +3489,15 @@ next_cell:
         // ignored at the time; we
         // should then also be able to
         // ignore it this time as well
-        for (unsigned int f=0; f<GeometryInfo<structdim>::faces_per_cell; ++f)
+        for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
           {
             Assert (cell->face(f)->has_children(), ExcInternalError());
             Assert (cell->face(f)->refinement_case() ==
-                    RefinementCase<structdim-1>::isotropic_refinement,
+                    RefinementCase<dim - 1>::isotropic_refinement,
                     ExcInternalError());
 
             bool subface_is_more_refined = false;
-            for (unsigned int g=0; g<GeometryInfo<structdim>::max_children_per_face; ++g)
+            for (unsigned int g=0; g<GeometryInfo<dim>::max_children_per_face; ++g)
               if (cell->face(f)->child(g)->has_children())
                 {
                   subface_is_more_refined = true;
@@ -3573,28 +3507,23 @@ next_cell:
             if (subface_is_more_refined == true)
               continue;
 
-            // so, now we finally know
-            // that we can do something
-            // about this face
-            fix_up_object (cell->face(f), cell->at_boundary(f));
+            // we finally know that we can do something about this face
+            fix_up_object (cell->face(f));
           }
       }
-
-
     } /* namespace FixUpDistortedChildCells */
   } /* namespace internal */
 
 
   template <int dim, int spacedim>
   typename Triangulation<dim,spacedim>::DistortedCellList
-
-  fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
-                                Triangulation<dim,spacedim> &/*triangulation*/)
+  fix_up_distorted_child_cells
+  (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
+   Triangulation<dim,spacedim> &/*triangulation*/)
   {
     typename Triangulation<dim,spacedim>::DistortedCellList unfixable_subset;
 
-    // loop over all cells that we have
-    // to fix up
+    // loop over all cells that we have to fix up
     for (typename std::list<typename Triangulation<dim,spacedim>::cell_iterator>::const_iterator
          cell_ptr = distorted_cells.distorted_cells.begin();
          cell_ptr != distorted_cells.distorted_cells.end(); ++cell_ptr)
@@ -3611,14 +3540,8 @@ next_cell:
                         std::integral_constant<int, dim>(),
                         std::integral_constant<int, spacedim>());
 
-        // fix up the object. we need to
-        // respect the manifold if the cell is
-        // embedded in a higher dimensional
-        // space; otherwise, like a hex in 3d,
-        // every point within the cell interior
-        // is fair game
-        if (! internal::FixUpDistortedChildCells::fix_up_object (cell,
-                                                                 (dim < spacedim)))
+        // If possible, fix up the object.
+        if (!internal::FixUpDistortedChildCells::fix_up_object (cell))
           unfixable_subset.distorted_cells.push_back (cell);
       }
 

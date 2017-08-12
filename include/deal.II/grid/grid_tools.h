@@ -23,6 +23,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -186,6 +187,30 @@ namespace GridTools
    */
   template <int dim, int spacedim>
   BoundingBox<spacedim> compute_bounding_box(const Triangulation<dim, spacedim> &triangulation);
+
+  /**
+   * Return the point on the geometrical object @object closest to the given
+   * point @p trial_point. For example, if @p object is a one-dimensional line
+   * or edge, then the the returned point will be a point on the geodesic that
+   * connects the vertices as the manifold associated with the object sees it
+   * (i.e., the geometric line may be curved if it lives in a higher
+   * dimensional space). If the iterator points to a quadrilateral in a higher
+   * dimensional space, then the returned point lies within the convex hull of
+   * the vertices of the quad as seen by the associated manifold.
+   *
+   * @note This projection is usually not well-posed since there may be
+   * multiple points on the object that minimize the distance. The algorithm
+   * used in this function is robust (and the output is guaranteed to be on
+   * the given @p object) but may only provide a few correct digits if the
+   * object has high curvature. If your manifold supports it then the
+   * specialized function Manifold::project_to_manifold() may perform better.
+   *
+   * @author Luca Heltai, David Wells, 2017.
+   */
+  template <typename Iterator>
+  Point<Iterator::AccessorType::space_dimension>
+  project_to_object(const Iterator &object,
+                    const Point<Iterator::AccessorType::space_dimension> &trial_point);
 
   /*@}*/
   /**
@@ -2252,6 +2277,512 @@ namespace GridTools
                 }
             }
         }
+  }
+
+
+
+  namespace internal
+  {
+    namespace ProjectToObject
+    {
+      /**
+       * The method GridTools::project_to_object requires taking derivatives
+       * along the surface of a simplex. In general these cannot be
+       * approximated with finite differences but special differences of the
+       * form
+       *
+       *     df/dx_i - df/dx_j
+       *
+       * <em>can</em> be approximated. This <code>struct</code> just stores
+       * the two derivatives approximated by the stencil (in the case of the
+       * example above <code>i</code> and <code>j</code>).
+       */
+      struct CrossDerivative
+      {
+        const unsigned int direction_0;
+        const unsigned int direction_1;
+
+        CrossDerivative(const unsigned int d0, const unsigned int d1);
+      };
+
+      inline
+      CrossDerivative::CrossDerivative(const unsigned int d0, const unsigned int d1)
+        :
+        direction_0 (d0),
+        direction_1 (d1)
+      {}
+
+
+
+      /**
+       * Standard second-order approximation to the first derivative with a
+       * two-point centered scheme. This is used below in a 1D Newton method.
+       */
+      template <typename F>
+      inline
+      auto
+      centered_first_difference(const double  center,
+                                const double  step,
+                                const F      &f)
+      -> decltype(f(center) - f(center))
+      {
+        return (f(center + step) - f(center - step))/(2.0*step);
+      }
+
+
+
+      /**
+       * Standard second-order approximation to the second derivative with a
+       * three-point centered scheme. This is used below in a 1D Newton method.
+       */
+      template <typename F>
+      inline
+      auto
+      centered_second_difference(const double  center,
+                                 const double  step,
+                                 const F      &f)
+      -> decltype(f(center) - f(center))
+      {
+        return (f(center + step) - 2.0*f(center) + f(center - step))/(step*step);
+      }
+
+
+
+      /**
+       * Fourth order approximation of the derivative
+       *
+       *     df/dx_i - df/dx_j
+       *
+       * where <code>i</code> and <code>j</code> are specified by @p
+       * cross_derivative. The derivative approximation is at @p center with a
+       * step size of @p step and function @p f.
+       */
+      template <int structdim, typename F>
+      inline
+      auto
+      cross_stencil
+      (const CrossDerivative                                        cross_derivative,
+       const Tensor<1, GeometryInfo<structdim>::vertices_per_cell> &center,
+       const double                                                 step,
+       const F                                                     &f)
+      -> decltype(f(center) - f(center))
+      {
+        Tensor<1, GeometryInfo<structdim>::vertices_per_cell> simplex_vector;
+        simplex_vector[cross_derivative.direction_0] = 0.5*step;
+        simplex_vector[cross_derivative.direction_1] = -0.5*step;
+        return (- 4.0     *f(center)
+                - 1.0     *f(center + simplex_vector)
+                - 1.0/3.0 *f(center - simplex_vector)
+                + 16.0/3.0*f(center + 0.5*simplex_vector)
+               )/step;
+      }
+
+
+
+      /**
+       * The optimization algorithm used in GridTools::project_to_object is
+       * essentially a gradient descent method. This function computes entries
+       * in the gradient of the objective function; see the description in the
+       * comments inside GridTools::project_to_object for more information.
+       */
+      template <int spacedim, int structdim, typename F>
+      inline
+      double
+      gradient_entry
+      (const unsigned int                                           row_n,
+       const unsigned int                                           dependent_direction,
+       const Point<spacedim>                                       &p0,
+       const Tensor<1, GeometryInfo<structdim>::vertices_per_cell> &center,
+       const double                                                 step,
+       const F                                                     &f)
+      {
+        Assert(row_n < GeometryInfo<structdim>::vertices_per_cell &&
+               dependent_direction < GeometryInfo<structdim>::vertices_per_cell,
+               ExcMessage("This function assumes that the last weight is a "
+                          "dependent variable (and hence we cannot take its "
+                          "derivative directly)."));
+        Assert(row_n != dependent_direction,
+               ExcMessage("We cannot differentiate with respect to the variable "
+                          "that is assumed to be dependent."));
+
+        const Point<spacedim> manifold_point = f(center);
+        const Tensor<1, spacedim> stencil_value = cross_stencil<structdim>
+                                                  ({row_n, dependent_direction},
+                                                   center,
+                                                   step,
+                                                   f);
+        double entry = 0.0;
+        for (unsigned int dim_n = 0; dim_n < spacedim; ++dim_n)
+          entry += -2.0*(p0[dim_n] - manifold_point[dim_n])*stencil_value[dim_n];
+        return entry;
+      }
+
+      /**
+       * Project onto a d-linear object. This is more accurate than the
+       * general algorithm in project_to_object but only works for geometries
+       * described by linear, bilinear, or trilinear mappings.
+       */
+      template <typename Iterator, int spacedim, int structdim>
+      Point<spacedim>
+      project_to_d_linear_object (const Iterator        &object,
+                                  const Point<spacedim> &trial_point)
+      {
+        // let's look at this for simplicity for a quad (structdim==2) in a space with
+        // spacedim>2 (notate trial_point by y): all points on the surface are
+        // given by
+        //   x(\xi) = sum_i v_i phi_x(\xi)
+        // where v_i are the vertices of the quad, and \xi=(\xi_1,\xi_2) are the
+        // reference coordinates of the quad. so what we are trying to do is find
+        // a point x on the surface that is closest to the point y. there are
+        // different ways to solve this problem, but in the end it's a nonlinear
+        // problem and we have to find reference coordinates \xi so that J(\xi) =
+        // 1/2 || x(\xi)-y ||^2 is minimal. x(\xi) is a function that is
+        // structdim-linear in \xi, so J(\xi) is a polynomial of degree 2*structdim that we'd
+        // like to minimize. unless structdim==1, we'll have to use a Newton method to
+        // find the answer. This leads to the following formulation of Newton
+        // steps:
+        //
+        // Given \xi_k, find \delta\xi_k so that
+        //   H_k \delta\xi_k = - F_k
+        // where H_k is an approximation to the second derivatives of J at \xi_k,
+        // and F_k is the first derivative of J.  We'll iterate this a number of
+        // times until the right hand side is small enough. As a stopping
+        // criterion, we terminate if ||\delta\xi||<eps.
+        //
+        // As for the Hessian, the best choice would be
+        //   H_k = J''(\xi_k)
+        // but we'll opt for the simpler Gauss-Newton form
+        //   H_k = A^T A
+        // i.e.
+        //   (H_k)_{nm} = \sum_{i,j} v_i*v_j *
+        //                   \partial_n phi_i *
+        //                   \partial_m phi_j
+        // we start at xi=(0.5, 0.5).
+        Point<structdim> xi;
+        for (unsigned int d=0; d<structdim; ++d)
+          xi[d] = 0.5;
+
+        Point<spacedim> x_k;
+        for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+          x_k += object->vertex(i) *
+                 GeometryInfo<structdim>::d_linear_shape_function (xi, i);
+
+        do
+          {
+            Tensor<1,structdim> F_k;
+            for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+              F_k += (x_k-trial_point)*object->vertex(i) *
+                     GeometryInfo<structdim>::d_linear_shape_function_gradient (xi, i);
+
+            Tensor<2,structdim> H_k;
+            for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+              for (unsigned int j=0; j<GeometryInfo<structdim>::vertices_per_cell; ++j)
+                {
+                  Tensor<2, structdim> tmp = outer_product(
+                                               GeometryInfo<structdim>::d_linear_shape_function_gradient(xi, i),
+                                               GeometryInfo<structdim>::d_linear_shape_function_gradient(xi, j));
+                  H_k += (object->vertex(i) * object->vertex(j)) * tmp;
+                }
+
+            const Tensor<1,structdim> delta_xi = - invert(H_k) * F_k;
+            xi += delta_xi;
+
+            x_k = Point<spacedim>();
+            for (unsigned int i=0; i<GeometryInfo<structdim>::vertices_per_cell; ++i)
+              x_k += object->vertex(i) *
+                     GeometryInfo<structdim>::d_linear_shape_function (xi, i);
+
+            if (delta_xi.norm() < 1e-7)
+              break;
+          }
+        while (true);
+
+        return x_k;
+      }
+    }
+  }
+
+
+
+  template <typename Iterator>
+  Point<Iterator::AccessorType::space_dimension>
+  project_to_object(const Iterator &object,
+                    const Point<Iterator::AccessorType::space_dimension> &trial_point)
+  {
+    const int spacedim = Iterator::AccessorType::space_dimension;
+    const int structdim = Iterator::AccessorType::structure_dimension;
+
+    Point<spacedim> projected_point = trial_point;
+
+    if (structdim >= spacedim)
+      return projected_point;
+    else if (structdim == 1 || structdim == 2)
+      {
+        using namespace internal::ProjectToObject;
+        // Try to use the special flat algorithm for quads (this is better
+        // than the general algorithm in 3D). This does not take into account
+        // whether projected_point is outside the quad, but we optimize along
+        // lines below anyway:
+        const int dim = Iterator::AccessorType::dimension;
+        const Manifold<dim, spacedim> &manifold = object->get_manifold();
+        if (structdim == 2 &&
+            dynamic_cast<const FlatManifold<dim,spacedim> *>(&manifold)
+            != nullptr)
+          {
+            projected_point = project_to_d_linear_object<Iterator, spacedim, structdim>(object, trial_point);
+          }
+        else
+          {
+            // We want to find a point on the convex hull (defined by the
+            // vertices of the object and the manifold description) that is
+            // relatively close to the trial point. This has a few issues:
+            //
+            // 1. For a general convex hull we are not guaranteed that a unique
+            //    minimum exists.
+            // 2. The independent variables in the optimization process are the
+            //    weights given to Manifold::get_new_point, which must sum to 1,
+            //    so we cannot use standard finite differences to approximate a
+            //    gradient.
+            //
+            // There is not much we can do about 1., but for 2. we can derive
+            // finite difference stencils that work on a structdim-dimensional
+            // simplex and rewrite the optimization problem to use those
+            // instead. Consider the structdim 2 case and let
+            //
+            // F(c0, c1, c2, c3) = Manifold::get_new_point(vertices, {c0, c1, c2, c3})
+            //
+            // where {c0, c1, c2, c3} are the weights for the four vertices on
+            // the quadrilateral. We seek to minimize the Euclidean distance
+            // between F(...) and trial_point. We can solve for c3 in terms of
+            // the other weights and get, for one coordinate direction
+            //
+            // d/dc0 ((x0 - F(c0, c1, c2, 1 - c0 - c1 - c2))^2)
+            //      = -2(x0 - F(...)) (d/dc0 F(...) - d/dc3 F(...))
+            //
+            // where we substitute back in for c3 after taking the
+            // derivative. We can compute a stencil for the cross derivative
+            // d/dc0 - d/dc3: this is exactly what cross_stencil approximates
+            // (and gradient_entry computes the sum over the independent
+            // variables). Below, we somewhat arbitrarily pick the last
+            // component as the dependent one.
+            //
+            // Since we can now calculate derivatives of the objective
+            // function we can use gradient descent to minimize it.
+            //
+            // Of course, this is much simpler in the structdim = 1 case (we
+            // could rewrite the projection as a 1D optimization problem), but
+            // to reduce the potential for bugs we use the same code in both
+            // cases.
+            auto weights_are_ok = [](const Tensor<1, GeometryInfo<structdim>::vertices_per_cell> &v)
+                                  -> bool
+            {
+              // clang has trouble figuring out structdim here, so define it
+              // again:
+              static const std::size_t n_vertices_per_cell
+              = Tensor<1, GeometryInfo<structdim>::vertices_per_cell>::n_independent_components;
+              std::array<double, n_vertices_per_cell> copied_weights;
+              for (unsigned int i = 0; i < n_vertices_per_cell; ++i)
+                {
+                  copied_weights[i] = v[i];
+                  if (v[i] < 0.0 || v[i] > 1.0)
+                    return false;
+                }
+
+              // check the sum: try to avoid some roundoff errors by summing in order
+              std::sort(copied_weights.begin(), copied_weights.end());
+              const double sum = std::accumulate(copied_weights.begin(), copied_weights.end(), 0.0);
+              return std::abs(sum - 1.0) < 1e-10; // same tolerance used in manifold.cc
+            };
+            const double step_size = object->diameter()/64.0;
+
+
+            std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell> vertices;
+            for (unsigned int vertex_n = 0; vertex_n < GeometryInfo<structdim>::vertices_per_cell;
+                 ++vertex_n)
+              vertices[vertex_n] = object->vertex(vertex_n);
+
+            auto get_point_from_weights =
+              [&](const Tensor<1, GeometryInfo<structdim>::vertices_per_cell> &weights)
+              -> Point<spacedim>
+            {
+              return object->get_manifold().get_new_point
+              (make_array_view(vertices.begin(), vertices.end()),
+              make_array_view(&weights[0],
+              &weights[GeometryInfo<structdim>::vertices_per_cell - 1] + 1));
+            };
+
+            // pick the initial weights as (normalized) inverse distances from
+            // the trial point:
+            Tensor<1, GeometryInfo<structdim>::vertices_per_cell> guess_weights;
+            double guess_weights_sum = 0.0;
+            for (unsigned int vertex_n = 0; vertex_n < GeometryInfo<structdim>::vertices_per_cell;
+                 ++vertex_n)
+              {
+                const double distance = vertices[vertex_n].distance(trial_point);
+                if (distance == 0.0)
+                  {
+                    guess_weights = 0.0;
+                    guess_weights[vertex_n] = 1.0;
+                    guess_weights_sum = 1.0;
+                    break;
+                  }
+                else
+                  {
+                    guess_weights[vertex_n] = 1.0/distance;
+                    guess_weights_sum += guess_weights[vertex_n];
+                  }
+              }
+            guess_weights /= guess_weights_sum;
+            Assert(weights_are_ok(guess_weights), ExcInternalError());
+
+            // The optimization algorithm consists of two parts:
+            //
+            // 1. An outer loop where we apply the gradient descent algorithm.
+            // 2. An inner loop where we do a line search to find the optimal
+            //    length of the step one should take in the gradient direction.
+            //
+            for (unsigned int outer_n = 0; outer_n < 40; ++outer_n)
+              {
+                const unsigned int dependent_direction = GeometryInfo<structdim>::vertices_per_cell - 1;
+                Tensor<1, GeometryInfo<structdim>::vertices_per_cell> current_gradient;
+                for (unsigned int row_n = 0;
+                     row_n < GeometryInfo<structdim>::vertices_per_cell;
+                     ++row_n)
+                  {
+                    if (row_n != dependent_direction)
+                      {
+                        current_gradient[row_n] = gradient_entry<spacedim, structdim>
+                                                  (row_n,
+                                                   dependent_direction,
+                                                   trial_point,
+                                                   guess_weights,
+                                                   step_size,
+                                                   get_point_from_weights);
+
+                        current_gradient[dependent_direction] -= current_gradient[row_n];
+                      }
+                  }
+
+                // We need to travel in the -gradient direction, as noted
+                // above, but we may not want to take a full step in that
+                // direction; instead, guess that we will go -0.5*gradient and
+                // do quasi-Newton iteration to pick the best multiplier. The
+                // goal is to find a scalar alpha such that
+                //
+                // F(x - alpha g)
+                //
+                // is minimized, where g is the gradient and F is the
+                // objective function. To find the optimal value we find roots
+                // of the derivative of the objective function with respect to
+                // alpha by Newton iteration, where we approximate the first
+                // and second derivatives of F(x - alpha g) with centered
+                // finite differences.
+                double gradient_weight = -0.5;
+                auto gradient_weight_objective_function = [&](const double gradient_weight_guess)
+                                                          -> double
+                {
+                  return (trial_point -
+                  get_point_from_weights(guess_weights +
+                  gradient_weight_guess*current_gradient)).norm_square();
+                };
+
+                for (unsigned int inner_n = 0; inner_n < 10; ++inner_n)
+                  {
+                    const double update_numerator = centered_first_difference
+                                                    (gradient_weight, step_size, gradient_weight_objective_function);
+                    const double update_denominator = centered_second_difference
+                                                      (gradient_weight, step_size, gradient_weight_objective_function);
+
+                    // avoid division by zero. Note that we limit the gradient weight below
+                    if (std::abs(update_denominator) == 0.0)
+                      break;
+                    gradient_weight = gradient_weight - update_numerator/update_denominator;
+
+                    // Put a fairly lenient bound on the largest possible
+                    // gradient (things tend to be locally flat, so the gradient
+                    // itself is usually small)
+                    if (std::abs(gradient_weight) > 10)
+                      {
+                        gradient_weight = -10.0;
+                        break;
+                      }
+                  }
+
+                // It only makes sense to take convex combinations with weights
+                // between zero and one. If the update takes us outside of this
+                // region then rescale the update to stay within the region and
+                // try again
+                Tensor<1, GeometryInfo<structdim>::vertices_per_cell> tentative_weights =
+                  guess_weights + gradient_weight*current_gradient;
+
+                double new_gradient_weight = gradient_weight;
+                for (unsigned int iteration_count = 0; iteration_count < 40; ++iteration_count)
+                  {
+                    if (weights_are_ok(tentative_weights))
+                      break;
+
+                    for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; ++i)
+                      {
+                        if (tentative_weights[i] < 0.0)
+                          {
+                            tentative_weights -= (tentative_weights[i]/current_gradient[i])
+                                                 *current_gradient;
+                          }
+                        if (tentative_weights[i] < 0.0 || 1.0 < tentative_weights[i])
+                          {
+                            new_gradient_weight /= 2.0;
+                            tentative_weights = guess_weights + new_gradient_weight*current_gradient;
+                          }
+                      }
+                  }
+
+                // the update might still send us outside the valid region, so
+                // check again and quit if the update is still not valid
+                if (!weights_are_ok(tentative_weights))
+                  break;
+
+                // if we cannot get closer by traveling in the gradient direction then quit
+                if (get_point_from_weights(tentative_weights).distance(trial_point) <
+                    get_point_from_weights(guess_weights).distance(trial_point))
+                  guess_weights = tentative_weights;
+                else
+                  break;
+                Assert(weights_are_ok(guess_weights), ExcInternalError());
+              }
+            Assert(weights_are_ok(guess_weights), ExcInternalError());
+            projected_point =  get_point_from_weights(guess_weights);
+          }
+
+        // if structdim == 2 and the optimal point is not on the interior then
+        // we may be able to get a more accurate result by projecting onto the
+        // lines.
+        if (structdim == 2)
+          {
+            std::array<Point<spacedim>, GeometryInfo<structdim>::lines_per_cell>
+            line_projections;
+            for (unsigned int line_n = 0; line_n < GeometryInfo<structdim>::lines_per_cell;
+                 ++line_n)
+              {
+                line_projections[line_n] = project_to_object(object->line(line_n),
+                                                             trial_point);
+              }
+            std::sort(line_projections.begin(), line_projections.end(),
+                      [&](const Point<spacedim> &a, const Point<spacedim> &b)
+            {
+              return a.distance(trial_point) < b.distance(trial_point);
+            });
+            if (line_projections[0].distance(trial_point)
+                < projected_point.distance(trial_point))
+              projected_point = line_projections[0];
+          }
+      }
+    else
+      {
+        Assert(false, ExcNotImplemented());
+        return projected_point;
+      }
+
+    return projected_point;
   }
 }
 

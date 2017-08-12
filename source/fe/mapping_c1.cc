@@ -69,7 +69,6 @@ MappingC1<2>::MappingC1Generic::add_line_support_points (const Triangulation<2>:
   const std::array<double, 2> interior_gl_points
   {{0.5 - 0.5*std::sqrt(1.0/5.0), 0.5 + 0.5*std::sqrt(1.0/5.0)}};
 
-
   // loop over each of the lines, and if it is at the boundary, then first get
   // the boundary description and second compute the points on it. if not at
   // the boundary, get the respective points from another function
