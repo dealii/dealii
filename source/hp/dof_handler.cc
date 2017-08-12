@@ -171,7 +171,7 @@ namespace internal
           // one slot as the end marker for the fe_indices. at the
           // same time already fill the vertex_dof_offsets field
           dof_handler.vertex_dof_offsets.resize (dof_handler.tria->n_vertices(),
-                                                 numbers::invalid_dof_index);
+                                                 numbers::invalid_unsigned_int);
 
           unsigned int vertex_slots_needed = 0;
           for (unsigned int v=0; v<dof_handler.tria->n_vertices(); ++v)
