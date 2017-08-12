@@ -172,12 +172,12 @@ namespace Step22
     const unsigned int n_u = dofs_per_block[0],
                        n_p = dofs_per_block[1];
     deallog << "   Number of active cells: "
-              << triangulation.n_active_cells()
-              << std::endl
-              << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
-              << " (" << n_u << '+' << n_p << ')'
-              << std::endl;
+            << triangulation.n_active_cells()
+            << std::endl
+            << "   Number of degrees of freedom: "
+            << dof_handler.n_dofs()
+            << " (" << n_u << '+' << n_p << ')'
+            << std::endl;
     {
       BlockDynamicSparsityPattern dsp (2,2);
       dsp.block(0,0).reinit (n_u, n_u);
@@ -318,9 +318,9 @@ namespace Step22
 
     constraints.distribute (solution);
     deallog << "  "
-              << solver_control_S.last_step()
-              << " outer CG Schur complement iterations for pressure"
-              << std::endl;
+            << solver_control_S.last_step()
+            << " outer CG Schur complement iterations for pressure"
+            << std::endl;
   }
 
   template <int dim>
