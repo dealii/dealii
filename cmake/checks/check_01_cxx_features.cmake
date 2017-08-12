@@ -49,6 +49,7 @@ IF(DEFINED DEAL_II_WITH_CXX14 AND NOT DEAL_II_WITH_CXX14)
   SET(DEAL_II_WITH_CXX17 OFF CACHE STRING "" FORCE)
 ENDIF()
 
+#
 # Check the user supplied DEAL_II_CXX_VERSION_FLAG
 #
 
@@ -184,6 +185,22 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
       DEAL_II_HAVE_CXX14_MAKE_UNIQUE)
 
     #
+    # This test checks constexpr std::max/min support. Unfortunately,
+    # gcc-4.9 does claim to support C++14 but fails to provide a constexpr
+    # compatible std::max/min. Disable C++14 support in this case.
+    #
+    CHECK_CXX_SOURCE_COMPILES(
+      "
+      #include <algorithm>
+      int main()
+      {
+          constexpr int max = std::max(0,1);
+      }
+      "
+      DEAL_II_HAVE_CXX14_CONSTEXPR_STDMAXMIN)
+
+
+    #
     # Clang-3.5* or older, bail out with a spurious error message in case
     # of an undeduced auto return type.
     #
@@ -207,7 +224,8 @@ IF(NOT DEFINED DEAL_II_WITH_CXX14 OR DEAL_II_WITH_CXX14)
   ENDIF()
 
   IF( DEAL_II_HAVE_CXX14_MAKE_UNIQUE AND
-      DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK )
+      DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK AND
+      DEAL_II_HAVE_CXX14_CONSTEXPR_STDMAXMIN)
     SET(DEAL_II_HAVE_CXX14 TRUE)
   ELSE()
     IF(NOT _user_provided_cxx_version_flag)
