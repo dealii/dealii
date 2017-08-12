@@ -304,6 +304,9 @@ namespace detail
             (*this).~auto_buffer();
             buffer_   = new_buffer;
             members_.capacity_ = new_capacity;
+            // Make sure size_ is initialized. After calling the dectructor
+            // the size should be zero.
+            size_ = 0;
             BOOST_ASSERT( size_ <= members_.capacity_ );
         }
 
