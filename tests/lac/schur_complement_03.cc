@@ -372,9 +372,9 @@ namespace Step22
         if (refinement_cycle > 0)
           refine_mesh ();
         setup_dofs ();
-        deallog << "   Assembling..." << std::endl << std::flush;
+        deallog << "   Assembling..." << std::endl;
         assemble_system ();
-        deallog << "   Solving..." << std::flush;
+        deallog << "   Solving..." << std::endl;
         solve ();
         deallog << std::endl;
       }
