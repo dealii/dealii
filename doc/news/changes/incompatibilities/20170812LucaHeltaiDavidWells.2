@@ -1,0 +1,7 @@
+Changed: The member function Boundary::project_to_surface is now ignored in the
+function GridTools::fix_up_distorted_child_cells. Instead,
+GridTools::fix_up_distorted_child_cells uses an internal function that
+duplicates the algorithm used by StraightBoundary::project_to_surface, which was
+the only place project_to_surface was implemented in the library.
+<br>
+(Luca Heltai, David Wells, 2017/08/12)
