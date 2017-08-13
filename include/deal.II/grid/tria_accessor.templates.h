@@ -3713,6 +3713,13 @@ CellAccessor<dim,spacedim>::neighbor_face_no (const unsigned int neighbor) const
 
 
 
+template <int dim, int spacedim>
+inline
+bool
+CellAccessor<dim,spacedim>::is_level_cell()
+{
+  return false;
+}
 
 
 DEAL_II_NAMESPACE_CLOSE

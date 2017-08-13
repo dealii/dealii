@@ -1,0 +1,5 @@
+New: A new MeshWorker::mesh_loop() function has been added
+that performs the same tasks of the MeshWorker::loop() function
+without forcing the users to adhere to a specific interface.
+<br>
+(Luca Heltai, 2017/08/12)
