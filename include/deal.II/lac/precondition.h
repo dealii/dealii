@@ -2124,10 +2124,10 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::estimate_eigenv
 
   // We do not need the third auxiliary vector in case we have a
   // DiagonalMatrix as preconditioner and use deal.II's own vectors
-  if (types_are_equal<PreconditionerType,DiagonalMatrix<VectorType> >::value == false ||
-      (types_are_equal<VectorType,dealii::Vector<typename VectorType::value_type> >::value == false
+  if (std::is_same<PreconditionerType,DiagonalMatrix<VectorType> >::value == false ||
+      (std::is_same<VectorType,dealii::Vector<typename VectorType::value_type> >::value == false
        &&
-       types_are_equal<VectorType,LinearAlgebra::distributed::Vector<typename VectorType::value_type> >::value == false
+       std::is_same<VectorType,LinearAlgebra::distributed::Vector<typename VectorType::value_type> >::value == false
       ))
     update3.reinit (src, true);
 

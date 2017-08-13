@@ -527,11 +527,11 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
-  if ((types_are_equal<number,double>::value
+  if ((std::is_same<number,double>::value
        ||
-       types_are_equal<number,float>::value)
+       std::is_same<number,float>::value)
       &&
-      types_are_equal<number,number2>::value)
+      std::is_same<number,number2>::value)
     if (this->n()*this->m()*src.n() > 300)
       {
         // In case we have the BLAS function gemm detected by CMake, we
@@ -597,11 +597,11 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
-  if ((types_are_equal<number,double>::value
+  if ((std::is_same<number,double>::value
        ||
-       types_are_equal<number,float>::value)
+       std::is_same<number,float>::value)
       &&
-      types_are_equal<number,number2>::value)
+      std::is_same<number,number2>::value)
     if (this->n()*this->m()*src.n() > 300)
       {
         // In case we have the BLAS function gemm detected by CMake, we
@@ -687,11 +687,11 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
-  if ((types_are_equal<number,double>::value
+  if ((std::is_same<number,double>::value
        ||
-       types_are_equal<number,float>::value)
+       std::is_same<number,float>::value)
       &&
-      types_are_equal<number,number2>::value)
+      std::is_same<number,number2>::value)
     if (this->n()*this->m()*src.m() > 300)
       {
         // In case we have the BLAS function gemm detected by CMake, we
@@ -775,11 +775,11 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
   // works for us (it is usually not efficient to use BLAS for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
-  if ((types_are_equal<number,double>::value
+  if ((std::is_same<number,double>::value
        ||
-       types_are_equal<number,float>::value)
+       std::is_same<number,float>::value)
       &&
-      types_are_equal<number,number2>::value)
+      std::is_same<number,number2>::value)
     if (this->n()*this->m()*src.m() > 300)
       {
         // In case we have the BLAS function gemm detected by CMake, we
@@ -1762,9 +1762,9 @@ FullMatrix<number>::gauss_jordan ()
   // efficient to use Lapack for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
-  if (types_are_equal<number,double>::value
+  if (std::is_same<number,double>::value
       ||
-      types_are_equal<number,float>::value)
+      std::is_same<number,float>::value)
     if (this->n_cols() > 15)
       {
         // In case we have the LAPACK functions

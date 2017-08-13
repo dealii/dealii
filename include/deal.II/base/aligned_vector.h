@@ -412,7 +412,7 @@ namespace internal
       // completely fill its memory and may lead to false positives in
       // e.g. valgrind
       if (std::is_trivial<T>::value == true &&
-          types_are_equal<T,long double>::value == false)
+          std::is_same<T,long double>::value == false)
         {
           const unsigned char zero [sizeof(T)] = {};
           // cast element to (void*) to silence compiler warning for virtual

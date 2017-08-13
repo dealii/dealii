@@ -228,7 +228,7 @@ namespace internal
 
       void operator() (const size_type begin, const size_type end) const
       {
-        if (types_are_equal<Number,OtherNumber>::value)
+        if (std::is_same<Number,OtherNumber>::value)
           std::memcpy(dst+begin, src+begin, (end-begin)*sizeof(Number));
         else
           {
@@ -689,7 +689,7 @@ namespace internal
     template <typename Number, typename Number2>
     struct Dot
     {
-      static const bool vectorizes = types_are_equal<Number,Number2>::value &&
+      static const bool vectorizes = std::is_same<Number,Number2>::value &&
                                      (VectorizedArray<Number>::n_array_elements > 1);
 
       Dot(const Number *X, const Number2 *Y)

@@ -402,7 +402,7 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
           return;
         }
 
-      if (types_are_equal<PreconditionerType,PreconditionIdentity>::value == false)
+      if (std::is_same<PreconditionerType,PreconditionIdentity>::value == false)
         {
           precondition.vmult(h,g);
 
@@ -434,7 +434,7 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
           if (conv != SolverControl::iterate)
             break;
 
-          if (types_are_equal<PreconditionerType,PreconditionIdentity>::value
+          if (std::is_same<PreconditionerType,PreconditionIdentity>::value
               == false)
             {
               precondition.vmult(h,g);

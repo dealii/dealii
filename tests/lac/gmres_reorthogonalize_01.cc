@@ -60,7 +60,7 @@ void test (unsigned int variant)
       matrix(i,i) = 1e30*(i+1)*(i+1)*(i+1)*(i+1);
   else
     Assert(false, ExcMessage("Invalid variant"));
-  if (types_are_equal<number,float>::value == true)
+  if (std::is_same<number,float>::value == true)
     Assert(variant < 4, ExcMessage("Invalid_variant"));
 
   deallog.push(Utilities::int_to_string(variant,1));
