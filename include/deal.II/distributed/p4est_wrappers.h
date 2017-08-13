@@ -472,13 +472,11 @@ namespace internal
       static
       size_t (&connectivity_memory_used) (types<3>::connectivity *p4est);
 
-      template <int spacedim>
-      static void iterate(dealii::internal::p4est::types<3>::forest *parallel_forest,
-                          dealii::internal::p4est::types<3>::ghost *parallel_ghost,
-                          void *user_data);
+
 
       static const unsigned int max_level = P8EST_MAXLEVEL;
     };
+
 
 
 
@@ -565,18 +563,15 @@ namespace internal
                          const typename types<dim>::topidx coarse_grid_cell);
 
 
+
     /**
-     * This is the callback data structure used to fill
-     * vertices_with_ghost_neighbors via the p4est_iterate tool
+     * Compute the ghost neighbors surrounding each vertex by querying p4est
      */
     template <int dim, int spacedim>
-    struct FindGhosts
-    {
-      const typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation;
-      sc_array_t                                                                *subids;
-      std::map<unsigned int, std::set<dealii::types::subdomain_id> >            *vertices_with_ghost_neighbors;
-    };
-
+    std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+    compute_vertices_with_ghost_neighbors(const dealii::parallel::distributed::Triangulation<dim,spacedim> &tria,
+                                          typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
+                                          typename dealii::internal::p4est::types<dim>::ghost *parallel_ghost);
 
   }
 }

@@ -3387,20 +3387,11 @@ namespace parallel
     {
       Assert (dim>1, ExcNotImplemented());
 
-      std::map<unsigned int, std::set<dealii::types::subdomain_id> > vertices_with_ghost_neighbors;
+      return dealii::internal::p4est::compute_vertices_with_ghost_neighbors<dim, spacedim> (*this,
+             this->parallel_forest,
+             this->parallel_ghost);
 
-      dealii::internal::p4est::FindGhosts<dim,spacedim> fg;
-      fg.subids = sc_array_new (sizeof (dealii::types::subdomain_id));
-      fg.triangulation = this;
-      fg.vertices_with_ghost_neighbors = &vertices_with_ghost_neighbors;
 
-      dealii::internal::p4est::functions<dim>::template iterate<spacedim> (this->parallel_forest,
-          this->parallel_ghost,
-          static_cast<void *>(&fg));
-
-      sc_array_destroy (fg.subids);
-
-      return vertices_with_ghost_neighbors;
     }
 
 
