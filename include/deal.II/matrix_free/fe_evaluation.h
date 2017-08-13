@@ -3083,7 +3083,7 @@ FEEvaluationBase<dim,n_components_,Number>
                 for (unsigned int comp=0; comp<n_components; ++comp)
                   operation.process_dof_gather(dof_indices+ind,
                                                *src[comp], values_dofs[comp][j],
-                                               std::integral_constant<bool, types_are_equal<typename VectorType::value_type,Number>::value>());
+                                               std::integral_constant<bool, std::is_same<typename VectorType::value_type,Number>::value>());
             }
         }
 
@@ -3226,7 +3226,7 @@ FEEvaluationBase<dim,n_components_,Number>
                 for (unsigned int j=0; j<dofs_per_cell; ++j, ind += VectorizedArray<Number>::n_array_elements)
                   operation.process_dof_gather(dof_indices+ind,
                                                *src[0], values_dofs[comp][j],
-                                               std::integral_constant<bool, types_are_equal<typename VectorType::value_type,Number>::value>());
+                                               std::integral_constant<bool, std::is_same<typename VectorType::value_type,Number>::value>());
             }
         }
 

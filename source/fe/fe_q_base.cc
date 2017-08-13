@@ -132,7 +132,7 @@ struct FE_Q_Base<PolynomialType,xdim,xspacedim>::Implementation
     const unsigned int dim = 2;
 
     unsigned int q_deg = fe.degree;
-    if (types_are_equal<PolynomialType, TensorProductPolynomialsBubbles<dim> >::value)
+    if (std::is_same<PolynomialType, TensorProductPolynomialsBubbles<dim> >::value)
       q_deg = fe.degree-1;
 
     // restricted to each face, the traces of the shape functions is an
@@ -239,7 +239,7 @@ struct FE_Q_Base<PolynomialType,xdim,xspacedim>::Implementation
     const unsigned int dim = 3;
 
     unsigned int q_deg = fe.degree;
-    if (types_are_equal<PolynomialType,TensorProductPolynomialsBubbles<dim> >::value)
+    if (std::is_same<PolynomialType,TensorProductPolynomialsBubbles<dim> >::value)
       q_deg = fe.degree-1;
 
     // For a detailed documentation of the interpolation see the
@@ -422,7 +422,7 @@ FE_Q_Base<PolynomialType,dim,spacedim>::FE_Q_Base
   :
   FE_Poly<PolynomialType,dim,spacedim>(poly_space, fe_data, restriction_is_additive_flags,
                                        std::vector<ComponentMask>(1, std::vector<bool>(1,true))),
-  q_degree (types_are_equal<PolynomialType, TensorProductPolynomialsBubbles<dim> >::value
+  q_degree (std::is_same<PolynomialType, TensorProductPolynomialsBubbles<dim> >::value
             ?this->degree-1
             :this->degree)
 {}

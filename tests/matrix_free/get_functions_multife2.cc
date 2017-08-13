@@ -185,7 +185,7 @@ public:
     // for floats for the relative error size
     for (unsigned int i=0; i<3; ++i)
       {
-        if (types_are_equal<Number,double>::value == true)
+        if (std::is_same<Number,double>::value == true)
           {
             deallog << "Error function values FE " << i << ": "
                     << errors[i*3+0]/total[i*3+0] << std::endl;
@@ -203,7 +203,7 @@ public:
             const double output2 = total[i*3+2] == 0 ? 0. : errors[i*3+2] / total[i*3+2];
             deallog << "Error function Laplacians FE " << i << ": " << output2 << std::endl;
           }
-        else if (types_are_equal<Number,float>::value == true)
+        else if (std::is_same<Number,float>::value == true)
           {
             deallog << "Error function values FE " << i << ": "
                     << errors[i*3+0]/total[i*3+0] << std::endl;

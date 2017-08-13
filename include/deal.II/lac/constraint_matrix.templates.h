@@ -2241,7 +2241,7 @@ ConstraintMatrix::distribute_local_to_global (
                             global_vector.size() == 0) ? false : true;
   typedef typename MatrixType::value_type number;
   const bool use_dealii_matrix =
-    types_are_equal<MatrixType,SparseMatrix<number> >::value;
+    std::is_same<MatrixType,SparseMatrix<number> >::value;
 
   AssertDimension (local_matrix.n(), local_dof_indices.size());
   AssertDimension (local_matrix.m(), local_dof_indices.size());
@@ -2344,7 +2344,7 @@ ConstraintMatrix::distribute_local_to_global (
   // add must be equal if we have a Trilinos or PETSc vector but do not have to
   // be if we have a deal.II native vector: one could further optimize this for
   // Vector, LinearAlgebra::distributed::vector, etc.
-  if (types_are_equal<typename VectorType::value_type, number>::value)
+  if (std::is_same<typename VectorType::value_type, number>::value)
     {
       global_vector.add(vector_indices,
                         *reinterpret_cast<std::vector<number> *>(&vector_values));
@@ -2382,7 +2382,7 @@ distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &
                             global_vector.size() == 0) ? false : true;
   typedef typename MatrixType::value_type number;
   const bool use_dealii_matrix =
-    types_are_equal<MatrixType,BlockSparseMatrix<number> >::value;
+    std::is_same<MatrixType,BlockSparseMatrix<number> >::value;
 
   AssertDimension (local_matrix.n(), local_dof_indices.size());
   AssertDimension (local_matrix.m(), local_dof_indices.size());

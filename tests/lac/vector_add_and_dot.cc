@@ -41,7 +41,7 @@ void check ()
       v1.add(factor, v2);
       const number prod = v1 * v3;
       const number prod_check = check.add_and_dot(factor, v2, v3);
-      if (test == 0 && types_are_equal<number,double>::value)
+      if (test == 0 && std::is_same<number,double>::value)
         {
           deallog << "Vector add reference:   ";
           v1.print(deallog);
