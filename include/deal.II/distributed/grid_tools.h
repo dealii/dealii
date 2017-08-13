@@ -201,12 +201,13 @@ namespace parallel
       constexpr int spacedim = MeshType::space_dimension;
       auto tria =
         static_cast<const parallel::Triangulation<dim, spacedim>*>(&mesh.get_triangulation());
-      Assert(tria != NULL, ExcMessage("The function exchange_cell_data_to_ghosts only works with parallel Triangulations."));
+      Assert (tria != null_ptr,
+              ExcMessage("The function exchange_cell_data_to_ghosts() only works with parallel triangulations."));
 
       // map neighbor_id -> data_buffer where we accumulate the data to send
       typedef std::map<dealii::types::subdomain_id, internal::CellDataTransferBuffer<dim, DataType> >
-      cellmap_t;
-      cellmap_t destination_to_data_buffer;
+      DestinationToBufferMap;
+      DestinationToBufferMap destination_to_data_buffer_map;
 
       std::map<unsigned int, std::set<dealii::types::subdomain_id> >
       vertices_with_ghost_neighbors = tria->compute_vertices_with_ghost_neighbors();
@@ -247,9 +248,9 @@ namespace parallel
 
                     // find the data buffer for proc "subdomain" if it exists
                     // or create an empty one otherwise
-                    typename cellmap_t::iterator p
-                      = destination_to_data_buffer.insert (std::make_pair(subdomain,
-                                                                          internal::CellDataTransferBuffer<dim, DataType>()))
+                    typename DestinationToBufferMap::iterator p
+                      = destination_to_data_buffer_map.insert (std::make_pair(subdomain,
+                                                                              internal::CellDataTransferBuffer<dim, DataType>()))
                         .first;
 
                     p->second.cell_ids.emplace_back(cellid);
@@ -270,7 +271,7 @@ namespace parallel
            it!=ghost_owners.end();
            ++it, ++idx)
         {
-          internal::CellDataTransferBuffer<dim, DataType> &data = destination_to_data_buffer[*it];
+          internal::CellDataTransferBuffer<dim, DataType> &data = destination_to_data_buffer_map[*it];
 
           // pack all the data into
           // the buffer for this
