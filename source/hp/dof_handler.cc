@@ -28,6 +28,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/grid_tools.h>
 
 #include <set>
 #include <algorithm>
@@ -912,7 +913,26 @@ namespace internal
           else if (const parallel::distributed::Triangulation<dim, spacedim> *tr =
                      dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()))
             {
-              Assert (false, ExcNotImplemented());
+              // For completely distributed meshes, use the function that is able to move
+              // data from locally owned cells on one processor to the corresponding
+              // ghost cells on others. To this end, we need to have functions that can pack
+              // and unpack the data we want to transport -- namely, the single unsigned int
+              // active_fe_index objects
+              auto pack
+              = [] (const typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell) -> unsigned int
+              {
+                return cell->active_fe_index();
+              };
+
+              auto unpack
+                = [] (const typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell,
+                      const unsigned int                                                        &active_fe_index) -> void
+              {
+                cell->set_active_fe_index(active_fe_index);
+              };
+
+              parallel::GridTools::exchange_cell_data_to_ghosts<unsigned int, dealii::hp::DoFHandler<dim,spacedim>>
+                  (dof_handler, pack, unpack);
             }
           else
             {
