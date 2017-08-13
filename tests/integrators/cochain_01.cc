@@ -296,13 +296,7 @@ void run3d (unsigned int degree)
 
 int main()
 {
-  const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
-  deallog.log_execution_time(false);
-  if (!debugging)
-    {
-    }
+  initlog();
 
   run2d(0);
   run2d(1);
