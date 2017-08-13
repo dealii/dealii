@@ -2149,7 +2149,8 @@ operator-(const SymmetricTensor<rank, dim, Number>      &left,
 
 /**
  * Addition of a SymmetricTensor and a general Tensor of equal rank. The
- * result is a general Tensor.
+ * result is a general Tensor that has a number type that is compatible with the
+ * operation.
  *
  * @relates SymmetricTensor
  */
@@ -2165,7 +2166,8 @@ operator+(const SymmetricTensor<rank, dim, Number> &left,
 
 /**
  * Addition of a general Tensor with a SymmetricTensor of equal rank. The
- * result is a general Tensor.
+ * result is a general Tensor that has a number type that is compatible with the
+ * operation.
  *
  * @relates SymmetricTensor
  */
@@ -2180,8 +2182,9 @@ operator+(const Tensor<rank, dim, Number> &left,
 
 
 /**
- * Subtraction of a SymmetricTensor and a general Tensor of equal rank. The
- * result is a general Tensor.
+ * Subtraction of a general Tensor from a SymmetricTensor of equal rank. The
+ * result is a general Tensor that has a number type that is compatible with the
+ * operation.
  *
  * @relates SymmetricTensor
  */
@@ -2196,8 +2199,9 @@ operator-(const SymmetricTensor<rank, dim, Number> &left,
 
 
 /**
- * Subtraction of a general Tensor with a SymmetricTensor of equal rank. The
- * result is a general Tensor.
+ * Subtraction of a SymmetricTensor from a general Tensor of equal rank. The
+ * result is a general Tensor that has a number type that is compatible with the
+ * operation.
  *
  * @relates SymmetricTensor
  */
