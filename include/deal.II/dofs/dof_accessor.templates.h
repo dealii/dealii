@@ -3781,16 +3781,15 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::set_active_fe_index (const uns
                       "children because no degrees of freedom will be assigned "
                       "to this cell."));
 
-  if (i != DoFHandlerType::default_fe_index)
-    Assert ((dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
-             (this->dof_handler) != nullptr)
-            ||
-            this->is_locally_owned(),
-            ExcMessage ("You can only set active_fe_index information on cells "
-                        "that are locally owned. On ghost cells, this information "
-                        "will automatically be propagated from the owning process "
-                        "of that cell, and there is no information at all on "
-                        "artificial cells."));
+  Assert ((dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
+           (this->dof_handler) != nullptr)
+          ||
+          this->is_locally_owned(),
+          ExcMessage ("You can only set active_fe_index information on cells "
+                      "that are locally owned. On ghost cells, this information "
+                      "will automatically be propagated from the owning process "
+                      "of that cell, and there is no information at all on "
+                      "artificial cells."));
   dealii::internal::DoFCellAccessor::Implementation::set_active_fe_index (*this, i);
 }
 

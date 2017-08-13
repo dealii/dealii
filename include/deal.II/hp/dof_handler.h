@@ -132,19 +132,26 @@ namespace hp
    *
    * When this class is used with either a parallel::shared::Triangulation
    * or a parallel::distributed::Triangulation, you can only set active
-   * FE indices on cells that are locally owned or that are ghost cells,
+   * FE indices on cells that are locally owned,
    * using a call such as <code>cell-@>set_active_fe_index(...)</code>.
-   * On the other hand, setting the active FE index on artificial cells
-   * is not allowed.
+   * On the other hand, setting the active FE index on ghost
+   * or artificial cells is not allowed.
    *
-   * However, setting the index on ghost cells has no real effect: whenever
+   * Ghost cells do acquire the information what element
+   * is active on them, however: whenever
    * you call hp::DoFHandler::distribute_dofs(), all processors that
    * participate in the parallel mesh exchange information in such a way
    * that the active FE index on ghost cells equals the active FE index
    * that was set on that processor that owned that particular ghost cell.
-   * In other words, information that may have previously been set on
-   * ghost cells is overwritten so that the active FE index there is
-   * consistent with the value on the processor that owns the cell.
+   * Consequently, one can <i>query</i> the @p active_fe_index on ghost
+   * cells, just not set it by hand.
+   *
+   * On artificial cells, no information is available about the
+   * @p active_fe_index used there. That's because we don't even know
+   * whether these cells exist at all, and even if they did, the
+   * current processor does not know anything specific about them.
+   * See @ref GlossArtificialCell "the glossary entry on artificial cells"
+   * for more information.
    *
    *
    * @ingroup dofs
