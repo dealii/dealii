@@ -3116,7 +3116,7 @@ namespace internal
       template <int dim, int spacedim, bool level_dof_access>
       static
       void
-      set_active_fe_index (DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, level_dof_access> &accessor,
+      set_active_fe_index (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, level_dof_access> &accessor,
                            const unsigned int                                      i)
       {
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
@@ -3771,7 +3771,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::active_fe_index () const
 template <typename DoFHandlerType, bool level_dof_access>
 inline
 void
-DoFCellAccessor<DoFHandlerType,level_dof_access>::set_active_fe_index (const unsigned int i)
+DoFCellAccessor<DoFHandlerType,level_dof_access>::set_active_fe_index (const unsigned int i) const
 {
   Assert ((dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
            (this->dof_handler) != nullptr)

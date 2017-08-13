@@ -1710,7 +1710,7 @@ public:
    * associated with them without having any degrees of freedom. Consequently,
    * this function will produce an exception when called on non-active cells.
    */
-  void set_active_fe_index (const unsigned int i);
+  void set_active_fe_index (const unsigned int i) const;
   /**
    * @}
    */
