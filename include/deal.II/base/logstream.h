@@ -125,9 +125,8 @@ public:
 
 
   /**
-   * Standard constructor, since we intend to provide an object
-   * <tt>deallog</tt> in the library. Set the standard output stream to
-   * <tt>std::cerr</tt>.
+   * Standard constructor. The standard output stream to
+   * <tt>std::cout</tt>.
    */
   LogStream ();
 
@@ -291,7 +290,7 @@ private:
 
   /**
    * Default stream, where the output is to go to. This stream defaults to
-   * <tt>std::cerr</tt>, but can be set to another stream through the
+   * <tt>std::cout</tt>, but can be set to another stream through the
    * constructor.
    */
   std::ostream  *std_out;

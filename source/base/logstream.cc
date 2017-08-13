@@ -38,7 +38,7 @@ LogStream deallog;
 
 LogStream::LogStream()
   :
-  std_out(&std::cerr),
+  std_out(&std::cout),
   file(nullptr),
   std_depth(0),
   file_depth(10000),
@@ -71,13 +71,13 @@ LogStream::~LogStream()
         // may want to write to 'deallog' itself, and AssertThrow will
         // throw an exception that can't be caught)
         if ((this == &deallog) && file)
-          std::cerr << ("You still have content that was written to 'deallog' "
-                        "but not flushed to the screen or a file while the "
-                        "program is being terminated. This would lead to a "
-                        "segmentation fault. Make sure you flush the "
-                        "content of the 'deallog' object using 'std::endl' "
-                        "before the end of the program.")
-                    << std::endl;
+          *std_out << ("You still have content that was written to 'deallog' "
+                       "but not flushed to the screen or a file while the "
+                       "program is being terminated. This would lead to a "
+                       "segmentation fault. Make sure you flush the "
+                       "content of the 'deallog' object using 'std::endl' "
+                       "before the end of the program.")
+                   << std::endl;
         else
           *this << std::endl;
       }
