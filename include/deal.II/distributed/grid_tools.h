@@ -48,7 +48,11 @@ namespace parallel
      * ghost cell as it was given by @p pack on the owning processor.
      *
      * @tparam DataType The type of the data to be communicated. It is assumed
-     * to be serializable by boost::serialization.
+     *   to be serializable by boost::serialization. In many cases, this
+     *   data type can not be deduced by the compiler, e.g., if you provide
+     *   lambda functions for the second and third argument
+     *   to this function. In this case, you have to explicitly specify
+     *   the @p DataType as a template argument to the function call.
      * @tparam MeshType The type of @p mesh.
      *
      * @param mesh A variable of a type that satisfies the requirements of the
@@ -59,7 +63,7 @@ namespace parallel
      * with the data imported from the other procs.
 
      */
-    template <typename MeshType, typename DataType>
+    template <typename DataType, typename MeshType>
     void
     exchange_cell_data_to_ghosts (const MeshType &mesh,
                                   std::function<DataType (const typename MeshType::active_cell_iterator &)> pack,
@@ -191,7 +195,7 @@ namespace parallel
     }
 
 
-    template <typename MeshType, typename DataType>
+    template <typename DataType, typename MeshType>
     void
     exchange_cell_data_to_ghosts (const MeshType &mesh,
                                   std::function<DataType (const typename MeshType::active_cell_iterator &)> pack,

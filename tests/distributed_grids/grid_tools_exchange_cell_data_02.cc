@@ -50,9 +50,10 @@ void test ()
   typedef short DT;
   short counter = 0;
   parallel::GridTools::exchange_cell_data_to_ghosts<
-  DoFHandler<dim>,
-             DT> (dofhandler,
-                  [&](const cell_iterator& cell)
+  DT,
+  DoFHandler<dim> >
+  (dofhandler,
+   [&](const cell_iterator& cell)
   {
     DT value = ++counter;
 
