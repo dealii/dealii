@@ -83,8 +83,9 @@ void test(VectorTools::NormType norm, double value, double exp = 2.0)
 
   // assign FEs mostly randomly to each cell
   for (auto cell : dofh.active_cell_iterators())
-    cell->set_active_fe_index (cell->active_cell_index() %
-                               fe.size());
+    if (cell->is_locally_owned())
+      cell->set_active_fe_index (cell->active_cell_index() %
+                                 fe.size());
   dofh.distribute_dofs(fe);
 
   TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),

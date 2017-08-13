@@ -863,6 +863,65 @@ namespace internal
 
           return std::min(max_couplings,dof_handler.n_dofs());
         }
+
+
+        /**
+         * Given a hp::DoFHandler object, make sure that the active_fe_indices that
+         * a user has set for locally owned cells are communicated to all ghost
+         * cells as well.
+         */
+        template <int dim, int spacedim>
+        static
+        void communicate_active_fe_indices (dealii::hp::DoFHandler<dim,spacedim> &dof_handler)
+        {
+          if (const parallel::shared::Triangulation<dim, spacedim> *tr =
+                dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()))
+            {
+              // we have a shared triangulation. in this case, every processor
+              // knows about all cells, but every processor only has knowledge
+              // about the active_fe_index on the cells it owns.
+              //
+              // we can create a complete set of active_fe_indices by letting
+              // every processor create a vector of indices for all cells,
+              // filling only those on the cells it owns and setting the indices
+              // on the other cells to zero. then we add all of these vectors
+              // up, and because every vector entry has exactly one processor
+              // that owns it, the sum is correct
+              std::vector<unsigned int> active_fe_indices (tr->n_active_cells(),
+                                                           (unsigned int)0);
+              for (const auto &cell : dof_handler.active_cell_iterators())
+                if (cell->is_locally_owned())
+                  active_fe_indices[cell->active_cell_index()] = cell->active_fe_index();
+
+              Utilities::MPI::sum (active_fe_indices,
+                                   tr->get_communicator(),
+                                   active_fe_indices);
+
+              // now go back and fill the active_fe_index on ghost
+              // cells. we would like to call cell->set_active_fe_index(),
+              // but that function does not allow setting these indices on
+              // non-locally_owned cells. so we have to work around the
+              // issue a little bit by accessing the underlying data
+              // structures directly
+              for (auto cell : dof_handler.active_cell_iterators())
+                if (cell->is_ghost())
+                  dof_handler.levels[cell->level()]->
+                  set_active_fe_index(cell->index(),
+                                      active_fe_indices[cell->active_cell_index()]);
+            }
+          else if (const parallel::distributed::Triangulation<dim, spacedim> *tr =
+                     dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()))
+            {
+              Assert (false, ExcNotImplemented());
+            }
+          else
+            {
+              // a sequential triangulation. there is nothing we need to do here
+              Assert ((dynamic_cast<const parallel::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation())
+                       == nullptr),
+                      ExcInternalError());
+            }
+        }
       };
     }
   }
@@ -1178,7 +1237,8 @@ namespace hp
     active_cell_iterator cell=begin_active(),
                          endc=end();
     for (unsigned int i=0; cell!=endc; ++cell, ++i)
-      cell->set_active_fe_index(active_fe_indices[i]);
+      if (cell->is_locally_owned())
+        cell->set_active_fe_index(active_fe_indices[i]);
   }
 
 
@@ -1194,66 +1254,8 @@ namespace hp
     active_cell_iterator cell=begin_active(),
                          endc=end();
     for (unsigned int i=0; cell!=endc; ++cell, ++i)
-      active_fe_indices[i]=cell->active_fe_index();
+      active_fe_indices[i] = cell->active_fe_index();
   }
-
-
-
-  namespace
-  {
-    /**
-     * Given a hp::DoFHandler object, make sure that the active_fe_indices that
-     * a user has set for locally owned cells are communicated to all ghost
-     * cells as well.
-     */
-    template <int dim, int spacedim>
-    void communicate_active_fe_indices (hp::DoFHandler<dim,spacedim> &dof_handler)
-    {
-      if (const parallel::shared::Triangulation<dim, spacedim> *tr =
-            dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()))
-        {
-          // we have a shared triangulation. in this case, every processor
-          // knows about all cells, but every processor only has knowledge
-          // about the active_fe_index on the cells it owns.
-          //
-          // we can create a complete set of active_fe_indices by letting
-          // every processor create a vector of indices for all cells,
-          // filling only those on the cells it owns and setting the indices
-          // on the other cells to zero. then we add all of these vectors
-          // up, and because every vector entry has exactly one processor
-          // that owns it, the sum is correct
-          std::vector<unsigned int> active_fe_indices (tr->n_active_cells(),
-                                                       (unsigned int)0);
-          for (const auto &cell : dof_handler.active_cell_iterators())
-            if (cell->is_locally_owned())
-              active_fe_indices[cell->active_cell_index()] = cell->active_fe_index();
-
-          Utilities::MPI::sum (active_fe_indices,
-                               tr->get_communicator(),
-                               active_fe_indices);
-
-          // now go back and fill the active_fe_index on ghost cells
-          for (auto cell : dof_handler.active_cell_iterators())
-            if (cell->is_ghost())
-              cell->set_active_fe_index(active_fe_indices[cell->active_cell_index()]);
-        }
-      else if (const parallel::distributed::Triangulation<dim, spacedim> *tr =
-                 dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation()))
-        {
-          Assert (false, ExcNotImplemented());
-        }
-      else
-        {
-          // a sequential triangulation. there is nothing we need to do here
-          Assert ((dynamic_cast<const parallel::Triangulation<dim, spacedim>*> (&dof_handler.get_triangulation())
-                   == nullptr),
-                  ExcInternalError());
-        }
-    }
-  }
-
-
-
 
 
 
@@ -1266,7 +1268,7 @@ namespace hp
 
     // at the beginning, make sure every processor knows the
     // active_fe_indices on both its own cells and all ghost cells
-    communicate_active_fe_indices (*this);
+    dealii::internal::hp::DoFHandler::Implementation::communicate_active_fe_indices (*this);
 
     // If an underlying shared::Tria allows artificial cells,
     // then save the current set of subdomain ids, and set
@@ -1602,9 +1604,14 @@ namespace hp
                 // cell->active_fe_index() since that function is not
                 // allowed for inactive cells, but we can access this
                 // information from the DoFLevels directly
+                //
+                // we don't have to set the active_fe_index for ghost
+                // cells -- these will be exchanged automatically
+                // upon distribute_dofs()
                 for (unsigned int i = 0; i < cell->n_children(); ++i)
-                  cell->child (i)->set_active_fe_index
-                  (levels[cell->level()]->active_fe_index (cell->index()));
+                  if (cell->child (i)->is_locally_owned())
+                    cell->child (i)->set_active_fe_index
+                    (levels[cell->level()]->active_fe_index (cell->index()));
               }
           }
       }

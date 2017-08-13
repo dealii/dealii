@@ -3073,8 +3073,7 @@ namespace internal
       unsigned int
       active_fe_index (const DoFCellAccessor<DoFHandler<dim,spacedim>, level_dof_access> &)
       {
-        // ::DoFHandler only supports a
-        // single active fe with index
+        // ::DoFHandler only supports a single active fe with index
         // zero
         return 0;
       }
@@ -3106,8 +3105,7 @@ namespace internal
                            const unsigned int                                i)
       {
         (void)i;
-        // ::DoFHandler only supports a
-        // single active fe with index
+        // ::DoFHandler only supports a single active fe with index
         // zero
         typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (i == 0, typename BaseClass::ExcInvalidObject());
@@ -3757,6 +3755,14 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::active_fe_index () const
                       "children because no degrees of freedom are assigned "
                       "to this cell and, consequently, no finite element "
                       "is associated with it."));
+  Assert ((dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
+           (this->dof_handler) != nullptr)
+          ||
+          (this->is_locally_owned() || this->is_ghost()),
+          ExcMessage ("You can only query active_fe_index information on cells "
+                      "that are either locally owned or (after distributing "
+                      "degrees of freedom) are ghost cells."));
+
   return dealii::internal::DoFCellAccessor::Implementation::active_fe_index (*this);
 }
 
@@ -3774,6 +3780,16 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::set_active_fe_index (const uns
           ExcMessage ("You can not set the active_fe_index on a cell that has "
                       "children because no degrees of freedom will be assigned "
                       "to this cell."));
+
+  Assert ((dynamic_cast<const dealii::DoFHandler<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
+           (this->dof_handler) != nullptr)
+          ||
+          this->is_locally_owned(),
+          ExcMessage ("You can only set active_fe_index information on cells "
+                      "that are locally owned. On ghost cells, this information "
+                      "will automatically be propagated from the owning process "
+                      "of that cell, and there is no information at all on "
+                      "artificial cells."));
   dealii::internal::DoFCellAccessor::Implementation::set_active_fe_index (*this, i);
 }
 
