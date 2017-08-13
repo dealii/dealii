@@ -1,259 +1,259 @@
 
 DEAL::FE: FE_DGQ<2>(1)
 DEAL::no. cells: 88
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
+DEAL::Diff prolongate   l1: 2.42730e-15
+DEAL::Diff prolongate   l2: 4.65368e-15
+DEAL::Diff prolongate   l3: 6.10375e-15
+DEAL::Diff prolongate   l4: 7.04242e-15
+DEAL::Diff prolongate   l5: 5.56110e-15
+DEAL::Diff restrict     l1: 1.60119e-15
+DEAL::Diff restrict add l1: 1.60119e-15
+DEAL::Diff restrict     l2: 2.03507e-15
+DEAL::Diff restrict add l2: 2.22045e-15
+DEAL::Diff restrict     l3: 3.19467e-15
+DEAL::Diff restrict add l3: 3.29345e-15
+DEAL::Diff restrict     l4: 3.55271e-15
+DEAL::Diff restrict add l4: 3.71552e-15
+DEAL::Diff restrict     l5: 2.68298e-15
+DEAL::Diff restrict add l5: 3.01196e-15
 DEAL::
 DEAL::no. cells: 250
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
+DEAL::Diff prolongate   l1: 2.35694e-15
+DEAL::Diff prolongate   l2: 5.57399e-15
+DEAL::Diff prolongate   l3: 8.18221e-15
+DEAL::Diff prolongate   l4: 8.75579e-15
+DEAL::Diff prolongate   l5: 1.12793e-14
+DEAL::Diff prolongate   l6: 1.01444e-14
+DEAL::Diff restrict     l1: 9.93014e-16
+DEAL::Diff restrict add l1: 9.93014e-16
+DEAL::Diff restrict     l2: 2.65759e-15
+DEAL::Diff restrict add l2: 2.59897e-15
+DEAL::Diff restrict     l3: 4.92018e-15
+DEAL::Diff restrict add l3: 4.88498e-15
+DEAL::Diff restrict     l4: 4.10032e-15
+DEAL::Diff restrict add l4: 4.39626e-15
+DEAL::Diff restrict     l5: 6.27644e-15
+DEAL::Diff restrict add l5: 6.99352e-15
+DEAL::Diff restrict     l6: 7.15039e-15
+DEAL::Diff restrict add l6: 7.54952e-15
 DEAL::
 DEAL::no. cells: 510
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
+DEAL::Diff prolongate   l1: 5.96603e-15
+DEAL::Diff prolongate   l2: 1.30851e-14
+DEAL::Diff prolongate   l3: 1.09245e-14
+DEAL::Diff prolongate   l4: 1.40643e-14
+DEAL::Diff prolongate   l5: 1.55790e-14
+DEAL::Diff restrict     l1: 4.04127e-15
+DEAL::Diff restrict add l1: 4.00297e-15
+DEAL::Diff restrict     l2: 8.51621e-15
+DEAL::Diff restrict add l2: 8.69383e-15
+DEAL::Diff restrict     l3: 7.35182e-15
+DEAL::Diff restrict add l3: 7.38110e-15
+DEAL::Diff restrict     l4: 8.41502e-15
+DEAL::Diff restrict add l4: 8.60262e-15
+DEAL::Diff restrict     l5: 9.99016e-15
+DEAL::Diff restrict add l5: 1.02189e-14
 DEAL::
 DEAL::FE: FE_DGQ<2>(3)
 DEAL::no. cells: 34
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
+DEAL::Diff prolongate   l1: 4.17131e-15
+DEAL::Diff prolongate   l2: 8.41667e-15
+DEAL::Diff prolongate   l3: 7.96119e-15
+DEAL::Diff prolongate   l4: 4.42038e-15
+DEAL::Diff restrict     l1: 3.68745e-15
+DEAL::Diff restrict add l1: 3.66205e-15
+DEAL::Diff restrict     l2: 9.22562e-15
+DEAL::Diff restrict add l2: 9.18873e-15
+DEAL::Diff restrict     l3: 9.94210e-15
+DEAL::Diff restrict add l3: 9.94502e-15
+DEAL::Diff restrict     l4: 6.65914e-15
+DEAL::Diff restrict add l4: 6.70928e-15
 DEAL::
 DEAL::no. cells: 88
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
+DEAL::Diff prolongate   l1: 3.40743e-15
+DEAL::Diff prolongate   l2: 7.39654e-15
+DEAL::Diff prolongate   l3: 1.06370e-14
+DEAL::Diff prolongate   l4: 1.19581e-14
+DEAL::Diff prolongate   l5: 9.34608e-15
+DEAL::Diff restrict     l1: 6.04033e-15
+DEAL::Diff restrict add l1: 6.11329e-15
+DEAL::Diff restrict     l2: 9.91651e-15
+DEAL::Diff restrict add l2: 9.85788e-15
+DEAL::Diff restrict     l3: 1.31993e-14
+DEAL::Diff restrict add l3: 1.33476e-14
+DEAL::Diff restrict     l4: 1.48527e-14
+DEAL::Diff restrict add l4: 1.48579e-14
+DEAL::Diff restrict     l5: 1.19310e-14
+DEAL::Diff restrict add l5: 1.21720e-14
 DEAL::
 DEAL::no. cells: 141
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
+DEAL::Diff prolongate   l1: 1.11899e-14
+DEAL::Diff prolongate   l2: 1.16846e-14
+DEAL::Diff prolongate   l3: 1.51778e-14
+DEAL::Diff prolongate   l4: 1.33316e-14
+DEAL::Diff restrict     l1: 1.39003e-14
+DEAL::Diff restrict add l1: 1.37923e-14
+DEAL::Diff restrict     l2: 1.43074e-14
+DEAL::Diff restrict add l2: 1.47764e-14
+DEAL::Diff restrict     l3: 1.79785e-14
+DEAL::Diff restrict add l3: 1.80468e-14
+DEAL::Diff restrict     l4: 1.63117e-14
+DEAL::Diff restrict add l4: 1.63044e-14
 DEAL::
 DEAL::FE: FE_DGQ<3>(1)
 DEAL::no. cells: 15
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
+DEAL::Diff prolongate   l1: 6.12839e-15
+DEAL::Diff prolongate   l2: 7.68203e-15
+DEAL::Diff restrict     l1: 6.57192e-15
+DEAL::Diff restrict add l1: 6.60186e-15
+DEAL::Diff restrict     l2: 7.45753e-15
+DEAL::Diff restrict add l2: 7.69185e-15
 DEAL::
 DEAL::no. cells: 694
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
+DEAL::Diff prolongate   l1: 3.54546e-15
+DEAL::Diff prolongate   l2: 1.57343e-14
+DEAL::Diff prolongate   l3: 2.90876e-14
+DEAL::Diff prolongate   l4: 3.99611e-14
+DEAL::Diff prolongate   l5: 3.59884e-14
+DEAL::Diff restrict     l1: 5.90822e-15
+DEAL::Diff restrict add l1: 5.89151e-15
+DEAL::Diff restrict     l2: 2.08580e-14
+DEAL::Diff restrict add l2: 2.13394e-14
+DEAL::Diff restrict     l3: 3.14270e-14
+DEAL::Diff restrict add l3: 3.10609e-14
+DEAL::Diff restrict     l4: 4.23355e-14
+DEAL::Diff restrict add l4: 4.23588e-14
+DEAL::Diff restrict     l5: 4.02752e-14
+DEAL::Diff restrict add l5: 4.01674e-14
 DEAL::
 DEAL::no. cells: 1791
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
+DEAL::Diff prolongate   l1: 3.08167e-14
+DEAL::Diff prolongate   l2: 3.40085e-14
+DEAL::Diff prolongate   l3: 5.26770e-14
+DEAL::Diff prolongate   l4: 6.79970e-14
+DEAL::Diff restrict     l1: 3.51729e-14
+DEAL::Diff restrict add l1: 3.51673e-14
+DEAL::Diff restrict     l2: 3.59164e-14
+DEAL::Diff restrict add l2: 3.63041e-14
+DEAL::Diff restrict     l3: 6.09924e-14
+DEAL::Diff restrict add l3: 6.16501e-14
+DEAL::Diff restrict     l4: 7.84845e-14
+DEAL::Diff restrict add l4: 7.93156e-14
 DEAL::
 DEAL::FE: FE_DGQ<3>(3)
 DEAL::no. cells: 1
 DEAL::
 DEAL::no. cells: 15
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
+DEAL::Diff prolongate   l1: 2.33378e-14
+DEAL::Diff prolongate   l2: 2.41578e-14
+DEAL::Diff restrict     l1: 2.75986e-14
+DEAL::Diff restrict add l1: 2.77120e-14
+DEAL::Diff restrict     l2: 2.84487e-14
+DEAL::Diff restrict add l2: 2.84486e-14
 DEAL::
 DEAL::no. cells: 223
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
+DEAL::Diff prolongate   l1: 6.15027e-14
+DEAL::Diff prolongate   l2: 8.99854e-14
+DEAL::Diff prolongate   l3: 5.10249e-14
+DEAL::Diff restrict     l1: 7.28331e-14
+DEAL::Diff restrict add l1: 7.27565e-14
+DEAL::Diff restrict     l2: 1.17604e-13
+DEAL::Diff restrict add l2: 1.18098e-13
+DEAL::Diff restrict     l3: 7.66222e-14
+DEAL::Diff restrict add l3: 7.65525e-14
 DEAL::
 DEAL::FE: FE_DGQ<2>(2)
 DEAL::no. cells: 88
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
+DEAL::Diff prolongate   l1: 8.80750e-08
+DEAL::Diff prolongate   l2: 2.32126e-07
+DEAL::Diff prolongate   l3: 3.49252e-07
+DEAL::Diff prolongate   l4: 3.71788e-07
+DEAL::Diff prolongate   l5: 3.89546e-07
+DEAL::Diff restrict     l1: 2.05689e-07
+DEAL::Diff restrict add l1: 2.35921e-07
+DEAL::Diff restrict     l2: 6.46161e-07
+DEAL::Diff restrict add l2: 8.53976e-07
+DEAL::Diff restrict     l3: 1.10133e-06
+DEAL::Diff restrict add l3: 1.32253e-06
+DEAL::Diff restrict     l4: 1.20100e-06
+DEAL::Diff restrict add l4: 1.29764e-06
+DEAL::Diff restrict     l5: 7.85391e-07
+DEAL::Diff restrict add l5: 8.58580e-07
 DEAL::
 DEAL::no. cells: 250
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff prolongate   l6: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
-DEAL::Diff restrict     l6: 0
-DEAL::Diff restrict add l6: 0
+DEAL::Diff prolongate   l1: 1.70304e-07
+DEAL::Diff prolongate   l2: 1.80863e-07
+DEAL::Diff prolongate   l3: 4.37828e-07
+DEAL::Diff prolongate   l4: 4.44354e-07
+DEAL::Diff prolongate   l5: 5.50270e-07
+DEAL::Diff prolongate   l6: 5.91192e-07
+DEAL::Diff restrict     l1: 4.46472e-07
+DEAL::Diff restrict add l1: 4.47186e-07
+DEAL::Diff restrict     l2: 6.03085e-07
+DEAL::Diff restrict add l2: 7.56254e-07
+DEAL::Diff restrict     l3: 1.34162e-06
+DEAL::Diff restrict add l3: 1.81144e-06
+DEAL::Diff restrict     l4: 1.31130e-06
+DEAL::Diff restrict add l4: 1.61412e-06
+DEAL::Diff restrict     l5: 1.61300e-06
+DEAL::Diff restrict add l5: 1.82997e-06
+DEAL::Diff restrict     l6: 1.66056e-06
+DEAL::Diff restrict add l6: 1.88641e-06
 DEAL::
 DEAL::no. cells: 510
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
+DEAL::Diff prolongate   l1: 2.85840e-07
+DEAL::Diff prolongate   l2: 6.99005e-07
+DEAL::Diff prolongate   l3: 6.37051e-07
+DEAL::Diff prolongate   l4: 6.49375e-07
+DEAL::Diff prolongate   l5: 8.03533e-07
+DEAL::Diff restrict     l1: 1.19518e-06
+DEAL::Diff restrict add l1: 1.30982e-06
+DEAL::Diff restrict     l2: 2.03789e-06
+DEAL::Diff restrict add l2: 2.37529e-06
+DEAL::Diff restrict     l3: 1.73984e-06
+DEAL::Diff restrict add l3: 2.04626e-06
+DEAL::Diff restrict     l4: 2.27244e-06
+DEAL::Diff restrict add l4: 2.68893e-06
+DEAL::Diff restrict     l5: 2.50819e-06
+DEAL::Diff restrict add l5: 2.81610e-06
 DEAL::
 DEAL::FE: FE_DGQ<3>(2)
 DEAL::no. cells: 15
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
+DEAL::Diff prolongate   l1: 3.59899e-07
+DEAL::Diff prolongate   l2: 2.87715e-07
+DEAL::Diff restrict     l1: 1.42897e-06
+DEAL::Diff restrict add l1: 1.63752e-06
+DEAL::Diff restrict     l2: 1.23597e-06
+DEAL::Diff restrict add l2: 1.64779e-06
 DEAL::
 DEAL::no. cells: 694
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff prolongate   l5: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
-DEAL::Diff restrict     l5: 0
-DEAL::Diff restrict add l5: 0
+DEAL::Diff prolongate   l1: 2.21408e-07
+DEAL::Diff prolongate   l2: 8.88202e-07
+DEAL::Diff prolongate   l3: 1.52178e-06
+DEAL::Diff prolongate   l4: 2.01890e-06
+DEAL::Diff prolongate   l5: 2.01186e-06
+DEAL::Diff restrict     l1: 1.68129e-06
+DEAL::Diff restrict add l1: 1.72600e-06
+DEAL::Diff restrict     l2: 4.82686e-06
+DEAL::Diff restrict add l2: 4.96640e-06
+DEAL::Diff restrict     l3: 7.12362e-06
+DEAL::Diff restrict add l3: 7.57417e-06
+DEAL::Diff restrict     l4: 8.57089e-06
+DEAL::Diff restrict add l4: 9.27497e-06
+DEAL::Diff restrict     l5: 8.82054e-06
+DEAL::Diff restrict add l5: 9.29884e-06
 DEAL::
 DEAL::no. cells: 1791
-DEAL::Diff prolongate   l1: 0
-DEAL::Diff prolongate   l2: 0
-DEAL::Diff prolongate   l3: 0
-DEAL::Diff prolongate   l4: 0
-DEAL::Diff restrict     l1: 0
-DEAL::Diff restrict add l1: 0
-DEAL::Diff restrict     l2: 0
-DEAL::Diff restrict add l2: 0
-DEAL::Diff restrict     l3: 0
-DEAL::Diff restrict add l3: 0
-DEAL::Diff restrict     l4: 0
-DEAL::Diff restrict add l4: 0
+DEAL::Diff prolongate   l1: 1.83067e-06
+DEAL::Diff prolongate   l2: 1.76217e-06
+DEAL::Diff prolongate   l3: 2.90233e-06
+DEAL::Diff prolongate   l4: 3.65006e-06
+DEAL::Diff restrict     l1: 7.62144e-06
+DEAL::Diff restrict add l1: 7.96738e-06
+DEAL::Diff restrict     l2: 6.90848e-06
+DEAL::Diff restrict add l2: 7.61657e-06
+DEAL::Diff restrict     l3: 1.27095e-05
+DEAL::Diff restrict add l3: 1.36699e-05
+DEAL::Diff restrict     l4: 1.63296e-05
+DEAL::Diff restrict add l4: 1.74402e-05
 DEAL::

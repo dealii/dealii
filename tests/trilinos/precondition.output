@@ -1,45 +1,45 @@
 
 DEAL:01089:Jacobi:cg::Starting value 15.4650
-DEAL:01089:Jacobi:cg::Convergence step 50 value 0
+DEAL:01089:Jacobi:cg::Convergence step 50 value 4.48478e-11
 DEAL:01089:SSOR:cg::Starting value 15.4650
-DEAL:01089:SSOR:cg::Convergence step 41 value 0
+DEAL:01089:SSOR:cg::Convergence step 41 value 4.42998e-11
 DEAL:01089:SOR:Bicgstab::Starting value 15.4650
-DEAL:01089:SOR:Bicgstab::Convergence step 32 value 0
+DEAL:01089:SOR:Bicgstab::Convergence step 32 value 3.30388e-06
 DEAL:01089:BlockJacobi:cg::Starting value 15.4650
-DEAL:01089:BlockJacobi:cg::Convergence step 74 value 0
+DEAL:01089:BlockJacobi:cg::Convergence step 74 value 6.73830e-11
 DEAL:01089:BlockSSOR:cg::Starting value 15.4650
-DEAL:01089:BlockSSOR:cg::Convergence step 31 value 0
+DEAL:01089:BlockSSOR:cg::Convergence step 31 value 7.86992e-11
 DEAL:01089:BlockSOR:Bicgstab::Starting value 15.4650
-DEAL:01089:BlockSOR:Bicgstab::Convergence step 19 value 0
+DEAL:01089:BlockSOR:Bicgstab::Convergence step 19 value 7.10623e-06
 DEAL:01089:IC:cg::Starting value 15.4650
-DEAL:01089:IC:cg::Convergence step 52 value 0
+DEAL:01089:IC:cg::Convergence step 52 value 8.58018e-11
 DEAL:01089:ILU:cg::Starting value 15.4650
-DEAL:01089:ILU:cg::Convergence step 31 value 0
+DEAL:01089:ILU:cg::Convergence step 31 value 4.81299e-11
 DEAL:01089:ILUT:Bicgstab::Starting value 15.4650
-DEAL:01089:ILUT:Bicgstab::Convergence step 12 value 0
+DEAL:01089:ILUT:Bicgstab::Convergence step 12 value 1.37052e-06
 DEAL:01089:Chebyshev:cg::Starting value 15.4650
-DEAL:01089:Chebyshev:cg::Convergence step 24 value 0
+DEAL:01089:Chebyshev:cg::Convergence step 24 value 9.92823e-11
 DEAL:01089:Direct:cg::Starting value 15.4650
-DEAL:01089:Direct:cg::Convergence step 1 value 0
+DEAL:01089:Direct:cg::Convergence step 1 value 4.94722e-14
 DEAL:04225:Jacobi:cg::Starting value 21.8299
-DEAL:04225:Jacobi:cg::Convergence step 101 value 0
+DEAL:04225:Jacobi:cg::Convergence step 101 value 5.77109e-11
 DEAL:04225:SSOR:cg::Starting value 21.8299
-DEAL:04225:SSOR:cg::Convergence step 78 value 0
+DEAL:04225:SSOR:cg::Convergence step 78 value 4.50033e-11
 DEAL:04225:SOR:Bicgstab::Starting value 21.8299
-DEAL:04225:SOR:Bicgstab::Convergence step 63 value 0
+DEAL:04225:SOR:Bicgstab::Convergence step 63 value 7.96877e-06
 DEAL:04225:BlockJacobi:cg::Starting value 21.8299
-DEAL:04225:BlockJacobi:cg::Convergence step 146 value 0
+DEAL:04225:BlockJacobi:cg::Convergence step 146 value 9.98613e-11
 DEAL:04225:BlockSSOR:cg::Starting value 21.8299
-DEAL:04225:BlockSSOR:cg::Convergence step 60 value 0
+DEAL:04225:BlockSSOR:cg::Convergence step 60 value 6.80642e-11
 DEAL:04225:BlockSOR:Bicgstab::Starting value 21.8299
-DEAL:04225:BlockSOR:Bicgstab::Convergence step 38 value 0
+DEAL:04225:BlockSOR:Bicgstab::Convergence step 38 value 9.92349e-06
 DEAL:04225:IC:cg::Starting value 21.8299
-DEAL:04225:IC:cg::Convergence step 70 value 0
+DEAL:04225:IC:cg::Convergence step 69 value 9.23798e-11
 DEAL:04225:ILU:cg::Starting value 21.8299
-DEAL:04225:ILU:cg::Convergence step 57 value 0
+DEAL:04225:ILU:cg::Convergence step 57 value 8.22307e-11
 DEAL:04225:ILUT:Bicgstab::Starting value 21.8299
-DEAL:04225:ILUT:Bicgstab::Convergence step 20 value 0
+DEAL:04225:ILUT:Bicgstab::Convergence step 20 value 3.49065e-06
 DEAL:04225:Chebyshev:cg::Starting value 21.8299
-DEAL:04225:Chebyshev:cg::Convergence step 47 value 0
+DEAL:04225:Chebyshev:cg::Convergence step 47 value 7.80130e-11
 DEAL:04225:Direct:cg::Starting value 21.8299
-DEAL:04225:Direct:cg::Convergence step 1 value 0
+DEAL:04225:Direct:cg::Convergence step 1 value 1.51477e-13

@@ -1,21 +1,21 @@
 
 DEAL:double:0:GMRES::Starting value 8.00
-DEAL:double:0:GMRES::Convergence step 57 value 0
+DEAL:double:0:GMRES::Convergence step 57 value 1.44e-14
 DEAL:double:1:GMRES::Starting value 8.00
-DEAL:double:1:GMRES::Convergence step 64 value 0
+DEAL:double:1:GMRES::Convergence step 64 value 2.12e-30
 DEAL:double:2:GMRES::Starting value 8.00
-DEAL:double:2:GMRES::Convergence step 57 value 0
+DEAL:double:2:GMRES::Convergence step 57 value 1.50e-14
 DEAL:double:3:GMRES::Starting value 8.00
-DEAL:double:3:GMRES::Convergence step 64 value 0
+DEAL:double:3:GMRES::Convergence step 64 value 7.71e-31
 DEAL:double:4:GMRES::Starting value 8.00
-DEAL:double:4:GMRES::Convergence step 57 value 0
+DEAL:double:4:GMRES::Convergence step 57 value 1.50e-14
 DEAL:double:5:GMRES::Starting value 8.00
-DEAL:double:5:GMRES::Convergence step 64 value 0
+DEAL:double:5:GMRES::Convergence step 64 value 1.13e-30
 DEAL:float:0:GMRES::Starting value 8.00
-DEAL:float:0:GMRES::Convergence step 37 value 0
+DEAL:float:0:GMRES::Convergence step 37 value 6.92e-06
 DEAL:float:1:GMRES::Starting value 8.00
-DEAL:float:1:GMRES::Convergence step 64 value 0
+DEAL:float:1:GMRES::Convergence step 64 value 4.82e-13
 DEAL:float:2:GMRES::Starting value 8.00
-DEAL:float:2:GMRES::Convergence step 37 value 0
+DEAL:float:2:GMRES::Convergence step 37 value 6.44e-06
 DEAL:float:3:GMRES::Starting value 8.00
-DEAL:float:3:GMRES::Convergence step 64 value 0
+DEAL:float:3:GMRES::Convergence step 64 value 4.50e-13

@@ -187,7 +187,6 @@ main()
       deallog << std::setprecision (8);
       deallog.attach(logfile);
       deallog.depth_console(0);
-      deallog.test_mode(true, 1.e-10, 1.e-7f, 1.e-10);
 
       CHECK_ALL(Q,1,Q,1);
       CHECK_ALL(Q,1,Q,2);
