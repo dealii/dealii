@@ -193,8 +193,8 @@ public:
    * @return vector of indices and distances of the matching points
    */
   std::vector<std::pair<unsigned int, double> > get_points_within_ball(const Point<dim> &target,
-                                                                       const double &radius,
-                                                                       bool sorted=false) const;
+      const double &radius,
+      bool sorted=false) const;
 
   /**
    * Fill two vectors with the indices and distances of the closest
@@ -209,7 +209,7 @@ public:
    * @return a vector of pairs of indices and distances of the matching points
    */
   std::vector<std::pair<unsigned int, double> >  get_closest_points(const Point<dim> &target,
-                                                                    const unsigned int n_points) const;
+      const unsigned int n_points) const;
 
 private:
   /**

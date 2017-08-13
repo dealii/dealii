@@ -43,14 +43,16 @@ int main ()
 
   kdtree.set_points(points);
 
-  for (auto &p : test_points) {
+  for (auto &p : test_points)
+    {
       auto res = kdtree.get_closest_points(p,1)[0];
-     deallog << "P: " << p << ", distance: " << res.second << ", index: " << res.first << std::endl;
+      deallog << "P: " << p << ", distance: " << res.second << ", index: " << res.first << std::endl;
     }
 
   deallog << "Consistency checking: the following are all the points in the set." << std::endl;
-  for (auto &p : points) {
-    auto res = kdtree.get_closest_points(p,1)[0];
-    deallog << "P: " << p << ", distance: " << res.second << ", index: " << res.first << std::endl;
+  for (auto &p : points)
+    {
+      auto res = kdtree.get_closest_points(p,1)[0];
+      deallog << "P: " << p << ", distance: " << res.second << ", index: " << res.first << std::endl;
     }
 }

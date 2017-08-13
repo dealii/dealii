@@ -19,8 +19,8 @@ KDTreeDistance<dim>::KDTreeDistance(const unsigned int &max_leaf_size,
 
 template<int dim>
 std::vector<std::pair<unsigned int, double> > KDTreeDistance<dim>::get_points_within_ball(const Point<dim> &center,
-                                                                                          const double &radius,
-                                                                                          bool sorted) const
+    const double &radius,
+    bool sorted) const
 {
   std::vector<std::pair<unsigned int, double> > matches;
   Assert(adaptor, ExcNotInitialized());
@@ -37,7 +37,7 @@ std::vector<std::pair<unsigned int, double> > KDTreeDistance<dim>::get_points_wi
 
 template<int dim>
 std::vector<std::pair<unsigned int, double> > KDTreeDistance<dim>::get_closest_points(const Point<dim> &target,
-                                                                                      const unsigned int n_points) const
+    const unsigned int n_points) const
 {
   Assert(adaptor, ExcNotInitialized());
   Assert(kdtree, ExcInternalError());
@@ -46,7 +46,7 @@ std::vector<std::pair<unsigned int, double> > KDTreeDistance<dim>::get_closest_p
   std::vector<std::pair<unsigned int, double> > matches(n_points);
 
   kdtree->knnSearch(&target[0], n_points, &indices[0], &distances[0]);
-  for(unsigned int i=0; i<n_points; ++i)
+  for (unsigned int i=0; i<n_points; ++i)
     matches[i] = std::make_pair(indices[i], distances[i]);
   return matches;
 }
