@@ -2,32 +2,32 @@
 DEAL::CELLS ONLY
 DEAL::
 DEAL::Cell worker on : 1.1
+DEAL::copier
 DEAL::Cell worker on : 1.2
+DEAL::copier
 DEAL::Cell worker on : 1.3
+DEAL::copier
 DEAL::Cell worker on : 2.0
+DEAL::copier
 DEAL::Cell worker on : 2.1
+DEAL::copier
 DEAL::Cell worker on : 2.2
+DEAL::copier
 DEAL::Cell worker on : 2.3
-DEAL::copier
-DEAL::copier
-DEAL::copier
-DEAL::copier
-DEAL::copier
-DEAL::copier
 DEAL::copier
 DEAL::CELLS ONLY WORKSTREAM
 DEAL::
 DEAL::Cell worker on : 1.1
+DEAL::copier
 DEAL::Cell worker on : 1.2
+DEAL::copier
 DEAL::Cell worker on : 1.3
+DEAL::copier
 DEAL::Cell worker on : 2.0
+DEAL::copier
 DEAL::Cell worker on : 2.1
+DEAL::copier
 DEAL::Cell worker on : 2.2
+DEAL::copier
 DEAL::Cell worker on : 2.3
-DEAL::copier
-DEAL::copier
-DEAL::copier
-DEAL::copier
-DEAL::copier
-DEAL::copier
 DEAL::copier

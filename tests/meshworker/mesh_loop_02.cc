@@ -124,6 +124,7 @@ void test()
 int main()
 {
   initlog();
+  MultithreadInfo::set_thread_limit(1); // to make output deterministic
 
   test<2,2>();
 }
