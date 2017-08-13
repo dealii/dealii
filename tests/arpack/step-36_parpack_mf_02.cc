@@ -126,7 +126,7 @@ void test ()
                        solver_c,
                        preconditioner);
 
-    const unsigned int num_arnoldi_vectors = 2*eigenvalues.size() + 10;
+    const unsigned int num_arnoldi_vectors = 2*eigenvalues.size() + 40;
     PArpackSolver<LinearAlgebra::distributed::Vector<double> >::AdditionalData
     additional_data(num_arnoldi_vectors,
                     PArpackSolver<LinearAlgebra::distributed::Vector<double> >::largest_magnitude,
@@ -134,7 +134,7 @@ void test ()
                     2);
 
     SolverControl solver_control(
-      dof_handler.n_dofs(), 1e-9, /*log_history*/ false, /*log_results*/ false);
+      dof_handler.n_dofs(), 1e-10, /*log_history*/ false, /*log_results*/ false);
 
     PArpackSolver<LinearAlgebra::distributed::Vector<double> > eigensolver(
       solver_control, mpi_communicator, additional_data);
