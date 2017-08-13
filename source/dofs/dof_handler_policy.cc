@@ -3208,6 +3208,11 @@ namespace internal
               for (unsigned int i=0; i<dof_indices.size(); ++i)
                 if (dofs[i] != numbers::invalid_dof_index)
                   {
+                    // if we are in phase 2, then we will
+                    // receive a complete set of dof indices
+                    // where we may have had only a partial
+                    // set in phase 1. make sure that they do not
+                    // contradict each other
                     Assert((dof_indices[i] ==
                             (numbers::invalid_dof_index))
                            ||
@@ -3218,9 +3223,22 @@ namespace internal
                 else
                   complete=false;
 
-              if (!complete)
-                dealii_cell->set_user_flag();
-              else
+              // if we are in phase 1, then all ghost cells had their user
+              // flag set, indicating that they need to receive data from
+              // the cell's owner. if the data we received in phase 1 was
+              // complete, then we need not receive data from there again.
+              // consequently, remove the user flag from this ghost cell.
+              //
+              // if the data we received was *not* complete (because the
+              // owning processor of that cell had not gotten information
+              // from even more remote processors yet), then we leave
+              // the user flag set
+              //
+              // in any case, if we are treating this cell right now,
+              // then its user flag must have been set, and we can
+              // assert that that is so.
+              Assert (dealii_cell->user_flag_set(), ExcInternalError());
+              if (complete)
                 dealii_cell->clear_user_flag();
 
               const_cast<CellIteratorType &>(dealii_cell)->set_dof_indices(dof_indices);
@@ -3242,6 +3260,24 @@ namespace internal
 
 
 
+        /**
+         * A function that communicates the DoF indices from that subset of
+         * locally owned cells that have their user indices set to the
+         * corresponding ghost cells on other processors.
+         *
+         * This function makes use of the user flags in the following
+         * way:
+         * - On locally owned cells, the flag indicates whether we still
+         *   need to send the DoF indices to other processors on which
+         *   the current cell is a ghost. In phase 1, this is true for
+         *   all locally owned cells that are adjacent to ghost cells
+         *   in some way. In phase 2, this is only true if before phase
+         *   1 we did not know all dof indices yet
+         * - On ghost cells, the flag indicates whether we still expect
+         *   information to be sent to us. In phase 1, this is true for
+         *   all ghost cells. In phase 2, this is only true if we
+         *   did not receive a complete set of DoF indices in phase 1.
+         */
         template <int spacedim>
         void
         communicate_dof_indices_on_marked_cells
@@ -3289,7 +3325,12 @@ namespace internal
           Assert (triangulation != nullptr, ExcInternalError());
 
           // first, collect cells and their dof_indices to send to
-          // interested neighbors
+          // interested neighbors. the functions called in the
+          // following loop only work on cells that are locally owned
+          // and are adjacent to ghost cells and that are marked via
+          // the user flag. in the first phase, all locally owned
+          // cells fall in this category, but we remove some of
+          // these flags later in this function
           typedef
           std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim>>
               cellmap_t;
@@ -3357,14 +3398,24 @@ namespace internal
                     }
                   else
                     {
+                      // this is a locally owned cell.
+                      //
+                      // if we are in phase 1: if it is
+                      // complete already, then we have sent its information
+                      // to the other processors that need it above, and we don't
+                      // need to do so again in phase 2. if it wasn't
+                      // complete, then it will be completed below, and we
+                      // will have to send the completed information a
+                      // second time.
+                      //
+                      // if we are in phase 2, nothing we do matters, so
+                      // we just run this loop anyway
                       local_dof_indices.resize (cell->get_fe().dofs_per_cell);
                       cell->get_dof_indices (local_dof_indices);
-                      if (local_dof_indices.end() !=
+                      if (local_dof_indices.end() ==
                           std::find (local_dof_indices.begin(),
                                      local_dof_indices.end(),
                                      numbers::invalid_dof_index))
-                        cell->set_user_flag();
-                      else
                         cell->clear_user_flag();
                     }
                 }
@@ -3638,16 +3689,29 @@ namespace internal
           triangulation->save_user_flags(user_flags);
           triangulation->clear_user_flags ();
 
-          // mark all own cells for transfer
-          for (auto cell : dof_handler->active_cell_iterators())
-            if (!cell->is_artificial())
-              cell->set_user_flag();
-
           // figure out which cells are ghost cells on which we have
           // to exchange DoF indices
           const std::map<unsigned int, std::set<dealii::types::subdomain_id> >
           vertices_with_ghost_neighbors
             = triangulation->compute_vertices_with_ghost_neighbors ();
+
+          // mark all cells that either have to send data (locally
+          // owned cells that are adjacent to ghost neighbors in some
+          // way) or receive data (all ghost cells) via the user flags
+          for (auto cell : dof_handler->active_cell_iterators())
+            if (cell->is_locally_owned())
+              {
+                for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+                  if (vertices_with_ghost_neighbors.find (cell->vertex_index(v))
+                      != vertices_with_ghost_neighbors.end())
+                    {
+                      cell->set_user_flag();
+                      break;
+                    }
+              }
+            else if (cell->is_ghost())
+              cell->set_user_flag();
+
 
 
           // Send and receive cells. After this, only the local cells
