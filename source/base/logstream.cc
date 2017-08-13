@@ -15,16 +15,7 @@
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/job_identifier.h>
-#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
-
-#ifdef DEAL_II_HAVE_SYS_RESOURCE_H
-#  include <sys/resource.h>
-#endif
-
-#ifdef DEAL_II_HAVE_UNISTD_H
-#  include <unistd.h>
-#endif
 
 #include <iostream>
 #include <iomanip>
@@ -51,18 +42,10 @@ LogStream::LogStream()
   file(nullptr),
   std_depth(0),
   file_depth(10000),
-  print_utime(false),
-  diff_utime(false),
-  last_time (0.),
   print_thread_id(false),
   at_newline(true)
 {
   get_prefixes().push("DEAL:");
-
-#if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_TIMES)
-  reference_time_val = 1./sysconf(_SC_CLK_TCK) * times(&reference_tms);
-#endif
-
 }
 
 
@@ -308,26 +291,6 @@ LogStream::depth_file (const unsigned int n)
 
 
 bool
-LogStream::log_execution_time (const bool flag)
-{
-  Threads::Mutex::ScopedLock lock(log_lock);
-  const bool h = print_utime;
-  print_utime = flag;
-  return h;
-}
-
-
-bool
-LogStream::log_time_differences (const bool flag)
-{
-  Threads::Mutex::ScopedLock lock(log_lock);
-  const bool h = diff_utime;
-  diff_utime = flag;
-  return h;
-}
-
-
-bool
 LogStream::log_thread_id (const bool flag)
 {
   Threads::Mutex::ScopedLock lock(log_lock);
@@ -372,36 +335,11 @@ LogStream::get_prefixes() const
 void
 LogStream::print_line_head()
 {
-#ifdef DEAL_II_HAVE_SYS_RESOURCE_H
-  rusage usage;
-  double utime = 0.;
-  if (print_utime)
-    {
-      getrusage(RUSAGE_SELF, &usage);
-      utime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-      if (diff_utime)
-        {
-          double diff = utime - last_time;
-          last_time = utime;
-          utime = diff;
-        }
-    }
-#else
-//TODO[BG]: Do something useful here
-  double utime = 0.;
-#endif
-
   const std::string &head = get_prefix();
   const unsigned int thread = Threads::this_thread_id();
 
   if (get_prefixes().size() <= std_depth)
     {
-      if (print_utime)
-        {
-          int p = std_out->width(5);
-          *std_out << utime << ':';
-          std_out->width(p);
-        }
       if (print_thread_id)
         *std_out << '[' << thread << ']';
 
@@ -411,64 +349,12 @@ LogStream::print_line_head()
 
   if (file && (get_prefixes().size() <= file_depth))
     {
-      if (print_utime)
-        {
-          int p = file->width(6);
-          *file << utime << ':';
-          file->width(p);
-        }
       if (print_thread_id)
         *file << '[' << thread << ']';
 
       if (head.size() > 0)
         *file << head << ':';
     }
-}
-
-
-void
-LogStream::timestamp ()
-{
-  struct tms current_tms;
-#if defined(DEAL_II_HAVE_UNISTD_H) && defined(DEAL_II_HAVE_TIMES)
-  const clock_t tick = sysconf(_SC_CLK_TCK);
-  const double time = 1./tick * times(&current_tms);
-#else
-  const double time = 0.;
-  const unsigned int tick = 100;
-  current_tms.tms_utime = 0;
-  current_tms.tms_stime = 0;
-  current_tms.tms_cutime = 0;
-  current_tms.tms_cstime = 0;
-#endif
-  (*this) << "Wall: " << time - reference_time_val
-          << " User: " << 1./tick * (current_tms.tms_utime - reference_tms.tms_utime)
-          << " System: " << 1./tick * (current_tms.tms_stime - reference_tms.tms_stime)
-          << " Child-User: " << 1./tick * (current_tms.tms_cutime - reference_tms.tms_cutime)
-          << " Child-System: " << 1./tick * (current_tms.tms_cstime - reference_tms.tms_cstime)
-          << std::endl;
-}
-
-
-std::size_t
-LogStream::memory_consumption () const
-{
-  // TODO
-  Assert(false, ExcNotImplemented());
-
-  std::size_t mem = sizeof(*this);
-  // to determine size of stack
-  // elements, we have to copy the
-  // stack since we can't access
-  // elements from further below
-//   std::stack<std::string> tmp = prefixes;
-//   while (tmp.empty() == false)
-//     {
-//       mem += MemoryConsumption::memory_consumption (tmp.top());
-//       tmp.pop ();
-//     }
-
-  return mem;
 }
 
 DEAL_II_NAMESPACE_CLOSE

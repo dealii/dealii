@@ -28,15 +28,6 @@
 #include <sstream>
 #include <memory>
 
-#ifdef DEAL_II_HAVE_SYS_TIMES_H
-#  include <sys/times.h>
-#else
-struct tms
-{
-  int tms_utime, tms_stime, tms_cutime, tms_cstime;
-};
-#endif
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -227,36 +218,6 @@ public:
 
 
   /**
-   * Set time printing flag. If this flag is true, each output line will be
-   * prepended by the user time used by the running program so far.
-   *
-   * The previous value of this parameter is returned.
-   */
-  bool log_execution_time (const bool flag);
-
-
-  /**
-   * Output time differences between consecutive logs. If this function is
-   * invoked with <tt>true</tt>, the time difference between the previous log
-   * line and the recent one is printed. If it is invoked with <tt>false</tt>,
-   * the accumulated time since start of the program is printed (default
-   * behavior).
-   *
-   * The measurement of times is not changed by this function, just the
-   * output.
-   *
-   * The previous value of this parameter is returned.
-   */
-  bool log_time_differences (const bool flag);
-
-
-  /**
-   * Write detailed timing information.
-   */
-  void timestamp();
-
-
-  /**
    * Log the thread id.
    */
   bool log_thread_id (const bool flag);
@@ -357,34 +318,9 @@ private:
   unsigned int file_depth;
 
   /**
-   * Flag for printing execution time.
-   */
-  bool print_utime;
-
-  /**
-   * Flag for printing time differences.
-   */
-  bool diff_utime;
-
-  /**
-   * Time of last output line.
-   */
-  double last_time;
-
-  /**
    * Flag for printing thread id.
    */
   bool print_thread_id;
-
-  /**
-   * The value times() returned on initialization.
-   */
-  double reference_time_val;
-
-  /**
-   * The tms structure times() filled on initialization.
-   */
-  struct tms reference_tms;
 
   /**
    * A flag indicating whether output is currently at a new line
@@ -392,8 +328,7 @@ private:
   bool at_newline;
 
   /**
-   * Print head of line. This prints optional time information and the
-   * contents of the prefix stack.
+   * Print head of line.
    */
   void print_line_head ();
 
