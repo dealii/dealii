@@ -25,17 +25,17 @@ To build from the repository, execute the following commands first:
 
 Then continue as before.
 
-A detailed *ReadME* can be found at [./doc/readme.html](http://dealii.org/developer/readme.html)
-and [./doc/users/cmake.html](http://dealii.org/developer/users/cmake.html) or at
-http://www.dealii.org/.
+A detailed *ReadME* can be found at [./doc/readme.html](https://dealii.org/developer/readme.html)
+and [./doc/users/cmake.html](https://dealii.org/developer/users/cmake.html) or at
+https://www.dealii.org/.
 
 Getting started:
 ----------------
 
 The tutorial steps are located under examples/ of the installation.
 Information about the tutorial steps can be found at
-[./doc/doxygen/tutorial/index.html](http://dealii.org/developer/doxygen/deal.II/Tutorial.html)
-or at http://www.dealii.org/.
+[./doc/doxygen/tutorial/index.html](https://dealii.org/developer/doxygen/deal.II/Tutorial.html)
+or at https://www.dealii.org/.
 
 deal.II includes support for pretty-printing deal.II objects inside GDB.
 See [`contrib/utilities/dotgdbinit.py`](contrib/utilities/dotgdbinit.py) or
@@ -51,8 +51,8 @@ Further information:
 --------------------
 
 For further information have a look at
-[./doc/index.html](http://dealii.org/developer/index.html) or at
-http://www.dealii.org.
+[./doc/index.html](https://dealii.org/developer/index.html) or at
+https://www.dealii.org.
 
 Continuous Integration Status:
 ------------------------
