@@ -220,6 +220,9 @@ namespace MatrixCreator
    * Assemble the mass matrix. If no coefficient is given (i.e., if the
    * pointer to a function object is zero as it is by default), the
    * coefficient is taken as being constant and equal to one.
+   * In case you want to specify @p constraints and use the default argument
+   * for the coefficient you have to specify the (unused) coefficient argument as
+   * <code>(const Function<spacedim,number> *const)nullptr</code>.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.
@@ -255,6 +258,9 @@ namespace MatrixCreator
    * Assemble the mass matrix and a right hand side vector. If no coefficient
    * is given (i.e., if the pointer to a function object is zero as it is by
    * default), the coefficient is taken as being constant and equal to one.
+   * In case you want to specify @p constraints and use the default argument
+   * for the coefficient you have to specify the (unused) coefficient argument as
+   * <code>(const Function <spacedim,number> *const)nullptr</code>.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.
@@ -287,7 +293,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim,number> *const a = 0,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -308,7 +314,7 @@ namespace MatrixCreator
   void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim,number> *const a = 0,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -333,7 +339,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim,number> *const a = 0,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
 
@@ -348,6 +354,9 @@ namespace MatrixCreator
    *
    * @arg @p weight: an optional weight for the computation of the mass
    * matrix. If no weight is given, it is set to one.
+   * In case you want to specify @p component_mapping and use the default argument
+   * for the coefficient you have to specify the (unused) coefficient argument as
+   * <code>(const Function <spacedim,number> *const)nullptr</code>.
    *
    * @arg @p component_mapping: if the components in @p boundary_functions and
    * @p dof do not coincide, this vector allows them to be remapped. If the
@@ -382,7 +391,7 @@ namespace MatrixCreator
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,number> *const a = 0,
+                                    const Function<spacedim,number> *const a = nullptr,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -396,7 +405,7 @@ namespace MatrixCreator
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,number> *const a = 0,
+                                    const Function<spacedim,number> *const a = nullptr,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -409,13 +418,16 @@ namespace MatrixCreator
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,number> *const a = 0,
+                                    const Function<spacedim,number> *const a = nullptr,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
    * Assemble the Laplace matrix. If no coefficient is given (i.e., if the
    * pointer to a function object is zero as it is by default), the
    * coefficient is taken as being constant and equal to one.
+   * In case you want to specify @p constraints and use the default argument
+   * for the coefficient you have to specify the (unused) coefficient argument as
+   * <code>(const Function<spacedim> *const)nullptr</code>.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.
@@ -450,6 +462,9 @@ namespace MatrixCreator
   /**
    * Assemble the Laplace matrix and a right hand side vector. If no
    * coefficient is given, it is assumed to be constant one.
+   * In case you want to specify @p constraints and use the default argument
+   * for the coefficient you have to specify the (unused) coefficient argument as
+   * <code>(const Function<spacedim> *const)nullptr</code>.
    *
    * If the library is configured to use multithreading, this function works
    * in parallel.
