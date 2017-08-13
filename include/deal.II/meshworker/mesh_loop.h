@@ -42,11 +42,11 @@ namespace MeshWorker
    * work on adaptively refined faces
    * and parallel computation (work on faces to ghost neighbors for example).
    * The @p mesh_loop can be used to simplify operations on cells (for example
-   * assembly), on boundaries (Neumann type boundary conditions), or on faces
-   * (for example in discontinuous Galerkin methods).
+   * assembly), on boundaries (Neumann type boundary conditions), or on
+   * interior faces (for example in discontinuous Galerkin methods).
    *
    * For uniformly refined meshes, it would be relatively easy to use
-   * WorkStream::run() with a `cell_worker` that also loops over faces, and
+   * WorkStream::run() with a @p cell_worker that also loops over faces, and
    * takes care of assembling face terms depending on the current and neighbor
    * cell. All user codes that do these loops would then need to insert
    * manually the logic that identifies, for every face of the current cell,
@@ -61,15 +61,15 @@ namespace MeshWorker
    * This method externalises that logic (which is independent from user codes)
    * and separates the assembly of face terms (internal faces, boundary faces,
    * or faces between different subdomain ids on parallel computations) from
-   * the assembling of cells, allowing the user to specify two additional
-   * workers (a `cell_worker`, a `boundary_worker`, and a `face_worker`) that
-   * are called automatically in each `cell`, according to the specific
-   * AssembleFlags `flags` that are passed. The `cell_worker` is passed the
+   * the assembling on cells, allowing the user to specify two additional
+   * workers (a @p cell_worker, a @p boundary_worker, and a @p face_worker) that
+   * are called automatically in each @p cell, according to the specific
+   * AssembleFlags @p flags that are passed. The @p cell_worker is passed the
    * cell identifier, a ScratchData object, and a CopyData object, following
    * the same principles of WorkStream::run. Internally the function passes to
    * `boundary_worker`, in addition to the above, also a `face_no` parameter
    * that identifies the face on which the integration should be performed. The
-   * `face_worker` instead need to identify the current face unambiguously both on
+   * `face_worker` instead needs to identify the current face unambiguously both on
    * the cell and on the neighboring cell, and it is therefore called with six
    * arguments (three for each cell: the actual cell, the face index, and
    * the subface_index. If no subface integration is needed, then the
@@ -77,7 +77,7 @@ namespace MeshWorker
    * ScratchData and CopyData objects.
    *
    * If the flag AssembleFlags::assemble_own_cells is passed, then the default
-   * behaviour is to first loop over faces and do the work there, and then
+   * behavior is to first loop over faces and do the work there, and then
    * compute the actual work on the cell. It is possible to perform the
    * integration on the cells before working on faces, by adding the flag
    * AssembleFlags::cells_first.
@@ -103,6 +103,10 @@ namespace MeshWorker
    * If your data objects are large, or their constructors are expensive, it is
    * helpful to keep in mind that queue_length copies of the ScratchData object
    * and queue_length*chunk_size copies of the CopyData object are generated.
+   *
+   * @note More information about requirements on template types and meaning
+   * of @p queue_length and @p chunk_size can be found in the documentation of the
+   * WorkStream namespace and its members.
    *
    * @ingroup MeshWorker
    * @author Luca Heltai and Timo Heister, 2017
@@ -133,8 +137,7 @@ namespace MeshWorker
                  const unsigned int   queue_length = 2*MultithreadInfo::n_threads(),
                  const unsigned int   chunk_size = 8)
   {
-    Assert((!cell_worker)
-           || (flags & work_on_cells),
+    Assert((!cell_worker) == !(flags & work_on_cells),
            ExcMessage("If you specify a cell_worker, you need to set assemble_own_cells or assemble_ghost_cells."));
 
     Assert((flags & (assemble_own_interior_faces_once|assemble_own_interior_faces_both))
@@ -149,12 +152,10 @@ namespace MeshWorker
            (flags & (assemble_own_cells | assemble_ghost_cells)),
            ExcMessage("The option cells_first only makes sense if you assemble on cells."));
 
-    Assert((!face_worker)
-           || (flags & work_on_faces),
-           ExcMessage("If you specify a boundary_worker, assemble_boundary_faces needs to be set."));
+    Assert((!face_worker) == !(flags & work_on_faces),
+           ExcMessage("If you specify a face_worker, assemble_face_* needs to be set."));
 
-    Assert((!boundary_worker)
-           || (flags & assemble_boundary_faces),
+    Assert((!boundary_worker) == !(flags & assemble_boundary_faces),
            ExcMessage("If you specify a boundary_worker, assemble_boundary_faces needs to be set."));
 
 

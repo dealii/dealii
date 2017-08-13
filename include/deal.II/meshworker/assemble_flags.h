@@ -54,43 +54,45 @@ namespace MeshWorker
     assemble_ghost_cells = 0x0002,
     /**
      * Assemble on interior faces between two locally owned cells,
-     * visiting each face only once
+     * visiting each face only once.
      */
     assemble_own_interior_faces_once = 0x0004,
     /**
      * Assemble on interior faces between two locally owned cells,
-     * visiting each interior face twice
+     * visiting each interior face twice, once from each of the two
+     * adjacent cells.
      */
     assemble_own_interior_faces_both = 0x0008,
     /**
      * Assemble on faces between a locally owned cell and a ghost cell, making
      * sure that only one of the processes will assemble these faces (from the
-     * finer side or the process with the lower mpi rank)
+     * finer side or the process with the lower mpi rank).
      */
     assemble_ghost_faces_once = 0x0010,
     /**
-     * Assemble on faces between a locally owned cell and a ghost cell, both
-     * processes will assemble these faces. Note that these faces are never
+     * Assemble on faces between a locally owned cell and a ghost cell. Both
+     * processes will assemble these faces. Note that they are never
      * assembled from both sides on a single process.
      */
     assemble_ghost_faces_both = 0x0020,
     /**
-     * Assemble on boundary faces of the locally owned cells
+     * Assemble on boundary faces of the locally owned cells.
      */
     assemble_boundary_faces = 0x0040,
 
     /**
-     * Assemble cell integrals before face integrals.
+     * Assemble cell integrals before face integrals. If not specified, cells
+     * will be assembled after faces and boundaries.
      */
     cells_first = 0x0080,
 
     /**
-     * Combination of flags to determine if any work on cells is done
+     * Combination of flags to determine if any work on cells is done.
      */
     work_on_cells = assemble_own_cells | assemble_ghost_cells,
 
     /**
-     * Combination of flags to determine if any work is done on faces
+     * Combination of flags to determine if any work is done on faces.
      */
     work_on_faces = assemble_own_interior_faces_once
                     | assemble_own_interior_faces_both
@@ -99,14 +101,14 @@ namespace MeshWorker
 
     /**
      * Combination of flags to determine if any work is done on the boundary
-     * faces
+     * faces.
      */
     work_on_boundary = assemble_boundary_faces,
   };
 
 
   /**
-   * Output operator which outputs update flags as a set of or'd text values.
+   * Output operator which outputs assemble flags as a set of or'd text values.
    *
    * @ref AssembleFlags
    */
