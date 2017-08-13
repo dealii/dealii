@@ -18,10 +18,11 @@ KDTreeDistance<dim>::KDTreeDistance(const unsigned int &max_leaf_size,
 
 
 template<int dim>
-unsigned int KDTreeDistance<dim>::get_points_within_ball(const Point<dim> &center, const double &radius,
-                                                         std::vector<std::pair<unsigned int, double> > &matches,
-                                                         bool sorted) const
+std::vector<std::pair<unsigned int, double> > KDTreeDistance<dim>::get_points_within_ball(const Point<dim> &center,
+                                                                                          const double &radius,
+                                                                                          bool sorted) const
 {
+  std::vector<std::pair<unsigned int, double> > matches;
   Assert(adaptor, ExcNotInitialized());
   Assert(kdtree, ExcInternalError());
 
@@ -30,19 +31,24 @@ unsigned int KDTreeDistance<dim>::get_points_within_ball(const Point<dim> &cente
 
   nanoflann::SearchParams params;
   params.sorted = sorted;
-  return kdtree->radiusSearch(&center[0], radius, matches, params);
+  kdtree->radiusSearch(&center[0], radius, matches, params);
+  return matches;
 }
 
 template<int dim>
-void KDTreeDistance<dim>::get_closest_points(const Point<dim> &target,
-                                             std::vector<unsigned int> &indices,
-                                             std::vector<double> &distances) const
+std::vector<std::pair<unsigned int, double> > KDTreeDistance<dim>::get_closest_points(const Point<dim> &target,
+                                                                                      const unsigned int n_points) const
 {
   Assert(adaptor, ExcNotInitialized());
   Assert(kdtree, ExcInternalError());
-  AssertDimension(indices.size(), distances.size());
+  std::vector<unsigned int> indices(n_points);
+  std::vector<double> distances(n_points);
+  std::vector<std::pair<unsigned int, double> > matches(n_points);
 
-  kdtree->knnSearch(&target[0], indices.size(), &indices[0], &distances[0]);
+  kdtree->knnSearch(&target[0], n_points, &indices[0], &distances[0]);
+  for(unsigned int i=0; i<n_points; ++i)
+    matches[i] = std::make_pair(indices[i], distances[i]);
+  return matches;
 }
 
 template<int dim>

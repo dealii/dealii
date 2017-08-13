@@ -70,9 +70,9 @@ public:
 
 
   /**
-   * Adaptor class used internally by nanoflann. Class actually stores
-   * a reference to the vector of points, and generates some helper
-   * functions for nanoflann.
+   * Adaptor class used internally by nanoflann. This class stores a reference
+   * to the vector of points, and generates some helper functions for
+   * nanoflann.
    */
   struct PointCloudAdaptor
   {
@@ -187,14 +187,14 @@ public:
    *
    * @param[in] point: the target point
    * @param[in] radius: the radius of the ball
-   * @param[out] mathes: indices and distances of the matching points
    * @param[in] sorted: sort the output results in ascending order with respect to distances
+   * @param[out] matches:
    *
-   * @return number of points that are within the ball
+   * @return vector of indices and distances of the matching points
    */
-  unsigned int get_points_within_ball(const Point<dim> &target, const double &radius,
-                                      std::vector<std::pair<unsigned int, double> > &matches,
-                                      bool sorted=false) const;
+  std::vector<std::pair<unsigned int, double> > get_points_within_ball(const Point<dim> &target,
+                                                                       const double &radius,
+                                                                       bool sorted=false) const;
 
   /**
    * Fill two vectors with the indices and distances of the closest
@@ -204,12 +204,12 @@ public:
    * assertion is thrown if the vectors do not have the same size.
    *
    * @param[in] target: the target point
-   * @param[out] indices: indices of the matching points
-   * @param[out] distances: distances of the matching points
+   * @param[in] n_points: the number of requested points
+   *
+   * @return a vector of pairs of indices and distances of the matching points
    */
-  void get_closest_points(const Point<dim> &target,
-                          std::vector<unsigned int> &indices,
-                          std::vector<double> &distances) const;
+  std::vector<std::pair<unsigned int, double> >  get_closest_points(const Point<dim> &target,
+                                                                    const unsigned int n_points) const;
 
 private:
   /**
