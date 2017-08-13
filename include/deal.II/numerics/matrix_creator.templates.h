@@ -671,7 +671,7 @@ namespace MatrixCreator
                            const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const coefficient,
+                           const Function<spacedim,number> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
@@ -712,7 +712,7 @@ namespace MatrixCreator
   void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const coefficient,
+                           const Function<spacedim,number> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
     create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof,
@@ -728,7 +728,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number>      &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const coefficient,
+                           const Function<spacedim,number> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
@@ -770,7 +770,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number>      &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const coefficient,
+                           const Function<spacedim,number> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
     create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping,
@@ -785,7 +785,7 @@ namespace MatrixCreator
                            const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const coefficient,
+                           const Function<spacedim,number> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
@@ -822,7 +822,7 @@ namespace MatrixCreator
   void create_mass_matrix (const hp::DoFHandler<dim,spacedim> &dof,
                            const hp::QCollection<dim> &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const coefficient,
+                           const Function<spacedim,number> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
     create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
@@ -838,7 +838,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number>      &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const coefficient,
+                           const Function<spacedim,number> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
@@ -877,7 +877,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const coefficient,
+                           const Function<spacedim,number> *const coefficient,
                            const ConstraintMatrix   &constraints)
   {
     create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
@@ -1198,7 +1198,7 @@ namespace MatrixCreator
                                const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                Vector<number>            &rhs_vector,
                                std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                               const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const coefficient,
+                               const Function<spacedim,number> *const coefficient,
                                std::vector<unsigned int> component_mapping)
   {
     // what would that be in 1d? the
@@ -1597,7 +1597,7 @@ namespace MatrixCreator
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &rhs,
                                     Vector<number>            &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a,
+                                    const Function<spacedim,number> *const a,
                                     std::vector<unsigned int> component_mapping)
   {
     create_boundary_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
@@ -1615,7 +1615,7 @@ namespace MatrixCreator
                                const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                Vector<number>            &rhs_vector,
                                std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                               const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const coefficient,
+                               const Function<spacedim,number> *const coefficient,
                                std::vector<unsigned int> component_mapping)
   {
     // what would that be in 1d? the
@@ -1684,7 +1684,7 @@ namespace MatrixCreator
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &rhs,
                                     Vector<number>            &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a,
+                                    const Function<spacedim,number> *const a,
                                     std::vector<unsigned int> component_mapping)
   {
     create_boundary_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
@@ -1698,7 +1698,7 @@ namespace MatrixCreator
                               const DoFHandler<dim,spacedim>    &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<std::integral_constant<int, spacedim>::value> *const coefficient,
+                              const Function<spacedim> *const coefficient,
                               const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
@@ -1740,7 +1740,7 @@ namespace MatrixCreator
   void create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<std::integral_constant<int, spacedim>::value> *const coefficient,
+                              const Function<spacedim> *const coefficient,
                               const ConstraintMatrix &constraints)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping,
@@ -1756,7 +1756,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<std::integral_constant<int, spacedim>::value> *const coefficient,
+                              const Function<spacedim> *const coefficient,
                               const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
@@ -1800,7 +1800,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<std::integral_constant<int, spacedim>::value> *const coefficient,
+                              const Function<spacedim> *const coefficient,
                               const ConstraintMatrix &constraints)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
@@ -1814,7 +1814,7 @@ namespace MatrixCreator
                               const hp::DoFHandler<dim,spacedim>    &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<std::integral_constant<int, spacedim>::value> *const coefficient,
+                              const Function<spacedim> *const coefficient,
                               const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
@@ -1853,7 +1853,7 @@ namespace MatrixCreator
   void create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<std::integral_constant<int, spacedim>::value> *const coefficient,
+                              const Function<spacedim> *const coefficient,
                               const ConstraintMatrix &constraints)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
@@ -1869,7 +1869,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<std::integral_constant<int, spacedim>::value> *const coefficient,
+                              const Function<spacedim> *const coefficient,
                               const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
@@ -1910,7 +1910,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<std::integral_constant<int, spacedim>::value> *const coefficient,
+                              const Function<spacedim> *const coefficient,
                               const ConstraintMatrix &constraints)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,

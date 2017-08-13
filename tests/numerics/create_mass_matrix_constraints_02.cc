@@ -106,8 +106,9 @@ check ()
                       rhs_function, rhs_ref);
   constraints.condense(matrix_ref, rhs_ref);
 
+  const Function<dim> *const dummy = nullptr;
   MatrixTools::create_mass_matrix (mapping, dof, quadrature, matrix,
-                                   rhs_function, rhs, nullptr, constraints);
+                                   rhs_function, rhs, dummy, constraints);
 
   // compute reference: need to cancel constrained entries as these will in
   // general get different values

@@ -103,7 +103,7 @@ check ()
   constraints.condense(matrix_ref);
 
   MatrixTools::create_mass_matrix (mapping, dof, quadrature, matrix,
-                                   nullptr, constraints);
+                                   (const Function <dim> *const)nullptr, constraints);
 
   // compute reference: need to cancel constrained entries as these will in
   // general get different values
