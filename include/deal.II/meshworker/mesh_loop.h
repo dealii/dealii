@@ -158,9 +158,11 @@ namespace MeshWorker
     Assert((!boundary_worker) == !(flags & assemble_boundary_faces),
            ExcMessage("If you specify a boundary_worker, assemble_boundary_faces needs to be set."));
 
-
     auto cell_action = [&] (const CellIteratorType &cell, ScratchData &scratch, CopyData &copy)
     {
+      // First reset the CopyData class to the empty copy_data given by the user.
+      copy = copy_data;
+
       const bool ignore_subdomain = (cell->get_triangulation().locally_owned_subdomain()
                                      == numbers::invalid_subdomain_id);
 
