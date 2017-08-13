@@ -39,7 +39,7 @@
 #include <iomanip>
 #include <memory>
 
-#include <deal.II/base/sacado_product_type.h>
+#include <deal.II/differentiation/sacado_product_types.h>
 
 DEAL_II_NAMESPACE_OPEN
 

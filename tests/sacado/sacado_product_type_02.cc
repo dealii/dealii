@@ -19,7 +19,7 @@
 #include <typeinfo>
 
 #include <deal.II/base/tensor.h>
-#include <deal.II/base/sacado_product_type.h>
+#include <deal.II/differentiation/sacado_product_types.h>
 
 #include "../tests.h"
 

@@ -18,7 +18,7 @@
 
 
 #include <deal.II/base/symmetric_tensor.h>
-#include <deal.II/base/sacado_product_type.h>
+#include <deal.II/differentiation/sacado_product_types.h>
 
 #include "../tests.h"
 
@@ -30,16 +30,16 @@ int main()
 
 
   // check product with Tensor<2,dim>
-  Tensor<2,2,double> t;
-  SymmetricTensor<2,2,Sdouble> st;
+  Tensor<2,2,Sdouble> t;
+  SymmetricTensor<2,2,double> st;
   Sdouble a(2,0,7.0);
   Sdouble b(2,1,3.0);
 
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<2; ++j)
       {
-        t[i][j] = (1.+(i+1)*(j*2));
-        st[i][j] = 2.*a+i*j*b;
+        t[i][j] = 2.*a+i*j*b;
+        st[i][j] = (1.+(i+1)*(j*2));
       }
 
   deallog << scalar_product(t,st) << std::endl;
