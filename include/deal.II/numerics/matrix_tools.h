@@ -237,7 +237,7 @@ namespace MatrixCreator
                            const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -248,7 +248,7 @@ namespace MatrixCreator
   void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -274,7 +274,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -287,7 +287,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -298,7 +298,7 @@ namespace MatrixCreator
                            const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -308,7 +308,7 @@ namespace MatrixCreator
   void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -321,7 +321,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                           const Function<spacedim,number> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -333,7 +333,7 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                           const Function<spacedim,number> *const a = 0,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
 
@@ -367,7 +367,7 @@ namespace MatrixCreator
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const weight = nullptr,
+                                    const Function<spacedim,number> *const weight = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 
@@ -382,7 +382,7 @@ namespace MatrixCreator
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                                    const Function<spacedim,number> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -396,7 +396,7 @@ namespace MatrixCreator
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                                    const Function<spacedim,number> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -409,7 +409,7 @@ namespace MatrixCreator
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<std::integral_constant<int, spacedim>::value, typename identity<number>::type> *const a = nullptr,
+                                    const Function<spacedim,number> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -433,7 +433,7 @@ namespace MatrixCreator
                               const DoFHandler<dim,spacedim> &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<std::integral_constant<int, spacedim>::value> *const a = nullptr,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -444,7 +444,7 @@ namespace MatrixCreator
   void create_laplace_matrix (const DoFHandler<dim,spacedim> &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<std::integral_constant<int, spacedim>::value> *const a = nullptr,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -469,7 +469,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<std::integral_constant<int, spacedim>::value> *const a = nullptr,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -482,7 +482,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim> &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<std::integral_constant<int, spacedim>::value> *const a = nullptr,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -494,7 +494,7 @@ namespace MatrixCreator
                               const hp::DoFHandler<dim,spacedim> &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<std::integral_constant<int, spacedim>::value> *const a = nullptr,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -505,7 +505,7 @@ namespace MatrixCreator
   void create_laplace_matrix (const hp::DoFHandler<dim,spacedim> &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<std::integral_constant<int, spacedim>::value> *const a = nullptr,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -519,7 +519,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<std::integral_constant<int, spacedim>::value> *const a = nullptr,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -532,7 +532,7 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<std::integral_constant<int, spacedim>::value> *const a = nullptr,
+                              const Function<spacedim> *const a = nullptr,
                               const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
