@@ -34,7 +34,7 @@ namespace MeshWorker
    * elements need to be assembled.
    *
    * You can select more than one flag by concatenation using the bitwise or
-   * `operator|(AssembleFlags,AssembleFlags)`.
+   * <code>operator|(AssembleFlags,AssembleFlags)</code>.
    *
    * @author Luca Heltai, 2017.
    */

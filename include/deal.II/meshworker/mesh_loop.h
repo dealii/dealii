@@ -67,9 +67,9 @@ namespace MeshWorker
    * AssembleFlags @p flags that are passed. The @p cell_worker is passed the
    * cell identifier, a ScratchData object, and a CopyData object, following
    * the same principles of WorkStream::run. Internally the function passes to
-   * `boundary_worker`, in addition to the above, also a `face_no` parameter
+   * @p boundary_worker, in addition to the above, also a @p face_no parameter
    * that identifies the face on which the integration should be performed. The
-   * `face_worker` instead needs to identify the current face unambiguously both on
+   * @p face_worker instead needs to identify the current face unambiguously both on
    * the cell and on the neighboring cell, and it is therefore called with six
    * arguments (three for each cell: the actual cell, the face index, and
    * the subface_index. If no subface integration is needed, then the
@@ -83,12 +83,12 @@ namespace MeshWorker
    * AssembleFlags::cells_first.
    *
    * If the flag AssembleFlags::assemble_own_interior_faces_once is specified,
-   * then each interior face is visited only once, and the `face_worker` is
+   * then each interior face is visited only once, and the @p face_worker is
    * assumed to integrate all face terms at once (and add contributions to both
    * sides of the face in a discontinuous Galerkin setting).
    *
    * This method is equivalent to the WorkStream::run() method when
-   * AssembleFlags contains only `assemble_own_cells`, and can be used as a
+   * AssembleFlags contains only @p assemble_own_cells, and can be used as a
    * drop-in replacement for that method.
    *
    * The two data types ScratchData and CopyData need to have a working copy
