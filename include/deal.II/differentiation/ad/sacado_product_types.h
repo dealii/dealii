@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_differentiation_sacado_product_types_h
-#define dealii_differentiation_sacado_product_types_h
+#ifndef dealii_differentiation_ad_sacado_product_types_h
+#define dealii_differentiation_ad_sacado_product_types_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor.h>
