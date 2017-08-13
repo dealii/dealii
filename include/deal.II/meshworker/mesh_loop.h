@@ -37,9 +37,13 @@ template <typename> class TriaActiveIterator;
 namespace MeshWorker
 {
   /**
-   * This function extends the WorkStream concept by externalising most of the
-   * work that is required to assemble face terms (for example in discontinuous
-   * Galerkin methods) or boundary terms.
+   * This function extends the WorkStream concept to work on meshes
+   * (cells and/or faces) and handles the complicated logic for
+   * work on adaptively refined faces
+   * and parallel computation (work on faces to ghost neighbors for example).
+   * The @p mesh_loop can be used to simplify operations on cells (for example
+   * assembly), on boundaries (Neumann type boundary conditions), or on faces
+   * (for example in discontinuous Galerkin methods).
    *
    * For uniformly refined meshes, it would be relatively easy to use
    * WorkStream::run() with a `cell_worker` that also loops over faces, and
@@ -63,10 +67,10 @@ namespace MeshWorker
    * AssembleFlags `flags` that are passed. The `cell_worker` is passed the
    * cell identifier, a ScratchData object, and a CopyData object, following
    * the same principles of WorkStream::run. Internally the function passes to
-   * `boundary_worker`, in addition to the above, also a `face_no` paramater
+   * `boundary_worker`, in addition to the above, also a `face_no` parameter
    * that identifies the face on which the integration should be performed. The
-   * `face_worker` instead need to identify univoquely the current face both on
-   * the cell, and on the neighboring cell, and it is therefore called with six
+   * `face_worker` instead need to identify the current face unambiguously both on
+   * the cell and on the neighboring cell, and it is therefore called with six
    * arguments (three for each cell: the actual cell, the face index, and
    * the subface_index. If no subface integration is needed, then the
    * subface_index is numbers::invalid_unsigned_int) in addition to the usual
@@ -74,14 +78,14 @@ namespace MeshWorker
    *
    * If the flag AssembleFlags::assemble_own_cells is passed, then the default
    * behaviour is to first loop over faces and do the work there, and then
-   * compute the actual work on the cell.
-   *
-   * It is possible to perform the integration on the cells before working on
-   * faces, by adding the flag AssembleFlags::assemble_cells_first.
+   * compute the actual work on the cell. It is possible to perform the
+   * integration on the cells before working on faces, by adding the flag
+   * AssembleFlags::cells_first.
    *
    * If the flag AssembleFlags::assemble_own_interior_faces_once is specified,
    * then each interior face is visited only once, and the `face_worker` is
-   * assumed to integrate all face terms at once.
+   * assumed to integrate all face terms at once (and add contributions to both
+   * sides of the face in a discontinuous Galerkin setting).
    *
    * This method is equivalent to the WorkStream::run() method when
    * AssembleFlags contains only `assemble_own_cells`, and can be used as a
@@ -101,7 +105,7 @@ namespace MeshWorker
    * and queue_length*chunk_size copies of the CopyData object are generated.
    *
    * @ingroup MeshWorker
-   * @author Luca Heltai, 2017
+   * @author Luca Heltai and Timo Heister, 2017
    */
   template <class CellIteratorType,
             class ScratchData, class CopyData>
