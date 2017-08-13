@@ -55,7 +55,6 @@ LogStream::LogStream()
   diff_utime(false),
   last_time (0.),
   print_thread_id(false),
-  old_cerr(nullptr),
   at_newline(true)
 {
   get_prefixes().push("DEAL:");
@@ -100,9 +99,6 @@ LogStream::~LogStream()
           *this << std::endl;
       }
   }
-
-  if (old_cerr)
-    std::cerr.rdbuf(old_cerr);
 }
 
 
@@ -211,21 +207,6 @@ void LogStream::detach ()
 {
   Threads::Mutex::ScopedLock lock(log_lock);
   file = nullptr;
-}
-
-
-void LogStream::log_cerr ()
-{
-  Threads::Mutex::ScopedLock lock(log_lock);
-  if (old_cerr == nullptr)
-    {
-      old_cerr = std::cerr.rdbuf(file->rdbuf());
-    }
-  else
-    {
-      std::cerr.rdbuf(old_cerr);
-      old_cerr = nullptr;
-    }
 }
 
 

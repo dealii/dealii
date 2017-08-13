@@ -61,41 +61,38 @@ void polynomial_arithmetic ()
   c2[2] = -1.3;
   Polynomial<double> p2(c2);
   Monomial<double> p3(5);
-  std::cerr << "P1" << std::endl;
-  p1.print(std::cerr);
-  std::cerr << "P2" << std::endl;
-  p2.print(std::cerr);
+  deallog << "P1" << std::endl;
+  p1.print(deallog.get_file_stream());
+  deallog << "P2" << std::endl;
+  p2.print(deallog.get_file_stream());
   p1 += p2;
-  std::cerr << "P1+P2" << std::endl;
-  p1.print(std::cerr);
+  deallog << "P1+P2" << std::endl;
+  p1.print(deallog.get_file_stream());
   p2 += p1;
-  std::cerr << "P1+2P2" << std::endl;
-  p2.print(std::cerr);
-  std::cerr << "P1+P2+x^5" << std::endl;
+  deallog << "P1+2P2" << std::endl;
+  p2.print(deallog.get_file_stream());
+  deallog << "P1+P2+x^5" << std::endl;
   p1 += p3;
-  p1.print(std::cerr);
+  p1.print(deallog.get_file_stream());
   p1 *= 2.;
-  std::cerr << "*2" << std::endl;
-  p1.print(std::cerr);
-  std::cerr << "*P2" << std::endl;
+  deallog << "*2" << std::endl;
+  p1.print(deallog.get_file_stream());
+  deallog << "*P2" << std::endl;
   p2 *= p1;
-  p2.print(std::cerr);
+  p2.print(deallog.get_file_stream());
 
   for (unsigned int i=0; i<7; ++i)
     {
-      std::cerr << "derive" << std::endl;
+      deallog << "derive" << std::endl;
       p1 = p1.derivative();
-      p1.print(std::cerr);
+      p1.print(deallog.get_file_stream());
     }
 }
 
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(3);
-  deallog.attach(logfile);
-  deallog.log_cerr();
+  initlog();
 
   polynomial_arithmetic();
 
