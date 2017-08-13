@@ -197,6 +197,12 @@ namespace parallel
                                   std::function<DataType (const typename MeshType::active_cell_iterator &)> pack,
                                   std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> unpack)
     {
+#ifndef DEAL_II_WITH_MPI
+      (void)mesh;
+      (void)pack;
+      (void)unpack;
+      Assert(false, ExcMessage("parallel::GridTools::exchange_cell_data_to_ghosts() requires MPI."));
+#else
       constexpr int dim = MeshType::dimension;
       constexpr int spacedim = MeshType::space_dimension;
       auto tria =
@@ -320,7 +326,7 @@ namespace parallel
               unpack(cell, *data);
             }
         }
-
+#endif // DEAL_II_WITH_MPI
     }
 
   }
