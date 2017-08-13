@@ -1,0 +1,165 @@
+
+DEAL:0::OWN CELLS:
+DEAL:0::
+DEAL:0::Cell worker on : 2.0 ghost? 0
+DEAL:0::Cell worker on : 2.1 ghost? 0
+DEAL:0::Cell worker on : 2.2 ghost? 0
+DEAL:0::Cell worker on : 2.3 ghost? 0
+DEAL:0::n_cells: 4 n_own_cells: 4 n_ghost_cells: 0
+
+DEAL:1::OWN CELLS:
+DEAL:1::
+DEAL:1::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+
+DEAL:2::OWN CELLS:
+DEAL:2::
+DEAL:2::Cell worker on : 1.1 ghost? 0
+DEAL:2::Cell worker on : 1.2 ghost? 0
+DEAL:2::Cell worker on : 1.3 ghost? 0
+DEAL:2::n_cells: 3 n_own_cells: 3 n_ghost_cells: 0
+
+DEAL:0::GHOST and OWN CELLS
+DEAL:0::
+DEAL:0::Cell worker on : 1.1 ghost? 1
+DEAL:0::Cell worker on : 1.2 ghost? 1
+DEAL:0::Cell worker on : 1.3 ghost? 1
+DEAL:0::Cell worker on : 2.0 ghost? 0
+DEAL:0::Cell worker on : 2.1 ghost? 0
+DEAL:0::Cell worker on : 2.2 ghost? 0
+DEAL:0::Cell worker on : 2.3 ghost? 0
+DEAL:0::n_cells: 7 n_own_cells: 4 n_ghost_cells: 3
+
+DEAL:1::GHOST and OWN CELLS
+DEAL:1::
+DEAL:1::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+
+DEAL:2::GHOST and OWN CELLS
+DEAL:2::
+DEAL:2::Cell worker on : 1.1 ghost? 0
+DEAL:2::Cell worker on : 1.2 ghost? 0
+DEAL:2::Cell worker on : 1.3 ghost? 0
+DEAL:2::Cell worker on : 2.1 ghost? 1
+DEAL:2::Cell worker on : 2.2 ghost? 1
+DEAL:2::Cell worker on : 2.3 ghost? 1
+DEAL:2::n_cells: 6 n_own_cells: 3 n_ghost_cells: 3
+
+DEAL:0::GHOST CELLS:
+DEAL:0::
+DEAL:0::Cell worker on : 1.1 ghost? 1
+DEAL:0::Cell worker on : 1.2 ghost? 1
+DEAL:0::Cell worker on : 1.3 ghost? 1
+DEAL:0::n_cells: 3 n_own_cells: 0 n_ghost_cells: 3
+
+DEAL:1::GHOST CELLS:
+DEAL:1::
+DEAL:1::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+
+DEAL:2::GHOST CELLS:
+DEAL:2::
+DEAL:2::Cell worker on : 2.1 ghost? 1
+DEAL:2::Cell worker on : 2.2 ghost? 1
+DEAL:2::Cell worker on : 2.3 ghost? 1
+DEAL:2::n_cells: 3 n_own_cells: 0 n_ghost_cells: 3
+
+DEAL:0::CELLS and FACES
+DEAL:0::
+DEAL:0::Face worker on : 2.0, Neighbor cell : 2.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295, cell->is_ghost(): 0, neighbor->is_ghost(): 0
+DEAL:0::Face worker on : 2.0, Neighbor cell : 2.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295, cell->is_ghost(): 0, neighbor->is_ghost(): 0
+DEAL:0::Cell worker on : 2.0 ghost? 0
+DEAL:0::Face worker on : 2.1, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 0, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Face worker on : 2.1, Neighbor cell : 2.3, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295, cell->is_ghost(): 0, neighbor->is_ghost(): 0
+DEAL:0::Cell worker on : 2.1 ghost? 0
+DEAL:0::Face worker on : 2.2, Neighbor cell : 2.3, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295, cell->is_ghost(): 0, neighbor->is_ghost(): 0
+DEAL:0::Face worker on : 2.2, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 0, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Cell worker on : 2.2 ghost? 0
+DEAL:0::Face worker on : 2.3, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 1, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Face worker on : 2.3, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 1, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Cell worker on : 2.3 ghost? 0
+DEAL:0::n_cells: 4 n_own_cells: 4 n_ghost_cells: 0
+
+DEAL:1::CELLS and FACES
+DEAL:1::
+DEAL:1::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+
+DEAL:2::CELLS and FACES
+DEAL:2::
+DEAL:2::Face worker on : 1.1, Neighbor cell : 1.3, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 4294967295, cell->is_ghost(): 0, neighbor->is_ghost(): 0
+DEAL:2::Cell worker on : 1.1 ghost? 0
+DEAL:2::Face worker on : 1.2, Neighbor cell : 1.3, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 4294967295, cell->is_ghost(): 0, neighbor->is_ghost(): 0
+DEAL:2::Cell worker on : 1.2 ghost? 0
+DEAL:2::Cell worker on : 1.3 ghost? 0
+DEAL:2::n_cells: 3 n_own_cells: 3 n_ghost_cells: 0
+
+DEAL:0::OWN CELLS AND GHOST FACES ONCE
+DEAL:0::
+DEAL:0::Cell worker on : 2.0 ghost? 0
+DEAL:0::Face worker on : 2.1, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 0, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Cell worker on : 2.1 ghost? 0
+DEAL:0::Face worker on : 2.2, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 0, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Cell worker on : 2.2 ghost? 0
+DEAL:0::Face worker on : 2.3, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 1, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Face worker on : 2.3, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 1, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Cell worker on : 2.3 ghost? 0
+DEAL:0::n_cells: 4 n_own_cells: 4 n_ghost_cells: 0
+
+DEAL:1::OWN CELLS AND GHOST FACES ONCE
+DEAL:1::
+DEAL:1::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+
+DEAL:2::OWN CELLS AND GHOST FACES ONCE
+DEAL:2::
+DEAL:2::Cell worker on : 1.1 ghost? 0
+DEAL:2::Cell worker on : 1.2 ghost? 0
+DEAL:2::Cell worker on : 1.3 ghost? 0
+DEAL:2::n_cells: 3 n_own_cells: 3 n_ghost_cells: 0
+
+DEAL:0::GHOST FACES BOTH
+DEAL:0::
+DEAL:0::Face worker on : 2.1, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 0, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Face worker on : 2.2, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 0, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Face worker on : 2.3, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 1, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::Face worker on : 2.3, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 1, cell->is_ghost(): 0, neighbor->is_ghost(): 1
+DEAL:0::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+DEAL:1::GHOST FACES BOTH
+DEAL:1::
+DEAL:1::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+
+DEAL:2::GHOST FACES BOTH
+DEAL:2::
+DEAL:2::Face worker on : 2.1, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 0, cell->is_ghost(): 1, neighbor->is_ghost(): 0
+DEAL:2::Face worker on : 2.2, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 0, cell->is_ghost(): 1, neighbor->is_ghost(): 0
+DEAL:2::Face worker on : 2.3, Neighbor cell : 1.1, Face : 1, Neighbor Face : 0, Subface: 4294967295, Neighbor Subface: 1, cell->is_ghost(): 1, neighbor->is_ghost(): 0
+DEAL:2::Face worker on : 2.3, Neighbor cell : 1.2, Face : 3, Neighbor Face : 2, Subface: 4294967295, Neighbor Subface: 1, cell->is_ghost(): 1, neighbor->is_ghost(): 0
+DEAL:2::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+DEAL:0::BOUNDARY FACES
+DEAL:0::
+DEAL:0::Boundary worker on : 2.0, Face : 0
+DEAL:0::Boundary worker on : 2.0, Face : 2
+DEAL:0::Boundary worker on : 2.1, Face : 2
+DEAL:0::Boundary worker on : 2.2, Face : 0
+DEAL:0::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+DEAL:1::BOUNDARY FACES
+DEAL:1::
+DEAL:1::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+
+DEAL:2::BOUNDARY FACES
+DEAL:2::
+DEAL:2::Boundary worker on : 1.1, Face : 1
+DEAL:2::Boundary worker on : 1.1, Face : 2
+DEAL:2::Boundary worker on : 1.2, Face : 0
+DEAL:2::Boundary worker on : 1.2, Face : 3
+DEAL:2::Boundary worker on : 1.3, Face : 1
+DEAL:2::Boundary worker on : 1.3, Face : 3
+DEAL:2::n_cells: 0 n_own_cells: 0 n_ghost_cells: 0
+
+DEAL::OK

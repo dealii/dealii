@@ -377,11 +377,21 @@ struct MPILogInitAll
   {
 #ifdef DEAL_II_WITH_MPI
     unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-    deallogname = "output";
-    if (myid != 0)
-      deallogname = deallogname + Utilities::int_to_string(myid);
-    deallogfile.open(deallogname.c_str());
-    deallog.attach(deallogfile);
+    if (myid == 0)
+      {
+        if (!deallog.has_file())
+          {
+            deallogfile.open("output");
+            deallog.attach(deallogfile);
+          }
+      }
+    else
+      {
+        deallogname = "output" + Utilities::int_to_string(myid);
+        deallogfile.open(deallogname.c_str());
+        deallog.attach(deallogfile);
+      }
+
     deallog.depth_console(console?10:0);
 
     deallog.push(Utilities::int_to_string(myid));
@@ -418,19 +428,11 @@ struct MPILogInitAll
         for (unsigned int i=1; i<nproc; ++i)
           {
             std::string filename = "output" + Utilities::int_to_string(i);
-            std::ifstream in(filename.c_str());
-            Assert (in, ExcIO());
-
-            while (in)
-              {
-                std::string s;
-                std::getline(in, s);
-                deallog.get_file_stream() << s << "\n";
-              }
-            in.close();
-            std::remove (filename.c_str());
+            cat_file(filename.c_str());
           }
       }
+    MPI_Barrier(MPI_COMM_WORLD);
+
 #else
     // can't use this function if not using MPI
     Assert (false, ExcInternalError());
