@@ -28,7 +28,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   // Define some constants that will be used by the function parser
   std::map<std::string, double> constants;

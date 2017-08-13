@@ -79,7 +79,6 @@ void check (const char *p)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   check (SOURCE_DIR "/prm/multiple_parameter_loop_02.prm");
 

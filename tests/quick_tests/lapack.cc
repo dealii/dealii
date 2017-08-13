@@ -100,7 +100,6 @@ int main()
   std::ofstream logfile(logname.c_str());
   logfile.precision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   test_rect(3,4,rect);
   test_rect(4,3,rect);

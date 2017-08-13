@@ -327,7 +327,6 @@ int main ()
   deallog << std::setprecision (3);
 
   {
-    deallog.threshold_double(1.e-11);
     deallog.push("2d");
     test<2,1,double>();
     test<2,2,double>();
@@ -341,7 +340,6 @@ int main ()
 
   {
     deallog << std::endl << "Test with floats" << std::endl << std::endl;
-    deallog.threshold_double(1.e-7);
     deallog.push("2d");
     test<2,1,float>();
     deallog.pop();

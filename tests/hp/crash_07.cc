@@ -49,7 +49,6 @@ int main ()
   logfile.precision (3);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
 
   std::vector<Point<2> > points_glob;

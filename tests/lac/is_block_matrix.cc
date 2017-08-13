@@ -34,7 +34,6 @@ void test ()
   deallog << std::fixed;
   deallog << std::setprecision(2);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   deallog << IsBlockMatrix<SparseMatrix<double> >::value << ' '
           << IsBlockMatrix<SparseMatrix<float> >::value << ' '

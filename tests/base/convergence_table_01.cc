@@ -28,7 +28,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   ConvergenceTable table;
   ConvergenceTable table_2;

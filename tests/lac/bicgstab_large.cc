@@ -29,7 +29,6 @@ int main()
   std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   SparsityPattern sparsity_pattern(4,4);
   sparsity_pattern.compress();

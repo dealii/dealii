@@ -207,7 +207,6 @@ int main()
   std::ofstream logfile ("output");
   deallog << std::setprecision (PRECISION);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   test<2>();
   test<3>();

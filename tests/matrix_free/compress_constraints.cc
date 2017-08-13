@@ -92,7 +92,6 @@ int main ()
   deallog << std::setprecision (3);
 
   {
-    deallog.threshold_double(5.e-11);
     deallog.push("2d");
     test<2>();
     deallog.pop();

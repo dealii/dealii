@@ -341,7 +341,6 @@ void TestCases<dim>::run (const unsigned int test_case)
 int main ()
 {
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   for (unsigned int test_case=1; test_case<=2; ++test_case)
     {

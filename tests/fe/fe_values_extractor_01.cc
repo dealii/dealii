@@ -30,7 +30,6 @@ int main()
   deallog << std::setprecision (2);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-8);
 
   {
     std::vector<FEValuesExtractors::Scalar> x;

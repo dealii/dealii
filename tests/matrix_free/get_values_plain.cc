@@ -88,7 +88,6 @@ public:
     data.cell_loop (&MatrixFreeTest<dim,fe_degree,n_q_points_1d,Number>::operator(),
                     this, dst_dummy, src);
 
-    deallog.threshold_double(1e-10);
     deallog << "Error read_dof_values vs read_dof_values_plain: "
             << error/total << std::endl << std::endl;
   };

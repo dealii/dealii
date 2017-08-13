@@ -51,7 +51,6 @@ std::pair<double,double> test ()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   // create 4 threads, run the test function on them
   Threads::Thread<std::pair<double,double> > tg[4];

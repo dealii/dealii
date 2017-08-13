@@ -48,7 +48,6 @@ using namespace dealii;
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Triangulation<2> triangulation(Triangulation<2>::none);
   GridGenerator::hyper_cube (triangulation);

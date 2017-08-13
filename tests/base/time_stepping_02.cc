@@ -64,7 +64,6 @@ void test(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > he(TimeStepping::HEUN_EULER);
   test(he,f,my);

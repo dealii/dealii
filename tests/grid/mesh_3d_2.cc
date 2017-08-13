@@ -36,7 +36,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Triangulation<3> coarse_grid;
   create_two_cubes (coarse_grid);

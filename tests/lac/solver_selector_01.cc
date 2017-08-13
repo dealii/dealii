@@ -70,7 +70,6 @@ int main()
 //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   unsigned int size=37;
   unsigned int dim = (size-1)*(size-1);

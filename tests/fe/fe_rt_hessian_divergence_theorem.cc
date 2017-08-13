@@ -157,7 +157,6 @@ int main()
   deallog << std::setprecision (3);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-7);
 
   test_hyper_cube<2>(1e-6);
   test_hyper_cube<3>(1e-6);

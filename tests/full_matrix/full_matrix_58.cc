@@ -26,7 +26,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   const unsigned int N = 4;
   FullMatrix<double> f(N,N);

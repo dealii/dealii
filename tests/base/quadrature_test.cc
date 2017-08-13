@@ -190,7 +190,6 @@ check_faces (const std::vector<Quadrature<dim-1>*>& quadratures, const bool sub)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   std::vector<Quadrature<1> *> q1;
   std::vector<Quadrature<2> *> q2;

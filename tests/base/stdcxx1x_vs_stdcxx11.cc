@@ -29,7 +29,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   std_cxx1x::shared_ptr<int> p;
   deallog << "OK" << std::endl;

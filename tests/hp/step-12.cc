@@ -857,7 +857,6 @@ int main ()
       logfile.precision(2);
 
       deallog.attach(logfile);
-      deallog.threshold_double(1.e-10);
 
       DGMethod<2> dgmethod;
       dgmethod.run ();

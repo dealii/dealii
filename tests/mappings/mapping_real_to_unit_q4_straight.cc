@@ -114,7 +114,6 @@ main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
 
   test_real_to_unit_cell<1,1>();

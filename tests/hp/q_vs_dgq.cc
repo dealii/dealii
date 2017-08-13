@@ -100,7 +100,6 @@ int main ()
   logfile.precision(2);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   Step27::MixedFECollection<1>().run();
   Step27::MixedFECollection<2>().run();

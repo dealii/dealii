@@ -38,7 +38,6 @@ int main()
   logfile.precision (3);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   // Create triangulation
   Triangulation<2> tri;

@@ -60,7 +60,6 @@ int main ()
 {
   initlog();
 
-  deallog.threshold_double(1.e-10);
 
   Test gen;
   // For some of the finite element types, their

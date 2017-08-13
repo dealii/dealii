@@ -130,7 +130,6 @@ int main()
   deallog << std::setprecision (4);
   logfile << std::setprecision (4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   transfer<2>(logfile);
   transfer<3>(logfile);

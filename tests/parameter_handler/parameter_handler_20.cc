@@ -51,7 +51,6 @@ void check (const char *content)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   check ("subsection bar\nend  #comment is okay");
   check ("subsection bar\nend  ");

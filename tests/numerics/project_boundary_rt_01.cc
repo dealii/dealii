@@ -176,7 +176,6 @@ int main()
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-12);
 
   FE_RaviartThomasNodal<2> rt21(1);
   test_hyper_cube(rt21);

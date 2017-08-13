@@ -58,7 +58,6 @@ main()
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   for (unsigned int degree=0; degree<4; ++degree)
     test<2>(degree);

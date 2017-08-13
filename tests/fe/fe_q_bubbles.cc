@@ -320,7 +320,6 @@ int main ()
 {
   initlog();
   deallog.depth_file (1);
-  deallog.threshold_double(1.e-11);
   for (unsigned int degree = 1; degree <=3; ++degree)
     {
 //     {

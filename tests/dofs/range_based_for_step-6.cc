@@ -347,7 +347,6 @@ int main ()
   deallog << std::setprecision (3);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-7);
 
   Step6<2> laplace_problem_2d;
   laplace_problem_2d.run ();

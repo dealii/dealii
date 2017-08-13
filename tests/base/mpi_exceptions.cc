@@ -29,7 +29,6 @@ int main (int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   initlog();
-  deallog.threshold_double(1.e-10);
 
   std::vector<int> mpi_error_codes;
   mpi_error_codes.push_back(MPI_ERR_BUFFER);

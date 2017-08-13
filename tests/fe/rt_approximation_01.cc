@@ -435,7 +435,6 @@ int main ()
   logfile << std::setprecision(PRECISION);
   logfile << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   Triangulation<2> tria_test;
   DoFHandler<2> *dof_handler,

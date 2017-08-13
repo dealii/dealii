@@ -134,7 +134,6 @@ int main()
   deallog << std::setprecision (2);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-7);
 
   test_hyper_sphere<2>();
   test_hyper_sphere<3>();

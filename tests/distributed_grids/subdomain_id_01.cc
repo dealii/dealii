@@ -63,7 +63,6 @@ int main (int argc, char *argv[])
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Triangulation<2> tria;
   parallel::distributed::Triangulation<2> tria2(MPI_COMM_WORLD);

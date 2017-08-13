@@ -39,7 +39,6 @@ void check()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   check<double,double,double>();
   deallog << ProductType<double,double>::type(2.345)*ProductType<double,double>::type(3.456)

@@ -25,7 +25,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   FEEvaluationAccess<1,1,double> *test; // didn't compile before
   deallog <<  "OK" << std::endl;

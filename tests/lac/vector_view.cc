@@ -43,7 +43,6 @@ int main()
   deallog << std::fixed;
   deallog << std::setprecision(2);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   Vector<double>  v1(N);
   fill(v1);

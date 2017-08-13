@@ -58,7 +58,6 @@ main()
   std::ofstream logfile(logname.c_str());
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   plot_FE_FaceQ_shape_functions<1>();
   plot_FE_FaceQ_shape_functions<2>();

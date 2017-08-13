@@ -175,7 +175,6 @@ int main ()
   logfile << std::setprecision(16);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   compute_pi_by_area<2> ();
   compute_pi_by_perimeter<2> ();

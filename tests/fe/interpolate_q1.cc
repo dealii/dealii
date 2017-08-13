@@ -77,7 +77,6 @@ int main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);
-  deallog.threshold_double(2.e-15);
 
   Q1WedgeFunction<1,1> w1;
   check(w1,1);

@@ -277,7 +277,6 @@ test()
 int main(int /*argc*/, char ** /*argv*/)
 {
   initlog();
-  deallog.test_mode();
   deallog.push("2D");
   test<2,1>();
   test<2,2>();

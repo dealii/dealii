@@ -36,7 +36,6 @@ void burn (unsigned int n)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Timer t;
   burn(50);

@@ -93,7 +93,6 @@ void Test()
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Test<1>();
   Test<2>();

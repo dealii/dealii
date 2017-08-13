@@ -917,7 +917,6 @@ int main (int argc, char *argv[])
         {
           std::ofstream logfile("output");
           deallog.attach(logfile, false);
-          deallog.threshold_double(1.e-10);
           {
             StokesProblem<2> flow_problem(1);
             flow_problem.run ();

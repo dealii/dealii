@@ -38,7 +38,7 @@ void test_boundary(const FEValuesBase<dim> &fev)
   nitsche_tangential_matrix(M, fev, 17);
   {
     LogStream::Prefix pre("bdry");
-    M.print(deallog,12,8);
+    M.print(deallog,14,8);
   }
 
   Vector<double> u(n), v(n), w(n);
@@ -113,7 +113,6 @@ test(Triangulation<dim> &tr)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
   deallog.precision(8);
 
   Triangulation<2> tr2;

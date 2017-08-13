@@ -65,7 +65,6 @@ main()
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   for (unsigned int degree1=0; degree1<=4; ++degree1)
     for (unsigned int degree2=0; degree2<=4; ++degree2)

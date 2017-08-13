@@ -33,7 +33,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   for (unsigned int i = 0; i < 2; ++i)
     {

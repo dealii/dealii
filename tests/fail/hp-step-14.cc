@@ -2110,7 +2110,6 @@ int main ()
       logfile.precision(2);
 
       deallog.attach(logfile);
-      deallog.threshold_double(1.e-10);
 
       const unsigned int dim = 2;
       Framework<dim>::ProblemDescription descriptor;

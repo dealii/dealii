@@ -201,7 +201,6 @@ int main ()
   std::ofstream logfile("output");
   dealii::deallog.attach(logfile,/*do not print job id*/false);
   dealii::deallog.depth_console(0);
-  dealii::deallog.threshold_double(1e-8);
 
   {
     const unsigned int dim = 2;

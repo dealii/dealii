@@ -137,7 +137,6 @@ main()
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   MySimulator<1>(1);
   MySimulator<2>(1);

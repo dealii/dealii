@@ -56,7 +56,6 @@ public:
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
   deallog << std::setprecision (2);
   deallog << std::fixed;
 

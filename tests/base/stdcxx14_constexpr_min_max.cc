@@ -31,7 +31,6 @@ constexpr bool comp (const int &a, const int &b)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   constexpr int max_1 = std_cxx14::max(0,1);
   deallog << max_1 << std::endl;

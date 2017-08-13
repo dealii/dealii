@@ -35,7 +35,6 @@ main ()
   deallog << std::fixed;
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
   Testing::srand(3391466);
 
   FullMatrix<double> A(3,3,entries_A);

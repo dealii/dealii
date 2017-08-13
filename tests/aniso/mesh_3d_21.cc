@@ -179,7 +179,6 @@ void check2 (Triangulation<3> &orig_tria)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   {
     Triangulation<3> coarse_grid(Triangulation<3>::allow_anisotropic_smoothing);

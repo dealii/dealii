@@ -31,7 +31,6 @@ int main (int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   initlog();
-  deallog.threshold_double(1.e-10);
 
   std::vector<int> petsc_error_codes;
   petsc_error_codes.push_back(PETSC_ERR_MIN_VALUE);

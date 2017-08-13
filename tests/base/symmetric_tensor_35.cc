@@ -69,7 +69,6 @@ int main ()
   std::ofstream logfile("output");
   deallog << std::setprecision(5);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   deallog << "Symmetric Tensor dim 1" << std::endl;
   SymmetricTensor<2,1> t1;

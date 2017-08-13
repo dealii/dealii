@@ -78,7 +78,6 @@ int main()
   std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   check1<1> ();
   check1<2> ();

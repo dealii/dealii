@@ -28,7 +28,6 @@ int main()
   deallog << std::fixed;
   deallog << std::setprecision(0);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   const unsigned int N=20;
   FullMatrix<double> m (N,N);

@@ -54,7 +54,6 @@ void test2d (const VectorTools::NormType norm)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   deallog << "L2_norm" << std::endl;
   test2d(VectorTools::L2_norm);

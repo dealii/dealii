@@ -218,11 +218,9 @@ void test ()
   else
     return;
   deallog.push("double");
-  deallog.threshold_double(1.e-12);
   do_test<dim,double>(parallel_option);
   deallog.pop();
   deallog.push("float");
-  deallog.threshold_double(1.e-6);
   do_test<dim,float>(parallel_option);
   deallog.pop();
 }

@@ -60,7 +60,6 @@ int main()
 {
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   check<3> (.5, 1, 6);
   check<3> (.5, 1, 12);

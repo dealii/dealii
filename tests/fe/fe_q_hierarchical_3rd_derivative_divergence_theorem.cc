@@ -163,7 +163,6 @@ int main()
   deallog << std::setprecision (3);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-7);
 
   test_hyper_ball<2>(1e-6);
   test_hyper_ball<3>(1e-6);

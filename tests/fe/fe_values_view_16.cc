@@ -79,7 +79,7 @@ void test (const Triangulation<dim> &tr,
             {
               for (unsigned int e=0; e<dim; ++e)
                 for (unsigned int f=0; f<dim; ++f)
-                  deallog << selected_vector_values[q][d][e][f] << (e<dim-1 && f<dim-1 ? " " : "");
+                  deallog << selected_vector_values[q][d][e][f] << " ";
               deallog << std::endl;
               Assert ((selected_vector_values[q][d] - vector_values[q][c+d]).norm()
                       <= 1e-12 * selected_vector_values[q][d].norm(),
@@ -108,11 +108,7 @@ void test_hyper_sphere()
 
 int main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (3);
-
-  deallog.attach(logfile);
-  deallog.threshold_double(1.e-5);
+  initlog();
 
   test_hyper_sphere<2>();
   test_hyper_sphere<3>();

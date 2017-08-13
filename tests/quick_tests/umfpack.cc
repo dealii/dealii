@@ -112,7 +112,6 @@ void test (bool transpose = false)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-9);
 
   test<2> ();
   test<2> (/*transpose =*/ true);

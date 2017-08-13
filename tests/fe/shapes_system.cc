@@ -85,7 +85,6 @@ main()
   std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
   deallog << "FE_System<1>" << std::endl;
   plot_FE_System_shape_functions<1>();
   deallog << "FE_System<2>" << std::endl;

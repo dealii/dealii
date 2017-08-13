@@ -64,7 +64,6 @@ int main()
   std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   GrowingVectorMemory<> mem;
   SolverControl control(100, 1.e-3);

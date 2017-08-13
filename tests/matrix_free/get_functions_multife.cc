@@ -148,7 +148,6 @@ public:
       {
         if (types_are_equal<Number,double>::value == true)
           {
-            deallog.threshold_double (4e-14);
             deallog << "Error function values FE " << i << ": "
                     << errors[i*3+0]/total[i*3+0] << std::endl;
             deallog << "Error function gradients FE " << i << ": "
@@ -162,19 +161,16 @@ public:
             // some elements, it might also be zero
             // (linear elements on quadrilaterals), so
             // need to check for division by 0, too.
-            deallog.threshold_double (5e-7);
             const double output2 = total[i*3+2] == 0 ? 0. : errors[i*3+2] / total[i*3+2];
             deallog << "Error function Laplacians FE " << i << ": " << output2 << std::endl;
           }
         else if (types_are_equal<Number,float>::value == true)
           {
-            deallog.threshold_double (1e-6);
             deallog << "Error function values FE " << i << ": "
                     << errors[i*3+0]/total[i*3+0] << std::endl;
             deallog << "Error function gradients FE " << i << ": "
                     << errors[i*3+1]/total[i*3+1] << std::endl;
             const double output2 = total[i*3+2] == 0 ? 0. : errors[i*3+2] / total[i*3+2];
-            deallog.threshold_double (1e-6);
             deallog << "Error function Laplacians FE " << i << ": " << output2 << std::endl;
           }
       }
@@ -275,7 +271,6 @@ int main ()
   // need to set quite a loose tolerance because
   // FEValues approximates Hessians with finite
   // differences, which are not so accurate
-  deallog.threshold_double(2.e-5);
   deallog << std::setprecision (3);
 
   {

@@ -190,7 +190,6 @@ int main ()
   const int dim = 1;
 
   initlog();
-  deallog.threshold_double(1e-8);
 
   test_legendre_orthonormal(3);
   LegendreFunction<dim> function;

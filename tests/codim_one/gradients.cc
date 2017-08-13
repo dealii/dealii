@@ -196,7 +196,6 @@ int main ()
 {
   logfile.precision (4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-12);
 
   deallog<<"Test <1,2>"<<std::endl;
   test<1,2>(SOURCE_DIR "/grids/circle_4.inp");

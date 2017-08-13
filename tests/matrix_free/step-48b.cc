@@ -349,7 +349,6 @@ int main (int argc, char **argv)
 {
   initlog();
   deallog << std::setprecision(4);
-  deallog.threshold_double(1.e-10);
 
   Step48::SineGordonProblem<2> sg_problem;
   sg_problem.run ();

@@ -82,7 +82,6 @@ int main ()
 //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   check_value(  10,  -2, 1e-15);
   check_value(-0.1, 0.1, 1e-15);

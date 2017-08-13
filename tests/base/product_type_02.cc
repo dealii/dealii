@@ -38,7 +38,6 @@ void check()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   // check product of scalars
   check<Tensor<1,1,double>,double,Tensor<1,1,double> >();

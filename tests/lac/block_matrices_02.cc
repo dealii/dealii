@@ -59,7 +59,6 @@ void test ()
   deallog << std::fixed;
   deallog << std::setprecision(2);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   BlockSparsityPattern bsp(2,2);
   // set sizes

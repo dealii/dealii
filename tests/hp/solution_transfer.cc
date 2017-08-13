@@ -230,7 +230,6 @@ int main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   deallog << "   1D solution transfer" << std::endl;
   transfer<1>(logfile);

@@ -80,7 +80,6 @@ int main()
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   deallog.push("double");
   test<double>(0);
@@ -90,7 +89,6 @@ int main()
   test<double>(4);
   test<double>(5);
   deallog.pop();
-  deallog.threshold_double(1.e-4);
   deallog.push("float");
   test<float>(0);
   test<float>(1);

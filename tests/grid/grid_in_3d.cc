@@ -85,7 +85,6 @@ int main ()
 {
   deallog << std::setprecision (2);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   test (SOURCE_DIR "/grid_in_3d/1.in");
   test (SOURCE_DIR "/grid_in_3d/2.in");

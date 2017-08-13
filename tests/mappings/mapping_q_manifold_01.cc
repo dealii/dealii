@@ -195,7 +195,6 @@ int main ()
   deallog << std::setprecision (5);
   deallog.attach (std::cout);
   deallog.depth_console (0);
-  deallog.threshold_double (1e-12);
 
   const static unsigned dim = 3;
 

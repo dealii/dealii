@@ -65,7 +65,6 @@ int main()
 //  logfile.setf(std::ios::fixed);
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   for (unsigned int size=4; size <= 30; size *= 3)
     {

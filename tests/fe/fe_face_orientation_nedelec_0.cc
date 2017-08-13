@@ -152,7 +152,6 @@ void set_solution (Vector<double> &vector, const DoFHandler<3> &dof_handler, con
 int main ()
 {
   initlog();
-  deallog.threshold_double (1.e-10);
 
   Triangulation<3> tria_ref;
 

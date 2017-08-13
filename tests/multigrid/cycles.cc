@@ -89,7 +89,6 @@ void test_cycles(unsigned int minlevel, unsigned int maxlevel)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   test_cycles (0,4);
   test_cycles (2,5);

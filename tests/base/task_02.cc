@@ -34,7 +34,6 @@ int test ()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Threads::Task<int> t = Threads::new_task (test);
   AssertThrow (t.return_value() == 42, ExcInternalError());

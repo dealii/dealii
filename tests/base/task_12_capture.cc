@@ -44,7 +44,6 @@ int main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   int arg1=1;
   int arg2=2;

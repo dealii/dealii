@@ -158,7 +158,6 @@ int main ()
 {
   initlog();
   deallog.depth_file (1);
-  deallog.threshold_double(1.e-10);
   for (unsigned int i=1; i<=3; ++i)
     {
       {

@@ -28,7 +28,6 @@ int main()
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(2);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   IndexSet a(5);
   IndexSet b(3);

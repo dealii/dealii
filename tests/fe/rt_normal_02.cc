@@ -263,7 +263,6 @@ int main (int /*argc*/, char **/*argv*/)
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   Triangulation<2> tria_test;
   DoFHandler<2> *dof_handler;

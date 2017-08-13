@@ -102,7 +102,6 @@ int main ()
   logfile.precision(2);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   // this test depends on the right
   // starting value of the random

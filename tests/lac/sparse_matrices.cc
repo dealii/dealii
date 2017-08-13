@@ -279,7 +279,6 @@ int main()
   // Switch between regression test
   // and benchmark
 //#ifdef DEBUG
-  deallog.threshold_double(1.e-10);
   const unsigned int size = 5;
   const unsigned int row_length = 3;
   /*#else

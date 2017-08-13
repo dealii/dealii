@@ -37,7 +37,7 @@ void test_cell(const FEValuesBase<dim> &fev)
   cell_matrix(M,fev);
   {
     LogStream::Prefix pre("cell");
-    M.print(deallog,12,8);
+    M.print(deallog,14,8);
   }
 
   Vector<double> u(n), v(n), w(n);
@@ -75,7 +75,7 @@ void test_boundary(const FEValuesBase<dim> &fev)
   nitsche_matrix(M, fev, 17);
   {
     LogStream::Prefix pre("bdry");
-    M.print(deallog,12,8);
+    M.print(deallog,14,8);
   }
 
   Vector<double> u(n), v(n), w(n);
@@ -124,19 +124,19 @@ void test_face(const FEValuesBase<dim> &fev1,
 
   {
     LogStream::Prefix pre("M11");
-    M11.print(deallog,12,8);
+    M11.print(deallog,14,8);
   }
   {
     LogStream::Prefix pre("M12");
-    M12.print(deallog,12,8);
+    M12.print(deallog,14,8);
   }
   {
     LogStream::Prefix pre("M21");
-    M21.print(deallog,12,8);
+    M21.print(deallog,14,8);
   }
   {
     LogStream::Prefix pre("M22");
-    M22.print(deallog,12,8);
+    M22.print(deallog,14,8);
   }
 
   Vector<double> u1(n1), v1(n1), w1(n1);
@@ -245,7 +245,6 @@ test(Triangulation<dim> &tr)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
   deallog.precision(8);
 
   Triangulation<2> tr2;

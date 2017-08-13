@@ -23,7 +23,6 @@ int
 main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
   deallog << std::setprecision(9);
 
   CHECK_ALL(DGQ,0,2);

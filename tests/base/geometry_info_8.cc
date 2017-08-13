@@ -92,7 +92,6 @@ void test_lines()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   deallog << std::endl << "GeometryInfo<dim>::face_to_cell_vertices:" << std::endl;
 

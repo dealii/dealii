@@ -385,7 +385,6 @@ void LaplaceProblem<dim>::assemble_test ()
       frobenius_norm += test_matrix.block(i,j).frobenius_norm();
 
   // there should not even be roundoff difference between matrices
-  deallog.threshold_double(1e-30);
   deallog << "error in matrix: " << frobenius_norm << std::endl;
   test_rhs.add(-1., reference_rhs);
   deallog << "error in vector: " << test_rhs.l2_norm() << std::endl;

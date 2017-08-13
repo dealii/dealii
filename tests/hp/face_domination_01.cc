@@ -53,7 +53,6 @@ void print_dofs (const hp::DoFHandler<2>::active_cell_iterator &cell)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Triangulation<dim>   triangulation;
   std::vector<unsigned int> subdivisions(dim, 1U);

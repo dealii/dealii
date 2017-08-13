@@ -243,7 +243,6 @@ void FindBug<dim>::run ()
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   FindBug<2>().run ();
   FindBug<3>().run ();

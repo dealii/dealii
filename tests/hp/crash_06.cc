@@ -100,7 +100,6 @@ int main ()
   logfile.precision (3);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   hp::FECollection<3> fe;
   for (unsigned int i=0; i<4; ++i)

@@ -186,7 +186,6 @@ int main ()
   logfile.precision(2);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   deallog << "Try dim == 1" << std::flush << std::endl;
   test<1> ();

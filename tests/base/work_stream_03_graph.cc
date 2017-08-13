@@ -175,7 +175,6 @@ int main()
   deallog << std::setprecision(3);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   do_project();
 }

@@ -32,7 +32,6 @@ int main()
   const std::string logname = "output";
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   // generate a version of the
   // Nedelec element but force it to

@@ -722,7 +722,6 @@ int main ()
 {
   std::ofstream logfile("output");
   dealii::deallog.attach(logfile);
-  dealii::deallog.threshold_double(1e-8);
 
   {
     NeumanBC<2> func(1.25);

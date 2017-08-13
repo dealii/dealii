@@ -24,7 +24,6 @@ int main ()
   logfile.precision(2);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.0e-10);
 
   ConstraintMatrix constraints;
   unsigned int IDs[] = {1, 2, 3, 5, 8, 13, 21};

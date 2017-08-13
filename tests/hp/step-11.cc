@@ -216,7 +216,6 @@ int main ()
       deallog << std::setprecision(2);
 
       deallog.attach(logfile);
-      deallog.threshold_double(1.e-10);
 
       for (unsigned int mapping_degree=1; mapping_degree<=3; ++mapping_degree)
         LaplaceProblem<2>(mapping_degree).run ();

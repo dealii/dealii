@@ -327,7 +327,6 @@ int main ()
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   Triangulation<2> tria_test;
   Point<2> p1 (0,0),

@@ -114,7 +114,6 @@ int main(int argc, char **argv)
 {
   initlog();
   deallog << std::setprecision(6);
-  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   {

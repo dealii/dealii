@@ -47,7 +47,6 @@ void test()
 int main()
 {
   initlog();
-  deallog.threshold_double(1e-5);
 
   test<double>();
   test<float>();

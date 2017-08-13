@@ -38,7 +38,6 @@ int worker ()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Threads::Thread<int> t;
   // join non-existing thread

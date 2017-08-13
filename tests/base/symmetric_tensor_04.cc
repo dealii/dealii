@@ -24,7 +24,6 @@ int main ()
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   SymmetricTensor<4,3> t;
   t[0][0][0][0] = 1;

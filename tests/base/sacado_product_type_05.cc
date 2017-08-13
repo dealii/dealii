@@ -36,7 +36,6 @@ int main()
   typedef Sacado::Fad::DFad<double> Sdouble;
   typedef Sacado::Fad::DFad<Sdouble> SSdouble;
   initlog();
-  deallog.threshold_double(1.e-10);
 
 
   // check product with Tensor<2,dim>

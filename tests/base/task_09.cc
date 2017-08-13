@@ -54,7 +54,6 @@ void outer ()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   {
     const std::size_t n_tasks = MultithreadInfo::n_cores()*2;

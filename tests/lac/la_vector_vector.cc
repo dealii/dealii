@@ -134,7 +134,6 @@ int main()
   deallog << std::fixed;
   deallog << std::setprecision(2);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   LinearAlgebra::Vector<double>      d1(N), d2(N);
   LinearAlgebra::Vector<float>       f1(N), f2(N);

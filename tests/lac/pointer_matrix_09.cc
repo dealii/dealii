@@ -66,7 +66,6 @@ main()
   deallog << std::fixed;
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   const double Adata[] =
   { 2, 3, 4, 5 };

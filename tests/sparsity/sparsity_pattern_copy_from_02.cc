@@ -34,7 +34,6 @@ main ()
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   DynamicSparsityPattern csp (10000000, 100);
   csp.add(9999999, 1);

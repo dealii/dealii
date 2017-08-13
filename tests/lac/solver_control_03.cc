@@ -66,7 +66,6 @@ int main(int argc, char **argv)
   std::ofstream logfile("output");
   logfile.precision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
 
   {

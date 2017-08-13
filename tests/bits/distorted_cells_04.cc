@@ -147,7 +147,6 @@ void check ()
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-8);
 
   check<2> ();
   check<3> ();

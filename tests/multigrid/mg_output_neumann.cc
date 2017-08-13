@@ -276,7 +276,6 @@ int main()
   std::ofstream logfile("output");
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   //check_simple (FESystem<2>(FE_Q<2>(1), 2));
   check_simple (FESystem<2>(FE_Q<2>(1), 4));

@@ -23,7 +23,6 @@ int
 main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   CHECK_ALL(Q_DG0,1,2);
   CHECK_ALL(Q_DG0,2,2);

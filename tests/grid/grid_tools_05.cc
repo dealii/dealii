@@ -190,7 +190,6 @@ int main()
   deallog << std::setprecision(4);
   logfile << std::setprecision(4);
   deallog.attach(logfile, false);
-  deallog.threshold_double(1.e-10);
 
   deallog << "Test for 2D: Hypercube" << std::endl << std::endl;
 

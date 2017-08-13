@@ -35,7 +35,6 @@ int main(int argc, char **argv)
   deallog << std::fixed;
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 
 

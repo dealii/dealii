@@ -26,7 +26,6 @@ int main ()
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
   deallog << std::setprecision(3);
-  deallog.threshold_double(1.e-10);
 
   double a[3][3] = {{1, 2, 3}, {3, 4, 5}, {6, 7, 8}};
 

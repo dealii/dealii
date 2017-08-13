@@ -59,7 +59,6 @@ int main()
   std::ofstream logfile(logname.c_str());
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   PolynomialsBDM<2> p20(0);
   PolynomialsBDM<2> p21(1);

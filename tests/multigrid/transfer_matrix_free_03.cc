@@ -31,8 +31,6 @@
 template <int dim, typename Number>
 void check(const unsigned int fe_degree)
 {
-  deallog.threshold_double(std::max(5e2*(double)std::numeric_limits<Number>::epsilon(),
-                                    1e-11));
   FE_Q<dim> fe(fe_degree);
   deallog << "FE: " << fe.get_name() << std::endl;
 
