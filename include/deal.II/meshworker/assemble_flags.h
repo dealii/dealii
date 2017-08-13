@@ -40,67 +40,68 @@ namespace MeshWorker
    */
   enum AssembleFlags
   {
-    //! No update
-    assemble_default = 0,
-    //! Own cells
     /**
-     * Assemble on cells.
+     * Do Nothing.
+     */
+    assemble_nothing = 0,
+    /**
+     * Assemble on locally owned cells.
      */
     assemble_own_cells = 0x0001,
-    //! Ghost cells
     /**
      * Assemble on ghost cells.
      */
     assemble_ghost_cells = 0x0002,
-    //! Own faces once
     /**
-     * Assemble on own interior faces, visiting each face only once
+     * Assemble on interior faces between two locally owned cells,
+     * visiting each face only once
      */
     assemble_own_interior_faces_once = 0x0004,
-    //! Own faces both
     /**
-     * Assemble on own interior faces, visiting each interior face twice
+     * Assemble on interior faces between two locally owned cells,
+     * visiting each interior face twice
      */
     assemble_own_interior_faces_both = 0x0008,
-    //! Ghost faces once
     /**
      * Assemble on faces between a locally owned cell and a ghost cell, making
      * sure that only one of the processes will assemble these faces (from the
      * finer side or the process with the lower mpi rank)
      */
     assemble_ghost_faces_once = 0x0010,
-    //! Ghost faces both
     /**
      * Assemble on faces between a locally owned cell and a ghost cell, both
      * processes will assemble these faces. Note that these faces are never
      * assembled from both sides on a single process.
      */
     assemble_ghost_faces_both = 0x0020,
-    //! Assemble cells before faces
+    /**
+     * Assemble on boundary faces of the locally owned cells
+     */
+    assemble_boundary_faces = 0x0040,
+
     /**
      * Assemble cell integrals before face integrals.
      */
-    assemble_cells_first = 0x0040,
-    //! Assemble boundary faces
+    cells_first = 0x0080,
+
     /**
-     * Assemble on boundary faces
+     * Combination of flags to determine if any work on cells is done
      */
-    assemble_boundary_faces = 0x0080,
-    //! Assemble own interior aces
+    work_on_cells = assemble_own_cells | assemble_ghost_cells,
+
     /**
-     * Assemble own interior faces, either interior ones or on the boundary.
+     * Combination of flags to determine if any work is done on faces
      */
-    assemble_own_interior_faces = assemble_own_interior_faces_both | assemble_own_interior_faces_once,
-    //! Assemble own faces
+    work_on_faces = assemble_own_interior_faces_once
+                    | assemble_own_interior_faces_both
+                    | assemble_ghost_faces_once
+                    | assemble_ghost_faces_both,
+
     /**
-     * Assemble own faces, either interior ones or on the boundary.
+     * Combination of flags to determine if any work is done on the boundary
+     * faces
      */
-    assemble_own_faces = assemble_own_interior_faces | assemble_boundary_faces,
-    //! Assemble ghost faces
-    /**
-     * Assemble ghost faces
-     */
-    assemble_ghost_faces = assemble_ghost_faces_both | assemble_ghost_faces_once,
+    work_on_boundary = assemble_boundary_faces,
   };
 
 

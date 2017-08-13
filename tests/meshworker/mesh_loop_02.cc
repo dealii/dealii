@@ -76,44 +76,48 @@ void test()
     deallog << "copier" << std::endl;
   };
 
+  std::function<void (const decltype(cell) &, ScratchData &, CopyData &)>
+  empty_cell_worker;
+  std::function<void (const decltype(cell) &, const unsigned int &, ScratchData &, CopyData &)>
+  empty_boundary_worker;
+
   deallog << "CELLS ONLY" << std::endl << std::endl;
 
   mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
-            assemble_own_cells,
-            boundary_worker, face_worker);
+            assemble_own_cells);
 
 
   deallog << "BOUNDARY ONLY" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
+  mesh_loop(cell, endc, empty_cell_worker, copier, scratch, copy,
             assemble_boundary_faces,
-            boundary_worker, face_worker);
+            boundary_worker);
 
   deallog << "CELLS AND BOUNDARY" << std::endl << std::endl;
 
   mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
             assemble_own_cells | assemble_boundary_faces,
-            boundary_worker, face_worker);
+            boundary_worker);
 
   deallog << "CELLS FIRST AND BOUNDARY" << std::endl << std::endl;
 
   mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
-            assemble_own_cells | assemble_cells_first | assemble_boundary_faces,
-            boundary_worker, face_worker);
+            assemble_own_cells | cells_first | assemble_boundary_faces,
+            boundary_worker);
 
 
   deallog << "ONLY FACES ONCE" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
+  mesh_loop(cell, endc, empty_cell_worker, copier, scratch, copy,
             assemble_own_interior_faces_once,
-            boundary_worker, face_worker);
+            empty_boundary_worker, face_worker);
 
 
   deallog << "ONLY FACES BOTH" << std::endl << std::endl;
 
-  mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
+  mesh_loop(cell, endc, empty_cell_worker, copier, scratch, copy,
             assemble_own_interior_faces_both,
-            boundary_worker, face_worker);
+            empty_boundary_worker, face_worker);
 }
 
 

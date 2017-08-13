@@ -129,6 +129,31 @@ namespace MeshWorker
                  const unsigned int   queue_length = 2*MultithreadInfo::n_threads(),
                  const unsigned int   chunk_size = 8)
   {
+    Assert((!cell_worker)
+           || (flags & work_on_cells),
+           ExcMessage("If you specify a cell_worker, you need to set assemble_own_cells or assemble_ghost_cells."));
+
+    Assert((flags & (assemble_own_interior_faces_once|assemble_own_interior_faces_both))
+           != (assemble_own_interior_faces_once|assemble_own_interior_faces_both),
+           ExcMessage("You can only specify assemble_own_interior_faces_once OR assemble_own_interior_faces_both."));
+
+    Assert((flags & (assemble_ghost_faces_once|assemble_ghost_faces_both))
+           != (assemble_ghost_faces_once|assemble_ghost_faces_both),
+           ExcMessage("You can only specify assemble_ghost_faces_once OR assemble_ghost_faces_both."));
+
+    Assert(!(flags & cells_first) ||
+           (flags & (assemble_own_cells | assemble_ghost_cells)),
+           ExcMessage("The option cells_first only makes sense if you assemble on cells."));
+
+    Assert((!face_worker)
+           || (flags & work_on_faces),
+           ExcMessage("If you specify a boundary_worker, assemble_boundary_faces needs to be set."));
+
+    Assert((!boundary_worker)
+           || (flags & assemble_boundary_faces),
+           ExcMessage("If you specify a boundary_worker, assemble_boundary_faces needs to be set."));
+
+
     auto cell_action = [&] (const CellIteratorType &cell, ScratchData &scratch, CopyData &copy)
     {
       const bool ignore_subdomain = (cell->get_triangulation().locally_owned_subdomain()
@@ -143,12 +168,12 @@ namespace MeshWorker
       if ((!ignore_subdomain) && (current_subdomain_id == numbers::artificial_subdomain_id))
         return;
 
-      if ( (flags & (assemble_cells_first)) &&
+      if ( (flags & (cells_first)) &&
            ( ((flags & (assemble_own_cells)) && own_cell)
              || ( (flags & assemble_ghost_cells) && !own_cell) ) )
         cell_worker(cell, scratch, copy);
 
-      if (flags & assemble_own_faces)
+      if (flags & (work_on_faces | work_on_boundary))
         for (unsigned int face_no=0; face_no < GeometryInfo<CellIteratorType::AccessorType::Container::dimension>::faces_per_cell; ++face_no)
           {
             typename CellIteratorType::AccessorType::Container::face_iterator face = cell->face(face_no);
@@ -156,13 +181,11 @@ namespace MeshWorker
               {
                 // only integrate boundary faces of own cells
                 if ( (flags & assemble_boundary_faces) && own_cell)
-                  {
-                    boundary_worker(cell, face_no, scratch, copy);
-                  }
+                  boundary_worker(cell, face_no, scratch, copy);
               }
-            else if (flags & assemble_own_interior_faces)
+            else
               {
-                // Interior face
+                // interior face, potentially assemble
                 TriaIterator<typename CellIteratorType::AccessorType> neighbor = cell->neighbor_or_periodic_neighbor(face_no);
 
                 types::subdomain_id neighbor_subdomain_id = numbers::artificial_subdomain_id;
@@ -180,11 +203,11 @@ namespace MeshWorker
                   continue;
 
                 // skip if the user doesn't want faces between own cells
-                if (own_cell && own_neighbor && !(flags & assemble_own_interior_faces))
+                if (own_cell && own_neighbor && !(flags & (assemble_own_interior_faces_both | assemble_own_interior_faces_once)))
                   continue;
 
                 // skip face to ghost
-                if (own_cell != own_neighbor && !(flags & assemble_ghost_faces))
+                if (own_cell != own_neighbor && !(flags & (assemble_ghost_faces_both | assemble_ghost_faces_once)))
                   continue;
 
                 // Deal with refinement edges from the refined side. Assuming one-irregular
@@ -215,6 +238,10 @@ namespace MeshWorker
 
                     if (flags & assemble_own_interior_faces_both)
                       {
+                        // If own faces are to be assembled from both sides, call the
+                        // faceworker again with swapped arguments. This is because
+                        // we won't be looking at an adaptively refined edge
+                        // coming from the other side.
                         face_worker(neighbor, neighbor_face_no.first, neighbor_face_no.second,
                                     cell, face_no, numbers::invalid_unsigned_int,
                                     scratch, copy);
@@ -238,8 +265,7 @@ namespace MeshWorker
                         && (neighbor < cell))
                       continue;
 
-                    // independent of loop_control.faces_to_ghost,
-                    // we only look at faces to ghost on the same level once
+                    // We only look at faces to ghost on the same level once
                     // (only where own_cell=true and own_neighbor=false)
                     if (!own_cell)
                       continue;
@@ -260,20 +286,17 @@ namespace MeshWorker
                     face_worker(cell, face_no, numbers::invalid_unsigned_int,
                                 neighbor, neighbor_face_no, numbers::invalid_unsigned_int,
                                 scratch, copy);
-
                   }
               }
           } // faces
 
-      // Execute this, if faces
-      // have to be handled first
-      if ((flags & assemble_own_cells) && !(flags & assemble_cells_first) &&
+      // Execute the cell_worker if faces are handled before cells
+      if (!(flags & cells_first) &&
           ( ((flags & assemble_own_cells) && own_cell) || ((flags & assemble_ghost_cells) && !own_cell)))
         cell_worker(cell, scratch, copy);
     };
 
-
-    // Loop over all cells
+    // Submit to workstream
     WorkStream::run(begin, end,
                     cell_action, copier,
                     scratch_data, copy_data,
