@@ -236,7 +236,6 @@ int main ()
   deallog << std::setprecision(3);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   diffusionMechanics<DIMS> problem(1,1);
   problem.run ();

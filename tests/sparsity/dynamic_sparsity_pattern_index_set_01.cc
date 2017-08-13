@@ -26,7 +26,6 @@ int main ()
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   test_index_set<DynamicSparsityPattern> (true);
 }

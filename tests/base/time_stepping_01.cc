@@ -177,7 +177,6 @@ void test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double> > &solver,
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   deallog<<"Forward Euler"<<std::endl;
   TimeStepping::ExplicitRungeKutta<Vector<double> > fe(TimeStepping::FORWARD_EULER);

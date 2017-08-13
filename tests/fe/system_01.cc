@@ -79,7 +79,6 @@ main()
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   CHECK_SYS1(FE_Q<1>(1),  3,
              FE_Q<1>(2),  3,

@@ -116,11 +116,9 @@ void do_test (const DoFHandler<dim>  &dof)
   if (types_are_equal<number,float>::value == true)
     {
       deallog.push("float");
-      deallog.threshold_double(1e-6);
     }
   else
     {
-      deallog.threshold_double(5.e-11);
     }
 
   deallog << "Testing " << dof.get_fe().get_name();
@@ -313,7 +311,6 @@ int main (int argc, char **argv)
     }
 
   {
-    deallog.threshold_double(1.e-10);
     deallog.push("2d");
     test<2,1>();
     deallog.pop();

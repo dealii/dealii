@@ -29,7 +29,6 @@ main ()
   deallog << std::fixed;
   deallog << std::setprecision(0);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   const std::string elements = "1 2 3 4 5 6";
   {

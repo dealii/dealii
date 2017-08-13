@@ -41,7 +41,6 @@ void check ()
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   check ();
 

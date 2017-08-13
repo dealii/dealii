@@ -21,7 +21,6 @@
 int main()
 {
   initlog();
-  deallog.threshold_double(1.0e-10);
 
   const unsigned int entries[] = {1, 2, 3, 4, 5, 6};
   Table<2, unsigned int> t (2, 3);

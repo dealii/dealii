@@ -40,7 +40,6 @@ void test (Vector<std::complex<double> > &v)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   try
     {

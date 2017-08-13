@@ -137,7 +137,6 @@ void check_laplacian_list (const Function<dim> &f)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   deallog << "Functions PillowFunction" << std::endl;
   check_value (Functions::PillowFunction<1>());

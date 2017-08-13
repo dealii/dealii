@@ -97,7 +97,6 @@ void check (const Triangulation<dim> &tria)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   {
     Triangulation<2> coarse_grid;

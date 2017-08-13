@@ -121,7 +121,6 @@ void test()
 int main ()
 {
   initlog();
-  deallog.threshold_double(1e-14);
 
   deallog.push("values");
   test<4,4,0,false>();

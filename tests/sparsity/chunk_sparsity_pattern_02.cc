@@ -25,7 +25,6 @@ int main ()
   logfile.setf(std::ios::fixed);
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   const unsigned int chunk_sizes[] = { 1, 2, 4, 5, 7 };
   for (unsigned int i=0; i<sizeof(chunk_sizes)/sizeof(chunk_sizes[0]); ++i)

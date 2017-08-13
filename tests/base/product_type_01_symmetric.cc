@@ -37,7 +37,6 @@ void check()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   // check product with SymmetricTensor<2,dim>
   check<SymmetricTensor<2,2,double>,double,SymmetricTensor<2,2,double> >();

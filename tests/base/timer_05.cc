@@ -69,7 +69,6 @@ int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog();
-  deallog.threshold_double(1.e-10);
 
   Timer t1(MPI_COMM_WORLD, false);
   Timer t2(MPI_COMM_WORLD, true);

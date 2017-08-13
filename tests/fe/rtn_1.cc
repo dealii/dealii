@@ -136,7 +136,6 @@ main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   FE_RaviartThomasNodal<2> e20(0);
   check_support_points(e20);

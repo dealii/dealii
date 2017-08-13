@@ -29,7 +29,6 @@ DEAL_II_NAMESPACE_CLOSE
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   deallog << "OK" << std::endl;
 }

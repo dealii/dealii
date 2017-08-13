@@ -1,45 +1,45 @@
 
 DEAL::Testing dim=1, degree=1
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 1.19209e-07
+DEAL::Verifiction of vmult: 0.00000
+DEAL::Verification of inverse: 5.96046e-08
 DEAL::Testing dim=1, degree=2
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 1.19209e-07
+DEAL::Verifiction of vmult: 0.00000
+DEAL::Verification of inverse: 2.38419e-07
 DEAL::Testing dim=1, degree=5
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 9.53674e-06
+DEAL::Verifiction of vmult: 0.00000
+DEAL::Verification of inverse: 4.19617e-05
 DEAL::Testing dim=2, degree=1
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 2.38419e-07
+DEAL::Verifiction of vmult: 0.00000
+DEAL::Verification of inverse: 1.19209e-07
 DEAL::Testing dim=2, degree=2
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 9.53674e-07
+DEAL::Verifiction of vmult: 1.90735e-06
+DEAL::Verification of inverse: 3.57628e-07
 DEAL::Testing dim=2, degree=5
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 2.47955e-05
+DEAL::Verifiction of vmult: 3.81470e-06
+DEAL::Verification of inverse: 5.14984e-05
 DEAL::Testing dim=2, degree=11
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 7.67708e-05
+DEAL::Verifiction of vmult: 5.72205e-06
+DEAL::Verification of inverse: 0.000236511
 DEAL::Testing dim=3, degree=1
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 2.38419e-07
+DEAL::Verifiction of vmult: 0.00000
+DEAL::Verification of inverse: 8.94070e-08
 DEAL::Testing dim=3, degree=2
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 1.90735e-06
+DEAL::Verifiction of vmult: 3.81470e-06
+DEAL::Verification of inverse: 9.53674e-07
 DEAL::Testing dim=3, degree=3
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 1.71661e-05
+DEAL::Verifiction of vmult: 1.14441e-05
+DEAL::Verification of inverse: 1.04904e-05
 DEAL::Testing dim=3, degree=7
-DEAL::Verification of vmult and inverse: 0
-DEAL::Verifiction of vmult: 0
-DEAL::Verification of inverse: 0
+DEAL::Verification of vmult and inverse: 0.000104904
+DEAL::Verifiction of vmult: 1.14441e-05
+DEAL::Verification of inverse: 0.000228882

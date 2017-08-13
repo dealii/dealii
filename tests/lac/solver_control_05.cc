@@ -28,7 +28,6 @@ int main(int argc, char **argv)
   std::ofstream logfile("output");
   logfile.precision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   {
     ConsecutiveControl solver_control(12345, 1.e-3, 3, false, false);

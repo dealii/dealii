@@ -23,7 +23,6 @@ int
 main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   CHECK_ALL(DGP,0,2);
   CHECK_ALL(DGP,1,2);

@@ -68,7 +68,6 @@ int main ()
 {
   initlog();
   deallogfile << std::setprecision(8);
-  deallog.threshold_double(1.e-10);
 
   test<3> ();
 

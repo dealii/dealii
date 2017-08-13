@@ -41,7 +41,6 @@ int main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   {
     Threads::Thread<> t1 = Threads::new_thread (test, 1);

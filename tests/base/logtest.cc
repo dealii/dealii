@@ -26,7 +26,6 @@
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   deallog << "Test" << std::endl;
   deallog.push("l1");

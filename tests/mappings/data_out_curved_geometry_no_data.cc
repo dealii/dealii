@@ -45,7 +45,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   const Point<2> center (0,0);
   const SphericalManifold<2> boundary_description (center);

@@ -72,7 +72,6 @@ int main()
 
 
   initlog();
-  deallog.threshold_double(1.e-10);
   deallog << std::setprecision(8);
 
   deallog << "* 1d Gauss-Chebyshev" << std::endl;

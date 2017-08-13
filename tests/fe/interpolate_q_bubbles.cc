@@ -40,7 +40,6 @@ int main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);
-  deallog.threshold_double(2.e-15);
 
   Q1WedgeFunction<1,1> w1;
   check_q_bubbles(w1,1);

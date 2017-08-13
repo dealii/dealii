@@ -147,7 +147,6 @@ int main ()
   const int dim = 1;
 
   initlog();
-  deallog.threshold_double(1.e-10);
 
   {
     std::vector<double> coeff_in(2);

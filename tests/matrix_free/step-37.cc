@@ -617,7 +617,6 @@ int main ()
 {
   initlog();
   deallog << std::setprecision (3);
-  deallog.threshold_double(1e-10);
 
   {
     deallog.push("2d");

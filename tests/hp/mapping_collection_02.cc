@@ -39,7 +39,6 @@ int main ()
   logfile.precision(2);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   test<1> ();
   test<2> ();

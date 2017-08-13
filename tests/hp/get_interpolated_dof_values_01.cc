@@ -101,7 +101,6 @@ main()
   logfile.precision (PRECISION);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   deal_II_exceptions::disable_abort_on_exception();
 

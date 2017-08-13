@@ -49,7 +49,6 @@ int main ()
   logfile.precision (3);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
 
   // create a mesh like this (viewed

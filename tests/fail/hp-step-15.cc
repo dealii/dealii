@@ -591,7 +591,6 @@ int main ()
       logfile.precision(2);
 
       deallog.attach(logfile);
-      deallog.threshold_double(1.e-10);
 
       const unsigned int n_realizations = 10;
       for (unsigned int realization=0; realization<n_realizations; ++realization)

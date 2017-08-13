@@ -214,7 +214,6 @@ int main ()
   deallog << std::setprecision (2);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   deallog.push ("1d");
   loop<1> ();

@@ -113,7 +113,6 @@ int main()
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   deallog.push("LagrangeEquidistant");
   for (unsigned i=8; i<18; i+=2)

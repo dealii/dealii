@@ -54,9 +54,6 @@ LogStream::LogStream()
   print_utime(false),
   diff_utime(false),
   last_time (0.),
-  double_threshold(0.),
-  float_threshold(0.),
-  offset(0),
   print_thread_id(false),
   old_cerr(nullptr),
   at_newline(true)
@@ -106,28 +103,6 @@ LogStream::~LogStream()
 
   if (old_cerr)
     std::cerr.rdbuf(old_cerr);
-}
-
-
-void
-LogStream::test_mode(const bool on,
-                     const double double_threshold_,
-                     const float float_threshold_,
-                     const double offset_)
-{
-  Threads::Mutex::ScopedLock lock(log_lock);
-  if (on)
-    {
-      double_threshold = double_threshold_;
-      float_threshold = float_threshold_;
-      offset = offset_;
-    }
-  else
-    {
-      double_threshold = 0.;
-      float_threshold = 0.;
-      offset = 0.;
-    }
 }
 
 
@@ -348,22 +323,6 @@ LogStream::depth_file (const unsigned int n)
   const unsigned int h = file_depth;
   file_depth = n;
   return h;
-}
-
-
-void
-LogStream::threshold_double (const double t)
-{
-  Threads::Mutex::ScopedLock lock(log_lock);
-  double_threshold = t;
-}
-
-
-void
-LogStream::threshold_float (const float t)
-{
-  Threads::Mutex::ScopedLock lock(log_lock);
-  float_threshold = t;
 }
 
 

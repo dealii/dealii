@@ -34,7 +34,6 @@ int main()
   deal_II_exceptions::disable_abort_on_exception();
 
   initlog();
-  deallog.threshold_double(1.e-10);
 
   std::vector<int> v(7);
 

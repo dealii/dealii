@@ -244,7 +244,6 @@ int main ()
   deallog << std::setprecision (3);
 
   {
-    deallog.threshold_double(1.e-9);
     deallog.push("1d");
     test<1,1>();
     test<1,2>();

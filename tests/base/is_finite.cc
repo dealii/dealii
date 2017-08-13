@@ -58,7 +58,6 @@ int main ()
   std::ofstream logfile("output");
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   // the isnan() function (which we call in is_finite()) helpfully
   // produces a floating point exception when called with a signalling

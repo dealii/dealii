@@ -106,7 +106,6 @@ int main (int argc, char *argv[])
     {
       logfile.open("output");
       deallog.attach(logfile);
-      deallog.threshold_double(1.e-10);
       deallog.push("3d");
     }
 

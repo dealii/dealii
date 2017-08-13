@@ -264,7 +264,6 @@ int main (int argc, char **argv)
   initlog();
   deallog << std::setprecision(4);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
 
   deallog.push("2d");
   test<2,1>();

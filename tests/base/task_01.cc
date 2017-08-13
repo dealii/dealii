@@ -34,7 +34,6 @@ void test ()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Threads::Task<> t = Threads::new_task (test);
   t.join ();

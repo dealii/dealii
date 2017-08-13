@@ -42,7 +42,7 @@ void test_cell(const FEValuesBase<dim> &fev)
   cell_matrix(M,fev,fev,vel);
   {
     LogStream::Prefix pre("cell");
-    M.print(deallog,8);
+    M.print(deallog,14,8);
   }
 
   Vector<double> u(n), v(n), w(n);
@@ -70,7 +70,7 @@ void test_cell(const FEValuesBase<dim> &fev)
             cell_residual(w, fev, uval[0],vel);
             M.vmult(v,u);
             w.add(-1., v);
-            deallog << " e" << w.l2_norm();
+            deallog << " e " << w.l2_norm();
           }
       }
     deallog << std::endl;
@@ -92,7 +92,7 @@ void test_boundary(const FEValuesBase<dim> &fev)
   upwind_value_matrix(M, fev, fev, vel);
   {
     LogStream::Prefix pre("bdry");
-    M.print(deallog,8);
+    M.print(deallog,14,8);
   }
 
   Vector<double> u(n), v(n), w(n);
@@ -124,7 +124,7 @@ void test_boundary(const FEValuesBase<dim> &fev)
             upwind_value_residual(w, fev, uval[0], null_val[0], vel);
             M.vmult(v,u);
             w.add(-1., v);
-            deallog << " e" << w.l2_norm();
+            deallog << " e " << w.l2_norm();
           }
       }
     deallog << std::endl;
@@ -152,19 +152,19 @@ void test_face(const FEValuesBase<dim> &fev1,
 
   {
     LogStream::Prefix pre("M11");
-    M11.print(deallog,8);
+    M11.print(deallog,14,8);
   }
   {
     LogStream::Prefix pre("M12");
-    M12.print(deallog,8);
+    M12.print(deallog,14,8);
   }
   {
     LogStream::Prefix pre("M21");
-    M21.print(deallog,8);
+    M21.print(deallog,14,8);
   }
   {
     LogStream::Prefix pre("M22");
-    M22.print(deallog,8);
+    M22.print(deallog,14,8);
   }
 
   Vector<double> u1(n1), v1(n1), w1(n1);
@@ -286,7 +286,6 @@ test(Triangulation<dim> &tr)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Triangulation<2> tr2;
   TestGrids::hypercube(tr2, 1);

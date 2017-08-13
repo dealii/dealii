@@ -54,7 +54,6 @@ void test (const FiniteElement<dim> &fe)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   test(FE_Q<1>(2));
   test(FE_Q<2>(2));

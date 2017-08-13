@@ -27,7 +27,6 @@
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   const unsigned int N=10000;
   Vector<double> x(N), y(N), z(N), a(N);

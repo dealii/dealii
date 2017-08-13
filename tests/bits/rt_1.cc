@@ -58,7 +58,6 @@ void test (const unsigned int degree,
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   for (unsigned int degree=0; degree<3; ++degree)
     for (unsigned int q_order=1; q_order<=3; ++q_order)

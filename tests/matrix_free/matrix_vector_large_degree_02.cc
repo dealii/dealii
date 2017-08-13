@@ -167,6 +167,5 @@ void test ()
 int main (int argc, char **argv)
 {
   initlog();
-  deallog.threshold_double(1e-10);
   test<2,9>();
 }

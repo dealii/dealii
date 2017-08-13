@@ -223,7 +223,6 @@ int main (int argc,char **argv)
   deallog << std::setprecision(4);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
 
   try

@@ -116,7 +116,6 @@ void test ()
 {
   deallog << "Test doubles" << std::endl;
   sub_test<dim,fe_degree,double>();
-  deallog.threshold_double(1.e-6);
   deallog << "Test floats" << std::endl;
   sub_test<dim,fe_degree,float>();
 }

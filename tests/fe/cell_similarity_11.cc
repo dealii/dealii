@@ -126,7 +126,6 @@ int main()
   MultithreadInfo::set_thread_limit(1);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   test();
 }

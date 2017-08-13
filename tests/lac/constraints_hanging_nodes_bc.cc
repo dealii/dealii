@@ -135,7 +135,6 @@ void test ()
 int main ()
 {
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
   deallog << std::setprecision (2);
 
   {

@@ -44,7 +44,6 @@ struct X
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   // test with plain new/delete
   {

@@ -38,7 +38,6 @@ void test ()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
 #ifdef DEAL_II_WITH_THREADS
 

@@ -40,7 +40,6 @@ void check (const char *p, std::string last_line)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   // go into the source dir to read files there. this
   // is necessary so that we can include files there

@@ -401,7 +401,6 @@ void LaplaceProblem<dim>::assemble_test ()
   test_matrix.add(-1, reference_matrix);
 
   // there should not even be roundoff difference between matrices
-  deallog.threshold_double(1.e-30);
   double frobenius_norm = 0;
   for (unsigned int i=0; i<2; ++i)
     for (unsigned int j=0; j<2; ++j)

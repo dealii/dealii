@@ -127,7 +127,6 @@ void test (bool transpose = false)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-8);
 
   test<1> ();
   test<2> ();

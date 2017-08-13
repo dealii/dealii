@@ -66,7 +66,6 @@ int main()
   std::ofstream logfile("output");
   deallog << std::setprecision(2);
   deallog.attach(logfile);
-  deallog.threshold_double(1e-50); // exact equality required!
 
   check_norms<float>();
   check_norms<double>();

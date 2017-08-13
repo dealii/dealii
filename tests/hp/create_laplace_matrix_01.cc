@@ -133,11 +133,7 @@ check ()
 
 int main ()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision (2);
-  deallog << std::fixed;
-  deallog.attach(logfile);
-  deallog.test_mode(true, 0., 0.);
+  initlog();
 
   deallog.push ("1d");
   check<1> ();

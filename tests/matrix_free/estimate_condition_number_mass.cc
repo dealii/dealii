@@ -154,7 +154,6 @@ int main ()
 
   {
     // iterations taken from results at tolerance 1e-9
-    deallog.threshold_double(1.e-8);
     deallog.push("2d");
     test<2,1>(FE_Q<2>(1), 15);
     test<2,1>(FE_DGQ<2>(1), 3);

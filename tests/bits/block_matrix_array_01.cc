@@ -26,7 +26,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   FullMatrix<double> A1(4,4);
   FullMatrix<double> A2(4,4);

@@ -30,7 +30,6 @@ main ()
   deallog << std::fixed;
   deallog << std::setprecision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   logfile << numbers::PI << std::endl;
 

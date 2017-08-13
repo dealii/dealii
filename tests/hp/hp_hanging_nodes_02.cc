@@ -139,7 +139,6 @@ int main ()
   logfile.precision(8);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   unsigned int index[] =
   {

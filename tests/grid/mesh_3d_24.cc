@@ -58,7 +58,6 @@ int main ()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);
-  deallog.threshold_double(1.0e-10);
 
   Triangulation<3> triangulation;
   GridIn<3> grid_in;

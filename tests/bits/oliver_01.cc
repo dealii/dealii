@@ -28,7 +28,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   // this test only needs to compile, not run
   if (false)

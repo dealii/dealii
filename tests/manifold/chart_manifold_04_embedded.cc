@@ -127,7 +127,6 @@ void test(unsigned int ref, const MappingQ<dim> &mapping)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   test<2,2>(2, MappingQ<2>(4, false));
   test<2,2>(2, MappingQ<2>(4, true));

@@ -28,7 +28,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   ConvergenceTable table;
   table.set_auto_fill_mode (true);

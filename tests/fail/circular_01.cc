@@ -871,7 +871,6 @@ int main ()
   logfile.precision (3);
 
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
   try
     {
       LaplaceProblem<3> laplace_problem;

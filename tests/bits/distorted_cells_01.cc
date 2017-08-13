@@ -87,7 +87,6 @@ void check (const unsigned int testcase)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   for (unsigned int testcase=1; testcase<=2; ++testcase)
     {

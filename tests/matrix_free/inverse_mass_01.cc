@@ -195,9 +195,7 @@ void test ()
   if (dim == 2)
     {
       deallog.push("float");
-      deallog.threshold_double(2.e-6);
       do_test<dim, fe_degree, float> (dof);
-      deallog.threshold_double(1.e-10);
       deallog.pop();
     }
 }
@@ -211,7 +209,6 @@ int main ()
   deallog << std::setprecision (3);
 
   {
-    deallog.threshold_double(1.e-10);
     deallog.push("2d");
     test<2,1>();
     test<2,2>();

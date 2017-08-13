@@ -99,7 +99,6 @@ void MixedFECollection<dim>::run ()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   MixedFECollection<2> mixed_FECollection_problem;
   mixed_FECollection_problem.run ();

@@ -27,7 +27,6 @@ int main ()
   std::ofstream logfile("output");
   deallog << std::setprecision(5);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   const int dim = 3;
   SymmetricTensor<2,dim,VectorizedArray<float> > s1;

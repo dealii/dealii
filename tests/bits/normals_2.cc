@@ -48,7 +48,6 @@ void check (const Triangulation<dim> &tria,
   FE_Q<dim> fe(1);
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
-  deallog.threshold_double(1.e-10);
 
   QGauss<dim-1> q_face(3);
 
@@ -100,7 +99,6 @@ void check (const Triangulation<dim> &tria,
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   {
     Triangulation<2> coarse_grid;

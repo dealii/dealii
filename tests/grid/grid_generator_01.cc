@@ -186,7 +186,6 @@ int main()
 {
   std::ofstream logfile("output");
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   deallog.push("1d");
   test<1>(logfile);

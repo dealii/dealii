@@ -58,7 +58,6 @@ void test(std::string content)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   test ("subsection bar\nend");
   test ("");

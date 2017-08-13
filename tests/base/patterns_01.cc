@@ -21,7 +21,6 @@
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   // create a pattern and let it
   // output its description

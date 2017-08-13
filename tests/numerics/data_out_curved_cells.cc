@@ -250,7 +250,6 @@ int main ()
   deallog.attach(logfile);
   deallog << std::setprecision (4);
   logfile << std::setprecision (4);
-  deallog.threshold_double(1.e-10);
 
   curved_grid (logfile);
 }

@@ -120,7 +120,6 @@ int main ()
 {
   deallog << std::setprecision (2);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   test<2> (SOURCE_DIR "/grid_in/2d.xda");
 

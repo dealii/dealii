@@ -579,7 +579,6 @@ int main (int argc, char **argv)
                                             testing_max_num_threads());
 
   mpi_initlog();
-  deallog.threshold_double(1e-9);
 
   test<2,1,double>();
   test<2,2,float>();

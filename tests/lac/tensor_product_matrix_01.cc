@@ -82,7 +82,6 @@ void do_test(const unsigned int size)
 int main()
 {
   initlog();
-  deallog.threshold_double(1e-11);
 
   do_test<1>(1);
   do_test<1>(2);

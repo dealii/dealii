@@ -142,7 +142,6 @@ int main()
   deallog << std::fixed;
   deallog << std::setprecision(0);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   check<double>(5);
   check<float>(4);

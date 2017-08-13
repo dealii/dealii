@@ -1125,7 +1125,6 @@ int main ()
   deallog << std::setprecision (3);
   deallog << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   // The general idea behind the
   // layout of this function is as

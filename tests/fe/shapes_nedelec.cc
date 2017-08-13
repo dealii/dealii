@@ -42,7 +42,6 @@ main()
   std::ofstream logfile ("output");
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
   deallog << "FE_Nedelec<2>" << std::endl;
   plot_FE_Nedelec_shape_functions<2>();
   deallog << "FE_Nedelec<3>" << std::endl;

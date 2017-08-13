@@ -41,7 +41,6 @@ void check (const std::string     &name,
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   check ("gauss", 2, QGauss<1>(2));
   check ("gauss", 2, QGauss<2>(2));

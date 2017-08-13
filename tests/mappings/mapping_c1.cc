@@ -34,7 +34,6 @@ int main ()
   deallog << std::fixed;
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   // create grid of circle, somehow
   // arbitrarily from only one cell,

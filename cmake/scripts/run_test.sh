@@ -105,7 +105,15 @@ case $STAGE in
       #
       case "${NUMDIFF_EXECUTABLE}" in
         *numdiff*)
-          "${NUMDIFF_EXECUTABLE}" -a 1e-6 -r 1e-8 -s ' \t\n:<>=,;' \
+          #
+          # Configure numdiff with
+          #   - absolute precision set to 1e-6, everything below is
+          #     regarded as being equal to 0
+          #   - relative differences of 1e-8
+          #   - [space][tab][newline]=,:;<>[](){}^ as separators between
+          #     numbers
+          #
+          "${NUMDIFF_EXECUTABLE}" -a 1e-6 -r 1e-8 -s ' \t\n=,:;<>[](){}^' \
                                 "${file}" output > diff${variant}
           ;;
         *)

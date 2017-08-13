@@ -48,7 +48,6 @@ void verify (const std::string &s)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   verify ("abc");
   verify ("1.23.4");

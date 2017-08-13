@@ -288,7 +288,6 @@ int main (int argc, char *argv[])
 
       MPILogInitAll log;
 
-      deallog.threshold_double(1.e-10);
       {
         deallog << "Test for 2D" << std::endl << std::endl;
         for (int i = 0; i < 2; ++i)

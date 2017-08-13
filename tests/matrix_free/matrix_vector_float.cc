@@ -68,6 +68,5 @@ void test ()
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
 
-  deallog.threshold_double (5e-6);
   do_test<dim, fe_degree, float, fe_degree+1> (dof, constraints);
 }

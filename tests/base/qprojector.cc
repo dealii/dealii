@@ -175,7 +175,6 @@ int main()
   initlog();
   deallog << std::setprecision(2);
 
-  deallog.threshold_double(1.e-10);
 
   Quadrature<1> none(0);
   check(none);

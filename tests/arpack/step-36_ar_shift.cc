@@ -332,7 +332,6 @@ int main (int argc, char **argv)
       using namespace Step36;
 
       initlog();
-      deallog.threshold_double(1.e-10);
 
 
       EigenvalueProblem<2> problem ("");

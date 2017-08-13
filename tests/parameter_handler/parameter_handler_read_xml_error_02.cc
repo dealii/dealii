@@ -25,7 +25,6 @@
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   ParameterHandler prm;
   prm.declare_entry ("int1",

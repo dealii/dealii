@@ -66,7 +66,6 @@ void check (Triangulation<3> &tria)
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   try
     {

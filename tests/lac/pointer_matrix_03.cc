@@ -37,7 +37,6 @@ main()
   deallog << std::fixed;
   deallog << std::setprecision(4);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   char *name = "Matrix A";
 

@@ -80,7 +80,6 @@ main()
 {
   std::ofstream logfile ("output");
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   test2<2>();
 

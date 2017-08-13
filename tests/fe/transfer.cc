@@ -74,7 +74,6 @@ main()
 {
   initlog();
   deallog << std::setprecision(7);
-  deallog.threshold_double(1.e-10);
 
   Triangulation<2> tr2(Triangulation<2>::limit_level_difference_at_vertices);
 

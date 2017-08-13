@@ -34,7 +34,6 @@ int sum (const int begin,
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   const int N = 10000;
   const int s = parallel::accumulate_from_subranges<int> (&sum, 0, N, 10);

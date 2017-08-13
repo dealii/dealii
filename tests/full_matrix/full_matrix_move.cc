@@ -23,7 +23,6 @@
 int main()
 {
   initlog();
-  deallog.threshold_double(1.0e-10);
 
   size_t m = 2, n = 3;
   FullMatrix<double> A(m, n);

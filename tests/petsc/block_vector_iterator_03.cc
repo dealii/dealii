@@ -227,7 +227,6 @@ int main (int argc,char **argv)
   logfile.setf(std::ios::fixed);
   logfile.precision(3);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   try
     {

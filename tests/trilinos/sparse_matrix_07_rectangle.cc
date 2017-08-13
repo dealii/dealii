@@ -31,7 +31,6 @@ int main (int argc,char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   initlog();
-  deallog.threshold_double(1.e-10);
 
   SparsityPattern sparsity (4,5,5);
   sparsity.add (1,2);

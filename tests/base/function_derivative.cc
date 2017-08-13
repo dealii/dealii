@@ -156,7 +156,6 @@ check_sine(unsigned int nquad)
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   check_sine<2>(3);
   check_sine<3>(3);

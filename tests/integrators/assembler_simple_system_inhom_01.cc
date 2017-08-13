@@ -672,7 +672,6 @@ void MeshWorkerConstraintMatrixTest<dim>::run()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   FE_Q<2> fe(1);
   deallog.push(fe.get_name());

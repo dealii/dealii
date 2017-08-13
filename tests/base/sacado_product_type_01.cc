@@ -35,7 +35,6 @@ int main()
 {
   typedef Sacado::Fad::DFad<double> Sdouble;
   initlog();
-  deallog.threshold_double(1.e-10);
 
 
   // check product of scalars

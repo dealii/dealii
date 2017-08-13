@@ -78,7 +78,6 @@ main()
 {
   initlog();
   deallog << std::setprecision(7);
-  deallog.threshold_double(1.e-10);
 
   FE_Nedelec<3> fe1(0);  // works
   test<3>(fe1);

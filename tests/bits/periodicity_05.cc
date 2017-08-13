@@ -154,7 +154,6 @@ void Deal2PeriodicBug::makeGrid()
 int main ()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   Deal2PeriodicBug Deal2Bug;
   Deal2Bug.run();

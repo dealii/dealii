@@ -66,7 +66,6 @@ int main ()
   deallog << std::setprecision (2);
   logfile << std::setprecision (2);
   deallog.attach(logfile);
-  deallog.threshold_double(1.e-10);
 
   check_file ();
 }

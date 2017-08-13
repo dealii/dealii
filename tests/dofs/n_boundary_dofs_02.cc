@@ -65,7 +65,6 @@ void test()
 int main()
 {
   initlog();
-  deallog.threshold_double(1.e-10);
 
   deallog.push("2d");
   test<2>();
