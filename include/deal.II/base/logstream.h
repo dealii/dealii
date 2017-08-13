@@ -182,13 +182,6 @@ public:
 
 
   /**
-   * Reroutes cerr to LogStream. Works as a switch, turning logging of
-   * <tt>cerr</tt> on and off alternatingly with every call.
-   */
-  void log_cerr ();
-
-
-  /**
    * Return the prefix string.
    */
   const std::string &get_prefix () const;
@@ -392,13 +385,6 @@ private:
    * The tms structure times() filled on initialization.
    */
   struct tms reference_tms;
-
-  /**
-   * Original buffer of <tt>std::cerr</tt>. We store the address of that
-   * buffer when #log_cerr is called, and reset it to this value if #log_cerr
-   * is called a second time, or when the destructor of this class is run.
-   */
-  std::streambuf *old_cerr;
 
   /**
    * A flag indicating whether output is currently at a new line
