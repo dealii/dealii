@@ -71,11 +71,11 @@ for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
 #if     deal_II_dimension > 1
 #if       deal_II_space_dimension >= deal_II_dimension
     template
-    void
-    functions<deal_II_dimension>::
-    iterate<deal_II_space_dimension>(dealii::internal::p4est::types<deal_II_dimension>::forest *parallel_forest,
-                                     dealii::internal::p4est::types<deal_II_dimension>::ghost *parallel_ghost,
-                                     void *user_data);
+    std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+    compute_vertices_with_ghost_neighbors(const dealii::parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &tria,
+                                          typename dealii::internal::p4est::types<deal_II_dimension>::forest *parallel_forest,
+                                          typename dealii::internal::p4est::types<deal_II_dimension>::ghost *parallel_ghost);
+
 #endif
 #endif
     \}

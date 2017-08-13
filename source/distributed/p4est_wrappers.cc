@@ -35,6 +35,18 @@ namespace internal
         return out_cell;
       }
 
+      /**
+       * This is the callback data structure used to fill
+       * vertices_with_ghost_neighbors via the p4est_iterate tool
+       */
+      template <int dim, int spacedim>
+      struct FindGhosts
+      {
+        const typename dealii::parallel::distributed::Triangulation<dim,spacedim> *triangulation;
+        sc_array_t                                                                *subids;
+        std::map<unsigned int, std::set<dealii::types::subdomain_id> >            *vertices_with_ghost_neighbors;
+      };
+
 
       /** At a corner (vertex), determine if any of the neighboring cells are
        * ghosts.  If there are, find out their subdomain ids, and if this is a
@@ -436,19 +448,45 @@ namespace internal
     size_t (&functions<2>::connectivity_memory_used) (types<2>::connectivity *p4est)
       = p4est_connectivity_memory_used;
 
-    template <int spacedim>
-    void functions<2>::iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
-                               dealii::internal::p4est::types<2>::ghost *parallel_ghost,
-                               void *user_data)
+    template <int dim, int spacedim>
+    std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+    compute_vertices_with_ghost_neighbors(const typename dealii::parallel::distributed::Triangulation<dim,spacedim> &tria,
+                                          typename dealii::internal::p4est::types<dim>::forest *parallel_forest,
+                                          typename dealii::internal::p4est::types<dim>::ghost *parallel_ghost)
     {
-      p4est_iterate (parallel_forest, parallel_ghost, user_data,
-                     nullptr,
-                     find_ghosts_face<2,spacedim>,
-                     find_ghosts_corner<2,spacedim>);
+      std::map<unsigned int, std::set<dealii::types::subdomain_id> > vertices_with_ghost_neighbors;
+
+      dealii::internal::p4est::FindGhosts<dim,spacedim> fg;
+      fg.subids = sc_array_new (sizeof (dealii::types::subdomain_id));
+      fg.triangulation = &tria;
+      fg.vertices_with_ghost_neighbors = &vertices_with_ghost_neighbors;
+
+      switch (dim)
+        {
+        case 2:
+          p4est_iterate (reinterpret_cast<dealii::internal::p4est::types<2>::forest *>(parallel_forest),
+                         reinterpret_cast<dealii::internal::p4est::types<2>::ghost *>(parallel_ghost),
+                         static_cast<void *>(&fg),
+                         NULL, find_ghosts_face<2,spacedim>, find_ghosts_corner<2,spacedim>);
+          break;
+
+        case 3:
+          p8est_iterate (reinterpret_cast<dealii::internal::p4est::types<3>::forest *>(parallel_forest),
+                         reinterpret_cast<dealii::internal::p4est::types<3>::ghost *>(parallel_ghost),
+                         static_cast<void *>(&fg),
+                         NULL, find_ghosts_face<3,3>, find_ghosts_edge<3,3>, find_ghosts_corner<3,3>);
+          break;
+
+        default:
+          Assert (false, ExcNotImplemented());
+        }
+
+      sc_array_destroy (fg.subids);
+
+      return vertices_with_ghost_neighbors;
     }
 
     const unsigned int functions<2>::max_level;
-
 
 
 
@@ -638,20 +676,7 @@ namespace internal
     size_t (&functions<3>::connectivity_memory_used) (types<3>::connectivity *p4est)
       = p8est_connectivity_memory_used;
 
-    template <int spacedim>
-    void functions<3>::iterate(dealii::internal::p4est::types<3>::forest *parallel_forest,
-                               dealii::internal::p4est::types<3>::ghost *parallel_ghost,
-                               void *user_data)
-    {
-      p8est_iterate (parallel_forest, parallel_ghost, user_data,
-                     nullptr,
-                     find_ghosts_face<3,spacedim>,
-                     find_ghosts_edge<3,spacedim>,
-                     find_ghosts_corner<3,spacedim>);
-    }
-
     const unsigned int functions<3>::max_level;
-
 
 
 
