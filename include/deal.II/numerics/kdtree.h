@@ -22,6 +22,8 @@
 
 #include <deal.II/base/point.h>
 
+#include <memory>
+
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <nanoflann.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
@@ -245,7 +247,7 @@ unsigned int KDTree<dim>::size() const
     return adaptor->points.size();
   else
     return 0;
-};
+}
 
 
 
