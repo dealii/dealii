@@ -37,6 +37,7 @@
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/evaluation_kernels.h>
+#include <deal.II/matrix_free/evaluation_selector.h>
 
 #include <cmath>
 #include <algorithm>
@@ -1614,11 +1615,16 @@ namespace internal
                 VectorizedArray<double> *values_dofs_ptr[n_comp];
                 data.values_quad.resize(n_comp*n_q_points);
                 VectorizedArray<double> *values_quad_ptr[n_comp];
+                // Some evaluators need to write into the gradients array.
+                data.gradients_quad.resize (n_comp*n_q_points*dim);
+                VectorizedArray<double> *gradients_quad_ptr[n_comp][dim];
 
                 for (unsigned int c=0; c<n_comp; ++c)
                   {
                     values_dofs_ptr[c] = &(data.values_dofs[c*n_shape_values]);
                     values_quad_ptr[c] = &(data.values_quad[c*n_q_points]);
+                    for (unsigned int j=0; j<dim; ++j)
+                      gradients_quad_ptr[c][j] = &(data.gradients_quad[(c*dim+j)*n_q_points]);
                   }
 
                 const std::vector<unsigned int> &renumber_to_lexicographic
@@ -1632,9 +1638,9 @@ namespace internal
                         = data.mapping_support_points[renumber_to_lexicographic[i]][d];
                     }
 
-                internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general, dim, -1, 0, n_comp, double>::evaluate
-                (data.shape_info, &(values_dofs_ptr[0]), &(values_quad_ptr[0]), nullptr, nullptr,
-                 &(data.scratch[0]), true, false, false);
+                SelectEvaluator<dim, -1, 0, n_comp, double>::evaluate
+                (data.shape_info, &(values_dofs_ptr[0]), &(values_quad_ptr[0]),
+                 &(gradients_quad_ptr[0]), nullptr, &(data.scratch[0]), true, false, false);
 
                 for (unsigned int out_comp=0; out_comp<n_comp; ++out_comp)
                   for (unsigned int i=0; i<n_q_points; ++i)
@@ -1703,6 +1709,9 @@ namespace internal
                   VectorizedArray<double> *values_dofs_ptr[n_comp];
                   data.gradients_quad.resize (n_comp*n_q_points*dim);
                   VectorizedArray<double> *gradients_quad_ptr[n_comp][dim];
+                  // Some evaluators need to write into the values array.
+                  data.values_quad.resize(n_comp*n_q_points);
+                  VectorizedArray<double> *values_quad_ptr[n_comp];
 
                   // transform data appropriately
                   const std::vector<unsigned int> &renumber_to_lexicographic
@@ -1719,13 +1728,14 @@ namespace internal
                   for (unsigned int c=0; c<n_comp; ++c)
                     {
                       values_dofs_ptr[c] = &(data.values_dofs[c*n_shape_values]);
+                      values_quad_ptr[c] = &(data.values_quad[c*n_q_points]);
                       for (unsigned int j=0; j<dim; ++j)
                         gradients_quad_ptr[c][j] = &(data.gradients_quad[(c*dim+j)*n_q_points]);
                     }
 
-                  internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general, dim, -1, 0, n_comp, double>::evaluate
-                  (data.shape_info, &(values_dofs_ptr[0]), nullptr, &(gradients_quad_ptr[0]), nullptr,
-                   &(data.scratch[0]), false, true, false);
+                  SelectEvaluator<dim, -1, 0, n_comp, double>::evaluate
+                  (data.shape_info, &(values_dofs_ptr[0]), &(values_quad_ptr[0]),
+                   &(gradients_quad_ptr[0]), nullptr, &(data.scratch[0]), false, true, false);
 
                   // We need to reinterpret the data after evaluate has been applied.
                   for (unsigned int out_comp=0; out_comp<n_comp; ++out_comp)
@@ -1831,6 +1841,12 @@ namespace internal
                     VectorizedArray<double> *values_dofs_ptr[n_comp];
                     data.hessians_quad.resize(n_comp*n_q_points*n_hessians);
                     VectorizedArray<double> *hessians_quad_ptr[n_comp][n_hessians];
+                    // Some evaluators need to write into the gradients array
+                    // and into the values array.
+                    data.gradients_quad.resize (n_comp*n_q_points*dim);
+                    VectorizedArray<double> *gradients_quad_ptr[n_comp][dim];
+                    data.values_quad.resize(n_comp*n_q_points);
+                    VectorizedArray<double> *values_quad_ptr[n_comp];
 
                     // transform data appropriately
                     const std::vector<unsigned int> &renumber_to_lexicographic
@@ -1847,12 +1863,16 @@ namespace internal
                     for (unsigned int c=0; c<n_comp; ++c)
                       {
                         values_dofs_ptr[c] = &(data.values_dofs[c*n_shape_values]);
+                        values_quad_ptr[c] = &(data.values_quad[c*n_q_points]);
+                        for (unsigned int j=0; j<dim; ++j)
+                          gradients_quad_ptr[c][j] = &(data.gradients_quad[(c*dim+j)*n_q_points]);
                         for (unsigned int j=0; j<n_hessians; ++j)
                           hessians_quad_ptr[c][j] = &(data.hessians_quad[(c*n_hessians+j)*n_q_points]);
                       }
 
-                    internal::FEEvaluationImpl<internal::MatrixFreeFunctions::tensor_general, dim, -1, 0, n_comp, double>::evaluate
-                    (data.shape_info, &(values_dofs_ptr[0]), nullptr, nullptr, &(hessians_quad_ptr[0]),
+                    SelectEvaluator<dim, -1, 0, n_comp, double>::evaluate
+                    (data.shape_info, &(values_dofs_ptr[0]), &(values_quad_ptr[0]),
+                     &(gradients_quad_ptr[0]), &(hessians_quad_ptr[0]),
                      &(data.scratch[0]), false, false, true);
 
                     constexpr int desymmetrize_3d [6][2] = {{0,0},{1,1},{2,2},{0,1},{0,2},{1,2}};
