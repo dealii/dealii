@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__parameter_handler_h
-#define dealii__parameter_handler_h
+#ifndef dealii_parameter_handler_h
+#define dealii_parameter_handler_h
 
 
 #include <deal.II/base/config.h>

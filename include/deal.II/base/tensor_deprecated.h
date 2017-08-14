@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tensor_deprecated_h
-#define dealii__tensor_deprecated_h
+#ifndef dealii_tensor_deprecated_h
+#define dealii_tensor_deprecated_h
 
 #include <deal.II/base/tensor.h>
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__types_h
-#define dealii__types_h
+#ifndef dealii_types_h
+#define dealii_types_h
 
 
 #include <deal.II/base/config.h>

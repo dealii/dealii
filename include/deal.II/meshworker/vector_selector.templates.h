@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__vector_selector_templates_h
-#define dealii__vector_selector_templates_h
+#ifndef dealii_vector_selector_templates_h
+#define dealii_vector_selector_templates_h
 
 
 #include <deal.II/meshworker/vector_selector.h>

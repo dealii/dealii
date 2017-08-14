@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_p1nc_h
-#define dealii__fe_p1nc_h
+#ifndef dealii_fe_p1nc_h
+#define dealii_fe_p1nc_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/fe/fe.h>

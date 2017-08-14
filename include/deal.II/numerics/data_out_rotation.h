@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__data_out_rotation_h
-#define dealii__data_out_rotation_h
+#ifndef dealii_data_out_rotation_h
+#define dealii_data_out_rotation_h
 
 
 #include <deal.II/base/config.h>

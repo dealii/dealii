@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__solver_fire_h
-#define dealii__solver_fire_h
+#ifndef dealii_solver_fire_h
+#define dealii_solver_fire_h
 
 
 #include <deal.II/base/config.h>

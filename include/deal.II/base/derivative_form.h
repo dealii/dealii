@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__derivative_form_h
-#define dealii__derivative_form_h
+#ifndef dealii_derivative_form_h
+#define dealii_derivative_form_h
 
 #include <deal.II/base/tensor.h>
 

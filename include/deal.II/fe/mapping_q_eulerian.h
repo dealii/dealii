@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__mapping_q_eulerian_h
-#define dealii__mapping_q_eulerian_h
+#ifndef dealii_mapping_q_eulerian_h
+#define dealii_mapping_q_eulerian_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>
@@ -276,4 +276,4 @@ MappingQEulerian<dim,VectorType,spacedim>::preserves_vertex_locations () const
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // dealii__mapping_q_eulerian_h
+#endif // dealii_mapping_q_eulerian_h

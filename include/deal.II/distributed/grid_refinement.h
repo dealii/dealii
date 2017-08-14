@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__distributed_grid_refinement_h
-#define dealii__distributed_grid_refinement_h
+#ifndef dealii_distributed_grid_refinement_h
+#define dealii_distributed_grid_refinement_h
 
 
 #include <deal.II/base/config.h>
@@ -114,4 +114,4 @@ namespace parallel
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif //dealii__distributed_grid_refinement_h
+#endif //dealii_distributed_grid_refinement_h

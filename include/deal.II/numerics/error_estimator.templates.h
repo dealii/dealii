@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__error_estimator_templates_h
-#define dealii__error_estimator_templates_h
+#ifndef dealii_error_estimator_templates_h
+#define dealii_error_estimator_templates_h
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/thread_management.h>

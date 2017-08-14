@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__communication_pattern_base_h
-#define dealii__communication_pattern_base_h
+#ifndef dealii_communication_pattern_base_h
+#define dealii_communication_pattern_base_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/mpi.h>

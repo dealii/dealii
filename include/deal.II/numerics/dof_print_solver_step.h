@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__dof_print_solver_step_h
-#define dealii__dof_print_solver_step_h
+#ifndef dealii_dof_print_solver_step_h
+#define dealii_dof_print_solver_step_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/logstream.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__point_wrapper_h
-#define dealii__point_wrapper_h
+#ifndef dealii_point_wrapper_h
+#define dealii_point_wrapper_h
 
 #include <deal.II/base/config.h>
 

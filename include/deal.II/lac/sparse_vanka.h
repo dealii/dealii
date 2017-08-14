@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__sparse_vanka_h
-#define dealii__sparse_vanka_h
+#ifndef dealii_sparse_vanka_h
+#define dealii_sparse_vanka_h
 
 
 

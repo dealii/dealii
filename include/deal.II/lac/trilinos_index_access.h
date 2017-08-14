@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__trilinos_index_access_h
-#define dealii__trilinos_index_access_h
+#ifndef dealii_trilinos_index_access_h
+#define dealii_trilinos_index_access_h
 
 #include <deal.II/base/config.h>
 
@@ -219,4 +219,4 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 #endif // DEAL_II_WITH_TRILINOS
-#endif // dealii__trilinos_index_access_h
+#endif // dealii_trilinos_index_access_h

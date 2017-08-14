@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__quadrature_lib_h
-#define dealii__quadrature_lib_h
+#ifndef dealii_quadrature_lib_h
+#define dealii_quadrature_lib_h
 
 
 #include <deal.II/base/config.h>

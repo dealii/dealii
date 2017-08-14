@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__transformations_h
-#define dealii__transformations_h
+#ifndef dealii_transformations_h
+#define dealii_transformations_h
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>

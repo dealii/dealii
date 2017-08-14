@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__newton_h
-#define dealii__newton_h
+#ifndef dealii_newton_h
+#define dealii_newton_h
 
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/lac/solver_control.h>

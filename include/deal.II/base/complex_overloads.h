@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__complex_overloads_h
-#define dealii__complex_overloads_h
+#ifndef dealii_complex_overloads_h
+#define dealii_complex_overloads_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/template_constraints.h>

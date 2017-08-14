@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_component_mask_h
-#define dealii__fe_component_mask_h
+#ifndef dealii_fe_component_mask_h
+#define dealii_fe_component_mask_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

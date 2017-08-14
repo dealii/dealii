@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__trilinos_vector_base_h
-#define dealii__trilinos_vector_base_h
+#ifndef dealii_trilinos_vector_base_h
+#define dealii_trilinos_vector_base_h
 
 #warning This file is deprecated. Use <deal.II/lac/trilinos_vector.h> instead.
 
@@ -36,4 +36,4 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii__trilinos_vector_base_h
+#endif // dealii_trilinos_vector_base_h

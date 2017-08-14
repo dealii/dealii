@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mpi_templates_h
-#define dealii__mpi_templates_h
+#ifndef dealii_mpi_templates_h
+#define dealii_mpi_templates_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

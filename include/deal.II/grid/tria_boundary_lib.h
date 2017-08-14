@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tria_boundary_lib_h
-#define dealii__tria_boundary_lib_h
+#ifndef dealii_tria_boundary_lib_h
+#define dealii_tria_boundary_lib_h
 
 
 #include <deal.II/base/config.h>

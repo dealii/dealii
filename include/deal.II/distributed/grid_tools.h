@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__distributed_grid_tools_h
-#define dealii__distributed_grid_tools_h
+#ifndef dealii_distributed_grid_tools_h
+#define dealii_distributed_grid_tools_h
 
 
 #include <deal.II/base/config.h>

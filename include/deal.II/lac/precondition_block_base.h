@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__precondition_block_base_h
-#define dealii__precondition_block_base_h
+#ifndef dealii_precondition_block_base_h
+#define dealii_precondition_block_base_h
 
 
 #include <deal.II/base/config.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__grid_out_h
-#define dealii__grid_out_h
+#ifndef dealii_grid_out_h
+#define dealii_grid_out_h
 
 
 

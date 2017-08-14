@@ -1219,11 +1219,11 @@ get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
 
 
 template <int dim, int spacedim>
-TorusBoundary<dim,spacedim>::TorusBoundary (const double R__,
-                                            const double r__)
+TorusBoundary<dim,spacedim>::TorusBoundary (const double R_,
+                                            const double r_)
   :
-  R(R__),
-  r(r__)
+  R(R_),
+  r(r_)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -1231,11 +1231,11 @@ TorusBoundary<dim,spacedim>::TorusBoundary (const double R__,
 
 
 template <>
-TorusBoundary<2,3>::TorusBoundary (const double R__,
-                                   const double r__)
+TorusBoundary<2,3>::TorusBoundary (const double R_,
+                                   const double r_)
   :
-  R(R__),
-  r(r__)
+  R(R_),
+  r(r_)
 {
   Assert (R>r, ExcMessage("Outer radius must be greater than inner radius."));
 }

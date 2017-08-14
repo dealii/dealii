@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__vector_view_h
-#define dealii__vector_view_h
+#ifndef dealii_vector_view_h
+#define dealii_vector_view_h
 
 
 #include <deal.II/base/config.h>

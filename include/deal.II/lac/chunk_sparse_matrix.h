@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__chunk_sparse_matrix_h
-#define dealii__chunk_sparse_matrix_h
+#ifndef dealii_chunk_sparse_matrix_h
+#define dealii_chunk_sparse_matrix_h
 
 
 #include <deal.II/base/config.h>

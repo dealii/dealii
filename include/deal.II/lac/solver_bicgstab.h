@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__solver_bicgstab_h
-#define dealii__solver_bicgstab_h
+#ifndef dealii_solver_bicgstab_h
+#define dealii_solver_bicgstab_h
 
 
 #include <deal.II/base/config.h>

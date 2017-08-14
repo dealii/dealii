@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_system_h
-#define dealii__fe_system_h
+#ifndef dealii_fe_system_h
+#define dealii_fe_system_h
 
 
 /*----------------------------   fe_system.h     ---------------------------*/

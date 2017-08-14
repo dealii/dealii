@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mg_transfer_matrix_free_h
-#define dealii__mg_transfer_matrix_free_h
+#ifndef dealii_mg_transfer_matrix_free_h
+#define dealii_mg_transfer_matrix_free_h
 
 #include <deal.II/base/config.h>
 

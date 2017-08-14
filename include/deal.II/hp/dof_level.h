@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__hp_dof_level_h
-#define dealii__hp_dof_level_h
+#ifndef dealii_hp_dof_level_h
+#define dealii_hp_dof_level_h
 
 
 #include <deal.II/base/config.h>

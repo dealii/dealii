@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__identity_matrix_h
-#define dealii__identity_matrix_h
+#ifndef dealii_identity_matrix_h
+#define dealii_identity_matrix_h
 
 
 #include <deal.II/base/config.h>

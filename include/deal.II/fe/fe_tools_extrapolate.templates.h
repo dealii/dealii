@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_tools_extrapolate_templates_H
-#define dealii__fe_tools_extrapolate_templates_H
+#ifndef dealii_fe_tools_extrapolate_templates_H
+#define dealii_fe_tools_extrapolate_templates_H
 
 
 #include <deal.II/distributed/p4est_wrappers.h>
@@ -1646,5 +1646,5 @@ namespace FETools
 DEAL_II_NAMESPACE_CLOSE
 
 /*----------------------------   fe_tools_extrapolate_templates.h     ---------------------------*/
-/* end of #ifndef dealii__fe_tools_extrapolate_templates_H */
+/* end of #ifndef dealii_fe_tools_extrapolate_templates_H */
 #endif

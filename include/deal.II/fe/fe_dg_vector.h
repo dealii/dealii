@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_dg_vector_h
-#define dealii__fe_dg_vector_h
+#ifndef dealii_fe_dg_vector_h
+#define dealii_fe_dg_vector_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>

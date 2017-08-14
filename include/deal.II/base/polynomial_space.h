@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__polynomial_space_h
-#define dealii__polynomial_space_h
+#ifndef dealii_polynomial_space_h
+#define dealii_polynomial_space_h
 
 
 #include <deal.II/base/config.h>

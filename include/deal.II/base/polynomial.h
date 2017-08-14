@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__polynomial_h
-#define dealii__polynomial_h
+#ifndef dealii_polynomial_h
+#define dealii_polynomial_h
 
 
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__function_cspline_h
-#define dealii__function_cspline_h
+#ifndef dealii_function_cspline_h
+#define dealii_function_cspline_h
 
 #include <deal.II/base/config.h>
 

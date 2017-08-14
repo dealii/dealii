@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__polynomials_bernstein_h
-#define dealii__polynomials_bernstein_h
+#ifndef dealii_polynomials_bernstein_h
+#define dealii_polynomials_bernstein_h
 
 
 #include <deal.II/base/polynomial.h>

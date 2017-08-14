@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__event_h
-#define dealii__event_h
+#ifndef dealii_event_h
+#define dealii_event_h
 
 #include <deal.II/base/config.h>
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mg_matrix_h
-#define dealii__mg_matrix_h
+#ifndef dealii_mg_matrix_h
+#define dealii_mg_matrix_h
 
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/lac/linear_operator.h>

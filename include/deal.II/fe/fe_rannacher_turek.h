@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__fe_rannacher_turek_h
-#define dealii__fe_rannacher_turek_h
+#ifndef dealii_fe_rannacher_turek_h
+#define dealii_fe_rannacher_turek_h
 
 #include <deal.II/base/polynomials_rannacher_turek.h>
 #include <deal.II/fe/fe_poly.h>

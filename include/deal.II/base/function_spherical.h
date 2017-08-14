@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__function_spherical_h
-#define dealii__function_spherical_h
+#ifndef dealii_function_spherical_h
+#define dealii_function_spherical_h
 
 #include <deal.II/base/config.h>
 

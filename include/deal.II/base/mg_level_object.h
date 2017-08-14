@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mg_level_object_h
-#define dealii__mg_level_object_h
+#ifndef dealii_mg_level_object_h
+#define dealii_mg_level_object_h
 
 #include <deal.II/base/subscriptor.h>
 #include <vector>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef _dealii__numerics_kdtree_h
-#define _dealii__numerics_kdtree_h
+#ifndef dealii_numerics_kdtree_h
+#define dealii_numerics_kdtree_h
 
 #include <deal.II/base/config.h>
 

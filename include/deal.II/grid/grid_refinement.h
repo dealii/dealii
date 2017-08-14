@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__grid_refinement_h
-#define dealii__grid_refinement_h
+#ifndef dealii_grid_refinement_h
+#define dealii_grid_refinement_h
 
 
 #include <deal.II/base/config.h>
@@ -361,4 +361,4 @@ namespace GridRefinement
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif //dealii__grid_refinement_h
+#endif //dealii_grid_refinement_h

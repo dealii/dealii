@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__matrix_free_helper_functions_h
-#define dealii__matrix_free_helper_functions_h
+#ifndef dealii_matrix_free_helper_functions_h
+#define dealii_matrix_free_helper_functions_h
 
 
 #include <deal.II/base/exceptions.h>

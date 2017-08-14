@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__function_time_templates_h
-#define dealii__function_time_templates_h
+#ifndef dealii_function_time_templates_h
+#define dealii_function_time_templates_h
 
 #include <deal.II/base/function_time.h>
 
@@ -53,4 +53,4 @@ FunctionTime<Number>::advance_time (const Number delta_t)
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif /* dealii__function_time_templates_h */
+#endif /* dealii_function_time_templates_h */

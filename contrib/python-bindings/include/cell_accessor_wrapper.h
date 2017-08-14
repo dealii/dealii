@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__cell_accessor_wrapper_h
-#define dealii__cell_accessor_wrapper_h
+#ifndef dealii_cell_accessor_wrapper_h
+#define dealii_cell_accessor_wrapper_h
 
 #include <deal.II/base/config.h>
 

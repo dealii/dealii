@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__read_write_vector_h
-#define dealii__read_write_vector_h
+#ifndef dealii_read_write_vector_h
+#define dealii_read_write_vector_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/index_set.h>

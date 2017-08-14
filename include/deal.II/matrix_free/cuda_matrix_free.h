@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__cuda_matrix_free_h
-#define dealii__cuda_matrix_free_h
+#ifndef dealii_cuda_matrix_free_h
+#define dealii_cuda_matrix_free_h
 
 #include <deal.II/base/config.h>
 

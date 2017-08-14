@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__std_cxx1x_bind_h
-#define dealii__std_cxx1x_bind_h
+#ifndef dealii_std_cxx1x_bind_h
+#define dealii_std_cxx1x_bind_h
 
 // this file is deprecated. simply include the one we use now
 #include "../std_cxx11/bind.h"

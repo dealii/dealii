@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__memory_consumption_h
-#define dealii__memory_consumption_h
+#ifndef dealii_memory_consumption_h
+#define dealii_memory_consumption_h
 
 
 #include <deal.II/base/config.h>

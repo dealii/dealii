@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mesh_worker_assemble_flags_h
-#define dealii__mesh_worker_assemble_flags_h
+#ifndef dealii_mesh_worker_assemble_flags_h
+#define dealii_mesh_worker_assemble_flags_h
 
 
 #include <deal.II/base/config.h>

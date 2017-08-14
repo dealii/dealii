@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__mesh_worker_local_results_h
-#define dealii__mesh_worker_local_results_h
+#ifndef dealii_mesh_worker_local_results_h
+#define dealii_mesh_worker_local_results_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/geometry_info.h>

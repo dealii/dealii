@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__matrix_creator_templates_h
-#define dealii__matrix_creator_templates_h
+#ifndef dealii_matrix_creator_templates_h
+#define dealii_matrix_creator_templates_h
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature.h>

@@ -43,7 +43,7 @@ using namespace dealii;
 // Now the output of mesh and refine indicators in vtu format is disabled to
 // prevent unnecessary outputs during regression test. It you want to see the
 // mesh, uncomment the following macro definition.
-// #define __WRITE_VTU__
+// #define WRITE_VTU
 
 template <int dim> class Location;
 
@@ -273,7 +273,7 @@ void TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
 template <int dim>
 void TriaTest<dim>::write_vtu(const unsigned int counter) const
 {
-#ifdef __WRITE_VTU__
+#ifdef WRITE_VTU
   // save refine flag
   Vector<float> refine_mark;
   {
@@ -329,4 +329,3 @@ void TriaTest<dim>::write_vtu(const unsigned int counter) const
 #endif
   return;
 }
-

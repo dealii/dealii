@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__symmetric_tensor_h
-#define dealii__symmetric_tensor_h
+#ifndef dealii_symmetric_tensor_h
+#define dealii_symmetric_tensor_h
 
 
 #include <deal.II/base/tensor.h>

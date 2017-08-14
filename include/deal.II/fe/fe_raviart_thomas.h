@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_raviart_thomas_h
-#define dealii__fe_raviart_thomas_h
+#ifndef dealii_fe_raviart_thomas_h
+#define dealii_fe_raviart_thomas_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/table.h>

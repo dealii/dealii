@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__integrators_local_integrators_h
-#define dealii__integrators_local_integrators_h
+#ifndef dealii_integrators_local_integrators_h
+#define dealii_integrators_local_integrators_h
 
 // This file only provides definition and documentation of the
 // namespace LocalIntegrators. There is no necessity to include it

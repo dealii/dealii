@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__occ_boundary_lib_h
-#define dealii__occ_boundary_lib_h
+#ifndef dealii_occ_boundary_lib_h
+#define dealii_occ_boundary_lib_h
 
 #include <deal.II/base/config.h>
 

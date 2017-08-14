@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__mg_transfer_templates_h
-#define dealii__mg_transfer_templates_h
+#ifndef dealii_mg_transfer_templates_h
+#define dealii_mg_transfer_templates_h
 
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>

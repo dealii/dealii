@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mpi_h
-#define dealii__mpi_h
+#ifndef dealii_mpi_h
+#define dealii_mpi_h
 
 #include <deal.II/base/config.h>
 

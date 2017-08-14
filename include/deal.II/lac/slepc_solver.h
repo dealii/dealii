@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__slepc_solver_h
-#define dealii__slepc_solver_h
+#ifndef dealii_slepc_solver_h
+#define dealii_slepc_solver_h
 
 #include <deal.II/base/config.h>
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__trilinos_block_sparse_matrix_h
-#define dealii__trilinos_block_sparse_matrix_h
+#ifndef dealii_trilinos_block_sparse_matrix_h
+#define dealii_trilinos_block_sparse_matrix_h
 
 
 #include <deal.II/base/config.h>
@@ -632,4 +632,4 @@ DEAL_II_NAMESPACE_CLOSE
 
 #endif    // DEAL_II_WITH_TRILINOS
 
-#endif    // dealii__trilinos_block_sparse_matrix_h
+#endif    // dealii_trilinos_block_sparse_matrix_h

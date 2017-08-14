@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__quadrature_selector_h
-#define dealii__quadrature_selector_h
+#ifndef dealii_quadrature_selector_h
+#define dealii_quadrature_selector_h
 
 
 #include <deal.II/base/quadrature.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__job_identifier_h
-#define dealii__job_identifier_h
+#ifndef dealii_job_identifier_h
+#define dealii_job_identifier_h
 
 
 #include <deal.II/base/config.h>

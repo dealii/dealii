@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__data_out_dof_data_templates_h
-#define dealii__data_out_dof_data_templates_h
+#ifndef dealii_data_out_dof_data_templates_h
+#define dealii_data_out_dof_data_templates_h
 
 
 #include <deal.II/base/memory_consumption.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__integrators_advection_h
-#define dealii__integrators_advection_h
+#ifndef dealii_integrators_advection_h
+#define dealii_integrators_advection_h
 
 
 #include <deal.II/base/config.h>

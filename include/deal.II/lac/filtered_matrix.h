@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__filtered_matrix_h
-#define dealii__filtered_matrix_h
+#ifndef dealii_filtered_matrix_h
+#define dealii_filtered_matrix_h
 
 
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__composition_manifold_h
-#define dealii__composition_manifold_h
+#ifndef dealii_composition_manifold_h
+#define dealii_composition_manifold_h
 
 
 /*----------------------------   composition_manifold.h     ------------*/

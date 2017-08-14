@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__theta_timestepping_templates_h
-#define dealii__theta_timestepping_templates_h
+#ifndef dealii_theta_timestepping_templates_h
+#define dealii_theta_timestepping_templates_h
 
 
 #include <deal.II/algorithms/theta_timestepping.h>

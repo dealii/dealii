@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__std_cxx1x_condition_variable_h
-#define dealii__std_cxx1x_condition_variable_h
+#ifndef dealii_std_cxx1x_condition_variable_h
+#define dealii_std_cxx1x_condition_variable_h
 
 // this file is deprecated. simply include the one we use now
 #include "../std_cxx11/condition_variable.h"

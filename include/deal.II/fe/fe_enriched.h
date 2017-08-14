@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_enriched_h
-#define dealii__fe_enriched_h
+#ifndef dealii_fe_enriched_h
+#define dealii_fe_enriched_h
 
 #include <deal.II/base/config.h>
 
@@ -641,4 +641,4 @@ private:
 //}
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii__fe_enriched_h
+#endif // dealii_fe_enriched_h

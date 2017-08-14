@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mapping_collection_h
-#define dealii__mapping_collection_h
+#ifndef dealii_mapping_collection_h
+#define dealii_mapping_collection_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>

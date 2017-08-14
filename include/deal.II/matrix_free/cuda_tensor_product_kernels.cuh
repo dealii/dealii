@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__cuda_tensor_product_kernels_h
-#define dealii__cuda_tensor_product_kernels_h
+#ifndef dealii_cuda_tensor_product_kernels_h
+#define dealii_cuda_tensor_product_kernels_h
 
 #include <deal.II/base/config.h>
 

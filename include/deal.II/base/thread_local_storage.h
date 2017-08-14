@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__thread_local_storage_h
-#define dealii__thread_local_storage_h
+#ifndef dealii_thread_local_storage_h
+#define dealii_thread_local_storage_h
 
 
 #include <deal.II/base/config.h>
@@ -278,6 +278,6 @@ namespace Threads
 
 //---------------------------------------------------------------------------
 DEAL_II_NAMESPACE_CLOSE
-// end of #ifndef dealii__thread_local_storage_h
+// end of #ifndef dealii_thread_local_storage_h
 #endif
 //---------------------------------------------------------------------------

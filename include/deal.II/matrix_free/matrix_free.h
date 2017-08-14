@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__matrix_free_h
-#define dealii__matrix_free_h
+#ifndef dealii_matrix_free_h
+#define dealii_matrix_free_h
 
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>

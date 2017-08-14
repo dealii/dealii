@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__error_estimator_h
-#define dealii__error_estimator_h
+#ifndef dealii_error_estimator_h
+#define dealii_error_estimator_h
 
 
 #include <deal.II/base/config.h>

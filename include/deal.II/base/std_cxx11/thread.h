@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__std_cxx11_thread_h
-#define dealii__std_cxx11_thread_h
+#ifndef dealii_std_cxx11_thread_h
+#define dealii_std_cxx11_thread_h
 
 
 #include <deal.II/base/config.h>

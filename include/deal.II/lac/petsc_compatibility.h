@@ -17,8 +17,8 @@
  * Rather than using ifdefs everywhere, try to wrap older versions of PETSc
  * functions in one place.
  */
-#ifndef dealii__petsc_compatibility_h
-#define dealii__petsc_compatibility_h
+#ifndef dealii_petsc_compatibility_h
+#define dealii_petsc_compatibility_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/exceptions.h>
@@ -145,4 +145,4 @@ namespace PETScWrappers
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC
-#endif // dealii__petsc_compatibility_h
+#endif // dealii_petsc_compatibility_h

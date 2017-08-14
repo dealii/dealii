@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__mg_transfer_internal_h
-#define dealii__mg_transfer_internal_h
+#ifndef dealii_mg_transfer_internal_h
+#define dealii_mg_transfer_internal_h
 
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/dofs/dof_handler.h>

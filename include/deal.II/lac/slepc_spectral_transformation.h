@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__slepc_spectral_transformation_h
-#define dealii__slepc_spectral_transformation_h
+#ifndef dealii_slepc_spectral_transformation_h
+#define dealii_slepc_spectral_transformation_h
 
 
 #include <deal.II/base/config.h>

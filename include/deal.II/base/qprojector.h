@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__qprojector_h
-#define dealii__qprojector_h
+#ifndef dealii_qprojector_h
+#define dealii_qprojector_h
 
 
 #include <deal.II/base/quadrature.h>

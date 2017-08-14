@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mg_base_h
-#define dealii__mg_base_h
+#ifndef dealii_mg_base_h
+#define dealii_mg_base_h
 
 /*
  * This file contains some abstract base classes

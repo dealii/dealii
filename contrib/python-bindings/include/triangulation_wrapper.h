@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__triangulation_wrapper_h
-#define dealii__triangulation_wrapper_h
+#ifndef dealii_triangulation_wrapper_h
+#define dealii_triangulation_wrapper_h
 
 #include <deal.II/base/config.h>
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__block_indices_h
-#define dealii__block_indices_h
+#ifndef dealii_block_indices_h
+#define dealii_block_indices_h
 
 
 #include <deal.II/base/config.h>

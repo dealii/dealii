@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__synchronous_iterator_h
-#define dealii__synchronous_iterator_h
+#ifndef dealii_synchronous_iterator_h
+#define dealii_synchronous_iterator_h
 
 
 #include <deal.II/base/config.h>

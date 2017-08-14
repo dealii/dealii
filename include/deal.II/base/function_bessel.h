@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__function_bessel_h
-#define dealii__function_bessel_h
+#ifndef dealii_function_bessel_h
+#define dealii_function_bessel_h
 
 
 #include <deal.II/base/config.h>

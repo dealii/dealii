@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_poly_face_h
-#define dealii__fe_poly_face_h
+#ifndef dealii_fe_poly_face_h
+#define dealii_fe_poly_face_h
 
 
 #include <deal.II/base/qprojector.h>

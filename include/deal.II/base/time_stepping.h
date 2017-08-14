@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__time_stepping_h
-#define dealii__time_stepping_h
+#ifndef dealii_time_stepping_h
+#define dealii_time_stepping_h
 
 
 #include <deal.II/base/config.h>

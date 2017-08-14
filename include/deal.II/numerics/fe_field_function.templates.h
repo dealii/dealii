@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_field_function_templates_h
-#define dealii__fe_field_function_templates_h
+#ifndef dealii_fe_field_function_templates_h
+#define dealii_fe_field_function_templates_h
 
 
 #include <deal.II/base/utilities.h>

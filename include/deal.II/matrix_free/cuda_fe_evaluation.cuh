@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__cuda_fe_evaluation_cuh
-#define dealii__cuda_fe_evaluation_cuh
+#ifndef dealii_cuda_fe_evaluation_cuh
+#define dealii_cuda_fe_evaluation_cuh
 
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>

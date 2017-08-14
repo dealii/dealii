@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__multithread_info_h
-#define dealii__multithread_info_h
+#ifndef dealii_multithread_info_h
+#define dealii_multithread_info_h
 //---------------------------------------------------------------------------
 
 
@@ -126,6 +126,6 @@ private:
 
 //---------------------------------------------------------------------------
 DEAL_II_NAMESPACE_CLOSE
-// end of #ifndef dealii__multithread_info_h
+// end of #ifndef dealii_multithread_info_h
 #endif
 //---------------------------------------------------------------------------

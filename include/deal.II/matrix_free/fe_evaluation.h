@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__matrix_free_fe_evaluation_h
-#define dealii__matrix_free_fe_evaluation_h
+#ifndef dealii_matrix_free_fe_evaluation_h
+#define dealii_matrix_free_fe_evaluation_h
 
 
 #include <deal.II/base/array_view.h>

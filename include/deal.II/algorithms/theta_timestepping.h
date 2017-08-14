@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__theta_timestepping_h
-#define dealii__theta_timestepping_h
+#ifndef dealii_theta_timestepping_h
+#define dealii_theta_timestepping_h
 
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/algorithms/operator.h>

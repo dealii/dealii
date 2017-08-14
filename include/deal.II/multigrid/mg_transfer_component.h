@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mg_transfer_component_h
-#define dealii__mg_transfer_component_h
+#ifndef dealii_mg_transfer_component_h
+#define dealii_mg_transfer_component_h
 
 #include <deal.II/base/config.h>
 

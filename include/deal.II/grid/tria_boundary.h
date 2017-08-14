@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tria_boundary_h
-#define dealii__tria_boundary_h
+#ifndef dealii_tria_boundary_h
+#define dealii_tria_boundary_h
 
 
 /*----------------------------   boundary-function.h     ---------------------------*/
