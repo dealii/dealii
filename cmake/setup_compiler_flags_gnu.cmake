@@ -73,6 +73,11 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Woverloaded-virtual")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-long-long")
 
 #
+# Disable fallthrough warnings on GCC7:
+#
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-implicit-fallthrough")
+
+#
 # Disable Wplacement-new that will trigger a lot of warnings
 # in the BOOST function classes that we include via the
 # BOOST signals classes:
