@@ -97,6 +97,10 @@ void test ()
 
     const auto a = make_array_view(v.cbegin() + 2, v.cend());
     AssertThrow(a.size() + 2 == v.size(), ExcInternalError());
+    // some older versions of boost (1.57 in particular) do not implement
+    // static_vector::cbegin() and static_vector::cend() correctly, so ignore
+    // the type checking in that case
+#if BOOST_VERSION >= 106200
     // a should be const ArrayView<const double>
     static_assert(std::is_const<decltype(a)>::value,
                   "a should not be const (but has const value)");
@@ -106,6 +110,7 @@ void test ()
                   "type should be const");
     static_assert(is_const_reference<decltype(*a.end())>(),
                   "type should be const");
+#endif
     v[2] = 10.0;
     AssertThrow(a[0] == v[2], ExcInternalError());
 
