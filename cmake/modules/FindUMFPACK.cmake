@@ -119,24 +119,6 @@ FIND_UMFPACK_LIBRARY(CAMD camd)
 FIND_UMFPACK_LIBRARY(SuiteSparse_config suitesparseconfig)
 
 #
-# Test whether libsuitesparseconfig.xxx can be used for shared library
-# linkage. If not, exclude it from the command line.
-#
-LIST(APPEND CMAKE_REQUIRED_LIBRARIES
-  "-shared"
-  ${SuiteSparse_config_LIBRARY}
-  )
-CHECK_CXX_SOURCE_COMPILES("extern int SuiteSparse_version (int[3]);
-  void foo(int bar[3]) { SuiteSparse_version(bar);}"
-  LAPACK_SUITESPARSECONFIG_WITH_PIC
-  )
-RESET_CMAKE_REQUIRED()
-
-IF(LAPACK_SUITESPARSECONFIG_WITH_PIC OR NOT BUILD_SHARED_LIBS)
-  SET(_suitesparse_config SuiteSparse_config_LIBRARY)
-ENDIF()
-
-#
 # Add rt to the link interface as well (for whatever reason,
 # libsuitesparse.so depends on clock_gettime but the shared
 # lib does not record its dependence on librt.so as evidenced
@@ -148,7 +130,7 @@ MARK_AS_ADVANCED(rt_LIBRARY)
 DEAL_II_PACKAGE_HANDLE(UMFPACK
   LIBRARIES
     REQUIRED UMFPACK_LIBRARY
-    OPTIONAL CHOLMOD_LIBRARY CCOLAMD_LIBRARY COLAMD_LIBRARY CAMD_LIBRARY ${_suitesparse_config}
+    OPTIONAL CHOLMOD_LIBRARY CCOLAMD_LIBRARY COLAMD_LIBRARY CAMD_LIBRARY SuiteSparse_config_LIBRARY
     REQUIRED AMD_LIBRARY
     OPTIONAL METIS_LIBRARIES LAPACK_LIBRARIES rt_LIBRARY
   INCLUDE_DIRS
