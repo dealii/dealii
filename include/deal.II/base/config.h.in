@@ -52,6 +52,7 @@
 #cmakedefine DEAL_II_WITH_P4EST
 #cmakedefine DEAL_II_WITH_PETSC
 #cmakedefine DEAL_II_WITH_SLEPC
+#cmakedefine DEAL_II_WITH_SUNDIALS
 #cmakedefine DEAL_II_WITH_THREADS
 #cmakedefine DEAL_II_WITH_TRILINOS
 #cmakedefine DEAL_II_WITH_UMFPACK
