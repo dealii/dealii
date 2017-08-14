@@ -1,0 +1,3 @@
+Deprecated: constraint_and_return_value has been deprecated 
+in favor of std::enable_if.
+<br> (Daniel Arndt, 2017/08/14)
