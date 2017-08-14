@@ -67,7 +67,7 @@ parameter that is chosen in the range of the (local) mesh width $h$;
 good results are usually obtained by setting $\delta=0.1h$. Note that
 the modification in the test function vanishes as the mesh size tends
 to zero. We will not discuss reasons, pros, and cons of the streamline
-diffusion method, but rather use it ``as is'', and refer the
+diffusion method, but rather use it "as is", and refer the
 interested reader to the sufficiently available literature; every
 recent good book on finite elements should have a discussion of that
 topic.
