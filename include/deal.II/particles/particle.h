@@ -133,11 +133,14 @@ namespace Particles
      * class then de-serializes its data from this memory location and
      * advance the pointer accordingly.
      *
-     * @param[in,out] new_property_pool A property pool that is used to
-     * allocate the property data used by this particle.
+     * @param[in,out] property_pool An optional pointer to a property pool
+     * that is used to manage the property data used by this particle. Note that
+     * if a non-null pointer is handed over this constructor assumes @p begin_data
+     * contains serialized data of the same length and type that is allocated
+     * by @p property_pool.
      */
     Particle (const void *&begin_data,
-              PropertyPool<PropertyType> &new_property_pool);
+              PropertyPool<PropertyType> *property_pool = NULL);
 
     /**
      * Move constructor for Particle, creates a particle from an existing
@@ -169,7 +172,7 @@ namespace Particles
      * point to the first element in which the data should be written. This
      * function is meant for serializing all particle properties and
      * afterwards de-serializing the properties by calling the appropriate
-     * constructor Particle(void *&data, const unsigned int data_size);
+     * constructor Particle(void *&data, PropertyPool<PropertyType> *property_pool = NULL);
      *
      * @param [in,out] data The memory location to write particle data
      * into. This pointer points to the begin of the memory, in which the
@@ -178,6 +181,14 @@ namespace Particles
      */
     void
     write_data(void *&data) const;
+
+    /**
+     * Returns the size in bytes this particle occupies if all of its data is
+     * serialized (i.e. the number of bytes that is written by the write_data
+     * function of this class).
+     */
+    std::size_t
+    size() const;
 
     /**
      * Set the location of this particle. Note that this does not check

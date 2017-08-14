@@ -73,7 +73,7 @@ namespace Particles
 
   template <int dim, int spacedim, typename PropertyType>
   Particle<dim,spacedim,PropertyType>::Particle (const void *&data,
-                                                 PropertyPool<PropertyType> &new_property_pool)
+                                                 PropertyPool<PropertyType> *new_property_pool)
   {
     const types::particle_index *id_data = static_cast<const types::particle_index *> (data);
     id = *id_data++;
@@ -85,16 +85,22 @@ namespace Particles
     for (unsigned int i = 0; i < dim; ++i)
       reference_location(i) = *pdata++;
 
-    property_pool = &new_property_pool;
-    properties = property_pool->allocate_properties_array();
-
-    // TODO reinterpret cast pdata to PropertyType
-    // See if there are properties to load
-    const ArrayView<PropertyType> particle_properties = property_pool->get_properties(properties);
-    for (unsigned int i = 0; i < particle_properties.size(); ++i)
-      particle_properties[i] = *pdata++;
-
     data = static_cast<const void *> (pdata);
+
+    // See if there are properties to load
+    if (new_property_pool != NULL)
+      {
+        property_pool = new_property_pool;
+        properties = property_pool->allocate_properties_array();
+
+        const PropertyType *property_data = static_cast<const PropertyType *> (data);
+
+        const ArrayView<PropertyType> particle_properties = property_pool->get_properties(properties);
+        for (unsigned int i = 0; i < particle_properties.size(); ++i)
+          particle_properties[i] = *property_data++;
+
+        data = static_cast<const void *> (property_data);
+      }
   }
 
 
@@ -187,13 +193,37 @@ namespace Particles
     for (unsigned int i = 0; i < dim; ++i,++pdata)
       *pdata = reference_location(i);
 
-    // TODO reinterpret cast pdata to PropertyType
-    // Write property data
-    const ArrayView<PropertyType> particle_properties = property_pool->get_properties(properties);
-    for (unsigned int i = 0; i < particle_properties.size(); ++i,++pdata)
-      *pdata = particle_properties[i];
-
     data = static_cast<void *> (pdata);
+
+    // Write property data
+    if (has_properties())
+      {
+        PropertyType *property_data = reinterpret_cast<PropertyType *> (data);
+
+        const ArrayView<PropertyType> particle_properties = property_pool->get_properties(properties);
+        for (unsigned int i = 0; i < particle_properties.size(); ++i,++property_data)
+          *property_data = particle_properties[i];
+
+        data = static_cast<void *> (pdata);
+      }
+  }
+
+
+
+  template <int dim, int spacedim, typename PropertyType>
+  std::size_t
+  Particle<dim,spacedim,PropertyType>::size () const
+  {
+    std::size_t size = sizeof(types::particle_index)
+        + sizeof(location)
+        + sizeof(reference_location);
+
+    if (has_properties())
+      {
+        const ArrayView<PropertyType> particle_properties = property_pool->get_properties(properties);
+        size += sizeof(PropertyType) * particle_properties.size();
+      }
+    return size;
   }
 
 
@@ -266,6 +296,10 @@ namespace Particles
   void
   Particle<dim,spacedim,PropertyType>::set_properties (const ArrayView<const PropertyType> &new_properties)
   {
+    Assert(property_pool != NULL,
+        ExcMessage("A particle was asked to set its properties without an "
+            "associated PropertyPool."))
+
     if (properties == PropertyPool<PropertyType>::invalid_handle)
       properties = property_pool->allocate_properties_array();
 
@@ -280,8 +314,9 @@ namespace Particles
   const ArrayView<const PropertyType>
   Particle<dim,spacedim,PropertyType>::get_properties () const
   {
-    Assert(property_pool != NULL,
-           ExcInternalError());
+    Assert(has_properties(),
+           ExcMessage("A particle without additional properties was asked for "
+               "its properties."));
 
     return property_pool->get_properties(properties);
   }
@@ -292,8 +327,9 @@ namespace Particles
   const ArrayView<PropertyType>
   Particle<dim,spacedim,PropertyType>::get_properties ()
   {
-    Assert(property_pool != NULL,
-           ExcInternalError());
+    Assert(has_properties(),
+           ExcMessage("A particle without additional properties was asked for "
+               "its properties."));
 
     return property_pool->get_properties(properties);
   }
