@@ -50,6 +50,7 @@ ADD_SUBDIRECTORY(meshworker)
 ADD_SUBDIRECTORY(opencascade)
 ADD_SUBDIRECTORY(physics)
 ADD_SUBDIRECTORY(non_matching)
+ADD_SUBDIRECTORY(sundials)
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${build} build_lowercase)
