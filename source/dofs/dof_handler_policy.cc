@@ -3750,11 +3750,17 @@ namespace internal
                   {
                     if (cell->is_ghost())
                       {
-                        Assert(false, ExcMessage ("Not a ghost cell"));
+                        Assert(false,
+                               ExcMessage ("A ghost cell ended up with incomplete "
+                                           "DoF index information. This should not "
+                                           "have happened!"));
                       }
                     else
                       {
-                        Assert(false, ExcMessage ("Not one of our own cells"));
+                        Assert(false,
+                               ExcMessage ("A locally owned cell ended up with incomplete "
+                                           "DoF index information. This should not "
+                                           "have happened!"));
                       }
                   }
               }
