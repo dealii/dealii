@@ -22,7 +22,16 @@ DEAL_II_NAMESPACE_OPEN
 unsigned int
 GeometryInfo<0>::n_children(const RefinementCase<0> &)
 {
-  return 0;
+  return []()
+  {
+    return []()
+    {
+      return []()
+      {
+        return 0;
+      } ();
+    } ();
+  } ();
 }
 
 
