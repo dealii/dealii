@@ -86,7 +86,7 @@ namespace internal
       DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
       template <typename VectorType>
-      typename constraint_and_return_value<!IsBlockVector<VectorType>::value,
+      typename std::enable_if<!IsBlockVector<VectorType>::value,
                typename VectorType::value_type>::type
                min_element (const VectorType &criteria)
       {
@@ -95,7 +95,7 @@ namespace internal
 
 
       template <typename VectorType>
-      typename constraint_and_return_value<!IsBlockVector<VectorType>::value,
+      typename std::enable_if<!IsBlockVector<VectorType>::value,
                typename VectorType::value_type>::type
                max_element (const VectorType &criteria)
       {
@@ -104,7 +104,7 @@ namespace internal
 
 
       template <typename VectorType>
-      typename constraint_and_return_value<IsBlockVector<VectorType>::value,
+      typename std::enable_if<IsBlockVector<VectorType>::value,
                typename VectorType::value_type>::type
                min_element (const VectorType &criteria)
       {
@@ -117,7 +117,7 @@ namespace internal
 
 
       template <typename VectorType>
-      typename constraint_and_return_value<IsBlockVector<VectorType>::value,
+      typename std::enable_if<IsBlockVector<VectorType>::value,
                typename VectorType::value_type>::type
                max_element (const VectorType &criteria)
       {

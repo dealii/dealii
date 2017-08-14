@@ -81,12 +81,14 @@ template <bool, typename> struct constraint_and_return_value;
  * constraint_and_return_value template is true, then the return type is just
  * the second type in the template.
  *
+ * @deprecated Use std::enable_if instead.
+ *
  * @author Wolfgang Bangerth, 2003
  */
 template <typename T> struct constraint_and_return_value<true,T>
 {
   typedef T type;
-};
+} DEAL_II_DEPRECATED;
 
 
 
