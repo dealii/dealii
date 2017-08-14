@@ -1,0 +1,7 @@
+New: A new KDTreeDistance class has been added that interfaces
+the nanoflann library (https://github.com/jlblancoc/nanoflann).
+This class can be used to extract nearest neighbour information 
+on collection of points, query for the closest points to a target
+point or all points contained within a given distance.
+<br>
+(Luca Heltai, 2017/08/13)
