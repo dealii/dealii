@@ -1,0 +1,2 @@
+Deprecated: types_are_equal has been deprecated in favor of std::is_same.
+<br> (David Wells, 2017/08/14)

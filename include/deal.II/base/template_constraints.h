@@ -297,25 +297,9 @@ namespace internal
  * instead of this class.
  */
 template <typename T, typename U>
-struct types_are_equal
-{
-  static const bool value = false;
-} DEAL_II_DEPRECATED;
+struct types_are_equal : std::is_same<T,U>
+{} DEAL_II_DEPRECATED;
 
-
-/**
- * Partial specialization of the general template for the case that both
- * template arguments are equal. See the documentation of the general template
- * for more information.
- *
- * @deprecated Use the standard library type trait <code>std::is_same</code>
- * instead of this class.
- */
-template <typename T>
-struct types_are_equal<T,T>
-{
-  static const bool value = true;
-} DEAL_II_DEPRECATED;
 
 
 /**
