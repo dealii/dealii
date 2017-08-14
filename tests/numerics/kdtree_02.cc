@@ -1,22 +1,22 @@
-//-----------------------------------------------------------
+// ---------------------------------------------------------------------
 //
-//    Copyright (C) 2015 by the deal2lkit authors
+// Copyright (C) 2017 by the deal.II authors
 //
-//    This file is part of the deal2lkit library.
+// This file is part of the deal.II library.
 //
-//    The deal2lkit library is free software; you can use it, redistribute
-//    it, and/or modify it under the terms of the GNU Lesser General
-//    Public License as published by the Free Software Foundation; either
-//    version 2.1 of the License, or (at your option) any later version.
-//    The full text of the license can be found in the file LICENSE at
-//    the top level of the deal2lkit distribution.
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal2lkit distribution.
 //
-//-----------------------------------------------------------
+//---------------------------------------------------------------------
 
 // Create a list of points, and compute the closest points to a given one.
 
 #include "../tests.h"
-#include <deal.II/numerics/kdtree_distance.h>
+#include <deal.II/numerics/kdtree.h>
 
 int main ()
 {

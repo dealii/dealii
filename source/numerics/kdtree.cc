@@ -1,4 +1,4 @@
-#include <deal.II/numerics/kdtree_distance.h>
+#include <deal.II/numerics/kdtree.h>
 
 #ifdef DEAL_II_WITH_NANOFLANN
 
@@ -8,8 +8,8 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template<int dim>
-KDTreeDistance<dim>::KDTreeDistance(const unsigned int &max_leaf_size,
-                                    const std::vector<Point<dim> > &pts)
+KDTree<dim>::KDTree(const unsigned int &max_leaf_size,
+                    const std::vector<Point<dim> > &pts)
   : max_leaf_size(max_leaf_size)
 {
   if (pts.size() > 0)
@@ -18,7 +18,7 @@ KDTreeDistance<dim>::KDTreeDistance(const unsigned int &max_leaf_size,
 
 
 template<int dim>
-std::vector<std::pair<unsigned int, double> > KDTreeDistance<dim>::get_points_within_ball(const Point<dim> &center,
+std::vector<std::pair<unsigned int, double> > KDTree<dim>::get_points_within_ball(const Point<dim> &center,
     const double &radius,
     bool sorted) const
 {
@@ -36,7 +36,7 @@ std::vector<std::pair<unsigned int, double> > KDTreeDistance<dim>::get_points_wi
 }
 
 template<int dim>
-std::vector<std::pair<unsigned int, double> > KDTreeDistance<dim>::get_closest_points(const Point<dim> &target,
+std::vector<std::pair<unsigned int, double> > KDTree<dim>::get_closest_points(const Point<dim> &target,
     const unsigned int n_points) const
 {
   Assert(adaptor, ExcNotInitialized());
@@ -52,18 +52,18 @@ std::vector<std::pair<unsigned int, double> > KDTreeDistance<dim>::get_closest_p
 }
 
 template<int dim>
-void KDTreeDistance<dim>::set_points(const std::vector<Point<dim> > &pts)
+void KDTree<dim>::set_points(const std::vector<Point<dim> > &pts)
 {
   Assert(pts.size() > 0, ExcMessage("Expecting a non zero set of points."));
   adaptor = std_cxx14::make_unique<PointCloudAdaptor>(pts);
-  kdtree = std_cxx14::make_unique<KDTree>(dim, *adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));
+  kdtree = std_cxx14::make_unique<NanoFlannKDTree>(dim, *adaptor, nanoflann::KDTreeSingleIndexAdaptorParams(max_leaf_size));
   kdtree->buildIndex();
 }
 
 
-template class KDTreeDistance<1>;
-template class KDTreeDistance<2>;
-template class KDTreeDistance<3>;
+template class KDTree<1>;
+template class KDTree<2>;
+template class KDTree<3>;
 
 DEAL_II_NAMESPACE_CLOSE
 

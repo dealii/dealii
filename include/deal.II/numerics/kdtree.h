@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef _dealii__numerics_kdtree_distance_h
-#define _dealii__numerics_kdtree_distance_h
+#ifndef _dealii__numerics_kdtree_h
+#define _dealii__numerics_kdtree_h
 
 #include <deal.II/base/config.h>
 
@@ -33,15 +33,35 @@ DEAL_II_NAMESPACE_OPEN
  * A wrapper for the nanoflann library, used to compute the distance from a
  * collection of points, and to efficiently return nearest neighbors to a
  * target point. This function uses nanoflann to efficiently partition the
- * space in a tree. The cost of each query is then roughly of order log(n),
- * where n is the number of points stored in this class.
+ * space in a k-dimensional tree. The cost of each query is then roughly of
+ * order log(n), where n is the number of points stored in this class.
  *
- * The wrapper provides methods that give access to some of thefunctionalities
+ * The wrapper provides methods that give access to some of the functionalities
  * of the nanoflann library, like searching the n nearest neighbors, or
- * searching the points that fall within a raidius of a target point.
+ * searching the points that fall within a radius of a target point.
+ *
+ * @quotation
+ * From wikipedia (https://en.wikipedia.org/wiki/K-d_tree):
+ *
+ * A k-d tree is a binary tree in which every node is a k-dimensional point.
+ * Every non-leaf node can be thought of as implicitly generating a splitting
+ * hyperplane that divides the space into two parts, known as half-spaces.
+ * Points to the left of this hyperplane are represented by the left subtree of
+ * that node and points right of the hyperplane are represented by the right
+ * subtree. The hyperplane direction is chosen in the following way: every node
+ * in the tree is associated with one of the k-dimensions, with the hyperplane
+ * perpendicular to that dimension's axis. So, for example, if for a particular
+ * split the "x" axis is chosen, all points in the subtree with a smaller "x"
+ * value than the node will appear in the left subtree and all points with
+ * larger "x" value will be in the right subtree. In such a case, the
+ * hyperplane would be set by the x-value of the point, and its normal would be
+ * the unit x-axis.
+ * @endquotation
+ *
+ * @author Luca Heltai, 2017.
  */
 template<int dim>
-class KDTreeDistance
+class KDTree
 {
 public:
   /**
@@ -56,7 +76,7 @@ public:
    * a vector of points will result in an exception. Only a reference
    * to the points is stored, so you should make sure that the life of
    * the the vector you pass is longer than the life of this class, or
-   * you'll get undefinite behaviour.
+   * you'll get undefined behaviour.
    *
    * If you update the vector of points in someway, remember to call
    * again the set_points() method. The tree and the index are
@@ -65,8 +85,8 @@ public:
    * your points, and do not call again set_points(), your results
    * will likely be wrong.
    */
-  KDTreeDistance(const unsigned int &max_leaf_size=10,
-                 const std::vector<Point<dim> > &pts=std::vector<Point<dim> >());
+  KDTree(const unsigned int &max_leaf_size=10,
+         const std::vector<Point<dim> > &pts=std::vector<Point<dim> >());
 
 
   /**
@@ -86,45 +106,32 @@ public:
      * Reference to the vector of points from which we want to compute
      * the distance.
      */
-    const std::vector<Point<dim> > &points; //!< A const ref to the data set origin
+    const std::vector<Point<dim> > &points;
 
 
     /**
-     * The constrcutor needs the data set source.
+     * The constructor needs the vector of points from which we want to build
+     * the tree.
      */
-    PointCloudAdaptor(const std::vector<Point<dim> > &_points) : points(_points) { }
+    PointCloudAdaptor(const std::vector<Point<dim> > &_points);
 
 
     /**
      * Return number of points in the data set (required by nanoflann).
      */
-    inline size_t kdtree_get_point_count() const
-    {
-      return points.size();
-    }
+    size_t kdtree_get_point_count() const;
 
 
     /**
      * Return the L2 distance between points
      */
-    inline coord_t kdtree_distance(const coord_t *p1, const size_t idx_p2,size_t size) const
-    {
-      AssertDimension(size, dim);
-      coord_t res=0.0;
-      for (size_t d=0; d<size; ++d)
-        res += (p1[d]-points[idx_p2][d])*(p1[d]-points[idx_p2][d]);
-      return std::sqrt(res);
-    }
+    coord_t kdtree_distance(const coord_t *p1, const size_t idx_p2,size_t size) const;
 
 
     /**
-     * Return the dim'th component of the idx'th point in the class.
+     * Return the d-th component of the idx-th point in the class.
      */
-    inline coord_t kdtree_get_pt(const size_t idx, int d) const
-    {
-      AssertIndexRange(d,dim);
-      return points[idx][d];
-    }
+    coord_t kdtree_get_pt(const size_t idx, int d) const;
 
 
     /**
@@ -143,7 +150,7 @@ public:
    * A typedef for the actual KDTree object.
    */
   typedef typename nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<double, PointCloudAdaptor> ,
-          PointCloudAdaptor, dim, unsigned int>  KDTree;
+          PointCloudAdaptor, dim, unsigned int>  NanoFlannKDTree;
 
 
   /**
@@ -188,7 +195,6 @@ public:
    * @param[in] point: the target point
    * @param[in] radius: the radius of the ball
    * @param[in] sorted: sort the output results in ascending order with respect to distances
-   * @param[out] matches:
    *
    * @return vector of indices and distances of the matching points
    */
@@ -197,11 +203,8 @@ public:
       bool sorted=false) const;
 
   /**
-   * Fill two vectors with the indices and distances of the closest
-   * points to the given target point. The vectors are filled with
-   * indices and distances until there is space in them. You should
-   * resize them to the number of closest points you wish to get. An
-   * assertion is thrown if the vectors do not have the same size.
+   * Fill a vectors with the indices and distances of the closest @p n_points
+   * points to the given target point.
    *
    * @param[in] target: the target point
    * @param[in] n_points: the number of requested points
@@ -227,15 +230,16 @@ private:
   /**
    * The actual kdtree.
    */
-  std::unique_ptr<KDTree> kdtree;
+  std::unique_ptr<NanoFlannKDTree> kdtree;
 };
 
 
 //------------ inline functions -------------
+#ifndef DOXYGEN
 
 template<int dim>
 inline
-unsigned int KDTreeDistance<dim>::size() const
+unsigned int KDTree<dim>::size() const
 {
   if (adaptor)
     return adaptor->points.size();
@@ -243,22 +247,65 @@ unsigned int KDTreeDistance<dim>::size() const
     return 0;
 };
 
+
+
 template<int dim>
 inline const Point<dim> &
-KDTreeDistance<dim>::operator[](unsigned int i) const
+KDTree<dim>::operator[](unsigned int i) const
 {
   AssertIndexRange(i, size());
   return adaptor->points[i];
 }
 
 
+
+template<int dim>
+KDTree<dim>::PointCloudAdaptor::PointCloudAdaptor(const std::vector<Point<dim> > &_points)
+  : points(_points)
+{}
+
+
+
+template<int dim>
+inline size_t
+KDTree<dim>::PointCloudAdaptor::kdtree_get_point_count() const
+{
+  return points.size();
+}
+
+
+
+template<int dim>
+inline double
+KDTree<dim>::PointCloudAdaptor::kdtree_get_pt(const size_t idx, int d) const
+{
+  AssertIndexRange(d,dim);
+  return points[idx][d];
+}
+
+
+
 template<int dim>
 template <class BBOX>
 inline bool
-KDTreeDistance<dim>::PointCloudAdaptor::kdtree_get_bbox(BBOX &) const
+KDTree<dim>::PointCloudAdaptor::kdtree_get_bbox(BBOX &) const
 {
   return false;
 }
+
+
+
+template<int dim>
+inline double
+KDTree<dim>::PointCloudAdaptor::kdtree_distance(const double *p1, const size_t idx_p2,size_t size) const
+{
+  AssertDimension(size, dim);
+  double res=0.0;
+  for (size_t d=0; d<size; ++d)
+    res += (p1[d]-points[idx_p2][d])*(p1[d]-points[idx_p2][d]);
+  return std::sqrt(res);
+}
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
