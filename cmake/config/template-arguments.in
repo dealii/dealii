@@ -156,6 +156,12 @@ TRIANGULATION_AND_DOFHANDLERS := { Triangulation<deal_II_dimension, deal_II_spac
                                    DoFHandler<deal_II_dimension, deal_II_space_dimension>;
                                    hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> }
 
+// concrete Triangulation types (all types you can iterate over cells from)
+// with hard-coded <deal_II_dimension, deal_II_space_dimension>
+TRIANGULATIONS := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
+                    parallel::shared::Triangulation<deal_II_dimension, deal_II_space_dimension>;
+                    parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>;}
+
 // serial and parallel sparsity pattern types
 SPARSITY_PATTERNS := { SparsityPattern;
                        DynamicSparsityPattern;

@@ -13,6 +13,24 @@
 //
 // ---------------------------------------------------------------------
 
+for (X : TRIANGULATIONS; deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools \{
+    template
+    std::pair<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type, Point<deal_II_dimension> >
+    find_active_cell_around_point (const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+                                   const X &,
+                                   const Point<deal_II_space_dimension> &,
+                                   const std::vector<std::set<typename dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type> > &,
+                                   const std::vector<std::vector<Tensor<1,deal_II_space_dimension> > > &,
+                                   const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type &,
+                                   const std::vector<bool> &);
+    \}
+
+#endif
+}
 
 
 for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
@@ -101,6 +119,8 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
         template
         std::map<unsigned int,types::global_vertex_index>
         compute_local_to_global_vertex_index_map(const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &triangulation);
+
+
                 \}
 
 #endif
@@ -240,6 +260,12 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     template
     std::vector<std::set<Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> >
     vertex_to_cell_map(const Triangulation<deal_II_dimension,deal_II_space_dimension> &triangulation);
+
+    template
+    std::vector<std::vector<Tensor<1,deal_II_space_dimension> > >
+    vertex_to_cell_centers_directions(const Triangulation<deal_II_dimension,deal_II_space_dimension> &mesh,
+                                      const std::vector<std::set<typename Triangulation<deal_II_dimension,
+                                      deal_II_space_dimension>::active_cell_iterator> > &vertex_to_cells);
 
 #if deal_II_dimension == deal_II_space_dimension
 #  if deal_II_dimension > 1
