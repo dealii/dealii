@@ -277,8 +277,6 @@ void test_fe_datas()
 int main()
 {
   initlog();
-//  deallog.log_execution_time(true);
-//  deallog.log_time_differences(true);
 
   test_fe_datas<1>();
   test_fe_datas<2>();

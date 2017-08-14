@@ -276,18 +276,8 @@ int main()
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  // Switch between regression test
-  // and benchmark
-//#ifdef DEBUG
   const unsigned int size = 5;
   const unsigned int row_length = 3;
-  /*#else
-    deallog.depth_console(1000);
-    deallog.log_execution_time(true);
-    deallog.log_time_differences(true);
-    const unsigned int size = 50;
-    const unsigned int row_length = 9;
-    #endif*/
 
   check_ez_iterator();
   check_conjugate(logfile);
@@ -309,9 +299,7 @@ int main()
     deallog << "Assemble" << std::endl;
     testproblem.five_point(A, true);
     check_vmult_quadratic(A_res, A, "5-SparseMatrix<double>");
-//#ifdef DEBUG
     check_iterator(A);
-//#endif
   }
 
   // block sparse matrix with only
@@ -328,9 +316,7 @@ int main()
     testproblem.five_point(block_A, true);
     std::vector<double> block_A_res;
     check_vmult_quadratic(block_A_res, block_A, "5-BlockSparseMatrix<double>");
-//#ifdef DEBUG
     check_iterator(block_A);
-//#endif
   }
 
   // ez sparse matrix
@@ -339,9 +325,7 @@ int main()
     deallog << "Assemble" << std::endl;
     testproblem.five_point(E, true);
     check_vmult_quadratic(E_res, E, "5-SparseMatrixEZ<double>");
-//#ifdef DEBUG
     check_iterator(E);
-//#endif
     E.print_statistics(deallog, true);
     E.add(-1., A);
     if (E.l2_norm() < 1.e-14)
