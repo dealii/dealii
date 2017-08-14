@@ -174,6 +174,23 @@ SET(DEAL_II_LIBRARIES "@CONFIG_LIBRARIES@")
 
 
 #
+# Information about CUDA configuration
+#
+
+SET(DEAL_II_CUDA_TOOLKIT_ROOT_DIR "@CUDA_TOOLKIT_ROOT_DIR@")
+SET(DEAL_II_CUDA_COMPILER "@CMAKE_CUDA_COMPILER@")
+
+# used for all cuda targets:
+SET(DEAL_II_CUDA_FLAGS "@DEAL_II_CUDA_FLAGS@")
+
+# _additionally_ used for debug targets:
+SET(DEAL_II_CUDA_FLAGS_DEBUG "@DEAL_II_CUDA_FLAGS_DEBUG@")
+
+# _additionally_ used for release targets:
+SET(DEAL_II_CUDA_FLAGS_RELEASE "@DEAL_II_CUDA_FLAGS_RELEASE@")
+
+
+#
 # Information about library targets and feature configuration
 #
 
