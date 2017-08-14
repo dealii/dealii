@@ -48,9 +48,9 @@ void test ()
   typedef double DT;
   DT counter = 0.0;
   parallel::GridTools::exchange_cell_data_to_ghosts<
-  parallel::shared::Triangulation<dim>,
-           DT> (tria,
-                [&](const cell_iterator& cell)
+  DT, parallel::shared::Triangulation<dim>>
+                                         (tria,
+                                          [&](const cell_iterator& cell)
   {
     DT value = ++counter;
 
