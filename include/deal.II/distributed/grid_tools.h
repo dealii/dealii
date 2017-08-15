@@ -23,6 +23,7 @@
 #include <deal.II/distributed/grid_tools.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/optional.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/iostreams/stream.hpp>
@@ -44,8 +45,18 @@ namespace parallel
      * Exchange arbitrary data of type @p DataType provided by the function
      * objects from locally owned cells to ghost cells on other processors.
      *
-     * After this call, you will have received data from @p unpack on every
-     * ghost cell as it was given by @p pack on the owning processor.
+     * After this call, you typically will have received data from @p unpack on
+     * every ghost cell as it was given by @p pack on the owning processor.
+     * Whether you do or do not receive information to @p unpack on a given
+     * ghost cell depends on whether the @p pack function decided that
+     * something needs to be sent. It does so using the boost::optional
+     * mechanism: if the boost::optional return object of the @p pack
+     * function is empty, then this implies that no data has to be sent for
+     * the locally owned cell it was called on. In that case, @p unpack will
+     * also not be called on the ghost cell that corresponds to it on the
+     * receiving side. On the other hand, if the boost::optional object is
+     * not empty, then the data stored within it will be sent to the received
+     * and the @p unpack function called with it.
      *
      * @tparam DataType The type of the data to be communicated. It is assumed
      *   to be serializable by boost::serialization. In many cases, this
@@ -58,15 +69,21 @@ namespace parallel
      * @param mesh A variable of a type that satisfies the requirements of the
      * @ref ConceptMeshType "MeshType concept".
      * @param pack The function that will be called on each locally owned cell
-     * that needs to be sent.
+     *   that is a ghost cell somewhere else. As mentioned above, the function
+     *   may return a regular data object of type @p DataType to indicate
+     *   that data should be sent, or an empty
+     *   <code>boost::optional@<DataType@></code> to indicate that nothing has
+     *   to be sent for this cell.
      * @param unpack The function that will be called for each ghost cell
-     * with the data imported from the other procs.
-
+     *   for which data was sent, i.e., for which the @p pack function
+     *   on the sending side returned a non-empty boost::optional object.
+     *   The @p unpack function is then called with the data sent by the
+     *   processor that owns that cell.
      */
     template <typename DataType, typename MeshType>
     void
     exchange_cell_data_to_ghosts (const MeshType &mesh,
-                                  std::function<DataType (const typename MeshType::active_cell_iterator &)> pack,
+                                  std::function<boost::optional<DataType> (const typename MeshType::active_cell_iterator &)> pack,
                                   std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> unpack);
   }
 
@@ -79,7 +96,6 @@ namespace parallel
 {
   namespace GridTools
   {
-
     namespace internal
     {
       /**
@@ -198,7 +214,7 @@ namespace parallel
     template <typename DataType, typename MeshType>
     void
     exchange_cell_data_to_ghosts (const MeshType &mesh,
-                                  std::function<DataType (const typename MeshType::active_cell_iterator &)> pack,
+                                  std::function<boost::optional<DataType> (const typename MeshType::active_cell_iterator &)> pack,
                                   std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> unpack)
     {
 #ifndef DEAL_II_WITH_MPI
@@ -249,22 +265,26 @@ namespace parallel
                 typename MeshType::active_cell_iterator
                 mesh_it (tria, cell->level(), cell->index(), &mesh);
 
-                const DataType data = pack(mesh_it);
-                const CellId cellid = cell->id();
+                const boost::optional<DataType> data = pack(mesh_it);
 
-                for (auto it : send_to)
+                if (data)
                   {
-                    const dealii::types::subdomain_id subdomain = it;
+                    const CellId cellid = cell->id();
 
-                    // find the data buffer for proc "subdomain" if it exists
-                    // or create an empty one otherwise
-                    typename DestinationToBufferMap::iterator p
-                      = destination_to_data_buffer_map.insert (std::make_pair(subdomain,
-                                                                              internal::CellDataTransferBuffer<dim, DataType>()))
-                        .first;
+                    for (auto it : send_to)
+                      {
+                        const dealii::types::subdomain_id subdomain = it;
 
-                    p->second.cell_ids.emplace_back(cellid);
-                    p->second.data.emplace_back(data);
+                        // find the data buffer for proc "subdomain" if it exists
+                        // or create an empty one otherwise
+                        typename DestinationToBufferMap::iterator p
+                          = destination_to_data_buffer_map.insert (std::make_pair(subdomain,
+                                                                                  internal::CellDataTransferBuffer<dim, DataType>()))
+                            .first;
+
+                        p->second.cell_ids.emplace_back(cellid);
+                        p->second.data.emplace_back(data.get());
+                      }
                   }
               }
           }
@@ -317,7 +337,6 @@ namespace parallel
 
           internal::CellDataTransferBuffer<dim, DataType> cellinfo;
           cellinfo.unpack_data(receive);
-          Assert (cellinfo.cell_ids.size()>0, ExcInternalError());
 
           DataType *data = cellinfo.data.data();
           for (unsigned int c=0; c<cellinfo.cell_ids.size(); ++c, ++data)
