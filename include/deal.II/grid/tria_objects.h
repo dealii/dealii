@@ -430,13 +430,15 @@ namespace internal
 
 
       /**
-       * For edges, we enforce a standard convention that opposite edges
-       * should be parallel. Now, that's enforceable in most cases, and we
-       * have code that makes sure that if a mesh allows this to happen, that
-       * we have this convention. We also know that it is always possible to
-       * have opposite faces have parallel normal vectors. (For both things,
-       * see the Agelek, Anderson, Bangerth, Barth paper mentioned in the
-       * documentation of the GridReordering class.)
+       * For edges, we enforce a standard convention that opposite
+       * edges should be parallel. Now, that's enforceable in most
+       * cases, and we have code that makes sure that if a mesh allows
+       * this to happen, that we have this convention. We also know
+       * that it is always possible to have opposite faces have
+       * parallel normal vectors. (For both things, see the paper by
+       * Agelek, Anderson, Bangerth, Barth in the ACM Transactions on
+       * Mathematical Software mentioned in the documentation of the
+       * GridReordering class.)
        *
        * The problem is that we originally had another condition, namely that
        * faces 0, 2 and 6 have normals that point into the cell, while the
