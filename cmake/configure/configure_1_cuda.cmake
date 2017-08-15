@@ -45,9 +45,9 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
         )
     ENDIF()
 
-    IF("${DEAL_II_CUDA_FLAGS}" MATCHES "-arch[ ]*sm_([0-9]*)")
+    IF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch[ ]*sm_([0-9]*)")
       SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
-    ELSEIF("${DEAL_II_CUDA_FLAGS}" MATCHES "-arch=sm_([0-9]*)")
+    ELSEIF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch=sm_([0-9]*)")
       SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
     ELSE()
       #
