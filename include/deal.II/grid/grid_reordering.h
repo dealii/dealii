@@ -470,18 +470,18 @@ DeclExceptionMsg (ExcMeshNotOrientable,
  * It is obvious that this algorithm has linear run-time, since it only ever
  * touches each face exactly once.
  *
- * The algorithm just described is implemented in a specialization of this
- * class for the 2d case. A similar, but slightly more complex algorithm is
- * implemented in a specialization for 3d. It using sheets instead of strings
- * of cells to work on. If a grid is orientable, then the algorithm is able to
- * do its work in linear time; if it is not orientable, then it aborts in
+ * The algorithm just described in the two-dimensional case is
+ * implemented for both 2d and (in generalized form) for 3d in this
+ * class. The 3d case uses sheets instead of strings of cells to work
+ * on. If a grid is orientable, then the algorithm is able to do its
+ * work in linear time; if it is not orientable, then it aborts in
  * linear time as well.
  *
  * Both algorithms are described in the paper "On orienting edges of
- * unstructured two- and three-dimensional meshes", R. Agelek, M. Anderson, W.
- * Bangerth, W. L. Barth, accepted for publication in the ACM Transactions
- * on Mathematical Software. A preprint is available as <a
- * href="http://arxiv.org/abs/1512.02137">arxiv
+ * unstructured two- and three-dimensional meshes", R. Agelek,
+ * M. Anderson, W.  Bangerth, W. L. Barth, ACM Transactions on
+ * Mathematical Software, vol. 44, article 5, 2017. A preprint is
+ * available as <a href="http://arxiv.org/abs/1512.02137">arxiv
  * 1512.02137</a>.
  *
  *
