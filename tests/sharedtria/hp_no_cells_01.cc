@@ -46,15 +46,20 @@ template <int dim>
 void test()
 {
   parallel::shared::Triangulation<dim>
-  triangulation (MPI_COMM_WORLD);
+  triangulation (MPI_COMM_WORLD, typename Triangulation<dim>::MeshSmoothing
+                 (Triangulation<dim>::limit_level_difference_at_vertices), true,
+                 parallel::shared::Triangulation<dim>::partition_custom_signal);
+  triangulation.signals.post_refinement.connect ([&triangulation]()
+  {
+    // partition the triangulation by hand
+    for (auto cell : triangulation.active_cell_iterators())
+      cell->set_subdomain_id (cell->active_cell_index() %
+                              Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD));
+  }
+                                                );
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global (1);
-
-  // partition the triangulation by hand
-  for (auto cell : triangulation.active_cell_iterators())
-    cell->set_subdomain_id (cell->active_cell_index() %
-                            Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD));
 
 
   hp::FECollection<dim> fe;
