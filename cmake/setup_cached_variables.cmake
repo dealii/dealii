@@ -223,6 +223,7 @@ SET(DEAL_II_REMOVED_FLAGS
   CMAKE_Fortran_FLAGS_DEBUG
   CMAKE_Fortran_FLAGS_MINSIZEREL
   CMAKE_Fortran_FLAGS_RELWITHDEBINFO
+  CUDA_NVCC_FLAGS
   CMAKE_CUDA_FLAGS
   CMAKE_CUDA_FLAGS_RELEASE
   CMAKE_CUDA_FLAGS_DEBUG
@@ -302,6 +303,15 @@ FOREACH(_flag LINKER_FLAGS LINKER_FLAGS_DEBUG LINKER_FLAGS_RELEASE)
   ENDIF()
 ENDFOREACH()
 
+IF(NOT "${CUDA_NVCC_FLAGS}}" STREQUAL "")
+  MESSAGE(STATUS
+    "Prepending \${CUDA_NVCC_FLAGS} to \${DEAL_II_CUDA_FLAGS}"
+    )
+  SET(DEAL_II_CUDA_FLAGS "${CUDA_NVCC_FLAGS} ${DEAL_II_CUDA_FLAGS}")
+ENDIF()
+
+
+
 #
 # Store user supplied flags in ${_flag}_SAVED and clear configuration
 # variables.
@@ -330,8 +340,8 @@ FOREACH(_flag ${DEAL_II_REMOVED_FLAGS})
 ENDFOREACH()
 
 #
-# Finally, read in CXXFLAGS and LDFLAGS from environment and prepend them
-# to the saved variables:
+# Finally, read in CXXFLAGS, LDFLAGS and NVCCFLAGS from environment and
+# prepend them to the saved variables:
 #
 # Also strip leading and trailing whitespace from linker flags to make
 # old cmake versions happy
@@ -341,8 +351,11 @@ SET(DEAL_II_CXX_FLAGS_SAVED "$ENV{CXXFLAGS} ${DEAL_II_CXX_FLAGS_SAVED}")
 STRING(STRIP "${DEAL_II_CXX_FLAGS_SAVED}" DEAL_II_CXX_FLAGS_SAVED)
 SET(DEAL_II_LINKER_FLAGS_SAVED "$ENV{LDFLAGS} ${DEAL_II_LINKER_FLAGS_SAVED}")
 STRING(STRIP "${DEAL_II_LINKER_FLAGS_SAVED}" DEAL_II_LINKER_FLAGS_SAVED)
+SET(DEAL_II_CUDA_FLAGS_SAVED "$ENV{NVCCFLAGS} ${DEAL_II_CUDA_FLAGS_SAVED}")
+STRING(STRIP "${DEAL_II_CUDA_FLAGS_SAVED}" DEAL_II_CUDA_FLAGS_SAVED)
 UNSET(ENV{CXXFLAGS})
 UNSET(ENV{LDFLAGS})
+UNSET(ENV{NVCCFLAGS})
 
 
 ########################################################################
