@@ -1,0 +1,14 @@
+
+DEAL::rank 2, double
+DEAL::constructor
+DEAL::initializer
+DEAL::rank 2, std::complex<double>
+DEAL::constructor
+DEAL::initializer
+DEAL::rank 4, double
+DEAL::constructor
+DEAL::initializer
+DEAL::rank 4, std::complex<double>
+DEAL::constructor
+DEAL::initializer
+DEAL::OK
