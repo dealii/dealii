@@ -3161,14 +3161,14 @@ namespace internal
           // somewhere else, and unpack data on cells where we get information
           // from elsewhere
           auto pack
-          = [] (const typename DoFHandlerType::active_cell_iterator &cell) -> std::vector<types::global_dof_index>
+          = [] (const typename DoFHandlerType::active_cell_iterator &cell) -> boost::optional<std::vector<types::global_dof_index>>
           {
             Assert (cell->is_locally_owned(), ExcInternalError());
 
             // first see whether we need to do anything at all on this cell.
             // this is determined by whether the user_flag is set on the
-            // cell that indicates whether the *complete* set of DoF indices
-            // had already been sent
+            // cell that indicates that the *complete* set of DoF indices
+            // has not been sent
             if (cell->user_flag_set())
               {
                 // get dof indices for the current cell
@@ -3205,97 +3205,67 @@ namespace internal
                 std::vector<types::global_dof_index> local_dof_indices (cell->get_fe().dofs_per_cell);
                 cell->get_dof_indices (local_dof_indices);
 
-                Assert (std::find (local_dof_indices.begin(),
-                local_dof_indices.end(),
-                numbers::invalid_dof_index)
-                ==
-                local_dof_indices.end(),
-                ExcInternalError());
+                const bool is_complete
+                = (std::find (local_dof_indices.begin(), local_dof_indices.end(), numbers::invalid_dof_index)
+                == local_dof_indices.end());
+                Assert (is_complete, ExcInternalError());
 #endif
-                return std::vector<types::global_dof_index>();
+                return boost::optional<std::vector<types::global_dof_index>>();
               }
           };
 
           auto unpack
             = [] (const typename DoFHandlerType::active_cell_iterator &cell,
-                  const std::vector<types::global_dof_index> &dof_indices) -> void
+                  const std::vector<types::global_dof_index> &received_dof_indices) -> void
           {
-            // if we get an empty array, then the sending processor has
-            // determined that all data has already been sent. that can
-            // only happen if the complete data set had previously
-            // been sent, and in that case, (i) the user flag must have been
-            // deleted, and (ii) the current set of DoF indices must already
-            // be complete
+            // this function should only be called on ghost cells, and
+            // on top of that, only on cells that have not been
+            // completed -- which we indicate via the user flag.
+            // check both
+            Assert (cell->is_ghost(), ExcInternalError());
+            Assert (cell->user_flag_set(), ExcInternalError());
+
+            // if we just got an incomplete array of DoF indices, then we must
+            // be in the first ghost exchange and the user flag must have been
+            // set. we tested that already above.
             //
-            // there is one curious corner case, namely if the cell has no DoFs
-            // (e.g., when using FE_Nothing), in which case there is nothing
-            // to do anyway (but we shouldn't fall into the Assert either)
-            if (dof_indices.empty())
-              {
-                if (cell->get_fe().dofs_per_cell > 0)
-                  Assert (cell->user_flag_set() == false, ExcInternalError());
-#ifdef DEBUG
-                std::vector<types::global_dof_index> local_dof_indices (cell->get_fe().dofs_per_cell);
-                cell->get_dof_indices (local_dof_indices);
+            // if we did get a complete array, then we may be in the first
+            // or second ghost exchange, but in any case we need not exchange
+            // another time. so delete the user flag
+            const bool is_complete
+            = (std::find (received_dof_indices.begin(), received_dof_indices.end(), numbers::invalid_dof_index)
+            == received_dof_indices.end());
+            if (is_complete)
+              cell->clear_user_flag();
 
-                Assert (std::find (local_dof_indices.begin(),
-                local_dof_indices.end(),
-                numbers::invalid_dof_index)
-                ==
-                local_dof_indices.end(),
+            // in any case, set the DoF indices on this cell. some
+            // of the ones we received may still be invalid because
+            // the sending processor did not know them yet, so we
+            // need to merge the ones we get with those that are
+            // already set here and may have already been known. for
+            // those that we already know *and* get, they must obviously
+            // agree
+            //
+            // before getting the local dof indices, we need to update the
+            // cell dof indices cache because we may have set dof indices
+            // on a neighboring ghost cell before this one, which may have
+            // affected the dof indices we know about the current cell
+            std::vector<types::global_dof_index> local_dof_indices (cell->get_fe().dofs_per_cell);
+            cell->update_cell_dof_indices_cache();
+            cell->get_dof_indices (local_dof_indices);
+
+            for (unsigned int i=0; i<local_dof_indices.size(); ++i)
+              if (local_dof_indices[i] == numbers::invalid_dof_index)
+                local_dof_indices[i] = received_dof_indices[i];
+              else
+                // we already know the dof index. check that there
+                // is no conflict
+                Assert ((received_dof_indices[i] == numbers::invalid_dof_index)
+                ||
+                (received_dof_indices[i] == local_dof_indices[i]),
                 ExcInternalError());
-#endif
-              }
-            else
-              {
-                // we did get DoF indices
-                //
-                // if we just got an incomplete array of DoF indices, then we must
-                // be in the first ghost exchange and the user flag must have been set
-                //
-                // if we did get a complete array, then we may be in the first
-                // or second ghost exchange, but in any case we need not exchange
-                // another time. so delete the user flag
-                if (std::find (dof_indices.begin(),
-                dof_indices.end(),
-                numbers::invalid_dof_index)
-                !=
-                dof_indices.end())
-                  {
-                    Assert (cell->user_flag_set(), ExcInternalError());
-                  }
-                else
-                  cell->clear_user_flag();
 
-                // in any case, set the DoF indices on this cell. some
-                // of the ones we received may still be invalid because
-                // the sending processor did not know them yet, so we
-                // need to merge the ones we get with those that are
-                // already set here and may have already been known. for
-                // those that we already know *and* get, they must obviously
-                // agree
-                //
-                // before getting the local dof indices, we need to update the
-                // cell dof indices cache because we may have set dof indices
-                // on a neighboring ghost cell before this one, which may have
-                // affected the dof indices we know about the current cell
-                std::vector<types::global_dof_index> local_dof_indices (cell->get_fe().dofs_per_cell);
-                cell->update_cell_dof_indices_cache();
-                cell->get_dof_indices (local_dof_indices);
-
-                for (unsigned int i=0; i<local_dof_indices.size(); ++i)
-                  if (local_dof_indices[i] == numbers::invalid_dof_index)
-                    local_dof_indices[i] = dof_indices[i];
-                  else
-                    // we already know the dof index. check that there
-                    // is no conflict
-                    Assert ((dof_indices[i] == numbers::invalid_dof_index)
-                    ||
-                    (dof_indices[i] == local_dof_indices[i]),
-                    ExcInternalError());
-
-                const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)->set_dof_indices(local_dof_indices);
-              }
+            const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)->set_dof_indices(local_dof_indices);
           };
 
           parallel::GridTools::exchange_cell_data_to_ghosts<std::vector<types::global_dof_index>, DoFHandlerType>
