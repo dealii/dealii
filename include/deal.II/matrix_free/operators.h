@@ -1312,7 +1312,7 @@ namespace MatrixFreeOperators
             .local_element(edge_constrained_indices[j][i])
               = edge_constrained_values[j][i].first;
           }
-        for ( ; c<dst.local_size(); ++c)
+        for ( ; c<subblock(dst,j).local_size(); ++c)
           subblock(dst,j).local_element(c) = 0.;
       }
   }
