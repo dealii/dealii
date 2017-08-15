@@ -84,23 +84,31 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
 
   SET(CMAKE_CXX_COMPILER ${DEAL_II_CXX_COMPILER} CACHE STRING
     "CXX Compiler.")
-
-  SET(CMAKE_C_COMPILER ${DEAL_II_C_COMPILER} CACHE STRING
-    "C Compiler.")
-
   SET(CMAKE_CXX_FLAGS "" CACHE STRING
     "Flags used by the compiler during all build types."
     )
-
   SET(CMAKE_CXX_FLAGS_DEBUG "" CACHE STRING
     "Flags used by the compiler during debug builds."
     )
-
   SET(CMAKE_CXX_FLAGS_RELEASE "" CACHE STRING
     "Flags used by the compiler during release builds."
     )
 
+
+  IF(DEAL_II_WITH_CUDA)
+    SET(CMAKE_CUDA_COMPILER ${DEAL_II_CUDA_COMPILER} CACHE STRING
+      "CUDA Compiler.")
+    SET(CMAKE_CUDA_FLAGS "" CACHE STRING
+      "Flags used by the compiler during all build types."
+      )
+    SET(CMAKE_CUDA_FLAGS_DEBUG "" CACHE STRING
+      "Flags used by the compiler during debug builds."
+      )
+    SET(CMAKE_CUDA_FLAGS_RELEASE "" CACHE STRING
+      "Flags used by the compiler during release builds."
+      )
+  ENDIF()
+
   MARK_AS_ADVANCED(CMAKE_INSTALL_PREFIX)
 
 ENDMACRO()
-
