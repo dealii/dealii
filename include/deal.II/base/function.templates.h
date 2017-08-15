@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__function_templates_h
-#define dealii__function_templates_h
+#ifndef dealii_function_templates_h
+#define dealii_function_templates_h
 
 
 #include <deal.II/base/function.h>
@@ -812,4 +812,4 @@ void VectorFunctionFromTensorFunction<dim, Number>::vector_value_list (
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif /* dealii__function_templates_h */
+#endif /* dealii_function_templates_h */

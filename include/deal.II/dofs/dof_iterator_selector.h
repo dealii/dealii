@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__dof_iterators_h
-#define dealii__dof_iterators_h
+#ifndef dealii_dof_iterators_h
+#define dealii_dof_iterators_h
 
 #include <deal.II/base/config.h>
 
@@ -168,4 +168,4 @@ namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii__dof_iterator_selector_h
+#endif // dealii_dof_iterator_selector_h

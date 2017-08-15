@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__time_stepping_templates_h
-#define dealii__time_stepping_templates_h
+#ifndef dealii_time_stepping_templates_h
+#define dealii_time_stepping_templates_h
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/time_stepping.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__sparse_direct_h
-#define dealii__sparse_direct_h
+#ifndef dealii_sparse_direct_h
+#define dealii_sparse_direct_h
 
 
 #include <deal.II/base/config.h>
@@ -353,4 +353,4 @@ private:
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii__sparse_direct_h
+#endif // dealii_sparse_direct_h

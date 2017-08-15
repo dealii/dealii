@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tria_accessor_templates_h
-#define dealii__tria_accessor_templates_h
+#ifndef dealii_tria_accessor_templates_h
+#define dealii_tria_accessor_templates_h
 
 
 #include <deal.II/base/config.h>

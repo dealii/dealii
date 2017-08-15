@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__block_sparse_matrix_ez_h
-#define dealii__block_sparse_matrix_ez_h
+#ifndef dealii_block_sparse_matrix_ez_h
+#define dealii_block_sparse_matrix_ez_h
 
 
 //TODO: Derive BlockSparseMatrixEZ from BlockMatrixBase, like all the other block matrices as well; this would allow to instantiate a few functions with this template argument as well (in particular ConstraintMatrix::distribute_local_to_global)
@@ -500,4 +500,4 @@ BlockSparseMatrixEZ<number>::print_statistics (StreamType &out, bool full)
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif //dealii__block_sparse_matrix_ez_h
+#endif //dealii_block_sparse_matrix_ez_h

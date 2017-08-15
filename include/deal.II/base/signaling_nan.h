@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__signaling_nan_h
-#define dealii__signaling_nan_h
+#ifndef dealii_signaling_nan_h
+#define dealii_signaling_nan_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor.h>

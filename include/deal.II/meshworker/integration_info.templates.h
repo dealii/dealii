@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__integration_info_templates_h
-#define dealii__integration_info_templates_h
+#ifndef dealii_integration_info_templates_h
+#define dealii_integration_info_templates_h
 
 
 #include <deal.II/meshworker/dof_info.h>

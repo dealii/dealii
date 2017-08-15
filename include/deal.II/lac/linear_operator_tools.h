@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__linear_operator_tools_h
-#define dealii__linear_operator_tools_h
+#ifndef dealii_linear_operator_tools_h
+#define dealii_linear_operator_tools_h
 
 // Many usage cases lead to a combination of LinearOperator and
 // PackagedOperation. To ease the pain of reading compilation errors, just

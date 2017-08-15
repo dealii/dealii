@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__schur_complement_h
-#define dealii__schur_complement_h
+#ifndef dealii_schur_complement_h
+#define dealii_schur_complement_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

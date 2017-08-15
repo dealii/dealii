@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__sparse_matrix_h
-#define dealii__sparse_matrix_h
+#ifndef dealii_sparse_matrix_h
+#define dealii_sparse_matrix_h
 
 
 #include <deal.II/base/config.h>

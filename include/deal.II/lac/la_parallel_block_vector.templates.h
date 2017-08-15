@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__parallel_block_vector_templates_h
-#define dealii__parallel_block_vector_templates_h
+#ifndef dealii_parallel_block_vector_templates_h
+#define dealii_parallel_block_vector_templates_h
 
 
 #include <deal.II/base/config.h>

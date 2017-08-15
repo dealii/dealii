@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__trilinos_precondition_h
-#define dealii__trilinos_precondition_h
+#ifndef dealii_trilinos_precondition_h
+#define dealii_trilinos_precondition_h
 
 
 #include <deal.II/base/config.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__trilinos_linear_operator_h
-#define dealii__trilinos_linear_operator_h
+#ifndef dealii_trilinos_linear_operator_h
+#define dealii_trilinos_linear_operator_h
 
 #include <deal.II/base/config.h>
 

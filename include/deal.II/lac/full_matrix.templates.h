@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__full_matrix_templates_h
-#define dealii__full_matrix_templates_h
+#ifndef dealii_full_matrix_templates_h
+#define dealii_full_matrix_templates_h
 
 
 // TODO: this file has a lot of operations between matrices and matrices or

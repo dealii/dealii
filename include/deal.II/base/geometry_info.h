@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__geometry_info_h
-#define dealii__geometry_info_h
+#ifndef dealii_geometry_info_h
+#define dealii_geometry_info_h
 
 
 #include <deal.II/base/config.h>

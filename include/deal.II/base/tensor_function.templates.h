@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tensor_function_templates_h
-#define dealii__tensor_function_templates_h
+#ifndef dealii_tensor_function_templates_h
+#define dealii_tensor_function_templates_h
 
 #include <deal.II/base/tensor_function.h>
 #include <deal.II/base/tensor.h>
@@ -161,4 +161,4 @@ ZeroTensorFunction<rank, dim, Number>::ZeroTensorFunction (const Number initial_
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif /* dealii__tensor_function_templates_h */
+#endif /* dealii_tensor_function_templates_h */

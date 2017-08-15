@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mapping_cartesian_h
-#define dealii__mapping_cartesian_h
+#ifndef dealii_mapping_cartesian_h
+#define dealii_mapping_cartesian_h
 
 
 #include <deal.II/base/config.h>

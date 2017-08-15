@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__p4est_wrappers_h
-#define dealii__p4est_wrappers_h
+#ifndef dealii_p4est_wrappers_h
+#define dealii_p4est_wrappers_h
 
 #include <deal.II/base/geometry_info.h>
 
@@ -580,4 +580,4 @@ DEAL_II_NAMESPACE_CLOSE
 
 #endif //DEAL_II_WITH_P4EST
 
-#endif //dealii__p4est_wrappers_h
+#endif //dealii_p4est_wrappers_h

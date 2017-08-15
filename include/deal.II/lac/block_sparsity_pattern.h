@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__block_sparsity_pattern_h
-#define dealii__block_sparsity_pattern_h
+#ifndef dealii_block_sparsity_pattern_h
+#define dealii_block_sparsity_pattern_h
 
 
 #include <deal.II/base/config.h>

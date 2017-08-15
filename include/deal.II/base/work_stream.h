@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__work_stream_h
-#define dealii__work_stream_h
+#ifndef dealii_work_stream_h
+#define dealii_work_stream_h
 
 
 #include <deal.II/base/config.h>
@@ -1251,6 +1251,6 @@ DEAL_II_NAMESPACE_CLOSE
 
 
 //----------------------------   work_stream.h     ---------------------------
-// end of #ifndef dealii__work_stream_h
+// end of #ifndef dealii_work_stream_h
 #endif
 //----------------------------   work_stream.h     ---------------------------

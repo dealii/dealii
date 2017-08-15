@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__std_cxx1x_type_traits_h
-#define dealii__std_cxx1x_type_traits_h
+#ifndef dealii_std_cxx1x_type_traits_h
+#define dealii_std_cxx1x_type_traits_h
 
 // this file is deprecated. simply include the one we use now
 #include "../std_cxx11/type_traits.h"

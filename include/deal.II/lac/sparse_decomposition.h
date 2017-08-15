@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__sparse_decomposition_h
-#define dealii__sparse_decomposition_h
+#ifndef dealii_sparse_decomposition_h
+#define dealii_sparse_decomposition_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -423,4 +423,4 @@ AdditionalData::AdditionalData (const double strengthen_diag,
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii__sparse_decomposition_h
+#endif // dealii_sparse_decomposition_h

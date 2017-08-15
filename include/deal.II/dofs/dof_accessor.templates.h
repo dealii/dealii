@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__dof_accessor_templates_h
-#define dealii__dof_accessor_templates_h
+#ifndef dealii_dof_accessor_templates_h
+#define dealii_dof_accessor_templates_h
 
 
 #include <deal.II/base/config.h>

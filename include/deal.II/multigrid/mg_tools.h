@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mg_tools_h
-#define dealii__mg_tools_h
+#ifndef dealii_mg_tools_h
+#define dealii_mg_tools_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/index_set.h>

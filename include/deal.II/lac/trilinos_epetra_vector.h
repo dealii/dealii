@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__trilinos_epetra_vector_h
-#define dealii__trilinos_epetra_vector_h
+#ifndef dealii_trilinos_epetra_vector_h
+#define dealii_trilinos_epetra_vector_h
 
 
 #include <deal.II/base/config.h>

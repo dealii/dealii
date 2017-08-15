@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__vector_element_access_h
-#define dealii__vector_element_access_h
+#ifndef dealii_vector_element_access_h
+#define dealii_vector_element_access_h
 
 
 #include <deal.II/lac/trilinos_epetra_vector.h>

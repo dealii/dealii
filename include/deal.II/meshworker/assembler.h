@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__mesh_worker_assembler_h
-#define dealii__mesh_worker_assembler_h
+#ifndef dealii_mesh_worker_assembler_h
+#define dealii_mesh_worker_assembler_h
 
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/mg_level_object.h>

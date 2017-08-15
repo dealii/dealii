@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__trilinos_vector_h
-#define dealii__trilinos_vector_h
+#ifndef dealii_trilinos_vector_h
+#define dealii_trilinos_vector_h
 
 
 #include <deal.II/base/config.h>
@@ -2243,4 +2243,4 @@ DEAL_II_NAMESPACE_CLOSE
 
 /*----------------------------   trilinos_vector.h     ---------------------------*/
 
-#endif // dealii__trilinos_vector_h
+#endif // dealii_trilinos_vector_h

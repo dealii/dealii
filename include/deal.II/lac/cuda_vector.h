@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__cuda_vector_h
-#define dealii__cuda_vector_h
+#ifndef dealii_cuda_vector_h
+#define dealii_cuda_vector_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/vector_space_vector.h>

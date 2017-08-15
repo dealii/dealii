@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__non_matching_immersed_surface_quadrature
-#define dealii__non_matching_immersed_surface_quadrature
+#ifndef dealii_non_matching_immersed_surface_quadrature
+#define dealii_non_matching_immersed_surface_quadrature
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/point.h>

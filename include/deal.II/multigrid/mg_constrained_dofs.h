@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mg_constrained_dofs_h
-#define dealii__mg_constrained_dofs_h
+#ifndef dealii_mg_constrained_dofs_h
+#define dealii_mg_constrained_dofs_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>

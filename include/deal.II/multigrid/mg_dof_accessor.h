@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mg_dof_accessor_h
-#define dealii__mg_dof_accessor_h
+#ifndef dealii_mg_dof_accessor_h
+#define dealii_mg_dof_accessor_h
 
 #warning This file is deprecated. Use <deal.II/dofs/dof_accessor.h> instead.
 #include <deal.II/dofs/dof_accessor.h>

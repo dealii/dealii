@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__petsc_solver_h
-#define dealii__petsc_solver_h
+#ifndef dealii_petsc_solver_h
+#define dealii_petsc_solver_h
 
 
 #include <deal.II/base/config.h>

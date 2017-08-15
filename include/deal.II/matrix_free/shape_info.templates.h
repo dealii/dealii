@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__matrix_free_shape_info_templates_h
-#define dealii__matrix_free_shape_info_templates_h
+#ifndef dealii_matrix_free_shape_info_templates_h
+#define dealii_matrix_free_shape_info_templates_h
 
 
 #include <deal.II/base/utilities.h>

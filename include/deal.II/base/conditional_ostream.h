@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__conditional_ostream_h
-#define dealii__conditional_ostream_h
+#ifndef dealii_conditional_ostream_h
+#define dealii_conditional_ostream_h
 
 #include <deal.II/base/config.h>
 

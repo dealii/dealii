@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tria_iterator_base_h
-#define dealii__tria_iterator_base_h
+#ifndef dealii_tria_iterator_base_h
+#define dealii_tria_iterator_base_h
 
 
 #include <deal.II/base/config.h>

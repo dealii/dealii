@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__grid_tools_H
-#define dealii__grid_tools_H
+#ifndef dealii_grid_tools_H
+#define dealii_grid_tools_H
 
 
 #include <deal.II/base/config.h>
@@ -2149,6 +2149,6 @@ namespace GridTools
 DEAL_II_NAMESPACE_CLOSE
 
 /*----------------------------   grid_tools.h     ---------------------------*/
-/* end of #ifndef dealii__grid_tools_H */
+/* end of #ifndef dealii_grid_tools_H */
 #endif
 /*----------------------------   grid_tools.h     ---------------------------*/

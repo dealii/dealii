@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mapping_q_h
-#define dealii__mapping_q_h
+#ifndef dealii_mapping_q_h
+#define dealii_mapping_q_h
 
 
 #include <deal.II/base/config.h>

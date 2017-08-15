@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tria_manifold_h
-#define dealii__tria_manifold_h
+#ifndef dealii_tria_manifold_h
+#define dealii_tria_manifold_h
 
 
 /*----------------------------   manifold.h     ---------------------------*/

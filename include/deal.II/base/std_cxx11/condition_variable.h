@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__std_cxx11_condition_variable_h
-#define dealii__std_cxx11_condition_variable_h
+#ifndef dealii_std_cxx11_condition_variable_h
+#define dealii_std_cxx11_condition_variable_h
 
 
 #include <deal.II/base/config.h>

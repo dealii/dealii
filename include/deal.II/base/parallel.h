@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__parallel_h
-#define dealii__parallel_h
+#ifndef dealii_parallel_h
+#define dealii_parallel_h
 
 
 #include <deal.II/base/config.h>

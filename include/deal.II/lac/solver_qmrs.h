@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__solver_qmrs_h
-#define dealii__solver_qmrs_h
+#ifndef dealii_solver_qmrs_h
+#define dealii_solver_qmrs_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/solver.h>

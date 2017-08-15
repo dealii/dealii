@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__solver_richardson_h
-#define dealii__solver_richardson_h
+#ifndef dealii_solver_richardson_h
+#define dealii_solver_richardson_h
 
 
 #include <deal.II/base/config.h>

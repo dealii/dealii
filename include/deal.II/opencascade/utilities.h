@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__occ_utilities_h
-#define dealii__occ_utilities_h
+#ifndef dealii_occ_utilities_h
+#define dealii_occ_utilities_h
 
 #include <deal.II/base/config.h>
 

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__pointer_matrix_h
-#define dealii__pointer_matrix_h
+#ifndef dealii_pointer_matrix_h
+#define dealii_pointer_matrix_h
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__operator_templates_h
-#define dealii__operator_templates_h
+#ifndef dealii_operator_templates_h
+#define dealii_operator_templates_h
 
 
 #include <deal.II/algorithms/operator.h>

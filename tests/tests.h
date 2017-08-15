@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tests_h
-#define dealii__tests_h
+#ifndef dealii_tests_h
+#define dealii_tests_h
 
 // common definitions used in all the tests
 
@@ -582,4 +582,4 @@ operator << (LogStream &out,
 }
 
 
-#endif // dealii__tests_h
+#endif // dealii_tests_h

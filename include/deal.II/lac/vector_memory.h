@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__vector_memory_h
-#define dealii__vector_memory_h
+#ifndef dealii_vector_memory_h
+#define dealii_vector_memory_h
 
 
 #include <deal.II/base/config.h>

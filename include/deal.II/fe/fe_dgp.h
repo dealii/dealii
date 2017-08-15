@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_dgp_h
-#define dealii__fe_dgp_h
+#ifndef dealii_fe_dgp_h
+#define dealii_fe_dgp_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/polynomial_space.h>

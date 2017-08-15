@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_q_hierarchical_h
-#define dealii__fe_q_hierarchical_h
+#ifndef dealii_fe_q_hierarchical_h
+#define dealii_fe_q_hierarchical_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor_product_polynomials.h>

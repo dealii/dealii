@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__filtered_iterator_h
-#define dealii__filtered_iterator_h
+#ifndef dealii_filtered_iterator_h
+#define dealii_filtered_iterator_h
 
 
 #include <deal.II/base/config.h>

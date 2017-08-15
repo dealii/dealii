@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__dof_output_operator_templates_h
-#define dealii__dof_output_operator_templates_h
+#ifndef dealii_dof_output_operator_templates_h
+#define dealii_dof_output_operator_templates_h
 
 
 #include <deal.II/numerics/dof_output_operator.h>

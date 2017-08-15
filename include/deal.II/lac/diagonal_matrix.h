@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__diagonal_matrix_h
-#define dealii__diagonal_matrix_h
+#ifndef dealii_diagonal_matrix_h
+#define dealii_diagonal_matrix_h
 
 
 #include <deal.II/lac/vector.h>

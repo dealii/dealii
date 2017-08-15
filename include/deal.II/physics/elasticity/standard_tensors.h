@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__elasticity__standard_tensors_h
-#define dealii__elasticity__standard_tensors_h
+#ifndef dealii_elasticity_standard_tensors_h
+#define dealii_elasticity_standard_tensors_h
 
 
 #include <deal.II/base/symmetric_tensor.h>

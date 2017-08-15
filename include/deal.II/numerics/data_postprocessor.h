@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__data_postprocessor_h
-#define dealii__data_postprocessor_h
+#ifndef dealii_data_postprocessor_h
+#define dealii_data_postprocessor_h
 
 
 

@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__vector_operations_internal_h
-#define dealii__vector_operations_internal_h
+#ifndef dealii_vector_operations_internal_h
+#define dealii_vector_operations_internal_h
 
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/parallel.h>

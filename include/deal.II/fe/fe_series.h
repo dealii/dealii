@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_series_H
-#define dealii__fe_series_H
+#ifndef dealii_fe_series_H
+#define dealii_fe_series_H
 
 
 
@@ -419,4 +419,4 @@ FESeries::process_coefficients(const Table<dim,T> &coefficients,
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii__fe_series_H
+#endif // dealii_fe_series_H

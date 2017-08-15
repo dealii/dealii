@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__path_search_h
-#define dealii__path_search_h
+#ifndef dealii_path_search_h
+#define dealii_path_search_h
 
 
 #include <deal.II/base/config.h>

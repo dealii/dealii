@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__partitioner_h
-#define dealii__partitioner_h
+#ifndef dealii_partitioner_h
+#define dealii_partitioner_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/index_set.h>

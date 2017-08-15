@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__lapack_support_h
-#define dealii__lapack_support_h
+#ifndef dealii_lapack_support_h
+#define dealii_lapack_support_h
 
 
 #include <deal.II/base/config.h>

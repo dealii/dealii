@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__chunk_sparsity_pattern_h
-#define dealii__chunk_sparsity_pattern_h
+#ifndef dealii_chunk_sparsity_pattern_h
+#define dealii_chunk_sparsity_pattern_h
 
 
 #include <deal.II/base/config.h>

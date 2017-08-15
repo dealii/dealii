@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__constraint_matrix_templates_h
-#define dealii__constraint_matrix_templates_h
+#ifndef dealii_constraint_matrix_templates_h
+#define dealii_constraint_matrix_templates_h
 
 
 #include <deal.II/lac/constraint_matrix.h>

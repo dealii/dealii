@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__integrators_grad_div_h
-#define dealii__integrators_grad_div_h
+#ifndef dealii_integrators_grad_div_h
+#define dealii_integrators_grad_div_h
 
 
 #include <deal.II/base/config.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mg_sparse_matrix_collection_h
-#define dealii__mg_sparse_matrix_collection_h
+#ifndef dealii_mg_sparse_matrix_collection_h
+#define dealii_mg_sparse_matrix_collection_h
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/sparse_matrix.h>

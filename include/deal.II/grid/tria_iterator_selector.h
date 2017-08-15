@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tria_iterator_selector_h
-#define dealii__tria_iterator_selector_h
+#ifndef dealii_tria_iterator_selector_h
+#define dealii_tria_iterator_selector_h
 
 
 #include <deal.II/base/config.h>
@@ -180,4 +180,4 @@ namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii__tria_iterator_selector_h
+#endif // dealii_tria_iterator_selector_h

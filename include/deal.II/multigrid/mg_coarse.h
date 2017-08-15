@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__mg_coarse_h
-#define dealii__mg_coarse_h
+#ifndef dealii_mg_coarse_h
+#define dealii_mg_coarse_h
 
 
 #include <deal.II/lac/full_matrix.h>

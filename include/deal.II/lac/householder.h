@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__householder_h
-#define dealii__householder_h
+#ifndef dealii_householder_h
+#define dealii_householder_h
 
 
 #include <cmath>

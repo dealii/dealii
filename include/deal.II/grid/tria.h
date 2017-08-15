@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tria_h
-#define dealii__tria_h
+#ifndef dealii_tria_h
+#define dealii_tria_h
 
 
 #include <deal.II/base/config.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__polynomials_abf_h
-#define dealii__polynomials_abf_h
+#ifndef dealii_polynomials_abf_h
+#define dealii_polynomials_abf_h
 
 
 #include <deal.II/base/config.h>

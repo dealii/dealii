@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__utilities_h
-#define dealii__utilities_h
+#ifndef dealii_utilities_h
+#define dealii_utilities_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

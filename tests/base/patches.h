@@ -72,7 +72,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim> > &patches)
 
 // Do this only if the necessary headers were included
 
-#if defined(dealii__quadrature_lib_h) && defined(dealii__function_lib_h)
+#if defined(dealii_quadrature_lib_h) && defined(dealii_function_lib_h)
 
 template <int dim>
 void

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__trilinos_parallel_block_vector_h
-#define dealii__trilinos_parallel_block_vector_h
+#ifndef dealii_trilinos_parallel_block_vector_h
+#define dealii_trilinos_parallel_block_vector_h
 
 
 #include <deal.II/base/config.h>

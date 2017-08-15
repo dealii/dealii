@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__polynomials_adini_h
-#define dealii__polynomials_adini_h
+#ifndef dealii_polynomials_adini_h
+#define dealii_polynomials_adini_h
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>

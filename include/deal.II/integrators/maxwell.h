@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__integrators_maxwell_h
-#define dealii__integrators_maxwell_h
+#ifndef dealii_integrators_maxwell_h
+#define dealii_integrators_maxwell_h
 
 
 #include <deal.II/base/config.h>

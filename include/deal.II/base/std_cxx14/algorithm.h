@@ -12,8 +12,8 @@
 // the top level of the deal.II distribution.
 //
 // ---------------------------------------------------------------------
-#ifndef dealii__cxx14_algorithm_h
-#define dealii__cxx14_algorithm_h
+#ifndef dealii_cxx14_algorithm_h
+#define dealii_cxx14_algorithm_h
 
 #include <deal.II/base/config.h>
 
@@ -57,4 +57,4 @@ namespace std_cxx14
 }
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii__cxx14_algorithm_h
+#endif // dealii_cxx14_algorithm_h

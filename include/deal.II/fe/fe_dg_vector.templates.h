@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__fe_dg_vector_templates_h
-#define dealii__fe_dg_vector_templates_h
+#ifndef dealii_fe_dg_vector_templates_h
+#define dealii_fe_dg_vector_templates_h
 
 
 #include <deal.II/fe/fe_dg_vector.h>

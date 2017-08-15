@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__integrators_elasticity_h
-#define dealii__integrators_elasticity_h
+#ifndef dealii_integrators_elasticity_h
+#define dealii_integrators_elasticity_h
 
 
 #include <deal.II/base/config.h>

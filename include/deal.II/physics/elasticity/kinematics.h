@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__elasticity__kinematics_h
-#define dealii__elasticity__kinematics_h
+#ifndef dealii_elasticity_kinematics_h
+#define dealii_elasticity_kinematics_h
 
 
 #include <deal.II/base/symmetric_tensor.h>

@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__newton_templates_h
-#define dealii__newton_templates_h
+#ifndef dealii_newton_templates_h
+#define dealii_newton_templates_h
 
 
 #include <deal.II/algorithms/newton.h>

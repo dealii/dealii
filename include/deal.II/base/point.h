@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__point_h
-#define dealii__point_h
+#ifndef dealii_point_h
+#define dealii_point_h
 
 
 #include <deal.II/base/config.h>

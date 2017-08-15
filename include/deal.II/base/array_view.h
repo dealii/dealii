@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__array_view_h
-#define dealii__array_view_h
+#ifndef dealii_array_view_h
+#define dealii_array_view_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

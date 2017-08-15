@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__vectorization_h
-#define dealii__vectorization_h
+#ifndef dealii_vectorization_h
+#define dealii_vectorization_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>

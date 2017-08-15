@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__precondition_h
-#define dealii__precondition_h
+#ifndef dealii_precondition_h
+#define dealii_precondition_h
 
 // This file contains simple preconditioners.
 

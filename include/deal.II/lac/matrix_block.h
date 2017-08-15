@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__matrix_block_h
-#define dealii__matrix_block_h
+#ifndef dealii_matrix_block_h
+#define dealii_matrix_block_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>

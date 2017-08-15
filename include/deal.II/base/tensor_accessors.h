@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__tensor_accessors_h
-#define dealii__tensor_accessors_h
+#ifndef dealii_tensor_accessors_h
+#define dealii_tensor_accessors_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/template_constraints.h>
@@ -765,4 +765,4 @@ namespace TensorAccessors
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif /* dealii__tensor_accessors_h */
+#endif /* dealii_tensor_accessors_h */

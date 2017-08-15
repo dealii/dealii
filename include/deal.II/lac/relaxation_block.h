@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__relaxation_block_h
-#define dealii__relaxation_block_h
+#ifndef dealii_relaxation_block_h
+#define dealii_relaxation_block_h
 
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>

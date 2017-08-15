@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__polynomials_integrated_legendre_sz_h
-#define dealii__polynomials_integrated_legendre_sz_h
+#ifndef dealii_polynomials_integrated_legendre_sz_h
+#define dealii_polynomials_integrated_legendre_sz_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/polynomial.h>

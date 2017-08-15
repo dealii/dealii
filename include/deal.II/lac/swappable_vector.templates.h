@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__swappable_vector_templates_h
-#define dealii__swappable_vector_templates_h
+#ifndef dealii_swappable_vector_templates_h
+#define dealii_swappable_vector_templates_h
 
 
 #include <deal.II/base/memory_consumption.h>
@@ -256,4 +256,4 @@ SwappableVector<number>::memory_consumption () const
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // dealii__swappable_vector_templates_h
+#endif // dealii_swappable_vector_templates_h
