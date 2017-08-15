@@ -76,7 +76,7 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
           )
 
         TARGET_COMPILE_OPTIONS(${_library}_${_build_lowercase} PUBLIC
-          $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler "${_cxx_flags}">
+          $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler ${_cxx_flags}>
           $<$<COMPILE_LANGUAGE:CUDA>:${_cuda_flags}>
           )
 

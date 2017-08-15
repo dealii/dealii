@@ -147,7 +147,7 @@ MACRO(DEAL_II_SETUP_TARGET _target)
         )
 
       TARGET_COMPILE_OPTIONS(${_target} PUBLIC
-        $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler "${_cxx_flags}">
+        $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler ${_cxx_flags}>
         $<$<COMPILE_LANGUAGE:CUDA>:${_cuda_flags}>
         )
 
