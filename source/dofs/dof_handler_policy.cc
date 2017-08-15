@@ -3730,6 +3730,14 @@ namespace internal
                                                    triangulation->coarse_cell_to_p4est_tree_permutation,
                                                    triangulation->p4est_tree_to_coarse_cell_permutation);
 
+          // at this point, we must have taken care of the data transfer
+          // on all cells we had previously marked. verify this
+#ifdef DEBUG
+          for (auto cell : dof_handler->active_cell_iterators())
+            Assert (cell->user_flag_set() == false,
+                    ExcInternalError());
+#endif
+
           triangulation->load_user_flags(user_flags);
         }
 
