@@ -51,14 +51,47 @@ namespace parallel
   {
 
     /**
-     * This is an extension of dealii::Triangulation class to automatically
-     * partition triangulation when run with MPI. Different from the
-     * parallel::distributed::Triangulation, the entire mesh is stored on each
-     * processor. However, cells are labeled according to the id of the
-     * processor which "owns" them. The partitioning is done automatically
-     * inside the DoFHandler by calling Metis. This enables distributing DoFs
-     * among processors and therefore splitting matrices and vectors across
-     * processors. The usage of this class is demonstrated in Step-18.
+     * This class provides a parallel triangulation for which every processor
+     * knows about every cell of the global mesh (unlike for the
+     * parallel::distributed::Triangulation class) but in which cells are
+     * automatically partitioned when run with MPI so that each processor
+     * "owns" a subset of cells. The use of this class is demonstrated in
+     * step-18.
+     *
+     * Different from the parallel::distributed::Triangulation, this implies
+     * that the entire mesh is stored on each processor. While this is clearly
+     * a memory bottleneck that limits the use of this class to a few dozen
+     * or hundreds of MPI processes, the partitioning of the mesh can be used
+     * to partition work such as assembly or postprocessing between
+     * participating processors, and it can also be used to partition which
+     * processor stores which parts of matrices and vectors. As a consequence,
+     * using this class is often a gentler introduction to parallelizing a
+     * code than the more involved parallel::distributed::Triangulation class
+     * in which processors only know their own part of the mesh, but nothing
+     * about cells owned by other processors with the exception of a single
+     * layer of ghost cells around their own part of the domain.
+     *
+     * The class is also useful in cases where compute time and memory
+     * considerations dictate that the program needs to be run in parallel,
+     * but where algorithmic concerns require that every processor knows
+     * about the entire mesh. An example could be where an application
+     * has to have both volume and surface meshes that can then both
+     * be partitioned independently, but where it is difficult to ensure
+     * that the locally owned set of surface mesh cells is adjacent to the
+     * locally owned set of volume mesh cells and the other way around. In
+     * such cases, knowing the <i>entirety</i> of both meshes ensures that
+     * assembly of coupling terms can be implemented without also
+     * implementing overly complicated schemes to transfer information about
+     * adjacent cells from processor to processor.
+     *
+     * By default, the partitioning of cells between processors is done
+     * automatically by calling the METIS library. By passing appropriate
+     * flags to the constructor of this class (see the Triangulation::Settings
+     * enum), it is possible to select other modes of partitioning the mesh,
+     * including ways that are dictated by the application and not by the
+     * desire to minimize the length of the interface between subdomains owned
+     * by processors. Both the DoFHandler and hp::DoFHandler classes know how
+     * to enumerate degrees of freedom in ways appropriate for the partitioned mesh.
      *
      * @author Denis Davydov, 2015
      * @ingroup distributed
@@ -98,26 +131,50 @@ namespace parallel
          * Partition cells using a custom, user defined function. This is
          * accomplished by connecting the post_refinement signal to the
          * triangulation whenever it is first created and passing the user
-         * defined function through the signal using <code>std_cxx11::bind</code>.
+         * defined function through the signal using <code>std::bind</code>.
          * Here is an example:
-         *
          *  @code
          *     template <int dim>
          *     void mypartition(parallel::shared::Triangulation<dim> &tria)
          *     {
-         *       // user defined partitioning scheme
+         *       // user defined partitioning scheme: assign subdomain_ids
+         *       // round-robin in a mostly random way:
+         *       std::vector<unsigned int> assignment = {0,0,1,2,0,0,2,1,0,2,2,1,2,2,0,0};
+         *       typename Triangulation<dim>::active_cell_iterator
+         *         cell = tria.begin_active(),
+         *         endc = tria.end();
+         *       unsigned int index = 0;
+         *       for (; cell != endc; ++cell, ++index)
+         *         cell->set_subdomain_id(assignment[index%16]);
          *     }
          *
          *     int main ()
          *     {
          *       parallel::shared::Triangulation<dim> tria(...,
          *                                                 parallel::shared::Triangulation<dim>::Settings::partition_custom_signal);
-         *       tria.signals.post_refinement.connect (std::bind(&mypartition<dim>, std::ref(shared_tria)));
+         *       tria.signals.post_refinement.connect (std::bind(&mypartition<dim>, std::ref(tria)));
          *     }
          *  @endcode
          *
-         * Note: If you plan to use a custom partition with geometric multigrid,
-         * you must manualy partition the level cells in addition to the active cells.
+         * An equivalent code using lambda functions would look like this:
+         *  @code
+         *     int main ()
+         *     {
+         *       parallel::shared::Triangulation<dim> tria(...,
+         *                                                 parallel::shared::Triangulation<dim>::Settings::partition_custom_signal);
+         *       tria.signals.post_refinement.connect ([&tria]()
+         *                                             {
+         *                                               // user defined partitioning scheme
+         *                                               // as above
+         *                                               ...
+         *                                             }
+         *                                            );
+         *     }
+         *  @endcode
+         *
+         *
+         * @note If you plan to use a custom partition with geometric multigrid,
+         * you must manually partition the level cells in addition to the active cells.
          */
         partition_custom_signal = 0x4,
 
