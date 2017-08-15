@@ -22,7 +22,7 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Sacado.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
-#include <deal.II/differentiation/sacado_product_types.h>
+#include <deal.II/differentiation/ad/sacado_product_types.h>
 #endif
 
 #include <deal.II/base/symmetric_tensor.h>

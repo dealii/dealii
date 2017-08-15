@@ -25,7 +25,7 @@
 #include "../tests.h"
 
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/differentiation/sacado_product_types.h>
+#include <deal.II/differentiation/ad/sacado_product_types.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/grid/grid_generator.h>
