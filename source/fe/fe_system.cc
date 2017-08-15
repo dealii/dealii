@@ -2251,8 +2251,8 @@ FESystem<dim,spacedim>::get_constant_modes () const
 template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::
-convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const
+convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
+                                                        std::vector<double>                &nodal_values) const
 {
   // we currently only support the case where each base element has exactly
   // as many generalized support points as there are dofs in that element.
@@ -2301,7 +2301,7 @@ convert_generalized_support_point_values_to_nodal_values (const std::vector<Vect
           // then call the base element to get its version of the
           // nodal values
           base_nodal_values.resize (base_element(base).dofs_per_cell);
-          base_element(base).convert_generalized_support_point_values_to_nodal_values
+          base_element(base).convert_generalized_support_point_values_to_dof_values
           (base_support_point_values, base_nodal_values);
 
           // finally put these nodal values back into global nodal

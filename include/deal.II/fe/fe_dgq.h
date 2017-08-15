@@ -309,8 +309,8 @@ public:
    */
   virtual
   void
-  convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
-                                                            std::vector<double>                &nodal_values) const;
+  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
+                                                          std::vector<double>                &nodal_values) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -426,8 +426,8 @@ public:
    */
   virtual
   void
-  convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
-                                                            std::vector<double>                &nodal_values) const;
+  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
+                                                          std::vector<double>                &nodal_values) const;
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
   clone() const;

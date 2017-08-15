@@ -178,8 +178,8 @@ FE_Q_DG0<dim,spacedim>::clone() const
 template <int dim, int spacedim>
 void
 FE_Q_DG0<dim,spacedim>::
-convert_generalized_support_point_values_to_nodal_values(const std::vector<Vector<double> > &support_point_values,
-                                                         std::vector<double>    &nodal_dofs) const
+convert_generalized_support_point_values_to_dof_values(const std::vector<Vector<double> > &support_point_values,
+                                                       std::vector<double>    &nodal_dofs) const
 {
   Assert (support_point_values.size() == this->unit_support_points.size(),
           ExcDimensionMismatch(support_point_values.size(),

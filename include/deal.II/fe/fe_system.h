@@ -853,15 +853,15 @@ public:
 
   /**
    * Implementation of the
-   * FiniteElement::convert_generalized_support_point_values_to_nodal_values()
+   * FiniteElement::convert_generalized_support_point_values_to_dof_values()
    * function. The current function simply takes the input argument apart,
    * passes the pieces to the base elements, and then re-assembles everything
    * into the output argument.
    */
   virtual
   void
-  convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
-                                                            std::vector<double>                &nodal_values) const;
+  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
+                                                          std::vector<double>                &nodal_values) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
