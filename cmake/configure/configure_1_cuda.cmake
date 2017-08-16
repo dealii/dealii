@@ -24,6 +24,11 @@ SET(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
 
 MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
 
+  #
+  # TODO: Ultimately, this find_package call is not needed any more. We
+  # still use it because it is very convenient to (a) check that CUDA is
+  # installed, (b) get compiler path and include directories / libraries.
+  #
   FIND_PACKAGE(CUDA)
 
   IF(CUDA_FOUND)
@@ -96,6 +101,11 @@ ENDMACRO()
 
 MACRO(FEATURE_CUDA_CONFIGURE_EXTERNAL)
 
+  #
+  # Ensure that we enable CMake-internal CUDA support with the right
+  # compiler:
+  #
+  SET(CMAKE_CUDA_COMPILER "${CUDA_NVCC_EXECUTABLE}")
   ENABLE_LANGUAGE(CUDA)
 
   #
