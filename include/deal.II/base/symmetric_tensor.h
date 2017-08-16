@@ -3594,12 +3594,12 @@ scalar_product (const Tensor<2,dim,Number>               &t1,
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
-template <typename Number>
+template <typename Number, typename OtherNumber>
 inline
 void
-double_contract (SymmetricTensor<2,1,Number> &tmp,
-                 const SymmetricTensor<4,1,Number> &t,
-                 const SymmetricTensor<2,1,Number> &s)
+double_contract (SymmetricTensor<2,1,typename ProductType<Number, OtherNumber>::type> &tmp,
+                 const SymmetricTensor<4,1,Number>      &t,
+                 const SymmetricTensor<2,1,OtherNumber> &s)
 {
   tmp[0][0] = t[0][0][0][0] * s[0][0];
 }
@@ -3621,12 +3621,12 @@ double_contract (SymmetricTensor<2,1,Number> &tmp,
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
-template <typename Number>
+template <typename Number, typename OtherNumber>
 inline
 void
-double_contract (SymmetricTensor<2,1,Number> &tmp,
-                 const SymmetricTensor<2,1,Number> &s,
-                 const SymmetricTensor<4,1,Number> &t)
+double_contract (SymmetricTensor<2,1,typename ProductType<Number, OtherNumber>::type> &tmp,
+                 const SymmetricTensor<2,1,Number>      &s,
+                 const SymmetricTensor<4,1,OtherNumber> &t)
 {
   tmp[0][0] = t[0][0][0][0] * s[0][0];
 }
@@ -3647,12 +3647,12 @@ double_contract (SymmetricTensor<2,1,Number> &tmp,
  *
  * @related SymmetricTensor @author Wolfgang Bangerth, 2005
  */
-template <typename Number>
+template <typename Number, typename OtherNumber>
 inline
 void
-double_contract (SymmetricTensor<2,2,Number> &tmp,
-                 const SymmetricTensor<4,2,Number> &t,
-                 const SymmetricTensor<2,2,Number> &s)
+double_contract (SymmetricTensor<2,2,typename ProductType<Number, OtherNumber>::type> &tmp,
+                 const SymmetricTensor<4,2,Number>      &t,
+                 const SymmetricTensor<2,2,OtherNumber> &s)
 {
   const unsigned int dim = 2;
 
@@ -3680,12 +3680,12 @@ double_contract (SymmetricTensor<2,2,Number> &tmp,
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
-template <typename Number>
+template <typename Number, typename OtherNumber>
 inline
 void
-double_contract (SymmetricTensor<2,2,Number> &tmp,
-                 const SymmetricTensor<2,2,Number> &s,
-                 const SymmetricTensor<4,2,Number> &t)
+double_contract (SymmetricTensor<2,2,typename ProductType<Number, OtherNumber>::type> &tmp,
+                 const SymmetricTensor<2,2,Number>      &s,
+                 const SymmetricTensor<4,2,OtherNumber> &t)
 {
   const unsigned int dim = 2;
 
@@ -3713,12 +3713,12 @@ double_contract (SymmetricTensor<2,2,Number> &tmp,
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
-template <typename Number>
+template <typename Number, typename OtherNumber>
 inline
 void
-double_contract (SymmetricTensor<2,3,Number> &tmp,
-                 const SymmetricTensor<4,3,Number> &t,
-                 const SymmetricTensor<2,3,Number> &s)
+double_contract (SymmetricTensor<2,3,typename ProductType<Number, OtherNumber>::type> &tmp,
+                 const SymmetricTensor<4,3,Number>      &t,
+                 const SymmetricTensor<2,3,OtherNumber> &s)
 {
   const unsigned int dim = 3;
 
@@ -3749,12 +3749,12 @@ double_contract (SymmetricTensor<2,3,Number> &tmp,
  * @related SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
-template <typename Number>
+template <typename Number, typename OtherNumber>
 inline
 void
-double_contract (SymmetricTensor<2,3,Number> &tmp,
-                 const SymmetricTensor<2,3,Number> &s,
-                 const SymmetricTensor<4,3,Number> &t)
+double_contract (SymmetricTensor<2,3,typename ProductType<Number, OtherNumber>::type> &tmp,
+                 const SymmetricTensor<2,3,Number>      &s,
+                 const SymmetricTensor<4,3,OtherNumber> &t)
 {
   const unsigned int dim = 3;
 
