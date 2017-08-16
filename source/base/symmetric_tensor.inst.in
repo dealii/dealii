@@ -79,6 +79,19 @@ for (deal_II_dimension : DIMENSIONS; number : COMPLEX_SCALARS)
 
 for (number : REAL_SCALARS)
 {
+    namespace internal
+    \{
+    namespace SymmetricTensor
+    \{
+    template
+    struct Inverse<4,3,number>;
+    \}
+    \}
+
+    template
+    SymmetricTensor<4,3,number>
+    invert (const SymmetricTensor<4,3,number> &t);
+
     template
     std::array<number,1>
     eigenvalues (const SymmetricTensor<2,1,number> &);

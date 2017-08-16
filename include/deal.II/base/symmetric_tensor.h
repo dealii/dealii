@@ -53,6 +53,20 @@ determinant (const SymmetricTensor<2,dim,Number> &);
 namespace internal
 {
   /**
+   * A namespace for functions and classes that are internal to how the
+   * SymmetricTensor class (and its associate functions) works.
+   */
+  namespace SymmetricTensor
+  {
+    /**
+     * Compute the inverse of a symmetric tensor of a
+     * generic @p rank, @p dim and @p Number type.
+     */
+    template<int rank, int dim, typename Number>
+    struct Inverse;
+  }
+
+  /**
    * A namespace for classes that are internal to how the SymmetricTensor
    * class works.
    */
@@ -837,11 +851,13 @@ private:
   template <int dim2, typename Number2>
   friend SymmetricTensor<4,dim2,Number2> identity_tensor ();
 
-  template <int dim2, typename Number2>
-  friend SymmetricTensor<2,dim2,Number2> invert (const SymmetricTensor<2,dim2,Number2> &);
 
-  template <int dim2, typename Number2>
-  friend SymmetricTensor<4,dim2,Number2> invert (const SymmetricTensor<4,dim2,Number2> &);
+  /**
+   * Make a few helper classes friends as well.
+   */
+  friend struct internal::SymmetricTensor::Inverse<2,dim,Number>;
+
+  friend struct internal::SymmetricTensor::Inverse<4,dim,Number>;
 };
 
 
@@ -1070,6 +1086,271 @@ namespace internal
 
       return t;
     }
+
+
+    template<typename Number>
+    struct Inverse<2,1,Number>
+    {
+      static inline dealii::SymmetricTensor<2,1,Number>
+      value (const dealii::SymmetricTensor<2,1,Number> &t)
+      {
+        dealii::SymmetricTensor<2,1,Number> tmp;
+
+        tmp[0][0] = 1.0/t[0][0];
+
+        return tmp;
+      }
+    };
+
+
+    template<typename Number>
+    struct Inverse<2,2,Number>
+    {
+      static inline dealii::SymmetricTensor<2,2,Number>
+      value (const dealii::SymmetricTensor<2,2,Number> &t)
+      {
+        dealii::SymmetricTensor<2,2,Number> tmp;
+
+        // Sympy result: ([
+        // [ t11/(t00*t11 - t01**2), -t01/(t00*t11 - t01**2)],
+        // [-t01/(t00*t11 - t01**2),  t00/(t00*t11 - t01**2)]  ])
+        const TableIndices<2> idx_00 (0,0);
+        const TableIndices<2> idx_01 (0,1);
+        const TableIndices<2> idx_11 (1,1);
+        const Number inv_det_t
+          = 1.0/(t[idx_00]*t[idx_11]
+                 - t[idx_01]*t[idx_01]);
+        tmp[idx_00] = t[idx_11];
+        tmp[idx_01] = -t[idx_01];
+        tmp[idx_11] = t[idx_00];
+        tmp *= inv_det_t;
+
+        return tmp;
+      }
+    };
+
+
+    template<typename Number>
+    struct Inverse<2,3,Number>
+    {
+      static dealii::SymmetricTensor<2,3,Number>
+      value (const dealii::SymmetricTensor<2,3,Number> &t)
+      {
+        dealii::SymmetricTensor<2,3,Number> tmp;
+
+        // Sympy result: ([
+        // [  (t11*t22 - t12**2)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+        //    (-t01*t22 + t02*t12)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+        //    (t01*t12 - t02*t11)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11)],
+        // [  (-t01*t22 + t02*t12)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+        //    (t00*t22 - t02**2)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+        //    (t00*t12 - t01*t02)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11)],
+        // [  (t01*t12 - t02*t11)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
+        //    (t00*t12 - t01*t02)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11),
+        //    (-t00*t11 + t01**2)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11)]  ])
+        const TableIndices<2> idx_00 (0,0);
+        const TableIndices<2> idx_01 (0,1);
+        const TableIndices<2> idx_02 (0,2);
+        const TableIndices<2> idx_11 (1,1);
+        const TableIndices<2> idx_12 (1,2);
+        const TableIndices<2> idx_22 (2,2);
+        const Number inv_det_t
+          = 1.0/(t[idx_00]*t[idx_11]*t[idx_22]
+                 - t[idx_00]*t[idx_12]*t[idx_12]
+                 - t[idx_01]*t[idx_01]*t[idx_22]
+                 + 2.0*t[idx_01]*t[idx_02]*t[idx_12]
+                 - t[idx_02]*t[idx_02]*t[idx_11]);
+        tmp[idx_00] = t[idx_11]*t[idx_22] - t[idx_12]*t[idx_12];
+        tmp[idx_01] = -t[idx_01]*t[idx_22] + t[idx_02]*t[idx_12];
+        tmp[idx_02] = t[idx_01]*t[idx_12] - t[idx_02]*t[idx_11];
+        tmp[idx_11] = t[idx_00]*t[idx_22] - t[idx_02]*t[idx_02];
+        tmp[idx_12] = -t[idx_00]*t[idx_12] + t[idx_01]*t[idx_02];
+        tmp[idx_22] = t[idx_00]*t[idx_11] - t[idx_01]*t[idx_01];
+        tmp *= inv_det_t;
+
+        return tmp;
+      }
+    };
+
+
+    template<typename Number>
+    struct Inverse<4,1,Number>
+    {
+      static inline dealii::SymmetricTensor<4,1,Number>
+      value (const dealii::SymmetricTensor<4,1,Number> &t)
+      {
+        dealii::SymmetricTensor<4,1,Number> tmp;
+        tmp.data[0][0] = 1.0/t.data[0][0];
+        return tmp;
+      }
+    };
+
+
+    template<typename Number>
+    struct Inverse<4,2,Number>
+    {
+      static inline dealii::SymmetricTensor<4,2,Number>
+      value (const dealii::SymmetricTensor<4,2,Number> &t)
+      {
+        dealii::SymmetricTensor<4,2,Number> tmp;
+
+        // Inverting this tensor is a little more complicated than necessary,
+        // since we store the data of 't' as a 3x3 matrix t.data, but the
+        // product between a rank-4 and a rank-2 tensor is really not the
+        // product between this matrix and the 3-vector of a rhs, but rather
+        //
+        // B.vec = t.data * mult * A.vec
+        //
+        // where mult is a 3x3 matrix with entries [[1,0,0],[0,1,0],[0,0,2]] to
+        // capture the fact that we need to add up both the c_ij12*a_12 and the
+        // c_ij21*a_21 terms.
+        //
+        // In addition, in this scheme, the identity tensor has the matrix
+        // representation mult^-1.
+        //
+        // The inverse of 't' therefore has the matrix representation
+        //
+        // inv.data = mult^-1 * t.data^-1 * mult^-1
+        //
+        // in order to compute it, let's first compute the inverse of t.data and
+        // put it into tmp.data; at the end of the function we then scale the
+        // last row and column of the inverse by 1/2, corresponding to the left
+        // and right multiplication with mult^-1.
+        const Number t4 = t.data[0][0]*t.data[1][1],
+                     t6 = t.data[0][0]*t.data[1][2],
+                     t8 = t.data[0][1]*t.data[1][0],
+                     t00 = t.data[0][2]*t.data[1][0],
+                     t01 = t.data[0][1]*t.data[2][0],
+                     t04 = t.data[0][2]*t.data[2][0],
+                     t07 = 1.0/(t4*t.data[2][2]-t6*t.data[2][1]-
+                                t8*t.data[2][2]+t00*t.data[2][1]+
+                                t01*t.data[1][2]-t04*t.data[1][1]);
+        tmp.data[0][0] = (t.data[1][1]*t.data[2][2]-t.data[1][2]*t.data[2][1])*t07;
+        tmp.data[0][1] = -(t.data[0][1]*t.data[2][2]-t.data[0][2]*t.data[2][1])*t07;
+        tmp.data[0][2] = -(-t.data[0][1]*t.data[1][2]+t.data[0][2]*t.data[1][1])*t07;
+        tmp.data[1][0] = -(t.data[1][0]*t.data[2][2]-t.data[1][2]*t.data[2][0])*t07;
+        tmp.data[1][1] = (t.data[0][0]*t.data[2][2]-t04)*t07;
+        tmp.data[1][2] = -(t6-t00)*t07;
+        tmp.data[2][0] = -(-t.data[1][0]*t.data[2][1]+t.data[1][1]*t.data[2][0])*t07;
+        tmp.data[2][1] = -(t.data[0][0]*t.data[2][1]-t01)*t07;
+        tmp.data[2][2] = (t4-t8)*t07;
+
+        // scale last row and column as mentioned
+        // above
+        tmp.data[2][0] /= 2;
+        tmp.data[2][1] /= 2;
+        tmp.data[0][2] /= 2;
+        tmp.data[1][2] /= 2;
+        tmp.data[2][2] /= 4;
+
+        return tmp;
+      }
+    };
+
+
+    template<typename Number>
+    struct Inverse<4,3,Number>
+    {
+      static dealii::SymmetricTensor<4,3,Number>
+      value (const dealii::SymmetricTensor<4,3,Number> &t)
+      {
+        dealii::SymmetricTensor<4,3,Number> tmp = t;
+
+        // This function follows the exact same scheme as the 2d case, except
+        // that hardcoding the inverse of a 6x6 matrix is pretty wasteful.
+        // Instead, we use the Gauss-Jordan algorithm implemented for
+        // FullMatrix. For historical reasons the following code is copied from
+        // there, with the tangential benefit that we do not need to copy the
+        // tensor entries to and from the FullMatrix.
+        const unsigned int N = 6;
+
+        // First get an estimate of the size of the elements of this matrix,
+        // for later checks whether the pivot element is large enough, or
+        // whether we have to fear that the matrix is not regular.
+        Number diagonal_sum = internal::NumberType<Number>::value(0.0);
+        for (unsigned int i=0; i<N; ++i)
+          diagonal_sum += std::fabs(tmp.data[i][i]);
+        const Number typical_diagonal_element = diagonal_sum/N;
+        (void)typical_diagonal_element;
+
+        unsigned int p[N];
+        for (unsigned int i=0; i<N; ++i)
+          p[i] = i;
+
+        for (unsigned int j=0; j<N; ++j)
+          {
+            // Pivot search: search that part of the line on and right of the
+            // diagonal for the largest element.
+            Number       max = std::fabs(tmp.data[j][j]);
+            unsigned int r   = j;
+            for (unsigned int i=j+1; i<N; ++i)
+              if (std::fabs(tmp.data[i][j]) > max)
+                {
+                  max = std::fabs(tmp.data[i][j]);
+                  r = i;
+                }
+
+            // Check whether the pivot is too small
+            Assert(max > 1.e-16*typical_diagonal_element,
+                   ExcMessage("This tensor seems to be noninvertible"));
+
+            // Row interchange
+            if (r>j)
+              {
+                for (unsigned int k=0; k<N; ++k)
+                  std::swap (tmp.data[j][k], tmp.data[r][k]);
+
+                std::swap (p[j], p[r]);
+              }
+
+            // Transformation
+            const Number hr = 1./tmp.data[j][j];
+            tmp.data[j][j] = hr;
+            for (unsigned int k=0; k<N; ++k)
+              {
+                if (k==j) continue;
+                for (unsigned int i=0; i<N; ++i)
+                  {
+                    if (i==j) continue;
+                    tmp.data[i][k] -= tmp.data[i][j]*tmp.data[j][k]*hr;
+                  }
+              }
+            for (unsigned int i=0; i<N; ++i)
+              {
+                tmp.data[i][j] *= hr;
+                tmp.data[j][i] *= -hr;
+              }
+            tmp.data[j][j] = hr;
+          }
+
+        // Column interchange
+        Number hv[N];
+        for (unsigned int i=0; i<N; ++i)
+          {
+            for (unsigned int k=0; k<N; ++k)
+              hv[p[k]] = tmp.data[i][k];
+            for (unsigned int k=0; k<N; ++k)
+              tmp.data[i][k] = hv[k];
+          }
+
+        // Scale rows and columns. The mult matrix
+        // here is diag[1, 1, 1, 1/2, 1/2, 1/2].
+        for (unsigned int i=3; i<6; ++i)
+          for (unsigned int j=0; j<3; ++j)
+            tmp.data[i][j] /= 2;
+
+        for (unsigned int i=0; i<3; ++i)
+          for (unsigned int j=3; j<6; ++j)
+            tmp.data[i][j] /= 2;
+
+        for (unsigned int i=3; i<6; ++i)
+          for (unsigned int j=3; j<6; ++j)
+            tmp.data[i][j] /= 4;
+
+        return tmp;
+      }
+    };
+
   }
 }
 
@@ -2450,10 +2731,6 @@ eigenvalues (const SymmetricTensor<2,3,Number> &T);
 
 namespace internal
 {
-  /**
-   * A namespace for functions and classes that are internal to how the
-   * SymmetricTensor class (and its associate functions) works.
-   */
   namespace SymmetricTensor
   {
     /**
@@ -3063,109 +3340,16 @@ identity_tensor ()
 template <int dim, typename Number>
 inline
 SymmetricTensor<2,dim,Number>
-invert (const SymmetricTensor<2,dim,Number> &)
+invert (const SymmetricTensor<2,dim,Number> &t)
 {
-  // if desired, take over the
-  // inversion of a 4x4 tensor
-  // from the FullMatrix
-  AssertThrow (false, ExcNotImplemented());
-
-  return SymmetricTensor<2,dim,Number>();
+  return internal::SymmetricTensor::Inverse<2,dim,Number>::value(t);
 }
-
-
-
-#ifndef DOXYGEN
-
-template <typename Number>
-inline
-SymmetricTensor<2,1,Number>
-invert (const SymmetricTensor<2,1,Number> &t)
-{
-  SymmetricTensor<2,1,Number> tmp;
-
-  tmp[0][0] = 1.0/t[0][0];
-
-  return tmp;
-}
-
-
-
-template <typename Number>
-inline
-SymmetricTensor<2,2,Number>
-invert (const SymmetricTensor<2,2,Number> &t)
-{
-  SymmetricTensor<2,2,Number> tmp;
-
-  // Sympy result: ([
-  // [ t11/(t00*t11 - t01**2), -t01/(t00*t11 - t01**2)],
-  // [-t01/(t00*t11 - t01**2),  t00/(t00*t11 - t01**2)]  ])
-  const TableIndices<2> idx_00 (0,0);
-  const TableIndices<2> idx_01 (0,1);
-  const TableIndices<2> idx_11 (1,1);
-  const Number inv_det_t
-    = 1.0/(t[idx_00]*t[idx_11]
-           - t[idx_01]*t[idx_01]);
-  tmp[idx_00] = t[idx_11];
-  tmp[idx_01] = -t[idx_01];
-  tmp[idx_11] = t[idx_00];
-  tmp *= inv_det_t;
-
-  return tmp;
-}
-
-
-
-template <typename Number>
-inline
-SymmetricTensor<2,3,Number>
-invert (const SymmetricTensor<2,3,Number> &t)
-{
-  SymmetricTensor<2,3,Number> tmp;
-
-  // Sympy result: ([
-  // [  (t11*t22 - t12**2)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
-  //    (-t01*t22 + t02*t12)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
-  //    (t01*t12 - t02*t11)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11)],
-  // [  (-t01*t22 + t02*t12)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
-  //    (t00*t22 - t02**2)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
-  //    (t00*t12 - t01*t02)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11)],
-  // [  (t01*t12 - t02*t11)/(t00*t11*t22 - t00*t12**2 - t01**2*t22 + 2*t01*t02*t12 - t02**2*t11),
-  //    (t00*t12 - t01*t02)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11),
-  //    (-t00*t11 + t01**2)/(-t00*t11*t22 + t00*t12**2 + t01**2*t22 - 2*t01*t02*t12 + t02**2*t11)]  ])
-  const TableIndices<2> idx_00 (0,0);
-  const TableIndices<2> idx_01 (0,1);
-  const TableIndices<2> idx_02 (0,2);
-  const TableIndices<2> idx_11 (1,1);
-  const TableIndices<2> idx_12 (1,2);
-  const TableIndices<2> idx_22 (2,2);
-  const Number inv_det_t
-    = 1.0/(t[idx_00]*t[idx_11]*t[idx_22]
-           - t[idx_00]*t[idx_12]*t[idx_12]
-           - t[idx_01]*t[idx_01]*t[idx_22]
-           + 2.0*t[idx_01]*t[idx_02]*t[idx_12]
-           - t[idx_02]*t[idx_02]*t[idx_11]);
-  tmp[idx_00] = t[idx_11]*t[idx_22] - t[idx_12]*t[idx_12];
-  tmp[idx_01] = -t[idx_01]*t[idx_22] + t[idx_02]*t[idx_12];
-  tmp[idx_02] = t[idx_01]*t[idx_12] - t[idx_02]*t[idx_11];
-  tmp[idx_11] = t[idx_00]*t[idx_22] - t[idx_02]*t[idx_02];
-  tmp[idx_12] = -t[idx_00]*t[idx_12] + t[idx_01]*t[idx_02];
-  tmp[idx_22] = t[idx_00]*t[idx_11] - t[idx_01]*t[idx_01];
-  tmp *= inv_det_t;
-
-  return tmp;
-}
-
-#endif /* DOXYGEN */
 
 
 
 /**
  * Invert a symmetric rank-4 tensor. Since symmetric rank-4 tensors are
  * mappings from and to symmetric rank-2 tensors, they can have an inverse.
- * This function computes it, if it exists, for the case that the dimension
- * equals either 1 or 2.
  *
  * If a tensor is not invertible, then the result is unspecified, but will
  * likely contain the results of a division by zero or a very small number at
@@ -3179,100 +3363,8 @@ inline
 SymmetricTensor<4,dim,Number>
 invert (const SymmetricTensor<4,dim,Number> &t)
 {
-  SymmetricTensor<4,dim,Number> tmp;
-  switch (dim)
-    {
-    case 1:
-      tmp.data[0][0] = 1./t.data[0][0];
-      break;
-    case 2:
-
-      // inverting this tensor is a little more
-      // complicated than necessary, since we
-      // store the data of 't' as a 3x3 matrix
-      // t.data, but the product between a rank-4
-      // and a rank-2 tensor is really not the
-      // product between this matrix and the
-      // 3-vector of a rhs, but rather
-      //
-      // B.vec = t.data * mult * A.vec
-      //
-      // where mult is a 3x3 matrix with
-      // entries [[1,0,0],[0,1,0],[0,0,2]] to
-      // capture the fact that we need to add up
-      // both the c_ij12*a_12 and the c_ij21*a_21
-      // terms
-      //
-      // in addition, in this scheme, the
-      // identity tensor has the matrix
-      // representation mult^-1.
-      //
-      // the inverse of 't' therefore has the
-      // matrix representation
-      //
-      // inv.data = mult^-1 * t.data^-1 * mult^-1
-      //
-      // in order to compute it, let's first
-      // compute the inverse of t.data and put it
-      // into tmp.data; at the end of the
-      // function we then scale the last row and
-      // column of the inverse by 1/2,
-      // corresponding to the left and right
-      // multiplication with mult^-1
-    {
-      const Number t4 = t.data[0][0]*t.data[1][1],
-                   t6 = t.data[0][0]*t.data[1][2],
-                   t8 = t.data[0][1]*t.data[1][0],
-                   t00 = t.data[0][2]*t.data[1][0],
-                   t01 = t.data[0][1]*t.data[2][0],
-                   t04 = t.data[0][2]*t.data[2][0],
-                   t07 = 1.0/(t4*t.data[2][2]-t6*t.data[2][1]-
-                              t8*t.data[2][2]+t00*t.data[2][1]+
-                              t01*t.data[1][2]-t04*t.data[1][1]);
-      tmp.data[0][0] = (t.data[1][1]*t.data[2][2]-t.data[1][2]*t.data[2][1])*t07;
-      tmp.data[0][1] = -(t.data[0][1]*t.data[2][2]-t.data[0][2]*t.data[2][1])*t07;
-      tmp.data[0][2] = -(-t.data[0][1]*t.data[1][2]+t.data[0][2]*t.data[1][1])*t07;
-      tmp.data[1][0] = -(t.data[1][0]*t.data[2][2]-t.data[1][2]*t.data[2][0])*t07;
-      tmp.data[1][1] = (t.data[0][0]*t.data[2][2]-t04)*t07;
-      tmp.data[1][2] = -(t6-t00)*t07;
-      tmp.data[2][0] = -(-t.data[1][0]*t.data[2][1]+t.data[1][1]*t.data[2][0])*t07;
-      tmp.data[2][1] = -(t.data[0][0]*t.data[2][1]-t01)*t07;
-      tmp.data[2][2] = (t4-t8)*t07;
-
-      // scale last row and column as mentioned
-      // above
-      tmp.data[2][0] /= 2;
-      tmp.data[2][1] /= 2;
-      tmp.data[0][2] /= 2;
-      tmp.data[1][2] /= 2;
-      tmp.data[2][2] /= 4;
-    }
-    break;
-    default:
-      Assert (false, ExcNotImplemented());
-    }
-  return tmp;
+  return internal::SymmetricTensor::Inverse<4,dim,Number>::value(t);
 }
-
-
-
-/**
- * Invert a symmetric rank-4 tensor. Since symmetric rank-4 tensors are
- * mappings from and to symmetric rank-2 tensors, they can have an inverse.
- * This function computes it, if it exists, for the case that the dimension
- * equals 3.
- *
- * If a tensor is not invertible, then the result is unspecified, but will
- * likely contain the results of a division by zero or a very small number at
- * the very least.
- *
- * @relates SymmetricTensor
- * @author Wolfgang Bangerth, 2005
- */
-template <>
-SymmetricTensor<4,3,double>
-invert (const SymmetricTensor<4,3,double> &t);
-// this function is implemented in the .cc file for double data types
 
 
 
