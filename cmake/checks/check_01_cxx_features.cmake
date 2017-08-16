@@ -264,7 +264,7 @@ CHECK_CXX_SOURCE_COMPILES(
 
   // Check the version language macro, but skip MSVC because
   // MSVC reports 199711 even in MSVC 2017.
-  #if __cplusplus < 201103L && !defined(_MSC_VER)
+  #if __cplusplus < 201103L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
   #  error \"insufficient support for C++11\"
   #endif
 
