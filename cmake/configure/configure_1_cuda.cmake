@@ -45,6 +45,29 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
         )
     ENDIF()
 
+    #
+    # CUDA 8.0 requires C++11 support, CUDA 9.0 requires C++14 support.
+    # Make sure that deal.II is configured appropriately
+    #
+    MACRO(_cuda_ensure_feature_off _version _feature)
+      IF(${CUDA_VERSION_MAJOR} EQUAL ${_version})
+        IF(${_feature})
+          SET(${var} FALSE)
+          MESSAGE(STATUS "CUDA ${_version} requires ${_feature} to be set to off.")
+          SET(CUDA_ADDITIONAL_ERROR_STRING
+            ${CUDA_ADDITIONAL_ERROR_STRING}
+            "CUDA ${_version} is not compatible with the C++ standard\n"
+            "enabled by ${_feature}.\n"
+            "Please disable ${_feature}, e.g. by reconfiguring with\n"
+            "  cmake -D${_feature}=OFF ."
+            )
+        ENDIF()
+      ENDIF()
+    ENDMACRO()
+    _cuda_ensure_feature_off(8 DEAL_II_WITH_CXX14)
+    _cuda_ensure_feature_off(9 DEAL_II_WITH_CXX17)
+
+
     IF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch[ ]*sm_([0-9]*)")
       SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
     ELSEIF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch=sm_([0-9]*)")
