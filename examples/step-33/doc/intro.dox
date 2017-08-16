@@ -138,7 +138,7 @@ above equations. For simplicity, we define $ \mathbf{B}({\mathbf{w}_{n}})(\mathb
 \int_{\partial \Omega} \left(\mathbf{H}(\mathbf{w}_n^+,
 \mathbf{w}^-(\mathbf{w}_n^+), \mathbf{n}), \mathbf{z}\right)
 -
-\int_{\partial \Omega} \left(\mathbf{G}(\mathbf{w}_n),
+\int_{\Omega} \left(\mathbf{G}(\mathbf{w}_n),
 \mathbf{z}\right) .
 @f}
 
