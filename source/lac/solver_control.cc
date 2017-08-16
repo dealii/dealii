@@ -36,7 +36,7 @@ SolverControl::SolverControl (const unsigned int maxiter,
   lcheck(failure),
   initial_val(numbers::signaling_nan<double>()),
   lvalue(numbers::signaling_nan<double>()),
-  lstep(0),
+  lstep(numbers::invalid_unsigned_int),
   check_failure(false),
   relative_failure_residual(0),
   failure_residual(0),
@@ -399,6 +399,14 @@ ConsecutiveControl::check (const unsigned int step,
   // reset the counter if ConsecutiveControl is being reused
   if (step==0)
     n_converged_iterations = 0;
+  else
+    {
+      // check two things:
+      // (i)  steps are ascending without repetitions
+      // (ii) user started from zero even when solver is being reused.
+      Assert (step-1 == lstep,
+              ExcMessage("steps should be ascending integers."));
+    }
 
   SolverControl::State state = SolverControl::check(step, check_value);
   // check if we need to override the success:
