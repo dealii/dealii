@@ -140,12 +140,13 @@ namespace internal
      * tensor of rank <tt>rank1+rank2-4</tt>, but if this is zero it is a
      * single scalar Number. For this case, we have a specialization.
      *
-     * @author Wolfgang Bangerth, 2005
+     * @author Wolfgang Bangerth, 2005, Jean-Paul Pelteret, 2017
      */
-    template <int rank1, int rank2, int dim, typename Number>
+    template <int rank1, int rank2, int dim, typename Number, typename OtherNumber = Number>
     struct double_contraction_result
     {
-      typedef ::dealii::SymmetricTensor<rank1+rank2-4,dim,Number> type;
+      typedef typename ProductType<Number,OtherNumber>::type          value_type;
+      typedef ::dealii::SymmetricTensor<rank1+rank2-4,dim,value_type> type;
     };
 
 
@@ -155,12 +156,12 @@ namespace internal
      * tensor of rank <tt>rank1+rank2-4</tt>, but if this is zero it is a
      * single scalar Number. For this case, we have a specialization.
      *
-     * @author Wolfgang Bangerth, 2005
+     * @author Wolfgang Bangerth, 2005, Jean-Paul Pelteret, 2017
      */
-    template <int dim, typename Number>
-    struct double_contraction_result<2,2,dim,Number>
+    template <int dim, typename Number, typename OtherNumber>
+    struct double_contraction_result<2,2,dim,Number,OtherNumber>
     {
-      typedef Number type;
+      typedef typename ProductType<Number,OtherNumber>::type type;
     };
 
 
@@ -683,15 +684,17 @@ public:
    * as this operator, but rather than returning the result as a return value,
    * they write it into the first argument to the function.
    */
-  typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim,Number>::type
-  operator * (const SymmetricTensor<2,dim,Number> &s) const;
+  template<typename OtherNumber>
+  typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim,Number,OtherNumber>::type
+  operator * (const SymmetricTensor<2,dim,OtherNumber> &s) const;
 
   /**
    * Contraction over two indices of the present object with the rank-4
    * symmetric tensor given as argument.
    */
-  typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,dim,Number>::type
-  operator * (const SymmetricTensor<4,dim,Number> &s) const;
+  template<typename OtherNumber>
+  typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,dim,Number,OtherNumber>::type
+  operator * (const SymmetricTensor<4,dim,OtherNumber> &s) const;
 
   /**
    * Return a read-write reference to the indicated element.
@@ -1478,12 +1481,14 @@ SymmetricTensor<rank,dim,Number>::memory_consumption ()
 namespace internal
 {
 
-  template <int dim, typename Number>
+  template <int dim, typename Number, typename OtherNumber = Number>
   inline
-  typename SymmetricTensorAccessors::double_contraction_result<2,2,dim,Number>::type
-  perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type &data,
-                              const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type &sdata)
+  typename SymmetricTensorAccessors::double_contraction_result<2,2,dim,Number,OtherNumber>::type
+  perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type      &data,
+                              const typename SymmetricTensorAccessors::StorageType<2,dim,OtherNumber>::base_tensor_type &sdata)
   {
+    typedef typename SymmetricTensorAccessors::double_contraction_result<2,2,dim,Number,OtherNumber>::type result_type;
+
     switch (dim)
       {
       case 1:
@@ -1491,7 +1496,8 @@ namespace internal
       default:
         // Start with the non-diagonal part to avoid some multiplications by
         // 2.
-        Number sum = data[dim] * sdata[dim];
+
+        result_type sum = data[dim] * sdata[dim];
         for (unsigned int d=dim+1; d<(dim*(dim+1)/2); ++d)
           sum += data[d] * sdata[d];
         sum += sum; // sum = sum * 2.;
@@ -1505,33 +1511,42 @@ namespace internal
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename Number, typename OtherNumber = Number>
   inline
-  typename SymmetricTensorAccessors::double_contraction_result<4,2,dim,Number>::type
-  perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type &data,
-                              const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type &sdata)
+  typename SymmetricTensorAccessors::double_contraction_result<4,2,dim,Number,OtherNumber>::type
+  perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type      &data,
+                              const typename SymmetricTensorAccessors::StorageType<2,dim,OtherNumber>::base_tensor_type &sdata)
   {
+    typedef typename SymmetricTensorAccessors::double_contraction_result<4,2,dim,Number,OtherNumber>::type       result_type;
+    typedef typename SymmetricTensorAccessors::double_contraction_result<4,2,dim,Number,OtherNumber>::value_type value_type;
+
     const unsigned int data_dim =
-      SymmetricTensorAccessors::StorageType<2,dim,Number>::n_independent_components;
-    Number tmp [data_dim];
+      SymmetricTensorAccessors::StorageType<2,dim,value_type>::n_independent_components;
+    value_type tmp [data_dim];
     for (unsigned int i=0; i<data_dim; ++i)
-      tmp[i] = perform_double_contraction<dim,Number>(data[i], sdata);
-    return dealii::SymmetricTensor<2,dim,Number>(tmp);
+      tmp[i] = perform_double_contraction<dim,Number,OtherNumber>(data[i], sdata);
+    return result_type(tmp);
   }
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename Number, typename OtherNumber = Number>
   inline
-  typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type
-  perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type &data,
-                              const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type &sdata)
+  typename SymmetricTensorAccessors::StorageType<2,dim,
+           typename SymmetricTensorAccessors::double_contraction_result<2,4,dim,Number,OtherNumber>::value_type
+           >::base_tensor_type
+           perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type      &data,
+                                       const typename SymmetricTensorAccessors::StorageType<4,dim,OtherNumber>::base_tensor_type &sdata)
   {
-    typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type tmp;
+    typedef typename SymmetricTensorAccessors::double_contraction_result<2,4,dim,Number,OtherNumber>::type       result_type;
+    typedef typename SymmetricTensorAccessors::double_contraction_result<2,4,dim,Number,OtherNumber>::value_type value_type;
+    typedef typename SymmetricTensorAccessors::StorageType<2,dim,value_type>::base_tensor_type base_tensor_type;
+
+    base_tensor_type tmp;
     for (unsigned int i=0; i<tmp.dimension; ++i)
       {
         // Start with the non-diagonal part
-        Number sum = data[dim] * sdata[dim][i];
+        value_type sum = data[dim] * sdata[dim][i];
         for (unsigned int d=dim+1; d<(dim*(dim+1)/2); ++d)
           sum += data[d] * sdata[d][i];
         sum += sum; // sum = sum * 2.;
@@ -1546,15 +1561,21 @@ namespace internal
 
 
 
-  template <int dim, typename Number>
+  template <int dim, typename Number, typename OtherNumber = Number>
   inline
-  typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type
-  perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type &data,
-                              const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type &sdata)
+  typename SymmetricTensorAccessors::StorageType<4,dim,
+           typename SymmetricTensorAccessors::double_contraction_result<4,4,dim,Number,OtherNumber>::value_type
+           >::base_tensor_type
+           perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type      &data,
+                                       const typename SymmetricTensorAccessors::StorageType<4,dim,OtherNumber>::base_tensor_type &sdata)
   {
+    typedef typename SymmetricTensorAccessors::double_contraction_result<4,4,dim,Number,OtherNumber>::type       result_type;
+    typedef typename SymmetricTensorAccessors::double_contraction_result<4,4,dim,Number,OtherNumber>::value_type value_type;
+    typedef typename SymmetricTensorAccessors::StorageType<4,dim,value_type>::base_tensor_type base_tensor_type;
+
     const unsigned int data_dim =
-      SymmetricTensorAccessors::StorageType<2,dim,Number>::n_independent_components;
-    typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type tmp;
+      SymmetricTensorAccessors::StorageType<2,dim,value_type>::n_independent_components;
+    base_tensor_type tmp;
     for (unsigned int i=0; i<data_dim; ++i)
       for (unsigned int j=0; j<data_dim; ++j)
         {
@@ -1575,27 +1596,29 @@ namespace internal
 
 
 template <int rank, int dim, typename Number>
+template<typename OtherNumber>
 inline
-typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim,Number>::type
-SymmetricTensor<rank,dim,Number>::operator * (const SymmetricTensor<2,dim,Number> &s) const
+typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim,Number,OtherNumber>::type
+SymmetricTensor<rank,dim,Number>::operator * (const SymmetricTensor<2,dim,OtherNumber> &s) const
 {
   // need to have two different function calls
   // because a scalar and rank-2 tensor are not
   // the same data type (see internal function
   // above)
-  return internal::perform_double_contraction<dim,Number> (data, s.data);
+  return internal::perform_double_contraction<dim,Number,OtherNumber> (data, s.data);
 }
 
 
 
 template <int rank, int dim, typename Number>
+template<typename OtherNumber>
 inline
-typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,dim,Number>::type
-SymmetricTensor<rank,dim,Number>::operator * (const SymmetricTensor<4,dim,Number> &s) const
+typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,dim,Number,OtherNumber>::type
+SymmetricTensor<rank,dim,Number>::operator * (const SymmetricTensor<4,dim,OtherNumber> &s) const
 {
   typename internal::SymmetricTensorAccessors::
-  double_contraction_result<rank,4,dim,Number>::type tmp;
-  tmp.data = internal::perform_double_contraction<dim,Number> (data,s.data);
+  double_contraction_result<rank,4,dim,Number,OtherNumber>::type tmp;
+  tmp.data = internal::perform_double_contraction<dim,Number,OtherNumber> (data,s.data);
   return tmp;
 }
 
