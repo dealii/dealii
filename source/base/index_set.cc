@@ -41,16 +41,21 @@ DEAL_II_NAMESPACE_OPEN
 IndexSet::IndexSet (const Epetra_Map &map)
   :
   is_compressed (true),
-  index_space_size (map.NumGlobalElements64()),
+  index_space_size (1+map.MaxAllGID64()),
   largest_range (numbers::invalid_unsigned_int)
 {
+  Assert(
+    map.MinAllGID64() == 0,
+    ExcMessage("The Epetra_Map does not contain the global index 0, which "
+               "means some entries are not present on any processor."));
+
   // For a contiguous map, we do not need to go through the whole data...
   if (map.LinearMap())
     add_range(size_type(map.MinMyGID64()), size_type(map.MaxMyGID64()+1));
   else
     {
       const size_type n_indices = map.NumMyElements();
-      size_type *indices = (size_type *)map.MyGlobalElements64();
+      size_type *indices = reinterpret_cast<size_type *>(map.MyGlobalElements64());
       add_indices(indices, indices+n_indices);
     }
   compress();
@@ -63,16 +68,21 @@ IndexSet::IndexSet (const Epetra_Map &map)
 IndexSet::IndexSet (const Epetra_Map &map)
   :
   is_compressed (true),
-  index_space_size (map.NumGlobalElements()),
+  index_space_size (1+map.MaxAllGID()),
   largest_range (numbers::invalid_unsigned_int)
 {
+  Assert(
+    map.MinAllGID() == 0,
+    ExcMessage("The Epetra_Map does not contain the global index 0, which "
+               "means some entries are not present on any processor."));
+
   // For a contiguous map, we do not need to go through the whole data...
   if (map.LinearMap())
     add_range(size_type(map.MinMyGID()), size_type(map.MaxMyGID()+1));
   else
     {
       const size_type n_indices = map.NumMyElements();
-      unsigned int *indices = (unsigned int *)map.MyGlobalElements();
+      unsigned int *indices = reinterpret_cast<unsigned int *>(map.MyGlobalElements());
       add_indices(indices, indices+n_indices);
     }
   compress();
@@ -566,7 +576,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
     }
 #endif
 
-  // Find out if the IndexSet is ascending and 1:1. This correspinds to a
+  // Find out if the IndexSet is ascending and 1:1. This corresponds to a
   // linear EpetraMap. Overlapping IndexSets are never 1:1.
   const bool linear = overlapping ? false : is_ascending_and_one_to_one(communicator);
 
