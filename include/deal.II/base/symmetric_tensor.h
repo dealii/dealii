@@ -3463,7 +3463,7 @@ template <int rank, int dim, typename Number>
 inline
 SymmetricTensor<rank,dim,Number>
 operator * (const SymmetricTensor<rank,dim,Number> &t,
-            const Number                            factor)
+            const Number                           &factor)
 {
   SymmetricTensor<rank,dim,Number> tt = t;
   tt *= factor;
@@ -3482,7 +3482,7 @@ operator * (const SymmetricTensor<rank,dim,Number> &t,
 template <int rank, int dim, typename Number>
 inline
 SymmetricTensor<rank,dim,Number>
-operator * (const Number                            factor,
+operator * (const Number                           &factor,
             const SymmetricTensor<rank,dim,Number> &t)
 {
   // simply forward to the other operator
@@ -3520,7 +3520,7 @@ template <int rank, int dim, typename Number, typename OtherNumber>
 inline
 SymmetricTensor<rank,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
 operator * (const SymmetricTensor<rank,dim,Number> &t,
-            const OtherNumber                    factor)
+            const OtherNumber                      &factor)
 {
   // form the product. we have to convert the two factors into the final
   // type via explicit casts because, for awkward reasons, the C++
@@ -3554,8 +3554,8 @@ operator * (const SymmetricTensor<rank,dim,Number> &t,
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 inline
-SymmetricTensor<rank,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
-operator * (const Number                     factor,
+SymmetricTensor<rank,dim,typename ProductType<OtherNumber,typename EnableIfScalar<Number>::type>::type>
+operator * (const Number                                &factor,
             const SymmetricTensor<rank,dim,OtherNumber> &t)
 {
   // simply forward to the other operator with switched arguments
