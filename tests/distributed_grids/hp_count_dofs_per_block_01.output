@@ -1,0 +1,21 @@
+
+DEAL:2d::Total number of dofs: 818
+DEAL:2d::Block 0 has 347 global dofs
+DEAL:2d::Block 1 has 347 global dofs
+DEAL:2d::Block 2 has 124 global dofs
+DEAL:2d::Total number of dofs: 1874
+DEAL:2d::Block 0 has 791 global dofs
+DEAL:2d::Block 1 has 791 global dofs
+DEAL:2d::Block 2 has 292 global dofs
+DEAL:2d::Total number of dofs: 2800
+DEAL:2d::Block 0 has 1182 global dofs
+DEAL:2d::Block 1 has 1182 global dofs
+DEAL:2d::Block 2 has 436 global dofs
+DEAL:3d::Total number of dofs: 13282
+DEAL:3d::Block 0 has 6021 global dofs
+DEAL:3d::Block 1 has 6021 global dofs
+DEAL:3d::Block 2 has 1240 global dofs
+DEAL:3d::Total number of dofs: 42960
+DEAL:3d::Block 0 has 19292 global dofs
+DEAL:3d::Block 1 has 19292 global dofs
+DEAL:3d::Block 2 has 4376 global dofs
