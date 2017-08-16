@@ -213,9 +213,10 @@ double Timer::stop ()
       cumulative_time += last_lap_cpu_time;
       this->mpi_total_data = Utilities::MPI::min_max_avg (cumulative_wall_time,
                                                           mpi_communicator);
-#endif
+#else
       cumulative_wall_time += last_lap_time;
       cumulative_time += last_lap_cpu_time;
+#endif
     }
   return cumulative_time;
 }
