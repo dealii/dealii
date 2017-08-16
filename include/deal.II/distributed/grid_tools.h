@@ -79,6 +79,39 @@ namespace parallel
      *   on the sending side returned a non-empty boost::optional object.
      *   The @p unpack function is then called with the data sent by the
      *   processor that owns that cell.
+     *
+     *
+     * <h4> An example </h4>
+     *
+     * Here is an example that shows how this function is to be used
+     * in a concrete context. It is taken from the code that makes
+     * sure that the @p active_fe_index (a single unsigned integer) is
+     * transported from locally owned cells where one can set it in
+     * hp::DoFHandler objects, to the corresponding ghost cells on
+     * other processors to ensure that one can query the right value
+     * also on those processors:
+     * @code
+     *    auto pack
+     *    = [] (const typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell) -> unsigned int
+     *    {
+     *      return cell->active_fe_index();
+     *    };
+     *
+     *    auto unpack
+     *      = [] (const typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell,
+     *            const unsigned int                                                        &active_fe_index) -> void
+     *    {
+     *      cell->set_active_fe_index(active_fe_index);
+     *    };
+     *
+     *    parallel::GridTools::exchange_cell_data_to_ghosts<unsigned int, dealii::hp::DoFHandler<dim,spacedim>>
+     *        (dof_handler, pack, unpack);
+     * @endcode
+     *
+     * You will notice that the lambda function returns an `unsigned int`,
+     * not a `boost::optional<unsigned int>`. The former converts automatically
+     * to the latter, implying that data will always be transported to the
+     * other processor.
      */
     template <typename DataType, typename MeshType>
     void
