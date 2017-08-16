@@ -3895,12 +3895,12 @@ double_contract (SymmetricTensor<2,3,typename ProductType<Number, OtherNumber>::
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
-template <int dim, typename Number>
-Tensor<1,dim,Number>
+template <int dim, typename Number, typename OtherNumber>
+Tensor<1,dim,typename ProductType<Number,OtherNumber>::type>
 operator * (const SymmetricTensor<2,dim,Number> &src1,
-            const Tensor<1,dim,Number> &src2)
+            const Tensor<1,dim,OtherNumber>     &src2)
 {
-  Tensor<1,dim,Number> dest;
+  Tensor<1,dim,typename ProductType<Number,OtherNumber>::type> dest;
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       dest[i] += src1[i][j] * src2[j];
@@ -3915,10 +3915,10 @@ operator * (const SymmetricTensor<2,dim,Number> &src1,
  * @relates SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
-template <int dim, typename Number>
-Tensor<1,dim,Number>
-operator * (const Tensor<1,dim,Number> &src1,
-            const SymmetricTensor<2,dim,Number> &src2)
+template <int dim, typename Number, typename OtherNumber>
+Tensor<1,dim,typename ProductType<Number,OtherNumber>::type>
+operator * (const Tensor<1,dim,Number>               &src1,
+            const SymmetricTensor<2,dim,OtherNumber> &src2)
 {
   // this is easy for symmetric tensors:
   return src2 * src1;
