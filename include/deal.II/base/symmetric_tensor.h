@@ -567,7 +567,9 @@ public:
    * <tt>symmetrize</tt> function first. If you aren't sure, it is good
    * practice to check before calling <tt>symmetrize</tt>.
    */
-  explicit SymmetricTensor (const Tensor<2,dim,Number> &t);
+  template<typename OtherNumber>
+  explicit
+  SymmetricTensor (const Tensor<2,dim,OtherNumber> &t);
 
   /**
    * A constructor that creates a symmetric tensor from an array holding its
@@ -943,8 +945,9 @@ SymmetricTensor<rank,dim,Number>::SymmetricTensor ()
 
 
 template <int rank, int dim, typename Number>
+template<typename OtherNumber>
 inline
-SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Tensor<2,dim,Number> &t)
+SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Tensor<2,dim,OtherNumber> &t)
 {
   Assert (rank == 2, ExcNotImplemented());
   switch (dim)
