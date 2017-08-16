@@ -24,79 +24,69 @@ SET(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
 
 MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
 
-  #
-  # FIXME Restructure this call into a ./modules/FindCUDA.cmake file and
-  # use DEAL_II_PACKAGE_HANDLE
-  #
   FIND_PACKAGE(CUDA)
-  MARK_AS_ADVANCED(
-    CUDA_HOST_COMPILER
-    CUDA_SDK_ROOT_DIR
-    CUDA_TOOLKIT_ROOT_DIR
-    CUDA_USE_STATIC_CUDA_RUNTIME
-    )
 
   IF(CUDA_FOUND)
-
+    #
+    # CUDA was found, check whether we can actually use it:
+    #
     SET(${var} TRUE)
 
-    IF(DEFINED CUDA_DIR)
-      SET(CUDA_TOOLKIT_ROOT_DIR "${CUDA_DIR}")
-    ENDIF()
-    MESSAGE(STATUS "Configured to use CUDA installation at ${CUDA_TOOLKIT_ROOT_DIR}")
-
-    IF("${CUDA_NVCC_FLAGS}" MATCHES "-arch")
-
-      # Compute Capability specified explicitly.
-      # Now parse:
-
-      IF("${CUDA_NVCC_FLAGS}" MATCHES "-arch[ ]*sm_([0-9]*)")
-        SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
-      ELSEIF("${CUDA_NVCC_FLAGS}" MATCHES "-arch=sm_([0-9]*)")
-        SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
-      ELSE()
-        STRING(REGEX MATCH "(-arch[ ]*[^ ]*)" match "${CUDA_NVCC_FLAGS}")
-        MESSAGE(STATUS "Ill-formed Compute Capability specified.")
-        SET(CUDA_ADDITIONAL_ERROR_STRING
-          ${CUDA_ADDITIONAL_ERROR_STRING}
-          "An ill-formed Compute Capability was passed in CUDA_NVCC_FLAGS: ${match}\n"
-          "deal.II requires at least Compute Capability 3.5\n"
-          "which is used as default is nothing is specified."
-          )
-        SET(${var} FALSE)
-      ENDIF()
-
-
-      IF("${CUDA_COMPUTE_CAPABILITY}" LESS "35")
-        MESSAGE(STATUS "Too low CUDA Compute Capability specified -- deal.II requires at least 3.5 ")
-        SET(CUDA_ADDITIONAL_ERROR_STRING
-          ${CUDA_ADDITIONAL_ERROR_STRING}
-          "Too low CUDA Compute Capability specified: ${CUDA_COMPUTE_CAPABILITY}\n"
-          "deal.II requires at least Compute Capability 3.5\n"
-          "which is used as default is nothing is specified."
-          )
-        SET(${var} FALSE)
-      ENDIF()
+    #
+    # CUDA support requires CMake version 3.9 or newer
+    #
+    IF(CMAKE_VERSION VERSION_LESS 3.9)
+      SET(${var} FALSE)
+      MESSAGE(STATUS "deal.II requires CMake version 3.9, or newer for CUDA support")
+      SET(CUDA_ADDITIONAL_ERROR_STRING
+        ${CUDA_ADDITIONAL_ERROR_STRING}
+        "deal.II requires CMake version 3.9, or newer for CUDA support.\n"
+        "Reconfigure with a sufficient cmake version."
+        )
     ENDIF()
 
-    # Configuration was successful
-    IF(${var})
+    IF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch[ ]*sm_([0-9]*)")
+      SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
+    ELSEIF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch=sm_([0-9]*)")
+      SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
+    ELSE()
+      #
+      # Assume a cuda compute capability of 35
+      #
+      SET(CUDA_COMPUTE_CAPABILITY "35")
+      ADD_FLAGS(DEAL_II_CUDA_FLAGS "-arch=sm_35")
+    ENDIF()
 
-      IF( NOT DEFINED CUDA_COMPUTE_CAPABILITY)
-        # Set to use compute capability 3.5 by default
-        SET(CUDA_COMPUTE_CAPABILITY "35")
-        SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -arch=sm_35)
-      ENDIF()
-
-      # Export further definitions
-      STRING(SUBSTRING "${CUDA_COMPUTE_CAPABILITY}" 0 1 CUDA_COMPUTE_CAPABILITY_MAJOR)
-      STRING(SUBSTRING "${CUDA_COMPUTE_CAPABILITY}" 1 1 CUDA_COMPUTE_CAPABILITY_MINOR)
-      SET(CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE FALSE)
-
+    IF("${CUDA_COMPUTE_CAPABILITY}" LESS "35")
+      MESSAGE(STATUS "Too low CUDA Compute Capability specified -- deal.II requires at least 3.5 ")
+      SET(CUDA_ADDITIONAL_ERROR_STRING
+        ${CUDA_ADDITIONAL_ERROR_STRING}
+        "Too low CUDA Compute Capability specified: ${CUDA_COMPUTE_CAPABILITY}\n"
+        "deal.II requires at least Compute Capability 3.5\n"
+        "which is used as default if nothing is specified."
+        )
+      SET(${var} FALSE)
     ENDIF()
   ENDIF()
-
 ENDMACRO()
+
+
+MACRO(FEATURE_CUDA_CONFIGURE_EXTERNAL)
+
+  ENABLE_LANGUAGE(CUDA)
+
+  #
+  # Set up cuda flags:
+  #
+  ADD_FLAGS(DEAL_II_CUDA_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
+
+  #
+  # Export definitions:
+  #
+  STRING(SUBSTRING "${CUDA_COMPUTE_CAPABILITY}" 0 1 CUDA_COMPUTE_CAPABILITY_MAJOR)
+  STRING(SUBSTRING "${CUDA_COMPUTE_CAPABILITY}" 1 1 CUDA_COMPUTE_CAPABILITY_MINOR)
+ENDMACRO()
+
 
 MACRO(FEATURE_CUDA_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"

@@ -15,15 +15,14 @@
 
 #
 # A small wrapper around ADD_LIBRARY that will define a target for each
-# build type specified in DEAL_II_BUILD_TYPES
+# build type specified in DEAL_II_BUILD_TYPES. Only compatible with object
+# targets (as used in the build system).
 #
 # It is assumed that the desired compilation configuration is set via
-#   DEAL_II_LINKER_FLAGS_${build}
 #   DEAL_II_CXX_FLAGS_${build}
 #   DEAL_II_DEFINITIONS_${build}
 #
 # as well as the global (for all build types)
-#   DEAL_II_LINKER_FLAGS
 #   DEAL_II_CXX_FLAGS
 #   DEAL_II_DEFINITIONS
 #
@@ -37,60 +36,60 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
       ${ARGN}
       )
 
-
-    #
-    # Work around a problem in CUDA_WARP_SRCS that doesn't take empty list
-    # elements lightly...
-    #
-    SET(_definitions
-      ${DEAL_II_DEFINITIONS}
-      ${DEAL_II_DEFINITIONS_${_build}}
-      )
-
     SET_TARGET_PROPERTIES(${_library}_${_build_lowercase} PROPERTIES
-      LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
-      COMPILE_DEFINITIONS "${_definitions}"
-      COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
       LINKER_LANGUAGE "CXX"
       )
+
+    IF(CMAKE_VERSION VERSION_LESS 3.9)
+
+      SET_TARGET_PROPERTIES(${_library}_${_build_lowercase} PROPERTIES
+        COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+        COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
+        )
+
+    ELSE()
+
+      SET(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
+      SEPARATE_ARGUMENTS(_flags)
+      TARGET_COMPILE_OPTIONS(${_library}_${_build_lowercase} PUBLIC
+        $<$<COMPILE_LANGUAGE:CXX>:${_flags}>
+        )
+
+      TARGET_COMPILE_DEFINITIONS(${_library}_${_build_lowercase}
+        PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
+        )
+
+      IF(DEAL_II_WITH_CUDA)
+        #
+        # Add cxx compiler and cuda compilation flags to cuda source files:
+        #
+
+        SET(_cuda_flags "${DEAL_II_CUDA_FLAGS} ${DEAL_II_CUDA_FLAGS_${_build}}")
+        SEPARATE_ARGUMENTS(_cuda_flags)
+
+        #
+        # Workaround: cuda will split every compiler option with a comma
+        # (','), so remove all compiler flags that contain a comma:
+        #
+        STRING(REGEX REPLACE "[^ ]*,[^ ]*" "" _cxx_flags
+          "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+          )
+
+        TARGET_COMPILE_OPTIONS(${_library}_${_build_lowercase} PUBLIC
+          $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler ${_cxx_flags}>
+          $<$<COMPILE_LANGUAGE:CUDA>:${_cuda_flags}>
+          )
+
+        SET_TARGET_PROPERTIES(${_library}_${_build_lowercase} PROPERTIES
+          CUDA_SEPARABLE_COMPILATION TRUE
+          )
+      ENDIF()
+
+    ENDIF()
 
     SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
       "$<TARGET_OBJECTS:${_library}_${_build_lowercase}>"
       )
-
-    #
-    # Cuda specific target setup:
-    #
-    IF(DEAL_II_WITH_CUDA)
-
-      #
-      # CUDA_WRAP_SRCS does not automatically pick up host compiler flags
-      # from the target, so we have to feed relevant flags ourselves
-      #
-      # Furthermore, C++14 is not yet supported, so filter the flag:
-      #
-      STRING(REPLACE "-std=c++14" "-std=c++11" CMAKE_CXX_FLAGS
-        "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-        )
-
-      CUDA_WRAP_SRCS(${_library}_${_build_lowercase}
-        OBJ _generated_cuda_files ${ARGN} SHARED
-        )
-      SET(CMAKE_CXX_FLAGS "")
-
-      ADD_CUSTOM_TARGET(${_library}_${_build_lowercase}_cuda
-        DEPENDS
-        ${_generated_cuda_files}
-        )
-      ADD_DEPENDENCIES(${_library}_${_build_lowercase}
-        ${_library}_${_build_lowercase}_cuda
-        )
-
-      SET_PROPERTY(GLOBAL APPEND PROPERTY DEAL_II_OBJECTS_${_build}
-        "${_generated_cuda_files}"
-        )
-    ENDIF()
-
   ENDFOREACH()
 
 ENDMACRO()

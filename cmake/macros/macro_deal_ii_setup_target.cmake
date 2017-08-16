@@ -95,7 +95,6 @@ MACRO(DEAL_II_SETUP_TARGET _target)
       )
   ENDIF()
 
-
   #
   # We can only append DEBUG link flags and compile definitions if deal.II
   # was built with the Debug or DebugRelease build type. So test for this:
@@ -108,14 +107,55 @@ MACRO(DEAL_II_SETUP_TARGET _target)
     INCLUDE_DIRECTORIES "${DEAL_II_INCLUDE_DIRS}"
     )
   SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
-    COMPILE_FLAGS " ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
-    )
-  SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
     LINK_FLAGS " ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
     )
-  SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
-    COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
-    )
+
+  IF(CMAKE_VERSION VERSION_LESS 3.9)
+    SET_PROPERTY(TARGET ${_target} APPEND_STRING PROPERTY
+      COMPILE_FLAGS " ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+      )
+    SET_PROPERTY(TARGET ${_target} APPEND PROPERTY
+      COMPILE_DEFINITIONS "${DEAL_II_USER_DEFINITIONS};${DEAL_II_USER_DEFINITIONS_${_build}}"
+      )
+
+  ELSE()
+
+    SET(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
+    SEPARATE_ARGUMENTS(_flags)
+    TARGET_COMPILE_OPTIONS(${_target} PUBLIC
+      $<$<COMPILE_LANGUAGE:CXX>:${_flags}>
+      )
+
+    TARGET_COMPILE_DEFINITIONS(${_target}
+      PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
+      )
+
+    IF(DEAL_II_WITH_CUDA)
+      #
+      # Add cxx compiler and cuda compilation flags to cuda source files:
+      #
+
+      SET(_cuda_flags "${DEAL_II_CUDA_FLAGS} ${DEAL_II_CUDA_FLAGS_${_build}}")
+      SEPARATE_ARGUMENTS(_cuda_flags)
+
+      #
+      # Workaround: cuda will split every compiler option with a comma
+      # (','), so remove all compiler flags that contain a comma:
+      #
+      STRING(REGEX REPLACE "[^ ]*,[^ ]*" "" _cxx_flags
+        "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+        )
+
+      TARGET_COMPILE_OPTIONS(${_target} PUBLIC
+        $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler ${_cxx_flags}>
+        $<$<COMPILE_LANGUAGE:CUDA>:${_cuda_flags}>
+        )
+
+      SET_TARGET_PROPERTIES(${_target} PROPERTIES
+        CUDA_SEPARABLE_COMPILATION TRUE
+        )
+    ENDIF()
+  ENDIF()
 
   #
   # Set up the link interface:

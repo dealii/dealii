@@ -8,6 +8,10 @@ FOREACH(_var DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT)
   SET(${_var} "${${_var}}" CACHE STRING "" FORCE)
 ENDFOREACH()
 
+IF(DEAL_II_WITH_CUDA)
+  PROJECT(TESTSUITE CXX CUDA)
+ENDIF()
+
 #
 # A custom target that does absolutely nothing. It is used in the main
 # project to trigger a "make rebuild_cache" if necessary.

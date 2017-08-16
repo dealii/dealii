@@ -210,7 +210,11 @@ FOREACH(_feature ${_deal_ii_features_sorted})
       _detailed("#            OMPI_VERSION = ${OMPI_VERSION}\n")
     ENDIF()
     IF(_feature MATCHES "CUDA" AND DEFINED CUDA_COMPUTE_CAPABILITY)
+      _detailed("#            CMAKE_CUDA_COMPILER = ${CMAKE_CUDA_COMPILER}\n")
       _detailed("#            CUDA_COMPUTE_CAPABILITY = ${CUDA_COMPUTE_CAPABILITY_MAJOR}.${CUDA_COMPUTE_CAPABILITY_MINOR}\n")
+      _detailed("#            DEAL_II_CUDA_FLAGS = ${DEAL_II_CUDA_FLAGS}\n")
+      _detailed("#            DEAL_II_CUDA_FLAGS_RELEASE = ${DEAL_II_CUDA_FLAGS_RELEASE}\n")
+      _detailed("#            DEAL_II_CUDA_FLAGS_DEBUG = ${DEAL_II_CUDA_FLAGS_DEBUG}\n")
     ENDIF()
 
 
