@@ -3527,11 +3527,11 @@ operator / (const SymmetricTensor<rank,dim> &t,
  *
  * @relates SymmetricTensor
  */
-template <int dim, typename Number>
+template <int dim, typename Number, typename OtherNumber>
 inline
-Number
-scalar_product (const SymmetricTensor<2,dim,Number> &t1,
-                const SymmetricTensor<2,dim,Number> &t2)
+typename ProductType<Number, OtherNumber>::type
+scalar_product (const SymmetricTensor<2,dim,Number>      &t1,
+                const SymmetricTensor<2,dim,OtherNumber> &t2)
 {
   return (t1*t2);
 }
@@ -3546,11 +3546,11 @@ scalar_product (const SymmetricTensor<2,dim,Number> &t1,
  *
  * @relates Tensor @relates SymmetricTensor
  */
-template <int dim, typename Number>
+template <int dim, typename Number, typename OtherNumber>
 inline
-Number
+typename ProductType<Number, OtherNumber>::type
 scalar_product (const SymmetricTensor<2,dim,Number> &t1,
-                const Tensor<2,dim,Number> &t2)
+                const Tensor<2,dim,OtherNumber>     &t2)
 {
   Number s = 0;
   for (unsigned int i=0; i<dim; ++i)
@@ -3569,11 +3569,11 @@ scalar_product (const SymmetricTensor<2,dim,Number> &t1,
  *
  * @relates Tensor @relates SymmetricTensor
  */
-template <int dim, typename Number>
+template <int dim, typename Number, typename OtherNumber>
 inline
-Number
-scalar_product (const Tensor<2,dim,Number> &t1,
-                const SymmetricTensor<2,dim,Number> &t2)
+typename ProductType<Number, OtherNumber>::type
+scalar_product (const Tensor<2,dim,Number>               &t1,
+                const SymmetricTensor<2,dim,OtherNumber> &t2)
 {
   return scalar_product(t2, t1);
 }
