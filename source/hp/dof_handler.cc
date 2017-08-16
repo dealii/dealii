@@ -30,6 +30,8 @@
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_tools.h>
 
+#include <boost/serialization/array.hpp>
+
 #include <set>
 #include <algorithm>
 #include <functional>
