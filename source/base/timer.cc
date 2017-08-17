@@ -37,33 +37,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-// in case we use an MPI compiler, need
-// to create a communicator just for the
-// current process
 Timer::Timer()
   :
-  current_lap_starting_cpu_time (0.),
-  current_lap_starting_wall_time (0.),
-  accumulated_cpu_time (0.),
-  accumulated_wall_time (0.),
-  last_lap_time (numbers::signaling_nan<double>()),
-  last_lap_cpu_time(numbers::signaling_nan<double>()),
-  running (false)
-#ifdef DEAL_II_WITH_MPI
-  ,
-  mpi_communicator (MPI_COMM_SELF),
-  sync_wall_time (false)
-#endif
-{
-#ifdef DEAL_II_WITH_MPI
-  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
-  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
-  mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
-  mpi_total_data.min_index = mpi_total_data.max_index = 0;
-#endif
-
-  start();
-}
+  Timer(MPI_COMM_SELF, /*sync_wall_time=*/false)
+{}
 
 
 
