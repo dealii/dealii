@@ -20,7 +20,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_out.h>
 
-void dim2(std::ostream &os)
+void dim_2(std::ostream &os)
 {
   std::vector<Point<2> > vertices(4);
   vertices[0](0) = -1.;
@@ -39,7 +39,7 @@ void dim2(std::ostream &os)
   gout.write_vtk(tria, os);
 }
 
-void dim3(std::ostream &os)
+void dim_3(std::ostream &os)
 {
   std::vector<Point<3> > vertices(8);
   vertices[0](0) = -1.;
@@ -79,6 +79,6 @@ int main()
 {
   initlog(true);
   std::ostream &logfile = deallog.get_file_stream();
-  dim2(logfile);
-  dim3(logfile);
+  dim_2(logfile);
+  dim_3(logfile);
 }
