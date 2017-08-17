@@ -3925,6 +3925,75 @@ operator * (const Tensor<1,dim,Number>               &src1,
 }
 
 
+
+/**
+ * The dot product (single contraction) for tensors: Return a tensor of rank
+ * $(\text{rank}_1 + \text{rank}_2 - 2)$ that is the contraction of the last
+ * index of a tensor @p src1 of rank @p rank_1 with the first index of a
+ * tensor @p src2 of rank @p rank_2:
+ * @f[
+ *   \text{result}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
+ *   = \sum_{k}
+ *     \text{left}_{i_1,\ldots,i_{r1}, k}
+ *     \text{right}_{k, j_1,\ldots,j_{r2}}
+ * @f]
+ *
+ * @note As one operand is a Tensor, the multiplication operator only performs a
+ * contraction over a single pair of indices. This is in contrast to the
+ * multiplication operator for SymmetricTensor, which does the double
+ * contraction.
+ *
+ * @relates SymmetricTensor
+ * @author Matthias Maier, Jean-Paul Pelteret, 2017
+ */
+template <int rank_1, int rank_2, int dim,
+          typename Number, typename OtherNumber>
+inline DEAL_II_ALWAYS_INLINE
+typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type
+operator * (const Tensor<rank_1, dim, Number>               &src1,
+            const SymmetricTensor<rank_2, dim, OtherNumber> &src2s)
+{
+  typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type result;
+  const Tensor<rank_2, dim, OtherNumber> src2 (src2s);
+  return src1*src2;
+}
+
+
+
+/**
+ * The dot product (single contraction) for tensors: Return a tensor of rank
+ * $(\text{rank}_1 + \text{rank}_2 - 2)$ that is the contraction of the last
+ * index of a tensor @p src1 of rank @p rank_1 with the first index of a
+ * tensor @p src2 of rank @p rank_2:
+ * @f[
+ *   \text{result}_{i_1,\ldots,i_{r1},j_1,\ldots,j_{r2}}
+ *   = \sum_{k}
+ *     \text{left}_{i_1,\ldots,i_{r1}, k}
+ *     \text{right}_{k, j_1,\ldots,j_{r2}}
+ * @f]
+ *
+ * @note As one operand is a Tensor, the multiplication operator only performs a
+ * contraction over a single pair of indices. This is in contrast to the
+ * multiplication operator for SymmetricTensor, which does the double
+ * contraction.
+ *
+ * @relates SymmetricTensor
+ * @author Matthias Maier, Jean-Paul Pelteret, 2017
+ */
+template <int rank_1, int rank_2, int dim,
+          typename Number, typename OtherNumber>
+inline DEAL_II_ALWAYS_INLINE
+typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type
+operator * (const SymmetricTensor<rank_1, dim, Number> &src1s,
+            const Tensor<rank_2, dim, OtherNumber>     &src2)
+{
+  typename Tensor<rank_1 + rank_2 - 2, dim, typename ProductType<Number, OtherNumber>::type>::tensor_type result;
+  const Tensor<rank_2, dim, OtherNumber> src1 (src1s);
+  return src1*src2;
+}
+
+
+
 /**
  * Output operator for symmetric tensors of rank 2. Print the elements
  * consecutively, with a space in between, two spaces between rank 1
