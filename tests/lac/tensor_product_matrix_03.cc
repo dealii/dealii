@@ -51,7 +51,11 @@ void do_test()
   mat.vmult(v2, v1);
   mat.apply_inverse(v3, v2);
   v3 -= v1;
-  deallog << "Verification of vmult and inverse: " << (double)v3.linfty_norm() << std::endl;
+  // add tolerance to account for different BLAS/LAPACK combinations. Float is
+  // too inaccurate so numdiff does not work...
+  double norm = v3.linfty_norm();
+  deallog << "Verification of vmult and inverse: "
+          << (norm < 1e-3 ? 0. : norm)  << std::endl;
 
   FullMatrix<float> full(v1.size(), v1.size());
   for (unsigned int i=0, c=0; i<(dim>2?size:1); ++i)
@@ -69,13 +73,16 @@ void do_test()
                              + laplace(i,ii)*mass(j,jj)*mass(k,kk);
   full.vmult(v3, v1);
   v3 -= v2;
-  deallog << "Verifiction of vmult: " << (double)v3.linfty_norm() << std::endl;
+
+  norm = v3.linfty_norm();
+  deallog << "Verifiction of vmult: " << (norm < 1e-4 ? 0. : norm) << std::endl;
 
   full.gauss_jordan();
   full.vmult(v3, v1);
   mat.apply_inverse(v2, v1);
   v3 -= v2;
-  deallog << "Verification of inverse: " << (double)v3.linfty_norm() << std::endl;
+  norm = v3.linfty_norm();
+  deallog << "Verification of inverse: " << (norm < 5e-3 ? 0. : norm) << std::endl;
 }
 
 
