@@ -3569,13 +3569,13 @@ operator * (const Number                                &factor,
  *
  * @relates SymmetricTensor
  */
-template <int rank, int dim, typename Number>
+template <int rank, int dim, typename Number, typename OtherNumber>
 inline
-SymmetricTensor<rank,dim,Number>
+SymmetricTensor<rank,dim,typename ProductType<Number,typename EnableIfScalar<OtherNumber>::type>::type>
 operator / (const SymmetricTensor<rank,dim,Number> &t,
-            const Number                            factor)
+            const OtherNumber                      &factor)
 {
-  SymmetricTensor<rank,dim,Number> tt = t;
+  SymmetricTensor<rank,dim,typename ProductType<Number,OtherNumber>::type> tt = t;
   tt /= factor;
   return tt;
 }
