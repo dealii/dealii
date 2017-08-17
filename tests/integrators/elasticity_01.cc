@@ -37,7 +37,7 @@ void test_cell(const FEValuesBase<dim> &fev)
   cell_matrix(M,fev);
   {
     deallog << "cell" << std::endl;
-    M.print_formatted(deallog.get_file_stream(), 3, true, 0, "0.", 3, true, 0, "0.");
+    M.print_formatted(deallog.get_file_stream(), 3, true, 0, "0.");
   }
 
   Vector<double> u(n), v(n), w(n);
