@@ -1,0 +1,4 @@
+Improved: The CMake CUDA detection and configure has been completely
+rewritten. CUDA support now requires CMake version 3.9 or newer.
+<br>
+(Matthias Maier, 2017/08/08)

@@ -24,6 +24,11 @@ SET(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
 
 MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
 
+  #
+  # TODO: Ultimately, this find_package call is not needed any more. We
+  # still use it because it is very convenient to (a) check that CUDA is
+  # installed, (b) get compiler path and include directories / libraries.
+  #
   FIND_PACKAGE(CUDA)
 
   IF(CUDA_FOUND)
@@ -44,6 +49,29 @@ MACRO(FEATURE_CUDA_FIND_EXTERNAL var)
         "Reconfigure with a sufficient cmake version."
         )
     ENDIF()
+
+    #
+    # CUDA 8.0 requires C++11 support, CUDA 9.0 requires C++14 support.
+    # Make sure that deal.II is configured appropriately
+    #
+    MACRO(_cuda_ensure_feature_off _version _feature)
+      IF(${CUDA_VERSION_MAJOR} EQUAL ${_version})
+        IF(${_feature})
+          SET(${var} FALSE)
+          MESSAGE(STATUS "CUDA ${_version} requires ${_feature} to be set to off.")
+          SET(CUDA_ADDITIONAL_ERROR_STRING
+            ${CUDA_ADDITIONAL_ERROR_STRING}
+            "CUDA ${_version} is not compatible with the C++ standard\n"
+            "enabled by ${_feature}.\n"
+            "Please disable ${_feature}, e.g. by reconfiguring with\n"
+            "  cmake -D${_feature}=OFF ."
+            )
+        ENDIF()
+      ENDIF()
+    ENDMACRO()
+    _cuda_ensure_feature_off(8 DEAL_II_WITH_CXX14)
+    _cuda_ensure_feature_off(9 DEAL_II_WITH_CXX17)
+
 
     IF("${DEAL_II_CUDA_FLAGS_SAVED}" MATCHES "-arch[ ]*sm_([0-9]*)")
       SET(CUDA_COMPUTE_CAPABILITY "${CMAKE_MATCH_1}")
@@ -73,7 +101,14 @@ ENDMACRO()
 
 MACRO(FEATURE_CUDA_CONFIGURE_EXTERNAL)
 
+  #
+  # Ensure that we enable CMake-internal CUDA support with the right
+  # compiler:
+  #
+  SET(CMAKE_CUDA_COMPILER "${CUDA_NVCC_EXECUTABLE}")
   ENABLE_LANGUAGE(CUDA)
+
+  MARK_AS_ADVANCED(CMAKE_CUDA_HOST_COMPILER)
 
   #
   # Set up cuda flags:
