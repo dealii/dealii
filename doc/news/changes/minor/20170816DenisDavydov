@@ -1,0 +1,4 @@
+Fixed: ConsecutiveControl now asserts that check() is being called for zeroth
+iteration.
+<br>
+(Denis Davydov, 2017/08/16)
