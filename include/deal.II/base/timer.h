@@ -47,15 +47,15 @@ DEAL_II_NAMESPACE_OPEN
  * functions:
  * @code
  *   Timer timer;
- *   timer.start ();
+ *   timer.start();
  *
  *   // do some complicated computations here
- *   ...
+ *   // ...
  *
- *   timer.stop ();
+ *   timer.stop();
  *
- *   std::cout << "Elapsed CPU time: " << timer() << " seconds.";
- *   std::cout << "Elapsed wall time: " << timer.wall_time() << " seconds.";
+ *   std::cout << "Elapsed CPU time: " << timer.cpu_time() << " seconds.\n";
+ *   std::cout << "Elapsed wall time: " << timer.wall_time() << " seconds.\n";
  *
  *   // reset timer for the next thing it shall do
  *   timer.reset();
@@ -174,7 +174,7 @@ public:
   double last_wall_time() const;
 
   /**
-   * Access to the current total wall time without stopping the timer.
+   * Access to the current total CPU time without stopping the timer.
    * The elapsed time is returned in units of seconds.
    */
   double cpu_time() const;
@@ -220,22 +220,24 @@ private:
   double              cumulative_wall_time;
 
   /**
-   * Stores the wall time between the last start()/stop() cycle.
+   * Wall time between the last start()/stop() cycle.
    */
   double              last_lap_time;
 
   /**
-   * Stores the CPU time between the last start()/stop() cycle.
+   * CPU time between the last start()/stop() cycle.
    */
   double              last_lap_cpu_time;
 
   /**
-   * Store whether the timer is presently running.
+   * Whether or not the timer is presently running.
    */
   bool                running;
 
   /**
-   * Store whether the timer is presently running.
+   * The communicator over which various time values are synchronized and
+   * combined: see the documentation of the relevant constructor for
+   * additional information.
    */
   MPI_Comm            mpi_communicator;
 
