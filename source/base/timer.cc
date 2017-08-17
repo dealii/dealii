@@ -43,7 +43,6 @@ DEAL_II_NAMESPACE_OPEN
 Timer::Timer()
   :
   start_time (0.),
-  start_time_children (0.),
   start_wall_time (0.),
   cumulative_time (0.),
   cumulative_wall_time (0.),
@@ -75,7 +74,6 @@ Timer::Timer(MPI_Comm mpi_communicator,
              const bool sync_wall_time_)
   :
   start_time (0.),
-  start_time_children (0.),
   start_wall_time (0.),
   cumulative_time (0.),
   cumulative_wall_time (0.),
@@ -154,14 +152,9 @@ void Timer::start ()
   getrusage (RUSAGE_SELF, &usage);
   start_time = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
 
-  rusage usage_children;
-  getrusage (RUSAGE_CHILDREN, &usage_children);
-  start_time_children = usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
-
 #elif defined(DEAL_II_MSVC)
   start_wall_time = windows::wall_clock();
   start_time = windows::cpu_clock();
-  start_time_children = start_time;
 #else
 #  error Unsupported platform. Porting not finished.
 #endif
@@ -182,12 +175,6 @@ double Timer::stop ()
       getrusage (RUSAGE_SELF, &usage);
       const double dtime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
       last_lap_cpu_time = dtime - start_time;
-
-      rusage usage_children;
-      getrusage (RUSAGE_CHILDREN, &usage_children);
-      const double dtime_children =
-        usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
-      last_lap_cpu_time += dtime_children - start_time_children;
 
       struct timeval wall_timer;
       gettimeofday(&wall_timer, nullptr);
@@ -231,14 +218,7 @@ double Timer::cpu_time() const
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-
-      rusage usage_children;
-      getrusage (RUSAGE_CHILDREN, &usage_children);
-      const double dtime_children =
-        usage_children.ru_utime.tv_sec + 1.e-6 * usage_children.ru_utime.tv_usec;
-
-      const double running_time = dtime - start_time + dtime_children
-                                  - start_time_children + cumulative_time;
+      const double running_time = dtime - start_time + cumulative_time;
 
       // in case of MPI, need to get the time passed by summing the time over
       // all processes in the network. works also in case we just want to have
