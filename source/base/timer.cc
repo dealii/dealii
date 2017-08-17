@@ -126,7 +126,7 @@ void Timer::start ()
   current_lap_starting_wall_time = windows::wall_clock();
   current_lap_starting_cpu_time = windows::cpu_clock();
 #else
-#  error Unsupported platform. Porting not finished.
+#  error "Unsupported platform. Porting not finished."
 #endif
 }
 
@@ -154,7 +154,7 @@ double Timer::stop ()
       last_lap_time = windows::wall_clock() - current_lap_starting_wall_time;
       last_lap_cpu_time = windows::cpu_clock() - current_lap_starting_cpu_time;
 #else
-#  error Unsupported platform. Porting not finished.
+#  error "Unsupported platform. Porting not finished."
 #endif
 
       this->mpi_data = Utilities::MPI::min_max_avg (last_lap_time,
@@ -195,7 +195,7 @@ double Timer::cpu_time() const
       const double running_time = windows::cpu_clock() - current_lap_starting_cpu_time + accumulated_cpu_time;
       return running_time;
 #else
-#  error Unsupported platform. Porting not finished.
+#  error "Unsupported platform. Porting not finished."
 #endif
     }
   else
