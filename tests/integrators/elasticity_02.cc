@@ -37,8 +37,8 @@ void test_boundary(const FEValuesBase<dim> &fev)
   FullMatrix<double> M(n,n);
   nitsche_tangential_matrix(M, fev, 17);
   {
-    LogStream::Prefix pre("bdry");
-    M.print(deallog,14,8);
+    deallog << "bdry" << std::endl;
+    M.print_formatted(deallog.get_file_stream(), 3, true, 0, "0.");
   }
 
   Vector<double> u(n), v(n), w(n);
@@ -53,7 +53,7 @@ void test_boundary(const FEValuesBase<dim> &fev)
     indices[i] = i;
 
   {
-    LogStream::Prefix pre("Residuals");
+    deallog << "Residuals" << std::endl;
     for (unsigned int i=0; i<n; ++i)
       {
         u = 0.;
