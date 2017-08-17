@@ -67,9 +67,6 @@ Timer::Timer()
 
 
 
-// in case we use an MPI compiler, use
-// the communicator given from input
-#ifdef DEAL_II_WITH_MPI
 Timer::Timer(MPI_Comm mpi_communicator,
              const bool sync_wall_time_)
   :
@@ -83,16 +80,13 @@ Timer::Timer(MPI_Comm mpi_communicator,
   mpi_communicator (mpi_communicator),
   sync_wall_time(sync_wall_time_)
 {
-#ifdef DEAL_II_WITH_MPI
   mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
   mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
   mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
   mpi_total_data.min_index = mpi_total_data.max_index = 0;
-#endif
 
   start();
 }
-#endif
 
 
 
@@ -130,8 +124,7 @@ namespace
 
 void Timer::start ()
 {
-  running    = true;
-
+  running = true;
 #ifdef DEAL_II_WITH_MPI
   if (sync_wall_time)
     {
@@ -187,7 +180,6 @@ double Timer::stop ()
 #  error Unsupported platform. Porting not finished.
 #endif
 
-#ifdef DEAL_II_WITH_MPI
       this->mpi_data = Utilities::MPI::min_max_avg (last_lap_time,
                                                     mpi_communicator);
       if (sync_wall_time && Utilities::MPI::job_supports_mpi())
@@ -200,10 +192,6 @@ double Timer::stop ()
       accumulated_cpu_time += last_lap_cpu_time;
       this->mpi_total_data = Utilities::MPI::min_max_avg (accumulated_wall_time,
                                                           mpi_communicator);
-#else
-      accumulated_wall_time += last_lap_time;
-      accumulated_cpu_time += last_lap_cpu_time;
-#endif
     }
   return accumulated_cpu_time;
 }
@@ -298,12 +286,10 @@ void Timer::reset ()
   accumulated_cpu_time = 0.;
   accumulated_wall_time = 0.;
   running         = false;
-#ifdef DEAL_II_WITH_MPI
   mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
   mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
   mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
   mpi_total_data.min_index = mpi_total_data.max_index = 0;
-#endif
 }
 
 
@@ -317,10 +303,8 @@ TimerOutput::TimerOutput (std::ostream &stream,
   output_frequency (output_frequency),
   output_type (output_type),
   out_stream (stream, true),
-  output_is_enabled (true)
-#ifdef DEAL_II_WITH_MPI
-  , mpi_communicator (MPI_COMM_SELF)
-#endif
+  output_is_enabled (true),
+  mpi_communicator (MPI_COMM_SELF)
 {}
 
 
@@ -332,14 +316,11 @@ TimerOutput::TimerOutput (ConditionalOStream &stream,
   output_frequency (output_frequency),
   output_type (output_type),
   out_stream (stream),
-  output_is_enabled (true)
-#ifdef DEAL_II_WITH_MPI
-  , mpi_communicator (MPI_COMM_SELF)
-#endif
+  output_is_enabled (true),
+  mpi_communicator (MPI_COMM_SELF)
 {}
 
 
-#ifdef DEAL_II_WITH_MPI
 
 TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
                           std::ostream &stream,
@@ -367,7 +348,6 @@ TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
   mpi_communicator (mpi_communicator)
 {}
 
-#endif
 
 
 TimerOutput::~TimerOutput()
@@ -402,7 +382,6 @@ TimerOutput::enter_subsection (const std::string &section_name)
 
   if (sections.find (section_name) == sections.end())
     {
-#ifdef DEAL_II_WITH_MPI
       if (mpi_communicator != MPI_COMM_SELF)
         {
           // create a new timer for this section. the second argument
@@ -414,7 +393,6 @@ TimerOutput::enter_subsection (const std::string &section_name)
           // among all processes inside mpi_communicator.
           sections[section_name].timer = Timer(mpi_communicator, true);
         }
-#endif
 
 
       sections[section_name].total_cpu_time = 0;

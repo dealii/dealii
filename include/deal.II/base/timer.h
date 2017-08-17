@@ -22,10 +22,6 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
-#ifdef DEAL_II_WITH_MPI
-#  include <mpi.h>
-#endif
-
 #include <string>
 #include <list>
 #include <map>
@@ -81,7 +77,6 @@ public:
    */
   Timer ();
 
-#ifdef DEAL_II_WITH_MPI
   /**
    * Constructor that takes an MPI communicator as input. A timer constructed
    * this way will sum up the CPU times over all processors in the MPI network
@@ -94,8 +89,6 @@ public:
    * only works if you stop() the timer before querying for the wall time. The
    * time for the MPI operations are not included in the timing but may slow
    * down your program.
-   *
-   * This constructor is only available if deal.II is compiled with MPI support.
    */
   Timer (MPI_Comm mpi_communicator,
          const bool sync_wall_time = false);
@@ -127,7 +120,6 @@ public:
   template <class StreamType>
   void print_total_data(StreamType &stream) const;
 
-#endif
 
   /**
    * Re-start the timer at the point where it was stopped. This way a
@@ -242,7 +234,6 @@ private:
    */
   MPI_Comm            mpi_communicator;
 
-#ifdef DEAL_II_WITH_MPI
   /**
    * Store whether the wall time is synchronized between machines.
    */
@@ -263,7 +254,6 @@ private:
    * number of MPI processes in the MPI_Comm for the total run time.
    */
   Utilities::MPI::MinMaxAvg mpi_total_data;
-#endif
 };
 
 
@@ -556,7 +546,6 @@ public:
                const enum OutputFrequency output_frequency,
                const enum OutputType      output_type);
 
-#ifdef DEAL_II_WITH_MPI
   /**
    * Constructor that takes an MPI communicator as input. A timer constructed
    * this way will sum up the CPU times over all processors in the MPI network
@@ -612,11 +601,6 @@ public:
                ConditionalOStream        &stream,
                const enum OutputFrequency output_frequency,
                const enum OutputType      output_type);
-
-
-
-
-#endif
 
   /**
    * Destructor. Calls print_summary() in case the option for writing the
@@ -760,8 +744,6 @@ void Timer::restart ()
 
 
 
-#ifdef DEAL_II_WITH_MPI
-
 inline
 const Utilities::MPI::MinMaxAvg &
 Timer::get_data() const
@@ -803,8 +785,6 @@ Timer::print_total_data(StreamType &stream) const
          << " max @" << statistic.max_index << ", min=" << statistic.min << " @"
          << statistic.min_index << ", avg=" << statistic.avg << std::endl;
 }
-
-#endif
 
 
 
