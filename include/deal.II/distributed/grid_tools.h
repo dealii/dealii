@@ -154,7 +154,8 @@ namespace parallel
         {
           Assert(cell_ids.size() == data.size(), ExcInternalError());
           // archive the cellids in an efficient binary format
-          ar &cell_ids.size();
+          const size_t n_cells = cell_ids.size();
+          ar &n_cells;
           for (auto &it : cell_ids)
             {
               CellId::binary_type binary_cell_id = it.template to_binary<dim>();
