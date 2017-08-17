@@ -57,10 +57,10 @@ Timer::Timer(MPI_Comm mpi_communicator,
   mpi_communicator (mpi_communicator),
   sync_wall_time(sync_wall_time_)
 {
-  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
-  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
-  mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
-  mpi_total_data.min_index = mpi_total_data.max_index = 0;
+  last_lap_data.sum = last_lap_data.min = last_lap_data.max = last_lap_data.avg = numbers::signaling_nan<double>();
+  last_lap_data.min_index = last_lap_data.max_index = numbers::invalid_unsigned_int;
+  accumulated_wall_time_data.sum = accumulated_wall_time_data.min = accumulated_wall_time_data.max = accumulated_wall_time_data.avg = 0.;
+  accumulated_wall_time_data.min_index = accumulated_wall_time_data.max_index = 0;
 
   start();
 }
@@ -157,18 +157,18 @@ double Timer::stop ()
 #  error "Unsupported platform. Porting not finished."
 #endif
 
-      this->mpi_data = Utilities::MPI::min_max_avg (last_lap_time,
-                                                    mpi_communicator);
-      if (sync_wall_time && Utilities::MPI::job_supports_mpi())
+      last_lap_data = Utilities::MPI::min_max_avg (last_lap_time,
+                                                   mpi_communicator);
+      if (sync_wall_time)
         {
-          last_lap_time = this->mpi_data.max;
+          last_lap_time = last_lap_data.max;
           last_lap_cpu_time = Utilities::MPI::min_max_avg (last_lap_cpu_time,
                                                            mpi_communicator).max;
         }
       accumulated_wall_time += last_lap_time;
       accumulated_cpu_time += last_lap_cpu_time;
-      this->mpi_total_data = Utilities::MPI::min_max_avg (accumulated_wall_time,
-                                                          mpi_communicator);
+      accumulated_wall_time_data = Utilities::MPI::min_max_avg (accumulated_wall_time,
+                                                                mpi_communicator);
     }
   return accumulated_cpu_time;
 }
@@ -263,10 +263,10 @@ void Timer::reset ()
   accumulated_cpu_time = 0.;
   accumulated_wall_time = 0.;
   running         = false;
-  mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
-  mpi_data.min_index = mpi_data.max_index = numbers::invalid_unsigned_int;
-  mpi_total_data.sum = mpi_total_data.min = mpi_total_data.max = mpi_total_data.avg = 0.;
-  mpi_total_data.min_index = mpi_total_data.max_index = 0;
+  last_lap_data.sum = last_lap_data.min = last_lap_data.max = last_lap_data.avg = numbers::signaling_nan<double>();
+  last_lap_data.min_index = last_lap_data.max_index = numbers::invalid_unsigned_int;
+  accumulated_wall_time_data.sum = accumulated_wall_time_data.min = accumulated_wall_time_data.max = accumulated_wall_time_data.avg = 0.;
+  accumulated_wall_time_data.min_index = accumulated_wall_time_data.max_index = 0;
 }
 
 
