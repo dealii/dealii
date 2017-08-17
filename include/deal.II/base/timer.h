@@ -80,7 +80,7 @@ public:
   /**
    * Constructor that takes an MPI communicator as input. A timer constructed
    * this way will sum up the CPU times over all processors in the MPI network
-   * when requested by the operator ().
+   * when requested by Timer::cpu_time().
    *
    * Starts the timer at 0 sec.
    *
