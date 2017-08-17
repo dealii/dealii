@@ -1,0 +1,5 @@
+New: An additional non-member operator*() function, performing a single 
+contraction between a symmetric and normal tensor of arbitrary rank, has been 
+added to the SymmetricTensor class.
+<br>
+(Matthias Maier, Jean-Paul Pelteret, 2017/08/17)

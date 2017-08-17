@@ -1,0 +1,10 @@
+Fixed: The following non-member functions operating on SymmetricTensors have
+been generalized for all number types:
+  - scalar_product()
+  - double_contract()
+  - invert() for rank-4 symmetric tensors
+  - operator*() performing a double contraction between two symmetric tensors.
+  - operator*() performing a single contraction of a symmetric tensor with a
+    rank-1 tensor.
+<br>
+(Jean-Paul Pelteret, 2017/08/17)
