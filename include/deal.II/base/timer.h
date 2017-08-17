@@ -196,28 +196,29 @@ public:
 private:
 
   /**
-   * Value of the user time when start() was called the last time or when the
-   * object was created and no stop() was issued in between.
+   * Amount of CPU time that the current process has used as of the last call
+   * to start(). Note that the constructor of this class calls the start()
+   * function.
    */
-  double              start_time;
+  double              current_lap_starting_cpu_time;
 
   /**
-   * Value of the wall time when start() was called the last time or when the
-   * object was created and no stop() was issued in between.
+   * Value of the wall time as of the last call to start(). Note that the
+   * constructor of this class calls the start() function.
    */
-  double              start_wall_time;
+  double              current_lap_starting_wall_time;
 
   /**
-   * Accumulated time for all previous start()/stop() cycles. The time for the
-   * present cycle is not included.
+   * Accumulated CPU time for all previous start()/stop() cycles. The time for
+   * the present cycle is not included.
    */
-  double              cumulative_time;
+  double              accumulated_cpu_time;
 
   /**
    * Accumulated wall time for all previous start()/stop() cycles. The wall
    * time for the present cycle is not included.
    */
-  double              cumulative_wall_time;
+  double              accumulated_wall_time;
 
   /**
    * Wall time between the last start()/stop() cycle.
