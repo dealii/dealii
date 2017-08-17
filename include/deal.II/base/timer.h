@@ -66,9 +66,9 @@ DEAL_II_NAMESPACE_OPEN
  * accumulated. The usage of this class is also explained in the step-28,
  * step-29 and step-30 tutorial programs.
  *
- * @note Implementation of this class is system dependent. In case
- * multithreaded routines (matrix-vector products, error estimators, etc.) are
- * used, the CPU time is accumulated from all the children.
+ * @note Implementation of this class is system dependent. In particular, CPU
+ * times are accumulated from summing across all threads and will usually
+ * exceed the wall times.
  *
  * @ingroup utilities
  * @author G. Kanschat, W. Bangerth, M. Kronbichler
@@ -200,19 +200,6 @@ private:
    * object was created and no stop() was issued in between.
    */
   double              start_time;
-
-
-  /**
-   * Similar to #start_time, but needed for children threads in multithread
-   * mode. Value of the user time when start() was called the last time or
-   * when the object was created and no stop() was issued in between.
-   *
-   * For some reason (error in operating system?) the function call
-   * <tt>getrusage(RUSAGE_CHILDREN,.)</tt> gives always 0 (at least on
-   * Solaris7). Hence the Timer class still does not yet work for
-   * multithreading mode.
-   */
-  double              start_time_children;
 
   /**
    * Value of the wall time when start() was called the last time or when the
