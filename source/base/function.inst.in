@@ -17,8 +17,8 @@
 for (S : REAL_SCALARS; dim : SPACE_DIMENSIONS)
 {
     template class Function<dim, S>;
-    template class ZeroFunction<dim, S>;
-    template class ConstantFunction<dim, S>;
+    template class Functions::ZeroFunction<dim, S>;
+    template class Functions::ConstantFunction<dim, S>;
     template class ComponentSelectFunction<dim, S>;
     template class ScalarFunctionFromFunctionObject<dim, S>;
     template class VectorFunctionFromScalarFunctionObject<dim, S>;
@@ -28,8 +28,8 @@ for (S : REAL_SCALARS; dim : SPACE_DIMENSIONS)
 for (S : COMPLEX_SCALARS; dim : SPACE_DIMENSIONS)
 {
     template class Function<dim, S>;
-    template class ZeroFunction<dim, S>;
-    template class ConstantFunction<dim, S>;
+    template class Functions::ZeroFunction<dim, S>;
+    template class Functions::ConstantFunction<dim, S>;
     template class ComponentSelectFunction<dim, S>;
     template class ScalarFunctionFromFunctionObject<dim, S>;
     template class VectorFunctionFromScalarFunctionObject<dim, S>;

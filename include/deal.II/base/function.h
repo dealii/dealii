@@ -347,135 +347,158 @@ public:
 };
 
 
-
-/**
- * Provide a function which always returns zero. Obviously, also the derivates
- * of this function are zero. Also, it returns zero on all components in case
- * the function is not a scalar one, which can be obtained by passing the
- * constructor the appropriate number of components.
- *
- * This function is of use when you want to implement homogeneous boundary
- * conditions, or zero initial conditions.
- *
- * @ingroup functions
- * @author Wolfgang Bangerth, 1998, 1999
- */
-template <int dim, typename Number=double>
-class ZeroFunction : public Function<dim, Number>
+namespace Functions
 {
-public:
-  /**
-   * Constructor. The number of components is preset to one.
-   */
-  ZeroFunction (const unsigned int n_components = 1);
+
 
   /**
-   * Virtual destructor; absolutely necessary in this case.
+   * Provide a function which always returns zero. Obviously, also the derivates
+   * of this function are zero. Also, it returns zero on all components in case
+   * the function is not a scalar one, which can be obtained by passing the
+   * constructor the appropriate number of components.
    *
+   * This function is of use when you want to implement homogeneous boundary
+   * conditions, or zero initial conditions.
+   *
+   * @ingroup functions
+   * @author Wolfgang Bangerth, 1998, 1999
    */
-  virtual ~ZeroFunction ();
+  template <int dim, typename Number=double>
+  class ZeroFunction : public Function<dim, Number>
+  {
+  public:
+    /**
+     * Constructor. The number of components is preset to one.
+     */
+    ZeroFunction (const unsigned int n_components = 1);
 
-  virtual Number value (const Point<dim>   &p,
-                        const unsigned int  component) const;
+    /**
+     * Virtual destructor; absolutely necessary in this case.
+     *
+     */
+    virtual ~ZeroFunction ();
 
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<Number>   &return_value) const;
+    virtual Number value (const Point<dim>   &p,
+                          const unsigned int  component = 0) const;
 
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<Number>            &values,
-                           const unsigned int              component = 0) const;
+    virtual void vector_value (const Point<dim> &p,
+                               Vector<Number>   &return_value) const;
 
-  virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                  std::vector<Vector<Number> >   &values) const;
+    virtual void value_list (const std::vector<Point<dim> > &points,
+                             std::vector<Number>            &values,
+                             const unsigned int              component = 0) const;
 
-  virtual Tensor<1,dim, Number> gradient (const Point<dim> &p,
-                                          const unsigned int component = 0) const;
+    virtual void vector_value_list (const std::vector<Point<dim> > &points,
+                                    std::vector<Vector<Number> >   &values) const;
 
-  virtual void vector_gradient (const Point<dim>            &p,
-                                std::vector<Tensor<1,dim, Number> > &gradients) const;
+    virtual Tensor<1,dim, Number> gradient (const Point<dim> &p,
+                                            const unsigned int component = 0) const;
 
-  virtual void gradient_list (const std::vector<Point<dim> > &points,
-                              std::vector<Tensor<1,dim, Number> >    &gradients,
-                              const unsigned int              component = 0) const;
+    virtual void vector_gradient (const Point<dim>            &p,
+                                  std::vector<Tensor<1,dim, Number> > &gradients) const;
 
-  virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
-                                     std::vector<std::vector<Tensor<1,dim, Number> > > &gradients) const;
-};
+    virtual void gradient_list (const std::vector<Point<dim> > &points,
+                                std::vector<Tensor<1,dim, Number> >    &gradients,
+                                const unsigned int              component = 0) const;
+
+    virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
+                                       std::vector<std::vector<Tensor<1,dim, Number> > > &gradients) const;
+  };
 
 
+
+  /**
+   * Provide a function which always returns the constant values handed to the
+   * constructor.
+   *
+   * Obviously, the derivates of this function are zero, which is why we derive
+   * this class from <tt>ZeroFunction</tt>: we then only have to overload the
+   * value functions, not all the derivatives. In some way, it would be more
+   * obvious to do the derivation in the opposite direction, i.e. let
+   * <tt>ZeroFunction</tt> be a more specialized version of
+   * <tt>ConstantFunction</tt>; however, this would be less efficient, since we
+   * could not make use of the fact that the function value of the
+   * <tt>ZeroFunction</tt> is known at compile time and need not be looked up
+   * somewhere in memory.
+   *
+   * @ingroup functions
+   * @author Wolfgang Bangerth, 1998, 1999, Lei Qiao, 2015
+   */
+  template <int dim, typename Number=double>
+  class ConstantFunction : public ZeroFunction<dim, Number>
+  {
+  public:
+    /**
+     * Constructor; set values of all components to the provided one. The
+     * default number of components is one.
+     */
+    ConstantFunction (const Number       value,
+                      const unsigned int n_components = 1);
+
+    /**
+     * Constructor; takes an <tt>std::vector<Number></tt> object as an argument.
+     * The number of components is determined by <tt>values.size()</tt>.
+     */
+    ConstantFunction (const std::vector<Number> &values);
+
+    /**
+     * Constructor; takes an <tt>Vector<Number></tt> object as an argument. The
+     * number of components is determined by <tt>values.size()</tt>.
+     */
+    ConstantFunction (const Vector<Number> &values);
+
+    /**
+     * Constructor; uses whatever stores in [begin_ptr, begin_ptr+n_components)
+     * to initialize a new object.
+     */
+    ConstantFunction (const Number *begin_ptr, const unsigned int n_components);
+
+    /**
+     * Virtual destructor; absolutely necessary in this case.
+     */
+    virtual ~ConstantFunction ();
+
+    virtual Number value (const Point<dim>   &p,
+                          const unsigned int  component = 0) const;
+
+    virtual void vector_value (const Point<dim> &p,
+                               Vector<Number>   &return_value) const;
+
+    virtual void value_list (const std::vector<Point<dim> > &points,
+                             std::vector<Number>            &return_values,
+                             const unsigned int              component = 0) const;
+
+    virtual void vector_value_list (const std::vector<Point<dim> > &points,
+                                    std::vector<Vector<Number> >   &return_values) const;
+
+    std::size_t memory_consumption () const;
+
+  protected:
+    /**
+     * Store the constant function value vector.
+     */
+    std::vector<Number> function_value_vector;
+  };
+
+}
 
 /**
  * Provide a function which always returns the constant values handed to the
  * constructor.
  *
- * Obviously, the derivates of this function are zero, which is why we derive
- * this class from <tt>ZeroFunction</tt>: we then only have to overload the
- * value functions, not all the derivatives. In some way, it would be more
- * obvious to do the derivation in the opposite direction, i.e. let
- * <tt>ZeroFunction</tt> be a more specialized version of
- * <tt>ConstantFunction</tt>; however, this would be less efficient, since we
- * could not make use of the fact that the function value of the
- * <tt>ZeroFunction</tt> is known at compile time and need not be looked up
- * somewhere in memory.
- *
- * @ingroup functions
- * @author Wolfgang Bangerth, 1998, 1999, Lei Qiao, 2015
+ * @deprecated use Functions::ConstantFunction instead.
  */
-template <int dim, typename Number=double>
-class ConstantFunction : public ZeroFunction<dim, Number>
-{
-public:
-  /**
-   * Constructor; set values of all components to the provided one. The
-   * default number of components is one.
-   */
-  ConstantFunction (const Number       value,
-                    const unsigned int n_components = 1);
+template<int dim, typename Number=double>
+using ConstantFunction DEAL_II_DEPRECATED = Functions::ConstantFunction<dim,Number>;
 
-  /**
-   * Constructor; takes an <tt>std::vector<Number></tt> object as an argument.
-   * The number of components is determined by <tt>values.size()</tt>.
-   */
-  ConstantFunction (const std::vector<Number> &values);
+/**
+ * Provide a function which always returns zero.
+ *
+ * @deprecated use Functions::ZeroFunction instead.
+ */
+template<int dim, typename Number=double>
+using ZeroFunction DEAL_II_DEPRECATED = Functions::ZeroFunction<dim,Number>;
 
-  /**
-   * Constructor; takes an <tt>Vector<Number></tt> object as an argument. The
-   * number of components is determined by <tt>values.size()</tt>.
-   */
-  ConstantFunction (const Vector<Number> &values);
-
-  /**
-   * Constructor; uses whatever stores in [begin_ptr, begin_ptr+n_components)
-   * to initialize a new object.
-   */
-  ConstantFunction (const Number *begin_ptr, const unsigned int n_components);
-
-  /**
-   * Virtual destructor; absolutely necessary in this case.
-   */
-  virtual ~ConstantFunction ();
-
-  virtual Number value (const Point<dim>   &p,
-                        const unsigned int  component) const;
-
-  virtual void vector_value (const Point<dim> &p,
-                             Vector<Number>   &return_value) const;
-
-  virtual void value_list (const std::vector<Point<dim> > &points,
-                           std::vector<Number>            &return_values,
-                           const unsigned int              component = 0) const;
-
-  virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                  std::vector<Vector<Number> >   &return_values) const;
-
-  std::size_t memory_consumption () const;
-
-protected:
-  /**
-   * Store the constant function value vector.
-   */
-  std::vector<Number> function_value_vector;
-};
 
 
 /**

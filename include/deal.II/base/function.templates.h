@@ -297,240 +297,248 @@ Function<dim, Number>::memory_consumption () const
 
 //---------------------------------------------------------------------------
 
-
-
-template <int dim, typename Number>
-ZeroFunction<dim, Number>::ZeroFunction (const unsigned int n_components)
-  :
-  Function<dim, Number> (n_components)
-{}
-
-
-template <int dim, typename Number>
-ZeroFunction<dim, Number>::~ZeroFunction ()
-{}
-
-
-template <int dim, typename Number>
-Number ZeroFunction<dim, Number>::value (const Point<dim> &,
-                                         const unsigned int) const
+namespace Functions
 {
-  return 0.;
-}
+
+  template <int dim, typename Number>
+  ZeroFunction<dim, Number>::ZeroFunction (const unsigned int n_components)
+    :
+    Function<dim, Number> (n_components)
+  {}
 
 
-template <int dim, typename Number>
-void ZeroFunction<dim, Number>::vector_value (const Point<dim> &,
-                                              Vector<Number>   &return_value) const
-{
-  Assert (return_value.size() == this->n_components,
-          ExcDimensionMismatch (return_value.size(), this->n_components));
-
-  std::fill (return_value.begin(), return_value.end(), 0.0);
-}
+  template <int dim, typename Number>
+  ZeroFunction<dim, Number>::~ZeroFunction ()
+  {}
 
 
-template <int dim, typename Number>
-void ZeroFunction<dim, Number>::value_list (
-  const std::vector<Point<dim> > &points,
-  std::vector<Number>            &values,
-  const unsigned int              /*component*/) const
-{
-  (void)points;
-  Assert (values.size() == points.size(),
-          ExcDimensionMismatch(values.size(), points.size()));
-
-  std::fill (values.begin(), values.end(), 0.);
-}
+  template <int dim, typename Number>
+  Number ZeroFunction<dim, Number>::value (const Point<dim> &,
+                                           const unsigned int) const
+  {
+    return 0.;
+  }
 
 
-template <int dim, typename Number>
-void ZeroFunction<dim, Number>::vector_value_list (
-  const std::vector<Point<dim> > &points,
-  std::vector<Vector<Number> >   &values) const
-{
-  Assert (values.size() == points.size(),
-          ExcDimensionMismatch(values.size(), points.size()));
+  template <int dim, typename Number>
+  void ZeroFunction<dim, Number>::vector_value (const Point<dim> &,
+                                                Vector<Number>   &return_value) const
+  {
+    Assert (return_value.size() == this->n_components,
+            ExcDimensionMismatch (return_value.size(), this->n_components));
 
-  for (unsigned int i=0; i<points.size(); ++i)
-    {
-      Assert (values[i].size() == this->n_components,
-              ExcDimensionMismatch(values[i].size(), this->n_components));
-      std::fill (values[i].begin(), values[i].end(), 0.);
-    };
-}
+    std::fill (return_value.begin(), return_value.end(), 0.0);
+  }
 
 
-template <int dim, typename Number>
-Tensor<1,dim,Number> ZeroFunction<dim, Number>::gradient (const Point<dim> &,
-                                                          const unsigned int) const
-{
-  return Tensor<1,dim,Number>();
-}
+  template <int dim, typename Number>
+  void ZeroFunction<dim, Number>::value_list (
+    const std::vector<Point<dim> > &points,
+    std::vector<Number>            &values,
+    const unsigned int              /*component*/) const
+  {
+    (void)points;
+    Assert (values.size() == points.size(),
+            ExcDimensionMismatch(values.size(), points.size()));
+
+    std::fill (values.begin(), values.end(), 0.);
+  }
 
 
-template <int dim, typename Number>
-void ZeroFunction<dim, Number>::vector_gradient (
-  const Point<dim> &,
-  std::vector<Tensor<1,dim,Number> > &gradients) const
-{
-  Assert (gradients.size() == this->n_components,
-          ExcDimensionMismatch(gradients.size(), this->n_components));
+  template <int dim, typename Number>
+  void ZeroFunction<dim, Number>::vector_value_list (
+    const std::vector<Point<dim> > &points,
+    std::vector<Vector<Number> >   &values) const
+  {
+    Assert (values.size() == points.size(),
+            ExcDimensionMismatch(values.size(), points.size()));
 
-  for (unsigned int c=0; c<this->n_components; ++c)
-    gradients[c].clear ();
-}
-
-
-template <int dim, typename Number>
-void ZeroFunction<dim, Number>::gradient_list (
-  const std::vector<Point<dim> >     &points,
-  std::vector<Tensor<1,dim,Number> > &gradients,
-  const unsigned int                  /*component*/) const
-{
-  Assert (gradients.size() == points.size(),
-          ExcDimensionMismatch(gradients.size(), points.size()));
-
-  for (unsigned int i=0; i<points.size(); ++i)
-    gradients[i].clear ();
-}
+    for (unsigned int i=0; i<points.size(); ++i)
+      {
+        Assert (values[i].size() == this->n_components,
+                ExcDimensionMismatch(values[i].size(), this->n_components));
+        std::fill (values[i].begin(), values[i].end(), 0.);
+      };
+  }
 
 
-template <int dim, typename Number>
-void ZeroFunction<dim, Number>::vector_gradient_list (
-  const std::vector<Point<dim> >                   &points,
-  std::vector<std::vector<Tensor<1,dim,Number> > > &gradients) const
-{
-  Assert (gradients.size() == points.size(),
-          ExcDimensionMismatch(gradients.size(), points.size()));
-  for (unsigned int i=0; i<points.size(); ++i)
-    {
-      Assert (gradients[i].size() == this->n_components,
-              ExcDimensionMismatch(gradients[i].size(), this->n_components));
-      for (unsigned int c=0; c<this->n_components; ++c)
-        gradients[i][c].clear ();
-    };
+  template <int dim, typename Number>
+  Tensor<1,dim,Number> ZeroFunction<dim, Number>::gradient (const Point<dim> &,
+                                                            const unsigned int) const
+  {
+    return Tensor<1,dim,Number>();
+  }
+
+
+  template <int dim, typename Number>
+  void ZeroFunction<dim, Number>::vector_gradient (
+    const Point<dim> &,
+    std::vector<Tensor<1,dim,Number> > &gradients) const
+  {
+    Assert (gradients.size() == this->n_components,
+            ExcDimensionMismatch(gradients.size(), this->n_components));
+
+    for (unsigned int c=0; c<this->n_components; ++c)
+      gradients[c].clear ();
+  }
+
+
+  template <int dim, typename Number>
+  void ZeroFunction<dim, Number>::gradient_list (
+    const std::vector<Point<dim> >     &points,
+    std::vector<Tensor<1,dim,Number> > &gradients,
+    const unsigned int                  /*component*/) const
+  {
+    Assert (gradients.size() == points.size(),
+            ExcDimensionMismatch(gradients.size(), points.size()));
+
+    for (unsigned int i=0; i<points.size(); ++i)
+      gradients[i].clear ();
+  }
+
+
+  template <int dim, typename Number>
+  void ZeroFunction<dim, Number>::vector_gradient_list (
+    const std::vector<Point<dim> >                   &points,
+    std::vector<std::vector<Tensor<1,dim,Number> > > &gradients) const
+  {
+    Assert (gradients.size() == points.size(),
+            ExcDimensionMismatch(gradients.size(), points.size()));
+    for (unsigned int i=0; i<points.size(); ++i)
+      {
+        Assert (gradients[i].size() == this->n_components,
+                ExcDimensionMismatch(gradients[i].size(), this->n_components));
+        for (unsigned int c=0; c<this->n_components; ++c)
+          gradients[i][c].clear ();
+      };
+  }
+
 }
 
 //---------------------------------------------------------------------------
 
-template <int dim, typename Number>
-ConstantFunction<dim, Number>::ConstantFunction (const Number value,
-                                                 const unsigned int n_components)
-  :
-  ZeroFunction<dim, Number> (n_components),
-  function_value_vector (n_components, value)
-{}
-
-template <int dim, typename Number>
-ConstantFunction<dim, Number>::
-ConstantFunction (const std::vector<Number> &values)
-  :
-  ZeroFunction<dim, Number> (values.size()),
-  function_value_vector (values)
-{}
-
-
-template <int dim, typename Number>
-ConstantFunction<dim, Number>::
-ConstantFunction (const Vector<Number> &values)
-  :
-  ZeroFunction<dim, Number> (values.size()),
-  function_value_vector (values.size())
+namespace Functions
 {
-  Assert (values.size() == function_value_vector.size(),
-          ExcDimensionMismatch (values.size(), function_value_vector.size()));
-  std::copy (values.begin(),values.end(),function_value_vector.begin());
-}
+
+  template <int dim, typename Number>
+  ConstantFunction<dim, Number>::ConstantFunction (const Number value,
+                                                   const unsigned int n_components)
+    :
+    ZeroFunction<dim, Number> (n_components),
+    function_value_vector (n_components, value)
+  {}
+
+  template <int dim, typename Number>
+  ConstantFunction<dim, Number>::
+  ConstantFunction (const std::vector<Number> &values)
+    :
+    ZeroFunction<dim, Number> (values.size()),
+    function_value_vector (values)
+  {}
 
 
-template <int dim, typename Number>
-ConstantFunction<dim, Number>::
-ConstantFunction (const Number *begin_ptr, const unsigned int n_components)
-  :
-  ZeroFunction<dim, Number> (n_components),
-  function_value_vector (n_components)
-{
-  Assert (begin_ptr != nullptr, ExcMessage ("Null pointer encountered!"));
-  std::copy (begin_ptr, begin_ptr+n_components, function_value_vector.begin());
-}
+  template <int dim, typename Number>
+  ConstantFunction<dim, Number>::
+  ConstantFunction (const Vector<Number> &values)
+    :
+    ZeroFunction<dim, Number> (values.size()),
+    function_value_vector (values.size())
+  {
+    Assert (values.size() == function_value_vector.size(),
+            ExcDimensionMismatch (values.size(), function_value_vector.size()));
+    std::copy (values.begin(),values.end(),function_value_vector.begin());
+  }
 
 
-
-template <int dim, typename Number>
-ConstantFunction<dim, Number>::~ConstantFunction ()
-{
-  function_value_vector.clear();
-}
-
-
-template <int dim, typename Number>
-Number ConstantFunction<dim, Number>::value (const Point<dim> &,
-                                             const unsigned int component) const
-{
-  Assert (component < this->n_components,
-          ExcIndexRange (component, 0, this->n_components));
-  return function_value_vector[component];
-}
-
-
-
-template <int dim, typename Number>
-void ConstantFunction<dim, Number>::vector_value (const Point<dim> &,
-                                                  Vector<Number>   &return_value) const
-{
-  Assert (return_value.size() == this->n_components,
-          ExcDimensionMismatch (return_value.size(), this->n_components));
-
-  std::copy (function_value_vector.begin(),function_value_vector.end(),
-             return_value.begin());
-}
+  template <int dim, typename Number>
+  ConstantFunction<dim, Number>::
+  ConstantFunction (const Number *begin_ptr, const unsigned int n_components)
+    :
+    ZeroFunction<dim, Number> (n_components),
+    function_value_vector (n_components)
+  {
+    Assert (begin_ptr != nullptr, ExcMessage ("Null pointer encountered!"));
+    std::copy (begin_ptr, begin_ptr+n_components, function_value_vector.begin());
+  }
 
 
 
-template <int dim, typename Number>
-void ConstantFunction<dim, Number>::value_list (
-  const std::vector<Point<dim> > &points,
-  std::vector<Number>            &return_values,
-  const unsigned int              component) const
-{
-  // To avoid warning of unused parameter
-  (void)points;
-  Assert (component < this->n_components,
-          ExcIndexRange (component, 0, this->n_components));
-  Assert (return_values.size() == points.size(),
-          ExcDimensionMismatch(return_values.size(), points.size()))
-
-  std::fill (return_values.begin(), return_values.end(), function_value_vector[component]);
-}
+  template <int dim, typename Number>
+  ConstantFunction<dim, Number>::~ConstantFunction ()
+  {
+    function_value_vector.clear();
+  }
 
 
-
-template <int dim, typename Number>
-void ConstantFunction<dim, Number>::vector_value_list (
-  const std::vector<Point<dim> > &points,
-  std::vector<Vector<Number> >   &return_values) const
-{
-  Assert (return_values.size() == points.size(),
-          ExcDimensionMismatch(return_values.size(), points.size()));
-
-  for (unsigned int i=0; i<points.size(); ++i)
-    {
-      Assert (return_values[i].size() == this->n_components,
-              ExcDimensionMismatch(return_values[i].size(), this->n_components));
-      std::copy (function_value_vector.begin(),function_value_vector.end(),
-                 return_values[i].begin());
-    };
-}
+  template <int dim, typename Number>
+  Number ConstantFunction<dim, Number>::value (const Point<dim> &,
+                                               const unsigned int component) const
+  {
+    Assert (component < this->n_components,
+            ExcIndexRange (component, 0, this->n_components));
+    return function_value_vector[component];
+  }
 
 
 
-template <int dim, typename Number>
-std::size_t
-ConstantFunction<dim, Number>::memory_consumption () const
-{
-  // Here we assume Number is a simple type.
-  return (sizeof(*this) + this->n_components*sizeof(Number));
+  template <int dim, typename Number>
+  void ConstantFunction<dim, Number>::vector_value (const Point<dim> &,
+                                                    Vector<Number>   &return_value) const
+  {
+    Assert (return_value.size() == this->n_components,
+            ExcDimensionMismatch (return_value.size(), this->n_components));
+
+    std::copy (function_value_vector.begin(),function_value_vector.end(),
+               return_value.begin());
+  }
+
+
+
+  template <int dim, typename Number>
+  void ConstantFunction<dim, Number>::value_list (
+    const std::vector<Point<dim> > &points,
+    std::vector<Number>            &return_values,
+    const unsigned int              component) const
+  {
+    // To avoid warning of unused parameter
+    (void)points;
+    Assert (component < this->n_components,
+            ExcIndexRange (component, 0, this->n_components));
+    Assert (return_values.size() == points.size(),
+            ExcDimensionMismatch(return_values.size(), points.size()))
+
+    std::fill (return_values.begin(), return_values.end(), function_value_vector[component]);
+  }
+
+
+
+  template <int dim, typename Number>
+  void ConstantFunction<dim, Number>::vector_value_list (
+    const std::vector<Point<dim> > &points,
+    std::vector<Vector<Number> >   &return_values) const
+  {
+    Assert (return_values.size() == points.size(),
+            ExcDimensionMismatch(return_values.size(), points.size()));
+
+    for (unsigned int i=0; i<points.size(); ++i)
+      {
+        Assert (return_values[i].size() == this->n_components,
+                ExcDimensionMismatch(return_values[i].size(), this->n_components));
+        std::copy (function_value_vector.begin(),function_value_vector.end(),
+                   return_values[i].begin());
+      };
+  }
+
+
+
+  template <int dim, typename Number>
+  std::size_t
+  ConstantFunction<dim, Number>::memory_consumption () const
+  {
+    // Here we assume Number is a simple type.
+    return (sizeof(*this) + this->n_components*sizeof(Number));
+  }
+
 }
 
 //---------------------------------------------------------------------------
