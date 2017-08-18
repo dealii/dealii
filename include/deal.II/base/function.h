@@ -352,7 +352,7 @@ namespace Functions
 
 
   /**
-   * Provide a function which always returns zero. Obviously, also the derivates
+   * Provide a function which always returns zero. Obviously, also the derivatives
    * of this function are zero. Also, it returns zero on all components in case
    * the function is not a scalar one, which can be obtained by passing the
    * constructor the appropriate number of components.
@@ -411,7 +411,7 @@ namespace Functions
    * Provide a function which always returns the constant values handed to the
    * constructor.
    *
-   * Obviously, the derivates of this function are zero, which is why we derive
+   * Obviously, the derivatives of this function are zero, which is why we derive
    * this class from <tt>ZeroFunction</tt>: we then only have to overload the
    * value functions, not all the derivatives. In some way, it would be more
    * obvious to do the derivation in the opposite direction, i.e. let
