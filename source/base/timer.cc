@@ -42,10 +42,10 @@ DEAL_II_NAMESPACE_OPEN
 // current process
 Timer::Timer()
   :
-  start_time (0.),
-  start_wall_time (0.),
-  cumulative_time (0.),
-  cumulative_wall_time (0.),
+  current_lap_starting_cpu_time (0.),
+  current_lap_starting_wall_time (0.),
+  accumulated_cpu_time (0.),
+  accumulated_wall_time (0.),
   last_lap_time (numbers::signaling_nan<double>()),
   last_lap_cpu_time(numbers::signaling_nan<double>()),
   running (false)
@@ -73,10 +73,10 @@ Timer::Timer()
 Timer::Timer(MPI_Comm mpi_communicator,
              const bool sync_wall_time_)
   :
-  start_time (0.),
-  start_wall_time (0.),
-  cumulative_time (0.),
-  cumulative_wall_time (0.),
+  current_lap_starting_cpu_time (0.),
+  current_lap_starting_wall_time (0.),
+  accumulated_cpu_time (0.),
+  accumulated_wall_time (0.),
   last_lap_time (numbers::signaling_nan<double>()),
   last_lap_cpu_time (numbers::signaling_nan<double>()),
   running (false),
@@ -146,15 +146,15 @@ void Timer::start ()
 //namespace windows above
   struct timeval wall_timer;
   gettimeofday(&wall_timer, nullptr);
-  start_wall_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec;
+  current_lap_starting_wall_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec;
 
   rusage usage;
   getrusage (RUSAGE_SELF, &usage);
-  start_time = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
+  current_lap_starting_cpu_time = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
 
 #elif defined(DEAL_II_MSVC)
-  start_wall_time = windows::wall_clock();
-  start_time = windows::cpu_clock();
+  current_lap_starting_wall_time = windows::wall_clock();
+  current_lap_starting_cpu_time = windows::cpu_clock();
 #else
 #  error Unsupported platform. Porting not finished.
 #endif
@@ -174,15 +174,15 @@ double Timer::stop ()
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-      last_lap_cpu_time = dtime - start_time;
+      last_lap_cpu_time = dtime - current_lap_starting_cpu_time;
 
       struct timeval wall_timer;
       gettimeofday(&wall_timer, nullptr);
       last_lap_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
-                      - start_wall_time;
+                      - current_lap_starting_wall_time;
 #elif defined(DEAL_II_MSVC)
-      last_lap_time = windows::wall_clock() - start_wall_time;
-      last_lap_cpu_time = windows::cpu_clock() - start_time;
+      last_lap_time = windows::wall_clock() - current_lap_starting_wall_time;
+      last_lap_cpu_time = windows::cpu_clock() - current_lap_starting_cpu_time;
 #else
 #  error Unsupported platform. Porting not finished.
 #endif
@@ -196,16 +196,16 @@ double Timer::stop ()
           last_lap_cpu_time = Utilities::MPI::min_max_avg (last_lap_cpu_time,
                                                            mpi_communicator).max;
         }
-      cumulative_wall_time += last_lap_time;
-      cumulative_time += last_lap_cpu_time;
-      this->mpi_total_data = Utilities::MPI::min_max_avg (cumulative_wall_time,
+      accumulated_wall_time += last_lap_time;
+      accumulated_cpu_time += last_lap_cpu_time;
+      this->mpi_total_data = Utilities::MPI::min_max_avg (accumulated_wall_time,
                                                           mpi_communicator);
 #else
-      cumulative_wall_time += last_lap_time;
-      cumulative_time += last_lap_cpu_time;
+      accumulated_wall_time += last_lap_time;
+      accumulated_cpu_time += last_lap_cpu_time;
 #endif
     }
-  return cumulative_time;
+  return accumulated_cpu_time;
 }
 
 
@@ -218,7 +218,7 @@ double Timer::cpu_time() const
       rusage usage;
       getrusage (RUSAGE_SELF, &usage);
       const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-      const double running_time = dtime - start_time + cumulative_time;
+      const double running_time = dtime - current_lap_starting_cpu_time + accumulated_cpu_time;
 
       // in case of MPI, need to get the time passed by summing the time over
       // all processes in the network. works also in case we just want to have
@@ -227,7 +227,7 @@ double Timer::cpu_time() const
       return Utilities::MPI::sum (running_time, mpi_communicator);
 
 #elif defined(DEAL_II_MSVC)
-      const double running_time = windows::cpu_clock() - start_time + cumulative_time;
+      const double running_time = windows::cpu_clock() - current_lap_starting_cpu_time + accumulated_cpu_time;
       return running_time;
 #else
 #  error Unsupported platform. Porting not finished.
@@ -235,7 +235,7 @@ double Timer::cpu_time() const
     }
   else
     {
-      return Utilities::MPI::sum (cumulative_time, mpi_communicator);
+      return Utilities::MPI::sum (accumulated_cpu_time, mpi_communicator);
     }
 }
 
@@ -271,15 +271,15 @@ double Timer::wall_time () const
       gettimeofday(&wall_timer, nullptr);
       return (wall_timer.tv_sec
               + 1.e-6 * wall_timer.tv_usec
-              - start_wall_time
-              + cumulative_wall_time);
+              - current_lap_starting_wall_time
+              + accumulated_wall_time);
 #else
 //TODO[BG]: Do something useful here
       return 0;
 #endif
     }
   else
-    return cumulative_wall_time;
+    return accumulated_wall_time;
 }
 
 
@@ -295,8 +295,8 @@ void Timer::reset ()
 {
   last_lap_time = numbers::signaling_nan<double>();
   last_lap_cpu_time = numbers::signaling_nan<double>();
-  cumulative_time = 0.;
-  cumulative_wall_time = 0.;
+  accumulated_cpu_time = 0.;
+  accumulated_wall_time = 0.;
   running         = false;
 #ifdef DEAL_II_WITH_MPI
   mpi_data.sum = mpi_data.min = mpi_data.max = mpi_data.avg = numbers::signaling_nan<double>();
