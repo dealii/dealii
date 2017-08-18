@@ -676,9 +676,15 @@ namespace LinearAlgebra
             for ( ; my_imports!=part.import_indices().end(); ++my_imports)
               for (unsigned int j=my_imports->first; j<my_imports->second;
                    j++, read_position++)
+                // Below we use relatively large precision in units in the last place (ULP) as
+                // this Assert can be easily triggered in p::d::SolutionTransfer.
+                // The rationale is that during interpolation on two elements sharing
+                // the face, values on this face obtained from each side might
+                // be different due to additions being done in different order.
                 Assert(*read_position == Number() ||
                        std::abs(local_element(j) - *read_position) <=
-                       std::abs(local_element(j)) * 10000. *
+                       std::abs(local_element(j) + *read_position) *
+                       100000. *
                        std::numeric_limits<real_type>::epsilon(),
                        ExcNonMatchingElements(*read_position, local_element(j),
                                               part.this_mpi_process()));
