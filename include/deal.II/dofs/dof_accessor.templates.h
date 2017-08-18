@@ -1264,7 +1264,7 @@ namespace internal
                 ExcIndexRange (vertex_index, 0,
                                dof_handler.vertex_dof_offsets.size()));
         Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
-                numbers::invalid_dof_index,
+                numbers::invalid_unsigned_int,
                 ExcMessage ("This vertex is unused and has no DoFs associated with it"));
 
         // hop along the list of index
