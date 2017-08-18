@@ -1175,7 +1175,7 @@ namespace internal
         Assert (fe_index < dof_handler.finite_elements->size(),
                 ExcInternalError());
         Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
-                numbers::invalid_dof_index,
+                numbers::invalid_unsigned_int,
                 ExcMessage ("This vertex is unused and has no DoFs associated with it"));
 
         // hop along the list of index
@@ -1264,7 +1264,7 @@ namespace internal
                 ExcIndexRange (vertex_index, 0,
                                dof_handler.vertex_dof_offsets.size()));
         Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
-                numbers::invalid_dof_index,
+                numbers::invalid_unsigned_int,
                 ExcMessage ("This vertex is unused and has no DoFs associated with it"));
 
         // hop along the list of index
@@ -1312,7 +1312,7 @@ namespace internal
                             "this DoFHandler"));
 
         // if this vertex is unused, return 0
-        if (dof_handler.vertex_dof_offsets[vertex_index] == numbers::invalid_dof_index)
+        if (dof_handler.vertex_dof_offsets[vertex_index] == numbers::invalid_unsigned_int)
           return 0;
 
         // hop along the list of index
@@ -1364,7 +1364,7 @@ namespace internal
         // make sure we don't ask on
         // unused vertices
         Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
-                numbers::invalid_dof_index,
+                numbers::invalid_unsigned_int,
                 ExcInternalError());
 
         // hop along the list of index
@@ -1424,7 +1424,7 @@ namespace internal
         // make sure we don't ask on
         // unused vertices
         Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
-                numbers::invalid_dof_index,
+                numbers::invalid_unsigned_int,
                 ExcInternalError());
 
         // hop along the list of index
