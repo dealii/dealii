@@ -47,14 +47,14 @@ namespace internal
       (void)fe_index;
       Assert ((fe_index == dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
               ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-      Assert (local_index<dof_handler.get_fe().template n_dofs_per_object<dim>(),
-              ExcIndexRange (local_index, 0, dof_handler.get_fe().template n_dofs_per_object<dim>()));
-      Assert (obj_index * dof_handler.get_fe().template n_dofs_per_object<dim>()+local_index
+      Assert (local_index<dof_handler.get_finite_element().template n_dofs_per_object<dim>(),
+              ExcIndexRange (local_index, 0, dof_handler.get_finite_element().template n_dofs_per_object<dim>()));
+      Assert (obj_index * dof_handler.get_finite_element().template n_dofs_per_object<dim>()+local_index
               <
               dofs.size(),
               ExcInternalError());
 
-      dofs[obj_index * dof_handler.get_fe()
+      dofs[obj_index * dof_handler.get_finite_element()
            .template n_dofs_per_object<dim>() + local_index] = global_index;
     }
   }

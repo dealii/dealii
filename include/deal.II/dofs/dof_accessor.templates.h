@@ -696,7 +696,7 @@ namespace internal
                            const unsigned int              i)
       {
         return dof_handler.mg_vertex_dofs[vertex_index].get_index (level, i,
-                                                                   dof_handler.get_fe().dofs_per_vertex);
+                                                                   dof_handler.get_finite_element().dofs_per_vertex);
       }
 
 
@@ -723,7 +723,7 @@ namespace internal
                                types::global_dof_index         index)
       {
         return dof_handler.mg_vertex_dofs[vertex_index].set_index (level, i,
-                                                                   dof_handler.get_fe().dofs_per_vertex,
+                                                                   dof_handler.get_finite_element().dofs_per_vertex,
                                                                    index);
       }
 
@@ -1475,7 +1475,7 @@ namespace internal
                                const unsigned int fe_index)
       {
         const FiniteElement<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe
-          = accessor.get_dof_handler ().get_fe ()[fe_index];
+          = accessor.get_dof_handler ().get_finite_element(fe_index);
         std::vector<types::global_dof_index>::const_iterator next = dof_indices.begin ();
 
         for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_cell; ++vertex)
@@ -1503,7 +1503,7 @@ namespace internal
        const unsigned int                          fe_index)
       {
         const FiniteElement<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe
-          = accessor.get_dof_handler ().get_fe ()[fe_index];
+          = accessor.get_dof_handler ().get_finite_element(fe_index);
         std::vector<types::global_dof_index>::const_iterator next = dof_indices.begin ();
 
         for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_cell; ++vertex)
@@ -1721,8 +1721,8 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::mg_vertex_dof_index (co
   Assert (this->dof_handler != nullptr, ExcInvalidObject ());
   Assert (vertex < GeometryInfo<structdim>::vertices_per_cell,
           ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
-  Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex,
-          ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
+  Assert (i < this->dof_handler->get_finite_element (fe_index).dofs_per_vertex,
+          ExcIndexRange (i, 0, this->dof_handler->get_finite_element (fe_index).dofs_per_vertex));
 
   return
     dealii::internal::DoFAccessor::Implementation::mg_vertex_dof_index
@@ -1764,8 +1764,8 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_vertex_dof_index
   Assert (this->dof_handler != nullptr, ExcInvalidObject ());
   Assert (vertex < GeometryInfo<structdim>::vertices_per_cell,
           ExcIndexRange (vertex, 0, GeometryInfo<structdim>::vertices_per_cell));
-  Assert (i < this->dof_handler->get_fe ()[fe_index].dofs_per_vertex,
-          ExcIndexRange (i, 0, this->dof_handler->get_fe ()[fe_index].dofs_per_vertex));
+  Assert (i < this->dof_handler->get_finite_element (fe_index).dofs_per_vertex,
+          ExcIndexRange (i, 0, this->dof_handler->get_finite_element (fe_index).dofs_per_vertex));
 
   return
     dealii::internal::DoFAccessor::Implementation::set_mg_vertex_dof_index
@@ -1789,32 +1789,6 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_dof_index
 }
 
 
-namespace internal
-{
-  namespace DoFAccessor
-  {
-    template <int dim, int spacedim>
-    inline
-    const FiniteElement<dim,spacedim> &
-    get_fe (const FiniteElement<dim,spacedim> &fe,
-            const unsigned int)
-    {
-      return fe;
-    }
-
-
-
-    template <int dim, int spacedim>
-    inline
-    const FiniteElement<dim,spacedim> &
-    get_fe (const dealii::hp::FECollection<dim,spacedim> &fe,
-            const unsigned int                            index)
-    {
-      return fe[index];
-    }
-  }
-}
-
 
 template <int dim, typename DoFHandlerType, bool level_dof_access>
 inline
@@ -1824,7 +1798,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::get_fe (const unsigned int fe_
   Assert (fe_index_is_active (fe_index) == true,
           ExcMessage ("This function can only be called for active fe indices"));
 
-  return dealii::internal::DoFAccessor::get_fe (this->dof_handler->get_fe(), fe_index);
+  return this->dof_handler->get_finite_element(fe_index);
 }
 
 
@@ -1951,7 +1925,7 @@ namespace internal
       const DoFHandlerType &handler = accessor.get_dof_handler();
 
       const FiniteElement<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe
-        = handler.get_fe ()[fe_index];
+        = handler.get_finite_element (fe_index);
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin ();
 
       for (unsigned int vertex = 0; vertex < GeometryInfo<1>::vertices_per_cell; ++vertex)
@@ -1975,7 +1949,7 @@ namespace internal
       const DoFHandlerType &handler = accessor.get_dof_handler();
 
       const FiniteElement<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe
-        = handler.get_fe ()[fe_index];
+        = handler.get_finite_element (fe_index);
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin ();
 
       for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_cell; ++vertex)
@@ -2004,7 +1978,7 @@ namespace internal
       const DoFHandlerType &handler = accessor.get_dof_handler();
 
       const FiniteElement<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &fe
-        = handler.get_fe ()[fe_index];
+        = handler.get_finite_element (fe_index);
       std::vector<types::global_dof_index>::iterator next = dof_indices.begin ();
 
       for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_cell; ++vertex)
@@ -2055,23 +2029,23 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::get_dof_indices
     {
     case 1:
       Assert (dof_indices.size() ==
-              (2*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
-               this->dof_handler->get_fe()[fe_index].dofs_per_line),
+              (2*this->dof_handler->get_finite_element(fe_index).dofs_per_vertex +
+               this->dof_handler->get_finite_element(fe_index).dofs_per_line),
               ExcVectorDoesNotMatch());
       break;
     case 2:
       Assert (dof_indices.size() ==
-              (4*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
-               4*this->dof_handler->get_fe()[fe_index].dofs_per_line +
-               this->dof_handler->get_fe()[fe_index].dofs_per_quad),
+              (4*this->dof_handler->get_finite_element(fe_index).dofs_per_vertex +
+               4*this->dof_handler->get_finite_element(fe_index).dofs_per_line +
+               this->dof_handler->get_finite_element(fe_index).dofs_per_quad),
               ExcVectorDoesNotMatch());
       break;
     case 3:
       Assert (dof_indices.size() ==
-              (8*this->dof_handler->get_fe()[fe_index].dofs_per_vertex +
-               12*this->dof_handler->get_fe()[fe_index].dofs_per_line +
-               6*this->dof_handler->get_fe()[fe_index].dofs_per_quad +
-               this->dof_handler->get_fe()[fe_index].dofs_per_hex),
+              (8*this->dof_handler->get_finite_element(fe_index).dofs_per_vertex +
+               12*this->dof_handler->get_finite_element(fe_index).dofs_per_line +
+               6*this->dof_handler->get_finite_element(fe_index).dofs_per_quad +
+               this->dof_handler->get_finite_element(fe_index).dofs_per_hex),
               ExcVectorDoesNotMatch());
       break;
     default:
@@ -2092,9 +2066,9 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::get_dof_indices
   // non-active thing
   Assert (this->fe_index_is_active (fe_index)
           ||
-          (this->dof_handler->get_fe()[fe_index].dofs_per_cell ==
+          (this->dof_handler->get_finite_element(fe_index).dofs_per_cell ==
            GeometryInfo<structdim>::vertices_per_cell *
-           this->dof_handler->get_fe()[fe_index].dofs_per_vertex),
+           this->dof_handler->get_finite_element(fe_index).dofs_per_vertex),
           ExcInternalError());
 
   // now do the actual work
@@ -2117,8 +2091,8 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::get_mg_dof_indices
     case 1:
     {
       Assert (dof_indices.size () ==
-              2 * this->dof_handler->get_fe ()[fe_index].dofs_per_vertex +
-              this->dof_handler->get_fe ()[fe_index].dofs_per_line,
+              2 * this->dof_handler->get_finite_element (fe_index).dofs_per_vertex +
+              this->dof_handler->get_finite_element (fe_index).dofs_per_line,
               ExcVectorDoesNotMatch ());
       break;
     }
@@ -2126,9 +2100,9 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::get_mg_dof_indices
     case 2:
     {
       Assert (dof_indices.size () ==
-              4 * (this->dof_handler->get_fe ()[fe_index].dofs_per_vertex +
-                   this->dof_handler->get_fe ()[fe_index].dofs_per_line) +
-              this->dof_handler->get_fe ()[fe_index].dofs_per_quad,
+              4 * (this->dof_handler->get_finite_element (fe_index).dofs_per_vertex +
+                   this->dof_handler->get_finite_element (fe_index).dofs_per_line) +
+              this->dof_handler->get_finite_element (fe_index).dofs_per_quad,
               ExcVectorDoesNotMatch ());
       break;
     }
@@ -2136,10 +2110,10 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::get_mg_dof_indices
     case 3:
     {
       Assert (dof_indices.size () ==
-              8 * this->dof_handler->get_fe ()[fe_index].dofs_per_vertex +
-              12 * this->dof_handler->get_fe ()[fe_index].dofs_per_line +
-              6 * this->dof_handler->get_fe ()[fe_index].dofs_per_quad +
-              this->dof_handler->get_fe ()[fe_index].dofs_per_hex,
+              8 * this->dof_handler->get_finite_element (fe_index).dofs_per_vertex +
+              12 * this->dof_handler->get_finite_element (fe_index).dofs_per_line +
+              6 * this->dof_handler->get_finite_element (fe_index).dofs_per_quad +
+              this->dof_handler->get_finite_element (fe_index).dofs_per_hex,
               ExcVectorDoesNotMatch ());
       break;
     }
@@ -2169,8 +2143,8 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_dof_indices
     case 1:
     {
       Assert (dof_indices.size () ==
-              2 * this->dof_handler->get_fe ()[fe_index].dofs_per_vertex +
-              this->dof_handler->get_fe ()[fe_index].dofs_per_line,
+              2 * this->dof_handler->get_finite_element (fe_index).dofs_per_vertex +
+              this->dof_handler->get_finite_element (fe_index).dofs_per_line,
               ExcVectorDoesNotMatch ());
       break;
     }
@@ -2178,9 +2152,9 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_dof_indices
     case 2:
     {
       Assert (dof_indices.size () ==
-              4 * (this->dof_handler->get_fe ()[fe_index].dofs_per_vertex +
-                   this->dof_handler->get_fe ()[fe_index].dofs_per_line) +
-              this->dof_handler->get_fe ()[fe_index].dofs_per_quad,
+              4 * (this->dof_handler->get_finite_element (fe_index).dofs_per_vertex +
+                   this->dof_handler->get_finite_element (fe_index).dofs_per_line) +
+              this->dof_handler->get_finite_element (fe_index).dofs_per_quad,
               ExcVectorDoesNotMatch ());
       break;
     }
@@ -2188,10 +2162,10 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_dof_indices
     case 3:
     {
       Assert (dof_indices.size () ==
-              8 * this->dof_handler->get_fe ()[fe_index].dofs_per_vertex +
-              12 * this->dof_handler->get_fe ()[fe_index].dofs_per_line +
-              6 * this->dof_handler->get_fe ()[fe_index].dofs_per_quad +
-              this->dof_handler->get_fe ()[fe_index].dofs_per_hex,
+              8 * this->dof_handler->get_finite_element (fe_index).dofs_per_vertex +
+              12 * this->dof_handler->get_finite_element (fe_index).dofs_per_line +
+              6 * this->dof_handler->get_finite_element (fe_index).dofs_per_quad +
+              this->dof_handler->get_finite_element (fe_index).dofs_per_hex,
               ExcVectorDoesNotMatch ());
       break;
     }
@@ -2479,7 +2453,7 @@ get_mg_dof_indices (const int,
   (void) fe_index;
   Assert (this->dof_handler != nullptr, ExcInvalidObject ());
   Assert (dof_indices.size () ==
-          this->dof_handler->get_fe ()[fe_index].dofs_per_vertex,
+          this->dof_handler->get_finite_element (fe_index).dofs_per_vertex,
           ExcVectorDoesNotMatch ());
 
   Assert (false, ExcNotImplemented());
@@ -2565,7 +2539,7 @@ DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
 get_fe (const unsigned int fe_index) const
 {
   Assert (this->dof_handler != nullptr, ExcInvalidObject());
-  return dof_handler->get_fe()[fe_index];
+  return dof_handler->get_finite_element(fe_index);
 }
 
 
@@ -2830,7 +2804,7 @@ namespace internal
         // (cell-local) ordering.
         for (unsigned int line=0; line<12; ++line)
           for (unsigned int d=0; d<dofs_per_line; ++d)
-            *next++ = accessor.line(line)->dof_index(accessor.dof_handler->get_fe().
+            *next++ = accessor.line(line)->dof_index(accessor.dof_handler->get_finite_element().
                                                      adjust_line_dof_index_for_line_orientation(d,
                                                          accessor.line_orientation(line)));
         // now copy dof numbers from the face. for
@@ -2848,7 +2822,7 @@ namespace internal
         // face_orientation is non-standard
         for (unsigned int quad=0; quad<6; ++quad)
           for (unsigned int d=0; d<dofs_per_quad; ++d)
-            *next++ = accessor.quad(quad)->dof_index(accessor.dof_handler->get_fe().
+            *next++ = accessor.quad(quad)->dof_index(accessor.dof_handler->get_finite_element().
                                                      adjust_quad_dof_index_for_face_orientation(d,
                                                          accessor.face_orientation(quad),
                                                          accessor.face_flip(quad),
@@ -3016,7 +2990,7 @@ namespace internal
         // (cell-local) ordering.
         for (unsigned int line=0; line<12; ++line)
           for (unsigned int d=0; d<dofs_per_line; ++d, ++index)
-            accessor.line(line)->set_dof_index(accessor.dof_handler->get_fe().
+            accessor.line(line)->set_dof_index(accessor.dof_handler->get_finite_element().
                                                adjust_line_dof_index_for_line_orientation(d,
                                                    accessor.line_orientation(line)),
                                                local_dof_indices[index]);
@@ -3035,7 +3009,7 @@ namespace internal
         // face_orientation is non-standard
         for (unsigned int quad=0; quad<6; ++quad)
           for (unsigned int d=0; d<dofs_per_quad; ++d, ++index)
-            accessor.quad(quad)->set_dof_index(accessor.dof_handler->get_fe().
+            accessor.quad(quad)->set_dof_index(accessor.dof_handler->get_finite_element().
                                                adjust_quad_dof_index_for_face_orientation(d,
                                                    accessor.face_orientation(quad),
                                                    accessor.face_flip(quad),
@@ -3737,7 +3711,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::get_fe () const
           ExcMessage ("In hp::DoFHandler objects, finite elements are only associated "
                       "with active cells. Consequently, you can not ask for the "
                       "active finite element on cells with children."));
-  return dealii::internal::DoFAccessor::get_fe (this->dof_handler->get_fe(), active_fe_index());
+  return this->dof_handler->get_finite_element(active_fe_index());
 }
 
 

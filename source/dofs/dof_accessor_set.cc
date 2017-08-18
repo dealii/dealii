@@ -62,12 +62,12 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
         this->set_dof_values (local_values, values);
       else
         {
-          Assert (local_values.size() == this->dof_handler->get_fe()[fe_index].dofs_per_cell,
+          Assert (local_values.size() == this->dof_handler->get_finite_element(fe_index).dofs_per_cell,
                   ExcMessage ("Incorrect size of local_values vector.") );
 
-          FullMatrix<double> interpolation (this->get_fe().dofs_per_cell, this->dof_handler->get_fe()[fe_index].dofs_per_cell);
+          FullMatrix<double> interpolation (this->get_fe().dofs_per_cell, this->dof_handler->get_finite_element(fe_index).dofs_per_cell);
 
-          this->get_fe().get_interpolation_matrix (this->dof_handler->get_fe()[fe_index],
+          this->get_fe().get_interpolation_matrix (this->dof_handler->get_finite_element(fe_index),
                                                    interpolation);
 
           // do the interpolation to the target space. for historical
@@ -96,7 +96,7 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
                           "of freedom are only distributed on active cells for which "
                           "the active_fe_index has been set."));
 
-      const FiniteElement<dim,spacedim> &fe            = this->get_dof_handler().get_fe()[fe_index];
+      const FiniteElement<dim,spacedim> &fe            = this->get_dof_handler().get_finite_element(fe_index);
       const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
 
       Assert (this->dof_handler != nullptr,

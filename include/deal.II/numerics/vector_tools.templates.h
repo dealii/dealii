@@ -94,20 +94,20 @@ namespace VectorTools
                     const ComponentMask                                       &component_mask)
   {
     typedef typename VectorType::value_type number;
-    Assert (component_mask.represents_n_components(dof.get_fe().n_components()),
+    Assert (component_mask.represents_n_components(dof.get_finite_element(0).n_components()),
             ExcMessage("The number of components in the mask has to be either "
                        "zero or equal to the number of components in the finite "
                        "element.") );
 
     Assert (vec.size() == dof.n_dofs(),
             ExcDimensionMismatch (vec.size(), dof.n_dofs()));
-    Assert (dof.get_fe().n_components() == function.n_components,
-            ExcDimensionMismatch(dof.get_fe().n_components(),
+    Assert (dof.get_finite_element(0).n_components() == function.n_components,
+            ExcDimensionMismatch(dof.get_finite_element(0).n_components(),
                                  function.n_components));
-    Assert (component_mask.n_selected_components(dof.get_fe().n_components()) > 0,
+    Assert (component_mask.n_selected_components(dof.get_finite_element(0).n_components()) > 0,
             ComponentMask::ExcNoComponentSelected());
 
-    const hp::FECollection<dim,spacedim> fe (dof.get_fe());
+    const hp::FECollection<dim,spacedim> fe (dof.get_fe_collection());
     const unsigned int          n_components = fe.n_components();
     const bool                  fe_is_system = (n_components != 1);
 
@@ -320,11 +320,11 @@ namespace VectorTools
                OutVector                      &data_2)
   {
     typedef typename OutVector::value_type number;
-    Vector<number> cell_data_1(dof_1.get_fe().dofs_per_cell);
-    Vector<number> cell_data_2(dof_2.get_fe().dofs_per_cell);
+    Vector<number> cell_data_1(dof_1.get_finite_element().dofs_per_cell);
+    Vector<number> cell_data_2(dof_2.get_finite_element().dofs_per_cell);
 
     std::vector<short unsigned int> touch_count (dof_2.n_dofs(), 0); //TODO: check on datatype... kinda strange (UK)
-    std::vector<types::global_dof_index>       local_dof_indices (dof_2.get_fe().dofs_per_cell);
+    std::vector<types::global_dof_index>       local_dof_indices (dof_2.get_finite_element().dofs_per_cell);
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator h = dof_1.begin_active();
     typename DoFHandler<dim,spacedim>::active_cell_iterator l = dof_2.begin_active();
@@ -338,7 +338,7 @@ namespace VectorTools
         l->get_dof_indices (local_dof_indices);
 
         // distribute cell vector
-        for (unsigned int j=0; j<dof_2.get_fe().dofs_per_cell; ++j)
+        for (unsigned int j=0; j<dof_2.get_finite_element().dofs_per_cell; ++j)
           {
             ::dealii::internal::ElementAccess<OutVector>::add(cell_data_2(j),
                                                               local_dof_indices[j], data_2);
@@ -381,7 +381,7 @@ namespace VectorTools
   {
     typedef typename VectorType::value_type number;
 
-    Assert( component_mask.represents_n_components(dof.get_fe().n_components()),
+    Assert( component_mask.represents_n_components(dof.get_finite_element(0).n_components()),
             ExcMessage("The number of components in the mask has to be either "
                        "zero or equal to the number of components in the finite "
                        "element.") );
@@ -399,12 +399,12 @@ namespace VectorTools
          iter != function_map.end();
          ++iter )
       {
-        Assert( dof.get_fe().n_components() == iter->second->n_components,
-                ExcDimensionMismatch(dof.get_fe().n_components(), iter->second->n_components) );
+        Assert( dof.get_finite_element(0).n_components() == iter->second->n_components,
+                ExcDimensionMismatch(dof.get_finite_element(0).n_components(), iter->second->n_components) );
       }
 
     const hp::FECollection<dim, spacedim>
-    fe(dof.get_fe());
+    fe(dof.get_fe_collection());
     const unsigned int n_components =  fe.n_components();
     const bool         fe_is_system = (n_components != 1);
 
@@ -840,8 +840,8 @@ namespace VectorTools
                      const bool                          project_to_boundary_first)
     {
       typedef typename VectorType::value_type number;
-      Assert (dof.get_fe().n_components() == function.n_components,
-              ExcDimensionMismatch(dof.get_fe().n_components(),
+      Assert (dof.get_finite_element(0).n_components() == function.n_components,
+              ExcDimensionMismatch(dof.get_finite_element(0).n_components(),
                                    function.n_components));
       Assert (vec_result.size() == dof.n_dofs(),
               ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
@@ -930,14 +930,14 @@ namespace VectorTools
       (void) project_to_boundary_first;
       (void) q_boundary;
 
-      Assert (dof.get_fe().n_components() == function.n_components,
-              ExcDimensionMismatch(dof.get_fe().n_components(),
+      Assert (dof.get_finite_element(0).n_components() == function.n_components,
+              ExcDimensionMismatch(dof.get_finite_element(0).n_components(),
                                    function.n_components));
       Assert (fe_degree == -1 ||
-              dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
-              ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
-      Assert (dof.get_fe().n_components() == components,
-              ExcDimensionMismatch(components, dof.get_fe().n_components()));
+              dof.get_finite_element().degree == static_cast<unsigned int>(fe_degree),
+              ExcDimensionMismatch(fe_degree, dof.get_finite_element().degree));
+      Assert (dof.get_finite_element(0).n_components() == components,
+              ExcDimensionMismatch(components, dof.get_finite_element(0).n_components()));
 
       // set up mass matrix and right hand side
       typename MatrixFree<dim,Number>::AdditionalData additional_data;
@@ -947,7 +947,7 @@ namespace VectorTools
       std::shared_ptr<MatrixFree<dim, Number> > matrix_free(
         new MatrixFree<dim, Number> ());
       matrix_free->reinit (mapping, dof, constraints,
-                           QGauss<1>(dof.get_fe().degree+2), additional_data);
+                           QGauss<1>(dof.get_finite_element().degree+2), additional_data);
       typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, components, LinearAlgebra::distributed::Vector<Number> > MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
@@ -998,7 +998,7 @@ namespace VectorTools
      const Quadrature<dim-1>                    &q_boundary,
      const bool                                  project_to_boundary_first)
     {
-      switch (dof.get_fe().degree)
+      switch (dof.get_finite_element().degree)
         {
         case 1:
           project_matrix_free<components, 1>
@@ -1041,7 +1041,7 @@ namespace VectorTools
      const Quadrature<dim-1>                    &q_boundary,
      const bool                                  project_to_boundary_first)
     {
-      switch (dof.get_fe().n_components())
+      switch (dof.get_finite_element(0).n_components())
         {
         case 1:
           project_matrix_free_degree<1>
@@ -1127,14 +1127,14 @@ namespace VectorTools
                   const bool                    project_to_boundary_first)
     {
       // If we can, use the matrix-free implementation
-      bool use_matrix_free = MatrixFree<dim, typename VectorType::value_type>::is_supported(dof.get_fe());
+      bool use_matrix_free = MatrixFree<dim, typename VectorType::value_type>::is_supported(dof.get_finite_element());
 
       // enforce_zero_boundary and project_to_boundary_first
       // are not yet supported.
       // We have explicit instantiations only if
       // the number of components is not too high.
       if (enforce_zero_boundary || project_to_boundary_first
-          || dof.get_fe().n_components()>4)
+          || dof.get_finite_element(0).n_components()>4)
         use_matrix_free = false;
 
       if (use_matrix_free)
@@ -1164,14 +1164,14 @@ namespace VectorTools
                            VectorType                     &vec_result)
     {
       typedef typename VectorType::value_type Number;
-      Assert (dof.get_fe().n_components() == 1,
-              ExcDimensionMismatch(dof.get_fe().n_components(),
+      Assert (dof.get_finite_element(0).n_components() == 1,
+              ExcDimensionMismatch(dof.get_finite_element(0).n_components(),
                                    1));
       Assert (vec_result.size() == dof.n_dofs(),
               ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
       Assert (fe_degree == -1 ||
-              dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
-              ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
+              dof.get_finite_element().degree == static_cast<unsigned int>(fe_degree),
+              ExcDimensionMismatch(fe_degree, dof.get_finite_element().degree));
 
       // set up mass matrix and right hand side
       typename MatrixFree<dim,Number>::AdditionalData additional_data;
@@ -1181,7 +1181,7 @@ namespace VectorTools
       std::shared_ptr<MatrixFree<dim, Number> > matrix_free(
         new MatrixFree<dim, Number>());
       matrix_free->reinit (mapping, dof, constraints,
-                           QGauss<1>(dof.get_fe().degree+2), additional_data);
+                           QGauss<1>(dof.get_finite_element().degree+2), additional_data);
       typedef MatrixFreeOperators::MassOperator<dim, fe_degree, fe_degree+2, 1, LinearAlgebra::distributed::Vector<Number> > MatrixType;
       MatrixType mass_matrix;
       mass_matrix.initialize(matrix_free);
@@ -1197,10 +1197,10 @@ namespace VectorTools
 
       // assemble right hand side:
       {
-        FEValues<dim> fe_values (mapping, dof.get_fe(), quadrature,
+        FEValues<dim> fe_values (mapping, dof.get_finite_element(), quadrature,
                                  update_values | update_JxW_values);
 
-        const unsigned int   dofs_per_cell = dof.get_fe().dofs_per_cell;
+        const unsigned int   dofs_per_cell = dof.get_finite_element().dofs_per_cell;
         const unsigned int   n_q_points    = quadrature.size();
         Vector<Number>       cell_rhs (dofs_per_cell);
         std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
@@ -1264,14 +1264,14 @@ namespace VectorTools
       const DoFHandler<dim,spacedim> &dof = matrix_free->get_dof_handler();
 
       typedef typename VectorType::value_type Number;
-      Assert (dof.get_fe().n_components() == 1,
-              ExcDimensionMismatch(dof.get_fe().n_components(),
+      Assert (dof.get_finite_element(0).n_components() == 1,
+              ExcDimensionMismatch(dof.get_finite_element(0).n_components(),
                                    1));
       Assert (vec_result.size() == dof.n_dofs(),
               ExcDimensionMismatch (vec_result.size(), dof.n_dofs()));
       Assert (fe_degree == -1 ||
-              dof.get_fe().degree == static_cast<unsigned int>(fe_degree),
-              ExcDimensionMismatch(fe_degree, dof.get_fe().degree));
+              dof.get_finite_element().degree == static_cast<unsigned int>(fe_degree),
+              ExcDimensionMismatch(fe_degree, dof.get_finite_element().degree));
 
       typedef MatrixFreeOperators::MassOperator<dim, fe_degree, n_q_points_1d, 1, LinearAlgebra::distributed::Vector<Number> > MatrixType;
       MatrixType mass_matrix;
@@ -1339,7 +1339,7 @@ namespace VectorTools
                 const std::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
                 VectorType                     &vec_result)
   {
-    switch (dof.get_fe().degree)
+    switch (dof.get_finite_element().degree)
       {
       case 1:
         project_parallel<dim,VectorType,spacedim,1> (mapping,dof,constraints,quadrature,func,vec_result);
@@ -1365,7 +1365,7 @@ namespace VectorTools
                 VectorType &vec_result)
   {
     (void) n_q_points_1d;
-    const unsigned int fe_degree = matrix_free->get_dof_handler().get_fe().degree;
+    const unsigned int fe_degree = matrix_free->get_dof_handler().get_finite_element().degree;
 
     Assert (fe_degree+1 == n_q_points_1d,
             ExcNotImplemented());
@@ -1396,7 +1396,7 @@ namespace VectorTools
   {
     project (matrix_free,
              constraints,
-             matrix_free->get_dof_handler().get_fe().degree+1,
+             matrix_free->get_dof_handler().get_finite_element().degree+1,
              func,
              vec_result);
   }
@@ -1503,7 +1503,7 @@ namespace VectorTools
   {
     typedef typename VectorType::value_type Number;
 
-    const FiniteElement<dim,spacedim> &fe  = dof_handler.get_fe();
+    const FiniteElement<dim,spacedim> &fe  = dof_handler.get_finite_element();
     Assert (fe.n_components() == rhs_function.n_components,
             ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
     Assert (rhs_vector.size() == dof_handler.n_dofs(),
@@ -1629,7 +1629,7 @@ namespace VectorTools
   {
     typedef typename VectorType::value_type Number;
 
-    const hp::FECollection<dim,spacedim> &fe  = dof_handler.get_fe();
+    const hp::FECollection<dim,spacedim> &fe  = dof_handler.get_fe_collection();
     Assert (fe.n_components() == rhs_function.n_components,
             ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
     Assert (rhs_vector.size() == dof_handler.n_dofs(),
@@ -1769,7 +1769,7 @@ namespace VectorTools
   {
     Assert (rhs_vector.size() == dof_handler.n_dofs(),
             ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert (dof_handler.get_fe().n_components() == 1,
+    Assert (dof_handler.get_finite_element(0).n_components() == 1,
             ExcMessage ("This function only works for scalar finite elements"));
 
     rhs_vector = 0;
@@ -1780,11 +1780,11 @@ namespace VectorTools
 
     Quadrature<dim> q(GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
 
-    FEValues<dim,spacedim> fe_values(mapping, dof_handler.get_fe(),
+    FEValues<dim,spacedim> fe_values(mapping, dof_handler.get_finite_element(),
                                      q, UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_finite_element().dofs_per_cell;
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     cell_point.first->get_dof_indices (local_dof_indices);
@@ -1813,7 +1813,7 @@ namespace VectorTools
   {
     Assert (rhs_vector.size() == dof_handler.n_dofs(),
             ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert (dof_handler.get_fe().n_components() == 1,
+    Assert (dof_handler.get_finite_element(0).n_components() == 1,
             ExcMessage ("This function only works for scalar finite elements"));
 
     rhs_vector = 0;
@@ -1861,7 +1861,7 @@ namespace VectorTools
   {
     Assert (rhs_vector.size() == dof_handler.n_dofs(),
             ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert (dof_handler.get_fe().n_components() == dim,
+    Assert (dof_handler.get_finite_element(0).n_components() == dim,
             ExcMessage ("This function only works for vector-valued finite elements."));
 
     rhs_vector = 0;
@@ -1873,11 +1873,11 @@ namespace VectorTools
     const Quadrature<dim> q(GeometryInfo<dim>::project_to_unit_cell(cell_point.second));
 
     const FEValuesExtractors::Vector vec (0);
-    FEValues<dim,spacedim> fe_values(mapping, dof_handler.get_fe(),
+    FEValues<dim,spacedim> fe_values(mapping, dof_handler.get_finite_element(),
                                      q, UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_finite_element().dofs_per_cell;
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     cell_point.first->get_dof_indices (local_dof_indices);
@@ -1908,7 +1908,7 @@ namespace VectorTools
   {
     Assert (rhs_vector.size() == dof_handler.n_dofs(),
             ExcDimensionMismatch(rhs_vector.size(), dof_handler.n_dofs()));
-    Assert (dof_handler.get_fe().n_components() == dim,
+    Assert (dof_handler.get_finite_element(0).n_components() == dim,
             ExcMessage ("This function only works for vector-valued finite elements."));
 
     rhs_vector = 0;
@@ -1957,7 +1957,7 @@ namespace VectorTools
                                    VectorType                         &rhs_vector,
                                    const std::set<types::boundary_id> &boundary_ids)
   {
-    const FiniteElement<dim> &fe  = dof_handler.get_fe();
+    const FiniteElement<dim> &fe  = dof_handler.get_finite_element();
     Assert (fe.n_components() == rhs_function.n_components,
             ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
     Assert (rhs_vector.size() == dof_handler.n_dofs(),
@@ -2096,7 +2096,7 @@ namespace VectorTools
                                    VectorType                                &rhs_vector,
                                    const std::set<types::boundary_id>        &boundary_ids)
   {
-    const hp::FECollection<dim> &fe  = dof_handler.get_fe();
+    const hp::FECollection<dim> &fe  = dof_handler.get_fe_collection();
     Assert (fe.n_components() == rhs_function.n_components,
             ExcDimensionMismatch(fe.n_components(), rhs_function.n_components));
     Assert (rhs_vector.size() == dof_handler.n_dofs(),
@@ -2254,7 +2254,7 @@ namespace VectorTools
      std::map<types::global_dof_index,number>                             &boundary_values,
      const ComponentMask                                                  &component_mask)
     {
-      Assert (component_mask.represents_n_components(dof.get_fe().n_components()),
+      Assert (component_mask.represents_n_components(dof.get_finite_element(0).n_components()),
               ExcMessage ("The number of components in the mask has to be either "
                           "zero or equal to the number of components in the finite "
                           "element."));
@@ -2349,7 +2349,7 @@ namespace VectorTools
           // before we start with the loop over all cells create an hp::FEValues
           // object that holds the interpolation points of all finite elements
           // that may ever be in use
-          dealii::hp::FECollection<dim,spacedim> finite_elements (dof.get_fe());
+          dealii::hp::FECollection<dim,spacedim> finite_elements (dof.get_fe_collection());
           dealii::hp::QCollection<dim-1>  q_collection;
           for (unsigned int f=0; f<finite_elements.size(); ++f)
             {
@@ -2819,16 +2819,16 @@ namespace VectorTools
 
       if (component_mapping.size() == 0)
         {
-          AssertDimension (dof.get_fe().n_components(), boundary_functions.begin()->second->n_components);
+          AssertDimension (dof.get_finite_element(0).n_components(), boundary_functions.begin()->second->n_components);
           // I still do not see why i
           // should create another copy
           // here
-          component_mapping.resize(dof.get_fe().n_components());
+          component_mapping.resize(dof.get_finite_element(0).n_components());
           for (unsigned int i= 0 ; i < component_mapping.size() ; ++i)
             component_mapping[i] = i;
         }
       else
-        AssertDimension (dof.get_fe().n_components(), component_mapping.size());
+        AssertDimension (dof.get_finite_element(0).n_components(), component_mapping.size());
 
       std::vector<types::global_dof_index> dof_to_boundary_mapping;
       std::set<types::boundary_id> selected_boundary_components;
@@ -4109,10 +4109,10 @@ namespace VectorTools
     // ones. Thus we have to solve two linear systems of equations of size
     // <tt>degree * (degree + 1)<tt> to obtain the values for the
     // corresponding degrees of freedom.
-    const unsigned int superdegree = dof_handler.get_fe ().degree;
+    const unsigned int superdegree = dof_handler.get_finite_element ().degree;
     const QGauss<dim - 1> reference_face_quadrature (2 * superdegree);
-    const unsigned int dofs_per_face = dof_handler.get_fe ().dofs_per_face;
-    hp::FECollection<dim> fe_collection (dof_handler.get_fe ());
+    const unsigned int dofs_per_face = dof_handler.get_finite_element ().dofs_per_face;
+    hp::FECollection<dim> fe_collection (dof_handler.get_fe_collection ());
     hp::MappingCollection<dim> mapping_collection (mapping);
     hp::QCollection<dim> face_quadrature_collection;
 
@@ -4314,7 +4314,7 @@ namespace VectorTools
    ConstraintMatrix                 &constraints,
    const hp::MappingCollection<dim> &mapping_collection)
   {
-    hp::FECollection<dim> fe_collection (dof_handler.get_fe ());
+    hp::FECollection<dim> fe_collection (dof_handler.get_fe_collection ());
     hp::QCollection<dim> face_quadrature_collection;
 
     for (unsigned int i = 0; i < fe_collection.size (); ++i)
@@ -5138,7 +5138,7 @@ namespace VectorTools
 
       // Create hp FEcollection, dof_handler can be either hp or standard type.
       // From here on we can treat it like a hp-namespace object.
-      const hp::FECollection<dim> fe_collection (dof_handler.get_fe ());
+      const hp::FECollection<dim> fe_collection (dof_handler.get_fe_collection ());
 
       // Create face quadrature collection
       hp::QCollection<dim - 1> face_quadrature_collection;
@@ -5603,7 +5603,7 @@ namespace VectorTools
     // normal components of the shape
     // functions supported on the
     // boundary.
-    const FiniteElement<dim> &fe = dof_handler.get_fe ();
+    const FiniteElement<dim> &fe = dof_handler.get_finite_element ();
     QGauss<dim - 1> face_quadrature (fe.degree + 1);
     FEFaceValues<dim> fe_face_values (mapping, fe, face_quadrature, update_JxW_values |
                                       update_normal_vectors |
@@ -5759,7 +5759,7 @@ namespace VectorTools
    const hp::MappingCollection<dim, dim> &mapping_collection)
   {
     const unsigned int spacedim = dim;
-    const hp::FECollection<dim> &fe_collection = dof_handler.get_fe ();
+    const hp::FECollection<dim> &fe_collection = dof_handler.get_fe_collection ();
     hp::QCollection<dim - 1> face_quadrature_collection;
     hp::QCollection<dim> quadrature_collection;
 
@@ -5928,7 +5928,7 @@ namespace VectorTools
 
     // create FE and mapping collections for all elements in use by this
     // DoFHandler
-    hp::FECollection<dim,spacedim>      fe_collection (dof_handler.get_fe());
+    hp::FECollection<dim,spacedim>      fe_collection (dof_handler.get_fe_collection());
     hp::MappingCollection<dim,spacedim> mapping_collection;
     for (unsigned int i=0; i<fe_collection.size(); ++i)
       mapping_collection.push_back (mapping);
@@ -6514,7 +6514,7 @@ namespace VectorTools
                                              no_normal_flux_constraints,
                                              mapping);
 
-    hp::FECollection<dim,spacedim>      fe_collection (dof_handler.get_fe());
+    hp::FECollection<dim,spacedim>      fe_collection (dof_handler.get_fe_collection());
     hp::MappingCollection<dim,spacedim> mapping_collection;
     for (unsigned int i=0; i<fe_collection.size(); ++i)
       mapping_collection.push_back (mapping);
@@ -7079,7 +7079,7 @@ namespace VectorTools
       // on, if necessary, so have a read-write version of it:
       double exponent = exponent_1;
 
-      const unsigned int        n_components = dof.get_fe().n_components();
+      const unsigned int        n_components = dof.get_finite_element(0).n_components();
 
       if (weight!=nullptr)
         {
@@ -7133,7 +7133,7 @@ namespace VectorTools
           break;
         }
 
-      dealii::hp::FECollection<dim,spacedim> fe_collection (dof.get_fe());
+      dealii::hp::FECollection<dim,spacedim> fe_collection (dof.get_fe_collection());
       IDScratchData<dim,spacedim, Number> data(mapping, fe_collection, q, update_flags);
 
       // loop over all cells
@@ -7367,7 +7367,7 @@ namespace VectorTools
                     const Point<spacedim>                                     &point)
   {
     typedef typename VectorType::value_type Number;
-    const FiniteElement<dim> &fe = dof.get_fe();
+    const FiniteElement<dim> &fe = dof.get_finite_element();
 
     Assert(difference.size() == fe.n_components(),
            ExcDimensionMismatch(difference.size(), fe.n_components()));
@@ -7469,7 +7469,7 @@ namespace VectorTools
                Vector<typename VectorType::value_type> &value)
   {
     typedef typename VectorType::value_type Number;
-    const FiniteElement<dim> &fe = dof.get_fe();
+    const FiniteElement<dim> &fe = dof.get_finite_element();
 
     Assert(value.size() == fe.n_components(),
            ExcDimensionMismatch(value.size(), fe.n_components()));
@@ -7510,7 +7510,7 @@ namespace VectorTools
                Vector<typename VectorType::value_type>    &value)
   {
     typedef typename VectorType::value_type Number;
-    const hp::FECollection<dim, spacedim> &fe = dof.get_fe();
+    const hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
 
     Assert(value.size() == fe.n_components(),
            ExcDimensionMismatch(value.size(), fe.n_components()));
@@ -7551,7 +7551,7 @@ namespace VectorTools
                const VectorType               &fe_function,
                const Point<spacedim>          &point)
   {
-    Assert(dof.get_fe().n_components() == 1,
+    Assert(dof.get_finite_element(0).n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
     Vector<typename VectorType::value_type> value(1);
@@ -7568,7 +7568,7 @@ namespace VectorTools
                const VectorType                           &fe_function,
                const Point<spacedim>                      &point)
   {
-    Assert(dof.get_fe().n_components() == 1,
+    Assert(dof.get_finite_element(0).n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
     Vector<typename VectorType::value_type> value(1);
@@ -7644,7 +7644,7 @@ namespace VectorTools
                   const Point<spacedim>          &point,
                   std::vector<Tensor<1, spacedim, typename VectorType::value_type> > &gradient)
   {
-    const FiniteElement<dim> &fe = dof.get_fe();
+    const FiniteElement<dim> &fe = dof.get_finite_element();
 
     Assert(gradient.size() == fe.n_components(),
            ExcDimensionMismatch(gradient.size(), fe.n_components()));
@@ -7687,7 +7687,7 @@ namespace VectorTools
                   std::vector<Tensor<1, spacedim, typename VectorType::value_type> > &gradient)
   {
     typedef typename VectorType::value_type Number;
-    const hp::FECollection<dim, spacedim> &fe = dof.get_fe();
+    const hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
 
     Assert(gradient.size() == fe.n_components(),
            ExcDimensionMismatch(gradient.size(), fe.n_components()));
@@ -7727,7 +7727,7 @@ namespace VectorTools
                   const VectorType               &fe_function,
                   const Point<spacedim>          &point)
   {
-    Assert(dof.get_fe().n_components() == 1,
+    Assert(dof.get_finite_element(0).n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
     std::vector<Tensor<1, dim, typename VectorType::value_type> > gradient(1);
@@ -7745,7 +7745,7 @@ namespace VectorTools
                   const VectorType                           &fe_function,
                   const Point<spacedim>                      &point)
   {
-    Assert(dof.get_fe().n_components() == 1,
+    Assert(dof.get_finite_element(0).n_components() == 1,
            ExcMessage ("Finite element is not scalar as is necessary for this function"));
 
     std::vector<Tensor<1, dim, typename VectorType::value_type> > gradient(1);
@@ -7850,16 +7850,16 @@ namespace VectorTools
     typedef typename VectorType::value_type Number;
     Assert (v.size() == dof.n_dofs(),
             ExcDimensionMismatch (v.size(), dof.n_dofs()));
-    Assert (component < dof.get_fe().n_components(),
-            ExcIndexRange(component, 0, dof.get_fe().n_components()));
+    Assert (component < dof.get_finite_element(0).n_components(),
+            ExcIndexRange(component, 0, dof.get_finite_element(0).n_components()));
 
-    FEValues<dim,spacedim> fe(mapping, dof.get_fe(), quadrature,
+    FEValues<dim,spacedim> fe(mapping, dof.get_finite_element(), quadrature,
                               UpdateFlags(update_JxW_values
                                           | update_values));
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell;
     std::vector<Vector<Number> > values(quadrature.size(),
-                                        Vector<Number> (dof.get_fe().n_components()));
+                                        Vector<Number> (dof.get_finite_element(0).n_components()));
 
     Number mean = Number();
     double area = 0.;
@@ -7926,7 +7926,7 @@ namespace VectorTools
                            const ComponentMask                &mask)
   {
     AssertDimension(vector.size(), dh.n_dofs());
-    const FiniteElement<dim, spacedim> &fe = dh.get_fe();
+    const FiniteElement<dim, spacedim> &fe = dh.get_finite_element();
 
     // Construct default fe_mask;
     const ComponentMask fe_mask(mask.size() ? mask :

@@ -219,7 +219,7 @@ namespace Step14
       // ...then have some objects of which the meaning will become clear
       // below...
       QTrapez<dim>  vertex_quadrature;
-      FEValues<dim> fe_values (dof_handler.get_fe(),
+      FEValues<dim> fe_values (dof_handler.get_finite_element(),
                                vertex_quadrature,
                                update_gradients | update_quadrature_points);
       std::vector<Tensor<1,dim> >
@@ -1654,12 +1654,12 @@ namespace Step14
       // have abbreviations for the number of quadrature points and shape
       // functions...
       QGauss<dim> quadrature(4);
-      FEValues<dim>  fe_values (dof_handler.get_fe(), quadrature,
+      FEValues<dim>  fe_values (dof_handler.get_finite_element(), quadrature,
                                 update_gradients |
                                 update_quadrature_points  |
                                 update_JxW_values);
       const unsigned int n_q_points = fe_values.n_quadrature_points;
-      const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell = dof_handler.get_finite_element().dofs_per_cell;
 
       // ...and have two objects that are used to store the global indices of
       // the degrees of freedom on a cell, and the values of the gradients of

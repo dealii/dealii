@@ -125,10 +125,10 @@ namespace DoFTools
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
     Assert (sparsity.n_cols() == n_dofs,
             ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
-    Assert (couplings.n_rows() == dof.get_fe().n_components(),
-            ExcDimensionMismatch(couplings.n_rows(), dof.get_fe().n_components()));
-    Assert (couplings.n_cols() == dof.get_fe().n_components(),
-            ExcDimensionMismatch(couplings.n_cols(), dof.get_fe().n_components()));
+    Assert (couplings.n_rows() == dof.get_finite_element(0).n_components(),
+            ExcDimensionMismatch(couplings.n_rows(), dof.get_finite_element(0).n_components()));
+    Assert (couplings.n_cols() == dof.get_finite_element(0).n_components(),
+            ExcDimensionMismatch(couplings.n_cols(), dof.get_finite_element(0).n_components()));
 
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
@@ -143,7 +143,7 @@ namespace DoFTools
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
 
-    const hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> fe_collection (dof.get_fe());
+    const hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> fe_collection (dof.get_fe_collection());
 
     const std::vector<Table<2,Coupling> > dof_mask //(fe_collection.size())
       = dof_couplings_from_component_couplings (fe_collection,
@@ -697,7 +697,7 @@ namespace DoFTools
                                   const types::subdomain_id  subdomain_id)
       {
         const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
-        &fe = dof.get_fe();
+        &fe = dof.get_finite_element();
 
         std::vector<types::global_dof_index> dofs_on_this_cell (fe.dofs_per_cell);
         std::vector<types::global_dof_index> dofs_on_other_cell (fe.dofs_per_cell);
@@ -978,7 +978,7 @@ namespace DoFTools
         // consequently, the implementation here is simpler and probably
         // less efficient but at least readable...
 
-        const dealii::hp::FECollection<dim,spacedim> &fe = dof.get_fe();
+        const dealii::hp::FECollection<dim,spacedim> &fe = dof.get_fe_collection();
 
         std::vector<types::global_dof_index> dofs_on_this_cell(DoFTools::max_dofs_per_cell(dof));
         std::vector<types::global_dof_index> dofs_on_other_cell(DoFTools::max_dofs_per_cell(dof));
@@ -1225,7 +1225,7 @@ namespace DoFTools
     // specialized functions in the internal namespace
     const types::global_dof_index n_dofs = dof.n_dofs();
     (void)n_dofs;
-    const unsigned int n_comp = dof.get_fe().n_components();
+    const unsigned int n_comp = dof.get_finite_element(0).n_components();
     (void)n_comp;
 
     Assert (sparsity.n_rows() == n_dofs,

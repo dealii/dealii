@@ -29,6 +29,7 @@
 #include <deal.II/dofs/dof_faces.h>
 #include <deal.II/dofs/dof_levels.h>
 #include <deal.II/dofs/function_map.h>
+#include <deal.II/hp/fe_collection.h>
 
 #include <boost/serialization/split_member.hpp>
 
@@ -828,8 +829,24 @@ public:
 
   /**
    * Return a constant reference to the selected finite element object.
+   *
+   * @deprecated Use get_finite_element() instead.
    */
-  const FiniteElement<dim,spacedim> &get_fe () const;
+  const FiniteElement<dim,spacedim> &get_fe () const DEAL_II_DEPRECATED;
+
+  /**
+   * Return a constant reference to the selected finite element object.
+   */
+  const FiniteElement<dim,spacedim> &
+  get_finite_element (const unsigned int number=0) const;
+
+  /**
+    * Return a constant reference to the set of finite element objects that
+    * are used by this @p DoFHandler. Since this object only contains one
+    * FiniteElement, only this one object is returned wrapped in a
+    * hp::FECollection.
+    */
+  hp::FECollection<dim,spacedim> get_fe_collection () const;
 
   /**
    * Return a constant reference to the triangulation underlying this object.
@@ -1218,6 +1235,31 @@ DoFHandler<dim,spacedim>::get_fe () const
   Assert(selected_fe!=nullptr,
          ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
   return *selected_fe;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const FiniteElement<dim,spacedim> &
+DoFHandler<dim,spacedim>::get_finite_element
+(const unsigned int) const
+{
+  Assert(selected_fe!=nullptr,
+         ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
+  return *selected_fe;
+}
+
+
+
+template <int dim, int spacedim>
+inline
+hp::FECollection<dim,spacedim>
+DoFHandler<dim,spacedim>::get_fe_collection () const
+{
+  Assert(selected_fe!=nullptr,
+         ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
+  return hp::FECollection<dim,spacedim>(*selected_fe);
 }
 
 

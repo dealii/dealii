@@ -100,7 +100,7 @@ namespace
     const unsigned int selected_block,
     std::vector<std::vector<types::global_dof_index> > &ndofs)
   {
-    const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+    const unsigned int n_blocks = mg_dof.get_finite_element().n_blocks();
     Assert(selected_block < n_blocks, ExcIndexRange(selected_block, 0, n_blocks));
 
     std::vector<bool> selected(n_blocks, false);
@@ -198,7 +198,7 @@ void MGTransferBlockBase::build_matrices (
   const DoFHandler<dim,spacedim> &,
   const DoFHandler<dim,spacedim> &mg_dof)
 {
-  const FiniteElement<dim> &fe = mg_dof.get_fe();
+  const FiniteElement<dim> &fe = mg_dof.get_finite_element();
   const unsigned int n_blocks  = fe.n_blocks();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_levels      = mg_dof.get_triangulation().n_levels();
@@ -336,7 +336,7 @@ void MGTransferBlockBase::build_matrices (
                 // prolongation matrix for
                 // this child
                 const FullMatrix<double> &prolongation
-                  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
+                  = mg_dof.get_finite_element().get_prolongation_matrix (child, cell->refinement_case());
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
@@ -375,7 +375,7 @@ void MGTransferBlockBase::build_matrices (
                 // prolongation matrix for
                 // this child
                 const FullMatrix<double> &prolongation
-                  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
+                  = mg_dof.get_finite_element().get_prolongation_matrix (child, cell->refinement_case());
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
@@ -454,8 +454,8 @@ void MGTransferBlockSelect<number>::build_matrices (
   const DoFHandler<dim,spacedim> &mg_dof,
   unsigned int select)
 {
-  const FiniteElement<dim> &fe = mg_dof.get_fe();
-  unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+  const FiniteElement<dim> &fe = mg_dof.get_finite_element();
+  unsigned int n_blocks = mg_dof.get_finite_element().n_blocks();
 
   selected_block = select;
   selected.resize(n_blocks, false);
@@ -538,8 +538,8 @@ void MGTransferBlock<number>::build_matrices (
   const DoFHandler<dim,spacedim> &mg_dof,
   const std::vector<bool> &sel)
 {
-  const FiniteElement<dim> &fe = mg_dof.get_fe();
-  unsigned int n_blocks = mg_dof.get_fe().n_blocks();
+  const FiniteElement<dim> &fe = mg_dof.get_finite_element();
+  unsigned int n_blocks = mg_dof.get_finite_element().n_blocks();
 
   if (sel.size() != 0)
     {

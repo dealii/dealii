@@ -47,7 +47,7 @@ MappingQEulerianGeneric (const unsigned int                                 degr
   MappingQGeneric<dim,spacedim>(degree),
   mapping_q_eulerian (mapping_q_eulerian),
   support_quadrature(degree),
-  fe_values(mapping_q_eulerian.euler_dof_handler->get_fe(),
+  fe_values(mapping_q_eulerian.euler_dof_handler->get_finite_element(),
             support_quadrature,
             update_values | update_quadrature_points)
 {}
@@ -197,7 +197,7 @@ compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell
   // or create a separate dof handler for the displacements.
 
   const unsigned int n_support_pts = support_quadrature.size();
-  const unsigned int n_components  = mapping_q_eulerian.euler_dof_handler->get_fe().n_components();
+  const unsigned int n_components  = mapping_q_eulerian.euler_dof_handler->get_finite_element(0).n_components();
 
   Assert (n_components >= spacedim, ExcDimensionMismatch(n_components, spacedim) );
 

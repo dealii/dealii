@@ -1314,7 +1314,7 @@ namespace Step43
     FEFaceValues<dim> saturation_fe_face_values_neighbor (saturation_fe, face_quadrature_formula,
                                                           update_values);
 
-    const unsigned int dofs_per_cell = saturation_dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = saturation_dof_handler.get_finite_element().dofs_per_cell;
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     const double                   global_max_u_F_prime = get_max_u_F_prime ();

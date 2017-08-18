@@ -1131,7 +1131,7 @@ namespace hp
 
     std::set<types::global_dof_index> boundary_dofs;
     std::vector<types::global_dof_index> dofs_on_face;
-    dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
+    dofs_on_face.reserve (this->get_fe_collection().max_dofs_per_face());
 
     // loop over all faces to check whether they are at a
     // boundary. note that we need not take special care of single
@@ -1169,7 +1169,7 @@ namespace hp
     // indicators
     std::set<types::global_dof_index> boundary_dofs;
     std::vector<types::global_dof_index> dofs_on_face;
-    dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
+    dofs_on_face.reserve (this->get_fe_collection().max_dofs_per_face());
 
     typename HpDoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
                                                               endc = this->end();

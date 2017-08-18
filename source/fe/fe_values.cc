@@ -4287,7 +4287,7 @@ FEFaceValues<dim,spacedim>::reinit
   // this cell, are the same
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
           static_cast<const FiniteElementData<dim>&>(
-            cell->get_dof_handler().get_fe()[cell->active_fe_index ()]),
+            cell->get_dof_handler().get_finite_element(cell->active_fe_index ())),
           (typename FEValuesBase<dim,spacedim>::ExcFEDontMatch()));
 
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
@@ -4454,7 +4454,7 @@ void FESubfaceValues<dim,spacedim>::reinit
   // this cell, are the same
   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
           static_cast<const FiniteElementData<dim>&>(
-            cell->get_dof_handler().get_fe()[cell->active_fe_index ()]),
+            cell->get_dof_handler().get_finite_element(cell->active_fe_index ())),
           (typename FEValuesBase<dim,spacedim>::ExcFEDontMatch()));
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));

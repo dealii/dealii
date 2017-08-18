@@ -377,7 +377,7 @@ namespace internal
         dof_handler.clear_mg_space ();
 
         const dealii::Triangulation<1, spacedim> &tria = dof_handler.get_triangulation();
-        const unsigned int &dofs_per_line = dof_handler.get_fe ().dofs_per_line;
+        const unsigned int &dofs_per_line = dof_handler.get_finite_element ().dofs_per_line;
         const unsigned int &n_levels = tria.n_levels ();
 
         for (unsigned int i = 0; i < n_levels; ++i)
@@ -414,7 +414,7 @@ namespace internal
             {
               Assert (min_level[vertex] < n_levels, ExcInternalError ());
               Assert (max_level[vertex] >= min_level[vertex], ExcInternalError ());
-              dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex], max_level[vertex], dof_handler.get_fe ().dofs_per_vertex);
+              dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex], max_level[vertex], dof_handler.get_finite_element ().dofs_per_vertex);
             }
 
           else
@@ -432,7 +432,7 @@ namespace internal
         Assert (dof_handler.get_triangulation().n_levels () > 0, ExcMessage ("Invalid triangulation"));
         dof_handler.clear_mg_space ();
 
-        const dealii::FiniteElement<2, spacedim> &fe = dof_handler.get_fe ();
+        const dealii::FiniteElement<2, spacedim> &fe = dof_handler.get_finite_element ();
         const dealii::Triangulation<2, spacedim> &tria = dof_handler.get_triangulation();
         const unsigned int &n_levels = tria.n_levels ();
 
@@ -491,7 +491,7 @@ namespace internal
         Assert (dof_handler.get_triangulation().n_levels () > 0, ExcMessage ("Invalid triangulation"));
         dof_handler.clear_mg_space ();
 
-        const dealii::FiniteElement<3, spacedim> &fe = dof_handler.get_fe ();
+        const dealii::FiniteElement<3, spacedim> &fe = dof_handler.get_finite_element ();
         const dealii::Triangulation<3, spacedim> &tria = dof_handler.get_triangulation();
         const unsigned int &n_levels = tria.n_levels ();
 
@@ -888,7 +888,7 @@ types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
 {
   std::set<int> boundary_dofs;
 
-  const unsigned int dofs_per_face = get_fe().dofs_per_face;
+  const unsigned int dofs_per_face = get_finite_element().dofs_per_face;
   std::vector<types::global_dof_index> dofs_on_face(dofs_per_face);
 
   // loop over all faces of all cells
@@ -930,7 +930,7 @@ DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &b
 
   std::set<types::global_dof_index> boundary_dofs;
 
-  const unsigned int dofs_per_face = get_fe().dofs_per_face;
+  const unsigned int dofs_per_face = get_finite_element().dofs_per_face;
   std::vector<types::global_dof_index> dofs_on_face(dofs_per_face);
 
   // same as in the previous
@@ -1164,10 +1164,10 @@ DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
   switch (dim)
     {
     case 1:
-      return get_fe().dofs_per_vertex;
+      return get_finite_element().dofs_per_vertex;
     case 2:
-      return (3*get_fe().dofs_per_vertex +
-              2*get_fe().dofs_per_line);
+      return (3*get_finite_element().dofs_per_vertex +
+              2*get_finite_element().dofs_per_line);
     case 3:
       // we need to take refinement of
       // one boundary face into
@@ -1185,9 +1185,9 @@ DoFHandler<dim,spacedim>::max_couplings_between_boundary_dofs () const
       // harm since the matrix will cry
       // foul if its requirements are
       // not satisfied
-      return (19*get_fe().dofs_per_vertex +
-              28*get_fe().dofs_per_line +
-              8*get_fe().dofs_per_quad);
+      return (19*get_finite_element().dofs_per_vertex +
+              28*get_finite_element().dofs_per_line +
+              8*get_finite_element().dofs_per_quad);
     default:
       Assert (false, ExcNotImplemented());
       return numbers::invalid_unsigned_int;

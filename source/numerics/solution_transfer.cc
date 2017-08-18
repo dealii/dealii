@@ -148,7 +148,7 @@ SolutionTransfer<dim, VectorType, DoFHandlerType>::refine_interpolate
         // function
         {
           const unsigned int this_fe_index = pointerstruct->second.active_fe_index;
-          const unsigned int dofs_per_cell=cell->get_dof_handler().get_fe()[this_fe_index].dofs_per_cell;
+          const unsigned int dofs_per_cell=cell->get_dof_handler().get_finite_element(this_fe_index).dofs_per_cell;
           local_values.reinit(dofs_per_cell, true);
 
           // make sure that the size of the stored indices is the same as
@@ -191,7 +191,7 @@ namespace internal
   void extract_interpolation_matrices (const dealii::hp::DoFHandler<dim,spacedim> &dof,
                                        dealii::Table<2,FullMatrix<double> > &matrices)
   {
-    const dealii::hp::FECollection<dim,spacedim> &fe = dof.get_fe();
+    const dealii::hp::FECollection<dim,spacedim> &fe = dof.get_fe_collection();
     matrices.reinit (fe.size(), fe.size());
     for (unsigned int i=0; i<fe.size(); ++i)
       for (unsigned int j=0; j<fe.size(); ++j)
@@ -303,7 +303,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
   std::vector<std::vector<bool> > restriction_is_additive;
 
   internal::extract_interpolation_matrices (*dof_handler, interpolation_hp);
-  internal::restriction_additive (dof_handler->get_fe(), restriction_is_additive);
+  internal::restriction_additive (dof_handler->get_fe_collection(), restriction_is_additive);
 
   // we need counters for
   // the 'to_stay_or_refine' cells 'n_sr' and
@@ -362,9 +362,9 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
               if (cell->child(child)->get_fe().dofs_per_cell >
                   cell->child(most_general_child)->get_fe().dofs_per_cell)
                 most_general_child = child;
-          const unsigned int target_fe_index = cell->child(most_general_child)->active_fe_index();
+          const unsigned int target_finite_element_index = cell->child(most_general_child)->active_fe_index();
 
-          const unsigned int dofs_per_cell=cell->get_dof_handler().get_fe()[target_fe_index].dofs_per_cell;
+          const unsigned int dofs_per_cell=cell->get_dof_handler().get_finite_element(target_finite_element_index).dofs_per_cell;
 
           std::vector<Vector<typename VectorType::value_type> >(in_size,
                                                                 Vector<typename VectorType::value_type>(dofs_per_cell))
@@ -378,9 +378,9 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
           for (unsigned int j=0; j<in_size; ++j)
             cell->get_interpolated_dof_values(all_in[j],
                                               dof_values_on_cell[n_cf][j],
-                                              target_fe_index);
+                                              target_finite_element_index);
           cell_map[std::make_pair(cell->level(), cell->index())]
-            = Pointerstruct(&dof_values_on_cell[n_cf], target_fe_index);
+            = Pointerstruct(&dof_values_on_cell[n_cf], target_finite_element_index);
           ++n_cf;
         }
     }

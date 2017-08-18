@@ -70,9 +70,9 @@ get_interpolated_dof_values (const InputVector &values,
           Vector<number> tmp (this->get_fe().dofs_per_cell);
           this->get_dof_values (values, tmp);
 
-          FullMatrix<double> interpolation (this->dof_handler->get_fe()[fe_index].dofs_per_cell,
+          FullMatrix<double> interpolation (this->dof_handler->get_finite_element(fe_index).dofs_per_cell,
                                             this->get_fe().dofs_per_cell);
-          this->dof_handler->get_fe()[fe_index].get_interpolation_matrix (this->get_fe(),
+          this->dof_handler->get_finite_element(fe_index).get_interpolation_matrix (this->get_fe(),
               interpolation);
           interpolation.vmult (interpolated_values, tmp);
         }
@@ -99,7 +99,7 @@ get_interpolated_dof_values (const InputVector &values,
                           "of freedom are only distributed on active cells for which "
                           "the active_fe_index has been set."));
 
-      const FiniteElement<dim,spacedim> &fe            = this->get_dof_handler().get_fe()[fe_index];
+      const FiniteElement<dim,spacedim> &fe            = this->get_dof_handler().get_finite_element(fe_index);
       const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
 
       Assert (this->dof_handler != nullptr,

@@ -1104,7 +1104,7 @@ estimate (const Mapping<dim, spacedim>               &mapping,
     = subdomain_id_;
 #endif
 
-  const unsigned int n_components = dof_handler.get_fe().n_components();
+  const unsigned int n_components = dof_handler.get_finite_element(0).n_components();
   (void)n_components;
 
   // sanity checks
@@ -1147,7 +1147,7 @@ estimate (const Mapping<dim, spacedim>               &mapping,
   // gathered in the following structures
   const hp::MappingCollection<dim,spacedim> mapping_collection(mapping);
   const internal::ParallelData<DoFHandlerType,typename InputVector::value_type>
-  parallel_data (dof_handler.get_fe(),
+  parallel_data (dof_handler.get_fe_collection(),
                  face_quadratures,
                  mapping_collection,
                  (!neumann_bc.empty() || (coefficients != nullptr)),

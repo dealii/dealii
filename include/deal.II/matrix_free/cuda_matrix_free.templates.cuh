@@ -439,7 +439,7 @@ namespace CUDAWrappers
     //TODO: only free if we actually need arrays of different length
     free();
 
-    const FiniteElement<dim> &fe = dof_handler.get_fe();
+    const FiniteElement<dim> &fe = dof_handler.get_finite_element();
 
     fe_degree = fe.degree;
     //TODO this should be a templated parameter
