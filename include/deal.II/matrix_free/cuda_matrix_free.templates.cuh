@@ -14,8 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-#ifndef dealii__cuda_matrix_free_templates_cuh
-#define dealii__cuda_matrix_free_templates_cuh
+#ifndef dealii_cuda_matrix_free_templates_cuh
+#define dealii_cuda_matrix_free_templates_cuh
 
 #include <deal.II/matrix_free/cuda_matrix_free.h>
 
