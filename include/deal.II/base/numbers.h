@@ -397,7 +397,7 @@ namespace internal
   template <typename T>
   struct NumberType
   {
-    static T value (const T &t)
+    static DEAL_II_CUDA_HOST_DEV T value (const T &t)
     {
       return t;
     }
