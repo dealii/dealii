@@ -93,35 +93,6 @@ CHECK_CXX_COMPILER_BUG(
   )
 
 
-
-#
-# Some older versions of gcc compile this, despite the 'explicit'
-# keyword:
-#
-# struct X {
-#     template <typename T>
-#     explicit X(T);
-# };
-# void f(X);
-# int main () { f(1); }
-#
-# Check for this misfeature.
-#
-# - Wolfgang Bangerth, Matthias Maier, rewritten 2012
-#
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  struct X {
-    template <typename T>
-    explicit X(T) {}
-  };
-  void f(X) {}
-  int main() { f(1); }
-  "
-  DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
-  )
-
-
 #
 # Some older versions of gcc deduce pointers to const functions in
 # template contexts to pointer-to-function of const objects.
