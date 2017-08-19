@@ -54,9 +54,9 @@ int main ()
   }
 
   {
-    dealii::Tensor<1,2,float> f = { {1., 2.} };
-    dealii::Tensor<1,2,double> d = { {4., 8.} };
-    dealii::Tensor<1,2,std::complex<double> > c = { {16., 32.} };
+    dealii::Tensor<1,2,float> f ({1., 2.});
+    dealii::Tensor<1,2,double> d ({4., 8.});
+    dealii::Tensor<1,2,std::complex<double> > c ({16., 32.});
 
     deallog << f + d << std::endl;
     deallog << f - d << std::endl;
@@ -82,9 +82,9 @@ int main ()
   }
 
   {
-    dealii::Tensor<1,3,float> f = { {1., 2., 4.} };
-    dealii::Tensor<1,3,double> d = { {4., 8., 16.} };
-    dealii::Tensor<1,3,std::complex<double> > c = { {32., 64., 128.} };
+    dealii::Tensor<1,3,float> f ({1., 2., 4.});
+    dealii::Tensor<1,3,double> d ({4., 8., 16.});
+    dealii::Tensor<1,3,std::complex<double> > c ({32., 64., 128.});
 
     deallog << f + d << std::endl;
     deallog << f - d << std::endl;

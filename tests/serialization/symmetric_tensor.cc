@@ -29,14 +29,14 @@ void test ()
     {2., 5., 6.},
     {3., 6., 9.}
   };
-  SymmetricTensor<rank,dim> t1(a1);
+  SymmetricTensor<rank,dim> t1((Tensor<rank,dim>(a1)));
 
 
   double a2[3][3] = {{10., 11., 12.},
     {11., 14., 15.},
     {12., 15., 18.}
   };
-  SymmetricTensor<rank,dim> t2(a2);
+  SymmetricTensor<rank,dim> t2((Tensor<rank,dim>(a2)));
 
   verify (t1, t2);
 }
@@ -44,9 +44,7 @@ void test ()
 
 int main ()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(3);
-  deallog.attach(logfile);
+  initlog();
 
   test ();
 

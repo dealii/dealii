@@ -378,7 +378,7 @@ public:
   /**
    * Constructor, where the data is copied from a C-style array.
    */
-  Tensor (const array_type &initializer);
+  explicit Tensor (const array_type &initializer);
 
   /**
    * Constructor from tensors with different underlying scalar type. This
@@ -816,7 +816,7 @@ inline
 Tensor<rank_,dim,Number>::Tensor (const array_type &initializer)
 {
   for (unsigned int i=0; i<dim; ++i)
-    values[i] = initializer[i];
+    values[i] = Tensor<rank_-1, dim, Number>(initializer[i]);
 }
 
 
@@ -826,7 +826,7 @@ inline
 Tensor<rank_,dim,Number>::Tensor (const Tensor<rank_,dim,OtherNumber> &initializer)
 {
   for (unsigned int i=0; i!=dim; ++i)
-    values[i] = initializer[i];
+    values[i] = Tensor<rank_-1,dim,Number>(initializer[i]);
 }
 
 
