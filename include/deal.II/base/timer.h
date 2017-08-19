@@ -203,8 +203,11 @@ public:
   double last_wall_time() const;
 
   /**
-   * Access to the current total CPU time without stopping the timer.
-   * The elapsed time is returned in units of seconds.
+   * Access to the current total CPU time without stopping the timer. The
+   * elapsed time is returned in units of seconds.
+   *
+   * If an MPI communicator is provided to the constructor then this value is
+   * summed over all relevant MPI processes.
    */
   double cpu_time() const;
 

@@ -13,16 +13,21 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/timer.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi.h>
-#include <deal.II/base/utilities.h>
 #include <deal.II/base/signaling_nan.h>
-#include <sstream>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/base/utilities.h>
+
+#include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <iomanip>
-#include <algorithm>
-#include <stddef.h>
+#include <map>
+#include <sstream>
+#include <string>
+#include <type_traits>
 
 #if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
 #  include <sys/time.h>
@@ -36,6 +41,84 @@
 
 
 DEAL_II_NAMESPACE_OPEN
+
+namespace internal
+{
+  namespace Timer
+  {
+    namespace
+    {
+      /**
+       * Type trait for checking whether or not a type is a std::chrono::duration.
+       */
+      template <typename T>
+      struct is_duration : std::false_type {};
+
+      /**
+       * Specialization to get the right truth value.
+       */
+      template <typename Rep, typename Period>
+      struct is_duration<std::chrono::duration<Rep, Period>> : std::true_type {};
+
+      /**
+       * Convert a double precision number with units of seconds into a
+       * specified duration type T. Only valid when T is a
+       * std::chrono::duration type.
+       */
+      template <typename T>
+      T
+      from_seconds(const double time)
+      {
+        static_assert(is_duration<T>::value,
+                      "The template type should be a duration type.");
+        return T(std::lround(T::period::den*(time/T::period::num)));
+      }
+
+      /**
+       * Convert a given duration into a double precision number with units of
+       * seconds.
+       */
+      template <typename Rep, typename Period>
+      double
+      to_seconds(const std::chrono::duration<Rep, Period> duration)
+      {
+        return Period::num*double(duration.count())/Period::den;
+      }
+
+      /**
+       * Return the amount of CPU time that the current process has used so
+       * far. Unfortunately, this requires platform-specific calls, so this
+       * function returns 0 on platforms that are neither windows nor POSIX.
+       */
+      template <typename T>
+      T
+      get_current_cpu_time()
+      {
+        static_assert(is_duration<T>::value,
+                      "The template type should be a duration type.");
+        double system_cpu_duration = 0.0;
+#ifdef DEAL_II_MSVC
+        FILETIME cpuTime, sysTime, createTime, exitTime;
+        if (GetProcessTimes(GetCurrentProcess(), &createTime,
+                            &exitTime, &sysTime, &cpuTime))
+          {
+            system_cpu_duration = (double)
+                                  (((unsigned long long)cpuTime.dwHighDateTime << 32)
+                                   | cpuTime.dwLowDateTime) / 1e6;
+          }
+        // keep the zero value if GetProcessTimes didn't work
+#elif defined(DEAL_II_HAVE_SYS_RESOURCE_H)
+        rusage usage;
+        getrusage (RUSAGE_SELF, &usage);
+        system_cpu_duration = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
+#else
+#  warning "Unsupported platform. Porting not finished."
+#endif
+        return from_seconds<T>(system_cpu_duration);
+      }
+    }
+  }
+}
 
 Timer::Timer()
   :
@@ -80,19 +163,6 @@ namespace
       QueryPerformanceCounter(&time);
       return (double) time.QuadPart / freq.QuadPart;
     }
-
-
-    double cpu_clock()
-    {
-      FILETIME cpuTime, sysTime, createTime, exitTime;
-      if (GetProcessTimes(GetCurrentProcess(),  &createTime,
-                          &exitTime, &sysTime, &cpuTime))
-        {
-          return (double)(((unsigned long long)cpuTime.dwHighDateTime << 32)
-                          | cpuTime.dwLowDateTime) / 1e6;
-        }
-      return 0;
-    }
   }
 }
 
@@ -118,16 +188,15 @@ void Timer::start ()
   gettimeofday(&wall_timer, nullptr);
   current_lap_starting_wall_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec;
 
-  rusage usage;
-  getrusage (RUSAGE_SELF, &usage);
-  current_lap_starting_cpu_time = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-
 #elif defined(DEAL_II_MSVC)
   current_lap_starting_wall_time = windows::wall_clock();
-  current_lap_starting_cpu_time = windows::cpu_clock();
 #else
 #  error "Unsupported platform. Porting not finished."
 #endif
+  // TODO once we convert all private time variables to chrono types we will
+  // not need to call to_seconds here
+  current_lap_starting_cpu_time = internal::Timer::to_seconds
+                                  (internal::Timer::get_current_cpu_time<std::chrono::nanoseconds>());
 }
 
 
@@ -141,21 +210,20 @@ double Timer::stop ()
 #if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
 //TODO: Break this out into a function like the functions in
 //namespace windows above
-      rusage usage;
-      getrusage (RUSAGE_SELF, &usage);
-      const double dtime = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-      last_lap_cpu_time = dtime - current_lap_starting_cpu_time;
-
       struct timeval wall_timer;
       gettimeofday(&wall_timer, nullptr);
       last_lap_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
                       - current_lap_starting_wall_time;
 #elif defined(DEAL_II_MSVC)
       last_lap_time = windows::wall_clock() - current_lap_starting_wall_time;
-      last_lap_cpu_time = windows::cpu_clock() - current_lap_starting_cpu_time;
 #else
 #  error "Unsupported platform. Porting not finished."
 #endif
+      // TODO once we convert all private time variables to chrono types we will
+      // not need to call to_seconds here
+      last_lap_cpu_time = internal::Timer::to_seconds
+                          (internal::Timer::get_current_cpu_time<std::chrono::nanoseconds>())
+                          - current_lap_starting_cpu_time;
 
       last_lap_data = Utilities::MPI::min_max_avg (last_lap_time,
                                                    mpi_communicator);
@@ -179,24 +247,11 @@ double Timer::cpu_time() const
 {
   if (running)
     {
-#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
-      rusage usage;
-      getrusage (RUSAGE_SELF, &usage);
-      const double dtime =  usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-      const double running_time = dtime - current_lap_starting_cpu_time + accumulated_cpu_time;
-
-      // in case of MPI, need to get the time passed by summing the time over
-      // all processes in the network. works also in case we just want to have
-      // the time of a single thread, since then the communicator is
-      // MPI_COMM_SELF
+      const double running_time = internal::Timer::to_seconds
+                                  (internal::Timer::get_current_cpu_time<std::chrono::nanoseconds>())
+                                  - current_lap_starting_cpu_time
+                                  + accumulated_cpu_time;
       return Utilities::MPI::sum (running_time, mpi_communicator);
-
-#elif defined(DEAL_II_MSVC)
-      const double running_time = windows::cpu_clock() - current_lap_starting_cpu_time + accumulated_cpu_time;
-      return running_time;
-#else
-#  error "Unsupported platform. Porting not finished."
-#endif
     }
   else
     {
