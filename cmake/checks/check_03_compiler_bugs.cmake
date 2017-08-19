@@ -19,31 +19,6 @@
 #                                                                      #
 ########################################################################
 
-
-#
-# On some gcc 4.3 snapshots, a 'const' qualifier on a return type triggers a
-# warning. This is unfortunate, since we happen to stumble on this
-# in some of our template trickery with iterator classes. If necessary,
-# do not use the relevant warning flag
-#
-# - Wolfgang Bangerth, Matthias Maier, rewritten 2012
-#
-PUSH_CMAKE_REQUIRED("-Wreturn-type")
-PUSH_CMAKE_REQUIRED("-Werror")
-CHECK_CXX_COMPILER_BUG(
-  "
-  const double foo() { return 1.; }
-  int main() { return 0; }
-  "
-  DEAL_II_WRETURN_TYPE_CONST_QUALIFIER_BUG
-  )
-RESET_CMAKE_REQUIRED()
-
-IF(DEAL_II_WRETURN_TYPE_CONST_QUALIFIER_BUG)
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS -Wno-return-type)
-ENDIF()
-
-
 #
 # In some cases, we would like to name partial specializations
 # as friends. However, the standard forbids us to do so. But
