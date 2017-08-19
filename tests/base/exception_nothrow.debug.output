@@ -1,0 +1,12 @@
+
+DEAL::Exception: ExcInternalError()
+DEAL::
+--------------------------------------------------------
+An error occurred in file <exception_nothrow.cc> in function
+    int main()
+The violated condition was: 
+    1==2
+Additional information: 
+    (none)
+--------------------------------------------------------
+

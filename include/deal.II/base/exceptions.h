@@ -234,16 +234,9 @@ namespace deal_II_exceptions
      * Depending on whether deal_II_exceptions::disable_abort_on_exception was
      * called, this function either aborts the program flow by printing the
      * error message provided by @p exc and calling <tt>std::abort()</tt>, or
-     * throws @p exc instead (if @p nothrow is set to <tt>false</tt>).
-     *
-     * If the boolean @p nothrow is set to true and
-     * deal_II_exceptions::disable_abort_on_exception was called, the
-     * exception type is just printed to deallog and program flow
-     * continues. This is useful if throwing an exception is prohibited
-     * (e.g. in a destructor with <tt>noexcept(true)</tt> or
-     * <tt>throw()</tt>).
+     * throws @p exc instead.
      */
-    void abort (const ExceptionBase &exc, bool nothrow = false);
+    void abort (const ExceptionBase &exc);
 
     /**
      * An enum describing how to treat an exception in issue_error.
@@ -298,13 +291,29 @@ namespace deal_II_exceptions
           dealii::deal_II_exceptions::internals::abort(e);
           break;
         case abort_nothrow_on_exception:
-          dealii::deal_II_exceptions::internals::abort(e, /*nothrow =*/ true);
+          // The proper way is to call the function below directly
+          // to preserve the noexcept specifier.
+          // For reasons of backward compatibility
+          // we treat this case here as well.
+          issue_error_nothrow(handling, file, line, function, cond, exc_name, e);
           break;
         case throw_on_exception:
           throw e;
         }
     }
 
+    /**
+     * Exception generation mechanism in case we must not throw.
+     *
+     * @ref ExceptionBase
+     */
+    void issue_error_nothrow (ExceptionHandling,
+                              const char       *file,
+                              int               line,
+                              const char       *function,
+                              const char       *cond,
+                              const char       *exc_name,
+                              ExceptionBase     e) noexcept;
   } /*namespace internals*/
 
 } /*namespace deal_II_exceptions*/
@@ -355,16 +364,16 @@ namespace deal_II_exceptions
  * @author Wolfgang Bangerth, 1997, 1998, Matthias Maier, 2013
  */
 #ifdef DEBUG
-#define AssertNothrow(cond, exc)                                            \
-  {                                                                           \
-    if (!(cond))                                                              \
-      ::dealii::deal_II_exceptions::internals::                               \
-      issue_error(                                                            \
+#define AssertNothrow(cond, exc)                                              \
+  {                                                                             \
+    if (!(cond))                                                                \
+      ::dealii::deal_II_exceptions::internals::                                 \
+      issue_error_nothrow(                                                      \
           ::dealii::deal_II_exceptions::internals::abort_nothrow_on_exception,  \
           __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc);           \
   }
 #else
-#define AssertNothrow(cond, exc)                                            \
+#define AssertNothrow(cond, exc)                                              \
   {}
 #endif
 
