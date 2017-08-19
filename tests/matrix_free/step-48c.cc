@@ -287,7 +287,7 @@ namespace Step48
     Vector<float> norm_per_cell (triangulation.n_active_cells());
     VectorTools::integrate_difference (dof_handler,
                                        solution,
-                                       ZeroFunction<dim>(),
+                                       Functions::ZeroFunction<dim>(),
                                        norm_per_cell,
                                        QGauss<dim>(fe_degree+1),
                                        VectorTools::L2_norm);

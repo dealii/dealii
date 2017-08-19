@@ -65,7 +65,7 @@ void test()
   x.reinit(owned_set, MPI_COMM_WORLD);
 
   VectorTools::interpolate(dofh,
-                           ConstantFunction<dim>(1),
+                           Functions::ConstantFunction<dim>(1),
                            x);
   const double norm = x.l2_norm();
   if (myid == 0)

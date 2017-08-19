@@ -2058,7 +2058,7 @@ namespace Step32
       FEValuesExtractors::Vector velocity_components(0);
       VectorTools::interpolate_boundary_values (stokes_dof_handler,
                                                 0,
-                                                ZeroFunction<dim>(dim+1),
+                                                Functions::ZeroFunction<dim>(dim+1),
                                                 stokes_constraints,
                                                 stokes_fe.component_mask(velocity_components));
 

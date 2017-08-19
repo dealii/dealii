@@ -56,7 +56,7 @@ void check_simple(const FiniteElement<dim> &fe)
   mgdof.distribute_mg_dofs(fe);
 
   typename FunctionMap<dim>::type dirichlet_boundary;
-  ZeroFunction<dim> homogeneous_dirichlet_bc (1);
+  Functions::ZeroFunction<dim> homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
 
   MGConstrainedDoFs mg_constrained_dofs;

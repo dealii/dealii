@@ -110,7 +110,7 @@ void test (std::string solver_name,
   dealii::DoFTools::make_hanging_node_constraints  (dof_handler, constraints);
   dealii::VectorTools::interpolate_boundary_values (dof_handler,
                                                     0,
-                                                    dealii::ZeroFunction<dim> (),
+                                                    dealii::Functions::ZeroFunction<dim> (),
                                                     constraints);
   constraints.close ();
 

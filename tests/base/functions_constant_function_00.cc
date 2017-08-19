@@ -27,7 +27,7 @@
 #define LOG_FILE "output"
 #define NUMBER double
 
-#define TESTEE ConstantFunction
+#define TESTEE Functions::ConstantFunction
 
 // Test a given TESTEE object f on n_points points
 template <int dim, typename Number>

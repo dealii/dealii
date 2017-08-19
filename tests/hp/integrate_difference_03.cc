@@ -90,7 +90,7 @@ void test ()
   {
     VectorTools::integrate_difference (dof_handler,
                                        vec,
-                                       ZeroFunction<dim>(dim),
+                                       Functions::ZeroFunction<dim>(dim),
                                        diff,
                                        q_collection,
                                        VectorTools::H1_seminorm);
@@ -103,7 +103,7 @@ void test ()
   {
     VectorTools::integrate_difference (dof_handler,
                                        vec,
-                                       ZeroFunction<dim>(dim),
+                                       Functions::ZeroFunction<dim>(dim),
                                        diff,
                                        q_collection,
                                        VectorTools::W1infty_seminorm);

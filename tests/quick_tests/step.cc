@@ -141,12 +141,12 @@ void LaplaceProblem<dim>::assemble_and_solve ()
                                       system_matrix);
   VectorTools::create_right_hand_side (mapping, dof_handler,
                                        QGauss<dim>(gauss_degree),
-                                       ConstantFunction<dim>(-2),
+                                       Functions::ConstantFunction<dim>(-2),
                                        system_rhs);
   Vector<double> tmp (system_rhs.size());
   VectorTools::create_boundary_right_hand_side (mapping, dof_handler,
                                                 QGauss<dim-1>(gauss_degree),
-                                                ConstantFunction<dim>(1),
+                                                Functions::ConstantFunction<dim>(1),
                                                 tmp);
   system_rhs += tmp;
 
@@ -159,7 +159,7 @@ void LaplaceProblem<dim>::assemble_and_solve ()
   Vector<float> norm_per_cell (triangulation.n_active_cells());
   VectorTools::integrate_difference (mapping, dof_handler,
                                      solution,
-                                     ZeroFunction<dim>(),
+                                     Functions::ZeroFunction<dim>(),
                                      norm_per_cell,
                                      QGauss<dim>(gauss_degree+1),
                                      VectorTools::H1_seminorm);

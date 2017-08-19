@@ -43,7 +43,7 @@ check_this (const DoFHandler<dim> &dof_handler)
       std::string::npos)
     return;
 
-  ConstantFunction<dim> test_func (1, dof_handler.get_fe().n_components ());
+  Functions::ConstantFunction<dim> test_func (1, dof_handler.get_fe().n_components ());
 
   // don't run this test if hanging
   // nodes are not implemented

@@ -118,7 +118,7 @@ private:
 // simply be omitted for scalar functions.
 //
 // Function objects are used in lots of places in the library (for example, in
-// step-2 we used a ZeroFunction instance as an argument to
+// step-2 we used a Functions::ZeroFunction instance as an argument to
 // VectorTools::interpolate_boundary_values) and this is the first step where
 // we define a new class that inherits from Function. Since we only ever call
 // Function::value, we could get away with just a plain function (and this is
@@ -415,7 +415,7 @@ void Step4<dim>::assemble_system ()
 
   // As the final step in this function, we wanted to have non-homogeneous
   // boundary values in this example, unlike the one before. This is a simple
-  // task, we only have to replace the ZeroFunction used there by an object of
+  // task, we only have to replace the Functions::ZeroFunction used there by an object of
   // the class which describes the boundary values we would like to use
   // (i.e. the <code>BoundaryValues</code> class declared above):
   std::map<types::global_dof_index,double> boundary_values;

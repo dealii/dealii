@@ -287,7 +287,7 @@ namespace Step50
 
     std::set<types::boundary_id>         dirichlet_boundary_ids;
     typename FunctionMap<dim>::type      dirichlet_boundary;
-    ConstantFunction<dim>                    homogeneous_dirichlet_bc (1.0);
+    Functions::ConstantFunction<dim>                    homogeneous_dirichlet_bc (1.0);
     dirichlet_boundary_ids.insert(0);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values (mg_dof_handler,

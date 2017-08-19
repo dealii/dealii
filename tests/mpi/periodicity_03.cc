@@ -282,25 +282,25 @@ namespace Step22
 
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 1,
-                                                ZeroFunction<dim>(dim+1),
+                                                Functions::ZeroFunction<dim>(dim+1),
                                                 constraints,
                                                 fe.component_mask(velocities));
 
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 2,
-                                                ZeroFunction<dim>(dim+1),
+                                                Functions::ZeroFunction<dim>(dim+1),
                                                 constraints,
                                                 fe.component_mask(velocities));
 
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 3,
-                                                ZeroFunction<dim>(dim+1),
+                                                Functions::ZeroFunction<dim>(dim+1),
                                                 constraints,
                                                 fe.component_mask(velocities));
 
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 5,
-                                                ZeroFunction<dim>(dim+1),
+                                                Functions::ZeroFunction<dim>(dim+1),
                                                 constraints,
                                                 fe.component_mask(velocities));
     }

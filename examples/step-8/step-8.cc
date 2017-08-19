@@ -297,7 +297,7 @@ namespace Step8
     // value 1.0. Although we could omit the respective factors in the
     // assemblage of the matrix, we use them here for purpose of
     // demonstration.
-    ConstantFunction<dim> lambda(1.), mu(1.);
+    Functions::ConstantFunction<dim> lambda(1.), mu(1.);
 
     // Like the two constant functions above, we will call the function
     // right_hand_side just once per cell to make things simpler.
@@ -434,17 +434,17 @@ namespace Step8
 
     // The interpolation of the boundary values needs a small modification:
     // since the solution function is vector-valued, so need to be the
-    // boundary values. The <code>ZeroFunction</code> constructor accepts a
+    // boundary values. The <code>Functions::ZeroFunction</code> constructor accepts a
     // parameter that tells it that it shall represent a vector valued,
     // constant zero function with that many components. By default, this
-    // parameter is equal to one, in which case the <code>ZeroFunction</code>
+    // parameter is equal to one, in which case the <code>Functions::ZeroFunction</code>
     // object would represent a scalar function. Since the solution vector has
     // <code>dim</code> components, we need to pass <code>dim</code> as number
     // of components to the zero function as well.
     std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
-                                              ZeroFunction<dim>(dim),
+                                              Functions::ZeroFunction<dim>(dim),
                                               boundary_values);
     MatrixTools::apply_boundary_values (boundary_values,
                                         system_matrix,

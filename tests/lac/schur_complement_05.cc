@@ -345,12 +345,12 @@ namespace Step22
 #endif
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 0,
-                                                BoundaryValues<dim>(),//ZeroFunction<dim>(dim+1),
+                                                BoundaryValues<dim>(),//Functions::ZeroFunction<dim>(dim+1),
                                                 constraints,
                                                 fe.component_mask(velocities));
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 1,
-                                                BoundaryValues<dim>(),//ZeroFunction<dim>(dim+1),
+                                                BoundaryValues<dim>(),//Functions::ZeroFunction<dim>(dim+1),
                                                 constraints,
                                                 fe.component_mask(velocities));
 

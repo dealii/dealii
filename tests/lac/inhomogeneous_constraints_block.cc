@@ -134,7 +134,7 @@ void AdvectionProblem<dim>::setup_system ()
     std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
-                                              ConstantFunction<dim>(1.,2),
+                                              Functions::ConstantFunction<dim>(1.,2),
                                               boundary_values);
     std::map<types::global_dof_index,double>::const_iterator boundary_value =
       boundary_values.begin();
@@ -316,7 +316,7 @@ void AdvectionProblem<dim>::assemble_reference ()
   std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ConstantFunction<dim>(1.,2),
+                                            Functions::ConstantFunction<dim>(1.,2),
                                             boundary_values);
   MatrixTools::apply_boundary_values (boundary_values,
                                       reference_matrix,

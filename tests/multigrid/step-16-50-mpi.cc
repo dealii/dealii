@@ -203,7 +203,7 @@ namespace Step50
     DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
 
     typename FunctionMap<dim>::type      dirichlet_boundary;
-    ZeroFunction<dim>                    homogeneous_dirichlet_bc;
+    Functions::ZeroFunction<dim>                    homogeneous_dirichlet_bc;
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values (mg_dof_handler,
                                               dirichlet_boundary,

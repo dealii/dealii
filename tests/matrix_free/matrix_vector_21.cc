@@ -145,7 +145,7 @@ void test ()
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints(dof, constraints);
-  VectorTools::interpolate_boundary_values (dof, 0, ZeroFunction<dim>(),
+  VectorTools::interpolate_boundary_values (dof, 0, Functions::ZeroFunction<dim>(),
                                             constraints);
   constraints.close();
 

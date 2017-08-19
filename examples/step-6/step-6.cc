@@ -268,7 +268,7 @@ void Step6<dim>::setup_system ()
                                            constraints);
 
 
-  // Now we are ready to interpolate the ZeroFunction to our boundary with
+  // Now we are ready to interpolate the Functions::ZeroFunction to our boundary with
   // indicator 0 (the whole boundary) and store the resulting constraints in
   // our <code>constraints</code> object. Note that we do not to apply the
   // boundary conditions after assembly, like we did in earlier steps.  As
@@ -280,7 +280,7 @@ void Step6<dim>::setup_system ()
   // values into the ContraintMatrix after the hanging node constraints.
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ZeroFunction<dim>(),
+                                            Functions::ZeroFunction<dim>(),
                                             constraints);
 
 

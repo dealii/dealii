@@ -166,7 +166,7 @@ namespace Step52
   {
     dof_handler.distribute_dofs(fe);
 
-    VectorTools::interpolate_boundary_values(dof_handler,1,ZeroFunction<2>(),constraint_matrix);
+    VectorTools::interpolate_boundary_values(dof_handler,1,Functions::ZeroFunction<2>(),constraint_matrix);
     constraint_matrix.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());

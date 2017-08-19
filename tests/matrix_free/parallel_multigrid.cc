@@ -64,7 +64,7 @@ public:
 
     // extract the constraints due to Dirichlet boundary conditions
     ConstraintMatrix constraints;
-    ZeroFunction<dim> zero;
+    Functions::ZeroFunction<dim> zero;
     typename FunctionMap<dim>::type functions;
     for (std::set<types::boundary_id>::const_iterator it=dirichlet_boundaries.begin();
          it != dirichlet_boundaries.end(); ++it)

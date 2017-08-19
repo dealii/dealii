@@ -269,12 +269,12 @@ void MinimizationProblem<dim>::assemble_step ()
   std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ZeroFunction<dim>(),
+                                            Functions::ZeroFunction<dim>(),
                                             boundary_values);
   if (dim == 1)
     VectorTools::interpolate_boundary_values (dof_handler,
                                               1,
-                                              ZeroFunction<dim>(),
+                                              Functions::ZeroFunction<dim>(),
                                               boundary_values);
   Vector<double> dummy (residual.size());
   MatrixTools::apply_boundary_values (boundary_values,

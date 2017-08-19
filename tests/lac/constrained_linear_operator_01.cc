@@ -108,7 +108,7 @@ void Step6<dim>::setup_system ()
                                            constraints);
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ConstantFunction<dim>(1.),
+                                            Functions::ConstantFunction<dim>(1.),
                                             constraints);
   constraints.close ();
 

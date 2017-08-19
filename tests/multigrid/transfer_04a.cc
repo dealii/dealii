@@ -112,7 +112,7 @@ void check_fe(FiniteElement<dim> &fe)
     }
 
 
-  ZeroFunction<dim> zero;
+  Functions::ZeroFunction<dim> zero;
   typename FunctionMap<dim>::type fmap;
   fmap.insert(std::make_pair(0, &zero));
 

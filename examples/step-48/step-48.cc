@@ -462,7 +462,7 @@ namespace Step48
     solution.update_ghost_values();
     VectorTools::integrate_difference (dof_handler,
                                        solution,
-                                       ZeroFunction<dim>(),
+                                       Functions::ZeroFunction<dim>(),
                                        norm_per_cell,
                                        QGauss<dim>(fe_degree+1),
                                        VectorTools::L2_norm);

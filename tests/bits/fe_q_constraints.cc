@@ -189,7 +189,7 @@ void TestFEQConstraints<dim>::test ()
   // First error check. Simply the interpolation error of the used FE-Space
   // on the given triangulation.
   VectorTools::integrate_difference (dof_handler, solution,
-                                     ZeroFunction<dim>(1),
+                                     Functions::ZeroFunction<dim>(1),
                                      norm_per_cell,
                                      quadrature,
                                      VectorTools::L2_norm);

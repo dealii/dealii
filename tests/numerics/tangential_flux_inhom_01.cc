@@ -42,7 +42,7 @@ void test (const Triangulation<dim> &tr,
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(fe);
 
-  ConstantFunction<dim> constant_function(1.,dim);
+  Functions::ConstantFunction<dim> constant_function(1.,dim);
   typename FunctionMap<dim>::type function_map;
   for (unsigned int j=0; j<GeometryInfo<dim>::faces_per_cell; ++j)
     function_map[j] = &constant_function;

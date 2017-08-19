@@ -156,7 +156,7 @@ namespace Step40
 
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
-                                              ZeroFunction<dim>(),
+                                              Functions::ZeroFunction<dim>(),
                                               constraints);
     DoFTools::make_hanging_node_constraints (dof_handler, constraints);
     constraints.close ();

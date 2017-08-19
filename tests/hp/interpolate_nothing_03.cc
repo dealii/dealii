@@ -72,7 +72,7 @@ void test ()
 
   // interpolate the function
   VectorTools::interpolate(dof_handler,
-                           ConstantFunction<dim>(3.14),
+                           Functions::ConstantFunction<dim>(3.14),
                            interpolant);
   deallog << interpolant.mean_value() << std::endl;
 }

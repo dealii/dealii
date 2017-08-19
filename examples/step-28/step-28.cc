@@ -644,7 +644,7 @@ namespace Step28
     for (unsigned int i=0; i<dim; ++i)
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 2*i+1,
-                                                ZeroFunction<dim>(),
+                                                Functions::ZeroFunction<dim>(),
                                                 boundary_values);
   }
 
@@ -1687,7 +1687,7 @@ namespace Step28
           {
             for (unsigned int group=0; group<parameters.n_groups; ++group)
               {
-                energy_groups[group]->assemble_ingroup_rhs (ZeroFunction<dim>());
+                energy_groups[group]->assemble_ingroup_rhs (Functions::ZeroFunction<dim>());
 
                 for (unsigned int bgroup=0; bgroup<parameters.n_groups; ++bgroup)
                   energy_groups[group]->assemble_cross_group_rhs (*energy_groups[bgroup]);

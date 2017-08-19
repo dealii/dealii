@@ -403,7 +403,7 @@ namespace Step37
     constraints.clear();
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
-                                              ZeroFunction<dim>(),
+                                              Functions::ZeroFunction<dim>(),
                                               constraints);
     constraints.close();
 
@@ -416,7 +416,7 @@ namespace Step37
     mg_constraints.resize (0, nlevels-1);
 
     typename FunctionMap<dim>::type dirichlet_boundary;
-    ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
+    Functions::ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     std::vector<std::set<types::global_dof_index> > boundary_indices(triangulation.n_levels());
     MGTools::make_boundary_list (dof_handler,

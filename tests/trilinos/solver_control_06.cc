@@ -200,7 +200,7 @@ void Test_Solver_Output::setup_system()
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
-                                           ZeroFunction<2>(),
+                                           Functions::ZeroFunction<2>(),
                                            constraints);
   constraints.close();
 

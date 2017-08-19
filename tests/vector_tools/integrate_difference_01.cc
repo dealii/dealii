@@ -72,7 +72,7 @@ void test(VectorTools::NormType norm, double value)
   Vector<double> cellwise_errors (tria.n_active_cells());
   VectorTools::integrate_difference (dofh,
                                      solution,
-                                     ZeroFunction<dim>(dim),
+                                     Functions::ZeroFunction<dim>(dim),
                                      cellwise_errors,
                                      QGauss<dim>(5),
                                      norm);

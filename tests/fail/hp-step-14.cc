@@ -1011,12 +1011,12 @@ namespace Data
   template <int dim>
   struct Exercise_2_3
   {
-    typedef ZeroFunction<dim> BoundaryValues;
+    typedef Functions::ZeroFunction<dim> BoundaryValues;
 
-    class RightHandSide : public ConstantFunction<dim>
+    class RightHandSide : public Functions::ConstantFunction<dim>
     {
     public:
-      RightHandSide () : ConstantFunction<dim> (1.) {}
+      RightHandSide () : Functions::ConstantFunction<dim> (1.) {}
     };
 
     static
@@ -1290,13 +1290,13 @@ namespace LaplaceSolver
     const SmartPointer<const DualFunctional::DualFunctionalBase<dim> > dual_functional;
     virtual void assemble_rhs (Vector<double> &rhs) const;
 
-    static const ZeroFunction<dim> boundary_values;
+    static const Functions::ZeroFunction<dim> boundary_values;
 
     friend class WeightedResidual<dim>;
   };
 
   template <int dim>
-  const ZeroFunction<dim> DualSolver<dim>::boundary_values;
+  const Functions::ZeroFunction<dim> DualSolver<dim>::boundary_values;
 
   template <int dim>
   DualSolver<dim>::

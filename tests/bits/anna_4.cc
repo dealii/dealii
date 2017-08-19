@@ -181,7 +181,7 @@ void FindBug<dim>::dirichlet_conditions ()
   // Here comes the crucial call....
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ZeroFunction<dim> (2),
+                                            Functions::ZeroFunction<dim> (2),
                                             dirichlet_dofs,
                                             component_mask);
 

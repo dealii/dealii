@@ -540,7 +540,7 @@ int main ()
   hn_constraints.close ();
   MappingQGeneric<3> map_default(1);
   project (map_default, dof_handler, hn_constraints,
-           QGauss<3> (6), ConstantFunction<3>(1., 3),
+           QGauss<3> (6), Functions::ConstantFunction<3>(1., 3),
            solution);
 
   EvaluateDerivative (dof_handler, solution);

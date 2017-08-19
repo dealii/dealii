@@ -439,7 +439,7 @@ namespace Step18
     VectorTools::
     interpolate_boundary_values (dof_handler,
                                  0,
-                                 ZeroFunction<dim> (dim),
+                                 Functions::ZeroFunction<dim> (dim),
                                  boundary_values);
     VectorTools::
     interpolate_boundary_values (dof_handler,

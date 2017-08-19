@@ -639,7 +639,7 @@ namespace Step18
   // For the purposes of this program, we choose a simple form of boundary
   // displacement: we displace the top boundary with constant velocity
   // downwards. The rest of the boundary is either going to be fixed (and is
-  // then described using an object of type <code>ZeroFunction</code>) or free
+  // then described using an object of type <code>Functions::ZeroFunction</code>) or free
   // (Neumann-type, in which case nothing special has to be done).  The
   // implementation of the class describing the constant downward motion
   // should then be obvious using the knowledge we gained through all the
@@ -1139,7 +1139,7 @@ namespace Step18
     VectorTools::
     interpolate_boundary_values (dof_handler,
                                  0,
-                                 ZeroFunction<dim> (dim),
+                                 Functions::ZeroFunction<dim> (dim),
                                  boundary_values);
     VectorTools::
     interpolate_boundary_values (dof_handler,

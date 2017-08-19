@@ -150,7 +150,7 @@ void check (const FiniteElement<dim> &fe)
 
   std::vector<std::set<types::global_dof_index> > boundary_indices(tr.n_levels());
   typename FunctionMap<dim>::type      dirichlet_boundary;
-  ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
+  Functions::ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
   dirichlet_boundary[3] =             &dirichlet_bc;
 
   MGTools::make_boundary_list (mg_dof_handler, dirichlet_boundary,

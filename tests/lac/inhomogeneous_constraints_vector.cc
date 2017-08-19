@@ -143,7 +143,7 @@ void LaplaceProblem<dim>::setup_system ()
   constraints.clear();
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ConstantFunction<dim>(1),
+                                            Functions::ConstantFunction<dim>(1),
                                             constraints);
   constraints.close();
   sparsity_pattern.reinit (dof_handler.n_dofs(),

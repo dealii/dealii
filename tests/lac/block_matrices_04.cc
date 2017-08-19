@@ -309,7 +309,7 @@ void LaplaceProblem<VectorType,Matrix,Sparsity>::assemble_system ()
   std::map<types::global_dof_index,typename VectorType::value_type> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ZeroFunction<2,typename VectorType::value_type>(),
+                                            Functions::ZeroFunction<2,typename VectorType::value_type>(),
                                             boundary_values);
   MatrixTools::apply_boundary_values (boundary_values,
                                       system_matrix,

@@ -64,7 +64,7 @@ void test()
   PETScWrappers::MPI::Vector x (MPI_COMM_WORLD,dofh.n_dofs(),owned_set.n_elements());
 
   VectorTools::interpolate(dofh,
-                           ConstantFunction<dim,PetscScalar>(1),
+                           Functions::ConstantFunction<dim,PetscScalar>(1),
                            x);
   const double norm = x.l2_norm();
   if (myid == 0)

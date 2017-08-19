@@ -57,7 +57,7 @@ void test ()
                                                 v2(dof2.locally_owned_dofs(), locally_relevant_dofs2, MPI_COMM_WORLD);
 
   // set first vector to 1
-  VectorTools::interpolate(dof1, ConstantFunction<dim>(1.), v1);
+  VectorTools::interpolate(dof1, Functions::ConstantFunction<dim>(1.), v1);
   for (unsigned int i=0; i<v1.local_size(); ++i)
     Assert(v1.local_element(i) == 1., ExcInternalError());
 
