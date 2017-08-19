@@ -1,0 +1,6 @@
+New: DoFHandler::get_fe() and hp::DoFHandler::get_fe()
+have been deprecated in favor of DoFHandler::get_finite_element(),
+DoFHandler::get_fe_collection(), hp::DoFHandler::get_finite_element()
+and hp::DoFHandler::get_fe_collection() that share a common signature each.
+<br>
+(Daniel Arndt, 2017/08/19)
