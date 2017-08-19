@@ -69,38 +69,11 @@ namespace hp
     explicit FECollection (const FiniteElement<dim,spacedim> &fe);
 
     /**
-     * Constructor. This constructor creates a FECollection from two finite
-     * elements.
+     * Constructor. This constructor creates a FECollection from more than
+     * one finite element.
      */
-    FECollection (const FiniteElement<dim,spacedim> &fe1,
-                  const FiniteElement<dim,spacedim> &fe2);
-
-    /**
-     * Constructor. This constructor creates a FECollection from three finite
-     * elements.
-     */
-    FECollection (const FiniteElement<dim,spacedim> &fe1,
-                  const FiniteElement<dim,spacedim> &fe2,
-                  const FiniteElement<dim,spacedim> &fe3);
-
-    /**
-     * Constructor. This constructor creates a FECollection from four finite
-     * elements.
-     */
-    FECollection (const FiniteElement<dim,spacedim> &fe1,
-                  const FiniteElement<dim,spacedim> &fe2,
-                  const FiniteElement<dim,spacedim> &fe3,
-                  const FiniteElement<dim,spacedim> &fe4);
-
-    /**
-     * Constructor. This constructor creates a FECollection from five finite
-     * elements.
-     */
-    FECollection (const FiniteElement<dim,spacedim> &fe1,
-                  const FiniteElement<dim,spacedim> &fe2,
-                  const FiniteElement<dim,spacedim> &fe3,
-                  const FiniteElement<dim,spacedim> &fe4,
-                  const FiniteElement<dim,spacedim> &fe5);
+    template<class... FETypes>
+    explicit FECollection (const FETypes &... fes);
 
     /**
      * Constructor. Same as above but for any number of elements. Pointers to
@@ -114,7 +87,18 @@ namespace hp
     /**
      * Copy constructor.
      */
-    FECollection (const FECollection<dim,spacedim> &fe_collection);
+    FECollection (const FECollection<dim,spacedim> &fe_collection) = default;
+
+    /**
+     * Move constructor.
+     */
+    FECollection (FECollection<dim,spacedim> &&fe_collection) = default;
+
+    /**
+     * Move assignement operator.
+     */
+    FECollection<dim, spacedim> &
+    operator= (FECollection<dim,spacedim> &&fe_collection) = default;
 
     /**
      * Add a finite element. This function generates a copy of the given
@@ -465,6 +449,14 @@ namespace hp
 
 
   /* --------------- inline functions ------------------- */
+
+  template <int dim, int spacedim>
+  template <class... FETypes>
+  FECollection<dim,spacedim>::FECollection (const FETypes &... fes)
+  {
+    [](...) {}((push_back(fes),0)...);
+  }
+
 
   template <int dim, int spacedim>
   inline
