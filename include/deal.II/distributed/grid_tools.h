@@ -337,12 +337,8 @@ namespace parallel
         {
           internal::CellDataTransferBuffer<dim, DataType> &data = destination_to_data_buffer_map[*it];
 
-          // pack all the data into
-          // the buffer for this
-          // recipient and send
-          // it. keep data around
-          // till we can make sure
-          // that the packet has been
+          // pack all the data into the buffer for this recipient and send it.
+          // keep data around till we can make sure that the packet has been
           // received
           sendbuffers[idx] = data.pack_data ();
           const int ierr = MPI_Isend(sendbuffers[idx].data(), sendbuffers[idx].size(),
@@ -383,6 +379,14 @@ namespace parallel
 
               unpack(cell, *data);
             }
+        }
+
+      // make sure that all communication is finished
+      // when we leave this function.
+      if (requests.size())
+        {
+          const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+          AssertThrowMPI(ierr);
         }
 #endif // DEAL_II_WITH_MPI
     }
