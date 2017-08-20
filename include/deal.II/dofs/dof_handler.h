@@ -836,9 +836,11 @@ public:
 
   /**
    * Return a constant reference to the selected finite element object.
+   * Since there is only one FiniteElement @index must be equal to zero
+   * which is also the default value.
    */
   const FiniteElement<dim,spacedim> &
-  get_finite_element (const unsigned int number=0) const;
+  get_finite_element (const unsigned int index=0) const;
 
   /**
     * Return a constant reference to the set of finite element objects that
@@ -1243,8 +1245,10 @@ template <int dim, int spacedim>
 inline
 const FiniteElement<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_finite_element
-(const unsigned int) const
+(const unsigned int index) const
 {
+  (void) index;
+  Assert(index == 0, ExcMessage("There is only one FiniteElement stored. The index must be zero!"));
   Assert(selected_fe!=nullptr,
          ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
   return *selected_fe;

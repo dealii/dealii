@@ -665,11 +665,11 @@ namespace hp
     const hp::FECollection<dim,spacedim> &get_fe () const DEAL_II_DEPRECATED;
 
     /**
-     * Return a constant reference to the ith finite element object that is
+     * Return a constant reference to the indexth finite element object that is
      * used by this @p DoFHandler.
      */
     const FiniteElement<dim,spacedim> &
-    get_finite_element (const unsigned int i) const;
+    get_finite_element (const unsigned int index) const;
 
     /**
      * Return a constant reference to the set of finite element objects that
