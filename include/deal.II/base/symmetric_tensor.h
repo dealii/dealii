@@ -517,6 +517,8 @@ template <int rank, int dim, typename Number>
 class SymmetricTensor
 {
 public:
+  static_assert(rank%2==0, "A SymmetricTensor must have even rank!");
+
   /**
    * Provide a way to get the dimension of an object without explicit
    * knowledge of it's data type. Implementation is this way instead of
