@@ -1,0 +1,4 @@
+New: The constructors for hp::FECollection taking a fixed number of
+FiniteElement objects as argument were replaced by a variadic
+template constructor taking an arbitrary number of objects.
+<br> (Daniel Arndt, 2017/08/20)
