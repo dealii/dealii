@@ -1,0 +1,4 @@
+Changed: The constructors SymmetricTensor (const Tensor &) and
+Tensor (const array_type &) have been marked as 'explicit'.
+<br>
+(Daniel Arndt, 2017/08/20)

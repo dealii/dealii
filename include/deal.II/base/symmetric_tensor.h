@@ -517,6 +517,8 @@ template <int rank, int dim, typename Number>
 class SymmetricTensor
 {
 public:
+  static_assert(rank%2==0, "A SymmetricTensor must have even rank!");
+
   /**
    * Provide a way to get the dimension of an object without explicit
    * knowledge of it's data type. Implementation is this way instead of
@@ -551,7 +553,7 @@ public:
    * <tt>symmetrize</tt> function first. If you aren't sure, it is good
    * practice to check before calling <tt>symmetrize</tt>.
    */
-  SymmetricTensor (const Tensor<2,dim,Number> &t);
+  explicit SymmetricTensor (const Tensor<2,dim,Number> &t);
 
   /**
    * A constructor that creates a symmetric tensor from an array holding its

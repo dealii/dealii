@@ -96,8 +96,9 @@ void test (const Triangulation<dim> &tr,
 
                       AssertThrow (fe_values[vec_components].symmetric_gradient (i,q)
                                    ==
-                                   (fe_values[vec_components].gradient(i,q) +
-                                    transpose(fe_values[vec_components].gradient(i,q)))/2,
+                                   decltype(fe_values[vec_components].symmetric_gradient (i,q))
+                                   ( (fe_values[vec_components].gradient(i,q) +
+                                      transpose(fe_values[vec_components].gradient(i,q)))/2 ),
                                    ExcInternalError());
 
                       AssertThrow (fe_values[vec_components].hessian (i,q)[d]

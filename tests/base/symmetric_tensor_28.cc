@@ -32,7 +32,7 @@ void test ()
       s[i][j] = (i+1) * (j+1);
 
   Tensor<2,dim> t = s;
-  SymmetricTensor<2,dim> u = t;
+  SymmetricTensor<2,dim> u (t);
 
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
