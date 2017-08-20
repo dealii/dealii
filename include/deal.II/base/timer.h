@@ -22,10 +22,6 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
-#ifdef DEAL_II_WITH_MPI
-#  include <mpi.h>
-#endif
-
 #include <string>
 #include <list>
 #include <map>
@@ -81,11 +77,10 @@ public:
    */
   Timer ();
 
-#ifdef DEAL_II_WITH_MPI
   /**
    * Constructor that takes an MPI communicator as input. A timer constructed
    * this way will sum up the CPU times over all processors in the MPI network
-   * when requested by the operator ().
+   * when requested by Timer::cpu_time().
    *
    * Starts the timer at 0 sec.
    *
@@ -94,8 +89,6 @@ public:
    * only works if you stop() the timer before querying for the wall time. The
    * time for the MPI operations are not included in the timing but may slow
    * down your program.
-   *
-   * This constructor is only available if deal.II is compiled with MPI support.
    */
   Timer (MPI_Comm mpi_communicator,
          const bool sync_wall_time = false);
@@ -103,31 +96,67 @@ public:
   /**
    * Return a reference to the data structure with global timing information
    * for the last lap. Filled after calling stop().
+   *
+   * @deprecated Use Timer::get_last_lap_data() instead, which returns a
+   * reference to the same structure.
    */
-  const Utilities::MPI::MinMaxAvg &get_data() const;
+  const Utilities::MPI::MinMaxAvg &get_data() const DEAL_II_DEPRECATED;
+
+  /**
+   * Return a reference to the data structure containing timing information
+   * across all MPI processes in the given communicator about the last
+   * lap. Filled after calling stop().
+   */
+  const Utilities::MPI::MinMaxAvg &get_last_lap_data() const;
 
   /**
    * Return a reference to the data structure with global timing information
-   * for the total run.
-   * Filled after calling stop().
+   * for the total run. Filled after calling stop().
+   *
+   * @deprecated Use Timer::get_accumulated_wall_time_data() instead, which
+   * returns a reference the same structure.
    */
-  const Utilities::MPI::MinMaxAvg &get_total_data() const;
+  const Utilities::MPI::MinMaxAvg &get_total_data() const DEAL_II_DEPRECATED;
+
+  /**
+   * Return a reference to the data structure with global timing information
+   * for the total run. Filled after calling stop().
+   */
+  const Utilities::MPI::MinMaxAvg &get_accumulated_wall_time_data() const;
 
   /**
    * Prints the data returned by get_data(), i.e. for the last lap,
    * to the given stream.
+   *
+   * @deprecated Use Timer::print_last_lap_data() instead, which prints the
+   * same information.
    */
   template <class StreamType>
-  void print_data(StreamType &stream) const;
+  void print_data(StreamType &stream) const DEAL_II_DEPRECATED;
+
+  /**
+   * Print the data returned by Timer::get_last_lap_data() to the given
+   * stream.
+   */
+  template <class StreamType>
+  void print_last_lap_data(StreamType &stream) const;
 
   /**
    * Prints the data returned by get_total_data(), i.e. for the total run,
    * to the given stream.
+   *
+   * @deprecated Use Timer::print_accumulated_wall_time_data() instead, which
+   * prints the same information.
    */
   template <class StreamType>
-  void print_total_data(StreamType &stream) const;
+  void print_total_data(StreamType &stream) const DEAL_II_DEPRECATED;
 
-#endif
+  /**
+   * Print the data returned by Timer::get_accumulated_wall_time_data() to the
+   * given stream.
+   */
+  template <class StreamType>
+  void print_accumulated_wall_time_data(StreamType &stream) const;
 
   /**
    * Re-start the timer at the point where it was stopped. This way a
@@ -242,19 +271,17 @@ private:
    */
   MPI_Comm            mpi_communicator;
 
-#ifdef DEAL_II_WITH_MPI
   /**
    * Store whether the wall time is synchronized between machines.
    */
   bool sync_wall_time;
 
   /**
-   * A structure for parallel wall time measurement that includes the minimum
-   * time recorded among all processes, the maximum time as well as the
-   * average time defined as the sum of all individual times divided by the
-   * number of MPI processes in the MPI_Comm for the last lap.
+   * A structure for parallel wall time measurement that includes the minimum,
+   * maximum, and average over all processors known to the MPI communicator of
+   * the last lap time.
    */
-  Utilities::MPI::MinMaxAvg mpi_data;
+  Utilities::MPI::MinMaxAvg last_lap_data;
 
   /**
    * A structure for parallel wall time measurement that includes the minimum
@@ -262,8 +289,7 @@ private:
    * average time defined as the sum of all individual times divided by the
    * number of MPI processes in the MPI_Comm for the total run time.
    */
-  Utilities::MPI::MinMaxAvg mpi_total_data;
-#endif
+  Utilities::MPI::MinMaxAvg accumulated_wall_time_data;
 };
 
 
@@ -556,7 +582,6 @@ public:
                const enum OutputFrequency output_frequency,
                const enum OutputType      output_type);
 
-#ifdef DEAL_II_WITH_MPI
   /**
    * Constructor that takes an MPI communicator as input. A timer constructed
    * this way will sum up the CPU times over all processors in the MPI network
@@ -612,11 +637,6 @@ public:
                ConditionalOStream        &stream,
                const enum OutputFrequency output_frequency,
                const enum OutputType      output_type);
-
-
-
-
-#endif
 
   /**
    * Destructor. Calls print_summary() in case the option for writing the
@@ -760,13 +780,20 @@ void Timer::restart ()
 
 
 
-#ifdef DEAL_II_WITH_MPI
-
 inline
 const Utilities::MPI::MinMaxAvg &
 Timer::get_data() const
 {
-  return mpi_data;
+  return last_lap_data;
+}
+
+
+
+inline
+const Utilities::MPI::MinMaxAvg &
+Timer::get_last_lap_data() const
+{
+  return last_lap_data;
 }
 
 
@@ -775,7 +802,16 @@ inline
 const Utilities::MPI::MinMaxAvg &
 Timer::get_total_data() const
 {
-  return mpi_total_data;
+  return accumulated_wall_time_data;
+}
+
+
+
+inline
+const Utilities::MPI::MinMaxAvg &
+Timer::get_accumulated_wall_time_data() const
+{
+  return accumulated_wall_time_data;
 }
 
 
@@ -785,7 +821,17 @@ inline
 void
 Timer::print_data(StreamType &stream) const
 {
-  const Utilities::MPI::MinMaxAvg statistic = get_data();
+  print_last_lap_data(stream);
+}
+
+
+
+template <class StreamType>
+inline
+void
+Timer::print_last_lap_data(StreamType &stream) const
+{
+  const Utilities::MPI::MinMaxAvg statistic = get_last_lap_data();
   stream << statistic.max << " wall,"
          << " max @" << statistic.max_index << ", min=" << statistic.min << " @"
          << statistic.min_index << ", avg=" << statistic.avg << std::endl;
@@ -798,13 +844,21 @@ inline
 void
 Timer::print_total_data(StreamType &stream) const
 {
-  const Utilities::MPI::MinMaxAvg statistic = get_total_data();
+  print_accumulated_wall_time_data(stream);
+}
+
+
+
+template <class StreamType>
+inline
+void
+Timer::print_accumulated_wall_time_data(StreamType &stream) const
+{
+  const Utilities::MPI::MinMaxAvg statistic = get_accumulated_wall_time_data();
   stream << statistic.max << " wall,"
          << " max @" << statistic.max_index << ", min=" << statistic.min << " @"
          << statistic.min_index << ", avg=" << statistic.avg << std::endl;
 }
-
-#endif
 
 
 
