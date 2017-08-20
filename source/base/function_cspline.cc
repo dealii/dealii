@@ -127,7 +127,7 @@ namespace Functions
   CSpline<dim>::hessian (const Point<dim>   &p,
                          const unsigned int) const
   {
-    Tensor<2,dim> res;
+    SymmetricTensor<2,dim> res;
     res[0][0] = laplacian(p);
     return res;
   }
