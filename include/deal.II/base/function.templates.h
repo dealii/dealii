@@ -306,11 +306,6 @@ namespace Functions
     ConstantFunction<dim, Number> (Number(), n_components)
   {}
 
-
-  template <int dim, typename Number>
-  ZeroFunction<dim, Number>::~ZeroFunction ()
-  {}
-
 }
 
 //---------------------------------------------------------------------------
@@ -359,13 +354,6 @@ namespace Functions
     std::copy (begin_ptr, begin_ptr+n_components, function_value_vector.begin());
   }
 
-
-
-  template <int dim, typename Number>
-  ConstantFunction<dim, Number>::~ConstantFunction ()
-  {
-    function_value_vector.clear();
-  }
 
 
   template <int dim, typename Number>

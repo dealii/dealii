@@ -386,11 +386,6 @@ namespace Functions
      */
     ConstantFunction (const Number *begin_ptr, const unsigned int n_components);
 
-    /**
-     * Virtual destructor; absolutely necessary in this case.
-     */
-    virtual ~ConstantFunction ();
-
     virtual Number value (const Point<dim>   &p,
                           const unsigned int  component = 0) const;
 
@@ -448,12 +443,6 @@ namespace Functions
      * Constructor. The number of components is preset to one.
      */
     ZeroFunction (const unsigned int n_components = 1);
-
-    /**
-     * Destructor.
-     *
-     */
-    virtual ~ZeroFunction ();
 
   };
 
