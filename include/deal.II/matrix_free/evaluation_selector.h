@@ -291,11 +291,18 @@ namespace
  * pass these values to the respective template specializations.
  * Otherwise, we perform a runtime matching of the runtime parameters to find
  * the correct specialization. This matching currently supports
- * $0\leq fe\_degree$ and $degree-1\leq n_q_points_1d\leq degree+1$.
+ * $0\leq fe\_degree \leq 9$ and $degree+1\leq n\_q\_points\_1d\leq fe\_degree+2$.
  */
 template <int dim, int fe_degree, int n_q_points_1d, int n_components, typename Number>
 struct SelectEvaluator
 {
+  /**
+   * Chooses an appropriate evaluation strategy for the evaluate function, i.e.
+   * this calls internal::FEEvaluationImpl::evaluate(),
+   * internal::FEEvaluationImplCollocation::evaluate() or
+   * internal::FEEvaluationImplTransformToCollocation::evaluate() with appropriate
+   * template parameters.
+   */
   static void evaluate(const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number> > &shape_info,
                        VectorizedArray<Number> *values_dofs_actual[],
                        VectorizedArray<Number> *values_quad[],
@@ -306,6 +313,13 @@ struct SelectEvaluator
                        const bool               evaluate_gradients,
                        const bool               evaluate_hessians);
 
+  /**
+   * Chooses an appropriate evaluation strategy for the integrate function, i.e.
+   * this calls internal::FEEvaluationImpl::integrate(),
+   * internal::FEEvaluationImplCollocation::integrate() or
+   * internal::FEEvaluationImplTransformToCollocation::integrate() with appropriate
+   * template parameters.
+   */
   static void integrate(const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number> > &shape_info,
                         VectorizedArray<Number> *values_dofs_actual[],
                         VectorizedArray<Number> *values_quad[],
@@ -316,11 +330,26 @@ struct SelectEvaluator
 };
 
 /**
- * Specialization for invalid template parameters, i.e. fe_degree==-1.
+ * This specialization chooses an appropriate evaluation strategy if we
+ * don't know the correct template parameters at compile time. Instead
+ * the selection is done based on the shape_info variable which contains
+ * the relevant runtime parameters.
+ * In case these parameters do not satisfy
+ * $0\leq fe\_degree \leq 9$ and
+ * $degree+1\leq n\_q\_points\_1d\leq fe\_degree+2$, a non-optimized fallback
+ * is used.
  */
 template <int dim, int n_q_points_1d, int n_components, typename Number>
 struct SelectEvaluator<dim, -1, n_q_points_1d, n_components, Number>
 {
+  /**
+   * Based on the the run time parameters stored in @shape_info this function
+   * chooses an appropriate evaluation strategy for the integrate function, i.e.
+   * this calls internal::FEEvaluationImpl::evaluate(),
+   * internal::FEEvaluationImplCollocation::evaluate() or
+   * internal::FEEvaluationImplTransformToCollocation::evaluate() with appropriate
+   * template parameters.
+   */
   static void evaluate(const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number> > &shape_info,
                        VectorizedArray<Number> *values_dofs_actual[],
                        VectorizedArray<Number> *values_quad[],
@@ -331,6 +360,14 @@ struct SelectEvaluator<dim, -1, n_q_points_1d, n_components, Number>
                        const bool               evaluate_gradients,
                        const bool               evaluate_hessians);
 
+  /**
+   * Based on the the run time parameters stored in @shape_info this function
+   * chooses an appropriate evaluation strategy for the integrate function, i.e.
+   * this calls internal::FEEvaluationImpl::integrate(),
+   * internal::FEEvaluationImplCollocation::integrate() or
+   * internal::FEEvaluationImplTransformToCollocation::integrate() with appropriate
+   * template parameters.
+   */
   static void integrate(const internal::MatrixFreeFunctions::ShapeInfo<VectorizedArray<Number> > &shape_info,
                         VectorizedArray<Number> *values_dofs_actual[],
                         VectorizedArray<Number> *values_quad[],
