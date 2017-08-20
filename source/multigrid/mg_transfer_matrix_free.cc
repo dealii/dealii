@@ -553,6 +553,90 @@ MGTransferMatrixFree<dim,Number>::memory_consumption() const
 }
 
 
+template <int dim, typename Number>
+MGTransferBlockMatrixFree<dim,Number>::MGTransferBlockMatrixFree ()
+{}
+
+
+
+template <int dim, typename Number>
+MGTransferBlockMatrixFree<dim,Number>::MGTransferBlockMatrixFree (const MGConstrainedDoFs &mg_c)
+  :
+  matrix_free_transfer(mg_c)
+{
+}
+
+
+
+template <int dim, typename Number>
+MGTransferBlockMatrixFree<dim,Number>::~MGTransferBlockMatrixFree ()
+{}
+
+
+
+template <int dim, typename Number>
+void MGTransferBlockMatrixFree<dim,Number>::initialize_constraints
+(const MGConstrainedDoFs &mg_c)
+{
+  matrix_free_transfer.initialize_constraints(mg_c);
+}
+
+
+
+template <int dim, typename Number>
+void MGTransferBlockMatrixFree<dim,Number>::clear ()
+{
+  matrix_free_transfer.clear();
+}
+
+
+
+template <int dim, typename Number>
+void MGTransferBlockMatrixFree<dim,Number>::build
+(const DoFHandler<dim,dim>  &mg_dof)
+{
+  matrix_free_transfer.build(mg_dof);
+}
+
+
+
+template <int dim, typename Number>
+void MGTransferBlockMatrixFree<dim,Number>
+::prolongate (const unsigned int                           to_level,
+              LinearAlgebra::distributed::BlockVector<Number>       &dst,
+              const LinearAlgebra::distributed::BlockVector<Number> &src) const
+{
+  AssertDimension(dst.n_blocks(), src.n_blocks());
+  const unsigned int n_blocks = dst.n_blocks();
+  for (unsigned int b = 0; b < n_blocks; ++b)
+    matrix_free_transfer.prolongate(to_level, dst.block(b), src.block(b));
+}
+
+
+
+template <int dim, typename Number>
+void MGTransferBlockMatrixFree<dim,Number>
+::restrict_and_add (const unsigned int                           from_level,
+                    LinearAlgebra::distributed::BlockVector<Number>       &dst,
+                    const LinearAlgebra::distributed::BlockVector<Number> &src) const
+{
+  AssertDimension(dst.n_blocks(), src.n_blocks());
+  const unsigned int n_blocks = dst.n_blocks();
+  for (unsigned int b = 0; b < n_blocks; ++b)
+    matrix_free_transfer.restrict_and_add(from_level, dst.block(b), src.block(b));
+}
+
+
+
+template <int dim, typename Number>
+std::size_t
+MGTransferBlockMatrixFree<dim,Number>::memory_consumption() const
+{
+  return matrix_free_transfer.memory_consumption();
+}
+
+
+
 // explicit instantiation
 #include "mg_transfer_matrix_free.inst"
 
