@@ -27,6 +27,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
+#include <deal.II/base/std_cxx14/memory.h>
 
 #include <set>
 #include <algorithm>
@@ -653,6 +654,7 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   :
   tria(&tria, typeid(*this).name()),
   selected_fe(nullptr, typeid(*this).name()),
+  fe_collection(nullptr),
   faces(nullptr),
   mg_faces (nullptr)
 {
@@ -674,7 +676,8 @@ template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler ()
   :
   tria(nullptr, typeid(*this).name()),
-  selected_fe(nullptr, typeid(*this).name())
+  selected_fe(nullptr, typeid(*this).name()),
+  fe_collection(nullptr)
 {}
 
 
@@ -963,6 +966,7 @@ DoFHandler<dim,spacedim>::memory_consumption () const
 {
   std::size_t mem = (MemoryConsumption::memory_consumption (tria) +
                      MemoryConsumption::memory_consumption (selected_fe) +
+                     MemoryConsumption::memory_consumption (fe_collection) +
                      MemoryConsumption::memory_consumption (block_info_object) +
                      MemoryConsumption::memory_consumption (levels) +
                      MemoryConsumption::memory_consumption (*faces) +
@@ -991,6 +995,7 @@ template <int dim, int spacedim>
 void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &ff)
 {
   selected_fe = &ff;
+  fe_collection = std_cxx14::make_unique<hp::FECollection<dim, spacedim>>(ff);
 
   // delete all levels and set them
   // up newly. note that we still
@@ -1087,6 +1092,7 @@ void DoFHandler<dim,spacedim>::clear ()
 {
   // release lock to old fe
   selected_fe = nullptr;
+  fe_collection.release();
 
   // release memory
   clear_space ();

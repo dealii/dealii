@@ -848,7 +848,7 @@ public:
     * FiniteElement, only this one object is returned wrapped in a
     * hp::FECollection.
     */
-  hp::FECollection<dim,spacedim> get_fe_collection () const;
+  const hp::FECollection<dim,spacedim> &get_fe_collection () const;
 
   /**
    * Return a constant reference to the triangulation underlying this object.
@@ -952,6 +952,12 @@ private:
    */
   SmartPointer<const FiniteElement<dim,spacedim>,DoFHandler<dim,spacedim> >
   selected_fe;
+
+  /**
+   * Store a pointer to a hp::FECollection object containing the (one)
+   * FiniteElement this object is initialized with.
+   */
+  std::unique_ptr<const hp::FECollection<dim,spacedim> > fe_collection;
 
   /**
    * An object that describes how degrees of freedom should be distributed and
@@ -1258,12 +1264,12 @@ DoFHandler<dim,spacedim>::get_finite_element
 
 template <int dim, int spacedim>
 inline
-hp::FECollection<dim,spacedim>
+const hp::FECollection<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_fe_collection () const
 {
-  Assert(selected_fe!=nullptr,
-         ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
-  return hp::FECollection<dim,spacedim>(*selected_fe);
+  Assert(fe_collection != nullptr,
+         ExcMessage("You are trying to access the DoFHandler's FECollection object before it has been initialized."));
+  return *fe_collection;
 }
 
 
