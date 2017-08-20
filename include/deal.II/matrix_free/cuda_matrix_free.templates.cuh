@@ -519,36 +519,40 @@ namespace CUDAWrappers
     // Constrained indices
     n_constrained_dofs = constraints.n_constraints();
 
-    const unsigned int constraint_n_blocks = std::ceil(static_cast<double>(n_constrained_dofs) /
-                                                       static_cast<double>(BLOCK_SIZE));
-    const unsigned int constraint_x_n_blocks = std::round(std::sqrt(constraint_n_blocks));
-    const unsigned int constraint_y_n_blocks = std::ceil(static_cast<double>(constraint_n_blocks) /
-                                                         static_cast<double>(constraint_x_n_blocks));
-
-    constraint_grid_dim = dim3(constraint_x_n_blocks, constraint_y_n_blocks);
-    constraint_block_dim = dim3(BLOCK_SIZE);
-
-    std::vector<dealii::types::global_dof_index> constrained_dofs_host(n_constrained_dofs);
-
-    unsigned int i_constraint = 0;
-    const unsigned int n_dofs = dof_handler.n_dofs();
-    for (unsigned int i=0; i<n_dofs; ++i)
+    if (n_constrained_dofs != 0)
       {
-        if (constraints.is_constrained(i))
+
+        const unsigned int constraint_n_blocks = std::ceil(static_cast<double>(n_constrained_dofs) /
+                                                           static_cast<double>(BLOCK_SIZE));
+        const unsigned int constraint_x_n_blocks = std::round(std::sqrt(constraint_n_blocks));
+        const unsigned int constraint_y_n_blocks = std::ceil(static_cast<double>(constraint_n_blocks) /
+                                                             static_cast<double>(constraint_x_n_blocks));
+
+        constraint_grid_dim = dim3(constraint_x_n_blocks, constraint_y_n_blocks);
+        constraint_block_dim = dim3(BLOCK_SIZE);
+
+        std::vector<dealii::types::global_dof_index> constrained_dofs_host(n_constrained_dofs);
+
+        unsigned int i_constraint = 0;
+        const unsigned int n_dofs = dof_handler.n_dofs();
+        for (unsigned int i=0; i<n_dofs; ++i)
           {
-            constrained_dofs_host[i_constraint] = i;
-            ++i_constraint;
+            if (constraints.is_constrained(i))
+              {
+                constrained_dofs_host[i_constraint] = i;
+                ++i_constraint;
+              }
           }
+
+        cuda_error = cudaMalloc(&constrained_dofs, n_constrained_dofs *
+                                sizeof(dealii::types::global_dof_index));
+        AssertCuda(cuda_error);
+
+        cuda_error = cudaMemcpy(constrained_dofs, &constrained_dofs_host[0],
+                                n_constrained_dofs * sizeof(dealii::types::global_dof_index),
+                                cudaMemcpyHostToDevice);
+        AssertCuda(cuda_error);
       }
-
-    cuda_error = cudaMalloc(&constrained_dofs, n_constrained_dofs *
-                            sizeof(dealii::types::global_dof_index));
-    AssertCuda(cuda_error);
-
-    cuda_error = cudaMemcpy(constrained_dofs, &constrained_dofs_host[0],
-                            n_constrained_dofs * sizeof(dealii::types::global_dof_index),
-                            cudaMemcpyHostToDevice);
-    AssertCuda(cuda_error);
   }
 
 
