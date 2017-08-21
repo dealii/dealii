@@ -272,20 +272,24 @@ namespace DoFTools
   /**
    * Maximal number of degrees of freedom on a cell.
    *
+   * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_cell()</code>.
+   *
    * @relates DoFHandler
    */
   template <int dim, int spacedim>
   unsigned int
-  max_dofs_per_cell (const DoFHandler<dim,spacedim> &dh);
+  max_dofs_per_cell (const DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
 
   /**
    * Maximal number of degrees of freedom on a cell.
    *
+   * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_cell()</code>.
+   *
    * @relates hp::DoFHandler
    */
   template <int dim, int spacedim>
   unsigned int
-  max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh);
+  max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
 
 
   /**
@@ -294,11 +298,13 @@ namespace DoFTools
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
    *
+   * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_face()</code>.
+   *
    * @relates DoFHandler
    */
   template <int dim, int spacedim>
   unsigned int
-  max_dofs_per_face (const DoFHandler<dim,spacedim> &dh);
+  max_dofs_per_face (const DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
 
   /**
    * Maximal number of degrees of freedom on a face.
@@ -306,23 +312,27 @@ namespace DoFTools
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
    *
+   * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_face()</code>.
+   *
    * @relates hp::DoFHandler
    */
   template <int dim, int spacedim>
   unsigned int
-  max_dofs_per_face (const hp::DoFHandler<dim,spacedim> &dh);
+  max_dofs_per_face (const hp::DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
 
   /**
    * Maximal number of degrees of freedom on a vertex.
    *
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
+   *
+   * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_vertex()</code>.
    *
    * @relates DoFHandler
    */
   template <int dim, int spacedim>
   unsigned int
-  max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh);
+  max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
 
   /**
    * Maximal number of degrees of freedom on a vertex.
@@ -330,11 +340,13 @@ namespace DoFTools
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
    *
+   * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_vertex()</code>.
+   *
    * @relates hp::DoFHandler
    */
   template <int dim, int spacedim>
   unsigned int
-  max_dofs_per_vertex (const hp::DoFHandler<dim,spacedim> &dh);
+  max_dofs_per_vertex (const hp::DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
 
   /**
    * Number of vector components in the finite element object used by this
@@ -343,11 +355,13 @@ namespace DoFTools
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
    *
+   * @deprecated Use <code>dh.get_fe_collection().n_components()</code>.
+   *
    * @relates DoFHandler
    */
   template <int dim, int spacedim>
   unsigned int
-  n_components (const DoFHandler<dim,spacedim> &dh);
+  n_components (const DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
 
   /**
    * Number of vector components in the finite element object used by this
@@ -356,37 +370,43 @@ namespace DoFTools
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
    *
+   * @deprecated Use <code>dh.get_fe_collection().n_components()</code>.
+   *
    * @relates hp::DoFHandler
    */
   template <int dim, int spacedim>
   unsigned int
-  n_components (const hp::DoFHandler<dim,spacedim> &dh);
+  n_components (const hp::DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
 
   /**
-   * Find out whether the FiniteElement used by this DoFHandler is primitive
-   * or not.
+   * Find out whether the first FiniteElement used by this DoFHandler is
+   * primitive or not.
    *
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
+   *
+   * @deprecated Use <code>dh.get_finite_element(0).is_primitive()</code>.
    *
    * @relates DoFHandler
    */
   template <int dim, int spacedim>
   bool
-  fe_is_primitive (const DoFHandler<dim,spacedim> &dh);
+  fe_is_primitive (const DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
 
   /**
-   * Find out whether the FiniteElement used by this DoFHandler is primitive
+   * Find out whether the first FiniteElement used by this DoFHandler is primitive
    * or not.
    *
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
    *
+   * @deprecated Use <code>dh.get_finite_element(0).is_primitive()</code>.
+   *
    * @relates hp::DoFHandler
    */
   template <int dim, int spacedim>
   bool
-  fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh);
+  fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
 
   /**
    * @}
