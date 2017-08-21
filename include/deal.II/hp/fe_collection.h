@@ -87,7 +87,7 @@ namespace hp
     /**
      * Copy constructor.
      */
-    FECollection (const FECollection<dim,spacedim> &fe_collection) = default;
+    FECollection (const FECollection<dim,spacedim> &) = default;
 
     /**
      * Move constructor.
