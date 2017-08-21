@@ -457,16 +457,13 @@ namespace hp
     static_assert(is_base_of_all<FiniteElement<dim, spacedim>, FETypes...>::value,
                   "Not all of the input parameters are derived from FiniteElement<dim, spacedim>!");
 
-    // We want to call 'push_back' for each of the arguments. To do so parameter
-    // pack expansion comes in handy. Unfortunately, we can't just write
-    //   push_back(fes)...;
-    // but have to treat this as arguments to some function which doesn't need
-    // to do anything with it. Now,
-    //   [](...) {}(push_back(fes)...);
-    // doesn't work as well because the ellipsis cannot deal with no parameters
-    // at all. Hence, we extend the return value of each of the return values
-    // by zero using the comma operator.
-    [](...) {}((push_back(fes),0)...);
+    // loop over all of the given arguments and add the finite
+    // elements to this collection
+    for (auto p :
+         {
+           &fes...
+         })
+      push_back (*p);
   }
 
 
