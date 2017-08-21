@@ -15,7 +15,7 @@
 
 
 
-// like the same test in deal.II but this time use a
+// like the dofs/dof_handler_number_cache test but this time use a
 // parallel::distributed::Triangulation object. We still use only a
 // single processor so the end result should be the same but we use
 // entirely different code paths
@@ -114,12 +114,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-#ifdef DEAL_II_WITH_MPI
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
-#else
-  (void)argc;
-  (void)argv;
-#endif
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   if (myid == 0)

@@ -41,7 +41,7 @@
 
 
 template <int dim>
-void test(std::ostream & /*out*/)
+void test()
 {
   deallog << "hyper_cube" << std::endl;
 
@@ -81,12 +81,9 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog ();
 
   deallog.push("2d");
-  test<2>(logfile);
+  test<2>();
   deallog.pop();
-
-
 }
