@@ -25,6 +25,28 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace
+{
+  // helper struct for is_base_of_all
+  template<bool... Types> struct BoolStorage;
+}
+
+/**
+ * This struct is a generalization of std::is_base_of<Base, Derived>
+ * to template parameter packs and tests if all of the Derived...
+ * classes have Base as base class or are Base itself. The result
+ * is stored in the member variable value.
+ */
+template<class Base, class... Derived>
+struct is_base_of_all
+{
+  static constexpr bool value =
+    std::is_same<BoolStorage<std::is_base_of<Base,Derived>::value..., true>,
+    BoolStorage<true, std::is_base_of<Base,Derived>::value...>>::value;
+};
+
+
+
 template <bool, typename> struct constraint_and_return_value;
 
 
