@@ -1452,7 +1452,7 @@ namespace internal
               // really is unused
               Assert (dof_handler.get_triangulation()
                       .vertex_used((i-dof_handler.vertex_dofs.begin()) /
-                                   dof_handler.selected_fe->dofs_per_vertex)
+                                   dof_handler.get_finite_element().dofs_per_vertex)
                       == false,
                       ExcInternalError ());
         }

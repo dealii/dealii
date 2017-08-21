@@ -1140,15 +1140,12 @@ namespace internal
         (void)fe_index;
         Assert ((fe_index == dealii::DoFHandler<dim,spacedim>::default_fe_index),
                 ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-        Assert (dof_handler.selected_fe != nullptr,
-                ExcMessage ("No finite element collection is associated with "
-                            "this DoFHandler"));
-        Assert (local_index < dof_handler.selected_fe->dofs_per_vertex,
+        Assert (local_index < dof_handler.get_finite_element().dofs_per_vertex,
                 ExcIndexRange(local_index, 0,
-                              dof_handler.selected_fe->dofs_per_vertex));
+                              dof_handler.get_finite_element().dofs_per_vertex));
 
         dof_handler.vertex_dofs[vertex_index *
-                                dof_handler.selected_fe->dofs_per_vertex
+                                dof_handler.get_finite_element().dofs_per_vertex
                                 + local_index]
           = global_index;
       }
@@ -1229,16 +1226,13 @@ namespace internal
         (void)fe_index;
         Assert ((fe_index == dealii::DoFHandler<dim,spacedim>::default_fe_index),
                 ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
-        Assert (dof_handler.selected_fe != nullptr,
-                ExcMessage ("No finite element collection is associated with "
-                            "this DoFHandler"));
-        Assert (local_index < dof_handler.selected_fe->dofs_per_vertex,
+        Assert (local_index < dof_handler.get_finite_element().dofs_per_vertex,
                 ExcIndexRange(local_index, 0,
-                              dof_handler.selected_fe->dofs_per_vertex));
+                              dof_handler.get_finite_element().dofs_per_vertex));
 
         return
           dof_handler.vertex_dofs[vertex_index *
-                                  dof_handler.selected_fe->dofs_per_vertex
+                                  dof_handler.get_finite_element().dofs_per_vertex
                                   + local_index];
       }
 

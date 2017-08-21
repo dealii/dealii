@@ -107,8 +107,8 @@ namespace internal
       unsigned int
       max_couplings_between_dofs (const DoFHandler<1,spacedim> &dof_handler)
       {
-        return std::min(static_cast<types::global_dof_index>(3*dof_handler.selected_fe->dofs_per_vertex +
-                                                             2*dof_handler.selected_fe->dofs_per_line),
+        return std::min(static_cast<types::global_dof_index>(3*dof_handler.get_finite_element().dofs_per_vertex +
+                                                             2*dof_handler.get_finite_element().dofs_per_line),
                         dof_handler.n_dofs());
       }
 
@@ -145,29 +145,29 @@ namespace internal
         switch (dof_handler.tria->max_adjacent_cells())
           {
           case 4:
-            max_couplings=19*dof_handler.selected_fe->dofs_per_vertex +
-                          28*dof_handler.selected_fe->dofs_per_line +
-                          8*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=19*dof_handler.get_finite_element().dofs_per_vertex +
+                          28*dof_handler.get_finite_element().dofs_per_line +
+                          8*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 5:
-            max_couplings=21*dof_handler.selected_fe->dofs_per_vertex +
-                          31*dof_handler.selected_fe->dofs_per_line +
-                          9*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=21*dof_handler.get_finite_element().dofs_per_vertex +
+                          31*dof_handler.get_finite_element().dofs_per_line +
+                          9*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 6:
-            max_couplings=28*dof_handler.selected_fe->dofs_per_vertex +
-                          42*dof_handler.selected_fe->dofs_per_line +
-                          12*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=28*dof_handler.get_finite_element().dofs_per_vertex +
+                          42*dof_handler.get_finite_element().dofs_per_line +
+                          12*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 7:
-            max_couplings=30*dof_handler.selected_fe->dofs_per_vertex +
-                          45*dof_handler.selected_fe->dofs_per_line +
-                          13*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=30*dof_handler.get_finite_element().dofs_per_vertex +
+                          45*dof_handler.get_finite_element().dofs_per_line +
+                          13*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 8:
-            max_couplings=37*dof_handler.selected_fe->dofs_per_vertex +
-                          56*dof_handler.selected_fe->dofs_per_line +
-                          16*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=37*dof_handler.get_finite_element().dofs_per_vertex +
+                          56*dof_handler.get_finite_element().dofs_per_line +
+                          16*dof_handler.get_finite_element().dofs_per_quad;
             break;
 
           // the following numbers are not based on actual counting but by
@@ -175,44 +175,44 @@ namespace internal
           // example, for dofs_per_vertex, the sequence above is 19, 21, 28,
           // 30, 37, and is continued as follows):
           case 9:
-            max_couplings=39*dof_handler.selected_fe->dofs_per_vertex +
-                          59*dof_handler.selected_fe->dofs_per_line +
-                          17*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=39*dof_handler.get_finite_element().dofs_per_vertex +
+                          59*dof_handler.get_finite_element().dofs_per_line +
+                          17*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 10:
-            max_couplings=46*dof_handler.selected_fe->dofs_per_vertex +
-                          70*dof_handler.selected_fe->dofs_per_line +
-                          20*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=46*dof_handler.get_finite_element().dofs_per_vertex +
+                          70*dof_handler.get_finite_element().dofs_per_line +
+                          20*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 11:
-            max_couplings=48*dof_handler.selected_fe->dofs_per_vertex +
-                          73*dof_handler.selected_fe->dofs_per_line +
-                          21*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=48*dof_handler.get_finite_element().dofs_per_vertex +
+                          73*dof_handler.get_finite_element().dofs_per_line +
+                          21*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 12:
-            max_couplings=55*dof_handler.selected_fe->dofs_per_vertex +
-                          84*dof_handler.selected_fe->dofs_per_line +
-                          24*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=55*dof_handler.get_finite_element().dofs_per_vertex +
+                          84*dof_handler.get_finite_element().dofs_per_line +
+                          24*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 13:
-            max_couplings=57*dof_handler.selected_fe->dofs_per_vertex +
-                          87*dof_handler.selected_fe->dofs_per_line +
-                          25*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=57*dof_handler.get_finite_element().dofs_per_vertex +
+                          87*dof_handler.get_finite_element().dofs_per_line +
+                          25*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 14:
-            max_couplings=63*dof_handler.selected_fe->dofs_per_vertex +
-                          98*dof_handler.selected_fe->dofs_per_line +
-                          28*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=63*dof_handler.get_finite_element().dofs_per_vertex +
+                          98*dof_handler.get_finite_element().dofs_per_line +
+                          28*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 15:
-            max_couplings=65*dof_handler.selected_fe->dofs_per_vertex +
-                          103*dof_handler.selected_fe->dofs_per_line +
-                          29*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=65*dof_handler.get_finite_element().dofs_per_vertex +
+                          103*dof_handler.get_finite_element().dofs_per_line +
+                          29*dof_handler.get_finite_element().dofs_per_quad;
             break;
           case 16:
-            max_couplings=72*dof_handler.selected_fe->dofs_per_vertex +
-                          114*dof_handler.selected_fe->dofs_per_line +
-                          32*dof_handler.selected_fe->dofs_per_quad;
+            max_couplings=72*dof_handler.get_finite_element().dofs_per_vertex +
+                          114*dof_handler.get_finite_element().dofs_per_line +
+                          32*dof_handler.get_finite_element().dofs_per_quad;
             break;
 
           default:
@@ -246,10 +246,10 @@ namespace internal
 
         types::global_dof_index max_couplings;
         if (max_adjacent_cells <= 8)
-          max_couplings=7*7*7*dof_handler.selected_fe->dofs_per_vertex +
-                        7*6*7*3*dof_handler.selected_fe->dofs_per_line +
-                        9*4*7*3*dof_handler.selected_fe->dofs_per_quad +
-                        27*dof_handler.selected_fe->dofs_per_hex;
+          max_couplings=7*7*7*dof_handler.get_finite_element().dofs_per_vertex +
+                        7*6*7*3*dof_handler.get_finite_element().dofs_per_line +
+                        9*4*7*3*dof_handler.get_finite_element().dofs_per_quad +
+                        27*dof_handler.get_finite_element().dofs_per_hex;
         else
           {
             Assert (false, ExcNotImplemented());
@@ -275,7 +275,7 @@ namespace internal
       {
         dof_handler.vertex_dofs
         .resize(dof_handler.tria->n_vertices() *
-                dof_handler.selected_fe->dofs_per_vertex,
+                dof_handler.get_finite_element().dofs_per_vertex,
                 numbers::invalid_dof_index);
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
@@ -284,12 +284,12 @@ namespace internal
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
-                     dof_handler.selected_fe->dofs_per_line,
+                     dof_handler.get_finite_element().dofs_per_line,
                      numbers::invalid_dof_index);
 
             dof_handler.levels.back()->cell_dof_indices_cache
             .resize (dof_handler.tria->n_raw_cells(i) *
-                     dof_handler.selected_fe->dofs_per_cell,
+                     dof_handler.get_finite_element().dofs_per_cell,
                      numbers::invalid_dof_index);
           }
       }
@@ -301,7 +301,7 @@ namespace internal
       {
         dof_handler.vertex_dofs
         .resize(dof_handler.tria->n_vertices() *
-                dof_handler.selected_fe->dofs_per_vertex,
+                dof_handler.get_finite_element().dofs_per_vertex,
                 numbers::invalid_dof_index);
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
@@ -310,12 +310,12 @@ namespace internal
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
-                     dof_handler.selected_fe->dofs_per_quad,
+                     dof_handler.get_finite_element().dofs_per_quad,
                      numbers::invalid_dof_index);
 
             dof_handler.levels.back()->cell_dof_indices_cache
             .resize (dof_handler.tria->n_raw_cells(i) *
-                     dof_handler.selected_fe->dofs_per_cell,
+                     dof_handler.get_finite_element().dofs_per_cell,
                      numbers::invalid_dof_index);
           }
 
@@ -325,7 +325,7 @@ namespace internal
           {
             dof_handler.faces->lines.dofs
             .resize (dof_handler.tria->n_raw_lines() *
-                     dof_handler.selected_fe->dofs_per_line,
+                     dof_handler.get_finite_element().dofs_per_line,
                      numbers::invalid_dof_index);
           }
       }
@@ -337,7 +337,7 @@ namespace internal
       {
         dof_handler.vertex_dofs
         .resize(dof_handler.tria->n_vertices() *
-                dof_handler.selected_fe->dofs_per_vertex,
+                dof_handler.get_finite_element().dofs_per_vertex,
                 numbers::invalid_dof_index);
 
         for (unsigned int i=0; i<dof_handler.tria->n_levels(); ++i)
@@ -346,12 +346,12 @@ namespace internal
 
             dof_handler.levels.back()->dof_object.dofs
             .resize (dof_handler.tria->n_raw_cells(i) *
-                     dof_handler.selected_fe->dofs_per_hex,
+                     dof_handler.get_finite_element().dofs_per_hex,
                      numbers::invalid_dof_index);
 
             dof_handler.levels.back()->cell_dof_indices_cache
             .resize (dof_handler.tria->n_raw_cells(i) *
-                     dof_handler.selected_fe->dofs_per_cell,
+                     dof_handler.get_finite_element().dofs_per_cell,
                      numbers::invalid_dof_index);
           }
         dof_handler.faces.reset (new internal::DoFHandler::DoFFaces<3>);
@@ -361,11 +361,11 @@ namespace internal
           {
             dof_handler.faces->lines.dofs
             .resize (dof_handler.tria->n_raw_lines() *
-                     dof_handler.selected_fe->dofs_per_line,
+                     dof_handler.get_finite_element().dofs_per_line,
                      numbers::invalid_dof_index);
             dof_handler.faces->quads.dofs
             .resize (dof_handler.tria->n_raw_quads() *
-                     dof_handler.selected_fe->dofs_per_quad,
+                     dof_handler.get_finite_element().dofs_per_quad,
                      numbers::invalid_dof_index);
           }
       }
@@ -653,7 +653,6 @@ template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   :
   tria(&tria, typeid(*this).name()),
-  selected_fe(nullptr, typeid(*this).name()),
   fe_collection(nullptr),
   faces(nullptr),
   mg_faces (nullptr)
@@ -676,7 +675,6 @@ template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::DoFHandler ()
   :
   tria(nullptr, typeid(*this).name()),
-  selected_fe(nullptr, typeid(*this).name()),
   fe_collection(nullptr)
 {}
 
@@ -965,7 +963,6 @@ std::size_t
 DoFHandler<dim,spacedim>::memory_consumption () const
 {
   std::size_t mem = (MemoryConsumption::memory_consumption (tria) +
-                     MemoryConsumption::memory_consumption (selected_fe) +
                      MemoryConsumption::memory_consumption (fe_collection) +
                      MemoryConsumption::memory_consumption (block_info_object) +
                      MemoryConsumption::memory_consumption (levels) +
@@ -994,7 +991,6 @@ DoFHandler<dim,spacedim>::memory_consumption () const
 template <int dim, int spacedim>
 void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &ff)
 {
-  selected_fe = &ff;
   fe_collection = std_cxx14::make_unique<hp::FECollection<dim, spacedim>>(ff);
 
   // delete all levels and set them
@@ -1029,14 +1025,9 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
 
 
 template <int dim, int spacedim>
-void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe)
+void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spacedim> &)
 {
-  (void)fe;
   Assert(levels.size()>0, ExcMessage("Distribute active DoFs using distribute_dofs() before calling distribute_mg_dofs()."));
-
-  const FiniteElement<dim, spacedim> *old_fe = selected_fe;
-  (void)old_fe;
-  Assert(old_fe == &fe, ExcMessage("You are required to use the same FE for level and active DoFs!") );
 
   Assert(((tria->get_mesh_smoothing() & Triangulation<dim, spacedim>::limit_level_difference_at_vertices)
           != Triangulation<dim, spacedim>::none),
@@ -1091,7 +1082,6 @@ template <int dim, int spacedim>
 void DoFHandler<dim,spacedim>::clear ()
 {
   // release lock to old fe
-  selected_fe = nullptr;
   fe_collection.release();
 
   // release memory

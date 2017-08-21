@@ -354,11 +354,7 @@ public:
    * The purpose of this function is first discussed in the introduction to
    * the step-2 tutorial program.
    *
-   * @note A pointer of the finite element given as argument is stored.
-   * Therefore, the lifetime of the finite element object shall be longer than
-   * that of this object. If you don't want this behavior, you may want to
-   * call the @p clear member function which also releases the lock of this
-   * object to the finite element.
+   * @note A copy of the finite element given as argument is stored.
    */
   virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe);
 
@@ -402,9 +398,7 @@ public:
   void initialize_local_block_info();
 
   /**
-   * Clear all data of this object and especially delete the lock this object
-   * has to the finite element used the last time when @p distribute_dofs was
-   * called.
+   * Clear all data of this object.
    */
   virtual void clear ();
 
@@ -942,16 +936,6 @@ private:
   SmartPointer<const Triangulation<dim,spacedim>,DoFHandler<dim,spacedim> >
   tria;
 
-  /**
-   * Store a pointer to the finite element given latest for the distribution
-   * of dofs. In order to avoid destruction of the object before the lifetime
-   * of the DoF handler, we subscribe to the finite element object. To unlock
-   * the FE before the end of the lifetime of this DoF handler, use the
-   * <tt>clear()</tt> function (this clears all data of this object as well,
-   * though).
-   */
-  SmartPointer<const FiniteElement<dim,spacedim>,DoFHandler<dim,spacedim> >
-  selected_fe;
 
   /**
    * Store a pointer to a hp::FECollection object containing the (one)
@@ -1240,9 +1224,7 @@ inline
 const FiniteElement<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_fe () const
 {
-  Assert(selected_fe!=nullptr,
-         ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
-  return *selected_fe;
+  return this->get_finite_element();
 }
 
 
@@ -1255,9 +1237,7 @@ DoFHandler<dim,spacedim>::get_finite_element
 {
   (void) index;
   Assert(index == 0, ExcMessage("There is only one FiniteElement stored. The index must be zero!"));
-  Assert(selected_fe!=nullptr,
-         ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
-  return *selected_fe;
+  return get_fe_collection()[0];
 }
 
 
@@ -1353,7 +1333,7 @@ void DoFHandler<dim,spacedim>::save (Archive &ar,
   // loading that this number is indeed correct; same with something that
   // identifies the FE and the policy
   unsigned int n_cells = tria->n_cells();
-  std::string  fe_name = selected_fe->get_name();
+  std::string  fe_name = this->get_finite_element().get_name();
   std::string  policy_name = internal::policy_to_string(*policy);
 
   ar &n_cells &fe_name &policy_name;
@@ -1403,7 +1383,7 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
   AssertThrow (n_cells == tria->n_cells(),
                ExcMessage ("The object being loaded into does not match the triangulation "
                            "that has been stored previously."));
-  AssertThrow (fe_name == selected_fe->get_name(),
+  AssertThrow (fe_name == this->get_finite_element().get_name(),
                ExcMessage ("The finite element associated with this DoFHandler does not match "
                            "the one that was associated with the DoFHandler previously stored."));
   AssertThrow (policy_name == internal::policy_to_string(*policy),
