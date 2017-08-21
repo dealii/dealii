@@ -1524,7 +1524,7 @@ namespace DoFRenumbering
         std::vector<std::pair<Point<DoFHandlerType::space_dimension>,unsigned int> > support_point_list
         (n_dofs);
 
-        const hp::FECollection<DoFHandlerType::dimension> fe_collection (dof.get_fe_collection());
+        const hp::FECollection<DoFHandlerType::dimension> &fe_collection = dof.get_fe_collection();
         Assert (fe_collection[0].has_support_points(),
                 typename FiniteElement<DoFHandlerType::dimension>::ExcFEHasNoSupportPoints());
         hp::QCollection<DoFHandlerType::dimension> quadrature_collection;

@@ -260,7 +260,7 @@ namespace Functions
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
-    hp::FECollection<dim> fe_collection (dh->get_fe_collection());
+    const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i)
@@ -321,7 +321,7 @@ namespace Functions
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
-    hp::FECollection<dim> fe_collection (dh->get_fe_collection());
+    const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i)
@@ -386,7 +386,7 @@ namespace Functions
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
-    hp::FECollection<dim> fe_collection (dh->get_fe_collection());
+    const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i)

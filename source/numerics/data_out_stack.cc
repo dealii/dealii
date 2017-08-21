@@ -279,7 +279,7 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned in
   // collection of which we do a
   // shallow copy instead
   const hp::QCollection<dim>       q_collection (patch_points);
-  const hp::FECollection<dim>      fe_collection(dof_handler->get_fe_collection());
+  const hp::FECollection<dim>     &fe_collection = dof_handler->get_fe_collection();
 
   hp::FEValues<dim> x_fe_patch_values (fe_collection, q_collection,
                                        update_values);

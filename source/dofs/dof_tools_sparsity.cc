@@ -143,7 +143,7 @@ namespace DoFTools
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
 
-    const hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> fe_collection (dof.get_fe_collection());
+    const hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_collection = dof.get_fe_collection();
 
     const std::vector<Table<2,Coupling> > dof_mask //(fe_collection.size())
       = dof_couplings_from_component_couplings (fe_collection,

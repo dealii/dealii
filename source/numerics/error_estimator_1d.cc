@@ -324,7 +324,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
   const QGauss<0> face_quadrature(1);
   const hp::QCollection<0> q_face_collection(face_quadrature);
 
-  const hp::FECollection<1,spacedim> fe (dof_handler.get_fe_collection());
+  const hp::FECollection<1,spacedim> &fe = dof_handler.get_fe_collection();
 
   hp::MappingCollection<1,spacedim> mapping_collection;
   mapping_collection.push_back (mapping);

@@ -778,7 +778,7 @@ namespace DerivativeApproximation
       // collection of which we do a
       // shallow copy instead
       const hp::QCollection<dim>       q_collection (midpoint_rule);
-      const hp::FECollection<dim>      fe_collection(dof_handler.get_fe_collection());
+      const hp::FECollection<dim>     &fe_collection = dof_handler.get_fe_collection();
       const hp::MappingCollection<dim> mapping_collection (mapping);
 
       hp::FEValues<dim> x_fe_midpoint_value (mapping_collection, fe_collection,

@@ -107,7 +107,7 @@ namespace VectorTools
     Assert (component_mask.n_selected_components(dof.get_finite_element(0).n_components()) > 0,
             ComponentMask::ExcNoComponentSelected());
 
-    const hp::FECollection<dim,spacedim> fe (dof.get_fe_collection());
+    const hp::FECollection<dim,spacedim> &fe = dof.get_fe_collection();
     const unsigned int          n_components = fe.n_components();
     const bool                  fe_is_system = (n_components != 1);
 
@@ -403,8 +403,7 @@ namespace VectorTools
                 ExcDimensionMismatch(dof.get_finite_element(0).n_components(), iter->second->n_components) );
       }
 
-    const hp::FECollection<dim, spacedim>
-    fe(dof.get_fe_collection());
+    const hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
     const unsigned int n_components =  fe.n_components();
     const bool         fe_is_system = (n_components != 1);
 
@@ -2349,7 +2348,7 @@ namespace VectorTools
           // before we start with the loop over all cells create an hp::FEValues
           // object that holds the interpolation points of all finite elements
           // that may ever be in use
-          dealii::hp::FECollection<dim,spacedim> finite_elements (dof.get_fe_collection());
+          const dealii::hp::FECollection<dim,spacedim> &finite_elements = dof.get_fe_collection();
           dealii::hp::QCollection<dim-1>  q_collection;
           for (unsigned int f=0; f<finite_elements.size(); ++f)
             {
@@ -5928,7 +5927,7 @@ namespace VectorTools
 
     // create FE and mapping collections for all elements in use by this
     // DoFHandler
-    hp::FECollection<dim,spacedim>      fe_collection (dof_handler.get_fe_collection());
+    const hp::FECollection<dim,spacedim> &fe_collection = dof_handler.get_fe_collection();
     hp::MappingCollection<dim,spacedim> mapping_collection;
     for (unsigned int i=0; i<fe_collection.size(); ++i)
       mapping_collection.push_back (mapping);
@@ -6514,7 +6513,7 @@ namespace VectorTools
                                              no_normal_flux_constraints,
                                              mapping);
 
-    hp::FECollection<dim,spacedim>      fe_collection (dof_handler.get_fe_collection());
+    const hp::FECollection<dim,spacedim> &fe_collection = dof_handler.get_fe_collection();
     hp::MappingCollection<dim,spacedim> mapping_collection;
     for (unsigned int i=0; i<fe_collection.size(); ++i)
       mapping_collection.push_back (mapping);
@@ -7133,7 +7132,7 @@ namespace VectorTools
           break;
         }
 
-      dealii::hp::FECollection<dim,spacedim> fe_collection (dof.get_fe_collection());
+      const dealii::hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe_collection();
       IDScratchData<dim,spacedim, Number> data(mapping, fe_collection, q, update_flags);
 
       // loop over all cells

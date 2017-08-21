@@ -178,8 +178,8 @@ namespace DoFTools
                                const ComponentMask        &component_mask,
                                std::vector<unsigned char> &dofs_by_component)
     {
-      const dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
-      fe_collection (dof.get_fe_collection());
+      const dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
+      fe_collection = dof.get_fe_collection();
       Assert (fe_collection.n_components() < 256, ExcNotImplemented());
       Assert (dofs_by_component.size() == dof.n_locally_owned_dofs(),
               ExcDimensionMismatch(dofs_by_component.size(),
@@ -233,8 +233,8 @@ namespace DoFTools
     get_block_association (const DoFHandlerType       &dof,
                            std::vector<unsigned char> &dofs_by_block)
     {
-      const dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
-      fe_collection (dof.get_fe_collection());
+      const dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
+      fe_collection = dof.get_fe_collection();
       Assert (fe_collection.n_components() < 256, ExcNotImplemented());
       Assert (dofs_by_block.size() == dof.n_locally_owned_dofs(),
               ExcDimensionMismatch(dofs_by_block.size(),
@@ -1193,8 +1193,8 @@ namespace DoFTools
     //
     // TODO: We might be able to extend this also for elements which do not
     // have the same constant modes, but that is messy...
-    const dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
-    fe_collection (dof_handler.get_fe_collection());
+    const dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
+    fe_collection = dof_handler.get_fe_collection();
     std::vector<Table<2,bool> > element_constant_modes;
     std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
     constant_mode_to_component_translation(n_components);
@@ -1824,8 +1824,8 @@ namespace DoFTools
   {
     std::vector<unsigned int>  target_block = target_block_;
 
-    const dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension>
-    fe_collection (dof_handler.get_fe_collection());
+    const dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
+    fe_collection = dof_handler.get_fe_collection();
     Assert (fe_collection.size() < 256, ExcNotImplemented());
 
     for (unsigned int this_fe=0; this_fe<fe_collection.size(); ++this_fe)
@@ -1989,7 +1989,7 @@ namespace DoFTools
         const unsigned int dim = DoFHandlerType::dimension;
         const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        hp::FECollection<dim, spacedim> fe_collection(dof_handler.get_fe_collection());
+        const hp::FECollection<dim, spacedim> &fe_collection = dof_handler.get_fe_collection();
         hp::QCollection<dim> q_coll_dummy;
 
         for (unsigned int fe_index = 0; fe_index < fe_collection.size(); ++fe_index)
