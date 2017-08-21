@@ -2006,13 +2006,13 @@ cofactor (const Tensor<2,dim,Number> &t)
  */
 template <int dim, typename Number>
 inline
-double
+Number
 l1_norm (const Tensor<2,dim,Number> &t)
 {
-  double max = 0;
+  Number max = internal::NumberType<Number>::value(0.0);
   for (unsigned int j=0; j<dim; ++j)
     {
-      double sum = 0;
+      Number sum = internal::NumberType<Number>::value(0.0);
       for (unsigned int i=0; i<dim; ++i)
         sum += std::fabs(t[i][j]);
 
@@ -2033,13 +2033,13 @@ l1_norm (const Tensor<2,dim,Number> &t)
  */
 template <int dim, typename Number>
 inline
-double
+Number
 linfty_norm (const Tensor<2,dim,Number> &t)
 {
-  double max = 0;
+  Number max = internal::NumberType<Number>::value(0.0);
   for (unsigned int i=0; i<dim; ++i)
     {
-      double sum = 0;
+      Number sum = internal::NumberType<Number>::value(0.0);
       for (unsigned int j=0; j<dim; ++j)
         sum += std::fabs(t[i][j]);
 

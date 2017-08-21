@@ -1,0 +1,4 @@
+Fixed: The non-member invert() function operating on SymmetricTensors has
+been generalized for all number types.
+<br>
+(Wolfgang Bangerth, Jean-Paul Pelteret, 2017/08/17)

@@ -1,0 +1,4 @@
+Fixed: The Tensor::l1_norm() and Tensor::linfty_norm() functions have now been
+generalized for all number types.
+<br>
+(Jean-Paul Pelteret, 2017/08/17)
