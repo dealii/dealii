@@ -293,7 +293,7 @@ namespace Step36
     DoFTools::make_hanging_node_constraints  (dof_handler, constraints);
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
-                                              ZeroFunction<dim> (2),
+                                              Functions::ZeroFunction<dim> (2),
                                               constraints);
     constrain_pou_dofs();
     constraints.close ();

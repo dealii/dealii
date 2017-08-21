@@ -223,7 +223,7 @@ namespace Step21
   //
   // We therefore simply create a function that returns zero in all
   // components. We do that by simply forward every function to the
-  // ZeroFunction class. Why not use that right away in the places of this
+  // Functions::ZeroFunction class. Why not use that right away in the places of this
   // program where we presently use the <code>InitialValues</code> class?
   // Because this way it is simpler to later go back and choose a different
   // function for initial values.
@@ -247,7 +247,7 @@ namespace Step21
   InitialValues<dim>::value (const Point<dim>  &p,
                              const unsigned int component) const
   {
-    return ZeroFunction<dim>(dim+2).value (p, component);
+    return Functions::ZeroFunction<dim>(dim+2).value (p, component);
   }
 
 
@@ -256,7 +256,7 @@ namespace Step21
   InitialValues<dim>::vector_value (const Point<dim> &p,
                                     Vector<double>   &values) const
   {
-    ZeroFunction<dim>(dim+2).vector_value (p, values);
+    Functions::ZeroFunction<dim>(dim+2).vector_value (p, values);
   }
 
 

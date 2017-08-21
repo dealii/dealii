@@ -1288,15 +1288,15 @@ namespace Step14
       // We need a class to denote the boundary values of the problem. In this
       // case, this is simple: it's the zero function, so don't even declare a
       // class, just a typedef:
-      typedef ZeroFunction<dim> BoundaryValues;
+      typedef Functions::ZeroFunction<dim> BoundaryValues;
 
       // Second, a class that denotes the right hand side. Since they are
       // constant, just subclass the corresponding class of the library and be
       // done:
-      class RightHandSide : public ConstantFunction<dim>
+      class RightHandSide : public Functions::ConstantFunction<dim>
       {
       public:
-        RightHandSide () : ConstantFunction<dim> (1.) {}
+        RightHandSide () : Functions::ConstantFunction<dim> (1.) {}
       };
 
       // Finally a function to generate the coarse grid. This is somewhat more
@@ -1756,11 +1756,11 @@ namespace Step14
       const SmartPointer<const DualFunctional::DualFunctionalBase<dim> > dual_functional;
       virtual void assemble_rhs (Vector<double> &rhs) const;
 
-      static const ZeroFunction<dim> boundary_values;
+      static const Functions::ZeroFunction<dim> boundary_values;
     };
 
     template <int dim>
-    const ZeroFunction<dim> DualSolver<dim>::boundary_values;
+    const Functions::ZeroFunction<dim> DualSolver<dim>::boundary_values;
 
     template <int dim>
     DualSolver<dim>::

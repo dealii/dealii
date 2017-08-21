@@ -72,7 +72,7 @@ void test ()
   Vector<double> solution(dof_handler.n_dofs());
 
   VectorTools::interpolate(dof_handler,
-                           ZeroFunction<dim>(2*dim+1),
+                           Functions::ZeroFunction<dim>(2*dim+1),
                            solution);
 
   deallog << "l2_norm = " << solution.l2_norm() << std::endl;

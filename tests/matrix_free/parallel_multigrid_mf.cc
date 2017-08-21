@@ -63,7 +63,7 @@ public:
 
     // extract the constraints due to Dirichlet boundary conditions
     ConstraintMatrix constraints;
-    ZeroFunction<dim> zero;
+    Functions::ZeroFunction<dim> zero;
     typename FunctionMap<dim>::type functions;
     for (std::set<types::boundary_id>::const_iterator it=dirichlet_boundaries.begin();
          it != dirichlet_boundaries.end(); ++it)
@@ -334,7 +334,7 @@ void do_test (const DoFHandler<dim>  &dof)
     }
 
   MGConstrainedDoFs mg_constrained_dofs;
-  ZeroFunction<dim> zero_function;
+  Functions::ZeroFunction<dim> zero_function;
   typename FunctionMap<dim>::type dirichlet_boundary;
   dirichlet_boundary[0] = &zero_function;
   mg_constrained_dofs.initialize(dof, dirichlet_boundary);

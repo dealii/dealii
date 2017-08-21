@@ -166,7 +166,7 @@ void test ()
   std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ZeroFunction<dim>(size.size()),
+                                            Functions::ZeroFunction<dim>(size.size()),
                                             boundary_values);
   MatrixTools::apply_boundary_values (boundary_values, Bb, bx, bb);
   MatrixTools::apply_boundary_values (boundary_values, B, x, b);

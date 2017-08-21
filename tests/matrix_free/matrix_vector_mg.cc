@@ -56,7 +56,7 @@ void test ()
   ConstraintMatrix constraints;
   VectorTools::interpolate_boundary_values (dof,
                                             0,
-                                            ZeroFunction<dim>(),
+                                            Functions::ZeroFunction<dim>(),
                                             constraints);
   constraints.close ();
 
@@ -91,7 +91,7 @@ void test ()
   mg_ref_matrices.resize (0, nlevels-1);
 
   typename FunctionMap<dim>::type dirichlet_boundary;
-  ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
+  Functions::ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
   std::vector<std::set<types::global_dof_index> > boundary_indices(nlevels);
   MGTools::make_boundary_list (dof, dirichlet_boundary, boundary_indices);

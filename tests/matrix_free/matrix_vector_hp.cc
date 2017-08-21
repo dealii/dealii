@@ -155,7 +155,7 @@ void test ()
                                            constraints);
   VectorTools::interpolate_boundary_values (dof,
                                             0,
-                                            ZeroFunction<dim>(),
+                                            Functions::ZeroFunction<dim>(),
                                             constraints);
   constraints.close ();
   DynamicSparsityPattern csp (dof.n_dofs(),

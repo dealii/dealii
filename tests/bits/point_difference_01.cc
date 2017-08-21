@@ -149,7 +149,7 @@ check ()
           deallog << difference(0) << std::endl;
           Assert (difference(0) < 2e-4, ExcInternalError());
 
-          VectorTools::point_difference (dof, v, ZeroFunction<dim>(),
+          VectorTools::point_difference (dof, v, Functions::ZeroFunction<dim>(),
                                          difference, p[i]);
           deallog << difference(0) << std::endl;
           Assert (std::abs(-difference(0) - function.value(p[i])) < 2e-4,

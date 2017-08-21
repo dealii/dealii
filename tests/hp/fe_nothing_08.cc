@@ -69,7 +69,7 @@ void test ()
   std::map<types::global_dof_index, double> bv;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ZeroFunction<dim>(1),
+                                            Functions::ZeroFunction<dim>(1),
                                             bv);
   for (std::map<types::global_dof_index, double>::iterator
        p = bv.begin(); p!=bv.end(); ++p)

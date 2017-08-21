@@ -449,7 +449,7 @@ void do_test (const DoFHandler<dim>  &dof, const bool threaded)
   hanging_node_constraints.close();
 
   MGConstrainedDoFs mg_constrained_dofs;
-  ZeroFunction<dim> zero_function;
+  Functions::ZeroFunction<dim> zero_function;
   typename FunctionMap<dim>::type dirichlet_boundary;
   dirichlet_boundary[0] = &zero_function;
   mg_constrained_dofs.initialize(dof, dirichlet_boundary);

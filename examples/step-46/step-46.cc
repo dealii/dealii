@@ -399,7 +399,7 @@ namespace Step46
       const FEValuesExtractors::Vector displacements(dim+1);
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 0,
-                                                ZeroFunction<dim>(dim+1+dim),
+                                                Functions::ZeroFunction<dim>(dim+1+dim),
                                                 constraints,
                                                 fe_collection.component_mask(displacements));
     }

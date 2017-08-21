@@ -179,7 +179,7 @@ namespace Step27
                                              constraints);
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
-                                              ZeroFunction<dim>(),
+                                              Functions::ZeroFunction<dim>(),
                                               constraints);
     constraints.close ();
 

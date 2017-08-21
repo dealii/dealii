@@ -504,7 +504,7 @@ void Step3::assemble_system ()
   // the boundary.
   //
   // The function describing the boundary values is an object of type Function
-  // or of a derived class. One of the derived classes is ZeroFunction, which
+  // or of a derived class. One of the derived classes is Functions::ZeroFunction, which
   // describes (not unexpectedly) a function which is zero everywhere. We
   // create such an object in-place and pass it to the
   // VectorTools::interpolate_boundary_values() function.
@@ -517,7 +517,7 @@ void Step3::assemble_system ()
   std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ZeroFunction<2>(),
+                                            Functions::ZeroFunction<2>(),
                                             boundary_values);
   // Now that we got the list of boundary DoFs and their respective boundary
   // values, let's use them to modify the system of equations

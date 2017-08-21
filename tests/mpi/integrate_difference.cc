@@ -80,7 +80,7 @@ void test()
   // ones printed in the output are correct
   Vector<float> results (tr.n_active_cells());
   VectorTools::integrate_difference (dofh, x_rel,
-                                     ZeroFunction<dim>(),
+                                     Functions::ZeroFunction<dim>(),
                                      results,
                                      QGauss<dim>(3),
                                      VectorTools::L2_norm);

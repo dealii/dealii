@@ -74,7 +74,7 @@ void test ()
       cell->set_material_id(cell->index() % 128);
       if (functions.find(cell->index() % 128) == functions.end())
         functions[cell->index() % 128]
-          = new ConstantFunction<dim>(cell->index() % 128);
+          = new Functions::ConstantFunction<dim>(cell->index() % 128);
     }
 
   for (unsigned int p=1; p<7-dim; ++p)

@@ -78,7 +78,7 @@ void test(VectorTools::NormType norm, double value, double exp = 2.0)
   const dealii::Function<dim,double> *w = nullptr;
   VectorTools::integrate_difference (dofh,
                                      solution,
-                                     ZeroFunction<dim>(dim),
+                                     Functions::ZeroFunction<dim>(dim),
                                      cellwise_errors,
                                      quadrature,
                                      norm,

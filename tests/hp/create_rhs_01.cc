@@ -85,7 +85,7 @@ void test ()
   // the sum over the elements of the
   // resulting rhs vector, you need to get
   // four
-  ConstantFunction< 2 > rhs_function(1);
+  Functions::ConstantFunction< 2 > rhs_function(1);
 
   VectorTools::create_boundary_right_hand_side ( hp_dof_handler2,
                                                  quadrature,

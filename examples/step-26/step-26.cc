@@ -463,7 +463,7 @@ start_time_iteration:
 
 
     VectorTools::interpolate(dof_handler,
-                             ZeroFunction<dim>(),
+                             Functions::ZeroFunction<dim>(),
                              old_solution);
     solution = old_solution;
 

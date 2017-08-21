@@ -52,7 +52,7 @@ void test ()
   DoFTools::extract_locally_relevant_dofs (dof, relevant_set);
 
   ConstraintMatrix constraints_0 (relevant_set), constraints_1(relevant_set);
-  VectorTools::interpolate_boundary_values (dof, 0, ZeroFunction<dim>(),
+  VectorTools::interpolate_boundary_values (dof, 0, Functions::ZeroFunction<dim>(),
                                             constraints_0);
   constraints_0.close();
   constraints_1.close();

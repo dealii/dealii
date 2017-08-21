@@ -155,7 +155,7 @@ void test()
 
   VectorTools::interpolate_boundary_values (dofh,
                                             0,
-                                            ZeroFunction<dim>(dim+1),
+                                            Functions::ZeroFunction<dim>(dim+1),
                                             cm,
                                             velocity_mask);
 

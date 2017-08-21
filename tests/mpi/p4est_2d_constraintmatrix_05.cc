@@ -57,7 +57,7 @@ void test()
   TrilinosWrappers::MPI::Vector x_ref;
   x_ref.reinit(owned_set, MPI_COMM_WORLD);
   VectorTools::interpolate(dofh,
-                           ConstantFunction<dim> (1.),
+                           Functions::ConstantFunction<dim> (1.),
                            x_ref);
 
   TrilinosWrappers::MPI::Vector x1 (x_ref);

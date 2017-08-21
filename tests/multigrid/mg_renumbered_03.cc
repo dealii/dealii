@@ -326,7 +326,7 @@ template <int dim>
 void LaplaceProblem<dim>::test ()
 {
   typename FunctionMap<dim>::type      dirichlet_boundary;
-  ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
+  Functions::ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
   dirichlet_boundary[0] =             &dirichlet_bc;
 
   MGConstrainedDoFs mg_constrained_dofs;

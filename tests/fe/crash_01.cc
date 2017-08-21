@@ -67,7 +67,7 @@ void test(FiniteElement<dim> &fe)
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs (fe);
   ConstraintMatrix constraints;
-  ZeroFunction<dim> boundary_values(fe.n_components());
+  Functions::ZeroFunction<dim> boundary_values(fe.n_components());
   VectorTools::project_boundary_values_curl_conforming (dof_handler, 0, boundary_values, 0, constraints);
 }
 

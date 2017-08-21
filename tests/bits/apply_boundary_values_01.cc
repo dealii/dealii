@@ -84,7 +84,7 @@ void test ()
   std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ConstantFunction<dim>(1.),
+                                            Functions::ConstantFunction<dim>(1.),
                                             boundary_values);
 
   std::vector<types::global_dof_index> local_dofs (fe.dofs_per_cell);

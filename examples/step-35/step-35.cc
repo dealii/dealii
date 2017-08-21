@@ -776,9 +776,9 @@ namespace Step35
       {
         vel_exact.set_time (t_0);
         vel_exact.set_component(d);
-        VectorTools::interpolate (dof_handler_velocity, ZeroFunction<dim>(), u_n_minus_1[d]);
+        VectorTools::interpolate (dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n_minus_1[d]);
         vel_exact.advance_time (dt);
-        VectorTools::interpolate (dof_handler_velocity, ZeroFunction<dim>(), u_n[d]);
+        VectorTools::interpolate (dof_handler_velocity, Functions::ZeroFunction<dim>(), u_n[d]);
       }
   }
 
@@ -1047,7 +1047,7 @@ namespace Step35
                 VectorTools::
                 interpolate_boundary_values (dof_handler_velocity,
                                              *boundaries,
-                                             ZeroFunction<dim>(),
+                                             Functions::ZeroFunction<dim>(),
                                              boundary_values);
                 break;
               case 2:
@@ -1062,14 +1062,14 @@ namespace Step35
                   VectorTools::
                   interpolate_boundary_values (dof_handler_velocity,
                                                *boundaries,
-                                               ZeroFunction<dim>(),
+                                               Functions::ZeroFunction<dim>(),
                                                boundary_values);
                 break;
               case 4:
                 VectorTools::
                 interpolate_boundary_values (dof_handler_velocity,
                                              *boundaries,
-                                             ZeroFunction<dim>(),
+                                             Functions::ZeroFunction<dim>(),
                                              boundary_values);
                 break;
               default:
@@ -1215,7 +1215,7 @@ namespace Step35
     static std::map<types::global_dof_index, double> bval;
     if (reinit_prec)
       VectorTools::interpolate_boundary_values (dof_handler_pressure, 3,
-                                                ZeroFunction<dim>(), bval);
+                                                Functions::ZeroFunction<dim>(), bval);
 
     MatrixTools::apply_boundary_values (bval, pres_iterative, phi_n, pres_tmp);
 

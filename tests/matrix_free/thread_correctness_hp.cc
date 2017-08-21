@@ -131,7 +131,7 @@ void do_test (const unsigned int parallel_option)
                                            constraints);
   VectorTools::interpolate_boundary_values (dof,
                                             0,
-                                            ZeroFunction<dim>(),
+                                            Functions::ZeroFunction<dim>(),
                                             constraints);
   constraints.close ();
 

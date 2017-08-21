@@ -57,7 +57,7 @@ void check_fe(FiniteElement<dim> &fe)
   Triangulation<dim> tr(Triangulation<dim>::limit_level_difference_at_vertices);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
-  ZeroFunction<dim> zero;
+  Functions::ZeroFunction<dim> zero;
   typename FunctionMap<dim>::type fmap;
   fmap.insert(std::make_pair(0, &zero));
 

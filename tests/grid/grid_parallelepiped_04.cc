@@ -123,7 +123,7 @@ void check_parallelepiped (bool colorize, bool log, const unsigned int (&subd)[d
       for (unsigned int c=0; c<6; ++c)
         VectorTools::interpolate_boundary_values (dh,
                                                   c,
-                                                  ConstantFunction<dim>(c),
+                                                  Functions::ConstantFunction<dim>(c),
                                                   constraints);
       constraints.close();
       constraints.distribute(vec);

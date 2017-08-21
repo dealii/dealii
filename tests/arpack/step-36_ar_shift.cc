@@ -138,7 +138,7 @@ namespace Step36
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
-    ZeroFunction<dim> potential;
+    Functions::ZeroFunction<dim> potential;
 
     std::vector<double> potential_values (n_q_points);
 

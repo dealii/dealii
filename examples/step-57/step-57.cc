@@ -337,7 +337,7 @@ namespace Step57
       DoFTools::make_hanging_node_constraints(dof_handler, zero_constraints);
       VectorTools::interpolate_boundary_values(dof_handler,
                                                0,
-                                               ZeroFunction<dim>(dim+1),
+                                               Functions::ZeroFunction<dim>(dim+1),
                                                zero_constraints,
                                                fe.component_mask(velocities));
     }

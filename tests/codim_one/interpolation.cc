@@ -64,7 +64,7 @@ void test(std::string filename, unsigned int n)
   for (unsigned int i=0; i <real_one.size(); ++i)
     real_one(i) = 1.;
 
-  ConstantFunction<spacedim> constant(1.);
+  Functions::ConstantFunction<spacedim> constant(1.);
   VectorTools::interpolate(dof_handler, constant, interpolated_one);
 
   real_one.add(-1, interpolated_one);

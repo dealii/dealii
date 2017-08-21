@@ -62,7 +62,7 @@ void test ()
   v2_interpolated(v2);
 
   // set first vector to 1
-  VectorTools::interpolate(dof2, ConstantFunction<dim>(1.), v2);
+  VectorTools::interpolate(dof2, Functions::ConstantFunction<dim>(1.), v2);
   for (unsigned int i=0; i<v2.local_size(); ++i)
     Assert(v2.local_element(i) == 1., ExcInternalError());
 

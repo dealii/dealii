@@ -170,7 +170,7 @@ void test ()
   DoFTools::make_hanging_node_constraints  (dof_handler, constraints);
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
-                                            ZeroFunction<dim> (),
+                                            Functions::ZeroFunction<dim> (),
                                             constraints);
   constraints.close ();
 

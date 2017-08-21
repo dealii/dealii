@@ -480,7 +480,7 @@ namespace Step17
     std::vector<double>     lambda_values (n_q_points);
     std::vector<double>     mu_values (n_q_points);
 
-    ConstantFunction<dim> lambda(1.), mu(1.);
+    Functions::ConstantFunction<dim> lambda(1.), mu(1.);
 
     RightHandSide<dim>      right_hand_side;
     std::vector<Vector<double> > rhs_values (n_q_points,
@@ -616,7 +616,7 @@ namespace Step17
     std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
-                                              ZeroFunction<dim>(dim),
+                                              Functions::ZeroFunction<dim>(dim),
                                               boundary_values);
     MatrixTools::apply_boundary_values (boundary_values,
                                         system_matrix,
