@@ -455,7 +455,8 @@ namespace hp
   FECollection<dim,spacedim>::FECollection (const FETypes &... fes)
   {
     static_assert(is_base_of_all<FiniteElement<dim, spacedim>, FETypes...>::value,
-                  "Not all of the input parameters are derived from FiniteElement<dim, spacedim>!");
+                  "Not all of the input arguments of this function "
+                  "are derived from FiniteElement<dim,spacedim>!");
 
     // loop over all of the given arguments and add the finite
     // elements to this collection
