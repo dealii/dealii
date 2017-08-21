@@ -363,8 +363,17 @@ public:
    * multigrid. The active DoFs need to be distributed using distribute_dofs()
    * before calling this function and the @p fe needs to be identical to the
    * finite element passed to distribute_dofs().
+   *
+   * @deprecated Use the version without parameter instead.
    */
-  virtual void distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe);
+  virtual void distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe) DEAL_II_DEPRECATED;
+
+  /**
+   * Distribute level degrees of freedom on each level for geometric
+   * multigrid. The active DoFs need to be distributed using distribute_dofs()
+   * before calling this function.
+   */
+  virtual void distribute_mg_dofs ();
 
   /**
    * This function returns whether this DoFHandler has DoFs distributed on

@@ -1024,8 +1024,17 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
 }
 
 
+
 template <int dim, int spacedim>
 void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spacedim> &)
+{
+  this->distribute_mg_dofs();
+}
+
+
+
+template <int dim, int spacedim>
+void DoFHandler<dim, spacedim>::distribute_mg_dofs ()
 {
   Assert(levels.size()>0, ExcMessage("Distribute active DoFs using distribute_dofs() before calling distribute_mg_dofs()."));
 
