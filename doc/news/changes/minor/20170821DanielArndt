@@ -1,0 +1,5 @@
+New: The struct is_base_of_all is a generalization of std::is_base_of
+to template parameter packs and tests if all classes in the parameter pack
+have a given class as base class or are this class.
+<br>
+(Daniel Arndt, 2017/08/21)
