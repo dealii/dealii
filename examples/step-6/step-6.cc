@@ -191,8 +191,8 @@ Step6<dim>::Step6 ()
 // To be fair, such exceptions about still used objects are not particularly
 // popular among programmers using deal.II, since they only tell us that
 // something is wrong, namely that some other object is still using the object
-// that is presently being destructed, but most of the time not who this user
-// is. It is therefore often rather time-consuming to find out where the
+// that is presently being destructed, but most of the time not who this using
+// object is. It is therefore often rather time-consuming to find out where the
 // problem exactly is, although it is then usually straightforward to remedy
 // the situation. However, we believe that the effort to find invalid
 // references to objects that do no longer exist is less if the problem is
@@ -203,12 +203,12 @@ Step6<dim>::Step6 ()
 // Coming back to the present situation, if we did not write this destructor,
 // the compiler will generate code that triggers exactly the behavior sketched
 // above. The reason is that member variables of the <code>Step6</code> class
-// are destructed bottom-up (i.e. in reverse order of their declaration in the
-// class), as always in C++. Thus, the finite element object will be
-// destructed before the DoF handler object, since its declaration is below
-// the one of the DoF handler. This triggers the situation above, and an
-// exception will be raised when the <code>fe</code> object is
-// destructed. What needs to be done is to tell the <code>triangulation</code>
+// are destroyed bottom-up (i.e., in reverse order of their declaration in the
+// class), as always in C++. Thus, the boundary object will be
+// destroyed before the triangulation object, since its declaration is below
+// the one of the triangulation. This triggers the situation above, and an
+// exception will be raised when the boundary object is
+// destroyed. What needs to be done is to tell the <code>triangulation</code>
 // object to release its lock to <code>boundary</code>. Of course, the
 // <code>triangulation</code> will only release its lock if it really does not
 // need the <code>boundary</code> any more. For this purpose, the
