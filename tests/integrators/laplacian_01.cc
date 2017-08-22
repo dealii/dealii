@@ -35,8 +35,8 @@ void test_cell(const FEValuesBase<dim> &fev)
   FullMatrix<double> M(n,n);
   cell_matrix(M,fev);
   {
-    LogStream::Prefix pre("cell");
-    M.print(deallog,14,8);
+    deallog << "cell" << std::endl;
+    M.print_formatted(deallog.get_file_stream(), 3, true, 0, "0.");
   }
 
   Vector<double> u(n), v(n), w(n);
@@ -48,7 +48,7 @@ void test_cell(const FEValuesBase<dim> &fev)
     indices[i] = i;
 
   {
-    LogStream::Prefix pre("Residuals");
+    deallog << "Residuals" << std::endl;
     for (unsigned int i=0; i<n; ++i)
       {
         u = 0.;
@@ -80,8 +80,8 @@ void test_boundary(const FEValuesBase<dim> &fev)
   FullMatrix<double> M(n,n);
   nitsche_matrix(M, fev, 17);
   {
-    LogStream::Prefix pre("bdry");
-    M.print(deallog,14,8);
+    deallog << "bdry" << std::endl;
+    M.print_formatted(deallog.get_file_stream(), 3, true, 0, "0.");
   }
 
   Vector<double> u(n), v(n), w(n);
@@ -96,7 +96,7 @@ void test_boundary(const FEValuesBase<dim> &fev)
     indices[i] = i;
 
   {
-    LogStream::Prefix pre("Residuals");
+    deallog << "Residuals" << std::endl;
     for (unsigned int i=0; i<n; ++i)
       {
         u = 0.;
@@ -136,20 +136,20 @@ void test_face(const FEValuesBase<dim> &fev1,
   ip_matrix(M11, M12, M21, M22, fev1, fev2, 17);
 
   {
-    LogStream::Prefix pre("M11");
-    M11.print(deallog,14,8);
+    deallog << "M11" << std::endl;
+    M11.print_formatted(deallog.get_file_stream(), 3, true, 0, "0.");
   }
   {
-    LogStream::Prefix pre("M12");
-    M12.print(deallog,14,8);
+    deallog << "M12" << std::endl;
+    M12.print_formatted(deallog.get_file_stream(), 3, true, 0, "0.");
   }
   {
-    LogStream::Prefix pre("M21");
-    M21.print(deallog,14,8);
+    deallog << "M21" << std::endl;
+    M21.print_formatted(deallog.get_file_stream(), 3, true, 0, "0.");
   }
   {
-    LogStream::Prefix pre("M22");
-    M22.print(deallog,14,8);
+    deallog << "M22" << std::endl;
+    M22.print_formatted(deallog.get_file_stream(), 3, true, 0, "0.");
   }
 
   Vector<double> u1(n1), v1(n1), w1(n1);
@@ -166,7 +166,7 @@ void test_face(const FEValuesBase<dim> &fev1,
   for (unsigned int i=0; i<n2; ++i) indices2[i] = i;
 
   {
-    LogStream::Prefix pre("Residuals");
+    deallog << "Residuals" << std::endl;
     for (unsigned int i1=0; i1<n1; ++i1)
       {
         u1 = 0.;
