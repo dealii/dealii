@@ -740,7 +740,7 @@ namespace PETScWrappers
 
     /**
      * Specifies if the vector is the owner of the PETSc Vec. This is true if
-     * it got created by this class and determines if it gets destructed in
+     * it got created by this class and determines if it gets destroyed in
      * the destructor.
      */
     bool obtained_ownership;
