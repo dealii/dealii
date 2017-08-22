@@ -340,12 +340,12 @@ namespace FEValuesViews
      *
      * The DoF values typically would be obtained in the following way:
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
+     * Vector<double> local_dof_values(cell->get_finite_element().dofs_per_cell);
      * cell->get_dof_values(solution, local_dof_values);
      * @endcode
      * or, for a generic @p Number type,
      * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
+     * std::vector<Number> local_dof_values(cell->get_finite_element().dofs_per_cell);
      * cell->get_dof_values(solution, local_dof_values.begin(), local_dof_values.end());
      * @endcode
      */
@@ -853,12 +853,12 @@ namespace FEValuesViews
      *
      * The DoF values typically would be obtained in the following way:
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
+     * Vector<double> local_dof_values(cell->get_finite_element().dofs_per_cell);
      * cell->get_dof_values(solution, local_dof_values);
      * @endcode
      * or, for a generic @p Number type,
      * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
+     * std::vector<Number> local_dof_values(cell->get_finite_element().dofs_per_cell);
      * cell->get_dof_values(solution, local_dof_values.begin(), local_dof_values.end());
      * @endcode
      */
@@ -1297,12 +1297,12 @@ namespace FEValuesViews
      *
      * The DoF values typically would be obtained in the following way:
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
+     * Vector<double> local_dof_values(cell->get_finite_element().dofs_per_cell);
      * cell->get_dof_values(solution, local_dof_values);
      * @endcode
      * or, for a generic @p Number type,
      * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
+     * std::vector<Number> local_dof_values(cell->get_finite_element().dofs_per_cell);
      * cell->get_dof_values(solution, local_dof_values.begin(), local_dof_values.end());
      * @endcode
      */
@@ -1553,12 +1553,12 @@ namespace FEValuesViews
      *
      * The DoF values typically would be obtained in the following way:
      * @code
-     * Vector<double> local_dof_values(cell->get_fe().dofs_per_cell);
+     * Vector<double> local_dof_values(cell->get_finite_element().dofs_per_cell);
      * cell->get_dof_values(solution, local_dof_values);
      * @endcode
      * or, for a generic @p Number type,
      * @code
-     * std::vector<Number> local_dof_values(cell->get_fe().dofs_per_cell);
+     * std::vector<Number> local_dof_values(cell->get_finite_element().dofs_per_cell);
      * cell->get_dof_values(solution, local_dof_values.begin(), local_dof_values.end());
      * @endcode
      */

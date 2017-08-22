@@ -1279,7 +1279,7 @@ namespace MatrixCreator
       const unsigned int n_components  = fe_collection.n_components();
       const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
       const bool         fe_is_system  = (n_components != 1);
-      const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+      const FiniteElement<dim,spacedim> &fe = cell->get_finite_element();
       const unsigned int dofs_per_face = fe.dofs_per_face;
 
       copy_data.cell = cell;

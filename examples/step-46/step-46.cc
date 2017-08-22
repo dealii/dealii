@@ -586,9 +586,9 @@ namespace Step46
 
         const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
 
-        local_matrix.reinit (cell->get_fe().dofs_per_cell,
-                             cell->get_fe().dofs_per_cell);
-        local_rhs.reinit (cell->get_fe().dofs_per_cell);
+        local_matrix.reinit (cell->get_finite_element().dofs_per_cell,
+                             cell->get_finite_element().dofs_per_cell);
+        local_rhs.reinit (cell->get_finite_element().dofs_per_cell);
 
         // With all of this done, we continue to assemble the cell terms for
         // cells that are part of the Stokes and elastic regions. While we
@@ -606,7 +606,7 @@ namespace Step46
         // documentation module for the elasticity equations:
         if (cell_is_in_fluid_domain (cell))
           {
-            const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+            const unsigned int dofs_per_cell = cell->get_finite_element().dofs_per_cell;
             Assert (dofs_per_cell == stokes_dofs_per_cell,
                     ExcInternalError());
 
@@ -629,7 +629,7 @@ namespace Step46
           }
         else
           {
-            const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+            const unsigned int dofs_per_cell = cell->get_finite_element().dofs_per_cell;
             Assert (dofs_per_cell == elasticity_dofs_per_cell,
                     ExcInternalError());
 
@@ -668,7 +668,7 @@ namespace Step46
         // along since the elimination of nonzero boundary values requires the
         // modification of local and consequently also global right hand side
         // values:
-        local_dof_indices.resize (cell->get_fe().dofs_per_cell);
+        local_dof_indices.resize (cell->get_finite_element().dofs_per_cell);
         cell->get_dof_indices (local_dof_indices);
         constraints.distribute_local_to_global (local_matrix, local_rhs,
                                                 local_dof_indices,

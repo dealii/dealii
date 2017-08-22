@@ -94,7 +94,7 @@ namespace DoFTools
           &&
           cell->is_locally_owned())
         {
-          const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell = cell->get_finite_element().dofs_per_cell;
           dofs_on_this_cell.resize (dofs_per_cell);
           cell->get_dof_indices (dofs_on_this_cell);
 
@@ -231,9 +231,9 @@ namespace DoFTools
         if (!cell_row->has_children() && !cell_col->has_children())
           {
             const unsigned int dofs_per_cell_row =
-              cell_row->get_fe().dofs_per_cell;
+              cell_row->get_finite_element().dofs_per_cell;
             const unsigned int dofs_per_cell_col =
-              cell_col->get_fe().dofs_per_cell;
+              cell_col->get_finite_element().dofs_per_cell;
             std::vector<types::global_dof_index>
             local_dof_indices_row(dofs_per_cell_row);
             std::vector<types::global_dof_index>
@@ -254,9 +254,9 @@ namespace DoFTools
                 const typename DoFHandlerType::cell_iterator
                 cell_row_child = child_cells[i];
                 const unsigned int dofs_per_cell_row =
-                  cell_row_child->get_fe().dofs_per_cell;
+                  cell_row_child->get_finite_element().dofs_per_cell;
                 const unsigned int dofs_per_cell_col =
-                  cell_col->get_fe().dofs_per_cell;
+                  cell_col->get_finite_element().dofs_per_cell;
                 std::vector<types::global_dof_index>
                 local_dof_indices_row(dofs_per_cell_row);
                 std::vector<types::global_dof_index>
@@ -278,9 +278,9 @@ namespace DoFTools
                 const typename DoFHandlerType::active_cell_iterator
                 cell_col_child = child_cells[i];
                 const unsigned int dofs_per_cell_row =
-                  cell_row->get_fe().dofs_per_cell;
+                  cell_row->get_finite_element().dofs_per_cell;
                 const unsigned int dofs_per_cell_col =
-                  cell_col_child->get_fe().dofs_per_cell;
+                  cell_col_child->get_finite_element().dofs_per_cell;
                 std::vector<types::global_dof_index>
                 local_dof_indices_row(dofs_per_cell_row);
                 std::vector<types::global_dof_index>
@@ -353,7 +353,7 @@ namespace DoFTools
       for (unsigned int f=0; f<GeometryInfo<DoFHandlerType::dimension>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
           {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+            const unsigned int dofs_per_face = cell->get_finite_element().dofs_per_face;
             dofs_on_this_face.resize (dofs_per_face);
             cell->face(f)->get_dof_indices (dofs_on_this_face,
                                             cell->active_fe_index());
@@ -393,7 +393,7 @@ namespace DoFTools
             while (!cell->active())
               cell = cell->child(direction);
 
-            const unsigned int dofs_per_vertex = cell->get_fe().dofs_per_vertex;
+            const unsigned int dofs_per_vertex = cell->get_finite_element().dofs_per_vertex;
             std::vector<types::global_dof_index> boundary_dof_boundary_indices (dofs_per_vertex);
 
             // next get boundary mapped dof indices of boundary dofs
@@ -441,7 +441,7 @@ namespace DoFTools
         if (boundary_ids.find(cell->face(f)->boundary_id()) !=
             boundary_ids.end())
           {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+            const unsigned int dofs_per_face = cell->get_finite_element().dofs_per_face;
             dofs_on_this_face.resize (dofs_per_face);
             cell->face(f)->get_dof_indices (dofs_on_this_face,
                                             cell->active_fe_index());
@@ -508,7 +508,7 @@ namespace DoFTools
           &&
           cell->is_locally_owned())
         {
-          const unsigned int n_dofs_on_this_cell = cell->get_fe().dofs_per_cell;
+          const unsigned int n_dofs_on_this_cell = cell->get_finite_element().dofs_per_cell;
           dofs_on_this_cell.resize (n_dofs_on_this_cell);
           cell->get_dof_indices (dofs_on_this_cell);
 
@@ -550,7 +550,7 @@ namespace DoFTools
                               cell->neighbor_child_on_subface (face, sub_nr);
 
                           const unsigned int n_dofs_on_neighbor
-                            = sub_neighbor->get_fe().dofs_per_cell;
+                            = sub_neighbor->get_finite_element().dofs_per_cell;
                           dofs_on_other_cell.resize (n_dofs_on_neighbor);
                           sub_neighbor->get_dof_indices (dofs_on_other_cell);
 
@@ -578,7 +578,7 @@ namespace DoFTools
                           continue;
 
                       const unsigned int n_dofs_on_neighbor
-                        = neighbor->get_fe().dofs_per_cell;
+                        = neighbor->get_finite_element().dofs_per_cell;
                       dofs_on_other_cell.resize (n_dofs_on_neighbor);
 
                       neighbor->get_dof_indices (dofs_on_other_cell);
@@ -1011,7 +1011,7 @@ namespace DoFTools
               &&
               cell->is_locally_owned())
             {
-              dofs_on_this_cell.resize (cell->get_fe().dofs_per_cell);
+              dofs_on_this_cell.resize (cell->get_finite_element().dofs_per_cell);
               cell->get_dof_indices (dofs_on_this_cell);
 
               // make sparsity pattern for this cell
@@ -1031,14 +1031,14 @@ namespace DoFTools
 
                   if (cell->at_boundary (face) && (!periodic_neighbor))
                     {
-                      for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-                        for (unsigned int j=0; j<cell->get_fe().dofs_per_cell; ++j)
-                          if ((flux_mask(cell->get_fe().system_to_component_index(i).first,
-                                         cell->get_fe().system_to_component_index(j).first)
+                      for (unsigned int i=0; i<cell->get_finite_element().dofs_per_cell; ++i)
+                        for (unsigned int j=0; j<cell->get_finite_element().dofs_per_cell; ++j)
+                          if ((flux_mask(cell->get_finite_element().system_to_component_index(i).first,
+                                         cell->get_finite_element().system_to_component_index(j).first)
                                == always)
                               ||
-                              (flux_mask(cell->get_fe().system_to_component_index(i).first,
-                                         cell->get_fe().system_to_component_index(j).first)
+                              (flux_mask(cell->get_finite_element().system_to_component_index(i).first,
+                                         cell->get_finite_element().system_to_component_index(j).first)
                                == nonzero))
                             sparsity.add (dofs_on_this_cell[i],
                                           dofs_on_this_cell[j]);
@@ -1092,19 +1092,19 @@ namespace DoFTools
                                   cell->periodic_neighbor_child_on_subface (face, sub_nr):
                                   cell->neighbor_child_on_subface (face, sub_nr);
 
-                              dofs_on_other_cell.resize (sub_neighbor->get_fe().dofs_per_cell);
+                              dofs_on_other_cell.resize (sub_neighbor->get_finite_element().dofs_per_cell);
                               sub_neighbor->get_dof_indices (dofs_on_other_cell);
-                              for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+                              for (unsigned int i=0; i<cell->get_finite_element().dofs_per_cell; ++i)
                                 {
-                                  for (unsigned int j=0; j<sub_neighbor->get_fe().dofs_per_cell;
+                                  for (unsigned int j=0; j<sub_neighbor->get_finite_element().dofs_per_cell;
                                        ++j)
                                     {
-                                      if ((flux_mask(cell->get_fe().system_to_component_index(i).first,
-                                                     sub_neighbor->get_fe().system_to_component_index(j).first)
+                                      if ((flux_mask(cell->get_finite_element().system_to_component_index(i).first,
+                                                     sub_neighbor->get_finite_element().system_to_component_index(j).first)
                                            == always)
                                           ||
-                                          (flux_mask(cell->get_fe().system_to_component_index(i).first,
-                                                     sub_neighbor->get_fe().system_to_component_index(j).first)
+                                          (flux_mask(cell->get_finite_element().system_to_component_index(i).first,
+                                                     sub_neighbor->get_finite_element().system_to_component_index(j).first)
                                            == nonzero))
                                         {
                                           sparsity.add (dofs_on_this_cell[i],
@@ -1117,12 +1117,12 @@ namespace DoFTools
                                                         dofs_on_other_cell[j]);
                                         }
 
-                                      if ((flux_mask(sub_neighbor->get_fe().system_to_component_index(j).first,
-                                                     cell->get_fe().system_to_component_index(i).first)
+                                      if ((flux_mask(sub_neighbor->get_finite_element().system_to_component_index(j).first,
+                                                     cell->get_finite_element().system_to_component_index(i).first)
                                            == always)
                                           ||
-                                          (flux_mask(sub_neighbor->get_fe().system_to_component_index(j).first,
-                                                     cell->get_fe().system_to_component_index(i).first)
+                                          (flux_mask(sub_neighbor->get_finite_element().system_to_component_index(j).first,
+                                                     cell->get_finite_element().system_to_component_index(i).first)
                                            == nonzero))
                                         {
                                           sparsity.add (dofs_on_this_cell[j],
@@ -1140,18 +1140,18 @@ namespace DoFTools
                         }
                       else
                         {
-                          dofs_on_other_cell.resize (neighbor->get_fe().dofs_per_cell);
+                          dofs_on_other_cell.resize (neighbor->get_finite_element().dofs_per_cell);
                           neighbor->get_dof_indices (dofs_on_other_cell);
-                          for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+                          for (unsigned int i=0; i<cell->get_finite_element().dofs_per_cell; ++i)
                             {
-                              for (unsigned int j=0; j<neighbor->get_fe().dofs_per_cell; ++j)
+                              for (unsigned int j=0; j<neighbor->get_finite_element().dofs_per_cell; ++j)
                                 {
-                                  if ((flux_mask(cell->get_fe().system_to_component_index(i).first,
-                                                 neighbor->get_fe().system_to_component_index(j).first)
+                                  if ((flux_mask(cell->get_finite_element().system_to_component_index(i).first,
+                                                 neighbor->get_finite_element().system_to_component_index(j).first)
                                        == always)
                                       ||
-                                      (flux_mask(cell->get_fe().system_to_component_index(i).first,
-                                                 neighbor->get_fe().system_to_component_index(j).first)
+                                      (flux_mask(cell->get_finite_element().system_to_component_index(i).first,
+                                                 neighbor->get_finite_element().system_to_component_index(j).first)
                                        == nonzero))
                                     {
                                       sparsity.add (dofs_on_this_cell[i],
@@ -1164,12 +1164,12 @@ namespace DoFTools
                                                     dofs_on_other_cell[j]);
                                     }
 
-                                  if ((flux_mask(neighbor->get_fe().system_to_component_index(j).first,
-                                                 cell->get_fe().system_to_component_index(i).first)
+                                  if ((flux_mask(neighbor->get_finite_element().system_to_component_index(j).first,
+                                                 cell->get_finite_element().system_to_component_index(i).first)
                                        == always)
                                       ||
-                                      (flux_mask(neighbor->get_fe().system_to_component_index(j).first,
-                                                 cell->get_fe().system_to_component_index(i).first)
+                                      (flux_mask(neighbor->get_finite_element().system_to_component_index(j).first,
+                                                 cell->get_finite_element().system_to_component_index(i).first)
                                        == nonzero))
                                     {
                                       sparsity.add (dofs_on_this_cell[j],

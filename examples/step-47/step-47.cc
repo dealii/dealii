@@ -296,7 +296,7 @@ namespace Step47
 
     for (; cell!=endc; ++cell)
       {
-        const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell = cell->get_finite_element().dofs_per_cell;
         cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
         cell_rhs.reinit (dofs_per_cell);
 
@@ -351,10 +351,10 @@ namespace Step47
 
             for (unsigned int q_point=0; q_point<this_fe_values.n_quadrature_points; ++q_point)
               for (unsigned int i=0; i<dofs_per_cell; ++i)
-                if (cell->get_fe().system_to_component_index(i).first == 0)
+                if (cell->get_finite_element().system_to_component_index(i).first == 0)
                   {
                     for (unsigned int j=0; j<dofs_per_cell; ++j)
-                      if (cell->get_fe().system_to_component_index(j).first == 0)
+                      if (cell->get_finite_element().system_to_component_index(j).first == 0)
                         cell_matrix(i,j) += (coefficient_values[q_point] *
                                              this_fe_values.shape_grad(i,q_point) *
                                              this_fe_values.shape_grad(j,q_point) *
@@ -365,7 +365,7 @@ namespace Step47
                                              *
                                              ((std::fabs(level_set(this_fe_values.quadrature_point(q_point)))
                                                -
-                                               std::fabs(level_set(cell->vertex(cell->get_fe().system_to_component_index(j).second))))*
+                                               std::fabs(level_set(cell->vertex(cell->get_finite_element().system_to_component_index(j).second))))*
                                               this_fe_values.shape_grad(j,q_point)
                                               +
                                               grad_level_set(this_fe_values.quadrature_point(q_point)) *
@@ -380,11 +380,11 @@ namespace Step47
                 else
                   {
                     for (unsigned int j=0; j<dofs_per_cell; ++j)
-                      if (cell->get_fe().system_to_component_index(j).first == 0)
+                      if (cell->get_finite_element().system_to_component_index(j).first == 0)
                         cell_matrix(i,j) += (coefficient_values[q_point] *
                                              ((std::fabs(level_set(this_fe_values.quadrature_point(q_point)))
                                                -
-                                               std::fabs(level_set(cell->vertex(cell->get_fe().system_to_component_index(i).second))))*
+                                               std::fabs(level_set(cell->vertex(cell->get_finite_element().system_to_component_index(i).second))))*
                                               this_fe_values.shape_grad(i,q_point)
                                               +
                                               grad_level_set(this_fe_values.quadrature_point(q_point)) *
@@ -396,7 +396,7 @@ namespace Step47
                         cell_matrix(i,j) += (coefficient_values[q_point] *
                                              ((std::fabs(level_set(this_fe_values.quadrature_point(q_point)))
                                                -
-                                               std::fabs(level_set(cell->vertex(cell->get_fe().system_to_component_index(i).second))))*
+                                               std::fabs(level_set(cell->vertex(cell->get_finite_element().system_to_component_index(i).second))))*
                                               this_fe_values.shape_grad(i,q_point)
                                               +
                                               grad_level_set(this_fe_values.quadrature_point(q_point)) *
@@ -404,7 +404,7 @@ namespace Step47
                                               this_fe_values.shape_value(i,q_point)) *
                                              ((std::fabs(level_set(this_fe_values.quadrature_point(q_point)))
                                                -
-                                               std::fabs(level_set(cell->vertex(cell->get_fe().system_to_component_index(j).second))))*
+                                               std::fabs(level_set(cell->vertex(cell->get_finite_element().system_to_component_index(j).second))))*
                                               this_fe_values.shape_grad(j,q_point)
                                               +
                                               grad_level_set(this_fe_values.quadrature_point(q_point)) *
@@ -414,7 +414,7 @@ namespace Step47
 
                     cell_rhs(i) += ((std::fabs(level_set(this_fe_values.quadrature_point(q_point)))
                                      -
-                                     std::fabs(level_set(cell->vertex(cell->get_fe().system_to_component_index(i).second))))*
+                                     std::fabs(level_set(cell->vertex(cell->get_finite_element().system_to_component_index(i).second))))*
                                     this_fe_values.shape_value(i,q_point) *
                                     1.0 *
                                     this_fe_values.JxW(q_point));

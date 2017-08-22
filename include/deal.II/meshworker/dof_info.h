@@ -300,12 +300,12 @@ namespace MeshWorker
   inline void
   DoFInfo<dim,spacedim,number>::get_indices(const DHCellIterator &c)
   {
-    indices.resize(c->get_fe().dofs_per_cell);
+    indices.resize(c->get_finite_element().dofs_per_cell);
     if (block_info == nullptr || block_info->local().size() == 0)
       c->get_active_or_mg_dof_indices(indices);
     else
       {
-        indices_org.resize(c->get_fe().dofs_per_cell);
+        indices_org.resize(c->get_finite_element().dofs_per_cell);
         c->get_active_or_mg_dof_indices(indices_org);
         set_block_indices();
       }

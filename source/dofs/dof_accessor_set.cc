@@ -65,15 +65,15 @@ set_dof_values_by_interpolation (const Vector<number> &local_values,
           Assert (local_values.size() == this->dof_handler->get_finite_element(fe_index).dofs_per_cell,
                   ExcMessage ("Incorrect size of local_values vector.") );
 
-          FullMatrix<double> interpolation (this->get_fe().dofs_per_cell, this->dof_handler->get_finite_element(fe_index).dofs_per_cell);
+          FullMatrix<double> interpolation (this->get_finite_element().dofs_per_cell, this->dof_handler->get_finite_element(fe_index).dofs_per_cell);
 
-          this->get_fe().get_interpolation_matrix (this->dof_handler->get_finite_element(fe_index),
-                                                   interpolation);
+          this->get_finite_element().get_interpolation_matrix (this->dof_handler->get_finite_element(fe_index),
+                                                               interpolation);
 
           // do the interpolation to the target space. for historical
           // reasons, matrices are set to size 0x0 internally even
           // we reinit as 4x0, so we have to treat this case specially
-          Vector<number> tmp (this->get_fe().dofs_per_cell);
+          Vector<number> tmp (this->get_finite_element().dofs_per_cell);
           if ((tmp.size() > 0) && (local_values.size() > 0))
             interpolation.vmult (tmp, local_values);
 

@@ -251,10 +251,10 @@ namespace internal
                     !cell->is_artificial())
                   {
                     dof_handler.levels[level]->dof_offsets[cell->index()] = next_free_dof;
-                    next_free_dof += cell->get_fe().template n_dofs_per_object<dim>();
+                    next_free_dof += cell->get_finite_element().template n_dofs_per_object<dim>();
 
                     dof_handler.levels[level]->cell_cache_offsets[cell->index()] = cache_size;
-                    cache_size += cell->get_fe().dofs_per_cell;
+                    cache_size += cell->get_finite_element().dofs_per_cell;
                   }
 
               dof_handler.levels[level]->dof_indices
@@ -280,7 +280,7 @@ namespace internal
                 if (!cell->has_children()
                     &&
                     !cell->is_artificial())
-                  counter += cell->get_fe().template n_dofs_per_object<dim>();
+                  counter += cell->get_finite_element().template n_dofs_per_object<dim>();
 
               Assert (dof_handler.levels[level]->dof_indices.size() == counter,
                       ExcInternalError());
@@ -1135,7 +1135,7 @@ namespace hp
       for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
         if (cell->at_boundary(f))
           {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+            const unsigned int dofs_per_face = cell->get_finite_element().dofs_per_face;
             dofs_on_face.resize (dofs_per_face);
 
             cell->face(f)->get_dof_indices (dofs_on_face,
@@ -1170,7 +1170,7 @@ namespace hp
             (boundary_ids.find(cell->face(f)->boundary_id()) !=
              boundary_ids.end()))
           {
-            const unsigned int dofs_per_face = cell->get_fe().dofs_per_face;
+            const unsigned int dofs_per_face = cell->get_finite_element().dofs_per_face;
             dofs_on_face.resize (dofs_per_face);
 
             cell->face(f)->get_dof_indices (dofs_on_face,

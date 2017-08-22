@@ -67,12 +67,12 @@ get_interpolated_dof_values (const InputVector &values,
           // well, here we need to first get the values from the current
           // cell and then interpolate it to the element requested. this
           // can clearly only happen for hp::DoFHandler objects
-          Vector<number> tmp (this->get_fe().dofs_per_cell);
+          Vector<number> tmp (this->get_finite_element().dofs_per_cell);
           this->get_dof_values (values, tmp);
 
           FullMatrix<double> interpolation (this->dof_handler->get_finite_element(fe_index).dofs_per_cell,
-                                            this->get_fe().dofs_per_cell);
-          this->dof_handler->get_finite_element(fe_index).get_interpolation_matrix (this->get_fe(),
+                                            this->get_finite_element().dofs_per_cell);
+          this->dof_handler->get_finite_element(fe_index).get_interpolation_matrix (this->get_finite_element(),
               interpolation);
           interpolation.vmult (interpolated_values, tmp);
         }
