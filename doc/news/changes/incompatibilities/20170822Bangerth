@@ -1,0 +1,6 @@
+Changed: The VectorMemory::Pointer class used to have an automatic
+conversion operator to the underlying pointer-to-vector object. As
+part of a rewrite of this class, this conversion (rarely used in
+practice) has been removed.
+<br>
+(Wolfgang Bangerth, 2017/08/22)
