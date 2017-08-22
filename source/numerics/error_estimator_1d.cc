@@ -248,7 +248,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
     = subdomain_id_;
 #endif
 
-  const unsigned int n_components       = dof_handler.get_fe().n_components();
+  const unsigned int n_components       = dof_handler.get_finite_element(0).n_components();
   const unsigned int n_solution_vectors = solutions.size();
 
   // sanity checks
@@ -324,7 +324,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
   const QGauss<0> face_quadrature(1);
   const hp::QCollection<0> q_face_collection(face_quadrature);
 
-  const hp::FECollection<1,spacedim> fe (dof_handler.get_fe());
+  const hp::FECollection<1,spacedim> &fe = dof_handler.get_fe_collection();
 
   hp::MappingCollection<1,spacedim> mapping_collection;
   mapping_collection.push_back (mapping);

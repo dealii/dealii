@@ -679,7 +679,7 @@ namespace MatrixCreator
     Assert (matrix.n() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_finite_element());
     hp::QCollection<dim>                q_collection (q);
     hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,number>
@@ -736,7 +736,7 @@ namespace MatrixCreator
     Assert (matrix.n() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_finite_element());
     hp::QCollection<dim>                q_collection (q);
     hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,number>
@@ -794,7 +794,7 @@ namespace MatrixCreator
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,number>
-    assembler_data (dof.get_fe(),
+    assembler_data (dof.get_fe_collection(),
                     update_values | update_JxW_values |
                     (coefficient != nullptr ? update_quadrature_points : UpdateFlags(0)),
                     coefficient, /*rhs_function=*/nullptr,
@@ -847,7 +847,7 @@ namespace MatrixCreator
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,number>
-    assembler_data (dof.get_fe(),
+    assembler_data (dof.get_fe_collection(),
                     update_values |
                     update_JxW_values | update_quadrature_points,
                     coefficient, &rhs,
@@ -1210,7 +1210,7 @@ namespace MatrixCreator
         return;
       }
 
-    const FiniteElement<dim,spacedim> &fe = dof.get_fe();
+    const FiniteElement<dim,spacedim> &fe = dof.get_finite_element();
     const unsigned int n_components  = fe.n_components();
 
     Assert (matrix.n() == dof.n_boundary_dofs (boundary_functions),
@@ -1627,7 +1627,7 @@ namespace MatrixCreator
         return;
       }
 
-    const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe();
+    const hp::FECollection<dim,spacedim> &fe_collection = dof.get_fe_collection();
     const unsigned int n_components  = fe_collection.n_components();
 
     Assert (matrix.n() == dof.n_boundary_dofs (boundary_functions),
@@ -1706,7 +1706,7 @@ namespace MatrixCreator
     Assert (matrix.n() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_finite_element());
     hp::QCollection<dim>                q_collection (q);
     hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,double>
@@ -1764,7 +1764,7 @@ namespace MatrixCreator
     Assert (matrix.n() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_finite_element());
     hp::QCollection<dim>                q_collection (q);
     hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,double>
@@ -1823,7 +1823,7 @@ namespace MatrixCreator
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,double>
-    assembler_data (dof.get_fe(),
+    assembler_data (dof.get_fe_collection(),
                     update_gradients  | update_JxW_values |
                     (coefficient != nullptr ? update_quadrature_points : UpdateFlags(0)),
                     coefficient, /*rhs_function=*/nullptr,
@@ -1878,7 +1878,7 @@ namespace MatrixCreator
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,double>
-    assembler_data (dof.get_fe(),
+    assembler_data (dof.get_fe_collection(),
                     update_gradients  | update_values |
                     update_JxW_values | update_quadrature_points,
                     coefficient, &rhs,

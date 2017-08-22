@@ -925,7 +925,7 @@ namespace VectorTools
                 VectorType &vec_result);
 
   /**
-   * Same as above but for <code>n_q_points_1d = matrix_free.get_dof_handler().get_fe().degree+1</code>.
+   * Same as above but for <code>n_q_points_1d = matrix_free.get_dof_handler().get_finite_element().degree+1</code>.
    */
   template <int dim, typename VectorType>
   void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,

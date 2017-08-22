@@ -259,8 +259,8 @@ namespace FETools
                    const FiniteElement<dim,spacedim>   &fe2,
                    OutVector                           &u1_interpolated)
   {
-    Assert(dof1.get_fe().n_components() == fe2.n_components(),
-           ExcDimensionMismatch(dof1.get_fe().n_components(), fe2.n_components()));
+    Assert(dof1.get_finite_element(0).n_components() == fe2.n_components(),
+           ExcDimensionMismatch(dof1.get_finite_element(0).n_components(), fe2.n_components()));
     Assert(u1.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u1_interpolated.size() == dof1.n_dofs(),
@@ -454,13 +454,13 @@ namespace FETools
   {
     // For discontinuous elements without constraints take the simpler version
     // of the back_interpolate function.
-    if (dof1.get_fe().dofs_per_vertex==0 && dof2.get_fe().dofs_per_vertex==0
+    if (dof1.get_finite_element().dofs_per_vertex==0 && dof2.get_finite_element().dofs_per_vertex==0
         && constraints1.n_constraints()==0 && constraints2.n_constraints()==0)
-      back_interpolate(dof1, u1, dof2.get_fe(), u1_interpolated);
+      back_interpolate(dof1, u1, dof2.get_finite_element(), u1_interpolated);
     else
       {
-        Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
-               ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
+        Assert(dof1.get_finite_element(0).n_components() == dof2.get_finite_element(0).n_components(),
+               ExcDimensionMismatch(dof1.get_finite_element(0).n_components(), dof2.get_finite_element(0).n_components()));
         Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
         Assert(u1_interpolated.size()==dof1.n_dofs(),
                ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
@@ -481,8 +481,8 @@ namespace FETools
                                  const FiniteElement<dim,spacedim> &fe2,
                                  OutVector &u1_difference)
   {
-    Assert(dof1.get_fe().n_components() == fe2.n_components(),
-           ExcDimensionMismatch(dof1.get_fe().n_components(), fe2.n_components()));
+    Assert(dof1.get_finite_element(0).n_components() == fe2.n_components(),
+           ExcDimensionMismatch(dof1.get_finite_element(0).n_components(), fe2.n_components()));
     Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u1_difference.size()==dof1.n_dofs(),
            ExcDimensionMismatch(u1_difference.size(), dof1.n_dofs()));
@@ -507,9 +507,9 @@ namespace FETools
     // hanging node constraints are
     // allowed.
     const bool hanging_nodes_not_allowed=
-      (dof1.get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
+      (dof1.get_finite_element().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
 
-    const unsigned int dofs_per_cell=dof1.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell=dof1.get_finite_element().dofs_per_cell;
 
     Vector<typename OutVector::value_type> u1_local(dofs_per_cell);
     Vector<typename OutVector::value_type> u1_diff_local(dofs_per_cell);
@@ -518,7 +518,7 @@ namespace FETools
       dof1.get_triangulation().locally_owned_subdomain();
 
     FullMatrix<double> difference_matrix(dofs_per_cell, dofs_per_cell);
-    get_interpolation_difference_matrix(dof1.get_fe(), fe2,
+    get_interpolation_difference_matrix(dof1.get_finite_element(), fe2,
                                         difference_matrix);
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell = dof1.begin_active(),
@@ -604,9 +604,9 @@ namespace FETools
     // without constraints take the
     // cheaper version of the
     // interpolation_difference function.
-    if (dof1.get_fe().dofs_per_vertex==0 && dof2.get_fe().dofs_per_vertex==0
+    if (dof1.get_finite_element().dofs_per_vertex==0 && dof2.get_finite_element().dofs_per_vertex==0
         && constraints1.n_constraints()==0 && constraints2.n_constraints()==0)
-      interpolation_difference(dof1, u1, dof2.get_fe(), u1_difference);
+      interpolation_difference(dof1, u1, dof2.get_finite_element(), u1_difference);
     else
       {
         internal::interpolation_difference(dof1, constraints1, u1, dof2, constraints2, u1_difference);
@@ -622,8 +622,8 @@ namespace FETools
                   OutVector &u2)
   {
     Assert(&dof1.get_triangulation()==&dof2.get_triangulation(), ExcTriangulationMismatch());
-    Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
-           ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
+    Assert(dof1.get_finite_element(0).n_components() == dof2.get_finite_element(0).n_components(),
+           ExcDimensionMismatch(dof1.get_finite_element(0).n_components(), dof2.get_finite_element(0).n_components()));
     Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
@@ -631,15 +631,15 @@ namespace FETools
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active();
     typename DoFHandler<dim,spacedim>::active_cell_iterator end = dof2.end();
 
-    const unsigned int n1 = dof1.get_fe().dofs_per_cell;
-    const unsigned int n2 = dof2.get_fe().dofs_per_cell;
+    const unsigned int n1 = dof1.get_finite_element().dofs_per_cell;
+    const unsigned int n2 = dof2.get_finite_element().dofs_per_cell;
 
     Vector<typename OutVector::value_type> u1_local(n1);
     Vector<typename OutVector::value_type> u2_local(n2);
     std::vector<types::global_dof_index> dofs(n2);
 
     FullMatrix<double> matrix(n2,n1);
-    get_projection_matrix(dof1.get_fe(), dof2.get_fe(), matrix);
+    get_projection_matrix(dof1.get_finite_element(), dof2.get_finite_element(), matrix);
 
     u2 = 0;
     while (cell2 != end)

@@ -29,7 +29,7 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof, bool levels_only, bo
 {
   if (!levels_only && dof.has_active_dofs())
     {
-      const FiniteElement<dim, spacedim> &fe = dof.get_fe();
+      const FiniteElement<dim, spacedim> &fe = dof.get_finite_element();
       std::vector<types::global_dof_index> sizes(fe.n_blocks());
       DoFTools::count_dofs_per_block(dof, sizes);
       bi_global.reinit(sizes);
@@ -40,7 +40,7 @@ BlockInfo::initialize(const DoFHandler<dim, spacedim> &dof, bool levels_only, bo
       std::vector<std::vector<types::global_dof_index> > sizes (dof.get_triangulation().n_levels ());
 
       for (unsigned int i = 0; i < sizes.size (); ++i)
-        sizes[i].resize (dof.get_fe ().n_blocks ());
+        sizes[i].resize (dof.get_finite_element ().n_blocks ());
 
       MGTools::count_dofs_per_block (dof, sizes);
       levels.resize (sizes.size ());
@@ -55,7 +55,7 @@ template <int dim, int spacedim>
 void
 BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
 {
-  const FiniteElement<dim, spacedim> &fe = dof.get_fe();
+  const FiniteElement<dim, spacedim> &fe = dof.get_finite_element();
   std::vector<types::global_dof_index> sizes(fe.n_blocks());
 
   base_elements.resize(fe.n_blocks());

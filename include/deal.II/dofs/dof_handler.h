@@ -29,6 +29,7 @@
 #include <deal.II/dofs/dof_faces.h>
 #include <deal.II/dofs/dof_levels.h>
 #include <deal.II/dofs/function_map.h>
+#include <deal.II/hp/fe_collection.h>
 
 #include <boost/serialization/split_member.hpp>
 
@@ -353,11 +354,7 @@ public:
    * The purpose of this function is first discussed in the introduction to
    * the step-2 tutorial program.
    *
-   * @note A pointer of the finite element given as argument is stored.
-   * Therefore, the lifetime of the finite element object shall be longer than
-   * that of this object. If you don't want this behavior, you may want to
-   * call the @p clear member function which also releases the lock of this
-   * object to the finite element.
+   * @note A copy of the finite element given as argument is stored.
    */
   virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe);
 
@@ -366,8 +363,17 @@ public:
    * multigrid. The active DoFs need to be distributed using distribute_dofs()
    * before calling this function and the @p fe needs to be identical to the
    * finite element passed to distribute_dofs().
+   *
+   * @deprecated Use the version without parameter instead.
    */
-  virtual void distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe);
+  virtual void distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe) DEAL_II_DEPRECATED;
+
+  /**
+   * Distribute level degrees of freedom on each level for geometric
+   * multigrid. The active DoFs need to be distributed using distribute_dofs()
+   * before calling this function.
+   */
+  virtual void distribute_mg_dofs ();
 
   /**
    * This function returns whether this DoFHandler has DoFs distributed on
@@ -401,9 +407,7 @@ public:
   void initialize_local_block_info();
 
   /**
-   * Clear all data of this object and especially delete the lock this object
-   * has to the finite element used the last time when @p distribute_dofs was
-   * called.
+   * Clear all data of this object.
    */
   virtual void clear ();
 
@@ -828,8 +832,26 @@ public:
 
   /**
    * Return a constant reference to the selected finite element object.
+   *
+   * @deprecated Use get_finite_element() instead.
    */
-  const FiniteElement<dim,spacedim> &get_fe () const;
+  const FiniteElement<dim,spacedim> &get_fe () const DEAL_II_DEPRECATED;
+
+  /**
+   * Return a constant reference to the selected finite element object.
+   * Since there is only one FiniteElement @index must be equal to zero
+   * which is also the default value.
+   */
+  const FiniteElement<dim,spacedim> &
+  get_finite_element (const unsigned int index=0) const;
+
+  /**
+    * Return a constant reference to the set of finite element objects that
+    * are used by this @p DoFHandler. Since this object only contains one
+    * FiniteElement, only this one object is returned wrapped in a
+    * hp::FECollection.
+    */
+  const hp::FECollection<dim,spacedim> &get_fe_collection () const;
 
   /**
    * Return a constant reference to the triangulation underlying this object.
@@ -923,16 +945,12 @@ private:
   SmartPointer<const Triangulation<dim,spacedim>,DoFHandler<dim,spacedim> >
   tria;
 
+
   /**
-   * Store a pointer to the finite element given latest for the distribution
-   * of dofs. In order to avoid destruction of the object before the lifetime
-   * of the DoF handler, we subscribe to the finite element object. To unlock
-   * the FE before the end of the lifetime of this DoF handler, use the
-   * <tt>clear()</tt> function (this clears all data of this object as well,
-   * though).
+   * Store a pointer to a hp::FECollection object containing the (one)
+   * FiniteElement this object is initialized with.
    */
-  SmartPointer<const FiniteElement<dim,spacedim>,DoFHandler<dim,spacedim> >
-  selected_fe;
+  std::unique_ptr<const hp::FECollection<dim,spacedim> > fe_collection;
 
   /**
    * An object that describes how degrees of freedom should be distributed and
@@ -1215,9 +1233,32 @@ inline
 const FiniteElement<dim,spacedim> &
 DoFHandler<dim,spacedim>::get_fe () const
 {
-  Assert(selected_fe!=nullptr,
-         ExcMessage("You are trying to access the DoFHandler's FiniteElement object before it has been initialized."));
-  return *selected_fe;
+  return this->get_finite_element();
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const FiniteElement<dim,spacedim> &
+DoFHandler<dim,spacedim>::get_finite_element
+(const unsigned int index) const
+{
+  (void) index;
+  Assert(index == 0, ExcMessage("There is only one FiniteElement stored. The index must be zero!"));
+  return get_fe_collection()[0];
+}
+
+
+
+template <int dim, int spacedim>
+inline
+const hp::FECollection<dim,spacedim> &
+DoFHandler<dim,spacedim>::get_fe_collection () const
+{
+  Assert(fe_collection != nullptr,
+         ExcMessage("You are trying to access the DoFHandler's FECollection object before it has been initialized."));
+  return *fe_collection;
 }
 
 
@@ -1301,7 +1342,7 @@ void DoFHandler<dim,spacedim>::save (Archive &ar,
   // loading that this number is indeed correct; same with something that
   // identifies the FE and the policy
   unsigned int n_cells = tria->n_cells();
-  std::string  fe_name = selected_fe->get_name();
+  std::string  fe_name = this->get_finite_element().get_name();
   std::string  policy_name = internal::policy_to_string(*policy);
 
   ar &n_cells &fe_name &policy_name;
@@ -1351,7 +1392,7 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
   AssertThrow (n_cells == tria->n_cells(),
                ExcMessage ("The object being loaded into does not match the triangulation "
                            "that has been stored previously."));
-  AssertThrow (fe_name == selected_fe->get_name(),
+  AssertThrow (fe_name == this->get_finite_element().get_name(),
                ExcMessage ("The finite element associated with this DoFHandler does not match "
                            "the one that was associated with the DoFHandler previously stored."));
   AssertThrow (policy_name == internal::policy_to_string(*policy),

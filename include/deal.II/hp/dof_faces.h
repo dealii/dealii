@@ -54,7 +54,7 @@ namespace internal
      * documentation of the internal::DoFHandler::DoFLevel class, we can
      * compute the location of the first line DoF, for example, by calculating
      * the offset as <code>line_index *
-     * dof_handler.get_fe().dofs_per_line</code>. This of course doesn't work
+     * dof_handler.get_finite_element().dofs_per_line</code>. This of course doesn't work
      * any more if different lines may have different numbers of degrees of
      * freedom associated with them. Consequently, rather than using this
      * simple multiplication, the dofs array has an associated array
@@ -371,12 +371,12 @@ namespace internal
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
-      Assert (fe_index < dof_handler.get_fe().size(),
-              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
+      Assert (fe_index < dof_handler.get_fe_collection().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe_collection().size()));
       Assert (local_index <
-              dof_handler.get_fe()[fe_index].template n_dofs_per_object<structdim>(),
+              dof_handler.get_finite_element(fe_index).template n_dofs_per_object<structdim>(),
               ExcIndexRange(local_index, 0,
-                            dof_handler.get_fe()[fe_index]
+                            dof_handler.get_finite_element(fe_index)
                             .template n_dofs_per_object<structdim>()));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
@@ -406,7 +406,7 @@ namespace internal
             return *(pointer + 1 + local_index);
           else
             pointer += static_cast<types::global_dof_index>(
-                         dof_handler.get_fe()[*pointer]
+                         dof_handler.get_finite_element(*pointer)
                          .template n_dofs_per_object<structdim>() + 1);
         }
     }
@@ -428,12 +428,12 @@ namespace internal
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
-      Assert (fe_index < dof_handler.get_fe().size(),
-              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
+      Assert (fe_index < dof_handler.get_fe_collection().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe_collection().size()));
       Assert (local_index <
-              dof_handler.get_fe()[fe_index].template n_dofs_per_object<structdim>(),
+              dof_handler.get_finite_element(fe_index).template n_dofs_per_object<structdim>(),
               ExcIndexRange(local_index, 0,
-                            dof_handler.get_fe()[fe_index]
+                            dof_handler.get_finite_element(fe_index)
                             .template n_dofs_per_object<structdim>()));
       Assert (obj_index < dof_offsets.size(),
               ExcIndexRange (obj_index, 0, dof_offsets.size()));
@@ -465,7 +465,7 @@ namespace internal
               return;
             }
           else
-            pointer += dof_handler.get_fe()[*pointer]
+            pointer += dof_handler.get_finite_element(*pointer)
                        .template n_dofs_per_object<structdim>() + 1;
         }
     }
@@ -507,7 +507,7 @@ namespace internal
           else
             {
               ++counter;
-              pointer += dof_handler.get_fe()[*pointer]
+              pointer += dof_handler.get_finite_element(*pointer)
                          .template n_dofs_per_object<structdim>() + 1;
             }
         }
@@ -557,14 +557,14 @@ namespace internal
 
           const unsigned int fe_index = *pointer;
 
-          Assert (fe_index < dof_handler.get_fe().size(),
+          Assert (fe_index < dof_handler.get_fe_collection().size(),
                   ExcInternalError());
 
           if (counter == n)
             return fe_index;
 
           ++counter;
-          pointer += dof_handler.get_fe()[fe_index]
+          pointer += dof_handler.get_finite_element(fe_index)
                      .template n_dofs_per_object<structdim>() + 1;
         }
     }
@@ -586,8 +586,8 @@ namespace internal
       Assert ((fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
-      Assert (fe_index < dof_handler.get_fe().size(),
-              ExcIndexRange (fe_index, 0, dof_handler.get_fe().size()));
+      Assert (fe_index < dof_handler.get_fe_collection().size(),
+              ExcIndexRange (fe_index, 0, dof_handler.get_fe_collection().size()));
 
       // make sure we are on an
       // object for which DoFs have
@@ -615,7 +615,7 @@ namespace internal
             return true;
           else
             pointer += static_cast<types::global_dof_index>(
-                         dof_handler.get_fe()[*pointer]
+                         dof_handler.get_finite_element(*pointer)
                          .template n_dofs_per_object<structdim>()+1);
         }
     }

@@ -469,12 +469,12 @@ namespace Step33
                                    const Vector<double>  &solution,
                                    Vector<double>        &refinement_indicators)
     {
-      const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell = dof_handler.get_finite_element().dofs_per_cell;
       std::vector<unsigned int> dofs (dofs_per_cell);
 
       const QMidpoint<dim>  quadrature_formula;
       const UpdateFlags update_flags = update_gradients;
-      FEValues<dim> fe_v (mapping, dof_handler.get_fe(),
+      FEValues<dim> fe_v (mapping, dof_handler.get_finite_element(),
                           quadrature_formula, update_flags);
 
       std::vector<std::vector<Tensor<1,dim> > >
@@ -1431,7 +1431,7 @@ namespace Step33
   template <int dim>
   void ConservationLaw<dim>::assemble_system ()
   {
-    const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof_handler.get_finite_element().dofs_per_cell;
 
     std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
     std::vector<types::global_dof_index> dof_indices_neighbor (dofs_per_cell);

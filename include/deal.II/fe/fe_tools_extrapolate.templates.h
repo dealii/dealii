@@ -495,7 +495,7 @@ namespace FETools
 
       if (locally_owned_children)
         {
-          const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
+          const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_finite_element();
           const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
 
           Vector<typename OutVector::value_type> interpolated_values(dofs_per_cell);
@@ -560,7 +560,7 @@ namespace FETools
         }
       else
         {
-          const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
+          const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_finite_element();
           const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
 
           Assert (interpolated_values.size() == dofs_per_cell,
@@ -668,7 +668,7 @@ namespace FETools
                                      const Vector<value_type>                                      &local_values,
                                      OutVector                                                     &u)
     {
-      const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
+      const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_finite_element();
       const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
 
       if (!dealii_cell->has_children ())
@@ -1135,7 +1135,7 @@ namespace FETools
                   const typename dealii::internal::p4est::types<dim>::quadrant  &p4est_cell,
                   std::vector<CellData>                                         &new_needs)
     {
-      const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_fe();
+      const FiniteElement<dim,spacedim> &fe            = dealii_cell->get_dof_handler().get_finite_element();
       const unsigned int                 dofs_per_cell = fe.dofs_per_cell;
 
       CellData  cell_data (dofs_per_cell);
@@ -1305,7 +1305,7 @@ namespace FETools
       compute_all_non_local_data (dof2, u2_relevant);
 
       // exclude dofs on more refined ghosted cells
-      const FiniteElement<dim,spacedim> &fe  = dof2.get_fe();
+      const FiniteElement<dim,spacedim> &fe  = dof2.get_finite_element();
       const unsigned int dofs_per_face = fe.dofs_per_face;
       if (dofs_per_face > 0)
         {
@@ -1542,7 +1542,7 @@ namespace FETools
                               const DoFHandler<dim,spacedim> &dof2,
                               OutVector &u2)
       {
-        const unsigned int dofs_per_cell  = dof2.get_fe().dofs_per_cell;
+        const unsigned int dofs_per_cell  = dof2.get_finite_element().dofs_per_cell;
         Vector<typename OutVector::value_type> dof_values(dofs_per_cell);
 
         // then traverse grid bottom up
@@ -1603,8 +1603,8 @@ namespace FETools
                    const ConstraintMatrix &constraints,
                    OutVector &u2)
   {
-    Assert(dof1.get_fe().n_components() == dof2.get_fe().n_components(),
-           ExcDimensionMismatch(dof1.get_fe().n_components(), dof2.get_fe().n_components()));
+    Assert(dof1.get_finite_element(0).n_components() == dof2.get_finite_element(0).n_components(),
+           ExcDimensionMismatch(dof1.get_finite_element(0).n_components(), dof2.get_finite_element(0).n_components()));
     Assert(&dof1.get_triangulation()==&dof2.get_triangulation(), ExcTriangulationMismatch());
     Assert(u1.size()==dof1.n_dofs(), ExcDimensionMismatch(u1.size(), dof1.n_dofs()));
     Assert(u2.size()==dof2.n_dofs(), ExcDimensionMismatch(u2.size(), dof2.n_dofs()));

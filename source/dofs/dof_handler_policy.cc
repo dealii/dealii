@@ -287,11 +287,11 @@ namespace internal
         {
 
           // distribute dofs of vertices
-          if (dof_handler.get_fe().dofs_per_vertex > 0)
+          if (dof_handler.get_finite_element().dofs_per_vertex > 0)
             for (unsigned int v=0; v<GeometryInfo<1>::vertices_per_cell; ++v)
               {
                 if (cell->vertex_dof_index (v,0) == numbers::invalid_dof_index)
-                  for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
+                  for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_vertex; ++d)
                     {
                       Assert ((cell->vertex_dof_index (v,d) ==
                                numbers::invalid_dof_index),
@@ -299,14 +299,14 @@ namespace internal
                       cell->set_vertex_dof_index (v, d, next_free_dof++);
                     }
                 else
-                  for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
+                  for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_vertex; ++d)
                     Assert ((cell->vertex_dof_index (v,d) !=
                              numbers::invalid_dof_index),
                             ExcInternalError());
               }
 
           // dofs of line
-          for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_line; ++d)
+          for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_line; ++d)
             cell->set_dof_index (d, next_free_dof++);
 
           return next_free_dof;
@@ -321,17 +321,17 @@ namespace internal
                                  const typename DoFHandler<2,spacedim>::active_cell_iterator &cell,
                                  types::global_dof_index                                      next_free_dof)
         {
-          if (dof_handler.get_fe().dofs_per_vertex > 0)
+          if (dof_handler.get_finite_element().dofs_per_vertex > 0)
             // number dofs on vertices
             for (unsigned int vertex=0; vertex<GeometryInfo<2>::vertices_per_cell; ++vertex)
               // check whether dofs for this vertex have been distributed
               // (checking the first dof should be good enough)
               if (cell->vertex_dof_index(vertex, 0) == numbers::invalid_dof_index)
-                for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
+                for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_vertex; ++d)
                   cell->set_vertex_dof_index (vertex, d, next_free_dof++);
 
           // for the four sides
-          if (dof_handler.get_fe().dofs_per_line > 0)
+          if (dof_handler.get_finite_element().dofs_per_line > 0)
             for (unsigned int side=0; side<GeometryInfo<2>::faces_per_cell; ++side)
               {
                 const typename DoFHandler<2,spacedim>::line_iterator
@@ -341,14 +341,14 @@ namespace internal
                 // numbered (checking the first dof should be good enough)
                 if (line->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
-                  for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_line; ++d)
+                  for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_line; ++d)
                     line->set_dof_index (d, next_free_dof++);
               }
 
 
           // dofs of quad
-          if (dof_handler.get_fe().dofs_per_quad > 0)
-            for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_quad; ++d)
+          if (dof_handler.get_finite_element().dofs_per_quad > 0)
+            for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_quad; ++d)
               cell->set_dof_index (d, next_free_dof++);
 
           return next_free_dof;
@@ -363,17 +363,17 @@ namespace internal
                                  const typename DoFHandler<3,spacedim>::active_cell_iterator &cell,
                                  types::global_dof_index                                      next_free_dof)
         {
-          if (dof_handler.get_fe().dofs_per_vertex > 0)
+          if (dof_handler.get_finite_element().dofs_per_vertex > 0)
             // number dofs on vertices
             for (unsigned int vertex=0; vertex<GeometryInfo<3>::vertices_per_cell; ++vertex)
               // check whether dofs for this vertex have been distributed
               // (checking the first dof should be good enough)
               if (cell->vertex_dof_index(vertex, 0) == numbers::invalid_dof_index)
-                for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
+                for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_vertex; ++d)
                   cell->set_vertex_dof_index (vertex, d, next_free_dof++);
 
           // for the lines
-          if (dof_handler.get_fe().dofs_per_line > 0)
+          if (dof_handler.get_finite_element().dofs_per_line > 0)
             for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
               {
                 const typename DoFHandler<3,spacedim>::line_iterator
@@ -383,12 +383,12 @@ namespace internal
                 // numbered (checking the first dof should be good enough)
                 if (line->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
-                  for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_line; ++d)
+                  for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_line; ++d)
                     line->set_dof_index (d, next_free_dof++);
               }
 
           // for the quads
-          if (dof_handler.get_fe().dofs_per_quad > 0)
+          if (dof_handler.get_finite_element().dofs_per_quad > 0)
             for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
               {
                 const typename DoFHandler<3,spacedim>::quad_iterator
@@ -398,14 +398,14 @@ namespace internal
                 // numbered (checking the first dof should be good enough)
                 if (quad->dof_index(0) == numbers::invalid_dof_index)
                   // if not: distribute dofs
-                  for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_quad; ++d)
+                  for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_quad; ++d)
                     quad->set_dof_index (d, next_free_dof++);
               }
 
 
           // dofs of hex
-          if (dof_handler.get_fe().dofs_per_hex > 0)
-            for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_hex; ++d)
+          if (dof_handler.get_finite_element().dofs_per_hex > 0)
+            for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_hex; ++d)
               cell->set_dof_index (d, next_free_dof++);
 
           return next_free_dof;
@@ -603,8 +603,8 @@ namespace internal
           // vertices at all, I can't think of a finite element that
           // would make that necessary...
           dealii::Table<2,std::shared_ptr<DoFIdentities> >
-          vertex_dof_identities (dof_handler.get_fe().size(),
-                                 dof_handler.get_fe().size());
+          vertex_dof_identities (dof_handler.get_fe_collection().size(),
+                                 dof_handler.get_fe_collection().size());
 
           // loop over all vertices and see which one we need to work
           // on
@@ -634,8 +634,8 @@ namespace internal
                         // make sure the entry in the equivalence
                         // table exists
                         ensure_existence_of_dof_identities<0>
-                        (dof_handler.get_fe()[first_fe_index],
-                         dof_handler.get_fe()[other_fe_index],
+                        (dof_handler.get_finite_element(first_fe_index),
+                         dof_handler.get_finite_element(other_fe_index),
                          vertex_dof_identities[first_fe_index][other_fe_index]);
 
                         // then loop through the identities we
@@ -1452,7 +1452,7 @@ namespace internal
               // really is unused
               Assert (dof_handler.get_triangulation()
                       .vertex_used((i-dof_handler.vertex_dofs.begin()) /
-                                   dof_handler.selected_fe->dofs_per_vertex)
+                                   dof_handler.get_finite_element().dofs_per_vertex)
                       == false,
                       ExcInternalError ());
         }
@@ -1572,7 +1572,7 @@ namespace internal
                     = dealii::internal::DoFAccessor::Implementation::
                       nth_active_vertex_fe_index (dof_handler, vertex_index, f);
 
-                  for (unsigned int d=0; d<dof_handler.get_fe()[fe_index].dofs_per_vertex; ++d)
+                  for (unsigned int d=0; d<dof_handler.get_finite_element(fe_index).dofs_per_vertex; ++d)
                     {
                       const types::global_dof_index old_dof_index
                         = dealii::internal::DoFAccessor::Implementation::
@@ -1616,7 +1616,7 @@ namespace internal
             {
               const unsigned int fe_index = cell->active_fe_index ();
 
-              for (unsigned int d=0; d<dof_handler.get_fe()[fe_index].template n_dofs_per_object<dim>(); ++d)
+              for (unsigned int d=0; d<dof_handler.get_finite_element(fe_index).template n_dofs_per_object<dim>(); ++d)
                 {
                   const types::global_dof_index old_dof_index = cell->dof_index(d,fe_index);
                   if (old_dof_index != numbers::invalid_dof_index)
@@ -1679,7 +1679,7 @@ namespace internal
                         const unsigned int fe_index
                           = line->nth_active_fe_index (f);
 
-                        for (unsigned int d=0; d<dof_handler.get_fe()[fe_index].dofs_per_line; ++d)
+                        for (unsigned int d=0; d<dof_handler.get_finite_element(fe_index).dofs_per_line; ++d)
                           {
                             const types::global_dof_index old_dof_index = line->dof_index(d,fe_index);
                             if (old_dof_index != numbers::invalid_dof_index)
@@ -1736,7 +1736,7 @@ namespace internal
                         const unsigned int fe_index
                           = line->nth_active_fe_index (f);
 
-                        for (unsigned int d=0; d<dof_handler.get_fe()[fe_index].dofs_per_line; ++d)
+                        for (unsigned int d=0; d<dof_handler.get_finite_element(fe_index).dofs_per_line; ++d)
                           {
                             const types::global_dof_index old_dof_index = line->dof_index(d,fe_index);
                             if (old_dof_index != numbers::invalid_dof_index)
@@ -1779,7 +1779,7 @@ namespace internal
                         const unsigned int fe_index
                           = quad->nth_active_fe_index (f);
 
-                        for (unsigned int d=0; d<dof_handler.get_fe()[fe_index].dofs_per_quad; ++d)
+                        for (unsigned int d=0; d<dof_handler.get_finite_element(fe_index).dofs_per_quad; ++d)
                           {
                             const types::global_dof_index old_dof_index = quad->dof_index(d,fe_index);
                             if (old_dof_index != numbers::invalid_dof_index)
@@ -1875,17 +1875,17 @@ namespace internal
             // if the present vertex lives on the current level
             if ((i->get_coarsest_level() <= level) &&
                 (i->get_finest_level() >= level))
-              for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
+              for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_vertex; ++d)
                 {
                   const dealii::types::global_dof_index idx
-                    = i->get_index (level, d, dof_handler.get_fe().dofs_per_vertex);
+                    = i->get_index (level, d, dof_handler.get_finite_element().dofs_per_vertex);
 
                   if (check_validity)
                     Assert(idx != numbers::invalid_dof_index, ExcInternalError ());
 
                   if (idx != numbers::invalid_dof_index)
                     i->set_index (level, d,
-                                  dof_handler.get_fe().dofs_per_vertex,
+                                  dof_handler.get_finite_element().dofs_per_vertex,
                                   (indices.size() == 0)?
                                   (new_numbers[idx]) :
                                   (new_numbers[indices.index_within_set(idx)]));
@@ -1956,7 +1956,7 @@ namespace internal
                                const unsigned int                                  level,
                                const bool                                          check_validity)
         {
-          if (dof_handler.get_fe().dofs_per_line > 0)
+          if (dof_handler.get_finite_element().dofs_per_line > 0)
             {
               // save user flags as they will be modified
               std::vector<bool> user_flags;
@@ -1978,7 +1978,7 @@ namespace internal
                 for (unsigned int l=0; l<GeometryInfo<2>::lines_per_cell; ++l)
                   if (cell->line(l)->user_flag_set())
                     {
-                      for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_line; ++d)
+                      for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_line; ++d)
                         {
                           const dealii::types::global_dof_index idx = cell->line(l)->mg_dof_index(level, d);
                           if (check_validity)
@@ -2007,8 +2007,8 @@ namespace internal
                                const unsigned int                                  level,
                                const bool                                          check_validity)
         {
-          if (dof_handler.get_fe().dofs_per_line > 0 ||
-              dof_handler.get_fe().dofs_per_quad > 0)
+          if (dof_handler.get_finite_element().dofs_per_line > 0 ||
+              dof_handler.get_finite_element().dofs_per_quad > 0)
             {
               // save user flags as they will be modified
               std::vector<bool> user_flags;
@@ -2029,7 +2029,7 @@ namespace internal
                 for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
                   if (cell->line(l)->user_flag_set())
                     {
-                      for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_line; ++d)
+                      for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_line; ++d)
                         {
                           const dealii::types::global_dof_index idx = cell->line(l)->mg_dof_index(level, d);
                           if (check_validity)
@@ -2055,7 +2055,7 @@ namespace internal
                 for (unsigned int l=0; l<GeometryInfo<3>::quads_per_cell; ++l)
                   if (cell->quad(l)->user_flag_set())
                     {
-                      for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_quad; ++d)
+                      for (unsigned int d=0; d<dof_handler.get_finite_element().dofs_per_quad; ++d)
                         {
                           const dealii::types::global_dof_index idx = cell->quad(l)->mg_dof_index(level, d);
                           if (check_validity)

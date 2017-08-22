@@ -104,7 +104,7 @@ internal_reinit(const Mapping<dim>                          &mapping,
       for (unsigned int nq =0; nq<n_quad; nq++)
         {
           AssertDimension (quad[nq].size(), 1);
-          shape_info(no,nq,0,0).reinit(quad[nq][0], dof_handler[no]->get_fe());
+          shape_info(no,nq,0,0).reinit(quad[nq][0], dof_handler[no]->get_finite_element());
         }
   }
 
@@ -177,8 +177,8 @@ internal_reinit(const Mapping<dim>                          &mapping,
       for (unsigned int i=0; i<dof_info.size(); ++i)
         {
           dof_info[i].dimension    = dim;
-          dof_info[i].n_components = dof_handler[i]->get_fe().element_multiplicity(0);
-          dof_info[i].dofs_per_cell.push_back(dof_handler[i]->get_fe().dofs_per_cell);
+          dof_info[i].n_components = dof_handler[i]->get_finite_element().element_multiplicity(0);
+          dof_info[i].dofs_per_cell.push_back(dof_handler[i]->get_finite_element().dofs_per_cell);
           dof_info[i].row_starts.resize(size_info.n_macro_cells+1);
           dof_info[i].row_starts.back()[2] =
             cell_level_index.size() % VectorizedArray<Number>::n_array_elements;
@@ -227,7 +227,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
     unsigned int n_fe_in_collection = 0;
     for (unsigned int i=0; i<n_components; ++i)
       n_fe_in_collection = std::max (n_fe_in_collection,
-                                     dof_handler[i]->get_fe().size());
+                                     dof_handler[i]->get_fe_collection().size());
     unsigned int n_quad_in_collection = 0;
     for (unsigned int q=0; q<n_quad; ++q)
       n_quad_in_collection = std::max (n_quad_in_collection, quad[q].size());
@@ -235,11 +235,11 @@ internal_reinit(const Mapping<dim>                            &mapping,
                                        n_fe_in_collection,
                                        n_quad_in_collection));
     for (unsigned int no=0; no<n_components; no++)
-      for (unsigned int fe_no=0; fe_no<dof_handler[no]->get_fe().size(); ++fe_no)
+      for (unsigned int fe_no=0; fe_no<dof_handler[no]->get_fe_collection().size(); ++fe_no)
         for (unsigned int nq =0; nq<n_quad; nq++)
           for (unsigned int q_no=0; q_no<quad[nq].size(); ++q_no)
             shape_info(no,nq,fe_no,q_no).reinit (quad[nq][q_no],
-                                                 dof_handler[no]->get_fe()[fe_no]);
+                                                 dof_handler[no]->get_finite_element(fe_no));
   }
 
   if (additional_data.initialize_indices == true)
@@ -310,10 +310,10 @@ internal_reinit(const Mapping<dim>                            &mapping,
                              dummy, dummy);
       for (unsigned int i=0; i<dof_info.size(); ++i)
         {
-          Assert(dof_handler[i]->get_fe().size() == 1, ExcNotImplemented());
+          Assert(dof_handler[i]->get_fe_collection().size() == 1, ExcNotImplemented());
           dof_info[i].dimension    = dim;
-          dof_info[i].n_components = dof_handler[i]->get_fe()[0].element_multiplicity(0);
-          dof_info[i].dofs_per_cell.push_back(dof_handler[i]->get_fe()[0].dofs_per_cell);
+          dof_info[i].n_components = dof_handler[i]->get_finite_element(0).element_multiplicity(0);
+          dof_info[i].dofs_per_cell.push_back(dof_handler[i]->get_finite_element(0).dofs_per_cell);
           dof_info[i].row_starts.resize(size_info.n_macro_cells+1);
           dof_info[i].row_starts.back()[2] =
             cell_level_index.size() % VectorizedArray<Number>::n_array_elements;
@@ -520,13 +520,13 @@ void MatrixFree<dim,Number>::initialize_indices
       if (dof_handlers.active_dof_handler == DoFHandlers::hp)
         {
           const hp::DoFHandler<dim> *hpdof = dof_handlers.hp_dof_handler[no];
-          const hp::FECollection<dim> &fe = hpdof->get_fe();
+          const hp::FECollection<dim> &fe = hpdof->get_fe_collection();
           for (unsigned int f=0; f<fe.size(); ++f)
             fes.push_back (&fe[f]);
 
           dof_info[no].max_fe_index = fe.size();
           dof_info[no].fe_index_conversion.resize (fe.size());
-          for (unsigned int ind=0; ind<hpdof->get_fe().size(); ++ind)
+          for (unsigned int ind=0; ind<hpdof->get_fe_collection().size(); ++ind)
             dof_info[no].fe_index_conversion[ind] =
               std::pair<unsigned int,unsigned int>(fe[ind].degree,
                                                    fe[ind].dofs_per_cell);
@@ -537,7 +537,7 @@ void MatrixFree<dim,Number>::initialize_indices
       else
         {
           const DoFHandler<dim> *dofh =&*dof_handlers.dof_handler[no];
-          fes.push_back (&dofh->get_fe());
+          fes.push_back (&dofh->get_finite_element());
           dof_info[no].max_fe_index = 1;
           dof_info[no].fe_index_conversion.resize (1);
           dof_info[no].fe_index_conversion[0] =
@@ -641,7 +641,7 @@ void MatrixFree<dim,Number>::initialize_indices
                        cell_level_index[counter].first,
                        cell_level_index[counter].second,
                        dofh);
-              if (dofh->get_fe().size() > 1)
+              if (dofh->get_fe_collection().size() > 1)
                 dof_info[no].cell_active_fe_index[counter] =
                   cell_it->active_fe_index();
               local_dof_indices.resize (cell_it->get_fe().dofs_per_cell);

@@ -261,7 +261,7 @@ namespace Step16
   void LaplaceProblem<dim>::setup_system ()
   {
     dof_handler.distribute_dofs (fe);
-    dof_handler.distribute_mg_dofs (fe);
+    dof_handler.distribute_mg_dofs ();
 
     deallog << "   Number of degrees of freedom: "
             << dof_handler.n_dofs()

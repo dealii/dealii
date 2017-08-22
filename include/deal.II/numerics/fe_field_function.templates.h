@@ -40,7 +40,7 @@ namespace Functions
    const VectorType     &myv,
    const Mapping<dim>   &mymapping)
     :
-    Function<dim,typename VectorType::value_type>(mydh.get_fe().n_components()),
+    Function<dim,typename VectorType::value_type>(mydh.get_finite_element(0).n_components()),
     dh(&mydh, "FEFieldFunction"),
     data_vector(myv),
     mapping(mymapping),
@@ -260,7 +260,7 @@ namespace Functions
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
-    hp::FECollection<dim> fe_collection (dh->get_fe ());
+    const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i)
@@ -321,7 +321,7 @@ namespace Functions
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
-    hp::FECollection<dim> fe_collection (dh->get_fe ());
+    const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i)
@@ -386,7 +386,7 @@ namespace Functions
 
     unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
-    hp::FECollection<dim> fe_collection (dh->get_fe ());
+    const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
     for (unsigned int i=0; i<ncells; ++i)

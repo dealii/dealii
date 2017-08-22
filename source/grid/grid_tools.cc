@@ -1636,7 +1636,7 @@ next_cell:
                                  const Point<spacedim>     &p)
   {
     Assert ((mapping.size() == 1) ||
-            (mapping.size() == mesh.get_fe().size()),
+            (mapping.size() == mesh.get_fe_collection().size()),
             ExcMessage ("Mapping collection needs to have either size 1 "
                         "or size equal to the number of elements in "
                         "the FECollection."));

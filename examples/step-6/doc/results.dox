@@ -115,14 +115,12 @@ from this example.
 
 @code
 --------------------------------------------------------
-An error occurred in line <128> of file <source/base/subscriptor.cc> in function
+An error occurred in line <104> of file <source/base/subscriptor.cc> in function
     void dealii::Subscriptor::check_no_subscribers() const
 The violated condition was:
     counter == 0
-The name and call sequence of the exception was:
-    ExcInUse (counter, object_info->name(), infostring)
-Additional Information:
-Object of class N6dealii4FE_QILi2ELi2EEE is still used by 1 other objects.
+Additional information:
+Object of class N6dealii17SphericalManifoldILi2ELi2EEE is still used by 1 other objects.
 
 (Additional information: <none>)
 
@@ -134,7 +132,7 @@ Stacktrace:
 -----------
 #0  /lib/libdeal_II.g.so: dealii::Subscriptor::check_no_subscribers() const
 #1  /lib/libdeal_II.g.so: dealii::Subscriptor::~Subscriptor()
-#2  /lib/libdeal_II.g.so: dealii::FiniteElement<2, 2>::~FiniteElement()
+#2  /lib/libdeal_II.g.so: dealii::Manifold<2, 2>::~Manifold()
 #3  ./step-6: Step6<2>::~Step6()
 #4  ./step-6: main
 --------------------------------------------------------

@@ -811,7 +811,7 @@ namespace Step37
     mg_matrices.clear_elements();
 
     dof_handler.distribute_dofs (fe);
-    dof_handler.distribute_mg_dofs (fe);
+    dof_handler.distribute_mg_dofs ();
 
     pcout << "Number of degrees of freedom: "
           << dof_handler.n_dofs()

@@ -515,7 +515,7 @@ namespace Step56
         // velocity space in a separate DoFHandler as described in the
         // introduction.
         velocity_dof_handler.distribute_dofs(velocity_fe);
-        velocity_dof_handler.distribute_mg_dofs(velocity_fe);
+        velocity_dof_handler.distribute_mg_dofs();
 
         // The following block of code initializes the MGConstrainedDofs
         // (using the boundary conditions for the velocity), and the

@@ -980,7 +980,7 @@ add_data_vector_internal
                         "does not have any degrees of freedom, so it is not "
                         "possible to output DoF data in this context."));
       const std::string name = names[0];
-      const unsigned int n_components = dof_handler->get_fe().n_components();
+      const unsigned int n_components = dof_handler->get_finite_element(0).n_components();
       deduced_names.resize (n_components);
       if (n_components > 1)
         {
@@ -1016,9 +1016,9 @@ add_data_vector_internal
               Exceptions::DataOut::ExcInvalidVectorSize (data_vector.size(),
                                                          dof_handler->n_dofs(),
                                                          triangulation->n_active_cells()));
-      Assert (deduced_names.size() == dof_handler->get_fe().n_components(),
+      Assert (deduced_names.size() == dof_handler->get_finite_element(0).n_components(),
               Exceptions::DataOut::ExcInvalidNumberOfNames (deduced_names.size(),
-                                                            dof_handler->get_fe().n_components()));
+                                                            dof_handler->get_finite_element(0).n_components()));
       break;
     default:
       Assert (false, ExcInternalError());
@@ -1256,7 +1256,7 @@ std::vector<std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
           }
       if (duplicate == false)
         finite_elements[i].reset(new dealii::hp::FECollection<dhdim,dhspacedim>
-                                 (this->dof_data[i]->dof_handler->get_fe()));
+                                 (this->dof_data[i]->dof_handler->get_fe_collection()));
     }
   if (this->dof_data.empty())
     {
