@@ -158,11 +158,6 @@ class PrimitiveVectorMemory : public VectorMemory<VectorType>
 {
 public:
   /**
-   * Constructor.
-   */
-  PrimitiveVectorMemory () = default;
-
-  /**
    * Return a pointer to a new vector. The number of elements or their
    * subdivision into blocks (if applicable) is unspecified and users of this
    * function should reset vectors to their proper size. The same holds for
@@ -171,10 +166,7 @@ public:
    * For the present class, calling this function will allocate a new vector
    * on the heap and returning a pointer to it.
    */
-  virtual VectorType *alloc ()
-  {
-    return new VectorType();
-  }
+  virtual VectorType *alloc ();
 
   /**
    * Return a vector and indicate that it is not going to be used any further
@@ -184,10 +176,7 @@ public:
    * For the present class, this means that the vector is returned to the
    * global heap.
    */
-  virtual void free (const VectorType *const v)
-  {
-    delete v;
-  }
+  virtual void free (const VectorType *const v);
 };
 
 
@@ -358,6 +347,26 @@ VectorMemory<VectorType>::Pointer::Pointer(VectorMemory<VectorType> &mem)
   mem.free(v);
 })
 {}
+
+
+
+template <typename VectorType>
+VectorType *
+PrimitiveVectorMemory<VectorType>::alloc ()
+{
+  return new VectorType();
+}
+
+
+
+template <typename VectorType>
+void
+PrimitiveVectorMemory<VectorType>::free (const VectorType *const v)
+{
+  delete v;
+}
+
+
 
 
 #endif // DOXYGEN
