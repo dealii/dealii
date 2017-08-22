@@ -121,7 +121,7 @@ void make_petsc_complex ()
 // initialised to 0+0i.
 void init_petsc_complex ()
 {
-  deallog << "Check PetscScalar initialisation" << std::endl;
+  deallog << "Check PetscScalar initialization" << std::endl;
 
   // Initialise (no argument) to zero.
   const PetscScalar alpha;
@@ -151,11 +151,11 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        // initialisation (zero and nonzero)
+        // initialization (zero and nonzero)
         init_petsc_complex ();
         make_petsc_complex ();
 
-        // initialisation from std::complex (and vice versa)
+        // initialization from std::complex (and vice versa)
         make_petsc_complex_from_std_complex ();
         make_std_complex_from_petsc_complex ();
 

@@ -183,7 +183,7 @@ template <class VectorType> class FilteredMatrixBlock;
  * <h3>Thread-safety</h3>
  *
  * The functions that operate as a matrix and do not change the internal state
- * of this object are synchronised and thus threadsafe. Consequently, you do
+ * of this object are synchronized and thus threadsafe. Consequently, you do
  * not need to serialize calls to @p vmult or @p residual .
  *
  * @author Wolfgang Bangerth 2001, Luca Heltai 2006, Guido Kanschat 2007, 2008

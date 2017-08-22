@@ -1263,7 +1263,7 @@ template <typename Range,
 LinearOperator<Range, Domain, Payload>
 linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
 {
-  // Initialise the payload based on the input exemplar matrix
+  // Initialize the payload based on the input exemplar matrix
   LinearOperator<Range, Domain, Payload> return_op (Payload(operator_exemplar,matrix));
 
   // Always store a reference to matrix and operator_exemplar in the lambda
@@ -1317,7 +1317,7 @@ LinearOperator<Range, Domain, Payload>
 linear_operator(const LinearOperator<Range, Domain, Payload> &operator_exemplar,
                 const Matrix &matrix)
 {
-  // Initialise the payload based on the LinearOperator exemplar
+  // Initialize the payload based on the LinearOperator exemplar
   auto return_op = operator_exemplar;
 
   typename std::conditional<

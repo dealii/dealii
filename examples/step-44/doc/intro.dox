@@ -34,7 +34,7 @@ The setup of the example problem is then presented.
 
 @note This tutorial has been developed (and is described in the introduction) for the problem of elasticity in three dimensions.
  While the space dimension could be changed in the main() routine, care needs to be taken.
- Two-dimensional elasticity problems, in general, exist only as idealisations of three-dimensional ones.
+ Two-dimensional elasticity problems, in general, exist only as idealizations of three-dimensional ones.
  That is, they are either plane strain or plane stress. 
  The assumptions that follow either of these choices needs to be consistently imposed. 
  For more information see the note in step-8.
@@ -531,7 +531,7 @@ Note that the following terms are termed the geometrical stress and  the materia
 @f}
 
 
-<h3> Discretisation of governing equations </h3>
+<h3> Discretization of governing equations </h3>
 
 The three-field formulation used here is effective for quasi-incompressible materials,
 that is where $\nu \rightarrow 0.5$ (where $\nu$ is <a

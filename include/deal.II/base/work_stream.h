@@ -55,11 +55,11 @@ DEAL_II_NAMESPACE_OPEN
  * many such examples, part of the work can be done entirely independently and
  * in parallel, possibly using several processor cores on a machine with
  * shared memory. However, some other part of this work may need to be
- * synchronised and be done in order. In the example of assembling a matrix,
+ * synchronized and be done in order. In the example of assembling a matrix,
  * the computation of local contributions can be done entirely in parallel,
  * but copying the local contributions into the global matrix requires some
  * care: First, several threads can't write at the same time, but need to
- * synchronise writing using a mutex; secondly, we want the order in which
+ * synchronize writing using a mutex; secondly, we want the order in which
  * local contributions are added to the global matrix to be always the same
  * because floating point addition is not commutative and adding local
  * contributions to the global matrix in different orders leads to subtly
@@ -74,7 +74,7 @@ DEAL_II_NAMESPACE_OPEN
  * parallel on all of these objects and then passes each object to a
  * postprocessor function that runs sequentially and gets objects in exactly
  * the order in which they appear in the input iterator range. None of the
- * synchronisation work is exposed to the user of this class.
+ * synchronization work is exposed to the user of this class.
  *
  * Internally, the range given to the run() function of this class is split
  * into a sequence of "items", which are then distributed according to some

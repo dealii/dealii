@@ -128,8 +128,8 @@ public:
    * spent in the factorization, so this functionality may not always be of
    * large benefit.
    *
-   * In contrast to the other direct solver classes, the initialisation method
-   * does nothing. Therefore initialise is not automatically called by this
+   * In contrast to the other direct solver classes, the initialization method
+   * does nothing. Therefore initialize is not automatically called by this
    * method, when the initialization step has not been performed yet.
    *
    * This function copies the contents of the matrix into its own storage; the

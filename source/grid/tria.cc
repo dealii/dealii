@@ -12580,7 +12580,7 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
 
   // now for what is done in each loop: we have to fulfill several
   // tasks at the same time, namely several mesh smoothing algorithms
-  // and mesh regularisation, by which we mean that the next mesh
+  // and mesh regularization, by which we mean that the next mesh
   // fulfills several requirements such as no double refinement at
   // each face or line, etc.
   //
@@ -12590,7 +12590,7 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
   // these were done at once, so the code was rather impossible to
   // join into this, only, function), we do them one after each
   // other. the order in which we do them is such that the important
-  // tasks, namely regularisation, are done last and the least
+  // tasks, namely regularization, are done last and the least
   // important things are done the first. the following order is
   // chosen:
   //

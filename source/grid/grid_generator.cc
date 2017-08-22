@@ -834,7 +834,7 @@ namespace GridGenerator
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize)
   {
-    // Equalise number of subdivisions in each dim-direction, their
+    // Equalize number of subdivisions in each dim-direction, their
     // validity will be checked later
     unsigned int n_subdivisions_ [dim];
     for (unsigned int i=0; i<dim; ++i)

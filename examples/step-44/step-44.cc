@@ -1012,7 +1012,7 @@ namespace Step44
     BlockVector<double>       solution_n;
 
     // Then define a number of variables to store norms and update norms and
-    // normalisation factors.
+    // normalization factors.
     struct Errors
     {
       Errors()
@@ -1027,7 +1027,7 @@ namespace Step44
         p = 1.0;
         J = 1.0;
       }
-      void normalise(const Errors &rhs)
+      void normalize(const Errors &rhs)
       {
         if (rhs.norm != 0.0)
           norm /= rhs.norm;
@@ -1073,7 +1073,7 @@ namespace Step44
 
 // @sect4{Public interface}
 
-// We initialise the Solid class using data extracted from the parameter file.
+// We initialize the Solid class using data extracted from the parameter file.
   template <int dim>
   Solid<dim>::Solid(const std::string &input_file)
     :
@@ -1561,7 +1561,7 @@ namespace Step44
     block_component[p_component] = p_dof; // Pressure
     block_component[J_component] = J_dof; // Dilatation
 
-    // The DOF handler is then initialised and we renumber the grid in an
+    // The DOF handler is then initialized and we renumber the grid in an
     // efficient manner. We also record the number of DOFs per block.
     dof_handler_ref.distribute_dofs(fe);
     DoFRenumbering::Cuthill_McKee(dof_handler_ref);
@@ -1615,7 +1615,7 @@ namespace Step44
       //  \\ \mathsf{\mathbf{F}}_{\widetilde{J}}(\widetilde{J}_{\textrm{i}})
       //\end{bmatrix}}_{ \mathsf{\mathbf{F}}(\mathbf{\Xi}_{\textrm{i}}) } \, .
       // @f}
-      // We optimise the sparsity pattern to reflect this structure
+      // We optimize the sparsity pattern to reflect this structure
       // and prevent unnecessary data creation for the right-diagonal
       // block components.
       Table<2, DoFTools::Coupling> coupling(n_components, n_components);
@@ -1838,10 +1838,10 @@ namespace Step44
         if (newton_iteration == 0)
           error_residual_0 = error_residual;
 
-        // We can now determine the normalised residual error and check for
+        // We can now determine the normalized residual error and check for
         // solution convergence:
         error_residual_norm = error_residual;
-        error_residual_norm.normalise(error_residual_0);
+        error_residual_norm.normalize(error_residual_0);
 
         if (newton_iteration > 0 && error_update_norm.u <= parameters.tol_u
             && error_residual_norm.u <= parameters.tol_f)
@@ -1866,12 +1866,12 @@ namespace Step44
         if (newton_iteration == 0)
           error_update_0 = error_update;
 
-        // We can now determine the normalised Newton update error, and
+        // We can now determine the normalized Newton update error, and
         // perform the actual update of the solution increment for the current
         // time step, update all quadrature point information pertaining to
         // this new displacement and stress state and continue iterating:
         error_update_norm = error_update;
-        error_update_norm.normalise(error_update_0);
+        error_update_norm.normalize(error_update_0);
 
         solution_delta += newton_update;
         update_qph_incremental(solution_delta);
@@ -2140,7 +2140,7 @@ namespace Step44
   }
 
 // Of course, we still have to define how we assemble the tangent matrix
-// contribution for a single cell.  We first need to reset and initialise some
+// contribution for a single cell.  We first need to reset and initialize some
 // of the scratch data structures and retrieve some basic information
 // regarding the DOF numbering on this cell.  We can precalculate the cell
 // shape function values and gradients. Note that the shape function gradients
