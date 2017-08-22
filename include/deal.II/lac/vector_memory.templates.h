@@ -18,6 +18,7 @@
 
 
 #include <deal.II/lac/vector_memory.h>
+#include <deal.II/base/std_cxx14/memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -42,18 +43,12 @@ inline
 GrowingVectorMemory<VectorType>::Pool::~Pool()
 {
   // Nothing to do if memory was unused.
-  if (data == nullptr) return;
+  if (data == nullptr)
+    return;
 
-  // First, delete all remaining
-  // vectors. Actually, there should
-  // be none, if there is no memory
-  // leak
-  for (typename std::vector<entry_type>::iterator i=data->begin();
-       i != data->end();
-       ++i)
-    {
-      delete i->second;
-    }
+  // delete the 'data' object. this also releases all vectors
+  // that are pointed to by the std::unique_ptrs
+  data->clear();
   delete data;
 }
 
@@ -72,7 +67,7 @@ GrowingVectorMemory<VectorType>::Pool::initialize(const size_type size)
            ++i)
         {
           i->first = false;
-          i->second = new VectorType;
+          i->second = std_cxx14::make_unique<VectorType>();
         }
     }
 }
@@ -116,6 +111,7 @@ VectorType *
 GrowingVectorMemory<VectorType>::alloc ()
 {
   Threads::Mutex::ScopedLock lock(mutex);
+
   ++total_alloc;
   ++current_alloc;
   // see if there is a free vector
@@ -126,16 +122,14 @@ GrowingVectorMemory<VectorType>::alloc ()
       if (i->first == false)
         {
           i->first = true;
-          return (i->second);
+          return i->second.get();
         }
     }
 
-  // no free vector found, so let's
-  // just allocate a new one
-  const entry_type t (true, new VectorType);
-  pool.data->push_back(t);
+  // no free vector found, so let's just allocate a new one
+  pool.data->emplace_back(entry_type (true, std_cxx14::make_unique<VectorType>()));
 
-  return t.second;
+  return pool.data->back().second.get();
 }
 
 
@@ -146,10 +140,11 @@ void
 GrowingVectorMemory<VectorType>::free(const VectorType *const v)
 {
   Threads::Mutex::ScopedLock lock(mutex);
+
   for (typename std::vector<entry_type>::iterator i=pool.data->begin();
        i != pool.data->end(); ++i)
     {
-      if (v == (i->second))
+      if (v == i->second.get())
         {
           i->first = false;
           --current_alloc;
@@ -168,21 +163,8 @@ GrowingVectorMemory<VectorType>::release_unused_memory ()
 {
   Threads::Mutex::ScopedLock lock(mutex);
 
-  std::vector<entry_type> new_data;
-
   if (pool.data != nullptr)
-    {
-      const typename std::vector<entry_type>::const_iterator
-      end = pool.data->end();
-      for (typename std::vector<entry_type>::const_iterator
-           i = pool.data->begin(); i != end ; ++i)
-        if (i->first == false)
-          delete i->second;
-        else
-          new_data.push_back (*i);
-
-      *pool.data = new_data;
-    }
+    pool.data->clear();
 }
 
 
