@@ -497,7 +497,7 @@ namespace Step13
     // which uses a counter in the triangulation class to denote the fact that
     // there is still an object out there using this triangulation, thus
     // leading to an abort in case the triangulation is attempted to be
-    // destructed while this object still uses it.
+    // destroyed while this object still uses it.
     //
     // Note that while the pointer itself is declared constant
     // (i.e. throughout the lifetime of this object, the pointer points to the

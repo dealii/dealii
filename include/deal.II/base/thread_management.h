@@ -1004,7 +1004,7 @@ namespace Threads
      * While we have only one of these objects per thread, several
      * Threads::Thread objects may refer to this descriptor. If all Thread
      * objects go out of scope the ThreadDescriptor will detach from the
-     * thread before being destructed.
+     * thread before being destroyed.
      */
     template <typename RT>
     struct ThreadDescriptor
