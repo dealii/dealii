@@ -503,7 +503,7 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
 
   typedef typename BlockLinearOperator<Range, Domain, BlockPayload>::BlockType BlockType;
 
-  BlockLinearOperator<Range, Domain, BlockPayload> return_op ((BlockPayload())); // TODO: Create block payload so that this can be initialised correctly
+  BlockLinearOperator<Range, Domain, BlockPayload> return_op ((BlockPayload())); // TODO: Create block payload so that this can be initialized correctly
 
   return_op.n_block_rows = []() -> unsigned int
   {

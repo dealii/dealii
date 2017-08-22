@@ -48,7 +48,7 @@ namespace PETScWrappers
 
     /**
      * Implementation of a parallel vector class based on PETSC and using MPI
-     * communication to synchronise distributed operations. All the
+     * communication to synchronize distributed operations. All the
      * functionality is actually in the base class, except for the calls to
      * generate a parallel vector. This is possible since PETSc only works on
      * an abstract vector type and internally distributes to functions that do
@@ -105,7 +105,7 @@ namespace PETScWrappers
      * time, all these additions are executed. However, if one process adds to
      * an element, and another overwrites to it, the order of execution would
      * yield non-deterministic behavior if we don't make sure that a
-     * synchronisation with compress() happens in between.
+     * synchronization with compress() happens in between.
      *
      * In order to make sure these calls to compress() happen at the
      * appropriate time, the deal.II wrappers keep a state variable that store

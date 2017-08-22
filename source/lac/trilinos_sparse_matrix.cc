@@ -2975,7 +2975,7 @@ namespace TrilinosWrappers
           static GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
-          // Initialise intermediate vector
+          // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -3016,7 +3016,7 @@ namespace TrilinosWrappers
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
 
-          // Initialise intermediate vector
+          // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -3054,7 +3054,7 @@ namespace TrilinosWrappers
           static GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
-          // Initialise intermediate vector
+          // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -3095,7 +3095,7 @@ namespace TrilinosWrappers
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
 
-          // Initialise intermediate vector
+          // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -3152,7 +3152,7 @@ namespace TrilinosWrappers
           static GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
-          // Initialise intermediate vector
+          // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -3191,7 +3191,7 @@ namespace TrilinosWrappers
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
 
-          // Initialise intermediate vector
+          // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -3226,7 +3226,7 @@ namespace TrilinosWrappers
           static GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
-          // Initialise intermediate vector
+          // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -3265,7 +3265,7 @@ namespace TrilinosWrappers
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
 
-          // Initialise intermediate vector
+          // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),

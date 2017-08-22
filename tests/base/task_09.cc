@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// we used to synchronise child tasks with the one that spawned it by
+// we used to synchronize child tasks with the one that spawned it by
 // using a mutex, but this could lead to deadlocks if there are more
 // tasks than processors available, see the emails on the mailing
 // lists in late nov 2010.

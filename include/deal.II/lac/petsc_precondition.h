@@ -603,7 +603,7 @@ namespace PETScWrappers
 
       /**
        * This quantity is added to the diagonal of the matrix during
-       * factorisation.
+       * factorization.
        */
       double damping;
     };

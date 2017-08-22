@@ -160,7 +160,7 @@ FE_ABF<dim>::initialize_support_points (const unsigned int deg)
 
 
   // These might be required when the faces contribution is computed
-  // Therefore they will be initialised at this point.
+  // Therefore they will be initialized at this point.
   std::vector<AnisotropicPolynomials<dim>* > polynomials_abf(dim);
 
   // Generate x_1^{i} x_2^{r+1} ...
@@ -212,7 +212,7 @@ FE_ABF<dim>::initialize_support_points (const unsigned int deg)
         }
 
 
-      // Now initialise edge interior weights for the ABF elements.
+      // Now initialize edge interior weights for the ABF elements.
       // These are completely independent from the usual edge moments. They
       // stem from applying the Gauss theorem to the nodal values, which
       // was necessary to cast the ABF elements into the deal.II framework

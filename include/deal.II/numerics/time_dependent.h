@@ -1251,7 +1251,7 @@ namespace TimeStepBase_Tria_Flags
 
 
 /**
- * Specialisation of TimeStepBase which addresses some aspects of grid
+ * Specialization of TimeStepBase which addresses some aspects of grid
  * handling. In particular, this class is thought to make handling of grids
  * available that are adaptively refined on each time step separately or with
  * a loose coupling between time steps. It also takes care of deleting and

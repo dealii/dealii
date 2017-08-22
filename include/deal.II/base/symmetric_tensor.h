@@ -3018,7 +3018,7 @@ enum struct SymmetricTensorEigenvectorMethod
   hybrid,
   /**
    * The iterative QL algorithm with implicit shifts applied after
-   * tridiagonalisation of the tensor using the householder method.
+   * tridiagonalization of the tensor using the householder method.
    *
    * This method offers a compromise between speed of computation and its
    * robustness. This method is particularly useful when the elements

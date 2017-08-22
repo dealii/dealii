@@ -326,7 +326,7 @@ private:
   bool log_statistics;
 
   /**
-   * Mutex to synchronise access to internal data of this object from multiple
+   * Mutex to synchronize access to internal data of this object from multiple
    * threads.
    */
   static Threads::Mutex mutex;

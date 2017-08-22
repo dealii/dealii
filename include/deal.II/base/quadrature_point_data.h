@@ -506,7 +506,7 @@ void CellDataStorage<CellIteratorType,DataType>::initialize(const CellIteratorTy
   if (map.find(cell) == map.end())
     {
       map[cell] = std::vector<std::shared_ptr<DataType> >(n_q_points);
-      // we need to initialise one-by-one as the std::vector<>(q, T())
+      // we need to initialize one-by-one as the std::vector<>(q, T())
       // will end with a single same T object stored in each element of the vector:
       auto it = map.find(cell);
       for (unsigned int q=0; q < n_q_points; q++)

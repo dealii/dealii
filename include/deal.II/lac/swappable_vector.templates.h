@@ -117,7 +117,7 @@ void SwappableVector<number>::swap_out (const std::string &name)
 template <typename number>
 void SwappableVector<number>::reload ()
 {
-  // if in MT mode: synchronise with
+  // if in MT mode: synchronize with
   // possibly existing @p alert
   // calls. if not in MT mode, this
   // is a no-op
@@ -155,7 +155,7 @@ void SwappableVector<number>::alert ()
   return;
 #else
 
-  // synchronise with possible other
+  // synchronize with possible other
   // invocations of this function and
   // other functions in this class
   lock.acquire ();

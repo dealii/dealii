@@ -51,7 +51,7 @@ namespace internal
      * The indices of degrees of freedom located on lower dimensional objects,
      * i.e. on lines for 2D and on quads and lines for 3D are treated
      * similarly than that on cells. However, these geometrical objects, which
-     * are called faces as a generalisation, are not organised in a
+     * are called faces as a generalization, are not organised in a
      * hierarchical structure of levels. Therefore, the degrees of freedom
      * located on these objects are stored in separate classes, namely the
      * <tt>DoFFaces</tt> classes.

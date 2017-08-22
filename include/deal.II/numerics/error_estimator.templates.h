@@ -69,14 +69,14 @@ namespace internal
      * which we found can take a significant amount of time if it happens
      * often even in the single threaded case (10-20 per cent in our
      * measurements); however, most importantly, memory allocation requires
-     * synchronisation in multithreaded mode. While that is done by the C++
+     * synchronization in multithreaded mode. While that is done by the C++
      * library and has not to be handcoded, it nevertheless seriously damages
      * the ability to efficiently run the functions of this class in parallel,
-     * since they are quite often blocked by these synchronisation points,
+     * since they are quite often blocked by these synchronization points,
      * slowing everything down by a factor of two or three.
      *
      * Thus, every thread gets an instance of this class to work with and
-     * needs not allocate memory itself, or synchronise with other threads.
+     * needs not allocate memory itself, or synchronize with other threads.
      *
      * The sizes of the arrays are initialized with the maximal number of
      * entries necessary for the hp case. Within the loop over individual
@@ -113,7 +113,7 @@ namespace internal
        * points for each of the solution vectors (i.e. a temporary value).
        * This vector is not allocated inside the functions that use it, but
        * rather globally, since memory allocation is slow, in particular in
-       * presence of multiple threads where synchronisation makes things even
+       * presence of multiple threads where synchronization makes things even
        * slower.
        */
       std::vector<std::vector<std::vector<number> > > phi;

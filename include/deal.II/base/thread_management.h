@@ -174,7 +174,7 @@ namespace Threads
    * class names in multithreading and non-MT mode and thus may be compiled
    * with or without thread-support without the need to use conditional
    * compilation. Since a barrier class only makes sense in non-multithread
-   * mode if only one thread is to be synchronised (otherwise, the barrier
+   * mode if only one thread is to be synchronized (otherwise, the barrier
    * could not be left, since the one thread is waiting for some other part of
    * the program to reach a certain point of execution), the constructor of
    * this class throws an exception if the <code>count</code> argument
@@ -188,7 +188,7 @@ namespace Threads
   public:
     /**
      * Constructor. Since barriers are only useful in single-threaded mode if
-     * the number of threads to be synchronised is one, this constructor
+     * the number of threads to be synchronized is one, this constructor
      * raises an exception if the <code>count</code> argument is one.
      */
     DummyBarrier (const unsigned int  count,

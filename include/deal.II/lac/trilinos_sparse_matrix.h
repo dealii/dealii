@@ -2011,7 +2011,7 @@ namespace TrilinosWrappers
 
     /**
      * Trilinos doesn't allow to mix additions to matrix entries and
-     * overwriting them (to make synchronisation of %parallel computations
+     * overwriting them (to make synchronization of %parallel computations
      * simpler). The way we do it is to, for each access operation, store
      * whether it is an insertion or an addition. If the previous one was of
      * different type, then we first have to flush the Trilinos buffers;

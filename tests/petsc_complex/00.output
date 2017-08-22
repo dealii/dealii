@@ -1,5 +1,5 @@
 
-DEAL::Check PetscScalar initialisation
+DEAL::Check PetscScalar initialization
 DEAL::OK
 DEAL::Check a nonzero PetscScalar
 DEAL::OK
