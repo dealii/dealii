@@ -191,7 +191,7 @@ Step6<dim>::Step6 ()
 // To be fair, such exceptions about still used objects are not particularly
 // popular among programmers using deal.II, since they only tell us that
 // something is wrong, namely that some other object is still using the object
-// that is presently being destructed, but most of the time not who this using
+// that is presently being destroyed, but most of the time not who this using
 // object is. It is therefore often rather time-consuming to find out where the
 // problem exactly is, although it is then usually straightforward to remedy
 // the situation. However, we believe that the effort to find invalid
