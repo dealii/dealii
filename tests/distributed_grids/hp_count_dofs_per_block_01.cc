@@ -15,13 +15,13 @@
 
 
 
-// like the dofs/dof_handler_number_cache test but this time use a
-// parallel::distributed::Triangulation object. We still use only a
-// single processor so the end result should be the same but we use
-// entirely different code paths
+// Test DoFTools::count_dofs_per_block
+//
+// like the test without the hp_ prefix, but for hp::DoFHandler
 
 
 #include "../tests.h"
+#include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -29,11 +29,16 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/hp/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/hp/fe_collection.h>
 
+#include <fstream>
+#include <numeric>
+#include <cstdlib>
 
 
 template <int dim>
@@ -43,10 +48,11 @@ void test()
   triangulation (MPI_COMM_WORLD,
                  Triangulation<dim>::limit_level_difference_at_vertices);
 
-  FESystem<dim> fe (FE_Q<dim>(3),2,
-                    FE_DGQ<dim>(1),1);
+  hp::FECollection<dim> fe;
+  fe.push_back (FESystem<dim> (FE_Q<dim>(3),2,
+                               FE_DGQ<dim>(1),1));
 
-  DoFHandler<dim> dof_handler (triangulation);
+  hp::DoFHandler<dim> dof_handler (triangulation);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global (2);
@@ -85,22 +91,21 @@ void test()
       triangulation.execute_coarsening_and_refinement ();
       dof_handler.distribute_dofs (fe);
 
-      const unsigned int N = dof_handler.n_dofs();
-      deallog << N << std::endl;
+      std::vector<types::global_dof_index> dofs_per_block (fe.n_components());
+      DoFTools::count_dofs_per_block (dof_handler, dofs_per_block);
 
-      IndexSet all (N);
-      all.add_range (0, N);
+      AssertThrow (std::accumulate (dofs_per_block.begin(), dofs_per_block.end(), 0U)
+                   == dof_handler.n_dofs(),
+                   ExcInternalError());
 
-      AssertThrow (dof_handler.n_locally_owned_dofs() == N,
-                   ExcInternalError());
-      AssertThrow (dof_handler.locally_owned_dofs() == all,
-                   ExcInternalError());
-      AssertThrow (dof_handler.n_locally_owned_dofs_per_processor() ==
-                   std::vector<types::global_dof_index> (1,N),
-                   ExcInternalError());
-      AssertThrow (dof_handler.locally_owned_dofs_per_processor() ==
-                   std::vector<IndexSet>(1,all),
-                   ExcInternalError());
+      unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+      if (myid == 0)
+        {
+          deallog << "Total number of dofs: " << dof_handler.n_dofs() << std::endl;
+          for (unsigned int i=0; i<dofs_per_block.size(); ++i)
+            deallog << "Block " << i << " has " << dofs_per_block[i] << " global dofs"
+                    << std::endl;
+        }
     }
 }
 
