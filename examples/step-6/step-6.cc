@@ -109,10 +109,11 @@ private:
   void refine_grid ();
   void output_results (const unsigned int cycle) const;
 
-  Triangulation<dim>   triangulation;
+  Triangulation<dim>           triangulation;
+  const SphericalManifold<dim> boundary;
 
-  DoFHandler<dim>      dof_handler;
   FE_Q<dim>            fe;
+  DoFHandler<dim>      dof_handler;
 
   // This is the new variable in the main class. We need an object which holds
   // a list of constraints to hold the hanging nodes and the boundary
@@ -153,39 +154,39 @@ double coefficient (const Point<dim> &p)
 template <int dim>
 Step6<dim>::Step6 ()
   :
-  dof_handler (triangulation),
-  fe (2)
+  fe (2),
+  dof_handler (triangulation)
 {}
 
 
 // @sect4{Step6::~Step6}
 
 // Here comes the added destructor of the class. The reason why we want to add
-// it is a subtle change in the order of data elements in the class as
-// compared to all previous examples: the <code>dof_handler</code> object was
-// defined before and not after the <code>fe</code> object. Of course we could
-// have left this order unchanged, but we would like to show what happens if
-// the order is reversed since this produces a rather nasty side-effect and
-// results in an error which is difficult to track down if one does not know
-// what happens.
+// it is to pick up an issue we already started to discuss in step-1:
+// the <code>boundary</code> object was defined before and not after the
+// <code>triangulation</code> object. Of course we could have left this order
+// unchanged, but we would like to show what happens if the order is reversed
+// since this produces a rather nasty side-effect and results in an error which
+// is difficult to track down if one does not know what happens.
 //
-// Basically what happens is the following: when we distribute the degrees of
-// freedom using the function call <code>dof_handler.distribute_dofs()</code>,
-// the <code>dof_handler</code> also stores a pointer to the finite element in
-// use. Since this pointer is used every now and then until either the degrees
-// of freedom are re-distributed using another finite element object or until
-// the <code>dof_handler</code> object is destroyed, it would be unwise if we
-// would allow the finite element object to be deleted before the
-// <code>dof_handler</code> object. To disallow this, the DoF handler
-// increases a counter inside the finite element object which counts how many
-// objects use that finite element (this is what the
+// Basically what happens is the following: when we set a manifold description
+// to the triangulation using the function call
+// <code>triangulation.set_manifold (0, boundary)</code>, the
+// <code>Triangulation</code> object also stores a pointer to the
+// <code>Manifold</code> object in use. Since this pointer is used until either
+// another <code>Manifold</code> object is set as boundary description or until
+// the <code>Triangulation</code> object is destroyed, it would be unwise if we
+// would allow the <code>boundary</code> to be deleted before the
+// <code>triangulation</code>. To disallow this, the <code>triangulation</code>
+// increases a counter inside the <code>boundary</code> which counts how many
+// objects use it (this is what the
 // <code>Subscriptor</code>/<code>SmartPointer</code> class pair is used for,
 // in case you want something like this for your own programs; see step-7 for
-// a more complete discussion of this topic). The finite element object will
+// a more complete discussion of this topic). The <code>boundary</code> will
 // refuse its destruction if that counter is larger than zero, since then some
-// other objects might rely on the persistence of the finite element
-// object. An exception will then be thrown and the program will usually abort
-// upon the attempt to destroy the finite element.
+// other objects might rely on its persistence. An exception will then be
+// thrown and the program will usually abort upon the attempt to destroy
+// <code>boundary</code>.
 //
 // To be fair, such exceptions about still used objects are not particularly
 // popular among programmers using deal.II, since they only tell us that
@@ -207,14 +208,14 @@ Step6<dim>::Step6 ()
 // destructed before the DoF handler object, since its declaration is below
 // the one of the DoF handler. This triggers the situation above, and an
 // exception will be raised when the <code>fe</code> object is
-// destructed. What needs to be done is to tell the <code>dof_handler</code>
-// object to release its lock to the finite element. Of course, the
-// <code>dof_handler</code> will only release its lock if it really does not
-// need the finite element any more, i.e. when all finite element related data
-// is deleted from it. For this purpose, the <code>DoFHandler</code> class has
-// a function <code>clear</code> which deletes all degrees of freedom, and
-// releases its lock to the finite element. After this, you can safely
-// destruct the finite element object since its internal counter is then zero.
+// destructed. What needs to be done is to tell the <code>triangulation</code>
+// object to release its lock to <code>boundary</code>. Of course, the
+// <code>triangulation</code> will only release its lock if it really does not
+// need the <code>boundary</code> any more. For this purpose, the
+// <code>Triangulation</code> class has a function <code>clear</code> which
+// resets the object into a virgin state by deleting all data and releases its
+// lock to the finite element. After this, you can safely destruct the
+// <code>boundary</code> object since its internal counter is then zero.
 //
 // For completeness, we add the output of the exception that would have been
 // triggered without this destructor, to the end of the results section of
@@ -222,7 +223,7 @@ Step6<dim>::Step6 ()
 template <int dim>
 Step6<dim>::~Step6 ()
 {
-  dof_handler.clear ();
+  triangulation.clear ();
 }
 
 
@@ -636,7 +637,6 @@ void Step6<dim>::run ()
         {
           GridGenerator::hyper_ball (triangulation);
 
-          static const SphericalManifold<dim> boundary;
           triangulation.set_all_manifold_ids_on_boundary(0);
           triangulation.set_manifold (0, boundary);
 

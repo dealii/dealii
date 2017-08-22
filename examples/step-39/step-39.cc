@@ -492,7 +492,7 @@ namespace Step39
     // First, we use the finite element to distribute degrees of freedom over
     // the mesh and number them.
     dof_handler.distribute_dofs(fe);
-    dof_handler.distribute_mg_dofs(fe);
+    dof_handler.distribute_mg_dofs();
     unsigned int n_dofs = dof_handler.n_dofs();
     // Then, we already know the size of the vectors representing finite
     // element functions.
