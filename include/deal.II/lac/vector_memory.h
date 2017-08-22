@@ -74,10 +74,11 @@ class VectorMemory : public Subscriptor
 public:
 
   /**
-   * Virtual destructor is needed as there are virtual functions in this
+   * Virtual destructor. This destructor is declared @p virtual to allow
+   * destroying objects of derived type through pointers to this base
    * class.
    */
-  virtual ~VectorMemory () {}
+  virtual ~VectorMemory () = default;
 
   /**
    * Return a pointer to a new vector. The number of elements or their
