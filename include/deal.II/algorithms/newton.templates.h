@@ -117,12 +117,12 @@ namespace Algorithms
     AnyData src2;
     src1.add<const VectorType *>(&u, "Newton iterate");
     src1.merge(in);
-    src2.add<const VectorType *>(res, "Newton residual");
+    src2.add<const VectorType *>(res.get(), "Newton residual");
     src2.merge(src1);
     AnyData out1;
-    out1.add<VectorType *>(res, "Residual");
+    out1.add<VectorType *>(res.get(), "Residual");
     AnyData out2;
-    out2.add<VectorType *>(Du, "Update");
+    out2.add<VectorType *>(Du.get(), "Update");
 
     unsigned int step = 0;
     // fill res with (f(u), v)
@@ -135,9 +135,9 @@ namespace Algorithms
         AnyData tmp;
         VectorType *p = &u;
         tmp.add<const VectorType *>(p, "solution");
-        p = Du;
+        p = Du.get();
         tmp.add<const VectorType *>(p, "update");
-        p = res;
+        p = res.get();
         tmp.add<const VectorType *>(p, "residual");
         *data_out << step;
         *data_out << tmp;
@@ -166,9 +166,9 @@ namespace Algorithms
             AnyData tmp;
             VectorType *p = &u;
             tmp.add<const VectorType *>(p, "solution");
-            p = Du;
+            p = Du.get();
             tmp.add<const VectorType *>(p, "update");
-            p = res;
+            p = res.get();
             tmp.add<const VectorType *>(p, "residual");
             *data_out << step;
             *data_out << tmp;
