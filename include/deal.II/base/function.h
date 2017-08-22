@@ -525,7 +525,7 @@ public:
    * beginning. So the number of components of @p f cannot be less than the
    * calling object.
    */
-  virtual void substitute_function_value_with (const ConstantFunction<dim, Number> &f);
+  virtual void substitute_function_value_with (const Functions::ConstantFunction<dim, Number> &f);
 
   /**
    * Return the value of the function at the given point for all components.

@@ -504,7 +504,7 @@ namespace Step29
     // function:
     timer.stop ();
     deallog << "done ("
-            << timer()
+            << timer.cpu_time()
             << "s)"
             << std::endl;
 
@@ -539,7 +539,7 @@ namespace Step29
 
     timer.stop ();
     deallog << "done ("
-            << timer()
+            << timer.cpu_time()
             << "s)"
             << std::endl;
 
@@ -779,7 +779,7 @@ namespace Step29
 
     timer.stop ();
     deallog << "done ("
-            << timer()
+            << timer.cpu_time()
             << "s)"
             << std::endl;
   }
@@ -823,7 +823,7 @@ namespace Step29
 
     timer.stop ();
     deallog << "done ("
-            << timer ()
+            << timer.cpu_time()
             << "s)"
             << std::endl;
   }
@@ -895,7 +895,7 @@ namespace Step29
 
     timer.stop ();
     deallog << "done ("
-            << timer()
+            << timer.cpu_time()
             << "s)"
             << std::endl;
   }

@@ -704,9 +704,8 @@ namespace Step50
     SolverControl coarse_solver_control (1000, 1e-10, false, false);
     SolverCG<vector_t> coarse_solver(coarse_solver_control);
     PreconditionIdentity id;
-    MGCoarseGridLACIteration<SolverCG<vector_t>,vector_t> coarse_grid_solver(coarse_solver,
-        coarse_matrix,
-        id);
+    MGCoarseGridIterativeSolver<vector_t, SolverCG<vector_t>, matrix_t, PreconditionIdentity>
+    coarse_grid_solver(coarse_solver, coarse_matrix, id);
 
     // The next component of a multilevel solver or preconditioner is
     // that we need a smoother on each level. A common choice for this
@@ -765,8 +764,7 @@ namespace Step50
     // Now, we are ready to set up the
     // V-cycle operator and the
     // multilevel preconditioner.
-    Multigrid<vector_t > mg(mg_dof_handler,
-                            mg_matrix,
+    Multigrid<vector_t > mg(mg_matrix,
                             coarse_grid_solver,
                             mg_transfer,
                             mg_smoother,

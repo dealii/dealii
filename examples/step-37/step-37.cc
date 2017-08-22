@@ -832,7 +832,7 @@ namespace Step37
     constraints.close();
     setup_time += time.wall_time();
     time_details << "Distribute DoFs & B.C.     (CPU/wall) "
-                 << time() << "s/" << time.wall_time() << "s" << std::endl;
+                 << time.cpu_time() << "s/" << time.wall_time() << "s" << std::endl;
     time.restart();
 
     {
@@ -855,7 +855,7 @@ namespace Step37
 
     setup_time += time.wall_time();
     time_details << "Setup matrix-free system   (CPU/wall) "
-                 << time() << "s/" << time.wall_time() << "s" << std::endl;
+                 << time.cpu_time() << "s/" << time.wall_time() << "s" << std::endl;
     time.restart();
 
     // Next, initialize the matrices for the multigrid method on all the
@@ -902,7 +902,7 @@ namespace Step37
       }
     setup_time += time.wall_time();
     time_details << "Setup matrix-free levels   (CPU/wall) "
-                 << time() << "s/" << time.wall_time() << "s" << std::endl;
+                 << time.cpu_time() << "s/" << time.wall_time() << "s" << std::endl;
   }
 
 
@@ -936,7 +936,7 @@ namespace Step37
 
     setup_time += time.wall_time();
     time_details << "Assemble right hand side   (CPU/wall) "
-                 << time() << "s/" << time.wall_time() << "s" << std::endl;
+                 << time.cpu_time() << "s/" << time.wall_time() << "s" << std::endl;
   }
 
 
@@ -955,7 +955,7 @@ namespace Step37
     MGTransferMatrixFree<dim,float> mg_transfer(mg_constrained_dofs);
     mg_transfer.build(dof_handler);
     setup_time += time.wall_time();
-    time_details << "MG build transfer time     (CPU/wall) " << time()
+    time_details << "MG build transfer time     (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << "s\n";
     time.restart();
 
@@ -1089,7 +1089,7 @@ namespace Step37
     SolverControl solver_control (100, 1e-12*system_rhs.l2_norm());
     SolverCG<LinearAlgebra::distributed::Vector<double> > cg (solver_control);
     setup_time += time.wall_time();
-    time_details << "MG build smoother time     (CPU/wall) " << time()
+    time_details << "MG build smoother time     (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << "s\n";
     pcout << "Total setup time               (wall) " << setup_time
           << "s\n";
@@ -1103,7 +1103,7 @@ namespace Step37
 
     pcout << "Time solve ("
           << solver_control.last_step()
-          << " iterations)  (CPU/wall) " << time() << "s/"
+          << " iterations)  (CPU/wall) " << time.cpu_time() << "s/"
           << time.wall_time() << "s\n";
   }
 

@@ -235,7 +235,7 @@ namespace Step30
     Vector<double> &cell_vector) const
   {
     const std::vector<double> &JxW = fe_v.get_JxW_values ();
-    const std::vector<Tensor<1,dim> > &normals = fe_v.get_all_normal_vectors ();
+    const std::vector<Tensor<1,dim> > &normals = fe_v.get_normal_vectors ();
 
     std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
     std::vector<double> g(fe_v.n_quadrature_points);
@@ -273,7 +273,7 @@ namespace Step30
     FullMatrix<double> &ue_ve_matrix) const
   {
     const std::vector<double> &JxW = fe_v.get_JxW_values ();
-    const std::vector<Tensor<1,dim> > &normals = fe_v.get_all_normal_vectors ();
+    const std::vector<Tensor<1,dim> > &normals = fe_v.get_normal_vectors ();
 
     std::vector<Point<dim> > beta (fe_v.n_quadrature_points);
 
@@ -952,7 +952,7 @@ namespace Step30
         Timer assemble_timer;
         assemble_system2 ();
         std::cout << "Time of assemble_system2: "
-                  << assemble_timer()
+                  << assemble_timer.cpu_time()
                   << std::endl;
         solve (solution2);
 

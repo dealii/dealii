@@ -1721,7 +1721,7 @@ namespace Step28
         std::cout << "   Cycle=" << cycle
                   << ", n_dofs=" << energy_groups[0]->n_dofs() + energy_groups[1]->n_dofs()
                   << ",  k_eff=" << k_eff
-                  << ", time=" << timer()
+                  << ", time=" << timer.cpu_time()
                   << std::endl;
 
 
