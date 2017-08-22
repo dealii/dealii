@@ -2810,8 +2810,15 @@ public:
 
   /**
    * Constant reference to the selected finite element object.
+   *
+   * @deprecated Use get_finite_element() instead.
    */
-  const FiniteElement<dim,spacedim> &get_fe () const;
+  const FiniteElement<dim,spacedim> &get_fe () const DEAL_II_DEPRECATED;
+
+  /**
+   * Constant reference to the selected finite element object.
+   */
+  const FiniteElement<dim,spacedim> &get_finite_element () const;
 
   /**
    * Return the update flags set for this object.
@@ -4623,6 +4630,17 @@ FEValuesBase<dim,spacedim>::get_fe () const
 {
   return *fe;
 }
+
+
+
+template <int dim, int spacedim>
+inline
+const FiniteElement<dim,spacedim> &
+FEValuesBase<dim,spacedim>::get_finite_element () const
+{
+  return *fe;
+}
+
 
 
 template <int dim, int spacedim>

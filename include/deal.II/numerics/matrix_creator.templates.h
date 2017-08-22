@@ -234,7 +234,7 @@ namespace MatrixCreator
 
       const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
                          n_q_points    = fe_values.n_quadrature_points;
-      const FiniteElement<dim,spacedim> &fe  = fe_values.get_fe();
+      const FiniteElement<dim,spacedim> &fe  = fe_values.get_finite_element();
       const unsigned int n_components  = fe.n_components();
 
       Assert(data.rhs_function == nullptr ||
@@ -417,7 +417,7 @@ namespace MatrixCreator
 
       const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
                          n_q_points    = fe_values.n_quadrature_points;
-      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_fe();
+      const FiniteElement<dim,spacedim>    &fe  = fe_values.get_finite_element();
       const unsigned int n_components  = fe.n_components();
 
       Assert(data.rhs_function == nullptr ||

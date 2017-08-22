@@ -643,11 +643,11 @@ namespace Step9
   AdvectionProblem<dim>::AssemblyScratchData::
   AssemblyScratchData (const AssemblyScratchData &scratch_data)
     :
-    fe_values (scratch_data.fe_values.get_fe(),
+    fe_values (scratch_data.fe_values.get_finite_element(),
                scratch_data.fe_values.get_quadrature(),
                update_values   | update_gradients |
                update_quadrature_points | update_JxW_values),
-    fe_face_values (scratch_data.fe_face_values.get_fe(),
+    fe_face_values (scratch_data.fe_face_values.get_finite_element(),
                     scratch_data.fe_face_values.get_quadrature(),
                     update_values     | update_quadrature_points   |
                     update_JxW_values | update_normal_vectors)
@@ -986,7 +986,7 @@ namespace Step9
   GradientEstimation::EstimateScratchData<dim>::
   EstimateScratchData(const EstimateScratchData &scratch_data)
     :
-    fe_midpoint_value(scratch_data.fe_midpoint_value.get_fe(),
+    fe_midpoint_value(scratch_data.fe_midpoint_value.get_finite_element(),
                       scratch_data.fe_midpoint_value.get_quadrature(),
                       update_values | update_quadrature_points),
     solution(scratch_data.solution)

@@ -56,7 +56,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
 
-      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertDimension(fe.get_finite_element().n_components(), dim);
       AssertDimension(M.m(), n_dofs);
       AssertDimension(M.n(), n_dofs);
 
@@ -92,7 +92,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fetest.dofs_per_cell;
 
-      AssertDimension(fetest.get_fe().n_components(), dim);
+      AssertDimension(fetest.get_finite_element().n_components(), dim);
       AssertVectorVectorDimension(input, dim, fetest.n_quadrature_points);
 
       for (unsigned int k=0; k<fetest.n_quadrature_points; ++k)
@@ -126,7 +126,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
 
-      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertDimension(fe.get_finite_element().n_components(), dim);
       AssertDimension(M.m(), n_dofs);
       AssertDimension(M.n(), n_dofs);
 
@@ -181,7 +181,7 @@ namespace LocalIntegrators
       double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      AssertDimension(fe.get_fe().n_components(), dim)
+      AssertDimension(fe.get_finite_element().n_components(), dim)
       AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
       AssertVectorVectorDimension(Dinput, dim, fe.n_quadrature_points);
       AssertVectorVectorDimension(data, dim, fe.n_quadrature_points);
@@ -307,7 +307,7 @@ namespace LocalIntegrators
     {
       const unsigned int n1 = fe1.dofs_per_cell;
 
-      AssertDimension(fe1.get_fe().n_components(), dim);
+      AssertDimension(fe1.get_finite_element().n_components(), dim);
       AssertVectorVectorDimension(input1, dim, fe1.n_quadrature_points);
       AssertVectorVectorDimension(Dinput1, dim, fe1.n_quadrature_points);
       AssertVectorVectorDimension(input2, dim, fe2.n_quadrature_points);

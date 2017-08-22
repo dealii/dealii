@@ -56,7 +56,7 @@ namespace LocalIntegrators
       const double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      const unsigned int n_components = fe.get_fe().n_components();
+      const unsigned int n_components = fe.get_finite_element().n_components();
 
       for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
         {
@@ -108,7 +108,7 @@ namespace LocalIntegrators
       const std::vector<double> &weights)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      const unsigned int n_components = fe.get_fe().n_components();
+      const unsigned int n_components = fe.get_finite_element().n_components();
       AssertDimension(M.m(), n_dofs);
       AssertDimension(M.n(), n_dofs);
       AssertDimension(weights.size(), fe.n_quadrature_points);
@@ -158,7 +158,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       AssertDimension(result.size(), n_dofs);
-      AssertDimension(fe.get_fe().n_components(), 1);
+      AssertDimension(fe.get_finite_element().n_components(), 1);
       AssertDimension(input.size(), fe.n_quadrature_points);
 
       for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
@@ -185,7 +185,7 @@ namespace LocalIntegrators
       const unsigned int n_components = input.size();
 
       AssertDimension(result.size(), n_dofs);
-      AssertDimension(input.size(), fe.get_fe().n_components());
+      AssertDimension(input.size(), fe.get_finite_element().n_components());
 
       for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
         for (unsigned int i=0; i<n_dofs; ++i)
@@ -218,11 +218,11 @@ namespace LocalIntegrators
     {
       const unsigned int n1_dofs = fe1.dofs_per_cell;
       const unsigned int n2_dofs = fe2.dofs_per_cell;
-      const unsigned int n_components = fe1.get_fe().n_components();
+      const unsigned int n_components = fe1.get_finite_element().n_components();
 
       Assert(n1_dofs == n2_dofs, ExcNotImplemented());
       (void) n2_dofs;
-      AssertDimension(n_components, fe2.get_fe().n_components());
+      AssertDimension(n_components, fe2.get_finite_element().n_components());
       AssertDimension(M11.m(), n1_dofs);
       AssertDimension(M12.m(), n1_dofs);
       AssertDimension(M21.m(), n2_dofs);

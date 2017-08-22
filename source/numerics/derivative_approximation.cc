@@ -132,7 +132,7 @@ namespace DerivativeApproximation
                               const InputVector    &solution,
                               const unsigned int    component)
     {
-      if (fe_values.get_fe().n_components() == 1)
+      if (fe_values.get_finite_element().n_components() == 1)
         {
           std::vector<typename InputVector::value_type> values (1);
           fe_values.get_function_values (solution, values);
@@ -141,7 +141,7 @@ namespace DerivativeApproximation
       else
         {
           std::vector<Vector<typename InputVector::value_type> > values
-          (1, Vector<typename InputVector::value_type>(fe_values.get_fe().n_components()));
+          (1, Vector<typename InputVector::value_type>(fe_values.get_finite_element().n_components()));
           fe_values.get_function_values (solution, values);
           return values[0](component);
         }
@@ -248,7 +248,7 @@ namespace DerivativeApproximation
                               const InputVector    &solution,
                               const unsigned int    component)
     {
-      if (fe_values.get_fe().n_components() == 1)
+      if (fe_values.get_finite_element().n_components() == 1)
         {
           std::vector<Tensor<1,dim,typename InputVector::value_type> > values (1);
           fe_values.get_function_gradients (solution, values);
@@ -257,7 +257,7 @@ namespace DerivativeApproximation
       else
         {
           std::vector<std::vector<Tensor<1,dim,typename InputVector::value_type> > > values
-          (1, std::vector<Tensor<1,dim,typename InputVector::value_type> >(fe_values.get_fe().n_components()));
+          (1, std::vector<Tensor<1,dim,typename InputVector::value_type> >(fe_values.get_finite_element().n_components()));
           fe_values.get_function_gradients (solution, values);
           return ProjectedDerivative(values[0][component]);
         };
@@ -591,7 +591,7 @@ namespace DerivativeApproximation
                               const InputVector    &solution,
                               const unsigned int    component)
     {
-      if (fe_values.get_fe().n_components() == 1)
+      if (fe_values.get_finite_element().n_components() == 1)
         {
           std::vector<Tensor<2,dim,typename InputVector::value_type> > values (1);
           fe_values.get_function_hessians (solution, values);
@@ -600,7 +600,7 @@ namespace DerivativeApproximation
       else
         {
           std::vector<std::vector<Tensor<2,dim,typename InputVector::value_type> > > values
-          (1, std::vector<Tensor<2,dim,typename InputVector::value_type> >(fe_values.get_fe().n_components()));
+          (1, std::vector<Tensor<2,dim,typename InputVector::value_type> >(fe_values.get_finite_element().n_components()));
           fe_values.get_function_hessians (solution, values);
           return ProjectedDerivative(values[0][component]);
         };

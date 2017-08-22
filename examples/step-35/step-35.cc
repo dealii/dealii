@@ -569,10 +569,10 @@ namespace Step35
       InitGradScratchData (const InitGradScratchData &data)
         :
         nqp (data.nqp),
-        fe_val_vel (data.fe_val_vel.get_fe(),
+        fe_val_vel (data.fe_val_vel.get_finite_element(),
                     data.fe_val_vel.get_quadrature(),
                     data.fe_val_vel.get_update_flags()),
-        fe_val_pres (data.fe_val_pres.get_fe(),
+        fe_val_pres (data.fe_val_pres.get_finite_element(),
                      data.fe_val_pres.get_quadrature(),
                      data.fe_val_pres.get_update_flags())
       {}
@@ -626,7 +626,7 @@ namespace Step35
         u_star_local (nqp),
         grad_u_star (nqp),
         u_star_tmp (nqp),
-        fe_val (data.fe_val.get_fe(),
+        fe_val (data.fe_val.get_finite_element(),
                 data.fe_val.get_quadrature(),
                 data.fe_val.get_update_flags())
       {}

@@ -377,7 +377,7 @@ namespace Step32
       StokesPreconditioner (const StokesPreconditioner &scratch)
         :
         stokes_fe_values (scratch.stokes_fe_values.get_mapping(),
-                          scratch.stokes_fe_values.get_fe(),
+                          scratch.stokes_fe_values.get_finite_element(),
                           scratch.stokes_fe_values.get_quadrature(),
                           scratch.stokes_fe_values.get_update_flags()),
         grad_phi_u (scratch.grad_phi_u),
@@ -446,7 +446,7 @@ namespace Step32
         :
         StokesPreconditioner<dim> (scratch),
         temperature_fe_values (scratch.temperature_fe_values.get_mapping(),
-                               scratch.temperature_fe_values.get_fe(),
+                               scratch.temperature_fe_values.get_finite_element(),
                                scratch.temperature_fe_values.get_quadrature(),
                                scratch.temperature_fe_values.get_update_flags()),
         phi_u (scratch.phi_u),
@@ -496,7 +496,7 @@ namespace Step32
       TemperatureMatrix (const TemperatureMatrix &scratch)
         :
         temperature_fe_values (scratch.temperature_fe_values.get_mapping(),
-                               scratch.temperature_fe_values.get_fe(),
+                               scratch.temperature_fe_values.get_finite_element(),
                                scratch.temperature_fe_values.get_quadrature(),
                                scratch.temperature_fe_values.get_update_flags()),
         phi_T (scratch.phi_T),
@@ -585,11 +585,11 @@ namespace Step32
       TemperatureRHS (const TemperatureRHS &scratch)
         :
         temperature_fe_values (scratch.temperature_fe_values.get_mapping(),
-                               scratch.temperature_fe_values.get_fe(),
+                               scratch.temperature_fe_values.get_finite_element(),
                                scratch.temperature_fe_values.get_quadrature(),
                                scratch.temperature_fe_values.get_update_flags()),
         stokes_fe_values (scratch.stokes_fe_values.get_mapping(),
-                          scratch.stokes_fe_values.get_fe(),
+                          scratch.stokes_fe_values.get_finite_element(),
                           scratch.stokes_fe_values.get_quadrature(),
                           scratch.stokes_fe_values.get_update_flags()),
         phi_T (scratch.phi_T),
@@ -2368,7 +2368,7 @@ namespace Step32
                                 Assembly::Scratch::StokesSystem<dim> &scratch,
                                 Assembly::CopyData::StokesSystem<dim> &data)
   {
-    const unsigned int dofs_per_cell = scratch.stokes_fe_values.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = scratch.stokes_fe_values.get_finite_element().dofs_per_cell;
     const unsigned int n_q_points    = scratch.stokes_fe_values.n_quadrature_points;
 
     const FEValuesExtractors::Vector velocities (0);
@@ -2524,7 +2524,7 @@ namespace Step32
                                      Assembly::Scratch::TemperatureMatrix<dim> &scratch,
                                      Assembly::CopyData::TemperatureMatrix<dim> &data)
   {
-    const unsigned int dofs_per_cell = scratch.temperature_fe_values.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = scratch.temperature_fe_values.get_finite_element().dofs_per_cell;
     const unsigned int n_q_points    = scratch.temperature_fe_values.n_quadrature_points;
 
     scratch.temperature_fe_values.reinit (cell);
@@ -2644,7 +2644,7 @@ namespace Step32
   {
     const bool use_bdf2_scheme = (timestep_number != 0);
 
-    const unsigned int dofs_per_cell = scratch.temperature_fe_values.get_fe().dofs_per_cell;
+    const unsigned int dofs_per_cell = scratch.temperature_fe_values.get_finite_element().dofs_per_cell;
     const unsigned int n_q_points    = scratch.temperature_fe_values.n_quadrature_points;
 
     const FEValuesExtractors::Vector velocities (0);

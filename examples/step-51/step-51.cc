@@ -599,13 +599,13 @@ namespace Step51
 
     ScratchData(const ScratchData &sd)
       :
-      fe_values_local (sd.fe_values_local.get_fe(),
+      fe_values_local (sd.fe_values_local.get_finite_element(),
                        sd.fe_values_local.get_quadrature(),
                        sd.fe_values_local.get_update_flags()),
-      fe_face_values_local (sd.fe_face_values_local.get_fe(),
+      fe_face_values_local (sd.fe_face_values_local.get_finite_element(),
                             sd.fe_face_values_local.get_quadrature(),
                             sd.fe_face_values_local.get_update_flags()),
-      fe_face_values (sd.fe_face_values.get_fe(),
+      fe_face_values (sd.fe_face_values.get_finite_element(),
                       sd.fe_face_values.get_quadrature(),
                       sd.fe_face_values.get_update_flags()),
       ll_matrix (sd.ll_matrix),
@@ -661,10 +661,10 @@ namespace Step51
 
     PostProcessScratchData(const PostProcessScratchData &sd)
       :
-      fe_values_local (sd.fe_values_local.get_fe(),
+      fe_values_local (sd.fe_values_local.get_finite_element(),
                        sd.fe_values_local.get_quadrature(),
                        sd.fe_values_local.get_update_flags()),
-      fe_values (sd.fe_values.get_fe(),
+      fe_values (sd.fe_values.get_finite_element(),
                  sd.fe_values.get_quadrature(),
                  sd.fe_values.get_update_flags()),
       u_values (sd.u_values),
@@ -740,7 +740,7 @@ namespace Step51
     const unsigned int n_q_points    = scratch.fe_values_local.get_quadrature().size();
     const unsigned int n_face_q_points = scratch.fe_face_values_local.get_quadrature().size();
 
-    const unsigned int loc_dofs_per_cell = scratch.fe_values_local.get_fe().dofs_per_cell;
+    const unsigned int loc_dofs_per_cell = scratch.fe_values_local.get_finite_element().dofs_per_cell;
 
     const FEValuesExtractors::Vector fluxes (0);
     const FEValuesExtractors::Scalar scalar (dim);
