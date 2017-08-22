@@ -482,7 +482,7 @@ namespace FEValuesViews
             const double *shape_value_ptr =
               &shape_values(shape_function_data[shape_function].row_index, 0);
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-              values[q_point] += value **shape_value_ptr++;
+              values[q_point] += value * (*shape_value_ptr++);
           }
     }
 
@@ -589,7 +589,7 @@ namespace FEValuesViews
                 shape_function_data[shape_function].single_nonzero_component_index;
               const double *shape_value_ptr = &shape_values(snc,0);
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                values[q_point][comp] += value **shape_value_ptr++;
+                values[q_point][comp] += value * (*shape_value_ptr++);
             }
           else
             for (unsigned int d=0; d<spacedim; ++d)
@@ -598,7 +598,7 @@ namespace FEValuesViews
                   const double *shape_value_ptr =
                     &shape_values(shape_function_data[shape_function].row_index[d],0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][d] += value **shape_value_ptr++;
+                    values[q_point][d] += value * (*shape_value_ptr++);
                 }
         }
     }
@@ -1045,7 +1045,7 @@ namespace FEValuesViews
                 (shape_function_data[shape_function].single_nonzero_component_index);
               const double *shape_value_ptr = &shape_values(snc,0);
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                values[q_point][comp] += value **shape_value_ptr++;
+                values[q_point][comp] += value * (*shape_value_ptr++);
             }
           else
             for (unsigned int d=0;
@@ -1057,7 +1057,7 @@ namespace FEValuesViews
                   const double *shape_value_ptr =
                     &shape_values(shape_function_data[shape_function].row_index[d],0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][comp] += value **shape_value_ptr++;
+                    values[q_point][comp] += value * (*shape_value_ptr++);
                 }
         }
     }
@@ -1189,7 +1189,7 @@ namespace FEValuesViews
 
               const double *shape_value_ptr = &shape_values(snc,0);
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                values[q_point][indices] += value **shape_value_ptr++;
+                values[q_point][indices] += value * (*shape_value_ptr++);
             }
           else
             for (unsigned int d=0;
@@ -1201,7 +1201,7 @@ namespace FEValuesViews
                   const double *shape_value_ptr =
                     &shape_values(shape_function_data[shape_function].row_index[d],0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][indices] += value **shape_value_ptr++;
+                    values[q_point][indices] += value * (*shape_value_ptr++);
                 }
         }
     }
@@ -2691,7 +2691,7 @@ namespace internal
 
         const double *shape_value_ptr = &shape_values(shape_func, 0);
         for (unsigned int point=0; point<n_quadrature_points; ++point)
-          values[point] += value **shape_value_ptr++;
+          values[point] += value * (*shape_value_ptr++);
       }
   }
 
@@ -2759,11 +2759,11 @@ namespace internal
                 {
                   VectorType &values_comp = values[comp];
                   for (unsigned int point=0; point<n_quadrature_points; ++point)
-                    values_comp[point] += value **shape_value_ptr++;
+                    values_comp[point] += value * (*shape_value_ptr++);
                 }
               else
                 for (unsigned int point=0; point<n_quadrature_points; ++point)
-                  values[point][comp] += value **shape_value_ptr++;
+                  values[point][comp] += value * (*shape_value_ptr++);
             }
           else
             for (unsigned int c=0; c<n_components; ++c)
@@ -2782,11 +2782,11 @@ namespace internal
                     VectorType &values_comp = values[comp];
                     for (unsigned int point=0; point<n_quadrature_points;
                          ++point)
-                      values_comp[point] += value **shape_value_ptr++;
+                      values_comp[point] += value * (*shape_value_ptr++);
                   }
                 else
                   for (unsigned int point=0; point<n_quadrature_points; ++point)
-                    values[point][comp] += value **shape_value_ptr++;
+                    values[point][comp] += value * (*shape_value_ptr++);
               }
         }
   }
