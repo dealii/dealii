@@ -1171,7 +1171,7 @@ namespace internal
   {
     // LAPACKFullMatrix is not implemented for
     // complex numbers or long doubles
-    template<typename number, typename = void>
+    template <typename number, typename = void>
     struct Determinant
     {
       static number value (const FullMatrix<number> &)
@@ -1184,7 +1184,7 @@ namespace internal
 
     // LAPACKFullMatrix is only implemented for
     // floats and doubles
-    template<typename number>
+    template <typename number>
     struct Determinant<number, typename std::enable_if<
       std::is_same<number,float>::value ||
       std::is_same<number,double>::value

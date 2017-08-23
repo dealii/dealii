@@ -31,7 +31,7 @@ struct CopyData {};
 
 using namespace MeshWorker;
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   Triangulation<dim,spacedim> tria;

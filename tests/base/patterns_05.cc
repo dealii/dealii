@@ -25,7 +25,7 @@ using namespace Patterns::Tools;
 
 // Try conversion on elementary types
 
-template<class T>
+template <class T>
 void test(T t, std::string s)
 {
   auto p = Convert<T>::to_pattern();

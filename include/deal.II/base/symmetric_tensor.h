@@ -62,7 +62,7 @@ namespace internal
      * Compute the inverse of a symmetric tensor of a
      * generic @p rank, @p dim and @p Number type.
      */
-    template<int rank, int dim, typename Number>
+    template <int rank, int dim, typename Number>
     struct Inverse;
   }
 
@@ -568,7 +568,7 @@ public:
    * <tt>symmetrize</tt> function first. If you aren't sure, it is good
    * practice to check before calling <tt>symmetrize</tt>.
    */
-  template<typename OtherNumber>
+  template <typename OtherNumber>
   explicit
   SymmetricTensor (const Tensor<2,dim,OtherNumber> &t);
 
@@ -684,7 +684,7 @@ public:
    * as this operator, but rather than returning the result as a return value,
    * they write it into the first argument to the function.
    */
-  template<typename OtherNumber>
+  template <typename OtherNumber>
   typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim,Number,OtherNumber>::type
   operator * (const SymmetricTensor<2,dim,OtherNumber> &s) const;
 
@@ -692,7 +692,7 @@ public:
    * Contraction over two indices of the present object with the rank-4
    * symmetric tensor given as argument.
    */
-  template<typename OtherNumber>
+  template <typename OtherNumber>
   typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,dim,Number,OtherNumber>::type
   operator * (const SymmetricTensor<4,dim,OtherNumber> &s) const;
 
@@ -948,7 +948,7 @@ SymmetricTensor<rank,dim,Number>::SymmetricTensor ()
 
 
 template <int rank, int dim, typename Number>
-template<typename OtherNumber>
+template <typename OtherNumber>
 inline
 SymmetricTensor<rank,dim,Number>::SymmetricTensor (const Tensor<2,dim,OtherNumber> &t)
 {
@@ -1094,7 +1094,7 @@ namespace internal
     }
 
 
-    template<typename Number>
+    template <typename Number>
     struct Inverse<2,1,Number>
     {
       static inline dealii::SymmetricTensor<2,1,Number>
@@ -1109,7 +1109,7 @@ namespace internal
     };
 
 
-    template<typename Number>
+    template <typename Number>
     struct Inverse<2,2,Number>
     {
       static inline dealii::SymmetricTensor<2,2,Number>
@@ -1136,7 +1136,7 @@ namespace internal
     };
 
 
-    template<typename Number>
+    template <typename Number>
     struct Inverse<2,3,Number>
     {
       static dealii::SymmetricTensor<2,3,Number>
@@ -1179,7 +1179,7 @@ namespace internal
     };
 
 
-    template<typename Number>
+    template <typename Number>
     struct Inverse<4,1,Number>
     {
       static inline dealii::SymmetricTensor<4,1,Number>
@@ -1192,7 +1192,7 @@ namespace internal
     };
 
 
-    template<typename Number>
+    template <typename Number>
     struct Inverse<4,2,Number>
     {
       static inline dealii::SymmetricTensor<4,2,Number>
@@ -1254,7 +1254,7 @@ namespace internal
     };
 
 
-    template<typename Number>
+    template <typename Number>
     struct Inverse<4,3,Number>
     {
       static dealii::SymmetricTensor<4,3,Number>
@@ -1596,7 +1596,7 @@ namespace internal
 
 
 template <int rank, int dim, typename Number>
-template<typename OtherNumber>
+template <typename OtherNumber>
 inline
 typename internal::SymmetricTensorAccessors::double_contraction_result<rank,2,dim,Number,OtherNumber>::type
 SymmetricTensor<rank,dim,Number>::operator * (const SymmetricTensor<2,dim,OtherNumber> &s) const
@@ -1611,7 +1611,7 @@ SymmetricTensor<rank,dim,Number>::operator * (const SymmetricTensor<2,dim,OtherN
 
 
 template <int rank, int dim, typename Number>
-template<typename OtherNumber>
+template <typename OtherNumber>
 inline
 typename internal::SymmetricTensorAccessors::double_contraction_result<rank,4,dim,Number,OtherNumber>::type
 SymmetricTensor<rank,dim,Number>::operator * (const SymmetricTensor<4,dim,OtherNumber> &s) const
@@ -2956,7 +2956,7 @@ namespace internal
        * A struct that is used to sort arrays of pairs of eign=envalues and
        * eigenvectors. Sorting is performed in in descending order of eigenvalue.
        */
-      template<int dim, typename Number>
+      template <int dim, typename Number>
       struct SortEigenValuesVectors
       {
         typedef std::pair<Number, Tensor<1,dim,Number> > EigValsVecs;

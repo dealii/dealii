@@ -62,7 +62,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Luca Heltai, 2017.
  */
-template<int dim>
+template <int dim>
 class KDTree
 {
 public:
@@ -239,7 +239,7 @@ private:
 //------------ inline functions -------------
 #ifndef DOXYGEN
 
-template<int dim>
+template <int dim>
 inline
 unsigned int KDTree<dim>::size() const
 {
@@ -251,7 +251,7 @@ unsigned int KDTree<dim>::size() const
 
 
 
-template<int dim>
+template <int dim>
 inline const Point<dim> &
 KDTree<dim>::operator[](unsigned int i) const
 {
@@ -261,14 +261,14 @@ KDTree<dim>::operator[](unsigned int i) const
 
 
 
-template<int dim>
+template <int dim>
 KDTree<dim>::PointCloudAdaptor::PointCloudAdaptor(const std::vector<Point<dim> > &_points)
   : points(_points)
 {}
 
 
 
-template<int dim>
+template <int dim>
 inline size_t
 KDTree<dim>::PointCloudAdaptor::kdtree_get_point_count() const
 {
@@ -277,7 +277,7 @@ KDTree<dim>::PointCloudAdaptor::kdtree_get_point_count() const
 
 
 
-template<int dim>
+template <int dim>
 inline double
 KDTree<dim>::PointCloudAdaptor::kdtree_get_pt(const size_t idx, int d) const
 {
@@ -287,7 +287,7 @@ KDTree<dim>::PointCloudAdaptor::kdtree_get_pt(const size_t idx, int d) const
 
 
 
-template<int dim>
+template <int dim>
 template <class BBOX>
 inline bool
 KDTree<dim>::PointCloudAdaptor::kdtree_get_bbox(BBOX &) const
@@ -297,7 +297,7 @@ KDTree<dim>::PointCloudAdaptor::kdtree_get_bbox(BBOX &) const
 
 
 
-template<int dim>
+template <int dim>
 inline double
 KDTree<dim>::PointCloudAdaptor::kdtree_distance(const double *p1, const size_t idx_p2,size_t size) const
 {

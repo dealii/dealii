@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace
 {
   // helper struct for is_base_of_all
-  template<bool... Types> struct BoolStorage;
+  template <bool... Types> struct BoolStorage;
 }
 
 /**
@@ -37,7 +37,7 @@ namespace
  * classes have Base as base class or are Base itself. The result
  * is stored in the member variable value.
  */
-template<class Base, class... Derived>
+template <class Base, class... Derived>
 struct is_base_of_all
 {
   static constexpr bool value =

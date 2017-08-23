@@ -454,7 +454,7 @@ namespace Functions
  *
  * @deprecated use Functions::ConstantFunction instead.
  */
-template<int dim, typename Number=double>
+template <int dim, typename Number=double>
 using ConstantFunction DEAL_II_DEPRECATED = Functions::ConstantFunction<dim,Number>;
 
 /**
@@ -462,7 +462,7 @@ using ConstantFunction DEAL_II_DEPRECATED = Functions::ConstantFunction<dim,Numb
  *
  * @deprecated use Functions::ZeroFunction instead.
  */
-template<int dim, typename Number=double>
+template <int dim, typename Number=double>
 using ZeroFunction DEAL_II_DEPRECATED = Functions::ZeroFunction<dim,Number>;
 
 

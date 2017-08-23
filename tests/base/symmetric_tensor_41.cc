@@ -39,14 +39,14 @@ check_value (const int dim, const int index,
     }
 };
 
-template<int dim>
+template <int dim>
 bool
 is_unit_vector(const Tensor<1,dim> &v)
 {
   return std::abs(v.norm() - 1.0) < 1e-9;
 }
 
-template<int dim>
+template <int dim>
 bool
 check_orientation(Tensor<1,dim> v1,
                   Tensor<1,dim> v2,
@@ -57,7 +57,7 @@ check_orientation(Tensor<1,dim> v1,
   return std::abs(std::abs(v1*v2) - 1.0) < tol;
 }
 
-template<int dim>
+template <int dim>
 void
 check_vector (const int index,
               const Tensor<1,dim> expected, const Tensor<1,dim> actual,

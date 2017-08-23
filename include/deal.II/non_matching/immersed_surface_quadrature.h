@@ -70,7 +70,7 @@ namespace NonMatching
    *
    * @author Simon Sticko, 2017
    */
-  template<int dim>
+  template <int dim>
   class ImmersedSurfaceQuadrature : public Quadrature<dim>
   {
   public:

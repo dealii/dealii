@@ -7,7 +7,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template<int dim>
+template <int dim>
 KDTree<dim>::KDTree(const unsigned int &max_leaf_size,
                     const std::vector<Point<dim> > &pts)
   : max_leaf_size(max_leaf_size)
@@ -17,7 +17,7 @@ KDTree<dim>::KDTree(const unsigned int &max_leaf_size,
 }
 
 
-template<int dim>
+template <int dim>
 std::vector<std::pair<unsigned int, double> > KDTree<dim>::get_points_within_ball(const Point<dim> &center,
     const double &radius,
     bool sorted) const
@@ -35,7 +35,7 @@ std::vector<std::pair<unsigned int, double> > KDTree<dim>::get_points_within_bal
   return matches;
 }
 
-template<int dim>
+template <int dim>
 std::vector<std::pair<unsigned int, double> > KDTree<dim>::get_closest_points(const Point<dim> &target,
     const unsigned int n_points) const
 {
@@ -51,7 +51,7 @@ std::vector<std::pair<unsigned int, double> > KDTree<dim>::get_closest_points(co
   return matches;
 }
 
-template<int dim>
+template <int dim>
 void KDTree<dim>::set_points(const std::vector<Point<dim> > &pts)
 {
   Assert(pts.size() > 0, ExcMessage("Expecting a non zero set of points."));

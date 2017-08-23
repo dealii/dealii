@@ -38,7 +38,7 @@
 #include <fstream>
 #include <type_traits>
 
-template<typename NumberType, int dim, typename ExtractorType>
+template <typename NumberType, int dim, typename ExtractorType>
 void test_view (const Vector<double> &solution,
                 const FEValues<dim>  &fe_values,
                 const unsigned int   &n_q_points,
@@ -46,7 +46,7 @@ void test_view (const Vector<double> &solution,
                 const std::vector<NumberType> &local_dof_values);
 
 // Scalar view
-template<typename NumberType, int dim>
+template <typename NumberType, int dim>
 void test_view (const Vector<double> &solution,
                 const FEValues<dim> &fe_values,
                 const unsigned int  &n_q_points,
@@ -81,7 +81,7 @@ void test_view (const Vector<double> &solution,
 }
 
 // Vector view
-template<typename NumberType, int dim>
+template <typename NumberType, int dim>
 void test_view (const Vector<double> &solution,
                 const FEValues<dim> &fe_values,
                 const unsigned int  &n_q_points,
@@ -128,7 +128,7 @@ void test_view (const Vector<double> &solution,
 }
 
 // SymmetricTensor view
-template<typename NumberType, int dim>
+template <typename NumberType, int dim>
 void test_view (const Vector<double> &solution,
                 const FEValues<dim>  &fe_values,
                 const unsigned int   &n_q_points,
@@ -153,7 +153,7 @@ void test_view (const Vector<double> &solution,
 }
 
 // Tensor view
-template<typename NumberType, int dim>
+template <typename NumberType, int dim>
 void test_view (const Vector<double> &solution,
                 const FEValues<dim>  &fe_values,
                 const unsigned int   &n_q_points,
@@ -177,7 +177,7 @@ void test_view (const Vector<double> &solution,
   fe_values_view.get_function_divergences_from_local_dof_values(local_dof_values, qp_divs_local);
 }
 
-template<typename NumberType, int dim, typename FEType, typename ExtractorType>
+template <typename NumberType, int dim, typename FEType, typename ExtractorType>
 void test_extractor (const FEType        &fe,
                      const ExtractorType &extractor)
 {
@@ -225,7 +225,7 @@ void test_extractor (const FEType        &fe,
   deallog << "OK" << std::endl;
 }
 
-template<typename NumberType, int dim = 2>
+template <typename NumberType, int dim = 2>
 void test()
 {
   const unsigned int degree = 3; // Need third derivatives

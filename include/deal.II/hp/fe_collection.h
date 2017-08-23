@@ -72,7 +72,7 @@ namespace hp
      * Constructor. This constructor creates a FECollection from more than
      * one finite element.
      */
-    template<class... FETypes>
+    template <class... FETypes>
     explicit FECollection (const FETypes &... fes);
 
     /**

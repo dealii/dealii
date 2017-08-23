@@ -263,7 +263,7 @@ MGLevelObject<Object>::max_level () const
   return minlevel + objects.size() - 1;
 }
 
-template<class Object>
+template <class Object>
 template <typename ActionFunctionObjectType>
 void
 MGLevelObject<Object>::apply (ActionFunctionObjectType action)
