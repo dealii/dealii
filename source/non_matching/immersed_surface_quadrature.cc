@@ -19,7 +19,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
 {
 
-  template<int dim>
+  template <int dim>
   ImmersedSurfaceQuadrature<dim>::ImmersedSurfaceQuadrature(
     const std::vector<Point<dim> > &points,
     const std::vector<double> &weights,
@@ -39,7 +39,7 @@ namespace NonMatching
 
 
 
-  template<int dim>
+  template <int dim>
   void ImmersedSurfaceQuadrature<dim>::push_back(
     const Point<dim> &point,
     const double weight,
@@ -54,7 +54,7 @@ namespace NonMatching
 
 
 
-  template<int dim>
+  template <int dim>
   const Tensor<1,dim> &
   ImmersedSurfaceQuadrature<dim>::normal_vector(
     const unsigned int i) const
@@ -65,7 +65,7 @@ namespace NonMatching
 
 
 
-  template<int dim>
+  template <int dim>
   const std::vector<Tensor<1,dim> > &
   ImmersedSurfaceQuadrature<dim>::get_normal_vectors() const
   {

@@ -27,7 +27,7 @@ using namespace Patterns::Tools;
 
 // Try conversion on non elementary types
 
-template<class T>
+template <class T>
 void test(T t)
 {
   auto p = Convert<T>::to_pattern();

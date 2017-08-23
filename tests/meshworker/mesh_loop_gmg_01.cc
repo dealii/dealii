@@ -44,7 +44,7 @@ struct CopyData
 
 using namespace MeshWorker;
 
-template<int dim, int spacedim>
+template <int dim, int spacedim>
 void test()
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD,

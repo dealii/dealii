@@ -42,8 +42,8 @@ void fill_tensor  (Tensor<rank,dim,NumberType> &t)
 }
 
 template <int dim,
-          template<int,int,typename> class TensorType1, typename NumberType1,
-          template<int,int,typename> class TensorType2, typename NumberType2>
+          template <int,int,typename> class TensorType1, typename NumberType1,
+          template <int,int,typename> class TensorType2, typename NumberType2>
 void print (const TensorType1<2,dim,NumberType1> &t2,
             const TensorType2<4,dim,NumberType2> &t4)
 {
@@ -52,8 +52,8 @@ void print (const TensorType1<2,dim,NumberType1> &t2,
 }
 
 template <int dim,
-          template<int,int,typename> class TensorType1, typename NumberType1,
-          template<int,int,typename> class TensorType2, typename NumberType2>
+          template <int,int,typename> class TensorType1, typename NumberType1,
+          template <int,int,typename> class TensorType2, typename NumberType2>
 void print (const TensorType1<2,dim,NumberType1> &t2_1,
             const TensorType2<2,dim,NumberType2> &t2_2,
             const TensorType1<4,dim,NumberType1> &t4_1,
@@ -66,18 +66,18 @@ void print (const TensorType1<2,dim,NumberType1> &t2_1,
 }
 
 
-template<template<int,int,typename> class TensorType1,
-         template<int,int,typename> class TensorType2>
+template <template <int,int,typename> class TensorType1,
+          template <int,int,typename> class TensorType2>
 struct AreSame : std::false_type
 {};
 
-template<template<int,int,typename> class TensorType1>
+template <template <int,int,typename> class TensorType1>
 struct AreSame<TensorType1,TensorType1> : std::true_type
 {};
 
 
-template<template<int,int,typename> class TensorType1, typename NumberType1,
-         template<int,int,typename> class TensorType2, typename NumberType2>
+template <template <int,int,typename> class TensorType1, typename NumberType1,
+          template <int,int,typename> class TensorType2, typename NumberType2>
 void test_one ()
 {
   const unsigned int dim = 2;
@@ -108,8 +108,8 @@ void test_one ()
   deallog << scalar_product(t2_1,t2_2) << std::endl;
 }
 
-template<template<int,int,typename> class TensorType1, typename NumberType1,
-         template<int,int,typename> class TensorType2, typename NumberType2>
+template <template <int,int,typename> class TensorType1, typename NumberType1,
+          template <int,int,typename> class TensorType2, typename NumberType2>
 typename std::enable_if<AreSame<TensorType1,TensorType2>::value>::type
 test_two ()
 {
@@ -159,14 +159,14 @@ test_two ()
   deallog << (t4_1*t4_2) << std::endl;
 }
 
-template<template<int,int,typename> class TensorType1, typename NumberType1,
-         template<int,int,typename> class TensorType2, typename NumberType2>
+template <template <int,int,typename> class TensorType1, typename NumberType1,
+          template <int,int,typename> class TensorType2, typename NumberType2>
 typename std::enable_if<!AreSame<TensorType1,TensorType2>::value>::type
 test_two ()
 {}
 
-template<template<int,int,typename> class TensorType1, typename NumberType1,
-         template<int,int,typename> class TensorType2, typename NumberType2>
+template <template <int,int,typename> class TensorType1, typename NumberType1,
+          template <int,int,typename> class TensorType2, typename NumberType2>
 typename std::enable_if<(
   AreSame<TensorType1,SymmetricTensor>::value &&
   AreSame<TensorType2,SymmetricTensor>::value)>::type
@@ -187,8 +187,8 @@ test_three ()
   deallog << res_dc << std::endl;
 }
 
-template<template<int,int,typename> class TensorType1, typename NumberType1,
-         template<int,int,typename> class TensorType2, typename NumberType2>
+template <template <int,int,typename> class TensorType1, typename NumberType1,
+          template <int,int,typename> class TensorType2, typename NumberType2>
 typename std::enable_if<!(
   AreSame<TensorType1,SymmetricTensor>::value &&
   AreSame<TensorType2,SymmetricTensor>::value)>::type
@@ -196,8 +196,8 @@ test_three ()
 {}
 
 
-template<template<int,int,typename> class TensorType1, typename NumberType1,
-         template<int,int,typename> class TensorType2, typename NumberType2>
+template <template <int,int,typename> class TensorType1, typename NumberType1,
+          template <int,int,typename> class TensorType2, typename NumberType2>
 void test_all ()
 {
   test_one<TensorType1,NumberType1,TensorType2,NumberType2>();
@@ -205,7 +205,7 @@ void test_all ()
   test_three<TensorType1,NumberType1,TensorType2,NumberType2>();
 }
 
-template<typename Number1, typename Number2>
+template <typename Number1, typename Number2>
 void test_T ()
 {
   deallog.push("ST,ST");

@@ -85,7 +85,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Vishal Boddu, Denis Davydov, 2017
  */
-template<typename VectorType = Vector<double> >
+template <typename VectorType = Vector<double> >
 class SolverFIRE : public Solver<VectorType>
 {
 
@@ -151,7 +151,7 @@ public:
    * passed in as first argument based on the second argument-- the state of
    * variables.
    */
-  template<typename PreconditionerType = DiagonalMatrix<VectorType>>
+  template <typename PreconditionerType = DiagonalMatrix<VectorType>>
   void solve
   (const std::function<double(VectorType &, const VectorType &)> &compute,
    VectorType                                                    &x,
@@ -162,7 +162,7 @@ public:
    * when $E(\mathbf x)
    * = \frac{1}{2} \mathbf x^{T} \mathbf A \mathbf x - \mathbf x^{T} \mathbf b$.
    */
-  template<typename MatrixType, typename PreconditionerType>
+  template <typename MatrixType, typename PreconditionerType>
   void solve (const MatrixType         &A,
               VectorType               &x,
               const VectorType         &b,
@@ -194,7 +194,7 @@ protected:
 
 #ifndef DOXYGEN
 
-template<typename VectorType>
+template <typename VectorType>
 SolverFIRE<VectorType>::AdditionalData::
 AdditionalData (const double  initial_timestep,
                 const double  maximum_timestep,
@@ -214,7 +214,7 @@ AdditionalData (const double  initial_timestep,
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 SolverFIRE<VectorType>::
 SolverFIRE (SolverControl            &solver_control,
             VectorMemory<VectorType> &vector_memory,
@@ -226,7 +226,7 @@ SolverFIRE (SolverControl            &solver_control,
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 SolverFIRE<VectorType>::
 SolverFIRE (SolverControl         &solver_control,
             const AdditionalData  &data          )
@@ -237,14 +237,14 @@ SolverFIRE (SolverControl         &solver_control,
 
 
 
-template<typename VectorType>
+template <typename VectorType>
 SolverFIRE<VectorType>::~SolverFIRE()
 {}
 
 
 
-template<typename VectorType>
-template<typename PreconditionerType>
+template <typename VectorType>
+template <typename PreconditionerType>
 void
 SolverFIRE<VectorType>::solve
 (const std::function<double(VectorType &, const VectorType &)> &compute,
@@ -373,7 +373,7 @@ SolverFIRE<VectorType>::solve
 
 
 template <typename VectorType>
-template<typename MatrixType, typename PreconditionerType>
+template <typename MatrixType, typename PreconditionerType>
 void SolverFIRE<VectorType>::solve (const MatrixType         &A,
                                     VectorType               &x,
                                     const VectorType         &b,
