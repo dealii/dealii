@@ -236,7 +236,7 @@ inline
 Number double_contract (const Tensor<2, dim, Number> &src1,
                         const Tensor<2, dim, Number> &src2)
 {
-  Number res = 0.;
+  Number res = internal::NumberType<Number>::value(0.0);
   for (unsigned int i=0; i<dim; ++i)
     res += src1[i] * src2[i];
 

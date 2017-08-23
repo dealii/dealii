@@ -2562,7 +2562,7 @@ Number determinant (const SymmetricTensor<2,dim,Number> &t)
     }
     default:
       Assert (false, ExcNotImplemented());
-      return 0;
+      return internal::NumberType<Number>::value(0.0);
     }
 }
 
@@ -2636,7 +2636,7 @@ template <typename Number>
 inline
 Number second_invariant (const SymmetricTensor<2,1,Number> &)
 {
-  return 0;
+  return internal::NumberType<Number>::value(0.0);
 }
 
 
