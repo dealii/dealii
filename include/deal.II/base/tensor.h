@@ -601,6 +601,11 @@ namespace internal
   template <int rank, int dim, typename T>
   struct NumberType<Tensor<rank,dim,T> >
   {
+    static const Tensor<rank,dim,T> &value (const Tensor<rank,dim,T> &t)
+    {
+      return t;
+    }
+
     static Tensor<rank,dim,T> value (const T &t)
     {
       Tensor<rank,dim,T> tmp;
@@ -612,6 +617,11 @@ namespace internal
   template <int rank, int dim, typename T>
   struct NumberType<Tensor<rank,dim,VectorizedArray<T> > >
   {
+    static const Tensor<rank,dim,VectorizedArray<T> > &value (const Tensor<rank,dim,VectorizedArray<T> > &t)
+    {
+      return t;
+    }
+
     static Tensor<rank,dim,VectorizedArray<T> > value (const T &t)
     {
       Tensor<rank,dim,VectorizedArray<T> > tmp;
