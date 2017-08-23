@@ -458,12 +458,11 @@ namespace hp
                   "Not all of the input arguments of this function "
                   "are derived from FiniteElement<dim,spacedim>!");
 
-    // loop over all of the given arguments and add the finite
-    // elements to this collection
-    for (auto p :
-         {
-           &fes...
-         })
+    // loop over all of the given arguments and add the finite elements to
+    // this collection. Inlining the definition of fe_pointers causes internal
+    // compiler errors on GCC 7.1.1 so we define it separately:
+    const auto fe_pointers = { &fes... };
+    for (auto p : fe_pointers)
       push_back (*p);
   }
 
