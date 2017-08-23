@@ -49,8 +49,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <iostream>
 
-std::ofstream logfile("output");
-
 
 
 class LaplaceProblem
@@ -225,9 +223,9 @@ void LaplaceProblem::solve ()
 
   check_solver_within_range(
     cg.solve(system_matrix, solution, system_rhs, PreconditionIdentity()),
-    solver_control.last_step(), 629, 630);
+    solver_control.last_step(), 625, 635);
 
-  solution.print (deallog.get_file_stream());
+  solution.print (deallog.get_file_stream(), 5);
 
   hanging_node_constraints.distribute (solution);
 }
@@ -272,12 +270,14 @@ void LaplaceProblem::run ()
 
 int main ()
 {
-  logfile.precision(6);
-
-  deallog.attach(logfile);
+  initlog();
+  auto old_precision = deallog.get_file_stream().precision();
+  deallog.get_file_stream() << std::setprecision(7);
 
   LaplaceProblem laplace_problem;
   laplace_problem.run ();
+
+  deallog.get_file_stream() << std::setprecision(old_precision);
 
   return 0;
 }
