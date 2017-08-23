@@ -294,14 +294,14 @@ void Step4<dim>::solve (int cycle)
 
   {
     deallog.push("IC");
-    static constexpr std::array<int,2> lower {51,69};
+    static constexpr std::array<int,2> lower {49,67};
     TrilinosWrappers::PreconditionIC preconditioner;
     solution = 0;
     SolverControl           solver_control (1000, 1e-10);
     SolverCG<>              solver (solver_control);
     preconditioner.initialize(system_matrix);
     check_solver_within_range(solver.solve(system_matrix,solution,system_rhs,preconditioner),
-                              solver_control.last_step(), lower[cycle], lower[cycle]+2);
+                              solver_control.last_step(), lower[cycle], lower[cycle]+4);
     deallog.pop();
   }
 
