@@ -3075,8 +3075,8 @@ namespace internal
         (void)i;
         // ::DoFHandler only supports a single active fe with index
         // zero
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
-        Assert (i == 0, typename BaseClass::ExcInvalidObject());
+        Assert (i == 0,
+                (typename dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
       }
 
 
@@ -3087,9 +3087,8 @@ namespace internal
       set_active_fe_index (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, level_dof_access> &accessor,
                            const unsigned int                                      i)
       {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != nullptr,
-                typename BaseClass::ExcInvalidObject());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
         Assert (static_cast<unsigned int>(accessor.level()) <
                 accessor.dof_handler->levels.size(),
                 ExcMessage ("DoFHandler not initialized"));
@@ -3108,15 +3107,14 @@ namespace internal
                                   ForwardIterator local_source_end,
                                   OutputVector   &global_destination)
       {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != nullptr,
-                typename BaseClass::ExcInvalidObject());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
         Assert (static_cast<unsigned int>(local_source_end-local_source_begin)
                 ==
                 accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
 
         Assert (!accessor.has_children(),
                 ExcMessage ("Cell must be active"));
@@ -3140,13 +3138,12 @@ namespace internal
                                   ForwardIterator local_source_end,
                                   OutputVector   &global_destination)
       {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
-                typename BaseClass::ExcInvalidObject());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
 
         const unsigned int n_dofs = local_source_end - local_source_begin;
 
@@ -3171,13 +3168,12 @@ namespace internal
                                   ForwardIterator         local_source_end,
                                   OutputVector           &global_destination)
       {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
-                typename BaseClass::ExcInvalidObject());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
 
         Assert (!accessor.has_children(),
                 ExcMessage ("Cell must be active."));
@@ -3203,13 +3199,12 @@ namespace internal
                                   ForwardIterator         local_source_end,
                                   OutputVector           &global_destination)
       {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
-                typename BaseClass::ExcInvalidObject());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
 
         const unsigned int n_dofs = local_source_end - local_source_begin;
 
@@ -3233,17 +3228,16 @@ namespace internal
                                   const dealii::FullMatrix<number> &local_source,
                                   OutputMatrix                     &global_destination)
       {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != nullptr,
-                typename BaseClass::ExcInvalidObject());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
         Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (local_source.n() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.m(),
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.n(),
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
 
         Assert (!accessor.has_children(),
                 ExcMessage ("Cell must be active."));
@@ -3268,17 +3262,16 @@ namespace internal
                                   const dealii::FullMatrix<number> &local_source,
                                   OutputMatrix                     &global_destination)
       {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
-                typename BaseClass::ExcInvalidObject());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
         Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (local_source.n() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.m(),
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.n(),
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
 
         const unsigned int n_dofs = local_source.size();
 
@@ -3304,21 +3297,20 @@ namespace internal
                                   OutputMatrix                     &global_matrix,
                                   OutputVector                     &global_vector)
       {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
-                typename BaseClass::ExcInvalidObject());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
         Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (local_matrix.n() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_matrix.m(),
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_matrix.n(),
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (local_vector.size() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_vector.size(),
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
 
         Assert (!accessor.has_children(),
                 ExcMessage ("Cell must be active."));
@@ -3347,21 +3339,20 @@ namespace internal
                                   OutputMatrix                     &global_matrix,
                                   OutputVector                     &global_vector)
       {
-        typedef dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access> BaseClass;
         Assert (accessor.dof_handler != 0,
-                typename BaseClass::ExcInvalidObject());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
         Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (local_matrix.n() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_matrix.m(),
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_matrix.n(),
-                typename BaseClass::ExcMatrixDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
         Assert (local_vector.size() == accessor.get_fe().dofs_per_cell,
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_vector.size(),
-                typename BaseClass::ExcVectorDoesNotMatch());
+                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
 
         const unsigned int n_dofs = local_matrix.size();
 
