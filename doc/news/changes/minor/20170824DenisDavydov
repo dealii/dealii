@@ -1,0 +1,3 @@
+New: extend Point::distance_square() to work with VectorizedArray numbers.
+<br>
+(Denis Davydov, 2017/08/24)
