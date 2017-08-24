@@ -127,13 +127,29 @@ public:
    * memory is not destroyed using `operator delete` but returned to the
    * VectorMemory pool.
    *
-   * @author Guido Kanschat, 2009
+   * @author Guido Kanschat, 2009; Wolfgang Bangerth, 2017.
    */
   class Pointer : public std::unique_ptr<VectorType, std::function<void (VectorType *)> >
   {
   public:
     /**
-     * Constructor, automatically allocating a vector from @p mem.
+     * Default constructor. This constructor corresponds to a @p nullptr
+     * object that does not own a vector. It can, however, later be
+     * assigned another Pointer object via move assignment in which case
+     * it will steal the vector owned by the other object
+     * (as @p std::unique_ptr does).
+     */
+    Pointer() = default;
+
+    /**
+     * Move operator. This operator steals the pointer to the vector
+     * represented by this object from the one give as argument.
+     */
+    Pointer &operator = (Pointer &&) = default;
+
+    /**
+     * Constructor. This constructor automatically allocates a vector from
+     * the given vector memory object @p mem.
      */
     Pointer(VectorMemory<VectorType> &mem);
 
