@@ -15,6 +15,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/dof_level.h>
@@ -1277,7 +1278,7 @@ namespace hp
   {
     Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
 
-    finite_elements = &ff;
+    finite_elements = std_cxx14::make_unique<hp::FECollection<dim, spacedim>>(ff);
 
     // at the beginning, make sure every processor knows the
     // active_fe_indices on both its own cells and all ghost cells

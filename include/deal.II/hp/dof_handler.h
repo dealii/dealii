@@ -781,14 +781,10 @@ namespace hp
     SmartPointer<const Triangulation<dim,spacedim>,DoFHandler<dim,spacedim> > tria;
 
     /**
-     * Store a pointer to the finite element set given latest for the
-     * distribution of dofs. In order to avoid destruction of the object
-     * before the lifetime of the DoF handler, we subscribe to the finite
-     * element object. To unlock the FE before the end of the lifetime of this
-     * DoF handler, use the <tt>clear()</tt> function (this clears all data of
-     * this object as well, though).
+     * Store a pointer to the hp::FECollection object containing the finite element
+     * set this object is initialized with.
      */
-    SmartPointer<const hp::FECollection<dim,spacedim>,hp::DoFHandler<dim,spacedim> > finite_elements;
+    std::unique_ptr<const hp::FECollection<dim,spacedim> > finite_elements;
 
     /**
      * An object that describes how degrees of freedom should be distributed and
