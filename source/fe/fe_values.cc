@@ -38,6 +38,7 @@
 
 #include <iomanip>
 #include <memory>
+#include <type_traits>
 
 #include <deal.II/differentiation/ad/sacado_product_types.h>
 
@@ -461,27 +462,27 @@ namespace FEValuesViews
     do_function_values (const ArrayView<Number> &dof_values,
                         const Table<2,double> &shape_values,
                         const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                        std::vector<typename ProductType<typename std::remove_cv<Number>::type,double>::type>            &values)
+                        std::vector<typename ProductType<typename std::decay<Number>::type,double>::type>            &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                                shape_values.n_cols() : values.size();
       AssertDimension (values.size(), n_quadrature_points);
 
-      std::fill (values.begin(), values.end(), Number());
+      std::fill (values.begin(), values.end(), dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0));
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
             const Number &value = dof_values[shape_function];
-            if (value == Number() )
+            if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
               continue;
 
             const double *shape_value_ptr =
               &shape_values(shape_function_data[shape_function].row_index, 0);
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-              values[q_point] += value **shape_value_ptr++;
+              values[q_point] += value * (*shape_value_ptr++);
           }
     }
 
@@ -494,7 +495,7 @@ namespace FEValuesViews
     do_function_derivatives (const ArrayView<Number> &dof_values,
                              const Table<2,dealii::Tensor<order,spacedim> > &shape_derivatives,
                              const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<typename ProductType<Number,dealii::Tensor<order,spacedim> >::type> &derivatives)
+                             std::vector<typename ProductType<typename std::decay<Number>::type,dealii::Tensor<order,spacedim> >::type> &derivatives)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -502,14 +503,14 @@ namespace FEValuesViews
       AssertDimension (derivatives.size(), n_quadrature_points);
 
       std::fill (derivatives.begin(), derivatives.end(),
-                 typename ProductType<Number,dealii::Tensor<order,spacedim> >::type());
+                 typename ProductType<typename std::decay<Number>::type,dealii::Tensor<order,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
             const Number &value = dof_values[shape_function];
-            if (value == Number() )
+            if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
               continue;
 
             const dealii::Tensor<order,spacedim> *shape_derivative_ptr =
@@ -542,7 +543,7 @@ namespace FEValuesViews
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
             const Number &value = dof_values[shape_function];
-            if (value == Number())
+            if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
               continue;
 
             const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
@@ -560,14 +561,14 @@ namespace FEValuesViews
     void do_function_values (const ArrayView<Number> &dof_values,
                              const Table<2,double>          &shape_values,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<typename ProductType<Number,dealii::Tensor<1,spacedim> >::type> &values)
+                             std::vector<typename ProductType<typename std::decay<Number>::type,dealii::Tensor<1,spacedim> >::type> &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                                shape_values.n_cols() : values.size();
       AssertDimension (values.size(), n_quadrature_points);
 
-      std::fill (values.begin(), values.end(), typename ProductType<Number,dealii::Tensor<1,spacedim> >::type());
+      std::fill (values.begin(), values.end(), typename ProductType<typename std::decay<Number>::type,dealii::Tensor<1,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -579,7 +580,7 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (snc != -1)
@@ -588,7 +589,7 @@ namespace FEValuesViews
                 shape_function_data[shape_function].single_nonzero_component_index;
               const double *shape_value_ptr = &shape_values(snc,0);
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                values[q_point][comp] += value **shape_value_ptr++;
+                values[q_point][comp] += value * (*shape_value_ptr++);
             }
           else
             for (unsigned int d=0; d<spacedim; ++d)
@@ -597,7 +598,7 @@ namespace FEValuesViews
                   const double *shape_value_ptr =
                     &shape_values(shape_function_data[shape_function].row_index[d],0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][d] += value **shape_value_ptr++;
+                    values[q_point][d] += value * (*shape_value_ptr++);
                 }
         }
     }
@@ -609,7 +610,7 @@ namespace FEValuesViews
     do_function_derivatives (const ArrayView<Number> &dof_values,
                              const Table<2,dealii::Tensor<order,spacedim> > &shape_derivatives,
                              const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                             std::vector<typename ProductType<Number,dealii::Tensor<order+1,spacedim> >::type> &derivatives)
+                             std::vector<typename ProductType<typename std::decay<Number>::type,dealii::Tensor<order+1,spacedim> >::type> &derivatives)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -617,7 +618,7 @@ namespace FEValuesViews
       AssertDimension (derivatives.size(), n_quadrature_points);
 
       std::fill (derivatives.begin(), derivatives.end(),
-                 typename ProductType<Number,dealii::Tensor<order+1,spacedim> >::type());
+                 typename ProductType<typename std::decay<Number>::type,dealii::Tensor<order+1,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -629,7 +630,7 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (snc != -1)
@@ -663,7 +664,7 @@ namespace FEValuesViews
     do_function_symmetric_gradients (const ArrayView<Number> &dof_values,
                                      const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                                      const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                                     std::vector<typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type> &symmetric_gradients)
+                                     std::vector<typename ProductType<typename std::decay<Number>::type,dealii::SymmetricTensor<2,spacedim> >::type> &symmetric_gradients)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -671,7 +672,7 @@ namespace FEValuesViews
       AssertDimension (symmetric_gradients.size(), n_quadrature_points);
 
       std::fill (symmetric_gradients.begin(), symmetric_gradients.end(),
-                 typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type());
+                 typename ProductType<typename std::decay<Number>::type,dealii::SymmetricTensor<2,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -683,7 +684,7 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (snc != -1)
@@ -736,7 +737,7 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (snc != -1)
@@ -767,14 +768,15 @@ namespace FEValuesViews
     do_function_curls (const ArrayView<Number> &dof_values,
                        const Table<2,dealii::Tensor<1,spacedim> > &shape_gradients,
                        const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                       std::vector<typename ProductType<Number,typename dealii::internal::CurlType<spacedim>::type>::type> &curls)
+                       std::vector<typename ProductType<typename std::decay<Number>::type,typename dealii::internal::CurlType<spacedim>::type>::type> &curls)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
                                                shape_gradients[0].size() : curls.size();
       AssertDimension (curls.size(), n_quadrature_points);
 
-      std::fill (curls.begin(), curls.end(), typename ProductType<Number,typename dealii::internal::CurlType<spacedim>::type>::type());
+      std::fill (curls.begin(), curls.end(),
+                 typename ProductType<typename std::decay<Number>::type,typename dealii::internal::CurlType<spacedim>::type>::type());
 
       switch (spacedim)
         {
@@ -797,7 +799,7 @@ namespace FEValuesViews
 
               const Number &value = dof_values[shape_function];
 
-              if (value == Number())
+              if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
                 continue;
 
               if (snc != -1)
@@ -857,7 +859,7 @@ namespace FEValuesViews
 
               const Number &value = dof_values[shape_function];
 
-              if (value == Number())
+              if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
                 continue;
 
               if (snc != -1)
@@ -979,7 +981,7 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (snc != -1)
@@ -1013,7 +1015,7 @@ namespace FEValuesViews
     do_function_values (const ArrayView<Number> &dof_values,
                         const dealii::Table<2,double>          &shape_values,
                         const std::vector<typename SymmetricTensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                        std::vector<typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type> &values)
+                        std::vector<typename ProductType<typename std::decay<Number>::type,dealii::SymmetricTensor<2,spacedim> >::type> &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1021,7 +1023,7 @@ namespace FEValuesViews
       AssertDimension (values.size(), n_quadrature_points);
 
       std::fill (values.begin(), values.end(),
-                 typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type());
+                 typename ProductType<typename std::decay<Number>::type,dealii::SymmetricTensor<2,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1033,7 +1035,7 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (snc != -1)
@@ -1043,7 +1045,7 @@ namespace FEValuesViews
                 (shape_function_data[shape_function].single_nonzero_component_index);
               const double *shape_value_ptr = &shape_values(snc,0);
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                values[q_point][comp] += value **shape_value_ptr++;
+                values[q_point][comp] += value * (*shape_value_ptr++);
             }
           else
             for (unsigned int d=0;
@@ -1055,7 +1057,7 @@ namespace FEValuesViews
                   const double *shape_value_ptr =
                     &shape_values(shape_function_data[shape_function].row_index[d],0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][comp] += value **shape_value_ptr++;
+                    values[q_point][comp] += value * (*shape_value_ptr++);
                 }
         }
     }
@@ -1087,7 +1089,7 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (snc != -1)
@@ -1155,7 +1157,7 @@ namespace FEValuesViews
     do_function_values (const ArrayView<Number> &dof_values,
                         const dealii::Table<2,double>          &shape_values,
                         const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                        std::vector<typename ProductType<Number,dealii::Tensor<2,spacedim> >::type> &values)
+                        std::vector<typename ProductType<typename std::decay<Number>::type,dealii::Tensor<2,spacedim> >::type> &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
       const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
@@ -1163,7 +1165,7 @@ namespace FEValuesViews
       AssertDimension (values.size(), n_quadrature_points);
 
       std::fill (values.begin(), values.end(),
-                 typename ProductType<Number,dealii::Tensor<2,spacedim> >::type());
+                 typename ProductType<typename std::decay<Number>::type,dealii::Tensor<2,spacedim> >::type());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1175,7 +1177,7 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (snc != -1)
@@ -1187,7 +1189,7 @@ namespace FEValuesViews
 
               const double *shape_value_ptr = &shape_values(snc,0);
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                values[q_point][indices] += value **shape_value_ptr++;
+                values[q_point][indices] += value * (*shape_value_ptr++);
             }
           else
             for (unsigned int d=0;
@@ -1199,7 +1201,7 @@ namespace FEValuesViews
                   const double *shape_value_ptr =
                     &shape_values(shape_function_data[shape_function].row_index[d],0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][indices] += value **shape_value_ptr++;
+                    values[q_point][indices] += value * (*shape_value_ptr++);
                 }
         }
     }
@@ -1231,7 +1233,7 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (snc != -1)
@@ -2672,7 +2674,7 @@ namespace internal
     AssertDimension(values.size(), n_quadrature_points);
 
     // initialize with zero
-    std::fill_n (values.begin(), n_quadrature_points, Number());
+    std::fill_n (values.begin(), n_quadrature_points, dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0));
 
     // add up contributions of trial functions. note that here we deal with
     // scalar finite elements, so no need to check for non-primitivity of
@@ -2689,7 +2691,7 @@ namespace internal
 
         const double *shape_value_ptr = &shape_values(shape_func, 0);
         for (unsigned int point=0; point<n_quadrature_points; ++point)
-          values[point] += value **shape_value_ptr++;
+          values[point] += value * (*shape_value_ptr++);
       }
   }
 
@@ -2740,7 +2742,7 @@ namespace internal
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
           const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (fe.is_primitive(shape_func))
@@ -2757,11 +2759,11 @@ namespace internal
                 {
                   VectorType &values_comp = values[comp];
                   for (unsigned int point=0; point<n_quadrature_points; ++point)
-                    values_comp[point] += value **shape_value_ptr++;
+                    values_comp[point] += value * (*shape_value_ptr++);
                 }
               else
                 for (unsigned int point=0; point<n_quadrature_points; ++point)
-                  values[point][comp] += value **shape_value_ptr++;
+                  values[point][comp] += value * (*shape_value_ptr++);
             }
           else
             for (unsigned int c=0; c<n_components; ++c)
@@ -2780,11 +2782,11 @@ namespace internal
                     VectorType &values_comp = values[comp];
                     for (unsigned int point=0; point<n_quadrature_points;
                          ++point)
-                      values_comp[point] += value **shape_value_ptr++;
+                      values_comp[point] += value * (*shape_value_ptr++);
                   }
                 else
                   for (unsigned int point=0; point<n_quadrature_points; ++point)
-                    values[point][comp] += value **shape_value_ptr++;
+                    values[point][comp] += value * (*shape_value_ptr++);
               }
         }
   }
@@ -2815,7 +2817,7 @@ namespace internal
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
         const Number &value = dof_values_ptr[shape_func];
-        if (value == Number())
+        if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
           continue;
 
         const Tensor<order,spacedim> *shape_derivative_ptr
@@ -2874,7 +2876,7 @@ namespace internal
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
           const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (fe.is_primitive(shape_func))
@@ -2934,7 +2936,7 @@ namespace internal
     AssertDimension(laplacians.size(), n_quadrature_points);
 
     // initialize with zero
-    std::fill_n (laplacians.begin(), n_quadrature_points, Number());
+    std::fill_n (laplacians.begin(), n_quadrature_points, dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0));
 
     // add up contributions of trial functions. note that here we deal with
     // scalar finite elements and also note that the Laplacian is
@@ -3000,7 +3002,7 @@ namespace internal
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
           const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == Number())
+          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
             continue;
 
           if (fe.is_primitive(shape_func))
