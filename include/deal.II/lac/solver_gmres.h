@@ -102,12 +102,6 @@ namespace internal
        * Field for storing the vectors.
        */
       std::vector<typename VectorMemory<VectorType>::Pointer> data;
-
-      /**
-       * Offset of the first vector. This is for later when vector rotation
-       * will be implemented.
-       */
-      unsigned int offset;
     };
   }
 }
@@ -519,8 +513,7 @@ namespace internal
                 VectorMemory<VectorType> &vmem)
       :
       mem(vmem),
-      data (max_size),
-      offset(0)
+      data (max_size)
     {}
 
 
@@ -529,28 +522,28 @@ namespace internal
     inline VectorType &
     TmpVectors<VectorType>::operator[] (const unsigned int i) const
     {
-      Assert (i+offset<data.size(),
-              ExcIndexRange(i, -offset, data.size()-offset));
+      Assert (i<data.size(),
+              ExcIndexRange(i, 0, data.size()));
 
-      Assert (data[i-offset] != nullptr, ExcNotInitialized());
-      return *data[i-offset];
+      Assert (data[i] != nullptr, ExcNotInitialized());
+      return *data[i];
     }
 
 
 
     template <class VectorType>
     inline VectorType &
-    TmpVectors<VectorType>::operator() (const unsigned int i,
-                                        const VectorType       &temp)
+    TmpVectors<VectorType>::operator() (const unsigned int  i,
+                                        const VectorType   &temp)
     {
-      Assert (i+offset<data.size(),
-              ExcIndexRange(i,-offset, data.size()-offset));
-      if (data[i-offset] == nullptr)
+      Assert (i<data.size(),
+              ExcIndexRange(i, 0, data.size()));
+      if (data[i] == nullptr)
         {
-          data[i-offset] = std::move(typename VectorMemory<VectorType>::Pointer(mem));
-          data[i-offset]->reinit(temp);
+          data[i] = std::move(typename VectorMemory<VectorType>::Pointer(mem));
+          data[i]->reinit(temp);
         }
-      return *data[i-offset];
+      return *data[i];
     }
 
 
