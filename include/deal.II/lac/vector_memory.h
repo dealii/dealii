@@ -74,10 +74,11 @@ class VectorMemory : public Subscriptor
 public:
 
   /**
-   * Virtual destructor is needed as there are virtual functions in this
+   * Virtual destructor. This destructor is declared @p virtual to allow
+   * destroying objects of derived type through pointers to this base
    * class.
    */
-  virtual ~VectorMemory () {}
+  virtual ~VectorMemory () = default;
 
   /**
    * Return a pointer to a new vector. The number of elements or their
@@ -158,11 +159,6 @@ class PrimitiveVectorMemory : public VectorMemory<VectorType>
 {
 public:
   /**
-   * Constructor.
-   */
-  PrimitiveVectorMemory () = default;
-
-  /**
    * Return a pointer to a new vector. The number of elements or their
    * subdivision into blocks (if applicable) is unspecified and users of this
    * function should reset vectors to their proper size. The same holds for
@@ -171,10 +167,7 @@ public:
    * For the present class, calling this function will allocate a new vector
    * on the heap and returning a pointer to it.
    */
-  virtual VectorType *alloc ()
-  {
-    return new VectorType();
-  }
+  virtual VectorType *alloc ();
 
   /**
    * Return a vector and indicate that it is not going to be used any further
@@ -184,10 +177,7 @@ public:
    * For the present class, this means that the vector is returned to the
    * global heap.
    */
-  virtual void free (const VectorType *const v)
-  {
-    delete v;
-  }
+  virtual void free (const VectorType *const v);
 };
 
 
@@ -270,10 +260,12 @@ public:
 
 private:
   /**
-   * Type to enter into the array. First component will be a flag telling
-   * whether the vector is used, second the vector itself.
+   * A type that describes this entries of an array that represents
+   * the vectors stored by this object. The first component of the pair
+   * is be a flag telling whether the vector is used, the second
+   * a pointer to the vector itself.
    */
-  typedef std::pair<bool, VectorType *> entry_type;
+  typedef std::pair<bool, std::unique_ptr<VectorType> > entry_type;
 
   /**
    * The class providing the actual storage for the memory pool.
@@ -282,7 +274,7 @@ private:
    * Only one of these pools is used for each vector type, thus allocating all
    * vectors from the same storage.
    *
-   * @author Guido Kanschat, 2007
+   * @author Guido Kanschat, 2007, Wolfgang Bangerth 2017.
    */
   struct Pool
   {
@@ -290,14 +282,17 @@ private:
      * Standard constructor creating an empty pool
      */
     Pool();
+
     /**
-     * Destructor. Frees memory and warns about memory leaks
+     * Destructor.
      */
     ~Pool();
+
     /**
      * Create data vector; does nothing after first initialization
      */
     void initialize(const size_type size);
+
     /**
      * Pointer to the storage object
      */
@@ -314,6 +309,7 @@ private:
    * output at the end of an object's lifetime.
    */
   size_type total_alloc;
+
   /**
    * Number of vectors currently allocated in this object; used for detecting
    * memory leaks.
@@ -358,6 +354,26 @@ VectorMemory<VectorType>::Pointer::Pointer(VectorMemory<VectorType> &mem)
   mem.free(v);
 })
 {}
+
+
+
+template <typename VectorType>
+VectorType *
+PrimitiveVectorMemory<VectorType>::alloc ()
+{
+  return new VectorType();
+}
+
+
+
+template <typename VectorType>
+void
+PrimitiveVectorMemory<VectorType>::free (const VectorType *const v)
+{
+  delete v;
+}
+
+
 
 
 #endif // DOXYGEN

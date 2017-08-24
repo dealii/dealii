@@ -187,14 +187,6 @@ protected:
     const boost::signals2::signal<void (double)> &cond_signal);
 
   /**
-   * Temporary vectors, allocated through the @p VectorMemory object at the
-   * start of the actual solution process and deallocated at the end.
-   */
-  VectorType *Vr;
-  VectorType *Vp;
-  VectorType *Vz;
-
-  /**
    * Additional parameters.
    */
   AdditionalData additional_data;
@@ -227,9 +219,6 @@ protected:
    * iteration.
    */
   boost::signals2::signal<void (const std::vector<double> &)> all_eigenvalues_signal;
-
-private:
-  void cleanup();
 };
 
 /*@}*/
@@ -244,9 +233,6 @@ SolverCG<VectorType>::SolverCG (SolverControl        &cn,
                                 const AdditionalData     &data)
   :
   Solver<VectorType>(cn,mem),
-  Vr(nullptr),
-  Vp(nullptr),
-  Vz(nullptr),
   additional_data(data)
 {}
 
@@ -257,9 +243,6 @@ SolverCG<VectorType>::SolverCG (SolverControl        &cn,
                                 const AdditionalData &data)
   :
   Solver<VectorType>(cn),
-  Vr(nullptr),
-  Vp(nullptr),
-  Vz(nullptr),
   additional_data(data)
 {}
 
@@ -268,18 +251,6 @@ SolverCG<VectorType>::SolverCG (SolverControl        &cn,
 template <typename VectorType>
 SolverCG<VectorType>::~SolverCG ()
 {}
-
-
-
-template <typename VectorType>
-void
-SolverCG<VectorType>::cleanup()
-{
-  this->memory.free(Vr);
-  this->memory.free(Vp);
-  this->memory.free(Vz);
-  deallog.pop();
-}
 
 
 
@@ -348,11 +319,16 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
   deallog.push("cg");
 
   // Memory allocation
-  Vr = this->memory.alloc();
-  Vz = this->memory.alloc();
-  Vp = this->memory.alloc();
-  // Should we build the matrix for
-  // eigenvalue computations?
+  typename VectorMemory<VectorType>::Pointer g_pointer(this->memory);
+  typename VectorMemory<VectorType>::Pointer d_pointer(this->memory);
+  typename VectorMemory<VectorType>::Pointer h_pointer(this->memory);
+
+  // define some aliases for simpler access
+  VectorType &g = *g_pointer;
+  VectorType &d = *d_pointer;
+  VectorType &h = *h_pointer;
+
+  // Should we build the matrix for eigenvalue computations?
   const bool do_eigenvalues = !condition_number_signal.empty()
                               ||!all_condition_numbers_signal.empty()
                               ||!eigenvalues_signal.empty()
@@ -370,10 +346,6 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
     {
       double eigen_beta_alpha = 0;
 
-      // define some aliases for simpler access
-      VectorType &g = *Vr;
-      VectorType &d = *Vz;
-      VectorType &h = *Vp;
       // resize the vectors, but do not set
       // the values since they'd be overwritten
       // soon anyway.
@@ -398,7 +370,7 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
       conv = this->iteration_status(0, res, x);
       if (conv != SolverControl::iterate)
         {
-          cleanup();
+          deallog.pop();
           return;
         }
 
@@ -470,14 +442,14 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
     }
   catch (...)
     {
-      cleanup();
+      deallog.pop();
       throw;
     }
   compute_eigs_and_cond(diagonal,offdiagonal,eigenvalues_signal,
                         condition_number_signal);
 
-  // Deallocate Memory
-  cleanup();
+  deallog.pop();
+
   // in case of failure: throw exception
   if (conv != SolverControl::success)
     AssertThrow(false, SolverControl::NoConvergence (it, res));
