@@ -1,0 +1,11 @@
+Fixed: It turns out that it was not possible to copy an invalid
+operator, i.e., the following code would yield an exception:
+@code
+  typename DoFHandler<dim>::active_cell_iterator invalid_1;
+  typename DoFHandler<dim>::active_cell_iterator invalid_2;
+
+  invalid_1 = invalid_2;  // resulted in an error
+@endcode
+This made no sense, and has now been fixed.
+<br>
+(Wolfgang Bangerth, 2017/08/23)

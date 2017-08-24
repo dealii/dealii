@@ -149,7 +149,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::copy_from
 (const DoFAccessor<structdim,DoFHandlerType,level_dof_access2> &a)
 {
   BaseClass::copy_from (a);
-  set_dof_handler (a.dof_handler);
+  this->dof_handler = a.dof_handler;
 }
 
 
