@@ -17,10 +17,12 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
   matrix_free.cc
+  evaluation_selector.cc
   )
 
 SET(_inst
   matrix_free.inst.in
+  evaluation_selector.inst.in
   )
 
 FILE(GLOB _header

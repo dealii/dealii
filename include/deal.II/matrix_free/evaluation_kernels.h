@@ -155,8 +155,6 @@ namespace internal
     const unsigned int temp_size = Eval::dofs_per_cell == numbers::invalid_unsigned_int ? 0
                                    : (Eval::dofs_per_cell > Eval::n_q_points ?
                                       Eval::dofs_per_cell : Eval::n_q_points);
-    const unsigned int max_stack_size = 100;
-    VectorizedArray<Number>  temp_data[(temp_size > 0 && temp_size < max_stack_size) ? 2*temp_size : 1];
     VectorizedArray<Number> *temp1;
     VectorizedArray<Number> *temp2;
     if (temp_size == 0)
@@ -164,11 +162,6 @@ namespace internal
         temp1 = scratch_data;
         temp2 = temp1 + std::max(Utilities::fixed_power<dim>(shape_info.fe_degree+1),
                                  Utilities::fixed_power<dim>(shape_info.n_q_points_1d));
-      }
-    else if (temp_size < max_stack_size)
-      {
-        temp1 = &temp_data[0];
-        temp2 = temp1 + temp_size;
       }
     else
       {
@@ -375,8 +368,6 @@ namespace internal
     const unsigned int temp_size = Eval::dofs_per_cell == numbers::invalid_unsigned_int ? 0
                                    : (Eval::dofs_per_cell > Eval::n_q_points ?
                                       Eval::dofs_per_cell : Eval::n_q_points);
-    const unsigned int max_stack_size = 100;
-    VectorizedArray<Number>  temp_data[(temp_size > 0 && temp_size < max_stack_size) ? 2*temp_size : 1];
     VectorizedArray<Number> *temp1;
     VectorizedArray<Number> *temp2;
     if (temp_size == 0)
@@ -384,11 +375,6 @@ namespace internal
         temp1 = scratch_data;
         temp2 = temp1 + std::max(Utilities::fixed_power<dim>(shape_info.fe_degree+1),
                                  Utilities::fixed_power<dim>(shape_info.n_q_points_1d));
-      }
-    else if (temp_size < max_stack_size)
-      {
-        temp1 = &temp_data[0];
-        temp2 = temp1 + temp_size;
       }
     else
       {
