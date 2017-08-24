@@ -494,10 +494,10 @@ inline
 typename numbers::NumberTraits<Number>::real_type
 Point<dim,Number>::distance_square (const Point<dim,Number> &p) const
 {
-  Number sum = Number();
+  Number sum = internal::NumberType<Number>::value(0.0);
   for (unsigned int i=0; i<dim; ++i)
     {
-      const Number diff=this->values[i]-p(i);
+      const Number diff=static_cast<Number>(this->values[i])-p(i);
       sum += numbers::NumberTraits<Number>::abs_square (diff);
     }
 
