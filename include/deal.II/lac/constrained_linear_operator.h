@@ -318,13 +318,11 @@ constrained_right_hand_side(const ConstraintMatrix &constraint_matrix,
     const auto Ct = transpose_operator(C);
 
     static GrowingVectorMemory<Domain> vector_memory;
-    Domain *k = vector_memory.alloc();
+    typename VectorMemory<Domain>::Pointer k (vector_memory);
     linop.reinit_domain_vector(*k, /*bool fast=*/ false);
     constraint_matrix.distribute(*k);
 
     v += Ct * (right_hand_side - linop **k);
-
-    vector_memory.free(k);
   };
 
   // lambda capture expressions are a C++14 feature...
