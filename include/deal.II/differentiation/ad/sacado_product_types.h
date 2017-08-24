@@ -29,47 +29,52 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename T>
-struct ProductType<Sacado::Fad::DFad<T>, float>
+namespace internal
 {
-  typedef Sacado::Fad::DFad<T> type;
-};
 
-template <typename T>
-struct ProductType<float, Sacado::Fad::DFad<T> >
-{
-  typedef Sacado::Fad::DFad<T> type;
-};
+  template <typename T>
+  struct ProductTypeImpl<Sacado::Fad::DFad<T>, float>
+  {
+    typedef Sacado::Fad::DFad<T> type;
+  };
 
-template <typename T>
-struct ProductType<Sacado::Fad::DFad<T>, double>
-{
-  typedef Sacado::Fad::DFad<T> type;
-};
+  template <typename T>
+  struct ProductTypeImpl<float, Sacado::Fad::DFad<T> >
+  {
+    typedef Sacado::Fad::DFad<T> type;
+  };
 
-template <typename T>
-struct ProductType<double, Sacado::Fad::DFad<T> >
-{
-  typedef Sacado::Fad::DFad<T> type;
-};
+  template <typename T>
+  struct ProductTypeImpl<Sacado::Fad::DFad<T>, double>
+  {
+    typedef Sacado::Fad::DFad<T> type;
+  };
 
-template <typename T>
-struct ProductType<Sacado::Fad::DFad<T>, int>
-{
-  typedef Sacado::Fad::DFad<T> type;
-};
+  template <typename T>
+  struct ProductTypeImpl<double, Sacado::Fad::DFad<T> >
+  {
+    typedef Sacado::Fad::DFad<T> type;
+  };
 
-template <typename T>
-struct ProductType<int, Sacado::Fad::DFad<T> >
-{
-  typedef Sacado::Fad::DFad<T> type;
-};
+  template <typename T>
+  struct ProductTypeImpl<Sacado::Fad::DFad<T>, int>
+  {
+    typedef Sacado::Fad::DFad<T> type;
+  };
 
-template <typename T, typename U>
-struct ProductType<Sacado::Fad::DFad<T>, Sacado::Fad::DFad<U> >
-{
-  typedef Sacado::Fad::DFad<typename ProductType<T,U>::type > type;
-};
+  template <typename T>
+  struct ProductTypeImpl<int, Sacado::Fad::DFad<T> >
+  {
+    typedef Sacado::Fad::DFad<T> type;
+  };
+
+  template <typename T, typename U>
+  struct ProductTypeImpl<Sacado::Fad::DFad<T>, Sacado::Fad::DFad<U> >
+  {
+    typedef Sacado::Fad::DFad<typename ProductType<T,U>::type > type;
+  };
+
+}
 
 template <typename T>
 struct EnableIfScalar<Sacado::Fad::DFad<T> >

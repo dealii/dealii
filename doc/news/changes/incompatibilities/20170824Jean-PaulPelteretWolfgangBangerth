@@ -1,0 +1,6 @@
+Changed: Specialization of the ProductType class are now implemented through
+specialization of the class internal::ProductTypeImpl . This was done in order 
+to ensure that product operations performed with qualified number types do not
+result in the intended specializations being overlooked by the compiler.
+<br>
+(Jean-Paul Pelteret, Wolfgang Bangerth, 2017/08/24)
