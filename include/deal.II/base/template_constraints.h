@@ -326,6 +326,31 @@ struct types_are_equal : std::is_same<T,U>
 
 
 
+namespace internal
+{
+
+  /**
+   * A struct that implements the default product type resulting from the
+   * multiplication of two types.
+   *
+   * @note Care should be taken when @p T or @p U have qualifiers (@p const or
+   * @p volatile) or are @p lvalue or @p rvalue references! It is recommended
+   * that specialization of this class is only made for unqualified (fully
+   * stripped) types and that the ProductType class be used to determine the
+   * result of operating with (potentially) qualified types.
+   *
+   * @author Wolfgang Bangerth, Jean-Paul Pelteret, 2017
+   */
+  template <typename T, typename U>
+  struct ProductTypeImpl
+  {
+    typedef decltype(std::declval<T>() * std::declval<U>()) type;
+  };
+
+}
+
+
+
 /**
  * A class with a local typedef that represents the type that results from the
  * product of two variables of type @p T and @p U. In other words, we would
@@ -372,54 +397,60 @@ struct types_are_equal : std::is_same<T,U>
  * used for the result of computing the product of unknowns and the values,
  * gradients, or other properties of shape functions.
  *
- * @author Wolfgang Bangerth, 2015
+ * @author Wolfgang Bangerth, 2015, 2017
  */
 template <typename T, typename U>
 struct ProductType
 {
-  typedef decltype(std::declval<T>() * std::declval<U>()) type;
+  typedef typename internal::ProductTypeImpl<
+  typename std::decay<T>::type, typename std::decay<U>::type>::type type;
 };
 
-// Annoyingly, there is no std::complex<T>::operator*(U) for scalars U
-// other than T (not even in C++11, or C++14). We provide our own overloads
-// in base/complex_overloads.h, but in order for them to work, we have to
-// manually specify all products we want to allow:
-
-template <typename T>
-struct ProductType<std::complex<T>,std::complex<T> >
+namespace internal
 {
-  typedef std::complex<T> type;
-};
 
-template <typename T, typename U>
-struct ProductType<std::complex<T>,std::complex<U> >
-{
-  typedef std::complex<typename ProductType<T,U>::type> type;
-};
+  // Annoyingly, there is no std::complex<T>::operator*(U) for scalars U
+  // other than T (not even in C++11, or C++14). We provide our own overloads
+  // in base/complex_overloads.h, but in order for them to work, we have to
+  // manually specify all products we want to allow:
 
-template <typename U>
-struct ProductType<double,std::complex<U> >
-{
-  typedef std::complex<typename ProductType<double,U>::type> type;
-};
+  template <typename T>
+  struct ProductTypeImpl<std::complex<T>,std::complex<T> >
+  {
+    typedef std::complex<T> type;
+  };
 
-template <typename T>
-struct ProductType<std::complex<T>,double>
-{
-  typedef std::complex<typename ProductType<T,double>::type> type;
-};
+  template <typename T, typename U>
+  struct ProductTypeImpl<std::complex<T>,std::complex<U> >
+  {
+    typedef std::complex<typename ProductType<T,U>::type> type;
+  };
 
-template <typename U>
-struct ProductType<float,std::complex<U> >
-{
-  typedef std::complex<typename ProductType<float,U>::type> type;
-};
+  template <typename U>
+  struct ProductTypeImpl<double,std::complex<U> >
+  {
+    typedef std::complex<typename ProductType<double,U>::type> type;
+  };
 
-template <typename T>
-struct ProductType<std::complex<T>,float>
-{
-  typedef std::complex<typename ProductType<T,float>::type> type;
-};
+  template <typename T>
+  struct ProductTypeImpl<std::complex<T>,double>
+  {
+    typedef std::complex<typename ProductType<T,double>::type> type;
+  };
+
+  template <typename U>
+  struct ProductTypeImpl<float,std::complex<U> >
+  {
+    typedef std::complex<typename ProductType<float,U>::type> type;
+  };
+
+  template <typename T>
+  struct ProductTypeImpl<std::complex<T>,float>
+  {
+    typedef std::complex<typename ProductType<T,float>::type> type;
+  };
+
+}
 
 
 

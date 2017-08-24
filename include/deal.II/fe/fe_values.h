@@ -178,31 +178,31 @@ namespace FEValuesViews
        * A typedef for the data type of the product of a @p Number and the
        * values of the view the Scalar class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Scalar<dim,spacedim>::value_type>::type value_type;
+      typedef typename ProductType<Number, typename Scalar<dim,spacedim>::value_type>::type value_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * gradients of the view the Scalar class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Scalar<dim,spacedim>::gradient_type>::type gradient_type;
+      typedef typename ProductType<Number, typename Scalar<dim,spacedim>::gradient_type>::type gradient_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * laplacians of the view the Scalar class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Scalar<dim,spacedim>::value_type>::type laplacian_type;
+      typedef typename ProductType<Number, typename Scalar<dim,spacedim>::value_type>::type laplacian_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * hessians of the view the Scalar class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Scalar<dim,spacedim>::hessian_type>::type hessian_type;
+      typedef typename ProductType<Number, typename Scalar<dim,spacedim>::hessian_type>::type hessian_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * third derivatives of the view the Scalar class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Scalar<dim,spacedim>::third_derivative_type>::type third_derivative_type;
+      typedef typename ProductType<Number, typename Scalar<dim,spacedim>::third_derivative_type>::type third_derivative_type;
     };
 
     /**
@@ -595,49 +595,49 @@ namespace FEValuesViews
        * A typedef for the data type of the product of a @p Number and the
        * values of the view the Vector class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Vector<dim,spacedim>::value_type>::type value_type;
+      typedef typename ProductType<Number, typename Vector<dim,spacedim>::value_type>::type value_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * gradients of the view the Vector class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Vector<dim,spacedim>::gradient_type>::type gradient_type;
+      typedef typename ProductType<Number, typename Vector<dim,spacedim>::gradient_type>::type gradient_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * symmetric gradients of the view the Vector class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Vector<dim,spacedim>::symmetric_gradient_type>::type symmetric_gradient_type;
+      typedef typename ProductType<Number, typename Vector<dim,spacedim>::symmetric_gradient_type>::type symmetric_gradient_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * divergences of the view the Vector class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Vector<dim,spacedim>::divergence_type>::type divergence_type;
+      typedef typename ProductType<Number, typename Vector<dim,spacedim>::divergence_type>::type divergence_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * laplacians of the view the Vector class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Vector<dim,spacedim>::value_type>::type laplacian_type;
+      typedef typename ProductType<Number, typename Vector<dim,spacedim>::value_type>::type laplacian_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * curls of the view the Vector class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Vector<dim,spacedim>::curl_type>::type curl_type;
+      typedef typename ProductType<Number, typename Vector<dim,spacedim>::curl_type>::type curl_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * hessians of the view the Vector class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Vector<dim,spacedim>::hessian_type>::type hessian_type;
+      typedef typename ProductType<Number, typename Vector<dim,spacedim>::hessian_type>::type hessian_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * third derivatives of the view the Vector class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Vector<dim,spacedim>::third_derivative_type>::type third_derivative_type;
+      typedef typename ProductType<Number, typename Vector<dim,spacedim>::third_derivative_type>::type third_derivative_type;
     };
 
     /**
@@ -1157,13 +1157,13 @@ namespace FEValuesViews
        * A typedef for the data type of the product of a @p Number and the
        * values of the view the SymmetricTensor class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename SymmetricTensor<2,dim,spacedim>::value_type>::type value_type;
+      typedef typename ProductType<Number, typename SymmetricTensor<2,dim,spacedim>::value_type>::type value_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * divergences of the view the SymmetricTensor class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename SymmetricTensor<2,dim,spacedim>::divergence_type>::type divergence_type;
+      typedef typename ProductType<Number, typename SymmetricTensor<2,dim,spacedim>::divergence_type>::type divergence_type;
     };
 
     /**
@@ -1413,13 +1413,13 @@ namespace FEValuesViews
        * A typedef for the data type of the product of a @p Number and the
        * values of the view the Tensor class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Tensor<2,dim,spacedim>::value_type>::type value_type;
+      typedef typename ProductType<Number, typename Tensor<2,dim,spacedim>::value_type>::type value_type;
 
       /**
        * A typedef for the data type of the product of a @p Number and the
        * divergences of the view the Tensor class.
        */
-      typedef typename ProductType<typename std::decay<Number>::type, typename Tensor<2,dim,spacedim>::divergence_type>::type divergence_type;
+      typedef typename ProductType<Number, typename Tensor<2,dim,spacedim>::divergence_type>::type divergence_type;
     };
 
     /**
