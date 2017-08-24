@@ -158,10 +158,10 @@
  *   partitioning may also sometimes consist of disconnected
  *   parts, such as shown at the top right. However, it can be
  *   proven that each subdomain consists of at most two disconnected
- *   pieces; see C. Burstedde, T. Isaac: "Morton curve segments produce
- *   no more than two distinct face-connected subdomains",
+ *   pieces; see C. Burstedde, J. Holke, T. Isaac: "Bounds on the number of
+ *   discontinuities of Morton-type space-filling curves",
  *   <a href="http://arxiv.org/abs/1505.05055">arXiv 1505.05055</a>,
- *   2015.)
+ *   2017.)
  *
  *
  * <h4>Distributed degree of freedom handler</h4>
