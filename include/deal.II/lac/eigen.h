@@ -239,10 +239,10 @@ EigenPower<VectorType>::solve (double           &value,
 
   deallog.push("Power method");
 
-  VectorType *Vy = this->memory.alloc ();
+  typename VectorMemory<VectorType>::Pointer Vy (this->memory);
   VectorType &y = *Vy;
   y.reinit (x);
-  VectorType *Vr = this->memory.alloc ();
+  typename VectorMemory<VectorType>::Pointer Vr (this->memory);
   VectorType &r = *Vr;
   r.reinit (x);
 
@@ -290,9 +290,6 @@ EigenPower<VectorType>::solve (double           &value,
       // Brrr, this is not really a good criterion
       conv = this->iteration_status (iter, std::fabs(1./length-1./old_length), x);
     }
-
-  this->memory.free(Vy);
-  this->memory.free(Vr);
 
   deallog.pop();
 

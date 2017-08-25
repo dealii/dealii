@@ -750,26 +750,22 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
   {
     static GrowingVectorMemory<Range> vector_memory;
 
-    Range *i = vector_memory.alloc();
+    typename VectorMemory<Range>::Pointer i (vector_memory);
     op.reinit_domain_vector(*i, /*bool omit_zeroing_entries =*/ true);
 
     comp.apply(*i);
     op.vmult(v, *i);
-
-    vector_memory.free(i);
   };
 
   return_comp.apply_add = [op, comp](Domain &v)
   {
     static GrowingVectorMemory<Range> vector_memory;
 
-    Range *i = vector_memory.alloc();
+    typename VectorMemory<Range>::Pointer i (vector_memory);
     op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
 
     comp.apply(*i);
     op.vmult_add(v, *i);
-
-    vector_memory.free(i);
   };
 
   return return_comp;
@@ -800,26 +796,22 @@ operator*(const PackagedOperation<Range> &comp,
   {
     static GrowingVectorMemory<Range> vector_memory;
 
-    Range *i = vector_memory.alloc();
+    typename VectorMemory<Range>::Pointer i (vector_memory);
     op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
 
     comp.apply(*i);
     op.Tvmult(v, *i);
-
-    vector_memory.free(i);
   };
 
   return_comp.apply_add = [op, comp](Domain &v)
   {
     static GrowingVectorMemory<Range> vector_memory;
 
-    Range *i = vector_memory.alloc();
+    typename VectorMemory<Range>::Pointer i (vector_memory);
     op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
 
     comp.apply(*i);
     op.Tvmult_add(v, *i);
-
-    vector_memory.free(i);
   };
 
   return return_comp;
