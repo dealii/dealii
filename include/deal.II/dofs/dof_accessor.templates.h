@@ -3069,14 +3069,15 @@ namespace internal
       template <int dim, int spacedim, bool level_dof_access>
       static
       void
-      set_active_fe_index (const DoFCellAccessor<DoFHandler<dim,spacedim>, level_dof_access> &,
+      set_active_fe_index (const DoFCellAccessor<DoFHandler<dim,spacedim>, level_dof_access> &accessor,
                            const unsigned int                                i)
       {
+        (void)accessor;
         (void)i;
         // ::DoFHandler only supports a single active fe with index
         // zero
         Assert (i == 0,
-                (typename dealii::DoFAccessor<dim,DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
+                (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
       }
 
 
@@ -3088,7 +3089,7 @@ namespace internal
                            const unsigned int                                      i)
       {
         Assert (accessor.dof_handler != nullptr,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
+                (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (static_cast<unsigned int>(accessor.level()) <
                 accessor.dof_handler->levels.size(),
                 ExcMessage ("DoFHandler not initialized"));
@@ -3108,13 +3109,13 @@ namespace internal
                                   OutputVector   &global_destination)
       {
         Assert (accessor.dof_handler != nullptr,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
+                (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (static_cast<unsigned int>(local_source_end-local_source_begin)
                 ==
                 accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
 
         Assert (!accessor.has_children(),
                 ExcMessage ("Cell must be active"));
@@ -3139,11 +3140,11 @@ namespace internal
                                   OutputVector   &global_destination)
       {
         Assert (accessor.dof_handler != 0,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
+                (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
 
         const unsigned int n_dofs = local_source_end - local_source_begin;
 
@@ -3169,11 +3170,11 @@ namespace internal
                                   OutputVector           &global_destination)
       {
         Assert (accessor.dof_handler != 0,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
+                (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
 
         Assert (!accessor.has_children(),
                 ExcMessage ("Cell must be active."));
@@ -3200,11 +3201,11 @@ namespace internal
                                   OutputVector           &global_destination)
       {
         Assert (accessor.dof_handler != 0,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
+                (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
 
         const unsigned int n_dofs = local_source_end - local_source_begin;
 
@@ -3229,15 +3230,15 @@ namespace internal
                                   OutputMatrix                     &global_destination)
       {
         Assert (accessor.dof_handler != nullptr,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
+                (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (local_source.n() == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.m(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.n(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
 
         Assert (!accessor.has_children(),
                 ExcMessage ("Cell must be active."));
@@ -3263,15 +3264,15 @@ namespace internal
                                   OutputMatrix                     &global_destination)
       {
         Assert (accessor.dof_handler != 0,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
+                (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (local_source.n() == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.m(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_destination.n(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
 
         const unsigned int n_dofs = local_source.size();
 
@@ -3298,19 +3299,19 @@ namespace internal
                                   OutputVector                     &global_vector)
       {
         Assert (accessor.dof_handler != 0,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
+                (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (local_matrix.n() == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_matrix.m(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_matrix.n(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (local_vector.size() == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_vector.size(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
 
         Assert (!accessor.has_children(),
                 ExcMessage ("Cell must be active."));
@@ -3340,19 +3341,19 @@ namespace internal
                                   OutputVector                     &global_vector)
       {
         Assert (accessor.dof_handler != 0,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcInvalidObject()));
+                (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (local_matrix.n() == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_matrix.m(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_matrix.n(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcMatrixDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
         Assert (local_vector.size() == accessor.get_fe().dofs_per_cell,
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
         Assert (accessor.dof_handler->n_dofs() == global_vector.size(),
-                (typename DoFCellAccessor<dealii::DoFHandler<dim,spacedim>, level_dof_access>::ExcVectorDoesNotMatch()));
+                (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
 
         const unsigned int n_dofs = local_matrix.size();
 
