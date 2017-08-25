@@ -758,8 +758,8 @@ block_forward_substitution(const BlockLinearOperator<Range, Domain, BlockPayload
     if (m == 0)
       return;
 
-    static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
-    typename Range::BlockType *tmp = vector_memory.alloc();
+    static GrowingVectorMemory<typename Range::BlockType> vector_memory;
+    typename VectorMemory<typename Range::BlockType>::Pointer tmp (vector_memory);
 
     diagonal_inverse.block(0, 0).vmult_add(v.block(0), u.block(0));
 
@@ -773,8 +773,6 @@ block_forward_substitution(const BlockLinearOperator<Range, Domain, BlockPayload
         *tmp *= -1.;
         diagonal_inverse.block(i, i).vmult_add(v.block(i),*tmp);
       }
-
-    vector_memory.free(tmp);
   };
 
   return return_op;
@@ -867,8 +865,8 @@ block_back_substitution(const BlockLinearOperator<Range, Domain, BlockPayload> &
            ExcDimensionMismatch(diagonal_inverse.n_block_cols(), m));
     Assert(v.n_blocks() == m, ExcDimensionMismatch(v.n_blocks(), m));
     Assert(u.n_blocks() == m, ExcDimensionMismatch(u.n_blocks(), m));
-    static GrowingVectorMemory<typename  Range::BlockType> vector_memory;
-    typename  Range::BlockType *tmp = vector_memory.alloc();
+    static GrowingVectorMemory<typename Range::BlockType> vector_memory;
+    typename VectorMemory<typename Range::BlockType>::Pointer tmp (vector_memory);
 
     if (m == 0)
       return;
@@ -885,8 +883,6 @@ block_back_substitution(const BlockLinearOperator<Range, Domain, BlockPayload> &
         *tmp *= -1.;
         diagonal_inverse.block(i, i).vmult_add(v.block(i),*tmp);
       }
-
-    vector_memory.free(tmp);
   };
 
   return return_op;

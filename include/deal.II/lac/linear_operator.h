@@ -582,44 +582,40 @@ operator*(const LinearOperator<Range, Intermediate, Payload> &first_op,
       {
         static GrowingVectorMemory<Intermediate> vector_memory;
 
-        Intermediate *i = vector_memory.alloc();
+        typename VectorMemory<Intermediate>::Pointer i (vector_memory);
         second_op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
         second_op.vmult(*i, u);
         first_op.vmult(v, *i);
-        vector_memory.free(i);
       };
 
       return_op.vmult_add = [first_op, second_op](Range &v, const Domain &u)
       {
         static GrowingVectorMemory<Intermediate> vector_memory;
 
-        Intermediate *i = vector_memory.alloc();
+        typename VectorMemory<Intermediate>::Pointer i (vector_memory);
         second_op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
         second_op.vmult(*i, u);
         first_op.vmult_add(v, *i);
-        vector_memory.free(i);
       };
 
       return_op.Tvmult = [first_op, second_op](Domain &v, const Range &u)
       {
         static GrowingVectorMemory<Intermediate> vector_memory;
 
-        Intermediate *i = vector_memory.alloc();
+        typename VectorMemory<Intermediate>::Pointer i (vector_memory);
         first_op.reinit_domain_vector(*i, /*bool omit_zeroing_entries =*/ true);
         first_op.Tvmult(*i, u);
         second_op.Tvmult(v, *i);
-        vector_memory.free(i);
       };
 
       return_op.Tvmult_add = [first_op, second_op](Domain &v, const Range &u)
       {
         static GrowingVectorMemory<Intermediate> vector_memory;
 
-        Intermediate *i = vector_memory.alloc();
+        typename VectorMemory<Intermediate>::Pointer i (vector_memory);
         first_op.reinit_domain_vector(*i, /*bool omit_zeroing_entries =*/ true);
         first_op.Tvmult(*i, u);
         second_op.Tvmult_add(v, *i);
-        vector_memory.free(i);
       };
 
       return return_op;
@@ -701,11 +697,10 @@ inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
   {
     static GrowingVectorMemory<Range> vector_memory;
 
-    Range *v2 = vector_memory.alloc();
+    typename VectorMemory<Range>::Pointer v2 (vector_memory);
     op.reinit_range_vector(*v2, /*bool omit_zeroing_entries =*/ false);
     solver.solve(op, *v2, u, preconditioner);
     v += *v2;
-    vector_memory.free(v2);
   };
 
   return_op.Tvmult = [op, &solver, &preconditioner](Range &v, const Domain &u)
@@ -719,11 +714,10 @@ inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
   {
     static GrowingVectorMemory<Range> vector_memory;
 
-    Range *v2 = vector_memory.alloc();
+    typename VectorMemory<Range>::Pointer v2 (vector_memory);
     op.reinit_range_vector(*v2, /*bool omit_zeroing_entries =*/ false);
     solver.solve(transpose_operator(op), *v2, u, preconditioner);
     v += *v2;
-    vector_memory.free(v2);
   };
 
   return return_op;
@@ -1041,7 +1035,7 @@ namespace
   {
     static GrowingVectorMemory<Range> vector_memory;
 
-    Range *i = vector_memory.alloc();
+    typename VectorMemory<Range>::Pointer i (vector_memory);
     i->reinit(v, /*bool omit_zeroing_entries =*/true);
 
     function(*i, u);
@@ -1050,8 +1044,6 @@ namespace
       v += *i;
     else
       v = *i;
-
-    vector_memory.free(i);
   }
 
 
