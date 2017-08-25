@@ -461,7 +461,7 @@ void DataOutRotation<dim,DoFHandlerType>::build_patches (const unsigned int n_pa
                n_subdivisions, n_patches_per_circle,
                n_postprocessor_outputs,
                StaticMappingQ1<dimension,space_dimension>::mapping,
-               this->get_finite_elements(),
+               this->get_fes(),
                update_flags);
   std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> >
   new_patches (n_patches_per_circle);

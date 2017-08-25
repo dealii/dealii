@@ -40,7 +40,7 @@ namespace Functions
    const VectorType     &myv,
    const Mapping<dim>   &mymapping)
     :
-    Function<dim,typename VectorType::value_type>(mydh.get_finite_element(0).n_components()),
+    Function<dim,typename VectorType::value_type>(mydh.get_fe(0).n_components()),
     dh(&mydh, "FEFieldFunction"),
     data_vector(myv),
     mapping(mymapping),

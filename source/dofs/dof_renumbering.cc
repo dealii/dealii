@@ -1447,7 +1447,7 @@ namespace DoFRenumbering
             ExcDimensionMismatch(reverse.size(), dof.n_dofs(level)));
 
     unsigned int n_global_dofs = dof.n_dofs(level);
-    unsigned int n_cell_dofs = dof.get_finite_element().n_dofs_per_cell();
+    unsigned int n_cell_dofs = dof.get_fe().n_dofs_per_cell();
 
     std::vector<bool> already_sorted(n_global_dofs, false);
     std::vector<types::global_dof_index> cell_dofs(n_cell_dofs);
@@ -1622,19 +1622,19 @@ namespace DoFRenumbering
       }
     else
       {
-        Assert (dof.get_finite_element().has_support_points(),
+        Assert (dof.get_fe().has_support_points(),
                 typename FiniteElement<DoFHandlerType::dimension>::ExcFEHasNoSupportPoints());
         const unsigned int n_dofs = dof.n_dofs(level);
         std::vector<std::pair<Point<DoFHandlerType::space_dimension>,unsigned int> > support_point_list
         (n_dofs);
 
-        Quadrature<DoFHandlerType::dimension>   q_dummy(dof.get_finite_element().get_unit_support_points());
-        FEValues<DoFHandlerType::dimension,DoFHandlerType::space_dimension> fe_values (dof.get_finite_element(), q_dummy,
+        Quadrature<DoFHandlerType::dimension>   q_dummy(dof.get_fe().get_unit_support_points());
+        FEValues<DoFHandlerType::dimension,DoFHandlerType::space_dimension> fe_values (dof.get_fe(), q_dummy,
             update_quadrature_points);
 
         std::vector<bool> already_touched (dof.n_dofs(), false);
 
-        const unsigned int dofs_per_cell = dof.get_finite_element().dofs_per_cell;
+        const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
         std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
         typename DoFHandlerType::level_cell_iterator begin = dof.begin(level);
         typename DoFHandlerType::level_cell_iterator end = dof.end(level);

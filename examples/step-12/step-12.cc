@@ -257,7 +257,7 @@ namespace Step12
     // formula with number of points one higher than the polynomial degree
     // used. Since the quadratures for cells, boundary and interior faces can
     // be selected independently, we have to hand over this value three times.
-    const unsigned int n_gauss_points = dof_handler.get_finite_element().degree+1;
+    const unsigned int n_gauss_points = dof_handler.get_fe().degree+1;
     info_box.initialize_gauss_quadrature(n_gauss_points,
                                          n_gauss_points,
                                          n_gauss_points);

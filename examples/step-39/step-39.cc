@@ -759,7 +759,7 @@ namespace Step39
 
     // This starts like before,
     MeshWorker::IntegrationInfoBox<dim> info_box;
-    const unsigned int n_gauss_points = dof_handler.get_finite_element().tensor_degree()+1;
+    const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
     info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
 
     // but now we need to notify the info box of the finite element function we
@@ -827,7 +827,7 @@ namespace Step39
       cell->set_user_index(i);
 
     MeshWorker::IntegrationInfoBox<dim> info_box;
-    const unsigned int n_gauss_points = dof_handler.get_finite_element().tensor_degree()+1;
+    const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
     info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
 
     AnyData solution_data;

@@ -335,7 +335,7 @@ void DataOutFaces<dim,DoFHandlerType>::build_patches (const Mapping<dimension> &
                n_subdivisions,
                n_postprocessor_outputs,
                mapping,
-               this->get_finite_elements(),
+               this->get_fes(),
                update_flags);
   DataOutBase::Patch<dimension-1,space_dimension> sample_patch;
   sample_patch.n_subdivisions = n_subdivisions;

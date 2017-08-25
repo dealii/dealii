@@ -82,7 +82,7 @@ namespace internal
       IndexSet globally_relevant;
       DoFTools::extract_locally_relevant_dofs(mg_dof, globally_relevant);
 
-      const unsigned int dofs_per_cell = mg_dof.get_finite_element().dofs_per_cell;
+      const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
       std::vector<types::global_dof_index> global_dof_indices (dofs_per_cell);
       std::vector<types::global_dof_index> level_dof_indices  (dofs_per_cell);
 
@@ -395,10 +395,10 @@ namespace internal
                             const dealii::DoFHandler<dim> &mg_dof)
     {
       // currently, we have only FE_Q and FE_DGQ type elements implemented
-      elem_info.n_components = mg_dof.get_finite_element().element_multiplicity(0);
+      elem_info.n_components = mg_dof.get_fe().element_multiplicity(0);
       AssertDimension(Utilities::fixed_power<dim>(fe.dofs_per_cell)*elem_info.n_components,
-                      mg_dof.get_finite_element().dofs_per_cell);
-      AssertDimension(fe.degree, mg_dof.get_finite_element().degree);
+                      mg_dof.get_fe().dofs_per_cell);
+      AssertDimension(fe.degree, mg_dof.get_fe().degree);
       elem_info.fe_degree = fe.degree;
       elem_info.element_is_continuous = fe.dofs_per_vertex > 0;
       Assert(fe.dofs_per_vertex < 2, ExcNotImplemented());
@@ -430,7 +430,7 @@ namespace internal
       elem_info.n_child_cell_dofs = elem_info.n_components*Utilities::fixed_power<dim>(n_child_dofs_1d);
       const Quadrature<1> dummy_quadrature(std::vector<Point<1> >(1, Point<1>()));
       internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
-      shape_info.reinit(dummy_quadrature, mg_dof.get_finite_element(), 0);
+      shape_info.reinit(dummy_quadrature, mg_dof.get_fe(), 0);
       elem_info.lexicographic_numbering = shape_info.lexicographic_numbering;
 
       // step 1.4: get the 1d prolongation matrix and combine from both children
@@ -494,8 +494,8 @@ namespace internal
       // ---------------------------- 1. Extract 1D info about the finite element
       // step 1.1: create a 1D copy of the finite element from FETools where we
       // substitute the template argument
-      AssertDimension(mg_dof.get_finite_element().n_base_elements(), 1);
-      std::string fe_name = mg_dof.get_finite_element().base_element(0).get_name();
+      AssertDimension(mg_dof.get_fe().n_base_elements(), 1);
+      std::string fe_name = mg_dof.get_fe().base_element(0).get_name();
       {
         const std::size_t template_starts = fe_name.find_first_of('<');
         Assert (fe_name[template_starts+1] == (dim==1?'1':(dim==2?'2':'3')),
@@ -518,7 +518,7 @@ namespace internal
       for (unsigned int level=0; level<std::min(tria.n_levels(),n_levels-1); ++level)
         coarse_level_indices[level].resize(tria.n_raw_cells(level),
                                            numbers::invalid_unsigned_int);
-      std::vector<types::global_dof_index> local_dof_indices(mg_dof.get_finite_element().dofs_per_cell);
+      std::vector<types::global_dof_index> local_dof_indices(mg_dof.get_fe().dofs_per_cell);
       dirichlet_indices.resize(n_levels-1);
 
       // We use the vectors stored ghosted_level_vector in the base class for
@@ -616,13 +616,13 @@ namespace internal
                         parent_index = start_index/elem_info.n_child_cell_dofs + tria.n_cells(level);
                       parent_child_connect[level][child_index] =
                         std::make_pair(parent_index, c);
-                      AssertIndexRange(mg_dof.get_finite_element().dofs_per_cell,
+                      AssertIndexRange(mg_dof.get_fe().dofs_per_cell,
                                        static_cast<unsigned short>(-1));
 
                       // set Dirichlet boundary conditions (as a list of
                       // constrained DoFs) for the child
                       if (mg_constrained_dofs != nullptr)
-                        for (unsigned int i=0; i<mg_dof.get_finite_element().dofs_per_cell; ++i)
+                        for (unsigned int i=0; i<mg_dof.get_fe().dofs_per_cell; ++i)
                           if (mg_constrained_dofs->is_boundary_index(level,
                                                                      local_dof_indices[elem_info.lexicographic_numbering[i]]))
                             dirichlet_indices[level][child_index].push_back(i);
@@ -660,7 +660,7 @@ namespace internal
 
                   dirichlet_indices[0].emplace_back();
                   if (mg_constrained_dofs != nullptr)
-                    for (unsigned int i=0; i<mg_dof.get_finite_element().dofs_per_cell; ++i)
+                    for (unsigned int i=0; i<mg_dof.get_fe().dofs_per_cell; ++i)
                       if (mg_constrained_dofs->is_boundary_index(0, local_dof_indices[elem_info.lexicographic_numbering[i]]))
                         dirichlet_indices[0].back().push_back(i);
                 }

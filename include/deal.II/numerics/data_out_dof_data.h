@@ -856,7 +856,7 @@ protected:
    * dummy object of FE_DGQ<dim>(0) in case only the triangulation is used.
    */
   std::vector<std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,DoFHandlerType::space_dimension> > >
-  get_finite_elements() const;
+  get_fes() const;
 
   /**
    * Overload of the respective DataOutInterface::get_vector_data_ranges()

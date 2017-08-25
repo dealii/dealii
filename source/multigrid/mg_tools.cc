@@ -548,7 +548,7 @@ namespace MGTools
     Assert (sparsity.n_cols() == n_dofs,
             ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
 
-    const unsigned int dofs_per_cell = dof.get_finite_element().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     typename DoFHandlerType::cell_iterator cell = dof.begin(level),
                                            endc = dof.end(level);
@@ -581,7 +581,7 @@ namespace MGTools
     Assert (sparsity.n_cols() == n_dofs,
             ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
 
-    const unsigned int dofs_per_cell = dof.get_finite_element().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
     typename DoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
@@ -663,7 +663,7 @@ namespace MGTools
     Assert (sparsity.n_cols() == fine_dofs,
             ExcDimensionMismatch (sparsity.n_cols(), fine_dofs));
 
-    const unsigned int dofs_per_cell = dof.get_finite_element().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
     typename DoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
@@ -718,7 +718,7 @@ namespace MGTools
                               const Table<2,DoFTools::Coupling> &int_mask,
                               const Table<2,DoFTools::Coupling> &flux_mask)
   {
-    const FiniteElement<dim> &fe = dof.get_finite_element();
+    const FiniteElement<dim> &fe = dof.get_fe();
     const types::global_dof_index n_dofs = dof.n_dofs(level);
     const unsigned int n_comp = fe.n_components();
     (void)n_dofs;
@@ -899,7 +899,7 @@ namespace MGTools
                                    const unsigned int                 level,
                                    const Table<2,DoFTools::Coupling> &flux_mask)
   {
-    const FiniteElement<dim> &fe = dof.get_finite_element();
+    const FiniteElement<dim> &fe = dof.get_fe();
     const unsigned int n_comp = fe.n_components();
     (void)n_comp;
 
@@ -922,7 +922,7 @@ namespace MGTools
     Assert (flux_mask.n_cols() == n_comp,
             ExcDimensionMismatch (flux_mask.n_cols(), n_comp));
 
-    const unsigned int dofs_per_cell = dof.get_finite_element().dofs_per_cell;
+    const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
     std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
     Table<2,bool> support_on_face(dofs_per_cell, GeometryInfo<dim>::faces_per_cell);
@@ -989,7 +989,7 @@ namespace MGTools
                             bool                              only_once,
                             std::vector<unsigned int>         target_component)
   {
-    const FiniteElement<dim> &fe = dof_handler.get_finite_element();
+    const FiniteElement<dim> &fe = dof_handler.get_fe();
     const unsigned int n_components = fe.n_components();
     const unsigned int nlevels = dof_handler.get_triangulation().n_global_levels();
 
@@ -1071,7 +1071,7 @@ namespace MGTools
                   }
               }
             // finally sanity check
-            Assert (!dof_handler.get_finite_element().is_primitive()
+            Assert (!dof_handler.get_fe().is_primitive()
                     ||
                     std::accumulate (result[l].begin(),
                                      result[l].end(), 0U)
@@ -1091,7 +1091,7 @@ namespace MGTools
    std::vector<std::vector<types::global_dof_index> > &dofs_per_block,
    std::vector<unsigned int>                           target_block)
   {
-    const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe = dof_handler.get_finite_element();
+    const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe = dof_handler.get_fe();
     const unsigned int n_blocks = fe.n_blocks();
     const unsigned int n_levels = dof_handler.get_triangulation().n_global_levels();
 
@@ -1366,7 +1366,7 @@ namespace MGTools
             ExcDimensionMismatch (non_interface_dofs.size(),
                                   mg_dof_handler.get_triangulation().n_global_levels()));
 
-    const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_finite_element();
+    const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
 
     const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int   dofs_per_face   = fe.dofs_per_face;
@@ -1438,7 +1438,7 @@ namespace MGTools
     std::vector<std::vector<types::global_dof_index> >
     tmp_interface_dofs(interface_dofs.size());
 
-    const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_finite_element();
+    const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
 
     const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int   dofs_per_face   = fe.dofs_per_face;

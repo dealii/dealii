@@ -679,7 +679,7 @@ namespace MatrixCreator
     Assert (matrix.n() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim,spacedim>      fe_collection (dof.get_finite_element());
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
     hp::QCollection<dim>                q_collection (q);
     hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,number>
@@ -736,7 +736,7 @@ namespace MatrixCreator
     Assert (matrix.n() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim,spacedim>      fe_collection (dof.get_finite_element());
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
     hp::QCollection<dim>                q_collection (q);
     hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,number>
@@ -1210,7 +1210,7 @@ namespace MatrixCreator
         return;
       }
 
-    const FiniteElement<dim,spacedim> &fe = dof.get_finite_element();
+    const FiniteElement<dim,spacedim> &fe = dof.get_fe();
     const unsigned int n_components  = fe.n_components();
 
     Assert (matrix.n() == dof.n_boundary_dofs (boundary_functions),
@@ -1706,7 +1706,7 @@ namespace MatrixCreator
     Assert (matrix.n() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim,spacedim>      fe_collection (dof.get_finite_element());
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
     hp::QCollection<dim>                q_collection (q);
     hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,double>
@@ -1764,7 +1764,7 @@ namespace MatrixCreator
     Assert (matrix.n() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
 
-    hp::FECollection<dim,spacedim>      fe_collection (dof.get_finite_element());
+    hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
     hp::QCollection<dim>                q_collection (q);
     hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
     MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim,double>

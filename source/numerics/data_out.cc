@@ -445,7 +445,7 @@ void DataOut<dim,DoFHandlerType>::build_patches
   thread_data (n_datasets, n_subdivisions,
                n_postprocessor_outputs,
                mapping,
-               this->get_finite_elements(),
+               this->get_fes(),
                update_flags,
                cell_to_patch_index_map);
 

@@ -207,7 +207,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
  const ComponentMask  mask)
   :
   euler_vector(&euler_vector),
-  fe(&euler_dof_handler.get_finite_element()),
+  fe(&euler_dof_handler.get_fe()),
   euler_dof_handler(&euler_dof_handler),
   fe_mask(mask.size() ? mask :
           ComponentMask(fe->get_nonzero_components(0).size(), true)),

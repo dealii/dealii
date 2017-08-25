@@ -774,7 +774,7 @@ namespace DerivativeApproximation
       // single quadratures, mappings,
       // and finite elements. if we have
       // an hp DoFHandler,
-      // dof_handler.get_finite_element() returns a
+      // dof_handler.get_fe() returns a
       // collection of which we do a
       // shallow copy instead
       const hp::QCollection<dim>       q_collection (midpoint_rule);
@@ -977,8 +977,8 @@ namespace DerivativeApproximation
       Assert (derivative_norm.size() == dof_handler.get_triangulation().n_active_cells(),
               ExcVectorLengthVsNActiveCells (derivative_norm.size(),
                                              dof_handler.get_triangulation().n_active_cells()));
-      Assert (component < dof_handler.get_finite_element(0).n_components(),
-              ExcIndexRange (component, 0, dof_handler.get_finite_element(0).n_components()));
+      Assert (component < dof_handler.get_fe(0).n_components(),
+              ExcIndexRange (component, 0, dof_handler.get_fe(0).n_components()));
 
       typedef std::tuple<TriaActiveIterator<dealii::DoFCellAccessor
       <DoFHandlerType<dim, spacedim>, false> >,

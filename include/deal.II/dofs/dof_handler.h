@@ -832,18 +832,11 @@ public:
 
   /**
    * Return a constant reference to the selected finite element object.
-   *
-   * @deprecated Use get_finite_element() instead.
-   */
-  const FiniteElement<dim,spacedim> &get_fe () const DEAL_II_DEPRECATED;
-
-  /**
-   * Return a constant reference to the selected finite element object.
    * Since there is only one FiniteElement @index must be equal to zero
    * which is also the default value.
    */
   const FiniteElement<dim,spacedim> &
-  get_finite_element (const unsigned int index=0) const;
+  get_fe (const unsigned int index=0) const;
 
   /**
     * Return a constant reference to the set of finite element objects that
@@ -1231,17 +1224,7 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor (const unsigned i
 template <int dim, int spacedim>
 inline
 const FiniteElement<dim,spacedim> &
-DoFHandler<dim,spacedim>::get_fe () const
-{
-  return this->get_finite_element();
-}
-
-
-
-template <int dim, int spacedim>
-inline
-const FiniteElement<dim,spacedim> &
-DoFHandler<dim,spacedim>::get_finite_element
+DoFHandler<dim,spacedim>::get_fe
 (const unsigned int index) const
 {
   (void) index;
@@ -1342,7 +1325,7 @@ void DoFHandler<dim,spacedim>::save (Archive &ar,
   // loading that this number is indeed correct; same with something that
   // identifies the FE and the policy
   unsigned int n_cells = tria->n_cells();
-  std::string  fe_name = this->get_finite_element().get_name();
+  std::string  fe_name = this->get_fe(0).get_name();
   std::string  policy_name = internal::policy_to_string(*policy);
 
   ar &n_cells &fe_name &policy_name;
@@ -1392,7 +1375,7 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
   AssertThrow (n_cells == tria->n_cells(),
                ExcMessage ("The object being loaded into does not match the triangulation "
                            "that has been stored previously."));
-  AssertThrow (fe_name == this->get_finite_element().get_name(),
+  AssertThrow (fe_name == this->get_fe(0).get_name(),
                ExcMessage ("The finite element associated with this DoFHandler does not match "
                            "the one that was associated with the DoFHandler previously stored."));
   AssertThrow (policy_name == internal::policy_to_string(*policy),
