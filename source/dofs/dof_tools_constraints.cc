@@ -724,7 +724,7 @@ namespace DoFTools
                             ExcNotImplemented());
 
                 // ok, start up the work
-                const FiniteElement<dim,spacedim> &fe       = cell->get_fe();
+                const FiniteElement<dim,spacedim> &fe       = cell->get_finite_element();
                 const unsigned int        fe_index = cell->active_fe_index();
 
                 const unsigned int
@@ -840,7 +840,7 @@ namespace DoFTools
                 // first of all, make sure that we treat a case which is
                 // possible, i.e. either no dofs on the face at all or no
                 // anisotropic refinement
-                if (cell->get_fe().dofs_per_face == 0)
+                if (cell->get_finite_element().dofs_per_face == 0)
                   continue;
 
                 Assert(cell->face(face)->refinement_case()==RefinementCase<dim-1>::isotropic_refinement,
@@ -888,7 +888,7 @@ namespace DoFTools
                   }
 
                 // ok, start up the work
-                const FiniteElement<dim> &fe       = cell->get_fe();
+                const FiniteElement<dim> &fe       = cell->get_finite_element();
                 const unsigned int        fe_index = cell->active_fe_index();
 
                 const unsigned int n_dofs_on_mother = fe.dofs_per_face;
@@ -1098,7 +1098,7 @@ namespace DoFTools
                 // first of all, make sure that we treat a case which is
                 // possible, i.e. either no dofs on the face at all or no
                 // anisotropic refinement
-                if (cell->get_fe().dofs_per_face == 0)
+                if (cell->get_finite_element().dofs_per_face == 0)
                   continue;
 
                 Assert(cell->face(face)->refinement_case()==RefinementCase<dim-1>::isotropic_refinement,
@@ -1142,8 +1142,8 @@ namespace DoFTools
                     if (!cell->neighbor_child_on_subface (face, c)->is_artificial())
                       {
                         mother_face_dominates = mother_face_dominates &
-                                                (cell->get_fe().compare_for_face_domination
-                                                 (cell->neighbor_child_on_subface (face, c)->get_fe()));
+                                                (cell->get_finite_element().compare_for_face_domination
+                                                 (cell->neighbor_child_on_subface (face, c)->get_finite_element()));
                         fe_ind_face_subface.insert(cell->neighbor_child_on_subface (face, c)->active_fe_index());
                       }
 
@@ -1159,7 +1159,7 @@ namespace DoFTools
                     //
                     // so we are going to constrain the DoFs on the face
                     // children against the DoFs on the face itself
-                    master_dofs.resize (cell->get_fe().dofs_per_face);
+                    master_dofs.resize (cell->get_finite_element().dofs_per_face);
 
                     cell->face(face)->get_dof_indices (master_dofs,
                                                        cell->active_fe_index ());
@@ -1191,15 +1191,15 @@ namespace DoFTools
                         // subface between FE_Q(1) and FE_Nothing, there
                         // are no constraints that we need to take care of.
                         // in that case, just continue
-                        if (cell->get_fe().compare_for_face_domination
-                            (subface->get_fe(subface_fe_index))
+                        if (cell->get_finite_element().compare_for_face_domination
+                            (subface->get_finite_element(subface_fe_index))
                             ==
                             FiniteElementDomination::no_requirements)
                           continue;
 
                         // Same procedure as for the mother cell. Extract
                         // the face DoFs from the cell DoFs.
-                        slave_dofs.resize (subface->get_fe(subface_fe_index)
+                        slave_dofs.resize (subface->get_finite_element(subface_fe_index)
                                            .dofs_per_face);
                         subface->get_dof_indices (slave_dofs, subface_fe_index);
 
@@ -1230,8 +1230,8 @@ namespace DoFTools
                         // result of projection verifies the approximation
                         // properties of a finite element onto that mesh
                         ensure_existence_of_subface_matrix
-                        (cell->get_fe(),
-                         subface->get_fe(subface_fe_index),
+                        (cell->get_finite_element(),
+                         subface->get_finite_element(subface_fe_index),
                          c,
                          subface_interpolation_matrices
                          [cell->active_fe_index()][subface_fe_index][c]);
@@ -1291,19 +1291,19 @@ namespace DoFTools
                     // first get the interpolation matrix from the mother
                     // to the virtual dofs
                     Assert (dominating_fe.dofs_per_face <=
-                            cell->get_fe().dofs_per_face,
+                            cell->get_finite_element().dofs_per_face,
                             ExcInternalError());
 
                     ensure_existence_of_face_matrix
                     (dominating_fe,
-                     cell->get_fe(),
+                     cell->get_finite_element(),
                      face_interpolation_matrices
                      [dominating_fe_index][cell->active_fe_index()]);
 
                     // split this matrix into master and slave components.
                     // invert the master component
                     ensure_existence_of_master_dof_mask
-                    (cell->get_fe(),
+                    (cell->get_finite_element(),
                      dominating_fe,
                      (*face_interpolation_matrices
                       [dominating_fe_index]
@@ -1330,7 +1330,7 @@ namespace DoFTools
 
                     // now compute the constraint matrix as the product
                     // between the inverse matrix and the slave part
-                    constraint_matrix.reinit (cell->get_fe().dofs_per_face -
+                    constraint_matrix.reinit (cell->get_finite_element().dofs_per_face -
                                               dominating_fe.dofs_per_face,
                                               dominating_fe.dofs_per_face);
                     restrict_mother_to_virtual_slave
@@ -1339,14 +1339,14 @@ namespace DoFTools
 
                     // then figure out the global numbers of master and
                     // slave dofs and apply constraints
-                    scratch_dofs.resize (cell->get_fe().dofs_per_face);
+                    scratch_dofs.resize (cell->get_finite_element().dofs_per_face);
                     cell->face(face)->get_dof_indices (scratch_dofs,
                                                        cell->active_fe_index ());
 
                     // split dofs into master and slave components
                     master_dofs.clear ();
                     slave_dofs.clear ();
-                    for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
+                    for (unsigned int i=0; i<cell->get_finite_element().dofs_per_face; ++i)
                       if ((*master_dof_masks
                            [dominating_fe_index][cell->active_fe_index()])[i] == true)
                         master_dofs.push_back (scratch_dofs[i]);
@@ -1355,7 +1355,7 @@ namespace DoFTools
 
                     AssertDimension (master_dofs.size(), dominating_fe.dofs_per_face);
                     AssertDimension (slave_dofs.size(),
-                                     cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face);
+                                     cell->get_finite_element().dofs_per_face - dominating_fe.dofs_per_face);
 
                     filter_constraints (master_dofs,
                                         slave_dofs,
@@ -1466,17 +1466,17 @@ namespace DoFTools
                     const typename DoFHandlerType::level_cell_iterator neighbor = cell->neighbor (face);
 
                     // see which side of the face we have to constrain
-                    switch (cell->get_fe().compare_for_face_domination (neighbor->get_fe ()))
+                    switch (cell->get_finite_element().compare_for_face_domination (neighbor->get_finite_element ()))
                       {
                       case FiniteElementDomination::this_element_dominates:
                       {
                         // Get DoFs on dominating and dominated side of the
                         // face
-                        master_dofs.resize (cell->get_fe().dofs_per_face);
+                        master_dofs.resize (cell->get_finite_element().dofs_per_face);
                         cell->face(face)->get_dof_indices (master_dofs,
                                                            cell->active_fe_index ());
 
-                        slave_dofs.resize (neighbor->get_fe().dofs_per_face);
+                        slave_dofs.resize (neighbor->get_finite_element().dofs_per_face);
                         cell->face(face)->get_dof_indices (slave_dofs,
                                                            neighbor->active_fe_index ());
 
@@ -1488,8 +1488,8 @@ namespace DoFTools
                         // make sure the element constraints for this face
                         // are available
                         ensure_existence_of_face_matrix
-                        (cell->get_fe(),
-                         neighbor->get_fe(),
+                        (cell->get_finite_element(),
+                         neighbor->get_finite_element(),
                          face_interpolation_matrices
                          [cell->active_fe_index()][neighbor->active_fe_index()]);
 
@@ -1566,9 +1566,9 @@ namespace DoFTools
 
                         AssertThrow(dominating_fe_index != numbers::invalid_unsigned_int,
                                     ExcMessage("Could not find the dominating FE for "
-                                               +cell->get_fe().get_name()
+                                               +cell->get_finite_element().get_name()
                                                +" and "
-                                               +neighbor->get_fe().get_name()
+                                               +neighbor->get_finite_element().get_name()
                                                +" inside FECollection."));
 
                         const FiniteElement<dim,spacedim> &dominating_fe = fe_collection[dominating_fe_index];
@@ -1579,19 +1579,19 @@ namespace DoFTools
                         // first get the interpolation matrix from main FE
                         // to the virtual dofs
                         Assert (dominating_fe.dofs_per_face <=
-                                cell->get_fe().dofs_per_face,
+                                cell->get_finite_element().dofs_per_face,
                                 ExcInternalError());
 
                         ensure_existence_of_face_matrix
                         (dominating_fe,
-                         cell->get_fe(),
+                         cell->get_finite_element(),
                          face_interpolation_matrices
                          [dominating_fe_index][cell->active_fe_index()]);
 
                         // split this matrix into master and slave components.
                         // invert the master component
                         ensure_existence_of_master_dof_mask
-                        (cell->get_fe(),
+                        (cell->get_finite_element(),
                          dominating_fe,
                          (*face_interpolation_matrices
                           [dominating_fe_index]
@@ -1618,7 +1618,7 @@ namespace DoFTools
 
                         // now compute the constraint matrix as the product
                         // between the inverse matrix and the slave part
-                        constraint_matrix.reinit (cell->get_fe().dofs_per_face -
+                        constraint_matrix.reinit (cell->get_finite_element().dofs_per_face -
                                                   dominating_fe.dofs_per_face,
                                                   dominating_fe.dofs_per_face);
                         restrict_mother_to_virtual_slave
@@ -1627,14 +1627,14 @@ namespace DoFTools
 
                         // then figure out the global numbers of master and
                         // slave dofs and apply constraints
-                        scratch_dofs.resize (cell->get_fe().dofs_per_face);
+                        scratch_dofs.resize (cell->get_finite_element().dofs_per_face);
                         cell->face(face)->get_dof_indices (scratch_dofs,
                                                            cell->active_fe_index ());
 
                         // split dofs into master and slave components
                         master_dofs.clear ();
                         slave_dofs.clear ();
-                        for (unsigned int i=0; i<cell->get_fe().dofs_per_face; ++i)
+                        for (unsigned int i=0; i<cell->get_finite_element().dofs_per_face; ++i)
                           if ((*master_dof_masks
                                [dominating_fe_index][cell->active_fe_index()])[i] == true)
                             master_dofs.push_back (scratch_dofs[i]);
@@ -1643,7 +1643,7 @@ namespace DoFTools
 
                         AssertDimension (master_dofs.size(), dominating_fe.dofs_per_face);
                         AssertDimension (slave_dofs.size(),
-                                         cell->get_fe().dofs_per_face - dominating_fe.dofs_per_face);
+                                         cell->get_finite_element().dofs_per_face - dominating_fe.dofs_per_face);
 
                         filter_constraints (master_dofs,
                                             slave_dofs,
@@ -1654,12 +1654,12 @@ namespace DoFTools
                         // this is pretty much the same we do above to
                         // resolve h-refinement constraints
                         Assert (dominating_fe.dofs_per_face <=
-                                neighbor->get_fe().dofs_per_face,
+                                neighbor->get_finite_element().dofs_per_face,
                                 ExcInternalError());
 
                         ensure_existence_of_face_matrix
                         (dominating_fe,
-                         neighbor->get_fe(),
+                         neighbor->get_finite_element(),
                          face_interpolation_matrices
                          [dominating_fe_index][neighbor->active_fe_index()]);
 
@@ -1667,14 +1667,14 @@ namespace DoFTools
                           = *(face_interpolation_matrices
                               [dominating_fe_index][neighbor->active_fe_index()]);
 
-                        constraint_matrix.reinit (neighbor->get_fe().dofs_per_face,
+                        constraint_matrix.reinit (neighbor->get_finite_element().dofs_per_face,
                                                   dominating_fe.dofs_per_face);
 
                         restrict_secondface_to_virtual
                         .mmult (constraint_matrix,
                                 restrict_mother_to_virtual_master_inv);
 
-                        slave_dofs.resize (neighbor->get_fe().dofs_per_face);
+                        slave_dofs.resize (neighbor->get_finite_element().dofs_per_face);
                         cell->face(face)->get_dof_indices (slave_dofs,
                                                            neighbor->active_fe_index ());
 
@@ -1779,7 +1779,7 @@ namespace DoFTools
           Assert (face_2->n_children() == GeometryInfo<dim>::max_children_per_face,
                   ExcNotImplemented());
           const unsigned int dofs_per_face
-            = face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
+            = face_1->get_finite_element(face_1->nth_active_fe_index(0)).dofs_per_face;
           FullMatrix<double> child_transformation (dofs_per_face, dofs_per_face);
           FullMatrix<double> subface_interpolation (dofs_per_face, dofs_per_face);
           for (unsigned int c=0; c<face_2->n_children(); ++c)
@@ -1788,8 +1788,8 @@ namespace DoFTools
               // interpolated from face_1 to face_2 by multiplying from the
               // left with the one that interpolates from face_2 to
               // its child
-              face_1->get_fe(face_1->nth_active_fe_index(0))
-              .get_subface_interpolation_matrix (face_1->get_fe(face_1->nth_active_fe_index(0)),
+              face_1->get_finite_element(face_1->nth_active_fe_index(0))
+              .get_subface_interpolation_matrix (face_1->get_finite_element(face_1->nth_active_fe_index(0)),
                                                  c,
                                                  subface_interpolation);
               subface_interpolation.mmult (child_transformation, transformation);
@@ -1804,10 +1804,10 @@ namespace DoFTools
         {
           const unsigned int face_1_index = face_1->nth_active_fe_index(0);
           const unsigned int face_2_index = face_2->nth_active_fe_index(0);
-          Assert(face_1->get_fe(face_1_index) == face_2->get_fe(face_2_index),
+          Assert(face_1->get_finite_element(face_1_index) == face_2->get_finite_element(face_2_index),
                  ExcMessage ("Matching periodic cells need to use the same finite element"));
 
-          const FiniteElement<dim, spacedim> &fe = face_1->get_fe(face_1_index);
+          const FiniteElement<dim, spacedim> &fe = face_1->get_finite_element(face_1_index);
 
           Assert(component_mask.represents_n_components(fe.n_components()),
                  ExcMessage ("The number of components in the mask has to be either "
@@ -2189,7 +2189,7 @@ namespace DoFTools
       {
         Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
         const unsigned int n_dofs_per_face =
-          face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
+          face_1->get_finite_element(face_1->nth_active_fe_index(0)).dofs_per_face;
 
         Assert(matrix.m() == 0
                || (first_vector_components.empty() && matrix.m() == n_dofs_per_face)
@@ -2204,7 +2204,7 @@ namespace DoFTools
       {
         Assert(face_2->n_active_fe_indices() == 1, ExcInternalError());
         const unsigned int n_dofs_per_face =
-          face_2->get_fe(face_2->nth_active_fe_index(0)).dofs_per_face;
+          face_2->get_finite_element(face_2->nth_active_fe_index(0)).dofs_per_face;
 
         Assert(matrix.m() == 0
                || (first_vector_components.empty() && matrix.m() == n_dofs_per_face)
@@ -2291,8 +2291,8 @@ namespace DoFTools
         // The finite element that matters is the one on the active face:
         const FiniteElement<dim,spacedim> &fe =
           face_1->has_children()
-          ? face_2->get_fe(face_2->nth_active_fe_index(0))
-          : face_1->get_fe(face_1->nth_active_fe_index(0));
+          ? face_2->get_finite_element(face_2->nth_active_fe_index(0))
+          : face_1->get_finite_element(face_1->nth_active_fe_index(0));
 
         const unsigned int n_dofs_per_face = fe.dofs_per_face;
 
@@ -3251,7 +3251,7 @@ namespace DoFTools
           &&
           cell->at_boundary ())
         {
-          const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+          const FiniteElement<dim,spacedim> &fe = cell->get_finite_element();
 
           // get global indices of dofs on the cell
           cell_dofs.resize (fe.dofs_per_cell);
@@ -3286,7 +3286,7 @@ namespace DoFTools
                       const unsigned int index_on_cell = std::distance(cell_dofs.begin(),
                                                                        it_index_on_cell);
                       const ComponentMask &nonzero_component_array
-                        = cell->get_fe().get_nonzero_components (index_on_cell);
+                        = cell->get_finite_element().get_nonzero_components (index_on_cell);
                       bool nonzero = false;
                       for (unsigned int c=0; c<n_components; ++c)
                         if (nonzero_component_array[c] && component_mask[c])

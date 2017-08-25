@@ -2502,7 +2502,7 @@ FEEvaluationBase<dim,n_components_,Number>
                     "instead"));
   Assert(mapped_geometry.get() != nullptr, ExcNotInitialized());
   mapped_geometry->reinit(static_cast<typename Triangulation<dim>::cell_iterator>(cell));
-  local_dof_indices.resize(cell->get_fe().dofs_per_cell);
+  local_dof_indices.resize(cell->get_finite_element().dofs_per_cell);
   if (level_dof_access)
     cell->get_mg_dof_indices(local_dof_indices);
   else

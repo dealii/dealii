@@ -216,7 +216,7 @@ namespace parallel
 
       typename DoFHandlerType::cell_iterator cell(*cell_, dof_handler);
 
-      const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell=cell->get_finite_element().dofs_per_cell;
       ::dealii::Vector<typename VectorType::value_type> dofvalues(dofs_per_cell);
       for (typename std::vector<const VectorType *>::iterator it=input_vectors.begin();
            it !=input_vectors.end();
@@ -240,7 +240,7 @@ namespace parallel
       typename DoFHandlerType::cell_iterator
       cell(*cell_, dof_handler);
 
-      const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
+      const unsigned int dofs_per_cell=cell->get_finite_element().dofs_per_cell;
       ::dealii::Vector<typename VectorType::value_type> dofvalues(dofs_per_cell);
       const typename VectorType::value_type *data_store = reinterpret_cast<const typename VectorType::value_type *>(data);
 

@@ -44,7 +44,7 @@ namespace LocalIntegrators
       const FEValuesBase<dim> &fe,
       const VectorSlice<const std::vector<std::vector<double> > > &input)
     {
-      const unsigned int n_comp = fe.get_fe().n_components();
+      const unsigned int n_comp = fe.get_finite_element().n_components();
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
       AssertDimension(result.n_rows(), fe.n_quadrature_points);
       AssertDimension(result.n_cols(), n_comp+dim);

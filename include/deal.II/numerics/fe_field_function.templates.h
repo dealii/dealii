@@ -91,7 +91,7 @@ namespace Functions
 
     // Now we can find out about the point
     Quadrature<dim> quad(qp.get());
-    FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
+    FEValues<dim> fe_v(mapping, cell->get_finite_element(), quad,
                        update_values);
     fe_v.reinit(cell);
     std::vector< Vector<typename VectorType::value_type> >
@@ -148,7 +148,7 @@ namespace Functions
 
     // Now we can find out about the point
     Quadrature<dim> quad(qp.get());
-    FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
+    FEValues<dim> fe_v(mapping, cell->get_finite_element(), quad,
                        update_gradients);
     fe_v.reinit(cell);
 
@@ -220,7 +220,7 @@ namespace Functions
 
     // Now we can find out about the point
     Quadrature<dim> quad(qp.get());
-    FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
+    FEValues<dim> fe_v(mapping, cell->get_finite_element(), quad,
                        update_hessians);
     fe_v.reinit(cell);
     std::vector< Vector<typename VectorType::value_type> >

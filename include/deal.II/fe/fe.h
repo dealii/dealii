@@ -737,8 +737,8 @@ public:
    * @endcode
    *
    * This code doesn't work in both situations without the present operator
-   * because DoFHandler::get_fe() returns a finite element, whereas
-   * hp::DoFHandler::get_fe() returns a collection of finite elements that
+   * because DoFHandler::get_finite_element() returns a finite element, whereas
+   * hp::DoFHandler::get_finite_element() returns a collection of finite elements that
    * doesn't offer a <code>dofs_per_cell</code> member variable: one first has
    * to select which finite element to work on, which is done using the
    * operator[]. Fortunately, <code>cell-@>active_fe_index()</code> also works

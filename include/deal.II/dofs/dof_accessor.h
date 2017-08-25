@@ -539,9 +539,19 @@ public:
    * Return a reference to the finite element used on this object with the
    * given @p fe_index. @p fe_index must be used on this object, i.e.
    * <code>fe_index_is_active(fe_index)</code> must return true.
+   *
+   * @deprecated Use get_finite_element() instead.
    */
   const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
-  get_fe (const unsigned int fe_index) const;
+  get_fe (const unsigned int fe_index) const  DEAL_II_DEPRECATED;
+
+  /**
+   * Return a reference to the finite element used on this object with the
+   * given @p fe_index. @p fe_index must be used on this object, i.e.
+   * <code>fe_index_is_active(fe_index)</code> must return true.
+   */
+  const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
+  get_finite_element (const unsigned int fe_index) const;
 
   /**
    * @}
@@ -1006,9 +1016,19 @@ public:
    * Return a reference to the finite element used on this object with the
    * given @p fe_index. @p fe_index must be used on this object, i.e.
    * <code>fe_index_is_active(fe_index)</code> must return true.
+   *
+   * @deprecated Use get_finite_element() instead.
    */
   const FiniteElement<DoFHandlerType<1,spacedim>::dimension,DoFHandlerType<1,spacedim>::space_dimension> &
-  get_fe (const unsigned int fe_index) const;
+  get_fe (const unsigned int fe_index) const DEAL_II_DEPRECATED;
+
+  /**
+   * Return a reference to the finite element used on this object with the
+   * given @p fe_index. @p fe_index must be used on this object, i.e.
+   * <code>fe_index_is_active(fe_index)</code> must return true.
+   */
+  const FiniteElement<DoFHandlerType<1,spacedim>::dimension,DoFHandlerType<1,spacedim>::space_dimension> &
+  get_finite_element (const unsigned int fe_index) const;
 
   /**
    * @}
@@ -1679,9 +1699,27 @@ public:
    * element on non-active cells since they do not have finite element spaces
    * associated with them without having any degrees of freedom. Consequently,
    * this function will produce an exception when called on non-active cells.
+   *
+   * @deprecated Use get_finite_element() instead.
    */
   const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
-  get_fe () const;
+  get_fe () const DEAL_II_DEPRECATED;
+
+  /**
+   * Return the finite element that is used on the cell pointed to by this
+   * iterator. For non-hp DoF handlers, this is of course always the same
+   * element, independent of the cell we are presently on, but for hp DoF
+   * handlers, this may change from cell to cell.
+   *
+   * @note Since degrees of freedoms only exist on active cells for
+   * hp::DoFHandler (i.e., there is currently no implementation of multilevel
+   * hp::DoFHandler objects), it does not make sense to query the finite
+   * element on non-active cells since they do not have finite element spaces
+   * associated with them without having any degrees of freedom. Consequently,
+   * this function will produce an exception when called on non-active cells.
+   */
+  const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &
+  get_finite_element () const;
 
   /**
    * Return the index inside the hp::FECollection of the FiniteElement used

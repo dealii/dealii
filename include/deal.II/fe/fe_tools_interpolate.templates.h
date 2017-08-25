@@ -143,9 +143,9 @@ namespace FETools
           ||
           (subdomain_id == numbers::invalid_subdomain_id))
         {
-          Assert(cell1->get_fe().n_components() == cell2->get_fe().n_components(),
-                 ExcDimensionMismatch (cell1->get_fe().n_components(),
-                                       cell2->get_fe().n_components()));
+          Assert(cell1->get_finite_element().n_components() == cell2->get_finite_element().n_components(),
+                 ExcDimensionMismatch (cell1->get_finite_element().n_components(),
+                                       cell2->get_finite_element().n_components()));
 
           // for continuous elements on
           // grids with hanging nodes we
@@ -155,7 +155,7 @@ namespace FETools
           // then hanging nodes are not
           // allowed.
           const bool hanging_nodes_not_allowed
-            = ((cell2->get_fe().dofs_per_vertex != 0) &&
+            = ((cell2->get_finite_element().dofs_per_vertex != 0) &&
                (constraints.n_constraints() == 0));
 
           if (hanging_nodes_not_allowed)
@@ -165,8 +165,8 @@ namespace FETools
                       ExcHangingNodesNotAllowed(0));
 
 
-          const unsigned int dofs_per_cell1 = cell1->get_fe().dofs_per_cell;
-          const unsigned int dofs_per_cell2 = cell2->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell1 = cell1->get_finite_element().dofs_per_cell;
+          const unsigned int dofs_per_cell2 = cell2->get_finite_element().dofs_per_cell;
           u1_local.reinit (dofs_per_cell1);
           u2_local.reinit (dofs_per_cell2);
 
@@ -174,21 +174,21 @@ namespace FETools
           // matrix for this particular
           // pair of elements is already
           // there
-          if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()].get() == nullptr)
+          if (interpolation_matrices[&cell1->get_finite_element()][&cell2->get_finite_element()].get() == nullptr)
             {
               std::shared_ptr<FullMatrix<double> >
               interpolation_matrix (new FullMatrix<double> (dofs_per_cell2,
                                                             dofs_per_cell1));
-              interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
+              interpolation_matrices[&cell1->get_finite_element()][&cell2->get_finite_element()]
                 = interpolation_matrix;
 
-              get_interpolation_matrix(cell1->get_fe(),
-                                       cell2->get_fe(),
+              get_interpolation_matrix(cell1->get_finite_element(),
+                                       cell2->get_finite_element(),
                                        *interpolation_matrix);
             }
 
           cell1->get_dof_values(u1, u1_local);
-          interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
+          interpolation_matrices[&cell1->get_finite_element()][&cell2->get_finite_element()]
           ->vmult(u2_local, u1_local);
 
           dofs.resize (dofs_per_cell2);
@@ -306,7 +306,7 @@ namespace FETools
           // continuous no hanging node
           // constraints are allowed.
           const bool hanging_nodes_not_allowed=
-            (cell->get_fe().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
+            (cell->get_finite_element().dofs_per_vertex != 0) || (fe2.dofs_per_vertex != 0);
 
           if (hanging_nodes_not_allowed)
             for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -314,24 +314,24 @@ namespace FETools
                       cell->neighbor(face)->level() == cell->level(),
                       ExcHangingNodesNotAllowed(0));
 
-          const unsigned int dofs_per_cell1 = cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell1 = cell->get_finite_element().dofs_per_cell;
 
           // make sure back_interpolation
           // matrix is available
-          if (interpolation_matrices[&cell->get_fe()] == nullptr)
+          if (interpolation_matrices[&cell->get_finite_element()] == nullptr)
             {
-              interpolation_matrices[&cell->get_fe()] =
+              interpolation_matrices[&cell->get_finite_element()] =
                 std::shared_ptr<FullMatrix<double> >
                 (new FullMatrix<double>(dofs_per_cell1, dofs_per_cell1));
-              get_back_interpolation_matrix(cell->get_fe(), fe2,
-                                            *interpolation_matrices[&cell->get_fe()]);
+              get_back_interpolation_matrix(cell->get_finite_element(), fe2,
+                                            *interpolation_matrices[&cell->get_finite_element()]);
             }
 
           u1_local.reinit (dofs_per_cell1);
           u1_int_local.reinit (dofs_per_cell1);
 
           cell->get_dof_values(u1, u1_local);
-          interpolation_matrices[&cell->get_fe()]->vmult(u1_int_local, u1_local);
+          interpolation_matrices[&cell->get_finite_element()]->vmult(u1_int_local, u1_local);
           cell->set_dof_values(u1_int_local, u1_interpolated);
         };
 
