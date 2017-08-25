@@ -119,8 +119,8 @@ namespace MeshWorker
                  const typename identity<std::function<void (const CellIteratorType &, ScratchData &, CopyData &)>>::type &cell_worker,
                  const typename identity<std::function<void (const CopyData &)>>::type &copier,
 
-                 ScratchData &scratch_data,
-                 CopyData &copy_data,
+                 const ScratchData &sample_scratch_data,
+                 const CopyData &sample_copy_data,
 
                  const AssembleFlags flags = assemble_own_cells,
 
@@ -161,7 +161,7 @@ namespace MeshWorker
     auto cell_action = [&] (const CellIteratorType &cell, ScratchData &scratch, CopyData &copy)
     {
       // First reset the CopyData class to the empty copy_data given by the user.
-      copy = copy_data;
+      copy = sample_copy_data;
 
       const bool ignore_subdomain = (cell->get_triangulation().locally_owned_subdomain()
                                      == numbers::invalid_subdomain_id);
@@ -306,7 +306,7 @@ namespace MeshWorker
     // Submit to workstream
     WorkStream::run(begin, end,
                     cell_action, copier,
-                    scratch_data, copy_data,
+                    sample_scratch_data, sample_copy_data,
                     queue_length, chunk_size);
   }
 }
