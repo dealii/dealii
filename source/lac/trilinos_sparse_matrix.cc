@@ -2972,7 +2972,7 @@ namespace TrilinosWrappers
         {
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
-          static GrowingVectorMemory<GVMVectorType> vector_memory;
+          GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
           // Initialize intermediate vector
@@ -3006,7 +3006,7 @@ namespace TrilinosWrappers
         {
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
-          static GrowingVectorMemory<GVMVectorType> vector_memory;
+          GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
           // These operators may themselves be transposed or not, so we let them
@@ -3051,7 +3051,7 @@ namespace TrilinosWrappers
         {
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
-          static GrowingVectorMemory<GVMVectorType> vector_memory;
+          GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
           // Initialize intermediate vector
@@ -3085,7 +3085,7 @@ namespace TrilinosWrappers
         {
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
-          static GrowingVectorMemory<GVMVectorType> vector_memory;
+          GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
           // These operators may themselves be transposed or not, so we let them
@@ -3149,7 +3149,7 @@ namespace TrilinosWrappers
         {
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
-          static GrowingVectorMemory<GVMVectorType> vector_memory;
+          GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
           // Initialize intermediate vector
@@ -3181,7 +3181,7 @@ namespace TrilinosWrappers
         {
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
-          static GrowingVectorMemory<GVMVectorType> vector_memory;
+          GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
           // These operators may themselves be transposed or not, so we let them
@@ -3223,7 +3223,7 @@ namespace TrilinosWrappers
         {
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
-          static GrowingVectorMemory<GVMVectorType> vector_memory;
+          GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
           // Initialize intermediate vector
@@ -3255,7 +3255,7 @@ namespace TrilinosWrappers
         {
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
-          static GrowingVectorMemory<GVMVectorType> vector_memory;
+          GrowingVectorMemory<GVMVectorType> vector_memory;
           GVMVectorType *i = vector_memory.alloc();
 
           // These operators may themselves be transposed or not, so we let them

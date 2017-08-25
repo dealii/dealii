@@ -748,7 +748,7 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
 
   return_comp.apply = [op, comp](Domain &v)
   {
-    static GrowingVectorMemory<Range> vector_memory;
+    GrowingVectorMemory<Range> vector_memory;
 
     typename VectorMemory<Range>::Pointer i (vector_memory);
     op.reinit_domain_vector(*i, /*bool omit_zeroing_entries =*/ true);
@@ -759,7 +759,7 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
 
   return_comp.apply_add = [op, comp](Domain &v)
   {
-    static GrowingVectorMemory<Range> vector_memory;
+    GrowingVectorMemory<Range> vector_memory;
 
     typename VectorMemory<Range>::Pointer i (vector_memory);
     op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
@@ -794,7 +794,7 @@ operator*(const PackagedOperation<Range> &comp,
 
   return_comp.apply = [op, comp](Domain &v)
   {
-    static GrowingVectorMemory<Range> vector_memory;
+    GrowingVectorMemory<Range> vector_memory;
 
     typename VectorMemory<Range>::Pointer i (vector_memory);
     op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
@@ -805,7 +805,7 @@ operator*(const PackagedOperation<Range> &comp,
 
   return_comp.apply_add = [op, comp](Domain &v)
   {
-    static GrowingVectorMemory<Range> vector_memory;
+    GrowingVectorMemory<Range> vector_memory;
 
     typename VectorMemory<Range>::Pointer i (vector_memory);
     op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
