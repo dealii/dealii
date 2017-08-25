@@ -1538,7 +1538,6 @@ namespace internal
            perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type      &data,
                                        const typename SymmetricTensorAccessors::StorageType<4,dim,OtherNumber>::base_tensor_type &sdata)
   {
-    typedef typename SymmetricTensorAccessors::double_contraction_result<2,4,dim,Number,OtherNumber>::type       result_type;
     typedef typename SymmetricTensorAccessors::double_contraction_result<2,4,dim,Number,OtherNumber>::value_type value_type;
     typedef typename SymmetricTensorAccessors::StorageType<2,dim,value_type>::base_tensor_type base_tensor_type;
 
@@ -1569,7 +1568,6 @@ namespace internal
            perform_double_contraction (const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type      &data,
                                        const typename SymmetricTensorAccessors::StorageType<4,dim,OtherNumber>::base_tensor_type &sdata)
   {
-    typedef typename SymmetricTensorAccessors::double_contraction_result<4,4,dim,Number,OtherNumber>::type       result_type;
     typedef typename SymmetricTensorAccessors::double_contraction_result<4,4,dim,Number,OtherNumber>::value_type value_type;
     typedef typename SymmetricTensorAccessors::StorageType<4,dim,value_type>::base_tensor_type base_tensor_type;
 
