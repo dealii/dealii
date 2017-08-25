@@ -257,7 +257,7 @@ namespace Step13
               //
               // Ideally, we would check this at the beginning of the
               // function, for example by a statement like <code>Assert
-              // (dof_handler.get_finite_element().dofs_per_vertex @> 0,
+              // (dof_handler.get_fe().dofs_per_vertex @> 0,
               // ExcNotImplemented())</code>, which should make it quite clear
               // what is going wrong when the exception is triggered. In this
               // case, we omit it (which is indeed bad style), but knowing

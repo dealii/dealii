@@ -290,7 +290,7 @@ namespace MeshWorker
     level_cell (false)
   {
     std::vector<types::global_dof_index> aux(1);
-    aux[0] = dof_handler.get_finite_element().dofs_per_cell;
+    aux[0] = dof_handler.get_fe().dofs_per_cell;
     aux_local_indices.reinit(aux);
   }
 

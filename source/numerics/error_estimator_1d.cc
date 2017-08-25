@@ -248,7 +248,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
     = subdomain_id_;
 #endif
 
-  const unsigned int n_components       = dof_handler.get_finite_element(0).n_components();
+  const unsigned int n_components       = dof_handler.get_fe(0).n_components();
   const unsigned int n_solution_vectors = solutions.size();
 
   // sanity checks

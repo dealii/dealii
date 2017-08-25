@@ -980,7 +980,7 @@ add_data_vector_internal
                         "does not have any degrees of freedom, so it is not "
                         "possible to output DoF data in this context."));
       const std::string name = names[0];
-      const unsigned int n_components = dof_handler->get_finite_element(0).n_components();
+      const unsigned int n_components = dof_handler->get_fe(0).n_components();
       deduced_names.resize (n_components);
       if (n_components > 1)
         {
@@ -1016,9 +1016,9 @@ add_data_vector_internal
               Exceptions::DataOut::ExcInvalidVectorSize (data_vector.size(),
                                                          dof_handler->n_dofs(),
                                                          triangulation->n_active_cells()));
-      Assert (deduced_names.size() == dof_handler->get_finite_element(0).n_components(),
+      Assert (deduced_names.size() == dof_handler->get_fe(0).n_components(),
               Exceptions::DataOut::ExcInvalidNumberOfNames (deduced_names.size(),
-                                                            dof_handler->get_finite_element(0).n_components()));
+                                                            dof_handler->get_fe(0).n_components()));
       break;
     default:
       Assert (false, ExcInternalError());
@@ -1230,7 +1230,7 @@ template <typename DoFHandlerType,
           int patch_dim, int patch_space_dim>
 std::vector<std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
     DoFHandlerType::space_dimension> > >
-    DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_finite_elements() const
+    DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_fes() const
 {
   const unsigned int dhdim = DoFHandlerType::dimension;
   const unsigned int dhspacedim = DoFHandlerType::space_dimension;

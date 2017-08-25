@@ -59,8 +59,8 @@ get_vertices
   // object is constructed, which is not necessarily what we want.
 
   //TODO: Only one of these two assertions should be relevant
-  AssertDimension (spacedim, shiftmap_dof_handler->get_finite_element().n_dofs_per_vertex());
-  AssertDimension (shiftmap_dof_handler->get_finite_element(0).n_components(), spacedim);
+  AssertDimension (spacedim, shiftmap_dof_handler->get_fe().n_dofs_per_vertex());
+  AssertDimension (shiftmap_dof_handler->get_fe(0).n_components(), spacedim);
 
   AssertDimension (shiftmap_dof_handler->n_dofs(), euler_transform_vectors->size());
 
@@ -74,7 +74,7 @@ get_vertices
   Assert (dof_cell->active() == true, ExcInactiveCell());
 
   // now get the values of the shift vectors at the vertices
-  Vector<double> mapping_values (shiftmap_dof_handler->get_finite_element().dofs_per_cell);
+  Vector<double> mapping_values (shiftmap_dof_handler->get_fe().dofs_per_cell);
   dof_cell->get_dof_values (*euler_transform_vectors, mapping_values);
 
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)

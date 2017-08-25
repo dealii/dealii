@@ -450,7 +450,7 @@ namespace DoFTools
       /**
        * A function that returns how many different finite elements a dof
        * handler uses. This is one for non-hp DoFHandlers and
-       * dof_handler.get_finite_element().size() for the hp-versions.
+       * dof_handler.get_fe().size() for the hp-versions.
        */
       template <int dim, int spacedim>
       unsigned int
@@ -1286,7 +1286,7 @@ namespace DoFTools
                                 ExcMessage("Could not find a least face dominating FE."));
 
                     const FiniteElement<dim,spacedim> &dominating_fe
-                      = dof_handler.get_finite_element(dominating_fe_index);
+                      = dof_handler.get_fe(dominating_fe_index);
 
                     // first get the interpolation matrix from the mother
                     // to the virtual dofs
@@ -1385,7 +1385,7 @@ namespace DoFTools
                         const unsigned int subface_fe_index
                           = cell->face(face)->child(sf)->nth_active_fe_index(0);
                         const FiniteElement<dim,spacedim> &subface_fe
-                          = dof_handler.get_finite_element(subface_fe_index);
+                          = dof_handler.get_fe(subface_fe_index);
 
                         // first get the interpolation matrix from the
                         // subface to the virtual dofs
@@ -2676,8 +2676,8 @@ namespace DoFTools
         Assembler::CopyData<dim,spacedim> copy_data;
 
         unsigned int n_interesting_dofs = 0;
-        for (unsigned int local_dof=0; local_dof<coarse_grid.get_finite_element().dofs_per_cell; ++local_dof)
-          if (coarse_grid.get_finite_element().system_to_component_index(local_dof).first
+        for (unsigned int local_dof=0; local_dof<coarse_grid.get_fe().dofs_per_cell; ++local_dof)
+          if (coarse_grid.get_fe().system_to_component_index(local_dof).first
               ==
               coarse_component)
             ++n_interesting_dofs;
@@ -2723,13 +2723,13 @@ namespace DoFTools
                                   std::placeholders::_2,
                                   std::placeholders::_3,
                                   coarse_component,
-                                  std::cref(coarse_grid.get_finite_element()),
+                                  std::cref(coarse_grid.get_fe()),
                                   std::cref(coarse_to_fine_grid_map),
                                   std::cref(parameter_dofs)),
                         std::bind(&copy_intergrid_weights_3<dim,spacedim>,
                                   std::placeholders::_1,
                                   coarse_component,
-                                  std::cref(coarse_grid.get_finite_element()),
+                                  std::cref(coarse_grid.get_fe()),
                                   std::cref(weight_mapping),
                                   is_called_in_parallel,
                                   std::ref(weights)),
@@ -2761,8 +2761,8 @@ namespace DoFTools
         std::vector<types::global_dof_index>                   &weight_mapping)
       {
         // aliases to the finite elements used by the dof handlers:
-        const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_finite_element(),
-                                           &fine_fe = fine_grid.get_finite_element();
+        const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe(),
+                                           &fine_fe = fine_grid.get_fe();
 
         // global numbers of dofs
         const types::global_dof_index n_coarse_dofs = coarse_grid.n_dofs(),
@@ -3016,7 +3016,7 @@ namespace DoFTools
     std::vector<bool> coarse_dof_is_parameter (coarse_grid.n_dofs());
     if (true)
       {
-        std::vector<bool> mask (coarse_grid.get_finite_element(0).n_components(),
+        std::vector<bool> mask (coarse_grid.get_fe(0).n_components(),
                                 false);
         mask[coarse_component] = true;
         extract_dofs (coarse_grid, ComponentMask(mask), coarse_dof_is_parameter);
@@ -3226,7 +3226,7 @@ namespace DoFTools
                                   ConstraintMatrix                    &zero_boundary_constraints,
                                   const ComponentMask                 &component_mask)
   {
-    Assert (component_mask.represents_n_components(dof.get_finite_element(0).n_components()),
+    Assert (component_mask.represents_n_components(dof.get_fe(0).n_components()),
             ExcMessage ("The number of components in the mask has to be either "
                         "zero or equal to the number of components in the finite "
                         "element."));

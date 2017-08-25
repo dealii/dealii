@@ -482,7 +482,7 @@ namespace Step41
     for (; cell!=endc; ++cell)
       for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
         {
-          Assert (dof_handler.get_finite_element().dofs_per_cell ==
+          Assert (dof_handler.get_fe().dofs_per_cell ==
                   GeometryInfo<dim>::vertices_per_cell,
                   ExcNotImplemented());
 

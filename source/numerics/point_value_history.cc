@@ -191,7 +191,7 @@ void PointValueHistory<dim>
 
   // Implementation assumes that support
   // points locations are dofs locations
-  AssertThrow (dof_handler->get_finite_element().has_support_points (), ExcNotImplemented ());
+  AssertThrow (dof_handler->get_fe().has_support_points (), ExcNotImplemented ());
 
   // While in general quadrature points seems
   // to refer to Gauss quadrature points, in
@@ -199,14 +199,14 @@ void PointValueHistory<dim>
   // forced to be the support points of the
   // FE.
   Quadrature<dim>
-  support_point_quadrature (dof_handler->get_finite_element().get_unit_support_points ());
-  FEValues<dim> fe_values (dof_handler->get_finite_element(),
+  support_point_quadrature (dof_handler->get_fe().get_unit_support_points ());
+  FEValues<dim> fe_values (dof_handler->get_fe(),
                            support_point_quadrature,
                            update_quadrature_points);
   unsigned int n_support_points
-    = dof_handler->get_finite_element().get_unit_support_points ().size ();
+    = dof_handler->get_fe().get_unit_support_points ().size ();
   unsigned int n_components
-    = dof_handler->get_finite_element(0).n_components ();
+    = dof_handler->get_fe(0).n_components ();
 
   // set up a loop over all the cells in the
   // DoFHandler
@@ -229,7 +229,7 @@ void PointValueHistory<dim>
       // setup valid data in the empty
       // vectors
       unsigned int component
-        = dof_handler->get_finite_element().system_to_component_index (support_point).first;
+        = dof_handler->get_fe().system_to_component_index (support_point).first;
       current_points [component] = fe_values.quadrature_point (support_point);
       current_fe_index [component] = support_point;
     }
@@ -252,7 +252,7 @@ void PointValueHistory<dim>
            support_point < n_support_points; support_point++)
         {
           unsigned int component
-            = dof_handler->get_finite_element().system_to_component_index (support_point).first;
+            = dof_handler->get_fe().system_to_component_index (support_point).first;
           Point<dim> test_point
             = fe_values.quadrature_point (support_point);
 
@@ -269,7 +269,7 @@ void PointValueHistory<dim>
 
 
   std::vector<types::global_dof_index>
-  local_dof_indices (dof_handler->get_finite_element().dofs_per_cell);
+  local_dof_indices (dof_handler->get_fe().dofs_per_cell);
   std::vector <types::global_dof_index> new_solution_indices;
   current_cell->get_dof_indices (local_dof_indices);
   // there is an implicit assumption here
@@ -292,7 +292,7 @@ void PointValueHistory<dim>
   // a vector of points, and does not seem to
   // be intrinsicly faster than this method.
   for (unsigned int component = 0;
-       component < dof_handler->get_finite_element(0).n_components (); component++)
+       component < dof_handler->get_fe(0).n_components (); component++)
     {
       new_solution_indices
       .push_back (local_dof_indices[current_fe_index [component]]);
@@ -334,17 +334,17 @@ void PointValueHistory<dim>
 
   // Implementation assumes that support
   // points locations are dofs locations
-  AssertThrow (dof_handler->get_finite_element().has_support_points (), ExcNotImplemented ());
+  AssertThrow (dof_handler->get_fe().has_support_points (), ExcNotImplemented ());
 
   // While in general quadrature points seems
   // to refer to Gauss quadrature points, in
   // this case the quadrature points are
   // forced to be the support points of the
   // FE.
-  Quadrature<dim> support_point_quadrature (dof_handler->get_finite_element().get_unit_support_points ());
-  FEValues<dim> fe_values (dof_handler->get_finite_element(), support_point_quadrature, update_quadrature_points);
-  unsigned int n_support_points = dof_handler->get_finite_element().get_unit_support_points ().size ();
-  unsigned int n_components = dof_handler->get_finite_element(0).n_components ();
+  Quadrature<dim> support_point_quadrature (dof_handler->get_fe().get_unit_support_points ());
+  FEValues<dim> fe_values (dof_handler->get_fe(), support_point_quadrature, update_quadrature_points);
+  unsigned int n_support_points = dof_handler->get_fe().get_unit_support_points ().size ();
+  unsigned int n_components = dof_handler->get_fe(0).n_components ();
 
   // set up a loop over all the cells in the
   // DoFHandler
@@ -367,7 +367,7 @@ void PointValueHistory<dim>
     {
       // setup valid data in the empty
       // vectors
-      unsigned int component = dof_handler->get_finite_element().system_to_component_index (support_point).first;
+      unsigned int component = dof_handler->get_fe().system_to_component_index (support_point).first;
       temp_points [component] = fe_values.quadrature_point (support_point);
       temp_fe_index [component] = support_point;
     }
@@ -388,7 +388,7 @@ void PointValueHistory<dim>
       fe_values.reinit (cell);
       for (unsigned int support_point = 0; support_point < n_support_points; support_point++)
         {
-          unsigned int component = dof_handler->get_finite_element().system_to_component_index (support_point).first;
+          unsigned int component = dof_handler->get_fe().system_to_component_index (support_point).first;
           Point<dim> test_point = fe_values.quadrature_point (support_point);
 
           for (unsigned int point = 0; point < locations.size (); point++)
@@ -404,13 +404,13 @@ void PointValueHistory<dim>
         }
     }
 
-  std::vector<types::global_dof_index> local_dof_indices (dof_handler->get_finite_element().dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dof_handler->get_fe().dofs_per_cell);
   for (unsigned int point = 0; point < locations.size (); point++)
     {
       current_cell[point]->get_dof_indices (local_dof_indices);
       std::vector<types::global_dof_index> new_solution_indices;
 
-      for (unsigned int component = 0; component < dof_handler->get_finite_element(0).n_components (); component++)
+      for (unsigned int component = 0; component < dof_handler->get_fe(0).n_components (); component++)
         {
           new_solution_indices.push_back (local_dof_indices[current_fe_index[point][component]]);
         }
@@ -454,7 +454,7 @@ void PointValueHistory<dim>
     component_mask.insert (std::make_pair (vector_name, mask));
   else
     component_mask.insert (std::make_pair (vector_name,
-                                           ComponentMask(std::vector<bool>(dof_handler->get_finite_element(0).n_components(), true))));
+                                           ComponentMask(std::vector<bool>(dof_handler->get_fe(0).n_components(), true))));
 
   // insert an empty vector of strings
   // to ensure each field has an entry
@@ -471,7 +471,7 @@ void PointValueHistory<dim>
                                  ?
                                  mask.n_selected_components()
                                  :
-                                 dof_handler->get_finite_element(0).n_components());
+                                 dof_handler->get_fe(0).n_components());
 
   int n_datastreams = point_geometry_data.size () * n_stored; // each point has n_stored sub parts
   std::vector < std::vector <double> > vector_size (n_datastreams,
@@ -576,7 +576,7 @@ PointValueHistory<dim>::evaluate_field (const std::string &vector_name,
   typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
   Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
 
-  unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_finite_element(0).n_components ());
+  unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_fe(0).n_components ());
 
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
@@ -586,7 +586,7 @@ PointValueHistory<dim>::evaluate_field (const std::string &vector_name,
       // access the data associated with
       // those components
 
-      for (unsigned int store_index = 0, comp = 0; comp < dof_handler->get_finite_element(0).n_components (); comp++)
+      for (unsigned int store_index = 0, comp = 0; comp < dof_handler->get_fe(0).n_components (); comp++)
         {
           if (mask->second[comp])
             {
@@ -626,8 +626,8 @@ PointValueHistory<dim>::evaluate_field (const std::vector <std::string> &vector_
   Assert (!(update_flags & update_normal_vectors),
           ExcMessage("The update of normal vectors may not be requested for evaluation of "
                      "data on cells via DataPostprocessor."));
-  FEValues<dim> fe_values (dof_handler->get_finite_element(), quadrature, update_flags);
-  unsigned int n_components = dof_handler->get_finite_element(0).n_components ();
+  FEValues<dim> fe_values (dof_handler->get_fe(), quadrature, update_flags);
+  unsigned int n_components = dof_handler->get_fe(0).n_components ();
   unsigned int n_quadrature_points = quadrature.size();
 
   unsigned int n_output_variables = data_postprocessor.get_names().size();
@@ -837,10 +837,10 @@ void PointValueHistory<dim>
   typename std::map <std::string, ComponentMask>::iterator mask = component_mask.find(vector_name);
   Assert (mask != component_mask.end(), ExcMessage("vector_name not in class"));
 
-  unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_finite_element(0).n_components ());
+  unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_fe(0).n_components ());
 
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
-  Vector <number> value (dof_handler->get_finite_element(0).n_components());
+  Vector <number> value (dof_handler->get_fe(0).n_components());
   for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
     {
       // Make a Vector <double> for the value
@@ -984,7 +984,7 @@ void PointValueHistory<dim>
           // comments
           to_gnuplot << "# Requested location: " << point->requested_location << "\n";
           to_gnuplot << "# DoF_index : Support location (for each component)\n";
-          for (unsigned int component = 0; component < dof_handler->get_finite_element(0).n_components (); component++)
+          for (unsigned int component = 0; component < dof_handler->get_fe(0).n_components (); component++)
             {
               to_gnuplot << "# " << point->solution_indices[component] << " : " << point->support_point_locations [component] << "\n";
             }
@@ -1090,7 +1090,7 @@ Vector<double> PointValueHistory<dim>
   typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   for (; point != point_geometry_data.end (); ++point)
     {
-      for (unsigned int component = 0; component < dof_handler->get_finite_element(0).n_components (); component++)
+      for (unsigned int component = 0; component < dof_handler->get_fe(0).n_components (); component++)
         {
           dof_vector (point->solution_indices[component]) = 1;
         }
@@ -1135,7 +1135,7 @@ void PointValueHistory<dim>
 
   locations = std::vector<Point <dim> > ();
 
-  FEValues<dim> fe_values (dof_handler->get_finite_element(), quadrature, update_quadrature_points);
+  FEValues<dim> fe_values (dof_handler->get_fe(), quadrature, update_quadrature_points);
   unsigned int n_quadrature_points = quadrature.size();
   std::vector<Point<dim> > evaluation_points;
 
@@ -1191,7 +1191,7 @@ void PointValueHistory<dim>
             {
               out << "# Requested location: " << point->requested_location << "\n";
               out << "# DoF_index : Support location (for each component)\n";
-              for (unsigned int component = 0; component < dof_handler->get_finite_element(0).n_components (); component++)
+              for (unsigned int component = 0; component < dof_handler->get_fe(0).n_components (); component++)
                 {
                   out << point->solution_indices[component] << " : " << point->support_point_locations [component] << "\n";
                 }

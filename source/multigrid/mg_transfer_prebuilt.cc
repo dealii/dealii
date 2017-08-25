@@ -151,7 +151,7 @@ void MGTransferPrebuilt<VectorType>::build_matrices
 (const DoFHandler<dim,spacedim>  &mg_dof)
 {
   const unsigned int n_levels      = mg_dof.get_triangulation().n_global_levels();
-  const unsigned int dofs_per_cell = mg_dof.get_finite_element().dofs_per_cell;
+  const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
 
   this->sizes.resize(n_levels);
   for (unsigned int l=0; l<n_levels; ++l)
@@ -224,8 +224,8 @@ void MGTransferPrebuilt<VectorType>::build_matrices
               {
                 // set an alias to the prolongation matrix for this child
                 const FullMatrix<double> &prolongation
-                  = mg_dof.get_finite_element().get_prolongation_matrix (child,
-                                                                         cell->refinement_case());
+                  = mg_dof.get_fe().get_prolongation_matrix (child,
+                                                             cell->refinement_case());
 
                 Assert (prolongation.n() != 0, ExcNoProlongation());
 
@@ -274,8 +274,8 @@ void MGTransferPrebuilt<VectorType>::build_matrices
               {
                 // set an alias to the prolongation matrix for this child
                 prolongation
-                  = mg_dof.get_finite_element().get_prolongation_matrix (child,
-                                                                         cell->refinement_case());
+                  = mg_dof.get_fe().get_prolongation_matrix (child,
+                                                             cell->refinement_case());
 
                 if (this->mg_constrained_dofs != nullptr &&
                     this->mg_constrained_dofs->have_boundary_indices())

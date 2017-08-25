@@ -1,0 +1,6 @@
+Changed: DoFHandler::get_finite_element(unsigned int) has been removed again in
+favor of equipping DoFHandler::get_fe() with a (defaulted) unsigned int
+parameter. hp::DoFHandler::get_finite_element(unsigned int)  has been renamed to
+hp::DoFHandler::get_fe(unsigned int).
+<br>
+(Daniel Arndt, 2017/08/25)

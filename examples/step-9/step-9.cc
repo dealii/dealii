@@ -1037,7 +1037,7 @@ namespace Step9
                      end_sync_it,
                      &GradientEstimation::template estimate_cell<dim>,
                      std::function<void (const EstimateCopyData &)> (),
-                     EstimateScratchData<dim> (dof_handler.get_finite_element(),
+                     EstimateScratchData<dim> (dof_handler.get_fe(),
                                                solution),
                      EstimateCopyData ());
   }

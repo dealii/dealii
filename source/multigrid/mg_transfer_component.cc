@@ -85,7 +85,7 @@ namespace
   {
     std::vector<bool> selected=sel;
     std::vector<unsigned int> target_component=target_comp;
-    const unsigned int ncomp = mg_dof.get_finite_element(0).n_components();
+    const unsigned int ncomp = mg_dof.get_fe(0).n_components();
 
     // If the selected and
     // target_component have size 0,
@@ -260,16 +260,16 @@ void MGTransferComponentBase::build_matrices (
   // is empty
   if (target_component.size() == 0)
     {
-      target_component.resize(mg_dof.get_finite_element(0).n_components());
+      target_component.resize(mg_dof.get_fe(0).n_components());
       for (unsigned int i=0; i<target_component.size(); ++i)
         target_component[i] = i;
     }
   else
     {
       // otherwise, check it for consistency
-      Assert (target_component.size() == mg_dof.get_finite_element(0).n_components(),
+      Assert (target_component.size() == mg_dof.get_fe(0).n_components(),
               ExcDimensionMismatch(target_component.size(),
-                                   mg_dof.get_finite_element(0).n_components()));
+                                   mg_dof.get_fe(0).n_components()));
 
       for (unsigned int i=0; i<target_component.size(); ++i)
         {
@@ -282,15 +282,15 @@ void MGTransferComponentBase::build_matrices (
   // different.
   if (mg_target_component.size() == 0)
     {
-      mg_target_component.resize(mg_dof.get_finite_element(0).n_components());
+      mg_target_component.resize(mg_dof.get_fe(0).n_components());
       for (unsigned int i=0; i<mg_target_component.size(); ++i)
         mg_target_component[i] = target_component[i];
     }
   else
     {
-      Assert (mg_target_component.size() == mg_dof.get_finite_element(0).n_components(),
+      Assert (mg_target_component.size() == mg_dof.get_fe(0).n_components(),
               ExcDimensionMismatch(mg_target_component.size(),
-                                   mg_dof.get_finite_element(0).n_components()));
+                                   mg_dof.get_fe(0).n_components()));
 
       for (unsigned int i=0; i<mg_target_component.size(); ++i)
         {
@@ -299,7 +299,7 @@ void MGTransferComponentBase::build_matrices (
         }
     }
 
-  const FiniteElement<dim> &fe = mg_dof.get_finite_element();
+  const FiniteElement<dim> &fe = mg_dof.get_fe();
 
   // Effective number of components
   // is the maximum entry in
@@ -432,7 +432,7 @@ void MGTransferComponentBase::build_matrices (
                 // prolongation matrix for
                 // this child
                 const FullMatrix<double> &prolongation
-                  = mg_dof.get_finite_element().get_prolongation_matrix (child, cell->refinement_case());
+                  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
@@ -469,7 +469,7 @@ void MGTransferComponentBase::build_matrices (
                 // prolongation matrix for
                 // this child
                 const FullMatrix<double> &prolongation
-                  = mg_dof.get_finite_element().get_prolongation_matrix (child, cell->refinement_case());
+                  = mg_dof.get_fe().get_prolongation_matrix (child, cell->refinement_case());
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
@@ -553,8 +553,8 @@ void MGTransferSelect<number>::build_matrices (
   const std::vector<unsigned int> &mg_t_component,
   const std::vector<std::set<types::global_dof_index> > &bdry_indices)
 {
-  const FiniteElement<dim> &fe = mg_dof.get_finite_element();
-  unsigned int ncomp = mg_dof.get_finite_element(0).n_components();
+  const FiniteElement<dim> &fe = mg_dof.get_fe();
+  unsigned int ncomp = mg_dof.get_fe(0).n_components();
 
   target_component = t_component;
   mg_target_component = mg_t_component;

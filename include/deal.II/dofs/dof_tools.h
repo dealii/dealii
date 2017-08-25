@@ -385,7 +385,7 @@ namespace DoFTools
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
    *
-   * @deprecated Use <code>dh.get_finite_element(0).is_primitive()</code>.
+   * @deprecated Use <code>dh.get_fe(0).is_primitive()</code>.
    *
    * @relates DoFHandler
    */
@@ -400,7 +400,7 @@ namespace DoFTools
    * This function exists for both non-hp and hp DoFHandlers, to allow for a
    * uniform interface to query this property.
    *
-   * @deprecated Use <code>dh.get_finite_element(0).is_primitive()</code>.
+   * @deprecated Use <code>dh.get_fe(0).is_primitive()</code>.
    *
    * @relates hp::DoFHandler
    */
@@ -2512,7 +2512,7 @@ namespace DoFTools
   unsigned int
   max_dofs_per_cell (const DoFHandler<dim,spacedim> &dh)
   {
-    return dh.get_finite_element().dofs_per_cell;
+    return dh.get_fe().dofs_per_cell;
   }
 
 
@@ -2521,7 +2521,7 @@ namespace DoFTools
   unsigned int
   max_dofs_per_face (const DoFHandler<dim,spacedim> &dh)
   {
-    return dh.get_finite_element().dofs_per_face;
+    return dh.get_fe().dofs_per_face;
   }
 
 
@@ -2530,7 +2530,7 @@ namespace DoFTools
   unsigned int
   max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh)
   {
-    return dh.get_finite_element().dofs_per_vertex;
+    return dh.get_fe().dofs_per_vertex;
   }
 
 
@@ -2539,7 +2539,7 @@ namespace DoFTools
   unsigned int
   n_components (const DoFHandler<dim,spacedim> &dh)
   {
-    return dh.get_finite_element().n_components();
+    return dh.get_fe().n_components();
   }
 
 
@@ -2549,7 +2549,7 @@ namespace DoFTools
   bool
   fe_is_primitive (const DoFHandler<dim,spacedim> &dh)
   {
-    return dh.get_finite_element().is_primitive();
+    return dh.get_fe().is_primitive();
   }
 
 
@@ -2585,7 +2585,7 @@ namespace DoFTools
   unsigned int
   n_components (const hp::DoFHandler<dim,spacedim> &dh)
   {
-    return dh.get_finite_element(0).n_components();
+    return dh.get_fe(0).n_components();
   }
 
 
@@ -2594,7 +2594,7 @@ namespace DoFTools
   bool
   fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh)
   {
-    return dh.get_finite_element(0).is_primitive();
+    return dh.get_fe(0).is_primitive();
   }
 
 

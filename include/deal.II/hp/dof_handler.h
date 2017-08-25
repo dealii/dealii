@@ -669,7 +669,7 @@ namespace hp
      * used by this @p DoFHandler.
      */
     const FiniteElement<dim,spacedim> &
-    get_finite_element (const unsigned int index) const;
+    get_fe (const unsigned int index) const;
 
     /**
      * Return a constant reference to the set of finite element objects that
@@ -1089,7 +1089,7 @@ namespace hp
   template <int dim, int spacedim>
   inline
   const FiniteElement<dim,spacedim> &
-  DoFHandler<dim,spacedim>::get_finite_element
+  DoFHandler<dim,spacedim>::get_fe
   (const unsigned int number) const
   {
     Assert (finite_elements != nullptr,

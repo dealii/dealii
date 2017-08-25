@@ -72,7 +72,7 @@ namespace
                  std::vector<unsigned int> target_component,
                  MGLevelObject<BlockVector<number> > &v)
   {
-    const unsigned int n_blocks = mg_dof.get_finite_element().n_blocks();
+    const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
     if (target_component.size()==0)
       {
         target_component.resize(n_blocks);

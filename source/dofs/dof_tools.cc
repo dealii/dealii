@@ -373,7 +373,7 @@ namespace DoFTools
                 const ComponentMask            &component_mask,
                 std::vector<bool>              &selected_dofs)
   {
-    const FiniteElement<dim,spacedim> &fe = dof.get_finite_element();
+    const FiniteElement<dim,spacedim> &fe = dof.get_fe();
     (void)fe;
 
     Assert(component_mask.represents_n_components(fe.n_components()),
@@ -491,7 +491,7 @@ namespace DoFTools
                       const ComponentMask  &component_mask,
                       std::vector<bool>    &selected_dofs)
   {
-    const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe = dof.get_finite_element();
+    const FiniteElement<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe = dof.get_fe();
 
     Assert(component_mask.represents_n_components(n_components(dof)),
            ExcMessage ("The given component mask is not sized correctly to represent the "
@@ -544,7 +544,7 @@ namespace DoFTools
                       std::vector<bool>    &selected_dofs)
   {
     // simply defer to the other extract_level_dofs() function
-    extract_level_dofs (level, dof, dof.get_finite_element().component_mask(block_mask),
+    extract_level_dofs (level, dof, dof.get_fe().component_mask(block_mask),
                         selected_dofs);
   }
 
@@ -894,7 +894,7 @@ namespace DoFTools
         // preset all values by false
         std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
-        const FiniteElement<dim,spacedim> &fe = dof_handler.get_finite_element();
+        const FiniteElement<dim,spacedim> &fe = dof_handler.get_fe();
 
         // this function is similar to the make_sparsity_pattern function,
         // see there for more information
@@ -929,7 +929,7 @@ namespace DoFTools
         // preset all values by false
         std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
-        const FiniteElement<dim,spacedim> &fe = dof_handler.get_finite_element();
+        const FiniteElement<dim,spacedim> &fe = dof_handler.get_fe();
 
         // this function is similar to the make_sparsity_pattern function,
         // see there for more information
@@ -1166,7 +1166,7 @@ namespace DoFTools
                           const ComponentMask             &component_mask,
                           std::vector<std::vector<bool> > &constant_modes)
   {
-    const unsigned int n_components = dof_handler.get_finite_element(0).n_components();
+    const unsigned int n_components = dof_handler.get_fe(0).n_components();
     Assert (component_mask.represents_n_components(n_components),
             ExcDimensionMismatch(n_components,
                                  component_mask.size()));
@@ -1576,9 +1576,9 @@ namespace DoFTools
                                          const types::subdomain_id  subdomain,
                                          std::vector<unsigned int> &n_dofs_on_subdomain)
   {
-    Assert (n_dofs_on_subdomain.size() == dof_handler.get_finite_element(0).n_components(),
+    Assert (n_dofs_on_subdomain.size() == dof_handler.get_fe(0).n_components(),
             ExcDimensionMismatch (n_dofs_on_subdomain.size(),
-                                  dof_handler.get_finite_element(0).n_components()));
+                                  dof_handler.get_fe(0).n_components()));
     std::fill (n_dofs_on_subdomain.begin(), n_dofs_on_subdomain.end(), 0);
 
     // in debug mode, make sure that there are some cells at least with
@@ -1607,7 +1607,7 @@ namespace DoFTools
     internal::get_component_association (dof_handler, std::vector<bool>(),
                                          component_association);
 
-    for (unsigned int c=0; c<dof_handler.get_finite_element(0).n_components(); ++c)
+    for (unsigned int c=0; c<dof_handler.get_fe(0).n_components(); ++c)
       {
         for (types::global_dof_index i=0; i<dof_handler.n_dofs(); ++i)
           if ((subdomain_association[i] == subdomain) &&
@@ -1736,7 +1736,7 @@ namespace DoFTools
                             bool                                  only_once,
                             std::vector<unsigned int>             target_component)
   {
-    const unsigned int n_components = dof_handler.get_finite_element(0).n_components();
+    const unsigned int n_components = dof_handler.get_fe(0).n_components();
 
     std::fill (dofs_per_component.begin(), dofs_per_component.end(),
                types::global_dof_index(0));
@@ -2188,7 +2188,7 @@ namespace DoFTools
    const Table<2, Coupling>        &table,
    std::vector<Table<2,Coupling> > &tables_by_block)
   {
-    const FiniteElement<dim,spacedim> &fe = dof_handler.get_finite_element();
+    const FiniteElement<dim,spacedim> &fe = dof_handler.get_fe();
     const unsigned int nb = fe.n_blocks();
 
     tables_by_block.resize(1);
@@ -2253,7 +2253,7 @@ namespace DoFTools
     for (cell=dof_handler.begin(level); cell != endc; ++cell)
       if (cell->is_locally_owned_on_level())
         ++i;
-    block_list.reinit(i, dof_handler.n_dofs(), dof_handler.get_finite_element().dofs_per_cell);
+    block_list.reinit(i, dof_handler.n_dofs(), dof_handler.get_fe().dofs_per_cell);
     i=0;
     for (cell=dof_handler.begin(level); cell != endc; ++cell)
       if (cell->is_locally_owned_on_level())
@@ -2285,7 +2285,7 @@ namespace DoFTools
                          const unsigned int    level,
                          const bool            interior_only)
   {
-    const FiniteElement<DoFHandlerType::dimension> &fe = dof_handler.get_finite_element();
+    const FiniteElement<DoFHandlerType::dimension> &fe = dof_handler.get_fe();
     block_list.reinit(1, dof_handler.n_dofs(level), dof_handler.n_dofs(level));
     typename DoFHandlerType::level_cell_iterator cell;
     typename DoFHandlerType::level_cell_iterator endc = dof_handler.end(level);
@@ -2348,7 +2348,7 @@ namespace DoFTools
             const typename DoFHandlerType::level_cell_iterator cell = pcell->child(child);
 
             // For hp, only this line here would have to be replaced.
-            const FiniteElement<DoFHandlerType::dimension> &fe = dof_handler.get_finite_element();
+            const FiniteElement<DoFHandlerType::dimension> &fe = dof_handler.get_fe();
             const unsigned int n_dofs = fe.dofs_per_cell;
             indices.resize(n_dofs);
             exclude.resize(n_dofs);
@@ -2396,7 +2396,7 @@ namespace DoFTools
                        const bool            single_cell_patches,
                        const bool            invert_vertex_mapping)
   {
-    const unsigned int n_blocks = dof_handler.get_finite_element().n_blocks();
+    const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
     BlockMask exclude_boundary_dofs = BlockMask(n_blocks,interior_only);
     return make_vertex_patches(block_list,
                                dof_handler,

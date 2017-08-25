@@ -135,7 +135,7 @@ template <typename number>
 void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<number> &vec,
     const std::string    &name)
 {
-  const unsigned int n_components = dof_handler->get_finite_element(0).n_components ();
+  const unsigned int n_components = dof_handler->get_fe(0).n_components ();
 
   std::vector<std::string> names;
   // if only one component or vector
@@ -176,9 +176,9 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<nu
            (names.size() == 1))
           ||
           ((vec.size() == dof_handler->n_dofs()) &&
-           (names.size() == dof_handler->get_finite_element(0).n_components())),
+           (names.size() == dof_handler->get_fe(0).n_components())),
           Exceptions::DataOut::ExcInvalidNumberOfNames (names.size(),
-                                                        dof_handler->get_finite_element(0).n_components()));
+                                                        dof_handler->get_fe(0).n_components()));
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -248,7 +248,7 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned in
 
   this->validate_dataset_names();
 
-  const unsigned int n_components   = dof_handler->get_finite_element(0).n_components();
+  const unsigned int n_components   = dof_handler->get_fe(0).n_components();
   const unsigned int n_datasets     = dof_data.size() * n_components +
                                       cell_data.size();
 
@@ -275,7 +275,7 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned in
   // single quadratures,
   // and finite elements. if we have
   // an hp DoFHandler,
-  // dof_handler.get_finite_element() returns a
+  // dof_handler.get_fe() returns a
   // collection of which we do a
   // shallow copy instead
   const hp::QCollection<dim>       q_collection (patch_points);
