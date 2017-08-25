@@ -28,6 +28,8 @@
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector.h>
 
+#include <deal.II/base/std_cxx14/memory.h>
+
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -64,9 +66,9 @@ namespace internal
                  VectorMemory<VectorType> &vmem);
 
       /**
-       * Delete all allocated vectors.
+       * Destructor. Delete all allocated vectors.
        */
-      ~TmpVectors();
+      ~TmpVectors() = default;
 
       /**
        * Get vector number @p i. If this vector was unused before, an error
@@ -99,13 +101,7 @@ namespace internal
       /**
        * Field for storing the vectors.
        */
-      std::vector<VectorType *> data;
-
-      /**
-       * Offset of the first vector. This is for later when vector rotation
-       * will be implemented.
-       */
-      unsigned int offset;
+      std::vector<typename VectorMemory<VectorType>::Pointer> data;
     };
   }
 }
@@ -517,48 +513,39 @@ namespace internal
                 VectorMemory<VectorType> &vmem)
       :
       mem(vmem),
-      data (max_size, nullptr),
-      offset(0)
+      data (max_size)
     {}
 
-
-    template <class VectorType>
-    inline
-    TmpVectors<VectorType>::~TmpVectors ()
-    {
-      for (typename std::vector<VectorType *>::iterator v = data.begin();
-           v != data.end(); ++v)
-        if (*v != nullptr)
-          mem.free(*v);
-    }
 
 
     template <class VectorType>
     inline VectorType &
     TmpVectors<VectorType>::operator[] (const unsigned int i) const
     {
-      Assert (i+offset<data.size(),
-              ExcIndexRange(i, -offset, data.size()-offset));
+      Assert (i<data.size(),
+              ExcIndexRange(i, 0, data.size()));
 
-      Assert (data[i-offset] != nullptr, ExcNotInitialized());
-      return *data[i-offset];
+      Assert (data[i] != nullptr, ExcNotInitialized());
+      return *data[i];
     }
+
 
 
     template <class VectorType>
     inline VectorType &
-    TmpVectors<VectorType>::operator() (const unsigned int i,
-                                        const VectorType       &temp)
+    TmpVectors<VectorType>::operator() (const unsigned int  i,
+                                        const VectorType   &temp)
     {
-      Assert (i+offset<data.size(),
-              ExcIndexRange(i,-offset, data.size()-offset));
-      if (data[i-offset] == nullptr)
+      Assert (i<data.size(),
+              ExcIndexRange(i, 0, data.size()));
+      if (data[i] == nullptr)
         {
-          data[i-offset] = mem.alloc();
-          data[i-offset]->reinit(temp);
+          data[i] = std::move(typename VectorMemory<VectorType>::Pointer(mem));
+          data[i]->reinit(temp);
         }
-      return *data[i-offset];
+      return *data[i];
     }
+
 
 
     template <class VectorType>
@@ -567,6 +554,7 @@ namespace internal
     {
       return (data.size() > 0 ? data.size()-1 : 0);
     }
+
 
 
     // A comparator for better printing eigenvalues
@@ -822,20 +810,19 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
   VectorType &v = tmp_vectors(0, x);
   VectorType &p = tmp_vectors(n_tmp_vectors-1, x);
 
-  // Following vectors are needed
-  // when not the default residuals
-  // are used as stopping criterion
-  VectorType *r=nullptr;
-  VectorType *x_=nullptr;
-  dealii::Vector<double> *gamma_=nullptr;
+  // Following vectors are needed when we are not using the default residuals
+  // as stopping criterion
+  typename VectorMemory<VectorType>::Pointer r;
+  typename VectorMemory<VectorType>::Pointer x_;
+  std::unique_ptr<dealii::Vector<double> > gamma_;
   if (!use_default_residual)
     {
-      r=this->memory.alloc();
-      x_=this->memory.alloc();
+      r  = std::move(typename VectorMemory<VectorType>::Pointer(this->memory));
+      x_ = std::move(typename VectorMemory<VectorType>::Pointer(this->memory));
       r->reinit(x);
       x_->reinit(x);
 
-      gamma_ = new dealii::Vector<double> (gamma.size());
+      gamma_ = std_cxx14::make_unique<dealii::Vector<double> >(gamma.size());
     }
 
   bool re_orthogonalize = additional_data.force_re_orthogonalization;
@@ -1038,14 +1025,6 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
   if (!krylov_space_signal.empty())
     krylov_space_signal(tmp_vectors);
 
-  if (!use_default_residual)
-    {
-      this->memory.free(r);
-      this->memory.free(x_);
-
-      delete gamma_;
-    }
-
   deallog.pop();
 
   // in case of failure: throw exception
@@ -1186,7 +1165,7 @@ SolverFGMRES<VectorType>::solve (const MatrixType         &A,
   // Iteration starts here
   double res = -std::numeric_limits<double>::max();
 
-  VectorType *aux = this->memory.alloc();
+  typename VectorMemory<VectorType>::Pointer aux (this->memory);
   aux->reinit(x);
   do
     {
@@ -1246,8 +1225,6 @@ SolverFGMRES<VectorType>::solve (const MatrixType         &A,
         x.add(y(j), z[j]);
     }
   while (iteration_state == SolverControl::iterate);
-
-  this->memory.free(aux);
 
   deallog.pop();
   // in case of failure: throw exception
