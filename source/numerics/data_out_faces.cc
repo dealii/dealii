@@ -141,7 +141,7 @@ build_one_patch (const FaceDescriptor *cell_and_face,
           const FEValuesBase<dimension> &this_fe_patch_values
             = data.get_present_fe_values (dataset);
           const unsigned int n_components
-            = this_fe_patch_values.get_fe().n_components();
+            = this_fe_patch_values.get_finite_element().n_components();
           const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
           if (postprocessor != nullptr)
             {

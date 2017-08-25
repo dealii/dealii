@@ -335,7 +335,7 @@ namespace Step27
     endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
-        const unsigned int   dofs_per_cell = cell->get_fe().dofs_per_cell;
+        const unsigned int   dofs_per_cell = cell->get_finite_element().dofs_per_cell;
 
         cell_matrix.reinit (dofs_per_cell, dofs_per_cell);
         cell_matrix = 0;
@@ -739,7 +739,7 @@ namespace Step27
         // element. This is done by calling FESeries::Fourier::calculate(),
         // that has to be provided with the <code>local_dof_values</code>,
         // <code>cell->active_fe_index()</code> and a Table to store coefficients.
-        local_dof_values.reinit (cell->get_fe().dofs_per_cell);
+        local_dof_values.reinit (cell->get_finite_element().dofs_per_cell);
         cell->get_dof_values (solution, local_dof_values);
 
         fourier->calculate(local_dof_values,

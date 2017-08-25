@@ -280,7 +280,7 @@ namespace DoFRenumbering
       for (; cell!=endc; ++cell)
         {
 
-          const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell = cell->get_finite_element().dofs_per_cell;
 
           dofs_on_this_cell.resize (dofs_per_cell);
 
@@ -1118,7 +1118,7 @@ namespace DoFRenumbering
         {
           if (cell->is_locally_owned())
             {
-              const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+              const unsigned int dofs_per_cell = cell->get_finite_element().dofs_per_cell;
               std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
               cell->get_dof_indices (local_dof_indices);
 
@@ -1384,7 +1384,7 @@ namespace DoFRenumbering
         // on this cell and reinit the
         // vector storing these
         // numbers.
-        unsigned int n_cell_dofs = (*cell)->get_fe().n_dofs_per_cell();
+        unsigned int n_cell_dofs = (*cell)->get_finite_element().n_dofs_per_cell();
         cell_dofs.resize(n_cell_dofs);
 
         (*cell)->get_active_or_mg_dof_indices(cell_dofs);
@@ -1547,7 +1547,7 @@ namespace DoFRenumbering
         typename DoFHandlerType::active_cell_iterator end = dof.end();
         for ( ; begin != end; ++begin)
           {
-            const unsigned int dofs_per_cell = begin->get_fe().dofs_per_cell;
+            const unsigned int dofs_per_cell = begin->get_finite_element().dofs_per_cell;
             local_dof_indices.resize (dofs_per_cell);
             hp_fe_values.reinit (begin);
             const FEValues<DoFHandlerType::dimension> &fe_values =

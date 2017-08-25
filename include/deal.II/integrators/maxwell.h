@@ -172,7 +172,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
 
-      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertDimension(fe.get_finite_element().n_components(), dim);
       AssertDimension(M.m(), n_dofs);
       AssertDimension(M.n(), n_dofs);
 
@@ -227,10 +227,10 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertDimension(fe.get_finite_element().n_components(), dim);
       // There should be the right number of components (3 in 3D, otherwise 1)
       // for the curl.
-      AssertDimension(fetest.get_fe().n_components(), (dim == 3) ? dim : 1);
+      AssertDimension(fetest.get_finite_element().n_components(), (dim == 3) ? dim : 1);
       AssertDimension(M.m(), t_dofs);
       AssertDimension(M.n(), n_dofs);
 
@@ -279,7 +279,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
 
-      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertDimension(fe.get_finite_element().n_components(), dim);
       AssertDimension(M.m(), n_dofs);
       AssertDimension(M.n(), n_dofs);
 
@@ -301,7 +301,7 @@ namespace LocalIntegrators
           const Tensor<1,dim> n = fe.normal_vector(k);
           for (unsigned int i=0; i<n_dofs; ++i)
             for (unsigned int j=0; j<n_dofs; ++j)
-              if (fe.get_fe().has_support_on_face(i, face_no) && fe.get_fe().has_support_on_face(j, face_no))
+              if (fe.get_finite_element().has_support_on_face(i, face_no) && fe.get_finite_element().has_support_on_face(j, face_no))
                 {
                   for (unsigned int d=0; d<d_max; ++d)
                     {
@@ -336,7 +336,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
 
-      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertDimension(fe.get_finite_element().n_components(), dim);
       AssertDimension(M.m(), n_dofs);
       AssertDimension(M.n(), n_dofs);
 
@@ -400,8 +400,8 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe1.dofs_per_cell;
 
-      AssertDimension(fe1.get_fe().n_components(), dim);
-      AssertDimension(fe2.get_fe().n_components(), dim);
+      AssertDimension(fe1.get_finite_element().n_components(), dim);
+      AssertDimension(fe2.get_finite_element().n_components(), dim);
       AssertDimension(M11.m(), n_dofs);
       AssertDimension(M11.n(), n_dofs);
       AssertDimension(M12.m(), n_dofs);

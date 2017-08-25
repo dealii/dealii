@@ -140,7 +140,7 @@ build_one_patch
           const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &this_fe_patch_values
             = scratch_data.get_present_fe_values (dataset);
           const unsigned int n_components =
-            this_fe_patch_values.get_fe().n_components();
+            this_fe_patch_values.get_finite_element().n_components();
 
           const DataPostprocessor<DoFHandlerType::space_dimension> *postprocessor
             = this->dof_data[dataset]->postprocessor;

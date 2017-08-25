@@ -239,7 +239,7 @@ namespace hp
      * the signature of this function to make it compatible with the signature
      * of the respective constructor of the usual FEValues object, with the
      * respective parameter in that function also being the return value of
-     * the DoFHandler::get_fe() function.
+     * the DoFHandler::get_finite_element() function.
      */
     FEValues (const dealii::hp::MappingCollection<dim,spacedim> &mapping_collection,
               const dealii::hp::FECollection<dim,spacedim>  &fe_collection,
@@ -256,7 +256,7 @@ namespace hp
      * the signature of this function to make it compatible with the signature
      * of the respective constructor of the usual FEValues object, with the
      * respective parameter in that function also being the return value of
-     * the DoFHandler::get_fe() function.
+     * the DoFHandler::get_finite_element() function.
      */
     FEValues (const hp::FECollection<dim,spacedim> &fe_collection,
               const hp::QCollection<dim>      &q_collection,
@@ -375,7 +375,7 @@ namespace hp
      * the signature of this function to make it compatible with the signature
      * of the respective constructor of the usual FEValues object, with the
      * respective parameter in that function also being the return value of
-     * the <tt>DoFHandler::get_fe()</tt> function.
+     * the <tt>DoFHandler::get_finite_element()</tt> function.
      */
     FEFaceValues (const hp::MappingCollection<dim,spacedim> &mapping_collection,
                   const hp::FECollection<dim,spacedim>  &fe_collection,
@@ -392,7 +392,7 @@ namespace hp
      * the signature of this function to make it compatible with the signature
      * of the respective constructor of the usual FEValues object, with the
      * respective parameter in that function also being the return value of
-     * the <tt>DoFHandler::get_fe()</tt> function.
+     * the <tt>DoFHandler::get_finite_element()</tt> function.
      */
     FEFaceValues (const hp::FECollection<dim,spacedim>  &fe_collection,
                   const hp::QCollection<dim-1> &q_collection,
@@ -493,7 +493,7 @@ namespace hp
      * the signature of this function to make it compatible with the signature
      * of the respective constructor of the usual FEValues object, with the
      * respective parameter in that function also being the return value of
-     * the <tt>DoFHandler::get_fe()</tt> function.
+     * the <tt>DoFHandler::get_finite_element()</tt> function.
      */
     FESubfaceValues (const hp::MappingCollection<dim,spacedim> &mapping_collection,
                      const hp::FECollection<dim,spacedim>  &fe_collection,
@@ -510,7 +510,7 @@ namespace hp
      * the signature of this function to make it compatible with the signature
      * of the respective constructor of the usual FEValues object, with the
      * respective parameter in that function also being the return value of
-     * the <tt>DoFHandler::get_fe()</tt> function.
+     * the <tt>DoFHandler::get_finite_element()</tt> function.
      */
     FESubfaceValues (const hp::FECollection<dim,spacedim> &fe_collection,
                      const hp::QCollection<dim-1>    &q_collection,

@@ -188,7 +188,7 @@ build_one_patch (const cell_iterator                                            
               const FEValuesBase<dimension> &fe_patch_values
                 = data.get_present_fe_values(dataset);
               const unsigned int n_components
-                = fe_patch_values.get_fe().n_components();
+                = fe_patch_values.get_finite_element().n_components();
               const DataPostprocessor<dim> *postprocessor=this->dof_data[dataset]->postprocessor;
               if (postprocessor != nullptr)
                 {

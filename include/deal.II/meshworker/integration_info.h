@@ -584,14 +584,14 @@ namespace MeshWorker
 
         if (pc != nullptr)
           fevalv[i] = std::shared_ptr<FEValuesBase<dim,sdim> > (
-                        new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
+                        new FEValues<dim,sdim> (pc->get_mapping(), pc->get_finite_element(),
                                                 pc->get_quadrature(), pc->get_update_flags()));
         else if (pf != nullptr)
           fevalv[i] = std::shared_ptr<FEValuesBase<dim,sdim> > (
-                        new FEFaceValues<dim,sdim> (pf->get_mapping(), pf->get_fe(), pf->get_quadrature(), pf->get_update_flags()));
+                        new FEFaceValues<dim,sdim> (pf->get_mapping(), pf->get_finite_element(), pf->get_quadrature(), pf->get_update_flags()));
         else if (ps != nullptr)
           fevalv[i] = std::shared_ptr<FEValuesBase<dim,sdim> > (
-                        new FESubfaceValues<dim,sdim> (ps->get_mapping(), ps->get_fe(), ps->get_quadrature(), ps->get_update_flags()));
+                        new FESubfaceValues<dim,sdim> (ps->get_mapping(), ps->get_finite_element(), ps->get_quadrature(), ps->get_update_flags()));
         else
           Assert(false, ExcInternalError());
       }

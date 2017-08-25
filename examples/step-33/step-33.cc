@@ -1737,7 +1737,7 @@ namespace Step33
     for (unsigned int q=0; q<n_q_points; ++q)
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         {
-          const unsigned int c = fe_v.get_fe().system_to_component_index(i).first;
+          const unsigned int c = fe_v.get_finite_element().system_to_component_index(i).first;
 
           W[q][c] += independent_local_dof_values[i] *
                      fe_v.shape_value_component(i, q, c);
@@ -1824,7 +1824,7 @@ namespace Step33
         Sacado::Fad::DFad<double> R_i = 0;
 
         const unsigned int
-        component_i = fe_v.get_fe().system_to_component_index(i).first;
+        component_i = fe_v.get_finite_element().system_to_component_index(i).first;
 
         // The residual for each row (i) will be accumulating into this fad
         // variable.  At the end of the assembly for this row, we will query
@@ -1939,7 +1939,7 @@ namespace Step33
     for (unsigned int q=0; q<n_q_points; ++q)
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         {
-          const unsigned int component_i = fe_v.get_fe().system_to_component_index(i).first;
+          const unsigned int component_i = fe_v.get_finite_element().system_to_component_index(i).first;
           Wplus[q][component_i] +=  independent_local_dof_values[i] *
                                     fe_v.shape_value_component(i, q, component_i);
           Wplus_old[q][component_i] +=  old_solution(dof_indices[i]) *
@@ -1954,7 +1954,7 @@ namespace Step33
         for (unsigned int q=0; q<n_q_points; ++q)
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             {
-              const unsigned int component_i = fe_v_neighbor.get_fe().
+              const unsigned int component_i = fe_v_neighbor.get_finite_element().
                                                system_to_component_index(i).first;
               Wminus[q][component_i] += independent_neighbor_dof_values[i] *
                                         fe_v_neighbor.shape_value_component(i, q, component_i);
@@ -2048,14 +2048,14 @@ namespace Step33
     // the neighboring cell:
     std::vector<double> residual_derivatives (dofs_per_cell);
     for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-      if (fe_v.get_fe().has_support_on_face(i, face_no) == true)
+      if (fe_v.get_finite_element().has_support_on_face(i, face_no) == true)
         {
           Sacado::Fad::DFad<double> R_i = 0;
 
           for (unsigned int point=0; point<n_q_points; ++point)
             {
               const unsigned int
-              component_i = fe_v.get_fe().system_to_component_index(i).first;
+              component_i = fe_v.get_finite_element().system_to_component_index(i).first;
 
               R_i += ( parameters.theta * normal_fluxes[point][component_i] +
                        (1.0 - parameters.theta) * normal_fluxes_old[point][component_i] ) *

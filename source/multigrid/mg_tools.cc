@@ -141,7 +141,7 @@ namespace MGTools
     // smaller than dim-1.
     for (cell = dofs.begin(level); cell != end; ++cell)
       {
-        const FiniteElement<dim> &fe = cell->get_fe();
+        const FiniteElement<dim> &fe = cell->get_finite_element();
         cell_indices.resize(fe.dofs_per_cell);
         cell->get_mg_dof_indices(cell_indices);
         unsigned int i = 0;
@@ -226,7 +226,7 @@ namespace MGTools
                 continue;
               }
 
-            const FiniteElement<dim> &nfe = neighbor->get_fe();
+            const FiniteElement<dim> &nfe = neighbor->get_finite_element();
             typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(iface);
 
             // Flux couplings are
@@ -324,7 +324,7 @@ namespace MGTools
     // smaller than dim-1.
     for (cell = dofs.begin_active(); cell != end; ++cell)
       {
-        const FiniteElement<dim> &fe = cell->get_fe();
+        const FiniteElement<dim> &fe = cell->get_finite_element();
         const unsigned int fe_index = cell->active_fe_index();
 
         Assert (couplings.n_rows()==fe.n_components(),
@@ -464,7 +464,7 @@ namespace MGTools
                 continue;
               }
 
-            const FiniteElement<dim> &nfe = neighbor->get_fe();
+            const FiniteElement<dim> &nfe = neighbor->get_finite_element();
             typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(iface);
 
             // Flux couplings are
@@ -1252,7 +1252,7 @@ namespace MGTools
             if (dof.get_triangulation().locally_owned_subdomain()!=numbers::invalid_subdomain_id
                 && cell->level_subdomain_id()==numbers::artificial_subdomain_id)
               continue;
-            const FiniteElement<dim> &fe = cell->get_fe();
+            const FiniteElement<dim> &fe = cell->get_finite_element();
             const unsigned int level = cell->level();
             local_dofs.resize(fe.dofs_per_face);
 
@@ -1289,7 +1289,7 @@ namespace MGTools
                 if (cell->at_boundary(face_no) == false)
                   continue;
 
-                const FiniteElement<dim> &fe = cell->get_fe();
+                const FiniteElement<dim> &fe = cell->get_finite_element();
                 const unsigned int level = cell->level();
 
                 typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_no);
@@ -1298,10 +1298,10 @@ namespace MGTools
                   // we want to constrain this boundary
                   {
 
-                    for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+                    for (unsigned int i=0; i<cell->get_finite_element().dofs_per_cell; ++i)
                       {
                         const ComponentMask &nonzero_component_array
-                          = cell->get_fe().get_nonzero_components (i);
+                          = cell->get_finite_element().get_nonzero_components (i);
                         // if we want to constrain one of the nonzero components,
                         // we have to constrain all of them
 
@@ -1336,7 +1336,7 @@ namespace MGTools
                                 // We already know that either all or none
                                 // of the components are selected
                                 const ComponentMask &nonzero_component_array
-                                  = cell->get_fe().get_nonzero_components (i);
+                                  = cell->get_finite_element().get_nonzero_components (i);
                                 for (unsigned int c=0; c<n_components; ++c)
                                   if (nonzero_component_array[c] == true)
                                     {

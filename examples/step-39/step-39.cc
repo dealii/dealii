@@ -129,7 +129,7 @@ namespace Step39
     MeshWorker::DoFInfo<dim> &dinfo,
     typename MeshWorker::IntegrationInfo<dim> &info) const
   {
-    const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
+    const unsigned int deg = info.fe_values(0).get_finite_element().tensor_degree();
     LocalIntegrators::Laplace::nitsche_matrix(
       dinfo.matrix(0,false).matrix, info.fe_values(0),
       LocalIntegrators::Laplace::compute_penalty(dinfo, dinfo, deg, deg));
@@ -143,7 +143,7 @@ namespace Step39
     typename MeshWorker::IntegrationInfo<dim> &info1,
     typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
-    const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
+    const unsigned int deg = info1.fe_values(0).get_finite_element().tensor_degree();
     LocalIntegrators::Laplace::ip_matrix(
       dinfo1.matrix(0,false).matrix, dinfo1.matrix(0,true).matrix,
       dinfo2.matrix(0,true).matrix, dinfo2.matrix(0,false).matrix,
@@ -181,7 +181,7 @@ namespace Step39
     std::vector<double> boundary_values(fe.n_quadrature_points);
     exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
 
-    const unsigned int deg = fe.get_fe().tensor_degree();
+    const unsigned int deg = fe.get_finite_element().tensor_degree();
     const double penalty = 2. * deg * (deg+1) * dinfo.face->measure() / dinfo.cell->measure();
 
     for (unsigned k=0; k<fe.n_quadrature_points; ++k)
@@ -245,7 +245,7 @@ namespace Step39
 
     const std::vector<double> &uh = info.values[0][0];
 
-    const unsigned int deg = fe.get_fe().tensor_degree();
+    const unsigned int deg = fe.get_finite_element().tensor_degree();
     const double penalty = 2. * deg * (deg+1) * dinfo.face->measure() / dinfo.cell->measure();
 
     for (unsigned k=0; k<fe.n_quadrature_points; ++k)
@@ -269,7 +269,7 @@ namespace Step39
     const std::vector<Tensor<1,dim> > &Duh1 = info1.gradients[0][0];
     const std::vector<Tensor<1,dim> > &Duh2 = info2.gradients[0][0];
 
-    const unsigned int deg = fe.get_fe().tensor_degree();
+    const unsigned int deg = fe.get_finite_element().tensor_degree();
     const double penalty1 = deg * (deg+1) * dinfo1.face->measure() / dinfo1.cell->measure();
     const double penalty2 = deg * (deg+1) * dinfo2.face->measure() / dinfo2.cell->measure();
     const double penalty = penalty1 + penalty2;
@@ -367,7 +367,7 @@ namespace Step39
 
     const std::vector<double> &uh = info.values[0][0];
 
-    const unsigned int deg = fe.get_fe().tensor_degree();
+    const unsigned int deg = fe.get_finite_element().tensor_degree();
     const double penalty = 2. * deg * (deg+1) * dinfo.face->measure() / dinfo.cell->measure();
 
     for (unsigned k=0; k<fe.n_quadrature_points; ++k)
@@ -390,7 +390,7 @@ namespace Step39
     const std::vector<double> &uh1 = info1.values[0][0];
     const std::vector<double> &uh2 = info2.values[0][0];
 
-    const unsigned int deg = fe.get_fe().tensor_degree();
+    const unsigned int deg = fe.get_finite_element().tensor_degree();
     const double penalty1 = deg * (deg+1) * dinfo1.face->measure() / dinfo1.cell->measure();
     const double penalty2 = deg * (deg+1) * dinfo2.face->measure() / dinfo2.cell->measure();
     const double penalty = penalty1 + penalty2;

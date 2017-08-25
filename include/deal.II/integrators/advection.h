@@ -81,7 +81,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      const unsigned int n_components = fe.get_fe().n_components();
+      const unsigned int n_components = fe.get_finite_element().n_components();
 
       AssertDimension(velocity.size(), dim);
       // If the size of the
@@ -181,7 +181,7 @@ namespace LocalIntegrators
     {
       const unsigned int nq = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
-      const unsigned int n_comp = fe.get_fe().n_components();
+      const unsigned int n_comp = fe.get_finite_element().n_components();
 
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
       Assert(result.size() == n_dofs, ExcDimensionMismatch(result.size(), n_dofs));
@@ -262,7 +262,7 @@ namespace LocalIntegrators
     {
       const unsigned int nq = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
-      const unsigned int n_comp = fe.get_fe().n_components();
+      const unsigned int n_comp = fe.get_finite_element().n_components();
 
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
       Assert(result.size() == n_dofs, ExcDimensionMismatch(result.size(), n_dofs));
@@ -314,7 +314,7 @@ namespace LocalIntegrators
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
       const unsigned int t_dofs = fetest.dofs_per_cell;
-      unsigned int n_components = fe.get_fe().n_components();
+      unsigned int n_components = fe.get_finite_element().n_components();
       AssertDimension (M.m(), n_dofs);
       AssertDimension (M.n(), n_dofs);
 
@@ -338,7 +338,7 @@ namespace LocalIntegrators
               for (unsigned i=0; i<t_dofs; ++i)
                 for (unsigned j=0; j<n_dofs; ++j)
                   {
-                    if (fe.get_fe().is_primitive())
+                    if (fe.get_finite_element().is_primitive())
                       M(i,j) += dx * nv * fe.shape_value(i,k) * fe.shape_value(j,k);
                     else
                       for (unsigned int c=0; c<n_components; ++c)
@@ -454,7 +454,7 @@ namespace LocalIntegrators
       double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      const unsigned int n_comp = fe.get_fe().n_components();
+      const unsigned int n_comp = fe.get_finite_element().n_components();
 
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
       AssertVectorVectorDimension(data, n_comp, fe.n_quadrature_points);
@@ -550,14 +550,14 @@ namespace LocalIntegrators
           for (unsigned i=0; i<n1; ++i)
             for (unsigned j=0; j<n1; ++j)
               {
-                if (fe1.get_fe().is_primitive())
+                if (fe1.get_finite_element().is_primitive())
                   {
                     M1(i,j) += dx_nbeta*fe.shape_value(j,k)*fetest.shape_value(i,k);
                     M2(i,j) -= dx_nbeta*fe.shape_value(j,k)*fetestn.shape_value(i,k);
                   }
                 else
                   {
-                    for (unsigned int d=0; d<fe1.get_fe().n_components(); ++d)
+                    for (unsigned int d=0; d<fe1.get_finite_element().n_components(); ++d)
                       {
                         M1(i,j) += dx_nbeta*fe.shape_value_component(j,k,d)*fetest.shape_value_component(i,k,d);
                         M2(i,j) -= dx_nbeta*fe.shape_value_component(j,k,d)*fetestn.shape_value_component(i,k,d);
@@ -600,10 +600,10 @@ namespace LocalIntegrators
       const VectorSlice<const std::vector<std::vector<double> > > &velocity,
       const double factor = 1.)
     {
-      Assert(fe1.get_fe().n_components() == 1,
-             ExcDimensionMismatch(fe1.get_fe().n_components(), 1));
-      Assert(fe2.get_fe().n_components() == 1,
-             ExcDimensionMismatch(fe2.get_fe().n_components(), 1));
+      Assert(fe1.get_finite_element().n_components() == 1,
+             ExcDimensionMismatch(fe1.get_finite_element().n_components(), 1));
+      Assert(fe2.get_finite_element().n_components() == 1,
+             ExcDimensionMismatch(fe2.get_finite_element().n_components(), 1));
 
       const unsigned int n1 = fe1.dofs_per_cell;
       // Multiply the quadrature point
@@ -678,7 +678,7 @@ namespace LocalIntegrators
       const VectorSlice<const std::vector<std::vector<double> > > &velocity,
       const double factor = 1.)
     {
-      const unsigned int n_comp = fe1.get_fe().n_components();
+      const unsigned int n_comp = fe1.get_finite_element().n_components();
       const unsigned int n1 = fe1.dofs_per_cell;
       AssertVectorVectorDimension(input1, n_comp, fe1.n_quadrature_points);
       AssertVectorVectorDimension(input2, n_comp, fe2.n_quadrature_points);

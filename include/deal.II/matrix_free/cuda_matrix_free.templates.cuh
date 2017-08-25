@@ -339,7 +339,7 @@ namespace CUDAWrappers
       const ConstraintMatrix &constraints)
     {
       std::vector<types::global_dof_index> local_dof_indices(
-        cell->get_fe().dofs_per_cell);
+        cell->get_finite_element().dofs_per_cell);
       cell->get_dof_indices(local_dof_indices);
       constraints.resolve_indices(local_dof_indices);
 

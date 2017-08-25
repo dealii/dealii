@@ -55,7 +55,7 @@ namespace LocalIntegrators
       const double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      const unsigned int n_components = fe.get_fe().n_components();
+      const unsigned int n_components = fe.get_finite_element().n_components();
 
       for (unsigned int k=0; k<fe.n_quadrature_points; ++k)
         {
@@ -126,7 +126,7 @@ namespace LocalIntegrators
     {
       const unsigned int nq = fe.n_quadrature_points;
       const unsigned int n_dofs = fe.dofs_per_cell;
-      const unsigned int n_comp = fe.get_fe().n_components();
+      const unsigned int n_comp = fe.get_finite_element().n_components();
 
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
       Assert(result.size() == n_dofs, ExcDimensionMismatch(result.size(), n_dofs));
@@ -165,7 +165,7 @@ namespace LocalIntegrators
       double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      const unsigned int n_comp = fe.get_fe().n_components();
+      const unsigned int n_comp = fe.get_finite_element().n_components();
 
       Assert (M.m() == n_dofs, ExcDimensionMismatch(M.m(), n_dofs));
       Assert (M.n() == n_dofs, ExcDimensionMismatch(M.n(), n_dofs));
@@ -206,7 +206,7 @@ namespace LocalIntegrators
       double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertDimension(fe.get_finite_element().n_components(), dim);
       Assert (M.m() == n_dofs, ExcDimensionMismatch(M.m(), n_dofs));
       Assert (M.n() == n_dofs, ExcDimensionMismatch(M.n(), n_dofs));
 
@@ -318,7 +318,7 @@ namespace LocalIntegrators
       double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      const unsigned int n_comp = fe.get_fe().n_components();
+      const unsigned int n_comp = fe.get_finite_element().n_components();
       AssertVectorVectorDimension(input, n_comp, fe.n_quadrature_points);
       AssertVectorVectorDimension(Dinput, n_comp, fe.n_quadrature_points);
       AssertVectorVectorDimension(data, n_comp, fe.n_quadrature_points);
@@ -390,7 +390,7 @@ namespace LocalIntegrators
         {
           const double dx = fe1.JxW(k);
           const Tensor<1,dim> n = fe1.normal_vector(k);
-          for (unsigned int d=0; d<fe1.get_fe().n_components(); ++d)
+          for (unsigned int d=0; d<fe1.get_finite_element().n_components(); ++d)
             {
               for (unsigned int i=0; i<n_dofs; ++i)
                 {
@@ -441,8 +441,8 @@ namespace LocalIntegrators
       double factor2 = -1.)
     {
       const unsigned int n_dofs = fe1.dofs_per_cell;
-      AssertDimension(fe1.get_fe().n_components(), dim);
-      AssertDimension(fe2.get_fe().n_components(), dim);
+      AssertDimension(fe1.get_finite_element().n_components(), dim);
+      AssertDimension(fe2.get_finite_element().n_components(), dim);
       AssertDimension(M11.n(), n_dofs);
       AssertDimension(M11.m(), n_dofs);
       AssertDimension(M12.n(), n_dofs);
@@ -542,10 +542,10 @@ namespace LocalIntegrators
       double int_factor = 1.,
       double ext_factor = -1.)
     {
-      Assert(fe1.get_fe().n_components() == 1,
-             ExcDimensionMismatch(fe1.get_fe().n_components(), 1));
-      Assert(fe2.get_fe().n_components() == 1,
-             ExcDimensionMismatch(fe2.get_fe().n_components(), 1));
+      Assert(fe1.get_finite_element().n_components() == 1,
+             ExcDimensionMismatch(fe1.get_finite_element().n_components(), 1));
+      Assert(fe2.get_finite_element().n_components() == 1,
+             ExcDimensionMismatch(fe2.get_finite_element().n_components(), 1));
 
       const double nui = int_factor;
       const double nue = (ext_factor < 0) ? int_factor : ext_factor;
@@ -609,7 +609,7 @@ namespace LocalIntegrators
       double int_factor = 1.,
       double ext_factor = -1.)
     {
-      const unsigned int n_comp = fe1.get_fe().n_components();
+      const unsigned int n_comp = fe1.get_finite_element().n_components();
       const unsigned int n1 = fe1.dofs_per_cell;
 
       AssertVectorVectorDimension(input1, n_comp, fe1.n_quadrature_points);

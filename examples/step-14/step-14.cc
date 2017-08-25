@@ -613,7 +613,7 @@ namespace Step14
     Solver<dim>::AssemblyScratchData::
     AssemblyScratchData (const AssemblyScratchData &scratch_data)
       :
-      fe_values (scratch_data.fe_values.get_fe(),
+      fe_values (scratch_data.fe_values.get_finite_element(),
                  scratch_data.fe_values.get_quadrature(),
                  update_gradients | update_JxW_values)
     {}
@@ -2022,7 +2022,7 @@ namespace Step14
     WeightedResidual<dim>::CellData::
     CellData (const CellData &cell_data)
       :
-      fe_values (cell_data.fe_values.get_fe(),
+      fe_values (cell_data.fe_values.get_finite_element(),
                  cell_data.fe_values.get_quadrature(),
                  update_values   |
                  update_hessians |
@@ -2070,19 +2070,19 @@ namespace Step14
     WeightedResidual<dim>::FaceData::
     FaceData (const FaceData &face_data)
       :
-      fe_face_values_cell (face_data.fe_face_values_cell.get_fe(),
+      fe_face_values_cell (face_data.fe_face_values_cell.get_finite_element(),
                            face_data.fe_face_values_cell.get_quadrature(),
                            update_values        |
                            update_gradients     |
                            update_JxW_values    |
                            update_normal_vectors),
-      fe_face_values_neighbor (face_data.fe_face_values_neighbor.get_fe(),
+      fe_face_values_neighbor (face_data.fe_face_values_neighbor.get_finite_element(),
                                face_data.fe_face_values_neighbor.get_quadrature(),
                                update_values     |
                                update_gradients  |
                                update_JxW_values |
                                update_normal_vectors),
-      fe_subface_values_cell (face_data.fe_subface_values_cell.get_fe(),
+      fe_subface_values_cell (face_data.fe_subface_values_cell.get_finite_element(),
                               face_data.fe_subface_values_cell.get_quadrature(),
                               update_gradients),
       jump_residual (face_data.jump_residual),

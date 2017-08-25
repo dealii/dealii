@@ -1252,7 +1252,7 @@ namespace Step44
 
     ScratchData_K(const ScratchData_K &rhs)
       :
-      fe_values_ref(rhs.fe_values_ref.get_fe(),
+      fe_values_ref(rhs.fe_values_ref.get_finite_element(),
                     rhs.fe_values_ref.get_quadrature(),
                     rhs.fe_values_ref.get_update_flags()),
       Nx(rhs.Nx),
@@ -1328,10 +1328,10 @@ namespace Step44
 
     ScratchData_RHS(const ScratchData_RHS &rhs)
       :
-      fe_values_ref(rhs.fe_values_ref.get_fe(),
+      fe_values_ref(rhs.fe_values_ref.get_finite_element(),
                     rhs.fe_values_ref.get_quadrature(),
                     rhs.fe_values_ref.get_update_flags()),
-      fe_face_values_ref(rhs.fe_face_values_ref.get_fe(),
+      fe_face_values_ref(rhs.fe_face_values_ref.get_finite_element(),
                          rhs.fe_face_values_ref.get_quadrature(),
                          rhs.fe_face_values_ref.get_update_flags()),
       Nx(rhs.Nx),
@@ -1474,7 +1474,7 @@ namespace Step44
       solution_grads_u_total(rhs.solution_grads_u_total),
       solution_values_p_total(rhs.solution_values_p_total),
       solution_values_J_total(rhs.solution_values_J_total),
-      fe_values_ref(rhs.fe_values_ref.get_fe(),
+      fe_values_ref(rhs.fe_values_ref.get_finite_element(),
                     rhs.fe_values_ref.get_quadrature(),
                     rhs.fe_values_ref.get_update_flags())
     {}

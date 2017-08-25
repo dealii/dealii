@@ -1,0 +1,5 @@
+New: FEValuesBase::get_fe() has been deprecated in favor of
+FEValuesBase::get_finite_element() to restore similarity to
+the DoFHandler and hp::DoFHandler class.
+<br>
+(Daniel Arndt, 2017/08/23)

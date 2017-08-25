@@ -96,7 +96,7 @@ void SolutionTransfer<dim, VectorType, DoFHandlerType>::prepare_for_pure_refinem
 
   for (unsigned int i=0; cell!=endc; ++cell, ++i)
     {
-      indices_on_cell[i].resize(cell->get_fe().dofs_per_cell);
+      indices_on_cell[i].resize(cell->get_finite_element().dofs_per_cell);
       // on each cell store the indices of the
       // dofs. after refining we get the values
       // on the children by taking these
@@ -315,7 +315,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
       // CASE 1: active cell that remains as it is
       if (cell->active() && !cell->coarsen_flag_set())
         {
-          const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
+          const unsigned int dofs_per_cell=cell->get_finite_element().dofs_per_cell;
           indices_on_cell[n_sr].resize(dofs_per_cell);
           // cell will not be coarsened,
           // so we get away by storing the
@@ -359,8 +359,8 @@ prepare_for_coarsening_and_refinement(const std::vector<VectorType> &all_in)
           unsigned int most_general_child = 0;
           if (different_fe_on_children == true)
             for (unsigned int child=1; child<cell->n_children(); ++child)
-              if (cell->child(child)->get_fe().dofs_per_cell >
-                  cell->child(most_general_child)->get_fe().dofs_per_cell)
+              if (cell->child(child)->get_finite_element().dofs_per_cell >
+                  cell->child(most_general_child)->get_finite_element().dofs_per_cell)
                 most_general_child = child;
           const unsigned int target_finite_element_index = cell->child(most_general_child)->active_fe_index();
 
@@ -482,7 +482,7 @@ interpolate (const std::vector<VectorType> &all_in,
               Assert (indexptr == nullptr,
                       ExcInternalError());
 
-              const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+              const unsigned int dofs_per_cell = cell->get_finite_element().dofs_per_cell;
               dofs.resize(dofs_per_cell);
               // get the local
               // indices

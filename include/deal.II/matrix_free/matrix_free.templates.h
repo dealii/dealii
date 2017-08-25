@@ -644,7 +644,7 @@ void MatrixFree<dim,Number>::initialize_indices
               if (dofh->get_fe_collection().size() > 1)
                 dof_info[no].cell_active_fe_index[counter] =
                   cell_it->active_fe_index();
-              local_dof_indices.resize (cell_it->get_fe().dofs_per_cell);
+              local_dof_indices.resize (cell_it->get_finite_element().dofs_per_cell);
               cell_it->get_dof_indices(local_dof_indices);
               dof_info[no].read_dof_indices (local_dof_indices,
                                              shape_info(no,0,cell_it->active_fe_index(),0).lexicographic_numbering,

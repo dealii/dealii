@@ -946,7 +946,7 @@ namespace Step13
     Solver<dim>::AssemblyScratchData::
     AssemblyScratchData (const AssemblyScratchData &scratch_data)
       :
-      fe_values (scratch_data.fe_values.get_fe(),
+      fe_values (scratch_data.fe_values.get_finite_element(),
                  scratch_data.fe_values.get_quadrature(),
                  update_gradients | update_JxW_values)
     {}
