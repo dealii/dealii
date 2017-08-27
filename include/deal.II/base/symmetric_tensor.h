@@ -3045,7 +3045,7 @@ enum struct SymmetricTensorEigenvectorMethod
 template <typename Number>
 std::array<std::pair<Number, Tensor<1,1,Number> >,1>
 eigenvectors (const SymmetricTensor<2,1,Number>           &T,
-              const enum SymmetricTensorEigenvectorMethod /*method*/ = SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
+              const SymmetricTensorEigenvectorMethod /*method*/ = SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
 {
   return { {std::make_pair(T[0][0], Tensor<1,1,Number>({1.0}))} };
 }
@@ -3082,7 +3082,7 @@ eigenvectors (const SymmetricTensor<2,1,Number>           &T,
 template <int dim, typename Number>
 std::array<std::pair<Number, Tensor<1,dim,Number> >,dim>
 eigenvectors (const SymmetricTensor<2,dim,Number>         &T,
-              const enum SymmetricTensorEigenvectorMethod  method = SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
+              const SymmetricTensorEigenvectorMethod  method = SymmetricTensorEigenvectorMethod::ql_implicit_shifts)
 {
   std::array<std::pair<Number, Tensor<1,dim,Number> >,dim> eig_vals_vecs;
 
