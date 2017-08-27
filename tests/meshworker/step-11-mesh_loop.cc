@@ -257,27 +257,23 @@ namespace Step11
           }
     };
 
-    auto boundary_worker = [] (const Iterator &cell, const unsigned int &f, ScratchData<dim> &scratch_data, CopyData &copy_data)
+    auto boundary_worker = [] (const Iterator &cell, const unsigned int &face_no, ScratchData<dim> &scratch_data, CopyData &copy_data)
     {
       const unsigned int dofs_per_cell   = scratch_data.fe_values.get_fe().dofs_per_cell;
       const unsigned int n_face_q_points = scratch_data.fe_face_values.get_quadrature().size();
 
-      std::vector<double>         face_boundary_values (n_face_q_points);
+      std::vector<double> face_boundary_values (n_face_q_points);
       ConstantFunction<dim> boundary_values (1.0);
 
-      for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-        if (cell->face(face)->at_boundary())
-          {
-            scratch_data.fe_face_values.reinit (cell, face);
-            boundary_values.value_list (scratch_data.fe_face_values.get_quadrature_points(),
-                                        face_boundary_values);
+      scratch_data.fe_face_values.reinit (cell, face_no);
+      boundary_values.value_list (scratch_data.fe_face_values.get_quadrature_points(),
+                                  face_boundary_values);
 
-            for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
-              for (unsigned int i=0; i<dofs_per_cell; ++i)
-                copy_data.cell_rhs(i) -= (face_boundary_values[q_point] *
-                                          scratch_data.fe_face_values.shape_value(i,q_point) *
-                                          scratch_data.fe_face_values.JxW(q_point));
-          }
+      for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          copy_data.cell_rhs(i) -= (face_boundary_values[q_point] *
+                                    scratch_data.fe_face_values.shape_value(i,q_point) *
+                                    scratch_data.fe_face_values.JxW(q_point));
     };
 
     auto copier = [&](const CopyData &c)
