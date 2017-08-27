@@ -999,7 +999,7 @@ SymmetricTensor<rank,dim,Number>::
 SymmetricTensor (const SymmetricTensor<rank,dim,OtherNumber> &initializer)
 {
   for (unsigned int i=0; i<base_tensor_type::dimension; ++i)
-    data[i] = initializer.data[i];
+    data[i] = internal::NumberType<typename base_tensor_type::value_type>::value(initializer.data[i]);
 }
 
 
@@ -2560,7 +2560,7 @@ Number determinant (const SymmetricTensor<2,dim,Number> &t)
     }
     default:
       Assert (false, ExcNotImplemented());
-      return 0;
+      return internal::NumberType<Number>::value(0.0);
     }
 }
 
@@ -2634,7 +2634,7 @@ template <typename Number>
 inline
 Number second_invariant (const SymmetricTensor<2,1,Number> &)
 {
-  return 0;
+  return internal::NumberType<Number>::value(0.0);
 }
 
 

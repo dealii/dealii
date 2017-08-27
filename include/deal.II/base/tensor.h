@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/tensor_accessors.h>
 #include <deal.II/base/template_constraints.h>
@@ -601,6 +602,11 @@ namespace internal
   template <int rank, int dim, typename T>
   struct NumberType<Tensor<rank,dim,T> >
   {
+    static const Tensor<rank,dim,T> &value (const Tensor<rank,dim,T> &t)
+    {
+      return t;
+    }
+
     static Tensor<rank,dim,T> value (const T &t)
     {
       Tensor<rank,dim,T> tmp;
@@ -612,10 +618,22 @@ namespace internal
   template <int rank, int dim, typename T>
   struct NumberType<Tensor<rank,dim,VectorizedArray<T> > >
   {
+    static const Tensor<rank,dim,VectorizedArray<T> > &value (const Tensor<rank,dim,VectorizedArray<T> > &t)
+    {
+      return t;
+    }
+
     static Tensor<rank,dim,VectorizedArray<T> > value (const T &t)
     {
       Tensor<rank,dim,VectorizedArray<T> > tmp;
       tmp=internal::NumberType<VectorizedArray<T> >::value(t);
+      return tmp;
+    }
+
+    static Tensor<rank,dim,VectorizedArray<T> > value (const VectorizedArray<T> &t)
+    {
+      Tensor<rank,dim,VectorizedArray<T> > tmp;
+      tmp=t;
       return tmp;
     }
   };
@@ -640,7 +658,7 @@ template <typename OtherNumber>
 inline
 Tensor<0,dim,Number>::Tensor (const OtherNumber &initializer)
 {
-  value = initializer;
+  value = internal::NumberType<Number>::value(initializer);
 }
 
 

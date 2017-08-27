@@ -397,7 +397,7 @@ namespace internal
   template <typename T>
   struct NumberType
   {
-    static DEAL_II_CUDA_HOST_DEV T value (const T &t)
+    static DEAL_II_CUDA_HOST_DEV const T &value (const T &t)
     {
       return t;
     }
@@ -406,9 +406,23 @@ namespace internal
   template <typename T>
   struct NumberType<std::complex<T> >
   {
+    static const std::complex<T> &value (const std::complex<T> &t)
+    {
+      return t;
+    }
+
     static std::complex<T> value (const T &t)
     {
       return std::complex<T>(t);
+    }
+
+    // Facilitate cast from complex<double> to complex<float>
+    template <typename U>
+    static std::complex<T> value (const std::complex<U> &t)
+    {
+      return std::complex<T>(
+               NumberType<T>::value(t.real()),
+               NumberType<T>::value(t.imag()));
     }
   };
 }

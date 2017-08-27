@@ -74,6 +74,11 @@ namespace internal
   template <typename T>
   struct NumberType<VectorizedArray<T> >
   {
+    static const VectorizedArray<T> &value (const VectorizedArray<T> &t)
+    {
+      return t;
+    }
+
     static VectorizedArray<T> value (const T &t)
     {
       VectorizedArray<T> tmp;
