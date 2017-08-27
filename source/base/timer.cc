@@ -329,8 +329,8 @@ void Timer::reset ()
 /* ---------------------------- TimerOutput -------------------------- */
 
 TimerOutput::TimerOutput (std::ostream &stream,
-                          const enum OutputFrequency output_frequency,
-                          const enum OutputType output_type)
+                          const OutputFrequency output_frequency,
+                          const OutputType output_type)
   :
   output_frequency (output_frequency),
   output_type (output_type),
@@ -342,8 +342,8 @@ TimerOutput::TimerOutput (std::ostream &stream,
 
 
 TimerOutput::TimerOutput (ConditionalOStream &stream,
-                          const enum OutputFrequency output_frequency,
-                          const enum OutputType output_type)
+                          const OutputFrequency output_frequency,
+                          const OutputType output_type)
   :
   output_frequency (output_frequency),
   output_type (output_type),
@@ -356,8 +356,8 @@ TimerOutput::TimerOutput (ConditionalOStream &stream,
 
 TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
                           std::ostream &stream,
-                          const enum OutputFrequency output_frequency,
-                          const enum OutputType output_type)
+                          const OutputFrequency output_frequency,
+                          const OutputType output_type)
   :
   output_frequency (output_frequency),
   output_type (output_type),
@@ -370,8 +370,8 @@ TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
 
 TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
                           ConditionalOStream &stream,
-                          const enum OutputFrequency output_frequency,
-                          const enum OutputType output_type)
+                          const OutputFrequency output_frequency,
+                          const OutputType output_type)
   :
   output_frequency (output_frequency),
   output_type (output_type),

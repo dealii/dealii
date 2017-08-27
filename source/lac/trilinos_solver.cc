@@ -57,9 +57,9 @@ namespace TrilinosWrappers
 
 
 
-  SolverBase::SolverBase (const enum SolverBase::SolverName  solver_name,
-                          SolverControl                     &cn,
-                          const AdditionalData              &data)
+  SolverBase::SolverBase (const SolverBase::SolverName  solver_name,
+                          SolverControl                &cn,
+                          const AdditionalData         &data)
     :
     solver_name    (solver_name),
     solver_control (cn),
