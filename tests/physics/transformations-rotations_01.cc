@@ -18,6 +18,7 @@
 
 #include "../tests.h"
 
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
@@ -97,7 +98,7 @@ int main ()
   deallog << std::setprecision(3);
   deallog.attach(logfile);
 
-  const double deg_to_rad = M_PI/180.0;
+  const double deg_to_rad = numbers::PI/180.0;
 
   // 2-d
   {

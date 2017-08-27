@@ -44,6 +44,7 @@ std::ofstream logfile ("output");
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
 
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -373,7 +374,7 @@ int main (int /*argc*/, char **/*argv*/)
 
   unsigned int test_out = 0;
   // Try rotating the elements
-  for (double rotat = 0; rotat < 2 * M_PI; rotat += 0.25 * M_PI)
+  for (double rotat = 0; rotat < 2 * numbers::PI; rotat += 0.25 * numbers::PI)
     {
       // Rotate element
       VectorTools::project (*dof_handler_def, hn_constraints_def,

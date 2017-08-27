@@ -76,6 +76,7 @@ namespace LA
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 
@@ -213,8 +214,10 @@ namespace Step55
     const double R_x = p[0];
     const double R_y = p[1];
 
-    values[0] = -1.0L/2.0L*(-2*sqrt(25.0 + 4*pow(M_PI, 2)) + 10.0)*exp(R_x*(-2*sqrt(25.0 + 4*pow(M_PI, 2)) + 10.0)) - 0.4*pow(M_PI, 2)*exp(R_x*(-sqrt(25.0 + 4*pow(M_PI, 2)) + 5.0))*cos(2*R_y*M_PI) + 0.1*pow(-sqrt(25.0 + 4*pow(M_PI, 2)) + 5.0, 2)*exp(R_x*(-sqrt(25.0 + 4*pow(M_PI, 2)) + 5.0))*cos(2*R_y*M_PI);
-    values[1] = 0.2*M_PI*(-sqrt(25.0 + 4*pow(M_PI, 2)) + 5.0)*exp(R_x*(-sqrt(25.0 + 4*pow(M_PI, 2)) + 5.0))*sin(2*R_y*M_PI) - 0.05*pow(-sqrt(25.0 + 4*pow(M_PI, 2)) + 5.0, 3)*exp(R_x*(-sqrt(25.0 + 4*pow(M_PI, 2)) + 5.0))*sin(2*R_y*M_PI)/M_PI;
+    const double pi = numbers::PI;
+    const double pi2 = pi*pi;
+    values[0] = -1.0L/2.0L*(-2*sqrt(25.0 + 4*pi2) + 10.0)*exp(R_x*(-2*sqrt(25.0 + 4*pi2) + 10.0)) - 0.4*pi2*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*cos(2*R_y*pi) + 0.1*pow(-sqrt(25.0 + 4*pi2) + 5.0, 2)*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*cos(2*R_y*pi);
+    values[1] = 0.2*pi*(-sqrt(25.0 + 4*pi2) + 5.0)*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*sin(2*R_y*pi) - 0.05*pow(-sqrt(25.0 + 4*pi2) + 5.0, 3)*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*sin(2*R_y*pi)/pi;
     values[2] = 0;
   }
 
@@ -237,9 +240,11 @@ namespace Step55
     const double R_x = p[0];
     const double R_y = p[1];
 
-    values[0] = -exp(R_x*(-sqrt(25.0 + 4*pow(M_PI, 2)) + 5.0))*cos(2*R_y*M_PI) + 1;
-    values[1] = (1.0L/2.0L)*(-sqrt(25.0 + 4*pow(M_PI, 2)) + 5.0)*exp(R_x*(-sqrt(25.0 + 4*pow(M_PI, 2)) + 5.0))*sin(2*R_y*M_PI)/M_PI;
-    values[2] = -1.0L/2.0L*exp(R_x*(-2*sqrt(25.0 + 4*pow(M_PI, 2)) + 10.0)) - 2.0*(-6538034.74494422 + 0.0134758939981709*exp(4*sqrt(25.0 + 4*pow(M_PI, 2))))/(-80.0*exp(3*sqrt(25.0 + 4*pow(M_PI, 2))) + 16.0*sqrt(25.0 + 4*pow(M_PI, 2))*exp(3*sqrt(25.0 + 4*pow(M_PI, 2)))) - 1634508.68623606*exp(-3.0*sqrt(25.0 + 4*pow(M_PI, 2)))/(-10.0 + 2.0*sqrt(25.0 + 4*pow(M_PI, 2))) + (-0.00673794699908547*exp(sqrt(25.0 + 4*pow(M_PI, 2))) + 3269017.37247211*exp(-3*sqrt(25.0 + 4*pow(M_PI, 2))))/(-8*sqrt(25.0 + 4*pow(M_PI, 2)) + 40.0) + 0.00336897349954273*exp(1.0*sqrt(25.0 + 4*pow(M_PI, 2)))/(-10.0 + 2.0*sqrt(25.0 + 4*pow(M_PI, 2)));
+    const double pi = numbers::PI;
+    const double pi2 = pi*pi;
+    values[0] = -exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*cos(2*R_y*pi) + 1;
+    values[1] = (1.0L/2.0L)*(-sqrt(25.0 + 4*pi2) + 5.0)*exp(R_x*(-sqrt(25.0 + 4*pi2) + 5.0))*sin(2*R_y*pi)/pi;
+    values[2] = -1.0L/2.0L*exp(R_x*(-2*sqrt(25.0 + 4*pi2) + 10.0)) - 2.0*(-6538034.74494422 + 0.0134758939981709*exp(4*sqrt(25.0 + 4*pi2)))/(-80.0*exp(3*sqrt(25.0 + 4*pi2)) + 16.0*sqrt(25.0 + 4*pi2)*exp(3*sqrt(25.0 + 4*pi2))) - 1634508.68623606*exp(-3.0*sqrt(25.0 + 4*pi2))/(-10.0 + 2.0*sqrt(25.0 + 4*pi2)) + (-0.00673794699908547*exp(sqrt(25.0 + 4*pi2)) + 3269017.37247211*exp(-3*sqrt(25.0 + 4*pi2)))/(-8*sqrt(25.0 + 4*pi2) + 40.0) + 0.00336897349954273*exp(1.0*sqrt(25.0 + 4*pi2))/(-10.0 + 2.0*sqrt(25.0 + 4*pi2));
   }
 
 
