@@ -69,23 +69,10 @@ FE_DGPNonparametric<dim,spacedim>::FE_DGPNonparametric (const unsigned int degre
   // presently not implemented for DGPNonparametric
   // elements.
   //
-  // if it were, then the following
-  // snippet would be the right code
-//    if ((degree < Matrices::n_projection_matrices) &&
-//        (Matrices::projection_matrices[degree] != 0))
-//      {
-//        restriction[0].fill (Matrices::projection_matrices[degree]);
-//      }
-//    else
-//                                   // matrix undefined, set size to zero
-//      for (unsigned int i=0;i<GeometryInfo<dim>::max_children_per_cell;++i)
-//        restriction[i].reinit(0, 0);
   // since not implemented, set to
   // "empty". however, that is done in the
   // default constructor already, so do nothing
-//  for (unsigned int i=0;i<GeometryInfo<dim>::max_children_per_cell;++i)
-//    this->restriction[i].reinit(0, 0);
-
+  //
   // note further, that these
   // elements have neither support
   // nor face-support points, so

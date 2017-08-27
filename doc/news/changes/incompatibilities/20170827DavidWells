@@ -1,0 +1,4 @@
+Changed: The public struct <code>FE_DGP::Matrices</code> has been removed. It
+previously contained two static pointers that were never defined.
+<br>
+(David Wells, 2017/08/27)
