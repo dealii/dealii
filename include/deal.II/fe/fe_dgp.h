@@ -445,26 +445,6 @@ public:
    */
   virtual std::size_t memory_consumption () const;
 
-
-  /**
-   * Declare a nested class which will hold static definitions of various
-   * matrices such as constraint and embedding matrices. The definition of the
-   * various static fields are in the files <tt>fe_dgp_[123]d.cc</tt> in the
-   * source directory.
-   */
-  struct Matrices
-  {
-    /**
-     * As @p embedding but for projection matrices.
-     */
-    static const double *const projection_matrices[][GeometryInfo<dim>::max_children_per_cell];
-
-    /**
-     * As @p n_embedding_matrices but for projection matrices.
-     */
-    static const unsigned int n_projection_matrices;
-  };
-
   /**
    * Return a list of constant modes of the element. For this element, the
    * first entry is true, all other are false.
@@ -488,42 +468,6 @@ private:
 };
 
 /* @} */
-#ifndef DOXYGEN
-
-
-// declaration of explicit specializations of member variables
-template <>
-const double *const FE_DGP<1>::Matrices::projection_matrices[][GeometryInfo<1>::max_children_per_cell];
-
-template <>
-const unsigned int FE_DGP<1>::Matrices::n_projection_matrices;
-
-template <>
-const double *const FE_DGP<2>::Matrices::projection_matrices[][GeometryInfo<2>::max_children_per_cell];
-
-template <>
-const unsigned int FE_DGP<2>::Matrices::n_projection_matrices;
-
-template <>
-const double *const FE_DGP<3>::Matrices::projection_matrices[][GeometryInfo<3>::max_children_per_cell];
-
-template <>
-const unsigned int FE_DGP<3>::Matrices::n_projection_matrices;
-
-//codimension 1
-template <>
-const double *const FE_DGP<1,2>::Matrices::projection_matrices[][GeometryInfo<1>::max_children_per_cell];
-
-template <>
-const unsigned int FE_DGP<1,2>::Matrices::n_projection_matrices;
-
-template <>
-const double *const FE_DGP<2,3>::Matrices::projection_matrices[][GeometryInfo<2>::max_children_per_cell];
-
-template <>
-const unsigned int FE_DGP<2,3>::Matrices::n_projection_matrices;
-
-#endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
