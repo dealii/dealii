@@ -117,6 +117,9 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   #
   CHECK_CXX_SOURCE_RUNS(
     "
+    #ifndef __AVX__
+    #error \"__AVX__ flag not set, no support for AVX\"
+    #endif
     #include <immintrin.h>
     class VectorizedArray
     {
@@ -173,6 +176,9 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
 
   CHECK_CXX_SOURCE_RUNS(
     "
+    #ifndef __AVX512F__
+    #error \"__AVX512F__ flag not set, no support for AVX512\"
+    #endif
     #include <immintrin.h>
     int main()
     {
