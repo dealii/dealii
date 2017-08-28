@@ -166,7 +166,7 @@ public:
   void solve (const MatrixType         &A,
               VectorType               &x,
               const VectorType         &b,
-              const PreconditionerType &precondition);
+              const PreconditionerType &preconditioner);
 
 protected:
 
@@ -377,7 +377,7 @@ template <typename MatrixType, typename PreconditionerType>
 void SolverFIRE<VectorType>::solve (const MatrixType         &A,
                                     VectorType               &x,
                                     const VectorType         &b,
-                                    const PreconditionerType &precondition)
+                                    const PreconditionerType &preconditioner)
 {
 
   std::function<double(VectorType &,  const VectorType &)> compute_func =
@@ -394,7 +394,7 @@ void SolverFIRE<VectorType>::solve (const MatrixType         &A,
     return 0.5*A.matrix_norm_square(x) - x*b;
   };
 
-  this->solve (compute_func, x, precondition);
+  this->solve (compute_func, x, preconditioner);
 }
 
 

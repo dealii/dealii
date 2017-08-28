@@ -246,7 +246,7 @@ public:
   solve (const MatrixType         &A,
          VectorType               &x,
          const VectorType         &b,
-         const PreconditionerType &precondition);
+         const PreconditionerType &preconditioner);
 
   /**
    * Connect a slot to retrieve the estimated condition number. Called on each
@@ -477,7 +477,7 @@ public:
   solve (const MatrixType         &A,
          VectorType               &x,
          const VectorType         &b,
-         const PreconditionerType &precondition);
+         const PreconditionerType &preconditioner);
 
 private:
 
@@ -748,7 +748,7 @@ void
 SolverGMRES<VectorType>::solve (const MatrixType         &A,
                                 VectorType               &x,
                                 const VectorType         &b,
-                                const PreconditionerType &precondition)
+                                const PreconditionerType &preconditioner)
 {
   // this code was written a very long time ago by people not associated with
   // deal.II. we don't make any guarantees to its optimality or that it even
@@ -840,7 +840,7 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
         {
           A.vmult(p,x);
           p.sadd(-1.,1.,b);
-          precondition.vmult(v,p);
+          preconditioner.vmult(v,p);
         }
       else
         {
@@ -871,7 +871,7 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
               r->sadd(-1.,1.,b);
             }
           else
-            precondition.vmult(*r,v);
+            preconditioner.vmult(*r,v);
 
           double res = r->l2_norm();
           last_res = res;
@@ -901,11 +901,11 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
           if (left_precondition)
             {
               A.vmult(p, tmp_vectors[inner_iteration]);
-              precondition.vmult(vv,p);
+              preconditioner.vmult(vv,p);
             }
           else
             {
-              precondition.vmult(p, tmp_vectors[inner_iteration]);
+              preconditioner.vmult(p, tmp_vectors[inner_iteration]);
               A.vmult(vv,p);
             }
 
@@ -965,7 +965,7 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
                   p = 0.;
                   for (unsigned int i=0; i<dim; ++i)
                     p.add(h_(i), tmp_vectors[i]);
-                  precondition.vmult(*r,p);
+                  preconditioner.vmult(*r,p);
                   x_->add(1.,*r);
                 };
               A.vmult(*r,*x_);
@@ -980,7 +980,7 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
                 }
               else
                 {
-                  precondition.vmult(*x_, *r);
+                  preconditioner.vmult(*x_, *r);
                   const double preconditioned_res=x_->l2_norm();
                   last_res = preconditioned_res;
 
@@ -1011,7 +1011,7 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
           p = 0.;
           for (unsigned int i=0; i<dim; ++i)
             p.add(h(i), tmp_vectors[i]);
-          precondition.vmult(v,p);
+          preconditioner.vmult(v,p);
           x.add(1.,v);
         };
       // end of outer iteration. restart if no convergence and the number of
@@ -1139,7 +1139,7 @@ void
 SolverFGMRES<VectorType>::solve (const MatrixType         &A,
                                  VectorType               &x,
                                  const VectorType         &b,
-                                 const PreconditionerType &precondition)
+                                 const PreconditionerType &preconditioner)
 {
   deallog.push("FGMRES");
 
@@ -1189,7 +1189,7 @@ SolverFGMRES<VectorType>::solve (const MatrixType         &A,
             v(j,x) = 0.;
 
 
-          precondition.vmult(z(j,x), v[j]);
+          preconditioner.vmult(z(j,x), v[j]);
           A.vmult(*aux, z[j]);
 
           // Gram-Schmidt

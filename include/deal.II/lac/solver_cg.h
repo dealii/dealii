@@ -130,7 +130,7 @@ public:
   solve (const MatrixType         &A,
          VectorType               &x,
          const VectorType         &b,
-         const PreconditionerType &precondition);
+         const PreconditionerType &preconditioner);
 
   /**
    * Connect a slot to retrieve the CG coefficients. The slot will be called
@@ -312,7 +312,7 @@ void
 SolverCG<VectorType>::solve (const MatrixType         &A,
                              VectorType               &x,
                              const VectorType         &b,
-                             const PreconditionerType &precondition)
+                             const PreconditionerType &preconditioner)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -376,7 +376,7 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
 
       if (std::is_same<PreconditionerType,PreconditionIdentity>::value == false)
         {
-          precondition.vmult(h,g);
+          preconditioner.vmult(h,g);
 
           d.equ(-1.,h);
 
@@ -409,7 +409,7 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
           if (std::is_same<PreconditionerType,PreconditionIdentity>::value
               == false)
             {
-              precondition.vmult(h,g);
+              preconditioner.vmult(h,g);
 
               beta = gh;
               Assert(beta != 0., ExcDivideByZero());
