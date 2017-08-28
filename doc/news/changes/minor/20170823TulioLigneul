@@ -1,0 +1,5 @@
+Fixed: On Vector::add(..), a pointer to the first element of a std::vector
+is gotten by std::vector::data() instead of using the "&v[0]" idiom, which
+results in an undefined behaviour.
+<br>
+(Tulio Ligneul, 2017/08/23)
