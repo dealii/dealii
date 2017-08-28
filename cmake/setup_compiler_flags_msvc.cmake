@@ -73,6 +73,10 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4789")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd4808")
 
 
+# Bug in MSVC 2017: bogus warning C5037: an out-of-line definition of a member of a class template cannot have default arguments
+# see https://developercommunity.visualstudio.com/content/problem/81223/incorrect-error-c5037-with-permissive.html
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "/wd5037")
+
 #############################
 #                           #
 #    For Release target:    #

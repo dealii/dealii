@@ -294,9 +294,10 @@
 #endif
 
 //
-// tjhei: taken from boost git repo
+// tjhei: upgrade supported MSVC version to 19.11
+// Boost repo has only 19.10:
 // last known and checked version is 19.10.24629 (VC++ 2017 RC):
-#if (_MSC_VER > 1910)
+#if (_MSC_VER > 1911)
 #  if defined(BOOST_ASSERT_CONFIG)
 #     error "Unknown compiler version - please run the configure tests and report the results"
 #  else
