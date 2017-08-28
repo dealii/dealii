@@ -345,10 +345,10 @@ EigenInverse<VectorType>::solve (double           &value,
   unsigned int goal = additional_data.start_adaption;
 
   // Auxiliary vector
-  VectorType *Vy = this->memory.alloc ();
+  typename VectorMemory<VectorType>::Pointer Vy (this->memory);
   VectorType &y = *Vy;
   y.reinit (x);
-  VectorType *Vr = this->memory.alloc ();
+  typename VectorMemory<VectorType>::Pointer Vr (this->memory);
   VectorType &r = *Vr;
   r.reinit (x);
 
@@ -415,9 +415,6 @@ EigenInverse<VectorType>::solve (double           &value,
         }
       old_value = value;
     }
-
-  this->memory.free(Vy);
-  this->memory.free(Vr);
 
   deallog.pop();
 

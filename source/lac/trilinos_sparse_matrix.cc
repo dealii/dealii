@@ -2973,7 +2973,7 @@ namespace TrilinosWrappers
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
           GrowingVectorMemory<GVMVectorType> vector_memory;
-          GVMVectorType *i = vector_memory.alloc();
+          VectorMemory<GVMVectorType>::Pointer i (vector_memory);
 
           // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
@@ -2997,8 +2997,6 @@ namespace TrilinosWrappers
           first_op.Apply(tril_src, tril_dst);
           const int ierr = tril_dst.Update (1.0, tril_int, 1.0);
           AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-          vector_memory.free(i);
         };
 
         return_op.Tvmult = [first_op, second_op](Domain &tril_dst,
@@ -3007,7 +3005,7 @@ namespace TrilinosWrappers
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
           GrowingVectorMemory<GVMVectorType> vector_memory;
-          GVMVectorType *i = vector_memory.alloc();
+          VectorMemory<GVMVectorType>::Pointer i (vector_memory);
 
           // These operators may themselves be transposed or not, so we let them
           // decide what the intended outcome is
@@ -3042,8 +3040,6 @@ namespace TrilinosWrappers
           // Reset transpose flag
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
-
-          vector_memory.free(i);
         };
 
         return_op.inv_vmult = [first_op, second_op](Domain &tril_dst,
@@ -3052,7 +3048,7 @@ namespace TrilinosWrappers
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
           GrowingVectorMemory<GVMVectorType> vector_memory;
-          GVMVectorType *i = vector_memory.alloc();
+          VectorMemory<GVMVectorType>::Pointer i (vector_memory);
 
           // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
@@ -3076,8 +3072,6 @@ namespace TrilinosWrappers
           first_op.ApplyInverse(tril_src, tril_dst);
           const int ierr = tril_dst.Update (1.0, tril_int, 1.0);
           AssertThrow (ierr == 0, ExcTrilinosError(ierr));
-
-          vector_memory.free(i);
         };
 
         return_op.inv_Tvmult = [first_op, second_op](Range &tril_dst,
@@ -3086,7 +3080,7 @@ namespace TrilinosWrappers
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
           GrowingVectorMemory<GVMVectorType> vector_memory;
-          GVMVectorType *i = vector_memory.alloc();
+          VectorMemory<GVMVectorType>::Pointer i (vector_memory);
 
           // These operators may themselves be transposed or not, so we let them
           // decide what the intended outcome is
@@ -3121,8 +3115,6 @@ namespace TrilinosWrappers
           // Reset transpose flag
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
-
-          vector_memory.free(i);
         };
 
         return return_op;
@@ -3150,7 +3142,7 @@ namespace TrilinosWrappers
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
           GrowingVectorMemory<GVMVectorType> vector_memory;
-          GVMVectorType *i = vector_memory.alloc();
+          VectorMemory<GVMVectorType>::Pointer i (vector_memory);
 
           // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
@@ -3172,8 +3164,6 @@ namespace TrilinosWrappers
           // decide what the intended outcome is
           second_op.Apply(tril_src, tril_int);
           first_op.Apply(tril_int, tril_dst);
-
-          vector_memory.free(i);
         };
 
         return_op.Tvmult = [first_op, second_op](Domain &tril_dst,
@@ -3182,7 +3172,7 @@ namespace TrilinosWrappers
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
           GrowingVectorMemory<GVMVectorType> vector_memory;
-          GVMVectorType *i = vector_memory.alloc();
+          VectorMemory<GVMVectorType>::Pointer i (vector_memory);
 
           // These operators may themselves be transposed or not, so we let them
           // decide what the intended outcome is
@@ -3214,8 +3204,6 @@ namespace TrilinosWrappers
           // Reset transpose flag
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
-
-          vector_memory.free(i);
         };
 
         return_op.inv_vmult = [first_op, second_op](Domain &tril_dst,
@@ -3224,7 +3212,7 @@ namespace TrilinosWrappers
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
           GrowingVectorMemory<GVMVectorType> vector_memory;
-          GVMVectorType *i = vector_memory.alloc();
+          VectorMemory<GVMVectorType>::Pointer i (vector_memory);
 
           // Initialize intermediate vector
           const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
@@ -3246,8 +3234,6 @@ namespace TrilinosWrappers
           // and the same order as Tvmult
           first_op.ApplyInverse(tril_src, tril_int);
           second_op.ApplyInverse(tril_int, tril_dst);
-
-          vector_memory.free(i);
         };
 
         return_op.inv_Tvmult = [first_op, second_op](Range &tril_dst,
@@ -3256,7 +3242,7 @@ namespace TrilinosWrappers
           // Duplicated from LinearOperator::operator*
           // TODO: Template the constructor on GrowingVectorMemory vector type?
           GrowingVectorMemory<GVMVectorType> vector_memory;
-          GVMVectorType *i = vector_memory.alloc();
+          VectorMemory<GVMVectorType>::Pointer i (vector_memory);
 
           // These operators may themselves be transposed or not, so we let them
           // decide what the intended outcome is
@@ -3291,8 +3277,6 @@ namespace TrilinosWrappers
           // Reset transpose flag
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
-
-          vector_memory.free(i);
         };
 
         return return_op;
