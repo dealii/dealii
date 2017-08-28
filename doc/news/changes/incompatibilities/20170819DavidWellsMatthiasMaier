@@ -13,6 +13,7 @@ are no longer defined:
   <li> <code>DEAL_II_HAVE_SYS_TIMES_H</code>
   <li> <code>DEAL_II_HAVE_TIMES</code>
   <li> <code>DEAL_II_HAVE_SYS_TYPES_H</code>
+  <li> <code>DEAL_II_HAVE_SYS_TIMES_H</code>
 </ul>
 
-<br> (Matthias Maier and David Wells, 2017/08/08 - 2017/08/19)
+<br> (Matthias Maier and David Wells, 2017/08/08 - 2017/08/24)

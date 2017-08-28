@@ -29,8 +29,7 @@
 #include <string>
 #include <type_traits>
 
-#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
-#  include <sys/time.h>
+#ifdef DEAL_II_HAVE_SYS_RESOURCE_H
 #  include <sys/resource.h>
 #endif
 
@@ -85,40 +84,58 @@ namespace internal
         return Period::num*double(duration.count())/Period::den;
       }
 
-      /**
-       * Return the amount of CPU time that the current process has used so
-       * far. Unfortunately, this requires platform-specific calls, so this
-       * function returns 0 on platforms that are neither windows nor POSIX.
-       */
-      template <typename T>
-      T
-      get_current_cpu_time()
-      {
-        static_assert(is_duration<T>::value,
-                      "The template type should be a duration type.");
-        double system_cpu_duration = 0.0;
-#ifdef DEAL_II_MSVC
-        FILETIME cpuTime, sysTime, createTime, exitTime;
-        if (GetProcessTimes(GetCurrentProcess(), &createTime,
-                            &exitTime, &sysTime, &cpuTime))
-          {
-            system_cpu_duration = (double)
-                                  (((unsigned long long)cpuTime.dwHighDateTime << 32)
-                                   | cpuTime.dwLowDateTime) / 1e6;
-          }
-        // keep the zero value if GetProcessTimes didn't work
-#elif defined(DEAL_II_HAVE_SYS_RESOURCE_H)
-        rusage usage;
-        getrusage (RUSAGE_SELF, &usage);
-        system_cpu_duration = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
-#else
-#  warning "Unsupported platform. Porting not finished."
-#endif
-        return from_seconds<T>(system_cpu_duration);
-      }
     }
   }
 }
+
+
+
+CPUClock::time_point CPUClock::now() noexcept
+{
+  double system_cpu_duration = 0.0;
+#ifdef DEAL_II_MSVC
+  FILETIME cpuTime, sysTime, createTime, exitTime;
+  const auto succeeded = GetProcessTimes
+  (GetCurrentProcess(), &createTime, &exitTime, &sysTime, &cpuTime);
+  if (succeeded)
+    {
+      system_cpu_duration = (double)
+      (((unsigned long long)cpuTime.dwHighDateTime << 32)
+      | cpuTime.dwLowDateTime) / 1e6;
+    }
+  // keep the zero value if GetProcessTimes didn't work
+#elif defined(DEAL_II_HAVE_SYS_RESOURCE_H)
+  rusage usage;
+  getrusage (RUSAGE_SELF, &usage);
+  system_cpu_duration = usage.ru_utime.tv_sec + 1.e-6 * usage.ru_utime.tv_usec;
+#else
+#  warning "Unsupported platform. Porting not finished."
+#endif
+  return time_point(internal::Timer::from_seconds<duration>(system_cpu_duration));
+}
+
+
+
+template <typename clock_type_>
+Timer::ClockMeasurements<clock_type_>::ClockMeasurements()
+  :
+  current_lap_start_time(clock_type::now()),
+  accumulated_time(duration_type::zero()),
+  last_lap_time(duration_type::zero())
+{}
+
+
+
+template <typename clock_type_>
+void
+Timer::ClockMeasurements<clock_type_>::reset()
+{
+  current_lap_start_time = clock_type::now();
+  accumulated_time = duration_type::zero();
+  last_lap_time = duration_type::zero();
+}
+
+
 
 Timer::Timer()
   :
@@ -130,12 +147,6 @@ Timer::Timer()
 Timer::Timer(MPI_Comm mpi_communicator,
              const bool sync_wall_time_)
   :
-  current_lap_starting_cpu_time (0.),
-  current_lap_starting_wall_time (0.),
-  accumulated_cpu_time (0.),
-  accumulated_wall_time (0.),
-  last_lap_time (numbers::signaling_nan<double>()),
-  last_lap_cpu_time (numbers::signaling_nan<double>()),
   running (false),
   mpi_communicator (mpi_communicator),
   sync_wall_time(sync_wall_time_)
@@ -150,25 +161,6 @@ Timer::Timer(MPI_Comm mpi_communicator,
 
 
 
-#ifdef DEAL_II_MSVC
-
-namespace
-{
-  namespace windows
-  {
-    double wall_clock()
-    {
-      LARGE_INTEGER freq, time;
-      QueryPerformanceFrequency(&freq);
-      QueryPerformanceCounter(&time);
-      return (double) time.QuadPart / freq.QuadPart;
-    }
-  }
-}
-
-#endif
-
-
 void Timer::start ()
 {
   running = true;
@@ -179,24 +171,8 @@ void Timer::start ()
       AssertThrowMPI(ierr);
     }
 #endif
-
-#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
-
-//TODO: Break this out into a function like the functions in
-//namespace windows above
-  struct timeval wall_timer;
-  gettimeofday(&wall_timer, nullptr);
-  current_lap_starting_wall_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec;
-
-#elif defined(DEAL_II_MSVC)
-  current_lap_starting_wall_time = windows::wall_clock();
-#else
-#  error "Unsupported platform. Porting not finished."
-#endif
-  // TODO once we convert all private time variables to chrono types we will
-  // not need to call to_seconds here
-  current_lap_starting_cpu_time = internal::Timer::to_seconds
-                                  (internal::Timer::get_current_cpu_time<std::chrono::nanoseconds>());
+  wall_times.current_lap_start_time = wall_clock_type::now();
+  cpu_times.current_lap_start_time = cpu_clock_type::now();
 }
 
 
@@ -207,38 +183,28 @@ double Timer::stop ()
     {
       running = false;
 
-#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
-//TODO: Break this out into a function like the functions in
-//namespace windows above
-      struct timeval wall_timer;
-      gettimeofday(&wall_timer, nullptr);
-      last_lap_time = wall_timer.tv_sec + 1.e-6 * wall_timer.tv_usec
-                      - current_lap_starting_wall_time;
-#elif defined(DEAL_II_MSVC)
-      last_lap_time = windows::wall_clock() - current_lap_starting_wall_time;
-#else
-#  error "Unsupported platform. Porting not finished."
-#endif
-      // TODO once we convert all private time variables to chrono types we will
-      // not need to call to_seconds here
-      last_lap_cpu_time = internal::Timer::to_seconds
-                          (internal::Timer::get_current_cpu_time<std::chrono::nanoseconds>())
-                          - current_lap_starting_cpu_time;
+      wall_times.last_lap_time = wall_clock_type::now() - wall_times.current_lap_start_time;
+      cpu_times.last_lap_time = cpu_clock_type::now() - cpu_times.current_lap_start_time;
 
-      last_lap_data = Utilities::MPI::min_max_avg (last_lap_time,
-                                                   mpi_communicator);
+      last_lap_data = Utilities::MPI::min_max_avg
+                      (internal::Timer::to_seconds(wall_times.last_lap_time),
+                       mpi_communicator);
       if (sync_wall_time)
         {
-          last_lap_time = last_lap_data.max;
-          last_lap_cpu_time = Utilities::MPI::min_max_avg (last_lap_cpu_time,
-                                                           mpi_communicator).max;
+          wall_times.last_lap_time = internal::Timer::from_seconds<decltype(wall_times)::duration_type>
+                                     (last_lap_data.max);
+          cpu_times.last_lap_time = internal::Timer::from_seconds<decltype(cpu_times)::duration_type>
+                                    (Utilities::MPI::min_max_avg
+                                     (internal::Timer::to_seconds(cpu_times.last_lap_time),
+                                      mpi_communicator).max);
         }
-      accumulated_wall_time += last_lap_time;
-      accumulated_cpu_time += last_lap_cpu_time;
-      accumulated_wall_time_data = Utilities::MPI::min_max_avg (accumulated_wall_time,
-                                                                mpi_communicator);
+      wall_times.accumulated_time += wall_times.last_lap_time;
+      cpu_times.accumulated_time += cpu_times.last_lap_time;
+      accumulated_wall_time_data = Utilities::MPI::min_max_avg
+                                   (internal::Timer::to_seconds(wall_times.accumulated_time),
+                                    mpi_communicator);
     }
-  return accumulated_cpu_time;
+  return internal::Timer::to_seconds(cpu_times.accumulated_time);
 }
 
 
@@ -248,14 +214,15 @@ double Timer::cpu_time() const
   if (running)
     {
       const double running_time = internal::Timer::to_seconds
-                                  (internal::Timer::get_current_cpu_time<std::chrono::nanoseconds>())
-                                  - current_lap_starting_cpu_time
-                                  + accumulated_cpu_time;
+                                  (cpu_clock_type::now()
+                                   - cpu_times.current_lap_start_time
+                                   + cpu_times.accumulated_time);
       return Utilities::MPI::sum (running_time, mpi_communicator);
     }
   else
     {
-      return Utilities::MPI::sum (accumulated_cpu_time, mpi_communicator);
+      return Utilities::MPI::sum (internal::Timer::to_seconds(cpu_times.accumulated_time),
+                                  mpi_communicator);
     }
 }
 
@@ -263,14 +230,14 @@ double Timer::cpu_time() const
 
 double Timer::last_cpu_time() const
 {
-  return last_lap_cpu_time;
+  return internal::Timer::to_seconds(cpu_times.last_lap_time);
 }
 
 
 
 double Timer::get_lap_time() const
 {
-  return last_lap_time;
+  return internal::Timer::to_seconds(wall_times.last_lap_time);
 }
 
 
@@ -284,39 +251,30 @@ double Timer::operator() () const
 
 double Timer::wall_time () const
 {
+  wall_clock_type::duration current_elapsed_wall_time;
   if (running)
-    {
-#if defined(DEAL_II_HAVE_SYS_TIME_H) && defined(DEAL_II_HAVE_SYS_RESOURCE_H)
-      struct timeval wall_timer;
-      gettimeofday(&wall_timer, nullptr);
-      return (wall_timer.tv_sec
-              + 1.e-6 * wall_timer.tv_usec
-              - current_lap_starting_wall_time
-              + accumulated_wall_time);
-#else
-//TODO[BG]: Do something useful here
-      return 0;
-#endif
-    }
+    current_elapsed_wall_time = wall_clock_type::now()
+                                - wall_times.current_lap_start_time
+                                + wall_times.accumulated_time;
   else
-    return accumulated_wall_time;
+    current_elapsed_wall_time = wall_times.accumulated_time;
+
+  return internal::Timer::to_seconds(current_elapsed_wall_time);
 }
 
 
 
 double Timer::last_wall_time () const
 {
-  return last_lap_time;
+  return internal::Timer::to_seconds(wall_times.last_lap_time);
 }
 
 
 
 void Timer::reset ()
 {
-  last_lap_time = numbers::signaling_nan<double>();
-  last_lap_cpu_time = numbers::signaling_nan<double>();
-  accumulated_cpu_time = 0.;
-  accumulated_wall_time = 0.;
+  wall_times.reset();
+  cpu_times.reset();
   running         = false;
   last_lap_data.sum = last_lap_data.min = last_lap_data.max = last_lap_data.avg = numbers::signaling_nan<double>();
   last_lap_data.min_index = last_lap_data.max_index = numbers::invalid_unsigned_int;

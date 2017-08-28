@@ -22,11 +22,53 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
-#include <string>
+#include <chrono>
 #include <list>
 #include <map>
+#include <string>
 
 DEAL_II_NAMESPACE_OPEN
+
+/**
+ * A clock, compatible with the <code>std::chrono</code> notion of a clock,
+ * whose now() method returns a time point indicating the amount of CPU time
+ * that the current process has used.
+ */
+struct CPUClock
+{
+  /**
+   * Duration type. Windows measures CPU times in units of 100 nanoseconds
+   * and POSIX uses microseconds, so go with microseconds for uniformity.
+   */
+  typedef std::chrono::microseconds duration;
+
+  /**
+   * Signed integral type used to store the value returned by count().
+   */
+  typedef duration::rep rep;
+
+  /**
+   * Ratio representing the length of a period (in seconds).
+   */
+  typedef duration::period period;
+
+  /**
+   * Time point type.
+   */
+  typedef std::chrono::time_point<CPUClock, duration> time_point;
+
+  /**
+   * Boolean indicating that the clock monotonically increases.
+   */
+  static const bool is_steady = true;
+
+  /**
+   * Return the amount of CPU time that the current process has
+   * used. Unfortunately, this requires platform-specific calls, so this
+   * function returns 0 on platforms that are neither Windows nor POSIX.
+   */
+  static time_point now() noexcept;
+};
 
 /**
  * This is a very simple class which provides information about both the CPU
@@ -226,41 +268,83 @@ public:
   double get_lap_time () const DEAL_II_DEPRECATED;
 
 private:
+  /**
+   * The Timer class stores timing information for two different clocks: a
+   * wall clock and a CPU usage clock. Since the logic for handling both
+   * clocks is, in most places, identical, we collect the relevant
+   * measurements for each clock into this <code>struct</code>.
+   *
+   * @tparam clock_type_ The type of the clock whose measurements are being
+   * stored. This class should conform to the usual clock interface expected
+   * by <code>std::chrono</code> (i.e., the correct <code>typedef</code>s and
+   * a static <code>now()</code> method).
+   */
+  template <class clock_type_>
+  struct ClockMeasurements
+  {
+    /**
+     * Store the clock type.
+     */
+    typedef clock_type_ clock_type;
+
+    /**
+     * The time point type of the provided clock.
+     */
+    typedef typename clock_type::time_point time_point_type;
+
+    /**
+     * The duration type of the provided clock.
+     */
+    typedef typename clock_type::duration duration_type;
+
+    /**
+     * The time point corresponding to the start of the current lap. This is
+     * obtained by calling <code>clock_type::now()</code>.
+     */
+    time_point_type current_lap_start_time;
+
+    /**
+     * The accumulated time over several laps.
+     */
+    duration_type accumulated_time;
+
+    /**
+     * The duration of the last lap.
+     */
+    duration_type last_lap_time;
+
+    /**
+     * Constructor. Sets <code>current_lap_start_time</code> to the
+     * current clock time and the durations to zero.
+     */
+    ClockMeasurements();
+
+    /**
+     * Reset the clock by setting <code>current_lap_start_time</code> to the
+     * current clock time and the durations to zero.
+     */
+    void reset();
+  };
 
   /**
-   * Amount of CPU time that the current process has used as of the last call
-   * to start(). Note that the constructor of this class calls the start()
-   * function.
+   * typedef for the wall clock.
    */
-  double              current_lap_starting_cpu_time;
+  typedef std::chrono::steady_clock wall_clock_type;
 
   /**
-   * Value of the wall time as of the last call to start(). Note that the
-   * constructor of this class calls the start() function.
+   * typedef for the CPU clock.
    */
-  double              current_lap_starting_wall_time;
+  typedef CPUClock cpu_clock_type;
 
   /**
-   * Accumulated CPU time for all previous start()/stop() cycles. The time for
-   * the present cycle is not included.
+   * Collection of wall time measurements.
    */
-  double              accumulated_cpu_time;
+  ClockMeasurements<wall_clock_type> wall_times;
 
   /**
-   * Accumulated wall time for all previous start()/stop() cycles. The wall
-   * time for the present cycle is not included.
+   * Collection of CPU time measurements.
    */
-  double              accumulated_wall_time;
-
-  /**
-   * Wall time between the last start()/stop() cycle.
-   */
-  double              last_lap_time;
-
-  /**
-   * CPU time between the last start()/stop() cycle.
-   */
-  double              last_lap_cpu_time;
+  ClockMeasurements<cpu_clock_type> cpu_times;
 
   /**
    * Whether or not the timer is presently running.
