@@ -112,7 +112,7 @@ eigenvalues (const SymmetricTensor<2,3,Number> &T)
       // floating point errors might place it slightly outside
       // this range. It is therefore necessary to correct for it
       const Number phi =
-        (tmp_2 <= -1.0 ? Number(M_PI/3.0) :
+        (tmp_2 <= -1.0 ? Number(numbers::PI/3.0) :
          (tmp_2 >= 1.0 ? Number(0.0) :
           std::acos(tmp_2)/3.0));
 
@@ -122,7 +122,7 @@ eigenvalues (const SymmetricTensor<2,3,Number> &T)
       = { {
           static_cast<Number>(q + 2.0*p*std::cos(phi)),
           static_cast<Number>(0.0),
-          static_cast<Number>(q + 2.0*p*std::cos(phi + (2.0/3.0*M_PI)))
+          static_cast<Number>(q + 2.0*p*std::cos(phi + (2.0/3.0*numbers::PI)))
         }
       };
       // Use the identity tr(T) = eig1 + eig2 + eig3

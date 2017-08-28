@@ -2,6 +2,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
@@ -48,7 +49,7 @@ using namespace dealii;
 static const unsigned int fe_order = 4;
 static const dealii::types::boundary_id boundary_id = 0;
 static const dealii::types::manifold_id cubic_manifold_id = 1;
-static const double pi = M_PI;
+static const double pi = numbers::PI;
 
 // ----------------------------------------------------------------------------
 // Manufactured solution and manufactured forcing
