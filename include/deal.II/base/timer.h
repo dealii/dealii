@@ -567,9 +567,9 @@ public:
    * @param output_type A variable indicating what kind of timing the output
    * should represent (CPU or wall time).
    */
-  TimerOutput (std::ostream              &stream,
-               const enum OutputFrequency output_frequency,
-               const enum OutputType      output_type);
+  TimerOutput (std::ostream          &stream,
+               const OutputFrequency  output_frequency,
+               const OutputType       output_type);
 
   /**
    * Constructor.
@@ -581,9 +581,9 @@ public:
    * @param output_type A variable indicating what kind of timing the output
    * should represent (CPU or wall time).
    */
-  TimerOutput (ConditionalOStream        &stream,
-               const enum OutputFrequency output_frequency,
-               const enum OutputType      output_type);
+  TimerOutput (ConditionalOStream    &stream,
+               const OutputFrequency  output_frequency,
+               const OutputType       output_type);
 
   /**
    * Constructor that takes an MPI communicator as input. A timer constructed
@@ -608,10 +608,10 @@ public:
    * <code>MPI_Barrier</code> call before starting and stopping the timer for
    * each section.
    */
-  TimerOutput (MPI_Comm                   mpi_comm,
-               std::ostream              &stream,
-               const enum OutputFrequency output_frequency,
-               const enum OutputType      output_type);
+  TimerOutput (MPI_Comm               mpi_comm,
+               std::ostream          &stream,
+               const OutputFrequency  output_frequency,
+               const OutputType       output_type);
 
   /**
    * Constructor that takes an MPI communicator as input. A timer constructed
@@ -636,10 +636,10 @@ public:
    * <code>MPI_Barrier</code> call before starting and stopping the timer for
    * each section.)
    */
-  TimerOutput (MPI_Comm                   mpi_comm,
-               ConditionalOStream        &stream,
-               const enum OutputFrequency output_frequency,
-               const enum OutputType      output_type);
+  TimerOutput (MPI_Comm               mpi_comm,
+               ConditionalOStream    &stream,
+               const OutputFrequency  output_frequency,
+               const OutputType       output_type);
 
   /**
    * Destructor. Calls print_summary() in case the option for writing the
