@@ -39,7 +39,7 @@ int main(int argc, char *argv[] )
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  int err;
+  int err = MPI_SUCCESS;
   int value = myrank;
 
   if (myrank==1)
