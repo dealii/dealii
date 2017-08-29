@@ -1,0 +1,4 @@
+New: The DataPostprocessorVector class now has an extensive example of
+its use.
+<br>
+(Wolfgang Bangerth, 2017/08/29)
