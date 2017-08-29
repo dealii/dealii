@@ -204,9 +204,10 @@ public:
  *
  * Each time a vector is requested from this class, it checks if it has one
  * available and returns its address, or allocates a new one on the heap. If a
- * vector is returned, through the free() member function, it doesn't return
- * it to the operating system memory subsystem, but keeps it around unused for
- * later use if alloc() is called again, or until the object is destroyed. The
+ * vector is returned from its user, through the GrowingVectorMemory::free()
+ * member function, it doesn't return the allocated memory to the operating
+ * system memory subsystem, but keeps it around unused for later use if
+ * GrowingVectorMemory::alloc() is called again. The
  * class therefore avoid the overhead of repeatedly allocating memory on the
  * heap if temporary vectors are required and released frequently; on the
  * other hand, it doesn't release once-allocated memory at the earliest
@@ -214,13 +215,15 @@ public:
  * consumption.
  *
  * All GrowingVectorMemory objects of the same vector type use the same memory
- * Pool. Therefore, functions can create such a VectorMemory object whenever
- * needed without performance penalty. A drawback of this policy might be that
+ * pool. (In other words: The pool of vectors from which this class draws is
+ * <i>global</i>, rather than a regular member variable of the current class
+ * that is destroyed at the time that the surrounding GrowingVectorMemory
+ * object is destroyed.) Therefore, functions can create such a
+ * GrowingVectorMemory object whenever needed without the performance penalty
+ * of creating a new memory pool every time. A drawback of this policy is that
  * vectors once allocated are only released at the end of the program run.
- * Nevertheless, the since they are reused, this should be of no concern.
- * Additionally, the destructor of the Pool warns about memory leaks.
  *
- * @author Guido Kanschat, 1999, 2007
+ * @author Guido Kanschat, 1999, 2007; Wolfgang Bangerth, 2017.
  */
 template <typename VectorType = dealii::Vector<double> >
 class GrowingVectorMemory : public VectorMemory<VectorType>
@@ -239,11 +242,10 @@ public:
                        const bool log_statistics = false);
 
   /**
-   * Destructor. Release all vectors. This destructor also offers some
-   * statistic on the number of allocated vectors.
-   *
-   * The log file will also contain a warning message, if there are allocated
-   * vectors left.
+   * Destructor. The destructor also checks that all vectors that have been
+   * allocated through the current object have all been released again.
+   * However, as discussed in the class documentation, this does not imply
+   * that their memory is returned to the operating system.
    */
   virtual ~GrowingVectorMemory();
 

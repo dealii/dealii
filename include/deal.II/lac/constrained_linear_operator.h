@@ -317,7 +317,7 @@ constrained_right_hand_side(const ConstraintMatrix &constraint_matrix,
       distribute_constraints_linear_operator(constraint_matrix, linop);
     const auto Ct = transpose_operator(C);
 
-    static GrowingVectorMemory<Domain> vector_memory;
+    GrowingVectorMemory<Domain> vector_memory;
     typename VectorMemory<Domain>::Pointer k (vector_memory);
     linop.reinit_domain_vector(*k, /*bool fast=*/ false);
     constraint_matrix.distribute(*k);

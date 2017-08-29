@@ -580,7 +580,7 @@ operator*(const LinearOperator<Range, Intermediate, Payload> &first_op,
 
       return_op.vmult = [first_op, second_op](Range &v, const Domain &u)
       {
-        static GrowingVectorMemory<Intermediate> vector_memory;
+        GrowingVectorMemory<Intermediate> vector_memory;
 
         typename VectorMemory<Intermediate>::Pointer i (vector_memory);
         second_op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
@@ -590,7 +590,7 @@ operator*(const LinearOperator<Range, Intermediate, Payload> &first_op,
 
       return_op.vmult_add = [first_op, second_op](Range &v, const Domain &u)
       {
-        static GrowingVectorMemory<Intermediate> vector_memory;
+        GrowingVectorMemory<Intermediate> vector_memory;
 
         typename VectorMemory<Intermediate>::Pointer i (vector_memory);
         second_op.reinit_range_vector(*i, /*bool omit_zeroing_entries =*/ true);
@@ -600,7 +600,7 @@ operator*(const LinearOperator<Range, Intermediate, Payload> &first_op,
 
       return_op.Tvmult = [first_op, second_op](Domain &v, const Range &u)
       {
-        static GrowingVectorMemory<Intermediate> vector_memory;
+        GrowingVectorMemory<Intermediate> vector_memory;
 
         typename VectorMemory<Intermediate>::Pointer i (vector_memory);
         first_op.reinit_domain_vector(*i, /*bool omit_zeroing_entries =*/ true);
@@ -610,7 +610,7 @@ operator*(const LinearOperator<Range, Intermediate, Payload> &first_op,
 
       return_op.Tvmult_add = [first_op, second_op](Domain &v, const Range &u)
       {
-        static GrowingVectorMemory<Intermediate> vector_memory;
+        GrowingVectorMemory<Intermediate> vector_memory;
 
         typename VectorMemory<Intermediate>::Pointer i (vector_memory);
         first_op.reinit_domain_vector(*i, /*bool omit_zeroing_entries =*/ true);
@@ -695,7 +695,7 @@ inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
   return_op.vmult_add =
     [op, &solver, &preconditioner](Range &v, const Domain &u)
   {
-    static GrowingVectorMemory<Range> vector_memory;
+    GrowingVectorMemory<Range> vector_memory;
 
     typename VectorMemory<Range>::Pointer v2 (vector_memory);
     op.reinit_range_vector(*v2, /*bool omit_zeroing_entries =*/ false);
@@ -712,7 +712,7 @@ inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
   return_op.Tvmult_add =
     [op, &solver, &preconditioner](Range &v, const Domain &u)
   {
-    static GrowingVectorMemory<Range> vector_memory;
+    GrowingVectorMemory<Range> vector_memory;
 
     typename VectorMemory<Range>::Pointer v2 (vector_memory);
     op.reinit_range_vector(*v2, /*bool omit_zeroing_entries =*/ false);
@@ -1033,7 +1033,7 @@ namespace
   void apply_with_intermediate_storage(Function function, Range &v,
                                        const Domain &u, bool add)
   {
-    static GrowingVectorMemory<Range> vector_memory;
+    GrowingVectorMemory<Range> vector_memory;
 
     typename VectorMemory<Range>::Pointer i (vector_memory);
     i->reinit(v, /*bool omit_zeroing_entries =*/true);
