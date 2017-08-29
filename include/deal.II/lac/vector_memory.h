@@ -43,8 +43,9 @@ DEAL_II_NAMESPACE_OPEN
  * for auxiliary vectors. One could allocate and release them anew every time,
  * but this may be expensive in some situations if it has to happen very
  * frequently. A common case for this is when an iterative method is used to
- * invert a matrix in each iteration an outer solver, such as when inverting a
- * matrix block for a Schur complement solver.
+ * invert a matrix in each iteration of an outer solver, such as when inverting a
+ * matrix block for a Schur complement solver. (step-20 does this, for example,
+ * but instead just keeps a vector around permanently for temporary storage.)
  *
  * In such situations, allocating and deallocating vectors anew in each call
  * to the inner solver is expensive and leads to memory fragmentation. The
@@ -54,7 +55,8 @@ DEAL_II_NAMESPACE_OPEN
  * vectors to using classes.
  *
  * For example, the PrimitiveVectorMemory class simply allocates and
- * deallocated vectors each time it is asked for a vector. It is an
+ * deallocates vectors via the operating system facilities (i.e., using
+ * @p new and @p delete) each time it is asked for a vector. It is an
  * appropriate implementation to use for iterative solvers that are called
  * only once, or very infrequently.
  *
@@ -63,10 +65,40 @@ DEAL_II_NAMESPACE_OPEN
  * only marks them as unused and allows them to be reused next time a vector
  * is requested.
  *
- * Yet other classes, when implemented, could provide even other strategies
- * for memory management.
  *
- * @author Guido Kanschat, 1998-2003
+ * <h3> Practical use </h3>
+ *
+ * Classes derived from this base class return pointers to new vectors
+ * via the VectorMemory::alloc() function, and re-claim the vector
+ * when it is returned via VectorMemory::free(). These two functions
+ * therefore play a similar role as @p new and @p delete. This
+ * includes the usual drawbacks: It is simple to forget to call
+ * VectorMemory::free() at the end of a function that uses this
+ * facility, or to forget it in an @p if branch of the function where
+ * one has an early @p return from the function. In both cases, this
+ * results in a memory leak: a correct piece of code has to call
+ * VectorMemory::free() for all allocated vectors at <i>all</i>
+ * possible exit points. This includes places where a function is left
+ * because an exception is thrown further down in the call stack and
+ * not explicitly handled here.
+ *
+ * In other words, vectors allocated via VectorMemory::alloc() have
+ * the same issue as raw pointers allocated via @p new: It is easy to
+ * write code that has memory leaks. In the case of raw pointers, the
+ * common solution is to use the std::unique_ptr class instead (see
+ * http://en.cppreference.com/w/cpp/memory/unique_ptr). In the case of
+ * the current class, the VectorMemory::Pointer class is the solution:
+ * it is a class that for all practical purposes looks like a pointer,
+ * but upon destruction also returns the vector back to the
+ * VectorMemory object from which it got it. Since destruction of the
+ * VectorMemory::Pointer class happens whenever it goes out of scope
+ * (whether because the function explicitly returns, or because
+ * control flow leaves it due to an exception), a memory leak cannot
+ * happen: the vector the VectroMemory::Pointer object points to is
+ * <i>always</i> returned.
+ *
+ *
+ * @author Guido Kanschat, 1998-2003; Wolfgang Bangerth, 2017.
  */
 template <typename VectorType = dealii::Vector<double> >
 class VectorMemory : public Subscriptor
