@@ -28,5 +28,6 @@ char logname[] = "output";
 void test ()
 {
   FE_RaviartThomas<2> fe (0);
-  check (fe);
+  const std::array<unsigned int,3> min_convergence_steps = {{3,3,3}};
+  check (fe, min_convergence_steps);
 }

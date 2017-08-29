@@ -476,6 +476,7 @@ void project (const Mapping<dim>       &mapping,
               const Quadrature<dim>    &quadrature,
               const Function<dim>      &function,
               Vector<double>           &vec,
+              const unsigned int        min_convergence_steps,
               const bool                enforce_zero_boundary = false,
               const Quadrature<dim-1>  & = QGauss<dim-1>(2),
               const bool                project_to_boundary_first = false)
@@ -582,7 +583,9 @@ void project (const Mapping<dim>       &mapping,
   PreconditionSSOR<> prec;
   prec.initialize(mass_matrix, 1.2);
   // solve
-  cg.solve (mass_matrix, vec, tmp, prec);
+  check_solver_within_range(cg.solve(mass_matrix,vec,tmp,prec),
+                            control.last_step(),
+                            min_convergence_steps, min_convergence_steps+2);
 
   // distribute solution
   constraints.distribute (vec);
@@ -701,7 +704,7 @@ int main (int /*argc*/, char **/*argv*/)
 
 
 
-void check (const FiniteElement<2> &fe)
+void check (const FiniteElement<2> &fe, const std::array<unsigned int,3> &min_convergence_steps)
 {
   Triangulation<2> tria_test;
   DoFHandler<2> *dof_handler;
@@ -733,7 +736,7 @@ void check (const FiniteElement<2> &fe)
 
       project (map_default, *dof_handler, hn_constraints,
                QGauss<2> (6), TestMap1<2>(2),
-               solution);
+               solution, min_convergence_steps[elm]);
 
       // Test the core functionality
       DataOut<2> *data_out = new DataOut<2>;

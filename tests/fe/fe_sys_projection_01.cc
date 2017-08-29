@@ -29,5 +29,6 @@ char logname[] = "output";
 void test ()
 {
   FESystem<2> fe (FE_Q<2>(3), 2);
-  check (fe);
+  const std::array<unsigned int,3> min_convergence_steps = {{12,12,12}};
+  check (fe, min_convergence_steps);
 }
