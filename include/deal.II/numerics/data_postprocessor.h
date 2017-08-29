@@ -408,6 +408,10 @@ namespace DataPostprocessorInputs
  * flags to the constructor of the base class and overload the function that
  * actually computes the results.
  *
+ * The DataPostprocessorVector class documentation also contains an extensive
+ * example of how it can be used.
+ *
+ *
  * @ingroup output
  * @author Tobias Leicht, 2007, Wolfgang Bangerth, 2016
  */
