@@ -91,8 +91,8 @@ public:
      * 1e-16.
      */
     explicit
-    AdditionalData(bool exact_residual = false,
-                   double breakdown=1.e-16) :
+    AdditionalData(const bool   exact_residual = false,
+                   const double breakdown      = 1.e-16) :
       exact_residual(exact_residual),
       breakdown(breakdown)
     {}
@@ -130,7 +130,7 @@ public:
   solve (const MatrixType         &A,
          VectorType               &x,
          const VectorType         &b,
-         const PreconditionerType &precondition);
+         const PreconditionerType &preconditioner);
 
   /**
    * Interface for derived class. This function gets the current iteration
@@ -201,7 +201,7 @@ private:
   template <typename MatrixType, typename PreconditionerType>
   IterationResult
   iterate (const MatrixType         &A,
-           const PreconditionerType &precondition);
+           const PreconditionerType &preconditioner);
 
   /**
    * Number of the current iteration (accumulated over restarts)
@@ -269,7 +269,7 @@ void
 SolverQMRS<VectorType>::solve (const MatrixType         &A,
                                VectorType               &x,
                                const VectorType         &b,
-                               const PreconditionerType &precondition)
+                               const PreconditionerType &preconditioner)
 {
   deallog.push("QMRS");
 
@@ -298,7 +298,7 @@ SolverQMRS<VectorType>::solve (const MatrixType         &A,
     {
       if (step > 0)
         deallog << "Restart step " << step << std::endl;
-      state = iterate(A, precondition);
+      state = iterate(A, preconditioner);
     }
   while (state.state == SolverControl::iterate);
 
@@ -325,7 +325,7 @@ template <class VectorType>
 template <typename MatrixType, typename PreconditionerType>
 typename SolverQMRS<VectorType>::IterationResult
 SolverQMRS<VectorType>::iterate(const MatrixType         &A,
-                                const PreconditionerType &precondition)
+                                const PreconditionerType &preconditioner)
 {
   /* Remark: the matrix A in the article is the preconditioned matrix.
    * Therefore, we have to precondition x before we compute the first residual.
@@ -352,7 +352,7 @@ SolverQMRS<VectorType>::iterate(const MatrixType         &A,
   d.reinit(x);
 
   // Apply right preconditioning to x
-  precondition.vmult(q,x);
+  preconditioner.vmult(q,x);
   // Preconditioned residual
   A.vmult(v,q);
   v.sadd(-1.,1.,b);
@@ -363,7 +363,7 @@ SolverQMRS<VectorType>::iterate(const MatrixType         &A,
 
   p = v;
 
-  precondition.vmult(q,p);
+  preconditioner.vmult(q,p);
 
   tau = v.norm_sqr();
   rho = q*v;
@@ -412,12 +412,12 @@ SolverQMRS<VectorType>::iterate(const MatrixType         &A,
         return IterationResult(SolverControl::iterate, std::fabs(rho));
       // Step 7
       const double rho_old = rho;
-      precondition.vmult(q,v);
+      preconditioner.vmult(q,v);
       rho = q*v;
 
       const double beta = rho/rho_old;
       p.sadd(beta,v);
-      precondition.vmult(q,p);
+      preconditioner.vmult(q,p);
     }
   return IterationResult(SolverControl::success, std::fabs(rho));
 }

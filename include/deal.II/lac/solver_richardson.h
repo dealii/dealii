@@ -113,7 +113,7 @@ public:
   solve (const MatrixType         &A,
          VectorType               &x,
          const VectorType         &b,
-         const PreconditionerType &precondition);
+         const PreconditionerType &preconditioner);
 
   /**
    * Solve $A^Tx=b$ for $x$.
@@ -123,7 +123,7 @@ public:
   Tsolve (const MatrixType         &A,
           VectorType               &x,
           const VectorType         &b,
-          const PreconditionerType &precondition);
+          const PreconditionerType &preconditioner);
 
   /**
    * Set the damping-coefficient. Default is 1., i.e. no damping.
@@ -225,7 +225,7 @@ void
 SolverRichardson<VectorType>::solve (const MatrixType         &A,
                                      VectorType               &x,
                                      const VectorType         &b,
-                                     const PreconditionerType &precondition)
+                                     const PreconditionerType &preconditioner)
 {
   SolverControl::State conv=SolverControl::iterate;
 
@@ -252,7 +252,7 @@ SolverRichardson<VectorType>::solve (const MatrixType         &A,
           // but do it in 2 steps
           A.vmult(r,x);
           r.sadd(-1.,1.,b);
-          precondition.vmult(d,r);
+          preconditioner.vmult(d,r);
 
           // The required norm of the
           // (preconditioned)
@@ -296,7 +296,7 @@ void
 SolverRichardson<VectorType>::Tsolve (const MatrixType         &A,
                                       VectorType               &x,
                                       const VectorType         &b,
-                                      const PreconditionerType &precondition)
+                                      const PreconditionerType &preconditioner)
 {
   SolverControl::State conv=SolverControl::iterate;
   double last_criterion = -std::numeric_limits<double>::max();
@@ -322,7 +322,7 @@ SolverRichardson<VectorType>::Tsolve (const MatrixType         &A,
           // but do it in 2 steps
           A.Tvmult(r,x);
           r.sadd(-1.,1.,b);
-          precondition.Tvmult(d,r);
+          preconditioner.Tvmult(d,r);
 
           last_criterion = criterion();
           conv = this->iteration_status (iter, last_criterion, x);

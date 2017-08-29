@@ -134,7 +134,7 @@ public:
   solve (const MatrixType         &A,
          VectorType               &x,
          const VectorType         &b,
-         const PreconditionerType &precondition);
+         const PreconditionerType &preconditioner);
 
 protected:
   /**
@@ -257,7 +257,7 @@ private:
   template <typename MatrixType, typename PreconditionerType>
   IterationResult
   iterate(const MatrixType         &A,
-          const PreconditionerType &precondition);
+          const PreconditionerType &preconditioner);
 };
 
 /*@}*/
@@ -367,7 +367,7 @@ template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 typename SolverBicgstab<VectorType>::IterationResult
 SolverBicgstab<VectorType>::iterate(const MatrixType         &A,
-                                    const PreconditionerType &precondition)
+                                    const PreconditionerType &preconditioner)
 {
 //TODO:[GK] Implement "use the length of the computed orthogonal residual" in the BiCGStab method.
   SolverControl::State state = SolverControl::iterate;
@@ -402,7 +402,7 @@ SolverBicgstab<VectorType>::iterate(const MatrixType         &A,
           p.add(-beta*omega, v);
         }
 
-      precondition.vmult(y,p);
+      preconditioner.vmult(y,p);
       A.vmult(v,y);
       rhobar = rbar * v;
 
@@ -428,7 +428,7 @@ SolverBicgstab<VectorType>::iterate(const MatrixType         &A,
           return IterationResult(false, SolverControl::success, step, res);
         }
 
-      precondition.vmult(z,r);
+      preconditioner.vmult(z,r);
       A.vmult(t,z);
       rhobar = t*r;
       omega = rhobar/(t*t);
@@ -456,7 +456,7 @@ void
 SolverBicgstab<VectorType>::solve(const MatrixType         &A,
                                   VectorType               &x,
                                   const VectorType         &b,
-                                  const PreconditionerType &precondition)
+                                  const PreconditionerType &preconditioner)
 {
   deallog.push("Bicgstab");
   Vr    = this->memory.alloc();
@@ -491,7 +491,7 @@ SolverBicgstab<VectorType>::solve(const MatrixType         &A,
           state.state = SolverControl::success;
           break;
         }
-      state = iterate(A, precondition);
+      state = iterate(A, preconditioner);
       ++step;
     }
   while (state.breakdown == true);

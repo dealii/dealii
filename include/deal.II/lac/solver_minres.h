@@ -104,7 +104,7 @@ public:
   solve (const MatrixType         &A,
          VectorType               &x,
          const VectorType         &b,
-         const PreconditionerType &precondition);
+         const PreconditionerType &preconditioner);
 
   /**
    * @addtogroup Exceptions
@@ -210,7 +210,7 @@ void
 SolverMinRes<VectorType>::solve (const MatrixType         &A,
                                  VectorType               &x,
                                  const VectorType         &b,
-                                 const PreconditionerType &precondition)
+                                 const PreconditionerType &preconditioner)
 {
   deallog.push("minres");
 
@@ -263,7 +263,7 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
   // positive definite and symmetric
 
   // M v = u[1]
-  precondition.vmult (v,*u[1]);
+  preconditioner.vmult (v,*u[1]);
 
   delta[1] = v * (*u[1]);
   // Preconditioner positive
@@ -297,7 +297,7 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
       // precondition: solve M v = u[2]
       // Preconditioner has to be positive
       // definite and symmetric.
-      precondition.vmult(v,*u[2]);
+      preconditioner.vmult(v,*u[2]);
 
       delta[2] = v * (*u[2]);
 
