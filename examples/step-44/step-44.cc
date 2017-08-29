@@ -2470,6 +2470,17 @@ namespace Step44
     constraints.clear();
     const bool apply_dirichlet_bc = (it_nr == 0);
 
+    // In this particular example, the boundary values will be calculated for
+    // the two first iterations of Newton's algorithm. In general, one would
+    // build non-homogeneous constraints in the zeroth iteration (that is, when
+    // `apply_dirichlet_bc == true`) and build only the corresponding
+    // homogeneous constraints in the following step. While the current
+    // example has only homogenous constraints, previous experiences have
+    // shown that a common error is forgetting to add the extra condition when
+    // refactoring the code to specific uses. This could lead errors that are
+    // hard to debug. In this spirit, we choose to make the code more verbose
+    // in terms of what operations are performed at each Newton step.
+    //
     // The boundary conditions for the indentation problem are as follows: On
     // the -x, -y and -z faces (IDs 0,2,4) we set up a symmetry condition to
     // allow only planar movement while the +x and +z faces (IDs 1,5) are
