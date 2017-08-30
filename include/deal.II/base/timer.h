@@ -71,18 +71,18 @@ struct CPUClock
 };
 
 /**
- * This is a very simple class which provides information about both the CPU
- * time and the wallclock time elapsed since the timer was started last time.
- * Information is retrieved from the system on the basis of clock cycles since
- * last time the computer was booted for the CPU time. The wall time is based
- * on the system clock accessed by @p gettimeofday, with a typical accuracy of
- * 0.01 ms on linux systems.
- *
+ * The Timer class provides a way to measure both the amount of wall time
+ * (i.e., the amount of time elapsed on a wall clock) and the amount of CPU
+ * time that certain sections of an application have used. This class also
+ * offers facilities for synchronizing the elapsed time across an MPI
+ * communicator.
  *
  * <h3>Usage</h3>
  *
- * Use of this class is as you might expect by looking at the member
- * functions:
+ * The Timer class can be started and stopped several times. It stores both
+ * the amount of time elapsed over the last start-stop cycle, or <em>lap</em>,
+ * as well as the total time elapsed over all laps. Here is an example:
+ *
  * @code
  *   Timer timer;
  *   timer.start();
@@ -100,9 +100,9 @@ struct CPUClock
  * @endcode
  *
  * Alternatively, you can also restart the timer instead of resetting it. The
- * times between successive calls to start() / stop() will then be
- * accumulated. The usage of this class is also explained in the step-28,
- * step-29 and step-30 tutorial programs.
+ * times between successive calls to start() and stop() (i.e., the laps) will
+ * then be accumulated. The usage of this class is also explained in the
+ * step-28, step-29 and step-30 tutorial programs.
  *
  * @note Implementation of this class is system dependent. In particular, CPU
  * times are accumulated from summing across all threads and will usually
@@ -115,29 +115,31 @@ class Timer
 {
 public:
   /**
-   * Constructor. Starts the timer at 0 sec.
+   * Constructor. Sets the accumulated times at zero and calls Timer::start().
    */
   Timer ();
 
   /**
-   * Constructor that takes an MPI communicator as input. A timer constructed
-   * this way will sum up the CPU times over all processors in the MPI network
-   * when requested by Timer::cpu_time().
+   * Constructor specifying that CPU times should be summed over the given
+   * communicator. If @p sync_wall_time is <code>true</code> then the Timer
+   * will set the elapsed wall and CPU times over the last lap to their
+   * maximum values across the provided communicator. This synchronization is
+   * only performed if Timer::stop() is called before the timer is queried for
+   * time duration values.
    *
-   * Starts the timer at 0 sec.
+   * This constructor calls Timer::start().
    *
-   * If @p sync_wall_time is true, the wall time is synchronized between all
-   * CPUs using a MPI_Barrier() and a collective operation. Note that this
-   * only works if you stop() the timer before querying for the wall time. The
-   * time for the MPI operations are not included in the timing but may slow
-   * down your program.
+   * @note The timer is stopped before the synchronization over the
+   * communicator occurs; the extra cost of the synchronization is not
+   * measured.
    */
   Timer (MPI_Comm mpi_communicator,
          const bool sync_wall_time = false);
 
   /**
    * Return a reference to the data structure with global timing information
-   * for the last lap. Filled after calling stop().
+   * for the last lap. This structure does not contain meaningful values until
+   * Timer::stop() has been called.
    *
    * @deprecated Use Timer::get_last_lap_data() instead, which returns a
    * reference to the same structure.
@@ -145,15 +147,18 @@ public:
   const Utilities::MPI::MinMaxAvg &get_data() const DEAL_II_DEPRECATED;
 
   /**
-   * Return a reference to the data structure containing timing information
-   * across all MPI processes in the given communicator about the last
-   * lap. Filled after calling stop().
+   * Return a reference to the data structure containing basic statistics on
+   * the last lap's wall time measured across all MPI processes in the given
+   * communicator. This structure does not contain meaningful values until
+   * Timer::stop() has been called.
    */
   const Utilities::MPI::MinMaxAvg &get_last_lap_data() const;
 
   /**
-   * Return a reference to the data structure with global timing information
-   * for the total run. Filled after calling stop().
+   * Return a reference to the data structure containing basic statistics on
+   * the accumulated wall time measured across all MPI processes in the given
+   * communicator. This structure does not contain meaningful values until
+   * Timer::stop() has been called.
    *
    * @deprecated Use Timer::get_accumulated_wall_time_data() instead, which
    * returns a reference the same structure.
@@ -161,8 +166,10 @@ public:
   const Utilities::MPI::MinMaxAvg &get_total_data() const DEAL_II_DEPRECATED;
 
   /**
-   * Return a reference to the data structure with global timing information
-   * for the total run. Filled after calling stop().
+   * Return a reference to the data structure containing basic statistics on
+   * the accumulated wall time measured across all MPI processes in the given
+   * communicator. This structure does not contain meaningful values until
+   * Timer::stop() has been called.
    */
   const Utilities::MPI::MinMaxAvg &get_accumulated_wall_time_data() const;
 
@@ -201,25 +208,26 @@ public:
   void print_accumulated_wall_time_data(StreamType &stream) const;
 
   /**
-   * Re-start the timer at the point where it was stopped. This way a
-   * cumulative measurement of time is possible.
+   * Begin measuring a new lap. If <code>sync_wall_time</code> is
+   * <code>true</code> then an MPI barrier is used to ensure that all
+   * processes begin the lap at the same wall time.
    */
   void start ();
 
   /**
-   * Set the current time as next starting time and return the elapsed time
-   * in seconds.
+   * Stop the timer. This updates the lap times and accumulated times.
+   * Returns the accumulated CPU time in seconds.
    */
   double stop ();
 
   /**
-   * Stop the timer if necessary and reset the elapsed time to zero.
+   * Stop the timer, if it is running, and reset all measured values to their
+   * default states.
    */
   void reset ();
 
   /**
-   * Resets the elapsed time to zero and starts the timer. This corresponds to
-   * calling @p reset() and @p start() on the Timer object.
+   * Equivalent to calling Timer::reset() followed by calling Timer::start().
    */
   void restart();
 
@@ -232,31 +240,30 @@ public:
   double operator() () const DEAL_II_DEPRECATED;
 
   /**
-   * Access to the current total wall time without stopping the timer.
-   * The elapsed time is returned in units of seconds.
+   * Return the current accumulated wall time (including the current lap, if
+   * the timer is running) in seconds without stopping the timer.
    */
   double wall_time () const;
 
   /**
-   * Access to the wall time since the timer has been stopped the last time.
-   * The timer is not stopped by this function.
-   * The elapsed time is returned in units of seconds.
+   * Return the wall time of the last lap in seconds. The timer is not stopped
+   * by this function.
    */
   double last_wall_time() const;
 
   /**
-   * Access to the current total CPU time without stopping the timer. The
-   * elapsed time is returned in units of seconds.
+   * Return the accumulated CPU time (including the current lap, if the timer
+   * is running) in seconds without stopping the timer.
    *
-   * If an MPI communicator is provided to the constructor then this value is
-   * summed over all relevant MPI processes.
+   * If an MPI communicator is provided to the constructor then the returned
+   * value is the sum of all accumulated CPU times over all processors in the
+   * communicator.
    */
   double cpu_time() const;
 
   /**
-   * Access to the CPU time since the timer has been stopped the last time.
-   * The timer is not stopped by this function.
-   * The elapsed time is returned in units of seconds.
+   * Return the CPU time of the last lap in seconds. The timer is not stopped
+   * by this function.
    */
   double last_cpu_time() const;
 
@@ -359,7 +366,8 @@ private:
   MPI_Comm            mpi_communicator;
 
   /**
-   * Store whether the wall time is synchronized between machines.
+   * Store whether or not the wall time and CPU time are synchronized in
+   * Timer::start() and Timer::stop().
    */
   bool sync_wall_time;
 
