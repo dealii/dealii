@@ -970,6 +970,20 @@ private:
       base_elements;
 
   /**
+   * An index table that maps generalized support points of a base element
+   * to the vector of generalized support points of the FE System.
+   * It holds true that
+   * @code
+   *   auto n = generalized_support_points_index_table[i][j];
+   *   generalized_support_points[n] ==
+   *           base_elements[i].generalized_support_points[j];
+   * @endcode
+   * for each base element (indexed by i) and each g. s. point of the base
+   * element (index by j).
+   */
+  std::vector<std::vector<std::size_t>> generalized_support_points_index_table;
+
+  /**
    * This function is simply singled out of the constructors since there are
    * several of them. It sets up the index table for the system as well as @p
    * restriction and @p prolongation matrices.

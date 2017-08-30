@@ -1587,6 +1587,57 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
         }
     });
 
+  // Initialize generalized support points and an (internal) index table
+  init_tasks += Threads::new_task ([&]()
+  {
+    // If one of the base elements has no generalized support points, then
+    // it makes no sense to define generalized support points for the
+    // composed element, so return an empty array to demonstrate that fact.
+    // Note that we ignore FE_Nothing in this logic.
+    for (unsigned int base_el=0; base_el < this->n_base_elements(); ++base_el)
+      if (!base_element(base_el).has_generalized_support_points() &&
+          base_element(base_el).dofs_per_cell != 0)
+        {
+          this->generalized_support_points.resize(0);
+          return;
+        }
+
+    // Iterate over all base elements, extract a representative set of
+    // _unique_ generalized support points and store the information how
+    // generalized support points of base elements are mapped to this list
+    // of representatives. Complexity O(n^2), where n is the number of
+    // generalized support points.
+
+    generalized_support_points_index_table.resize(this->n_base_elements());
+
+    for (unsigned int base_el = 0; base_el < this->n_base_elements(); ++base_el)
+      {
+        for (const auto &point :
+             base_element(base_el).get_generalized_support_points())
+          {
+            // Is point already an element of generalized_support_points?
+            const auto p =
+              std::find(std::begin(this->generalized_support_points),
+                        std::end(this->generalized_support_points),
+                        point);
+
+            if (p == std::end(this->generalized_support_points))
+              {
+                // If no, update the table and add the point to the vector
+                const auto n = this->generalized_support_points.size();
+                generalized_support_points_index_table[base_el].push_back(n);
+                this->generalized_support_points.push_back(point);
+              }
+            else
+              {
+                // If yes, just add the correct index to the table.
+                const auto n = p - std::begin(this->generalized_support_points);
+                generalized_support_points_index_table[base_el].push_back(n);
+              }
+          }
+      }
+  });
+
   // initialize quad dof index permutation in 3d and higher
   if (dim >= 3)
     init_tasks += Threads::new_task ([&]()

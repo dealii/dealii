@@ -979,10 +979,8 @@ template <int dim, int spacedim>
 const std::vector<Point<dim> > &
 FiniteElement<dim,spacedim>::get_generalized_support_points () const
 {
-  // a finite element may define
-  // support points, but only if
-  // there are as many as there are
-  // degrees of freedom
+  // If the finite element implements generalized support points, return
+  // those. Otherwise fall back to unit support points.
   return ((generalized_support_points.size() == 0)
           ? unit_support_points
           : generalized_support_points);
