@@ -675,7 +675,7 @@ namespace PETScWrappers
                             VectorBase       &x,
                             const VectorBase &b)
   {
-#ifdef PETSC_HAVE_MUMPS
+#ifdef DEAL_II_PETSC_WITH_MUMPS
     /**
      * factorization matrix to be obtained from MUMPS
      */
@@ -821,7 +821,7 @@ namespace PETScWrappers
         AssertThrow (ierr == 0, ExcPETScError(ierr));
       }
 
-#else  // PETSC_HAVE_MUMPS
+#else  // DEAL_II_PETSC_WITH_MUMPS
     Assert (false,
             ExcMessage ("Your PETSc installation does not include a copy of "
                         "the MUMPS package necessary for this solver. You will need to configure "
