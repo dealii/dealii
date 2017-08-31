@@ -149,6 +149,67 @@ template <int dim, int spacedim> class FESystem;
  * FiniteElement::system_to_block_index(). The number of blocks of a finite
  * element can be determined by FiniteElement::n_blocks().
  *
+ * To better illustrate these concepts, let's consider the following
+ * example of the multi-component system
+ * @code
+ * FESystem<dim> fe_basis(FE_Q<dim>(2), dim, FE_Q<dim>(1),1);
+ * @endcode
+ * with <code>dim=2</code>. The resulting finite element has 3 components:
+ * two that come from the quadratic element and one from the linear element.
+ * If, for example, this system were used to discretize a problem in fluid
+ * dynamics then one could think of the first two components representing a
+ * vector-valued velocity field whereas the last one corresponds to the scalar
+ * pressure field. Without degree-of-freedom (DoF) renumbering this finite element will
+ * produce the following distribution of local DoFs:
+ *
+ * @image html fe_system_example.png DoF indices
+ *
+ * Using the two functions FiniteElement::system_to_component_index() and
+ * FiniteElement::system_to_base_index() one can get the
+ * following information for each degree-of-freedom "i":
+ * @code
+ * const unsigned int component     = fe_basis.system_to_component_index(i).first;
+ * const unsigned int within_base   = fe_basis.system_to_component_index(i).second;
+ * const unsigned int base          = fe_basis.system_to_base_index(i).first.first;
+ * const unsigned int multiplicity  = fe_basis.system_to_base_index(i).first.second;
+ * const unsigned int within_base_  = fe_basis.system_to_base_index(i).second; // same as above
+ * @endcode
+ * which will result in:
+ *
+ * | DoF    | Component  | Base element | Shape function within base | Multiplicity |
+ * | :----: | :--------: | :----------: | :------------------------: | :----------: |
+ * |      0 |          0 |            0 |                          0 |            0 |
+ * |      1 |          1 |            0 |                          0 |            1 |
+ * |      2 |          2 |            1 |                          0 |            0 |
+ * |      3 |          0 |            0 |                          1 |            0 |
+ * |      4 |          1 |            0 |                          1 |            1 |
+ * |      5 |          2 |            1 |                          1 |            0 |
+ * |      6 |          0 |            0 |                          2 |            0 |
+ * |      7 |          1 |            0 |                          2 |            1 |
+ * |      8 |          2 |            1 |                          2 |            0 |
+ * |      9 |          0 |            0 |                          3 |            0 |
+ * |     10 |          1 |            0 |                          3 |            1 |
+ * |     11 |          2 |            1 |                          3 |            0 |
+ * |     12 |          0 |            0 |                          4 |            0 |
+ * |     13 |          1 |            0 |                          4 |            1 |
+ * |     14 |          0 |            0 |                          5 |            0 |
+ * |     15 |          1 |            0 |                          5 |            1 |
+ * |     16 |          0 |            0 |                          6 |            0 |
+ * |     17 |          1 |            0 |                          6 |            1 |
+ * |     18 |          0 |            0 |                          7 |            0 |
+ * |     19 |          1 |            0 |                          7 |            1 |
+ * |     20 |          0 |            0 |                          8 |            0 |
+ * |     21 |          1 |            0 |                          8 |            1 |
+ *
+ * What we see is the following: there are a total of 22 degrees-of-freedom on this
+ * element with components ranging from 0 to 2. Each DoF corresponds to
+ * one of the two base elements used to build FESystem : $\mathbb Q_2$ or $\mathbb Q_1$.
+ * Since FE_Q are primitive elements, we have a total of 9 distinct
+ * scalar-valued shape functions for the quadratic element and 4 for the linear element.
+ * Finally, for DoFs corresponding to the first base element multiplicity
+ * is either zero or one, meaning that we use the same scalar valued $\mathbb Q_2$
+ * for both $x$ and $y$ components of the velocity field $\mathbb Q_2 \otimes \mathbb Q_2$.
+ * For DoFs corresponding to the second base element multiplicity is zero.
  *
  * <h4>Support points</h4>
  *
@@ -1287,6 +1348,8 @@ public:
    * than one vector-component). For this information, refer to the
    * #system_to_base_table field and the system_to_base_index() function.
    *
+   * See the class description above for an example of how this function is typically used.
+   *
    * The use of this function is explained extensively in the step-8 and
    * @ref step_20 "step-20"
    * tutorial programs as well as in the
@@ -1503,6 +1566,8 @@ public:
    * #system_to_component_table. It differs only in case the element is
    * composed of other elements and at least one of them is vector-valued
    * itself.
+   *
+   * See the class documentation above for an example of how this function is typically used.
    *
    * This function returns valid values also in the case of vector-valued
    * (i.e. non-primitive) shape functions, in contrast to the
