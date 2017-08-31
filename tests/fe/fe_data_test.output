@@ -483,7 +483,7 @@ DEAL::degree=2
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=6
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=6
+DEAL::generalized_support_points=3
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1
 DEAL::face_to_cell_index: 0 1
@@ -510,7 +510,7 @@ DEAL::degree=2
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=7
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=7
+DEAL::generalized_support_points=3
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1 2
 DEAL::face_to_cell_index: 0 1 2
@@ -699,7 +699,7 @@ DEAL::degree=3
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=8
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=8
+DEAL::generalized_support_points=4
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1
 DEAL::face_to_cell_index: 0 1
@@ -726,7 +726,7 @@ DEAL::degree=3
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=8
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=8
+DEAL::generalized_support_points=4
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1 2
 DEAL::face_to_cell_index: 0 1 2
@@ -753,7 +753,7 @@ DEAL::degree=4
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=10
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=10
+DEAL::generalized_support_points=5
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1
 DEAL::face_to_cell_index: 0 1
@@ -780,7 +780,7 @@ DEAL::degree=1
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=8
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=8
+DEAL::generalized_support_points=2
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1 2 3
 DEAL::face_to_cell_index: 0 1 2 3
@@ -807,7 +807,7 @@ DEAL::degree=1
 DEAL::conformity=
 DEAL::unit_support_points=8
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=8
+DEAL::generalized_support_points=2
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1
 DEAL::face_to_cell_index: 0 1
@@ -834,7 +834,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=17
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=17
+DEAL::generalized_support_points=3
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1 2 3
 DEAL::face_to_cell_index: 0 1 2 3
@@ -861,7 +861,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=58
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=58
+DEAL::generalized_support_points=3
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
 DEAL::face_to_cell_index: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
@@ -1436,7 +1436,7 @@ DEAL::degree=2
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=18
 DEAL::unit_face_support_points=6
-DEAL::generalized_support_points=18
+DEAL::generalized_support_points=9
 DEAL::generalized_face_support_points=6
 DEAL::face_to_equivalent_cell_index: 0 1 4 5 8 9
 DEAL::face_to_cell_index: 0 1 4 5 8 9
@@ -1467,7 +1467,7 @@ DEAL::degree=2
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=17
 DEAL::unit_face_support_points=7
-DEAL::generalized_support_points=17
+DEAL::generalized_support_points=9
 DEAL::generalized_face_support_points=7
 DEAL::face_to_equivalent_cell_index: 0 1 2 6 7 8 12
 DEAL::face_to_cell_index: 0 1 2 6 7 8 12
@@ -1963,7 +1963,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=0
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=0
+DEAL::generalized_support_points=16
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1
 DEAL::face_to_cell_index: 0 1
@@ -2242,7 +2242,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=0
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=0
+DEAL::generalized_support_points=16
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1
 DEAL::face_to_cell_index: 0 1
@@ -2273,7 +2273,7 @@ DEAL::degree=3
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=32
 DEAL::unit_face_support_points=8
-DEAL::generalized_support_points=32
+DEAL::generalized_support_points=16
 DEAL::generalized_face_support_points=8
 DEAL::face_to_equivalent_cell_index: 0 1 4 5 8 9 10 11
 DEAL::face_to_cell_index: 0 1 4 5 8 9 10 11
@@ -2304,7 +2304,7 @@ DEAL::degree=3
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=24
 DEAL::unit_face_support_points=8
-DEAL::generalized_support_points=24
+DEAL::generalized_support_points=16
 DEAL::generalized_face_support_points=8
 DEAL::face_to_equivalent_cell_index: 0 1 2 6 7 8 12 13
 DEAL::face_to_cell_index: 0 1 2 6 7 8 12 13
@@ -2335,7 +2335,7 @@ DEAL::degree=4
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=50
 DEAL::unit_face_support_points=10
-DEAL::generalized_support_points=50
+DEAL::generalized_support_points=25
 DEAL::generalized_face_support_points=10
 DEAL::face_to_equivalent_cell_index: 0 1 4 5 8 9 10 11 12 13
 DEAL::face_to_cell_index: 0 1 4 5 8 9 10 11 12 13
@@ -2366,7 +2366,7 @@ DEAL::degree=1
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=16
 DEAL::unit_face_support_points=8
-DEAL::generalized_support_points=16
+DEAL::generalized_support_points=4
 DEAL::generalized_face_support_points=8
 DEAL::face_to_equivalent_cell_index: 0 1 2 3 8 9 10 11
 DEAL::face_to_cell_index: 0 1 2 3 8 9 10 11
@@ -2397,7 +2397,7 @@ DEAL::degree=1
 DEAL::conformity=
 DEAL::unit_support_points=16
 DEAL::unit_face_support_points=4
-DEAL::generalized_support_points=16
+DEAL::generalized_support_points=4
 DEAL::generalized_face_support_points=4
 DEAL::face_to_equivalent_cell_index: 0 1 4 5
 DEAL::face_to_cell_index: 0 1 4 5
@@ -2428,7 +2428,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=49
 DEAL::unit_face_support_points=11
-DEAL::generalized_support_points=49
+DEAL::generalized_support_points=9
 DEAL::generalized_face_support_points=11
 DEAL::face_to_equivalent_cell_index: 0 1 2 3 8 9 10 11 16 17 18
 DEAL::face_to_cell_index: 0 1 2 3 8 9 10 11 16 17 18
@@ -2459,7 +2459,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=146
 DEAL::unit_face_support_points=42
-DEAL::generalized_support_points=146
+DEAL::generalized_support_points=9
 DEAL::generalized_face_support_points=42
 DEAL::face_to_equivalent_cell_index: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 72 73 74 75 76 77
 DEAL::face_to_cell_index: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 72 73 74 75 76 77
@@ -3097,7 +3097,7 @@ DEAL::degree=2
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=54
 DEAL::unit_face_support_points=18
-DEAL::generalized_support_points=54
+DEAL::generalized_support_points=27
 DEAL::generalized_face_support_points=18
 DEAL::face_to_equivalent_cell_index: 0 1 4 5 8 9 12 13 32 33 36 37 16 17 24 25 40 41
 DEAL::face_to_cell_index: 0 1 4 5 8 9 12 13 32 33 36 37 16 17 24 25 40 41
@@ -3132,7 +3132,7 @@ DEAL::degree=2
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=43
 DEAL::unit_face_support_points=17
-DEAL::generalized_support_points=43
+DEAL::generalized_support_points=27
 DEAL::generalized_face_support_points=17
 DEAL::face_to_equivalent_cell_index: 0 1 2 6 7 8 12 13 14 18 19 20 32 34 24 28 36
 DEAL::face_to_cell_index: 0 1 2 6 7 8 12 13 14 18 19 20 32 34 24 28 36
@@ -3692,7 +3692,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=0
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=0
+DEAL::generalized_support_points=40
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1 2 3
 DEAL::face_to_cell_index: 0 1 2 3
@@ -3937,7 +3937,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=0
 DEAL::unit_face_support_points=0
-DEAL::generalized_support_points=0
+DEAL::generalized_support_points=44
 DEAL::generalized_face_support_points=0
 DEAL::face_to_equivalent_cell_index: 0 1 2 3
 DEAL::face_to_cell_index: 0 1 2 3
@@ -3972,7 +3972,7 @@ DEAL::degree=1
 DEAL::conformity= Hcurl Hdiv H1
 DEAL::unit_support_points=32
 DEAL::unit_face_support_points=16
-DEAL::generalized_support_points=32
+DEAL::generalized_support_points=8
 DEAL::generalized_face_support_points=16
 DEAL::face_to_equivalent_cell_index: 0 1 2 3 8 9 10 11 16 17 18 19 24 25 26 27
 DEAL::face_to_cell_index: 0 1 2 3 8 9 10 11 16 17 18 19 24 25 26 27
@@ -4007,7 +4007,7 @@ DEAL::degree=1
 DEAL::conformity=
 DEAL::unit_support_points=32
 DEAL::unit_face_support_points=8
-DEAL::generalized_support_points=32
+DEAL::generalized_support_points=8
 DEAL::generalized_face_support_points=8
 DEAL::face_to_equivalent_cell_index: 0 1 4 5 8 9 12 13
 DEAL::face_to_cell_index: 0 1 4 5 8 9 12 13
@@ -4042,7 +4042,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=143
 DEAL::unit_face_support_points=31
-DEAL::generalized_support_points=143
+DEAL::generalized_support_points=27
 DEAL::generalized_face_support_points=31
 DEAL::face_to_equivalent_cell_index: 0 1 2 3 8 9 10 11 16 17 18 19 24 25 26 27 56 57 58 62 63 64 32 33 34 44 45 46 68 69 70
 DEAL::face_to_cell_index: 0 1 2 3 8 9 10 11 16 17 18 19 24 25 26 27 56 57 58 62 63 64 32 33 34 44 45 46 68 69 70
@@ -4077,7 +4077,7 @@ DEAL::degree=2
 DEAL::conformity=
 DEAL::unit_support_points=382
 DEAL::unit_face_support_points=102
-DEAL::generalized_support_points=382
+DEAL::generalized_support_points=27
 DEAL::generalized_face_support_points=102
 DEAL::face_to_equivalent_cell_index: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 192 193 194 195 196 197 204 205 206 207 208 209 144 145 146 147 148 149 168 169 170 171 172 173 216 217 218 219 220 221
 DEAL::face_to_cell_index: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 192 193 194 195 196 197 204 205 206 207 208 209 144 145 146 147 148 149 168 169 170 171 172 173 216 217 218 219 220 221
