@@ -1,0 +1,5 @@
+Changed: The various overloads for Threads::new_thread() and 
+Threads::new_task() taking from 0 to 9 parameters have been replaced 
+by two variadic template versions.
+<br>
+(Daniel Arndt, 2017/09/01)
