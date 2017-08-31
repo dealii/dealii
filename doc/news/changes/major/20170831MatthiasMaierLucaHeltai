@@ -1,4 +1,4 @@
-Improved: The support for non-lagrangian elements with generalized support
+Improved: The support for non-Lagrangian elements with generalized support
 points has been vastly improved: FESystem::get_generalized_support_point()
 now returns a list of unique generalized support points for the finite
 element system; TODO

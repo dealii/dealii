@@ -1910,7 +1910,7 @@ public:
   /**
    * Return whether a finite element has defined support points on faces. If
    * the result is true, then a call to the get_unit_face_support_points()
-   * yields a non-empty array.
+   * yields a non-empty vector.
    *
    * For more information, see the documentation for the has_support_points()
    * function.
@@ -1928,6 +1928,11 @@ public:
   /**
    * Return a vector of generalized support points.
    *
+   * @note The vector returned by this function is always a minimal set of
+   * *unique* support points. This is in contrast to the behavior of
+   * get_unit_support_points() that returns a repeated list of unit support
+   * points for an FESystem of numerous (Lagrangian) base elements.
+   *
    * See the
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
    * for more information.
@@ -1936,8 +1941,9 @@ public:
   get_generalized_support_points () const;
 
   /**
-   * Return <tt>true</tt> if the class provides nonempty vectors either from
-   * get_unit_support_points() or get_generalized_support_points().
+   * Return whether a finite element has defined generalized support
+   * points. If the result is true, then a call to the
+   * get_generalized_support_points() yields a non-empty vector.
    *
    * See the
    * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
