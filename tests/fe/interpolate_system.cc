@@ -34,9 +34,9 @@ void check1(const Function<dim> &f,
 
   std::vector<double> dofs(fe.dofs_per_cell);
 
-  std::vector<Vector<double> > values (fe.get_unit_support_points().size(),
+  std::vector<Vector<double> > values (fe.get_generalized_support_points().size(),
                                        Vector<double>(comp));
-  f.vector_value_list(fe.get_unit_support_points(), values);
+  f.vector_value_list(fe.get_generalized_support_points(), values);
   fe.convert_generalized_support_point_values_to_dof_values(values, dofs);
   deallog << " vector " << vector_difference(fe,dofs,f,0) << std::endl;
 }
@@ -56,9 +56,9 @@ void check3(const Function<dim> &f,
 
   std::vector<double> dofs(fe.dofs_per_cell);
 
-  std::vector<Vector<double> > values (fe.get_unit_support_points().size(),
+  std::vector<Vector<double> > values (fe.get_generalized_support_points().size(),
                                        Vector<double>(f.n_components));
-  f.vector_value_list(fe.get_unit_support_points(), values);
+  f.vector_value_list(fe.get_generalized_support_points(), values);
   fe.convert_generalized_support_point_values_to_dof_values(values, dofs);
   deallog << " vector " << vector_difference(fe,dofs,f,0) << std::endl;
 }
