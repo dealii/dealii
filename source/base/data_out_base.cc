@@ -1533,11 +1533,11 @@ namespace
 
 namespace DataOutBase
 {
-  template <int dim, int spacedim>
-  const unsigned int Patch<dim,spacedim>::space_dim;
-
   const unsigned int Deal_II_IntermediateFlags::format_version = 3;
 
+
+  template <int dim, int spacedim>
+  const unsigned int Patch<dim,spacedim>::space_dim;
 
 
   template <int dim, int spacedim>
@@ -1550,10 +1550,8 @@ namespace DataOutBase
     patch_index(no_neighbor),
     n_subdivisions (1),
     points_are_available(false)
-    // all the other data has a
-    // constructor of its own, except
-    // for the "neighbors" field, which
-    // we set to invalid values.
+    // all the other data has a constructor of its own, except for the
+    // "neighbors" field, which we set to invalid values.
   {
     for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i)
       neighbors[i] = no_neighbor;
@@ -1632,6 +1630,91 @@ namespace DataOutBase
     std::swap (neighbors, other_patch.neighbors);
     std::swap (patch_index, other_patch.patch_index);
     std::swap (n_subdivisions, other_patch.n_subdivisions);
+    data.swap (other_patch.data);
+    std::swap (points_are_available, other_patch.points_are_available);
+  }
+
+
+
+  template <int spacedim>
+  const unsigned int Patch<0,spacedim>::space_dim;
+
+
+  template <int spacedim>
+  const unsigned int Patch<0,spacedim>::no_neighbor;
+
+
+  template <int spacedim>
+  unsigned int Patch<0,spacedim>::neighbors[1] = { Patch<0,spacedim>::no_neighbor };
+
+  template <int spacedim>
+  unsigned int Patch<0,spacedim>::n_subdivisions = 1;
+
+  template <int spacedim>
+  Patch<0,spacedim>::Patch ()
+    :
+    patch_index(no_neighbor),
+    points_are_available(false)
+  {
+    Assert (spacedim<=3, ExcNotImplemented());
+  }
+
+
+
+  template <int spacedim>
+  bool
+  Patch<0,spacedim>::operator == (const Patch &patch) const
+  {
+    const unsigned int dim = 0;
+
+//TODO: make tolerance relative
+    const double epsilon=3e-16;
+    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+      if (vertices[i].distance(patch.vertices[i]) > epsilon)
+        return false;
+
+    if (patch_index != patch.patch_index)
+      return false;
+
+    if (points_are_available != patch.points_are_available)
+      return false;
+
+    if (data.n_rows() != patch.data.n_rows())
+      return false;
+
+    if (data.n_cols() != patch.data.n_cols())
+      return false;
+
+    for (unsigned int i=0; i<data.n_rows(); ++i)
+      for (unsigned int j=0; j<data.n_cols(); ++j)
+        if (data[i][j] != patch.data[i][j])
+          return false;
+
+    return true;
+  }
+
+
+
+  template <int spacedim>
+  std::size_t
+  Patch<0,spacedim>::memory_consumption () const
+  {
+    return (sizeof(vertices) / sizeof(vertices[0]) *
+            MemoryConsumption::memory_consumption(vertices[0])
+            +
+            MemoryConsumption::memory_consumption(data)
+            +
+            MemoryConsumption::memory_consumption(points_are_available));
+  }
+
+
+
+  template <int spacedim>
+  void
+  Patch<0,spacedim>::swap (Patch<0,spacedim> &other_patch)
+  {
+    std::swap (vertices, other_patch.vertices);
+    std::swap (patch_index, other_patch.patch_index);
     data.swap (other_patch.data);
     std::swap (points_are_available, other_patch.points_are_available);
   }
@@ -7769,8 +7852,7 @@ namespace DataOutBase
     }
 
 
-    // then read all the data that is
-    // in this patch
+    // then read all the data that is in this patch
     for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
       in >> patch.vertices[GeometryInfo<dim>::ucd_to_deal[i]];
 
