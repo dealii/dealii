@@ -472,7 +472,7 @@ public:
   virtual std::vector<std::string> get_names () const = 0;
 
   /**
-   * This functions returns information about how the individual components of
+   * This function returns information about how the individual components of
    * output files that consist of more than one data set are to be
    * interpreted.
    *
@@ -558,7 +558,7 @@ public:
   virtual std::vector<std::string> get_names () const;
 
   /**
-   * This functions returns information about how the individual components of
+   * This function returns information about how the individual components of
    * output files that consist of more than one data set are to be
    * interpreted. Since the current class is meant to be used for a single
    * scalar result variable, the returned value is obviously
@@ -793,7 +793,7 @@ public:
   virtual std::vector<std::string> get_names () const;
 
   /**
-   * This functions returns information about how the individual components of
+   * This function returns information about how the individual components of
    * output files that consist of more than one data set are to be
    * interpreted. Since the current class is meant to be used for a single
    * vector result variable, the returned value is obviously
@@ -901,16 +901,26 @@ private:
  *           // want to create tensor-valued outputs), and copy the
  *           // gradients of the solution at the evaluation points
  *           // into the output slots:
- *           AssertDimension (computed_quantities[p].size(), dim*dim);
+ *           AssertDimension (computed_quantities[p].size(),
+ *                            (Tensor<2,dim>::n_independent_components));
  *           for (unsigned int d=0; d<dim; ++d)
  *             for (unsigned int e=0; e<dim; ++e)
- *               computed_quantities[p][d*dim+e]
+ *               computed_quantities[p][Tensor<2,dim>::component_to_unrolled_index(TableIndices<2>(d,e)]
  *                 = input_data.solution_gradients[p][d][e];
  *         }
  *     }
  *   };
  * @endcode
- * The only thing that is necessary is to add another output to the call
+ * The only tricky part in this piece of code is how to sort the <code>dim*dim</code>
+ * elements of the strain tensor into the one vector of computed output
+ * quantities -- in other words, how to <i>unroll</i> the elements of
+ * the tensor into the vector. This is facilitated by the
+ * Tensor::component_to_unrolled_index() function that takes a
+ * pair of indices that specify a particular element of the
+ * tensor and returns a vector index that is then used in the code
+ * above to fill the @p computed_quantities array.
+ *
+ * The last thing that is necessary is to add another output to the call
  * of DataOut::add_vector() in the @p output_results() function of the @p Step8
  * class of that example program. The corresponding code snippet would then look
  * like this:
@@ -969,10 +979,11 @@ private:
  *
  *       for (unsigned int p=0; p<input_data.solution_gradients.size(); ++p)
  *         {
- *           AssertDimension (computed_quantities[p].size(), dim*dim);
+ *           AssertDimension (computed_quantities[p].size(),
+ *                            (Tensor<2,dim>::n_independent_components));
  *           for (unsigned int d=0; d<dim; ++d)
  *             for (unsigned int e=0; e<dim; ++e)
- *               computed_quantities[p][d*dim+e]
+ *               computed_quantities[p][Tensor<2,dim>::component_to_unrolled_index(TableIndices<2>(d,e))]
  *                 = (input_data.solution_gradients[p][d][e]
  *                    +
  *                    input_data.solution_gradients[p][e][d]) / 2;
@@ -981,10 +992,15 @@ private:
  *   };
  * @endcode
  *
- * This leads to the following visualization:
+ * Using this class in in step-8 leads to the following visualization:
  *
  * @image html data_postprocessor_tensor_2.png
  *
+ * Given how easy it is to output the strain, it would also not be very
+ * complicated to write a postprocessor that computes the <i>stress</i>
+ * in the solution field as the stress is easily computed from the
+ * strain by multiplication with either the strain-stress tensor or,
+ * in simple cases, the Lam&eacute; constants.
  *
  * @ingroup output
  * @author Wolfgang Bangerth, 2017
@@ -1016,7 +1032,7 @@ public:
   virtual std::vector<std::string> get_names () const;
 
   /**
-   * This functions returns information about how the individual components of
+   * This function returns information about how the individual components of
    * output files that consist of more than one data set are to be
    * interpreted. Since the current class is meant to be used for a single
    * vector result variable, the returned value is obviously
