@@ -1,0 +1,6 @@
+Fixed: FiniteElement::get_generalized_support_points() now always returns a
+list of unique points. This is in contrast to the old behavior where
+get_generalized_support_points() returned a repeated list of (nodal)
+support points for an FE_System consisting of Lagrangian elements.
+<br>
+(Matthias Maier, 2017/08/31)
