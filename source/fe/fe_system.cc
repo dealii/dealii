@@ -1610,10 +1610,10 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
 
     generalized_support_points_index_table.resize(this->n_base_elements());
 
-    for (unsigned int base_el = 0; base_el < this->n_base_elements(); ++base_el)
+    for (unsigned int base = 0; base < this->n_base_elements(); ++base)
       {
         for (const auto &point :
-             base_element(base_el).get_generalized_support_points())
+             base_element(base).get_generalized_support_points())
           {
             // Is point already an element of generalized_support_points?
             const auto p =
@@ -1625,14 +1625,14 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
               {
                 // If no, update the table and add the point to the vector
                 const auto n = this->generalized_support_points.size();
-                generalized_support_points_index_table[base_el].push_back(n);
+                generalized_support_points_index_table[base].push_back(n);
                 this->generalized_support_points.push_back(point);
               }
             else
               {
                 // If yes, just add the correct index to the table.
                 const auto n = p - std::begin(this->generalized_support_points);
-                generalized_support_points_index_table[base_el].push_back(n);
+                generalized_support_points_index_table[base].push_back(n);
               }
           }
       }
