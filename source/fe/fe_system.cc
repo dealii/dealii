@@ -2251,64 +2251,68 @@ FESystem<dim,spacedim>::get_constant_modes () const
 template <int dim, int spacedim>
 void
 FESystem<dim,spacedim>::
-convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                        std::vector<double>                &nodal_values) const
+convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &point_values,
+                                                        std::vector<double>                &dof_values) const
 {
-  // we currently only support the case where each base element has exactly
-  // as many generalized support points as there are dofs in that element.
-  //
-  // in the more general case, if there are more generalized support
-  // points than dofs, we don't have the infrastructure at the time of
-  // writing this to tease apart which support point value
-  // belongs to which element
-  AssertDimension (support_point_values.size(), this->dofs_per_cell);
-  AssertDimension (nodal_values.size(), this->dofs_per_cell);
+  Assert(this->has_generalized_support_points(),
+         ExcMessage("The FESystem does not have generalized support points"));
 
-  // loop over the bases and let them do the work on their
-  // share of the input argument
-  std::vector<Vector<double>> base_support_point_values;
-  std::vector<double>         base_nodal_values;
-  unsigned int                current_vector_component = 0;
-  for (unsigned int base=0; base<base_elements.size(); ++base)
+  AssertDimension(point_values.size(),
+                  this->get_generalized_support_points().size());
+  AssertDimension(dof_values.size(), this->dofs_per_cell);
+
+  // loop over all base elements (respecting multiplicity) and let them do
+  // the work on their share of the input argument
+
+  unsigned int current_vector_component = 0;
+  for (unsigned int base = 0; base < base_elements.size(); ++base)
     {
-      const unsigned int element_multiplicity = this->element_multiplicity(base);
-      for (unsigned int m=0;
-           m<element_multiplicity;
-           ++m, current_vector_component += base_element(base).n_components())
+      // We need access to the base_element, its multiplicity, the
+      // number of generalized support points (n_base_points) and the
+      // number of components we're dealing with.
+      const auto &base_element = this->base_element(base);
+      const unsigned int multiplicity = this->element_multiplicity(base);
+      const unsigned int n_base_dofs = base_element.dofs_per_cell;
+      const unsigned int n_base_points =
+        base_element.get_generalized_support_points().size();
+      const unsigned int n_base_components = base_element.n_components();
+
+      std::vector<double> base_dof_values(n_base_dofs);
+      std::vector<Vector<double> > base_point_values(n_base_points);
+
+      for (unsigned int m = 0; m < multiplicity;
+           ++m, current_vector_component += n_base_components)
         {
-          // extract the support points of this base element.
-          // assume that support points are numbered in exactly
-          // the same way as dofs -- this is how the
-          // initialize_unit_support_points() function does it,
-          // at least
-          //
-          // to pick things apart, we could really use a base_to_system_index()
-          // function, but that doesn't exist -- just do it by using
-          // the reverse table -- the amount of work done here is not
-          // worth trying to optimizing this
-          base_support_point_values.resize  (base_element(base).dofs_per_cell);
-          for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-            if (this->system_to_base_index(i).first == std::make_pair(base,m))
-              {
-                const unsigned int base_n_components = base_element(base).n_components();
-                base_support_point_values[this->system_to_base_index(i).second]
-                .reinit (base_n_components, false);
-                for (unsigned int c=0; c<base_n_components; ++c)
-                  base_support_point_values[this->system_to_base_index(i).second][c]
-                    = support_point_values[i][current_vector_component+c];
-              }
+          // populate base_point_values for a recursive call to
+          // convert_generalized_support_point_values_to_dof_values
+          for (unsigned int j = 0; j < base_point_values.size(); ++j)
+            {
+              base_point_values[j].reinit(n_base_components, false);
 
-          // then call the base element to get its version of the
-          // nodal values
-          base_nodal_values.resize (base_element(base).dofs_per_cell);
-          base_element(base).convert_generalized_support_point_values_to_dof_values
-          (base_support_point_values, base_nodal_values);
+              const auto n = generalized_support_points_index_table[base][j];
 
-          // finally put these nodal values back into global nodal
-          // values vector. use the same reverse loop as above
-          for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-            if (this->system_to_base_index(i).first == std::make_pair(base,m))
-              nodal_values[i] = base_nodal_values[this->system_to_base_index(i).second];
+              // we have to extract the correct slice out of the global
+              // vector of values:
+              const auto begin =
+                std::begin(point_values[n]) + current_vector_component;
+              const auto end = begin + n_base_components;
+              std::copy(begin, end, std::begin(base_point_values[j]));
+            }
+
+          base_element.convert_generalized_support_point_values_to_dof_values(
+            base_point_values, base_dof_values);
+
+          // Finally put these dof values back into global dof values
+          // vector.
+
+          // To do this, we could really use a base_to_system_index()
+          // function, but that doesn't exist -- just do it by using the
+          // reverse table -- the amount of work done here is not worth
+          // trying to optimizing this.
+          for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+            if (this->system_to_base_index(i).first == std::make_pair(base, m))
+              dof_values[i] =
+                base_dof_values[this->system_to_base_index(i).second];
         }
     }
 }
