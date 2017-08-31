@@ -291,6 +291,8 @@ namespace LinearAlgebra
      * replace the current elements. The last parameter can be used if the same
      * communication pattern is used multiple times. This can be used to improve
      * performance.
+     *
+     * @note: The @p trilinos_vec is not allowed to have ghost entries.
      */
     void import(const TrilinosWrappers::MPI::Vector &trilinos_vec,
                 VectorOperation::values operation,

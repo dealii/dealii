@@ -338,20 +338,32 @@ namespace LinearAlgebra
 
     if (operation==VectorOperation::insert)
       {
-        target_vector.Import(multivector, import, Insert);
-        double *values = target_vector.Values();
+        const int err = target_vector.Import(multivector, import, Insert);
+        AssertThrow(err == 0, ExcMessage("Epetra Import() failed with error code: "
+                                         + Utilities::to_string(err)));
+
+        const double *values = target_vector.Values();
         const int size = target_vector.MyLength();
+        Assert(size==0 || values != nullptr, ExcInternalError("Import failed."));
+
         for (int i=0; i<size; ++i)
           val[i] = values[i];
       }
-    else
+    else if (operation==VectorOperation::add)
       {
-        target_vector.Import(multivector, import, Add);
-        double *values = target_vector.Values();
+        const int err = target_vector.Import(multivector, import, Add);
+        AssertThrow(err == 0, ExcMessage("Epetra Import() failed with error code: "
+                                         + Utilities::to_string(err)));
+
+        const double *values = target_vector.Values();
         const int size = target_vector.MyLength();
+        Assert(size==0 || values != nullptr, ExcInternalError("Import failed."));
+
         for (int i=0; i<size; ++i)
           val[i] += values[i];
       }
+    else
+      AssertThrow(false, ExcNotImplemented());
   }
 
 
