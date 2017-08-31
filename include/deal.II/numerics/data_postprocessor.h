@@ -408,6 +408,10 @@ namespace DataPostprocessorInputs
  * flags to the constructor of the base class and overload the function that
  * actually computes the results.
  *
+ * The DataPostprocessorVector class documentation also contains an extensive
+ * example of how it can be used.
+ *
+ *
  * @ingroup output
  * @author Tobias Leicht, 2007, Wolfgang Bangerth, 2016
  */
@@ -591,8 +595,172 @@ private:
  * An example of how the closely related class DataPostprocessorScalar is used
  * can be found in step-29.
  *
+ *
+ * <h3> An example </h3>
+ *
+ * A common example of what one wants to do with postprocessors is to visualize
+ * not just the value of the solution, but the gradient. Let's, for simplicity,
+ * assume that you have only a scalar solution. In fact, because it's readily
+ * available, let us simply take the step-6 solver to produce such a scalar
+ * solution. The gradient is a vector (with exactly @p dim components), so the
+ * current class fits the bill to produce the gradient through postprocessing.
+ * Then, the following code snippet implements everything you need to have
+ * to visualize the gradient:
+ * @code
+ * template <int dim>
+ * class GradientPostprocessor : public DataPostprocessorVector<dim>
+ * {
+ * public:
+ *   GradientPostprocessor ()
+ *     :
+ *     // call the constructor of the base class. call the variable to
+ *     // be output "grad_u" and make sure that DataOut provides us
+ *     // with the gradients:
+ *     DataPostprocessorVector<dim> ("grad_u",
+ *                                   update_gradients)
+ *   {}
+ *
+ *   virtual
+ *   void
+ *   evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &input_data,
+ *                          std::vector<Vector<double> >               &computed_quantities) const
+ *   {
+ *     // ensure that there really are as many output slots
+ *     // as there are points at which DataOut provides the
+ *     // gradients:
+ *     AssertDimension (input_data.solution_gradients.size(),
+ *                      computed_quantities.size());
+ *
+ *     // then loop over all of these inputs:
+ *     for (unsigned int p=0; p<input_data.solution_gradients.size(); ++p)
+ *       {
+ *         // ensure that each output slot has exactly 'dim'
+ *         // components (as should be expected, given that we
+ *         // want to create vector-valued outputs), and copy the
+ *         // gradients of the solution at the evaluation points
+ *         // into the output slots:
+ *         AssertDimension (computed_quantities[p].size(), dim);
+ *         for (unsigned int d=0; d<dim; ++d)
+ *           computed_quantities[p][d]
+ *             = input_data.solution_gradients[p][d];
+ *       }
+ *   }
+ * };
+ * @endcode
+ * The only thing that is necessary is to add another output to the call
+ * of DataOut::add_vector() in the @p run() function of the @p Step6 class
+ * of that example program. The corresponding code snippet would then look
+ * like this (where we also use VTU as the file format to output the data):
+ * @code
+ *   GradientPostprocessor<dim> gradient_postprocessor;
+ *
+ *   DataOut<dim> data_out;
+ *   data_out.attach_dof_handler (dof_handler);
+ *   data_out.add_data_vector (solution, "solution");
+ *   data_out.add_data_vector (solution, gradient_postprocessor);
+ *   data_out.build_patches ();
+ *
+ *   std::ofstream output ("solution.vtu");
+ *   data_out.write_vtu (output);
+ * @endcode
+ *
+ * This leads to the following output for the solution and the
+ * gradients (you may want to compare with the solution shown in the results
+ * section of step-6; the current data is generated on a coarser mesh for
+ * simplicity):
+ *
+ * @image html data_postprocessor_vector_0.png
+ * @image html data_postprocessor_vector_1.png
+ *
+ * In the second image, the background color corresponds to the magnitude of the
+ * gradient vector and the vector glyphs to the gradient itself. It may be surprising
+ * at first to see that from each vertex, multiple vectors originate, going in
+ * different directions. But that is because the solution is only continuous:
+ * in general, the gradient is discontinuous across edges, and so the multiple
+ * vectors originating from each vertex simply represent the differing
+ * gradients of the solution at each adjacent cell.
+ *
+ * The output above -- namely, the gradient $\nabla u$ of the solution --
+ * corresponds to the temperature gradient if one interpreted step-6 as solving
+ * a steady-state heat transfer problem.
+ * It is very small in the central part of the domain because in step-6 we are
+ * solving an equation that has a coefficient $a(\mathbf x)$ that is large in
+ * the central part and small on the outside. This can be thought as a material
+ * that conducts heat well, and consequently the temperature gradient is small.
+ * On the other hand, the "heat flux" corresponds to the quantity
+ * $a(\mathbf x) \nabla u(\mathbf x)$. For the
+ * solution of that equation, the flux should be continuous across the interface.
+ * This is easily verified by the following modification of the postprocessor:
+ * @code
+ * template <int dim>
+ * class HeatFluxPostprocessor : public DataPostprocessorVector<dim>
+ * {
+ * public:
+ *   HeatFluxPostprocessor ()
+ *     :
+ *     // like above, but now also make sure that DataOut provides
+ *     // us with coordinates of the evaluation points:
+ *     DataPostprocessorVector<dim> ("heat_flux",
+ *                                   update_gradients | update_quadrature_points)
+ *   {}
+ *
+ *   virtual
+ *   void
+ *   evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &input_data,
+ *                          std::vector<Vector<double> >               &computed_quantities) const
+ *   {
+ *     AssertDimension (input_data.solution_gradients.size(),
+ *                      computed_quantities.size());
+ *
+ *     for (unsigned int p=0; p<input_data.solution_gradients.size(); ++p)
+ *       {
+ *         AssertDimension (computed_quantities[p].size(), dim);
+ *         for (unsigned int d=0; d<dim; ++d)
+ *           // like above, but also multiply the gradients with
+ *           // the coefficient evaluated at the current point:
+ *           computed_quantities[p][d]
+ *             = coefficient (input_data.evaluation_points[p]) *
+ *               input_data.solution_gradients[p][d];
+ *       }
+ *   }
+ * };
+ * @endcode
+ * With this postprocessor, we get the following picture of the heat flux:
+ *
+ * @image html data_postprocessor_vector_2.png
+ *
+ * As the background color shows, the gradient times the coefficient is now
+ * a continuous function. There are (large) vectors around the interface
+ * where the coefficient jumps (at half the distance between the center of the
+ * disk to the perimeter) that seem to point in the wrong direction; this is
+ * an artifact of the fact that the solution has a discontinuous gradient
+ * at these points and that the numerical solution on the current grid
+ * does not adequately resolve this interface. This, however, is not
+ * important to the current discussion.
+ *
+ *
+ * <h3> Extension to the gradients of vector-valued problems </h3>
+ *
+ * The example above uses a scalar solution and its gradient as an example.
+ * On the other hand, one may want to do something similar for the gradient
+ * of a vector-valued displacement field (such as the strain or
+ * stress of a displacement field, like those computed in step-8, step-17,
+ * step-18, or step-44). In that case, the solution is already vector
+ * valued and the stress is a (symmetric) tensor.
+ *
+ * deal.II does not currently support outputting tensor-valued quantities, but
+ * they can of course be output as a collection of scalar-valued components of
+ * the tensor. This means that the current class is not applicable any more,
+ * but it is not very difficult to derive a true "stress" postprocessor directly
+ * from the DataPostprocessor class that simply outputs <code>dim*dim</code>
+ * components of the stress vector as scalars and that is structured in a
+ * similar way to the postprocessors above. (It has to overload the
+ * @p evaluate_vector_field() function, however, given that the solution is
+ * vector valued already.)
+ *
+ *
  * @ingroup output
- * @author Wolfgang Bangerth, 2011
+ * @author Wolfgang Bangerth, 2011, 2017
  */
 template <int dim>
 class DataPostprocessorVector : public DataPostprocessor<dim>
