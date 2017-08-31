@@ -2261,6 +2261,9 @@ convert_generalized_support_point_values_to_dof_values (const std::vector<Vector
                   this->get_generalized_support_points().size());
   AssertDimension(dof_values.size(), this->dofs_per_cell);
 
+  std::vector<double> base_dof_values;
+  std::vector<Vector<double> > base_point_values;
+
   // loop over all base elements (respecting multiplicity) and let them do
   // the work on their share of the input argument
 
@@ -2277,8 +2280,8 @@ convert_generalized_support_point_values_to_dof_values (const std::vector<Vector
         base_element.get_generalized_support_points().size();
       const unsigned int n_base_components = base_element.n_components();
 
-      std::vector<double> base_dof_values(n_base_dofs);
-      std::vector<Vector<double> > base_point_values(n_base_points);
+      base_dof_values.resize(n_base_dofs);
+      base_point_values.resize(n_base_points);
 
       for (unsigned int m = 0; m < multiplicity;
            ++m, current_vector_component += n_base_components)
