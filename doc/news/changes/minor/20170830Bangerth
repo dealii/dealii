@@ -1,0 +1,4 @@
+New: The new DataPostprocessorTensor can help visualize tensor-valued
+quantities.
+<br>
+(Wolfgang Bangerth, 2017/08/30)
