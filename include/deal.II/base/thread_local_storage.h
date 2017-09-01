@@ -267,6 +267,8 @@ namespace Threads
   {
 #ifdef DEAL_II_WITH_THREADS
     data.clear ();
+#else
+    data = T {};
 #endif
   }
 }   // end of implementation of namespace Threads
