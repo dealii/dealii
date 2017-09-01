@@ -216,12 +216,12 @@ namespace DataOutBase
    *
    * A patch consists of the following data:
    * <ul>
-   * <li>the corner #vertices,
+   * <li> the corner #vertices,
    * <li> the number #n_subdivisions of the number of cells the Patch has in
    * each space direction,
    * <li> the #data attached to each vertex, in the usual lexicographic
    * ordering,
-   * <li> Information on #neighbors.
+   * <li> information on #neighbors.
    * </ul>
    *
    * See the general documentation of the DataOutBase class for more
@@ -243,7 +243,7 @@ namespace DataOutBase
     static const unsigned int space_dim=spacedim;
 
     /**
-     * Corner points of a patch.  Inner points are computed by a multilinear
+     * Corner points of a patch.  Interior points are computed by a multilinear
      * transformation of the unit cell to the cell specified by these corner
      * points, if <code>points_are_available==false</code>.
      *
@@ -257,10 +257,9 @@ namespace DataOutBase
     Point<spacedim> vertices[GeometryInfo<dim>::vertices_per_cell];
 
     /**
-     * Numbers of neighbors of a patch.  OpenDX format requires neighbor
-     * information for advanced output. Here the neighborship relationship of
-     * patches is stored. During output, this must be transformed into
-     * neighborship of sub-grid cells. For dim==0 we still allow one
+     * Patch indices of neighbors of the current patch. This is made available
+     * for the OpenDX format that requires neighbor
+     * information for advanced output. For dim==0 we still allow one
      * neighbor, to avoid compiler warnings about zero-sized arrays.
      */
     unsigned int neighbors[dim > 0

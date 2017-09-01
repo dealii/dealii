@@ -1607,8 +1607,13 @@ namespace DataOutBase
   std::size_t
   Patch<dim,spacedim>::memory_consumption () const
   {
-    return (sizeof(vertices) / sizeof(vertices[0]) *
+    return (sizeof(vertices)/sizeof(vertices[0]) *
             MemoryConsumption::memory_consumption(vertices[0])
+            +
+            sizeof(neighbors)/sizeof(neighbors[0]) *
+            MemoryConsumption::memory_consumption(neighbors[0])
+            +
+            MemoryConsumption::memory_consumption(patch_index)
             +
             MemoryConsumption::memory_consumption(n_subdivisions)
             +
