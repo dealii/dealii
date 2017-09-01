@@ -26,7 +26,7 @@
 
 
 template <typename number>
-void test (unsigned int variant)
+void test (unsigned int variant, unsigned int min_convergence_steps)
 {
   const unsigned int n = 64;
   Vector<number> rhs(n), sol(n);
@@ -70,30 +70,31 @@ void test (unsigned int variant)
   data.max_n_tmp_vectors = 80;
 
   SolverGMRES<Vector<number> > solver(control, data);
-  solver.solve(matrix, sol, rhs, PreconditionIdentity());
+
+  check_solver_within_range
+  (solver.solve(matrix, sol, rhs, PreconditionIdentity()),
+   control.last_step(), min_convergence_steps, min_convergence_steps+2);
 
   deallog.pop();
 }
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog << std::setprecision(3);
-  deallog.attach(logfile);
+  initlog();
 
   deallog.push("double");
-  test<double>(0);
-  test<double>(1);
-  test<double>(2);
-  test<double>(3);
-  test<double>(4);
-  test<double>(5);
+  test<double>(0, 56);
+  test<double>(1, 64);
+  test<double>(2, 56);
+  test<double>(3, 64);
+  test<double>(4, 56);
+  test<double>(5, 64);
   deallog.pop();
   deallog.push("float");
-  test<float>(0);
-  test<float>(1);
-  test<float>(2);
-  test<float>(3);
+  test<float>(0, 36);
+  test<float>(1, 64);
+  test<float>(2, 36);
+  test<float>(3, 64);
   deallog.pop();
 }
 
