@@ -269,8 +269,8 @@ namespace DataOutBase
                            1];
 
     /**
-     * Number of this patch. Since we are not sure patches are handled in the
-     * same order, always, we better store this.
+     * Number of this patch. Since we are not sure patches are always
+     * handled in the same order, we better store this.
      */
     unsigned int patch_index;
 
@@ -347,6 +347,149 @@ namespace DataOutBase
      * Value to be used if this patch has no neighbor on one side.
      */
     static const unsigned int no_neighbor = numbers::invalid_unsigned_int;
+
+    /**
+     * @addtogroup Exceptions
+     * @{
+     */
+
+    /**
+     * Exception
+     */
+    DeclException2 (ExcInvalidCombinationOfDimensions,
+                    int, int,
+                    << "It is not possible to have a structural dimension of " << arg1
+                    << " to be larger than the space dimension of the surrounding"
+                    << " space " << arg2);
+    //@}
+  };
+
+
+
+  /**
+   * A specialization of the general Patch<dim,spacedim> template that is
+   * tailored to the case of points, i.e., zero-dimensional objects embedded
+   * in @p spacedim dimensional space.
+   *
+   * The current class is compatible with the general template to allow for
+   * using the same functions accessing patches of arbitrary dimensionality
+   * in a generic way. However, it makes some variables that are nonsensical
+   * for zero-dimensional patches into @p static variables that exist only
+   * once in the entire program, as opposed to once per patch. Specifically,
+   * this is the case for the @p neighbors array and the @p n_subdivisions
+   * member variable that make no sense for zero-dimensional patches because
+   * points have no natural neighbors across their non-existent faces, nor
+   * can they reasonably be subdivided.
+   *
+   * @author Wolfgang Bangerth, 2017.
+   */
+  template <int spacedim>
+  struct Patch<0,spacedim>
+  {
+    /**
+     * Make the <tt>spacedim</tt> template parameter available.
+     */
+    static const unsigned int space_dim=spacedim;
+
+    /**
+     * Corner points of a patch.  For the current class of zero-dimensional
+     * patches, there is of course only a single vertex.
+     *
+     * If <code>points_are_available==true</code>, then
+     * the coordinates of the point at which output is to be generated
+     * is attached as an additional row to the <code>data</code> table.
+     */
+    Point<spacedim> vertices[1];
+
+    /**
+     * An unused, @p static variable that exists only to allow access
+     * from general code in a generic fashion.
+     */
+    static unsigned int neighbors[1];
+
+    /**
+     * Number of this patch. Since we are not sure patches are always
+     * handled in the same order, we better store this.
+     */
+    unsigned int patch_index;
+
+    /**
+     * Number of subdivisions with which this patch is to be written.
+     * <tt>1</tt> means no subdivision, <tt>2</tt> means bisection, <tt>3</tt>
+     * trisection, etc.
+     *
+     * Since subdivision makes no sense for zero-dimensional patches,
+     * this variable is not used but exists only to allow access
+     * from general code in a generic fashion.
+     */
+    static unsigned int n_subdivisions;
+
+    /**
+     * Data vectors. The format is as follows: <tt>data(i,.)</tt> denotes the
+     * data belonging to the <tt>i</tt>th data vector. <tt>data.n_cols()</tt>
+     * therefore equals the number of output points; this number is
+     * of course one for the current class, given that we produce output on
+     * points. <tt>data.n_rows()</tt> equals the number of
+     * data vectors. For the current purpose, a data vector equals one scalar,
+     * even if multiple scalars may later be interpreted as vectors.
+     *
+     * Within each column, <tt>data(.,j)</tt> are the data values at the
+     * output point <tt>j</tt>; for the current class, @p j can only
+     * be zero.
+     *
+     * Since the number of data vectors is usually the same for all patches to
+     * be printed, <tt>data.size()</tt> should yield the same value for all
+     * patches provided. The exception are patches for which
+     * points_are_available are set, where the actual coordinates of the point
+     * are appended to the 'data' field, see the documentation of the
+     * points_are_available flag.
+     */
+    Table<2,float> data;
+
+    /**
+     * A flag indicating whether the coordinates of the interior patch points
+     * (assuming that the patch is supposed to be subdivided further) are
+     * appended to the @p data table (@p true) or not (@p false). The latter
+     * is the default and in this case the locations of the points interior to
+     * this patch are computed by (bi-, tri-)linear interpolation from the
+     * vertices of the patch.
+     *
+     * This option exists since patch points may be evaluated using a Mapping
+     * (rather than by a linear interpolation) and therefore have to be stored
+     * in the Patch structure.
+     */
+    bool points_are_available;
+
+    /**
+     * Default constructor. Sets #points_are_available
+     * to false, and #patch_index to #no_neighbor.
+     */
+    Patch ();
+
+    /**
+     * Compare the present patch for equality with another one. This is used
+     * in a few of the automated tests in our testsuite.
+     */
+    bool operator == (const Patch &patch) const;
+
+    /**
+     * Return an estimate for the memory consumption, in bytes, of this
+     * object. This is not exact (but will usually be close) because
+     * calculating the memory usage of trees (e.g., <tt>std::map</tt>) is
+     * difficult.
+     */
+    std::size_t memory_consumption () const;
+
+    /**
+     * Swap the current object's contents with those of the given argument.
+     */
+    void swap (Patch<0,spacedim> &other_patch);
+
+    /**
+     * Value to be used if this patch has no neighbor on one side.
+     */
+    static const unsigned int no_neighbor = numbers::invalid_unsigned_int;
+
     /**
      * @addtogroup Exceptions
      * @{
