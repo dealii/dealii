@@ -1098,8 +1098,8 @@ FiniteElement<dim,spacedim>::get_constant_modes () const
 template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::
-convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &,
-                                                          std::vector<double> &) const
+convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &,
+                                                        std::vector<double> &) const
 {
   Assert (has_generalized_support_points(),
           ExcMessage ("The element for which you are calling the current "

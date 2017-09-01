@@ -35,7 +35,7 @@ void check1(const Function<dim> &f,
   std::vector<Vector<double> > values (fe.get_generalized_support_points().size(),
                                        Vector<double>(dim));
   f.vector_value_list(fe.get_generalized_support_points(), values);
-  fe.convert_generalized_support_point_values_to_nodal_values(values, dofs);
+  fe.convert_generalized_support_point_values_to_dof_values(values, dofs);
   deallog << " vector " << vector_difference(fe,dofs,f,0) << std::endl;
 }
 

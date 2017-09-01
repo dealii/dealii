@@ -513,8 +513,8 @@ FE_ABF<dim>::has_support_on_face (const unsigned int shape_index,
 template <int dim>
 void
 FE_ABF<dim>::
-convert_generalized_support_point_values_to_nodal_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const
+convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
+                                                        std::vector<double>                &nodal_values) const
 {
   Assert (support_point_values.size() == this->generalized_support_points.size(),
           ExcDimensionMismatch(support_point_values.size(), this->generalized_support_points.size()));

@@ -1345,7 +1345,7 @@
  * code that describes a finite element simply by providing a polynomial
  * space (without having to give it any particular basis -- whatever is convenient
  * is entirely sufficient) and the nodal functionals. This is used, for example
- * in the FiniteElement::convert_generalized_support_point_values_to_nodal_values()
+ * in the FiniteElement::convert_generalized_support_point_values_to_dof_values()
  * function.
  * </dd>
  *

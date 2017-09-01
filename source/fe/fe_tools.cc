@@ -1649,8 +1649,8 @@ namespace FETools
               Assert (numbers::is_finite(support_point_values[k][d]), ExcInternalError());
             }
 
-        fe.convert_generalized_support_point_values_to_nodal_values(support_point_values,
-                                                                    nodal_values);
+        fe.convert_generalized_support_point_values_to_dof_values(support_point_values,
+                                                                  nodal_values);
 
         // Enter the interpolated dofs into the matrix
         for (unsigned int j=0; j<n_dofs; ++j)

@@ -291,7 +291,7 @@ namespace FETools
    *   that returns a scalar.
    * - That the finite element has exactly @p dim vector components.
    * - That the function $f_j$ is given by whatever the element implements
-   *   through the FiniteElement::convert_generalized_support_point_values_to_nodal_values()
+   *   through the FiniteElement::convert_generalized_support_point_values_to_dof_values()
    *   function.
    *
    * @param fe The finite element for which the operations above are to be
