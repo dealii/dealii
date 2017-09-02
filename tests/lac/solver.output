@@ -1,44 +1,44 @@
 
 DEAL::Size 4 Unknowns 9
-DEAL::SOR-diff:0
+DEAL::SOR-diff:0.000
 DEAL:no-fail:cg::Starting value 3.000
-DEAL:no-fail:cg::Convergence step 3 value 0
+DEAL:no-fail:cg::Convergence step 3 value 4.807e-17
 DEAL:no-fail:Bicgstab::Starting value 3.000
-DEAL:no-fail:Bicgstab::Convergence step 3 value 0
+DEAL:no-fail:Bicgstab::Convergence step 3 value 5.998e-18
 DEAL:no-fail:GMRES::Starting value 3.000
-DEAL:no-fail:GMRES::Convergence step 3 value 0
+DEAL:no-fail:GMRES::Convergence step 3 value 1.110e-16
 DEAL:no-fail:GMRES::Starting value 3.000
-DEAL:no-fail:GMRES::Convergence step 3 value 0
+DEAL:no-fail:GMRES::Convergence step 3 value 1.110e-16
 DEAL:no-fail:QMRS::Starting value 3.000
-DEAL:no-fail:QMRS::Convergence step 3 value 0
+DEAL:no-fail:QMRS::Convergence step 3 value 9.615e-17
 DEAL:no-fail:FIRE::Starting value 9.000
 DEAL:no-fail:FIRE::Convergence step 38 value 0.0002184
 DEAL:no:Richardson::Starting value 3.000
 DEAL:no:Richardson::Convergence step 24 value 0.0007118
 DEAL:no:cg::Starting value 3.000
-DEAL:no:cg::Convergence step 3 value 0
+DEAL:no:cg::Convergence step 3 value 4.807e-17
 DEAL:no:Bicgstab::Starting value 3.000
-DEAL:no:Bicgstab::Convergence step 3 value 0
+DEAL:no:Bicgstab::Convergence step 3 value 5.998e-18
 DEAL:no:GMRES::Starting value 3.000
-DEAL:no:GMRES::Convergence step 3 value 0
+DEAL:no:GMRES::Convergence step 3 value 1.110e-16
 DEAL:no:GMRES::Starting value 3.000
-DEAL:no:GMRES::Convergence step 3 value 0
+DEAL:no:GMRES::Convergence step 3 value 1.110e-16
 DEAL:no:QMRS::Starting value 3.000
-DEAL:no:QMRS::Convergence step 3 value 0
+DEAL:no:QMRS::Convergence step 3 value 9.615e-17
 DEAL:no:FIRE::Starting value 9.000
 DEAL:no:FIRE::Convergence step 38 value 0.0002184
 DEAL:rich:Richardson::Starting value 3.000
 DEAL:rich:Richardson::Convergence step 42 value 0.0008696
 DEAL:rich:cg::Starting value 3.000
-DEAL:rich:cg::Convergence step 3 value 0
+DEAL:rich:cg::Convergence step 3 value 3.102e-16
 DEAL:rich:Bicgstab::Starting value 3.000
-DEAL:rich:Bicgstab::Convergence step 3 value 0
+DEAL:rich:Bicgstab::Convergence step 3 value 7.254e-18
 DEAL:rich:GMRES::Starting value 1.800
-DEAL:rich:GMRES::Convergence step 3 value 0
+DEAL:rich:GMRES::Convergence step 3 value 6.029e-16
 DEAL:rich:GMRES::Starting value 3.000
-DEAL:rich:GMRES::Convergence step 3 value 0
+DEAL:rich:GMRES::Convergence step 3 value 1.078e-15
 DEAL:rich:QMRS::Starting value 3.000
-DEAL:rich:QMRS::Convergence step 3 value 0
+DEAL:rich:QMRS::Convergence step 3 value 7.195e-16
 DEAL:rich:FIRE::Starting value 9.000
 DEAL:rich:FIRE::Convergence step 32 value 0.0009708
 DEAL:ssor:RichardsonT::Starting value 3.000
@@ -65,13 +65,11 @@ DEAL:sor:cg::Starting value 3.000
 DEAL:sor:cg::Failure step 100 value 0.2585
 DEAL:sor::Exception: SolverControl::NoConvergence (it, res)
 DEAL:sor:Bicgstab::Starting value 3.000
-DEAL:sor:Bicgstab::Convergence step 5 value 0
+DEAL:sor:Bicgstab::Convergence step 5 value 6.247e-18
 DEAL:sor:GMRES::Starting value 1.462
-DEAL:sor:GMRES::Re-orthogonalization enabled at step 5
-DEAL:sor:GMRES::Convergence step 5 value 0
+DEAL:sor:GMRES::Convergence step 5 value 7.914e-19
 DEAL:sor:GMRES::Starting value 3.000
-DEAL:sor:GMRES::Re-orthogonalization enabled at step 5
-DEAL:sor:GMRES::Convergence step 5 value 0
+DEAL:sor:GMRES::Convergence step 5 value 6.144e-18
 DEAL:sor:FIRE::Starting value 9.000
 DEAL:sor:FIRE::Convergence step 51 value 0.0004993
 DEAL:psor:RichardsonT::Starting value 3.000
@@ -90,7 +88,7 @@ DEAL:psor:GMRES::Convergence step 6 value 0.0004455
 DEAL:psor:FIRE::Starting value 9.000
 DEAL:psor:FIRE::Convergence step 45 value 0.0009217
 DEAL::Size 12 Unknowns 121
-DEAL::SOR-diff:0
+DEAL::SOR-diff:0.000
 DEAL:no-fail:cg::Starting value 11.00
 DEAL:no-fail:cg::Failure step 10 value 0.1496
 DEAL:no-fail::Exception: SolverControl::NoConvergence (it, res)
