@@ -1,0 +1,5 @@
+Changed: SolverGMRES used to notify via deallog when re-orthogonalization
+of the Arnoldi vectors kicks in. Now, there is a slot one can connect to
+retrieve this information. By default nothing is printed.
+<br>
+(Daniel Arndt, 2017/09/02)
