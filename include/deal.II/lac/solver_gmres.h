@@ -292,6 +292,14 @@ public:
     const std::function<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> &slot);
 
 
+  /**
+   * Connect a slot to retrieve a notification when the vectors are
+   * re-orthogonalized.
+   */
+  boost::signals2::connection
+  connect_re_orthogonalization_slot(const std::function<void (int)> &slot);
+
+
   DeclException1 (ExcTooFewTmpVectors,
                   int,
                   << "The number of temporary vectors you gave ("
@@ -348,6 +356,12 @@ protected:
   boost::signals2::signal<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> krylov_space_signal;
 
   /**
+   * Signal used to retrieve a notification
+   * when the vectors are re-orthogonalized.
+   */
+  boost::signals2::signal<void (int)> re_orthogonalize_signal;
+
+  /**
    * Implementation of the computation of the norm of the residual.
    */
   virtual double criterion();
@@ -368,14 +382,17 @@ protected:
    * should be applied twice. The algorithm checks loss of orthogonality in
    * the procedure every fifth step and sets the flag to true in that case.
    * All subsequent iterations use re-orthogonalization.
+   * Calls the signal re_orthogonalize_signal if it is connected.
    */
   static double
-  modified_gram_schmidt (const internal::SolverGMRES::TmpVectors<VectorType> &orthogonal_vectors,
-                         const unsigned int                                  dim,
-                         const unsigned int                                  accumulated_iterations,
-                         VectorType                                          &vv,
-                         Vector<double>                                      &h,
-                         bool                                                &re_orthogonalize);
+  modified_gram_schmidt
+  (const internal::SolverGMRES::TmpVectors<VectorType> &orthogonal_vectors,
+   const unsigned int                                  dim,
+   const unsigned int                                  accumulated_iterations,
+   VectorType                                          &vv,
+   Vector<double>                                      &h,
+   bool                                                &re_orthogonalize,
+   const boost::signals2::signal<void(int)>            &re_orthogonalize_signal = boost::signals2::signal<void(int)>());
 
   /**
    * Estimates the eigenvalues from the Hessenberg matrix, H_orig, generated
@@ -642,14 +659,17 @@ SolverGMRES<VectorType>::modified_gram_schmidt
  const unsigned int                                  accumulated_iterations,
  VectorType                                          &vv,
  Vector<double>                                      &h,
- bool                                                &re_orthogonalize)
+ bool                                                &reorthogonalize,
+ const boost::signals2::signal<void(int)>            &reorthogonalize_signal)
 {
   Assert(dim > 0, ExcInternalError());
   const unsigned int inner_iteration = dim - 1;
 
   // need initial norm for detection of re-orthogonalization, see below
   double norm_vv_start = 0;
-  if (re_orthogonalize == false && inner_iteration % 5 == 4)
+  const bool consider_reorthogonalize = (reorthogonalize == false) &&
+                                        (inner_iteration % 5 == 4);
+  if (consider_reorthogonalize)
     norm_vv_start = vv.l2_norm();
 
   // Orthogonalization
@@ -665,7 +685,7 @@ SolverGMRES<VectorType>::modified_gram_schmidt
   // orthogonalization. If vv became very small (here: less than the square
   // root of the machine precision times 10), it is almost in the span of the
   // previous vectors, which indicates loss of precision.
-  if (re_orthogonalize == false && inner_iteration % 5 == 4)
+  if (consider_reorthogonalize)
     {
       if (norm_vv > 10. * norm_vv_start *
           std::sqrt(std::numeric_limits<typename VectorType::value_type>::epsilon()))
@@ -673,13 +693,13 @@ SolverGMRES<VectorType>::modified_gram_schmidt
 
       else
         {
-          re_orthogonalize = true;
-          deallog << "Re-orthogonalization enabled at step "
-                  << accumulated_iterations << std::endl;
+          reorthogonalize = true;
+          if (!reorthogonalize_signal.empty())
+            reorthogonalize_signal(accumulated_iterations);
         }
     }
 
-  if (re_orthogonalize == true)
+  if (reorthogonalize == true)
     {
       double htmp = vv * orthogonal_vectors[0];
       h(0) += htmp;
@@ -913,7 +933,8 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
 
           const double s = modified_gram_schmidt(tmp_vectors, dim,
                                                  accumulated_iterations,
-                                                 vv, h, re_orthogonalize);
+                                                 vv, h, re_orthogonalize,
+                                                 re_orthogonalize_signal);
           h(inner_iteration+1) = s;
 
           //s=0 is a lucky breakdown, the solver will reach convergence,
@@ -1095,6 +1116,16 @@ SolverGMRES<VectorType>::connect_krylov_space_slot
 (const std::function<void (const internal::SolverGMRES::TmpVectors<VectorType> &)> &slot)
 {
   return krylov_space_signal.connect(slot);
+}
+
+
+
+template <class VectorType>
+boost::signals2::connection
+SolverGMRES<VectorType>::connect_re_orthogonalization_slot
+(const std::function<void (int)> &slot)
+{
+  return re_orthogonalize_signal.connect(slot);
 }
 
 
