@@ -1972,6 +1972,7 @@ public:
    */
   bool has_generalized_support_points () const;
 
+//FIXME
   /**
    * Return the equivalent to get_generalized_support_points(), except
    * for faces.
@@ -1979,6 +1980,7 @@ public:
   const std::vector<Point<dim-1> > &
   get_generalized_face_support_points () const;
 
+//FIXME
   /**
    * Return whether a finite element has defined generalized support points on
    * faces. If the result is true, then a call to the
