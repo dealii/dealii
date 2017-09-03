@@ -137,6 +137,35 @@ namespace LinearAlgebra
 
 
 
+#if defined(DEAL_II_WITH_TRILINOS) && defined(DEAL_II_WITH_MPI)
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::reinit(const TrilinosWrappers::MPI::Vector &trilinos_vec)
+  {
+    // TODO: We could avoid copying the data by just using a view into the
+    // trilinos data but only if Number=double. Also update documentation that
+    // the argument's lifetime needs to be longer then. If we do this, we need
+    // to think about whether the view should be read/write.
+
+    stored_elements = IndexSet(trilinos_vec.vector_partitioner());
+
+    resize_val(stored_elements.n_elements());
+
+    TrilinosScalar *start_ptr;
+    int leading_dimension;
+    int ierr = trilinos_vec.trilinos_vector().ExtractView (&start_ptr, &leading_dimension);
+    AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+
+    std::copy(start_ptr, start_ptr + leading_dimension, val);
+
+    // reset the communication pattern
+    source_stored_elements.clear();
+    comm_pattern.reset();
+  }
+#endif
+
+
+
   template <typename Number>
   template <typename Functor>
   void
