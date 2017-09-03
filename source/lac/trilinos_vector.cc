@@ -761,33 +761,39 @@ namespace TrilinosWrappers
       AssertThrow (out, ExcIO());
       boost::io::ios_flags_saver restore_flags(out);
 
-      // get a representation of the
-      // vector and loop over all
-      // the elements TODO: up to
-      // now only local data printed
-      // out! Find a way to neatly
-      // output distributed data...
-      TrilinosScalar *val;
-      int leading_dimension;
-      int ierr = vector->ExtractView (&val, &leading_dimension);
 
-      AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       out.precision (precision);
       if (scientific)
         out.setf (std::ios::scientific, std::ios::floatfield);
       else
         out.setf (std::ios::fixed, std::ios::floatfield);
 
-      if (across)
-        for (size_type i=0; i<size(); ++i)
-          out << static_cast<double>(val[i]) << ' ';
+      if (size() != local_size())
+        {
+          auto global_id = [&] (const size_type index)
+          {
+            return vector->Map().GID(static_cast<TrilinosWrappers::types::int_type>(index));
+          };
+          out << "size:" << size() << " local_size:" << local_size() << " :" << std::endl;
+          for (size_type i=0; i<local_size(); ++i)
+            out << "[" << global_id(i) << "]: " << (*(vector))[0][i] << std::endl;
+        }
       else
-        for (size_type i=0; i<size(); ++i)
-          out << static_cast<double>(val[i]) << std::endl;
-      out << std::endl;
+        {
+          TrilinosScalar *val;
+          int leading_dimension;
+          int ierr = vector->ExtractView (&val, &leading_dimension);
 
-      // restore the representation
-      // of the vector
+          AssertThrow (ierr == 0, ExcTrilinosError(ierr));
+          if (across)
+            for (size_type i=0; i<size(); ++i)
+              out << static_cast<double>(val[i]) << ' ';
+          else
+            for (size_type i=0; i<size(); ++i)
+              out << static_cast<double>(val[i]) << std::endl;
+          out << std::endl;
+        }
+
       AssertThrow (out, ExcIO());
     }
 

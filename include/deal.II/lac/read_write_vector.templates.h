@@ -25,6 +25,8 @@
 #include <deal.II/lac/vector_operations_internal.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <boost/io/ios_state.hpp>
+
 #ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/lac/petsc_parallel_vector.h>
 #endif
@@ -444,8 +446,7 @@ namespace LinearAlgebra
                                   const bool         scientific) const
   {
     AssertThrow (out, ExcIO());
-    std::ios::fmtflags old_flags = out.flags();
-    unsigned int old_precision = out.precision (precision);
+    boost::io::ios_flags_saver restore_flags(out);
 
     out.precision (precision);
     if (scientific)
@@ -456,15 +457,12 @@ namespace LinearAlgebra
     out << "IndexSet: ";
     stored_elements.print(out);
     out << std::endl;
-    for (unsigned int i=0; i<this->n_elements(); ++i)
-      out << val[i] << std::endl;
+    unsigned int i=0;
+    for (const auto &idx : this->stored_elements)
+      out << "[" << idx << "]: " << val[i++] << '\n';
     out << std::flush;
 
-
     AssertThrow (out, ExcIO());
-    // reset output format
-    out.flags (old_flags);
-    out.precision(old_precision);
   }
 
 
