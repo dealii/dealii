@@ -758,7 +758,18 @@ public:
    * Virtual destructor. Makes sure that pointers to this class are deleted
    * properly.
    */
-  virtual ~FiniteElement ();
+  virtual ~FiniteElement () = default;
+
+  /**
+   * Creates information for creating a FESystem with this class as
+   * base element and with multiplicity @p multiplicity. In particular,
+   * the return type of this function can be used in the constructor
+   * for a FESystem object.
+   * This function calls clone() and hence creates a copy of the
+   * current object.
+   */
+  std::pair<std::unique_ptr<FiniteElement<dim, spacedim> >, unsigned int>
+  operator^ (unsigned int multiplicity) const;
 
   /**
    * A sort of virtual copy constructor, this function returns a copy of
@@ -772,8 +783,8 @@ public:
    * type. They do so through this function.
    */
   virtual
-  std::unique_ptr<FiniteElement<dim,spacedim>>
-                                            clone() const = 0;
+  std::unique_ptr<FiniteElement<dim,spacedim> >
+  clone() const = 0;
 
   /**
    * Return a string that uniquely identifies a finite element. The general

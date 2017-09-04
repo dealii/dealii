@@ -152,9 +152,12 @@ FiniteElement (const FiniteElementData<dim> &fe_data,
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim>::~FiniteElement ()
-{}
-
+std::pair<std::unique_ptr<FiniteElement<dim, spacedim> >, unsigned int>
+FiniteElement<dim, spacedim>::operator^ (unsigned int multiplicity) const
+{
+  return std::make_pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+         unsigned int> (std::move(this->clone()), std::move(multiplicity));
+}
 
 
 
