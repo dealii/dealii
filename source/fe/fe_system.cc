@@ -286,12 +286,6 @@ FESystem<dim,spacedim>::FESystem (
 
 
 template <int dim, int spacedim>
-FESystem<dim,spacedim>::~FESystem ()
-{}
-
-
-
-template <int dim, int spacedim>
 std::string
 FESystem<dim,spacedim>::get_name () const
 {
