@@ -1,0 +1,3 @@
+New: add Utilities::MPI::sum() for FullMatrix objects.
+<br>
+(Denis Davydov, 2017/09/04)
