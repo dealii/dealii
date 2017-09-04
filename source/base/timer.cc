@@ -84,6 +84,19 @@ namespace internal
         return Period::num*double(duration.count())/Period::den;
       }
 
+      /**
+       * Fill a MinMaxAvg struct with default values.
+       */
+      void
+      clear_timing_data(Utilities::MPI::MinMaxAvg &data)
+      {
+        data.sum = numbers::signaling_nan<double>();
+        data.min = numbers::signaling_nan<double>();
+        data.max = numbers::signaling_nan<double>();
+        data.avg = numbers::signaling_nan<double>();
+        data.min_index = numbers::invalid_unsigned_int;
+        data.max_index = numbers::invalid_unsigned_int;
+      }
     }
   }
 }
@@ -151,11 +164,7 @@ Timer::Timer(MPI_Comm mpi_communicator,
   mpi_communicator (mpi_communicator),
   sync_wall_time(sync_wall_time_)
 {
-  last_lap_data.sum = last_lap_data.min = last_lap_data.max = last_lap_data.avg = numbers::signaling_nan<double>();
-  last_lap_data.min_index = last_lap_data.max_index = numbers::invalid_unsigned_int;
-  accumulated_wall_time_data.sum = accumulated_wall_time_data.min = accumulated_wall_time_data.max = accumulated_wall_time_data.avg = 0.;
-  accumulated_wall_time_data.min_index = accumulated_wall_time_data.max_index = 0;
-
+  reset();
   start();
 }
 
@@ -275,11 +284,9 @@ void Timer::reset ()
 {
   wall_times.reset();
   cpu_times.reset();
-  running         = false;
-  last_lap_data.sum = last_lap_data.min = last_lap_data.max = last_lap_data.avg = numbers::signaling_nan<double>();
-  last_lap_data.min_index = last_lap_data.max_index = numbers::invalid_unsigned_int;
-  accumulated_wall_time_data.sum = accumulated_wall_time_data.min = accumulated_wall_time_data.max = accumulated_wall_time_data.avg = 0.;
-  accumulated_wall_time_data.min_index = accumulated_wall_time_data.max_index = 0;
+  running = false;
+  internal::Timer::clear_timing_data(last_lap_data);
+  internal::Timer::clear_timing_data(accumulated_wall_time_data);
 }
 
 
