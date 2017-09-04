@@ -1,0 +1,13 @@
+
+DEAL::FESystem<2>[FE_RaviartThomas<2>(1)^2-FESystem<2>[FE_RaviartThomas<2>(1)^2]]
+DEAL:: vector 1.66533e-16
+DEAL::FESystem<2>[FE_RaviartThomas<2>(2)^2-FESystem<2>[FE_RaviartThomas<2>(2)^2]]
+DEAL:: vector 2.39392e-16
+DEAL::FESystem<2>[FE_RaviartThomas<2>(3)^2-FESystem<2>[FE_RaviartThomas<2>(3)^2]]
+DEAL:: vector 1.87784e-16
+DEAL::FESystem<3>[FE_RaviartThomas<3>(1)^2-FESystem<3>[FE_RaviartThomas<3>(1)^2]]
+DEAL:: vector 1.59595e-16
+DEAL::FESystem<3>[FE_RaviartThomas<3>(2)^2-FESystem<3>[FE_RaviartThomas<3>(2)^2]]
+DEAL:: vector 5.22585e-16
+DEAL::FESystem<3>[FE_RaviartThomas<3>(3)^2-FESystem<3>[FE_RaviartThomas<3>(3)^2]]
+DEAL:: vector 3.52637e-16
