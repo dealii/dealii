@@ -21,7 +21,12 @@
 // @sect3{Include files}
 
 // We start with a bunch of include files that have already been explained in
-// previous tutorial programs:
+// previous tutorial programs. One new one is <code>timer.h</code>: This is
+// the first example program that uses the Timer class. The Timer keeps track
+// of both the elapsed wall clock time (that is, the amount of time that a
+// clock mounted on the wall would measure) and CPU clock time (the amount of
+// time that the current process uses on the CPUs). We will use a Timer below
+// to measure how much CPU time each grid refinement cycle takes.
 #include <deal.II/base/timer.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
@@ -1640,11 +1645,15 @@ namespace Step28
 
     double k_eff_old = k_eff;
 
-    Timer timer;
-    timer.start ();
-
     for (unsigned int cycle=0; cycle<parameters.n_refinement_cycles; ++cycle)
       {
+        // We will measure the CPU time that each cycle takes below. The
+        // constructor for Timer calls Timer::start(), so once we create a
+        // timer we can query it for information. Since we use a thread pool
+        // to assemble the system matrices, the CPU time we measure (if we run
+        // with more than one thread) will be larger than the wall time.
+        Timer timer;
+
         std::cout << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
@@ -1717,6 +1726,10 @@ namespace Step28
         for (unsigned int group=0; group<parameters.n_groups; ++group)
           energy_groups[group]->output_results (cycle);
 
+        // Print out information about the simulation as well as the elapsed
+        // CPU time. We can call Timer::cpu_time() without first calling
+        // Timer::stop() to get the elapsed CPU time at the point of calling
+        // the function.
         std::cout << std::endl;
         std::cout << "   Cycle=" << cycle
                   << ", n_dofs=" << energy_groups[0]->n_dofs() + energy_groups[1]->n_dofs()
