@@ -208,7 +208,7 @@ Householder<number>::least_squares (Vector<number2> &dst,
   const size_type m = this->m(), n = this->n();
 
   GrowingVectorMemory<Vector<number2> > mem;
-  Vector<number2> *aux = mem.alloc();
+  typename VectorMemory<Vector<number2> >::Pointer aux (mem);
   aux->reinit(src, true);
   *aux = src;
   // m > n, m = src.n, n = dst.n
@@ -235,10 +235,10 @@ Householder<number>::least_squares (Vector<number2> &dst,
   // Compute solution
   this->backward(dst, *aux);
 
-  mem.free(aux);
-
   return std::sqrt(sum);
 }
+
+
 
 template <typename number>
 template <typename number2>
@@ -253,7 +253,7 @@ Householder<number>::least_squares (BlockVector<number2> &dst,
   const size_type m = this->m(), n = this->n();
 
   GrowingVectorMemory<BlockVector<number2> > mem;
-  BlockVector<number2> *aux = mem.alloc();
+  typename VectorMemory<BlockVector<number2> >::Pointer aux (mem);
   aux->reinit(src, true);
   *aux = src;
   // m > n, m = src.n, n = dst.n
@@ -288,8 +288,6 @@ Householder<number>::least_squares (BlockVector<number2> &dst,
   //copy the result back
   //to the BlockVector
   dst = v_dst;
-
-  mem.free(aux);
 
   return std::sqrt(sum);
 }

@@ -160,31 +160,31 @@ protected:
   /**
    * Auxiliary vector.
    */
-  VectorType *Vr;
+  typename VectorMemory<VectorType>::Pointer Vr;
   /**
    * Auxiliary vector.
    */
-  VectorType *Vrbar;
+  typename VectorMemory<VectorType>::Pointer Vrbar;
   /**
    * Auxiliary vector.
    */
-  VectorType *Vp;
+  typename VectorMemory<VectorType>::Pointer Vp;
   /**
    * Auxiliary vector.
    */
-  VectorType *Vy;
+  typename VectorMemory<VectorType>::Pointer Vy;
   /**
    * Auxiliary vector.
    */
-  VectorType *Vz;
+  typename VectorMemory<VectorType>::Pointer Vz;
   /**
    * Auxiliary vector.
    */
-  VectorType *Vt;
+  typename VectorMemory<VectorType>::Pointer Vt;
   /**
    * Auxiliary vector.
    */
-  VectorType *Vv;
+  typename VectorMemory<VectorType>::Pointer Vv;
   /**
    * Right hand side vector.
    */
@@ -296,15 +296,6 @@ SolverBicgstab<VectorType>::SolverBicgstab (SolverControl        &cn,
                                             const AdditionalData &data)
   :
   Solver<VectorType>(cn),
-  Vx(nullptr),
-  Vr(nullptr),
-  Vrbar(nullptr),
-  Vp(nullptr),
-  Vy(nullptr),
-  Vz(nullptr),
-  Vt(nullptr),
-  Vv(nullptr),
-  Vb(nullptr),
   alpha(0.),
   beta(0.),
   omega(0.),
@@ -459,19 +450,20 @@ SolverBicgstab<VectorType>::solve(const MatrixType         &A,
                                   const PreconditionerType &preconditioner)
 {
   deallog.push("Bicgstab");
-  Vr    = this->memory.alloc();
+  Vr    = typename VectorMemory<VectorType>::Pointer(this->memory);
+  Vrbar = typename VectorMemory<VectorType>::Pointer(this->memory);
+  Vp    = typename VectorMemory<VectorType>::Pointer(this->memory);
+  Vy    = typename VectorMemory<VectorType>::Pointer(this->memory);
+  Vz    = typename VectorMemory<VectorType>::Pointer(this->memory);
+  Vt    = typename VectorMemory<VectorType>::Pointer(this->memory);
+  Vv    = typename VectorMemory<VectorType>::Pointer(this->memory);
+
   Vr->reinit(x, true);
-  Vrbar = this->memory.alloc();
   Vrbar->reinit(x, true);
-  Vp    = this->memory.alloc();
   Vp->reinit(x, true);
-  Vy    = this->memory.alloc();
   Vy->reinit(x, true);
-  Vz    = this->memory.alloc();
   Vz->reinit(x, true);
-  Vt    = this->memory.alloc();
   Vt->reinit(x, true);
-  Vv    = this->memory.alloc();
   Vv->reinit(x, true);
 
   Vx = &x;
@@ -495,14 +487,6 @@ SolverBicgstab<VectorType>::solve(const MatrixType         &A,
       ++step;
     }
   while (state.breakdown == true);
-
-  this->memory.free(Vr);
-  this->memory.free(Vrbar);
-  this->memory.free(Vp);
-  this->memory.free(Vy);
-  this->memory.free(Vz);
-  this->memory.free(Vt);
-  this->memory.free(Vv);
 
   deallog.pop();
 

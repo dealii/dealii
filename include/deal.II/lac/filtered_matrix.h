@@ -900,7 +900,7 @@ FilteredMatrix<VectorType>::vmult (VectorType &dst, const VectorType &src) const
   if (!expect_constrained_source)
     {
       GrowingVectorMemory<VectorType> mem;
-      VectorType *tmp_vector = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer tmp_vector (mem);
       // first copy over src vector and
       // pre-filter
       tmp_vector->reinit(src, true);
@@ -908,7 +908,6 @@ FilteredMatrix<VectorType>::vmult (VectorType &dst, const VectorType &src) const
       pre_filter (*tmp_vector);
       // then let matrix do its work
       matrix->vmult (dst, *tmp_vector);
-      mem.free(tmp_vector);
     }
   else
     {
@@ -929,7 +928,7 @@ FilteredMatrix<VectorType>::Tvmult (VectorType &dst, const VectorType &src) cons
   if (!expect_constrained_source)
     {
       GrowingVectorMemory<VectorType> mem;
-      VectorType *tmp_vector = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer tmp_vector (mem);
       // first copy over src vector and
       // pre-filter
       tmp_vector->reinit(src, true);
@@ -937,7 +936,6 @@ FilteredMatrix<VectorType>::Tvmult (VectorType &dst, const VectorType &src) cons
       pre_filter (*tmp_vector);
       // then let matrix do its work
       matrix->Tvmult (dst, *tmp_vector);
-      mem.free(tmp_vector);
     }
   else
     {
@@ -958,7 +956,7 @@ FilteredMatrix<VectorType>::vmult_add (VectorType &dst, const VectorType &src) c
   if (!expect_constrained_source)
     {
       GrowingVectorMemory<VectorType> mem;
-      VectorType *tmp_vector = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer tmp_vector (mem);
       // first copy over src vector and
       // pre-filter
       tmp_vector->reinit(src, true);
@@ -966,7 +964,6 @@ FilteredMatrix<VectorType>::vmult_add (VectorType &dst, const VectorType &src) c
       pre_filter (*tmp_vector);
       // then let matrix do its work
       matrix->vmult_add (dst, *tmp_vector);
-      mem.free(tmp_vector);
     }
   else
     {
@@ -987,7 +984,7 @@ FilteredMatrix<VectorType>::Tvmult_add (VectorType &dst, const VectorType &src) 
   if (!expect_constrained_source)
     {
       GrowingVectorMemory<VectorType> mem;
-      VectorType *tmp_vector = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer tmp_vector (mem);
       // first copy over src vector and
       // pre-filter
       tmp_vector->reinit(src, true);
@@ -995,7 +992,6 @@ FilteredMatrix<VectorType>::Tvmult_add (VectorType &dst, const VectorType &src) 
       pre_filter (*tmp_vector);
       // then let matrix do its work
       matrix->Tvmult_add (dst, *tmp_vector);
-      mem.free(tmp_vector);
     }
   else
     {
