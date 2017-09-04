@@ -1,0 +1,3 @@
+Changed: deal.II now requires BOOST version 1.59 or newer.
+<br>
+(David Wells, 2017/09/04)
