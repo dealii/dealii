@@ -69,6 +69,9 @@ for (S : COMPLEX_SCALARS)
     void sum<S> (const Vector<S> &, const MPI_Comm &, Vector<S> &);
 
     template
+    void sum<S> (const FullMatrix<S> &, const MPI_Comm &, FullMatrix<S> &);
+
+    template
     S sum<S> (const S &, const MPI_Comm &);
 
     template
