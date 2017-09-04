@@ -22,6 +22,7 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/full_matrix.h>
 
 #include <vector>
 
@@ -43,10 +44,12 @@ namespace Utilities
       }
 
 
+
       inline MPI_Datatype mpi_type_id (const long int *)
       {
         return MPI_LONG;
       }
+
 
 
       inline MPI_Datatype mpi_type_id (const unsigned int *)
@@ -55,10 +58,12 @@ namespace Utilities
       }
 
 
+
       inline MPI_Datatype mpi_type_id (const unsigned long int *)
       {
         return MPI_UNSIGNED_LONG;
       }
+
 
 
       inline MPI_Datatype mpi_type_id (const unsigned long long int *)
@@ -67,10 +72,12 @@ namespace Utilities
       }
 
 
+
       inline MPI_Datatype mpi_type_id (const float *)
       {
         return MPI_FLOAT;
       }
+
 
 
       inline MPI_Datatype mpi_type_id (const double *)
@@ -79,11 +86,14 @@ namespace Utilities
       }
 
 
+
       inline MPI_Datatype mpi_type_id (const long double *)
       {
         return MPI_LONG_DOUBLE;
       }
 #endif
+
+
 
       template <typename T>
       void all_reduce (const MPI_Op      &mpi_op,
@@ -122,6 +132,8 @@ namespace Utilities
               output[i] = values[i];
           }
       }
+
+
 
       template <typename T>
       void all_reduce (const MPI_Op                   &mpi_op,
@@ -162,6 +174,8 @@ namespace Utilities
           }
       }
 
+
+
       template <typename T>
       T all_reduce (const MPI_Op &mpi_op,
                     const T &t,
@@ -171,6 +185,8 @@ namespace Utilities
         all_reduce(mpi_op, &t, mpi_communicator, &output, 1);
         return output;
       }
+
+
 
       template <typename T>
       void all_reduce (const MPI_Op &mpi_op,
@@ -183,6 +199,8 @@ namespace Utilities
         all_reduce(mpi_op, &values[0], mpi_communicator, &output[0], values.size());
       }
 
+
+
       template <typename T>
       void all_reduce (const MPI_Op    &mpi_op,
                        const Vector<T> &values,
@@ -193,7 +211,24 @@ namespace Utilities
                ExcDimensionMismatch(values.size(), output.size()));
         all_reduce(mpi_op, values.begin(), mpi_communicator, output.begin(), values.size());
       }
+
+
+
+      template <typename T>
+      void all_reduce (const MPI_Op    &mpi_op,
+                       const FullMatrix<T> &values,
+                       const MPI_Comm  &mpi_communicator,
+                       FullMatrix<T>  &output)
+      {
+        Assert(values.m() == output.m(),
+               ExcDimensionMismatch(values.m(), output.m()));
+        Assert(values.n() == output.n(),
+               ExcDimensionMismatch(values.n(), output.n()));
+        all_reduce(mpi_op, &values[0][0], mpi_communicator, &output[0][0], values.m() * values.n());
+      }
+
     }
+
 
 
     template <typename T>
@@ -204,6 +239,7 @@ namespace Utilities
     }
 
 
+
     template <typename T>
     void sum (const std::vector<T> &values,
               const MPI_Comm       &mpi_communicator,
@@ -212,6 +248,8 @@ namespace Utilities
       internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
 
+
+
     template <typename T>
     void sum (const Vector<T> &values,
               const MPI_Comm &mpi_communicator,
@@ -219,6 +257,17 @@ namespace Utilities
     {
       internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
+
+
+
+    template <typename T>
+    void sum (const FullMatrix<T> &values,
+              const MPI_Comm &mpi_communicator,
+              FullMatrix<T> &sums)
+    {
+      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
+    }
+
 
 
     template <int rank, int dim, typename Number>
@@ -242,6 +291,8 @@ namespace Utilities
       return global;
     }
 
+
+
     template <int rank, int dim, typename Number>
     SymmetricTensor<rank,dim,Number>
     sum (const SymmetricTensor<rank,dim,Number> &local,
@@ -263,12 +314,15 @@ namespace Utilities
       return global;
     }
 
+
+
     template <typename T>
     T max (const T &t,
            const MPI_Comm &mpi_communicator)
     {
       return internal::all_reduce(MPI_MAX, t, mpi_communicator);
     }
+
 
 
     template <typename T>
@@ -280,12 +334,14 @@ namespace Utilities
     }
 
 
+
     template <typename T>
     T min (const T &t,
            const MPI_Comm &mpi_communicator)
     {
       return internal::all_reduce(MPI_MIN, t, mpi_communicator);
     }
+
 
 
     template <typename T>

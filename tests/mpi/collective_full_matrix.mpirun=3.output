@@ -1,0 +1,4 @@
+
+DEAL:float::Ok
+DEAL:double::Ok
+DEAL:complex<double>::Ok

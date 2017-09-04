@@ -43,6 +43,8 @@ template <int rank, int dim, typename Number> class SymmetricTensor;
 
 //Forward type declaration to allow MPI sums over Vector<number> type
 template <typename Number> class Vector;
+//Forward type declaration to allow MPI sums over FullMatrix<number> type
+template <typename Number> class FullMatrix;
 
 
 namespace Utilities
@@ -172,6 +174,16 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               Vector<T> &sums);
 
+    /**
+     * Like the previous function, but take the sums over the elements of a
+     * FullMatrix<T>.
+     *
+     * Input and output matrices may be the same.
+     */
+    template <typename T>
+    void sum (const FullMatrix<T> &values,
+              const MPI_Comm &mpi_communicator,
+              FullMatrix<T> &sums);
 
     /**
      * Perform an MPI sum of the entries of a symmetric tensor.
