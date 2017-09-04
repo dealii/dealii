@@ -42,6 +42,8 @@
 
 #include <deal.II/differentiation/ad/sacado_product_types.h>
 
+#include <boost/container/small_vector.hpp>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -3096,22 +3098,10 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   AssertDimension (fe->n_components(), 1);
   AssertDimension (indices.size(), dofs_per_cell);
 
-  // avoid allocation when the local size is small enough
-  if (dofs_per_cell <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(&dof_values[0], this->finite_element_output.shape_values, values);
-    }
-  else
-    {
-      Vector<Number> dof_values(dofs_per_cell);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(dof_values.begin(), this->finite_element_output.shape_values,
-                                   values);
-    }
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_values(dof_values.data(), this->finite_element_output.shape_values, values);
 }
 
 
@@ -3156,24 +3146,12 @@ void FEValuesBase<dim,spacedim>::get_function_values (
           ExcAccessToUninitializedField("update_values"));
 
   VectorSlice<std::vector<Vector<Number> > > val(values);
-  if (indices.size() <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(&dof_values[0], this->finite_element_output.shape_values, *fe,
-                                   this->finite_element_output.shape_function_to_row_table, val,
-                                   false, indices.size()/dofs_per_cell);
-    }
-  else
-    {
-      Vector<Number> dof_values(100);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(dof_values.begin(), this->finite_element_output.shape_values, *fe,
-                                   this->finite_element_output.shape_function_to_row_table, val,
-                                   false, indices.size()/dofs_per_cell);
-    }
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_values(dof_values.data(), this->finite_element_output.shape_values, *fe,
+                               this->finite_element_output.shape_function_to_row_table, val,
+                               false, indices.size()/dofs_per_cell);
 }
 
 
@@ -3195,26 +3173,13 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
 
-  if (indices.size() <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(&dof_values[0], this->finite_element_output.shape_values, *fe,
-                                   this->finite_element_output.shape_function_to_row_table, values,
-                                   quadrature_points_fastest,
-                                   indices.size()/dofs_per_cell);
-    }
-  else
-    {
-      Vector<Number> dof_values(indices.size());
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_values(dof_values.begin(), this->finite_element_output.shape_values, *fe,
-                                   this->finite_element_output.shape_function_to_row_table, values,
-                                   quadrature_points_fastest,
-                                   indices.size()/dofs_per_cell);
-    }
+  boost::container::small_vector<Number, 200> dof_values(indices.size());
+  for (unsigned int i=0; i<indices.size(); ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_values(dof_values.data(), this->finite_element_output.shape_values, *fe,
+                               this->finite_element_output.shape_function_to_row_table, values,
+                               quadrature_points_fastest,
+                               indices.size()/dofs_per_cell);
 }
 
 
@@ -3255,22 +3220,12 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
           ExcAccessToUninitializedField("update_gradients"));
   AssertDimension (fe->n_components(), 1);
   AssertDimension (indices.size(), dofs_per_cell);
-  if (dofs_per_cell <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_gradients,
-                                        gradients);
-    }
-  else
-    {
-      Vector<Number> dof_values(dofs_per_cell);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_gradients,
-                                        gradients);
-    }
+
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_gradients,
+                                    gradients);
 }
 
 
@@ -3317,26 +3272,13 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
   Assert (this->update_flags & update_gradients,
           ExcAccessToUninitializedField("update_gradients"));
 
-  if (indices.size() <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_gradients,
-                                        *fe, this->finite_element_output.shape_function_to_row_table,
-                                        gradients, quadrature_points_fastest,
-                                        indices.size()/dofs_per_cell);
-    }
-  else
-    {
-      Vector<Number> dof_values(indices.size());
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(dof_values.begin(),this->finite_element_output.shape_gradients,
-                                        *fe, this->finite_element_output.shape_function_to_row_table,
-                                        gradients, quadrature_points_fastest,
-                                        indices.size()/dofs_per_cell);
-    }
+  boost::container::small_vector<Number, 200> dof_values(indices.size());
+  for (unsigned int i=0; i<indices.size(); ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_gradients,
+                                    *fe, this->finite_element_output.shape_function_to_row_table,
+                                    gradients, quadrature_points_fastest,
+                                    indices.size()/dofs_per_cell);
 }
 
 
@@ -3377,22 +3319,12 @@ void FEValuesBase<dim,spacedim>::get_function_hessians (
           ExcAccessToUninitializedField("update_hessians"));
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
   AssertDimension (indices.size(), dofs_per_cell);
-  if (dofs_per_cell <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_hessians,
-                                        hessians);
-    }
-  else
-    {
-      Vector<Number> dof_values(dofs_per_cell);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_hessians,
-                                        hessians);
-    }
+
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_hessians,
+                                    hessians);
 }
 
 
@@ -3437,26 +3369,14 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
           ExcAccessToUninitializedField("update_hessians"));
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
-  if (indices.size() <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_hessians,
-                                        *fe, this->finite_element_output.shape_function_to_row_table,
-                                        hessians, quadrature_points_fastest,
-                                        indices.size()/dofs_per_cell);
-    }
-  else
-    {
-      Vector<Number> dof_values(indices.size());
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(dof_values.begin(),this->finite_element_output.shape_hessians,
-                                        *fe, this->finite_element_output.shape_function_to_row_table,
-                                        hessians, quadrature_points_fastest,
-                                        indices.size()/dofs_per_cell);
-    }
+
+  boost::container::small_vector<Number, 200> dof_values(indices.size());
+  for (unsigned int i=0; i<indices.size(); ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_hessians,
+                                    *fe, this->finite_element_output.shape_function_to_row_table,
+                                    hessians, quadrature_points_fastest,
+                                    indices.size()/dofs_per_cell);
 }
 
 
@@ -3496,22 +3416,12 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
           ExcAccessToUninitializedField("update_hessians"));
   AssertDimension (fe->n_components(), 1);
   AssertDimension (indices.size(), dofs_per_cell);
-  if (dofs_per_cell <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(&dof_values[0], this->finite_element_output.shape_hessians,
-                                       laplacians);
-    }
-  else
-    {
-      Vector<Number> dof_values(dofs_per_cell);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(dof_values.begin(), this->finite_element_output.shape_hessians,
-                                       laplacians);
-    }
+
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_laplacians(dof_values.data(), this->finite_element_output.shape_hessians,
+                                   laplacians);
 }
 
 
@@ -3553,26 +3463,14 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
           ExcNotMultiple(indices.size(), dofs_per_cell));
   Assert (this->update_flags & update_hessians,
           ExcAccessToUninitializedField("update_hessians"));
-  if (indices.size() <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(&dof_values[0], this->finite_element_output.shape_hessians,
-                                       *fe, this->finite_element_output.shape_function_to_row_table,
-                                       laplacians, false,
-                                       indices.size()/dofs_per_cell);
-    }
-  else
-    {
-      Vector<Number> dof_values(indices.size());
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(dof_values.begin(),this->finite_element_output.shape_hessians,
-                                       *fe, this->finite_element_output.shape_function_to_row_table,
-                                       laplacians, false,
-                                       indices.size()/dofs_per_cell);
-    }
+
+  boost::container::small_vector<Number, 200> dof_values(indices.size());
+  for (unsigned int i=0; i<indices.size(); ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_laplacians(dof_values.data(), this->finite_element_output.shape_hessians,
+                                   *fe, this->finite_element_output.shape_function_to_row_table,
+                                   laplacians, false,
+                                   indices.size()/dofs_per_cell);
 }
 
 
@@ -3590,26 +3488,14 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
           ExcNotMultiple(indices.size(), dofs_per_cell));
   Assert (this->update_flags & update_hessians,
           ExcAccessToUninitializedField("update_hessians"));
-  if (indices.size() <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(&dof_values[0], this->finite_element_output.shape_hessians,
-                                       *fe, this->finite_element_output.shape_function_to_row_table,
-                                       laplacians, quadrature_points_fastest,
-                                       indices.size()/dofs_per_cell);
-    }
-  else
-    {
-      Vector<Number> dof_values(indices.size());
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_laplacians(dof_values.begin(),this->finite_element_output.shape_hessians,
-                                       *fe, this->finite_element_output.shape_function_to_row_table,
-                                       laplacians, quadrature_points_fastest,
-                                       indices.size()/dofs_per_cell);
-    }
+
+  boost::container::small_vector<Number, 200> dof_values(indices.size());
+  for (unsigned int i=0; i<indices.size(); ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_laplacians(dof_values.data(), this->finite_element_output.shape_hessians,
+                                   *fe, this->finite_element_output.shape_function_to_row_table,
+                                   laplacians, quadrature_points_fastest,
+                                   indices.size()/dofs_per_cell);
 }
 
 
@@ -3650,22 +3536,12 @@ void FEValuesBase<dim,spacedim>::get_function_third_derivatives (
           ExcAccessToUninitializedField("update_3rd_derivatives"));
   AssertDimension (fe_function.size(), present_cell->n_dofs_for_dof_handler());
   AssertDimension (indices.size(), dofs_per_cell);
-  if (dofs_per_cell <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_3rd_derivatives,
-                                        third_derivatives);
-    }
-  else
-    {
-      Vector<Number> dof_values(dofs_per_cell);
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_3rd_derivatives,
-                                        third_derivatives);
-    }
+
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  for (unsigned int i=0; i<dofs_per_cell; ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_3rd_derivatives,
+                                    third_derivatives);
 }
 
 
@@ -3710,26 +3586,14 @@ void FEValuesBase<dim, spacedim>::get_function_third_derivatives (
           ExcAccessToUninitializedField("update_3rd_derivatives"));
   Assert (indices.size() % dofs_per_cell == 0,
           ExcNotMultiple(indices.size(), dofs_per_cell));
-  if (indices.size() <= 100)
-    {
-      Number dof_values[100];
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(&dof_values[0], this->finite_element_output.shape_3rd_derivatives,
-                                        *fe, this->finite_element_output.shape_function_to_row_table,
-                                        third_derivatives, quadrature_points_fastest,
-                                        indices.size()/dofs_per_cell);
-    }
-  else
-    {
-      Vector<Number> dof_values(indices.size());
-      for (unsigned int i=0; i<indices.size(); ++i)
-        dof_values[i] = get_vector_element (fe_function, indices[i]);
-      internal::do_function_derivatives(dof_values.begin(),this->finite_element_output.shape_3rd_derivatives,
-                                        *fe, this->finite_element_output.shape_function_to_row_table,
-                                        third_derivatives, quadrature_points_fastest,
-                                        indices.size()/dofs_per_cell);
-    }
+
+  boost::container::small_vector<Number, 200> dof_values(indices.size());
+  for (unsigned int i=0; i<indices.size(); ++i)
+    dof_values[i] = get_vector_element (fe_function, indices[i]);
+  internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_3rd_derivatives,
+                                    *fe, this->finite_element_output.shape_function_to_row_table,
+                                    third_derivatives, quadrature_points_fastest,
+                                    indices.size()/dofs_per_cell);
 }
 
 

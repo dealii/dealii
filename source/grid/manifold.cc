@@ -20,7 +20,10 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/fe/fe_q.h>
+
 #include <cmath>
+
+#include <boost/container/small_vector.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -101,23 +104,9 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
   // First sort points in the order of their weights. This is done to
   // produce unique points even if get_intermediate_points is not
   // associative (as for the SphericalManifold).
-  unsigned int permutation_short[30];
-  std::vector<unsigned int> permutation_long;
-  unsigned int *permutation;
-  if (n_points > 30)
-    {
-      permutation_long.resize(n_points);
-      permutation = &permutation_long[0];
-    }
-  else
-    permutation = &permutation_short[0];
-
-  for (unsigned int i=0; i<n_points; ++i)
-    permutation[i] = i;
-
-  std::sort(permutation,
-            permutation + n_points,
-            CompareWeights(weights));
+  boost::container::small_vector<unsigned int, 100> permutation(n_points);
+  std::iota(permutation.begin(), permutation.end(), 0);
+  std::sort(permutation.begin(), permutation.end(), CompareWeights(weights));
 
   // Now loop over points in the order of their associated weight
   Point<spacedim> p = surrounding_points[permutation[0]];
