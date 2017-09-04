@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-  // helper struct for is_base_of_all
+  // helper struct for is_base_of_all and all_same_as
   template <bool... Types> struct BoolStorage;
 }
 
@@ -43,6 +43,21 @@ struct is_base_of_all
   static constexpr bool value =
     std::is_same<BoolStorage<std::is_base_of<Base,Derived>::value..., true>,
     BoolStorage<true, std::is_base_of<Base,Derived>::value...>>::value;
+};
+
+
+
+/**
+ * This struct is a generalization of std::is_same to template
+ * parameter packs and tests if all of the Types... classes are
+ * in Type classes. The result is stored in the member variable value.
+ */
+template <class Type, class... Types>
+struct all_same_as
+{
+  static constexpr bool value =
+    std::is_same<BoolStorage<std::is_same<Type, Types>::value..., true>,
+    BoolStorage<true, std::is_same<Type, Types>::value...>>::value;
 };
 
 
