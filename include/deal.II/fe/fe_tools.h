@@ -977,6 +977,18 @@ namespace FETools
                           const bool do_tensor_product = true);
 
     /**
+     * Same as above for an arbitrary number of parameters of type
+     * <code>std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int></code>
+     * and <code>do_tensor_product = true</code>.
+     */
+    template <int dim, int spacedim, class... FESystems,
+              typename = typename std::enable_if<all_same_as<typename std::decay<FESystems>::type...,
+                                                             std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                                                                 unsigned int>>::value>::type>
+    FiniteElementData<dim>
+    multiply_dof_numbers (FESystems &&... fe_systems);
+
+    /**
      * Same as above but for a specific number of sub-elements.
      */
     template <int dim, int spacedim>
@@ -1010,6 +1022,17 @@ namespace FETools
                                            const std::vector<unsigned int>              &multiplicities);
 
     /**
+     * Same as above for an arbitrary number of parameters of type
+     * <code>std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int></code>.
+     */
+    template <int dim, int spacedim, class... FESystems,
+              typename = typename std::enable_if<all_same_as<typename std::decay<FESystems>::type...,
+                                                             std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                                                                 unsigned int>>::value>::type>
+    std::vector<bool>
+    compute_restriction_is_additive_flags (FESystems &&... fe_systems);
+
+    /**
      * Take a @p FiniteElement object and return a boolean vector
      * describing the @p restriction_is_additive_flags (see the
      * documentation of the FiniteElement class) for each shape function
@@ -1036,6 +1059,7 @@ namespace FETools
                                            const FiniteElement<dim,spacedim> *fe5=nullptr,
                                            const unsigned int        N5=0);
 
+
     /**
      * Compute the nonzero components for each shape function of a
      * composed finite element described by a list of finite elements
@@ -1057,6 +1081,18 @@ namespace FETools
     compute_nonzero_components (const std::vector<const FiniteElement<dim,spacedim>*> &fes,
                                 const std::vector<unsigned int>              &multiplicities,
                                 const bool do_tensor_product = true);
+
+    /**
+     * Same as above for an arbitrary number of parameters of type
+     * <code>std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int></code>
+     * and <code>do_tensor_product = true</code>.
+     */
+    template <int dim, int spacedim, class... FESystems,
+              typename = typename std::enable_if<all_same_as<typename std::decay<FESystems>::type...,
+                                                             std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                                                                 unsigned int>>::value>::type>
+    std::vector<ComponentMask>
+    compute_nonzero_components (FESystems &&... fe_systems);
 
     /**
      * Compute the non-zero vector components of a composed finite
@@ -1343,7 +1379,80 @@ namespace FETools
   {
     return new FE(degree);
   }
-}
+
+  namespace Compositing
+  {
+    template <int dim, int spacedim, class... FESystems, typename>
+    std::vector<bool>
+    compute_restriction_is_additive_flags (FESystems &&... fe_systems)
+    {
+      std::vector<const FiniteElement<dim,spacedim>*> fes;
+      std::vector<unsigned int> multiplicities;
+
+      const auto extract =
+        [&fes, &multiplicities]
+        (const std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int> &fe_system)
+      {
+        fes.push_back(fe_system.first.get());
+        multiplicities.push_back(fe_system.second);
+      };
+
+      const auto fe_system_pointers = {&fe_systems...};
+      for (const auto p : fe_system_pointers)
+        extract (*p);
+
+      return compute_restriction_is_additive_flags (fes, multiplicities);
+    }
+
+
+
+    template <int dim, int spacedim, class... FESystems, typename>
+    FiniteElementData<dim>
+    multiply_dof_numbers (FESystems &&... fe_systems)
+    {
+      std::vector<const FiniteElement<dim,spacedim>*> fes;
+      std::vector<unsigned int> multiplicities;
+
+      const auto extract =
+        [&fes, &multiplicities]
+        (const std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int> &fe_system)
+      {
+        fes.push_back(fe_system.first.get());
+        multiplicities.push_back(fe_system.second);
+      };
+
+      const auto fe_system_pointers = {&fe_systems...};
+      for (const auto p : fe_system_pointers)
+        extract (*p);
+
+      return multiply_dof_numbers (fes, multiplicities, true);
+    }
+
+
+
+    template <int dim, int spacedim, class... FESystems, typename>
+    std::vector<ComponentMask>
+    compute_nonzero_components (FESystems &&... fe_systems)
+    {
+      std::vector<const FiniteElement<dim,spacedim>*> fes;
+      std::vector<unsigned int> multiplicities;
+
+      const auto extract =
+        [&fes, &multiplicities]
+        (const std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int> &fe_system)
+      {
+        fes.push_back(fe_system.first.get());
+        multiplicities.push_back(fe_system.second);
+      };
+
+      const auto fe_system_pointers = {&fe_systems...};
+      for (const auto p : fe_system_pointers)
+        extract (*p);
+
+      return compute_nonzero_components (fes, multiplicities, true);
+    }
+  } //Compositing
+} //FETools
 
 #endif
 
