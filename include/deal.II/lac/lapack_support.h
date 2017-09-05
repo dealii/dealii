@@ -43,6 +43,8 @@ namespace LAPACKSupport
     inverse_matrix,
     /// Contents is an LU decomposition.
     lu,
+    /// Contents is a Cholesky decomposition.
+    cholesky,
     /// Eigenvalue vector is filled
     eigenvalues,
     /// Matrix contains singular value decomposition,
@@ -90,9 +92,9 @@ namespace LAPACKSupport
     /// Matrix is symmetric
     symmetric = 1,
     /// Matrix is upper triangular
-    upper_triangle = 2,
+    upper_triangular = 2,
     /// Matrix is lower triangular
-    lower_triangle = 4,
+    lower_triangular = 4,
     /// Matrix is diagonal
     diagonal = 6,
     /// Matrix is in upper Hessenberg form
@@ -115,6 +117,10 @@ namespace LAPACKSupport
    * Character constant.
    */
   static const char U = 'U';
+  /**
+   * Character constant.
+   */
+  static const char L = 'L';
   /**
    * Character constant.
    */
