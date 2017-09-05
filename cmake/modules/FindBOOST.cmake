@@ -26,6 +26,9 @@
 #     BOOST_VERSION_MINOR
 #     BOOST_VERSION_SUBMINOR
 #
+# We require at least boost 1.59 since boost::container::small_vector was
+# introduced in 1.58 and some serialization bugs in 1.58 were not fixed until
+# 1.59.
 
 SET(BOOST_DIR "" CACHE PATH "An optional hint to a BOOST installation")
 SET_IF_EMPTY(BOOST_DIR "$ENV{BOOST_DIR}")
@@ -43,7 +46,7 @@ ENDIF()
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-FIND_PACKAGE(Boost 1.56 COMPONENTS
+FIND_PACKAGE(Boost 1.59 COMPONENTS
   iostreams serialization system thread
   )
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
@@ -56,7 +59,7 @@ IF(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
 
   # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
   LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-  FIND_PACKAGE(Boost 1.56 COMPONENTS iostreams serialization system thread)
+  FIND_PACKAGE(Boost 1.59 COMPONENTS iostreams serialization system thread)
   LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 ENDIF()
 

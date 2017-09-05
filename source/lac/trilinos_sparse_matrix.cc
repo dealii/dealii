@@ -35,6 +35,8 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Teuchos_RCP.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
+#include <boost/container/small_vector.hpp>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
@@ -1395,11 +1397,8 @@ namespace TrilinosWrappers
     TrilinosScalar *col_value_ptr;
     TrilinosWrappers::types::int_type n_columns;
 
-    TrilinosScalar short_val_array[100];
-    TrilinosWrappers::types::int_type short_index_array[100];
-    std::vector<TrilinosScalar> long_val_array;
-    std::vector<TrilinosWrappers::types::int_type> long_index_array;
-
+    boost::container::small_vector<TrilinosScalar, 200> local_value_array(n_cols);
+    boost::container::small_vector<TrilinosWrappers::types::int_type, 200> local_index_array(n_cols);
 
     // If we don't elide zeros, the pointers are already available... need to
     // cast to non-const pointers as that is the format taken by Trilinos (but
@@ -1414,18 +1413,8 @@ namespace TrilinosWrappers
       {
         // Otherwise, extract nonzero values in each row and get the
         // respective indices.
-        if (n_cols > 100)
-          {
-            long_val_array.resize(n_cols);
-            long_index_array.resize(n_cols);
-            col_index_ptr = &long_index_array[0];
-            col_value_ptr = &long_val_array[0];
-          }
-        else
-          {
-            col_index_ptr = &short_index_array[0];
-            col_value_ptr = &short_val_array[0];
-          }
+        col_index_ptr = local_index_array.data();
+        col_value_ptr = local_value_array.data();
 
         n_columns = 0;
         for (size_type j=0; j<n_cols; ++j)
@@ -1586,10 +1575,8 @@ namespace TrilinosWrappers
     TrilinosScalar *col_value_ptr;
     TrilinosWrappers::types::int_type n_columns;
 
-    double short_val_array[100];
-    TrilinosWrappers::types::int_type short_index_array[100];
-    std::vector<TrilinosScalar> long_val_array;
-    std::vector<TrilinosWrappers::types::int_type> long_index_array;
+    boost::container::small_vector<TrilinosScalar, 100> local_value_array(n_cols);
+    boost::container::small_vector<TrilinosWrappers::types::int_type, 100> local_index_array(n_cols);
 
     // If we don't elide zeros, the pointers are already available... need to
     // cast to non-const pointers as that is the format taken by Trilinos (but
@@ -1608,18 +1595,8 @@ namespace TrilinosWrappers
       {
         // Otherwise, extract nonzero values in each row and the corresponding
         // index.
-        if (n_cols > 100)
-          {
-            long_val_array.resize(n_cols);
-            long_index_array.resize(n_cols);
-            col_index_ptr = &long_index_array[0];
-            col_value_ptr = &long_val_array[0];
-          }
-        else
-          {
-            col_index_ptr = &short_index_array[0];
-            col_value_ptr = &short_val_array[0];
-          }
+        col_index_ptr = local_index_array.data();
+        col_value_ptr = local_value_array.data();
 
         n_columns = 0;
         for (size_type j=0; j<n_cols; ++j)
