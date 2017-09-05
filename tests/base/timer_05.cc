@@ -72,14 +72,14 @@ test_timer(Timer &t)
   AssertThrow(old_cpu_time > 0., ExcInternalError());
   assert_min_max_avg_invalid(t.get_data());
   assert_min_max_avg_invalid(t.get_total_data());
-  assert_min_max_avg_invalid(t.get_last_lap_data());
+  assert_min_max_avg_invalid(t.get_last_lap_wall_time_data());
   assert_min_max_avg_invalid(t.get_accumulated_wall_time_data());
 
   burn(50);
   AssertThrow(t.stop() > 0., ExcInternalError());
   assert_min_max_avg_valid(t.get_data());
   assert_min_max_avg_valid(t.get_total_data());
-  assert_min_max_avg_valid(t.get_last_lap_data());
+  assert_min_max_avg_valid(t.get_last_lap_wall_time_data());
   assert_min_max_avg_valid(t.get_accumulated_wall_time_data());
 
   AssertThrow(t.wall_time() > old_wall_time, ExcInternalError());
@@ -92,7 +92,7 @@ test_timer(Timer &t)
   AssertThrow(t.cpu_time()== 0., ExcInternalError());
   assert_min_max_avg_invalid(t.get_data());
   assert_min_max_avg_invalid(t.get_total_data());
-  assert_min_max_avg_invalid(t.get_last_lap_data());
+  assert_min_max_avg_invalid(t.get_last_lap_wall_time_data());
   assert_min_max_avg_invalid(t.get_accumulated_wall_time_data());
 
   deallog << "OK" << std::endl;

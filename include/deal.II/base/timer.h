@@ -121,7 +121,7 @@ public:
 
   /**
    * Constructor specifying that CPU times should be summed over the given
-   * communicator. If @p sync_wall_time is <code>true</code> then the Timer
+   * communicator. If @p sync_lap_times is <code>true</code> then the Timer
    * will set the elapsed wall and CPU times over the last lap to their
    * maximum values across the provided communicator. This synchronization is
    * only performed if Timer::stop() is called before the timer is queried for
@@ -134,15 +134,15 @@ public:
    * measured.
    */
   Timer (MPI_Comm mpi_communicator,
-         const bool sync_wall_time = false);
+         const bool sync_lap_times = false);
 
   /**
    * Return a reference to the data structure with global timing information
    * for the last lap. This structure does not contain meaningful values until
    * Timer::stop() has been called.
    *
-   * @deprecated Use Timer::get_last_lap_data() instead, which returns a
-   * reference to the same structure.
+   * @deprecated Use Timer::get_last_lap_wall_time_data() instead, which
+   * returns a reference to the same structure.
    */
   const Utilities::MPI::MinMaxAvg &get_data() const DEAL_II_DEPRECATED;
 
@@ -152,7 +152,7 @@ public:
    * communicator. This structure does not contain meaningful values until
    * Timer::stop() has been called.
    */
-  const Utilities::MPI::MinMaxAvg &get_last_lap_data() const;
+  const Utilities::MPI::MinMaxAvg &get_last_lap_wall_time_data() const;
 
   /**
    * Return a reference to the data structure containing basic statistics on
@@ -177,18 +177,18 @@ public:
    * Prints the data returned by get_data(), i.e. for the last lap,
    * to the given stream.
    *
-   * @deprecated Use Timer::print_last_lap_data() instead, which prints the
-   * same information.
+   * @deprecated Use Timer::print_last_lap_wall_time_data() instead, which
+   * prints the same information.
    */
   template <class StreamType>
   void print_data(StreamType &stream) const DEAL_II_DEPRECATED;
 
   /**
-   * Print the data returned by Timer::get_last_lap_data() to the given
-   * stream.
+   * Print the data returned by Timer::get_last_lap_wall_time_data() to the
+   * given stream.
    */
   template <class StreamType>
-  void print_last_lap_data(StreamType &stream) const;
+  void print_last_lap_wall_time_data(StreamType &stream) const;
 
   /**
    * Prints the data returned by get_total_data(), i.e. for the total run,
@@ -208,14 +208,18 @@ public:
   void print_accumulated_wall_time_data(StreamType &stream) const;
 
   /**
-   * Begin measuring a new lap. If <code>sync_wall_time</code> is
+   * Begin measuring a new lap. If <code>sync_lap_times</code> is
    * <code>true</code> then an MPI barrier is used to ensure that all
    * processes begin the lap at the same wall time.
    */
   void start ();
 
   /**
-   * Stop the timer. This updates the lap times and accumulated times.
+   * Stop the timer. This updates the lap times and accumulated times. If
+   * <code>sync_lap_times</code> is <code>true</code> then the lap times are
+   * synchronized over all processors in the communicator (i.e., the lap times
+   * are set to the maximum lap time).
+   *
    * Returns the accumulated CPU time in seconds.
    */
   double stop ();
@@ -232,8 +236,8 @@ public:
   void restart();
 
   /**
-   * Access to the current CPU time without stopping the timer.
-   * The elapsed time is returned in units of seconds.
+   * Access to the current CPU time without stopping the timer. The elapsed
+   * time is returned in units of seconds.
    *
    * @deprecated Use cpu_time() instead.
    */
@@ -321,8 +325,8 @@ private:
     duration_type last_lap_time;
 
     /**
-     * Constructor. Sets <code>current_lap_start_time</code> to the
-     * current clock time and the durations to zero.
+     * Constructor. Sets <code>current_lap_start_time</code> to the current
+     * clock time and the durations to zero.
      */
     ClockMeasurements();
 
@@ -356,27 +360,27 @@ private:
   /**
    * Whether or not the timer is presently running.
    */
-  bool                running;
+  bool running;
 
   /**
    * The communicator over which various time values are synchronized and
    * combined: see the documentation of the relevant constructor for
    * additional information.
    */
-  MPI_Comm            mpi_communicator;
+  MPI_Comm mpi_communicator;
 
   /**
-   * Store whether or not the wall time and CPU time are synchronized in
-   * Timer::start() and Timer::stop().
+   * Store whether or not the wall time and CPU time are synchronized across
+   * the communicator in Timer::start() and Timer::stop().
    */
-  bool sync_wall_time;
+  bool sync_lap_times;
 
   /**
    * A structure for parallel wall time measurement that includes the minimum,
    * maximum, and average over all processors known to the MPI communicator of
    * the last lap time.
    */
-  Utilities::MPI::MinMaxAvg last_lap_data;
+  Utilities::MPI::MinMaxAvg last_lap_wall_time_data;
 
   /**
    * A structure for parallel wall time measurement that includes the minimum
@@ -879,16 +883,16 @@ inline
 const Utilities::MPI::MinMaxAvg &
 Timer::get_data() const
 {
-  return last_lap_data;
+  return last_lap_wall_time_data;
 }
 
 
 
 inline
 const Utilities::MPI::MinMaxAvg &
-Timer::get_last_lap_data() const
+Timer::get_last_lap_wall_time_data() const
 {
-  return last_lap_data;
+  return last_lap_wall_time_data;
 }
 
 
@@ -916,7 +920,7 @@ inline
 void
 Timer::print_data(StreamType &stream) const
 {
-  print_last_lap_data(stream);
+  print_last_lap_wall_time_data(stream);
 }
 
 
@@ -924,9 +928,9 @@ Timer::print_data(StreamType &stream) const
 template <class StreamType>
 inline
 void
-Timer::print_last_lap_data(StreamType &stream) const
+Timer::print_last_lap_wall_time_data(StreamType &stream) const
 {
-  const Utilities::MPI::MinMaxAvg statistic = get_last_lap_data();
+  const Utilities::MPI::MinMaxAvg statistic = get_last_lap_wall_time_data();
   stream << statistic.max << " wall,"
          << " max @" << statistic.max_index << ", min=" << statistic.min << " @"
          << statistic.min_index << ", avg=" << statistic.avg << std::endl;
