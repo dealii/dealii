@@ -34,7 +34,7 @@ DEAL::copier
 DEAL::Boundary worker on : 2.2, Face : 0
 DEAL::copier
 DEAL::copier
-DEAL::CELLS AND BOUNDARY
+DEAL::CELLS LAST AND BOUNDARY
 DEAL::
 DEAL::Boundary worker on : 1.1, Face : 1
 DEAL::Boundary worker on : 1.1, Face : 2
