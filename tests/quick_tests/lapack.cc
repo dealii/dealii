@@ -20,9 +20,11 @@
 #include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/base/logstream.h>
 
 #include <fstream>
 #include <iostream>
+#include <fstream>
 
 /*
  * Eigenvalues and -vectors of this system are
