@@ -97,48 +97,20 @@ template <typename> class FullMatrix;
  * @author Martin Kronbichler, 2017
  */
 template <int dim, typename Number, int size = -1>
-class TensorProductMatrixSymmetricSum
+class TensorProductMatrixSymmetricSumBase
 {
 public:
-  /**
-   * Constructor.
-   */
-  TensorProductMatrixSymmetricSum() = default;
-
-  /**
-   * Constructor that is equivalent to the previous constructor and
-   * immediately calling reinit().
-   */
-  TensorProductMatrixSymmetricSum(const FullMatrix<Number> &mass_matrix,
-                                  const FullMatrix<Number> &derivative_matrix);
-
-  /**
-   * Initializes the matrix to the given mass matrix $M$ and derivative matrix
-   * $A$. Note that the current implementation requires $M$ to be symmetric
-   * and positive definite and $A$ to be symmetric and invertible but not
-   * necessarily positive defininte.
-   */
-  void reinit (const FullMatrix<Number> &mass_matrix,
-               const FullMatrix<Number> &derivative_matrix);
-
   /**
    * Returns the number of rows of this matrix, given by the dim-th power of
    * the size of the 1D matrices passed to the constructor.
    */
-  unsigned int m() const;
+  unsigned int m () const;
 
   /**
    * Returns the number of columns of this matrix, given by the dim-th power
    * of the size of the 1D matrices passed to the constructor.
    */
-  unsigned int n() const;
-
-  /**
-   * Implements a matrix-vector product with the underlying matrix as
-   * described in the main documentation of this class.
-   */
-  void vmult (Vector<Number> &dst,
-              const Vector<Number> &src) const;
+  unsigned int n () const;
 
   /**
    * Implements a matrix-vector product with the underlying matrix as
@@ -148,14 +120,7 @@ public:
    */
   void vmult (Number *dst,
               const Number *src) const;
-
-  /**
-   * Implements a matrix-vector product with the underlying matrix as
-   * described in the main documentation of this class.
-   */
-  void apply_inverse (Vector<Number> &dst,
-                      const Vector<Number> &src) const;
-
+  
   /**
    * Implements a matrix-vector product with the underlying matrix as
    * described in the main documentation of this class. Same as the other
@@ -164,27 +129,52 @@ public:
    */
   void apply_inverse (Number *dst,
                       const Number *src) const;
+  
+protected:
+  /**
+   * Constructor.
+   */
+  TensorProductMatrixSymmetricSumBase () = default ;
 
-private:
+  /**
+   * Constructor that is equivalent to the previous constructor and
+   * immediately calling reinit().
+   */
+  TensorProductMatrixSymmetricSumBase (const std::array<Table<2,Number>,dim> &mass_matrix,
+                                       const std::array<Table<2,Number>,dim> &derivative_matrix) ;
+
+  /**
+   * Initializes the matrix to the given mass matrix $M$ and derivative matrix
+   * $A$. Note that the current implementation requires $M$ to be symmetric
+   * and positive definite and $A$ to be symmetric and invertible but not
+   * necessarily positive defininte.
+   */
+  template <typename MatrixArray, typename EigenvalueType, typename EigenvectorType>
+  void
+  fill_data (MatrixArray&& mass_matrices,
+	     MatrixArray&& derivative_matrices,
+	     EigenvalueType&& eigenvalues,
+	     EigenvectorType&& eigenvectors) ;
+
   /**
    * A copy of the @p mass_matrix object passed to the reinit() method.
    */
-  FullMatrix<Number> mass_matrix;
+  std::array<Table<2,Number>,dim> mass_matrix;
 
   /**
    * A copy of the @p derivative_matrix object passed to the reinit() method.
    */
-  FullMatrix<Number> derivative_matrix;
+  std::array<Table<2,Number>,dim> derivative_matrix;
 
   /**
    * A vector containing the generalized eigenvalues of A s = lambda B s.
    */
-  AlignedVector<Number> eigenvalues;
+  std::array<AlignedVector<Number>,dim> eigenvalues;
 
   /**
    * The matrix containing the generalized eigenvectors.
    */
-  Table<2,Number> eigenvectors;
+  std::array<Table<2,Number>,dim> eigenvectors;
 
   /**
    * An array for temporary data.
@@ -198,55 +188,251 @@ private:
 };
 
 
+
+/**
+ * ... new TensorProductMatrixSymmetricSum using the base class as tensor product
+ * container and interface to arithmetic operations for a generic Number type ...
+ */
+template <int dim, typename Number, int size = -1>
+class TensorProductMatrixSymmetricSum
+  : public TensorProductMatrixSymmetricSumBase<dim,Number,size>
+{
+public:
+  /**
+   * Constructor.
+   */
+  TensorProductMatrixSymmetricSum () ;
+
+  /**
+   * Constructor that is equivalent to the previous constructor and
+   * immediately calling the corresponding reinit().
+   */
+  TensorProductMatrixSymmetricSum (const std::array<Table<2,Number>, dim> &mass_matrix,
+				   const std::array<Table<2,Number>, dim> &derivative_matrix) ;
+  
+  /**
+   * Constructor that is equivalent to the first constructor and
+   * immediately calling the corresponding reinit().
+   */
+  TensorProductMatrixSymmetricSum (const std::array<FullMatrix<Number>,dim> &mass_matrix,
+                                   const std::array<FullMatrix<Number>,dim> &derivative_matrix) ;
+  
+  /**
+   * Constructor that is equivalent to the first constructor and
+   * immediately calling the corresponding reinit(). 
+   */
+  TensorProductMatrixSymmetricSum (const FullMatrix<Number> &mass_matrix,
+				   const FullMatrix<Number> &derivative_matrix) ;
+
+  /**
+   * Initializes the tensor product matrix to the given mass matrices $M_0,\ldots,M_{dim}$
+   * and derivative matrices $A_0,\ldots,A_{dim}$.
+   * Note that the current implementation requires each $M_{d}$ to be symmetric
+   * and positive definite and every $A_{d}$ to be symmetric and invertible but not
+   * necessarily positive defininte. 
+   */
+  void reinit (const std::array<Table<2,Number>,dim> &mass_matrix,
+               const std::array<Table<2,Number>,dim> &derivative_matrix) ;
+
+  /**
+   * Equivalent to the previous reinit() unless that the mass and derivative
+   * matrices are passed by Table instead of FullMatrix.
+   */
+  void reinit (const std::array<FullMatrix<Number>,dim> &mass_matrix,
+               const std::array<FullMatrix<Number>,dim> &derivative_matrix) ;
+  
+  /**
+   * Initializes the same mass matrix $M$ and derivative matrix $A$ to the given array
+   * of mass matrices and array of derivative matrices, respectively.
+   * Note that the current implementation requires $M$ to be symmetric
+   * and positive definite and $A$ to be symmetric and invertible but not
+   * necessarily positive defininte.
+   */
+  void reinit (const FullMatrix<Number> &mass_matrix,
+               const FullMatrix<Number> &derivative_matrix) ;
+
+  /**
+   * Implements a matrix-vector product with the underlying matrix as
+   * described in the main documentation of this class.
+   */
+  void vmult (Vector<Number> &dst,
+              const Vector<Number> &src) const;
+
+  /**
+   * Implements a matrix-vector product with the underlying matrix as
+   * described in the main documentation of this class.
+   */
+  void apply_inverse (Vector<Number> &dst,
+                      const Vector<Number> &src) const;
+
+  /**
+   * ... for compability to MappingQGeneric
+   */
+  using TensorProductMatrixSymmetricSumBase<dim,Number,size>::vmult ;
+
+  /**
+   * ... for compability to MappingQGeneric
+   */
+  using TensorProductMatrixSymmetricSumBase<dim,Number,size>::apply_inverse ;
+
+private:
+  /**
+   * A generic implementation of all reinit() functions based on 
+   * perfect forwarding, that makes it possible to pass lvalue as well
+   * as rvalue arguments. MatrixArray has to be convertible to the underlying
+   * type of the bass class' members mass_matrices and derivative_matrices.
+   */
+  template <typename MatrixArray>
+  void reinit_impl (MatrixArray &&mass_matrix,
+		    MatrixArray &&derivative_matrix) ;
+};
+
+
+/**
+ * ... same as previous class but based on a vectorized value type, namely
+ * VectorizedArray<Number> ...
+ */
+template <int dim, typename Number, int size>
+class TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
+  : public TensorProductMatrixSymmetricSumBase<dim,VectorizedArray<Number>,size>
+{
+public:
+  /**
+   * Constructor.
+   */
+  TensorProductMatrixSymmetricSum () ;
+
+  /**
+   * Constructor that is equivalent to the previous constructor and
+   * immediately calling reinit().
+   */
+  TensorProductMatrixSymmetricSum (const std::array<Table<2,VectorizedArray<Number> >,dim> &mass_matrix,
+                                   const std::array<Table<2,VectorizedArray<Number> >,dim> &derivative_matrix) ;
+
+  /**
+   * Constructor that is equivalent to the first constructor and
+   * immediately calling the corresponding reinit(). 
+   */
+  TensorProductMatrixSymmetricSum (const Table<2,VectorizedArray<Number> > &mass_matrix,
+				   const Table<2,VectorizedArray<Number> > &derivative_matrix) ;
+
+  /**
+   * Initializes the tensor product matrix to the given mass matrices $M_0,\ldots,M_{dim}$
+   * and derivative matrices $A_0,\ldots,A_{dim}$.
+   * Note that the current implementation requires each $M_{d}$ to be symmetric
+   * and positive definite and every $A_{d}$ to be symmetric and invertible but not
+   * necessarily positive defininte. 
+   */
+  void reinit (const std::array<Table<2,VectorizedArray<Number> >,dim> &mass_matrix,
+               const std::array<Table<2,VectorizedArray<Number> >,dim> &derivative_matrix) ;
+
+  /**
+   * Initializes the same mass matrix $M$ and derivative matrix $A$ to the given array
+   * of mass matrices and array of derivative matrices, respectively.
+   * Note that the current implementation requires $M$ to be symmetric
+   * and positive definite and $A$ to be symmetric and invertible but not
+   * necessarily positive defininte.
+   */
+  void reinit (const Table<2,VectorizedArray<Number> > &mass_matrix,
+               const Table<2,VectorizedArray<Number> > &derivative_matrix) ;
+
+  /**
+   * Implements a matrix-vector product with the underlying matrix as
+   * described in the main documentation of this class.
+   */
+  void vmult (AlignedVector<VectorizedArray<Number> > &dst,
+              const AlignedVector<VectorizedArray<Number> > &src) const ;
+
+  /**
+   * Implements a matrix-vector product with the underlying matrix as
+   * described in the main documentation of this class.
+   */
+  void apply_inverse (AlignedVector<VectorizedArray<Number> > &dst,
+                      const AlignedVector<VectorizedArray<Number> > &src) const ;
+
+private:
+  /**
+   * A generic implementation of all reinit() functions based on 
+   * perfect forwarding, that makes it possible to pass lvalue as well
+   * as rvalue arguments. MatrixArray has to be convertible to the underlying
+   * type of the bass class' members mass_matrices and derivative_matrices.
+   */
+  template <typename MatrixArray>
+  void reinit_impl (MatrixArray &&mass_matrix,
+		    MatrixArray &&derivative_matrix) ;
+};
+
+
 /*----------------------- Inline functions ----------------------------------*/
 
 #ifndef DOXYGEN
 
-
-template <int dim, typename Number, int size>
-inline
-TensorProductMatrixSymmetricSum<dim,Number,size>
-::TensorProductMatrixSymmetricSum(const FullMatrix<Number> &mass_matrix,
-                                  const FullMatrix<Number> &derivative_matrix)
+namespace
 {
-  reinit(mass_matrix, derivative_matrix);
+  /**
+   * Compute generalized eigenvalues and eigenvectors of the real
+   * generalized symmetric eigenproblem $M v = \lambda A v$. Since we are
+   * operating on plain pointers we require the size of the matrices beforehand.
+   * Note that the data arrays for the eigenvalues and eigenvectors
+   * have to be initialized to a proper size, too. (no check of array bounds
+   * possible)
+   */
+  template <typename Number>
+  void spectral_assembly (const Number *mass_matrix,
+                          const Number *derivative_matrix,
+                          const unsigned int n_rows,
+                          const unsigned int n_cols,
+                          Number *eigenvalues,
+                          Number *eigenvectors)
+  {
+    Assert (n_rows == n_cols, ExcNotImplemented()) ;
+
+    auto &&transpose_fill_nm
+      = [](Number *out, const Number *in, const unsigned int n, const unsigned int m)
+    {
+      for (unsigned int mm = 0; mm < m; ++mm)
+        for (unsigned int nn = 0; nn < n; ++nn)
+          out[mm+nn*m] = *(in++) ;
+    };
+
+    std::vector<Vector<Number> > eigenvecs(n_rows) ;
+    LAPACKFullMatrix<Number> mass_copy(n_rows, n_cols) ;
+    LAPACKFullMatrix<Number> deriv_copy(n_rows, n_cols) ;
+
+    transpose_fill_nm (&(mass_copy(0,0)), mass_matrix, n_rows, n_cols) ;
+    transpose_fill_nm (&(deriv_copy(0,0)), derivative_matrix, n_rows, n_cols) ;
+
+    deriv_copy.compute_generalized_eigenvalues_symmetric (mass_copy, eigenvecs);
+    AssertDimension (eigenvecs.size(), n_rows) ;
+    for (unsigned int i=0; i<n_rows; ++i)
+      for (unsigned int j=0; j<n_cols; ++j, ++eigenvectors)
+        *eigenvectors = eigenvecs[j][i] ;
+
+    for (unsigned int i=0; i<n_rows; ++i, ++eigenvalues)
+      *eigenvalues = deriv_copy.eigenvalue(i).real();
+  }
 }
 
 
 
 template <int dim, typename Number, int size>
+template <typename MatrixArray, typename EigenvalueType, typename EigenvectorType>
 inline
 void
-TensorProductMatrixSymmetricSum<dim,Number,size>
-::reinit(const FullMatrix<Number> &mass_matrix,
-         const FullMatrix<Number> &derivative_matrix)
+TensorProductMatrixSymmetricSumBase<dim,Number,size>
+::fill_data (MatrixArray&& mass_matrices,
+	     MatrixArray&& derivative_matrices,
+	     EigenvalueType&& eigenvalues,
+	     EigenvectorType&& eigenvectors)
 {
-  Assert(size == -1 ||
-         (size > 0 && static_cast<unsigned int>(size) == mass_matrix.m()),
-         ExcDimensionMismatch(size, mass_matrix.m()));
-  AssertDimension(mass_matrix.m(), mass_matrix.n());
-  AssertDimension(mass_matrix.m(), derivative_matrix.m());
-  AssertDimension(mass_matrix.m(), derivative_matrix.n());
+  AssertDimension (mass_matrices.size(), dim) ;
+  AssertDimension (eigenvalues.size(), dim) ;
+  AssertDimension (eigenvectors.size(), dim) ;
 
-  this->mass_matrix = mass_matrix;
-  this->derivative_matrix = derivative_matrix;
-
-  std::vector<Vector<Number> > eigenvecs(mass_matrix.m());
-  LAPACKFullMatrix<Number> mass_copy(mass_matrix.m(), mass_matrix.n());
-  LAPACKFullMatrix<Number> deriv_copy(derivative_matrix.m(), derivative_matrix.n());
-  mass_copy = mass_matrix;
-  deriv_copy = derivative_matrix;
-
-  deriv_copy.compute_generalized_eigenvalues_symmetric(mass_copy, eigenvecs);
-  AssertDimension(eigenvecs.size(), mass_matrix.m());
-  eigenvectors.reinit(mass_matrix.m(), mass_matrix.m());
-  for (unsigned int i=0; i<mass_matrix.m(); ++i)
-    for (unsigned int j=0; j<mass_matrix.n(); ++j)
-      eigenvectors(i,j) = eigenvecs[j][i];
-
-  eigenvalues.resize(mass_matrix.m());
-  for (unsigned int i=0; i<mass_matrix.m(); ++i)
-    eigenvalues[i] = deriv_copy.eigenvalue(i).real();
+  this->mass_matrix = std::forward<MatrixArray>(mass_matrices) ;
+  this->derivative_matrix = std::forward<MatrixArray>(derivative_matrices) ;
+  this->eigenvalues = std::forward<EigenvalueType>(eigenvalues) ;
+  this->eigenvectors = std::forward<EigenvectorType>(eigenvectors) ;
 }
 
 
@@ -254,9 +440,12 @@ TensorProductMatrixSymmetricSum<dim,Number,size>
 template <int dim, typename Number, int size>
 inline
 unsigned int
-TensorProductMatrixSymmetricSum<dim,Number,size>::m() const
+TensorProductMatrixSymmetricSumBase<dim,Number,size>::m() const
 {
-  return Utilities::fixed_power<dim>(mass_matrix.m());
+  unsigned int m = mass_matrix[0].n_rows() ;
+  for (unsigned int d = 1; d < dim; ++d)
+    m *= mass_matrix[d].n_rows() ;
+  return m ;
 }
 
 
@@ -264,9 +453,12 @@ TensorProductMatrixSymmetricSum<dim,Number,size>::m() const
 template <int dim, typename Number, int size>
 inline
 unsigned int
-TensorProductMatrixSymmetricSum<dim,Number,size>::n() const
+TensorProductMatrixSymmetricSumBase<dim,Number,size>::n() const
 {
-  return Utilities::fixed_power<dim>(mass_matrix.n());
+  unsigned int n = mass_matrix[0].n_cols() ;
+  for (unsigned int d = 1; d < dim; ++d)
+    n *= mass_matrix[d].n_cols() ;
+  return n ;
 }
 
 
@@ -274,67 +466,54 @@ TensorProductMatrixSymmetricSum<dim,Number,size>::n() const
 template <int dim, typename Number, int size>
 inline
 void
-TensorProductMatrixSymmetricSum<dim,Number,size>
-::vmult(Vector<Number> &dst,
-        const Vector<Number> &src) const
-{
-  AssertDimension(dst.size(), Utilities::fixed_power<dim>(eigenvalues.size()));
-  AssertDimension(src.size(), Utilities::fixed_power<dim>(eigenvalues.size()));
-  vmult(dst.begin(), src.begin());
-}
-
-
-
-template <int dim, typename Number, int size>
-inline
-void
-TensorProductMatrixSymmetricSum<dim,Number,size>
-::apply_inverse(Vector<Number> &dst,
-                const Vector<Number> &src) const
-{
-  AssertDimension(dst.size(), Utilities::fixed_power<dim>(eigenvalues.size()));
-  AssertDimension(src.size(), Utilities::fixed_power<dim>(eigenvalues.size()));
-  apply_inverse(dst.begin(), src.begin());
-}
-
-
-
-template <int dim, typename Number, int size>
-inline
-void
-TensorProductMatrixSymmetricSum<dim,Number,size>
+TensorProductMatrixSymmetricSumBase<dim,Number,size>
 ::vmult(Number *dst,
         const Number *src) const
 {
   Threads::Mutex::ScopedLock lock(this->mutex);
-  const unsigned int n = Utilities::fixed_power<dim>(size > 0 ? size : eigenvalues.size());
+  const unsigned int n = Utilities::fixed_power<dim>(size > 0 ? size : eigenvalues[0].size());
   tmp_array.resize_fast(n*2);
-  const int kernel_size = size > 0 ? size-1 : -1;
+  constexpr int kernel_size = size > 0 ? size-1 : -1;
   internal::EvaluatorTensorProduct<internal::evaluate_general,dim,kernel_size,kernel_size+1,Number>
-  eval(AlignedVector<Number>(), AlignedVector<Number>(),
-       AlignedVector<Number>(), mass_matrix.m()-1, mass_matrix.m());
-  const Number *A = &derivative_matrix(0,0);
-  const Number *M = &mass_matrix(0,0);
+  eval(AlignedVector<Number> {}, AlignedVector<Number> {},
+       AlignedVector<Number> {}, mass_matrix[0].n_rows()-1, mass_matrix[0].n_rows());
   Number *t = tmp_array.begin();
+
   if (dim == 1)
-    eval.template apply<0, true, false>(A, src, dst);
+    {
+      const Number *A = &derivative_matrix[0](0,0);
+      eval.template apply<0, false, false> (A, src, dst);
+    }
+
   else if (dim == 2)
     {
-      eval.template apply<0, true, false>(M, src, t);
-      eval.template apply<1, true, false>(A, t, dst);
-      eval.template apply<0, true, false>(A, src, t);
-      eval.template apply<1, true, true> (M, t, dst);
+      const Number *A0 = &derivative_matrix[0](0,0);
+      const Number *M0 = &mass_matrix[0](0,0);
+      const Number *A1 = &derivative_matrix[1](0,0);
+      const Number *M1 = &mass_matrix[1](0,0);
+      eval.template apply<0, false, false> (M0, src, t);
+      eval.template apply<1, false, false> (A1, t, dst);
+      eval.template apply<0, false, false> (A0, src, t);
+      eval.template apply<1, false, true>  (M1, t, dst);
     }
+
   else if (dim == 3)
     {
-      eval.template apply<0, true, false>(M, src, t+n);
-      eval.template apply<1, true, false>(M, t+n, t);
-      eval.template apply<2, true, false>(A, t, dst);
-      eval.template apply<1, true, false>(A, t+n, t);
-      eval.template apply<0, true, false>(A, src, t+n);
-      eval.template apply<1, true, true> (M, t+n, t);
-      eval.template apply<2, true, true> (M, t, dst);
+      const Number *A0 = &derivative_matrix[0](0,0);
+      const Number *M0 = &mass_matrix[0](0,0);
+      const Number *A1 = &derivative_matrix[1](0,0);
+      const Number *M1 = &mass_matrix[1](0,0);
+      const Number *A2 = &derivative_matrix[2](0,0);
+      const Number *M2 = &mass_matrix[2](0,0);
+      eval.template apply<0, false, false> (M0, src, t+n);
+      eval.template apply<1, false, false> (M1, t+n, t);
+      eval.template apply<2, false, false> (A2, t, dst);
+      eval.template apply<1, false, false> (A1, t+n, t);
+      eval.template apply<0, false, false> (A0, src, t+n);
+      eval.template apply<1, false, true> (M1, t+n, t);
+      eval.template apply<2, false, true> (M2, t, dst);
     }
+
   else
     AssertThrow(false, ExcNotImplemented());
 }
@@ -344,55 +523,430 @@ TensorProductMatrixSymmetricSum<dim,Number,size>
 template <int dim, typename Number, int size>
 inline
 void
-TensorProductMatrixSymmetricSum<dim,Number,size>
+TensorProductMatrixSymmetricSumBase<dim,Number,size>
 ::apply_inverse(Number *dst,
                 const Number *src) const
 {
   Threads::Mutex::ScopedLock lock(this->mutex);
-  const unsigned int n = size > 0 ? size : eigenvalues.size();
-  tmp_array.resize_fast(Utilities::fixed_power<dim>(n));
-  const int kernel_size = size > 0 ? size-1 : -1;
+  const unsigned int n = size > 0 ? size : eigenvalues[0].size();
+  tmp_array.resize_fast (Utilities::fixed_power<dim>(n));
+  constexpr int kernel_size = size > 0 ? size-1 : -1;
   internal::EvaluatorTensorProduct<internal::evaluate_general,dim,kernel_size,kernel_size+1,Number>
   eval(AlignedVector<Number>(), AlignedVector<Number>(),
-       AlignedVector<Number>(), mass_matrix.m()-1, mass_matrix.m());
-  const Number *S = &eigenvectors(0,0);
+       AlignedVector<Number>(), mass_matrix[0].n_rows()-1, mass_matrix[0].n_rows());
   Number *t = tmp_array.begin();
 
-  switch (dim)
+  // NOTE: dof_to_quad has to be interpreted as 'dof to eigenvalue index'
+  //       --> apply<.,true,.> (S,src,dst) calculates dst = S^T * src,
+  //       --> apply<.,false,.> (S,src,dst) calculates dst = S * src,
+  //       while the eigenvectors are stored column-wise in S, i.e.
+  //       rows correspond to dofs whereas columns to eigenvalue indices!
+  if (dim == 1)
     {
-    case 1:
+      const Number *S = &eigenvectors[0](0,0);
       eval.template apply<0, true, false> (S, src, t);
       for (unsigned int i=0; i<n; ++i)
-        t[i] /= eigenvalues[i];
+        t[i] /= eigenvalues[0][i];
       eval.template apply<0, false, false> (S, t, dst);
-      break;
-
-    case 2:
-      eval.template apply<0, true, false> (S, src, t);
-      eval.template apply<1, true, false> (S, t, dst);
-      for (unsigned int i=0, c=0; i<n; ++i)
-        for (unsigned int j=0; j<n; ++j, ++c)
-          dst[c] /= (eigenvalues[i] + eigenvalues[j]);
-      eval.template apply<1, false, false> (S, dst, t);
-      eval.template apply<0, false, false> (S, t, dst);
-      break;
-
-    case 3:
-      eval.template apply<0, true, false> (S, src, t);
-      eval.template apply<1, true, false> (S, t, dst);
-      eval.template apply<2, true, false> (S, dst, t);
-      for (unsigned int i=0, c=0; i<n; ++i)
-        for (unsigned int j=0; j<n; ++j)
-          for (unsigned int k=0; k<n; ++k, ++c)
-            t[c] /= (eigenvalues[i] + eigenvalues[j] + eigenvalues[k]);
-      eval.template apply<2, false, false> (S, t, dst);
-      eval.template apply<1, false, false> (S, dst, t);
-      eval.template apply<0, false, false> (S, t, dst);
-      break;
-
-    default:
-      Assert(false, ExcNotImplemented());
     }
+
+  else if (dim == 2)
+    {
+      const Number *S0 = &(eigenvectors[0](0,0));
+      const Number *S1 = &(eigenvectors[1](0,0));
+      eval.template apply<0, true, false> (S0, src, t);
+      eval.template apply<1, true, false> (S1, t, dst);
+      for (unsigned int i1=0, c=0; i1<n; ++i1)
+        for (unsigned int i0=0; i0<n; ++i0, ++c)
+          dst[c] /= (eigenvalues[1][i1] + eigenvalues[0][i0]);
+      eval.template apply<0, false, false> (S0, dst, t);
+      eval.template apply<1, false, false> (S1, t, dst);
+    }
+
+  else if (dim == 3)
+    {
+      const Number *S0 = &eigenvectors[0](0,0);
+      const Number *S1 = &eigenvectors[1](0,0);
+      const Number *S2 = &eigenvectors[2](0,0);
+      eval.template apply<0, true, false> (S0, src, t);
+      eval.template apply<1, true, false> (S1, t, dst);
+      eval.template apply<2, true, false> (S2, dst, t);
+      for (unsigned int i2=0, c=0; i2<n; ++i2)
+        for (unsigned int i1=0; i1<n; ++i1)
+          for (unsigned int i0=0; i0<n; ++i0, ++c)
+            t[c] /= (eigenvalues[2][i2] + eigenvalues[1][i1] + eigenvalues[0][i0]);
+      eval.template apply<0, false, false> (S0, t, dst);
+      eval.template apply<1, false, false> (S1, dst, t);
+      eval.template apply<2, false, false> (S2, t, dst);
+    }
+
+  else
+    Assert(false, ExcNotImplemented());
+}
+
+
+// ------------------------------   TensorProductMatrixSymmetricSum   ------------------------------
+
+template <int dim, typename Number, int size>
+inline
+TensorProductMatrixSymmetricSum<dim,Number,size>
+::TensorProductMatrixSymmetricSum ()
+  : TensorProductMatrixSymmetricSumBase<dim,Number,size>()
+{}
+
+
+
+template <int dim, typename Number, int size>
+inline
+TensorProductMatrixSymmetricSum<dim,Number,size>
+::TensorProductMatrixSymmetricSum (const std::array<Table<2,Number>, dim> &mass_matrix,
+				   const std::array<Table<2,Number>, dim> &derivative_matrix)
+{
+  reinit_impl (mass_matrix, derivative_matrix) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+TensorProductMatrixSymmetricSum<dim,Number,size>
+::TensorProductMatrixSymmetricSum(const std::array<FullMatrix<Number>, dim> &mass_matrix,
+                                  const std::array<FullMatrix<Number>, dim> &derivative_matrix)
+{
+  reinit (mass_matrix, derivative_matrix) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+TensorProductMatrixSymmetricSum<dim,Number,size>
+::TensorProductMatrixSymmetricSum (const FullMatrix<Number> &mass_matrix,
+                                   const FullMatrix<Number> &derivative_matrix)
+{
+  reinit (mass_matrix, derivative_matrix) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+template <typename MatrixArray>
+inline
+void
+TensorProductMatrixSymmetricSum<dim,Number,size>
+::reinit_impl (MatrixArray &&mass_matrices_,
+	       MatrixArray &&derivative_matrices_)
+{
+  auto &&mass_matrices = std::forward<MatrixArray>(mass_matrices_) ;
+  auto &&derivative_matrices = std::forward<MatrixArray>(derivative_matrices_) ;
+  
+  std::array<Table<2,Number>,dim> eigenvectors ;
+  std::array<AlignedVector<Number>, dim> eigenvalues ;
+  for (int dir = 0; dir < dim; ++dir)
+    {
+      Assert (size == -1 || (size > 0 && static_cast<unsigned int>(size) == mass_matrices[dir].n_rows()),
+              ExcDimensionMismatch(size, mass_matrices[dir].n_rows()));
+      AssertDimension (mass_matrices[dir].n_rows(), mass_matrices[dir].n_cols());
+      AssertDimension (mass_matrices[dir].n_rows(), derivative_matrices[dir].n_rows());
+      AssertDimension (mass_matrices[dir].n_rows(), derivative_matrices[dir].n_cols());
+
+      eigenvectors[dir].reinit (mass_matrices[dir].n_cols(), mass_matrices[dir].n_rows()) ;
+      eigenvalues[dir].resize (mass_matrices[dir].n_cols()) ;
+      spectral_assembly<Number> (&(mass_matrices[dir](0,0))
+                                 , &(derivative_matrices[dir](0,0))
+                                 , mass_matrices[dir].n_rows()
+                                 , mass_matrices[dir].n_cols()
+                                 , eigenvalues[dir].begin()
+                                 , &(eigenvectors[dir](0,0))) ;
+    }
+
+  TensorProductMatrixSymmetricSumBase<dim,Number,size>
+    ::fill_data (std::forward<MatrixArray>(mass_matrices), std::forward<MatrixArray>(derivative_matrices),
+		 std::move(eigenvalues), std::move(eigenvectors)) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+void
+TensorProductMatrixSymmetricSum<dim,Number,size>
+::reinit (const std::array<Table<2,Number>, dim> &mass_matrix,
+          const std::array<Table<2,Number>, dim> &derivative_matrix)
+{
+  reinit_impl (mass_matrix, derivative_matrix) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+void
+TensorProductMatrixSymmetricSum<dim,Number,size>
+::reinit (const std::array<FullMatrix<Number>, dim> &mass_matrix,
+          const std::array<FullMatrix<Number>, dim> &derivative_matrix)
+{
+  std::array<Table<2,Number>,dim> mass_copy ;
+  std::array<Table<2,Number>,dim> deriv_copy ;
+
+  std::transform (mass_matrix.cbegin(), mass_matrix.cend(), mass_copy.begin(),
+		  [] (const FullMatrix<Number>& m) ->Table<2,Number> {return m;}) ;
+  std::transform (derivative_matrix.cbegin(), derivative_matrix.cend(), deriv_copy.begin(),
+		  [] (const FullMatrix<Number>& m) ->Table<2,Number> {return m;}) ;
+
+  reinit_impl (std::move(mass_copy), std::move(deriv_copy)) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+void
+TensorProductMatrixSymmetricSum<dim,Number,size>
+::reinit (const FullMatrix<Number> &mass_matrix,
+          const FullMatrix<Number> &derivative_matrix)
+{
+  std::array<Table<2,Number>,dim> mass_matrices ;
+  std::array<Table<2,Number>,dim> derivative_matrices ;
+  
+  std::fill (mass_matrices.begin(), mass_matrices.end(), mass_matrix) ;
+  std::fill (derivative_matrices.begin(), derivative_matrices.end(), derivative_matrix) ;
+
+  reinit_impl (std::move(mass_matrices), std::move(derivative_matrices)) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+void
+TensorProductMatrixSymmetricSum<dim,Number,size>
+::vmult (Vector<Number> &dst,
+         const Vector<Number> &src) const
+{
+  AssertDimension(dst.size(), Utilities::fixed_power<dim>(this->eigenvalues[0].size()));
+  AssertDimension(src.size(), Utilities::fixed_power<dim>(this->eigenvalues[0].size()));
+  TensorProductMatrixSymmetricSumBase<dim,Number,size>::vmult (dst.begin(), src.begin());
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+void
+TensorProductMatrixSymmetricSum<dim,Number,size>
+::apply_inverse (Vector<Number> &dst,
+                 const Vector<Number> &src) const
+{
+  AssertDimension (dst.size(), Utilities::fixed_power<dim>(this->eigenvalues[0].size()));
+  AssertDimension (src.size(), Utilities::fixed_power<dim>(this->eigenvalues[0].size()));
+  TensorProductMatrixSymmetricSumBase<dim,Number,size>::apply_inverse (dst.begin(), src.begin());
+}
+
+
+
+// template <int dim, typename Number, int size>
+// inline
+// FullMatrix<Number>
+// TensorProductMatrixSymmetricSum<dim,Number,size>
+// ::get_full_matrix () const
+// {
+//   const auto& mass_matrix = TensorProductMatrixSymmetricSumBase<dim,Number,size>::mass_matrix ;
+//   const auto& derivative_matrix = this->derivative_matrix ;
+//   const auto& eigenvalues = this->eigenvalues ;
+
+//   FullMatrix<Number> matrix {Utilities::fixed_power<dim>(mass_matrix[0].n_rows())} ;
+//   const unsigned int stride = size > 0 ? size : eigenvalues[0].size() ;
+
+//   if (dim == 1)
+//     matrix.Table<2,Number>::fill (&(derivative_matrix[0](0,0)), true) ;
+
+//   else if (dim == 2)
+//     {
+//       for (unsigned int i1 = 0; i1 < stride; ++i1)
+//  for (unsigned int j1 = 0; j1 < stride; ++j1)
+//    for (unsigned int i0 = 0; i0 < stride; ++i0)
+//      for (unsigned int j0 = 0; j0 < stride; ++j0)
+//        matrix(i1*stride+i0, j1*stride+j0)
+//    = mass_matrix[1](i1,j1) * derivative_matrix[0](i0,j0)
+//    + derivative_matrix[1](i1,j1) * mass_matrix[0](i0,j0) ;
+//     }
+
+//   else if (dim == 3)
+//     {
+//       const unsigned int stride2 = stride * stride ;
+//       for (unsigned int i2 = 0; i2 < stride; ++i2)
+//  for (unsigned int j2 = 0; j2 < stride; ++j2)
+//    for (unsigned int i1 = 0; i1 < stride; ++i1)
+//      for (unsigned int j1 = 0; j1 < stride; ++j1)
+//        for (unsigned int i0 = 0; i0 < stride; ++i0)
+//    for (unsigned int j0 = 0; j0 < stride; ++j0)
+//      matrix(i2*stride2+i1*stride+i0, j2*stride2+j1*stride+j0)
+//        = mass_matrix[2](i2,j2) * mass_matrix[1](i1,j1) * derivative_matrix[0](i0,j0)
+//        + mass_matrix[2](i2,j2) * derivative_matrix[1](i1,j1) * mass_matrix[0](i0,j0)
+//        + derivative_matrix[2](i2,j2) * mass_matrix[1](i1,j1) * mass_matrix[0](i0,j0) ;
+//     }
+
+//   else
+//     Assert (false, ExcNotImplemented()) ;
+
+//   return matrix ;
+// }
+
+
+// ------------------------------ vectorized spez.: TensorProductMatrixSymmetricSum   ------------------------------
+
+template <int dim, typename Number, int size>
+inline
+TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
+::TensorProductMatrixSymmetricSum ()
+  : TensorProductMatrixSymmetricSumBase<dim,VectorizedArray<Number>,size>()
+{}
+
+
+
+template <int dim, typename Number, int size>
+inline
+TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
+::TensorProductMatrixSymmetricSum (const std::array<Table<2,VectorizedArray<Number> >,dim> &mass_matrix,
+                                   const std::array<Table<2,VectorizedArray<Number> >,dim> &derivative_matrix)
+{
+  reinit_impl (mass_matrix, derivative_matrix) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
+::TensorProductMatrixSymmetricSum (const Table<2,VectorizedArray<Number> > &mass_matrix,
+				   const Table<2,VectorizedArray<Number> > &derivative_matrix)
+{
+  std::array<Table<2,VectorizedArray<Number> >,dim> mass_matrices ;
+  std::array<Table<2,VectorizedArray<Number> >,dim> derivative_matrices ;
+
+  std::fill (mass_matrices.begin(), mass_matrices.end(), mass_matrix) ;
+  std::fill (derivative_matrices.begin(), derivative_matrices.end(), derivative_matrix) ;
+  
+  reinit_impl (mass_matrices, derivative_matrices) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+template <typename MatrixArray>
+inline
+void
+TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
+::reinit_impl (MatrixArray &&mass_matrices_,
+	       MatrixArray &&derivative_matrices_)
+{
+  auto &&mass_matrix = std::forward<MatrixArray>(mass_matrices_) ;
+  auto &&derivative_matrix = std::forward<MatrixArray>(derivative_matrices_) ;
+  std::array<Table<2,VectorizedArray<Number> >,dim> eigenvectors ;
+  std::array<AlignedVector<VectorizedArray<Number> >, dim> eigenvalues ;
+  
+  constexpr unsigned int macro_size = VectorizedArray<Number>::n_array_elements ;
+
+  std::vector<Number> mass_matrix_flat ;
+  std::vector<Number> deriv_matrix_flat ;
+  std::vector<Number> eigenvalues_flat ;
+  std::vector<Number> eigenvectors_flat ;
+  std::array<unsigned int,macro_size> offsets_nm ;
+  std::array<unsigned int,macro_size> offsets_n ;
+  for (int dir = 0; dir < dim; ++dir)
+    {
+      Assert (size == -1 ||
+              (size > 0 && static_cast<unsigned int>(size) == mass_matrix[dir].n_rows()),
+              ExcDimensionMismatch(size, mass_matrix[dir].n_rows()));
+      AssertDimension (mass_matrix[dir].n_rows(), mass_matrix[dir].n_cols());
+      AssertDimension (mass_matrix[dir].n_rows(), derivative_matrix[dir].n_rows());
+      AssertDimension (mass_matrix[dir].n_rows(), derivative_matrix[dir].n_cols());
+
+      const unsigned int n_rows = mass_matrix[dir].n_rows() ;
+      const unsigned int n_cols = mass_matrix[dir].n_cols() ;
+      const unsigned int nm = n_rows * n_cols ;
+      mass_matrix_flat.resize (macro_size*nm) ;
+      deriv_matrix_flat.resize (macro_size*nm) ;
+      eigenvalues_flat.resize (macro_size*n_rows) ;
+      eigenvectors_flat.resize (macro_size*nm) ;
+      std::generate (offsets_nm.begin(), offsets_nm.end(),
+                     [=, i=unsigned {0}] () mutable {return nm*(i++);}) ;
+      std::generate (offsets_n.begin(), offsets_n.end(),
+                     [=, i=unsigned {0}] () mutable {return n_rows*(i++);}) ;
+
+      vectorized_transpose_and_store (false, nm, &(mass_matrix[dir](0,0))
+                                      , offsets_nm.cbegin(), mass_matrix_flat.data()) ;
+      vectorized_transpose_and_store (false, nm, &(derivative_matrix[dir](0,0))
+                                      , offsets_nm.cbegin(), deriv_matrix_flat.data()) ;
+
+      const Number *mass_cbegin = mass_matrix_flat.data() ;
+      const Number *deriv_cbegin = deriv_matrix_flat.data() ;
+      Number *eigenvec_begin = eigenvectors_flat.data() ;
+      Number *eigenval_begin = eigenvalues_flat.data() ;
+      spectral_assembly<Number> (mass_cbegin, deriv_cbegin, n_rows, n_cols
+                                 , eigenval_begin, eigenvec_begin) ;
+      for (unsigned int lane = 1; lane < macro_size; ++lane)
+        {
+          std::advance (mass_cbegin, nm) ;
+          std::advance (deriv_cbegin, nm) ;
+          std::advance (eigenvec_begin, nm) ;
+          std::advance (eigenval_begin, n_rows) ;
+          spectral_assembly<Number> (mass_cbegin, deriv_cbegin, n_rows, n_cols
+                                     , eigenval_begin, eigenvec_begin) ;
+        }
+
+      eigenvalues[dir].resize (n_rows) ;
+      eigenvectors[dir].reinit (n_rows, n_cols) ;
+      vectorized_load_and_transpose (n_rows, eigenvalues_flat.data()
+                                     , offsets_n.cbegin(), this->eigenvalues[dir].begin()) ;
+      vectorized_load_and_transpose (nm, eigenvectors_flat.data()
+                                     , offsets_nm.cbegin(), &(this->eigenvectors[dir](0,0))) ;
+    }
+
+  TensorProductMatrixSymmetricSumBase<dim,VectorizedArray<Number>,size>
+    ::fill_data (std::forward<MatrixArray>(mass_matrix), std::forward<MatrixArray>(derivative_matrix),
+		 std::move(eigenvalues), std::move(eigenvectors)) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+void
+TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
+::reinit (const std::array<Table<2,VectorizedArray<Number> >,dim> &mass_matrix,
+          const std::array<Table<2,VectorizedArray<Number> >,dim> &derivative_matrix)
+{
+  reinit_impl (mass_matrix, derivative_matrix) ;
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+void
+TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
+::vmult (AlignedVector<VectorizedArray<Number> > &dst,
+         const AlignedVector<VectorizedArray<Number> > &src) const
+{
+  AssertDimension(dst.size(), Utilities::fixed_power<dim>(this->eigenvalues[0].size()));
+  AssertDimension(src.size(), Utilities::fixed_power<dim>(this->eigenvalues[0].size()));
+  TensorProductMatrixSymmetricSumBase<dim,VectorizedArray<Number>,size>::vmult (dst.begin(), src.begin());
+}
+
+
+
+template <int dim, typename Number, int size>
+inline
+void
+TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
+::apply_inverse (AlignedVector<VectorizedArray<Number> > &dst,
+                 const AlignedVector<VectorizedArray<Number> > &src) const
+{
+  AssertDimension (dst.size(), Utilities::fixed_power<dim>(this->eigenvalues[0].size()));
+  AssertDimension (src.size(), Utilities::fixed_power<dim>(this->eigenvalues[0].size()));
+  TensorProductMatrixSymmetricSumBase<dim,VectorizedArray<Number>,size>::apply_inverse (dst.begin(), src.begin());
 }
 
 
