@@ -32,6 +32,33 @@ void burn (unsigned int n)
     }
 }
 
+// check that the MinMaxAvg is set to a default, unpopulated state.
+void
+assert_min_max_avg_invalid(const Utilities::MPI::MinMaxAvg &data)
+{
+  // we want to explicitly check that some things are signaling NaNs, so
+  // disable FP exceptions if they are on
+#if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+  fedisableexcept(FE_INVALID);
+#endif
+
+  AssertThrow(std::isnan(data.min), ExcInternalError());
+  AssertThrow(std::isnan(data.max), ExcInternalError());
+  AssertThrow(std::isnan(data.avg), ExcInternalError());
+  AssertThrow(data.min_index == numbers::invalid_unsigned_int, ExcInternalError());
+  AssertThrow(data.max_index == numbers::invalid_unsigned_int, ExcInternalError());
+}
+
+// check that the MinMaxAvg values are reasonable.
+void
+assert_min_max_avg_valid(const Utilities::MPI::MinMaxAvg &data)
+{
+  AssertThrow(data.min > 0., ExcInternalError());
+  AssertThrow(data.max >= data.min, ExcInternalError());
+  AssertThrow(data.avg >= data.min, ExcInternalError());
+  AssertThrow(data.min_index != numbers::invalid_unsigned_int, ExcInternalError());
+  AssertThrow(data.max_index != numbers::invalid_unsigned_int, ExcInternalError());
+}
 
 
 void
@@ -43,22 +70,30 @@ test_timer(Timer &t)
   AssertThrow(old_wall_time > 0., ExcInternalError());
   const double old_cpu_time = t.wall_time();
   AssertThrow(old_cpu_time > 0., ExcInternalError());
-  AssertThrow(t.get_total_data().max == 0., ExcInternalError());
+  assert_min_max_avg_invalid(t.get_data());
+  assert_min_max_avg_invalid(t.get_total_data());
+  assert_min_max_avg_invalid(t.get_last_lap_data());
+  assert_min_max_avg_invalid(t.get_accumulated_wall_time_data());
 
   burn(50);
   AssertThrow(t.stop() > 0., ExcInternalError());
+  assert_min_max_avg_valid(t.get_data());
+  assert_min_max_avg_valid(t.get_total_data());
+  assert_min_max_avg_valid(t.get_last_lap_data());
+  assert_min_max_avg_valid(t.get_accumulated_wall_time_data());
 
   AssertThrow(t.wall_time() > old_wall_time, ExcInternalError());
   AssertThrow(t.cpu_time() > old_cpu_time, ExcInternalError());
   AssertThrow(t.last_wall_time() > 0., ExcInternalError());
   AssertThrow(t.last_cpu_time() > 0., ExcInternalError());
-  AssertThrow(t.get_data().min > 0., ExcInternalError());
-  AssertThrow(t.get_total_data().min > 0., ExcInternalError());
 
   t.reset();
   AssertThrow(t.wall_time() == 0., ExcInternalError());
   AssertThrow(t.cpu_time()== 0., ExcInternalError());
-  AssertThrow(t.get_total_data().max == 0, ExcInternalError());
+  assert_min_max_avg_invalid(t.get_data());
+  assert_min_max_avg_invalid(t.get_total_data());
+  assert_min_max_avg_invalid(t.get_last_lap_data());
+  assert_min_max_avg_invalid(t.get_accumulated_wall_time_data());
 
   deallog << "OK" << std::endl;
 }
@@ -76,4 +111,3 @@ int main (int argc, char **argv)
   test_timer(t1);
   test_timer(t2);
 }
-
