@@ -79,8 +79,8 @@ namespace MeshWorker
    * If the flag AssembleFlags::assemble_own_cells is passed, then the default
    * behavior is to first loop over faces and do the work there, and then
    * compute the actual work on the cell. It is possible to perform the
-   * integration on the cells before working on faces, by adding the flag
-   * AssembleFlags::cells_first.
+   * integration on the cells after working on faces, by adding the flag
+   * AssembleFlags::cells_after_faces.
    *
    * If the flag AssembleFlags::assemble_own_interior_faces_once is specified,
    * then each interior face is visited only once, and the @p face_worker is
@@ -148,9 +148,9 @@ namespace MeshWorker
            != (assemble_ghost_faces_once|assemble_ghost_faces_both),
            ExcMessage("You can only specify assemble_ghost_faces_once OR assemble_ghost_faces_both."));
 
-    Assert(!(flags & cells_first) ||
+    Assert(!(flags & cells_after_faces) ||
            (flags & (assemble_own_cells | assemble_ghost_cells)),
-           ExcMessage("The option cells_first only makes sense if you assemble on cells."));
+           ExcMessage("The option cells_after_faces only makes sense if you assemble on cells."));
 
     Assert((!face_worker) == !(flags & work_on_faces),
            ExcMessage("If you specify a face_worker, assemble_face_* needs to be set."));
@@ -175,7 +175,7 @@ namespace MeshWorker
       if ((!ignore_subdomain) && (current_subdomain_id == numbers::artificial_subdomain_id))
         return;
 
-      if ( (flags & (cells_first)) &&
+      if ( !(flags & (cells_after_faces)) &&
            ( ((flags & (assemble_own_cells)) && own_cell)
              || ( (flags & assemble_ghost_cells) && !own_cell) ) )
         cell_worker(cell, scratch, copy);
@@ -298,7 +298,7 @@ namespace MeshWorker
           } // faces
 
       // Execute the cell_worker if faces are handled before cells
-      if (!(flags & cells_first) &&
+      if ((flags & cells_after_faces) &&
           ( ((flags & assemble_own_cells) && own_cell) || ((flags & assemble_ghost_cells) && !own_cell)))
         cell_worker(cell, scratch, copy);
     };
