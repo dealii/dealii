@@ -22,6 +22,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/fe_tools.h>
@@ -347,10 +348,12 @@ FE_RaviartThomasNodal<dim>::hp_vertex_dof_identities (
 {
   // we can presently only compute these
   // identities if both FEs are
-  // FE_RaviartThomasNodals. in that case, no
-  // dofs are assigned on the vertex, so we
-  // shouldn't be getting here at all.
+  // FE_RaviartThomasNodals or the other is FE_Nothing.
+  // In either case, no dofs are assigned on the vertex,
+  // so we shouldn't be getting here at all.
   if (dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&fe_other)!=nullptr)
+    return std::vector<std::pair<unsigned int, unsigned int> > ();
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
     return std::vector<std::pair<unsigned int, unsigned int> > ();
   else
     {
@@ -368,7 +371,8 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 {
   // we can presently only compute
   // these identities if both FEs are
-  // FE_RaviartThomasNodals
+  // FE_RaviartThomasNodals or if the other
+  // one is FE_Nothing
   if (const FE_RaviartThomasNodal<dim> *fe_q_other
       = dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&fe_other))
     {
@@ -410,6 +414,12 @@ hp_line_dof_identities (const FiniteElement<dim> &fe_other) const
 
       return identities;
     }
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
+    {
+      // the FE_Nothing has no degrees of freedom, so there are no
+      // equivalencies to be recorded
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
   else
     {
       Assert (false, ExcNotImplemented());
@@ -425,7 +435,8 @@ FE_RaviartThomasNodal<dim>::hp_quad_dof_identities (
 {
   // we can presently only compute
   // these identities if both FEs are
-  // FE_RaviartThomasNodals
+  // FE_RaviartThomasNodals or if the other
+  // one is FE_Nothing
   if (const FE_RaviartThomasNodal<dim> *fe_q_other
       = dynamic_cast<const FE_RaviartThomasNodal<dim>*>(&fe_other))
     {
@@ -450,6 +461,12 @@ FE_RaviartThomasNodal<dim>::hp_quad_dof_identities (
 
       return identities;
     }
+  else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
+    {
+      // the FE_Nothing has no degrees of freedom, so there are no
+      // equivalencies to be recorded
+      return std::vector<std::pair<unsigned int, unsigned int> > ();
+    }
   else
     {
       Assert (false, ExcNotImplemented());
@@ -472,6 +489,21 @@ FE_RaviartThomasNodal<dim>::compare_for_face_domination (
         return FiniteElementDomination::either_element_can_dominate;
       else
         return FiniteElementDomination::other_element_dominates;
+    }
+  else if (const FE_Nothing<dim> *fe_q_other
+           = dynamic_cast<const FE_Nothing<dim>*>(&fe_other))
+    {
+      if (fe_q_other->is_dominating())
+        {
+          return FiniteElementDomination::other_element_dominates;
+        }
+      else
+        {
+          // FE_Nothing has no degrees of freedom and is typically
+          // used in a context where there are no continuity
+          // requirements along the interface
+          return FiniteElementDomination::no_requirements;
+        }
     }
 
   Assert (false, ExcNotImplemented());
