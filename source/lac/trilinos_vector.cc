@@ -772,7 +772,7 @@ namespace TrilinosWrappers
         {
           auto global_id = [&] (const size_type index)
           {
-            return vector->Map().GID(static_cast<TrilinosWrappers::types::int_type>(index));
+            return gid(vector->Map(), static_cast<TrilinosWrappers::types::int_type>(index));
           };
           out << "size:" << size() << " local_size:" << local_size() << " :" << std::endl;
           for (size_type i=0; i<local_size(); ++i)
