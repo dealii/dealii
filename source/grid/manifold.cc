@@ -105,7 +105,7 @@ get_new_point (const std::vector<Point<spacedim> > &surrounding_points,
   // produce unique points even if get_intermediate_points is not
   // associative (as for the SphericalManifold).
   boost::container::small_vector<unsigned int, 100> permutation(n_points);
-  std::iota(permutation.begin(), permutation.end(), 0);
+  std::iota(permutation.begin(), permutation.end(), 0u);
   std::sort(permutation.begin(), permutation.end(), CompareWeights(weights));
 
   // Now loop over points in the order of their associated weight

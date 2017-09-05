@@ -467,7 +467,7 @@ GridRefinement::refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
 
   // get a decreasing order on the error indicator
   std::vector<unsigned int> cell_indices(criteria.size());
-  std::iota(cell_indices.begin(), cell_indices.end(), 0);
+  std::iota(cell_indices.begin(), cell_indices.end(), 0u);
 
   std::sort(cell_indices.begin(), cell_indices.end(),
             [&criteria](const unsigned int left,

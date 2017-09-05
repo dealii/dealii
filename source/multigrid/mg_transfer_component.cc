@@ -120,7 +120,7 @@ namespace
     const unsigned int n_selected
       = std::accumulate(selected.begin(),
                         selected.end(),
-                        0U);
+                        0u);
 
     if (ndofs.size() == 0)
       {

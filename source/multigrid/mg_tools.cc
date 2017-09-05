@@ -1074,7 +1074,8 @@ namespace MGTools
             Assert (!dof_handler.get_fe().is_primitive()
                     ||
                     std::accumulate (result[l].begin(),
-                                     result[l].end(), 0U)
+                                     result[l].end(),
+                                     types::global_dof_index(0))
                     ==
                     dof_handler.n_dofs(l),
                     ExcInternalError());
