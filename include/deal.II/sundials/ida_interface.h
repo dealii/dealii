@@ -42,6 +42,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// Shorthand notation for IDA error codes.
+#define AssertIDA(code) Assert(code >= 0, ExcIDAError(code))
+
 namespace SUNDIALS
 {
 
@@ -305,6 +308,14 @@ namespace SUNDIALS
      * in the parameter file.
      */
     void set_initial_time(const double &t);
+
+    /**
+     * Handle IDA exceptions.
+     */
+    DeclException1(ExcIDAError, int, << "One of the SUNDIALS IDA internal functions "
+                   << " returned a negative error code: "
+                   << arg1 << ". Please consult SUNDIALS manual.");
+
 
   private:
 

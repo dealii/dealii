@@ -428,6 +428,7 @@ namespace SUNDIALS
     copy(diff_id, differential_components());
 
     status = IDAInit(ida_mem, t_dae_residual<VectorType>, current_time, yy, yp);
+    AssertIDA(status);
 
     if (use_local_tolerances)
       {
@@ -439,16 +440,24 @@ namespace SUNDIALS
         status += IDASStolerances(ida_mem, rel_tol, abs_tol);
       }
 
-    status += IDASetInitStep(ida_mem, current_time_step);
-    status += IDASetUserData(ida_mem, (void *) this);
+    status = IDASetInitStep(ida_mem, current_time_step);
+    AssertIDA(status);
 
-    status += IDASetId(ida_mem, diff_id);
-    status += IDASetSuppressAlg(ida_mem, ignore_algebraic_terms_for_errors);
+    status = IDASetUserData(ida_mem, (void *) this);
+    AssertIDA(status);
 
-//  status += IDASetMaxNumSteps(ida_mem, max_steps);
-    status += IDASetStopTime(ida_mem, final_time);
+    status = IDASetId(ida_mem, diff_id);
+    AssertIDA(status);
 
-    status += IDASetMaxNonlinIters(ida_mem, max_non_linear_iterations);
+    status = IDASetSuppressAlg(ida_mem, ignore_algebraic_terms_for_errors);
+    AssertIDA(status);
+
+//  status = IDASetMaxNumSteps(ida_mem, max_steps);
+    status = IDASetStopTime(ida_mem, final_time);
+    AssertIDA(status);
+
+    status = IDASetMaxNonlinIters(ida_mem, max_non_linear_iterations);
+    AssertIDA(status);
 
     // Initialize solver
     IDAMem IDA_mem;
@@ -458,9 +467,8 @@ namespace SUNDIALS
     IDA_mem->ida_lsolve = t_dae_solve<VectorType>;
     IDA_mem->ida_setupNonNull = true;
 
-    status += IDASetMaxOrd(ida_mem, max_order);
-
-    AssertThrow(status == 0, ExcMessage("Error initializing IDA."));
+    status = IDASetMaxOrd(ida_mem, max_order);
+    AssertIDA(status);
 
     std::string type;
     if (first_step)
@@ -479,16 +487,22 @@ namespace SUNDIALS
     if (type == "use_y_dot")
       {
         // (re)initialization of the vectors
-        IDACalcIC(ida_mem, IDA_Y_INIT, current_time+current_time_step);
-        IDAGetConsistentIC(ida_mem, yy, yp);
+        status = IDACalcIC(ida_mem, IDA_Y_INIT, current_time+current_time_step);
+        AssertIDA(status);
+
+        status = IDAGetConsistentIC(ida_mem, yy, yp);
+        AssertIDA(status);
 
         copy(solution, yy);
         copy(solution_dot, yp);
       }
     else if (type == "use_y_diff")
       {
-        IDACalcIC(ida_mem, IDA_YA_YDP_INIT, current_time+current_time_step);
-        IDAGetConsistentIC(ida_mem, yy, yp);
+        status = IDACalcIC(ida_mem, IDA_YA_YDP_INIT, current_time+current_time_step);
+        AssertIDA(status);
+
+        status = IDAGetConsistentIC(ida_mem, yy, yp);
+        AssertIDA(status);
 
         copy(solution, yy);
         copy(solution_dot, yp);
