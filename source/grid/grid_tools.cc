@@ -2258,7 +2258,8 @@ next_cell:
                              indices.size(), DEAL_II_DOF_INDEX_MPI_TYPE, triangulation.get_communicator());
     AssertThrowMPI(ierr);
     const types::global_vertex_index shift = std::accumulate(&indices[0],
-                                                             &indices[0]+triangulation.locally_owned_subdomain(),0);
+                                                             &indices[0]+triangulation.locally_owned_subdomain(),
+                                                             types::global_vertex_index(0));
 
     std::map<unsigned int,types::global_vertex_index>::iterator
     global_index_it = local_to_global_vertex_index.begin(),

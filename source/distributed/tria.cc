@@ -256,7 +256,7 @@ namespace
     const typename internal::p4est::types<dim>::locidx
     num_vtt = std::accumulate (vertex_touch_count.begin(),
                                vertex_touch_count.end(),
-                               0);
+                               0u);
     (void)num_vtt;
     Assert (connectivity->ctt_offset[triangulation.n_vertices()] ==
             num_vtt,
@@ -2019,7 +2019,7 @@ namespace parallel
       const dealii::internal::p4est::types<2>::locidx
       num_vtt = std::accumulate (vertex_touch_count.begin(),
                                  vertex_touch_count.end(),
-                                 0);
+                                 0u);
 
       // now create a connectivity object with the right sizes for all
       // arrays. set vertex information only in debug mode (saves a few bytes
@@ -2090,7 +2090,7 @@ namespace parallel
       const dealii::internal::p4est::types<2>::locidx
       num_vtt = std::accumulate (vertex_touch_count.begin(),
                                  vertex_touch_count.end(),
-                                 0);
+                                 0u);
 
       // now create a connectivity object with the right sizes for all
       // arrays. set vertex information only in debug mode (saves a few bytes
@@ -2159,7 +2159,7 @@ namespace parallel
       const dealii::internal::p4est::types<2>::locidx
       num_vtt = std::accumulate (vertex_touch_count.begin(),
                                  vertex_touch_count.end(),
-                                 0);
+                                 0u);
 
       std::vector<unsigned int> edge_touch_count;
       std::vector<
@@ -2173,7 +2173,7 @@ namespace parallel
       const dealii::internal::p4est::types<2>::locidx
       num_ett = std::accumulate (edge_touch_count.begin(),
                                  edge_touch_count.end(),
-                                 0);
+                                 0u);
 
       // now create a connectivity object with the right sizes for all arrays
       const bool set_vertex_info

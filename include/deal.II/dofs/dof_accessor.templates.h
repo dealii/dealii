@@ -1546,7 +1546,7 @@ namespace internal
       {
         // initialize original index locations
         std::vector<unsigned int> idx(v_end-v_begin);
-        std::iota(idx.begin(), idx.end(), 0);
+        std::iota(idx.begin(), idx.end(), 0u);
 
         // sort indices based on comparing values in v
         std::sort(idx.begin(), idx.end(),
