@@ -146,6 +146,11 @@ IF (DEAL_II_WITH_ARPACK AND DEAL_II_WITH_UMFPACK)
   make_quicktest("arpack" ${_mybuild} "")
 ENDIF()
 
+# Test Adol-C
+IF (DEAL_II_WITH_ADOLC)
+  make_quicktest("adolc" ${_mybuild} "")
+ENDIF()
+
 
 
 # A custom test target:
