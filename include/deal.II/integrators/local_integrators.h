@@ -128,16 +128,19 @@ DEAL_II_NAMESPACE_OPEN
  * With these matrices, the function called by MeshWorker::loop() could be
  * written like
  * @code
- * using namespace ::dealii:: LocalIntegrators;
+ * using namespace dealii::LocalIntegrators;
  *
  * template <int dim>
- * void MatrixIntegrator<dim>::cell(
- * MeshWorker::DoFInfo<dim>& dinfo,
- * typename MeshWorker::IntegrationInfo<dim>& info)
+ * void MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>         &dinfo,
+ *                                  MeshWorker::IntegrationInfo<dim> &info)
  * {
- * Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values(0));
- * Divergence::cell_matrix(dinfo.matrix(1,false).matrix, info.fe_values(0), info.fe_values(1));
- * L2::cell_matrix(dinfo.matrix(2,false).matrix, info.fe_values(1));
+ *   Laplace::cell_matrix (dinfo.matrix(0,false).matrix,
+ *                         info.fe_values(0));
+ *   Divergence::cell_matrix (dinfo.matrix(1,false).matrix,
+ *                            info.fe_values(0),
+ *                            info.fe_values(1));
+ *   L2::cell_matrix (dinfo.matrix(2,false).matrix,
+ *                    info.fe_values(1));
  * }
  * @endcode
  * See step-39 for a worked out example of this code.
