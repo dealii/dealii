@@ -10,7 +10,7 @@ the commands
 set style data lines
 set size 0.721, 1
 unset key
-plot [-1:1][-1:1] "ball0_mapping_q1.dat"
+plot [-1:1][-1:1] "ball_0_mapping_q_1.dat"
 @endcode
 or using one of the other filenames. The second line makes sure that
 the aspect ratio of the generated output is actually 1:1, i.e. a

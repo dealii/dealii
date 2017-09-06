@@ -97,7 +97,7 @@ namespace Step10
         // Then have a string which denotes the base part of the names of the
         // files into which we write the output (ending with the refinement
         // level).
-        std::string filename_base = "ball" + Utilities::to_string(refinement);
+        std::string filename_base = "ball_" + Utilities::to_string(refinement);
 
         // Then output the present grid for $Q_1$, $Q_2$, and $Q_3$ mappings:
         for (unsigned int degree=1; degree<4; ++degree)
@@ -139,7 +139,7 @@ namespace Step10
 
             // Finally, generate a filename and a file for output:
             std::string filename = filename_base
-                                   + "_mapping_q"
+                                   + "_mapping_q_"
                                    + Utilities::to_string(degree)
                                    + ".dat";
             std::ofstream gnuplot_file (filename.c_str());
