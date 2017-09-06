@@ -48,7 +48,7 @@ namespace Step10
   using namespace dealii;
 
   // Now, as we want to compute the value of $\pi$, we have to compare to
-  // somewhat. These are the first few digits of $\pi$, which we define
+  // something. These are the first few digits of $\pi$, which we define
   // beforehand for later use. Since we would like to compute the difference
   // between two numbers which are quite accurate, with the accuracy of the
   // computed approximation to $\pi$ being in the range of the number of
