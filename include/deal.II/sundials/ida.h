@@ -13,8 +13,8 @@
 //
 //---------------------------------------------------------------
 
-#ifndef dealii_sundials_ida_interface_h
-#define dealii_sundials_ida_interface_h
+#ifndef dealii_sundials_ida_h
+#define dealii_sundials_ida_h
 
 #include <deal.II/base/config.h>
 #ifdef DEAL_II_WITH_SUNDIALS
@@ -128,7 +128,7 @@ namespace SUNDIALS
    * @author Luca Heltai, Alberto Sartori, 2017.
    */
   template<typename VectorType=Vector<double> >
-  class IDAInterface
+  class IDA
   {
   public:
 
@@ -176,28 +176,28 @@ namespace SUNDIALS
      * @param verbose Show output of time steps
      * @param use_local_tolerances Use local tolerances
      */
-    IDAInterface(const MPI_Comm mpi_comm = MPI_COMM_WORLD,
-                 const double &initial_time = 0.0,
-                 const double &final_time = 1.0,
-                 const double &initial_step_size = 1e-4,
-                 const double &min_step_size = 1e-6,
-                 const double &abs_tol = 1e-6,
-                 const double &rel_tol = 1e-5,
-                 const unsigned int &max_order = 5,
-                 const double &output_period = .1,
-                 const bool &ignore_algebraic_terms_for_errors = true,
-                 const std::string &ic_type = "none",
-                 const std::string &reset_type = "none",
-                 const double &ic_alpha = .33,
-                 const unsigned int &ic_max_iter = 5,
-                 const unsigned int &max_non_linear_iterations = 10,
-                 const bool &verbose = true,
-                 const bool &use_local_tolerances = false);
+    IDA(const MPI_Comm mpi_comm = MPI_COMM_WORLD,
+        const double &initial_time = 0.0,
+        const double &final_time = 1.0,
+        const double &initial_step_size = 1e-4,
+        const double &min_step_size = 1e-6,
+        const double &abs_tol = 1e-6,
+        const double &rel_tol = 1e-5,
+        const unsigned int &max_order = 5,
+        const double &output_period = .1,
+        const bool &ignore_algebraic_terms_for_errors = true,
+        const std::string &ic_type = "none",
+        const std::string &reset_type = "none",
+        const double &ic_alpha = .33,
+        const unsigned int &ic_max_iter = 5,
+        const unsigned int &max_non_linear_iterations = 10,
+        const bool &verbose = true,
+        const bool &use_local_tolerances = false);
 
     /**
      * House cleaning.
      */
-    ~IDAInterface();
+    ~IDA();
 
     /**
      * Add all internal parameters to the given ParameterHandler object. When

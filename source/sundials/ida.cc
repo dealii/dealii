@@ -14,7 +14,7 @@
 //-----------------------------------------------------------
 
 
-#include <deal.II/sundials/ida_interface.h>
+#include <deal.II/sundials/ida.h>
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_SUNDIALS
@@ -48,7 +48,7 @@ namespace SUNDIALS
     int t_dae_residual(realtype tt, N_Vector yy, N_Vector yp,
                        N_Vector rr, void *user_data)
     {
-      IDAInterface<VectorType> &solver = *static_cast<IDAInterface<VectorType> *>(user_data);
+      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
 
       std::shared_ptr<VectorType> src_yy = solver.create_new_vector();
       std::shared_ptr<VectorType> src_yp = solver.create_new_vector();
@@ -79,7 +79,7 @@ namespace SUNDIALS
       (void) tmp2;
       (void) tmp3;
       (void) resp;
-      IDAInterface<VectorType> &solver = *static_cast<IDAInterface<VectorType> *>(IDA_mem->ida_user_data);
+      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
 
       std::shared_ptr<VectorType> src_yy = solver.create_new_vector();
       std::shared_ptr<VectorType> src_yp = solver.create_new_vector();
@@ -107,7 +107,7 @@ namespace SUNDIALS
       (void) yy;
       (void) yp;
       (void) resp;
-      IDAInterface<VectorType> &solver = *static_cast<IDAInterface<VectorType> *>(IDA_mem->ida_user_data);
+      IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
 
       std::shared_ptr<VectorType> dst = solver.create_new_vector();
       std::shared_ptr<VectorType> src = solver.create_new_vector();
@@ -122,23 +122,23 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  IDAInterface<VectorType>::IDAInterface(const MPI_Comm mpi_comm,
-                                         const double &initial_time,
-                                         const double &final_time,
-                                         const double &initial_step_size,
-                                         const double &min_step_size,
-                                         const double &abs_tol,
-                                         const double &rel_tol,
-                                         const unsigned int &max_order,
-                                         const double &output_period,
-                                         const bool &ignore_algebraic_terms_for_errors,
-                                         const std::string &ic_type,
-                                         const std::string &reset_type,
-                                         const double &ic_alpha,
-                                         const unsigned int &ic_max_iter,
-                                         const unsigned int &max_non_linear_iterations,
-                                         const bool &verbose,
-                                         const bool &use_local_tolerances) :
+  IDA<VectorType>::IDA(const MPI_Comm mpi_comm,
+                       const double &initial_time,
+                       const double &final_time,
+                       const double &initial_step_size,
+                       const double &min_step_size,
+                       const double &abs_tol,
+                       const double &rel_tol,
+                       const unsigned int &max_order,
+                       const double &output_period,
+                       const bool &ignore_algebraic_terms_for_errors,
+                       const std::string &ic_type,
+                       const std::string &reset_type,
+                       const double &ic_alpha,
+                       const unsigned int &ic_max_iter,
+                       const unsigned int &max_non_linear_iterations,
+                       const bool &verbose,
+                       const bool &use_local_tolerances) :
     initial_time(initial_time),
     final_time(final_time),
     initial_step_size(initial_step_size),
@@ -163,7 +163,7 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  IDAInterface<VectorType>::~IDAInterface()
+  IDA<VectorType>::~IDA()
   {
     if (ida_mem)
       IDAFree(&ida_mem);
@@ -171,7 +171,7 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  void IDAInterface<VectorType>::add_parameters(ParameterHandler &prm)
+  void IDA<VectorType>::add_parameters(ParameterHandler &prm)
   {
     prm.add_parameter("Initial step size",initial_step_size);
 
@@ -228,8 +228,8 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
-  unsigned int IDAInterface<VectorType>::solve_dae(VectorType &solution,
-                                                   VectorType &solution_dot)
+  unsigned int IDA<VectorType>::solve_dae(VectorType &solution,
+                                          VectorType &solution_dot)
   {
 
     unsigned int system_size = solution.size();
@@ -335,10 +335,10 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  void IDAInterface<VectorType>::reset(const double &current_time,
-                                       const double &current_time_step,
-                                       VectorType &solution,
-                                       VectorType &solution_dot)
+  void IDA<VectorType>::reset(const double &current_time,
+                              const double &current_time_step,
+                              VectorType &solution,
+                              VectorType &solution_dot)
   {
 
     unsigned int system_size;
@@ -508,13 +508,13 @@ namespace SUNDIALS
   }
 
   template<typename VectorType>
-  void IDAInterface<VectorType>::set_initial_time(const double &t)
+  void IDA<VectorType>::set_initial_time(const double &t)
   {
     initial_time = t;
   }
 
   template<typename VectorType>
-  void IDAInterface<VectorType>::set_functions_to_trigger_an_assert()
+  void IDA<VectorType>::set_functions_to_trigger_an_assert()
   {
 
     create_new_vector = []() ->std::unique_ptr<VectorType>
@@ -582,19 +582,19 @@ namespace SUNDIALS
     };
   }
 
-  template class IDAInterface<Vector<double> >;
-  template class IDAInterface<BlockVector<double> >;
+  template class IDA<Vector<double> >;
+  template class IDA<BlockVector<double> >;
 
 #ifdef DEAL_II_WITH_MPI
 
 #ifdef DEAL_II_WITH_TRILINOS
-  template class IDAInterface<TrilinosWrappers::MPI::Vector>;
-  template class IDAInterface<TrilinosWrappers::MPI::BlockVector>;
+  template class IDA<TrilinosWrappers::MPI::Vector>;
+  template class IDA<TrilinosWrappers::MPI::BlockVector>;
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
-  template class IDAInterface<PETScWrappers::MPI::Vector>;
-  template class IDAInterface<PETScWrappers::MPI::BlockVector>;
+  template class IDA<PETScWrappers::MPI::Vector>;
+  template class IDA<PETScWrappers::MPI::BlockVector>;
 #endif
 
 #endif

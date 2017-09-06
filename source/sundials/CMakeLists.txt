@@ -16,7 +16,7 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
-  ida_interface.cc
+  ida.cc
   copy.cc
   )
 

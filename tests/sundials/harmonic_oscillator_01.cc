@@ -14,7 +14,7 @@
 //-----------------------------------------------------------
 
 #include "../tests.h"
-#include <deal.II/sundials/ida_interface.h>
+#include <deal.II/sundials/ida.h>
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -130,7 +130,7 @@ public:
     y_dot[0] = kappa;
     time_stepper.solve_dae(y,y_dot);
   }
-  SUNDIALS::IDAInterface<Vector<double> >  time_stepper;
+  SUNDIALS::IDA<Vector<double> >  time_stepper;
 private:
   Vector<double> y;
   Vector<double> y_dot;
