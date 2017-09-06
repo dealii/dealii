@@ -206,6 +206,24 @@ namespace LinearAlgebra
     virtual void reinit (const IndexSet &locally_stored_indices,
                          const bool      omit_zeroing_entries = false);
 
+
+#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_WITH_MPI
+    /**
+     * Initialize this ReadWriteVector by supplying access to all locally available
+     * entries in the given ghosted or non-ghosted vector.
+     *
+     * @note This function currently copies the values from the argument into
+     * the ReadWriteVector, so modifications here will not modify @p trilinos_vec.
+     *
+     * This function is mainly written for backwards-compatibility to get
+     * element access to a ghosted TrilinosWrappers::MPI::Vector inside the
+     * library.
+     */
+    void reinit(const TrilinosWrappers::MPI::Vector &trilinos_vec);
+#endif
+#endif
+
     /**
      * Apply the functor @p func to each element of the vector. The functor
      * should look like
