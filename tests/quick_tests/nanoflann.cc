@@ -19,6 +19,8 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/numerics/kdtree.h>
 
+using namespace dealii;
+
 
 int main ()
 {
