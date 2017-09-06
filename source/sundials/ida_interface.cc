@@ -408,7 +408,6 @@ namespace SUNDIALS
 
     copy(yy, solution);
     copy(yp, solution_dot);
-    copy(diff_id, differential_components());
 
     status = IDAInit(ida_mem, t_dae_residual<VectorType>, current_time, yy, yp);
     AssertIDA(status);
@@ -429,8 +428,18 @@ namespace SUNDIALS
     status = IDASetUserData(ida_mem, (void *) this);
     AssertIDA(status);
 
-    status = IDASetId(ida_mem, diff_id);
-    AssertIDA(status);
+    if (ic_type == "use_y_diff" || reset_type == "use_y_diff" || ignore_algebraic_terms_for_errors)
+      {
+        VectorType diff_comp_vector(solution);
+        diff_comp_vector = 0.0;
+        auto dc = differential_components();
+        for (auto i = dc.begin(); i != dc.end(); ++i)
+          diff_comp_vector[*i] = 1.0;
+
+        copy(diff_id, diff_comp_vector);
+        status = IDASetId(ida_mem, diff_id);
+        AssertIDA(status);
+      }
 
     status = IDASetSuppressAlg(ida_mem, ignore_algebraic_terms_for_errors);
     AssertIDA(status);
@@ -508,9 +517,9 @@ namespace SUNDIALS
   void IDAInterface<VectorType>::set_functions_to_trigger_an_assert()
   {
 
-    create_new_vector = []() ->std::shared_ptr<VectorType>
+    create_new_vector = []() ->std::unique_ptr<VectorType>
     {
-      std::shared_ptr<VectorType> p;
+      std::unique_ptr<VectorType> p;
       AssertThrow(false, ExcFunctionNotProvided("create_new_vector"));
       return p;
     };
@@ -548,23 +557,21 @@ namespace SUNDIALS
                      const VectorType &,
                      const unsigned int)
     {
-      AssertThrow(false, ExcFunctionNotProvided("output_step"));
+      return;
     };
 
     solver_should_restart = [](const double,
                                VectorType &,
                                VectorType &) ->bool
     {
-      bool ret=false;
-      AssertThrow(false, ExcFunctionNotProvided("solver_should_restart"));
-      return ret;
+      return false;
     };
 
-    differential_components = []() ->VectorType &
+    differential_components = []() ->IndexSet
     {
-      std::shared_ptr<VectorType> y;
+      IndexSet i;
       AssertThrow(false, ExcFunctionNotProvided("differential_components"));
-      return *y;
+      return i;
     };
 
     get_local_tolerances = []() ->VectorType &

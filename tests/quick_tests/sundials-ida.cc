@@ -68,9 +68,9 @@ public:
     diff[0] = 1.0;
     diff[1] = 1.0;
 
-    time_stepper.create_new_vector = [&] () -> std::shared_ptr<Vector<double> >
+    time_stepper.create_new_vector = [&] () -> std::unique_ptr<Vector<double> >
     {
-      return std::shared_ptr<Vector<double>>(new Vector<double>(2));
+      return std::unique_ptr<Vector<double>>(new Vector<double>(2));
     };
 
 
@@ -127,9 +127,9 @@ public:
     };
 
 
-    time_stepper.differential_components = [&]() -> VectorType&
+    time_stepper.differential_components = [&]() -> IndexSet
     {
-      return diff;
+      return complete_index_set(2);
     };
   }
 

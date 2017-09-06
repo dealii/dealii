@@ -39,7 +39,7 @@
  * A = [ 0 , -1; k^2, 0 ]
  *
  * y_0  = 0, k
- * y_0' = 0, 0
+ * y_0' = k, 0
  *
  * The exact solution is
  *
@@ -58,19 +58,15 @@ public:
   HarmonicOscillator(double _kappa=1.0) :
     y(2),
     y_dot(2),
-    diff(2),
     J(2,2),
     A(2,2),
     Jinv(2,2),
     kappa(_kappa),
     out("output")
   {
-    diff[0] = 1.0;
-    diff[1] = 1.0;
-
-    time_stepper.create_new_vector = [&] () -> std::shared_ptr<Vector<double> >
+    time_stepper.create_new_vector = [&] () -> std::unique_ptr<Vector<double> >
     {
-      return std::shared_ptr<Vector<double>>(new Vector<double>(2));
+      return std::unique_ptr<Vector<double>>(new Vector<double>(2));
     };
 
 
@@ -116,7 +112,7 @@ public:
                                    const unsigned int step_number) -> int
     {
       out << t << " "
-      << sol << " " << sol_dot;
+      << sol[0] << " " << sol[1] << " " << sol_dot[0] << " " << sol_dot[1] << std::endl;
       return 0;
     };
 
@@ -126,24 +122,18 @@ public:
     {
       return false;
     };
-
-
-    time_stepper.differential_components = [&]() -> VectorType&
-    {
-      return diff;
-    };
   }
 
   void run()
   {
     y[1] = kappa;
+    y_dot[0] = kappa;
     time_stepper.solve_dae(y,y_dot);
   }
   SUNDIALS::IDAInterface<Vector<double> >  time_stepper;
 private:
   Vector<double> y;
   Vector<double> y_dot;
-  Vector<double> diff;
   FullMatrix<double> J;
   FullMatrix<double> A;
   FullMatrix<double> Jinv;
@@ -157,7 +147,7 @@ int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
-  HarmonicOscillator ode(2*numbers::PI);
+  HarmonicOscillator ode(1.0);
   ParameterHandler prm;
   ode.time_stepper.add_parameters(prm);
 

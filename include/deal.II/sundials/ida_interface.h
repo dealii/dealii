@@ -60,9 +60,15 @@ namespace SUNDIALS
    *  - residual;
    *  - setup_jacobian;
    *  - solve_jacobian_system;
-   *  - output_step;
+   *
+   * Optionally, also the following functions could be implemented. By default
+   * they do nothing, or are not required. If you call the constructor in a way
+   * that requires any of the not-implemented functions, an Assertion will be
+   * thrown.
    *  - solver_should_restart;
-   *  - differential_components.
+   *  - differential_components;
+   *  - output_step;
+   *  - get_local_tolerances;
    *
    * Citing from the SUNDIALS documentation:
    *
@@ -180,8 +186,8 @@ namespace SUNDIALS
                  const unsigned int &max_order = 5,
                  const double &output_period = .1,
                  const bool &ignore_algebraic_terms_for_errors = true,
-                 const std::string &ic_type = "use_y_diff",
-                 const std::string &reset_type = "use_y_dot",
+                 const std::string &ic_type = "none",
+                 const std::string &reset_type = "none",
                  const double &ic_alpha = .33,
                  const unsigned int &ic_max_iter = 5,
                  const unsigned int &max_non_linear_iterations = 10,
