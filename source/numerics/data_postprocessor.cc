@@ -149,6 +149,61 @@ get_needed_update_flags () const
 }
 
 
+
+
+// -------------------------- DataPostprocessorTensor ---------------------------
+
+template <int dim>
+DataPostprocessorTensor<dim>::
+DataPostprocessorTensor (const std::string &name,
+                         const UpdateFlags  update_flags)
+  :
+  name (name),
+  update_flags (update_flags)
+{}
+
+
+
+template <int dim>
+std::vector<std::string>
+DataPostprocessorTensor<dim>::
+get_names () const
+{
+  static_assert (dim <= 3,
+                 "The following variable needs to be expanded for dim>3");
+  static const char suffixes[] = { 'x', 'y', 'z' };
+
+  std::vector<std::string> names;
+  for (unsigned int d=0; d<dim; ++d)
+    for (unsigned int e=0; e<dim; ++e)
+      names.push_back (name + '_' + suffixes[d] + suffixes[e]);
+  return names;
+}
+
+
+
+template <int dim>
+std::vector<DataComponentInterpretation::DataComponentInterpretation>
+DataPostprocessorTensor<dim>::
+get_data_component_interpretation () const
+{
+  return
+    std::vector<DataComponentInterpretation::DataComponentInterpretation>
+    (dim*dim, DataComponentInterpretation::component_is_scalar);
+}
+
+
+template <int dim>
+UpdateFlags
+DataPostprocessorTensor<dim>::
+get_needed_update_flags () const
+{
+  return update_flags;
+}
+
+
+
+
 // explicit instantiation
 #include "data_postprocessor.inst"
 

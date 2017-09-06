@@ -64,7 +64,8 @@ namespace DataPostprocessorInputs
    * DataPostprocessor is typically called from classes such as DataOut
    * or DataOutFaces that evaluate solution fields on a cell-by-cell
    * basis. As a consequence, classes derived from DataPostprocessor
-   * (or DataPostprocessorScalar or DataPostprocessorVector) sometimes
+   * (or DataPostprocessorScalar, DataPostprocessorVector, or
+   * DataPostprocessorTensor) sometimes
    * need to use which cell is currently under investigation. Consequently,
    * DataOut and similar classes pass the cell they are currently working
    * on to DataPostprocessor via the classes in this namespace (and
@@ -156,9 +157,9 @@ namespace DataPostprocessorInputs
      * DataPostprocessor::get_needed_update_flags(), and the function
      * returns (possibly among other flags)
      * UpdateFlags::update_normal_vectors.  Alternatively, a class
-     * derived from DataPostprocessorScalar or DataPostprocessorVector
-     * may pass this flag to the constructor of
-     * DataPostprocessorScalar or DataPostprocessorVector.
+     * derived from DataPostprocessorScalar, DataPostprocessorVector,
+     * or DataPostprocessorTensor may pass this flag to the constructor of
+     * these three classes.
      */
     std::vector<Tensor<1, spacedim> > normals;
 
@@ -170,9 +171,9 @@ namespace DataPostprocessorInputs
      * DataPostprocessor::get_needed_update_flags(), and the function
      * returns (possibly among other flags)
      * UpdateFlags::update_quadrature_points.  Alternatively, a class
-     * derived from DataPostprocessorScalar or DataPostprocessorVector
-     * may pass this flag to the constructor of
-     * DataPostprocessorScalar or DataPostprocessorVector.
+     * derived from DataPostprocessorScalar, DataPostprocessorVector,
+     * or DataPostprocessorTensor may pass this flag to the constructor of
+     * these three classes.
      */
     std::vector<Point<spacedim> >     evaluation_points;
 
@@ -239,10 +240,10 @@ namespace DataPostprocessorInputs
      * This array is only filled if a user-derived class overloads the
      * DataPostprocessor::get_needed_update_flags(), and the function
      * returns (possibly among other flags)
-     * UpdateFlags::update_gradients.  Alternatively, a class derived
-     * from DataPostprocessorScalar or DataPostprocessorVector may
-     * pass this flag to the constructor of DataPostprocessorScalar or
-     * DataPostprocessorVector.
+     * UpdateFlags::update_gradients.  Alternatively, a class
+     * derived from DataPostprocessorScalar, DataPostprocessorVector,
+     * or DataPostprocessorTensor may pass this flag to the constructor of
+     * these three classes.
      */
     std::vector<Tensor<1, spacedim> > solution_gradients;
 
@@ -254,10 +255,10 @@ namespace DataPostprocessorInputs
      * This array is only filled if a user-derived class overloads the
      * DataPostprocessor::get_needed_update_flags(), and the function
      * returns (possibly among other flags)
-     * UpdateFlags::update_hessians.  Alternatively, a class derived
-     * from DataPostprocessorScalar or DataPostprocessorVector may
-     * pass this flag to the constructor of DataPostprocessorScalar or
-     * DataPostprocessorVector.
+     * UpdateFlags::update_hessians.  Alternatively, a class
+     * derived from DataPostprocessorScalar, DataPostprocessorVector,
+     * or DataPostprocessorTensor may pass this flag to the constructor of
+     * these three classes.
      */
     std::vector<Tensor<2, spacedim> > solution_hessians;
   };
@@ -303,10 +304,10 @@ namespace DataPostprocessorInputs
      * This array is only filled if a user-derived class overloads the
      * DataPostprocessor::get_needed_update_flags(), and the function
      * returns (possibly among other flags)
-     * UpdateFlags::update_gradients.  Alternatively, a class derived
-     * from DataPostprocessorScalar or DataPostprocessorVector may
-     * pass this flag to the constructor of DataPostprocessorScalar or
-     * DataPostprocessorVector.
+     * UpdateFlags::update_gradients.  Alternatively, a class
+     * derived from DataPostprocessorScalar, DataPostprocessorVector,
+     * or DataPostprocessorTensor may pass this flag to the constructor of
+     * these three classes.
      */
     std::vector<std::vector<Tensor<1, spacedim> > > solution_gradients;
 
@@ -322,10 +323,10 @@ namespace DataPostprocessorInputs
      * This array is only filled if a user-derived class overloads the
      * DataPostprocessor::get_needed_update_flags(), and the function
      * returns (possibly among other flags)
-     * UpdateFlags::update_hessians.  Alternatively, a class derived
-     * from DataPostprocessorScalar or DataPostprocessorVector may
-     * pass this flag to the constructor of DataPostprocessorScalar or
-     * DataPostprocessorVector.
+     * UpdateFlags::update_hessians.  Alternatively, a class
+     * derived from DataPostprocessorScalar, DataPostprocessorVector,
+     * or DataPostprocessorTensor may pass this flag to the constructor of
+     * these three classes.
      */
     std::vector<std::vector<Tensor<2, spacedim> > > solution_hessians;
   };
@@ -400,16 +401,20 @@ namespace DataPostprocessorInputs
  * (evaluate_scalar_field() or evaluate_vector_field(), get_names(), get_update_flags() and
  * get_data_component_interpretation()).
  *
- * To this end there are two classes DataPostprocessorScalar and
- * DataPostprocessorVector that are meant to be used if the output quantity is
- * either a single scalar or a single vector (here used meaning to have
- * exactly dim components). When using these classes, one only has to write a
+ * To this end there are three classes DataPostprocessorScalar,
+ * DataPostprocessorVector, and DataPostprocessorTensor that are meant to be
+ * used if the output quantity is either a single scalar, a single vector
+ * (here used meaning to have exactly @p dim components), or a single
+ * tensor (here used meaning to have exactly <code>dim*dim</code> components).
+ * When using these classes, one only has to write a
  * constructor that passes the name of the output variable and the update
  * flags to the constructor of the base class and overload the function that
  * actually computes the results.
  *
- * The DataPostprocessorVector class documentation also contains an extensive
- * example of how it can be used.
+ * The DataPostprocessorVector and DataPostprocessorTensor class documentations
+ * also contains a extensive examples of how they can be used. The step-29
+ * tutorial program contains an example of using the DataPostprocessorScalar
+ * class.
  *
  *
  * @ingroup output
@@ -467,7 +472,7 @@ public:
   virtual std::vector<std::string> get_names () const = 0;
 
   /**
-   * This functions returns information about how the individual components of
+   * This function returns information about how the individual components of
    * output files that consist of more than one data set are to be
    * interpreted.
    *
@@ -519,6 +524,9 @@ public:
  * DataPostprocessor::evaluate_vector_field().
  *
  * An example of how this class can be used can be found in step-29.
+ * An example of how the closely related DataPostprocessorVector
+ * class can be used is found in the documentation of that class.
+ * The same is true for the DataPostprocessorTensor class.
  *
  * @ingroup output
  * @author Wolfgang Bangerth, 2011
@@ -550,7 +558,7 @@ public:
   virtual std::vector<std::string> get_names () const;
 
   /**
-   * This functions returns information about how the individual components of
+   * This function returns information about how the individual components of
    * output files that consist of more than one data set are to be
    * interpreted. Since the current class is meant to be used for a single
    * scalar result variable, the returned value is obviously
@@ -580,7 +588,7 @@ private:
 /**
  * This class provides a simpler interface to the functionality offered by the
  * DataPostprocessor class in case one wants to compute only a single vector
- * quantity (defined as having exactly dim components) from the finite element
+ * quantity (defined as having exactly @p dim components) from the finite element
  * field passed to the DataOut class. For this particular case, it is clear
  * what the returned value of
  * DataPostprocessor::get_data_component_interpretation() should be and we
@@ -593,7 +601,8 @@ private:
  * DataPostprocessor::evaluate_vector_field().
  *
  * An example of how the closely related class DataPostprocessorScalar is used
- * can be found in step-29.
+ * can be found in step-29. An example of how the DataPostprocessorTensor
+ * class can be used is found in the documentation of that class.
  *
  *
  * <h3> An example </h3>
@@ -750,13 +759,8 @@ private:
  *
  * deal.II does not currently support outputting tensor-valued quantities, but
  * they can of course be output as a collection of scalar-valued components of
- * the tensor. This means that the current class is not applicable any more,
- * but it is not very difficult to derive a true "stress" postprocessor directly
- * from the DataPostprocessor class that simply outputs <code>dim*dim</code>
- * components of the stress vector as scalars and that is structured in a
- * similar way to the postprocessors above. (It has to overload the
- * @p evaluate_vector_field() function, however, given that the solution is
- * vector valued already.)
+ * the tensor. This can be facilitated using the DataPostprocessorTensor
+ * class. The documentation of that class contains an example.
  *
  *
  * @ingroup output
@@ -789,7 +793,246 @@ public:
   virtual std::vector<std::string> get_names () const;
 
   /**
-   * This functions returns information about how the individual components of
+   * This function returns information about how the individual components of
+   * output files that consist of more than one data set are to be
+   * interpreted. Since the current class is meant to be used for a single
+   * vector result variable, the returned value is obviously
+   * DataComponentInterpretation::component_is_part repeated dim times.
+   */
+  virtual
+  std::vector<DataComponentInterpretation::DataComponentInterpretation>
+  get_data_component_interpretation () const;
+
+  /**
+   * Return which data has to be provided to compute the derived quantities.
+   * The flags returned here are the ones passed to the constructor of this
+   * class.
+   */
+  virtual UpdateFlags get_needed_update_flags () const;
+
+private:
+  /**
+   * Copies of the two arguments given to the constructor of this class.
+   */
+  const std::string name;
+  const UpdateFlags update_flags;
+};
+
+
+
+/**
+ * This class provides a simpler interface to the functionality offered by the
+ * DataPostprocessor class in case one wants to compute only a single tensor
+ * quantity (defined as having exactly <code>dim*dim</code> components) from
+ * the finite element field passed to the DataOut class.
+ *
+ * For this case, we would like to output all of these components as parts
+ * of a tensor-valued quantity. Unfortunately, the various backends that
+ * write DataOut data in graphical file formats (see the DataOutBase
+ * namespace for what formats can be written) do not support tensor data
+ * at the current time. In fact, neither does the DataComponentInterpretation
+ * namespace that provides semantic information how individual components
+ * of graphical data should be interpreted. Nevertheless, like
+ * DataPostprocessorScalar and DataPostprocessorVector, this class helps
+ * with setting up what the get_names() and get_needed_update_flags()
+ * functions required by the DataPostprocessor base class should return,
+ * and so the current class implements these based on information that
+ * the constructor of the current class receives from further derived
+ * classes.
+ *
+ * (In order to visualize this collection of scalar fields that, together,
+ * are then supposed to be interpreted as a tensor, one has to (i) use a
+ * visualization program that can visualize tensors, and (ii) teach it
+ * how to re-combine the scalar fields into tensors. In the case of
+ * Visit -- see https://wci.llnl.gov/simulation/computer-codes/visit/ --
+ * this is done by creating a new "Expression": in essence, one creates
+ * a variable, say "grad_u", that is tensor-valued and whose value is
+ * given by the expression <code>{{grad_u_xx,grad_u_xy},
+ * {grad_u_yx, grad_u_yy}}</code>, where the referenced variables are
+ * the names of scalar fields that, here, are produced by the example
+ * below. Visit is then able to visualize this "new" variable as a
+ * tensor.)
+ *
+ * All derived classes have to do is implement a constructor and overload
+ * either DataPostprocessor::evaluate_scalar_field() or
+ * DataPostprocessor::evaluate_vector_field().
+ *
+ * An example of how the closely related class DataPostprocessorScalar is used
+ * can be found in step-29. An example of how the DataPostprocessorVector
+ * class can be used is found in the documentation of that class.
+ *
+ *
+ * <h3> An example </h3>
+ *
+ * A common example of what one wants to do with postprocessors is to visualize
+ * not just the value of the solution, but the gradient. This class is meant for
+ * tensor-valued outputs, so we will start with a vector-valued solution: the
+ * displacement field of step-8. The gradient is a rank-2 tensor (with exactly
+ * <code>dim*dim</code> components), so the
+ * current class fits the bill to produce the gradient through postprocessing.
+ * Then, the following code snippet implements everything you need to have
+ * to visualize the gradient:
+ * @code
+ *   template <int dim>
+ *   class GradientPostprocessor : public DataPostprocessorTensor<dim>
+ *   {
+ *   public:
+ *     GradientPostprocessor ()
+ *       :
+ *       DataPostprocessorTensor<dim> ("grad_u",
+ *                                     update_gradients)
+ *     {}
+ *
+ *     virtual
+ *     void
+ *     evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
+ *                            std::vector<Vector<double> >               &computed_quantities) const
+ *     {
+ *       // ensure that there really are as many output slots
+ *       // as there are points at which DataOut provides the
+ *       // gradients:
+ *       AssertDimension (input_data.solution_gradients.size(),
+ *                        computed_quantities.size());
+ *
+ *       for (unsigned int p=0; p<input_data.solution_gradients.size(); ++p)
+ *         {
+ *           // ensure that each output slot has exactly 'dim*dim'
+ *           // components (as should be expected, given that we
+ *           // want to create tensor-valued outputs), and copy the
+ *           // gradients of the solution at the evaluation points
+ *           // into the output slots:
+ *           AssertDimension (computed_quantities[p].size(),
+ *                            (Tensor<2,dim>::n_independent_components));
+ *           for (unsigned int d=0; d<dim; ++d)
+ *             for (unsigned int e=0; e<dim; ++e)
+ *               computed_quantities[p][Tensor<2,dim>::component_to_unrolled_index(TableIndices<2>(d,e)]
+ *                 = input_data.solution_gradients[p][d][e];
+ *         }
+ *     }
+ *   };
+ * @endcode
+ * The only tricky part in this piece of code is how to sort the <code>dim*dim</code>
+ * elements of the strain tensor into the one vector of computed output
+ * quantities -- in other words, how to <i>unroll</i> the elements of
+ * the tensor into the vector. This is facilitated by the
+ * Tensor::component_to_unrolled_index() function that takes a
+ * pair of indices that specify a particular element of the
+ * tensor and returns a vector index that is then used in the code
+ * above to fill the @p computed_quantities array.
+ *
+ * The last thing that is necessary is to add another output to the call
+ * of DataOut::add_vector() in the @p output_results() function of the @p Step8
+ * class of that example program. The corresponding code snippet would then look
+ * like this:
+ * @code
+ *     GradientPostprocessor<dim> grad_u;
+ *
+ *     DataOut<dim> data_out;
+ *     data_out.attach_dof_handler (dof_handler);
+ *
+ *     std::vector<DataComponentInterpretation::DataComponentInterpretation>
+ *     data_component_interpretation
+ *     (dim, DataComponentInterpretation::component_is_part_of_vector);
+ *     data_out.add_data_vector (solution, std::vector<std::string>(dim,"displacement"),
+ *                               DataOut<dim>::type_dof_data,
+ *                               data_component_interpretation);
+ *     data_out.add_data_vector (solution, grad_u);
+ *     data_out.build_patches ();
+ *     data_out.write_vtk (output);
+ * @endcode
+ *
+ * This leads to the following output for the displacement field (i.e., the
+ * solution) and the gradients (you may want to compare with the solution shown
+ * in the results section of step-8; the current data is generated on a uniform
+ * mesh for simplicity):
+ *
+ * @image html data_postprocessor_tensor_0.png
+ * @image html data_postprocessor_tensor_1.png
+ *
+ * These pictures show an ellipse representing the gradient tensor at, on average,
+ * every tenth mesh point. You may want to read through the documentation of the
+ * Visit visualization program (see https://wci.llnl.gov/simulation/computer-codes/visit/)
+ * for an interpretation of how exactly tensors are visualizated.
+ *
+ * In elasticity, one is often interested not in the gradient of the displacement,
+ * but in the "strain", i.e., the symmetrized version of the gradient
+ * $\varepsilon=\frac 12 (\nabla u + \nabla u^T)$. This is easily facilitated with
+ * the following minor modification:
+ * @code
+ *   template <int dim>
+ *   class StrainPostprocessor : public DataPostprocessorTensor<dim>
+ *   {
+ *   public:
+ *     StrainPostprocessor ()
+ *       :
+ *       DataPostprocessorTensor<dim> ("strain",
+ *                                     update_gradients)
+ *     {}
+ *
+ *     virtual
+ *     void
+ *     evaluate_vector_field (const DataPostprocessorInputs::Vector<dim> &input_data,
+ *                            std::vector<Vector<double> >               &computed_quantities) const
+ *     {
+ *       AssertDimension (input_data.solution_gradients.size(),
+ *                        computed_quantities.size());
+ *
+ *       for (unsigned int p=0; p<input_data.solution_gradients.size(); ++p)
+ *         {
+ *           AssertDimension (computed_quantities[p].size(),
+ *                            (Tensor<2,dim>::n_independent_components));
+ *           for (unsigned int d=0; d<dim; ++d)
+ *             for (unsigned int e=0; e<dim; ++e)
+ *               computed_quantities[p][Tensor<2,dim>::component_to_unrolled_index(TableIndices<2>(d,e))]
+ *                 = (input_data.solution_gradients[p][d][e]
+ *                    +
+ *                    input_data.solution_gradients[p][e][d]) / 2;
+ *         }
+ *     }
+ *   };
+ * @endcode
+ *
+ * Using this class in in step-8 leads to the following visualization:
+ *
+ * @image html data_postprocessor_tensor_2.png
+ *
+ * Given how easy it is to output the strain, it would also not be very
+ * complicated to write a postprocessor that computes the <i>stress</i>
+ * in the solution field as the stress is easily computed from the
+ * strain by multiplication with either the strain-stress tensor or,
+ * in simple cases, the Lam&eacute; constants.
+ *
+ * @ingroup output
+ * @author Wolfgang Bangerth, 2017
+ */
+template <int dim>
+class DataPostprocessorTensor : public DataPostprocessor<dim>
+{
+public:
+  /**
+   * Constructor. Take the name of the single vector variable computed by
+   * classes derived from the current one, as well as the update flags
+   * necessary to compute this quantity.
+   *
+   * @param name The name by which the vector variable computed by this class
+   * should be made available in graphical output files.
+   * @param update_flags This has to be a combination of @p update_values, @p
+   * update_gradients and @p update_hessians. If the DataPostprocessor is to
+   * be used in combination with DataOutFaces, you may also ask for a update
+   * of normals via the @p update_normal_vectors flag.
+   */
+  DataPostprocessorTensor (const std::string &name,
+                           const UpdateFlags  update_flags);
+
+  /**
+   * Return the vector of strings describing the names of the computed
+   * quantities. Given the purpose of this class, this is a vector with dim
+   * entries all equal to the name given to the constructor.
+   */
+  virtual std::vector<std::string> get_names () const;
+
+  /**
+   * This function returns information about how the individual components of
    * output files that consist of more than one data set are to be
    * interpreted. Since the current class is meant to be used for a single
    * vector result variable, the returned value is obviously
