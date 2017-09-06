@@ -276,11 +276,10 @@ namespace SUNDIALS
         diff_id   = N_VNew_Serial(system_size);
         abs_tolls = N_VNew_Serial(system_size);
       }
-    reset_dae(initial_time,
-              solution,
-              solution_dot,
-              initial_step_size,
-              true);
+    reset(initial_time,
+          initial_step_size,
+          solution,
+          solution_dot);
 
     double next_time = initial_time;
 
@@ -305,28 +304,12 @@ namespace SUNDIALS
         copy(solution, yy);
         copy(solution_dot, yp);
 
-        // Check the solution
-        bool reset = solver_should_restart(t,
-                                           solution,
-                                           solution_dot);
-
-
-        while (reset)
-          {
-            // double frac = 0;
-            int k = 0;
-            IDAGetLastOrder(ida_mem, &k);
-            // frac = std::pow((double)k,2.);
-            reset_dae(t, solution, solution_dot,
-                      h/2.0, false);
-            reset = solver_should_restart(t,
-                                          solution,
-                                          solution_dot);
-          }
+        while (solver_should_restart(t, solution, solution_dot))
+          reset(t, h, solution, solution_dot);
 
         step_number++;
 
-        output_step(t, solution, solution_dot,  step_number);
+        output_step(t, solution, solution_dot, step_number);
       }
 
     pcout << std::endl;
@@ -352,15 +335,15 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  void IDAInterface<VectorType>::reset_dae(double current_time,
-                                           VectorType &solution,
-                                           VectorType &solution_dot,
-                                           double current_time_step,
-                                           bool first_step)
+  void IDAInterface<VectorType>::reset(const double &current_time,
+                                       const double &current_time_step,
+                                       VectorType &solution,
+                                       VectorType &solution_dot)
   {
 
     unsigned int system_size;
     unsigned int local_system_size;
+    bool first_step = (current_time == initial_time);
 
     if (ida_mem)
       IDAFree(&ida_mem);

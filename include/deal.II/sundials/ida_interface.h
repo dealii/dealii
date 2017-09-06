@@ -48,13 +48,14 @@ DEAL_II_NAMESPACE_OPEN
 namespace SUNDIALS
 {
 
-  /** Interface to SUNDIALS IDA library.
+  /**
+   * Interface to SUNDIALS IDA (Implicit Differential-Algebraic) solver.
    *
    * The class IDAInterface is a wrapper to the Implicit
    * Differential-Algebraic solver which is a general purpose solver for
    * systems of Differential-Algebraic Equations (DAEs).
    *
-   * The user has to provide the implmentation of the following std::functions:
+   * The user has to provide the implementation of the following std::functions:
    *  - create_new_vector;
    *  - residual;
    *  - setup_jacobian;
@@ -76,46 +77,46 @@ namespace SUNDIALS
    *   \end{cases}
    * \f]
    *
-   * where \f$y,\dot y\f$ are vectors in \f$\R^n\f$, \f$t\f$ is often the time (but can
+   * where $y,\dot y$ are vectors in $\R^n$, $t$ is often the time (but can
    * also be a parametric quantity), and
-   * \f$F:\R\times\R^n\times\R^n\rightarrow\R^n\f$. Such problem is solved
+   * $F:\R\times\R^n\times\R^n\rightarrow\R^n$. Such problem is solved
    * using Newton iteration augmented with a line search global
-   * strategy. The integration method used in ida is the variable-order,
+   * strategy. The integration method used in IDA is the variable-order,
    * variable-coefficient BDF (Backward Differentiation Formula), in
    * fixed-leading-coefficient. The method order ranges from 1 to 5, with
-   * the BDF of order \f$q\f$ given by the multistep formula
+   * the BDF of order $q$ given by the multistep formula
    *
    * \f[
-   *   \sum\limits_{i=0}^q \alpha_{n,i}\,y_{n-i}=h_n\,\dot y_n\, ,
+   *   \sum_{i=0}^q \alpha_{n,i}\,y_{n-i}=h_n\,\dot y_n\, ,
    *   \label{eq:bdf}
    * \f]
    *
-   * where \f$y_n\f$ and \f$\dot y_n\f$ are the computed approximations of \f$y(t_n)\f$
-   * and \f$\dot y(t_n)\f$, respectively, and the step size is
-   * \f$h_n=t_n-t_{n-1}\f$. The coefficients \f$\alpha_{n,i}\f$ are uniquely
-   * determined by the order \f$q\f$, and the history of the step sizes. The
+   * where $y_n$ and $\dot y_n$ are the computed approximations of $y(t_n)$
+   * and $\dot y(t_n)$, respectively, and the step size is
+   * $h_n=t_n-t_{n-1}$. The coefficients $\alpha_{n,i}$ are uniquely
+   * determined by the order $q$, and the history of the step sizes. The
    * application of the BDF method to the DAE system results in a nonlinear algebraic
    * system to be solved at each time step:
    *
    * \f[
-   *   G(y_n)\equiv F\left(t_n,y_n,\dfrac{1}{h_n}\sum\limits_{i=0}^q \alpha_{n,i}\,y_{n-i}\right)=0\, .
-   *   \label{eq:nonlinear}
-   * \end{equation}
+   *   G(y_n)\equiv F\left(t_n,y_n,\dfrac{1}{h_n}\sum_{i=0}^q
+   *  \alpha_{n,i}\,y_{n-i}\right)=0\, .
+   * \f]
    * The Newton method leads to a linear system of the form
-   * \begin{equation}
+   * \f[
    *   J[y_{n(m+1)}-y_{n(m)}]=-G(y_{n(m)})\, ,
-   *   \label{eq:linear}
    * \f]
    *
-   * where \f$y_{n(m)}\f$ is the \f$m\f$-th approximation to \f$y_n\f$, \f$J\f$ is the approximation of the system Jacobian
+   *where $y_{n(m)}$ is the $m$-th approximation to $y_n$, and $J$ is the
+   *approximation of the system Jacobian
    *
    * \f[
-   *   J=\dfrac{\partial G}{\partial y} = \dfrac{\partial F}{\partial y} + \alpha \dfrac{\partial F}{\partial \dot y}\, ,
-   *   \label{eq:jacobian}
+   *   J=\dfrac{\partial G}{\partial y} = \dfrac{\partial F}{\partial y} +
+   *  \alpha \dfrac{\partial F}{\partial \dot y}\, ,
    * \f]
    *
-   * and \f$\alpha = \alpha_{n,0}/h_n\f$. It is worthing metioning that the
-   * scalar \f$\alpha\f$ changes whenever the step size or method order
+   * and $\alpha = \alpha_{n,0}/h_n$. It is worth metioning that the
+   * scalar $\alpha$ changes whenever the step size or method order
    * changes.
    *
    * @author Luca Heltai, Alberto Sartori, 2017.
@@ -232,23 +233,45 @@ namespace SUNDIALS
                            VectorType &solution_dot);
 
     /**
-     * Clear internal memory, and start with clean objects. This function is
-     * called when the simulation start and when the user return true to a call
-     * to solver_should_restart()
+     * Clear internal memory and start with clean objects. This function is
+     * called when the simulation start and when the user returns true to a
+     * call to solver_should_restart().
+     *
+     * By default solver_should_restart returns false. If the user needs to
+     * implement, for example, local adaptivity in space, he or she may assign
+     * a different function to solver_should_restart() that performs all mesh
+     * changes, transfers the solution and the solution dot to the new mesh, and
+     * returns true.
+     *
+     * During reset(), both y and yp are checked for consistency, and according to
+     * what was specified as ic_type (if t==initial_time) or reset_type (if
+     * t>initial_time), yp, y, or both are modified to obtain a consistent set
+     * of initial data.
+     *
+     * @param[in] t  The new starting time
+     * @param[in] h  The new (tentative) starting time step
+     * @param[in,out] y   The new (tentative) initial solution
+     * @param[in,out] yp  The new (tentative) initial solution_dot
      */
-    void reset_dae(const double t,
-                   VectorType &y,
-                   VectorType &yp,
-                   double h,
-                   bool first_step);
+    void reset(const double &t,
+               const double &h,
+               VectorType &y,
+               VectorType &yp);
 
     /**
-     * Return a newly allocated shared_ptr<VectorType>.
+     * Return a newly allocated unique_ptr<VectorType>.
      */
-    std::function<std::shared_ptr<VectorType>()> create_new_vector;
+    std::function<std::unique_ptr<VectorType>()> create_new_vector;
 
     /**
      * Compute residual.
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error (IDAReinit will be called if this happens, and
+     *       then last function will be attempted again
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const double t,
                       const VectorType &y,
@@ -257,6 +280,13 @@ namespace SUNDIALS
 
     /**
      * Compute Jacobian.
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error (IDAReinit will be called if this happens, and
+     *       then last function will be attempted again
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const double t,
                       const VectorType &y,
@@ -265,6 +295,13 @@ namespace SUNDIALS
 
     /**
      * Solve linear system.
+     *
+     * This function should return:
+     * - 0: Success
+     * - >0: Recoverable error (IDAReinit will be called if this happens, and
+     *       then last function will be attempted again
+     * - <0: Unrecoverable error the computation will be aborted and an assertion
+     *       will be thrown.
      */
     std::function<int(const VectorType &rhs, VectorType &dst)> solve_jacobian_system;
 
@@ -283,25 +320,32 @@ namespace SUNDIALS
      * This function is supposed to perform all operations that are necessary in
      * `sol` and `sol_dot` to make sure that the resulting vectors are
      * consistent, and of the correct final size.
+     *
+     * For example, one may decide that a local refinement is necessary at time
+     * t. This function should then return true, and change the dimension of
+     * both sol and sol_dot to reflect the new dimension. Since IDA does not
+     * know about the new dimension, an internal reset is necessary.
      */
     std::function<bool (const double t,
                         VectorType &sol,
                         VectorType &sol_dot)> solver_should_restart;
 
     /**
-     * Return a vector whose component are 1 if the corresponding
-     * dof is differential, 0 if algebraic.
+     * Return an index set containing the differential components.
+     * Implementation of this function is optional. If you do not provide such
+     * implementation, you cannot use `use_y_diff` as an option for automatic
+     * calculation of differential components as initial value, and you cannot
+     * exclude the algebraic components from the computation of the errors.
      */
-    std::function<VectorType&()> differential_components;
+    std::function<IndexSet()> differential_components;
 
     /**
-     * Return a vector whose components are the weights used by IDA to
-     * compute the vector norm. The implementation of this function
-     * is optional.
+     * Return a vector whose components are the weights used by IDA to compute
+     * the vector norm. The implementation of this function is optional, and it
+     * is used only when `use_local_tolerances` is set to true at construction
+     * time, or through the parameter file.
      */
     std::function<VectorType&()> get_local_tolerances;
-
-
 
     /**
      * Set initial time equal to @p t disregarding what is written
@@ -382,7 +426,7 @@ namespace SUNDIALS
      *
      * IDA is a Differential Algebraic solver. As such, it requires initial conditions also for
      * the first order derivatives. If you do not provide consistent initial conditions, (i.e.,
-     * conditions for which F(y_dot(0), y(0), 0) = 0), you can ask SUNDIALS to compute initial
+     * conditions for which $F(y_dot(0), y(0), 0) = 0$), you can ask SUNDIALS to compute initial
      * conditions for you by using the `ic_type` parameter at construction time.
      *
      * You have three options
@@ -392,6 +436,12 @@ namespace SUNDIALS
      *    This option requires that the user specifies differential and
      *    algebraic components in the function get_differential_components.
      * -  use_y_dot: compute all components of y, given y_dot.
+     *
+     * Notice that you could in principle use this capabilities to solve for
+     * stady state problems by setting y_dot to zero, and asking to compute
+     * $y(0)$ that satisfies $F(0, y(0), 0) = 0$, however the nonlinear solver
+     * used inside IDA may not be robust enough for complex problems with
+     * several millions unknowns.
      */
     std::string ic_type;
 
@@ -439,27 +489,27 @@ namespace SUNDIALS
     bool use_local_tolerances;
 
     /**
-     * Ida memory object.
+     * IDA memory object.
      */
     void *ida_mem;
 
     /**
-     * Ida solution vector.
+     * IDA solution vector.
      */
     N_Vector yy;
 
     /**
-     * Ida solution derivative vector.
+     * IDA solution derivative vector.
      */
     N_Vector yp;
 
     /**
-     * Ida absolute tolerances vector.
+     * IDA absolute tolerances vector.
      */
     N_Vector abs_tolls;
 
     /**
-     * Ida differential components vector.
+     * IDA differential components vector.
      */
     N_Vector diff_id;
 
