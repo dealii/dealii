@@ -81,10 +81,10 @@ namespace MeshWorker
     assemble_boundary_faces = 0x0040,
 
     /**
-     * Assemble cell integrals before face integrals. If not specified, cells
-     * will be assembled after faces and boundaries.
+     * By default we assemble cell integrals before face integrals. If this
+     * flag is specified, cells will be assembled after faces and boundaries.
      */
-    cells_first = 0x0080,
+    cells_after_faces = 0x0080,
 
     /**
      * Combination of flags to determine if any work on cells is done.

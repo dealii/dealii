@@ -93,16 +93,16 @@ void test()
             assemble_boundary_faces,
             boundary_worker);
 
-  deallog << "CELLS AND BOUNDARY" << std::endl << std::endl;
+  deallog << "CELLS LAST AND BOUNDARY" << std::endl << std::endl;
 
   mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
-            assemble_own_cells | assemble_boundary_faces,
+            assemble_own_cells | assemble_boundary_faces | cells_after_faces,
             boundary_worker);
 
   deallog << "CELLS FIRST AND BOUNDARY" << std::endl << std::endl;
 
   mesh_loop(cell, endc, cell_worker, copier, scratch, copy,
-            assemble_own_cells | cells_first | assemble_boundary_faces,
+            assemble_own_cells | assemble_boundary_faces,
             boundary_worker);
 
 
