@@ -547,7 +547,6 @@ namespace FETools
 
 
 
-
   /**
    * This method implements the
    * FETools::compute_projection_from_quadrature_points_matrix method for
@@ -1351,7 +1350,4 @@ namespace FETools
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*----------------------------   fe_tools.h     ---------------------------*/
-/* end of #ifndef dealii_fe_tools_H */
-#endif
-/*----------------------------   fe_tools.h     ---------------------------*/
+#endif /* dealii_fe_tools_H */
