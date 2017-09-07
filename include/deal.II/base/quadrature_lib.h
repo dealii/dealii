@@ -526,8 +526,6 @@ public:
 
 };
 
-/*@}*/
-
 /**
  * Gauss-Chebyshev quadrature rules integrate the weighted product
  * $\int_{-1}^1 f(x) w(x) dx$ with weight given by: $w(x) = 1/\sqrt{1-x^2}$.
@@ -648,6 +646,8 @@ private:
   get_quadrature_weights(const unsigned int n);
 
 };
+
+/*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
 
