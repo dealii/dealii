@@ -84,8 +84,7 @@ struct CPUClock
  * as well as the total time elapsed over all laps. Here is an example:
  *
  * @code
- *   Timer timer;
- *   timer.start();
+ *   Timer timer; // creating a timer also starts it
  *
  *   // do some complicated computations here
  *   // ...
@@ -102,7 +101,10 @@ struct CPUClock
  * Alternatively, you can also restart the timer instead of resetting it. The
  * times between successive calls to start() and stop() (i.e., the laps) will
  * then be accumulated. The usage of this class is also explained in the
- * step-28, step-29 and step-30 tutorial programs.
+ * step-28 tutorial program.
+ *
+ * @note The TimerOutput (combined with TimerOutput::Scope) class provide a
+ * convenient way to time multiple named sections and summarize the output.
  *
  * @note Implementation of this class is system dependent. In particular, CPU
  * times are accumulated from summing across all threads and will usually
@@ -540,8 +542,8 @@ private:
  *                      TimerOutput::wall_times);
  * @endcode
  * Here, <code>pcout</code> is an object of type ConditionalOStream that makes
- * sure that we only generate output on a single processor. See the step-32
- * and step-40 tutorial programs for this kind of usage of this class.
+ * sure that we only generate output on a single processor. See the step-32,
+ * step-40, and step-42 tutorial programs for this kind of usage of this class.
  *
  * @ingroup utilities
  * @author M. Kronbichler, 2009.

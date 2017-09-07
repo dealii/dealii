@@ -433,7 +433,6 @@ namespace Step29
     // compute execution time when this function is done:
     deallog << "Generating grid... ";
     Timer timer;
-    timer.start ();
 
     // Then we query the values for the focal distance of the transducer lens
     // and the number of mesh refinement steps from our ParameterHandler
@@ -525,7 +524,6 @@ namespace Step29
   {
     deallog << "Setting up system... ";
     Timer timer;
-    timer.start();
 
     dof_handler.distribute_dofs (fe);
 
@@ -558,7 +556,6 @@ namespace Step29
   {
     deallog << "Assembling system matrix... ";
     Timer timer;
-    timer.start ();
 
     // First we query wavespeed and frequency from the ParameterHandler object
     // and store them in local variables, as they will be used frequently
@@ -805,7 +802,6 @@ namespace Step29
   {
     deallog << "Solving linear system... ";
     Timer timer;
-    timer.start ();
 
     // The code to solve the linear system is short: First, we allocate an
     // object of the right type. The following <code>initialize</code> call
@@ -843,7 +839,6 @@ namespace Step29
   {
     deallog << "Generating output... ";
     Timer timer;
-    timer.start ();
 
     // Define objects of our <code>ComputeIntensity</code> class and a DataOut
     // object:

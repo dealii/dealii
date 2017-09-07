@@ -804,7 +804,6 @@ namespace Step37
   void LaplaceProblem<dim>::setup_system ()
   {
     Timer time;
-    time.start ();
     setup_time = 0;
 
     system_matrix.clear();
