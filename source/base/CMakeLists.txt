@@ -62,6 +62,7 @@ SET(_unity_include_src
   polynomials_piecewise.cc
   polynomials_rannacher_turek.cc
   polynomials_raviart_thomas.cc
+  polynomials_rt_bubbles
   quadrature.cc
   quadrature_lib.cc
   quadrature_selector.cc
