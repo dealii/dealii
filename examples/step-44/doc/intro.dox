@@ -434,7 +434,7 @@ The third is the definition of the pressure $\widetilde{p}$.
 
 @note The simplified single-field derivation ($\mathbf{u}$ is the only primary variable) below makes it clear how we transform the limits of integration to the reference domain:
 @f{align*}
-\int_{\Omega}\delta \mathbf{u} \cdot [ \boldsymbol{\sigma} + \mathbf{b}^\text{p}]~\mathrm{d}v
+\int_{\Omega}\delta \mathbf{u} \cdot [\textrm{div}\ \boldsymbol{\sigma} + \mathbf{b}^\text{p}]~\mathrm{d}v
 &=
 \int_{\Omega} [-\mathrm{grad}\delta \mathbf{u}:\boldsymbol{\sigma} + \delta \mathbf{u} \cdot\mathbf{b}^\text{p}]~\mathrm{d}v
   + \int_{\partial \Omega} \delta \mathbf{u} \cdot \mathbf{t}^\text{p}~\mathrm{d}a \\
