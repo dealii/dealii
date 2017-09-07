@@ -882,7 +882,7 @@ namespace VectorTools
    *  dof_handler,
    *  constraints,
    *  quadrature_formula,
-   *  [=] (const typename DoFHandler<dim>::active_cell_iterator & cell, const unsigned int q) -> double
+   *  [&] (const typename DoFHandler<dim>::active_cell_iterator & cell, const unsigned int q) -> double
    *  { return qp_data.get_data(cell)[q]->density; },
    *  field);
    * @endcode
@@ -910,7 +910,7 @@ namespace VectorTools
    * (matrix_free_data,
    *  constraints,
    *  3,
-   *  [=] (const unsigned int cell, const unsigned int q) -> VectorizedArray<double>
+   *  [&] (const unsigned int cell, const unsigned int q) -> VectorizedArray<double>
    *  { return qp_data(cell,q); },
    *  field);
    * @endcode
