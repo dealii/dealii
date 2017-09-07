@@ -536,7 +536,7 @@ public:
  * we rescale the quadrature formula so that it is defined on the interval
  * $[0,1]$ instead of $[-1,1]$. So the quadrature formulas integrate exactly
  * the integral $\int_0^1 f(x) w(x) dx$ with the weight: $w(x) =
- * 1/sqrt{x(1-x)}$. For details see: M. Abramowitz & I.A. Stegun: Handbook of
+ * 1/\sqrt{x(1-x)}$. For details see: M. Abramowitz & I.A. Stegun: Handbook of
  * Mathematical Functions, par. 25.4.38
  *
  * @author Giuseppe Pitton, Luca Heltai 2015
@@ -569,7 +569,7 @@ private:
  * of quadrature points. Here we rescale the quadrature formula so that it is
  * defined on the interval $[0,1]$ instead of $[-1,1]$. So the quadrature
  * formulas integrate exactly the integral $\int_0^1 f(x) w(x) dx$ with the
- * weight: $w(x) = 1/sqrt{x(1-x)}$. By default the quadrature is constructed
+ * weight: $w(x) = 1/\sqrt{x(1-x)}$. By default the quadrature is constructed
  * with the left endpoint as quadrature node, but the quadrature node can be
  * imposed at the right endpoint through the variable ep that can assume the
  * values left or right.
@@ -625,7 +625,7 @@ private:
  * where $n$ is the number of quadrature points. Here we rescale the
  * quadrature formula so that it is defined on the interval $[0,1]$ instead of
  * $[-1,1]$. So the quadrature formulas integrate exactly the integral
- * $\int_0^1 f(x) w(x) dx$ with the weight: $w(x) = 1/sqrt{x(1-x)}$. For
+ * $\int_0^1 f(x) w(x) dx$ with the weight: $w(x) = 1/\sqrt{x(1-x)}$. For
  * details see: M. Abramowitz & I.A. Stegun: Handbook of Mathematical
  * Functions, par. 25.4.40
  *
