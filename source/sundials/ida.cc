@@ -49,10 +49,16 @@ namespace SUNDIALS
                        N_Vector rr, void *user_data)
     {
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
+      GrowingVectorMemory<VectorType> mem;
 
-      std::shared_ptr<VectorType> src_yy = solver.create_new_vector();
-      std::shared_ptr<VectorType> src_yp = solver.create_new_vector();
-      std::shared_ptr<VectorType> residual = solver.create_new_vector();
+      VectorType *src_yy = mem.alloc();
+      solver.reinit_vector(*src_yy);
+
+      VectorType *src_yp = mem.alloc();
+      solver.reinit_vector(*src_yp);
+
+      VectorType *residual = mem.alloc();
+      solver.reinit_vector(*residual);
 
       copy(*src_yy, yy);
       copy(*src_yp, yp);
@@ -60,6 +66,10 @@ namespace SUNDIALS
       int err = solver.residual(tt, *src_yy, *src_yp, *residual);
 
       copy(rr, *residual);
+
+      mem.free(src_yy);
+      mem.free(src_yp);
+      mem.free(residual);
 
       return err;
     }
@@ -80,9 +90,13 @@ namespace SUNDIALS
       (void) tmp3;
       (void) resp;
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
+      GrowingVectorMemory<VectorType> mem;
 
-      std::shared_ptr<VectorType> src_yy = solver.create_new_vector();
-      std::shared_ptr<VectorType> src_yp = solver.create_new_vector();
+      VectorType *src_yy = mem.alloc();
+      solver.reinit_vector(*src_yy);
+
+      VectorType *src_yp = mem.alloc();
+      solver.reinit_vector(*src_yp);
 
       copy(*src_yy, yy);
       copy(*src_yp, yp);
@@ -91,6 +105,10 @@ namespace SUNDIALS
                                       *src_yy,
                                       *src_yp,
                                       IDA_mem->ida_cj);
+
+      mem.free(src_yy);
+      mem.free(src_yp);
+
       return err;
     }
 
@@ -108,14 +126,22 @@ namespace SUNDIALS
       (void) yp;
       (void) resp;
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
+      GrowingVectorMemory<VectorType> mem;
 
-      std::shared_ptr<VectorType> dst = solver.create_new_vector();
-      std::shared_ptr<VectorType> src = solver.create_new_vector();
+      VectorType *src = mem.alloc();
+      solver.reinit_vector(*src);
+
+      VectorType *dst = mem.alloc();
+      solver.reinit_vector(*dst);
 
       copy(*src, b);
 
       int err = solver.solve_jacobian_system(*src,*dst);
       copy(b, *dst);
+
+      mem.free(src);
+      mem.free(dst);
+
       return err;
     }
 
@@ -297,9 +323,10 @@ namespace SUNDIALS
                   << std::endl;
           }
         status = IDASolve(ida_mem, next_time, &t, yy, yp, IDA_NORMAL);
+        AssertIDA(status);
 
         status = IDAGetLastStep(ida_mem, &h);
-        AssertThrow(status == 0, ExcMessage("Error in IDA Solver"));
+        AssertIDA(status);
 
         copy(solution, yy);
         copy(solution_dot, yp);
@@ -415,11 +442,13 @@ namespace SUNDIALS
     if (use_local_tolerances)
       {
         copy(abs_tolls, get_local_tolerances());
-        status += IDASVtolerances(ida_mem, rel_tol, abs_tolls);
+        status = IDASVtolerances(ida_mem, rel_tol, abs_tolls);
+        AssertIDA(status);
       }
     else
       {
-        status += IDASStolerances(ida_mem, rel_tol, abs_tol);
+        status = IDASStolerances(ida_mem, rel_tol, abs_tol);
+        AssertIDA(status);
       }
 
     status = IDASetInitStep(ida_mem, current_time_step);
@@ -517,11 +546,9 @@ namespace SUNDIALS
   void IDA<VectorType>::set_functions_to_trigger_an_assert()
   {
 
-    create_new_vector = []() ->std::unique_ptr<VectorType>
+    reinit_vector = [](VectorType &)
     {
-      std::unique_ptr<VectorType> p;
-      AssertThrow(false, ExcFunctionNotProvided("create_new_vector"));
-      return p;
+      AssertThrow(false, ExcFunctionNotProvided("reinit_vector"));
     };
 
     residual = [](const double,
@@ -567,11 +594,14 @@ namespace SUNDIALS
       return false;
     };
 
-    differential_components = []() ->IndexSet
+    differential_components = [&]() ->IndexSet
     {
-      IndexSet i;
-      AssertThrow(false, ExcFunctionNotProvided("differential_components"));
-      return i;
+      GrowingVectorMemory<VectorType> mem;
+      auto v = mem.alloc();
+      reinit_vector(*v);
+      unsigned int size = v->size();
+      mem.free(v);
+      return complete_index_set(size);
     };
 
     get_local_tolerances = []() ->VectorType &

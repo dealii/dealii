@@ -26,7 +26,7 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_view.h>
-
+#include <deal.II/lac/vector_memory.h>
 
 #include <ida/ida.h>
 #include <ida/ida_spils.h>
@@ -56,14 +56,14 @@ namespace SUNDIALS
    * systems of Differential-Algebraic Equations (DAEs).
    *
    * The user has to provide the implementation of the following std::functions:
-   *  - create_new_vector;
+   *  - reinit_vector;
    *  - residual;
    *  - setup_jacobian;
    *  - solve_jacobian_system;
    *
-   * Optionally, also the following functions could be implemented. By default
+   * Optionally, also the following functions could be rewritten. By default
    * they do nothing, or are not required. If you call the constructor in a way
-   * that requires any of the not-implemented functions, an Assertion will be
+   * that requires a not-implemented function, an Assertion will be
    * thrown.
    *  - solver_should_restart;
    *  - differential_components;
@@ -125,6 +125,99 @@ namespace SUNDIALS
    * scalar $\alpha$ changes whenever the step size or method order
    * changes.
    *
+   * To provide a simple example, consider the following harmonic oscillator problem:
+   * \f[
+   * \begin{split}
+   *   u'' & = -k^2 u \\
+   *   u (0) & = 0 \\
+   *   u'(0) & = k
+   * \end{split}
+   * \f]
+   *
+   * We write it in terms of a first order ode:
+   *\f[
+   * \begin{matrix}
+   *   y_0' & -y_1      & = 0 \\
+   *   y_1' & + k^2 y_0 & = 0
+   * \end{matrix}
+   * \f]
+   *
+   * That is $F(y', y, t) = y' + A y = 0 $
+   *
+   * where
+   * \f[
+   * \begin{matrix}
+   * 0 & -1 \\
+   * k^2 &0
+   * \end{matrix}
+   * \f]
+   *
+   * and $y(0)=(0, k)$, $y'(0) = (k, 0)$
+   *
+   * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t) = k \cos(k t)$,
+   * $y_1'(t) = -k^2 \sin(k t)$
+   *
+   * The Jacobian to assemble is the following:  $J = \alpha I + A$
+   *
+   * This is achieved by the following snippet of code:
+   * @code
+   * typedef Vector<double> VectorType;
+   *
+   * VectorType y(2);
+   * VectorType y_dot(2);
+   *
+   * FullMatrix<double> A(2,2);
+   * A(0,1) = -1.0;
+   * A(1,0) = kappa*kappa;
+   *
+   * FullMatrix<double> J(2,2);
+   * FullMatrix<double> Jinv(2,2);
+   *
+   * double kappa = 1.0;
+   *
+   * IDA time_stepper;
+   *
+   * time_stepper.reinit_vector = [&] (VectorType&v)
+   * {
+   *   v.reinit(2);
+   * };
+   *
+   * time_stepper.residual = [&](const double t,
+   *                             const VectorType &y,
+   *                             const VectorType &y_dot,
+   *                             VectorType &res) ->int
+   * {
+   *   res = y_dot;
+   *   A.vmult_add(res, y);
+   *   return 0;
+   * };
+   *
+   * time_stepper.setup_jacobian = [&](const double ,
+   *                                   const VectorType &,
+   *                                   const VectorType &,
+   *                                   const double alpha) ->int
+   * {
+   *   J = A;
+   *
+   *   J(0,0) = alpha;
+   *   J(1,1) = alpha;
+   *
+   *   Jinv.invert(J);
+   *   return 0;
+   * };
+   *
+   * time_stepper.solve_jacobian_system = [&](const VectorType &src,
+   *                                          VectorType &dst) ->int
+   * {
+   *   Jinv.vmult(dst,src);
+   *   return 0;
+   * };
+   *
+   * y[1] = kappa;
+   * y_dot[0] = kappa;
+   * time_stepper.solve_dae(y,y_dot);
+   * @endcode
+   *
    * @author Luca Heltai, Alberto Sartori, 2017.
    */
   template<typename VectorType=Vector<double> >
@@ -148,6 +241,11 @@ namespace SUNDIALS
      *    This option requires that the user specifies differential and
      *    algebraic components in the function get_differential_components.
      * -  use_y_dot: compute all components of y, given y_dot.
+     *
+     * By default, this class assumes that all components are differential, and that you want
+     * to solve a standard ode. In this case, the initial component type is set to `use_y_diff`,
+     * so that the `y_dot` at time t=`initial_time` is computed by solving the nonlinear problem
+     * $F(y_dot, y(t0), t0) = 0$ in the variable `y_dot`.
      *
      * Notice that a Newton solver is used for this computation. The Newton solver parameters
      * can be tweaked by acting on `ic_alpha` and `ic_max_iter`.
@@ -265,9 +363,9 @@ namespace SUNDIALS
                VectorType &yp);
 
     /**
-     * Return a newly allocated unique_ptr<VectorType>.
+     * Reinit vector to have the right size, MPI communicator, etc.
      */
-    std::function<std::unique_ptr<VectorType>()> create_new_vector;
+    std::function<void(VectorType &)> reinit_vector;
 
     /**
      * Compute residual.
@@ -331,6 +429,9 @@ namespace SUNDIALS
      * t. This function should then return true, and change the dimension of
      * both sol and sol_dot to reflect the new dimension. Since IDA does not
      * know about the new dimension, an internal reset is necessary.
+     *
+     * The default implementation simply returns `false`, i.e., no restart is
+     * performed during the evolution.
      */
     std::function<bool (const double t,
                         VectorType &sol,
@@ -338,10 +439,11 @@ namespace SUNDIALS
 
     /**
      * Return an index set containing the differential components.
-     * Implementation of this function is optional. If you do not provide such
-     * implementation, you cannot use `use_y_diff` as an option for automatic
-     * calculation of differential components as initial value, and you cannot
-     * exclude the algebraic components from the computation of the errors.
+     * Implementation of this function is optional. The default is to return a
+     * complete index set. If your equation is also algebraic (i.e., it
+     * contains algebraic constraings, or lagrange multipliers), you should
+     * overwrite this function in order to return only the differential
+     * components of your system.
      */
     std::function<IndexSet()> differential_components;
 
@@ -350,6 +452,9 @@ namespace SUNDIALS
      * the vector norm. The implementation of this function is optional, and it
      * is used only when `use_local_tolerances` is set to true at construction
      * time, or through the parameter file.
+     *
+     * If you do not overwrite this function and set `use_local_tolerances` to
+     * true, an exception will be thrown when trying to start the time stepper.
      */
     std::function<VectorType&()> get_local_tolerances;
 
@@ -531,6 +636,11 @@ namespace SUNDIALS
      * output verbose information about time steps.
      */
     ConditionalOStream pcout;
+
+    /**
+     * Memory pool of vectors.
+     */
+    GrowingVectorMemory<VectorType> mem;
   };
 
 }

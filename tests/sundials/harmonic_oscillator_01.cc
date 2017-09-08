@@ -64,13 +64,13 @@ public:
     kappa(_kappa),
     out("output")
   {
-    time_stepper.create_new_vector = [&] () -> std::unique_ptr<Vector<double> >
+    typedef Vector<double> VectorType;
+
+    time_stepper.reinit_vector = [&] (VectorType&v)
     {
-      return std::unique_ptr<Vector<double>>(new Vector<double>(2));
+      v.reinit(2);
     };
 
-
-    typedef Vector<double> VectorType;
 
     time_stepper.residual = [&](const double t,
                                 const VectorType &y,
@@ -114,13 +114,6 @@ public:
       out << t << " "
       << sol[0] << " " << sol[1] << " " << sol_dot[0] << " " << sol_dot[1] << std::endl;
       return 0;
-    };
-
-    time_stepper.solver_should_restart = [](const double ,
-                                            VectorType &,
-                                            VectorType &) ->bool
-    {
-      return false;
     };
   }
 

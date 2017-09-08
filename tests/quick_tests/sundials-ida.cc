@@ -68,9 +68,9 @@ public:
     diff[0] = 1.0;
     diff[1] = 1.0;
 
-    time_stepper.create_new_vector = [&] () -> std::unique_ptr<Vector<double> >
+    time_stepper.reinit_vector = [&] (Vector<double> &v)
     {
-      return std::unique_ptr<Vector<double>>(new Vector<double>(2));
+      v.reinit(2);
     };
 
 
