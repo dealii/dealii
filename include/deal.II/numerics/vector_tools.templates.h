@@ -242,16 +242,6 @@ namespace VectorTools
         // element for the correct transformation.
         switch (fe[fe_index].conforming_space)
           {
-          case FiniteElementData<dim>::H1:
-            DEAL_II_FALLTHROUGH;
-          case FiniteElementData<dim>::L2:
-            // See Monk, Finite Element Methods for Maxwell's Equations,
-            // p. 77ff, formula (3.74).
-            // For given mapping F_K: \hat K \to K, we have to transform
-            //  \hat p = p\circ F_K
-            //  i.e., do nothing.
-            break;
-
           case FiniteElementData<dim>::Hcurl:
             // See Monk, Finite Element Methods for Maxwell's Equations,
             // p. 77ff, formula (3.76) and Corollary 3.58.
@@ -295,10 +285,22 @@ namespace VectorTools
               }
             break;
 
+          case FiniteElementData<dim>::H1:
+            DEAL_II_FALLTHROUGH;
+          case FiniteElementData<dim>::L2:
+            // See Monk, Finite Element Methods for Maxwell's Equations,
+            // p. 77ff, formula (3.74).
+            // For given mapping F_K: \hat K \to K, we have to transform
+            //  \hat p = p\circ F_K
+            //  i.e., do nothing.
+            //
+            break;
+
           default:
-            Assert(false,
-                   ExcMessage(
-                     "The supplied finite element has an unknown conformity."));
+            // In case we deal with an unknown conformity, just assume we
+            // deal with a Lagrange element and do nothing.
+            break;
+
           } /*switch*/
 
         FETools::convert_generalized_support_point_values_to_dof_values(
