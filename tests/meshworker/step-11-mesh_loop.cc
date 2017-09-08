@@ -296,7 +296,7 @@ namespace Step11
                           copier,
                           ScratchData<dim>(mapping, fe, gauss_degree),
                           CopyData(),
-                          MeshWorker::assemble_own_cells | MeshWorker::assemble_boundary_faces | MeshWorker::cells_first,
+                          MeshWorker::assemble_own_cells | MeshWorker::assemble_boundary_faces,
                           boundary_worker);
 
 
