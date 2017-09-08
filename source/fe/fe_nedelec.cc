@@ -3177,7 +3177,7 @@ convert_generalized_support_point_values_to_dof_values (const std::vector<Vector
                 += boundary_weights (q_point, j)
                    * lobatto_polynomials_grad[i + 1].value
                    (this->generalized_face_support_points[q_point]
-                    (1));
+                    (0));
 
           FullMatrix<double> system_matrix_inv (this->degree-1, this->degree-1);
 
