@@ -152,17 +152,17 @@ Timer::ClockMeasurements<clock_type_>::reset()
 
 Timer::Timer()
   :
-  Timer(MPI_COMM_SELF, /*sync_wall_time=*/false)
+  Timer(MPI_COMM_SELF, /*sync_lap_times=*/false)
 {}
 
 
 
 Timer::Timer(MPI_Comm mpi_communicator,
-             const bool sync_wall_time_)
+             const bool sync_lap_times_)
   :
   running (false),
   mpi_communicator (mpi_communicator),
-  sync_wall_time(sync_wall_time_)
+  sync_lap_times(sync_lap_times_)
 {
   reset();
   start();
@@ -174,7 +174,7 @@ void Timer::start ()
 {
   running = true;
 #ifdef DEAL_II_WITH_MPI
-  if (sync_wall_time)
+  if (sync_lap_times)
     {
       const int ierr = MPI_Barrier(mpi_communicator);
       AssertThrowMPI(ierr);
@@ -195,13 +195,13 @@ double Timer::stop ()
       wall_times.last_lap_time = wall_clock_type::now() - wall_times.current_lap_start_time;
       cpu_times.last_lap_time = cpu_clock_type::now() - cpu_times.current_lap_start_time;
 
-      last_lap_data = Utilities::MPI::min_max_avg
-                      (internal::Timer::to_seconds(wall_times.last_lap_time),
-                       mpi_communicator);
-      if (sync_wall_time)
+      last_lap_wall_time_data = Utilities::MPI::min_max_avg
+                                (internal::Timer::to_seconds(wall_times.last_lap_time),
+                                 mpi_communicator);
+      if (sync_lap_times)
         {
           wall_times.last_lap_time = internal::Timer::from_seconds<decltype(wall_times)::duration_type>
-                                     (last_lap_data.max);
+                                     (last_lap_wall_time_data.max);
           cpu_times.last_lap_time = internal::Timer::from_seconds<decltype(cpu_times)::duration_type>
                                     (Utilities::MPI::min_max_avg
                                      (internal::Timer::to_seconds(cpu_times.last_lap_time),
@@ -285,7 +285,7 @@ void Timer::reset ()
   wall_times.reset();
   cpu_times.reset();
   running = false;
-  internal::Timer::clear_timing_data(last_lap_data);
+  internal::Timer::clear_timing_data(last_lap_wall_time_data);
   internal::Timer::clear_timing_data(accumulated_wall_time_data);
 }
 
