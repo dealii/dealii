@@ -37,8 +37,9 @@ DEAL_II_NAMESPACE_OPEN
 struct CPUClock
 {
   /**
-   * Duration type. Windows measures CPU times in units of 100 nanoseconds
-   * and POSIX uses microseconds, so go with microseconds for uniformity.
+   * Duration type. Windows measures CPU times, by default, in multiples of
+   * 1/64th of a second and and POSIX uses microseconds, so go with
+   * microseconds for uniformity.
    */
   typedef std::chrono::microseconds duration;
 
@@ -111,7 +112,7 @@ struct CPUClock
  * exceed the wall times.
  *
  * @ingroup utilities
- * @author G. Kanschat, W. Bangerth, M. Kronbichler
+ * @author G. Kanschat, W. Bangerth, M. Kronbichler, D. Wells
  */
 class Timer
 {
