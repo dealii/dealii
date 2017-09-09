@@ -114,7 +114,7 @@ CPUClock::time_point CPUClock::now() noexcept
     {
       system_cpu_duration = (double)
       (((unsigned long long)cpuTime.dwHighDateTime << 32)
-      | cpuTime.dwLowDateTime) / 1e6;
+      | cpuTime.dwLowDateTime) / 1e7;
     }
   // keep the zero value if GetProcessTimes didn't work
 #elif defined(DEAL_II_HAVE_SYS_RESOURCE_H)
