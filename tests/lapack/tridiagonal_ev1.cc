@@ -52,4 +52,9 @@ int main()
   test_laplacian<double>(20);
   test_laplacian<double>(40);
   test_laplacian<double>(80);
+
+  test_laplacian<float>(10);
+  test_laplacian<float>(20);
+  test_laplacian<float>(40);
+  test_laplacian<float>(80);
 }
