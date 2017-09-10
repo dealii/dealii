@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * exception's message. These strings are represented as <code>const char
  * *</code> pointers since the underlying buffer comes from (and is managed
  * by) the run-time type information system: more exactly, these pointers are
- * the result the function call <code>typeid(x).name()<code> where
+ * the result the function call <code>typeid(x).name()</code> where
  * <code>x</code> is some object. Therefore, the pointers provided to
  * subscribe() and to unsubscribe() must be the same. Strings with equal
  * contents will not be recognized to be the same. The handling in

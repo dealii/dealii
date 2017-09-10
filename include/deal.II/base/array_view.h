@@ -354,7 +354,7 @@ make_array_view (std::vector<ElementType> &vector,
  * of the ArrayView is inferred from the value type of the iterator (e.g., the
  * view created from two const iterators will have a const type).
  *
- * @warning The iterators @begin and @p end must bound (in the usual half-open
+ * @warning The iterators @p begin and @p end must bound (in the usual half-open
  * way) a contiguous in memory range of values. This function is intended for
  * use with iterators into containers like
  * <code>boost::container::small_vector</code> or <code>std::vector</code> and
