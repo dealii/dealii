@@ -93,25 +93,6 @@ private:
   get_dpo_vector (const unsigned int degree);
 
   /**
-   * Initialize the @p generalized_support_points field of the FiniteElement
-   * class and fill the tables with @p interior_weights. Called from the
-   * constructor.
-   *
-   * See the
-   * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
-   * for more information.
-   */
-  void initialize_support_points (const unsigned int degree);
-
-  /**
-   * Initialize the interpolation from functions on refined mesh cells onto
-   * the father cell. According to the philosophy of the Raviart-Thomas
-   * element, this restriction operator preserves the divergence of a function
-   * weakly.
-   */
-  void initialize_restriction ();
-
-  /**
    * Fields of cell-independent data.
    *
    * For information about the general purpose of this class, see the

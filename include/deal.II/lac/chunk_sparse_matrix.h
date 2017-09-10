@@ -802,12 +802,6 @@ public:
   number diag_element (const size_type i) const;
 
   /**
-   * Same as above, but return a writeable reference. You're sure you know
-   * what you do?
-   */
-  number &diag_element (const size_type i);
-
-  /**
    * Extracts a copy of the values and indices in the given matrix row.
    *
    * The user is expected to pass the length of the arrays column_indices and

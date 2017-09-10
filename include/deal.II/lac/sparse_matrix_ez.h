@@ -246,11 +246,6 @@ public:
     const_iterator &operator++ ();
 
     /**
-     * Postfix increment. This always returns a valid entry or <tt>end()</tt>.
-     */
-    const_iterator &operator++ (int);
-
-    /**
      * Dereferencing operator.
      */
     const Accessor &operator* () const;

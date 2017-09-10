@@ -448,11 +448,6 @@ private:
   static std::vector<unsigned int> get_dpo_vector (const unsigned int degree);
 
   /**
-   * Initialize the embedding matrices. Called from the constructor.
-   */
-  void initialize_embedding ();
-
-  /**
    * Initialize the restriction matrices. Called from the constructor.
    */
   void initialize_restriction ();

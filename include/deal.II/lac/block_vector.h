@@ -310,13 +310,6 @@ public:
   void swap (BlockVector<Number> &v);
 
   /**
-   * Output of vector in user-defined format.
-   *
-   * This function is deprecated.
-   */
-  void print (const char *format = nullptr) const DEAL_II_DEPRECATED;
-
-  /**
    * Print to a stream.
    */
   void print (std::ostream       &out,

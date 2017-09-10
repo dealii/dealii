@@ -110,16 +110,6 @@ public:
   void inverses_computed(bool are_they);
 
   /**
-   * Use only the inverse of the first diagonal block to save memory and
-   * computation time.
-   *
-   * Possible applications: computing on a cartesian grid, all diagonal blocks
-   * are the same or all diagonal blocks are at least similar and inversion of
-   * one of them still yields a preconditioner.
-   */
-  void set_same_diagonal ();
-
-  /**
    * Does the matrix use only one diagonal block?
    */
   bool same_diagonal () const;
@@ -135,20 +125,9 @@ public:
   bool inverses_ready () const;
 
   /**
-   * Check whether the object is empty.
-   */
-  bool empty () const;
-
-  /**
    * The number of blocks.
    */
   unsigned int size() const;
-
-  /**
-   * Read-only access to entries. This function is only possible if the
-   * inverse diagonal blocks are stored.
-   */
-  number el(size_type i, size_type j) const;
 
   /**
    * Multiply with the inverse block at position <tt>i</tt>.

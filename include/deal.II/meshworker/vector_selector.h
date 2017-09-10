@@ -268,10 +268,6 @@ namespace MeshWorker
       const unsigned int start,
       const unsigned int size) const;
 
-    /**
-     * The memory used by this object.
-     */
-    std::size_t memory_consumption () const;
   protected:
     AnyData data;
   };
@@ -380,12 +376,6 @@ namespace MeshWorker
      * reasonable data before calling this function.
      */
     void initialize(const MGLevelObject<VectorType> *, const std::string &name);
-
-
-    /**
-     * The memory used by this object.
-     */
-    std::size_t memory_consumption () const;
   };
 
 

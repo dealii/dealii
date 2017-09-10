@@ -412,11 +412,6 @@ template <>
 Quadrature<1>
 QProjector<1>::project_to_all_subfaces (const Quadrature<0> &quadrature);
 
-
-template <>
-bool
-QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature);
-
 template <>
 QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
                          const unsigned int   n_copies);

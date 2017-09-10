@@ -3087,17 +3087,6 @@ public:
   unsigned int n_raw_quads (const unsigned int level) const;
 
   /**
-   * Total number of hexs, used or unused.
-   *
-   * @note This function really exports internal information about the
-   * triangulation. It shouldn't be used in applications. The function is only
-   * part of the public interface of this class because it is used in some of
-   * the other classes that build very closely on it (in particular, the
-   * DoFHandler class).
-   */
-  unsigned int n_raw_hexs () const;
-
-  /**
    * Number of hexs, used or unused, on the given level.
    *
    * @note This function really exports internal information about the
