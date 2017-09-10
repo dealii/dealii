@@ -1915,17 +1915,17 @@ namespace DoFTools
                       const bool            invert_vertex_mapping  = false);
 
   /**
-   *  Same as above but allows boundary dofs on blocks to be excluded individually.
+   * Same as above but allows boundary dofs on blocks to be excluded individually.
    *
-   *  This is helpful if you want to use, for example, Taylor Hood elements
-   *  as it allows you to not include the boundary DoFs for the velocity
-   *  block on the patches while also letting you include the boundary DoFs
-   *  for the pressure block.
+   * This is helpful if you want to use, for example, Taylor Hood elements as
+   * it allows you to not include the boundary DoFs for the velocity block on
+   * the patches while also letting you include the boundary DoFs for the
+   * pressure block.
    *
-   * @param exclude_boundary_dofs For each patch of cells around a
-   * vertex, collect all of the interior degrees of freedom of the patch and
-   * disregard those on the boundary of the patch if the boolean value for
-   * the corresponding block in the BlockMask is false.
+   * For each patch of cells around a vertex, collect all of the interior
+   * degrees of freedom of the patch and disregard those on the boundary of
+   * the patch if the boolean value for the corresponding block in the
+   * BlockMask of @p exclude_boundary_dofs is false.
    */
   template <typename DoFHandlerType>
   std::vector<unsigned int>

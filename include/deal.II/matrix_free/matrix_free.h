@@ -858,8 +858,7 @@ public:
    * field and separate vectors, ensuring thread safety. The mechanism to
    * acquire and release objects is similar to the mechanisms used for the
    * local contributions of WorkStream, see
-   * @ref workstream_paper "the WorkStream paper"
-   * .
+   * @ref workstream_paper "the WorkStream paper".
    */
   AlignedVector<VectorizedArray<Number> > *acquire_scratch_data() const;
 

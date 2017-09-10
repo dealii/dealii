@@ -327,9 +327,11 @@ public:
                                  const LinearAlgebra::distributed::BlockVector<Number> &src) const;
 
   /**
-   * Transfer from a block-vector on the global grid to block-vectors defined on each of the levels separately.
+   * Transfer from a block-vector on the global grid to block-vectors defined
+   * on each of the levels separately.
    *
-   * This function will initialize @dst accordingly if needed as required by the Multigrid class.
+   * This function will initialize @p dst accordingly if needed as required by
+   * the Multigrid class.
    */
   template <typename Number2, int spacedim>
   void

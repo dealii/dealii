@@ -343,7 +343,7 @@ template <int dim, int n_q_points_1d, int n_components, typename Number>
 struct SelectEvaluator<dim, -1, n_q_points_1d, n_components, Number>
 {
   /**
-   * Based on the the run time parameters stored in @shape_info this function
+   * Based on the the run time parameters stored in @p shape_info this function
    * chooses an appropriate evaluation strategy for the integrate function, i.e.
    * this calls internal::FEEvaluationImpl::evaluate(),
    * internal::FEEvaluationImplCollocation::evaluate() or

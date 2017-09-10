@@ -832,7 +832,7 @@ public:
 
   /**
    * Return a constant reference to the selected finite element object.
-   * Since there is only one FiniteElement @index must be equal to zero
+   * Since there is only one FiniteElement @p index must be equal to zero
    * which is also the default value.
    */
   const FiniteElement<dim,spacedim> &
