@@ -20,7 +20,6 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/distributed/tria_base.h>
-#include <deal.II/distributed/grid_tools.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/optional.hpp>
