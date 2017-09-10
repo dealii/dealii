@@ -318,6 +318,15 @@ protected:
      * The matrix block itself.
      */
     PointerMatrixBase<typename BlockVectorType::BlockType > *matrix;
+
+    /**
+    * Assignment operator.
+    *
+    * @note Since the copy constructor is destructive (see its documentation)
+    * and only exists for convenience there is no reasonable way to implement
+    * this, so it is explicitly deleted.
+    */
+    Entry &operator= (const Entry &) = delete;
   };
 
   /**
@@ -334,13 +343,6 @@ private:
    * number of blocks per row.
    */
   unsigned int block_cols;
-
-  /**
-   * Assignment operator. Since the copy constructor is destructive (see its
-   * documentation) and only exists for convenience there is no reasonable way
-   * to implement this. Hence this operator is both private and unimplemented.
-   */
-  Entry &operator= (const Entry &);
 };
 
 /*@}*/
