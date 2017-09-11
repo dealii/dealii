@@ -428,6 +428,11 @@ public:
   FESystem (const FESystem<dim,spacedim> &) = delete;
 
   /**
+   * Move constructor.
+   */
+  FESystem (FESystem<dim,spacedim> &&) = default;
+
+  /**
    * Destructor.
    */
   virtual ~FESystem ();

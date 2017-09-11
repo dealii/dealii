@@ -1,0 +1,3 @@
+New: FiniteElement and FESystem have move constructors.
+<br>
+(Daniel Arndt, 2017/09/11)

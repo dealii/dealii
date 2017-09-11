@@ -1,0 +1,64 @@
+
+DEAL::FESystem<1>[FE_Q<1>(2)-FE_Q<1>(1)]
+DEAL::components: 2
+DEAL::blocks: 2
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 2
+DEAL::memory consumption: 4608
+DEAL::
+DEAL::FESystem<1>[]
+DEAL::components: 2
+DEAL::blocks: 2
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 0
+DEAL::memory consumption: 1036
+DEAL::
+DEAL::FESystem<1>[FE_Q<1>(2)-FE_Q<1>(1)]
+DEAL::components: 2
+DEAL::blocks: 2
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 2
+DEAL::memory consumption: 4608
+DEAL::
+DEAL::FESystem<2>[FE_Q<2>(2)^2-FE_Q<2>(1)]
+DEAL::components: 3
+DEAL::blocks: 3
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 2
+DEAL::memory consumption: 13032
+DEAL::
+DEAL::FESystem<2>[]
+DEAL::components: 3
+DEAL::blocks: 3
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 0
+DEAL::memory consumption: 2600
+DEAL::
+DEAL::FESystem<2>[FE_Q<2>(2)^2-FE_Q<2>(1)]
+DEAL::components: 3
+DEAL::blocks: 3
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 2
+DEAL::memory consumption: 13032
+DEAL::
+DEAL::FESystem<3>[FE_Q<3>(2)^3-FE_Q<3>(1)]
+DEAL::components: 4
+DEAL::blocks: 4
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 2
+DEAL::memory consumption: 56040
+DEAL::
+DEAL::FESystem<3>[]
+DEAL::components: 4
+DEAL::blocks: 4
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 0
+DEAL::memory consumption: 8772
+DEAL::
+DEAL::FESystem<3>[FE_Q<3>(2)^3-FE_Q<3>(1)]
+DEAL::components: 4
+DEAL::blocks: 4
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 2
+DEAL::memory consumption: 56040
+DEAL::
