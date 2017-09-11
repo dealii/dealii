@@ -90,8 +90,8 @@ namespace OpenCASCADE
 
   template <int dim, int spacedim>
   Point<spacedim>  NormalProjectionBoundary<dim,spacedim>::
-  project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
-                       const Point<spacedim> &candidate) const
+  project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
+                       const Point<spacedim>                  &candidate) const
   {
     (void)surrounding_points;
 #ifdef DEBUG
@@ -120,8 +120,8 @@ namespace OpenCASCADE
 
   template <int dim, int spacedim>
   Point<spacedim>  DirectionalProjectionBoundary<dim,spacedim>::
-  project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
-                       const Point<spacedim> &candidate) const
+  project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
+                       const Point<spacedim>                  &candidate) const
   {
     (void)surrounding_points;
 #ifdef DEBUG
@@ -151,8 +151,8 @@ namespace OpenCASCADE
 
   template <int dim, int spacedim>
   Point<spacedim>  NormalToMeshProjectionBoundary<dim,spacedim>::
-  project_to_manifold (const std::vector<Point<spacedim> > &surrounding_points,
-                       const Point<spacedim> &candidate) const
+  project_to_manifold (const ArrayView<const Point<spacedim>> &surrounding_points,
+                       const Point<spacedim>                  &candidate) const
   {
     TopoDS_Shape out_shape;
     Tensor<1,3> average_normal;
