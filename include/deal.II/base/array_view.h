@@ -126,6 +126,39 @@ public:
   ArrayView (const ArrayView<typename std::remove_cv<value_type>::type> &view);
 
   /**
+   * A constructor that automatically creates a view from a std::vector object.
+   * The view encompasses all elements of the given vector.
+   *
+   * This implicit conversion constructor is particularly useful when calling
+   * a function that takes an ArrayView object as argument, and passing in
+   * a std::vector.
+   *
+   * @note This constructor takes a reference to a @p const vector as argument.
+   *   It can only be used to initialize ArrayView objects that point to
+   *   @p const memory locations, such as <code>ArrayView@<const double@></code>.
+   *   You cannot initialize ArrayView objects to non-@p const memory with
+   *   such arguments, such as <code>ArrayView@<double@></code>.
+   */
+  ArrayView (const std::vector<typename std::remove_cv<value_type>::type> &vector);
+
+  /**
+   * A constructor that automatically creates a view from a std::vector object.
+   * The view encompasses all elements of the given vector.
+   *
+   * This implicit conversion constructor is particularly useful when calling
+   * a function that takes an ArrayView object as argument, and passing in
+   * a std::vector.
+   *
+   * @note This constructor takes a reference to a non-@p const vector as
+   *   argument. It can be used to initialize ArrayView objects that point to
+   *   either @p const memory locations, such as
+   *   <code>ArrayView@<const double@></code>, or to non-@p const memory,
+   *   such as <code>ArrayView@<double@></code>.
+   */
+  ArrayView (std::vector<typename std::remove_cv<value_type>::type> &vector);
+
+
+  /**
    * Return the size (in elements) of the view of memory this object
    * represents.
    */
@@ -194,8 +227,9 @@ ArrayView<ElementType>::ArrayView()
 
 template <typename ElementType>
 inline
-ArrayView<ElementType>::ArrayView(value_type        *starting_element,
-                                  const std::size_t  n_elements)
+ArrayView<ElementType>::
+ArrayView(value_type        *starting_element,
+          const std::size_t  n_elements)
   :
   starting_element (starting_element),
   n_elements(n_elements)
@@ -205,11 +239,50 @@ ArrayView<ElementType>::ArrayView(value_type        *starting_element,
 
 template <typename ElementType>
 inline
-ArrayView<ElementType>::ArrayView(const ArrayView<typename std::remove_cv<value_type>::type> &view)
+ArrayView<ElementType>::
+ArrayView(const ArrayView<typename std::remove_cv<value_type>::type> &view)
   :
   starting_element (view.starting_element),
   n_elements(view.n_elements)
 {}
+
+
+
+template <typename ElementType>
+inline
+ArrayView<ElementType>::
+ArrayView (const std::vector<typename std::remove_cv<value_type>::type> &vector)
+  :
+  // use delegating constructor
+  ArrayView (vector.data(), vector.size())
+{
+  // the following static_assert is not strictly necessary because,
+  // if we got a const std::vector reference argument but ElementType
+  // is not itself const, then the call to the forwarding constructor
+  // above will already have failed: vector.data() will have returned
+  // a const pointer, but we need a non-const pointer.
+  //
+  // nevertheless, leave the static_assert in since it provides a
+  // more descriptive error message that will simply come after the first
+  // error produced above
+  static_assert (std::is_const<value_type>::value == true,
+                 "This constructor may only be called if the ArrayView "
+                 "object has a const value_type. In other words, you can "
+                 "only create an ArrayView to const values from a const "
+                 "std::vector.");
+}
+
+
+
+template <typename ElementType>
+inline
+ArrayView<ElementType>::
+ArrayView (std::vector<typename std::remove_cv<value_type>::type> &vector)
+  :
+  // use delegating constructor
+  ArrayView (vector.data(), vector.size())
+{}
+
 
 
 
