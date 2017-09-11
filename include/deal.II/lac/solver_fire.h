@@ -174,7 +174,7 @@ protected:
    * Interface for derived class. This function gets the current iteration
    * @p x (variables), @p v (x's time derivative) and @p g (the gradient) in
    * each step.
-   * It can be used for a graphical output of the convergence history.
+   * It can be used for graphical output of the convergence history.
    */
   virtual void print_vectors (const unsigned int,
                               const VectorType &x,
