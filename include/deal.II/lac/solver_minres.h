@@ -94,7 +94,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverMinRes ();
+  virtual ~SolverMinRes () = default;
 
   /**
    * Solve the linear system $Ax=b$ for x.
@@ -177,11 +177,6 @@ SolverMinRes<VectorType>::SolverMinRes (SolverControl        &cn,
   Vm2(nullptr),
   Vv(nullptr),
   res2(numbers::signaling_nan<double>())
-{}
-
-
-template <class VectorType>
-SolverMinRes<VectorType>::~SolverMinRes ()
 {}
 
 
