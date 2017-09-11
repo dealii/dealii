@@ -1,0 +1,19 @@
+Changed: The methods
+<ol>
+  <li>Manifold::get_new_point</li>
+  <li>Manifold::project_to_manifold</li>
+</ol>
+have had their declarations changed in an incompatible manner: these three
+methods now take ArrayView arguments instead of <code>std::vector</code>s. This
+change was done for performance reasons: before this change about a third of the
+time spent generating a curved grid (in this particular benchmark, a circle
+described with polar coordinates and a transfinite interpolation) was used in
+allocating and freeing memory used by the <code>std::vector</code> arguments to
+Manifold::get_new_point() even though the sizes of the arrays are usually known
+at compilation time. This change completely eliminates this allocation cost.
+
+The method <code>Manifold::add_new_points()</code> has been removed in favor of
+Manifold::get_new_points(), which also uses ArrayView arguments instead of
+<code>std::vector</code>s.
+<br>
+(David Wells, 2017/09/10)
