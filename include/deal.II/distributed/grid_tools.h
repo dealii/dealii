@@ -39,6 +39,9 @@ DEAL_II_NAMESPACE_OPEN
 namespace parallel
 {
 
+  /**
+   * This namespace defines parallel algorithms that operate on meshes.
+   */
   namespace GridTools
   {
     /**
