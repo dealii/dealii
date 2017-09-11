@@ -619,7 +619,7 @@ private:
  * the case for PolarManifold but not for Spherical manifold, so be careful
  * when using the latter. In case the quality of the manifold is not good
  * enough, upon mesh refinement it may happen that the transformation to a
- * chart inside the get_new_point() or add_new_points() methods produces
+ * chart inside the get_new_point() or get_new_points() methods produces
  * points that are outside the unit cell. Then this class throws an exception
  * of type Mapping::ExcTransformationFailed. In that case, the mesh should be
  * refined before attaching this class, as done in the following example:
@@ -721,7 +721,7 @@ public:
    */
   virtual
   void
-  add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+  get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                   const Table<2,double>                  &weights,
                   ArrayView<Point<spacedim>>              new_points) const override;
 

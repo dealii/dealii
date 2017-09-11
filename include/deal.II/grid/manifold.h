@@ -419,7 +419,7 @@ public:
    */
   virtual
   void
-  add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+  get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                   const Table<2,double>                  &weights,
                   ArrayView<Point<spacedim>>              new_points) const;
 
@@ -738,7 +738,7 @@ public:
    */
   virtual
   void
-  add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+  get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                   const Table<2,double>                  &weights,
                   ArrayView<Point<spacedim>>              new_points) const override;
 
@@ -964,7 +964,7 @@ public:
    */
   virtual
   void
-  add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+  get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                   const Table<2,double>                  &weights,
                   ArrayView<Point<spacedim>>              new_points) const override;
   /**

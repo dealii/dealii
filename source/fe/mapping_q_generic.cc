@@ -3821,7 +3821,7 @@ add_line_support_points (const typename Triangulation<dim,spacedim>::cell_iterat
               const std::size_t n_rows = support_point_weights_perimeter_to_interior[0].size(0);
               a.resize(a.size() + n_rows);
               auto a_view = make_array_view(a.end() - n_rows, a.end());
-              manifold.add_new_points(make_array_view(vertices.begin(),
+              manifold.get_new_points(make_array_view(vertices.begin(),
                                                       vertices.end()),
                                       support_point_weights_perimeter_to_interior[0],
                                       a_view);
@@ -3916,7 +3916,7 @@ add_quad_support_points(const Triangulation<3,3>::cell_iterator &cell,
           const std::size_t n_rows = support_point_weights_perimeter_to_interior[1].size(0);
           a.resize(a.size() + n_rows);
           auto a_view = make_array_view(a.end() - n_rows, a.end());
-          face->get_manifold().add_new_points (make_array_view(tmp_points.begin(),
+          face->get_manifold().get_new_points (make_array_view(tmp_points.begin(),
                                                                tmp_points.end()),
                                                support_point_weights_perimeter_to_interior[1],
                                                a_view);
@@ -3959,7 +3959,7 @@ add_quad_support_points(const Triangulation<2,3>::cell_iterator &cell,
       const std::size_t n_rows = weights.size(0);
       a.resize(a.size() + n_rows);
       auto a_view = make_array_view(a.end() - n_rows, a.end());
-      cell->get_manifold().add_new_points(make_array_view(vertices.begin(),
+      cell->get_manifold().get_new_points(make_array_view(vertices.begin(),
                                                           vertices.end()),
                                           weights,
                                           a_view);
@@ -4016,7 +4016,7 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
           const std::size_t n_rows = support_point_weights_cell.size(0);
           a.resize(a.size() + n_rows);
           auto a_view = make_array_view(a.end() - n_rows, a.end());
-          cell->get_manifold().add_new_points(make_array_view(a.begin(),
+          cell->get_manifold().get_new_points(make_array_view(a.begin(),
                                                               a.end() - n_rows),
                                               support_point_weights_cell,
                                               a_view);
@@ -4040,7 +4040,7 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
                 const std::size_t n_rows = support_point_weights_perimeter_to_interior[1].size(0);
                 a.resize(a.size() + n_rows);
                 auto a_view = make_array_view(a.end() - n_rows, a.end());
-                cell->get_manifold().add_new_points(make_array_view(a.begin(),
+                cell->get_manifold().get_new_points(make_array_view(a.begin(),
                                                                     a.end() - n_rows),
                                                     support_point_weights_perimeter_to_interior[1],
                                                     a_view);
@@ -4057,7 +4057,7 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
               const std::size_t n_rows = support_point_weights_perimeter_to_interior[2].size(0);
               a.resize(a.size() + n_rows);
               auto a_view = make_array_view(a.end() - n_rows, a.end());
-              cell->get_manifold().add_new_points(make_array_view(a.begin(),
+              cell->get_manifold().get_new_points(make_array_view(a.begin(),
                                                                   a.end() - n_rows),
                                                   support_point_weights_perimeter_to_interior[2],
                                                   a_view);

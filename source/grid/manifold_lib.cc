@@ -1146,7 +1146,7 @@ TransfiniteInterpolationManifold<dim, spacedim>
 template <int dim, int spacedim>
 void
 TransfiniteInterpolationManifold<dim,spacedim>::
-add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                 const Table<2,double>                  &weights,
                 ArrayView<Point<spacedim> >             new_points) const
 {
@@ -1159,7 +1159,7 @@ add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
   const auto cell = compute_chart_points(surrounding_points, chart_points_view);
 
   boost::container::small_vector<Point<dim>, 100> new_points_on_chart(weights.size(0));
-  chart_manifold.add_new_points(chart_points_view,
+  chart_manifold.get_new_points(chart_points_view,
                                 weights,
                                 make_array_view(new_points_on_chart.begin(),
                                                 new_points_on_chart.end()));

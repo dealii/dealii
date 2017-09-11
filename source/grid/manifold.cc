@@ -116,7 +116,7 @@ get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
 template <int dim, int spacedim>
 void
 Manifold<dim, spacedim>::
-add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                 const Table<2,double>                  &weights,
                 ArrayView<Point<spacedim>>              new_points) const
 {
@@ -573,7 +573,7 @@ get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
 template <int dim, int spacedim>
 void
 FlatManifold<dim, spacedim>::
-add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                 const Table<2,double>                  &weights,
                 ArrayView<Point<spacedim>>              new_points) const
 {
@@ -731,7 +731,7 @@ get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
 template <int dim, int spacedim, int chartdim>
 void
 ChartManifold<dim,spacedim,chartdim>::
-add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                 const Table<2,double>                  &weights,
                 ArrayView<Point<spacedim>>              new_points) const
 {
@@ -745,7 +745,7 @@ add_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
     chart_points[i] = pull_back(surrounding_points[i]);
 
   boost::container::small_vector<Point<chartdim>, 200> new_points_on_chart(weights.size(0));
-  sub_manifold.add_new_points(make_array_view(chart_points.begin(),
+  sub_manifold.get_new_points(make_array_view(chart_points.begin(),
                                               chart_points.end()),
                               weights,
                               make_array_view(new_points_on_chart.begin(),
