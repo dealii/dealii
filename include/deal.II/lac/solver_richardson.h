@@ -150,18 +150,6 @@ protected:
                                                     const VectorType &d) const;
 
   /**
-   * Residual. Temporary vector allocated through the VectorMemory object at
-   * the start of the actual solution process and deallocated at the end.
-   */
-  VectorType *Vr;
-  /**
-   * Preconditioned residual. Temporary vector allocated through the
-   * VectorMemory object at the start of the actual solution process and
-   * deallocated at the end.
-   */
-  VectorType *Vd;
-
-  /**
    * Control parameters.
    */
   AdditionalData additional_data;
@@ -189,8 +177,6 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl            &cn,
                                                const AdditionalData     &data)
   :
   Solver<VectorType> (cn,mem),
-  Vr(nullptr),
-  Vd(nullptr),
   additional_data(data)
 {}
 
@@ -201,8 +187,6 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl        &cn,
                                                const AdditionalData &data)
   :
   Solver<VectorType> (cn),
-  Vr(nullptr),
-  Vd(nullptr),
   additional_data(data)
 {}
 
@@ -227,11 +211,14 @@ SolverRichardson<VectorType>::solve (const MatrixType         &A,
 
   unsigned int iter = 0;
 
-  // Memory allocation
-  Vr  = this->memory.alloc();
+  // Memory allocation.
+  // 'Vr' holds the residual, 'Vd' the preconditioned residual
+  typename VectorMemory<VectorType>::Pointer Vr (this->memory);
+  typename VectorMemory<VectorType>::Pointer Vd (this->memory);
+
   VectorType &r  = *Vr;
   r.reinit(x);
-  Vd  = this->memory.alloc();
+
   VectorType &d  = *Vd;
   d.reinit(x);
 
@@ -263,14 +250,10 @@ SolverRichardson<VectorType>::solve (const MatrixType         &A,
     }
   catch (...)
     {
-      this->memory.free(Vr);
-      this->memory.free(Vd);
       deallog.pop();
       throw;
     }
-  // Deallocate Memory
-  this->memory.free(Vr);
-  this->memory.free(Vd);
+
   deallog.pop();
 
   // in case of failure: throw exception
@@ -279,6 +262,7 @@ SolverRichardson<VectorType>::solve (const MatrixType         &A,
                                                      last_criterion));
   // otherwise exit as normal
 }
+
 
 
 template <class VectorType>
@@ -294,11 +278,14 @@ SolverRichardson<VectorType>::Tsolve (const MatrixType         &A,
 
   unsigned int iter = 0;
 
-  // Memory allocation
-  Vr = this->memory.alloc();
+  // Memory allocation.
+  // 'Vr' holds the residual, 'Vd' the preconditioned residual
+  typename VectorMemory<VectorType>::Pointer Vr (this->memory);
+  typename VectorMemory<VectorType>::Pointer Vd (this->memory);
+
   VectorType &r  = *Vr;
   r.reinit(x);
-  Vd = this-> memory.alloc();
+
   VectorType &d  = *Vd;
   d.reinit(x);
 
@@ -328,15 +315,10 @@ SolverRichardson<VectorType>::Tsolve (const MatrixType         &A,
     }
   catch (...)
     {
-      this->memory.free(Vr);
-      this->memory.free(Vd);
       deallog.pop();
       throw;
     }
 
-  // Deallocate Memory
-  this->memory.free(Vr);
-  this->memory.free(Vd);
   deallog.pop();
   // in case of failure: throw exception
   if (conv != SolverControl::success)
