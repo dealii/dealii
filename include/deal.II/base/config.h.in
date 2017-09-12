@@ -280,6 +280,8 @@
 _Pragma("GCC diagnostic push")                                   \
 _Pragma("GCC diagnostic ignored \"-Wunknown-pragmas\"")          \
 _Pragma("GCC diagnostic ignored \"-Wpragmas\"")                  \
+_Pragma("GCC diagnostic ignored \"-Wunknown-warning-option\"")   \
+_Pragma("GCC diagnostic ignored \"-Wunknown-warning\"")          \
 _Pragma("GCC diagnostic ignored \"-Wextra\"")                    \
 _Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"")       \
 _Pragma("GCC diagnostic ignored \"-Wunused-function\"")          \
