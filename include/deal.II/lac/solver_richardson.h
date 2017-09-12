@@ -133,7 +133,7 @@ public:
   /**
    * Interface for derived class. This function gets the current iteration
    * vector, the residual and the update vector in each step. It can be used
-   * for a graphical output of the convergence history.
+   * for graphical output of the convergence history.
    */
   virtual void print_vectors (const unsigned int step,
                               const VectorType &x,
