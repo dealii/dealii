@@ -119,7 +119,10 @@ namespace internal
                   void *,
                   void *)
           {
-            cell->update_cell_dof_indices_cache ();
+            if (cell->has_children()
+                ||
+                (!cell->has_children() && !cell->is_artificial()))
+              cell->update_cell_dof_indices_cache ();
           };
 
           // parallelize filling all of the cell caches. by using
