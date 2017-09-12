@@ -36,6 +36,34 @@ namespace
 LogStream deallog;
 
 
+
+
+LogStream::Prefix::Prefix(const std::string &text)
+  :
+  stream(&deallog)
+{
+  stream->push(text);
+}
+
+
+
+LogStream::Prefix::Prefix(const std::string &text,
+                          LogStream &s)
+  :
+  stream(&s)
+{
+  stream->push(text);
+}
+
+
+
+LogStream::Prefix::~Prefix()
+{
+  stream->pop();
+}
+
+
+
 LogStream::LogStream()
   :
   std_out(&std::cout),
@@ -47,6 +75,7 @@ LogStream::LogStream()
 {
   get_prefixes().push("DEAL:");
 }
+
 
 
 LogStream::~LogStream()
@@ -200,6 +229,30 @@ LogStream::get_console()
 }
 
 
+
+std::ostringstream &
+LogStream::get_stream()
+{
+  // see if we have already created this stream. if not, do so and
+  // set the default flags (why we set these flags is lost to
+  // history, but this is what we need to keep several hundred tests
+  // from producing different output)
+  //
+  // note that in all of this we need not worry about thread-safety
+  // because we operate on a thread-local object and by definition
+  // there can only be one access at a time
+  if (outstreams.get().get() == nullptr)
+    {
+      outstreams.get().reset (new std::ostringstream);
+      outstreams.get()->setf(std::ios::showpoint | std::ios::left);
+    }
+
+  // then return the stream
+  return *outstreams.get();
+}
+
+
+
 std::ostream &
 LogStream::get_file_stream()
 {
@@ -210,11 +263,13 @@ LogStream::get_file_stream()
 }
 
 
+
 bool
 LogStream::has_file() const
 {
   return (file != nullptr);
 }
+
 
 
 const std::string &
@@ -227,6 +282,7 @@ LogStream::get_prefix() const
   else
     return empty_string;
 }
+
 
 
 void
@@ -242,11 +298,13 @@ LogStream::push (const std::string &text)
 }
 
 
+
 void LogStream::pop ()
 {
   if (get_prefixes().size() > 0)
     get_prefixes().pop();
 }
+
 
 
 std::ios::fmtflags
@@ -256,6 +314,7 @@ LogStream::flags(const std::ios::fmtflags f)
 }
 
 
+
 std::streamsize
 LogStream::precision (const std::streamsize prec)
 {
@@ -263,11 +322,13 @@ LogStream::precision (const std::streamsize prec)
 }
 
 
+
 std::streamsize
 LogStream::width (const std::streamsize wide)
 {
   return get_stream().width (wide);
 }
+
 
 
 unsigned int
@@ -280,6 +341,7 @@ LogStream::depth_console (const unsigned int n)
 }
 
 
+
 unsigned int
 LogStream::depth_file (const unsigned int n)
 {
@@ -290,6 +352,7 @@ LogStream::depth_file (const unsigned int n)
 }
 
 
+
 bool
 LogStream::log_thread_id (const bool flag)
 {
@@ -298,6 +361,8 @@ LogStream::log_thread_id (const bool flag)
   print_thread_id = flag;
   return h;
 }
+
+
 
 std::stack<std::string> &
 LogStream::get_prefixes() const
@@ -330,6 +395,7 @@ LogStream::get_prefixes() const
   return prefixes.get();
 #endif
 }
+
 
 
 void

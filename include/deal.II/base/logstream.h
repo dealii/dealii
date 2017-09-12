@@ -95,8 +95,8 @@ public:
    * <code>continue</code>, <code>break</code>, <code>return</code>,
    * <code>throw</code>, or by simply reaching the closing brace. In all of
    * these cases, it is not necessary to remember to pop the prefix manually
-   * using LogStream::pop. In this, it works just like the better known
-   * Threads::Mutex::ScopedLock class.
+   * using LogStream::pop(). In this, it works just like the better known
+   * std::unique_ptr and Threads::Mutex::ScopedLock classes.
    */
   class Prefix
   {
@@ -120,6 +120,10 @@ public:
     ~Prefix ();
 
   private:
+    /**
+     * A pointer to the LogStream object to which the prefix is
+     * applied.
+     */
     SmartPointer<LogStream,LogStream::Prefix> stream;
   };
 
@@ -367,44 +371,6 @@ LogStream &operator<< (LogStream &log, const T &t)
 }
 
 
-inline
-std::ostringstream &
-LogStream::get_stream()
-{
-  // see if we have already created this stream. if not, do so and
-  // set the default flags (why we set these flags is lost to
-  // history, but this is what we need to keep several hundred tests
-  // from producing different output)
-  //
-  // note that in all of this we need not worry about thread-safety
-  // because we operate on a thread-local object and by definition
-  // there can only be one access at a time
-  if (outstreams.get().get() == nullptr)
-    {
-      outstreams.get().reset (new std::ostringstream);
-      outstreams.get()->setf(std::ios::showpoint | std::ios::left);
-    }
-
-  // then return the stream
-  return *outstreams.get();
-}
-
-
-
-inline
-LogStream::Prefix::Prefix(const std::string &text, LogStream &s)
-  :
-  stream(&s)
-{
-  stream->push(text);
-}
-
-
-inline
-LogStream::Prefix::~Prefix()
-{
-  stream->pop();
-}
 
 
 /**
@@ -414,14 +380,6 @@ LogStream::Prefix::~Prefix()
  */
 extern LogStream deallog;
 
-
-inline
-LogStream::Prefix::Prefix(const std::string &text)
-  :
-  stream(&deallog)
-{
-  stream->push(text);
-}
 
 
 DEAL_II_NAMESPACE_CLOSE
