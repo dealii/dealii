@@ -165,14 +165,6 @@ protected:
    * Control parameters.
    */
   AdditionalData additional_data;
-
-  /**
-   * Within the iteration loop, the norm of the residual is stored in this
-   * variable. The function @p criterion uses this variable to compute the
-   * convergence value, which in this class is the norm of the residual vector
-   * and thus the square root of the @p res2 value.
-   */
-  typename VectorType::value_type res;
 };
 
 /*@}*/
@@ -211,8 +203,7 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl        &cn,
   Solver<VectorType> (cn),
   Vr(nullptr),
   Vd(nullptr),
-  additional_data(data),
-  res(numbers::signaling_nan<double>())
+  additional_data(data)
 {}
 
 
