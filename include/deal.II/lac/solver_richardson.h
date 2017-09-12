@@ -142,8 +142,12 @@ public:
 protected:
   /**
    * Implementation of the computation of the norm of the residual.
+   * Depending on the flags given to the solver, the default
+   * implementation of this function uses either the actual
+   * residual, @p r, or the preconditioned residual, @p d.
    */
-  virtual typename VectorType::value_type criterion();
+  virtual typename VectorType::value_type criterion(const VectorType &r,
+                                                    const VectorType &d) const;
 
   /**
    * Residual. Temporary vector allocated through the VectorMemory object at
@@ -253,12 +257,9 @@ SolverRichardson<VectorType>::solve (const MatrixType         &A,
           r.sadd(-1.,1.,b);
           preconditioner.vmult(d,r);
 
-          // The required norm of the
-          // (preconditioned)
-          // residual is computed in
-          // criterion() and stored
-          // in res.
-          last_criterion = criterion();
+          // get the required norm of the (possibly preconditioned)
+          // residual
+          last_criterion = criterion(r, d);
           conv = this->iteration_status (iter, last_criterion, x);
           if (conv != SolverControl::iterate)
             break;
@@ -303,10 +304,10 @@ SolverRichardson<VectorType>::Tsolve (const MatrixType         &A,
   unsigned int iter = 0;
 
   // Memory allocation
-  Vr  = this->memory.alloc();
+  Vr = this->memory.alloc();
   VectorType &r  = *Vr;
   r.reinit(x);
-  Vd  =this-> memory.alloc();
+  Vd = this-> memory.alloc();
   VectorType &d  = *Vd;
   d.reinit(x);
 
@@ -323,7 +324,7 @@ SolverRichardson<VectorType>::Tsolve (const MatrixType         &A,
           r.sadd(-1.,1.,b);
           preconditioner.Tvmult(d,r);
 
-          last_criterion = criterion();
+          last_criterion = criterion(r, d);
           conv = this->iteration_status (iter, last_criterion, x);
           if (conv != SolverControl::iterate)
             break;
@@ -365,14 +366,15 @@ SolverRichardson<VectorType>::print_vectors(const unsigned int,
 
 
 template <class VectorType>
-inline typename VectorType::value_type
-SolverRichardson<VectorType>::criterion()
+inline
+typename VectorType::value_type
+SolverRichardson<VectorType>::criterion(const VectorType &r,
+                                        const VectorType &d) const
 {
   if (!additional_data.use_preconditioned_residual)
-    res = Vr->l2_norm();
+    return r.l2_norm();
   else
-    res = Vd->l2_norm();
-  return res;
+    return d.l2_norm();
 }
 
 
