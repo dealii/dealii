@@ -1,0 +1,8 @@
+New: A new SUNDIALS::IDA class has been added that interfaces
+the SUNDIALS IDA library (https://computation.llnl.gov/projects/sundials)
+This class can be used to solve differential algebraic equations
+using IDA (an implicit differential algebraic equation solver, that
+supports variable step and variable order BDF schemes).
+<br>
+(Luca Heltai, 2017/09/12)
+
