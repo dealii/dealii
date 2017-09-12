@@ -23,15 +23,19 @@
 #   BZIP2_VERSION
 #
 
-#
-# Houston, we have a problem: CMake ships its own FindBZip2.cmake module.
-# Unfortunately we want to call DEAL_II_PACKAGE_HANDLE. Therefore, use the
-# original find module and do a dummy call to DEAL_II_PACKAGE_HANDLE:
-#
+SET(BZIP2_DIR "" CACHE PATH "An optional hint to a BZIP2 installation")
+SET_IF_EMPTY(BZIP2_DIR "$ENV{BZIP2_DIR}")
+
+SET(_cmake_prefix_path_backup "${CMAKE_PREFIX_PATH}")
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
+
+SET(CMAKE_PREFIX_PATH ${BZIP2_DIR} ${_cmake_prefix_path_backup})
+
 FIND_PACKAGE(BZip2)
+
+SET(CMAKE_PREFIX_PATH ${_cmake_prefix_path_backup})
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 SET(BZIP2_VERSION ${BZIP2_VERSION_STRING})
