@@ -2971,36 +2971,28 @@ namespace internal
           for (unsigned int d=0; d<dofs_per_vertex; ++d, ++index)
             accessor.set_vertex_dof_index(vertex,d,
                                           local_dof_indices[index]);
-        // now copy dof numbers into the line. for
-        // lines with the wrong orientation, we have
-        // already made sure that we're ok by picking
-        // the correct vertices (this happens
-        // automatically in the vertex()
-        // function). however, if the line is in
-        // wrong orientation, we look at it in
-        // flipped orientation and we will have to
-        // adjust the shape function indices that we
-        // see to correspond to the correct
-        // (cell-local) ordering.
+        // now copy dof numbers into the line. for lines with the
+        // wrong orientation, we have already made sure that we're ok
+        // by picking the correct vertices (this happens automatically
+        // in the vertex() function). however, if the line is in wrong
+        // orientation, we look at it in flipped orientation and we
+        // will have to adjust the shape function indices that we see
+        // to correspond to the correct (cell-local) ordering.
         for (unsigned int line=0; line<12; ++line)
           for (unsigned int d=0; d<dofs_per_line; ++d, ++index)
             accessor.line(line)->set_dof_index(accessor.dof_handler->get_fe().
                                                adjust_line_dof_index_for_line_orientation(d,
                                                    accessor.line_orientation(line)),
                                                local_dof_indices[index]);
-        // now copy dof numbers into the face. for
-        // faces with the wrong orientation, we
-        // have already made sure that we're ok by
-        // picking the correct lines and vertices
-        // (this happens automatically in the
-        // line() and vertex() functions). however,
-        // if the face is in wrong orientation, we
-        // look at it in flipped orientation and we
-        // will have to adjust the shape function
-        // indices that we see to correspond to the
-        // correct (cell-local) ordering. The same
-        // applies, if the face_rotation or
-        // face_orientation is non-standard
+        // now copy dof numbers into the face. for faces with the
+        // wrong orientation, we have already made sure that we're ok
+        // by picking the correct lines and vertices (this happens
+        // automatically in the line() and vertex()
+        // functions). however, if the face is in wrong orientation,
+        // we look at it in flipped orientation and we will have to
+        // adjust the shape function indices that we see to correspond
+        // to the correct (cell-local) ordering. The same applies, if
+        // the face_rotation or face_orientation is non-standard
         for (unsigned int quad=0; quad<6; ++quad)
           for (unsigned int d=0; d<dofs_per_quad; ++d, ++index)
             accessor.quad(quad)->set_dof_index(accessor.dof_handler->get_fe().
@@ -3017,10 +3009,8 @@ namespace internal
       }
 
 
-      // implementation for the case of
-      // hp::DoFHandler objects. it's
-      // not implemented there, for no
-      // space dimension
+      // implementation for the case of hp::DoFHandler objects. it's
+      // not implemented there, for no space dimension
       template <int dim, int spacedim, bool level_dof_access>
       static
       void
