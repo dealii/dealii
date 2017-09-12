@@ -94,7 +94,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverMinRes ();
+  virtual ~SolverMinRes () = default;
 
   /**
    * Solve the linear system $Ax=b$ for x.
@@ -122,6 +122,7 @@ protected:
    * Implementation of the computation of the norm of the residual.
    */
   virtual double criterion();
+
   /**
    * Interface for derived class. This function gets the current iteration
    * vector, the residual and the update vector in each step. It can be used
@@ -131,14 +132,6 @@ protected:
                              const VectorType   &x,
                              const VectorType   &r,
                              const VectorType   &d) const;
-
-  /**
-   * Temporary vectors, allocated through the @p VectorMemory object at the
-   * start of the actual solution process and deallocated at the end.
-   */
-  VectorType *Vu0, *Vu1, *Vu2;
-  VectorType *Vm0, *Vm1, *Vm2;
-  VectorType *Vv;
 
   /**
    * Within the iteration loop, the square of the residual vector is stored in
@@ -169,19 +162,7 @@ SolverMinRes<VectorType>::SolverMinRes (SolverControl        &cn,
                                         const AdditionalData &)
   :
   Solver<VectorType>(cn),
-  Vu0(nullptr),
-  Vu1(nullptr),
-  Vu2(nullptr),
-  Vm0(nullptr),
-  Vm1(nullptr),
-  Vm2(nullptr),
-  Vv(nullptr),
   res2(numbers::signaling_nan<double>())
-{}
-
-
-template <class VectorType>
-SolverMinRes<VectorType>::~SolverMinRes ()
 {}
 
 
@@ -215,20 +196,23 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
   deallog.push("minres");
 
   // Memory allocation
-  Vu0  = this->memory.alloc();
-  Vu1  = this->memory.alloc();
-  Vu2  = this->memory.alloc();
-  Vv   = this->memory.alloc();
-  Vm0  = this->memory.alloc();
-  Vm1  = this->memory.alloc();
-  Vm2  = this->memory.alloc();
+  typename VectorMemory<VectorType>::Pointer Vu0 (this->memory);
+  typename VectorMemory<VectorType>::Pointer Vu1 (this->memory);
+  typename VectorMemory<VectorType>::Pointer Vu2 (this->memory);
+
+  typename VectorMemory<VectorType>::Pointer Vm0 (this->memory);
+  typename VectorMemory<VectorType>::Pointer Vm1 (this->memory);
+  typename VectorMemory<VectorType>::Pointer Vm2 (this->memory);
+
+  typename VectorMemory<VectorType>::Pointer Vv (this->memory);
+
   // define some aliases for simpler access
   typedef VectorType *vecptr;
-  vecptr u[3] = {Vu0, Vu1, Vu2};
-  vecptr m[3] = {Vm0, Vm1, Vm2};
+  vecptr u[3] = {Vu0.get(), Vu1.get(), Vu2.get()};
+  vecptr m[3] = {Vm0.get(), Vm1.get(), Vm2.get()};
   VectorType &v   = *Vv;
-  // resize the vectors, but do not set
-  // the values since they'd be overwritten
+
+  // resize the vectors, but do not set the values since they'd be overwritten
   // soon anyway.
   u[0]->reinit(b,true);
   u[1]->reinit(b,true);
@@ -366,14 +350,6 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
       delta[1] = delta[2];
     }
 
-  // Deallocation of Memory
-  this->memory.free(Vu0);
-  this->memory.free(Vu1);
-  this->memory.free(Vu2);
-  this->memory.free(Vv);
-  this->memory.free(Vm0);
-  this->memory.free(Vm1);
-  this->memory.free(Vm2);
   // Output
   deallog.pop ();
 
