@@ -24,6 +24,7 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/vector_slice.h>
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/table.h>
 #include <deal.II/grid/tria.h>
@@ -351,9 +352,9 @@ namespace FEValuesViews
      * cell->get_dof_values(solution, local_dof_values.begin(), local_dof_values.end());
      * @endcode
      */
-    template <class InputVector>
-    void get_function_values_from_local_dof_values (const InputVector &dof_values,
-                                                    std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const;
+    template <typename Number>
+    void get_function_values_from_local_dof_values (const ArrayView<const Number> &dof_values,
+                                                    std::vector<typename OutputType<Number>::value_type> &values) const;
 
     /**
      * Return the gradients of the selected scalar component of the finite
