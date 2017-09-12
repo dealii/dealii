@@ -21,7 +21,6 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
-#include <deal.II/base/subscriptor.h>
 #include <deal.II/base/signaling_nan.h>
 
 DEAL_II_NAMESPACE_OPEN
