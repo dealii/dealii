@@ -26,8 +26,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace MeshWorker
 {
   template <int dim, int spacedim, typename Number>
-  VectorDataBase<dim, spacedim, Number>::~VectorDataBase()
-  {}
+  VectorDataBase<dim, spacedim, Number>::~VectorDataBase() = default;
+
 
 
   template <int dim, int spacedim, typename Number>
@@ -37,9 +37,10 @@ namespace MeshWorker
   {}
 
 
+
   template <int dim, int spacedim, typename Number>
-  VectorDataBase<dim, spacedim, Number>::VectorDataBase()
-  {}
+  VectorDataBase<dim, spacedim, Number>::VectorDataBase() = default;
+
 
 
   template <int dim, int spacedim, typename Number>

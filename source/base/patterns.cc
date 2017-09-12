@@ -127,8 +127,8 @@ namespace Patterns
 
 
 
-  PatternBase::~PatternBase ()
-  {}
+  PatternBase::~PatternBase () = default;
+
 
 
   std::size_t
@@ -1155,8 +1155,8 @@ namespace Patterns
   const char *Anything::description_init = "[Anything";
 
 
-  Anything::Anything ()
-  {}
+
+  Anything::Anything () = default;
 
 
 
@@ -1298,8 +1298,8 @@ namespace Patterns
   const char *DirectoryName::description_init = "[DirectoryName";
 
 
-  DirectoryName::DirectoryName ()
-  {}
+
+  DirectoryName::DirectoryName () = default;
 
 
 

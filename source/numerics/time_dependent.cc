@@ -264,8 +264,7 @@ TimeStepBase::TimeStepBase (const double time) :
 
 
 
-TimeStepBase::~TimeStepBase ()
-{}
+TimeStepBase::~TimeStepBase () = default;
 
 
 

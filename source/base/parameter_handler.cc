@@ -49,8 +49,7 @@ ParameterHandler::ParameterHandler ()
 
 
 
-ParameterHandler::~ParameterHandler ()
-{}
+ParameterHandler::~ParameterHandler () = default;
 
 
 
@@ -2111,9 +2110,7 @@ ParameterHandler::operator == (const ParameterHandler &prm2)  const
 
 
 
-
-MultipleParameterLoop::UserClass::~UserClass ()
-{}
+MultipleParameterLoop::UserClass::~UserClass () = default;
 
 
 
@@ -2124,8 +2121,7 @@ MultipleParameterLoop::MultipleParameterLoop()
 
 
 
-MultipleParameterLoop::~MultipleParameterLoop ()
-{}
+MultipleParameterLoop::~MultipleParameterLoop () = default;
 
 
 

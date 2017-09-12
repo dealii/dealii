@@ -29,8 +29,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
-SparseILU<number>::SparseILU ()
-{}
+SparseILU<number>::SparseILU () = default;
 
 
 

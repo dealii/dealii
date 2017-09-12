@@ -83,7 +83,7 @@ namespace TimeStepping
     /**
      * Virtual destructor.
      */
-    virtual ~TimeStepping() {}
+    virtual ~TimeStepping() = default;
 
     /**
      * Purely virtual function. This function is used to advance from time @p
@@ -128,7 +128,7 @@ namespace TimeStepping
     /**
      * Virtual destructor.
      */
-    virtual ~RungeKutta() {}
+    virtual ~RungeKutta() = default;
 
     /**
      * Purely virtual method used to initialize the Runge-Kutta method.
@@ -210,7 +210,7 @@ namespace TimeStepping
      * you will want to call <code>initialize(runge_kutta_method)</code>
      * before it can be used.
      */
-    ExplicitRungeKutta() {}
+    ExplicitRungeKutta() = default;
 
     /**
      * Constructor. This function calls initialize(runge_kutta_method).
@@ -305,7 +305,7 @@ namespace TimeStepping
      * set_newton_solver_parameters(unsigned int,double) need to be called
      * before the object can be used.
      */
-    ImplicitRungeKutta() {}
+    ImplicitRungeKutta() = default;
 
     /**
      * Constructor. This function calls initialize(runge_kutta_method) and
@@ -439,7 +439,7 @@ namespace TimeStepping
      * set_time_adaptation_parameters(double, double, double, double, double,
      * double) need to be called before the object can be used.
      */
-    EmbeddedExplicitRungeKutta() {}
+    EmbeddedExplicitRungeKutta() = default;
 
     /**
      * Constructor. This function calls initialize(runge_kutta_method) and

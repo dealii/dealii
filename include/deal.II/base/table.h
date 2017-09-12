@@ -1799,8 +1799,7 @@ namespace internal
 
 template <int N, typename T>
 inline
-TableBase<N,T>::~TableBase ()
-{}
+TableBase<N,T>::~TableBase () = default;
 
 
 

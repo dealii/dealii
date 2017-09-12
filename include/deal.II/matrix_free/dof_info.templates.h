@@ -130,25 +130,8 @@ namespace internal
     }
 
 
-    DoFInfo::DoFInfo (const DoFInfo &dof_info_in)
-      :
-      row_starts (dof_info_in.row_starts),
-      dof_indices (dof_info_in.dof_indices),
-      constraint_indicator (dof_info_in.constraint_indicator),
-      vector_partitioner (dof_info_in.vector_partitioner),
-      constrained_dofs (dof_info_in.constrained_dofs),
-      row_starts_plain_indices (dof_info_in.row_starts_plain_indices),
-      plain_dof_indices (dof_info_in.plain_dof_indices),
-      dimension (dof_info_in.dimension),
-      n_components (dof_info_in.n_components),
-      dofs_per_cell (dof_info_in.dofs_per_cell),
-      dofs_per_face (dof_info_in.dofs_per_face),
-      store_plain_indices (dof_info_in.store_plain_indices),
-      cell_active_fe_index (dof_info_in.cell_active_fe_index),
-      max_fe_index (dof_info_in.max_fe_index),
-      fe_index_conversion (dof_info_in.fe_index_conversion),
-      ghost_dofs (dof_info_in.ghost_dofs)
-    {}
+
+    DoFInfo::DoFInfo (const DoFInfo &dof_info_in) = default;
 
 
 

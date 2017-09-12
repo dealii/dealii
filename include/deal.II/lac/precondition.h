@@ -87,7 +87,7 @@ public:
     /**
      * Constructor.
      */
-    AdditionalData () {}
+    AdditionalData () = default;
   };
 
   /**
@@ -1805,7 +1805,7 @@ namespace internal
                           internal::Vector::minimum_parallel_grain_size);
       }
 
-      ~VectorUpdatesRange() {}
+      ~VectorUpdatesRange() = default;
 
       virtual void
       apply_to_subrange (const std::size_t begin,

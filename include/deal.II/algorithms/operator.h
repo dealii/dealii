@@ -106,7 +106,7 @@ namespace Algorithms
   template <typename VectorType>
   class OutputOperator : public Subscriptor
   {
-    OutputOperator(const OutputOperator<VectorType> &);
+    OutputOperator(const OutputOperator<VectorType> &) = delete;
   public:
     OutputOperator ();
     /**

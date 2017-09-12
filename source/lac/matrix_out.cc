@@ -29,8 +29,7 @@ MatrixOut::Options::Options (const bool         show_absolute_values,
 
 
 
-MatrixOut::~MatrixOut ()
-{}
+MatrixOut::~MatrixOut () = default;
 
 
 

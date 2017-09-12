@@ -356,8 +356,7 @@ namespace TrilinosWrappers
 
 
 
-  SparseMatrix::~SparseMatrix ()
-  {}
+  SparseMatrix::~SparseMatrix () = default;
 
 
 
@@ -2701,8 +2700,7 @@ namespace TrilinosWrappers
 
 
       // Destructor
-      TrilinosPayload::~TrilinosPayload ()
-      { }
+      TrilinosPayload::~TrilinosPayload () = default;
 
 
 

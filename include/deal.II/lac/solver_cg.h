@@ -249,8 +249,7 @@ SolverCG<VectorType>::SolverCG (SolverControl        &cn,
 
 
 template <typename VectorType>
-SolverCG<VectorType>::~SolverCG ()
-{}
+SolverCG<VectorType>::~SolverCG () = default;
 
 
 

@@ -29,8 +29,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-Boundary<dim, spacedim>::~Boundary ()
-{}
+Boundary<dim, spacedim>::~Boundary () = default;
 
 
 template <int dim, int spacedim>
@@ -187,8 +186,7 @@ get_line_support_points (const unsigned int n_intermediate_points) const
 
 
 template <int dim, int spacedim>
-StraightBoundary<dim, spacedim>::StraightBoundary ()
-{}
+StraightBoundary<dim, spacedim>::StraightBoundary () = default;
 
 
 template <int dim, int spacedim>

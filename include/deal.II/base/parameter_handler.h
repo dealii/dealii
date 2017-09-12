@@ -802,12 +802,12 @@ private:
   /**
    * Inhibit automatic CopyConstructor.
    */
-  ParameterHandler (const ParameterHandler &);
+  ParameterHandler (const ParameterHandler &) = delete;
 
   /**
    * Inhibit automatic assignment operator.
    */
-  ParameterHandler &operator= (const ParameterHandler &);
+  ParameterHandler &operator= (const ParameterHandler &) = delete;
 
 public:
   /**

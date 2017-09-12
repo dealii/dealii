@@ -58,8 +58,8 @@ FunctionParser<dim>::FunctionParser(const unsigned int n_components,
 
 
 template <int dim>
-FunctionParser<dim>::~FunctionParser()
-{}
+FunctionParser<dim>::~FunctionParser() = default;
+
 
 #ifdef DEAL_II_WITH_MUPARSER
 

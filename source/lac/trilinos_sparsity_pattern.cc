@@ -221,8 +221,7 @@ namespace TrilinosWrappers
 
 
 
-  SparsityPattern::~SparsityPattern ()
-  {}
+  SparsityPattern::~SparsityPattern () = default;
 
 
 

@@ -38,8 +38,7 @@ namespace Functions
 
 
   template <int dim>
-  FlowFunction<dim>::~FlowFunction()
-  {}
+  FlowFunction<dim>::~FlowFunction() = default;
 
 
   template <int dim>
@@ -192,9 +191,10 @@ namespace Functions
   }
 
 
+
   template <int dim>
-  PoisseuilleFlow<dim>::~PoisseuilleFlow()
-  {}
+  PoisseuilleFlow<dim>::~PoisseuilleFlow() = default;
+
 
 
   template <int dim>
@@ -288,9 +288,10 @@ namespace Functions
   {}
 
 
+
   template <int dim>
-  StokesCosine<dim>::~StokesCosine()
-  {}
+  StokesCosine<dim>::~StokesCosine() = default;
+
 
 
   template <int dim>
@@ -659,8 +660,9 @@ namespace Functions
   }
 
 
-  Kovasznay::~Kovasznay()
-  {}
+
+  Kovasznay::~Kovasznay() = default;
+
 
 
   void Kovasznay::vector_values (

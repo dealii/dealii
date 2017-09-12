@@ -228,8 +228,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    Triangulation<dim,spacedim>::~Triangulation ()
-    {}
+    Triangulation<dim,spacedim>::~Triangulation () = default;
 
 
 

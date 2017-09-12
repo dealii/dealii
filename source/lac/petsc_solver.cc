@@ -49,8 +49,7 @@ namespace PETScWrappers
 
 
 
-  SolverBase::~SolverBase ()
-  {}
+  SolverBase::~SolverBase () = default;
 
 
 

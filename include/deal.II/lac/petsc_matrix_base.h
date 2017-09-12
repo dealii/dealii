@@ -941,11 +941,11 @@ namespace PETScWrappers
     /**
      * purposefully not implemented
      */
-    MatrixBase(const MatrixBase &);
+    MatrixBase(const MatrixBase &) = delete;
     /**
      * purposefully not implemented
      */
-    MatrixBase &operator=(const MatrixBase &);
+    MatrixBase &operator=(const MatrixBase &) = delete;
 
     /**
      * An internal array of integer values that is used to store the column

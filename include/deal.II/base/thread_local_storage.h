@@ -181,8 +181,7 @@ namespace Threads
 
   template <typename T>
   inline
-  ThreadLocalStorage<T>::ThreadLocalStorage()
-  {}
+  ThreadLocalStorage<T>::ThreadLocalStorage() = default;
 
 
   template <typename T>

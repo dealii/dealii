@@ -844,8 +844,8 @@ namespace parallel
 
 
   inline
-  ParallelForInteger::~ParallelForInteger ()
-  {}
+  ParallelForInteger::~ParallelForInteger () = default;
+
 
 
   inline

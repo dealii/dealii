@@ -57,8 +57,7 @@ namespace parallel
 
 
     template <int dim, typename VectorType, typename DoFHandlerType>
-    SolutionTransfer<dim, VectorType, DoFHandlerType>::~SolutionTransfer ()
-    {}
+    SolutionTransfer<dim, VectorType, DoFHandlerType>::~SolutionTransfer () = default;
 
 
 

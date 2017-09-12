@@ -24,8 +24,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  BlockSparseMatrix::BlockSparseMatrix ()
-  {}
+  BlockSparseMatrix::BlockSparseMatrix () = default;
 
 
 
@@ -44,12 +43,7 @@ namespace TrilinosWrappers
 
 
   BlockSparseMatrix &
-  BlockSparseMatrix::operator = (const BlockSparseMatrix &m)
-  {
-    BaseClass::operator = (m);
-
-    return *this;
-  }
+  BlockSparseMatrix::operator = (const BlockSparseMatrix &m) = default;
 
 
 

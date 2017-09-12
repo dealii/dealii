@@ -59,8 +59,7 @@ MGTransferMatrixFree<dim,Number>::MGTransferMatrixFree (const MGConstrainedDoFs 
 
 
 template <int dim, typename Number>
-MGTransferMatrixFree<dim,Number>::~MGTransferMatrixFree ()
-{}
+MGTransferMatrixFree<dim,Number>::~MGTransferMatrixFree () = default;
 
 
 
@@ -554,8 +553,7 @@ MGTransferMatrixFree<dim,Number>::memory_consumption() const
 
 
 template <int dim, typename Number>
-MGTransferBlockMatrixFree<dim,Number>::MGTransferBlockMatrixFree ()
-{}
+MGTransferBlockMatrixFree<dim,Number>::MGTransferBlockMatrixFree () = default;
 
 
 
@@ -569,8 +567,7 @@ MGTransferBlockMatrixFree<dim,Number>::MGTransferBlockMatrixFree (const MGConstr
 
 
 template <int dim, typename Number>
-MGTransferBlockMatrixFree<dim,Number>::~MGTransferBlockMatrixFree ()
-{}
+MGTransferBlockMatrixFree<dim,Number>::~MGTransferBlockMatrixFree () = default;
 
 
 

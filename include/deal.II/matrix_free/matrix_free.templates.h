@@ -59,8 +59,7 @@ MatrixFree<dim, Number>::MatrixFree(const MatrixFree<dim,Number> &other)
 
 
 template <int dim, typename Number>
-MatrixFree<dim,Number>::~MatrixFree()
-{}
+MatrixFree<dim,Number>::~MatrixFree() = default;
 
 
 

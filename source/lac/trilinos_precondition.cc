@@ -55,8 +55,7 @@ namespace TrilinosWrappers
 
 
 
-  PreconditionBase::~PreconditionBase()
-  {}
+  PreconditionBase::~PreconditionBase() = default;
 
 
 

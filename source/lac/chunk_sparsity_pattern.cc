@@ -91,8 +91,7 @@ ChunkSparsityPattern::ChunkSparsityPattern (
 
 
 
-ChunkSparsityPattern::~ChunkSparsityPattern ()
-{}
+ChunkSparsityPattern::~ChunkSparsityPattern () = default;
 
 
 

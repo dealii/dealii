@@ -31,8 +31,7 @@ using namespace Manifolds;
 
 /* -------------------------- Manifold --------------------- */
 template <int dim, int spacedim>
-Manifold<dim, spacedim>::~Manifold ()
-{}
+Manifold<dim, spacedim>::~Manifold () = default;
 
 
 
@@ -693,8 +692,7 @@ FlatManifold<dim, spacedim>::get_tangent_vector (const Point<spacedim> &x1,
 /* -------------------------- ChartManifold --------------------- */
 
 template <int dim, int spacedim, int chartdim>
-ChartManifold<dim,spacedim,chartdim>::~ChartManifold ()
-{}
+ChartManifold<dim,spacedim,chartdim>::~ChartManifold () = default;
 
 
 

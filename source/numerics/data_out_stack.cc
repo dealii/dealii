@@ -42,8 +42,7 @@ DataOutStack<dim,spacedim,DoFHandlerType>::DataVector::memory_consumption () con
 
 
 template <int dim, int spacedim, typename DoFHandlerType>
-DataOutStack<dim,spacedim,DoFHandlerType>::~DataOutStack ()
-{}
+DataOutStack<dim,spacedim,DoFHandlerType>::~DataOutStack () = default;
 
 
 template <int dim, int spacedim, typename DoFHandlerType>

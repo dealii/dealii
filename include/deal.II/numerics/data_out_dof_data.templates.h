@@ -371,8 +371,7 @@ namespace internal
 
 
     template <typename DoFHandlerType>
-    DataEntryBase<DoFHandlerType>::~DataEntryBase ()
-    {}
+    DataEntryBase<DoFHandlerType>::~DataEntryBase () = default;
 
 
 

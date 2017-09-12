@@ -2173,8 +2173,7 @@ public:
 
 
 template <int dim, int spacedim>
-FEValuesBase<dim,spacedim>::CellIteratorBase::~CellIteratorBase ()
-{}
+FEValuesBase<dim,spacedim>::CellIteratorBase::~CellIteratorBase () = default;
 
 /* ---------------- classes derived from FEValuesBase<dim,spacedim>::CellIteratorBase --------- */
 

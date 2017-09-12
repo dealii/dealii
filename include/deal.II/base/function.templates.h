@@ -46,8 +46,7 @@ Function<dim, Number>::Function (const unsigned int n_components,
 
 
 template <int dim, typename Number>
-Function<dim, Number>::~Function ()
-{}
+Function<dim, Number>::~Function () = default;
 
 
 
@@ -681,8 +680,7 @@ VectorFunctionFromTensorFunction<dim, Number>::VectorFunctionFromTensorFunction 
 
 
 template <int dim, typename Number>
-VectorFunctionFromTensorFunction<dim, Number>::~VectorFunctionFromTensorFunction ()
-{}
+VectorFunctionFromTensorFunction<dim, Number>::~VectorFunctionFromTensorFunction () = default;
 
 
 template <int dim, typename Number>

@@ -43,8 +43,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
-MappingManifold<dim,spacedim>::InternalData::InternalData ()
-{}
+MappingManifold<dim,spacedim>::InternalData::InternalData () = default;
 
 
 template <int dim, int spacedim>
@@ -175,8 +174,7 @@ initialize_face (const UpdateFlags      update_flags,
 
 
 template <int dim, int spacedim>
-MappingManifold<dim,spacedim>::MappingManifold ()
-{}
+MappingManifold<dim,spacedim>::MappingManifold () = default;
 
 
 

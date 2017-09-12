@@ -87,8 +87,7 @@ namespace hp
   }
 
   template <int dim, int spacedim>
-  FECollection<dim,spacedim>::FECollection ()
-  {}
+  FECollection<dim,spacedim>::FECollection () = default;
 
 
 

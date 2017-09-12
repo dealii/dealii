@@ -24,8 +24,7 @@ namespace hp
 {
 
   template <int dim, int spacedim>
-  MappingCollection<dim,spacedim>::MappingCollection ()
-  {}
+  MappingCollection<dim,spacedim>::MappingCollection () = default;
 
 
 

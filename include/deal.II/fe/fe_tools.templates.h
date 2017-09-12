@@ -1319,8 +1319,7 @@ namespace
 namespace FETools
 {
   template <int dim, int spacedim>
-  FEFactoryBase<dim,spacedim>::~FEFactoryBase()
-  {}
+  FEFactoryBase<dim,spacedim>::~FEFactoryBase() = default;
 
 
 

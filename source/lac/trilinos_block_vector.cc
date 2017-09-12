@@ -68,8 +68,7 @@ namespace TrilinosWrappers
 
 
 
-    BlockVector::~BlockVector ()
-    {}
+    BlockVector::~BlockVector () = default;
 
 
 

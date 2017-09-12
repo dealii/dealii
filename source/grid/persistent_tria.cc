@@ -57,8 +57,7 @@ PersistentTriangulation (const PersistentTriangulation<dim,spacedim> &old_tria)
 
 
 template <int dim, int spacedim>
-PersistentTriangulation<dim,spacedim>::~PersistentTriangulation ()
-{}
+PersistentTriangulation<dim,spacedim>::~PersistentTriangulation () = default;
 
 
 

@@ -126,8 +126,7 @@ private:
 // QR-transformation cf. Stoer 1 4.8.2 (p. 191)
 
 template <typename number>
-Householder<number>::Householder()
-{}
+Householder<number>::Householder() = default;
 
 
 

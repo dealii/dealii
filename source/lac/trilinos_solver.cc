@@ -68,8 +68,7 @@ namespace TrilinosWrappers
 
 
 
-  SolverBase::~SolverBase ()
-  {}
+  SolverBase::~SolverBase () = default;
 
 
 
@@ -318,7 +317,7 @@ namespace TrilinosWrappers
                                   const double               &reduction,
                                   const Epetra_LinearProblem &linear_problem);
 
-        virtual ~TrilinosReductionControl() {}
+        virtual ~TrilinosReductionControl() = default;
 
         virtual bool
         ResidualVectorRequired () const
@@ -722,8 +721,7 @@ namespace TrilinosWrappers
 
 
 
-  SolverDirect::~SolverDirect ()
-  {}
+  SolverDirect::~SolverDirect () = default;
 
 
 

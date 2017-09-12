@@ -22,8 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 // -------------------------- DataPostprocessor ---------------------------
 
 template <int dim>
-DataPostprocessor<dim>::~DataPostprocessor()
-{}
+DataPostprocessor<dim>::~DataPostprocessor() = default;
 
 
 

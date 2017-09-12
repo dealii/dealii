@@ -21,8 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-Mapping<dim, spacedim>::~Mapping ()
-{}
+Mapping<dim, spacedim>::~Mapping () = default;
 
 
 template <int dim, int spacedim>
@@ -87,8 +86,7 @@ Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
 
 
 template <int dim, int spacedim>
-Mapping<dim, spacedim>::InternalDataBase::~InternalDataBase ()
-{}
+Mapping<dim, spacedim>::InternalDataBase::~InternalDataBase () = default;
 
 
 

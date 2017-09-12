@@ -357,8 +357,7 @@ namespace PETScWrappers
     }
 
     inline
-    BlockVector::~BlockVector ()
-    {}
+    BlockVector::~BlockVector () = default;
 
 
     inline

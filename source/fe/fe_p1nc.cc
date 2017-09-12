@@ -73,7 +73,7 @@ std::unique_ptr<FiniteElement<2,2>>
 
 
 
-FE_P1NC::~FE_P1NC () {}
+FE_P1NC::~FE_P1NC () = default;
 
 
 

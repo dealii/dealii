@@ -583,8 +583,7 @@ new_pointer_matrix_base(const TridiagonalMatrix<numberm> &matrix, const Vector<n
 
 template <typename VectorType>
 inline
-PointerMatrixBase<VectorType>::~PointerMatrixBase ()
-{}
+PointerMatrixBase<VectorType>::~PointerMatrixBase () = default;
 
 
 

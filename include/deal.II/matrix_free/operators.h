@@ -883,9 +883,7 @@ namespace MatrixFreeOperators
 
   //----------------- Base operator -----------------------------
   template <int dim, typename VectorType>
-  Base<dim,VectorType>::~Base ()
-  {
-  }
+  Base<dim,VectorType>::~Base () = default;
 
 
 

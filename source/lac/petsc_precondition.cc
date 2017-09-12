@@ -123,8 +123,7 @@ namespace PETScWrappers
   }
 
 
-  PreconditionJacobi::PreconditionJacobi ()
-  {}
+  PreconditionJacobi::PreconditionJacobi () = default;
 
 
   PreconditionJacobi::PreconditionJacobi (const MatrixBase     &matrix,
@@ -175,8 +174,7 @@ namespace PETScWrappers
   }
 
 
-  PreconditionBlockJacobi::PreconditionBlockJacobi ()
-  {}
+  PreconditionBlockJacobi::PreconditionBlockJacobi () = default;
 
 
   PreconditionBlockJacobi::
@@ -223,8 +221,7 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionSOR::PreconditionSOR ()
-  {}
+  PreconditionSOR::PreconditionSOR () = default;
 
 
   PreconditionSOR::PreconditionSOR (const MatrixBase     &matrix,
@@ -269,8 +266,7 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionSSOR::PreconditionSSOR ()
-  {}
+  PreconditionSSOR::PreconditionSSOR () = default;
 
 
   PreconditionSSOR::PreconditionSSOR (const MatrixBase     &matrix,
@@ -319,8 +315,7 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionEisenstat::PreconditionEisenstat ()
-  {}
+  PreconditionEisenstat::PreconditionEisenstat () = default;
 
 
   PreconditionEisenstat::PreconditionEisenstat (const MatrixBase     &matrix,
@@ -366,8 +361,7 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionICC::PreconditionICC ()
-  {}
+  PreconditionICC::PreconditionICC () = default;
 
 
   PreconditionICC::PreconditionICC (const MatrixBase     &matrix,
@@ -412,8 +406,7 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionILU::PreconditionILU ()
-  {}
+  PreconditionILU::PreconditionILU () = default;
 
 
   PreconditionILU::PreconditionILU (const MatrixBase     &matrix,
@@ -467,8 +460,7 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionBoomerAMG::PreconditionBoomerAMG ()
-  {}
+  PreconditionBoomerAMG::PreconditionBoomerAMG () = default;
 
   PreconditionBoomerAMG::PreconditionBoomerAMG (const MPI_Comm comm,
                                                 const AdditionalData &additional_data_)
@@ -586,8 +578,7 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionParaSails::PreconditionParaSails ()
-  {}
+  PreconditionParaSails::PreconditionParaSails () = default;
 
 
   PreconditionParaSails::PreconditionParaSails (const MatrixBase     &matrix,
@@ -682,8 +673,7 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionNone ------------------------- */
 
-  PreconditionNone::PreconditionNone ()
-  {}
+  PreconditionNone::PreconditionNone () = default;
 
 
   PreconditionNone::PreconditionNone (const MatrixBase     &matrix,
@@ -728,8 +718,7 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionLU::PreconditionLU ()
-  {}
+  PreconditionLU::PreconditionLU () = default;
 
 
   PreconditionLU::PreconditionLU (const MatrixBase     &matrix,

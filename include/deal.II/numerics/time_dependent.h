@@ -895,7 +895,7 @@ private:
    * private prevents the compiler to provide it's own, incorrect one if
    * anyone chose to copy such an object.
    */
-  TimeStepBase (const TimeStepBase &);
+  TimeStepBase (const TimeStepBase &) = delete;
 
   /**
    * Copy operator. I can see no reason why someone might want to use it, so I
@@ -903,7 +903,7 @@ private:
    * prevents the compiler to provide it's own, incorrect one if anyone chose
    * to copy such an object.
    */
-  TimeStepBase &operator = (const TimeStepBase &);
+  TimeStepBase &operator = (const TimeStepBase &) = delete;
 
   // make the manager object a friend
   friend class TimeDependent;

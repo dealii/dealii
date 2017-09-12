@@ -18,8 +18,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-ConvergenceTable::ConvergenceTable()
-{}
+ConvergenceTable::ConvergenceTable() = default;
+
 
 
 void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,

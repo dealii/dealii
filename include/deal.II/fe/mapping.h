@@ -529,7 +529,7 @@ public:
     /**
      * Copy construction is forbidden.
      */
-    InternalDataBase (const InternalDataBase &);
+    InternalDataBase (const InternalDataBase &) = delete;
 
   public:
     /**

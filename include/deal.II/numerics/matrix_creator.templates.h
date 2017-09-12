@@ -622,7 +622,7 @@ namespace MatrixCreator
     {
       struct Scratch
       {
-        Scratch() {}
+        Scratch() = default;
       };
 
       template <typename DoFHandlerType, typename number>

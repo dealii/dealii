@@ -48,8 +48,7 @@ SolverControl::SolverControl (const unsigned int maxiter,
 
 
 
-SolverControl::~SolverControl()
-{}
+SolverControl::~SolverControl() = default;
 
 
 
@@ -259,8 +258,7 @@ ReductionControl::operator= (const SolverControl &c)
 }
 
 
-ReductionControl::~ReductionControl()
-{}
+ReductionControl::~ReductionControl() = default;
 
 
 SolverControl::State
@@ -324,8 +322,7 @@ IterationNumberControl::IterationNumberControl(const unsigned int n,
   SolverControl (n, tolerance, m_log_history, m_log_result) {}
 
 
-IterationNumberControl::~IterationNumberControl()
-{}
+IterationNumberControl::~IterationNumberControl() = default;
 
 
 SolverControl::State
@@ -388,8 +385,7 @@ ConsecutiveControl::operator= (const SolverControl &c)
 
 
 
-ConsecutiveControl::~ConsecutiveControl()
-{}
+ConsecutiveControl::~ConsecutiveControl() = default;
 
 
 SolverControl::State

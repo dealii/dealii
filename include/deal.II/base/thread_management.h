@@ -104,7 +104,7 @@ namespace Threads
        * Destructor. Unlock the mutex. Since this is a dummy mutex class, this
        * of course does nothing.
        */
-      ~ScopedLock () {}
+      ~ScopedLock () = default;
     };
 
     /**
@@ -719,7 +719,9 @@ namespace Threads
     private:
       RT *value;
     public:
-      inline return_value () : value(nullptr) {}
+      inline return_value ()
+        : value(nullptr)
+      {}
 
       inline RT &get () const
       {

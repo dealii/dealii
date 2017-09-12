@@ -230,20 +230,9 @@ namespace LinearAlgebra
      * Destructor. Declared as virtual so that inheriting classes (which may
      * manage their own memory) are destroyed correctly.
      */
-    virtual ~VectorSpaceVector();
+    virtual ~VectorSpaceVector() = default;
   };
   /*@}*/
-
-
-
-#ifndef DOXYGEN
-  // TODO we can get rid of this when we require C++11 by using '=default'
-  // above
-  template <typename Number>
-  inline
-  VectorSpaceVector<Number>::~VectorSpaceVector()
-  {}
-#endif // DOXYGEN
 }
 
 DEAL_II_NAMESPACE_CLOSE

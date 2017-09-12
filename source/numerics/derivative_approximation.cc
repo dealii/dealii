@@ -735,12 +735,12 @@ namespace DerivativeApproximation
     {
       struct Scratch
       {
-        Scratch() {}
+        Scratch() = default;
       };
 
       struct CopyData
       {
-        CopyData() {}
+        CopyData() = default;
       };
     }
   }

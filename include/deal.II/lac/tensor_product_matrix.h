@@ -206,8 +206,7 @@ private:
 template <int dim, typename Number, int size>
 inline
 TensorProductMatrixSymmetricSum<dim,Number,size>
-::TensorProductMatrixSymmetricSum()
-{}
+::TensorProductMatrixSymmetricSum() = default;
 
 
 
