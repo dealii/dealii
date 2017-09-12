@@ -927,10 +927,16 @@ namespace internal
               };
 
               auto unpack
-                = [] (const typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell,
-                      const unsigned int                                                        &active_fe_index) -> void
+                = [&dof_handler] (const typename dealii::hp::DoFHandler<dim,spacedim>::active_cell_iterator &cell,
+                                  const unsigned int                                                        &active_fe_index) -> void
               {
-                cell->set_active_fe_index(active_fe_index);
+                // we would like to say
+                //   cell->set_active_fe_index(active_fe_index);
+                // but this is not allowed on cells that are not
+                // locally owned, and we are on a ghost cell
+                dof_handler.levels[cell->level()]->
+                set_active_fe_index(cell->index(),
+                active_fe_index);
               };
 
               parallel::GridTools::exchange_cell_data_to_ghosts<unsigned int, dealii::hp::DoFHandler<dim,spacedim>>
