@@ -55,7 +55,8 @@ class HarmonicOscillator
 {
 
 public:
-  HarmonicOscillator(double _kappa=1.0) :
+  HarmonicOscillator(double _kappa, const typename SUNDIALS::IDA<Vector<double>>::AdditionalData &data) :
+    time_stepper(MPI_COMM_WORLD, data),
     y(2),
     y_dot(2),
     J(2,2),
@@ -140,9 +141,9 @@ int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
-  HarmonicOscillator ode(1.0);
+  SUNDIALS::IDA<Vector<double>>::AdditionalData data;
   ParameterHandler prm;
-  ode.time_stepper.add_parameters(prm);
+  data.add_parameters(prm);
 
   // std::ofstream ofile(SOURCE_DIR "/harmonic_oscillator_01.prm");
   // prm.print_parameters(ofile, ParameterHandler::ShortText);
@@ -150,6 +151,9 @@ int main (int argc, char **argv)
 
   std::ifstream ifile(SOURCE_DIR "/harmonic_oscillator_01.prm");
   prm.parse_input(ifile);
+
+
+  HarmonicOscillator ode(1.0, data);
   ode.run();
   return 0;
 }

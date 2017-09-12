@@ -1,16 +1,20 @@
-set Absolute error tolerance                      = 0.000001
-set Final time                                    = 6.3
-set Ignore algebraic terms for error computations = false
-set Initial condition Newton max iterations       = 5
-set Initial condition Newton parameter            = 0.330000
-set Initial condition type                        = none
-set Initial condition type after restart          = none
-set Initial step size                             = 0.1
-set Initial time                                  = 0
-set Maximum number of nonlinear iterations        = 10
-set Maximum order of BDF                          = 5
-set Minimum step size                             = 0.000001
-set Relative error tolerance                      = 0.00001
-set Show output of time steps                     = true
-set Time interval between each output             = 0.2
-set Use local tolerances                          = false
+set Final time                        = 6.3
+set Initial time                      = 0
+set Time interval between each output = 0.2
+subsection Error control
+  set Absolute error tolerance                      = 1e-6
+  set Ignore algebraic terms for error computations = true
+  set Relative error tolerance                      = 1e-5
+  set Use local tolerances                          = false
+end
+subsection Initial condition correction parameters
+  set Correction type at initial time        = none
+  set Correction type after restart          = none
+  set Maximum number of nonlinear iterations = 5
+end
+subsection Running parameters
+  set Initial step size                      = 0.1
+  set Maximum number of nonlinear iterations = 10
+  set Maximum order of BDF                   = 5
+  set Minimum step size                      = 0.000001
+end

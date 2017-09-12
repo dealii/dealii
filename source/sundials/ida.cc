@@ -148,42 +148,10 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  IDA<VectorType>::IDA(const MPI_Comm mpi_comm,
-                       const double &initial_time,
-                       const double &final_time,
-                       const double &initial_step_size,
-                       const double &min_step_size,
-                       const double &abs_tol,
-                       const double &rel_tol,
-                       const unsigned int &max_order,
-                       const double &output_period,
-                       const bool &ignore_algebraic_terms_for_errors,
-                       const std::string &ic_type,
-                       const std::string &reset_type,
-                       const double &ic_alpha,
-                       const unsigned int &ic_max_iter,
-                       const unsigned int &max_non_linear_iterations,
-                       const bool &verbose,
-                       const bool &use_local_tolerances) :
-    initial_time(initial_time),
-    final_time(final_time),
-    initial_step_size(initial_step_size),
-    min_step_size(min_step_size),
-    abs_tol(abs_tol),
-    rel_tol(rel_tol),
-    max_order(max_order),
-    output_period(output_period),
-    ignore_algebraic_terms_for_errors(ignore_algebraic_terms_for_errors),
-    ic_type(ic_type),
-    reset_type(reset_type),
-    ic_alpha(ic_alpha),
-    ic_max_iter(ic_max_iter),
-    max_non_linear_iterations(max_non_linear_iterations),
-    verbose(verbose),
-    use_local_tolerances(use_local_tolerances),
+  IDA<VectorType>::IDA(const MPI_Comm mpi_comm, const AdditionalData &data) :
+    data(data),
     ida_mem(nullptr),
-    communicator(Utilities::MPI::duplicate_communicator(mpi_comm)),
-    pcout(std::cout, Utilities::MPI::this_mpi_process(mpi_comm)==0)
+    communicator(Utilities::MPI::duplicate_communicator(mpi_comm))
   {
     set_functions_to_trigger_an_assert();
   }
@@ -196,61 +164,6 @@ namespace SUNDIALS
     MPI_Comm_free(&communicator);
   }
 
-  template <typename VectorType>
-  void IDA<VectorType>::add_parameters(ParameterHandler &prm)
-  {
-    prm.add_parameter("Initial step size",initial_step_size);
-
-    prm.add_parameter("Minimum step size", min_step_size);
-
-    prm.add_parameter("Absolute error tolerance", abs_tol);
-
-    prm.add_parameter("Relative error tolerance", rel_tol);
-
-    prm.add_parameter("Initial time", initial_time);
-
-    prm.add_parameter("Final time", final_time);
-
-    prm.add_parameter("Time interval between each output", output_period);
-
-    prm.add_parameter("Maximum order of BDF", max_order);
-
-    prm.add_parameter("Maximum number of nonlinear iterations", max_non_linear_iterations);
-
-    prm.add_parameter("Ignore algebraic terms for error computations", ignore_algebraic_terms_for_errors,
-                      "Indicate whether or not to suppress algebraic variables "
-                      "in the local error test.");
-
-    prm.add_parameter("Initial condition type", ic_type,
-                      "This is one of the following three options for the "
-                      "initial condition calculation. \n"
-                      " none: do not try to make initial conditions consistent. \n"
-                      " use_y_diff: compute the algebraic components of y and differential\n"
-                      "    components of y_dot, given the differential components of y. \n"
-                      "    This option requires that the user specifies differential and \n"
-                      "    algebraic components in the function get_differential_components.\n"
-                      " use_y_dot: compute all components of y, given y_dot.",
-                      Patterns::Selection("none|use_y_diff|use_y_dot"));
-
-    prm.add_parameter("Initial condition type after restart", reset_type,
-                      "This is one of the following three options for the "
-                      "initial condition calculation. \n"
-                      " none: do not try to make initial conditions consistent. \n"
-                      " use_y_diff: compute the algebraic components of y and differential\n"
-                      "    components of y_dot, given the differential components of y. \n"
-                      "    This option requires that the user specifies differential and \n"
-                      "    algebraic components in the function get_differential_components.\n"
-                      " use_y_dot: compute all components of y, given y_dot.",
-                      Patterns::Selection("none|use_y_diff|use_y_dot"));
-
-    prm.add_parameter("Initial condition Newton parameter", ic_alpha);
-
-    prm.add_parameter("Initial condition Newton max iterations", ic_max_iter);
-
-    prm.add_parameter("Use local tolerances", use_local_tolerances);
-
-    prm.add_parameter("Show output of time steps", verbose);
-  }
 
 
   template <typename VectorType>
@@ -261,8 +174,8 @@ namespace SUNDIALS
     unsigned int system_size = solution.size();
     unsigned int local_system_size = system_size;
 
-    double t = initial_time;
-    double h = initial_step_size;
+    double t = data.initial_time;
+    double h = data.initial_step_size;
     unsigned int step_number = 0;
 
     int status;
@@ -302,26 +215,20 @@ namespace SUNDIALS
         diff_id   = N_VNew_Serial(system_size);
         abs_tolls = N_VNew_Serial(system_size);
       }
-    reset(initial_time,
-          initial_step_size,
+    reset(data.initial_time,
+          data.initial_step_size,
           solution,
           solution_dot);
 
-    double next_time = initial_time;
+    double next_time = data.initial_time;
 
     output_step( 0, solution, solution_dot, 0);
 
-    while (t<final_time)
+    while (t<data.final_time)
       {
 
-        next_time += output_period;
-        if (verbose)
-          {
-            pcout << " "//"\r"
-                  << std::setw(5) << t << " ----> "
-                  << std::setw(5) << next_time
-                  << std::endl;
-          }
+        next_time += data.output_period;
+
         status = IDASolve(ida_mem, next_time, &t, yy, yp, IDA_NORMAL);
         AssertIDA(status);
 
@@ -339,7 +246,6 @@ namespace SUNDIALS
         output_step(t, solution, solution_dot, step_number);
       }
 
-    pcout << std::endl;
     // Free the vectors which are no longer used.
 #ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
@@ -370,7 +276,7 @@ namespace SUNDIALS
 
     unsigned int system_size;
     unsigned int local_system_size;
-    bool first_step = (current_time == initial_time);
+    bool first_step = (current_time == data.initial_time);
 
     if (ida_mem)
       IDAFree(&ida_mem);
@@ -439,15 +345,15 @@ namespace SUNDIALS
     status = IDAInit(ida_mem, t_dae_residual<VectorType>, current_time, yy, yp);
     AssertIDA(status);
 
-    if (use_local_tolerances)
+    if (data.use_local_tolerances)
       {
         copy(abs_tolls, get_local_tolerances());
-        status = IDASVtolerances(ida_mem, rel_tol, abs_tolls);
+        status = IDASVtolerances(ida_mem, data.relative_tolerance, abs_tolls);
         AssertIDA(status);
       }
     else
       {
-        status = IDASStolerances(ida_mem, rel_tol, abs_tol);
+        status = IDASStolerances(ida_mem, data.relative_tolerance, data.absolute_tolerance);
         AssertIDA(status);
       }
 
@@ -457,7 +363,9 @@ namespace SUNDIALS
     status = IDASetUserData(ida_mem, (void *) this);
     AssertIDA(status);
 
-    if (ic_type == "use_y_diff" || reset_type == "use_y_diff" || ignore_algebraic_terms_for_errors)
+    if (data.ic_type == AdditionalData::use_y_diff ||
+        data.reset_type == AdditionalData::use_y_diff  ||
+        data.ignore_algebraic_terms_for_errors)
       {
         VectorType diff_comp_vector(solution);
         diff_comp_vector = 0.0;
@@ -470,14 +378,14 @@ namespace SUNDIALS
         AssertIDA(status);
       }
 
-    status = IDASetSuppressAlg(ida_mem, ignore_algebraic_terms_for_errors);
+    status = IDASetSuppressAlg(ida_mem, data.ignore_algebraic_terms_for_errors);
     AssertIDA(status);
 
 //  status = IDASetMaxNumSteps(ida_mem, max_steps);
-    status = IDASetStopTime(ida_mem, final_time);
+    status = IDASetStopTime(ida_mem, data.final_time);
     AssertIDA(status);
 
-    status = IDASetMaxNonlinIters(ida_mem, max_non_linear_iterations);
+    status = IDASetMaxNonlinIters(ida_mem, data.maximum_non_linear_iterations);
     AssertIDA(status);
 
     // Initialize solver
@@ -488,24 +396,19 @@ namespace SUNDIALS
     IDA_mem->ida_lsolve = t_dae_solve<VectorType>;
     IDA_mem->ida_setupNonNull = true;
 
-    status = IDASetMaxOrd(ida_mem, max_order);
+    status = IDASetMaxOrd(ida_mem, data.maximum_order);
     AssertIDA(status);
 
-    std::string type;
+    typename AdditionalData::InitialConditionCorrection  type;
     if (first_step)
-      type = ic_type;
+      type = data.ic_type;
     else
-      type = reset_type;
+      type = data.reset_type;
 
-    if (verbose)
-      {
-        pcout << "computing consistent initial conditions with the option "
-              << type
-              << " please be patient."
-              << std::endl;
-      }
+    status = IDASetMaxNumItersIC(ida_mem, data.maximum_non_linear_iterations_ic);
+    AssertIDA(status);
 
-    if (type == "use_y_dot")
+    if (type == AdditionalData::use_y_dot)
       {
         // (re)initialization of the vectors
         status = IDACalcIC(ida_mem, IDA_Y_INIT, current_time+current_time_step);
@@ -517,7 +420,7 @@ namespace SUNDIALS
         copy(solution, yy);
         copy(solution_dot, yp);
       }
-    else if (type == "use_y_diff")
+    else if (type == AdditionalData::use_y_diff)
       {
         status = IDACalcIC(ida_mem, IDA_YA_YDP_INIT, current_time+current_time_step);
         AssertIDA(status);
@@ -528,18 +431,6 @@ namespace SUNDIALS
         copy(solution, yy);
         copy(solution_dot, yp);
       }
-
-    if (verbose)
-      {
-        pcout << "compute initial conditions: done."
-              << std::endl;
-      }
-  }
-
-  template<typename VectorType>
-  void IDA<VectorType>::set_initial_time(const double &t)
-  {
-    initial_time = t;
   }
 
   template<typename VectorType>

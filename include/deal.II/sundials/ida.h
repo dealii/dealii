@@ -37,6 +37,7 @@
 #include <sundials/sundials_math.h>
 #include <sundials/sundials_types.h>
 
+#include <boost/signals2.hpp>
 #include <memory>
 
 
@@ -49,11 +50,11 @@ namespace SUNDIALS
 {
 
   /**
-   * Interface to SUNDIALS IDA (Implicit Differential-Algebraic) solver.
+   * Interface to SUNDIALS Implicit Differential-Algebraic (IDA) solver.
    *
-   * The class IDAInterface is a wrapper to the Implicit
-   * Differential-Algebraic solver which is a general purpose solver for
-   * systems of Differential-Algebraic Equations (DAEs).
+   * The class IDA is a wrapper to SUNDIALS Implicit Differential-Algebraic
+   * solver which is a general purpose solver for systems of
+   * Differential-Algebraic Equations (DAEs).
    *
    * The user has to provide the implementation of the following std::functions:
    *  - reinit_vector;
@@ -67,8 +68,10 @@ namespace SUNDIALS
    * thrown.
    *  - solver_should_restart;
    *  - differential_components;
-   *  - output_step;
    *  - get_local_tolerances;
+   *
+   * To output steps, connect a function to the signal
+   *  - output_step;
    *
    * Citing from the SUNDIALS documentation:
    *
@@ -143,7 +146,6 @@ namespace SUNDIALS
    * \f]
    *
    * That is $F(y', y, t) = y' + A y = 0 $
-   *
    * where
    * \f[
    * \begin{matrix}
@@ -151,13 +153,12 @@ namespace SUNDIALS
    * k^2 &0
    * \end{matrix}
    * \f]
-   *
-   * and $y(0)=(0, k)$, $y'(0) = (k, 0)$
+   * and $y(0)=(0, k)$, $y'(0) = (k, 0)$.
    *
    * The exact solution is $y_0(t) = \sin(k t)$, $y_1(t) = y_0'(t) = k \cos(k t)$,
-   * $y_1'(t) = -k^2 \sin(k t)$
+   * $y_1'(t) = -k^2 \sin(k t)$.
    *
-   * The Jacobian to assemble is the following:  $J = \alpha I + A$
+   * The Jacobian to assemble is the following:  $J = \alpha I + A$.
    *
    * This is achieved by the following snippet of code:
    * @code
@@ -226,8 +227,308 @@ namespace SUNDIALS
   public:
 
     /**
-     * Constructor. It is possible to fine tune the SUNDIALS IDA solver by tweaking some of
-     * the input parameters.
+     * Additional parameters that can be passed to the IDA class.
+     */
+    class AdditionalData
+    {
+    public:
+      /**
+       * IDA is a Differential Algebraic solver. As such, it requires initial
+       * conditions also for the first order derivatives. If you do not provide
+       * consistent initial conditions, (i.e., conditions for which F(y_dot(0),
+       * y(0), 0) = 0), you can ask SUNDIALS to compute initial conditions for
+       * you by specifying InitialConditionCorrection for the initial
+       * conditions both at the `initial_time` (`ic_type`) and after a reset
+       * has occurred (`reset_type`).
+       */
+      enum InitialConditionCorrection
+      {
+        /**
+         * Do not try to make initial conditions consistent.
+         */
+        none = 0,
+
+        /**
+         * Compute the algebraic components of y and differential
+         * components of y_dot, given the differential components of y.
+         *    This option requires that the user specifies differential and
+         *    algebraic components in the function get_differential_components.
+         */
+        use_y_diff = 1,
+
+        /**
+         * Compute all components of y, given y_dot.
+         */
+        use_y_dot = 2
+      };
+
+      /**
+       * Initialization parameters for IDA.
+       *
+       * Global parameters:
+       *
+       * @param initial_time Initial time
+       * @param final_time Final time
+       * @param initial_step_size Initial step size
+       * @param output_period Time interval between each output
+       *
+       * Running parameters:
+       *
+       * @param minimum_step_size Minimum step size
+       * @param maximum_order Maximum BDF order
+       * @param maximum_non_linear_iterations Maximum number of nonlinear iterations
+       *
+       * Error parameters:
+       *
+       * @param absolute_tolerance Absolute error tolerance
+       * @param relative_tolerance Relative error tolerance
+       * @param use_local_tolerances Use local tolerances when computing errors
+       * @param ignore_algebraic_terms_for_errors Ignore algebraic terms for error computations
+       *
+       * Initial condition correction parameters:
+       *
+       * @param ic_type Initial condition correction type
+       * @param reset_type Initial condition correction type after restart
+       * @param maximum_non_linear_iterations_ic Initial condition Newton max iterations
+       */
+      AdditionalData(// Initial parameters
+        const double &initial_time = 0.0,
+        const double &final_time = 1.0,
+        const double &initial_step_size = 1e-2,
+        const double &output_period = 1e-1,
+        // Running parameters
+        const double &minimum_step_size = 1e-6,
+        const unsigned int &maximum_order = 5,
+        const unsigned int &maximum_non_linear_iterations = 10,
+        // Error parameters
+        const double &absolute_tolerance = 1e-6,
+        const double &relative_tolerance = 1e-5,
+        const bool &use_local_tolerances = false,
+        const bool &ignore_algebraic_terms_for_errors = true,
+        // Initial conditions parameters
+        const InitialConditionCorrection &ic_type = use_y_diff,
+        const InitialConditionCorrection &reset_type = use_y_diff,
+        const unsigned int &maximum_non_linear_iterations_ic = 5) :
+        initial_time(initial_time),
+        final_time(final_time),
+        initial_step_size(initial_step_size),
+        minimum_step_size(minimum_step_size),
+        absolute_tolerance(absolute_tolerance),
+        relative_tolerance(relative_tolerance),
+        maximum_order(maximum_order),
+        output_period(output_period),
+        ignore_algebraic_terms_for_errors(ignore_algebraic_terms_for_errors),
+        ic_type(ic_type),
+        reset_type(reset_type),
+        maximum_non_linear_iterations_ic(maximum_non_linear_iterations_ic),
+        maximum_non_linear_iterations(maximum_non_linear_iterations),
+        use_local_tolerances(use_local_tolerances)
+      {};
+
+      /**
+       * Add all AdditionalData() parameters to the given ParameterHandler
+       * object. When the parameters are parsed from a file, the internal
+       * parameters are automatically updated.
+       *
+       * The following parameters are declared:
+       *
+       * @code
+       * set Final time                        = 1.000000
+       * set Initial time                      = 0.000000
+       * set Time interval between each output = 0.2
+       * subsection Error control
+       *   set Absolute error tolerance                      = 0.000001
+       *   set Ignore algebraic terms for error computations = true
+       *   set Relative error tolerance                      = 0.00001
+       *   set Use local tolerances                          = false
+       * end
+       * subsection Initial condition correction parameters
+       *   set Correction type at initial time        = none
+       *   set Correction type after restart          = none
+       *   set Maximum number of nonlinear iterations = 5
+       * end
+       * subsection Running parameters
+       *   set Initial step size                      = 0.1
+       *   set Maximum number of nonlinear iterations = 10
+       *   set Maximum order of BDF                   = 5
+       *   set Minimum step size                      = 0.000001
+       * end
+       * @endcode
+       *
+       * These are one-to-one with the options you can pass at construction time.
+       *
+       * The options you pass at construction time are set as default values in
+       * the ParameterHandler object `prm`. You can later modify them by parsing
+       * a parameter file using `prm`. The values of the parameter will be updated
+       * whenever the content of `prm` is updated.
+       *
+       * Make sure that this class lives longer than `prm`. Undefined behaviour
+       * will occurr if you destroy this class, and then parse a parameter file
+       * using `prm`.
+       */
+      void add_parameters(ParameterHandler &prm)
+      {
+        prm.add_parameter("Initial time", initial_time);
+        prm.add_parameter("Final time", final_time);
+        prm.add_parameter("Time interval between each output", output_period);
+
+        prm.enter_subsection("Running parameters");
+        prm.add_parameter("Initial step size",initial_step_size);
+        prm.add_parameter("Minimum step size", minimum_step_size);
+        prm.add_parameter("Maximum order of BDF", maximum_order);
+        prm.add_parameter("Maximum number of nonlinear iterations", maximum_non_linear_iterations);
+        prm.leave_subsection();
+
+        prm.enter_subsection("Error control");
+        prm.add_parameter("Absolute error tolerance", absolute_tolerance);
+        prm.add_parameter("Relative error tolerance", relative_tolerance);
+        prm.add_parameter("Ignore algebraic terms for error computations", ignore_algebraic_terms_for_errors,
+                          "Indicate whether or not to suppress algebraic variables "
+                          "in the local error test.");
+        prm.add_parameter("Use local tolerances", use_local_tolerances);
+        prm.leave_subsection();
+
+        prm.enter_subsection("Initial condition correction parameters");
+        static std::string ic_type_str="use_y_diff";
+        prm.add_parameter("Correction type at initial time", ic_type_str,
+                          "This is one of the following three options for the "
+                          "initial condition calculation. \n"
+                          " none: do not try to make initial conditions consistent. \n"
+                          " use_y_diff: compute the algebraic components of y and differential\n"
+                          "    components of y_dot, given the differential components of y. \n"
+                          "    This option requires that the user specifies differential and \n"
+                          "    algebraic components in the function get_differential_components.\n"
+                          " use_y_dot: compute all components of y, given y_dot.",
+                          Patterns::Selection("none|use_y_diff|use_y_dot"));
+        prm.add_action("Correction type at initial time",[&](const std::string &value)
+        {
+          if (value == "use_y_diff")
+            ic_type = use_y_diff;
+          else if (value == "use_y_dot")
+            ic_type = use_y_dot;
+          else if (value == "none")
+            ic_type = none;
+          else
+            AssertThrow(false, ExcInternalError());
+        });
+
+        static std::string reset_type_str="use_y_diff";
+        prm.add_parameter("Correction type after restart", reset_type_str,
+                          "This is one of the following three options for the "
+                          "initial condition calculation. \n"
+                          " none: do not try to make initial conditions consistent. \n"
+                          " use_y_diff: compute the algebraic components of y and differential\n"
+                          "    components of y_dot, given the differential components of y. \n"
+                          "    This option requires that the user specifies differential and \n"
+                          "    algebraic components in the function get_differential_components.\n"
+                          " use_y_dot: compute all components of y, given y_dot.",
+                          Patterns::Selection("none|use_y_diff|use_y_dot"));
+        prm.add_action("Correction type after restart",[&](const std::string &value)
+        {
+          if (value == "use_y_diff")
+            reset_type = use_y_diff;
+          else if (value == "use_y_dot")
+            reset_type = use_y_dot;
+          else if (value == "none")
+            reset_type = none;
+          else
+            AssertThrow(false, ExcInternalError());
+        });
+        prm.add_parameter("Maximum number of nonlinear iterations", maximum_non_linear_iterations_ic);
+        prm.leave_subsection();
+      }
+
+      /**
+       * Initial time for the DAE.
+       */
+      double initial_time;
+
+      /**
+       * Final time.
+       */
+      double final_time;
+
+      /**
+       * Initial step size.
+       */
+      double initial_step_size;
+
+      /**
+       * Minimum step size.
+       */
+      double minimum_step_size;
+
+      /**
+       * Absolute error tolerance for adaptive time stepping.
+       */
+      double absolute_tolerance;
+
+      /**
+       * Relative error tolerance for adaptive time stepping.
+       */
+      double relative_tolerance;
+
+      /**
+       * Maximum order of BDF.
+       */
+      unsigned int maximum_order;
+
+      /**
+       * Time period between each output.
+       */
+      double output_period;
+
+      /**
+       * Ignore algebraic terms for errors.
+       */
+      bool ignore_algebraic_terms_for_errors;
+
+      /**
+       * Type of correction for initial conditions.
+       *
+       * If you do not provide consistent initial conditions, (i.e., conditions
+       * for which $F(y_dot(0), y(0), 0) = 0$), you can ask SUNDIALS to compute
+       * initial conditions for you by using the `ic_type` parameter at
+       * construction time.
+       *
+       * Notice that you could in principle use this capabilities to solve for
+       * stady state problems by setting y_dot to zero, and asking to compute
+       * $y(0)$ that satisfies $F(0, y(0), 0) = 0$, however the nonlinear solver
+       * used inside IDA may not be robust enough for complex problems with
+       * several millions unknowns.
+       */
+      InitialConditionCorrection ic_type;
+
+      /**
+       * Type of correction for initial conditions to be used after a solver
+       * restart.
+       *
+       * If you do not have consistent initial conditions after a restart, (i.e.,
+       * conditions for which F(y_dot(t_restart), y(t_restart), t_restart) = 0),
+       * you can ask SUNDIALS to compute the new initial conditions for you by
+       * using the `reset_type` parameter at construction time.
+       */
+      InitialConditionCorrection reset_type;
+
+      /**
+       * Maximum number of iterations for Newton method in IC calculation.
+       */
+      unsigned maximum_non_linear_iterations_ic;
+
+      /**
+       * Maximum number of iterations for Newton method during time advancement.
+       */
+      unsigned int maximum_non_linear_iterations;
+
+      /**
+       * Use local tolerances when computing absolute tolerance.
+       */
+      bool use_local_tolerances;
+    };
+
+    /**
+     * Constructor. It is possible to fine tune the SUNDIALS IDA solver by passing an
+     * AdditionalData() object that sets all of the solver parameters.
      *
      * IDA is a Differential Algebraic solver. As such, it requires initial conditions also for
      * the first order derivatives. If you do not provide consistent initial conditions, (i.e.,
@@ -257,81 +558,19 @@ namespace SUNDIALS
      * options that you used for the initial conditions in `reset_type`.
      *
      * @param mpi_comm MPI communicator
-     * @param initial_time Initial time
-     * @param final_time Final time
-     * @param initial_step_size Initial step size
-     * @param min_step_size Minimum step size
-     * @param abs_tol Absolute error tolerance
-     * @param rel_tol Relative error tolerance
-     * @param max_order Maximum BDF order
-     * @param output_period Time interval between each output
-     * @param ignore_algebraic_terms_for_errors Ignore algebraic terms for error computations
-     * @param ic_type Initial condition type
-     * @param reset_type Initial condition type after restart
-     * @param ic_alpha Initial condition Newton parameter
-     * @param ic_max_iter Initial condition Newton max iterations
-     * @param max_non_linear_iterations Maximum number of nonlinear iterations
-     * @param verbose Show output of time steps
-     * @param use_local_tolerances Use local tolerances
+     * @param data IDA configuration data
      */
     IDA(const MPI_Comm mpi_comm = MPI_COMM_WORLD,
-        const double &initial_time = 0.0,
-        const double &final_time = 1.0,
-        const double &initial_step_size = 1e-4,
-        const double &min_step_size = 1e-6,
-        const double &abs_tol = 1e-6,
-        const double &rel_tol = 1e-5,
-        const unsigned int &max_order = 5,
-        const double &output_period = .1,
-        const bool &ignore_algebraic_terms_for_errors = true,
-        const std::string &ic_type = "none",
-        const std::string &reset_type = "none",
-        const double &ic_alpha = .33,
-        const unsigned int &ic_max_iter = 5,
-        const unsigned int &max_non_linear_iterations = 10,
-        const bool &verbose = true,
-        const bool &use_local_tolerances = false);
+        const AdditionalData &data=AdditionalData());
 
     /**
-     * House cleaning.
+     * Destructor.
      */
     ~IDA();
 
     /**
-     * Add all internal parameters to the given ParameterHandler object. When
-     * the paramaters are parsed from a file, the internal parameters are automatically
-     * updated.
-     *
-     * The following parameters are declared:
-     *
-     * @code
-     * set Absolute error tolerance                      = 0.000001
-     * set Final time                                    = 1.000000
-     * set Ignore algebraic terms for error computations = true
-     * set Initial condition Newton max iterations       = 5
-     * set Initial condition Newton parameter            = 0.330000
-     * set Initial condition type                        = use_y_diff
-     * set Initial condition type after restart          = use_y_dot
-     * set Initial step size                             = 0.000100
-     * set Initial time                                  = 0.000000
-     * set Maximum number of nonlinear iterations        = 10
-     * set Maximum order of BDF                          = 5
-     * set Min step size                                 = 0.000001
-     * set Relative error tolerance                      = 0.000010
-     * set Show output of time steps                     = true
-     * set Time units between each output                = 0.05
-     * set Use local tolerances                          = false
-     * @endcode
-     *
-     * These are one-to-one with the options you can pass at construction time.
-     *
-     * Those options are set as default value in the ParameterHandler object
-     * `prm`.
-     */
-    virtual void add_parameters(ParameterHandler &prm);
-
-    /**
-     * Evolve. This function returns the final number of steps.
+     * Integrate differential-algebraic equations. This function returns the
+     * final number of computed steps.
      */
     unsigned int solve_dae(VectorType &solution,
                            VectorType &solution_dot);
@@ -341,11 +580,11 @@ namespace SUNDIALS
      * called when the simulation start and when the user returns true to a
      * call to solver_should_restart().
      *
-     * By default solver_should_restart returns false. If the user needs to
+     * By default solver_should_restart() returns false. If the user needs to
      * implement, for example, local adaptivity in space, he or she may assign
      * a different function to solver_should_restart() that performs all mesh
-     * changes, transfers the solution and the solution dot to the new mesh, and
-     * returns true.
+     * changes, transfers the solution and the solution dot to the new mesh,
+     * and returns true.
      *
      * During reset(), both y and yp are checked for consistency, and according to
      * what was specified as ic_type (if t==initial_time) or reset_type (if
@@ -368,7 +607,7 @@ namespace SUNDIALS
     std::function<void(VectorType &)> reinit_vector;
 
     /**
-     * Compute residual.
+     * Compute residual. Return $F(t, y, \dot y)$.
      *
      * This function should return:
      * - 0: Success
@@ -383,7 +622,27 @@ namespace SUNDIALS
                       VectorType &res)> residual;
 
     /**
-     * Compute Jacobian.
+     * Compute Jacobian. This function is called by IDA any time a Jacobian
+     * update is required. The user should compute the Jacobian (or update all
+     * the variables that allow the application of the Jacobian). This function
+     * is called by IDA once, before any call to solve_jacobian_system().
+     *
+     * The Jacobian $J$ should be a (possibly inexact) computation of
+     * \f[
+     *   J=\dfrac{\partial G}{\partial y} = \dfrac{\partial F}{\partial y} +
+     *  \alpha \dfrac{\partial F}{\partial \dot y}.
+     * \f]
+     *
+     * If the user uses a matrix based computation of the Jacobian, than this
+     * is the right place where an assembly routine shoulde be called to
+     * assemble both a matrix and a preconditioner for the Jacobian system.
+     * Subsequent calls (possibly more than one) to solve_jacobian_system() can
+     * assume that this function has been called at least once.
+     *
+     * Notice that no assumption is made by this interface on what the user
+     * should do in this function. IDA only assumes that after a call to
+     * setup_jacobian() it is possible to call solve_jacobian_system(), to
+     * obtain a solution $x$ to the system $J x = b$.
      *
      * This function should return:
      * - 0: Success
@@ -398,7 +657,25 @@ namespace SUNDIALS
                       const double alpha)> setup_jacobian;
 
     /**
-     * Solve linear system.
+     * Solve the Jacobian linear system. This function will be called by IDA
+     * (possibly several times) after setup_jacobian() has been called at least
+     * once. IDA tries to do its best to call setup_jacobian() the minimum
+     * amount of times. If convergence can be achieved without updating the
+     * Jacobian, then IDA does not call setup_jacobian() again. If, on the
+     * contrary, internal IDA convergence tests fail, then IDA calls again
+     * setup_jacobian() with updated vectors and coefficents so that successive
+     * calls to solve_jacobian_systems() lead to better convergence in the
+     * Newton process.
+     *
+     * The jacobian $J$ should be (an approximation of) the system Jacobian
+     * \f[
+     *   J=\dfrac{\partial G}{\partial y} = \dfrac{\partial F}{\partial y} +
+     *  \alpha \dfrac{\partial F}{\partial \dot y}.
+     * \f]
+     *
+     * A call to this function should store in `dst` the result of $J^{-1}$
+     * applied to `src`, i.e., `J*dst = src`. It is the users responsability to
+     * set up proper solvers and preconditioners inside this function.
      *
      * This function should return:
      * - 0: Success
@@ -410,7 +687,18 @@ namespace SUNDIALS
     std::function<int(const VectorType &rhs, VectorType &dst)> solve_jacobian_system;
 
     /**
-     * Store solutions to file.
+     * Process solution. This function is called by IDA at fixed time steps,
+     * every `output_period` seconds, and it is passed a polynomial
+     * interpolation of the solution and of its time derivative, computed using
+     * the current BDF order and the (internally stored) previously computed
+     * solution steps.
+     *
+     * Notice that it is well possible that internally IDA computes a time step
+     * which is much larger than the `output_period` step, and therefore calls
+     * this function consecutively several times by simply performing all
+     * intermediate interpolations. There is no relationship between how many
+     * times this function is called and how many time steps have actually been
+     * computed.
      */
     std::function<void (const double t,
                         const VectorType &sol,
@@ -441,7 +729,7 @@ namespace SUNDIALS
      * Return an index set containing the differential components.
      * Implementation of this function is optional. The default is to return a
      * complete index set. If your equation is also algebraic (i.e., it
-     * contains algebraic constraings, or lagrange multipliers), you should
+     * contains algebraic constraints, or lagrange multipliers), you should
      * overwrite this function in order to return only the differential
      * components of your system.
      */
@@ -457,12 +745,6 @@ namespace SUNDIALS
      * true, an exception will be thrown when trying to start the time stepper.
      */
     std::function<VectorType&()> get_local_tolerances;
-
-    /**
-     * Set initial time equal to @p t disregarding what is written
-     * in the parameter file.
-     */
-    void set_initial_time(const double &t);
 
     /**
      * Handle IDA exceptions.
@@ -488,116 +770,9 @@ namespace SUNDIALS
     void set_functions_to_trigger_an_assert();
 
     /**
-     * Initial time for the DAE.
+     * IDA configuration data.
      */
-    double initial_time;
-
-    /**
-     * Final time.
-     */
-    double final_time;
-
-    /**
-     * Initial step size.
-     */
-    double initial_step_size;
-
-    /**
-     * Minimum step size.
-     */
-    double min_step_size;
-
-    /**
-     * Absolute error tolerance for adaptive time stepping.
-     */
-    double abs_tol;
-
-    /**
-     * Relative error tolerance for adaptive time stepping.
-     */
-    double rel_tol;
-
-    /**
-     * Maximum order of BDF.
-     */
-    unsigned int max_order;
-
-    /**
-     * Time period between each output.
-     */
-    double output_period;
-
-    /**
-     * Ignore algebraic terms for errors.
-     */
-    bool ignore_algebraic_terms_for_errors;
-
-    /**
-     * Type of initial conditions.
-     *
-     * IDA is a Differential Algebraic solver. As such, it requires initial conditions also for
-     * the first order derivatives. If you do not provide consistent initial conditions, (i.e.,
-     * conditions for which $F(y_dot(0), y(0), 0) = 0$), you can ask SUNDIALS to compute initial
-     * conditions for you by using the `ic_type` parameter at construction time.
-     *
-     * You have three options
-     * -  none: do not try to make initial conditions consistent.
-     * -  use_y_diff: compute the algebraic components of y and differential
-     *    components of y_dot, given the differential components of y.
-     *    This option requires that the user specifies differential and
-     *    algebraic components in the function get_differential_components.
-     * -  use_y_dot: compute all components of y, given y_dot.
-     *
-     * Notice that you could in principle use this capabilities to solve for
-     * stady state problems by setting y_dot to zero, and asking to compute
-     * $y(0)$ that satisfies $F(0, y(0), 0) = 0$, however the nonlinear solver
-     * used inside IDA may not be robust enough for complex problems with
-     * several millions unknowns.
-     */
-    std::string ic_type;
-
-    /**
-     * Type of conditions to be used after a solver restart.
-     *
-     * If you do not have consistent initial conditions after a restart, (i.e.,
-     * conditions for which F(y_dot(t_restart), y(t_restart), t_restart) = 0),
-     * you can ask SUNDIALS to compute the new initial conditions for you by
-     * using the `reset_type` parameter at construction time.
-     *
-     * You have three options
-     * -  none: do not try to make initial conditions consistent.
-     * -  use_y_diff: compute the algebraic components of y and differential
-     *    components of y_dot, given the differential components of y.
-     *    This option requires that the user specifies differential and
-     *    algebraic components in the function get_differential_components.
-     * -  use_y_dot: compute all components of y, given y_dot.
-     */
-    std::string reset_type;
-
-    /**
-     * Alpha to use in Newton method for IC calculation.
-     */
-    double ic_alpha;
-
-    /**
-     * Maximum number of iterations for Newton method in IC calculation.
-     */
-    unsigned ic_max_iter;
-
-    /**
-     * Maximum number of iterations for Newton method during time advancement.
-     */
-    unsigned int max_non_linear_iterations;
-
-    /**
-     * Show the progress of the time stepper.
-     */
-    bool verbose;
-
-    /**
-     * Use local tolerances when computing absolute tolerance.
-     */
-    bool use_local_tolerances;
+    AdditionalData data;
 
     /**
      * IDA memory object.
@@ -630,12 +805,6 @@ namespace SUNDIALS
      */
     MPI_Comm communicator;
 #endif
-
-    /**
-     * Output stream. If run in parallel, only processor zero will
-     * output verbose information about time steps.
-     */
-    ConditionalOStream pcout;
 
     /**
      * Memory pool of vectors.
