@@ -1,0 +1,45 @@
+
+DEAL::Testing dim=1, degree=1
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
+DEAL::Testing dim=1, degree=2
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
+DEAL::Testing dim=1, degree=5
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
+DEAL::Testing dim=2, degree=1
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
+DEAL::Testing dim=2, degree=2
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
+DEAL::Testing dim=2, degree=5
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
+DEAL::Testing dim=2, degree=11
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
+DEAL::Testing dim=3, degree=1
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
+DEAL::Testing dim=3, degree=2
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
+DEAL::Testing dim=3, degree=3
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
+DEAL::Testing dim=3, degree=7
+DEAL::Verification of vmult and inverse: 0
+DEAL::Verification of vmult: 0
+DEAL::Verification of inverse: 0
