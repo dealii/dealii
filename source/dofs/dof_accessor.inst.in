@@ -164,3 +164,7 @@ for (deal_II_dimension : DIMENSIONS; lda : BOOL)
 #endif
 }
 
+for (deal_II_struct_dimension : DIMENSIONS; deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
+{
+    template class DoFInvalidAccessor<deal_II_struct_dimension,deal_II_dimension,deal_II_space_dimension>;
+}

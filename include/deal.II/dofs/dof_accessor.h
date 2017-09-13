@@ -637,10 +637,9 @@ protected:
    * a cell object, there can only be a single set of degrees of freedom, and
    * fe_index has to match the result of active_fe_index().
    */
-  void set_dof_index
-  (const unsigned int i,
-   const types::global_dof_index index,
-   const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
+  void set_dof_index (const unsigned int i,
+                      const types::global_dof_index index,
+                      const unsigned int fe_index = DoFHandlerType::default_fe_index) const;
 
   void set_mg_dof_index (const int level, const unsigned int i, const types::global_dof_index index) const;
 
@@ -1139,6 +1138,81 @@ protected:
   friend struct dealii::internal::hp::DoFHandler::Implementation;
   friend struct dealii::internal::DoFCellAccessor::Implementation;
 };
+
+
+
+/* -------------------------------------------------------------------------- */
+
+
+/**
+ * A class that represents DoF accessor objects to iterators that don't make sense
+ * such as quad iterators in on 1d meshes.  This class can not be used to
+ * create objects (it will in fact throw an exception if this should ever be
+ * attempted but it sometimes allows code to be written in a simpler way in a
+ * dimension independent way. For example, it allows to write code that works
+ * on quad iterators that is dimension independent -- i.e., also compiles
+ * in 1d -- because quad iterators
+ * (via the current class) exist and are syntactically correct. You can not
+ * expect, however, to ever create an actual object of one of these iterators
+ * in 1d, meaning you need to expect to wrap the code block in which you use
+ * quad iterators into something like <code>if (dim@>1)</code> -- which makes
+ * eminent sense anyway.
+ *
+ * This class provides the minimal interface necessary for Accessor classes to
+ * interact with Iterator classes. However, this is only for syntactic
+ * correctness, none of the functions do anything but generate errors.
+ *
+ * @ingroup Accessors
+ * @author Wolfgang Bangerth, 2017
+ */
+template <int structdim, int dim, int spacedim=dim>
+class DoFInvalidAccessor : public InvalidAccessor<structdim,dim,spacedim>
+{
+public:
+  /**
+   * Propagate typedef from base class to this class.
+   */
+  typedef typename InvalidAccessor<structdim,dim,spacedim>::AccessorData AccessorData;
+
+  /**
+   * Constructor.  This class is used for iterators that do not make
+   * sense in a given dimension, for example quads for 1d meshes. Consequently,
+   * while the creation of such objects is syntactically valid, they make no
+   * semantic sense, and we generate an exception when such an object is
+   * actually generated.
+   */
+  DoFInvalidAccessor (const Triangulation<dim,spacedim> *parent     =  0,
+                      const int                 level      = -1,
+                      const int                 index      = -1,
+                      const AccessorData       *local_data =  0);
+
+  /**
+   * Copy constructor.  This class is used for iterators that do not make
+   * sense in a given dimension, for example quads for 1d meshes. Consequently,
+   * while the creation of such objects is syntactically valid, they make no
+   * semantic sense, and we generate an exception when such an object is
+   * actually generated.
+   */
+  DoFInvalidAccessor (const DoFInvalidAccessor<structdim,dim,spacedim> &);
+
+  /**
+   * Conversion from other accessors to the current invalid one. This of
+   * course also leads to a run-time error.
+   */
+  template <typename OtherAccessor>
+  DoFInvalidAccessor (const OtherAccessor &);
+
+  /**
+   * Set the index of the <i>i</i>th degree of freedom of this object to @p
+   * index. Since the current object doesn't point to anything useful, like
+   * all other functions in this class this function only throws an exception.
+   */
+  void set_dof_index (const unsigned int i,
+                      const types::global_dof_index index,
+                      const unsigned int fe_index = DoFHandler<dim,spacedim>::default_fe_index) const;
+};
+
+
 
 
 /* -------------------------------------------------------------------------- */
@@ -1769,6 +1843,21 @@ bool
 DoFAccessor<sd, DoFHandlerType, level_dof_access>::is_level_cell()
 {
   return level_dof_access;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+template <typename OtherAccessor>
+DoFInvalidAccessor<structdim, dim, spacedim>::
+DoFInvalidAccessor (const OtherAccessor &)
+{
+  Assert (false,
+          ExcMessage ("You are attempting an illegal conversion between "
+                      "iterator/accessor types. The constructor you call "
+                      "only exists to make certain template constructs "
+                      "easier to write as dimension independent code but "
+                      "the conversion is not valid in the current context."));
 }
 
 
