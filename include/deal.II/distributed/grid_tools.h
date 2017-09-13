@@ -110,10 +110,18 @@ namespace parallel
      *        (dof_handler, pack, unpack);
      * @endcode
      *
-     * You will notice that the lambda function returns an `unsigned int`,
+     * You will notice that the @p pack lambda function returns an `unsigned int`,
      * not a `boost::optional<unsigned int>`. The former converts automatically
      * to the latter, implying that data will always be transported to the
      * other processor.
+     *
+     * (In reality, the @p unpack function needs to be a bit more
+     * complicated because it is not allowed to call
+     * DoFAccessor::set_active_fe_index() on ghost cells. Rather, the
+     * @p unpack function directly accesses internal data structures. But
+     * you get the idea -- the code could, just as well, have exchanged
+     * material ids, user indices, boundary indictors, or any kind of other
+     * data with similar calls as the ones above.)
      */
     template <typename DataType, typename MeshType>
     void
