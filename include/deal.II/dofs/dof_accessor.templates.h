@@ -2952,13 +2952,15 @@ namespace internal
       set_dof_indices (DoFCellAccessor<DoFHandler<3,spacedim>, level_dof_access> &accessor,
                        const std::vector<types::global_dof_index>          &local_dof_indices)
       {
+        const unsigned int dim = 3;
+
         Assert (accessor.has_children() == false,
                 ExcInternalError());
 
-        const unsigned int dofs_per_vertex = accessor.get_fe().dofs_per_vertex,
-                           dofs_per_line   = accessor.get_fe().dofs_per_line,
-                           dofs_per_quad   = accessor.get_fe().dofs_per_quad,
-                           dofs_per_hex    = accessor.get_fe().dofs_per_hex,
+        const unsigned int dofs_per_vertex = accessor.get_fe().template n_dofs_per_object<0>(),
+                           dofs_per_line   = accessor.get_fe().template n_dofs_per_object<1>(),
+                           dofs_per_quad   = accessor.get_fe().template n_dofs_per_object<2>(),
+                           dofs_per_hex    = accessor.get_fe().template n_dofs_per_object<3>(),
                            dofs_per_cell   = accessor.get_fe().dofs_per_cell;
         (void)dofs_per_cell;
 
@@ -2967,7 +2969,7 @@ namespace internal
 
         unsigned int index = 0;
 
-        for (unsigned int vertex=0; vertex<8; ++vertex)
+        for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
           for (unsigned int d=0; d<dofs_per_vertex; ++d, ++index)
             accessor.set_vertex_dof_index(vertex,d,
                                           local_dof_indices[index]);
@@ -2978,7 +2980,7 @@ namespace internal
         // orientation, we look at it in flipped orientation and we
         // will have to adjust the shape function indices that we see
         // to correspond to the correct (cell-local) ordering.
-        for (unsigned int line=0; line<12; ++line)
+        for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
           for (unsigned int d=0; d<dofs_per_line; ++d, ++index)
             accessor.line(line)->set_dof_index(accessor.dof_handler->get_fe().
                                                adjust_line_dof_index_for_line_orientation(d,
@@ -2993,7 +2995,7 @@ namespace internal
         // adjust the shape function indices that we see to correspond
         // to the correct (cell-local) ordering. The same applies, if
         // the face_rotation or face_orientation is non-standard
-        for (unsigned int quad=0; quad<6; ++quad)
+        for (unsigned int quad=0; quad<GeometryInfo<dim>::quads_per_cell; ++quad)
           for (unsigned int d=0; d<dofs_per_quad; ++d, ++index)
             accessor.quad(quad)->set_dof_index(accessor.dof_handler->get_fe().
                                                adjust_quad_dof_index_for_face_orientation(d,
