@@ -1,0 +1,6 @@
+Changed: The virtual function SolverRichardson::criterion() now
+receives the residual and preconditioned residual vectors as
+arguments, rather than accessing it through the member variables of
+the class. It has also been made @p const.
+<br>
+(Wolfgang Bangerth, 2017/09/12)
