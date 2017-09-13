@@ -1694,6 +1694,15 @@ public:
    * indices on non-active cells since they do not have finite element spaces
    * associated with them without having any degrees of freedom. Consequently,
    * this function will produce an exception when called on non-active cells.
+   *
+   * @note When using parallel meshes, either through the
+   * parallel::shared::Triangulation or parallel::distributed::Triangulation
+   * classes, it is only allowed to call this function on locally
+   * owned or ghost cells. No information is available on artificial cells.
+   * Furthermore, @p active_fe_index information is exchanged from locally
+   * owned cells on one processor to other processors where they may be
+   * ghost cells, during the call to hp::DoFHandler::distribute_dofs().
+   * See the documentation of hp::DoFHandler for more information.
    */
   unsigned int active_fe_index () const;
 
@@ -1709,6 +1718,18 @@ public:
    * indices to non-active cells since they do not have finite element spaces
    * associated with them without having any degrees of freedom. Consequently,
    * this function will produce an exception when called on non-active cells.
+   *
+   * @note When using parallel meshes, either through the
+   * parallel::shared::Triangulation or parallel::distributed::Triangulation
+   * classes, it is only allowed to call this function on locally
+   * owned cells (see @ref GlossLocallyOwnedCell "this glossary entry"). This
+   * is because otherwise a common source of errors would be if one
+   * processor sets a different @p active_fe_index on a ghost cell than
+   * the processor that actually owns the cell does. To avoid this mistake,
+   * one can only set @p active_fe_index information on locally owned
+   * cells, and this information is then mirrored to all processors that
+   * have this cell as a ghost cell -- see the documentation of the
+   * hp::DoFHandler class.
    */
   void set_active_fe_index (const unsigned int i) const;
   /**
