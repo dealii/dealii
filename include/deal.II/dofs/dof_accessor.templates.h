@@ -2875,99 +2875,23 @@ namespace internal
       /**
        * Implement setting dof indices on a cell.
        */
-      template <int dim, int spacedim, bool level_dof_access>
+      template <typename DoFHandlerType, bool level_dof_access>
       static
       void
-      set_dof_indices (DoFCellAccessor<DoFHandler<dim,spacedim>, level_dof_access> &accessor,
-                       const std::vector<types::global_dof_index>                  &local_dof_indices)
-      {
-        Assert (accessor.has_children() == false,
-                ExcInternalError());
-
-        const unsigned int dofs_per_vertex = accessor.get_fe().template n_dofs_per_object<0>(),
-                           dofs_per_line   = accessor.get_fe().template n_dofs_per_object<1>(),
-                           dofs_per_quad   = accessor.get_fe().template n_dofs_per_object<2>(),
-                           dofs_per_hex    = accessor.get_fe().template n_dofs_per_object<3>(),
-                           dofs_per_cell   = accessor.get_fe().dofs_per_cell;
-        (void)dofs_per_cell;
-
-        Assert (local_dof_indices.size() == dofs_per_cell,
-                ExcInternalError());
-
-        unsigned int index = 0;
-
-        for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell; ++vertex)
-          for (unsigned int d=0; d<dofs_per_vertex; ++d, ++index)
-            accessor.set_vertex_dof_index(vertex,d,
-                                          local_dof_indices[index]);
-        // now copy dof numbers into the line. for lines in 3d with the
-        // wrong orientation, we have already made sure that we're ok
-        // by picking the correct vertices (this happens automatically
-        // in the vertex() function). however, if the line is in wrong
-        // orientation, we look at it in flipped orientation and we
-        // will have to adjust the shape function indices that we see
-        // to correspond to the correct (cell-local) ordering.
-        //
-        // of course, if dim<3, then there is nothing to adjust
-        for (unsigned int line=0; line<GeometryInfo<dim>::lines_per_cell; ++line)
-          for (unsigned int d=0; d<dofs_per_line; ++d, ++index)
-            accessor.line(line)->set_dof_index(dim < 3
-                                               ?
-                                               d
-                                               :
-                                               accessor.dof_handler->get_fe().
-                                               adjust_line_dof_index_for_line_orientation(d,
-                                                   accessor.line_orientation(line)),
-                                               local_dof_indices[index]);
-        // now copy dof numbers into the face. for faces in 3d with the
-        // wrong orientation, we have already made sure that we're ok
-        // by picking the correct lines and vertices (this happens
-        // automatically in the line() and vertex()
-        // functions). however, if the face is in wrong orientation,
-        // we look at it in flipped orientation and we will have to
-        // adjust the shape function indices that we see to correspond
-        // to the correct (cell-local) ordering. The same applies, if
-        // the face_rotation or face_orientation is non-standard
-        //
-        // again, if dim<3, then there is nothing to adjust
-        for (unsigned int quad=0; quad<GeometryInfo<dim>::quads_per_cell; ++quad)
-          for (unsigned int d=0; d<dofs_per_quad; ++d, ++index)
-            accessor.quad(quad)->set_dof_index(dim < 3
-                                               ?
-                                               d
-                                               :
-                                               accessor.dof_handler->get_fe().
-                                               adjust_quad_dof_index_for_face_orientation(d,
-                                                   accessor.face_orientation(quad),
-                                                   accessor.face_flip(quad),
-                                                   accessor.face_rotation(quad)),
-                                               local_dof_indices[index]);
-        for (unsigned int d=0; d<dofs_per_hex; ++d, ++index)
-          accessor.set_dof_index(d, local_dof_indices[index]);
-
-        Assert (index == dofs_per_cell,
-                ExcInternalError());
-      }
-
-
-      // implementation for the case of hp::DoFHandler objects
-      template <int dim, int spacedim, bool level_dof_access>
-      static
-      void
-      set_dof_indices (const DoFCellAccessor<dealii::hp::DoFHandler<dim,spacedim>, level_dof_access> &accessor,
+      set_dof_indices (const DoFCellAccessor<DoFHandlerType, level_dof_access> &accessor,
                        const std::vector<types::global_dof_index> &local_dof_indices)
       {
+        const unsigned int dim = DoFHandlerType::dimension;
+
         Assert (accessor.has_children() == false,
                 ExcInternalError());
 
-        const unsigned int dofs_per_vertex = accessor.get_fe().template n_dofs_per_object<0>(),
-                           dofs_per_line   = accessor.get_fe().template n_dofs_per_object<1>(),
-                           dofs_per_quad   = accessor.get_fe().template n_dofs_per_object<2>(),
-                           dofs_per_hex    = accessor.get_fe().template n_dofs_per_object<3>(),
-                           dofs_per_cell   = accessor.get_fe().dofs_per_cell;
-        (void)dofs_per_cell;
+        const unsigned int dofs_per_vertex = accessor.get_fe().dofs_per_vertex,
+                           dofs_per_line   = accessor.get_fe().dofs_per_line,
+                           dofs_per_quad   = accessor.get_fe().dofs_per_quad,
+                           dofs_per_hex    = accessor.get_fe().dofs_per_hex;
 
-        Assert (local_dof_indices.size() == dofs_per_cell,
+        Assert (local_dof_indices.size() == accessor.get_fe().dofs_per_cell,
                 ExcInternalError());
 
         unsigned int index = 0;
@@ -3025,7 +2949,7 @@ namespace internal
           accessor.set_dof_index(d, local_dof_indices[index],
                                  accessor.active_fe_index());
 
-        Assert (index == dofs_per_cell,
+        Assert (index == accessor.get_fe().dofs_per_cell,
                 ExcInternalError());
       }
 
