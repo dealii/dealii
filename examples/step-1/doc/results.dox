@@ -35,7 +35,7 @@ places where you can play with it. For example, you could modify the
 criterion by which we decide which cells to refine. An example would
 be to change the condition to this:
 @code
-      for (; cell!=endc; ++cell)
+      for (auto cell: triangulation.active_cell_iterators())
         if (cell->center()[1] > 0)
           cell->set_refine_flag ();
 @endcode
