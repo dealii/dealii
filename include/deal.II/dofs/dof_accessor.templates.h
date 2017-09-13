@@ -1166,9 +1166,9 @@ namespace internal
         Assert (dof_handler.finite_elements != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
-        Assert (local_index < (*dof_handler.finite_elements)[fe_index].dofs_per_vertex,
+        Assert (local_index < dof_handler.get_fe(fe_index).dofs_per_vertex,
                 ExcIndexRange(local_index, 0,
-                              (*dof_handler.finite_elements)[fe_index].dofs_per_vertex));
+                              dof_handler.get_fe(fe_index).dofs_per_vertex));
         Assert (fe_index < dof_handler.finite_elements->size(),
                 ExcInternalError());
         Assert (dof_handler.vertex_dof_offsets[vertex_index] !=
@@ -1204,7 +1204,7 @@ namespace internal
               }
             else
               pointer += static_cast<types::global_dof_index>(
-                           (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
+                           dof_handler.get_fe(this_fe_index).dofs_per_vertex + 1);
           }
       }
 
@@ -1251,9 +1251,9 @@ namespace internal
         Assert (dof_handler.finite_elements != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
-        Assert (local_index < (*dof_handler.finite_elements)[fe_index].dofs_per_vertex,
+        Assert (local_index < dof_handler.get_fe(fe_index).dofs_per_vertex,
                 ExcIndexRange(local_index, 0,
-                              (*dof_handler.finite_elements)[fe_index].dofs_per_vertex));
+                              dof_handler.get_fe(fe_index).dofs_per_vertex));
         Assert (vertex_index < dof_handler.vertex_dof_offsets.size(),
                 ExcIndexRange (vertex_index, 0,
                                dof_handler.vertex_dof_offsets.size()));
@@ -1286,7 +1286,7 @@ namespace internal
               return *(pointer + 1 + local_index);
             else
               pointer += static_cast<types::global_dof_index>(
-                           (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
+                           dof_handler.get_fe(this_fe_index).dofs_per_vertex + 1);
           }
       }
 
@@ -1330,7 +1330,7 @@ namespace internal
             else
               {
                 pointer += static_cast<types::global_dof_index>(
-                             (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
+                             dof_handler.get_fe(this_fe_index).dofs_per_vertex + 1);
                 ++counter;
               }
           }
@@ -1388,7 +1388,7 @@ namespace internal
                     ExcInternalError());
 
             pointer += static_cast<types::global_dof_index>(
-                         (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
+                         dof_handler.get_fe(this_fe_index).dofs_per_vertex + 1);
             ++counter;
           }
       }
@@ -1445,7 +1445,7 @@ namespace internal
             else if (this_fe_index == fe_index)
               return true;
             else
-              pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
+              pointer += dof_handler.get_fe(this_fe_index).dofs_per_vertex + 1;
           }
       }
 

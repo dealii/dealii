@@ -185,7 +185,7 @@ namespace internal
 
                   for (unsigned int fe=0; fe<dof_handler.finite_elements->size(); ++fe)
                     if (vertex_fe_association[fe][v] == true)
-                      vertex_slots_needed += (*dof_handler.finite_elements)[fe].dofs_per_vertex + 1;
+                      vertex_slots_needed += dof_handler.get_fe(fe).dofs_per_vertex + 1;
 
                   // don't forget the end_marker:
                   ++vertex_slots_needed;
@@ -206,7 +206,7 @@ namespace internal
                         // if this vertex uses this fe, then set the
                         // fe_index and move the pointer ahead
                         dof_handler.vertex_dofs[current_index] = fe;
-                        current_index += (*dof_handler.finite_elements)[fe].dofs_per_vertex + 1;
+                        current_index += dof_handler.get_fe(fe).dofs_per_vertex + 1;
                       }
                   // finally place the end marker
                   dof_handler.vertex_dofs[current_index] = numbers::invalid_dof_index;
@@ -414,7 +414,7 @@ namespace internal
                         // ok, one set of dofs. that makes one active_fe_index, 1
                         // times dofs_per_face dofs, and one stop index
                         n_face_slots
-                        += 1 + (*dof_handler.finite_elements)[cell->active_fe_index()].template n_dofs_per_object<dim-1>() + 1;
+                        += 1 + dof_handler.get_fe(cell->active_fe_index()).template n_dofs_per_object<dim-1>() + 1;
 
                       // otherwise we do indeed need two sets, i.e. two
                       // active_fe_indices, two sets of dofs, and one stop index:
@@ -422,9 +422,9 @@ namespace internal
                         n_face_slots
                         += (2
                             +
-                            (*dof_handler.finite_elements)[cell->active_fe_index()].template n_dofs_per_object<dim-1>()
+                            dof_handler.get_fe(cell->active_fe_index()).template n_dofs_per_object<dim-1>()
                             +
-                            (*dof_handler.finite_elements)[cell->neighbor(face)->active_fe_index()]
+                            dof_handler.get_fe(cell->neighbor(face)->active_fe_index())
                             .template n_dofs_per_object<dim-1>()
                             +
                             1);
@@ -510,7 +510,7 @@ namespace internal
 
                           // finally, mark those slots as used
                           next_free_face_slot
-                          += (*dof_handler.finite_elements)[cell->active_fe_index()].template n_dofs_per_object<dim-1>() + 2;
+                          += dof_handler.get_fe(cell->active_fe_index()).template n_dofs_per_object<dim-1>() + 2;
                         }
                       else
                         {
@@ -529,7 +529,7 @@ namespace internal
                           // cell:
                           face_dof_indices[next_free_face_slot
                                            +
-                                           (*dof_handler.finite_elements)[cell->active_fe_index()].template n_dofs_per_object<dim-1>()
+                                           dof_handler.get_fe(cell->active_fe_index()).template n_dofs_per_object<dim-1>()
                                            +
                                            1]
                             = cell->neighbor(face)->active_fe_index();
@@ -542,9 +542,9 @@ namespace internal
 
                           // finally, mark those slots as used
                           next_free_face_slot
-                          += ((*dof_handler.finite_elements)[cell->active_fe_index()].template n_dofs_per_object<dim-1>()
+                          += (dof_handler.get_fe(cell->active_fe_index()).template n_dofs_per_object<dim-1>()
                               +
-                              (*dof_handler.finite_elements)[cell->neighbor(face)->active_fe_index()]
+                              dof_handler.get_fe(cell->neighbor(face)->active_fe_index())
                               .template n_dofs_per_object<dim-1>()
                               +
                               3);
@@ -730,7 +730,7 @@ namespace internal
 
                     for (unsigned int fe=0; fe<dof_handler.finite_elements->size(); ++fe)
                       if (line_fe_association[fe][line] == true)
-                        line_slots_needed += (*dof_handler.finite_elements)[fe].dofs_per_line + 1;
+                        line_slots_needed += dof_handler.get_fe(fe).dofs_per_line + 1;
                     ++line_slots_needed;
                   }
 
@@ -748,7 +748,7 @@ namespace internal
                           // if this line uses this fe, then set the
                           // fe_index and move the pointer ahead
                           dof_handler.faces->lines.dofs[pointer] = fe;
-                          pointer += (*dof_handler.finite_elements)[fe].dofs_per_line + 1;
+                          pointer += dof_handler.get_fe(fe).dofs_per_line + 1;
                         }
                     // finally place the end marker
                     dof_handler.faces->lines.dofs[pointer] = numbers::invalid_dof_index;
