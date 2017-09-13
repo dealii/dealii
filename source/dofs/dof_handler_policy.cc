@@ -1842,7 +1842,7 @@ namespace internal
           tasks.join_all ();
 
           // update the cache used for cell dof indices
-          update_all_level_cell_dof_indices_caches(dof_handler);
+          update_all_active_cell_dof_indices_caches (dof_handler);
         }
 
 
