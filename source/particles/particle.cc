@@ -215,8 +215,8 @@ namespace Particles
   Particle<dim,spacedim,PropertyType>::size () const
   {
     std::size_t size = sizeof(types::particle_index)
-        + sizeof(location)
-        + sizeof(reference_location);
+                       + sizeof(location)
+                       + sizeof(reference_location);
 
     if (has_properties())
       {
@@ -287,7 +287,7 @@ namespace Particles
   Particle<dim,spacedim,PropertyType>::has_properties () const
   {
     return (property_pool != NULL)
-        && (properties != PropertyPool<PropertyType>::invalid_handle);
+           && (properties != PropertyPool<PropertyType>::invalid_handle);
   }
 
 
@@ -297,8 +297,8 @@ namespace Particles
   Particle<dim,spacedim,PropertyType>::set_properties (const ArrayView<const PropertyType> &new_properties)
   {
     Assert(property_pool != NULL,
-        ExcMessage("A particle was asked to set its properties without an "
-            "associated PropertyPool."))
+           ExcMessage("A particle was asked to set its properties without an "
+                      "associated PropertyPool."))
 
     if (properties == PropertyPool<PropertyType>::invalid_handle)
       properties = property_pool->allocate_properties_array();
@@ -316,7 +316,7 @@ namespace Particles
   {
     Assert(has_properties(),
            ExcMessage("A particle without additional properties was asked for "
-               "its properties."));
+                      "its properties."));
 
     return property_pool->get_properties(properties);
   }
@@ -329,7 +329,7 @@ namespace Particles
   {
     Assert(has_properties(),
            ExcMessage("A particle without additional properties was asked for "
-               "its properties."));
+                      "its properties."));
 
     return property_pool->get_properties(properties);
   }

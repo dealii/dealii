@@ -18,11 +18,15 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
   particle.cc
+  particle_accessor.cc
+  particle_iterator.cc
   property_pool.cc
   )
 
 SET(_inst
   particle.inst.in
+  particle_accessor.inst.in
+  particle_iterator.inst.in
   property_pool.inst.in
   )
 

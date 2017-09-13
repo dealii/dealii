@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii__particles_particle_h
-#define dealii__particles_particle_h
+#ifndef dealii_particles_particle_h
+#define dealii_particles_particle_h
 
 #include <deal.II/particles/property_pool.h>
 
@@ -36,6 +36,12 @@ namespace Particles
   namespace types
   {
     /* Type definitions */
+
+    /**
+     * Typedef of cell level/index pair. TODO: replace this by the
+     * active_cell_index from deal.II 8.3 onwards.
+     */
+    typedef std::pair<int, int> LevelInd;
 
 #ifdef DEAL_II_WITH_64BIT_INDICES
     /**
