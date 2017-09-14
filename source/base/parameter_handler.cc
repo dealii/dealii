@@ -1901,7 +1901,7 @@ ParameterHandler::scan_line (std::string         line,
 
   // if there is a comment, delete it
   if (line.find('#') != std::string::npos)
-    line.erase (line.find("#"), std::string::npos);
+    line.erase (line.find('#'), std::string::npos);
 
   // replace \t by space:
   while (line.find('\t') != std::string::npos)
@@ -1958,7 +1958,7 @@ ParameterHandler::scan_line (std::string         line,
       // erase "set" statement
       line.erase (0, 4);
 
-      std::string::size_type pos = line.find("=");
+      std::string::size_type pos = line.find('=');
       AssertThrow (pos != std::string::npos,
                    ExcCannotParseLine (current_line_n,
                                        input_filename,

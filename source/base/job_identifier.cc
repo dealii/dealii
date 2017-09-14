@@ -54,9 +54,9 @@ std::string
 JobIdentifier::base_name(const char *filename)
 {
   std::string name(filename);
-  std::string::size_type pos = name.find(".");
+  std::string::size_type pos = name.find('.');
   name.erase(pos, name.size());
-  pos = name.rfind("/");
+  pos = name.rfind('/');
   if (pos < name.size())
     name.erase(0,pos);
   return name;

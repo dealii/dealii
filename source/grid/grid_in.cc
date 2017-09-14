@@ -2142,7 +2142,7 @@ void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
 
   // now remove whitespace in front of and
   // after '='
-  std::string::size_type pos=header.find("=");
+  std::string::size_type pos=header.find('=');
 
   while (pos!=static_cast<std::string::size_type>(std::string::npos))
     if (header[pos+1]==' ')
@@ -2153,7 +2153,7 @@ void GridIn<dim, spacedim>::parse_tecplot_header(std::string &header,
         --pos;
       }
     else
-      pos=header.find("=",++pos);
+      pos=header.find('=',++pos);
 
   // split the string into individual entries
   std::vector<std::string> entries=Utilities::break_text_into_lines(header,1,' ');

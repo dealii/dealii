@@ -546,7 +546,7 @@ TimerOutput::print_summary () const
 
           // resize the array so that it is always
           // of the same size
-          unsigned int pos_non_space = name_out.find_first_not_of (" ");
+          unsigned int pos_non_space = name_out.find_first_not_of (' ');
           name_out.erase(0, pos_non_space);
           name_out.resize (32, ' ');
           out_stream << std::endl;
@@ -617,7 +617,7 @@ TimerOutput::print_summary () const
 
           // resize the array so that it is always
           // of the same size
-          unsigned int pos_non_space = name_out.find_first_not_of (" ");
+          unsigned int pos_non_space = name_out.find_first_not_of (' ');
           name_out.erase(0, pos_non_space);
           name_out.resize (32, ' ');
           out_stream << std::endl;
