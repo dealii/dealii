@@ -23,6 +23,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_tools.h>
 #include <vector>
 #include <memory>
 #include <utility>
@@ -422,6 +423,48 @@ public:
             const std::vector<unsigned int>                   &multiplicities);
 
   /**
+   * Constructor taking an arbitrary number of parameters of type
+   * <code>std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int></code>.
+   * In combination with FiniteElement::operator^, this allows to construct FESystem objects
+   * as follows:
+   * @code
+   *   FiniteElementType1<dim,spacedim> fe_1;
+   *   FiniteElementType1<dim,spacedim> fe_2;
+   *   FESystem<dim,spacedim> fe_system = ( fe_1^dim, fe_2^1 );
+   * @endcode
+   *
+   * The FiniteElement objects are not actually used for anything other than creating a
+   * copy that will then be owned by the current object. In other words, it is
+   * completely fine to call this constructor with a temporary object for the
+   * finite element, as in this code snippet:
+   * @code
+   *   FESystem<dim> fe (FE_Q<dim>(2)^2);
+   * @endcode
+   * Here, <code>FE_Q@<dim@>(2)</code> constructs an unnamed, temporary object
+   * that is passed to the FESystem constructor to create a finite element
+   * that consists of two components, both of which are quadratic FE_Q
+   * elements. The temporary is destroyed again at the end of the code that
+   * corresponds to this line, but this does not matter because FESystem
+   * creates its own copy of the FE_Q object.
+   */
+  template <class... FESystems,
+            typename = typename std::enable_if<all_same_as<typename std::decay<FESystems>::type...,
+                                                           std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                                                               unsigned int>>::value>::type>
+  FESystem (FESystems&& ... fe_systems);
+
+  /**
+   * Same as above allowing the following syntax:
+   * @code
+   *   FiniteElementType1<dim,spacedim> fe_1;
+   *   FiniteElementType1<dim,spacedim> fe_2;
+   *   FESystem<dim,spacedim> fe_system = { fe_1^dim, fe_2^1 };
+   * @endcode
+   */
+  FESystem (const std::initializer_list<std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+            unsigned int>> &fe_systems);
+
+  /**
    * Copy constructor. This constructor is deleted, i.e., copying
    * FESystem objects is not allowed.
    */
@@ -430,7 +473,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~FESystem ();
+  virtual ~FESystem () = default;
 
   /**
    * Return a string that uniquely identifies a finite element. This element
@@ -1081,9 +1124,66 @@ private:
   friend class FE_Enriched<dim,spacedim>;
 };
 
+//------------------------variadic template constructor------------------------
+
+#ifndef DOXYGEN
+namespace
+{
+  template <int dim, int spacedim>
+  unsigned int count_nonzeros
+  (const std::initializer_list<std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+   unsigned int>> &fe_systems)
+  {
+    return std::count_if(fe_systems.begin(),
+                         fe_systems.end(),
+                         [](const std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                            unsigned int> &fe_system)
+    {
+      return fe_system.second > 0;
+    });
+  }
+}
+
+// We are just forwarding/delegating to the constructor taking a std::initializer_list.
+// If we decide to remove the deprecated constructors, we might just use the variadic
+// constructor with a suitable static_assert instead of the std::enable_if.
+template<int dim, int spacedim>
+template <class... FESystems, typename>
+FESystem<dim,spacedim>::FESystem (FESystems &&... fe_systems)
+  : FESystem<dim, spacedim> ({std::forward<FESystems>(fe_systems)...})
+{}
+
+template <int dim, int spacedim>
+FESystem<dim,spacedim>::FESystem
+(const std::initializer_list<std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+ unsigned int>> &fe_systems)
+  :
+  FiniteElement<dim,spacedim>
+  (FETools::Compositing::multiply_dof_numbers<dim,spacedim>(fe_systems),
+   FETools::Compositing::compute_restriction_is_additive_flags<dim,spacedim> (fe_systems),
+   FETools::Compositing::compute_nonzero_components<dim,spacedim>(fe_systems)),
+  base_elements(count_nonzeros(fe_systems))
+{
+  std::vector<const FiniteElement<dim,spacedim>*> fes;
+  std::vector<unsigned int> multiplicities;
+
+  const auto extract
+    = [&fes, &multiplicities]
+      (const std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int> &fe_system)
+  {
+    fes.push_back(fe_system.first.get());
+    multiplicities.push_back(fe_system.second);
+  };
+
+  for (const auto &p : fe_systems)
+    extract (p);
+
+  initialize(fes, multiplicities);
+}
+
+#endif //DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*----------------------------  fe_system.h  ---------------------------*/
 #endif
 /*----------------------------  fe_system.h  ---------------------------*/

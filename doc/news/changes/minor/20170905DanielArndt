@@ -1,0 +1,12 @@
+New: The newly implemented FiniteElement::operator^ allows in combination
+with the new variadic template constructor or the new std::initializer_list
+constructor for FESystem to construct
+FESystem objects using syntax like
+@code
+  FESystem<dim, spacedim> fe_system1 ({FiniteElementType1^n1, 
+                                       FiniteElementType2^n2});
+  FESystem<dim, spacedim> fe_system2 (FiniteElementType1^n3, 
+                                      FiniteElementType2^n4);
+@endcode
+<br>
+(Daniel Arndt, 2017/09/05)
