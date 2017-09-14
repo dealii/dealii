@@ -449,11 +449,11 @@ public:
    * corresponds to this line, but this does not matter because FESystem
    * creates its own copy of the FE_Q object.
    */
-  template <class... FESystems,
-            typename = typename std::enable_if<all_same_as<typename std::decay<FESystems>::type...,
+  template <class... FEPairs,
+            typename = typename std::enable_if<all_same_as<typename std::decay<FEPairs>::type...,
                                                            std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
                                                                unsigned int>>::value>::type>
-  FESystem (FESystems&& ... fe_systems);
+  FESystem (FEPairs&& ... fe_pairs);
 
   /**
    * Same as above allowing the following syntax:
@@ -1151,14 +1151,19 @@ namespace
   }
 }
 
+
+
 // We are just forwarding/delegating to the constructor taking a std::initializer_list.
 // If we decide to remove the deprecated constructors, we might just use the variadic
 // constructor with a suitable static_assert instead of the std::enable_if.
 template<int dim, int spacedim>
-template <class... FESystems, typename>
-FESystem<dim,spacedim>::FESystem (FESystems &&... fe_systems)
-  : FESystem<dim, spacedim> ({std::forward<FESystems>(fe_systems)...})
+template <class... FEPairs, typename>
+FESystem<dim,spacedim>::FESystem (FEPairs &&... fe_pairs)
+  :
+  FESystem<dim, spacedim> ({std::forward<FEPairs>(fe_pairs)...})
 {}
+
+
 
 template <int dim, int spacedim>
 FESystem<dim,spacedim>::FESystem
