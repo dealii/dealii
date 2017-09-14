@@ -6950,12 +6950,12 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
       // HDF5 only supports 2- or 3-dimensional coordinates
       node_ds_dim[0] = global_node_cell_count[0];
       node_ds_dim[1] = (spacedim<2) ? 2 : spacedim;
-      node_dataspace = H5Screate_simple(2, node_ds_dim, NULL);
+      node_dataspace = H5Screate_simple(2, node_ds_dim, nullptr);
       AssertThrow(node_dataspace >= 0, ExcIO());
 
       cell_ds_dim[0] = global_node_cell_count[1];
       cell_ds_dim[1] = GeometryInfo<dim>::vertices_per_cell;
-      cell_dataspace = H5Screate_simple(2, cell_ds_dim, NULL);
+      cell_dataspace = H5Screate_simple(2, cell_ds_dim, nullptr);
       AssertThrow(cell_dataspace >= 0, ExcIO());
 
       // Create the dataset for the nodes and cells
@@ -6986,13 +6986,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
       offset[0] = global_node_cell_offsets[0];
       offset[1] = 0;
 
-      node_memory_dataspace = H5Screate_simple(2, count, NULL);
+      node_memory_dataspace = H5Screate_simple(2, count, nullptr);
       AssertThrow(node_memory_dataspace >= 0, ExcIO());
 
       // Select the hyperslab in the file
       node_file_dataspace = H5Dget_space(node_dataset);
       AssertThrow(node_file_dataspace >= 0, ExcIO());
-      status = H5Sselect_hyperslab(node_file_dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
+      status = H5Sselect_hyperslab(node_file_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
       AssertThrow(status >= 0, ExcIO());
 
       // And repeat for cells
@@ -7000,12 +7000,12 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
       count[1] = GeometryInfo<dim>::vertices_per_cell;
       offset[0] = global_node_cell_offsets[1];
       offset[1] = 0;
-      cell_memory_dataspace = H5Screate_simple(2, count, NULL);
+      cell_memory_dataspace = H5Screate_simple(2, count, nullptr);
       AssertThrow(cell_memory_dataspace >= 0, ExcIO());
 
       cell_file_dataspace = H5Dget_space(cell_dataset);
       AssertThrow(cell_file_dataspace >= 0, ExcIO());
-      status = H5Sselect_hyperslab(cell_file_dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
+      status = H5Sselect_hyperslab(cell_file_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
       AssertThrow(status >= 0, ExcIO());
 
       // And finally, write the node data
@@ -7074,7 +7074,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
       // Create the dataspace for the point data
       node_ds_dim[0] = global_node_cell_count[0];
       node_ds_dim[1] = pt_data_vector_dim;
-      pt_data_dataspace = H5Screate_simple(2, node_ds_dim, NULL);
+      pt_data_dataspace = H5Screate_simple(2, node_ds_dim, nullptr);
       AssertThrow(pt_data_dataspace >= 0, ExcIO());
 
 #if H5Gcreate_vers == 1
@@ -7089,13 +7089,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
       count[1] = pt_data_vector_dim;
       offset[0] = global_node_cell_offsets[0];
       offset[1] = 0;
-      pt_data_memory_dataspace = H5Screate_simple(2, count, NULL);
+      pt_data_memory_dataspace = H5Screate_simple(2, count, nullptr);
       AssertThrow(pt_data_memory_dataspace >= 0, ExcIO());
 
       // Select the hyperslab in the file
       pt_data_file_dataspace = H5Dget_space(pt_data_dataset);
       AssertThrow(pt_data_file_dataspace >= 0, ExcIO());
-      status = H5Sselect_hyperslab(pt_data_file_dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
+      status = H5Sselect_hyperslab(pt_data_file_dataspace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
       AssertThrow(status >= 0, ExcIO());
 
       // And finally, write the data
