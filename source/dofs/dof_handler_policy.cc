@@ -739,37 +739,38 @@ namespace internal
 
                   // do a first loop over all sets of dofs and do identity
                   // uniquification
-                  for (unsigned int f=0; f<line->n_active_fe_indices(); ++f)
-                    for (unsigned int g=f+1; g<line->n_active_fe_indices(); ++g)
+                  const unsigned int n_active_fe_indices = line->n_active_fe_indices();
+                  for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                    for (unsigned int g=f+1; g<n_active_fe_indices; ++g)
                       {
                         const unsigned int fe_index_1 = line->nth_active_fe_index (f),
                                            fe_index_2 = line->nth_active_fe_index (g);
 
-                        if (((*dof_handler.finite_elements)[fe_index_1].dofs_per_line
+                        if ((dof_handler.get_fe(fe_index_1).dofs_per_line
                              ==
-                             (*dof_handler.finite_elements)[fe_index_2].dofs_per_line)
+                             dof_handler.get_fe(fe_index_2).dofs_per_line)
                             &&
-                            ((*dof_handler.finite_elements)[fe_index_1].dofs_per_line > 0))
+                            (dof_handler.get_fe(fe_index_1).dofs_per_line > 0))
                           {
                             ensure_existence_of_dof_identities<1>
-                            ((*dof_handler.finite_elements)[fe_index_1],
-                             (*dof_handler.finite_elements)[fe_index_2],
+                            (dof_handler.get_fe(fe_index_1),
+                             dof_handler.get_fe(fe_index_2),
                              line_dof_identities[fe_index_1][fe_index_2]);
                             // see if these sets of dofs are identical. the first
                             // condition for this is that indeed there are n identities
                             if (line_dof_identities[fe_index_1][fe_index_2]->size()
                                 ==
-                                (*dof_handler.finite_elements)[fe_index_1].dofs_per_line)
+                                dof_handler.get_fe(fe_index_1).dofs_per_line)
                               {
                                 unsigned int i=0;
-                                for (; i<(*dof_handler.finite_elements)[fe_index_1].dofs_per_line; ++i)
+                                for (; i<dof_handler.get_fe(fe_index_1).dofs_per_line; ++i)
                                   if (((*(line_dof_identities[fe_index_1][fe_index_2]))[i].first != i)
                                       &&
                                       ((*(line_dof_identities[fe_index_1][fe_index_2]))[i].second != i))
                                     // not an identity
                                     break;
 
-                                if (i == (*dof_handler.finite_elements)[fe_index_1].dofs_per_line)
+                                if (i == dof_handler.get_fe(fe_index_1).dofs_per_line)
                                   {
                                     // The line dofs (i.e., the ones interior to a line) of these two finite elements are identical.
                                     // Note that there could be situations when one element still dominates another, e.g.:
@@ -778,7 +779,7 @@ namespace internal
 
                                     --unique_sets_of_dofs;
 
-                                    for (unsigned int j=0; j<(*dof_handler.finite_elements)[fe_index_1].dofs_per_line; ++j)
+                                    for (unsigned int j=0; j<dof_handler.get_fe(fe_index_1).dofs_per_line; ++j)
                                       {
                                         const types::global_dof_index master_dof_index
                                           = line->dof_index (j, fe_index_1);
@@ -848,8 +849,8 @@ namespace internal
                                 other_fe_index = line->nth_active_fe_index (f);
 
                                 ensure_existence_of_dof_identities<1>
-                                ((*dof_handler.finite_elements)[most_dominating_fe_index],
-                                 (*dof_handler.finite_elements)[other_fe_index],
+                                (dof_handler.get_fe(most_dominating_fe_index),
+                                 dof_handler.get_fe(other_fe_index),
                                  line_dof_identities[most_dominating_fe_index][other_fe_index]);
 
                                 DoFIdentities &identities
@@ -972,8 +973,8 @@ namespace internal
                             other_fe_index = quad->nth_active_fe_index (f);
 
                             ensure_existence_of_dof_identities<2>
-                            ((*dof_handler.finite_elements)[most_dominating_fe_index],
-                             (*dof_handler.finite_elements)[other_fe_index],
+                            (dof_handler.get_fe(most_dominating_fe_index),
+                             dof_handler.get_fe(other_fe_index),
                              quad_dof_identities[most_dominating_fe_index][other_fe_index]);
 
                             DoFIdentities &identities
