@@ -20,9 +20,9 @@ DEAL_II_NAMESPACE_OPEN
 
 template<int dim, int spacedim>
 TriangulationInfoCache<dim,spacedim>::TriangulationInfoCache(
-    const Triangulation<dim, spacedim> &tria,
-    const TriangulationInfoCacheFlags &flags,
-    const Mapping<dim, spacedim> &mapping) :
+  const Triangulation<dim, spacedim> &tria,
+  const TriangulationInfoCacheFlags &flags,
+  const Mapping<dim, spacedim> &mapping) :
   tria(&tria),
   flags(flags),
   mapping(&mapping)
@@ -32,7 +32,7 @@ TriangulationInfoCache<dim,spacedim>::TriangulationInfoCache(
     update();
   });
 
-  if(tria.n_active_cells()>0)
+  if (tria.n_active_cells()>0)
     update();
 }
 
@@ -41,11 +41,18 @@ TriangulationInfoCache<dim,spacedim>::TriangulationInfoCache(
 template<int dim, int spacedim>
 void TriangulationInfoCache<dim,spacedim>::update(bool topology_is_unchanged)
 {
-  if(topology_is_unchanged == false) {
-    if (cache_vertex_to_cell_map & flags)
+  if (topology_is_unchanged == false)
+    {
+      if (cache_vertex_to_cell_map & flags)
         vertex_to_cells = GridTools::vertex_to_cell_map(*tria);
-  }
+    }
+
+  if (cache_vertex_to_cell_centers_directions & flags)
+    vertex_to_cell_centers =
+      GridTools::vertex_to_cell_centers_directions(*tria, vertex_to_cells);
 }
+
+
 
 template<int dim, int spacedim>
 const std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> > &
@@ -58,5 +65,13 @@ TriangulationInfoCache<dim,spacedim>::get_vertex_to_cell_map() const
 
 
 
+template<int dim, int spacedim>
+const std::vector<std::vector<Tensor<1,spacedim>>> &
+TriangulationInfoCache<dim,spacedim>::get_vertex_to_cell_centers_directions() const
+{
+  Assert(flags & cache_vertex_to_cell_centers_directions,
+         ExcAccessToInvalidCacheObject(cache_vertex_to_cell_centers_directions, flags));
+  return vertex_to_cell_centers;
+}
 
 DEAL_II_NAMESPACE_CLOSE

@@ -41,6 +41,12 @@ enum TriangulationInfoCacheFlags
    * Cache vertex_to_cell_map, as returned by GridTools::vertex_to_cell_map().
    */
   cache_vertex_to_cell_map = 0x0001,
+
+  /**
+   * Cache vertex_to_cell_centers_directions, as returned by
+   * GridTools::vertex_to_cell_centers_directions()
+   */
+  cache_vertex_to_cell_centers_directions = cache_vertex_to_cell_map | 0x0002,
 };
 
 
@@ -54,7 +60,8 @@ inline
 StreamType &operator << (StreamType &s, TriangulationInfoCacheFlags u)
 {
   s << " TriangulationInfoCacheFlags";
-  if (u & cache_vertex_to_cell_map) s << "|vertex_to_cell_map"        ;
+  if (u & cache_vertex_to_cell_map)                 s << "|vertex_to_cell_map";
+  if (u & cache_vertex_to_cell_centers_directions)  s << "|vertex_to_cells_centers_directions";
   return s;
 }
 
