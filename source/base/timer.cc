@@ -431,13 +431,13 @@ TimerOutput::leave_subsection (const std::string &section_name)
 
   sections[actual_section_name].timer.stop();
   sections[actual_section_name].total_wall_time
-  += sections[actual_section_name].timer.wall_time();
+  += sections[actual_section_name].timer.last_wall_time();
 
   // Get cpu time. On MPI systems, if constructed with an mpi_communicator
   // like MPI_COMM_WORLD, then the Timer will sum up the CPU time between
   // processors among the provided mpi_communicator. Therefore, no
   // communication is needed here.
-  const double cpu_time = sections[actual_section_name].timer();
+  const double cpu_time = sections[actual_section_name].timer.last_cpu_time();
   sections[actual_section_name].total_cpu_time += cpu_time;
 
   // in case we have to print out something, do that here...
@@ -448,7 +448,7 @@ TimerOutput::leave_subsection (const std::string &section_name)
       std::ostringstream cpu;
       cpu << cpu_time << "s";
       std::ostringstream wall;
-      wall << sections[actual_section_name].timer.wall_time() << "s";
+      wall << sections[actual_section_name].timer.last_wall_time() << "s";
       if (output_type == cpu_times)
         output_time = ", CPU time: " + cpu.str();
       else if (output_type == wall_times)
