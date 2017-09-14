@@ -325,7 +325,7 @@ namespace TrilinosWrappers
     /**
      * Destructor. Made virtual so that one can use pointers to this class.
      */
-    virtual ~SparsityPattern ();
+    virtual ~SparsityPattern () = default;
 
     /**
      * Initialize a sparsity pattern that is completely stored locally, having

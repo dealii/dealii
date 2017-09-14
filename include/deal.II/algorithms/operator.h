@@ -73,7 +73,7 @@ namespace Algorithms
     /**
      * The virtual destructor.
      */
-    ~OperatorBase();
+    virtual ~OperatorBase() = default;
 
     /**
      * The actual operation, which is implemented in a derived class.
@@ -106,13 +106,22 @@ namespace Algorithms
   template <typename VectorType>
   class OutputOperator : public Subscriptor
   {
-    OutputOperator(const OutputOperator<VectorType> &) = delete;
   public:
+    /**
+     * Constructor initializing member variables with invalid data.
+     */
     OutputOperator ();
+
+    /**
+     * The copy constructor is deleted since objects of this class
+     * should not be copied.
+     */
+    OutputOperator(const OutputOperator<VectorType> &) = delete;
+
     /**
      * Empty virtual destructor.
      */
-    virtual ~OutputOperator();
+    virtual ~OutputOperator() = default;
 
     /**
      * Set the stream @p os to which data is written. If no stream is selected

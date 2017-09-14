@@ -75,7 +75,7 @@ public:
    * usually not used by their true type, but rather through pointers to this
    * base class.
    */
-  virtual ~TensorFunction ();
+  virtual ~TensorFunction () = default;
 
   /**
    * Return the value of the function at the given point.
@@ -127,7 +127,7 @@ public:
   ConstantTensorFunction (const dealii::Tensor<rank, dim, Number> &value,
                           const Number initial_time = 0.0);
 
-  virtual ~ConstantTensorFunction ();
+  virtual ~ConstantTensorFunction () = default;
 
   virtual typename dealii::TensorFunction<rank, dim, Number>::value_type value (const Point<dim> &p) const;
 

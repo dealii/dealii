@@ -101,12 +101,12 @@ namespace PETScWrappers
        * reinit(BlockSparsityPattern). The number of blocks per row and column
        * are then determined by that function.
        */
-      BlockSparseMatrix ();
+      BlockSparseMatrix () = default;
 
       /**
        * Destructor.
        */
-      ~BlockSparseMatrix ();
+      ~BlockSparseMatrix () = default;
 
       /**
        * Pseudo copy operator only copying empty objects. The sizes of the

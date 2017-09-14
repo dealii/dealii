@@ -1319,11 +1319,6 @@ namespace
 namespace FETools
 {
   template <int dim, int spacedim>
-  FEFactoryBase<dim,spacedim>::~FEFactoryBase() = default;
-
-
-
-  template <int dim, int spacedim>
   void compute_component_wise(
     const FiniteElement<dim,spacedim> &element,
     std::vector<unsigned int> &renumbering,

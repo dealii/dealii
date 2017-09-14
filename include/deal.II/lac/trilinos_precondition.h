@@ -106,7 +106,7 @@ namespace TrilinosWrappers
     /**
      * Destructor.
      */
-    ~PreconditionBase ();
+    ~PreconditionBase () = default;
 
     /**
      * Destroys the preconditioner, leaving an object like just after having

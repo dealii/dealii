@@ -41,11 +41,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename VectorType>
-MGTransferPrebuilt<VectorType>::MGTransferPrebuilt () = default;
-
-
-
-template <typename VectorType>
 MGTransferPrebuilt<VectorType>::MGTransferPrebuilt (const MGConstrainedDoFs &mg_c)
 {
   this->mg_constrained_dofs = &mg_c;
@@ -58,11 +53,6 @@ MGTransferPrebuilt<VectorType>::MGTransferPrebuilt (const ConstraintMatrix &/*c*
 {
   this->mg_constrained_dofs = &mg_c;
 }
-
-
-
-template <typename VectorType>
-MGTransferPrebuilt<VectorType>::~MGTransferPrebuilt () = default;
 
 
 

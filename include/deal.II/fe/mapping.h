@@ -291,7 +291,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Mapping ();
+  virtual ~Mapping () = default;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -525,12 +525,6 @@ public:
    */
   class InternalDataBase
   {
-  private:
-    /**
-     * Copy construction is forbidden.
-     */
-    InternalDataBase (const InternalDataBase &) = delete;
-
   public:
     /**
      * Constructor. Sets update_flags to @p update_default and @p first_cell
@@ -539,9 +533,14 @@ public:
     InternalDataBase ();
 
     /**
+     * Copy construction is forbidden.
+     */
+    InternalDataBase (const InternalDataBase &) = delete;
+
+    /**
      * Virtual destructor for derived classes
      */
-    virtual ~InternalDataBase ();
+    virtual ~InternalDataBase () = default;
 
     /**
      * A set of update flags specifying the kind of information that an

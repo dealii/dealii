@@ -91,10 +91,6 @@ ChunkSparsityPattern::ChunkSparsityPattern (
 
 
 
-ChunkSparsityPattern::~ChunkSparsityPattern () = default;
-
-
-
 ChunkSparsityPattern &
 ChunkSparsityPattern::operator = (const ChunkSparsityPattern &s)
 {

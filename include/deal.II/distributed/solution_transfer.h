@@ -131,7 +131,7 @@ namespace parallel
       /**
        * Destructor.
        */
-      ~SolutionTransfer();
+      ~SolutionTransfer() = default;
 
       /**
        * Prepares the @p SolutionTransfer for coarsening and refinement. It

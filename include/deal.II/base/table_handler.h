@@ -54,7 +54,7 @@ namespace internal
     /**
      * Default constructor.
      */
-    TableEntry ();
+    TableEntry () = default;
 
     /**
      * Constructor. Initialize this table element with the value

@@ -89,7 +89,7 @@ public:
   /**
    * The virtual destructor
    */
-  ~PreconditionBlockBase();
+  ~PreconditionBlockBase() = default;
 
   /**
    * Deletes the inverse diagonal block matrices if existent hence leaves the

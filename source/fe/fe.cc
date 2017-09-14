@@ -42,11 +42,6 @@ FiniteElement<dim, spacedim>::InternalDataBase::InternalDataBase ():
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim>::InternalDataBase::~InternalDataBase () = default;
-
-
-
-template <int dim, int spacedim>
 std::size_t
 FiniteElement<dim, spacedim>::InternalDataBase::memory_consumption () const
 {
@@ -157,10 +152,6 @@ FiniteElement<dim, spacedim>::operator^ (unsigned int multiplicity) const
   return std::make_pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
          unsigned int> (std::move(this->clone()), std::move(multiplicity));
 }
-
-
-
-FiniteElement<dim,spacedim>::~FiniteElement () = default;
 
 
 

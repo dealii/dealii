@@ -57,6 +57,9 @@ FunctionParser<dim>::FunctionParser(const unsigned int n_components,
 
 
 
+// We deliberately delay the definition of the default constructor
+// so that we don't need to include the definition of mu::Parser
+// in the header file.
 template <int dim>
 FunctionParser<dim>::~FunctionParser() = default;
 

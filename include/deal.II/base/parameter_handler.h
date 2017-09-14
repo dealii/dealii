@@ -863,7 +863,7 @@ public:
    * safer as we have virtual functions.  It actually does nothing
    * spectacular.
    */
-  virtual ~ParameterHandler ();
+  virtual ~ParameterHandler () = default;
 
   /**
    * Parse each line from a stream until the stream returns the <tt>eof</tt>
@@ -1765,7 +1765,7 @@ public:
      * Destructor. It doesn't actually do anything, but is declared to force
      * derived classes to have a virtual destructor.
      */
-    virtual ~UserClass ();
+    virtual ~UserClass () = default;
 
     /**
      * <tt>create_new</tt> must provide a clean object, either by creating a
@@ -1788,7 +1788,7 @@ public:
    * Destructor. Declare this only to have a virtual destructor, which is
    * safer as we have virtual functions. It actually does nothing spectacular.
    */
-  virtual ~MultipleParameterLoop ();
+  virtual ~MultipleParameterLoop () = default;
 
   /**
    * Read input from a stream until the stream returns the <tt>eof</tt>

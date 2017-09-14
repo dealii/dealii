@@ -180,7 +180,7 @@ namespace MeshWorker
     /**
      * Constructor
      */
-    VectorDataBase();
+    VectorDataBase() = default;
 
     /**
      * Constructor from a base class object
@@ -199,7 +199,7 @@ namespace MeshWorker
     /**
      * Virtual, but empty destructor.
      */
-    virtual ~VectorDataBase();
+    virtual ~VectorDataBase() = default;
 
     /**
      * The only function added to VectorSelector is an abstract virtual

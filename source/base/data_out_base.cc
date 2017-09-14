@@ -6384,11 +6384,6 @@ DataOutInterface<dim,spacedim>::DataOutInterface ()
 
 
 template <int dim, int spacedim>
-DataOutInterface<dim,spacedim>::~DataOutInterface () = default;
-
-
-
-template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_dx (std::ostream &out) const
 {
   DataOutBase::write_dx (get_patches(), get_dataset_names(),

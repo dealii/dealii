@@ -214,8 +214,6 @@ MGTransferSelect<number>::MGTransferSelect (const ConstraintMatrix &c)
   constraints(&c)
 {}
 
-template <typename number>
-MGTransferSelect<number>::~MGTransferSelect () = default;
 
 
 template <typename number>
@@ -275,11 +273,6 @@ MGTransferBlockSelect<number>::MGTransferBlockSelect (const ConstraintMatrix &/*
   MGTransferBlockBase(mg_c),
   selected_block (0)
 {}
-
-
-
-template <typename number>
-MGTransferBlockSelect<number>::~MGTransferBlockSelect () = default;
 
 
 

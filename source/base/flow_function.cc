@@ -37,9 +37,6 @@ namespace Functions
   {}
 
 
-  template <int dim>
-  FlowFunction<dim>::~FlowFunction() = default;
-
 
   template <int dim>
   void
@@ -193,11 +190,6 @@ namespace Functions
 
 
   template <int dim>
-  PoisseuilleFlow<dim>::~PoisseuilleFlow() = default;
-
-
-
-  template <int dim>
   void PoisseuilleFlow<dim>::vector_values (
     const std::vector<Point<dim> > &points,
     std::vector<std::vector<double> > &values) const
@@ -286,11 +278,6 @@ namespace Functions
     :
     viscosity(nu), reaction(r)
   {}
-
-
-
-  template <int dim>
-  StokesCosine<dim>::~StokesCosine() = default;
 
 
 
@@ -658,10 +645,6 @@ namespace Functions
     // x-direction
     p_average = 1/(8*l)*(std::exp(3.*l)-std::exp(-l));
   }
-
-
-
-  Kovasznay::~Kovasznay() = default;
 
 
 

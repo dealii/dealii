@@ -64,7 +64,7 @@ public:
   /**
    * Create an empty object.
    */
-  Householder ();
+  Householder () = default;
 
   /**
    * Create an object holding the QR-decomposition of a matrix.
@@ -124,11 +124,6 @@ private:
 /*-------------------------Inline functions -------------------------------*/
 
 // QR-transformation cf. Stoer 1 4.8.2 (p. 191)
-
-template <typename number>
-Householder<number>::Householder() = default;
-
-
 
 template <typename number>
 template <typename number2>

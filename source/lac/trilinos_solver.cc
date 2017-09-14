@@ -68,10 +68,6 @@ namespace TrilinosWrappers
 
 
 
-  SolverBase::~SolverBase () = default;
-
-
-
   SolverControl &
   SolverBase::control() const
   {
@@ -718,10 +714,6 @@ namespace TrilinosWrappers
     solver_control (cn),
     additional_data (data.output_solver_details,data.solver_type)
   {}
-
-
-
-  SolverDirect::~SolverDirect () = default;
 
 
 

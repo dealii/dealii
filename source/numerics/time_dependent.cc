@@ -264,10 +264,6 @@ TimeStepBase::TimeStepBase (const double time) :
 
 
 
-TimeStepBase::~TimeStepBase () = default;
-
-
-
 void
 TimeStepBase::wake_up (const unsigned int )
 {}

@@ -28,18 +28,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <typename VectorType>
-MGTransferBase<VectorType>::~MGTransferBase() = default;
-
-
-template <typename VectorType>
-MGMatrixBase<VectorType>::~MGMatrixBase() = default;
-
-
-template <typename VectorType>
-MGSmootherBase<VectorType>::~MGSmootherBase() = default;
-
-
-template <typename VectorType>
 void
 MGSmootherBase<VectorType>::apply (const unsigned int level,
                                    VectorType         &u,
@@ -48,10 +36,6 @@ MGSmootherBase<VectorType>::apply (const unsigned int level,
   u = 0;
   smooth(level, u, rhs);
 }
-
-
-template <typename VectorType>
-MGCoarseGridBase<VectorType>::~MGCoarseGridBase() = default;
 
 
 // Explicit instantiations

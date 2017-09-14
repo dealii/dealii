@@ -30,11 +30,6 @@ FunctionTime<Number>::FunctionTime(const Number initial_time)
 
 
 template <typename Number>
-FunctionTime<Number>::~FunctionTime() = default;
-
-
-
-template <typename Number>
 void
 FunctionTime<Number>::set_time (const Number new_time)
 {

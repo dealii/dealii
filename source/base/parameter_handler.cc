@@ -49,10 +49,6 @@ ParameterHandler::ParameterHandler ()
 
 
 
-ParameterHandler::~ParameterHandler () = default;
-
-
-
 std::string
 ParameterHandler::mangle (const std::string &s)
 {
@@ -2110,18 +2106,10 @@ ParameterHandler::operator == (const ParameterHandler &prm2)  const
 
 
 
-MultipleParameterLoop::UserClass::~UserClass () = default;
-
-
-
 MultipleParameterLoop::MultipleParameterLoop()
   :
   n_branches(0)
 {}
-
-
-
-MultipleParameterLoop::~MultipleParameterLoop () = default;
 
 
 

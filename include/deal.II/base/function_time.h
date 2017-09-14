@@ -81,7 +81,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~FunctionTime();
+  virtual ~FunctionTime() = default;
 
   /**
    * Return the value of the time variable.

@@ -272,7 +272,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~FE_P1NC ();
+  virtual ~FE_P1NC () = default;
 
 
 

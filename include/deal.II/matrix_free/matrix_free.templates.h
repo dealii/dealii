@@ -59,11 +59,6 @@ MatrixFree<dim, Number>::MatrixFree(const MatrixFree<dim,Number> &other)
 
 
 template <int dim, typename Number>
-MatrixFree<dim,Number>::~MatrixFree() = default;
-
-
-
-template <int dim, typename Number>
 void MatrixFree<dim,Number>::
 copy_from (const MatrixFree<dim,Number> &v)
 {

@@ -86,9 +86,6 @@ namespace hp
     return numbers::invalid_unsigned_int;
   }
 
-  template <int dim, int spacedim>
-  FECollection<dim,spacedim>::FECollection () = default;
-
 
 
   template <int dim, int spacedim>

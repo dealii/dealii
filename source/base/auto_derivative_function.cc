@@ -39,11 +39,6 @@ AutoDerivativeFunction (const double hh,
 
 
 template <int dim>
-AutoDerivativeFunction<dim>::~AutoDerivativeFunction () = default;
-
-
-
-template <int dim>
 void
 AutoDerivativeFunction<dim>::set_formula (const DifferenceFormula form)
 {

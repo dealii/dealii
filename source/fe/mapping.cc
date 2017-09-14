@@ -21,10 +21,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-Mapping<dim, spacedim>::~Mapping () = default;
-
-
-template <int dim, int spacedim>
 std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
 Mapping<dim, spacedim>::get_vertices (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
@@ -82,11 +78,6 @@ template <int dim, int spacedim>
 Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
   update_each(update_default)
 {}
-
-
-
-template <int dim, int spacedim>
-Mapping<dim, spacedim>::InternalDataBase::~InternalDataBase () = default;
 
 
 

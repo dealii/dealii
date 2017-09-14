@@ -45,9 +45,6 @@ AdditionalData (const size_type block_size,
 {}
 
 
-template <typename number>
-PreconditionBlockBase<number>::~PreconditionBlockBase () = default;
-
 
 template <typename MatrixType, typename inverse_type>
 PreconditionBlock<MatrixType,inverse_type>::PreconditionBlock (bool store)

@@ -42,10 +42,6 @@ DataOutStack<dim,spacedim,DoFHandlerType>::DataVector::memory_consumption () con
 
 
 template <int dim, int spacedim, typename DoFHandlerType>
-DataOutStack<dim,spacedim,DoFHandlerType>::~DataOutStack () = default;
-
-
-template <int dim, int spacedim, typename DoFHandlerType>
 void DataOutStack<dim,spacedim,DoFHandlerType>::new_parameter_value (const double p,
     const double dp)
 {

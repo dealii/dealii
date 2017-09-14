@@ -22,11 +22,6 @@ DEAL_II_NAMESPACE_OPEN
 // -------------------------- DataPostprocessor ---------------------------
 
 template <int dim>
-DataPostprocessor<dim>::~DataPostprocessor() = default;
-
-
-
-template <int dim>
 void
 DataPostprocessor<dim>::
 evaluate_scalar_field (const DataPostprocessorInputs::Scalar<dim> &,

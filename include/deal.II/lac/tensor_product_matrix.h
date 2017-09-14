@@ -103,7 +103,7 @@ public:
   /**
    * Constructor.
    */
-  TensorProductMatrixSymmetricSum();
+  TensorProductMatrixSymmetricSum() = default;
 
   /**
    * Constructor that is equivalent to the previous constructor and
@@ -201,13 +201,6 @@ private:
 /*----------------------- Inline functions ----------------------------------*/
 
 #ifndef DOXYGEN
-
-
-template <int dim, typename Number, int size>
-inline
-TensorProductMatrixSymmetricSum<dim,Number,size>
-::TensorProductMatrixSymmetricSum() = default;
-
 
 
 template <int dim, typename Number, int size>

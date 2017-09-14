@@ -672,7 +672,7 @@ public:
   /**
    * Destructor. At present, this does nothing.
    */
-  virtual ~TimeStepBase ();
+  virtual ~TimeStepBase () = default;
 
   /**
    * Reconstruct all the data that is needed for this time level to work. This

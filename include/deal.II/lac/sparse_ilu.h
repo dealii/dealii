@@ -71,7 +71,7 @@ public:
    * Call the @p initialize function before using this object as
    * preconditioner.
    */
-  SparseILU ();
+  SparseILU () = default;
 
   /**
    * Make SparseLUDecomposition::AdditionalData accessible to this class as

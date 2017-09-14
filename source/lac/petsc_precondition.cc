@@ -123,8 +123,6 @@ namespace PETScWrappers
   }
 
 
-  PreconditionJacobi::PreconditionJacobi () = default;
-
 
   PreconditionJacobi::PreconditionJacobi (const MatrixBase     &matrix,
                                           const AdditionalData &additional_data)
@@ -174,8 +172,6 @@ namespace PETScWrappers
   }
 
 
-  PreconditionBlockJacobi::PreconditionBlockJacobi () = default;
-
 
   PreconditionBlockJacobi::
   PreconditionBlockJacobi (const MatrixBase     &matrix,
@@ -221,8 +217,6 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionSOR::PreconditionSOR () = default;
-
 
   PreconditionSOR::PreconditionSOR (const MatrixBase     &matrix,
                                     const AdditionalData &additional_data)
@@ -265,8 +259,6 @@ namespace PETScWrappers
     omega (omega)
   {}
 
-
-  PreconditionSSOR::PreconditionSSOR () = default;
 
 
   PreconditionSSOR::PreconditionSSOR (const MatrixBase     &matrix,
@@ -315,8 +307,6 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionEisenstat::PreconditionEisenstat () = default;
-
 
   PreconditionEisenstat::PreconditionEisenstat (const MatrixBase     &matrix,
                                                 const AdditionalData &additional_data)
@@ -361,8 +351,6 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionICC::PreconditionICC () = default;
-
 
   PreconditionICC::PreconditionICC (const MatrixBase     &matrix,
                                     const AdditionalData &additional_data)
@@ -405,8 +393,6 @@ namespace PETScWrappers
     levels (levels)
   {}
 
-
-  PreconditionILU::PreconditionILU () = default;
 
 
   PreconditionILU::PreconditionILU (const MatrixBase     &matrix,
@@ -460,7 +446,6 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionBoomerAMG::PreconditionBoomerAMG () = default;
 
   PreconditionBoomerAMG::PreconditionBoomerAMG (const MPI_Comm comm,
                                                 const AdditionalData &additional_data_)
@@ -578,8 +563,6 @@ namespace PETScWrappers
   {}
 
 
-  PreconditionParaSails::PreconditionParaSails () = default;
-
 
   PreconditionParaSails::PreconditionParaSails (const MatrixBase     &matrix,
                                                 const AdditionalData &additional_data)
@@ -673,9 +656,6 @@ namespace PETScWrappers
 
   /* ----------------- PreconditionNone ------------------------- */
 
-  PreconditionNone::PreconditionNone () = default;
-
-
   PreconditionNone::PreconditionNone (const MatrixBase     &matrix,
                                       const AdditionalData &additional_data)
   {
@@ -717,8 +697,6 @@ namespace PETScWrappers
     damping (damping)
   {}
 
-
-  PreconditionLU::PreconditionLU () = default;
 
 
   PreconditionLU::PreconditionLU (const MatrixBase     &matrix,

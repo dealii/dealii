@@ -102,7 +102,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverRichardson ();
+  virtual ~SolverRichardson () = default;
 
   /**
    * Solve the linear system $Ax=b$ for x.
@@ -190,10 +190,6 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl        &cn,
   additional_data(data)
 {}
 
-
-
-template <class VectorType>
-SolverRichardson<VectorType>::~SolverRichardson() = default;
 
 
 template <class VectorType>

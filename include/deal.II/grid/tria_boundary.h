@@ -86,7 +86,7 @@ public:
    * Destructor. Does nothing here, but needs to be declared to make it
    * virtual.
    */
-  virtual ~Boundary ();
+  virtual ~Boundary () = default;
 
 
   /**
@@ -241,7 +241,7 @@ public:
   /**
    * Default constructor. Some compilers require this for some reasons.
    */
-  StraightBoundary ();
+  StraightBoundary () = default;
 
   /**
    * Let the new point be the arithmetic mean of the two vertices of the line.

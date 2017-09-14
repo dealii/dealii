@@ -22,12 +22,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace hp
 {
-
-  template <int dim, int spacedim>
-  MappingCollection<dim,spacedim>::MappingCollection () = default;
-
-
-
   template <int dim, int spacedim>
   MappingCollection<dim,spacedim>::
   MappingCollection (const Mapping<dim,spacedim> &mapping)

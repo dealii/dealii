@@ -29,10 +29,6 @@ MatrixOut::Options::Options (const bool         show_absolute_values,
 
 
 
-MatrixOut::~MatrixOut () = default;
-
-
-
 const std::vector<MatrixOut::Patch> &
 MatrixOut::get_patches () const
 {

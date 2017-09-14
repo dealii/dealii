@@ -48,10 +48,6 @@ SolverControl::SolverControl (const unsigned int maxiter,
 
 
 
-SolverControl::~SolverControl() = default;
-
-
-
 SolverControl::State
 SolverControl::check (const unsigned int step,
                       const double check_value)
@@ -258,8 +254,6 @@ ReductionControl::operator= (const SolverControl &c)
 }
 
 
-ReductionControl::~ReductionControl() = default;
-
 
 SolverControl::State
 ReductionControl::check (const unsigned int step,
@@ -322,7 +316,6 @@ IterationNumberControl::IterationNumberControl(const unsigned int n,
   SolverControl (n, tolerance, m_log_history, m_log_result) {}
 
 
-IterationNumberControl::~IterationNumberControl() = default;
 
 
 SolverControl::State
@@ -383,9 +376,6 @@ ConsecutiveControl::operator= (const SolverControl &c)
   return *this;
 }
 
-
-
-ConsecutiveControl::~ConsecutiveControl() = default;
 
 
 SolverControl::State

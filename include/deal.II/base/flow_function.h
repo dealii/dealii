@@ -56,7 +56,7 @@ namespace Functions
     /**
      * Virtual destructor.
      */
-    virtual ~FlowFunction();
+    virtual ~FlowFunction() = default;
 
     /**
      * Store an adjustment for the pressure function, such that its mean value
@@ -145,7 +145,8 @@ namespace Functions
      */
     PoisseuilleFlow<dim> (const double r,
                           const double Re);
-    virtual ~PoisseuilleFlow();
+
+    virtual ~PoisseuilleFlow() = default;
 
     virtual void vector_values (const std::vector<Point<dim> > &points,
                                 std::vector<std::vector<double> > &values) const;
@@ -187,7 +188,8 @@ namespace Functions
      * Change the viscosity and the reaction parameter.
      */
     void set_parameters (const double viscosity, const double reaction);
-    virtual ~StokesCosine();
+
+    virtual ~StokesCosine() = default;
 
     virtual void vector_values (const std::vector<Point<dim> > &points,
                                 std::vector<std::vector<double> > &values) const;
@@ -276,7 +278,8 @@ namespace Functions
      * Stokes problem.
      */
     Kovasznay (const double Re, bool Stokes = false);
-    virtual ~Kovasznay();
+
+    virtual ~Kovasznay() = default;
 
     virtual void vector_values (const std::vector<Point<2> > &points,
                                 std::vector<std::vector<double> > &values) const;

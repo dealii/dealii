@@ -334,7 +334,7 @@ public:
   /**
    * Destructor.
    */
-  ~ChunkSparsityPattern ();
+  ~ChunkSparsityPattern () = default;
 
   /**
    * Copy operator. For this the same holds as for the copy constructor: it is

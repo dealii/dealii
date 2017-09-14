@@ -65,7 +65,7 @@ public:
   /**
    * Constructor.
    */
-  ConvergenceTable();
+  ConvergenceTable() = default;
 
   /**
    * Rate in relation to the rows.

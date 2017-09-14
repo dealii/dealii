@@ -73,10 +73,6 @@ std::unique_ptr<FiniteElement<2,2>>
 
 
 
-FE_P1NC::~FE_P1NC () = default;
-
-
-
 std::vector<unsigned int>
 FE_P1NC::get_dpo_vector ()
 {

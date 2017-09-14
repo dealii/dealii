@@ -228,11 +228,6 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    Triangulation<dim,spacedim>::~Triangulation () = default;
-
-
-
-    template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::execute_coarsening_and_refinement ()
     {

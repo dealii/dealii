@@ -370,11 +370,6 @@ namespace internal
 
 
 
-    template <typename DoFHandlerType>
-    DataEntryBase<DoFHandlerType>::~DataEntryBase () = default;
-
-
-
     /**
      * Class that stores a pointer to a vector of type equal to the template
      * argument, and provides the functions to extract data from it.

@@ -58,7 +58,7 @@ namespace hp
      * Default constructor. Leads to an empty collection that can later be
      * filled using push_back().
      */
-    MappingCollection ();
+    MappingCollection () = default;
 
     /**
      * Conversion constructor. This constructor creates a MappingCollection

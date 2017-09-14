@@ -2130,7 +2130,7 @@ public:
    * pointers to the base
    * class.
    */
-  virtual ~CellIteratorBase ();
+  virtual ~CellIteratorBase () = default;
 
   /**
    * Conversion operator to an
@@ -2170,10 +2170,6 @@ public:
   get_interpolated_dof_values (const IndexSet &in,
                                Vector<IndexSet::value_type> &out) const = 0;
 };
-
-
-template <int dim, int spacedim>
-FEValuesBase<dim,spacedim>::CellIteratorBase::~CellIteratorBase () = default;
 
 /* ---------------- classes derived from FEValuesBase<dim,spacedim>::CellIteratorBase --------- */
 

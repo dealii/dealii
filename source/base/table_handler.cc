@@ -31,9 +31,6 @@ DEAL_II_NAMESPACE_OPEN
 // inline and template functions
 namespace internal
 {
-  TableEntry::TableEntry () = default;
-
-
   double TableEntry::get_numeric_value () const
   {
     // we don't quite know the data type in 'value', but

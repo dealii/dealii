@@ -71,8 +71,6 @@ namespace MeshWorker
   {}
 
 
-  template <int dim, int spacedim, typename number>
-  LocalIntegrator<dim, spacedim, number>::~LocalIntegrator () = default;
 
   template <int dim, int spacedim, typename number>
   void

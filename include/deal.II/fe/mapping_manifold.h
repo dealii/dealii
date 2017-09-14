@@ -63,7 +63,7 @@ public:
   /**
    * Constructor.
    */
-  MappingManifold ();
+  MappingManifold () = default;
 
   /**
    * Copy constructor.
@@ -174,7 +174,7 @@ public:
     /**
      * Constructor.
      */
-    InternalData();
+    InternalData() = default;
 
     /**
      * Initialize the object's member variables related to cell data based on

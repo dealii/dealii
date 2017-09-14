@@ -114,7 +114,7 @@ public:
   /**
    * Destructor. Declared in order to make it virtual.
    */
-  virtual ~MatrixOut ();
+  virtual ~MatrixOut () = default;
 
   /**
    * Generate a list of patches from the given matrix and use the given string

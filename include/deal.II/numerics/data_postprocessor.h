@@ -430,7 +430,7 @@ public:
    * virtual to ensure that data postprocessors can be destroyed through
    * pointers to the base class.
    */
-  virtual ~DataPostprocessor ();
+  virtual ~DataPostprocessor () = default;
 
   /**
    * This is the main function which actually performs the postprocessing. The

@@ -127,10 +127,6 @@ namespace Patterns
 
 
 
-  PatternBase::~PatternBase () = default;
-
-
-
   std::size_t
   PatternBase::memory_consumption () const
   {
@@ -1156,10 +1152,6 @@ namespace Patterns
 
 
 
-  Anything::Anything () = default;
-
-
-
   bool Anything::match (const std::string &) const
   {
     return true;
@@ -1296,10 +1288,6 @@ namespace Patterns
 
 
   const char *DirectoryName::description_init = "[DirectoryName";
-
-
-
-  DirectoryName::DirectoryName () = default;
 
 
 

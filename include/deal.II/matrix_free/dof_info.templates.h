@@ -131,10 +131,6 @@ namespace internal
 
 
 
-    DoFInfo::DoFInfo (const DoFInfo &dof_info_in) = default;
-
-
-
     void
     DoFInfo::clear ()
     {

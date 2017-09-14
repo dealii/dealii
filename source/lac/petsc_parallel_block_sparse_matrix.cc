@@ -24,12 +24,6 @@ namespace PETScWrappers
   namespace MPI
   {
 
-    BlockSparseMatrix::BlockSparseMatrix () = default;
-
-
-    BlockSparseMatrix::~BlockSparseMatrix () = default;
-
-
     BlockSparseMatrix &
     BlockSparseMatrix::operator = (const BlockSparseMatrix &m)
     {

@@ -2374,7 +2374,7 @@ public:
    * Destructor. Does nothing, but is declared virtual since this class has
    * virtual functions.
    */
-  virtual ~DataOutInterface ();
+  virtual ~DataOutInterface () = default;
 
   /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in OpenDX

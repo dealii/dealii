@@ -68,7 +68,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferMatrixFree ();
+  virtual ~MGTransferMatrixFree () = default;
 
   /**
    * Initialize the constraints to be used in build().
@@ -258,7 +258,7 @@ public:
    * Constructor without constraint matrices. Use this constructor only with
    * discontinuous finite elements or with no local refinement.
    */
-  MGTransferBlockMatrixFree ();
+  MGTransferBlockMatrixFree () = default;
 
   /**
    * Constructor with constraints. Equivalent to the default constructor
@@ -269,7 +269,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferBlockMatrixFree ();
+  virtual ~MGTransferBlockMatrixFree () = default;
 
   /**
    * Initialize the constraints to be used in build().

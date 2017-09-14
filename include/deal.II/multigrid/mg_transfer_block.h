@@ -322,7 +322,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferBlockSelect ();
+  virtual ~MGTransferBlockSelect () = default;
 
   /**
    * Actually build the prolongation matrices for grouped blocks.

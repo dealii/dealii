@@ -37,10 +37,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Algorithms
 {
-  OperatorBase::~OperatorBase() = default;
-
-
-
   void OperatorBase::notify(const Event &e)
   {
     notifications += e;

@@ -57,11 +57,6 @@ namespace parallel
 
 
     template <int dim, typename VectorType, typename DoFHandlerType>
-    SolutionTransfer<dim, VectorType, DoFHandlerType>::~SolutionTransfer () = default;
-
-
-
-    template <int dim, typename VectorType, typename DoFHandlerType>
     void
     SolutionTransfer<dim, VectorType, DoFHandlerType>::
     prepare_for_coarsening_and_refinement (const std::vector<const VectorType *> &all_in)

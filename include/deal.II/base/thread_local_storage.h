@@ -74,7 +74,7 @@ namespace Threads
      * Default constructor. Initialize each thread local object using its
      * default constructor.
      */
-    ThreadLocalStorage ();
+    ThreadLocalStorage () = default;
 
     /**
      * A kind of copy constructor. Initialize each thread local object by
@@ -178,11 +178,6 @@ namespace Threads
   };
 
 // ----------------- inline and template functions ----------------------------
-
-  template <typename T>
-  inline
-  ThreadLocalStorage<T>::ThreadLocalStorage() = default;
-
 
   template <typename T>
   inline
