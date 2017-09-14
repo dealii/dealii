@@ -1,0 +1,6 @@
+New: A new TriangulationInfoCache class
+allows caching of some expensive data of the 
+Triangulation class, computed generally using 
+functions in GridTools.
+<br>
+(Luca Heltai, 2017/09/14)

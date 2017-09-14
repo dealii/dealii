@@ -27,7 +27,7 @@ TriangulationInfoCache<dim,spacedim>::TriangulationInfoCache(
   flags(flags),
   mapping(&mapping)
 {
-  tria->signals.any_change.connect([&]()
+  tria_signal = tria.signals.any_change.connect([&]()
   {
     update();
   });
@@ -36,11 +36,29 @@ TriangulationInfoCache<dim,spacedim>::TriangulationInfoCache(
     update();
 }
 
+template<int dim, int spacedim>
+TriangulationInfoCache<dim,spacedim>::~TriangulationInfoCache()
+{
+  // Make sure that the signals that was attached to the triangulation
+  // is removed here.
+  if (tria_signal.connected())
+    tria_signal.disconnect();
+}
+
 
 
 template<int dim, int spacedim>
 void TriangulationInfoCache<dim,spacedim>::update(bool topology_is_unchanged)
 {
+  // If the triangulation is empty, just clear everything.
+  if (tria->n_active_cells() == 0)
+    {
+      vertex_to_cells.clear();
+      vertex_to_cell_centers.clear();
+      vertex_kdtree.set_points(tria->get_vertices());
+      return;
+    }
+
   if (topology_is_unchanged == false)
     {
       if (cache_vertex_to_cell_map & flags)
@@ -55,6 +73,7 @@ void TriangulationInfoCache<dim,spacedim>::update(bool topology_is_unchanged)
   if (cache_vertex_to_cell_centers_directions & flags)
     vertex_to_cell_centers =
       GridTools::vertex_to_cell_centers_directions(*tria, vertex_to_cells);
+
 }
 
 

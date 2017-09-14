@@ -30,6 +30,8 @@
 
 #include <deal.II/numerics/kdtree.h>
 
+#include <boost/signals2.hpp>
+
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -55,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Luca Heltai, 2017.
  */
-template <int dim, int spacedim>
+template <int dim, int spacedim = dim>
 class TriangulationInfoCache : public Subscriptor
 {
 public:
@@ -73,6 +75,8 @@ public:
   TriangulationInfoCache (const Triangulation<dim,spacedim> &tria,
                           const TriangulationInfoCacheFlags &flags = cache_nothing,
                           const Mapping<dim,spacedim> &mapping=StaticMappingQ1<dim,spacedim>::mapping);
+
+  ~TriangulationInfoCache();
 
   /**
    * Loop over all TriangulationInfoCacheFlags and rebuilds the specific data
@@ -160,6 +164,11 @@ private:
    */
   KDTree<spacedim> vertex_kdtree;
 #endif
+
+  /**
+   * Storage for the status of the triangulation signal.
+   */
+  boost::signals2::connection tria_signal;
 };
 
 DEAL_II_NAMESPACE_CLOSE
