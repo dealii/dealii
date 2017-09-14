@@ -7652,7 +7652,7 @@ XDMFEntry::XDMFEntry()
 
 
 
-XDMFEntry::XDMFEntry(const std::string filename,
+XDMFEntry::XDMFEntry(const std::string &filename,
                      const double time,
                      const unsigned int nodes,
                      const unsigned int cells,
@@ -7669,8 +7669,8 @@ XDMFEntry::XDMFEntry(const std::string filename,
 
 
 
-XDMFEntry::XDMFEntry(const std::string mesh_filename,
-                     const std::string solution_filename,
+XDMFEntry::XDMFEntry(const std::string &mesh_filename,
+                     const std::string &solution_filename,
                      const double time,
                      const unsigned int nodes,
                      const unsigned int cells,
@@ -7687,8 +7687,8 @@ XDMFEntry::XDMFEntry(const std::string mesh_filename,
 
 
 
-XDMFEntry::XDMFEntry(const std::string mesh_filename,
-                     const std::string solution_filename,
+XDMFEntry::XDMFEntry(const std::string &mesh_filename,
+                     const std::string &solution_filename,
                      const double time,
                      const unsigned int nodes,
                      const unsigned int cells,

@@ -185,7 +185,7 @@ namespace internal
                     const types::subdomain_id subdomain_id,
                     const types::material_id material_id,
                     const typename FunctionMap<spacedim>::type *neumann_bc,
-                    const ComponentMask                component_mask,
+                    const ComponentMask                &component_mask,
                     const Function<spacedim>                   *coefficients);
 
       /**
@@ -209,7 +209,7 @@ namespace internal
      const types::subdomain_id                           subdomain_id,
      const types::material_id                            material_id,
      const typename FunctionMap<spacedim>::type         *neumann_bc,
-     const ComponentMask                                 component_mask,
+     const ComponentMask                                 &component_mask,
      const Function<spacedim>                           *coefficients)
       :
       finite_element (fe),

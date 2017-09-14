@@ -111,7 +111,7 @@ public:
    */
   MappingFEField (const DoFHandlerType &euler_dof_handler,
                   const VectorType     &euler_vector,
-                  const ComponentMask   mask = ComponentMask());
+                  const ComponentMask   &mask = ComponentMask());
 
   /**
    * Copy constructor.
@@ -253,7 +253,7 @@ public:
      * Constructor.
      */
     InternalData(const FiniteElement<dim,spacedim> &fe,
-                 const ComponentMask mask);
+                 const ComponentMask &mask);
 
     /**
      * Shape function at quadrature point. Shape functions are in tensor

@@ -234,7 +234,7 @@ namespace IteratorFilters
      * have to be evaluated to true and state if the iterator must be locally
      * owned.
      */
-    MaterialIdEqualTo (const std::set<types::material_id> material_ids,
+    MaterialIdEqualTo (const std::set<types::material_id> &material_ids,
                        const bool only_locally_owned = false);
 
     /**
@@ -280,7 +280,7 @@ namespace IteratorFilters
      * shall have to be evaluated to true and state if the iterator must be
      * locally owned.
      */
-    ActiveFEIndexEqualTo (const std::set<unsigned int> active_fe_indices,
+    ActiveFEIndexEqualTo (const std::set<unsigned int> &active_fe_indices,
                           const bool only_locally_owned = false);
 
     /**
@@ -1301,7 +1301,7 @@ namespace IteratorFilters
 
 
   inline
-  MaterialIdEqualTo::MaterialIdEqualTo (const std::set<types::material_id> material_ids,
+  MaterialIdEqualTo::MaterialIdEqualTo (const std::set<types::material_id> &material_ids,
                                         const bool only_locally_owned)
     :
     material_ids (material_ids),
@@ -1339,7 +1339,7 @@ namespace IteratorFilters
 
 
   inline
-  ActiveFEIndexEqualTo::ActiveFEIndexEqualTo (const std::set<unsigned int> active_fe_indices,
+  ActiveFEIndexEqualTo::ActiveFEIndexEqualTo (const std::set<unsigned int> &active_fe_indices,
                                               const bool only_locally_owned)
     :
     active_fe_indices (active_fe_indices),

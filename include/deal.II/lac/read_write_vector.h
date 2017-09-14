@@ -283,7 +283,7 @@ namespace LinearAlgebra
      */
     void import(const distributed::Vector<Number> &vec,
                 VectorOperation::values operation,
-                std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                const std::shared_ptr<const CommunicationPatternBase> &communication_pattern =
                   std::shared_ptr<const CommunicationPatternBase> ());
 
 #ifdef DEAL_II_WITH_PETSC
@@ -297,7 +297,7 @@ namespace LinearAlgebra
      */
     void import(const PETScWrappers::MPI::Vector &petsc_vec,
                 VectorOperation::values operation,
-                std::shared_ptr<const CommunicationPatternBase> communication_pattern =
+                const std::shared_ptr<const CommunicationPatternBase> &communication_pattern =
                   std::shared_ptr<const CommunicationPatternBase> ());
 #endif
 
@@ -564,7 +564,7 @@ namespace LinearAlgebra
                 const IndexSet                                 &locally_owned_elements,
                 VectorOperation::values                         operation,
                 const MPI_Comm                                 &mpi_comm,
-                std::shared_ptr<const CommunicationPatternBase> communication_pattern);
+                const std::shared_ptr<const CommunicationPatternBase> &communication_pattern);
 #endif
 
     /**

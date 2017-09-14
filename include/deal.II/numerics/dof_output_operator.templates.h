@@ -25,7 +25,7 @@ namespace Algorithms
 {
   template <typename VectorType, int dim, int spacedim>
   DoFOutputOperator<VectorType, dim, spacedim>::DoFOutputOperator (
-    const std::string filename_base,
+    const std::string &filename_base,
     const unsigned int digits)
     :
     filename_base(filename_base),
