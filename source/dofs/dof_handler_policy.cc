@@ -1046,22 +1046,29 @@ namespace internal
           {
             Threads::TaskGroup<> tasks;
 
-            tasks += Threads::new_task ([&]()
+            unsigned int i=0;
+            tasks += Threads::new_task ([ &,i] ()
             {
-              all_constrained_indices[0] = compute_vertex_dof_identities (dof_handler);
+              all_constrained_indices[i] = compute_vertex_dof_identities (dof_handler);
             });
 
             if (dim > 1)
-              tasks += Threads::new_task ([&]()
               {
-                all_constrained_indices[1] = compute_line_dof_identities (dof_handler);
-              });
+                ++i;
+                tasks += Threads::new_task ([ &,i] ()
+                {
+                  all_constrained_indices[i] = compute_line_dof_identities (dof_handler);
+                });
+              }
 
             if (dim > 2)
-              tasks += Threads::new_task ([&]()
               {
-                all_constrained_indices[2] = compute_quad_dof_identities (dof_handler);
-              });
+                ++i;
+                tasks += Threads::new_task ([ &,i] ()
+                {
+                  all_constrained_indices[i] = compute_quad_dof_identities (dof_handler);
+                });
+              }
 
             tasks.join_all ();
           }

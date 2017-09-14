@@ -645,7 +645,8 @@ namespace
           case 1:
             Assert (xstep<n_subdivisions+1, ExcIndexRange(xstep,0,n_subdivisions+1));
             point_no+=xstep;
-
+            DEAL_II_FALLTHROUGH;
+          case 0:
             // break here for dim<=3
             break;
 
@@ -657,24 +658,29 @@ namespace
       }
     else
       {
-        // perform a dim-linear interpolation
-        const double stepsize=1./n_subdivisions,
-                     xfrac=xstep*stepsize;
-
-        node = (patch->vertices[1] * xfrac) + (patch->vertices[0] * (1-xfrac));
-        if (dim>1)
+        if (dim==0)
+          node = patch->vertices[0];
+        else
           {
-            const double yfrac=ystep*stepsize;
-            node*= 1-yfrac;
-            node += ((patch->vertices[3] * xfrac) + (patch->vertices[2] * (1-xfrac))) * yfrac;
-            if (dim>2)
+            // perform a dim-linear interpolation
+            const double stepsize=1./n_subdivisions,
+                         xfrac=xstep*stepsize;
+
+            node = (patch->vertices[1] * xfrac) + (patch->vertices[0] * (1-xfrac));
+            if (dim>1)
               {
-                const double zfrac=zstep*stepsize;
-                node *= (1-zfrac);
-                node += (((patch->vertices[5] * xfrac) + (patch->vertices[4] * (1-xfrac)))
-                         * (1-yfrac) +
-                         ((patch->vertices[7] * xfrac) + (patch->vertices[6] * (1-xfrac)))
-                         * yfrac) * zfrac;
+                const double yfrac=ystep*stepsize;
+                node*= 1-yfrac;
+                node += ((patch->vertices[3] * xfrac) + (patch->vertices[2] * (1-xfrac))) * yfrac;
+                if (dim>2)
+                  {
+                    const double zfrac=zstep*stepsize;
+                    node *= (1-zfrac);
+                    node += (((patch->vertices[5] * xfrac) + (patch->vertices[4] * (1-xfrac)))
+                             * (1-yfrac) +
+                             ((patch->vertices[7] * xfrac) + (patch->vertices[6] * (1-xfrac)))
+                             * yfrac) * zfrac;
+                  }
               }
           }
       }
