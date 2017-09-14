@@ -82,7 +82,7 @@ namespace LinearAlgebra
                         const bool omit_zeroing_entries)
     {
       // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V)!=NULL, ExcVectorTypeNotCompatible());
+      Assert(dynamic_cast<const Vector *>(&V)!=nullptr, ExcVectorTypeNotCompatible());
 
       // Downcast V. If fails, throws an exception.
       const Vector &down_V = dynamic_cast<const Vector &>(V);

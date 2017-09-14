@@ -56,8 +56,8 @@ namespace Functions
   {
     gsl_interp_accel_free (acc);
     gsl_spline_free (cspline);
-    acc = NULL;
-    cspline = NULL;
+    acc = nullptr;
+    cspline = nullptr;
   }
 
 

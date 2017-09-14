@@ -474,7 +474,7 @@ namespace internal
           p8est_iterate (reinterpret_cast<dealii::internal::p4est::types<3>::forest *>(parallel_forest),
                          reinterpret_cast<dealii::internal::p4est::types<3>::ghost *>(parallel_ghost),
                          static_cast<void *>(&fg),
-                         NULL, find_ghosts_face<3,3>, find_ghosts_edge<3,3>, find_ghosts_corner<3,3>);
+                         nullptr, find_ghosts_face<3,3>, find_ghosts_edge<3,3>, find_ghosts_corner<3,3>);
           break;
 
         default:
