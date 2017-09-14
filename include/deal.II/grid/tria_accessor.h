@@ -479,12 +479,13 @@ private:
  * create objects (it will in fact throw an exception if this should ever be
  * attempted but it sometimes allows code to be written in a simpler way in a
  * dimension independent way. For example, it allows to write code that works
- * on quad iterators that is dimension independent because quad iterators
- * (with the current class) exist and are syntactically correct. You can not
- * expect, however, to ever generate one of these iterators, meaning you need
- * to expect to wrap the code block in which you use quad iterators into
- * something like <code>if (dim@>1)</code> -- which makes eminent sense
- * anyway.
+ * on quad iterators that is dimension independent -- i.e., also compiles
+ * in 1d -- because quad iterators
+ * (via the current class) exist and are syntactically correct. You can not
+ * expect, however, to ever create an actual object of one of these iterators
+ * in 1d, meaning you need to expect to wrap the code block in which you use
+ * quad iterators into something like <code>if (dim@>1)</code> -- which makes
+ * eminent sense anyway.
  *
  * This class provides the minimal interface necessary for Accessor classes to
  * interact with Iterator classes. However, this is only for syntactic
@@ -503,11 +504,11 @@ public:
   typedef typename TriaAccessorBase<structdim,dim,spacedim>::AccessorData AccessorData;
 
   /**
-   * Constructor.  This class is used for iterators that make sense in a given
-   * dimension, for example quads for 1d meshes. Consequently, while the
-   * creation of such objects is syntactically valid, they make no semantic
-   * sense, and we generate an exception when such an object is actually
-   * generated.
+   * Constructor.  This class is used for iterators that do not make
+   * sense in a given dimension, for example quads for 1d meshes. Consequently,
+   * while the creation of such objects is syntactically valid, they make no
+   * semantic sense, and we generate an exception when such an object is
+   * actually generated.
    */
   InvalidAccessor (const Triangulation<dim,spacedim> *parent     =  0,
                    const int                 level      = -1,
@@ -515,11 +516,11 @@ public:
                    const AccessorData       *local_data =  0);
 
   /**
-   * Copy constructor.  This class is used for iterators that make sense in a
-   * given dimension, for example quads for 1d meshes. Consequently, while the
-   * creation of such objects is syntactically valid, they make no semantic
-   * sense, and we generate an exception when such an object is actually
-   * generated.
+   * Copy constructor.  This class is used for iterators that do not make
+   * sense in a given dimension, for example quads for 1d meshes. Consequently,
+   * while the creation of such objects is syntactically valid, they make no
+   * semantic sense, and we generate an exception when such an object is
+   * actually generated.
    */
   InvalidAccessor (const InvalidAccessor &);
 
