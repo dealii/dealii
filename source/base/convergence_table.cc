@@ -105,7 +105,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
   columns[rate_key].flag = 1;
   set_precision(rate_key, 2);
 
-  std::string superkey = data_column_key;
+  const std::string &superkey = data_column_key;
   if (!supercolumns.count(superkey))
     {
       add_column_to_supercolumn(data_column_key, superkey);
@@ -193,7 +193,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
   set_precision(rate_key, 2);
 
   // set the superkey equal to the key
-  std::string superkey=data_column_key;
+  const std::string &superkey=data_column_key;
   // and set the tex caption of the supercolumn to the tex caption of the
   // data_column.
   if (!supercolumns.count(superkey))

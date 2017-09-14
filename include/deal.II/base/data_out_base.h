@@ -2988,7 +2988,7 @@ public:
    * cases where <code>solution_filename == mesh_filename</code>, and
    * <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string filename,
+  XDMFEntry(const std::string &filename,
             const double time,
             const unsigned int nodes,
             const unsigned int cells,
@@ -2998,8 +2998,8 @@ public:
    * Simplified constructor that calls the complete constructor for
    * cases where <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string mesh_filename,
-            const std::string solution_filename,
+  XDMFEntry(const std::string &mesh_filename,
+            const std::string &solution_filename,
             const double time,
             const unsigned int nodes,
             const unsigned int cells,
@@ -3008,8 +3008,8 @@ public:
   /**
    * Constructor that sets all members to provided parameters.
    */
-  XDMFEntry(const std::string mesh_filename,
-            const std::string solution_filename,
+  XDMFEntry(const std::string &mesh_filename,
+            const std::string &solution_filename,
             const double time,
             const unsigned int nodes,
             const unsigned int cells,

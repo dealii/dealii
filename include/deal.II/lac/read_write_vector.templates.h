@@ -232,7 +232,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::import(const distributed::Vector<Number> &vec,
                                   VectorOperation::values operation,
-                                  std::shared_ptr<const CommunicationPatternBase> communication_pattern)
+                                  const std::shared_ptr<const CommunicationPatternBase> &communication_pattern)
   {
     // If no communication pattern is given, create one. Otherwise, use the
     // given one.
@@ -301,7 +301,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::import(const PETScWrappers::MPI::Vector &petsc_vec,
                                   VectorOperation::values /*operation*/,
-                                  std::shared_ptr<const CommunicationPatternBase> /*communication_pattern*/)
+                                  const std::shared_ptr<const CommunicationPatternBase> & /*communication_pattern*/)
   {
     //TODO: this works only if no communication is needed.
     Assert(petsc_vec.locally_owned_elements() == stored_elements,
@@ -330,7 +330,7 @@ namespace LinearAlgebra
                                   const IndexSet                  &source_elements,
                                   VectorOperation::values          operation,
                                   const MPI_Comm                  &mpi_comm,
-                                  std::shared_ptr<const CommunicationPatternBase> communication_pattern)
+                                  const std::shared_ptr<const CommunicationPatternBase> &communication_pattern)
   {
     std::shared_ptr<const EpetraWrappers::CommunicationPattern> epetra_comm_pattern;
 

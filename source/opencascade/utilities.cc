@@ -328,7 +328,7 @@ namespace OpenCASCADE
                          const double tolerance)
   {
     TopoDS_Edge out_shape;
-    TopoDS_Shape edges = in_shape;
+    const TopoDS_Shape &edges = in_shape;
     std::vector<Handle_Geom_BoundedCurve> intersections;
     TopLoc_Location L;
     Standard_Real First;

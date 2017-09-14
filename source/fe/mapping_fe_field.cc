@@ -58,7 +58,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData::InternalData
 (const FiniteElement<dim,spacedim> &fe,
- const ComponentMask                mask)
+ const ComponentMask                &mask)
   :
   n_shape_functions (fe.dofs_per_cell),
   mask (mask),
@@ -204,7 +204,7 @@ template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
 (const DoFHandlerType            &euler_dof_handler,
  const VectorType    &euler_vector,
- const ComponentMask  mask)
+ const ComponentMask  &mask)
   :
   euler_vector(&euler_vector),
   fe(&euler_dof_handler.get_fe()),
