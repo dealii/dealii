@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2016 by the deal.II authors
+// Copyright (C) 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,7 +15,7 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 {
 #if deal_II_dimension <= deal_II_space_dimension
     template class TriangulationInfoCache<deal_II_dimension, deal_II_space_dimension>;

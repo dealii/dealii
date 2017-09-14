@@ -22,14 +22,14 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
-   * The enum type given to the TriangulationInfoCache class to select what
-   * information to cache.
-   *
-   * You can select more than one flag by concatenation using the bitwise or
-   * <code>operator|(TriangulationInfoCacheFlags,TriangulationInfoCacheFlags)</code>.
-   *
-   * @author Luca Heltai, 2017.
-   */
+ * The enum type given to the TriangulationInfoCache class to select what
+ * information to cache.
+ *
+ * You can select more than one flag by concatenation using the bitwise or
+ * <code>operator|(TriangulationInfoCacheFlags,TriangulationInfoCacheFlags)</code>.
+ *
+ * @author Luca Heltai, 2017.
+ */
 enum TriangulationInfoCacheFlags
 {
   /**
@@ -45,10 +45,10 @@ enum TriangulationInfoCacheFlags
 
 
 /**
-   * Output operator which outputs assemble flags as a set of or'd text values.
-   *
-   * @ref TriangulationInfoCacheFlags
-   */
+ * Output operator which outputs assemble flags as a set of or'd text values.
+ *
+ * @ref TriangulationInfoCacheFlags
+ */
 template <class StreamType>
 inline
 StreamType &operator << (StreamType &s, TriangulationInfoCacheFlags u)
@@ -60,14 +60,14 @@ StreamType &operator << (StreamType &s, TriangulationInfoCacheFlags u)
 
 
 /**
-   * Global operator which returns an object in which all bits are set which are
-   * either set in the first or the second argument. This operator exists since
-   * if it did not then the result of the bit-or <tt>operator |</tt> would be an
-   * integer which would in turn trigger a compiler warning when we tried to
-   * assign it to an object of type TriangulationInfoCacheFlags.
-   *
-   * @ref TriangulationInfoCacheFlags
-   */
+ * Global operator which returns an object in which all bits are set which are
+ * either set in the first or the second argument. This operator exists since
+ * if it did not then the result of the bit-or <tt>operator |</tt> would be an
+ * integer which would in turn trigger a compiler warning when we tried to
+ * assign it to an object of type TriangulationInfoCacheFlags.
+ *
+ * @ref TriangulationInfoCacheFlags
+ */
 inline
 TriangulationInfoCacheFlags
 operator | (TriangulationInfoCacheFlags f1, TriangulationInfoCacheFlags f2)
@@ -81,11 +81,11 @@ operator | (TriangulationInfoCacheFlags f1, TriangulationInfoCacheFlags f2)
 
 
 /**
-   * Global operator which sets the bits from the second argument also in the
-   * first one.
-   *
-   * @ref TriangulationInfoCacheFlags
-   */
+ * Global operator which sets the bits from the second argument also in the
+ * first one.
+ *
+ * @ref TriangulationInfoCacheFlags
+ */
 inline
 TriangulationInfoCacheFlags &
 operator |= (TriangulationInfoCacheFlags &f1, TriangulationInfoCacheFlags f2)
@@ -96,14 +96,14 @@ operator |= (TriangulationInfoCacheFlags &f1, TriangulationInfoCacheFlags f2)
 
 
 /**
-   * Global operator which returns an object in which all bits are set which are
-   * set in the first as well as the second argument. This operator exists since
-   * if it did not then the result of the bit-and <tt>operator &</tt> would be
-   * an integer which would in turn trigger a compiler warning when we tried to
-   * assign it to an object of type TriangulationInfoCacheFlags.
-   *
-   * @ref TriangulationInfoCacheFlags
-   */
+ * Global operator which returns an object in which all bits are set which are
+ * set in the first as well as the second argument. This operator exists since
+ * if it did not then the result of the bit-and <tt>operator &</tt> would be
+ * an integer which would in turn trigger a compiler warning when we tried to
+ * assign it to an object of type TriangulationInfoCacheFlags.
+ *
+ * @ref TriangulationInfoCacheFlags
+ */
 inline
 TriangulationInfoCacheFlags
 operator & (TriangulationInfoCacheFlags f1, TriangulationInfoCacheFlags f2)
@@ -115,11 +115,11 @@ operator & (TriangulationInfoCacheFlags f1, TriangulationInfoCacheFlags f2)
 
 
 /**
-   * Global operator which clears all the bits in the first argument if they are
-   * not also set in the second argument.
-   *
-   * @ref TriangulationInfoCacheFlags
-   */
+ * Global operator which clears all the bits in the first argument if they are
+ * not also set in the second argument.
+ *
+ * @ref TriangulationInfoCacheFlags
+ */
 inline
 TriangulationInfoCacheFlags &
 operator &= (TriangulationInfoCacheFlags &f1, TriangulationInfoCacheFlags f2)

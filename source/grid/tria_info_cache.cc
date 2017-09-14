@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,7 +19,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 template<int dim, int spacedim>
-TriangulationInfoCache<dim,spacedim>::TriangulationInfoCache(const Triangulation<dim, spacedim> &tria,
+TriangulationInfoCache<dim,spacedim>::TriangulationInfoCache(
+    const Triangulation<dim, spacedim> &tria,
     const TriangulationInfoCacheFlags &flags,
     const Mapping<dim, spacedim> &mapping) :
   tria(&tria),
@@ -30,15 +31,20 @@ TriangulationInfoCache<dim,spacedim>::TriangulationInfoCache(const Triangulation
   {
     update();
   });
+
+  if(tria.n_active_cells()>0)
+    update();
 }
+
+
 
 template<int dim, int spacedim>
 void TriangulationInfoCache<dim,spacedim>::update(bool topology_is_unchanged)
 {
-  if (cache_vertex_to_cell_map & flags)
-    {
-      vertex_to_cells = GridTools::vertex_to_cell_map(*tria);
-    }
+  if(topology_is_unchanged == false) {
+    if (cache_vertex_to_cell_map & flags)
+        vertex_to_cells = GridTools::vertex_to_cell_map(*tria);
+  }
 }
 
 template<int dim, int spacedim>

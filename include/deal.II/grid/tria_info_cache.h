@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * missing TriangulationInfoCacheFlags flag), an Assertion is thrown.
  *
  * Notice that this class only notices if the underlying Triangulation has
- * changed due to a Triangulation::Signals::any_change() signal beeing triggered.
+ * changed due to a Triangulation::Signals::any_change() signal being triggered.
  *
  * If the triangulation changes due to a MappingQEulerian being passed to this
  * class, or because you manually change some vertex locations, then some of
@@ -64,7 +64,7 @@ public:
    * TriangulationInfoCacheFlags. If you provide the optional `mapping`
    * argument, then this is used whenever a mapping is required.
    *
-   * @param tria The triangulation to work on
+   * @param tria The triangulation for which to store information
    * @param flags TriangulationInfoCacheFlags that specify what to cache
    * @param mapping The mapping to use when computing cached objects
    */
