@@ -1,0 +1,64 @@
+
+DEAL::dim: 1
+DEAL::components: 1
+DEAL::blocks: 1
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 1
+DEAL::memory consumption: 1368
+DEAL::
+DEAL::dim: 1
+DEAL::components: 1
+DEAL::blocks: 1
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 0
+DEAL::memory consumption: 736
+DEAL::
+DEAL::dim: 1
+DEAL::components: 1
+DEAL::blocks: 1
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 1
+DEAL::memory consumption: 1368
+DEAL::
+DEAL::dim: 2
+DEAL::components: 1
+DEAL::blocks: 1
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 1
+DEAL::memory consumption: 3260
+DEAL::
+DEAL::dim: 2
+DEAL::components: 1
+DEAL::blocks: 1
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 0
+DEAL::memory consumption: 920
+DEAL::
+DEAL::dim: 2
+DEAL::components: 1
+DEAL::blocks: 1
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 1
+DEAL::memory consumption: 3260
+DEAL::
+DEAL::dim: 3
+DEAL::components: 1
+DEAL::blocks: 1
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 1
+DEAL::memory consumption: 8692
+DEAL::
+DEAL::dim: 3
+DEAL::components: 1
+DEAL::blocks: 1
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 0
+DEAL::memory consumption: 1288
+DEAL::
+DEAL::dim: 3
+DEAL::components: 1
+DEAL::blocks: 1
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 1
+DEAL::memory consumption: 8692
+DEAL::

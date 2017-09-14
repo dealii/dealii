@@ -755,6 +755,16 @@ public:
                  const std::vector<ComponentMask> &nonzero_components);
 
   /**
+   * Move constructor.
+   */
+  FiniteElement (FiniteElement<dim, spacedim> &&) = default;
+
+  /**
+   * Copy constructor.
+   */
+  FiniteElement (const FiniteElement<dim, spacedim> &) = default;
+
+  /**
    * Virtual destructor. Makes sure that pointers to this class are deleted
    * properly.
    */
