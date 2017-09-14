@@ -119,7 +119,10 @@ namespace internal
                   void *,
                   void *)
           {
-            cell->update_cell_dof_indices_cache ();
+            if (cell->has_children()
+                ||
+                (!cell->has_children() && !cell->is_artificial()))
+              cell->update_cell_dof_indices_cache ();
           };
 
           // parallelize filling all of the cell caches. by using
@@ -1020,7 +1023,8 @@ namespace internal
         static
         unsigned int
         unify_dof_indices (const DoFHandler<dim,spacedim> &,
-                           const unsigned int              n_dofs_before_identification)
+                           const unsigned int              n_dofs_before_identification,
+                           const bool)
         {
           return n_dofs_before_identification;
         }
@@ -1031,7 +1035,8 @@ namespace internal
         static
         unsigned int
         unify_dof_indices (hp::DoFHandler<dim,spacedim> &dof_handler,
-                           const unsigned int            n_dofs_before_identification)
+                           const unsigned int            n_dofs_before_identification,
+                           const bool                    check_validity)
         {
           // compute the constraints that correspond to unifying
           // dof indices on vertices, lines, and quads. do so
@@ -1101,12 +1106,13 @@ namespace internal
                       ExcInternalError());
             }
 
-          // finally, do the renumbering and set the number of actually
-          // used dof indices
+          // finally, do the renumbering. verify that previous dof indices
+          // were indeed all valid on all cells that we touch if we were
+          // told to do so
           renumber_dofs (new_dof_indices,
                          IndexSet(0),
                          dof_handler,
-                         true);
+                         check_validity);
 
 
           return next_free_dof;
@@ -1147,7 +1153,13 @@ namespace internal
                                                              next_free_dof);
 
           // Step 2: unify dof indices in case this is an hp DoFHandler
-          next_free_dof = unify_dof_indices (dof_handler, next_free_dof);
+          //
+          // during unification, we need to renumber DoF indices. there,
+          // we can check that all previous DoF indices were valid, but
+          // this only makes sense if we really distributed DoFs on
+          // all (non-artificial) cells above
+          next_free_dof = unify_dof_indices (dof_handler, next_free_dof,
+                                             /* check_validity = */ (subdomain_id == numbers::invalid_subdomain_id));
 
           update_all_active_cell_dof_indices_caches (dof_handler);
 
@@ -1567,6 +1579,16 @@ namespace internal
                 = dealii::internal::DoFAccessor::Implementation::
                   n_active_vertex_fe_indices (dof_handler, vertex_index);
 
+              // if this vertex is unused, then we really ought not to have allocated
+              // any space for it, i.e., n_active_fe_indices should be zero, and
+              // there is no space to actually store dof indices for this vertex
+              if (dof_handler.get_triangulation().vertex_used(vertex_index) == false)
+                Assert (n_active_fe_indices == 0,
+                        ExcInternalError());
+
+              // otherwise the vertex is used; it may still not hold any dof indices
+              // if it is located on an artificial cell and not adjacent to a ghost
+              // cell, but in that case there is simply nothing for us to do
               for (unsigned int f=0; f<n_active_fe_indices; ++f)
                 {
                   const unsigned int fe_index
@@ -1581,6 +1603,19 @@ namespace internal
                                                vertex_index,
                                                fe_index,
                                                d);
+
+                      // if check_validity was set, then we are to verify that the
+                      // previous indices were all valid. this really should be
+                      // the case: we allocated space for these vertex dofs,
+                      // i.e., at least one adjacent cell has a valid
+                      // active_fe_index, so there are DoFs that really live
+                      // on this vertex. if check_validity is set, then we
+                      // must make sure that they have been set to something
+                      // useful
+                      if (check_validity)
+                        Assert (old_dof_index != numbers::invalid_dof_index,
+                                ExcInternalError());
+
                       if (old_dof_index != numbers::invalid_dof_index)
                         dealii::internal::DoFAccessor::Implementation::
                         set_vertex_dof_index (dof_handler,
@@ -1590,13 +1625,6 @@ namespace internal
                                               (indices.size() == 0)?
                                               (new_numbers[old_dof_index]) :
                                               (new_numbers[indices.index_within_set(old_dof_index)]));
-                      else if (check_validity)
-                        // if index is invalid_dof_index: check if this one
-                        // really is unused
-                        Assert (dof_handler.get_triangulation()
-                                .vertex_used(vertex_index)
-                                == false,
-                                ExcInternalError ());
                     }
                 }
             }
@@ -1612,22 +1640,23 @@ namespace internal
                             hp::DoFHandler<dim,spacedim>               &dof_handler)
         {
           for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
-               cell = dof_handler.begin_active();
+               cell=dof_handler.begin_active();
                cell!=dof_handler.end(); ++cell)
-            {
-              const unsigned int fe_index = cell->active_fe_index ();
+            if (!cell->is_artificial())
+              {
+                const unsigned int fe_index = cell->active_fe_index ();
 
-              for (unsigned int d=0; d<dof_handler.get_fe(fe_index).template n_dofs_per_object<dim>(); ++d)
-                {
-                  const types::global_dof_index old_dof_index = cell->dof_index(d,fe_index);
-                  if (old_dof_index != numbers::invalid_dof_index)
-                    cell->set_dof_index (d,
-                                         (indices.size() == 0)?
-                                         (new_numbers[old_dof_index]) :
-                                         (new_numbers[indices.index_within_set(old_dof_index)]),
-                                         fe_index);
-                }
-            }
+                for (unsigned int d=0; d<dof_handler.get_fe(fe_index).template n_dofs_per_object<dim>(); ++d)
+                  {
+                    const types::global_dof_index old_dof_index = cell->dof_index(d,fe_index);
+                    if (old_dof_index != numbers::invalid_dof_index)
+                      cell->set_dof_index (d,
+                                           (indices.size() == 0)?
+                                           (new_numbers[old_dof_index]) :
+                                           (new_numbers[indices.index_within_set(old_dof_index)]),
+                                           fe_index);
+                  }
+              }
         }
 
 
@@ -1666,32 +1695,33 @@ namespace internal
 
             for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
                  cell = dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
-              for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
-                if (cell->line(l)->user_flag_set() == false)
-                  {
-                    const typename hp::DoFHandler<dim,spacedim>::line_iterator line = cell->line(l);
-                    line->set_user_flag();
+              if (!cell->is_artificial())
+                for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+                  if (cell->line(l)->user_flag_set() == false)
+                    {
+                      const typename hp::DoFHandler<dim,spacedim>::line_iterator line = cell->line(l);
+                      line->set_user_flag();
 
-                    const unsigned int n_active_fe_indices
-                      = line->n_active_fe_indices ();
+                      const unsigned int n_active_fe_indices
+                        = line->n_active_fe_indices ();
 
-                    for (unsigned int f=0; f<n_active_fe_indices; ++f)
-                      {
-                        const unsigned int fe_index
-                          = line->nth_active_fe_index (f);
+                      for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                        {
+                          const unsigned int fe_index
+                            = line->nth_active_fe_index (f);
 
-                        for (unsigned int d=0; d<dof_handler.get_fe(fe_index).dofs_per_line; ++d)
-                          {
-                            const types::global_dof_index old_dof_index = line->dof_index(d,fe_index);
-                            if (old_dof_index != numbers::invalid_dof_index)
-                              line->set_dof_index (d,
-                                                   (indices.size() == 0)?
-                                                   (new_numbers[old_dof_index]) :
-                                                   (new_numbers[indices.index_within_set(old_dof_index)]),
-                                                   fe_index);
-                          }
-                      }
-                  }
+                          for (unsigned int d=0; d<dof_handler.get_fe(fe_index).dofs_per_line; ++d)
+                            {
+                              const types::global_dof_index old_dof_index = line->dof_index(d,fe_index);
+                              if (old_dof_index != numbers::invalid_dof_index)
+                                line->set_dof_index (d,
+                                                     (indices.size() == 0)?
+                                                     (new_numbers[old_dof_index]) :
+                                                     (new_numbers[indices.index_within_set(old_dof_index)]),
+                                                     fe_index);
+                            }
+                        }
+                    }
 
             // at the end, restore the user
             // flags for the lines
@@ -1723,32 +1753,33 @@ namespace internal
 
             for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
                  cell = dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
-              for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
-                if (cell->line(l)->user_flag_set() == false)
-                  {
-                    const typename hp::DoFHandler<dim,spacedim>::line_iterator line = cell->line(l);
-                    line->set_user_flag();
+              if (!cell->is_artificial())
+                for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+                  if (cell->line(l)->user_flag_set() == false)
+                    {
+                      const typename hp::DoFHandler<dim,spacedim>::line_iterator line = cell->line(l);
+                      line->set_user_flag();
 
-                    const unsigned int n_active_fe_indices
-                      = line->n_active_fe_indices ();
+                      const unsigned int n_active_fe_indices
+                        = line->n_active_fe_indices ();
 
-                    for (unsigned int f=0; f<n_active_fe_indices; ++f)
-                      {
-                        const unsigned int fe_index
-                          = line->nth_active_fe_index (f);
+                      for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                        {
+                          const unsigned int fe_index
+                            = line->nth_active_fe_index (f);
 
-                        for (unsigned int d=0; d<dof_handler.get_fe(fe_index).dofs_per_line; ++d)
-                          {
-                            const types::global_dof_index old_dof_index = line->dof_index(d,fe_index);
-                            if (old_dof_index != numbers::invalid_dof_index)
-                              line->set_dof_index (d,
-                                                   (indices.size() == 0)?
-                                                   (new_numbers[old_dof_index]) :
-                                                   (new_numbers[indices.index_within_set(old_dof_index)]),
-                                                   fe_index);
-                          }
-                      }
-                  }
+                          for (unsigned int d=0; d<dof_handler.get_fe(fe_index).dofs_per_line; ++d)
+                            {
+                              const types::global_dof_index old_dof_index = line->dof_index(d,fe_index);
+                              if (old_dof_index != numbers::invalid_dof_index)
+                                line->set_dof_index (d,
+                                                     (indices.size() == 0)?
+                                                     (new_numbers[old_dof_index]) :
+                                                     (new_numbers[indices.index_within_set(old_dof_index)]),
+                                                     fe_index);
+                            }
+                        }
+                    }
 
             // at the end, restore the user
             // flags for the lines
@@ -1766,32 +1797,33 @@ namespace internal
 
             for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
                  cell = dof_handler.begin_active(); cell!=dof_handler.end(); ++cell)
-              for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
-                if (cell->quad(q)->user_flag_set() == false)
-                  {
-                    const typename hp::DoFHandler<dim,spacedim>::quad_iterator quad = cell->quad(q);
-                    quad->set_user_flag();
+              if (!cell->is_artificial())
+                for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
+                  if (cell->quad(q)->user_flag_set() == false)
+                    {
+                      const typename hp::DoFHandler<dim,spacedim>::quad_iterator quad = cell->quad(q);
+                      quad->set_user_flag();
 
-                    const unsigned int n_active_fe_indices
-                      = quad->n_active_fe_indices ();
+                      const unsigned int n_active_fe_indices
+                        = quad->n_active_fe_indices ();
 
-                    for (unsigned int f=0; f<n_active_fe_indices; ++f)
-                      {
-                        const unsigned int fe_index
-                          = quad->nth_active_fe_index (f);
+                      for (unsigned int f=0; f<n_active_fe_indices; ++f)
+                        {
+                          const unsigned int fe_index
+                            = quad->nth_active_fe_index (f);
 
-                        for (unsigned int d=0; d<dof_handler.get_fe(fe_index).dofs_per_quad; ++d)
-                          {
-                            const types::global_dof_index old_dof_index = quad->dof_index(d,fe_index);
-                            if (old_dof_index != numbers::invalid_dof_index)
-                              quad->set_dof_index (d,
-                                                   (indices.size() == 0)?
-                                                   (new_numbers[old_dof_index]) :
-                                                   (new_numbers[indices.index_within_set(old_dof_index)]),
-                                                   fe_index);
-                          }
-                      }
-                  }
+                          for (unsigned int d=0; d<dof_handler.get_fe(fe_index).dofs_per_quad; ++d)
+                            {
+                              const types::global_dof_index old_dof_index = quad->dof_index(d,fe_index);
+                              if (old_dof_index != numbers::invalid_dof_index)
+                                quad->set_dof_index (d,
+                                                     (indices.size() == 0)?
+                                                     (new_numbers[old_dof_index]) :
+                                                     (new_numbers[indices.index_within_set(old_dof_index)]),
+                                                     fe_index);
+                            }
+                        }
+                    }
 
             // at the end, restore the user flags for the quads
             const_cast<dealii::Triangulation<dim,spacedim>&>(dof_handler.get_triangulation())
