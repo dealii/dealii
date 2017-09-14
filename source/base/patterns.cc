@@ -955,7 +955,7 @@ namespace Patterns
 
   MultipleSelection::MultipleSelection (const std::string &seq)
   {
-    Assert (seq.find (",") == std::string::npos, ExcCommasNotAllowed(seq.find(",")));
+    Assert (seq.find (',') == std::string::npos, ExcCommasNotAllowed(seq.find(',')));
 
     sequence = seq;
     while (sequence.find(" |") != std::string::npos)
@@ -977,10 +977,10 @@ namespace Patterns
         std::string name;
         name = tmp;
 
-        if (name.find(",") != std::string::npos)
+        if (name.find(',') != std::string::npos)
           {
-            name.erase (name.find(","), std::string::npos);
-            tmp.erase (0, tmp.find(",")+1);
+            name.erase (name.find(','), std::string::npos);
+            tmp.erase (0, tmp.find(',')+1);
           }
         else
           tmp = "";

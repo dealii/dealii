@@ -348,7 +348,7 @@ namespace Utilities
         while ((text.length() != 0) && (text[0] == delimiter))
           text.erase(0, 1);
 
-        std::size_t pos_newline = text.find_first_of("\n", 0);
+        std::size_t pos_newline = text.find_first_of('\n', 0);
         if (pos_newline != std::string::npos && pos_newline <= width)
           {
             std::string line (text, 0, pos_newline);
