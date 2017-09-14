@@ -55,7 +55,9 @@ void TriangulationInfoCache<dim,spacedim>::update(bool topology_is_unchanged)
     {
       vertex_to_cells.clear();
       vertex_to_cell_centers.clear();
+#ifdef DEAL_II_WITH_NANOFLANN
       vertex_kdtree.set_points(tria->get_vertices());
+#endif
       return;
     }
 
