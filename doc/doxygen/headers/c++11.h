@@ -17,64 +17,14 @@
 /**
  * @defgroup CPP11 deal.II and the C++11 standard
  *
- * At present, deal.II only requires a compiler that conforms to the
- * <a href="http://en.wikipedia.org/wiki/C%2B%2B#Standardization">C++98</a>
- * standard and does not rely on compilers to either
- * provide the features introduced in
- * <a href="http://en.wikipedia.org/wiki/C%2B%2B03">C++03</a> or
- * <a href="http://en.wikipedia.org/wiki/C%2B%2B11">C++11</a>
+ * Since version 9.0, deal.II requires a compiler that supports at
+ * least <a href="http://en.wikipedia.org/wiki/C%2B%2B11">C++11</a>.
+ * As part of this, many places in the internal implementation of
+ * deal.II is now using features that were only introduced in C++11.
+ * That said, deal.II also has functions and classes that make using
+ * it with C++11 features easier.
  * 
- * That said, deal.II interfaces with C++11 in several ways as
- * outlined below.
- * 
- * 
- * <h3>Use of C++11 classes and substitution by BOOST</h3>
- *
- * deal.II makes use of many of the classes that were only
- * added as part of C++11. This includes std::shared_ptr,
- * std::function, std::bind, std::tuple and a number of others.
- * Because we do not assume that the compiler actually supports
- * C++11, there needs to be a way to ensure that these classes
- * are available also for pre-C++11 compilers. This is done using
- * the following approach:
- *
- * - We create a namespace std_cxx11.
- * - If the compiler supports C++11, we import the relevant classes
- *   and functions into this namespace using statements such as
- *   @code
- *     namespace std_cxx11 {  using std::shared_ptr;  }
- *   @endcode
- * - If the compiler does not support C++11, if its support for
- *   C++11 is incomplete, or if it is buggy, then we use as a fallback
- *   the corresponding classes and functions provided by the
- *   <a href="http://www.boost.org">BOOST library</a> through
- *   statements such as
- *   @code
- *     namespace std_cxx11 {  using boost::shared_ptr;  }
- *   @endcode
- *
- * Consequently, namespace std_cxx11 contains all of the symbols
- * we require. The classes that can be used this way are obviously
- * a subset of the intersection between C++11 and what BOOST provides.
- *
- *
- * <h3>Support for C++11 range-based for loops</h3>
- *
- * C++11 provides many new core language features, such as
- * rvalue references and move semantics, initialized lists, tuples,
- * variadic templates and
- * others. For a complete list, see  http://en.wikipedia.org/wiki/C++11 .
- * We can not use most of these in deal.II itself because we cannot rely
- * on compilers supporting them.
- *
- * However, this does not preclude users from using such features in their
- * own applications if they can be reasonably sure that the compilers on
- * all of the systems they will work on do support C++11. An example are
- * <a href="http://en.wikipedia.org/wiki/C++11#Type_inference">automatically
- * typed variables</a>.
- *
- * deal.II does provide some features that make programming simpler when using
- * C++11. This is true, in particular, for
+ * One example is support for C++11
  * <a href="http://en.wikipedia.org/wiki/C++11#Range-based_for_loop">range-based
  * for loops</a>. deal.II-based codes often have many loops of the kind
  * @code
@@ -99,18 +49,4 @@
  * There are variants of these functions that provide iterator ranges
  * for all cells (not just the active ones) and for cells on individual
  * levels.
- *
- *
- * <h3>Things that are only enabled if your compiler supports C++11</h3>
- *
- * There is a small number of places inside deal.II where we allow ourselves
- * the use of C++11 because it makes things so much simpler. These features
- * are simply not available if your compiler does not support C++11, but this
- * does not affect the usability of the remainder of deal.II.
- *
- * Specifically, these places are:
- * - The LinearOperator class and all associated functions such as
- *   linear_operator(), null_operator(), and everything else that is part of
- *   the LAOperators documentation module.
- * - The FE_Enriched class.
  */
