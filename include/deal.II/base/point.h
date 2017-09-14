@@ -560,8 +560,7 @@ std::ostream &operator << (std::ostream            &out,
 
 
 /**
- * Output operator for points. Print the elements consecutively, with a space
- * in between.
+ * Input operator for points. Inputs the elements consecutively.
  * @relates Point
  */
 template <int dim, typename Number>
