@@ -28,6 +28,8 @@
 #include <deal.II/grid/tria_info_cache_flags.h>
 #include <deal.II/fe/mapping_q1.h>
 
+#include <deal.II/numerics/kdtree.h>
+
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -103,6 +105,14 @@ public:
   const std::vector<std::vector<Tensor<1,spacedim>>>
   &get_vertex_to_cell_centers_directions() const;
 
+#ifdef DEAL_II_WITH_NANOFLANN
+  /**
+   * Return the cached vertex_kdtree object, constructed with the vertices of
+   * the stored triangulation.
+   */
+  const KDTree<spacedim> &get_vertex_kdtree() const;
+#endif
+
   /**
    * Exception for uninitialized cache fields.
    */
@@ -117,7 +127,7 @@ private:
   /**
    * A pointer to the Triangulation.
    */
-  SmartPointer<Triangulation<dim,spacedim>,
+  SmartPointer<const Triangulation<dim,spacedim>,
                TriangulationInfoCache<dim,spacedim>> tria;
 
   /**
@@ -128,7 +138,7 @@ private:
   /**
    * Mapping to use when computing on the Triangulation.
    */
-  SmartPointer<Mapping<dim,spacedim>,
+  SmartPointer<const Mapping<dim,spacedim>,
                TriangulationInfoCache<dim,spacedim>> mapping;
 
 
@@ -143,6 +153,13 @@ private:
    * GridTools::vertex_to_cell_centers_directions.
    */
   std::vector<std::vector<Tensor<1,spacedim>>> vertex_to_cell_centers;
+
+#ifdef DEAL_II_WITH_NANOFLANN
+  /**
+   * A KDTree object constructed with the vertices of the triangulation.
+   */
+  KDTree<spacedim> vertex_kdtree;
+#endif
 };
 
 DEAL_II_NAMESPACE_CLOSE

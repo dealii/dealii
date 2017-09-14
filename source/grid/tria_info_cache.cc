@@ -45,6 +45,11 @@ void TriangulationInfoCache<dim,spacedim>::update(bool topology_is_unchanged)
     {
       if (cache_vertex_to_cell_map & flags)
         vertex_to_cells = GridTools::vertex_to_cell_map(*tria);
+
+#ifdef DEAL_II_WITH_NANOFLANN
+      if (cache_vertex_kdtree & flags)
+        vertex_kdtree.set_points(tria->get_vertices());
+#endif
     }
 
   if (cache_vertex_to_cell_centers_directions & flags)
@@ -74,4 +79,19 @@ TriangulationInfoCache<dim,spacedim>::get_vertex_to_cell_centers_directions() co
   return vertex_to_cell_centers;
 }
 
+
+
+#ifdef DEAL_II_WITH_NANOFLANN
+template<int dim, int spacedim>
+const KDTree<spacedim> &TriangulationInfoCache<dim,spacedim>::get_vertex_kdtree() const
+{
+  Assert(flags & cache_vertex_kdtree,
+         ExcAccessToInvalidCacheObject(cache_vertex_kdtree, flags));
+  return vertex_kdtree;
+}
+#endif
+
+#include "tria_info_cache.inst"
+
 DEAL_II_NAMESPACE_CLOSE
+

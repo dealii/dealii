@@ -47,6 +47,13 @@ enum TriangulationInfoCacheFlags
    * GridTools::vertex_to_cell_centers_directions()
    */
   cache_vertex_to_cell_centers_directions = cache_vertex_to_cell_map | 0x0002,
+
+#ifdef DEAL_II_WITH_NANOFLANN
+  /**
+   * Cache a KDTree object, initialized with the vertices of the Triangulation.
+   */
+  cache_vertex_kdtree = 0x0004,
+#endif
 };
 
 
@@ -62,6 +69,9 @@ StreamType &operator << (StreamType &s, TriangulationInfoCacheFlags u)
   s << " TriangulationInfoCacheFlags";
   if (u & cache_vertex_to_cell_map)                 s << "|vertex_to_cell_map";
   if (u & cache_vertex_to_cell_centers_directions)  s << "|vertex_to_cells_centers_directions";
+#ifdef DEAL_II_WITH_NANOFLANN
+  if (u & cache_vertex_kdtree)                      s << "|vertex_kdtree";
+#endif
   return s;
 }
 
