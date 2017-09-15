@@ -1972,15 +1972,17 @@ public:
    */
   bool has_generalized_support_points () const;
 
-//FIXME
   /**
    * Return the equivalent to get_generalized_support_points(), except
    * for faces.
+   *
+   * @deprecated In general, it is not possible to associate a unique
+   * subset of generalized support points describing degrees of freedom for
+   * a given face. Don't use this function
    */
   const std::vector<Point<dim-1> > &
-  get_generalized_face_support_points () const;
+  get_generalized_face_support_points () const DEAL_II_DEPRECATED;
 
-//FIXME
   /**
    * Return whether a finite element has defined generalized support points on
    * faces. If the result is true, then a call to the
@@ -1988,9 +1990,13 @@ public:
    *
    * For more information, see the documentation for the has_support_points()
    * function.
+   *
+   * @deprecated In general, it is not possible to associate a unique
+   * subset of generalized support points describing degrees of freedom for
+   * a given face. Don't use this function
    */
   bool
-  has_generalized_face_support_points () const;
+  has_generalized_face_support_points () const DEAL_II_DEPRECATED;
 
   /**
    * For a given degree of freedom, return whether it is logically associated
