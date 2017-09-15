@@ -25,14 +25,23 @@
 // some constructs with MPI data
 // types. Therefore, create some dummies
 typedef int MPI_Comm;
-const int MPI_COMM_SELF = 0;
-const int MPI_COMM_WORLD = 0;
 typedef int MPI_Datatype;
 typedef int MPI_Op;
-
-static const int MPI_MIN = 0;
-static const int MPI_MAX = 0;
-static const int MPI_SUM = 0;
+#  ifndef MPI_COMM_WORLD
+#    define MPI_COMM_WORLD 0
+#  endif
+#  ifndef MPI_COMM_SELF
+#    define MPI_COMM_SELF 0
+#  endif
+#  ifndef MPI_MIN
+#    define MPI_MIN 0
+#  endif
+#  ifndef MPI_MAX
+#    define MPI_MAX 0
+#  endif
+#  ifndef MPI_SUM
+#    define MPI_SUM 0
+#  endif
 #endif
 
 DEAL_II_NAMESPACE_OPEN
