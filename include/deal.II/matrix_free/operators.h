@@ -182,7 +182,7 @@ namespace MatrixFreeOperators
     /**
      * Virtual destructor.
      */
-    virtual ~Base();
+    virtual ~Base() = default;
 
     /**
      * Release all memory and return to a state just like after having called
@@ -882,11 +882,6 @@ namespace MatrixFreeOperators
   }
 
   //----------------- Base operator -----------------------------
-  template <int dim, typename VectorType>
-  Base<dim,VectorType>::~Base () = default;
-
-
-
   template <int dim, typename VectorType>
   Base<dim,VectorType>::Base ()
     :

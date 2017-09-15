@@ -477,7 +477,7 @@ namespace parallel
      * Destructor. Made virtual to ensure that derived classes also have
      * virtual destructors.
      */
-    virtual ~ParallelForInteger ();
+    virtual ~ParallelForInteger () = default;
 
     /**
      * This function runs the for loop over the given range
@@ -841,11 +841,6 @@ namespace parallel
   }
 
 #endif
-
-
-  inline
-  ParallelForInteger::~ParallelForInteger () = default;
-
 
 
   inline

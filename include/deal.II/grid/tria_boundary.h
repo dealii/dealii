@@ -241,7 +241,7 @@ public:
   /**
    * Default constructor. Some compilers require this for some reasons.
    */
-  StraightBoundary () = default;
+  StraightBoundary ();
 
   /**
    * Let the new point be the arithmetic mean of the two vertices of the line.

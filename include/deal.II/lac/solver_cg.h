@@ -120,7 +120,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~SolverCG ();
+  virtual ~SolverCG () = default;
 
   /**
    * Solve the linear system $Ax=b$ for x.
@@ -245,11 +245,6 @@ SolverCG<VectorType>::SolverCG (SolverControl        &cn,
   Solver<VectorType>(cn),
   additional_data(data)
 {}
-
-
-
-template <typename VectorType>
-SolverCG<VectorType>::~SolverCG () = default;
 
 
 

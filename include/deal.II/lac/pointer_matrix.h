@@ -68,7 +68,7 @@ public:
    * of any derived class is called whenever a pointer-to-base-class object is
    * destroyed.
    */
-  virtual ~PointerMatrixBase ();
+  virtual ~PointerMatrixBase () = default;
 
   /**
    * Reset the object to its original state.
@@ -580,14 +580,6 @@ new_pointer_matrix_base(const TridiagonalMatrix<numberm> &matrix, const Vector<n
 
 /*@}*/
 //---------------------------------------------------------------------------
-
-template <typename VectorType>
-inline
-PointerMatrixBase<VectorType>::~PointerMatrixBase () = default;
-
-
-
-//----------------------------------------------------------------------//
 
 
 template <typename MatrixType, typename VectorType>

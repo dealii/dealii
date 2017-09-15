@@ -452,7 +452,7 @@ public:
   /**
    * Destructor. Free allocated memory.
    */
-  ~TableBase ();
+  ~TableBase () = default;
 
   /**
    * Assignment operator. Copy all elements of <tt>src</tt> into the matrix.
@@ -1794,12 +1794,6 @@ namespace internal
     }
   }
 }
-
-
-
-template <int N, typename T>
-inline
-TableBase<N,T>::~TableBase () = default;
 
 
 

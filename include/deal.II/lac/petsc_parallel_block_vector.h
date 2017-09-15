@@ -136,7 +136,7 @@ namespace PETScWrappers
       /**
        * Destructor. Clears memory
        */
-      ~BlockVector ();
+      ~BlockVector () = default;
 
       /**
        * Copy operator: fill all components of the vector that are locally
@@ -356,8 +356,6 @@ namespace PETScWrappers
       return *this;
     }
 
-    inline
-    BlockVector::~BlockVector () = default;
 
 
     inline

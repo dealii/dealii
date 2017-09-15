@@ -253,7 +253,8 @@ public:
 // and we can't use 'Point<dim,Number>::Point () = default' here.
 template <int dim, typename Number>
 inline
-Point<dim,Number>::Point () = default;
+Point<dim,Number>::Point ()
+{}
 
 
 

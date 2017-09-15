@@ -55,9 +55,6 @@ PreconditionBlock<MatrixType,inverse_type>::PreconditionBlock (bool store)
 {}
 
 
-template <typename MatrixType, typename inverse_type>
-PreconditionBlock<MatrixType,inverse_type>::~PreconditionBlock () = default;
-
 
 template <typename MatrixType, typename inverse_type>
 void PreconditionBlock<MatrixType,inverse_type>::clear ()

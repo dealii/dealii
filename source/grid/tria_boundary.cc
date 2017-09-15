@@ -180,6 +180,12 @@ get_line_support_points (const unsigned int n_intermediate_points) const
 
 /* -------------------------- StraightBoundary --------------------- */
 
+// At least clang < 3.9.0 complains if we move this definition to its
+// declaration when a 'const StraightBoundary' object is built.
+template <int dim, int spacedim>
+StraightBoundary<dim, spacedim>::StraightBoundary () = default;
+
+
 
 template <int dim, int spacedim>
 Point<spacedim>
