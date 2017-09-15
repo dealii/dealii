@@ -20,7 +20,7 @@
  * Since version 9.0, deal.II requires a compiler that supports at
  * least <a href="http://en.wikipedia.org/wiki/C%2B%2B11">C++11</a>.
  * As part of this, many places in the internal implementation of
- * deal.II is now using features that were only introduced in C++11.
+ * deal.II are now using features that were only introduced in C++11.
  * That said, deal.II also has functions and classes that make using
  * it with C++11 features easier.
  * 
