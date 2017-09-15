@@ -2912,55 +2912,50 @@ namespace FETools
 
   namespace
   {
-    // internal helper class to partially specialize the number type
+    // Helper functions for
+    // FETools::convert_generalized_support_point_values_to_dof_values
 
     template <int dim, int spacedim, typename number>
-    struct ConvertHelper
+    static void convert_helper(
+      const FiniteElement<dim, spacedim> &finite_element,
+      const std::vector<Vector<number> > &support_point_values,
+      std::vector<number>                &dof_values)
     {
-      static void convert_generalized_support_point_values_to_dof_values(
-        const FiniteElement<dim, spacedim> &finite_element,
-        const std::vector<Vector<number> > &support_point_values,
-        std::vector<number>                &dof_values)
-      {
-        static Threads::ThreadLocalStorage<std::vector<Vector<double> > >
-        double_support_point_values;
-        static Threads::ThreadLocalStorage<std::vector<double> >
-        double_dof_values;
+      static Threads::ThreadLocalStorage<std::vector<Vector<double> > >
+      double_support_point_values;
+      static Threads::ThreadLocalStorage<std::vector<double> >
+      double_dof_values;
 
-        double_support_point_values.get().resize(support_point_values.size());
-        double_dof_values.get().resize(dof_values.size());
+      double_support_point_values.get().resize(support_point_values.size());
+      double_dof_values.get().resize(dof_values.size());
 
-        for (unsigned int i = 0; i < support_point_values.size(); ++i)
-          {
-            double_support_point_values.get()[i].reinit(
-              finite_element.n_components(), false);
-            std::copy(std::begin(support_point_values[i]),
-                      std::end(support_point_values[i]),
-                      std::begin(double_support_point_values.get()[i]));
-          }
+      for (unsigned int i = 0; i < support_point_values.size(); ++i)
+        {
+          double_support_point_values.get()[i].reinit(
+            finite_element.n_components(), false);
+          std::copy(std::begin(support_point_values[i]),
+                    std::end(support_point_values[i]),
+                    std::begin(double_support_point_values.get()[i]));
+        }
 
-        finite_element.convert_generalized_support_point_values_to_dof_values(
-          double_support_point_values.get(), double_dof_values.get());
+      finite_element.convert_generalized_support_point_values_to_dof_values(
+        double_support_point_values.get(), double_dof_values.get());
 
-        std::copy(std::begin(double_dof_values.get()),
-                  std::end(double_dof_values.get()),
-                  std::begin(dof_values));
-      }
-    };
+      std::copy(std::begin(double_dof_values.get()),
+                std::end(double_dof_values.get()),
+                std::begin(dof_values));
+    }
 
-    // In case of double simply call the finite element directly
+
     template <int dim, int spacedim>
-    struct ConvertHelper<dim, spacedim, double>
+    static void convert_helper(
+      const FiniteElement<dim, spacedim> &finite_element,
+      const std::vector<Vector<double> > &support_point_values,
+      std::vector<double>                &dof_values)
     {
-      static void convert_generalized_support_point_values_to_dof_values(
-        const FiniteElement<dim, spacedim> &finite_element,
-        const std::vector<Vector<double> > &support_point_values,
-        std::vector<double>                &dof_values)
-      {
-        finite_element.convert_generalized_support_point_values_to_dof_values(
-          support_point_values, dof_values);
-      }
-    };
+      finite_element.convert_generalized_support_point_values_to_dof_values(
+        support_point_values, dof_values);
+    }
 
   } /* anonymous namespace */
 
@@ -2976,8 +2971,7 @@ namespace FETools
                     finite_element.get_generalized_support_points().size());
     AssertDimension(dof_values.size(), finite_element.dofs_per_cell);
 
-    ConvertHelper<dim, spacedim, number>::
-    convert_generalized_support_point_values_to_dof_values(
+    convert_helper<dim, spacedim>(
       finite_element, support_point_values, dof_values);
   }
 
