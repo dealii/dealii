@@ -272,7 +272,7 @@ int main ()
 {
   initlog();
   auto old_precision = deallog.get_file_stream().precision();
-  deallog.get_file_stream() << std::setprecision(7);
+  deallog.get_file_stream() << std::setprecision(8);
 
   LaplaceProblem laplace_problem;
   laplace_problem.run ();
