@@ -586,6 +586,12 @@ public:
      * Reference to the TimerOutput object
      */
     dealii::TimerOutput &timer;
+
+    /**
+     * Name of the section we need to exit
+     */
+    const std::string section_name;
+
     /**
      * Do we still need to exit the section we are in?
      */
@@ -981,9 +987,12 @@ TimerOutput::exit_section (const std::string &section_name)
 }
 
 inline
-TimerOutput::Scope::Scope(dealii::TimerOutput &timer_, const std::string &section_name)
+TimerOutput::Scope::Scope(dealii::TimerOutput &timer_,
+                          const std::string &section_name_)
   :
-  timer(timer_), in(true)
+  timer(timer_),
+  section_name(section_name_),
+  in(true)
 {
   timer.enter_section(section_name);
 }
@@ -1006,7 +1015,7 @@ TimerOutput::Scope::stop()
   if (!in) return;
   in=false;
 
-  timer.exit_section();
+  timer.exit_section(section_name);
 }
 
 

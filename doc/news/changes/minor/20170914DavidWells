@@ -1,0 +1,7 @@
+Fixed: The destructor of TimerOutput::Scope will now always exit the subsection
+it entered in its constructor, instead of just exiting the last subsection that
+was created in the provided TimerOutput object. This fixes timing output
+measurements for multithreaded applications and cases where subsections are
+nested.
+<br>
+(David Wells, 2017/09/14)
