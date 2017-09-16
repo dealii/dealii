@@ -1,0 +1,4 @@
+New: A new GridIn::read_assimp() function allows to
+read in a file in one of the (40) formats supported by Assimp.
+<br>
+(Luca Heltai, 2017/09/16)
