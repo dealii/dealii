@@ -461,8 +461,10 @@ public:
    * present in the file will be used to generate the Triangulation.
    *
    * This function can only be used to read two-dimensional meshes (possibly
-   * embedded in three dimensions), as this is the only format supported
-   * by the supported graphical formats.
+   * embedded in three dimensions). This is the standard for graphical software
+   * such as blender, or 3D studio max, and that is what the original Assimp
+   * library was built for. We "bend" it to deal.II to support complex
+   * co-dimension one meshes and complex two-dimensional meshes.
    *
    * If @p remove_duplicates is set to true (the default), then
    * duplicated vertices will be removed if their distance is lower
@@ -474,10 +476,10 @@ public:
    * `ignore_unsupported_element_types`, all the other element types are simply
    * ignored by this algorithm. If your mesh contains a mixture of triangles
    * and quadrilaterals, for example, only the quadrilaterals will be
-   * extracted. Careful that your mesh may not make any sense if you are mixing
-   * compatible and incompatible element types. If
-   * `ignore_unsupported_element_types` is set to `false`, then an exception is
-   * thrown when an unsupporte type is encountered.
+   * extracted. Your mesh may not make any sense if you are mixing compatible
+   * and incompatible element types. If `ignore_unsupported_element_types` is
+   * set to `false`, then an exception is thrown when an unsupporte type is
+   * encountered.
    *
    * @param filename The file to read from
    * @param mesh_index Index of the mesh within the file
