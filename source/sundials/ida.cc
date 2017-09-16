@@ -179,6 +179,7 @@ namespace SUNDIALS
     unsigned int step_number = 0;
 
     int status;
+    (void)status;
 
     // The solution is stored in
     // solution. Here we take only a
@@ -306,6 +307,7 @@ namespace SUNDIALS
       }
 
     int status;
+    (void)status;
     system_size = solution.size();
 #ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
