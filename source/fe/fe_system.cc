@@ -2274,6 +2274,15 @@ convert_generalized_support_point_values_to_dof_values (const std::vector<Vector
         base_element.get_generalized_support_points().size();
       const unsigned int n_base_components = base_element.n_components();
 
+      // If the number of base degrees of freedom is zero, there is nothing
+      // to do, skip the rest of the body in this case and continue with
+      // the next element
+      if (n_base_dofs == 0)
+        {
+          current_vector_component += multiplicity * n_base_components;
+          continue;
+        }
+
       base_dof_values.resize(n_base_dofs);
       base_point_values.resize(n_base_points);
 
