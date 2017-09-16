@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2015-2016 by the deal.II authors
+## Copyright (C) 2017 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,9 +18,21 @@
 #
 # This module exports
 #
-#   SUNDIALS_LIBRARIES
-#   SUNDIALS_INCLUDE_DIRS
+#   SUNDIALS_LIB_IDA
+#   SUNDIALS_LIB_KINSOL
+#   SUNDIALS_LIB_PAR
+#   SUNDIALS_LIB_SER
+#   SUNDIALS_INCLUDE_DIR
 #
+# Note that, unlike most other packages, SUNDIALS headers are typically
+# installed in multiple directories; for example, a typical system installation
+# may distribute the headers in the following way:
+#
+# /usr/include/ida/ida.h
+# /usr/include/kinsol/kinsol.h
+# /usr/include/sundials/sundials_nvector.h
+#
+# so, in this case, SUNDIALS_INCLUDE_DIR would just be /usr/include/.
 
 SET(SUNDIALS_DIR "" CACHE PATH "An optional hint to a SUNDIALS_DIR installation")
 SET_IF_EMPTY(SUNDIALS_DIR "$ENV{SUNDIALS_DIR}")
@@ -40,7 +52,19 @@ DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_SER NAMES sundials_nvecserial
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-SET(SUN_INC "${SUNDIALS_DIR}/include")
+#
+# only define the extra hint if ${SUNDIALS_DIR} is nonempty so that we do not
+# try to search through the top-level '/include/' directory, should it happen to
+# exist
+#
+STRING(COMPARE EQUAL "${SUNDIALS_DIR}" "" _sundials_dir_is_empty)
+IF(NOT ${_sundials_dir_is_empty})
+  SET(_sundials_include_hint_dir "${SUNDIALS_DIR}/include/")
+ENDIF()
+
+DEAL_II_FIND_PATH(SUNDIALS_INCLUDE_DIR sundials/sundials_nvector.h
+  HINTS ${SUNDIALS_DIR} "${_sundials_include_hint_dir}"
+)
 
 SET(_sundials_additional_libs)
 IF(DEAL_II_WITH_MPI)
@@ -55,8 +79,8 @@ DEAL_II_PACKAGE_HANDLE(SUNDIALS
   LIBRARIES REQUIRED
     SUNDIALS_LIB_IDA SUNDIALS_LIB_KINSOL SUNDIALS_LIB_SER SUNDIALS_LIB_PAR
     ${_sundials_additional_libs}
-  INCLUDE_DIRS REQUIRED SUN_INC
-  USER_INCLUDE_DIRS REQUIRED SUN_INC
+  INCLUDE_DIRS REQUIRED SUNDIALS_INCLUDE_DIR
+  USER_INCLUDE_DIRS REQUIRED SUNDIALS_INCLUDE_DIR
   CLEAR
     SUNDIALS_LIB_IDA SUNDIALS_LIB_KINSOL SUNDIALS_LIB_SER SUNDIALS_LIB_PAR
     SUN_INC
