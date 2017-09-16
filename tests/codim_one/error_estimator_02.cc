@@ -54,7 +54,6 @@ public:
                                Vector<double>     &values) const
   {
     values(0) = value(p,0);
-    values(1) = value(p,1);
   }
 };
 
@@ -81,7 +80,6 @@ public:
                                Vector<double>     &values) const
   {
     values(0) = value(p,0);
-    values(1) = value(p,1);
   }
 };
 
