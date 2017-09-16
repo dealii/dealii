@@ -28,7 +28,7 @@ void test ()
           << ", spacedim = " << spacedim << std::endl;
 
   Triangulation<dim> tria;
-  GridTools::Cache<dim> cache(tria, GridTools::cache_vertex_to_cell_map);
+  GridTools::Cache<dim> cache(tria);
 
   GridGenerator::hyper_cube(tria);
 

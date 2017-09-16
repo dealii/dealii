@@ -26,54 +26,59 @@ namespace GridTools
 
   /**
    * The enum type given to the Cache class to select what
-   * information to cache.
+   * information to update.
    *
    * You can select more than one flag by concatenation using the bitwise or
-   * <code>operator|(TriangulationInfoCacheFlags,TriangulationInfoCacheFlags)</code>.
+   * <code>operator|(CacheFlags,CacheFlags)</code>.
    *
    * @author Luca Heltai, 2017.
    */
-  enum TriangulationInfoCacheFlags
+  enum CacheFlags
   {
     /**
-     * Cache Nothing.
+     * Update Nothing.
      */
-    cache_nothing = 0,
+    update_nothing = 0x00,
 
     /**
-     * Cache vertex_to_cell_map, as returned by GridTools::vertex_to_cell_map().
+     * Update vertex_to_cell_map, as returned by GridTools::vertex_to_cell_map().
      */
-    cache_vertex_to_cell_map = 0x0001,
+    update_vertex_to_cell_map = 0x01,
 
     /**
-     * Cache vertex_to_cell_centers_directions, as returned by
+     * Update vertex_to_cell_centers_directions, as returned by
      * GridTools::vertex_to_cell_centers_directions()
      */
-    cache_vertex_to_cell_centers_directions = cache_vertex_to_cell_map | 0x0002,
+    update_vertex_to_cell_centers_directions = update_vertex_to_cell_map | 0x0002,
 
 #ifdef DEAL_II_WITH_NANOFLANN
     /**
-     * Cache a KDTree object, initialized with the vertices of the Triangulation.
+     * Update a KDTree object, initialized with the vertices of the Triangulation.
      */
-    cache_vertex_kdtree = 0x0004,
+    update_vertex_kdtree = 0x04,
 #endif
+
+    /**
+     * Update all objects.
+     */
+    update_all = 0xFF,
   };
 
 
   /**
    * Output operator which outputs assemble flags as a set of or'd text values.
    *
-   * @ref TriangulationInfoCacheFlags
+   * @ref CacheFlags
    */
   template <class StreamType>
   inline
-  StreamType &operator << (StreamType &s, TriangulationInfoCacheFlags u)
+  StreamType &operator << (StreamType &s, CacheFlags u)
   {
-    s << " TriangulationInfoCacheFlags";
-    if (u & cache_vertex_to_cell_map)                 s << "|vertex_to_cell_map";
-    if (u & cache_vertex_to_cell_centers_directions)  s << "|vertex_to_cells_centers_directions";
+    s << " CacheFlags";
+    if (u & update_vertex_to_cell_map)                 s << "|vertex_to_cell_map";
+    if (u & update_vertex_to_cell_centers_directions)  s << "|vertex_to_cells_centers_directions";
 #ifdef DEAL_II_WITH_NANOFLANN
-    if (u & cache_vertex_kdtree)                      s << "|vertex_kdtree";
+    if (u & update_vertex_kdtree)                      s << "|vertex_kdtree";
 #endif
     return s;
   }
@@ -84,19 +89,36 @@ namespace GridTools
    * either set in the first or the second argument. This operator exists since
    * if it did not then the result of the bit-or <tt>operator |</tt> would be an
    * integer which would in turn trigger a compiler warning when we tried to
-   * assign it to an object of type TriangulationInfoCacheFlags.
+   * assign it to an object of type CacheFlags.
    *
-   * @ref TriangulationInfoCacheFlags
+   * @ref CacheFlags
    */
   inline
-  TriangulationInfoCacheFlags
-  operator | (TriangulationInfoCacheFlags f1, TriangulationInfoCacheFlags f2)
+  CacheFlags
+  operator | (CacheFlags f1, CacheFlags f2)
   {
-    return static_cast<TriangulationInfoCacheFlags> (
+    return static_cast<CacheFlags> (
              static_cast<unsigned int> (f1) |
              static_cast<unsigned int> (f2));
   }
 
+  /**
+   * Global operator which returns an object in which all bits are set which are
+   * not set in the argument. This operator exists since
+   * if it did not then the result of the bit-negation <tt>operator ~</tt> would be an
+   * integer which would in turn trigger a compiler warning when we tried to
+   * assign it to an object of type CacheFlags.
+   *
+   * @ref CacheFlags
+   */
+  inline
+  CacheFlags
+  operator ~ (CacheFlags f1)
+  {
+    return static_cast<CacheFlags> (
+             ~static_cast<unsigned int> (f1)
+           );
+  }
 
 
 
@@ -104,11 +126,11 @@ namespace GridTools
    * Global operator which sets the bits from the second argument also in the
    * first one.
    *
-   * @ref TriangulationInfoCacheFlags
+   * @ref CacheFlags
    */
   inline
-  TriangulationInfoCacheFlags &
-  operator |= (TriangulationInfoCacheFlags &f1, TriangulationInfoCacheFlags f2)
+  CacheFlags &
+  operator |= (CacheFlags &f1, CacheFlags f2)
   {
     f1 = f1 | f2;
     return f1;
@@ -120,15 +142,15 @@ namespace GridTools
    * set in the first as well as the second argument. This operator exists since
    * if it did not then the result of the bit-and <tt>operator &</tt> would be
    * an integer which would in turn trigger a compiler warning when we tried to
-   * assign it to an object of type TriangulationInfoCacheFlags.
+   * assign it to an object of type CacheFlags.
    *
-   * @ref TriangulationInfoCacheFlags
+   * @ref CacheFlags
    */
   inline
-  TriangulationInfoCacheFlags
-  operator & (TriangulationInfoCacheFlags f1, TriangulationInfoCacheFlags f2)
+  CacheFlags
+  operator & (CacheFlags f1, CacheFlags f2)
   {
-    return static_cast<TriangulationInfoCacheFlags> (
+    return static_cast<CacheFlags> (
              static_cast<unsigned int> (f1) &
              static_cast<unsigned int> (f2));
   }
@@ -138,11 +160,11 @@ namespace GridTools
    * Global operator which clears all the bits in the first argument if they are
    * not also set in the second argument.
    *
-   * @ref TriangulationInfoCacheFlags
+   * @ref CacheFlags
    */
   inline
-  TriangulationInfoCacheFlags &
-  operator &= (TriangulationInfoCacheFlags &f1, TriangulationInfoCacheFlags f2)
+  CacheFlags &
+  operator &= (CacheFlags &f1, CacheFlags f2)
   {
     f1 = f1 & f2;
     return f1;

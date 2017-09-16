@@ -31,7 +31,7 @@ void test ()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
-  GridTools::Cache<dim> cache(tria, GridTools::cache_vertex_to_cell_map);
+  GridTools::Cache<dim> cache(tria);
 
   auto m = cache.get_vertex_to_cell_map();
 
