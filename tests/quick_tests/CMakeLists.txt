@@ -156,6 +156,12 @@ IF (DEAL_II_WITH_SUNDIALS)
   make_quicktest("sundials-ida" ${_mybuild} "")
 ENDIF()
 
+# Test Assimp
+IF (DEAL_II_WITH_ASSIMP)
+  make_quicktest("assimp" ${_mybuild} "")
+ENDIF()
+
+
 # A custom test target:
 ADD_CUSTOM_TARGET(test
   COMMAND ${CMAKE_COMMAND} -D ALL_TESTS="${ALL_TESTS}" -P ${CMAKE_CURRENT_SOURCE_DIR}/run.cmake
