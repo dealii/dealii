@@ -13,12 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-// Validate tria_info_cache
+// Validate grid_tools_cache
 
 #include "../tests.h"
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_info_cache.h>
+#include <deal.II/grid/grid_tools_cache.h>
 
 
 template <int dim, int spacedim>
@@ -31,7 +31,7 @@ void test ()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
-  TriangulationInfoCache<dim> cache(tria, cache_vertex_to_cell_map);
+  GridTools::Cache<dim> cache(tria, GridTools::cache_vertex_to_cell_map);
 
   auto m = cache.get_vertex_to_cell_map();
 

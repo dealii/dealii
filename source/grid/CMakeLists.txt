@@ -21,6 +21,7 @@ SET(_unity_include_src
   grid_in.cc
   grid_out.cc
   grid_refinement.cc
+  grid_tools_cache.cc
   intergrid_map.cc
   manifold.cc
   manifold_lib.cc
@@ -28,7 +29,6 @@ SET(_unity_include_src
   tria_accessor.cc
   tria_boundary.cc
   tria_boundary_lib.cc
-  tria_info_cache.cc
   tria_faces.cc
   tria_levels.cc
   tria_objects.cc
@@ -56,13 +56,13 @@ SET(_inst
   grid_out.inst.in
   grid_refinement.inst.in
   grid_tools.inst.in
+  grid_tools_cache.inst.in
   intergrid_map.inst.in
   manifold.inst.in
   manifold_lib.inst.in
   tria_accessor.inst.in
   tria_boundary.inst.in
   tria_boundary_lib.inst.in
-  tria_info_cache.inst.in
   tria.inst.in
   tria_objects.inst.in
   )

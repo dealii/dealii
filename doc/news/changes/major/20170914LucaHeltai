@@ -1,4 +1,4 @@
-New: A new TriangulationInfoCache class
+New: A new GridTools::Cache class
 allows caching of some expensive data of the 
 Triangulation class, computed generally using 
 functions in GridTools.

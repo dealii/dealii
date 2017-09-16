@@ -13,12 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-// Validate tria_info_cache. Different construction order. Check signal.
+// Validate grid_tools_cache. Different construction order. Check signal.
 
 #include "../tests.h"
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_info_cache.h>
+#include <deal.II/grid/grid_tools_cache.h>
 
 
 template <int dim, int spacedim>
@@ -28,7 +28,7 @@ void test ()
           << ", spacedim = " << spacedim << std::endl;
 
   Triangulation<dim> tria;
-  TriangulationInfoCache<dim> cache(tria, cache_vertex_to_cell_map);
+  GridTools::Cache<dim> cache(tria, GridTools::cache_vertex_to_cell_map);
 
   GridGenerator::hyper_cube(tria);
 
