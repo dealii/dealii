@@ -151,7 +151,10 @@ IF (DEAL_II_WITH_ADOLC)
   make_quicktest("adolc" ${_mybuild} "")
 ENDIF()
 
-
+# Test SUNDIALS
+IF (DEAL_II_WITH_SUNDIALS)
+  make_quicktest("sundials-ida" ${_mybuild} "")
+ENDIF()
 
 # A custom test target:
 ADD_CUSTOM_TARGET(test

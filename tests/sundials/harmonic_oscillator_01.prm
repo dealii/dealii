@@ -1,0 +1,20 @@
+set Final time                        = 6.3
+set Initial time                      = 0
+set Time interval between each output = 0.2
+subsection Error control
+  set Absolute error tolerance                      = 1e-6
+  set Ignore algebraic terms for error computations = true
+  set Relative error tolerance                      = 1e-5
+  set Use local tolerances                          = false
+end
+subsection Initial condition correction parameters
+  set Correction type at initial time        = none
+  set Correction type after restart          = none
+  set Maximum number of nonlinear iterations = 5
+end
+subsection Running parameters
+  set Initial step size                      = 0.1
+  set Maximum number of nonlinear iterations = 10
+  set Maximum order of BDF                   = 5
+  set Minimum step size                      = 0.000001
+end
