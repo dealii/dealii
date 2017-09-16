@@ -2574,6 +2574,7 @@ void GridIn<dim, spacedim>::read_assimp(const std::string &filename,
                                         const double tol,
                                         const bool ignore_unsupported_types)
 {
+#ifdef DEAL_II_WITH_ASSIMP
   // Only good for surface grids.
   AssertThrow(dim<3, ExcImpossibleInDim(dim));
 
@@ -2710,6 +2711,14 @@ void GridIn<dim, spacedim>::read_assimp(const std::string &filename,
     tria->create_triangulation_compatibility(vertices, cells, subcelldata);
   else
     tria->create_triangulation(vertices, cells, subcelldata);
+#else
+  (void) filename;
+  (void) mesh_index;
+  (void) remove_duplicates;
+  (void) tol;
+  (void) ignore_unsupported_types;
+  Assert(false, ExcNeedsAssimp());
+#endif
 }
 
 
