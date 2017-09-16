@@ -79,6 +79,13 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Currently, only symmetric real matrices are supported.
  *
+ * Here is a strong scaling example of ScaLAPACKMatrix::invert()
+ * on up to 5 nodes each composed of two Intel Xeon 2660v2 IvyBridge sockets
+ * 2.20GHz, 10 cores/socket. Calculate are performed on square processor
+ * grids 1x1, 2x2, 3x3, 4x4, 5x5, 6x6, 7x7, 8x8, 9x9, 10x10.
+ *
+ * @image html scalapack_invert.png
+ *
  * @ingroup Matrix1
  * @author Denis Davydov, 2017
  */
