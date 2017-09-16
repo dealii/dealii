@@ -319,8 +319,6 @@ namespace VectorTools
             // Figure out whether the component mask applies. We assume
             // that we are allowed to set degrees of freedom if at least
             // one of the components (of the dof) is selected.
-            //
-            // FIXME: Add a debug assert.
             bool selected = false;
             for (unsigned int i = 0; i < nonzero_components.size(); ++i)
               selected =
