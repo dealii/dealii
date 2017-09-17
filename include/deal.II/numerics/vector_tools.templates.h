@@ -20,8 +20,8 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/polynomials_piecewise.h>
-#include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/quadrature.h>
 #include <deal.II/distributed/tria_base.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
@@ -70,6 +70,8 @@
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
+
+#include <boost/range/iterator_range.hpp>
 
 #include <array>
 #include <numeric>
@@ -234,74 +236,124 @@ namespace VectorTools
         function.vector_value_list(generalized_support_points,
                                    function_values);
 
-        // FIXME: In case of an FESystem we have to apply this
-        // transformation according to the conformity of each base element.
+        // A small helper function to transform a component range starting
+        // at offset from the real to the unit cell according to the
+        // supplied conformity.
+        //
+        // FIXME: This should be refactored into the mapping (i.e.
+        // implement the inverse function of Mapping<dim,
+        // spacedim>::transform). Further, the finite element should make
+        // the information about the correct mapping directly accessible -
+        // fe.conforming_space is not the right call (thing about BDM).
+        const auto transform = [&](const typename FiniteElementData<dim>::Conformity conformity,
+                                   unsigned int offset)
+        {
+          switch (conformity)
+            {
+            case FiniteElementData<dim>::Hcurl:
+              // See Monk, Finite Element Methods for Maxwell's Equations,
+              // p. 77ff, formula (3.76) and Corollary 3.58.
+              // For given mapping F_K: \hat K \to K, we have to transform
+              //  \hat u = (dF_K)^T u\circ F_K
+
+              fe_values_jacobians.reinit(cell);
+              for (unsigned int i = 0; i < function_values.size(); ++i)
+                {
+                  const auto &jacobians =
+                    fe_values_jacobians.get_present_fe_values()
+                      .get_jacobians();
+
+                  auto shifted_view = boost::make_iterator_range(
+                    std::begin(function_values[i]) + offset,
+                    std::begin(function_values[i]) + offset + dim);
+                  std::vector<number> old_value;
+                  std::copy(std::begin(shifted_view),
+                            std::end(shifted_view),
+                            std::back_inserter(old_value));
+
+                  // value[m] <- sum jacobian_transpose[m][n] * old_value[n]:
+                  TensorAccessors::contract<1, 2, 1, dim>(
+                    shifted_view, jacobians[i].transpose(), old_value);
+                }
+              break;
+
+            case FiniteElementData<dim>::Hdiv:
+              // See Monk, Finite Element Methods for Maxwell's Equations,
+              // p. 79ff, formula (3.77) and Lemma 3.59.
+              // For given mapping F_K: \hat K \to K, we have to transform
+              //  \hat w = det(dF_K) (dF_K)^{-1} w\circ F_K
+
+              fe_values_jacobians.reinit(cell);
+              for (unsigned int i = 0; i < function_values.size(); ++i)
+                {
+                  const auto &jacobians =
+                    fe_values_jacobians.get_present_fe_values().get_jacobians();
+                  const auto &inverse_jacobians =
+                    fe_values_jacobians.get_present_fe_values().get_inverse_jacobians();
+
+                  auto shifted_view = boost::make_iterator_range(
+                    std::begin(function_values[i]) + offset,
+                    std::begin(function_values[i]) + offset + dim);
+                  std::vector<number> old_value;
+                  std::copy(std::begin(shifted_view),
+                            std::end(shifted_view),
+                            std::back_inserter(old_value));
+
+                  // value[m] <- sum inverse_jacobians[m][n] * old_value[n]:
+                  TensorAccessors::contract<1, 2, 1, dim>(
+                    shifted_view, inverse_jacobians[i], old_value);
+
+                  for (unsigned int j = 0; j < dim; ++j)
+                    shifted_view[j] *= jacobians[i].determinant();
+                }
+              break;
+
+            case FiniteElementData<dim>::H1:
+              DEAL_II_FALLTHROUGH;
+            case FiniteElementData<dim>::L2:
+              // See Monk, Finite Element Methods for Maxwell's Equations,
+              // p. 77ff, formula (3.74).
+              // For given mapping F_K: \hat K \to K, we have to transform
+              //  \hat p = p\circ F_K
+              //  i.e., do nothing.
+              //
+              break;
+
+            default:
+              // In case we deal with an unknown conformity, just assume we
+              // deal with a Lagrange element and do nothing.
+              break;
+
+            } /*switch*/
+        };
 
         // Before we can average, we have to transform all function values
         // from the real cell back to the unit cell. We query the finite
-        // element for the correct transformation.
-        switch (fe[fe_index].conforming_space)
+        // element for the correct transformation. Matters get a bit more
+        // complicated because we have to apply said transformation for
+        // every base element.
+        if (const auto *system =
+              dynamic_cast<const FESystem<dim, spacedim> *>(&fe[fe_index]))
           {
-          case FiniteElementData<dim>::Hcurl:
-            // See Monk, Finite Element Methods for Maxwell's Equations,
-            // p. 77ff, formula (3.76) and Corollary 3.58.
-            // For given mapping F_K: \hat K \to K, we have to transform
-            //  \hat u = (dF_K)^T u\circ F_K
+            // In case of an FESystem transform every (vector) component
+            // separately:
 
-            fe_values_jacobians.reinit(cell);
-            for (unsigned int i = 0; i < function_values.size(); ++i)
+            unsigned int offset = 0;
+            for (unsigned int i = 0; i < system->n_base_elements(); ++i)
               {
-                const auto &jacobians =
-                  fe_values_jacobians.get_present_fe_values().get_jacobians();
-
-                // value[m] <- sum jacobian_transpose[m][n] * old_value[n]:
-                const auto old_value = function_values[i];
-                TensorAccessors::contract<1, 2, 1, dim>(
-                  function_values[i], jacobians[i].transpose(), old_value);
+                const auto &fe = system->base_element(i);
+                const auto multiplicity = system->element_multiplicity(i);
+                for (unsigned int m = 0; m < multiplicity; ++m)
+                  {
+                    transform(fe.conforming_space, offset);
+                    offset += fe.n_components();
+                  }
               }
-            break;
-
-          case FiniteElementData<dim>::Hdiv:
-            // See Monk, Finite Element Methods for Maxwell's Equations,
-            // p. 79ff, formula (3.77) and Lemma 3.59.
-            // For given mapping F_K: \hat K \to K, we have to transform
-            //  \hat w = det(dF_K) (dF_K)^{-1} w\circ F_K
-
-            fe_values_jacobians.reinit(cell);
-            for (unsigned int i = 0; i < function_values.size(); ++i)
-              {
-                const auto &jacobians =
-                  fe_values_jacobians.get_present_fe_values().get_jacobians();
-                const auto &inverse_jacobians =
-                  fe_values_jacobians.get_present_fe_values().get_inverse_jacobians();
-
-                // value[m] <- sum inverse_jacobians[m][n] * old_value[n]:
-                const auto old_value = function_values[i];
-                TensorAccessors::contract<1, 2, 1, dim>(
-                  function_values[i], inverse_jacobians[i], old_value);
-
-                for (unsigned int j = 0; j < n_components; ++j)
-                  function_values[i][j] *= jacobians[i].determinant();
-              }
-            break;
-
-          case FiniteElementData<dim>::H1:
-            DEAL_II_FALLTHROUGH;
-          case FiniteElementData<dim>::L2:
-            // See Monk, Finite Element Methods for Maxwell's Equations,
-            // p. 77ff, formula (3.74).
-            // For given mapping F_K: \hat K \to K, we have to transform
-            //  \hat p = p\circ F_K
-            //  i.e., do nothing.
-            //
-            break;
-
-          default:
-            // In case we deal with an unknown conformity, just assume we
-            // deal with a Lagrange element and do nothing.
-            break;
-
-          } /*switch*/
+          }
+        else
+          {
+            transform(fe[fe_index].conforming_space, 0);
+          }
 
         FETools::convert_generalized_support_point_values_to_dof_values(
           fe[fe_index], function_values, dof_values);
