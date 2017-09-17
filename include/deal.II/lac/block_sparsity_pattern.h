@@ -382,7 +382,7 @@ public:
    * useful if you want such objects as member variables in other classes. You
    * can make the structure usable by calling the reinit() function.
    */
-  BlockSparsityPattern ();
+  BlockSparsityPattern () = default;
 
   /**
    * Initialize the matrix with the given number of block rows and columns.
@@ -488,7 +488,7 @@ public:
    * useful if you want such objects as member variables in other classes. You
    * can make the structure usable by calling the reinit() function.
    */
-  BlockDynamicSparsityPattern ();
+  BlockDynamicSparsityPattern () = default;
 
   /**
    * Initialize the matrix with the given number of block rows and columns.
@@ -604,7 +604,7 @@ namespace TrilinosWrappers
      * useful if you want such objects as member variables in other classes.
      * You can make the structure usable by calling the reinit() function.
      */
-    BlockSparsityPattern ();
+    BlockSparsityPattern () = default;
 
     /**
      * Initialize the matrix with the given number of block rows and columns.

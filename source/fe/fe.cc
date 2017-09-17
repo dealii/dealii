@@ -42,12 +42,6 @@ FiniteElement<dim, spacedim>::InternalDataBase::InternalDataBase ():
 
 
 template <int dim, int spacedim>
-FiniteElement<dim,spacedim>::InternalDataBase::~InternalDataBase ()
-{}
-
-
-
-template <int dim, int spacedim>
 std::size_t
 FiniteElement<dim, spacedim>::InternalDataBase::memory_consumption () const
 {

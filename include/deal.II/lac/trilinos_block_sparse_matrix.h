@@ -104,7 +104,7 @@ namespace TrilinosWrappers
      * reinit(BlockSparsityPattern). The number of blocks per row and column
      * are then determined by that function.
      */
-    BlockSparseMatrix ();
+    BlockSparseMatrix () = default;
 
     /**
      * Destructor.
@@ -116,7 +116,7 @@ namespace TrilinosWrappers
      * matrices need to be the same.
      */
     BlockSparseMatrix &
-    operator = (const BlockSparseMatrix &);
+    operator = (const BlockSparseMatrix &) = default;
 
     /**
      * This operator assigns a scalar to a matrix. Since this does usually not

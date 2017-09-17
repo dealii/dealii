@@ -28,11 +28,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <typename number>
-SparseILU<number>::SparseILU ()
-{}
-
-
 
 template <typename number>
 template <typename somenumber>

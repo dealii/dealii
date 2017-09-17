@@ -37,11 +37,6 @@ AutoDerivativeFunction (const double hh,
 }
 
 
-template <int dim>
-AutoDerivativeFunction<dim>::~AutoDerivativeFunction ()
-{}
-
-
 
 template <int dim>
 void

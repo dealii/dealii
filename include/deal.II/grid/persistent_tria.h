@@ -133,7 +133,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~PersistentTriangulation ();
+  virtual ~PersistentTriangulation () = default;
 
   /**
    * Overloaded version of the same function in the base class which stores

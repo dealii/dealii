@@ -221,11 +221,6 @@ namespace TrilinosWrappers
 
 
 
-  SparsityPattern::~SparsityPattern ()
-  {}
-
-
-
   void
   SparsityPattern::reinit (const size_type  m,
                            const size_type  n,

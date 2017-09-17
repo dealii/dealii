@@ -63,10 +63,6 @@ SparseMatrixEZ<number>::SparseMatrixEZ(const size_type    n_rows,
 }
 
 
-template <typename number>
-SparseMatrixEZ<number>::~SparseMatrixEZ()
-{}
-
 
 template <typename number>
 SparseMatrixEZ<number> &

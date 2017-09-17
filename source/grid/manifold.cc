@@ -31,12 +31,6 @@ using namespace Manifolds;
 
 /* -------------------------- Manifold --------------------- */
 template <int dim, int spacedim>
-Manifold<dim, spacedim>::~Manifold ()
-{}
-
-
-
-template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::
 project_to_manifold (const ArrayView<const Point<spacedim>> &,
@@ -691,13 +685,6 @@ FlatManifold<dim, spacedim>::get_tangent_vector (const Point<spacedim> &x1,
 
 
 /* -------------------------- ChartManifold --------------------- */
-
-template <int dim, int spacedim, int chartdim>
-ChartManifold<dim,spacedim,chartdim>::~ChartManifold ()
-{}
-
-
-
 template <int dim, int spacedim, int chartdim>
 ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Tensor<1,chartdim> &periodicity)
   :

@@ -214,11 +214,11 @@ namespace PETScWrappers
     /**
      * Purposefully not implemented
      */
-    SparseMatrix(const SparseMatrix &);
+    SparseMatrix(const SparseMatrix &) = delete;
     /**
      * Purposefully not implemented
      */
-    SparseMatrix &operator= (const SparseMatrix &);
+    SparseMatrix &operator= (const SparseMatrix &) = delete;
 
     /**
      * Do the actual work for the respective reinit() function and the

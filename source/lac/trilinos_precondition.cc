@@ -55,11 +55,6 @@ namespace TrilinosWrappers
 
 
 
-  PreconditionBase::~PreconditionBase()
-  {}
-
-
-
   void PreconditionBase::clear ()
   {
     preconditioner.reset();

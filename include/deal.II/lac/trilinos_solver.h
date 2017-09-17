@@ -146,7 +146,7 @@ namespace TrilinosWrappers
     /**
      * Destructor.
      */
-    virtual ~SolverBase ();
+    virtual ~SolverBase () = default;
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Depending on the information
@@ -628,7 +628,7 @@ namespace TrilinosWrappers
     /**
      * Destructor.
      */
-    virtual ~SolverDirect ();
+    virtual ~SolverDirect () = default;
 
     /**
      * Initializes the direct solver for the matrix <tt>A</tt> and creates a

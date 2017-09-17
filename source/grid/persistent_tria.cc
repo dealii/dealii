@@ -57,12 +57,6 @@ PersistentTriangulation (const PersistentTriangulation<dim,spacedim> &old_tria)
 
 
 template <int dim, int spacedim>
-PersistentTriangulation<dim,spacedim>::~PersistentTriangulation ()
-{}
-
-
-
-template <int dim, int spacedim>
 void
 PersistentTriangulation<dim,spacedim>::execute_coarsening_and_refinement ()
 {

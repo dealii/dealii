@@ -132,7 +132,7 @@ public:
   /**
    * Virtual destructor; absolutely necessary in this case.
    */
-  virtual ~AutoDerivativeFunction ();
+  virtual ~AutoDerivativeFunction () = default;
 
   /**
    * Choose the difference formula. See the enum #DifferenceFormula for

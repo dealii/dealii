@@ -91,11 +91,6 @@ ChunkSparsityPattern::ChunkSparsityPattern (
 
 
 
-ChunkSparsityPattern::~ChunkSparsityPattern ()
-{}
-
-
-
 ChunkSparsityPattern &
 ChunkSparsityPattern::operator = (const ChunkSparsityPattern &s)
 {

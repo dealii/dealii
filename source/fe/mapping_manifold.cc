@@ -43,11 +43,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
-MappingManifold<dim,spacedim>::InternalData::InternalData ()
-{}
-
-
-template <int dim, int spacedim>
 std::size_t
 MappingManifold<dim,spacedim>::InternalData::memory_consumption () const
 {
@@ -171,12 +166,6 @@ initialize_face (const UpdateFlags      update_flags,
         }
     }
 }
-
-
-
-template <int dim, int spacedim>
-MappingManifold<dim,spacedim>::MappingManifold ()
-{}
 
 
 

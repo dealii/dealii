@@ -45,10 +45,6 @@ AdditionalData (const size_type block_size,
 {}
 
 
-template <typename number>
-PreconditionBlockBase<number>::~PreconditionBlockBase ()
-{}
-
 
 template <typename MatrixType, typename inverse_type>
 PreconditionBlock<MatrixType,inverse_type>::PreconditionBlock (bool store)
@@ -58,10 +54,6 @@ PreconditionBlock<MatrixType,inverse_type>::PreconditionBlock (bool store)
     relaxation(1.0)
 {}
 
-
-template <typename MatrixType, typename inverse_type>
-PreconditionBlock<MatrixType,inverse_type>::~PreconditionBlock ()
-{}
 
 
 template <typename MatrixType, typename inverse_type>

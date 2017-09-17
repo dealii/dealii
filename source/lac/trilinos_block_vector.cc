@@ -67,12 +67,6 @@ namespace TrilinosWrappers
 
 
 
-
-    BlockVector::~BlockVector ()
-    {}
-
-
-
     void
     BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
                          const MPI_Comm              &communicator,

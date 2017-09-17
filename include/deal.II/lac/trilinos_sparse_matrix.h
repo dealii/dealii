@@ -570,7 +570,7 @@ namespace TrilinosWrappers
     /**
      * Destructor. Made virtual so that one can use pointers to this class.
      */
-    virtual ~SparseMatrix ();
+    virtual ~SparseMatrix () = default;
 
     /**
      * This function initializes the Trilinos matrix with a deal.II sparsity
@@ -2187,7 +2187,7 @@ namespace TrilinosWrappers
         /**
          * Destructor
          */
-        virtual ~TrilinosPayload();
+        virtual ~TrilinosPayload() = default;
 
         /**
          * Returns a payload configured for identity operations

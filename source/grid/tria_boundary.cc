@@ -29,11 +29,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-Boundary<dim, spacedim>::~Boundary ()
-{}
-
-
-template <int dim, int spacedim>
 void
 Boundary<dim, spacedim>::
 get_intermediate_points_on_line (const typename Triangulation<dim, spacedim>::line_iterator &,
@@ -185,10 +180,11 @@ get_line_support_points (const unsigned int n_intermediate_points) const
 
 /* -------------------------- StraightBoundary --------------------- */
 
-
+// At least clang < 3.9.0 complains if we move this definition to its
+// declaration when a 'const StraightBoundary' object is built.
 template <int dim, int spacedim>
-StraightBoundary<dim, spacedim>::StraightBoundary ()
-{}
+StraightBoundary<dim, spacedim>::StraightBoundary () = default;
+
 
 
 template <int dim, int spacedim>

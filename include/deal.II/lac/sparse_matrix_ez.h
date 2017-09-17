@@ -327,7 +327,7 @@ public:
    * Destructor. Free all memory, but do not release the memory of the
    * sparsity structure.
    */
-  ~SparseMatrixEZ ();
+  ~SparseMatrixEZ () = default;
 
   /**
    * Pseudo operator only copying empty objects.

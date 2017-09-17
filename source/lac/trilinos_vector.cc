@@ -130,10 +130,6 @@ namespace TrilinosWrappers
 
 
 
-    Vector::~Vector () = default;
-
-
-
     void
     Vector::clear ()
     {

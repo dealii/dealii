@@ -207,7 +207,7 @@ namespace parallel
       /**
        * Destructor.
        */
-      virtual ~Triangulation ();
+      virtual ~Triangulation () = default;
 
       /**
        * Coarsen and refine the mesh according to refinement and coarsening

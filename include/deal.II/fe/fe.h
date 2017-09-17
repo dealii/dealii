@@ -671,7 +671,7 @@ public:
     /**
      * Copy construction is forbidden.
      */
-    InternalDataBase (const InternalDataBase &);
+    InternalDataBase (const InternalDataBase &) = delete;
 
   public:
     /**
@@ -683,7 +683,7 @@ public:
     /**
      * Destructor. Made virtual to allow polymorphism.
      */
-    virtual ~InternalDataBase ();
+    virtual ~InternalDataBase () = default;
 
     /**
      * A set of update flags specifying the kind of information that an

@@ -186,7 +186,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferSelect ();
+  virtual ~MGTransferSelect () = default;
 
 //TODO: rewrite docs; make sure defaulted args are actually allowed
   /**

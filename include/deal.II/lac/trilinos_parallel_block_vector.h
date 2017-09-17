@@ -138,7 +138,7 @@ namespace TrilinosWrappers
       /**
        * Destructor. Clears memory
        */
-      ~BlockVector ();
+      ~BlockVector () = default;
 
       /**
        * Copy operator: fill all components of the vector that are locally

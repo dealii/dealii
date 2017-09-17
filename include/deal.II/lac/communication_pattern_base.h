@@ -41,7 +41,7 @@ namespace LinearAlgebra
     /**
      * Destructor.
      */
-    virtual ~CommunicationPatternBase() {};
+    virtual ~CommunicationPatternBase() = default;
 
     /**
      * Reinitialize the communication pattern. The first argument @p

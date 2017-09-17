@@ -182,7 +182,7 @@ namespace internal
       /**
        * Destructor made virtual.
        */
-      virtual ~DataEntryBase ();
+      virtual ~DataEntryBase () = default;
 
       /**
        * Assuming that the stored vector is a cell vector, extract the given

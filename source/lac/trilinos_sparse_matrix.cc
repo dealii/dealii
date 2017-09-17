@@ -356,11 +356,6 @@ namespace TrilinosWrappers
 
 
 
-  SparseMatrix::~SparseMatrix ()
-  {}
-
-
-
   void
   SparseMatrix::copy_from (const SparseMatrix &rhs)
   {
@@ -2696,12 +2691,6 @@ namespace TrilinosWrappers
           communicator (first_op.communicator),
           domain_map (second_op.domain_map),
           range_map (first_op.range_map)
-      { }
-
-
-
-      // Destructor
-      TrilinosPayload::~TrilinosPayload ()
       { }
 
 

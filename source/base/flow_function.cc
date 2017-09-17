@@ -37,10 +37,6 @@ namespace Functions
   {}
 
 
-  template <int dim>
-  FlowFunction<dim>::~FlowFunction()
-  {}
-
 
   template <int dim>
   void
@@ -192,10 +188,6 @@ namespace Functions
   }
 
 
-  template <int dim>
-  PoisseuilleFlow<dim>::~PoisseuilleFlow()
-  {}
-
 
   template <int dim>
   void PoisseuilleFlow<dim>::vector_values (
@@ -287,10 +279,6 @@ namespace Functions
     viscosity(nu), reaction(r)
   {}
 
-
-  template <int dim>
-  StokesCosine<dim>::~StokesCosine()
-  {}
 
 
   template <int dim>
@@ -658,9 +646,6 @@ namespace Functions
     p_average = 1/(8*l)*(std::exp(3.*l)-std::exp(-l));
   }
 
-
-  Kovasznay::~Kovasznay()
-  {}
 
 
   void Kovasznay::vector_values (

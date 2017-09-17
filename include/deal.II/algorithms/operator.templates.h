@@ -26,10 +26,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace Algorithms
 {
   template <typename VectorType>
-  OutputOperator<VectorType>::~OutputOperator()
-  {}
-
-  template <typename VectorType>
   OutputOperator<VectorType>::OutputOperator()
     :
     step (numbers::invalid_unsigned_int),

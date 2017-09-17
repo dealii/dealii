@@ -140,10 +140,6 @@ void BlockVector<Number>::reinit (const BlockVector<Number2> &v,
 }
 
 
-template <typename Number>
-BlockVector<Number>::~BlockVector ()
-{}
-
 
 #ifdef DEAL_II_WITH_TRILINOS
 template <typename Number>

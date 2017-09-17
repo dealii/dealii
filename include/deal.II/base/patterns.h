@@ -74,7 +74,7 @@ namespace Patterns
     /**
      * Make destructor of this and all derived classes virtual.
      */
-    virtual ~PatternBase ();
+    virtual ~PatternBase () = default;
 
     /**
      * Return <tt>true</tt> if the given string matches the pattern.
@@ -787,7 +787,7 @@ namespace Patterns
      * Constructor. (Allow for at least one non-virtual function in this
      * class, as otherwise sometimes no virtual table is emitted.)
      */
-    Anything ();
+    Anything () = default;
 
     /**
      * Return <tt>true</tt> if the string matches its constraints, i.e.
@@ -919,7 +919,7 @@ namespace Patterns
     /**
      * Constructor.
      */
-    DirectoryName ();
+    DirectoryName () = default;
 
     /**
      * Return <tt>true</tt> if the string matches its constraints, i.e.

@@ -691,7 +691,7 @@ private:
      * Mark the destructor virtual to allow destruction through pointers to
      * the base class.
      */
-    virtual ~PredicateBase () {}
+    virtual ~PredicateBase () = default;
 
     /**
      * Abstract function which in derived classes denotes the evaluation of

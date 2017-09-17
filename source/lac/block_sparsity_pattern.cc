@@ -327,11 +327,6 @@ BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(std::ostream &out) 
 
 
 
-BlockSparsityPattern::BlockSparsityPattern ()
-{}
-
-
-
 BlockSparsityPattern::BlockSparsityPattern (const size_type n_rows,
                                             const size_type n_columns)
   :
@@ -418,12 +413,6 @@ BlockSparsityPattern::copy_from  (const BlockDynamicSparsityPattern &dsp)
   // sizes
   collect_sizes();
 }
-
-
-
-
-BlockDynamicSparsityPattern::BlockDynamicSparsityPattern ()
-{}
 
 
 
@@ -519,11 +508,6 @@ BlockDynamicSparsityPattern::reinit (
 #ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
-
-  BlockSparsityPattern::BlockSparsityPattern ()
-  {}
-
-
 
   BlockSparsityPattern::
   BlockSparsityPattern (const size_type n_rows,

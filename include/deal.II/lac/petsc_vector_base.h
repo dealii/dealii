@@ -761,7 +761,7 @@ namespace PETScWrappers
      * deliberately left as private (and undefined) to prevent accidental
      * usage.
      */
-    VectorBase &operator=(const VectorBase &);
+    VectorBase &operator=(const VectorBase &) = delete;
   };
 
 

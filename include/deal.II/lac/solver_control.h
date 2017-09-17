@@ -99,7 +99,7 @@ public:
       : last_step (last_step), last_residual(last_residual)
     {}
 
-    virtual ~NoConvergence () noexcept {}
+    virtual ~NoConvergence () noexcept = default;
 
     virtual void print_info (std::ostream &out) const
     {
@@ -155,7 +155,7 @@ public:
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~SolverControl();
+  virtual ~SolverControl() = default;
 
   /**
    * Interface to parameter file.
@@ -429,7 +429,7 @@ public:
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~ReductionControl();
+  virtual ~ReductionControl() = default;
 
   /**
    * Interface to parameter file.
@@ -513,7 +513,7 @@ public:
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~IterationNumberControl();
+  virtual ~IterationNumberControl() = default;
 
   /**
    * Decide about success or failure of an iteration. This function bases
@@ -569,7 +569,7 @@ public:
    * Virtual destructor is needed as there are virtual functions in this
    * class.
    */
-  virtual ~ConsecutiveControl();
+  virtual ~ConsecutiveControl() = default;
 
   /**
    * Decide about success or failure of an iteration, see the class description

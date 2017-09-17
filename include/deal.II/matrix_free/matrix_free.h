@@ -295,7 +295,7 @@ public:
   /**
    * Destructor.
    */
-  ~MatrixFree();
+  ~MatrixFree() = default;
 
   /**
    * Extracts the information needed to perform loops over cells. The

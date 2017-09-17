@@ -128,7 +128,7 @@ public:
   /**
    * Destructor. Only declared to make it @p virtual.
    */
-  virtual ~DataOutStack ();
+  virtual ~DataOutStack () = default;
 
   /**
    * Start the next set of data for a specific parameter value. The argument

@@ -24,6 +24,7 @@
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/base/vectorization.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -68,7 +69,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferMatrixFree ();
+  virtual ~MGTransferMatrixFree () = default;
 
   /**
    * Initialize the constraints to be used in build().
@@ -258,7 +259,7 @@ public:
    * Constructor without constraint matrices. Use this constructor only with
    * discontinuous finite elements or with no local refinement.
    */
-  MGTransferBlockMatrixFree ();
+  MGTransferBlockMatrixFree () = default;
 
   /**
    * Constructor with constraints. Equivalent to the default constructor
@@ -269,7 +270,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~MGTransferBlockMatrixFree ();
+  virtual ~MGTransferBlockMatrixFree () = default;
 
   /**
    * Initialize the constraints to be used in build().

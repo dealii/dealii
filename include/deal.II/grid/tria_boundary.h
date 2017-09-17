@@ -86,7 +86,7 @@ public:
    * Destructor. Does nothing here, but needs to be declared to make it
    * virtual.
    */
-  virtual ~Boundary ();
+  virtual ~Boundary () = default;
 
 
   /**

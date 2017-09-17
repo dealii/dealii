@@ -24,11 +24,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  BlockSparseMatrix::BlockSparseMatrix ()
-  {}
-
-
-
   BlockSparseMatrix::~BlockSparseMatrix ()
   {
     // delete previous content of
@@ -39,16 +34,6 @@ namespace TrilinosWrappers
       }
     catch (...)
       {}
-  }
-
-
-
-  BlockSparseMatrix &
-  BlockSparseMatrix::operator = (const BlockSparseMatrix &m)
-  {
-    BaseClass::operator = (m);
-
-    return *this;
   }
 
 

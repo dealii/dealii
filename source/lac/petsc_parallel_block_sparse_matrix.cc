@@ -24,14 +24,6 @@ namespace PETScWrappers
   namespace MPI
   {
 
-    BlockSparseMatrix::BlockSparseMatrix ()
-    {}
-
-
-    BlockSparseMatrix::~BlockSparseMatrix ()
-    {}
-
-
     BlockSparseMatrix &
     BlockSparseMatrix::operator = (const BlockSparseMatrix &m)
     {

@@ -49,11 +49,6 @@ namespace PETScWrappers
 
 
 
-  SolverBase::~SolverBase ()
-  {}
-
-
-
   void
   SolverBase::solve (const MatrixBase         &A,
                      VectorBase               &x,

@@ -122,7 +122,7 @@ namespace PETScWrappers
     /**
      * Destructor.
      */
-    virtual ~SolverBase ();
+    virtual ~SolverBase () = default;
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Depending on the information

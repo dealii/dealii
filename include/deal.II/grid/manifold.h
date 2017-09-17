@@ -345,7 +345,7 @@ public:
    * Destructor. Does nothing here, but needs to be declared virtual to make
    * class hierarchies derived from this class possible.
    */
-  virtual ~Manifold ();
+  virtual ~Manifold () = default;
 
   /**
    * @name Computing the location of points.
@@ -930,7 +930,7 @@ public:
    * Destructor. Does nothing here, but needs to be declared to make it
    * virtual.
    */
-  virtual ~ChartManifold ();
+  virtual ~ChartManifold () = default;
 
   /**
    * Refer to the general documentation of this class and the documentation of

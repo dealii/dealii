@@ -96,7 +96,7 @@ namespace FETools
     /**
      * Virtual destructor doing nothing but making the compiler happy.
      */
-    virtual ~FEFactoryBase();
+    virtual ~FEFactoryBase() = default;
   };
 
   /**

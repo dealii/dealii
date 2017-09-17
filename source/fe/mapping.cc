@@ -21,11 +21,6 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-Mapping<dim, spacedim>::~Mapping ()
-{}
-
-
-template <int dim, int spacedim>
 std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
 Mapping<dim, spacedim>::get_vertices (
   const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
@@ -82,12 +77,6 @@ project_real_point_to_unit_point_on_face (
 template <int dim, int spacedim>
 Mapping<dim, spacedim>::InternalDataBase::InternalDataBase ():
   update_each(update_default)
-{}
-
-
-
-template <int dim, int spacedim>
-Mapping<dim, spacedim>::InternalDataBase::~InternalDataBase ()
 {}
 
 

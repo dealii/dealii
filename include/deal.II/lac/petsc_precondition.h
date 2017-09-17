@@ -141,7 +141,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionJacobi ();
+    PreconditionJacobi () = default;
 
 
     /**
@@ -215,7 +215,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionBlockJacobi ();
+    PreconditionBlockJacobi () = default;
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
@@ -291,7 +291,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionSOR ();
+    PreconditionSOR () = default;
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
@@ -351,7 +351,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionSSOR ();
+    PreconditionSSOR () = default;
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
@@ -414,7 +414,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionEisenstat ();
+    PreconditionEisenstat () = default;
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
@@ -474,7 +474,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionICC ();
+    PreconditionICC () = default;
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
@@ -534,7 +534,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionILU ();
+    PreconditionILU () = default;
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
@@ -612,7 +612,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionLU ();
+    PreconditionLU () = default;
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
@@ -718,7 +718,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionBoomerAMG ();
+    PreconditionBoomerAMG () = default;
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
@@ -859,7 +859,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionParaSails ();
+    PreconditionParaSails () = default;
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
@@ -906,7 +906,7 @@ namespace PETScWrappers
      * Empty Constructor. You need to call initialize() before using this
      * object.
      */
-    PreconditionNone ();
+    PreconditionNone () = default;
 
     /**
      * Constructor. Take the matrix which is used to form the preconditioner,
