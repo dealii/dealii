@@ -24,15 +24,15 @@
 #   SUNDIALS_LIB_SER
 #   SUNDIALS_INCLUDE_DIR
 #
-# Note that, unlike most other packages, SUNDIALS headers are typically
-# installed in multiple directories; for example, a typical system installation
-# may distribute the headers in the following way:
+# Note that sundials headers are typically installed in several directories,
+# e.g.,
 #
-# /usr/include/ida/ida.h
-# /usr/include/kinsol/kinsol.h
-# /usr/include/sundials/sundials_nvector.h
+# /prefix/include/ida/ida.h
+# /prefix/include/kinsol/kinsol.h
+# /prefix/include/sundials/sundials_nvector.h
 #
-# so, in this case, SUNDIALS_INCLUDE_DIR would just be /usr/include/.
+# Here SUNDIALS_INCLUDE_DIR is just '/prefix/include/', not
+# '/prefix/include/sundials/'.
 
 SET(SUNDIALS_DIR "" CACHE PATH "An optional hint to a SUNDIALS_DIR installation")
 SET_IF_EMPTY(SUNDIALS_DIR "$ENV{SUNDIALS_DIR}")
