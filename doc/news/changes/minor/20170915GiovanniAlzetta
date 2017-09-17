@@ -1,0 +1,4 @@
+New: Added the base class BoundingBox. The BoundingBox is constructed from a std::pair of points in real space, ordered following the convention bottom-left, top-right.
+The class has the method BoundingBox::point_inside(Point<spacedim> p) which checks for the presence of a point inside it.
+<br>
+(Giovanni Alzetta, 2017/09/15)
