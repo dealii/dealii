@@ -242,7 +242,10 @@ public:
                                  const Vector<number> &src) const;
 
   /**
-   * Transfer from a vector on the global grid to a multilevel vector.
+   * Transfer from a vector on the global grid to a multilevel vector for the
+   * active degrees of freedom. In particular, for a globally refined mesh only
+   * the finest level in @p dst is filled as a plain copy of @p src. All the
+   * other level objects are left untouched.
    */
   template <int dim, typename number2, int spacedim>
   void
@@ -274,7 +277,10 @@ public:
                     const MGLevelObject<Vector<number> > &src) const;
 
   /**
-   * Transfer from a vector on the global grid to multilevel vectors.
+   * Transfer from a vector on the global grid to a multilevel vector for the
+   * active degrees of freedom. In particular, for a globally refined mesh only
+   * the finest level in @p dst is filled as a plain copy of @p src. All the
+   * other level objects are left untouched.
    */
   template <int dim, typename number2, int spacedim>
   void

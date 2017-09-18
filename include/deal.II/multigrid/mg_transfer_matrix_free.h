@@ -329,7 +329,10 @@ public:
 
   /**
    * Transfer from a block-vector on the global grid to block-vectors defined
-   * on each of the levels separately.
+   * on each of the levels separately for active degrees of freedom.
+   * In particular, for a globally refined mesh only the finest level in @p dst
+   * is filled as a plain copy of @p src. All the other level objects are left
+   * untouched.
    *
    * This function will initialize @p dst accordingly if needed as required by
    * the Multigrid class.
