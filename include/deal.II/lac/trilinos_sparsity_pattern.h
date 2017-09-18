@@ -1228,7 +1228,7 @@ namespace TrilinosWrappers
 
 
     inline
-    Iterator::Iterator(const Iterator &i) = default;
+    Iterator::Iterator(const Iterator &) = default;
 
 
 
