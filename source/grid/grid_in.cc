@@ -43,19 +43,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <assimp/postprocess.h>     // Post processing flags
 #pragma GCC diagnostic pop
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
-#undef AI_CONFIG_PP_RVC_FLAGS
-#define AI_CONFIG_PP_RVC_FLAGS           \
-  aiComponent_NORMALS |            \
-  aiComponent_TANGENTS_AND_BITANGENTS |        \
-  aiComponent_COLORS    |        \
-  aiComponent_TEXCOORDS   |        \
-  aiComponent_BONEWEIGHTS |        \
-  aiComponent_ANIMATIONS |           \
-  aiComponent_TEXTURES  |          \
-  aiComponent_LIGHTS |             \
-  aiComponent_CAMERAS |            \
-  aiComponent_MATERIALS
 #endif
 
 
@@ -2578,7 +2565,7 @@ void GridIn<dim, spacedim>::read_assimp(const std::string &filename,
   // Only good for surface grids.
   AssertThrow(dim<3, ExcImpossibleInDim(dim));
 
-  // Create an istance of the Importer class
+  // Create an instance of the Importer class
   Assimp::Importer importer;
 
   // And have it read the given file with some  postprocessing
@@ -2599,10 +2586,10 @@ void GridIn<dim, spacedim>::read_assimp(const std::string &filename,
               (mesh_index < scene->mNumMeshes),
               ExcMessage("Too few meshes in the file."));
 
-  int start_mesh = (mesh_index == numbers::invalid_unsigned_int ?
-                    0 : mesh_index);
-  int end_mesh = (mesh_index == numbers::invalid_unsigned_int ?
-                  scene->mNumMeshes : mesh_index+1);
+  unsigned int start_mesh = (mesh_index == numbers::invalid_unsigned_int ?
+                             0 : mesh_index);
+  unsigned int end_mesh = (mesh_index == numbers::invalid_unsigned_int ?
+                           scene->mNumMeshes : mesh_index+1);
 
   // Deal.II objects are created empty, and then filled with imported file.
   std::vector<Point<spacedim> > vertices;
@@ -2614,7 +2601,7 @@ void GridIn<dim, spacedim>::read_assimp(const std::string &filename,
   unsigned int c_offset=0;
 
   // The index of the mesh will be used as a material index.
-  for (int m=start_mesh; m<end_mesh; ++m)
+  for (unsigned int m=start_mesh; m<end_mesh; ++m)
     {
       const aiMesh *mesh = scene->mMeshes[m];
 
@@ -2675,7 +2662,7 @@ void GridIn<dim, spacedim>::read_assimp(const std::string &filename,
         }
       cells.resize(valid_cell);
 
-      // The vertices are added all at once. Cells are check for
+      // The vertices are added all at once. Cells are checked for
       // validity, so only valid_cells are now present in the deal.II
       // list of cells.
       v_offset += n_vertices;
@@ -3000,7 +2987,7 @@ void GridIn<dim, spacedim>::read (std::istream &in,
 
     case netcdf:
       Assert(false, ExcMessage("There is no read_netcdf(istream &) function. "
-                               "Use the read_netcdf)(string &filename) "
+                               "Use the read_netcdf(string &filename) "
                                "functions, instead."));
       return;
 
@@ -3010,7 +2997,7 @@ void GridIn<dim, spacedim>::read (std::istream &in,
 
     case assimp:
       Assert(false, ExcMessage("There is no read_assimp(istream &) function. "
-                               "Use the read_netcdf)(string &filename, ...) "
+                               "Use the read_assimp(string &filename, ...) "
                                "functions, instead."));
       return;
 

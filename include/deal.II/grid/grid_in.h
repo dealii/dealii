@@ -38,8 +38,12 @@ template <int dim> struct CellData;
  * geometric (vertex locations) and topological (how vertices form cells,
  * faces, and edges) information is ignored, but the readers for the various
  * formats generally do read information that associates material ids or
- * boundary ids to cells or faces (see @ref GlossMaterialId "this" and @ref
- * GlossBoundaryIndicator "this" glossary entry for more information).
+ * boundary ids to cells or faces (see
+ * @ref GlossMaterialId "this"
+ * and
+ * @ref
+ * GlossBoundaryIndicator "this"
+ * glossary entry for more information).
  *
  * @note Since deal.II only supports line, quadrilateral and hexahedral
  * meshes, the functions in this class can only read meshes that consist
@@ -476,10 +480,10 @@ public:
    * `ignore_unsupported_element_types`, all the other element types are simply
    * ignored by this algorithm. If your mesh contains a mixture of triangles
    * and quadrilaterals, for example, only the quadrilaterals will be
-   * extracted. Your mesh may not make any sense if you are mixing compatible
-   * and incompatible element types. If `ignore_unsupported_element_types` is
-   * set to `false`, then an exception is thrown when an unsupporte type is
-   * encountered.
+   * extracted. The resulting mesh (as represented in the Triangulation object)
+   * may not make any sense if you are mixing compatible and incompatible
+   * element types. If `ignore_unsupported_element_types` is set to `false`,
+   * then an exception is thrown when an unsupporte type is encountered.
    *
    * @param filename The file to read from
    * @param mesh_index Index of the mesh within the file
