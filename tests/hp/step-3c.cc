@@ -225,7 +225,7 @@ void LaplaceProblem::solve ()
     cg.solve(system_matrix, solution, system_rhs, PreconditionIdentity()),
     solver_control.last_step(), 625, 635);
 
-  solution.print (deallog.get_file_stream(), 5);
+  solution.print (deallog.get_file_stream(), 7);
 
   hanging_node_constraints.distribute (solution);
 }
