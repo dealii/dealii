@@ -561,6 +561,40 @@ namespace GridTools
   /*@{*/
 
   /**
+   * Return a map of index:Point<spacedim>, containing the used vertices of the
+   * given `container`. The key of the returned map is the global index in the
+   * triangulation. The used vertices are obtained by looping over all cells,
+   * and querying for each cell where its vertices are through the (optional)
+   * `mapping` argument.
+   *
+   * The size of the returned map equals Triangulation::n_used_vertices(),
+   * (not Triangulation::n_vertices()). If you use the default `mapping`, the
+   * returned map satisfies the following equality:
+   *
+   * @code
+   * used_vertices = extract_used_vertices(tria);
+   * all_vertices = tria.get_vertices();
+   *
+   * for(auto &id_and_v : used_vertices)
+   *    all_vertices[id_and_v.first] == id_and_v.second; // true
+   * @endcode
+   *
+   * Notice that the above is not satisfied for mappings that change the
+   * location of vertices, like MappingQEulerian.
+   *
+   * @ref ConceptMeshType "MeshType concept".
+   * @param container The container to extract vertices from
+   * @param mapping The mapping to use to compute the points locations
+   *
+   * @author Luca Heltai, 2017.
+   */
+  template <int dim, int spacedim>
+  std::map<unsigned int,Point<spacedim>> extract_used_vertices (
+                                        const Triangulation<dim,spacedim> &container,
+                                        const Mapping<dim,spacedim> &mapping = StaticMappingQ1<dim,spacedim>::mapping);
+
+
+  /**
    * Find and return the number of the used vertex (or marked vertex) in a
    * given mesh that is located closest to a given point.
    *

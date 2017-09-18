@@ -4926,6 +4926,23 @@ next_cell:
 
 
 
+  template<int dim, int spacedim>
+  std::map<unsigned int, Point<spacedim> >
+  extract_used_vertices(const Triangulation<dim, spacedim> &container,
+                        const Mapping<dim,spacedim> &mapping)
+  {
+    std::map<unsigned int, Point<spacedim> > result;
+    for (const auto &cell : container.active_cell_iterators())
+      {
+        auto vs = mapping.get_vertices(cell);
+        for (unsigned int i=0; i<vs.size(); ++i)
+          result[cell->vertex_index(i)]=vs[i];
+      }
+    Assert(result.size() == container.n_used_vertices(),
+           ExcInternalError());
+    return result;
+  }
+
 } /* namespace GridTools */
 
 
