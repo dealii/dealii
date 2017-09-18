@@ -22,6 +22,7 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 #
 SET(_unity_include_src
   auto_derivative_function.cc
+  bounding_box.cc
   conditional_ostream.cc
   config.cc
   convergence_table.cc
@@ -93,6 +94,7 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
   )
 
 SET(_inst
+  bounding_box.inst.in
   data_out_base.inst.in
   function.inst.in
   function_time.inst.in
