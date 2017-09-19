@@ -53,10 +53,12 @@ namespace GridTools
    * changed due to a Triangulation::Signals::any_change() signal being
    * triggered.
    *
-   * If the triangulation changes due to a MappingQEulerian being passed to
-   * this class, or because you manually change some vertex locations, then
-   * some of the structures in this class become obsolete, and you will have to
-   * call the method update() manually.
+   * If the triangulation changes for other reasons, for example because you
+   * use it in conjunction with a MappingQEulerian object that sees the
+   * vertices through its own transformation, or because you manually change
+   * some vertex locations, then some of the structures in this class become
+   * obsolete, and you will have to mark them as outdated, by calling the
+   * method mark_for_update() manually.
    *
    * @author Luca Heltai, 2017.
    */
