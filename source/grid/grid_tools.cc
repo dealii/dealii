@@ -4943,6 +4943,21 @@ next_cell:
     return result;
   }
 
+  template<int spacedim>
+  unsigned int
+  find_closest_vertex(const std::map<unsigned int,Point<spacedim> > &vertices,
+                      const Point<spacedim> &p)
+  {
+    auto id_and_v = std::min_element(vertices.begin(), vertices.end(),
+                                     [&](const std::pair<const unsigned int, Point<spacedim>> &p1,
+                                         const std::pair<const unsigned int, Point<spacedim>> &p2) -> bool
+    {
+      return p1.second.distance(p) < p2.second.distance(p);
+    }
+                                    );
+    return id_and_v->first;
+  }
+
 } /* namespace GridTools */
 
 

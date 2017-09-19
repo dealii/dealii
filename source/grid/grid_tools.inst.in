@@ -143,6 +143,10 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
     find_active_cell_around_point (const Mapping<deal_II_space_dimension> &,
                                    const parallel::distributed::Triangulation<deal_II_space_dimension> &,
                                    const Point<deal_II_space_dimension> &);
+
+    template unsigned int
+    GridTools::find_closest_vertex(const std::map<unsigned int,Point<deal_II_space_dimension> >& vertices,
+                                   const Point<deal_II_space_dimension>& p);
 }
 
 

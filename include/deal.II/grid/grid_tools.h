@@ -593,6 +593,19 @@ namespace GridTools
                                         const Triangulation<dim,spacedim> &container,
                                         const Mapping<dim,spacedim> &mapping = StaticMappingQ1<dim,spacedim>::mapping);
 
+  /**
+   * Find and return the number of the closest vertex to a given point in the
+   * map of vertices passed as the first argument.
+   *
+   * @param vertices A map of index->vertex, as returned by
+   *        extract_used_vertices()
+   * @param p The target point
+   * @return The index of the vertex that is closest to the target point `p`
+   */
+  template<int spacedim>
+  unsigned int
+  find_closest_vertex (const std::map<unsigned int,Point<spacedim>> &vertices,
+                       const Point<spacedim>         &p);
 
   /**
    * Find and return the number of the used vertex (or marked vertex) in a
