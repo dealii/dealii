@@ -242,7 +242,8 @@ enum UpdateFlags
  */
 template <class StreamType>
 inline
-StreamType &operator << (StreamType &s, UpdateFlags u)
+StreamType &operator << (StreamType &s,
+                         const UpdateFlags u)
 {
   s << " UpdateFlags|";
   if (u & update_values)                                  s << "values|";
@@ -281,7 +282,8 @@ StreamType &operator << (StreamType &s, UpdateFlags u)
  */
 inline
 UpdateFlags
-operator | (UpdateFlags f1, UpdateFlags f2)
+operator | (const UpdateFlags f1,
+            const UpdateFlags f2)
 {
   return static_cast<UpdateFlags> (
            static_cast<unsigned int> (f1) |
@@ -299,7 +301,8 @@ operator | (UpdateFlags f1, UpdateFlags f2)
  */
 inline
 UpdateFlags &
-operator |= (UpdateFlags &f1, UpdateFlags f2)
+operator |= (UpdateFlags &f1,
+             const UpdateFlags f2)
 {
   f1 = f1 | f2;
   return f1;
@@ -317,7 +320,8 @@ operator |= (UpdateFlags &f1, UpdateFlags f2)
  */
 inline
 UpdateFlags
-operator & (UpdateFlags f1, UpdateFlags f2)
+operator & (const UpdateFlags f1,
+            const UpdateFlags f2)
 {
   return static_cast<UpdateFlags> (
            static_cast<unsigned int> (f1) &
@@ -333,7 +337,8 @@ operator & (UpdateFlags f1, UpdateFlags f2)
  */
 inline
 UpdateFlags &
-operator &= (UpdateFlags &f1, UpdateFlags f2)
+operator &= (UpdateFlags &f1,
+             const UpdateFlags f2)
 {
   f1 = f1 & f2;
   return f1;
