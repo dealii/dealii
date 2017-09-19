@@ -25,7 +25,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/grid_tools_cache_flags.h>
+#include <deal.II/grid/grid_tools_cache_update_flags.h>
 #include <deal.II/fe/mapping_q1.h>
 
 #include <deal.II/numerics/kdtree.h>
@@ -90,7 +90,7 @@ namespace GridTools
      *
      * @param flags What to mark for update
      */
-    void mark_for_update(const CacheFlags &flags=update_all);
+    void mark_for_update(const CacheUpdateFlags &flags=update_all);
 
 
     /**
@@ -118,7 +118,7 @@ namespace GridTools
     /**
      * Keep track of what needs to be updated next.
      */
-    mutable CacheFlags update_flags;
+    mutable CacheUpdateFlags update_flags;
 
     /**
      * A pointer to the Triangulation.

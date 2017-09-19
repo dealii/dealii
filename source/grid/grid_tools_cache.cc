@@ -47,7 +47,7 @@ namespace GridTools
 
 
   template<int dim, int spacedim>
-  void Cache<dim,spacedim>::mark_for_update(const CacheFlags &flags)
+  void Cache<dim,spacedim>::mark_for_update(const CacheUpdateFlags &flags)
   {
     update_flags |= flags;
   }

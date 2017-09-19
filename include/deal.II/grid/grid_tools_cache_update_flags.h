@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_grid_tria_info_cache_flags_h
-#define dealii_grid_tria_info_cache_flags_h
+#ifndef dealii_grid_tria_info_cache_update_flags_h
+#define dealii_grid_tria_info_cache_update_flags_h
 
 
 #include <deal.II/base/config.h>
@@ -29,11 +29,11 @@ namespace GridTools
    * information to update.
    *
    * You can select more than one flag by concatenation using the bitwise or
-   * <code>operator|(CacheFlags,CacheFlags)</code>.
+   * <code>operator|(CacheUpdateFlags,CacheUpdateFlags)</code>.
    *
    * @author Luca Heltai, 2017.
    */
-  enum CacheFlags
+  enum CacheUpdateFlags
   {
     /**
      * Update Nothing.
@@ -68,13 +68,13 @@ namespace GridTools
   /**
    * Output operator which outputs assemble flags as a set of or'd text values.
    *
-   * @ref CacheFlags
+   * @ref CacheUpdateFlags
    */
   template <class StreamType>
   inline
-  StreamType &operator << (StreamType &s, CacheFlags u)
+  StreamType &operator << (StreamType &s, CacheUpdateFlags u)
   {
-    s << " CacheFlags";
+    s << " CacheUpdateFlags";
     if (u & update_vertex_to_cell_map)                 s << "|vertex_to_cell_map";
     if (u & update_vertex_to_cell_centers_directions)  s << "|vertex_to_cells_centers_directions";
 #ifdef DEAL_II_WITH_NANOFLANN
@@ -89,15 +89,15 @@ namespace GridTools
    * either set in the first or the second argument. This operator exists since
    * if it did not then the result of the bit-or <tt>operator |</tt> would be an
    * integer which would in turn trigger a compiler warning when we tried to
-   * assign it to an object of type CacheFlags.
+   * assign it to an object of type CacheUpdateFlags.
    *
-   * @ref CacheFlags
+   * @ref CacheUpdateFlags
    */
   inline
-  CacheFlags
-  operator | (CacheFlags f1, CacheFlags f2)
+  CacheUpdateFlags
+  operator | (CacheUpdateFlags f1, CacheUpdateFlags f2)
   {
-    return static_cast<CacheFlags> (
+    return static_cast<CacheUpdateFlags> (
              static_cast<unsigned int> (f1) |
              static_cast<unsigned int> (f2));
   }
@@ -107,15 +107,15 @@ namespace GridTools
    * not set in the argument. This operator exists since
    * if it did not then the result of the bit-negation <tt>operator ~</tt> would be an
    * integer which would in turn trigger a compiler warning when we tried to
-   * assign it to an object of type CacheFlags.
+   * assign it to an object of type CacheUpdateFlags.
    *
-   * @ref CacheFlags
+   * @ref CacheUpdateFlags
    */
   inline
-  CacheFlags
-  operator ~ (CacheFlags f1)
+  CacheUpdateFlags
+  operator ~ (CacheUpdateFlags f1)
   {
-    return static_cast<CacheFlags> (
+    return static_cast<CacheUpdateFlags> (
              ~static_cast<unsigned int> (f1)
            );
   }
@@ -126,11 +126,11 @@ namespace GridTools
    * Global operator which sets the bits from the second argument also in the
    * first one.
    *
-   * @ref CacheFlags
+   * @ref CacheUpdateFlags
    */
   inline
-  CacheFlags &
-  operator |= (CacheFlags &f1, CacheFlags f2)
+  CacheUpdateFlags &
+  operator |= (CacheUpdateFlags &f1, CacheUpdateFlags f2)
   {
     f1 = f1 | f2;
     return f1;
@@ -142,15 +142,15 @@ namespace GridTools
    * set in the first as well as the second argument. This operator exists since
    * if it did not then the result of the bit-and <tt>operator &</tt> would be
    * an integer which would in turn trigger a compiler warning when we tried to
-   * assign it to an object of type CacheFlags.
+   * assign it to an object of type CacheUpdateFlags.
    *
-   * @ref CacheFlags
+   * @ref CacheUpdateFlags
    */
   inline
-  CacheFlags
-  operator & (CacheFlags f1, CacheFlags f2)
+  CacheUpdateFlags
+  operator & (CacheUpdateFlags f1, CacheUpdateFlags f2)
   {
-    return static_cast<CacheFlags> (
+    return static_cast<CacheUpdateFlags> (
              static_cast<unsigned int> (f1) &
              static_cast<unsigned int> (f2));
   }
@@ -160,11 +160,11 @@ namespace GridTools
    * Global operator which clears all the bits in the first argument if they are
    * not also set in the second argument.
    *
-   * @ref CacheFlags
+   * @ref CacheUpdateFlags
    */
   inline
-  CacheFlags &
-  operator &= (CacheFlags &f1, CacheFlags f2)
+  CacheUpdateFlags &
+  operator &= (CacheUpdateFlags &f1, CacheUpdateFlags f2)
   {
     f1 = f1 & f2;
     return f1;
