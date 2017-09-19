@@ -601,6 +601,8 @@ namespace GridTools
    *        extract_used_vertices()
    * @param p The target point
    * @return The index of the vertex that is closest to the target point `p`
+   *
+   * @author Luca Heltai, 2017.
    */
   template<int spacedim>
   unsigned int
@@ -632,6 +634,35 @@ namespace GridTools
   find_closest_vertex (const MeshType<dim, spacedim> &mesh,
                        const Point<spacedim>         &p,
                        const std::vector<bool>       &marked_vertices = std::vector<bool>());
+
+  /**
+   * Find and return the number of the used vertex (or marked vertex) in a
+   * given mesh that is located closest to a given point. Use the given
+   * mapping to compute the actual location of the vertices.
+   *
+   * @param mapping A mapping used to compute the vertex locations
+   * @param mesh A variable of a type that satisfies the requirements of the
+   * @ref ConceptMeshType "MeshType concept".
+   * @param p The point for which we want to find the closest vertex.
+   * @param marked_vertices An array of bools indicating which
+   * vertices of @p mesh will be considered within the search
+   * as the potentially closest vertex. On receiving a non-empty
+   * @p marked_vertices, the function will
+   * only search among @p marked_vertices for the closest vertex.
+   * The size of this array should be equal to the value returned by
+   * Triangulation::n_vertices() for the triangulation underlying the given mesh
+   * (as opposed to the value returned by Triangulation::n_used_vertices()).
+   * @return The index of the closest vertex found.
+   *
+   * @author Luca Heltai, 2017
+   */
+  template <int dim, template <int, int> class MeshType, int spacedim>
+  unsigned int
+  find_closest_vertex (const Mapping<dim,spacedim>   &mapping,
+                       const MeshType<dim, spacedim> &mesh,
+                       const Point<spacedim>         &p,
+                       const std::vector<bool>       &marked_vertices = std::vector<bool>());
+
 
   /**
    * Find and return a vector of iterators to active cells that surround a
