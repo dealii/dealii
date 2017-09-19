@@ -154,7 +154,9 @@ public:
 
   /**
    * Transfer from a vector on the global grid to vectors defined on each of
-   * the levels separately, i.a. an @p MGVector.
+   * the levels separately for the active degrees of freedom. In particular,
+   * for a globally refined mesh only the finest level in @p dst is filled as a
+   * plain copy of @p src. All the other level objects are left untouched.
    */
   template <int dim, class InVector, int spacedim>
   void
@@ -302,7 +304,9 @@ public:
 
   /**
    * Transfer from a vector on the global grid to vectors defined on each of
-   * the levels separately, i.a. an @p MGVector.
+   * the levels separately for the active degrees of freedom. In particular, for
+   * a globally refined mesh only the finest level in @p dst is filled as a
+   * plain copy of @p src. All the other level objects are left untouched.
    */
   template <int dim, typename Number2, int spacedim>
   void
