@@ -219,6 +219,11 @@ namespace parallel
      * Update the number_cache variable after mesh creation or refinement.
      */
     virtual void update_number_cache ();
+
+    /**
+     * Store MPI ranks of level ghost owners of this processor on all levels.
+     */
+    void fill_level_ghost_owners ();
   };
 
 } // namespace parallel

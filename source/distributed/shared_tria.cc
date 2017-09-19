@@ -111,10 +111,14 @@ namespace parallel
           // loop over all cells in multigrid hierarchy and mark artificial:
           if (settings & construct_multigrid_hierarchy)
             {
+              true_level_subdomain_ids_of_cells.resize(this->n_levels());
+
               std::function<bool (const typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator &)> predicate
                 = IteratorFilters::LocallyOwnedLevelCell();
               for (unsigned int lvl=0; lvl<this->n_levels(); ++lvl)
                 {
+                  true_level_subdomain_ids_of_cells[lvl].resize(this->n_cells(lvl));
+
                   const std::vector<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
                   level_halo_layer_vector = GridTools::compute_cell_halo_layer_on_level (*this, predicate, lvl);
                   std::set<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
@@ -123,8 +127,11 @@ namespace parallel
                   typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
                   cell = this->begin(lvl),
                   endc = this->end(lvl);
-                  for (; cell != endc; cell++)
+                  for (unsigned int index=0; cell != endc; cell++, index++)
                     {
+                      // Store true level subdomain IDs before setting artificial
+                      true_level_subdomain_ids_of_cells[lvl][index] = cell->level_subdomain_id();
+
                       // for active cells, we must have knowledge of level subdomain ids of
                       // all neighbors to our subdomain, not just neighbors on the same level.
                       // if the cells subdomain id was not set to artitficial above, we will
@@ -228,6 +235,15 @@ namespace parallel
 
 
     template <int dim, int spacedim>
+    const std::vector<types::subdomain_id> &
+    Triangulation<dim,spacedim>::get_true_level_subdomain_ids_of_cells(const unsigned int level) const
+    {
+      return true_level_subdomain_ids_of_cells[level];
+    }
+
+
+
+    template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::execute_coarsening_and_refinement ()
     {
@@ -274,6 +290,18 @@ namespace parallel
       this->update_number_cache ();
     }
 
+
+
+    template <int dim, int spacedim>
+    void
+    Triangulation<dim,spacedim>::
+    update_number_cache ()
+    {
+      parallel::Triangulation<dim,spacedim>::update_number_cache();
+
+      if (settings & construct_multigrid_hierarchy)
+        parallel::Triangulation<dim,spacedim>::fill_level_ghost_owners();
+    }
   }
 }
 
@@ -301,6 +329,15 @@ namespace parallel
       return true_subdomain_ids_of_cells;
     }
 
+
+
+    template <int dim, int spacedim>
+    const std::vector<unsigned int> &
+    Triangulation<dim,spacedim>::get_true_level_subdomain_ids_of_cells(const unsigned int) const
+    {
+      Assert (false, ExcNotImplemented());
+      return true_level_subdomain_ids_of_cells;
+    }
   }
 }
 

@@ -263,12 +263,28 @@ namespace parallel
       const std::vector<types::subdomain_id> &get_true_subdomain_ids_of_cells() const;
 
       /**
+       * Return a vector of length Triangulation::n_cells(level) where each
+       * element stores the level subdomain id of the owner of this cell. The
+       * elements of the vector are obviously the same as the level subdomain ids
+       * for locally owned and ghost cells, but are also correct for
+       * artificial cells that do not store who the owner of the cell is in
+       * their level_subdomain_id field.
+       */
+      const std::vector<types::subdomain_id> &get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
+
+      /**
        * Return allow_artificial_cells , namely true if artificial cells are
        * allowed.
        */
       bool with_artificial_cells() const;
 
     private:
+
+      /**
+       * Override the function to update the number cache so we can fill data
+       * like @p level_ghost_owners.
+       */
+      virtual void update_number_cache ();
 
       /**
        * Settings
@@ -288,16 +304,27 @@ namespace parallel
 
       /**
        * A vector containing subdomain IDs of cells obtained by partitioning
-       * using METIS. In case allow_artificial_cells is false, this vector is
+       * using either zorder, METIS, or a user-defined partitioning scheme.
+       * In case allow_artificial_cells is false, this vector is
        * consistent with IDs stored in cell->subdomain_id() of the
        * triangulation class. When allow_artificial_cells is true, cells which
        * are artificial will have cell->subdomain_id() == numbers::artificial;
+       *
+       * The original partition information is stored to allow using sequential
+       * DoF distribution and partitioning functions with semi-artificial
+       * cells.
+       */
+      std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
+
+      /**
+       * A vector containing level subdomain IDs of cells obtained by partitioning
+       * each level.
        *
        * The original parition information is stored to allow using sequential
        * DoF distribution and partitioning functions with semi-artificial
        * cells.
        */
-      std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
+      std::vector<std::vector<types::subdomain_id>> true_level_subdomain_ids_of_cells;
     };
 
     template <int dim, int spacedim>
@@ -343,6 +370,11 @@ namespace parallel
       const std::vector<types::subdomain_id> &get_true_subdomain_ids_of_cells() const;
 
       /**
+       * A dummy function to return empty vector.
+       */
+      const std::vector<types::subdomain_id> &get_true_level_subdomain_ids_of_cells(const unsigned int level) const;
+
+      /**
        * A dummy function which always returns true.
        */
       bool with_artificial_cells() const;
@@ -352,6 +384,11 @@ namespace parallel
        * A dummy vector.
        */
       std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
+
+      /**
+       * A dummy vector.
+       */
+      std::vector<types::subdomain_id> true_level_subdomain_ids_of_cells;
     };
   }
 
