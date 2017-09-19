@@ -1058,14 +1058,6 @@ void DoFHandler<dim, spacedim>::distribute_mg_dofs ()
 
 
 template <int dim, int spacedim>
-void DoFHandler<dim, spacedim>::reserve_space ()
-{
-  //TODO: move this to distribute_mg_dofs and remove function
-}
-
-
-
-template <int dim, int spacedim>
 void DoFHandler<dim, spacedim>::clear_mg_space ()
 {
   mg_levels.clear ();

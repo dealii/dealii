@@ -1049,11 +1049,6 @@ private:
    */
   void clear_mg_space ();
 
-  /**
-   * Allocate space that will be used by distribute_dofs().
-   */
-  void reserve_space ();
-
   template <int structdim>
   types::global_dof_index get_dof_index (const unsigned int obj_level,
                                          const unsigned int obj_index,
