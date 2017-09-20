@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2014 - 2016 by the deal.II authors
+//    Copyright (C) 2017 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -36,11 +36,12 @@ DEAL_II_NAMESPACE_OPEN
  * The basic interface provides two subscription mechanisms: a **global
  * subscription mechanism** and a **local subscription mechanism**.
  *
- * The global subscription mechanism is such that whenever a class that was
- * derived by ParameterAcceptor is constructed, a static registry
- * (ParameterAcceptor::class_list) in the base class is updated with a pointer
- * to the derived class, and a path in the parameter file. Such registry is
- * traversed upon invocation of the single function
+ * The global subscription mechanism is such that whenever an object of a class
+ * derived from ParameterAcceptor is created, then a pointer to that
+ * object-of-derived-type is registered, together with a path in the parameter
+ * file.
+ *
+ * Such registry is traversed upon invocation of the single function
  * ParameterAcceptor::initialize(file.prm) which in turn calls the method
  * ParameterAcceptor::declare_parameters() for each of the registered classes,
  * reads the file `file.prm` and subsequently calls the method
@@ -60,9 +61,10 @@ DEAL_II_NAMESPACE_OPEN
  * any of the virtual methods of this class.
  *
  * If some post processing is required on the parsed values, the user can
- * attach a signal to ParameterAcceptor::parse_parameters_call_back can be
- * overridden, which is called just after the parse_parameters() function of
- * each class.
+ * attach a signal to ParameterAcceptor::declare_parameters_call_back and
+ * ParameterAcceptor::parse_parameters_call_back, that are called just after
+ * the declare_parameters() and parse_parameters() functions of each derived
+ * class.
  *
  * A typical usage of this class is the following:
  *
@@ -74,8 +76,8 @@ DEAL_II_NAMESPACE_OPEN
  * // which defines the section name where the parameters of MyClass
  * // will be stored.
  *
- * MyClass(std::string name) :
- *   ParameterAcceptor(name)
+ * MyClass() :
+ *   ParameterAcceptor("Some class name")
  * {
  *    add_parameter("A param", member_var);
  * }
@@ -86,7 +88,7 @@ DEAL_II_NAMESPACE_OPEN
  * };
  *
  * int main() {
- *  // Make sure you build your class BEFORE calling
+ *  // Make sure you create your object BEFORE calling
  *  // ParameterAcceptor::initialize()
  *  MyClass class;
  *
@@ -101,11 +103,11 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @code
  * // Again your own class, derived from ParameterAcceptor
+ * //
+ * // If you don't pass anything to the constructor of
+ * // ParameterAcceptor, then the class name is used, "MyClass"
+ * // in this case
  * class MyClass : public ParameterAcceptor {
- *
- * MyClass(std::string name) :
- *   ParameterAcceptor(name)
- *   {}
  *
  *   virtual void declare_parameters(ParameterHandler &prm) {
  *    ...
@@ -117,7 +119,7 @@ DEAL_II_NAMESPACE_OPEN
  * };
  *
  * int main() {
- *  // Make sure you build your class BEFORE calling
+ *  // Make sure you create your object BEFORE calling
  *  // ParameterAcceptor::initialize()
  *  MyClass class;
  *  ParameterAcceptor::initialize("file.prm");
@@ -144,7 +146,7 @@ DEAL_II_NAMESPACE_OPEN
  * end
  * @endcode
  *
- * In the following examles, we propose some use cases with increasing
+ * In the following examples, we propose some use cases with increasing
  * complexities.
  *
  * MyClass is derived from ParameterAcceptor and has a
@@ -152,11 +154,11 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * class MyClass : public ParameterAcceptor
  * {
- *   MyClass (std::string name);
- *   virtual void declare_parameters(ParameterHandler &prm);
- * private:
- *   SomeParsedClass<dim> my_subclass;
- *  ...
+ *    MyClass (std::string name);
+ *    virtual void declare_parameters(ParameterHandler &prm);
+ *  private:
+ *    SomeParsedClass<dim> my_subclass;
+ *    ...
  * };
  *
  * MyClass::MyClass(std::string name)
@@ -167,16 +169,15 @@ DEAL_II_NAMESPACE_OPEN
  *
  * void MyClass::declare_parmeters(ParameterHandler &prm)
  * {
- *  // many add_parameter(...);
+ *   // many add_parameter(...);
  * }
  *
  * ...
  *
  * int main()
  * {
- * MyClass mc("My Class");
- *
- * ParameterAcceptor::initialize("file.prm");
+ *    MyClass mc("My Class");
+ *    ParameterAcceptor::initialize("file.prm");
  * }
  * @endcode
  *
@@ -189,15 +190,14 @@ DEAL_II_NAMESPACE_OPEN
  * ... #all the parameters of MyClass defined in declare_parameters
  * end
  * @endcode
- * Note that the sections are alphabetically sorted.
  *
  * Now suppose that in the main file we need two or more objects of MyClass
  * @code
  * int main()
  * {
- *  MyClass ca("Class A");
- *  MyClass cb("Class B");
- *  ParameterAcceptor::initialize("file.prm");
+ *   MyClass ca("Class A");
+ *   MyClass cb("Class B");
+ *   ParameterAcceptor::initialize("file.prm");
  * }
  * @endcode
  *
@@ -215,7 +215,7 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  * Note that there is only one section "Forcing term", this is because
  * both objects have defined the same name for the section of their
- * SomeParsedClass. There are two strategies to manage this issue. The
+ * SomeParsedClass. There are two strategies to change this behaviour. The
  * first one (not recommended) would be to change the name of the section
  * of SomeParsedClass such that it contains also the string passed to
  * the constructor of MyClass:
@@ -232,9 +232,9 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * int main()
  * {
- *  MyClass ca("/Class A/Class");
- *  MyClass cb("/Class B/Class");
- *  ParameterAcceptor::initialize("file.prm");
+ *   MyClass ca("/Class A/Class");
+ *   MyClass cb("/Class B/Class");
+ *   ParameterAcceptor::initialize("file.prm");
  * }
  * @endcode
  * Now, in the parameter file we can find
@@ -256,21 +256,22 @@ DEAL_II_NAMESPACE_OPEN
  *   end
  * end
  * @endcode
+ *
  * Note the "/" at the begin of the string name. This is interpreted by
- * ParameterAcceptor like the root folder in Unix systems. This means
- * that the sections "Class A" and "Class B" will not be nested under any
- * section. On the other hand, if the string does not begin with a "/"
- * as in the previous cases (and for the ParsedFunction also in this last
- * example) the section will be created **under the current path**, which
- * depends on the previously defined sections/subsections/subsubsections.
- * Indeed, the section "Forcing term" is nested under "Class A" or "Class B".
- * To make things more clear. let's consider the following two examples
+ * ParameterAcceptor like the root folder in Unix systems. The sections "Class
+ * A" and "Class B" will not be nested under any section. On the other hand, if
+ * the string does not begin with a "/" as in the previous cases the section
+ * will be created **under the current path**, which depends on the previously
+ * defined sections/subsections/subsubsections. Indeed, the section "Forcing
+ * term" is nested under "Class A" or "Class B". To make things more clear.
+ * let's consider the following two examples
+ *
  * @code
  * int main()
  * {
- *  MyClass ca("/Class A/Class");
- *  MyClass cb("Class B/Class");
- *  ParameterAcceptor::initialize("file.prm");
+ *   MyClass ca("/Class A/Class");
+ *   MyClass cb("Class B/Class");
+ *   ParameterAcceptor::initialize("file.prm");
  * }
  * @endcode
  * The parameter file will have the following structure
@@ -294,15 +295,14 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  *
  * If instead one of the paths ends with "/" instead of just
- * a name of the class, subsequent classes will be declared
- * under the full path, as if the class name should be interpreted
- * as a directory:
+ * a name of the class, subsequent classes will interpret this as
+ * a full path, interpreting the class name as a directory name:
  * @code
  * int main()
  * {
- *  MyClass ca("/Class A/Class/");
- *  MyClass cb("Class B/Class");
- *  ParameterAcceptor::initialize("file.prm");
+ *   MyClass ca("/Class A/Class/");
+ *   MyClass cb("Class B/Class");
+ *   ParameterAcceptor::initialize("file.prm");
  * }
  * @endcode
  * The parameter file will have the following structure
@@ -327,7 +327,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * As a final remark, in order to allow a proper management of all the
  * sections/subsections, the instantiation of objects and the call to
- * ParameterAcceptor::initialize() **cannot be done in multithread**.
+ * ParameterAcceptor::initialize() cannot be done on multiple, concurrently
+ * running threads.
  *
  * If you pass an empty name, the boost::core::demangle() function is used to
  * fill the section name with a human readable version of the class name
@@ -344,23 +345,30 @@ public:
    * parameters in the given section, otherwise a pretty printed
    * version of the derived class is used.
    */
-  ParameterAcceptor(const std::string section_name="");
+  ParameterAcceptor(const std::string &section_name="");
 
   /**
-   * The destructor sets to zero the pointer relative to this index,
-   * so that it is safe to destroy the mother class.
+   * Destructor.
    */
   virtual ~ParameterAcceptor();
 
   /**
-   * Call declare_all_parameters(), read filename (if it is present as input
-   * parameter) and parse_all_parameters() on the static member prm. If
-   * outfilename is not the emtpy string, then write the content that was read
-   * in to the outfilename. The format of both input and output files are
+   * Call declare_all_parameters(), read the parameters from `filename` (only
+   * if `filename` is a non-empty string), and then call
+   * parse_all_parameters().
+   *
+   * If the parameter `filename` is the empty string, then no attempt to read a
+   * parameter file is done. This may be useful if you are ok with using
+   * default values, and don't want to read external files to use a class
+   * derived from ParameterAcceptor.
+   *
+   * If outfilename is not the emtpy string, then write the content that was
+   * read in to the outfilename. The format of both input and output files are
    * selected using the extensions of the files themselves. This can be either
-   * `prm` or `xml`. If the output format is `prm`, then the
-   * `output_style_for_prm_format` is used to decide wether we write the full
-   * documentation as well, or only the parameters.
+   * `prm` or `xml` for input, and `prm`, `xml`, or `tex/latex` for output. If
+   * the output format is `prm`, then `output_style_for_prm_format` is used to
+   * decide wether we write the full documentation as well, or only the
+   * parameters.
    *
    * If the input file does not exist, a default one with the same name is created
    * for you, and an exception is thrown.
@@ -369,8 +377,8 @@ public:
    * @param output_filename Output file name
    * @param output_style_for_prm_format How to write the output file if format is `prm`
    */
-  static void initialize(const std::string filename,
-                         const std::string output_filename="",
+  static void initialize(const std::string &filename="",
+                         const std::string &output_filename="",
                          const ParameterHandler::OutputStyle output_style_for_prm_format=ParameterHandler::ShortText);
 
   /**
@@ -379,34 +387,35 @@ public:
   static void clear();
 
   /**
-   * Declare parameter entries of the derived class.
+   * Derived classes can use this method to declare their parameters.
+   * ParameterAcceptor::initialize() calls it for each derived class. The
+   * default implementation is empty.
    */
   virtual void declare_parameters(ParameterHandler &prm);
 
   /**
-   * Declare parameter call back. This function is called at the end of
-   * declare_all_parameters, to allow users to process their parameters right
-   * after they have been parsed. The default implementation is empty.
-   *
-   * You can use this function, for example, to create a quadrature
-   * rule after you have read how many quadrature points you wanted
-   * to use from the parameter file.
+   * Declare parameter call back. This signal is triggered right after
+   * declare_parameters() has been called, to allow users to prepare their
+   * variables right after parameters have been decalred. The default
+   * implementation is empty.
    */
   boost::signals2::signal<void()> declare_parameters_call_back;
 
   /**
-   * Parse the (derived class) parameters.
+   * Derived classes can use this method to parse their parameters.
+   * ParameterAcceptor::initialize() calls it for each derived class. The
+   * default implementation is empty.
    */
   virtual void parse_parameters(ParameterHandler &prm);
 
   /**
    * Parse parameter call back. This function is called at the end of
-   * parse_all_parameters, to allow users to process their parameters right
-   * after they have been parsed. The default implementation is empty.
+   * parse_parameters(), to allow users to process their parameters right after
+   * they have been parsed. The default implementation is empty.
    *
-   * You can use this function, for example, to create a quadrature
-   * rule after you have read how many quadrature points you wanted
-   * to use from the parameter file.
+   * You can use this function, for example, to create a quadrature rule after
+   * you have read how many quadrature points you wanted to use from the
+   * parameter file.
    */
   boost::signals2::signal<void()> parse_parameters_call_back;
 
@@ -417,13 +426,6 @@ public:
    */
   static void parse_all_parameters(ParameterHandler &prm=ParameterAcceptor::prm);
 
-
-  /**
-   * Print information to deallog about all stored classes.
-   */
-  static void log_info();
-
-
   /**
    * Initialize the global ParameterHandler with all derived classes
    * parameters.This function enters the subsection returned by
@@ -432,24 +434,24 @@ public:
    */
   static void declare_all_parameters(ParameterHandler &prm=ParameterAcceptor::prm);
 
-
   /**
    * Return the section name of this class. If a name was provided
    * at construction time, then that name is returned, otherwise it
-   * returns the name of this class, pretty printed.
+   * returns the demangled name of this class.
    */
   std::string get_section_name() const;
 
   /**
-   * Travers all registered classes, and figure out what
-   * subsections we need to enter.
+   * Traverse all registered classes, and figure out what subsections we need to
+   * enter.
    */
   std::vector<std::string> get_section_path() const;
 
   /**
    * Add a parameter in the correct path. This method forwards all arguments to
-   * the ParameterHandler::add_parameter() method, after entering the correct
-   * section path.
+   * the prm.add_parameter() method, after entering the correct section path.
+   * By default it uses the ParameterAcceptor::prm variable as
+   * ParameterHandler.
    *
    * See the documentation of ParameterHandler::add_parameter() for more
    * information.
@@ -458,6 +460,7 @@ public:
   void add_parameter(const std::string &entry,
                      ParameterType &parameter,
                      const std::string &documentation = std::string(),
+                     ParameterHandler &prm = ParameterAcceptor::prm,
                      const Patterns::PatternBase &pattern =
                        *Patterns::Tools::Convert<ParameterType>::to_pattern());
 
@@ -468,13 +471,13 @@ public:
 
 private:
   /**
-   * Make sure we enter the right subsection of the global parameter file.
+   * Make sure we enter the right subsection of the given parameter.
    */
   void enter_my_subsection(ParameterHandler &prm);
 
   /**
    * This function undoes what the enter_my_subsection() function did. It only
-   * makes sense if enter_my_subsection() is called before this one.
+   * makes sense if enter_my_subsection() was called on `prm` before this one.
    */
   void leave_my_subsection(ParameterHandler &prm);
 
@@ -488,7 +491,7 @@ private:
   const unsigned int acceptor_id;
 
   /**
-   * Separator between section and subsection.
+   * Separator between sections.
    */
   static const char sep = '/';
 
@@ -498,17 +501,20 @@ protected:
 };
 
 
+
 // Inline and template functions
 template<class ParameterType>
 void ParameterAcceptor::add_parameter(const std::string &entry,
                                       ParameterType &parameter,
                                       const std::string &documentation,
+                                      ParameterHandler &prm,
                                       const Patterns::PatternBase &pattern)
 {
   enter_my_subsection(prm);
   prm.add_parameter(entry, parameter, documentation, pattern);
   leave_my_subsection(prm);
 }
+
 
 
 DEAL_II_NAMESPACE_CLOSE

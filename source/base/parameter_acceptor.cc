@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2015 - 2016 by the deal.II authors
+//    Copyright (C) 2017 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@ std::vector<SmartPointer<ParameterAcceptor> > ParameterAcceptor::class_list;
 // Static parameter handler
 ParameterHandler ParameterAcceptor::prm;
 
-ParameterAcceptor::ParameterAcceptor(const std::string name) :
+ParameterAcceptor::ParameterAcceptor(const std::string &name) :
   acceptor_id(class_list.size()),
   section_name(name)
 {
@@ -49,49 +49,50 @@ std::string ParameterAcceptor::get_section_name() const
 
 
 void
-ParameterAcceptor::initialize(const std::string filename,
-                              const std::string output_filename,
+ParameterAcceptor::initialize(const std::string &filename,
+                              const std::string &output_filename,
                               const ParameterHandler::OutputStyle output_style_for_prm_format)
 {
   declare_all_parameters();
-  // check the extension of input file
-  if (filename.substr(filename.find_last_of(".") + 1) == "prm")
+  if (filename != "")
     {
-      try
+      // check the extension of input file
+      if (filename.substr(filename.find_last_of(".") + 1) == "prm")
         {
-          prm.parse_input(filename);
+          try
+            {
+              prm.parse_input(filename);
+            }
+          catch (dealii::PathSearch::ExcFileNotFound)
+            {
+              std::ofstream out(filename);
+              Assert(out, ExcIO());
+              prm.print_parameters(out, ParameterHandler::Text);
+              out.close();
+              AssertThrow(false, ExcMessage("You specified <"+filename+"> as input "+
+                                            "parameter file, but it does not exist. " +
+                                            "We created it for you."));
+            }
         }
-      catch (dealii::PathSearch::ExcFileNotFound)
+      else if (filename.substr(filename.find_last_of(".") + 1) == "xml")
         {
-          std::ofstream out(filename);
-          Assert(out, ExcIO());
-          prm.print_parameters(out, ParameterHandler::Text);
-          out.close();
-          AssertThrow(false, ExcMessage("You specified "+filename+" as input "+
-                                        "parameter file, but it does not exist. " +
-                                        "We created one for you."));
+          std::ifstream is(filename);
+          if (!is)
+            {
+              std::ofstream out(filename);
+              Assert(out, ExcIO());
+              prm.print_parameters(out, ParameterHandler::XML);
+              out.close();
+              AssertThrow(false, ExcMessage("You specified <"+filename+"> as input "+
+                                            "parameter file, but it does not exist. " +
+                                            "We created it for you."));
+            }
+          prm.parse_input_from_xml(is);
         }
+      else
+        AssertThrow(false, ExcMessage("Invalid extension of parameter file. Please use .prm or .xml"));
     }
-  else if (filename.substr(filename.find_last_of(".") + 1) == "xml")
-    {
-      std::ifstream is(filename);
-      if (!is)
-        {
-          std::ofstream out(filename);
-          Assert(out, ExcIO());
-          prm.print_parameters(out, ParameterHandler::XML);
-          out.close();
-          is.clear();
-          AssertThrow(false, ExcMessage("You specified "+filename+" as input "+
-                                        "parameter file, but it does not exist. " +
-                                        "We created one for you."));
-        }
-      prm.parse_input_from_xml(is);
-    }
-  else
-    AssertThrow(false, ExcMessage("Invalid extension of parameter file. Please use .prm or .xml"));
 
-  parse_all_parameters();
   if (output_filename != "")
     {
       std::ofstream outfile(output_filename.c_str());
@@ -115,6 +116,9 @@ ParameterAcceptor::initialize(const std::string filename,
       else
         AssertThrow(false,ExcNotImplemented());
     }
+
+  // Finally do the parsing.
+  parse_all_parameters();
 }
 
 void
@@ -135,21 +139,6 @@ void ParameterAcceptor::parse_parameters(ParameterHandler &prm)
 {}
 
 
-
-void
-ParameterAcceptor::log_info()
-{
-  deallog.push("ParameterAcceptor");
-  for (unsigned int i=0; i<class_list.size(); ++i)
-    {
-      deallog << "Class " << i << ":";
-      if (class_list[i])
-        deallog << class_list[i]->get_section_name() << std::endl;
-      else
-        deallog << " NULL" << std::endl;
-    }
-  deallog.pop();
-}
 
 void ParameterAcceptor::parse_all_parameters(ParameterHandler &prm)
 {
@@ -180,17 +169,20 @@ std::vector<std::string>
 ParameterAcceptor::get_section_path() const
 {
   Assert(acceptor_id < class_list.size(), ExcInternalError());
-  auto my_section_name = get_section_name();
-  bool is_absolute = my_section_name.front() == sep;
+  const auto my_section_name = get_section_name();
+  const bool is_absolute = (my_section_name.front() == sep);
 
   std::vector<std::string> sections =
     Utilities::split_string_list(my_section_name, sep);
 
+  // Split string list removes trailing empty strings, but not
+  // preceeding ones. Make sure that if we had an absolute path,
+  // we don't store as first section the empty string.
   if (is_absolute)
     sections.erase(sections.begin());
   else
     {
-      // If we want a relative path, we prepend the path of the previous class
+      // If we have a relative path, we prepend the path of the previous class
       // to ours. This is tricky. If the previous class has a path with a
       // trailing /, then the full path is used, else only the path except the
       // last one
@@ -201,7 +193,7 @@ ParameterAcceptor::get_section_path() const
             auto previous_path = class_list[i]->get_section_path();
 
             // See if we need to remove last piece of the path
-            if (previous_path.size() >= 1 && has_trailing == false)
+            if ( (previous_path.size() > 0) && has_trailing == false)
               previous_path.resize(previous_path.size()-1);
 
             sections.insert(sections.begin(), previous_path.begin(), previous_path.end());
@@ -214,7 +206,7 @@ ParameterAcceptor::get_section_path() const
 
 void ParameterAcceptor::enter_my_subsection(ParameterHandler &prm=ParameterAcceptor::prm)
 {
-  std::vector<std::string> sections = get_section_path();
+  const auto sections = get_section_path();
   for (auto sec : sections)
     {
       prm.enter_subsection(sec);
@@ -223,7 +215,7 @@ void ParameterAcceptor::enter_my_subsection(ParameterHandler &prm=ParameterAccep
 
 void ParameterAcceptor::leave_my_subsection(ParameterHandler &prm=ParameterAcceptor::prm)
 {
-  std::vector<std::string> sections = get_section_path();
+  const auto sections = get_section_path();
   for (auto sec : sections)
     {
       prm.leave_subsection();
