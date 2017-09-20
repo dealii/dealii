@@ -2609,18 +2609,16 @@ void GridIn<dim, spacedim>::read_assimp(const std::string &filename,
       // ignore it
       if ( (dim == 2) && mesh->mPrimitiveTypes != aiPrimitiveType_POLYGON)
         {
-          std::stringstream s;
-          s << "Incompatible mesh "  << m
-            << "/" << scene->mNumMeshes;
-          AssertThrow(ignore_unsupported_types, ExcMessage(s.str()));
+          AssertThrow(ignore_unsupported_types,
+                      ExcMessage("Incompatible mesh " + std::to_string(m) +
+                                 "/" + std::to_string(scene->mNumMeshes)));
           continue;
         }
       else if ( (dim == 1) && mesh->mPrimitiveTypes != aiPrimitiveType_LINE)
         {
-          std::stringstream s;
-          s << "Incompatible mesh "  << m
-            << "/" << scene->mNumMeshes;
-          AssertThrow(ignore_unsupported_types, ExcMessage(s.str()));
+          AssertThrow(ignore_unsupported_types,
+                      ExcMessage("Incompatible mesh " + std::to_string(m) +
+                                 "/" + std::to_string(scene->mNumMeshes)));
           continue;
         }
       // Vertices
@@ -2652,12 +2650,12 @@ void GridIn<dim, spacedim>::read_assimp(const std::string &filename,
             }
           else
             {
-              std::stringstream s;
-              s << "Face " << i << " of mesh "
-                << m << " has " << mFaces[i].mNumIndices
-                << " vertices. We expected only "
-                << GeometryInfo<dim>::vertices_per_cell;
-              AssertThrow(ignore_unsupported_types, ExcMessage(s.str()));
+              AssertThrow(ignore_unsupported_types,
+                          ExcMessage("Face " + std::to_string(i) + " of mesh "
+                                     + std::to_string(m) + " has "
+                                     + std::to_string(mFaces[i].mNumIndices)
+                                     + " vertices. We expected only "
+                                     + std::to_string(GeometryInfo<dim>::vertices_per_cell)));
             }
         }
       cells.resize(valid_cell);
