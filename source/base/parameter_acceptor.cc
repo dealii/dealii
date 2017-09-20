@@ -180,35 +180,34 @@ std::vector<std::string>
 ParameterAcceptor::get_section_path() const
 {
   Assert(acceptor_id < class_list.size(), ExcInternalError());
+  auto my_section_name = get_section_name();
+  bool is_absolute = my_section_name.front() == sep;
+
   std::vector<std::string> sections =
-    Utilities::split_string_list(class_list[acceptor_id]->get_section_name(), sep);
-  bool is_absolute = false;
-  if (sections.size() > 1)
+    Utilities::split_string_list(my_section_name, sep);
+
+  if (is_absolute)
+    sections.erase(sections.begin());
+  else
     {
-      // Handle the cases of a leading "/"
-      if (sections[0] == "")
-        {
-          is_absolute = true;
-          sections.erase(sections.begin());
-        }
-    }
-  if (is_absolute == false)
-    {
-      // In all other cases, we scan for earlier classes, and prepend the
-      // first absolute path (in reverse order) we find to ours
+      // If we want a relative path, we prepend the path of the previous class
+      // to ours. This is tricky. If the previous class has a path with a
+      // trailing /, then the full path is used, else only the path except the
+      // last one
       for (int i=acceptor_id-1; i>=0; --i)
         if (class_list[i] != NULL)
-          if (class_list[i]->get_section_name().front() == sep)
-            {
-              bool has_trailing = class_list[i]->get_section_name().back() == sep;
-              // Absolute path found
-              auto secs = Utilities::split_string_list(class_list[i]->get_section_name(), sep);
-              Assert(secs[0] == "", ExcInternalError());
-              // Insert all sections except first and last
-              sections.insert(sections.begin(), secs.begin()+1, secs.end()-(has_trailing ? 0 : 1));
-              // exit from for cycle
-              break;
-            }
+          {
+            bool has_trailing  = class_list[i]->get_section_name().back() == sep;
+            auto previous_path = class_list[i]->get_section_path();
+
+            // See if we need to remove last piece of the path
+            if (previous_path.size() >= 1 && has_trailing == false)
+              previous_path.resize(previous_path.size()-1);
+
+            sections.insert(sections.begin(), previous_path.begin(), previous_path.end());
+            // Exit the for cycle
+            break;
+          }
     }
   return sections;
 }

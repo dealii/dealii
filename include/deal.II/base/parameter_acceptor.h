@@ -500,10 +500,10 @@ protected:
 
 // Inline and template functions
 template<class ParameterType>
-void ParameterAcceptor::add_parameter(const std::string& entry,
-                                      ParameterType& parameter,
-                                      const std::string& documentation,
-                                      const Patterns::PatternBase& pattern)
+void ParameterAcceptor::add_parameter(const std::string &entry,
+                                      ParameterType &parameter,
+                                      const std::string &documentation,
+                                      const Patterns::PatternBase &pattern)
 {
   enter_my_subsection(prm);
   prm.add_parameter(entry, parameter, documentation, pattern);
