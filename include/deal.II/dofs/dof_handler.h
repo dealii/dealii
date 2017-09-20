@@ -1314,7 +1314,13 @@ void DoFHandler<dim,spacedim>::save (Archive &ar,
   for (unsigned int i = 0; i < levels.size(); ++i)
     ar &levels[i];
 
-  ar &faces;
+  // boost dereferences a nullptr when serializing a nullptr
+  // at least up to 1.65.1. This causes problems with clang-5.
+  // Therefore, work around it.
+  bool faces_is_nullptr = (faces.get()==nullptr);
+  ar &faces_is_nullptr;
+  if (!faces_is_nullptr)
+    ar &faces;
 
   // write out the number of triangulation cells and later check during
   // loading that this number is indeed correct; same with something that
@@ -1357,7 +1363,11 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
       levels[i] = std::move(level);
     }
 
-  ar &faces;
+  //Workaround for nullptr, see in save().
+  bool faces_is_nullptr = true;
+  ar &faces_is_nullptr;
+  if (!faces_is_nullptr)
+    ar &faces;
 
   // these are the checks that correspond to the last block in the save()
   // function
