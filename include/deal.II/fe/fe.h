@@ -1975,9 +1975,13 @@ public:
   /**
    * Return the equivalent to get_generalized_support_points(), except
    * for faces.
+   *
+   * @deprecated In general, it is not possible to associate a unique
+   * subset of generalized support points describing degrees of freedom for
+   * a given face. Don't use this function
    */
   const std::vector<Point<dim-1> > &
-  get_generalized_face_support_points () const;
+  get_generalized_face_support_points () const DEAL_II_DEPRECATED;
 
   /**
    * Return whether a finite element has defined generalized support points on
@@ -1986,9 +1990,13 @@ public:
    *
    * For more information, see the documentation for the has_support_points()
    * function.
+   *
+   * @deprecated In general, it is not possible to associate a unique
+   * subset of generalized support points describing degrees of freedom for
+   * a given face. Don't use this function
    */
   bool
-  has_generalized_face_support_points () const;
+  has_generalized_face_support_points () const DEAL_II_DEPRECATED;
 
   /**
    * For a given degree of freedom, return whether it is logically associated
@@ -2038,10 +2046,11 @@ public:
 
 
   /**
-   * Given the values of a function $f(\mathbf x)$ at the (generalized) support
-   * points, this function then computes what the nodal values of the element
-   * are, i.e., $\Psi_i[f]$, where $\Psi_i$ are the node functionals of
-   * the element (see also @ref GlossNodes "Node values or node functionals").
+   * Given the values of a function $f(\mathbf x)$ at the (generalized)
+   * support points of the reference cell, this function then computes what
+   * the nodal values of the element are, i.e., $\Psi_i[f]$, where $\Psi_i$
+   * are the node functionals of the element
+   * (see also @ref GlossNodes "Node values or node functionals").
    * The values $\Psi_i[f]$ are then the expansion coefficients
    * for the shape functions of the finite element function that
    * <i>interpolates</i> the given function $f(x)$, i.e.,
@@ -2097,6 +2106,11 @@ public:
    *   current element.
    * @param[out] nodal_values An array of size @p dofs_per_cell that contains
    *   the node functionals of the element applied to the given function.
+   *
+   * @note It is safe to call this function for (transformed) values on the
+   * real cell only for elements with trivial MappingType. For all other
+   * elements (for example for H(curl), or H(div) conforming elements)
+   * vector values have to be transformed to the reference cell first.
    *
    * @note Given what the function is supposed to do, the function clearly
    * can only work for elements that actually implement (generalized) support

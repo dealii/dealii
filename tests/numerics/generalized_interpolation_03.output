@@ -1,0 +1,12 @@
+DEAL::dim 2 FE_RaviartThomas<2>(0)
+DEAL::Check projection property: 0.00000
+DEAL::dim 2 FE_RaviartThomas<2>(1)
+DEAL::Check projection property: 0.00000
+DEAL::dim 2 FE_RaviartThomas<2>(1)
+DEAL::Check projection property: 0.00000
+DEAL::dim 3 FE_RaviartThomas<3>(0)
+DEAL::Check projection property: 0.00000
+DEAL::dim 3 FE_RaviartThomas<3>(1)
+DEAL::Check projection property: 0.00000
+DEAL::dim 3 FE_RaviartThomas<3>(1)
+DEAL::Check projection property: 0.00000

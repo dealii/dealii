@@ -258,3 +258,21 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #endif
     \}
 }
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; number : REAL_SCALARS)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace FETools
+    \{
+
+    template
+    void
+    convert_generalized_support_point_values_to_dof_values<deal_II_dimension, deal_II_space_dimension, number> (
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+        const std::vector<Vector<number> > &,
+        std::vector<number>                &);
+
+    \}
+#endif
+}
