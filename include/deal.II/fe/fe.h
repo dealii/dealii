@@ -779,7 +779,7 @@ public:
    * current object.
    */
   std::pair<std::unique_ptr<FiniteElement<dim, spacedim> >, unsigned int>
-  operator^ (unsigned int multiplicity) const;
+  operator^ (const unsigned int multiplicity) const;
 
   /**
    * A sort of virtual copy constructor, this function returns a copy of

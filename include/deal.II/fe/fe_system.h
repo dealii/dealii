@@ -24,9 +24,11 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_tools.h>
+
 #include <vector>
 #include <memory>
 #include <utility>
+#include <type_traits>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -446,12 +448,30 @@ public:
    * elements. The temporary is destroyed again at the end of the code that
    * corresponds to this line, but this does not matter because FESystem
    * creates its own copy of the FE_Q object.
+   *
+   * As a shortcut, this constructor also allows calling
+   * @code
+   *   FESystem<dim> fe (FE_Q<dim>(2)^dim, FE_Q<dim>(1));
+   * @endcode
+   * instead of the more explicit
+   * @code
+   *   FESystem<dim> fe (FE_Q<dim>(2)^dim, FE_Q<dim>(1)^1);
+   * @endcode
+   * In other words, if no multiplicity for an element is explicitly specified
+   * via the exponentiation operation, then it is assumed to be one (as one
+   * would have expected).
    */
-  template <class... FESystems,
-            typename = typename std::enable_if<all_same_as<typename std::decay<FESystems>::type...,
-                                                           std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-                                                               unsigned int>>::value>::type>
-  FESystem (FESystems&& ... fe_systems);
+  template <class... FEPairs,
+            typename = typename enable_if_all<
+              (std::is_same<typename std::decay<FEPairs>::type,
+                            std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>::value
+               ||
+               std::is_base_of<FiniteElement<dim, spacedim>,
+                               typename std::decay<FEPairs>::type>::value)
+              ...
+              >::type
+            >
+  FESystem (FEPairs &&... fe_pairs);
 
   /**
    * Same as above allowing the following syntax:
@@ -1147,16 +1167,42 @@ namespace
       return fe_system.second > 0;
     });
   }
+
+
+
+  template <int dim, int spacedim>
+  std::pair<std::unique_ptr<FiniteElement<dim, spacedim> >, unsigned int>
+  promote_to_fe_pair (const FiniteElement<dim,spacedim> &fe)
+  {
+    return std::make_pair<std::unique_ptr<FiniteElement<dim, spacedim> >,
+           unsigned int> (std::move(fe.clone()), 1u);
+  }
+
+
+
+  template <int dim, int spacedim>
+  auto
+  promote_to_fe_pair (std::pair<std::unique_ptr<FiniteElement<dim, spacedim> >, unsigned int> &&p)
+  -> decltype(std::forward<std::pair<std::unique_ptr<FiniteElement<dim, spacedim> >, unsigned int> >(p))
+  {
+    return std::forward<std::pair<std::unique_ptr<FiniteElement<dim, spacedim> >, unsigned int> >(p);
+  }
 }
+
+
 
 // We are just forwarding/delegating to the constructor taking a std::initializer_list.
 // If we decide to remove the deprecated constructors, we might just use the variadic
 // constructor with a suitable static_assert instead of the std::enable_if.
 template<int dim, int spacedim>
-template <class... FESystems, typename>
-FESystem<dim,spacedim>::FESystem (FESystems &&... fe_systems)
-  : FESystem<dim, spacedim> ({std::forward<FESystems>(fe_systems)...})
+template <class... FEPairs,
+          typename>
+FESystem<dim,spacedim>::FESystem (FEPairs &&... fe_pairs)
+  :
+  FESystem<dim, spacedim> ({promote_to_fe_pair<dim,spacedim>(std::forward<FEPairs>(fe_pairs))...})
 {}
+
+
 
 template <int dim, int spacedim>
 FESystem<dim,spacedim>::FESystem

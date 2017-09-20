@@ -1,0 +1,21 @@
+
+DEAL::FESystem<2>[FE_Q<2>(1)^2-FE_Q<2>(1)]
+DEAL::components: 3
+DEAL::blocks: 3
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 2
+DEAL::FESystem<2>[FE_Q<2>(1)^2-FE_Q<2>(1)]
+DEAL::components: 3
+DEAL::blocks: 3
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 2
+DEAL::FESystem<2>[FESystem<2>[FE_Q<2>(1)^2]-FE_Q<2>(1)]
+DEAL::components: 3
+DEAL::blocks: 2
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 2
+DEAL::FESystem<2>[FESystem<2>[FE_Q<2>(1)^2]-FE_Q<2>(1)]
+DEAL::components: 3
+DEAL::blocks: 2
+DEAL::conforms H1: 1
+DEAL::n_base_elements: 2
