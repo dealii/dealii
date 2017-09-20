@@ -1,0 +1,10 @@
+
+DEAL:parameters:Test<1>::A point: 1.0
+DEAL:parameters:Test<2>::A point: 1.0, 2.0
+DEAL:parameters:Test<3>::A point: 1.0, 2.0, 3.0
+DEAL::My type: Test<1>
+DEAL::p: 1.00000
+DEAL::My type: Test<2>
+DEAL::p: 1.00000 2.00000
+DEAL::My type: Test<3>
+DEAL::p: 1.00000 2.00000 3.00000
