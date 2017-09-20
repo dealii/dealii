@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Same as 'tensor_product_matrix_06.cc' unless that we replaced the scalar data
+// Same as 'tensor_product_matrix_06.cc' except that we replaced the scalar data
 // type 'float' by the vectorized data type 'VectorizedArray<float>'.
 // Note, all lanes compute the same.
 
@@ -64,11 +64,10 @@ void do_test()
     w1[i] = (2*i+1)%23 ;
 
   auto convert_to_vectorized =
-    [](const Vector<float> &in
-       , AlignedVector<VectorizedArray<float> > &out)
+    [](const Vector<float> &in, AlignedVector<VectorizedArray<float> > &out)
   {
     std::transform (in.begin(), in.end(), out.begin(),
-                    [](const auto &val)
+                    [](const float &val)
     {
       return make_vectorized_array(val);
     }) ;
@@ -82,11 +81,10 @@ void do_test()
   for (unsigned int i=0; i<macro_size; ++i)
     offsets[i] = v1.size() * i ;
   auto subtract_and_assign =
-    [](AlignedVector<VectorizedArray<float> > &lhs
-       , const AlignedVector<VectorizedArray<float> > &rhs)
+    [](AlignedVector<VectorizedArray<float> > &lhs, const AlignedVector<VectorizedArray<float> > &rhs)
   {
     std::transform (lhs.begin(), lhs.end(), rhs.begin(), lhs.begin(),
-                    [](const auto lval, const auto rval)
+                    [](const VectorizedArray<float> lval, const VectorizedArray<float> rval)
     {
       return lval - rval;
     }) ;

@@ -69,7 +69,7 @@ void do_test(const unsigned int size)
                              + laplace(i,ii)*mass(j,jj)*mass(k,kk);
   full.vmult(v3, v1);
   v3 -= v2;
-  deallog << "Verifiction of vmult: " << v3.linfty_norm() << std::endl;
+  deallog << "Verification of vmult: " << v3.linfty_norm() << std::endl;
 
   full.gauss_jordan();
   full.vmult(v3, v1);

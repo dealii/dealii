@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Similar to tensor_product_matrix_02.cc unless testing with
+// Similar to tensor_product_matrix_02.cc except testing with
 // different mass and laplace matrices for each tensor direction, respectively.
 
 #include "../tests.h"
@@ -87,7 +87,7 @@ void do_test()
                       + mass[2](i,ii) * (laplace[1](j,jj)*mass[0](k,kk) + mass[1](j,jj)*laplace[0](k,kk));
   full.vmult(v3, v1);
   v3 -= v2;
-  deallog << "Verifiction of vmult: " << v3.linfty_norm() << std::endl;
+  deallog << "Verification of vmult: " << v3.linfty_norm() << std::endl;
 
   full.gauss_jordan();
   full.vmult(v3, v1);

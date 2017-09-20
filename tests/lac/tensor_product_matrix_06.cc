@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Similar to tensor_product_matrix_03.cc unless testing with
+// Similar to tensor_product_matrix_03.cc except testing with
 // different mass and laplace matrices for each tensor direction, respectively.
 
 #include "../tests.h"
@@ -93,7 +93,7 @@ void do_test()
   v3 -= v2;
 
   norm = v3.linfty_norm();
-  deallog << "Verifiction of vmult: " << (norm < 1e-4 ? 0. : norm) << std::endl;
+  deallog << "Verification of vmult: " << (norm < 1e-4 ? 0. : norm) << std::endl;
 
   full.gauss_jordan();
   full.vmult(v3, v1);

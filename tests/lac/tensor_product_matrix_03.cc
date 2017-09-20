@@ -75,7 +75,7 @@ void do_test()
   v3 -= v2;
 
   norm = v3.linfty_norm();
-  deallog << "Verifiction of vmult: " << (norm < 1e-4 ? 0. : norm) << std::endl;
+  deallog << "Verification of vmult: " << (norm < 1e-4 ? 0. : norm) << std::endl;
 
   full.gauss_jordan();
   full.vmult(v3, v1);

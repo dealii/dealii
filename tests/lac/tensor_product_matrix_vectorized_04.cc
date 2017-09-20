@@ -58,11 +58,10 @@ void do_test(const unsigned int size)
     w1[i] = (2*i+1)%23 ;
 
   auto convert_to_vectorized =
-    [](const Vector<double> &in
-       , AlignedVector<VectorizedArray<double> > &out)
+    [](const Vector<double> &in, AlignedVector<VectorizedArray<double> > &out)
   {
     std::transform (in.begin(), in.end(), out.begin(),
-                    [](const auto &val)
+                    [](const double &val)
     {
       return make_vectorized_array(val);
     }) ;
@@ -76,11 +75,10 @@ void do_test(const unsigned int size)
   for (unsigned int i=0; i<macro_size; ++i)
     offsets[i] = v1.size() * i ;
   auto subtract_and_assign =
-    [](AlignedVector<VectorizedArray<double> > &lhs
-       , const AlignedVector<VectorizedArray<double> > &rhs)
+    [](AlignedVector<VectorizedArray<double> > &lhs, const AlignedVector<VectorizedArray<double> > &rhs)
   {
     std::transform (lhs.begin(), lhs.end(), rhs.begin(), lhs.begin(),
-                    [](const auto lval, const auto rval)
+                    [](const VectorizedArray<double> lval, const VectorizedArray<double> rval)
     {
       return lval - rval;
     }) ;
