@@ -344,13 +344,9 @@ void Step4<dim>::assemble_system ()
   // dimensions, but a hexahedron in 3D. In fact, the
   // <code>active_cell_iterator</code> data type is something different,
   // depending on the dimension we are in, but to the outside world they look
-  // alike and you will probably never see a difference although the classes
-  // that this typedef stands for are in fact completely unrelated:
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
-
-  for (; cell!=endc; ++cell)
+  // alike and you will probably never see a difference. In any case, the real
+  // type is hidden by using `auto`:
+  for (const auto &cell: dof_handler.active_cell_iterators())
     {
       fe_values.reinit (cell);
       cell_matrix = 0;

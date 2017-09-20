@@ -143,46 +143,61 @@ void second_grid ()
   // refine the grid in five steps towards the inner circle of the domain:
   for (unsigned int step=0; step<5; ++step)
     {
-      // Next, we need an iterator that points to a cell and which we will
-      // move over all active cells one by one. In a sense, you can think of a
-      // triangulation as a collection of cells. If it was an array, you would
-      // just get a pointer that you move from one array element to the next. In
-      // triangulations, cells aren't stored as an array, so simple pointers
-      // do not work, but one can generalize pointers to iterators (see <a
-      // href="http://en.wikipedia.org/wiki/Iterator#C.2B.2B">this wikipedia
-      // link</a> for more information). We will then get an iterator to the
-      // first cell and iterate over all of the cells until we hit the last
-      // one.
+      // Next, we need to loop over the active cells of the triangulation. You
+      // can think of a triangulation as a collection of cells. If it was an
+      // an array, you would just get a pointer that you increment from one
+      // element to the next using the operator `++`. The cells of a
+      // triangulation aren't stored as a simple array, but the concept of an
+      // <i>iterator</i> generalizes how pointers work to arbitrary collections
+      // of objects (see <a href=
+      // "http://en.wikipedia.org/wiki/Iterator#C.2B.2B">wikipedia</a> for more
+      // information). Typically, any container type in C++ will return an
+      // iterator pointing to the start of the collection with a method called
+      // `begin`, and an iterator point to 1 past the end of the collection with
+      // a method called `end`. We can increment an iterator `it` with the
+      // operator `++it`, dereference it to get the underlying data with `*it`,
+      // and check to see if we're done by comparing `it != collection.end()`.
       //
       // The second important piece is that we only need the active cells.
       // Active cells are those that are not further refined, and the only
-      // ones that can be marked for further refinement, obviously. deal.II
-      // provides iterator categories that allow us to iterate over <i>all</i>
-      // cells (including the parent cells of active ones) or only over the
-      // active cells. Because we want the latter, we need to choose
-      // Triangulation::active_cell_iterator as data type.
+      // ones that can be marked for further refinement. deal.II provides
+      // iterator categories that allow us to iterate over <i>all</i> cells
+      // (including the parent cells of active ones) or only over the active
+      // cells. Because we want the latter, we need to call the method
+      // Triangulation::active_cell_iterators().
       //
-      // Finally, by convention, we almost always use the names
-      // <code>cell</code> and <code>endc</code> for the iterator pointing to
-      // the present cell and to the "one-past-the-end" iterator. This is, in
-      // a sense a misnomer, because the object is not really a "cell": it is
-      // an iterator/pointer to a cell. We should really have started to call
-      // these objects <code>cell_iterator</code> when deal.II started in
-      // 1998, but it is what it is.
+      // Putting all of this together, we can loop over all the active cells of
+      // a triangulation with
+      // @code{.cpp}
+      //     for (auto it = triangulation.active_cell_iterators().begin();
+      //          it != triangulation.active_cell_iterators().end();
+      //          ++it)
+      //       {
+      //         auto cell = *it;
+      //         // Then a miracle occurs...
+      //       }
+      // @endcode
+      // In the initializer of this loop, we've used the `auto` keyword for the
+      // type of the iterator `it`. The `auto` keyword means that the type of
+      // the object being declared will be inferred from the context. This
+      // keyword is useful when the actual type names are long or possibly even
+      // redundant. If you're unsure of what the type is and want to look up
+      // what operations the result supports, you can go to the documentation
+      // for the method Triangulation::active_cell_iterators(). In this case,
+      // the type of `it` is `Triangulation::active_cell_iterator`.
       //
-      // After declaring the iterator variable, the loop over all cells is
-      // then rather trivial, and looks like any loop involving pointers
-      // instead of iterators:
-      Triangulation<2>::active_cell_iterator cell = triangulation.begin_active();
-      Triangulation<2>::active_cell_iterator endc = triangulation.end();
-      for (; cell!=endc; ++cell)
+      // While the `auto` keyword can save us from having to type out long names
+      // of data types, we still have to type a lot of redundant declarations
+      // about the start and end iterator and how to increment it. Instead of
+      // doing that, we'll use
+      // <a href="http://en.cppreference.com/w/cpp/language/range-for">range-
+      // based for loops</a>, which wrap up all of the syntax shown above into a
+      // much shorter form:
+      for (auto cell: triangulation.active_cell_iterators())
         {
-          // @note Writing a loop like this requires a lot of typing, but it
-          // is the only way of doing it in C++98 and C++03. However, if you
-          // have a C++11-compliant compiler, you can also use the C++11
-          // range-based for loop style that requires significantly less
-          // typing. Take a look at @ref CPP11 "the deal.II C++11 page" to see
-          // how this works.
+          // @note See @ref Iterators for more information about the iterator
+          // classes used in deal.II, and @ref CPP11 for more information about
+          // range-based for loops and the `auto` keyword.
           //
           // Next, we want to loop over all vertices of the cells. Since we are
           // in 2d, we know that each cell has exactly four vertices. However,
