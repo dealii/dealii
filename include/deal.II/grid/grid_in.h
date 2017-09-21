@@ -33,15 +33,16 @@ template <int dim> struct CellData;
 /**
  * This class implements an input mechanism for grid data. It allows to read a
  * grid structure into a triangulation object. At present, UCD (unstructured
- * cell data), DB Mesh, XDA, Gmsh, Tecplot, NetCDF, UNV, VTK, and Cubit are
- * supported as input format for grid data. Any numerical data other than
+ * cell data), DB Mesh, XDA, Gmsh, Tecplot, NetCDF, UNV, VTK, ASSIMP, and Cubit
+ * are supported as input format for grid data. Any numerical data other than
  * geometric (vertex locations) and topological (how vertices form cells,
  * faces, and edges) information is ignored, but the readers for the various
  * formats generally do read information that associates material ids or
  * boundary ids to cells or faces (see
  * @ref GlossMaterialId "this"
  * and
- * @ref GlossBoundaryIndicator "this"
+ * @ref
+ * GlossBoundaryIndicator "this"
  * glossary entry for more information).
  *
  * @note Since deal.II only supports line, quadrilateral and hexahedral
@@ -325,7 +326,9 @@ public:
     /// Use read_tecplot()
     tecplot,
     /// Use read_vtk()
-    vtk
+    vtk,
+    /// Use read_assimp()
+    assimp,
   };
 
   /**
@@ -454,6 +457,46 @@ public:
    * in the absence of any tecplot installation.
    */
   void read_tecplot (std::istream &in);
+
+  /**
+   * Read in a file supported by Assimp, and generate a Triangulation
+   * out of it.  If you specify a @p mesh_index, only the mesh with
+   * the given index will be extracted, otherwise all meshes which are
+   * present in the file will be used to generate the Triangulation.
+   *
+   * This function can only be used to read two-dimensional meshes (possibly
+   * embedded in three dimensions). This is the standard for graphical software
+   * such as blender, or 3D studio max, and that is what the original Assimp
+   * library was built for. We "bend" it to deal.II to support complex
+   * co-dimension one meshes and complex two-dimensional meshes.
+   *
+   * If @p remove_duplicates is set to true (the default), then
+   * duplicated vertices will be removed if their distance is lower
+   * than @p tol.
+   *
+   * Only the elements compatible with the given dimension and spacedimension
+   * will be extracted from the mesh, and only those elements that are
+   * compatible with deal.II are supported. If you set
+   * `ignore_unsupported_element_types`, all the other element types are simply
+   * ignored by this algorithm. If your mesh contains a mixture of triangles
+   * and quadrilaterals, for example, only the quadrilaterals will be
+   * extracted. The resulting mesh (as represented in the Triangulation object)
+   * may not make any sense if you are mixing compatible and incompatible
+   * element types. If `ignore_unsupported_element_types` is set to `false`,
+   * then an exception is thrown when an unsupporte type is encountered.
+   *
+   * @param filename The file to read from
+   * @param mesh_index Index of the mesh within the file
+   * @param remove_duplicates Remove duplicated vertices
+   * @param tol Tolerance to use when removing vertices
+   * @param ignore_unsupported_element_types Don't throw exceptions if we
+   *        encounter unsupported types during parsing
+   */
+  void read_assimp(const std::string &filename,
+                   const unsigned int mesh_index=numbers::invalid_unsigned_int,
+                   const bool remove_duplicates=true,
+                   const double tol = 1e-12,
+                   const bool ignore_unsupported_element_types = true);
 
   /**
    * Return the standard suffix for a file in this format.
@@ -649,7 +692,6 @@ void
 GridIn<3>::debug_output_grid (const std::vector<CellData<3> > &cells,
                               const std::vector<Point<3> >    &vertices,
                               std::ostream                    &out);
-
 #endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
