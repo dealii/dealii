@@ -21,6 +21,7 @@ SET(_unity_include_src
   grid_in.cc
   grid_out.cc
   grid_refinement.cc
+  grid_tools_cache.cc
   intergrid_map.cc
   manifold.cc
   manifold_lib.cc
@@ -55,6 +56,7 @@ SET(_inst
   grid_out.inst.in
   grid_refinement.inst.in
   grid_tools.inst.in
+  grid_tools_cache.inst.in
   intergrid_map.inst.in
   manifold.inst.in
   manifold_lib.inst.in
