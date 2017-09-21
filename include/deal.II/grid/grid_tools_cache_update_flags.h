@@ -51,12 +51,10 @@ namespace GridTools
      */
     update_vertex_to_cell_centers_directions = update_vertex_to_cell_map | 0x0002,
 
-#ifdef DEAL_II_WITH_NANOFLANN
     /**
      * Update a KDTree object, initialized with the vertices of the Triangulation.
      */
     update_vertex_kdtree = 0x04,
-#endif
 
     /**
      * Update all objects.

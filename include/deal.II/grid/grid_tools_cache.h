@@ -78,6 +78,9 @@ namespace GridTools
     Cache (const Triangulation<dim,spacedim> &tria,
            const Mapping<dim,spacedim> &mapping=StaticMappingQ1<dim,spacedim>::mapping);
 
+    /**
+     * Destructor.
+     */
     ~Cache();
 
     /**
