@@ -609,11 +609,37 @@ namespace internal
           vertex_dof_identities (dof_handler.get_fe_collection().size(),
                                  dof_handler.get_fe_collection().size());
 
+          // first identify vertices we want to exclude from working on.
+          // specifically, these are the vertices of artificial and ghost
+          // cells because at the time when we get here, we do not yet
+          // know DoF indices on ghost cells (and we will never know
+          // them for artificial cells). this is, at least the case for
+          // parallel::distributed::Triangulations.
+          //
+          // this means that we will not unify DoF indices between locally
+          // owned cells and ghost cells, and this is different from what
+          // we would do if the triangulation were not split into subdomains.
+          // on the other hand, DoF unification is only an optimization: we
+          // will still record these identities when we compute hanging
+          // node constraints; we just end up with more DoFs than we would
+          // if we unified DoF indices also between locally owned and ghost
+          // cells, but we end up with a simpler algorithm in return.
+          std::vector<bool> include_vertex = dof_handler.get_triangulation().get_used_vertices();
+          if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>
+              (&dof_handler.get_triangulation())
+              != nullptr)
+            for (const auto &cell : dof_handler.active_cell_iterators())
+              if (! cell->is_locally_owned())
+                for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+                  include_vertex[cell->vertex_index(v)] = false;
+
           // loop over all vertices and see which one we need to work
           // on
           for (unsigned int vertex_index=0; vertex_index<dof_handler.get_triangulation().n_vertices();
                ++vertex_index)
-            if (dof_handler.get_triangulation().get_used_vertices()[vertex_index] == true)
+            if ((dof_handler.get_triangulation().get_used_vertices()[vertex_index] == true)
+                &&
+                (include_vertex[vertex_index] == true))
               {
                 const unsigned int n_active_fe_indices
                   = dealii::internal::DoFAccessor::Implementation::
@@ -707,6 +733,28 @@ namespace internal
           std::vector<bool> user_flags;
           dof_handler.get_triangulation().save_user_flags_line(user_flags);
           const_cast<dealii::Triangulation<dim,spacedim> &>(dof_handler.get_triangulation()).clear_user_flags_line ();
+
+          // exclude lines that bound cells we don't locally own, because
+          // we do not have information about their dofs at this point.
+          // this is, at least the case for parallel::distributed::Triangulations.
+          //
+          // this means that we will not unify DoF indices between locally
+          // owned cells and ghost cells, and this is different from what
+          // we would do if the triangulation were not split into subdomains.
+          // on the other hand, DoF unification is only an optimization: we
+          // will still record these identities when we compute hanging
+          // node constraints; we just end up with more DoFs than we would
+          // if we unified DoF indices also between locally owned and ghost
+          // cells, but we end up with a simpler algorithm in return.
+          if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>
+              (&dof_handler.get_triangulation())
+              != nullptr)
+            for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
+                 cell=dof_handler.begin_active();
+                 cell!=dof_handler.end(); ++cell)
+              if (cell->is_locally_owned() == false)
+                for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
+                  cell->line(l)->set_user_flag();
 
           // An implementation of the algorithm described in the hp paper, including
           // the modification mentioned later in the "complications in 3-d" subsections
@@ -921,6 +969,29 @@ namespace internal
           std::vector<bool> user_flags;
           dof_handler.get_triangulation().save_user_flags_quad(user_flags);
           const_cast<dealii::Triangulation<dim,spacedim> &>(dof_handler.get_triangulation()).clear_user_flags_quad ();
+
+          // exclude quads that bound cells we don't locally own, because
+          // we do not have information about their dofs at this point.
+          // this is, at least the case for parallel::distributed::Triangulations.
+          //
+          // this means that we will not unify DoF indices between locally
+          // owned cells and ghost cells, and this is different from what
+          // we would do if the triangulation were not split into subdomains.
+          // on the other hand, DoF unification is only an optimization: we
+          // will still record these identities when we compute hanging
+          // node constraints; we just end up with more DoFs than we would
+          // if we unified DoF indices also between locally owned and ghost
+          // cells, but we end up with a simpler algorithm in return.
+          if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>
+              (&dof_handler.get_triangulation())
+              != nullptr)
+            for (typename hp::DoFHandler<dim,spacedim>::active_cell_iterator
+                 cell=dof_handler.begin_active();
+                 cell!=dof_handler.end(); ++cell)
+              if (cell->is_locally_owned() == false)
+                for (unsigned int q=0; q<GeometryInfo<dim>::quads_per_cell; ++q)
+                  cell->quad(q)->set_user_flag();
+
 
           // An implementation of the algorithm described in the hp
           // paper, including the modification mentioned later in the
