@@ -90,8 +90,11 @@ void do_test(const unsigned int size)
     }) ;
   } ;
 
-  mat.vmult(v2, v1);
-  mat.apply_inverse(v3, v2);
+  const ArrayView<VectorizedArray<double> > view1(v1.begin(), v1.size()) ;
+  const ArrayView<VectorizedArray<double> > view2(v2.begin(), v2.size()) ;
+  const ArrayView<VectorizedArray<double> > view3(v3.begin(), v3.size()) ;
+  mat.vmult(view2, view1);
+  mat.apply_inverse(view3, view2);
   subtract_and_assign (v3, v1) ;
   vectorized_transpose_and_store (false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin()) ;
   deallog << "Verification of vmult and inverse: " << vec_flat.linfty_norm() << std::endl;
@@ -121,7 +124,7 @@ void do_test(const unsigned int size)
 
   full.gauss_jordan();
   full.vmult(w2, w1);
-  mat.apply_inverse(v2, v1);
+  mat.apply_inverse(view2, view1);
   convert_to_vectorized (w2, v3) ;
   subtract_and_assign (v3, v2) ;
   vectorized_transpose_and_store (false, mat.m(), v3.begin(), offsets.data(), vec_flat.begin()) ;

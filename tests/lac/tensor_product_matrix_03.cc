@@ -48,8 +48,11 @@ void do_test()
   for (unsigned int i=0; i<v1.size(); ++i)
     v1(i) = (2*i+1)%23;
 
-  mat.vmult(v2, v1);
-  mat.apply_inverse(v3, v2);
+  const ArrayView<float> view1(v1.begin(), v1.size()) ;
+  const ArrayView<float> view2(v2.begin(), v2.size()) ;
+  const ArrayView<float> view3(v3.begin(), v3.size()) ;
+  mat.vmult(view2, view1);
+  mat.apply_inverse(view3, view2);
   v3 -= v1;
   // add tolerance to account for different BLAS/LAPACK combinations. Float is
   // too inaccurate so numdiff does not work...
@@ -79,7 +82,7 @@ void do_test()
 
   full.gauss_jordan();
   full.vmult(v3, v1);
-  mat.apply_inverse(v2, v1);
+  mat.apply_inverse(view2, view1);
   v3 -= v2;
   norm = v3.linfty_norm();
   deallog << "Verification of inverse: " << (norm < 5e-3 ? 0. : norm) << std::endl;

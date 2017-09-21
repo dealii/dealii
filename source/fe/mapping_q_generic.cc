@@ -1077,7 +1077,9 @@ namespace internal
             else
               Assert(false, ExcNotImplemented());
 
-            tensor_product_matrix.apply_inverse(&rl1[0], &tmp_rhs[0]);
+            const ArrayView<double> rl1_view {&(rl1[0]), n_inner};
+            const ArrayView<const double> tmp_rhs_view {&(tmp_rhs[0]), n_inner};
+            tensor_product_matrix.apply_inverse(rl1_view, tmp_rhs_view);
 
             for (unsigned int i=0; i<n_inner; ++i)
               lvs(i,k) = -rl1[i];

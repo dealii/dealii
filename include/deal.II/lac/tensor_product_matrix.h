@@ -17,6 +17,7 @@
 #define dealii_tensor_product_matrix_h
 
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/config.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/lac/lapack_full_matrix.h>
@@ -83,20 +84,20 @@ public:
   /**
    * Implements a matrix-vector product with the underlying matrix as
    * described in the main documentation of TensorProductMatrixSymmetricSum.
-   * This function is operating on plain pointers, i.e. no check of
-   * array bounds is possible.
+   * This function is operating on ArrayView to allow checks of
+   * array bounds with respect to @p dst and @p src.
    */
-  void vmult (Number *dst,
-              const Number *src) const;
+  void vmult (const ArrayView<Number> &dst,
+              const ArrayView<const Number> &src) const;
 
   /**
    * Implements a matrix-vector product with the underlying matrix as
    * described in the main documentation of TensorProductMatrixSymmetricSum.
-   * This function is operating on plain pointers, i.e. no check of
-   * array bounds is possible.
+   * This function is operating on ArrayView to allow checks of
+   * array bounds with respect to @p dst and @p src.
    */
-  void apply_inverse (Number *dst,
-                      const Number *src) const;
+  void apply_inverse (const ArrayView<Number> &dst,
+                      const ArrayView<const Number> &src) const;
 
 protected:
   /**
@@ -273,34 +274,6 @@ public:
   void reinit (const Table<2,Number> &mass_matrix,
                const Table<2,Number> &derivative_matrix);
 
-  /**
-   * Import functions from base class.
-   */
-  using TensorProductMatrixSymmetricSumBase<dim,Number,size>::vmult;
-
-  /**
-   * Import functions from base class.
-   */
-  using TensorProductMatrixSymmetricSumBase<dim,Number,size>::apply_inverse;
-
-  /**
-   * Implements a matrix-vector product with the underlying matrix as
-   * described in the main documentation of this class. Same as
-   * TensorProductMatrixSymmetricSumBase::vmult() but additionally
-   * providing bound checks of @p dst and @p src.
-   */
-  void vmult (Vector<Number> &dst,
-              const Vector<Number> &src) const;
-
-  /**
-   * Implements a matrix-vector product with the underlying matrix as
-   * described in the main documentation of this class. Same as
-   * TensorProductMatrixSymmetricSumBase::apply_inverse() but additionally
-   * providing bound checks of @p dst and @p src.
-   */
-  void apply_inverse (Vector<Number> &dst,
-                      const Vector<Number> &src) const;
-
 private:
   /**
    * A generic implementation of all reinit() functions based on
@@ -320,6 +293,8 @@ private:
 /** @copydoc TensorProductMatrixSymmetricSum<Number>
  * This is the template specialization for @p Number being
  * VectorizedArray<Number>.
+ *
+ * @author Martin Kronbichler and Julius Witte, 2017
  */
 template <int dim, typename Number, int size>
 class TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
@@ -369,34 +344,6 @@ public:
   void reinit (const Table<2,VectorizedArray<Number> > &mass_matrix,
                const Table<2,VectorizedArray<Number> > &derivative_matrix);
 
-  /**
-   * Import functions from base class.
-   */
-  using TensorProductMatrixSymmetricSumBase<dim,VectorizedArray<Number>,size>::vmult;
-
-  /**
-   * Import functions from base class.
-   */
-  using TensorProductMatrixSymmetricSumBase<dim,VectorizedArray<Number>,size>::apply_inverse;
-
-  /**
-   * Implements a matrix-vector product with the underlying matrix as
-   * described in the main documentation of this class. Same as
-   * TensorProductMatrixSymmetricSumBase::vmult() but additionally
-   * providing bound checks of @p dst and @p src.
-   */
-  void vmult (AlignedVector<VectorizedArray<Number> > &dst,
-              const AlignedVector<VectorizedArray<Number> > &src) const;
-
-  /**
-   * Implements a matrix-vector product with the underlying matrix as
-   * described in the main documentation of this class. Same as
-   * TensorProductMatrixSymmetricSumBase::apply_inverse() but additionally
-   * providing bound checks of @p dst and @p src.
-   */
-  void apply_inverse (AlignedVector<VectorizedArray<Number> > &dst,
-                      const AlignedVector<VectorizedArray<Number> > &src) const;
-
 private:
   /**
    * A generic implementation of all reinit() functions based on
@@ -416,53 +363,55 @@ private:
 
 #ifndef DOXYGEN
 
-namespace
+namespace internal
 {
-  /**
-   * Compute generalized eigenvalues and eigenvectors of the real
-   * generalized symmetric eigenproblem $A v = \lambda M v$. Since we are
-   * operating on plain pointers we require the size of the matrices beforehand.
-   * Note that the data arrays for the eigenvalues and eigenvectors
-   * have to be initialized to a proper size, too. (no check of array bounds
-   * possible)
-   */
-  template <typename Number>
-  void
-  spectral_assembly (const Number *mass_matrix,
-                     const Number *derivative_matrix,
-                     const unsigned int n_rows,
-                     const unsigned int n_cols,
-                     Number *eigenvalues,
-                     Number *eigenvectors)
+  namespace TensorProductMatrix
   {
-    Assert (n_rows == n_cols, ExcNotImplemented());
-
-    auto &&transpose_fill_nm
-      = [](Number *out, const Number *in, const unsigned int n, const unsigned int m)
+    /**
+     * Compute generalized eigenvalues and eigenvectors of the real
+     * generalized symmetric eigenproblem $A v = \lambda M v$. Since we are
+     * operating on plain pointers we require the size of the matrices beforehand.
+     * Note that the data arrays for the eigenvalues and eigenvectors
+     * have to be initialized to a proper size, too. (no check of array bounds
+     * possible)
+     */
+    template <typename Number>
+    void
+    spectral_assembly (const Number *mass_matrix,
+                       const Number *derivative_matrix,
+                       const unsigned int n_rows,
+                       const unsigned int n_cols,
+                       Number *eigenvalues,
+                       Number *eigenvectors)
     {
-      for (unsigned int mm = 0; mm < m; ++mm)
-        for (unsigned int nn = 0; nn < n; ++nn)
-          out[mm+nn*m] = *(in++);
-    };
+      Assert (n_rows == n_cols, ExcNotImplemented());
 
-    std::vector<Vector<Number> > eigenvecs(n_rows);
-    LAPACKFullMatrix<Number> mass_copy(n_rows, n_cols);
-    LAPACKFullMatrix<Number> deriv_copy(n_rows, n_cols);
+      auto &&transpose_fill_nm
+        = [](Number *out, const Number *in, const unsigned int n, const unsigned int m)
+      {
+        for (unsigned int mm = 0; mm < m; ++mm)
+          for (unsigned int nn = 0; nn < n; ++nn)
+            out[mm+nn*m] = *(in++);
+      };
 
-    transpose_fill_nm (&(mass_copy(0,0)), mass_matrix, n_rows, n_cols);
-    transpose_fill_nm (&(deriv_copy(0,0)), derivative_matrix, n_rows, n_cols);
+      std::vector<dealii::Vector<Number> > eigenvecs(n_rows);
+      LAPACKFullMatrix<Number> mass_copy(n_rows, n_cols);
+      LAPACKFullMatrix<Number> deriv_copy(n_rows, n_cols);
 
-    deriv_copy.compute_generalized_eigenvalues_symmetric (mass_copy, eigenvecs);
-    AssertDimension (eigenvecs.size(), n_rows);
-    for (unsigned int i=0; i<n_rows; ++i)
-      for (unsigned int j=0; j<n_cols; ++j, ++eigenvectors)
-        *eigenvectors = eigenvecs[j][i];
+      transpose_fill_nm (&(mass_copy(0,0)), mass_matrix, n_rows, n_cols);
+      transpose_fill_nm (&(deriv_copy(0,0)), derivative_matrix, n_rows, n_cols);
 
-    for (unsigned int i=0; i<n_rows; ++i, ++eigenvalues)
-      *eigenvalues = deriv_copy.eigenvalue(i).real();
+      deriv_copy.compute_generalized_eigenvalues_symmetric (mass_copy, eigenvecs);
+      AssertDimension (eigenvecs.size(), n_rows);
+      for (unsigned int i=0; i<n_rows; ++i)
+        for (unsigned int j=0; j<n_cols; ++j, ++eigenvectors)
+          *eigenvectors = eigenvecs[j][i];
+
+      for (unsigned int i=0; i<n_rows; ++i, ++eigenvalues)
+        *eigenvalues = deriv_copy.eigenvalue(i).real();
+    }
   }
 }
-
 
 
 template <int dim, typename Number, int size>
@@ -495,9 +444,11 @@ template <int dim, typename Number, int size>
 inline
 void
 TensorProductMatrixSymmetricSumBase<dim,Number,size>
-::vmult(Number *dst,
-        const Number *src) const
+::vmult (const ArrayView<Number> &dst_view,
+         const ArrayView<const Number> &src_view) const
 {
+  AssertDimension (dst_view.size(), this->m());
+  AssertDimension (src_view.size(), this->n());
   Threads::Mutex::ScopedLock lock(this->mutex);
   const unsigned int n = Utilities::fixed_power<dim>(size > 0 ? size : eigenvalues[0].size());
   tmp_array.resize_fast(n*2);
@@ -506,6 +457,8 @@ TensorProductMatrixSymmetricSumBase<dim,Number,size>
   eval(AlignedVector<Number> {}, AlignedVector<Number> {},
        AlignedVector<Number> {}, mass_matrix[0].n_rows()-1, mass_matrix[0].n_rows());
   Number *t = tmp_array.begin();
+  const Number *src = src_view.begin();
+  Number *dst = &(dst_view[0]);
 
   if (dim == 1)
     {
@@ -552,9 +505,11 @@ template <int dim, typename Number, int size>
 inline
 void
 TensorProductMatrixSymmetricSumBase<dim,Number,size>
-::apply_inverse(Number *dst,
-                const Number *src) const
+::apply_inverse (const ArrayView<Number> &dst_view,
+                 const ArrayView<const Number> &src_view) const
 {
+  AssertDimension (dst_view.size(), this->n());
+  AssertDimension (src_view.size(), this->m());
   Threads::Mutex::ScopedLock lock(this->mutex);
   const unsigned int n = size > 0 ? size : eigenvalues[0].size();
   tmp_array.resize_fast (Utilities::fixed_power<dim>(n));
@@ -563,6 +518,8 @@ TensorProductMatrixSymmetricSumBase<dim,Number,size>
   eval(AlignedVector<Number>(), AlignedVector<Number>(),
        AlignedVector<Number>(), mass_matrix[0].n_rows()-1, mass_matrix[0].n_rows());
   Number *t = tmp_array.begin();
+  const Number *src = src_view.begin();
+  Number *dst = &(dst_view[0]);
 
   // NOTE: dof_to_quad has to be interpreted as 'dof to eigenvalue index'
   //       --> apply<.,true,.> (S,src,dst) calculates dst = S^T * src,
@@ -671,12 +628,13 @@ TensorProductMatrixSymmetricSum<dim,Number,size>
 
       this->eigenvectors[dir].reinit (mass_matrices[dir].n_cols(), mass_matrices[dir].n_rows());
       this->eigenvalues[dir].resize (mass_matrices[dir].n_cols());
-      spectral_assembly<Number> (&(mass_matrices[dir](0,0)),
-                                 &(derivative_matrices[dir](0,0)),
-                                 mass_matrices[dir].n_rows(),
-                                 mass_matrices[dir].n_cols(),
-                                 this->eigenvalues[dir].begin(),
-                                 &(this->eigenvectors[dir](0,0)));
+      internal::TensorProductMatrix
+      ::spectral_assembly<Number> (&(mass_matrices[dir](0,0)),
+                                   &(derivative_matrices[dir](0,0)),
+                                   mass_matrices[dir].n_rows(),
+                                   mass_matrices[dir].n_cols(),
+                                   this->eigenvalues[dir].begin(),
+                                   &(this->eigenvectors[dir](0,0)));
     }
 }
 
@@ -728,34 +686,6 @@ TensorProductMatrixSymmetricSum<dim,Number,size>
   std::fill (derivative_matrices.begin(), derivative_matrices.end(), derivative_matrix);
 
   reinit_impl (std::move(mass_matrices), std::move(derivative_matrices));
-}
-
-
-
-template <int dim, typename Number, int size>
-inline
-void
-TensorProductMatrixSymmetricSum<dim,Number,size>
-::vmult (Vector<Number> &dst,
-         const Vector<Number> &src) const
-{
-  AssertDimension(dst.size(), this->m());
-  AssertDimension(src.size(), this->n());
-  TensorProductMatrixSymmetricSumBase<dim,Number,size>::vmult (dst.begin(), src.begin());
-}
-
-
-
-template <int dim, typename Number, int size>
-inline
-void
-TensorProductMatrixSymmetricSum<dim,Number,size>
-::apply_inverse (Vector<Number> &dst,
-                 const Vector<Number> &src) const
-{
-  AssertDimension (dst.size(), this->n());
-  AssertDimension (src.size(), this->m());
-  TensorProductMatrixSymmetricSumBase<dim,Number,size>::apply_inverse (dst.begin(), src.begin());
 }
 
 
@@ -849,8 +779,9 @@ TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
       Number *eigenvec_begin = eigenvectors_flat.data();
       Number *eigenval_begin = eigenvalues_flat.data();
       for (unsigned int lane = 0; lane < macro_size; ++lane)
-        spectral_assembly<Number> (mass_cbegin+nm*lane, deriv_cbegin+nm*lane, n_rows, n_cols,
-                                   eigenval_begin+n_rows*lane, eigenvec_begin+nm*lane);
+        internal::TensorProductMatrix
+        ::spectral_assembly<Number> (mass_cbegin+nm*lane, deriv_cbegin+nm*lane, n_rows, n_cols,
+                                     eigenval_begin+n_rows*lane, eigenvec_begin+nm*lane);
 
       this->eigenvalues[dir].resize (n_rows);
       this->eigenvectors[dir].reinit (n_rows, n_cols);
@@ -891,34 +822,6 @@ TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
   std::fill (derivative_matrices.begin(), derivative_matrices.end(), derivative_matrix);
 
   reinit_impl (std::move(mass_matrices), std::move(derivative_matrices));
-}
-
-
-
-template <int dim, typename Number, int size>
-inline
-void
-TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
-::vmult (AlignedVector<VectorizedArray<Number> > &dst,
-         const AlignedVector<VectorizedArray<Number> > &src) const
-{
-  AssertDimension(dst.size(), this->m());
-  AssertDimension(src.size(), this->n());
-  TensorProductMatrixSymmetricSumBase<dim,VectorizedArray<Number>,size>::vmult (dst.begin(), src.begin());
-}
-
-
-
-template <int dim, typename Number, int size>
-inline
-void
-TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
-::apply_inverse (AlignedVector<VectorizedArray<Number> > &dst,
-                 const AlignedVector<VectorizedArray<Number> > &src) const
-{
-  AssertDimension (dst.size(), this->n());
-  AssertDimension (src.size(), this->m());
-  TensorProductMatrixSymmetricSumBase<dim,VectorizedArray<Number>,size>::apply_inverse (dst.begin(), src.begin());
 }
 
 

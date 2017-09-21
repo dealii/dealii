@@ -48,8 +48,11 @@ void do_test()
   for (unsigned int i=0; i<v1.size(); ++i)
     v1(i) = (2*i+1)%23;
 
-  mat.vmult(v2, v1);
-  mat.apply_inverse(v3, v2);
+  const ArrayView<double> view1(v1.begin(), v1.size()) ;
+  const ArrayView<double> view2(v2.begin(), v2.size()) ;
+  const ArrayView<double> view3(v3.begin(), v3.size()) ;
+  mat.vmult(view2, view1);
+  mat.apply_inverse(view3, view2);
   v3 -= v1;
   deallog << "Verification of vmult and inverse: " << v3.linfty_norm() << std::endl;
 
@@ -73,7 +76,7 @@ void do_test()
 
   full.gauss_jordan();
   full.vmult(v3, v1);
-  mat.apply_inverse(v2, v1);
+  mat.apply_inverse(view2, view1);
   v3 -= v2;
   deallog << "Verification of inverse: " << v3.linfty_norm() << std::endl;
 }
