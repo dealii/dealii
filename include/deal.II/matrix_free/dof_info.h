@@ -66,7 +66,7 @@ namespace internal
       /**
        * Copy constructor.
        */
-      DoFInfo (const DoFInfo &dof_info) = default;
+      DoFInfo (const DoFInfo &) = default;
 
       /**
        * Clear all data fields in this class.
