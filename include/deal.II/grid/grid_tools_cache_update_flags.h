@@ -70,7 +70,8 @@ namespace GridTools
    */
   template <class StreamType>
   inline
-  StreamType &operator << (StreamType &s, CacheUpdateFlags u)
+  StreamType &operator << (StreamType &s,
+                           const CacheUpdateFlags u)
   {
     s << " CacheUpdateFlags";
     if (u & update_vertex_to_cell_map)                 s << "|vertex_to_cell_map";
@@ -93,7 +94,8 @@ namespace GridTools
    */
   inline
   CacheUpdateFlags
-  operator | (CacheUpdateFlags f1, CacheUpdateFlags f2)
+  operator | (const CacheUpdateFlags f1,
+              const CacheUpdateFlags f2)
   {
     return static_cast<CacheUpdateFlags> (
              static_cast<unsigned int> (f1) |
@@ -111,7 +113,7 @@ namespace GridTools
    */
   inline
   CacheUpdateFlags
-  operator ~ (CacheUpdateFlags f1)
+  operator ~ (const CacheUpdateFlags f1)
   {
     return static_cast<CacheUpdateFlags> (
              ~static_cast<unsigned int> (f1)
@@ -128,7 +130,8 @@ namespace GridTools
    */
   inline
   CacheUpdateFlags &
-  operator |= (CacheUpdateFlags &f1, CacheUpdateFlags f2)
+  operator |= (CacheUpdateFlags &f1,
+               const CacheUpdateFlags f2)
   {
     f1 = f1 | f2;
     return f1;
@@ -146,7 +149,8 @@ namespace GridTools
    */
   inline
   CacheUpdateFlags
-  operator & (CacheUpdateFlags f1, CacheUpdateFlags f2)
+  operator & (const CacheUpdateFlags f1,
+              const CacheUpdateFlags f2)
   {
     return static_cast<CacheUpdateFlags> (
              static_cast<unsigned int> (f1) &
@@ -162,7 +166,8 @@ namespace GridTools
    */
   inline
   CacheUpdateFlags &
-  operator &= (CacheUpdateFlags &f1, CacheUpdateFlags f2)
+  operator &= (CacheUpdateFlags &f1,
+               const CacheUpdateFlags f2)
   {
     f1 = f1 & f2;
     return f1;
