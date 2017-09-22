@@ -38,7 +38,6 @@ namespace Particles
    * (e.g. to allow for varying number of properties per handle) without
    * affecting its interface.
    */
-  template <typename PropertyType = double>
   class PropertyPool
   {
   public:
@@ -47,7 +46,7 @@ namespace Particles
      * uniquely identifies the slot of memory that is reserved for this
      * particle.
      */
-    typedef PropertyType *Handle;
+    typedef double *Handle;
 
     /**
      * Define a default (invalid) value for handles.
@@ -56,37 +55,38 @@ namespace Particles
 
     /**
      * Constructor. Stores the number of properties per reserved slot.
-     * By default this class assumes the template parameter PropertyType
-     * completely describes all properties of the particle.
      */
-    PropertyPool (const unsigned int n_properties_per_slot = 1);
+    PropertyPool (const unsigned int n_properties_per_slot=1);
 
     /**
      * Returns a new handle that allows accessing the reserved block
-     * of memory. The returned memory block is not initialized.
+     * of memory.
      */
     Handle allocate_properties_array ();
 
     /**
      * Mark the properties corresponding to the handle @p handle as
-     * deleted. After calling this function @p handle is invalid and
-     * can not longer be used to access properties.
+     * deleted. Calling this function more than once for the same
+     * handle causes undefined behavior.
      */
-    void deallocate_properties_array (Handle &handle);
+    void deallocate_properties_array (const Handle handle);
 
     /**
      * Return an ArrayView to the properties that correspond to the given
-     * handle @p handle. This function allows read-write access to the
-     * underlying properties.
+     * handle @p handle.
      */
-    const ArrayView<PropertyType> get_properties (const Handle handle);
+    ArrayView<double> get_properties (const Handle handle);
 
     /**
-     * Return an ArrayView to the properties that correspond to the given
-     * handle @p handle. This function only allows read access to the underlying
-     * properties.
+     * Reserves the dynamic memory needed for storing the properties of
+     * @p size particles.
      */
-    const ArrayView<const PropertyType> get_properties (const Handle handle) const;
+    void reserve(const std::size_t size);
+
+    /**
+     * Returns how many properties are stored per slot in the pool.
+     */
+    unsigned int n_properties_per_slot() const;
 
   private:
     /**
@@ -94,6 +94,7 @@ namespace Particles
      */
     const unsigned int n_properties;
   };
+
 
 }
 

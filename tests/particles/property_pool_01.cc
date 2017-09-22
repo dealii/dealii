@@ -23,13 +23,12 @@
 #include <iomanip>
 
 
-template <typename PropertyType>
 void test ()
 {
   {
-    Particles::PropertyPool<PropertyType> pool;
+    Particles::PropertyPool pool;
 
-    typename Particles::PropertyPool<PropertyType>::Handle handle = pool.allocate_properties_array();
+    typename Particles::PropertyPool::Handle handle = pool.allocate_properties_array();
 
     pool.get_properties(handle)[0] = 2.5;
 
@@ -46,6 +45,5 @@ void test ()
 int main ()
 {
   initlog();
-  test<double>();
-  test<float>();
+  test();
 }

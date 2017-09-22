@@ -20,6 +20,15 @@ DEAL_II_NAMESPACE_OPEN
 namespace Particles
 {
   template <int dim, int spacedim>
+  ParticleAccessor<dim,spacedim>::ParticleAccessor ()
+    :
+    map (NULL),
+    particle ()
+  {}
+
+
+
+  template <int dim, int spacedim>
   ParticleAccessor<dim,spacedim>::ParticleAccessor (const std::multimap<types::LevelInd, Particle<dim,spacedim> > &map,
                                                     const typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator &particle)
     :
@@ -103,7 +112,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleAccessor<dim,spacedim>::set_property_pool (PropertyPool<double> &new_property_pool)
+  ParticleAccessor<dim,spacedim>::set_property_pool (PropertyPool &new_property_pool)
   {
     Assert(particle != map->end(),
            ExcInternalError());
@@ -120,7 +129,7 @@ namespace Particles
     Assert(particle != map->end(),
            ExcInternalError());
 
-    particle->second.set_properties(ArrayView<const double>(&(new_properties[0]),new_properties.size()));
+    particle->second.set_properties(new_properties);
     return;
   }
 
@@ -167,12 +176,12 @@ namespace Particles
 
   template <int dim, int spacedim>
   std::size_t
-  ParticleAccessor<dim,spacedim>::size () const
+  ParticleAccessor<dim,spacedim>::serialized_size_in_bytes () const
   {
     Assert(particle != map->end(),
            ExcInternalError());
 
-    return particle->second.size();
+    return particle->second.serialized_size_in_bytes();
   }
 
 

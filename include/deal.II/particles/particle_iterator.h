@@ -32,6 +32,11 @@ namespace Particles
   {
   public:
     /**
+     * Empty constructor. Such an object is not usable!
+     */
+    ParticleIterator ();
+
+    /**
      * Constructor of the iterator. Takes a reference to the particle
      * container, and an iterator the the cell-particle pair.
      */
@@ -48,6 +53,11 @@ namespace Particles
      * Dereferencing operator, non-@p const version.
      */
     ParticleAccessor<dim,spacedim> &operator * ();
+
+    /**
+     * Assignment operator.
+     */
+    ParticleIterator &operator = (const ParticleIterator &);
 
     /**
      * Dereferencing operator, returns a pointer of the particle pointed to. Usage

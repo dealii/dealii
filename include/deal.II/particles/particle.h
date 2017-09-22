@@ -35,13 +35,13 @@ namespace Particles
    */
   namespace types
   {
-    /* Type definitions */
-
     /**
      * Typedef of cell level/index pair. TODO: replace this by the
-     * active_cell_index from deal.II 8.3 onwards.
+     * active_cell_index.
      */
     typedef std::pair<int, int> LevelInd;
+
+    /* Type definitions */
 
 #ifdef DEAL_II_WITH_64BIT_INDICES
     /**
@@ -87,15 +87,14 @@ namespace Particles
   /**
    * Base class of particles - represents a particle with position,
    * an ID number and a variable number of properties. This class
-   * can be extended to include arbitrary data related to a particle by
-   * attaching a property pool class to the particle.
-   *
+   * can be extended to include data related to a particle by the property
+   * manager.
    *
    * @ingroup Particle
    * @author Rene Gassmoeller, 2017
    *
    */
-  template <int dim, int spacedim=dim, typename PropertyType = double>
+  template <int dim, int spacedim=dim>
   class Particle
   {
   public:
@@ -127,7 +126,7 @@ namespace Particles
      * for registering and freeing this memory in the property pool this
      * constructor registers a new chunk, and copies the properties.
      */
-    Particle (const Particle<dim,spacedim,PropertyType> &particle);
+    Particle (const Particle<dim,spacedim> &particle);
 
     /**
      * Constructor for Particle, creates a particle from a data vector.
@@ -146,23 +145,23 @@ namespace Particles
      * by @p property_pool.
      */
     Particle (const void *&begin_data,
-              PropertyPool<PropertyType> *property_pool = NULL);
+              PropertyPool &property_pool);
 
     /**
      * Move constructor for Particle, creates a particle from an existing
-     * one by stealing its state and properties.
+     * one by stealing its state.
      */
-    Particle (Particle<dim,spacedim,PropertyType> &&particle);
+    Particle (Particle<dim,spacedim> &&particle);
 
     /**
      * Copy assignment operator.
      */
-    Particle<dim,spacedim,PropertyType> &operator=(const Particle<dim,spacedim,PropertyType> &particle);
+    Particle<dim,spacedim> &operator=(const Particle<dim,spacedim> &particle);
 
     /**
      * Move assignment operator.
      */
-    Particle<dim,spacedim,PropertyType> &operator=(Particle<dim,spacedim,PropertyType> &&particle);
+    Particle<dim,spacedim> &operator=(Particle<dim,spacedim> &&particle);
 
     /**
      * Destructor. Releases the property handle if it is valid, and
@@ -178,7 +177,7 @@ namespace Particles
      * point to the first element in which the data should be written. This
      * function is meant for serializing all particle properties and
      * afterwards de-serializing the properties by calling the appropriate
-     * constructor Particle(void *&data, PropertyPool<PropertyType> *property_pool = NULL);
+     * constructor Particle(void *&data, PropertyPool *property_pool = NULL);
      *
      * @param [in,out] data The memory location to write particle data
      * into. This pointer points to the begin of the memory, in which the
@@ -189,19 +188,11 @@ namespace Particles
     write_data(void *&data) const;
 
     /**
-     * Returns the size in bytes this particle occupies if all of its data is
-     * serialized (i.e. the number of bytes that is written by the write_data
-     * function of this class).
-     */
-    std::size_t
-    size() const;
-
-    /**
-     * Set the location of this particle. Note that this does not check
-     * whether this is a valid location in the simulation domain.
-     *
-     * @param [in] new_location The new location for this particle.
-     */
+      * Set the location of this particle. Note that this does not check
+      * whether this is a valid location in the simulation domain.
+      *
+      * @param [in] new_location The new location for this particle.
+      */
     void
     set_location (const Point<spacedim> &new_location);
 
@@ -237,35 +228,35 @@ namespace Particles
     /**
      * Tell the particle where to store its properties (even if it does not
      * own properties). Usually this is only done once per particle, but
-     * since the particle does not know about the properties
-     * we do not want to do it at construction time. Another use for this
+     * since the particle does not know about the properties,
+     * we want to do it not at construction time. Another use for this
      * function is after particle transfer to a new process.
      */
     void
-    set_property_pool(PropertyPool<PropertyType> &property_pool);
+    set_property_pool(PropertyPool &property_pool);
 
     /**
-     * Returns whether this particle has a valid property pool and a valid
-     * handle to properties.
-     */
+      * Returns whether this particle has a valid property pool and a valid
+      * handle to properties.
+      */
     bool
     has_properties () const;
 
     /**
      * Set the properties of this particle.
      *
-     * @param [in] new_properties An ArrayView of the new
-     * properties that will be copied into the property pool.
+     * @param [in] new_properties An ArrayView containing the
+     * new properties for this particle.
      */
     void
-    set_properties (const ArrayView<const PropertyType> &new_properties);
+    set_properties (const ArrayView<const double> &new_properties);
 
     /**
      * Get write-access to properties of this particle.
      *
      * @return An ArrayView of the properties of this particle.
      */
-    const ArrayView<PropertyType>
+    const ArrayView<double>
     get_properties ();
 
     /**
@@ -273,14 +264,32 @@ namespace Particles
      *
      * @return An ArrayView of the properties of this particle.
      */
-    const ArrayView<const PropertyType>
+    const ArrayView<const double>
     get_properties () const;
 
     /**
-     * Serialize the contents of this class.
+     * Returns the size in bytes this particle occupies if all of its data is
+     * serialized (i.e. the number of bytes that is written by the write_data
+     * function of this class).
+     */
+    std::size_t
+    serialized_size_in_bytes() const;
+
+    /**
+     * Write the data of this object to a stream for the purpose of
+     * serialization.
      */
     template <class Archive>
-    void serialize (Archive &ar, const unsigned int version);
+    void save (Archive &ar, const unsigned int version) const;
+
+    /**
+     * Read the data of this object from a stream for the purpose of
+     * serialization.
+     */
+    template <class Archive>
+    void load (Archive &ar, const unsigned int version);
+
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 
   private:
     /**
@@ -302,24 +311,50 @@ namespace Particles
      * A pointer to the property pool. Necessary to translate from the
      * handle to the actual memory locations.
      */
-    PropertyPool<PropertyType> *property_pool;
+    PropertyPool *property_pool;
 
     /**
-     * A handle to all particle properties.
+     * A handle to all particle properties
      */
-    typename PropertyPool<PropertyType>::Handle properties;
+    PropertyPool::Handle properties;
   };
 
   /* -------------------------- inline and template functions ---------------------- */
 
-  template <int dim, int spacedim, typename PropertyType>
+  template <int dim, int spacedim>
   template <class Archive>
-  void Particle<dim,spacedim,PropertyType>::serialize (Archive &ar, const unsigned int)
+  void Particle<dim,spacedim>::load (Archive &ar, const unsigned int)
   {
+    unsigned int n_properties = 0;
+
     ar &location
+    & reference_location
     & id
-    & properties
-    ;
+    & n_properties;
+
+    if (n_properties > 0)
+      {
+        properties = new double[n_properties];
+        ar &boost::serialization::make_array(properties, n_properties);
+      }
+  }
+
+  template <int dim, int spacedim>
+  template <class Archive>
+  void Particle<dim,spacedim>::save (Archive &ar, const unsigned int) const
+  {
+    unsigned int n_properties = 0;
+    if ((property_pool != NULL) && (properties != PropertyPool::invalid_handle))
+      n_properties = get_properties().size();
+
+    ar &location
+    & reference_location
+    & id
+    & n_properties;
+
+    if (n_properties > 0)
+      ar &boost::serialization::make_array(properties, n_properties);
+
   }
 }
 

@@ -23,14 +23,13 @@
 #include <iomanip>
 
 
-template <typename PropertyType>
 void test ()
 {
   {
     const unsigned int n_properties = 3;
-    Particles::PropertyPool<PropertyType> pool(n_properties);
+    Particles::PropertyPool pool(n_properties);
 
-    typename Particles::PropertyPool<PropertyType>::Handle handle = pool.allocate_properties_array();
+    typename Particles::PropertyPool::Handle handle = pool.allocate_properties_array();
 
     pool.get_properties(handle)[0] = 1.2;
     pool.get_properties(handle)[1] = 2.5;
@@ -55,6 +54,5 @@ void test ()
 int main ()
 {
   initlog();
-  test<double>();
-  test<float>();
+  test();
 }

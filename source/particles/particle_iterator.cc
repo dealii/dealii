@@ -20,6 +20,14 @@ DEAL_II_NAMESPACE_OPEN
 namespace Particles
 {
   template <int dim, int spacedim>
+  ParticleIterator<dim,spacedim>::ParticleIterator ()
+    :
+    accessor ()
+  {}
+
+
+
+  template <int dim, int spacedim>
   ParticleIterator<dim,spacedim>::ParticleIterator (const std::multimap<types::LevelInd, Particle<dim,spacedim> > &map,
                                                     const typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator &particle)
     :
@@ -60,6 +68,15 @@ namespace Particles
   ParticleIterator<dim,spacedim>::operator ->() const
   {
     return &(this->operator* ());
+  }
+
+
+  template <int dim, int spacedim>
+  ParticleIterator<dim,spacedim> &
+  ParticleIterator<dim,spacedim>::operator =(const ParticleIterator &other)
+  {
+    accessor = other.accessor;
+    return *this;
   }
 
 

@@ -27,7 +27,6 @@ SET(_inst
   particle.inst.in
   particle_accessor.inst.in
   particle_iterator.inst.in
-  property_pool.inst.in
   )
 
 FILE(GLOB _header

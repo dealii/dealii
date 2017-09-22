@@ -93,7 +93,7 @@ namespace Particles
      * function is after particle transfer to a new process.
      */
     void
-    set_property_pool(PropertyPool<double> &property_pool);
+    set_property_pool(PropertyPool &property_pool);
 
     /**
       * Returns whether this particle has a valid property pool and a valid
@@ -133,7 +133,7 @@ namespace Particles
      * function of this class).
      */
     std::size_t
-    size() const;
+    serialized_size_in_bytes() const;
 
     /**
      * Get a cell iterator to the cell surrounding the current particle.
@@ -171,6 +171,11 @@ namespace Particles
     bool operator == (const ParticleAccessor<dim,spacedim> &other) const;
 
   protected:
+    /**
+     * Construct an invalid accessor. Such an object is not usable.
+     */
+    ParticleAccessor ();
+
     /**
      * Construct an accessor from a reference to a map and an iterator to the map.
      * This constructor is protected so that it can only be accessed by friend

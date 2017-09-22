@@ -14,10 +14,58 @@
 // ---------------------------------------------------------------------
 
 
-#include <deal.II/particles/property_pool.templates.h>
+#include <deal.II/particles/property_pool.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-#include "property_pool.inst"
+namespace Particles
+{
+  const PropertyPool::Handle PropertyPool::invalid_handle = nullptr;
 
+
+  PropertyPool::PropertyPool (const unsigned int n_properties_per_slot)
+    :
+    n_properties (n_properties_per_slot)
+  {}
+
+
+
+  PropertyPool::Handle
+  PropertyPool::allocate_properties_array ()
+  {
+    return new double[n_properties];
+  }
+
+
+
+  void
+  PropertyPool::deallocate_properties_array (Handle handle)
+  {
+    delete[] handle;
+  }
+
+
+
+  ArrayView<double>
+  PropertyPool::get_properties (const Handle handle)
+  {
+    return ArrayView<double>(handle, n_properties);
+  }
+
+
+
+  void
+  PropertyPool::reserve(const std::size_t size)
+  {
+    (void)size;
+  }
+
+
+
+  unsigned int
+  PropertyPool::n_properties_per_slot() const
+  {
+    return n_properties;
+  }
+}
 DEAL_II_NAMESPACE_CLOSE
