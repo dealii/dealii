@@ -1,0 +1,3 @@
+New: Added two methods to the class BoundingBox. The first, merge_with(BoundingBox) merges the current BoundingBox with BBox. The second, volume(), returns the volume (dim-dimensional measure) of the current BoundingBox
+<br>
+(Giovanni Alzetta, 2017/09/22)

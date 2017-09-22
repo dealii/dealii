@@ -72,20 +72,32 @@ public:
   BoundingBox (const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &boundary_points);
 
   /**
-   * Returns the boundary_points
+   * Return the boundary_points
    */
   const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &get_boundary_points () const;
 
   /**
-   * Returns true if the point is inside the Bounding Box, false otherwise
+   * Enlarge the current object so that it contains @p other_bbox .
+   * If the current object already contains @p other_bbox then it is not changed
+   * by this function.
+   */
+  void merge_with(const BoundingBox<spacedim,Number> &other_bbox);
+
+  /**
+   * Return true if the point is inside the Bounding Box, false otherwise
    */
   bool point_inside (const Point<spacedim, Number> &p) const;
+
+  /**
+   * Compute the volume (i.e. the dim-dimensional measure) of the BoundingBox.
+   */
+  double volume() const;
 
 private:
   std::pair<Point<spacedim, Number>,Point<spacedim,Number>> boundary_points;
 };
 
-/*------------------------------- Inline functions: Point ---------------------------*/
+/*------------------------------- Inline functions: BoundingBox ---------------------------*/
 
 #ifndef DOXYGEN
 
