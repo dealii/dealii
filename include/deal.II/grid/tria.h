@@ -2197,6 +2197,44 @@ public:
     boost::signals2::signal<unsigned int (const cell_iterator &,
                                           const CellStatus),
                                                 CellWeightSum<unsigned int> > cell_weight;
+
+    /**
+     * This signal is triggered at the beginning of execution of the
+     * parallel::distributed::Triangulation::execute_coarsening_and_refinement()
+     * function (which is
+     * itself called by other functions such as Triangulation::refine_global()
+     * ). At the time this signal is triggered, the triangulation is still
+     * unchanged. This signal
+     * is different from the pre_refinement signal, because in the parallel distributed
+     * case the pre_refinement signal is triggered multiple times without a way to
+     * distinguish the last signal call.
+     */
+    boost::signals2::signal<void ()> pre_distributed_refinement;
+
+    /**
+     * This signal is triggered at the end of execution of the
+     * parallel::distributed::Triangulation::execute_coarsening_and_refinement()
+     * function when the triangulation has reached its final state. This signal
+     * is different from the post_refinement signal, because in the parallel distributed
+     * case the post_refinement signal is triggered multiple times without a way to
+     * distinguish the last signal call.
+     */
+    boost::signals2::signal<void ()> post_distributed_refinement;
+
+    /**
+     * This signal is triggered at the beginning of execution of the
+     * parallel::distributed::Triangulation::save()
+     * function. At the time this signal is triggered, the triangulation
+     * is still unchanged.
+     */
+    boost::signals2::signal<void ()> pre_distributed_save;
+
+    /**
+     * This signal is triggered at the end of execution of the
+     * parallel::distributed::Triangulation::load()
+     * function when the triangulation has reached its final state.
+     */
+    boost::signals2::signal<void ()> post_distributed_load;
   };
 
   /**
