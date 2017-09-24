@@ -49,13 +49,6 @@ public:
   {
     return p(0)*p(0)+2.0*p(0)*p(1);
   }
-
-  virtual void   vector_value (const Point<dim>   &p,
-                               Vector<double>     &values) const
-  {
-    values(0) = value(p,0);
-    values(1) = value(p,1);
-  }
 };
 
 
@@ -75,13 +68,6 @@ public:
 
     deallog << "evaluate normal derivative at " << p << " with value " << val << std::endl;
     return val;
-  }
-
-  virtual void   vector_value (const Point<dim>   &p,
-                               Vector<double>     &values) const
-  {
-    values(0) = value(p,0);
-    values(1) = value(p,1);
   }
 };
 
