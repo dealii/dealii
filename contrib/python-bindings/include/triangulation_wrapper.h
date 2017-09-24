@@ -335,11 +335,6 @@ namespace python
     void setup(const std::string &dimension, const std::string &spacedimension);
 
     /**
-     * Flag is true if the vector cells has been updated.
-     */
-    bool updated;
-
-    /**
      * Dimension of the underlying Triangulation object.
      */
     int dim;

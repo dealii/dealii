@@ -466,8 +466,6 @@ namespace python
 
 
   TriangulationWrapper::TriangulationWrapper(const std::string &dimension)
-    :
-    updated(false)
   {
     if ((dimension.compare("2D")==0) || (dimension.compare("2d")==0))
       setup("2D", "2D");
@@ -481,8 +479,6 @@ namespace python
 
   TriangulationWrapper::TriangulationWrapper(const std::string &dimension,
                                              const std::string &spacedimension)
-    :
-    updated(false)
   {
     setup(dimension, spacedimension);
   }
