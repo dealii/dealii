@@ -245,7 +245,7 @@ void test (std::string solver_name,
     PETScWrappers::SolverCG  linear_solver(linear_solver_control,mpi_communicator);
     linear_solver.initialize(*preconditioner);
 
-    dealii::SolverControl solver_control (100, 1e-11,/*log_history*/false,/*log_results*/false);
+    dealii::SolverControl solver_control (100, 1e-12,/*log_history*/false,/*log_results*/false);
 
     dealii::SLEPcWrappers::SolverBase *eigensolver;
 
