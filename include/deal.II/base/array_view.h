@@ -167,22 +167,22 @@ public:
   /**
    * Return an iterator pointing to the beginning of the array view.
    */
-  iterator begin();
+  iterator begin() const;
 
   /**
    * Return an iterator pointing to one past the end of the array view.
    */
-  iterator end();
+  iterator end() const;
 
   /**
    * Return a constant iterator pointing to the beginning of the array view.
    */
-  const_iterator begin() const;
+  const_iterator cbegin() const;
 
   /**
    * Return a constant iterator pointing to one past the end of the array view.
    */
-  const_iterator end() const;
+  const_iterator cend() const;
 
   /**
    * Return a reference to the $i$th element of the range represented by the
@@ -297,23 +297,6 @@ ArrayView<ElementType>::size() const
 template <typename ElementType>
 inline
 typename ArrayView<ElementType>::iterator
-ArrayView<ElementType>::begin()
-{
-  return starting_element;
-}
-
-
-template <typename ElementType>
-inline
-typename ArrayView<ElementType>::iterator
-ArrayView<ElementType>::end()
-{
-  return starting_element + n_elements;
-}
-
-template <typename ElementType>
-inline
-typename ArrayView<ElementType>::const_iterator
 ArrayView<ElementType>::begin() const
 {
   return starting_element;
@@ -322,8 +305,25 @@ ArrayView<ElementType>::begin() const
 
 template <typename ElementType>
 inline
-typename ArrayView<ElementType>::const_iterator
+typename ArrayView<ElementType>::iterator
 ArrayView<ElementType>::end() const
+{
+  return starting_element + n_elements;
+}
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::const_iterator
+ArrayView<ElementType>::cbegin() const
+{
+  return starting_element;
+}
+
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::const_iterator
+ArrayView<ElementType>::cend() const
 {
   return starting_element + n_elements;
 }
