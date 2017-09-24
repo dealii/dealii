@@ -137,6 +137,14 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS; deal_II_space_dimension :  SPACE_DIM
                          const DataOutFilter &data_filter,
                          const std::string &filename,
                          MPI_Comm comm);
+
+    template
+    void
+    write_filtered_data (const std::vector<Patch<deal_II_dimension,deal_II_space_dimension> > &,
+                         const std::vector<std::string>          &,
+                         const std::vector<std::tuple<unsigned int, unsigned int, std::string> > &,
+                         DataOutBase::DataOutFilter &);
+
     \}
 #endif
 }
