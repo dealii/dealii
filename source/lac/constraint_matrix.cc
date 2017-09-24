@@ -1427,11 +1427,17 @@ BLOCK_SPARSITY_FUNCTIONS(TrilinosWrappers::BlockSparsityPattern);
 #endif
 
 
-#define ONLY_MATRIX_FUNCTIONS(MatrixType) \
-  template void ConstraintMatrix::distribute_local_to_global<MatrixType > (\
-      const FullMatrix<MatrixType::value_type>        &, \
-      const std::vector<ConstraintMatrix::size_type> &, \
-      const std::vector<ConstraintMatrix::size_type> &, \
+#define ONLY_MATRIX_FUNCTIONS(MatrixType)                                   \
+  template void ConstraintMatrix::distribute_local_to_global<MatrixType > ( \
+      const FullMatrix<MatrixType::value_type>        &,                    \
+      const std::vector<ConstraintMatrix::size_type> &,                     \
+      const std::vector<ConstraintMatrix::size_type> &,                     \
+      MatrixType                      &) const;                             \
+  template void ConstraintMatrix::distribute_local_to_global<MatrixType > ( \
+      const FullMatrix<MatrixType::value_type>        &,                      \
+      const std::vector<ConstraintMatrix::size_type> &,                       \
+      const ConstraintMatrix &,                                               \
+      const std::vector<ConstraintMatrix::size_type> &,                       \
       MatrixType                      &) const
 
 ONLY_MATRIX_FUNCTIONS(FullMatrix<float>);
