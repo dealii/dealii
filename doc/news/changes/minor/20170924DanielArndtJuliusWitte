@@ -1,0 +1,5 @@
+Changed: The new methods ArrayView::cbegin() and ArrayView::cend() return
+const_iterators and are const themselves. ArrayView::begin() and 
+ArrayView::end() return (non-const) iterators and are const themselves.
+<br>
+(Daniel Arndt, Julius Witte, 2017/09/24)
