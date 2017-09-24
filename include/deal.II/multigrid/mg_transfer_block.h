@@ -228,7 +228,10 @@ public:
                                  const BlockVector<number> &src) const;
 
   /**
-   * Transfer from a vector on the global grid to a multilevel vector.
+   * Transfer from a vector on the global grid to a multilevel vector for the
+   * active degrees of freedom. In particular, for a globally refined mesh only
+   * the finest level in @p dst is filled  as a plain copy of @p src. All the
+   * other level objects are left untouched.
    *
    * The action for discontinuous elements is as follows: on an active mesh
    * cell, the global vector entries are simply copied to the corresponding
@@ -356,7 +359,9 @@ public:
 
   /**
    * Transfer a single block from a vector on the global grid to a multilevel
-   * vector.
+   * vector for the active degrees of freedom. In particular, for a globally
+   * refined mesh only the finest level in @p dst is filled as a plain copy of
+   * @p src. All the other level objects are left untouched.
    */
   template <int dim, typename number2, int spacedim>
   void
@@ -389,7 +394,10 @@ public:
 
   /**
    * Transfer a block from a vector on the global grid to multilevel vectors.
-   * Only the block selected is transfered.
+   * Only the values for the active degrees of freedom of the block selected are
+   * transfered. In particular, for a globally refined mesh only the finest
+   * level in @p dst is filled as a plain copy of @p src. All the other level
+   * objects are left untouched.
    */
   template <int dim, typename number2, int spacedim>
   void

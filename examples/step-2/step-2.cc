@@ -64,8 +64,8 @@ using namespace dealii;
 // @sect3{Mesh generation}
 
 // This is the function that produced the circular grid in the previous step-1
-// example program with fewer refinements steps. The sole difference is that it returns the grid it
-// produces via its argument.
+// example program with fewer refinements steps. The sole difference is that it
+// returns the grid it produces via its argument.
 //
 // The details of what the function does are explained in step-1. The only
 // thing we would like to comment on is this:
@@ -93,10 +93,7 @@ void make_grid (Triangulation<2> &triangulation)
 
   for (unsigned int step=0; step<3; ++step)
     {
-      Triangulation<2>::active_cell_iterator cell = triangulation.begin_active();
-      Triangulation<2>::active_cell_iterator endc = triangulation.end();
-
-      for (; cell!=endc; ++cell)
+      for (auto cell: triangulation.active_cell_iterators())
         for (unsigned int v=0;
              v < GeometryInfo<2>::vertices_per_cell;
              ++v)

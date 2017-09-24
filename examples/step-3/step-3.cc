@@ -359,7 +359,7 @@ void Step3::assemble_system ()
   //
   // The shortcuts, finally, are only defined to make the following loops a
   // bit more readable. You will see them in many places in larger programs,
-  // and `dofs_per_cell' and `n_q_points' are more or less by convention the
+  // and `dofs_per_cell` and `n_q_points` are more or less by convention the
   // standard names for these purposes:
   const unsigned int   dofs_per_cell = fe.dofs_per_cell;
   const unsigned int   n_q_points    = quadrature_formula.size();
@@ -387,18 +387,19 @@ void Step3::assemble_system ()
   // the type, types::global_dof_index, used here):
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
-  // Now for the loop over all cells. We have seen before how this works, so
-  // the following code should be familiar including the conventional names
-  // for these variables:
-  DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
-  DoFHandler<2>::active_cell_iterator endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  // Now for the loop over all cells. We have seen before how this works for a
+  // triangulation. A DoFHandler has cell iterators that are exactly analogous
+  // to those of a Triangulation, but with extra information about the degrees
+  // of freedom for the finite element you're using. Looping over the active
+  // cells of a degree-of-freedom handler works the same as for a triangulation.
+  //
+  // Note that we declare the type of the cell as `const auto &` instead of
+  // `auto` this time around. In step 1, we were modifying the cells of the
+  // triangulation by flagging them with refinement indicators. Here we're only
+  // examining the cells without modifying them, so it's good practice to
+  // declare `cell` as `const` in order to enforce this invariant.
+  for (const auto &cell: dof_handler.active_cell_iterators())
     {
-      // @note As already mentioned in step-1, there is a more convenient way
-      // of writing such loops if your compiler supports the C++11
-      // standard. See @ref CPP11 "the deal.II C++11 page" to see
-      // how this works.
-      //
       // We are now sitting on one cell, and we would like the values and
       // gradients of the shape functions be computed, as well as the
       // determinants of the Jacobian matrices of the mapping between
@@ -496,8 +497,8 @@ void Step3::assemble_system ()
   // boundary by different numbers and tell the interpolate_boundary_values
   // function to only compute the boundary values on a certain part of the
   // boundary (e.g. the clamped part, or the inflow boundary). By default, all
-  // boundaries have the number `0', and since we have not changed that, this
-  // is still so; therefore, if we give `0' as the desired portion of the
+  // boundaries have the number `0`, and since we have not changed that, this
+  // is still so; therefore, if we give `0` as the desired portion of the
   // boundary, this means we get the whole boundary. If you have boundaries
   // with kinds of boundaries, you have to number them differently. The
   // function call below will then only determine boundary values for parts of

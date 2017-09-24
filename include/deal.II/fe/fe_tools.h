@@ -557,13 +557,36 @@ namespace FETools
    * information.
    */
   template <int dim, int spacedim>
-  void
-  compute_projection_from_face_quadrature_points_matrix (const FiniteElement<dim, spacedim> &fe,
-                                                         const Quadrature<dim-1>    &lhs_quadrature,
-                                                         const Quadrature<dim-1>    &rhs_quadrature,
-                                                         const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-                                                         const unsigned int          face,
-                                                         FullMatrix<double>         &X);
+  void compute_projection_from_face_quadrature_points_matrix(
+    const FiniteElement<dim, spacedim> &fe,
+    const Quadrature<dim - 1> &lhs_quadrature,
+    const Quadrature<dim - 1> &rhs_quadrature,
+    const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
+    const unsigned int face,
+    FullMatrix<double> &X);
+
+
+
+  /**
+   * Wrapper around
+   * FiniteElement::convert_generalized_support_point_values_to_dof_values()
+   * that works with arbitrary number types.
+   *
+   * @param[in] finite_element The FiniteElement to compute dof values for.
+   * @param[in] support_point_values An array of size @p dofs_per_cell
+   *   (which equals the number of points the get_generalized_support_points()
+   *   function will return) where each element is a vector with as many entries
+   *   as the element has vector components. This array should contain
+   *   the values of a function at the generalized support points of the
+   *   finite element.
+   * @param[out] dof_values An array of size @p dofs_per_cell that contains
+   *   the node functionals of the element applied to the given function.
+   */
+  template <int dim, int spacedim, typename number>
+  void convert_generalized_support_point_values_to_dof_values(
+    const FiniteElement<dim, spacedim> &finite_element,
+    const std::vector<Vector<number> > &support_point_values,
+    std::vector<number>                &dof_values);
 
 
 

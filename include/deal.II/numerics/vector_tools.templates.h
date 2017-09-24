@@ -85,213 +85,280 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace VectorTools
 {
-  template <int dim, int spacedim, typename VectorType,
+  template <int dim,
+            int spacedim,
+            typename VectorType,
             template <int, int> class DoFHandlerType>
-  void interpolate (const Mapping<dim,spacedim>                               &mapping,
-                    const DoFHandlerType<dim,spacedim>                        &dof,
-                    const Function<spacedim, typename VectorType::value_type> &function,
-                    VectorType                                                &vec,
-                    const ComponentMask                                       &component_mask)
+  void interpolate(
+    const Mapping<dim, spacedim> &mapping,
+    const DoFHandlerType<dim, spacedim> &dof_handler,
+    const Function<spacedim, typename VectorType::value_type> &function,
+    VectorType &vec,
+    const ComponentMask &component_mask)
   {
-    typedef typename VectorType::value_type number;
-    Assert (component_mask.represents_n_components(dof.get_fe(0).n_components()),
-            ExcMessage("The number of components in the mask has to be either "
-                       "zero or equal to the number of components in the finite "
-                       "element.") );
+    Assert(component_mask.represents_n_components(dof_handler.get_fe().n_components()),
+           ExcMessage("The number of components in the mask has to be either "
+                      "zero or equal to the number of components in the finite "
+                      "element."));
 
-    Assert (vec.size() == dof.n_dofs(),
-            ExcDimensionMismatch (vec.size(), dof.n_dofs()));
-    Assert (dof.get_fe(0).n_components() == function.n_components,
-            ExcDimensionMismatch(dof.get_fe(0).n_components(),
-                                 function.n_components));
-    Assert (component_mask.n_selected_components(dof.get_fe(0).n_components()) > 0,
+    Assert (vec.size() == dof_handler.n_dofs(),
+            ExcDimensionMismatch (vec.size(), dof_handler.n_dofs()));
+
+    Assert (dof_handler.get_fe().n_components() == function.n_components,
+            ExcDimensionMismatch(dof_handler.get_fe().n_components(), function.n_components));
+
+    Assert (component_mask.n_selected_components(dof_handler.get_fe().n_components()) > 0,
             ComponentMask::ExcNoComponentSelected());
 
-    const hp::FECollection<dim,spacedim> &fe = dof.get_fe_collection();
-    const unsigned int          n_components = fe.n_components();
-    const bool                  fe_is_system = (n_components != 1);
-
-    typename DoFHandlerType<dim,spacedim>::active_cell_iterator
-    cell = dof.begin_active(),
-    endc = dof.end();
-
-    // For FESystems many of the
-    // unit_support_points will appear
-    // multiple times, as a point may be
-    // unit_support_point for several of the
-    // components of the system.  The following
-    // is rather complicated, but at least
-    // attempts to avoid evaluating the
-    // vectorfunction multiple times at the
-    // same point on a cell.
     //
-    // First check that the desired components are interpolating.
+    // Computing the generalized interpolant isn't quite as straightforward
+    // as for classical Lagrange elements. A major complication is the fact
+    // it generally doesn't hold true that a function evaluates to the same
+    // dof coefficient on different cells. This means *setting* the value
+    // of a (global) degree of freedom computed on one cell doesn't
+    // necessarily lead to the same result when computed on a neighboring
+    // cell (that shares the same global degree of freedom).
+    //
+    // We thus, do the following operation:
+    //
+    // On each cell:
+    //
+    //  - We first determine all function values u(x_i) in generalized
+    //    support points
+    //
+    //  - We transform these function values back to the unit cell
+    //    according to the conformity of the component (scalar, Hdiv, or
+    //    Hcurl conforming); see [Monk, Finite Element Methods for Maxwell's
+    //    Equations, p.77ff Section 3.9] for details. This results in
+    //    \hat u(\hat x_i)
+    //
+    //  - We convert these generalized support point values to nodal values
+    //
+    //  - For every global dof we take the average 1 / n_K \sum_{K} dof_K
+    //    where n_K is the number of cells sharing the global dof and dof_K
+    //    is the computed value on the cell K.
+    //
+    // For every degree of freedom that is shared by k cells, we compute
+    // its value on all k cells and take the weighted average with respect
+    // to the JxW values.
+    //
+
+    typedef typename VectorType::value_type number;
+
+    const hp::FECollection<dim, spacedim> fe(dof_handler.get_fe());
+
+    std::vector<types::global_dof_index> dofs_on_cell(fe.max_dofs_per_cell());
+
+    // Temporary storage for cell-wise interpolation operation. We store a
+    // variant for every fe we encounter to speed up resizing operations.
+    // The first vector is used for local function evaluation. The vector
+    // dof_values is used to store intermediate cell-wise interpolation
+    // results (see the detailed explanation in the for loop further down
+    // below).
+
+    std::vector<std::vector<Vector<number> > > fe_function_values(fe.size());
+    std::vector<std::vector<number> > fe_dof_values(fe.size());
+
+    // We will need two temporary global vectors that store the new values
+    // and weights.
+    VectorType interpolation;
+    VectorType weights;
+    interpolation.reinit(vec);
+    weights.reinit(vec);
+
+    // We use an FEValues object to transform all generalized support
+    // points from the unit cell to the real cell coordinates. Thus,
+    // initialize a quadrature with all generalized support points and
+    // create an FEValues object with it.
+
+    hp::QCollection<dim> support_quadrature;
     for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
       {
-        for (unsigned int component_index = 0; component_index < n_components; ++component_index)
-          {
-            if (component_mask[component_index] == true)
-              {
-                Assert ((fe[fe_index].base_element(fe[fe_index].component_to_base_index
-                                                   (component_index).first).has_support_points()) ||
-                        (fe[fe_index].base_element(fe[fe_index].component_to_base_index
-                                                   (component_index).first).dofs_per_cell == 0),
-                        ExcNonInterpolatingFE());
-              }
-          }
+        const auto &points = fe[fe_index].get_generalized_support_points();
+        support_quadrature.push_back(Quadrature<dim>(points));
       }
 
-    // Find the support points on a cell that are mentioned multiple times, and
-    // only add each once.  Each multiple point gets to know the dof index of
-    // its representative point by the dof_to_rep_dof_table.
+    hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
-    // the following vector collects all unit support points p[i],
-    // 0<=i<fe.dofs_per_cell, for which unit_support_point(i) is unique
-    // (representative). The position of a support point within this vector is
-    // called the rep index.
-    std::vector<std::vector<Point<dim> > > rep_unit_support_points (fe.size());
-    // the following table converts a dof i
-    // to the rep index.
-    std::vector<std::vector<types::global_dof_index> > dof_to_rep_index_table(fe.size());
+    hp::FEValues<dim, spacedim> fe_values(
+      mapping_collection,
+      fe,
+      support_quadrature,
+      update_quadrature_points);
 
-    std::vector<unsigned int> n_rep_points (fe.size(), 0);
+    // An extra FEValues object to compute jacobians.
+    // Only re-initialized in case of Hcurl or Hdiv conforming elements,
+    // i.e. if we really need the information.
+    hp::FEValues<dim, spacedim> fe_values_jacobians(
+      mapping_collection,
+      fe,
+      support_quadrature,
+      update_jacobians | update_inverse_jacobians);
 
-    for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
+    //
+    // Now loop over all locally owned, active cells.
+    //
+
+    for (auto cell : dof_handler.active_cell_iterators())
       {
-        for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
+        // If this cell is not locally owned, do nothing.
+        if (! cell->is_locally_owned())
+          continue;
+
+        const unsigned int fe_index = cell->active_fe_index();
+
+        // Do nothing if there are no local degrees of freedom.
+        if (fe[fe_index].dofs_per_cell == 0)
+          continue;
+
+        // Get transformed, generalized support points
+        fe_values.reinit(cell);
+        const std::vector<Point<spacedim> > &generalized_support_points =
+          fe_values.get_present_fe_values().get_quadrature_points();
+
+        // Get indices of the dofs on this cell
+        const auto n_dofs = fe[fe_index].dofs_per_cell;
+        dofs_on_cell.resize (n_dofs);
+        cell->get_dof_indices (dofs_on_cell);
+
+        // Prepare temporary storage
+        auto &function_values = fe_function_values[fe_index];
+        auto &dof_values = fe_dof_values[fe_index];
+
+        const auto n_components = fe[fe_index].n_components();
+        function_values.resize(generalized_support_points.size(),
+                               Vector<number>(n_components));
+        dof_values.resize(n_dofs);
+
+        // Get all function values:
+        function.vector_value_list(generalized_support_points,
+                                   function_values);
+
+        // FIXME: In case of an FESystem we have to apply this
+        // transformation according to the conformity of each base element.
+
+        // Before we can average, we have to transform all function values
+        // from the real cell back to the unit cell. We query the finite
+        // element for the correct transformation.
+        switch (fe[fe_index].conforming_space)
           {
-            const unsigned int component
-              = fe[fe_index].system_to_component_index(i).first;
-            if (component_mask[component] == true)
+          case FiniteElementData<dim>::Hcurl:
+            // See Monk, Finite Element Methods for Maxwell's Equations,
+            // p. 77ff, formula (3.76) and Corollary 3.58.
+            // For given mapping F_K: \hat K \to K, we have to transform
+            //  \hat u = (dF_K)^T u\circ F_K
+
+            fe_values_jacobians.reinit(cell);
+            for (unsigned int i = 0; i < function_values.size(); ++i)
               {
-                const Point<dim> dof_support_point = fe[fe_index].unit_support_point(i);
+                const auto &jacobians =
+                  fe_values_jacobians.get_present_fe_values().get_jacobians();
 
-                bool representative=true;
-                // the following loop is looped
-                // the other way round to get
-                // the minimal effort of
-                // O(fe.dofs_per_cell) for multiple
-                // support points that are placed
-                // one after the other.
-                for (unsigned int j=rep_unit_support_points[fe_index].size(); j>0; --j)
-                  if (dof_support_point
-                      == rep_unit_support_points[fe_index][j-1])
-                    {
-                      dof_to_rep_index_table[fe_index].push_back(j-1);
-                      representative=false;
-                      break;
-                    }
+                // value[m] <- sum jacobian_transpose[m][n] * old_value[n]:
+                const auto old_value = function_values[i];
+                TensorAccessors::contract<1, 2, 1, dim>(
+                  function_values[i], jacobians[i].transpose(), old_value);
+              }
+            break;
 
-                if (representative)
-                  {
-                    dof_to_rep_index_table[fe_index].push_back
-                    (rep_unit_support_points[fe_index].size());
-                    rep_unit_support_points[fe_index].push_back(dof_support_point);
-                    ++n_rep_points[fe_index];
-                  }
+          case FiniteElementData<dim>::Hdiv:
+            // See Monk, Finite Element Methods for Maxwell's Equations,
+            // p. 79ff, formula (3.77) and Lemma 3.59.
+            // For given mapping F_K: \hat K \to K, we have to transform
+            //  \hat w = det(dF_K) (dF_K)^{-1} w\circ F_K
+
+            fe_values_jacobians.reinit(cell);
+            for (unsigned int i = 0; i < function_values.size(); ++i)
+              {
+                const auto &jacobians =
+                  fe_values_jacobians.get_present_fe_values().get_jacobians();
+                const auto &inverse_jacobians =
+                  fe_values_jacobians.get_present_fe_values().get_inverse_jacobians();
+
+                // value[m] <- sum inverse_jacobians[m][n] * old_value[n]:
+                const auto old_value = function_values[i];
+                TensorAccessors::contract<1, 2, 1, dim>(
+                  function_values[i], inverse_jacobians[i], old_value);
+
+                for (unsigned int j = 0; j < n_components; ++j)
+                  function_values[i][j] *= jacobians[i].determinant();
+              }
+            break;
+
+          case FiniteElementData<dim>::H1:
+            DEAL_II_FALLTHROUGH;
+          case FiniteElementData<dim>::L2:
+            // See Monk, Finite Element Methods for Maxwell's Equations,
+            // p. 77ff, formula (3.74).
+            // For given mapping F_K: \hat K \to K, we have to transform
+            //  \hat p = p\circ F_K
+            //  i.e., do nothing.
+            //
+            break;
+
+          default:
+            // In case we deal with an unknown conformity, just assume we
+            // deal with a Lagrange element and do nothing.
+            break;
+
+          } /*switch*/
+
+        FETools::convert_generalized_support_point_values_to_dof_values(
+          fe[fe_index], function_values, dof_values);
+
+        for (unsigned int i=0; i < n_dofs; ++i)
+          {
+            ::dealii::internal::ElementAccess<VectorType>::add(
+              typename VectorType::value_type(1.0),
+              dofs_on_cell[i],
+              weights);
+
+            const auto &nonzero_components =
+              fe[fe_index].get_nonzero_components(i);
+
+            // Figure out whether the component mask applies. We assume
+            // that we are allowed to set degrees of freedom if at least
+            // one of the components (of the dof) is selected.
+            bool selected = false;
+            for (unsigned int i = 0; i < nonzero_components.size(); ++i)
+              selected =
+                selected || (nonzero_components[i] && component_mask[i]);
+
+            if (selected)
+              {
+                // Add local values to the global vectors
+                ::dealii::internal::ElementAccess<VectorType>::add(
+                  dof_values[i], dofs_on_cell[i], interpolation);
               }
             else
               {
-                // If correct component not to be interpolated, append invalid index to in table
-                dof_to_rep_index_table[fe_index].push_back(numbers::invalid_dof_index);
+                // If a component is ignored, simply copy all dof values
+                // from the vector "vec":
+                const auto value =
+                  ::dealii::internal::ElementAccess<VectorType>::get(
+                    vec, dofs_on_cell[i]);
+                ::dealii::internal::ElementAccess<VectorType>::add(
+                  value, dofs_on_cell[i], interpolation);
               }
           }
+      } /* loop over dof_handler.active_cell_iterators() */
 
-        Assert(rep_unit_support_points[fe_index].size()==n_rep_points[fe_index],
-               ExcInternalError());
-        Assert(dof_to_rep_index_table[fe_index].size()==fe[fe_index].dofs_per_cell,
-               ExcInternalError());
+    interpolation.compress(VectorOperation::add);
+    weights.compress(VectorOperation::add);
+
+    for (const auto i : interpolation.locally_owned_elements())
+      {
+        const auto value =
+          ::dealii::internal::ElementAccess<VectorType>::get(interpolation, i);
+        const auto weight =
+          ::dealii::internal::ElementAccess<VectorType>::get(weights, i);
+        ::dealii::internal::ElementAccess<VectorType>::set(
+          value / weight, i, vec);
       }
-
-    std::vector<types::global_dof_index> dofs_on_cell (fe.max_dofs_per_cell());
-
-    // get space for the values of the
-    // function at the rep support points.
-    //
-    // have two versions, one for system fe
-    // and one for scalar ones, to take the
-    // more efficient one respectively
-    std::vector<std::vector<number> >         function_values_scalar(fe.size());
-    std::vector<std::vector<Vector<number> > > function_values_system(fe.size());
-
-    // Make a quadrature rule from support points
-    // to feed it into FEValues
-    hp::QCollection<dim> support_quadrature;
-    for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
-      support_quadrature.push_back (Quadrature<dim>(rep_unit_support_points[fe_index]));
-
-    // Transformed support points are computed by
-    // FEValues
-    hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
-
-    hp::FEValues<dim,spacedim> fe_values (mapping_collection,
-                                          fe, support_quadrature, update_quadrature_points);
-
-    for (; cell!=endc; ++cell)
-      if (cell->is_locally_owned())
-        {
-          const unsigned int fe_index = cell->active_fe_index();
-          if (fe[fe_index].dofs_per_cell != 0)
-            {
-              // for each cell:
-              // get location of finite element
-              // support_points
-              fe_values.reinit(cell);
-              const std::vector<Point<spacedim> > &rep_support_points =
-                fe_values.get_present_fe_values().get_quadrature_points();
-
-              // get indices of the dofs on this cell
-              dofs_on_cell.resize (fe[fe_index].dofs_per_cell);
-              cell->get_dof_indices (dofs_on_cell);
-
-
-              if (fe_is_system)
-                {
-                  // get function values at
-                  // these points. Here: get
-                  // all components
-                  function_values_system[fe_index]
-                  .resize (n_rep_points[fe_index],
-                           Vector<number> (fe[fe_index].n_components()));
-                  function.vector_value_list (rep_support_points,
-                                              function_values_system[fe_index]);
-                  // distribute the function
-                  // values to the global
-                  // vector
-                  for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
-                    {
-                      const unsigned int component
-                        = fe[fe_index].system_to_component_index(i).first;
-                      if (component_mask[component] == true)
-                        {
-                          const unsigned int rep_dof=dof_to_rep_index_table[fe_index][i];
-                          ::dealii::internal::ElementAccess<VectorType>::set(
-                            function_values_system[fe_index][rep_dof](component),
-                            dofs_on_cell[i], vec);
-                        }
-                    }
-                }
-              else
-                {
-                  // get first component only,
-                  // which is the only component
-                  // in the function anyway
-                  function_values_scalar[fe_index].resize (n_rep_points[fe_index]);
-                  function.value_list (rep_support_points,
-                                       function_values_scalar[fe_index],
-                                       0);
-                  // distribute the function
-                  // values to the global
-                  // vector
-                  for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
-                    ::dealii::internal::ElementAccess<VectorType>::set(
-                      function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]],
-                      dofs_on_cell[i], vec);
-                }
-            }
-        }
     vec.compress(VectorOperation::insert);
   }
+
+
 
 
   template <int dim, int spacedim, typename VectorType,

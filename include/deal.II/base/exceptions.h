@@ -1113,6 +1113,14 @@ namespace StandardExceptions
                     "find a valid muparser library on your system and also did "
                     "not choose the one that comes bundled with deal.II.");
 
+  /**
+   * This function requires support for the Assimp library.
+   */
+  DeclExceptionMsg (ExcNeedsAssimp,
+                    "You are attempting to use functionality that is only available "
+                    "if deal.II was configured to use Assimp, but cmake did not "
+                    "find a valid Assimp library.");
+
 #ifdef DEAL_II_WITH_CUDA
   /**
    * This exception is raised if an error happened in a CUDA kernel.

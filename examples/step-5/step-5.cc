@@ -190,10 +190,7 @@ void Step5<dim>::assemble_system ()
   // change in this part, compared to step-4, is that we will use the
   // <code>coefficient</code> function defined above to compute the
   // coefficient value at each quadrature point.
-  typename DoFHandler<dim>::active_cell_iterator
-  cell = dof_handler.begin_active(),
-  endc = dof_handler.end();
-  for (; cell!=endc; ++cell)
+  for (const auto &cell: dof_handler.active_cell_iterators())
     {
       cell_matrix = 0;
       cell_rhs = 0;

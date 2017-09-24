@@ -2695,16 +2695,17 @@ namespace internal
       }
   }
 
-  template <int dim, int spacedim, typename VectorType, typename Number>
+  template <int dim, int spacedim, typename VectorType>
   void
-  do_function_values (const Number                      *dof_values_ptr,
-                      const dealii::Table<2,double>             &shape_values,
-                      const FiniteElement<dim,spacedim> &fe,
-                      const std::vector<unsigned int> &shape_function_to_row_table,
-                      VectorSlice<std::vector<VectorType> > &values,
-                      const bool quadrature_points_fastest  = false,
-                      const unsigned int component_multiple = 1)
+  do_function_values (const typename VectorType::value_type *dof_values_ptr,
+                      const dealii::Table<2,double>         &shape_values,
+                      const FiniteElement<dim,spacedim>     &fe,
+                      const std::vector<unsigned int>       &shape_function_to_row_table,
+                      ArrayView<VectorType>                  values,
+                      const bool                             quadrature_points_fastest = false,
+                      const unsigned int                     component_multiple        = 1)
   {
+    typedef typename VectorType::value_type Number;
     // initialize with zero
     for (unsigned int i=0; i<values.size(); ++i)
       std::fill_n (values[i].begin(), values[i].size(),
@@ -2830,13 +2831,13 @@ namespace internal
 
   template <int order, int dim, int spacedim, typename Number>
   void
-  do_function_derivatives (const Number                      *dof_values_ptr,
-                           const dealii::Table<2,Tensor<order,spacedim> > &shape_derivatives,
-                           const FiniteElement<dim,spacedim> &fe,
-                           const std::vector<unsigned int> &shape_function_to_row_table,
-                           VectorSlice<std::vector<std::vector<Tensor<order,spacedim,Number> > > > &derivatives,
-                           const bool quadrature_points_fastest  = false,
-                           const unsigned int component_multiple = 1)
+  do_function_derivatives (const Number                                            *dof_values_ptr,
+                           const dealii::Table<2,Tensor<order,spacedim> >          &shape_derivatives,
+                           const FiniteElement<dim,spacedim>                       &fe,
+                           const std::vector<unsigned int>                         &shape_function_to_row_table,
+                           ArrayView<std::vector<Tensor<order,spacedim,Number> > >  derivatives,
+                           const bool quadrature_points_fastest                   = false,
+                           const unsigned int component_multiple                  = 1)
   {
     // initialize with zero
     for (unsigned int i=0; i<derivatives.size(); ++i)
@@ -3118,9 +3119,11 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  VectorSlice<std::vector<Vector<Number> > > val(values);
-  internal::do_function_values(dof_values.begin(), this->finite_element_output.shape_values, *fe,
-                               this->finite_element_output.shape_function_to_row_table, val);
+  internal::do_function_values(dof_values.begin(),
+                               this->finite_element_output.shape_values,
+                               *fe,
+                               this->finite_element_output.shape_function_to_row_table,
+                               make_array_view(values.begin(), values.end()));
 }
 
 
@@ -3140,13 +3143,16 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   Assert (this->update_flags & update_values,
           ExcAccessToUninitializedField("update_values"));
 
-  VectorSlice<std::vector<Vector<Number> > > val(values);
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
     dof_values[i] = get_vector_element (fe_function, indices[i]);
-  internal::do_function_values(dof_values.data(), this->finite_element_output.shape_values, *fe,
-                               this->finite_element_output.shape_function_to_row_table, val,
-                               false, indices.size()/dofs_per_cell);
+  internal::do_function_values(dof_values.data(),
+                               this->finite_element_output.shape_values,
+                               *fe,
+                               this->finite_element_output.shape_function_to_row_table,
+                               make_array_view(values.begin(), values.end()),
+                               false,
+                               indices.size()/dofs_per_cell);
 }
 
 
@@ -3171,8 +3177,11 @@ void FEValuesBase<dim,spacedim>::get_function_values (
   boost::container::small_vector<Number, 200> dof_values(indices.size());
   for (unsigned int i=0; i<indices.size(); ++i)
     dof_values[i] = get_vector_element (fe_function, indices[i]);
-  internal::do_function_values(dof_values.data(), this->finite_element_output.shape_values, *fe,
-                               this->finite_element_output.shape_function_to_row_table, values,
+  internal::do_function_values(dof_values.data(),
+                               this->finite_element_output.shape_values,
+                               *fe,
+                               this->finite_element_output.shape_function_to_row_table,
+                               make_array_view(values.begin(), values.end()),
                                quadrature_points_fastest,
                                indices.size()/dofs_per_cell);
 }
@@ -3243,10 +3252,11 @@ FEValuesBase<dim,spacedim>::get_function_gradients (
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  VectorSlice<std::vector<std::vector<Tensor<1,spacedim,Number> > > > grads(gradients);
-  internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_gradients,
-                                    *fe, this->finite_element_output.shape_function_to_row_table,
-                                    grads);
+  internal::do_function_derivatives(dof_values.begin(),
+                                    this->finite_element_output.shape_gradients,
+                                    *fe,
+                                    this->finite_element_output.shape_function_to_row_table,
+                                    make_array_view(gradients.begin(), gradients.end()));
 }
 
 
@@ -3270,9 +3280,12 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
   boost::container::small_vector<Number, 200> dof_values(indices.size());
   for (unsigned int i=0; i<indices.size(); ++i)
     dof_values[i] = get_vector_element (fe_function, indices[i]);
-  internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_gradients,
-                                    *fe, this->finite_element_output.shape_function_to_row_table,
-                                    gradients, quadrature_points_fastest,
+  internal::do_function_derivatives(dof_values.data(),
+                                    this->finite_element_output.shape_gradients,
+                                    *fe,
+                                    this->finite_element_output.shape_function_to_row_table,
+                                    make_array_view(gradients.begin(), gradients.end()),
+                                    quadrature_points_fastest,
                                     indices.size()/dofs_per_cell);
 }
 
@@ -3343,10 +3356,12 @@ get_function_hessians (const InputVector                         &fe_function,
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  VectorSlice<std::vector<std::vector<Tensor<2,spacedim,Number> > > > hes(hessians);
-  internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_hessians,
-                                    *fe, this->finite_element_output.shape_function_to_row_table,
-                                    hes, quadrature_points_fastest);
+  internal::do_function_derivatives(dof_values.begin(),
+                                    this->finite_element_output.shape_hessians,
+                                    *fe,
+                                    this->finite_element_output.shape_function_to_row_table,
+                                    make_array_view(hessians.begin(), hessians.end()),
+                                    quadrature_points_fastest);
 }
 
 
@@ -3368,9 +3383,12 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
   boost::container::small_vector<Number, 200> dof_values(indices.size());
   for (unsigned int i=0; i<indices.size(); ++i)
     dof_values[i] = get_vector_element (fe_function, indices[i]);
-  internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_hessians,
-                                    *fe, this->finite_element_output.shape_function_to_row_table,
-                                    hessians, quadrature_points_fastest,
+  internal::do_function_derivatives(dof_values.data(),
+                                    this->finite_element_output.shape_hessians,
+                                    *fe,
+                                    this->finite_element_output.shape_function_to_row_table,
+                                    make_array_view(hessians.begin(), hessians.end()),
+                                    quadrature_points_fastest,
                                     indices.size()/dofs_per_cell);
 }
 
@@ -3560,10 +3578,12 @@ get_function_third_derivatives (const InputVector                         &fe_fu
   // get function values of dofs on this cell
   Vector<Number> dof_values (dofs_per_cell);
   present_cell->get_interpolated_dof_values(fe_function, dof_values);
-  VectorSlice<std::vector<std::vector<Tensor<3,spacedim,Number> > > > third(third_derivatives);
-  internal::do_function_derivatives(dof_values.begin(), this->finite_element_output.shape_3rd_derivatives,
-                                    *fe, this->finite_element_output.shape_function_to_row_table,
-                                    third, quadrature_points_fastest);
+  internal::do_function_derivatives(dof_values.begin(),
+                                    this->finite_element_output.shape_3rd_derivatives,
+                                    *fe,
+                                    this->finite_element_output.shape_function_to_row_table,
+                                    make_array_view(third_derivatives.begin(), third_derivatives.end()),
+                                    quadrature_points_fastest);
 }
 
 
@@ -3585,9 +3605,12 @@ void FEValuesBase<dim, spacedim>::get_function_third_derivatives (
   boost::container::small_vector<Number, 200> dof_values(indices.size());
   for (unsigned int i=0; i<indices.size(); ++i)
     dof_values[i] = get_vector_element (fe_function, indices[i]);
-  internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_3rd_derivatives,
-                                    *fe, this->finite_element_output.shape_function_to_row_table,
-                                    third_derivatives, quadrature_points_fastest,
+  internal::do_function_derivatives(dof_values.data(),
+                                    this->finite_element_output.shape_3rd_derivatives,
+                                    *fe,
+                                    this->finite_element_output.shape_function_to_row_table,
+                                    make_array_view(third_derivatives.begin(), third_derivatives.end()),
+                                    quadrature_points_fastest,
                                     indices.size()/dofs_per_cell);
 }
 
