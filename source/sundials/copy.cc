@@ -22,40 +22,37 @@ namespace SUNDIALS
 {
   namespace internal
   {
-    namespace
+    /**
+     * SUNDIALS provides different macros for getting the local length of a
+     * vector for serial and parallel vectors (as well as various parallel
+     * vectors that are not yet supported by deal.II). This function provides
+     * a generic interface to both and does a (checked) conversion from long
+     * int (the type SUNDIALS uses for lengths) to std::size_t.
+     */
+    inline
+    std::size_t
+    N_Vector_length(const N_Vector &vec)
     {
-      /**
-       * SUNDIALS provides different macros for getting the local length of a
-       * vector for serial and parallel vectors (as well as various parallel
-       * vectors that are not yet supported by deal.II). This function provides
-       * a generic interface to both and does a (checked) conversion from long
-       * int (the type SUNDIALS uses for lengths) to std::size_t.
-       */
-      inline
-      std::size_t
-      N_Vector_length(const N_Vector &vec)
-      {
-        const N_Vector_ID id = N_VGetVectorID(vec);
-        long int length = -1;
-        switch (id)
-          {
-          case SUNDIALS_NVEC_SERIAL:
-          {
-            length = NV_LENGTH_S(vec);
-            break;
-          }
-          case SUNDIALS_NVEC_PARALLEL:
-          {
-            length = NV_LOCLENGTH_P(vec);
-            break;
-          }
-          default:
-            Assert(false, ExcNotImplemented());
-          }
+      const N_Vector_ID id = N_VGetVectorID(vec);
+      long int length = -1;
+      switch (id)
+        {
+        case SUNDIALS_NVEC_SERIAL:
+        {
+          length = NV_LENGTH_S(vec);
+          break;
+        }
+        case SUNDIALS_NVEC_PARALLEL:
+        {
+          length = NV_LOCLENGTH_P(vec);
+          break;
+        }
+        default:
+          Assert(false, ExcNotImplemented());
+        }
 
-        Assert(length >= 0, ExcInternalError());
-        return static_cast<std::size_t>(length);
-      }
+      Assert(length >= 0, ExcInternalError());
+      return static_cast<std::size_t>(length);
     }
 
 #ifdef DEAL_II_WITH_MPI
