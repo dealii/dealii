@@ -34,6 +34,8 @@ shift 2
 export LC_ALL=C
 # Prevent OpenMP from creating additional threads
 export OMP_NUM_THREADS=2
+# Allow oversubscription for MPI (needed for Openmpi@3.0)
+export OMPI_MCA_rmaps_base_oversubscribe=1
 
 case $STAGE in
   run)
