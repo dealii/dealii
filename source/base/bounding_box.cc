@@ -32,9 +32,28 @@ bool BoundingBox<spacedim,Number>::point_inside (const Point<spacedim, Number> &
 }
 
 template <int spacedim, typename Number>
+void BoundingBox<spacedim,Number>::merge_with(const BoundingBox<spacedim,Number> &other_bbox)
+{
+  for (unsigned int i=0; i < spacedim; ++i)
+    {
+      this->boundary_points.first[i] = std::min( this->boundary_points.first[i], other_bbox.boundary_points.first[i] );
+      this->boundary_points.second[i] = std::max( this->boundary_points.second[i], other_bbox.boundary_points.second[i] );
+    }
+}
+
+template <int spacedim, typename Number>
 const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &BoundingBox<spacedim,Number>::get_boundary_points () const
 {
   return this->boundary_points;
+}
+
+template <int spacedim, typename Number>
+double BoundingBox<spacedim,Number>::volume() const
+{
+  double vol = 1.0;
+  for (unsigned int i=0; i < spacedim; ++i)
+    vol *= ( this->boundary_points.second[i] - this->boundary_points.first[i] );
+  return vol;
 }
 
 #include "bounding_box.inst"

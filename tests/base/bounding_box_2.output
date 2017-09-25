@@ -1,0 +1,65 @@
+
+DEAL::Test: Bounding Box class merge and volume functions
+DEAL::
+DEAL::Test for dimension 1
+DEAL::Empty BoundingBox: 
+DEAL::0.00000
+DEAL::Bounding box boundaries: 
+DEAL::0.00000
+DEAL::1.00000
+DEAL:: Boundary Box volume: 1.00000
+DEAL::Merging it with 0: volume 1.00000
+DEAL::Boundary points:
+DEAL::0.00000
+DEAL::1.00000
+DEAL::Bounding box boundaries: 
+DEAL::1.00000
+DEAL::2.00000
+DEAL::1.00000
+DEAL::Merging it with previous: volume 2.00000
+DEAL::Boundary points:
+DEAL::0.00000
+DEAL::2.00000
+DEAL::End test for dimension 1
+DEAL::
+DEAL::Test for dimension 2
+DEAL::Empty BoundingBox: 
+DEAL::0.00000
+DEAL::Bounding box boundaries: 
+DEAL::0.00000 0.00000
+DEAL::1.00000 1.00000
+DEAL:: Boundary Box volume: 1.00000
+DEAL::Merging it with 0: volume 1.00000
+DEAL::Boundary points:
+DEAL::0.00000 0.00000
+DEAL::1.00000 1.00000
+DEAL::Bounding box boundaries: 
+DEAL::1.00000 1.00000
+DEAL::2.00000 3.00000
+DEAL::2.00000
+DEAL::Merging it with previous: volume 6.00000
+DEAL::Boundary points:
+DEAL::0.00000 0.00000
+DEAL::2.00000 3.00000
+DEAL::End test for dimension 2
+DEAL::
+DEAL::Test for dimension 3
+DEAL::Empty BoundingBox: 
+DEAL::0.00000
+DEAL::Bounding box boundaries: 
+DEAL::0.00000 0.00000 0.00000
+DEAL::1.00000 1.00000 1.00000
+DEAL:: Boundary Box volume: 1.00000
+DEAL::Merging it with 0: volume 1.00000
+DEAL::Boundary points:
+DEAL::0.00000 0.00000 0.00000
+DEAL::1.00000 1.00000 1.00000
+DEAL::Bounding box boundaries: 
+DEAL::1.00000 1.00000 1.00000
+DEAL::2.00000 3.00000 4.00000
+DEAL::6.00000
+DEAL::Merging it with previous: volume 24.0000
+DEAL::Boundary points:
+DEAL::0.00000 0.00000 0.00000
+DEAL::2.00000 3.00000 4.00000
+DEAL::End test for dimension 3
