@@ -51,9 +51,10 @@ std::string ParameterAcceptor::get_section_name() const
 void
 ParameterAcceptor::initialize(const std::string &filename,
                               const std::string &output_filename,
-                              const ParameterHandler::OutputStyle output_style_for_prm_format)
+                              const ParameterHandler::OutputStyle output_style_for_prm_format,
+                              ParameterHandler &prm)
 {
-  declare_all_parameters();
+  declare_all_parameters(prm);
   if (filename != "")
     {
       // check the extension of input file
@@ -118,7 +119,19 @@ ParameterAcceptor::initialize(const std::string &filename,
     }
 
   // Finally do the parsing.
-  parse_all_parameters();
+  parse_all_parameters(prm);
+}
+
+
+
+void ParameterAcceptor::initialize(std::istream &input_stream,
+                                   ParameterHandler &prm)
+
+{
+  AssertThrow(input_stream, ExcIO());
+  declare_all_parameters(prm);
+  prm.parse_input(input_stream);
+  parse_all_parameters(prm);
 }
 
 void

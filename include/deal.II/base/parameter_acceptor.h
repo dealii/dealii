@@ -379,7 +379,21 @@ public:
    */
   static void initialize(const std::string &filename="",
                          const std::string &output_filename="",
-                         const ParameterHandler::OutputStyle output_style_for_prm_format=ParameterHandler::ShortText);
+                         const ParameterHandler::OutputStyle output_style_for_prm_format=ParameterHandler::ShortText,
+                         ParameterHandler &prm = ParameterAcceptor::prm);
+
+  /**
+   * Call declare_all_parameters(), read the parameters from the `input_stream`
+   * in `prm` format, and then call parse_all_parameters().
+   *
+   * An exception is thrown if the `input_stream` is invalid.
+   *
+   * @param input_stream Input stream
+   * @param prm The ParameterHandler to use
+   */
+  static void initialize(std::istream &input_stream,
+                         ParameterHandler &prm = ParameterAcceptor::prm);
+
 
   /**
    * Clear class list and global parameter file.
