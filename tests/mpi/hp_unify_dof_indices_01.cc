@@ -56,8 +56,8 @@ void test()
   Assert (triangulation.n_global_active_cells() == 2,
           ExcInternalError());
   Assert (triangulation.n_active_cells() == 2,
-          ExcInternalError());  
-  
+          ExcInternalError());
+
   hp::FECollection<dim> fe;
   fe.push_back (FE_Q<dim>(2));
   fe.push_back (FE_Q<dim>(2));
@@ -81,31 +81,20 @@ void test()
       for (auto i : dof_indices)
         deallog << i << ' ';
       deallog << std::endl;
-    }    
+    }
 }
 
 
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  MPILogInitAll log;
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  if (myid == 0)
-    {
-      initlog();
+  deallog.push("2d");
+  test<2>();
+  deallog.pop();
 
-      deallog.push("2d");
-      test<2>();
-      deallog.pop();
-
-      deallog.push("3d");
-      test<3>();
-      deallog.pop();
-    }
-  else
-    {
-      test<2>();
-      test<3>();
-    }
-
+  deallog.push("3d");
+  test<3>();
+  deallog.pop();
 }
