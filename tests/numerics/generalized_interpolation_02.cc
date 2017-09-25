@@ -102,11 +102,10 @@ int main ()
   // distorted mesh.
   test<3>(FE_RaviartThomas<3>(1), 3, 2, true);
 
-  // FIXME: Reenable, when FE_Nedelec is fixed :-/
-  // test<2>(FE_Nedelec<2>(0), 2, 1, false);
-  // test<2>(FE_Nedelec<2>(1), 2, 2, false);
-  // test<2>(FE_Nedelec<2>(2), 2, 3, false);
-  // test<2>(FE_Nedelec<2>(0), 2, 1, true);
-  // test<2>(FE_Nedelec<2>(1), 2, 2, true);
-  // test<2>(FE_Nedelec<2>(2), 2, 3, true);
+  test<2>(FE_Nedelec<2>(0), 2, 1, false);
+  test<2>(FE_Nedelec<2>(1), 2, 2, false);
+  test<2>(FE_Nedelec<2>(2), 2, 3, false);
+  test<2>(FE_Nedelec<2>(0), 2, 1, true);
+  test<2>(FE_Nedelec<2>(1), 2, 2, true);
+  test<2>(FE_Nedelec<2>(2), 2, 3, true);
 }
