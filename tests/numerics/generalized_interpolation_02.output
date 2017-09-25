@@ -1,3 +1,4 @@
+
 DEAL::dim 2 FE_Q<2>(1)
 DEAL::Function value at (0.0,0.0): 1.00000 
 DEAL::Check projection property: 0.00000
