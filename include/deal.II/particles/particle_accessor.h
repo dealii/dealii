@@ -18,7 +18,7 @@
 
 #include <deal.II/particles/particle.h>
 #include <deal.II/base/array_view.h>
-#include <deal.II/distributed/tria.h>
+#include <deal.II/grid/tria.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -141,8 +141,8 @@ namespace Particles
      * but the triangulation itself is not stored in the particle this
      * operation requires a reference to the triangulation.
      */
-    typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator
-    get_surrounding_cell (const parallel::distributed::Triangulation<dim,spacedim> &triangulation) const;
+    typename Triangulation<dim,spacedim>::cell_iterator
+    get_surrounding_cell (const Triangulation<dim,spacedim> &triangulation) const;
 
     /**
      * Serialize the contents of this class.
@@ -189,19 +189,18 @@ namespace Particles
      * A pointer to the container that stores the particles. Obviously,
      * this accessor is invalidated if the container changes.
      */
-    std::multimap<types::LevelInd, Particle<dim,spacedim> >            *map;
+    std::multimap<types::LevelInd, Particle<dim,spacedim> > *map;
 
     /**
      * An iterator into the container of particles. Obviously,
-       * this accessor is invalidated if the container changes.
+     * this accessor is invalidated if the container changes.
      */
-    typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator  particle;
+    typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator particle;
 
     /**
      * Make ParticleIterator a friend to allow it constructing ParticleAccessors.
      */
     template <int, int> friend class ParticleIterator;
-    template <int, int> friend class ParticleHandler;
   };
 }
 

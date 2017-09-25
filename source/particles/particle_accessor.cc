@@ -148,13 +148,13 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator
-  ParticleAccessor<dim,spacedim>::get_surrounding_cell (const parallel::distributed::Triangulation<dim,spacedim> &triangulation) const
+  typename Triangulation<dim,spacedim>::cell_iterator
+  ParticleAccessor<dim,spacedim>::get_surrounding_cell (const Triangulation<dim,spacedim> &triangulation) const
   {
     Assert(particle != map->end(),
            ExcInternalError());
 
-    const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell (&triangulation,
+    const typename Triangulation<dim,spacedim>::cell_iterator cell (&triangulation,
         particle->first.first,
         particle->first.second);
     return cell;
