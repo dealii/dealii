@@ -116,13 +116,35 @@ public:
    * Return a pointer to a new vector. The number of elements or their
    * subdivision into blocks (if applicable) is unspecified and users of this
    * function should reset vectors to their proper size. The same holds for
-   * the contents of vectors: they are unspecified.
+   * the contents of vectors: they are unspecified. In other words,
+   * the place that calls this function will need to resize or reinitialize
+   * it appropriately.
+   *
+   * @warning Just like using <code>new</code> and <code>delete</code>
+   *   explicitly in code invites bugs where memory is leaked (either
+   *   because the corresponding <code>delete</code> is forgotten
+   *   altogether, or because of exception safety issues), using the
+   *   alloc() and free() functions explicitly invites writing code
+   *   that accidentally leaks memory. You should consider using
+   *   the VectorMemory::Pointer class instead, which provides the
+   *   same kind of service that <code>std::unique</code> provides
+   *   for arbitrary memory allocated on the heap.
    */
   virtual VectorType *alloc () = 0;
 
   /**
    * Return a vector and indicate that it is not going to be used any further
-   * by the instance that called alloc() to get a pointer to it.
+   * by the place that called alloc() to get a pointer to it.
+   *
+   * @warning Just like using <code>new</code> and <code>delete</code>
+   *   explicitly in code invites bugs where memory is leaked (either
+   *   because the corresponding <code>delete</code> is forgotten
+   *   altogether, or because of exception safety issues), using the
+   *   alloc() and free() functions explicitly invites writing code
+   *   that accidentally leaks memory. You should consider using
+   *   the VectorMemory::Pointer class instead, which provides the
+   *   same kind of service that <code>std::unique</code> provides
+   *   for arbitrary memory allocated on the heap.
    */
   virtual void free (const VectorType *const) = 0;
 
@@ -210,10 +232,23 @@ public:
    * Return a pointer to a new vector. The number of elements or their
    * subdivision into blocks (if applicable) is unspecified and users of this
    * function should reset vectors to their proper size. The same holds for
-   * the contents of vectors: they are unspecified.
+   * the contents of vectors: they are unspecified. In other words,
+   * the place that calls this function will need to resize or reinitialize
+   * it appropriately.
    *
    * For the present class, calling this function will allocate a new vector
-   * on the heap and returning a pointer to it.
+   * on the heap and returning a pointer to it. Later calling free() then
+   * returns the memory to the global heap managed by the operating system.
+   *
+   * @warning Just like using <code>new</code> and <code>delete</code>
+   *   explicitly in code invites bugs where memory is leaked (either
+   *   because the corresponding <code>delete</code> is forgotten
+   *   altogether, or because of exception safety issues), using the
+   *   alloc() and free() functions explicitly invites writing code
+   *   that accidentally leaks memory. You should consider using
+   *   the VectorMemory::Pointer class instead, which provides the
+   *   same kind of service that <code>std::unique</code> provides
+   *   for arbitrary memory allocated on the heap.
    */
   virtual VectorType *alloc ();
 
@@ -221,9 +256,18 @@ public:
    * Return a vector and indicate that it is not going to be used any further
    * by the instance that called alloc() to get a pointer to it.
    *
-   *
    * For the present class, this means that the vector is returned to the
    * global heap.
+   *
+   * @warning Just like using <code>new</code> and <code>delete</code>
+   *   explicitly in code invites bugs where memory is leaked (either
+   *   because the corresponding <code>delete</code> is forgotten
+   *   altogether, or because of exception safety issues), using the
+   *   alloc() and free() functions explicitly invites writing code
+   *   that accidentally leaks memory. You should consider using
+   *   the VectorMemory::Pointer class instead, which provides the
+   *   same kind of service that <code>std::unique</code> provides
+   *   for arbitrary memory allocated on the heap.
    */
   virtual void free (const VectorType *const v);
 };
@@ -285,7 +329,19 @@ public:
    * Return a pointer to a new vector. The number of elements or their
    * subdivision into blocks (if applicable) is unspecified and users of this
    * function should reset vectors to their proper size. The same holds for
-   * the contents of vectors: they are unspecified.
+   * the contents of vectors: they are unspecified. In other words,
+   * the place that calls this function will need to resize or reinitialize
+   * it appropriately.
+   *
+   * @warning Just like using <code>new</code> and <code>delete</code>
+   *   explicitly in code invites bugs where memory is leaked (either
+   *   because the corresponding <code>delete</code> is forgotten
+   *   altogether, or because of exception safety issues), using the
+   *   alloc() and free() functions explicitly invites writing code
+   *   that accidentally leaks memory. You should consider using
+   *   the VectorMemory::Pointer class instead, which provides the
+   *   same kind of service that <code>std::unique</code> provides
+   *   for arbitrary memory allocated on the heap.
    */
   virtual VectorType *alloc ();
 
@@ -295,6 +351,16 @@ public:
    *
    * For the present class, this means retaining the vector for later reuse by
    * the alloc() method.
+   *
+   * @warning Just like using <code>new</code> and <code>delete</code>
+   *   explicitly in code invites bugs where memory is leaked (either
+   *   because the corresponding <code>delete</code> is forgotten
+   *   altogether, or because of exception safety issues), using the
+   *   alloc() and free() functions explicitly invites writing code
+   *   that accidentally leaks memory. You should consider using
+   *   the VectorMemory::Pointer class instead, which provides the
+   *   same kind of service that <code>std::unique</code> provides
+   *   for arbitrary memory allocated on the heap.
    */
   virtual void free (const VectorType *const);
 
