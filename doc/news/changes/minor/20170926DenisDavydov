@@ -1,0 +1,5 @@
+New: Extend LAPACKFullMatrix to provide (i) Cholesky factorization (and use it for inversion);
+(ii) an estimate of the reciprocal condition number; (iii) l1_norm(),
+linfty_norm() and frobenius_norm().
+<br>
+(Denis Davydov, 2017/09/26)
