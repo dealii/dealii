@@ -1476,14 +1476,15 @@ namespace DoFTools
                         cell->face(face)->get_dof_indices (master_dofs,
                                                            cell->active_fe_index ());
 
-                        slave_dofs.resize (neighbor->get_fe().dofs_per_face);
-                        cell->face(face)->get_dof_indices (slave_dofs,
-                                                           neighbor->active_fe_index ());
-
                         // break if the n_master_dofs == 0, because we are
                         // attempting to constrain to an element that has
                         // no face dofs
-                        if (master_dofs.size() == 0) break;
+                        if (master_dofs.size() == 0)
+                          break;
+
+                        slave_dofs.resize (neighbor->get_fe().dofs_per_face);
+                        cell->face(face)->get_dof_indices (slave_dofs,
+                                                           neighbor->active_fe_index ());
 
                         // make sure the element constraints for this face
                         // are available
