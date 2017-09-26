@@ -65,6 +65,33 @@ extern "C"
                 int *ipiv, double *inv_work, const int *lwork, int *info);
   void sgetri_ (const int *n, float *A, const int *lda,
                 int *ipiv, float *inv_work, const int *lwork, int *info);
+// Compute Cholesky factorization of SPD
+  void dpotrf_ (const char *uplo, const int *n, double *A,
+                const int *lda, int *info);
+  void spotrf_ (const char *uplo, const int *n, float *A,
+                const int *lda, int *info);
+// Estimate the reciprocal of the condition number in 1-norm from Cholesky
+  void dpocon_ (const char *uplo, const int *n, const double *A,
+                const int *lda, const double *anorm, double *rcond,
+                double *work, int *iwork, int *info);
+  void spocon_ (const char *uplo, const int *n, const float *A,
+                const int *lda, const float *anorm, float *rcond,
+                float *work, int *iwork, int *info);
+// Computes the inverse from Cholesky
+  void dpotri_ (const char *uplo, const int *n, double *A,
+                const int *lda, int *info);
+  void spotri_ (const char *uplo, const int *n, float *A,
+                const int *lda, int *info);
+// Norms
+  double dlansy_ (const char *norm, const char *uplo, const int *n, const double *A,
+                  const int *lda, double *work);
+  float  slansy_ (const char *norm, const char *uplo, const int *n, const float *A,
+                  const int *lda, float *work);
+  double dlange_ (const char *norm, const int *m, const int *n, const double *A,
+                  const int *lda, double *work);
+  float slange_ (const char *norm, const int *m, const int *n, const float *A,
+                 const int *lda, float *work);
+
 // Compute QR factorization (Householder)
   void dgeqrf_ (const int *m, const int *n, double *A,
                 const int *lda, double *tau, double *work,
@@ -364,6 +391,156 @@ gemm (const char *, const char *, const int *, const int *, const int *, const f
 }
 #endif
 
+
+
+/// Template wrapper for potrf
+template <typename number1>
+inline void
+potrf (const char *uplo, const int *n, number1 *A, const int *lda, int *info)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+inline void
+potrf (const char *uplo, const int *n, double *A, const int *lda, int *info)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  dpotrf_ (uplo,n,A,lda,info);
+#else
+  Assert (false, LAPACKSupport::ExcMissing("dpotrf"));
+#endif
+}
+
+inline void
+potrf (const char *uplo, const int *n, float *A, const int *lda, int *info)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  spotrf_ (uplo,n,A,lda,info);
+#else
+  Assert (false, LAPACKSupport::ExcMissing("spotrf"));
+#endif
+}
+
+
+
+/// Template wrapper for pocon
+template <typename number1>
+inline void
+pocon (const char *uplo, const int *n, const number1 *A, const int *lda, const number1 *anorm, number1 *rcond, number1 *work, int *iwork, int *info)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+inline void
+pocon (const char *uplo, const int *n, const double *A, const int *lda, const double *anorm, double *rcond, double *work, int *iwork, int *info)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  dpocon_ (uplo,n,A,lda,anorm,rcond,work,iwork,info);
+#else
+  Assert (false, LAPACKSupport::ExcMissing("dpocon"));
+#endif
+}
+
+inline void
+pocon (const char *uplo, const int *n, const float *A, const int *lda, const float *anorm, float *rcond, float *work, int *iwork, int *info)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  spocon_ (uplo,n,A,lda,anorm,rcond,work,iwork,info);
+#else
+  Assert (false, LAPACKSupport::ExcMissing("dpocon"));
+#endif
+}
+
+/// Template wrapper for potri
+template <typename number1>
+inline void
+potri(const char *uplo, const int *n, number1 *A, const int *lda, int *info)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+inline void
+potri(const char *uplo, const int *n, double *A, const int *lda, int *info)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  dpotri_(uplo,n,A,lda,info);
+#else
+  Assert (false, LAPACKSupport::ExcMissing("dpotri"));
+#endif
+}
+
+inline void
+potri(const char *uplo, const int *n, float *A, const int *lda, int *info)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  spotri_(uplo,n,A,lda,info);
+#else
+  Assert (false, LAPACKSupport::ExcMissing("spotri"));
+#endif
+}
+
+
+/// Template wrapper for lansy
+template <typename number>
+inline
+number lansy (const char *norm, const char *uplo, const int *n, const number *A, const int *lda, number *work)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+inline
+double lansy (const char *norm, const char *uplo, const int *n, const double *A, const int *lda, double *work)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  return dlansy_(norm,uplo,n,A,lda,work);
+#else
+  Assert (false, LAPACKSupport::ExcMissing("lansy"));
+  return 0.;
+#endif
+}
+
+inline
+float lansy (const char *norm, const char *uplo, const int *n, const float *A, const int *lda, float *work)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  return slansy_(norm,uplo,n,A,lda,work);
+#else
+  Assert (false, LAPACKSupport::ExcMissing("lansy"));
+  return 0.;
+#endif
+}
+
+
+
+/// Template wrapper for lange
+template <typename number>
+inline
+number lange (const char *norm, const int *m, const int *n, const number *A, const int *lda, number *work)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+inline
+double lange (const char *norm, const int *m, const int *n, const double *A, const int *lda, double *work)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  return dlange_(norm,m,n,A,lda,work);
+#else
+  Assert (false, LAPACKSupport::ExcMissing("lange"));
+  return 0.;
+#endif
+}
+
+inline
+float lange (const char *norm, const int *m, const int *n, const float *A, const int *lda, float *work)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  return slange_(norm,m,n,A,lda,work);
+#else
+  Assert (false, LAPACKSupport::ExcMissing("lange"));
+  return 0.;
+#endif
+}
 
 /// Template wrapper for LAPACK functions dgetrf and sgetrf
 template <typename number1>

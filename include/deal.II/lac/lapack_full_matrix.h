@@ -46,7 +46,7 @@ template <typename number> class SparseMatrix;
  * usually the names chosen for the arguments in the LAPACK documentation.
  *
  * @ingroup Matrix1
- * @author Guido Kanschat, 2005
+ * @author Guido Kanschat, 2005, Denis Davydov, 2017
  */
 template <typename number>
 class LAPACKFullMatrix : public TransposeTable<number>
@@ -156,6 +156,11 @@ public:
    */
   void reinit (const size_type rows,
                const size_type cols);
+
+  /**
+   * Assign @p property to this matrix.
+   */
+  void set_property(const LAPACKSupport::Property property);
 
   /**
    * Return the dimension of the codomain (or range) space.
@@ -405,6 +410,23 @@ public:
   void compute_lu_factorization ();
 
   /**
+   * Compute the Cholesky factorization of the matrix using LAPACK function Xpotrf.
+   *
+   * @note The factorization is stored in the lower diagonal.
+   */
+  void compute_cholesky_factorization ();
+
+  /**
+   * Estimate reciprocal of the condition number (in 1-norm) of a SPD matrix
+   * using Cholesky factorization. This function can only be called if the matrix
+   * is already factorized.
+   *
+   * @param a_norm Is the 1-norm of the matrix before calling Cholesky
+   * factorization.
+   */
+  number reciprocal_condition_number(const number a_norm) const;
+
+  /**
    * Compute the determinant of a matrix. As it requires the LU factorization of
    * the matrix, this function can only be called after
    * compute_lu_factorization() has been called.
@@ -412,8 +434,23 @@ public:
   number determinant () const;
 
   /**
-   * Invert the matrix by first computing an LU factorization with the LAPACK
-   * function Xgetrf and then building the actual inverse using Xgetri.
+   * Compute $L_1$ norm.
+   */
+  number l1_norm() const;
+
+  /**
+   * Compute $L_\infty$ norm.
+   */
+  number linfty_norm() const;
+
+  /**
+   * Compute Frobenius norm
+   */
+  number frobenius_norm() const;
+
+  /**
+   * Invert the matrix by first computing an LU/Cholesky factorization with the LAPACK
+   * function Xgetrf/Xpotrf and then building the actual inverse using Xgetri/Xpotri.
    */
   void invert ();
 
@@ -613,6 +650,10 @@ public:
                         const double        threshold   = 0.) const;
 
 private:
+  /**
+   * Internal function to compute various norms.
+   */
+  number norm(const char type) const;
 
   /**
    * Since LAPACK operations notoriously change the meaning of the matrix
@@ -621,10 +662,10 @@ private:
   LAPACKSupport::State state;
 
   /**
-   * Additional properties of the matrix which may help to select more
+   * Additional property of the matrix which may help to select more
    * efficient LAPACK functions.
    */
-  LAPACKSupport::Properties properties;
+  LAPACKSupport::Property property;
 
   /**
    * The working array used for some LAPACK functions.

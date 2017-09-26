@@ -33,7 +33,8 @@ template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix (const size_type n)
   :
   TransposeTable<number> (n,n),
-  state (matrix)
+  state (matrix),
+  property(general)
 {}
 
 
@@ -42,7 +43,8 @@ LAPACKFullMatrix<number>::LAPACKFullMatrix (const size_type m,
                                             const size_type n)
   :
   TransposeTable<number> (m, n),
-  state (matrix)
+  state (matrix),
+  property(general)
 {}
 
 
@@ -50,7 +52,8 @@ template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix (const LAPACKFullMatrix &M)
   :
   TransposeTable<number> (M),
-  state (matrix)
+  state (matrix),
+  property(general)
 {}
 
 
@@ -59,7 +62,8 @@ LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator = (const LAPACKFullMatrix<number> &M)
 {
   TransposeTable<number>::operator=(M);
-  state = LAPACKSupport::matrix;
+  state = M.state;
+  property = M.property;
   return *this;
 }
 
@@ -95,6 +99,7 @@ LAPACKFullMatrix<number>::operator = (const FullMatrix<number2> &M)
       (*this)(i,j) = M(i,j);
 
   state = LAPACKSupport::matrix;
+  property = LAPACKSupport::general;
   return *this;
 }
 
@@ -111,6 +116,7 @@ LAPACKFullMatrix<number>::operator = (const SparseMatrix<number2> &M)
       (*this)(i,j) = M.el(i,j);
 
   state = LAPACKSupport::matrix;
+  property = LAPACKSupport::general;
   return *this;
 }
 
@@ -514,6 +520,127 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
 }
 
 
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::set_property(const Property p)
+{
+  property = p;
+}
+
+
+
+template <typename number>
+number LAPACKFullMatrix<number>::l1_norm() const
+{
+  const char type('O');
+  return norm(type);
+}
+
+
+
+template <typename number>
+number LAPACKFullMatrix<number>::linfty_norm() const
+{
+  const char type('I');
+  return norm(type);
+}
+
+
+
+template <typename number>
+number LAPACKFullMatrix<number>::frobenius_norm() const
+{
+  const char type('F');
+  return norm(type);
+}
+
+
+
+template <typename number>
+number LAPACKFullMatrix<number>::norm(const char type) const
+{
+  Assert (state == LAPACKSupport::matrix ||
+          state == LAPACKSupport::inverse_matrix,
+          ExcMessage("norms can be called in matrix state only."));
+
+  const int N = this->n_cols();
+  const int M = this->n_rows();
+  const number *values = &this->values[0];
+  std::vector<number> w;
+  if (property == symmetric)
+    {
+      const int lda = std::max(1,N);
+      const int lwork = (type == 'I' || type == 'O') ?
+                        std::max(1,N) :
+                        0;
+      w.resize(lwork);
+      return lansy (&type, &LAPACKSupport::L, &N, values, &lda, &w[0]);
+    }
+  else
+    {
+      const int lda = std::max(1,M);
+      const int lwork = (type == 'I') ?
+                        std::max(1,M) :
+                        0;
+      w.resize(lwork);
+      return lange (&type, &M, &N, values, &lda, &w[0]);
+    }
+}
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::compute_cholesky_factorization()
+{
+  Assert(state == matrix, ExcState(state));
+  Assert(property == symmetric, ExcProperty(property));
+  state = LAPACKSupport::unusable;
+
+  const int mm = this->n_rows();
+  const int nn = this->n_cols();
+  Assert (mm == nn, ExcDimensionMismatch(mm,nn));
+
+  number *values = &this->values[0];
+  int info = 0;
+  const int lda = std::max(1,nn);
+  potrf (&LAPACKSupport::L, &nn, values, &lda, &info);
+
+  // info < 0 : the info-th argument had an illegal value
+  Assert(info >= 0, ExcInternalError());
+
+  state = cholesky;
+  AssertThrow(info == 0, LACExceptions::ExcSingular());
+}
+
+
+
+template <typename number>
+number
+LAPACKFullMatrix<number>::reciprocal_condition_number(const number a_norm) const
+{
+  Assert(state == cholesky, ExcState(state));
+  number rcond = 0.;
+
+  const int N = this->n_rows();
+  const number *values = &this->values[0];
+  int info = 0;
+  const int lda = std::max(1,N);
+  std::vector<number> w(3*N);
+  std::vector<int> iw(N);
+
+  // use the same uplo as in Cholesky
+  pocon (&LAPACKSupport::L, &N, values, &lda,
+         &a_norm, &rcond,
+         &w[0], &iw[0], &info);
+
+  Assert(info >= 0, ExcInternalError());
+
+  return rcond;
+}
+
+
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::compute_svd()
@@ -584,26 +711,36 @@ template <typename number>
 void
 LAPACKFullMatrix<number>::invert()
 {
-  Assert(state == matrix || state == lu,
+  Assert(state == matrix || state == lu || state == cholesky,
          ExcState(state));
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   Assert (nn == mm, ExcNotQuadratic());
 
   number *values = const_cast<number *> (&this->values[0]);
-  ipiv.resize(mm);
   int info = 0;
 
-  if (state == matrix)
+  if (property != symmetric)
     {
-      getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
+      if (state == matrix)
+        compute_lu_factorization();
 
-      Assert(info >= 0, ExcInternalError());
-      AssertThrow(info == 0, LACExceptions::ExcSingular());
+      ipiv.resize(mm);
+      inv_work.resize (mm);
+      getri(&mm, values, &mm, &ipiv[0], &inv_work[0], &mm, &info);
     }
+  else
+    {
+      if (state == matrix)
+        compute_cholesky_factorization();
 
-  inv_work.resize (mm);
-  getri(&mm, values, &mm, &ipiv[0], &inv_work[0], &mm, &info);
+      const int lda = std::max(1,nn);
+      potri(&LAPACKSupport::L, &nn, values,&lda,&info);
+      // inverse is stored in lower diagonal, set the upper diagonal appropriately:
+      for (int i=0; i < nn; ++i)
+        for (int j=i+1; j < nn; ++j)
+          this->el(i,j) = this->el(j,i);
+    }
 
   Assert(info >= 0, ExcInternalError());
   AssertThrow(info == 0, LACExceptions::ExcSingular());
@@ -1016,7 +1153,8 @@ LAPACKFullMatrix<number>::print_formatted (
   Assert ((!this->empty()) || (this->n_cols()+this->n_rows()==0),
           ExcInternalError());
   Assert (state == LAPACKSupport::matrix ||
-          state == LAPACKSupport::inverse_matrix,
+          state == LAPACKSupport::inverse_matrix ||
+          state == LAPACKSupport::cholesky,
           ExcState(state));
 
   // set output format, but store old

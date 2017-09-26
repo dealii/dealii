@@ -1,0 +1,33 @@
+
+DEAL::size=1
+DEAL::l1:        0.00000
+DEAL::linfty:    0.00000
+DEAL::frobenius: 0.00000
+DEAL::size=3
+DEAL::l1:        0.00000
+DEAL::linfty:    0.00000
+DEAL::frobenius: 0.00000
+DEAL::size=11
+DEAL::l1:        0.00000
+DEAL::linfty:    0.00000
+DEAL::frobenius: 0.00000
+DEAL::size=17
+DEAL::l1:        0.00000
+DEAL::linfty:    0.00000
+DEAL::frobenius: 0.00000
+DEAL::size=32
+DEAL::l1:        0.00000
+DEAL::linfty:    0.00000
+DEAL::frobenius: 0.00000
+DEAL::size=64
+DEAL::l1:        0.00000
+DEAL::linfty:    0.00000
+DEAL::frobenius: 0.00000
+DEAL::size=200
+DEAL::l1:        0.00000
+DEAL::linfty:    0.00000
+DEAL::frobenius: 0.00000
+DEAL::size=391
+DEAL::l1:        0.00000
+DEAL::linfty:    0.00000
+DEAL::frobenius: 0.00000
