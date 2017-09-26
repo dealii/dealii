@@ -146,6 +146,9 @@
 /* cmake/modules/FindARPACK.cmake */
 #cmakedefine DEAL_II_ARPACK_WITH_PARPACK
 
+/* cmake/modules/FindPETSC.cmake */
+#cmakedefine DEAL_II_PETSC_WITH_MUMPS
+
 /* cmake/configure/configure_1_threads.cmake */
 #cmakedefine DEAL_II_USE_MT_POSIX
 #cmakedefine DEAL_II_USE_MT_POSIX_NO_BARRIERS
