@@ -369,14 +369,18 @@ mpi_initlog(bool console=false)
 
 
 
-/* helper class to include the deallogs of all processors
-   on proc 0 */
+/**
+ * A helper class that gives each MPI process its own output file
+ * for the `deallog` stream, and at the end of the program (or,
+ * more correctly, the end of the current object), concatenates them
+ * all into the output file used on processor 0.
+ */
 struct MPILogInitAll
 {
-  MPILogInitAll(bool console=false)
+  MPILogInitAll(const bool console=false)
   {
 #ifdef DEAL_II_WITH_MPI
-    unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+    const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
     if (myid == 0)
       {
         if (!deallog.has_file())
@@ -392,7 +396,7 @@ struct MPILogInitAll
         deallog.attach(deallogfile);
       }
 
-    deallog.depth_console(console?10:0);
+    deallog.depth_console(console ? 10 : 0);
 
     deallog.push(Utilities::int_to_string(myid));
 #else
@@ -405,9 +409,10 @@ struct MPILogInitAll
   ~MPILogInitAll()
   {
 #ifdef DEAL_II_WITH_MPI
-    unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-    unsigned int nproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+    const unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+    const unsigned int nproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
+    // pop the prefix for the MPI rank of the current process
     deallog.pop();
 
     if (myid!=0)
