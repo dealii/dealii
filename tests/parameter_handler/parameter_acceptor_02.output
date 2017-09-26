@@ -1,0 +1,37 @@
+
+DEAL:parameters:Test<1>::A bool: true
+DEAL:parameters:Test<1>::A double: 1.0
+DEAL:parameters:Test<1>::A string: Ciao
+DEAL:parameters:Test<1>::An int: 2
+DEAL:parameters:Test<2>::A bool: true
+DEAL:parameters:Test<2>::A double: 1.0
+DEAL:parameters:Test<2>::A string: Ciao
+DEAL:parameters:Test<2>::An int: 2
+DEAL::My type: Test<1>
+DEAL::a: 1.00000
+DEAL::b: 2
+DEAL::c: Ciao
+DEAL::d: true
+DEAL::My type: Test<2>
+DEAL::a: 1.00000
+DEAL::b: 2
+DEAL::c: Ciao
+DEAL::d: true
+DEAL:parameters:Test<1>::A bool: true
+DEAL:parameters:Test<1>::A double: 3.0
+DEAL:parameters:Test<1>::A string: Ciao
+DEAL:parameters:Test<1>::An int: 2
+DEAL:parameters:Test<2>::A bool: true
+DEAL:parameters:Test<2>::A double: 5.0
+DEAL:parameters:Test<2>::A string: Ciao
+DEAL:parameters:Test<2>::An int: 2
+DEAL::My type: Test<1>
+DEAL::a: 3.00000
+DEAL::b: 2
+DEAL::c: Ciao
+DEAL::d: true
+DEAL::My type: Test<2>
+DEAL::a: 5.00000
+DEAL::b: 2
+DEAL::c: Ciao
+DEAL::d: true

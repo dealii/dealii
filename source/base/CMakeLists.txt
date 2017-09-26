@@ -47,6 +47,7 @@ SET(_unity_include_src
   named_selection.cc
   parallel.cc
   parameter_handler.cc
+  parameter_acceptor.cc
   parsed_function.cc
   partitioner.cc
   patterns.cc

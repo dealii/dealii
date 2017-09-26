@@ -1,0 +1,130 @@
+
+DEAL:parameters:First Class::First bool: true
+DEAL:parameters:First Class::First double: 7.7
+DEAL:parameters:First Class::First int: 3
+DEAL:parameters:First Class::First string: hello
+DEAL:parameters:Second Class::Second bool: false
+DEAL:parameters:Second Class::Second double: 9.9
+DEAL:parameters:Second Class::Second int: 5
+DEAL:parameters:Second Class::Second string: bye bye
+DEAL::reading used_parameter_acceptor_06.tex
+DEAL::\subsection{Global parameters}
+DEAL::\label{parameters:global}
+DEAL::
+DEAL::
+DEAL::
+DEAL::\subsection{Parameters in section \tt First Class}
+DEAL::\label{parameters:First_20Class}
+DEAL::
+DEAL::\begin{itemize}
+DEAL::\item {\it Parameter name:} {\tt First bool}
+DEAL::\phantomsection\label{parameters:First Class/First bool}
+DEAL::
+DEAL::
+DEAL::\index[prmindex]{First bool}
+DEAL::\index[prmindexfull]{First Class!First bool}
+DEAL::{\it Value:} true
+DEAL::
+DEAL::
+DEAL::{\it Default:} true
+DEAL::
+DEAL::
+DEAL::{\it Possible values:} A boolean value (true or false)
+DEAL::\item {\it Parameter name:} {\tt First double}
+DEAL::\phantomsection\label{parameters:First Class/First double}
+DEAL::
+DEAL::
+DEAL::\index[prmindex]{First double}
+DEAL::\index[prmindexfull]{First Class!First double}
+DEAL::{\it Value:} 7.7
+DEAL::
+DEAL::
+DEAL::{\it Default:} 7.700000
+DEAL::
+DEAL::
+DEAL::{\it Possible values:} A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$
+DEAL::\item {\it Parameter name:} {\tt First int}
+DEAL::\phantomsection\label{parameters:First Class/First int}
+DEAL::
+DEAL::
+DEAL::\index[prmindex]{First int}
+DEAL::\index[prmindexfull]{First Class!First int}
+DEAL::{\it Value:} 3
+DEAL::
+DEAL::
+DEAL::{\it Default:} 3
+DEAL::
+DEAL::
+DEAL::{\it Possible values:} An integer $n$ such that $-2147483648\leq n \leq 2147483647$
+DEAL::\item {\it Parameter name:} {\tt First string}
+DEAL::\phantomsection\label{parameters:First Class/First string}
+DEAL::
+DEAL::
+DEAL::\index[prmindex]{First string}
+DEAL::\index[prmindexfull]{First Class!First string}
+DEAL::{\it Value:} hello
+DEAL::
+DEAL::
+DEAL::{\it Default:} hello
+DEAL::
+DEAL::
+DEAL::{\it Possible values:} Any string
+DEAL::\end{itemize}
+DEAL::
+DEAL::\subsection{Parameters in section \tt Second Class}
+DEAL::\label{parameters:Second_20Class}
+DEAL::
+DEAL::\begin{itemize}
+DEAL::\item {\it Parameter name:} {\tt Second bool}
+DEAL::\phantomsection\label{parameters:Second Class/Second bool}
+DEAL::
+DEAL::
+DEAL::\index[prmindex]{Second bool}
+DEAL::\index[prmindexfull]{Second Class!Second bool}
+DEAL::{\it Value:} false
+DEAL::
+DEAL::
+DEAL::{\it Default:} false
+DEAL::
+DEAL::
+DEAL::{\it Possible values:} A boolean value (true or false)
+DEAL::\item {\it Parameter name:} {\tt Second double}
+DEAL::\phantomsection\label{parameters:Second Class/Second double}
+DEAL::
+DEAL::
+DEAL::\index[prmindex]{Second double}
+DEAL::\index[prmindexfull]{Second Class!Second double}
+DEAL::{\it Value:} 9.9
+DEAL::
+DEAL::
+DEAL::{\it Default:} 9.900000
+DEAL::
+DEAL::
+DEAL::{\it Possible values:} A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$
+DEAL::\item {\it Parameter name:} {\tt Second int}
+DEAL::\phantomsection\label{parameters:Second Class/Second int}
+DEAL::
+DEAL::
+DEAL::\index[prmindex]{Second int}
+DEAL::\index[prmindexfull]{Second Class!Second int}
+DEAL::{\it Value:} 5
+DEAL::
+DEAL::
+DEAL::{\it Default:} 5
+DEAL::
+DEAL::
+DEAL::{\it Possible values:} An integer $n$ such that $-2147483648\leq n \leq 2147483647$
+DEAL::\item {\it Parameter name:} {\tt Second string}
+DEAL::\phantomsection\label{parameters:Second Class/Second string}
+DEAL::
+DEAL::
+DEAL::\index[prmindex]{Second string}
+DEAL::\index[prmindexfull]{Second Class!Second string}
+DEAL::{\it Value:} bye bye
+DEAL::
+DEAL::
+DEAL::{\it Default:} bye bye
+DEAL::
+DEAL::
+DEAL::{\it Possible values:} Any string
+DEAL::\end{itemize}

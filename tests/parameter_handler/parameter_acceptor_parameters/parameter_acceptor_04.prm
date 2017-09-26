@@ -1,0 +1,18 @@
+# Listing of Parameters
+# ---------------------
+subsection First Class
+  set First bool   = true
+  set First double = 7.7
+  set First int    = 3
+  set First string = hello
+end
+
+
+subsection Second Class
+  set Second bool   = false
+  set Second double = 9.9
+  set Second int    = 5
+  set Second string = bye bye
+end
+
+

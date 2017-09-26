@@ -1,0 +1,9 @@
+
+DEAL:parameters:First Class::First bool: true
+DEAL:parameters:First Class::First double: 7.7
+DEAL:parameters:First Class::First int: 3
+DEAL:parameters:First Class::First string: hello
+DEAL:parameters:Second Class::Second bool: false
+DEAL:parameters:Second Class::Second double: 9.9
+DEAL:parameters:Second Class::Second int: 5
+DEAL:parameters:Second Class::Second string: bye bye

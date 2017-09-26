@@ -1,0 +1,12 @@
+New: A new ParameterAcceptor class has been added to the library.
+The class is intended to be used as a base class for any class
+that wants to handle parameters using the ParameterHandler class.
+
+If you derive all your classes from ParameterAcceptor, and declare 
+your parameters either with parse/declare_parameters methods or
+via the ParameterAcceptor::add_parameter() method, then the declaring
+and parsing of your parameter files will be automatically managed 
+by the ParameterAcceptor::initialize() function.
+<br>
+(Luca Heltai, 2017/09/20)
+
