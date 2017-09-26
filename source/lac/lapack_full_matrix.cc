@@ -178,6 +178,8 @@ LAPACKFullMatrix<number>::vmult (
   const Vector<number> &v,
   const bool            adding) const
 {
+  Threads::Mutex::ScopedLock lock (mutex);
+
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   const number alpha = 1.;
@@ -236,6 +238,8 @@ LAPACKFullMatrix<number>::Tvmult (
   const Vector<number> &v,
   const bool            adding) const
 {
+  Threads::Mutex::ScopedLock lock (mutex);
+
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   const number alpha = 1.;
@@ -560,6 +564,8 @@ number LAPACKFullMatrix<number>::frobenius_norm() const
 template <typename number>
 number LAPACKFullMatrix<number>::norm(const char type) const
 {
+  Threads::Mutex::ScopedLock lock (mutex);
+
   Assert (state == LAPACKSupport::matrix ||
           state == LAPACKSupport::inverse_matrix,
           ExcMessage("norms can be called in matrix state only."));
@@ -567,15 +573,14 @@ number LAPACKFullMatrix<number>::norm(const char type) const
   const int N = this->n_cols();
   const int M = this->n_rows();
   const number *values = &this->values[0];
-  std::vector<number> w;
   if (property == symmetric)
     {
       const int lda = std::max(1,N);
       const int lwork = (type == 'I' || type == 'O') ?
                         std::max(1,N) :
                         0;
-      w.resize(lwork);
-      return lansy (&type, &LAPACKSupport::L, &N, values, &lda, &w[0]);
+      work.resize(lwork);
+      return lansy (&type, &LAPACKSupport::L, &N, values, &lda, &work[0]);
     }
   else
     {
@@ -583,8 +588,8 @@ number LAPACKFullMatrix<number>::norm(const char type) const
       const int lwork = (type == 'I') ?
                         std::max(1,M) :
                         0;
-      w.resize(lwork);
-      return lange (&type, &M, &N, values, &lda, &w[0]);
+      work.resize(lwork);
+      return lange (&type, &M, &N, values, &lda, &work[0]);
     }
 }
 
@@ -619,6 +624,7 @@ template <typename number>
 number
 LAPACKFullMatrix<number>::reciprocal_condition_number(const number a_norm) const
 {
+  Threads::Mutex::ScopedLock lock (mutex);
   Assert(state == cholesky, ExcState(state));
   number rcond = 0.;
 
@@ -626,13 +632,13 @@ LAPACKFullMatrix<number>::reciprocal_condition_number(const number a_norm) const
   const number *values = &this->values[0];
   int info = 0;
   const int lda = std::max(1,N);
-  std::vector<number> w(3*N);
-  std::vector<int> iw(N);
+  work.resize(3*N);
+  iwork.resize(N);
 
   // use the same uplo as in Cholesky
   pocon (&LAPACKSupport::L, &N, values, &lda,
          &a_norm, &rcond,
-         &w[0], &iw[0], &info);
+         &work[0], &iwork[0], &info);
 
   Assert(info >= 0, ExcInternalError());
 
@@ -1002,7 +1008,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   const char *const uplo(&U);
   const char *const range(&V);
   const int *const  dummy(&one);
-  std::vector<int> iwork(static_cast<size_type> (5*nn));
+  iwork.resize(static_cast<size_type> (5*nn));
   std::vector<int> ifail(static_cast<size_type> (nn));
 
 

@@ -22,6 +22,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/lac/lapack_support.h>
 #include <deal.II/lac/vector_memory.h>
+#include <deal.II/base/thread_management.h>
 
 #include <memory>
 #include <vector>
@@ -673,6 +674,11 @@ private:
   mutable std::vector<number> work;
 
   /**
+   * Integer working array used for some LAPACK functions.
+   */
+  mutable std::vector<int> iwork;
+
+  /**
    * The vector storing the permutations applied for pivoting in the LU-
    * factorization.
    *
@@ -717,6 +723,11 @@ private:
    * <i>USV<sup>T</sup></i>.
    */
   std::shared_ptr<LAPACKFullMatrix<number> > svd_vt;
+
+  /**
+   * Thread mutex.
+   */
+  mutable Threads::Mutex mutex;
 };
 
 
