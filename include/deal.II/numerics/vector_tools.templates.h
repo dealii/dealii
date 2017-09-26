@@ -248,7 +248,6 @@ namespace VectorTools
         // should be used). Using fe.conforming_space might be a bit of a
         // problem because we only support doing nothing, Hcurl, and Hdiv
         // conforming mappings.
-        //
 
         const auto transform = [&function_values, &fe_values_jacobians, &cell](
             const typename FiniteElementData<dim>::Conformity conformity,
@@ -322,7 +321,6 @@ namespace VectorTools
               // For given mapping F_K: \hat K \to K, we have to transform
               //  \hat p = p\circ F_K
               //  i.e., do nothing.
-              //
               break;
 
             default:
@@ -331,35 +329,48 @@ namespace VectorTools
               break;
 
             } /*switch*/
-        };
+        }; /* lambda function transform */
 
         // Before we can average, we have to transform all function values
         // from the real cell back to the unit cell. We query the finite
         // element for the correct transformation. Matters get a bit more
         // complicated because we have to apply said transformation for
         // every base element.
-        if (const auto *system =
-              dynamic_cast<const FESystem<dim, spacedim> *>(&fe[fe_index]))
-          {
-            // In case of an FESystem transform every (vector) component
-            // separately:
 
-            unsigned int offset = 0;
-            for (unsigned int i = 0; i < system->n_base_elements(); ++i)
-              {
-                const auto &fe = system->base_element(i);
-                const auto multiplicity = system->element_multiplicity(i);
-                for (unsigned int m = 0; m < multiplicity; ++m)
-                  {
-                    transform(fe.conforming_space, offset);
-                    offset += fe.n_components();
-                  }
-              }
-          }
-        else
-          {
-            transform(fe[fe_index].conforming_space, 0);
-          }
+        // modifies offset
+        const auto apply_transformation = [&](auto &&self,
+                                              const FiniteElement<dim, spacedim> &fe,
+                                              unsigned int &offset) -> void
+        {
+          if (const auto *system =
+                dynamic_cast<const FESystem<dim, spacedim> *>(&fe))
+            {
+              // In case of an FESystem transform every (vector) component
+              // separately:
+              for (unsigned int i = 0; i < system->n_base_elements(); ++i)
+                {
+                  const auto &base_fe = system->base_element(i);
+                  const auto multiplicity = system->element_multiplicity(i);
+                  for (unsigned int m = 0; m < multiplicity; ++m)
+                    {
+                      // recursively call apply_transform to make sure to
+                      // correctly handle nested fe systems.
+                      self(self, base_fe, offset);
+                    }
+                }
+            }
+          else
+            {
+              transform(fe.conforming_space, offset);
+              offset += fe.n_components();
+            }
+        };
+
+        {
+          unsigned int offset = 0;
+          apply_transformation(apply_transformation, fe[fe_index], offset);
+          Assert(offset == fe[fe_index].n_components(), ExcInternalError());
+        }
 
         FETools::convert_generalized_support_point_values_to_dof_values(
           fe[fe_index], function_values, dof_values);
