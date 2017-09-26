@@ -148,24 +148,6 @@ protected:
   virtual double criterion();
 
   /**
-   * Temporary vectors, allocated through the @p VectorMemory object at the
-   * start of the actual solution process and deallocated at the end.
-   */
-  VectorType *Vv;
-  VectorType *Vp;
-  VectorType *Vq;
-  VectorType *Vt;
-  VectorType *Vd;
-  /**
-   * Iteration vector.
-   */
-  VectorType *Vx;
-  /**
-   * RHS vector.
-   */
-  const VectorType *Vb;
-
-  /**
    * Within the iteration loop, the square of the residual vector is stored in
    * this variable. The function @p criterion uses this variable to compute
    * the convergence value, which in this class is the norm of the residual
@@ -201,7 +183,14 @@ private:
   template <typename MatrixType, typename PreconditionerType>
   IterationResult
   iterate (const MatrixType         &A,
-           const PreconditionerType &preconditioner);
+           VectorType &x,
+           const VectorType &b,
+           const PreconditionerType &preconditioner,
+           VectorType &v,
+           VectorType &p,
+           VectorType &q,
+           VectorType &t,
+           VectorType &d);
 
   /**
    * Number of the current iteration (accumulated over restarts)
@@ -273,15 +262,15 @@ SolverQMRS<VectorType>::solve (const MatrixType         &A,
 {
   deallog.push("QMRS");
 
-  // Memory allocation
-  Vv  = this->memory.alloc();
-  Vp  = this->memory.alloc();
-  Vq  = this->memory.alloc();
-  Vt  = this->memory.alloc();
-  Vd  = this->memory.alloc();
+  // temporary vectors, allocated through the @p VectorMemory object at the
+  // start of the actual solution process and deallocated at the end.
+  typename VectorMemory<VectorType>::Pointer Vv(this->memory);
+  typename VectorMemory<VectorType>::Pointer Vp(this->memory);
+  typename VectorMemory<VectorType>::Pointer Vq(this->memory);
+  typename VectorMemory<VectorType>::Pointer Vt(this->memory);
+  typename VectorMemory<VectorType>::Pointer Vd(this->memory);
 
-  Vx = &x;
-  Vb = &b;
+
   // resize the vectors, but do not set
   // the values since they'd be overwritten
   // soon anyway.
@@ -298,16 +287,9 @@ SolverQMRS<VectorType>::solve (const MatrixType         &A,
     {
       if (step > 0)
         deallog << "Restart step " << step << std::endl;
-      state = iterate(A, preconditioner);
+      state = iterate(A, x, b, preconditioner, *Vv, *Vp, *Vq, *Vt, *Vd);
     }
   while (state.state == SolverControl::iterate);
-
-  // Deallocate Memory
-  this->memory.free(Vv);
-  this->memory.free(Vp);
-  this->memory.free(Vq);
-  this->memory.free(Vt);
-  this->memory.free(Vd);
 
   // Output
   deallog.pop();
@@ -325,7 +307,14 @@ template <class VectorType>
 template <typename MatrixType, typename PreconditionerType>
 typename SolverQMRS<VectorType>::IterationResult
 SolverQMRS<VectorType>::iterate(const MatrixType         &A,
-                                const PreconditionerType &preconditioner)
+                                VectorType &x,
+                                const VectorType &b,
+                                const PreconditionerType &preconditioner,
+                                VectorType &v,
+                                VectorType &p,
+                                VectorType &q,
+                                VectorType &t,
+                                VectorType &d)
 {
   /* Remark: the matrix A in the article is the preconditioned matrix.
    * Therefore, we have to precondition x before we compute the first residual.
@@ -334,15 +323,6 @@ SolverQMRS<VectorType>::iterate(const MatrixType         &A,
    */
 
   SolverControl::State state = SolverControl::iterate;
-
-  // define some aliases for simpler access
-  VectorType &v  = *Vv;
-  VectorType &p  = *Vp;
-  VectorType &q  = *Vq;
-  VectorType &t  = *Vt;
-  VectorType &d  = *Vd;
-  VectorType &x  = *Vx;
-  const VectorType &b = *Vb;
 
   int  it=0;
 
