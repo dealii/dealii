@@ -1110,6 +1110,29 @@ measure () const
 
 
 
+template <int structdim, int dim, int spacedim>
+BoundingBox<spacedim>
+TriaAccessor<structdim, dim, spacedim>::
+bounding_box () const
+{
+  std::pair<Point<spacedim>, Point<spacedim> > boundary_points =
+    std::make_pair(this->vertex(0), this->vertex(0));
+
+  for (unsigned int v=1; v<GeometryInfo<structdim>::vertices_per_cell; ++v)
+    {
+      const Point<spacedim> &x = this->vertex(v);
+      for (unsigned int k=0; k<spacedim; ++k)
+        {
+          boundary_points.first[k] = std::min(boundary_points.first[k], x[k]);
+          boundary_points.second[k] = std::max(boundary_points.second[k], x[k]);
+        }
+    }
+
+  return BoundingBox<spacedim>(boundary_points);
+}
+
+
+
 template <>
 double TriaAccessor<1,1,1>::extent_in_direction(const unsigned int axis) const
 {

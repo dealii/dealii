@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/mapping.h>
@@ -169,6 +170,22 @@ namespace GridTools
    */
   template <int dim, typename T>
   double cell_measure (const T &, ...);
+
+  /**
+   * Compute the smallest box containing the entire triangulation.
+   *
+   * If the input triangulation is a `parallel::distributed::Triangulation`,
+   * then each processor will compute a bounding box enclosing all locally
+   * owned, ghost, and artificial cells. In the case of a domain without curved
+   * boundaries, these bounding boxes will all agree between processors because
+   * the union of the areas occupied by artificial and ghost cells equals the
+   * union of the areas occupied by the cells that other processors own.
+   * However, if the domain has curved boundaries, this is no longer the case.
+   * The bounding box returned may be appropriate for the current processor,
+   * but different from the bounding boxes computed on other processors.
+   */
+  template <int dim, int spacedim>
+  BoundingBox<spacedim> compute_bounding_box(const Triangulation<dim, spacedim> &triangulation);
 
   /*@}*/
   /**

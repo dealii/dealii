@@ -364,6 +364,22 @@ namespace GridTools
   }
 
 
+
+  template <int dim, int spacedim>
+  BoundingBox<spacedim>
+  compute_bounding_box(const Triangulation<dim, spacedim> &tria)
+  {
+    using iterator = typename Triangulation<dim, spacedim>::active_cell_iterator;
+    const auto predicate = [](const iterator &)
+    {
+      return true;
+    };
+
+    return compute_bounding_box(tria, std::function<bool(const iterator &)>(predicate));
+  }
+
+
+
   template <int dim, int spacedim>
   void
   delete_unused_vertices (std::vector<Point<spacedim> >    &vertices,

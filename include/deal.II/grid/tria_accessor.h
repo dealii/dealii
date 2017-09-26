@@ -17,6 +17,7 @@
 #define dealii_tria_accessor_h
 
 
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
@@ -1299,6 +1300,11 @@ public:
    * [Ritter 1990]
    */
   std::pair<Point<spacedim>,double> enclosing_ball () const;
+
+  /**
+   * Return the smallest bounding box that encloses the object.
+   */
+  BoundingBox<spacedim> bounding_box () const;
 
   /**
    * Length of an object in the direction of the given axis, specified in the

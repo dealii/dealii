@@ -160,6 +160,11 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
      const Mapping<deal_II_dimension, deal_II_space_dimension> &);
 
     template
+    BoundingBox<deal_II_space_dimension>
+    compute_bounding_box
+    (const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
+    template
     void delete_unused_vertices (std::vector<Point<deal_II_space_dimension> > &,
                                  std::vector<CellData<deal_II_dimension> > &,
                                  SubCellData &);
