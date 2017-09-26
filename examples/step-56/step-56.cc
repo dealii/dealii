@@ -347,9 +347,9 @@ namespace Step56
 
 
 
-  template <class PreconditionerA, class PreconditionerMp>
+  template <class PreconditionerAType, class PreconditionerSType>
   void
-  BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
+  BlockSchurPreconditioner<PreconditionerAType, PreconditionerSType>::
   vmult (BlockVector<double>       &dst,
          const BlockVector<double> &src) const
   {
