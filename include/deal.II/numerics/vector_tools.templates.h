@@ -238,15 +238,21 @@ namespace VectorTools
 
         // A small helper function to transform a component range starting
         // at offset from the real to the unit cell according to the
-        // supplied conformity.
+        // supplied conformity. The function_values vector is transformed
+        // in place.
         //
         // FIXME: This should be refactored into the mapping (i.e.
-        // implement the inverse function of Mapping<dim,
-        // spacedim>::transform). Further, the finite element should make
-        // the information about the correct mapping directly accessible -
-        // fe.conforming_space is not the right call (thing about BDM).
-        const auto transform = [&](const typename FiniteElementData<dim>::Conformity conformity,
-                                   unsigned int offset)
+        // implement the inverse function of Mapping<dim, spacedim>::transform).
+        // Further, the finite element should make the information about
+        // the correct mapping directly accessible (i.e. which MappingType
+        // should be used). Using fe.conforming_space might be a bit of a
+        // problem because we only support doing nothing, Hcurl, and Hdiv
+        // conforming mappings.
+        //
+
+        const auto transform = [&function_values, &fe_values_jacobians, &cell](
+            const typename FiniteElementData<dim>::Conformity conformity,
+            const unsigned int offset)
         {
           switch (conformity)
             {
