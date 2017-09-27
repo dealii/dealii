@@ -40,6 +40,7 @@
 #include <algorithm>
 #include <array>
 #include <numeric>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -310,10 +311,9 @@ namespace DoFTools
                                            const FullMatrix<double> &face_interpolation_matrix,
                                            std::shared_ptr<std::vector<bool> > &master_dof_mask)
       {
-        if (master_dof_mask == std::shared_ptr<std::vector<bool> >())
+        if (master_dof_mask == nullptr)
           {
-            master_dof_mask = std::shared_ptr<std::vector<bool> >
-                              (new std::vector<bool> (fe1.dofs_per_face));
+            master_dof_mask.reset (new std::vector<bool> (fe1.dofs_per_face));
             select_master_dofs_for_face_restriction (fe1,
                                                      fe2,
                                                      face_interpolation_matrix,
@@ -335,11 +335,10 @@ namespace DoFTools
                                        const FiniteElement<dim,spacedim> &fe2,
                                        std::shared_ptr<FullMatrix<double> > &matrix)
       {
-        if (matrix == std::shared_ptr<FullMatrix<double> >())
+        if (matrix == nullptr)
           {
-            matrix = std::shared_ptr<FullMatrix<double> >
-                     (new FullMatrix<double> (fe2.dofs_per_face,
-                                              fe1.dofs_per_face));
+            matrix.reset (new FullMatrix<double> (fe2.dofs_per_face,
+                                                  fe1.dofs_per_face));
             fe1.get_face_interpolation_matrix (fe2,
                                                *matrix);
           }
@@ -357,11 +356,10 @@ namespace DoFTools
                                           const unsigned int        subface,
                                           std::shared_ptr<FullMatrix<double> > &matrix)
       {
-        if (matrix == std::shared_ptr<FullMatrix<double> >())
+        if (matrix == nullptr)
           {
-            matrix = std::shared_ptr<FullMatrix<double> >
-                     (new FullMatrix<double> (fe2.dofs_per_face,
-                                              fe1.dofs_per_face));
+            matrix.reset (new FullMatrix<double> (fe2.dofs_per_face,
+                                                  fe1.dofs_per_face));
             fe1.get_subface_interpolation_matrix (fe2,
                                                   subface,
                                                   *matrix);
@@ -385,12 +383,9 @@ namespace DoFTools
                 static_cast<signed int>(face_interpolation_matrix.n()),
                 ExcInternalError());
 
-        if (split_matrix ==
-            std::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > >())
+        if (split_matrix == nullptr)
           {
-            split_matrix
-              = std::shared_ptr<std::pair<FullMatrix<double>,FullMatrix<double> > >
-                (new std::pair<FullMatrix<double>,FullMatrix<double> >());
+            split_matrix.reset (new std::pair<FullMatrix<double>,FullMatrix<double> >());
 
             const unsigned int n_master_dofs = face_interpolation_matrix.n();
             const unsigned int n_dofs        = face_interpolation_matrix.m();
