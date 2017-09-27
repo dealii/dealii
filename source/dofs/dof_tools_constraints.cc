@@ -313,7 +313,7 @@ namespace DoFTools
       {
         if (master_dof_mask == nullptr)
           {
-            master_dof_mask.reset (new std::vector<bool> (fe1.dofs_per_face));
+            master_dof_mask = std::make_shared<std::vector<bool> > (fe1.dofs_per_face);
             select_master_dofs_for_face_restriction (fe1,
                                                      fe2,
                                                      face_interpolation_matrix,
@@ -337,8 +337,8 @@ namespace DoFTools
       {
         if (matrix == nullptr)
           {
-            matrix.reset (new FullMatrix<double> (fe2.dofs_per_face,
-                                                  fe1.dofs_per_face));
+            matrix = std::make_shared<FullMatrix<double> > (fe2.dofs_per_face,
+                                                            fe1.dofs_per_face);
             fe1.get_face_interpolation_matrix (fe2,
                                                *matrix);
           }
@@ -358,8 +358,8 @@ namespace DoFTools
       {
         if (matrix == nullptr)
           {
-            matrix.reset (new FullMatrix<double> (fe2.dofs_per_face,
-                                                  fe1.dofs_per_face));
+            matrix = std::make_shared<FullMatrix<double> > (fe2.dofs_per_face,
+                                                            fe1.dofs_per_face);
             fe1.get_subface_interpolation_matrix (fe2,
                                                   subface,
                                                   *matrix);
@@ -385,7 +385,7 @@ namespace DoFTools
 
         if (split_matrix == nullptr)
           {
-            split_matrix.reset (new std::pair<FullMatrix<double>,FullMatrix<double> >());
+            split_matrix = std::make_shared<std::pair<FullMatrix<double>,FullMatrix<double> > >();
 
             const unsigned int n_master_dofs = face_interpolation_matrix.n();
             const unsigned int n_dofs        = face_interpolation_matrix.m();
