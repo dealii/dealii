@@ -379,7 +379,6 @@ protected:
               const LinearAlgebra::distributed::Vector<Number2>          &src,
               const bool solution_transfer) const;
 
-
   /**
    * Internal function to @p fill copy_indices*. Called by derived classes.
    */
