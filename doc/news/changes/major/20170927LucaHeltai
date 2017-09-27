@@ -1,0 +1,8 @@
+New: Added support for the ARKode solver of the SUNDIALS 
+library. ARKode is a solver library that provides 
+adaptive-step time integration of the initial value problem 
+for systems of stiff, nonstiff, and multi-rate systems of 
+ordinary differential equations (ODEs) given in linearly 
+implicit form.
+<br>
+(Luca Heltai, 2017/09/27)
