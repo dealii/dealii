@@ -178,8 +178,6 @@ LAPACKFullMatrix<number>::vmult (
   const Vector<number> &v,
   const bool            adding) const
 {
-  Threads::Mutex::ScopedLock lock (mutex);
-
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   const number alpha = 1.;
@@ -199,6 +197,7 @@ LAPACKFullMatrix<number>::vmult (
     }
     case svd:
     {
+      Threads::Mutex::ScopedLock lock (mutex);
       AssertDimension(v.size(), this->n_cols());
       AssertDimension(w.size(), this->n_rows());
       // Compute V^T v
@@ -213,6 +212,7 @@ LAPACKFullMatrix<number>::vmult (
     }
     case inverse_svd:
     {
+      Threads::Mutex::ScopedLock lock (mutex);
       AssertDimension(w.size(), this->n_cols());
       AssertDimension(v.size(), this->n_rows());
       // Compute U^T v
@@ -238,8 +238,6 @@ LAPACKFullMatrix<number>::Tvmult (
   const Vector<number> &v,
   const bool            adding) const
 {
-  Threads::Mutex::ScopedLock lock (mutex);
-
   const int mm = this->n_rows();
   const int nn = this->n_cols();
   const number alpha = 1.;
@@ -259,6 +257,7 @@ LAPACKFullMatrix<number>::Tvmult (
     }
     case svd:
     {
+      Threads::Mutex::ScopedLock lock (mutex);
       AssertDimension(w.size(), this->n_cols());
       AssertDimension(v.size(), this->n_rows());
 
@@ -271,21 +270,22 @@ LAPACKFullMatrix<number>::Tvmult (
       // Multiply with V
       gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, &work[0], &one, &beta, w.val, &one);
       break;
-      case inverse_svd:
-      {
-        AssertDimension(v.size(), this->n_cols());
-        AssertDimension(w.size(), this->n_rows());
+    }
+    case inverse_svd:
+    {
+      Threads::Mutex::ScopedLock lock (mutex);
+      AssertDimension(v.size(), this->n_cols());
+      AssertDimension(w.size(), this->n_rows());
 
-        // Compute V^T v
-        work.resize(std::max(mm,nn));
-        gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.val, &one, &null, &work[0], &one);
-        // Multiply by singular values
-        for (size_type i=0; i<wr.size(); ++i)
-          work[i] *= wr[i];
-        // Multiply with U
-        gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, &work[0], &one, &beta, w.val, &one);
-        break;
-      }
+      // Compute V^T v
+      work.resize(std::max(mm,nn));
+      gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.val, &one, &null, &work[0], &one);
+      // Multiply by singular values
+      for (size_type i=0; i<wr.size(); ++i)
+        work[i] *= wr[i];
+      // Multiply with U
+      gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, &work[0], &one, &beta, w.val, &one);
+      break;
     }
     default:
       Assert (false, ExcState(state));
