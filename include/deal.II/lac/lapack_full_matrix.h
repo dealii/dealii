@@ -413,19 +413,29 @@ public:
   /**
    * Compute the Cholesky factorization of the matrix using LAPACK function Xpotrf.
    *
-   * @note The factorization is stored in the lower diagonal.
+   * @note The factorization is stored in the lower-triangular part of the matrix.
    */
   void compute_cholesky_factorization ();
 
   /**
-   * Estimate reciprocal of the condition number (in 1-norm) of a SPD matrix
-   * using Cholesky factorization. This function can only be called if the matrix
-   * is already factorized.
+   * Estimate the reciprocal of the condition number $1/k(A)$ in $L_1$ norm ($1/(||A||_1 ||A^{-1}||_1)$)
+   * of a symmetric positive definite matrix using Cholesky factorization. This function can only
+   * be called if the matrix is already factorized.
    *
-   * @param a_norm Is the 1-norm of the matrix before calling Cholesky
-   * factorization.
+   * @note The condition number $k(A)$ can be used to estimate the numerical
+   * error related to the matrix inversion or the solution of the
+   * system of linear algebraic equations as
+   * <code>error = std::numeric_limits<Number>::epsilon * k</code>.
+   * Alternatively one can get the number of accurate digits
+   * <code>std::floor(std::log10(k))</code>.
+   *
+   * @note The function computes reciprocal of the condition number to
+   * avoid possible overflow if the matrix is nearly singular.
+   *
+   * @param[in] l1_norm Is the $L_1$ norm of the matrix before calling Cholesky
+   * factorization. It can be obtained by calling l1_norm().
    */
-  number reciprocal_condition_number(const number a_norm) const;
+  number reciprocal_condition_number(const number l1_norm) const;
 
   /**
    * Compute the determinant of a matrix. As it requires the LU factorization of

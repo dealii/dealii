@@ -176,7 +176,7 @@ namespace LAPACKSupport
    * operation.
    */
   DeclException1(ExcProperty, Property,
-                 << "The function cannot be called while the "
+                 << "The function cannot be called with a "
                  << property_name(arg1)
                  << " matrix.");
 
