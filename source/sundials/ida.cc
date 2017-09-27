@@ -51,13 +51,13 @@ namespace SUNDIALS
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
       GrowingVectorMemory<VectorType> mem;
 
-      VectorType *src_yy = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer src_yy(mem);
       solver.reinit_vector(*src_yy);
 
-      VectorType *src_yp = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer src_yp(mem);
       solver.reinit_vector(*src_yp);
 
-      VectorType *residual = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer residual(mem);
       solver.reinit_vector(*residual);
 
       copy(*src_yy, yy);
@@ -66,10 +66,6 @@ namespace SUNDIALS
       int err = solver.residual(tt, *src_yy, *src_yp, *residual);
 
       copy(rr, *residual);
-
-      mem.free(src_yy);
-      mem.free(src_yp);
-      mem.free(residual);
 
       return err;
     }
@@ -92,10 +88,10 @@ namespace SUNDIALS
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
       GrowingVectorMemory<VectorType> mem;
 
-      VectorType *src_yy = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer src_yy(mem);
       solver.reinit_vector(*src_yy);
 
-      VectorType *src_yp = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer src_yp(mem);
       solver.reinit_vector(*src_yp);
 
       copy(*src_yy, yy);
@@ -105,9 +101,6 @@ namespace SUNDIALS
                                       *src_yy,
                                       *src_yp,
                                       IDA_mem->ida_cj);
-
-      mem.free(src_yy);
-      mem.free(src_yp);
 
       return err;
     }
@@ -128,19 +121,16 @@ namespace SUNDIALS
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(IDA_mem->ida_user_data);
       GrowingVectorMemory<VectorType> mem;
 
-      VectorType *src = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer src(mem);
       solver.reinit_vector(*src);
 
-      VectorType *dst = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer dst(mem);
       solver.reinit_vector(*dst);
 
       copy(*src, b);
 
       int err = solver.solve_jacobian_system(*src,*dst);
       copy(b, *dst);
-
-      mem.free(src);
-      mem.free(dst);
 
       return err;
     }
@@ -490,10 +480,9 @@ namespace SUNDIALS
     differential_components = [&]() ->IndexSet
     {
       GrowingVectorMemory<VectorType> mem;
-      auto v = mem.alloc();
+      typename VectorMemory<VectorType>::Pointer v(mem);
       reinit_vector(*v);
-      unsigned int size = v->size();
-      mem.free(v);
+      const unsigned int size = v->size();
       return complete_index_set(size);
     };
 
