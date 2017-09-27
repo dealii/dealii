@@ -136,8 +136,8 @@ namespace VectorTools
                 fe_values_jacobians.get_present_fe_values().get_jacobians();
 
               auto shifted_view = boost::make_iterator_range(
-                std::begin(function_values[i]) + offset,
-                std::begin(function_values[i]) + offset + dim);
+                                    std::begin(function_values[i]) + offset,
+                                    std::begin(function_values[i]) + offset + dim);
               std::vector<number> old_value;
               std::copy(std::begin(shifted_view),
                         std::end(shifted_view),
@@ -162,11 +162,11 @@ namespace VectorTools
                 fe_values_jacobians.get_present_fe_values().get_jacobians();
               const auto &inverse_jacobians =
                 fe_values_jacobians.get_present_fe_values()
-                  .get_inverse_jacobians();
+                .get_inverse_jacobians();
 
               auto shifted_view = boost::make_iterator_range(
-                std::begin(function_values[i]) + offset,
-                std::begin(function_values[i]) + offset + dim);
+                                    std::begin(function_values[i]) + offset,
+                                    std::begin(function_values[i]) + offset + dim);
               std::vector<number> old_value;
               std::copy(std::begin(shifted_view),
                         std::end(shifted_view),
@@ -398,7 +398,7 @@ namespace VectorTools
                  ExcDimensionMismatch(dof_handler.get_fe().n_components(),
                                       function(cell).n_components));
           function(cell).vector_value_list(generalized_support_points,
-                                     function_values);
+                                           function_values);
 
           {
             // Before we can average, we have to transform all function values
@@ -501,8 +501,8 @@ namespace VectorTools
     // Create a small lambda capture wrapping function and call the
     // internal implementation
     const auto function_map = [&function](
-      const typename DoFHandlerType<dim, spacedim>::active_cell_iterator &)
-      -> const Function<spacedim, typename VectorType::value_type> &
+                                const typename DoFHandlerType<dim, spacedim>::active_cell_iterator &)
+                              -> const Function<spacedim, typename VectorType::value_type> &
     {
       return function;
     };
