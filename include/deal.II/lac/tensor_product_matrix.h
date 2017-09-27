@@ -290,9 +290,11 @@ private:
 
 
 
-/** @copydoc TensorProductMatrixSymmetricSum<Number>
- * This is the template specialization for @p Number being
- * VectorizedArray<Number>.
+/**
+ * This is the template specialization for VectorizedArray<Number>
+ * being the arithmetic template. For a detailed description see
+ * the main documentation of the generic
+ * TensorProductMatrixSymmetricSum class.
  *
  * @author Martin Kronbichler and Julius Witte, 2017
  */
