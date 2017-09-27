@@ -583,8 +583,8 @@ namespace GridTools
    * location of vertices, like MappingQEulerian.
    *
    * @ref ConceptMeshType "MeshType concept".
-   * @param container The container to extract vertices from
-   * @param mapping The mapping to use to compute the points locations
+   * @param container The container to extract vertices from.
+   * @param mapping The mapping to use to compute the points locations.
    *
    * @author Luca Heltai, 2017.
    */
@@ -594,13 +594,13 @@ namespace GridTools
                                         const Mapping<dim,spacedim> &mapping = StaticMappingQ1<dim,spacedim>::mapping);
 
   /**
-   * Find and return the number of the closest vertex to a given point in the
+   * Find and return the index of the closest vertex to a given point in the
    * map of vertices passed as the first argument.
    *
    * @param vertices A map of index->vertex, as returned by
-   *        extract_used_vertices()
-   * @param p The target point
-   * @return The index of the vertex that is closest to the target point `p`
+   *        GridTools::extract_used_vertices().
+   * @param p The target point.
+   * @return The index of the vertex that is closest to the target point `p`.
    *
    * @author Luca Heltai, 2017.
    */
@@ -610,8 +610,14 @@ namespace GridTools
                        const Point<spacedim>         &p);
 
   /**
-   * Find and return the number of the used vertex (or marked vertex) in a
+   * Find and return the index of the used vertex (or marked vertex) in a
    * given mesh that is located closest to a given point.
+   *
+   * This function uses the locations of vertices as stored in the
+   * triangulation. This is usually sufficient, unless you are using a Mapping
+   * that moves the vertices around (for example, MappingQEulerian). In this
+   * case, you should call the function with the same name and with an
+   * additional Mapping argument.
    *
    * @param mesh A variable of a type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
@@ -636,9 +642,13 @@ namespace GridTools
                        const std::vector<bool>       &marked_vertices = std::vector<bool>());
 
   /**
-   * Find and return the number of the used vertex (or marked vertex) in a
+   * Find and return the index of the used vertex (or marked vertex) in a
    * given mesh that is located closest to a given point. Use the given
    * mapping to compute the actual location of the vertices.
+   *
+   * If the Mapping does not modify the position of the mesh vertices (like,
+   * for example, MappingQEulerian does), then this function is equivalent to
+   * the one with the same name, and without the `mapping` argument.
    *
    * @param mapping A mapping used to compute the vertex locations
    * @param mesh A variable of a type that satisfies the requirements of the

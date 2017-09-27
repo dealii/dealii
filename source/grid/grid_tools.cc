@@ -4996,7 +4996,7 @@ next_cell:
     std::map<unsigned int, Point<spacedim> > result;
     for (const auto &cell : container.active_cell_iterators())
       {
-        auto vs = mapping.get_vertices(cell);
+        const auto vs = mapping.get_vertices(cell);
         for (unsigned int i=0; i<vs.size(); ++i)
           result[cell->vertex_index(i)]=vs[i];
       }
