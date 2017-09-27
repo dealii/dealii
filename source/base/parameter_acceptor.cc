@@ -143,12 +143,12 @@ ParameterAcceptor::clear()
 
 
 
-void ParameterAcceptor::declare_parameters(ParameterHandler &prm)
+void ParameterAcceptor::declare_parameters(ParameterHandler &)
 {}
 
 
 
-void ParameterAcceptor::parse_parameters(ParameterHandler &prm)
+void ParameterAcceptor::parse_parameters(ParameterHandler &)
 {}
 
 
