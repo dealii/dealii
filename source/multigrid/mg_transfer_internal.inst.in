@@ -30,7 +30,8 @@ for (deal_II_dimension : DIMENSIONS;
         const MGConstrainedDoFs*,
         std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &,
         std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &,
-        std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &);
+        std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &,
+        const bool);
 #endif
     \}
     \}

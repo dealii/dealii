@@ -32,13 +32,18 @@ namespace internal
     /**
      * Internal function for filling the copy indices from global to level
      * indices
+     *
+     * If @p skip_interface_dofs is false, the mapping will also contain
+     * DoFs at the interface between levels. This is desirable when
+     * transfering solution vectors instead of residuals.
      */
     template <int dim, int spacedim>
     void fill_copy_indices(const dealii::DoFHandler<dim,spacedim>                                                  &mg_dof,
                            const MGConstrainedDoFs                                                                 *mg_constrained_dofs,
                            std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices,
                            std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_global_mine,
-                           std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_level_mine);
+                           std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_level_mine,
+                           const bool skip_interface_dofs = true);
 
 
 
