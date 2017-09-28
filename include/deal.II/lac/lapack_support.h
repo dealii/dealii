@@ -121,6 +121,9 @@ namespace LAPACKSupport
       case hessenberg:
         return "Hessenberg";
       }
+
+    Assert (false, ExcNotImplemented());
+    return "invalid";
   }
 
   /**
