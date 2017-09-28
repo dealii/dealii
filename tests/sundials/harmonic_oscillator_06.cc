@@ -65,7 +65,7 @@ int main (int argc, char **argv)
   std::ifstream ifile(SOURCE_DIR "/harmonic_oscillator_06.prm");
   prm.parse_input(ifile);
 
-  SUNDIALS::ARKode<VectorType> ode(MPI_COMM_WORLD,data);
+  SUNDIALS::ARKode<VectorType> ode(data);
 
   ode.reinit_vector = [&] (VectorType&v)
   {

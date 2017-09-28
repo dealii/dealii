@@ -56,7 +56,7 @@ class HarmonicOscillator
 
 public:
   HarmonicOscillator(double _kappa, const typename SUNDIALS::IDA<Vector<double>>::AdditionalData &data) :
-    time_stepper(MPI_COMM_WORLD, data),
+    time_stepper(data),
     y(2),
     y_dot(2),
     J(2,2),

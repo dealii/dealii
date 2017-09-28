@@ -557,11 +557,11 @@ namespace SUNDIALS
      * consistent. Then you can choose how these are made consistent, using the same three
      * options that you used for the initial conditions in `reset_type`.
      *
-     * @param mpi_comm MPI communicator
      * @param data IDA configuration data
+     * @param mpi_comm MPI communicator
      */
-    IDA(const MPI_Comm mpi_comm = MPI_COMM_WORLD,
-        const AdditionalData &data=AdditionalData());
+    IDA(const AdditionalData &data=AdditionalData(),
+        const MPI_Comm mpi_comm = MPI_COMM_WORLD);
 
     /**
      * Destructor.
