@@ -1217,6 +1217,20 @@ namespace VectorTools
    * $u_h|_\Gamma$, i.e., the nodal values of the degrees of freedom of this
    * function along the boundary, are then what is computed by this function.
    *
+   * In case this function is used with $H_{div}$ conforming finite element
+   * space, the solution of a different problem is computed, namely: Find $\vec{u}_h
+   * \in V_h \subset H(\text{div}; \Omega)$ so that
+   * @f{align*}{
+   * \int_{\Gamma} (\vec{\varphi}_i \cdot \vec{n}) (\vec{u}_h \cdot \vec{n})
+   * = \sum_{k \in {\cal K}} \int_{\Gamma_k} (\vec{\varphi}_i \cdot \vec{n})
+   * (\vec{f}_k \cdot \vec{n}),
+   * \qquad \forall \vec{\varphi_i} \in V_h,
+   * @f}
+   * where $\vec{n}$ is an outward normal vector.
+   *
+   * This function throws exception if used with $H_{curl}$ conforming elements,
+   * so the project_boundary_values_curl_conforming() should be used instead.
+   *
    * @param[in] mapping The mapping that will be used in the transformations
    * necessary to integrate along the boundary.
    * @param[in] dof The DoFHandler that describes the finite element space and

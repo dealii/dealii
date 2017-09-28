@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 by the deal.II authors
+// Copyright (C) 2016 - 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -51,8 +51,6 @@
 #  include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #endif
-
-#include <algorithm>
 
 
 #include <algorithm>
@@ -903,7 +901,7 @@ namespace MatrixCreator
                                    std::vector<unsigned int> const &component_mapping)
 
     {
-      // All assertions for this function are in the calling function
+      // Most assertions for this function are in the calling function
       // before creating threads.
       const unsigned int n_components = fe.n_components();
       const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
@@ -926,8 +924,7 @@ namespace MatrixCreator
       std::vector<number>          coefficient_values (fe_values.n_quadrature_points, 1.);
       std::vector<Vector<number> > coefficient_vector_values (fe_values.n_quadrature_points,
                                                               Vector<number>(n_components));
-      const bool coefficient_is_vector = (coefficient != nullptr && coefficient->n_components != 1)
-                                         ? true : false;
+      const bool coefficient_is_vector = (coefficient != nullptr && coefficient->n_components != 1);
 
       std::vector<number>          rhs_values_scalar (fe_values.n_quadrature_points);
       std::vector<Vector<number> > rhs_values_system (fe_values.n_quadrature_points,
@@ -981,9 +978,13 @@ namespace MatrixCreator
                       coefficient_vector_values[point] = coefficient_values[point];
                   }
 
-                // Special treatment for Hdiv and Hcurl elements,
-                // where only the normal or tangential component
-                // should be projected.
+                // Special treatment for Hdiv elements,
+                // where only normal components should be projected.
+                // For Hdiv we need to compute (u dot n, v dot n) which
+                // can be done as sum over dim components of
+                // u[c] * n[c] * v[c] * n[c] = u[c] * v[c] * normal_adjustment[c]
+                // Same approach does not work for Hcurl, so we throw an exception.
+                // Default value 1.0 allows for use with non Hdiv elements
                 std::vector<std::vector<double> > normal_adjustment(fe_values.n_quadrature_points,
                                                                     std::vector<double>(n_components, 1.));
 
@@ -991,6 +992,15 @@ namespace MatrixCreator
                   {
                     const FiniteElement<dim,spacedim> &base = fe.base_element(fe.component_to_base_index(comp).first);
                     const unsigned int bcomp = fe.component_to_base_index(comp).second;
+
+                    if (!base.conforms(FiniteElementData<dim>::H1) &&
+                        base.conforms(FiniteElementData<dim>::Hdiv) &&
+                        fe_is_primitive)
+                      Assert(false, ExcNotImplemented());
+
+                    if (!base.conforms(FiniteElementData<dim>::H1) &&
+                        base.conforms(FiniteElementData<dim>::Hcurl))
+                      Assert(false, ExcNotImplemented());
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv))
@@ -1278,8 +1288,9 @@ namespace MatrixCreator
     {
       const unsigned int n_components  = fe_collection.n_components();
       const unsigned int n_function_components = boundary_functions.begin()->second->n_components;
-      const bool         fe_is_system  = (n_components != 1);
       const FiniteElement<dim,spacedim> &fe = cell->get_fe();
+      const bool         fe_is_system  = (n_components != 1);
+      const bool         fe_is_primitive = fe.is_primitive();
       const unsigned int dofs_per_face = fe.dofs_per_face;
 
       copy_data.cell = cell;
@@ -1290,6 +1301,7 @@ namespace MatrixCreator
 
       UpdateFlags update_flags = UpdateFlags (update_values     |
                                               update_JxW_values |
+                                              update_normal_vectors |
                                               update_quadrature_points);
       hp::FEFaceValues<dim,spacedim> x_fe_values (mapping, fe_collection, q, update_flags);
 
@@ -1298,6 +1310,8 @@ namespace MatrixCreator
       // the name
       std::vector<number>          coefficient_values;
       std::vector<Vector<number> > coefficient_vector_values;
+
+      const bool coefficient_is_vector = (coefficient != nullptr && coefficient->n_components != 1);
 
       std::vector<number>          rhs_values_scalar;
       std::vector<Vector<number> > rhs_values_system;
@@ -1332,94 +1346,110 @@ namespace MatrixCreator
             if (fe_is_system)
               // FE has several components
               {
+                coefficient_vector_values.resize (fe_values.n_quadrature_points,
+                                                  Vector<number>(n_components));
+                coefficient_values.resize (fe_values.n_quadrature_points, 1.);
+
                 rhs_values_system.resize (fe_values.n_quadrature_points,
                                           Vector<number>(n_function_components));
                 boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->vector_value_list (fe_values.get_quadrature_points(),
                                              rhs_values_system);
-
-                if (coefficient != nullptr)
+                if (coefficient_is_vector)
+                  // In case coefficient is vector-valued, fill
+                  // all components
+                  coefficient->vector_value_list (fe_values.get_quadrature_points(),
+                                                  coefficient_vector_values);
+                else
+                  // In case the scalar function is given, update the
+                  // values, if not - use the default (1.0)
                   {
-                    if (coefficient->n_components==1)
-                      {
-                        coefficient_values.resize (fe_values.n_quadrature_points);
-                        coefficient->value_list (fe_values.get_quadrature_points(),
-                                                 coefficient_values);
-                        for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                          {
-                            const double weight = fe_values.JxW(point);
-                            for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-                              {
-                                const double v = fe_values.shape_value(i,point);
-                                for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                                  if (fe.system_to_component_index(i).first ==
-                                      fe.system_to_component_index(j).first)
-                                    {
-                                      const double u = fe_values.shape_value(j,point);
-                                      copy_data.cell_matrix.back()(i,j)
-                                      += (coefficient_values[point] * u * v * weight);
-                                    }
+                    if (coefficient != nullptr)
+                      coefficient->value_list (fe_values.get_quadrature_points(),
+                                               coefficient_values);
 
-                                copy_data.cell_vector.back()(i) += rhs_values_system[point](
-                                                                     component_mapping[fe.system_to_component_index(i).first])
-                                                                   * weight
-                                                                   * v;
-                              }
-                          }
-                      }
-                    else
-                      {
-                        coefficient_vector_values.resize (fe_values.n_quadrature_points,
-                                                          Vector<number>(n_components));
-                        coefficient->vector_value_list (fe_values.get_quadrature_points(),
-                                                        coefficient_vector_values);
-                        for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                          {
-                            const double weight = fe_values.JxW(point);
-                            for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-                              {
-                                const double v = fe_values.shape_value(i,point);
-                                const unsigned int component_i=
-                                  fe.system_to_component_index(i).first;
-                                for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                                  if (fe.system_to_component_index(j).first ==
-                                      component_i)
-                                    {
-                                      const double u = fe_values.shape_value(j,point);
-                                      copy_data.cell_matrix.back()(i,j) +=
-                                        (coefficient_vector_values[point](component_i) * u * v * weight);
-                                    }
-                                copy_data.cell_vector.back()(i) += rhs_values_system[point](component_mapping[component_i])
-                                                                   * v
-                                                                   * weight;
-                              }
-                          }
-                      }
+                    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                      coefficient_vector_values[point] = coefficient_values[point];
                   }
-                else  //      if (coefficient == 0)
-                  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                    {
-                      const double weight = fe_values.JxW(point);
-                      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+
+                // Special treatment for Hdiv elements,
+                // where only normal components should be projected.
+                // For Hdiv we need to compute (u dot n, v dot n) which
+                // can be done as sum over dim components of
+                // u[c] * n[c] * v[c] * n[c] = u[c] * v[c] * normal_adjustment[c]
+                // Same approach does not work for Hcurl, so we throw an exception.
+                // Default value 1.0 allows for use with non Hdiv elements
+                std::vector<std::vector<double> > normal_adjustment(fe_values.n_quadrature_points,
+                                                                    std::vector<double>(n_components, 1.));
+
+                for (unsigned int comp = 0; comp<n_components; ++comp)
+                  {
+                    const FiniteElement<dim,spacedim> &base = fe.base_element(fe.component_to_base_index(comp).first);
+                    const unsigned int bcomp = fe.component_to_base_index(comp).second;
+
+                    if (!base.conforms(FiniteElementData<dim>::H1) &&
+                        base.conforms(FiniteElementData<dim>::Hdiv) &&
+                        fe_is_primitive)
+                      Assert(false, ExcNotImplemented());
+
+                    if (!base.conforms(FiniteElementData<dim>::H1) &&
+                        base.conforms(FiniteElementData<dim>::Hcurl))
+                      Assert(false, ExcNotImplemented());
+
+                    if (!base.conforms(FiniteElementData<dim>::H1) &&
+                        base.conforms(FiniteElementData<dim>::Hdiv))
+                      for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                        normal_adjustment[point][comp] = fe_values.normal_vector(point)[bcomp]
+                                                         * fe_values.normal_vector(point)[bcomp];
+                  }
+
+                for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                  {
+                    const double weight = fe_values.JxW(point);
+                    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+                      if (fe_is_primitive)
                         {
-                          const double v = fe_values.shape_value(i,point);
                           for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                            if (fe.system_to_component_index(i).first ==
-                                fe.system_to_component_index(j).first)
-                              {
-                                const double u = fe_values.shape_value(j,point);
-                                copy_data.cell_matrix.back()(i,j) += (u * v * weight);
-                              }
+                            {
+                              if (fe.system_to_component_index(i).first
+                                  == fe.system_to_component_index(j).first)
+                                {
+                                  copy_data.cell_matrix.back()(i,j)
+                                  += coefficient_vector_values[point](fe.system_to_component_index(i).first)
+                                     * fe_values.shape_value(i,point)
+                                     * fe_values.shape_value(j,point)
+                                     * weight;
+                                }
+                            }
+
                           copy_data.cell_vector.back()(i) += rhs_values_system[point](
-                                                               fe.system_to_component_index(i).first) *
-                                                             v *
-                                                             weight;
+                                                               component_mapping[fe.system_to_component_index(i).first])
+                                                             * fe_values.shape_value(i,point)
+                                                             * weight;
                         }
-                    }
+                      else
+                        {
+                          for (unsigned int comp=0; comp<n_components; ++comp)
+                            {
+                              for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+                                copy_data.cell_matrix.back()(i,j)
+                                += coefficient_vector_values[point](comp)
+                                   * fe_values.shape_value_component(i,point,comp)
+                                   * fe_values.shape_value_component(j,point,comp)
+                                   * normal_adjustment[point][comp]
+                                   * weight;
+                              copy_data.cell_vector.back()(i) += rhs_values_system[point](component_mapping[comp])
+                                                                 * fe_values.shape_value_component(i,point,comp)
+                                                                 * normal_adjustment[point][comp]
+                                                                 * weight;
+                            }
+                        }
+                  }
               }
             else
-              // FE is a scalar one
+              // FE is scalar
               {
+                coefficient_values.resize (fe_values.n_quadrature_points, 1.);
                 rhs_values_scalar.resize (fe_values.n_quadrature_points);
                 boundary_functions.find(cell->face(face)->boundary_id())
                 ->second->value_list (fe_values.get_quadrature_points(), rhs_values_scalar);
@@ -1429,41 +1459,25 @@ namespace MatrixCreator
                     coefficient_values.resize (fe_values.n_quadrature_points);
                     coefficient->value_list (fe_values.get_quadrature_points(),
                                              coefficient_values);
-                    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                  }
+
+                for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
+                  {
+                    const double weight = fe_values.JxW(point);
+                    for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
                       {
-                        const double weight = fe_values.JxW(point);
-                        for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+                        const double v = fe_values.shape_value(i,point);
+                        for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
                           {
-                            const double v = fe_values.shape_value(i,point);
-                            for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                              {
-                                const double u = fe_values.shape_value(j,point);
-                                copy_data.cell_matrix.back()(i,j) += (coefficient_values[point] *
-                                                                      u * v * weight);
-                              }
-                            copy_data.cell_vector.back()(i) += rhs_values_scalar[point] * v * weight;
+                            const double u = fe_values.shape_value(j,point);
+                            copy_data.cell_matrix.back()(i,j) += (coefficient_values[point] * v * u * weight);
                           }
+                        copy_data.cell_vector.back()(i) += rhs_values_scalar[point] * v * weight;
                       }
                   }
-                else
-                  for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
-                    {
-                      const double weight = fe_values.JxW(point);
-                      for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
-                        {
-                          const double v = fe_values.shape_value(i,point);
-                          for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
-                            {
-                              const double u = fe_values.shape_value(j,point);
-                              copy_data.cell_matrix.back()(i,j) += (u * v * weight);
-                            }
-                          copy_data.cell_vector.back()(i) += rhs_values_scalar[point] * v * weight;
-                        }
-                    }
               }
 
-            cell->face(face)->get_dof_indices (dofs_on_face_vector,
-                                               cell->active_fe_index());
+            cell->face(face)->get_dof_indices (dofs_on_face_vector,cell->active_fe_index());
             // for each dof on the cell, have a
             // flag whether it is on the face
             copy_data.dof_is_on_face.emplace_back(copy_data.dofs_per_cell);
@@ -1477,7 +1491,6 @@ namespace MatrixCreator
                                                     dofs_on_face_vector.end());
           }
     }
-
 
 
     template <int dim, int spacedim, typename number>
@@ -1550,38 +1563,23 @@ namespace MatrixCreator
 #endif
 
               for (unsigned int i=0; i<copy_data.dofs_per_cell; ++i)
-                for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
-                  {
-                    if (copy_data.dof_is_on_face[pos][i] && copy_data.dof_is_on_face[pos][j])
-                      matrix.add(dof_to_boundary_mapping[copy_data.dofs[i]],
-                                 dof_to_boundary_mapping[copy_data.dofs[j]],
-                                 copy_data.cell_matrix[pos](i,j));
-                    else
-                      {
-                        // assume that all shape functions that are nonzero on the boundary
-                        // are also listed in the @p{dof_to_boundary} mapping. if that
-                        // is not the case, then the boundary mass matrix does not
-                        // make that much sense anyway, as it only contains entries for
-                        // parts of the functions living on the boundary
-                        //
-                        // these, we may compare here for relative smallness of all
-                        // entries in the local matrix which are not taken over to
-                        // the global one
-                        Assert (std::abs(copy_data.cell_matrix[pos](i,j)) <= 1e-10 * max_diag_entry,
-                                ExcInternalError ());
-                      }
-                  }
-
-              for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
-                if (copy_data.dof_is_on_face[pos][j])
-                  rhs_vector(dof_to_boundary_mapping[copy_data.dofs[j]]) += copy_data.cell_vector[pos](j);
-                else
-                  {
-                    // compare here for relative
-                    // smallness
-                    Assert (std::abs(copy_data.cell_vector[pos](j)) <= 1e-10 * max_diag_entry,
-                            ExcInternalError());
-                  }
+                {
+                  if (copy_data.dof_is_on_face[pos][i] &&
+                      dof_to_boundary_mapping[copy_data.dofs[i]] != numbers::invalid_dof_index)
+                    {
+                      for (unsigned int j=0; j<copy_data.dofs_per_cell; ++j)
+                        if (copy_data.dof_is_on_face[pos][j] &&
+                            dof_to_boundary_mapping[copy_data.dofs[j]] != numbers::invalid_dof_index)
+                          {
+                            AssertIsFinite(copy_data.cell_matrix[pos](i,j));
+                            matrix.add(dof_to_boundary_mapping[copy_data.dofs[i]],
+                                       dof_to_boundary_mapping[copy_data.dofs[j]],
+                                       copy_data.cell_matrix[pos](i,j));
+                          }
+                      AssertIsFinite(copy_data.cell_vector[pos](i));
+                      rhs_vector(dof_to_boundary_mapping[copy_data.dofs[i]]) += copy_data.cell_vector[pos](i);
+                    }
+                }
               ++pos;
             }
         }
