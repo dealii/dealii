@@ -138,7 +138,7 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  IDA<VectorType>::IDA(const MPI_Comm mpi_comm, const AdditionalData &data) :
+  IDA<VectorType>::IDA(const AdditionalData &data, const MPI_Comm mpi_comm) :
     data(data),
     ida_mem(nullptr),
     communicator(Utilities::MPI::duplicate_communicator(mpi_comm))

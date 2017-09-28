@@ -482,11 +482,11 @@ namespace SUNDIALS
      * passing an AdditionalData() object that sets all of the solver
      * parameters.
      *
-     * @param mpi_comm MPI communicator
      * @param data ARKode configuration data
+     * @param mpi_comm MPI communicator
      */
-    ARKode(const MPI_Comm mpi_comm = MPI_COMM_WORLD,
-           const AdditionalData &data=AdditionalData());
+    ARKode(const AdditionalData &data=AdditionalData(),
+           const MPI_Comm mpi_comm = MPI_COMM_WORLD);
 
     /**
      * Destructor.

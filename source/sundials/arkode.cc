@@ -208,7 +208,7 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  ARKode<VectorType>::ARKode(const MPI_Comm mpi_comm, const AdditionalData &data) :
+  ARKode<VectorType>::ARKode(const AdditionalData &data, const MPI_Comm mpi_comm) :
     data(data),
     arkode_mem(nullptr),
     communicator(Utilities::MPI::duplicate_communicator(mpi_comm))
