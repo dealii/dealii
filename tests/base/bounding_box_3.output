@@ -1,0 +1,131 @@
+
+DEAL::Test: Bounding Box class Is neighbour and volume functions
+DEAL::
+DEAL::Test for dimension 1
+DEAL::Bounding box boundaries A: 
+DEAL::0.00000
+DEAL::1.00000
+DEAL::Is neighbour of itself: 2
+DEAL::Bounding box boundaries B: 
+DEAL::1.00000
+DEAL::2.00000
+DEAL::Is neighbour A with B: 2
+DEAL::Is neighbour B with A: 2
+DEAL::Is neighbour B with B: 2
+DEAL::Bounding box boundaries C: 
+DEAL::0.00000
+DEAL::2.00000
+DEAL::Is neighbour C with B: 2
+DEAL::Is neighbour B with C: 2
+DEAL::Is neighbour A with C: 2
+DEAL::Is neighbour C with A: 2
+DEAL::Is neighbour C with C: 2
+DEAL::Bounding box boundaries D: 
+DEAL::0.00000
+DEAL::1.40000
+DEAL::Is neighbour D with A: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbour D with B: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbour D with C: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbour D with D: 2
+DEAL::Bounding box boundaries E: 
+DEAL::-10.0000
+DEAL::-8.00000
+DEAL::Is neighbour E with A: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with B: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with C: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with D: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with E: 2
+DEAL::End test for dimension 1
+DEAL::
+DEAL::Test for dimension 2
+DEAL::Bounding box boundaries A: 
+DEAL::0.00000 0.00000
+DEAL::1.00000 1.00000
+DEAL::Is neighbour of itself: 2
+DEAL::Bounding box boundaries B: 
+DEAL::1.00000 1.00000
+DEAL::2.00000 2.00000
+DEAL::Is neighbour A with B: 0
+DEAL::Is neighbour B with A: 0
+DEAL::Is neighbour B with B: 2
+DEAL::Bounding box boundaries C: 
+DEAL::0.00000 0.00000
+DEAL::2.00000 2.00000
+DEAL::Is neighbour C with B: 2
+DEAL::Is neighbour B with C: 2
+DEAL::Is neighbour A with C: 2
+DEAL::Is neighbour C with A: 2
+DEAL::Is neighbour C with C: 2
+DEAL::Bounding box boundaries D: 
+DEAL::0.00000 0.00000
+DEAL::1.40000 1.40000
+DEAL::Is neighbour D with A: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbour D with B: 1
+DEAL::Vice-versa: 1
+DEAL::Is neighbour D with C: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbour D with D: 2
+DEAL::Bounding box boundaries E: 
+DEAL::-10.0000 -10.0000
+DEAL::-8.00000 -8.00000
+DEAL::Is neighbour E with A: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with B: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with C: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with D: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with E: 2
+DEAL::End test for dimension 2
+DEAL::
+DEAL::Test for dimension 3
+DEAL::Bounding box boundaries A: 
+DEAL::0.00000 0.00000 0.00000
+DEAL::1.00000 1.00000 1.00000
+DEAL::Is neighbour of itself: 2
+DEAL::Bounding box boundaries B: 
+DEAL::1.00000 1.00000 1.00000
+DEAL::2.00000 2.00000 2.00000
+DEAL::Is neighbour A with B: 0
+DEAL::Is neighbour B with A: 0
+DEAL::Is neighbour B with B: 2
+DEAL::Bounding box boundaries C: 
+DEAL::0.00000 0.00000 0.00000
+DEAL::2.00000 2.00000 2.00000
+DEAL::Is neighbour C with B: 2
+DEAL::Is neighbour B with C: 2
+DEAL::Is neighbour A with C: 2
+DEAL::Is neighbour C with A: 2
+DEAL::Is neighbour C with C: 2
+DEAL::Bounding box boundaries D: 
+DEAL::0.00000 0.00000 0.00000
+DEAL::1.40000 1.40000 1.40000
+DEAL::Is neighbour D with A: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbour D with B: 1
+DEAL::Vice-versa: 1
+DEAL::Is neighbour D with C: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbour D with D: 2
+DEAL::Bounding box boundaries E: 
+DEAL::-10.0000 -10.0000 -10.0000
+DEAL::-8.00000 -8.00000 -8.00000
+DEAL::Is neighbour E with A: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with B: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with C: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with D: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbour E with E: 2
+DEAL::End test for dimension 3
