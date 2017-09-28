@@ -46,6 +46,13 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                          const std::vector<bool> &);
 
     template
+    unsigned int
+    find_closest_vertex (const Mapping<deal_II_dimension, deal_II_space_dimension>&,
+                         const X &,
+                         const Point<deal_II_space_dimension> &,
+                         const std::vector<bool> &);
+
+    template
     std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
     find_cells_adjacent_to_vertex(const X &, const unsigned int);
 
@@ -103,7 +110,6 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
     bool
     have_same_coarse_mesh (const X &mesh_1,
                            const X &mesh_2);
-
     \}
 
 #endif
@@ -120,8 +126,12 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
         std::map<unsigned int,types::global_vertex_index>
         compute_local_to_global_vertex_index_map(const parallel::distributed::Triangulation<deal_II_dimension,deal_II_space_dimension> &triangulation);
 
+        template
+        std::map<unsigned int, Point<deal_II_space_dimension> >
+        extract_used_vertices(const Triangulation<deal_II_dimension,deal_II_space_dimension>&mesh,
+                              const Mapping<deal_II_dimension,deal_II_space_dimension> &mapping);
 
-                \}
+                                    \}
 
 #endif
 }
@@ -140,6 +150,10 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
     find_active_cell_around_point (const Mapping<deal_II_space_dimension> &,
                                    const parallel::distributed::Triangulation<deal_II_space_dimension> &,
                                    const Point<deal_II_space_dimension> &);
+
+    template unsigned int
+    GridTools::find_closest_vertex(const std::map<unsigned int,Point<deal_II_space_dimension> >& vertices,
+                                   const Point<deal_II_space_dimension>& p);
 }
 
 

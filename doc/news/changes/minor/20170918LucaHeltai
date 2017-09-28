@@ -1,0 +1,6 @@
+New: A GridTools::extract_used_vertices() has been added
+that returns a map of index-vertex position, using an 
+optional Mapping<dim,spacedim> object to compute the 
+vertex locations.
+<br>
+(Luca Heltai, 2017/09/18)

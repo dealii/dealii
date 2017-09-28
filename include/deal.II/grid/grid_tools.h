@@ -561,8 +561,63 @@ namespace GridTools
   /*@{*/
 
   /**
-   * Find and return the number of the used vertex (or marked vertex) in a
+   * Return a map of index:Point<spacedim>, containing the used vertices of the
+   * given `container`. The key of the returned map is the global index in the
+   * triangulation. The used vertices are obtained by looping over all cells,
+   * and querying for each cell where its vertices are through the (optional)
+   * `mapping` argument.
+   *
+   * The size of the returned map equals Triangulation::n_used_vertices(),
+   * (not Triangulation::n_vertices()). If you use the default `mapping`, the
+   * returned map satisfies the following equality:
+   *
+   * @code
+   * used_vertices = extract_used_vertices(tria);
+   * all_vertices = tria.get_vertices();
+   *
+   * for(auto &id_and_v : used_vertices)
+   *    all_vertices[id_and_v.first] == id_and_v.second; // true
+   * @endcode
+   *
+   * Notice that the above is not satisfied for mappings that change the
+   * location of vertices, like MappingQEulerian.
+   *
+   * @ref ConceptMeshType "MeshType concept".
+   * @param container The container to extract vertices from.
+   * @param mapping The mapping to use to compute the points locations.
+   *
+   * @author Luca Heltai, 2017.
+   */
+  template <int dim, int spacedim>
+  std::map<unsigned int,Point<spacedim>> extract_used_vertices (
+                                        const Triangulation<dim,spacedim> &container,
+                                        const Mapping<dim,spacedim> &mapping = StaticMappingQ1<dim,spacedim>::mapping);
+
+  /**
+   * Find and return the index of the closest vertex to a given point in the
+   * map of vertices passed as the first argument.
+   *
+   * @param vertices A map of index->vertex, as returned by
+   *        GridTools::extract_used_vertices().
+   * @param p The target point.
+   * @return The index of the vertex that is closest to the target point `p`.
+   *
+   * @author Luca Heltai, 2017.
+   */
+  template<int spacedim>
+  unsigned int
+  find_closest_vertex (const std::map<unsigned int,Point<spacedim>> &vertices,
+                       const Point<spacedim>         &p);
+
+  /**
+   * Find and return the index of the used vertex (or marked vertex) in a
    * given mesh that is located closest to a given point.
+   *
+   * This function uses the locations of vertices as stored in the
+   * triangulation. This is usually sufficient, unless you are using a Mapping
+   * that moves the vertices around (for example, MappingQEulerian). In this
+   * case, you should call the function with the same name and with an
+   * additional Mapping argument.
    *
    * @param mesh A variable of a type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
@@ -585,6 +640,39 @@ namespace GridTools
   find_closest_vertex (const MeshType<dim, spacedim> &mesh,
                        const Point<spacedim>         &p,
                        const std::vector<bool>       &marked_vertices = std::vector<bool>());
+
+  /**
+   * Find and return the index of the used vertex (or marked vertex) in a
+   * given mesh that is located closest to a given point. Use the given
+   * mapping to compute the actual location of the vertices.
+   *
+   * If the Mapping does not modify the position of the mesh vertices (like,
+   * for example, MappingQEulerian does), then this function is equivalent to
+   * the one with the same name, and without the `mapping` argument.
+   *
+   * @param mapping A mapping used to compute the vertex locations
+   * @param mesh A variable of a type that satisfies the requirements of the
+   * @ref ConceptMeshType "MeshType concept".
+   * @param p The point for which we want to find the closest vertex.
+   * @param marked_vertices An array of bools indicating which
+   * vertices of @p mesh will be considered within the search
+   * as the potentially closest vertex. On receiving a non-empty
+   * @p marked_vertices, the function will
+   * only search among @p marked_vertices for the closest vertex.
+   * The size of this array should be equal to the value returned by
+   * Triangulation::n_vertices() for the triangulation underlying the given mesh
+   * (as opposed to the value returned by Triangulation::n_used_vertices()).
+   * @return The index of the closest vertex found.
+   *
+   * @author Luca Heltai, 2017
+   */
+  template <int dim, template <int, int> class MeshType, int spacedim>
+  unsigned int
+  find_closest_vertex (const Mapping<dim,spacedim>   &mapping,
+                       const MeshType<dim, spacedim> &mesh,
+                       const Point<spacedim>         &p,
+                       const std::vector<bool>       &marked_vertices = std::vector<bool>());
+
 
   /**
    * Find and return a vector of iterators to active cells that surround a

@@ -1,0 +1,6 @@
+New: A GridTools::find_closest_vertex() has been added
+that takes a map of index-vertex position and a target 
+point, and returns the index of the closest point in 
+the map. 
+<br>
+(Luca Heltai, 2017/09/19)

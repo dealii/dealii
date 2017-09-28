@@ -1,0 +1,10 @@
+Fixed: One of the fucntions GridTools::find_active_cell_around_point() 
+supports an additional `mapping` argument. This mapping was used
+to actually tranform points from the real to the reference space, 
+but somewhere in the algorithm we look for the `closest_vertex` to 
+the target point. Such search was done ignoring if the `mapping` 
+actually changes the location of the vertices. This is now fixed,
+and the internal function that looks for the closest vertex now
+takes into account the `mapping` tranformation. 
+<br>
+(Luca Heltai, 2017/09/27)

@@ -1048,6 +1048,7 @@ namespace GridTools
   }
 
 
+
   template <int dim, template <int, int> class MeshType, int spacedim>
   unsigned int
   find_closest_vertex (const MeshType<dim,spacedim> &mesh,
@@ -1120,6 +1121,67 @@ namespace GridTools
 
     return best_vertex;
   }
+
+
+
+  template <int dim, template <int, int> class MeshType, int spacedim>
+  unsigned int
+  find_closest_vertex (const Mapping<dim,spacedim>  &mapping,
+                       const MeshType<dim,spacedim> &mesh,
+                       const Point<spacedim>        &p,
+                       const std::vector<bool>      &marked_vertices)
+  {
+    // Take a shortcut in the simple case.
+    if (mapping.preserves_vertex_locations() == true)
+      return find_closest_vertex(mesh, p, marked_vertices);
+
+    // first get the underlying
+    // triangulation from the
+    // mesh and determine vertices
+    // and used vertices
+    const Triangulation<dim, spacedim> &tria = mesh.get_triangulation();
+
+    auto vertices = extract_used_vertices(tria, mapping);
+
+    Assert ( tria.get_vertices().size() == marked_vertices.size() || marked_vertices.size() ==0,
+             ExcDimensionMismatch(tria.get_vertices().size(), marked_vertices.size()));
+
+    // If p is an element of marked_vertices,
+    // and q is that of used_Vertices,
+    // the vector marked_vertices does NOT
+    // contain unused vertices if p implies q.
+    // I.e., if p is true q must be true
+    // (if p is false, q could be false or true).
+    // p implies q logic is encapsulated in ~p|q.
+    Assert( marked_vertices.size()==0
+            ||
+            std::equal( marked_vertices.begin(),
+                        marked_vertices.end(),
+                        tria.get_used_vertices().begin(),
+                        [](bool p, bool q)
+    {
+      return !p || q;
+    }),
+    ExcMessage("marked_vertices should be a subset of used vertices in the triangulation "
+               "but marked_vertices contains one or more vertices that are not used vertices!") );
+
+    // Remove from the map unwanted elements.
+    if (marked_vertices.size())
+      for (auto it = vertices.begin(); it != vertices.end(); )
+        {
+          if (marked_vertices[it->first] == false)
+            {
+              vertices.erase(it++);
+            }
+          else
+            {
+              ++it;
+            }
+        }
+
+    return find_closest_vertex(vertices, p);
+  }
+
 
 
   template <int dim, template <int, int> class MeshType, int spacedim>
@@ -1362,7 +1424,7 @@ next_cell:
     // all adjacent cells
     std::vector<active_cell_iterator> adjacent_cells_tmp
       = find_cells_adjacent_to_vertex(mesh,
-                                      find_closest_vertex(mesh, p, marked_vertices));
+                                      find_closest_vertex(mapping, mesh, p, marked_vertices));
 
     // Make sure that we have found
     // at least one cell adjacent to vertex.
@@ -4925,6 +4987,38 @@ next_cell:
   }
 
 
+
+  template<int dim, int spacedim>
+  std::map<unsigned int, Point<spacedim> >
+  extract_used_vertices(const Triangulation<dim, spacedim> &container,
+                        const Mapping<dim,spacedim> &mapping)
+  {
+    std::map<unsigned int, Point<spacedim> > result;
+    for (const auto &cell : container.active_cell_iterators())
+      {
+        const auto vs = mapping.get_vertices(cell);
+        for (unsigned int i=0; i<vs.size(); ++i)
+          result[cell->vertex_index(i)]=vs[i];
+      }
+    Assert(result.size() == container.n_used_vertices(),
+           ExcInternalError());
+    return result;
+  }
+
+  template<int spacedim>
+  unsigned int
+  find_closest_vertex(const std::map<unsigned int,Point<spacedim> > &vertices,
+                      const Point<spacedim> &p)
+  {
+    auto id_and_v = std::min_element(vertices.begin(), vertices.end(),
+                                     [&](const std::pair<const unsigned int, Point<spacedim>> &p1,
+                                         const std::pair<const unsigned int, Point<spacedim>> &p2) -> bool
+    {
+      return p1.second.distance(p) < p2.second.distance(p);
+    }
+                                    );
+    return id_and_v->first;
+  }
 
 } /* namespace GridTools */
 
