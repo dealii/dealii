@@ -85,7 +85,7 @@ namespace LAPACKSupport
    * A matrix can have certain features allowing for optimization, but hard to
    * test. These are listed here.
    */
-  enum Properties
+  enum Property
   {
     /// No special properties
     general = 0,
@@ -100,6 +100,28 @@ namespace LAPACKSupport
     /// Matrix is in upper Hessenberg form
     hessenberg = 8
   };
+
+  /**
+   * Function printing the name of a Property.
+   */
+  inline const char *property_name(const Property s)
+  {
+    switch (s)
+      {
+      case general:
+        return "general";
+      case symmetric:
+        return "symmetric";
+      case upper_triangular:
+        return "upper triangular";
+      case lower_triangular:
+        return "lower triangular";
+      case diagonal:
+        return "diagonal";
+      case hessenberg:
+        return "Hessenberg";
+      }
+  }
 
   /**
    * Character constant.
@@ -148,6 +170,15 @@ namespace LAPACKSupport
   DeclException1(ExcState, State,
                  << "The function cannot be called while the matrix is in state "
                  << state_name(arg1));
+
+  /**
+   * Exception thrown when a matrix does not have suitable properties for an
+   * operation.
+   */
+  DeclException1(ExcProperty, Property,
+                 << "The function cannot be called with a "
+                 << property_name(arg1)
+                 << " matrix.");
 
   /**
    * This exception is thrown if a certain LAPACK function is not available

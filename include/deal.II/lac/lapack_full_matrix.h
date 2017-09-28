@@ -22,6 +22,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/lac/lapack_support.h>
 #include <deal.II/lac/vector_memory.h>
+#include <deal.II/base/thread_management.h>
 
 #include <memory>
 #include <vector>
@@ -46,7 +47,7 @@ template <typename number> class SparseMatrix;
  * usually the names chosen for the arguments in the LAPACK documentation.
  *
  * @ingroup Matrix1
- * @author Guido Kanschat, 2005
+ * @author Guido Kanschat, 2005, Denis Davydov, 2017
  */
 template <typename number>
 class LAPACKFullMatrix : public TransposeTable<number>
@@ -156,6 +157,11 @@ public:
    */
   void reinit (const size_type rows,
                const size_type cols);
+
+  /**
+   * Assign @p property to this matrix.
+   */
+  void set_property(const LAPACKSupport::Property property);
 
   /**
    * Return the dimension of the codomain (or range) space.
@@ -405,6 +411,33 @@ public:
   void compute_lu_factorization ();
 
   /**
+   * Compute the Cholesky factorization of the matrix using LAPACK function Xpotrf.
+   *
+   * @note The factorization is stored in the lower-triangular part of the matrix.
+   */
+  void compute_cholesky_factorization ();
+
+  /**
+   * Estimate the reciprocal of the condition number $1/k(A)$ in $L_1$ norm ($1/(||A||_1 ||A^{-1}||_1)$)
+   * of a symmetric positive definite matrix using Cholesky factorization. This function can only
+   * be called if the matrix is already factorized.
+   *
+   * @note The condition number $k(A)$ can be used to estimate the numerical
+   * error related to the matrix inversion or the solution of the
+   * system of linear algebraic equations as
+   * <code>error = std::numeric_limits<Number>::epsilon * k</code>.
+   * Alternatively one can get the number of accurate digits
+   * <code>std::floor(std::log10(k))</code>.
+   *
+   * @note The function computes reciprocal of the condition number to
+   * avoid possible overflow if the matrix is nearly singular.
+   *
+   * @param[in] l1_norm Is the $L_1$ norm of the matrix before calling Cholesky
+   * factorization. It can be obtained by calling l1_norm().
+   */
+  number reciprocal_condition_number(const number l1_norm) const;
+
+  /**
    * Compute the determinant of a matrix. As it requires the LU factorization of
    * the matrix, this function can only be called after
    * compute_lu_factorization() has been called.
@@ -412,8 +445,23 @@ public:
   number determinant () const;
 
   /**
-   * Invert the matrix by first computing an LU factorization with the LAPACK
-   * function Xgetrf and then building the actual inverse using Xgetri.
+   * Compute $L_1$ norm.
+   */
+  number l1_norm() const;
+
+  /**
+   * Compute $L_\infty$ norm.
+   */
+  number linfty_norm() const;
+
+  /**
+   * Compute Frobenius norm
+   */
+  number frobenius_norm() const;
+
+  /**
+   * Invert the matrix by first computing an LU/Cholesky factorization with the LAPACK
+   * function Xgetrf/Xpotrf and then building the actual inverse using Xgetri/Xpotri.
    */
   void invert ();
 
@@ -613,6 +661,10 @@ public:
                         const double        threshold   = 0.) const;
 
 private:
+  /**
+   * Internal function to compute various norms.
+   */
+  number norm(const char type) const;
 
   /**
    * Since LAPACK operations notoriously change the meaning of the matrix
@@ -621,15 +673,20 @@ private:
   LAPACKSupport::State state;
 
   /**
-   * Additional properties of the matrix which may help to select more
+   * Additional property of the matrix which may help to select more
    * efficient LAPACK functions.
    */
-  LAPACKSupport::Properties properties;
+  LAPACKSupport::Property property;
 
   /**
    * The working array used for some LAPACK functions.
    */
   mutable std::vector<number> work;
+
+  /**
+   * Integer working array used for some LAPACK functions.
+   */
+  mutable std::vector<int> iwork;
 
   /**
    * The vector storing the permutations applied for pivoting in the LU-
@@ -676,6 +733,11 @@ private:
    * <i>USV<sup>T</sup></i>.
    */
   std::shared_ptr<LAPACKFullMatrix<number> > svd_vt;
+
+  /**
+   * Thread mutex.
+   */
+  mutable Threads::Mutex mutex;
 };
 
 

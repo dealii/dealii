@@ -1,0 +1,4 @@
+Changed: LAPACKSupport::Properties is renamed to LAPACKSupport::Property to be
+consistent with LAPACKSupport::State.
+<br>
+(Denis Davydov, 2017/08/24)
