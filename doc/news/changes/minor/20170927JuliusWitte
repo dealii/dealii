@@ -1,0 +1,7 @@
+Changed: Split TensorProductMatrixSymmetricSum into base and derived class.
+Added a template specialization for TensorProductMatrixSymmetricSum
+in case of having a VectorizedArray as arithmetic type.
+In addition, TensorProductMatrixSymmetricSum is now able to handle
+distinct 1D matrices in each tensor dimension.
+<br>
+(Julius Witte, 2017/09/27)
