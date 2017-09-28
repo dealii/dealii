@@ -19,6 +19,7 @@ SET(_src
   arkode.cc
   ida.cc
   copy.cc
+  kinsol.cc
   )
 
 SET(_inst
