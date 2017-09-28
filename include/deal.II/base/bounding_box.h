@@ -77,6 +77,24 @@ public:
   const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &get_boundary_points () const;
 
   /**
+   * Check if the current object and @p other_bbox are neighbours i.e. if the boxes
+   * have dimension spacedim, check if their insersection is non empty and has at least dimension
+   * spacedim-2 (i.e. a point in dimension 2, an edge in dimension 3)
+   *
+   * Return values:
+   * - 0 : not neighbours
+   * Values which are non zero are used for neighbours, in particular:
+   * - 1 : neighbours
+   * - 2 : neighbours which can be expressed with a single Bounding Box, e.g.
+   *  @code
+   *  .--V--W    .-----V
+   *  |  |  | =  |     |
+   *  V--W--.    V-----.
+   *  @endcode
+   */
+  unsigned int is_neighbour(const BoundingBox<spacedim,Number> &other_bbox, const double &err=1e-12) const;
+
+  /**
    * Enlarge the current object so that it contains @p other_bbox .
    * If the current object already contains @p other_bbox then it is not changed
    * by this function.
@@ -84,9 +102,10 @@ public:
   void merge_with(const BoundingBox<spacedim,Number> &other_bbox);
 
   /**
-   * Return true if the point is inside the Bounding Box, false otherwise
+   * Return true if the point is inside the Bounding Box within the numerical error
+   * @p err, false otherwise.
    */
-  bool point_inside (const Point<spacedim, Number> &p) const;
+  bool point_inside (const Point<spacedim, Number> &p, const double &err=1e-12) const;
 
   /**
    * Compute the volume (i.e. the dim-dimensional measure) of the BoundingBox.

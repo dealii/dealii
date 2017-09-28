@@ -17,6 +17,7 @@
 #define dealii_distributed_grid_tools_h
 
 
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/distributed/tria_base.h>
@@ -130,6 +131,41 @@ namespace parallel
     exchange_cell_data_to_ghosts (const MeshType &mesh,
                                   std::function<boost::optional<DataType> (const typename MeshType::active_cell_iterator &)> pack,
                                   std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> unpack);
+
+    /**
+     * Given a cell @p parent_cell of a distributed triangulation and a flag @p has_locally_owned.
+     * If there are active cells which are locally owned and are refinements of @p parent_cell,
+     * return a bounding box so that it encloses all these locally owned cells and modify the flag to true.
+     * Otherwise return an empty bounding box and set the flag to false.
+     *
+     * If @p parent_cell is active and locally owned then return a bounding box enclosing it.
+     */
+    template < int dim, int spacedim >
+    BoundingBox < spacedim >
+    compute_cell_locally_owned_bounding_box
+    (const typename parallel::distributed::Triangulation< dim, spacedim >::cell_iterator &parent_cell,
+     bool &has_locally_owned);
+
+    /**
+     * Compute a vector of bounding boxes which encloses the space occupied by
+     * the locally owned cells of the distributed triangulation @p distributed_tria.
+     *
+     * The algorithm loops over all cells at given level @p refinement_level and active cells at lower refinement
+     * levels, creating a Bounding Box containing all locally owned cells inside. Then it merges boxes which can
+     * be expressed as a single one.
+     *
+     * The parameters to control the algorithm are:
+     * - @p refinement_level : it describes the level at which the initial Bounding Boxes are created. The refinement
+     *  should be set to a low refinement level. If @p refinement_level is higher than the number of levels of the
+     *  triangulation or then an exception is trown.
+     * - @p err (optional) : this value is use to cope with numerical errors. Coordinates which are closer than
+     *  this value are considered the same
+     */
+    template < int dim, int spacedim>
+    std::vector< BoundingBox<spacedim> >
+    compute_locally_owned_bounding_box
+    ( const parallel::distributed::Triangulation< dim, spacedim > &distributed_tria,
+      const unsigned int &refinement_level, const unsigned int &max_boxes, const double &err = 1e-12);
   }
 
 
