@@ -1,0 +1,248 @@
+
+DEAL::Test: Bounding Box class Is neighbor and volume functions
+DEAL::
+DEAL::Test for dimension 1
+DEAL::Bounding box boundaries A: 
+DEAL::0.00000
+DEAL::1.00000
+DEAL::Is neighbor of itself: 3
+DEAL::Bounding box boundaries B: 
+DEAL::1.00000
+DEAL::2.00000
+DEAL::Is neighbor A with B: 3
+DEAL::Is neighbor B with A: 3
+DEAL::Is neighbor B with B: 3
+DEAL::Bounding box boundaries C: 
+DEAL::0.00000
+DEAL::2.00000
+DEAL::Is neighbor C with B: 3
+DEAL::Is neighbor B with C: 3
+DEAL::Is neighbor A with C: 3
+DEAL::Is neighbor C with A: 3
+DEAL::Is neighbor C with C: 3
+DEAL::Bounding box boundaries D: 
+DEAL::0.00000
+DEAL::1.40000
+DEAL::Is neighbor D with A: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor D with B: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor D with C: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor D with D: 3
+DEAL::Bounding box boundaries E: 
+DEAL::-10.0000
+DEAL::-8.00000
+DEAL::Is neighbor E with A: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with B: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with C: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with D: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with E: 3
+DEAL::Bounding box boundaries F: 
+DEAL::1.00000
+DEAL::2.00000
+DEAL::Is neighbor F with A: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor F with B: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor F with C: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor F with D: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor F with E: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor F with F: 3
+DEAL::End test for dimension 1
+DEAL::
+DEAL::Bounding box boundaries G: 
+DEAL::0.800000
+DEAL::1.80000
+DEAL::Is neighbor G with A: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with B: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with C: 0
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with D: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with E: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor G with F: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with G: 3
+DEAL::End test for dimension 1
+DEAL::
+DEAL::
+DEAL::Test for dimension 2
+DEAL::Bounding box boundaries A: 
+DEAL::0.00000 0.00000
+DEAL::1.00000 1.00000
+DEAL::Is neighbor of itself: 3
+DEAL::Bounding box boundaries B: 
+DEAL::1.00000 1.00000
+DEAL::2.00000 2.00000
+DEAL::Is neighbor A with B: 1
+DEAL::Is neighbor B with A: 1
+DEAL::Is neighbor B with B: 3
+DEAL::Bounding box boundaries C: 
+DEAL::0.00000 0.00000
+DEAL::2.00000 2.00000
+DEAL::Is neighbor C with B: 3
+DEAL::Is neighbor B with C: 3
+DEAL::Is neighbor A with C: 3
+DEAL::Is neighbor C with A: 3
+DEAL::Is neighbor C with C: 3
+DEAL::Bounding box boundaries D: 
+DEAL::0.00000 0.00000
+DEAL::1.40000 1.40000
+DEAL::Is neighbor D with A: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor D with B: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbor D with C: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor D with D: 3
+DEAL::Bounding box boundaries E: 
+DEAL::-10.0000 -10.0000
+DEAL::-8.00000 -8.00000
+DEAL::Is neighbor E with A: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with B: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with C: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with D: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with E: 3
+DEAL::Bounding box boundaries F: 
+DEAL::1.00000 0.00000
+DEAL::2.00000 1.00000
+DEAL::Is neighbor F with A: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor F with B: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor F with C: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor F with D: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbor F with E: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor F with F: 3
+DEAL::End test for dimension 2
+DEAL::
+DEAL::Bounding box boundaries G: 
+DEAL::0.800000 0.00000
+DEAL::1.80000 1.00000
+DEAL::Is neighbor G with A: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with B: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbor G with C: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with D: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbor G with E: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor G with F: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with G: 3
+DEAL::End test for dimension 2
+DEAL::
+DEAL::
+DEAL::Test for dimension 3
+DEAL::Bounding box boundaries A: 
+DEAL::0.00000 0.00000 0.00000
+DEAL::1.00000 1.00000 1.00000
+DEAL::Is neighbor of itself: 3
+DEAL::Bounding box boundaries B: 
+DEAL::1.00000 1.00000 1.00000
+DEAL::2.00000 2.00000 2.00000
+DEAL::Is neighbor A with B: 1
+DEAL::Is neighbor B with A: 1
+DEAL::Is neighbor B with B: 3
+DEAL::Bounding box boundaries B1: 
+DEAL::0.00000 1.00000 1.00000
+DEAL::1.00000 2.00000 2.00000
+DEAL::Is neighbor A with B1: 1
+DEAL::Is neighbor B1 with A: 1
+DEAL::Is neighbor B1 with B: 3
+DEAL::Bounding box boundaries B2: 
+DEAL::0.200000 1.00000 1.00000
+DEAL::1.00000 2.00000 2.00000
+DEAL::Is neighbor A with B2: 1
+DEAL::Is neighbor B2 with A: 1
+DEAL::Is neighbor B2 with B: 3
+DEAL::Bounding box boundaries B3: 
+DEAL::0.00000 1.00000 0.800000
+DEAL::1.00000 2.00000 2.00000
+DEAL::Is neighbor A with B3: 2
+DEAL::Is neighbor B3 with A: 2
+DEAL::Is neighbor B3 with B: 3
+DEAL::Bounding box boundaries C: 
+DEAL::0.00000 0.00000 0.00000
+DEAL::2.00000 2.00000 2.00000
+DEAL::Is neighbor C with B: 3
+DEAL::Is neighbor B with C: 3
+DEAL::Is neighbor A with C: 3
+DEAL::Is neighbor C with A: 3
+DEAL::Is neighbor C with C: 3
+DEAL::Bounding box boundaries D: 
+DEAL::0.00000 0.00000 0.00000
+DEAL::1.40000 1.40000 1.40000
+DEAL::Is neighbor D with A: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor D with B: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbor D with C: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor D with D: 3
+DEAL::Bounding box boundaries E: 
+DEAL::-10.0000 -10.0000 -10.0000
+DEAL::-8.00000 -8.00000 -8.00000
+DEAL::Is neighbor E with A: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with B: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with C: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with D: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor E with E: 3
+DEAL::Bounding box boundaries F: 
+DEAL::1.00000 0.00000 0.00000
+DEAL::2.00000 1.00000 1.00000
+DEAL::Is neighbor F with A: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor F with B: 1
+DEAL::Vice-versa: 1
+DEAL::Is neighbor F with C: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor F with D: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbor F with E: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor F with F: 3
+DEAL::End test for dimension 3
+DEAL::
+DEAL::Bounding box boundaries G: 
+DEAL::0.800000 0.00000 0.00000
+DEAL::1.80000 1.00000 1.00000
+DEAL::Is neighbor G with A: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with B: 1
+DEAL::Vice-versa: 1
+DEAL::Is neighbor G with C: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with D: 2
+DEAL::Vice-versa: 2
+DEAL::Is neighbor G with E: 0
+DEAL::Vice-versa: 0
+DEAL::Is neighbor G with F: 3
+DEAL::Vice-versa: 3
+DEAL::Is neighbor G with G: 3
+DEAL::End test for dimension 3
+DEAL::

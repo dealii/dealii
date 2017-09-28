@@ -17,6 +17,7 @@
 #define dealii_grid_tools_h
 
 
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/config.h>
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/geometry_info.h>
@@ -1199,7 +1200,6 @@ namespace GridTools
   compute_ghost_cell_layer_within_distance ( const MeshType &mesh,
                                              const double layer_thickness);
 
-
   /**
    * Compute and return a bounding box, defined through a pair of points
    * bottom left and top right, that surrounds a subdomain of the @p mesh.
@@ -1221,6 +1221,55 @@ namespace GridTools
   ( const MeshType                                                                    &mesh,
     const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate );
 
+  /**
+   * Compute a collection of bounding boxes so that all active cells for which the given predicate is true, are
+   * completely enclosed in at least one of the bounding boxes. Notice the cover is only guaranteed to contain
+   * all these active cells but it's not necessarily exact i.e. it can include a bigger area than their union.
+   *
+   * For each cell at a given refinement level containing active cells for which @p predicate is true,
+   * the function creates a bounding box of its children for which @p predicate is true.
+   *
+   * This results in a cover of all active cells for which @p predicate is true; the parameters
+   * @p allow_merge and @p max_boxes are used to reduce the number of cells at a computational cost and
+   * covering a bigger n-dimensional volume.
+   *
+   * The parameters to control the algorithm are:
+   * - @p predicate : the property of the cells to enclose e.g. IteratorFilters::LocallyOwnedCell .
+   *  The predicate is tested only on active cells.
+   * - @p refinement_level : it defines the level at which the initial bounding box are created. The refinement
+   *  should be set to a coarse refinement level. A bounding box is created for each active cell at coarser
+   *  level than @p refinement_level; if @p refinement_level is higher than the number of levels of the
+   *  triangulation an exception is thrown.
+   * - @p allow_merge : This flag allows for box merging and, by default, is false. The algorithm has a cost of
+   *  O(N^2) where N is the number of the bounding boxes created from the refinement level; for this reason, if
+   *  the flag is set to true, make sure to choose wisely a coarse enough @p refinement_level.
+   * - @p max_boxes : the maximum number of bounding boxes to compute. If more are created the smaller ones are
+   *  merged with neighbors. By default after merging the boxes which can be expressed as a single one no
+   *  more boxes are merged. See the BoundingBox::get_neighbor_type () function for details.
+   *  Notice only neighboring cells are merged (see the @p get_neighbor_type  function in bounding box class): if
+   *  the target number of bounding boxes max_boxes can't be reached by merging neighbors an exception is thrown
+   *
+   * The following image describes an example of the algorithm with @p refinement_level = 2, @p allow_merge = true
+   * and @p max_boxes = 1. The cells with the property predicate are in red, the area of a bounding box is
+   * slightly orange.
+   * @image html bounding_box_predicate.png
+   * - 1. In black we can see the cells of the current level.
+   * - 2. For each cell containing the red area a bounding box is created: by default these are returned.
+   * - 3. Because @p allow_merge = true the number of bounding boxes is reduced while not changing the cover.
+   *  If @p max_boxes was left as default or bigger than 1 these two boxes would be returned.
+   * - 4. Because @p max_boxes = 1 the smallest bounding box is merged to the bigger one.
+   * Notice it is important to choose the parameters wisely. For instance, @p allow_merge = false and
+   * @p refinement_level = 1 returns the very same bounding box but with a fraction of the computational cost.
+   *
+   * This function does not take into account the curvature of cells and thus it is not suited for handling
+   * curved geometry: the mapping is assumed to be linear.
+   */
+  template < class MeshType >
+  std::vector< BoundingBox< MeshType::space_dimension > >
+  compute_mesh_predicate_bounding_box
+  ( const MeshType &mesh,
+    const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate,
+    const unsigned int &refinement_level = 0, const bool &allow_merge = false, const unsigned int &max_boxes = numbers::invalid_unsigned_int);
 
   /**
    * Return the adjacent cells of all the vertices. If a vertex is also a

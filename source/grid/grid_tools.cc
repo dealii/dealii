@@ -55,6 +55,7 @@
 #include <numeric>
 #include <list>
 #include <set>
+#include <tuple>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -2166,6 +2167,174 @@ next_cell:
   }
 
 
+
+  namespace internal
+  {
+    namespace BoundingBoxPredicate
+    {
+      template < class MeshType >
+      std::tuple< BoundingBox < MeshType::space_dimension >, bool >
+      compute_cell_predicate_bounding_box
+      (const typename MeshType::cell_iterator &parent_cell,
+       const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate)
+      {
+        bool has_predicate = false; // Start assuming there's no cells with predicate inside
+        std::vector< typename MeshType::active_cell_iterator > active_cells;
+        if (parent_cell->active())
+          active_cells = {parent_cell};
+        else
+          //Finding all active cells descendants of the current one (or the current one if it is active)
+          active_cells = get_active_child_cells < MeshType > (parent_cell);
+
+        const unsigned int spacedim = MeshType::space_dimension;
+
+        // Looking for the first active cell which has the property predicate
+        unsigned int i = 0;
+        while ( i < active_cells.size() && !predicate(active_cells[i]) )
+          ++i;
+
+        // No active cells or no active cells with property
+        if ( active_cells.size() == 0 || i == active_cells.size() )
+          {
+            BoundingBox<spacedim> bbox;
+            return std::make_tuple(bbox, has_predicate);
+          }
+
+        // The two boundary points defining the boundary box
+        Point<spacedim> maxp = active_cells[i]->vertex(0);
+        Point<spacedim> minp = active_cells[i]->vertex(0);
+
+        for (; i < active_cells.size() ; ++i)
+          if ( predicate(active_cells[i]) )
+            for (unsigned int v=0; v<GeometryInfo<spacedim>::vertices_per_cell; ++v)
+              for ( unsigned int d=0; d<spacedim; ++d)
+                {
+                  minp[d] = std::min( minp[d], active_cells[i]->vertex(v)[d]);
+                  maxp[d] = std::max( maxp[d], active_cells[i]->vertex(v)[d]);
+                }
+
+        has_predicate = true;
+        BoundingBox < spacedim > bbox(std::make_pair(minp,maxp));
+        return std::make_tuple(bbox, has_predicate);
+      }
+    }
+  }
+
+
+
+  template < class MeshType >
+  std::vector< BoundingBox<MeshType::space_dimension> >
+  compute_mesh_predicate_bounding_box
+  (const MeshType &mesh,
+   const std::function<bool (const typename MeshType::active_cell_iterator &)> &predicate,
+   const unsigned int &refinement_level,  const bool &allow_merge, const unsigned int &max_boxes)
+  {
+    // Algorithm brief description: begin with creating bounding boxes of all cells at
+    // refinement_level (and coarser levels if there are active cells) which have the predicate
+    // property. These are then merged
+
+    Assert( refinement_level <= mesh.n_levels(),
+            ExcMessage ( "Error: refinement level is higher then total levels in the triangulation!") );
+
+    const unsigned int spacedim = MeshType::space_dimension;
+    std::vector< BoundingBox < spacedim > > bounding_boxes;
+
+    // Creating a bounding box for all active cell on coarser level
+
+    for (unsigned int i=0; i < refinement_level; ++i)
+      for (typename MeshType::cell_iterator cell: mesh.active_cell_iterators_on_level(i))
+        {
+          bool has_predicate = false;
+          BoundingBox < spacedim > bbox;
+          std::tie(bbox, has_predicate) =
+            internal::BoundingBoxPredicate::compute_cell_predicate_bounding_box <MeshType> (cell, predicate);
+          if (has_predicate)
+            bounding_boxes.push_back(bbox);
+        }
+
+    // Creating a Bounding Box for all cells on the chosen refinement_level
+    for (typename MeshType::cell_iterator cell: mesh.cell_iterators_on_level(refinement_level))
+      {
+        bool has_predicate = false;
+        BoundingBox < spacedim > bbox;
+        std::tie(bbox, has_predicate) =
+          internal::BoundingBoxPredicate::compute_cell_predicate_bounding_box <MeshType> (cell, predicate);
+        if (has_predicate)
+          bounding_boxes.push_back(bbox);
+      }
+
+    if ( !allow_merge)
+      // If merging is not requested return the created bounding_boxes
+      return bounding_boxes;
+    else
+      {
+        // Merging part of the algorithm
+        // Part 1: merging neighbors
+        // This array stores the indices of arrays we have already merged
+        std::vector<unsigned int> merged_boxes_idx;
+        bool found_neighbors = true;
+
+        // We merge only nighbors which can be expressed by a single bounding box
+        // e.g. in 1d [0,1] and [1,2] can be described with [0,2] without losing anything
+        while (found_neighbors)
+          {
+            found_neighbors = false;
+            for (unsigned int i=0; i<bounding_boxes.size()-1; ++i)
+              {
+                if ( std::find(merged_boxes_idx.begin(),merged_boxes_idx.end(),i) == merged_boxes_idx.end())
+                  for (unsigned int j=i+1; j<bounding_boxes.size(); ++j)
+                    if ( std::find(merged_boxes_idx.begin(),merged_boxes_idx.end(),j) == merged_boxes_idx.end()
+                         && bounding_boxes[i].get_neighbor_type (bounding_boxes[j]) == NeighborType::mergeable_neighbors  )
+                      {
+                        bounding_boxes[i].merge_with(bounding_boxes[j]);
+                        merged_boxes_idx.push_back(j);
+                        found_neighbors = true;
+                      }
+              }
+          }
+
+        // Copying the merged boxes into merged_b_boxes
+        std::vector< BoundingBox < spacedim > > merged_b_boxes;
+        for (unsigned int i=0; i<bounding_boxes.size(); ++i)
+          if (std::find(merged_boxes_idx.begin(),merged_boxes_idx.end(),i) == merged_boxes_idx.end())
+            merged_b_boxes.push_back(bounding_boxes[i]);
+
+        // Part 2: if there are too many bounding boxes, merging smaller boxes
+        // This has sense only in dimension 2 or greater, since  in dimension 1,
+        // neighboring intervals can always be merged without problems
+        if ( (merged_b_boxes.size() > max_boxes) && (spacedim > 1) )
+          {
+            std::vector<double> volumes;
+            for (unsigned int i=0; i< merged_b_boxes.size(); ++i)
+              volumes.push_back(merged_b_boxes[i].volume());
+
+            while ( merged_b_boxes.size() > max_boxes)
+              {
+                unsigned int min_idx = std::min_element(volumes.begin(),volumes.end()) -
+                                       volumes.begin();
+                volumes.erase(volumes.begin() + min_idx);
+                //Finding a neighbor
+                bool not_removed = true;
+                for (unsigned int i=0; i<merged_b_boxes.size() && not_removed; ++i)
+                  // We merge boxes if we have "attached" or "mergeable" neighbors, even though mergeable should
+                  // be dealt with in Part 1
+                  if ( i != min_idx &&
+                       (merged_b_boxes[i].get_neighbor_type (merged_b_boxes[min_idx]) == NeighborType::attached_neighbors ||
+                        merged_b_boxes[i].get_neighbor_type (merged_b_boxes[min_idx]) == NeighborType::mergeable_neighbors) )
+                    {
+                      merged_b_boxes[i].merge_with(merged_b_boxes[min_idx]);
+                      merged_b_boxes.erase(merged_b_boxes.begin() + min_idx);
+                      not_removed = false;
+                    }
+                Assert( !not_removed,
+                        ExcMessage ( "Error: couldn't merge bounding boxes!") );
+              }
+          }
+        Assert( merged_b_boxes.size() <= max_boxes,
+                ExcMessage ( "Error: couldn't reach target number of bounding boxes!") );
+        return merged_b_boxes;
+      }
+  }
 
   template <int dim, int spacedim>
   std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> >

@@ -1,0 +1,231 @@
+
+DEAL:0::Testing hypercube for spacedim = 2 refinement: 0 max number of boxes: 4
+DEAL:0::Computed Bounding Boxes:
+DEAL:0::0.00000 0.00000
+DEAL:0::0.500000 0.500000
+DEAL:0::
+DEAL:0::Bounding Boxes surround locally_owned cells: 1
+DEAL:0::Current test END
+DEAL:0::Testing hypercube for spacedim = 2 refinement: 1 max number of boxes: 4
+DEAL:0::Computed Bounding Boxes:
+DEAL:0::0.00000 0.00000
+DEAL:0::0.500000 0.500000
+DEAL:0::
+DEAL:0::Bounding Boxes surround locally_owned cells: 1
+DEAL:0::Current test END
+DEAL:0::Testing hypercube for spacedim = 2 refinement: 2 max number of boxes: 4
+DEAL:0::Computed Bounding Boxes:
+DEAL:0::0.00000 0.00000
+DEAL:0::0.500000 0.500000
+DEAL:0::
+DEAL:0::Bounding Boxes surround locally_owned cells: 1
+DEAL:0::Current test END
+DEAL:0::Testing hypercube for spacedim = 2 refinement: 2 max number of boxes: 2
+DEAL:0::Computed Bounding Boxes:
+DEAL:0::0.00000 0.00000
+DEAL:0::0.500000 0.500000
+DEAL:0::
+DEAL:0::Bounding Boxes surround locally_owned cells: 1
+DEAL:0::Current test END
+DEAL:0::Testing hypercube for spacedim = 3 refinement: 0 max number of boxes: 4
+DEAL:0::Computed Bounding Boxes:
+DEAL:0::0.00000 0.00000 0.00000
+DEAL:0::1.00000 0.500000 0.500000
+DEAL:0::
+DEAL:0::Bounding Boxes surround locally_owned cells: 1
+DEAL:0::Current test END
+DEAL:0::Testing hypercube for spacedim = 3 refinement: 1 max number of boxes: 4
+DEAL:0::Computed Bounding Boxes:
+DEAL:0::0.00000 0.00000 0.00000
+DEAL:0::1.00000 0.500000 0.500000
+DEAL:0::
+DEAL:0::Bounding Boxes surround locally_owned cells: 1
+DEAL:0::Current test END
+DEAL:0::Testing hypercube for spacedim = 3 refinement: 2 max number of boxes: 4
+DEAL:0::Computed Bounding Boxes:
+DEAL:0::0.00000 0.00000 0.00000
+DEAL:0::1.00000 0.500000 0.500000
+DEAL:0::
+DEAL:0::Bounding Boxes surround locally_owned cells: 1
+DEAL:0::Current test END
+DEAL:0::Testing hypercube for spacedim = 3 refinement: 2 max number of boxes: 2
+DEAL:0::Computed Bounding Boxes:
+DEAL:0::0.00000 0.00000 0.00000
+DEAL:0::1.00000 0.500000 0.500000
+DEAL:0::
+DEAL:0::Bounding Boxes surround locally_owned cells: 1
+DEAL:0::Current test END
+
+DEAL:1::Testing hypercube for spacedim = 2 refinement: 0 max number of boxes: 4
+DEAL:1::Computed Bounding Boxes:
+DEAL:1::0.500000 0.00000
+DEAL:1::1.00000 0.500000
+DEAL:1::
+DEAL:1::Bounding Boxes surround locally_owned cells: 1
+DEAL:1::Current test END
+DEAL:1::Testing hypercube for spacedim = 2 refinement: 1 max number of boxes: 4
+DEAL:1::Computed Bounding Boxes:
+DEAL:1::0.500000 0.00000
+DEAL:1::1.00000 0.500000
+DEAL:1::
+DEAL:1::Bounding Boxes surround locally_owned cells: 1
+DEAL:1::Current test END
+DEAL:1::Testing hypercube for spacedim = 2 refinement: 2 max number of boxes: 4
+DEAL:1::Computed Bounding Boxes:
+DEAL:1::0.500000 0.00000
+DEAL:1::1.00000 0.500000
+DEAL:1::
+DEAL:1::Bounding Boxes surround locally_owned cells: 1
+DEAL:1::Current test END
+DEAL:1::Testing hypercube for spacedim = 2 refinement: 2 max number of boxes: 2
+DEAL:1::Computed Bounding Boxes:
+DEAL:1::0.500000 0.00000
+DEAL:1::1.00000 0.500000
+DEAL:1::
+DEAL:1::Bounding Boxes surround locally_owned cells: 1
+DEAL:1::Current test END
+DEAL:1::Testing hypercube for spacedim = 3 refinement: 0 max number of boxes: 4
+DEAL:1::Computed Bounding Boxes:
+DEAL:1::0.00000 0.500000 0.00000
+DEAL:1::1.00000 1.00000 0.500000
+DEAL:1::
+DEAL:1::Bounding Boxes surround locally_owned cells: 1
+DEAL:1::Current test END
+DEAL:1::Testing hypercube for spacedim = 3 refinement: 1 max number of boxes: 4
+DEAL:1::Computed Bounding Boxes:
+DEAL:1::0.00000 0.500000 0.00000
+DEAL:1::1.00000 1.00000 0.500000
+DEAL:1::
+DEAL:1::Bounding Boxes surround locally_owned cells: 1
+DEAL:1::Current test END
+DEAL:1::Testing hypercube for spacedim = 3 refinement: 2 max number of boxes: 4
+DEAL:1::Computed Bounding Boxes:
+DEAL:1::0.00000 0.500000 0.00000
+DEAL:1::1.00000 1.00000 0.500000
+DEAL:1::
+DEAL:1::Bounding Boxes surround locally_owned cells: 1
+DEAL:1::Current test END
+DEAL:1::Testing hypercube for spacedim = 3 refinement: 2 max number of boxes: 2
+DEAL:1::Computed Bounding Boxes:
+DEAL:1::0.00000 0.500000 0.00000
+DEAL:1::1.00000 1.00000 0.500000
+DEAL:1::
+DEAL:1::Bounding Boxes surround locally_owned cells: 1
+DEAL:1::Current test END
+
+
+DEAL:2::Testing hypercube for spacedim = 2 refinement: 0 max number of boxes: 4
+DEAL:2::Computed Bounding Boxes:
+DEAL:2::0.00000 0.500000
+DEAL:2::0.500000 1.00000
+DEAL:2::
+DEAL:2::Bounding Boxes surround locally_owned cells: 1
+DEAL:2::Current test END
+DEAL:2::Testing hypercube for spacedim = 2 refinement: 1 max number of boxes: 4
+DEAL:2::Computed Bounding Boxes:
+DEAL:2::0.00000 0.500000
+DEAL:2::0.500000 1.00000
+DEAL:2::
+DEAL:2::Bounding Boxes surround locally_owned cells: 1
+DEAL:2::Current test END
+DEAL:2::Testing hypercube for spacedim = 2 refinement: 2 max number of boxes: 4
+DEAL:2::Computed Bounding Boxes:
+DEAL:2::0.00000 0.500000
+DEAL:2::0.500000 1.00000
+DEAL:2::
+DEAL:2::Bounding Boxes surround locally_owned cells: 1
+DEAL:2::Current test END
+DEAL:2::Testing hypercube for spacedim = 2 refinement: 2 max number of boxes: 2
+DEAL:2::Computed Bounding Boxes:
+DEAL:2::0.00000 0.500000
+DEAL:2::0.500000 1.00000
+DEAL:2::
+DEAL:2::Bounding Boxes surround locally_owned cells: 1
+DEAL:2::Current test END
+DEAL:2::Testing hypercube for spacedim = 3 refinement: 0 max number of boxes: 4
+DEAL:2::Computed Bounding Boxes:
+DEAL:2::0.00000 0.00000 0.500000
+DEAL:2::1.00000 0.500000 1.00000
+DEAL:2::
+DEAL:2::Bounding Boxes surround locally_owned cells: 1
+DEAL:2::Current test END
+DEAL:2::Testing hypercube for spacedim = 3 refinement: 1 max number of boxes: 4
+DEAL:2::Computed Bounding Boxes:
+DEAL:2::0.00000 0.00000 0.500000
+DEAL:2::1.00000 0.500000 1.00000
+DEAL:2::
+DEAL:2::Bounding Boxes surround locally_owned cells: 1
+DEAL:2::Current test END
+DEAL:2::Testing hypercube for spacedim = 3 refinement: 2 max number of boxes: 4
+DEAL:2::Computed Bounding Boxes:
+DEAL:2::0.00000 0.00000 0.500000
+DEAL:2::1.00000 0.500000 1.00000
+DEAL:2::
+DEAL:2::Bounding Boxes surround locally_owned cells: 1
+DEAL:2::Current test END
+DEAL:2::Testing hypercube for spacedim = 3 refinement: 2 max number of boxes: 2
+DEAL:2::Computed Bounding Boxes:
+DEAL:2::0.00000 0.00000 0.500000
+DEAL:2::1.00000 0.500000 1.00000
+DEAL:2::
+DEAL:2::Bounding Boxes surround locally_owned cells: 1
+DEAL:2::Current test END
+
+
+DEAL:3::Testing hypercube for spacedim = 2 refinement: 0 max number of boxes: 4
+DEAL:3::Computed Bounding Boxes:
+DEAL:3::0.500000 0.500000
+DEAL:3::1.00000 1.00000
+DEAL:3::
+DEAL:3::Bounding Boxes surround locally_owned cells: 1
+DEAL:3::Current test END
+DEAL:3::Testing hypercube for spacedim = 2 refinement: 1 max number of boxes: 4
+DEAL:3::Computed Bounding Boxes:
+DEAL:3::0.500000 0.500000
+DEAL:3::1.00000 1.00000
+DEAL:3::
+DEAL:3::Bounding Boxes surround locally_owned cells: 1
+DEAL:3::Current test END
+DEAL:3::Testing hypercube for spacedim = 2 refinement: 2 max number of boxes: 4
+DEAL:3::Computed Bounding Boxes:
+DEAL:3::0.500000 0.500000
+DEAL:3::1.00000 1.00000
+DEAL:3::
+DEAL:3::Bounding Boxes surround locally_owned cells: 1
+DEAL:3::Current test END
+DEAL:3::Testing hypercube for spacedim = 2 refinement: 2 max number of boxes: 2
+DEAL:3::Computed Bounding Boxes:
+DEAL:3::0.500000 0.500000
+DEAL:3::1.00000 1.00000
+DEAL:3::
+DEAL:3::Bounding Boxes surround locally_owned cells: 1
+DEAL:3::Current test END
+DEAL:3::Testing hypercube for spacedim = 3 refinement: 0 max number of boxes: 4
+DEAL:3::Computed Bounding Boxes:
+DEAL:3::0.00000 0.500000 0.500000
+DEAL:3::1.00000 1.00000 1.00000
+DEAL:3::
+DEAL:3::Bounding Boxes surround locally_owned cells: 1
+DEAL:3::Current test END
+DEAL:3::Testing hypercube for spacedim = 3 refinement: 1 max number of boxes: 4
+DEAL:3::Computed Bounding Boxes:
+DEAL:3::0.00000 0.500000 0.500000
+DEAL:3::1.00000 1.00000 1.00000
+DEAL:3::
+DEAL:3::Bounding Boxes surround locally_owned cells: 1
+DEAL:3::Current test END
+DEAL:3::Testing hypercube for spacedim = 3 refinement: 2 max number of boxes: 4
+DEAL:3::Computed Bounding Boxes:
+DEAL:3::0.00000 0.500000 0.500000
+DEAL:3::1.00000 1.00000 1.00000
+DEAL:3::
+DEAL:3::Bounding Boxes surround locally_owned cells: 1
+DEAL:3::Current test END
+DEAL:3::Testing hypercube for spacedim = 3 refinement: 2 max number of boxes: 2
+DEAL:3::Computed Bounding Boxes:
+DEAL:3::0.00000 0.500000 0.500000
+DEAL:3::1.00000 1.00000 1.00000
+DEAL:3::
+DEAL:3::Bounding Boxes surround locally_owned cells: 1
+DEAL:3::Current test END
+
