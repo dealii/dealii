@@ -338,6 +338,22 @@ public:
    std::vector<VectorType>            &eigenvectors,
    const unsigned int                  n_eigenvalues);
 
+  /**
+   * Same as above but takes eigenvectors as pointers.
+   */
+  template <typename MatrixType1,
+            typename MatrixType2, typename INVERSE>
+  void solve
+  (const MatrixType1                  &A,
+   const MatrixType2                  &B,
+   const INVERSE                      &inverse,
+   std::vector<std::complex<double> > &eigenvalues,
+   std::vector<VectorType *>           &eigenvectors,
+   const unsigned int                  n_eigenvalues);
+
+  /**
+   * Return the memory consumption of this class in bytes.
+   */
   std::size_t memory_consumption() const;
 
 protected:
@@ -529,6 +545,8 @@ private:
                   << " Arnoldi vectors.");
 };
 
+
+
 template <typename VectorType>
 std::size_t
 PArpackSolver<VectorType>::memory_consumption() const
@@ -545,6 +563,8 @@ PArpackSolver<VectorType>::memory_consumption() const
           tmp.memory_consumption() +
           MemoryConsumption::memory_consumption (types::global_dof_index()) * local_indices.size();
 }
+
+
 
 template <typename VectorType>
 PArpackSolver<VectorType>::AdditionalData::
@@ -574,6 +594,8 @@ AdditionalData (const unsigned int     number_of_arnoldi_vectors,
           ExcMessage("Currently, only modes 1, 2 and 3 are supported."));
 }
 
+
+
 template <typename VectorType>
 PArpackSolver<VectorType>::PArpackSolver (SolverControl        &control,
                                           const MPI_Comm       &mpi_communicator,
@@ -594,12 +616,16 @@ PArpackSolver<VectorType>::PArpackSolver (SolverControl        &control,
   sigmai(0.0)
 {}
 
+
+
 template <typename VectorType>
 void PArpackSolver<VectorType>::set_shift(const std::complex<double> sigma)
 {
   sigmar = sigma.real();
   sigmai = sigma.imag();
 }
+
+
 
 template <typename VectorType>
 void PArpackSolver<VectorType>::
@@ -612,6 +638,7 @@ set_initial_vector(const VectorType &vec)
                             local_indices.end(),
                             &resid[0]);
 }
+
 
 
 template <typename VectorType>
@@ -655,6 +682,8 @@ internal_reinit(const IndexSet &locally_owned_dofs)
   select.resize (ncv, 0);
 }
 
+
+
 template <typename VectorType>
 void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs)
 {
@@ -666,6 +695,8 @@ void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs)
   tmp.reinit (locally_owned_dofs,mpi_communicator);
 }
 
+
+
 template <typename VectorType>
 void PArpackSolver<VectorType>::reinit(const VectorType &distributed_vector)
 {
@@ -676,6 +707,7 @@ void PArpackSolver<VectorType>::reinit(const VectorType &distributed_vector)
   dst.reinit (distributed_vector);
   tmp.reinit (distributed_vector);
 }
+
 
 
 template <typename VectorType>
@@ -690,6 +722,26 @@ void PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs,
   tmp.reinit (partitioning,mpi_communicator);
 }
 
+
+
+template <typename VectorType>
+template <typename MatrixType1,typename MatrixType2, typename INVERSE>
+void PArpackSolver<VectorType>::solve
+(const MatrixType1                  &A,
+ const MatrixType2                  &B,
+ const INVERSE                      &inverse,
+ std::vector<std::complex<double> > &eigenvalues,
+ std::vector<VectorType>            &eigenvectors,
+ const unsigned int                  n_eigenvalues)
+{
+  std::vector<VectorType *>          eigenvectors_ptr(eigenvectors.size());
+  for (unsigned int i = 0; i < eigenvectors.size(); ++i)
+    eigenvectors_ptr[i] = &eigenvectors[i];
+  solve(A,B,inverse,eigenvalues,eigenvectors_ptr,n_eigenvalues);
+}
+
+
+
 template <typename VectorType>
 template <typename MatrixType1,typename MatrixType2, typename INVERSE>
 void PArpackSolver<VectorType>::solve
@@ -697,7 +749,7 @@ void PArpackSolver<VectorType>::solve
  const MatrixType2                  &mass_matrix,
  const INVERSE                      &inverse,
  std::vector<std::complex<double> > &eigenvalues,
- std::vector<VectorType>            &eigenvectors,
+ std::vector<VectorType *>           &eigenvectors,
  const unsigned int                  n_eigenvalues)
 {
 
@@ -716,12 +768,12 @@ void PArpackSolver<VectorType>::solve
 
   // use eigenvectors to get the problem size so that it is possible to
   // employ LinearOperator for mass_matrix.
-  Assert (n_eigenvalues < eigenvectors[0].size(),
-          PArpackExcInvalidNumberofEigenvalues(n_eigenvalues, eigenvectors[0].size()));
+  Assert (n_eigenvalues < eigenvectors[0]->size(),
+          PArpackExcInvalidNumberofEigenvalues(n_eigenvalues, eigenvectors[0]->size()));
 
-  Assert (additional_data.number_of_arnoldi_vectors < eigenvectors[0].size(),
+  Assert (additional_data.number_of_arnoldi_vectors < eigenvectors[0]->size(),
           PArpackExcInvalidNumberofArnoldiVectors(
-            additional_data.number_of_arnoldi_vectors, eigenvectors[0].size()));
+            additional_data.number_of_arnoldi_vectors, eigenvectors[0]->size()));
 
   Assert (additional_data.number_of_arnoldi_vectors > 2*n_eigenvalues+1,
           PArpackExcSmallNumberofArnoldiVectors(
@@ -969,13 +1021,13 @@ void PArpackSolver<VectorType>::solve
 
   for (int i=0; i<nev; ++i)
     {
-      eigenvectors[i] = 0.0;
+      (*eigenvectors[i]) = 0.0;
       Assert (i*nloc + nloc <= (int)v.size(), dealii::ExcInternalError() );
 
-      eigenvectors[i].add (nloc,
-                           &local_indices[0],
-                           &v[i*nloc] );
-      eigenvectors[i].compress (VectorOperation::add);
+      eigenvectors[i]->add (nloc,
+                            &local_indices[0],
+                            &v[i*nloc] );
+      eigenvectors[i]->compress (VectorOperation::add);
     }
 
   for (size_type i=0; i<n_eigenvalues; ++i)
@@ -1001,6 +1053,8 @@ void PArpackSolver<VectorType>::solve
 
 
 }
+
+
 
 template <typename VectorType>
 SolverControl &PArpackSolver<VectorType>::control () const
