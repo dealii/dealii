@@ -48,36 +48,40 @@ namespace SUNDIALS
   /**
    * Interface to SUNDIALS non linear solver (KINSOL).
    *
-   * KINSOL is a solver for nonlinear algebraic systems. It includes a
-   * Newton-Krylov solver as well as Picard and fixed point solvers, both of
-   * which can be accelerated with Anderson acceleration. KINSOL is based on
-   * the previous Fortran package NKSOL of Brown and Saad.
+   * KINSOL is a solver for nonlinear algebraic systems in residual form $F(u)
+   * = 0$ or fixed point form $G(u) = u$. It includes a Newton-Krylov solver
+   * as well as Picard and fixed point solvers, both of which can be
+   * accelerated with Anderson acceleration. KINSOL is based on the previous
+   * Fortran package NKSOL of Brown and Saad.
    *
    * KINSOL’s Newton solver employs the inexact Newton method. As this solver
-   * is intended mainly for large systems, the user is required to provide its
-   * own solver function. If a solver function is not provided, the internal
-   * dense solver of KINSOL is used. Be warned that this solver computes the
-   * Jacobian approximately, and may be efficient only for small systems.
+   * is intended mainly for large systems, the user is required to provide
+   * their own solver function. If a solver function is not provided, the
+   * internal dense solver of KINSOL is used. Be warned that this solver
+   * computes the Jacobian approximately, and may be efficient only for small
+   * systems.
    *
    * At the highest level, KINSOL implements the following iteration
    * scheme:
-   *  - set u0 = an initial guess
+   *  - set $u_0$ = an initial guess
    *  - For $n = 0, 1, 2, \ldots$ until convergence do:
    *    - Solve $J(u_n)\delta_n = −F(u_n)$
-   *    - Set $u_{n+1} = u_n + \lambda \detla_n, 0 < \lambda \leq 1$
+   *    - Set $u_{n+1} = u_n + \lambda \delta_n, 0 < \lambda \leq 1$
    *    - Test for convergence
    *
-   * Here, $u_n$ is the $n$-th iterate to $u$, and $J(u) = \partial_u F(u)$ is
+   * Here, $u_n$ is the $n$-th iterate to $u$, and $J(u) = \nabla_u F(u)$ is
    * the system Jacobian. At each stage in the iteration process, a scalar
-   * multiple of the step $\delta_n$, is added to un to produce a new iterate,
-   * $u_{n+1}$. A test for convergence is made before the iteration continues.
+   * multiple of the step $\delta_n$, is added to $u_n$ to produce a new
+   * iterate, $u_{n+1}$. A test for convergence is made before the iteration
+   * continues.
    *
    * Unless specified otherwise by the user, KINSOL strives to update Jacobian
    * information as infrequently as possible to balance the high costs of
    * matrix operations against other costs. Specifically, these updates occur
    * when:
    * - the problem is initialized,
-   * - $\|\lambda \delta_{n-1} \|_{D_u,\infty} \geq 1.5$ (inexact Newton only)
+   * - $\|\lambda \delta_{n-1} \|_{D_u,\infty} \geq 1.5$ (inexact Newton only,
+   *   see below for a definition of $\| \cdot \|_{D_u,\infty}$)
    * - a specified number of  nonlinear iterations have passed since the last
    *   update,
    * - the linear solver failed recoverably with outdated Jacobian information,
@@ -85,7 +89,7 @@ namespace SUNDIALS
    * - $\|\lambda \delta_{n} \|_{D_u,\infty} \leq $ *tolerance* with outdated
    *   Jacobian information.
    *
-   * KINSOL allows changes to the above strategy, through optional solver
+   * KINSOL allows changes to the above strategy through optional solver
    * inputs. The user can disable the initial Jacobian information evaluation
    * or change the default value of the number of nonlinear iterations after
    * which a Jacobian information update is enforced.
@@ -96,7 +100,7 @@ namespace SUNDIALS
    * get_solution_scaling(), that returns values $D_u$, which are diagonal
    * elements of the scaling matrix such that $D_u u_n$ has all components
    * roughly the same magnitude when $u_n$ is close to a solution, and
-   * get_residual_scaling(), that supply values $D_F$, which are diagonal
+   * get_function_scaling(), that supply values $D_F$, which are diagonal
    * scaling matrix elements such that $D_F F$ has all components roughly the
    * same magnitude when $u_n$ is *not* too close to a solution.
    *
@@ -148,7 +152,7 @@ namespace SUNDIALS
    * current iterate to produce a new iterate, $u_{n+1}$. A test for
    * convergence is made before the iteration continues.
    *
-   * For Picard iteration, as implemented in kinsol, we consider a special form
+   * For Picard iteration, as implemented in KINSOL, we consider a special form
    * of the nonlinear function $F$, such that $F(u) = Lu − N(u)$, where $L$ is
    * a constant nonsingular matrix and $N$ is (in general) nonlinear.
    *
@@ -281,6 +285,22 @@ namespace SUNDIALS
        * The following parameters are declared:
        *
        * @code
+       * set Function norm stopping tolerance       = 0
+       * set Maximum number of nonlinear iterations = 200
+       * set Scaled step stopping tolerance         = 0
+       * set Solution strategy                      = linesearch
+       * subsection Fixed point and Picard parameters
+       *   set Anderson acceleration subspace size = 5
+       * end
+       * subsection Linesearch parameters
+       *   set Maximum number of beta-condition failures = 0
+       * end
+       * subsection Newton parameters
+       *   set Maximum allowable scaled length of the Newton step = 0
+       *   set Maximum iterations without matrix setup            = 0
+       *   set No initial matrix setup                            = false
+       *   set Relative error for different quotient computation  = 0
+       * end
        * @endcode
        *
        * These are one-to-one with the options you can pass at construction time.
@@ -362,7 +382,7 @@ namespace SUNDIALS
        * Specifies the scalar used as a stopping tolerance on the scaled
        * maximum norm of the system function $F(u)$ or $G(u)$.
        *
-       * Pass 0.0 to use KINSOL defaults.
+       * If set to zero, default values provided by KINSOL will be used.
        */
       double function_tolerance;
 
@@ -370,7 +390,7 @@ namespace SUNDIALS
        * Specifies the scalar used as a stopping tolerance on the minimum
        * scaled step length.
        *
-       * Pass 0.0 to use KINSOL defaults.
+       * If set to zero, default values provided by KINSOL will be used.
        */
       double step_tolerance;
 
@@ -388,14 +408,14 @@ namespace SUNDIALS
        * Specifies the maximum number of nonlinear iterations that can be
        * performed between calls to the setup_jacobian() function.
        *
-       * Pass 0.0 to use KINSOL defaults.
+       * If set to zero, default values provided by KINSOL will be used.
        */
       unsigned int maximum_setup_calls;
 
       /**
        * Specifies the maximum allowable scaled length of the Newton step.
        *
-       * Pass 0.0 to use KINSOL defaults.
+       * If set to zero, default values provided by KINSOL will be used.
        */
       double maximum_newton_step;
 
@@ -404,7 +424,7 @@ namespace SUNDIALS
        * difference quotient approximation to the Jacobian matrix when the user
        * does not supply a solve_jacobian_system_matrix() function.
        *
-       * Pass 0.0 to use KINSOL defaults.
+       * If set to zero, default values provided by KINSOL will be used.
        */
       double dq_relative_error;
 
@@ -442,8 +462,8 @@ namespace SUNDIALS
 
     /**
      * Solve the non linear sytem. Return the number of nonlinear steps taken
-     * to converge. KINSOL uses the content of `solution` as initial guess, and
-     * stores the final solution in the same vector.
+     * to converge. KINSOL uses the content of `initial_guess_and_solution` as
+     * initial guess, and stores the final solution in the same vector.
      */
     unsigned int solve(VectorType &initial_guess_and_solution);
 
@@ -454,14 +474,14 @@ namespace SUNDIALS
     std::function<void(VectorType &)> reinit_vector;
 
     /**
-     * A function object that users should may and that is intended to compute
-     * the residual dst = F(src). This function is only used if the
+     * A function object that users should supply and that is intended to
+     * compute the residual dst = F(src). This function is only used if the
      * SolutionStrategy::newton or SolutionStrategy::linesearch are specified.
      *
      * This function should return:
      * - 0: Success
-     * - >0: Recoverable error (KINSOLReinit will be called if this happens, and
-     *       then last function will be attempted again
+     * - >0: Recoverable error (KINSOL will try to change its internal parameters
+     *       and attempt a new solution step)
      * - <0: Unrecoverable error the computation will be aborted and an assertion
      *       will be thrown.
      */
@@ -469,15 +489,15 @@ namespace SUNDIALS
                       VectorType &dst)> residual;
 
     /**
-     * A function object that users may supply and that is intended to compute
+     * A function object that users should supply and that is intended to compute
      * the iteration function G(u) for the fixed point and Picard iteration.
      * This function is only used if the SolutionStrategy::fixed_point or
      * SolutionStrategy::picard are specified.
      *
      * This function should return:
      * - 0: Success
-     * - >0: Recoverable error (KINSOLReinit will be called if this happens, and
-     *       then last function will be attempted again
+     * - >0: Recoverable error (KINSOL will try to change its internal parameters
+     *       and attempt a new solution step)
      * - <0: Unrecoverable error the computation will be aborted and an assertion
      *       will be thrown.
      */
@@ -520,8 +540,8 @@ namespace SUNDIALS
      *
      * This function should return:
      * - 0: Success
-     * - >0: Recoverable error (KINSOLReinit will be called if this happens, and
-     *       then last function will be attempted again
+     * - >0: Recoverable error (KINSOL will try to change its internal parameters
+     *       and attempt a new solution step)
      * - <0: Unrecoverable error the computation will be aborted and an assertion
      *       will be thrown.
      */
@@ -544,7 +564,7 @@ namespace SUNDIALS
      * point iteration is used instead of a Newton method. Notice that this may
      * not converge, or may converge very slowly.
      *
-     * The jacobian $J$ should be (an approximation of) the system Jacobian
+     * The Jacobian $J$ should be (an approximation of) the system Jacobian
      * \f[
      *   J = M - \gamma \frac{\partial f_I}{\partial y}
      * \f]
@@ -558,7 +578,7 @@ namespace SUNDIALS
      * Arguments to the function are
      *
      * @param[in] t  the current time
-     * @param[in] gamma  the current factor to use in the jacobian computation
+     * @param[in] gamma  the current factor to use in the Jacobian computation
      * @param[in] ycur  is the current $y$ vector for the current KINSOL internal step
      * @param[in] fcur  is the current value of the implicit right-hand side at ycur,
      *        $f_I (t_n, ypred)$.
@@ -566,8 +586,8 @@ namespace SUNDIALS
      *
      * This function should return:
      * - 0: Success
-     * - >0: Recoverable error (KINSOLReinit will be called if this happens, and
-     *       then last function will be attempted again
+     * - >0: Recoverable error (KINSOL will try to change its internal parameters
+     *       and attempt a new solution step)
      * - <0: Unrecoverable error the computation will be aborted and an assertion
      *       will be thrown.
      */
