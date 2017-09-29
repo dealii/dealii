@@ -20,6 +20,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table.h>
 
+#include <initializer_list>
 #include <type_traits>
 #include <vector>
 
@@ -157,6 +158,18 @@ public:
    */
   ArrayView (std::vector<typename std::remove_cv<value_type>::type> &vector);
 
+  /**
+   * A constructor creating a view of a temporary array created from an
+   * initializer list. This allows one to write things like
+   *
+   * @code
+   * const Point<2> trial_point = face->get_manifold().get_new_point
+   *                              ({face->vertex(0), face->vertex(1)}, {0.125, 0.875});
+   * @endcode
+   *
+   * which will create two ArrayView objects from brace-enclosed initializers.
+   */
+  ArrayView (const std::initializer_list<typename std::remove_cv<value_type>::type> &list);
 
   /**
    * Return the size (in elements) of the view of memory this object
@@ -284,6 +297,15 @@ ArrayView (std::vector<typename std::remove_cv<value_type>::type> &vector)
 {}
 
 
+
+
+template <typename ElementType>
+inline
+ArrayView<ElementType>::
+ArrayView (const std::initializer_list<typename std::remove_cv<value_type>::type> &list)
+  :
+  ArrayView (list.begin(), list.size())
+{}
 
 
 template <typename ElementType>
