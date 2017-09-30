@@ -13,6 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
+for (S : REAL_SCALARS)
+{
+    template
+    void sum<S> (const LAPACKFullMatrix<S> &, const MPI_Comm &, LAPACKFullMatrix<S> &);
+}
 
 for (S : MPI_SCALARS)
 {
