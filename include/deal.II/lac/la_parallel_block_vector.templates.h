@@ -779,6 +779,56 @@ namespace LinearAlgebra
               MemoryConsumption::memory_consumption (this->components));
     }
 
+
+
+    template <typename Number>
+    template <typename FullMatrixType>
+    void
+    BlockVector<Number>::multivector_inner_product(FullMatrixType &matrix,
+                                                   const BlockVector<Number> &V,
+                                                   const bool symmetric) const
+    {
+      const unsigned int m = this->n_blocks();
+      const unsigned int n = V.n_blocks();
+
+      // in case one vector is empty and the second one is not, the
+      // FullMatrix resized to (m,n) will have 0 both in m() and n()
+      // which is how TableBase<N,T>::reinit() works as of deal.ii@8.5.0.
+      // Since in this case there is nothing to do anyway -- return immediately.
+      if (n==0 || m==0)
+        return;
+
+      Assert (matrix.m() == m,
+              dealii::ExcDimensionMismatch(matrix.m(),m));
+      Assert (matrix.n() == n,
+              dealii::ExcDimensionMismatch(matrix.n(),n));
+
+      // reset the matrix
+      matrix = Number();
+
+      if (symmetric)
+        {
+          Assert (m == n,
+                  dealii::ExcDimensionMismatch(m,n));
+
+          for (unsigned int i = 0; i < m; i++)
+            for (unsigned int j = i; j < n; j++)
+              matrix(i,j) = this->block(i).inner_product_local(V.block(j));
+
+          for (unsigned int i = 0; i < m; i++)
+            for (unsigned int j = i+1; j < n; j++)
+              matrix(j,i) = matrix(i,j);
+        }
+      else
+        {
+          for (unsigned int i = 0; i < m; ++i)
+            for (unsigned int j = 0; j < n; ++j)
+              matrix(i,j) = this->block(i).inner_product_local(V.block(j));
+        }
+
+      Utilities::MPI::sum(matrix, this->block(0).get_mpi_communicator(), matrix);
+    }
+
   } // end of namespace distributed
 
 } // end of namespace parallel

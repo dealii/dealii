@@ -448,6 +448,24 @@ namespace LinearAlgebra
       virtual Number operator* (const VectorSpaceVector<Number> &V) const override;
 
       /**
+       * Calculate the scalar product between each block of this vector and @p V
+       * and store the result in a full matrix @p matrix. This function
+       * computes the result by forming $A_{ij}=U_i \cdot V_j$ where $U_i$
+       * and $V_i$ indicate the $i$th block (not element!) of $U$ and the
+       * $j$th block of $V$, respectively. If @p symmetric is
+       * <code>true</code>, it is assumed that inner product results in a
+       * square symmetric matrix and almost half of the scalar products can be avoided.
+       *
+       * Obviously, this function can only be used if each block in this
+       * object and @p V are of the same size.
+       *
+       * @note Internally, a single global reduction will be called to
+       * accumulate scalar product between locally owned degrees of freedom.
+       */
+      template <typename FullMatrixType>
+      void multivector_inner_product(FullMatrixType &matrix, const BlockVector<Number> &V, const bool symmetric = false) const;
+
+      /**
        * Add @p a to all components. Note that @p a is a scalar not a vector.
        */
       virtual void add(const Number a) override;

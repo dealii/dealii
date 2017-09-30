@@ -22,6 +22,12 @@ for (SCALAR : REAL_SCALARS)
     namespace distributed
     \{
     template class BlockVector<SCALAR>;
+    template
+    void
+    BlockVector<SCALAR>::multivector_inner_product(FullMatrix<SCALAR> &, const BlockVector<SCALAR> &V, const bool) const;
+    template
+    void
+    BlockVector<SCALAR>::multivector_inner_product(LAPACKFullMatrix<SCALAR> &, const BlockVector<SCALAR> &V, const bool) const;
     \}
     \}
 }
