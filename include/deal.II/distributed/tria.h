@@ -738,24 +738,12 @@ namespace parallel
        * triangulation.
        */
       typename dealii::internal::p4est::types<dim>::forest *parallel_forest;
+
       /**
        * A data structure that holds some information about the ghost cells of
        * the triangulation.
        */
       typename dealii::internal::p4est::types<dim>::ghost  *parallel_ghost;
-
-      /**
-       * A flag that indicates whether refinement of a triangulation is
-       * currently in progress. This flag is used to disambiguate whether a
-       * call to execute_coarsening_and_triangulation came from the outside or
-       * through a recursive call. While the first time we want to take over
-       * work to copy things from a refined p4est, the other times we don't
-       * want to get in the way as these latter calls to
-       * Triangulation::execute_coarsening_and_refinement() are simply there
-       * in order to re-create a triangulation that matches the p4est.
-       */
-      bool refinement_in_progress;
-
 
       /**
        * number of bytes that get attached to the Triangulation through
