@@ -2561,7 +2561,7 @@ namespace parallel
 
             try
               {
-                this->execute_coarsening_and_refinement();
+                dealii::Triangulation<dim,spacedim>::execute_coarsening_and_refinement();
               }
             catch (const typename Triangulation<dim, spacedim>::DistortedCellList &)
               {
@@ -2682,7 +2682,7 @@ namespace parallel
 
           try
             {
-              this->execute_coarsening_and_refinement();
+              dealii::Triangulation<dim,spacedim>::execute_coarsening_and_refinement();
             }
           catch (const typename Triangulation<dim,spacedim>::DistortedCellList &)
             {
@@ -2835,11 +2835,7 @@ namespace parallel
     Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
     {
       // first make sure that recursive calls are handled correctly
-      if (refinement_in_progress == true)
-        {
-          dealii::Triangulation<dim,spacedim>::execute_coarsening_and_refinement ();
-          return;
-        }
+      Assert (refinement_in_progress == false, ExcInternalError());
 
       // do not allow anisotropic refinement
 #ifdef DEBUG
