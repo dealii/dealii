@@ -369,6 +369,17 @@ public:
 protected:
 
   /**
+   * Internal function to perform transfer of residuals or solutions
+   * basesd on the flag @p solution_transfer.
+   */
+  template <int dim, typename Number2, int spacedim>
+  void
+  copy_to_mg (const DoFHandler<dim,spacedim>                        &mg_dof,
+              MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &dst,
+              const LinearAlgebra::distributed::Vector<Number2>          &src,
+              const bool solution_transfer) const;
+
+  /**
    * Internal function to @p fill copy_indices*. Called by derived classes.
    */
   template <int dim, int spacedim>
@@ -389,6 +400,13 @@ protected:
   std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
   copy_indices;
 
+
+  /**
+   * Same as above, but used to transfer solution vectors.
+   */
+  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  solution_copy_indices;
+
   /**
    * Additional degrees of freedom for the copy_to_mg() function. These are
    * the ones where the global degree of freedom is locally owned and the
@@ -400,6 +418,12 @@ protected:
   copy_indices_global_mine;
 
   /**
+   * Same as above, but used to transfer solution vectors.
+   */
+  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  solution_copy_indices_global_mine;
+
+  /**
    * Additional degrees of freedom for the copy_from_mg() function. These are
    * the ones where the level degree of freedom is locally owned and the
    * global degree of freedom is not.
@@ -408,6 +432,12 @@ protected:
    */
   std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
   copy_indices_level_mine;
+
+  /**
+   * Same as above, but used to transfer solution vectors.
+   */
+  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  solution_copy_indices_level_mine;
 
   /**
    * Stores whether the copy operation from the global to the level vector is
@@ -436,10 +466,21 @@ protected:
   mutable LinearAlgebra::distributed::Vector<Number> ghosted_global_vector;
 
   /**
+   * Same as above but used when working with solution vectors.
+   */
+  mutable LinearAlgebra::distributed::Vector<Number> solution_ghosted_global_vector;
+
+  /**
    * In the function copy_from_mg, we access all level vectors with certain
    * ghost entries for inserting the result into a global vector.
    */
   mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number> > ghosted_level_vector;
+
+  /**
+   * Same as above but used when working with solution vectors.
+   */
+  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number> > solution_ghosted_level_vector;
+
 };
 
 

@@ -24,6 +24,7 @@
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/multigrid/mg_transfer.h>
+#include <deal.II/multigrid/mg_transfer_internal.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -125,6 +126,18 @@ public:
   virtual void restrict_and_add (const unsigned int from_level,
                                  LinearAlgebra::distributed::Vector<Number>       &dst,
                                  const LinearAlgebra::distributed::Vector<Number> &src) const;
+
+  /**
+   * Restrict fine-mesh field @p src to each multigrid level in @p mg_dof and
+   * store the result in @p dst.
+   *
+   * If @p dst is empty or has incorrect locally owned size, it will be
+   * resized to locally relevant vectors on each level.
+   */
+  template<typename Number2, int spacedim>
+  void interpolate_to_mg(const DoFHandler< dim, spacedim > &mg_dof,
+                         MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
+                         const LinearAlgebra::distributed::Vector<Number2> &src) const;
 
   /**
    * Finite element does not provide prolongation matrices.
@@ -371,6 +384,98 @@ private:
 
 //------------------------ templated functions -------------------------
 #ifndef DOXYGEN
+
+
+template <int dim, typename Number>
+template <typename Number2, int spacedim>
+void
+MGTransferMatrixFree<dim,Number>::
+interpolate_to_mg(const DoFHandler<dim,spacedim> &dof_handler,
+                  MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
+                  const LinearAlgebra::distributed::Vector<Number2> &src) const
+{
+  const unsigned int min_level = dst.min_level();
+  const unsigned int max_level = dst.max_level();
+
+  Assert (max_level == dof_handler.get_triangulation().n_global_levels()-1,
+          ExcDimensionMismatch(max_level,dof_handler.get_triangulation().n_global_levels()-1));
+
+  const parallel::Triangulation<dim,spacedim> *p_tria =
+    (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
+     (&dof_handler.get_triangulation()));
+  MPI_Comm mpi_communicator = p_tria != nullptr ? p_tria->get_communicator() : MPI_COMM_SELF;
+
+  // resize the dst vector if it's empty or has incorrect size
+  MGLevelObject<IndexSet> relevant_dofs(min_level,max_level);
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    {
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler, level,
+                                                    relevant_dofs[level]);
+      if (dst[level].size() != dof_handler.locally_owned_mg_dofs(level).size() ||
+          dst[level].local_size() != dof_handler.locally_owned_mg_dofs(level).n_elements())
+        dst[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                          relevant_dofs[level],
+                          mpi_communicator);
+    }
+
+  const FiniteElement<dim,spacedim> &fe = dof_handler.get_fe();
+
+  // copy fine level vector to active cells in MG hierarchy
+  this->copy_to_mg (dof_handler, dst, src, true);
+
+  // FIXME: maybe need to store hanging nodes constraints per level?
+  // MGConstrainedDoFs does NOT keep this info right now, only periodicity constraints...
+  dst[max_level].update_ghost_values();
+  // do the transfer from level to level-1:
+  for (unsigned int level=max_level; level > min_level; --level)
+    {
+      // auxiliary vector which always has ghost elements
+      LinearAlgebra::distributed::Vector<Number>
+      ghosted_vector(dof_handler.locally_owned_mg_dofs(level),
+                     relevant_dofs[level],
+                     mpi_communicator);
+      ghosted_vector = dst[level];
+      ghosted_vector.update_ghost_values();
+
+      std::vector<Number> dof_values_coarse(fe.dofs_per_cell);
+      Vector<Number> dof_values_fine(fe.dofs_per_cell);
+      Vector<Number> tmp(fe.dofs_per_cell);
+      std::vector<types::global_dof_index> dof_indices(fe.dofs_per_cell);
+      typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin(level-1);
+      typename DoFHandler<dim>::cell_iterator endc=dof_handler.end(level-1);
+      for ( ; cell != endc; ++cell)
+        if (cell->is_locally_owned_on_level())
+          {
+            // if we get to a cell without children (== active), we can
+            // skip it as there values should be already set by the
+            // equivalent of copy_to_mg()
+            if (!cell->has_children())
+              continue;
+
+            std::fill(dof_values_coarse.begin(), dof_values_coarse.end(), 0.);
+            for (unsigned int child=0; child<cell->n_children(); ++child)
+              {
+                cell->child(child)->get_mg_dof_indices(dof_indices);
+                for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+                  dof_values_fine(i) = ghosted_vector(dof_indices[i]);
+                fe.get_restriction_matrix(child, cell->refinement_case()).vmult (tmp, dof_values_fine);
+                for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+                  if (fe.restriction_is_additive(i))
+                    dof_values_coarse[i] += tmp[i];
+                  else if (tmp(i) != 0.)
+                    dof_values_coarse[i] = tmp[i];
+              }
+            cell->get_mg_dof_indices(dof_indices);
+            for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+              dst[level-1](dof_indices[i]) = dof_values_coarse[i];
+          }
+
+      dst[level-1].compress(VectorOperation::insert);
+      dst[level-1].update_ghost_values();
+    }
+}
+
+
 
 template <int dim, typename Number>
 template <typename Number2, int spacedim>

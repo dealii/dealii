@@ -53,19 +53,21 @@ namespace internal
       {}
     };
 
-    // Internal function for filling the copy indices from global to level
-    // indices
+
+
+
     template <int dim, int spacedim>
     void fill_copy_indices(const dealii::DoFHandler<dim,spacedim>                                                  &mg_dof,
                            const MGConstrainedDoFs                                                                 *mg_constrained_dofs,
                            std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices,
                            std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_global_mine,
-                           std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_level_mine)
+                           std::vector<std::vector<std::pair<types::global_dof_index, types::global_dof_index> > > &copy_indices_level_mine,
+                           const bool skip_interface_dofs)
     {
       // Now we are filling the variables copy_indices*, which are essentially
       // maps from global to mgdof for each level stored as a std::vector of
       // pairs. We need to split this map on each level depending on the
-      // ownership of the global and mgdof, so that we later not access
+      // ownership of the global and mgdof, so that we later do not access
       // non-local elements in copy_to/from_mg.
       // We keep track in the bitfield dof_touched which global dof has been
       // processed already (on the current level). This is the same as the
@@ -114,9 +116,11 @@ namespace internal
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   // we need to ignore if the DoF is on a refinement edge (hanging node)
-                  if (mg_constrained_dofs != nullptr
+                  if (skip_interface_dofs &&
+                      mg_constrained_dofs != nullptr
                       && mg_constrained_dofs->at_refinement_edge(level, level_dof_indices[i]))
                     continue;
+
                   types::global_dof_index global_idx = globally_relevant.index_within_set(global_dof_indices[i]);
                   //skip if we did this global dof already (on this or a coarser level)
                   if (dof_touched[global_idx])

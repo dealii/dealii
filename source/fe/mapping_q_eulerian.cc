@@ -58,11 +58,13 @@ template <int dim, class VectorType, int spacedim>
 MappingQEulerian<dim, VectorType, spacedim>::
 MappingQEulerian (const unsigned int              degree,
                   const DoFHandler<dim,spacedim> &euler_dof_handler,
-                  const VectorType               &euler_vector)
+                  const VectorType               &euler_vector,
+                  const unsigned int              level)
   :
   MappingQ<dim,spacedim>(degree, true),
   euler_vector(&euler_vector),
-  euler_dof_handler(&euler_dof_handler)
+  euler_dof_handler(&euler_dof_handler),
+  level(level)
 {
   // reset the q1 mapping we use for interior cells (and previously
   // set by the MappingQ constructor) to a MappingQ1Eulerian with the
@@ -168,10 +170,13 @@ std::vector<Point<spacedim> >
 MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerianGeneric::
 compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const
 {
-  // first, basic assertion with respect to vector size,
+  const bool mg_vector = mapping_q_eulerian.level != numbers::invalid_unsigned_int;
 
-  const types::global_dof_index n_dofs  = mapping_q_eulerian.euler_dof_handler->n_dofs();
+  const types::global_dof_index n_dofs  = mg_vector ?
+                                          mapping_q_eulerian.euler_dof_handler->n_dofs(mapping_q_eulerian.level) :
+                                          mapping_q_eulerian.euler_dof_handler->n_dofs();
   const types::global_dof_index vector_size = mapping_q_eulerian.euler_vector->size();
+
   (void)n_dofs;
   (void)vector_size;
 
@@ -182,20 +187,19 @@ compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell
   typename DoFHandler<dim,spacedim>::cell_iterator dof_cell(*cell,
                                                             mapping_q_eulerian.euler_dof_handler);
 
-  Assert (dof_cell->active() == true, ExcInactiveCell());
+  Assert (mg_vector || dof_cell->active() == true, ExcInactiveCell());
 
   // our quadrature rule is chosen so that each quadrature point corresponds
-  // to a support point in the undeformed configuration.  we can then query
+  // to a support point in the undeformed configuration. We can then query
   // the given displacement field at these points to determine the shift
   // vector that maps the support points to the deformed configuration.
 
-  // we assume that the given field contains dim displacement components, but
+  // We assume that the given field contains dim displacement components, but
   // that there may be other solution components as well (e.g. pressures).
   // this class therefore assumes that the first dim components represent the
   // actual shift vector we need, and simply ignores any components after
-  // that.  this implies that the user should order components appropriately,
+  // that. This implies that the user should order components appropriately,
   // or create a separate dof handler for the displacements.
-
   const unsigned int n_support_pts = support_quadrature.size();
   const unsigned int n_components  = mapping_q_eulerian.euler_dof_handler->get_fe(0).n_components();
 
@@ -205,12 +209,21 @@ compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell
   shift_vector(n_support_pts,
                Vector<typename VectorType::value_type>(n_components));
 
+  std::vector<types::global_dof_index> dof_indices(mapping_q_eulerian.euler_dof_handler->get_fe(0).dofs_per_cell);
   // fill shift vector for each support point using an fe_values object. make
   // sure that the fe_values variable isn't used simultaneously from different
   // threads
   Threads::Mutex::ScopedLock lock(fe_values_mutex);
   fe_values.reinit(dof_cell);
-  fe_values.get_function_values(*mapping_q_eulerian.euler_vector, shift_vector);
+  if (mg_vector)
+    {
+      dof_cell->get_mg_dof_indices(dof_indices);
+      fe_values.get_function_values(*mapping_q_eulerian.euler_vector,
+                                    dof_indices,
+                                    shift_vector);
+    }
+  else
+    fe_values.get_function_values(*mapping_q_eulerian.euler_vector, shift_vector);
 
   // and finally compute the positions of the support points in the deformed
   // configuration.

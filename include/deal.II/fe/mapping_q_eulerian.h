@@ -43,11 +43,11 @@ template <typename> class Vector;
  * <h3>Usage</h3>
  *
  * The constructor of this class takes three arguments: the polynomial degree
- * of the desire Qp mapping, a reference to the vector that defines the
+ * of the desired Qp mapping, a reference to the vector that defines the
  * mapping from the initial configuration to the current configuration, and a
  * reference to the DoFHandler. The most common case is to use the solution
  * vector for the problem under consideration as the shift vector. The key
- * requirement is that the number of components of the given vector field be
+ * requirement is that the number of components of the given vector field must be
  * equal to (or possibly greater than) the number of space dimensions. If
  * there are more components than space dimensions (for example, if one is
  * working with a coupled problem where there are additional solution
@@ -57,7 +57,7 @@ template <typename> class Vector;
  * the triangulation and associate the desired shift vector to it.
  *
  * Typically, the DoFHandler operates on a finite element that is constructed
- * as a system element (FESystem) from continuous FE_Q() objects. An example
+ * as a system element (FESystem) from continuous FE_Q objects. An example
  * is shown below:
  * @code
  *    FESystem<dim> fe(FE_Q<dim>(2), dim, FE_Q<dim>(1), 1);
@@ -80,7 +80,7 @@ template <typename> class Vector;
  * that whenever you use this object, the given objects still represent valid
  * data.
  *
- * To enable the use of the MappingQ1Eulerian class also in the context of
+ * To enable the use of the MappingQEulerian class also in the context of
  * parallel codes using the PETSc or Trilinos wrapper classes, the type
  * of the vector can be specified as template parameter <tt>VectorType</tt>.
  *
@@ -102,10 +102,14 @@ public:
    * the second argument. The first dim components of this function will be
    * interpreted as the displacement we use in defining the mapping, relative
    * to the location of cells of the underlying triangulation.
+   * @param[in] level. Is the multi-grid level at which the mapping will
+   * be used. It is mainly used to check if the size of the @p euler_vector
+   * is consistent with the @p euler_dof_handler .
    */
   MappingQEulerian (const unsigned int             degree,
                     const DoFHandler<dim,spacedim> &euler_dof_handler,
-                    const VectorType               &euler_vector);
+                    const VectorType               &euler_vector,
+                    const unsigned int             level = numbers::invalid_unsigned_int);
 
   /**
    * Return the mapped vertices of the cell. For the current class, this
@@ -125,15 +129,16 @@ public:
   Mapping<dim,spacedim> *clone () const;
 
   /**
-   * Always returns @p false because MappingQ1Eulerian does not in general
+   * Always returns @p false because MappingQEulerian does not in general
    * preserve vertex locations (unless the translation vector happens to
-   * provide for zero displacements at vertex locations).
+   * provide zero displacements at vertex locations).
    */
   virtual
   bool preserves_vertex_locations () const;
 
   /**
-   * Exception
+   * Exception which is thrown when the mapping is being evaluated at
+   * non-active cell.
    */
   DeclException0 (ExcInactiveCell);
 
@@ -166,6 +171,11 @@ protected:
 
 
 private:
+
+  /**
+   * Multigrid level at which the mapping is to be used.
+   */
+  const unsigned int level;
 
   /**
    * A class derived from MappingQGeneric that provides the generic mapping
@@ -202,7 +212,7 @@ private:
     compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
     /**
-     * Always returns @p false because MappingQ1Eulerian does not in general
+     * Always returns @p false because MappingQEulerianGeneric does not in general
      * preserve vertex locations (unless the translation vector happens to
      * provide for zero displacements at vertex locations).
      */
@@ -220,14 +230,12 @@ private:
      * Special quadrature rule used to define the support points in the
      * reference configuration.
      */
-
     class SupportQuadrature : public Quadrature<dim>
     {
     public:
       /**
        * Constructor, with an argument defining the desired polynomial degree.
        */
-
       SupportQuadrature (const unsigned int map_degree);
 
     };

@@ -369,6 +369,29 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_to_mg
  MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &dst,
  const LinearAlgebra::distributed::Vector<Number2>          &src) const
 {
+  copy_to_mg (mg_dof_handler,
+              dst,
+              src,
+              false);
+}
+
+
+template <typename Number>
+template <int dim, typename Number2, int spacedim>
+void
+MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_to_mg
+(const DoFHandler<dim,spacedim>                        &mg_dof_handler,
+ MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &dst,
+ const LinearAlgebra::distributed::Vector<Number2>          &src,
+ const bool solution_transfer) const
+{
+  LinearAlgebra::distributed::Vector<Number> &this_ghosted_global_vector =
+    solution_transfer ? solution_ghosted_global_vector : ghosted_global_vector;
+  const std::vector<std::vector<std::pair<unsigned int, unsigned int> > > &this_copy_indices =
+    solution_transfer ? solution_copy_indices : copy_indices;
+  const std::vector<std::vector<std::pair<unsigned int, unsigned int> > > &this_copy_indices_level_mine =
+    solution_transfer ? solution_copy_indices_level_mine : copy_indices_level_mine;
+
   AssertIndexRange(dst.max_level(), mg_dof_handler.get_triangulation().n_global_levels());
   AssertIndexRange(dst.min_level(), dst.max_level()+1);
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
@@ -390,8 +413,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_to_mg
 
   // copy the source vector to the temporary vector that we hold for the
   // purpose of data exchange
-  ghosted_global_vector = src;
-  ghosted_global_vector.update_ghost_values();
+  this_ghosted_global_vector = src;
+  this_ghosted_global_vector.update_ghost_values();
 
   for (unsigned int level=dst.max_level()+1; level != dst.min_level();)
     {
@@ -401,15 +424,15 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_to_mg
       LinearAlgebra::distributed::Vector<Number> &dst_level = dst[level];
 
       // first copy local unknowns
-      for (dof_pair_iterator i = copy_indices[level].begin();
-           i != copy_indices[level].end(); ++i)
-        dst_level.local_element(i->second) = ghosted_global_vector.local_element(i->first);
+      for (dof_pair_iterator i = this_copy_indices[level].begin();
+           i != this_copy_indices[level].end(); ++i)
+        dst_level.local_element(i->second) = this_ghosted_global_vector.local_element(i->first);
 
       // Do the same for the indices where the level index is local, but the
       // global index is not
-      for (dof_pair_iterator i = copy_indices_level_mine[level].begin();
-           i != copy_indices_level_mine[level].end(); ++i)
-        dst_level.local_element(i->second) = ghosted_global_vector.local_element(i->first);
+      for (dof_pair_iterator i = this_copy_indices_level_mine[level].begin();
+           i != this_copy_indices_level_mine[level].end(); ++i)
+        dst_level.local_element(i->second) = this_ghosted_global_vector.local_element(i->first);
 
       dst_level.compress(VectorOperation::insert);
     }

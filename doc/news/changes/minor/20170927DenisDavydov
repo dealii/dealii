@@ -1,0 +1,3 @@
+New: extend MappingQEulerian to work with multi-grid vectors.
+<br>
+(Denis Davydov, 2017/09/27)
