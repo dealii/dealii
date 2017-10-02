@@ -604,6 +604,7 @@ LAPACKFullMatrix<number>::compute_cholesky_factorization()
 
   const int mm = this->n_rows();
   const int nn = this->n_cols();
+  (void) mm;
   Assert (mm == nn, ExcDimensionMismatch(mm,nn));
 
   number *values = &this->values[0];
