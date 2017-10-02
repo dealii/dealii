@@ -396,7 +396,7 @@ gemm (const char *, const char *, const int *, const int *, const int *, const f
 /// Template wrapper for potrf
 template <typename number1>
 inline void
-potrf (const char *uplo, const int *n, number1 *A, const int *lda, int *info)
+potrf (const char *, const int *, number1 *, const int *, int *)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -407,6 +407,12 @@ potrf (const char *uplo, const int *n, double *A, const int *lda, int *info)
 #ifdef DEAL_II_WITH_LAPACK
   dpotrf_ (uplo,n,A,lda,info);
 #else
+  (void) uplo;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) info;
+
   Assert (false, LAPACKSupport::ExcMissing("dpotrf"));
 #endif
 }
@@ -417,6 +423,12 @@ potrf (const char *uplo, const int *n, float *A, const int *lda, int *info)
 #ifdef DEAL_II_WITH_LAPACK
   spotrf_ (uplo,n,A,lda,info);
 #else
+  (void) uplo;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) info;
+
   Assert (false, LAPACKSupport::ExcMissing("spotrf"));
 #endif
 }
@@ -426,7 +438,7 @@ potrf (const char *uplo, const int *n, float *A, const int *lda, int *info)
 /// Template wrapper for pocon
 template <typename number1>
 inline void
-pocon (const char *uplo, const int *n, const number1 *A, const int *lda, const number1 *anorm, number1 *rcond, number1 *work, int *iwork, int *info)
+pocon (const char *, const int *, const number1 *, const int *, const number1 *, number1 *, number1 *, int *, int *)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -437,6 +449,16 @@ pocon (const char *uplo, const int *n, const double *A, const int *lda, const do
 #ifdef DEAL_II_WITH_LAPACK
   dpocon_ (uplo,n,A,lda,anorm,rcond,work,iwork,info);
 #else
+  (void) uplo;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) anorm;
+  (void) rcond;
+  (void) work;
+  (void) iwork;
+  (void) info;
+
   Assert (false, LAPACKSupport::ExcMissing("dpocon"));
 #endif
 }
@@ -447,6 +469,16 @@ pocon (const char *uplo, const int *n, const float *A, const int *lda, const flo
 #ifdef DEAL_II_WITH_LAPACK
   spocon_ (uplo,n,A,lda,anorm,rcond,work,iwork,info);
 #else
+  (void) uplo;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) anorm;
+  (void) rcond;
+  (void) work;
+  (void) iwork;
+  (void) info;
+
   Assert (false, LAPACKSupport::ExcMissing("dpocon"));
 #endif
 }
@@ -454,7 +486,7 @@ pocon (const char *uplo, const int *n, const float *A, const int *lda, const flo
 /// Template wrapper for potri
 template <typename number1>
 inline void
-potri(const char *uplo, const int *n, number1 *A, const int *lda, int *info)
+potri(const char *, const int *, number1 *, const int *, int *)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -465,6 +497,12 @@ potri(const char *uplo, const int *n, double *A, const int *lda, int *info)
 #ifdef DEAL_II_WITH_LAPACK
   dpotri_(uplo,n,A,lda,info);
 #else
+  (void) uplo;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) info;
+
   Assert (false, LAPACKSupport::ExcMissing("dpotri"));
 #endif
 }
@@ -475,6 +513,12 @@ potri(const char *uplo, const int *n, float *A, const int *lda, int *info)
 #ifdef DEAL_II_WITH_LAPACK
   spotri_(uplo,n,A,lda,info);
 #else
+  (void) uplo;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) info;
+
   Assert (false, LAPACKSupport::ExcMissing("spotri"));
 #endif
 }
@@ -483,7 +527,7 @@ potri(const char *uplo, const int *n, float *A, const int *lda, int *info)
 /// Template wrapper for lansy
 template <typename number>
 inline
-number lansy (const char *norm, const char *uplo, const int *n, const number *A, const int *lda, number *work)
+number lansy (const char *, const char *, const int *, const number *, const int *, number *)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -494,6 +538,13 @@ double lansy (const char *norm, const char *uplo, const int *n, const double *A,
 #ifdef DEAL_II_WITH_LAPACK
   return dlansy_(norm,uplo,n,A,lda,work);
 #else
+  (void) norm;
+  (void) uplo;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) work;
+
   Assert (false, LAPACKSupport::ExcMissing("lansy"));
   return 0.;
 #endif
@@ -505,6 +556,13 @@ float lansy (const char *norm, const char *uplo, const int *n, const float *A, c
 #ifdef DEAL_II_WITH_LAPACK
   return slansy_(norm,uplo,n,A,lda,work);
 #else
+  (void) norm;
+  (void) uplo;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) work;
+
   Assert (false, LAPACKSupport::ExcMissing("lansy"));
   return 0.;
 #endif
@@ -515,7 +573,7 @@ float lansy (const char *norm, const char *uplo, const int *n, const float *A, c
 /// Template wrapper for lange
 template <typename number>
 inline
-number lange (const char *norm, const int *m, const int *n, const number *A, const int *lda, number *work)
+number lange (const char *, const int *, const int *, const number *, const int *, number *)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -526,6 +584,13 @@ double lange (const char *norm, const int *m, const int *n, const double *A, con
 #ifdef DEAL_II_WITH_LAPACK
   return dlange_(norm,m,n,A,lda,work);
 #else
+  (void) norm;
+  (void) m;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) work;
+
   Assert (false, LAPACKSupport::ExcMissing("lange"));
   return 0.;
 #endif
@@ -537,6 +602,13 @@ float lange (const char *norm, const int *m, const int *n, const float *A, const
 #ifdef DEAL_II_WITH_LAPACK
   return slange_(norm,m,n,A,lda,work);
 #else
+  (void) norm;
+  (void) m;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) work;
+
   Assert (false, LAPACKSupport::ExcMissing("lange"));
   return 0.;
 #endif
