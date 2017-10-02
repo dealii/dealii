@@ -502,14 +502,16 @@ namespace SUNDIALS
 #ifdef DEAL_II_WITH_TRILINOS
   template class IDA<TrilinosWrappers::MPI::Vector>;
   template class IDA<TrilinosWrappers::MPI::BlockVector>;
-#endif
+#endif // DEAL_II_WITH_TRILINOS
 
 #ifdef DEAL_II_WITH_PETSC
+#ifndef PETSC_USE_COMPLEX
   template class IDA<PETScWrappers::MPI::Vector>;
   template class IDA<PETScWrappers::MPI::BlockVector>;
-#endif
+#endif // PETSC_USE_COMPLEX
+#endif // DEAL_II_WITH_PETSC
 
-#endif
+#endif //DEAL_II_WITH_MPI
 
 }
 

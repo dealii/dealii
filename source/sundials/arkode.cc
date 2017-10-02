@@ -472,14 +472,16 @@ namespace SUNDIALS
 #ifdef DEAL_II_WITH_TRILINOS
   template class ARKode<TrilinosWrappers::MPI::Vector>;
   template class ARKode<TrilinosWrappers::MPI::BlockVector>;
-#endif
+#endif // DEAL_II_WITH_TRILINOS
 
 #ifdef DEAL_II_WITH_PETSC
+#ifndef PETSC_USE_COMPLEX
   template class ARKode<PETScWrappers::MPI::Vector>;
   template class ARKode<PETScWrappers::MPI::BlockVector>;
-#endif
+#endif // PETSC_USE_COMPLEX
+#endif // DEAL_II_WITH_PETSC
 
-#endif
+#endif //DEAL_II_WITH_MPI
 
 }
 
