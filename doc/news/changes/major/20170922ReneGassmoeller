@@ -1,0 +1,4 @@
+New: There is now support for the storage of Particles and their
+properties in the new namespace Particles.  
+<br>
+(Rene Gassmoeller, 2017/09/22)
