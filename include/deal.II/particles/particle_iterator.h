@@ -34,7 +34,7 @@ namespace Particles
     /**
      * Empty constructor. Such an object is not usable!
      */
-    ParticleIterator ();
+    ParticleIterator () = default;
 
     /**
      * Constructor of the iterator. Takes a reference to the particle
