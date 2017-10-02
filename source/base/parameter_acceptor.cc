@@ -64,7 +64,7 @@ ParameterAcceptor::initialize(const std::string &filename,
             {
               prm.parse_input(filename);
             }
-          catch (dealii::PathSearch::ExcFileNotFound)
+          catch (const dealii::PathSearch::ExcFileNotFound &)
             {
               std::ofstream out(filename);
               Assert(out, ExcIO());
