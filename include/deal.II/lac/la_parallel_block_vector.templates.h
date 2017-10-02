@@ -21,10 +21,14 @@
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
+#include <deal.II/lac/lapack_support.h>
 
 
 DEAL_II_NAMESPACE_OPEN
 
+//Forward type declaration to have special treatment of LAPACKFullMatrix<number>
+// in multivector_inner_product()
+template <typename Number> class LAPACKFullMatrix;
 
 namespace LinearAlgebra
 {
@@ -781,6 +785,27 @@ namespace LinearAlgebra
 
 
 
+    namespace
+    {
+      template <typename FullMatrixType>
+      inline
+      void set_symmetric(FullMatrixType &, const bool)
+      {
+      }
+
+      template <typename NumberType>
+      inline
+      void set_symmetric(LAPACKFullMatrix<NumberType> &matrix, const bool symmetric)
+      {
+        if (symmetric)
+          matrix.set_property (LAPACKSupport::symmetric);
+        else
+          matrix.set_property (LAPACKSupport::general);
+      }
+    }
+
+
+
     template <typename Number>
     template <typename FullMatrixType>
     void
@@ -806,6 +831,7 @@ namespace LinearAlgebra
       // reset the matrix
       matrix = Number();
 
+      set_symmetric(matrix, symmetric);
       if (symmetric)
         {
           Assert (m == n,
