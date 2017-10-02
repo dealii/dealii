@@ -2947,6 +2947,60 @@ namespace FETools
     }
 
 
+    template <int dim, int spacedim, typename number>
+    static void convert_helper(
+      const FiniteElement<dim, spacedim> &finite_element,
+      const std::vector<Vector<std::complex<number> > > &support_point_values,
+      std::vector<std::complex<number> >                &dof_values)
+    {
+      static Threads::ThreadLocalStorage<std::vector<Vector<double> > >
+      double_support_point_values_real;
+      static Threads::ThreadLocalStorage<std::vector<double> >
+      double_dof_values_real;
+      static Threads::ThreadLocalStorage<std::vector<Vector<double> > >
+      double_support_point_values_imag;
+      static Threads::ThreadLocalStorage<std::vector<double> >
+      double_dof_values_imag;
+
+      double_support_point_values_real.get().resize(support_point_values.size());
+      double_dof_values_real.get().resize(dof_values.size());
+      double_support_point_values_imag.get().resize(support_point_values.size());
+      double_dof_values_imag.get().resize(dof_values.size());
+
+      for (unsigned int i = 0; i < support_point_values.size(); ++i)
+        {
+          double_support_point_values_real.get()[i].reinit(
+            finite_element.n_components(), false);
+          double_support_point_values_imag.get()[i].reinit(
+            finite_element.n_components(), false);
+
+          std::transform
+          (std::begin(support_point_values[i]),
+           std::end(support_point_values[i]),
+           std::begin(double_support_point_values_real.get()[i]),
+           [](std::complex<number> c) -> double {return c.real();});
+
+          std::transform
+          (std::begin(support_point_values[i]),
+           std::end(support_point_values[i]),
+           std::begin(double_support_point_values_imag.get()[i]),
+           [](std::complex<number> c) -> double {return c.imag();});
+        }
+
+      finite_element.convert_generalized_support_point_values_to_dof_values(
+        double_support_point_values_real.get(), double_dof_values_real.get());
+      finite_element.convert_generalized_support_point_values_to_dof_values(
+        double_support_point_values_imag.get(), double_dof_values_imag.get());
+
+      std::transform
+      (std::begin(double_dof_values_real.get()),
+       std::end(double_dof_values_real.get()),
+       std::begin(double_dof_values_imag.get()),
+       std::begin(dof_values),
+       [](number real, number imag) -> std::complex<number> {return {real, imag};});
+    }
+
+
     template <int dim, int spacedim>
     static void convert_helper(
       const FiniteElement<dim, spacedim> &finite_element,
