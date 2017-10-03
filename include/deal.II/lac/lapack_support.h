@@ -23,6 +23,10 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+/**
+ * A namespace containing constants, exceptions, enumerations, and other
+ * utilities used by the deal.II LAPACK bindings.
+ */
 namespace LAPACKSupport
 {
   /**
