@@ -138,10 +138,10 @@ namespace VectorTools
               auto shifted_view = boost::make_iterator_range(
                                     std::begin(function_values[i]) + offset,
                                     std::begin(function_values[i]) + offset + dim);
-              std::vector<number> old_value;
+              std::vector<number> old_value(dim);
               std::copy(std::begin(shifted_view),
                         std::end(shifted_view),
-                        std::back_inserter(old_value));
+                        std::begin(old_value));
 
               // value[m] <- sum jacobian_transpose[m][n] * old_value[n]:
               TensorAccessors::contract<1, 2, 1, dim>(
@@ -167,10 +167,10 @@ namespace VectorTools
               auto shifted_view = boost::make_iterator_range(
                                     std::begin(function_values[i]) + offset,
                                     std::begin(function_values[i]) + offset + dim);
-              std::vector<number> old_value;
+              std::vector<number> old_value(dim);
               std::copy(std::begin(shifted_view),
                         std::end(shifted_view),
-                        std::back_inserter(old_value));
+                        std::begin(old_value));
 
               // value[m] <- sum inverse_jacobians[m][n] * old_value[n]:
               TensorAccessors::contract<1, 2, 1, dim>(
