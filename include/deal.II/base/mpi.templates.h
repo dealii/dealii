@@ -23,6 +23,7 @@
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 
 #include <vector>
 
@@ -227,6 +228,21 @@ namespace Utilities
         all_reduce(mpi_op, &values[0][0], mpi_communicator, &output[0][0], values.m() * values.n());
       }
 
+
+
+      template <typename T>
+      void all_reduce (const MPI_Op    &mpi_op,
+                       const LAPACKFullMatrix<T> &values,
+                       const MPI_Comm  &mpi_communicator,
+                       LAPACKFullMatrix<T>  &output)
+      {
+        Assert(values.m() == output.m(),
+               ExcDimensionMismatch(values.m(), output.m()));
+        Assert(values.n() == output.n(),
+               ExcDimensionMismatch(values.n(), output.n()));
+        all_reduce(mpi_op, &values(0,0), mpi_communicator, &output(0,0), values.m() * values.n());
+      }
+
     }
 
 
@@ -264,6 +280,16 @@ namespace Utilities
     void sum (const FullMatrix<T> &values,
               const MPI_Comm &mpi_communicator,
               FullMatrix<T> &sums)
+    {
+      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
+    }
+
+
+
+    template <typename T>
+    void sum (const LAPACKFullMatrix<T> &values,
+              const MPI_Comm &mpi_communicator,
+              LAPACKFullMatrix<T> &sums)
     {
       internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }

@@ -1,0 +1,3 @@
+New: add Utilities::MPI::sum() for LAPACKFullMatrix objects.
+<br>
+(Denis Davydov, 2017/09/04)

@@ -1,0 +1,4 @@
+New: add LinearAlgebra::distributed::BlockVector<Number>::multivector_inner_product()
+to perform inner product between each block of the two block vectors.
+<br>
+(Denis Davydov, 2017/09/30)
