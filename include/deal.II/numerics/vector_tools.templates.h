@@ -110,7 +110,7 @@ namespace VectorTools
     //  conformity: conformity of the finite element, used to select
     //              appropriate type of transformation
     //  fe_values_jacobians, cell: used to reinitialize an fe_values object
-    //                             if values of jacbians (and inverses of
+    //                             if values of jacobians (and inverses of
     //                             jacobians) are needed
     //  function_values, offset: function_values is manipulated in place
     //                           starting at position offset
@@ -207,18 +207,22 @@ namespace VectorTools
     // Input
     //   fe: the full finite element corresponding to function_values
     //   [ rest see above]
+    // Output: the offset after we have handled the element at
+    //   a given offset
     template <int dim, int spacedim, typename number, typename T1, typename T2, typename T3>
-    void apply_transform(const FiniteElement<dim, spacedim> &fe,
-                         const T1 &cell,
-                         unsigned int &offset, /* modifies offset */
-                         T2 &fe_values_jacobians,
-                         T3 &function_values)
+    unsigned int
+    apply_transform(const FiniteElement<dim, spacedim> &fe,
+                    const T1 &cell,
+                    const unsigned int offset,
+                    T2 &fe_values_jacobians,
+                    T3 &function_values)
     {
       if (const auto *system =
             dynamic_cast<const FESystem<dim, spacedim> *>(&fe))
         {
           // In case of an FESystem transform every (vector) component
           // separately:
+          unsigned current_offset = offset;
           for (unsigned int i = 0; i < system->n_base_elements(); ++i)
             {
               const auto &base_fe = system->base_element(i);
@@ -227,13 +231,15 @@ namespace VectorTools
                 {
                   // recursively call apply_transform to make sure to
                   // correctly handle nested fe systems.
-                  apply_transform<dim, spacedim, number>(base_fe,
-                                                         cell,
-                                                         offset,
-                                                         fe_values_jacobians,
-                                                         function_values);
+                  current_offset =
+                    apply_transform<dim, spacedim, number>(base_fe,
+                                                           cell,
+                                                           current_offset,
+                                                           fe_values_jacobians,
+                                                           function_values);
                 }
             }
+          return current_offset;
         }
       else
         {
@@ -242,7 +248,7 @@ namespace VectorTools
                                            offset,
                                            fe_values_jacobians,
                                            function_values);
-          offset += fe.n_components();
+          return (offset + fe.n_components());
         }
     }
 
@@ -407,9 +413,11 @@ namespace VectorTools
             // complicated because we have to apply said transformation for
             // every base element.
 
-            unsigned int offset = 0;
-            apply_transform<dim, spacedim, number>(
-              fe[fe_index], cell, offset, fe_values_jacobians, function_values);
+            const unsigned int offset =
+              apply_transform<dim, spacedim, number>(
+                fe[fe_index], cell, /* starting_offset = */ 0,
+                fe_values_jacobians, function_values);
+            (void)offset;
             Assert(offset == n_components, ExcInternalError());
           }
 
