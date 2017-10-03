@@ -59,7 +59,17 @@ LogStream::Prefix::Prefix(const std::string &text,
 
 LogStream::Prefix::~Prefix()
 {
-  stream->pop();
+  // destructors may not throw exceptions. if the pop() function
+  // actually does throw one, then ignore it
+  try
+    {
+      stream->pop();
+    }
+  catch (...)
+    {
+      AssertNothrow (false,
+                     ExcMessage("An exception occurred in LogStream::Prefix::~Prefix."));
+    }
 }
 
 
