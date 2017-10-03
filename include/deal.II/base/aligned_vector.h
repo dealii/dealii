@@ -131,14 +131,35 @@ public:
 
   /**
    * Change the size of the vector. It keeps old elements previously
-   * available, and initializes each element with the specified data. If the
-   * new vector size is shorter than the old one, the memory is not released
-   * unless the new size is zero.
+   * available, and initializes each newly added element to a
+   * default-constructed object of type @p T.
+   *
+   * If the new vector size is shorter than the old one, the memory is
+   * not immediately released unless the new size is zero; however,
+   * the size of the current object is of course set to the requested
+   * value.
+   *
+   * @dealiiOperationIsMultithreaded
+   */
+  void resize (const size_type size_in);
+
+  /**
+   * Change the size of the vector. It keeps old elements previously
+   * available, and initializes each newly added element with the
+   * provided initializer.
+   *
+   * If the new vector size is shorter than the old one, the memory is
+   * not immediately released unless the new size is zero; however,
+   * the size of the current object is of course set to the requested
+   * value.
+   *
+   * @note This method can only be invoked for classes that define the copy
+   * assignment operator. Otherwise, compilation will fail.
    *
    * @dealiiOperationIsMultithreaded
    */
   void resize (const size_type size_in,
-               const T        &init = T());
+               const T        &init);
 
   /**
    * Reserve memory space for @p size elements. If the argument @p size is set
@@ -180,6 +201,17 @@ public:
   template <typename ForwardIterator>
   void insert_back (ForwardIterator begin,
                     ForwardIterator end);
+
+  /**
+   * Fills the vector with size() copies of a default constructed object.
+   *
+   * @note Unlike the other fill() function, this method can also be
+   * invoked for classes that do not define a copy assignment
+   * operator.
+   *
+   * @dealiiOperationIsMultithreaded
+   */
+  void fill ();
 
   /**
    * Fills the vector with size() copies of the given input.
@@ -363,7 +395,7 @@ namespace internal
           {
             // initialize memory (copy construct by placement new), and
             // destruct the source
-            new (&destination_[i]) T(source_[i]);
+            new (&destination_[i]) T(std::move(source_[i]));
             source_[i].~T();
           }
       else
@@ -465,6 +497,97 @@ namespace internal
     {
       for (std::size_t i=begin; i<end; ++i)
         new (&destination_[i]) T(element_);
+    }
+  };
+
+
+
+  /**
+   * Class that issues the set commands for AlignedVector.
+   *
+   * @tparam initialize_memory Sets whether the set command should
+   * initialize memory (with a call to the copy constructor) or rather use the
+   * copy assignment operator. A template is necessary to select the
+   * appropriate operation since some classes might define only one of those
+   * two operations.
+   *
+   * @relates AlignedVector
+   */
+  template <typename T, bool initialize_memory>
+  class AlignedVectorDefaultInitialize : private parallel::ParallelForInteger
+  {
+    static const std::size_t minimum_parallel_grain_size = 160000/sizeof(T)+1;
+  public:
+    /**
+     * Constructor. Issues a parallel call if there are sufficiently many
+     * elements, otherwise work in serial.
+     */
+    AlignedVectorDefaultInitialize (const std::size_t size,
+                                    T *destination)
+      :
+      destination_ (destination),
+      trivial_element (false)
+    {
+      if (size == 0)
+        return;
+
+      // do not use memcmp for long double because on some systems it does not
+      // completely fill its memory and may lead to false positives in
+      // e.g. valgrind
+      if (std::is_trivial<T>::value == true &&
+          std::is_same<T,long double>::value == false)
+        {
+          const unsigned char zero [sizeof(T)] = {};
+          // cast element to (void*) to silence compiler warning for virtual
+          // classes (they will never arrive here because they are
+          // non-trivial).
+          T element {};
+          if (std::memcmp(zero, (void *)&element, sizeof(T)) == 0)
+            trivial_element = true;
+        }
+      if (size < minimum_parallel_grain_size)
+        apply_to_subrange (0, size);
+      else
+        apply_parallel (0, size, minimum_parallel_grain_size);
+    }
+
+    /**
+     * This initializes elements on a subrange given by two integers.
+     */
+    virtual void apply_to_subrange (const std::size_t begin,
+                                    const std::size_t end) const
+    {
+      // for classes with trivial assignment of zero can use memset. cast
+      // element to (void*) to silence compiler warning for virtual
+      // classes (they will never arrive here because they are
+      // non-trivial).
+      if (std::is_trivial<T>::value == true && trivial_element)
+        std::memset ((void *)(destination_+begin), 0, (end-begin)*sizeof(T));
+      else
+        default_construct_or_assign(begin, end,
+                                    std::integral_constant<bool, initialize_memory>());
+    }
+
+  private:
+    mutable T *destination_;
+    bool trivial_element;
+
+    // copy assignment operation
+    void default_construct_or_assign(const std::size_t begin,
+                                     const std::size_t end,
+                                     std::integral_constant<bool, false>) const
+    {
+      for (std::size_t i=begin; i<end; ++i)
+        destination_[i] = std::move(T());
+    }
+
+    // copy constructor (memory initialization)
+    void default_construct_or_assign(const std::size_t begin,
+                                     const std::size_t end,
+                                     std::integral_constant<bool, true>) const
+    {
+      for (std::size_t i=begin; i<end; ++i)
+        new (&destination_[i]) T;
     }
   };
 
@@ -593,7 +716,31 @@ AlignedVector<T>::resize_fast (const size_type size_in)
   // need to still set the values in case the class is non-trivial because
   // virtual classes etc. need to run their (default) constructor
   if (std::is_trivial<T>::value == false && size_in > old_size)
-    dealii::internal::AlignedVectorSet<T,true> (size_in-old_size, T(), _data+old_size);
+    dealii::internal::AlignedVectorDefaultInitialize<T,true> (size_in-old_size, _data+old_size);
+}
+
+
+
+template < class T >
+inline
+void
+AlignedVector<T>::resize (const size_type size_in)
+{
+  const size_type old_size = size();
+  if (std::is_trivial<T>::value == false && size_in < old_size)
+    {
+      // call destructor on fields that are released. doing it backward
+      // releases the elements in reverse order as compared to how they were
+      // created
+      while (_end_data != _data+size_in)
+        (--_end_data)->~T();
+    }
+  reserve (size_in);
+  _end_data = _data + size_in;
+
+  // finally set the desired init values
+  if (size_in > old_size)
+    dealii::internal::AlignedVectorDefaultInitialize<T,true> (size_in-old_size, _data+old_size);
 }
 
 
@@ -741,6 +888,16 @@ AlignedVector<T>::insert_back (ForwardIterator begin,
         new (_end_data) T;
       *_end_data = *begin;
     }
+}
+
+
+
+template < class T >
+inline
+void
+AlignedVector<T>::fill ()
+{
+  dealii::internal::AlignedVectorDefaultInitialize<T,false> (size(), _data);
 }
 
 
