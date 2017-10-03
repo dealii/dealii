@@ -51,13 +51,26 @@ void test()
   (++cell)->set_active_fe_index(1);
 
   dof_handler.distribute_dofs (fe);
+
+  deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
+  for (auto cell : dof_handler.active_cell_iterators())
+    {
+      deallog << cell << ": ";
+      std::vector<types::global_dof_index> dof_indices (cell->get_fe().dofs_per_cell);
+      cell->get_dof_indices (dof_indices);
+      for (auto i : dof_indices)
+        deallog << i << ' ';
+      deallog << std::endl;
+    }
+
   ConstraintMatrix hanging_node_constraints;
   DoFTools::make_hanging_node_constraints (dof_handler,
                                            hanging_node_constraints);
   hanging_node_constraints.close ();
 
   // print constraints. there shouldn't be any
-  deallog << hanging_node_constraints.n_constraints() << std::endl;
+  deallog << "n_constraints: "
+          << hanging_node_constraints.n_constraints() << std::endl;
   hanging_node_constraints.print (deallog.get_file_stream());
 }
 
