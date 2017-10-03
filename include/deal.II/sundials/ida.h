@@ -24,9 +24,14 @@
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/mpi.h>
+#ifdef DEAL_II_WITH_PETSC
+#include <deal.II/lac/petsc_parallel_block_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#endif
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_view.h>
 #include <deal.II/lac/vector_memory.h>
+
 
 #include <ida/ida.h>
 #include <ida/ida_spils.h>
@@ -810,6 +815,18 @@ namespace SUNDIALS
      * Memory pool of vectors.
      */
     GrowingVectorMemory<VectorType> mem;
+
+#ifdef DEAL_II_WITH_PETSC
+#ifdef PETSC_USE_COMPLEX
+    static_assert(!std::is_same<VectorType, PETScWrappers::MPI::Vector>::value,
+                  "Sundials does not support complex scalar types, "
+                  "but PETSc is configured to use a complex scalar type!");
+
+    static_assert(!std::is_same<VectorType, PETScWrappers::MPI::BlockVector>::value,
+                  "Sundials does not support complex scalar types, "
+                  "but PETSc is configured to use a complex scalar type!");
+#endif // PETSC_USE_COMPLEX
+#endif // DEAL_II_WITH_PETSC
   };
 
 }
