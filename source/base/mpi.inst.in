@@ -28,6 +28,9 @@ for (S : MPI_SCALARS)
     void sum<S> (const FullMatrix<S> &, const MPI_Comm &, FullMatrix<S> &);
 
     template
+    void sum<S> (const ArrayView<const S> &, const MPI_Comm &, const ArrayView<S> &);
+
+    template
     S sum<S> (const S &, const MPI_Comm &);
 
     template
@@ -61,10 +64,9 @@ for (S : MPI_SCALARS)
     // seem to inline it with the '-march=native' flag.
     template
     void Utilities::MPI::internal::all_reduce<S> (const MPI_Op    &,
-            const S *const,
+            const ArrayView<const S> &,
             const MPI_Comm  &,
-            S               *,
-            const std::size_t);
+            const ArrayView<S>    &);
 }
 
 
@@ -81,8 +83,10 @@ for (S : COMPLEX_SCALARS)
 
     template
     void sum<S> (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
-}
 
+    template
+    void sum<S> (const ArrayView<const S> &, const MPI_Comm &, const ArrayView<S> &);
+}
 
 for (S : REAL_SCALARS; rank: RANKS; dim : SPACE_DIMENSIONS)
 {
