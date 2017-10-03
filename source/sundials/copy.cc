@@ -105,6 +105,7 @@ namespace SUNDIALS
 #endif //DEAL_II_WITH_TRILINOS
 
 #ifdef DEAL_II_WITH_PETSC
+#ifndef PETSC_USE_COMPLEX
 
     void copy(PETScWrappers::MPI::Vector &dst, const N_Vector &src)
     {
@@ -148,6 +149,7 @@ namespace SUNDIALS
         }
     }
 
+#endif //PETSC_USE_COMPLEX
 #endif //DEAL_II_WITH_PETSC
 
 #endif //mpi
