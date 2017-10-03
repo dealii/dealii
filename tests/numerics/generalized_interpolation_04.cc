@@ -13,24 +13,33 @@
 //
 // ---------------------------------------------------------------------
 
-// Check projection property of VectorTools::interpolate for
-// Hdiv and Hcurl conforming spaces on something nontrivial.
+// Check projection property of VectorTools::interpolate for a complex,
+// staggered system of Hdiv / Hcurl / L2 conforming spaces.
 
 #include <deal.II/fe/fe_nedelec.h>
+#include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_system.h>
 
 #include "../tests.h"
 #include "generalized_interpolation.h"
 
 int main ()
 {
-  deallog.depth_console(3);
+  initlog();
 
-  test<2>(FE_RaviartThomas<2>(0), F<2>(2, 1), 1, false);
-  test<2>(FE_RaviartThomas<2>(1), F<2>(2, 0), 2, false);
-  test<2>(FE_RaviartThomas<2>(1), F<2>(2, 2), 2, false);
+  static const int dim = 2;
 
-  test<3>(FE_RaviartThomas<3>(0), F<3>(3, 0), 1, false);
-  test<3>(FE_RaviartThomas<3>(1), F<3>(3, 0), 2, false);
-  test<3>(FE_RaviartThomas<3>(1), F<3>(3, 2), 2, false);
+  FESystem<dim> fe(FE_RaviartThomas<dim>(1),
+                   1,
+                   FE_Q<dim>(1),
+                   1,
+                   FE_Nedelec<dim>(2),
+                   2,
+                   FESystem<dim>(FE_Q<dim>(1), dim),
+                   1);
+
+  const unsigned int n_comp = fe.n_components();
+
+  test<2>(fe, F<2>(n_comp, 1), 1, false);
 }
