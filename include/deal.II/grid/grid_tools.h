@@ -1111,8 +1111,14 @@ namespace GridTools
    * Here, the "subdomain" consists of exactly all of those
    * active cells for which the @p predicate returns @p true.
    *
-   * For a description of how predicate works,
-   * see compute_active_cell_halo_layer()
+   * For a description of how @p predicate works,
+   * see compute_active_cell_halo_layer().
+   *
+   * @note This function was written before the BoundingBox class was invented.
+   *   Consequently, it returns a pair of points, rather than a BoundingBox object
+   *   as one may expect. However, BoundingBox has a conversion constructor from
+   *   pairs of points, so the result of this function can still be assigned to
+   *   a BoundingBox object.
    */
   template <class MeshType>
   std::pair< Point<MeshType::space_dimension>, Point<MeshType::space_dimension> >
