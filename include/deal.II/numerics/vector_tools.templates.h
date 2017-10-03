@@ -244,7 +244,7 @@ namespace VectorTools
                                            function_values);
           offset += fe.n_components();
         }
-    };
+    }
 
 
     // Internal implementation of interpolate that takes a generic functor
