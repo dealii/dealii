@@ -38,8 +38,9 @@ template <int, int> class Triangulation;
  * This class
  * stores the index of the coarse cell from which a cell is descendant,
  * together with information on how to reach the cell from that coarse cell
- * (i.e., which child index to take on each level when moving from one cell to
- * its children). The important point about this class is that an object of
+ * (i.e., which child index to take on each level of the triangulation when
+ * moving from one cell to its children). The important point about this
+ * class is that an object of
  * the current class uniquely identifies a cell in triangulation, and it even
  * does so in the context of objects of type
  * parallel::distributed::Triangulation where the local portion of a mesh may
@@ -49,9 +50,9 @@ template <int, int> class Triangulation;
  * and index of the iterators pointing to that cell <i>within the
  * triangulation stored on each of the processors</i> may (and in general
  * will) be different. In other words, CellId provides the tool with which it
- * is possible to uniquely identify cells in a parallel triangulation, and
- * consequently makes it possible to exchange data between processors tied to
- * individual cells.
+ * is possible to globally and uniquely identify cells in a parallel
+ * triangulation, and consequently makes it possible to exchange, between
+ * processors, data tied to individual cells.
  *
  * @note How this data is internally represented is not of importance (and not
  * exposed on purpose).
