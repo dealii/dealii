@@ -1292,7 +1292,6 @@ namespace parallel
       triangulation_has_content (false),
       connectivity (nullptr),
       parallel_forest (nullptr),
-      refinement_in_progress (false),
       attached_data_size(0),
       n_attached_datas(0),
       n_attached_deserialize(0)
@@ -1311,7 +1310,6 @@ namespace parallel
               ExcInternalError());
       Assert (connectivity == nullptr,    ExcInternalError());
       Assert (parallel_forest == nullptr, ExcInternalError());
-      Assert (refinement_in_progress == false, ExcInternalError());
     }
 
 
@@ -2556,12 +2554,9 @@ namespace parallel
               }
 
             this->prepare_coarsening_and_refinement();
-            const bool saved_refinement_in_progress = refinement_in_progress;
-            refinement_in_progress = true;
-
             try
               {
-                this->execute_coarsening_and_refinement();
+                dealii::Triangulation<dim,spacedim>::execute_coarsening_and_refinement();
               }
             catch (const typename Triangulation<dim, spacedim>::DistortedCellList &)
               {
@@ -2569,8 +2564,6 @@ namespace parallel
                 // distorted cells
                 Assert (false, ExcInternalError());
               }
-
-            refinement_in_progress = saved_refinement_in_progress;
           }
 
 
@@ -2675,14 +2668,11 @@ namespace parallel
                 break;
               }
 
-          // actually do the refinement but prevent the refinement hook below
-          // from taking over
-          const bool saved_refinement_in_progress = refinement_in_progress;
-          refinement_in_progress = true;
-
+          // actually do the refinement to change the local mesh by
+          // calling the base class refinement function directly
           try
             {
-              this->execute_coarsening_and_refinement();
+              dealii::Triangulation<dim,spacedim>::execute_coarsening_and_refinement();
             }
           catch (const typename Triangulation<dim,spacedim>::DistortedCellList &)
             {
@@ -2690,8 +2680,6 @@ namespace parallel
               // distorted cells
               Assert (false, ExcInternalError());
             }
-
-          refinement_in_progress = saved_refinement_in_progress;
         }
       while (mesh_changed);
 
@@ -2834,13 +2822,6 @@ namespace parallel
     void
     Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
     {
-      // first make sure that recursive calls are handled correctly
-      if (refinement_in_progress == true)
-        {
-          dealii::Triangulation<dim,spacedim>::execute_coarsening_and_refinement ();
-          return;
-        }
-
       // do not allow anisotropic refinement
 #ifdef DEBUG
       for (typename Triangulation<dim,spacedim>::active_cell_iterator
@@ -2866,7 +2847,6 @@ namespace parallel
         }
 
       // now do the work we're supposed to do when we are in charge
-      refinement_in_progress = true;
       this->prepare_coarsening_and_refinement ();
 
       // make sure all flags are cleared on cells we don't own, since nothing
@@ -3036,7 +3016,6 @@ namespace parallel
         }
 #endif
 
-      refinement_in_progress = false;
       this->update_number_cache ();
       this->update_periodic_face_map();
     }
@@ -3055,8 +3034,6 @@ namespace parallel
             !cell->refine_flag_set() && !cell->coarsen_flag_set(),
             ExcMessage ("Error: There shouldn't be any cells flagged for coarsening/refinement when calling repartition()."));
 #endif
-
-      refinement_in_progress = true;
 
       // before repartitioning the mesh let others attach mesh related info
       // (such as SolutionTransfer data) to the p4est
@@ -3103,8 +3080,6 @@ namespace parallel
           // cells
           Assert (false, ExcInternalError());
         }
-
-      refinement_in_progress = false;
 
       // update how many cells, edges, etc, we store locally
       this->update_number_cache ();
@@ -3617,7 +3592,6 @@ namespace parallel
         + MemoryConsumption::memory_consumption(triangulation_has_content)
         + MemoryConsumption::memory_consumption(connectivity)
         + MemoryConsumption::memory_consumption(parallel_forest)
-        + MemoryConsumption::memory_consumption(refinement_in_progress)
         + MemoryConsumption::memory_consumption(attached_data_size)
         + MemoryConsumption::memory_consumption(n_attached_datas)
 //      + MemoryConsumption::memory_consumption(attached_data_pack_callbacks) //TODO[TH]: how?
@@ -3668,10 +3642,6 @@ namespace parallel
       if (const dealii::parallel::distributed::Triangulation<dim,spacedim> *
           other_tria_x = dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&other_tria))
         {
-          Assert (!other_tria_x->refinement_in_progress,
-                  ExcMessage ("Parallel distributed triangulations can only "
-                              "be copied, if no refinement is in progress!"));
-
           coarse_cell_to_p4est_tree_permutation = other_tria_x->coarse_cell_to_p4est_tree_permutation;
           p4est_tree_to_coarse_cell_permutation = other_tria_x->p4est_tree_to_coarse_cell_permutation;
           attached_data_size = other_tria_x->attached_data_size;
