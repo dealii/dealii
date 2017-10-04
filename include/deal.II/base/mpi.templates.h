@@ -95,14 +95,13 @@ namespace Utilities
 #endif
 
 
-
       template <typename T>
-      void all_reduce (const MPI_Op      &mpi_op,
-                       const T *const    values,
-                       const MPI_Comm    &mpi_communicator,
-                       T                 *output,
-                       const std::size_t  size)
+      void all_reduce (const MPI_Op             &mpi_op,
+                       const ArrayView<const T> &values,
+                       const MPI_Comm           &mpi_communicator,
+                       const ArrayView<T>       &output)
       {
+        AssertDimension(values.size(), output.size());
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
           {
@@ -114,12 +113,12 @@ namespace Utilities
                               // implementations of MPI-2. It is not needed as
                               // of MPI-3 and we should remove it at some
                               // point in the future.
-                              const_cast<void *>(static_cast<const void *>(values))
+                              const_cast<void *>(static_cast<const void *>(values.begin()))
                               :
                               MPI_IN_PLACE,
-                              static_cast<void *>(output),
-                              static_cast<int>(size),
-                              internal::mpi_type_id(values),
+                              static_cast<void *>(output.begin()),
+                              static_cast<int>(values.size()),
+                              internal::mpi_type_id(values.begin()),
                               mpi_op,
                               mpi_communicator);
             AssertThrowMPI(ierr);
@@ -129,24 +128,23 @@ namespace Utilities
           {
             (void)mpi_op;
             (void)mpi_communicator;
-            for (std::size_t i=0; i<size; ++i)
-              output[i] = values[i];
+            if (values != output)
+              std::copy(values.begin(), values.end(), output.begin());
           }
       }
 
 
 
       template <typename T>
-      void all_reduce (const MPI_Op                   &mpi_op,
-                       const std::complex<T> *const    values,
-                       const MPI_Comm                 &mpi_communicator,
-                       std::complex<T>                *output,
-                       const std::size_t               size)
+      void all_reduce (const MPI_Op                           &mpi_op,
+                       const ArrayView<const std::complex<T>> &values,
+                       const MPI_Comm                         &mpi_communicator,
+                       const ArrayView<std::complex<T>>       &output)
       {
+        AssertDimension(values.size(), output.size());
 #ifdef DEAL_II_WITH_MPI
         if (job_supports_mpi())
           {
-            T dummy_selector;
             const int ierr = MPI_Allreduce
                              (values != output
                               ?
@@ -155,12 +153,12 @@ namespace Utilities
                               // implementations of MPI-2. It is not needed as
                               // of MPI-3 and we should remove it at some
                               // point in the future.
-                              const_cast<void *>(static_cast<const void *>(values))
+                              const_cast<void *>(static_cast<const void *>(values.begin()))
                               :
                               MPI_IN_PLACE,
-                              static_cast<void *>(output),
-                              static_cast<int>(size*2),
-                              internal::mpi_type_id(&dummy_selector),
+                              static_cast<void *>(output.begin()),
+                              static_cast<int>(values.size()*2),
+                              internal::mpi_type_id(static_cast<T *>(nullptr)),
                               mpi_op,
                               mpi_communicator);
             AssertThrowMPI(ierr);
@@ -170,79 +168,10 @@ namespace Utilities
           {
             (void)mpi_op;
             (void)mpi_communicator;
-            for (std::size_t i=0; i<size; ++i)
-              output[i] = values[i];
+            if (values != output)
+              std::copy(values.begin(), values.end(), output.begin());
           }
       }
-
-
-
-      template <typename T>
-      T all_reduce (const MPI_Op &mpi_op,
-                    const T &t,
-                    const MPI_Comm &mpi_communicator)
-      {
-        T output;
-        all_reduce(mpi_op, &t, mpi_communicator, &output, 1);
-        return output;
-      }
-
-
-
-      template <typename T>
-      void all_reduce (const MPI_Op &mpi_op,
-                       const std::vector<T> &values,
-                       const MPI_Comm       &mpi_communicator,
-                       std::vector<T>       &output)
-      {
-        Assert(values.size() == output.size(),
-               ExcDimensionMismatch(values.size(), output.size()));
-        all_reduce(mpi_op, &values[0], mpi_communicator, &output[0], values.size());
-      }
-
-
-
-      template <typename T>
-      void all_reduce (const MPI_Op    &mpi_op,
-                       const Vector<T> &values,
-                       const MPI_Comm  &mpi_communicator,
-                       Vector<T>  &output)
-      {
-        Assert(values.size() == output.size(),
-               ExcDimensionMismatch(values.size(), output.size()));
-        all_reduce(mpi_op, values.begin(), mpi_communicator, output.begin(), values.size());
-      }
-
-
-
-      template <typename T>
-      void all_reduce (const MPI_Op    &mpi_op,
-                       const FullMatrix<T> &values,
-                       const MPI_Comm  &mpi_communicator,
-                       FullMatrix<T>  &output)
-      {
-        Assert(values.m() == output.m(),
-               ExcDimensionMismatch(values.m(), output.m()));
-        Assert(values.n() == output.n(),
-               ExcDimensionMismatch(values.n(), output.n()));
-        all_reduce(mpi_op, &values[0][0], mpi_communicator, &output[0][0], values.m() * values.n());
-      }
-
-
-
-      template <typename T>
-      void all_reduce (const MPI_Op    &mpi_op,
-                       const LAPACKFullMatrix<T> &values,
-                       const MPI_Comm  &mpi_communicator,
-                       LAPACKFullMatrix<T>  &output)
-      {
-        Assert(values.m() == output.m(),
-               ExcDimensionMismatch(values.m(), output.m()));
-        Assert(values.n() == output.n(),
-               ExcDimensionMismatch(values.n(), output.n()));
-        all_reduce(mpi_op, &values(0,0), mpi_communicator, &output(0,0), values.m() * values.n());
-      }
-
     }
 
 
@@ -251,7 +180,10 @@ namespace Utilities
     T sum (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-      return internal::all_reduce(MPI_SUM, t, mpi_communicator);
+      T return_value;
+      internal::all_reduce(MPI_SUM, ArrayView<const T>(&t,1),
+                           mpi_communicator, ArrayView<T>(&return_value,1));
+      return return_value;
     }
 
 
@@ -260,6 +192,17 @@ namespace Utilities
     void sum (const std::vector<T> &values,
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &sums)
+    {
+      internal::all_reduce(MPI_SUM, ArrayView<const T>(values),
+                           mpi_communicator, ArrayView<T>(sums));
+    }
+
+
+
+    template <typename T>
+    void sum (const ArrayView<const T> &values,
+              const MPI_Comm           &mpi_communicator,
+              const ArrayView<T>       &sums)
     {
       internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
     }
@@ -271,7 +214,9 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               Vector<T> &sums)
     {
-      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
+      const auto &size = values.size();
+      internal::all_reduce(MPI_SUM, ArrayView<const T>(values.begin(), size),
+                           mpi_communicator, ArrayView<T>(sums.begin(), size));
     }
 
 
@@ -281,7 +226,10 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               FullMatrix<T> &sums)
     {
-      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
+      const auto size_values = values.n()*values.m();
+      const auto size_sums = sums.n()*sums.m();
+      internal::all_reduce(MPI_SUM, ArrayView<const T>(&values[0][0], size_values),
+                           mpi_communicator, ArrayView<T>(&sums[0][0], size_sums));
     }
 
 
@@ -291,7 +239,10 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               LAPACKFullMatrix<T> &sums)
     {
-      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
+      const auto size_values = values.n()*values.m();
+      const auto size_sums = sums.n()*sums.m();
+      internal::all_reduce(MPI_SUM, ArrayView<const T>(&values(0,0), size_values),
+                           mpi_communicator, ArrayView<T>(&sums(0,0), size_sums));
     }
 
 
@@ -346,7 +297,10 @@ namespace Utilities
     T max (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-      return internal::all_reduce(MPI_MAX, t, mpi_communicator);
+      T return_value;
+      internal::all_reduce(MPI_MAX, ArrayView<const T>(&t,1),
+                           mpi_communicator, ArrayView<T> (&return_value,1));
+      return return_value;
     }
 
 
@@ -356,7 +310,8 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &maxima)
     {
-      internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
+      internal::all_reduce(MPI_MAX, ArrayView<const T>(values),
+                           mpi_communicator, ArrayView<T> (maxima));
     }
 
 
@@ -365,7 +320,10 @@ namespace Utilities
     T min (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-      return internal::all_reduce(MPI_MIN, t, mpi_communicator);
+      T return_value;
+      internal::all_reduce(MPI_MIN, ArrayView<const T>(&t,1),
+                           mpi_communicator, ArrayView<T>(&return_value,1));
+      return return_value;
     }
 
 
@@ -375,7 +333,8 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &minima)
     {
-      internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
+      internal::all_reduce(MPI_MIN, ArrayView<const T>(values),
+                           mpi_communicator, ArrayView<T> (minima));
     }
   } // end of namespace MPI
 } // end of namespace Utilities

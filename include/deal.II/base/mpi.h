@@ -17,6 +17,7 @@
 #define dealii_mpi_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/array_view.h>
 
 #include <vector>
 
@@ -162,6 +163,11 @@ namespace Utilities
     void sum (const T (&values)[N],
               const MPI_Comm &mpi_communicator,
               T (&sums)[N]);
+
+    template <typename T>
+    void sum (const ArrayView<const T> &values,
+              const MPI_Comm           &mpi_communicator,
+              const ArrayView<T>       &sums);
 
     /**
      * Like the previous function, but take the sums over the elements of a
@@ -481,11 +487,10 @@ namespace Utilities
     namespace internal
     {
       template <typename T>
-      void all_reduce (const MPI_Op      &mpi_op,
-                       const T *const    values,
-                       const MPI_Comm    &mpi_communicator,
-                       T                 *output,
-                       const std::size_t  size);
+      void all_reduce (const MPI_Op             &mpi_op,
+                       const ArrayView<const T> &values,
+                       const MPI_Comm           &mpi_communicator,
+                       const ArrayView<T>       &output);
     }
 
     // Since these depend on N they must live in the header file
@@ -494,7 +499,8 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&sums)[N])
     {
-      internal::all_reduce(MPI_SUM, values, mpi_communicator, sums, N);
+      internal::all_reduce(MPI_SUM, ArrayView<const T>(values, N),
+                           mpi_communicator, ArrayView<T>(sums, N));
     }
 
     template <typename T, unsigned int N>
@@ -502,7 +508,8 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&maxima)[N])
     {
-      internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima, N);
+      internal::all_reduce(MPI_MAX, ArrayView<const T>(values, N),
+                           mpi_communicator, ArrayView<T>(maxima, N));
     }
 
     template <typename T, unsigned int N>
@@ -510,7 +517,8 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&minima)[N])
     {
-      internal::all_reduce(MPI_MIN, values, mpi_communicator, minima, N);
+      internal::all_reduce(MPI_MIN, ArrayView<const T>(values, N),
+                           mpi_communicator, ArrayView<T>(minima, N));
     }
 #endif
   } // end of namespace MPI

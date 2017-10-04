@@ -157,6 +157,35 @@ public:
    */
   ArrayView (std::vector<typename std::remove_cv<value_type>::type> &vector);
 
+  /**
+   * Compare two ArrayView objects of the same type. Two objects are considered
+   * equal if they have the same size and the same starting pointer.
+   * This version always compares with the const value_type.
+   */
+  bool operator == (const ArrayView<const value_type> &other_view) const;
+
+  /**
+   * Compare two ArrayView objects of the same type. Two objects are considered
+   * equal if they have the same size and the same starting pointer.
+   * This version always compares with the non-const value_type.
+   */
+  bool operator ==
+  (const ArrayView<typename std::remove_cv<value_type>::type> &other_view) const;
+
+  /**
+   * Compare two ArrayView objects of the same type. Two objects are considered
+   * equal if they have the same size and the same starting pointer.
+   * This version always compares with the const value_type.
+   */
+  bool operator != (const ArrayView<const value_type> &other_view) const;
+
+  /**
+   * Compare two ArrayView objects of the same type. Two objects are considered
+   * equal if they have the same size and the same starting pointer.
+   * This version always comapres with the non-const value_type.
+   */
+  bool operator !=
+  (const ArrayView<typename std::remove_cv<value_type>::type> &other_view) const;
 
   /**
    * Return the size (in elements) of the view of memory this object
@@ -283,6 +312,49 @@ ArrayView (std::vector<typename std::remove_cv<value_type>::type> &vector)
   ArrayView (vector.data(), vector.size())
 {}
 
+
+
+template <typename ElementType>
+inline
+bool
+ArrayView<ElementType>::operator == (const ArrayView<const value_type> &other_view) const
+{
+  return (other_view.begin() == starting_element)
+         && (other_view.size() == n_elements);
+}
+
+
+
+template <typename ElementType>
+inline
+bool
+ArrayView<ElementType>::operator ==
+(const ArrayView<typename std::remove_cv<value_type>::type> &other_view) const
+{
+  return (other_view.begin() == starting_element)
+         && (other_view.size() == n_elements);
+}
+
+
+
+template <typename ElementType>
+inline
+bool
+ArrayView<ElementType>::operator != (const ArrayView<const value_type> &other_view) const
+{
+  return !(*this == other_view);
+}
+
+
+
+template <typename ElementType>
+inline
+bool
+ArrayView<ElementType>::operator !=
+(const ArrayView<typename std::remove_cv<value_type>::type> &other_view) const
+{
+  return !(*this == other_view);
+}
 
 
 
