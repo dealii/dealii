@@ -282,6 +282,8 @@ void test (std::string solver_name,
                                                                     mpi_communicator);
       }
 
+    PETScWrappers::set_option_value("-st_pc_factor_mat_solver_package", "mumps");
+
     // Set the initial vector. This is optional, if not done the initial vector is set to random values
     eigensolver->set_initial_space(eigenfunctions);
 
