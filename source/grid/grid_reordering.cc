@@ -980,12 +980,6 @@ namespace
     for (unsigned int c=0; c<cells.size(); ++c)
       rotate_cell (cell_list, edge_list, c, cells);
   }
-
-
-  // overload of the function above for 1d -- there is nothing
-  // to orient in that case
-  void reorient (std::vector<CellData<1> > &)
-  {}
 }
 
 
@@ -1001,11 +995,6 @@ namespace
    * do the reordering of their
    * arguments in-place.
    */
-  void
-  reorder_new_to_old_style (std::vector<CellData<1> > &)
-  {}
-
-
   void
   reorder_new_to_old_style (std::vector<CellData<2> > &cells)
   {
@@ -1031,11 +1020,6 @@ namespace
   /**
    * And now also in the opposite direction.
    */
-  void
-  reorder_old_to_new_style (std::vector<CellData<1> > &)
-  {}
-
-
   void
   reorder_old_to_new_style (std::vector<CellData<2> > &cells)
   {
@@ -1069,9 +1053,13 @@ GridReordering<dim,spacedim>::reorder_cells (std::vector<CellData<dim> > &cells,
   Assert (cells.size() != 0,
           ExcMessage("List of elements to orient must have at least one cell"));
 
-  // there is nothing for us to do in 1d
+  // There is nothing for us to do in 1d. This should be covered by the
+  // explicit instantiation in the header file.
   if (dim == 1)
-    return;
+    {
+      Assert(false, ExcInternalError());
+      return;
+    }
 
   // if necessary, convert to new-style format
   if (use_new_style_ordering == false)
@@ -1098,35 +1086,6 @@ GridReordering<dim,spacedim>::reorder_cells (std::vector<CellData<dim> > &cells,
     reorder_new_to_old_style(cells);
 }
 
-
-
-template <>
-void
-GridReordering<1>::invert_all_cells_of_negative_grid(const std::vector<Point<1> > &,
-                                                     std::vector<CellData<1> > &)
-{
-  // nothing to be done in 1d
-}
-
-
-
-template <>
-void
-GridReordering<1,2>::invert_all_cells_of_negative_grid(const std::vector<Point<2> > &,
-                                                       std::vector<CellData<1> > &)
-{
-  // nothing to be done in 1d
-}
-
-
-
-template <>
-void
-GridReordering<1,3>::invert_all_cells_of_negative_grid(const std::vector<Point<3> > &,
-                                                       std::vector<CellData<1> > &)
-{
-  // nothing to be done in 1d
-}
 
 
 template <>
