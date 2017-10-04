@@ -17,6 +17,7 @@
 #define dealii_sundials_ida_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/mpi.h>
 #ifdef DEAL_II_WITH_SUNDIALS
 
 #include <deal.II/base/logstream.h>
@@ -328,7 +329,7 @@ namespace SUNDIALS
         maximum_non_linear_iterations_ic(maximum_non_linear_iterations_ic),
         maximum_non_linear_iterations(maximum_non_linear_iterations),
         use_local_tolerances(use_local_tolerances)
-      {};
+      {}
 
       /**
        * Add all AdditionalData() parameters to the given ParameterHandler
@@ -561,6 +562,8 @@ namespace SUNDIALS
      * and after transferring the solution to the new grid, the initial conditions are no longer
      * consistent. Then you can choose how these are made consistent, using the same three
      * options that you used for the initial conditions in `reset_type`.
+     *
+     * The MPI communicator is simply ignored in the serial case.
      *
      * @param data IDA configuration data
      * @param mpi_comm MPI communicator
@@ -804,12 +807,12 @@ namespace SUNDIALS
      */
     N_Vector diff_id;
 
-#ifdef DEAL_II_WITH_MPI
     /**
-     * MPI communicator. SUNDIALS solver runs happily in parallel.
+     * MPI communicator. SUNDIALS solver runs happily in
+     * parallel. Note that if the library is compiled without MPI
+     * support, MPI_Comm is typedefed as int.
      */
     MPI_Comm communicator;
-#endif
 
     /**
      * Memory pool of vectors.
