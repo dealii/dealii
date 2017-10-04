@@ -109,14 +109,13 @@ namespace VectorTools
     // Input:
     //  conformity: conformity of the finite element, used to select
     //              appropriate type of transformation
-    //  fe_values_jacobians, cell: used to reinitialize an fe_values object
-    //                             if values of jacobians (and inverses of
-    //                             jacobians) are needed
+    //  fe_values_jacobians: used for jacobians (and inverses of
+    //                        jacobians). the object is supposed to be
+    //                        reinit()'d for the current cell
     //  function_values, offset: function_values is manipulated in place
     //                           starting at position offset
-    template <int dim, int spacedim, typename number, typename T1, typename T2, typename T3>
+    template <int dim, int spacedim, typename number, typename T2, typename T3>
     void transform(const typename FiniteElementData<dim>::Conformity conformity,
-                   const T1 &cell,
                    const unsigned int offset,
                    T2 &fe_values_jacobians,
                    T3 &function_values)
@@ -129,7 +128,6 @@ namespace VectorTools
           // For given mapping F_K: \hat K \to K, we have to transform
           //  \hat u = (dF_K)^T u\circ F_K
 
-          fe_values_jacobians.reinit(cell);
           for (unsigned int i = 0; i < function_values.size(); ++i)
             {
               const auto &jacobians =
@@ -155,7 +153,6 @@ namespace VectorTools
           // For given mapping F_K: \hat K \to K, we have to transform
           //  \hat w = det(dF_K) (dF_K)^{-1} w\circ F_K
 
-          fe_values_jacobians.reinit(cell);
           for (unsigned int i = 0; i < function_values.size(); ++i)
             {
               const auto &jacobians =
@@ -209,10 +206,9 @@ namespace VectorTools
     //   [ rest see above]
     // Output: the offset after we have handled the element at
     //   a given offset
-    template <int dim, int spacedim, typename number, typename T1, typename T2, typename T3>
+    template <int dim, int spacedim, typename number, typename T2, typename T3>
     unsigned int
     apply_transform(const FiniteElement<dim, spacedim> &fe,
-                    const T1 &cell,
                     const unsigned int offset,
                     T2 &fe_values_jacobians,
                     T3 &function_values)
@@ -233,7 +229,6 @@ namespace VectorTools
                   // correctly handle nested fe systems.
                   current_offset =
                     apply_transform<dim, spacedim, number>(base_fe,
-                                                           cell,
                                                            current_offset,
                                                            fe_values_jacobians,
                                                            function_values);
@@ -244,7 +239,6 @@ namespace VectorTools
       else
         {
           transform<dim, spacedim, number>(fe.conforming_space,
-                                           cell,
                                            offset,
                                            fe_values_jacobians,
                                            function_values);
@@ -349,19 +343,15 @@ namespace VectorTools
 
       hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
+      // An FEValues object to evaluate (generalized) support point
+      // locations as well as Jacobians and their inverses.
+      // the latter are only needed for Hcurl or Hdiv conforming elements,
+      // but we'll just always include them.
       hp::FEValues<dim, spacedim> fe_values(
         mapping_collection,
         fe,
         support_quadrature,
-        update_quadrature_points);
-
-      // An extra FEValues object to compute jacobians.
-      // Only re-initialized in case of Hcurl or Hdiv conforming elements,
-      // i.e. if we really need the information.
-      hp::FEValues<dim, spacedim> fe_values_jacobians(
-        mapping_collection,
-        fe,
-        support_quadrature,
+        update_quadrature_points |
         update_jacobians | update_inverse_jacobians);
 
       //
@@ -415,8 +405,8 @@ namespace VectorTools
 
             const unsigned int offset =
               apply_transform<dim, spacedim, number>(
-                fe[fe_index], cell, /* starting_offset = */ 0,
-                fe_values_jacobians, function_values);
+                fe[fe_index], /* starting_offset = */ 0,
+                fe_values, function_values);
             (void)offset;
             Assert(offset == n_components, ExcInternalError());
           }
