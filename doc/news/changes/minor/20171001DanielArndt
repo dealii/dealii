@@ -1,0 +1,4 @@
+New: MGTransferBlockMatrixFree allows to use a separate DoFHandler
+for each block. The required interface is supported by PreconditionMG.
+<br>
+(Daniel Arndt, 2017/10/01)

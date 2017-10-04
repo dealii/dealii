@@ -955,7 +955,8 @@ namespace MatrixFreeOperators
         const unsigned int index = selected_rows[i];
         if (!subblock(vec,index).partitioners_are_compatible
             (*data->get_dof_info(index).vector_partitioner))
-          data->initialize_dof_vector(subblock(vec,index));
+          data->initialize_dof_vector(subblock(vec,index),index);
+
         Assert(subblock(vec,index).partitioners_are_globally_compatible
                (*data->get_dof_info(index).vector_partitioner),
                ExcInternalError());
