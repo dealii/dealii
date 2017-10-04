@@ -327,7 +327,7 @@ private:
 namespace internal
 {
   /**
-   * Move and class that actually issues the copy commands in AlignedVector.
+   * A class that actually issues the copy commands in AlignedVector.
    * This class is based on the specialized for loop base class
    * ParallelForLoop in parallel.h whose purpose is the following: When
    * calling a parallel for loop on AlignedVector with apply_to_subranges, it
@@ -338,6 +338,81 @@ namespace internal
    * class channels all copy commands through one call to apply_to_subrange
    * for all possible types, which makes the copy operation much cleaner
    * (thanks to a virtual function, whose cost is negligible in this context).
+   *
+   * @relates AlignedVector
+   */
+  template <typename T>
+  class AlignedVectorCopy : private parallel::ParallelForInteger
+  {
+    static const std::size_t minimum_parallel_grain_size = 160000/sizeof(T)+1;
+  public:
+    /**
+     * Constructor. Issues a parallel call if there are sufficiently many
+     * elements, otherwise works in serial. Copies the data from the half-open
+     * interval between @p source_begin and @p source_end to array starting at
+     * @p destination (by calling the copy constructor with placement new). If
+     * the flag copy_source is set to @p true, the elements from the source
+     * array are simply copied. If it is set to @p false, the data is moved
+     * between the two arrays by invoking the destructor on the source range
+     * (preparing for a subsequent call to free).
+     */
+    AlignedVectorCopy (T *source_begin,
+                       T *source_end,
+                       T *destination,
+                       const bool copy_source)
+      :
+      source_ (source_begin),
+      destination_ (destination),
+      copy_source_ (copy_source)
+    {
+      Assert (source_end >= source_begin, ExcInternalError());
+      const std::size_t size = source_end - source_begin;
+      if (size < minimum_parallel_grain_size)
+        apply_to_subrange (0, size);
+      else
+        apply_parallel (0, size, minimum_parallel_grain_size);
+    }
+
+    /**
+     * This method moves elements from the source to the destination given in
+     * the constructor on a subrange given by two integers.
+     */
+    virtual void apply_to_subrange (const std::size_t begin,
+                                    const std::size_t end) const
+    {
+      if (end == begin)
+        return;
+
+      // for classes trivial assignment can use memcpy. cast element to
+      // (void*) to silence compiler warning for virtual classes (they will
+      // never arrive here because they are non-trivial).
+
+      if (std::is_trivial<T>::value == true)
+        std::memcpy ((void *)(destination_+begin), (void *)(source_+begin),
+                     (end-begin)*sizeof(T));
+      else if (copy_source_ == false)
+        for (std::size_t i=begin; i<end; ++i)
+          {
+            // initialize memory (copy construct by placement new),
+            // and destroy the source. because we destroy the source
+            // immediately after, we use move construction
+            new (&destination_[i]) T(std::move(source_[i]));
+            source_[i].~T();
+          }
+      else
+        for (std::size_t i=begin; i<end; ++i)
+          new (&destination_[i]) T(source_[i]);
+    }
+
+  private:
+    T *source_;
+    T *destination_;
+    const bool copy_source_;
+  };
+
+
+  /**
+   * Like AlignedVectorCopy, but use move operations instead of copy operations.
    *
    * @relates AlignedVector
    */
@@ -400,7 +475,7 @@ namespace internal
           }
       else
         for (std::size_t i=begin; i<end; ++i)
-          new (&destination_[i]) T(source_[i]);
+          new (&destination_[i]) T(std::move(source_[i]));
     }
 
   private:
@@ -409,6 +484,7 @@ namespace internal
     const bool copy_source_;
   };
 
+  
   /**
    * Class that issues the set commands for AlignedVector.
    *
@@ -643,7 +719,7 @@ AlignedVector<T>::AlignedVector (const AlignedVector<T> &vec)
   // copy the data from vec
   reserve (vec._end_data - vec._data);
   _end_data = _end_allocated;
-  internal::AlignedVectorMove<T> (vec._data, vec._end_data, _data, true);
+  internal::AlignedVectorCopy<T> (vec._data, vec._end_data, _data, true);
 }
 
 
@@ -670,7 +746,7 @@ AlignedVector<T>::operator = (const AlignedVector<T> &vec)
 {
   resize(0);
   resize_fast (vec._end_data - vec._data);
-  internal::AlignedVectorMove<T> (vec._data, vec._end_data, _data, true);
+  internal::AlignedVectorCopy<T> (vec._data, vec._end_data, _data, true);
   return *this;
 }
 
