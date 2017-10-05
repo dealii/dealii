@@ -1,0 +1,7 @@
+New: Added support for the KINSOL solver of the SUNDIALS 
+library. KINSOL is a solver for nonlinear algebraic systems. 
+It includes a Newton-Krylov solver as well as Picard and 
+fixed point solvers, both of which can be accelerated with 
+Anderson acceleration. 
+<br>
+(Luca Heltai, 2017/09/28)
