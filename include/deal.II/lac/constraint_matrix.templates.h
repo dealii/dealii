@@ -2332,6 +2332,7 @@ ConstraintMatrix::distribute_local_to_global (
                                                    local_vector,
                                                    local_dof_indices,
                                                    local_matrix);
+          AssertIsFinite(val);
 
           if (val != number ())
             {
