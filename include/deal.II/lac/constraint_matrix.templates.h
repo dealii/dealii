@@ -513,8 +513,10 @@ namespace internal
     {
       typedef types::global_dof_index size_type;
 
-      template <class VEC>
-      void set_zero_parallel(const std::vector<size_type> &cm, VEC &vec, size_type shift = 0)
+      template <class VectorType>
+      void set_zero_parallel(const std::vector<size_type> &cm,
+                             VectorType &vec,
+                             size_type shift = 0)
       {
         Assert(!vec.has_ghost_elements(), ExcInternalError());
         IndexSet locally_owned = vec.locally_owned_elements();
@@ -530,7 +532,7 @@ namespace internal
               continue;
             size_type idx = *it - shift;
             if (idx<vec.size() && locally_owned.is_element(idx))
-              internal::ElementAccess<VEC>::set(0., idx, vec);
+              internal::ElementAccess<VectorType>::set(0., idx, vec);
           }
       }
 
@@ -554,15 +556,19 @@ namespace internal
         vec.zero_out_ghosts();
       }
 
-      template <class VEC>
-      void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, std::integral_constant<bool, false>)
+      template <class VectorType>
+      void set_zero_in_parallel(const std::vector<size_type> &cm,
+                                VectorType                   &vec,
+                                std::integral_constant<bool, false>)
       {
         set_zero_parallel(cm, vec, 0);
       }
 
       // in parallel for BlockVectors
-      template <class VEC>
-      void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, std::integral_constant<bool, true>)
+      template <class VectorType>
+      void set_zero_in_parallel(const std::vector<size_type> &cm,
+                                VectorType                   &vec,
+                                std::integral_constant<bool, true>)
       {
         size_type start_shift = 0;
         for (size_type j=0; j<vec.n_blocks(); ++j)
@@ -572,18 +578,20 @@ namespace internal
           }
       }
 
-      template <class VEC>
-      void set_zero_serial(const std::vector<size_type> &cm, VEC &vec)
+      template <class VectorType>
+      void set_zero_serial(const std::vector<size_type> &cm,
+                           VectorType                   &vec)
       {
         for (typename std::vector<size_type>::const_iterator it = cm.begin();
              it != cm.end(); ++it)
           vec(*it) = 0.;
       }
 
-      template <class VEC>
-      void set_zero_all(const std::vector<size_type> &cm, VEC &vec)
+      template <class VectorType>
+      void set_zero_all(const std::vector<size_type> &cm,
+                        VectorType                   &vec)
       {
-        set_zero_in_parallel<VEC>(cm, vec, std::integral_constant<bool, IsBlockVector<VEC>::value>());
+        set_zero_in_parallel<VectorType>(cm, vec, std::integral_constant<bool, IsBlockVector<VectorType>::value>());
         vec.compress(VectorOperation::insert);
       }
 
