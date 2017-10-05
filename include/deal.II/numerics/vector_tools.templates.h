@@ -248,10 +248,10 @@ namespace VectorTools
 
 
     // Internal implementation of interpolate that takes a generic functor
-    // function such that function(cell).second is of type
-    // Function<spacedim, typename VectorType::value_type>* and
-    // function(cell).first is a boolean indicating whether the current
-    // cell should be processed
+    // function such that function(cell) is of type
+    // Function<spacedim, typename VectorType::value_type>*
+    //
+    // A given cell is skipped if function(cell) == nullptr
     template <int dim,
               int spacedim,
               typename VectorType,
@@ -372,8 +372,10 @@ namespace VectorTools
           if (fe[fe_index].dofs_per_cell == 0)
             continue;
 
-          // Skip processing of the current cell if we're told to do so.
-          if (!function(cell).first)
+          // Skip processing of the current cell if the function object is
+          // invalid. This is used by interpolate_by_material_id to skip
+          // interpolating over cells with unknown material id.
+          if (!function(cell))
             continue;
 
           // Get transformed, generalized support points
@@ -396,11 +398,11 @@ namespace VectorTools
           dof_values.resize(n_dofs);
 
           // Get all function values:
-          Assert(n_components == function(cell).second->n_components,
+          Assert(n_components == function(cell)->n_components,
                  ExcDimensionMismatch(dof_handler.get_fe().n_components(),
-                                      function(cell).second->n_components));
-          function(cell).second->vector_value_list(generalized_support_points,
-                                                   function_values);
+                                      function(cell)->n_components));
+          function(cell)->vector_value_list(generalized_support_points,
+                                            function_values);
 
           {
             // Before we can average, we have to transform all function values
@@ -506,9 +508,9 @@ namespace VectorTools
     // internal implementation
     const auto function_map = [&function](
                                 const typename DoFHandlerType<dim, spacedim>::active_cell_iterator &)
-                              -> std::pair<bool, const Function<spacedim, typename VectorType::value_type> *>
+                              -> const Function<spacedim, typename VectorType::value_type> *
     {
-      return std::make_pair(true, &function);
+      return &function;
     };
 
     interpolate(mapping, dof_handler, function_map, vec, component_mask);
@@ -617,11 +619,13 @@ namespace VectorTools
     // internal implementation
     const auto function_map = [&functions](
                                 const typename DoFHandlerType<dim, spacedim>::active_cell_iterator &cell)
-                              -> std::pair<bool, const Function<spacedim, typename VectorType::value_type> *>
+                              -> const Function<spacedim, typename VectorType::value_type> *
     {
       const auto function = functions.find(cell->material_id());
-      bool update = function != functions.end();
-      return std::make_pair(update, function->second);
+      if (function != functions.end())
+        return function->second;
+      else
+        return nullptr;
     };
 
     interpolate(mapping, dof_handler, function_map, vec, component_mask);
