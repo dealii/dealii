@@ -350,20 +350,17 @@ namespace internal
      * Constructor. Issues a parallel call if there are sufficiently many
      * elements, otherwise works in serial. Copies the data from the half-open
      * interval between @p source_begin and @p source_end to array starting at
-     * @p destination (by calling the copy constructor with placement new). If
-     * the flag copy_source is set to @p true, the elements from the source
-     * array are simply copied. If it is set to @p false, the data is moved
-     * between the two arrays by invoking the destructor on the source range
-     * (preparing for a subsequent call to free).
+     * @p destination (by calling the copy constructor with placement new).
+     *
+     * The elements from the source array are simply copied via the placement
+     * new copy constructor.
      */
     AlignedVectorCopy (T *source_begin,
                        T *source_end,
-                       T *destination,
-                       const bool copy_source)
+                       T *destination)
       :
       source_ (source_begin),
-      destination_ (destination),
-      copy_source_ (copy_source)
+      destination_ (destination)
     {
       Assert (source_end >= source_begin, ExcInternalError());
       const std::size_t size = source_end - source_begin;
@@ -390,15 +387,6 @@ namespace internal
       if (std::is_trivial<T>::value == true)
         std::memcpy ((void *)(destination_+begin), (void *)(source_+begin),
                      (end-begin)*sizeof(T));
-      else if (copy_source_ == false)
-        for (std::size_t i=begin; i<end; ++i)
-          {
-            // initialize memory (copy construct by placement new),
-            // and destroy the source. because we destroy the source
-            // immediately after, we use move construction
-            new (&destination_[i]) T(std::move(source_[i]));
-            source_[i].~T();
-          }
       else
         for (std::size_t i=begin; i<end; ++i)
           new (&destination_[i]) T(source_[i]);
@@ -407,7 +395,6 @@ namespace internal
   private:
     T *source_;
     T *destination_;
-    const bool copy_source_;
   };
 
 
@@ -423,22 +410,19 @@ namespace internal
   public:
     /**
      * Constructor. Issues a parallel call if there are sufficiently many
-     * elements, otherwise works in serial. Copies the data from the half-open
+     * elements, otherwise works in serial. Moves the data from the half-open
      * interval between @p source_begin and @p source_end to array starting at
-     * @p destination (by calling the copy constructor with placement new). If
-     * the flag copy_source is set to @p true, the elements from the source
-     * array are simply copied. If it is set to @p false, the data is moved
-     * between the two arrays by invoking the destructor on the source range
-     * (preparing for a subsequent call to free).
+     * @p destination (by calling the move constructor with placement new).
+     *
+     * The data is moved between the two arrays by invoking the destructor on
+     * the source range (preparing for a subsequent call to free).
      */
     AlignedVectorMove (T *source_begin,
                        T *source_end,
-                       T *destination,
-                       const bool copy_source)
+                       T *destination)
       :
       source_ (source_begin),
-      destination_ (destination),
-      copy_source_ (copy_source)
+      destination_ (destination)
     {
       Assert (source_end >= source_begin, ExcInternalError());
       const std::size_t size = source_end - source_begin;
@@ -465,7 +449,7 @@ namespace internal
       if (std::is_trivial<T>::value == true)
         std::memcpy ((void *)(destination_+begin), (void *)(source_+begin),
                      (end-begin)*sizeof(T));
-      else if (copy_source_ == false)
+      else
         for (std::size_t i=begin; i<end; ++i)
           {
             // initialize memory (copy construct by placement new), and
@@ -473,18 +457,14 @@ namespace internal
             new (&destination_[i]) T(std::move(source_[i]));
             source_[i].~T();
           }
-      else
-        for (std::size_t i=begin; i<end; ++i)
-          new (&destination_[i]) T(std::move(source_[i]));
     }
 
   private:
     T *source_;
     T *destination_;
-    const bool copy_source_;
   };
 
-  
+
   /**
    * Class that issues the set commands for AlignedVector.
    *
@@ -719,7 +699,7 @@ AlignedVector<T>::AlignedVector (const AlignedVector<T> &vec)
   // copy the data from vec
   reserve (vec._end_data - vec._data);
   _end_data = _end_allocated;
-  internal::AlignedVectorCopy<T> (vec._data, vec._end_data, _data, true);
+  internal::AlignedVectorCopy<T> (vec._data, vec._end_data, _data);
 }
 
 
@@ -746,7 +726,7 @@ AlignedVector<T>::operator = (const AlignedVector<T> &vec)
 {
   resize(0);
   resize_fast (vec._end_data - vec._data);
-  internal::AlignedVectorCopy<T> (vec._data, vec._end_data, _data, true);
+  internal::AlignedVectorCopy<T> (vec._data, vec._end_data, _data);
   return *this;
 }
 
@@ -877,7 +857,7 @@ AlignedVector<T>::reserve (const size_type size_alloc)
       if (_end_data != _data)
         {
           dealii::internal::AlignedVectorMove<T>(new_data, new_data + old_size,
-                                                 _data, false);
+                                                 _data);
           free(new_data);
         }
       else
