@@ -231,7 +231,7 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::smooth(const unsigned int  
                                                             BlockVector<number>       &u,
                                                             const BlockVector<number> &rhs) const
 {
-  deallog.push("Smooth");
+  LogStream::Prefix prefix("Smooth");
 
   unsigned int maxlevel = matrices.max_level();
   unsigned int steps2 = this->steps;
@@ -266,8 +266,6 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::smooth(const unsigned int  
       if (this->symmetric)
         T = !T;
     }
-
-  deallog.pop();
 }
 
 #endif // DOXYGEN
