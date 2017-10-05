@@ -449,7 +449,7 @@ SolverBicgstab<VectorType>::solve(const MatrixType         &A,
                                   const VectorType         &b,
                                   const PreconditionerType &preconditioner)
 {
-  deallog.push("Bicgstab");
+  LogStream::Prefix prefix("Bicgstab");
   Vr    = typename VectorMemory<VectorType>::Pointer(this->memory);
   Vrbar = typename VectorMemory<VectorType>::Pointer(this->memory);
   Vp    = typename VectorMemory<VectorType>::Pointer(this->memory);
@@ -487,8 +487,6 @@ SolverBicgstab<VectorType>::solve(const MatrixType         &A,
       ++step;
     }
   while (state.breakdown == true);
-
-  deallog.pop();
 
   // in case of failure: throw exception
   AssertThrow(state.state == SolverControl::success,

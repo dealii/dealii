@@ -310,7 +310,7 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
 {
   SolverControl::State conv=SolverControl::iterate;
 
-  deallog.push("cg");
+  LogStream::Prefix prefix("cg");
 
   // Memory allocation
   typename VectorMemory<VectorType>::Pointer g_pointer(this->memory);
@@ -336,113 +336,101 @@ SolverCG<VectorType>::solve (const MatrixType         &A,
   int  it=0;
   double res = -std::numeric_limits<double>::max();
 
-  try
+  double eigen_beta_alpha = 0;
+
+  // resize the vectors, but do not set
+  // the values since they'd be overwritten
+  // soon anyway.
+  g.reinit(x, true);
+  d.reinit(x, true);
+  h.reinit(x, true);
+
+  double gh,beta;
+
+  // compute residual. if vector is
+  // zero, then short-circuit the
+  // full computation
+  if (!x.all_zero())
     {
-      double eigen_beta_alpha = 0;
+      A.vmult(g,x);
+      g.add(-1.,b);
+    }
+  else
+    g.equ(-1.,b);
+  res = g.l2_norm();
 
-      // resize the vectors, but do not set
-      // the values since they'd be overwritten
-      // soon anyway.
-      g.reinit(x, true);
-      d.reinit(x, true);
-      h.reinit(x, true);
+  conv = this->iteration_status(0, res, x);
+  if (conv != SolverControl::iterate)
+    return;
 
-      double gh,beta;
+  if (std::is_same<PreconditionerType,PreconditionIdentity>::value == false)
+    {
+      preconditioner.vmult(h,g);
 
-      // compute residual. if vector is
-      // zero, then short-circuit the
-      // full computation
-      if (!x.all_zero())
-        {
-          A.vmult(g,x);
-          g.add(-1.,b);
-        }
-      else
-        g.equ(-1.,b);
-      res = g.l2_norm();
+      d.equ(-1.,h);
 
-      conv = this->iteration_status(0, res, x);
+      gh = g*h;
+    }
+  else
+    {
+      d.equ(-1.,g);
+      gh = res*res;
+    }
+
+  while (conv == SolverControl::iterate)
+    {
+      it++;
+      A.vmult(h,d);
+
+      double alpha = d*h;
+      Assert(alpha != 0., ExcDivideByZero());
+      alpha = gh/alpha;
+
+      x.add(alpha,d);
+      res = std::sqrt(g.add_and_dot(alpha, h, g));
+
+      print_vectors(it, x, g, d);
+
+      conv = this->iteration_status(it, res, x);
       if (conv != SolverControl::iterate)
-        {
-          deallog.pop();
-          return;
-        }
+        break;
 
-      if (std::is_same<PreconditionerType,PreconditionIdentity>::value == false)
+      if (std::is_same<PreconditionerType,PreconditionIdentity>::value
+          == false)
         {
           preconditioner.vmult(h,g);
 
-          d.equ(-1.,h);
-
-          gh = g*h;
+          beta = gh;
+          Assert(beta != 0., ExcDivideByZero());
+          gh   = g*h;
+          beta = gh/beta;
+          d.sadd(beta,-1.,h);
         }
       else
         {
-          d.equ(-1.,g);
+          beta = gh;
           gh = res*res;
+          beta = gh/beta;
+          d.sadd(beta,-1.,g);
         }
 
-      while (conv == SolverControl::iterate)
+      this->coefficients_signal(alpha,beta);
+      // set up the vectors
+      // containing the diagonal
+      // and the off diagonal of
+      // the projected matrix.
+      if (do_eigenvalues)
         {
-          it++;
-          A.vmult(h,d);
-
-          double alpha = d*h;
-          Assert(alpha != 0., ExcDivideByZero());
-          alpha = gh/alpha;
-
-          x.add(alpha,d);
-          res = std::sqrt(g.add_and_dot(alpha, h, g));
-
-          print_vectors(it, x, g, d);
-
-          conv = this->iteration_status(it, res, x);
-          if (conv != SolverControl::iterate)
-            break;
-
-          if (std::is_same<PreconditionerType,PreconditionIdentity>::value
-              == false)
-            {
-              preconditioner.vmult(h,g);
-
-              beta = gh;
-              Assert(beta != 0., ExcDivideByZero());
-              gh   = g*h;
-              beta = gh/beta;
-              d.sadd(beta,-1.,h);
-            }
-          else
-            {
-              beta = gh;
-              gh = res*res;
-              beta = gh/beta;
-              d.sadd(beta,-1.,g);
-            }
-
-          this->coefficients_signal(alpha,beta);
-          // set up the vectors
-          // containing the diagonal
-          // and the off diagonal of
-          // the projected matrix.
-          if (do_eigenvalues)
-            {
-              diagonal.push_back(1./alpha + eigen_beta_alpha);
-              eigen_beta_alpha = beta/alpha;
-              offdiagonal.push_back(std::sqrt(beta)/alpha);
-            }
-          compute_eigs_and_cond(diagonal,offdiagonal,all_eigenvalues_signal,
-                                all_condition_numbers_signal);
+          diagonal.push_back(1./alpha + eigen_beta_alpha);
+          eigen_beta_alpha = beta/alpha;
+          offdiagonal.push_back(std::sqrt(beta)/alpha);
         }
+      compute_eigs_and_cond(diagonal,offdiagonal,all_eigenvalues_signal,
+                            all_condition_numbers_signal);
     }
-  catch (...)
-    {
-      deallog.pop();
-      throw;
-    }
+
   compute_eigs_and_cond(diagonal,offdiagonal,eigenvalues_signal,
                         condition_number_signal);
-
-  deallog.pop();
 
   // in case of failure: throw exception
   if (conv != SolverControl::success)

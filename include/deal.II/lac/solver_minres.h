@@ -193,7 +193,7 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
                                  const VectorType         &b,
                                  const PreconditionerType &preconditioner)
 {
-  deallog.push("minres");
+  LogStream::Prefix prefix("minres");
 
   // Memory allocation
   typename VectorMemory<VectorType>::Pointer Vu0 (this->memory);
@@ -349,9 +349,6 @@ SolverMinRes<VectorType>::solve (const MatrixType         &A,
       delta[0] = delta[1];
       delta[1] = delta[2];
     }
-
-  // Output
-  deallog.pop ();
 
   // in case of failure: throw exception
   AssertThrow(conv == SolverControl::success,
