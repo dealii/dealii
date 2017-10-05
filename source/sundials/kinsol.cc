@@ -153,7 +153,9 @@ namespace SUNDIALS
   {
     if (kinsol_mem)
       KINFree(&kinsol_mem);
+#ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
+#endif
   }
 
 
@@ -162,7 +164,6 @@ namespace SUNDIALS
   unsigned int KINSOL<VectorType>::solve(VectorType &initial_guess_and_solution)
   {
     unsigned int system_size = initial_guess_and_solution.size();
-    unsigned int local_system_size = system_size;
 
     // The solution is stored in
     // solution. Here we take only a
@@ -170,8 +171,8 @@ namespace SUNDIALS
 #ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
-        IndexSet is = initial_guess_and_solution.locally_owned_elements();
-        local_system_size = is.n_elements();
+        const IndexSet is = initial_guess_and_solution.locally_owned_elements();
+        const unsigned int local_system_size = is.n_elements();
 
         solution        = N_VNew_Parallel(communicator,
                                           local_system_size,
@@ -213,6 +214,7 @@ namespace SUNDIALS
     kinsol_mem = KINCreate();
 
     int status = KINInit(kinsol_mem, t_kinsol_function<VectorType> , solution);
+    (void) status;
     AssertKINSOL(status);
 
     status = KINSetUserData(kinsol_mem, (void *) this);

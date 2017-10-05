@@ -275,7 +275,7 @@ namespace SUNDIALS
         dq_relative_error(dq_relative_error),
         maximum_beta_failures(maximum_beta_failures),
         anderson_subspace_size(anderson_subspace_size)
-      {};
+      {}
 
       /**
        * Add all AdditionalData() parameters to the given ParameterHandler
@@ -560,15 +560,9 @@ namespace SUNDIALS
      * successive calls to solve_jacobian_systems() lead to better convergence
      * in the Newton process.
      *
-     * If you do not specify a solve_jacobian_system() function, then a fixed
-     * point iteration is used instead of a Newton method. Notice that this may
-     * not converge, or may converge very slowly.
-     *
-     * The Jacobian $J$ should be (an approximation of) the system Jacobian
-     * \f[
-     *   J = M - \gamma \frac{\partial f_I}{\partial y}
-     * \f]
-     * evaluated at `t`, `ycur`. `fcur` is $f_I(t,ycur)$.
+     * If you do not specify a solve_jacobian_system() function, then only a
+     * fixed point iteration strategy can be used. Notice that this may not
+     * converge, or may converge very slowly.
      *
      * A call to this function should store in `dst` the result of $J^{-1}$
      * applied to `src`, i.e., `J*dst = src`. It is the users responsability to
@@ -577,12 +571,11 @@ namespace SUNDIALS
      *
      * Arguments to the function are
      *
-     * @param[in] t  the current time
-     * @param[in] gamma  the current factor to use in the Jacobian computation
      * @param[in] ycur  is the current $y$ vector for the current KINSOL internal step
      * @param[in] fcur  is the current value of the implicit right-hand side at ycur,
      *        $f_I (t_n, ypred)$.
-     *
+     * @param[in] rhs  the system right hand side to solve for
+     * @param[out] dst the solution of $A^{-1} * src$
      *
      * This function should return:
      * - 0: Success
@@ -661,12 +654,10 @@ namespace SUNDIALS
      */
     N_Vector f_scale;
 
-#ifdef DEAL_II_WITH_MPI
     /**
      * MPI communicator. SUNDIALS solver runs happily in parallel.
      */
     MPI_Comm communicator;
-#endif
 
     /**
      * Memory pool of vectors.
