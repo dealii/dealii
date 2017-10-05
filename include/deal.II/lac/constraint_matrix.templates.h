@@ -1442,14 +1442,12 @@ namespace internals
       std::vector<Number> vector_values;
 
       /**
-       * Data array for reorder row/column indices. Use a shared ptr to
-       * global_rows to avoid defining in the .h file
+       * Data array for reorder row/column indices.
        */
       GlobalRowsFromLocal global_rows;
 
       /**
-       * Data array for reorder row/column indices. Use a shared ptr to
-       * global_rows to avoid defining in the .h file
+       * Data array for reorder row/column indices.
        */
       GlobalRowsFromLocal global_columns;
     };
