@@ -136,7 +136,7 @@ namespace VectorTools
               auto shifted_view = boost::make_iterator_range(
                                     std::begin(function_values[i]) + offset,
                                     std::begin(function_values[i]) + offset + dim);
-              std::vector<number> old_value(dim);
+              std::array<number,dim> old_value;
               std::copy(std::begin(shifted_view),
                         std::end(shifted_view),
                         std::begin(old_value));
@@ -164,7 +164,7 @@ namespace VectorTools
               auto shifted_view = boost::make_iterator_range(
                                     std::begin(function_values[i]) + offset,
                                     std::begin(function_values[i]) + offset + dim);
-              std::vector<number> old_value(dim);
+              std::array<number,dim> old_value;
               std::copy(std::begin(shifted_view),
                         std::end(shifted_view),
                         std::begin(old_value));
