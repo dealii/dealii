@@ -1,0 +1,5 @@
+Fixed: It was previously not possible to create objects of type Table
+with elements that are not copyable or copy constructible. An example
+of such a type is `std::unique_ptr`. This has now been fixed.
+<br>
+(Wolfgang Bangerth, 2017/10/02)
