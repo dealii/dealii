@@ -236,8 +236,6 @@ namespace MeshWorker
                       = periodic_neighbor?
                         cell->periodic_neighbor_of_coarser_periodic_neighbor(face_no):
                         cell->neighbor_of_coarser_neighbor(face_no);
-                    const typename CellIteratorType::AccessorType::Container::face_iterator nface
-                      = neighbor->face(neighbor_face_no.first);
 
                     face_worker(cell, face_no, numbers::invalid_unsigned_int,
                                 neighbor, neighbor_face_no.first, neighbor_face_no.second,
