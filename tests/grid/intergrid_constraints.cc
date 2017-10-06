@@ -13,11 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-/*
- * Author: Wolfgang Bangerth, University of Heidelberg, 2000
- *
- * Purpose: check some things with the intergrid map
- */
+// Purpose: check some things with the intergrid map
+
+// Note: really old and out of date test, but currently the only one for compute_intergrid_constraints
 
 #include "../tests.h"
 #include <deal.II/grid/tria.h>
@@ -37,11 +35,6 @@
 #include <deal.II/fe/fe_system.h>
 
 
-
-
-std::ofstream logfile("output");
-
-
 template <int dim>
 void check ()
 {
@@ -52,7 +45,7 @@ void check ()
   // create two grids
   Triangulation<dim> tria_1, tria_2;
   GridGenerator::hyper_cube (tria_1, -1, 1);
-  tria_1.refine_global (4-dim);
+  tria_1.refine_global (1);
   tria_2.copy_triangulation (tria_1);
 
   // create two different fe's:
@@ -103,7 +96,7 @@ void check ()
 
   // make several loops to refine the
   // two grids
-  for (unsigned int i=0; i<3; ++i)
+  for (unsigned int i=0; i<2; ++i)
     {
       deallog << "Refinement step " << i << std::endl;
 
@@ -130,8 +123,7 @@ void check ()
       deallog << "  Grid 2: " << tria_2.n_active_cells() << " cells, "
               << dof_2.n_dofs() << " dofs" << std::endl;
 
-      // now compute intergrid
-      // constraints
+      // now compute intergrid constraints
       InterGridMap<DoFHandler<dim> > intergrid_map;
       intergrid_map.make_mapping (dof_1, dof_2);
       ConstraintMatrix intergrid_constraints;
@@ -170,7 +162,7 @@ void check ()
                                                  intergrid_map,
                                                  intergrid_constraints);
 
-      intergrid_constraints.print (logfile);
+      intergrid_constraints.print (deallog.get_file_stream());
 
 
 
@@ -185,7 +177,7 @@ void check ()
         if (cell->active())
           {
             ++index;
-            if (index % 3 == 0)
+            if (index % (2*dim) == 0)
               {
                 cell->set_refine_flag ();
 
@@ -214,7 +206,7 @@ void check ()
         if (cell->active())
           {
             ++index;
-            if (index % 3 == 1)
+            if (index % (2*dim) == 1)
               cell->set_refine_flag ();
           };
 
@@ -225,21 +217,18 @@ void check ()
       // testing continuous elements
       // in 2d
 //      tria_2.refine_global(1);
-    };
+    }
 
   delete fe_1;
   delete fe_2;
-  if (fe_dq_quadratic != nullptr)
-    delete fe_dq_quadratic;
+  delete fe_dq_quadratic;
 }
 
 
 
 int main ()
 {
-  deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
-  deallog.attach(logfile);
+  initlog();
 
   check<1> ();
   check<2> ();
