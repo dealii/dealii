@@ -513,8 +513,10 @@ namespace internal
     {
       typedef types::global_dof_index size_type;
 
-      template <class VEC>
-      void set_zero_parallel(const std::vector<size_type> &cm, VEC &vec, size_type shift = 0)
+      template <class VectorType>
+      void set_zero_parallel(const std::vector<size_type> &cm,
+                             VectorType &vec,
+                             size_type shift = 0)
       {
         Assert(!vec.has_ghost_elements(), ExcInternalError());
         IndexSet locally_owned = vec.locally_owned_elements();
@@ -530,7 +532,7 @@ namespace internal
               continue;
             size_type idx = *it - shift;
             if (idx<vec.size() && locally_owned.is_element(idx))
-              internal::ElementAccess<VEC>::set(0., idx, vec);
+              internal::ElementAccess<VectorType>::set(0., idx, vec);
           }
       }
 
@@ -554,15 +556,19 @@ namespace internal
         vec.zero_out_ghosts();
       }
 
-      template <class VEC>
-      void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, std::integral_constant<bool, false>)
+      template <class VectorType>
+      void set_zero_in_parallel(const std::vector<size_type> &cm,
+                                VectorType                   &vec,
+                                std::integral_constant<bool, false>)
       {
         set_zero_parallel(cm, vec, 0);
       }
 
       // in parallel for BlockVectors
-      template <class VEC>
-      void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, std::integral_constant<bool, true>)
+      template <class VectorType>
+      void set_zero_in_parallel(const std::vector<size_type> &cm,
+                                VectorType                   &vec,
+                                std::integral_constant<bool, true>)
       {
         size_type start_shift = 0;
         for (size_type j=0; j<vec.n_blocks(); ++j)
@@ -572,30 +578,34 @@ namespace internal
           }
       }
 
-      template <class VEC>
-      void set_zero_serial(const std::vector<size_type> &cm, VEC &vec)
+      template <class VectorType>
+      void set_zero_serial(const std::vector<size_type> &cm,
+                           VectorType                   &vec)
       {
         for (typename std::vector<size_type>::const_iterator it = cm.begin();
              it != cm.end(); ++it)
           vec(*it) = 0.;
       }
 
-      template <class VEC>
-      void set_zero_all(const std::vector<size_type> &cm, VEC &vec)
+      template <class VectorType>
+      void set_zero_all(const std::vector<size_type> &cm,
+                        VectorType                   &vec)
       {
-        set_zero_in_parallel<VEC>(cm, vec, std::integral_constant<bool, IsBlockVector<VEC>::value>());
+        set_zero_in_parallel<VectorType>(cm, vec, std::integral_constant<bool, IsBlockVector<VectorType>::value>());
         vec.compress(VectorOperation::insert);
       }
 
 
       template <class T>
-      void set_zero_all(const std::vector<size_type> &cm, dealii::Vector<T> &vec)
+      void set_zero_all(const std::vector<size_type> &cm,
+                        dealii::Vector<T>            &vec)
       {
         set_zero_serial(cm, vec);
       }
 
       template <class T>
-      void set_zero_all(const std::vector<size_type> &cm, dealii::BlockVector<T> &vec)
+      void set_zero_all(const std::vector<size_type> &cm,
+                        dealii::BlockVector<T>       &vec)
       {
         set_zero_serial(cm, vec);
       }
@@ -1442,14 +1452,12 @@ namespace internals
       std::vector<Number> vector_values;
 
       /**
-       * Data array for reorder row/column indices. Use a shared ptr to
-       * global_rows to avoid defining in the .h file
+       * Data array for reorder row/column indices.
        */
       GlobalRowsFromLocal global_rows;
 
       /**
-       * Data array for reorder row/column indices. Use a shared ptr to
-       * global_rows to avoid defining in the .h file
+       * Data array for reorder row/column indices.
        */
       GlobalRowsFromLocal global_columns;
     };
@@ -1595,10 +1603,10 @@ namespace internals
   template <typename LocalType>
   static inline
   LocalType resolve_matrix_entry (const GlobalRowsFromLocal   &global_rows,
-                                  const GlobalRowsFromLocal &global_cols,
-                                  const size_type            i,
-                                  const size_type            j,
-                                  const size_type            loc_row,
+                                  const GlobalRowsFromLocal   &global_cols,
+                                  const size_type              i,
+                                  const size_type              j,
+                                  const size_type              loc_row,
                                   const FullMatrix<LocalType> &local_matrix)
   {
     const size_type loc_col = global_cols.local_row(j);
@@ -1646,14 +1654,14 @@ namespace internals
   template <typename number, typename LocalType>
   inline
   void
-  resolve_matrix_row (const GlobalRowsFromLocal &global_rows,
-                      const GlobalRowsFromLocal &global_cols,
-                      const size_type            i,
-                      const size_type            column_start,
-                      const size_type            column_end,
-                      const FullMatrix<LocalType> &local_matrix,
-                      size_type                *&col_ptr,
-                      number                   *&val_ptr)
+  resolve_matrix_row (const GlobalRowsFromLocal    &global_rows,
+                      const GlobalRowsFromLocal    &global_cols,
+                      const size_type               i,
+                      const size_type               column_start,
+                      const size_type               column_end,
+                      const FullMatrix<LocalType>  &local_matrix,
+                      size_type                   *&col_ptr,
+                      number                      *&val_ptr)
   {
     if (column_end == column_start)
       return;
@@ -1735,12 +1743,12 @@ namespace internals
   template <typename number, typename LocalType>
   inline
   void
-  resolve_matrix_row (const GlobalRowsFromLocal &global_rows,
-                      const size_type            i,
-                      const size_type            column_start,
-                      const size_type            column_end,
+  resolve_matrix_row (const GlobalRowsFromLocal   &global_rows,
+                      const size_type              i,
+                      const size_type              column_start,
+                      const size_type              column_end,
                       const FullMatrix<LocalType> &local_matrix,
-                      SparseMatrix<number>      *sparse_matrix)
+                      SparseMatrix<number>        *sparse_matrix)
   {
     if (column_end == column_start)
       return;
@@ -1881,11 +1889,11 @@ namespace internals
   // global row global_rows[i] as before, now for sparsity pattern
   inline
   void
-  resolve_matrix_row (const GlobalRowsFromLocal     &global_rows,
-                      const size_type                i,
-                      const size_type                column_start,
-                      const size_type                column_end,
-                      const Table<2,bool>           &dof_mask,
+  resolve_matrix_row (const GlobalRowsFromLocal        &global_rows,
+                      const size_type                   i,
+                      const size_type                   column_start,
+                      const size_type                   column_end,
+                      const Table<2,bool>              &dof_mask,
                       std::vector<size_type>::iterator &col_ptr)
   {
     if (column_end == column_start)
@@ -1973,13 +1981,13 @@ add_this_index:
   // do actually do something with this dof
   template <typename MatrixType, typename VectorType>
   inline void
-  set_matrix_diagonals (const internals::GlobalRowsFromLocal &global_rows,
-                        const std::vector<size_type>         &local_dof_indices,
-                        const FullMatrix<typename MatrixType::value_type>  &local_matrix,
-                        const ConstraintMatrix               &constraints,
-                        MatrixType                           &global_matrix,
-                        VectorType                           &global_vector,
-                        bool                                 use_inhomogeneities_for_rhs)
+  set_matrix_diagonals (const internals::GlobalRowsFromLocal              &global_rows,
+                        const std::vector<size_type>                      &local_dof_indices,
+                        const FullMatrix<typename MatrixType::value_type> &local_matrix,
+                        const ConstraintMatrix                            &constraints,
+                        MatrixType                                        &global_matrix,
+                        VectorType                                        &global_vector,
+                        bool                                               use_inhomogeneities_for_rhs)
   {
     if (global_rows.n_constraints() > 0)
       {
@@ -2227,12 +2235,12 @@ resolve_vector_entry (const size_type                       i,
 template <typename MatrixType, typename VectorType>
 void
 ConstraintMatrix::distribute_local_to_global (
-  const FullMatrix<typename MatrixType::value_type>     &local_matrix,
-  const Vector<typename VectorType::value_type>         &local_vector,
-  const std::vector<size_type>    &local_dof_indices,
-  MatrixType                      &global_matrix,
-  VectorType                      &global_vector,
-  bool                            use_inhomogeneities_for_rhs,
+  const FullMatrix<typename MatrixType::value_type> &local_matrix,
+  const Vector<typename VectorType::value_type>     &local_vector,
+  const std::vector<size_type>                      &local_dof_indices,
+  MatrixType                                        &global_matrix,
+  VectorType                                        &global_vector,
+  bool                                               use_inhomogeneities_for_rhs,
   std::integral_constant<bool, false>) const
 {
   // check whether we work on real vectors or we just used a dummy when
@@ -2324,6 +2332,7 @@ ConstraintMatrix::distribute_local_to_global (
                                                    local_vector,
                                                    local_dof_indices,
                                                    local_matrix);
+          AssertIsFinite(val);
 
           if (val != number ())
             {
@@ -2370,13 +2379,14 @@ ConstraintMatrix::distribute_local_to_global (
 template <typename MatrixType, typename VectorType>
 void
 ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &local_matrix,
-                            const Vector<typename VectorType::value_type>      &local_vector,
-                            const std::vector<size_type> &local_dof_indices,
-                            MatrixType                   &global_matrix,
-                            VectorType                   &global_vector,
-                            bool                          use_inhomogeneities_for_rhs,
-                            std::integral_constant<bool, true>) const
+distribute_local_to_global (
+  const FullMatrix<typename MatrixType::value_type> &local_matrix,
+  const Vector<typename VectorType::value_type>     &local_vector,
+  const std::vector<size_type>                      &local_dof_indices,
+  MatrixType                                        &global_matrix,
+  VectorType                                        &global_vector,
+  bool                                               use_inhomogeneities_for_rhs,
+  std::integral_constant<bool, true>) const
 {
   const bool use_vectors = (local_vector.size() == 0 &&
                             global_vector.size() == 0) ? false : true;
@@ -2490,10 +2500,10 @@ distribute_local_to_global (const FullMatrix<typename MatrixType::value_type>  &
 template <typename MatrixType>
 void
 ConstraintMatrix::distribute_local_to_global (
-  const FullMatrix<typename MatrixType::value_type>  &local_matrix,
-  const std::vector<size_type> &row_indices,
-  const std::vector<size_type> &col_indices,
-  MatrixType                   &global_matrix) const
+  const FullMatrix<typename MatrixType::value_type> &local_matrix,
+  const std::vector<size_type>                      &row_indices,
+  const std::vector<size_type>                      &col_indices,
+  MatrixType                                        &global_matrix) const
 {
   distribute_local_to_global(local_matrix, row_indices, *this,
                              col_indices, global_matrix);
@@ -2504,11 +2514,11 @@ ConstraintMatrix::distribute_local_to_global (
 template <typename MatrixType>
 void
 ConstraintMatrix::distribute_local_to_global (
-  const FullMatrix<typename MatrixType::value_type>  &local_matrix,
-  const std::vector<size_type> &row_indices,
-  const ConstraintMatrix       &col_constraint_matrix,
-  const std::vector<size_type> &col_indices,
-  MatrixType                   &global_matrix) const
+  const FullMatrix<typename MatrixType::value_type> &local_matrix,
+  const std::vector<size_type>                      &row_indices,
+  const ConstraintMatrix                            &col_constraint_matrix,
+  const std::vector<size_type>                      &col_indices,
+  MatrixType                                        &global_matrix) const
 {
   typedef typename MatrixType::value_type number;
 
