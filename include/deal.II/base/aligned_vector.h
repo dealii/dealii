@@ -581,26 +581,11 @@ namespace internal
     AlignedVectorDefaultInitialize (const std::size_t size,
                                     T *destination)
       :
-      destination_ (destination),
-      trivial_element (false)
+      destination_ (destination)
     {
       if (size == 0)
         return;
 
-      // do not use memcmp for long double because on some systems it does not
-      // completely fill its memory and may lead to false positives in
-      // e.g. valgrind
-      if (std::is_trivial<T>::value == true &&
-          std::is_same<T,long double>::value == false)
-        {
-          const unsigned char zero [sizeof(T)] = {};
-          // cast element to (void*) to silence compiler warning for virtual
-          // classes (they will never arrive here because they are
-          // non-trivial).
-          T element {};
-          if (std::memcmp(zero, (void *)&element, sizeof(T)) == 0)
-            trivial_element = true;
-        }
       if (size < minimum_parallel_grain_size)
         apply_to_subrange (0, size);
       else
@@ -617,7 +602,7 @@ namespace internal
       // element to (void*) to silence compiler warning for virtual
       // classes (they will never arrive here because they are
       // non-trivial).
-      if (std::is_trivial<T>::value == true && trivial_element)
+      if (std::is_trivial<T>::value == true)
         std::memset ((void *)(destination_+begin), 0, (end-begin)*sizeof(T));
       else
         default_construct_or_assign(begin, end,
@@ -626,7 +611,6 @@ namespace internal
 
   private:
     mutable T *destination_;
-    bool trivial_element;
 
     // copy assignment operation
     void default_construct_or_assign(const std::size_t begin,
