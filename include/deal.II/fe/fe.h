@@ -1574,6 +1574,92 @@ public:
   element_multiplicity (const unsigned int index) const;
 
   /**
+   * Return a reference to a contained finite element that matches the components
+   * selected by the given ComponentMask @p mask.
+   *
+   * For an arbitrarily nested FESystem, this function returns the inner-most
+   * FiniteElement that matches the given mask. The method fails if the @p mask
+   * does not exactly match one of the contained finite elements. It is most
+   * useful if the current object is an FESystem, as the return value can
+   * only be @p this in all other cases.
+   *
+   * Note that the returned object can be an FESystem if the
+   * mask matches it but not any of the contained objects.
+   *
+   * Let us illustrate the function with the an FESystem @p fe with 7 components:
+   * @code
+   * FESystem<2> fe_velocity(FE_Q<2>(2), 2);
+   * FE_Q<2> fe_pressure(1);
+   * FE_DGP<2> fe_dg(0);
+   * FE_BDM<2> fe_nonprim(1);
+   * FESystem<2> fe(fe_velocity, 1, fe_pressure, 1, fe_dg, 2, fe_nonprim, 1);
+   * @endcode
+   *
+   * The following table lists all possible component masks you can use:
+   * <table>
+   * <tr>
+   * <th>ComponentMask</th>
+   * <th>Result</th>
+   * <th>Description</th>
+   * </tr>
+   * <tr>
+   * <td><code>[true,true,true,true,true,true,true]</code></td>
+   * <td><code>FESystem<2>[FESystem<2>[FE_Q<2>(2)^2]-FE_Q<2>(1)-FE_DGP<2>(0)^2-FE_BDM<2>(1)]</code></td>
+   * <td>@p fe itself, the whole @p FESystem</td>
+   * </tr>
+   * <tr>
+   * <td><code>[true,true,false,false,false,false,false]</code></td>
+   * <td><code>FESystem<2>[FE_Q<2>(2)^2]</code></td>
+   * <td>just the @p fe_velocity</td>
+   * </tr>
+   * <tr>
+   * <td><code>[true,false,false,false,false,false,false]</code></td>
+   * <td><code>FE_Q<2>(2)</code></td>
+   * <td>The first component in @p fe_velocity</td>
+   * </tr>
+   * <tr>
+   * <td><code>[false,true,false,false,false,false,false]</code></td>
+   * <td><code>FE_Q<2>(2)</code></td>
+   * <td>The second component in @p fe_velocity</td>
+   * </tr>
+   * <tr>
+   * <td><code>[false,false,true,false,false,false,false]</code></td>
+   * <td><code>FE_Q<2>(1)</code></td>
+   * <td>@p fe_pressure</td>
+   * </tr>
+   * <tr>
+   * <td><code>[false,false,false,true,false,false,false]</code></td>
+   * <td><code>FE_DGP<2>(0)</code></td>
+   * <td>first copy of @p fe_dg</td>
+   * </tr>
+   * <tr>
+   * <td><code>[false,false,false,false,true,false,false]</code></td>
+   * <td><code>FE_DGP<2>(0)</code></td>
+   * <td>second copy of @p fe_dg</td>
+   * </tr>
+   * <tr>
+   * <td><code>[false,false,false,false,false,true,true]</code></td>
+   * <td><code>FE_BDM<2>(1)</code></td>
+   * <td>both components of @p fe_nonprim</td>
+   * </tr>
+   * </table>
+   */
+  const FiniteElement<dim,spacedim> &
+  get_sub_fe (const ComponentMask &mask) const;
+
+  /**
+   * Return a reference to a contained finite element that matches the components
+   * @p n_selected_components components starting at component with index
+   * @p first_component.
+   *
+   * See the other get_sub_fe() function above for more details.
+   */
+  virtual
+  const FiniteElement<dim,spacedim> &
+  get_sub_fe (const unsigned int first_component,
+              const unsigned int n_selected_components) const;
+
+  /**
    * Return for shape function @p index the base element it belongs to, the
    * number of the copy of this base element (which is between zero and the
    * multiplicity of this element), and the index of this shape function
@@ -2986,6 +3072,7 @@ FiniteElement<dim,spacedim>::face_system_to_component_index (const unsigned int 
 
   return face_system_to_component_table[index];
 }
+
 
 
 

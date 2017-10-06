@@ -71,7 +71,6 @@ FESystem<dim,spacedim>::InternalData::~InternalData()
 }
 
 
-
 template <int dim, int spacedim>
 typename FiniteElement<dim,spacedim>::InternalDataBase &
 FESystem<dim,spacedim>::
@@ -329,6 +328,31 @@ FESystem<dim,spacedim>::clone() const
       multiplicities.push_back(this->element_multiplicity(i) );
     }
   return std_cxx14::make_unique<FESystem<dim,spacedim>>(fes, multiplicities);
+}
+
+
+
+template <int dim, int spacedim>
+const FiniteElement<dim,spacedim> &
+FESystem<dim,spacedim>::
+get_sub_fe (const unsigned int first_component,
+            const unsigned int n_selected_components) const
+{
+  Assert(first_component+n_selected_components <= this->n_components(),
+         ExcMessage("Invalid arguments (not a part of this FiniteElement)."));
+
+  const unsigned int base_index = this->component_to_base_table[first_component].first.first;
+  const unsigned int component_in_base = this->component_to_base_table[first_component].first.second;
+  const unsigned int base_components = this->base_element(base_index).n_components();
+
+  // Only select our child base_index if that is all the user wanted. Error
+  // handling will be done inside the recursion.
+  if (n_selected_components<=base_components)
+    return this->base_element(base_index).get_sub_fe(component_in_base, n_selected_components);
+
+  Assert(n_selected_components == this->n_components(),
+         ExcMessage("You can not select a part of a FiniteElement."));
+  return *this;
 }
 
 

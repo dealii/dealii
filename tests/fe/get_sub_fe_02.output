@@ -1,0 +1,49 @@
+
+DEAL::
+<table>
+<tr>
+<th>ComponentMask</th>
+<th>Result</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><code>[true,true,true,true,true,true,true]</code></td>
+<td><code>FESystem<2>[FESystem<2>[FE_Q<2>(2)^2]-FE_Q<2>(1)-FE_DGP<2>(0)^2-FE_BDM<2>(1)]</code></td>
+<td>@p fe itself, the whole @p FESystem</td>
+</tr>
+<tr>
+<td><code>[true,true,false,false,false,false,false]</code></td>
+<td><code>FESystem<2>[FE_Q<2>(2)^2]</code></td>
+<td>just the @p fe_velocity</td>
+</tr>
+<tr>
+<td><code>[true,false,false,false,false,false,false]</code></td>
+<td><code>FE_Q<2>(2)</code></td>
+<td>The first component in @p fe_velocity</td>
+</tr>
+<tr>
+<td><code>[false,true,false,false,false,false,false]</code></td>
+<td><code>FE_Q<2>(2)</code></td>
+<td>The second component in @p fe_velocity</td>
+</tr>
+<tr>
+<td><code>[false,false,true,false,false,false,false]</code></td>
+<td><code>FE_Q<2>(1)</code></td>
+<td>@p fe_pressure</td>
+</tr>
+<tr>
+<td><code>[false,false,false,true,false,false,false]</code></td>
+<td><code>FE_DGP<2>(0)</code></td>
+<td>first copy of @p fe_dg</td>
+</tr>
+<tr>
+<td><code>[false,false,false,false,true,false,false]</code></td>
+<td><code>FE_DGP<2>(0)</code></td>
+<td>second copy of @p fe_dg</td>
+</tr>
+<tr>
+<td><code>[false,false,false,false,false,true,true]</code></td>
+<td><code>FE_BDM<2>(1)</code></td>
+<td>both components of @p fe_nonprim</td>
+</tr>
+</table>
