@@ -17,6 +17,7 @@
 #define dealii_sundials_arkode_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/mpi.h>
 #ifdef DEAL_II_WITH_SUNDIALS
 
 #include <deal.II/base/logstream.h>
@@ -36,6 +37,9 @@
 #include <arkode/arkode.h>
 #include <arkode/arkode_impl.h>
 #include <nvector/nvector_serial.h>
+#ifdef DEAL_II_WITH_MPI
+#include <nvector/nvector_parallel.h>
+#endif
 #include <sundials/sundials_math.h>
 #include <sundials/sundials_types.h>
 
@@ -360,7 +364,7 @@ namespace SUNDIALS
         maximum_non_linear_iterations(maximum_non_linear_iterations),
         implicit_function_is_linear(implicit_function_is_linear),
         implicit_function_is_time_independent(implicit_function_is_time_independent)
-      {};
+      {}
 
       /**
        * Add all AdditionalData() parameters to the given ParameterHandler
@@ -486,6 +490,9 @@ namespace SUNDIALS
      * Constructor. It is possible to fine tune the SUNDIALS ARKode solver by
      * passing an AdditionalData() object that sets all of the solver
      * parameters.
+     *
+     * The MPI communicator is simply ignored in the serial case.
+     *
      *
      * @param data ARKode configuration data
      * @param mpi_comm MPI communicator
@@ -851,12 +858,12 @@ namespace SUNDIALS
      */
     N_Vector abs_tolls;
 
-#ifdef DEAL_II_WITH_MPI
     /**
-     * MPI communicator. SUNDIALS solver runs happily in parallel.
+     * MPI communicator. SUNDIALS solver runs happily in
+     * parallel. Note that if the library is compiled without MPI
+     * support, MPI_Comm is typedefed as int.
      */
     MPI_Comm communicator;
-#endif
 
     /**
      * Memory pool of vectors.

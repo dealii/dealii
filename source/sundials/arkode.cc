@@ -208,7 +208,8 @@ namespace SUNDIALS
   }
 
   template <typename VectorType>
-  ARKode<VectorType>::ARKode(const AdditionalData &data, const MPI_Comm mpi_comm) :
+  ARKode<VectorType>::ARKode(const AdditionalData &data,
+                             const MPI_Comm mpi_comm) :
     data(data),
     arkode_mem(nullptr),
     communicator(Utilities::MPI::duplicate_communicator(mpi_comm))
@@ -221,7 +222,9 @@ namespace SUNDIALS
   {
     if (arkode_mem)
       ARKodeFree(&arkode_mem);
+#ifdef DEAL_II_WITH_MPI
     MPI_Comm_free(&communicator);
+#endif
   }
 
 
@@ -231,7 +234,6 @@ namespace SUNDIALS
   {
 
     unsigned int system_size = solution.size();
-    unsigned int local_system_size = system_size;
 
     double t = data.initial_time;
     double h = data.initial_step_size;
@@ -246,8 +248,8 @@ namespace SUNDIALS
 #ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
-        IndexSet is = solution.locally_owned_elements();
-        local_system_size = is.n_elements();
+        const IndexSet is = solution.locally_owned_elements();
+        const size_t local_system_size = is.n_elements();
 
         yy        = N_VNew_Parallel(communicator,
                                     local_system_size,
@@ -320,7 +322,6 @@ namespace SUNDIALS
   {
 
     unsigned int system_size;
-    unsigned int local_system_size;
 
     if (arkode_mem)
       ARKodeFree(&arkode_mem);
@@ -350,8 +351,8 @@ namespace SUNDIALS
 #ifdef DEAL_II_WITH_MPI
     if (is_serial_vector<VectorType>::value == false)
       {
-        IndexSet is = solution.locally_owned_elements();
-        local_system_size = is.n_elements();
+        const IndexSet is = solution.locally_owned_elements();
+        const size_t local_system_size = is.n_elements();
 
         yy        = N_VNew_Parallel(communicator,
                                     local_system_size,
