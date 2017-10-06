@@ -249,7 +249,9 @@ namespace VectorTools
 
     // Internal implementation of interpolate that takes a generic functor
     // function such that function(cell) is of type
-    // Function<spacedim, typename VectorType::value_type>
+    // Function<spacedim, typename VectorType::value_type>*
+    //
+    // A given cell is skipped if function(cell) == nullptr
     template <int dim,
               int spacedim,
               typename VectorType,
@@ -370,6 +372,12 @@ namespace VectorTools
           if (fe[fe_index].dofs_per_cell == 0)
             continue;
 
+          // Skip processing of the current cell if the function object is
+          // invalid. This is used by interpolate_by_material_id to skip
+          // interpolating over cells with unknown material id.
+          if (!function(cell))
+            continue;
+
           // Get transformed, generalized support points
           fe_values.reinit(cell);
           const std::vector<Point<spacedim> > &generalized_support_points =
@@ -390,11 +398,11 @@ namespace VectorTools
           dof_values.resize(n_dofs);
 
           // Get all function values:
-          Assert(n_components == function(cell).n_components,
+          Assert(n_components == function(cell)->n_components,
                  ExcDimensionMismatch(dof_handler.get_fe().n_components(),
-                                      function(cell).n_components));
-          function(cell).vector_value_list(generalized_support_points,
-                                           function_values);
+                                      function(cell)->n_components));
+          function(cell)->vector_value_list(generalized_support_points,
+                                            function_values);
 
           {
             // Before we can average, we have to transform all function values
@@ -500,9 +508,9 @@ namespace VectorTools
     // internal implementation
     const auto function_map = [&function](
                                 const typename DoFHandlerType<dim, spacedim>::active_cell_iterator &)
-                              -> const Function<spacedim, typename VectorType::value_type> &
+                              -> const Function<spacedim, typename VectorType::value_type> *
     {
-      return function;
+      return &function;
     };
 
     interpolate(mapping, dof_handler, function_map, vec, component_mask);
@@ -591,158 +599,36 @@ namespace VectorTools
   void
   interpolate_based_on_material_id
   (const Mapping<dim,spacedim>        &mapping,
-   const DoFHandlerType<dim,spacedim> &dof,
-   const std::map<types::material_id, const Function<spacedim, typename VectorType::value_type> *> &function_map,
-   VectorType                         &dst,
+   const DoFHandlerType<dim,spacedim> &dof_handler,
+   const std::map<types::material_id, const Function<spacedim, typename VectorType::value_type> *> &functions,
+   VectorType                         &vec,
    const ComponentMask                &component_mask)
   {
-    typedef typename VectorType::value_type number;
+    Assert(component_mask.represents_n_components(dof_handler.get_fe().n_components()),
+           ExcMessage("The number of components in the mask has to be either "
+                      "zero or equal to the number of components in the finite "
+                      "element."));
 
-    Assert( component_mask.represents_n_components(dof.get_fe(0).n_components()),
-            ExcMessage("The number of components in the mask has to be either "
-                       "zero or equal to the number of components in the finite "
-                       "element.") );
+    Assert (vec.size() == dof_handler.n_dofs(),
+            ExcDimensionMismatch (vec.size(), dof_handler.n_dofs()));
 
-    if ( function_map.size() == 0 )
-      return;
+    Assert (component_mask.n_selected_components(dof_handler.get_fe().n_components()) > 0,
+            ComponentMask::ExcNoComponentSelected());
 
-    Assert( function_map.find(numbers::invalid_material_id) == function_map.end(),
-            ExcMessage("You cannot specify the invalid material indicator "
-                       "in your function map."));
+    // Create a small lambda capture wrapping the function map and call the
+    // internal implementation
+    const auto function_map = [&functions](
+                                const typename DoFHandlerType<dim, spacedim>::active_cell_iterator &cell)
+                              -> const Function<spacedim, typename VectorType::value_type> *
+    {
+      const auto function = functions.find(cell->material_id());
+      if (function != functions.end())
+        return function->second;
+      else
+        return nullptr;
+    };
 
-    for (typename std::map<types::material_id, const Function<spacedim, number>* >
-         ::const_iterator
-         iter  = function_map.begin();
-         iter != function_map.end();
-         ++iter )
-      {
-        Assert( dof.get_fe(0).n_components() == iter->second->n_components,
-                ExcDimensionMismatch(dof.get_fe(0).n_components(), iter->second->n_components) );
-      }
-
-    const hp::FECollection<dim, spacedim> &fe = dof.get_fe_collection();
-    const unsigned int n_components =  fe.n_components();
-    const bool         fe_is_system = (n_components != 1);
-
-    typename DoFHandlerType<dim,spacedim>::active_cell_iterator
-    cell = dof.begin_active(),
-    endc = dof.end();
-
-    std::vector< std::vector< Point<dim> > > unit_support_points(fe.size());
-    for (unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
-      {
-        unit_support_points[fe_index] = fe[fe_index].get_unit_support_points();
-        Assert( unit_support_points[fe_index].size() != 0,
-                ExcNonInterpolatingFE() );
-      }
-
-    std::vector< std::vector<unsigned int> > dofs_of_rep_points(fe.size());
-    std::vector< std::vector<unsigned int> > dof_to_rep_index_table(fe.size());
-    std::vector<unsigned int>                n_rep_points(fe.size(), 0);
-
-    for (unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
-      {
-        for (unsigned int i = 0; i < fe[fe_index].dofs_per_cell; ++i)
-          {
-            bool representative = true;
-
-            for (unsigned int j = dofs_of_rep_points[fe_index].size(); j > 0; --j)
-              if ( unit_support_points[fe_index][i]
-                   == unit_support_points[fe_index][dofs_of_rep_points[fe_index][j-1]] )
-                {
-                  dof_to_rep_index_table[fe_index].push_back(j-1);
-                  representative = false;
-                  break;
-                }
-
-            if (representative)
-              {
-                dof_to_rep_index_table[fe_index].push_back(dofs_of_rep_points[fe_index].size());
-                dofs_of_rep_points[fe_index].push_back(i);
-                ++n_rep_points[fe_index];
-              }
-          }
-
-        Assert( dofs_of_rep_points[fe_index].size() == n_rep_points[fe_index],
-                ExcInternalError() );
-        Assert( dof_to_rep_index_table[fe_index].size() == fe[fe_index].dofs_per_cell,
-                ExcInternalError() );
-      }
-
-    const unsigned int max_rep_points = *std::max_element(n_rep_points.begin(),
-                                                          n_rep_points.end());
-    std::vector< types::global_dof_index> dofs_on_cell(fe.max_dofs_per_cell());
-    std::vector< Point<spacedim> > rep_points(max_rep_points);
-
-    std::vector< std::vector<number> >           function_values_scalar(fe.size());
-    std::vector< std::vector< Vector<number> > > function_values_system(fe.size());
-
-    hp::QCollection<dim> support_quadrature;
-    for (unsigned int fe_index = 0; fe_index < fe.size(); ++fe_index)
-      support_quadrature.push_back( Quadrature<dim>(unit_support_points[fe_index]) );
-
-    hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
-    hp::FEValues<dim, spacedim> fe_values(mapping_collection,
-                                          fe,
-                                          support_quadrature,
-                                          update_quadrature_points);
-
-    for ( ; cell != endc; ++cell)
-      if ( cell->is_locally_owned() )
-        if ( function_map.find(cell->material_id()) != function_map.end() )
-          {
-            const unsigned int fe_index = cell->active_fe_index();
-
-            fe_values.reinit(cell);
-
-            const std::vector< Point<spacedim> > &support_points
-              = fe_values.get_present_fe_values().get_quadrature_points();
-
-            rep_points.resize( dofs_of_rep_points[fe_index].size() );
-            for (unsigned int i = 0; i < dofs_of_rep_points[fe_index].size(); ++i)
-              rep_points[i] = support_points[dofs_of_rep_points[fe_index][i]];
-
-            dofs_on_cell.resize( fe[fe_index].dofs_per_cell );
-            cell->get_dof_indices(dofs_on_cell);
-
-            if (fe_is_system)
-              {
-                function_values_system[fe_index].resize( n_rep_points[fe_index],
-                                                         Vector<number>(fe[fe_index].n_components()) );
-
-                function_map.find(cell->material_id())->second->vector_value_list(rep_points,
-                    function_values_system[fe_index]);
-
-                for (unsigned int i = 0; i < fe[fe_index].dofs_per_cell; ++i)
-                  {
-                    const unsigned int component = fe[fe_index].system_to_component_index(i).first;
-
-                    if ( component_mask[component] )
-                      {
-                        const unsigned int rep_dof = dof_to_rep_index_table[fe_index][i];
-                        ::dealii::internal::ElementAccess<VectorType>::set(
-                          function_values_system[fe_index][rep_dof](component),
-                          dofs_on_cell[i], dst);
-                      }
-                  }
-              }
-            else
-              {
-                function_values_scalar[fe_index].resize(n_rep_points[fe_index]);
-
-                function_map.find(cell->material_id())->second->value_list
-                (rep_points,
-                 function_values_scalar[fe_index],
-                 0);
-
-                for (unsigned int i = 0; i < fe[fe_index].dofs_per_cell; ++i)
-                  ::dealii::internal::ElementAccess<VectorType>::set(
-                    function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]],
-                    dofs_on_cell[i], dst);
-              }
-          }
-
-    dst.compress (VectorOperation::insert);
+    interpolate(mapping, dof_handler, function_map, vec, component_mask);
   }
 
 
