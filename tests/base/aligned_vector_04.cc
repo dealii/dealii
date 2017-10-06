@@ -46,6 +46,14 @@ public:
     deallog << "Construct object" << std::endl;
   }
 
+  Function(const Function &f)
+    :
+    size_ (f.size_),
+    vec (f.vec)
+  {
+    deallog << "Copy construct object" << std::endl;
+  }
+
   ~Function()
   {
     deallog << "Destruct with size " << vec.size() << std::endl;
