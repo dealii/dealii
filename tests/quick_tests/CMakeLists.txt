@@ -59,7 +59,7 @@ MACRO(make_quicktest test_basename build_name mpi_run)
   # this is a hack to make sure the -OK file is deleted
   # even if compilation fails.
   ADD_CUSTOM_TARGET(kill-${_target}-OK
-        COMMAND rm -f ${_target}-OK 
+        COMMAND rm -f ${_target}-OK
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
   ADD_DEPENDENCIES(${_target} kill-${_target}-OK)
@@ -70,7 +70,10 @@ MACRO(make_quicktest test_basename build_name mpi_run)
       -P ${CMAKE_SOURCE_DIR}/cmake/scripts/run_test.cmake
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
-  SET_TESTS_PROPERTIES(${_target} PROPERTIES LABEL "sanity checks")
+  SET_TESTS_PROPERTIES(${_target} PROPERTIES
+    LABEL "sanity checks"
+    ENVIRONMENT "OMPI_MCA_rmaps_base_oversubscribe=1")
+  # ^^^ Allow oversubscription for MPI (needed for Openmpi@3.0)
 ENDMACRO()
 
 
