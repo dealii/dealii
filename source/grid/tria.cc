@@ -6373,7 +6373,7 @@ namespace internal
                         ->line((hex->face(5)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3)         //3
                       };
 
-                      lines = &lines_x[0];
+                      lines = lines_x;
 
                       unsigned int line_indices_x[4];
 

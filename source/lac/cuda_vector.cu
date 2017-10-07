@@ -593,7 +593,7 @@ namespace LinearAlgebra
           AssertCuda(error_code);
 
           // Copy the vector from the host to the temporary vector on the device
-          error_code = cudaMemcpy(&tmp[0], V.begin(), n_elements*sizeof(Number),
+          error_code = cudaMemcpy(tmp, V.begin(), n_elements*sizeof(Number),
                                   cudaMemcpyHostToDevice);
           AssertCuda(error_code);
 

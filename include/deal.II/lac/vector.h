@@ -1052,7 +1052,7 @@ inline
 typename Vector<Number>::iterator
 Vector<Number>::begin ()
 {
-  return &val[0];
+  return val;
 }
 
 
@@ -1062,7 +1062,7 @@ inline
 typename Vector<Number>::const_iterator
 Vector<Number>::begin () const
 {
-  return &val[0];
+  return val;
 }
 
 
@@ -1072,7 +1072,7 @@ inline
 typename Vector<Number>::iterator
 Vector<Number>::end ()
 {
-  return &val[vec_size];
+  return val + vec_size;
 }
 
 
@@ -1082,7 +1082,7 @@ inline
 typename Vector<Number>::const_iterator
 Vector<Number>::end () const
 {
-  return &val[vec_size];
+  return val + vec_size;
 }
 
 

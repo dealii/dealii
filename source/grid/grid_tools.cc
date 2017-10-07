@@ -3112,8 +3112,8 @@ next_cell:
 
         const Tensor<spacedim-structdim,spacedim>
         average_parent_alternating_form
-          = std::accumulate (&parent_alternating_forms[0],
-                             &parent_alternating_forms[GeometryInfo<structdim>::vertices_per_cell],
+          = std::accumulate (parent_alternating_forms,
+                             parent_alternating_forms + GeometryInfo<structdim>::vertices_per_cell,
                              Tensor<spacedim-structdim,spacedim>());
 
         // now do the same

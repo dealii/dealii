@@ -274,7 +274,7 @@ namespace
 
       do
         {
-          int ierr = MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
+          int ierr = MPI_Bcast (interesting_range, 2, MPI_DOUBLE,
                                 master_mpi_rank, mpi_communicator);
           AssertThrowMPI(ierr);
 
@@ -371,7 +371,7 @@ namespace
 
       do
         {
-          int ierr = MPI_Bcast (&interesting_range[0], 2, MPI_DOUBLE,
+          int ierr = MPI_Bcast (interesting_range, 2, MPI_DOUBLE,
                                 master_mpi_rank, mpi_communicator);
           AssertThrowMPI(ierr);
 

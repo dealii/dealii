@@ -2160,7 +2160,7 @@ namespace GridGenerator
         cells[i].material_id = 0;
       };
     tria.create_triangulation (
-      std::vector<Point<2> >(&vertices[0], &vertices[10]),
+      std::vector<Point<2> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
 
@@ -2188,7 +2188,7 @@ namespace GridGenerator
     vertices_tmp[2] = Point<2> (-half_length, radius_0);
     vertices_tmp[3] = Point<2> (half_length, radius_1);
 
-    const std::vector<Point<2> > vertices (&vertices_tmp[0], &vertices_tmp[4]);
+    const std::vector<Point<2> > vertices (std::begin(vertices_tmp), std::end(vertices_tmp));
     unsigned int cell_vertices[1][GeometryInfo<2>::vertices_per_cell];
 
     for (unsigned int i = 0; i < GeometryInfo<2>::vertices_per_cell; ++i)
@@ -2245,7 +2245,7 @@ namespace GridGenerator
       };
 
     tria.create_triangulation (
-      std::vector<Point<2> >(&vertices[0], &vertices[8]),
+      std::vector<Point<2> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());
 
@@ -2310,7 +2310,7 @@ namespace GridGenerator
       };
 
     tria.create_triangulation (
-      std::vector<Point<2> >(&vertices[0], &vertices[8]),
+      std::vector<Point<2> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
   }
@@ -2466,7 +2466,7 @@ namespace GridGenerator
       };
 
     tria.create_triangulation (
-      std::vector<Point<dim> >(&vertices[0], &vertices[7]),
+      std::vector<Point<dim> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
 
@@ -2527,7 +2527,7 @@ namespace GridGenerator
       };
 
     tria.create_triangulation (
-      std::vector<Point<2> >(&vertices[0], &vertices[8]),
+      std::vector<Point<2> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
 
@@ -2762,7 +2762,7 @@ namespace GridGenerator
         cells[i].material_id = 0;
       };
     tria.create_triangulation (
-      std::vector<Point<3> >(&vertices[0], &vertices[20]),
+      std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
 
@@ -2985,7 +2985,7 @@ namespace GridGenerator
       };
 
     tria.create_triangulation (
-      std::vector<Point<3> >(&vertices[0], &vertices[26]),
+      std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
 
@@ -3055,7 +3055,7 @@ namespace GridGenerator
       };
 
     tria.create_triangulation (
-      std::vector<Point<3> >(&vertices[0], &vertices[n_vertices]),
+      std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
   }
@@ -3144,7 +3144,7 @@ namespace GridGenerator
       };
 
     tria.create_triangulation (
-      std::vector<Point<3> >(&vertices[0], &vertices[24]),
+      std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
 
@@ -3236,7 +3236,7 @@ namespace GridGenerator
       };
 
     tria.create_triangulation (
-      std::vector<Point<dim> >(&vertices[0], &vertices[15]),
+      std::vector<Point<dim> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
 
@@ -3337,7 +3337,7 @@ namespace GridGenerator
       };
 
     tria.create_triangulation (
-      std::vector<Point<3> >(&vertices[0], &vertices[16]),
+      std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
       cells,
       SubCellData());       // no boundary information
 
@@ -3676,7 +3676,7 @@ namespace GridGenerator
           };
 
         tria.create_triangulation (
-          std::vector<Point<3> >(&vertices[0], &vertices[16]),
+          std::vector<Point<3> >(std::begin(vertices), std::end(vertices)),
           cells,
           SubCellData());       // no boundary information
       }

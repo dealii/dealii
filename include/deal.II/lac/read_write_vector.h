@@ -756,7 +756,7 @@ namespace LinearAlgebra
   typename ReadWriteVector<Number>::iterator
   ReadWriteVector<Number>::begin ()
   {
-    return &val[0];
+    return val;
   }
 
 
@@ -766,7 +766,7 @@ namespace LinearAlgebra
   typename ReadWriteVector<Number>::const_iterator
   ReadWriteVector<Number>::begin () const
   {
-    return &val[0];
+    return val;
   }
 
 
@@ -776,7 +776,7 @@ namespace LinearAlgebra
   typename ReadWriteVector<Number>::iterator
   ReadWriteVector<Number>::end ()
   {
-    return &val[this->n_elements()];
+    return val + this->n_elements();
   }
 
 
@@ -786,7 +786,7 @@ namespace LinearAlgebra
   typename ReadWriteVector<Number>::const_iterator
   ReadWriteVector<Number>::end () const
   {
-    return &val[this->n_elements()];
+    return val + this->n_elements();
   }
 
 

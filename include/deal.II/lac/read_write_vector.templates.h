@@ -438,7 +438,7 @@ namespace LinearAlgebra
     const unsigned int n_elements = stored_elements.n_elements();
     if (operation == VectorOperation::insert)
       {
-        cudaError_t error_code = cudaMemcpy(&val[0], cuda_vec.get_values(),
+        cudaError_t error_code = cudaMemcpy(val, cuda_vec.get_values(),
                                             n_elements*sizeof(Number),
                                             cudaMemcpyDeviceToHost);
         AssertCuda(error_code);
