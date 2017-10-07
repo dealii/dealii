@@ -1659,8 +1659,8 @@ inline
 void
 BlockMatrixBase<MatrixType>::set (const std::vector<size_type> &row_indices,
                                   const std::vector<size_type> &col_indices,
-                                  const FullMatrix<number>        &values,
-                                  const bool                       elide_zero_values)
+                                  const FullMatrix<number>     &values,
+                                  const bool                    elide_zero_values)
 {
   Assert (row_indices.size() == values.m(),
           ExcDimensionMismatch(row_indices.size(), values.m()));
@@ -1679,8 +1679,8 @@ template <typename number>
 inline
 void
 BlockMatrixBase<MatrixType>::set (const std::vector<size_type> &indices,
-                                  const FullMatrix<number>        &values,
-                                  const bool                       elide_zero_values)
+                                  const FullMatrix<number>     &values,
+                                  const bool                    elide_zero_values)
 {
   Assert (indices.size() == values.m(),
           ExcDimensionMismatch(indices.size(), values.m()));
