@@ -100,6 +100,11 @@ void test()
               << tria.begin_active()->extent_in_direction(0) << std::endl;
       deallog << "dim" << dim << ":case" << case_no << ":minimum_vertex_distance="
               << tria.begin_active()->minimum_vertex_distance() << std::endl;
+
+      const BoundingBox<dim> box = tria.begin_active()->bounding_box();
+      const std::pair<Point<dim>, Point<dim> > &pts = box.get_boundary_points();
+      deallog << "dim" << dim << ":case" << case_no << ":bounding_box="
+              << pts.first << ", " << pts.second << std::endl;
       tria.clear();
     }
 }
