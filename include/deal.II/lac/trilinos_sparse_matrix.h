@@ -2962,7 +2962,7 @@ namespace TrilinosWrappers
     Assert (values.m() == values.n(), ExcNotQuadratic());
 
     for (size_type i=0; i<indices.size(); ++i)
-      set (indices[i], indices.size(), &indices[0], &values(i,0),
+      set (indices[i], indices.size(), indices.data(), &values(i,0),
            elide_zero_values);
   }
 

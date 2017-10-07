@@ -315,10 +315,10 @@ namespace DoFRenumbering
 
       minimum_degree_ordering
       (G,
-       make_iterator_property_map(&degree[0], id, degree[0]),
-       &inverse_perm[0],
-       &perm[0],
-       make_iterator_property_map(&supernode_sizes[0], id, supernode_sizes[0]),
+       make_iterator_property_map(degree.begin(), id, degree[0]),
+       inverse_perm.data(),
+       perm.data(),
+       make_iterator_property_map(supernode_sizes.begin(), id, supernode_sizes[0]),
        delta, id);
 
 
@@ -733,9 +733,9 @@ namespace DoFRenumbering
         all_dof_counts(fe_collection.n_components() *
                        Utilities::MPI::n_mpi_processes (tria->get_communicator()));
 
-        const int ierr = MPI_Allgather ( &local_dof_count[0],
+        const int ierr = MPI_Allgather ( local_dof_count.data(),
                                          n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
-                                         &all_dof_counts[0],
+                                         all_dof_counts.data(),
                                          n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
                                          tria->get_communicator());
         AssertThrowMPI(ierr);
@@ -1021,9 +1021,9 @@ namespace DoFRenumbering
         all_dof_counts(fe_collection.n_components() *
                        Utilities::MPI::n_mpi_processes (tria->get_communicator()));
 
-        const int ierr = MPI_Allgather ( &local_dof_count[0],
+        const int ierr = MPI_Allgather ( local_dof_count.data(),
                                          n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
-                                         &all_dof_counts[0],
+                                         all_dof_counts.data(),
                                          n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
                                          tria->get_communicator());
         AssertThrowMPI(ierr);

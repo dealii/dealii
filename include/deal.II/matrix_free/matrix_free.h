@@ -1164,7 +1164,7 @@ MatrixFree<dim,Number>::constraint_pool_begin (const unsigned int row) const
 {
   AssertIndexRange (row, constraint_pool_row_index.size()-1);
   return constraint_pool_data.empty() ? nullptr :
-         &constraint_pool_data[0] + constraint_pool_row_index[row];
+         constraint_pool_data.data() + constraint_pool_row_index[row];
 }
 
 
@@ -1176,7 +1176,7 @@ MatrixFree<dim,Number>::constraint_pool_end (const unsigned int row) const
 {
   AssertIndexRange (row, constraint_pool_row_index.size()-1);
   return constraint_pool_data.empty() ? nullptr :
-         &constraint_pool_data[0] + constraint_pool_row_index[row+1];
+         constraint_pool_data.data() + constraint_pool_row_index[row+1];
 }
 
 
@@ -1235,13 +1235,13 @@ MatrixFree<dim,Number>::create_cell_subrange_hp_by_index
 #endif
       std::pair<unsigned int,unsigned int> return_range;
       return_range.first =
-        std::lower_bound(&fe_indices[0] + range.first,
-                         &fe_indices[0] + range.second, fe_index)
-        -&fe_indices[0] ;
+        std::lower_bound(fe_indices.data() + range.first,
+                         fe_indices.data() + range.second, fe_index)
+        -fe_indices.data() ;
       return_range.second =
-        std::lower_bound(&fe_indices[0] + return_range.first,
-                         &fe_indices[0] + range.second,
-                         fe_index + 1)-&fe_indices[0];
+        std::lower_bound(fe_indices.data() + return_range.first,
+                         fe_indices.data() + range.second,
+                         fe_index + 1)-fe_indices.data();
       Assert(return_range.first >= range.first &&
              return_range.second <= range.second, ExcInternalError());
       return return_range;

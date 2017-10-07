@@ -125,8 +125,8 @@ namespace Utilities
       // processors in this case, which is more expensive than the reduction
       // operation above in MPI_Allreduce)
       std::vector<unsigned int> all_destinations (max_n_destinations * n_procs);
-      const int ierr = MPI_Allgather (&my_destinations[0], max_n_destinations, MPI_UNSIGNED,
-                                      &all_destinations[0], max_n_destinations, MPI_UNSIGNED,
+      const int ierr = MPI_Allgather (my_destinations.data(), max_n_destinations, MPI_UNSIGNED,
+                                      all_destinations.data(), max_n_destinations, MPI_UNSIGNED,
                                       mpi_comm);
       AssertThrowMPI(ierr);
 
@@ -388,8 +388,8 @@ namespace Utilities
 
           std::vector<char> all_hostnames(max_hostname_size *
                                           MPI::n_mpi_processes(MPI_COMM_WORLD));
-          const int ierr = MPI_Allgather (&hostname_array[0], max_hostname_size, MPI_CHAR,
-                                          &all_hostnames[0], max_hostname_size, MPI_CHAR,
+          const int ierr = MPI_Allgather (hostname_array.data(), max_hostname_size, MPI_CHAR,
+                                          all_hostnames.data(), max_hostname_size, MPI_CHAR,
                                           MPI_COMM_WORLD);
           AssertThrowMPI(ierr);
 
@@ -398,7 +398,7 @@ namespace Utilities
           unsigned int n_local_processes=0;
           unsigned int nth_process_on_host = 0;
           for (unsigned int i=0; i<MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
-            if (std::string (&all_hostnames[0] + i*max_hostname_size) == hostname)
+            if (std::string (all_hostnames.data() + i*max_hostname_size) == hostname)
               {
                 ++n_local_processes;
                 if (i <= MPI::this_mpi_process (MPI_COMM_WORLD))

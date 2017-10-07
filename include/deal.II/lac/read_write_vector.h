@@ -892,7 +892,7 @@ namespace LinearAlgebra
                                 const std::vector<Number2>   &values)
   {
     AssertDimension (indices.size(), values.size());
-    add (indices.size(), &indices[0], &values[0]);
+    add (indices.size(), indices.data(), values.data());
   }
 
 

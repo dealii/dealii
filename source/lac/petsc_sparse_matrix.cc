@@ -180,7 +180,7 @@ namespace PETScWrappers
     int_row_lengths (row_lengths.begin(), row_lengths.end());
 
     const PetscErrorCode ierr = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, 0,
-                                                &int_row_lengths[0], &matrix);
+                                                int_row_lengths.data(), &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     // set symmetric flag, if so requested
@@ -231,8 +231,8 @@ namespace PETScWrappers
 
             const PetscInt int_row = i;
             const PetscErrorCode ierr = MatSetValues (matrix, 1, &int_row,
-                                                      row_lengths[i], &row_entries[0],
-                                                      &row_values[0], INSERT_VALUES);
+                                                      row_lengths[i], row_entries.data(),
+                                                      row_values.data(), INSERT_VALUES);
             AssertThrow (ierr == 0, ExcPETScError(ierr));
           }
         compress (VectorOperation::insert);

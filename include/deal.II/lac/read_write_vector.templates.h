@@ -447,7 +447,7 @@ namespace LinearAlgebra
       {
         // Copy the vector from the device to a temporary vector on the host
         std::vector<Number> tmp(n_elements);
-        cudaError_t error_code = cudaMemcpy(&tmp[0], cuda_vec.get_values(),
+        cudaError_t error_code = cudaMemcpy(tmp.data(), cuda_vec.get_values(),
                                             n_elements*sizeof(Number),
                                             cudaMemcpyDeviceToHost);
         AssertCuda(error_code);

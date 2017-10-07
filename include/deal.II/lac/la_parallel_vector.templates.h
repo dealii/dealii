@@ -656,7 +656,7 @@ namespace LinearAlgebra
       // first wait for the receive to complete
       if (compress_requests.size() > 0 && n_import_targets > 0)
         {
-          const int ierr = MPI_Waitall (n_import_targets, &compress_requests[0],
+          const int ierr = MPI_Waitall (n_import_targets, compress_requests.data(),
                                         MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
 
@@ -814,7 +814,7 @@ namespace LinearAlgebra
           Threads::Mutex::ScopedLock lock (mutex);
 
           const int ierr = MPI_Waitall (update_ghost_values_requests.size(),
-                                        &update_ghost_values_requests[0],
+                                        update_ghost_values_requests.data(),
                                         MPI_STATUSES_IGNORE);
           AssertThrowMPI (ierr);
         }
@@ -893,7 +893,7 @@ namespace LinearAlgebra
           if (update_ghost_values_requests.size()>0)
             {
               const int ierr = MPI_Testall (update_ghost_values_requests.size(),
-                                            &update_ghost_values_requests[0],
+                                            update_ghost_values_requests.data(),
                                             &flag, MPI_STATUSES_IGNORE);
               AssertThrowMPI (ierr);
               Assert (flag == 1,
@@ -902,7 +902,7 @@ namespace LinearAlgebra
             }
           if (compress_requests.size()>0)
             {
-              const int ierr = MPI_Testall (compress_requests.size(), &compress_requests[0],
+              const int ierr = MPI_Testall (compress_requests.size(), compress_requests.data(),
                                             &flag, MPI_STATUSES_IGNORE);
               AssertThrowMPI (ierr);
               Assert (flag == 1,

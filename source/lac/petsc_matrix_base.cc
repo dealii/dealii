@@ -150,7 +150,7 @@ namespace PETScWrappers
     IS index_set;
 
     ISCreateGeneral (get_mpi_communicator(), rows.size(),
-                     &petsc_rows[0], PETSC_COPY_VALUES, &index_set);
+                     petsc_rows.data(), PETSC_COPY_VALUES, &index_set);
 
     const PetscErrorCode ierr = MatZeroRowsIS(matrix, index_set, new_diag_value,
                                               nullptr, nullptr);

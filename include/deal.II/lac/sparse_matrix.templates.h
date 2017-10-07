@@ -205,7 +205,7 @@ SparseMatrix<number>::operator = (const double d)
                                             val.get()),
                                   grain_size);
   else if (matrix_size > 0)
-    std::memset (&val[0], 0, matrix_size*sizeof(number));
+    std::memset (val.get(), 0, matrix_size*sizeof(number));
 
   return *this;
 }
@@ -363,8 +363,8 @@ SparseMatrix<number>::copy_from (const SparseMatrix<somenumber> &matrix)
   Assert (val != nullptr, ExcNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  std::copy (&matrix.val[0], &matrix.val[cols->n_nonzero_elements()],
-             &val[0]);
+  std::copy (matrix.val.get(), matrix.val.get() + cols->n_nonzero_elements(),
+             val.get());
 
   return *this;
 }
@@ -445,9 +445,9 @@ SparseMatrix<number>::add (const number factor,
   Assert (val != nullptr, ExcNotInitialized());
   Assert (cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  number             *val_ptr    = &val[0];
-  const somenumber   *matrix_ptr = &matrix.val[0];
-  const number *const end_ptr    = &val[cols->n_nonzero_elements()];
+  number             *val_ptr    = val.get();
+  const somenumber   *matrix_ptr = matrix.val.get();
+  const number *const end_ptr    = val.get() + cols->n_nonzero_elements();
 
   while (val_ptr != end_ptr)
     *val_ptr++ += factor * number(*matrix_ptr++);
@@ -1084,14 +1084,14 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
           // now the innermost loop that goes over all the elements in row
           // 'col' of matrix B. Cache the elements, and then write them into C
           // at once
-          numberC *new_ptr = &new_entries[0];
+          numberC *new_ptr = new_entries.data();
           const numberB *B_val_ptr =
             &B.val[new_cols-&sp_B.colnums[sp_B.rowstart[0]]];
           const numberB *const end_cols = &B.val[sp_B.rowstart[col+1]];
           for (; B_val_ptr != end_cols; ++B_val_ptr)
             *new_ptr++ = numberC(A_val) * numberC(*B_val_ptr) * numberC(use_vector ? V(col) : 1);
 
-          C.add (i, new_ptr-&new_entries[0], new_cols, &new_entries[0],
+          C.add (i, new_ptr-new_entries.data(), new_cols, new_entries.data(),
                  false, true);
         }
     }
@@ -1215,13 +1215,13 @@ SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
           // now the innermost loop that goes over all the elements in row
           // 'col' of matrix B. Cache the elements, and then write them into C
           // at once
-          numberC *new_ptr = &new_entries[0];
+          numberC *new_ptr = new_entries.data();
           const numberB *B_val_ptr =
             &B.val[new_cols-&sp_B.colnums[sp_B.rowstart[0]]];
           for (; B_val_ptr != end_cols; ++B_val_ptr)
             *new_ptr++ = numberC(A_val) * numberC(*B_val_ptr) * numberC(use_vector ? V(i) : 1);
 
-          C.add (row, new_ptr-&new_entries[0], new_cols, &new_entries[0],
+          C.add (row, new_ptr-new_entries.data(), new_cols, new_entries.data(),
                  false, true);
         }
     }
@@ -1281,8 +1281,8 @@ SparseMatrix<number>::frobenius_norm () const
   // reference to rows or columns
   real_type norm_sqr = 0;
   const size_type n_rows = m();
-  for (const number *ptr = &val[0];
-       ptr != &val[cols->rowstart[n_rows]]; ++ptr)
+  for (const number *ptr = val.get();
+       ptr != val.get() + cols->rowstart[n_rows]; ++ptr)
     norm_sqr +=  numbers::NumberTraits<number>::abs_square(*ptr);
 
   return std::sqrt (norm_sqr);
@@ -1974,9 +1974,9 @@ SparseMatrix<number>::block_write (std::ostream &out) const
   // bracketed in [...]
   out << '[' << max_len << "][";
   // then write out real data
-  out.write (reinterpret_cast<const char *>(&val[0]),
-             reinterpret_cast<const char *>(&val[max_len])
-             - reinterpret_cast<const char *>(&val[0]));
+  out.write (reinterpret_cast<const char *>(val.get()),
+             reinterpret_cast<const char *>(val.get() +  max_len)
+             - reinterpret_cast<const char *>(val.get()));
   out << ']';
 
   AssertThrow (out, ExcIO());
@@ -2006,9 +2006,9 @@ SparseMatrix<number>::block_read (std::istream &in)
   val.reset (new number[max_len]);
 
   // then read data
-  in.read (reinterpret_cast<char *>(&val[0]),
-           reinterpret_cast<char *>(&val[max_len])
-           - reinterpret_cast<char *>(&val[0]));
+  in.read (reinterpret_cast<char *>(val.get()),
+           reinterpret_cast<char *>(val.get() + max_len)
+           - reinterpret_cast<char *>(val.get()));
   in >> c;
   AssertThrow (c == ']', ExcIO());
 }

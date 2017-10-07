@@ -92,7 +92,7 @@ FE_ABF<dim>::FE_ABF (const unsigned int deg)
                                                  this->dofs_per_face));
   // TODO: Something goes wrong there. The error of the least squares fit
   // is to large ...
-  // FETools::compute_face_embedding_matrices(*this, &face_embeddings[0], 0, 0);
+  // FETools::compute_face_embedding_matrices(*this, face_embeddings.data(), 0, 0);
   this->interface_constraints.reinit((1<<(dim-1)) * this->dofs_per_face,
                                      this->dofs_per_face);
   unsigned int target_row=0;

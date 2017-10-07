@@ -200,7 +200,7 @@ namespace internal
                 // just send an empty message.
                 if (data.size())
                   {
-                    const int ierr = MPI_Isend(&data[0], data.size()*sizeof(data[0]),
+                    const int ierr = MPI_Isend(data.data(), data.size()*sizeof(data[0]),
                                                MPI_BYTE, dest, 71, tria->get_communicator(),
                                                &*requests.rbegin());
                     AssertThrowMPI(ierr);
@@ -239,7 +239,7 @@ namespace internal
                 Assert(static_cast<int>(count * sizeof(DoFPair)) == len, ExcInternalError());
                 receive_buffer.resize(count);
 
-                void *ptr = &receive_buffer[0];
+                void *ptr = receive_buffer.data();
                 ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
                                 tria->get_communicator(), &status);
                 AssertThrowMPI(ierr);
@@ -256,7 +256,7 @@ namespace internal
           // * wait for all MPI_Isend to complete
           if (requests.size() > 0)
             {
-              const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+              const int ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
               requests.clear();
             }

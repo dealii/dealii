@@ -243,7 +243,7 @@ namespace parallel
             decompressing_stream.push(boost::iostreams::gzip_decompressor());
             decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
 
-            decompressing_stream.write (&buffer[0], buffer.size());
+            decompressing_stream.write (buffer.data(), buffer.size());
           }
 
           // then restore the object from the buffer
@@ -372,7 +372,7 @@ namespace parallel
 
           receive.resize(len);
 
-          char *ptr = &receive[0];
+          char *ptr = receive.data();
           ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
                           tria->get_communicator(), &status);
           AssertThrowMPI(ierr);
@@ -397,7 +397,7 @@ namespace parallel
       // when we leave this function.
       if (requests.size())
         {
-          const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+          const int ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
 #endif // DEAL_II_WITH_MPI

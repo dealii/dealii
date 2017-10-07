@@ -184,7 +184,7 @@ namespace TrilinosWrappers
         // the current processor. Therefore, pass a dummy in that case
         else
           parameter_list.set("null space: vectors",
-                             &dummy[0]);
+                             dummy.data());
       }
 
     initialize (matrix, parameter_list);

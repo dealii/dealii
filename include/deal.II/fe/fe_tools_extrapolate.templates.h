@@ -144,7 +144,7 @@ namespace FETools
         {
           buffer.resize(bytes_for_buffer());
 
-          char *ptr = &buffer[0];
+          char *ptr = buffer.data();
 
           unsigned int n_dofs = dof_values.size ();
           std::memcpy(ptr, &n_dofs, sizeof(unsigned int));
@@ -159,13 +159,13 @@ namespace FETools
           std::memcpy(ptr,&quadrant,sizeof(typename dealii::internal::p4est::types<dim>::quadrant));
           ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
 
-          Assert (ptr == &buffer[0]+buffer.size(),
+          Assert (ptr == buffer.data()+buffer.size(),
                   ExcInternalError());
         }
 
         void unpack_data (const std::vector<char> &buffer)
         {
-          const char *ptr = &buffer[0];
+          const char *ptr = buffer.data();
           unsigned int n_dofs;
           memcpy(&n_dofs, ptr, sizeof(unsigned int));
           ptr += sizeof(unsigned int);
@@ -180,7 +180,7 @@ namespace FETools
           std::memcpy(&quadrant,ptr,sizeof(typename dealii::internal::p4est::types<dim>::quadrant));
           ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
 
-          Assert (ptr == &buffer[0]+buffer.size(),
+          Assert (ptr == buffer.data()+buffer.size(),
                   ExcInternalError());
         }
       };
@@ -1100,7 +1100,7 @@ namespace FETools
           AssertThrowMPI(ierr);
           receive.resize (len);
 
-          char *buf = &receive[0];
+          char *buf = receive.data();
           ierr = MPI_Recv (buf, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG, communicator, &status);
           AssertThrowMPI(ierr);
 
@@ -1116,7 +1116,7 @@ namespace FETools
 
       if (requests.size () > 0)
         {
-          const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+          const int ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
 

@@ -183,7 +183,7 @@ namespace Utilities
       // Allow non-zero start index for the vector. send this data to all
       // processors
       first_index[0] = local_range_data.first;
-      int ierr = MPI_Bcast(&first_index[0], 1, DEAL_II_DOF_INDEX_MPI_TYPE,
+      int ierr = MPI_Bcast(first_index.data(), 1, DEAL_II_DOF_INDEX_MPI_TYPE,
                            0, communicator);
       AssertThrowMPI(ierr);
 
@@ -262,7 +262,7 @@ namespace Utilities
         for (unsigned int i=0; i<n_ghost_targets; i++)
           send_buffer[ghost_targets_data[i].first] = ghost_targets_data[i].second;
 
-        const int ierr = MPI_Alltoall (&send_buffer[0], 1, MPI_INT, &receive_buffer[0], 1,
+        const int ierr = MPI_Alltoall (send_buffer.data(), 1, MPI_INT, receive_buffer.data(), 1,
                                        MPI_INT, communicator);
         AssertThrowMPI(ierr);
 
@@ -314,7 +314,7 @@ namespace Utilities
         if (import_requests.size()>0)
           {
             const int ierr = MPI_Waitall (import_requests.size(),
-                                          &import_requests[0],
+                                          import_requests.data(),
                                           MPI_STATUSES_IGNORE);
             AssertThrowMPI(ierr);
           }

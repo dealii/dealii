@@ -298,7 +298,7 @@ namespace TrilinosWrappers
         }
 
       Assert (n_elements == added_elements, ExcInternalError());
-      Epetra_Map new_map (v.size(), n_elements, &global_ids[0], 0,
+      Epetra_Map new_map (v.size(), n_elements, global_ids.data(), 0,
                           v.block(0).vector_partitioner().Comm());
 
       std::shared_ptr<Epetra_FEVector> actual_vec;

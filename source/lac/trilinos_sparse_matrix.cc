@@ -498,10 +498,10 @@ namespace TrilinosWrappers
       std::shared_ptr<Epetra_CrsGraph> graph;
       if (input_row_map.Comm().NumProc() > 1)
         graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
-                                          &n_entries_per_row[0], true));
+                                          n_entries_per_row.data(), true));
       else
         graph.reset (new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
-                                          &n_entries_per_row[0], true));
+                                          n_entries_per_row.data(), true));
 
       // This functions assumes that the sparsity pattern sits on all
       // processors (completely). The parallel version uses an Epetra graph
@@ -523,7 +523,7 @@ namespace TrilinosWrappers
               row_indices[col] = p->column();
           }
           graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
-                                                       &row_indices[0]);
+                                                       row_indices.data());
         }
 
       // Eventually, optimize the graph structure (sort indices, make memory
@@ -613,7 +613,7 @@ namespace TrilinosWrappers
         Epetra_Map relevant_map (TrilinosWrappers::types::int_type(-1),
                                  TrilinosWrappers::types::int_type(relevant_rows.n_elements()),
                                  (indices.empty() ? nullptr :
-                                  reinterpret_cast<TrilinosWrappers::types::int_type *>(&indices[0])),
+                                  reinterpret_cast<TrilinosWrappers::types::int_type *>(indices.data())),
                                  0, input_row_map.Comm());
         if (relevant_map.SameAs(input_row_map))
           have_ghost_rows = false;
@@ -639,7 +639,7 @@ namespace TrilinosWrappers
         }
 
       Epetra_Map off_processor_map(-1, ghost_rows.size(),
-                                   (ghost_rows.size()>0)?(&ghost_rows[0]):nullptr,
+                                   (ghost_rows.size()>0)?(ghost_rows.data()):nullptr,
                                    0, input_row_map.Comm());
 
       std::shared_ptr<Epetra_CrsGraph> graph;
@@ -647,15 +647,15 @@ namespace TrilinosWrappers
       if (input_row_map.Comm().NumProc() > 1)
         {
           graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
-                                            (n_entries_per_row.size()>0)?(&n_entries_per_row[0]):nullptr,
+                                            (n_entries_per_row.size()>0)?(n_entries_per_row.data()):nullptr,
                                             exchange_data ? false : true));
           if (have_ghost_rows == true)
             nonlocal_graph.reset (new Epetra_CrsGraphMod (off_processor_map,
-                                                          &n_entries_per_ghost_row[0]));
+                                                          n_entries_per_ghost_row.data()));
         }
       else
         graph.reset (new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
-                                          (n_entries_per_row.size()>0)?(&n_entries_per_row[0]):nullptr,
+                                          (n_entries_per_row.size()>0)?(n_entries_per_row.data()):nullptr,
                                           true));
 
       // now insert the indices, select between the right matrix
@@ -674,12 +674,12 @@ namespace TrilinosWrappers
             row_indices[col] = sparsity_pattern.column_number(global_row, col);
 
           if (input_row_map.MyGID(global_row))
-            graph->InsertGlobalIndices (global_row, row_length, &row_indices[0]);
+            graph->InsertGlobalIndices (global_row, row_length, row_indices.data());
           else
             {
               Assert(nonlocal_graph.get() != nullptr, ExcInternalError());
               nonlocal_graph->InsertGlobalIndices (global_row, row_length,
-                                                   &row_indices[0]);
+                                                   row_indices.data());
             }
         }
 
@@ -937,8 +937,8 @@ namespace TrilinosWrappers
               ++select_index;
               ++it;
             }
-          set (row, col, reinterpret_cast<size_type *>(&row_indices[0]),
-               &values[0], false);
+          set (row, col, reinterpret_cast<size_type *>(row_indices.data()),
+               values.data(), false);
         }
     compress(VectorOperation::insert);
   }
@@ -1015,7 +1015,7 @@ namespace TrilinosWrappers
         const TrilinosScalar *in_values = input_matrix[0];
         TrilinosScalar *values = (*matrix)[0];
         const size_type my_nonzeros = input_matrix.NumMyNonzeros();
-        std::memcpy (&values[0], &in_values[0],
+        std::memcpy (values, in_values,
                      my_nonzeros*sizeof (TrilinosScalar));
       }
 
@@ -1347,7 +1347,7 @@ namespace TrilinosWrappers
             ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (size_type i=0; i<row_indices.size(); ++i)
-      set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+      set (row_indices[i], col_indices.size(), col_indices.data(), &values(i,0),
            elide_zero_values);
   }
 
@@ -1362,7 +1362,7 @@ namespace TrilinosWrappers
     Assert (col_indices.size() == values.size(),
             ExcDimensionMismatch(col_indices.size(), values.size()));
 
-    set (row, col_indices.size(), &col_indices[0], &values[0],
+    set (row, col_indices.size(), col_indices.data(), values.data(),
          elide_zero_values);
   }
 
@@ -1505,7 +1505,7 @@ namespace TrilinosWrappers
     Assert (values.m() == values.n(), ExcNotQuadratic());
 
     for (size_type i=0; i<indices.size(); ++i)
-      add (indices[i], indices.size(), &indices[0], &values(i,0),
+      add (indices[i], indices.size(), indices.data(), &values(i,0),
            elide_zero_values);
   }
 
@@ -1523,7 +1523,7 @@ namespace TrilinosWrappers
             ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (size_type i=0; i<row_indices.size(); ++i)
-      add (row_indices[i], col_indices.size(), &col_indices[0],
+      add (row_indices[i], col_indices.size(), col_indices.data(),
            &values(i,0), elide_zero_values);
   }
 
@@ -1538,7 +1538,7 @@ namespace TrilinosWrappers
     Assert (col_indices.size() == values.size(),
             ExcDimensionMismatch(col_indices.size(), values.size()));
 
-    add (row, col_indices.size(), &col_indices[0], &values[0],
+    add (row, col_indices.size(), col_indices.data(), values.data(),
          elide_zero_values);
   }
 
@@ -1679,7 +1679,7 @@ namespace TrilinosWrappers
         indices.resize(graph->NumGlobalIndices(static_cast<TrilinosWrappers::types::int_type>(row)));
         int n_indices = 0;
         graph->ExtractGlobalRowCopy(static_cast<TrilinosWrappers::types::int_type>(row),
-                                    indices.size(), n_indices, &indices[0]);
+                                    indices.size(), n_indices, indices.data());
         AssertDimension(static_cast<unsigned int>(n_indices), indices.size());
 
         for (TrilinosWrappers::types::int_type i=0; i<n_indices; ++i)

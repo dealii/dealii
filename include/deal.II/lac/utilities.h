@@ -216,8 +216,8 @@ namespace Utilities
       int info;
       // call lapack_templates.h wrapper:
       stev ("N", &n,
-            &diagonal[0], &subdiagonal[0],
-            &Z[0], &ldz, &work[0],
+            diagonal.data(), subdiagonal.data(),
+            Z.data(), &ldz, work.data(),
             &info);
 
       Assert (info == 0,

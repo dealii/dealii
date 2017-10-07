@@ -1806,7 +1806,7 @@ namespace DoFTools
       {
         std::vector<types::global_dof_index> local_dof_count = dofs_per_component;
 
-        const int ierr = MPI_Allreduce (&local_dof_count[0], &dofs_per_component[0], n_target_components,
+        const int ierr = MPI_Allreduce (local_dof_count.data(), dofs_per_component.data(), n_target_components,
                                         DEAL_II_DOF_INDEX_MPI_TYPE,
                                         MPI_SUM, tria->get_communicator());
         AssertThrowMPI (ierr);
@@ -1884,7 +1884,7 @@ namespace DoFTools
                (&dof_handler.get_triangulation())))
           {
             std::vector<types::global_dof_index> local_dof_count = dofs_per_block;
-            const int ierr = MPI_Allreduce (&local_dof_count[0], &dofs_per_block[0],
+            const int ierr = MPI_Allreduce (local_dof_count.data(), dofs_per_block.data(),
                                             n_target_blocks,
                                             DEAL_II_DOF_INDEX_MPI_TYPE,
                                             MPI_SUM, tria->get_communicator());

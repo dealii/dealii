@@ -202,12 +202,12 @@ LAPACKFullMatrix<number>::vmult (
       AssertDimension(w.size(), this->n_rows());
       // Compute V^T v
       work.resize(std::max(mm,nn));
-      gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.val, &one, &null, &work[0], &one);
+      gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.val, &one, &null, work.data(), &one);
       // Multiply by singular values
       for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with U
-      gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, &work[0], &one, &beta, w.val, &one);
+      gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, work.data(), &one, &beta, w.val, &one);
       break;
     }
     case inverse_svd:
@@ -217,12 +217,12 @@ LAPACKFullMatrix<number>::vmult (
       AssertDimension(v.size(), this->n_rows());
       // Compute U^T v
       work.resize(std::max(mm,nn));
-      gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.val, &one, &null, &work[0], &one);
+      gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.val, &one, &null, work.data(), &one);
       // Multiply by singular values
       for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with V
-      gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, &work[0], &one, &beta, w.val, &one);
+      gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, work.data(), &one, &beta, w.val, &one);
       break;
     }
     default:
@@ -263,12 +263,12 @@ LAPACKFullMatrix<number>::Tvmult (
 
       // Compute U^T v
       work.resize(std::max(mm,nn));
-      gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.val, &one, &null, &work[0], &one);
+      gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.val, &one, &null, work.data(), &one);
       // Multiply by singular values
       for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with V
-      gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, &work[0], &one, &beta, w.val, &one);
+      gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, work.data(), &one, &beta, w.val, &one);
       break;
     }
     case inverse_svd:
@@ -279,12 +279,12 @@ LAPACKFullMatrix<number>::Tvmult (
 
       // Compute V^T v
       work.resize(std::max(mm,nn));
-      gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.val, &one, &null, &work[0], &one);
+      gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.val, &one, &null, work.data(), &one);
       // Multiply by singular values
       for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with U
-      gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, &work[0], &one, &beta, w.val, &one);
+      gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, work.data(), &one, &beta, w.val, &one);
       break;
     }
     default:
@@ -513,7 +513,7 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
   number *values = const_cast<number *> (&this->values[0]);
   ipiv.resize(mm);
   int info = 0;
-  getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
+  getrf(&mm, &nn, values, &mm, ipiv.data(), &info);
 
   Assert(info >= 0, ExcInternalError());
 
@@ -580,7 +580,7 @@ number LAPACKFullMatrix<number>::norm(const char type) const
                         std::max(1,N) :
                         0;
       work.resize(lwork);
-      return lansy (&type, &LAPACKSupport::L, &N, values, &lda, &work[0]);
+      return lansy (&type, &LAPACKSupport::L, &N, values, &lda, work.data());
     }
   else
     {
@@ -589,7 +589,7 @@ number LAPACKFullMatrix<number>::norm(const char type) const
                         std::max(1,M) :
                         0;
       work.resize(lwork);
-      return lange (&type, &M, &N, values, &lda, &work[0]);
+      return lange (&type, &M, &N, values, &lda, work.data());
     }
 }
 
@@ -658,7 +658,7 @@ LAPACKFullMatrix<number>::reciprocal_condition_number(const number a_norm) const
   // use the same uplo as in Cholesky
   pocon (&LAPACKSupport::L, &N, values, &lda,
          &a_norm, &rcond,
-         &work[0], &iwork[0], &info);
+         work.data(), iwork.data(), &info);
 
   Assert(info >= 0, ExcInternalError());
 
@@ -691,8 +691,8 @@ LAPACKFullMatrix<number>::compute_svd()
   work.resize(1);
   int lwork = -1;
   gesdd(&LAPACKSupport::A, &mm, &nn, values, &mm,
-        &wr[0], mu, &mm, mvt, &nn,
-        &work[0], &lwork, &ipiv[0], &info);
+        wr.data(), mu, &mm, mvt, &nn,
+        work.data(), &lwork, ipiv.data(), &info);
   AssertThrow (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
   // Resize the work array. Add one to the size computed by LAPACK to be on
   // the safe side.
@@ -701,8 +701,8 @@ LAPACKFullMatrix<number>::compute_svd()
   work.resize(lwork);
   // Do the actual SVD.
   gesdd(&LAPACKSupport::A, &mm, &nn, values, &mm,
-        &wr[0], mu, &mm, mvt, &nn,
-        &work[0], &lwork, &ipiv[0], &info);
+        wr.data(), mu, &mm, mvt, &nn,
+        work.data(), &lwork, ipiv.data(), &info);
   AssertThrow (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
 
   work.resize(0);
@@ -753,7 +753,7 @@ LAPACKFullMatrix<number>::invert()
 
       ipiv.resize(mm);
       inv_work.resize (mm);
-      getri(&mm, values, &mm, &ipiv[0], &inv_work[0], &mm, &info);
+      getri(&mm, values, &mm, ipiv.data(), inv_work.data(), &mm, &info);
     }
   else
     {
@@ -790,7 +790,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
   const number *values = &this->values[0];
   int info = 0;
 
-  getrs(trans, &nn, &one, values, &nn, &ipiv[0],
+  getrs(trans, &nn, &one, values, &nn, ipiv.data(),
         v.begin(), &nn, &info);
 
   Assert(info == 0, ExcInternalError());
@@ -813,7 +813,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
   const number *values = &this->values[0];
   int info = 0;
 
-  getrs(trans, &nn, &kk, values, &nn, &ipiv[0], &B.values[0], &nn, &info);
+  getrs(trans, &nn, &kk, values, &nn, ipiv.data(), &B.values[0], &nn, &info);
 
   Assert(info == 0, ExcInternalError());
 }
@@ -881,9 +881,9 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
   work.resize(1);
 
   geev(jobvl, jobvr, &nn, values, &nn,
-       &wr[0], &wi[0],
-       &vl[0], &nn, &vr[0], &nn,
-       &work[0], &lwork, &info);
+       wr.data(), wi.data(),
+       vl.data(), &nn, vr.data(), &nn,
+       work.data(), &lwork, &info);
   // geev returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
@@ -896,9 +896,9 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
 
   // Finally compute the eigenvalues.
   geev(jobvl, jobvr, &nn, values, &nn,
-       &wr[0], &wi[0],
-       &vl[0], &nn, &vr[0], &nn,
-       &work[0], &lwork, &info);
+       wr.data(), wi.data(),
+       vl.data(), &nn, vr.data(), &nn,
+       work.data(), &lwork, &info);
   // Negative return value implies a wrong argument. This should be internal.
 
   Assert (info >=0, ExcInternalError());
@@ -954,9 +954,9 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lowe
          uplo, &nn, values_A, &nn,
          &lower_bound, &upper_bound,
          dummy, dummy, &abs_accuracy,
-         &n_eigenpairs, &wr[0], values_eigenvectors,
-         &nn, &work[0], &lwork, &iwork[0],
-         &ifail[0], &info);
+         &n_eigenpairs, wr.data(), values_eigenvectors,
+         &nn, work.data(), &lwork, iwork.data(),
+         ifail.data(), &info);
   // syevx returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
@@ -970,9 +970,9 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lowe
          uplo, &nn, values_A, &nn,
          &lower_bound, &upper_bound,
          dummy, dummy, &abs_accuracy,
-         &n_eigenpairs, &wr[0], values_eigenvectors,
-         &nn, &work[0], &lwork, &iwork[0],
-         &ifail[0], &info);
+         &n_eigenpairs, wr.data(), values_eigenvectors,
+         &nn, work.data(), &lwork, iwork.data(),
+         ifail.data(), &info);
 
   // Negative return value implies a wrong argument. This should be internal.
   Assert (info >=0, ExcInternalError());
@@ -1046,8 +1046,8 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   sygvx (&itype, jobz, range, uplo, &nn, values_A, &nn,
          values_B, &nn, &lower_bound, &upper_bound,
          dummy, dummy, &abs_accuracy, &n_eigenpairs,
-         &wr[0], values_eigenvectors, &nn, &work[0],
-         &lwork, &iwork[0], &ifail[0], &info);
+         wr.data(), values_eigenvectors, &nn, work.data(),
+         &lwork, iwork.data(), ifail.data(), &info);
   // sygvx returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
@@ -1062,8 +1062,8 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   sygvx (&itype, jobz, range, uplo, &nn, values_A, &nn,
          values_B, &nn, &lower_bound, &upper_bound,
          dummy, dummy, &abs_accuracy, &n_eigenpairs,
-         &wr[0], values_eigenvectors, &nn, &work[0],
-         &lwork, &iwork[0], &ifail[0], &info);
+         wr.data(), values_eigenvectors, &nn, work.data(),
+         &lwork, iwork.data(), ifail.data(), &info);
 
   // Negative return value implies a wrong argument. This should be internal.
   Assert (info >=0, ExcInternalError());
@@ -1129,7 +1129,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
 
   sygv (&itype, jobz, uplo, &nn, values_A, &nn,
         values_B, &nn,
-        &wr[0], &work[0], &lwork, &info);
+        wr.data(), work.data(), &lwork, &info);
   // sygv returns info=0 on success. Since we only queried the optimal size
   // for work, everything else would not be acceptable.
   Assert (info == 0, ExcInternalError());
@@ -1143,7 +1143,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   // Finally compute the generalized eigenvalues.
   sygv (&itype, jobz, uplo, &nn, values_A, &nn,
         values_B, &nn,
-        &wr[0], &work[0], &lwork, &info);
+        wr.data(), work.data(), &lwork, &info);
   // Negative return value implies a wrong argument. This should be internal.
 
   Assert (info >=0, ExcInternalError());

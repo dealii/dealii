@@ -321,7 +321,7 @@ namespace TrilinosWrappers
 
       if (row_map.Comm().NumProc() > 1)
         graph.reset(new Epetra_FECrsGraph(Copy, row_map,
-                                          &local_entries_per_row[0],
+                                          local_entries_per_row.data(),
                                           false
                                           // TODO: Check which new Trilinos
                                           // version supports this... Remember
@@ -333,7 +333,7 @@ namespace TrilinosWrappers
                                          ));
       else
         graph.reset(new Epetra_FECrsGraph(Copy, row_map, col_map,
-                                          &local_entries_per_row[0],
+                                          local_entries_per_row.data(),
                                           false));
     }
 
@@ -373,11 +373,11 @@ namespace TrilinosWrappers
 
       if (row_map.Comm().NumProc() > 1)
         graph.reset(new Epetra_FECrsGraph(Copy, row_map,
-                                          &n_entries_per_row[0],
+                                          n_entries_per_row.data(),
                                           false));
       else
         graph.reset (new Epetra_FECrsGraph(Copy, row_map, col_map,
-                                           &n_entries_per_row[0],
+                                           n_entries_per_row.data(),
                                            false));
 
       AssertDimension (sp.n_rows(),
@@ -407,7 +407,7 @@ namespace TrilinosWrappers
                 }
             }
             graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
-                                                         &row_indices[0]);
+                                                         row_indices.data());
           }
       else
         for (size_type row=0; row<sp.n_rows(); ++row)
@@ -430,7 +430,7 @@ namespace TrilinosWrappers
             }
             graph->InsertGlobalIndices (1,
                                         reinterpret_cast<TrilinosWrappers::types::int_type *>(&row),
-                                        row_length, &row_indices[0]);
+                                        row_length, row_indices.data());
           }
 
       int ierr =

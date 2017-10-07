@@ -73,7 +73,7 @@ namespace CUDAWrappers
       std::vector<Number> old(array_host.size());
       old.swap(array_host);
 
-      transpose(n, m, &old[0], &array_host[0]);
+      transpose(n, m, old.data(), array_host.data());
     }
 
 
@@ -88,7 +88,7 @@ namespace CUDAWrappers
       cudaError_t error_code = cudaMalloc(array_device, n*sizeof(Number1));
       AssertCuda(error_code);
 
-      error_code = cudaMemcpy(*array_device, &array_host[0], n*sizeof(Number1),
+      error_code = cudaMemcpy(*array_device, array_host.data(), n*sizeof(Number1),
                               cudaMemcpyHostToDevice);
       AssertCuda(error_code);
     }
@@ -246,7 +246,7 @@ namespace CUDAWrappers
       for (unsigned int i=0; i<dofs_per_cell; ++i)
         lexicographic_dof_indices[i] = local_dof_indices[lexicographic_inv[i]];
 
-      memcpy(&local_to_global_host[cell_id*padding_length], &lexicographic_dof_indices[0],
+      memcpy(&local_to_global_host[cell_id*padding_length], lexicographic_dof_indices.data(),
              dofs_per_cell*sizeof(unsigned int));
 
       fe_values.reinit(cell);
@@ -255,7 +255,7 @@ namespace CUDAWrappers
       if (update_flags & update_quadrature_points)
         {
           const std::vector<Point<dim>> &q_points = fe_values.get_quadrature_points();
-          memcpy(&q_points_host[cell_id*padding_length], &q_points[0],
+          memcpy(&q_points_host[cell_id*padding_length], q_points.data(),
                  q_points_per_cell*sizeof(Point<dim>));
         }
 
@@ -271,7 +271,7 @@ namespace CUDAWrappers
         {
           const std::vector<DerivativeForm<1,dim,dim>> &inv_jacobians =
                                                       fe_values.get_inverse_jacobians();
-          memcpy(&inv_jacobian_host[cell_id*padding_length*dim*dim], &inv_jacobians[0],
+          memcpy(&inv_jacobian_host[cell_id*padding_length*dim*dim], inv_jacobians.data(),
                  q_points_per_cell*sizeof(DerivativeForm<1,dim,dim>));
         }
     }
@@ -548,7 +548,7 @@ namespace CUDAWrappers
                                 sizeof(dealii::types::global_dof_index));
         AssertCuda(cuda_error);
 
-        cuda_error = cudaMemcpy(constrained_dofs, &constrained_dofs_host[0],
+        cuda_error = cudaMemcpy(constrained_dofs, constrained_dofs_host.data(),
                                 n_constrained_dofs * sizeof(dealii::types::global_dof_index),
                                 cudaMemcpyHostToDevice);
         AssertCuda(cuda_error);

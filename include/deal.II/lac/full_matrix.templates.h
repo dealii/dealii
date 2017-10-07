@@ -1794,7 +1794,7 @@ FullMatrix<number>::gauss_jordan ()
 
         // Use the LAPACK function getrf for
         // calculating the LU factorization.
-        getrf(&nn, &nn, &this->values[0], &nn, &ipiv[0], &info);
+        getrf(&nn, &nn, &this->values[0], &nn, ipiv.data(), &info);
 
         Assert(info >= 0, ExcInternalError());
         Assert(info == 0, LACExceptions::ExcSingular());
@@ -1805,7 +1805,7 @@ FullMatrix<number>::gauss_jordan ()
         // Use the LAPACK function getri for
         // calculating the actual inverse using
         // the LU factorization.
-        getri(&nn, &this->values[0], &nn, &ipiv[0], &inv_work[0], &nn, &info);
+        getri(&nn, &this->values[0], &nn, ipiv.data(), inv_work.data(), &nn, &info);
 
         Assert(info >= 0, ExcInternalError());
         Assert(info == 0, LACExceptions::ExcSingular());

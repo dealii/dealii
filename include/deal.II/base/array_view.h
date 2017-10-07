@@ -431,7 +431,7 @@ inline
 ArrayView<ElementType>
 make_array_view (std::vector<ElementType> &vector)
 {
-  return ArrayView<ElementType> (&vector[0], vector.size());
+  return ArrayView<ElementType> (vector.data(), vector.size());
 }
 
 
@@ -455,7 +455,7 @@ inline
 ArrayView<const ElementType>
 make_array_view (const std::vector<ElementType> &vector)
 {
-  return ArrayView<const ElementType> (&vector[0], vector.size());
+  return ArrayView<const ElementType> (vector.data(), vector.size());
 }
 
 

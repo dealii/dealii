@@ -47,7 +47,7 @@ namespace Polynomials
   {
     Assert (values.size() > 0, ExcZero());
 
-    value(x,values.size()-1,&values[0]);
+    value(x,values.size()-1,values.data());
   }
 
 

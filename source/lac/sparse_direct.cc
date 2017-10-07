@@ -59,7 +59,7 @@ SparseDirectUMFPACK::SparseDirectUMFPACK ()
   numeric_decomposition (nullptr),
   control (UMFPACK_CONTROL)
 {
-  umfpack_dl_defaults (&control[0]);
+  umfpack_dl_defaults (control.data());
 }
 
 
@@ -95,7 +95,7 @@ SparseDirectUMFPACK::clear ()
     tmp.swap (Ax);
   }
 
-  umfpack_dl_defaults (&control[0]);
+  umfpack_dl_defaults (control.data());
 }
 
 
@@ -279,16 +279,16 @@ factorize (const Matrix &matrix)
 
   int status;
   status = umfpack_dl_symbolic (N, N,
-                                &Ap[0], &Ai[0], &Ax[0],
+                                Ap.data(), Ai.data(), Ax.data(),
                                 &symbolic_decomposition,
-                                &control[0], nullptr);
+                                control.data(), nullptr);
   AssertThrow (status == UMFPACK_OK,
                ExcUMFPACKError("umfpack_dl_symbolic", status));
 
-  status = umfpack_dl_numeric (&Ap[0], &Ai[0], &Ax[0],
+  status = umfpack_dl_numeric (Ap.data(), Ai.data(), Ax.data(),
                                symbolic_decomposition,
                                &numeric_decomposition,
-                               &control[0], nullptr);
+                               control.data(), nullptr);
   AssertThrow (status == UMFPACK_OK,
                ExcUMFPACKError("umfpack_dl_numeric", status));
 
@@ -317,10 +317,10 @@ SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution,
   // instead.
   const int status
     = umfpack_dl_solve (transpose ? UMFPACK_A : UMFPACK_At,
-                        &Ap[0], &Ai[0], &Ax[0],
+                        Ap.data(), Ai.data(), Ax.data(),
                         rhs_and_solution.begin(), rhs.begin(),
                         numeric_decomposition,
-                        &control[0], nullptr);
+                        control.data(), nullptr);
   AssertThrow (status == UMFPACK_OK, ExcUMFPACKError("umfpack_dl_solve", status));
 }
 

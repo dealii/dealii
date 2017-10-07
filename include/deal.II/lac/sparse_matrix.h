@@ -1692,7 +1692,7 @@ SparseMatrix<number>::set (const std::vector<size_type> &indices,
   Assert (values.m() == values.n(), ExcNotQuadratic());
 
   for (size_type i=0; i<indices.size(); ++i)
-    set (indices[i], indices.size(), &indices[0], &values(i,0),
+    set (indices[i], indices.size(), indices.data(), &values(i,0),
          elide_zero_values);
 }
 
@@ -1713,7 +1713,7 @@ SparseMatrix<number>::set (const std::vector<size_type> &row_indices,
           ExcDimensionMismatch(col_indices.size(), values.n()));
 
   for (size_type i=0; i<row_indices.size(); ++i)
-    set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+    set (row_indices[i], col_indices.size(), col_indices.data(), &values(i,0),
          elide_zero_values);
 }
 
@@ -1731,7 +1731,7 @@ SparseMatrix<number>::set (const size_type               row,
   Assert (col_indices.size() == values.size(),
           ExcDimensionMismatch(col_indices.size(), values.size()));
 
-  set (row, col_indices.size(), &col_indices[0], &values[0],
+  set (row, col_indices.size(), col_indices.data(), values.data(),
        elide_zero_values);
 }
 
@@ -1779,7 +1779,7 @@ SparseMatrix<number>::add (const std::vector<size_type> &indices,
   Assert (values.m() == values.n(), ExcNotQuadratic());
 
   for (size_type i=0; i<indices.size(); ++i)
-    add (indices[i], indices.size(), &indices[0], &values(i,0),
+    add (indices[i], indices.size(), indices.data(), &values(i,0),
          elide_zero_values);
 }
 
@@ -1800,7 +1800,7 @@ SparseMatrix<number>::add (const std::vector<size_type> &row_indices,
           ExcDimensionMismatch(col_indices.size(), values.n()));
 
   for (size_type i=0; i<row_indices.size(); ++i)
-    add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+    add (row_indices[i], col_indices.size(), col_indices.data(), &values(i,0),
          elide_zero_values);
 }
 
@@ -1818,7 +1818,7 @@ SparseMatrix<number>::add (const size_type               row,
   Assert (col_indices.size() == values.size(),
           ExcDimensionMismatch(col_indices.size(), values.size()));
 
-  add (row, col_indices.size(), &col_indices[0], &values[0],
+  add (row, col_indices.size(), col_indices.data(), values.data(),
        elide_zero_values);
 }
 
@@ -1832,8 +1832,8 @@ SparseMatrix<number>::operator *= (const number factor)
   Assert (cols != nullptr, ExcNotInitialized());
   Assert (val != nullptr, ExcNotInitialized());
 
-  number             *val_ptr    = &val[0];
-  const number *const end_ptr    = &val[cols->n_nonzero_elements()];
+  number             *val_ptr    = val.get();
+  const number *const end_ptr    = val.get() + cols->n_nonzero_elements();
 
   while (val_ptr != end_ptr)
     *val_ptr++ *= factor;
@@ -1854,8 +1854,8 @@ SparseMatrix<number>::operator /= (const number factor)
 
   const number factor_inv = number(1.) / factor;
 
-  number             *val_ptr    = &val[0];
-  const number *const end_ptr    = &val[cols->n_nonzero_elements()];
+  number             *val_ptr    = val.get();
+  const number *const end_ptr    = val.get() + cols->n_nonzero_elements();
 
   while (val_ptr != end_ptr)
     *val_ptr++ *= factor_inv;
