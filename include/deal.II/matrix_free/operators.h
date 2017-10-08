@@ -483,6 +483,11 @@ namespace MatrixFreeOperators
     typedef typename OperatorType::value_type value_type;
 
     /**
+     * Size type.
+     */
+    typedef typename OperatorType::size_type size_type;
+
+    /**
      * Default constructor.
      */
     MGInterfaceOperator();
