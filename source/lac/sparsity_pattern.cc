@@ -339,7 +339,7 @@ SparsityPattern::reinit (const size_type m,
           ExcInternalError());
 
   // preset the column numbers by a value indicating it is not in use
-  std::fill_n (&colnums[0], vec_len, invalid_entry);
+  std::fill_n (colnums.get(), vec_len, invalid_entry);
 
   // if diagonal elements are special: let the first entry in each row be the
   // diagonal value
@@ -654,7 +654,7 @@ SparsityPattern::operator () (const size_type i,
                                                  &colnums[rowstart[i+1]],
                                                  j);
   if ((p != &colnums[rowstart[i+1]])  &&  (*p == j))
-    return (p - &colnums[0]);
+    return (p - colnums.get());
   else
     return invalid_entry;
 }
@@ -783,8 +783,8 @@ SparsityPattern::matrix_position (const std::size_t global_index) const
   // it is sorted, and since there is an element for the one-past-last row, we
   // can simply use a bisection search on it
   const size_type row
-    = (std::upper_bound (&rowstart[0], &rowstart[rows], global_index)
-       - &rowstart[0] - 1);
+    = (std::upper_bound (rowstart.get(), rowstart.get() + rows, global_index)
+       - rowstart.get() - 1);
 
   // now, the column index is simple since that is what the colnums array
   // stores:
@@ -936,13 +936,13 @@ SparsityPattern::block_write (std::ostream &out) const
       << compressed << ' '
       << store_diagonal_first_in_row << "][";
   // then write out real data
-  out.write (reinterpret_cast<const char *>(&rowstart[0]),
-             reinterpret_cast<const char *>(&rowstart[max_dim+1])
-             - reinterpret_cast<const char *>(&rowstart[0]));
+  out.write (reinterpret_cast<const char *>(rowstart.get()),
+             reinterpret_cast<const char *>(rowstart.get() + max_dim + 1)
+             - reinterpret_cast<const char *>(rowstart.get()));
   out << "][";
-  out.write (reinterpret_cast<const char *>(&colnums[0]),
-             reinterpret_cast<const char *>(&colnums[max_vec_len])
-             - reinterpret_cast<const char *>(&colnums[0]));
+  out.write (reinterpret_cast<const char *>(colnums.get()),
+             reinterpret_cast<const char *>(colnums.get() + max_vec_len)
+             - reinterpret_cast<const char *>(colnums.get()));
   out << ']';
 
   AssertThrow (out, ExcIO());
@@ -978,16 +978,16 @@ SparsityPattern::block_read (std::istream &in)
   colnums.reset (new size_type[max_vec_len]);
 
   // then read data
-  in.read (reinterpret_cast<char *>(&rowstart[0]),
-           reinterpret_cast<char *>(&rowstart[max_dim+1])
-           - reinterpret_cast<char *>(&rowstart[0]));
+  in.read (reinterpret_cast<char *>(rowstart.get()),
+           reinterpret_cast<char *>(rowstart.get() + max_dim + 1)
+           - reinterpret_cast<char *>(rowstart.get()));
   in >> c;
   AssertThrow (c == ']', ExcIO());
   in >> c;
   AssertThrow (c == '[', ExcIO());
-  in.read (reinterpret_cast<char *>(&colnums[0]),
-           reinterpret_cast<char *>(&colnums[max_vec_len])
-           - reinterpret_cast<char *>(&colnums[0]));
+  in.read (reinterpret_cast<char *>(colnums.get()),
+           reinterpret_cast<char *>(colnums.get() + max_vec_len)
+           - reinterpret_cast<char *>(colnums.get()));
   in >> c;
   AssertThrow (c == ']', ExcIO());
 }

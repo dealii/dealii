@@ -1580,9 +1580,9 @@ ChunkSparseMatrix<number>::block_write (std::ostream &out) const
   // first the simple objects, bracketed in [...]
   out << '[' << max_len << "][";
   // then write out real data
-  out.write (reinterpret_cast<const char *>(&val[0]),
-             reinterpret_cast<const char *>(&val[max_len])
-             - reinterpret_cast<const char *>(&val[0]));
+  out.write (reinterpret_cast<const char *>(val.get()),
+             reinterpret_cast<const char *>(val.get() + max_len)
+             - reinterpret_cast<const char *>(val.get()));
   out << ']';
 
   AssertThrow (out, ExcIO());
@@ -1612,9 +1612,9 @@ ChunkSparseMatrix<number>::block_read (std::istream &in)
   val.reset (new number[max_len]);
 
   // then read data
-  in.read (reinterpret_cast<char *>(&val[0]),
-           reinterpret_cast<char *>(&val[max_len])
-           - reinterpret_cast<char *>(&val[0]));
+  in.read (reinterpret_cast<char *>(val.get()),
+           reinterpret_cast<char *>(val.get() + max_len)
+           - reinterpret_cast<char *>(val.get()));
   in >> c;
   AssertThrow (c == ']', ExcIO());
 }
