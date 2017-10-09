@@ -46,13 +46,6 @@ Function<dim, Number>::Function (const unsigned int n_components,
 
 
 
-// The destructor is pure virtual so we can't default it
-// in the declaration.
-template <int dim, typename Number>
-Function<dim, Number>::~Function () = default;
-
-
-
 template <int dim, typename Number>
 Function<dim, Number> &Function<dim, Number>::operator= (const Function &f)
 {

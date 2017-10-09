@@ -850,6 +850,18 @@ private:
 };
 
 
+#ifndef DOXYGEN
+// icc 2018 complains about an undefined reference
+// if we put this in the templates.h file
+//
+// The destructor is pure virtual so we can't default it
+// in the declaration.
+template <int dim, typename Number>
+inline
+Function<dim, Number>::~Function () = default;
+#endif
+
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
