@@ -436,9 +436,9 @@ namespace VectorTools
               // that we are allowed to set degrees of freedom if at least
               // one of the components (of the dof) is selected.
               bool selected = false;
-              for (unsigned int i = 0; i < nonzero_components.size(); ++i)
+              for (unsigned int c = 0; c < nonzero_components.size(); ++c)
                 selected =
-                  selected || (nonzero_components[i] && component_mask[i]);
+                  selected || (nonzero_components[c] && component_mask[c]);
 
               if (selected)
                 {
