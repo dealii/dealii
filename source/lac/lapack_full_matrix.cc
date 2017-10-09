@@ -594,6 +594,25 @@ number LAPACKFullMatrix<number>::norm(const char type) const
 }
 
 
+
+template <typename number>
+number LAPACKFullMatrix<number>::trace() const
+{
+  Assert (state == LAPACKSupport::matrix ||
+          state == LAPACKSupport::inverse_matrix,
+          ExcMessage("Trace can be called in matrix state only."));
+  Assert (this->n_cols() == this->n_rows(),
+          ExcDimensionMismatch(this->n_cols(), this->n_rows()));
+
+  number tr = 0;
+  for (size_type i=0; i<this->n_rows(); ++i)
+    tr += (*this)(i,i);
+
+  return tr;
+}
+
+
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::compute_cholesky_factorization()

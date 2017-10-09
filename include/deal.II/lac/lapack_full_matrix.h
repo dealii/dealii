@@ -460,6 +460,12 @@ public:
   number frobenius_norm() const;
 
   /**
+   * Compute trace of the matrix, i.e. the sum of the diagonal values.
+   * Obviously, the matrix needs to be quadratic for this function.
+   */
+  number trace() const;
+
+  /**
    * Invert the matrix by first computing an LU/Cholesky factorization with the LAPACK
    * function Xgetrf/Xpotrf and then building the actual inverse using Xgetri/Xpotri.
    */
