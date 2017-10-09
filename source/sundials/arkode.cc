@@ -376,8 +376,8 @@ namespace SUNDIALS
            ExcFunctionNotProvided("explicit_function || implicit_function"));
 
     status = ARKodeInit(arkode_mem,
-                        explicit_function ? t_arkode_explicit_function<VectorType> : nullptr,
-                        implicit_function ? t_arkode_implicit_function<VectorType> : nullptr,
+                        explicit_function ? &t_arkode_explicit_function<VectorType> : nullptr,
+                        implicit_function ? &t_arkode_implicit_function<VectorType> : nullptr,
                         current_time, yy);
     AssertARKode(status);
 
