@@ -28,6 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim> class DoFHandler;
+class MGConstrainedDoFs;
 
 /* !@addtogroup mg */
 /* @{ */
@@ -136,6 +137,20 @@ namespace MGTools
                                    SparsityPatternType               &sparsity,
                                    const unsigned int                 level,
                                    const Table<2,DoFTools::Coupling> &flux_mask);
+
+
+  /**
+   * Create sparsity pattern for interface_in/out matrices used in a multigrid computation.
+   * These matrices contain an entry representing the coupling of degrees of
+   * freedom on a refinement edge to those not on the refinement edge of a certain level.
+   */
+  template <typename DoFHandlerType, typename SparsityPatternType>
+  void
+  make_interface_sparsity_pattern (const DoFHandlerType    &dof_handler,
+                                   const MGConstrainedDoFs &mg_constrained_dofs,
+                                   SparsityPatternType     &sparsity,
+                                   const unsigned int      level);
+
 
   /**
    * Count the dofs block-wise on each level.

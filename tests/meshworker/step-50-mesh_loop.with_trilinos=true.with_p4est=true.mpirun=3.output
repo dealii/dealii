@@ -1,0 +1,55 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       256
+DEAL::   Number of degrees of freedom: 289 (by level: 4, 9, 25, 81, 289)
+DEAL::mg_matrices[0]: 2.78887
+DEAL::mg_interface_matrices[0]: 0.00000
+DEAL::mg_matrices[1]: 7.37274
+DEAL::mg_interface_matrices[1]: 0.00000
+DEAL::mg_matrices[2]: 20.4478
+DEAL::mg_interface_matrices[2]: 0.00000
+DEAL::mg_matrices[3]: 47.8346
+DEAL::mg_interface_matrices[3]: 0.00000
+DEAL::mg_matrices[4]: 101.551
+DEAL::mg_interface_matrices[4]: 0.00000
+DEAL:cg::Starting value 21.0544
+DEAL:cg::Convergence step 7 value 3.37709e-08
+DEAL::   CG converged in 7 iterations.
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       499
+DEAL::   Number of degrees of freedom: 550 (by level: 4, 9, 25, 81, 289, 361)
+DEAL::mg_matrices[0]: 2.78887
+DEAL::mg_interface_matrices[0]: 0.00000
+DEAL::mg_matrices[1]: 7.37274
+DEAL::mg_interface_matrices[1]: 0.00000
+DEAL::mg_matrices[2]: 20.4478
+DEAL::mg_interface_matrices[2]: 0.00000
+DEAL::mg_matrices[3]: 47.8346
+DEAL::mg_interface_matrices[3]: 0.00000
+DEAL::mg_matrices[4]: 101.551
+DEAL::mg_interface_matrices[4]: 0.00000
+DEAL::mg_matrices[5]: 195.872
+DEAL::mg_interface_matrices[5]: 3.31662
+DEAL:cg::Starting value 29.0111
+DEAL:cg::Convergence step 7 value 9.42221e-08
+DEAL::   CG converged in 7 iterations.
+DEAL::Cycle 2:
+DEAL::   Number of active cells:       1366
+DEAL::   Number of degrees of freedom: 1451 (by level: 4, 9, 25, 81, 289, 361, 1225)
+DEAL::mg_matrices[0]: 2.78887
+DEAL::mg_interface_matrices[0]: 0.00000
+DEAL::mg_matrices[1]: 7.37274
+DEAL::mg_interface_matrices[1]: 0.00000
+DEAL::mg_matrices[2]: 20.4478
+DEAL::mg_interface_matrices[2]: 0.00000
+DEAL::mg_matrices[3]: 47.8346
+DEAL::mg_interface_matrices[3]: 0.00000
+DEAL::mg_matrices[4]: 101.551
+DEAL::mg_interface_matrices[4]: 0.00000
+DEAL::mg_matrices[5]: 195.872
+DEAL::mg_interface_matrices[5]: 3.31662
+DEAL::mg_matrices[6]: 397.385
+DEAL::mg_interface_matrices[6]: 4.65475
+DEAL:cg::Starting value 40.5102
+DEAL:cg::Convergence step 7 value 2.64596e-07
+DEAL::   CG converged in 7 iterations.

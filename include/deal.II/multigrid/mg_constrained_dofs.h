@@ -110,6 +110,17 @@ public:
   bool at_refinement_edge (const unsigned int level,
                            const types::global_dof_index index) const;
 
+
+  /**
+   * Determine whether the (i,j) entry of the interface matrix
+   * on a given level should be set. This is taken in terms of
+   * dof i, that is, return true if i is at a refinement edge,
+   * j is not, and both are not on the external boundary.
+   */
+  bool is_interface_matrix_entry (const unsigned int level,
+                                  const types::global_dof_index i,
+                                  const types::global_dof_index j) const;
+
   /**
    * Return the indices of level dofs on the given level that are subject to
    * Dirichlet boundary conditions (as set by the @p function_map parameter in
@@ -310,6 +321,24 @@ MGConstrainedDoFs::at_refinement_edge (const unsigned int level,
   AssertIndexRange(level, refinement_edge_indices.size());
 
   return refinement_edge_indices[level].is_element(index);
+}
+
+inline
+bool
+MGConstrainedDoFs::is_interface_matrix_entry (const unsigned int level,
+                                              const types::global_dof_index i,
+                                              const types::global_dof_index j) const
+{
+  const IndexSet &interface_dofs_on_level
+    = this->get_refinement_edge_indices(level);
+
+  return interface_dofs_on_level.is_element(i)   // at_refinement_edge(i)
+         &&
+         !interface_dofs_on_level.is_element(j)  // !at_refinement_edge(j)
+         &&
+         !this->is_boundary_index(level, i)      // !on_boundary(i)
+         &&
+         !this->is_boundary_index(level, j);     // !on_boundary(j)
 }
 
 
