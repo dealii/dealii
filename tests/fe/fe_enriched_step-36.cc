@@ -647,7 +647,6 @@ int main (int argc,char **argv)
         PETScWrappers::set_option_value("-st_type","sinvert");
         PETScWrappers::set_option_value("-st_ksp_type","cg");
         PETScWrappers::set_option_value("-st_pc_type", "jacobi");
-        PETScWrappers::set_option_value("-st_ksp_tol", "1e-11");
         step36.run();
       }
 
