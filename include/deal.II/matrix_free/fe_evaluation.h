@@ -2923,9 +2923,22 @@ namespace internal
     typedef VectorType BaseVectorType;
 
     static BaseVectorType *get_vector_component (VectorType &vec,
-                                                 const unsigned int)
+                                                 const unsigned int component)
     {
-      return &vec;
+      // FEEvaluation allows to combine several vectors from a scalar
+      // FiniteElement into a "vector-valued" FEEvaluation object with
+      // multiple components. These components can be extracted with the other
+      // get_vector_component functions. If we do not get a vector of vectors
+      // (std::vector<VectorType>, std::vector<VectorType*>, BlockVector), we
+      // must make sure that we do not duplicate the components in input
+      // and/or duplicate the resulting integrals. In such a case, we should
+      // only get the zeroth component in the vector contained set nullptr for
+      // the others which allows us to catch unintended use in
+      // read_write_operation.
+      if (component == 0)
+        return &vec;
+      else
+        return nullptr;
     }
   };
 
@@ -3016,6 +3029,16 @@ FEEvaluationBase<dim,n_components_,Number>
   // and sit on a different vector each)
   if (n_fe_components == 1)
     {
+      for (unsigned int c=0; c<n_components; ++c)
+        Assert(src[c] != nullptr,
+               ExcMessage("The finite element underlying this FEEvaluation "
+                          "object is scalar, but you requested " +
+                          std::to_string(n_components) +
+                          " components via the template argument in "
+                          "FEEvaluation. In that case, you must pass an "
+                          "std::vector<VectorType> or a BlockVector to " +
+                          "read_dof_values and distribute_local_to_global."));
+
       const unsigned int n_local_dofs =
         VectorizedArray<Number>::n_array_elements * dofs_per_cell;
       for (unsigned int comp=0; comp<n_components; ++comp)
