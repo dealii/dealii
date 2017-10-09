@@ -1162,6 +1162,10 @@ namespace Patterns
         else if (std::is_floating_point<T>::value)
           return std_cxx14::make_unique<Patterns::Double>(
                    -std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
+
+        Assert(false, ExcNotImplemented());
+        //the following line should never be invoked
+        return nullptr;
       }
 
       static std::string to_string(const T &value,
