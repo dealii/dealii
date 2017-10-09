@@ -64,7 +64,7 @@ namespace Particles
           {
             const ArrayView<const double> their_properties = particle.get_properties();
 
-            std::copy(&their_properties[0],&their_properties[0]+their_properties.size(),&my_properties[0]);
+            std::copy(their_properties.begin(), their_properties.end(), my_properties.begin());
           }
       }
   }
@@ -131,7 +131,7 @@ namespace Particles
             if (their_properties.size() != 0)
               {
                 const ArrayView<double> my_properties = property_pool->get_properties(properties);
-                std::copy(&their_properties[0],&their_properties[0]+their_properties.size(),&my_properties[0]);
+                std::copy(their_properties.begin(), their_properties.end(), my_properties.begin());
               }
           }
         else
@@ -284,7 +284,7 @@ namespace Particles
                        + "This is not allowed."));
 
     if (old_properties.size() > 0)
-      std::copy(new_properties.begin(),new_properties.end(),&old_properties[0]);
+      std::copy(new_properties.begin(), new_properties.end(), old_properties.begin());
   }
 
 
