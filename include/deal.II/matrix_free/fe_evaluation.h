@@ -3455,6 +3455,16 @@ FEEvaluationBase<dim,n_components_,Number>
   // and sit on a different vector each)
   if (n_fe_components == 1)
     {
+      for (unsigned int c=0; c<n_components; ++c)
+        Assert(src[c] != nullptr,
+               ExcMessage("The finite element underlying this FEEvaluation "
+                          "object is scalar, but you requested " +
+                          std::to_string(n_components) +
+                          " components via the template argument in "
+                          "FEEvaluation. In that case, you must pass an "
+                          "std::vector<VectorType> or a BlockVector to " +
+                          "read_dof_values_plain."));
+
       const unsigned int n_local_dofs =
         VectorizedArray<Number>::n_array_elements * dofs_per_cell;
       for (unsigned int comp=0; comp<n_components; ++comp)
