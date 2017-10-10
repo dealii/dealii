@@ -1,0 +1,3 @@
+New: The function distribute_mg_dofs has been written for a parallel::shared::Triangulation. This allows for geometric multigrid computations on an adaptively refined mesh using a shared triangulation with the possibility of a user defined partitioning of the active and level cells. 
+<br>
+(Conrad Clevenger, 2017/10/10)

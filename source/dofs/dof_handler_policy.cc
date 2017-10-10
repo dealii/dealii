@@ -2414,6 +2414,68 @@ namespace internal
 
           return subdomain_association;
         }
+
+
+        /**
+         * level subdomain association. Similar to the above function only
+         * for level meshes. This function assigns boundary dofs in
+         * the same way as parallel::distributed::Triangulation (proc with
+         * smallest index) instead of the coin flip method above.
+         */
+        template <class DoFHandlerType>
+        std::vector<types::subdomain_id>
+        get_dof_level_subdomain_association (const DoFHandlerType          &dof_handler,
+                                             const types::global_dof_index  n_dofs_on_level,
+                                             const unsigned int             n_procs,
+                                             const unsigned int             level)
+        {
+          (void)n_procs;
+          std::vector<types::subdomain_id> level_subdomain_association (n_dofs_on_level,
+              numbers::invalid_subdomain_id);
+          std::vector<types::global_dof_index> local_dof_indices;
+          local_dof_indices.reserve (DoFTools::max_dofs_per_cell(dof_handler));
+
+          // loop over all cells and record which subdomain a DoF belongs to.
+          // interface goes to proccessor with smaller subdomain id
+          typename DoFHandlerType::cell_iterator
+          cell = dof_handler.begin(level),
+          endc = dof_handler.end(level);
+          for (; cell!=endc; ++cell)
+            {
+              // get the owner of the cell; note that we have made sure above that
+              // all cells are either locally owned or ghosts (not artificial), so
+              // this call will always yield the true owner
+              const types::subdomain_id level_subdomain_id = cell->level_subdomain_id();
+              const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
+              local_dof_indices.resize (dofs_per_cell);
+              cell->get_mg_dof_indices (local_dof_indices);
+
+              // set level subdomain ids. if dofs already have their values set then
+              // they must be on partition interfaces. in that case assign them to the
+              // processor wit the smaller subdomain id.
+              for (unsigned int i=0; i<dofs_per_cell; ++i)
+                if (level_subdomain_association[local_dof_indices[i]] ==
+                    numbers::invalid_subdomain_id)
+                  level_subdomain_association[local_dof_indices[i]] = level_subdomain_id;
+                else if (level_subdomain_association[local_dof_indices[i]] > level_subdomain_id)
+                  {
+                    level_subdomain_association[local_dof_indices[i]] = level_subdomain_id;
+                  }
+            }
+
+          Assert (std::find (level_subdomain_association.begin(),
+                             level_subdomain_association.end(),
+                             numbers::invalid_subdomain_id)
+                  == level_subdomain_association.end(),
+                  ExcInternalError());
+
+          Assert (*std::max_element (level_subdomain_association.begin(),
+                                     level_subdomain_association.end())
+                  < n_procs,
+                  ExcInternalError());
+
+          return level_subdomain_association;
+        }
       }
 
 
@@ -2581,12 +2643,168 @@ namespace internal
       ParallelShared<DoFHandlerType>::
       distribute_mg_dofs () const
       {
-        // this is not currently implemented; the algorithm should work
-        // as above, though: first call the sequential numbering
-        // algorithm, then re-enumerate subdomain-wise
-        Assert(false, ExcNotImplemented());
+        const unsigned int dim      = DoFHandlerType::dimension;
+        const unsigned int spacedim = DoFHandlerType::space_dimension;
 
-        return std::vector<NumberCache>();
+        const parallel::shared::Triangulation<dim, spacedim> *tr =
+          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>*> (&this->dof_handler->get_triangulation()));
+        Assert(tr != nullptr, ExcInternalError());
+
+        const unsigned int n_procs = Utilities::MPI::n_mpi_processes(tr->get_communicator());
+        const unsigned int n_levels = tr->n_global_levels();
+
+        std::vector<NumberCache> number_caches;
+        number_caches.reserve(n_levels);
+
+        // We create an index set for each level
+        for (unsigned int lvl=0; lvl<n_levels; ++lvl)
+          {
+            // If the underlying shared::Tria allows artificial cells,
+            // then save the current set of level subdomain ids, and set
+            // subdomain ids to the "true" owner of each cell. we later
+            // restore these flags
+            // Note: "allows_artificial_cells" is currently enforced for
+            //       MG computations.
+            std::vector<types::subdomain_id> saved_level_subdomain_ids;
+            saved_level_subdomain_ids.resize(tr->n_cells(lvl));
+            {
+              typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
+              cell = this->dof_handler->get_triangulation().begin(lvl),
+              endc = this->dof_handler->get_triangulation().end(lvl);
+
+              const std::vector<types::subdomain_id> &true_level_subdomain_ids
+                = tr->get_true_level_subdomain_ids_of_cells(lvl);
+
+              for (unsigned int index=0; cell != endc; ++cell, ++index)
+                {
+                  saved_level_subdomain_ids[index] = cell->level_subdomain_id();
+                  cell->set_level_subdomain_id(true_level_subdomain_ids[index]);
+                }
+            }
+
+            // Next let the sequential algorithm do its magic. it is going to
+            // enumerate DoFs on all cells on the given level, regardless of owner
+            const types::global_dof_index n_dofs_on_level =
+              Implementation::distribute_dofs_on_level(numbers::invalid_subdomain_id,
+                                                       *this->dof_handler,
+                                                       lvl);
+
+            // then re-enumerate them based on their level subdomain association.
+            // for this, we first have to identify for each current DoF
+            // index which subdomain they belong to. ideally, we would
+            // like to call DoFRenumbering::subdomain_wise(), but
+            // because the NumberCache of the current DoFHandler is not
+            // fully set up yet, we can't quite do that. also, that
+            // function has to deal with other kinds of triangulations as
+            // well, whereas we here know what kind of triangulation
+            // we have and can simplify the code accordingly
+            std::vector<types::global_dof_index> new_dof_indices (n_dofs_on_level,
+                                                                  numbers::invalid_dof_index);
+            {
+              // first get the association of each dof with a subdomain and
+              // determine the total number of subdomain ids used
+              const std::vector<types::subdomain_id> level_subdomain_association
+                = get_dof_level_subdomain_association (*this->dof_handler,
+                                                       n_dofs_on_level, n_procs, lvl);
+
+              // then renumber the subdomains by first looking at those belonging
+              // to subdomain 0, then those of subdomain 1, etc. note that the
+              // algorithm is stable, i.e. if two dofs i,j have i<j and belong to
+              // the same subdomain, then they will be in this order also after
+              // reordering
+              types::global_dof_index next_free_index = 0;
+              for (types::subdomain_id level_subdomain=0; level_subdomain<n_procs; ++level_subdomain)
+                for (types::global_dof_index i=0; i<n_dofs_on_level; ++i)
+                  if (level_subdomain_association[i] == level_subdomain)
+                    {
+                      Assert (new_dof_indices[i] == numbers::invalid_dof_index,
+                              ExcInternalError());
+                      new_dof_indices[i] = next_free_index;
+                      ++next_free_index;
+                    }
+
+              // we should have numbered all dofs
+              Assert (next_free_index == n_dofs_on_level, ExcInternalError());
+              Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
+                                 numbers::invalid_dof_index)
+                      == new_dof_indices.end(),
+                      ExcInternalError());
+            }
+
+            // finally do the renumbering. we can use the sequential
+            // version of the function because we do things on all
+            // cells and all cells have their subdomain ids and DoFs
+            // correctly set
+            Implementation::renumber_mg_dofs (new_dof_indices, IndexSet(0),
+                                              *this->dof_handler, lvl, true);
+
+            // update the number cache. for this, we first have to find the level subdomain
+            // association for each DoF again following renumbering, from which we
+            // can then compute the IndexSets of locally owned DoFs for all processors.
+            // all other fields then follow from this
+            //
+            // given the way we enumerate degrees of freedom, the locally owned
+            // ranges must all be contiguous and consecutive. this makes filling
+            // the IndexSets cheap. an assertion at the top verifies that this
+            // assumption is true
+            const std::vector<types::subdomain_id> level_subdomain_association
+              = get_dof_level_subdomain_association (*this->dof_handler,
+                                                     n_dofs_on_level, n_procs, lvl);
+
+            for (unsigned int i=1; i<n_dofs_on_level; ++i)
+              Assert (level_subdomain_association[i] >= level_subdomain_association[i-1],
+                      ExcInternalError());
+
+            std::vector<IndexSet> locally_owned_dofs_per_processor (n_procs,
+                                                                    IndexSet(n_dofs_on_level));
+            {
+              // we know that the set of subdomain indices is contiguous from
+              // the assertion above; find the start and end index for each
+              // processor, taking into account that sometimes a processor
+              // may not in fact have any DoFs at all. we do the latter
+              // by just identifying contiguous ranges of level_subdomain_ids
+              // and filling IndexSets for those subdomains; subdomains
+              // that don't appear will lead to IndexSets that are simply
+              // never touched and remain empty as initialized above.
+              unsigned int start_index = 0;
+              unsigned int end_index   = 0;
+              while (start_index < n_dofs_on_level)
+                {
+                  while ((end_index) < n_dofs_on_level &&
+                         (level_subdomain_association[end_index] == level_subdomain_association[start_index]))
+                    ++end_index;
+
+                  // we've now identified a range of same indices. set that
+                  // range in the corresponding IndexSet
+                  if (end_index > start_index)
+                    {
+                      const unsigned int level_subdomain_owner = level_subdomain_association[start_index];
+                      locally_owned_dofs_per_processor[level_subdomain_owner]
+                      .add_range (start_index, end_index);
+                    }
+
+                  // then move on to thinking about the next range
+                  start_index = end_index;
+                }
+            }
+
+            // finally, restore current level subdomain ids
+            {
+              typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator
+              cell = this->dof_handler->get_triangulation().begin(lvl),
+              endc = this->dof_handler->get_triangulation().end(lvl);
+
+              for (unsigned int index=0; cell != endc; ++cell, ++index)
+                cell->set_level_subdomain_id(saved_level_subdomain_ids[index]);
+
+              // add NumberCache for current level
+              number_caches.emplace_back (NumberCache(locally_owned_dofs_per_processor,
+                                                      this->dof_handler->get_triangulation()
+                                                      .locally_owned_subdomain ()));
+            }
+          }
+
+        return number_caches;
       }
 
 

@@ -154,10 +154,10 @@ namespace internal
             }
         }
 
-      const dealii::parallel::distributed::Triangulation<dim,spacedim> *tria =
-        (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+      const dealii::parallel::Triangulation<dim,spacedim> *tria =
+        (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
          (&mg_dof.get_triangulation()));
-      AssertThrow(send_data_temp.size()==0 || tria!=nullptr, ExcMessage("parallel Multigrid only works with a distributed Triangulation!"));
+      AssertThrow(send_data_temp.size()==0 || tria!=nullptr, ExcMessage("We should only be sending information with a parallel Triangulation!"));
 
 #ifdef DEAL_II_WITH_MPI
       if (tria)

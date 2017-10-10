@@ -1,0 +1,13 @@
+
+DEAL::Cycle 0:
+DEAL::   Number of active cells:       1024
+DEAL::   Number of degrees of freedom: 1089 (by level: 4, 9, 25, 81, 289, 1089)
+DEAL:cg::Starting value 29.7769
+DEAL:cg::Convergence step 7 value 8.10686e-08
+DEAL::   CG converged in 7 iterations.
+DEAL::Cycle 1:
+DEAL::   Number of active cells:       1891
+DEAL::   Number of degrees of freedom: 1990 (by level: 4, 9, 25, 81, 289, 1089, 1225)
+DEAL:cg::Starting value 41.0662
+DEAL:cg::Convergence step 7 value 2.21064e-07
+DEAL::   CG converged in 7 iterations.

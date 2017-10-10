@@ -215,6 +215,80 @@ namespace parallel
                          static_cast<types::global_dof_index>(0));
     number_cache.n_global_levels = Utilities::MPI::max(this->n_levels(), this->mpi_communicator);
   }
+
+
+
+  template <int dim, int spacedim>
+  void
+  Triangulation<dim,spacedim>::fill_level_ghost_owners ()
+  {
+    number_cache.level_ghost_owners.clear ();
+
+    if (this->n_levels() > 0)
+      {
+        // find level ghost owners
+        for (typename Triangulation<dim,spacedim>::cell_iterator
+             cell = this->begin();
+             cell != this->end();
+             ++cell)
+          if (cell->level_subdomain_id() != numbers::artificial_subdomain_id
+              && cell->level_subdomain_id() != this->locally_owned_subdomain())
+            this->number_cache.level_ghost_owners.insert(cell->level_subdomain_id());
+
+#ifdef DEBUG
+        // Check that level_ghost_owners is symmetric by sending a message
+        // to everyone
+        {
+          int ierr = MPI_Barrier(this->mpi_communicator);
+          AssertThrowMPI(ierr);
+
+          // important: preallocate to avoid (re)allocation:
+          std::vector<MPI_Request> requests (this->number_cache.level_ghost_owners.size());
+          int dummy = 0;
+          unsigned int req_counter = 0;
+
+          for (std::set<types::subdomain_id>::iterator it = this->number_cache.level_ghost_owners.begin();
+               it != this->number_cache.level_ghost_owners.end();
+               ++it, ++req_counter)
+            {
+              Assert (typeid(types::subdomain_id)
+                      == typeid(unsigned int),
+                      ExcNotImplemented());
+              ierr = MPI_Isend(&dummy, 1, MPI_UNSIGNED,
+                               *it, 9001, this->mpi_communicator,
+                               &requests[req_counter]);
+              AssertThrowMPI(ierr);
+            }
+
+          for (std::set<types::subdomain_id>::iterator it = this->number_cache.level_ghost_owners.begin();
+               it != this->number_cache.level_ghost_owners.end();
+               ++it)
+            {
+              Assert (typeid(types::subdomain_id)
+                      == typeid(unsigned int),
+                      ExcNotImplemented());
+              unsigned int dummy;
+              ierr = MPI_Recv(&dummy, 1, MPI_UNSIGNED,
+                              *it, 9001, this->mpi_communicator,
+                              MPI_STATUS_IGNORE);
+              AssertThrowMPI(ierr);
+            }
+
+          if (requests.size() > 0)
+            {
+              ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+              AssertThrowMPI(ierr);
+            }
+
+          ierr = MPI_Barrier(this->mpi_communicator);
+          AssertThrowMPI(ierr);
+        }
+#endif
+
+        Assert(this->number_cache.level_ghost_owners.size() < Utilities::MPI::n_mpi_processes(this->mpi_communicator),
+               ExcInternalError());
+      }
+  }
 #else
   template <int dim, int spacedim>
   void
