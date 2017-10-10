@@ -186,7 +186,12 @@ public:
    * a colon and there is a double colon after the last prefix.
    *
    * A simpler way to add a prefix (without the manual need to add the
-   * corresponding pop()) is to use the Prefix class.
+   * corresponding pop()) is to use the LogStream::Prefix class. Using
+   * that class has the advantage that the corresponding pop() call is
+   * issued whenever the Prefix object goes out of scope -- either at
+   * the end of the code block, at the nearest @p return statement, or
+   * because an intermediate function call results in an exception that
+   * is not immediately caught.
    */
   void push (const std::string &text);
 
