@@ -148,7 +148,7 @@ check ()
 int main ()
 {
   std::ofstream logfile ("output");
-  logfile.precision (2);
+  logfile.precision (3);
   logfile.setf(std::ios::fixed);
   deallog.attach(logfile);
 

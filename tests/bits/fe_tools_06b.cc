@@ -61,6 +61,7 @@ check_this (const FiniteElement<dim> &fe1,
   LinearAlgebra::distributed::Vector<double> out (dof1->n_dofs());
 
   FETools::back_interpolate (*dof1, cm1, in, *dof2, cm2, out);
+  deallog << std::setprecision(9);
   output_vector (out);
 }
 
