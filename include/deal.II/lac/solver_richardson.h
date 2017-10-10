@@ -217,39 +217,29 @@ SolverRichardson<VectorType>::solve (const MatrixType         &A,
   VectorType &d  = *Vd;
   d.reinit(x);
 
-  deallog.push("Richardson");
+  LogStream::Prefix prefix("Richardson");
 
-  try
+  // Main loop
+  while (conv==SolverControl::iterate)
     {
-      // Main loop
-      while (conv==SolverControl::iterate)
-        {
-          // Do not use residual,
-          // but do it in 2 steps
-          A.vmult(r,x);
-          r.sadd(-1.,1.,b);
-          preconditioner.vmult(d,r);
+      // Do not use residual,
+      // but do it in 2 steps
+      A.vmult(r,x);
+      r.sadd(-1.,1.,b);
+      preconditioner.vmult(d,r);
 
-          // get the required norm of the (possibly preconditioned)
-          // residual
-          last_criterion = criterion(r, d);
-          conv = this->iteration_status (iter, last_criterion, x);
-          if (conv != SolverControl::iterate)
-            break;
+      // get the required norm of the (possibly preconditioned)
+      // residual
+      last_criterion = criterion(r, d);
+      conv = this->iteration_status (iter, last_criterion, x);
+      if (conv != SolverControl::iterate)
+        break;
 
-          x.add(additional_data.omega,d);
-          print_vectors(iter,x,r,d);
+      x.add(additional_data.omega,d);
+      print_vectors(iter,x,r,d);
 
-          ++iter;
-        }
+      ++iter;
     }
-  catch (...)
-    {
-      deallog.pop();
-      throw;
-    }
-
-  deallog.pop();
 
   // in case of failure: throw exception
   if (conv != SolverControl::success)
@@ -284,37 +274,28 @@ SolverRichardson<VectorType>::Tsolve (const MatrixType         &A,
   VectorType &d  = *Vd;
   d.reinit(x);
 
-  deallog.push("RichardsonT");
+  LogStream::Prefix prefix("RichardsonT");
 
-  try
+  // Main loop
+  while (conv==SolverControl::iterate)
     {
-      // Main loop
-      while (conv==SolverControl::iterate)
-        {
-          // Do not use Tresidual,
-          // but do it in 2 steps
-          A.Tvmult(r,x);
-          r.sadd(-1.,1.,b);
-          preconditioner.Tvmult(d,r);
+      // Do not use Tresidual,
+      // but do it in 2 steps
+      A.Tvmult(r,x);
+      r.sadd(-1.,1.,b);
+      preconditioner.Tvmult(d,r);
 
-          last_criterion = criterion(r, d);
-          conv = this->iteration_status (iter, last_criterion, x);
-          if (conv != SolverControl::iterate)
-            break;
+      last_criterion = criterion(r, d);
+      conv = this->iteration_status (iter, last_criterion, x);
+      if (conv != SolverControl::iterate)
+        break;
 
-          x.add(additional_data.omega,d);
-          print_vectors(iter,x,r,d);
+      x.add(additional_data.omega,d);
+      print_vectors(iter,x,r,d);
 
-          ++iter;
-        }
-    }
-  catch (...)
-    {
-      deallog.pop();
-      throw;
+      ++iter;
     }
 
-  deallog.pop();
   // in case of failure: throw exception
   if (conv != SolverControl::success)
     AssertThrow(false, SolverControl::NoConvergence (iter, last_criterion));

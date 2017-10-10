@@ -777,7 +777,7 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
 //TODO:[?] Check, why there are two different start residuals.
 //TODO:[GK] Make sure the parameter in the constructor means maximum basis size
 
-  deallog.push("GMRES");
+  LogStream::Prefix prefix("GMRES");
   const unsigned int n_tmp_vectors = additional_data.max_n_tmp_vectors;
 
   // Generate an object where basis vectors are stored.
@@ -1046,8 +1046,6 @@ SolverGMRES<VectorType>::solve (const MatrixType         &A,
   if (!krylov_space_signal.empty())
     krylov_space_signal(tmp_vectors);
 
-  deallog.pop();
-
   // in case of failure: throw exception
   AssertThrow(iteration_state == SolverControl::success,
               SolverControl::NoConvergence (accumulated_iterations,
@@ -1172,7 +1170,7 @@ SolverFGMRES<VectorType>::solve (const MatrixType         &A,
                                  const VectorType         &b,
                                  const PreconditionerType &preconditioner)
 {
-  deallog.push("FGMRES");
+  LogStream::Prefix prefix("FGMRES");
 
   SolverControl::State iteration_state = SolverControl::iterate;
 
@@ -1257,7 +1255,6 @@ SolverFGMRES<VectorType>::solve (const MatrixType         &A,
     }
   while (iteration_state == SolverControl::iterate);
 
-  deallog.pop();
   // in case of failure: throw exception
   if (iteration_state != SolverControl::success)
     AssertThrow(false, SolverControl::NoConvergence (accumulated_iterations,

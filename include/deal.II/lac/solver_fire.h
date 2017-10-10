@@ -251,7 +251,7 @@ SolverFIRE<VectorType>::solve
  VectorType                                                    &x,
  const PreconditionerType                                      &inverse_mass_matrix)
 {
-  deallog.push("FIRE");
+  LogStream::Prefix prefix("FIRE");
 
   // FIRE algorithm constants
   const double DELAYSTEP       = 5;
@@ -360,8 +360,6 @@ SolverFIRE<VectorType>::solve
       print_vectors(iter, x, velocities, gradients);
 
     } // While we need to iterate.
-
-  deallog.pop();
 
   // In the case of failure: throw exception.
   if (conv != SolverControl::success)

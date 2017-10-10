@@ -81,7 +81,7 @@ namespace Algorithms
   {
     Assert(!adaptive, ExcNotImplemented());
 
-    deallog.push ("Theta");
+    LogStream::Prefix prefix("Theta");
 
     VectorType &solution = *out.entry<VectorType *>(0);
     GrowingVectorMemory<VectorType> mem;
@@ -143,7 +143,6 @@ namespace Algorithms
 
         d_explicit.time = control.now();
       }
-    deallog.pop();
   }
 }
 

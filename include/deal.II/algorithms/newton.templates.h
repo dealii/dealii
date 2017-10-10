@@ -100,7 +100,7 @@ namespace Algorithms
                                   const AnyData &in)
   {
     Assert (out.size() == 1, ExcNotImplemented());
-    deallog.push ("Newton");
+    LogStream::Prefix prefix("Newton");
 
     VectorType &u = *out.entry<VectorType *>(0);
 
@@ -197,7 +197,6 @@ namespace Algorithms
             resnorm = res->l2_norm();
           }
       }
-    deallog.pop();
 
     // in case of failure: throw exception
     if (control.last_check() != SolverControl::success)

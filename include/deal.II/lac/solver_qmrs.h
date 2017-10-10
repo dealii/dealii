@@ -260,7 +260,7 @@ SolverQMRS<VectorType>::solve (const MatrixType         &A,
                                const VectorType         &b,
                                const PreconditionerType &preconditioner)
 {
-  deallog.push("QMRS");
+  LogStream::Prefix prefix("QMRS");
 
   // temporary vectors, allocated through the @p VectorMemory object at the
   // start of the actual solution process and deallocated at the end.
@@ -290,9 +290,6 @@ SolverQMRS<VectorType>::solve (const MatrixType         &A,
       state = iterate(A, x, b, preconditioner, *Vv, *Vp, *Vq, *Vt, *Vd);
     }
   while (state.state == SolverControl::iterate);
-
-  // Output
-  deallog.pop();
 
   // in case of failure: throw exception
   AssertThrow(state.state == SolverControl::success,

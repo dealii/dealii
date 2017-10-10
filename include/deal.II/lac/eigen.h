@@ -237,7 +237,7 @@ EigenPower<VectorType>::solve (double           &value,
 {
   SolverControl::State conv=SolverControl::iterate;
 
-  deallog.push("Power method");
+  LogStream::Prefix prefix("Power method");
 
   typename VectorMemory<VectorType>::Pointer Vy (this->memory);
   VectorType &y = *Vy;
@@ -291,8 +291,6 @@ EigenPower<VectorType>::solve (double           &value,
       conv = this->iteration_status (iter, std::fabs(1./length-1./old_length), x);
     }
 
-  deallog.pop();
-
   // in case of failure: throw exception
   AssertThrow(conv == SolverControl::success, SolverControl::NoConvergence (iter,
               std::fabs(1./length-1./old_length)));
@@ -326,7 +324,7 @@ EigenInverse<VectorType>::solve (double           &value,
                                  const MatrixType &A,
                                  VectorType       &x)
 {
-  deallog.push("Wielandt");
+  LogStream::Prefix prefix("Wielandt");
 
   SolverControl::State conv=SolverControl::iterate;
 
@@ -415,8 +413,6 @@ EigenInverse<VectorType>::solve (double           &value,
         }
       old_value = value;
     }
-
-  deallog.pop();
 
   // in case of failure: throw
   // exception
