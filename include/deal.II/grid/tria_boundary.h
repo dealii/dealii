@@ -73,6 +73,9 @@ DEAL_II_NAMESPACE_OPEN
  * right into the middle of the given points, and HyperBallBoundary creating a
  * hyperball with given radius around a given center point.
  *
+ * @deprecated This class has been deprecated in favor of the more general
+ * Manifold class.
+ *
  * @ingroup boundary
  * @author Wolfgang Bangerth, 1999, 2001, 2009, Ralf Hartmann, 2001, 2008,
  * Luca Heltai, 2014
@@ -216,7 +219,7 @@ private:
    * Mutex for protecting the points array.
    */
   mutable Threads::Mutex mutex;
-};
+} DEAL_II_DEPRECATED;
 
 
 
@@ -229,6 +232,9 @@ private:
  * placing new points in the middle of old ones, it rather assumes that the
  * boundary of the domain is given by the polygon/polyhedron defined by the
  * boundary of the initial coarse triangulation.
+ *
+ * @deprecated This class has been deprecated in favor of the more general
+ * FlatManifold class.
  *
  * @ingroup boundary
  *
@@ -361,7 +367,7 @@ public:
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::hex_iterator &hex,
                       const Point<spacedim> &candidate) const;
-};
+} DEAL_II_DEPRECATED;
 
 
 
