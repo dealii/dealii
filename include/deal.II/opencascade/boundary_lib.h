@@ -60,6 +60,9 @@ namespace OpenCASCADE
    * face would be collapsed to the edge, and your surrounding points would
    * not be lying on the given shape, raising an exception.
    *
+   * @deprecated This class has been deprecated in favor of the equivalent
+   * Manifold class.
+   *
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
@@ -104,7 +107,7 @@ namespace OpenCASCADE
      * Relative tolerance used by this class to compute distances.
      */
     const double tolerance;
-  };
+  } DEAL_II_DEPRECATED;
 
   /**
    * A Boundary object based on OpenCASCADE TopoDS_Shape where new points are
@@ -124,6 +127,9 @@ namespace OpenCASCADE
    * the triangulation to be refined is close to the boundary of the given
    * TopoDS_Shape, or when the direction you use at construction time does not
    * intersect the shape. An exception is thrown when this happens.
+   *
+   * @deprecated This class has been deprecated in favor of the equivalent
+   * Manifold class.
    *
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
@@ -170,7 +176,7 @@ namespace OpenCASCADE
      * Relative tolerance used by this class to compute distances.
      */
     const double tolerance;
-  };
+  } DEAL_II_DEPRECATED;
 
 
   /**
@@ -215,6 +221,9 @@ namespace OpenCASCADE
    * points does not intersect the shape.  An exception is thrown when this
    * happens.
    *
+   * @deprecated This class has been deprecated in favor of the equivalent
+   * Manifold class.
+   *
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
@@ -252,7 +261,7 @@ namespace OpenCASCADE
      * Relative tolerance used by this class to compute distances.
      */
     const double tolerance;
-  };
+  } DEAL_II_DEPRECATED;
 
   /**
    * A Boundary object based on OpenCASCADE TopoDS_Shape objects which have
