@@ -22,7 +22,6 @@
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
@@ -36,7 +35,6 @@ void test ()
   deallog << "dim=" << dim << std::endl;
 
   Triangulation<dim> tria;
-  StraightBoundary<dim> boundary;
 
   GridGenerator::hyper_cube(tria, 0, 1);
 
@@ -73,7 +71,7 @@ void test ()
 
           deallog << "    Quad " << e << ", projected point=";
 
-          const Point<dim> p = boundary.project_to_surface (quad, trial_point);
+          const Point<dim> p = GridTools::project_to_object (quad, trial_point);
           deallog << p;
           deallog << "  (quad is from ";
           deallog << quad->vertex(0);

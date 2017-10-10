@@ -428,10 +428,8 @@ public:
    * projects it to manifold itself.
    *
    * This class is used by the default implementation of the function
-   * get_new_point(). It should be made pure virtual, but for historical
-   * reason, derived classes like Boundary<dim, spacedim> do not implement it.
-   * The default behavior of this class, however, is to throw an exception
-   * when called.
+   * get_new_point() and should be implemented by derived classes. The default
+   * implementation simply throws an exception if called.
    *
    * If your manifold is simple, you could implement this function only, and
    * the default behavior should work out of the box.

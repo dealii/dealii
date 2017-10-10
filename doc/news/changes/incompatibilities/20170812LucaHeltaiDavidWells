@@ -1,0 +1,4 @@
+Changed: Triangulation::get_manifold() will now return a FlatManifold instead of
+a StraightBoundary in the case that no manifold description has been attached to
+a provided manifold ID.
+<br> (Luca Heltai, David Wells, 2017/08/12)
