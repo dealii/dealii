@@ -320,7 +320,7 @@ namespace parallel
        * A vector containing level subdomain IDs of cells obtained by partitioning
        * each level.
        *
-       * The original parition information is stored to allow using sequential
+       * The original partition information is stored to allow using sequential
        * DoF distribution and partitioning functions with semi-artificial
        * cells.
        */
