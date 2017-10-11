@@ -35,7 +35,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 class BlockMask;
-template <int dim, typename Number> class Function;
+template <int dim, typename RangeNumberType> class Function;
 template <int dim, int spacedim> class FiniteElement;
 namespace hp
 {

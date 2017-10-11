@@ -33,7 +33,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, typename Number> class Function;
+template <int dim, typename RangeNumberType> class Function;
 template <int dim> class Quadrature;
 template <int dim> class QGauss;
 template <int dim, typename number> class MatrixFree;
