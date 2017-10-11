@@ -290,17 +290,6 @@ namespace
   {
   public:
     /**
-     * Default constructor. Creates an invalid edge.
-     */
-    Edge ()
-      :
-      orientation_status (not_oriented)
-    {
-      for (unsigned int i=0; i<2; ++i)
-        vertex_indices[i] = numbers::invalid_unsigned_int;
-    }
-
-    /**
      * Constructor. Create the edge based on the information given
      * in @p cell, and selecting the edge with number @p edge_number
      * within this cell. Initialize the edge as unoriented.
@@ -377,17 +366,6 @@ namespace
   template <int dim>
   struct Cell
   {
-    /**
-     * Default construct a cell.
-     */
-    Cell ()
-    {
-      for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-        vertex_indices[i] = numbers::invalid_unsigned_int;
-      for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i)
-        edge_indices[i] = numbers::invalid_unsigned_int;
-    }
-
     /**
      * Construct a Cell object from a CellData object. Also take a
      * (sorted) list of edges and to point the edges of the current
