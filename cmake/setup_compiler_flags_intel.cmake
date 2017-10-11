@@ -56,6 +56,11 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-ansi")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
 
 #
+# Disable remarks like "Inlining inhibited by limit max-size"
+#
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-diag-disable=remark")
+
+#
 # Disable some warnings that lead to a lot of false positives:
 #
 #   -w21    type qualifiers are meaningless in this declaration
@@ -133,12 +138,16 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd15531")
 #   -w185 dynamic initialization in unreachable code
 #         When initializing a local variable in code
 #         that is executed only for one specific dimension
+#   -w186 pointless comparison of unsigned integer with zero
+#         The condition of for loops often depends on dim
+#         and happens to evaluate to zero sometimes
 #   -w280 selector expression is constant
 #         When writing 'switch(dim)'
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd111")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd128")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd185")
+ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd186")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-wd280")
 
 
