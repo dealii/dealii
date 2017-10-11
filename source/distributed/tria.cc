@@ -1462,7 +1462,7 @@ namespace parallel
                 // Additionally, we need to store the pointer to this
                 // vertex index with respect to the std::vector
                 const unsigned int *const vertex_index
-                  = reinterpret_cast<const unsigned int *const>(ptr);
+                  = reinterpret_cast<const unsigned int *>(ptr);
                 first_indices[c] = vertex_indices.size();
                 vertex_indices.push_back(*vertex_index);
                 n_vertices_on_cell[c] = *vertex_index;
@@ -1482,7 +1482,7 @@ namespace parallel
               {
                 // We need to store a pointer to the first vertex.
                 const dealii::Point<spacedim> *const vertex
-                  = reinterpret_cast<const dealii::Point<spacedim> * const>(ptr);
+                  = reinterpret_cast<const dealii::Point<spacedim> *>(ptr);
                 first_indices[c] = vertices.size();
                 vertices.push_back(*vertex);
                 ptr += sizeof(dealii::Point<spacedim>);
