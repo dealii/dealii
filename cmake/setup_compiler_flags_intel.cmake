@@ -56,7 +56,7 @@ ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-ansi")
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-w2")
 
 #
-# Disable remarks:
+# Disable remarks like "Inlining inhibited by limit max-size"
 #
 ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-diag-disable=remark")
 
