@@ -1083,7 +1083,7 @@ template <int dim, int spacedim>
 void DoFHandler<dim,spacedim>::clear ()
 {
   // release lock to old fe
-  fe_collection.release();
+  fe_collection.reset();
 
   // release memory
   clear_space ();
