@@ -289,18 +289,17 @@ FE_Enriched<dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 template <int dim, int spacedim>
 template <int dim_1>
 typename FiniteElement<dim,spacedim>::InternalDataBase *
-FE_Enriched<dim,spacedim>::setup_data (std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> fes_data,
+FE_Enriched<dim,spacedim>::setup_data (std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> &&fes_data,
                                        const UpdateFlags      flags,
                                        const Quadrature<dim_1> &quadrature) const
 {
   Assert ((dynamic_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.get()) != nullptr),
           ExcInternalError());
-  typename FESystem<dim,spacedim>::InternalData *data_fesystem =
-    static_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.get());
 
   // FESystem::InternalData will be aggregated (owned) by
   // our InternalData.
-  fes_data.release();
+  typename FESystem<dim,spacedim>::InternalData *data_fesystem =
+    static_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.release());
   InternalData *data = new InternalData(std::unique_ptr<typename FESystem<dim,spacedim>::InternalData>(data_fesystem));
 
   // copy update_each from FESystem data:
