@@ -101,5 +101,7 @@ int main(void)
   delete[] H;
   H = nullptr;
 
+  delete[] xp;
+
   return 0;
 }
