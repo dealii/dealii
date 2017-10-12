@@ -871,7 +871,10 @@ namespace PETScWrappers
     /**
      * Exception
      */
-    DeclException0 (ExcSourceEqualsDestination);
+    DeclExceptionMsg (ExcSourceEqualsDestination,
+                      "You are attempting an operation on two matrices that "
+                      "are the same object, but the operation requires that the "
+                      "two objects are in fact different.");
 
     /**
      * Exception.
