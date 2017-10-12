@@ -247,6 +247,16 @@ Test project .../examples/step
 100% tests passed, 0 tests failed out of 2
 
 Total Test time (real) =   0.43 sec</pre>
+    In some cases, additional input data has to be provided in users' tests. For
+    example, we may have an input file
+      <pre>
+tests/support/my_test_2.input</pre>
+    which shall be parsed within <code>my_test_2.cc</code>. To read this file,
+    one can use the <code>SOURCE_DIR</code> preprocessor variable which will be equal
+    to the parent folder of each <code>.cc</code> test. In other words, given the current
+    imaginary directory stucture, <code>const std::string str = std::string(SOURCE_DIR) + "/my_test_2.input";</code>
+    used from <code>my_test_2.cc</code> will contain the path to the
+    auxiliary input file.
     </p>
 
     <p>
