@@ -69,7 +69,6 @@ namespace Particles
      */
     ParticleHandler(const parallel::distributed::Triangulation<dim,spacedim> &tria,
                     const Mapping<dim,spacedim> &mapping,
-                    const MPI_Comm mpi_communicator,
                     const unsigned int n_properties = 0);
 
     /**
@@ -84,7 +83,6 @@ namespace Particles
      */
     void initialize(const parallel::distributed::Triangulation<dim,spacedim> &tria,
                     const Mapping<dim,spacedim> &mapping,
-                    const MPI_Comm mpi_communicator,
                     const unsigned int n_properties = 0);
 
     /**
@@ -228,16 +226,6 @@ namespace Particles
     n_particles_in_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell) const;
 
     /**
-     * Returns a vector that contains a tensor for every vertex-cell
-     * combination of the output of dealii::GridTools::vertex_to_cell_map()
-     * (which is expected as input parameter for this function).
-     * Each tensor represents a geometric vector from the vertex to the
-     * respective cell center.
-     */
-    std::vector<std::vector<Tensor<1,spacedim> > >
-    vertex_to_cell_centers_directions(const std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> > &vertex_to_cells) const;
-
-    /**
      * Finds the cells containing each particle for all locally owned
      * particles. If particles moved out of the local subdomain
      * they will be sent to their new process and inserted there.
@@ -276,11 +264,6 @@ namespace Particles
      * Address of the mapping to work on.
      */
     SmartPointer<const Mapping<dim,spacedim>,ParticleHandler<dim,spacedim> > mapping;
-
-    /**
-     * MPI communicator.
-     */
-    MPI_Comm mpi_communicator;
 
     /**
      * Set of particles currently in the local domain, organized by

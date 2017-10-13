@@ -26,7 +26,6 @@ namespace Particles
   ParticleHandler<dim,spacedim>::ParticleHandler()
     :
     triangulation(),
-    mpi_communicator(),
     particles(),
     ghost_particles(),
     global_number_of_particles(0),
@@ -44,12 +43,10 @@ namespace Particles
   template <int dim,int spacedim>
   ParticleHandler<dim,spacedim>::ParticleHandler(const parallel::distributed::Triangulation<dim,spacedim> &triangulation,
                                                  const Mapping<dim,spacedim> &mapping,
-                                                 const MPI_Comm mpi_communicator,
                                                  const unsigned int n_properties)
     :
     triangulation(&triangulation, typeid(*this).name()),
     mapping(&mapping, typeid(*this).name()),
-    mpi_communicator(mpi_communicator),
     particles(),
     ghost_particles(),
     global_number_of_particles(0),
@@ -74,12 +71,10 @@ namespace Particles
   void
   ParticleHandler<dim,spacedim>::initialize(const parallel::distributed::Triangulation<dim,spacedim> &tria,
                                             const Mapping<dim,spacedim> &mapp,
-                                            const MPI_Comm communicator,
                                             const unsigned int n_properties)
   {
     triangulation = &tria;
     mapping = &mapp;
-    mpi_communicator = communicator;
 
     // Create the memory pool that will store all particle properties
     property_pool.reset(new PropertyPool(n_properties));
@@ -242,7 +237,7 @@ namespace Particles
   void
   ParticleHandler<dim,spacedim>::update_n_global_particles()
   {
-    global_number_of_particles = dealii::Utilities::MPI::sum (particles.size(), mpi_communicator);
+    global_number_of_particles = dealii::Utilities::MPI::sum (particles.size(), triangulation->get_communicator());
   }
 
 
@@ -273,7 +268,7 @@ namespace Particles
     for (particle_iterator particle = begin(); particle != end(); ++particle)
       locally_highest_index = std::max(locally_highest_index,particle->get_id());
 
-    next_free_particle_index = dealii::Utilities::MPI::max (locally_highest_index, mpi_communicator) + 1;
+    next_free_particle_index = dealii::Utilities::MPI::max (locally_highest_index, triangulation->get_communicator()) + 1;
   }
 
 
@@ -291,7 +286,7 @@ namespace Particles
                                                   n_particles_in_cell(cell));
         }
 
-    global_max_particles_per_cell = dealii::Utilities::MPI::max(local_max_particles_per_cell,mpi_communicator);
+    global_max_particles_per_cell = dealii::Utilities::MPI::max(local_max_particles_per_cell,triangulation->get_communicator());
   }
 
 
@@ -322,34 +317,6 @@ namespace Particles
 
 
 
-  template <int dim, int spacedim>
-  std::vector<std::vector<Tensor<1,spacedim> > >
-  ParticleHandler<dim,spacedim>::vertex_to_cell_centers_directions(const std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> > &vertex_to_cells) const
-  {
-    const std::vector<Point<spacedim> > &vertices = triangulation->get_vertices();
-    const unsigned int n_vertices = vertex_to_cells.size();
-
-    std::vector<std::vector<Tensor<1,spacedim> > > vertex_to_cell_centers(n_vertices);
-    for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
-      if (triangulation->vertex_used(vertex))
-        {
-          const unsigned int n_neighbor_cells = vertex_to_cells[vertex].size();
-          vertex_to_cell_centers[vertex].resize(n_neighbor_cells);
-
-          typename std::set<typename Triangulation<dim,spacedim>::active_cell_iterator>::iterator
-          it = vertex_to_cells[vertex].begin();
-
-          for (unsigned int cell=0; cell<n_neighbor_cells; ++cell,++it)
-            {
-              vertex_to_cell_centers[vertex][cell] = (*it)->center() - vertices[vertex];
-              vertex_to_cell_centers[vertex][cell] /= vertex_to_cell_centers[vertex][cell].norm();
-            }
-        }
-    return vertex_to_cell_centers;
-  }
-
-
-
   namespace
   {
     /**
@@ -375,31 +342,6 @@ namespace Particles
       // for the alignment of particle direction and center direction,
       // therefore return if the scalar product of a is larger.
       return (scalar_product_a > scalar_product_b);
-    }
-
-    /**
-     * Returns the local vertex index of cell @p cell that is closest to
-     * the given location @p position.
-     */
-    template <int dim>
-    unsigned int
-    get_closest_vertex_of_cell(const typename Triangulation<dim>::active_cell_iterator &cell,
-                               const Point<dim> &position)
-    {
-      double minimum_distance = std::numeric_limits<double>::max();
-      unsigned int closest_vertex = numbers::invalid_unsigned_int;
-
-      for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-        {
-          const double vertex_distance = position.distance(cell->vertex(v));
-          if (vertex_distance < minimum_distance)
-            {
-              closest_vertex = v;
-              minimum_distance = vertex_distance;
-            }
-        }
-
-      return closest_vertex;
     }
   }
 
@@ -475,7 +417,8 @@ namespace Particles
       vertex_to_cells(GridTools::vertex_to_cell_map(*triangulation));
 
       // Create a corresponding map of vectors from vertex to cell center
-      const std::vector<std::vector<Tensor<1,spacedim> > > vertex_to_cell_centers(vertex_to_cell_centers_directions(vertex_to_cells));
+      const std::vector<std::vector<Tensor<1,spacedim> > >
+      vertex_to_cell_centers(GridTools::vertex_to_cell_centers_directions(*triangulation,vertex_to_cells));
 
       std::vector<unsigned int> neighbor_permutation;
 
@@ -493,7 +436,7 @@ namespace Particles
           // that are adjacent to the closest vertex
           typename Triangulation<dim,spacedim>::active_cell_iterator current_cell = (*it)->get_surrounding_cell(*triangulation);
 
-          const unsigned int closest_vertex = get_closest_vertex_of_cell(current_cell,(*it)->get_location());
+          const unsigned int closest_vertex = GridTools::find_closest_vertex_of_cell<dim,spacedim>(current_cell,(*it)->get_location());
           Tensor<1,spacedim> vertex_to_particle = (*it)->get_location() - current_cell->vertex(closest_vertex);
           vertex_to_particle /= vertex_to_particle.norm();
 
@@ -583,7 +526,7 @@ namespace Particles
     std::multimap<types::LevelInd,Particle <dim,spacedim> > sorted_particles_map;
 
     // Exchange particles between processors if we have more than one process
-    if (dealii::Utilities::MPI::n_mpi_processes(mpi_communicator) > 1)
+    if (dealii::Utilities::MPI::n_mpi_processes(triangulation->get_communicator()) > 1)
       send_recv_particles(moved_particles,sorted_particles_map,moved_cells);
 
     sorted_particles_map.insert(sorted_particles.begin(),sorted_particles.end());
@@ -601,7 +544,7 @@ namespace Particles
   ParticleHandler<dim,spacedim>::exchange_ghost_particles()
   {
     // Nothing to do in serial computations
-    if (dealii::Utilities::MPI::n_mpi_processes(mpi_communicator) == 1)
+    if (dealii::Utilities::MPI::n_mpi_processes(triangulation->get_communicator()) == 1)
       return;
 
     // First clear the current ghost_particle information
@@ -731,9 +674,9 @@ namespace Particles
     {
       std::vector<MPI_Request> n_requests(2*n_neighbors);
       for (unsigned int i=0; i<n_neighbors; ++i)
-        MPI_Irecv(&(n_recv_data[i]), 1, MPI_INT, neighbors[i], 0, mpi_communicator, &(n_requests[2*i]));
+        MPI_Irecv(&(n_recv_data[i]), 1, MPI_INT, neighbors[i], 0, triangulation->get_communicator(), &(n_requests[2*i]));
       for (unsigned int i=0; i<n_neighbors; ++i)
-        MPI_Isend(&(n_send_data[i]), 1, MPI_INT, neighbors[i], 0, mpi_communicator, &(n_requests[2*i+1]));
+        MPI_Isend(&(n_send_data[i]), 1, MPI_INT, neighbors[i], 0, triangulation->get_communicator(), &(n_requests[2*i+1]));
       MPI_Waitall(2*n_neighbors,&n_requests[0],MPI_STATUSES_IGNORE);
     }
 
@@ -757,14 +700,14 @@ namespace Particles
       for (unsigned int i=0; i<n_neighbors; ++i)
         if (n_recv_data[i] > 0)
           {
-            MPI_Irecv(&(recv_data[recv_offsets[i]]), n_recv_data[i], MPI_CHAR, neighbors[i], 1, mpi_communicator,&(requests[send_ops]));
+            MPI_Irecv(&(recv_data[recv_offsets[i]]), n_recv_data[i], MPI_CHAR, neighbors[i], 1, triangulation->get_communicator(),&(requests[send_ops]));
             send_ops++;
           }
 
       for (unsigned int i=0; i<n_neighbors; ++i)
         if (n_send_data[i] > 0)
           {
-            MPI_Isend(&(send_data[send_offsets[i]]), n_send_data[i], MPI_CHAR, neighbors[i], 1, mpi_communicator,&(requests[send_ops+recv_ops]));
+            MPI_Isend(&(send_data[send_offsets[i]]), n_send_data[i], MPI_CHAR, neighbors[i], 1, triangulation->get_communicator(),&(requests[send_ops+recv_ops]));
             recv_ops++;
           }
       MPI_Waitall(send_ops+recv_ops,&requests[0],MPI_STATUSES_IGNORE);
