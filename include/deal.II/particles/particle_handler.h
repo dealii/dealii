@@ -20,7 +20,7 @@
 #include <deal.II/particles/particle_iterator.h>
 #include <deal.II/particles/property_pool.h>
 
-#include <deal.II/grid/tria.h>
+#include <deal.II/distributed/tria.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/array_view.h>
@@ -125,7 +125,7 @@ namespace Particles
      * particle that is no longer in the cell.
      */
     particle_iterator_range
-    particles_in_cell(const typename parallel::distributed::Triangulation<dim,spacedim>::active_cell_iterator &cell);
+    particles_in_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell);
 
 
     /**
@@ -134,7 +134,7 @@ namespace Particles
      * particle that is no longer in the cell.
      */
     particle_iterator_range
-    particles_in_cell(const typename parallel::distributed::Triangulation<dim,spacedim>::active_cell_iterator &cell) const;
+    particles_in_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell) const;
 
     /**
      * Remove a particle pointed to by the iterator.
@@ -150,7 +150,7 @@ namespace Particles
      */
     particle_iterator
     insert_particle(const Particle<dim,spacedim> &particle,
-                    const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell);
+                    const typename Triangulation<dim,spacedim>::active_cell_iterator &cell);
 
     /**
      * Insert a number of particle into the collection of particles.
@@ -235,7 +235,7 @@ namespace Particles
      * respective cell center.
      */
     std::vector<std::vector<Tensor<1,spacedim> > >
-    vertex_to_cell_centers_directions(const std::vector<std::set<typename parallel::distributed::Triangulation<dim,spacedim>::active_cell_iterator> > &vertex_to_cells) const;
+    vertex_to_cell_centers_directions(const std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> > &vertex_to_cells) const;
 
     /**
      * Finds the cells containing each particle for all locally owned
@@ -267,12 +267,6 @@ namespace Particles
     void serialize (Archive &ar, const unsigned int version);
 
   private:
-    /**
-     * A private typedef for cell iterator that makes the code of this class
-     * easier to read.
-     */
-    typedef typename parallel::distributed::Triangulation<dim,spacedim>::active_cell_iterator active_cell_it;
-
     /**
      * Address of the triangulation to work on.
      */
@@ -425,7 +419,7 @@ namespace Particles
     void
     send_recv_particles(const std::vector<std::vector<particle_iterator> >      &particles_to_send,
                         std::multimap<types::LevelInd,Particle <dim,spacedim> > &received_particles,
-                        const std::vector<std::vector<active_cell_it> >         &new_cells_for_particles = std::vector<std::vector<active_cell_it> > ());
+                        const std::vector<std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > &new_cells_for_particles = std::vector<std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > ());
 
 
 
@@ -451,8 +445,8 @@ namespace Particles
      * cell to be sent around to the new processes.
      */
     void
-    store_particles(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
-                    const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus status,
+    store_particles(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                    const typename Triangulation<dim,spacedim>::CellStatus status,
                     void *data) const;
 
     /**
@@ -460,8 +454,8 @@ namespace Particles
      * of particles has to be read from the triangulation user_pointer.
      */
     void
-    load_particles(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
-                   const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus status,
+    load_particles(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                   const typename Triangulation<dim,spacedim>::CellStatus status,
                    const void *data);
 
     /**

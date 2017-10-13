@@ -201,6 +201,7 @@ namespace Particles
      * Make ParticleIterator a friend to allow it constructing ParticleAccessors.
      */
     template <int, int> friend class ParticleIterator;
+    template <int, int> friend class ParticleHandler;
   };
 }
 

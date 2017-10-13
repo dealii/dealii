@@ -146,7 +146,7 @@ namespace Particles
 
   template <int dim,int spacedim>
   typename ParticleHandler<dim,spacedim>::particle_iterator_range
-  ParticleHandler<dim,spacedim>::particles_in_cell(const active_cell_it &cell) const
+  ParticleHandler<dim,spacedim>::particles_in_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell) const
   {
     return (const_cast<ParticleHandler<dim,spacedim> *> (this))->particles_in_cell(cell);
   }
@@ -155,7 +155,7 @@ namespace Particles
 
   template <int dim,int spacedim>
   typename ParticleHandler<dim,spacedim>::particle_iterator_range
-  ParticleHandler<dim,spacedim>::particles_in_cell(const active_cell_it &cell)
+  ParticleHandler<dim,spacedim>::particles_in_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell)
   {
     const types::LevelInd level_index = std::make_pair<int, int> (cell->level(),cell->index());
 
@@ -185,7 +185,7 @@ namespace Particles
   template <int dim,int spacedim>
   typename ParticleHandler<dim,spacedim>::particle_iterator
   ParticleHandler<dim,spacedim>::insert_particle(const Particle<dim,spacedim> &particle,
-                                                 const typename parallel::distributed::Triangulation<dim>::active_cell_iterator &cell)
+                                                 const typename Triangulation<dim,spacedim>::active_cell_iterator &cell)
   {
     typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator it =
       particles.insert(std::make_pair(types::LevelInd(cell->level(),cell->index()),particle));
@@ -283,7 +283,7 @@ namespace Particles
   ParticleHandler<dim,spacedim>::update_global_max_particles_per_cell()
   {
     unsigned int local_max_particles_per_cell(0);
-    active_cell_it cell = triangulation->begin_active();
+    typename Triangulation<dim,spacedim>::active_cell_iterator cell = triangulation->begin_active();
     for (; cell!=triangulation->end(); ++cell)
       if (cell->is_locally_owned())
         {
@@ -324,7 +324,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   std::vector<std::vector<Tensor<1,spacedim> > >
-  ParticleHandler<dim,spacedim>::vertex_to_cell_centers_directions(const std::vector<std::set<active_cell_it> > &vertex_to_cells) const
+  ParticleHandler<dim,spacedim>::vertex_to_cell_centers_directions(const std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> > &vertex_to_cells) const
   {
     const std::vector<Point<spacedim> > &vertices = triangulation->get_vertices();
     const unsigned int n_vertices = vertex_to_cells.size();
@@ -336,7 +336,9 @@ namespace Particles
           const unsigned int n_neighbor_cells = vertex_to_cells[vertex].size();
           vertex_to_cell_centers[vertex].resize(n_neighbor_cells);
 
-          typename std::set<typename Triangulation<dim,spacedim>::active_cell_iterator>::iterator it = vertex_to_cells[vertex].begin();
+          typename std::set<typename Triangulation<dim,spacedim>::active_cell_iterator>::iterator
+          it = vertex_to_cells[vertex].begin();
+
           for (unsigned int cell=0; cell<n_neighbor_cells; ++cell,++it)
             {
               vertex_to_cell_centers[vertex][cell] = (*it)->center() - vertices[vertex];
@@ -413,7 +415,7 @@ namespace Particles
     // Now update the reference locations of the moved particles
     for (particle_iterator it=begin(); it!=end(); ++it)
       {
-        const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator cell = it->get_surrounding_cell(*triangulation);
+        const typename Triangulation<dim,spacedim>::cell_iterator cell = it->get_surrounding_cell(*triangulation);
 
         try
           {
@@ -447,7 +449,7 @@ namespace Particles
     // the mesh completely are ignored and removed.
     std::vector<std::pair<types::LevelInd, Particle<dim,spacedim> > > sorted_particles;
     std::vector<std::vector<particle_iterator> > moved_particles;
-    std::vector<std::vector<active_cell_it> > moved_cells;
+    std::vector<std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > moved_cells;
 
     // We do not know exactly how many particles are lost, exchanged between
     // domains, or remain on this process. Therefore we pre-allocate approximate
@@ -489,7 +491,7 @@ namespace Particles
 
           // Check if the particle is in one of the old cell's neighbors
           // that are adjacent to the closest vertex
-          active_cell_it current_cell = (*it)->get_surrounding_cell(*triangulation);
+          typename Triangulation<dim,spacedim>::active_cell_iterator current_cell = (*it)->get_surrounding_cell(*triangulation);
 
           const unsigned int closest_vertex = get_closest_vertex_of_cell(current_cell,(*it)->get_location());
           Tensor<1,spacedim> vertex_to_particle = (*it)->get_location() - current_cell->vertex(closest_vertex);
@@ -516,7 +518,9 @@ namespace Particles
             {
               try
                 {
-                  typename std::set<typename Triangulation<dim,spacedim>::active_cell_iterator>::const_iterator cell = vertex_to_cells[closest_vertex_index].begin();
+                  typename std::set<typename Triangulation<dim,spacedim>::active_cell_iterator>::const_iterator
+                  cell = vertex_to_cells[closest_vertex_index].begin();
+
                   std::advance(cell,neighbor_permutation[i]);
                   const Point<dim> p_unit = mapping->transform_real_to_unit_cell(*cell,
                                             (*it)->get_location());
@@ -539,7 +543,7 @@ namespace Particles
               // This case is rare.
               try
                 {
-                  const std::pair<const typename parallel::distributed::Triangulation<dim,spacedim>::active_cell_iterator,
+                  const std::pair<const typename Triangulation<dim,spacedim>::active_cell_iterator,
                         Point<dim> > current_cell_and_position =
                           GridTools::find_active_cell_around_point<> (*mapping,
                                                                       *triangulation,
@@ -609,7 +613,7 @@ namespace Particles
 
     std::vector<std::set<unsigned int> > vertex_to_neighbor_subdomain(triangulation->n_vertices());
 
-    active_cell_it
+    typename Triangulation<dim,spacedim>::active_cell_iterator
     cell = triangulation->begin_active(),
     endc = triangulation->end();
     for (; cell != endc; ++cell)
@@ -657,7 +661,7 @@ namespace Particles
   void
   ParticleHandler<dim,spacedim>::send_recv_particles(const std::vector<std::vector<particle_iterator> >      &particles_to_send,
                                                      std::multimap<types::LevelInd,Particle <dim,spacedim> > &received_particles,
-                                                     const std::vector<std::vector<active_cell_it> >         &send_cells)
+                                                     const std::vector<std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> >         &send_cells)
   {
     // Determine the communication pattern
     const std::set<types::subdomain_id> ghost_owners = triangulation->ghost_owners();
@@ -701,7 +705,7 @@ namespace Particles
             for (unsigned int i=0; i<particles_to_send[neighbor_id].size(); ++i)
               {
                 // If no target cells are given, use the iterator information
-                active_cell_it cell;
+                typename Triangulation<dim,spacedim>::active_cell_iterator cell;
                 if (send_cells.size() == 0)
                   cell = particles_to_send[neighbor_id][i]->get_surrounding_cell(*triangulation);
                 else
@@ -776,7 +780,7 @@ namespace Particles
         const CellId id(binary_cellid);
         recv_data_it = static_cast<const char *> (recv_data_it) + cellid_size;
 
-        const active_cell_it cell = id.to_cell(*triangulation);
+        const typename Triangulation<dim,spacedim>::active_cell_iterator cell = id.to_cell(*triangulation);
 
         typename std::multimap<types::LevelInd,Particle <dim,spacedim> >::iterator recv_particle =
           received_particles.insert(std::make_pair(types::LevelInd(cell->level(),cell->index()),
@@ -821,8 +825,8 @@ namespace Particles
 
     if (global_max_particles_per_cell > 0)
       {
-        const std::function<void(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &,
-                                 const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus, void *) > callback_function
+        const std::function<void(const typename Triangulation<dim,spacedim>::cell_iterator &,
+                                 const typename Triangulation<dim,spacedim>::CellStatus, void *) > callback_function
           = std::bind(&ParticleHandler<dim,spacedim>::store_particles,
                       std::cref(*this),
                       std::placeholders::_1,
@@ -874,8 +878,8 @@ namespace Particles
     // data correctly. Only do this if something was actually stored.
     if (serialization && (global_max_particles_per_cell > 0))
       {
-        const std::function<void(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &,
-                                 const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus, void *) > callback_function
+        const std::function<void(const typename Triangulation<dim,spacedim>::cell_iterator &,
+                                 const typename Triangulation<dim,spacedim>::CellStatus, void *) > callback_function
           = std::bind(&ParticleHandler<dim,spacedim>::store_particles,
                       std::cref(*this),
                       std::placeholders::_1,
@@ -903,8 +907,8 @@ namespace Particles
     // Check if something was stored and load it
     if (data_offset != numbers::invalid_unsigned_int)
       {
-        const std::function<void(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &,
-                                 const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus,
+        const std::function<void(const typename Triangulation<dim,spacedim>::cell_iterator &,
+                                 const typename Triangulation<dim,spacedim>::CellStatus,
                                  const void *) > callback_function
           = std::bind(&ParticleHandler<dim,spacedim>::load_particles,
                       std::ref(*this),
@@ -925,8 +929,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleHandler<dim,spacedim>::store_particles(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
-                                                 const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus status,
+  ParticleHandler<dim,spacedim>::store_particles(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                                 const typename Triangulation<dim,spacedim>::CellStatus status,
                                                  void *data) const
   {
     unsigned int n_particles(0);
@@ -955,7 +959,7 @@ namespace Particles
       {
         for (unsigned int child_index = 0; child_index < GeometryInfo<dim>::max_children_per_cell; ++child_index)
           {
-            const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);
+            const typename Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);
             n_particles += n_particles_in_cell(child);
           }
 
@@ -966,7 +970,7 @@ namespace Particles
 
         for (unsigned int child_index = 0; child_index < GeometryInfo<dim>::max_children_per_cell; ++child_index)
           {
-            const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);
+            const typename Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);
             const boost::iterator_range<particle_iterator> particle_range
               = particles_in_cell(child);
 
@@ -984,8 +988,8 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleHandler<dim,spacedim>::load_particles(const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator &cell,
-                                                const typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus status,
+  ParticleHandler<dim,spacedim>::load_particles(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                                                const typename Triangulation<dim,spacedim>::CellStatus status,
                                                 const void *data)
   {
     const unsigned int *n_particles_in_cell_ptr = static_cast<const unsigned int *> (data);
@@ -1046,7 +1050,7 @@ namespace Particles
         std::vector<typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator > position_hints(GeometryInfo<dim>::max_children_per_cell);
         for (unsigned int child_index=0; child_index<GeometryInfo<dim>::max_children_per_cell; ++child_index)
           {
-            const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);
+            const typename Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);
             position_hints[child_index] = particles.upper_bound(std::make_pair(child->level(),child->index()));
           }
 
@@ -1056,7 +1060,7 @@ namespace Particles
 
             for (unsigned int child_index = 0; child_index < GeometryInfo<dim>::max_children_per_cell; ++child_index)
               {
-                const typename parallel::distributed::Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);
+                const typename Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);
 
                 try
                   {
