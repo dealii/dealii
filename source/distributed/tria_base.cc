@@ -202,7 +202,7 @@ namespace parallel
     const int ierr = MPI_Allgather (&send_value,
                                     1,
                                     MPI_UNSIGNED,
-                                    &number_cache.n_locally_owned_active_cells[0],
+                                    number_cache.n_locally_owned_active_cells.data(),
                                     1,
                                     MPI_UNSIGNED,
                                     this->mpi_communicator);
@@ -276,7 +276,7 @@ namespace parallel
 
           if (requests.size() > 0)
             {
-              ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+              ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
             }
 

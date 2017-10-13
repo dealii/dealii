@@ -289,7 +289,7 @@ namespace PETScWrappers
   {
     Assert (indices.size() == values.size(),
             ExcMessage ("Function called with arguments of different sizes"));
-    do_set_add_operation(indices.size(), &indices[0], &values[0], false);
+    do_set_add_operation(indices.size(), indices.data(), values.data(), false);
   }
 
 
@@ -300,7 +300,7 @@ namespace PETScWrappers
   {
     Assert (indices.size() == values.size(),
             ExcMessage ("Function called with arguments of different sizes"));
-    do_set_add_operation(indices.size(), &indices[0], &values[0], true);
+    do_set_add_operation(indices.size(), indices.data(), values.data(), true);
   }
 
 
@@ -311,7 +311,7 @@ namespace PETScWrappers
   {
     Assert (indices.size() == values.size(),
             ExcMessage ("Function called with arguments of different sizes"));
-    do_set_add_operation(indices.size(), &indices[0], values.begin(), true);
+    do_set_add_operation(indices.size(), indices.data(), values.begin(), true);
   }
 
 

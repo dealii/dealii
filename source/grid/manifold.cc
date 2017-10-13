@@ -590,7 +590,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
 
   // check whether periodicity shifts some of the points. Only do this if
   // necessary to avoid memory allocation
-  const Point<spacedim> *surrounding_points_start = &surrounding_points[0];
+  const Point<spacedim> *surrounding_points_start = surrounding_points.begin();
 
   boost::container::small_vector<Point<spacedim>, 200> modified_points;
   bool adjust_periodicity = false;
@@ -612,7 +612,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
           for (unsigned int i=0; i<n_points; ++i)
             if ((surrounding_points[i][d]-minP[d]) > periodicity[d]/2.0)
               modified_points[i][d] -= periodicity[d];
-      surrounding_points_start = &modified_points[0];
+      surrounding_points_start = modified_points.data();
     }
 
   // Now perform the interpolation

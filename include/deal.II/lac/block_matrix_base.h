@@ -1659,8 +1659,8 @@ inline
 void
 BlockMatrixBase<MatrixType>::set (const std::vector<size_type> &row_indices,
                                   const std::vector<size_type> &col_indices,
-                                  const FullMatrix<number>        &values,
-                                  const bool                       elide_zero_values)
+                                  const FullMatrix<number>     &values,
+                                  const bool                    elide_zero_values)
 {
   Assert (row_indices.size() == values.m(),
           ExcDimensionMismatch(row_indices.size(), values.m()));
@@ -1668,7 +1668,7 @@ BlockMatrixBase<MatrixType>::set (const std::vector<size_type> &row_indices,
           ExcDimensionMismatch(col_indices.size(), values.n()));
 
   for (size_type i=0; i<row_indices.size(); ++i)
-    set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+    set (row_indices[i], col_indices.size(), col_indices.data(), &values(i,0),
          elide_zero_values);
 }
 
@@ -1679,15 +1679,15 @@ template <typename number>
 inline
 void
 BlockMatrixBase<MatrixType>::set (const std::vector<size_type> &indices,
-                                  const FullMatrix<number>        &values,
-                                  const bool                       elide_zero_values)
+                                  const FullMatrix<number>     &values,
+                                  const bool                    elide_zero_values)
 {
   Assert (indices.size() == values.m(),
           ExcDimensionMismatch(indices.size(), values.m()));
   Assert (values.n() == values.m(), ExcNotQuadratic());
 
   for (size_type i=0; i<indices.size(); ++i)
-    set (indices[i], indices.size(), &indices[0], &values(i,0),
+    set (indices[i], indices.size(), indices.data(), &values(i,0),
          elide_zero_values);
 }
 
@@ -1705,7 +1705,7 @@ BlockMatrixBase<MatrixType>::set (const size_type               row,
   Assert (col_indices.size() == values.size(),
           ExcDimensionMismatch(col_indices.size(), values.size()));
 
-  set (row, col_indices.size(), &col_indices[0], &values[0],
+  set (row, col_indices.size(), col_indices.data(), values.data(),
        elide_zero_values);
 }
 
@@ -1865,7 +1865,7 @@ BlockMatrixBase<MatrixType>::add (const std::vector<size_type> &row_indices,
           ExcDimensionMismatch(col_indices.size(), values.n()));
 
   for (size_type i=0; i<row_indices.size(); ++i)
-    add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+    add (row_indices[i], col_indices.size(), col_indices.data(), &values(i,0),
          elide_zero_values);
 }
 
@@ -1884,7 +1884,7 @@ BlockMatrixBase<MatrixType>::add (const std::vector<size_type> &indices,
   Assert (values.n() == values.m(), ExcNotQuadratic());
 
   for (size_type i=0; i<indices.size(); ++i)
-    add (indices[i], indices.size(), &indices[0], &values(i,0),
+    add (indices[i], indices.size(), indices.data(), &values(i,0),
          elide_zero_values);
 }
 
@@ -1902,7 +1902,7 @@ BlockMatrixBase<MatrixType>::add (const size_type               row,
   Assert (col_indices.size() == values.size(),
           ExcDimensionMismatch(col_indices.size(), values.size()));
 
-  add (row, col_indices.size(), &col_indices[0], &values[0],
+  add (row, col_indices.size(), col_indices.data(), values.data(),
        elide_zero_values);
 }
 

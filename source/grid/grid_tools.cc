@@ -2332,11 +2332,11 @@ next_cell:
     // processors and shifting the indices accordingly
     const unsigned int n_cpu = Utilities::MPI::n_mpi_processes(triangulation.get_communicator());
     std::vector<types::global_vertex_index> indices(n_cpu);
-    int ierr = MPI_Allgather(&next_index, 1, DEAL_II_DOF_INDEX_MPI_TYPE, &indices[0],
+    int ierr = MPI_Allgather(&next_index, 1, DEAL_II_DOF_INDEX_MPI_TYPE, indices.data(),
                              indices.size(), DEAL_II_DOF_INDEX_MPI_TYPE, triangulation.get_communicator());
     AssertThrowMPI(ierr);
-    const types::global_vertex_index shift = std::accumulate(&indices[0],
-                                                             &indices[0]+triangulation.locally_owned_subdomain(),
+    const types::global_vertex_index shift = std::accumulate(indices.begin(),
+                                                             indices.begin()+triangulation.locally_owned_subdomain(),
                                                              types::global_vertex_index(0));
 
     std::map<unsigned int,types::global_vertex_index>::iterator
@@ -3112,8 +3112,8 @@ next_cell:
 
         const Tensor<spacedim-structdim,spacedim>
         average_parent_alternating_form
-          = std::accumulate (&parent_alternating_forms[0],
-                             &parent_alternating_forms[GeometryInfo<structdim>::vertices_per_cell],
+          = std::accumulate (parent_alternating_forms,
+                             parent_alternating_forms + GeometryInfo<structdim>::vertices_per_cell,
                              Tensor<spacedim-structdim,spacedim>());
 
         // now do the same

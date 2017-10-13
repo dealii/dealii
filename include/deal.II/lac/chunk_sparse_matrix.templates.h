@@ -271,9 +271,9 @@ namespace internal
               val_ptr += chunk_size * chunk_size;
             }
         }
-      Assert(std::size_t(colnum_ptr-&colnums[0]) == rowstart[end_row],
+      Assert(std::size_t(colnum_ptr-colnums) == rowstart[end_row],
              ExcInternalError());
-      Assert(std::size_t(val_ptr-&values[0]) ==
+      Assert(std::size_t(val_ptr - values) ==
              rowstart[end_row] * chunk_size * chunk_size,
              ExcInternalError());
     }
@@ -411,7 +411,7 @@ ChunkSparseMatrix<number>::operator = (const double d)
                                             val.get()),
                                   grain_size);
   else if (matrix_size > 0)
-    std::memset (&val[0], 0, matrix_size*sizeof(number));
+    std::memset (val.get(), 0, matrix_size*sizeof(number));
 
   return *this;
 }
@@ -512,9 +512,9 @@ ChunkSparseMatrix<number>::n_actually_nonzero_elements () const
   // around the matrix. since we have the invariant that padding elements are
   // zero, nothing bad can happen here
   const size_type chunk_size = cols->get_chunk_size();
-  return std::count_if(&val[0],
-                       &val[cols->sparsity_pattern.n_nonzero_elements () *
-                            chunk_size * chunk_size],
+  return std::count_if(val.get(),
+                       val.get() + cols->sparsity_pattern.n_nonzero_elements ()
+                       * chunk_size * chunk_size,
                        std::bind(std::not_equal_to<double>(), std::placeholders::_1, 0));
 }
 
@@ -543,10 +543,10 @@ ChunkSparseMatrix<number>::copy_from (const ChunkSparseMatrix<somenumber> &matri
 
   // copy everything, including padding elements
   const size_type chunk_size = cols->get_chunk_size();
-  std::copy (&matrix.val[0],
-             &matrix.val[cols->sparsity_pattern.n_nonzero_elements()
-                         * chunk_size * chunk_size],
-             &val[0]);
+  std::copy (matrix.val.get(),
+             matrix.val.get() + cols->sparsity_pattern.n_nonzero_elements()
+             * chunk_size * chunk_size,
+             val.get());
 
   return *this;
 }
@@ -582,10 +582,10 @@ ChunkSparseMatrix<number>::add (const number factor,
 
   // add everything, including padding elements
   const size_type     chunk_size = cols->get_chunk_size();
-  number             *val_ptr    = &val[0];
+  number             *val_ptr    = val.get();
   const somenumber   *matrix_ptr = &matrix.val[0];
-  const number *const end_ptr    = &val[cols->sparsity_pattern.n_nonzero_elements()
-                                        * chunk_size * chunk_size];
+  const number *const end_ptr    = val.get() + cols->sparsity_pattern.n_nonzero_elements()
+                                   * chunk_size * chunk_size;
 
   while (val_ptr != end_ptr)
     *val_ptr++ += factor **matrix_ptr++;
@@ -1110,7 +1110,7 @@ ChunkSparseMatrix<number>::frobenius_norm () const
   //
   // padding elements are zero, so we can add them up as well
   real_type norm_sqr = 0;
-  for (const number *ptr = &val[0]; ptr != &val[max_len]; ++ptr)
+  for (const number *ptr = val.get(); ptr != val.get() + max_len; ++ptr)
     norm_sqr +=  numbers::NumberTraits<number>::abs_square(*ptr);
 
   return std::sqrt (norm_sqr);
@@ -1580,9 +1580,9 @@ ChunkSparseMatrix<number>::block_write (std::ostream &out) const
   // first the simple objects, bracketed in [...]
   out << '[' << max_len << "][";
   // then write out real data
-  out.write (reinterpret_cast<const char *>(&val[0]),
-             reinterpret_cast<const char *>(&val[max_len])
-             - reinterpret_cast<const char *>(&val[0]));
+  out.write (reinterpret_cast<const char *>(val.get()),
+             reinterpret_cast<const char *>(val.get() + max_len)
+             - reinterpret_cast<const char *>(val.get()));
   out << ']';
 
   AssertThrow (out, ExcIO());
@@ -1612,9 +1612,9 @@ ChunkSparseMatrix<number>::block_read (std::istream &in)
   val.reset (new number[max_len]);
 
   // then read data
-  in.read (reinterpret_cast<char *>(&val[0]),
-           reinterpret_cast<char *>(&val[max_len])
-           - reinterpret_cast<char *>(&val[0]));
+  in.read (reinterpret_cast<char *>(val.get()),
+           reinterpret_cast<char *>(val.get() + max_len)
+           - reinterpret_cast<char *>(val.get()));
   in >> c;
   AssertThrow (c == ']', ExcIO());
 }

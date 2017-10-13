@@ -119,17 +119,17 @@ namespace SparsityTools
 
     // Use recursive if the number of partitions is less than or equal to 8
     if (nparts <= 8)
-      ierr = METIS_PartGraphRecursive(&n, &ncon, &int_rowstart[0], &int_colnums[0],
+      ierr = METIS_PartGraphRecursive(&n, &ncon, int_rowstart.data(), int_colnums.data(),
                                       nullptr, nullptr, nullptr,
-                                      &nparts,nullptr,nullptr,&options[0],
-                                      &dummy,&int_partition_indices[0]);
+                                      &nparts,nullptr,nullptr,options,
+                                      &dummy,int_partition_indices.data());
 
     // Otherwise use kway
     else
-      ierr = METIS_PartGraphKway(&n, &ncon, &int_rowstart[0], &int_colnums[0],
+      ierr = METIS_PartGraphKway(&n, &ncon, int_rowstart.data(), int_colnums.data(),
                                  nullptr, nullptr, nullptr,
-                                 &nparts,nullptr,nullptr,&options[0],
-                                 &dummy,&int_partition_indices[0]);
+                                 &nparts,nullptr,nullptr,options,
+                                 &dummy,int_partition_indices.data());
 
     // If metis returns normally, an error code METIS_OK=1 is returned from
     // the above functions (see metish.h)
@@ -604,7 +604,7 @@ namespace SparsityTools
           ierr = MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
           AssertThrowMPI(ierr);
           recv_buf.resize(len);
-          ierr = MPI_Recv(&recv_buf[0], len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
+          ierr = MPI_Recv(recv_buf.data(), len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
                           status.MPI_TAG, mpi_comm, &status);
           AssertThrowMPI(ierr);
 
@@ -629,7 +629,7 @@ namespace SparsityTools
     // complete all sends, so that we can safely destroy the buffers.
     if (requests.size())
       {
-        const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+        const int ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr);
       }
 
@@ -735,7 +735,7 @@ namespace SparsityTools
           ierr = MPI_Get_count(&status, DEAL_II_DOF_INDEX_MPI_TYPE, &len);
           AssertThrowMPI(ierr);
           recv_buf.resize(len);
-          ierr = MPI_Recv(&recv_buf[0], len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
+          ierr = MPI_Recv(recv_buf.data(), len, DEAL_II_DOF_INDEX_MPI_TYPE, status.MPI_SOURCE,
                           status.MPI_TAG, mpi_comm, &status);
           AssertThrowMPI(ierr);
 
@@ -760,7 +760,7 @@ namespace SparsityTools
     // complete all sends, so that we can safely destroy the buffers.
     if (requests.size())
       {
-        const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+        const int ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
         AssertThrowMPI(ierr);
       }
   }

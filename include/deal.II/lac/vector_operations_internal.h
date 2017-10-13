@@ -1200,7 +1200,7 @@ namespace internal
             // make sure we allocate an even number of elements,
             // access to the new last element is needed in do_sum()
             large_array.resize(2*((n_chunks+1)/2));
-            array_ptr = &large_array[0];
+            array_ptr = large_array.data();
           }
         else
           array_ptr = &small_array[0];

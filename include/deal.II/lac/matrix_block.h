@@ -682,7 +682,7 @@ MatrixBlock<MatrixType>::add (const std::vector<size_type> &r_indices,
   AssertDimension (c_indices.size(), values.n());
 
   for (size_type i=0; i<row_indices.size(); ++i)
-    add (r_indices[i], c_indices.size(), &c_indices[0], &values(i,0),
+    add (r_indices[i], c_indices.size(), c_indices.data(), &values(i,0),
          elide_zero_values);
 }
 
@@ -742,7 +742,7 @@ MatrixBlock<MatrixType>::add (const std::vector<size_type> &indices,
   Assert (values.n() == values.m(), ExcNotQuadratic());
 
   for (size_type i=0; i<indices.size(); ++i)
-    add (indices[i], indices.size(), &indices[0], &values(i,0),
+    add (indices[i], indices.size(), indices.data(), &values(i,0),
          elide_zero_values);
 }
 
@@ -761,7 +761,7 @@ MatrixBlock<MatrixType>::add (const size_type               row,
   Assert(column_indices.size() != 0, ExcNotInitialized());
 
   AssertDimension (col_indices.size(), values.size());
-  add (row, col_indices.size(), &col_indices[0], &values[0],
+  add (row, col_indices.size(), col_indices.data(), values.data(),
        elide_zero_values);
 }
 

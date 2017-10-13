@@ -1156,7 +1156,7 @@ namespace PETScWrappers
     Assert (values.m() == values.n(), ExcNotQuadratic());
 
     for (size_type i=0; i<indices.size(); ++i)
-      set (indices[i], indices.size(), &indices[0], &values(i,0),
+      set (indices[i], indices.size(), indices.data(), &values(i,0),
            elide_zero_values);
   }
 
@@ -1175,7 +1175,7 @@ namespace PETScWrappers
             ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (size_type i=0; i<row_indices.size(); ++i)
-      set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+      set (row_indices[i], col_indices.size(), col_indices.data(), &values(i,0),
            elide_zero_values);
   }
 
@@ -1191,7 +1191,7 @@ namespace PETScWrappers
     Assert (col_indices.size() == values.size(),
             ExcDimensionMismatch(col_indices.size(), values.size()));
 
-    set (row, col_indices.size(), &col_indices[0], &values[0],
+    set (row, col_indices.size(), col_indices.data(), values.data(),
          elide_zero_values);
   }
 
@@ -1244,8 +1244,8 @@ namespace PETScWrappers
           }
         Assert(n_columns <= (int)n_cols, ExcInternalError());
 
-        col_index_ptr = &column_indices[0];
-        col_value_ptr = &column_values[0];
+        col_index_ptr = column_indices.data();
+        col_value_ptr = column_values.data();
       }
 
     const PetscErrorCode ierr = MatSetValues (matrix, 1, &petsc_i, n_columns,
@@ -1292,7 +1292,7 @@ namespace PETScWrappers
     Assert (values.m() == values.n(), ExcNotQuadratic());
 
     for (size_type i=0; i<indices.size(); ++i)
-      add (indices[i], indices.size(), &indices[0], &values(i,0),
+      add (indices[i], indices.size(), indices.data(), &values(i,0),
            elide_zero_values);
   }
 
@@ -1311,7 +1311,7 @@ namespace PETScWrappers
             ExcDimensionMismatch(col_indices.size(), values.n()));
 
     for (size_type i=0; i<row_indices.size(); ++i)
-      add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
+      add (row_indices[i], col_indices.size(), col_indices.data(), &values(i,0),
            elide_zero_values);
   }
 
@@ -1327,7 +1327,7 @@ namespace PETScWrappers
     Assert (col_indices.size() == values.size(),
             ExcDimensionMismatch(col_indices.size(), values.size()));
 
-    add (row, col_indices.size(), &col_indices[0], &values[0],
+    add (row, col_indices.size(), col_indices.data(), values.data(),
          elide_zero_values);
   }
 
@@ -1383,8 +1383,8 @@ namespace PETScWrappers
           }
         Assert(n_columns <= (int)n_cols, ExcInternalError());
 
-        col_index_ptr = &column_indices[0];
-        col_value_ptr = &column_values[0];
+        col_index_ptr = column_indices.data();
+        col_value_ptr = column_values.data();
       }
 
     const PetscErrorCode ierr = MatSetValues (matrix, 1, &petsc_i, n_columns,

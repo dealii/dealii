@@ -280,7 +280,7 @@ void MGTransferPrebuilt<VectorType>::build_matrices
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
                   prolongation_matrices[level]->set (dof_indices_child[i],
                                                      dofs_per_cell,
-                                                     &dof_indices_parent[0],
+                                                     dof_indices_parent.data(),
                                                      &prolongation(i,0),
                                                      true);
               }

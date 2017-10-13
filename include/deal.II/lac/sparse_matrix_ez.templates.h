@@ -599,13 +599,13 @@ SparseMatrixEZ<number>::block_read (std::istream &in)
   DEAL_II_CHECK_INPUT(in,'[',c);
 
   // then read data
-  in.read(reinterpret_cast<char *>(&row_info[0]),
+  in.read(reinterpret_cast<char *>(row_info.data()),
           sizeof(RowInfo) * row_info.size());
 
   DEAL_II_CHECK_INPUT(in,']',c);
   DEAL_II_CHECK_INPUT(in,'[',c);
 
-  in.read(reinterpret_cast<char *>(&data[0]),
+  in.read(reinterpret_cast<char *>(data.data()),
           sizeof(Entry) * data.size());
 
   DEAL_II_CHECK_INPUT(in,']',c);

@@ -636,7 +636,7 @@ set_initial_vector(const VectorType &vec)
           ExcDimensionMismatch(resid.size(),local_indices.size()));
   vec.extract_subvector_to (local_indices.begin(),
                             local_indices.end(),
-                            &resid[0]);
+                            resid.data());
 }
 
 
@@ -876,12 +876,12 @@ void PArpackSolver<VectorType>::solve
       // call of ARPACK pdnaupd routine
       if (additional_data.symmetric)
         pdsaupd_(&mpi_communicator_fortran,&ido, bmat, &n_inside_arpack, which, &nev, &tol,
-                 &resid[0], &ncv, &v[0], &ldv, &iparam[0], &ipntr[0],
-                 &workd[0], &workl[0], &lworkl, &info);
+                 resid.data(), &ncv, v.data(), &ldv, iparam.data(), ipntr.data(),
+                 workd.data(), workl.data(), &lworkl, &info);
       else
         pdnaupd_(&mpi_communicator_fortran,&ido, bmat, &n_inside_arpack, which, &nev, &tol,
-                 &resid[0], &ncv, &v[0], &ldv, &iparam[0], &ipntr[0],
-                 &workd[0], &workl[0], &lworkl, &info);
+                 resid.data(), &ncv, v.data(), &ldv, iparam.data(), ipntr.data(),
+                 workd.data(), workl.data(), &lworkl, &info);
 
       AssertThrow (info == 0, PArpackExcInfoPdnaupd(info));
 
@@ -906,8 +906,8 @@ void PArpackSolver<VectorType>::solve
         // compute  Y = OP * X
         {
           src.add (nloc,
-                   &local_indices[0],
-                   &workd[0]+shift_x );
+                   local_indices.data(),
+                   workd.data()+shift_x );
           src.compress (VectorOperation::add);
 
           if (mode == 3)
@@ -923,7 +923,7 @@ void PArpackSolver<VectorType>::solve
               // store M*X in X
               tmp.extract_subvector_to (local_indices.begin(),
                                         local_indices.end(),
-                                        &workd[0]+shift_x);
+                                        workd.data()+shift_x);
               inverse.vmult(dst,tmp);
             }
           else if (mode == 1)
@@ -944,8 +944,8 @@ void PArpackSolver<VectorType>::solve
 
           // B*X
           src.add (nloc,
-                   &local_indices[0],
-                   &workd[0]+shift_b_x );
+                   local_indices.data(),
+                   workd.data()+shift_b_x );
           src.compress (VectorOperation::add);
 
           // solving linear system
@@ -956,8 +956,8 @@ void PArpackSolver<VectorType>::solve
         // compute  Y = B * X
         {
           src.add (nloc,
-                   &local_indices[0],
-                   &workd[0]+shift_x );
+                   local_indices.data(),
+                   workd.data()+shift_x );
           src.compress (VectorOperation::add);
 
           // Multiplication with mass matrix M
@@ -979,7 +979,7 @@ void PArpackSolver<VectorType>::solve
       // store the result
       dst.extract_subvector_to (local_indices.begin(),
                                 local_indices.end(),
-                                &workd[0]+shift_y);
+                                workd.data()+shift_y);
     } // end of pd*aupd_ loop
 
   // 1 - compute eigenvectors,
@@ -994,17 +994,17 @@ void PArpackSolver<VectorType>::solve
 
   // call of ARPACK pdneupd routine
   if (additional_data.symmetric)
-    pdseupd_(&mpi_communicator_fortran, &rvec, howmany, &select[0], &eigenvalues_real[0],
-             &z[0], &ldz, &sigmar,
+    pdseupd_(&mpi_communicator_fortran, &rvec, howmany, select.data(), eigenvalues_real.data(),
+             z.data(), &ldz, &sigmar,
              bmat, &n_inside_arpack, which, &nev, &tol,
-             &resid[0], &ncv, &v[0], &ldv,
-             &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
+             resid.data(), &ncv, v.data(), &ldv,
+             iparam.data(), ipntr.data(), workd.data(), workl.data(), &lworkl, &info);
   else
-    pdneupd_(&mpi_communicator_fortran, &rvec, howmany, &select[0], &eigenvalues_real[0],
-             &eigenvalues_im[0], &v[0], &ldz, &sigmar, &sigmai,
-             &workev[0], bmat, &n_inside_arpack, which, &nev, &tol,
-             &resid[0], &ncv, &v[0], &ldv,
-             &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
+    pdneupd_(&mpi_communicator_fortran, &rvec, howmany, select.data(), eigenvalues_real.data(),
+             eigenvalues_im.data(), v.data(), &ldz, &sigmar, &sigmai,
+             workev.data(), bmat, &n_inside_arpack, which, &nev, &tol,
+             resid.data(), &ncv, v.data(), &ldv,
+             iparam.data(), ipntr.data(), workd.data(), workl.data(), &lworkl, &info);
 
   if (info == 1)
     {
@@ -1025,7 +1025,7 @@ void PArpackSolver<VectorType>::solve
       Assert (i*nloc + nloc <= (int)v.size(), dealii::ExcInternalError() );
 
       eigenvectors[i]->add (nloc,
-                            &local_indices[0],
+                            local_indices.data(),
                             &v[i*nloc] );
       eigenvectors[i]->compress (VectorOperation::add);
     }
@@ -1046,8 +1046,8 @@ void PArpackSolver<VectorType>::solve
 
     tmp = 0.0;
     tmp.add (nloc,
-             &local_indices[0],
-             &resid[0]);
+             local_indices.data(),
+             resid.data());
     solver_control.check  ( iparam[2], tmp.l2_norm() );
   }
 

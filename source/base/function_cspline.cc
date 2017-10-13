@@ -46,7 +46,7 @@ namespace Functions
     const unsigned int n = interpolation_points.size();
     cspline = gsl_spline_alloc (gsl_interp_cspline, n);
     // gsl_spline_init returns something but it seems nobody knows what
-    gsl_spline_init (cspline, &interpolation_points[0], &interpolation_values[0], n);
+    gsl_spline_init (cspline, interpolation_points.data(), interpolation_values.data(), n);
   }
 
 

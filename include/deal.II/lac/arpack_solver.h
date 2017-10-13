@@ -550,12 +550,12 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
       // call of ARPACK dsaupd/dnaupd routine
       if (additional_data.symmetric)
         dsaupd_(&ido, bmat, &n, which, &nev, &tol,
-                &resid[0], &ncv, &v[0], &ldv, &iparam[0], &ipntr[0],
-                &workd[0], &workl[0], &lworkl, &info);
+                resid.data(), &ncv, v.data(), &ldv, iparam.data(), ipntr.data(),
+                workd.data(), workl.data(), &lworkl, &info);
       else
         dnaupd_(&ido, bmat, &n, which, &nev, &tol,
-                &resid[0], &ncv, &v[0], &ldv, &iparam[0], &ipntr[0],
-                &workd[0], &workl[0], &lworkl, &info);
+                resid.data(), &ncv, v.data(), &ldv, iparam.data(), ipntr.data(),
+                workd.data(), workl.data(), &lworkl, &info);
 
       if (ido == 99)
         break;
@@ -671,19 +671,19 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
       if (additional_data.symmetric)
         {
           std::vector<double> z (ldz*nev, 0.);
-          dseupd_(&rvec, &howmany, &select[0], &eigenvalues_real[0],
-                  &z[0], &ldz, &sigmar, bmat, &n, which, &nev, &tol,
-                  &resid[0], &ncv, &v[0], &ldv,
-                  &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
+          dseupd_(&rvec, &howmany, select.data(), eigenvalues_real.data(),
+                  z.data(), &ldz, &sigmar, bmat, &n, which, &nev, &tol,
+                  resid.data(), &ncv, v.data(), &ldv,
+                  iparam.data(), ipntr.data(), workd.data(), workl.data(), &lworkl, &info);
         }
       else
         {
           std::vector<double> workev (3*ncv, 0.);
-          dneupd_(&rvec, &howmany, &select[0], &eigenvalues_real[0],
-                  &eigenvalues_im[0], &v[0], &ldz, &sigmar, &sigmai,
-                  &workev[0], bmat, &n, which, &nev, &tol,
-                  &resid[0], &ncv, &v[0], &ldv,
-                  &iparam[0], &ipntr[0], &workd[0], &workl[0], &lworkl, &info);
+          dneupd_(&rvec, &howmany, select.data(), eigenvalues_real.data(),
+                  eigenvalues_im.data(), v.data(), &ldz, &sigmar, &sigmai,
+                  workev.data(), bmat, &n, which, &nev, &tol,
+                  resid.data(), &ncv, v.data(), &ldv,
+                  iparam.data(), ipntr.data(), workd.data(), workl.data(), &lworkl, &info);
         }
 
       if (info == 1)

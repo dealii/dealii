@@ -298,9 +298,9 @@ namespace PETScWrappers
                                   (communicator,
                                    local_rows, local_columns,
                                    m, n,
-                                   0, &int_row_lengths[0],
+                                   0, int_row_lengths.data(),
                                    0,
-                                   offdiag_row_lengths.size() ? &int_offdiag_row_lengths[0] : nullptr,
+                                   offdiag_row_lengths.size() ? int_offdiag_row_lengths.data() : nullptr,
                                    &matrix);
 
 //TODO: Sometimes the actual number of nonzero entries allocated is greater than the number of nonzero entries, which petsc will complain about unless explicitly disabled with MatSetOption. There is probably a way to prevent a different number nonzero elements being allocated in the first place. (See also previous TODO).
@@ -429,8 +429,8 @@ namespace PETScWrappers
           // that summarily allocates these
           // entries:
           ierr = MatMPIAIJSetPreallocationCSR (matrix,
-                                               &rowstart_in_window[0],
-                                               &colnums_in_window[0],
+                                               rowstart_in_window.data(),
+                                               colnums_in_window.data(),
                                                nullptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
         }
@@ -558,8 +558,8 @@ namespace PETScWrappers
           // that summarily allocates these
           // entries:
           ierr = MatMPIAIJSetPreallocationCSR (matrix,
-                                               &rowstart_in_window[0],
-                                               &colnums_in_window[0],
+                                               rowstart_in_window.data(),
+                                               colnums_in_window.data(),
                                                nullptr);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
 

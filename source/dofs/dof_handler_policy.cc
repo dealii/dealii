@@ -2872,7 +2872,7 @@ namespace internal
               // set rcounts based on new_numbers:
               int cur_count = new_numbers_copy.size ();
               int ierr = MPI_Allgather (&cur_count,  1, MPI_INT,
-                                        &rcounts[0], 1, MPI_INT,
+                                        rcounts.data(), 1, MPI_INT,
                                         tr->get_communicator ());
               AssertThrowMPI(ierr);
 
@@ -2887,10 +2887,10 @@ namespace internal
               Assert(((int)new_numbers_copy.size()) ==
                      rcounts[Utilities::MPI::this_mpi_process (tr->get_communicator ())],
                      ExcInternalError());
-              ierr = MPI_Allgatherv (&new_numbers_copy[0],     new_numbers_copy.size (),
+              ierr = MPI_Allgatherv (new_numbers_copy.data(),     new_numbers_copy.size (),
                                      DEAL_II_DOF_INDEX_MPI_TYPE,
-                                     &gathered_new_numbers[0], &rcounts[0],
-                                     &displacements[0],
+                                     gathered_new_numbers.data(), rcounts.data(),
+                                     displacements.data(),
                                      DEAL_II_DOF_INDEX_MPI_TYPE,
                                      tr->get_communicator ());
               AssertThrowMPI(ierr);
@@ -3008,8 +3008,8 @@ namespace internal
             // know how to serialize itself. consequently, first copy it over
             // to an array of bytes, and then serialize that
             std::vector<char> quadrants_as_chars (sizeof(quadrants[0]) * quadrants.size());
-            std::memcpy(&quadrants_as_chars[0],
-                        &quadrants[0],
+            std::memcpy(quadrants_as_chars.data(),
+                        quadrants.data(),
                         quadrants_as_chars.size());
 
             // now serialize everything
@@ -3033,8 +3033,8 @@ namespace internal
             &dof_numbers_and_indices;
 
             quadrants.resize (quadrants_as_chars.size() / sizeof(quadrants[0]));
-            std::memcpy(&quadrants[0],
-                        &quadrants_as_chars[0],
+            std::memcpy(quadrants.data(),
+                        quadrants_as_chars.data(),
                         quadrants_as_chars.size());
           }
 
@@ -3083,7 +3083,7 @@ namespace internal
               decompressing_stream.push(boost::iostreams::gzip_decompressor());
               decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
 
-              decompressing_stream.write (&buffer[0], buffer.size());
+              decompressing_stream.write (buffer.data(), buffer.size());
             }
 
             // then restore the object from the buffer
@@ -3307,7 +3307,7 @@ namespace internal
               AssertThrowMPI(ierr);
               receive.resize(len);
 
-              char *ptr = &receive[0];
+              char *ptr = receive.data();
               ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
                               tria.get_communicator(), &status);
               AssertThrowMPI(ierr);
@@ -3355,7 +3355,7 @@ namespace internal
               AssertThrowMPI(ierr);
               receive.resize(len);
 
-              char *ptr = &receive[0];
+              char *ptr = receive.data();
               ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
                               tria.get_communicator(), &status);
               AssertThrowMPI(ierr);
@@ -3391,12 +3391,12 @@ namespace internal
           // buffers.
           if (requests.size() > 0)
             {
-              const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+              const int ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
             }
           if (reply_requests.size() > 0)
             {
-              const int ierr = MPI_Waitall(reply_requests.size(), &reply_requests[0], MPI_STATUSES_IGNORE);
+              const int ierr = MPI_Waitall(reply_requests.size(), reply_requests.data(), MPI_STATUSES_IGNORE);
               AssertThrowMPI(ierr);
             }
         }
@@ -3739,7 +3739,7 @@ namespace internal
 
         const int ierr = MPI_Allgather ( &n_locally_owned_dofs,
                                          1, DEAL_II_DOF_INDEX_MPI_TYPE,
-                                         &n_locally_owned_dofs_per_processor[0],
+                                         n_locally_owned_dofs_per_processor.data(),
                                          1, DEAL_II_DOF_INDEX_MPI_TYPE,
                                          triangulation->get_communicator());
         AssertThrowMPI(ierr);
@@ -4318,8 +4318,8 @@ namespace internal
           my_data.resize(max_size);
 
           std::vector<char> buffer(max_size*n_cpus);
-          const int ierr = MPI_Allgather(&my_data[0], max_size, MPI_BYTE,
-                                         &buffer[0], max_size, MPI_BYTE,
+          const int ierr = MPI_Allgather(my_data.data(), max_size, MPI_BYTE,
+                                         buffer.data(), max_size, MPI_BYTE,
                                          triangulation->get_communicator());
           AssertThrowMPI(ierr);
 

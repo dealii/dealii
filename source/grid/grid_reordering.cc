@@ -230,7 +230,7 @@ namespace
      */
     const_iterator begin () const
     {
-      return &adjacent_cells[0];
+      return adjacent_cells;
     }
 
 
@@ -245,11 +245,11 @@ namespace
       // adjacent cells, and use this to point to the element past the
       // last valid one
       if (adjacent_cells[0].cell_index == numbers::invalid_unsigned_int)
-        return &adjacent_cells[0];
+        return adjacent_cells;
       else if (adjacent_cells[1].cell_index == numbers::invalid_unsigned_int)
-        return &adjacent_cells[0]+1;
+        return adjacent_cells + 1;
       else
-        return &adjacent_cells[0]+2;
+        return adjacent_cells + 2;
     }
 
   private:
@@ -464,7 +464,7 @@ namespace
      */
     const_iterator begin () const
     {
-      return &edge_indices[0];
+      return edge_indices;
     }
 
 
@@ -477,11 +477,11 @@ namespace
       // indices, and use this to point to the element past the
       // last valid one
       if (edge_indices[0] == numbers::invalid_unsigned_int)
-        return &edge_indices[0];
+        return edge_indices;
       else if (edge_indices[1] == numbers::invalid_unsigned_int)
-        return &edge_indices[0]+1;
+        return edge_indices + 1;
       else
-        return &edge_indices[0]+2;
+        return edge_indices + 2;
     }
 
   private:
@@ -825,8 +825,8 @@ namespace
         for (origin_vertex_of_cell=0;
              origin_vertex_of_cell<GeometryInfo<dim>::vertices_per_cell;
              ++origin_vertex_of_cell)
-          if (std::count (&starting_vertex_of_edge[0],
-                          &starting_vertex_of_edge[0]+GeometryInfo<dim>::lines_per_cell,
+          if (std::count (starting_vertex_of_edge,
+                          starting_vertex_of_edge + GeometryInfo<dim>::lines_per_cell,
                           cell_list[cell_index].vertex_indices[origin_vertex_of_cell])
               == dim)
             break;

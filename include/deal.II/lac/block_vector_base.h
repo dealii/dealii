@@ -1797,7 +1797,7 @@ BlockVectorBase<VectorType>::add (const std::vector<size_type> &indices,
 {
   Assert (indices.size() == values.size(),
           ExcDimensionMismatch(indices.size(), values.size()));
-  add (indices.size(), &indices[0], &values[0]);
+  add (indices.size(), indices.data(), values.data());
 }
 
 

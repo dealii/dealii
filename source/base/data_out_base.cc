@@ -271,7 +271,7 @@ namespace
         char *compressed_data = new char[compressed_data_length];
         int err = compress2 ((Bytef *) compressed_data,
                              &compressed_data_length,
-                             (const Bytef *) &data[0],
+                             (const Bytef *) data.data(),
                              data.size() * sizeof(T),
                              get_zlib_compression_level(flags.compression_level));
         (void)err;
@@ -1154,7 +1154,7 @@ namespace
   {
     if (flags.data_binary)
       {
-        stream.write(reinterpret_cast<const char *>(&values[0]),
+        stream.write(reinterpret_cast<const char *>(values.data()),
                      values.size()*sizeof(data));
       }
     else
@@ -7010,13 +7010,13 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 
       // And finally, write the node data
       data_filter.fill_node_data(node_data_vec);
-      status = H5Dwrite(node_dataset, H5T_NATIVE_DOUBLE, node_memory_dataspace, node_file_dataspace, plist_id, &node_data_vec[0]);
+      status = H5Dwrite(node_dataset, H5T_NATIVE_DOUBLE, node_memory_dataspace, node_file_dataspace, plist_id, node_data_vec.data());
       AssertThrow(status >= 0, ExcIO());
       node_data_vec.clear();
 
       // And the cell data
       data_filter.fill_cell_data(global_node_cell_offsets[0], cell_data_vec);
-      status = H5Dwrite(cell_dataset, H5T_NATIVE_UINT, cell_memory_dataspace, cell_file_dataspace, plist_id, &cell_data_vec[0]);
+      status = H5Dwrite(cell_dataset, H5T_NATIVE_UINT, cell_memory_dataspace, cell_file_dataspace, plist_id, cell_data_vec.data());
       AssertThrow(status >= 0, ExcIO());
       cell_data_vec.clear();
 

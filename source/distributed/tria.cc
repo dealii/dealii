@@ -1403,52 +1403,52 @@ namespace parallel
           {
             buffer.resize(bytes_for_buffer());
 
-            char *ptr = &buffer[0];
+            char *ptr = buffer.data();
 
             const unsigned int num_cells = tree_index.size();
             std::memcpy(ptr, &num_cells, sizeof(unsigned int));
             ptr += sizeof(unsigned int);
 
             std::memcpy(ptr,
-                        &tree_index[0],
+                        tree_index.data(),
                         num_cells*sizeof(unsigned int));
             ptr += num_cells*sizeof(unsigned int);
 
             std::memcpy(ptr,
-                        &quadrants[0],
+                        quadrants.data(),
                         num_cells * sizeof(typename dealii::internal::p4est::
                                            types<dim>::quadrant));
             ptr += num_cells*sizeof(typename dealii::internal::p4est::types<dim>::
                                     quadrant);
 
             std::memcpy(ptr,
-                        &vertex_indices[0],
+                        vertex_indices.data(),
                         vertex_indices.size() * sizeof(unsigned int));
             ptr += vertex_indices.size() * sizeof(unsigned int);
 
             std::memcpy(ptr,
-                        &vertices[0],
+                        vertices.data(),
                         vertices.size() * sizeof(dealii::Point<spacedim>));
             ptr += vertices.size() * sizeof(dealii::Point<spacedim>);
 
-            Assert (ptr == &buffer[0]+buffer.size(),
+            Assert (ptr == buffer.data()+buffer.size(),
                     ExcInternalError());
 
           }
 
           void unpack_data (const std::vector<char> &buffer)
           {
-            const char *ptr = &buffer[0];
+            const char *ptr = buffer.data();
             unsigned int cells;
             memcpy(&cells, ptr, sizeof(unsigned int));
             ptr += sizeof(unsigned int);
 
             tree_index.resize(cells);
-            memcpy(&tree_index[0],ptr,sizeof(unsigned int)*cells);
+            memcpy(tree_index.data(),ptr,sizeof(unsigned int)*cells);
             ptr += sizeof(unsigned int)*cells;
 
             quadrants.resize(cells);
-            memcpy(&quadrants[0],ptr,
+            memcpy(quadrants.data(),ptr,
                    sizeof(typename dealii::internal::p4est::types<dim>::quadrant)*cells);
             ptr += sizeof(typename dealii::internal::p4est::types<dim>::quadrant)*cells;
 
@@ -1494,7 +1494,7 @@ namespace parallel
             for (unsigned int c=0; c<cells; ++c)
               first_vertices[c] = &vertices[first_indices[c]];
 
-            Assert (ptr == &buffer[0]+buffer.size(),
+            Assert (ptr == buffer.data() + buffer.size(),
                     ExcInternalError());
           }
         };
@@ -3143,7 +3143,7 @@ namespace parallel
           AssertThrowMPI(ierr);
           receive.resize(len);
 
-          char *ptr = &receive[0];
+          char *ptr = receive.data();
           ierr = MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
                           this->get_communicator(), &status);
           AssertThrowMPI(ierr);
@@ -3173,7 +3173,7 @@ namespace parallel
       // safely destroy the buffers.
       if (requests.size() > 0)
         {
-          const int ierr = MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+          const int ierr = MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
 

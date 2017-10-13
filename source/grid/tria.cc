@@ -6296,12 +6296,6 @@ namespace internal
                     {
                     case RefinementCase<dim>::cut_x:
                     {
-                      const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      *lines = nullptr;
-                      const unsigned int *line_indices     = nullptr;
-                      const bool         *line_orientation = nullptr;
-                      const int          *quad_indices     = nullptr;
-
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_x
@@ -6360,7 +6354,7 @@ namespace internal
                       // this, construct lists of line_indices and
                       // line orientations later on
                       const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      lines_x[4]
+                      lines[4]
                       =
                       {
                         hex->face(2)->child(0)
@@ -6373,20 +6367,16 @@ namespace internal
                         ->line((hex->face(5)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3)         //3
                       };
 
-                      lines = &lines_x[0];
-
-                      unsigned int line_indices_x[4];
-
+                      unsigned int line_indices[4];
                       for (unsigned int i=0; i<4; ++i)
-                        line_indices_x[i] = lines[i]->index();
-                      line_indices = &line_indices_x[0];
+                        line_indices[i] = lines[i]->index();
 
                       // the orientation of lines for the inner quads
                       // is quite tricky. as these lines are newly
                       // created ones and thus have no parents, they
                       // cannot inherit this property. set up an array
                       // and fill it with the respective values
-                      bool line_orientation_x[4];
+                      bool line_orientation[4];
 
                       // the middle vertice marked as m0 above is the
                       // start vertex for lines 0 and 2 in standard
@@ -6400,17 +6390,15 @@ namespace internal
 
                       for (unsigned int i=0; i<4; ++i)
                         if (lines[i]->vertex_index(i%2)==middle_vertices[i%2])
-                          line_orientation_x[i]=true;
+                          line_orientation[i]=true;
                         else
                           {
                             // it must be the other
                             // way round then
                             Assert(lines[i]->vertex_index((i+1)%2)==middle_vertices[i%2],
                                    ExcInternalError());
-                            line_orientation_x[i]=false;
+                            line_orientation[i]=false;
                           }
-
-                      line_orientation=&line_orientation_x[0];
 
                       // set up the new quad, line numbering is as
                       // indicated above
@@ -6456,7 +6444,7 @@ namespace internal
                       //
                       // note that we have to take care of the
                       // orientation of faces.
-                      const int quad_indices_x[11]
+                      const int quad_indices[11]
                       =
                       {
                         new_quads[0]->index(),     //0
@@ -6478,7 +6466,6 @@ namespace internal
                         hex->face(5)->child_index(1-child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]])
 
                       };
-                      quad_indices = &quad_indices_x[0];
 
                       new_hexes[0]->set (internal::Triangulation
                                          ::TriaObject<3>(quad_indices[1],
@@ -6499,12 +6486,6 @@ namespace internal
 
                     case RefinementCase<dim>::cut_y:
                     {
-                      const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      *lines = nullptr;
-                      const unsigned int *line_indices     = nullptr;
-                      const bool         *line_orientation = nullptr;
-                      const int          *quad_indices     = nullptr;
-
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_y
@@ -6568,7 +6549,7 @@ namespace internal
                       // this, construct lists of line_indices and
                       // line orientations later on
                       const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      lines_y[4]
+                      lines[4]
                       =
                       {
                         hex->face(0)->child(0)
@@ -6581,20 +6562,16 @@ namespace internal
                         ->line((hex->face(5)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3)         //3
                       };
 
-                      lines=&lines_y[0];
-
-                      unsigned int line_indices_y[4];
-
+                      unsigned int line_indices[4];
                       for (unsigned int i=0; i<4; ++i)
-                        line_indices_y[i]=lines[i]->index();
-                      line_indices=&line_indices_y[0];
+                        line_indices[i]=lines[i]->index();
 
                       // the orientation of lines for the inner quads
                       // is quite tricky. as these lines are newly
                       // created ones and thus have no parents, they
                       // cannot inherit this property. set up an array
                       // and fill it with the respective values
-                      bool line_orientation_y[4];
+                      bool line_orientation[4];
 
                       // the middle vertice marked as m0 above is the
                       // start vertex for lines 0 and 2 in standard
@@ -6608,16 +6585,14 @@ namespace internal
 
                       for (unsigned int i=0; i<4; ++i)
                         if (lines[i]->vertex_index(i%2)==middle_vertices[i%2])
-                          line_orientation_y[i]=true;
+                          line_orientation[i]=true;
                         else
                           {
                             // it must be the other way round then
                             Assert(lines[i]->vertex_index((i+1)%2)==middle_vertices[i%2],
                                    ExcInternalError());
-                            line_orientation_y[i]=false;
+                            line_orientation[i]=false;
                           }
-
-                      line_orientation=&line_orientation_y[0];
 
                       // set up the new quad, line numbering is as
                       // indicated above
@@ -6663,7 +6638,7 @@ namespace internal
                       //
                       // note that we have to take care of the
                       // orientation of faces.
-                      const int quad_indices_y[11]
+                      const int quad_indices[11]
                       =
                       {
                         new_quads[0]->index(),     //0
@@ -6685,7 +6660,6 @@ namespace internal
                         hex->face(5)->child_index(1-child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]])
 
                       };
-                      quad_indices=&quad_indices_y[0];
 
                       new_hexes[0]->set (internal::Triangulation
                                          ::TriaObject<3>(quad_indices[1],
@@ -6706,12 +6680,6 @@ namespace internal
 
                     case RefinementCase<dim>::cut_z:
                     {
-                      const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      *lines = nullptr;
-                      const unsigned int *line_indices     = nullptr;
-                      const bool         *line_orientation = nullptr;
-                      const int          *quad_indices     = nullptr;
-
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_z
@@ -6777,7 +6745,7 @@ namespace internal
                       // this, construct lists of line_indices and
                       // line orientations later on
                       const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      lines_z[4]
+                      lines[4]
                       =
                       {
                         hex->face(0)->child(0)
@@ -6790,20 +6758,16 @@ namespace internal
                         ->line((hex->face(3)->refinement_case() == RefinementCase<2>::cut_x) ? 1 : 3)         //3
                       };
 
-                      lines=&lines_z[0];
-
-                      unsigned int line_indices_z[4];
-
+                      unsigned int line_indices[4];
                       for (unsigned int i=0; i<4; ++i)
-                        line_indices_z[i]=lines[i]->index();
-                      line_indices=&line_indices_z[0];
+                        line_indices[i]=lines[i]->index();
 
                       // the orientation of lines for the inner quads
                       // is quite tricky. as these lines are newly
                       // created ones and thus have no parents, they
                       // cannot inherit this property. set up an array
                       // and fill it with the respective values
-                      bool line_orientation_z[4];
+                      bool line_orientation[4];
 
                       // the middle vertex marked as m0 above is the
                       // start vertex for lines 0 and 2 in standard
@@ -6817,16 +6781,14 @@ namespace internal
 
                       for (unsigned int i=0; i<4; ++i)
                         if (lines[i]->vertex_index(i%2)==middle_vertices[i%2])
-                          line_orientation_z[i]=true;
+                          line_orientation[i]=true;
                         else
                           {
                             // it must be the other way round then
                             Assert(lines[i]->vertex_index((i+1)%2)==middle_vertices[i%2],
                                    ExcInternalError());
-                            line_orientation_z[i]=false;
+                            line_orientation[i]=false;
                           }
-
-                      line_orientation=&line_orientation_z[0];
 
                       // set up the new quad, line numbering is as
                       // indicated above
@@ -6873,7 +6835,7 @@ namespace internal
                       //
                       // note that we have to take care of the
                       // orientation of faces.
-                      const int quad_indices_z[11]
+                      const int quad_indices[11]
                       =
                       {
                         new_quads[0]->index(),     //0
@@ -6894,7 +6856,6 @@ namespace internal
 
                         hex->face(5)->index()      //10
                       };
-                      quad_indices=&quad_indices_z[0];
 
                       new_hexes[0]->set (internal::Triangulation
                                          ::TriaObject<3>(quad_indices[1],
@@ -6915,12 +6876,6 @@ namespace internal
 
                     case RefinementCase<dim>::cut_xy:
                     {
-                      const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      *lines = nullptr;
-                      const unsigned int *line_indices     = nullptr;
-                      const bool         *line_orientation = nullptr;
-                      const int          *quad_indices     = nullptr;
-
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_xy
@@ -7010,7 +6965,7 @@ namespace internal
                       // this, construct lists of line_indices and
                       // line orientations later on
                       const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      lines_xy[13]
+                      lines[13]
                       =
                       {
                         hex->face(0)->child(0)
@@ -7043,20 +6998,16 @@ namespace internal
                         new_lines[0]                        //12
                       };
 
-                      lines=&lines_xy[0];
-
-                      unsigned int line_indices_xy[13];
-
+                      unsigned int line_indices[13];
                       for (unsigned int i=0; i<13; ++i)
-                        line_indices_xy[i]=lines[i]->index();
-                      line_indices=&line_indices_xy[0];
+                        line_indices[i]=lines[i]->index();
 
                       // the orientation of lines for the inner quads
                       // is quite tricky. as these lines are newly
                       // created ones and thus have no parents, they
                       // cannot inherit this property. set up an array
                       // and fill it with the respective values
-                      bool line_orientation_xy[13];
+                      bool line_orientation[13];
 
                       // the middle vertices of the lines of our
                       // bottom face
@@ -7073,13 +7024,13 @@ namespace internal
                       // face
                       for (unsigned int i=0; i<4; ++i)
                         if (lines[i]->vertex_index(0)==middle_vertices[i])
-                          line_orientation_xy[i]=true;
+                          line_orientation[i]=true;
                         else
                           {
                             // it must be the other way round then
                             Assert(lines[i]->vertex_index(1)==middle_vertices[i],
                                    ExcInternalError());
-                            line_orientation_xy[i]=false;
+                            line_orientation[i]=false;
                           }
 
                       // note: for lines 4 to 11 (inner lines of the
@@ -7091,7 +7042,7 @@ namespace internal
                       for (unsigned int i=4; i<12; ++i)
                         if (lines[i]->vertex_index((i+1)%2) ==
                             middle_vertex_index<dim,spacedim>(hex->face(3+i/4)))
-                          line_orientation_xy[i]=true;
+                          line_orientation[i]=true;
                         else
                           {
                             // it must be the other way
@@ -7099,14 +7050,12 @@ namespace internal
                             Assert(lines[i]->vertex_index(i%2) ==
                                    (middle_vertex_index<dim,spacedim>(hex->face(3+i/4))),
                                    ExcInternalError());
-                            line_orientation_xy[i]=false;
+                            line_orientation[i]=false;
                           }
                       // for the last line the line orientation is
                       // always true, since it was just constructed
                       // that way
-
-                      line_orientation_xy[12]=true;
-                      line_orientation=&line_orientation_xy[0];
+                      line_orientation[12]=true;
 
                       // set up the 4 quads, numbered as follows (left
                       // quad numbering, right line numbering
@@ -7199,7 +7148,7 @@ namespace internal
                       //
                       // note that we have to take care of the
                       // orientation of faces.
-                      const int quad_indices_xy[20]
+                      const int quad_indices[20]
                       =
                       {
                         new_quads[0]->index(),     //0
@@ -7229,7 +7178,6 @@ namespace internal
                         hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[5],f_fl[5],f_ro[5])),
                         hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
                       };
-                      quad_indices=&quad_indices_xy[0];
 
                       new_hexes[0]->set (internal::Triangulation
                                          ::TriaObject<3>(quad_indices[4],
@@ -7264,12 +7212,6 @@ namespace internal
 
                     case RefinementCase<dim>::cut_xz:
                     {
-                      const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      *lines = nullptr;
-                      const unsigned int *line_indices     = nullptr;
-                      const bool         *line_orientation = nullptr;
-                      const int          *quad_indices     = nullptr;
-
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_xz
@@ -7359,7 +7301,7 @@ namespace internal
                       // this, construct lists of line_indices and
                       // line orientations later on
                       const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      lines_xz[13]
+                      lines[13]
                       =
                       {
                         hex->face(0)->child(0)
@@ -7392,20 +7334,16 @@ namespace internal
                         new_lines[0]                        //12
                       };
 
-                      lines=&lines_xz[0];
-
-                      unsigned int line_indices_xz[13];
-
+                      unsigned int line_indices[13];
                       for (unsigned int i=0; i<13; ++i)
-                        line_indices_xz[i]=lines[i]->index();
-                      line_indices=&line_indices_xz[0];
+                        line_indices[i]=lines[i]->index();
 
                       // the orientation of lines for the inner quads
                       // is quite tricky. as these lines are newly
                       // created ones and thus have no parents, they
                       // cannot inherit this property. set up an array
                       // and fill it with the respective values
-                      bool line_orientation_xz[13];
+                      bool line_orientation[13];
 
                       // the middle vertices of the
                       // lines of our front face
@@ -7421,13 +7359,13 @@ namespace internal
                       // line is 'true', if vertex 0 is on the front
                       for (unsigned int i=0; i<4; ++i)
                         if (lines[i]->vertex_index(0)==middle_vertices[i])
-                          line_orientation_xz[i]=true;
+                          line_orientation[i]=true;
                         else
                           {
                             // it must be the other way round then
                             Assert(lines[i]->vertex_index(1)==middle_vertices[i],
                                    ExcInternalError());
-                            line_orientation_xz[i]=false;
+                            line_orientation[i]=false;
                           }
 
                       // note: for lines 4 to 11 (inner lines of the
@@ -7439,7 +7377,7 @@ namespace internal
                       for (unsigned int i=4; i<12; ++i)
                         if (lines[i]->vertex_index((i+1)%2) ==
                             middle_vertex_index<dim,spacedim>(hex->face(1+i/4)))
-                          line_orientation_xz[i]=true;
+                          line_orientation[i]=true;
                         else
                           {
                             // it must be the other way
@@ -7447,14 +7385,12 @@ namespace internal
                             Assert(lines[i]->vertex_index(i%2) ==
                                    (middle_vertex_index<dim,spacedim>(hex->face(1+i/4))),
                                    ExcInternalError());
-                            line_orientation_xz[i]=false;
+                            line_orientation[i]=false;
                           }
                       // for the last line the line orientation is
                       // always true, since it was just constructed
                       // that way
-
-                      line_orientation_xz[12]=true;
-                      line_orientation=&line_orientation_xz[0];
+                      line_orientation[12]=true;
 
                       // set up the 4 quads, numbered as follows (left
                       // quad numbering, right line numbering
@@ -7549,7 +7485,7 @@ namespace internal
                       //
                       // note that we have to take care of the
                       // orientation of faces.
-                      const int quad_indices_xz[20]
+                      const int quad_indices[20]
                       =
                       {
                         new_quads[0]->index(),     //0
@@ -7579,7 +7515,6 @@ namespace internal
                         hex->face(5)->child_index(  child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]]),  //18
                         hex->face(5)->child_index(1-child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]])
                       };
-                      quad_indices=&quad_indices_xz[0];
 
                       // due to the exchange of x and y for the front
                       // and back face, we order the children
@@ -7623,12 +7558,6 @@ namespace internal
 
                     case RefinementCase<dim>::cut_yz:
                     {
-                      const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      *lines = nullptr;
-                      const unsigned int *line_indices     = nullptr;
-                      const bool         *line_orientation = nullptr;
-                      const int          *quad_indices     = nullptr;
-
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_yz
@@ -7720,7 +7649,7 @@ namespace internal
                       // this, construct lists of line_indices and
                       // line orientations later on
                       const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      lines_yz[13]
+                      lines[13]
                       =
                       {
                         hex->face(2)->child(0)
@@ -7753,20 +7682,17 @@ namespace internal
                         new_lines[0]                        //12
                       };
 
-                      lines=&lines_yz[0];
-
-                      unsigned int line_indices_yz[13];
+                      unsigned int line_indices[13];
 
                       for (unsigned int i=0; i<13; ++i)
-                        line_indices_yz[i]=lines[i]->index();
-                      line_indices=&line_indices_yz[0];
+                        line_indices[i]=lines[i]->index();
 
                       // the orientation of lines for the inner quads
                       // is quite tricky. as these lines are newly
                       // created ones and thus have no parents, they
                       // cannot inherit this property. set up an array
                       // and fill it with the respective values
-                      bool line_orientation_yz[13];
+                      bool line_orientation[13];
 
                       // the middle vertices of the lines of our front
                       // face
@@ -7782,13 +7708,13 @@ namespace internal
                       // line is 'true', if vertex 0 is on the front
                       for (unsigned int i=0; i<4; ++i)
                         if (lines[i]->vertex_index(0)==middle_vertices[i])
-                          line_orientation_yz[i]=true;
+                          line_orientation[i]=true;
                         else
                           {
                             // it must be the other way round then
                             Assert(lines[i]->vertex_index(1)==middle_vertices[i],
                                    ExcInternalError());
-                            line_orientation_yz[i]=false;
+                            line_orientation[i]=false;
                           }
 
                       // note: for lines 4 to 11 (inner lines of the
@@ -7800,7 +7726,7 @@ namespace internal
                       for (unsigned int i=4; i<12; ++i)
                         if (lines[i]->vertex_index((i+1)%2) ==
                             middle_vertex_index<dim,spacedim>(hex->face(i/4-1)))
-                          line_orientation_yz[i]=true;
+                          line_orientation[i]=true;
                         else
                           {
                             // it must be the other way
@@ -7808,14 +7734,12 @@ namespace internal
                             Assert(lines[i]->vertex_index(i%2) ==
                                    (middle_vertex_index<dim,spacedim>(hex->face(i/4-1))),
                                    ExcInternalError());
-                            line_orientation_yz[i]=false;
+                            line_orientation[i]=false;
                           }
                       // for the last line the line orientation is
                       // always true, since it was just constructed
                       // that way
-
-                      line_orientation_yz[12]=true;
-                      line_orientation=&line_orientation_yz[0];
+                      line_orientation[12]=true;
 
                       // set up the 4 quads, numbered as follows (left
                       // quad numbering, right line numbering
@@ -7904,7 +7828,7 @@ namespace internal
                       //
                       // note that we have to take care of the
                       // orientation of faces.
-                      const int quad_indices_yz[20]
+                      const int quad_indices[20]
                       =
                       {
                         new_quads[0]->index(),     //0
@@ -7934,7 +7858,6 @@ namespace internal
                         hex->face(5)->child_index(  child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]]),  //18
                         hex->face(5)->child_index(1-child_at_origin[hex->face(5)->refinement_case()-1][f_fl[5]][f_ro[5]])
                       };
-                      quad_indices=&quad_indices_yz[0];
 
                       new_hexes[0]->set (internal::Triangulation
                                          ::TriaObject<3>(quad_indices[4],
@@ -7969,13 +7892,6 @@ namespace internal
 
                     case RefinementCase<dim>::cut_xyz:
                     {
-                      const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      *lines = nullptr;
-                      const unsigned int *vertex_indices   = nullptr;
-                      const unsigned int *line_indices     = nullptr;
-                      const bool         *line_orientation = nullptr;
-                      const int          *quad_indices     = nullptr;
-
                       //////////////////////////////
                       //
                       //     RefinementCase<dim>::cut_xyz
@@ -8033,7 +7949,7 @@ namespace internal
                       //  /  0  /      |  4  |
                       // *--*--*       *--*--*
                       //
-                      const unsigned int vertex_indices_xyz[7]
+                      const unsigned int vertex_indices[7]
                         = { middle_vertex_index<dim,spacedim>(hex->face(0)),
                             middle_vertex_index<dim,spacedim>(hex->face(1)),
                             middle_vertex_index<dim,spacedim>(hex->face(2)),
@@ -8042,7 +7958,6 @@ namespace internal
                             middle_vertex_index<dim,spacedim>(hex->face(5)),
                             next_unused_vertex
                           };
-                      vertex_indices=&vertex_indices_xyz[0];
 
                       new_lines[0]->set (internal::Triangulation::
                                          TriaObject<1>(vertex_indices[2], vertex_indices[6]));
@@ -8123,7 +8038,7 @@ namespace internal
                       // this, construct lists of line_indices and
                       // line orientations later on
                       const typename Triangulation<dim,spacedim>::raw_line_iterator
-                      lines_xyz[30]
+                      lines[30]
                       =
                       {
                         hex->face(0)->isotropic_child(GeometryInfo<dim>::standard_to_real_face_vertex(0,f_or[0],f_fl[0],f_ro[0]))
@@ -8188,19 +8103,16 @@ namespace internal
                         new_lines[5]                        //29
                       };
 
-                      lines=&lines_xyz[0];
-
-                      unsigned int line_indices_xyz[30];
+                      unsigned int line_indices[30];
                       for (unsigned int i=0; i<30; ++i)
-                        line_indices_xyz[i]=lines[i]->index();
-                      line_indices=&line_indices_xyz[0];
+                        line_indices[i]=lines[i]->index();
 
                       // the orientation of lines for the inner quads
                       // is quite tricky. as these lines are newly
                       // created ones and thus have no parents, they
                       // cannot inherit this property. set up an array
                       // and fill it with the respective values
-                      bool line_orientation_xyz[30];
+                      bool line_orientation[30];
 
                       // note: for the first 24 lines (inner lines of
                       // the outer quads) the following holds: the
@@ -8210,21 +8122,20 @@ namespace internal
                       // vertex is the same middle vertex.
                       for (unsigned int i=0; i<24; ++i)
                         if (lines[i]->vertex_index((i+1)%2)==vertex_indices[i/4])
-                          line_orientation_xyz[i]=true;
+                          line_orientation[i]=true;
                         else
                           {
                             // it must be the other way
                             // round then
                             Assert(lines[i]->vertex_index(i%2)==vertex_indices[i/4],
                                    ExcInternalError());
-                            line_orientation_xyz[i]=false;
+                            line_orientation[i]=false;
                           }
                       // for the last 6 lines the line orientation is
                       // always true, since they were just constructed
                       // that way
                       for (unsigned int i=24; i<30; ++i)
-                        line_orientation_xyz[i]=true;
-                      line_orientation=&line_orientation_xyz[0];
+                        line_orientation[i]=true;
 
                       // set up the 12 quads, numbered as follows
                       // (left quad numbering, right line numbering
@@ -8395,7 +8306,7 @@ namespace internal
                       // take care of the
                       // orientation of
                       // faces.
-                      const int quad_indices_xyz[36]
+                      const int quad_indices[36]
                       =
                       {
                         new_quads[0]->index(),     //0
@@ -8441,7 +8352,6 @@ namespace internal
                         hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(2,f_or[5],f_fl[5],f_ro[5])),
                         hex->face(5)->isotropic_child_index(GeometryInfo<dim>::standard_to_real_face_vertex(3,f_or[5],f_fl[5],f_ro[5]))
                       };
-                      quad_indices=&quad_indices_xyz[0];
 
                       // bottom children
                       new_hexes[0]->set (internal::Triangulation

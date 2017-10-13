@@ -1519,7 +1519,7 @@ namespace TrilinosWrappers
       Assert (indices.size() == values.size(),
               ExcDimensionMismatch(indices.size(),values.size()));
 
-      set (indices.size(), &indices[0], &values[0]);
+      set (indices.size(), indices.data(), values.data());
     }
 
 
@@ -1536,7 +1536,7 @@ namespace TrilinosWrappers
       Assert (indices.size() == values.size(),
               ExcDimensionMismatch(indices.size(),values.size()));
 
-      set (indices.size(), &indices[0], values.begin());
+      set (indices.size(), indices.data(), values.begin());
     }
 
 
@@ -1595,7 +1595,7 @@ namespace TrilinosWrappers
       Assert (indices.size() == values.size(),
               ExcDimensionMismatch(indices.size(),values.size()));
 
-      add (indices.size(), &indices[0], &values[0]);
+      add (indices.size(), indices.data(), values.data());
     }
 
 
@@ -1611,7 +1611,7 @@ namespace TrilinosWrappers
       Assert (indices.size() == values.size(),
               ExcDimensionMismatch(indices.size(),values.size()));
 
-      add (indices.size(), &indices[0], values.begin());
+      add (indices.size(), indices.data(), values.begin());
     }
 
 
