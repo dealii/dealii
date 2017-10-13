@@ -48,8 +48,8 @@
 #   CTEST_CMAKE_GENERATOR
 #     - The CMake Generator to use (e.g. "Unix Makefiles", or "Ninja", see
 #       $ man cmake)
-#     - If unspecified the generator of a configured build directory will
-#       be used, otherwise "Unix Makefiles".
+#     - If unspecified the current generator of a configured build directory
+#       will be used, otherwise "Unix Makefiles".
 #
 #   TRACK
 #     - The track the test should be submitted to. Defaults to
@@ -67,7 +67,7 @@
 #       "Continuous"       - Reserved for the "official" regression tester
 #
 #   CONFIG_FILE
-#     - A configuration file (see ../docs/development/Config.sample)
+#     - A configuration file (see ../doc/users/config.sample)
 #       that will be used during the configuration stage (invokes
 #       # cmake -C ${CONFIG_FILE}). This only has an effect if
 #       CTEST_BINARY_DIRECTORY is empty.
@@ -76,8 +76,8 @@
 #     - A string that is appended to CTEST_BUILD_NAME
 #
 #   COVERAGE
-#     - If set to TRUE deal.II will be configured with
-#     DEAL_II_SETUP_COVERAGE=TRUE, CMAKE_BUILD_TYPE=Debug and the
+#     - If set to ON deal.II will be configured with
+#     DEAL_II_SETUP_COVERAGE=ON, CMAKE_BUILD_TYPE=Debug and the
 #     CTEST_COVERAGE() stage will be run. Test results must go into the
 #     "Experimental" section.
 #

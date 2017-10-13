@@ -34,8 +34,11 @@
 #       - specifying a test target to be executed for a parameter run.
 #
 #     TEST_TIME_LIMIT
-#       - specifying the maximal wall clock time in seconds a test is
-#         allowed to run
+#       - Specifies the maximal wall clock time in seconds a test is
+#         allowed to run. Defaults to 600.
+#     TEST_PICKUP_REGEX
+#       - A regular expression to select only a subset of tests during setup.
+#         An empty string is interpreted as a catchall (this is the default).
 #
 # Either numdiff (if available), or diff are used for the comparison of
 # test results. Their location can be specified with NUMDIFF_DIR and
