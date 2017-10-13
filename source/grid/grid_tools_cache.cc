@@ -83,6 +83,20 @@ namespace GridTools
 
 
 
+  template<int dim, int spacedim>
+  const std::map<unsigned int, Point<spacedim> > &
+  Cache<dim,spacedim>::get_used_vertices() const
+  {
+    if (update_flags & update_used_vertices)
+      {
+        used_vertices = GridTools::extract_used_vertices(*tria, *mapping);
+        update_flags = update_flags & ~update_used_vertices;
+      }
+    return used_vertices;
+  }
+
+
+
 #ifdef DEAL_II_WITH_NANOFLANN
   template<int dim, int spacedim>
   const KDTree<spacedim> &Cache<dim,spacedim>::get_vertex_kdtree() const

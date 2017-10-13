@@ -57,6 +57,11 @@ namespace GridTools
     update_vertex_kdtree = 0x04,
 
     /**
+     * Update a mapping of used vertices.
+     */
+    update_used_vertices = 0x08,
+
+    /**
      * Update all objects.
      */
     update_all = 0xFF,
