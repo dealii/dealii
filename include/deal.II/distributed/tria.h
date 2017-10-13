@@ -935,6 +935,24 @@ namespace parallel
       communicate_locally_moved_vertices (const std::vector<bool> &vertex_locally_moved);
 
       /**
+       * This function is not implemented, but needs to be present for the compiler.
+       */
+      unsigned int
+      register_data_attach (const std::size_t size,
+                            const std::function<void (const typename dealii::Triangulation<1,spacedim>::cell_iterator &,
+                                                      const typename dealii::Triangulation<1,spacedim>::CellStatus,
+                                                      void *)> &pack_callback);
+
+      /**
+       * This function is not implemented, but needs to be present for the compiler.
+       */
+      void
+      notify_ready_to_unpack (const unsigned int offset,
+                              const std::function<void (const typename dealii::Triangulation<1,spacedim>::cell_iterator &,
+                                                        const typename dealii::Triangulation<1,spacedim>::CellStatus,
+                                                        const void *)> &unpack_callback);
+
+      /**
        * Dummy arrays. This class isn't usable but the compiler wants to see
        * these variables at a couple places anyway.
        */

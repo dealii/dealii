@@ -3741,6 +3741,31 @@ namespace parallel
     }
 
 
+
+    template <int spacedim>
+    unsigned int
+    Triangulation<1,spacedim>::register_data_attach (const std::size_t /*size*/,
+                                                     const std::function<void (const typename dealii::Triangulation<1,spacedim>::cell_iterator &,
+                                                         const typename dealii::Triangulation<1,spacedim>::CellStatus,
+                                                         void *)> &/*pack_callback*/)
+    {
+      Assert (false, ExcNotImplemented());
+      return 0;
+    }
+
+
+
+    template <int spacedim>
+    void
+    Triangulation<1,spacedim>::notify_ready_to_unpack (const unsigned int /*offset*/,
+                                                       const std::function<void (const typename dealii::Triangulation<1,spacedim>::cell_iterator &,
+                                                           const typename dealii::Triangulation<1,spacedim>::CellStatus,
+                                                           const void *)> &/*unpack_callback*/)
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
+
     template <int spacedim>
     const std::vector<types::global_dof_index> &
     Triangulation<1,spacedim>::get_p4est_tree_to_coarse_cell_permutation() const
