@@ -288,7 +288,6 @@ namespace SUNDIALS
        *
        * @param absolute_tolerance Absolute error tolerance
        * @param relative_tolerance Relative error tolerance
-       * @param use_local_tolerances Use local tolerances when computing errors
        * @param ignore_algebraic_terms_for_errors Ignore algebraic terms for error computations
        *
        * Initial condition correction parameters:
@@ -309,7 +308,6 @@ namespace SUNDIALS
         // Error parameters
         const double &absolute_tolerance = 1e-6,
         const double &relative_tolerance = 1e-5,
-        const bool &use_local_tolerances = false,
         const bool &ignore_algebraic_terms_for_errors = true,
         // Initial conditions parameters
         const InitialConditionCorrection &ic_type = use_y_diff,
@@ -327,8 +325,7 @@ namespace SUNDIALS
         ic_type(ic_type),
         reset_type(reset_type),
         maximum_non_linear_iterations_ic(maximum_non_linear_iterations_ic),
-        maximum_non_linear_iterations(maximum_non_linear_iterations),
-        use_local_tolerances(use_local_tolerances)
+        maximum_non_linear_iterations(maximum_non_linear_iterations)
       {}
 
       /**
@@ -391,7 +388,6 @@ namespace SUNDIALS
         prm.add_parameter("Ignore algebraic terms for error computations", ignore_algebraic_terms_for_errors,
                           "Indicate whether or not to suppress algebraic variables "
                           "in the local error test.");
-        prm.add_parameter("Use local tolerances", use_local_tolerances);
         prm.leave_subsection();
 
         prm.enter_subsection("Initial condition correction parameters");
@@ -525,11 +521,6 @@ namespace SUNDIALS
        * Maximum number of iterations for Newton method during time advancement.
        */
       unsigned int maximum_non_linear_iterations;
-
-      /**
-       * Use local tolerances when computing absolute tolerance.
-       */
-      bool use_local_tolerances;
     };
 
     /**
@@ -745,12 +736,9 @@ namespace SUNDIALS
 
     /**
      * Return a vector whose components are the weights used by IDA to compute
-     * the vector norm. The implementation of this function is optional, and it
-     * is used only when `use_local_tolerances` is set to true at construction
-     * time, or through the parameter file.
-     *
-     * If you do not overwrite this function and set `use_local_tolerances` to
-     * true, an exception will be thrown when trying to start the time stepper.
+     * the vector norm. The implementation of this function is optional. If the
+     * user does not provide an implementation, the weights are assumed to be all
+     * ones.
      */
     std::function<VectorType&()> get_local_tolerances;
 

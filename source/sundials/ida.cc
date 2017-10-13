@@ -338,7 +338,7 @@ namespace SUNDIALS
     status = IDAInit(ida_mem, t_dae_residual<VectorType>, current_time, yy, yp);
     AssertIDA(status);
 
-    if (data.use_local_tolerances)
+    if (get_local_tolerances)
       {
         copy(abs_tolls, get_local_tolerances());
         status = IDASVtolerances(ida_mem, data.relative_tolerance, abs_tolls);
@@ -485,13 +485,6 @@ namespace SUNDIALS
       reinit_vector(*v);
       const unsigned int size = v->size();
       return complete_index_set(size);
-    };
-
-    get_local_tolerances = []() ->VectorType &
-    {
-      std::shared_ptr<VectorType> y;
-      AssertThrow(false, ExcFunctionNotProvided("get_local_tolerances"));
-      return *y;
     };
   }
 

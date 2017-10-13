@@ -5,7 +5,6 @@ subsection Error control
   set Absolute error tolerance                      = 1e-6
   set Ignore algebraic terms for error computations = true
   set Relative error tolerance                      = 1e-5
-  set Use local tolerances                          = false
 end
 subsection Initial condition correction parameters
   set Correction type at initial time        = none
