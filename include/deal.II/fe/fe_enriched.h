@@ -547,7 +547,7 @@ protected:
    */
   template <int dim_1>
   typename FiniteElement<dim,spacedim>::InternalDataBase *
-  setup_data (std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> fes_data,
+  setup_data (std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase> &&fes_data,
               const UpdateFlags      flags,
               const Quadrature<dim_1> &quadrature) const;
 
