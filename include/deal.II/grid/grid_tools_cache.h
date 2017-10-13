@@ -109,6 +109,16 @@ namespace GridTools
     const std::vector<std::vector<Tensor<1,spacedim>>>
     &get_vertex_to_cell_centers_directions() const;
 
+    /**
+     * Return a reference to the stored triangulation.
+     */
+    const Triangulation<dim,spacedim> & get_triangulation() const;
+
+    /**
+     * Return a reference to the stored mapping.
+     */
+    const Mapping<dim,spacedim> & get_mapping() const;
+
 #ifdef DEAL_II_WITH_NANOFLANN
     /**
      * Return the cached vertex_kdtree object, constructed with the vertices of
@@ -162,7 +172,25 @@ namespace GridTools
     boost::signals2::connection tria_signal;
   };
 
+
+
+  // Inline functions
+  template<int dim, int spacedim>
+  inline const Triangulation<dim, spacedim>& Cache::get_triangulation() const
+  {
+    return *tria;
+  }
+
+
+
+  template<int dim, int spacedim>
+  inline const Mapping<dim, spacedim>& Cache::get_mapping() const
+  {
+    return *mapping;
+  }
 }
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 
