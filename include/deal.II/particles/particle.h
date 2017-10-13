@@ -25,65 +25,65 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
+ * A namespace for all type definitions related to particles.
+ */
+namespace types
+{
+  /**
+   * Typedef of cell level/index pair. TODO: replace this by the
+   * active_cell_index.
+   */
+  typedef std::pair<int, int> LevelInd;
+
+  /* Type definitions */
+
+#ifdef DEAL_II_WITH_64BIT_INDICES
+  /**
+   * The type used for indices of particles. While in
+   * sequential computations the 4 billion indices of 32-bit unsigned integers
+   * is plenty, parallel computations using hundreds of processes can overflow
+   * this number and we need a bigger index space. We here utilize the same
+   * build variable that controls the dof indices because the number
+   * of degrees of freedom and the number of particles are typically on the same
+   * order of magnitude.
+   *
+   * The data type always indicates an unsigned integer type.
+   */
+  typedef unsigned long long int particle_index;
+
+  /**
+   * An identifier that denotes the MPI type associated with
+   * types::global_dof_index.
+   */
+#  define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#else
+  /**
+   * The type used for indices of particles. While in
+   * sequential computations the 4 billion indices of 32-bit unsigned integers
+   * is plenty, parallel computations using hundreds of processes can overflow
+   * this number and we need a bigger index space. We here utilize the same
+   * build variable that controls the dof indices because the number
+   * of degrees of freedom and the number of particles are typically on the same
+   * order of magnitude.
+   *
+   * The data type always indicates an unsigned integer type.
+   */
+  typedef unsigned int particle_index;
+
+  /**
+   * An identifier that denotes the MPI type associated with
+   * types::global_dof_index.
+   */
+#  define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED
+#endif
+}
+
+/**
  * A namespace that contains all classes that are related to the particle
  * implementation, in particular the fundamental Particle class.
  */
 namespace Particles
 {
-  /**
-   * A namespace for all type definitions related to particles.
-   */
-  namespace types
-  {
-    /**
-     * Typedef of cell level/index pair. TODO: replace this by the
-     * active_cell_index.
-     */
-    typedef std::pair<int, int> LevelInd;
-
-    /* Type definitions */
-
-#ifdef DEAL_II_WITH_64BIT_INDICES
-    /**
-     * The type used for indices of particles. While in
-     * sequential computations the 4 billion indices of 32-bit unsigned integers
-     * is plenty, parallel computations using hundreds of processes can overflow
-     * this number and we need a bigger index space. We here utilize the same
-     * build variable that controls the dof indices because the number
-     * of degrees of freedom and the number of particles are typically on the same
-     * order of magnitude.
-     *
-     * The data type always indicates an unsigned integer type.
-     */
-    typedef unsigned long long int particle_index;
-
-    /**
-     * An identifier that denotes the MPI type associated with
-     * types::global_dof_index.
-     */
-#  define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
-#else
-    /**
-     * The type used for indices of particles. While in
-     * sequential computations the 4 billion indices of 32-bit unsigned integers
-     * is plenty, parallel computations using hundreds of processes can overflow
-     * this number and we need a bigger index space. We here utilize the same
-     * build variable that controls the dof indices because the number
-     * of degrees of freedom and the number of particles are typically on the same
-     * order of magnitude.
-     *
-     * The data type always indicates an unsigned integer type.
-     */
-    typedef unsigned int particle_index;
-
-    /**
-     * An identifier that denotes the MPI type associated with
-     * types::global_dof_index.
-     */
-#  define PARTICLE_INDEX_MPI_TYPE MPI_UNSIGNED
-#endif
-  }
-
   /**
    * Base class of particles - represents a particle with position,
    * an ID number and a variable number of properties. This class
