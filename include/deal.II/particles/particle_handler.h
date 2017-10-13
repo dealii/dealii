@@ -98,6 +98,16 @@ namespace Particles
     void clear_particles();
 
     /**
+     * Updates all internally cached numbers. Note that all functions that
+     * modify internal data structures and act on multiple particles will
+     * call this function automatically (e.g. insert_particles), while
+     * functions that act on single particles will not call this function
+     * (e.g. insert_particle). This is done because the update is
+     * expensive compared to single operations.
+     */
+    void update_cache();
+
+    /**
      * Return an iterator to the first particle.
      */
     ParticleHandler<dim,spacedim>::particle_iterator begin() const;
@@ -351,32 +361,6 @@ namespace Particles
      * to check where the particle data was stored.
      */
     unsigned int data_offset;
-
-    /**
-     * Calculates the number of particles in the global model domain.
-     */
-    void
-    update_n_global_particles();
-
-    /**
-     * Calculates and stores the number of particles in the cell that
-     * contains the most particles in the global model (stored in the
-     * member variable global_max_particles_per_cell). This variable is a
-     * state variable, because it is needed to serialize and deserialize
-     * the particle data correctly in parallel (it determines the size of
-     * the data chunks per cell that are stored and read). Before accessing
-     * the variable this function has to be called, unless the state was
-     * read from another source (e.g. after resuming from a checkpoint).
-     */
-    void
-    update_global_max_particles_per_cell();
-
-    /**
-     * Calculates the next free particle index in the global model domain.
-     * This equals one plus the highest particle index currently active.
-     */
-    void
-    update_next_free_particle_index();
 
     /**
      * Transfer particles that have crossed subdomain boundaries to other

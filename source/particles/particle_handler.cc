@@ -104,6 +104,36 @@ namespace Particles
 
 
   template <int dim,int spacedim>
+  void
+  ParticleHandler<dim,spacedim>::update_cache()
+  {
+
+    types::particle_index locally_highest_index = 0;
+    unsigned int local_max_particles_per_cell = 0;
+    unsigned int current_particles_per_cell = 0;
+    typename Triangulation<dim,spacedim>::active_cell_iterator current_cell;
+
+    for (particle_iterator particle = begin(); particle != end(); ++particle)
+      {
+        locally_highest_index = std::max(locally_highest_index,particle->get_id());
+
+        if (particle->get_surrounding_cell(*triangulation) != current_cell)
+          current_particles_per_cell = 0;
+
+        ++current_particles_per_cell;
+        local_max_particles_per_cell = std::max(local_max_particles_per_cell,
+                                                current_particles_per_cell);
+      }
+
+    global_number_of_particles = dealii::Utilities::MPI::sum (particles.size(), triangulation->get_communicator());
+    next_free_particle_index = dealii::Utilities::MPI::max (locally_highest_index, triangulation->get_communicator()) + 1;
+    global_max_particles_per_cell = dealii::Utilities::MPI::max(local_max_particles_per_cell,triangulation->get_communicator());
+  }
+
+
+
+
+  template <int dim,int spacedim>
   typename ParticleHandler<dim,spacedim>::particle_iterator
   ParticleHandler<dim,spacedim>::begin() const
   {
@@ -202,6 +232,7 @@ namespace Particles
   ParticleHandler<dim,spacedim>::insert_particles(const std::multimap<types::LevelInd, Particle<dim,spacedim> > &new_particles)
   {
     particles.insert(new_particles.begin(),new_particles.end());
+    update_cache();
   }
 
 
@@ -234,15 +265,6 @@ namespace Particles
 
 
   template <int dim,int spacedim>
-  void
-  ParticleHandler<dim,spacedim>::update_n_global_particles()
-  {
-    global_number_of_particles = dealii::Utilities::MPI::sum (particles.size(), triangulation->get_communicator());
-  }
-
-
-
-  template <int dim,int spacedim>
   unsigned int
   ParticleHandler<dim,spacedim>::n_particles_in_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell) const
   {
@@ -256,37 +278,6 @@ namespace Particles
       AssertThrow(false,ExcInternalError());
 
     return 0;
-  }
-
-
-
-  template <int dim,int spacedim>
-  void
-  ParticleHandler<dim,spacedim>::update_next_free_particle_index()
-  {
-    types::particle_index locally_highest_index = 0;
-    for (particle_iterator particle = begin(); particle != end(); ++particle)
-      locally_highest_index = std::max(locally_highest_index,particle->get_id());
-
-    next_free_particle_index = dealii::Utilities::MPI::max (locally_highest_index, triangulation->get_communicator()) + 1;
-  }
-
-
-
-  template <int dim,int spacedim>
-  void
-  ParticleHandler<dim,spacedim>::update_global_max_particles_per_cell()
-  {
-    unsigned int local_max_particles_per_cell(0);
-    typename Triangulation<dim,spacedim>::active_cell_iterator cell = triangulation->begin_active();
-    for (; cell!=triangulation->end(); ++cell)
-      if (cell->is_locally_owned())
-        {
-          local_max_particles_per_cell = std::max(local_max_particles_per_cell,
-                                                  n_particles_in_cell(cell));
-        }
-
-    global_max_particles_per_cell = dealii::Utilities::MPI::max(local_max_particles_per_cell,triangulation->get_communicator());
   }
 
 
@@ -535,6 +526,7 @@ namespace Particles
       remove_particle(particles_out_of_cell[i]);
 
     particles.insert(sorted_particles_map.begin(),sorted_particles_map.end());
+    update_cache();
   }
 
 
@@ -764,7 +756,7 @@ namespace Particles
 
     // Only save and load particles if there are any, we might get here for
     // example if somebody created a ParticleHandler but generated 0 particles.
-    update_global_max_particles_per_cell();
+    update_cache();
 
     if (global_max_particles_per_cell > 0)
       {
@@ -864,7 +856,7 @@ namespace Particles
         // Reset offset and update global number of particles. The number
         // can change because of discarded or newly generated particles
         data_offset = numbers::invalid_unsigned_int;
-        update_n_global_particles();
+        update_cache();
       }
   }
 
