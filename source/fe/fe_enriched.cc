@@ -296,8 +296,8 @@ FE_Enriched<dim,spacedim>::setup_data (std::unique_ptr<typename FiniteElement<di
   Assert ((dynamic_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.get()) != nullptr),
           ExcInternalError());
 
-  // FESystem::InternalData will be aggregated (owned) by
-  // our InternalData.
+  // Pass ownership of the FiniteElement::InternalDataBase object
+  // that fes_data points to, to the new InternalData object.
   typename FESystem<dim,spacedim>::InternalData *data_fesystem =
     static_cast<typename FESystem<dim,spacedim>::InternalData *> (fes_data.release());
   InternalData *data = new InternalData(std::unique_ptr<typename FESystem<dim,spacedim>::InternalData>(data_fesystem));
