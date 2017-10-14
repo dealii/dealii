@@ -237,7 +237,7 @@ TridiagonalMatrix<double>::compute_eigenvalues()
 
   const int nn = n();
   int info;
-  stev (&N, &nn, &*diagonal.begin(), &*right.begin(), nullptr, &one, nullptr, &info);
+  stev (&N, &nn, diagonal.data(), right.data(), nullptr, &one, nullptr, &info);
   Assert(info == 0, ExcInternalError());
 
   state = LAPACKSupport::eigenvalues;
