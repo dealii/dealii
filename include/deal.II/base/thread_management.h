@@ -1053,9 +1053,8 @@ namespace Threads
   private:
     /**
      * Shared pointer to the object representing the thread, and abstracting
-     * operating system functions to work on it. Boost's shared pointer
-     * implementation will make sure that that object lives as long as there
-     * is at least one subscriber to it.
+     * operating system functions to work on it. This also makes sure that the
+     * object lives as long as there is at least one subscriber to it.
      */
     std::shared_ptr<internal::ThreadDescriptor<RT> > thread_descriptor;
   };
@@ -1735,9 +1734,8 @@ namespace Threads
     //@}
   private:
     /**
-     * Shared pointer to the object representing the task. Boost's shared
-     * pointer implementation will make sure that that object lives as long as
-     * there is at least one subscriber to it.
+     * Shared pointer to the object representing the task. This makes sure that
+     * the object lives as long as there is at least one subscriber to it.
      */
     std::shared_ptr<internal::TaskDescriptor<RT> > task_descriptor;
   };
