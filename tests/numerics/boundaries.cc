@@ -67,14 +67,6 @@ boundary_q (const DoFHandler<dim> &)
 }
 
 
-const Quadrature<0> &
-boundary_q (const DoFHandler<1> &)
-{
-  static const Quadrature<0> *q = nullptr;
-  return *q;
-}
-
-
 void write_map (const std::map<types::global_dof_index,double> &bv)
 {
   for (std::map<types::global_dof_index,double>::const_iterator
