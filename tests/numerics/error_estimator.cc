@@ -66,16 +66,6 @@ get_q_face (Function<dim> &)
 }
 
 
-Quadrature<0> &
-get_q_face (Function<1> &)
-{
-  Quadrature<0> *q = nullptr;
-  return *q;
-}
-
-
-
-
 template <int dim>
 void
 check ()

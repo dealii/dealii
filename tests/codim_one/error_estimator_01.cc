@@ -65,14 +65,6 @@ get_q_face ()
   return q;
 }
 
-template <>
-Quadrature<0> &
-get_q_face <1>()
-{
-  Quadrature<0> *q = nullptr;
-  return *q;
-}
-
 template <int dim, int spacedim>
 void make_mesh (Triangulation<dim,spacedim> &tria)
 {
