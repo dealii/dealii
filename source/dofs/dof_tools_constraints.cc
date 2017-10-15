@@ -2699,14 +2699,14 @@ namespace DoFTools
                 // Nothing bad happened: the user used serial Triangulation
               }
 
-            IndexSet locally_owned_dofs, locally_relevant_dofs;
-            DoFTools::extract_locally_owned_dofs
-            (coarse_to_fine_grid_map.get_destination_grid (), locally_owned_dofs);
+
+            IndexSet locally_relevant_dofs;
             DoFTools::extract_locally_relevant_dofs
             (coarse_to_fine_grid_map.get_destination_grid (), locally_relevant_dofs);
 
             copy_data.global_parameter_representation[i].reinit
-            (locally_owned_dofs, locally_relevant_dofs, communicator);
+            (coarse_to_fine_grid_map.get_destination_grid().locally_owned_dofs(),
+             locally_relevant_dofs, communicator);
 #else
             const types::global_dof_index n_fine_dofs = weight_mapping.size();
             copy_data.global_parameter_representation[i].reinit (n_fine_dofs);
