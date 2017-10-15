@@ -143,12 +143,12 @@ public:
   void clear ();
 
   /**
-   * Return a pointer to the source grid.
+   * Return a reference to the source grid.
    */
   const MeshType &get_source_grid () const;
 
   /**
-   * Return a pointer to the destination grid.
+   * Return a reference to the destination grid.
    */
   const MeshType &get_destination_grid () const;
 
