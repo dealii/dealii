@@ -203,18 +203,22 @@ namespace internal
         :
         value(value),
         dst(dst)
-      {}
+      {
+        Assert(dst != nullptr, ExcInternalError());
+      }
 
       void operator() (const size_type begin, const size_type end) const
       {
+        Assert (end>=begin, ExcInternalError());
+
         if (value == Number())
           std::memset (dst+begin,0,(end-begin)*sizeof(Number));
         else
           std::fill (dst+begin, dst+end, value);
       }
 
-      Number value;
-      Number *dst;
+      const Number value;
+      Number *const dst;
     };
 
     template <typename Number, typename OtherNumber>
@@ -224,10 +228,15 @@ namespace internal
         :
         src(src),
         dst(dst)
-      {}
+      {
+        Assert(src!=nullptr, ExcInternalError());
+        Assert(dst!=nullptr, ExcInternalError());
+      }
 
       void operator() (const size_type begin, const size_type end) const
       {
+        Assert (end>=begin, ExcInternalError());
+
         if (std::is_same<Number,OtherNumber>::value)
           std::memcpy(dst+begin, src+begin, (end-begin)*sizeof(Number));
         else
@@ -238,8 +247,8 @@ namespace internal
           }
       }
 
-      const OtherNumber *src;
-      Number *dst;
+      const OtherNumber *const src;
+      Number *const dst;
     };
 
     template <typename Number>

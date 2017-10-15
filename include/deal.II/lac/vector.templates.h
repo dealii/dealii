@@ -205,8 +205,11 @@ Vector<Number>::operator= (const Vector<Number> &v)
   if (vec_size != v.vec_size)
     reinit (v, true);
 
-  dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(v.val, val);
-  internal::VectorOperations::parallel_for(copier,0,vec_size,thread_loop_partitioner);
+  if (vec_size>0)
+    {
+      dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(v.val, val);
+      internal::VectorOperations::parallel_for(copier,0,vec_size,thread_loop_partitioner);
+    }
 
   return *this;
 }
@@ -358,9 +361,11 @@ Vector<Number>::operator= (const Number s)
   if (s != Number())
     Assert (vec_size!=0, ExcEmptyObject());
 
-  internal::VectorOperations::Vector_set<Number> setter(s, val);
-
-  internal::VectorOperations::parallel_for(setter,0,vec_size,thread_loop_partitioner);
+  if (vec_size>0)
+    {
+      internal::VectorOperations::Vector_set<Number> setter(s, val);
+      internal::VectorOperations::parallel_for(setter,0,vec_size,thread_loop_partitioner);
+    }
 
   return *this;
 }

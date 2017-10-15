@@ -237,9 +237,14 @@ namespace LinearAlgebra
       reinit (v, true);
 
       thread_loop_partitioner = v.thread_loop_partitioner;
-      dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(v.val, val);
-      internal::VectorOperations::parallel_for(copier, 0, partitioner->local_size(),
-                                               thread_loop_partitioner);
+
+      const size_type this_size = local_size();
+      if (this_size>0)
+        {
+          dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(v.val, val);
+          internal::VectorOperations::parallel_for(copier, 0, partitioner->local_size(),
+                                                   thread_loop_partitioner);
+        }
     }
 
 
@@ -378,9 +383,14 @@ namespace LinearAlgebra
         must_update_ghost_values |= vector_is_ghosted;
 
       thread_loop_partitioner = c.thread_loop_partitioner;
-      dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(c.val, val);
-      internal::VectorOperations::parallel_for(copier, 0, partitioner->local_size(),
-                                               thread_loop_partitioner);
+
+      const size_type this_size = local_size();
+      if (this_size>0)
+        {
+          dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(c.val, val);
+          internal::VectorOperations::parallel_for(copier, 0, this_size,
+                                                   thread_loop_partitioner);
+        }
 
       if (must_update_ghost_values)
         update_ghost_values();
@@ -930,10 +940,14 @@ namespace LinearAlgebra
     Vector<Number> &
     Vector<Number>::operator = (const Number s)
     {
-      internal::VectorOperations::Vector_set<Number> setter(s, val);
+      const size_type this_size = local_size();
+      if (this_size>0)
+        {
+          internal::VectorOperations::Vector_set<Number> setter(s, val);
 
-      internal::VectorOperations::parallel_for(setter, 0, partitioner->local_size(),
-                                               thread_loop_partitioner);
+          internal::VectorOperations::parallel_for(setter, 0, this_size,
+                                                   thread_loop_partitioner);
+        }
 
       // if we call Vector::operator=0, we want to zero out all the entries
       // plus ghosts.
