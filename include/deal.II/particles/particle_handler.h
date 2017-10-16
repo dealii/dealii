@@ -105,7 +105,7 @@ namespace Particles
      * (e.g. insert_particle). This is done because the update is
      * expensive compared to single operations.
      */
-    void update_cache();
+    void update_cached_numbers();
 
     /**
      * Return an iterator to the first particle.
@@ -218,6 +218,12 @@ namespace Particles
     types::particle_index n_locally_owned_particles() const;
 
     /**
+     * Return the number of particles in the local part of the
+     * triangulation.
+     */
+    types::particle_index get_next_free_particle_index() const;
+
+    /**
      * Return the number of properties each particle has.
      */
     unsigned int n_properties_per_particle() const;
@@ -257,6 +263,22 @@ namespace Particles
      */
     void
     exchange_ghost_particles();
+
+    /**
+     * Callback function that should be called before every
+     * refinement and when writing checkpoints.
+     * Allows registering store_particles() in the triangulation.
+     */
+    void
+    register_store_callback_function(const bool serialization);
+
+    /**
+     * Callback function that should be called after every
+     * refinement and after resuming from a checkpoint.
+     * Allows registering load_particles() in the triangulation.
+     */
+    void
+    register_load_callback_function(const bool serialization);
 
     /**
      * Serialize the contents of this class.
@@ -387,24 +409,6 @@ namespace Particles
     send_recv_particles(const std::vector<std::vector<particle_iterator> >      &particles_to_send,
                         std::multimap<types::LevelInd,Particle <dim,spacedim> > &received_particles,
                         const std::vector<std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > &new_cells_for_particles = std::vector<std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > ());
-
-
-
-    /**
-     * Callback function that should be called before every
-     * refinement and when writing checkpoints.
-     * Allows registering store_particles() in the triangulation.
-     */
-    void
-    register_store_callback_function(const bool serialization);
-
-    /**
-     * Callback function that should be called after every
-     * refinement and after resuming from a checkpoint.
-     * Allows registering load_particles() in the triangulation.
-     */
-    void
-    register_load_callback_function(const bool serialization);
 
     /**
      * Called by listener functions from Triangulation for every cell

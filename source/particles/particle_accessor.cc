@@ -123,6 +123,18 @@ namespace Particles
 
 
   template <int dim, int spacedim>
+  bool
+  ParticleAccessor<dim,spacedim>::has_properties () const
+  {
+    Assert(particle != map->end(),
+           ExcInternalError());
+
+    return particle->second.has_properties();
+  }
+
+
+
+  template <int dim, int spacedim>
   void
   ParticleAccessor<dim,spacedim>::set_properties (const std::vector<double> &new_properties)
   {

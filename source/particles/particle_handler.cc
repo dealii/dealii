@@ -105,7 +105,7 @@ namespace Particles
 
   template <int dim,int spacedim>
   void
-  ParticleHandler<dim,spacedim>::update_cache()
+  ParticleHandler<dim,spacedim>::update_cached_numbers()
   {
 
     types::particle_index locally_highest_index = 0;
@@ -232,7 +232,7 @@ namespace Particles
   ParticleHandler<dim,spacedim>::insert_particles(const std::multimap<types::LevelInd, Particle<dim,spacedim> > &new_particles)
   {
     particles.insert(new_particles.begin(),new_particles.end());
-    update_cache();
+    update_cached_numbers();
   }
 
 
@@ -278,6 +278,15 @@ namespace Particles
       AssertThrow(false,ExcInternalError());
 
     return 0;
+  }
+
+
+
+  template <int dim,int spacedim>
+  types::particle_index
+  ParticleHandler<dim,spacedim>::get_next_free_particle_index() const
+  {
+    return next_free_particle_index;
   }
 
 
@@ -526,7 +535,7 @@ namespace Particles
       remove_particle(particles_out_of_cell[i]);
 
     particles.insert(sorted_particles_map.begin(),sorted_particles_map.end());
-    update_cache();
+    update_cached_numbers();
   }
 
 
@@ -756,7 +765,7 @@ namespace Particles
 
     // Only save and load particles if there are any, we might get here for
     // example if somebody created a ParticleHandler but generated 0 particles.
-    update_cache();
+    update_cached_numbers();
 
     if (global_max_particles_per_cell > 0)
       {
@@ -856,7 +865,7 @@ namespace Particles
         // Reset offset and update global number of particles. The number
         // can change because of discarded or newly generated particles
         data_offset = numbers::invalid_unsigned_int;
-        update_cache();
+        update_cached_numbers();
       }
   }
 
