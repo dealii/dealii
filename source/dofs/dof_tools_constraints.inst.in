@@ -72,52 +72,48 @@ for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
 #endif
 }
 
-for (deal_II_dimension : DIMENSIONS)
+for (DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 {
+#if deal_II_dimension <= deal_II_space_dimension
     template
     void
     DoFTools::make_zero_boundary_constraints
-    (const DoFHandler<deal_II_dimension> &,
-     ConstraintMatrix                    &,
-     const ComponentMask             &);
+    (const DH<deal_II_dimension, deal_II_space_dimension> &,
+     ConstraintMatrix                                     &,
+     const ComponentMask                                  &);
 
     template
     void
     DoFTools::make_zero_boundary_constraints
-    (const DoFHandler<deal_II_dimension> &,
+    (const DH<deal_II_dimension, deal_II_space_dimension> &,
      const types::boundary_id,
-     ConstraintMatrix                    &,
-     const ComponentMask             &);
+     ConstraintMatrix                                     &,
+     const ComponentMask                                  &);
+#endif
+}
 
+// intergrid transfer is not yet implemented for hp::DoFHandler
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+#if deal_II_dimension <= deal_II_space_dimension
     template
     void
-    DoFTools::make_zero_boundary_constraints
-    (const hp::DoFHandler<deal_II_dimension> &,
-     ConstraintMatrix                        &,
-     const ComponentMask                 &);
-
-    template
-    void
-    DoFTools::make_zero_boundary_constraints
-    (const hp::DoFHandler<deal_II_dimension> &,
-     const types::boundary_id,
-     ConstraintMatrix                        &,
-     const ComponentMask                 &);
-
-    template
-    void
-    DoFTools::compute_intergrid_constraints<deal_II_dimension> (
-        const DoFHandler<deal_II_dimension> &, const unsigned int,
-        const DoFHandler<deal_II_dimension> &, const unsigned int,
-        const InterGridMap<DoFHandler<deal_II_dimension> > &,
-        ConstraintMatrix&);
+    DoFTools::compute_intergrid_constraints
+    (const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+     const unsigned int,
+     const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+     const unsigned int,
+     const InterGridMap<DoFHandler<deal_II_dimension, deal_II_space_dimension> > &,
+     ConstraintMatrix &);
 
     template
     void
     DoFTools::compute_intergrid_transfer_representation<deal_II_dimension>
-    (const DoFHandler<deal_II_dimension> &, const unsigned int,
-     const DoFHandler<deal_II_dimension> &, const unsigned int,
-     const InterGridMap<DoFHandler<deal_II_dimension> > &,
+    (const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+     const unsigned int,
+     const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+     const unsigned int,
+     const InterGridMap<DoFHandler<deal_II_dimension, deal_II_space_dimension> > &,
      std::vector<std::map<types::global_dof_index, float> > &);
-
+#endif
 }

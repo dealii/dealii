@@ -1554,11 +1554,14 @@ namespace DoFTools
    * processor. For regular DoFHandler objects, this set is the complete set
    * with all DoF indices. In either case, it equals what
    * DoFHandler::locally_owned_dofs() returns.
+   *
+   * @deprecated Use DoFHandler::locally_owned_dofs() directly instead of this
+   * function.
    */
   template <typename DoFHandlerType>
   void
   extract_locally_owned_dofs (const DoFHandlerType &dof_handler,
-                              IndexSet             &dof_set);
+                              IndexSet             &dof_set) DEAL_II_DEPRECATED;
 
 
   /**
@@ -1742,10 +1745,11 @@ namespace DoFTools
    * processor. Note that this includes the ones that this subdomain "owns"
    * (i.e. the ones for which get_subdomain_association() returns a value
    * equal to the subdomain given here and that are selected by the
-   * extract_locally_owned_dofs() function) but also all of those that sit on
-   * the boundary between the given subdomain and other subdomain. In essence,
-   * degrees of freedom that sit on boundaries between subdomain will be in
-   * the index sets returned by this function for more than one subdomain.
+   * DoFHandler::locally_owned_dofs() function) but also all of those that sit
+   * on the boundary between the given subdomain and other subdomain. In
+   * essence, degrees of freedom that sit on boundaries between subdomain will
+   * be in the index sets returned by this function for more than one
+   * subdomain.
    *
    * Note that this function is of questionable use for DoFHandler objects
    * built on parallel::distributed::Triangulation since in that case
