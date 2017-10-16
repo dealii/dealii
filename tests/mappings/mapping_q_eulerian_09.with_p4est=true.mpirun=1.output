@@ -1,0 +1,17 @@
+
+DEAL:2d::Mass operator: 
+DEAL:2d::l2_norm:       0.00000
+DEAL:2d::l1_norm:       0.00000
+DEAL:2d::linfty_norm:   0.00000
+DEAL:2d::Laplace operator: 
+DEAL:2d::l2_norm:       0.00000
+DEAL:2d::l1_norm:       0.00000
+DEAL:2d::linfty_norm:   0.00000
+DEAL:3d::Mass operator: 
+DEAL:3d::l2_norm:       0.00000
+DEAL:3d::l1_norm:       0.00000
+DEAL:3d::linfty_norm:   0.00000
+DEAL:3d::Laplace operator: 
+DEAL:3d::l2_norm:       0.00000
+DEAL:3d::l1_norm:       0.00000
+DEAL:3d::linfty_norm:   0.00000
