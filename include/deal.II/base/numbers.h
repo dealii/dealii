@@ -385,6 +385,36 @@ namespace numbers
 namespace internal
 {
   /**
+   * A test to see if it is possible to convert one number
+   * type to the other.
+   */
+  template<typename From, typename To>
+  struct is_explicitly_convertible
+  {
+    // Source: https://stackoverflow.com/a/16944130
+  private:
+    template<typename T>
+    static void f(T);
+
+    template<typename F, typename T>
+    static constexpr auto test(int) ->
+    decltype(f(static_cast<T>(std::declval<F>())),true)
+    {
+      return true;
+    }
+
+    template<typename F, typename T>
+    static constexpr auto test(...) -> bool
+    {
+      return false;
+    }
+
+  public:
+
+    static bool const value = test<From,To>(0);
+  };
+
+  /**
   * The structs below are needed since VectorizedArray<T1> is a POD-type without a constructor and
   * can be a template argument for SymmetricTensor<...,T2> where T2 would equal VectorizedArray<T1>.
   * Internally, in previous versions of deal.II, SymmetricTensor<...,T2> would make use of the constructor
@@ -400,6 +430,38 @@ namespace internal
     static DEAL_II_CUDA_HOST_DEV const T &value (const T &t)
     {
       return t;
+    }
+
+    // Below are generic functions that allows an overload for any
+    // type U that is transformable to type T. This is particularly
+    // useful when needing to cast exotic number types
+    // (e.g. auto-differentiable or symbolic numbers) to a floating
+    // point one, such as might  happen when converting between tensor
+    // types.
+
+    // Type T is constructible from F.
+    template<typename F>
+    static T
+    value (const F &f,
+           typename std::enable_if<
+           !std::is_same<typename std::decay<T>::type,typename std::decay<F>::type>::value &&
+           std::is_constructible<T,F>::value
+           >::type * = 0)
+    {
+      return T(f);
+    }
+
+    // Type T is explicitly convertible (but not constructible) from F.
+    template<typename F>
+    static T
+    value (const F &f,
+           typename std::enable_if<
+           !std::is_same<typename std::decay<T>::type,typename std::decay<F>::type>::value &&
+           !std::is_constructible<T,F>::value &&
+           is_explicitly_convertible<const F,T>::value
+           >::type * = 0)
+    {
+      return static_cast<T>(f);
     }
   };
 
