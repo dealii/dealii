@@ -1393,8 +1393,7 @@ namespace hp
   {
     Assert(levels.size()>0, ExcMessage("You need to distribute DoFs before you can renumber them."));
 
-    Assert (new_numbers.size() == n_locally_owned_dofs(),
-            ExcRenumberingIncomplete());
+    AssertDimension (new_numbers.size(), n_locally_owned_dofs());
 
 #ifdef DEBUG
     // assert that the new indices are

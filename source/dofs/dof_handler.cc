@@ -1098,8 +1098,7 @@ DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_ind
 {
   Assert(levels.size()>0, ExcMessage("You need to distribute DoFs before you can renumber them."));
 
-  Assert (new_numbers.size() == n_locally_owned_dofs(),
-          ExcRenumberingIncomplete());
+  AssertDimension (new_numbers.size(), n_locally_owned_dofs());
 
 #ifdef DEBUG
   // assert that the new indices are
@@ -1138,7 +1137,7 @@ DoFHandler<dim,spacedim>::renumber_dofs (const unsigned int                     
   Assert(mg_levels.size()>0 && levels.size()>0,
          ExcMessage("You need to distribute active and level DoFs before you can renumber level DoFs."));
   AssertIndexRange(level, levels.size());
-  Assert (new_numbers.size() == n_dofs(level), ExcRenumberingIncomplete());
+  AssertDimension (new_numbers.size(), n_dofs(level));
 
   mg_number_cache[level] = policy->renumber_mg_dofs (level, new_numbers);
 }

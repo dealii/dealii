@@ -878,13 +878,6 @@ public:
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 
   /**
-   * We are trying to renumber the degrees of freedom, but somehow did not
-   * count correctly.
-   *
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcRenumberingIncomplete);
-  /**
    * Exception
    * @ingroup Exceptions
    */

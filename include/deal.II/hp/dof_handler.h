@@ -720,10 +720,6 @@ namespace hp
     /**
      * Exception
      */
-    DeclException0 (ExcRenumberingIncomplete);
-    /**
-     * Exception
-     */
     DeclException0 (ExcGridsDoNotMatch);
     /**
      * Exception

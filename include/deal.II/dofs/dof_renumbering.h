@@ -1089,13 +1089,6 @@ namespace DoFRenumbering
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcRenumberingIncomplete);
-
-  /**
-   * Exception
-   *
-   * @ingroup Exceptions
-   */
   DeclException0 (ExcInvalidComponentOrder);
 
   /**

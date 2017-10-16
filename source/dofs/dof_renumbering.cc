@@ -527,7 +527,7 @@ namespace DoFRenumbering
             ((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs())
              &&
              (result <= dof_handler.n_dofs())),
-            ExcRenumberingIncomplete());
+            ExcInternalError());
 
     dof_handler.renumber_dofs (renumbering);
   }
@@ -556,7 +556,7 @@ namespace DoFRenumbering
     if (result == 0) return;
 
     Assert (result == dof_handler.n_dofs(level),
-            ExcRenumberingIncomplete());
+            ExcInternalError());
 
     if (renumbering.size()!=0)
       dof_handler.renumber_dofs (level, renumbering);
@@ -834,7 +834,7 @@ namespace DoFRenumbering
             ((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs())
              &&
              (result <= dof_handler.n_dofs())),
-            ExcRenumberingIncomplete());
+            ExcInternalError());
 
     dof_handler.renumber_dofs (renumbering);
   }
@@ -862,7 +862,7 @@ namespace DoFRenumbering
       return;
 
     Assert (result == dof_handler.n_dofs(),
-            ExcRenumberingIncomplete());
+            ExcInternalError());
 
     dof_handler.renumber_dofs (renumbering);
   }
@@ -871,7 +871,8 @@ namespace DoFRenumbering
 
   template <int dim, int spacedim>
   void
-  block_wise (DoFHandler<dim,spacedim> &dof_handler, const unsigned int level)
+  block_wise (DoFHandler<dim,spacedim> &dof_handler,
+              const unsigned int        level)
   {
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcDoFHandlerNotInitialized());
@@ -892,7 +893,7 @@ namespace DoFRenumbering
     if (result == 0) return;
 
     Assert (result == dof_handler.n_dofs(level),
-            ExcRenumberingIncomplete());
+            ExcInternalError());
 
     if (renumbering.size()!=0)
       dof_handler.renumber_dofs (level, renumbering);
@@ -1204,7 +1205,7 @@ namespace DoFRenumbering
             ((dof_handler.n_locally_owned_dofs() < dof_handler.n_dofs())
              &&
              (next_free <= dof_handler.n_dofs())),
-            ExcRenumberingIncomplete());
+            ExcInternalError());
 
     // make sure that all local DoFs got new numbers assigned
     Assert (std::find (renumbering.begin(), renumbering.end(),
@@ -1404,7 +1405,10 @@ namespace DoFRenumbering
               }
           }
       }
-    Assert(global_index == n_global_dofs, ExcRenumberingIncomplete());
+    Assert(global_index == n_global_dofs,
+           ExcMessage("Traversing over the given set of cells did not cover all "
+                      "degrees of freedom in the DoFHandler. Does the set of cells "
+                      "not include all active cells?"));
 
     for (types::global_dof_index i=0; i<reverse.size(); ++i)
       new_indices[reverse[i]] = i;
@@ -1472,7 +1476,10 @@ namespace DoFRenumbering
               }
           }
       }
-    Assert(global_index == n_global_dofs, ExcRenumberingIncomplete());
+    Assert(global_index == n_global_dofs,
+           ExcMessage("Traversing over the given set of cells did not cover all "
+                      "degrees of freedom in the DoFHandler. Does the set of cells "
+                      "not include all cells of the specified level?"));
 
     for (types::global_dof_index i=0; i<new_order.size(); ++i)
       new_order[reverse[i]] = i;
