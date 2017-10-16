@@ -1503,7 +1503,32 @@ public:
    */
   typedef TriaActiveIterator<CellAccessor<dim,spacedim>         > active_cell_iterator;
 
+  /**
+   * A typedef that is used to identify iterators that point to faces.
+   * The concept of iterators is discussed at length in the
+   * @ref Iterators "iterators documentation module".
+   *
+   * The current typedef identifies faces in a triangulation. The
+   * TriaIterator class works like a pointer to objects that when
+   * you dereference it yields an object of type TriaAccessor, i.e.,
+   * class that can be used to query geometric properties of faces
+   * such as their vertices, their area, etc.
+   *
+   * @ingroup Iterators
+   */
   typedef TriaIterator      <TriaAccessor<dim-1, dim, spacedim> > face_iterator;
+
+  /**
+   * A typedef that is used to identify iterators that point to active faces,
+   * i.e., to faces that have no children. Active faces must be faces of at
+   * least one active cell.
+   *
+   * Other than the "active" qualification, this typedef is identical to the
+   * @p face_iterator typedef. In particular, dereferencing either yields
+   * the same kind of object.
+   *
+   * @ingroup Iterators
+   */
   typedef TriaActiveIterator<TriaAccessor<dim-1, dim, spacedim> > active_face_iterator;
 
   /**

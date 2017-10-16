@@ -256,7 +256,35 @@ public:
    */
   typedef typename ActiveSelector::cell_iterator        cell_iterator;
 
+  /**
+   * A typedef that is used to identify iterators that point to faces.
+   * The concept of iterators is discussed at length in the
+   * @ref Iterators "iterators documentation module".
+   *
+   * While the actual data type of the typedef is hidden behind a few layers
+   * of (unfortunately necessary) indirections, it is in essence
+   * TriaIterator<DoFAccessor>. The
+   * TriaIterator class works like a pointer to objects that when
+   * you dereference it yields an object of type DoFAccessor. DoFAccessor,
+   * in turn, is a class that can be used to query DoF indices on faces,
+   * but it is also derived from TriaAccessor and consequently can be used
+   * to query geometric properties such as vertices of faces, their area, etc.
+   *
+   * @ingroup Iterators
+   */
   typedef typename ActiveSelector::face_iterator        face_iterator;
+
+  /**
+   * A typedef that is used to identify iterators that point to active faces,
+   * i.e., to faces that have no children. Active faces must be faces of at
+   * least one active cell.
+   *
+   * Other than the "active" qualification, this typedef is identical to the
+   * @p face_iterator typedef. In particular, dereferencing either yields
+   * the same kind of object.
+   *
+   * @ingroup Iterators
+   */
   typedef typename ActiveSelector::active_face_iterator active_face_iterator;
 
   typedef typename LevelSelector::CellAccessor          level_cell_accessor;
