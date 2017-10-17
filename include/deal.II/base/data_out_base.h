@@ -1274,21 +1274,137 @@ namespace DataOutBase
    */
   class DataOutFilter
   {
+  public:
+    /**
+     * Default constructor.
+     */
+    DataOutFilter();
+
+    /**
+     * Destructor with a given set of flags. See DataOutFilterFlags for
+     * possible flags.
+     */
+    DataOutFilter(const DataOutBase::DataOutFilterFlags &flags);
+
+    /**
+     * Write a point with the specified index into the filtered data set. If
+     * the point already exists and we are filtering redundant values, the
+     * provided index will internally refer to another recorded point.
+     */
+    template <int dim>
+    void write_point(const unsigned int index,
+                     const Point<dim> &p);
+
+    /**
+     * Record a deal.II cell in the internal reordered format.
+     */
+    template <int dim>
+    void write_cell(const unsigned int index,
+                    const unsigned int start,
+                    const unsigned int d1,
+                    const unsigned int d2,
+                    const unsigned int d3);
+
+    /**
+     * Filter and record a data set. If there are multiple values at a given
+     * vertex and redundant values are being removed, one is arbitrarily
+     * chosen as the recorded value. In the future this can be expanded to
+     * average/min/max multiple values at a given vertex.
+     */
+    void write_data_set(const std::string &name,
+                        const unsigned int dimension,
+                        const unsigned int set_num,
+                        const Table<2,double> &data_vectors);
+
+    /**
+     * Resize and fill a vector with all the filtered node vertex points, for
+     * output to a file.
+     */
+    void fill_node_data(std::vector<double> &node_data) const;
+
+    /**
+     * Resize and fill a vector with all the filtered cell vertex indices, for
+     * output to a file.
+     */
+    void fill_cell_data(const unsigned int local_node_offset,
+                        std::vector<unsigned int> &cell_data) const;
+
+    /**
+     * Get the name of the data set indicated by the set number.
+     */
+    std::string get_data_set_name(const unsigned int set_num) const;
+
+    /**
+     * Get the dimensionality of the data set indicated by the set number.
+     */
+    unsigned int get_data_set_dim(const unsigned int set_num) const;
+
+    /**
+     * Get the raw double valued data of the data set indicated by the set
+     * number.
+     */
+    const double *get_data_set(const unsigned int set_num) const;
+
+    /**
+     * Return the number of nodes in this DataOutFilter. This may be smaller
+     * than the original number of nodes if filtering is enabled.
+     */
+    unsigned int n_nodes() const;
+
+    /**
+     * Return the number of filtered cells in this DataOutFilter. Cells are
+     * not filtered so this will be the original number of cells.
+     */
+    unsigned int n_cells() const;
+
+    /**
+     * Return the number of filtered data sets in this DataOutFilter. Data
+     * sets are not filtered so this will be the original number of data sets.
+     */
+    unsigned int n_data_sets() const;
+
+    /**
+     * Empty functions to do base class inheritance.
+     */
+    void flush_points ();
+
+    /**
+     * Empty functions to do base class inheritance.
+     */
+    void flush_cells ();
+
+
   private:
     /**
      * Empty class to provide comparison function for Map3DPoint.
      */
     struct Point3Comp
     {
-      bool operator() (const Point<3> &lhs, const Point<3> &rhs) const
+      bool operator() (const Point<3> &one,
+                       const Point<3> &two) const
       {
-        return (lhs(0) < rhs(0) || (!(rhs(0) < lhs(0)) && (lhs(1) < rhs(1) || (!(rhs(1) < lhs(1)) && lhs(2) < rhs(2)))));
+        /*
+         * The return statement below is an optimized version of the following code:
+         *
+         * for (unsigned int d=0; d<3; ++d)
+         * {
+         *   if (one(d) < two(d))
+         *     return true;
+         *   else if (one(d) > two(d))
+         *     return false;
+         * }
+         * return false;
+         */
+
+        return (one(0) < two(0) || (!(two(0) < one(0)) && (one(1) < two(1) || (!(two(1) < one(1)) && one(2) < two(2)))));
       }
     };
 
     typedef std::multimap<Point<3>, unsigned int, Point3Comp> Map3DPoint;
 
-    /// Flags used to specify filtering behavior
+    /**
+     * Flags used to specify filtering behavior.
+     */
     DataOutBase::DataOutFilterFlags   flags;
 
     /**
@@ -1307,139 +1423,41 @@ namespace DataOutBase
      */
     unsigned int      vertices_per_cell;
 
-    /// Map of points to an internal index
+    /**
+     * Map of points to an internal index.
+     */
     Map3DPoint        existing_points;
 
-    /// Map of actual point index to internal point index
+    /**
+     * Map of actual point index to internal point index.
+     */
     std::map<unsigned int, unsigned int>  filtered_points;
 
-    /// Map of cells to the filtered points
+    /**
+     * Map of cells to the filtered points.
+     */
     std::map<unsigned int, unsigned int>  filtered_cells;
 
-    /// Data set names
+    /**
+     * Data set names.
+     */
     std::vector<std::string>    data_set_names;
 
-    /// Data set dimensions
+    /**
+     * Data set dimensions.
+     */
     std::vector<unsigned int>   data_set_dims;
 
-    /// Data set data
+    /**
+     * Data set data.
+     */
     std::vector<std::vector<double> > data_sets;
 
     /**
      * Record a cell vertex index based on the internal reordering.
      */
-    void internal_add_cell(const unsigned int &cell_index, const unsigned int &pt_index);
-
-  public:
-    DataOutFilter()
-      :
-      flags(false, true),
-      node_dim (numbers::invalid_unsigned_int),
-      vertices_per_cell (numbers::invalid_unsigned_int)
-    {}
-
-    DataOutFilter(const DataOutBase::DataOutFilterFlags &flags)
-      :
-      flags(flags),
-      node_dim (numbers::invalid_unsigned_int),
-      vertices_per_cell (numbers::invalid_unsigned_int)
-    {}
-
-    /**
-     * Write a point with the specified index into the filtered data set. If
-     * the point already exists and we are filtering redundant values, the
-     * provided index will internally refer to another recorded point.
-     */
-    template <int dim>
-    void write_point(const unsigned int &index, const Point<dim> &p);
-
-    /**
-     * Record a deal.II cell in the internal reordered format.
-     */
-    template <int dim>
-    void write_cell(unsigned int index, unsigned int start, unsigned int d1, unsigned int d2, unsigned int d3);
-
-    /**
-     * Filter and record a data set. If there are multiple values at a given
-     * vertex and redundant values are being removed, one is arbitrarily
-     * chosen as the recorded value. In the future this can be expanded to
-     * average/min/max multiple values at a given vertex.
-     */
-    void write_data_set(const std::string &name, const unsigned int &dimension, const unsigned int &set_num, const Table<2,double> &data_vectors);
-
-    /**
-     * Resize and fill a vector with all the filtered node vertex points, for
-     * output to a file.
-     */
-    void fill_node_data(std::vector<double> &node_data) const;
-
-    /**
-     * Resize and fill a vector with all the filtered cell vertex indices, for
-     * output to a file.
-     */
-    void fill_cell_data(const unsigned int &local_node_offset, std::vector<unsigned int> &cell_data) const;
-
-    /**
-     * Get the name of the data set indicated by the set number.
-     */
-    std::string get_data_set_name(const unsigned int &set_num) const
-    {
-      return data_set_names.at(set_num);
-    };
-
-    /**
-     * Get the dimensionality of the data set indicated by the set number.
-     */
-    unsigned int get_data_set_dim(const unsigned int &set_num) const
-    {
-      return data_set_dims.at(set_num);
-    };
-
-    /**
-     * Get the raw double valued data of the data set indicated by the set
-     * number.
-     */
-    const double *get_data_set(const unsigned int &set_num) const
-    {
-      return &data_sets[set_num][0];
-    };
-
-    /**
-     * Return the number of nodes in this DataOutFilter. This may be smaller
-     * than the original number of nodes if filtering is enabled.
-     */
-    unsigned int n_nodes() const
-    {
-      return existing_points.size();
-    };
-
-    /**
-     * Return the number of filtered cells in this DataOutFilter. Cells are
-     * not filtered so this will be the original number of cells.
-     */
-    unsigned int n_cells() const
-    {
-      return filtered_cells.size()/vertices_per_cell;
-    };
-
-    /**
-     * Return the number of filtered data sets in this DataOutFilter. Data
-     * sets are not filtered so this will be the original number of data sets.
-     */
-    unsigned int n_data_sets() const
-    {
-      return data_set_names.size();
-    };
-
-    /**
-     * Empty functions to do base class inheritance.
-     */
-    void flush_points () {};
-
-    /**
-     * Empty functions to do base class inheritance.
-     */
-    void flush_cells () {};
+    void internal_add_cell(const unsigned int cell_index,
+                           const unsigned int pt_index);
   };
 
 
