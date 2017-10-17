@@ -516,6 +516,13 @@ namespace MatrixFreeOperators
     void Tvmult (VectorType &dst,
                  const VectorType &src) const;
 
+    /**
+     * A wrapper for initialize_dof_vector() of OperatorType object.
+     */
+    template <typename VectorType>
+    void initialize_dof_vector (VectorType &vec) const;
+
+
   private:
     /**
      * Const pointer to the operator class.
@@ -1489,6 +1496,19 @@ namespace MatrixFreeOperators
            ExcNotInitialized());
 
     mf_base_operator->vmult_interface_up(dst, src);
+  }
+
+
+
+  template <typename OperatorType>
+  template <typename VectorType>
+  void
+  MGInterfaceOperator<OperatorType>::initialize_dof_vector (VectorType &vec) const
+  {
+    Assert(mf_base_operator != nullptr,
+           ExcNotInitialized());
+
+    mf_base_operator->initialize_dof_vector(vec);
   }
 
 
