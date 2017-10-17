@@ -178,23 +178,7 @@ namespace hp
     typedef typename ActiveSelector::active_hex_iterator  active_hex_iterator;
 
     /**
-     * A typedef that is used to identify
-     * @ref GlossActive "active cell iterators".
-     * The concept of iterators is discussed at length in the
-     * @ref Iterators "iterators documentation module".
-     *
-     * The current typedef identifies active cells in a hp::DoFHandler object.
-     * While the actual data type of the typedef is hidden behind a few layers
-     * of (unfortunately necessary) indirections, it is in essence
-     * TriaActiveIterator<DoFCellAccessor>. The TriaActiveIterator class works
-     * like a pointer to active objects that when you dereference it yields an
-     * object of type DoFCellAccessor. DoFCellAccessor is a class that
-     * identifies properties that are specific to cells in a DoFHandler, but
-     * it is derived (and consequently inherits) from both DoFAccessor,
-     * TriaCellAccessor and TriaAccessor that describe what you can ask of
-     * more general objects (lines, faces, as well as cells) in a
-     * triangulation and hp::DoFHandler objects.
-     *
+     * @copydoc ::DoFHandler::active_cell_iterator
      * @ingroup Iterators
      */
 #ifndef _MSC_VER
@@ -206,29 +190,7 @@ namespace hp
     typedef typename LevelSelector::cell_iterator         level_cell_iterator;
 
     /**
-     * A typedef that is used to identify cell iterators. The concept of
-     * iterators is discussed at length in the
-     * @ref Iterators "iterators documentation module".
-     *
-     * The current typedef identifies cells in a DoFHandler object. Some of
-     * these cells may in fact be active (see
-     * @ref GlossActive "active cell iterators"
-     * ) in which case they can in fact be asked for the degrees of freedom
-     * that live on them. On the other hand, if the cell is not active, any
-     * such query will result in an error. Note that this is what
-     * distinguishes this typedef from the level_cell_iterator typedef.
-     *
-     * While the actual data type of the typedef is hidden behind a few layers
-     * of (unfortunately necessary) indirections, it is in essence
-     * TriaIterator<DoFCellAccessor>. The TriaIterator class works like a
-     * pointer to objects that when you dereference it yields an object of
-     * type DoFCellAccessor. DoFCellAccessor is a class that identifies
-     * properties that are specific to cells in a DoFHandler, but it is
-     * derived (and consequently inherits) from both DoFAccessor,
-     * TriaCellAccessor and TriaAccessor that describe what you can ask of
-     * more general objects (lines, faces, as well as cells) in a
-     * triangulation and DoFHandler objects.
-     *
+     * @copydoc ::DoFHandler::cell_iterator
      * @ingroup Iterators
      */
 #ifndef _MSC_VER
@@ -237,8 +199,16 @@ namespace hp
     typedef TriaIterator < dealii::DoFCellAccessor < DoFHandler < dim, spacedim >, false > >        cell_iterator;
 #endif
 
-
+    /**
+     * @copydoc ::DoFHandler::face_iterator
+     * @ingroup Iterators
+     */
     typedef typename ActiveSelector::face_iterator        face_iterator;
+
+    /**
+     * @copydoc ::DoFHandler::active_face_iterator
+     * @ingroup Iterators
+     */
     typedef typename ActiveSelector::active_face_iterator active_face_iterator;
 
     typedef typename LevelSelector::CellAccessor          level_cell_accessor;
