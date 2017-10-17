@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/partitioner.h>
+#include <deal.II/base/partitioner.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -139,7 +140,8 @@ namespace Utilities
 
 
     void
-    Partitioner::set_ghost_indices (const IndexSet &ghost_indices_in)
+    Partitioner::set_ghost_indices (const IndexSet &ghost_indices_in,
+                                    const IndexSet &larger_ghost_index_set)
     {
       // Set ghost indices from input. To be sure that no entries from the
       // locally owned range are present, subtract the locally owned indices
@@ -322,25 +324,32 @@ namespace Utilities
         // transform import indices to local index space and compress
         // contiguous indices in form of ranges
         {
-          types::global_dof_index last_index = numbers::invalid_dof_index-1;
+          import_indices_chunks_by_rank_data.resize(import_targets_data.size()+1);
+          import_indices_chunks_by_rank_data[0] = 0;
           std::vector<std::pair<unsigned int,unsigned int> > compressed_import_indices;
-          for (unsigned int i=0; i<n_import_indices_data; i++)
+          unsigned int shift = 0;
+          for (unsigned int p=0; p<import_targets_data.size(); ++p)
             {
-              Assert (expanded_import_indices[i] >= local_range_data.first &&
-                      expanded_import_indices[i] < local_range_data.second,
-                      ExcIndexRange(expanded_import_indices[i], local_range_data.first,
-                                    local_range_data.second));
-              types::global_dof_index new_index = (expanded_import_indices[i] -
-                                                   local_range_data.first);
-              Assert(new_index<numbers::invalid_unsigned_int,
-                     ExcNotImplemented());
-              if (new_index == last_index+1)
-                compressed_import_indices.back().second++;
-              else
+              types::global_dof_index last_index = numbers::invalid_dof_index-1;
+              for (unsigned int ii=0; ii<import_targets_data[p].second; ++ii)
                 {
-                  compressed_import_indices.emplace_back (new_index,new_index+1);
+                  const unsigned int i = shift + ii;
+                  Assert (expanded_import_indices[i] >= local_range_data.first &&
+                          expanded_import_indices[i] < local_range_data.second,
+                          ExcIndexRange(expanded_import_indices[i], local_range_data.first,
+                                        local_range_data.second));
+                  types::global_dof_index new_index = (expanded_import_indices[i] -
+                                                       local_range_data.first);
+                  Assert(new_index<numbers::invalid_unsigned_int,
+                         ExcNotImplemented());
+                  if (new_index == last_index+1)
+                    compressed_import_indices.back().second++;
+                  else
+                    compressed_import_indices.emplace_back (new_index,new_index+1);
+                  last_index = new_index;
                 }
-              last_index = new_index;
+              shift += import_targets_data[p].second;
+              import_indices_chunks_by_rank_data[p+1] = compressed_import_indices.size();
             }
           import_indices_data = compressed_import_indices;
 
@@ -355,7 +364,58 @@ namespace Utilities
 #endif
         }
       }
-#endif
+#endif // #ifdef DEAL_II_WITH_MPI
+
+      if (larger_ghost_index_set.size() == 0)
+        {
+          ghost_indices_subset_chunks_by_rank_data.clear();
+          ghost_indices_subset_data.push_back(std::make_pair(local_size(),
+                                                             local_size()+n_ghost_indices()));
+          n_ghost_indices_in_larger_set = n_ghost_indices_data;
+        }
+      else
+        {
+          AssertDimension(larger_ghost_index_set.size(), ghost_indices_data.size());
+          Assert((larger_ghost_index_set & locally_owned_range_data).n_elements()==0,
+                 ExcMessage("Ghost index set should not overlap with owned set."));
+          Assert((larger_ghost_index_set & ghost_indices_data) == ghost_indices_data,
+                 ExcMessage("Larger ghost index set must contain the tight "
+                            "ghost index set."));
+
+          n_ghost_indices_in_larger_set = larger_ghost_index_set.n_elements();
+
+          std::vector<unsigned int> expanded_numbering;
+          for (IndexSet::ElementIterator it=ghost_indices_data.begin();
+               it != ghost_indices_data.end(); ++it)
+            {
+              Assert(larger_ghost_index_set.is_element(*it),
+                     ExcMessage("The given larger ghost index set must contain"
+                                "all indices in the actual index set."));
+              expanded_numbering.push_back(larger_ghost_index_set.index_within_set(*it));
+            }
+
+          std::vector<std::pair<unsigned int,unsigned int> > ghost_indices_subset;
+          ghost_indices_subset_chunks_by_rank_data.resize(ghost_targets_data.size()+1);
+          ghost_indices_subset_chunks_by_rank_data[0] = 0;
+          unsigned int shift = 0;
+          for (unsigned int p=0; p<ghost_targets_data.size(); ++p)
+            {
+              unsigned int last_index = numbers::invalid_unsigned_int-1;
+              for (unsigned int ii=0; ii<ghost_targets_data[p].second; ii++)
+                {
+                  const unsigned int i = shift + ii;
+                  if (expanded_numbering[i] == last_index+1)
+                    ghost_indices_subset.back().second++;
+                  else
+                    ghost_indices_subset.emplace_back(expanded_numbering[i],
+                                                      expanded_numbering[i]+1);
+                  last_index = expanded_numbering[i];
+                }
+              shift += ghost_targets_data[p].second;
+              ghost_indices_subset_chunks_by_rank_data[p+1] = ghost_indices_subset.size();
+            }
+          ghost_indices_subset_data = ghost_indices_subset;
+        }
     }
 
 
@@ -404,6 +464,9 @@ namespace Utilities
       memory += MemoryConsumption::memory_consumption(ghost_targets_data);
       memory += MemoryConsumption::memory_consumption(import_targets_data);
       memory += MemoryConsumption::memory_consumption(import_indices_data);
+      memory += MemoryConsumption::memory_consumption(import_indices_chunks_by_rank_data);
+      memory += MemoryConsumption::memory_consumption(ghost_indices_subset_chunks_by_rank_data);
+      memory += MemoryConsumption::memory_consumption(ghost_indices_subset_data);
       memory += MemoryConsumption::memory_consumption(ghost_indices_data);
       return memory;
     }
@@ -412,5 +475,9 @@ namespace Utilities
 
 } // end of namespace Utilities
 
+
+
+// explicit instantiations from .templates.h file
+#include "partitioner.inst"
 
 DEAL_II_NAMESPACE_CLOSE

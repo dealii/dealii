@@ -100,6 +100,7 @@ SET(_inst
   function.inst.in
   function_time.inst.in
   mpi.inst.in
+  partitioner.inst.in
   polynomials_rannacher_turek.inst.in
   symmetric_tensor.inst.in
   tensor.inst.in

@@ -17,11 +17,13 @@
 #define dealii_partitioner_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/base/array_view.h>
+#include <deal.II/lac/vector.h>
 #include <deal.II/lac/communication_pattern_base.h>
 
 #include <limits>
@@ -113,8 +115,15 @@ namespace Utilities
       /**
        * Allows to set the ghost indices after the constructor has been
        * called.
+       *
+       * The optional parameter @p larger_ghost_index_set allows for defining
+       * an indirect addressing into a larger set of ghost indices. This setup
+       * is useful if a distributed vector is based on that larger ghost index
+       * set but only a tighter subset should be communicated according to the
+       * given index set.
        */
-      void set_ghost_indices (const IndexSet &ghost_indices);
+      void set_ghost_indices (const IndexSet &ghost_indices,
+                              const IndexSet &larger_ghost_index_set = IndexSet());
 
       /**
        * Return the global size.
@@ -190,6 +199,20 @@ namespace Utilities
       unsigned int n_ghost_indices() const;
 
       /**
+       * In case the partitioner was built to define ghost indices as a subset
+       * of indices in a larger set of ghosts, this set returns the numbering
+       * in terms of ranges of that range. Similar structure as in an
+       * IndexSet, but tailored to be iterated over, and some indices may be
+       * duplicates.
+       *
+       * In case the partitioner did not take a second set of ghost indices
+       * into account, this subset is simply defined as the half-open interval
+       * <code>local_size(),local_size().second+n_ghost_indices()</code>.
+       */
+      const std::vector<std::pair<unsigned int, unsigned int> > &
+      ghost_indices_within_larger_ghost_set() const;
+
+      /**
        * Return a list of processors (first entry) and the number of ghost degrees
        * of freedom owned by that processor (second entry). The sum of the
        * latter over all processors equals n_ghost_indices().
@@ -226,6 +249,20 @@ namespace Utilities
        */
       const std::vector<std::pair<unsigned int, unsigned int> > &
       import_targets() const;
+
+      /**
+       * Caches the number of chunks in the import indices per MPI rank. The
+       * length is import_indices_data.size()+1.
+       */
+      const std::vector<unsigned int> &
+      import_indices_chunks_by_rank() const;
+
+      /**
+       * Caches the number of chunks in the ghost indices subsets per MPI
+       * rank. The length is ghost_indices_subset_data.size()+1.
+       */
+      const std::vector<unsigned int> &
+      ghost_indices_subset_chunks_by_rank() const;
 
       /**
        * Check whether the given partitioner is compatible with the
@@ -281,6 +318,65 @@ namespace Utilities
        * provided that argument.
        */
       bool ghost_indices_initialized() const;
+
+#ifdef DEAL_II_WITH_MPI
+      /**
+       * Starts the exports of the data in a locally owned array to the range
+       * described by the ghost indices of this class.
+       *
+       * This functionality is used in
+       * LinearAlgebra::distributed::Vector::update_ghost_values().
+       */
+      template <typename Number>
+      void
+      export_to_ghosted_array_start(const unsigned int              communication_channel,
+                                    const ArrayView<const Number>  &locally_owned_array,
+                                    const ArrayView<Number>        &temporary_storage,
+                                    const ArrayView<Number>        &ghost_array,
+                                    std::vector<MPI_Request>       &requests) const;
+
+      /**
+       * Starts the exports of the data in a locally owned array to the range
+       * described by the ghost indices of this class.
+       *
+       * This functionality is used in
+       * LinearAlgebra::distributed::Vector::update_ghost_values().
+       */
+      template <typename Number>
+      void
+      export_to_ghosted_array_finish(const ArrayView<Number>  &ghost_array,
+                                     std::vector<MPI_Request> &requests) const;
+
+      /**
+       * Imports the data on an array described by the
+       * ghost indices of this class into the locally owned array. The
+       *
+       * This functionality is used in
+       * LinearAlgebra::distributed::Vector::compress().
+       */
+      template <typename Number>
+      void
+      import_from_ghosted_array_start(const VectorOperation::values vector_operation,
+                                      const unsigned int            communication_channel,
+                                      const ArrayView<Number>      &ghost_array,
+                                      const ArrayView<Number>      &temporary_storage,
+                                      std::vector<MPI_Request>     &requests) const;
+
+      /**
+       * Imports the data on an array described by the
+       * ghost indices of this class into the locally owned array. The
+       *
+       * This functionality is used in
+       * LinearAlgebra::distributed::Vector::compress().
+       */
+      template <typename Number>
+      void
+      import_from_ghosted_array_finish(const VectorOperation::values  vector_operation,
+                                       const ArrayView<const Number> &temporary_array,
+                                       const ArrayView<Number>       &locally_owned_storage,
+                                       const ArrayView<Number>       &ghost_array,
+                                       std::vector<MPI_Request>      &requests) const;
+#endif
 
       /**
        * Compute the memory consumption of this structure.
@@ -350,6 +446,31 @@ namespace Utilities
        * ghost data
        */
       std::vector<std::pair<unsigned int, unsigned int> > import_targets_data;
+
+      /**
+       * Caches the number of chunks in the import indices per MPI rank. The
+       * length is import_indices_data.size()+1.
+       */
+      std::vector<unsigned int> import_indices_chunks_by_rank_data;
+
+      /**
+       * Caches the number of ghost indices in a larger set of indices given by
+       * the optional argument to set_ghost_indices().
+       */
+      unsigned int n_ghost_indices_in_larger_set;
+
+      /**
+       * Caches the number of chunks in the import indices per MPI rank. The
+       * length is ghost_indices_subset_data.size()+1.
+       */
+      std::vector<unsigned int> ghost_indices_subset_chunks_by_rank_data;
+
+      /**
+       * The set of indices that appear for an IndexSet that is a subset of a
+       * larger set. Similar structure as in an IndexSet within all ghost
+       * indices, but tailored to be iterated over.
+       */
+      std::vector<std::pair<unsigned int, unsigned int> > ghost_indices_subset_data;
 
       /**
        * The ID of the current processor in the MPI network
@@ -490,6 +611,15 @@ namespace Utilities
 
     inline
     const std::vector<std::pair<unsigned int, unsigned int> > &
+    Partitioner::ghost_indices_within_larger_ghost_set() const
+    {
+      return ghost_indices_subset_data;
+    }
+
+
+
+    inline
+    const std::vector<std::pair<unsigned int, unsigned int> > &
     Partitioner::ghost_targets() const
     {
       return ghost_targets_data;
@@ -519,6 +649,24 @@ namespace Utilities
     Partitioner::import_targets() const
     {
       return import_targets_data;
+    }
+
+
+
+    inline
+    const std::vector<unsigned int> &
+    Partitioner::import_indices_chunks_by_rank() const
+    {
+      return import_indices_chunks_by_rank_data;
+    }
+
+
+
+    inline
+    const std::vector<unsigned int> &
+    Partitioner::ghost_indices_subset_chunks_by_rank() const
+    {
+      return ghost_indices_subset_chunks_by_rank_data;
     }
 
 
