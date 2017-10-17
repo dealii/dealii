@@ -4575,7 +4575,7 @@ FEEvaluationAccess<dim,dim,Number>
   // copy from generic function into dim-specialization function
   const Tensor<2,dim,VectorizedArray<Number> > grad = get_gradient(q_point);
   VectorizedArray<Number> symmetrized [(dim*dim+dim)/2];
-  VectorizedArray<Number> half = make_vectorized_array (0.5);
+  VectorizedArray<Number> half = make_vectorized_array<Number> (0.5);
   for (unsigned int d=0; d<dim; ++d)
     symmetrized[d] = grad[d][d];
   switch (dim)
