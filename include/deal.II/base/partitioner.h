@@ -116,11 +116,11 @@ namespace Utilities
        * Allows to set the ghost indices after the constructor has been
        * called.
        *
-       * The optional parameter @p larger_ghost_index_set allows for defining
-       * an indirect addressing into a larger set of ghost indices. This setup
-       * is useful if a distributed vector is based on that larger ghost index
-       * set but only a tighter subset should be communicated according to the
-       * given index set.
+       * The optional parameter @p larger_ghost_index_set allows defining an
+       * indirect addressing into a larger set of ghost indices. This setup is
+       * useful if a distributed vector is based on that larger ghost index
+       * set but only a tighter subset should be communicated according to
+       * @p larger_ghost_index_set.
        */
       void set_ghost_indices (const IndexSet &ghost_indices,
                               const IndexSet &larger_ghost_index_set = IndexSet());
@@ -200,14 +200,13 @@ namespace Utilities
 
       /**
        * In case the partitioner was built to define ghost indices as a subset
-       * of indices in a larger set of ghosts, this set returns the numbering
-       * in terms of ranges of that range. Similar structure as in an
-       * IndexSet, but tailored to be iterated over, and some indices may be
-       * duplicates.
+       * of indices in a larger set of ghosts, this function returns the
+       * numbering in terms of ranges within that set. Similar structure as in
+       * an IndexSet, but tailored to be iterated over.
        *
        * In case the partitioner did not take a second set of ghost indices
        * into account, this subset is simply defined as the half-open interval
-       * <code>local_size(),local_size().second+n_ghost_indices()</code>.
+       * <code>[0, n_ghost_indices())</code>.
        */
       const std::vector<std::pair<unsigned int, unsigned int> > &
       ghost_indices_within_larger_ghost_set() const;
@@ -336,7 +335,7 @@ namespace Utilities
                                     std::vector<MPI_Request>       &requests) const;
 
       /**
-       * Starts the exports of the data in a locally owned array to the range
+       * Finish the exports of the data in a locally owned array to the range
        * described by the ghost indices of this class.
        *
        * This functionality is used in
@@ -348,8 +347,9 @@ namespace Utilities
                                      std::vector<MPI_Request> &requests) const;
 
       /**
-       * Imports the data on an array described by the
-       * ghost indices of this class into the locally owned array. The
+       * Starts importing the data on an array indexed by the ghost indices of
+       * this class that is later accumulated into a locally owned array with
+       * import_from_ghosted_array_finish().
        *
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::compress().
@@ -363,8 +363,9 @@ namespace Utilities
                                       std::vector<MPI_Request>     &requests) const;
 
       /**
-       * Imports the data on an array described by the
-       * ghost indices of this class into the locally owned array. The
+       * Finishes importing the data from an array indexed by the ghost
+       * indices of this class into a specified locally owned array, combining
+       * the results according to the given input @p vector_operation.
        *
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::compress().
