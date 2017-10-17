@@ -818,7 +818,7 @@ namespace internal
       transformation_contraction (const Tensor<2,dim,Number> &T,
                                   const Tensor<2,dim,Number> &F)
       {
-        return contract<1,1>(F,contract<1,0>(F, T));
+        return contract<1,0>(F,contract<1,1>(T, F));
       }
 
 
@@ -852,9 +852,26 @@ namespace internal
       transformation_contraction (const Tensor<4,dim,Number> &H,
                                   const Tensor<2,dim,Number> &F)
       {
-        // Its significantly quicker (in 3d) to push forward
+        // This contraction order and indexing might look a bit dubious, so a
+        // quick explanation as to what's going on is probably in order:
+        //
+        // When the contract() function operates on the inner indices, the
+        // result has the inner index and outer index transposed, i.e.
+        // contract<2,1>(H,F) implies
+        // T_{IJLk} = (H_{IJMN} F_{mM}) \delta_{mL} \delta_{Nk}
+        // rather than T_{IJkL} (the desired result).
+        // So, in effect, contraction of the 3rd (inner) index with F as the
+        // second argument results in its transposition with respect to its
+        // adjacent neighbor. This is due to the position of the argument F,
+        // leading to the free index being on the right hand side of the result.
+        // However, given that we can do two transformations from the LHS of H
+        // and two from the right we can undo the otherwise erroneous
+        // swapping of the outer indices upon application of the second
+        // sets of contractions.
+        //
+        // Note: Its significantly quicker (in 3d) to push forward
         // each index individually
-        return contract<1,3>(F,contract<1,2>(F,contract<1,1>(F,contract<1,0>(F, H))));
+        return contract<1,1>(F,contract<1,1>(F,contract<2,1>(contract<2,1>(H,F), F)));
       }
 
 
@@ -865,40 +882,41 @@ namespace internal
       transformation_contraction (const dealii::SymmetricTensor<4,dim,Number> &H,
                                   const Tensor<2,dim,Number>                  &F)
       {
-        // Its significantly quicker (in 3d) to push forward
+        // The first and last transformation operations respectively
+        // break and recover the symmetry properties of the tensors.
+        // We also want to perform a minimal number of operations here
+        // and avoid some complications related to the transposition of
+        // tensor indices when contracting inner indices using the contract()
+        // function. (For an explanation of the contraction operations,
+        // please see the note in the equivalent function for standard
+        // Tensors.) So what we'll do here is manually perform the first
+        // and last contractions that break/recover the tensor symmetries
+        // on the inner indices, and use the contract() function only on
+        // the outer indices.
+        //
+        // Note: Its significantly quicker (in 3d) to push forward
         // each index individually
 
-        Tensor<4,dim,Number> tmp_1;
-        for (unsigned int i=0; i<dim; ++i)
-          for (unsigned int J=0; J<dim; ++J)
-            for (unsigned int K=0; K<dim; ++K)
-              for (unsigned int L=0; L<dim; ++L)
-                for (unsigned int I=0; I<dim; ++I)
-                  tmp_1[i][J][K][L] += F[i][I] * H[I][J][K][L];
-
-        Tensor<4,dim,Number> tmp_2;
-        for (unsigned int i=0; i<dim; ++i)
+        // Push forward (inner) index 1
+        Tensor<4,dim,Number> tmp;
+        for (unsigned int I=0; I<dim; ++I)
           for (unsigned int j=0; j<dim; ++j)
             for (unsigned int K=0; K<dim; ++K)
               for (unsigned int L=0; L<dim; ++L)
                 for (unsigned int J=0; J<dim; ++J)
-                  tmp_2[i][j][K][L] += F[j][J] * tmp_1[i][J][K][L];
+                  tmp[I][j][K][L] += F[j][J] * H[I][J][K][L];
 
-        tmp_1 = 0.0;
-        for (unsigned int i=0; i<dim; ++i)
-          for (unsigned int j=0; j<dim; ++j)
-            for (unsigned int k=0; k<dim; ++k)
-              for (unsigned int L=0; L<dim; ++L)
-                for (unsigned int K=0; K<dim; ++K)
-                  tmp_1[i][j][k][L] += F[k][K] * tmp_2[i][j][K][L];
+        // Push forward (outer) indices 0 and 3
+        tmp = contract<1,0>(F, contract<3,1>(tmp,F));
 
+        // Push forward (inner) index 2
         dealii::SymmetricTensor<4,dim,Number> out;
         for (unsigned int i=0; i<dim; ++i)
           for (unsigned int j=i; j<dim; ++j)
             for (unsigned int k=0; k<dim; ++k)
               for (unsigned int l=k; l<dim; ++l)
-                for (unsigned int L=0; L<dim; ++L)
-                  out[i][j][k][l] += F[l][L] * tmp_1[i][j][k][L];
+                for (unsigned int K=0; K<dim; ++K)
+                  out[i][j][k][l] += F[k][K] * tmp[i][j][K][l];
 
         return out;
       }
