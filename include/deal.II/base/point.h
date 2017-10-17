@@ -25,16 +25,31 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * A class that represents a point in a space with arbitrary dimension
- * <tt>dim</tt>.
+ * A class that represents a point in a Cartesian space of dimension
+ * @p dim .
  *
- * Objects of this class are used to represent points, i.e., vectors anchored
- * at the origin of a Cartesian vector space. They are, among other uses,
- * passed to functions that operate on points in spaces of a priori fixed
- * dimension: rather than using functions like <tt>double f(double x)</tt> and
- * <tt>double f(double x, double y)</tt>, you should use <tt>double
- * f(Point<dim> &p)</tt> instead as it allows writing dimension independent
- * code.
+ * Objects of this class are used to represent points (i.e., vectors
+ * anchored at the origin) of a vector space equipped with a <a
+ * href="https://en.wikipedia.org/wiki/Cartesian_coordinate_system">Cartesian
+ * coordinate system</a>. They are, among other uses, passed to
+ * functions that operate on points in spaces of a priori fixed
+ * dimension: rather than using functions like <code>double f(const
+ * double x)</code> and <code>double f(const double x, const double
+ * y)</code>, you can use <code>double f(const Point<dim> &p)</code>
+ * instead as it allows writing dimension independent code.
+ *
+ * deal.II specifically uses Point objects as indicating points that
+ * are represented by Cartesian coordinates, i.e., where a point in @p
+ * dim space dimensions is characterized by signed distances along the
+ * axes of a coordinate system spanned by @p dim mutually orthogonal
+ * unit vectors (called the "coordinate axes"). This choice of
+ * representing a vector makes addition and scaling of vectors
+ * particularly simple: one only has to add or multiply each
+ * coordinate value. On the other hand, adding or scaling vectors is
+ * not nearly as simple when a vector is represented in other kinds of
+ * coordinate systems (e.g., <a
+ * href="https://en.wikipedia.org/wiki/Spherical_coordinate_system">spherical
+ * coordinate systems</a>).
  *
  *
  * <h3>What's a <code>Point@<dim@></code> and what is a
