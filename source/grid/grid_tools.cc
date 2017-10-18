@@ -35,6 +35,7 @@
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
 #include <deal.II/grid/grid_reordering.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -4946,6 +4947,24 @@ next_cell:
     return id_and_v->first;
   }
 
+  template<int dim, int spacedim>
+  std::pair<typename Triangulation<dim,spacedim>::active_cell_iterator, Point<dim> >
+  find_active_cell_around_point(const Cache<dim,spacedim> &cache,
+                                const Point<spacedim> &p,
+                                const typename Triangulation<dim,spacedim>::active_cell_iterator &cell_hint,
+                                const std::vector<bool> &marked_vertices)
+  {
+    const auto &mesh = cache.get_triangulation();
+    const auto &mapping = cache.get_mapping();
+    const auto &vertex_to_cells = cache.get_vertex_to_cell_map();
+    const auto &vertex_to_cell_centers = cache.get_vertex_to_cell_centers_directions();
+
+    return find_active_cell_around_point(mapping, mesh, p,
+                                         vertex_to_cells,
+                                         vertex_to_cell_centers,
+                                         cell_hint,
+                                         marked_vertices);
+  }
 } /* namespace GridTools */
 
 

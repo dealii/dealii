@@ -131,7 +131,16 @@ for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS
         extract_used_vertices(const Triangulation<deal_II_dimension,deal_II_space_dimension>&mesh,
                               const Mapping<deal_II_dimension,deal_II_space_dimension> &mapping);
 
-                                    \}
+        template
+        std::pair<typename Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator,
+                  Point<deal_II_dimension> >
+        find_active_cell_around_point(const Cache<deal_II_dimension,deal_II_space_dimension>&,
+                                      const Point<deal_II_space_dimension> &,
+                                      const typename Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator &,
+                                      const std::vector<bool>  &);
+
+
+                       \}
 
 #endif
 }

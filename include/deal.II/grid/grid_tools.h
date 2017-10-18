@@ -92,6 +92,9 @@ namespace internal
  */
 namespace GridTools
 {
+  template <int dim, int spacedim>
+  class Cache;
+
   /**
    * @name Information about meshes and cells
    */
@@ -925,6 +928,19 @@ namespace GridTools
   find_active_cell_around_point (const hp::MappingCollection<dim,spacedim> &mapping,
                                  const hp::DoFHandler<dim,spacedim>        &mesh,
                                  const Point<spacedim>                     &p);
+
+  /**
+   * A version of the previous function that exploits an already existing
+   * GridTools::Cache<dim,spacedim> object.
+   *
+   * @author Luca Heltai, 2017
+   */
+  template <int dim, int spacedim>
+  std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator, Point<dim> >
+  find_active_cell_around_point (const Cache<dim,spacedim>                                         &cache,
+                                 const Point<spacedim>                                             &p,
+                                 const typename Triangulation<dim, spacedim>::active_cell_iterator &cell_hint=typename Triangulation<dim, spacedim>::active_cell_iterator(),
+                                 const std::vector<bool>                                           &marked_vertices = std::vector<bool>());
 
   /**
    * Return a list of all descendants of the given cell that are active. For
