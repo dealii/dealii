@@ -881,7 +881,7 @@ namespace GridTools
    * A version of the previous function that exploits an already existing
    * map between vertices and cells, constructed using the function
    * GridTools::vertex_to_cell_map, a map of vertex_to_cell_centers, obtained
-   * through GridTools::vertex_to_cells_center_directions, and a guess `cell_hint`.
+   * through GridTools::vertex_to_cell_centers_directions, and a guess `cell_hint`.
    *
    * @author Luca Heltai, Rene Gassmoeller, 2017
    */
