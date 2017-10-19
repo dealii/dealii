@@ -58,8 +58,58 @@ namespace Utilities
      * consecutively in [@p local_size, @p local_size + @p n_ghost_indices).
      * The ghost indices are sorted according to their global index.
      *
+     * <h4>Parallel data exchange</h4>
      *
-     * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
+     * This class handles the main ghost data exchange of
+     * LinearAlgebra::distributed::Vector through four functions:
+     * <ul>
+     * <li> export_to_ghosted_array_start() is used for initiating an export
+     * operation that sends data from the locally owned data field, passed as
+     * an array, to a ghost data array according to the ghost indices stored
+     * in the present class. This call starts non-blocking MPI communication
+     * routines, but does not wait for the routines to finish. Thus, the user
+     * may not write into the respective positions of the underlying arrays as
+     * the data might still be needed by MPI.
+     * <li> export_to_ghosted_array_finish() finalizes the MPI data exchange
+     * started in export_to_ghosted_array_start() and signals that the data in
+     * the arrays may be used for further processing or modified as
+     * appropriate.
+     * <li> import_from_ghosted_array_start() is used for initiating an import
+     * operation that sends data from a ghost data field, passed as an array,
+     * to the locally owned array according to the ghost indices stored in the
+     * present class. A VectorOperation::values flag can be passed to decide
+     * on how to combine the data in the ghost field with the data at the
+     * owner, since both relate to the same data entry. In assembly, this is
+     * usually and add-into operation. This call starts non-blocking MPI
+     * communication routines, but does not wait for the routines to
+     * finish. Thus, the user may not write into the respective positions of
+     * the underlying arrays as the data might still be needed by MPI.
+     * <li> import_from_ghosted_array_finish() finalizes the MPI data exchange
+     * started in import_from_ghosted_array_start() and signals that the data
+     * in the arrays may be used for further processing or modified as
+     * appropriate.
+     * </ul>
+     *
+     * The MPI communication routines are point-to-point communication patterns.
+     *
+     * <h4>Sending only selected ghost data</h4>
+     *
+     * This partitioner class operates on a fixed set of ghost indices and
+     * must always be compatible with the ghost indices inside a vector. In
+     * some cases, one only wants to send some of the ghost indices present in
+     * a vector around, but without creating a copy of the vector with a
+     * suitable index set - think e.g. of local time stepping where different
+     * regions of a vector might be exchanged at different stages of a time
+     * step slice. This class supports that case by the following model: A
+     * vector is first created with the full ghosted index set. Then, a second
+     * Partitioner instance is created that sets ghost indices with a tighter
+     * index set as ghosts, but specifying the larger index set as the second
+     * argument to the set_ghost_indices() call. When data is exchanged, the
+     * export_to_ghosted_array_start() and import_from_ghosted_array_start()
+     * detect this case and only send the selected indices, taken from the
+     * full array of ghost entries.
+     *
+     * @author Katharina Kormann, Martin Kronbichler, 2010, 2011, 2017
      */
     class Partitioner : public ::dealii::LinearAlgebra::CommunicationPatternBase
     {
@@ -250,20 +300,6 @@ namespace Utilities
       import_targets() const;
 
       /**
-       * Caches the number of chunks in the import indices per MPI rank. The
-       * length is import_indices_data.size()+1.
-       */
-      const std::vector<unsigned int> &
-      import_indices_chunks_by_rank() const;
-
-      /**
-       * Caches the number of chunks in the ghost indices subsets per MPI
-       * rank. The length is ghost_indices_subset_data.size()+1.
-       */
-      const std::vector<unsigned int> &
-      ghost_indices_subset_chunks_by_rank() const;
-
-      /**
        * Check whether the given partitioner is compatible with the
        * partitioner used for this vector. Two partitioners are compatible if
        * they have the same local size and the same ghost indices. They do not
@@ -323,6 +359,30 @@ namespace Utilities
        * Starts the exports of the data in a locally owned array to the range
        * described by the ghost indices of this class.
        *
+       * @param communication_channel Sets an offset to the MPI_Isend and
+       * MPI_Irecv calls that avoids interference with other ongoing
+       * export_to_ghosted_array_start() calls on different entries. Typically
+       * handled within the blocks of a block vector.
+       *
+       * @param locally_owned_array The array of data from which the data is
+       * extracted and sent to the ghost entries on a remote processor.
+       *
+       * @param temporary_storage A temporary storage array of length
+       * n_import_indices() that is used to hold the packed data from the @p
+       * locally_owned_array to be sent. Note that this array must not be
+       * touched until the respective export_to_ghosted_array_finish() call
+       * has been made because the model uses non-blocking communication.
+       *
+       * @param ghost_array The array that will receive the exported data,
+       * i.e., the entries that a remote processor sent to the calling
+       * process. Its size must either be n_ghost_indices() or equal the
+       * number of ghost indices in the larger index set that was given as
+       * second argument to set_ghost_indices().
+       *
+       * @param requests The list of MPI requests for the ongoing non-blocking
+       * communication that will be finalized in the
+       * export_to_ghosted_array_finish() call.
+       *
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::update_ghost_values().
        */
@@ -338,6 +398,16 @@ namespace Utilities
        * Finish the exports of the data in a locally owned array to the range
        * described by the ghost indices of this class.
        *
+       * @param ghost_array The array that will receive the exported data
+       * started in the @p export_to_ghosted_array_start(). This must be the
+       * same array as passed to that function, otherwise the behavior is
+       * undefined.
+       *
+       * @param requests The list of MPI requests for the ongoing non-blocking
+       * communication that were started in the
+       * export_to_ghosted_array_start() call. This must be the same array as
+       * passed to that function, otherwise MPI will likely throw an error.
+       *
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::update_ghost_values().
        */
@@ -350,6 +420,34 @@ namespace Utilities
        * Starts importing the data on an array indexed by the ghost indices of
        * this class that is later accumulated into a locally owned array with
        * import_from_ghosted_array_finish().
+       *
+       * @param vector_operation Defines how the data sent to the owner should
+       * be combined with the existing entries, e.g., added into.
+       *
+       * @param communication_channel Sets an offset to the MPI_Isend and
+       * MPI_Irecv calls that avoids interference with other ongoing
+       * import_from_ghosted_array_start() calls on different
+       * entries. Typically handled within the blocks of a block vector.
+       *
+       * @param ghost_array The array of ghost data that is sent to a remote
+       * owner of the respective index in a vector. Its size must either be
+       * n_ghost_indices() or equal the number of ghost indices in the larger
+       * index set that was given as second argument to
+       * set_ghost_indices(). This or the subsequent
+       * import_from_ghosted_array_finish() function, the order is
+       * implementation-dependent, will set all data entries behind @p
+       * ghost_array to zero.
+       *
+       * @param temporary_storage A temporary storage array of length
+       * n_import_indices() that is used to hold the packed data from MPI
+       * communication that will later be written into the locally owned
+       * array. Note that this array must not be touched until the respective
+       * import_from_ghosted_array_finish() call has been made because the
+       * model uses non-blocking communication.
+       *
+       * @param requests The list of MPI requests for the ongoing non-blocking
+       * communication that will be finalized in the
+       * export_to_ghosted_array_finish() call.
        *
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::compress().
@@ -366,6 +464,32 @@ namespace Utilities
        * Finishes importing the data from an array indexed by the ghost
        * indices of this class into a specified locally owned array, combining
        * the results according to the given input @p vector_operation.
+       *
+       * @param vector_operation Defines how the data sent to the owner should
+       * be combined with the existing entries, e.g., added into.
+       *
+       * @param temporary_storage The same array given to the
+       * import_from_ghosted_array_start() call that contains the packed data
+       * from MPI communication. In thus function, it is combined at the
+       * corresponding entries described by the ghost relations according to
+       * @p vector_operation.
+       *
+       * @param ghost_array The array of ghost data that is sent to a remote
+       * owner of the respective index in a vector. Its size must either be
+       * n_ghost_indices() or equal the number of ghost indices in the larger
+       * index set that was given as second argument to
+       * set_ghost_indices(). This function will set all data entries behind
+       * @p ghost_array to zero for the implementation-dependent cases when it
+       * was not already done in the import_from_ghosted_array_start() call.
+       *
+       * @param locally_owned_array The array of data where the resulting data
+       * sent by remote processes to the calling process will be accumulated
+       * into.
+       *
+       * @param requests The list of MPI requests for the ongoing non-blocking
+       * communication that have been initiated in the
+       * import_to_ghosted_array_finish() call. This must be the same array as
+       * passed to that function, otherwise MPI will likely throw an error.
        *
        * This functionality is used in
        * LinearAlgebra::distributed::Vector::compress().
@@ -650,24 +774,6 @@ namespace Utilities
     Partitioner::import_targets() const
     {
       return import_targets_data;
-    }
-
-
-
-    inline
-    const std::vector<unsigned int> &
-    Partitioner::import_indices_chunks_by_rank() const
-    {
-      return import_indices_chunks_by_rank_data;
-    }
-
-
-
-    inline
-    const std::vector<unsigned int> &
-    Partitioner::ghost_indices_subset_chunks_by_rank() const
-    {
-      return ghost_indices_subset_chunks_by_rank_data;
     }
 
 
