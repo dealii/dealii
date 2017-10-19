@@ -527,95 +527,18 @@ namespace LinearAlgebra
               ExcMessage ("Cannot call compress() on a ghosted vector"));
 
 #ifdef DEAL_II_WITH_MPI
-      // nothing to do for insert (only need to zero ghost entries in
-      // compress_finish()). in debug mode we want to check consistency
-      // of the inserted data, therefore the communication is still
-      // initialized. Having different code in debug and optimized mode is
-      // somewhat dangerous, but it really saves communication so it seems
-      // still worthwhile.
-#ifndef DEBUG
-      if (operation == VectorOperation::insert)
-        return;
-#endif
-
-      const Utilities::MPI::Partitioner &part = *partitioner;
-
-      // nothing to do when we neither have import
-      // nor ghost indices.
-      if (part.n_ghost_indices()==0 && part.n_import_indices()==0)
-        return;
-
       // make this function thread safe
       Threads::Mutex::ScopedLock lock (mutex);
 
-      const unsigned int n_import_targets = part.import_targets().size();
-      const unsigned int n_ghost_targets  = part.ghost_targets().size();
-
-      Assert(compress_requests.size() == 0,
-             ExcMessage("Another compress operation seems to still be running. "
-                        "Call compress_finish() first."));
-
-      // Need to send and receive the data. Use non-blocking communication,
-      // where it is generally less overhead to first initiate the receive and
-      // then actually send the data
-
-      // set channels in different range from update_ghost_values channels
-      const unsigned int channel = counter + 400;
-      unsigned int current_index_start = 0;
-      compress_requests.resize (n_import_targets + n_ghost_targets);
-
       // allocate import_data in case it is not set up yet
-      if (import_data == nullptr)
-        import_data = new Number[part.n_import_indices()];
+      if (import_data == nullptr && partitioner->n_import_indices() > 0)
+        import_data = new Number[partitioner->n_import_indices()];
 
-      // initiate the receive operations
-      for (unsigned int i=0; i<n_import_targets; i++)
-        {
-          AssertThrow (static_cast<size_type>(part.import_targets()[i].second)*
-                       sizeof(Number) <
-                       static_cast<size_type>(std::numeric_limits<int>::max()),
-                       ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
-                                  "The number of ghost entries times the size of 'Number' "
-                                  "exceeds this value. This is not supported."));
-          const int ierr = MPI_Irecv (&import_data[current_index_start],
-                                      part.import_targets()[i].second*sizeof(Number),
-                                      MPI_BYTE,
-                                      part.import_targets()[i].first,
-                                      part.import_targets()[i].first +
-                                      part.n_mpi_processes()*channel,
-                                      part.get_mpi_communicator(),
-                                      &compress_requests[i]);
-          AssertThrowMPI (ierr);
-          current_index_start += part.import_targets()[i].second;
-        }
-      AssertDimension(current_index_start, part.n_import_indices());
-
-      // initiate the send operations
-      current_index_start = part.local_size();
-      for (unsigned int i=0; i<n_ghost_targets; i++)
-        {
-          AssertThrow (static_cast<size_type>(part.ghost_targets()[i].second)*
-                       sizeof(Number) <
-                       static_cast<size_type>(std::numeric_limits<int>::max()),
-                       ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
-                                  "The number of ghost entries times the size of 'Number' "
-                                  "exceeds this value. This is not supported."));
-          const int ierr = MPI_Isend (&this->val[current_index_start],
-                                      part.ghost_targets()[i].second*sizeof(Number),
-                                      MPI_BYTE,
-                                      part.ghost_targets()[i].first,
-                                      part.this_mpi_process() +
-                                      part.n_mpi_processes()*channel,
-                                      part.get_mpi_communicator(),
-                                      &compress_requests[n_import_targets+i]);
-          AssertThrowMPI (ierr);
-          current_index_start += part.ghost_targets()[i].second;
-        }
-      AssertDimension (current_index_start,
-                       part.local_size()+part.n_ghost_indices());
-
-      AssertDimension(n_import_targets + n_ghost_targets,
-                      compress_requests.size());
+      partitioner->import_from_ghosted_array_start
+      (operation, counter,
+       ArrayView<Number>(val + partitioner->local_size(),partitioner->n_ghost_indices()),
+       ArrayView<Number>(import_data, partitioner->n_import_indices()),
+       compress_requests);
 #endif
     }
 
@@ -626,86 +549,22 @@ namespace LinearAlgebra
     Vector<Number>::compress_finish (::dealii::VectorOperation::values operation)
     {
 #ifdef DEAL_II_WITH_MPI
-
-      // in optimized mode, no communication was started, so leave the
-      // function directly (and only clear ghosts)
-#ifndef DEBUG
-      if (operation == VectorOperation::insert)
-        {
-          zero_out_ghosts();
-          return;
-        }
-#endif
-
-      const Utilities::MPI::Partitioner &part = *partitioner;
-
-      // nothing to do when we neither have import nor ghost indices.
-      if (part.n_ghost_indices()==0 && part.n_import_indices()==0)
+      if (compress_requests.size() == 0)
         return;
 
       // make this function thread safe
       Threads::Mutex::ScopedLock lock (mutex);
 
-      const unsigned int n_import_targets = part.import_targets().size();
-      const unsigned int n_ghost_targets  = part.ghost_targets().size();
+      Assert(partitioner->n_import_indices() == 0 ||
+             import_data != nullptr, ExcNotInitialized());
+      partitioner->import_from_ghosted_array_finish
+      (operation,
+       ArrayView<const Number>(import_data, partitioner->n_import_indices()),
+       ArrayView<Number>(val, partitioner->local_size()),
+       ArrayView<Number>(val + partitioner->local_size(),partitioner->n_ghost_indices()),
+       compress_requests);
 
-      if (operation != dealii::VectorOperation::insert)
-        AssertDimension (n_ghost_targets+n_import_targets,
-                         compress_requests.size());
-
-      // first wait for the receive to complete
-      if (compress_requests.size() > 0 && n_import_targets > 0)
-        {
-          const int ierr = MPI_Waitall (n_import_targets, compress_requests.data(),
-                                        MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
-
-          Number *read_position = import_data;
-          std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
-          my_imports = part.import_indices().begin();
-
-          // If the operation is no insertion, add the imported data to the
-          // local values. For insert, nothing is done here (but in debug mode
-          // we assert that the specified value is either zero or matches with
-          // the ones already present
-          if (operation != dealii::VectorOperation::insert)
-            for ( ; my_imports!=part.import_indices().end(); ++my_imports)
-              for (unsigned int j=my_imports->first; j<my_imports->second; j++)
-                local_element(j) += *read_position++;
-          else
-            for ( ; my_imports!=part.import_indices().end(); ++my_imports)
-              for (unsigned int j=my_imports->first; j<my_imports->second;
-                   j++, read_position++)
-                // Below we use relatively large precision in units in the last place (ULP) as
-                // this Assert can be easily triggered in p::d::SolutionTransfer.
-                // The rationale is that during interpolation on two elements sharing
-                // the face, values on this face obtained from each side might
-                // be different due to additions being done in different order.
-                Assert(*read_position == Number() ||
-                       std::abs(local_element(j) - *read_position) <=
-                       std::abs(local_element(j) + *read_position) *
-                       100000. *
-                       std::numeric_limits<real_type>::epsilon(),
-                       ExcNonMatchingElements(*read_position, local_element(j),
-                                              part.this_mpi_process()));
-          AssertDimension(read_position-import_data,part.n_import_indices());
-        }
-
-      // wait for the send operations to complete
-      if (compress_requests.size() > 0 && n_ghost_targets > 0)
-        {
-          const int ierr = MPI_Waitall (n_ghost_targets,
-                                        &compress_requests[n_import_targets],
-                                        MPI_STATUSES_IGNORE);
-          AssertThrowMPI(ierr);
-        }
-      else
-        AssertDimension (part.n_ghost_indices(), 0);
-
-      // clear the compress requests
-      compress_requests.resize(0);
-
-      zero_out_ghosts ();
+      vector_is_ghosted = false;
 #else
       (void)operation;
 #endif
@@ -718,79 +577,24 @@ namespace LinearAlgebra
     Vector<Number>::update_ghost_values_start (const unsigned int counter) const
     {
 #ifdef DEAL_II_WITH_MPI
-      const Utilities::MPI::Partitioner &part = *partitioner;
-
       // nothing to do when we neither have import nor ghost indices.
-      if (part.n_ghost_indices()==0 && part.n_import_indices()==0)
+      if (partitioner->n_ghost_indices()==0 && partitioner->n_import_indices()==0)
         return;
 
       // make this function thread safe
       Threads::Mutex::ScopedLock lock (mutex);
 
-      const unsigned int n_import_targets = part.import_targets().size();
-      const unsigned int n_ghost_targets = part.ghost_targets().size();
-
-      Assert(update_ghost_values_requests.size() == 0,
-             ExcMessage("Another compress operation seems to still be running. "
-                        "Call compress_finish() first."));
-
-      // Need to send and receive the data. Use non-blocking communication,
-      // where it is generally less overhead to first initiate the receive and
-      // then actually send the data
-      size_type current_index_start = part.local_size();
-      update_ghost_values_requests.resize (n_import_targets+n_ghost_targets);
-      for (unsigned int i=0; i<n_ghost_targets; i++)
-        {
-          // allow writing into ghost indices even though we are in a
-          // const function
-          const int ierr = MPI_Irecv (const_cast<Number *>(&val[current_index_start]),
-                                      part.ghost_targets()[i].second*sizeof(Number),
-                                      MPI_BYTE,
-                                      part.ghost_targets()[i].first,
-                                      part.ghost_targets()[i].first +
-                                      counter*part.n_mpi_processes(),
-                                      part.get_mpi_communicator(),
-                                      &update_ghost_values_requests[i]);
-          AssertThrowMPI (ierr);
-          current_index_start += part.ghost_targets()[i].second;
-        }
-      AssertDimension (current_index_start,
-                       part.local_size()+part.n_ghost_indices());
-
       // allocate import_data in case it is not set up yet
-      if (import_data == nullptr && part.n_import_indices() > 0)
-        import_data = new Number[part.n_import_indices()];
+      if (import_data == nullptr && partitioner->n_import_indices() > 0)
+        import_data = new Number[partitioner->n_import_indices()];
 
-      // copy the data to be sent to the import_data field
-      if (part.n_import_indices() > 0)
-        {
-          Assert (import_data != nullptr, ExcInternalError());
-          Number *write_position = import_data;
-          std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
-          my_imports = part.import_indices().begin();
-          for ( ; my_imports!=part.import_indices().end(); ++my_imports)
-            for (unsigned int j=my_imports->first; j<my_imports->second; j++)
-              *write_position++ = local_element(j);
-        }
+      partitioner->export_to_ghosted_array_start
+      (counter,
+       ArrayView<const Number>(val, partitioner->local_size()),
+       ArrayView<Number>(import_data, partitioner->n_import_indices()),
+       ArrayView<Number>(val + partitioner->local_size(),partitioner->n_ghost_indices()),
+       update_ghost_values_requests);
 
-      // start the send operations
-      current_index_start = 0;
-      for (unsigned int i=0; i<n_import_targets; i++)
-        {
-          const int ierr = MPI_Isend (&import_data[current_index_start],
-                                      part.import_targets()[i].second*sizeof(Number),
-                                      MPI_BYTE, part.import_targets()[i].first,
-                                      part.this_mpi_process() +
-                                      part.n_mpi_processes()*counter,
-                                      part.get_mpi_communicator(),
-                                      &update_ghost_values_requests[n_ghost_targets+i]);
-          AssertThrowMPI (ierr);
-          current_index_start += part.import_targets()[i].second;
-        }
-      AssertDimension (current_index_start, part.n_import_indices());
-
-      AssertDimension (n_import_targets+n_ghost_targets,
-                       update_ghost_values_requests.size());
 #else
       (void)counter;
 #endif
@@ -813,12 +617,10 @@ namespace LinearAlgebra
           // make this function thread safe
           Threads::Mutex::ScopedLock lock (mutex);
 
-          const int ierr = MPI_Waitall (update_ghost_values_requests.size(),
-                                        update_ghost_values_requests.data(),
-                                        MPI_STATUSES_IGNORE);
-          AssertThrowMPI (ierr);
+          partitioner->export_to_ghosted_array_finish
+          (ArrayView<Number>(val + partitioner->local_size(),partitioner->n_ghost_indices()),
+           update_ghost_values_requests);
         }
-      update_ghost_values_requests.resize(0);
 #endif
       vector_is_ghosted = true;
     }
