@@ -173,6 +173,8 @@ src/CMakeLists.txt
 src/step.cc
 src/support.cc
 
+include/support.h
+
 tests/step/CMakeLists
 tests/step/my_test_1.prm
 tests/step/my_test_1.output
@@ -199,6 +201,8 @@ FIND_PACKAGE(deal.II 9.0.0 REQUIRED
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(step)
 ENABLE_TESTING()
+
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(tests/step)
