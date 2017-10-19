@@ -54,18 +54,14 @@ namespace Particles
     reference_location (particle.get_reference_location()),
     id (particle.get_id()),
     property_pool(particle.property_pool),
-    properties ((property_pool != NULL) ? property_pool->allocate_properties_array() : PropertyPool::invalid_handle)
+    properties ((particle.has_properties()) ? property_pool->allocate_properties_array() : PropertyPool::invalid_handle)
   {
-    if (property_pool != NULL)
+    if (particle.has_properties())
       {
         const ArrayView<double> my_properties = property_pool->get_properties(properties);
+        const ArrayView<const double> their_properties = particle.get_properties();
 
-        if (my_properties.size() != 0)
-          {
-            const ArrayView<const double> their_properties = particle.get_properties();
-
-            std::copy(their_properties.begin(), their_properties.end(), my_properties.begin());
-          }
+        std::copy(their_properties.begin(), their_properties.end(), my_properties.begin());
       }
   }
 
@@ -79,7 +75,7 @@ namespace Particles
     id = *id_data++;
     const double *pdata = reinterpret_cast<const double *> (id_data);
 
-    for (unsigned int i = 0; i < dim; ++i)
+    for (unsigned int i = 0; i < spacedim; ++i)
       location(i) = *pdata++;
 
     for (unsigned int i = 0; i < dim; ++i)
@@ -89,9 +85,12 @@ namespace Particles
     properties = property_pool->allocate_properties_array();
 
     // See if there are properties to load
-    const ArrayView<double> particle_properties = property_pool->get_properties(properties);
-    for (unsigned int i = 0; i < particle_properties.size(); ++i)
-      particle_properties[i] = *pdata++;
+    if (has_properties())
+      {
+        const ArrayView<double> particle_properties = property_pool->get_properties(properties);
+        for (unsigned int i = 0; i < particle_properties.size(); ++i)
+          particle_properties[i] = *pdata++;
+      }
 
     data = static_cast<const void *> (pdata);
   }
@@ -123,16 +122,13 @@ namespace Particles
         id = particle.id;
         property_pool = particle.property_pool;
 
-        if (property_pool != NULL)
+        if (particle.has_properties())
           {
             properties = property_pool->allocate_properties_array();
             const ArrayView<const double> their_properties = particle.get_properties();
+            const ArrayView<double> my_properties = property_pool->get_properties(properties);
 
-            if (their_properties.size() != 0)
-              {
-                const ArrayView<double> my_properties = property_pool->get_properties(properties);
-                std::copy(their_properties.begin(), their_properties.end(), my_properties.begin());
-              }
+            std::copy(their_properties.begin(), their_properties.end(), my_properties.begin());
           }
         else
           properties = PropertyPool::invalid_handle;
@@ -179,7 +175,7 @@ namespace Particles
     double *pdata = reinterpret_cast<double *> (id_data);
 
     // Write location data
-    for (unsigned int i = 0; i < dim; ++i,++pdata)
+    for (unsigned int i = 0; i < spacedim; ++i,++pdata)
       *pdata = location(i);
 
     // Write reference location data
@@ -187,9 +183,12 @@ namespace Particles
       *pdata = reference_location(i);
 
     // Write property data
-    const ArrayView<double> particle_properties = property_pool->get_properties(properties);
-    for (unsigned int i = 0; i < particle_properties.size(); ++i,++pdata)
-      *pdata = particle_properties[i];
+    if (has_properties())
+      {
+        const ArrayView<double> particle_properties = property_pool->get_properties(properties);
+        for (unsigned int i = 0; i < particle_properties.size(); ++i,++pdata)
+          *pdata = particle_properties[i];
+      }
 
     data = static_cast<void *> (pdata);
   }

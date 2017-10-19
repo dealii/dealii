@@ -1,0 +1,43 @@
+
+DEAL::Particle location: 0.300000
+DEAL::Particle reference location: 0.200000
+DEAL::Particle index: 7
+DEAL::Copy particle location: 0.300000
+DEAL::Copy particle reference location: 0.200000
+DEAL::Copy particle index: 7
+DEAL::OK
+DEAL::Particle location: 0.300000 0.500000
+DEAL::Particle reference location: 0.200000
+DEAL::Particle index: 7
+DEAL::Copy particle location: 0.300000 0.500000
+DEAL::Copy particle reference location: 0.200000
+DEAL::Copy particle index: 7
+DEAL::OK
+DEAL::Particle location: 0.300000 0.500000 0.700000
+DEAL::Particle reference location: 0.200000
+DEAL::Particle index: 7
+DEAL::Copy particle location: 0.300000 0.500000 0.700000
+DEAL::Copy particle reference location: 0.200000
+DEAL::Copy particle index: 7
+DEAL::OK
+DEAL::Particle location: 0.300000 0.500000
+DEAL::Particle reference location: 0.200000 0.400000
+DEAL::Particle index: 7
+DEAL::Copy particle location: 0.300000 0.500000
+DEAL::Copy particle reference location: 0.200000 0.400000
+DEAL::Copy particle index: 7
+DEAL::OK
+DEAL::Particle location: 0.300000 0.500000 0.700000
+DEAL::Particle reference location: 0.200000 0.400000
+DEAL::Particle index: 7
+DEAL::Copy particle location: 0.300000 0.500000 0.700000
+DEAL::Copy particle reference location: 0.200000 0.400000
+DEAL::Copy particle index: 7
+DEAL::OK
+DEAL::Particle location: 0.300000 0.500000 0.700000
+DEAL::Particle reference location: 0.200000 0.400000 0.600000
+DEAL::Particle index: 7
+DEAL::Copy particle location: 0.300000 0.500000 0.700000
+DEAL::Copy particle reference location: 0.200000 0.400000 0.600000
+DEAL::Copy particle index: 7
+DEAL::OK
