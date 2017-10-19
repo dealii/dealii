@@ -44,21 +44,8 @@ namespace Utilities
       AssertDimension(temporary_storage.size(), n_import_indices());
       Assert(ghost_array.size() == n_ghost_indices() ||
              ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcMessage(std::string("The size of the ghost index array (")
-                        +
-                        std::to_string(ghost_array.size())
-                        +
-                        ") must either equal the number of ghost in the "
-                        "partitioner ("
-                        +
-                        std::to_string(n_ghost_indices())
-                        +
-                        ") or be equal in size to a more comprehensive index"
-                        "set which contains "
-                        +
-                        std::to_string(n_ghost_indices_in_larger_set)
-                        +
-                        " elements for this partitioner."));
+             ExcGhostIndexArrayHasWrongSize(ghost_array.size(), n_ghost_indices(),
+                                            n_ghost_indices_in_larger_set));
 
       const unsigned int n_import_targets = import_targets_data.size();
       const unsigned int n_ghost_targets = ghost_targets_data.size();
@@ -74,12 +61,15 @@ namespace Utilities
 
       // as a ghost array pointer, put the data at the end of the given ghost
       // array in case we want to fill only a subset of the ghosts so that we
-      // can get move data to the right position in a forward loop in the
-      // _finish function.
+      // can move data to the right position in a forward loop in the _finish
+      // function.
       AssertIndexRange(n_ghost_indices(), n_ghost_indices_in_larger_set+1);
-      Number *ghost_array_ptr = ghost_array.begin()+
-                                n_ghost_indices_in_larger_set-
-                                n_ghost_indices();
+      const bool use_larger_set = (n_ghost_indices_in_larger_set > n_ghost_indices() &&
+                                   ghost_array.size() == n_ghost_indices_in_larger_set);
+      Number *ghost_array_ptr = use_larger_set ?
+                                ghost_array.begin()+
+                                n_ghost_indices_in_larger_set-n_ghost_indices()
+                                : ghost_array.begin();
 
       for (unsigned int i=0; i<n_ghost_targets; i++)
         {
@@ -131,21 +121,8 @@ namespace Utilities
     {
       Assert(ghost_array.size() == n_ghost_indices() ||
              ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcMessage(std::string("The size of the ghost index array (")
-                        +
-                        std::to_string(ghost_array.size())
-                        +
-                        ") must either equal the number of ghost in the "
-                        "partitioner ("
-                        +
-                        std::to_string(n_ghost_indices())
-                        +
-                        ") or be equal in size to a more comprehensive index"
-                        "set which contains "
-                        +
-                        std::to_string(n_ghost_indices_in_larger_set)
-                        +
-                        " elements for this partitioner."));
+             ExcGhostIndexArrayHasWrongSize(ghost_array.size(), n_ghost_indices(),
+                                            n_ghost_indices_in_larger_set));
 
       // wait for both sends and receives to complete, even though only
       // receives are really necessary. this gives (much) better performance
@@ -178,7 +155,10 @@ namespace Utilities
                   ghost_array[offset] = Number();
                 }
             else
-              Assert(offset == my_ghosts->first, ExcInternalError());
+              {
+                AssertDimension(offset, my_ghosts->first);
+                break;
+              }
         }
     }
 
@@ -195,21 +175,8 @@ namespace Utilities
       AssertDimension(temporary_storage.size(), n_import_indices());
       Assert(ghost_array.size() == n_ghost_indices() ||
              ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcMessage(std::string("The size of the ghost index array (")
-                        +
-                        std::to_string(ghost_array.size())
-                        +
-                        ") must either equal the number of ghost in the "
-                        "partitioner ("
-                        +
-                        std::to_string(n_ghost_indices())
-                        +
-                        ") or be equal in size to a more comprehensive index"
-                        "set which contains "
-                        +
-                        std::to_string(n_ghost_indices_in_larger_set)
-                        +
-                        " elements for this partitioner."));
+             ExcGhostIndexArrayHasWrongSize(ghost_array.size(), n_ghost_indices(),
+                                            n_ghost_indices_in_larger_set));
 
       (void)vector_operation;
 
@@ -326,21 +293,8 @@ namespace Utilities
       AssertDimension(temporary_storage.size(), n_import_indices());
       Assert(ghost_array.size() == n_ghost_indices() ||
              ghost_array.size() == n_ghost_indices_in_larger_set,
-             ExcMessage(std::string("The size of the ghost index array (")
-                        +
-                        std::to_string(ghost_array.size())
-                        +
-                        ") must either equal the number of ghost in the "
-                        "partitioner ("
-                        +
-                        std::to_string(n_ghost_indices())
-                        +
-                        ") or be equal in size to a more comprehensive index"
-                        "set which contains "
-                        +
-                        std::to_string(n_ghost_indices_in_larger_set)
-                        +
-                        " elements for this partitioner."));
+             ExcGhostIndexArrayHasWrongSize(ghost_array.size(), n_ghost_indices(),
+                                            n_ghost_indices_in_larger_set));
 
       // in optimized mode, no communication was started, so leave the
       // function directly (and only clear ghosts)

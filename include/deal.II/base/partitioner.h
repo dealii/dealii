@@ -170,7 +170,7 @@ namespace Utilities
        * indirect addressing into a larger set of ghost indices. This setup is
        * useful if a distributed vector is based on that larger ghost index
        * set but only a tighter subset should be communicated according to
-       * @p larger_ghost_index_set.
+       * @p ghost_indices.
        */
       void set_ghost_indices (const IndexSet &ghost_indices,
                               const IndexSet &larger_ghost_index_set = IndexSet());
@@ -377,7 +377,10 @@ namespace Utilities
        * i.e., the entries that a remote processor sent to the calling
        * process. Its size must either be n_ghost_indices() or equal the
        * number of ghost indices in the larger index set that was given as
-       * second argument to set_ghost_indices().
+       * second argument to set_ghost_indices(). In case only selected indices
+       * are sent, no guarantee is made regarding the entries that do not get
+       * set. Some of them might be used to organize the transfer and later
+       * reset to zero, so make sure you do not use them in computations.
        *
        * @param requests The list of MPI requests for the ongoing non-blocking
        * communication that will be finalized in the
@@ -516,6 +519,20 @@ namespace Utilities
                       unsigned int,
                       << "Global index " << arg1
                       << " neither owned nor ghost on proc " << arg2 << ".");
+
+      /**
+       * Exception
+       */
+      DeclException3 (ExcGhostIndexArrayHasWrongSize,
+                      unsigned int,
+                      unsigned int,
+                      unsigned int,
+                      << "The size of the ghost index array (" << arg1
+                      << ") must either equal the number of ghost in the "
+                      << "partitioner (" << arg2
+                      << ") or be equal in size to a more comprehensive index"
+                      << "set which contains " << arg3
+                      << " elements for this partitioner.");
 
     private:
       /**
