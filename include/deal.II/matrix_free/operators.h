@@ -109,7 +109,8 @@ namespace MatrixFreeOperators
    * the finest mesh or at a certain level in geometric multigrid.
    *
    * A derived class has to implement apply_add() method as well as
-   * compute_diagonal() to initialize the protected member inverse_diagonal_entries.
+   * compute_diagonal() to initialize the protected member inverse_diagonal_entries
+   * and/or diagonal_entries.
    * In case of a non-symmetric operator, Tapply_add() should be additionally
    * implemented.
    *
@@ -315,7 +316,7 @@ namespace MatrixFreeOperators
      * Compute diagonal of this operator.
      *
      * A derived class needs to implement this function and resize and fill
-     * the protected member inverse_diagonal_entries accordingly.
+     * the protected member inverse_diagonal_entries and/or diagonal_entries accordingly.
      */
     virtual void compute_diagonal () = 0;
 
@@ -330,6 +331,13 @@ namespace MatrixFreeOperators
      */
     const std::shared_ptr<DiagonalMatrix<VectorType> > &
     get_matrix_diagonal_inverse() const;
+
+    /**
+     * Get read access to the diagonal of this operator.
+     */
+    const std::shared_ptr<DiagonalMatrix<VectorType> > &
+    get_matrix_diagonal() const;
+
 
     /**
      * Apply the Jacobi preconditioner, which multiplies every element of the
@@ -378,6 +386,12 @@ namespace MatrixFreeOperators
      * MatrixFree object to be used with this operator.
      */
     std::shared_ptr<const MatrixFree<dim,value_type> > data;
+
+    /**
+     * A shared pointer to a diagonal matrix that stores the
+     * diagonal elements as a vector.
+     */
+    std::shared_ptr<DiagonalMatrix<VectorType > > diagonal_entries;
 
     /**
      * A shared pointer to a diagonal matrix that stores the inverse of
@@ -1407,6 +1421,17 @@ namespace MatrixFreeOperators
 
 
   template <int dim, typename VectorType>
+  const std::shared_ptr<DiagonalMatrix<VectorType> > &
+  Base<dim,VectorType>::get_matrix_diagonal() const
+  {
+    Assert(diagonal_entries.get() != nullptr &&
+           diagonal_entries->m() > 0, ExcNotInitialized());
+    return diagonal_entries;
+  }
+
+
+
+  template <int dim, typename VectorType>
   void
   Base<dim,VectorType>::Tapply_add(VectorType &dst,
                                    const VectorType &src) const
@@ -1534,14 +1559,17 @@ namespace MatrixFreeOperators
 
     this->inverse_diagonal_entries.
     reset(new DiagonalMatrix<VectorType>());
+    this->diagonal_entries.
+    reset(new DiagonalMatrix<VectorType>());
     VectorType &inverse_diagonal_vector = this->inverse_diagonal_entries->get_vector();
-    VectorType ones;
-    this->initialize_dof_vector(ones);
+    VectorType &diagonal_vector         = this->diagonal_entries->get_vector();
     this->initialize_dof_vector(inverse_diagonal_vector);
-    ones = Number(1.);
-    apply_add(inverse_diagonal_vector, ones);
+    this->initialize_dof_vector(diagonal_vector);
+    inverse_diagonal_vector = Number(1.);
+    apply_add(diagonal_vector, inverse_diagonal_vector);
 
-    this->set_constrained_entries_to_one(inverse_diagonal_vector);
+    this->set_constrained_entries_to_one(diagonal_vector);
+    inverse_diagonal_vector = diagonal_vector;
 
     const unsigned int local_size = inverse_diagonal_vector.local_size();
     for (unsigned int i=0; i<local_size; ++i)
@@ -1549,6 +1577,7 @@ namespace MatrixFreeOperators
         =1./inverse_diagonal_vector.local_element(i);
 
     inverse_diagonal_vector.update_ghost_values();
+    diagonal_vector.update_ghost_values();
   }
 
 
@@ -1644,12 +1673,18 @@ namespace MatrixFreeOperators
     unsigned int dummy = 0;
     this->inverse_diagonal_entries.
     reset(new DiagonalMatrix<VectorType>());
+    this->diagonal_entries.
+    reset(new DiagonalMatrix<VectorType>());
     VectorType &inverse_diagonal_vector = this->inverse_diagonal_entries->get_vector();
+    VectorType &diagonal_vector         = this->diagonal_entries->get_vector();
     this->initialize_dof_vector(inverse_diagonal_vector);
+    this->initialize_dof_vector(diagonal_vector);
 
     this->data->cell_loop (&LaplaceOperator::local_diagonal_cell,
-                           this, inverse_diagonal_vector, dummy);
-    this->set_constrained_entries_to_one(inverse_diagonal_vector);
+                           this, diagonal_vector, dummy);
+    this->set_constrained_entries_to_one(diagonal_vector);
+
+    inverse_diagonal_vector = diagonal_vector;
 
     for (unsigned int i=0; i<inverse_diagonal_vector.local_size(); ++i)
       if (std::abs(inverse_diagonal_vector.local_element(i)) > std::sqrt(std::numeric_limits<Number>::epsilon()))
@@ -1658,6 +1693,7 @@ namespace MatrixFreeOperators
         inverse_diagonal_vector.local_element(i) = 1.;
 
     inverse_diagonal_vector.update_ghost_values();
+    diagonal_vector.update_ghost_values();
   }
 
 
