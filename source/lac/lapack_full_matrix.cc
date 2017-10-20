@@ -192,7 +192,7 @@ LAPACKFullMatrix<number>::vmult (
       AssertDimension(v.size(), this->n_cols());
       AssertDimension(w.size(), this->n_rows());
 
-      gemv("N", &mm, &nn, &alpha, &this->values[0], &mm, v.values, &one, &beta, w.values, &one);
+      gemv("N", &mm, &nn, &alpha, &this->values[0], &mm, v.values.get(), &one, &beta, w.values.get(), &one);
       break;
     }
     case svd:
@@ -202,12 +202,12 @@ LAPACKFullMatrix<number>::vmult (
       AssertDimension(w.size(), this->n_rows());
       // Compute V^T v
       work.resize(std::max(mm,nn));
-      gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.values, &one, &null, work.data(), &one);
+      gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.values.get(), &one, &null, work.data(), &one);
       // Multiply by singular values
       for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with U
-      gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, work.data(), &one, &beta, w.values, &one);
+      gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, work.data(), &one, &beta, w.values.get(), &one);
       break;
     }
     case inverse_svd:
@@ -217,12 +217,12 @@ LAPACKFullMatrix<number>::vmult (
       AssertDimension(v.size(), this->n_rows());
       // Compute U^T v
       work.resize(std::max(mm,nn));
-      gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.values, &one, &null, work.data(), &one);
+      gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.values.get(), &one, &null, work.data(), &one);
       // Multiply by singular values
       for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with V
-      gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, work.data(), &one, &beta, w.values, &one);
+      gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, work.data(), &one, &beta, w.values.get(), &one);
       break;
     }
     default:
@@ -252,7 +252,7 @@ LAPACKFullMatrix<number>::Tvmult (
       AssertDimension(w.size(), this->n_cols());
       AssertDimension(v.size(), this->n_rows());
 
-      gemv("T", &mm, &nn, &alpha, &this->values[0], &mm, v.values, &one, &beta, w.values, &one);
+      gemv("T", &mm, &nn, &alpha, &this->values[0], &mm, v.values.get(), &one, &beta, w.values.get(), &one);
       break;
     }
     case svd:
@@ -263,12 +263,12 @@ LAPACKFullMatrix<number>::Tvmult (
 
       // Compute U^T v
       work.resize(std::max(mm,nn));
-      gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.values, &one, &null, work.data(), &one);
+      gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.values.get(), &one, &null, work.data(), &one);
       // Multiply by singular values
       for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with V
-      gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, work.data(), &one, &beta, w.values, &one);
+      gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, work.data(), &one, &beta, w.values.get(), &one);
       break;
     }
     case inverse_svd:
@@ -279,12 +279,12 @@ LAPACKFullMatrix<number>::Tvmult (
 
       // Compute V^T v
       work.resize(std::max(mm,nn));
-      gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.values, &one, &null, work.data(), &one);
+      gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.values.get(), &one, &null, work.data(), &one);
       // Multiply by singular values
       for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with U
-      gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, work.data(), &one, &beta, w.values, &one);
+      gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, work.data(), &one, &beta, w.values.get(), &one);
       break;
     }
     default:

@@ -222,7 +222,7 @@ public:
    * Destructor, deallocates memory. Made virtual to allow for derived classes
    * to behave properly.
    */
-  virtual ~Vector ();
+  virtual ~Vector () = default;
 
   /**
    * This function does nothing but exists for compatibility with the parallel
@@ -891,8 +891,12 @@ protected:
 
   /**
    * Pointer to the array of elements of this vector.
+   *
+   * Because we allocate these arrays via Utilities::System::posix_memalign,
+   * we need to use a custom deleter for this object that does not call
+   * <code>delete[]</code>, but instead calls @p free().
    */
-  Number *values;
+  std::unique_ptr<Number[], decltype(&free)> values;
 
   /**
    * For parallel loops with TBB, this member variable stores the affinity
@@ -922,11 +926,6 @@ private:
    * allocated memory is determined by @p max_vec_size .
    */
   void allocate();
-
-  /**
-   * Deallocate @p values.
-   */
-  void deallocate();
 };
 
 /*@}*/
@@ -950,7 +949,7 @@ Vector<Number>::Vector ()
   :
   vec_size(0),
   max_vec_size(0),
-  values(nullptr)
+  values(nullptr, &free)
 {
   reinit(0);
 }
@@ -963,7 +962,7 @@ Vector<Number>::Vector (const InputIterator first, const InputIterator last)
   :
   vec_size (0),
   max_vec_size (0),
-  values (nullptr)
+  values (nullptr, &free)
 {
   // allocate memory. do not initialize it, as we will copy over to it in a
   // second
@@ -979,22 +978,9 @@ Vector<Number>::Vector (const size_type n)
   :
   vec_size(0),
   max_vec_size(0),
-  values(nullptr)
+  values(nullptr, &free)
 {
   reinit (n, false);
-}
-
-
-
-template <typename Number>
-inline
-Vector<Number>::~Vector ()
-{
-  if (values)
-    {
-      deallocate();
-      values = nullptr;
-    }
 }
 
 
@@ -1022,7 +1008,7 @@ inline
 typename Vector<Number>::iterator
 Vector<Number>::begin ()
 {
-  return values;
+  return values.get();
 }
 
 
@@ -1032,7 +1018,7 @@ inline
 typename Vector<Number>::const_iterator
 Vector<Number>::begin () const
 {
-  return values;
+  return values.get();
 }
 
 
@@ -1042,7 +1028,7 @@ inline
 typename Vector<Number>::iterator
 Vector<Number>::end ()
 {
-  return values + vec_size;
+  return values.get() + vec_size;
 }
 
 
@@ -1052,7 +1038,7 @@ inline
 typename Vector<Number>::const_iterator
 Vector<Number>::end () const
 {
-  return values + vec_size;
+  return values.get() + vec_size;
 }
 
 
@@ -1161,7 +1147,7 @@ Vector<Number>::add (const std::vector<size_type> &indices,
 {
   Assert (indices.size() == values.size(),
           ExcDimensionMismatch(indices.size(), values.size()));
-  add (indices.size(), indices.data(), values.values);
+  add (indices.size(), indices.data(), values.values.get());
 }
 
 
@@ -1238,7 +1224,7 @@ Vector<Number>::save (Archive &ar, const unsigned int) const
   ar &static_cast<const Subscriptor &>(*this);
 
   ar &vec_size &max_vec_size ;
-  ar &boost::serialization::make_array(values, max_vec_size);
+  ar &boost::serialization::make_array(values.get(), max_vec_size);
 }
 
 
@@ -1250,14 +1236,14 @@ void
 Vector<Number>::load (Archive &ar, const unsigned int)
 {
   // get rid of previous content
-  deallocate();
+  values.reset();
 
   // the load stuff again from the archive
   ar &static_cast<Subscriptor &>(*this);
   ar &vec_size &max_vec_size ;
 
   allocate();
-  ar &boost::serialization::make_array(values, max_vec_size);
+  ar &boost::serialization::make_array(values.get(), max_vec_size);
 }
 
 #endif

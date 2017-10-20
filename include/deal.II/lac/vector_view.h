@@ -238,7 +238,9 @@ VectorView<Number>::VectorView(const size_type new_size, Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
-  this->values        = ptr;
+  // release the pointer, but do not delete the object pointed to
+  this->values.release();
+  this->values.reset (ptr);
 }
 
 
@@ -249,7 +251,7 @@ VectorView<Number>::VectorView(const size_type new_size, const Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
-  this->values        = const_cast<Number *>(ptr);
+  this->values.reset (const_cast<Number *>(ptr));
 }
 
 
@@ -262,7 +264,9 @@ VectorView<Number>::~VectorView()
   // memory it doesn't own
   this->vec_size = 0;
   this->max_vec_size = 0;
-  this->values = nullptr;
+
+  // release the pointer, but do not delete the object pointed to
+  this->values.release();
 }
 
 
@@ -284,7 +288,9 @@ void VectorView<Number>::reinit(const size_type new_size, Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
-  this->values        = ptr;
+  // release the pointer, but do not delete the object pointed to
+  this->values.release();
+  this->values.reset (ptr);
 }
 
 
@@ -294,7 +300,9 @@ void VectorView<Number>::reinit(const size_type new_size, const Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
-  this->values        = const_cast<Number *>(ptr);
+  // release the pointer, but do not delete the object pointed to
+  this->values.release();
+  this->values.reset (const_cast<Number *>(ptr));
 }
 
 
