@@ -1082,8 +1082,12 @@ namespace LinearAlgebra
 
       /**
        * Pointer to the array of local elements of this vector.
+       *
+       * Because we allocate these arrays via Utilities::System::posix_memalign,
+       * we need to use a custom deleter for this object that does not call
+       * <code>delete[]</code>, but instead calls @p free().
        */
-      std::unique_ptr<Number[]> values;
+      std::unique_ptr<Number[], void (*)(void *)> values;
 
       /**
        * For parallel loops with TBB, this member variable stores the affinity
