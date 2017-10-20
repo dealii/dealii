@@ -20,6 +20,8 @@
 #include <deal.II/base/partitioner.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <type_traits>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -281,6 +283,31 @@ namespace Utilities
 
 
 
+    namespace internal
+    {
+      // In the import_from_ghosted_array_finish we need to invoke abs() also
+      // on unsigned data types, which is ill-formed on newer C++
+      // standards. To avoid this, we use std::abs on default types but
+      // simply return the number on unsigned types
+      template <typename Number>
+      typename std::enable_if<!std::is_unsigned<Number>::value,
+               typename numbers::NumberTraits<Number>::real_type>::type
+               get_abs (const Number a)
+      {
+        return std::abs(a);
+      }
+
+      template <typename Number>
+      typename std::enable_if<std::is_unsigned<Number>::value, Number>::type
+      get_abs (const Number a)
+      {
+        return a;
+      }
+
+    }
+
+
+
     template <typename Number>
     void
     Partitioner::import_from_ghosted_array_finish(const VectorOperation::values  vector_operation,
@@ -352,8 +379,8 @@ namespace Utilities
                 // the face, values on this face obtained from each side might
                 // be different due to additions being done in different order.
                 Assert(*read_position == Number() ||
-                       std::abs(locally_owned_array[j] - *read_position) <=
-                       std::abs(locally_owned_array[j] + *read_position) *
+                       internal::get_abs(locally_owned_array[j] - *read_position) <=
+                       internal::get_abs(locally_owned_array[j] + *read_position) *
                        100000. *
                        std::numeric_limits<typename numbers::NumberTraits<Number>::real_type>::epsilon(),
                        typename LinearAlgebra::distributed::Vector<Number>::
