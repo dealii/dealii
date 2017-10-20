@@ -238,7 +238,7 @@ VectorView<Number>::VectorView(const size_type new_size, Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
-  this->val           = ptr;
+  this->values        = ptr;
 }
 
 
@@ -249,7 +249,7 @@ VectorView<Number>::VectorView(const size_type new_size, const Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
-  this->val           = const_cast<Number *>(ptr);
+  this->values        = const_cast<Number *>(ptr);
 }
 
 
@@ -262,7 +262,7 @@ VectorView<Number>::~VectorView()
   // memory it doesn't own
   this->vec_size = 0;
   this->max_vec_size = 0;
-  this->val = nullptr;
+  this->values = nullptr;
 }
 
 
@@ -284,7 +284,7 @@ void VectorView<Number>::reinit(const size_type new_size, Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
-  this->val           = ptr;
+  this->values        = ptr;
 }
 
 
@@ -294,7 +294,7 @@ void VectorView<Number>::reinit(const size_type new_size, const Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
-  this->val           = const_cast<Number *>(ptr);
+  this->values        = const_cast<Number *>(ptr);
 }
 
 

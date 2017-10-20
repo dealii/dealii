@@ -922,7 +922,7 @@ protected:
   /**
    * Pointer to the array of elements of this vector.
    */
-  Number *val;
+  Number *values;
 
   /**
    * For parallel loops with TBB, this member variable stores the affinity
@@ -948,13 +948,13 @@ protected:
 private:
 
   /**
-   * Allocate and align @p val along 64-byte boundaries. The size of the
+   * Allocate and align @p values along 64-byte boundaries. The size of the
    * allocated memory is determined by @p max_vec_size .
    */
   void allocate();
 
   /**
-   * Deallocate @p val.
+   * Deallocate @p values.
    */
   void deallocate();
 };
@@ -980,7 +980,7 @@ Vector<Number>::Vector ()
   :
   vec_size(0),
   max_vec_size(0),
-  val(nullptr)
+  values(nullptr)
 {
   reinit(0);
 }
@@ -993,7 +993,7 @@ Vector<Number>::Vector (const InputIterator first, const InputIterator last)
   :
   vec_size (0),
   max_vec_size (0),
-  val (nullptr)
+  values (nullptr)
 {
   // allocate memory. do not initialize it, as we will copy over to it in a
   // second
@@ -1009,7 +1009,7 @@ Vector<Number>::Vector (const size_type n)
   :
   vec_size(0),
   max_vec_size(0),
-  val(nullptr)
+  values(nullptr)
 {
   reinit (n, false);
 }
@@ -1020,10 +1020,10 @@ template <typename Number>
 inline
 Vector<Number>::~Vector ()
 {
-  if (val)
+  if (values)
     {
       deallocate();
-      val=nullptr;
+      values = nullptr;
     }
 }
 
@@ -1052,7 +1052,7 @@ inline
 typename Vector<Number>::iterator
 Vector<Number>::begin ()
 {
-  return val;
+  return values;
 }
 
 
@@ -1062,7 +1062,7 @@ inline
 typename Vector<Number>::const_iterator
 Vector<Number>::begin () const
 {
-  return val;
+  return values;
 }
 
 
@@ -1072,7 +1072,7 @@ inline
 typename Vector<Number>::iterator
 Vector<Number>::end ()
 {
-  return val + vec_size;
+  return values + vec_size;
 }
 
 
@@ -1082,7 +1082,7 @@ inline
 typename Vector<Number>::const_iterator
 Vector<Number>::end () const
 {
-  return val + vec_size;
+  return values + vec_size;
 }
 
 
@@ -1092,7 +1092,7 @@ inline
 Number Vector<Number>::operator() (const size_type i) const
 {
   Assert (i<vec_size, ExcIndexRange(i,0,vec_size));
-  return val[i];
+  return values[i];
 }
 
 
@@ -1102,7 +1102,7 @@ inline
 Number &Vector<Number>::operator() (const size_type i)
 {
   Assert (i<vec_size, ExcIndexRangeType<size_type>(i,0,vec_size));
-  return val[i];
+  return values[i];
 }
 
 
@@ -1191,7 +1191,7 @@ Vector<Number>::add (const std::vector<size_type> &indices,
 {
   Assert (indices.size() == values.size(),
           ExcDimensionMismatch(indices.size(), values.size()));
-  add (indices.size(), indices.data(), values.val);
+  add (indices.size(), indices.data(), values.values);
 }
 
 
@@ -1210,7 +1210,7 @@ Vector<Number>::add (const size_type  n_indices,
       Assert (numbers::is_finite(values[i]),
               ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));
 
-      val[indices[i]] += values[i];
+      this->values[indices[i]] += values[i];
     }
 }
 
@@ -1253,7 +1253,7 @@ Vector<Number>::swap (Vector<Number> &v)
 {
   std::swap (vec_size,     v.vec_size);
   std::swap (max_vec_size, v.max_vec_size);
-  std::swap (val,          v.val);
+  std::swap (values,       v.values);
 }
 
 
@@ -1268,7 +1268,7 @@ Vector<Number>::save (Archive &ar, const unsigned int) const
   ar &static_cast<const Subscriptor &>(*this);
 
   ar &vec_size &max_vec_size ;
-  ar &boost::serialization::make_array(val, max_vec_size);
+  ar &boost::serialization::make_array(values, max_vec_size);
 }
 
 
@@ -1287,7 +1287,7 @@ Vector<Number>::load (Archive &ar, const unsigned int)
   ar &vec_size &max_vec_size ;
 
   allocate();
-  ar &boost::serialization::make_array(val, max_vec_size);
+  ar &boost::serialization::make_array(values, max_vec_size);
 }
 
 #endif
