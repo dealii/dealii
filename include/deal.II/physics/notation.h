@@ -303,6 +303,8 @@ namespace Physics
 
       /**
        * Convert a scalar value to its compressed vector equivalent.
+       *
+       * The output vector has one entry.
        */
       template<typename Number>
       Vector<Number>
@@ -311,6 +313,8 @@ namespace Physics
 
       /**
        * Convert a rank-0 tensor to its compressed vector equivalent.
+       *
+       * The output vector has one entry.
        */
       template<int dim, typename Number>
       Vector<Number>
@@ -319,6 +323,8 @@ namespace Physics
 
       /**
        * Convert a rank-1 tensor to its compressed vector equivalent.
+       *
+       * The output vector has $dim$ entries.
        */
       template<int dim, typename Number>
       Vector<Number>
@@ -327,6 +333,8 @@ namespace Physics
 
       /**
        * Convert a rank-2 tensor to its compressed vector equivalent.
+       *
+       * The output vector has Tensor<2,dim>::n_independent_components entries.
        */
       template<int dim, typename Number>
       Vector<Number>
@@ -335,6 +343,9 @@ namespace Physics
 
       /**
        * Convert a rank-2 symmetric tensor to its compressed vector equivalent.
+       *
+       * The output vector has SymmetricTensor<2,dim>::n_independent_components 
+       * entries.
        */
       template<int dim, typename Number>
       Vector<Number>
@@ -343,6 +354,8 @@ namespace Physics
 
       /**
        * Convert a scalar value to its compressed matrix equivalent.
+       *
+       * The output matrix will have one row and one column.
        */
       template<typename Number>
       FullMatrix<Number>
@@ -351,6 +364,8 @@ namespace Physics
 
       /**
        * Convert a rank-0 tensor to its compressed matrix equivalent.
+       *
+       * The output matrix will have one row and one column.
        */
       template<int dim, typename Number>
       FullMatrix<Number>
@@ -359,6 +374,8 @@ namespace Physics
 
       /**
        * Convert a rank-1 tensor to its compressed matrix equivalent.
+       *
+       * The output matrix will have $dim$ rows and one column.
        */
       template<int dim, typename Number>
       FullMatrix<Number>
@@ -367,6 +384,8 @@ namespace Physics
 
       /**
        * Convert a rank-2 tensor to its compressed matrix equivalent.
+       *
+       * The output matrix will have $dim$ rows and $dim$ columns.
        */
       template<int dim, typename Number>
       FullMatrix<Number>
@@ -375,6 +394,12 @@ namespace Physics
 
       /**
        * Convert a rank-2 symmetric tensor to its compressed matrix equivalent.
+       *
+       * The output matrix will have $dim$ rows and $dim$ columns, with the same
+       * format as the equivalent function for non-symmetric tensors. This is 
+       * because it is not possible to compress the 
+       * SymmetricTensor<2,dim>::n_independent_components unique entries into a 
+       * square matrix.
        */
       template<int dim, typename Number>
       FullMatrix<Number>
@@ -416,6 +441,9 @@ namespace Physics
 
       /**
        * Convert a rank-4 tensor to its compressed matrix equivalent.
+       *
+       * The output matrix will have Tensor<2,dim>::n_independent_components 
+       * rows and Tensor<2,dim>::n_independent_components columns.
        */
       template<int dim, typename Number>
       FullMatrix<Number>
@@ -424,6 +452,9 @@ namespace Physics
 
       /**
        * Convert a rank-4 symmetric tensor to its compressed matrix equivalent.
+       *
+       * The output matrix will have SymmetricTensor<2,dim>::n_independent_components 
+       * rows and SymmetricTensor<2,dim>::n_independent_components columns.
        */
       template<int dim, typename Number>
       FullMatrix<Number>
