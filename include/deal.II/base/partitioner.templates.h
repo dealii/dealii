@@ -283,7 +283,7 @@ namespace Utilities
 
 
 
-    namespace
+    namespace internal
     {
       // In the import_from_ghosted_array_finish we need to invoke abs() also
       // on unsigned data types, which is ill-formed on newer C++
@@ -379,8 +379,8 @@ namespace Utilities
                 // the face, values on this face obtained from each side might
                 // be different due to additions being done in different order.
                 Assert(*read_position == Number() ||
-                       get_abs(locally_owned_array[j] - *read_position) <=
-                       get_abs(locally_owned_array[j] + *read_position) *
+                       internal::get_abs(locally_owned_array[j] - *read_position) <=
+                       internal::get_abs(locally_owned_array[j] + *read_position) *
                        100000. *
                        std::numeric_limits<typename numbers::NumberTraits<Number>::real_type>::epsilon(),
                        typename LinearAlgebra::distributed::Vector<Number>::
