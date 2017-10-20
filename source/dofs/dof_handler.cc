@@ -991,6 +991,12 @@ DoFHandler<dim,spacedim>::memory_consumption () const
 template <int dim, int spacedim>
 void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &ff)
 {
+  Assert(tria!=nullptr,
+         ExcMessage("You need to set the Triangulation in the DoFHandler using initialize() or "
+                    "in the constructor before you can distribute DoFs."));
+  Assert (tria->n_levels() > 0,
+          ExcMessage("The Triangulation you are using is empty!"));
+
   fe_collection = std_cxx14::make_unique<hp::FECollection<dim, spacedim>>(ff);
 
   // delete all levels and set them
