@@ -217,7 +217,7 @@ namespace FETools
     // if we work on parallel distributed
     // vectors, we have to ensure, that we only
     // work on dofs this processor owns.
-    IndexSet  locally_owned_dofs = dof2.locally_owned_dofs();
+    const IndexSet  &locally_owned_dofs = dof2.locally_owned_dofs();
 
     // when a discontinuous element is
     // interpolated to a continuous
@@ -371,7 +371,7 @@ namespace FETools
         // if u1 is a parallel distributed PETSc vector, we create a
         // vector u2 with based on the sets of locally owned and relevant
         // dofs of dof2
-        IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+        const IndexSet  &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
         IndexSet  dof2_locally_relevant_dofs;
         DoFTools::extract_locally_relevant_dofs (dof2,
                                                  dof2_locally_relevant_dofs);
@@ -400,7 +400,7 @@ namespace FETools
         // if u1 is a parallel distributed Trilinos vector, we create a
         // vector u2 with based on the sets of locally owned and relevant
         // dofs of dof2
-        IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+        const IndexSet  &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
         IndexSet  dof2_locally_relevant_dofs;
         DoFTools::extract_locally_relevant_dofs (dof2,
                                                  dof2_locally_relevant_dofs);
@@ -425,7 +425,7 @@ namespace FETools
                              const ConstraintMatrix &constraints2,
                              LinearAlgebra::distributed::Vector<Number> &u1_interpolated)
       {
-        IndexSet dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+        const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
         IndexSet dof2_locally_relevant_dofs;
         DoFTools::extract_locally_relevant_dofs (dof2,
                                                  dof2_locally_relevant_dofs);

@@ -1202,7 +1202,7 @@ namespace VectorTools
                                      enforce_zero_boundary, q_boundary,
                                      project_to_boundary_first);
 
-      const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
+      const IndexSet &locally_owned_dofs = dof.locally_owned_dofs();
       IndexSet::ElementIterator it = locally_owned_dofs.begin();
       for (; it!=locally_owned_dofs.end(); ++it)
         ::dealii::internal::ElementAccess<VectorType>::set(work_result(*it),
@@ -1348,7 +1348,7 @@ namespace VectorTools
 
       constraints.distribute (vec);
 
-      const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
+      const IndexSet &locally_owned_dofs = dof.locally_owned_dofs();
       IndexSet::ElementIterator it = locally_owned_dofs.begin();
       for (; it!=locally_owned_dofs.end(); ++it)
         ::dealii::internal::ElementAccess<VectorType>::set(vec(*it), *it, vec_result);
@@ -1423,7 +1423,7 @@ namespace VectorTools
 
       constraints.distribute (vec);
 
-      const IndexSet locally_owned_dofs = dof.locally_owned_dofs();
+      const IndexSet &locally_owned_dofs = dof.locally_owned_dofs();
       IndexSet::ElementIterator it = locally_owned_dofs.begin();
       for (; it!=locally_owned_dofs.end(); ++it)
         ::dealii::internal::ElementAccess<VectorType>::set(vec(*it), *it, vec_result);
