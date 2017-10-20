@@ -1136,8 +1136,28 @@ DoFHandler<dim,spacedim>::renumber_dofs (const unsigned int                     
 {
   Assert(mg_levels.size()>0 && levels.size()>0,
          ExcMessage("You need to distribute active and level DoFs before you can renumber level DoFs."));
-  AssertIndexRange(level, levels.size());
-  AssertDimension (new_numbers.size(), n_dofs(level));
+  AssertIndexRange(level, get_triangulation().n_global_levels());
+  AssertDimension (new_numbers.size(), locally_owned_mg_dofs(level).n_elements());
+
+#ifdef DEBUG
+  // assert that the new indices are consecutively numbered if we are working
+  // on a single processor. this doesn't need to hold in the case of a
+  // parallel mesh since we map the interval [0...n_dofs(level)) into itself
+  // but only globally, not on each processor
+  if (n_locally_owned_dofs() == n_dofs())
+    {
+      std::vector<types::global_dof_index> tmp(new_numbers);
+      std::sort (tmp.begin(), tmp.end());
+      std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
+      types::global_dof_index i = 0;
+      for (; p!=tmp.end(); ++p, ++i)
+        Assert (*p == i, ExcNewNumbersNotConsecutive(i));
+    }
+  else
+    for (types::global_dof_index i=0; i<new_numbers.size(); ++i)
+      Assert (new_numbers[i] < n_dofs(level),
+              ExcMessage ("New DoF index is not less than the total number of dofs."));
+#endif
 
   mg_number_cache[level] = policy->renumber_mg_dofs (level, new_numbers);
 }
