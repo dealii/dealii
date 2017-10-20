@@ -27,7 +27,6 @@
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/trilinos_epetra_vector.h>
-#  include <deal.II/lac/vector_view.h>
 #  include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/vector_operation.h>
 

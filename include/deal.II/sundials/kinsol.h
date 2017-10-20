@@ -25,7 +25,6 @@
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_view.h>
 #include <deal.II/lac/vector_memory.h>
 
 #include <kinsol/kinsol.h>

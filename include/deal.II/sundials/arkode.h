@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/mpi.h>
+
 #ifdef DEAL_II_WITH_SUNDIALS
 
 #include <deal.II/base/logstream.h>
@@ -26,11 +27,10 @@
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/mpi.h>
 #ifdef DEAL_II_WITH_PETSC
-#include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#  include <deal.II/lac/petsc_parallel_block_vector.h>
+#  include <deal.II/lac/petsc_parallel_vector.h>
 #endif
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_view.h>
 #include <deal.II/lac/vector_memory.h>
 
 
@@ -38,7 +38,7 @@
 #include <arkode/arkode_impl.h>
 #include <nvector/nvector_serial.h>
 #ifdef DEAL_II_WITH_MPI
-#include <nvector/nvector_parallel.h>
+#  include <nvector/nvector_parallel.h>
 #endif
 #include <sundials/sundials_math.h>
 #include <sundials/sundials_types.h>
