@@ -828,7 +828,6 @@ public:
    */
   const IndexSet &locally_owned_mg_dofs(const unsigned int level) const;
 
-
   /**
    * Return a vector that stores the locally owned DoFs of each processor. If
    * you are only interested in the number of elements each processor owns
@@ -839,9 +838,6 @@ public:
    */
   const std::vector<IndexSet> &
   locally_owned_dofs_per_processor () const;
-
-  const std::vector<IndexSet> &
-  locally_owned_mg_dofs_per_processor (const unsigned int level) const;
 
   /**
    * Return a vector that stores the number of degrees of freedom each
@@ -857,6 +853,16 @@ public:
    */
   const std::vector<types::global_dof_index> &
   n_locally_owned_dofs_per_processor () const;
+
+  /**
+   * Return a vector that stores the locally owned DoFs of each processor on
+   * the given level @p level.
+   *
+   * If this is a sequential job, then the vector has a single element that
+   * equals the IndexSet representing the entire range [0,n_dofs()].
+   */
+  const std::vector<IndexSet> &
+  locally_owned_mg_dofs_per_processor (const unsigned int level) const;
 
   /**
    * Return a constant reference to the selected finite element object.
