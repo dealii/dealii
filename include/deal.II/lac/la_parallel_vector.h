@@ -1093,10 +1093,10 @@ namespace LinearAlgebra
 
       /**
        * Temporary storage that holds the data that is sent to this processor
-       * in @p compress() or sent from this processor in @p
-       * update_ghost_values.
+       * in @p compress() or sent from this processor in
+       * @p update_ghost_values.
        */
-      mutable Number *import_data;
+      mutable std::unique_ptr<Number[]> import_data;
 
       /**
        * Stores whether the vector currently allows for reading ghost elements

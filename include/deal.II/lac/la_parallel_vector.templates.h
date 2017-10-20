@@ -94,9 +94,7 @@ namespace LinearAlgebra
       resize_val (size);
 
       // delete previous content in import data
-      if (import_data != nullptr)
-        delete[] import_data;
-      import_data = nullptr;
+      import_data.reset ();
 
       // set partitioner to serial version
       partitioner.reset (new Utilities::MPI::Partitioner (size));
@@ -136,16 +134,11 @@ namespace LinearAlgebra
       else
         zero_out_ghosts();
 
-      if (import_data != nullptr)
-        {
-          delete [] import_data;
-
-          // do not reallocate import_data directly, but only upon request. It
-          // is only used as temporary storage for compress() and
-          // update_ghost_values, and we might have vectors where we never
-          // call these methods and hence do not need to have the storage.
-          import_data = nullptr;
-        }
+      // do not reallocate import_data directly, but only upon request. It
+      // is only used as temporary storage for compress() and
+      // update_ghost_values, and we might have vectors where we never
+      // call these methods and hence do not need to have the storage.
+      import_data.reset ();
 
       thread_loop_partitioner = v.thread_loop_partitioner;
     }
@@ -196,16 +189,12 @@ namespace LinearAlgebra
       // initialize to zero
       this->operator= (Number());
 
-      if (import_data != nullptr)
-        {
-          delete [] import_data;
 
-          // do not reallocate import_data directly, but only upon request. It
-          // is only used as temporary storage for compress() and
-          // update_ghost_values, and we might have vectors where we never
-          // call these methods and hence do not need to have the storage.
-          import_data = nullptr;
-        }
+      // do not reallocate import_data directly, but only upon request. It
+      // is only used as temporary storage for compress() and
+      // update_ghost_values, and we might have vectors where we never
+      // call these methods and hence do not need to have the storage.
+      import_data.reset ();
 
       vector_is_ghosted = false;
     }
@@ -217,8 +206,7 @@ namespace LinearAlgebra
       :
       partitioner (new Utilities::MPI::Partitioner()),
       allocated_size (0),
-      val (nullptr),
-      import_data (nullptr)
+      val (nullptr)
     {
       reinit(0);
     }
@@ -231,7 +219,6 @@ namespace LinearAlgebra
       Subscriptor(),
       allocated_size (0),
       val (nullptr),
-      import_data (nullptr),
       vector_is_ghosted (false)
     {
       reinit (v, true);
@@ -251,7 +238,6 @@ namespace LinearAlgebra
       :
       allocated_size (0),
       val (nullptr),
-      import_data (nullptr),
       vector_is_ghosted (false)
     {
       reinit (local_range, ghost_indices, communicator);
@@ -265,7 +251,6 @@ namespace LinearAlgebra
       :
       allocated_size (0),
       val (nullptr),
-      import_data (nullptr),
       vector_is_ghosted (false)
     {
       reinit (local_range, communicator);
@@ -278,7 +263,6 @@ namespace LinearAlgebra
       :
       allocated_size (0),
       val (nullptr),
-      import_data (nullptr),
       vector_is_ghosted (false)
     {
       reinit (size, false);
@@ -292,7 +276,6 @@ namespace LinearAlgebra
       :
       allocated_size (0),
       val (nullptr),
-      import_data (nullptr),
       vector_is_ghosted (false)
     {
       reinit (partitioner);
@@ -305,11 +288,6 @@ namespace LinearAlgebra
     Vector<Number>::~Vector ()
     {
       resize_val(0);
-
-      if (import_data != nullptr)
-        delete[] import_data;
-      import_data = nullptr;
-
       clear_mpi_requests();
     }
 
@@ -532,12 +510,12 @@ namespace LinearAlgebra
 
       // allocate import_data in case it is not set up yet
       if (import_data == nullptr && partitioner->n_import_indices() > 0)
-        import_data = new Number[partitioner->n_import_indices()];
+        import_data.reset (new Number[partitioner->n_import_indices()]);
 
       partitioner->import_from_ghosted_array_start
       (operation, counter,
        ArrayView<Number>(val + partitioner->local_size(),partitioner->n_ghost_indices()),
-       ArrayView<Number>(import_data, partitioner->n_import_indices()),
+       ArrayView<Number>(import_data.get(), partitioner->n_import_indices()),
        compress_requests);
 #endif
     }
@@ -556,10 +534,11 @@ namespace LinearAlgebra
       Threads::Mutex::ScopedLock lock (mutex);
 
       Assert(partitioner->n_import_indices() == 0 ||
-             import_data != nullptr, ExcNotInitialized());
+             import_data != nullptr,
+             ExcNotInitialized());
       partitioner->import_from_ghosted_array_finish
       (operation,
-       ArrayView<const Number>(import_data, partitioner->n_import_indices()),
+       ArrayView<const Number>(import_data.get(), partitioner->n_import_indices()),
        ArrayView<Number>(val, partitioner->local_size()),
        ArrayView<Number>(val + partitioner->local_size(),partitioner->n_ghost_indices()),
        compress_requests);
@@ -586,12 +565,12 @@ namespace LinearAlgebra
 
       // allocate import_data in case it is not set up yet
       if (import_data == nullptr && partitioner->n_import_indices() > 0)
-        import_data = new Number[partitioner->n_import_indices()];
+        import_data.reset (new Number[partitioner->n_import_indices()]);
 
       partitioner->export_to_ghosted_array_start
       (counter,
        ArrayView<const Number>(val, partitioner->local_size()),
-       ArrayView<Number>(import_data, partitioner->n_import_indices()),
+       ArrayView<Number>(import_data.get(), partitioner->n_import_indices()),
        ArrayView<Number>(val + partitioner->local_size(),partitioner->n_ghost_indices()),
        update_ghost_values_requests);
 
