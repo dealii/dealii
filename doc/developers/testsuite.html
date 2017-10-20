@@ -15,12 +15,13 @@
     <h1>The deal.II Testsuite</h1>
 
     <p>
-      deal.II has a testsuite that has, at the time this article was last
-      updated (April 2015), some 3,600 small programs (growing by roughly
-      one per day) that we run every time we make a change to make sure
-      that no existing functionality is broken. The expected output for
-      every test is stored in an <code>*.output</code>, and when you run a
-      test you are notified if a test produces different output.
+      deal.II has a testsuite with thousands of small programs that we run every time
+      we make a change to make sure
+      that no existing functionality is broken. It is located in the <code>tests/</code>
+      directory of the development repository. The expected output for
+      every test is stored in an <code>*.output</code> next to the <code>.cc</code> file,
+      and when running a test, you are notified if the output differs from the expected
+      output.
     </p>
 
     <p>
@@ -28,9 +29,9 @@
       we add at least one new test to the testsuite, and we also do so if
       we fix a bug, in both cases to make sure that future changes do not
       break this functionality (again). Machines running the testsuite
-      submit the results to
-      <a href="http://cdash.kyomu.43-1.org/index.php?project=deal.II"
-      target="body">a webpage showing the status of our regression tests</a>.
+      submit the results to our cdash 
+      <a href="http://cdash.kyomu.43-1.org/index.php?project=deal.II">CDash instance</a>, 
+      a webpage showing the status of our regression tests.
     </p>
 
     <div class="toc">
@@ -765,9 +766,8 @@ ctest -D&lt;variable&gt;=&lt;value&gt; [...]
 <pre>
 CTEST_SOURCE_DIRECTORY
   - The source directory of deal.II
-  - If unspecified, "../deal.II" and "../../" relative to the location
-    of this script is used. If this is not a source directory, an error
-    thrown.
+  - If unspecified, "../" relative to the location of this script is
+    used. If this is not a source directory, an error is thrown.
 
 CTEST_BINARY_DIRECTORY
   - The designated build directory (already configured, empty, or non
@@ -779,12 +779,12 @@ CTEST_BINARY_DIRECTORY
 CTEST_CMAKE_GENERATOR
   - The CMake Generator to use (e.g. "Unix Makefiles", or "Ninja", see
     $ man cmake)
-  - If unspecified the current generator of a configured build directory
-    will be used, otherwise "Unix Makefiles".
+  - If unspecified the generator of a configured build directory will
+    be used, otherwise "Unix Makefiles".
 
 TRACK
-  - The track the test should be submitted to. Defaults to "Experimental".
-    Possible values are:
+  - The track the test should be submitted to. Defaults to
+    "Experimental". Possible values are:
 
     "Experimental"     - all tests that are not specifically "build" or
                          "regression" tests should go into this track
@@ -793,13 +793,12 @@ TRACK
                          directory (without actually running the
                          testsuite)
 
-    "Nightly"          - Reserved for nightly regression tests for
-                         build bots on various architectures
+    "Regression Tests" - Reserved for the "official" regression tester
 
-    "Regression Tests" - Reserved for the regression tester
+    "Continuous"       - Reserved for the "official" regression tester
 
 CONFIG_FILE
-  - A configuration file (see docs/users/config.sample)
+  - A configuration file (see doc/users/config.sample)
     that will be used during the configuration stage (invokes
     $ cmake -C ${CONFIG_FILE}). This only has an effect if
     CTEST_BINARY_DIRECTORY is empty.
@@ -809,15 +808,20 @@ DESCRIPTION
 
 COVERAGE
   - If set to ON deal.II will be configured with
-    DEAL_II_SETUP_COVERAGE=ON, CMAKE_BUILD_TYPE=Debug and the
-    CTEST_COVERAGE() stage will be run. Test results must go into the
-    "Experimental" section.
+  DEAL_II_SETUP_COVERAGE=ON, CMAKE_BUILD_TYPE=Debug and the
+  CTEST_COVERAGE() stage will be run. Test results must go into the
+  "Experimental" section.
 
 MAKEOPTS
   - Additional options that will be passed directly to make (or ninja).
 </pre>
-      Furthermore, the variables described <a href="#setup">above</a> can also be
-      set and will be handed automatically down to <code>cmake</code>.
+
+      Furthermore, the variables TEST_TIME_LIMIT and TEST_PICKUP_REGEX (as
+      described <a href="#setupbuild">above</a>), DIFF_DIR, and NUMDIFF_DIR
+      can also be set and will be handed automatically down
+      to <code>cmake</code>. For more details on the different tracks, see
+      the <a href="https://github.com/dealii/dealii/wiki/Testing-Infrastructure">
+      Testing Infrastructure Wiki page</a>.
     </p>
 
 
