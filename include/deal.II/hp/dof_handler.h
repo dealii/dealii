@@ -682,10 +682,6 @@ namespace hp
     /**
      * Exception
      */
-    DeclException0 (ExcInvalidTriangulation);
-    /**
-     * Exception
-     */
     DeclException0 (ExcNoFESelected);
     /**
      * Exception

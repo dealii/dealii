@@ -606,8 +606,7 @@ namespace internal
           Assert (dof_handler.finite_elements->size() > 0,
                   typename BaseClass::ExcNoFESelected());
           Assert (dof_handler.tria->n_levels() > 0,
-                  typename
-                  BaseClass::ExcInvalidTriangulation());
+                  ExcMessage("The current Triangulation must not be empty."));
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
                   ExcInternalError ());
 
@@ -633,7 +632,7 @@ namespace internal
           Assert (dof_handler.finite_elements->size() > 0,
                   typename BaseClass::ExcNoFESelected());
           Assert (dof_handler.tria->n_levels() > 0,
-                  typename BaseClass::ExcInvalidTriangulation());
+                  ExcMessage("The current Triangulation must not be empty."));
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
                   ExcInternalError ());
 
@@ -663,7 +662,7 @@ namespace internal
           Assert (dof_handler.finite_elements->size() > 0,
                   typename BaseClass::ExcNoFESelected());
           Assert (dof_handler.tria->n_levels() > 0,
-                  typename BaseClass::ExcInvalidTriangulation());
+                  ExcMessage("The current Triangulation must not be empty."));
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
                   ExcInternalError ());
 
