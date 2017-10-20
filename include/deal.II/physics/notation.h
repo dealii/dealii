@@ -46,13 +46,13 @@ namespace Physics
      *  S_{00}          & S_{01}          & S_{02} \\
      *  S_{10} = S_{01} & S_{11}          & S_{12} \\
      *  S_{20} = S_{02} & S_{21} = S_{12} & S_{22}
-     * \end{array}\right]
+     * \end{array} \right]
      * \quad \Rightarrow \quad
      * \left[ \begin{array}{ccc}
      *  n = 0 & n = 5 & n = 4 \\
      *  sym   & n = 1 & n = 3 \\
-     *  sym   & sym   & n = 2}
-     * \end{array}\right] ,
+     *  sym   & sym   & n = 2
+     * \end{array} \right] ,
      * @f]
      * where $n$ denotes the Kelvin index for the tensor component,
      * while for a general rank-2 tensor $\mathbf{T}$
@@ -66,18 +66,18 @@ namespace Physics
      * \left[ \begin{array}{ccc}
      *  n = 0 & n = 5 & n = 4 \\
      *  n = 6 & n = 1 & n = 3 \\
-     *  n = 7 & n = 8 & n = 2}
+     *  n = 7 & n = 8 & n = 2
      * \end{array}\right] ,
      * @f]
      * and for a rank-1 tensor $\mathbf{v}$
      * @f[
-     * \mathbf{v} := \left[ \begin{array}{ccc}
-     *  v_{0} & v_{1} & v_{2}
-     * \end{array}\right]^{T}
+     * \mathbf{v} := \left[ \begin{array}{c}
+     *  v_{0} \\ v_{1} \\ v_{2}
+     * \end{array}\right]
      * \quad \Rightarrow \quad
-     * \left[ \begin{array}{ccc}
-     *  n = 0 & n = 1 & n = 2
-     * \end{array}\right]^{T} .
+     * \left[ \begin{array}{c}
+     *  n = 0 \\ n = 1 \\ n = 2
+     * \end{array}\right] .
      * @f]
      * To summarize, the relationship between tensor and Kelvin indices for both
      * the three-dimensional case and the analogously discerned two-dimensional
@@ -173,7 +173,7 @@ namespace Physics
      * @f[
      * \mathbf{S} = \cal{C} : \mathbf{E}
      * \quad \Rightarrow   \quad
-     * \tilde{\mathbf{S}} = \tilde{\cal{C}} \tilde{\mathbf{E}}
+     * \tilde{\mathbf{S}} = \tilde{\cal{C}} \; \tilde{\mathbf{E}}
      * @f]
      * and
      * @f[
