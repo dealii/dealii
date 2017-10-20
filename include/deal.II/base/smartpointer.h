@@ -236,7 +236,7 @@ SmartPointer<T,P>::SmartPointer (const SmartPointer<T,Q> &tt)
   :
   t (tt.t), id(tt.id)
 {
-  if (t != 0)
+  if (t != nullptr)
     t->subscribe(id);
 }
 
@@ -269,11 +269,11 @@ inline
 void
 SmartPointer<T,P>::clear ()
 {
-  if (t != 0)
+  if (t != nullptr)
     {
       t->unsubscribe(id);
       delete t;
-      t = 0;
+      t = nullptr;
     }
 }
 
@@ -310,10 +310,10 @@ SmartPointer<T,P>::operator = (const SmartPointer<T,Q> &tt)
   if (&tt == this)
     return *this;
 
-  if (t != 0)
+  if (t != nullptr)
     t->unsubscribe(id);
   t = static_cast<T *>(tt);
-  if (tt != 0)
+  if (tt != nullptr)
     tt->subscribe(id);
   return *this;
 }
@@ -390,12 +390,12 @@ template <typename T, typename P>
 inline
 void SmartPointer<T,P>::swap (T *&tt)
 {
-  if (t != 0)
+  if (t != nullptr)
     t->unsubscribe (id);
 
   std::swap (t, tt);
 
-  if (t != 0)
+  if (t != nullptr)
     t->subscribe (id);
 }
 
