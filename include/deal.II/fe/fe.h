@@ -2398,15 +2398,20 @@ protected:
    *
    * For each component number <tt>c</tt>, the entries have the following
    * meaning: <dl> <dt><tt>table[c].first.first</tt></dt> <dd>Number of the
-   * base element for <tt>c</tt>.</dd> <dt><tt>table[c].first.second</tt></dt>
-   * <dd>Component in the base element for <tt>c</tt>.</dd>
-   * <dt><tt>table[c].second</tt></dt> <dd>Multiple of the base element for
-   * <tt>c</tt>.</dd> </dl>
+   * base element for <tt>c</tt>. This is the index you can pass to
+   * base_element().</dd> <dt><tt>table[c].first.second</tt></dt>
+   * <dd>Component within the base element for <tt>c</tt>. This value is
+   * between 0 and the n_components() of this base element.</dd>
+   * <dt><tt>table[c].second</tt></dt> <dd>Index of the multiple of the base
+   * element that contains <tt>c</tt>. This value is between 0 and the
+   * element_multiplicity() of this base element.</dd> </dl>
    *
    * This variable is set to the correct size by the constructor of this
    * class, but needs to be initialized by derived classes, unless its size is
    * one and the only entry is a zero, which is the case for scalar elements.
    * In that case, the initialization by the base class is sufficient.
+   *
+   * @note This table is filled by FETools::Compositing::build_cell_tables().
    */
   std::vector<std::pair<std::pair<unsigned int, unsigned int>, unsigned int> >
   component_to_base_table;
