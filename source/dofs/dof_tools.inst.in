@@ -23,6 +23,18 @@ for (deal_II_dimension : DIMENSIONS)
     DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension-1,deal_II_dimension > >
     (const DoFHandler<deal_II_dimension-1,deal_II_dimension > & dof_handler,
      IndexSet & dof_set);
+    template
+    void
+    DoFTools::extract_locally_relevant_level_dofs<DoFHandler<deal_II_dimension-1,deal_II_dimension > >
+    (const DoFHandler<deal_II_dimension-1,deal_II_dimension > & dof_handler,
+     const unsigned int level,
+     IndexSet & dof_set);
+    template
+    void
+    DoFTools::extract_locally_relevant_level_dofs<hp::DoFHandler<deal_II_dimension-1,deal_II_dimension > >
+    (const hp::DoFHandler<deal_II_dimension-1,deal_II_dimension > & dof_handler,
+     const unsigned int level,
+     IndexSet & dof_set);
 #endif
 
 #if deal_II_dimension > 2
@@ -30,6 +42,18 @@ for (deal_II_dimension : DIMENSIONS)
     void
     DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension-2,deal_II_dimension > >
     (const DoFHandler<deal_II_dimension-2,deal_II_dimension > & dof_handler,
+     IndexSet & dof_set);
+    template
+    void
+    DoFTools::extract_locally_relevant_level_dofs<DoFHandler<deal_II_dimension-2,deal_II_dimension > >
+    (const DoFHandler<deal_II_dimension-2,deal_II_dimension > & dof_handler,
+     const unsigned int level,
+     IndexSet & dof_set);
+    template
+    void
+    DoFTools::extract_locally_relevant_level_dofs<hp::DoFHandler<deal_II_dimension-2,deal_II_dimension > >
+    (const hp::DoFHandler<deal_II_dimension-2,deal_II_dimension > & dof_handler,
+     const unsigned int level,
      IndexSet & dof_set);
 #endif
 
@@ -226,6 +250,13 @@ for (deal_II_dimension : DIMENSIONS)
     void
     DoFTools::extract_locally_relevant_level_dofs<DoFHandler<deal_II_dimension> >
     (const DoFHandler<deal_II_dimension> & dof_handler,
+     const unsigned int level,
+     IndexSet & dof_set);
+
+    template
+    void
+    DoFTools::extract_locally_relevant_level_dofs<hp::DoFHandler<deal_II_dimension> >
+    (const hp::DoFHandler<deal_II_dimension> & dof_handler,
      const unsigned int level,
      IndexSet & dof_set);
 
