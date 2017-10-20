@@ -121,11 +121,11 @@ for all discrete test functions $v_h$ there holds
 @f[
   (\beta \cdot \nabla u_h, v_h + \delta \beta\cdot\nabla v_h)_\Omega
   -
-  (\beta\cdot {\mathbf n} u_h, v_h)_{\partial\Omega_-}
+  (u_h, \beta\cdot {\mathbf n} v_h)_{\partial\Omega_-}
   =
   (f, v_h + \delta \beta\cdot\nabla v_h)_\Omega
   -
-  (\beta\cdot {\mathbf n} g, v_h)_{\partial\Omega_-}.
+  (g, \beta\cdot {\mathbf n} v_h)_{\partial\Omega_-}.
 @f]
 
 
@@ -136,18 +136,18 @@ to be inverted of the form
   (\beta \cdot \nabla \varphi_i,
    \varphi_j + \delta \beta\cdot\nabla \varphi_j)_\Omega
   -
-  (\beta\cdot {\mathbf n} \varphi_i, \varphi_j)_{\partial\Omega_-},
+  (\varphi_i, \beta\cdot {\mathbf n} \varphi_j)_{\partial\Omega_-},
 @f]
 with basis functions $\varphi_i,\varphi_j$.  However, this is a
 pitfall that happens to every numerical analyst at least once
 (including the author): we have here expanded the solution
-$u_h = \sum_i u_i \varphi_i$, but if we do so, we will have to solve the
+$u_h = \sum_i U_i \varphi_i$, but if we do so, we will have to solve the
 problem
 @f[
-  {\mathbf u}^T A = {\mathbf f}^T,
+  U^T A = F^T,
 @f]
-where ${\mathbf u}=(u_i)$, i.e., we have to solve the transpose problem of
-what we might have expected naively.
+where $U$ is the vector of expansion coefficients, i.e., we have to
+solve the transpose problem of what we might have expected naively.
 
 This is a point we made in the introduction of step-3. There, we argued that
 to avoid this very kind of problem, one should get in the habit of always
