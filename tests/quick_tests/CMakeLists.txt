@@ -36,7 +36,11 @@ MACRO(make_quicktest test_basename build_name mpi_run)
   STRING(TOLOWER ${build_name} _build_lowercase)
   SET(_target ${test_basename}.${_build_lowercase})
   LIST(APPEND ALL_TESTS "${_target}")
-  ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${test_basename}.cc)
+  IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${test_basename}.cc")
+    ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${test_basename}.cc)
+  ELSE()
+    ADD_EXECUTABLE(${_target} EXCLUDE_FROM_ALL ${test_basename}.cu)
+  ENDIF()
   DEAL_II_INSOURCE_SETUP_TARGET(${_target} ${build_name})
 
   IF("${mpi_run}" STREQUAL "")
@@ -162,6 +166,11 @@ ENDIF()
 # Test Assimp
 IF (DEAL_II_WITH_ASSIMP)
   make_quicktest("assimp" ${_mybuild} "")
+ENDIF()
+
+# Test CUDA
+IF (DEAL_II_WITH_CUDA)
+  make_quicktest("cuda" ${_mybuild} "")
 ENDIF()
 
 
