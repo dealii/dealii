@@ -1083,7 +1083,7 @@ namespace LinearAlgebra
       /**
        * Pointer to the array of local elements of this vector.
        */
-      Number         *val;
+      std::unique_ptr<Number[]> val;
 
       /**
        * For parallel loops with TBB, this member variable stores the affinity
@@ -1263,7 +1263,7 @@ namespace LinearAlgebra
     typename Vector<Number>::iterator
     Vector<Number>::begin ()
     {
-      return val;
+      return val.get();
     }
 
 
@@ -1273,7 +1273,7 @@ namespace LinearAlgebra
     typename Vector<Number>::const_iterator
     Vector<Number>::begin () const
     {
-      return val;
+      return val.get();
     }
 
 
@@ -1283,7 +1283,7 @@ namespace LinearAlgebra
     typename Vector<Number>::iterator
     Vector<Number>::end ()
     {
-      return val+partitioner->local_size();
+      return val.get()+partitioner->local_size();
     }
 
 
@@ -1293,7 +1293,7 @@ namespace LinearAlgebra
     typename Vector<Number>::const_iterator
     Vector<Number>::end () const
     {
-      return val+partitioner->local_size();
+      return val.get()+partitioner->local_size();
     }
 
 
