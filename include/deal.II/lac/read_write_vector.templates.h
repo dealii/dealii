@@ -220,8 +220,12 @@ namespace LinearAlgebra
     Assert(s==static_cast<Number>(0), ExcMessage("Only 0 can be assigned to a vector."));
     (void)s;
 
-    dealii::internal::VectorOperations::Vector_set<Number> setter(Number(), val);
-    dealii::internal::VectorOperations::parallel_for(setter, 0, n_elements(), thread_loop_partitioner);
+    const size_type this_size = n_elements();
+    if (this_size>0)
+      {
+        dealii::internal::VectorOperations::Vector_set<Number> setter(Number(), val);
+        dealii::internal::VectorOperations::parallel_for(setter, 0, this_size, thread_loop_partitioner);
+      }
 
     return *this;
   }
