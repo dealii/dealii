@@ -249,7 +249,7 @@ namespace Functions
     /// The angle of the reentrant corner, set to 3*pi/2
     const double omega;
     /// The exponent of the radius, computed as the solution to
-    /// $\sin(\lambda\omega)+\lambda*sin(\omega)=0$
+    /// $\sin(\lambda\omega)+\lambda \sin(\omega)=0$
     static const double lambda;
     /// Cosine of lambda times omega
     const double coslo;

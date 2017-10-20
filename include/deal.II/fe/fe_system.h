@@ -510,7 +510,6 @@ public:
    */
   virtual std::string get_name () const;
 
-  // for documentation, see the FiniteElement base class
   virtual
   std::unique_ptr<FiniteElement<dim,spacedim> >
   clone() const;
