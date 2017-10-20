@@ -53,12 +53,21 @@ be negative if the transport direction $\beta$ points inward, i.e. at
 the inflow boundary. The mathematical theory states that we must not
 pose any boundary condition on the outflow part of the boundary.
 
-As it is stated, the transport equation is not stably solvable using
+As stated, the transport equation cannot be solved in a stable way using
 the standard finite element method, however. The problem is that
 solutions to this equation possess only insufficient regularity
-orthogonal to the transport direction: while they are smooth %parallel
-to $\beta$, they may be discontinuous perpendicular to this
-direction. These discontinuities lead to numerical instabilities that
+perpendicular to the transport direction: while they are smooth along
+the streamlines defined by the "wind field"
+$\beta$, they may be discontinuous perpendicular to this
+direction. This is easy to understand: what the equation $\beta \cdot
+\nabla u = f$ means is in essence that the <i>rate of change of $u$ in
+direction $\beta$ equals $f$</i>. But the equation has no implications
+for the derivatives in the perpendicular direction, and consequently
+if $u$ is discontinuous at a point on the inflow boundary, then this
+discontinuity will simply be transported along the streamline of the
+wind field that starts at this boundary point.
+
+These discontinuities lead to numerical instabilities that
 make a stable solution by a straight-forward discretization
 impossible. We will thus use the streamline diffusion stabilized
 formulation, in which we test the equation with test functions $v +
@@ -66,14 +75,48 @@ formulation, in which we test the equation with test functions $v +
 parameter that is chosen in the range of the (local) mesh width $h$;
 good results are usually obtained by setting $\delta=0.1h$. Note that
 the modification in the test function vanishes as the mesh size tends
-to zero. We will not discuss reasons, pros, and cons of the streamline
+to zero. The modification in the test function can be thought as
+adding a small amount of diffusion along the direction $\beta$ of the
+wind field, i.e., along "stream lines".
+We will not discuss reasons, pros, and cons of the streamline
 diffusion method, but rather use it "as is", and refer the
 interested reader to the sufficiently available literature; every
 recent good book on finite elements should have a discussion of that
 topic.
 
-Using the test functions as defined above, the weak formulation of
-our stabilized problem reads: find a discrete function $u_h$ such that
+Using the test functions as defined above, an initial weak form of the
+problem would ask for finding a function $u_h$ so that for all test
+functions $v_h$ we have
+@f[
+  (\beta \cdot \nabla u_h, v_h + \delta \beta\cdot\nabla v_h)_\Omega
+  =
+  (f, v_h + \delta \beta\cdot\nabla v_h)_\Omega.
+@f]
+However, we would like to include inflow boundary conditions $u=g$
+weakly into this problem, and this can be done by requiring that in
+addition to the equation above we also have
+@f[
+  (u_h, w_h)_{\partial\Omega_-}
+  =
+  (g, w_h)_{\partial\Omega_-}
+@f]
+for all test functions $w_h$ that live on the boundary and that are
+from a suitable test space. It turns out that a suitable space of test
+functions happens to be $\beta\cdot {\mathbf n}$ times the traces of
+the functions $v_h$ in the test space we already use for the
+differential equation in the domain. Thus, we require that for all
+test functions $v_h$ we have
+@f[
+  (u_h, \beta\cdot {\mathbf n} v_h)_{\partial\Omega_-}
+  =
+  (g, \beta\cdot {\mathbf n} v_h)_{\partial\Omega_-}.
+@f]
+Without attempting a justification (see again the literature on the finite
+element method in general, and the streamline diffusion method in
+particular), we can combine the equations for the differential
+equation and the boundary values in the following
+weak formulation of
+our stabilized problem: find a discrete function $u_h$ such that
 for all discrete test functions $v_h$ there holds
 @f[
   (\beta \cdot \nabla u_h, v_h + \delta \beta\cdot\nabla v_h)_\Omega
@@ -84,10 +127,9 @@ for all discrete test functions $v_h$ there holds
   -
   (\beta\cdot {\mathbf n} g, v_h)_{\partial\Omega_-}.
 @f]
-Note that we have included the inflow boundary values into the weak
-form, and that the respective terms to the left hand side operator are
-positive definite due to the fact that $\beta\cdot{\mathbf n}<0$ on the
-inflow boundary. One would think that this leads to a system matrix
+
+
+One would think that this leads to a system matrix
 to be inverted of the form
 @f[
   a_{ij} =
@@ -99,7 +141,7 @@ to be inverted of the form
 with basis functions $\varphi_i,\varphi_j$.  However, this is a
 pitfall that happens to every numerical analyst at least once
 (including the author): we have here expanded the solution
-$u_h = u_i \varphi_i$, but if we do so, we will have to solve the
+$u_h = \sum_i u_i \varphi_i$, but if we do so, we will have to solve the
 problem
 @f[
   {\mathbf u}^T A = {\mathbf f}^T,
@@ -132,15 +174,20 @@ and then to obtain
 @f]
 as system matrix. We will assemble this matrix in the program.
 
-There remains the solution of this linear system of equations. As the
+
+<h3>Solving the linear system that corresponds to the advection equation</h3>
+
+As the
 resulting matrix is no longer symmetric positive definite, we can't
-employ the usual CG method any more. Suitable for the solution of
-systems as the one at hand is the BiCGStab (bi-conjugate gradients
-stabilized) method, which is also available in deal.II, so we will use
-it.
+employ the usual Conjugate Gradient method (implemented in the
+SolverCG class) any more. Instead, we use the BiCGStab (bi-conjugate gradients
+stabilized) method (implemented in SolverBicgstab) that is suitable
+for problems of the kind we have here.
 
 
-Regarding the exact form of the problem which we will solve, we use
+<h3>The test case</h3>
+
+For the problem which we will solve in this tutorial program, we use
 the following domain and functions (in $d=2$ space dimensions):
 @f{eqnarray*}
   \Omega &=& [-1,1]^d \\
@@ -170,9 +217,10 @@ the following domain and functions (in $d=2$ space dimensions):
   &=&
   e^{5(1-|{\mathbf x}|^2)} \sin(16\pi|{\mathbf x}|^2).
 @f}
-For $d>2$, we extend $\beta$ and ${\mathbf x}_0$ by the same as the last
-component. Regarding these functions, we have the following
-comments:
+For $d>2$, we extend $\beta$ and ${\mathbf x}_0$ by simply duplicating
+the last of the components shown above one more time.
+
+With all of this, the following comments are in order:
 <ol>
 <li> The advection field $\beta$ transports the solution roughly in
 diagonal direction from lower left to upper right, but with a wiggle
