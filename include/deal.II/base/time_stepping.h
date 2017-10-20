@@ -165,8 +165,8 @@ namespace TimeStepping
      * evolve_one_time_step returns the time at the end of the time step.
      */
     virtual double evolve_one_time_step
-    (std::function<VectorType (const double, const VectorType &)>               f,
-     std::function<VectorType (const double, const double, const VectorType &)> id_minus_tau_J_inverse,
+    (const std::function<VectorType (const double, const VectorType &)>               &f,
+     const std::function<VectorType (const double, const double, const VectorType &)> &id_minus_tau_J_inverse,
      double                                                                     t,
      double                                                                     delta_t,
      VectorType                                                                 &y) = 0;
@@ -234,8 +234,8 @@ namespace TimeStepping
      * end of the time step.
      */
     double evolve_one_time_step
-    (std::function<VectorType (const double, const VectorType &)>                f,
-     std::function<VectorType (const double, const double, const VectorType &)>  id_minus_tau_J_inverse,
+    (const std::function<VectorType (const double, const VectorType &)>                &f,
+     const std::function<VectorType (const double, const double, const VectorType &)>  &id_minus_tau_J_inverse,
      double                                                                      t,
      double                                                                      delta_t,
      VectorType                                                                  &y);
@@ -248,7 +248,7 @@ namespace TimeStepping
      * step.
      */
     double evolve_one_time_step
-    (std::function<VectorType (const double, const VectorType &)> f,
+    (const std::function<VectorType (const double, const VectorType &)> &f,
      double                                                       t,
      double                                                       delta_t,
      VectorType                                                   &y);
@@ -276,7 +276,7 @@ namespace TimeStepping
      * Compute the different stages needed.
      */
     void compute_stages
-    (std::function<VectorType (const double, const VectorType &)> f,
+    (const std::function<VectorType (const double, const VectorType &)> &f,
      const double                                                 t,
      const double                                                 delta_t,
      const VectorType                                             &y,
@@ -333,11 +333,11 @@ namespace TimeStepping
      * returns the time at the end of the time step.
      */
     double evolve_one_time_step
-    (std::function<VectorType (const double, const VectorType &)>               f,
-     std::function<VectorType (const double, const double, const VectorType &)> id_minus_tau_J_inverse,
-     double                                                                     t,
-     double                                                                     delta_t,
-     VectorType                                                                 &y);
+    (const std::function<VectorType (const double, const VectorType &)>               &f,
+     const std::function<VectorType (const double, const double, const VectorType &)> &id_minus_tau_J_inverse,
+     double                                                                           t,
+     double                                                                           delta_t,
+     VectorType                                                                       &y);
 
     /**
      * Set the maximum number of iterations and the tolerance used by the
@@ -374,30 +374,30 @@ namespace TimeStepping
      * Compute the different stages needed.
      */
     void compute_stages
-    (std::function<VectorType (const double, const VectorType &)>               f,
-     std::function<VectorType (const double, const double, const VectorType &)> id_minus_tau_J_inverse,
-     double                                                                     t,
-     double                                                                     delta_t,
-     VectorType                                                                 &y,
+    (const std::function<VectorType (const double, const VectorType &)>               &f,
+     const std::function<VectorType (const double, const double, const VectorType &)> &id_minus_tau_J_inverse,
+     double                                                                           t,
+     double                                                                           delta_t,
+     VectorType                                                                       &y,
      std::vector<VectorType> &f_stages);
 
     /**
      * Newton solver used for the implicit stages.
      */
-    void newton_solve(std::function<void (const VectorType &,VectorType &)> get_residual,
-                      std::function<VectorType (const VectorType &)>        id_minus_tau_J_inverse,
-                      VectorType                                            &y);
+    void newton_solve(const std::function<void (const VectorType &,VectorType &)> &get_residual,
+                      const std::function<VectorType (const VectorType &)>        &id_minus_tau_J_inverse,
+                      VectorType                                                  &y);
 
     /**
      * Compute the residual needed by the Newton solver.
      */
-    void compute_residual(std::function<VectorType (const double, const VectorType &)> f,
-                          double                                                       t,
-                          double                                                       delta_t,
-                          const VectorType                                             &new_y,
-                          const VectorType                                             &y,
-                          VectorType                                                   &tendency,
-                          VectorType                                                   &residual) const;
+    void compute_residual(const std::function<VectorType (const double, const VectorType &)> &f,
+                          double                                                             t,
+                          double                                                             delta_t,
+                          const VectorType                                                   &new_y,
+                          const VectorType                                                   &y,
+                          VectorType                                                         &tendency,
+                          VectorType                                                         &residual) const;
 
     /**
      * When using SDIRK, there is no need to compute the linear combination of
@@ -483,8 +483,8 @@ namespace TimeStepping
      * at the end of the time step.
      */
     double evolve_one_time_step
-    (std::function<VectorType (const double, const VectorType &)>               f,
-     std::function<VectorType (const double, const double, const VectorType &)> id_minus_tau_J_inverse,
+    (const std::function<VectorType (const double, const VectorType &)>               &f,
+     const std::function<VectorType (const double, const double, const VectorType &)> &id_minus_tau_J_inverse,
      double                                                                     t,
      double                                                                     delta_t,
      VectorType &y);
@@ -497,7 +497,7 @@ namespace TimeStepping
      * step.
      */
     double evolve_one_time_step
-    (std::function<VectorType (const double, const VectorType &)> f,
+    (const std::function<VectorType (const double, const VectorType &)> &f,
      double                                                       t,
      double                                                       delta_t,
      VectorType &y);
@@ -536,7 +536,7 @@ namespace TimeStepping
     /**
      * Compute the different stages needed.
      */
-    void compute_stages(std::function<VectorType (const double, const VectorType &)> f,
+    void compute_stages(const std::function<VectorType (const double, const VectorType &)> &f,
                         const double                                                 t,
                         const double                                                 delta_t,
                         const VectorType                                             &y,

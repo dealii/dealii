@@ -897,7 +897,7 @@ namespace VectorTools
                 const DoFHandler<dim,spacedim> &dof,
                 const ConstraintMatrix         &constraints,
                 const Quadrature<dim>          &quadrature,
-                const std::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                const std::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> &func,
                 VectorType                     &vec_result);
 
   /**
@@ -924,7 +924,7 @@ namespace VectorTools
   void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
                 const ConstraintMatrix &constraints,
                 const unsigned int n_q_points_1d,
-                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> &func,
                 VectorType &vec_result);
 
   /**
@@ -933,7 +933,7 @@ namespace VectorTools
   template <int dim, typename VectorType>
   void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
                 const ConstraintMatrix &constraints,
-                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> &func,
                 VectorType &vec_result);
 
   /**

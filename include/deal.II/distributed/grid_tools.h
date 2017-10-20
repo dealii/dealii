@@ -128,8 +128,8 @@ namespace parallel
     template <typename DataType, typename MeshType>
     void
     exchange_cell_data_to_ghosts (const MeshType &mesh,
-                                  std::function<boost::optional<DataType> (const typename MeshType::active_cell_iterator &)> pack,
-                                  std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> unpack);
+                                  const std::function<boost::optional<DataType> (const typename MeshType::active_cell_iterator &)> &pack,
+                                  const std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> &unpack);
   }
 
 
@@ -260,8 +260,8 @@ namespace parallel
     template <typename DataType, typename MeshType>
     void
     exchange_cell_data_to_ghosts (const MeshType &mesh,
-                                  std::function<boost::optional<DataType> (const typename MeshType::active_cell_iterator &)> pack,
-                                  std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> unpack)
+                                  const std::function<boost::optional<DataType> (const typename MeshType::active_cell_iterator &)> &pack,
+                                  const std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> &unpack)
     {
 #ifndef DEAL_II_WITH_MPI
       (void)mesh;

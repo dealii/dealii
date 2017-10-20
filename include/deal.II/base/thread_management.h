@@ -893,7 +893,7 @@ namespace Threads
        * The function that runs on the thread.
        */
       static
-      void thread_entry_point (const std::function<RT ()> function,
+      void thread_entry_point (const std::function<RT ()> &function,
                                std::shared_ptr<return_value<RT> > ret_val)
       {
         // call the function in question. since an exception that is

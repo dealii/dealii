@@ -1262,7 +1262,7 @@ namespace VectorTools
                            const DoFHandler<dim,spacedim> &dof,
                            const ConstraintMatrix         &constraints,
                            const Quadrature<dim>          &quadrature,
-                           const std::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                           const std::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> &func,
                            VectorType                     &vec_result)
     {
       typedef typename VectorType::value_type Number;
@@ -1360,7 +1360,7 @@ namespace VectorTools
     template <int dim, typename VectorType, int spacedim, int fe_degree, int n_q_points_1d>
     void project_parallel (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                            const ConstraintMatrix &constraints,
-                           const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                           const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> &func,
                            VectorType &vec_result)
     {
       const DoFHandler<dim,spacedim> &dof = matrix_free->get_dof_handler();
@@ -1438,7 +1438,7 @@ namespace VectorTools
                 const DoFHandler<dim,spacedim> &dof,
                 const ConstraintMatrix         &constraints,
                 const Quadrature<dim>          &quadrature,
-                const std::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> func,
+                const std::function< typename VectorType::value_type (const typename DoFHandler<dim, spacedim>::active_cell_iterator &, const unsigned int)> &func,
                 VectorType                     &vec_result)
   {
     switch (dof.get_fe().degree)
@@ -1463,7 +1463,7 @@ namespace VectorTools
   void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                 const ConstraintMatrix &constraints,
                 const unsigned int n_q_points_1d,
-                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> &func,
                 VectorType &vec_result)
   {
     (void) n_q_points_1d;
@@ -1493,7 +1493,7 @@ namespace VectorTools
   template <int dim, typename VectorType>
   void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                 const ConstraintMatrix &constraints,
-                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> func,
+                const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> &func,
                 VectorType &vec_result)
   {
     project (matrix_free,
