@@ -58,7 +58,7 @@ ParameterAcceptor::initialize(const std::string &filename,
   if (filename != "")
     {
       // check the extension of input file
-      if (filename.substr(filename.find_last_of(".") + 1) == "prm")
+      if (filename.substr(filename.find_last_of('.') + 1) == "prm")
         {
           try
             {
@@ -75,7 +75,7 @@ ParameterAcceptor::initialize(const std::string &filename,
                                             "We created it for you."));
             }
         }
-      else if (filename.substr(filename.find_last_of(".") + 1) == "xml")
+      else if (filename.substr(filename.find_last_of('.') + 1) == "xml")
         {
           std::ifstream is(filename);
           if (!is)
@@ -98,7 +98,7 @@ ParameterAcceptor::initialize(const std::string &filename,
     {
       std::ofstream outfile(output_filename.c_str());
       Assert(outfile, ExcIO());
-      std::string extension = output_filename.substr(output_filename.find_last_of(".") + 1);
+      std::string extension = output_filename.substr(output_filename.find_last_of('.') + 1);
 
       if ( extension == "prm")
         {
@@ -220,7 +220,7 @@ ParameterAcceptor::get_section_path() const
 void ParameterAcceptor::enter_my_subsection(ParameterHandler &prm=ParameterAcceptor::prm)
 {
   const auto sections = get_section_path();
-  for (auto sec : sections)
+  for (const auto &sec : sections)
     {
       prm.enter_subsection(sec);
     }
@@ -229,7 +229,7 @@ void ParameterAcceptor::enter_my_subsection(ParameterHandler &prm=ParameterAccep
 void ParameterAcceptor::leave_my_subsection(ParameterHandler &prm=ParameterAcceptor::prm)
 {
   const auto sections = get_section_path();
-  for (auto sec : sections)
+  for (const auto &sec : sections)
     {
       prm.leave_subsection();
     }
