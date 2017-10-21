@@ -397,7 +397,7 @@ namespace DoFRenumbering
       }
     constraints.close ();
 
-    const IndexSet locally_owned = dof_handler.locally_owned_dofs();
+    const IndexSet &locally_owned = dof_handler.locally_owned_dofs();
 
     // otherwise compute the Cuthill-McKee permutation
     DynamicSparsityPattern dsp (dof_handler.n_dofs(),
