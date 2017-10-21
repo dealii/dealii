@@ -1082,8 +1082,12 @@ namespace LinearAlgebra
 
       /**
        * Pointer to the array of local elements of this vector.
+       *
+       * Because we allocate these arrays via Utilities::System::posix_memalign,
+       * we need to use a custom deleter for this object that does not call
+       * <code>delete[]</code>, but instead calls @p free().
        */
-      Number         *val;
+      std::unique_ptr<Number[], decltype(&free)> values;
 
       /**
        * For parallel loops with TBB, this member variable stores the affinity
@@ -1263,7 +1267,7 @@ namespace LinearAlgebra
     typename Vector<Number>::iterator
     Vector<Number>::begin ()
     {
-      return val;
+      return values.get();
     }
 
 
@@ -1273,7 +1277,7 @@ namespace LinearAlgebra
     typename Vector<Number>::const_iterator
     Vector<Number>::begin () const
     {
-      return val;
+      return values.get();
     }
 
 
@@ -1283,7 +1287,7 @@ namespace LinearAlgebra
     typename Vector<Number>::iterator
     Vector<Number>::end ()
     {
-      return val+partitioner->local_size();
+      return values.get()+partitioner->local_size();
     }
 
 
@@ -1293,7 +1297,7 @@ namespace LinearAlgebra
     typename Vector<Number>::const_iterator
     Vector<Number>::end () const
     {
-      return val+partitioner->local_size();
+      return values.get()+partitioner->local_size();
     }
 
 
@@ -1312,7 +1316,7 @@ namespace LinearAlgebra
       Assert (partitioner->in_local_range (global_index) || vector_is_ghosted == true,
               ExcMessage("You tried to read a ghost element of this vector, "
                          "but it has not imported its ghost values."));
-      return val[partitioner->global_to_local(global_index)];
+      return values[partitioner->global_to_local(global_index)];
     }
 
 
@@ -1333,7 +1337,7 @@ namespace LinearAlgebra
       // (then, the compiler picks this method according to the C++ rule book
       // even if a human would pick the const method when this subsequent use
       // is just a read)
-      return val[partitioner->global_to_local (global_index)];
+      return values[partitioner->global_to_local (global_index)];
     }
 
 
@@ -1370,7 +1374,7 @@ namespace LinearAlgebra
       Assert (local_index < local_size() || vector_is_ghosted == true,
               ExcMessage("You tried to read a ghost element of this vector, "
                          "but it has not imported its ghost values."));
-      return val[local_index];
+      return values[local_index];
     }
 
 
@@ -1383,7 +1387,7 @@ namespace LinearAlgebra
       AssertIndexRange (local_index,
                         partitioner->local_size()+
                         partitioner->n_ghost_indices());
-      return val[local_index];
+      return values[local_index];
     }
 
 
