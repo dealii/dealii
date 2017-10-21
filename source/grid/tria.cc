@@ -3091,7 +3091,7 @@ namespace internal
 
               // right child
               neighbor = neighbor->child(1);
-              while (1)
+              while (true)
                 {
                   Assert (neighbor->neighbor(1) == cell->child(0),
                           ExcInternalError());
@@ -3119,7 +3119,7 @@ namespace internal
 
               // left child
               neighbor = neighbor->child(0);
-              while (1)
+              while (true)
                 {
                   Assert (neighbor->neighbor(0) == cell->child(1),
                           ExcInternalError());

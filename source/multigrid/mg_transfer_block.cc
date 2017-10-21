@@ -425,7 +425,7 @@ void MGTransferBlockBase::build_matrices (
             {
               const types::global_dof_index n_dofs = prolongation_matrices[level]->block(block, block).m();
               constraints_per_block[block].resize(0);
-              constraints_per_block[block].resize(n_dofs, 0);
+              constraints_per_block[block].resize(n_dofs, false);
               for (types::global_dof_index i=0; i<n_dofs; ++i, ++index)
                 constraints_per_block[block][i] = (constrain_indices[index] == 1);
 
