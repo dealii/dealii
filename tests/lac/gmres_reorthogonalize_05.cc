@@ -35,7 +35,7 @@ namespace dealii
   {
     Number sum = 0;
     for (unsigned int i=0; i<size(); ++i)
-      sum += val[i] * v.val[i];
+      sum += values[i] * v.values[i];
     return sum;
   }
   template <typename Number>
@@ -43,7 +43,7 @@ namespace dealii
   {
     real_type sum = 0;
     for (unsigned int i=0; i<size(); ++i)
-      sum += val[i] * val[i];
+      sum += values[i] * values[i];
     return std::sqrt(sum);
   }
 }

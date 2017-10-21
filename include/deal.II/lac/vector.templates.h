@@ -48,7 +48,7 @@ Vector<Number>::Vector (const Vector<Number> &v)
   Subscriptor(),
   vec_size(v.size()),
   max_vec_size(v.size()),
-  val(nullptr)
+  values(nullptr)
 {
   if (vec_size != 0)
     {
@@ -65,12 +65,12 @@ Vector<Number>::Vector (Vector<Number> &&v)
   Subscriptor(std::move(v)),
   vec_size(v.vec_size),
   max_vec_size(v.max_vec_size),
-  val(v.val),
+  values(v.values),
   thread_loop_partitioner(std::move(v.thread_loop_partitioner))
 {
   v.vec_size = 0;
   v.max_vec_size = 0;
-  v.val = nullptr;
+  v.values = nullptr;
 }
 
 
@@ -82,7 +82,7 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
   Subscriptor(),
   vec_size(v.size()),
   max_vec_size(v.size()),
-  val(nullptr)
+  values(nullptr)
 {
   if (vec_size != 0)
     {
@@ -145,7 +145,7 @@ Vector<Number>::Vector (const PETScWrappers::VectorBase &v)
   Subscriptor(),
   vec_size(0),
   max_vec_size(0),
-  val(nullptr)
+  values(nullptr)
 {
   if (v.size() != 0)
     {
@@ -163,7 +163,7 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
   Subscriptor(),
   vec_size(v.size()),
   max_vec_size(v.size()),
-  val(nullptr)
+  values(nullptr)
 {
   if (vec_size != 0)
     {
@@ -207,7 +207,7 @@ Vector<Number>::operator= (const Vector<Number> &v)
 
   if (vec_size>0)
     {
-      dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(v.val, val);
+      dealii::internal::VectorOperations::Vector_copy<Number,Number> copier(v.values, values);
       internal::VectorOperations::parallel_for(copier,0,vec_size,thread_loop_partitioner);
     }
 
@@ -224,16 +224,16 @@ Vector<Number>::operator= (Vector<Number> &&v)
 {
   Subscriptor::operator=(std::move(v));
 
-  if (val) deallocate();
+  if (values) deallocate();
 
   vec_size = v.vec_size;
   max_vec_size = v.max_vec_size;
-  val = v.val;
+  values = v.values;
   thread_loop_partitioner = std::move(v.thread_loop_partitioner);
 
   v.vec_size = 0;
   v.max_vec_size = 0;
-  v.val = nullptr;
+  v.values = nullptr;
 
   return *this;
 }
@@ -251,7 +251,7 @@ Vector<Number>::operator= (const Vector<Number2> &v)
   if (vec_size != v.vec_size)
     reinit (v, true);
 
-  dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(v.val, val);
+  dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(v.values, values);
   internal::VectorOperations::parallel_for(copier,0,vec_size,thread_loop_partitioner);
 
   return *this;
@@ -266,8 +266,8 @@ void Vector<Number>::reinit (const size_type n,
 {
   if (n==0)
     {
-      if (val) deallocate();
-      val = nullptr;
+      if (values) deallocate();
+      values = nullptr;
       max_vec_size = vec_size = 0;
       thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
       return;
@@ -275,7 +275,7 @@ void Vector<Number>::reinit (const size_type n,
 
   if (n>max_vec_size)
     {
-      if (val) deallocate();
+      if (values) deallocate();
       max_vec_size = n;
       allocate();
     };
@@ -305,15 +305,15 @@ void Vector<Number>::reinit (const Vector<Number2> &v,
 
   if (v.vec_size==0)
     {
-      if (val) deallocate();
-      val = nullptr;
+      if (values) deallocate();
+      values = nullptr;
       max_vec_size = vec_size = 0;
       return;
     };
 
   if (v.vec_size>max_vec_size)
     {
-      if (val) deallocate();
+      if (values) deallocate();
       max_vec_size = v.vec_size;
       allocate();
     };
@@ -331,7 +331,7 @@ Vector<Number>::all_zero () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   for (size_type i=0; i<vec_size; ++i)
-    if (val[i] != Number())
+    if (values[i] != Number())
       return false;
   return true;
 }
@@ -345,7 +345,7 @@ Vector<Number>::is_non_negative () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   for (size_type i=0; i<vec_size; ++i)
-    if ( ! internal::VectorOperations::is_non_negative (val[i]))
+    if ( ! internal::VectorOperations::is_non_negative (values[i]))
       return false;
 
   return true;
@@ -363,7 +363,7 @@ Vector<Number>::operator= (const Number s)
 
   if (vec_size>0)
     {
-      internal::VectorOperations::Vector_set<Number> setter(s, val);
+      internal::VectorOperations::Vector_set<Number> setter(s, values);
       internal::VectorOperations::parallel_for(setter,0,vec_size,thread_loop_partitioner);
     }
 
@@ -379,7 +379,7 @@ Vector<Number> &Vector<Number>::operator *= (const Number factor)
 
   Assert (vec_size!=0, ExcEmptyObject());
 
-  internal::VectorOperations::Vectorization_multiply_factor<Number> vector_multiply(val, factor);
+  internal::VectorOperations::Vectorization_multiply_factor<Number> vector_multiply(values, factor);
 
   internal::VectorOperations::parallel_for(vector_multiply,0,vec_size,thread_loop_partitioner);
 
@@ -398,7 +398,7 @@ Vector<Number>::add (const Number a,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  internal::VectorOperations::Vectorization_add_av<Number> vector_add_av(val, v.val, a);
+  internal::VectorOperations::Vectorization_add_av<Number> vector_add_av(values, v.values, a);
   internal::VectorOperations::parallel_for(vector_add_av,0,vec_size,thread_loop_partitioner);
 }
 
@@ -416,7 +416,7 @@ Vector<Number>::sadd (const Number x,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd_xav(val, v.val, a, x);
+  internal::VectorOperations::Vectorization_sadd_xav<Number> vector_sadd_xav(values, v.values, a, x);
   internal::VectorOperations::parallel_for(vector_sadd_xav,0,vec_size,thread_loop_partitioner);
 }
 
@@ -435,7 +435,7 @@ Number Vector<Number>::operator * (const Vector<Number2> &v) const
           ExcDimensionMismatch(vec_size, v.size()));
 
   Number sum;
-  internal::VectorOperations::Dot<Number,Number2> dot(val, v.val);
+  internal::VectorOperations::Dot<Number,Number2> dot(values, v.values);
   internal::VectorOperations::parallel_reduce (dot, 0, vec_size, sum, thread_loop_partitioner);
   AssertIsFinite(sum);
 
@@ -451,7 +451,7 @@ Vector<Number>::norm_sqr () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   real_type sum;
-  internal::VectorOperations::Norm2<Number,real_type> norm2(val);
+  internal::VectorOperations::Norm2<Number,real_type> norm2(values);
   internal::VectorOperations::parallel_reduce (norm2, 0, vec_size, sum, thread_loop_partitioner);
 
   AssertIsFinite(sum);
@@ -467,7 +467,7 @@ Number Vector<Number>::mean_value () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   Number sum;
-  internal::VectorOperations::MeanValue<Number> mean(val);
+  internal::VectorOperations::MeanValue<Number> mean(values);
   internal::VectorOperations::parallel_reduce (mean, 0, vec_size, sum, thread_loop_partitioner);
 
   return sum / real_type(size());
@@ -482,7 +482,7 @@ Vector<Number>::l1_norm () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   real_type sum;
-  internal::VectorOperations::Norm1<Number, real_type> norm1(val);
+  internal::VectorOperations::Norm1<Number, real_type> norm1(values);
   internal::VectorOperations::parallel_reduce (norm1, 0, vec_size, sum, thread_loop_partitioner);
 
   return sum;
@@ -502,7 +502,7 @@ Vector<Number>::l2_norm () const
   Assert (vec_size!=0, ExcEmptyObject());
 
   real_type norm_square;
-  internal::VectorOperations::Norm2<Number, real_type> norm2(val);
+  internal::VectorOperations::Norm2<Number, real_type> norm2(values);
   internal::VectorOperations::parallel_reduce (norm2, 0, vec_size, norm_square,
                                                thread_loop_partitioner);
   if (numbers::is_finite(norm_square) &&
@@ -514,10 +514,10 @@ Vector<Number>::l2_norm () const
       real_type sum = 1.;
       for (size_type i=0; i<vec_size; ++i)
         {
-          if (val[i] != Number())
+          if (values[i] != Number())
             {
               const real_type abs_x =
-                numbers::NumberTraits<Number>::abs(val[i]);
+                numbers::NumberTraits<Number>::abs(values[i]);
               if (scale < abs_x)
                 {
                   sum = 1. + sum * (scale/abs_x) * (scale/abs_x);
@@ -546,7 +546,7 @@ Vector<Number>::lp_norm (const real_type p) const
     return l2_norm();
 
   real_type sum;
-  internal::VectorOperations::NormP<Number, real_type> normp(val, p);
+  internal::VectorOperations::NormP<Number, real_type> normp(values, p);
   internal::VectorOperations::parallel_reduce (normp, 0, vec_size, sum, thread_loop_partitioner);
 
   if (numbers::is_finite(sum) && sum >= std::numeric_limits<real_type>::min())
@@ -557,10 +557,10 @@ Vector<Number>::lp_norm (const real_type p) const
       real_type sum = 1.;
       for (size_type i=0; i<vec_size; ++i)
         {
-          if (val[i] != Number())
+          if (values[i] != Number())
             {
               const real_type abs_x =
-                numbers::NumberTraits<Number>::abs(val[i]);
+                numbers::NumberTraits<Number>::abs(values[i]);
               if (scale < abs_x)
                 {
                   sum = 1. + sum * std::pow(scale/abs_x, p);
@@ -585,7 +585,7 @@ Vector<Number>::linfty_norm () const
   real_type max = 0.;
 
   for (size_type i=0; i<vec_size; ++i)
-    max = std::max (numbers::NumberTraits<Number>::abs(val[i]), max);
+    max = std::max (numbers::NumberTraits<Number>::abs(values[i]), max);
 
   return max;
 }
@@ -603,7 +603,7 @@ Vector<Number>::add_and_dot (const Number          a,
   AssertDimension (vec_size, W.size());
 
   Number sum;
-  internal::VectorOperations::AddAndDot<Number> adder(this->val, V.val, W.val, a);
+  internal::VectorOperations::AddAndDot<Number> adder(this->values, V.values, W.values, a);
   internal::VectorOperations::parallel_reduce (adder, 0, vec_size, sum, thread_loop_partitioner);
   AssertIsFinite(sum);
 
@@ -618,7 +618,7 @@ Vector<Number> &Vector<Number>::operator += (const Vector<Number> &v)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  internal::VectorOperations::Vectorization_add_v<Number> vector_add(val, v.val);
+  internal::VectorOperations::Vectorization_add_v<Number> vector_add(values, v.values);
   internal::VectorOperations::parallel_for(vector_add,0,vec_size,thread_loop_partitioner);
   return *this;
 }
@@ -631,7 +631,7 @@ Vector<Number> &Vector<Number>::operator -= (const Vector<Number> &v)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  internal::VectorOperations::Vectorization_subtract_v<Number> vector_subtract(val, v.val);
+  internal::VectorOperations::Vectorization_subtract_v<Number> vector_subtract(values, v.values);
   internal::VectorOperations::parallel_for(vector_subtract,0,vec_size,thread_loop_partitioner);
 
   return *this;
@@ -644,7 +644,7 @@ void Vector<Number>::add (const Number v)
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  internal::VectorOperations::Vectorization_add_factor<Number> vector_add(val, v);
+  internal::VectorOperations::Vectorization_add_factor<Number> vector_add(values, v);
   internal::VectorOperations::parallel_for(vector_add,0,vec_size,thread_loop_partitioner);
 }
 
@@ -661,7 +661,7 @@ void Vector<Number>::add (const Number a, const Vector<Number> &v,
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
   Assert (vec_size == w.vec_size, ExcDimensionMismatch(vec_size, w.vec_size));
 
-  internal::VectorOperations::Vectorization_add_avpbw<Number> vector_add(val, v.val, w.val, a, b);
+  internal::VectorOperations::Vectorization_add_avpbw<Number> vector_add(values, v.values, w.values, a, b);
   internal::VectorOperations::parallel_for(vector_add,0,vec_size,thread_loop_partitioner);
 }
 
@@ -676,7 +676,7 @@ void Vector<Number>::sadd (const Number x,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == v.vec_size, ExcDimensionMismatch(vec_size, v.vec_size));
 
-  internal::VectorOperations::Vectorization_sadd_xv<Number> vector_sadd(val, v.val, x);
+  internal::VectorOperations::Vectorization_sadd_xv<Number> vector_sadd(values, v.values, x);
   internal::VectorOperations::parallel_for(vector_sadd,0,vec_size,thread_loop_partitioner);
 }
 
@@ -688,7 +688,7 @@ void Vector<Number>::scale (const Vector<Number> &s)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
 
-  internal::VectorOperations::Vectorization_scale<Number> vector_scale(val, s.val);
+  internal::VectorOperations::Vectorization_scale<Number> vector_scale(values, s.values);
   internal::VectorOperations::parallel_for(vector_scale,0,vec_size,thread_loop_partitioner);
 }
 
@@ -702,7 +702,7 @@ void Vector<Number>::scale (const Vector<Number2> &s)
   Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
 
   for (size_type i=0; i<vec_size; ++i)
-    val[i] *= Number(s.val[i]);
+    values[i] *= Number(s.values[i]);
 }
 
 
@@ -716,7 +716,7 @@ void Vector<Number>::equ (const Number a,
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == u.vec_size, ExcDimensionMismatch(vec_size, u.vec_size));
 
-  internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(val, u.val, a);
+  internal::VectorOperations::Vectorization_equ_au<Number> vector_equ(values, u.values, a);
   internal::VectorOperations::parallel_for(vector_equ,0,vec_size,thread_loop_partitioner);
 }
 
@@ -739,7 +739,7 @@ void Vector<Number>::equ (const Number a,
   // operator*(complex<float>,complex<double>)
   // is not defined by default
   for (size_type i=0; i<vec_size; ++i)
-    val[i] = a * Number(u.val[i]);
+    values[i] = a * Number(u.values[i]);
 }
 
 
@@ -756,7 +756,7 @@ void Vector<Number>::ratio (const Vector<Number> &a,
   // we overwrite them anyway
   reinit (a.size(), true);
 
-  internal::VectorOperations::Vectorization_ratio<Number> vector_ratio(val, a.val, b.val);
+  internal::VectorOperations::Vectorization_ratio<Number> vector_ratio(values, a.values, b.values);
   internal::VectorOperations::parallel_for(vector_ratio,0,vec_size,thread_loop_partitioner);
 }
 
@@ -772,7 +772,7 @@ Vector<Number>::operator= (const BlockVector<Number> &v)
   size_type this_index = 0;
   for (size_type b=0; b<v.n_blocks(); ++b)
     for (size_type i=0; i<v.block(b).size(); ++i, ++this_index)
-      val[this_index] = v.block(b)(i);
+      values[this_index] = v.block(b)(i);
 
   return *this;
 }
@@ -837,7 +837,7 @@ Vector<Number>::operator== (const Vector<Number2> &v) const
   // operator==(complex<float>,complex<double>)
   // is not defined by default
   for (size_type i=0; i<vec_size; ++i)
-    if (val[i] != Number(v.val[i]))
+    if (values[i] != Number(v.values[i]))
       return false;
 
   return true;
@@ -851,7 +851,7 @@ void Vector<Number>::print (const char *format) const
   Assert (vec_size!=0, ExcEmptyObject());
 
   for (size_type j=0; j<size(); ++j)
-    internal::VectorOperations::print (val[j], format);
+    internal::VectorOperations::print (values[j], format);
   std::printf ("\n");
 }
 
@@ -877,10 +877,10 @@ void Vector<Number>::print (std::ostream      &out,
 
   if (across)
     for (size_type i=0; i<size(); ++i)
-      out << val[i] << ' ';
+      out << values[i] << ' ';
   else
     for (size_type i=0; i<size(); ++i)
-      out << val[i] << std::endl;
+      out << values[i] << std::endl;
   out << std::endl;
 
   AssertThrow (out, ExcIO());
@@ -899,10 +899,10 @@ Vector<Number>::print (LogStream &out, const unsigned int width, const bool acro
 
   if (across)
     for (size_type i=0; i<size(); ++i)
-      out << std::setw(width) << val[i] << ' ';
+      out << std::setw(width) << values[i] << ' ';
   else
     for (size_type i=0; i<size(); ++i)
-      out << val[i] << std::endl;
+      out << values[i] << std::endl;
   out << std::endl;
 }
 
@@ -998,10 +998,10 @@ void
 Vector<Number>::allocate()
 {
   // make sure that we don't create a memory leak
-  Assert (val == nullptr, ExcInternalError());
+  Assert (values == nullptr, ExcInternalError());
 
   // then allocate memory with the proper alignment requirements of 64 bytes
-  Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*max_vec_size);
+  Utilities::System::posix_memalign ((void **)&values, 64, sizeof(Number)*max_vec_size);
 }
 
 
@@ -1010,8 +1010,8 @@ template <typename Number>
 void
 Vector<Number>::deallocate()
 {
-  free(val);
-  val = nullptr;
+  free(values);
+  values = nullptr;
 }
 
 DEAL_II_NAMESPACE_CLOSE
