@@ -310,7 +310,7 @@ namespace VectorTools
 
       typedef typename VectorType::value_type number;
 
-      const hp::FECollection<dim, spacedim> fe(dof_handler.get_fe());
+      const hp::FECollection<dim, spacedim> &fe(dof_handler.get_fe_collection());
 
       std::vector<types::global_dof_index> dofs_on_cell(fe.max_dofs_per_cell());
 
@@ -343,7 +343,7 @@ namespace VectorTools
           support_quadrature.push_back(Quadrature<dim>(points));
         }
 
-      hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
+      const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
       // An FEValues object to evaluate (generalized) support point
       // locations as well as Jacobians and their inverses.
@@ -2496,7 +2496,7 @@ namespace VectorTools
           // now that we have a q_collection object with all the right quadrature
           // points, create an hp::FEFaceValues object that we can use to evaluate
           // the boundary values at
-          dealii::hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
+          const dealii::hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
           dealii::hp::FEFaceValues<dim,spacedim> x_fe_values (mapping_collection,
                                                               finite_elements,
                                                               q_collection,
@@ -4214,8 +4214,8 @@ namespace VectorTools
     const unsigned int superdegree = dof_handler.get_fe ().degree;
     const QGauss<dim - 1> reference_face_quadrature (2 * superdegree);
     const unsigned int dofs_per_face = dof_handler.get_fe ().dofs_per_face;
-    hp::FECollection<dim> fe_collection (dof_handler.get_fe_collection ());
-    hp::MappingCollection<dim> mapping_collection (mapping);
+    const hp::FECollection<dim> &fe_collection (dof_handler.get_fe_collection ());
+    const hp::MappingCollection<dim> mapping_collection (mapping);
     hp::QCollection<dim> face_quadrature_collection;
 
     for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
@@ -4416,7 +4416,7 @@ namespace VectorTools
    ConstraintMatrix                 &constraints,
    const hp::MappingCollection<dim> &mapping_collection)
   {
-    hp::FECollection<dim> fe_collection (dof_handler.get_fe_collection ());
+    const hp::FECollection<dim> &fe_collection (dof_handler.get_fe_collection ());
     hp::QCollection<dim> face_quadrature_collection;
 
     for (unsigned int i = 0; i < fe_collection.size (); ++i)
@@ -5240,7 +5240,7 @@ namespace VectorTools
 
       // Create hp FEcollection, dof_handler can be either hp or standard type.
       // From here on we can treat it like a hp-namespace object.
-      const hp::FECollection<dim> fe_collection (dof_handler.get_fe_collection ());
+      const hp::FECollection<dim> &fe_collection (dof_handler.get_fe_collection ());
 
       // Create face quadrature collection
       hp::QCollection<dim - 1> face_quadrature_collection;
@@ -5470,7 +5470,7 @@ namespace VectorTools
     // compute_project_boundary_values_curl_conforming_l2() function
     // above after recasting the mapping.
 
-    hp::MappingCollection<dim> mapping_collection (mapping);
+    const hp::MappingCollection<dim> mapping_collection (mapping);
     internals::
     compute_project_boundary_values_curl_conforming_l2(dof_handler,
                                                        first_vector_component,
@@ -5712,7 +5712,7 @@ namespace VectorTools
                                       update_quadrature_points |
                                       update_values);
     hp::FECollection<dim> fe_collection (fe);
-    hp::MappingCollection<dim> mapping_collection (mapping);
+    const hp::MappingCollection<dim> mapping_collection (mapping);
     hp::QCollection<dim> quadrature_collection;
 
     for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell; ++face)
