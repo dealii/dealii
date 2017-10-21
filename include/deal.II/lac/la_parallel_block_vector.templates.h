@@ -296,7 +296,7 @@ namespace LinearAlgebra
     BlockVector<Number>::reinit(const VectorSpaceVector<Number> &V,
                                 const bool omit_zeroing_entries)
     {
-      Assert(dynamic_cast<const BlockVector<Number> *>(&V)!=NULL,
+      Assert(dynamic_cast<const BlockVector<Number> *>(&V)!=nullptr,
              ExcVectorTypeNotCompatible());
       const BlockVector<Number> &down_V = dynamic_cast<const BlockVector<Number> &>(V);
       reinit(down_V, omit_zeroing_entries);

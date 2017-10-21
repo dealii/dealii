@@ -467,7 +467,7 @@ namespace internal
           p4est_iterate (reinterpret_cast<dealii::internal::p4est::types<2>::forest *>(parallel_forest),
                          reinterpret_cast<dealii::internal::p4est::types<2>::ghost *>(parallel_ghost),
                          static_cast<void *>(&fg),
-                         NULL, find_ghosts_face<2,spacedim>, find_ghosts_corner<2,spacedim>);
+                         nullptr, find_ghosts_face<2,spacedim>, find_ghosts_corner<2,spacedim>);
           break;
 
         case 3:

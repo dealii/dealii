@@ -742,7 +742,7 @@ namespace LinearAlgebra
                                 const bool omit_zeroing_entries)
     {
       // Downcast. Throws an exception if invalid.
-      Assert(dynamic_cast<const Vector<Number> *>(&V)!=NULL,
+      Assert(dynamic_cast<const Vector<Number> *>(&V)!=nullptr,
              ExcVectorTypeNotCompatible());
       const Vector<Number> &down_V = dynamic_cast<const Vector<Number> &>(V);
 

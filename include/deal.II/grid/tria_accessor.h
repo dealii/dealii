@@ -511,10 +511,10 @@ public:
    * semantic sense, and we generate an exception when such an object is
    * actually generated.
    */
-  InvalidAccessor (const Triangulation<dim,spacedim> *parent     =  0,
-                   const int                 level      = -1,
-                   const int                 index      = -1,
-                   const AccessorData       *local_data =  0);
+  InvalidAccessor (const Triangulation<dim,spacedim> *parent     =  nullptr,
+                   const int                          level      = -1,
+                   const int                          index      = -1,
+                   const AccessorData                *local_data =  nullptr);
 
   /**
    * Copy constructor.  This class is used for iterators that do not make
