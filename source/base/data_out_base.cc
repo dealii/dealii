@@ -126,7 +126,7 @@ namespace
 
       switch (state_in->step)
         {
-          while (1)
+          while (true)
             {
               DEAL_II_FALLTHROUGH;
             case step_A:

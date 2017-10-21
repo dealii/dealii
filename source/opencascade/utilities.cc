@@ -365,12 +365,12 @@ namespace OpenCASCADE
             {
               Handle(Geom_Curve) curve = intersections[i];
               Handle(Geom_BoundedCurve) bcurve = Handle(Geom_BoundedCurve)::DownCast(curve);
-              check = convert_bspline.Add(bcurve,tolerance,0,1,0);
+              check = convert_bspline.Add(bcurve,tolerance,false,true,0);
               if (check == false)  // If we failed, try again with the reversed curve
                 {
                   curve->Reverse();
                   Handle(Geom_BoundedCurve) bcurve = Handle(Geom_BoundedCurve)::DownCast(curve);
-                  check = convert_bspline.Add(bcurve,tolerance,0,1,0);
+                  check = convert_bspline.Add(bcurve,tolerance,false,true,0);
                 }
               one_failed = one_failed || (check == false);
               one_added = one_added || (check == true);
