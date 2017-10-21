@@ -146,7 +146,7 @@ void test ()
     src.local_element(i) = (NumberType)Testing::rand()/RAND_MAX;
 
   MatrixFreeOperators::MassOperator<dim,fe_degree, n_q_points, 1, LinearAlgebra::distributed::Vector<NumberType>> mf_mass;
-  MatrixFreeOperators::MassOperator<dim,fe_degree, n_q_points, 1, LinearAlgebra::distributed::Vector<NumberType>> mf_laplace;
+  MatrixFreeOperators::LaplaceOperator<dim,fe_degree, n_q_points, 1, LinearAlgebra::distributed::Vector<NumberType>> mf_laplace;
   mf_mass.initialize(matrix_free);
   mf_laplace.initialize(matrix_free);
 
