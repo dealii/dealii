@@ -1281,7 +1281,11 @@ namespace hp
   template <int dim, int spacedim>
   void DoFHandler<dim,spacedim>::distribute_dofs (const hp::FECollection<dim,spacedim> &ff)
   {
-    Assert (tria->n_levels() > 0, ExcInvalidTriangulation());
+    Assert(tria!=nullptr,
+           ExcMessage("You need to set the Triangulation in the DoFHandler using initialize() or "
+                      "in the constructor before you can distribute DoFs."));
+    Assert (tria->n_levels() > 0,
+            ExcMessage("The Triangulation you are using is empty!"));
 
     finite_elements = &ff;
 
