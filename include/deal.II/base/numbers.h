@@ -446,7 +446,7 @@ namespace internal
            typename std::enable_if<
            !std::is_same<typename std::decay<T>::type,typename std::decay<F>::type>::value &&
            std::is_constructible<T,F>::value
-           >::type * = 0)
+           >::type * = nullptr)
     {
       return T(f);
     }
