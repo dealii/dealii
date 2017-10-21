@@ -518,6 +518,17 @@ public:
   UpdateFlags
   requires_update_flags (const UpdateFlags update_flags) const;
 
+  // make variant with ComponentMask also available:
+  using FiniteElement<dim,spacedim>::get_sub_fe;
+
+  /**
+   * @copydoc FiniteElement<dim,spacedim>::get_sub_fe()
+   */
+  virtual
+  const FiniteElement<dim,spacedim> &
+  get_sub_fe (const unsigned int first_component,
+              const unsigned int n_selected_components) const;
+
   /**
    * Return the value of the @p ith shape function at the point @p p.  @p p is
    * a point on the reference element. Since this finite element is always

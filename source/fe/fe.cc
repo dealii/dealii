@@ -1080,6 +1080,57 @@ FiniteElement<dim,spacedim>::has_support_on_face (
 
 
 template <int dim, int spacedim>
+const FiniteElement<dim,spacedim> &
+FiniteElement<dim,spacedim>::
+get_sub_fe (const ComponentMask &mask) const
+{
+  // Translate the ComponentMask into first_selected and n_components after
+  // some error checking:
+  const unsigned int n_total_components = this->n_components();
+  Assert((n_total_components == mask.size()) || (mask.size()==0),
+         ExcMessage("The given ComponentMask has the wrong size."));
+
+  const unsigned int n_selected = mask.n_selected_components(n_total_components);
+  Assert(n_selected>0,
+         ExcMessage("You need at least one selected component."));
+
+  const unsigned int first_selected = mask.first_selected_component(n_total_components);
+
+#ifdef DEBUG
+  // check that it is contiguous:
+  for (unsigned int c=0; c<n_total_components; ++c)
+    Assert((c<first_selected && (!mask[c]))
+           ||
+           (c>=first_selected && c<first_selected+n_selected && mask[c])
+           ||
+           (c>=first_selected+n_selected && !mask[c]),
+           ExcMessage("Error: the given ComponentMask is not contiguous!"));
+#endif
+
+  return get_sub_fe(first_selected, n_selected);
+}
+
+
+
+template <int dim, int spacedim>
+const FiniteElement<dim,spacedim> &
+FiniteElement<dim,spacedim>::
+get_sub_fe (const unsigned int first_component,
+            const unsigned int n_selected_components) const
+{
+  // No complicated logic is needed here, because it is overridden in
+  // FESystem<dim,spacedim>. Just make sure that what the user chose is valid:
+  Assert(first_component == 0 && n_selected_components == this->n_components(),
+         ExcMessage("You can only select a whole FiniteElement, not a part of one."));
+
+  (void)first_component;
+  (void)n_selected_components;
+  return *this;
+}
+
+
+
+template <int dim, int spacedim>
 std::pair<Table<2,bool>, std::vector<unsigned int> >
 FiniteElement<dim,spacedim>::get_constant_modes () const
 {
