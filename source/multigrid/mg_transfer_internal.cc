@@ -167,7 +167,7 @@ namespace internal
           // The list of neighbors is symmetric (our neighbors have us as a
           // neighbor), so we can use it to send and to know how many messages
           // we will get.
-          std::set<types::subdomain_id> neighbors = tria->level_ghost_owners();
+          const std::set<types::subdomain_id> &neighbors = tria->level_ghost_owners();
           std::map<int, std::vector<DoFPair> > send_data;
 
           // * find owners of the level dofs and insert into send_data accordingly
@@ -306,7 +306,7 @@ namespace internal
         {
           // shift the local number of the copy indices according to the new
           // partitioner that we are going to use for the vector
-          const std::shared_ptr<const Utilities::MPI::Partitioner> part
+          const std::shared_ptr<const Utilities::MPI::Partitioner> &part
             = ghosted_level_vector.get_partitioner();
           ghosted_dofs.add_indices(part->ghost_indices());
           for (unsigned int i=0; i<copy_indices_global_mine.size(); ++i)

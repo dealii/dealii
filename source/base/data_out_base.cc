@@ -7549,7 +7549,7 @@ merge (const DataOutReader<dim,spacedim> &source)
   typedef typename dealii::DataOutBase::Patch<dim,spacedim> Patch;
 
 
-  const std::vector<Patch> source_patches = source.get_patches ();
+  const std::vector<Patch> &source_patches = source.get_patches ();
   Assert (patches.size () != 0,        DataOutBase::ExcNoPatches ());
   Assert (source_patches.size () != 0, DataOutBase::ExcNoPatches ());
   // check equality of component
