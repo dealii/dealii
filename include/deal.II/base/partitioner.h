@@ -23,8 +23,10 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/array_view.h>
-#include <deal.II/lac/vector.h>
+
 #include <deal.II/lac/communication_pattern_base.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_operation.h>
 
 #include <limits>
 

@@ -24,6 +24,7 @@
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/petsc_vector_base.h>
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/lac/vector_type_traits.h>

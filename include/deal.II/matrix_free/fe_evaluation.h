@@ -32,6 +32,7 @@
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 #include <deal.II/matrix_free/evaluation_selector.h>
 
+#include <deal.II/lac/vector_operation.h>
 
 DEAL_II_NAMESPACE_OPEN
 

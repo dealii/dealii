@@ -17,11 +17,13 @@
 #define dealii_parpack_solver_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/memory_consumption.h>
+
 #include <deal.II/lac/solver_control.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/base/index_set.h>
+#include <deal.II/lac/vector_operation.h>
+
 
 #include <cstring>
 

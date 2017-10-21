@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/numbers.h>
-#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_operation.h>
 
 #include <memory>
 
