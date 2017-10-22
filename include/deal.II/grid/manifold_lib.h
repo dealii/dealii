@@ -330,13 +330,6 @@ private:
    */
   double tolerance;
 
-  // explicitly check for sensible template arguments, but not on windows
-  // because MSVC creates bogus warnings during normal compilation
-#ifndef DEAL_II_MSVC
-  static_assert (spacedim==3,
-                 "CylindricalManifold can only be used for spacedim==3!");
-#endif
-
 };
 
 
