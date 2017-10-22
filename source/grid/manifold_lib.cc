@@ -361,7 +361,13 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const Point<spacedim> &d
               direction (direction_/direction_.norm()),
               point_on_axis (point_on_axis_),
               tolerance(tolerance)
-{}
+{
+  // do not use static_assert to make dimension-independent programming
+  // easier.
+  Assert (spacedim==3,
+          ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+
+}
 
 
 
