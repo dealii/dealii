@@ -229,7 +229,7 @@ void ParameterAcceptor::enter_my_subsection(ParameterHandler &prm=ParameterAccep
 void ParameterAcceptor::leave_my_subsection(ParameterHandler &prm=ParameterAcceptor::prm)
 {
   const auto sections = get_section_path();
-  for (const auto &sec : sections)
+  for (unsigned int i=0; i<sections.size(); ++i)
     {
       prm.leave_subsection();
     }
