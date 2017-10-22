@@ -94,7 +94,6 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
 
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter")
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-variable")
 
   #
   # Disable a diagnostic that warns about potentially uninstantiated static
@@ -106,12 +105,18 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Clang versions prior to 3.6 emit a lot of false positives wrt
   # "-Wunused-function". Also suppress warnings for Xcode older than 6.3
   # (which is equivalent to clang < 3.6).
+  # Policy CMP0025 allows to differentiate between Clang and AppleClang
+  # which admits a more fine-grained control. Otherwise, we are left
+  # with just disabling this feature for all versions between 4.0 and 6.3.
   #
-  # FIXME: I wait for the day with a clang version "4.0"... and I will
-  # curse the person that thought it is a _great_ idea to come up with
-  # independent version numbers for clang on Mac...
-  #
-  IF( CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.6" OR
+  IF (POLICY CMP0025)
+    IF( (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+         AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.6")
+        OR (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
+         AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.3"))
+      ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
+    ENDIF()
+  ELSEIF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.6" OR
       ( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.0" AND
         CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.3") )
     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-function")
