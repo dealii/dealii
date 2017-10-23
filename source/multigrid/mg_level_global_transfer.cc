@@ -51,13 +51,14 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices
                                           copy_indices_global_mine, copy_indices_level_mine);
 
   // check if we can run a plain copy operation between the global DoFs and
-  // the finest level.
-  perform_plain_copy =
+  // the finest level, on the current processor.
+  bool
+  my_perform_plain_copy =
     (copy_indices.back().size() == mg_dof.locally_owned_dofs().n_elements())
     &&
     (mg_dof.locally_owned_dofs().n_elements() ==
      mg_dof.locally_owned_mg_dofs(mg_dof.get_triangulation().n_global_levels()-1).n_elements());
-  if (perform_plain_copy)
+  if (my_perform_plain_copy)
     {
       AssertDimension(copy_indices_global_mine.back().size(), 0);
       AssertDimension(copy_indices_level_mine.back().size(), 0);
@@ -68,19 +69,23 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices
       for (unsigned int i=0; i<copy_indices.back().size(); ++i)
         if (copy_indices.back()[i].first != copy_indices.back()[i].second)
           {
-            perform_plain_copy = false;
+            my_perform_plain_copy = false;
             break;
           }
     }
-  const parallel::Triangulation<dim, spacedim> *ptria =
-    dynamic_cast<const parallel::Triangulation<dim, spacedim> *>
-    (&mg_dof.get_triangulation());
-  const MPI_Comm mpi_communicator = ptria != nullptr ? ptria->get_communicator() :
-                                    MPI_COMM_SELF;
-  perform_plain_copy =
-    Utilities::MPI::min(static_cast<int>(perform_plain_copy),
-                        mpi_communicator);
 
+  // now do a global reduction over all processors to see what operation
+  // they can agree upon
+  if (const parallel::Triangulation<dim, spacedim> *ptria =
+        dynamic_cast<const parallel::Triangulation<dim, spacedim> *>
+      (&mg_dof.get_triangulation()))
+    perform_plain_copy =
+      (Utilities::MPI::min(my_perform_plain_copy ? 1 : 0,
+                           ptria->get_communicator())
+       ==
+       1);
+  else
+    perform_plain_copy = my_perform_plain_copy;
 }
 
 
