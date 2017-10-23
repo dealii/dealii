@@ -97,6 +97,9 @@ void test ()
                                            temp_array.size()),
                                        make_array_view(locally_owned_array),
                                        make_array_view(ghosts), requests);
+    // check that the ghost entries are zeroed out in these calls
+    for (unsigned int i=0; i<v.n_ghost_indices(); ++i)
+      AssertDimension(ghosts[i], 0);
   }
   deallog << "From all ghosts: ";
   for (unsigned int i=0; i<locally_owned_array.size(); ++i)
@@ -117,6 +120,10 @@ void test ()
                                            temp_array.size()),
                                        make_array_view(locally_owned_array),
                                        make_array_view(ghosts), requests);
+
+    // check that the ghost entries are zeroed out in these calls
+    for (unsigned int i=0; i<w.n_ghost_indices(); ++i)
+      AssertDimension(ghosts[i], 0);
   }
   deallog << "From reduced ghosts 1: ";
   for (unsigned int i=0; i<locally_owned_array.size(); ++i)
@@ -137,6 +144,10 @@ void test ()
                                            temp_array.size()),
                                        make_array_view(locally_owned_array),
                                        make_array_view(ghosts), requests);
+
+    // check that the ghost entries are zeroed out in these calls
+    for (unsigned int i=0; i<x.n_ghost_indices(); ++i)
+      AssertDimension(ghosts[i], 0);
   }
   deallog << "From reduced ghosts 2: ";
   for (unsigned int i=0; i<locally_owned_array.size(); ++i)
