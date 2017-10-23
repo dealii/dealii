@@ -24,15 +24,14 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
-#include <deal.II/lac/vector_view.h>
 #include <deal.II/lac/vector_operation.h>
 
 #include <cstring>
 #include <iomanip>
 
 #ifdef DEAL_II_WITH_TRILINOS
-#include <deal.II/lac/trilinos_epetra_communication_pattern.h>
-#include <deal.II/lac/trilinos_epetra_vector.h>
+#  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
+#  include <deal.II/lac/trilinos_epetra_vector.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_MultiVector.h>
