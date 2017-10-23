@@ -25,6 +25,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/lac/vector_view.h>
+#include <deal.II/lac/vector_operation.h>
 
 #include <cstring>
 #include <iomanip>

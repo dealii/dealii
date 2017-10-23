@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/lac/read_write_vector.h>
+#include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_space_vector.h>
 #include <deal.II/lac/vector_type_traits.h>
 

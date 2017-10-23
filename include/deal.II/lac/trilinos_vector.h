@@ -26,6 +26,7 @@
 #  include <deal.II/base/mpi.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
 #  include <vector>

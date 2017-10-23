@@ -25,7 +25,7 @@
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/petsc_compatibility.h>
-#  include <deal.II/lac/vector.h>
+#  include <deal.II/lac/vector_operation.h>
 
 #  include <petscmat.h>
 

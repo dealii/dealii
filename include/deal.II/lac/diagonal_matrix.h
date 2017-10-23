@@ -18,6 +18,7 @@
 
 
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_operation.h>
 
 DEAL_II_NAMESPACE_OPEN
 

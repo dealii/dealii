@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/lac/vector_space_vector.h>
-
+#include <deal.II/lac/vector_operation.h>
 
 #ifdef DEAL_II_WITH_CUDA
 

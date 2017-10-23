@@ -21,6 +21,7 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_space_vector.h>
 #include <deal.II/lac/vector_type_traits.h>
 

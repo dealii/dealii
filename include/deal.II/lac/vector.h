@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
 // boost::serialization::make_array used to be in array.hpp, but was
@@ -78,37 +79,6 @@ namespace parallel
 /*! @addtogroup Vectors
  *@{
  */
-
-/**
- * This enum keeps track of the current operation in parallel linear algebra
- * objects like Vectors and Matrices.
- *
- * It is used in the various compress() functions. They also exist in serial
- * codes for compatibility and are empty there.
- *
- * See
- * @ref GlossCompress "Compressing distributed objects"
- * for more information.
- */
-struct VectorOperation
-{
-  enum values
-  {
-    /**
-     * The current operation is unknown.
-     */
-    unknown,
-    /**
-     * The current operation is an insertion.
-     */
-    insert,
-    /**
-     * The current operation is an addition.
-     */
-    add
-  };
-};
-
 
 /**
  * Numerical vector of data.  For this class there are different types of

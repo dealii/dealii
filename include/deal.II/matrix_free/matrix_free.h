@@ -27,7 +27,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/constraint_matrix.h>

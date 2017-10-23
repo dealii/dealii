@@ -24,6 +24,8 @@
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_operation.h>
+
 #include <vector>
 #include <iterator>
 #include <cmath>

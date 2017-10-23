@@ -22,6 +22,7 @@
 #include <deal.II/lac/petsc_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/lapack_support.h>
+#include <deal.II/lac/vector.h>
 
 
 DEAL_II_NAMESPACE_OPEN
