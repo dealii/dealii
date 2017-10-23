@@ -1778,7 +1778,25 @@ namespace DataOutBase
   {
     prm.declare_entry ("Filter duplicate vertices", "false",
                        Patterns::Bool(),
-                       "Whether to remove duplicate vertex values.");
+                       "Whether to remove duplicate vertex values. deal.II duplicates "
+                       "vertices once for each adjacent cell so that it can output "
+                       "discontinuous quantities for which there may be more than one "
+                       "value for each vertex position. Setting this flag to "
+                       "'true' will merge all of these values by selecting a "
+                       "random one and outputting this as 'the' value for the vertex. "
+                       "As long as the data to be output corresponds to continuous "
+                       "fields, merging vertices has no effect. On the other hand, "
+                       "if the data to be output corresponds to discontinuous fields "
+                       "(either because you are using a discontinuous finite element, "
+                       "or because you are using a DataPostprocessor that yields "
+                       "discontinuous data, or because the data to be output has been "
+                       "produced by entirely different means), then the data in the "
+                       "output file no longer faithfully represents the underlying data "
+                       "because the discontinuous field has been replaced by a "
+                       "continuous one."
+                       "\n\n"
+                       "In any case, filtering results in drastically smaller output "
+                       "files (smaller by about a factor of 2^dim).");
     prm.declare_entry ("XDMF HDF5 output", "false",
                        Patterns::Bool(),
                        "Whether the data will be used in an XDMF/HDF5 combination.");

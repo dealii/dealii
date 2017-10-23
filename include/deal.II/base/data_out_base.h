@@ -1208,13 +1208,13 @@ namespace DataOutBase
    *
    * @ingroup output
    */
-
   struct DataOutFilterFlags
   {
     /**
      * Filter duplicate vertices and associated values. This will drastically
-     * reduce the output data size but may affect the correctness of some
-     * calculated values.
+     * reduce the output data size but will result in an output file that
+     * does not faithfully represent the actual data if the data corresponds
+     * to discontinuous fields.
      */
     bool filter_duplicate_vertices;
 
@@ -1440,7 +1440,6 @@ namespace DataOutBase
      * Empty functions to do base class inheritance.
      */
     void flush_cells () {};
-
   };
 
 
