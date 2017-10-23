@@ -246,9 +246,8 @@ namespace internal
 
                 for (unsigned int i=0; i<receive_buffer.size(); ++i)
                   {
-                    copy_indices_level_mine[receive_buffer[i].level].push_back(
-                      std::make_pair (receive_buffer[i].global_dof_index, receive_buffer[i].level_dof_index)
-                    );
+                    copy_indices_level_mine[receive_buffer[i].level].emplace_back(
+                      receive_buffer[i].global_dof_index, receive_buffer[i].level_dof_index);
                   }
               }
           }
