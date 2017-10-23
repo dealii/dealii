@@ -402,9 +402,7 @@ namespace Utilities
 
       // clear the ghost array in case we did not yet do that in the _start
       // function
-      if (n_ghost_indices_in_larger_set == n_ghost_indices() ||
-          ghost_array.size() != n_ghost_indices_in_larger_set)
-        std::memset(ghost_array.begin(), 0, sizeof(Number)*n_ghost_indices());
+      std::memset(ghost_array.begin(), 0, sizeof(Number)*n_ghost_indices());
 
       // clear the compress requests
       requests.resize(0);
