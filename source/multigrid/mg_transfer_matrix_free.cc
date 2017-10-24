@@ -157,7 +157,7 @@ void MGTransferMatrixFree<dim,Number>
   AssertDimension(this->ghosted_level_vector[to_level-1].local_size(),
                   src.local_size());
 
-  this->ghosted_level_vector[to_level-1] = src;
+  this->ghosted_level_vector[to_level-1].copy_locally_owned_data_from(src);
   this->ghosted_level_vector[to_level-1].update_ghost_values();
   this->ghosted_level_vector[to_level] = 0.;
 
@@ -202,7 +202,7 @@ void MGTransferMatrixFree<dim,Number>
                           this->ghosted_level_vector[to_level-1]);
 
   this->ghosted_level_vector[to_level].compress(VectorOperation::add);
-  dst = this->ghosted_level_vector[to_level];
+  dst.copy_locally_owned_data_from(this->ghosted_level_vector[to_level]);
 }
 
 
@@ -221,7 +221,7 @@ void MGTransferMatrixFree<dim,Number>
   AssertDimension(this->ghosted_level_vector[from_level-1].local_size(),
                   dst.local_size());
 
-  this->ghosted_level_vector[from_level] = src;
+  this->ghosted_level_vector[from_level].copy_locally_owned_data_from(src);
   this->ghosted_level_vector[from_level].update_ghost_values();
   this->ghosted_level_vector[from_level-1] = 0.;
 
