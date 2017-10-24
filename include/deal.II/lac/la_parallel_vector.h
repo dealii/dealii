@@ -513,6 +513,24 @@ namespace LinearAlgebra
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       bool has_ghost_elements() const;
+
+      /**
+       * This method copies the data in the locally owned range from another
+       * distributed vector @p src into the calling vector. As opposed to
+       * operator= that also includes ghost entries, this operation ignores
+       * the ghost range. The only prerequisite is that the local range on the
+       * calling vector and the given vector @p src are the same on all
+       * processors. It is explicitly allowed that the two vectors have
+       * different ghost elements that might or might not be related to each
+       * other.
+       *
+       * Since no data exchange is performed, make sure that neither @p src
+       * nor the calling vector have pending communications in order to obtain
+       * correct results.
+       */
+      template <typename Number2>
+      void copy_locally_owned_data_from(const Vector<Number2> &src);
+
       //@}
 
       /**
