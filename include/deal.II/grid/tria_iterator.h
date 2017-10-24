@@ -482,8 +482,7 @@ public:
                        "past_the_end" : "invalid")));
 
   /**
-   * Exception for lower-dimensional TriaObjects without level, i.e. objects
-   * faces are constructed with.
+   * Exception.
    */
   DeclException1 (ExcDereferenceInvalidObject,
                   Accessor,

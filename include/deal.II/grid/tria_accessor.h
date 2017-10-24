@@ -124,11 +124,20 @@ template <int spacedim>                         class TriaAccessor<0, 1, spacedi
  */
 namespace TriaAccessorExceptions
 {
-//TODO: Write documentation!
   /**
    * @ingroup Exceptions
    */
-  DeclException0 (ExcCellNotUsed);
+  DeclExceptionMsg (ExcCellNotUsed,
+                    "The operation you are attempting can only be performed for "
+                    "(cell, face, or edge) iterators that point to valid "
+                    "objects. These objects need not necessarily be active, "
+                    "i.e., have no children, but they need to be part of a "
+                    "triangulation. (The objects pointed to by an iterator "
+                    "may -- after coarsening -- also be objects that used "
+                    "to be part of a triangulation, but are now no longer "
+                    "used. Their memory location may have been retained "
+                    "for re-use upon the next mesh refinement, but is "
+                    "currently unused.)");
   /**
    * The cell is not an
    * @ref GlossActive "active"
@@ -138,54 +147,64 @@ namespace TriaAccessorExceptions
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcCellNotActive);
+  DeclExceptionMsg (ExcCellNotActive,
+                    "The operation you are attempting can only be performed for "
+                    "(cell, face, or edge) iterators that point to 'active' "
+                    "objects. 'Active' objects are those that do not have "
+                    "children (in the case of cells), or that are part of "
+                    "an active cell (in the case of faces or edges). However, "
+                    "the object on which you are trying the current "
+                    "operation is not 'active' in this sense.");
   /**
    * Trying to access the children of a cell which is in fact active.
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcCellHasNoChildren);
+  DeclExceptionMsg (ExcCellHasNoChildren,
+                    "The operation you are attempting can only be performed for "
+                    "(cell, face, or edge) iterators that have children, "
+                    "but the object on which you are trying the current "
+                    "operation does not have any.");
   /**
    * Trying to access the parent of a cell which is in the coarsest level of
    * the triangulation.
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcCellHasNoParent);
-//TODO: Write documentation!
-  /**
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcUnusedCellAsChild);
-//TODO: Write documentation!
+  DeclExceptionMsg (ExcCellHasNoParent,
+                    "The operation you are attempting can only be performed for "
+                    "(cell, face, or edge) iterators that have a parent object, "
+                    "but the object on which you are trying the current "
+                    "operation does not have one -- i.e., it is on the "
+                    "coarsest level of the triangulation.");
   /**
    * @ingroup Exceptions
    */
   DeclException1 (ExcCantSetChildren,
                   int,
-                  << "You can only set the child index if the cell has no "
-                  << "children, or clear it. The given "
-                  << "index was " << arg1 << " (-1 means: clear children)");
-//TODO: Write documentation!
+                  << "You can only set the child index if the cell does not "
+                  << "currently have children registered; or you can clear it. "
+                  << "The given index was " << arg1 << " (-1 means: clear children).");
   /**
    * @ingroup Exceptions
    */
-  DeclException0 (ExcUnusedCellAsNeighbor);
-//TODO: Write documentation!
+  template <typename AccessorType>
+  DeclException1 (ExcDereferenceInvalidObject,
+                  AccessorType,
+                  << "You tried to dereference an iterator for which this "
+                  << "is not possible. More information on this iterator: "
+                  << "index=" << arg1.index()
+                  << ", state="
+                  << (arg1.state() == IteratorState::valid ? "valid" :
+                      (arg1.state() == IteratorState::past_the_end ?
+                       "past_the_end" : "invalid")));
   /**
    * @ingroup Exceptions
    */
-  DeclException0 (ExcUncaughtCase);
-//TODO: Write documentation!
-  /**
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcDereferenceInvalidObject);
-//TODO: Write documentation!
-  /**
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcCantCompareIterators);
+  DeclExceptionMsg (ExcCantCompareIterators,
+                    "Iterators can only be compared if they point to the same "
+                    "triangulation, or if neither of them are associated "
+                    "with a triangulation.");
 //TODO: Write documentation!
   /**
    * @ingroup Exceptions

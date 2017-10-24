@@ -3344,7 +3344,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::neighbor (const unsigned int i
 
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsNeighbor());
+    Assert (q->used(), ExcInternalError());
 #endif
   return q;
 }
@@ -3363,7 +3363,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::child (const unsigned int i) c
 
 #ifdef DEBUG
   if (q.state() != IteratorState::past_the_end)
-    Assert (q->used(), TriaAccessorExceptions::ExcUnusedCellAsChild());
+    Assert (q->used(), ExcInternalError());
 #endif
   return q;
 }
