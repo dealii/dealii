@@ -420,7 +420,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
         {
           output_data.inverse_jacobians[i] = Tensor<2,dim>();
           for (unsigned int j=0; j<dim; ++j)
-            output_data.inverse_jacobians[j][j]=1./data.cell_extents[j];
+            output_data.inverse_jacobians[i][j][j]=1./data.cell_extents[j];
         }
 
   return cell_similarity;
