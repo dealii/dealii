@@ -359,7 +359,7 @@ namespace LinearAlgebra
 
       thread_loop_partitioner = c.thread_loop_partitioner;
 
-      const size_type this_size = local_size();
+      const size_type this_size = partitioner->local_size();
       if (this_size>0)
         {
           dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(c.values.get(), values.get());
@@ -373,6 +373,24 @@ namespace LinearAlgebra
         zero_out_ghosts();
       return *this;
     }
+
+
+
+    template <typename Number>
+    template <typename Number2>
+    void
+    Vector<Number>::copy_locally_owned_data_from(const Vector<Number2> &src)
+    {
+      AssertDimension(partitioner->local_size(), src.partitioner->local_size());
+      if (partitioner->local_size() > 0)
+        {
+          dealii::internal::VectorOperations::Vector_copy<Number,Number2> copier(src.values.get(),
+              values.get());
+          internal::VectorOperations::parallel_for(copier, 0, partitioner->local_size(),
+                                                   thread_loop_partitioner);
+        }
+    }
+
 
 
 
@@ -534,6 +552,8 @@ namespace LinearAlgebra
     Vector<Number>::compress_finish (::dealii::VectorOperation::values operation)
     {
 #ifdef DEAL_II_WITH_MPI
+      vector_is_ghosted = false;
+
       if (compress_requests.size() == 0)
         return;
 
@@ -549,8 +569,6 @@ namespace LinearAlgebra
        ArrayView<Number>(values.get(), partitioner->local_size()),
        ArrayView<Number>(values.get() + partitioner->local_size(),partitioner->n_ghost_indices()),
        compress_requests);
-
-      vector_is_ghosted = false;
 #else
       (void)operation;
 #endif

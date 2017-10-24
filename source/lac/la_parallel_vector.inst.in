@@ -34,6 +34,7 @@ for (S1, S2 : REAL_SCALARS)
     \{
     template void Vector<S1>::reinit<S2> (const Vector<S2>&,
                                           const bool);
+    template void Vector<S1>::copy_locally_owned_data_from<S2> (const Vector<S2>&);
     template S1 Vector<S1>::inner_product_local<S2> (const Vector<S2>&) const;
     \}
     \}
@@ -58,6 +59,7 @@ for (S1, S2 : COMPLEX_SCALARS)
     \{
     template void Vector<S1>::reinit<S2> (const Vector<S2>&,
                                           const bool);
+    template void Vector<S1>::copy_locally_owned_data_from<S2> (const Vector<S2>&);
     \}
     \}
 }

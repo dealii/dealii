@@ -448,6 +448,14 @@ protected:
   bool perform_plain_copy;
 
   /**
+   * Stores whether the copy operation from the global to the level vector is
+   * actually a plain copy to the finest level except for a renumbering within
+   * the finest level of the degrees of freedom. This means that the grid has
+   * no adaptive refinement.
+   */
+  bool perform_renumbered_plain_copy;
+
+  /**
    * The vector that stores what has been given to the
    * set_component_to_block_map() function.
    */
