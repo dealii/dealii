@@ -443,7 +443,6 @@ namespace Functions
      * Constructor. The number of components is preset to one.
      */
     ZeroFunction (const unsigned int n_components = 1);
-
   };
 
 }
