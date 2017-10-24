@@ -165,7 +165,11 @@ Total Test time (real) =   1.72 sec</pre>
       as a second example a project is presented that consists of a support
       library "support" and an executable "step". The task shall be to
       provide unit tests for the library "support" and simple configuration
-      type tests for "step". In detail:
+      type tests for "step". We shall assume that all the
+      functions and classes are declared in a single header <code>support.h</code>
+      to be included <code>#include &lt;support.h&gt;</code> from the executable "step"
+      and units tests for the library.
+      In detail the directory and file layout is as follows:
       <pre>
 CMakeLists.txt
 
