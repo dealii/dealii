@@ -376,7 +376,7 @@ template <typename Number>
 template <int dim, typename Number2, int spacedim>
 void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_to_mg
-(const DoFHandler<dim,spacedim>                        &mg_dof_handler,
+(const DoFHandler<dim,spacedim>                             &mg_dof_handler,
  MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &dst,
  const LinearAlgebra::distributed::Vector<Number2>          &src,
  const bool solution_transfer) const
@@ -394,12 +394,17 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_to_mg
 
   if (perform_plain_copy)
     {
-      // In this case, we can simply copy the local range (in parallel by
-      // VectorView)
+      // In this case, we can simply copy the local range.
       AssertDimension(dst[dst.max_level()].local_size(), src.local_size());
-      VectorView<Number>  dst_view (src.local_size(), dst[dst.max_level()].begin());
-      VectorView<Number2> src_view (src.local_size(), src.begin());
-      static_cast<Vector<Number> &>(dst_view) = static_cast<Vector<Number2> &>(src_view);
+      dst[dst.max_level()].copy_locally_owned_data_from(src);
+      return;
+    }
+  else if (perform_renumbered_plain_copy)
+    {
+      Assert(copy_indices_level_mine.back().empty(), ExcInternalError());
+      LinearAlgebra::distributed::Vector<Number> &dst_level = dst[dst.max_level()];
+      for (std::pair<unsigned int,unsigned int> i : this_copy_indices.back())
+        dst_level.local_element(i.second) = src.local_element(i.first);
       return;
     }
 
@@ -440,7 +445,7 @@ template <typename Number>
 template <int dim, typename Number2, int spacedim>
 void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_from_mg
-(const DoFHandler<dim,spacedim>                              &mg_dof_handler,
+(const DoFHandler<dim,spacedim>                                   &mg_dof_handler,
  LinearAlgebra::distributed::Vector<Number2>                      &dst,
  const MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &src) const
 {
@@ -449,14 +454,21 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_from_mg
   AssertIndexRange(src.min_level(), src.max_level()+1);
   if (perform_plain_copy)
     {
-      // In this case, we can simply copy the local range (in parallel by
-      // VectorView). To avoid having stray data in ghost entries of the
-      // destination, make sure to clear them here.
+      // In this case, we can simply copy the local range. To avoid having
+      // stray data in ghost entries of the destination, make sure to clear
+      // them here.
       dst.zero_out_ghosts();
-      AssertDimension(dst.local_size(), src[src.max_level()].local_size());
-      VectorView<Number2> dst_view (dst.local_size(), dst.begin());
-      VectorView<Number>  src_view (dst.local_size(), src[src.max_level()].begin());
-      static_cast<Vector<Number2> &>(dst_view) = static_cast<Vector<Number> &>(src_view);
+      AssertDimension(src[src.max_level()].local_size(), dst.local_size());
+      dst.copy_locally_owned_data_from(src[src.max_level()]);
+      return;
+    }
+  else if (perform_renumbered_plain_copy)
+    {
+      Assert(copy_indices_global_mine.back().empty(), ExcInternalError());
+      const LinearAlgebra::distributed::Vector<Number> &src_level = src[src.max_level()];
+      dst.zero_out_ghosts();
+      for (std::pair<unsigned int,unsigned int> i : copy_indices.back())
+        dst.local_element(i.first) = src_level.local_element(i.second);
       return;
     }
 
@@ -501,7 +513,7 @@ template <typename Number>
 template <int dim, typename Number2, int spacedim>
 void
 MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::copy_from_mg_add
-(const DoFHandler<dim,spacedim>                              &/*mg_dof_handler*/,
+(const DoFHandler<dim,spacedim>                                   &/*mg_dof_handler*/,
  LinearAlgebra::distributed::Vector<Number2>                      &dst,
  const MGLevelObject<LinearAlgebra::distributed::Vector<Number> > &src) const
 {

@@ -51,7 +51,7 @@ MGLevelGlobalTransfer<VectorType>::fill_and_communicate_copy_indices
                                           copy_indices_global_mine, copy_indices_level_mine);
 
   // check if we can run a plain copy operation between the global DoFs and
-  // the finest level, on the current processor.
+  // the finest level.
   bool
   my_perform_plain_copy =
     (copy_indices.back().size() == mg_dof.locally_owned_dofs().n_elements())
@@ -100,6 +100,7 @@ MGLevelGlobalTransfer<VectorType>::clear()
   copy_indices_level_mine.clear();
   component_to_block_map.resize(0);
   mg_constrained_dofs = nullptr;
+  perform_plain_copy = false;
 }
 
 
@@ -286,10 +287,12 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::fill_and_com
                 solution_ghosted_global_vector,
                 solution_ghosted_level_vector);
 
-  perform_plain_copy = this->copy_indices.back().size()
-                       == mg_dof.locally_owned_dofs().n_elements();
-  if (perform_plain_copy)
+  bool my_perform_renumbered_plain_copy = (this->copy_indices.back().size() ==
+                                           mg_dof.locally_owned_dofs().n_elements());
+  bool my_perform_plain_copy = false;
+  if (my_perform_renumbered_plain_copy)
     {
+      my_perform_plain_copy = true;
       AssertDimension(this->copy_indices_global_mine.back().size(), 0);
       AssertDimension(this->copy_indices_level_mine.back().size(), 0);
 
@@ -300,16 +303,22 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::fill_and_com
         if (this->copy_indices.back()[i].first !=
             this->copy_indices.back()[i].second)
           {
-            perform_plain_copy = false;
+            my_perform_plain_copy = false;
             break;
           }
     }
+
+  // now do a global reduction over all processors to see what operation
+  // they can agree upon
   perform_plain_copy =
-    Utilities::MPI::min(static_cast<int>(perform_plain_copy),
+    Utilities::MPI::min(static_cast<int>(my_perform_plain_copy),
+                        mpi_communicator);
+  perform_renumbered_plain_copy =
+    Utilities::MPI::min(static_cast<int>(my_perform_renumbered_plain_copy),
                         mpi_communicator);
 
   // if we do a plain copy, no need to hold additional ghosted vectors
-  if (perform_plain_copy)
+  if (perform_renumbered_plain_copy)
     {
       ghosted_global_vector.reinit(0);
       ghosted_level_vector.resize(0, 0);
@@ -332,6 +341,8 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number> >::clear()
   mg_constrained_dofs = nullptr;
   ghosted_global_vector.reinit(0);
   ghosted_level_vector.resize(0, 0);
+  perform_plain_copy = false;
+  perform_renumbered_plain_copy = false;
 }
 
 
