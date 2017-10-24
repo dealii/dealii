@@ -1,0 +1,10 @@
+
+DEAL::Deal.II compute_pt_loc:
+DEAL::Testing for dim = 2
+DEAL::Testing on: 100 points.
+DEAL::Points found in 81 cells
+DEAL::Test finished
+DEAL::Testing for dim = 3
+DEAL::Testing on: 200 points.
+DEAL::Points found in 170 cells
+DEAL::Test finished
