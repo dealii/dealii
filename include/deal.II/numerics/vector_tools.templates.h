@@ -331,6 +331,10 @@ namespace VectorTools
       interpolation.reinit(vec);
       weights.reinit(vec);
 
+      // Store locally owned dofs, so that we can skip all non-local dofs,
+      // if they do not need to be interpolated.
+      const IndexSet locally_owned_dofs = vec.locally_owned_elements();
+
       // We use an FEValues object to transform all generalized support
       // points from the unit cell to the real cell coordinates. Thus,
       // initialize a quadrature with all generalized support points and
@@ -424,11 +428,6 @@ namespace VectorTools
 
           for (unsigned int i=0; i < n_dofs; ++i)
             {
-              ::dealii::internal::ElementAccess<VectorType>::add(
-                typename VectorType::value_type(1.0),
-                dofs_on_cell[i],
-                weights);
-
               const auto &nonzero_components =
                 fe[fe_index].get_nonzero_components(i);
 
@@ -443,18 +442,29 @@ namespace VectorTools
               if (selected)
                 {
                   // Add local values to the global vectors
-                  ::dealii::internal::ElementAccess<VectorType>::add(
-                    dof_values[i], dofs_on_cell[i], interpolation);
+                  ::dealii::internal::ElementAccess<VectorType>::add(dof_values[i],
+                                                                     dofs_on_cell[i],
+                                                                     interpolation);
+                  ::dealii::internal::ElementAccess<VectorType>::add(typename VectorType::value_type(1.0),
+                                                                     dofs_on_cell[i],
+                                                                     weights);
                 }
               else
                 {
-                  // If a component is ignored, simply copy all dof values
-                  // from the vector "vec":
-                  const auto value =
-                    ::dealii::internal::ElementAccess<VectorType>::get(
-                      vec, dofs_on_cell[i]);
-                  ::dealii::internal::ElementAccess<VectorType>::add(
-                    value, dofs_on_cell[i], interpolation);
+                  // If a component is ignored, copy the dof values
+                  // from the vector "vec", but only if they are locally available
+                  if (locally_owned_dofs.is_element(dofs_on_cell[i]))
+                    {
+                      const auto value =
+                        ::dealii::internal::ElementAccess<VectorType>::get(vec,
+                                                                           dofs_on_cell[i]);
+                      ::dealii::internal::ElementAccess<VectorType>::add(value,
+                                                                         dofs_on_cell[i],
+                                                                         interpolation);
+                      ::dealii::internal::ElementAccess<VectorType>::add(typename VectorType::value_type(1.0),
+                                                                         dofs_on_cell[i],
+                                                                         weights);
+                    }
                 }
             }
         } /* loop over dof_handler.active_cell_iterators() */
