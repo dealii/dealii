@@ -1763,6 +1763,10 @@ namespace parallel
     {
       Assert(n_attached_deserialize==0,
              ExcMessage ("not all SolutionTransfer's got deserialized after the last load()"));
+
+      // signal that serialization is going to happen
+      this->signals.pre_distributed_save();
+
       int real_data_size = 0;
       if (attached_data_size>0)
         real_data_size = attached_data_size+sizeof(CellStatus);
@@ -1885,6 +1889,10 @@ namespace parallel
         }
 
       this->update_number_cache ();
+
+      // signal that de-serialization is finished
+      this->signals.post_distributed_load();
+
       this->update_periodic_face_map();
     }
 
@@ -2784,6 +2792,9 @@ namespace parallel
             }
         }
 
+      // signal that refinement is going to happen
+      this->signals.pre_distributed_refinement();
+
       // now do the work we're supposed to do when we are in charge
       this->prepare_coarsening_and_refinement ();
 
@@ -2955,6 +2966,12 @@ namespace parallel
 #endif
 
       this->update_number_cache ();
+
+      // signal that refinement is finished,
+      // this is triggered before update_periodic_face_map
+      // to be consistent with the serial triangulation class
+      this->signals.post_distributed_refinement();
+
       this->update_periodic_face_map();
     }
 
