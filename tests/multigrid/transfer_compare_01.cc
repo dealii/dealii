@@ -130,7 +130,7 @@ void check_block(const FiniteElement<dim> &fe)
 
   // Make sure all orderings are the
   // same
-  Point<dim> direction;
+  Tensor<1,dim> direction;
   for (unsigned int d=0; d<dim; ++d)
     direction[d] = d*d*d;
   DoFRenumbering::downstream(dof, direction);

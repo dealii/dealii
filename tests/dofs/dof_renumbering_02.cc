@@ -113,9 +113,9 @@ check_renumbering(DoFHandler<dim> &mgdof)
   std::vector<unsigned int> order(element.n_components());
   for (unsigned int i=0; i<order.size(); ++i) order[i] = order.size()-i-1;
 
-  Point<dim> direction;
+  Tensor<1,dim> direction;
   for (unsigned int i=0; i<dim; ++i)
-    direction(i) = -5.0001+i;
+    direction[i] = -5.0001+i;
 
   deallog << std::endl << "Downstream numbering cell-wise" << std::endl;
   DoFRenumbering::downstream(dof, direction);

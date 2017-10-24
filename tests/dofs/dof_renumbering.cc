@@ -83,9 +83,9 @@ check_renumbering(DoFHandler<dim> &mgdof, bool discontinuous)
   std::vector<unsigned int> order(element.n_components());
   for (unsigned int i=0; i<order.size(); ++i) order[i] = order.size()-i-1;
 
-  Point<dim> direction;
+  Tensor<1,dim> direction;
   for (unsigned int i=0; i<dim; ++i)
-    direction(i) = std::pow(10.,static_cast<double>(i));
+    direction[i] = std::pow(10.,static_cast<double>(i));
 
   // Check global ordering
   print_dofs (dof);
