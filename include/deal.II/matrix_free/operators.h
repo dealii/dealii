@@ -24,7 +24,6 @@
 
 #include <deal.II/lac/diagonal_matrix.h>
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/vector_view.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/matrix_free/matrix_free.h>
 #include <deal.II/matrix_free/fe_evaluation.h>
@@ -1197,14 +1196,10 @@ namespace MatrixFreeOperators
 
         // copy the vector content to a temporary vector so that it does not get
         // lost
-        VectorView<Number> view_src_in(subblock(src,i).local_size(),
-                                       subblock(src,i).begin());
-        const Vector<Number> copy_vec = view_src_in;
+        LinearAlgebra::distributed::Vector<Number> copy_vec(subblock(src,i));
         subblock(const_cast<VectorType &>(src),i).
         reinit(data->get_dof_info(mf_component).vector_partitioner);
-        VectorView<Number> view_src_out(subblock(src,i).local_size(),
-                                        subblock(src,i).begin());
-        static_cast<Vector<Number>&>(view_src_out) = copy_vec;
+        subblock(const_cast<VectorType &>(src),i).copy_locally_owned_data_from(copy_vec);
       }
   }
 
