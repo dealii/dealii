@@ -949,7 +949,9 @@ namespace VectorTools
    * be handled by this function and corresponding boundary value functions.
    * The keys of this map correspond to the number @p boundary_id of the face.
    * numbers::internal_face_boundary_id is an illegal value for this key since
-   * it is reserved for interior faces.
+   * it is reserved for interior faces. For an example of how to use this
+   * argument with a non-empty map, see the step-16 tutorial program. (Note
+   * that the argument type is equal to the FunctionMap type.)
    *
    * The flags in the last parameter, @p component_mask denote which
    * components of the finite element space shall be interpolated. If it is
