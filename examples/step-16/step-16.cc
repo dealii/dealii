@@ -283,7 +283,7 @@ namespace Step16
 
     std::set<types::boundary_id>         dirichlet_boundary_ids;
     typename FunctionMap<dim>::type      dirichlet_boundary_functions;
-    Functions::ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
+    Functions::ZeroFunction<dim>         homogeneous_dirichlet_bc;
     dirichlet_boundary_ids.insert(0);
     dirichlet_boundary_functions[0] = &homogeneous_dirichlet_bc;
     VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(dof_handler),
