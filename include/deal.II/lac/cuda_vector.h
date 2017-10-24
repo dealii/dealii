@@ -17,6 +17,8 @@
 #define dealii_cuda_vector_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/index_set.h>
 #include <deal.II/lac/vector_space_vector.h>
 #include <deal.II/lac/vector_operation.h>
 
