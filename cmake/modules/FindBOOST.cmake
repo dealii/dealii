@@ -46,9 +46,15 @@ ENDIF()
 
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-FIND_PACKAGE(Boost 1.59 COMPONENTS
-  iostreams serialization system thread
-  )
+IF(DEAL_II_WITH_ZLIB)
+  FIND_PACKAGE(Boost 1.59 COMPONENTS
+    iostreams serialization system thread
+    )
+ELSE()
+  FIND_PACKAGE(Boost 1.59 COMPONENTS
+    serialization system thread
+    )
+ENDIF()
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
@@ -59,7 +65,11 @@ IF(NOT Boost_FOUND AND Boost_USE_STATIC_LIBS)
 
   # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
   LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
-  FIND_PACKAGE(Boost 1.59 COMPONENTS iostreams serialization system thread)
+  IF(DEAL_II_WITH_ZLIB)
+    FIND_PACKAGE(Boost 1.59 COMPONENTS iostreams serialization system thread)
+  ELSE()
+    FIND_PACKAGE(Boost 1.59 COMPONENTS serialization system thread)
+  ENDIF()
   LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 ENDIF()
 
