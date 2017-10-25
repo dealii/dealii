@@ -1297,11 +1297,11 @@ namespace FEValuesViews
   }
 
   template <int dim, int spacedim>
-  template <class InputVector>
+  template <typename Number>
   void
   Scalar<dim,spacedim>::
-  get_function_values_from_local_dof_values (const InputVector &dof_values,
-                                             std::vector<typename OutputType<typename InputVector::value_type>::value_type> &values) const
+  get_function_values_from_local_dof_values (const ArrayView<const Number> &dof_values,
+                                             std::vector<typename OutputType<Number>::value_type> &values) const
   {
     Assert (fe_values->update_flags & update_values,
             (typename FEValuesBase<dim,spacedim>::ExcAccessToUninitializedField("update_values")));
