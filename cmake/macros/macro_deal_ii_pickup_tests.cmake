@@ -149,10 +149,11 @@ MACRO(DEAL_II_PICKUP_TESTS)
   #
   STRING(FIND "${NUMDIFF_EXECUTABLE}" "numdiff" _found_numdiff_binary)
   IF(NOT "${_found_numdiff_binary}" STREQUAL "-1")
+    STRING(RANDOM _suffix)
     SET(_first_test_file_name
-      "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-test-1.txt")
+      "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-test-${_suffix}-1.txt")
     SET(_second_test_file_name
-      "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-test-2.txt")
+      "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/numdiff-test-${_suffix}-2.txt")
     FILE(WRITE "${_first_test_file_name}" "0.99999999998\n2.0\n1.0\n")
     FILE(WRITE "${_second_test_file_name}" "1.00000000001\n2.0\n1.0\n")
 
