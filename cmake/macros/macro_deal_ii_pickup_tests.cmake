@@ -164,11 +164,10 @@ MACRO(DEAL_II_PICKUP_TESTS)
       RESULT_VARIABLE _numdiff_tolerance_test_status
       )
 
-    #
-    # Tidy up:
-    #
-    FILE(REMOVE ${_first_test_file_name})
-    FILE(REMOVE ${_second_test_file_name})
+    # Note: We do not remove the test files to avoid a race condition if 
+    # cmake decides to rerun in a concurrent situation:
+    # FILE(REMOVE ${_first_test_file_name})
+    # FILE(REMOVE ${_second_test_file_name})
 
     IF(NOT "${_numdiff_tolerance_test_status}" STREQUAL "0")
       MESSAGE(FATAL_ERROR
