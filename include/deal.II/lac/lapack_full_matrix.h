@@ -135,6 +135,12 @@ public:
   operator/= (const number factor);
 
   /**
+   * Simple addition of a scaled matrix, i.e. <tt>*this += a*A</tt>.
+   */
+  void add (const number                    a,
+            const LAPACKFullMatrix<number> &A);
+
+  /**
    * Assignment from different matrix classes, performing the usual conversion
    * to the transposed format expected by LAPACK. This assignment operator
    * uses iterators of the typename MatrixType. Therefore, sparse matrices are
