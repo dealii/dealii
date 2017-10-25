@@ -2854,26 +2854,17 @@ public:
                   << "pass to the constructor. Here, the operation you are attempting requires "
                   << "the <" << arg1 << "> flag to be set, but it was apparently not specified "
                   << "upon construction.");
+
   /**
-   * @todo Document this
+   * Mismatch between the FEValues FiniteElement and cell->get_dof_handler().get_fe()
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcCannotInitializeField);
+  DeclExceptionMsg (ExcFEDontMatch,
+                    "The FiniteElement you provided to FEValues and the FiniteElement that belongs "
+                    "to the DoFHandler that provided the cell iterator do not match.");
   /**
-   * @todo Document this
-   *
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcInvalidUpdateFlag);
-  /**
-   * @todo Document this
-   *
-   * @ingroup Exceptions
-   */
-  DeclException0 (ExcFEDontMatch);
-  /**
-   * @todo Document this
+   * A given shape function is not primitive, but it needs to be.
    *
    * @ingroup Exceptions
    */
@@ -2885,12 +2876,15 @@ public:
                   << "function cannot be called for these shape functions. "
                   << "Maybe you want to use the same function with the "
                   << "_component suffix?");
+
   /**
-   * @todo Document this
+   * The given FiniteElement is not a primitive element, see FiniteElement::is_primitive().
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcFENotPrimitive);
+  DeclExceptionMsg (ExcFENotPrimitive,
+                    "The given FiniteElement is not a primitive element but the requested operation "
+                    "only works for those. See FiniteElement::is_primitive() for more information.");
 
 protected:
   /**
