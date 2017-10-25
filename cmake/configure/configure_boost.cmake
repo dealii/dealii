@@ -86,8 +86,7 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
       #
       RESET_CMAKE_REQUIRED()
       PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
-      PUSH_CMAKE_REQUIRED("-L${Boost_LIBRARY_DIRS}")
-      SET(CMAKE_REQUIRED_LIBRARIES "-lboost_iostreams")
+      SET(CMAKE_REQUIRED_LIBRARIES "${BOOST_LIBRARIES}")
       CHECK_CXX_SOURCE_COMPILES(
         "
         #include <string>
@@ -116,6 +115,10 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
                 "with zlib support but a simple test failed! "
                 "Therefore, the bundled boost package is used."
                )
+        SET(BOOST_ADDITIONAL_ERROR_STRING
+            "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
+            "with zlib support but a simple test failed! "
+           )
         SET(${var} FALSE)
       ENDIF()
       RESET_CMAKE_REQUIRED()
