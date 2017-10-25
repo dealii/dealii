@@ -120,7 +120,8 @@ TriaAccessorBase<structdim,dim,spacedim>::operator == (const TriaAccessorBase<st
 {
   Assert (tria == a.tria || tria == nullptr || a.tria == nullptr,
           TriaAccessorExceptions::ExcCantCompareIterators());
-  return ((present_level == a.present_level) &&
+  return ((tria == a.tria) &&
+          (present_level == a.present_level) &&
           (present_index == a.present_index));
 }
 
@@ -133,7 +134,8 @@ TriaAccessorBase<structdim,dim,spacedim>::operator != (const TriaAccessorBase<st
 {
   Assert (tria == a.tria || tria == nullptr || a.tria == nullptr,
           TriaAccessorExceptions::ExcCantCompareIterators());
-  return ((present_level != a.present_level) ||
+  return ((tria != a.tria) ||
+          (present_level != a.present_level) ||
           (present_index != a.present_index));
 }
 
