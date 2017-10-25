@@ -1215,7 +1215,7 @@ bool
 TriaAccessor<structdim,dim,spacedim>::used () const
 {
   Assert (this->state() == IteratorState::valid,
-          TriaAccessorExceptions::ExcDereferenceInvalidObject());
+          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
   return this->objects().used[this->present_index];
 }
 
@@ -1409,7 +1409,7 @@ template <int structdim, int dim, int spacedim>
 void TriaAccessor<structdim, dim, spacedim>::set_used_flag () const
 {
   Assert (this->state() == IteratorState::valid,
-          TriaAccessorExceptions::ExcDereferenceInvalidObject());
+          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
   this->objects().used[this->present_index] = true;
 }
 
@@ -1420,7 +1420,7 @@ void
 TriaAccessor<structdim, dim, spacedim>::clear_used_flag () const
 {
   Assert (this->state() == IteratorState::valid,
-          TriaAccessorExceptions::ExcDereferenceInvalidObject());
+          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
   this->objects().used[this->present_index] = false;
 }
 
@@ -1492,7 +1492,7 @@ RefinementCase<structdim>
 TriaAccessor<structdim, dim, spacedim>::refinement_case() const
 {
   Assert (this->state() == IteratorState::valid,
-          TriaAccessorExceptions::ExcDereferenceInvalidObject());
+          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
 
   switch (structdim)
     {
@@ -1541,7 +1541,7 @@ TriaAccessor<structdim,dim,spacedim>::child (const unsigned int i) const
      child_index (i));
 
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
-          TriaAccessorExceptions::ExcUnusedCellAsChild());
+          ExcInternalError());
 
   return q;
 }
@@ -1602,7 +1602,7 @@ bool
 TriaAccessor<structdim,dim,spacedim>::has_children () const
 {
   Assert (this->state() == IteratorState::valid,
-          TriaAccessorExceptions::ExcDereferenceInvalidObject());
+          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
 
   // each set of two children are stored
   // consecutively, so we only have to find
@@ -1631,7 +1631,7 @@ TriaAccessor<structdim, dim, spacedim>::
 set_refinement_case (const RefinementCase<structdim> &refinement_case) const
 {
   Assert (this->state() == IteratorState::valid,
-          TriaAccessorExceptions::ExcDereferenceInvalidObject());
+          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
   Assert (static_cast<unsigned int> (this->present_index) <
           this->objects().refinement_cases.size(),
           ExcIndexRange(this->present_index, 0,
@@ -1647,7 +1647,7 @@ void
 TriaAccessor<structdim, dim, spacedim>::clear_refinement_case () const
 {
   Assert (this->state() == IteratorState::valid,
-          TriaAccessorExceptions::ExcDereferenceInvalidObject());
+          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(*this));
   Assert (static_cast<unsigned int> (this->present_index) <
           this->objects().refinement_cases.size(),
           ExcIndexRange(this->present_index, 0,
@@ -1674,11 +1674,20 @@ TriaAccessor<structdim, dim, spacedim>::set_children (const unsigned int i,
   // the location of the set of children
   const unsigned int n_sets_of_two = GeometryInfo<structdim>::max_children_per_cell/2;
 
-  Assert ((index==-1) ||
-          (i==0 && !this->has_children() && (index>=0)) ||
-          (i>0  &&  this->has_children() && (index>=0) &&
-           this->objects().children[n_sets_of_two*this->present_index+i/2] == -1),
-          TriaAccessorExceptions::ExcCantSetChildren(index));
+  Assert (
+    // clearing the child index for a cell
+    (index==-1)
+    ||
+    // if setting the child index for the i'th child (with i==0),
+    // then the index must be a non-negative number
+    (i==0 && !this->has_children() && (index>=0))
+    ||
+    // if setting the child index for the i'th child (with i>0),
+    // then the previously stored index must be the invalid
+    // index
+    (i>0  &&  this->has_children() && (index>=0) &&
+     this->objects().children[n_sets_of_two*this->present_index+i/2] == -1),
+    TriaAccessorExceptions::ExcCantSetChildren(index));
 
   this->objects().children[n_sets_of_two*this->present_index+i/2] = index;
 }
@@ -3552,7 +3561,7 @@ CellAccessor<dim,spacedim>::neighbor (const unsigned int i) const
   q (this->tria, neighbor_level (i), neighbor_index (i));
 
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
-          TriaAccessorExceptions::ExcUnusedCellAsNeighbor());
+          ExcInternalError());
 
   return q;
 }
@@ -3568,7 +3577,7 @@ CellAccessor<dim,spacedim>::child (const unsigned int i) const
   q (this->tria, this->present_level+1, this->child_index (i));
 
   Assert ((q.state() == IteratorState::past_the_end) || q->used(),
-          TriaAccessorExceptions::ExcUnusedCellAsChild());
+          ExcInternalError());
 
   return q;
 }
