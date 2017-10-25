@@ -32,11 +32,13 @@
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#ifdef DEAL_II_WITH_ZLIB
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/serialization/array.hpp>
+#endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <set>
@@ -3052,6 +3054,7 @@ namespace internal
             // stream into which we serialize the current object
             std::vector<char> buffer;
             {
+#ifdef DEAL_II_WITH_ZLIB
               boost::iostreams::filtering_ostream out;
               out.push(boost::iostreams::gzip_compressor
                        (boost::iostreams::gzip_params
@@ -3062,6 +3065,14 @@ namespace internal
 
               archive << *this;
               out.flush();
+#else
+              std::ostringstream out;
+              boost::archive::binary_oarchive archive(out);
+              archive << *this;
+              const std::string &s = out.str();
+              buffer.reserve(s.size());
+              buffer.assign(s.begin(), s.end());
+#endif
             }
 
             return buffer;
@@ -3079,11 +3090,14 @@ namespace internal
 
             // first decompress the buffer
             {
+#ifdef DEAL_II_WITH_ZLIB
               boost::iostreams::filtering_ostream decompressing_stream;
               decompressing_stream.push(boost::iostreams::gzip_decompressor());
               decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
-
               decompressing_stream.write (buffer.data(), buffer.size());
+#else
+              decompressed_buffer.assign (buffer.begin(), buffer.end());
+#endif
             }
 
             // then restore the object from the buffer
@@ -4296,6 +4310,8 @@ namespace internal
           // serialize our own IndexSet
           std::vector<char> my_data;
           {
+#ifdef DEAL_II_WITH_ZLIB
+
             boost::iostreams::filtering_ostream out;
             out.push(boost::iostreams::gzip_compressor
                      (boost::iostreams::gzip_params
@@ -4306,6 +4322,14 @@ namespace internal
 
             archive << my_locally_owned_dofs;
             out.flush();
+#else
+            std::ostringstream out;
+            boost::archive::binary_oarchive archive(out);
+            archive << my_locally_owned_dofs;
+            const std::string &s = out.str();
+            my_data.reserve(s.size());
+            my_data.assign(s.begin(), s.end());
+#endif
           }
 
           // determine maximum size of IndexSet
@@ -4334,11 +4358,16 @@ namespace internal
 
                 // first decompress the buffer
                 {
+#ifdef DEAL_II_WITH_ZLIB
+
                   boost::iostreams::filtering_ostream decompressing_stream;
                   decompressing_stream.push(boost::iostreams::gzip_decompressor());
                   decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
 
                   decompressing_stream.write(&buffer[i*max_size], max_size);
+#else
+                  decompressed_buffer.assign (&buffer[i*max_size], max_size);
+#endif
                 }
 
                 // then restore the object from the buffer
