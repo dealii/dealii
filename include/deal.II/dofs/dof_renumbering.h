@@ -831,9 +831,9 @@ namespace DoFRenumbering
    * numbering is performed cell-wise, otherwise it is performed based on the
    * location of the support points.
    *
-   * The cells are sorted such that the centers of higher numbers are further
+   * The cells are sorted such that the centers of cells numbered higher are further
    * downstream with respect to the constant vector @p direction than the
-   * centers of lower numbers. Even if this yields a downstream numbering with
+   * centers of of cells numbered lower. Even if this yields a downstream numbering with
    * respect to the flux on the edges for fairly general grids, this might not
    * be guaranteed for all meshes.
    *
@@ -852,48 +852,48 @@ namespace DoFRenumbering
    */
   template <typename DoFHandlerType>
   void
-  downstream (DoFHandlerType                               &dof_handler,
-              const Point<DoFHandlerType::space_dimension> &direction,
-              const bool                                    dof_wise_renumbering = false);
+  downstream (DoFHandlerType                                  &dof_handler,
+              const Tensor<1,DoFHandlerType::space_dimension> &direction,
+              const bool                                       dof_wise_renumbering = false);
 
 
   /**
    * Cell-wise downstream numbering with respect to a constant flow direction
-   * on one level. See the other function with the same name.
+   * on one level of a multigrid hierarchy. See the other function with the same name.
    */
   template <typename DoFHandlerType>
   void
-  downstream (DoFHandlerType                               &dof_handler,
-              const unsigned int                            level,
-              const Point<DoFHandlerType::space_dimension> &direction,
-              const bool                                    dof_wise_renumbering = false);
+  downstream (DoFHandlerType                                  &dof_handler,
+              const unsigned int                               level,
+              const Tensor<1,DoFHandlerType::space_dimension> &direction,
+              const bool                                       dof_wise_renumbering = false);
 
   /**
-   * Compute the renumbering vector needed by the downstream() function. Does
+   * Compute the set of renumbering indices needed by the downstream() function. Does
    * not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
   template <typename DoFHandlerType>
   void
-  compute_downstream (std::vector<types::global_dof_index>         &new_dof_indices,
-                      std::vector<types::global_dof_index>         &reverse,
-                      const DoFHandlerType                         &dof_handler,
-                      const Point<DoFHandlerType::space_dimension> &direction,
-                      const bool                                    dof_wise_renumbering);
+  compute_downstream (std::vector<types::global_dof_index>            &new_dof_indices,
+                      std::vector<types::global_dof_index>            &reverse,
+                      const DoFHandlerType                            &dof_handler,
+                      const Tensor<1,DoFHandlerType::space_dimension> &direction,
+                      const bool                                       dof_wise_renumbering);
 
   /**
-   * Compute the renumbering vector needed by the downstream() function. Does
+   * Compute the set of renumbering indices needed by the downstream() function. Does
    * not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
   template <typename DoFHandlerType>
   void
-  compute_downstream (std::vector<types::global_dof_index>         &new_dof_indices,
-                      std::vector<types::global_dof_index>         &reverse,
-                      const DoFHandlerType                         &dof_handler,
-                      const unsigned int                            level,
-                      const Point<DoFHandlerType::space_dimension> &direction,
-                      const bool                                    dof_wise_renumbering);
+  compute_downstream (std::vector<types::global_dof_index>            &new_dof_indices,
+                      std::vector<types::global_dof_index>            &reverse,
+                      const DoFHandlerType                            &dof_handler,
+                      const unsigned int                               level,
+                      const Tensor<1,DoFHandlerType::space_dimension> &direction,
+                      const bool                                       dof_wise_renumbering);
 
   /**
    * Cell-wise clockwise numbering.
@@ -910,8 +910,8 @@ namespace DoFRenumbering
                 const bool                                    counter = false);
 
   /**
-   * Cell-wise clockwise numbering on one level. See the other function with
-   * the same name.
+   * Cell-wise clockwise numbering on one level of a multigrid
+   * hierarchy. See the other function with the same name.
    */
   template <typename DoFHandlerType>
   void
@@ -1099,28 +1099,6 @@ namespace DoFRenumbering
    */
   DeclException0 (ExcNotDGFEM);
 }
-
-/* ------------------------- inline functions -------------- */
-
-#ifndef DOXYGEN
-namespace DoFRenumbering
-{
-  template <typename DoFHandlerType>
-  void
-  inline
-  downstream (DoFHandlerType                               &dof,
-              const Point<DoFHandlerType::space_dimension> &direction,
-              const bool                                    dof_wise_renumbering)
-  {
-    std::vector<types::global_dof_index> renumbering(dof.n_dofs());
-    std::vector<types::global_dof_index> reverse(dof.n_dofs());
-    compute_downstream(renumbering, reverse, dof, direction,
-                       dof_wise_renumbering);
-
-    dof.renumber_dofs(renumbering);
-  }
-}
-#endif
 
 
 DEAL_II_NAMESPACE_CLOSE

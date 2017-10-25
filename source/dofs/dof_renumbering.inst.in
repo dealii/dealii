@@ -198,7 +198,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     template void
     compute_downstream<DoFHandler<deal_II_dimension> >
     (std::vector<types::global_dof_index>&,std::vector<types::global_dof_index>&,
-     const DoFHandler<deal_II_dimension>&, const Point<deal_II_dimension>&,
+     const DoFHandler<deal_II_dimension>&, const Tensor<1,DoFHandler<deal_II_dimension>::space_dimension>&,
      const bool);
 
     template
@@ -229,7 +229,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     compute_downstream<hp::DoFHandler<deal_II_dimension> >
     (std::vector<types::global_dof_index>&,std::vector<types::global_dof_index>&,
      const hp::DoFHandler<deal_II_dimension>&,
-     const Point<deal_II_dimension>&,
+     const Tensor<1,hp::DoFHandler<deal_II_dimension>::space_dimension>&,
      const bool);
 
     template
@@ -246,13 +246,19 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
      const Point<deal_II_dimension>&,
      const bool);
 
+    template
+    void downstream
+    (DoFHandler<deal_II_dimension>&,
+     const Tensor<1,DoFHandler<deal_II_dimension>::space_dimension>&,
+     const bool);
+
 // MG
 
     template
     void downstream
     (DoFHandler<deal_II_dimension>&,
      const unsigned int,
-     const Point<deal_II_dimension>&,
+     const Tensor<1,DoFHandler<deal_II_dimension>::space_dimension>&,
      const bool);
 
     template

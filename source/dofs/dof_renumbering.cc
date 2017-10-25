@@ -1487,18 +1487,30 @@ namespace DoFRenumbering
 
 
 
+  template <typename DoFHandlerType>
+  void
+  downstream (DoFHandlerType                                  &dof,
+              const Tensor<1,DoFHandlerType::space_dimension> &direction,
+              const bool                                       dof_wise_renumbering)
+  {
+    std::vector<types::global_dof_index> renumbering(dof.n_dofs());
+    std::vector<types::global_dof_index> reverse(dof.n_dofs());
+    compute_downstream(renumbering, reverse, dof, direction,
+                       dof_wise_renumbering);
 
+    dof.renumber_dofs(renumbering);
+  }
 
 
 
   template <typename DoFHandlerType>
   void
   compute_downstream
-  (std::vector<types::global_dof_index>         &new_indices,
-   std::vector<types::global_dof_index>         &reverse,
-   const DoFHandlerType                         &dof,
-   const Point<DoFHandlerType::space_dimension> &direction,
-   const bool                                    dof_wise_renumbering)
+  (std::vector<types::global_dof_index>            &new_indices,
+   std::vector<types::global_dof_index>            &reverse,
+   const DoFHandlerType                            &dof,
+   const Tensor<1,DoFHandlerType::space_dimension> &direction,
+   const bool                                       dof_wise_renumbering)
   {
     if (dof_wise_renumbering == false)
       {
@@ -1583,10 +1595,10 @@ namespace DoFRenumbering
 
 
   template <typename DoFHandlerType>
-  void downstream (DoFHandlerType                               &dof,
-                   const unsigned int                            level,
-                   const Point<DoFHandlerType::space_dimension> &direction,
-                   const bool                                    dof_wise_renumbering)
+  void downstream (DoFHandlerType                                  &dof,
+                   const unsigned int                               level,
+                   const Tensor<1,DoFHandlerType::space_dimension> &direction,
+                   const bool                                       dof_wise_renumbering)
   {
     std::vector<types::global_dof_index> renumbering(dof.n_dofs(level));
     std::vector<types::global_dof_index> reverse(dof.n_dofs(level));
@@ -1601,12 +1613,12 @@ namespace DoFRenumbering
   template <typename DoFHandlerType>
   void
   compute_downstream
-  (std::vector<types::global_dof_index>         &new_indices,
-   std::vector<types::global_dof_index>         &reverse,
-   const DoFHandlerType                         &dof,
-   const unsigned int                            level,
-   const Point<DoFHandlerType::space_dimension> &direction,
-   const bool                                    dof_wise_renumbering)
+  (std::vector<types::global_dof_index>            &new_indices,
+   std::vector<types::global_dof_index>            &reverse,
+   const DoFHandlerType                            &dof,
+   const unsigned int                               level,
+   const Tensor<1,DoFHandlerType::space_dimension> &direction,
+   const bool                                       dof_wise_renumbering)
   {
     if (dof_wise_renumbering == false)
       {
