@@ -21,7 +21,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int spacedim, typename Number> class Function;
+template <int spacedim, typename RangeNumberType> class Function;
 
 
 
