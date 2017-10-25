@@ -171,6 +171,28 @@ LAPACKFullMatrix<number>::operator/= (const number factor)
 }
 
 
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::add (const number              a,
+                               const LAPACKFullMatrix<number> &A)
+{
+  Assert(state == LAPACKSupport::matrix ||
+         state == LAPACKSupport::inverse_matrix,
+         ExcState(state));
+
+  Assert (m() == A.m(), ExcDimensionMismatch(m(), A.m()));
+  Assert (n() == A.n(), ExcDimensionMismatch(n(), A.n()));
+
+  AssertIsFinite(a);
+
+  for (size_type i=0; i<m(); ++i)
+    for (size_type j=0; j<n(); ++j)
+      (*this)(i,j) += a * A(i,j);
+}
+
+
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::vmult (
