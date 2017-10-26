@@ -204,12 +204,15 @@ build_one_patch (const cell_iterator                                            
                       // value, gradient etc.
                       if (update_flags & update_values)
                         this->dof_data[dataset]->get_function_values (fe_patch_values,
+                                                                      internal::DataOut::ComponentExtractor::real_part,
                                                                       data.patch_values_scalar.solution_values);
                       if (update_flags & update_gradients)
                         this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+                                                                         internal::DataOut::ComponentExtractor::real_part,
                                                                          data.patch_values_scalar.solution_gradients);
                       if (update_flags & update_hessians)
                         this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+                                                                        internal::DataOut::ComponentExtractor::real_part,
                                                                         data.patch_values_scalar.solution_hessians);
 
                       if (update_flags & update_quadrature_points)
@@ -233,12 +236,15 @@ build_one_patch (const cell_iterator                                            
                       // its derivative...
                       if (update_flags & update_values)
                         this->dof_data[dataset]->get_function_values (fe_patch_values,
+                                                                      internal::DataOut::ComponentExtractor::real_part,
                                                                       data.patch_values_system.solution_values);
                       if (update_flags & update_gradients)
                         this->dof_data[dataset]->get_function_gradients (fe_patch_values,
+                                                                         internal::DataOut::ComponentExtractor::real_part,
                                                                          data.patch_values_system.solution_gradients);
                       if (update_flags & update_hessians)
                         this->dof_data[dataset]->get_function_hessians (fe_patch_values,
+                                                                        internal::DataOut::ComponentExtractor::real_part,
                                                                         data.patch_values_system.solution_hessians);
 
                       if (update_flags & update_quadrature_points)
@@ -288,6 +294,7 @@ build_one_patch (const cell_iterator                                            
               else if (n_components == 1)
                 {
                   this->dof_data[dataset]->get_function_values (fe_patch_values,
+                                                                internal::DataOut::ComponentExtractor::real_part,
                                                                 data.patch_values_scalar.solution_values);
 
                   switch (dimension)
@@ -320,6 +327,7 @@ build_one_patch (const cell_iterator                                            
                 {
                   data.resize_system_vectors(n_components);
                   this->dof_data[dataset]->get_function_values (fe_patch_values,
+                                                                internal::DataOut::ComponentExtractor::real_part,
                                                                 data.patch_values_system.solution_values);
 
                   for (unsigned int component=0; component<n_components;
@@ -366,7 +374,8 @@ build_one_patch (const cell_iterator                                            
                 = std::distance (this->triangulation->begin_active(),
                                  typename Triangulation<dimension,space_dimension>::active_cell_iterator(*cell));
               const double value
-                = this->cell_data[dataset]->get_cell_data_value (cell_number);
+                = this->cell_data[dataset]->get_cell_data_value (cell_number,
+                                                                 internal::DataOut::ComponentExtractor::real_part);
               switch (dimension)
                 {
                 case 1:

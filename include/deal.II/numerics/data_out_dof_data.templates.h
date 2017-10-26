@@ -23,6 +23,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/numbers.h>
+#include <deal.II/base/signaling_nan.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -312,6 +313,66 @@ namespace internal
 {
   namespace DataOut
   {
+    /**
+     * Extract the specified component of a number. This template is used
+     * when the given value is assumed to be a real scalar, so asking
+     * for the real part is the only valid choice for the second argument.
+     */
+    template <typename NumberType>
+    double get_component (const NumberType         value,
+                          const ComponentExtractor extract_component)
+    {
+      static_assert (numbers::NumberTraits<NumberType>::is_complex == false,
+                     "This function must not be called for complex-valued data types.");
+      Assert (extract_component == ComponentExtractor::real_part,
+              ExcMessage ("You cannot extract anything other than the real "
+                          "part from a real number."));
+      return value;
+    }
+
+
+
+    /**
+     * Extract the specified component of a number. This template is used
+     * when the given value is a complex number
+     */
+    template <typename NumberType>
+    double get_component (const std::complex<NumberType> &value,
+                          const ComponentExtractor        extract_component)
+    {
+      switch (extract_component)
+        {
+        case ComponentExtractor::real_part:
+          return value.real();
+
+        case ComponentExtractor::imaginary_part:
+          return value.imag();
+
+        default:
+          Assert (false, ExcInternalError());
+        }
+
+      return numbers::signaling_nan<double>();
+    }
+
+
+
+    template <int rank, int dim, typename NumberType>
+    Tensor<rank,dim> get_component (const Tensor<rank,dim,NumberType>         &value,
+                                    const ComponentExtractor extract_component)
+    {
+      Assert (extract_component == ComponentExtractor::real_part,
+              ExcMessage ("You cannot extract anything other than the real "
+                          "part from a real number."));
+
+      Tensor<rank,dim,double> t;
+      for (unsigned int d=0; d<dim; ++d)
+        t[d] = get_component (value[d], extract_component);
+
+      return t;
+    }
+
+
     template <typename DoFHandlerType>
     DataEntryBase<DoFHandlerType>::DataEntryBase
     (const DoFHandlerType           *dofs,
@@ -407,7 +468,8 @@ namespace internal
        */
       virtual
       double
-      get_cell_data_value (const unsigned int cell_number) const;
+      get_cell_data_value (const unsigned int cell_number,
+                           const ComponentExtractor extract_component) const;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -417,6 +479,7 @@ namespace internal
       void
       get_function_values
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<double> &patch_values) const;
 
       /**
@@ -428,6 +491,7 @@ namespace internal
       void
       get_function_values
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<dealii::Vector<double> > &patch_values_system) const;
 
       /**
@@ -438,6 +502,7 @@ namespace internal
       void
       get_function_gradients
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<Tensor<1,DoFHandlerType::space_dimension> > &patch_gradients) const;
 
       /**
@@ -449,6 +514,7 @@ namespace internal
       void
       get_function_gradients
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > > &patch_gradients_system) const;
 
       /**
@@ -459,6 +525,7 @@ namespace internal
       void
       get_function_hessians
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<Tensor<2,DoFHandlerType::space_dimension> > &patch_hessians) const;
 
       /**
@@ -470,6 +537,7 @@ namespace internal
       void
       get_function_hessians
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<std::vector< Tensor<2,DoFHandlerType::space_dimension> > > &patch_hessians_system) const;
 
       /**
@@ -526,7 +594,8 @@ namespace internal
     namespace
     {
       template <typename VectorType>
-      double
+      inline
+      typename VectorType::value_type
       get_vector_element (const VectorType   &vector,
                           const unsigned int  cell_number)
       {
@@ -534,7 +603,8 @@ namespace internal
       }
 
 
-      inline double
+      inline
+      double
       get_vector_element (const IndexSet &is,
                           const unsigned int cell_number)
       {
@@ -547,9 +617,11 @@ namespace internal
     template <typename DoFHandlerType, typename VectorType>
     double
     DataEntry<DoFHandlerType,VectorType>::
-    get_cell_data_value (const unsigned int cell_number) const
+    get_cell_data_value (const unsigned int cell_number,
+                         const ComponentExtractor extract_component) const
     {
-      return get_vector_element(*vector, cell_number);
+      return get_component (get_vector_element(*vector, cell_number),
+                            extract_component);
     }
 
 
@@ -558,21 +630,15 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_values
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+     const ComponentExtractor extract_component,
      std::vector<dealii::Vector<double> >                  &patch_values_system) const
     {
-      // FIXME: FEValuesBase gives us data in types that match that of
-      // the solution vector. but this function needs to pass it back
-      // up as 'double' vectors. this requires the use of a temporary
-      // variable here if the data we get is not a 'double' vector.
-      // (of course, in reality, this also means that we may lose
-      // information to begin with.)
-      //
-      // the correct thing would be to also use the correct data type
-      // upstream somewhere, but this is complicated because we hide
-      // the actual data type from upstream. rather, we should at
-      // least make sure we can deal with complex numbers
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
+          Assert (extract_component == ComponentExtractor::real_part,
+                  ExcMessage ("You cannot extract anything other than the real "
+                              "part from a real number."));
+
           fe_patch_values.get_function_values (*vector,
                                                // reinterpret output argument type; because of
                                                // the 'if' statement above, this is the
@@ -591,7 +657,8 @@ namespace internal
           fe_patch_values.get_function_values (*vector, tmp);
 
           for (unsigned int i = 0; i < patch_values_system.size(); i++)
-            patch_values_system[i] = tmp[i];
+            for (unsigned int j=0; j<tmp[i].size(); ++j)
+              patch_values_system[i](j) = get_component (tmp[i](j), extract_component);
         }
     }
 
@@ -601,21 +668,15 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_values
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+     const ComponentExtractor extract_component,
      std::vector<double>                                   &patch_values) const
     {
-      // FIXME: FEValuesBase gives us data in types that match that of
-      // the solution vector. but this function needs to pass it back
-      // up as 'double' vectors. this requires the use of a temporary
-      // variable here if the data we get is not a 'double' vector.
-      // (of course, in reality, this also means that we may lose
-      // information to begin with.)
-      //
-      // the correct thing would be to also use the correct data type
-      // upstream somewhere, but this is complicated because we hide
-      // the actual data type from upstream. rather, we should at
-      // least make sure we can deal with complex numbers
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
+          Assert (extract_component == ComponentExtractor::real_part,
+                  ExcMessage ("You cannot extract anything other than the real "
+                              "part from a real number."));
+
           fe_patch_values.get_function_values (*vector,
                                                // reinterpret output argument type; because of
                                                // the 'if' statement above, this is the
@@ -632,7 +693,7 @@ namespace internal
           fe_patch_values.get_function_values (*vector, tmp);
 
           for (unsigned int i = 0; i < tmp.size(); i++)
-            patch_values[i] = tmp[i];
+            patch_values[i] = get_component (tmp[i], extract_component);
         }
     }
 
@@ -642,21 +703,15 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_gradients
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension>     &fe_patch_values,
+     const ComponentExtractor extract_component,
      std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > > &patch_gradients_system) const
     {
-      // FIXME: FEValuesBase gives us data in types that match that of
-      // the solution vector. but this function needs to pass it back
-      // up as 'double' vectors. this requires the use of a temporary
-      // variable here if the data we get is not a 'double' vector.
-      // (of course, in reality, this also means that we may lose
-      // information to begin with.)
-      //
-      // the correct thing would be to also use the correct data type
-      // upstream somewhere, but this is complicated because we hide
-      // the actual data type from upstream. rather, we should at
-      // least make sure we can deal with complex numbers
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
+          Assert (extract_component == ComponentExtractor::real_part,
+                  ExcMessage ("You cannot extract anything other than the real "
+                              "part from a real number."));
+
           fe_patch_values.get_function_gradients (*vector,
                                                   // reinterpret output argument type; because of
                                                   // the 'if' statement above, this is the
@@ -678,7 +733,7 @@ namespace internal
 
           for (unsigned int i = 0; i < tmp.size(); i++)
             for (unsigned int j = 0; j < tmp[i].size(); j++)
-              patch_gradients_system[i][j] = tmp[i][j];
+              patch_gradients_system[i][j] = get_component (tmp[i][j], extract_component);
         }
     }
 
@@ -688,21 +743,15 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_gradients
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+     const ComponentExtractor extract_component,
      std::vector<Tensor<1,DoFHandlerType::space_dimension> >           &patch_gradients) const
     {
-      // FIXME: FEValuesBase gives us data in types that match that of
-      // the solution vector. but this function needs to pass it back
-      // up as 'double' vectors. this requires the use of a temporary
-      // variable here if the data we get is not a 'double' vector.
-      // (of course, in reality, this also means that we may lose
-      // information to begin with.)
-      //
-      // the correct thing would be to also use the correct data type
-      // upstream somewhere, but this is complicated because we hide
-      // the actual data type from upstream. rather, we should at
-      // least make sure we can deal with complex numbers
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
+          Assert (extract_component == ComponentExtractor::real_part,
+                  ExcMessage ("You cannot extract anything other than the real "
+                              "part from a real number."));
+
           fe_patch_values.get_function_gradients (*vector,
                                                   // reinterpret output argument type; because of
                                                   // the 'if' statement above, this is the
@@ -720,7 +769,7 @@ namespace internal
           fe_patch_values.get_function_gradients (*vector, tmp);
 
           for (unsigned int i = 0; i < tmp.size(); i++)
-            patch_gradients[i] = tmp[i];
+            patch_gradients[i] = get_component(tmp[i], extract_component);
         }
     }
 
@@ -730,21 +779,15 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_hessians
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+     const ComponentExtractor extract_component,
      std::vector<std::vector<Tensor<2,DoFHandlerType::space_dimension> > > &patch_hessians_system) const
     {
-      // FIXME: FEValuesBase gives us data in types that match that of
-      // the solution vector. but this function needs to pass it back
-      // up as 'double' vectors. this requires the use of a temporary
-      // variable here if the data we get is not a 'double' vector.
-      // (of course, in reality, this also means that we may lose
-      // information to begin with.)
-      //
-      // the correct thing would be to also use the correct data type
-      // upstream somewhere, but this is complicated because we hide
-      // the actual data type from upstream. rather, we should at
-      // least make sure we can deal with complex numbers
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
+          Assert (extract_component == ComponentExtractor::real_part,
+                  ExcMessage ("You cannot extract anything other than the real "
+                              "part from a real number."));
+
           fe_patch_values.get_function_hessians (*vector,
                                                  // reinterpret output argument type; because of
                                                  // the 'if' statement above, this is the
@@ -766,7 +809,7 @@ namespace internal
 
           for (unsigned int i = 0; i < tmp.size(); i++)
             for (unsigned int j = 0; j < tmp[i].size(); j++)
-              patch_hessians_system[i][j] = tmp[i][j];
+              patch_hessians_system[i][j] = get_component (tmp[i][j], extract_component);
         }
     }
 
@@ -776,21 +819,15 @@ namespace internal
     void
     DataEntry<DoFHandlerType,VectorType>::get_function_hessians
     (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+     const ComponentExtractor extract_component,
      std::vector<Tensor<2,DoFHandlerType::space_dimension> >                       &patch_hessians) const
     {
-      // FIXME: FEValuesBase gives us data in types that match that of
-      // the solution vector. but this function needs to pass it back
-      // up as 'double' vectors. this requires the use of a temporary
-      // variable here if the data we get is not a 'double' vector.
-      // (of course, in reality, this also means that we may lose
-      // information to begin with.)
-      //
-      // the correct thing would be to also use the correct data type
-      // upstream somewhere, but this is complicated because we hide
-      // the actual data type from upstream. rather, we should at
-      // least make sure we can deal with complex numbers
       if (typeid(typename VectorType::value_type) == typeid(double))
         {
+          Assert (extract_component == ComponentExtractor::real_part,
+                  ExcMessage ("You cannot extract anything other than the real "
+                              "part from a real number."));
+
           fe_patch_values.get_function_hessians (*vector,
                                                  // reinterpret output argument type; because of
                                                  // the 'if' statement above, this is the
@@ -809,7 +846,7 @@ namespace internal
           fe_patch_values.get_function_hessians (*vector, tmp);
 
           for (unsigned int i = 0; i < tmp.size(); i++)
-            patch_hessians[i] = tmp[i];
+            patch_hessians[i] = get_component(tmp[i], extract_component);
         }
     }
 
