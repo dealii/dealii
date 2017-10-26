@@ -966,6 +966,13 @@ namespace Patterns
 
 
 
+  Tuple::Tuple (const std::vector<std::unique_ptr<PatternBase> >  &ps,
+                const char *separator) :
+    Tuple(ps, std::string(separator))
+  {}
+
+
+
   Tuple::Tuple (const Tuple &other)
     :
     separator (other.separator)

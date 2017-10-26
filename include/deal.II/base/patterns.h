@@ -701,6 +701,15 @@ namespace Patterns
            const std::string  &separator = ",");
 
     /**
+     * Constructor. Same as above, specialized for const char *. This is
+     * necessary to avoid compilers errors due to the variadic constructors
+     * provided below.
+     */
+    Tuple (const std::vector<std::unique_ptr<PatternBase> > &patterns,
+           const char *separator);
+
+
+    /**
      * Constructor. Creates a Tuple from more than one class derived from
      * PatternBase.
      *
@@ -716,7 +725,7 @@ namespace Patterns
      * directly the separator without using std::string(";").
      *
      * Since we support a pure variadic templates version, without this
-     * specialization, the compiler will fail with criptyc errors.
+     * specialization, the compiler will fail with cryptic errors.
      */
     template<class... PatternTypes>
     Tuple (const char *separator,
