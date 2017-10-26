@@ -89,6 +89,51 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
 
   IF(BOOST_FOUND)
     SET(${var} TRUE)
+
+    IF(DEAL_II_WITH_ZLIB)
+      #
+      # Test that Boost.Iostreams is usuable.
+      #
+      RESET_CMAKE_REQUIRED()
+      PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
+      SET(CMAKE_REQUIRED_LIBRARIES "${BOOST_LIBRARIES}")
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <string>
+        #include <boost/iostreams/device/back_inserter.hpp>
+        #include <boost/iostreams/filter/gzip.hpp>
+        #include <boost/iostreams/filtering_stream.hpp>
+
+        int main()
+        {
+          std::string decompressed_buffer;
+          char test[1] = {'c'};
+
+          boost::iostreams::filtering_ostream decompressing_stream;
+          decompressing_stream.push(boost::iostreams::gzip_decompressor());
+          decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
+          decompressing_stream.write (test, 1);
+        }
+        "
+        _boost_iostreams_usuable
+        )
+      IF(${_boost_iostreams_usuable})
+        MESSAGE(STATUS "Boost.Iostreams is usuable.")
+      ELSE()
+        MESSAGE(STATUS
+                "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
+                "with zlib support but a simple test failed! "
+                "Therefore, the bundled boost package is used."
+               )
+        SET(BOOST_ADDITIONAL_ERROR_STRING
+            "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
+            "with zlib support but a simple test failed! "
+           )
+        SET(${var} FALSE)
+      ENDIF()
+      RESET_CMAKE_REQUIRED()
+    ENDIF()
+
   ENDIF()
 ENDMACRO()
 
