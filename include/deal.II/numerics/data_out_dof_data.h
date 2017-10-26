@@ -256,6 +256,12 @@ namespace internal
        std::vector<std::vector< Tensor<2,DoFHandlerType::space_dimension> > > &patch_hessians_system) const = 0;
 
       /**
+       * Return whether the data represented by (a derived class of) this object
+       * represents a complex-valued (as opposed to real-valued) information.
+       */
+      virtual bool is_complex_valued () const = 0;
+
+      /**
        * Clear all references to the vectors.
        */
       virtual void clear () = 0;

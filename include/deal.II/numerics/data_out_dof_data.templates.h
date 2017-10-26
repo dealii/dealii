@@ -22,6 +22,7 @@
 #include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/work_stream.h>
+#include <deal.II/base/numbers.h>
 
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -472,6 +473,12 @@ namespace internal
        std::vector<std::vector< Tensor<2,DoFHandlerType::space_dimension> > > &patch_hessians_system) const;
 
       /**
+       * Return whether the data represented by (a derived class of) this object
+       * represents a complex-valued (as opposed to real-valued) information.
+       */
+      virtual bool is_complex_valued () const;
+
+      /**
        * Clear all references to the vectors.
        */
       virtual void clear ();
@@ -804,6 +811,15 @@ namespace internal
           for (unsigned int i = 0; i < tmp.size(); i++)
             patch_hessians[i] = tmp[i];
         }
+    }
+
+
+
+    template <typename DoFHandlerType, typename VectorType>
+    bool
+    DataEntry<DoFHandlerType,VectorType>::is_complex_valued() const
+    {
+      return numbers::NumberTraits<typename VectorType::value_type>::is_complex;
     }
 
 
