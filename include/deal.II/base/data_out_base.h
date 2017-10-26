@@ -1214,7 +1214,9 @@ namespace DataOutBase
      * Filter duplicate vertices and associated values. This will drastically
      * reduce the output data size but will result in an output file that
      * does not faithfully represent the actual data if the data corresponds
-     * to discontinuous fields.
+     * to discontinuous fields. In particular, along subdomain boundaries
+     * the data will still be discontinuous, while it will look like a
+     * continuous field inside of the subdomain.
      */
     bool filter_duplicate_vertices;
 

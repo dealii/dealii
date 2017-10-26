@@ -1890,7 +1890,10 @@ namespace DataOutBase
                        "produced by entirely different means), then the data in the "
                        "output file no longer faithfully represents the underlying data "
                        "because the discontinuous field has been replaced by a "
-                       "continuous one."
+                       "continuous one. Note also that the filtering can not occur "
+                       "on processor boundaries. Thus, a filtered discontinuous field "
+                       "looks like a continuous field inside of a subdomain, "
+                       "but like a discontinuous field at the subdomain boundary."
                        "\n\n"
                        "In any case, filtering results in drastically smaller output "
                        "files (smaller by about a factor of 2^dim).");
