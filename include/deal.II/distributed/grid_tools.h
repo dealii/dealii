@@ -27,10 +27,14 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/array.hpp>
+
+#ifdef DEAL_II_WITH_ZLIB
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
+#endif
+
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <vector>
@@ -212,6 +216,7 @@ namespace parallel
           // stream into which we serialize the current object
           std::vector<char> buffer;
           {
+#ifdef DEAL_II_WITH_ZLIB
             boost::iostreams::filtering_ostream out;
             out.push(boost::iostreams::gzip_compressor
                      (boost::iostreams::gzip_params
@@ -219,9 +224,16 @@ namespace parallel
             out.push(boost::iostreams::back_inserter(buffer));
 
             boost::archive::binary_oarchive archive(out);
-
             archive << *this;
             out.flush();
+#else
+            std::ostringstream out;
+            boost::archive::binary_oarchive archive(out);
+            archive << *this;
+            const std::string &s = out.str();
+            buffer.reserve(s.size());
+            buffer.assign(s.begin(), s.end());
+#endif
           }
 
           return buffer;
@@ -239,11 +251,14 @@ namespace parallel
 
           // first decompress the buffer
           {
+#ifdef DEAL_II_WITH_ZLIB
             boost::iostreams::filtering_ostream decompressing_stream;
             decompressing_stream.push(boost::iostreams::gzip_decompressor());
             decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
-
             decompressing_stream.write (buffer.data(), buffer.size());
+#else
+            decompressed_buffer.assign (buffer.begin(), buffer.end());
+#endif
           }
 
           // then restore the object from the buffer
