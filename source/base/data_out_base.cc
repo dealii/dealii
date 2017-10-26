@@ -453,122 +453,219 @@ namespace DataOutBase
                 ExcInternalError());
     }
   }
+
+
+
+  DataOutFilter::DataOutFilter()
+    :
+    flags(false, true),
+    node_dim (numbers::invalid_unsigned_int),
+    vertices_per_cell (numbers::invalid_unsigned_int)
+  {}
+
+
+
+  DataOutFilter::DataOutFilter(const DataOutBase::DataOutFilterFlags &flags)
+    :
+    flags(flags),
+    node_dim (numbers::invalid_unsigned_int),
+    vertices_per_cell (numbers::invalid_unsigned_int)
+  {}
+
+
+
+  template <int dim>
+  void
+  DataOutFilter::write_point(const unsigned int index,
+                             const Point<dim> &p)
+  {
+    node_dim = dim;
+
+    Point<3> int_pt;
+    for (unsigned int d=0; d<dim; ++d)
+      int_pt(d) = p(d);
+
+    const Map3DPoint::const_iterator it = existing_points.find(int_pt);
+    unsigned int internal_ind;
+
+    // If the point isn't in the set, or we're not filtering duplicate points, add it
+    if (it == existing_points.end() || !flags.filter_duplicate_vertices)
+      {
+        internal_ind = existing_points.size();
+        existing_points.insert(std::make_pair(int_pt, internal_ind));
+      }
+    else
+      {
+        internal_ind = it->second;
+      }
+    // Now add the index to the list of filtered points
+    filtered_points[index] = internal_ind;
+  }
+
+
+
+  void
+  DataOutFilter::internal_add_cell(const unsigned int cell_index,
+                                   const unsigned int pt_index)
+  {
+    filtered_cells[cell_index] = filtered_points[pt_index];
+  }
+
+
+
+  void
+  DataOutFilter::fill_node_data(std::vector<double> &node_data) const
+  {
+    node_data.resize(existing_points.size()*node_dim);
+
+    for (Map3DPoint::const_iterator it=existing_points.begin(); it!=existing_points.end(); ++it)
+      {
+        for (unsigned int d=0; d<node_dim; ++d)
+          node_data[node_dim*it->second+d] = it->first(d);
+      }
+  }
+
+
+
+  void
+  DataOutFilter::fill_cell_data(const unsigned int local_node_offset,
+                                std::vector<unsigned int> &cell_data) const
+  {
+    cell_data.resize(filtered_cells.size());
+
+    for (std::map<unsigned int, unsigned int>::const_iterator it=filtered_cells.begin(); it!=filtered_cells.end(); ++it)
+      {
+        cell_data[it->first] = it->second+local_node_offset;
+      }
+  }
+
+
+
+  std::string
+  DataOutFilter::get_data_set_name(const unsigned int set_num) const
+  {
+    return data_set_names.at(set_num);
+  }
+
+
+
+  unsigned int
+  DataOutFilter::get_data_set_dim(const unsigned int set_num) const
+  {
+    return data_set_dims.at(set_num);
+  }
+
+
+
+  const double *
+  DataOutFilter::get_data_set(const unsigned int set_num) const
+  {
+    return &data_sets[set_num][0];
+  }
+
+
+
+  unsigned int
+  DataOutFilter::n_nodes() const
+  {
+    return existing_points.size();
+  }
+
+
+
+  unsigned int
+  DataOutFilter::n_cells() const
+  {
+    return filtered_cells.size()/vertices_per_cell;
+  }
+
+
+
+  unsigned int
+  DataOutFilter::n_data_sets() const
+  {
+    return data_set_names.size();
+  }
+
+
+
+  void
+  DataOutFilter::flush_points ()
+  {}
+
+
+
+  void
+  DataOutFilter::flush_cells ()
+  {}
+
+
+
+  template <int dim>
+  void
+  DataOutFilter::write_cell(const unsigned int index,
+                            const unsigned int start,
+                            const unsigned int d1,
+                            const unsigned int d2,
+                            const unsigned int d3)
+  {
+    const unsigned int base_entry = index * GeometryInfo<dim>::vertices_per_cell;
+    vertices_per_cell = GeometryInfo<dim>::vertices_per_cell;
+    internal_add_cell(base_entry+0, start);
+    if (dim>=1)
+      {
+        internal_add_cell(base_entry+1, start+d1);
+        if (dim>=2)
+          {
+            internal_add_cell(base_entry+2, start+d2+d1);
+            internal_add_cell(base_entry+3, start+d2);
+            if (dim>=3)
+              {
+                internal_add_cell(base_entry+4, start+d3);
+                internal_add_cell(base_entry+5, start+d3+d1);
+                internal_add_cell(base_entry+6, start+d3+d2+d1);
+                internal_add_cell(base_entry+7, start+d3+d2);
+              }
+          }
+      }
+  }
+
+
+
+  void DataOutFilter::write_data_set(const std::string &name,
+                                     const unsigned int dimension,
+                                     const unsigned int set_num,
+                                     const Table<2,double> &data_vectors)
+  {
+    unsigned int new_dim;
+
+    // HDF5/XDMF output only supports 1D or 3D output, so force rearrangement if needed
+    if (flags.xdmf_hdf5_output && dimension != 1)
+      new_dim = 3;
+    else
+      new_dim = dimension;
+
+    // Record the data set name, dimension, and allocate space for it
+    data_set_names.push_back(name);
+    data_set_dims.push_back(new_dim);
+    data_sets.emplace_back(new_dim * existing_points.size());
+
+    // TODO: averaging, min/max, etc for merged vertices
+    for (unsigned int i=0; i<filtered_points.size(); ++i)
+      {
+        const unsigned int r = filtered_points[i];
+
+        for (unsigned int d=0; d<new_dim; ++d)
+          {
+            if (d < dimension)
+              data_sets.back()[r*new_dim+d] = data_vectors(set_num+d, i);
+            else
+              data_sets.back()[r*new_dim+d] = 0;
+          }
+      }
+  }
 }
 
-//----------------------------------------------------------------------//
-// DataOutFilter class member functions
-//----------------------------------------------------------------------//
-
-template <int dim>
-void DataOutBase::DataOutFilter::write_point(const unsigned int &index, const Point<dim> &p)
-{
-  Map3DPoint::const_iterator  it;
-  unsigned int      internal_ind;
-  Point<3>      int_pt;
-
-  for (int d=0; d<3; ++d) int_pt(d) = (d < dim ? p(d) : 0);
-  node_dim = dim;
-  it = existing_points.find(int_pt);
-
-  // If the point isn't in the set, or we're not filtering duplicate points, add it
-  if (it == existing_points.end() || !flags.filter_duplicate_vertices)
-    {
-      internal_ind = existing_points.size();
-      existing_points.insert(std::make_pair(int_pt, internal_ind));
-    }
-  else
-    {
-      internal_ind = it->second;
-    }
-  // Now add the index to the list of filtered points
-  filtered_points[index] = internal_ind;
-}
-
-void DataOutBase::DataOutFilter::internal_add_cell(const unsigned int &cell_index, const unsigned int &pt_index)
-{
-  filtered_cells[cell_index] = filtered_points[pt_index];
-}
-
-void DataOutBase::DataOutFilter::fill_node_data(std::vector<double> &node_data) const
-{
-  Map3DPoint::const_iterator  it;
-
-  node_data.resize(existing_points.size()*node_dim);
-
-  for (it=existing_points.begin(); it!=existing_points.end(); ++it)
-    {
-      for (unsigned int d=0; d<node_dim; ++d)
-        node_data[node_dim*it->second+d] = it->first(d);
-    }
-}
-
-void DataOutBase::DataOutFilter::fill_cell_data(const unsigned int &local_node_offset, std::vector<unsigned int> &cell_data) const
-{
-  std::map<unsigned int, unsigned int>::const_iterator  it;
-
-  cell_data.resize(filtered_cells.size());
-
-  for (it=filtered_cells.begin(); it!=filtered_cells.end(); ++it)
-    {
-      cell_data[it->first] = it->second+local_node_offset;
-    }
-}
-
-template <int dim>
-void
-DataOutBase::DataOutFilter::write_cell(
-  unsigned int index,
-  unsigned int start,
-  unsigned int d1,
-  unsigned int d2,
-  unsigned int d3)
-{
-  unsigned int base_entry = index * GeometryInfo<dim>::vertices_per_cell;
-  vertices_per_cell = GeometryInfo<dim>::vertices_per_cell;
-  internal_add_cell(base_entry+0, start);
-  if (dim>=1)
-    {
-      internal_add_cell(base_entry+1, start+d1);
-      if (dim>=2)
-        {
-          internal_add_cell(base_entry+2, start+d2+d1);
-          internal_add_cell(base_entry+3, start+d2);
-          if (dim>=3)
-            {
-              internal_add_cell(base_entry+4, start+d3);
-              internal_add_cell(base_entry+5, start+d3+d1);
-              internal_add_cell(base_entry+6, start+d3+d2+d1);
-              internal_add_cell(base_entry+7, start+d3+d2);
-            }
-        }
-    }
-}
-
-void DataOutBase::DataOutFilter::write_data_set(const std::string &name, const unsigned int &dimension, const unsigned int &set_num, const Table<2,double> &data_vectors)
-{
-  unsigned int    num_verts = existing_points.size();
-  unsigned int    i, r, d, new_dim;
-
-  // HDF5/XDMF output only supports 1D or 3D output, so force rearrangement if needed
-  if (flags.xdmf_hdf5_output && dimension != 1) new_dim = 3;
-  else new_dim = dimension;
-
-  // Record the data set name, dimension, and allocate space for it
-  data_set_names.push_back(name);
-  data_set_dims.push_back(new_dim);
-  data_sets.emplace_back(new_dim*num_verts);
-
-  // TODO: averaging, min/max, etc for merged vertices
-  for (i=0; i<filtered_points.size(); ++i)
-    {
-      for (d=0; d<new_dim; ++d)
-        {
-          r = filtered_points[i];
-          if (d < dimension) data_sets.back()[r*new_dim+d] = data_vectors(set_num+d, i);
-          else data_sets.back()[r*new_dim+d] = 0;
-        }
-    }
-}
 
 
 //----------------------------------------------------------------------//
@@ -1793,7 +1890,10 @@ namespace DataOutBase
                        "produced by entirely different means), then the data in the "
                        "output file no longer faithfully represents the underlying data "
                        "because the discontinuous field has been replaced by a "
-                       "continuous one."
+                       "continuous one. Note also that the filtering can not occur "
+                       "on processor boundaries. Thus, a filtered discontinuous field "
+                       "looks like a continuous field inside of a subdomain, "
+                       "but like a discontinuous field at the subdomain boundary."
                        "\n\n"
                        "In any case, filtering results in drastically smaller output "
                        "files (smaller by about a factor of 2^dim).");
