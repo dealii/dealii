@@ -1,0 +1,7 @@
+
+DEAL:0:2d::30 50
+DEAL:0:2d::Error of interpolated component: 0.00000
+DEAL:0:2d::Error of not interpolated component: 1.00000
+DEAL:0:3d::150 250
+DEAL:0:3d::Error of interpolated component: 0.00000
+DEAL:0:3d::Error of not interpolated component: 1.00000
