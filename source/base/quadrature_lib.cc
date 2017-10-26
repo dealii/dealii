@@ -1094,7 +1094,7 @@ QTelles<1>::QTelles (
     {
       quadrature_points.resize(quadrature_points_dummy.size()-1);
       weights.resize(weights_dummy.size()-1);
-      for (unsigned int d = 0; d < quadrature_points.size()-1; ++d)
+      for (unsigned int d = 0; d < quadrature_points.size(); ++d)
         {
           quadrature_points[d] = quadrature_points_dummy[d];
           weights[d] = weights_dummy[d];

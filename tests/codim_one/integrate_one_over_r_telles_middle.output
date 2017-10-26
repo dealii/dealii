@@ -1,0 +1,146 @@
+
+DEAL::
+DEAL::Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]
+DEAL::for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being
+DEAL::the distance from (x,y) to [0.5,0.5].
+DEAL::
+DEAL:: =========Quadrature Order: 1 =============================== 
+DEAL:: ============================================================ 
+DEAL:: ===============Vertex: 0.500000 0.500000 ============================= 
+DEAL::f(x,y) = x^0 y^0, Errors = 0.735219, -0.125059
+DEAL::f(x,y) = x^0 y^1, Errors = 0.367609, -0.062529
+DEAL::f(x,y) = x^0 y^2, Errors = 0.184404, -0.098068
+DEAL::f(x,y) = x^0 y^3, Errors = 0.092801, -0.115837
+DEAL::f(x,y) = x^0 y^4, Errors = 0.040442, -0.127062
+DEAL::f(x,y) = x^1 y^0, Errors = 0.367609, -0.062529
+DEAL::f(x,y) = x^1 y^1, Errors = 0.183805, -0.031265
+DEAL::f(x,y) = x^1 y^2, Errors = 0.092202, -0.049034
+DEAL::f(x,y) = x^1 y^3, Errors = 0.046401, -0.057919
+DEAL::f(x,y) = x^1 y^4, Errors = 0.020221, -0.063531
+DEAL::f(x,y) = x^2 y^0, Errors = 0.184404, -0.098068
+DEAL::f(x,y) = x^2 y^1, Errors = 0.092202, -0.049034
+DEAL::f(x,y) = x^2 y^2, Errors = 0.046757, -0.052260
+DEAL::f(x,y) = x^2 y^3, Errors = 0.024034, -0.053873
+DEAL::f(x,y) = x^2 y^4, Errors = 0.010439, -0.054296
+DEAL::f(x,y) = x^3 y^0, Errors = 0.092801, -0.115837
+DEAL::f(x,y) = x^3 y^1, Errors = 0.046401, -0.057919
+DEAL::f(x,y) = x^3 y^2, Errors = 0.024034, -0.053873
+DEAL::f(x,y) = x^3 y^3, Errors = 0.012851, -0.051850
+DEAL::f(x,y) = x^3 y^4, Errors = 0.005548, -0.049678
+DEAL::f(x,y) = x^4 y^0, Errors = 0.040442, -0.127062
+DEAL::f(x,y) = x^4 y^1, Errors = 0.020221, -0.063531
+DEAL::f(x,y) = x^4 y^2, Errors = 0.010439, -0.054296
+DEAL::f(x,y) = x^4 y^3, Errors = 0.005548, -0.049678
+DEAL::f(x,y) = x^4 y^4, Errors = 0.001794, -0.045881
+DEAL:: =========Quadrature Order: 2 =============================== 
+DEAL:: ============================================================ 
+DEAL:: ===============Vertex: 0.500000 0.500000 ============================= 
+DEAL::f(x,y) = x^0 y^0, Errors = 0.123997, -0.003591
+DEAL::f(x,y) = x^0 y^1, Errors = 0.061998, -0.001795
+DEAL::f(x,y) = x^0 y^2, Errors = 0.030989, -0.002719
+DEAL::f(x,y) = x^0 y^3, Errors = 0.015484, -0.003181
+DEAL::f(x,y) = x^0 y^4, Errors = 0.007730, -0.004396
+DEAL::f(x,y) = x^1 y^0, Errors = 0.061998, -0.001795
+DEAL::f(x,y) = x^1 y^1, Errors = 0.030999, -0.000898
+DEAL::f(x,y) = x^1 y^2, Errors = 0.015494, -0.001360
+DEAL::f(x,y) = x^1 y^3, Errors = 0.007742, -0.001590
+DEAL::f(x,y) = x^1 y^4, Errors = 0.003865, -0.002198
+DEAL::f(x,y) = x^2 y^0, Errors = 0.030989, -0.002719
+DEAL::f(x,y) = x^2 y^1, Errors = 0.015494, -0.001360
+DEAL::f(x,y) = x^2 y^2, Errors = 0.007749, -0.001993
+DEAL::f(x,y) = x^2 y^3, Errors = 0.003876, -0.002309
+DEAL::f(x,y) = x^2 y^4, Errors = 0.001939, -0.002940
+DEAL::f(x,y) = x^3 y^0, Errors = 0.015484, -0.003181
+DEAL::f(x,y) = x^3 y^1, Errors = 0.007742, -0.001590
+DEAL::f(x,y) = x^3 y^2, Errors = 0.003876, -0.002309
+DEAL::f(x,y) = x^3 y^3, Errors = 0.001944, -0.002669
+DEAL::f(x,y) = x^3 y^4, Errors = 0.000975, -0.003312
+DEAL::f(x,y) = x^4 y^0, Errors = 0.007730, -0.004396
+DEAL::f(x,y) = x^4 y^1, Errors = 0.003865, -0.002198
+DEAL::f(x,y) = x^4 y^2, Errors = 0.001939, -0.002940
+DEAL::f(x,y) = x^4 y^3, Errors = 0.000975, -0.003312
+DEAL::f(x,y) = x^4 y^4, Errors = 0.000492, -0.003909
+DEAL:: =========Quadrature Order: 3 =============================== 
+DEAL:: ============================================================ 
+DEAL:: ===============Vertex: 0.500000 0.500000 ============================= 
+DEAL::f(x,y) = x^0 y^0, Errors = 0.040837, -0.000104
+DEAL::f(x,y) = x^0 y^1, Errors = 0.020419, -0.000052
+DEAL::f(x,y) = x^0 y^2, Errors = 0.010209, -0.000126
+DEAL::f(x,y) = x^0 y^3, Errors = 0.005104, -0.000163
+DEAL::f(x,y) = x^0 y^4, Errors = 0.002552, -0.000232
+DEAL::f(x,y) = x^1 y^0, Errors = 0.020419, -0.000052
+DEAL::f(x,y) = x^1 y^1, Errors = 0.010209, -0.000026
+DEAL::f(x,y) = x^1 y^2, Errors = 0.005104, -0.000063
+DEAL::f(x,y) = x^1 y^3, Errors = 0.002552, -0.000081
+DEAL::f(x,y) = x^1 y^4, Errors = 0.001276, -0.000116
+DEAL::f(x,y) = x^2 y^0, Errors = 0.010209, -0.000126
+DEAL::f(x,y) = x^2 y^1, Errors = 0.005104, -0.000063
+DEAL::f(x,y) = x^2 y^2, Errors = 0.002552, -0.000085
+DEAL::f(x,y) = x^2 y^3, Errors = 0.001276, -0.000096
+DEAL::f(x,y) = x^2 y^4, Errors = 0.000638, -0.000128
+DEAL::f(x,y) = x^3 y^0, Errors = 0.005104, -0.000163
+DEAL::f(x,y) = x^3 y^1, Errors = 0.002552, -0.000081
+DEAL::f(x,y) = x^3 y^2, Errors = 0.001276, -0.000096
+DEAL::f(x,y) = x^3 y^3, Errors = 0.000638, -0.000103
+DEAL::f(x,y) = x^3 y^4, Errors = 0.000319, -0.000134
+DEAL::f(x,y) = x^4 y^0, Errors = 0.002552, -0.000232
+DEAL::f(x,y) = x^4 y^1, Errors = 0.001276, -0.000116
+DEAL::f(x,y) = x^4 y^2, Errors = 0.000638, -0.000128
+DEAL::f(x,y) = x^4 y^3, Errors = 0.000319, -0.000134
+DEAL::f(x,y) = x^4 y^4, Errors = 0.000159, -0.000166
+DEAL:: =========Quadrature Order: 4 =============================== 
+DEAL:: ============================================================ 
+DEAL:: ===============Vertex: 0.500000 0.500000 ============================= 
+DEAL::f(x,y) = x^0 y^0, Errors = 0.018129, -0.000003
+DEAL::f(x,y) = x^0 y^1, Errors = 0.009064, -0.000002
+DEAL::f(x,y) = x^0 y^2, Errors = 0.004532, -0.000006
+DEAL::f(x,y) = x^0 y^3, Errors = 0.002266, -0.000007
+DEAL::f(x,y) = x^0 y^4, Errors = 0.001133, -0.000013
+DEAL::f(x,y) = x^1 y^0, Errors = 0.009064, -0.000002
+DEAL::f(x,y) = x^1 y^1, Errors = 0.004532, -0.000001
+DEAL::f(x,y) = x^1 y^2, Errors = 0.002266, -0.000003
+DEAL::f(x,y) = x^1 y^3, Errors = 0.001133, -0.000004
+DEAL::f(x,y) = x^1 y^4, Errors = 0.000566, -0.000006
+DEAL::f(x,y) = x^2 y^0, Errors = 0.004532, -0.000006
+DEAL::f(x,y) = x^2 y^1, Errors = 0.002266, -0.000003
+DEAL::f(x,y) = x^2 y^2, Errors = 0.001133, -0.000004
+DEAL::f(x,y) = x^2 y^3, Errors = 0.000566, -0.000005
+DEAL::f(x,y) = x^2 y^4, Errors = 0.000283, -0.000007
+DEAL::f(x,y) = x^3 y^0, Errors = 0.002266, -0.000007
+DEAL::f(x,y) = x^3 y^1, Errors = 0.001133, -0.000004
+DEAL::f(x,y) = x^3 y^2, Errors = 0.000566, -0.000005
+DEAL::f(x,y) = x^3 y^3, Errors = 0.000283, -0.000005
+DEAL::f(x,y) = x^3 y^4, Errors = 0.000142, -0.000007
+DEAL::f(x,y) = x^4 y^0, Errors = 0.001133, -0.000013
+DEAL::f(x,y) = x^4 y^1, Errors = 0.000566, -0.000006
+DEAL::f(x,y) = x^4 y^2, Errors = 0.000283, -0.000007
+DEAL::f(x,y) = x^4 y^3, Errors = 0.000142, -0.000007
+DEAL::f(x,y) = x^4 y^4, Errors = 0.000071, -0.000009
+DEAL:: =========Quadrature Order: 5 =============================== 
+DEAL:: ============================================================ 
+DEAL:: ===============Vertex: 0.500000 0.500000 ============================= 
+DEAL::f(x,y) = x^0 y^0, Errors = 0.009556, 0.000000
+DEAL::f(x,y) = x^0 y^1, Errors = 0.004778, 0.000000
+DEAL::f(x,y) = x^0 y^2, Errors = 0.002389, 0.000000
+DEAL::f(x,y) = x^0 y^3, Errors = 0.001194, 0.000000
+DEAL::f(x,y) = x^0 y^4, Errors = 0.000597, -0.000001
+DEAL::f(x,y) = x^1 y^0, Errors = 0.004778, 0.000000
+DEAL::f(x,y) = x^1 y^1, Errors = 0.002389, 0.000000
+DEAL::f(x,y) = x^1 y^2, Errors = 0.001194, 0.000000
+DEAL::f(x,y) = x^1 y^3, Errors = 0.000597, 0.000000
+DEAL::f(x,y) = x^1 y^4, Errors = 0.000299, 0.000000
+DEAL::f(x,y) = x^2 y^0, Errors = 0.002389, 0.000000
+DEAL::f(x,y) = x^2 y^1, Errors = 0.001194, 0.000000
+DEAL::f(x,y) = x^2 y^2, Errors = 0.000597, 0.000000
+DEAL::f(x,y) = x^2 y^3, Errors = 0.000299, 0.000000
+DEAL::f(x,y) = x^2 y^4, Errors = 0.000149, 0.000000
+DEAL::f(x,y) = x^3 y^0, Errors = 0.001194, 0.000000
+DEAL::f(x,y) = x^3 y^1, Errors = 0.000597, 0.000000
+DEAL::f(x,y) = x^3 y^2, Errors = 0.000299, 0.000000
+DEAL::f(x,y) = x^3 y^3, Errors = 0.000149, 0.000000
+DEAL::f(x,y) = x^3 y^4, Errors = 0.000075, 0.000000
+DEAL::f(x,y) = x^4 y^0, Errors = 0.000597, -0.000001
+DEAL::f(x,y) = x^4 y^1, Errors = 0.000299, 0.000000
+DEAL::f(x,y) = x^4 y^2, Errors = 0.000149, 0.000000
+DEAL::f(x,y) = x^4 y^3, Errors = 0.000075, 0.000000
+DEAL::f(x,y) = x^4 y^4, Errors = 0.000037, 0.000000
