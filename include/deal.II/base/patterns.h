@@ -666,9 +666,24 @@ namespace Patterns
    * This pattern matches comma-separated values of arbitrary types. Each type
    * has to match a pattern given to the constructor.
    *
-   * The constructor expects a vector of Patterns, and optionally an
-   * std::string, specifying the separator to use when parsing the Tuple from a
-   * string.
+   * An example usage is the following:
+   *
+   * @code
+   * std::vector< std::unique_ptr<Patterns::PatternBase> > ps;
+   *
+   * ps.push_back(std::unique_ptr<Patterns::Integer>());
+   * ps.push_back(std::unique_ptr<Patterns::Double>());
+   * ps.push_back(std::unique_ptr<Patterns::Anything>());
+   *
+   * Patterns::Tuple pattern(ps, ";");
+   *
+   * bool check = ps.match("5; 3.14; Ciao"); // check = true
+   * @endcode
+   *
+   * The constructor expects a vector of Patterns, and optionally a string
+   * specifying the separator to use when parsing the Tuple from a string.
+   *
+   * @author Luca Heltai, 2017.
    */
   class Tuple : public PatternBase
   {
