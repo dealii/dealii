@@ -17,6 +17,16 @@
 # Configuration for the boost library:
 #
 
+IF(NOT FEATURE_ZLIB_PROCESSED)                                     
+  MESSAGE(FATAL_ERROR "\n"
+    "Internal build system error: The configuration of "
+    "DEAL_II_WITH_BOOST depends on "
+    "DEAL_II_WITH_ZLIB, but CONFIGURE_FEATURE(BOOST) "
+    "was called before CONFIGURE_FEATURE(ZLIB).\n\n"
+    )
+ENDIF()
+
+
 SET(DEAL_II_WITH_BOOST ON # Always true. We need it :-]
   CACHE BOOL "Build deal.II with support for boost." FORCE
   )
