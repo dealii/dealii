@@ -26,10 +26,4 @@ SET(src_boost_iostreams
     zlib.cpp
     )
 
-IF(DEAL_II_WITH_BZIP2)
-  LIST(APPEND src_boost_iostreams bzip2.cpp)
-ELSE()
-  MESSAGE(STATUS "BOOST::Iostreams will not support bz2'ed streams because libbz2 or its header files could not be found")
-ENDIF()
-
 DEAL_II_ADD_LIBRARY(obj_boost_iostreams OBJECT ${src_boost_iostreams})
