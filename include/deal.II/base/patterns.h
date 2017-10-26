@@ -25,6 +25,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/std_cxx14/algorithm.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <boost/archive/basic_archive.hpp>
 #include <boost/core/demangle.hpp>
@@ -689,18 +690,45 @@ namespace Patterns
   {
   public:
     /**
-     * Constructor. Specify each pattern that the Tuple should contain.
+     * Constructor. Use a vector of unique pointers to Patterns to construct
+     * the tuple.
      *
-     * Optionally specify a separator string.
-     */
-
-    /**
-     * Constructor.
      * @param patterns The pattern each object of the Tuple should match
      * @param separator An optional string used to delimit each element
+     * Constructor.
      */
     Tuple (const std::vector<std::unique_ptr<PatternBase> > &patterns,
            const std::string  &separator = ",");
+
+    /**
+     * Constructor. Creates a Tuple from more than one class derived from
+     * PatternBase.
+     *
+     * @param separator What separator to use.
+     * @param patterns The list of patterns to use
+     */
+    template<class... PatternTypes>
+    Tuple (const std::string  &separator,
+           const PatternTypes &... patterns);
+
+    /**
+     * Constructor. This is needed to allow users to specify
+     * directly the separator without using std::string(";").
+     *
+     * Since we support a pure variadic templates version, without this
+     * specialization, the compiler will fail with criptic errors.
+     */
+    template<class... PatternTypes>
+    Tuple (const char *separator,
+           const PatternTypes &... patterns);
+
+    /**
+     * Constructor. Same as above, using the default separator.
+     *
+     * @param patterns The list of patterns to use
+     */
+    template<typename... Patterns>
+    Tuple (const Patterns &... patterns);
 
     /**
      * Copy constructor.
@@ -761,11 +789,10 @@ namespace Patterns
     const std::string separator;
 
     /**
-     * Initial part of description
+     * Initial part of description.
      */
     static const char *description_init;
   };
-
 
 
   /**
@@ -1216,6 +1243,50 @@ namespace Patterns
 // ---------------------- inline and template functions --------------------
 namespace Patterns
 {
+  template<class... PatternTypes>
+  Tuple::Tuple(const char *separator,
+               const PatternTypes &... ps) :
+    separator(separator)
+  {
+    static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
+                  "Not all of the input arguments of this function "
+                  "are derived from PatternBase");
+    std::initializer_list<const PatternBase *> pss = { &ps... };
+    for (auto p : pss)
+      patterns.push_back(p->clone());
+  }
+
+
+
+  template<class... PatternTypes>
+  Tuple::Tuple(const std::string &separator,
+               const PatternTypes &... ps) :
+    separator(separator)
+  {
+    static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
+                  "Not all of the input arguments of this function "
+                  "are derived from PatternBase");
+    std::initializer_list<const PatternBase *> pss = { &ps... };
+    for (auto p : pss)
+      patterns.push_back(p->clone());
+  }
+
+
+
+  template<class... PatternTypes>
+  Tuple::Tuple(const PatternTypes &... ps) :
+    separator(",")
+  {
+    static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
+                  "Not all of the input arguments of this function "
+                  "are derived from PatternBase");
+    std::initializer_list<const PatternBase *> pss = { &ps... };
+    for (auto p : pss)
+      patterns.push_back(p->clone());
+  }
+
+
+
   namespace Tools
   {
     namespace internal
