@@ -544,8 +544,8 @@ namespace hp
 
     /**
      * The number of multilevel dofs on given level. Since hp::DoFHandler does
-     * not support multilevel methods yet, this function returns
-     * numbers::invalid_unsigned int independent of its argument.
+     * not support multilevel methods yet, this function throws an exception
+     * ExcNotImplemented() independent of its argument.
      */
     types::global_dof_index n_dofs(const unsigned int level) const;
 
@@ -599,7 +599,6 @@ namespace hp
      */
     const IndexSet &locally_owned_dofs() const;
 
-
     /**
      * Return a vector that stores the locally owned DoFs of each processor.
      * If you are only interested in the number of elements each processor
@@ -625,6 +624,23 @@ namespace hp
      */
     const std::vector<types::global_dof_index> &
     n_locally_owned_dofs_per_processor () const;
+
+    /**
+     * Return an IndexSet describing the set of locally owned DoFs used for
+     * the given multigrid level. Since hp::DoFHandler does not support
+     * multilevel methods yet, this function throws an exception
+     * ExcNotImplemented() independent of its argument.
+     */
+    const IndexSet &locally_owned_mg_dofs(const unsigned int level) const;
+
+    /**
+     * Return a vector that stores the locally owned level DoFs of each
+     * processor on the given level @p level. Since hp::DoFHandler does not
+     * support multilevel methods yet, this function throws an exception
+     * ExcNotImplemented() independent of its argument.
+     */
+    const std::vector<IndexSet> &
+    locally_owned_mg_dofs_per_processor (const unsigned int level) const;
 
     /**
      * Return a constant reference to the set of finite element objects that
@@ -818,6 +834,13 @@ namespace hp
     dealii::internal::DoFHandler::NumberCache number_cache;
 
     /**
+     * A structure that contains all sorts of numbers that characterize the
+     * degrees of freedom on multigrid levels. Since multigrid is not currently
+     * supported, this table is not filled with valid entries.
+     */
+    std::vector<dealii::internal::DoFHandler::NumberCache> mg_number_cache;
+
+    /**
      * Array to store the indices for degrees of freedom located at vertices.
      *
      * The format used here, in the form of a linked list, is the same as used
@@ -925,6 +948,7 @@ namespace hp
     ar &vertex_dofs;
     ar &vertex_dof_offsets;
     ar &number_cache;
+    ar &mg_number_cache;
     ar &levels;
     ar &faces;
     ar &has_children;
@@ -947,6 +971,7 @@ namespace hp
     ar &vertex_dofs;
     ar &vertex_dof_offsets;
     ar &number_cache;
+    ar &mg_number_cache;
 
     // boost::serialization can restore pointers just fine, but if the
     // pointer object still points to something useful, that object is not
@@ -994,6 +1019,7 @@ namespace hp
   types::global_dof_index
   DoFHandler<dim,spacedim>::n_dofs (const unsigned int) const
   {
+    Assert(false, ExcNotImplemented());
     return numbers::invalid_dof_index;
   }
 
@@ -1031,6 +1057,31 @@ namespace hp
   DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor () const
   {
     return number_cache.locally_owned_dofs_per_processor;
+  }
+
+
+
+  template <int dim, int spacedim>
+  const IndexSet &
+  DoFHandler<dim, spacedim>::locally_owned_mg_dofs (const unsigned int level) const
+  {
+    Assert(false, ExcNotImplemented());
+    (void)level;
+    Assert(level < this->get_triangulation().n_global_levels(),
+           ExcMessage("invalid level in locally_owned_mg_dofs"));
+    return mg_number_cache[0].locally_owned_dofs;
+  }
+
+
+  template <int dim, int spacedim>
+  const std::vector<IndexSet> &
+  DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor (const unsigned int level) const
+  {
+    Assert(false, ExcNotImplemented());
+    (void)level;
+    Assert(level < this->get_triangulation().n_global_levels(),
+           ExcMessage("invalid level in locally_owned_mg_dofs_per_processor"));
+    return mg_number_cache[0].locally_owned_dofs_per_processor;
   }
 
 

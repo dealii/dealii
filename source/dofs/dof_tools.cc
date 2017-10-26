@@ -1114,6 +1114,7 @@ namespace DoFTools
   }
 
 
+
   template <typename DoFHandlerType>
   void
   extract_locally_relevant_level_dofs (const DoFHandlerType &dof_handler,
@@ -1159,6 +1160,8 @@ namespace DoFTools
 
     dof_set.compress();
   }
+
+
 
   template <typename DoFHandlerType>
   void

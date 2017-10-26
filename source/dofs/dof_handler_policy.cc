@@ -19,6 +19,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/partitioner.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -2027,7 +2028,9 @@ namespace internal
             {
               if (*i != numbers::invalid_dof_index)
                 {
-                  Assert(*i<new_numbers.size(), ExcInternalError());
+                  Assert((indices.size() > 0 ?
+                          indices.is_element(*i) :
+                          (*i<new_numbers.size())), ExcInternalError());
                   *i = (indices.size() == 0)?
                        (new_numbers[*i]) :
                        (new_numbers[indices.index_within_set(*i)]);
@@ -2196,7 +2199,7 @@ namespace internal
                           const unsigned int                                  level,
                           const bool                                          check_validity)
         {
-          Assert (level<dof_handler.get_triangulation().n_levels(),
+          Assert (level<dof_handler.get_triangulation().n_global_levels(),
                   ExcInternalError());
 
           // renumber DoF indices on vertices, cells, and faces. this
@@ -4359,18 +4362,89 @@ namespace internal
       template <class DoFHandlerType>
       NumberCache
       ParallelDistributed<DoFHandlerType>::
-      renumber_mg_dofs (const unsigned int                          /*level*/,
-                        const std::vector<types::global_dof_index> &/*new_numbers*/) const
+      renumber_mg_dofs (const unsigned int                          level,
+                        const std::vector<types::global_dof_index> &new_numbers) const
       {
-        // this is not currently implemented, but should be simple to do by
-        // just calling the function like in the sequential case just with
-        // an appropriate index set argument
+        // we only implement the case where the multigrid numbers are
+        // renumbered within the processor's partition, rather than the most
+        // general case
+        const std::vector<IndexSet> &index_sets = dof_handler->locally_owned_mg_dofs_per_processor(level);
+
+        constexpr int dim = DoFHandlerType::dimension;
+        constexpr int spacedim = DoFHandlerType::space_dimension;
+        const parallel::Triangulation<dim, spacedim> *tr =
+          (dynamic_cast<const parallel::Triangulation<dim, spacedim>*>
+           (&this->dof_handler->get_triangulation()));
+        Assert(tr != nullptr, ExcInternalError());
+
+#ifdef DEAL_II_WITH_MPI
+        const unsigned int my_rank = Utilities::MPI::this_mpi_process(tr->get_communicator());
+
+#ifdef DEBUG
+        for (types::global_dof_index i : new_numbers)
+          {
+            Assert(index_sets[my_rank].is_element(i),
+                   ExcNotImplemented("Renumberings that change the locally owned mg dofs "
+                                     "partitioning are currently not implemented for "
+                                     "the multigrid levels"));
+          }
+#endif
+
+        // we need to access all locally relevant degrees of freedom. we
+        // use Utilities::MPI::Partitioner for handling the data exchange
+        // of the new numbers, which is simply the extraction of ghost data
+        IndexSet relevant_dofs;
+        DoFTools::extract_locally_relevant_level_dofs(*dof_handler, level, relevant_dofs);
+        std::vector<types::global_dof_index> ghosted_new_numbers(relevant_dofs.n_elements());
+        {
+          Utilities::MPI::Partitioner partitioner(index_sets[my_rank],
+                                                  relevant_dofs, tr->get_communicator());
+          std::vector<types::global_dof_index> temp_array(partitioner.n_import_indices());
+          const unsigned int communication_channel = 17;
+          std::vector<MPI_Request> requests;
+          partitioner.export_to_ghosted_array_start
+          (communication_channel,
+           make_array_view(new_numbers),
+           make_array_view(temp_array),
+           ArrayView<types::global_dof_index>(ghosted_new_numbers.data()+
+                                              new_numbers.size(), partitioner.n_ghost_indices()),
+           requests);
+          partitioner.export_to_ghosted_array_finish
+          (ArrayView<types::global_dof_index>(ghosted_new_numbers.data()+
+                                              new_numbers.size(), partitioner.n_ghost_indices()),
+           requests);
+
+          // we need to fill the indices of the locally owned part into the
+          // new numbers array. their right position is somewhere in the
+          // middle of the array, so we first copy the ghosted part from
+          // smaller ranks to the front, then insert the data in the middle.
+          unsigned int n_ghosts_on_smaller_ranks = 0;
+          for (std::pair<unsigned int,unsigned int> t : partitioner.ghost_targets())
+            {
+              if (t.first > my_rank)
+                break;
+              n_ghosts_on_smaller_ranks += t.second;
+            }
+          std::memmove(ghosted_new_numbers.data(),
+                       ghosted_new_numbers.data()+new_numbers.size(),
+                       sizeof(types::global_dof_index)*n_ghosts_on_smaller_ranks);
+          std::memcpy(ghosted_new_numbers.data()+n_ghosts_on_smaller_ranks,
+                      new_numbers.data(),
+                      sizeof(types::global_dof_index)*new_numbers.size());
+        }
+
+        // in case we do not own any of the given level (but only some remote
+        // processor), we do not need to call the renumbering
+        if (level < this->dof_handler->get_triangulation().n_levels())
+          Implementation::renumber_mg_dofs (ghosted_new_numbers, relevant_dofs,
+                                            *dof_handler, level, true);
+#else
         Assert(false, ExcNotImplemented());
+#endif
 
-        return NumberCache ();
+        return NumberCache (index_sets,
+                            Utilities::MPI::this_mpi_process (tr->get_communicator()));
       }
-
-
     }
   }
 }
