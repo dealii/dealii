@@ -716,7 +716,7 @@ namespace Patterns
      * directly the separator without using std::string(";").
      *
      * Since we support a pure variadic templates version, without this
-     * specialization, the compiler will fail with criptic errors.
+     * specialization, the compiler will fail with criptyc errors.
      */
     template<class... PatternTypes>
     Tuple (const char *separator,
