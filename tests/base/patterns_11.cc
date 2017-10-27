@@ -29,7 +29,7 @@ int main()
 
   deallog << desc << std::endl;
 
-  std::string test = "3.14, Ciao";
+  std::string test = "3.14: Ciao";
 
   if (pattern.match(test))
     deallog << "OK" << std::endl;

@@ -1020,7 +1020,7 @@ namespace Patterns
                       << patterns[i]->description(style)
                       << ">";
 
-        if (separator != ",")
+        if (separator != ":")
           description << " separated by <" << separator << ">";
         description << "]";
 
@@ -1034,7 +1034,7 @@ namespace Patterns
         description << "A Tuple of "
                     << patterns.size()
                     << " elements ";
-        if (separator != ",")
+        if (separator != ":")
           description << " separated by <" << separator << "> ";
         description << " where each element is ["
                     <<  patterns[0]->description(style)
@@ -1108,7 +1108,7 @@ namespace Patterns
         if (is)
           std::getline(is, separator, '>');
         else
-          separator = ",";
+          separator = ":";
 
         return std::unique_ptr<Tuple>(new Tuple(patterns,separator));
       }
