@@ -37,7 +37,8 @@ void
 test ()
 {
   Triangulation<dim> tria(Triangulation<dim>::MeshSmoothing::none,true);
-  GridGenerator::hyper_cube(tria, 1., 1. + 1000.0 * std::numeric_limits<double>::epsilon());
+  GridGenerator::hyper_cube(tria, 1., 2.);
+  tria.refine_global(1);
 
   FE_Q<dim> fe1(1);
 
@@ -58,27 +59,11 @@ test ()
 
   deallog << "Number of filtered nodes: " << data_filter.n_nodes() << std::endl;
 
-  Triangulation<dim> tria2(Triangulation<dim>::MeshSmoothing::none,true);
-  GridGenerator::hyper_cube(tria2, 1., 1 + 10.0 * std::numeric_limits<double>::epsilon());
-
-  FE_Q<dim> fe2(1);
-
-  DoFHandler<dim> dof2(tria2);
-  dof2.distribute_dofs(fe2);
-
-  Vector<double> v2(dof2.n_dofs());
-  for (unsigned int i=0; i<v2.size(); ++i) v2(i) = i;
-
-  DataOut<dim> data_out2;
-  data_out2.add_data_vector (dof2, v2, "linear");
-  data_out2.build_patches ();
-
   DataOutBase::DataOutFilter data_filter2
-  (DataOutBase::DataOutFilterFlags (true, false));
+  (DataOutBase::DataOutFilterFlags (false, false));
+  data_out.write_filtered_data (data_filter2);
 
-  data_out2.write_filtered_data (data_filter2);
-
-  deallog << "Number of filtered nodes: " << data_filter2.n_nodes() << std::endl;
+  deallog << "Number of unfiltered nodes: " << data_filter2.n_nodes() << std::endl;
 
   deallog << "ok" << std::endl;
 }
