@@ -1,0 +1,8 @@
+
+DEAL:parameters::A tuple: Ciao : 1.000000, 2.000000, 3.000000 : 33
+DEAL::After ParameterHandler::set ==========================
+DEAL::
+DEAL:parameters::A tuple: Mondo : 2.0, 3.0, 4.0 : 34
+DEAL::Actual variables            ==========================
+DEAL::
+DEAL::Mondo : 2.000000, 3.000000, 4.000000 : 34

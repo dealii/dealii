@@ -683,6 +683,27 @@ namespace Patterns
    * bool check = ps.match("5: 3.14: Ciao"); // check = true
    * @endcode
    *
+   * or, if you want to exploit ParameterHandler::add_parameter():
+   *
+   * @code
+   * typedef std::tuple<std::string, Point<3>, unsigned int> T;
+   *
+   * T a = Patterns::Tools::Convert<T>::to_value("Ciao : 1.0, 2.0, 3.0 : 33");
+   *
+   * ParameterHandler prm;
+   * prm.add_parameter("A tuple", a);
+   *
+   * prm.log_parameters(deallog);
+   * // DEAL:parameters::A tuple: Ciao : 1.000000, 2.000000, 3.000000 : 33
+   *
+   * prm.set("A tuple", "Mondo : 2.0, 3.0, 4.0 : 34");
+   * prm.log_parameters(deallog);
+   * // DEAL:parameters::A tuple: Mondo : 2.0, 3.0, 4.0 : 34
+   *
+   * deallog << Convert<T>::to_string(a) << std::endl;
+   * // DEAL::Mondo : 2.000000, 3.000000, 4.000000 : 34
+   * @endcode
+   *
    * The constructor expects a vector of Patterns, and optionally a string
    * specifying the separator to use when parsing the Tuple from a string.
    *
