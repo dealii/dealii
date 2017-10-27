@@ -21,11 +21,13 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/std_cxx14/algorithm.h>
 #include <deal.II/base/template_constraints.h>
+
+#include <deal.II/base/std_cxx14/memory.h>
+#include <deal.II/base/std_cxx14/algorithm.h>
+#include <deal.II/base/std_cxx14/utility.h>
 
 #include <boost/archive/basic_archive.hpp>
 #include <boost/core/demangle.hpp>
