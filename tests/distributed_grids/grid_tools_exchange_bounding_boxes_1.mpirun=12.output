@@ -1,0 +1,143 @@
+
+DEAL:0::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:0::Test for: dimension 1
+DEAL:0::12  mpi processes
+DEAL:0::Test passed
+DEAL:0::Test for: dimension 2
+DEAL:0::12  mpi processes
+DEAL:0::Test passed
+DEAL:0::Test for: dimension 3
+DEAL:0::12  mpi processes
+DEAL:0::Test passed
+
+DEAL:1::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:1::Test for: dimension 1
+DEAL:1::12  mpi processes
+DEAL:1::Test passed
+DEAL:1::Test for: dimension 2
+DEAL:1::12  mpi processes
+DEAL:1::Test passed
+DEAL:1::Test for: dimension 3
+DEAL:1::12  mpi processes
+DEAL:1::Test passed
+
+
+DEAL:2::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:2::Test for: dimension 1
+DEAL:2::12  mpi processes
+DEAL:2::Test passed
+DEAL:2::Test for: dimension 2
+DEAL:2::12  mpi processes
+DEAL:2::Test passed
+DEAL:2::Test for: dimension 3
+DEAL:2::12  mpi processes
+DEAL:2::Test passed
+
+
+DEAL:3::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:3::Test for: dimension 1
+DEAL:3::12  mpi processes
+DEAL:3::Test passed
+DEAL:3::Test for: dimension 2
+DEAL:3::12  mpi processes
+DEAL:3::Test passed
+DEAL:3::Test for: dimension 3
+DEAL:3::12  mpi processes
+DEAL:3::Test passed
+
+
+DEAL:4::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:4::Test for: dimension 1
+DEAL:4::12  mpi processes
+DEAL:4::Test passed
+DEAL:4::Test for: dimension 2
+DEAL:4::12  mpi processes
+DEAL:4::Test passed
+DEAL:4::Test for: dimension 3
+DEAL:4::12  mpi processes
+DEAL:4::Test passed
+
+
+DEAL:5::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:5::Test for: dimension 1
+DEAL:5::12  mpi processes
+DEAL:5::Test passed
+DEAL:5::Test for: dimension 2
+DEAL:5::12  mpi processes
+DEAL:5::Test passed
+DEAL:5::Test for: dimension 3
+DEAL:5::12  mpi processes
+DEAL:5::Test passed
+
+
+DEAL:6::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:6::Test for: dimension 1
+DEAL:6::12  mpi processes
+DEAL:6::Test passed
+DEAL:6::Test for: dimension 2
+DEAL:6::12  mpi processes
+DEAL:6::Test passed
+DEAL:6::Test for: dimension 3
+DEAL:6::12  mpi processes
+DEAL:6::Test passed
+
+
+DEAL:7::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:7::Test for: dimension 1
+DEAL:7::12  mpi processes
+DEAL:7::Test passed
+DEAL:7::Test for: dimension 2
+DEAL:7::12  mpi processes
+DEAL:7::Test passed
+DEAL:7::Test for: dimension 3
+DEAL:7::12  mpi processes
+DEAL:7::Test passed
+
+
+DEAL:8::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:8::Test for: dimension 1
+DEAL:8::12  mpi processes
+DEAL:8::Test passed
+DEAL:8::Test for: dimension 2
+DEAL:8::12  mpi processes
+DEAL:8::Test passed
+DEAL:8::Test for: dimension 3
+DEAL:8::12  mpi processes
+DEAL:8::Test passed
+
+
+DEAL:9::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:9::Test for: dimension 1
+DEAL:9::12  mpi processes
+DEAL:9::Test passed
+DEAL:9::Test for: dimension 2
+DEAL:9::12  mpi processes
+DEAL:9::Test passed
+DEAL:9::Test for: dimension 3
+DEAL:9::12  mpi processes
+DEAL:9::Test passed
+
+
+DEAL:10::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:10::Test for: dimension 1
+DEAL:10::12  mpi processes
+DEAL:10::Test passed
+DEAL:10::Test for: dimension 2
+DEAL:10::12  mpi processes
+DEAL:10::Test passed
+DEAL:10::Test for: dimension 3
+DEAL:10::12  mpi processes
+DEAL:10::Test passed
+
+
+DEAL:11::Test: parallel::GridTools::exchange_local_bounding_boxes 
+DEAL:11::Test for: dimension 1
+DEAL:11::12  mpi processes
+DEAL:11::Test passed
+DEAL:11::Test for: dimension 2
+DEAL:11::12  mpi processes
+DEAL:11::Test passed
+DEAL:11::Test for: dimension 3
+DEAL:11::12  mpi processes
+DEAL:11::Test passed
+
