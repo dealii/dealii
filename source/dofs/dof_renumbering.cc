@@ -1512,6 +1512,11 @@ namespace DoFRenumbering
    const Tensor<1,DoFHandlerType::space_dimension> &direction,
    const bool                                       dof_wise_renumbering)
   {
+    Assert ((dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
+             (&dof.get_triangulation())
+             == nullptr),
+            ExcNotImplemented());
+
     if (dof_wise_renumbering == false)
       {
         std::vector<typename DoFHandlerType::active_cell_iterator> ordered_cells;
