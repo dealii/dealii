@@ -1517,6 +1517,14 @@ namespace Patterns
         static constexpr int list_rank = std_cxx14::max(RankInfo<Key>::list_rank, RankInfo<Value>::list_rank);
         static constexpr int map_rank = std_cxx14::max(RankInfo<Key>::map_rank, RankInfo<Value>::map_rank)+1;
       };
+
+
+      template <class... Types>
+      struct RankInfo<std::tuple<Types...>>
+      {
+        static constexpr int list_rank = max_list_rank<Types...>();
+        static constexpr int map_rank = max_map_rank<Types...>()+1;
+      };
     }
 
     // stl containers
@@ -1878,6 +1886,97 @@ namespace Patterns
         return *m.begin();
       }
     };
+
+    // Tuples
+    template <class... Args>
+    struct Convert<std::tuple<Args...>>
+    {
+      typedef std::tuple<Args...> T;
+
+      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      {
+        static_assert(internal::RankInfo<T>::map_rank > 0,
+                      "Cannot use this class for non tuple-compatible types.");
+        return std_cxx14::make_unique<Patterns::Tuple>(
+                 internal::default_map_separator[internal::RankInfo<T>::map_rank-1],
+                 *Convert<Args>::to_pattern()...);
+      }
+
+      template<std::size_t... I>
+      static
+      decltype(auto) to_string_internal_1(const T &t,
+                                          const Patterns::Tuple &pattern,
+                                          std_cxx14::index_sequence<I...>)
+      {
+        std::array<std::string, std::tuple_size<T>::value> a
+        = {{
+            Convert<typename std::tuple_element<I,T>::type>::
+            to_string(std::get<I>(t), pattern.get_pattern(I).clone())...
+          }
+        };
+        return a;
+      }
+
+      static
+      decltype(auto) to_string_internal_2(const T &t,
+                                          const Patterns::Tuple &pattern)
+      {
+        return Convert<T>::to_string_internal_1(t, pattern,
+                                                std_cxx14::make_index_sequence<std::tuple_size<T>::value> {});
+      }
+
+      static std::string to_string(const T &t,
+                                   const std::unique_ptr<Patterns::PatternBase>
+                                   &pattern = Convert<T>::to_pattern())
+      {
+        auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
+        AssertThrow(p,ExcMessage("I need a Tuple pattern to convert a tuple "
+                                 "to a string."));
+
+        const auto string_array = Convert<T>::to_string_internal_2(t,*p);
+        std::string str;
+        for (unsigned int i=0; i< string_array.size(); ++i)
+          str += (i ? " " + p->get_separator() + " " : "") +string_array[i];
+        AssertThrow(p->match(str), ExcNoMatch(str, *p));
+        return str;
+      }
+
+
+      template<std::size_t... I>
+      static
+      T to_value_internal_1(const std::vector<std::string> &s,
+                            const Patterns::Tuple &pattern,
+                            std_cxx14::index_sequence<I...>)
+      {
+        return std::make_tuple(Convert<typename std::tuple_element<I,T>::type>::
+                               to_value(s[I], pattern.get_pattern(I).clone())...);
+      }
+
+      static
+      T to_value_internal_2(const std::vector<std::string> &s,
+                            const Patterns::Tuple &pattern)
+      {
+        return Convert<T>::to_value_internal_1(s, pattern,
+                                               std_cxx14::make_index_sequence<std::tuple_size<T>::value> {});
+      }
+
+
+      static T to_value(const std::string &s,
+                        const std::unique_ptr<Patterns::PatternBase> &pattern =
+                          Convert<T>::to_pattern())
+      {
+        AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
+
+        auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
+        AssertThrow(p,ExcMessage("I need a Tuple pattern to convert a string "
+                                 "to a tuple type."));
+
+        auto v = Utilities::split_string_list(s, p->get_separator());
+
+        return Convert<T>::to_value_internal_2(v,*p);
+      }
+    };
+
   }
 }
 
