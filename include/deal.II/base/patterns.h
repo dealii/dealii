@@ -1441,6 +1441,34 @@ namespace Patterns
 
     namespace internal
     {
+      // Helper function for list_rank
+      template <class T>
+      constexpr int max_list_rank()
+      {
+        return RankInfo<T>::list_rank;
+      };
+
+      template <class T1, class T2, class... Types>
+      constexpr int max_list_rank()
+      {
+        return std_cxx14::max(RankInfo<T1>::list_rank,
+                              max_list_rank<T2,Types...>());
+      };
+
+      // Helper function for map_rank
+      template <class T>
+      constexpr int max_map_rank()
+      {
+        return RankInfo<T>::map_rank;
+      };
+
+      template <class T1, class T2, class... Types>
+      constexpr int max_map_rank()
+      {
+        return std_cxx14::max(RankInfo<T1>::map_rank,
+                              max_map_rank<T2,Types...>());
+      };
+
       // Rank of vector types
       template <class T>
       struct RankInfo<T,
@@ -1457,13 +1485,9 @@ namespace Patterns
       struct RankInfo<T, typename std::enable_if<is_map_compatible<T>::value>::type>
       {
         static constexpr int list_rank =
-          std_cxx14::max(internal::RankInfo<typename T::key_type>::list_rank,
-                         RankInfo<typename T::mapped_type>::list_rank) +
-          1;
+          max_list_rank<typename T::key_type, typename T::mapped_type>() + 1;
         static constexpr int map_rank =
-          std_cxx14::max(internal::RankInfo<typename T::key_type>::map_rank,
-                         RankInfo<typename T::mapped_type>::map_rank) +
-          1;
+          max_map_rank<typename T::key_type, typename T::mapped_type>() + 1;
       };
 
       // Rank of Tensor types
