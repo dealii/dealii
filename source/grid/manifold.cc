@@ -537,7 +537,7 @@ get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
               minP[d] = std::min(minP[d], surrounding_points[i][d]);
               Assert( (surrounding_points[i][d] < periodicity[d]+tolerance*periodicity[d]) ||
                       (surrounding_points[i][d] >= -tolerance*periodicity[d]),
-                      ExcPeriodicBox(d, surrounding_points[i], periodicity[i]));
+                      ExcPeriodicBox(d, surrounding_points[i], periodicity[d]));
             }
 
       // compute the weighted average point, possibly taking into account periodicity
