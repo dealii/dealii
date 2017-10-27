@@ -25,6 +25,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/std_cxx14/algorithm.h>
+#include <deal.II/base/template_constraints.h>
 
 #include <boost/archive/basic_archive.hpp>
 #include <boost/core/demangle.hpp>
@@ -661,6 +662,148 @@ namespace Patterns
   };
 
 
+
+  /**
+   * This pattern matches comma-separated values of arbitrary types. Each type
+   * has to match a pattern given to the constructor.
+   *
+   * An example usage is the following:
+   *
+   * @code
+   * std::vector< std::unique_ptr<Patterns::PatternBase> > ps;
+   *
+   * ps.push_back(std::unique_ptr<Patterns::Integer>());
+   * ps.push_back(std::unique_ptr<Patterns::Double>());
+   * ps.push_back(std::unique_ptr<Patterns::Anything>());
+   *
+   * Patterns::Tuple pattern(ps, ";");
+   *
+   * bool check = ps.match("5; 3.14; Ciao"); // check = true
+   * @endcode
+   *
+   * The constructor expects a vector of Patterns, and optionally a string
+   * specifying the separator to use when parsing the Tuple from a string.
+   *
+   * @author Luca Heltai, 2017.
+   */
+  class Tuple : public PatternBase
+  {
+  public:
+    /**
+     * Constructor. Use a vector of unique pointers to Patterns to construct
+     * the tuple.
+     *
+     * @param patterns The pattern each object of the Tuple should match
+     * @param separator An optional string used to delimit each element
+     * Constructor.
+     */
+    Tuple (const std::vector<std::unique_ptr<PatternBase> > &patterns,
+           const std::string  &separator = ",");
+
+    /**
+     * Constructor. Same as above, specialized for const char *. This is
+     * necessary to avoid compilers errors due to the variadic constructors
+     * provided below.
+     */
+    Tuple (const std::vector<std::unique_ptr<PatternBase> > &patterns,
+           const char *separator);
+
+
+    /**
+     * Constructor. Creates a Tuple from more than one class derived from
+     * PatternBase.
+     *
+     * @param separator What separator to use.
+     * @param patterns The list of patterns to use
+     */
+    template<class... PatternTypes>
+    Tuple (const std::string  &separator,
+           const PatternTypes &... patterns);
+
+    /**
+     * Constructor. This is needed to allow users to specify
+     * directly the separator without using std::string(";").
+     *
+     * Since we support a pure variadic templates version, without this
+     * specialization, the compiler will fail with cryptic errors.
+     */
+    template<class... PatternTypes>
+    Tuple (const char *separator,
+           const PatternTypes &... patterns);
+
+    /**
+     * Constructor. Same as above, using the default separator.
+     *
+     * @param patterns The list of patterns to use
+     */
+    template<typename... Patterns>
+    Tuple (const Patterns &... patterns);
+
+    /**
+     * Copy constructor.
+     */
+    Tuple (const Tuple &other);
+
+    /**
+     * Return <tt>true</tt> if the string is a list of strings
+     * each of which matches the patterns given to the constructor.
+     */
+    virtual bool match (const std::string &test_string) const;
+
+    /**
+     * Return a description of the pattern that valid strings are expected to
+     * match.
+     */
+    virtual std::string description (const OutputStyle style=Machine) const;
+
+    /**
+     * Return a copy of the present object, which is newly allocated on the
+     * heap. Ownership of that object is transferred to the caller of this
+     * function.
+     */
+    virtual std::unique_ptr<PatternBase> clone () const;
+
+    /**
+     * Creates new object if the start of description matches
+     * description_init.  Ownership of that object is transferred to the
+     * caller of this function.
+     */
+    static std::unique_ptr<Tuple> create (const std::string &description);
+
+    /**
+     * Determine an estimate for the memory consumption (in bytes) of this
+     * object.
+     */
+    std::size_t memory_consumption () const;
+
+    /**
+     * Return a reference to the i-th pattern in the tuple.
+     */
+    const PatternBase &get_pattern(const unsigned int &i) const;
+
+    /**
+     * Return the separator of the tuple entries.
+     */
+    const std::string &get_separator() const;
+
+  private:
+    /**
+     * Copy of the patterns stored in the Tuple.
+     */
+    std::vector<std::unique_ptr<PatternBase> > patterns;
+
+    /**
+     * Separator between elements of the list.
+     */
+    const std::string separator;
+
+    /**
+     * Initial part of description.
+     */
+    static const char *description_init;
+  };
+
+
   /**
    * This class is much like the Selection class, but it allows the input to
    * be a comma-separated list of values which each have to be given in the
@@ -1109,6 +1252,50 @@ namespace Patterns
 // ---------------------- inline and template functions --------------------
 namespace Patterns
 {
+  template<class... PatternTypes>
+  Tuple::Tuple(const char *separator,
+               const PatternTypes &... ps) :
+    separator(separator)
+  {
+    static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
+                  "Not all of the input arguments of this function "
+                  "are derived from PatternBase");
+    std::initializer_list<const PatternBase *> pss = { &ps... };
+    for (auto p : pss)
+      patterns.push_back(p->clone());
+  }
+
+
+
+  template<class... PatternTypes>
+  Tuple::Tuple(const std::string &separator,
+               const PatternTypes &... ps) :
+    separator(separator)
+  {
+    static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
+                  "Not all of the input arguments of this function "
+                  "are derived from PatternBase");
+    std::initializer_list<const PatternBase *> pss = { &ps... };
+    for (auto p : pss)
+      patterns.push_back(p->clone());
+  }
+
+
+
+  template<class... PatternTypes>
+  Tuple::Tuple(const PatternTypes &... ps) :
+    separator(",")
+  {
+    static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
+                  "Not all of the input arguments of this function "
+                  "are derived from PatternBase");
+    std::initializer_list<const PatternBase *> pss = { &ps... };
+    for (auto p : pss)
+      patterns.push_back(p->clone());
+  }
+
+
+
   namespace Tools
   {
     namespace internal

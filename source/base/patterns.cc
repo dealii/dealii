@@ -946,6 +946,192 @@ namespace Patterns
   }
 
 
+
+  const char *Tuple::description_init = "[Tuple";
+
+
+  Tuple::Tuple (const std::vector<std::unique_ptr<PatternBase> >  &ps,
+                const std::string  &separator)
+    :
+    separator (separator)
+  {
+    Assert (ps.size() > 0,
+            ExcMessage ("The Patterns list must have a non-zero length."));
+    Assert (separator.size() > 0,
+            ExcMessage ("The separator must have a non-zero length."));
+    patterns.resize(ps.size());
+    for (unsigned int i=0; i<ps.size(); ++i)
+      patterns[i] = ps[i]->clone();
+  }
+
+
+
+  Tuple::Tuple (const std::vector<std::unique_ptr<PatternBase> >  &ps,
+                const char *separator) :
+    Tuple(ps, std::string(separator))
+  {}
+
+
+
+  Tuple::Tuple (const Tuple &other)
+    :
+    separator (other.separator)
+  {
+    patterns.resize(other.patterns.size());
+    for (unsigned int i=0; i<other.patterns.size(); ++i)
+      patterns[i] = other.patterns[i]->clone();
+  }
+
+
+
+  bool Tuple::match (const std::string &test_string_list) const
+  {
+    std::vector<std::string> split_list =
+      Utilities::split_string_list(test_string_list, separator);
+    if (split_list.size() != patterns.size())
+      return false;
+
+    for (unsigned int i=0; i<patterns.size(); ++i)
+      {
+        if (patterns[i]->match (split_list[i]) == false)
+          return false;
+      }
+
+    return true;
+  }
+
+
+
+  std::string Tuple::description (const OutputStyle style) const
+  {
+    switch (style)
+      {
+      case Machine:
+      {
+        std::ostringstream description;
+
+        description << description_init
+                    << " of <"
+                    << patterns.size() << "> elements <"
+                    << patterns[0]->description(style)
+                    << ">";
+        for (unsigned int i=1; i<patterns.size(); ++i)
+          description << ", <"
+                      << patterns[i]->description(style)
+                      << ">";
+
+        if (separator != ",")
+          description << " separated by <" << separator << ">";
+        description << "]";
+
+        return description.str();
+      }
+      case Text:
+      case LaTeX:
+      {
+        std::ostringstream description;
+
+        description << "A Tuple of "
+                    << patterns.size()
+                    << " elements ";
+        if (separator != ",")
+          description << " separated by <" << separator << "> ";
+        description << " where each element is ["
+                    <<  patterns[0]->description(style)
+                    << "]";
+        for (unsigned int i=1; i<patterns.size(); ++i)
+          {
+            description << separator
+                        << "[" << patterns[i]->description(style) << "]";
+
+            return description.str();
+          }
+      }
+      default:
+        AssertThrow(false, ExcNotImplemented());
+      }
+    // Should never occur without an exception, but prevent compiler from
+    // complaining
+    return "";
+  }
+
+
+
+  std::unique_ptr<PatternBase> Tuple::clone() const
+  {
+    return std::unique_ptr<PatternBase>(new Tuple(patterns, separator));
+  }
+
+
+  std::size_t
+  Tuple::memory_consumption () const
+  {
+    return (sizeof(*this) +
+            MemoryConsumption::memory_consumption (patterns) +
+            MemoryConsumption::memory_consumption (separator));
+  }
+
+
+
+  std::unique_ptr<Tuple> Tuple::create (const std::string &description)
+  {
+    if (description.compare(0, std::strlen(description_init), description_init) == 0)
+      {
+        std::vector<std::unique_ptr<PatternBase> > patterns;
+
+        std::istringstream is(description);
+        is.ignore(strlen(description_init) + strlen(" of <"));
+
+        std::string len;
+        std::getline(is, len, '>');
+        const unsigned int n_elements = Utilities::string_to_int(len);
+        Assert(n_elements>0,
+               ExcMessage("Provide at least 1 element in the tuple."));
+        patterns.resize(n_elements);
+
+        is.ignore(strlen(" elements <"));
+
+        std::string element;
+        std::getline(is, element, '>');
+        patterns[0] = pattern_factory(element);
+
+        for (unsigned int i=1; i<n_elements; ++i)
+          {
+            is.ignore(strlen(", <"));
+            std::getline(is, element, '>');
+            patterns[i] = pattern_factory(element);
+          }
+
+        is.ignore(strlen(" separated by <"));
+
+        std::string separator;
+        if (is)
+          std::getline(is, separator, '>');
+        else
+          separator = ",";
+
+        return std::unique_ptr<Tuple>(new Tuple(patterns,separator));
+      }
+    else
+      return std::unique_ptr<Tuple>();
+  }
+
+
+
+  const PatternBase &Tuple::get_pattern(const unsigned int &i) const
+  {
+    return *patterns[i];
+  }
+
+
+
+  const std::string &Tuple::get_separator() const
+  {
+    return separator;
+  }
+
+
+
   const char *MultipleSelection::description_init = "[MultipleSelection";
 
 
