@@ -1925,9 +1925,10 @@ namespace Patterns
 
       template<std::size_t... I>
       static
-      decltype(auto) to_string_internal_1(const T &t,
-                                          const Patterns::Tuple &pattern,
-                                          std_cxx14::index_sequence<I...>)
+      std::array<std::string, std::tuple_size<T>::value>
+      to_string_internal_1(const T &t,
+                           const Patterns::Tuple &pattern,
+                           std_cxx14::index_sequence<I...>)
       {
         std::array<std::string, std::tuple_size<T>::value> a
         = {{
@@ -1939,8 +1940,9 @@ namespace Patterns
       }
 
       static
-      decltype(auto) to_string_internal_2(const T &t,
-                                          const Patterns::Tuple &pattern)
+      std::array<std::string, std::tuple_size<T>::value>
+      to_string_internal_2(const T &t,
+                           const Patterns::Tuple &pattern)
       {
         return Convert<T>::to_string_internal_1(t, pattern,
                                                 std_cxx14::make_index_sequence<std::tuple_size<T>::value> {});
