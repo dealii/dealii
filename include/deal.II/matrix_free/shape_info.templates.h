@@ -62,9 +62,9 @@ namespace internal
       fe_degree (numbers::invalid_unsigned_int),
       n_q_points_1d(0),
       n_q_points (0),
-      dofs_per_cell (0),
+      dofs_per_component_on_cell (0),
       n_q_points_face (0),
-      dofs_per_face (0),
+      dofs_per_component_on_face (0),
       nodal_at_cell_boundaries (false)
     {}
 
@@ -181,9 +181,9 @@ namespace internal
       }
 
       n_q_points      = Utilities::fixed_power<dim>(n_q_points_1d);
-      dofs_per_cell   = fe->dofs_per_cell;
       n_q_points_face = dim>1?Utilities::fixed_power<dim-1>(n_q_points_1d):1;
-      dofs_per_face   = dim>1?Utilities::fixed_power<dim-1>(fe_degree+1):1;
+      dofs_per_component_on_cell = fe->dofs_per_cell;
+      dofs_per_component_on_face = dim>1?Utilities::fixed_power<dim-1>(fe_degree+1):1;
 
       const unsigned int array_size = n_dofs_1d*n_q_points_1d;
       this->shape_gradients.resize_fast (array_size);
@@ -302,7 +302,7 @@ namespace internal
       if (nodal_at_cell_boundaries == true)
         {
           face_to_cell_index_nodal.reinit(GeometryInfo<dim>::faces_per_cell,
-                                          dofs_per_face);
+                                          dofs_per_component_on_face);
           for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
             {
               const unsigned int direction = f/2;
@@ -313,7 +313,7 @@ namespace internal
               const unsigned int offset = (f%2)*fe_degree*shift;
 
               if (direction == 0 || direction == dim-1)
-                for (unsigned int i=0; i<dofs_per_face; ++i)
+                for (unsigned int i=0; i<dofs_per_component_on_face; ++i)
                   face_to_cell_index_nodal(f,i) = offset + i*stride;
               else
                 // local coordinate system on faces 2 and 3 is zx in
@@ -322,8 +322,8 @@ namespace internal
                 for (unsigned int j=0; j<=fe_degree; ++j)
                   for (unsigned int i=0; i<=fe_degree; ++i)
                     {
-                      const unsigned int ind = offset + j*dofs_per_face + i;
-                      AssertIndexRange(ind, dofs_per_cell);
+                      const unsigned int ind = offset + j*dofs_per_component_on_face + i;
+                      AssertIndexRange(ind, dofs_per_component_on_cell);
                       const unsigned int l = i*(fe_degree+1)+j;
                       face_to_cell_index_nodal(f,l) = ind;
                     }
@@ -333,7 +333,7 @@ namespace internal
       if (element_type == tensor_symmetric_hermite)
         {
           face_to_cell_index_hermite.reinit(GeometryInfo<dim>::faces_per_cell,
-                                            2*dofs_per_face);
+                                            2*dofs_per_component_on_face);
           for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
             {
               const unsigned int direction = f/2;
@@ -346,7 +346,7 @@ namespace internal
                 shift = -shift;
 
               if (direction == 0 || direction == dim-1)
-                for (unsigned int i=0; i<dofs_per_face; ++i)
+                for (unsigned int i=0; i<dofs_per_component_on_face; ++i)
                   {
                     face_to_cell_index_hermite(f,2*i) = offset + i*stride;
                     face_to_cell_index_hermite(f,2*i+1) = offset + i*stride + shift;
@@ -358,8 +358,8 @@ namespace internal
                 for (unsigned int j=0; j<=fe_degree; ++j)
                   for (unsigned int i=0; i<=fe_degree; ++i)
                     {
-                      const unsigned int ind = offset + j*dofs_per_face + i;
-                      AssertIndexRange(ind, dofs_per_cell);
+                      const unsigned int ind = offset + j*dofs_per_component_on_face + i;
+                      AssertIndexRange(ind, dofs_per_component_on_cell);
                       const unsigned int l = i*(fe_degree+1)+j;
                       face_to_cell_index_hermite(f,2*l) = ind;
                       face_to_cell_index_hermite(f,2*l+1) = ind+shift;
@@ -374,7 +374,7 @@ namespace internal
     bool
     ShapeInfo<Number>::check_1d_shapes_symmetric(const unsigned int n_q_points_1d)
     {
-      if (dofs_per_cell == 0)
+      if (dofs_per_component_on_cell == 0)
         return false;
 
       const double zero_tol =
@@ -476,7 +476,7 @@ namespace internal
     bool
     ShapeInfo<Number>::check_1d_shapes_collocation()
     {
-      if (dofs_per_cell != n_q_points)
+      if (dofs_per_component_on_cell != n_q_points)
         return false;
 
       const double zero_tol =
