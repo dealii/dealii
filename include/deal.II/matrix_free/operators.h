@@ -1781,17 +1781,18 @@ namespace MatrixFreeOperators
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
         phi.reinit (cell);
-        VectorizedArray<Number> local_diagonal_vector[phi.tensor_dofs_per_cell];
-        for (unsigned int i=0; i<phi.dofs_per_cell; ++i)
+        VectorizedArray<Number> local_diagonal_vector[phi.static_dofs_per_cell];
+        for (unsigned int i=0; i<phi.dofs_per_component; ++i)
           {
-            for (unsigned int j=0; j<phi.dofs_per_cell; ++j)
+            for (unsigned int j=0; j<phi.dofs_per_component; ++j)
               phi.begin_dof_values()[j] = VectorizedArray<Number>();
             phi.begin_dof_values()[i] = 1.;
             do_operation_on_cell(phi,cell);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];
           }
-        for (unsigned int i=0; i<phi.tensor_dofs_per_cell; ++i)
-          phi.begin_dof_values()[i] = local_diagonal_vector[i];
+        for (unsigned int i=0; i<phi.dofs_per_component; ++i)
+          for (unsigned int c=0; c<phi.n_components; ++c)
+            phi.begin_dof_values()[i+c*phi.dofs_per_component] = local_diagonal_vector[i];
         phi.distribute_local_to_global (dst);
       }
   }

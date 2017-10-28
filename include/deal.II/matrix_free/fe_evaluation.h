@@ -304,10 +304,13 @@ public:
   /**
    * Return the value stored for the local degree of freedom with index @p
    * dof. If the object is vector-valued, a vector-valued return argument is
-   * given. Note that when vectorization is enabled, values from several cells
-   * are grouped together. If @p set_dof_values was called last, the value
-   * corresponds to the one set there. If @p integrate was called last, it
-   * instead corresponds to the value of the integrated function with the test
+   * given. Thus, the argument @p dof can at most run until @p
+   * dofs_per_component rather than @p dofs_per_cell since the different
+   * components of a vector-valued FE are return together. Note that when
+   * vectorization is enabled, values from several cells are grouped
+   * together. If @p set_dof_values was called last, the value corresponds to
+   * the one set there. If @p integrate was called last, it instead
+   * corresponds to the value of the integrated function with the test
    * function of the given index.
    *
    * Note that the derived class FEEvaluationAccess overloads this operation
@@ -594,7 +597,7 @@ public:
    * Returns an ArrayView to internal memory for temporary use. Note that some
    * of this memory is overwritten during evaluate() and integrate() calls so
    * do not assume it to be stable over those calls. The maximum size you can
-   * write into is (n_components+2)*dofs_per_cell+2*n_q_points.
+   * write into is 3*dofs_per_cell+2*n_q_points.
    */
   ArrayView<VectorizedArray<Number> >
   get_scratch_data() const;
@@ -1910,7 +1913,9 @@ public:
   static const unsigned int dimension     = dim;
   static const unsigned int n_components  = n_components_;
   static const unsigned int static_n_q_points    = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
-  static const unsigned int tensor_dofs_per_cell = Utilities::fixed_int_power<fe_degree+1,dim>::value;
+  static const unsigned int static_dofs_per_component = Utilities::fixed_int_power<fe_degree+1,dim>::value;
+  static const unsigned int tensor_dofs_per_cell = static_dofs_per_component *n_components;
+  static const unsigned int static_dofs_per_cell = static_dofs_per_component *n_components;
 
   /**
    * Constructor. Takes all data stored in MatrixFree. If applied to problems
@@ -2024,16 +2029,26 @@ public:
   quadrature_point (const unsigned int q_point) const;
 
   /**
-   * The number of scalar degrees of freedom on the cell. Usually close to
-   * tensor_dofs_per_cell, but depends on the actual element selected and is
-   * thus not static.
+   * The number of degrees of freedom of a single component on the cell for
+   * the underlying evaluation object. Usually close to
+   * static_dofs_per_component, but the number depends on the actual element
+   * selected and is thus not static.
+   */
+  const unsigned int dofs_per_component;
+
+  /**
+   * The number of degrees of freedom on the cell accumulated over all
+   * components in the current evaluation object. Usually close to
+   * static_dofs_per_cell = static_dofs_per_component*n_components, but the
+   * number depends on the actual element selected and is thus not static.
    */
   const unsigned int dofs_per_cell;
 
   /**
-   * The number of scalar degrees of freedom on the cell. Usually close to
-   * tensor_dofs_per_cell, but depends on the actual element selected and is
-   * thus not static.
+   * The number of quadrature points in use for the current evaluation
+   * object. It equals static_n_q_points in case the element degree is not set
+   * to -1, i.e., the worker kernels can be set according to the templates @p
+   * fe_degree and @p n_q_points_1d rather than at run time.
    */
   const unsigned int n_q_points;
 
@@ -2055,16 +2070,16 @@ namespace internal
     // a helper function to compute the number of DoFs of a DGP element at compile
     // time, depending on the degree
     template <int dim, int degree>
-    struct DGP_dofs_per_cell
+    struct DGP_dofs_per_component
     {
       // this division is always without remainder
       static const unsigned int value =
-        (DGP_dofs_per_cell<dim-1,degree>::value * (degree+dim)) / dim;
+        (DGP_dofs_per_component<dim-1,degree>::value * (degree+dim)) / dim;
     };
 
     // base specialization: 1d elements have 'degree+1' degrees of freedom
     template <int degree>
-    struct DGP_dofs_per_cell<1,degree>
+    struct DGP_dofs_per_component<1,degree>
     {
       static const unsigned int value = degree+1;
     };
@@ -2132,8 +2147,8 @@ FEEvaluationBase<dim,n_components_,Number>
           ExcNotInitialized());
   AssertDimension (matrix_info->get_size_info().vectorization_length,
                    VectorizedArray<Number>::n_array_elements);
-  AssertDimension (data->dofs_per_cell,
-                   dof_info->dofs_per_cell[active_fe_index]/n_fe_components);
+  AssertDimension (data->dofs_per_component_on_cell*n_fe_components,
+                   dof_info->dofs_per_cell[active_fe_index]);
   AssertDimension (data->n_q_points,
                    mapping_info->mapping_data_gen[quad_no].n_q_points[active_quad_index]);
   Assert (n_fe_components == 1 ||
@@ -2377,33 +2392,33 @@ FEEvaluationBase<dim,n_components_,Number>
 {
   Assert(scratch_data_array != nullptr, ExcInternalError());
 
-  const unsigned int tensor_dofs_per_cell =
+  const unsigned int tensor_dofs_per_component =
     Utilities::fixed_power<dim>(this->data->fe_degree+1);
-  const unsigned int dofs_per_cell = this->data->dofs_per_cell;
+  const unsigned int dofs_per_component = this->data->dofs_per_component_on_cell;
   const unsigned int n_quadrature_points = this->data->n_q_points;
 
-  const unsigned int shift = std::max(tensor_dofs_per_cell+1, dofs_per_cell)*
-                             (n_components_+2) + 2 * n_quadrature_points;
-  const unsigned int allocated_size = shift + n_components_ * dofs_per_cell
+  const unsigned int shift = std::max(tensor_dofs_per_component+1, dofs_per_component)*
+                             n_components_*3 + 2 * n_quadrature_points;
+  const unsigned int allocated_size = shift + n_components_ * dofs_per_component
                                       + (n_components_*(dim*dim+2*dim+1)*n_quadrature_points);
   scratch_data_array->resize_fast(allocated_size);
 
   // set the pointers to the correct position in the data array
   for (unsigned int c=0; c<n_components_; ++c)
     {
-      this->values_dofs[c] = scratch_data_array->begin() + c*dofs_per_cell;
+      this->values_dofs[c] = scratch_data_array->begin() + c*dofs_per_component;
       this->values_quad[c] = scratch_data_array->begin() +
-                             n_components*dofs_per_cell+c*n_quadrature_points;
+                             n_components*dofs_per_component+c*n_quadrature_points;
       for (unsigned int d=0; d<dim; ++d)
         this->gradients_quad[c][d] = scratch_data_array->begin() +
-                                     n_components*(dofs_per_cell+n_quadrature_points) +
+                                     n_components*(dofs_per_component+n_quadrature_points) +
                                      (c*dim+d)*n_quadrature_points;
       for (unsigned int d=0; d<(dim*dim+dim)/2; ++d)
         this->hessians_quad[c][d] = scratch_data_array->begin() +
-                                    n_components*((dim+1)*n_quadrature_points + dofs_per_cell) +
+                                    n_components*((dim+1)*n_quadrature_points + dofs_per_component) +
                                     (c*(dim*dim+dim)+d)*n_quadrature_points;
     }
-  scratch_data = scratch_data_array->begin() + n_components_ * dofs_per_cell
+  scratch_data = scratch_data_array->begin() + n_components_ * dofs_per_component
                  + (n_components_*(dim*dim+2*dim+1)*n_quadrature_points);
 }
 
@@ -2993,10 +3008,10 @@ FEEvaluationBase<dim,n_components_,Number>
     {
       Assert (!local_dof_indices.empty(), ExcNotInitialized());
 
-      unsigned int index = first_selected_component * this->data->dofs_per_cell;
+      unsigned int index = first_selected_component * this->data->dofs_per_component_on_cell;
       for (unsigned int comp = 0; comp<n_components; ++comp)
         {
-          for (unsigned int i=0; i<this->data->dofs_per_cell; ++i, ++index)
+          for (unsigned int i=0; i<this->data->dofs_per_component_on_cell; ++i, ++index)
             {
               operation.process_dof_global(local_dof_indices[this->data->lexicographic_numbering[index]],
                                            *src[0], values_dofs[comp][i][0]);
@@ -3021,7 +3036,7 @@ FEEvaluationBase<dim,n_components_,Number>
   const std::pair<unsigned short,unsigned short> *indicators_end =
     dof_info->end_indicators(cell);
   unsigned int ind_local = 0;
-  const unsigned int dofs_per_cell = this->data->dofs_per_cell;
+  const unsigned int dofs_per_component = this->data->dofs_per_component_on_cell;
 
   const unsigned int n_irreg_components_filled = dof_info->row_starts[cell][2];
   const bool at_irregular_cell = n_irreg_components_filled > 0;
@@ -3041,7 +3056,7 @@ FEEvaluationBase<dim,n_components_,Number>
                           "read_dof_values and distribute_local_to_global."));
 
       const unsigned int n_local_dofs =
-        VectorizedArray<Number>::n_array_elements * dofs_per_cell;
+        VectorizedArray<Number>::n_array_elements * dofs_per_component;
       for (unsigned int comp=0; comp<n_components; ++comp)
         internal::check_vector_compatibility (*src[comp], *dof_info);
       Number *local_data [n_components];
@@ -3104,7 +3119,7 @@ FEEvaluationBase<dim,n_components_,Number>
               // vectorization loop
               AssertDimension (dof_info->end_indices(cell)-dof_indices,
                                static_cast<int>(n_local_dofs));
-              for (unsigned int j=0, ind=0; j<dofs_per_cell; ++j, ind += VectorizedArray<Number>::n_array_elements)
+              for (unsigned int j=0, ind=0; j<dofs_per_component; ++j, ind += VectorizedArray<Number>::n_array_elements)
                 for (unsigned int comp=0; comp<n_components; ++comp)
                   operation.process_dof_gather(dof_indices+ind,
                                                *src[comp], values_dofs[comp][j],
@@ -3199,7 +3214,7 @@ FEEvaluationBase<dim,n_components_,Number>
       internal::check_vector_compatibility (*src[0], *dof_info);
       Assert (n_fe_components == n_components_, ExcNotImplemented());
       const unsigned int n_local_dofs =
-        dofs_per_cell*VectorizedArray<Number>::n_array_elements * n_components;
+        dofs_per_component*VectorizedArray<Number>::n_array_elements * n_components;
       Number   *local_data =
         const_cast<Number *>(&values_dofs[0][0][0]);
       if (at_irregular_cell == false)
@@ -3248,7 +3263,7 @@ FEEvaluationBase<dim,n_components_,Number>
               AssertDimension (dof_info->end_indices(cell)-dof_indices,
                                static_cast<int>(n_local_dofs));
               for (unsigned int comp=0, ind=0; comp<n_components; ++comp)
-                for (unsigned int j=0; j<dofs_per_cell; ++j, ind += VectorizedArray<Number>::n_array_elements)
+                for (unsigned int j=0; j<dofs_per_component; ++j, ind += VectorizedArray<Number>::n_array_elements)
                   operation.process_dof_gather(dof_indices+ind,
                                                *src[0], values_dofs[comp][j],
                                                std::integral_constant<bool, std::is_same<typename VectorType::value_type,Number>::value>());
@@ -3447,7 +3462,7 @@ FEEvaluationBase<dim,n_components_,Number>
   // iterates over the elements of index_local_to_global and dof_indices
   // points to the global indices stored in index_local_to_global
   const unsigned int *dof_indices = dof_info->begin_indices_plain(cell);
-  const unsigned int dofs_per_cell = this->data->dofs_per_cell;
+  const unsigned int dofs_per_component = this->data->dofs_per_component_on_cell;
 
   const unsigned int n_irreg_components_filled = dof_info->row_starts[cell][2];
   const bool at_irregular_cell = n_irreg_components_filled > 0;
@@ -3467,7 +3482,7 @@ FEEvaluationBase<dim,n_components_,Number>
                           "read_dof_values_plain."));
 
       const unsigned int n_local_dofs =
-        VectorizedArray<Number>::n_array_elements * dofs_per_cell;
+        VectorizedArray<Number>::n_array_elements * dofs_per_component;
       for (unsigned int comp=0; comp<n_components; ++comp)
         internal::check_vector_compatibility (*src[comp], *dof_info);
       Number *local_src_number [n_components];
@@ -3517,7 +3532,7 @@ FEEvaluationBase<dim,n_components_,Number>
       internal::check_vector_compatibility (*src[0], *dof_info);
       Assert (n_fe_components == n_components_, ExcNotImplemented());
       const unsigned int n_local_dofs =
-        dofs_per_cell * VectorizedArray<Number>::n_array_elements * n_components;
+        dofs_per_component * VectorizedArray<Number>::n_array_elements * n_components;
       Number *local_src_number = &values_dofs[0][0][0];
       if (at_irregular_cell == false)
         {
@@ -3690,7 +3705,7 @@ Tensor<1,n_components_,VectorizedArray<Number> >
 FEEvaluationBase<dim,n_components_,Number>
 ::get_dof_value (const unsigned int dof) const
 {
-  AssertIndexRange (dof, this->data->dofs_per_cell);
+  AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
   Tensor<1,n_components_,VectorizedArray<Number> > return_value;
   for (unsigned int comp=0; comp<n_components; comp++)
     return_value[comp] = this->values_dofs[comp][dof];
@@ -4052,7 +4067,7 @@ FEEvaluationBase<dim,n_components_,Number>
 #ifdef DEBUG
   this->dof_values_initialized = true;
 #endif
-  AssertIndexRange (dof, this->data->dofs_per_cell);
+  AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
   for (unsigned int comp=0; comp<n_components; comp++)
     this->values_dofs[comp][dof] = val_in[comp];
 }
@@ -4272,7 +4287,7 @@ VectorizedArray<Number>
 FEEvaluationAccess<dim,1,Number>
 ::get_dof_value (const unsigned int dof) const
 {
-  AssertIndexRange (dof, this->data->dofs_per_cell);
+  AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
   return this->values_dofs[0][dof];
 }
 
@@ -4374,7 +4389,7 @@ FEEvaluationAccess<dim,1,Number>
 {
 #ifdef DEBUG
   this->dof_values_initialized = true;
-  AssertIndexRange (dof, this->data->dofs_per_cell);
+  AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
 #endif
   this->values_dofs[0][dof] = val_in;
 }
@@ -4895,7 +4910,7 @@ VectorizedArray<Number>
 FEEvaluationAccess<1,1,Number>
 ::get_dof_value (const unsigned int dof) const
 {
-  AssertIndexRange (dof, this->data->dofs_per_cell);
+  AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
   return this->values_dofs[0][dof];
 }
 
@@ -4992,7 +5007,7 @@ FEEvaluationAccess<1,1,Number>
 {
 #ifdef DEBUG
   this->dof_values_initialized = true;
-  AssertIndexRange (dof, this->data->dofs_per_cell);
+  AssertIndexRange (dof, this->data->dofs_per_component_on_cell);
 #endif
   this->values_dofs[0][dof] = val_in;
 }
@@ -5084,7 +5099,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
                 const unsigned int quad_no)
   :
   BaseClass (data_in, fe_no, quad_no, fe_degree, static_n_q_points),
-  dofs_per_cell (this->data->dofs_per_cell),
+  dofs_per_component (this->data->dofs_per_component_on_cell),
+  dofs_per_cell (this->data->dofs_per_component_on_cell *n_components_),
   n_q_points (this->data->n_q_points)
 {
   check_template_arguments(fe_no, 0);
@@ -5105,7 +5121,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   BaseClass (mapping, fe, quadrature, update_flags,
              first_selected_component,
              static_cast<FEEvaluationBase<dim,1,Number>*>(nullptr)),
-  dofs_per_cell (this->data->dofs_per_cell),
+  dofs_per_component (this->data->dofs_per_component_on_cell),
+  dofs_per_cell (this->data->dofs_per_component_on_cell *n_components_),
   n_q_points (this->data->n_q_points)
 {
   check_template_arguments(numbers::invalid_unsigned_int, 0);
@@ -5125,7 +5142,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   BaseClass (StaticMappingQ1<dim>::mapping, fe, quadrature, update_flags,
              first_selected_component,
              static_cast<FEEvaluationBase<dim,1,Number>*>(nullptr)),
-  dofs_per_cell (this->data->dofs_per_cell),
+  dofs_per_component (this->data->dofs_per_component_on_cell),
+  dofs_per_cell (this->data->dofs_per_component_on_cell *n_components_),
   n_q_points (this->data->n_q_points)
 {
   check_template_arguments(numbers::invalid_unsigned_int, 0);
@@ -5146,7 +5164,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
              fe, other.mapped_geometry->get_quadrature(),
              other.mapped_geometry->get_fe_values().get_update_flags(),
              first_selected_component, &other),
-  dofs_per_cell (this->data->dofs_per_cell),
+  dofs_per_component (this->data->dofs_per_component_on_cell),
+  dofs_per_cell (this->data->dofs_per_component_on_cell *n_components_),
   n_q_points (this->data->n_q_points)
 {
   check_template_arguments(numbers::invalid_unsigned_int, 0);
@@ -5161,7 +5180,8 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::FEEvaluation (const FEEvaluation &other)
   :
   BaseClass (other),
-  dofs_per_cell (this->data->dofs_per_cell),
+  dofs_per_component (this->data->dofs_per_component_on_cell),
+  dofs_per_cell (this->data->dofs_per_component_on_cell *n_components_),
   n_q_points (this->data->n_q_points)
 {
   check_template_arguments(numbers::invalid_unsigned_int, 0);
@@ -5308,7 +5328,7 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
       AssertDimension (n_q_points,
                        this->mapping_info->mapping_data_gen[this->quad_no].
                        n_q_points[this->active_quad_index]);
-      AssertDimension (this->data->dofs_per_cell * this->n_fe_components,
+      AssertDimension (this->data->dofs_per_component_on_cell * this->n_fe_components,
                        this->dof_info->dofs_per_cell[this->active_fe_index]);
     }
 #endif

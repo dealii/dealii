@@ -102,7 +102,7 @@ void do_test (const DoFHandler<dim> &dof)
 
         phi_u.reinit(cell);
         phi_p.reinit(cell);
-        const unsigned int dofs_per_cell_u = phi_u.dofs_per_cell*dim;
+        const unsigned int dofs_per_cell_u = phi_u.dofs_per_cell;
         const unsigned int dofs_per_cell_p = phi_p.dofs_per_cell;
         for (unsigned int i=0; i<dofs_per_cell_u;
              i += VectorizedArray<double>::n_array_elements)

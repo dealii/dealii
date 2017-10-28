@@ -175,7 +175,7 @@ namespace internal
       {
         values_dofs = expanded_dof_values;
         for (unsigned int c=0; c<n_components; ++c)
-          expanded_dof_values[c] = scratch_data+2*(std::max(shape_info.dofs_per_cell,
+          expanded_dof_values[c] = scratch_data+2*(std::max(shape_info.dofs_per_component_on_cell,
                                                             shape_info.n_q_points)) +
                                    c*Utilities::fixed_power<dim>(shape_info.fe_degree+1);
         const int degree = fe_degree != -1 ? fe_degree : shape_info.fe_degree;
@@ -334,7 +334,7 @@ namespace internal
     if (type == MatrixFreeFunctions::tensor_symmetric_plus_dg0 && evaluate_values)
       for (unsigned int c=0; c<n_components; ++c)
         for (unsigned int q=0; q<shape_info.n_q_points; ++q)
-          values_quad[c][q] += values_dofs[c][shape_info.dofs_per_cell-1];
+          values_quad[c][q] += values_dofs[c][shape_info.dofs_per_component_on_cell-1];
   }
 
 
@@ -389,7 +389,7 @@ namespace internal
       {
         values_dofs = expanded_dof_values;
         for (unsigned int c=0; c<n_components; ++c)
-          expanded_dof_values[c] = scratch_data+2*(std::max(shape_info.dofs_per_cell,
+          expanded_dof_values[c] = scratch_data+2*(std::max(shape_info.dofs_per_component_on_cell,
                                                             shape_info.n_q_points)) +
                                    c*Utilities::fixed_power<dim>(shape_info.fe_degree+1);
       }
@@ -492,13 +492,13 @@ namespace internal
         if (integrate_values)
           for (unsigned int c=0; c<n_components; ++c)
             {
-              values_dofs[c][shape_info.dofs_per_cell-1] = values_quad[c][0];
+              values_dofs[c][shape_info.dofs_per_component_on_cell-1] = values_quad[c][0];
               for (unsigned int q=1; q<shape_info.n_q_points; ++q)
-                values_dofs[c][shape_info.dofs_per_cell-1] += values_quad[c][q];
+                values_dofs[c][shape_info.dofs_per_component_on_cell-1] += values_quad[c][q];
             }
         else
           for (unsigned int c=0; c<n_components; ++c)
-            values_dofs[c][shape_info.dofs_per_cell-1] = VectorizedArray<Number>();
+            values_dofs[c][shape_info.dofs_per_component_on_cell-1] = VectorizedArray<Number>();
       }
 
     if (type == MatrixFreeFunctions::truncated_tensor)

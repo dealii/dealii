@@ -237,9 +237,10 @@ namespace internal
       unsigned int n_q_points;
 
       /**
-       * Stores the number of DoFs per cell in @p dim dimensions.
+       * Stores the number of DoFs per cell of the scalar element in @p dim
+       * dimensions.
        */
-      unsigned int dofs_per_cell;
+      unsigned int dofs_per_component_on_cell;
 
       /**
        * Stores the number of quadrature points per face in @p dim dimensions.
@@ -249,7 +250,7 @@ namespace internal
       /**
        * Stores the number of DoFs per face in @p dim dimensions.
        */
-      unsigned int dofs_per_face;
+      unsigned int dofs_per_component_on_face;
 
       /**
        * Indicates whether the basis functions are nodal in 0 and 1, i.e., the
@@ -364,9 +365,9 @@ namespace internal
       fe_degree (0),
       n_q_points_1d (0),
       n_q_points (0),
-      dofs_per_cell (0),
+      dofs_per_component_on_cell (0),
       n_q_points_face (0),
-      dofs_per_face (0),
+      dofs_per_component_on_face (0),
       nodal_at_cell_boundaries (false)
     {
       reinit (quad, fe_in, base_element_number);
