@@ -1341,7 +1341,7 @@ namespace FETools
       // not owned patch cells
       // are computed, start
       // the interpolation
-      u2 = 0;
+      u2 = typename OutVector::value_type(0.);
 
       std::queue<WorkPackage> queue;
       {

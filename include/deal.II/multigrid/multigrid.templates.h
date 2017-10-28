@@ -223,7 +223,7 @@ Multigrid<VectorType>::level_step(const unsigned int level,
   // Combine the defect from the initial copy_to_mg with the one that has come
   // from the finer level by the transfer
   defect2[level] += defect[level];
-  defect[level] = 0;
+  defect[level] = typename VectorType::value_type(0.);
 
   if (debug>2)
     deallog << cychar << "-cycle defect norm     " << defect2[level].l2_norm()
@@ -264,7 +264,7 @@ Multigrid<VectorType>::level_step(const unsigned int level,
   if (edge_down != nullptr)
     edge_down->vmult(level, defect2[level-1], solution[level]);
   else
-    defect2[level-1] = 0;
+    defect2[level-1] = typename VectorType::value_type(0.);
 
   transfer->restrict_and_add (level, defect2[level-1], t[level]);
 

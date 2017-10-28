@@ -8210,7 +8210,7 @@ namespace VectorTools
                                         Vector<Number> (dof.get_fe(0).n_components()));
 
     Number mean = Number();
-    double area = 0.;
+    typename numbers::NumberTraits<Number>::real_type area = 0.;
     // Compute mean value
     for (cell = dof.begin_active(); cell != dof.end(); ++cell)
       if (cell->is_locally_owned())

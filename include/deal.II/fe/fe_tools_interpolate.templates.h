@@ -127,9 +127,9 @@ namespace FETools
     std::vector<types::global_dof_index> dofs;
     dofs.reserve (DoFTools::max_dofs_per_cell (dof2));
 
-    u2 = 0;
+    u2 = typename OutVector::value_type(0.);
     OutVector touch_count(u2);
-    touch_count = 0;
+    touch_count = typename OutVector::value_type(0.);
 
     // for distributed triangulations,
     // we can only interpolate u1 on
@@ -641,7 +641,7 @@ namespace FETools
     FullMatrix<double> matrix(n2,n1);
     get_projection_matrix(dof1.get_fe(), dof2.get_fe(), matrix);
 
-    u2 = 0;
+    u2 = typename OutVector::value_type(0.);
     while (cell2 != end)
       {
         cell1->get_dof_values(u1, u1_local);

@@ -18,6 +18,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/memory_consumption.h>
@@ -1693,9 +1694,9 @@ BlockVectorBase<VectorType>::mean_value () const
   value_type sum = 0.;
   // need to do static_cast as otherwise it won't work with value_type=complex<T>
   for (size_type i=0; i<n_blocks(); ++i)
-    sum += components[i].mean_value() * static_cast<double>(components[i].size());
+    sum += components[i].mean_value() * (typename numbers::NumberTraits<value_type>::real_type(components[i].size()));
 
-  return sum/static_cast<double>(size());
+  return sum/(typename numbers::NumberTraits<value_type>::real_type(size()));
 }
 
 
