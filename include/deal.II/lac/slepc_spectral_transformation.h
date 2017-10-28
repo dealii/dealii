@@ -196,6 +196,12 @@ namespace SLEPcWrappers
      * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
+
+    /**
+     * Make the solver class a friend, since it may need to set target
+     * equal the provided shift value.
+     */
+    friend class SolverBase;
   };
 
   /**

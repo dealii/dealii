@@ -289,7 +289,7 @@ void test (std::string solver_name,
     // Set the initial vector. This is optional, if not done the initial vector is set to random values
     eigensolver->set_initial_space(eigenfunctions);
 
-    eigensolver->set_which_eigenpairs (EPS_SMALLEST_REAL);
+    eigensolver->set_which_eigenpairs (EPS_TARGET_MAGNITUDE);
     eigensolver->set_problem_type (EPS_GHEP);
 
     eigensolver->solve (stiffness_matrix,

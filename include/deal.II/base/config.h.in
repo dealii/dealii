@@ -246,6 +246,17 @@
     (major)*10000 + (minor)*100 + (subminor))
 
 /*
+ * SLEPC
+ * see slepcversion.h
+ */
+#define DEAL_II_SLEPC_VERSION_GTE(major,minor,subminor) \
+  ((SLEPC_VERSION_MAJOR * 10000 + \
+    SLEPC_VERSION_MINOR * 100 + \
+    SLEPC_VERSION_SUBMINOR) \
+    >=  \
+    (major)*10000 + (minor)*100 + (subminor))
+
+/*
  * Trilinos:
  */
 
