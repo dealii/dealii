@@ -73,9 +73,6 @@ protected:
      * located on bounding lines to the vector @p a. Points located on the
      * line but on vertices are not included.
      *
-     * Needed by the <tt>compute_support_points_simple(laplace)</tt>
-     * functions. For <tt>dim=1</tt> this function is empty.
-     *
      * This function chooses the respective points not such that they are
      * interpolating the boundary (as does the base class), but rather such
      * that the resulting cubic mapping is a continuous one.
@@ -88,9 +85,6 @@ protected:
      * For <tt>dim=3</tt>. Append the support points of all shape functions
      * located on bounding faces (quads in 3d) to the vector @p a. Points
      * located on the line but on vertices are not included.
-     *
-     * Needed by the @p compute_support_points_laplace function. For
-     * <tt>dim=1</tt> and 2 this function is empty.
      *
      * This function chooses the respective points not such that they are
      * interpolating the boundary (as does the base class), but rather such
