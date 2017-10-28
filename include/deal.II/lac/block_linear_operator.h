@@ -123,12 +123,12 @@ block_back_substitution(const BlockLinearOperator<Range, Domain, BlockPayload> &
  * @endcode
  *
  * A BlockLinearOperator can be sliced to a LinearOperator at any time. This
- * removes all information about the underlying block structure (beacuse above
+ * removes all information about the underlying block structure (because above
  * <code>std::function</code> objects are no longer available) - the linear
  * operator interface, however, remains intact.
  *
  * @note This class makes heavy use of <code>std::function</code> objects and
- * lambda functions. This flexibiliy comes with a run-time penalty. Only use
+ * lambda functions. This flexibility comes with a run-time penalty. Only use
  * this object to encapsulate object with medium to large individual block
  * sizes, and small block structure (as a rule of thumb, matrix blocks greater
  * than $1000\times1000$).
@@ -378,9 +378,9 @@ namespace internal
      * subblocks.
      *
      * This is the Payload class typically associated with deal.II's native
-     * BlockSparseMatrix. To use Trilinos and PETSc BlockSparseMatrices it is
-     * necessary to initialize a BlockLinearOperator with their associated
-     * BlockPayload.
+     * BlockSparseMatrix. To use either TrilinosWrappers::BlockSparseMatrix or
+     * PETScWrappers::BlockSparseMatrix one must initialize a
+     * BlockLinearOperator with their associated BlockPayload.
      *
      * @author Jean-Paul Pelteret, Matthias Maier, 2016
      *
@@ -472,7 +472,7 @@ block_operator(const BlockMatrixType &block_matrix)
  *
  * A variant of above function that encapsulates a given collection @p ops of
  * LinearOperators into a block structure. Here, it is assumed that Range and
- * Domain are blockvectors, i.e., derived from
+ * Domain are block vectors, i.e., derived from
  * @ref BlockVectorBase.
  * The individual linear operators in @p ops must act on the underlying vector
  * type of the block vectors, i.e., on Domain::BlockType yielding a result in
