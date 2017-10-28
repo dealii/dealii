@@ -1914,8 +1914,8 @@ public:
   static const unsigned int n_components  = n_components_;
   static const unsigned int static_n_q_points    = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
   static const unsigned int static_dofs_per_component = Utilities::fixed_int_power<fe_degree+1,dim>::value;
-  static const unsigned int tensor_dofs_per_cell = n_components *static_dofs_per_component;
-  static const unsigned int static_dofs_per_cell = n_components *static_dofs_per_component;
+  static const unsigned int tensor_dofs_per_cell = static_dofs_per_component *n_components;
+  static const unsigned int static_dofs_per_cell = static_dofs_per_component *n_components;
 
   /**
    * Constructor. Takes all data stored in MatrixFree. If applied to problems
@@ -2039,7 +2039,7 @@ public:
   /**
    * The number of degrees of freedom on the cell accumulated over all
    * components in the current evaluation object. Usually close to
-   * static_dofs_per_component*n_components=static_dofs_per_cell, but the
+   * static_dofs_per_cell = static_dofs_per_component*n_components, but the
    * number depends on the actual element selected and is thus not static.
    */
   const unsigned int dofs_per_cell;
