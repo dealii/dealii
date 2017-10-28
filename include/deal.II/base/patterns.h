@@ -527,7 +527,7 @@ namespace Patterns
    * map is described in the form <code>key1: value1, key2: value2, key3:
    * value3, ...</code>. Two constructor arguments allow to choose a delimiter
    * between pairs other than the comma, and a delimeter between key and value
-   * other than column.
+   * other than colon.
    *
    * With two additional parameters, the number of elements this list has to
    * have can be specified. If none is specified, the map may have zero or
@@ -666,7 +666,7 @@ namespace Patterns
 
 
   /**
-   * This pattern matches column-separated values of arbitrary types. Each type
+   * This pattern matches colon-separated values of arbitrary types. Each type
    * has to match a pattern given to the constructor.
    *
    * An example usage is the following:
@@ -680,7 +680,7 @@ namespace Patterns
    *
    * Patterns::Tuple pattern(ps, ":");
    *
-   * bool check = ps.match("5: 3.14: Ciao"); // check = true
+   * bool check = ps.match("5 : 3.14 : Ciao"); // check = true
    * @endcode
    *
    * or, if you want to exploit ParameterHandler::add_parameter():
@@ -700,15 +700,15 @@ namespace Patterns
    * prm.log_parameters(deallog);
    * // DEAL:parameters::A tuple: Mondo : 2.0, 3.0, 4.0 : 34
    *
-   * deallog << Convert<T>::to_string(a) << std::endl;
+   * deallog << Patterns::Tools::Convert<T>::to_string(a) << std::endl;
    * // DEAL::Mondo : 2.000000, 3.000000, 4.000000 : 34
    * @endcode
    *
    * The constructor expects a vector of Patterns, and optionally a string
    * specifying the separator to use when parsing the Tuple from a string.
    *
-   * The default separator is the semicolumn, owing to the fact that a pair
-   * is in fact a tuple with two elements.
+   * The default separator is a colon, owing to the fact that a pair is in fact
+   * a tuple with two elements.
    *
    * @author Luca Heltai, 2017.
    */
@@ -1866,7 +1866,6 @@ namespace Patterns
       }
     };
 
-
     // Pairs
     template <class Key, class Value>
     struct Convert<std::pair<Key,Value>>
@@ -1923,6 +1922,38 @@ namespace Patterns
                  *Convert<Args>::to_pattern()...);
       }
 
+      static std::string to_string(const T &t,
+                                   const std::unique_ptr<Patterns::PatternBase>
+                                   &pattern = Convert<T>::to_pattern())
+      {
+        auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
+        AssertThrow(p,ExcMessage("I need a Tuple pattern to convert a tuple "
+                                 "to a string."));
+
+        const auto string_array = Convert<T>::to_string_internal_2(t,*p);
+        std::string str;
+        for (unsigned int i=0; i< string_array.size(); ++i)
+          str += (i ? " " + p->get_separator() + " " : "") +string_array[i];
+        AssertThrow(p->match(str), ExcNoMatch(str, *p));
+        return str;
+      }
+
+      static T to_value(const std::string &s,
+                        const std::unique_ptr<Patterns::PatternBase> &pattern =
+                          Convert<T>::to_pattern())
+      {
+        AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
+
+        auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
+        AssertThrow(p,ExcMessage("I need a Tuple pattern to convert a string "
+                                 "to a tuple type."));
+
+        auto v = Utilities::split_string_list(s, p->get_separator());
+
+        return Convert<T>::to_value_internal_2(v,*p);
+      }
+
+    private:
       template<std::size_t... I>
       static
       std::array<std::string, std::tuple_size<T>::value>
@@ -1948,23 +1979,6 @@ namespace Patterns
                                                 std_cxx14::make_index_sequence<std::tuple_size<T>::value> {});
       }
 
-      static std::string to_string(const T &t,
-                                   const std::unique_ptr<Patterns::PatternBase>
-                                   &pattern = Convert<T>::to_pattern())
-      {
-        auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
-        AssertThrow(p,ExcMessage("I need a Tuple pattern to convert a tuple "
-                                 "to a string."));
-
-        const auto string_array = Convert<T>::to_string_internal_2(t,*p);
-        std::string str;
-        for (unsigned int i=0; i< string_array.size(); ++i)
-          str += (i ? " " + p->get_separator() + " " : "") +string_array[i];
-        AssertThrow(p->match(str), ExcNoMatch(str, *p));
-        return str;
-      }
-
-
       template<std::size_t... I>
       static
       T to_value_internal_1(const std::vector<std::string> &s,
@@ -1981,22 +1995,6 @@ namespace Patterns
       {
         return Convert<T>::to_value_internal_1(s, pattern,
                                                std_cxx14::make_index_sequence<std::tuple_size<T>::value> {});
-      }
-
-
-      static T to_value(const std::string &s,
-                        const std::unique_ptr<Patterns::PatternBase> &pattern =
-                          Convert<T>::to_pattern())
-      {
-        AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
-
-        auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
-        AssertThrow(p,ExcMessage("I need a Tuple pattern to convert a string "
-                                 "to a tuple type."));
-
-        auto v = Utilities::split_string_list(s, p->get_separator());
-
-        return Convert<T>::to_value_internal_2(v,*p);
       }
     };
 
