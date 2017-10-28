@@ -122,6 +122,39 @@ block_back_substitution(const BlockLinearOperator<Range, Domain, BlockPayload> &
  * const auto block_op_a = block_operator(A);
  * @endcode
  *
+ * Alternatively, there are several helper functions available for creating
+ * instances from multiple independent matrices of possibly different types.
+ * Here is an example of a block diagonal matrix created from a FullMatrix and
+ * a SparseMatrixEZ:
+ *
+ * @code
+ * FullMatrix<double> top_left(2, 2);
+ * top_left(0, 0) = 2.0;
+ * top_left(0, 1) = -1.0;
+ * top_left(1, 0) = -1.0;
+ * top_left(1, 1) = 2.0;
+ *
+ * SparseMatrixEZ<double> bottom_right(4, 4, 4);
+ * for (std::size_t row_n = 0; row_n < 4; ++row_n)
+ *   {
+ *     bottom_right.add(row_n, row_n, 1.0);
+ *     if (row_n < 3)
+ *       bottom_right.add(row_n, row_n + 1, -1.0);
+ *   }
+ *
+ * auto top_left_op = linear_operator(top_left);
+ * auto bottom_right_op = linear_operator(bottom_right);
+ * std::array<decltype(top_left_op), 2> operators {{top_left_op, bottom_right_op}};
+ * auto block_op = block_diagonal_operator (operators);
+ *
+ * std::vector<BlockVector<double>::size_type> block_sizes {2, 4};
+ * BlockVector<double> src(block_sizes);
+ * src = 2.0;
+ * BlockVector<double> dst(block_sizes);
+ * block_op.vmult(dst, src); // now equal to 2, 2, 0, 0, 0, 2
+ * @endcode
+ *
+ *
  * A BlockLinearOperator can be sliced to a LinearOperator at any time. This
  * removes all information about the underlying block structure (because above
  * <code>std::function</code> objects are no longer available) - the linear
