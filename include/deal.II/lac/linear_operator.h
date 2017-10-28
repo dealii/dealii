@@ -119,12 +119,12 @@ null_operator(const LinearOperator<Range, Domain, Payload> &);
  * in conjunction with the LinearOperator class, it is necessary to extend the
  * functionality of the LinearOperator class by means of an additional Payload.
  *
- * For example, in order to construct an InverseOperator a call to a solver is
- * required. Naturally these solvers don't have an interface to the
- * LinearOperator (which, for example, may represent a composite operation).
- * The TrilinosWrappers::internal::LinearOperator::TrilinosPayload therefore
- * provides an interface extension to the LinearOperator so that it can be
- * passed to the solver and used by the solver as if it were a Trilinos
+ * For example: LinearOperator instances representing matrix inverses usually
+ * require calling some linear solver. These solvers may not have interfaces
+ * to the LinearOperator (which, for example, may represent a composite
+ * operation). The TrilinosWrappers::internal::LinearOperator::TrilinosPayload
+ * therefore provides an interface extension to the LinearOperator so that it
+ * can be passed to the solver and used by the solver as if it were a Trilinos
  * operator. This implies that all of the necessary functionality of the
  * specific Trilinos operator has been overloaded within the Payload class.
  * This includes operator-vector multiplication and inverse operator-vector
