@@ -91,8 +91,21 @@ namespace SLEPcWrappers
   {
     // set transformation type if any
     // STSetShift is called inside
-    const PetscErrorCode ierr = EPSSetST(eps,transformation.st);
+    PetscErrorCode ierr = EPSSetST(eps,transformation.st);
     AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
+
+#if DEAL_II_SLEPC_VERSION_GTE(3, 8, 0)
+    // see https://lists.mcs.anl.gov/mailman/htdig/petsc-users/2017-October/033649.html
+    // From 3.8.0 SLEPc insists that when looking for smallest eigenvalues with shift-and-invert
+    // users should (a) set target (b) use EPS_TARGET_MAGNITUDE
+    // The former, however, needs to be applied to eps object and not spectral transformation.
+    if (SLEPcWrappers::TransformationShiftInvert *sinv = dynamic_cast<SLEPcWrappers::TransformationShiftInvert *>(&transformation))
+      {
+        ierr = EPSSetTarget (eps, sinv->additional_data.shift_parameter);
+        AssertThrow (ierr == 0, SolverBase::ExcSLEPcError(ierr));
+      }
+#endif
+
   }
 
   void
