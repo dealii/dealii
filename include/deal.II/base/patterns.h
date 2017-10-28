@@ -1254,45 +1254,36 @@ namespace Patterns
 {
   template<class... PatternTypes>
   Tuple::Tuple(const char *separator,
-               const PatternTypes &... ps) :
-    separator(separator)
-  {
-    static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
-                  "Not all of the input arguments of this function "
-                  "are derived from PatternBase");
-    std::initializer_list<const PatternBase *> pss = { &ps... };
-    for (auto p : pss)
-      patterns.push_back(p->clone());
-  }
+               const PatternTypes &... ps)
+    :
+    // simply forward to the std::string version
+    Tuple (std::string(separator), ps...)
+  {}
 
 
 
   template<class... PatternTypes>
   Tuple::Tuple(const std::string &separator,
-               const PatternTypes &... ps) :
-    separator(separator)
+               const PatternTypes &... ps)
+    :
+    separator (separator)
   {
     static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
                   "Not all of the input arguments of this function "
                   "are derived from PatternBase");
-    std::initializer_list<const PatternBase *> pss = { &ps... };
-    for (auto p : pss)
-      patterns.push_back(p->clone());
+    auto pattern_pointers = { (static_cast<const PatternBase *>(&ps))... };
+    for (auto p : pattern_pointers)
+      patterns.push_back (p->clone());
   }
 
 
 
   template<class... PatternTypes>
-  Tuple::Tuple(const PatternTypes &... ps) :
-    separator(",")
-  {
-    static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
-                  "Not all of the input arguments of this function "
-                  "are derived from PatternBase");
-    std::initializer_list<const PatternBase *> pss = { &ps... };
-    for (auto p : pss)
-      patterns.push_back(p->clone());
-  }
+  Tuple::Tuple(const PatternTypes &... ps)
+    :
+    // forward to the version with the separator argument
+    Tuple (std::string(","), ps...)
+  {}
 
 
 
