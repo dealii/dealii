@@ -1,0 +1,13 @@
+
+DEAL::[Tuple of <1> elements <[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]>]
+A Tuple of 1 elements  where each element is [A floating point number v such that -MAX_DOUBLE <= v <= MAX_DOUBLE]
+A Tuple of 1 elements  where each element is [A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$]
+
+DEAL::[Tuple of <2> elements <[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]>, <[Anything]>]
+A Tuple of 2 elements  where each element is [A floating point number v such that -MAX_DOUBLE <= v <= MAX_DOUBLE],[Any string]
+A Tuple of 2 elements  where each element is [A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$],[Any string]
+
+DEAL::[Tuple of <3> elements <[Double -MAX_DOUBLE...MAX_DOUBLE (inclusive)]>, <[Anything]>, <[Bool]>]
+A Tuple of 3 elements  where each element is [A floating point number v such that -MAX_DOUBLE <= v <= MAX_DOUBLE],[Any string],[A boolean value (true or false)]
+A Tuple of 3 elements  where each element is [A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$],[Any string],[A boolean value (true or false)]
+
