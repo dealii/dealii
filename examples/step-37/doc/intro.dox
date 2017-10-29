@@ -92,7 +92,8 @@ of the respective cell, and
 correspondingly for the result.
 A naive attempt to implement the local action of the Laplacian would hence be
 to use the following code:
-@code Matrixfree<dim>::vmult (Vector<double>       &dst,
+@code
+Matrixfree<dim>::vmult (Vector<double>       &dst,
                         const Vector<double> &src) const
 {
   dst = 0;

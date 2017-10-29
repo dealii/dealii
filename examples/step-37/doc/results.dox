@@ -366,7 +366,7 @@ to a tenth of this value.
 As mentioned in the introduction, the matrix-free method reduces the memory
 consumption of the data structures. Besides the higher performance due to less
 memory transfer, the algorithms also allow for very large problems to fit into
-memory. The figure below we show the computational time as we increase the
+memory. The figure below shows the computational time as we increase the
 problem size until an upper limit where the computation exhausts memory. We do
 this for 1k cores, 8k cores, and 65k cores and see that the problem size can
 be varied over almost two orders of magnitude with ideal scaling. The largest
@@ -379,7 +379,8 @@ were also run involving up to 549 billion (2^39) DoFs.
 Finally, we note that while performing the tests on the large-scale system
 shown above, improvements of the multigrid algorithms in deal.II have been
 developed. The original version contained the sub-optimal code based on
-MGSmootherPrecondition where some inner products were done on each smoothing
+MGSmootherPrecondition where some MPI_Allreduce commands (checking whether
+all vector entries are zero) were done on each smoothing
 operation on each level, which only became apparent on 65k cores and
 more. However, the following picture shows that the improvement already pay
 off on a smaller scale, here shown on computations on up to 14,336 cores for
@@ -401,6 +402,8 @@ processors in MPI, which limits scalability by a factor of around two to five.
 
 <h3> Possibilities for extensions</h3>
 
+<h4> Shared-memory parallelization</h4>
+
 This program is parallelized with MPI only. As an alternative, the MatrixFree
 loop can also be issued in hybrid mode, for example by using MPI parallelizing
 over the nodes of a cluster and with threads through Intel TBB within the
@@ -409,3 +412,232 @@ number of threads in the MPI_InitFinalize data structure in the main function,
 and set the MatrixFree::AdditionalData::tasks_parallel_scheme to
 partition_color to actually do the loop in parallel. This use case is
 discussed in step-48.
+
+<h4> Inhomogeneous Dirichlet boundary conditions </h4>
+
+The presented program assumes homogeneous Dirichlet boundary conditions. When
+going to non-homogeneous conditions, the situation is a bit more intricate. To
+understand how to implement such a setting, let us first recall how these
+arise in the mathematical formulation and how they are implemented in a
+matrix-based variant. In essence, an inhomogeneous Dirichlet condition sets
+some of the nodal values in the solution to given values rathern than
+determining them through the variational principles,
+@f{eqnarray*}
+u_h(\mathbf{x}) = \sum_{i=1}^{n_\mathrm{dofs}} \varphi_i(\mathbf{x}) u_i =
+\sum_{i=1}^{n_\mathrm{dofs}-n_\mathrm{dofs,D}} \varphi_i(\mathbf{x}) u_i +
+\sum_{i=n_\mathrm{dofs}-n_\mathrm{dofs,D}+1}^{n_\mathrm{dofs}} \varphi_i(\mathbf{x}) g_i,
+@f}
+where $u_i$ denotes the nodal values of the solution and $g_i =
+g(\mathbf{x}_i)$ denotes the interpolation of boundary values on the
+Dirichlet-constrained node points <i>i</i>. In this formula, where we have
+assumed that the degrees of freedom are numbered such that the ones subject to
+a Dirichlet condition are all appended to the end of the list of degrees of
+freedom. We then insert this solution representation into the weak form,
+e.g. the Laplacian shown above, and move the known quantities to the right
+hand side:
+@f{eqnarray*}
+(\varphi_i, u_h)_\Omega &=& (\varphi_i, f)_\Omega \quad \Rightarrow \\
+\sum_{j=1}^{n_\mathrm{dofs}-n_\mathrm{dofs,D}}(\varphi_i,\varphi_j)_\Omega u_j &=&
+(\varphi_i, f)_\Omega
+-\sum_{j=n_\mathrm{dofs}-n_\mathrm{dofs,D}+1}^{n_\mathrm{dofs}} (\varphi_i,\varphi_j)_\Omega g_j.
+@f}
+In this formula, the equations are tested for all basis functions $\varphi_i$
+with $i=1,\ldots,n_\mathrm{dofs}-n_\mathrm{dofs,D}$.
+
+In the implementation in deal.II, the integrals $(\varphi_i,\varphi_j)_\Omega$
+on the right hand side are already contained in the local matrix contributions
+we assemble on each cell. When using
+ConstraintMatrix::distributed_local_to_global as first described in the step-6
+and step-7 tutorial programs, we can account for the contribution of
+inhomogeneous constraints <i>j</i> by multiplying the columns <i>j</i> and
+rows <i>i</i> of the local matrix according to the integrals $(\varphi_i,
+\varphi_j)_\Omega$ by the inhomogeneities and subtracting the resulting from
+the position <i>i</i> in the global vector, see also the @ref constraints
+module. In essence, we use some of the integrals that get eliminated from the
+left hand side of the equation to finalize the right hand side
+contribution. Similar mathematics are also involved when first writing all
+entries into a left hand side matrix and then eliminating matrix rows and
+columns by MatrixTools::apply_boundary_values().
+
+In principle, the components that belong to the constrained degrees of freedom
+could be eliminated from the linear system because they do not carry any
+information. In practice, in deal.II we always keep the size of the linear
+system the same to avoid handling two different numbering systems and avoid
+confusion about the two different index sets. In order to ensure that the
+linear system does not get singular when not adding anything to constrained
+rows, we then add dummy entries to the matrix diagonal that are otherwise
+unrelated to the real entries.
+
+In a matrix-free method, we need to take a different approach, since the @p
+LaplaceOperator class represents the matrix-vector product of a
+<b>homogeneous</b> operator (the left-hand side of the last formula).  It does
+not matter whether the ConstraintMatrix passed to the MatrixFree::reinit()
+contains inhomogeneous constraints or not, the MatrixFree::cell_loop() call
+will only resolve the homogeneous part of the constraints as long as it
+represents a <b>linear</b> operator.
+
+In our matrix-free code, the right hand side computation where the
+contribution of inhomogeneous conditions ends up is completely decoupled from
+the matrix operator and handled by a different function above. Thus, we need
+to explicity generate the data that enters the right hand side rather than
+using a byproduct of the matrix assembly. Since we already know how to apply
+the operator on a vector, we could try to use those facilities for a vector
+where we only set the Dirichlet values:
+@code
+  // interpolate boundary values on vector solution
+  std::map<types::global_dof_index, double> boundary_values;
+  VectorTools::interpolate_boundary_values(mapping, dof_handler, 0,
+                                           BoundaryValueFunction<dim>(), boundary_values);
+  for (typename std::map<types::global_dof_index, double>::iterator it = boundary_values.begin();
+       it != boundary_values.end(); ++it)
+    if (solution.locally_owned_elements().is_element(it->first))
+      solution(it->first) = it->second;
+@endcode
+or, equivalently, if we already had filled the inhomogeneous constraints into
+a constraint matrix object,
+@code
+  solution = 0;
+  constraints.distribute(solution);
+@endcode
+
+We could then pass the vector @p solution to the @p LaplaceOperator::vmult_add()
+function and add the new contribution to the @p system_rhs vector that gets
+filled in the @p LaplaceProblem::assemble_rhs() function. However, this idea does
+not work because the vmult() functions eliminates the entries filled into
+Dirichlet-constrained degrees of freedom on the fly by construction. Instead,
+we could select one of two following strategies.
+
+<h5> Use FEEvaluation::read_dof_values_plain() to avoid resolving constraints </h5>
+
+The class FEEvaluation has a facility that is addresses precisely this
+requirement: For non-homogeneous Dirichlet values, we do want to skip the
+resolution of the (Dirichlet) constraints upon reading the data from the
+vector @p solution. For example, we could extend the
+@p LaplaceProblem::assemble_rhs() function to deal with inhomogeneous Dirichlet
+values as follows, assuming the Dirichlet values have been interpolated into
+the object @p constraints:
+@code
+template <int dim>
+void LaplaceProblem<dim>::assemble_rhs ()
+{
+  solution = 0;
+  constraints.distribute(solution);
+  system_rhs = 0;
+
+  solution.update_ghost_values();
+  FEEvaluation<dim,degree_finite_element> phi(*system_matrix.get_matrix_free());
+  for (unsigned int cell=0; cell<system_matrix.get_matrix_free()->n_macro_cells(); ++cell)
+    {
+      phi.reinit(cell);
+      phi.read_dof_values_plain(solution);
+      phi.evaluate(false, true);
+      for (unsigned int q=0; q<phi.n_q_points; ++q)
+        {
+          phi.submit_gradient(-coefficient(cell,q) * phi.get_gradient(q), q);
+          phi.submit_value(make_vectorized_array<double>(1.0), q);
+        }
+      phi.integrate(true, true);
+      phi.distribute_local_to_global(system_rhs);
+    }
+  system_rhs.compress(VectorOperation::add);
+}
+@endcode
+
+In this code, we replaced the FEEvaluation::read_dof_values() function for the
+tentative solution vector by FEEvaluation::read_dof_values_plain() that
+ignores all constraints. Due to this setup, we must make sure that other
+constraints, e.g. by hanging nodes, are correctly distributed to the input
+vector already as they are not resolved as in
+FEEvaluation::read_dof_values(). Inside the loop, we then evaluate the
+Laplacian and repeat the second derivative call with
+FEEvaluation::submit_gradient() from the @p LaplaceOperator class, but with the
+sign switched since we wanted to subtract the contribution of Dirichlet
+conditions on the right hand side vector according to the formula above. When
+we invoke the FEEvaluation::integrate() call, we then set both arguments
+regarding the value slot and first derivative slot to true to account for both
+terms added in the loop over quadrature points. Once the right hand side is
+assembled, we then go on to solving the linear system for the homogeneous
+problem, say involving a variable @p solution_update. After solving, we can
+add @p solution_update to the @p solution vector that contains the final
+(inhomogeneous) solution.
+
+Note that the negative sign for the Laplacian alongside with a positive sign
+for the forcing that we needed to build the right hand side is a more general
+concept: We have implemented nothing else than Newton's method for nonlinear
+equations, but applied to a linear system. We have used an initial guess for
+the variable @p solution in terms of the Dirichlet boundary conditions and
+computed a residual $r = f - Au_0$. The linear system was then solved as
+$\Delta u = A^{-1} (f-Au)$ and we finally computed $u = u_0 + \Delta u$. For a
+linear system, we obviously reach the exact solution after a single
+iteration. If we wanted to extend the code to a nonlinear problem, we would
+rename the @p assemble_rhs() function into a more descriptive name like @p
+assemble_residual() that computes the (weak) form of the residual, whereas the
+@p LaplaceOperator::apply_add() function would get the linearization of the
+residual with respect to the solution variable.
+
+<h5> Use LaplaceOperator with a second ConstraintMatrix without Dirichlet conditions </h5>
+
+A second alternative to get the right hand side that re-uses the
+@p LaplaceOperator::apply_add() function is to instead add a second constraint
+matrix that skips Dirichlet constraints on the read operation. To do this, we
+initialize a MatrixFree object in a more extended way with two different
+DoFHandler / ConstraintMatrix combinations. The 0-th component includes
+Dirichlet conditions for solving the linear system, whereas 1-st component
+does read also from Dirichlet-constrained degrees of freedom for the right
+hand side assembly:
+
+@code
+  constraints.clear();
+  constraints.reinit(locally_relevant_dofs);
+  DoFTools::make_hanging_node_constraints(dof_handler,
+                                          constraints);
+  VectorTools::interpolate_boundary_values (dof_handler,
+                                            0,
+                                            BoundaryValues<dim>(),
+                                            constraints);
+  constraints.close();
+  constraints_without_dirichlet.clear();
+  constraints_without_dirichlet.reinit(locally_relevant_dofs);
+  DoFTools::make_hanging_node_constraints(dof_handler,
+                                          constraints_without_dirichlet);
+  constraints_without_dirichlet.close();
+
+  std::vector<const DoFHandler<dim> *> dof_handlers(2, &dof_handler);
+  {
+    std::vector<const ConstraintMatrix *> constraint(2);
+    constraint[0] = &constraints;
+    constraint[1] = &constraints_without_dirichlet;
+    typename MatrixFree<dim,number>::AdditionalData additional_data;
+    additional_data.mapping_update_flags = (update_gradients | update_JxW_values |
+                                            update_quadrature_points);
+
+    std::shared_ptr<MatrixFree<dim,double> > matrix_free;
+    matrix_free->reinit (mapping, dof_handlers, constraint,
+                         QGauss<1>(fe.degree+1), additional_data);
+
+    // select zeroth block in matrix_free for the main matrix
+    std::vector<unsigned int> selected_block {0};
+    laplace_operator.initialize(matrix_free, selected_block);
+  }
+@endcode
+
+This @p matrix_free object is then passed to a @p LaplaceOperator class
+instance @p laplace_operator that gets used in the linear solver. Alongside,
+we create a second @p LaplaceOperator object that fills the right hand side:
+@code
+template <int dim>
+void LaplaceProblem<dim>::assemble_rhs ()
+{
+  LaplaceOperator<dim,fe_degree,double> laplace_operator_inhomogenous;
+
+  // select first block in matrix_free to use constraints_without_dirichlet
+  std::vector<unsigned int> selected_block {1};
+  laplace_operator_inhomogeneous.initialize(matrix_free, selected_block);
+  solution = 0;
+  constraints.distribute(solution);
+  laplace_operator_inhomogeneous.vmult(system_rhs, solution);
+  system_rhs *= -1.;
+
+  // proceed as usual with integration of right hand side function...
+}
+@endcode
