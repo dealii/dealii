@@ -351,13 +351,6 @@ public:
   DeclExceptionMsg (ExcInvalidQuadratureFormula,
                     "The quadrature formula you provided cannot be used "
                     "as the basis for iteration.");
-private:
-  /**
-   * Check whether the given quadrature formula has quadrature points at the
-   * left and right end points of the interval.
-   */
-  static bool
-  uses_both_endpoints (const Quadrature<1> &base_quadrature);
 };
 
 

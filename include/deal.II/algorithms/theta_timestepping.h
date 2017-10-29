@@ -236,10 +236,7 @@ namespace Algorithms
      * The current time in the timestepping scheme.
      */
     double current_time() const;
-    /**
-     * The current step size.
-     */
-    double step_size() const;
+
     /**
      * The weight between implicit and explicit part.
      */

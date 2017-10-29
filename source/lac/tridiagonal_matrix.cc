@@ -35,6 +35,7 @@ TridiagonalMatrix<number>::TridiagonalMatrix(
 {}
 
 
+
 template <typename number>
 void
 TridiagonalMatrix<number>::reinit(
@@ -47,6 +48,7 @@ TridiagonalMatrix<number>::reinit(
   left.resize(symmetric ? 0 : size);
   state = matrix;
 }
+
 
 
 template <typename number>
@@ -71,6 +73,7 @@ TridiagonalMatrix<number>::all_zero() const
     if (*i != 0.) return false;
   return true;
 }
+
 
 
 template <typename number>
@@ -137,6 +140,7 @@ TridiagonalMatrix<number>::vmult_add (
 }
 
 
+
 template <typename number>
 void
 TridiagonalMatrix<number>::Tvmult (
@@ -181,6 +185,7 @@ TridiagonalMatrix<number>::Tvmult (
 }
 
 
+
 template <typename number>
 void
 TridiagonalMatrix<number>::Tvmult_add (
@@ -189,6 +194,7 @@ TridiagonalMatrix<number>::Tvmult_add (
 {
   Tvmult(w, v, true);
 }
+
 
 
 template <typename number>
@@ -218,6 +224,7 @@ TridiagonalMatrix<number>::matrix_scalar_product(
 }
 
 
+
 template <typename number>
 number
 TridiagonalMatrix<number>::matrix_norm_square(
@@ -227,9 +234,10 @@ TridiagonalMatrix<number>::matrix_norm_square(
 }
 
 
-template <>
+
+template <typename number>
 void
-TridiagonalMatrix<double>::compute_eigenvalues()
+TridiagonalMatrix<number>::compute_eigenvalues()
 {
 #ifdef DEAL_II_WITH_LAPACK
   Assert(state == matrix, ExcState(state));
@@ -245,6 +253,7 @@ TridiagonalMatrix<double>::compute_eigenvalues()
   Assert(false, ExcNeedsLAPACK());
 #endif
 }
+
 
 
 template <typename number>

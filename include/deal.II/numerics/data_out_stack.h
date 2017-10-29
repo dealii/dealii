@@ -245,11 +245,6 @@ public:
   void finish_parameter_value ();
 
   /**
-   * Clear all data presently stored in this object.
-   */
-  void clear ();
-
-  /**
    * Determine an estimate for the memory consumption (in bytes) of this
    * object.
    */

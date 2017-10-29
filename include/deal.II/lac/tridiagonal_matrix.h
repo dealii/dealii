@@ -187,41 +187,6 @@ public:
   number matrix_norm_square (const Vector<number> &v) const;
 
 //@}
-///@name Matrixnorms
-//@{
-
-  /**
-   * Return the $l_1$-norm of the matrix, i.e. $|M|_1=max_{all columns
-   * j}\sum_{all rows i} |M_ij|$, (max. sum of columns). This is the natural
-   * matrix norm that is compatible to the $l_1$-norm for vectors, i.e.
-   * $|Mv|_1\leq |M|_1 |v|_1$. (cf. Rannacher Numerik0)
-   */
-  number l1_norm () const;
-
-  /**
-   * Return the $l_\infty$-norm of the matrix, i.e. $|M|_\infty=\max_{all rows
-   * i}\sum_{all columns j} |M_{ij}|$, (max. sum of rows). This is the natural
-   * matrix norm that is compatible to the $l_\infty$-norm of vectors, i.e.
-   * $|Mv|_\infty \leq |M|_\infty |v|_\infty$.
-   */
-  number linfty_norm () const;
-
-  /**
-   * The Frobenius norm of the matrix. Return value is the root of the square
-   * sum of all matrix entries.
-   */
-  number frobenius_norm () const;
-
-  /**
-   * Compute the relative norm of the skew-symmetric part. The return value is
-   * the Frobenius norm of the skew-symmetric part of the matrix divided by
-   * that of the matrix.
-   *
-   * Main purpose of this function is to check, if a matrix is symmetric
-   * within a certain accuracy, or not.
-   */
-  number relative_symmetry_norm2 () const;
-//@}
 ///@name LAPACK operations
 //@{
   /**
@@ -245,13 +210,6 @@ public:
   void print(OutputStream &s,
              const unsigned int  width=5,
              const unsigned int  precision=2) const;
-
-  /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object.
-   */
-  std::size_t memory_consumption () const;
-  //@}
 
 private:
   /**

@@ -1600,24 +1600,29 @@ QProjector<dim>::project_to_subface(const SubQuadrature       &quadrature,
 
 // ------------------------------------------------------------ //
 
-
-template <>
-bool
-QIterated<1>::uses_both_endpoints (const Quadrature<1> &base_quadrature)
+namespace internal
 {
-  bool at_left = false,
-       at_right = false;
-  for (unsigned int i=0; i<base_quadrature.size(); ++i)
+  namespace QIterated
+  {
+    namespace
     {
-      if (base_quadrature.point(i) == Point<1>(0.0))
-        at_left = true;
-      if (base_quadrature.point(i) == Point<1>(1.0))
-        at_right = true;
-    };
+      bool uses_both_endpoints(const Quadrature<1> &base_quadrature)
+      {
+        bool at_left = false,
+             at_right = false;
+        for (unsigned int i = 0; i<base_quadrature.size(); ++i)
+          {
+            if (base_quadrature.point(i) == Point<1>(0.0))
+              at_left = true;
+            if (base_quadrature.point(i) == Point<1>(1.0))
+              at_right = true;
+          }
 
-  return (at_left && at_right);
+        return (at_left && at_right);
+      }
+    }
+  }
 }
-
 
 // template <>
 // void
@@ -1738,7 +1743,7 @@ template <>
 QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
                          const unsigned int   n_copies)
   :
-  Quadrature<1> (uses_both_endpoints(base_quadrature) ?
+  Quadrature<1> (internal::QIterated::uses_both_endpoints(base_quadrature) ?
                  (base_quadrature.size()-1) * n_copies + 1 :
                  base_quadrature.size() * n_copies)
 {
@@ -1746,7 +1751,7 @@ QIterated<1>::QIterated (const Quadrature<1> &base_quadrature,
   Assert (base_quadrature.size() > 0, ExcNotInitialized());
   Assert (n_copies > 0, ExcZero());
 
-  if (!uses_both_endpoints(base_quadrature))
+  if (!internal::QIterated::uses_both_endpoints(base_quadrature))
     // we don't have to skip some
     // points in order to get a
     // reasonable quadrature formula

@@ -194,18 +194,6 @@ public:
   void clear();
 
   /**
-   * Check whether the object is empty.
-   */
-  bool empty () const;
-
-  /**
-   * Read-only access to entries.  This function is only possible if the
-   * inverse diagonal blocks are stored.
-   */
-  value_type el(size_type i,
-                size_type j) const;
-
-  /**
    * Stores the inverse of the diagonal blocks in @p inverse. This costs some
    * additional memory - for DG methods about 1/3 (for double inverses) or 1/6
    * (for float inverses) of that used for the matrix - but it makes the
@@ -308,10 +296,6 @@ public:
   /**
    * Make function of base class public again.
    */
-  using RelaxationBlock<MatrixType, InverseNumberType, VectorType>::empty;
-  /**
-   * Make function of base class public again.
-   */
   using RelaxationBlock<MatrixType, InverseNumberType, VectorType>::size;
   /**
    * Make function of base class public again.
@@ -350,11 +334,6 @@ public:
    * the dst() vector to zero before calling the Tstep() method.
    */
   void Tvmult (VectorType &dst, const VectorType &rhs) const;
-
-  /**
-   * Return the memory allocated in this object.
-   */
-  std::size_t memory_consumption() const;
 };
 
 
@@ -405,10 +384,6 @@ public:
    */
   using RelaxationBlock<MatrixType, InverseNumberType, VectorType>::clear;
 
-  /**
-   * Make function of base class public again.
-   */
-  using RelaxationBlock<MatrixType, InverseNumberType, VectorType>::empty;
   /**
    * Make function of base class public again.
    */
@@ -494,11 +469,6 @@ public:
    * Make function of base class public again.
    */
   using RelaxationBlock<MatrixType, InverseNumberType, VectorType>::clear;
-
-  /**
-   * Make function of base class public again.
-   */
-  using RelaxationBlock<MatrixType, InverseNumberType, VectorType>::empty;
 
   /**
    * Make function of base class public again.

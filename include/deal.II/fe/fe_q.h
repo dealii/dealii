@@ -572,14 +572,6 @@ public:
   FE_Q (const Quadrature<1> &points);
 
   /**
-   * Construct a FE_Q_isoQ1 element. That element shares large parts of code
-   * with FE_Q so most of the construction work is done in this routine,
-   * whereas the public constructor is in the class FE_Q_isoQ1.
-   */
-  FE_Q(const unsigned int subdivisions_per_dimension,
-       const unsigned int base_degree);
-
-  /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_Q<dim>(degree)</tt>, with @p dim and @p degree replaced by
    * appropriate values.

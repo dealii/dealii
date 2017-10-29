@@ -233,11 +233,6 @@ namespace MeshWorker
     template <class ASSEMBLER>
     void assemble(ASSEMBLER &ass) const;
 
-    /**
-     * The memory used by this object.
-     */
-    std::size_t memory_consumption () const;
-
 
     /**
      * The data for the cell.

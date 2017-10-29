@@ -165,7 +165,7 @@ public:
     /**
      * Postfix increment.
      */
-    const_iterator &operator++ (int);
+    const_iterator operator++ (int);
 
     /**
      * Dereferencing operator.
@@ -1376,6 +1376,18 @@ FullMatrix<number>::const_iterator::operator++ ()
       accessor.a_row++;
     }
   return *this;
+}
+
+
+template <typename number>
+inline
+typename FullMatrix<number>::const_iterator
+FullMatrix<number>::const_iterator::operator++ (int)
+{
+  const typename FullMatrix<number>::const_iterator current = *this;
+  ++(*this);
+
+  return current;
 }
 
 

@@ -358,14 +358,6 @@ namespace MeshWorker
 
   private:
     /**
-     * Initialize a single local matrix block. A helper function for
-     * initialize()
-     */
-    void initialize_local(MatrixBlock<FullMatrix<number> > &M,
-                          const unsigned int row,
-                          const unsigned int col);
-
-    /**
      * The local numbers, computed on a cell or on a face.
      */
     std::vector<number> J;
