@@ -85,8 +85,8 @@ public:
   typedef Number                            number_type;
   typedef Tensor<1,n_components_,VectorizedArray<Number> > value_type;
   typedef Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > gradient_type;
-  static const unsigned int dimension     = dim;
-  static const unsigned int n_components  = n_components_;
+  static constexpr unsigned int dimension     = dim;
+  static constexpr unsigned int n_components  = n_components_;
 
   /**
    * @name 1: General operations
@@ -974,8 +974,8 @@ public:
   typedef Number                            number_type;
   typedef Tensor<1,n_components_,VectorizedArray<Number> > value_type;
   typedef Tensor<1,n_components_,Tensor<1,dim,VectorizedArray<Number> > > gradient_type;
-  static const unsigned int dimension     = dim;
-  static const unsigned int n_components  = n_components_;
+  static constexpr unsigned int dimension     = dim;
+  static constexpr unsigned int n_components  = n_components_;
   typedef FEEvaluationBase<dim,n_components_, Number> BaseClass;
 
 protected:
@@ -1033,7 +1033,7 @@ public:
   typedef Number                                 number_type;
   typedef VectorizedArray<Number>                value_type;
   typedef Tensor<1,dim,VectorizedArray<Number> > gradient_type;
-  static const unsigned int dimension          = dim;
+  static constexpr unsigned int dimension          = dim;
   typedef FEEvaluationBase<dim,1,Number>         BaseClass;
 
   /** @copydoc FEEvaluationBase<dim,1,Number>::get_dof_value()
@@ -1135,8 +1135,8 @@ public:
   typedef Number                            number_type;
   typedef Tensor<1,dim,VectorizedArray<Number> > value_type;
   typedef Tensor<2,dim,VectorizedArray<Number> > gradient_type;
-  static const unsigned int dimension     = dim;
-  static const unsigned int n_components  = dim;
+  static constexpr unsigned int dimension     = dim;
+  static constexpr unsigned int n_components  = dim;
   typedef FEEvaluationBase<dim,dim,Number> BaseClass;
 
   /** @copydoc FEEvaluationBase<dim,dim,Number>::get_gradient()
@@ -1273,7 +1273,7 @@ public:
   typedef Number                                 number_type;
   typedef VectorizedArray<Number>                value_type;
   typedef Tensor<1,1,VectorizedArray<Number> >   gradient_type;
-  static const unsigned int dimension          = 1;
+  static constexpr unsigned int dimension          = 1;
   typedef FEEvaluationBase<1,1,Number>           BaseClass;
 
   /** @copydoc FEEvaluationBase<1,1,Number>::get_dof_value()
@@ -1910,12 +1910,12 @@ public:
   typedef Number                            number_type;
   typedef typename BaseClass::value_type    value_type;
   typedef typename BaseClass::gradient_type gradient_type;
-  static const unsigned int dimension     = dim;
-  static const unsigned int n_components  = n_components_;
-  static const unsigned int static_n_q_points    = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
-  static const unsigned int static_dofs_per_component = Utilities::fixed_int_power<fe_degree+1,dim>::value;
-  static const unsigned int tensor_dofs_per_cell = static_dofs_per_component *n_components;
-  static const unsigned int static_dofs_per_cell = static_dofs_per_component *n_components;
+  static constexpr unsigned int dimension     = dim;
+  static constexpr unsigned int n_components  = n_components_;
+  static constexpr unsigned int static_n_q_points    = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
+  static constexpr unsigned int static_dofs_per_component = Utilities::fixed_int_power<fe_degree+1,dim>::value;
+  static constexpr unsigned int tensor_dofs_per_cell = static_dofs_per_component *n_components;
+  static constexpr unsigned int static_dofs_per_cell = static_dofs_per_component *n_components;
 
   /**
    * Constructor. Takes all data stored in MatrixFree. If applied to problems
@@ -2073,7 +2073,7 @@ namespace internal
     struct DGP_dofs_per_component
     {
       // this division is always without remainder
-      static const unsigned int value =
+      static constexpr unsigned int value =
         (DGP_dofs_per_component<dim-1,degree>::value * (degree+dim)) / dim;
     };
 
@@ -2081,7 +2081,7 @@ namespace internal
     template <int degree>
     struct DGP_dofs_per_component<1,degree>
     {
-      static const unsigned int value = degree+1;
+      static constexpr unsigned int value = degree+1;
     };
   }
 }
