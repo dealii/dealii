@@ -146,6 +146,35 @@ namespace internal
   namespace DataOut
   {
     /**
+     * The DataEntry classes abstract away the concrete data type of vectors
+     * users can attach to DataOut (and similar) objects and allow the underlying
+     * DataOut functions to query for individual elements of solution vectors
+     * without having to know the concrete vector type. This avoids that
+     * DataOut has to know what vectors are being used, but it has the downside
+     * that DataOut also doesn't know the underlying scalar type of these vectors.
+     *
+     * If the underlying scalar types all represent real numbers (in the
+     * mathematical sense -- i.e., the scalar type would be @p float,
+     * @p double, etc) then that is not a problem -- DataOut simply
+     * receives the values of individual vector components as @p double
+     * objects. On the other hand, if the vector type uses a std::complex
+     * scalar type, then DataEntry returning a @p double for a vector
+     * entry is not sufficient -- we need to provide DataOut with a way
+     * to query both the real and the imaginary part, so that they can
+     * be written into output files separately.
+     *
+     * This enum allows DataOut to tell a DataEntry function which component
+     * of a vector entry it wants to query, i.e., whether it wants the real
+     * or the imaginary part of a vector entry.
+     */
+    enum class ComponentExtractor
+    {
+      real_part,
+      imaginary_part
+    };
+
+
+    /**
      * For each vector that has been added through the add_data_vector()
      * functions, we need to keep track of a pointer to it, and allow data
      * extraction from it when we generate patches. Unfortunately, we need to
@@ -190,7 +219,8 @@ namespace internal
        */
       virtual
       double
-      get_cell_data_value (const unsigned int cell_number) const = 0;
+      get_cell_data_value (const unsigned int cell_number,
+                           const ComponentExtractor extract_component) const = 0;
 
       /**
        * Given a FEValuesBase object, extract the values on the present cell
@@ -200,6 +230,7 @@ namespace internal
       void
       get_function_values
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<double> &patch_values) const = 0;
 
       /**
@@ -211,6 +242,7 @@ namespace internal
       void
       get_function_values
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<dealii::Vector<double> > &patch_values_system) const = 0;
 
       /**
@@ -221,6 +253,7 @@ namespace internal
       void
       get_function_gradients
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<Tensor<1,DoFHandlerType::space_dimension> > &patch_gradients) const = 0;
 
       /**
@@ -232,6 +265,7 @@ namespace internal
       void
       get_function_gradients
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<std::vector<Tensor<1,DoFHandlerType::space_dimension> > > &patch_gradients_system) const = 0;
 
       /**
@@ -242,6 +276,7 @@ namespace internal
       void
       get_function_hessians
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<Tensor<2,DoFHandlerType::space_dimension> > &patch_hessians) const = 0;
 
       /**
@@ -253,6 +288,7 @@ namespace internal
       void
       get_function_hessians
       (const FEValuesBase<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &fe_patch_values,
+       const ComponentExtractor extract_component,
        std::vector<std::vector< Tensor<2,DoFHandlerType::space_dimension> > > &patch_hessians_system) const = 0;
 
       /**

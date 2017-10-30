@@ -156,12 +156,15 @@ build_one_patch
                   // gradient etc.
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
+                                                                  internal::DataOut::ComponentExtractor::real_part,
                                                                   scratch_data.patch_values_scalar.solution_values);
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
+                                                                     internal::DataOut::ComponentExtractor::real_part,
                                                                      scratch_data.patch_values_scalar.solution_gradients);
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
+                                                                    internal::DataOut::ComponentExtractor::real_part,
                                                                     scratch_data.patch_values_scalar.solution_hessians);
 
                   if (update_flags & update_quadrature_points)
@@ -185,12 +188,15 @@ build_one_patch
                   // derivative...
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
+                                                                  internal::DataOut::ComponentExtractor::real_part,
                                                                   scratch_data.patch_values_system.solution_values);
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
+                                                                     internal::DataOut::ComponentExtractor::real_part,
                                                                      scratch_data.patch_values_system.solution_gradients);
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
+                                                                    internal::DataOut::ComponentExtractor::real_part,
                                                                     scratch_data.patch_values_system.solution_hessians);
 
                   if (update_flags & update_quadrature_points)
@@ -221,6 +227,7 @@ build_one_patch
             if (n_components == 1)
               {
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
+                                                              internal::DataOut::ComponentExtractor::real_part,
                                                               scratch_data.patch_values_scalar.solution_values);
                 for (unsigned int q=0; q<n_q_points; ++q)
                   patch.data(offset,q) = scratch_data.patch_values_scalar.solution_values[q];
@@ -229,6 +236,7 @@ build_one_patch
               {
                 scratch_data.resize_system_vectors(n_components);
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
+                                                              internal::DataOut::ComponentExtractor::real_part,
                                                               scratch_data.patch_values_system.solution_values);
                 for (unsigned int component=0; component<n_components;
                      ++component)
@@ -250,7 +258,8 @@ build_one_patch
           for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
             {
               const double value
-                = this->cell_data[dataset]->get_cell_data_value (cell_and_index->second);
+                = this->cell_data[dataset]->get_cell_data_value (cell_and_index->second,
+                                                                 internal::DataOut::ComponentExtractor::real_part);
               for (unsigned int q=0; q<n_q_points; ++q)
                 patch.data(offset+dataset,q) = value;
             }
