@@ -114,7 +114,7 @@ namespace VectorTools
     //                        reinit()'d for the current cell
     //  function_values, offset: function_values is manipulated in place
     //                           starting at position offset
-    template <int dim, int spacedim, typename number, typename T2, typename T3>
+    template <int dim, int spacedim, typename T2, typename T3>
     void transform(const typename FiniteElementData<dim>::Conformity conformity,
                    const unsigned int offset,
                    T2 &fe_values_jacobians,
@@ -136,7 +136,7 @@ namespace VectorTools
               auto shifted_view = boost::make_iterator_range(
                                     std::begin(function_values[i]) + offset,
                                     std::begin(function_values[i]) + offset + dim);
-              std::array<number,dim> old_value;
+              std::array<typename T3::value_type::value_type,dim> old_value;
               std::copy(std::begin(shifted_view),
                         std::end(shifted_view),
                         std::begin(old_value));
@@ -164,7 +164,7 @@ namespace VectorTools
               auto shifted_view = boost::make_iterator_range(
                                     std::begin(function_values[i]) + offset,
                                     std::begin(function_values[i]) + offset + dim);
-              std::array<number,dim> old_value;
+              std::array<typename T3::value_type::value_type,dim> old_value;
               std::copy(std::begin(shifted_view),
                         std::end(shifted_view),
                         std::begin(old_value));
@@ -206,7 +206,7 @@ namespace VectorTools
     //   [ rest see above]
     // Output: the offset after we have handled the element at
     //   a given offset
-    template <int dim, int spacedim, typename number, typename T2, typename T3>
+    template <int dim, int spacedim, typename T2, typename T3>
     unsigned int
     apply_transform(const FiniteElement<dim, spacedim> &fe,
                     const unsigned int offset,
@@ -228,20 +228,20 @@ namespace VectorTools
                   // recursively call apply_transform to make sure to
                   // correctly handle nested fe systems.
                   current_offset =
-                    apply_transform<dim, spacedim, number>(base_fe,
-                                                           current_offset,
-                                                           fe_values_jacobians,
-                                                           function_values);
+                    apply_transform(base_fe,
+                                    current_offset,
+                                    fe_values_jacobians,
+                                    function_values);
                 }
             }
           return current_offset;
         }
       else
         {
-          transform<dim, spacedim, number>(fe.conforming_space,
-                                           offset,
-                                           fe_values_jacobians,
-                                           function_values);
+          transform<dim, spacedim>(fe.conforming_space,
+                                   offset,
+                                   fe_values_jacobians,
+                                   function_values);
           return (offset + fe.n_components());
         }
     }
@@ -652,9 +652,8 @@ namespace VectorTools
             // every base element.
 
             const unsigned int offset =
-              apply_transform<dim, spacedim, number>(
-                fe[fe_index], /* starting_offset = */ 0,
-                fe_values, function_values);
+              apply_transform(fe[fe_index], /* starting_offset = */ 0,
+                              fe_values, function_values);
             (void)offset;
             Assert(offset == n_components, ExcInternalError());
           }
