@@ -57,6 +57,18 @@ namespace parallel
     template <int dim, int spacedim>
     void Triangulation<dim,spacedim>::partition()
     {
+#ifdef DEBUG
+      // Check that all meshes are the same (or at least have the same
+      // total number of active cells):
+      const unsigned int max_active_cells
+        = Utilities::MPI::max(this->n_active_cells(), this->get_communicator());
+      Assert(max_active_cells == this->n_active_cells(),
+             ExcMessage("A parallel::shared::Triangulation needs to be refined in the same"
+                        "way on all processors, but the participating processors don't "
+                        "agree on the number of active cells."))
+#endif
+
+
       if (settings & partition_metis)
         {
           dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
@@ -183,11 +195,8 @@ namespace parallel
           if (cell->is_locally_owned())
             n_my_cells += 1;
 
-        unsigned int total_cells;
-        int ierr = MPI_Allreduce (&n_my_cells, &total_cells, 1,
-                                  MPI_UNSIGNED, MPI_SUM, this->get_communicator());
-        AssertThrowMPI(ierr);
-
+        const unsigned int total_cells
+          = Utilities::MPI::sum(n_my_cells, this->get_communicator());
         Assert(total_cells == this->n_active_cells(),
                ExcMessage("Not all cells are assigned to a processor."))
       }
@@ -204,10 +213,8 @@ namespace parallel
             if (cell->is_locally_owned_on_level())
               n_my_cells += 1;
 
-          unsigned int total_cells;
-          int ierr = MPI_Allreduce (&n_my_cells, &total_cells, 1, MPI_UNSIGNED, MPI_SUM, this->get_communicator());
-          AssertThrowMPI(ierr);
-
+          const unsigned int total_cells
+            = Utilities::MPI::sum(n_my_cells, this->get_communicator());
           Assert(total_cells == this->n_cells(),
                  ExcMessage("Not all cells are assigned to a processor."))
         }
