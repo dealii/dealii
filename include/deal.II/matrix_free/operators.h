@@ -124,13 +124,30 @@ namespace MatrixFreeOperators
    * of the blocks in the underlying MatrixFree object by optional integer
    * lists that specify the chosen blocks.
    *
-   * One application of selection is in problems with a Newton-type iteration
+   * One application of constructing a matrix-free operator only on selected
+   * blocks would be the setting of the step-32 tutorial program: This
+   * problem has three <i>blocks</i>, one for the velocity, one for the
+   * pressure, and one for temperature. The time lag scheme used for temporal
+   * evolution splits the temperature equation away from the Stokes system in
+   * velocity and pressure. However, there are cross terms like the velocity
+   * that enters the temperature advection-diffusion equation or the
+   * temperature that enters the right hand side of the velocity. In order to
+   * be sure that MatrixFree uses the same integer indexing to the different
+   * blocks, one needs to put all the three blocks into the same MatrixFree
+   * object. However, when solving a linear system the operators involved
+   * either address the first two in the Stokes solver, or the last one for
+   * the temperature solver. In the former case, a BlockVector of two
+   * components would be selected with a vector selecting the blocks {0, 1} in
+   * MatrixFree, whereas in the latter, a non-block vector selecting the block
+   * {2} would be used.
+   *
+   * A second application of selection is in problems with a Newton-type iteration
    * or problems with inhomogeneous boundary conditions. In such a case, one
    * has to deal with two different sets of constraints: One set of
    * constraints applies to the solution vector which might include hanging
    * node constraints or periodicity constraints but no constraints on
    * inhomogeneous Dirichlet boundaries. Before the nonlinear iteration, the
-   * boundary values are set to the expected value in the vector representing
+   * boundary values are set to the expected value in the vector, representing
    * the initial guess. In each iteration of the Newton method, a linear
    * system subject to zero Dirichlet boundary conditions is solved that is
    * then added to the initial guess. This setup can be realized by using a
@@ -141,22 +158,26 @@ namespace MatrixFreeOperators
    * function, i.e., a vector of length 1 that selects exactly the first
    * constraint matrix with index 0.
    *
-   * A second application of using selectively constructing a matrix-free
-   * operator would be the setting of the step-32 tutorial program: This
-   * problem has three <i>blocks</i>, one for the velocity, one for the
-   * pressure, and one for temperature. The time lag scheme used for temporal
-   * evolution splits the temperature equation away from the Stokes system in
-   * velocity and pressure. However, there are cross terms like the velocity
-   * that enters the temperature advection-diffusion equation or the
-   * temperature that enters the right hand side of the velocity. In order to
-   * be sure that MatrixFree uses the same integer indexing to the different
-   * blocks, one needs to put all three blocks into the same MatrixFree
-   * object. However, when solving a linear system the operators involved
-   * either address the first two in the Stokes solver, or the last one for
-   * the temperature solver. In the former case, a BlockVector of two
-   * components would be selected with a vector selecting the blocks {0, 1} in
-   * MatrixFree, whereas in the latter, a non-block vector selecting the block
-   * {2} would be used.
+   * For systems of PDEs where the different blocks of MatrixFree are
+   * associated with different physical components of the equations, adding
+   * another block with a different ConstraintMatrix argument solely for the
+   * purpose of boundary conditions might lead to cumbersome index
+   * handling. Instead, one could set up a second MatrixFree instance with the
+   * different constraint matrix but the same interpretation of blocks, and
+   * use that for interpolating inhomogeneous boundary conditions (see also
+   * the discussion in the results section of the step-37 tutorial program):
+   *
+   * @code
+   * matrix_free_inhomogeneous.reinit(dof_handler, constraints_no_dirichlet,
+   *                                  quadrature, additional_data);
+   * operator_inhomogeneous.initialize(matrix_free_inhomogeneous, selected_blocks);
+   * LinearAlgebra::distributed::Vector<double> inhomogeneity;
+   * matrix_free_inhomogeneous.initialize_dof_vector(inhomogeneity);
+   * constraints_with_dirichlet.distribute(inhomogeneity);
+   * operator_inhomogeneous.vmult(system_rhs, inhomogeneity);
+   * system_rhs *= -1.;
+   * // proceed with other terms from right hand side...
+   * @endcode
    *
    * @author Denis Davydov, Daniel Arndt, Martin Kronbichler, 2016, 2017
    */

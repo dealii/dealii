@@ -30,16 +30,16 @@ solved with a multigrid method and uses large-scale parallelism with MPI.
 
 The major motivation for matrix-free methods is the fact that on today's
 processors access to main memory (i.e., for objects that do not fit in the
-caches) has become the bottleneck in scientific computing: To perform a
+caches) has become the bottleneck in many solvers for partial differential equations: To perform a
 matrix-vector product based on matrices, modern CPUs spend far more time
 waiting for data to arrive from memory than on actually doing the floating
 point multiplications and additions. Thus, if we could substitute looking up
 matrix elements in memory by re-computing them &mdash; or rather, the operator
 represented by these entries &mdash;, we may win in terms of overall run-time
-(even if this requires a significant number of additional floating point
-operations). That said, to realize this with a trivial implementation is not
+even if this requires a significant number of additional floating point
+operations. That said, to realize this with a trivial implementation is not
 enough and one needs to really look at the details to gain in
-performance. This tutorial program (and the papers referenced above) show how
+performance. This tutorial program and the papers referenced above show how
 one can implement such a scheme and demonstrates the speedup that can be
 obtained.
 
@@ -92,7 +92,8 @@ of the respective cell, and
 correspondingly for the result.
 A naive attempt to implement the local action of the Laplacian would hence be
 to use the following code:
-@code Matrixfree<dim>::vmult (Vector<double>       &dst,
+@code
+Matrixfree<dim>::vmult (Vector<double>       &dst,
                         const Vector<double> &src) const
 {
   dst = 0;
@@ -190,9 +191,9 @@ complexity of the work on one cell from something like $\mathcal
 {O}(\mathrm{dofs\_per\_cell}^2)$. An interpretation of this algorithm is that
 we first transform the vector of values on the local DoFs to a vector of
 gradients on the quadrature points. In the second loop, we multiply these
-gradients by the integration weight. The third loop applies the second
-gradient (in transposed form), so that we get back to a vector of (Laplacian)
-values on the cell dofs.
+gradients by the integration weight and the coefficient. The third loop applies
+the second gradient (in transposed form), so that we get back to a vector of
+(Laplacian) values on the cell dofs.
 
 The bottleneck in the above code is the operations done by the call to
 FEValues::reinit for every <code>cell</code>, which take about as much time as
@@ -216,8 +217,8 @@ cache some data that gets reused in the operator applications, i.e., integral
 computations. On the other hand, we realize that we must not cache too much
 data since otherwise we get back to the situation where memory access becomes
 the dominating factor. Therefore, we will not store the transformed gradients
-in the matrix <i>B</i>, as they would in general be different on every element
-for curved meshes.
+in the matrix <i>B</i>, as they would in general be different for each basis
+function and each quadrature point on every element for curved meshes.
 
 The trick is to factor out the Jacobian transformation and first apply the
 gradient on the reference cell only. This operation interpolates the vector of
