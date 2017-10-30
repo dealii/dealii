@@ -309,7 +309,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
   std::vector<std::vector<std::vector<Tensor<1,spacedim,number> > > >
   gradients_neighbor (gradients_here);
   std::vector<Vector<typename ProductType<number,double>::type> >
-  grad_neighbor (n_solution_vectors, Vector<typename ProductType<number,double>::type>(n_components));
+  grad_dot_n_neighbor (n_solution_vectors, Vector<typename ProductType<number,double>::type>(n_components));
 
   // reserve some space for coefficient values at one point.  if there is no
   // coefficient, then we fill it by unity once and for all and don't set it
@@ -386,7 +386,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
                 // extract the gradient in normal direction of all the components.
                 for (unsigned int s=0; s<n_solution_vectors; ++s)
                   for (unsigned int c=0; c<n_components; ++c)
-                    grad_neighbor[s](c)
+                    grad_dot_n_neighbor[s](c)
                       = - (gradients_neighbor[s][n==0 ? 1 : 0][c]*neighbor_normal);
               }
             else if (neumann_bc.find(n) != neumann_bc.end())
@@ -399,7 +399,7 @@ estimate (const Mapping<1,spacedim>                  &mapping,
                     v = neumann_bc.find(n)->second->value(cell->vertex(n));
 
                     for (unsigned int s=0; s<n_solution_vectors; ++s)
-                      grad_neighbor[s](0) = v;
+                      grad_dot_n_neighbor[s](0) = v;
                   }
                 else
                   {
@@ -407,13 +407,13 @@ estimate (const Mapping<1,spacedim>                  &mapping,
                     neumann_bc.find(n)->second->vector_value(cell->vertex(n), v);
 
                     for (unsigned int s=0; s<n_solution_vectors; ++s)
-                      grad_neighbor[s] = v;
+                      grad_dot_n_neighbor[s] = v;
                   }
               }
             else
               // fill with zeroes.
               for (unsigned int s=0; s<n_solution_vectors; ++s)
-                grad_neighbor[s] = 0;
+                grad_dot_n_neighbor[s] = 0;
 
             // if there is a coefficient, then evaluate it at the present
             // position. if there is none, reuse the preset values.
@@ -437,10 +437,10 @@ estimate (const Mapping<1,spacedim>                  &mapping,
                   {
                     // get gradient here
                     const typename ProductType<number,double>::type
-                    grad_here = gradients_here[s][n][component] * normal;
+                    grad_dot_n_here = gradients_here[s][n][component] * normal;
 
                     const typename ProductType<number,double>::type
-                    jump = ((grad_here - grad_neighbor[s](component)) *
+                    jump = ((grad_dot_n_here - grad_dot_n_neighbor[s](component)) *
                             coefficient_values(component));
                     (*errors[s])(cell->active_cell_index())
                     += numbers::NumberTraits<typename ProductType<number,double>::type>::abs_square(jump) * cell->diameter();
