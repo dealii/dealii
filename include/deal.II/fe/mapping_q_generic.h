@@ -692,14 +692,13 @@ protected:
                                         const Point<dim> &initial_p_unit) const;
 
   /**
-   * For <tt>dim=2,3</tt>. Append the support points of all shape functions
-   * located on bounding lines of the given cell to the vector @p a. Points
-   * located on the vertices of a line are not included.
+   * Append the support points of all shape functions located on bounding
+   * lines of the given cell to the vector @p a. Points located on the
+   * vertices of a line are not included.
    *
-   * Needed by the @p compute_support_points() function. For <tt>dim=1</tt>
-   * this function is empty. The function uses the underlying manifold object
-   * of the line (or, if none is set, of the cell) for the location of the
-   * requested points.
+   * This function uses the underlying manifold object of the line (or, if
+   * none is set, of the cell) for the location of the requested points. This
+   * function is usually called by compute_mapping_support_points() function.
    *
    * This function is made virtual in order to allow derived classes to choose
    * shape function support points differently than the present class, which
@@ -711,14 +710,14 @@ protected:
                            std::vector<Point<spacedim> > &a) const;
 
   /**
-   * For <tt>dim=3</tt>. Append the support points of all shape functions
-   * located on bounding faces (quads in 3d) of the given cell to the vector
-   * @p a. Points located on the vertices or lines of a quad are not included.
+   * Append the support points of all shape functions located on bounding
+   * faces (quads in 3d) of the given cell to the vector @p a. This function
+   * is only defined for <tt>dim=3</tt>. Points located on the vertices or
+   * lines of a quad are not included.
    *
-   * Needed by the @p compute_support_points() function. For <tt>dim=1</tt>
-   * and <tt>dim=2</tt> this function is empty. The function uses the
-   * underlying manifold object of the quad (or, if none is set, of the cell)
-   * for the location of the requested points.
+   * This function uses the underlying manifold object of the quad (or, if
+   * none is set, of the cell) for the location of the requested points. This
+   * function is usually called by compute_mapping_support_points().
    *
    * This function is made virtual in order to allow derived classes to choose
    * shape function support points differently than the present class, which
