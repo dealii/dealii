@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+// Check Convert<tuple>::to_value.
 
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
@@ -23,16 +24,14 @@ int main()
 {
   initlog();
 
-  // create a pattern and match a string
-  const auto &pattern = Patterns::Tuple(Patterns::Double(), Patterns::Anything());
-  const std::string desc = pattern.description();
+  auto a = std::make_tuple(Point<3>(), double(3.5), std::string("ciao"));
+  const auto &pattern = Patterns::Tools::Convert<decltype(a)>::to_pattern();
 
-  deallog << desc << std::endl;
+  deallog << pattern->description() << std::endl;
 
-  std::string test = "3.14: Ciao";
+  deallog << Patterns::Tools::Convert<decltype(a)>::to_string(a) << std::endl;
 
-  if (pattern.match(test))
-    deallog << "OK" << std::endl;
-  else
-    deallog << "Not OK" << std::endl;
+  a = Patterns::Tools::Convert<decltype(a)>::to_value("1.0, 2.0, 3.0 : 3.14 : mondo");
+
+  deallog << Patterns::Tools::Convert<decltype(a)>::to_string(a) << std::endl;
 }

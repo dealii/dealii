@@ -21,11 +21,13 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/std_cxx14/algorithm.h>
 #include <deal.II/base/template_constraints.h>
+
+#include <deal.II/base/std_cxx14/memory.h>
+#include <deal.II/base/std_cxx14/algorithm.h>
+#include <deal.II/base/std_cxx14/utility.h>
 
 #include <boost/archive/basic_archive.hpp>
 #include <boost/core/demangle.hpp>
@@ -525,7 +527,7 @@ namespace Patterns
    * map is described in the form <code>key1: value1, key2: value2, key3:
    * value3, ...</code>. Two constructor arguments allow to choose a delimiter
    * between pairs other than the comma, and a delimeter between key and value
-   * other than column.
+   * other than colon.
    *
    * With two additional parameters, the number of elements this list has to
    * have can be specified. If none is specified, the map may have zero or
@@ -664,7 +666,7 @@ namespace Patterns
 
 
   /**
-   * This pattern matches comma-separated values of arbitrary types. Each type
+   * This pattern matches colon-separated values of arbitrary types. Each type
    * has to match a pattern given to the constructor.
    *
    * An example usage is the following:
@@ -676,13 +678,37 @@ namespace Patterns
    * ps.push_back(std::unique_ptr<Patterns::Double>());
    * ps.push_back(std::unique_ptr<Patterns::Anything>());
    *
-   * Patterns::Tuple pattern(ps, ";");
+   * Patterns::Tuple pattern(ps, ":");
    *
-   * bool check = ps.match("5; 3.14; Ciao"); // check = true
+   * bool check = ps.match("5 : 3.14 : Ciao"); // check = true
+   * @endcode
+   *
+   * or, if you want to exploit ParameterHandler::add_parameter():
+   *
+   * @code
+   * typedef std::tuple<std::string, Point<3>, unsigned int> T;
+   *
+   * T a = Patterns::Tools::Convert<T>::to_value("Ciao : 1.0, 2.0, 3.0 : 33");
+   *
+   * ParameterHandler prm;
+   * prm.add_parameter("A tuple", a);
+   *
+   * prm.log_parameters(deallog);
+   * // DEAL:parameters::A tuple: Ciao : 1.000000, 2.000000, 3.000000 : 33
+   *
+   * prm.set("A tuple", "Mondo : 2.0, 3.0, 4.0 : 34");
+   * prm.log_parameters(deallog);
+   * // DEAL:parameters::A tuple: Mondo : 2.0, 3.0, 4.0 : 34
+   *
+   * deallog << Patterns::Tools::Convert<T>::to_string(a) << std::endl;
+   * // DEAL::Mondo : 2.000000, 3.000000, 4.000000 : 34
    * @endcode
    *
    * The constructor expects a vector of Patterns, and optionally a string
    * specifying the separator to use when parsing the Tuple from a string.
+   *
+   * The default separator is a colon, owing to the fact that a pair is in fact
+   * a tuple with two elements.
    *
    * @author Luca Heltai, 2017.
    */
@@ -698,7 +724,7 @@ namespace Patterns
      * Constructor.
      */
     Tuple (const std::vector<std::unique_ptr<PatternBase> > &patterns,
-           const std::string  &separator = ",");
+           const std::string  &separator = ":");
 
     /**
      * Constructor. Same as above, specialized for const char *. This is
@@ -1256,7 +1282,7 @@ namespace Patterns
   Tuple::Tuple(const char *separator,
                const PatternTypes &... ps)
     :
-    // simply forward to the std::string version
+    // forward to the version with std::string argument
     Tuple (std::string(separator), ps...)
   {}
 
@@ -1284,7 +1310,7 @@ namespace Patterns
   Tuple::Tuple(const PatternTypes &... ps)
     :
     // forward to the version with the separator argument
-    Tuple (std::string(","), ps...)
+    Tuple (std::string(":"), ps...)
   {}
 
 
@@ -1438,6 +1464,34 @@ namespace Patterns
 
     namespace internal
     {
+      // Helper function for list_rank
+      template <class T>
+      constexpr int max_list_rank()
+      {
+        return RankInfo<T>::list_rank;
+      };
+
+      template <class T1, class T2, class... Types>
+      constexpr int max_list_rank()
+      {
+        return std_cxx14::max(RankInfo<T1>::list_rank,
+                              max_list_rank<T2,Types...>());
+      };
+
+      // Helper function for map_rank
+      template <class T>
+      constexpr int max_map_rank()
+      {
+        return RankInfo<T>::map_rank;
+      };
+
+      template <class T1, class T2, class... Types>
+      constexpr int max_map_rank()
+      {
+        return std_cxx14::max(RankInfo<T1>::map_rank,
+                              max_map_rank<T2,Types...>());
+      };
+
       // Rank of vector types
       template <class T>
       struct RankInfo<T,
@@ -1454,13 +1508,9 @@ namespace Patterns
       struct RankInfo<T, typename std::enable_if<is_map_compatible<T>::value>::type>
       {
         static constexpr int list_rank =
-          std_cxx14::max(internal::RankInfo<typename T::key_type>::list_rank,
-                         RankInfo<typename T::mapped_type>::list_rank) +
-          1;
+          max_list_rank<typename T::key_type, typename T::mapped_type>() + 1;
         static constexpr int map_rank =
-          std_cxx14::max(internal::RankInfo<typename T::key_type>::map_rank,
-                         RankInfo<typename T::mapped_type>::map_rank) +
-          1;
+          max_map_rank<typename T::key_type, typename T::mapped_type>() + 1;
       };
 
       // Rank of Tensor types
@@ -1489,6 +1539,14 @@ namespace Patterns
       {
         static constexpr int list_rank = std_cxx14::max(RankInfo<Key>::list_rank, RankInfo<Value>::list_rank);
         static constexpr int map_rank = std_cxx14::max(RankInfo<Key>::map_rank, RankInfo<Value>::map_rank)+1;
+      };
+
+
+      template <class... Types>
+      struct RankInfo<std::tuple<Types...>>
+      {
+        static constexpr int list_rank = max_list_rank<Types...>();
+        static constexpr int map_rank = max_map_rank<Types...>()+1;
       };
     }
 
@@ -1810,7 +1868,6 @@ namespace Patterns
       }
     };
 
-
     // Pairs
     template <class Key, class Value>
     struct Convert<std::pair<Key,Value>>
@@ -1851,6 +1908,98 @@ namespace Patterns
         return *m.begin();
       }
     };
+
+    // Tuples
+    template <class... Args>
+    struct Convert<std::tuple<Args...>>
+    {
+      typedef std::tuple<Args...> T;
+
+      static std::unique_ptr<Patterns::PatternBase> to_pattern()
+      {
+        static_assert(internal::RankInfo<T>::map_rank > 0,
+                      "Cannot use this class for non tuple-compatible types.");
+        return std_cxx14::make_unique<Patterns::Tuple>(
+                 internal::default_map_separator[internal::RankInfo<T>::map_rank-1],
+                 *Convert<Args>::to_pattern()...);
+      }
+
+      static std::string to_string(const T &t,
+                                   const std::unique_ptr<Patterns::PatternBase>
+                                   &pattern = Convert<T>::to_pattern())
+      {
+        auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
+        AssertThrow(p,ExcMessage("I need a Tuple pattern to convert a tuple "
+                                 "to a string."));
+
+        const auto string_array = Convert<T>::to_string_internal_2(t,*p);
+        std::string str;
+        for (unsigned int i=0; i< string_array.size(); ++i)
+          str += (i ? " " + p->get_separator() + " " : "") +string_array[i];
+        AssertThrow(p->match(str), ExcNoMatch(str, *p));
+        return str;
+      }
+
+      static T to_value(const std::string &s,
+                        const std::unique_ptr<Patterns::PatternBase> &pattern =
+                          Convert<T>::to_pattern())
+      {
+        AssertThrow(pattern->match(s), ExcNoMatch(s, *pattern));
+
+        auto p = dynamic_cast<const Patterns::Tuple *>(pattern.get());
+        AssertThrow(p,ExcMessage("I need a Tuple pattern to convert a string "
+                                 "to a tuple type."));
+
+        auto v = Utilities::split_string_list(s, p->get_separator());
+
+        return Convert<T>::to_value_internal_2(v,*p);
+      }
+
+    private:
+      template<std::size_t... I>
+      static
+      std::array<std::string, std::tuple_size<T>::value>
+      to_string_internal_1(const T &t,
+                           const Patterns::Tuple &pattern,
+                           std_cxx14::index_sequence<I...>)
+      {
+        std::array<std::string, std::tuple_size<T>::value> a
+        = {{
+            Convert<typename std::tuple_element<I,T>::type>::
+            to_string(std::get<I>(t), pattern.get_pattern(I).clone())...
+          }
+        };
+        return a;
+      }
+
+      static
+      std::array<std::string, std::tuple_size<T>::value>
+      to_string_internal_2(const T &t,
+                           const Patterns::Tuple &pattern)
+      {
+        return Convert<T>::to_string_internal_1(t, pattern,
+                                                std_cxx14::make_index_sequence<std::tuple_size<T>::value> {});
+      }
+
+      template<std::size_t... I>
+      static
+      T to_value_internal_1(const std::vector<std::string> &s,
+                            const Patterns::Tuple &pattern,
+                            std_cxx14::index_sequence<I...>)
+      {
+        return std::make_tuple(Convert<typename std::tuple_element<I,T>::type>::
+                               to_value(s[I], pattern.get_pattern(I).clone())...);
+      }
+
+      static
+      T to_value_internal_2(const std::vector<std::string> &s,
+                            const Patterns::Tuple &pattern)
+      {
+        return Convert<T>::to_value_internal_1(s, pattern,
+                                               std_cxx14::make_index_sequence<std::tuple_size<T>::value> {});
+      }
+    };
+
   }
 }
 

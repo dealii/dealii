@@ -13,26 +13,38 @@
 //
 // ---------------------------------------------------------------------
 
+// test add_parameters with tuples.
 
 #include "../tests.h"
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/std_cxx14/memory.h>
 #include <memory>
 
+using namespace Patterns;
+using namespace Patterns::Tools;
+
 int main()
 {
   initlog();
 
-  // create a pattern and match a string
-  const auto &pattern = Patterns::Tuple(Patterns::Double(), Patterns::Anything());
-  const std::string desc = pattern.description();
+  typedef std::tuple<std::string, Point<3>, unsigned int> T;
 
-  deallog << desc << std::endl;
+  T a;
+  a = Convert<T>::to_value("Ciao : 1.0, 2.0, 3.0 : 33");
 
-  std::string test = "3.14: Ciao";
+  ParameterHandler prm;
+  prm.add_parameter("A tuple", a);
 
-  if (pattern.match(test))
-    deallog << "OK" << std::endl;
-  else
-    deallog << "Not OK" << std::endl;
+  prm.log_parameters(deallog);
+
+  prm.set("A tuple",            "Mondo : 2.0, 3.0, 4.0 : 34");
+
+  deallog << "After ParameterHandler::set =========================="
+          << std::endl << std::endl;
+  prm.log_parameters(deallog);
+
+  deallog << "Actual variables            =========================="
+          << std::endl << std::endl;
+
+  deallog << Convert<T>::to_string(a) << std::endl;
 }
