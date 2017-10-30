@@ -119,12 +119,12 @@ null_operator(const LinearOperator<Range, Domain, Payload> &);
  * in conjunction with the LinearOperator class, it is necessary to extend the
  * functionality of the LinearOperator class by means of an additional Payload.
  *
- * For example, in order to construct an InverseOperator a call to a solver is
- * required. Naturally these solvers don't have an interface to the
- * LinearOperator (which, for example, may represent a composite operation).
- * The TrilinosWrappers::internal::LinearOperator::TrilinosPayload therefore
- * provides an interface extension to the LinearOperator so that it can be
- * passed to the solver and used by the solver as if it were a Trilinos
+ * For example: LinearOperator instances representing matrix inverses usually
+ * require calling some linear solver. These solvers may not have interfaces
+ * to the LinearOperator (which, for example, may represent a composite
+ * operation). The TrilinosWrappers::internal::LinearOperator::TrilinosPayload
+ * therefore provides an interface extension to the LinearOperator so that it
+ * can be passed to the solver and used by the solver as if it were a Trilinos
  * operator. This implies that all of the necessary functionality of the
  * specific Trilinos operator has been overloaded within the Payload class.
  * This includes operator-vector multiplication and inverse operator-vector
@@ -140,7 +140,7 @@ null_operator(const LinearOperator<Range, Domain, Payload> &);
  *
  * @note To ensure that the correct payload is provided, wrapper functions
  * for linear operators have been provided within the respective
- * TrilinosWrappers (and, in the future, PetscWrappers) namespaces.
+ * TrilinosWrappers (and, in the future, PETScWrappers) namespaces.
  *
  * @author Luca Heltai, Matthias Maier, 2015; Jean-Paul Pelteret, 2016
  *
@@ -782,7 +782,7 @@ identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
  * Return a LinearOperator that is the identity of the vector space @p Range.
  *
  * The function takes a LinearOperator @p op and uses its range initializer
- * to create an identiy operator. In contrast to the function above, this
+ * to create an identity operator. In contrast to the function above, this
  * function also ensures that the underlying Payload matches that of the
  * input @p op.
  *
@@ -913,8 +913,8 @@ namespace internal
      * facilitate the operations of the matrix.
      *
      * This is the Payload class typically associated with deal.II's native
-     * SparseMatrix. To use Trilinos and PETSc SparseMatrices it is necessary
-     * to initialize a LinearOperator with their associated Payload.
+     * SparseMatrix. To use Trilinos and PETSc sparse matrix classes it is
+     * necessary to initialize a LinearOperator with their associated Payload.
      *
      * @author Jean-Paul Pelteret, Matthias Maier, 2016
      *

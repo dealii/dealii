@@ -105,6 +105,8 @@ DEAL_II_NAMESPACE_OPEN
  * The remaining code of this sample program concerns preconditioning and is
  * described in the documentation of BlockTrianglePrecondition.
  *
+ * @deprecated This class has been superseded by BlockLinearOperator.
+ *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat
@@ -343,7 +345,7 @@ private:
    * number of blocks per row.
    */
   unsigned int block_cols;
-};
+} DEAL_II_DEPRECATED;
 
 /*@}*/
 
@@ -398,6 +400,8 @@ private:
  * for solving.
  * @until Error
  *
+ * @deprecated This class has been superseded by block_back_substitution and
+ * block_forward_substitution, which build on BlockLinearOperator.
  *
  * @ingroup Preconditioners
  * @author Guido Kanschat, 2001, 2005
@@ -517,7 +521,7 @@ private:
    * Flag for backward insertion.
    */
   bool backward;
-};
+} DEAL_II_DEPRECATED;
 
 
 #ifndef DOXYGEN
