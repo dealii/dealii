@@ -1308,8 +1308,25 @@ namespace VectorTools
       constraints.distribute(inhomogeneities);
       inhomogeneities*=-1.;
 
-      create_right_hand_side (mapping, dof, quadrature, function, rhs, constraints);
-      mass_matrix.vmult_add(rhs, inhomogeneities);
+      {
+        create_right_hand_side (mapping, dof, quadrature, function, rhs, constraints);
+
+        // account for inhomogeneous constraints
+        inhomogeneities.update_ghost_values();
+        FEEvaluation<dim,fe_degree, fe_degree+2, components, Number> phi(*matrix_free);
+        for (unsigned int cell=0; cell<matrix_free->n_macro_cells(); ++cell)
+          {
+            phi.reinit(cell);
+            phi.read_dof_values_plain(inhomogeneities);
+            phi.evaluate(true, false);
+            for (unsigned int q=0; q<phi.n_q_points; ++q)
+              phi.submit_value(phi.get_value(q), q);
+
+            phi.integrate(true, false);
+            phi.distribute_local_to_global(rhs);
+          }
+        rhs.compress(VectorOperation::add);
+      }
 
       // now invert the matrix
       // Allow for a maximum of 5*n steps to reduce the residual by 10^-12. n
