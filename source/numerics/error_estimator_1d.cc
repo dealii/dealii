@@ -308,8 +308,8 @@ estimate (const Mapping<1,spacedim>                  &mapping,
                   std::vector<std::vector<Tensor<1,spacedim,number> > >(2, std::vector<Tensor<1,spacedim,number> >(n_components)));
   std::vector<std::vector<std::vector<Tensor<1,spacedim,number> > > >
   gradients_neighbor (gradients_here);
-  std::vector<Vector<number> >
-  grad_neighbor (n_solution_vectors, Vector<number>(n_components));
+  std::vector<Vector<typename ProductType<number,double>::type> >
+  grad_neighbor (n_solution_vectors, Vector<typename ProductType<number,double>::type>(n_components));
 
   // reserve some space for coefficient values at one point.  if there is no
   // coefficient, then we fill it by unity once and for all and don't set it
@@ -436,12 +436,14 @@ estimate (const Mapping<1,spacedim>                  &mapping,
                 if (component_mask[component] == true)
                   {
                     // get gradient here
-                    const number grad_here = gradients_here[s][n][component]
-                                             * normal;
+                    const typename ProductType<number,double>::type
+                    grad_here = gradients_here[s][n][component] * normal;
 
-                    const number jump = ((grad_here - grad_neighbor[s](component)) *
-                                         coefficient_values(component));
-                    (*errors[s])(cell->active_cell_index()) += numbers::NumberTraits<number>::abs_square(jump) * cell->diameter();
+                    const typename ProductType<number,double>::type
+                    jump = ((grad_here - grad_neighbor[s](component)) *
+                            coefficient_values(component));
+                    (*errors[s])(cell->active_cell_index())
+                    += numbers::NumberTraits<typename ProductType<number,double>::type>::abs_square(jump) * cell->diameter();
                   }
           }
 
