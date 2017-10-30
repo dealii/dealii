@@ -15,7 +15,7 @@
 
 
 
-for (S : REAL_SCALARS)
+for (S : REAL_AND_COMPLEX_SCALARS)
 {
     template class BlockVector<S>;
 }
@@ -26,13 +26,14 @@ for (S1, S2 : REAL_SCALARS)
             const bool);
 }
 
-
-for (S : COMPLEX_SCALARS)
+for (S1, S2 : COMPLEX_SCALARS)
 {
-    template class BlockVector<S>;
+    template void BlockVector<S1>::reinit<S2>(const BlockVector<S2>&,
+            const bool);
 }
 
-for (S1, S2 : COMPLEX_SCALARS)
+
+for (S1 : COMPLEX_SCALARS; S2 : REAL_SCALARS)
 {
     template void BlockVector<S1>::reinit<S2>(const BlockVector<S2>&,
             const bool);

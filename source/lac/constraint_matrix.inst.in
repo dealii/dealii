@@ -76,8 +76,3 @@ for (Vec : SERIAL_VECTORS)
 {
     template void ConstraintMatrix::distribute<Vec>(Vec &) const;
 }
-
-for (S: COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
-{
-    template void ConstraintMatrix::distribute<T<S> >(T<S> &) const;
-}

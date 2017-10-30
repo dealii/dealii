@@ -13,14 +13,12 @@
 //
 // ---------------------------------------------------------------------
 
-for (S : REAL_SCALARS)
-{
-    template
-    void sum<S> (const LAPACKFullMatrix<S> &, const MPI_Comm &, LAPACKFullMatrix<S> &);
-}
 
 for (S : MPI_SCALARS)
 {
+    template
+    void sum<S> (const LAPACKFullMatrix<S> &, const MPI_Comm &, LAPACKFullMatrix<S> &);
+
     template
     void sum<S> (const Vector<S> &, const MPI_Comm &, Vector<S> &);
 
@@ -69,24 +67,6 @@ for (S : MPI_SCALARS)
             const ArrayView<S>    &);
 }
 
-
-for (S : COMPLEX_SCALARS)
-{
-    template
-    void sum<S> (const Vector<S> &, const MPI_Comm &, Vector<S> &);
-
-    template
-    void sum<S> (const FullMatrix<S> &, const MPI_Comm &, FullMatrix<S> &);
-
-    template
-    S sum<S> (const S &, const MPI_Comm &);
-
-    template
-    void sum<S> (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
-
-    template
-    void sum<S> (const ArrayView<const S> &, const MPI_Comm &, const ArrayView<S> &);
-}
 
 for (S : REAL_SCALARS; rank: RANKS; dim : SPACE_DIMENSIONS)
 {

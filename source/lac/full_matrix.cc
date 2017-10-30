@@ -32,9 +32,6 @@ template void FullMatrix<long double>::vmult<long double>(Vector<long double> &,
 template void FullMatrix<long double>::Tvmult<long double>(Vector<long double> &, const Vector<long double> &, bool) const;
 template void FullMatrix<long double>::add<long double> (const long double, const FullMatrix<long double> &);
 
-// This is needed if PETSc was compiled with complex, though, it may
-// be used elsewhere too.
-template void dealii::FullMatrix<double>::vmult<std::complex<double> >(dealii::Vector<std::complex<double> > &, dealii::Vector<std::complex<double> > const &, bool) const;
 
 // do a few functions that currently don't fit the scheme because they have
 // two template arguments that need to be different (the case of same
