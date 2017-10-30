@@ -7265,9 +7265,10 @@ namespace VectorTools
               for (unsigned int q=0; q<n_q_points; ++q)
                 {
                   // compute (f.n) n
-                  const Number f_dot_n
-                    = (data.psi_grads[q][k] * fe_values.normal_vector(q));
-                  const Tensor<1,spacedim,Number> f_dot_n_times_n (f_dot_n * fe_values.normal_vector(q));
+                  const typename ProductType<Number,double>::type f_dot_n
+                    = data.psi_grads[q][k] * fe_values.normal_vector(q);
+                  const Tensor<1,spacedim,Number> f_dot_n_times_n
+                    = f_dot_n * fe_values.normal_vector(q);
 
                   data.psi_grads[q][k] -= (data.function_grads[q][k] + f_dot_n_times_n);
                 }
