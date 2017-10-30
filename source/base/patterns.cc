@@ -1044,9 +1044,10 @@ namespace Patterns
             description << separator
                         << "[" << patterns[i]->description(style) << "]";
 
-            return description.str();
           }
+        return description.str();
       }
+
       default:
         AssertThrow(false, ExcNotImplemented());
       }

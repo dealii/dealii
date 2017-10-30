@@ -1271,6 +1271,8 @@ namespace Patterns
     static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
                   "Not all of the input arguments of this function "
                   "are derived from PatternBase");
+    static_assert(sizeof...(ps) > 0,
+                  "The number of PatternTypes must be greater than zero!");
     auto pattern_pointers = { (static_cast<const PatternBase *>(&ps))... };
     for (auto p : pattern_pointers)
       patterns.push_back (p->clone());
