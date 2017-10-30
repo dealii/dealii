@@ -4468,6 +4468,7 @@ namespace internal
           Implementation::renumber_mg_dofs (ghosted_new_numbers, relevant_dofs,
                                             *dof_handler, level, true);
 #else
+        (void) new_numbers;
         Assert(false, ExcNotImplemented());
 #endif
 

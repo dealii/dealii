@@ -1469,28 +1469,28 @@ namespace Patterns
       constexpr int max_list_rank()
       {
         return RankInfo<T>::list_rank;
-      };
+      }
 
       template <class T1, class T2, class... Types>
       constexpr int max_list_rank()
       {
         return std_cxx14::max(RankInfo<T1>::list_rank,
                               max_list_rank<T2,Types...>());
-      };
+      }
 
       // Helper function for map_rank
       template <class T>
       constexpr int max_map_rank()
       {
         return RankInfo<T>::map_rank;
-      };
+      }
 
       template <class T1, class T2, class... Types>
       constexpr int max_map_rank()
       {
         return std_cxx14::max(RankInfo<T1>::map_rank,
                               max_map_rank<T2,Types...>());
-      };
+      }
 
       // Rank of vector types
       template <class T>
