@@ -530,6 +530,7 @@ inline
 number lansy (const char *, const char *, const int *, const number *, const int *, number *)
 {
   Assert (false, ExcNotImplemented());
+  return number();
 }
 
 inline
@@ -576,6 +577,7 @@ inline
 number lange (const char *, const int *, const int *, const number *, const int *, number *)
 {
   Assert (false, ExcNotImplemented());
+  return number();
 }
 
 inline
