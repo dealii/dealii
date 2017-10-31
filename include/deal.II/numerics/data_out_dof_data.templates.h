@@ -322,6 +322,7 @@ namespace internal
     double get_component (const NumberType         value,
                           const ComponentExtractor extract_component)
     {
+      (void)extract_component;
       static_assert (numbers::NumberTraits<NumberType>::is_complex == false,
                      "This function must not be called for complex-valued data types.");
       Assert (extract_component == ComponentExtractor::real_part,
