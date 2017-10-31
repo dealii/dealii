@@ -92,6 +92,20 @@ namespace Utilities
       {
         return MPI_LONG_DOUBLE;
       }
+
+
+
+      inline MPI_Datatype mpi_type_id (const std::complex<float> *)
+      {
+        return MPI_COMPLEX;
+      }
+
+
+
+      inline MPI_Datatype mpi_type_id (const std::complex<double> *)
+      {
+        return MPI_DOUBLE_COMPLEX;
+      }
 #endif
 
 
