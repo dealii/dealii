@@ -114,10 +114,10 @@ namespace VectorTools
     //                        reinit()'d for the current cell
     //  function_values, offset: function_values is manipulated in place
     //                           starting at position offset
-    template <int dim, int spacedim, typename T2, typename T3>
+    template <int dim, int spacedim, typename FEValuesType, typename T3>
     void transform(const typename FiniteElementData<dim>::Conformity conformity,
                    const unsigned int offset,
-                   T2 &fe_values_jacobians,
+                   const FEValuesType &fe_values_jacobians,
                    T3 &function_values)
     {
       switch (conformity)
@@ -206,11 +206,11 @@ namespace VectorTools
     //   [ rest see above]
     // Output: the offset after we have handled the element at
     //   a given offset
-    template <int dim, int spacedim, typename T2, typename T3>
+    template <int dim, int spacedim, typename FEValuesType, typename T3>
     unsigned int
     apply_transform(const FiniteElement<dim, spacedim> &fe,
                     const unsigned int offset,
-                    T2 &fe_values_jacobians,
+                    const FEValuesType &fe_values_jacobians,
                     T3 &function_values)
     {
       if (const auto *system =
