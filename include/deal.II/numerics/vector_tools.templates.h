@@ -133,17 +133,19 @@ namespace VectorTools
               const auto &jacobians =
                 fe_values_jacobians.get_present_fe_values().get_jacobians();
 
-              auto shifted_view = boost::make_iterator_range(
-                                    std::begin(function_values[i]) + offset,
-                                    std::begin(function_values[i]) + offset + dim);
-              std::array<typename T3::value_type::value_type,dim> old_value;
-              std::copy(std::begin(shifted_view),
-                        std::end(shifted_view),
-                        std::begin(old_value));
+              const ArrayView<typename T3::value_type::value_type>
+              source (&function_values[i][0] + offset, dim);
+
+              Tensor<1,dim,typename ProductType<typename T3::value_type::value_type,double>::type>
+              destination;
 
               // value[m] <- sum jacobian_transpose[m][n] * old_value[n]:
               TensorAccessors::contract<1, 2, 1, dim>(
-                shifted_view, jacobians[i].transpose(), old_value);
+                destination, jacobians[i].transpose(), source);
+
+              // now copy things back into the input=output vector
+              for (unsigned int d=0; d<dim; ++d)
+                source[d] = destination[d];
             }
           break;
 
@@ -161,20 +163,20 @@ namespace VectorTools
                 fe_values_jacobians.get_present_fe_values()
                 .get_inverse_jacobians();
 
-              auto shifted_view = boost::make_iterator_range(
-                                    std::begin(function_values[i]) + offset,
-                                    std::begin(function_values[i]) + offset + dim);
-              std::array<typename T3::value_type::value_type,dim> old_value;
-              std::copy(std::begin(shifted_view),
-                        std::end(shifted_view),
-                        std::begin(old_value));
+              const ArrayView<typename T3::value_type::value_type>
+              source (&function_values[i][0] + offset, dim);
+
+              Tensor<1,dim,typename ProductType<typename T3::value_type::value_type,double>::type>
+              destination;
 
               // value[m] <- sum inverse_jacobians[m][n] * old_value[n]:
               TensorAccessors::contract<1, 2, 1, dim>(
-                shifted_view, inverse_jacobians[i], old_value);
+                destination, inverse_jacobians[i], source);
+              destination *= jacobians[i].determinant();
 
-              for (unsigned int j = 0; j < dim; ++j)
-                shifted_view[j] *= jacobians[i].determinant();
+              // now copy things back into the input=output vector
+              for (unsigned int d=0; d<dim; ++d)
+                source[d] = destination[d];
             }
           break;
 
