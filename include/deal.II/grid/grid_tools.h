@@ -790,15 +790,9 @@ namespace GridTools
 
   /**
    * Find and return an iterator to the active cell that surrounds a given
-   * point.
-   *
-   * This is solely a wrapper function for the function of same name below.  A
-   * Q1 mapping is used for the boundary, and the iterator to the cell in
-   * which the point resides is returned.
-   *
-   * It is recommended to use the other version of this function, as it
-   * simultaneously delivers the local coordinate of the given point without
-   * additional computational cost.
+   * point. This function simply calls the following one with a
+   * MappingQ1 for the mapping argument. See the following function for
+   * a more thorough discussion.
    *
    * @param mesh A variable of a type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".
@@ -817,16 +811,6 @@ namespace GridTools
    * given, then this function throws an exception of type
    * GridTools::ExcPointNotFound. You can catch this exception and decide what
    * to do in that case.
-   *
-   * @note When applied to a triangulation or DoF handler object based on a
-   * parallel::distributed::Triangulation object, the cell returned may in
-   * fact be a ghost or artificial cell (see
-   * @ref GlossArtificialCell
-   * and
-   * @ref GlossGhostCell).
-   * If so, many of the operations one may want to do on this cell (e.g.,
-   * evaluating the solution) may not be possible and you will have to decide
-   * what to do in that case.
    */
   template <int dim, template <int,int> class MeshType, int spacedim>
 #ifndef _MSC_VER
@@ -842,15 +826,13 @@ namespace GridTools
    * Find and return an iterator to the active cell that surrounds a given
    * point @p p.
    *
-   * The algorithm used in this function proceeds by first looking for vertex
-   * located closest to the given point, see find_closest_vertex(). Secondly,
-   * all adjacent cells to this point are found in the mesh, see
-   * find_cells_adjacent_to_vertex(). Lastly, for each of these cells, it is
-   * tested whether the point is inside. This check is performed using
-   * arbitrary boundary mappings.  Still, it is possible that due to roundoff
-   * errors, the point cannot be located exactly inside the unit cell. In this
-   * case, even points at a very small distance outside the unit cell are
-   * allowed.
+   * The algorithm used in this function proceeds by first looking for the vertex
+   * located closest to the given point, see GridTools::find_closest_vertex(). Secondly,
+   * all adjacent cells to this vertex are found in the mesh, see
+   * GridTools::find_cells_adjacent_to_vertex(). Lastly, for each of these cells, the
+   * function tests whether the point is inside. This check is performed using
+   * the given @p mapping argument to determine whether cells have straight
+   * or curved boundarys, and if the latter then how exactly they are curved.
    *
    * If a point lies on the boundary of two or more cells, then the algorithm
    * tries to identify the cell that is of highest refinement level.
@@ -903,6 +885,26 @@ namespace GridTools
    * If so, many of the operations one may want to do on this cell (e.g.,
    * evaluating the solution) may not be possible and you will have to decide
    * what to do in that case.
+   *
+   * @note Floating point arithmetic implies that a point will, in general,
+   * never lie <i>exactly</i> on an edge or a face. It may, however, lie
+   * on a vertex of a cell. In either case, it is not predictable which
+   * of the cells adjacent to a vertex or an edge/face this function returns
+   * when given a point that lies on a vertex or within floating point
+   * precision of an edge or face. Consequently, algorithms that call
+   * this function need to take into account that the returned cell
+   * will only contain the point approximately (to within round-off error)
+   * and that these cells may also be ghost cells or artificial cells
+   * if the triangulation is a parallel one. The latter may even be true
+   * if the given point is in fact a vertex of a locally owned cell: the
+   * returned cell may still be a ghost cell that happens to share this
+   * vertex with a locally owned one. The reason for this behavior is that
+   * it is the only way to guarantee that all processors that participate
+   * in a parallel triangulation will agree which cell contains a point.
+   * In other words, two processors that own two cells that come together
+   * at one vertex will return the same cell when called with this vertex.
+   * One of them will then return a locally owned cell and the other one
+   * a ghost cell.
    */
   template <int dim, template <int, int> class MeshType, int spacedim>
 #ifndef _MSC_VER
