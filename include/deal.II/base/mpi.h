@@ -164,6 +164,15 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&sums)[N]);
 
+    /**
+     * Like the previous function, but take the sums over the elements of an
+     * array as specified by the ArrayView arguments.
+     * In other words, the i-th element of the results
+     * array is the sum over the i-th entries of the input arrays from each
+     * processor.
+     *
+     * Input and output arrays may be the same.
+     */
     template <typename T>
     void sum (const ArrayView<const T> &values,
               const MPI_Comm           &mpi_communicator,
