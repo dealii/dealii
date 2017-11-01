@@ -291,7 +291,12 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
     }
 
   // Unit norm direction.
-  candidate /= candidate.norm();
+  const double norm = candidate.norm();
+
+  if (norm == 0)
+    return center;
+
+  candidate /= norm;
 
   return center+rho*candidate;
 }
