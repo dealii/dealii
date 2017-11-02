@@ -714,7 +714,7 @@ namespace
     // https://en.wikipedia.org/wiki/Transfinite_interpolation
     // S(u,v) = (1-v)c_1(u)+v c_3(u) + (1-u)c_2(v) + u c_4(v) -
     //   [(1-u)(1-v)P_0 + u(1-v) P_1 + (1-u)v P_2 + uv P_3]
-    const std::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell> vertices
+    const std::array<Point<spacedim>, 4> vertices
     {{cell.vertex(0), cell.vertex(1), cell.vertex(2), cell.vertex(3)}};
 
     Point<spacedim> new_point;
@@ -777,6 +777,33 @@ namespace
     return new_point;
   }
 
+  // this is replicated from GeometryInfo::face_to_cell_vertices since we need
+  // it very often in compute_transfinite_interpolation and the function is
+  // performance critical
+  unsigned int
+  face_to_cell_vertices_3d[6][4] =
+  {
+    {0, 2, 4, 6},
+    {1, 3, 5, 7},
+    {0, 4, 1, 5},
+    {2, 6, 3, 7},
+    {0, 1, 2, 3},
+    {4, 5, 6, 7}
+  };
+
+  // this is replicated from GeometryInfo::face_to_cell_lines since we need it
+  // very often in compute_transfinite_interpolation and the function is
+  // performance critical
+  unsigned int face_to_cell_lines_3d[6][4] =
+  {
+    {8,10, 0, 4},
+    {9,11, 1, 5},
+    {2, 6, 8, 9},
+    {3, 7,10,11},
+    {0, 1, 2, 3},
+    {4, 5, 6, 7}
+  };
+
   // version for 3D
   template <typename AccessorType>
   Point<AccessorType::space_dimension>
@@ -790,12 +817,19 @@ namespace
 
     // Same approach as in 2D, but adding the faces, subtracting the edges, and
     // adding the vertices
+    const std::array<Point<spacedim>, 8> vertices
+    {
+      {
+        cell.vertex(0), cell.vertex(1), cell.vertex(2), cell.vertex(3),
+        cell.vertex(4), cell.vertex(5), cell.vertex(6), cell.vertex(7)
+      }
+    };
     Point<spacedim> new_point;
 
     if (cell_is_flat)
       for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_cell; ++v)
         new_point += GeometryInfo<3>::d_linear_shape_function(chart_point, v) *
-                     cell.vertex(v);
+                     vertices[v];
     else
       {
         // identify the weights for the vertices and lines to be accumulated
@@ -829,18 +863,18 @@ namespace
                 for (unsigned int line=0; line<GeometryInfo<2>::lines_per_cell; ++line)
                   {
                     const double line_weight = line%2 ? quad_point[line/2] : 1-quad_point[line/2];
-                    weights_lines[GeometryInfo<3>::face_to_cell_lines(face, line)] +=
+                    weights_lines[face_to_cell_lines_3d[face][line]] +=
                       my_weight * line_weight;
                   }
                 for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-                  weights_vertices[GeometryInfo<3>::face_to_cell_vertices(face, v)]
+                  weights_vertices[face_to_cell_vertices_3d[face][v]]
                   -= GeometryInfo<2>::d_linear_shape_function(quad_point, v) * my_weight;
               }
             else
               {
                 for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
                   {
-                    points[v] = cell.vertex(GeometryInfo<3>::face_to_cell_vertices(face,v));
+                    points[v] = vertices[face_to_cell_vertices_3d[face][v]];
                     weights[v] = GeometryInfo<2>::d_linear_shape_function(quad_point, v);
                   }
                 new_point += my_weight *
@@ -880,8 +914,8 @@ namespace
               }
             else
               {
-                points[0] = cell.vertex(GeometryInfo<3>::line_to_cell_vertices(line,0));
-                points[1] = cell.vertex(GeometryInfo<3>::line_to_cell_vertices(line,1));
+                points[0] = vertices[GeometryInfo<3>::line_to_cell_vertices(line,0)];
+                points[1] = vertices[GeometryInfo<3>::line_to_cell_vertices(line,1)];
                 weights[0] = 1. - line_point;
                 weights[1] = line_point;
                 new_point -= my_weight *
@@ -892,7 +926,7 @@ namespace
 
         // finally add the contribution of the
         for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
-          new_point += weights_vertices[v] * cell.vertex(v);
+          new_point += weights_vertices[v] * vertices[v];
       }
     return new_point;
   }
