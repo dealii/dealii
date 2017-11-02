@@ -17,7 +17,7 @@
 # Configuration for the boost library:
 #
 
-IF(NOT FEATURE_ZLIB_PROCESSED)                                     
+IF(NOT FEATURE_ZLIB_PROCESSED)
   MESSAGE(FATAL_ERROR "\n"
     "Internal build system error: The configuration of "
     "DEAL_II_WITH_BOOST depends on "
@@ -87,6 +87,12 @@ ENDMACRO()
 MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
   FIND_PACKAGE(BOOST)
 
+  IF(NOT "${BOOST_DIR}" STREQUAL "" AND NOT BOOST_FOUND)
+    MESSAGE(ERROR
+            "Could not find Boost in the provided prefix"
+           )
+  ENDIF()
+
   IF(BOOST_FOUND)
     SET(${var} TRUE)
 
@@ -122,11 +128,20 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
       IF(${_boost_iostreams_usuable})
         MESSAGE(STATUS "Boost.Iostreams is usuable.")
       ELSE()
-        MESSAGE(STATUS
-                "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
-                "with zlib support but a simple test failed! "
-                "Therefore, the bundled boost package is used."
-               )
+        # Do not silently switch to internal Boost when user wanted to use
+        # a specific one
+        IF("${BOOST_DIR}" STREQUAL "")
+          MESSAGE(STATUS
+                  "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
+                  "with zlib support but a simple test failed! "
+                  "Therefore, the bundled boost package is used."
+                 )
+        ELSE()
+          MESSAGE(ERROR
+                  "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
+                  "with zlib support but a simple test failed! "
+                 )
+        ENDIF()
         SET(BOOST_ADDITIONAL_ERROR_STRING
             "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
             "with zlib support but a simple test failed! "
