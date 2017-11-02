@@ -114,7 +114,8 @@ or set the relevant variables by hand in ccmake."
     ${${_feature}_ADDITIONAL_ERROR_STRING}
     "Please ensure that a suitable ${_feature_lowercase} library is installed on your computer.\n"
     "If the library is not at a default location, either provide some hints "
-    "for autodetection,${_hint_snippet}${_bundled_snippet}"
+    "for autodetection,${_hint_snippet}"
+    ${_bundled_snippet}
     )
 ENDMACRO()
 

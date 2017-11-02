@@ -17,7 +17,7 @@
 # Configuration for the boost library:
 #
 
-IF(NOT FEATURE_ZLIB_PROCESSED)                                     
+IF(NOT FEATURE_ZLIB_PROCESSED)
   MESSAGE(FATAL_ERROR "\n"
     "Internal build system error: The configuration of "
     "DEAL_II_WITH_BOOST depends on "
