@@ -696,6 +696,21 @@ ChartManifold<dim,spacedim,chartdim>::ChartManifold (const Tensor<1,chartdim> &p
 template <int dim, int spacedim, int chartdim>
 Point<spacedim>
 ChartManifold<dim,spacedim,chartdim>::
+get_intermediate_point (const Point<spacedim> &p1,
+                        const Point<spacedim> &p2,
+                        const double w) const
+{
+  const std::array<Point<spacedim>, 2> points({{p1, p2}});
+  const std::array<double, 2> weights({{1.-w, w}});
+  return get_new_point(make_array_view(points.begin(), points.end()),
+                       make_array_view(weights.begin(), weights.end()));
+}
+
+
+
+template <int dim, int spacedim, int chartdim>
+Point<spacedim>
+ChartManifold<dim,spacedim,chartdim>::
 get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
                const ArrayView<const double>          &weights) const
 {
