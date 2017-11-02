@@ -1,0 +1,4 @@
+Improved: SphericalManifold::get_new_point uses a Newton-type
+optimization algorithm instead of a simple averaging.
+<br>
+(Daniel Arndt, 2017/11/02)
