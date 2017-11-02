@@ -111,14 +111,17 @@ namespace Particles
     types::particle_index locally_highest_index = 0;
     unsigned int local_max_particles_per_cell = 0;
     unsigned int current_particles_per_cell = 0;
-    typename Triangulation<dim,spacedim>::active_cell_iterator current_cell;
+    typename Triangulation<dim,spacedim>::active_cell_iterator current_cell = triangulation->begin_active();
 
     for (particle_iterator particle = begin(); particle != end(); ++particle)
       {
         locally_highest_index = std::max(locally_highest_index,particle->get_id());
 
         if (particle->get_surrounding_cell(*triangulation) != current_cell)
-          current_particles_per_cell = 0;
+          {
+            current_particles_per_cell = 0;
+            current_cell = particle->get_surrounding_cell(*triangulation);
+          }
 
         ++current_particles_per_cell;
         local_max_particles_per_cell = std::max(local_max_particles_per_cell,
@@ -242,6 +245,15 @@ namespace Particles
   ParticleHandler<dim,spacedim>::n_global_particles() const
   {
     return global_number_of_particles;
+  }
+
+
+
+  template <int dim,int spacedim>
+  types::particle_index
+  ParticleHandler<dim,spacedim>::n_global_max_particles_per_cell() const
+  {
+    return global_max_particles_per_cell;
   }
 
 

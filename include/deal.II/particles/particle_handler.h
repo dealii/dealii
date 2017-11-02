@@ -212,6 +212,14 @@ namespace Particles
     types::particle_index n_global_particles() const;
 
     /**
+     * Return the maximum number of particles per cell the last
+     * time the update_n_global_particles() function was called.
+     *
+     * @return Maximum number of particles in one cell in simulation.
+     */
+    types::particle_index n_global_max_particles_per_cell() const;
+
+    /**
      * Return the number of particles in the local part of the
      * triangulation.
      */

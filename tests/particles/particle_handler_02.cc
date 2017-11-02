@@ -32,6 +32,7 @@ void test ()
     parallel::distributed::Triangulation<dim,spacedim> tr(MPI_COMM_WORLD);
 
     GridGenerator::hyper_cube(tr);
+    tr.refine_global(1);
     MappingQ<dim,spacedim> mapping(1);
 
     Particles::ParticleHandler<dim,spacedim> particle_handler(tr,mapping);
@@ -59,9 +60,19 @@ void test ()
       GridTools::find_active_cell_around_point(mapping, tr, particle.get_location());
 
     particle_handler.insert_particle(particle,cell_position.first);
+    particle_handler.insert_particle(particle,cell_position.first);
+
+    position(0) = 0.7;
+    Particles::Particle<dim,spacedim> particle2(position,reference_position,9);
+
+    cell_position = GridTools::find_active_cell_around_point(mapping, tr, particle2.get_location());
+    particle_handler.insert_particle(particle2,cell_position.first);
+
     particle_handler.update_cached_numbers();
 
     deallog << "Particle number: " << particle_handler.n_global_particles() << std::endl;
+    deallog << "Next free particle index: " << particle_handler.get_next_free_particle_index() << std::endl;
+    deallog << "Max particles per cell: " << particle_handler.n_global_max_particles_per_cell() << std::endl;
 
     for (auto particle = particle_handler.begin(); particle != particle_handler.end(); ++particle)
       {
