@@ -936,6 +936,16 @@ public:
    */
   virtual
   Point<spacedim>
+  get_intermediate_point (const Point<spacedim> &p1,
+                          const Point<spacedim> &p2,
+                          const double w) const override;
+
+  /**
+   * Refer to the general documentation of this class and the documentation of
+   * the base class for more information.
+   */
+  virtual
+  Point<spacedim>
   get_new_point(const ArrayView<const Point<spacedim>> &surrounding_points,
                 const ArrayView<const double>          &weights) const override;
 
