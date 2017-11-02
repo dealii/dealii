@@ -1,18 +1,18 @@
 
 DEAL::-----------------------------------
-DEAL:: Ref      = 1      RelErr  = -0.00177068
-DEAL:: Ref      = 2      RelErr  = -0.000124358
-DEAL:: Ref      = 3      RelErr  = -8.01488e-06
-DEAL:: Ref      = 4      RelErr  = -5.04782e-07
-DEAL:: Ref      = 5      RelErr  = -3.16096e-08
-DEAL:: Ref      = 6      RelErr  = -1.97752e-09
-DEAL:: Ref      = 7      RelErr  = -1.27465e-10
+DEAL:: Ref      = 1      RelErr  = -0.00176962
+DEAL:: Ref      = 2      RelErr  = -0.000124049
+DEAL:: Ref      = 3      RelErr  = -7.99429e-06
+DEAL:: Ref      = 4      RelErr  = -5.03485e-07
+DEAL:: Ref      = 5      RelErr  = -3.15283e-08
+DEAL:: Ref      = 6      RelErr  = -1.97238e-09
+DEAL:: Ref      = 7      RelErr  = -1.27008e-10
 DEAL::-----------------------------------
-DEAL:: Ref      = 1      RelErr  = -0.00304211
-DEAL:: Ref      = 2      RelErr  = -0.000191983
-DEAL:: Ref      = 3      RelErr  = -1.19955e-05
-DEAL:: Ref      = 4      RelErr  = -7.49493e-07
-DEAL:: Ref      = 5      RelErr  = -4.68391e-08
-DEAL:: Ref      = 6      RelErr  = -2.92737e-09
-DEAL:: Ref      = 7      RelErr  = -1.82956e-10
+DEAL:: Ref      = 1      RelErr  = -0.00298061
+DEAL:: Ref      = 2      RelErr  = -0.000190769
+DEAL:: Ref      = 3      RelErr  = -1.19680e-05
+DEAL:: Ref      = 4      RelErr  = -7.48575e-07
+DEAL:: Ref      = 5      RelErr  = -4.67944e-08
+DEAL:: Ref      = 6      RelErr  = -2.92480e-09
+DEAL:: Ref      = 7      RelErr  = -1.82817e-10
 DEAL::-----------------------------------
