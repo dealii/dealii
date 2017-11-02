@@ -117,6 +117,7 @@ private:
 };
 
 
+
 /**
  * Manifold description for a spherical space coordinate system.
  *
@@ -161,9 +162,11 @@ private:
  * connecting points on the surface of the sphere. In the examples above,
  * the PolarManifold class implements the first way of connecting two
  * points on the surface of a sphere, while SphericalManifold implements
- * the second way, i.e., if the codimension of the Manifold is one,
- * than this Manifold connects points using geodesics. In all other cases
- * it is a continuus extension of the codimension one case.
+ * the second way, i.e., this Manifold connects points using geodesics.
+ * If more than two points are involved through a
+ * SphericalManifold::get_new_points() call, a so-called spherical average is
+ * used where the final point minimizes the weighted distance to all other
+ * points via geodesics.
  *
  * In particular, this class implements a Manifold that joins any two
  * points in space by first projecting them onto the surface of a
@@ -190,13 +193,16 @@ private:
  * points across the center, they would travel on spherical
  * coordinates, avoiding the center.
  *
- * The ideal geometry for this Manifold is an HyperShell. If you plan
- * to use this Manifold on a HyperBall, you have to make sure you do
- * not attach this Manifold to the cell containing the center.
+ * The ideal geometry for this Manifold is an HyperShell. If you plan to use
+ * this Manifold on a HyperBall, you have to make sure you do not attach this
+ * Manifold to the cell containing the center. It is advisable to combine this
+ * class with TransfiniteInterpolationManifold to ensure a smooth transition
+ * from a curved shape to the straight coordinate system in the center of the
+ * ball.
  *
  * @ingroup manifold
  *
- * @author Mauro Bardelloni, Luca Heltai, 2016
+ * @author Mauro Bardelloni, Luca Heltai, Daniel Arndt, 2016, 2017
  */
 template <int dim, int spacedim = dim>
 class SphericalManifold : public Manifold<dim, spacedim>
@@ -243,6 +249,7 @@ public:
    */
   const Point<spacedim> center;
 };
+
 
 
 /**
@@ -331,6 +338,7 @@ private:
   double tolerance;
 
 };
+
 
 
 /**
@@ -471,6 +479,7 @@ private:
 };
 
 
+
 /**
  * Manifold description for the surface of a Torus in three dimensions. The
  * Torus is assumed to be in the x-z plane. The reference coordinate system
@@ -609,13 +618,14 @@ private:
  * two vertices using the weights 0.25 and 0.75 for the two vertices should
  * give the same result as first computing the mid point at 0.5 and then again
  * compute the midpoint between the first vertex and coarse mid point. This is
- * the case for PolarManifold but not for Spherical manifold, so be careful
- * when using the latter. In case the quality of the manifold is not good
- * enough, upon mesh refinement it may happen that the transformation to a
- * chart inside the get_new_point() or get_new_points() methods produces
- * points that are outside the unit cell. Then this class throws an exception
- * of type Mapping::ExcTransformationFailed. In that case, the mesh should be
- * refined before attaching this class, as done in the following example:
+ * the case for most of the manifold classes provided by deal.II, such as
+ * SphericalManifold or PolarManifold, but it might be violated by naive
+ * implementations. In case the quality of the manifold is not good enough,
+ * upon mesh refinement it may happen that the transformation to a chart
+ * inside the get_new_point() or get_new_points() methods produces points that
+ * are outside the unit cell. Then this class throws an exception of type
+ * Mapping::ExcTransformationFailed. In that case, the mesh should be refined
+ * before attaching this class, as done in the following example:
  *
  * @code
  * SphericalManifold<dim> spherical_manifold;
@@ -625,7 +635,7 @@ private:
  *
  * triangulation.set_all_manifold_ids(1);
  * triangulation.set_all_manifold_ids_on_boundary(0);
- * triangulation.set_manifold (0, polar_manifold);
+ * triangulation.set_manifold (0, spherical_manifold);
  * inner_manifold.initialize(triangulation);
  * triangulation.set_manifold (1, inner_manifold);
  * triangulation.refine_global(1);
