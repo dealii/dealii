@@ -88,7 +88,7 @@
  * object (derived from Manifold). Notice that Triangulation uses only
  * the Manifold interface, not the Boundary interface. Other tools,
  * however, might need to compute exact normals at quadrature points,
- * and therefore a wrapper to query Boundary objects is provided. 
+ * and therefore a wrapper to query Boundary objects is provided.
  *
  *
  * <h3>An example</h3>
@@ -136,7 +136,7 @@
  *  const HyperShellBoundary<2> boundary_description(center);
  *  triangulation.set_boundary (0, boundary_description);
  *
- *  triangulation.refine_global (3); 
+ *  triangulation.refine_global (3);
  * @endcode
  * This code is better, producing the following mesh:
  *
@@ -171,8 +171,8 @@
  *    cell = triangulation.begin_active(),
  *    endc = triangulation.end();
  *  for (; cell!=endc; ++cell)
- *    cell->set_all_manifold_ids (0);  
- *  
+ *    cell->set_all_manifold_ids (0);
+ *
  *  triangulation.refine_global (3);
  * @endcode
  * This leads to the following mesh:
@@ -206,7 +206,7 @@
  *  const HyperShellBoundary<2> boundary_description(center);
  *  triangulation.set_boundary (0, boundary_description);
  *
- *  triangulation.refine_global (3); 
+ *  triangulation.refine_global (3);
  * @endcode
  *
  * @image html hypershell-boundary-only-4.png ""
@@ -245,8 +245,8 @@
  *    cell = triangulation.begin_active(),
  *    endc = triangulation.end();
  *  for (; cell!=endc; ++cell)
- *    cell->set_all_manifold_ids (0);  
- *  
+ *    cell->set_all_manifold_ids (0);
+ *
  *  triangulation.refine_global (3);
  * @endcode
  *
@@ -258,7 +258,14 @@
  * in the context of what GridGenerator::hyper_shell() produces in 3d
  * (see the documentation of this function). It is also germane to the
  * cases discussed in the @ref GlossDistorted "glossary entry on distorted cells".
- * 
+ *
+ * Another example where the manifold description not just at the boundary but
+ * also in the interior of the domain matters is for high-order methods. When
+ * using cubic or even higher degrees of the polynomials, full convergence is
+ * typically only obtained if a curved description at a boundary transitions
+ * into a straight description inside the domain (for example when meshing a
+ * ball including the origin) over a layer of finite thickness. This is
+ * realized by the class TransfiniteInterpolationManifold.
  *
  * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
  *
