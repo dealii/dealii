@@ -1,0 +1,49 @@
+
+DEAL::PolarManifold between points [1.00 0.100] and [0.100 1.00] with weight 0.100
+DEAL::Intermediate point: 0.976938594605 0.235777400045
+DEAL::get_new_point:      0.976938594605 0.235777400045
+DEAL::PolarManifold between points [1.00 0.100] and [0.100 1.00] with weight 0.500
+DEAL::Intermediate point: 0.710633520178 0.710633520178
+DEAL::get_new_point:      0.710633520178 0.710633520178
+DEAL::PolarManifold between points [1.00 0.100] and [0.100 1.00] with weight 0.900
+DEAL::Intermediate point: 0.235777400045 0.976938594605
+DEAL::get_new_point:      0.235777400045 0.976938594605
+DEAL::PolarManifold between points [1.00 0.100] and [1.00 -0.100] with weight 0.100
+DEAL::Intermediate point: 1.00179457081 0.0800477225761
+DEAL::get_new_point:      1.00179457081 0.0800477225761
+DEAL::PolarManifold between points [1.00 0.100] and [1.00 -0.100] with weight 0.500
+DEAL::Intermediate point: 1.00498756211 9.06555268871e-17
+DEAL::get_new_point:      1.00498756211 9.06555268871e-17
+DEAL::PolarManifold between points [1.00 0.100] and [1.00 -0.100] with weight 0.900
+DEAL::Intermediate point: 1.00179457081 -0.0800477225761
+DEAL::get_new_point:      1.00179457081 -0.0800477225761
+DEAL::PolarManifold between points [1.00 0.100] and [-1.00 -0.0990] with weight 0.500
+DEAL::Intermediate point: -0.0994999878052 1.00000012499
+DEAL::get_new_point:      -0.0994999878052 1.00000012499
+DEAL::PolarManifold between points [1.00 0.100] and [-1.00 -0.101] with weight 0.500
+DEAL::Intermediate point: 0.100499987687 -1.00000012499
+DEAL::get_new_point:      0.100499987687 -1.00000012499
+DEAL::CylindricalManifold between points [1.00 0.100 0.200] and [0.100 1.00 0.200] with weight 0.100
+DEAL::Intermediate point: 0.976938594605 0.235777400045 0.200000000000
+DEAL::get_new_point:      0.976938594605 0.235777400045 0.200000000000
+DEAL::CylindricalManifold between points [1.00 0.100 0.200] and [0.100 1.00 0.200] with weight 0.500
+DEAL::Intermediate point: 0.710633520178 0.710633520178 0.200000000000
+DEAL::get_new_point:      0.710633520178 0.710633520178 0.200000000000
+DEAL::CylindricalManifold between points [1.00 0.100 0.200] and [0.100 1.00 0.200] with weight 0.900
+DEAL::Intermediate point: 0.235777400045 0.976938594605 0.200000000000
+DEAL::get_new_point:      0.235777400045 0.976938594605 0.200000000000
+DEAL::CylindricalManifold between points [1.00 0.100 0.200] and [-1.00 -0.0990 0.200] with weight 0.500
+DEAL::Intermediate point: -0.0994999878052 1.00000012499 0.200000000000
+DEAL::get_new_point:      -0.0994999878052 1.00000012499 0.200000000000
+DEAL::CylindricalManifold between points [1.00 0.100 0.200] and [-1.00 -0.101 0.200] with weight 0.500
+DEAL::Intermediate point: 0.100499987687 -1.00000012499 0.200000000000
+DEAL::get_new_point:      0.100499987687 -1.00000012499 0.200000000000
+DEAL::CylindricalManifold between points [1.00 0.100 0.200] and [-1.00 -0.101 0.500] with weight 0.100
+DEAL::Intermediate point: 0.981989158853 -0.213816255219 0.230000000000
+DEAL::get_new_point:      0.981989158853 -0.213816255219 0.230000000000
+DEAL::CylindricalManifold between points [1.00 0.100 0.200] and [-1.00 -0.101 0.500] with weight 0.500
+DEAL::Intermediate point: 0.100499987687 -1.00000012499 0.350000000000
+DEAL::get_new_point:      0.100499987687 -1.00000012499 0.350000000000
+DEAL::CylindricalManifold between points [1.00 0.100 0.200] and [-1.00 -0.101 0.500] with weight 0.900
+DEAL::Intermediate point: -0.919876745725 -0.404978606564 0.470000000000
+DEAL::get_new_point:      -0.919876745725 -0.404978606564 0.470000000000
