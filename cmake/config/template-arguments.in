@@ -18,15 +18,27 @@ REAL_AND_COMPLEX_SCALARS    := { double;
                                  std::complex<double>;
                                  std::complex<float> }
 
+// differentiable Adol-C scalar types
+DIFFERENTIABLE_ADOLC_REAL_SCALARS := {
+        @DEAL_II_EXPAND_ADOLC_TYPES@;
+        }
+
+// differentiable Sacado scalar types
+DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS := {
+        @DEAL_II_EXPAND_TRILINOS_SACADO_TYPES@;
+        }
+
 // differentiable scalar types
 DIFFERENTIABLE_REAL_SCALARS := {
-		    @DEAL_II_EXPAND_TRILINOS_SACADO_TYPES@;
-		    } 
+        @DEAL_II_EXPAND_TRILINOS_SACADO_TYPES@;
+        @DEAL_II_EXPAND_ADOLC_TYPES@;
+        }
 
 // all possible scalar types
 ALL_SCALAR_TYPES := {
     double; float ; std::complex<double>; std::complex<float>;
     @DEAL_II_EXPAND_TRILINOS_SACADO_TYPES@;
+    @DEAL_II_EXPAND_ADOLC_TYPES@;
 }
 
 // scalar types that have a corresponding MPI datatype and that we can
@@ -211,4 +223,3 @@ RANKS := { 1; 2; 3; 4 }
 OUTPUT_FLAG_TYPES := { DXFlags; UcdFlags; GnuplotFlags; PovrayFlags; EpsFlags;
                        GmvFlags; TecplotFlags; VtkFlags; SvgFlags;
                        Deal_II_IntermediateFlags }
-
