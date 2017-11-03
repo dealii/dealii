@@ -17,10 +17,13 @@ INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
   adolc_number_types.cc
+  sacado_number_types.cc
   )
 
 SET(_inst
   adolc_number_types.inst.in
+  sacado_number_types.inst1.in
+  sacado_number_types.inst2.in
   )
 
 FILE(GLOB _header
