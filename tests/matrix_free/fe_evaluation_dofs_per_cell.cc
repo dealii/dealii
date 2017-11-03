@@ -31,12 +31,20 @@
 template <typename FEEval>
 void print_info(const FEEval &eval)
 {
-  deallog << "FEEvaluation::dimension: " << FEEval::dimension << std::endl;
-  deallog << "FEEvaluation::n_components: " << FEEval::n_components << std::endl;
-  deallog << "FEEvaluation::static_n_q_points: " << FEEval::static_n_q_points << std::endl;
-  deallog << "FEEvaluation::static_dofs_per_component: " << FEEval::static_dofs_per_component << std::endl;
-  deallog << "FEEvaluation::tensor_dofs_per_cell: " << FEEval::tensor_dofs_per_cell << std::endl;
-  deallog << "FEEvaluation::static_dofs_per_cell: " << FEEval::static_dofs_per_cell << std::endl;
+  // copy static variables to int to avoid taking references (with possibly
+  // undefined references) when inside deallog::operator<<
+  unsigned int v = FEEval::dimension;
+  deallog << "FEEvaluation::dimension: " << v << std::endl;
+  v = FEEval::n_components;
+  deallog << "FEEvaluation::n_components: " << v << std::endl;
+  v = FEEval::static_n_q_points;
+  deallog << "FEEvaluation::static_n_q_points: " << v << std::endl;
+  v = FEEval::static_dofs_per_component;
+  deallog << "FEEvaluation::static_dofs_per_component: " << v << std::endl;
+  v = FEEval::tensor_dofs_per_cell;
+  deallog << "FEEvaluation::tensor_dofs_per_cell: " << v << std::endl;
+  v = FEEval::static_dofs_per_cell;
+  deallog << "FEEvaluation::static_dofs_per_cell: " << v << std::endl;
   deallog << "FEEvaluation::dofs_per_component: " << eval.dofs_per_component << std::endl;
   deallog << "FEEvaluation::dofs_per_cell: " << eval.dofs_per_cell << std::endl;
   deallog << "FEEvaluation::n_q_points: " << eval.n_q_points << std::endl;
