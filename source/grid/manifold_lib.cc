@@ -92,6 +92,7 @@ namespace internal
 }
 
 
+
 // ============================================================
 // PolarManifold
 // ============================================================
@@ -101,6 +102,8 @@ PolarManifold<dim,spacedim>::PolarManifold(const Point<spacedim> center):
   ChartManifold<dim,spacedim,spacedim>(PolarManifold<dim,spacedim>::get_periodicity()),
   center(center)
 {}
+
+
 
 template <int dim, int spacedim>
 Tensor<1,spacedim>
@@ -115,6 +118,8 @@ PolarManifold<dim,spacedim>::get_periodicity()
   periodicity[spacedim-1] = 2*numbers::PI;
   return periodicity;
 }
+
+
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -146,6 +151,8 @@ PolarManifold<dim,spacedim>::push_forward(const Point<spacedim> &spherical_point
       }
   return p+center;
 }
+
+
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -182,6 +189,8 @@ PolarManifold<dim,spacedim>::pull_back(const Point<spacedim> &space_point) const
     }
   return p;
 }
+
+
 
 template <int dim, int spacedim>
 DerivativeForm<1,spacedim,spacedim>
@@ -228,6 +237,8 @@ PolarManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &spheri
   return DX;
 }
 
+
+
 // ============================================================
 // SphericalManifold
 // ============================================================
@@ -236,6 +247,8 @@ template <int dim, int spacedim>
 SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center):
   center(center)
 {}
+
+
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -298,6 +311,8 @@ get_intermediate_point (const Point<spacedim> &p1,
   return Point<spacedim>(center + (w*r2+(1.0-w)*r1)*P);
 }
 
+
+
 template <int dim, int spacedim>
 Tensor<1,spacedim>
 SphericalManifold<dim,spacedim>::
@@ -339,6 +354,7 @@ get_tangent_vector (const Point<spacedim> &p1,
 
   return (r1-r2)*e1 + r1*gamma*tg;
 }
+
 
 
 // The main part of the implementation uses the ideas in the publication
@@ -497,6 +513,8 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
   return center + rho*candidate;
 }
 
+
+
 // ============================================================
 // CylindricalManifold
 // ============================================================
@@ -525,7 +543,6 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const Point<spacedim> &d
   // easier.
   Assert (spacedim==3,
           ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
-
 }
 
 
@@ -726,6 +743,9 @@ FunctionManifold<dim,spacedim,chartdim>::pull_back(const Point<spacedim> &space_
 
 
 
+// ============================================================
+// TorusManifold
+// ============================================================
 template <int dim>
 Point<3>
 TorusManifold<dim>::pull_back(const Point<3> &p) const
@@ -797,6 +817,9 @@ TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
 
 
 
+// ============================================================
+// TransfiniteInterpolationManifold
+// ============================================================
 template <int dim, int spacedim>
 TransfiniteInterpolationManifold<dim,spacedim>::TransfiniteInterpolationManifold()
   :
@@ -934,7 +957,7 @@ namespace
   // this is replicated from GeometryInfo::face_to_cell_vertices since we need
   // it very often in compute_transfinite_interpolation and the function is
   // performance critical
-  unsigned int
+  static constexpr unsigned int
   face_to_cell_vertices_3d[6][4] =
   {
     {0, 2, 4, 6},
@@ -948,7 +971,8 @@ namespace
   // this is replicated from GeometryInfo::face_to_cell_lines since we need it
   // very often in compute_transfinite_interpolation and the function is
   // performance critical
-  unsigned int face_to_cell_lines_3d[6][4] =
+  static constexpr unsigned int
+  face_to_cell_lines_3d[6][4] =
   {
     {8,10, 0, 4},
     {9,11, 1, 5},
