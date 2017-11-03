@@ -1233,7 +1233,7 @@ public:
    * and <code>parameters:section1/subsection1/someentry</code>. Because
    * special characters can appear in the section and entry names, these
    * will be "mangled". Here, all characters except <code>[a-zA-Z0-9]</code>
-   * are replaced by <code>_XX</code>, where <code>XX</code> is the digit
+   * are replaced by <code>_XX</code>, where <code>XX</code> is the two-digit
    * ascii code of the character in hexadecimal encoding (so a space becomes
    * <code>_20</code> for example).
    *
