@@ -32,6 +32,8 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/sundials/copy.h>
 
+#include <sundials/sundials_config.h>
+
 #include <iostream>
 #include <iomanip>
 #include <arkode/arkode_impl.h>
@@ -137,7 +139,9 @@ namespace SUNDIALS
     template<typename VectorType>
     int t_arkode_solve_jacobian(ARKodeMem arkode_mem,
                                 N_Vector b,
+#if DEAL_II_SUNDIALS_VERSION_LT(3,0,0)
                                 N_Vector,
+#endif
                                 N_Vector ycur,
                                 N_Vector fcur)
     {
@@ -186,8 +190,13 @@ namespace SUNDIALS
 
     template<typename VectorType>
     int t_arkode_solve_mass(ARKodeMem arkode_mem,
+#if DEAL_II_SUNDIALS_VERSION_LT(3,0,0)
                             N_Vector b,
-                            N_Vector)
+                            N_Vector
+#else
+                            N_Vector b
+#endif
+                           )
     {
       ARKode<VectorType> &solver = *static_cast<ARKode<VectorType> *>(arkode_mem->ark_user_data);
       GrowingVectorMemory<VectorType> mem;
@@ -424,7 +433,9 @@ namespace SUNDIALS
         if (setup_jacobian)
           {
             ARKode_mem->ark_lsetup = t_arkode_setup_jacobian<VectorType>;
+#if DEAL_II_SUNDIALS_VERSION_LT(3,0,0)
             ARKode_mem->ark_setupNonNull = true;
+#endif
           }
       }
     else
@@ -441,7 +452,9 @@ namespace SUNDIALS
         if (setup_mass)
           {
             ARKode_mem->ark_msetup = t_arkode_setup_mass<VectorType>;
+#if DEAL_II_SUNDIALS_VERSION_LT(3,0,0)
             ARKode_mem->ark_MassSetupNonNull = true;
+#endif
           }
       }
 

@@ -22,17 +22,24 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/block_vector.h>
 #ifdef DEAL_II_WITH_TRILINOS
-#include <deal.II/lac/trilinos_parallel_block_vector.h>
-#include <deal.II/lac/trilinos_vector.h>
+#  include <deal.II/lac/trilinos_parallel_block_vector.h>
+#  include <deal.II/lac/trilinos_vector.h>
 #endif
 #ifdef DEAL_II_WITH_PETSC
-#include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#  include <deal.II/lac/petsc_parallel_block_vector.h>
+#  include <deal.II/lac/petsc_parallel_vector.h>
 #endif
 #include <deal.II/base/utilities.h>
 #include <deal.II/sundials/copy.h>
 
-#include <kinsol/kinsol_dense.h>
+#include <sundials/sundials_config.h>
+#if DEAL_II_SUNDIALS_VERSION_GTE(3,0,0)
+#  include <sunmatrix/sunmatrix_dense.h>
+#  include <sunlinsol/sunlinsol_dense.h>
+#  include <kinsol/kinsol_direct.h>
+#else
+#  include <kinsol/kinsol_dense.h>
+#endif
 
 #include <iostream>
 #include <iomanip>
@@ -254,12 +261,20 @@ namespace SUNDIALS
         if (setup_jacobian)
           {
             KIN_mem->kin_lsetup = t_kinsol_setup_jacobian<VectorType>;
+#if DEAL_II_SUNDIALS_VERSION_LT(3,0,0)
             KIN_mem->kin_setupNonNull = true;
+#endif
           }
       }
     else
       {
+#if DEAL_II_SUNDIALS_VERSION_GTE(3,0,0)
+        const auto J = SUNDenseMatrix(system_size, system_size);
+        const auto LS = SUNDenseLinearSolver(u_scale, J);
+        status = KINDlsSetLinearSolver(kinsol_mem, LS, J);
+#else
         status = KINDense(kinsol_mem, system_size);
+#endif
         AssertKINSOL(status);
       }
 
