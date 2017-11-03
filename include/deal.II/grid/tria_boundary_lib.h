@@ -42,7 +42,8 @@ DEAL_II_NAMESPACE_OPEN
  * StraightBoundary::in_between() function.
  *
  * @deprecated The boundary classes have been deprecated in favor of the more
- * general Manifold classes.
+ * general Manifold classes. For this class CylindricalManifold is an appropriate
+ * replacement which is expected to produce better results under mesh refinement.
  *
  * @ingroup boundary
  *
@@ -193,7 +194,8 @@ private:
  * @image html cone_3d.png
  *
  * @deprecated The boundary classes have been deprecated in favor of the more
- * general Manifold classes.
+ * general Manifold classes. For this class CylindricalManifold is an appropriate
+ * replacement for spacedim==3, else StraightManifold can be used.
  *
  * @author Markus B&uuml;rg, 2009
  */
@@ -333,7 +335,8 @@ private:
  * @ingroup boundary
  *
  * @deprecated The boundary classes have been deprecated in favor of the more
- * general Manifold classes.
+ * general Manifold classes. For this class SphericalManifold is an appropriate
+ * replacement which is expected to produce better results under mesh refinement.
  *
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
@@ -474,7 +477,8 @@ private:
  * @ingroup boundary
  *
  * @deprecated The boundary classes have been deprecated in favor of the more
- * general Manifold classes.
+ * general Manifold classes. For this class CylindricalManifold is an appropriate
+ * replacement which is expected to produce better results under mesh refinement.
  *
  * @author Wolfgang Bangerth, 1999, 2001
  */
@@ -541,7 +545,8 @@ public:
  * @ingroup boundary
  *
  * @deprecated The boundary classes have been deprecated in favor of the more
- * general Manifold classes.
+ * general Manifold classes. For this class CylindricalManifold is an appropriate
+ * replacement which is expected to produce better results under mesh refinement.
  *
  * @author Wolfgang Bangerth, 1999
  */
@@ -571,7 +576,8 @@ public:
  * @ingroup boundary
  *
  * @deprecated The boundary classes have been deprecated in favor of the more
- * general Manifold classes.
+ * general Manifold classes. For this class CylindricalManifold is an appropriate
+ * replacement which is expected to produce better results under mesh refinement.
  *
  * @author Wolfgang Bangerth, 2000, 2009
  */
@@ -650,7 +656,7 @@ private:
  * is, just the surface.
  *
  * @deprecated This class has been deprecated in favor of the more general
- * Manifold class.
+ * TorusManifold class.
  */
 template <int dim, int spacedim>
 class TorusBoundary : public Boundary<dim,spacedim>
