@@ -1195,8 +1195,8 @@ namespace Manifolds
 
         if (with_laplace)
           {
-            std::fill(points_weights.second.begin(), points_weights.second.begin()+4, 1.0/16.0);
-            std::fill(points_weights.second.begin()+4, points_weights.second.end(), 3.0/16.0);
+            std::fill(points_weights.second.begin(), points_weights.second.begin()+4, -0.25);
+            std::fill(points_weights.second.begin()+4, points_weights.second.end(), 0.5);
           }
         else
           std::fill(points_weights.second.begin(), points_weights.second.end(), 1.0/8.0);
@@ -1223,21 +1223,21 @@ namespace Manifolds
         for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i, ++j)
           {
             (*sp3)[j] = hex->vertex(i);
-            points_weights.second[j] = 1.0/128.0;
+            points_weights.second[j] = 1.0/8.0;
           }
         for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i, ++j)
           {
             (*sp3)[j] = (hex->line(i)->has_children() ?
                          hex->line(i)->child(0)->vertex(1) :
                          hex->line(i)->get_manifold().get_new_point_on_line(hex->line(i)));
-            points_weights.second[j] = 7.0/192.0;
+            points_weights.second[j] = -1.0/4.0;
           }
         for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i, ++j)
           {
             (*sp3)[j] = (hex->quad(i)->has_children() ?
                          hex->quad(i)->isotropic_child(0)->vertex(3) :
                          hex->quad(i)->get_manifold().get_new_point_on_quad(hex->quad(i)));
-            points_weights.second[j] = 1.0/12.0;
+            points_weights.second[j] = 1.0/2.0;
           }
         // Overwrite the weights with 1/np if we don't want to use
         // laplace vectors.
