@@ -134,6 +134,53 @@ namespace parallel
     exchange_cell_data_to_ghosts (const MeshType &mesh,
                                   const std::function<boost::optional<DataType> (const typename MeshType::active_cell_iterator &)> &pack,
                                   const std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> &unpack);
+
+    /**
+     * A structure that allows the transfer of data of type T from one processor
+     * to another. It corresponds to a packed buffer that stores a list of
+     * cells and an array of type T.
+     *
+     * The vector @p data is the same size as @p cell_ids.
+     */
+    template <int dim, typename T>
+    struct CellDataTransferBuffer
+    {
+      std::vector<CellId> cell_ids;
+      std::vector<T> data;
+
+      /**
+       * Write the data of this object to a stream for the purpose of
+       * serialization.
+       */
+      template <class Archive>
+      void save (Archive &ar,
+                 const unsigned int /*version*/) const;
+
+      /**
+       * Read the data of this object from a stream for the purpose of
+       * serialization. Throw away the previous content.
+       */
+      template <class Archive>
+      void load (Archive &ar,
+                 const unsigned int version);
+
+      BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+      /**
+       * Pack the data that corresponds to this object into a buffer in
+       * the form of a vector of chars and return it.
+       */
+      std::vector<char> pack_data () const;
+
+      /**
+       * Given a buffer in the form of an array of chars, unpack it and
+       * restore the current object to the state that it was when
+       * it was packed into said buffer by the pack_data() function.
+       */
+      void unpack_data (const std::vector<char> &buffer);
+
+    };
+
   }
 
 
@@ -145,131 +192,106 @@ namespace parallel
 {
   namespace GridTools
   {
-    namespace internal
+
+    template <int dim, typename T>
+    template <class Archive>
+    void
+    CellDataTransferBuffer<dim,T>::save (Archive &ar,
+                                         const unsigned int /*version*/) const
     {
-      /**
-       * A structure that allows the transfer of data of type T from one processor
-       * to another. It corresponds to a packed buffer that stores a list of
-       * cells and an array of type T.
-       *
-       * The vector @p data is the same size as @p cell_ids.
-       */
-      template <int dim, typename T>
-      struct CellDataTransferBuffer
-      {
-        std::vector<CellId> cell_ids;
-        std::vector<T> data;
-
-        /**
-         * Write the data of this object to a stream for the purpose of
-         * serialization.
-         */
-        template <class Archive>
-        void save (Archive &ar,
-                   const unsigned int /*version*/) const
+      Assert(cell_ids.size() == data.size(), ExcInternalError());
+      // archive the cellids in an efficient binary format
+      const size_t n_cells = cell_ids.size();
+      ar &n_cells;
+      for (auto &it : cell_ids)
         {
-          Assert(cell_ids.size() == data.size(), ExcInternalError());
-          // archive the cellids in an efficient binary format
-          const size_t n_cells = cell_ids.size();
-          ar &n_cells;
-          for (auto &it : cell_ids)
-            {
-              CellId::binary_type binary_cell_id = it.template to_binary<dim>();
-              ar &binary_cell_id;
-            }
-
-          ar &data;
+          CellId::binary_type binary_cell_id = it.template to_binary<dim>();
+          ar &binary_cell_id;
         }
 
-        /**
-         * Read the data of this object from a stream for the purpose of
-         * serialization. Throw away the previous content.
-         */
-        template <class Archive>
-        void load (Archive &ar,
-                   const unsigned int /*version*/)
-        {
-          size_t n_cells;
-          ar &n_cells;
-          cell_ids.clear();
-          cell_ids.reserve(n_cells);
-          for (unsigned int c=0; c<n_cells; ++c)
-            {
-              CellId::binary_type value;
-              ar &value;
-              cell_ids.emplace_back(std::move(value));
-            }
-          ar &data;
-        }
-
-        BOOST_SERIALIZATION_SPLIT_MEMBER()
-
-
-        /**
-         * Pack the data that corresponds to this object into a buffer in
-         * the form of a vector of chars and return it.
-         */
-        std::vector<char>
-        pack_data () const
-        {
-          // set up a buffer and then use it as the target of a compressing
-          // stream into which we serialize the current object
-          std::vector<char> buffer;
-          {
-#ifdef DEAL_II_WITH_ZLIB
-            boost::iostreams::filtering_ostream out;
-            out.push(boost::iostreams::gzip_compressor
-                     (boost::iostreams::gzip_params
-                      (boost::iostreams::gzip::best_compression)));
-            out.push(boost::iostreams::back_inserter(buffer));
-
-            boost::archive::binary_oarchive archive(out);
-            archive << *this;
-            out.flush();
-#else
-            std::ostringstream out;
-            boost::archive::binary_oarchive archive(out);
-            archive << *this;
-            const std::string &s = out.str();
-            buffer.reserve(s.size());
-            buffer.assign(s.begin(), s.end());
-#endif
-          }
-
-          return buffer;
-        }
-
-
-        /**
-         * Given a buffer in the form of an array of chars, unpack it and
-         * restore the current object to the state that it was when
-         * it was packed into said buffer by the pack_data() function.
-         */
-        void unpack_data (const std::vector<char> &buffer)
-        {
-          std::string decompressed_buffer;
-
-          // first decompress the buffer
-          {
-#ifdef DEAL_II_WITH_ZLIB
-            boost::iostreams::filtering_ostream decompressing_stream;
-            decompressing_stream.push(boost::iostreams::gzip_decompressor());
-            decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
-            decompressing_stream.write (buffer.data(), buffer.size());
-#else
-            decompressed_buffer.assign (buffer.begin(), buffer.end());
-#endif
-          }
-
-          // then restore the object from the buffer
-          std::istringstream in(decompressed_buffer);
-          boost::archive::binary_iarchive archive(in);
-
-          archive >> *this;
-        }
-      };
-
+      ar &data;
     }
+
+
+
+    template <int dim, typename T>
+    template <class Archive>
+    void
+    CellDataTransferBuffer<dim,T>::load (Archive &ar,
+                                         const unsigned int /*version*/)
+    {
+      size_t n_cells;
+      ar &n_cells;
+      cell_ids.clear();
+      cell_ids.reserve(n_cells);
+      for (unsigned int c=0; c<n_cells; ++c)
+        {
+          CellId::binary_type value;
+          ar &value;
+          cell_ids.emplace_back(std::move(value));
+        }
+      ar &data;
+    }
+
+
+
+    template <int dim, typename T>
+    std::vector<char>
+    CellDataTransferBuffer<dim,T>::pack_data () const
+    {
+      // set up a buffer and then use it as the target of a compressing
+      // stream into which we serialize the current object
+      std::vector<char> buffer;
+      {
+#ifdef DEAL_II_WITH_ZLIB
+        boost::iostreams::filtering_ostream out;
+        out.push(boost::iostreams::gzip_compressor
+                 (boost::iostreams::gzip_params
+                  (boost::iostreams::gzip::best_compression)));
+        out.push(boost::iostreams::back_inserter(buffer));
+
+        boost::archive::binary_oarchive archive(out);
+        archive << *this;
+        out.flush();
+#else
+        std::ostringstream out;
+        boost::archive::binary_oarchive archive(out);
+        archive << *this;
+        const std::string &s = out.str();
+        buffer.reserve(s.size());
+        buffer.assign(s.begin(), s.end());
+#endif
+      }
+
+      return buffer;
+    }
+
+
+    template <int dim, typename T>
+    void
+    CellDataTransferBuffer<dim,T>::unpack_data (const std::vector<char> &buffer)
+    {
+      std::string decompressed_buffer;
+
+      // first decompress the buffer
+      {
+#ifdef DEAL_II_WITH_ZLIB
+        boost::iostreams::filtering_ostream decompressing_stream;
+        decompressing_stream.push(boost::iostreams::gzip_decompressor());
+        decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
+        decompressing_stream.write (buffer.data(), buffer.size());
+#else
+        decompressed_buffer.assign (buffer.begin(), buffer.end());
+#endif
+      }
+
+      // then restore the object from the buffer
+      std::istringstream in(decompressed_buffer);
+      boost::archive::binary_iarchive archive(in);
+
+      archive >> *this;
+    }
+
 
 
     template <typename DataType, typename MeshType>
@@ -292,7 +314,7 @@ namespace parallel
               ExcMessage("The function exchange_cell_data_to_ghosts() only works with parallel triangulations."));
 
       // map neighbor_id -> data_buffer where we accumulate the data to send
-      typedef std::map<dealii::types::subdomain_id, internal::CellDataTransferBuffer<dim, DataType> >
+      typedef std::map<dealii::types::subdomain_id, CellDataTransferBuffer<dim, DataType> >
       DestinationToBufferMap;
       DestinationToBufferMap destination_to_data_buffer_map;
 
@@ -340,7 +362,7 @@ namespace parallel
                         // or create an empty one otherwise
                         typename DestinationToBufferMap::iterator p
                           = destination_to_data_buffer_map.insert (std::make_pair(subdomain,
-                                                                                  internal::CellDataTransferBuffer<dim, DataType>()))
+                                                                                  CellDataTransferBuffer<dim, DataType>()))
                             .first;
 
                         p->second.cell_ids.emplace_back(cellid);
@@ -362,7 +384,7 @@ namespace parallel
            it!=ghost_owners.end();
            ++it, ++idx)
         {
-          internal::CellDataTransferBuffer<dim, DataType> &data = destination_to_data_buffer_map[*it];
+          CellDataTransferBuffer<dim, DataType> &data = destination_to_data_buffer_map[*it];
 
           // pack all the data into the buffer for this recipient and send it.
           // keep data around till we can make sure that the packet has been
@@ -392,7 +414,7 @@ namespace parallel
                           tria->get_communicator(), &status);
           AssertThrowMPI(ierr);
 
-          internal::CellDataTransferBuffer<dim, DataType> cellinfo;
+          CellDataTransferBuffer<dim, DataType> cellinfo;
           cellinfo.unpack_data(receive);
 
           DataType *data = cellinfo.data.data();
