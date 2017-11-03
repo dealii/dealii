@@ -136,25 +136,40 @@ namespace parallel
                                   const std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> &unpack);
 
     /**
-     * A structure that allows the transfer of data of type T from one processor
-     * to another. It corresponds to a packed buffer that stores a list of
-     * cells and an array of type T.
+     * A structure that allows the transfer of cell data of type @p T from one processor
+     * to another. It corresponds to a packed buffer that stores a vector of
+     * CellId and a vector of type @p T.
      *
-     * The vector @p data is the same size as @p cell_ids.
+     * This class facilitates the transfer by providing the save/load functions
+     * that are able to pack up the vector of CellId's and the associated
+     * data of type @p T into a stream.
+     *
+     * Type @p T is assumed to be serializable by <code>boost::serialization</code> (for
+     * example <code>unsigned int</code> or <code>std::vector@<double@></code>).
      */
     template <int dim, typename T>
     struct CellDataTransferBuffer
     {
+      /**
+       * A vector to store IDs of cells to be transfered.
+       */
       std::vector<CellId> cell_ids;
+
+      /**
+       * A vector of cell data to be transfered.
+       */
       std::vector<T> data;
 
       /**
        * Write the data of this object to a stream for the purpose of
        * serialization.
+       *
+       * @pre The user is responsible to keep the size of @p data
+       * equal to the size as @p cell_ids .
        */
       template <class Archive>
       void save (Archive &ar,
-                 const unsigned int /*version*/) const;
+                 const unsigned int version) const;
 
       /**
        * Read the data of this object from a stream for the purpose of
@@ -199,7 +214,8 @@ namespace parallel
     CellDataTransferBuffer<dim,T>::save (Archive &ar,
                                          const unsigned int /*version*/) const
     {
-      Assert(cell_ids.size() == data.size(), ExcInternalError());
+      Assert(cell_ids.size() == data.size(),
+             ExcDimensionMismatch(cell_ids.size(), data.size()));
       // archive the cellids in an efficient binary format
       const size_t n_cells = cell_ids.size();
       ar &n_cells;
