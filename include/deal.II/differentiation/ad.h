@@ -23,6 +23,9 @@
 #include <deal.II/differentiation/ad/ad_number_types.h>
 #include <deal.II/differentiation/ad/ad_number_traits.h>
 
+#include <deal.II/differentiation/ad/adolc_number_types.h>
+#include <deal.II/differentiation/ad/adolc_product_types.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
