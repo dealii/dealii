@@ -830,7 +830,7 @@ namespace LinearAlgebra
               dealii::ExcDimensionMismatch(matrix.n(),n));
 
       // reset the matrix
-      matrix = Number();
+      matrix = typename FullMatrixType::value_type(0.0);
 
       set_symmetric(matrix, symmetric);
       if (symmetric)
