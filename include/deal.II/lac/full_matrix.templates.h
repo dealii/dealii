@@ -282,10 +282,10 @@ void FullMatrix<number>::forward (Vector<number2>       &dst,
   size_type nu = ( (m()<n()) ? m() : n());
   for (i=0; i<nu; ++i)
     {
-      number s = number(src(i));
+      typename ProductType<number,number2>::type s = src(i);
       for (j=0; j<i; ++j)
-        s -= number(dst(j)) * (*this)(i,j);
-      dst(i) = s/(*this)(i,i);
+        s -= typename ProductType<number,number2>::type(dst(j)) * (*this)(i,j);
+      dst(i) = number2(s)/number2((*this)(i,i));
       AssertIsFinite(dst(i));
     }
 }
@@ -303,10 +303,10 @@ void FullMatrix<number>::backward (Vector<number2>       &dst,
   size_type nu = (m()<n() ? m() : n());
   for (int i=nu-1; i>=0; --i)
     {
-      number2 s = src(i);
+      typename ProductType<number,number2>::type s = src(i);
       for (j=i+1; j<nu; ++j)
-        s -= dst(j) * number2((*this)(i,j));
-      dst(i) = s/number2((*this)(i,i));
+        s -= typename ProductType<number,number2>::type(dst(j)) * (*this)(i,j);
+      dst(i) = number2(s)/number2((*this)(i,i));
       AssertIsFinite(dst(i));
     }
 }
@@ -903,13 +903,13 @@ FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
 
   for (size_type row=0; row<n_rows; ++row)
     {
-      number s = 0.;
+      number2 s = 0.;
       const number *const val_end_of_row = val_ptr+n_rows;
       const number2 *v_ptr = v.begin();
       while (val_ptr != val_end_of_row)
-        s += number(*val_ptr++) * number(*v_ptr++);
+        s += number2(*val_ptr++) * number2(*v_ptr++);
 
-      sum += s * number(numbers::NumberTraits<number2>::conjugate(v(row)));
+      sum += s * numbers::NumberTraits<number2>::conjugate(v(row));
     }
 
   return sum;
@@ -934,13 +934,13 @@ FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
 
   for (size_type row=0; row<n_rows; ++row)
     {
-      number s = 0.;
+      number2 s = number2(0.);
       const number *const val_end_of_row = val_ptr+n_cols;
       const number2 *v_ptr = v.begin();
       while (val_ptr != val_end_of_row)
-        s += number(*val_ptr++) * number(*v_ptr++);
+        s += number2(*val_ptr++) * number2(*v_ptr++);
 
-      sum += s * number(u(row));
+      sum += s * u(row);
     }
 
   return sum;
