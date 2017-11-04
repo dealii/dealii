@@ -521,24 +521,28 @@ namespace DoFRenumbering
    * If the given DoFHandler uses a distributed triangulation (i.e., if
    * dof_handler.locally_owned() is not the complete index set), the
    * renumbering is performed on each processor's degrees of freedom
-   * individually, without any communication between processors.
+   * individually, without any communication between processors. In other
+   * words, the resulting renumbering is an attempt at minimizing the bandwidth
+   * of <i>each diagonal block of the matrix corresponding to one processor</i>
+   * separately, without making an attempt at minimizing the bandwidth of
+   * the global matrix.
    *
    * @param dof_handler The DoFHandler or hp::DoFHandler object to work on.
    * @param reversed_numbering Whether to use the original Cuthill-McKee
-   * algorithm, or to reverse the ordering.
+   *   algorithm, or to reverse the ordering.
    * @param use_constraints Whether or not to use hanging node constraints in
-   * determining the reordering of degrees of freedom.
+   *   determining the reordering of degrees of freedom.
    * @param starting_indices A set of degrees of freedom that form the first
-   * level of renumbered degrees of freedom. If the set is empty, then a
-   * single starting entry is chosen automatically among those that have the
-   * smallest number of others that couple with it. If the DoFHandler is built
-   * on a parallel triangulation, then on every processor, these starting
-   * indices need to be a (possibly empty) subset of the
-   * @ref GlossLocallyOwnedDof "locally owned degrees of freedom".
-   * These will then be used as starting indices for the local renumbering on
-   * the current processor. (In other words, this argument will in fact be
-   * different on every processor unless you pass an empty list as is the
-   * default.)
+   *   level of renumbered degrees of freedom. If the set is empty, then a
+   *   single starting entry is chosen automatically among those that have the
+   *   smallest number of others that couple with it. If the DoFHandler is built
+   *   on a parallel triangulation, then on every processor, these starting
+   *   indices need to be a (possibly empty) subset of the
+   *   @ref GlossLocallyOwnedDof "locally owned degrees of freedom".
+   *   These will then be used as starting indices for the local renumbering on
+   *   the current processor. (In other words, you will have to choose this
+   *   argument differently on every processor, unless of course you pass an
+   *   empty list as is the default.)
    */
   template <typename DoFHandlerType>
   void
