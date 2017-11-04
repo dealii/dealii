@@ -117,10 +117,11 @@ public:
 
   /**
    * This operator assigns a scalar to a matrix. To avoid confusion with
-   * constructors, zero is the only value allowed for <tt>d</tt>
+   * constructors, zero (when cast to the @p number type) is the only
+   * value allowed for <tt>d</tt>
    */
   LAPACKFullMatrix<number> &
-  operator = (const double d);
+  operator = (const number d);
 
   /**
    * This operator multiplies all entries by a fixed factor.
