@@ -1224,7 +1224,7 @@ TransfiniteInterpolationManifold<dim,spacedim>
 
 
 template <int dim, int spacedim>
-std::array<unsigned int, 10>
+std::array<unsigned int, 20>
 TransfiniteInterpolationManifold<dim,spacedim>
 ::get_possible_cells_around_points(const ArrayView<const Point<spacedim>> &points) const
 {
@@ -1289,9 +1289,9 @@ TransfiniteInterpolationManifold<dim,spacedim>
   AssertThrow(distances_and_cells.size() > 0,
               (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
   std::sort(distances_and_cells.begin(), distances_and_cells.end());
-  std::array<unsigned int,10> cells;
+  std::array<unsigned int,20> cells;
   cells.fill(numbers::invalid_unsigned_int);
-  for (unsigned int i=0; i<distances_and_cells.size() && i<10; ++i)
+  for (unsigned int i=0; i<distances_and_cells.size() && i<cells.size(); ++i)
     cells[i] = distances_and_cells[i].second;
 
   return cells;
@@ -1309,14 +1309,12 @@ TransfiniteInterpolationManifold<dim, spacedim>
          ExcMessage("The chart points array view must be as large as the "
                     "surrounding points array view."));
 
-  std::array<unsigned int,10> nearby_cells =
+  std::array<unsigned int,20> nearby_cells =
     get_possible_cells_around_points(surrounding_points);
 
   // check whether all points are inside the unit cell of the current chart
   for (unsigned int c=0; c<nearby_cells.size(); ++c)
     {
-      AssertThrow(nearby_cells[c] != numbers::invalid_unsigned_int,
-                  (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
       typename Triangulation<dim,spacedim>::cell_iterator cell(triangulation,
                                                                level_coarse,
                                                                nearby_cells[c]);
@@ -1338,11 +1336,43 @@ TransfiniteInterpolationManifold<dim, spacedim>
         {
           return cell;
         }
+
+      // if we did not find a point and this was the last valid cell (the next
+      // iterate being the end of the array or an unvalid tag), we must stop
+      if (c == nearby_cells.size()-1 ||
+          nearby_cells[c+1] == numbers::invalid_unsigned_int)
+        {
+          // generate additional information to help debugging why we did not
+          // get a point
+          std::ostringstream message;
+          for (unsigned int b=0; b<c; ++b)
+            {
+              typename Triangulation<dim,spacedim>::cell_iterator cell(triangulation,
+                                                                       level_coarse,
+                                                                       nearby_cells[b]);
+              message << "Looking at cell "
+                      << cell->id() << " with vertices: " << std::endl;
+              for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+                message << cell->vertex(v) << "    ";
+              message << std::endl;
+              message << "Transformation to chart coordinates: " << std::endl;
+              for (unsigned int i=0; i<surrounding_points.size(); ++i)
+                {
+                  message << surrounding_points[i] << " -> "
+                          << pull_back(cell, surrounding_points[i])
+                          << std::endl;
+                }
+            }
+
+          AssertThrow(false,
+                      (typename Mapping<dim,spacedim>::ExcTransformationFailed(message.str())));
+        }
     }
 
-  // a valid inversion should have returned a point above.
-  AssertThrow(false,
-              (typename Mapping<dim,spacedim>::ExcTransformationFailed()));
+  // a valid inversion should have returned a point above. an invalid
+  // inversion should have triggered the assertion, so we should never end up
+  // here
+  Assert(false, ExcInternalError());
   return typename Triangulation<dim,spacedim>::cell_iterator();
 }
 

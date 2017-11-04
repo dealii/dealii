@@ -731,15 +731,16 @@ public:
 private:
   /**
    * Internal function to identify the most suitable cells (=charts) where the
-   * given surrounding points are located. We use a cheap algorithm to identify
-   * the cells and rank the cells by probability before we actually do the
-   * search inside the relevant cells. The cells are sorted by the distance of
-   * a Q1 approximation of the inverse mapping to the unit cell of the
-   * surrounding points. We expect at most 10 cells (it should be less than 8
-   * candidates even in 3D, typically only two or three), so get an array with
-   * 10 entries of a the indices <tt>cell->index()</tt>.
+   * given surrounding points are located. We use a cheap algorithm to
+   * identify the cells and rank the cells by probability before we actually
+   * do the search inside the relevant cells. The cells are sorted by the
+   * distance of a Q1 approximation of the inverse mapping to the unit cell of
+   * the surrounding points. We expect at most 20 cells (it should be up to 8
+   * candidates on a 3D structured mesh and a bit more on unstructured ones,
+   * typically we only get two or three), so get an array with 20 entries of a
+   * the indices <tt>cell->index()</tt>.
    */
-  std::array<unsigned int, 10>
+  std::array<unsigned int, 20>
   get_possible_cells_around_points(const ArrayView<const Point<spacedim>> &surrounding_points) const;
 
   /**
