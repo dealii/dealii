@@ -126,6 +126,7 @@ void test ()
       }
 
   A.compress(VectorOperation::add);
+  deallog.get_file_stream() << std::setprecision(10);
   A.print(deallog.get_file_stream());
 
   if (myid==0)
