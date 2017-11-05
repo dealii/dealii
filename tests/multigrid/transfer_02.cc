@@ -165,7 +165,7 @@ void check_simple(const FiniteElement<dim> &fe)
 int main()
 {
   std::ofstream logfile("output");
-  deallog << std::setprecision(6);
+  deallog << std::setprecision(10);
   deallog.attach(logfile);
 
   check_simple (FE_DGP<2>(0));
