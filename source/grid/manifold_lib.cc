@@ -245,7 +245,8 @@ PolarManifold<dim,spacedim>::push_forward_gradient(const Point<spacedim> &spheri
 
 template <int dim, int spacedim>
 SphericalManifold<dim,spacedim>::SphericalManifold(const Point<spacedim> center):
-  center(center)
+  center(center),
+  polar_manifold(center)
 {}
 
 
@@ -403,8 +404,10 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
     rho /= total_weights;
   }
 
-  if (spacedim<2)
-    return center + rho*candidate;
+  // If not in 3D, just use the implementation from PolarManifold
+  // after we verified that the candidate is not the center.
+  if (spacedim<3)
+    return polar_manifold.get_new_point(vertices, weights);
 
   // Step 2:
   // Do Newton-style iterations to improve the estimate.
