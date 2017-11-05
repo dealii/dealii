@@ -41,7 +41,7 @@ void test()
         D(i,j) += A(i,k) * B(j,k);
   C.add(-1., D);
 
-  deallog << "Difference: " << (double)C.l1_norm() << std::endl;
+  deallog << "Difference: " << filter_out_small_numbers(C.l1_norm(), std::numeric_limits<Number>::epsilon()*50.) << std::endl;
 }
 
 int main()
