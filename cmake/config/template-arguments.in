@@ -12,6 +12,12 @@ REAL_SCALARS    := { double; float }
 COMPLEX_SCALARS := { std::complex<double>;
                      std::complex<float> }
 
+// real scalar floating point types
+REAL_AND_COMPLEX_SCALARS    := { double;
+                                 float; 
+                                 std::complex<double>;
+                                 std::complex<float> }
+
 // differentiable scalar types
 DIFFERENTIABLE_REAL_SCALARS := {
 		    @DEAL_II_EXPAND_TRILINOS_SACADO_TYPES@;
@@ -32,28 +38,45 @@ MPI_SCALARS     := { int;
                      unsigned long long int;
                      float;
                      double;
-                     long double }
+                     long double; 
+                     std::complex<double>;
+                     std::complex<float> }
 
 // template names for serial vectors that we can instantiate as T<S> where
 // S=REAL_SCALARS for example
 DEAL_II_VEC_TEMPLATES := { Vector; BlockVector }
 
-// Serial vector types
+// Serial vector types, based on real or complex scalars
 // TODO: why are parallel vectors in here?
 SERIAL_VECTORS := { Vector<double>;
                     Vector<float> ;
 
+                    Vector<std::complex<double> >;
+                    Vector<std::complex<float> >;
+
                     BlockVector<double>;
                     BlockVector<float>;
+
+                    BlockVector<std::complex<double> >;
+                    BlockVector<std::complex<float> >;
 
                     LinearAlgebra::Vector<double>;
                     LinearAlgebra::Vector<float> ;
 
+                    LinearAlgebra::Vector<std::complex<double> >;
+                    LinearAlgebra::Vector<std::complex<float> > ;
+
                     LinearAlgebra::distributed::Vector<double>;
                     LinearAlgebra::distributed::Vector<float> ;
 
+                    LinearAlgebra::distributed::Vector<std::complex<double> >;
+                    LinearAlgebra::distributed::Vector<std::complex<float> > ;
+
                     LinearAlgebra::distributed::BlockVector<double>;
                     LinearAlgebra::distributed::BlockVector<float> ;
+
+                    LinearAlgebra::distributed::BlockVector<std::complex<double> >;
+                    LinearAlgebra::distributed::BlockVector<std::complex<float> > ;
 
                     @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
                     @DEAL_II_EXPAND_EPETRA_VECTOR@;
@@ -63,7 +86,8 @@ SERIAL_VECTORS := { Vector<double>;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
                   }
 
-// same as SERIAL_VECTORS but only with real-valued PETSc vectors
+// same as SERIAL_VECTORS but only real-valued vectors (and only with PETSc 
+// vectors if the PETScScalar data type is real-valued)
 REAL_SERIAL_VECTORS := { Vector<double>;
                          Vector<float> ;
 
