@@ -421,19 +421,45 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
 
     // If the candidate happens to coincide with a normalized
     // direction, we return it. Otherwise, the Hessian would be singular.
-    boost::container::small_vector<Tensor<1, 3>, 100> directions(n_points);
+    boost::container::small_vector<Tensor<1, 3>, 100> directions;
+    boost::container::small_vector<double, 100> merged_weights;
     for (unsigned int i=0; i<n_points; ++i)
       {
-        for (unsigned int c = 0; c < spacedim; ++c)
-          directions[i][c] = vertices[i][c] - center[c];
-        const double norm = directions[i].norm();
+        Tensor<1,spacedim> direction(vertices[i]-center);
+        const double norm = direction.norm();
         Assert(norm != 0.,
                ExcMessage("One of the vertices coincides with the center. "
                           "This is not allowed!"));
-        directions[i] /= norm;
-        if ((xVec - directions[i]).norm_square() < tolerance*tolerance)
+        direction /= norm;
+        if ((candidate - direction).norm_square() < tolerance*tolerance)
           return center + rho * candidate;
+
+        // append direction. check if the normalized candidate direction is
+        // the same as a previous direction (to a tighter tolerance (1e-14)^2
+        // than the outer ones to really not miss anything) -> in that case we
+        // can simply add the weights. Since the trigonometric functions used
+        // below are quite expensive, it makes sense to merge the points here,
+        // even if this search loop is of quadratic complexity loop (but we
+        // rarely have more than 9 points)
+        Tensor<1,3> direction_3d;
+        for (unsigned int c=0; c<spacedim; ++c)
+          direction_3d[c] = direction[c];
+        bool found = false;
+        for (unsigned int j=0; j<directions.size(); ++j)
+          if ((directions[j]-direction_3d).norm_square() < 1e-28)
+            {
+              merged_weights[j] += weights[i];
+              found = true;
+              break;
+            }
+        if (found == false)
+          {
+            directions.push_back(direction_3d);
+            merged_weights.push_back(weights[i]);
+          }
       }
+
+    const unsigned int n_merged_points = directions.size();
 
     Tensor<1,3> vPerp;
     Tensor<2,2> Hessian;
@@ -456,15 +482,15 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
         // Then compute its contribution to the Hessian.
         gradient = 0.;
         Hessian = 0.;
-        for (unsigned int i=0; i<n_points; ++i)
-          if (std::abs(weights[i])>1.e-15)
+        for (unsigned int i=0; i<n_merged_points; ++i)
+          if (std::abs(merged_weights[i])>1.e-15)
             {
               vPerp = internal::projected_direction(directions[i], xVec);
               const double sintheta = vPerp.norm();
               if (sintheta<tolerance)
                 {
-                  Hessian[0][0]+=weights[i];
-                  Hessian[1][1]+=weights[i];
+                  Hessian[0][0] += merged_weights[i];
+                  Hessian[1][1] += merged_weights[i];
                 }
               else
                 {
@@ -478,16 +504,16 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
 
                   gradlocal[0] = cosphi;
                   gradlocal[1] = sinphi;
-                  gradient += (weights[i]*theta)*gradlocal;
+                  gradient += (merged_weights[i]*theta)*gradlocal;
 
                   const double sinphiSq = sinphi*sinphi;
                   const double cosphiSq = cosphi*cosphi;
-                  const double tt = weights[i]*(theta*sinthetaInv)*costheta;
-                  const double offdiag = cosphi*sinphi*(weights[i]-tt);
-                  Hessian[0][0] += weights[i]*cosphiSq+tt*sinphiSq;
+                  const double tt = (theta*sinthetaInv)*costheta;
+                  const double offdiag = cosphi*sinphi*merged_weights[i]*(1.0-tt);
+                  Hessian[0][0] += merged_weights[i]*(cosphiSq+tt*sinphiSq);
                   Hessian[0][1] += offdiag;
                   Hessian[1][0] += offdiag;
-                  Hessian[1][1] += weights[i]*sinphiSq+tt*cosphiSq;
+                  Hessian[1][1] += merged_weights[i]*(sinphiSq+tt*cosphiSq);
                 }
             }
 
