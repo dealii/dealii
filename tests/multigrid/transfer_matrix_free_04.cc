@@ -68,7 +68,7 @@ void check(const unsigned int fe_degree)
       MGTransferMatrixFree<dim, Number> transfer;
       transfer.build(mgdof);
 
-      const double tolerance = 1000. * std::numeric_limits<Number>::epsilon();
+      const Number tolerance = 1000. * std::numeric_limits<Number>::epsilon();
 
       // check prolongation for all levels using random vector
       for (unsigned int level=1; level<mgdof.get_triangulation().n_global_levels(); ++level)

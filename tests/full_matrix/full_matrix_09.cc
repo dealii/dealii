@@ -41,7 +41,7 @@ void test()
 
   C.add(-1., E);
 
-  const double tolerance = 100*std::numeric_limits<Number>::epsilon();
+  const Number tolerance = 100*std::numeric_limits<Number>::epsilon();
   deallog << "Difference 1: " << filter_out_small_numbers(C.l1_norm(),tolerance) << std::endl;
 
   C = 0;
