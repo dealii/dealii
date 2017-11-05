@@ -137,7 +137,7 @@ check(const int degree, const bool scale = false, const double a_L = -0.1, const
   diff -=exact;
 
   deallog << " Filter ["<<a<<","<<b<<"]" << std::endl;
-  deallog << " Error: " << diff.linfty_norm() << std::endl;
+  deallog << " Error: " << diff.linfty_norm()/exact.linfty_norm() << std::endl;
 
 #ifdef EXTRA_OUTPUT
   // extra output for debugging:
