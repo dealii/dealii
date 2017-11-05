@@ -1200,6 +1200,14 @@ TransfiniteInterpolationManifold<dim,spacedim>
 
       // Line search, accept step if the residual has decreased
       double alpha = 1.;
+
+      // check if point is inside 1.2 times the unit cell to avoid
+      // hitting points very far away from valid ones in the manifolds
+      while (!GeometryInfo<dim>::is_inside_unit_cell(chart_point+alpha*update, 0.2)
+             &&
+             alpha > 1e-7)
+        alpha *= 0.5;
+
       while (alpha > 1e-7)
         {
           Point<dim> guess = chart_point + alpha*update;
