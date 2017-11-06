@@ -156,55 +156,66 @@ normal_vector (const Triangulation<3, 3>::face_iterator &face,
                const Point<3> &p) const
 {
   const int spacedim=3;
-  Tensor<1,spacedim> t1,t2,normal;
 
-  // the counter-clockwise sequence of face vertices (see
-  // the GeometryInfo class for more documentation).
-  const double face_vertices[4] = {0,1,3,2};
+  // Compute distances from p to vertices
+  std::array<std::pair<double,unsigned int>, GeometryInfo<3>::vertices_per_face> distances;
+  for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_face; ++i)
+    distances[i] = std::make_pair((p-face->vertex(i)).norm_square(),i);
 
-  // Look for the vertex with the largest distance to the given point
-  unsigned int max_index=0;
-  double       max_distance = (p-face->vertex(face_vertices[0])).norm_square();
+  // Sort the distances and figure out, which vertices to use
+  std::sort(distances.begin(),distances.end());
+  unsigned int first_index, second_index, fallback_index;
 
-  for (unsigned int i=1; i<GeometryInfo<3>::vertices_per_face; ++i)
+  const double center_distance = (p-face->center()).norm_square();
+
+  // If we are closer to the center than any vertex, use closest vertices
+  if (center_distance < distances[0].first)
     {
-      const double distance = (p-face->vertex(face_vertices[i])).norm_square();
-      if (distance > max_distance)
-        {
-          max_index = i;
-          max_distance = distance;
-        }
+      first_index = distances[0].second;
+      second_index = distances[1].second;
+      fallback_index = distances[2].second;
+    }
+  // Otherwise use vertices further away
+  else
+    {
+      first_index = distances[1].second;
+      second_index = distances[2].second;
+
+      // If we are very close to a vertex use the farthest vertex as fallback,
+      // otherwise use closest vertex.
+      if (distances[0].first < 1e4 * std::numeric_limits<double>::epsilon() * distances[1].first)
+        fallback_index = distances[3].second;
+      else
+        fallback_index = distances[0].second;
     }
 
-  // Compute tangent for max_index vertex.
-  t1 = get_tangent_vector(p, face->vertex(face_vertices[max_index]));
+  // Compute tangents and normal for selected vertices
+  Tensor<1,spacedim> t1 = get_tangent_vector(p, face->vertex(first_index));
+  Tensor<1,spacedim> t2 = get_tangent_vector(p, face->vertex(second_index));
+  Tensor<1,spacedim> normal = cross_product_3d(t1,t2);
 
-  // If p is sufficiently far away from next counter-clockwise vertex, compute normal.
-  const unsigned int next_index = (max_index + 1) % 4;
-
-  if ((p-face->vertex(face_vertices[next_index])).norm_square() >
-      1e4 * std::numeric_limits<double>::epsilon() * max_distance)
+  // If the tangents are linearly dependent fall back to another tangent
+  if (normal.norm_square() <= 1e4 * std::numeric_limits<double>::epsilon() *
+      t1.norm_square() * t2.norm_square())
     {
-      t2 = get_tangent_vector(p, face->vertex(face_vertices[next_index]));
+      t2 = get_tangent_vector(p, face->vertex(fallback_index));
       normal = cross_product_3d(t1,t2);
     }
 
-  // If p is too close to next_index, or the tangents are linearly dependent
-  // fall back to previous counter clockwise vertex.
-  // In this case the normal direction is flipped.
-  if (normal.norm_square() < 1e4 * std::numeric_limits<double>::epsilon() *
-      t1.norm_square() * t2.norm_square())
-    {
-      const unsigned int previous_index = (max_index - 1) % 4;
-      t2 = get_tangent_vector(p, face->vertex(face_vertices[previous_index]));
-      normal = cross_product_3d(t2,t1);
-    }
-
-  Assert(normal.norm_square() >= 1e4 * std::numeric_limits<double>::epsilon() *
+  Assert(normal.norm_square() > 1e4 * std::numeric_limits<double>::epsilon() *
          t1.norm_square() * t2.norm_square(),
          ExcMessage("Manifold::normal_vector was unable to find a suitable combination "
                     "of vertices to compute a normal on this face. Check for distorted "
                     "faces in your triangulation."));
+
+  // Now figure out if we need to flip the direction, we do this by comparing to a reference
+  // normal that would be the correct result if all vertices would lie in a plane
+  const Tensor<1,spacedim> rt1 = face->vertex(3) - face->vertex(0);
+  const Tensor<1,spacedim> rt2 = face->vertex(2) - face->vertex(1);
+  const Tensor<1,spacedim> reference_normal = cross_product_3d(rt1,rt2);
+
+  if (reference_normal * normal < 0.0)
+    normal *= -1.0;
 
   return normal / normal.norm();
 }
