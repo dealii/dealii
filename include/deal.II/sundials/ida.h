@@ -35,9 +35,12 @@
 
 #include <ida/ida.h>
 #include <ida/ida_spils.h>
-#include <ida/ida_spgmr.h>
-#include <ida/ida_spbcgs.h>
-#include <ida/ida_sptfqmr.h>
+#include <sundials/sundials_config.h>
+#if DEAL_II_SUNDIALS_VERSION_LT(3,0,0)
+#  include <ida/ida_spgmr.h>
+#  include <ida/ida_spbcgs.h>
+#  include <ida/ida_sptfqmr.h>
+#endif
 #include <nvector/nvector_serial.h>
 #include <sundials/sundials_math.h>
 #include <sundials/sundials_types.h>

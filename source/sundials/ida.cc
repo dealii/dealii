@@ -387,7 +387,9 @@ namespace SUNDIALS
 
     IDA_mem->ida_lsetup = t_dae_lsetup<VectorType>;
     IDA_mem->ida_lsolve = t_dae_solve<VectorType>;
+#if DEAL_II_SUNDIALS_VERSION_LT(3,0,0)
     IDA_mem->ida_setupNonNull = true;
+#endif
 
     status = IDASetMaxOrd(ida_mem, data.maximum_order);
     AssertIDA(status);
