@@ -142,7 +142,7 @@ int main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, testing_max_num_threads());
 
   std::ofstream logfile("output");
-  deallog << std::setprecision(6);
+  deallog << std::setprecision(10);
   deallog.attach(logfile);
 
   check_simple (FE_DGP<2>(0));

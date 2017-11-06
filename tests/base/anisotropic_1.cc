@@ -175,6 +175,7 @@ check_dimensions (const std::vector<Polynomial<double> > &p)
 int main()
 {
   initlog();
+  deallog.precision(10);
 
   deallog.push("Lagrange");
   std::vector<Polynomial<double> > p;

@@ -259,6 +259,20 @@ std::string unify_pretty_function (const std::string &text)
       }                                                                          \
   }
 
+/*
+ * Allow a test program to define a number that is very small to a given
+ * tolerance to be output as zero. This is used e.g. for the output of float
+ * numbers where roundoff difference can make the error larger than what we
+ * have set for numdiff (that is appropriate for double variables).
+ */
+template <typename Number>
+Number filter_out_small_numbers (const Number number, const double tolerance)
+{
+  if (std::abs(number) < tolerance)
+    return Number();
+  else
+    return number;
+}
 
 // ------------------------------ Functions used in initializing subsystems -------------------
 

@@ -41,7 +41,8 @@ void test()
 
   C.add(-1., E);
 
-  deallog << "Difference 1: " << (double)C.l1_norm() << std::endl;
+  const Number tolerance = 100*std::numeric_limits<Number>::epsilon();
+  deallog << "Difference 1: " << filter_out_small_numbers(C.l1_norm(),tolerance) << std::endl;
 
   C = 0;
   for (unsigned int i=0; i<A.m(); ++i)
@@ -50,7 +51,7 @@ void test()
         C(i,j) += A(i,k) * B(k,j);
   C.add(-1., E);
 
-  deallog << "Difference 2: " << (double)C.l1_norm() << std::endl;
+  deallog << "Difference 2: " << filter_out_small_numbers(C.l1_norm(),tolerance) << std::endl;
 }
 
 int main()
