@@ -81,7 +81,7 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
           )
 
         SET_TARGET_PROPERTIES(${_library}_${_build_lowercase} PROPERTIES
-          CUDA_SEPARABLE_COMPILATION TRUE
+          CUDA_SEPARABLE_COMPILATION FALSE
           )
       ENDIF()
 
