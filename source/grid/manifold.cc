@@ -156,49 +156,48 @@ normal_vector (const Triangulation<3, 3>::face_iterator &face,
                const Point<3> &p) const
 {
   const int spacedim=3;
+  Tensor<1,spacedim> t1,t2,normal;
 
-  // value of i used to compute t1
-  unsigned int i_t1 = numbers::invalid_unsigned_int;
-  Tensor<1,spacedim> t1,t2;
-  Tensor<1,spacedim> normal;
-  double normal_direction = numbers::signaling_nan<double>();
+  // the counter-clockwise sequence of face vertices (see
+  // the GeometryInfo class for more documentation).
+  const double face_vertices[4] = {0,1,3,2};
 
-  // Look for a combination of tangent vectors that
-  // are of approximately equal length and not linearly dependent
-  for (unsigned int i=0,j=1 ;
-       i<GeometryInfo<3>::vertices_per_face && j<GeometryInfo<3>::vertices_per_face;
-       ++j)
+  // Look for the vertex with the largest distance to the given point
+  unsigned int max_index=0;
+  double       max_distance = (p-face->vertex(face_vertices[0])).norm_square();
+
+  for (unsigned int i=1; i<GeometryInfo<3>::vertices_per_face; ++i)
     {
-      // if p is too close to vertex i try again with different i and j
-      if ((p - face->vertex(i)).norm_square() <
-          1e4 * std::numeric_limits<double>::epsilon() * (p - face->vertex(j)).norm_square())
+      const double distance = (p-face->vertex(face_vertices[i])).norm_square();
+      if (distance > max_distance)
         {
-          ++i;
-          continue;
+          max_index = i;
+          max_distance = distance;
         }
+    }
 
-      // if p is too close to vertex j try again with different j
-      if ((p - face->vertex(j)).norm_square() <
-          1e4 * std::numeric_limits<double>::epsilon() * (p - face->vertex(i)).norm_square())
-        continue;
+  // Compute tangent for max_index vertex.
+  t1 = get_tangent_vector(p, face->vertex(face_vertices[max_index]));
 
-      // i might not have changed, and get_tangent_vector is potentially expensive.
-      // Only compute a new t1 if necessary
-      if (i != i_t1)
-        {
-          i_t1 = i;
-          t1 = get_tangent_vector(p, face->vertex(i));
-        }
+  // If p is sufficiently far away from next counter-clockwise vertex, compute normal.
+  const unsigned int next_index = (max_index + 1) % 4;
 
-      t2 = get_tangent_vector(p, face->vertex(j));
+  if ((p-face->vertex(face_vertices[next_index])).norm_square() >
+      1e4 * std::numeric_limits<double>::epsilon() * max_distance)
+    {
+      t2 = get_tangent_vector(p, face->vertex(face_vertices[next_index]));
       normal = cross_product_3d(t1,t2);
+    }
 
-      // if t1 and t2 are (nearly) linearly dependent try again with different j / t2
-      if (normal.norm_square() < 1e4 * std::numeric_limits<double>::epsilon() *
-          t1.norm_square() * t2.norm_square())
-        continue;
-
-      break;
+  // If p is too close to next_index, or the tangents are linearly dependent
+  // fall back to previous counter clockwise vertex.
+  // In this case the normal direction is flipped.
+  if (normal.norm_square() < 1e4 * std::numeric_limits<double>::epsilon() *
+      t1.norm_square() * t2.norm_square())
+    {
+      const unsigned int previous_index = (max_index - 1) % 4;
+      t2 = get_tangent_vector(p, face->vertex(face_vertices[previous_index]));
+      normal = cross_product_3d(t2,t1);
     }
 
   Assert(normal.norm_square() >= 1e4 * std::numeric_limits<double>::epsilon() *
@@ -207,17 +206,7 @@ normal_vector (const Triangulation<3, 3>::face_iterator &face,
                     "of vertices to compute a normal on this face. Check for distorted "
                     "faces in your triangulation."));
 
-  // Make sure all found normal vectors on this face point in the same direction
-  // as the 'reference' normal vector created at the center position.
-  const Point<spacedim> center = face->center();
-  const Tensor<1,spacedim> reference_t1 = get_tangent_vector(center, face->vertex(0));
-  const Tensor<1,spacedim> reference_t2 = get_tangent_vector(center, face->vertex(1));
-  const Tensor<1,spacedim> reference_normal = cross_product_3d(reference_t1,reference_t2);
-
-  if (reference_normal * normal < 0.0)
-    normal *= -1;
-
-  return normal/normal.norm();
+  return normal / normal.norm();
 }
 
 
