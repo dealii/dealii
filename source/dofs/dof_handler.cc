@@ -1104,9 +1104,21 @@ DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_ind
 {
   Assert(levels.size()>0, ExcMessage("You need to distribute DoFs before you can renumber them."));
 
-  AssertDimension (new_numbers.size(), n_locally_owned_dofs());
-
 #ifdef DEBUG
+  if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&*tria) != nullptr)
+    {
+      Assert(new_numbers.size() == n_dofs() || new_numbers.size() == n_locally_owned_dofs(),
+             ExcMessage("Incorrect size of the input array."));
+    }
+  else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&*tria) != nullptr)
+    {
+      AssertDimension (new_numbers.size(), n_locally_owned_dofs());
+    }
+  else
+    {
+      AssertDimension (new_numbers.size(), n_dofs());
+    }
+
   // assert that the new indices are
   // consecutively numbered if we are
   // working on a single
