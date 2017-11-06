@@ -1107,6 +1107,8 @@ namespace
           }
 
         // next subtract the contributions of the lines
+        const auto weights_view_line = make_array_view(weights.begin(), weights.begin()+2);
+        const auto points_view_line = make_array_view(points.begin(), points.begin()+2);
         for (unsigned int line=0; line<GeometryInfo<3>::lines_per_cell; ++line)
           {
             const double line_point = (line < 8 ? chart_point[1-(line%4)/2] : chart_point[2]);
@@ -1142,8 +1144,8 @@ namespace
                 weights[0] = 1. - line_point;
                 weights[1] = line_point;
                 new_point -= my_weight *
-                             cell.line(line)->get_manifold().get_new_point(points_view,
-                                                                           weights_view);
+                             cell.line(line)->get_manifold().get_new_point(points_view_line,
+                                                                           weights_view_line);
               }
           }
 
@@ -1181,11 +1183,10 @@ template <int dim, int spacedim>
 DerivativeForm<1,dim,spacedim>
 TransfiniteInterpolationManifold<dim,spacedim>
 ::push_forward_gradient(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                        const Point<dim> &chart_point) const
+                        const Point<dim>      &chart_point,
+                        const Point<spacedim> &pushed_forward_chart_point) const
 {
   // compute the derivative with the help of finite differences
-  Point<spacedim> point = compute_transfinite_interpolation(*cell, chart_point,
-                                                            coarse_cell_is_flat[cell->index()]);
   DerivativeForm<1,dim,spacedim> grad;
   for (unsigned int d=0; d<dim; ++d)
     {
@@ -1196,7 +1197,8 @@ TransfiniteInterpolationManifold<dim,spacedim>
       modified[d] += step;
       Tensor<1,spacedim> difference =
         compute_transfinite_interpolation(*cell, modified,
-                                          coarse_cell_is_flat[cell->index()]) - point;
+                                          coarse_cell_is_flat[cell->index()]) -
+        pushed_forward_chart_point;
       for (unsigned int e=0; e<spacedim; ++e)
         grad[e][d] = difference[e] / step;
     }
@@ -1219,25 +1221,51 @@ TransfiniteInterpolationManifold<dim,spacedim>
   Point<dim> chart_point =
     GeometryInfo<dim>::project_to_unit_cell(cell->real_to_unit_cell_affine_approximation(point));
 
-  // run Newton iteration. As opposed to the various mapping implementations,
-  // this class does not throw exception upon failure as those are relatively
-  // expensive and failure occurs quite regularly in the implementation of the
-  // compute_chart_points method.
+  // run quasi-Newton iteration with a combination of finite differences for
+  // the exact Jacobian and "Broyden's good method". As opposed to the various
+  // mapping implementations, this class does not throw exception upon failure
+  // as those are relatively expensive and failure occurs quite regularly in
+  // the implementation of the compute_chart_points method.
   Tensor<1,spacedim> residual = point - compute_transfinite_interpolation(*cell, chart_point,
                                 coarse_cell_is_flat[cell->index()]);
   const double tolerance = 1e-21 * cell->diameter() * cell->diameter();
   double residual_norm_square = residual.norm_square();
+  DerivativeForm<1,dim,spacedim> inv_grad;
   for (unsigned int i=0; i<100; ++i)
     {
       if (residual_norm_square < tolerance)
-        return chart_point;
+        {
+          // do a final update of the point with the last available Jacobian
+          // information. The residual is close to zero due to the check
+          // above, but me might improve some of the last digits by a final
+          // Newton-like step with step length 1
+          Tensor<1,dim> update;
+          for (unsigned int d=0; d<spacedim; ++d)
+            for (unsigned int e=0; e<dim; ++e)
+              update[e] += inv_grad[d][e] * residual[d];
+          return chart_point + update;
+        }
 
-      // if the determinant is zero, the mapping is not invertible and we are
-      // outside the valid chart region
-      DerivativeForm<1,dim,spacedim> grad = push_forward_gradient(cell, chart_point);
-      if (grad.determinant() <= 0.0)
-        return outside;
-      DerivativeForm<1,dim,spacedim> inv_grad = grad.covariant_form();
+      // every 8 iterations, including the first time around, we create an
+      // approximation of the Jacobian with finite differences. Broyden's
+      // method usually does not need more than 5-8 iterations, but sometimes
+      // we might have had a bad initial guess and then we can accelerate
+      // convergence considerably with getting the actual Jacobian rather than
+      // using secant-like methods (one gradient calculation in 3D costs as
+      // much as 3 more iterations). this usually happens close to convergence
+      // and one more step with the finite-differenced Jacobian leads to
+      // convergence
+      if (i%8 == 0)
+        {
+          // if the determinant is zero, the mapping is not invertible and we are
+          // outside the valid chart region
+          DerivativeForm<1,dim,spacedim> grad
+            = push_forward_gradient(cell, chart_point,
+                                    Point<spacedim>(point-residual));
+          if (grad.determinant() <= 0.0)
+            return outside;
+          inv_grad = grad.covariant_form();
+        }
       Tensor<1,dim> update;
       for (unsigned int d=0; d<spacedim; ++d)
         for (unsigned int e=0; e<dim; ++e)
@@ -1253,6 +1281,7 @@ TransfiniteInterpolationManifold<dim,spacedim>
              alpha > 1e-7)
         alpha *= 0.5;
 
+      const Tensor<1,spacedim> old_residual = residual;
       while (alpha > 1e-7)
         {
           Point<dim> guess = chart_point + alpha*update;
@@ -1270,6 +1299,29 @@ TransfiniteInterpolationManifold<dim,spacedim>
         }
       if (alpha < 1e-7)
         return outside;
+
+      // update the inverse Jacobian with "Broyden's good method" and
+      // Sherman-Morrison formula for the update of the inverse, see
+      // https://en.wikipedia.org/wiki/Broyden%27s_method
+      const Tensor<1,dim> delta_x = alpha*update;
+
+      // switch sign in residual as compared to the wikipedia article because
+      // we use a negative definition of the residual with respect to the
+      // Jacobian
+      const Tensor<1,spacedim> delta_f = old_residual - residual;
+
+      Tensor<1,dim> Jinv_deltaf;
+      for (unsigned int d=0; d<spacedim; ++d)
+        for (unsigned int e=0; e<dim; ++e)
+          Jinv_deltaf[e] += inv_grad[d][e] * delta_f[d];
+      const Tensor<1,dim> factor = (delta_x - Jinv_deltaf)/(delta_x * Jinv_deltaf);
+      Tensor<1,spacedim> jac_update;
+      for (unsigned int d=0; d<spacedim; ++d)
+        for (unsigned int e=0; e<dim; ++e)
+          jac_update[d] += delta_x[e] * inv_grad[d][e];
+      for (unsigned int d=0; d<spacedim; ++d)
+        for (unsigned int e=0; e<dim; ++e)
+          inv_grad[d][e] += factor[e] * jac_update[d];
     }
   return outside;
 }

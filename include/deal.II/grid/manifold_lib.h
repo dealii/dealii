@@ -780,12 +780,12 @@ private:
    * Push forward operation.
    *
    * @note This internal function is currently not compatible with the
-   * ChartManifold::pull_back() function because the given class represents an
-   * atlas of charts, not a single chart. Thus, the pull_back() operation is
-   * only valid with the additional information of the chart, given by a cell
-   * on the coarse grid. An alternative implementation could shift the index
-   * depending on the coarse cell for a 1-to-1 relation between the chart space
-   * and the image space.
+   * ChartManifold::push_forward() function because the given class represents
+   * an atlas of charts, not a single chart. Thus, the push_forward()
+   * operation is only valid with the additional information of the chart,
+   * given by a cell on the coarse grid. An alternative implementation could
+   * shift the index depending on the coarse cell for a 1-to-1 relation
+   * between the chart space and the image space.
    */
   Point<spacedim>
   push_forward(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
@@ -793,10 +793,18 @@ private:
 
   /**
    * Gradient of the push_forward method.
+   *
+   * @note This internal function is not compatible with the
+   * ChartManifold::pull_back() function because the given class represents an
+   * atlas of charts, not a single chart. Furthermore, this private function
+   * also requires the user to provide the result of the push_forward() call
+   * on the chart point for the use case of this function, namely inside a
+   * Newton iteration where the gradient is computed by finite differences.
    */
   DerivativeForm<1,dim,spacedim>
   push_forward_gradient(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                        const Point<dim> &chart_point) const;
+                        const Point<dim>      &chart_point,
+                        const Point<spacedim> &pushed_forward_chart_point) const;
 
   /**
    * The underlying triangulation.
