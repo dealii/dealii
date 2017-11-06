@@ -1,15 +1,16 @@
-//----------------------------  manifold_id_01.cc  ---------------------------
-//    Copyright (C) 2011 - 2015 by the mathLab team.
+//-------------------------------------------------------------------
+//    Copyright (C) 2017 by the deal.II authors.
 //
 //    This file is subject to LGPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  flat_manifold_01.cc  ---------------------------
+//-------------------------------------------------------------------
 
 
-// Test that the flat manifold does what it should
+// Test that Manifold::get_normal_vector also works for a special case that
+// used to crash with another algorithm.
 
 #include "../tests.h"
 

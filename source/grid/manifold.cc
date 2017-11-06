@@ -156,16 +156,22 @@ normal_vector (const Triangulation<3, 3>::face_iterator &face,
                const Point<3> &p) const
 {
   const int spacedim=3;
+
+  // value of i used to compute t1
+  unsigned int i_t1 = numbers::invalid_unsigned_int;
   Tensor<1,spacedim> t1,t2;
   Tensor<1,spacedim> normal;
+  double normal_direction = numbers::signaling_nan<double>();
 
   // Look for a combination of tangent vectors that
   // are of approximately equal length and not linearly dependent
-  for (unsigned int i=0,j=1 ; i<4 && j<4; ++j)
+  for (unsigned int i=0,j=1 ;
+       i<GeometryInfo<3>::vertices_per_face && j<GeometryInfo<3>::vertices_per_face;
+       ++j)
     {
       // if p is too close to vertex i try again with different i and j
       if ((p - face->vertex(i)).norm_square() <
-          std::numeric_limits<double>::epsilon() * (p - face->vertex(j)).norm_square())
+          1e4 * std::numeric_limits<double>::epsilon() * (p - face->vertex(j)).norm_square())
         {
           ++i;
           continue;
@@ -173,23 +179,29 @@ normal_vector (const Triangulation<3, 3>::face_iterator &face,
 
       // if p is too close to vertex j try again with different j
       if ((p - face->vertex(j)).norm_square() <
-          std::numeric_limits<double>::epsilon() * (p - face->vertex(i)).norm_square())
+          1e4 * std::numeric_limits<double>::epsilon() * (p - face->vertex(i)).norm_square())
         continue;
 
-      t1 = get_tangent_vector(p, face->vertex(i));
-      t2 = get_tangent_vector(p, face->vertex(j));
+      // i might not have changed, and get_tangent_vector is potentially expensive.
+      // Only compute a new t1 if necessary
+      if (i != i_t1)
+        {
+          i_t1 = i;
+          t1 = get_tangent_vector(p, face->vertex(i));
+        }
 
+      t2 = get_tangent_vector(p, face->vertex(j));
       normal = cross_product_3d(t1,t2);
 
       // if t1 and t2 are (nearly) linearly dependent try again with different j / t2
-      if (normal.norm_square() < std::numeric_limits<double>::epsilon() *
+      if (normal.norm_square() < 1e4 * std::numeric_limits<double>::epsilon() *
           t1.norm_square() * t2.norm_square())
         continue;
 
       break;
     }
 
-  Assert(normal.norm_square() >= std::numeric_limits<double>::epsilon() *
+  Assert(normal.norm_square() >= 1e4 * std::numeric_limits<double>::epsilon() *
          t1.norm_square() * t2.norm_square(),
          ExcMessage("Manifold::normal_vector was unable to find a suitable combination "
                     "of vertices to compute a normal on this face. Check for distorted "
