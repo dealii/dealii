@@ -248,6 +248,13 @@ public:
    * The center of the spherical coordinate system.
    */
   const Point<spacedim> center;
+
+private:
+
+  /**
+   * A manifold description to be used for get_new_point in 2D.
+   **/
+  const PolarManifold<spacedim> polar_manifold;
 };
 
 
