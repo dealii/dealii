@@ -718,7 +718,7 @@ LAPACKFullMatrix<number>::compute_svd()
   AssertThrow (info==0, LAPACKSupport::ExcErrorCode("gesdd", info));
   // Resize the work array. Add one to the size computed by LAPACK to be on
   // the safe side.
-  lwork = static_cast<int>(std::fabs(work[0]) + 1);
+  lwork = static_cast<int>(std::abs(work[0]) + 1);
 
   work.resize(lwork);
   // Do the actual SVD.
@@ -743,10 +743,10 @@ LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
 
   Assert (state==LAPACKSupport::svd, ExcState(state));
 
-  const double lim = std::fabs(wr[0])*threshold;
+  const double lim = std::abs(wr[0])*threshold;
   for (size_type i=0; i<wr.size(); ++i)
     {
-      if (std::fabs(wr[i]) > lim)
+      if (std::abs(wr[i]) > lim)
         wr[i] = number(1.)/wr[i];
       else
         wr[i] = 0.;
@@ -911,7 +911,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
   Assert (info == 0, ExcInternalError());
   // Allocate working array according to suggestion (same strategy as was
   // noted in compute_svd).
-  lwork = static_cast<int>(std::fabs(work[0]) + 1);
+  lwork = static_cast<int>(std::abs(work[0]) + 1);
 
   // resize workspace array
   work.resize((size_type ) lwork);
@@ -984,7 +984,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lowe
   Assert (info == 0, ExcInternalError());
   // Allocate working array according to suggestion (same strategy as was noted in
   // compute_svd).
-  lwork = static_cast<int>(std::fabs(work[0]) + 1);
+  lwork = static_cast<int>(std::abs(work[0]) + 1);
   work.resize(static_cast<size_type> (lwork));
 
   // Finally compute the eigenvalues.
@@ -1075,7 +1075,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   Assert (info == 0, ExcInternalError());
   // Allocate working array according to suggestion (same strategy as was
   // noted in compute_svd).
-  lwork = static_cast<int>(std::fabs(work[0]) + 1);
+  lwork = static_cast<int>(std::abs(work[0]) + 1);
 
   // resize workspace arrays
   work.resize(static_cast<size_type> (lwork));
@@ -1157,7 +1157,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   Assert (info == 0, ExcInternalError());
   // Allocate working array according to suggestion (same strategy as was
   // noted in compute_svd).
-  lwork = static_cast<int>(std::fabs(work[0]) + 1);
+  lwork = static_cast<int>(std::abs(work[0]) + 1);
 
   // resize workspace array
   work.resize(static_cast<size_type>(lwork));
@@ -1230,7 +1230,7 @@ LAPACKFullMatrix<number>::print_formatted (
         // since there is no isnan on complex numbers
         if (std::isnan(std::abs((*this)(i,j))))
           out << std::setw(width) << (*this)(i,j) << ' ';
-        else if (std::fabs(this->el(i,j)) > threshold)
+        else if (std::abs(this->el(i,j)) > threshold)
           out << std::setw(width)
               << this->el(i,j) * denominator << ' ';
         else
