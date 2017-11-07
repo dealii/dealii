@@ -397,23 +397,36 @@ namespace DoFRenumbering
 
     const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
 
-    // otherwise compute the Cuthill-McKee permutation
-    DynamicSparsityPattern dsp (dof_handler.n_dofs(),
-                                dof_handler.n_dofs(),
-                                locally_owned_dofs);
-    DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
-
-    // constraints are not needed anymore
-    constraints.clear ();
-
-    // If the index set is not complete, then we need to work on only the
-    // local index space.
-    if (locally_owned_dofs.n_elements() != locally_owned_dofs.size())
+    // see if we can get away with the sequential algorithm
+    if (locally_owned_dofs.n_elements() == locally_owned_dofs.size())
       {
-        // Create sparsity pattern from dsp by transferring its indices to
-        // processor-local index space and doing Cuthill-McKee there
-        DynamicSparsityPattern sparsity(locally_owned_dofs.n_elements(),
-                                        locally_owned_dofs.n_elements());
+        AssertDimension(new_indices.size(), dof_handler.n_dofs());
+
+        DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                    dof_handler.n_dofs());
+        DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
+
+        SparsityTools::reorder_Cuthill_McKee (dsp, new_indices,
+                                              starting_indices);
+        if (reversed_numbering)
+          new_indices = Utilities::reverse_permutation (new_indices);
+      }
+    else
+      {
+        // we are in the parallel case where we need to work in the
+        // local index space, i.e., the locally owned part of the
+        // sparsity pattern.
+        //
+        // create first the global sparsity pattern, and then the local
+        // sparsity pattern from the global one by transferring its indices to
+        // processor-local index space
+        DynamicSparsityPattern dsp (dof_handler.n_dofs(),
+                                    dof_handler.n_dofs(),
+                                    locally_owned_dofs);
+        DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
+
+        DynamicSparsityPattern local_sparsity(locally_owned_dofs.n_elements(),
+                                              locally_owned_dofs.n_elements());
         std::vector<types::global_dof_index> row_entries;
         for (unsigned int i=0; i<locally_owned_dofs.n_elements(); ++i)
           {
@@ -426,8 +439,8 @@ namespace DoFRenumbering
                 if (col != row && locally_owned_dofs.is_element(col))
                   row_entries.push_back(locally_owned_dofs.index_within_set(col));
               }
-            sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
-                                 true);
+            local_sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
+                                       true);
           }
 
         // translate starting indices from global to local indices
@@ -444,7 +457,7 @@ namespace DoFRenumbering
 
         // then do the renumbering on the locally owned portion
         AssertDimension(new_indices.size(), locally_owned_dofs.n_elements());
-        SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
+        SparsityTools::reorder_Cuthill_McKee (local_sparsity, new_indices,
                                               local_starting_indices);
         if (reversed_numbering)
           new_indices = Utilities::reverse_permutation (new_indices);
@@ -452,14 +465,6 @@ namespace DoFRenumbering
         // convert indices back to global index space
         for (std::size_t i=0; i<new_indices.size(); ++i)
           new_indices[i] = locally_owned_dofs.nth_index_in_set(new_indices[i]);
-      }
-    else
-      {
-        AssertDimension(new_indices.size(), dsp.n_rows());
-        SparsityTools::reorder_Cuthill_McKee (dsp, new_indices,
-                                              starting_indices);
-        if (reversed_numbering)
-          new_indices = Utilities::reverse_permutation (new_indices);
       }
   }
 
