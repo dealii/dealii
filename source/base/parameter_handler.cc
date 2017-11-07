@@ -1140,13 +1140,23 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
                 // print name
                 out << "\\item {\\it Parameter name:} {\\tt "
                     << escape(demangle(p->first)) << "}\n"
-                    << "\\phantomsection\\label{parameters:";
+                    << "\\phantomsection";
                 // labels are not to be escaped but mangled:
-                for (unsigned int i=0; i<target_subsection_path.size(); ++i)
-                  out << mangle(target_subsection_path[i]) << "/";
-                out << p->first;
-                out << "}\n\n"
-                    << '\n';
+                {
+                  std::string label = "parameters:";
+                  for (unsigned int i=0; i<target_subsection_path.size(); ++i)
+                    {
+                      label.append(mangle(target_subsection_path[i]));
+                      label.append("/");
+                    }
+                  label.append(p->first);
+                  out << "\\label{" << label << "}\n";
+                  // Backwards-compatibility. Also output label without
+                  // escaping whitespace:
+                  if (label.find("_20")!=std::string::npos)
+                    out << "\\label{" << Utilities::replace_in_string(label,"_20", " ") << "}\n";
+                }
+                out << "\n\n";
 
                 out << "\\index[prmindex]{"
                     << escape(demangle(p->first))

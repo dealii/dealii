@@ -57,6 +57,7 @@ This parameter is an alias for the parameter ``\texttt{int}''.
 
 \item {\it Parameter name:} {\tt string list}
 \phantomsection\label{parameters:Testing/string_20list}
+\label{parameters:Testing/string list}
 
 
 \index[prmindex]{string list}
@@ -81,6 +82,7 @@ This parameter is an alias for the parameter ``\texttt{int}''.
 \begin{itemize}
 \item {\it Parameter name:} {\tt double 2}
 \phantomsection\label{parameters:Testing/Testing_202/double_202}
+\label{parameters:Testing/Testing 2/double 2}
 
 
 \index[prmindex]{double 2}
@@ -97,6 +99,7 @@ This parameter is an alias for the parameter ``\texttt{int}''.
 {\it Possible values:} A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$
 \item {\it Parameter name:} {\tt int 2}
 \phantomsection\label{parameters:Testing/Testing_202/int_202}
+\label{parameters:Testing/Testing 2/int 2}
 
 
 \index[prmindex]{int 2}
@@ -110,6 +113,7 @@ This parameter is an alias for the parameter ``\texttt{int}''.
 {\it Possible values:} An integer $n$ such that $-2147483648\leq n \leq 2147483647$
 \item {\it Parameter name:} {\tt string list 2}
 \phantomsection\label{parameters:Testing/Testing_202/string_20list_202}
+\label{parameters:Testing/Testing 2/string list 2}
 
 
 \index[prmindex]{string list 2}
