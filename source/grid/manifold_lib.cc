@@ -461,6 +461,22 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
 
     const unsigned int n_merged_points = directions.size();
 
+    // check if we only have two points now, in which case we can use the
+    // get_intermediate_point function
+    if (n_merged_points == 2)
+      {
+        SphericalManifold<3,3> unit_manifold;
+        Assert(std::abs(merged_weights[0] + merged_weights[1] - 1.0) < 1e-13,
+               ExcMessage("Weights do not sum up to 1"));
+        Point<3> intermediate = unit_manifold.get_intermediate_point
+                                (Point<3>(directions[0]), Point<3>(directions[1]), merged_weights[1]);
+        // copy back to spacedim-point
+        Point<spacedim> p;
+        for (unsigned int d=0; d<spacedim; ++d)
+          p[d] = intermediate[d];
+        return center + rho * p;
+      }
+
     Tensor<1,3> vPerp;
     Tensor<2,2> Hessian;
     Tensor<1,2> gradient;
