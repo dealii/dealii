@@ -613,16 +613,8 @@ public:
    * rotates it outward (with respect to the coordinate system of the edge)
    * by 90 degrees. In 3d, the default implementation is more
    * complicated, aiming at avoiding problems with numerical round-off
-   * for points close to one of the vertices. If the point p is closer
-   * to the center of the face than to any of the vertices, the
-   * normal vector is computed by the cross product of the tangent
-   * vectors from p to either vertex zero and one of the face (if
-   * the closest vertex is either vertex two or three), or of the tangent
-   * vectors from p to vertices two and three (if the closest vertex is
-   * either vertex zero or one). On the other hand, if the point p
-   * is closer to one of the vertices than to the center of the face,
-   * then we take the cross product of the tangent vectors from p
-   * to the two vertices that are adjacent to the closest one.
+   * for points close to one of the vertices, and avoiding tangent directions
+   * that are linearly dependent.
    */
   virtual
   Tensor<1,spacedim>

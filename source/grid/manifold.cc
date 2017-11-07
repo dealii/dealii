@@ -156,87 +156,68 @@ normal_vector (const Triangulation<3, 3>::face_iterator &face,
                const Point<3> &p) const
 {
   const int spacedim=3;
-  Tensor<1,spacedim> t1,t2;
 
-  // Take the difference between p and all four vertices
-  unsigned int min_index=0;
-  double       min_distance = (p-face->vertex(0)).norm_square();
+  // Compute distances from p to vertices
+  std::array<std::pair<double,unsigned int>, GeometryInfo<3>::vertices_per_face> distances;
+  for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_face; ++i)
+    distances[i] = std::make_pair((p-face->vertex(i)).norm_square(),i);
 
-  for (unsigned int i=1; i<4; ++i)
+  // Sort the distances and figure out, which vertices to use
+  std::sort(distances.begin(),distances.end());
+  unsigned int first_index, second_index, fallback_index;
+
+  const double center_distance = (p-face->center()).norm_square();
+
+  // If we are closer to the center than any vertex, use closest vertices
+  if (center_distance < distances[0].first)
     {
-      const Tensor<1,spacedim> dp = p-face->vertex(i);
-      double distance = dp.norm_square();
-      if (distance < min_distance)
-        {
-          min_index = i;
-          min_distance = distance;
-        }
+      first_index = distances[0].second;
+      second_index = distances[1].second;
+      fallback_index = distances[2].second;
     }
-  // Verify we have a valid vertex index
-  AssertIndexRange(min_index, 4);
-
-  // Now figure out which vertices are best to compute tangent vectors.
-  // We split the cell in a central diamond of points closer to the
-  // center than to any of the vertices, and the 4 triangles in the
-  // corner. The central diamond is split into its upper and lower
-  // half. For each of these 6 cases, the following encodes a list
-  // of two vertices each to which we compute the tangent vectors,
-  // and then take the cross product. See the documentation of this
-  // function for exact details.
-  if ((p-face->center()).norm_square() < min_distance)
-    {
-      // we are close to the face center: pick two consecutive vertices,
-      // but not the closest one. We make sure the direction is always
-      // the same.
-      if (min_index < 2)
-        {
-          t1 = get_tangent_vector(p, face->vertex(3));
-          t2 = get_tangent_vector(p, face->vertex(2));
-        }
-      else
-        {
-          t1 = get_tangent_vector(p, face->vertex(0));
-          t2 = get_tangent_vector(p, face->vertex(1));
-        }
-    }
+  // Otherwise use vertices further away
   else
     {
-      // we are closer to one of the vertices than to the
-      // center of the face
-      switch (min_index)
-        {
-        case 0:
-        {
-          t1 = get_tangent_vector(p, face->vertex(1));
-          t2 = get_tangent_vector(p, face->vertex(2));
-          break;
-        }
-        case 1:
-        {
-          t1 = get_tangent_vector(p, face->vertex(3));
-          t2 = get_tangent_vector(p, face->vertex(0));
-          break;
-        }
-        case 2:
-        {
-          t1 = get_tangent_vector(p, face->vertex(0));
-          t2 = get_tangent_vector(p, face->vertex(3));
-          break;
-        }
-        case 3:
-        {
-          t1 = get_tangent_vector(p, face->vertex(2));
-          t2 = get_tangent_vector(p, face->vertex(1));
-          break;
-        }
-        default:
-          Assert(false, ExcInternalError());
-          break;
-        }
+      first_index = distances[1].second;
+      second_index = distances[2].second;
+
+      // If we are very close to a vertex use the farthest vertex as fallback,
+      // otherwise use closest vertex.
+      if (distances[0].first < 1e4 * std::numeric_limits<double>::epsilon() * distances[1].first)
+        fallback_index = distances[3].second;
+      else
+        fallback_index = distances[0].second;
     }
 
-  const Tensor<1,spacedim> normal = cross_product_3d(t1,t2);
-  return normal/normal.norm();
+  // Compute tangents and normal for selected vertices
+  Tensor<1,spacedim> t1 = get_tangent_vector(p, face->vertex(first_index));
+  Tensor<1,spacedim> t2 = get_tangent_vector(p, face->vertex(second_index));
+  Tensor<1,spacedim> normal = cross_product_3d(t1,t2);
+
+  // If the tangents are linearly dependent fall back to another tangent
+  if (normal.norm_square() <= 1e4 * std::numeric_limits<double>::epsilon() *
+      t1.norm_square() * t2.norm_square())
+    {
+      t2 = get_tangent_vector(p, face->vertex(fallback_index));
+      normal = cross_product_3d(t1,t2);
+    }
+
+  Assert(normal.norm_square() > 1e4 * std::numeric_limits<double>::epsilon() *
+         t1.norm_square() * t2.norm_square(),
+         ExcMessage("Manifold::normal_vector was unable to find a suitable combination "
+                    "of vertices to compute a normal on this face. Check for distorted "
+                    "faces in your triangulation."));
+
+  // Now figure out if we need to flip the direction, we do this by comparing to a reference
+  // normal that would be the correct result if all vertices would lie in a plane
+  const Tensor<1,spacedim> rt1 = face->vertex(3) - face->vertex(0);
+  const Tensor<1,spacedim> rt2 = face->vertex(2) - face->vertex(1);
+  const Tensor<1,spacedim> reference_normal = cross_product_3d(rt1,rt2);
+
+  if (reference_normal * normal < 0.0)
+    normal *= -1.0;
+
+  return normal / normal.norm();
 }
 
 
