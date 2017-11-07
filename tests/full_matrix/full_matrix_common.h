@@ -80,10 +80,10 @@ template <typename number>
 void
 print_matrix (const FullMatrix<number> &m)
 {
+  const number tolerance = 100.*std::numeric_limits<number>::epsilon();
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
-      // make sure we also respect output thresholds on floats
-      deallog << i << ' ' << j << ' ' << (double)m(i,j)
+      deallog << i << ' ' << j << ' ' << filter_out_small_numbers(m(i,j),tolerance)
               << std::endl;
 }
 
@@ -93,9 +93,10 @@ template <typename number>
 void
 print_matrix (const FullMatrix<std::complex<number> > &m)
 {
+  const number tolerance = 100.*std::numeric_limits<number>::epsilon();
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
-      deallog << i << ' ' << j << ' ' << m(i,j)
+      deallog << i << ' ' << j << ' ' << filter_out_small_numbers(m(i,j),tolerance)
               << std::endl;
 }
 
@@ -105,8 +106,10 @@ template <typename number>
 void
 print_vector (const Vector<number> &v)
 {
+  const typename numbers::NumberTraits<number>::real_type tolerance
+    = 100.*std::numeric_limits<typename numbers::NumberTraits<number>::real_type>::epsilon();
   for (unsigned int i=0; i<v.size(); ++i)
-    deallog << i << ' ' << v(i)
+    deallog << i << ' ' << filter_out_small_numbers(v(i),tolerance)
             << std::endl;
 }
 
@@ -114,13 +117,13 @@ template <typename number>
 void
 display_matrix(FullMatrix<number> M)
 {
+  const number tolerance = 100.*std::numeric_limits<number>::epsilon();
   deallog<<M.m()<<"x"<<M.n()<<" matrix"<<std::endl;
   for (unsigned int i=0; i<M.m(); i++)
     {
-      // make sure we also respect output thresholds on floats
       for (unsigned int j=0; j<M.n(); j++)
-        deallog<<(double)M(i,j)<<" ";
-      deallog<<std::endl;
+        deallog << filter_out_small_numbers(M(i,j),tolerance) << " ";
+      deallog << std::endl;
     }
 }
 
@@ -128,11 +131,12 @@ template <typename number>
 void
 display_matrix(FullMatrix<std::complex<number> > M)
 {
+  const number tolerance = 100.*std::numeric_limits<number>::epsilon();
   deallog<<M.m()<<"x"<<M.n()<<" matrix"<<std::endl;
   for (unsigned int i=0; i<M.m(); i++)
     {
       for (unsigned int j=0; j<M.n(); j++)
-        deallog<<M(i,j)<<" ";
+        deallog << filter_out_small_numbers(M(i,j),tolerance) << " ";
       deallog<<std::endl;
     }
 }

@@ -532,7 +532,8 @@ void project (const Mapping<dim>       &mapping,
   PreconditionSSOR<> prec;
   prec.initialize(mass_matrix, 1.2);
   // solve
-  cg.solve (mass_matrix, vec, tmp, prec);
+  check_solver_within_range(cg.solve(mass_matrix, vec, tmp, prec),
+                            control.last_step(), 16, 17);
 
   // distribute solution
   constraints.distribute (vec);
