@@ -17,6 +17,7 @@
 #define dealii_distributed_grid_tools_h
 
 
+#include <deal.II/base/bounding_box.h>
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/distributed/tria_base.h>
@@ -134,6 +135,22 @@ namespace parallel
     exchange_cell_data_to_ghosts (const MeshType &mesh,
                                   const std::function<boost::optional<DataType> (const typename MeshType::active_cell_iterator &)> &pack,
                                   const std::function<void (const typename MeshType::active_cell_iterator &, const DataType &)> &unpack);
+
+    /**
+     * Exchange with all processors of the MPI communicator @p mpi_communicator the vector of bounding
+     * boxes @p local_bboxes.
+     *
+     * This function is meant to exchange bounding boxes describing the locally owned
+     * cells in a distributed triangulation obtained with the function
+     * GridTools::compute_mesh_predicate_bounding_box .
+     *
+     * The output vector's size is the number of processes of the MPI communicator:
+     * its i-th entry contains the vector @p local_bboxes of the i-th process.
+     */
+    template<int spacedim>
+    std::vector< std::vector< BoundingBox<spacedim> > >
+    exchange_local_bounding_boxes(const std::vector< BoundingBox<spacedim> > &local_bboxes,
+                                  MPI_Comm                                    mpi_communicator);
 
     /**
      * A structure that allows the transfer of cell data of type @p T from one processor
