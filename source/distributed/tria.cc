@@ -1733,7 +1733,7 @@ namespace parallel
     Triangulation<dim,spacedim>::setup_coarse_cell_to_p4est_tree_permutation ()
     {
       DynamicSparsityPattern cell_connectivity;
-      GridTools::get_vertex_connectivity_of_cells (*this, cell_connectivity);
+      dealii::GridTools::get_vertex_connectivity_of_cells (*this, cell_connectivity);
       coarse_cell_to_p4est_tree_permutation.resize (this->n_cells(0));
       SparsityTools::
       reorder_hierarchical (cell_connectivity,
@@ -3054,7 +3054,7 @@ namespace parallel
 #ifdef DEBUG
       {
         const std::vector<bool> locally_owned_vertices
-          = GridTools::get_locally_owned_vertices (*this);
+          = dealii::GridTools::get_locally_owned_vertices (*this);
         for (unsigned int i=0; i<locally_owned_vertices.size(); ++i)
           Assert ((vertex_locally_moved[i] == false)
                   ||
@@ -3395,7 +3395,7 @@ namespace parallel
     template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::add_periodicity
-    (const std::vector<GridTools::PeriodicFacePair<cell_iterator> > &
+    (const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator> > &
      periodicity_vector)
     {
 #if DEAL_II_P4EST_VERSION_GTE(0,3,4,1)
@@ -3404,7 +3404,7 @@ namespace parallel
       Assert (this->n_levels() == 1,
               ExcMessage ("The triangulation is refined!"));
 
-      typedef std::vector<GridTools::PeriodicFacePair<cell_iterator> >
+      typedef std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator> >
       FaceVector;
       typename FaceVector::const_iterator it, periodic_end;
       it = periodicity_vector.begin();

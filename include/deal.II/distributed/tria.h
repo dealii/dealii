@@ -704,7 +704,7 @@ namespace parallel
        */
       virtual void
       add_periodicity
-      (const std::vector<GridTools::PeriodicFacePair<cell_iterator> > &);
+      (const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator> > &);
 
 
     private:
