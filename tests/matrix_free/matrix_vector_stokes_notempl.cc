@@ -119,14 +119,11 @@ template <int dim>
 void test (const unsigned int fe_degree)
 {
   SphericalManifold<dim> manifold;
-  HyperShellBoundary<dim> boundary;
   Triangulation<dim>   triangulation;
   GridGenerator::hyper_shell (triangulation, Point<dim>(),
                               0.5, 1., 96, true);
   triangulation.set_all_manifold_ids(0);
-  triangulation.set_all_manifold_ids_on_boundary(1);
   triangulation.set_manifold (0, manifold);
-  triangulation.set_manifold (1, boundary);
 
   triangulation.begin_active()->set_refine_flag();
   triangulation.last()->set_refine_flag();
