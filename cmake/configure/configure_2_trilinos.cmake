@@ -192,7 +192,13 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
-  SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES "Sacado::Fad::DFad<double>; Sacado::Fad::DFad<float>; Sacado::Fad::DFad<Sacado::Fad::DFad<double>>; Sacado::Fad::DFad<Sacado::Fad::DFad<float>>")
+  # Note: Only CMake 3.0 and greater support line continuation with the "\" character
+  #       Elements of string lists are naturally separated by a ";"
+  SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES
+      "Sacado::Fad::DFad<double>"
+      "Sacado::Fad::DFad<float>"
+      "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
+      "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>")
 
   IF (TRILINOS_WITH_MPI)
     SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
