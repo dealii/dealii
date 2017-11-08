@@ -1141,8 +1141,8 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
                 out << "\\item {\\it Parameter name:} {\\tt "
                     << escape(demangle(p->first)) << "}\n"
                     << "\\phantomsection";
-                // labels are not to be escaped but mangled:
                 {
+                  // create label: labels are not to be escaped but mangled
                   std::string label = "parameters:";
                   for (unsigned int i=0; i<target_subsection_path.size(); ++i)
                     {
@@ -1150,11 +1150,11 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
                       label.append("/");
                     }
                   label.append(p->first);
-                  out << "\\label{" << label << "}\n";
-                  // Backwards-compatibility. Also output label without
+                  // Backwards-compatibility. Output the label with and without
                   // escaping whitespace:
                   if (label.find("_20")!=std::string::npos)
                     out << "\\label{" << Utilities::replace_in_string(label,"_20", " ") << "}\n";
+                  out << "\\label{" << label << "}\n";
                 }
                 out << "\n\n";
 
@@ -1197,13 +1197,23 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
                 // print name
                 out << "\\item {\\it Parameter name:} {\\tt "
                     << escape(demangle(p->first)) << "}\n"
-                    << "\\phantomsection\\label{parameters:";
-                // do not escape but mangle labels:
-                for (unsigned int i=0; i<target_subsection_path.size(); ++i)
-                  out << mangle(target_subsection_path[i]) << "/";
-                out << p->first;
-                out << "}\n\n"
-                    << '\n';
+                    << "\\phantomsection";
+                {
+                  // create label: labels are not to be escaped but mangled
+                  std::string label = "parameters:";
+                  for (unsigned int i=0; i<target_subsection_path.size(); ++i)
+                    {
+                      label.append(mangle(target_subsection_path[i]));
+                      label.append("/");
+                    }
+                  label.append(p->first);
+                  // Backwards-compatibility. Output the label with and without
+                  // escaping whitespace:
+                  if (label.find("_20")!=std::string::npos)
+                    out << "\\label{" << Utilities::replace_in_string(label,"_20", " ") << "}\n";
+                  out << "\\label{" << label << "}\n";
+                }
+                out << "\n\n";
 
                 out << "\\index[prmindex]{"
                     << escape(demangle(p->first))

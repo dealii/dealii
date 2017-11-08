@@ -38,8 +38,8 @@
 
 {\it Possible values:} An integer $n$ such that $-2147483648\leq n \leq 2147483647$
 \item {\it Parameter name:} {\tt string list}
-\phantomsection\label{parameters:Testing/string_20list}
-\label{parameters:Testing/string list}
+\phantomsection\label{parameters:Testing/string list}
+\label{parameters:Testing/string_20list}
 
 
 \index[prmindex]{string list}

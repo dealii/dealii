@@ -17,8 +17,8 @@
 
 \begin{itemize}
 \item {\it Parameter name:} {\tt some other entry with \{\%\}}
-\phantomsection\label{parameters:section_5f1/some_20other_20entry_20with_20_7b_25_7d}
-\label{parameters:section_5f1/some other entry with _7b_25_7d}
+\phantomsection\label{parameters:section_5f1/some other entry with _7b_25_7d}
+\label{parameters:section_5f1/some_20other_20entry_20with_20_7b_25_7d}
 
 
 \index[prmindex]{some other entry with \{\%\}}
