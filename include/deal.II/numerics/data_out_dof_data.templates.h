@@ -1085,7 +1085,25 @@ add_data_vector_internal
                    (dof_handler, &data_vector, deduced_names, data_component_interpretation);
 
   if (actual_type == type_dof_data)
-    dof_data.emplace_back (std::move(new_entry));
+    {
+      // output vectors for which at least part of the data is to be interpreted
+      // as vector fields cannot be complex-valued, because we cannot visualize
+      // complex-valued vector fields
+      Assert (!((std::find(data_component_interpretation.begin(),
+                           data_component_interpretation.end(),
+                           DataComponentInterpretation::component_is_part_of_vector)
+                 != data_component_interpretation.end())
+                &&
+                new_entry->is_complex_valued()),
+              ExcMessage ("Complex-valued vectors added to a DataOut-like object "
+                          "cannot contain components that shall be interpreted as "
+                          "vector fields because one can not visualize complex-valued "
+                          "vector fields. However, you may want to try to output "
+                          "this vector as a collection of scalar fields that can then "
+                          "be visualized by their real and imaginary parts separately."));
+
+      dof_data.emplace_back (std::move(new_entry));
+    }
   else
     cell_data.emplace_back (std::move(new_entry));
 }
@@ -1158,11 +1176,23 @@ get_dataset_names () const
   for (data_iterator  d=dof_data.begin();
        d!=dof_data.end(); ++d)
     for (unsigned int i=0; i<(*d)->names.size(); ++i)
-      names.push_back ((*d)->names[i]);
+      if ((*d)->is_complex_valued() == false)
+        names.push_back ((*d)->names[i]);
+      else
+        {
+          names.push_back ((*d)->names[i] + "_re");
+          names.push_back ((*d)->names[i] + "_im");
+        }
   for (data_iterator d=cell_data.begin(); d!=cell_data.end(); ++d)
     {
       Assert ((*d)->names.size() == 1, ExcInternalError());
-      names.push_back ((*d)->names[0]);
+      if ((*d)->is_complex_valued() == false)
+        names.push_back ((*d)->names[0]);
+      else
+        {
+          names.push_back ((*d)->names[0] + "_re");
+          names.push_back ((*d)->names[0] + "_im");
+        }
     }
 
   return names;
@@ -1178,8 +1208,7 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_vector_data_range
   std::vector<std::tuple<unsigned int, unsigned int, std::string> >
   ranges;
 
-  // collect the ranges of dof
-  // and cell data
+  // collect the ranges of dof and cell data
   typedef
   typename std::vector<std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >::const_iterator
   data_iterator;
@@ -1187,8 +1216,7 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_vector_data_range
   unsigned int output_component = 0;
   for (data_iterator  d=dof_data.begin();
        d!=dof_data.end(); ++d)
-    for (unsigned int i=0; i<(*d)->n_output_variables;
-         ++i, ++output_component)
+    for (unsigned int i=0; i<(*d)->n_output_variables; )
       // see what kind of data we have
       // here. note that for the purpose of
       // the current function all we care
@@ -1238,26 +1266,27 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_vector_data_range
           // by the appropriate amount, same
           // for 'i', since we have already
           // dealt with all these components
-          output_component += patch_space_dim-1;
-          i += patch_space_dim-1;
+          output_component += patch_space_dim;
+          i += patch_space_dim;
+        }
+      else
+        {
+          // just move one component forward by one, or two if the vector
+          // happens to be complex-valued
+          if ((*d)->is_complex_valued() == false)
+            {
+              ++output_component;
+              ++i;
+            }
+          else
+            {
+              output_component += 2;
+              ++i;
+            }
         }
 
-  // note that we do not have to traverse the
-  // list of cell data here because cell data
-  // is one value per (logical) cell and
-  // therefore cannot be a vector
-
-  // as a final check, the 'component'
-  // counter should be at the total number of
-  // components added up now
-#ifdef DEBUG
-  unsigned int n_output_components = 0;
-  for (data_iterator  d=dof_data.begin();
-       d!=dof_data.end(); ++d)
-    n_output_components += (*d)->n_output_variables;
-  Assert (output_component == n_output_components,
-          ExcInternalError());
-#endif
+  // note that we do not have to traverse the list of cell data here because cell data
+  // is one value per (logical) cell and therefore cannot be a vector
 
   return ranges;
 }
