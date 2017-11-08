@@ -1273,16 +1273,8 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_vector_data_range
         {
           // just move one component forward by one, or two if the vector
           // happens to be complex-valued
-          if ((*d)->is_complex_valued() == false)
-            {
-              ++output_component;
-              ++i;
-            }
-          else
-            {
-              output_component += 2;
-              ++i;
-            }
+          ++i;
+          output_component += ((*d)->is_complex_valued() ? 2 : 1);
         }
 
   // note that we do not have to traverse the list of cell data here because cell data
