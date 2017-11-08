@@ -20,6 +20,9 @@
 # code base looks uniform, as uniformity helps make code easier to
 # read.
 #
+# While we're already touching every file, this script also makes
+# sure we set permissions correctly
+#
 # The script needs to be executed as 
 #   ./contrib/utilities/indent
 # from the top-level directory of the source tree, or via
@@ -56,6 +59,9 @@ fi
 # collect all header and source files and process them in batches of 50 files
 # with up to 10 in parallel
 find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print | xargs -n 50 -P 10 astyle --options=contrib/styles/astyle.rc
+
+# use the same process to set file permissions for all source files
+find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print | xargs -n 50 -P 10 chmod 644
 
 # format .inst.in files. We need to replace \{ and \} because it confuses
 # astyle.
