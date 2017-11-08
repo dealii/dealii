@@ -24,15 +24,16 @@
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 template <int dim>
 void test()
 {
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);
-  static const HyperBallBoundary<dim> boundary;
-  tria.set_boundary (0, boundary);
+  static const SphericalManifold<dim> manifold;
+  tria.set_all_manifold_ids_on_boundary(0);
+  tria.set_manifold (0, manifold);
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
