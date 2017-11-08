@@ -286,13 +286,26 @@ build_one_patch
 
           for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
             {
-              const double value
-                = this->cell_data[dataset]->get_cell_data_value (cell_and_index->second,
-                                                                 internal::DataOut::ComponentExtractor::real_part);
-              for (unsigned int q=0; q<n_q_points; ++q)
-                patch.data(offset,q) = value;
+              // as above, first output the real part
+              {
+                const double value
+                  = this->cell_data[dataset]->get_cell_data_value (cell_and_index->second,
+                                                                   internal::DataOut::ComponentExtractor::real_part);
+                for (unsigned int q=0; q<n_q_points; ++q)
+                  patch.data(offset,q) = value;
+              }
 
-              offset += (this->dof_data[dataset]->is_complex_valued() ? 2 : 1);
+              // and if there is one, also output the imaginary part
+              if (this->cell_data[dataset]->is_complex_valued() == true)
+                {
+                  const double value
+                    = this->cell_data[dataset]->get_cell_data_value (cell_and_index->second,
+                                                                     internal::DataOut::ComponentExtractor::imaginary_part);
+                  for (unsigned int q=0; q<n_q_points; ++q)
+                    patch.data(offset+1,q) = value;
+                }
+
+              offset += (this->cell_data[dataset]->is_complex_valued() ? 2 : 1);
             }
         }
     }
