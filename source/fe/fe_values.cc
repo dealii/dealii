@@ -40,6 +40,7 @@
 #include <memory>
 #include <type_traits>
 
+#include <deal.II/differentiation/ad/adolc_product_types.h>
 #include <deal.II/differentiation/ad/sacado_product_types.h>
 
 #include <boost/container/small_vector.hpp>

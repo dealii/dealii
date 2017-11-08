@@ -198,7 +198,11 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
       "Sacado::Fad::DFad<double>"
       "Sacado::Fad::DFad<float>"
       "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
-      "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>")
+      "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>"
+      "Sacado::Rad::ADvar<double>"
+      "Sacado::Rad::ADvar<float>"
+      "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
+      "Sacado::Rad::ADvar<Sacado::Fad::DFad<float>>")
 
   IF (TRILINOS_WITH_MPI)
     SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
