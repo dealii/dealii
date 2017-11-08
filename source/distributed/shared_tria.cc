@@ -106,7 +106,7 @@ namespace parallel
             = IteratorFilters::SubdomainEqualTo(this->my_subdomain);
 
           const std::vector<typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator>
-          active_halo_layer_vector = GridTools::compute_active_cell_halo_layer (*this, predicate);
+          active_halo_layer_vector = dealii::GridTools::compute_active_cell_halo_layer (*this, predicate);
           std::set<typename parallel::shared::Triangulation<dim,spacedim>::active_cell_iterator>
           active_halo_layer(active_halo_layer_vector.begin(), active_halo_layer_vector.end());
 
@@ -132,7 +132,7 @@ namespace parallel
                   true_level_subdomain_ids_of_cells[lvl].resize(this->n_cells(lvl));
 
                   const std::vector<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
-                  level_halo_layer_vector = GridTools::compute_cell_halo_layer_on_level (*this, predicate, lvl);
+                  level_halo_layer_vector = dealii::GridTools::compute_cell_halo_layer_on_level (*this, predicate, lvl);
                   std::set<typename parallel::shared::Triangulation<dim,spacedim>::cell_iterator>
                   level_halo_layer(level_halo_layer_vector.begin(), level_halo_layer_vector.end());
 
