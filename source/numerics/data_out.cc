@@ -221,31 +221,60 @@ build_one_patch
                     = scratch_data.postprocessed_values[dataset][q](component);
             }
           else
-            // now we use the given data vector without modifications. again,
+            // use the given data vector directly, without a postprocessor. again,
             // we treat single component functions separately for efficiency
             // reasons.
             if (n_components == 1)
               {
+                // first output the real part of the solution vector
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
                                                               internal::DataOut::ComponentExtractor::real_part,
                                                               scratch_data.patch_values_scalar.solution_values);
                 for (unsigned int q=0; q<n_q_points; ++q)
                   patch.data(offset,q) = scratch_data.patch_values_scalar.solution_values[q];
+
+                // and if there is one, also output the imaginary part
+                if (this->dof_data[dataset]->is_complex_valued() == true)
+                  {
+                    this->dof_data[dataset]->get_function_values (this_fe_patch_values,
+                                                                  internal::DataOut::ComponentExtractor::imaginary_part,
+                                                                  scratch_data.patch_values_scalar.solution_values);
+                    for (unsigned int q=0; q<n_q_points; ++q)
+                      patch.data(offset+1,q) = scratch_data.patch_values_scalar.solution_values[q];
+                  }
               }
             else
               {
                 scratch_data.resize_system_vectors(n_components);
+
+                // same as above: first the real part
+                const unsigned int stride = (this->dof_data[dataset]->is_complex_valued() ? 2 : 1);
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
                                                               internal::DataOut::ComponentExtractor::real_part,
                                                               scratch_data.patch_values_system.solution_values);
                 for (unsigned int component=0; component<n_components;
                      ++component)
                   for (unsigned int q=0; q<n_q_points; ++q)
-                    patch.data(offset+component,q) =
+                    patch.data(offset+component*stride,q) =
                       scratch_data.patch_values_system.solution_values[q](component);
+
+                // and if there is one, also output the imaginary part
+                if (this->dof_data[dataset]->is_complex_valued() == true)
+                  {
+                    this->dof_data[dataset]->get_function_values (this_fe_patch_values,
+                                                                  internal::DataOut::ComponentExtractor::imaginary_part,
+                                                                  scratch_data.patch_values_system.solution_values);
+                    for (unsigned int component=0; component<n_components;
+                         ++component)
+                      for (unsigned int q=0; q<n_q_points; ++q)
+                        patch.data(offset+component*stride+1,q) =
+                          scratch_data.patch_values_system.solution_values[q](component);
+                  }
               }
+
           // increment the counter for the actual data record
-          offset+=this->dof_data[dataset]->n_output_variables;
+          offset += this->dof_data[dataset]->n_output_variables *
+                    (this->dof_data[dataset]->is_complex_valued() ? 2 : 1);
         }
 
       // then do the cell data. only compute the number of a cell if needed;
@@ -257,11 +286,26 @@ build_one_patch
 
           for (unsigned int dataset=0; dataset<this->cell_data.size(); ++dataset)
             {
-              const double value
-                = this->cell_data[dataset]->get_cell_data_value (cell_and_index->second,
-                                                                 internal::DataOut::ComponentExtractor::real_part);
-              for (unsigned int q=0; q<n_q_points; ++q)
-                patch.data(offset+dataset,q) = value;
+              // as above, first output the real part
+              {
+                const double value
+                  = this->cell_data[dataset]->get_cell_data_value (cell_and_index->second,
+                                                                   internal::DataOut::ComponentExtractor::real_part);
+                for (unsigned int q=0; q<n_q_points; ++q)
+                  patch.data(offset,q) = value;
+              }
+
+              // and if there is one, also output the imaginary part
+              if (this->cell_data[dataset]->is_complex_valued() == true)
+                {
+                  const double value
+                    = this->cell_data[dataset]->get_cell_data_value (cell_and_index->second,
+                                                                     internal::DataOut::ComponentExtractor::imaginary_part);
+                  for (unsigned int q=0; q<n_q_points; ++q)
+                    patch.data(offset+1,q) = value;
+                }
+
+              offset += (this->cell_data[dataset]->is_complex_valued() ? 2 : 1);
             }
         }
     }
@@ -423,9 +467,12 @@ void DataOut<dim,DoFHandlerType>::build_patches
   this->patches.resize(all_cells.size());
 
   // now create a default object for the WorkStream object to work with
-  unsigned int n_datasets=this->cell_data.size();
+  unsigned int n_datasets = 0;
+  for (unsigned int i=0; i<this->cell_data.size(); ++i)
+    n_datasets += (this->cell_data[i]->is_complex_valued() ? 2 : 1);
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
-    n_datasets += this->dof_data[i]->n_output_variables;
+    n_datasets += (this->dof_data[i]->n_output_variables
+                   * (this->dof_data[i]->is_complex_valued() ? 2 : 1));
 
   std::vector<unsigned int> n_postprocessor_outputs (this->dof_data.size());
   for (unsigned int dataset=0; dataset<this->dof_data.size(); ++dataset)
