@@ -14,49 +14,39 @@
 // ---------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (DoFHandler : DOFHANDLER_TEMPLATES; deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
 {
 
-#if deal_II_dimension > 1
+#if deal_II_dimension <= deal_II_space_dimension
     template
     void
-    DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension-1,deal_II_dimension > >
-    (const DoFHandler<deal_II_dimension-1,deal_II_dimension > & dof_handler,
+    DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension,deal_II_space_dimension > >
+    (const DoFHandler<deal_II_dimension,deal_II_space_dimension > & dof_handler,
      IndexSet & dof_set);
+
     template
     void
-    DoFTools::extract_locally_relevant_level_dofs<DoFHandler<deal_II_dimension-1,deal_II_dimension > >
-    (const DoFHandler<deal_II_dimension-1,deal_II_dimension > & dof_handler,
+    DoFTools::extract_locally_relevant_level_dofs<DoFHandler<deal_II_dimension,deal_II_space_dimension > >
+    (const DoFHandler<deal_II_dimension,deal_II_space_dimension > & dof_handler,
      const unsigned int level,
      IndexSet & dof_set);
+
     template
     void
-    DoFTools::extract_locally_relevant_level_dofs<hp::DoFHandler<deal_II_dimension-1,deal_II_dimension > >
-    (const hp::DoFHandler<deal_II_dimension-1,deal_II_dimension > & dof_handler,
-     const unsigned int level,
+    DoFTools::extract_locally_owned_dofs<DoFHandler<deal_II_dimension,deal_II_space_dimension> >
+    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> & dof_handler,
+     IndexSet & dof_set);
+
+    template
+    void
+    DoFTools::extract_locally_active_dofs<DoFHandler<deal_II_dimension,deal_II_space_dimension> >
+    (const DoFHandler<deal_II_dimension,deal_II_space_dimension> & dof_handler,
      IndexSet & dof_set);
 #endif
+}
 
-#if deal_II_dimension > 2
-    template
-    void
-    DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension-2,deal_II_dimension > >
-    (const DoFHandler<deal_II_dimension-2,deal_II_dimension > & dof_handler,
-     IndexSet & dof_set);
-    template
-    void
-    DoFTools::extract_locally_relevant_level_dofs<DoFHandler<deal_II_dimension-2,deal_II_dimension > >
-    (const DoFHandler<deal_II_dimension-2,deal_II_dimension > & dof_handler,
-     const unsigned int level,
-     IndexSet & dof_set);
-    template
-    void
-    DoFTools::extract_locally_relevant_level_dofs<hp::DoFHandler<deal_II_dimension-2,deal_II_dimension > >
-    (const hp::DoFHandler<deal_II_dimension-2,deal_II_dimension > & dof_handler,
-     const unsigned int level,
-     IndexSet & dof_set);
-#endif
-
+for (deal_II_dimension : DIMENSIONS)
+{
     template
     std::vector<unsigned int>
     DoFTools::make_vertex_patches (SparsityPattern&, const DoFHandler<deal_II_dimension>&,
@@ -209,56 +199,6 @@ for (deal_II_dimension : DIMENSIONS)
     (const hp::DoFHandler<deal_II_dimension> &dof_handler,
      const types::subdomain_id subdomain_id,
      std::vector<bool>     &selected_dofs);
-
-    template
-    void
-    DoFTools::extract_locally_owned_dofs<DoFHandler<deal_II_dimension> >
-    (const DoFHandler<deal_II_dimension> & dof_handler,
-     IndexSet & dof_set);
-
-    template
-    void
-    DoFTools::extract_locally_owned_dofs<hp::DoFHandler<deal_II_dimension> >
-    (const hp::DoFHandler<deal_II_dimension> & dof_handler,
-     IndexSet & dof_set);
-
-    template
-    void
-    DoFTools::extract_locally_active_dofs<DoFHandler<deal_II_dimension> >
-    (const DoFHandler<deal_II_dimension> & dof_handler,
-     IndexSet & dof_set);
-
-    template
-    void
-    DoFTools::extract_locally_active_dofs<hp::DoFHandler<deal_II_dimension> >
-    (const hp::DoFHandler<deal_II_dimension> & dof_handler,
-     IndexSet & dof_set);
-
-    template
-    void
-    DoFTools::extract_locally_relevant_dofs<DoFHandler<deal_II_dimension> >
-    (const DoFHandler<deal_II_dimension> & dof_handler,
-     IndexSet & dof_set);
-
-    template
-    void
-    DoFTools::extract_locally_relevant_dofs<hp::DoFHandler<deal_II_dimension> >
-    (const hp::DoFHandler<deal_II_dimension> & dof_handler,
-     IndexSet & dof_set);
-
-    template
-    void
-    DoFTools::extract_locally_relevant_level_dofs<DoFHandler<deal_II_dimension> >
-    (const DoFHandler<deal_II_dimension> & dof_handler,
-     const unsigned int level,
-     IndexSet & dof_set);
-
-    template
-    void
-    DoFTools::extract_locally_relevant_level_dofs<hp::DoFHandler<deal_II_dimension> >
-    (const hp::DoFHandler<deal_II_dimension> & dof_handler,
-     const unsigned int level,
-     IndexSet & dof_set);
 
     template
     void
