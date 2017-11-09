@@ -506,7 +506,7 @@ namespace Particles
                   current_cell = current_cell_and_position.first;
                   current_reference_position = current_cell_and_position.second;
                 }
-              catch (GridTools::ExcPointNotFound<dim> &)
+              catch (GridTools::ExcPointNotFound<spacedim> &)
                 {
                   // We can find no cell for this particle. It has left the
                   // domain due to an integration error or an open boundary.

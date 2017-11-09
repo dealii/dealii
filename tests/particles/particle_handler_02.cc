@@ -15,7 +15,8 @@
 
 
 
-// check the creation and destruction of particle within the particle handler class.
+// check the cached numbers inside of the particle handler class if
+// particles are distributed in different cells.
 
 #include "../tests.h"
 #include <deal.II/particles/particle_handler.h>
@@ -92,8 +93,13 @@ int main (int argc, char *argv[])
 
   initlog();
 
+  deallog.push("2d/2d");
   test<2,2>();
+  deallog.pop();
+  deallog.push("2d/3d");
   test<2,3>();
-
+  deallog.pop();
+  deallog.push("3d/3d");
   test<3,3>();
+  deallog.pop();
 }

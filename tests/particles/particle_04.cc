@@ -41,7 +41,7 @@ void test ()
     if (dim > 2)
       reference_position(2) = 0.6;
 
-    const Particles::types::particle_index index(7);
+    const types::particle_index index(7);
 
     Particles::Particle<dim,spacedim> particle(position,reference_position,index);
 
