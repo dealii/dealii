@@ -15,7 +15,7 @@
 
 
 
-for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
 {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace VectorTools \{
@@ -57,7 +57,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
 
 //TODO[SP]: replace <deal_II_dimension> by <deal_II_dimension, deal_II_space_dimension>
 // where applicable and move to codimension cases above also when applicable
-for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
 {
 #if deal_II_dimension == deal_II_space_dimension
 
@@ -96,7 +96,7 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
 }
 
 
-for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
 {
 #if deal_II_dimension <= deal_II_space_dimension
     namespace VectorTools \{
