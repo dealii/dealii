@@ -28,6 +28,8 @@
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/base/signaling_nan.h>
+
 
 using namespace dealii;
 
@@ -50,6 +52,8 @@ public:
       return p[0]*p[0]+p[1]*p[1];
     if (c==2)
       return p[2]+p[0]*p[1];
+    else
+      return numbers::signaling_nan<double>();
   }
 };
 
@@ -108,5 +112,4 @@ int main (int argc, char **argv)
 {
   initlog();
   test<2>();
-
 }
