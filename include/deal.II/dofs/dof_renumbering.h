@@ -518,15 +518,6 @@ namespace DoFRenumbering
    * comparison of various algorithms in the documentation of the
    * DoFRenumbering namespace.
    *
-   * If the given DoFHandler uses a distributed triangulation (i.e., if
-   * dof_handler.locally_owned() is not the complete index set), the
-   * renumbering is performed on each processor's degrees of freedom
-   * individually, without any communication between processors. In other
-   * words, the resulting renumbering is an attempt at minimizing the bandwidth
-   * of <i>each diagonal block of the matrix corresponding to one processor</i>
-   * separately, without making an attempt at minimizing the bandwidth of
-   * the global matrix.
-   *
    * @param dof_handler The DoFHandler or hp::DoFHandler object to work on.
    * @param reversed_numbering Whether to use the original Cuthill-McKee
    *   algorithm, or to reverse the ordering.
@@ -535,14 +526,50 @@ namespace DoFRenumbering
    * @param starting_indices A set of degrees of freedom that form the first
    *   level of renumbered degrees of freedom. If the set is empty, then a
    *   single starting entry is chosen automatically among those that have the
-   *   smallest number of others that couple with it. If the DoFHandler is built
-   *   on a parallel triangulation, then on every processor, these starting
-   *   indices need to be a (possibly empty) subset of the
-   *   @ref GlossLocallyOwnedDof "locally owned degrees of freedom".
-   *   These will then be used as starting indices for the local renumbering on
-   *   the current processor. (In other words, you will have to choose this
-   *   argument differently on every processor, unless of course you pass an
-   *   empty list as is the default.)
+   *   smallest number of others that couple with it.
+   *
+   * <h4> Operation in parallel </h4>
+   *
+   * If the given DoFHandler uses a distributed triangulation (i.e., if
+   * dof_handler.locally_owned() is not the complete index set), the
+   * renumbering is performed on each processor's degrees of freedom
+   * individually, without any communication between processors. In other
+   * words, the resulting renumbering is an attempt at minimizing the bandwidth
+   * of <i>each diagonal block of the matrix corresponding to one processor</i>
+   * separately, without making an attempt at minimizing the bandwidth of
+   * the global matrix. Furthermore, the renumbering reuses exactly the
+   * same set of DoF indices that each processor used before. In other words,
+   * if the previous numbering of DoFs on one processor used a contiguous
+   * range of DoF indices, then so will the DoFs on that processor after
+   * the renumbering, and they will occupy the same range. The same is true
+   * if the previous numbering of DoFs on a processor consisted of a number
+   * of index ranges or single indices: after renumbering, the locally owned
+   * DoFs on that processor will use the exact same indices, just in a
+   * different order.
+   *
+   * In addition, if the DoFHandler is built on a parallel triangulation, then
+   * on every processor, the starting indices for renumbering need to be a
+   * (possibly empty) subset of the
+   * @ref GlossLocallyActiveDof "locally active degrees of freedom". In
+   * general, these starting indices will be different on each processor
+   * (unless of course you pass an empty list as is the default),
+   * and each processor will use them as starting indices for the local
+   * renumbering on that processor.
+   *
+   * The starting indices must be locally active degrees of freedom, but
+   * the function will only renumber the locally owned subset of the
+   * locally owned DoFs. The function accepts starting indices from the
+   * largest set of locally active degrees of freedom because a typical
+   * renumbering operation with this function starts with indices that
+   * are located on the boundary -- in the case of the current function,
+   * that would be the boundary between processor subdomains. Since the
+   * degrees of freedom that are located on subdomain interfaces may
+   * be owned by either one of the two processors that own the adjacent
+   * subdomains, it is not always easy to identify starting indices that
+   * are locally owned. On the other hand, all degrees of freedom on subdomain
+   * interfaces are locally active, and so the function accepts them as
+   * starting indices even though it can only renumber them on a given
+   * processor if they are also locally owned.
    */
   template <typename DoFHandlerType>
   void
@@ -554,8 +581,10 @@ namespace DoFRenumbering
 
   /**
    * Compute the renumbering vector needed by the Cuthill_McKee() function.
-   * Does not perform the renumbering on the DoFHandler dofs but returns the
-   * renumbering vector.
+   * This function does not perform the renumbering on the DoFHandler DoFs but
+   * only returns the renumbering vector.
+   *
+   * See the Cuthill_McKee() function for an explanation of the arguments.
    */
   template <typename DoFHandlerType>
   void

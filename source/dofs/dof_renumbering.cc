@@ -417,27 +417,55 @@ namespace DoFRenumbering
         // local index space, i.e., the locally owned part of the
         // sparsity pattern.
         //
-        // create first the global sparsity pattern, and then the local
+        // first figure out whether the user only gave us starting
+        // indices that are locally owned, or that are only locally
+        // relevant. in the process, also check that all indices
+        // really belong to at least the locally relevant ones
+        IndexSet locally_active_dofs;
+        DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
+
+        bool needs_locally_active = false;
+        for (unsigned int i=0; i<starting_indices.size(); ++i)
+          {
+            if ((needs_locally_active == /* previously already set to */true)
+                ||
+                (locally_owned_dofs.is_element (starting_indices[i]) == false))
+              {
+                Assert (locally_active_dofs.is_element (starting_indices[i]),
+                        ExcMessage ("You specified global degree of freedom "
+                                    + Utilities::to_string(starting_indices[i]) +
+                                    " as a starting index, but this index is not among the "
+                                    "locally active ones on this processor, as required "
+                                    "for this function."));
+                needs_locally_active = true;
+              }
+          }
+
+        const IndexSet index_set_to_use = (needs_locally_active ?
+                                           locally_active_dofs :
+                                           locally_owned_dofs);
+
+        // then create first the global sparsity pattern, and then the local
         // sparsity pattern from the global one by transferring its indices to
-        // processor-local index space
+        // processor-local (locally owned or locally active) index space
         DynamicSparsityPattern dsp (dof_handler.n_dofs(),
                                     dof_handler.n_dofs(),
-                                    locally_owned_dofs);
+                                    index_set_to_use);
         DoFTools::make_sparsity_pattern (dof_handler, dsp, constraints);
 
-        DynamicSparsityPattern local_sparsity(locally_owned_dofs.n_elements(),
-                                              locally_owned_dofs.n_elements());
+        DynamicSparsityPattern local_sparsity(index_set_to_use.n_elements(),
+                                              index_set_to_use.n_elements());
         std::vector<types::global_dof_index> row_entries;
-        for (unsigned int i=0; i<locally_owned_dofs.n_elements(); ++i)
+        for (unsigned int i=0; i<index_set_to_use.n_elements(); ++i)
           {
-            const types::global_dof_index row = locally_owned_dofs.nth_index_in_set(i);
+            const types::global_dof_index row = index_set_to_use.nth_index_in_set(i);
             const unsigned int row_length = dsp.row_length(row);
             row_entries.clear();
             for (unsigned int j=0; j<row_length; ++j)
               {
                 const unsigned int col = dsp.column_number(row, j);
-                if (col != row && locally_owned_dofs.is_element(col))
-                  row_entries.push_back(locally_owned_dofs.index_within_set(col));
+                if (col != row && index_set_to_use.is_element(col))
+                  row_entries.push_back(index_set_to_use.index_within_set(col));
               }
             local_sparsity.add_entries(i, row_entries.begin(), row_entries.end(),
                                        true);
@@ -446,23 +474,88 @@ namespace DoFRenumbering
         // translate starting indices from global to local indices
         std::vector<types::global_dof_index> local_starting_indices (starting_indices.size());
         for (unsigned int i=0; i<starting_indices.size(); ++i)
-          {
-            Assert (locally_owned_dofs.is_element (starting_indices[i]),
-                    ExcMessage ("You specified global degree of freedom "
-                                + Utilities::to_string(starting_indices[i]) +
-                                " as a starting index, but this index is not among the "
-                                "locally owned ones on this processor."));
-            local_starting_indices[i] = locally_owned_dofs.index_within_set(starting_indices[i]);
-          }
+          local_starting_indices[i] = index_set_to_use.index_within_set(starting_indices[i]);
 
         // then do the renumbering on the locally owned portion
         AssertDimension(new_indices.size(), locally_owned_dofs.n_elements());
-        SparsityTools::reorder_Cuthill_McKee (local_sparsity, new_indices,
+        std::vector<types::global_dof_index> my_new_indices (index_set_to_use.n_elements());
+        SparsityTools::reorder_Cuthill_McKee (local_sparsity, my_new_indices,
                                               local_starting_indices);
         if (reversed_numbering)
-          new_indices = Utilities::reverse_permutation (new_indices);
+          my_new_indices = Utilities::reverse_permutation (my_new_indices);
 
-        // convert indices back to global index space
+        // now that we have a re-enumeration of all DoFs, we need to throw
+        // out the ones that are not locally owned in case we have worked
+        // with the locally active ones. that's because the renumbering
+        // functions only want new indices for the locally owned DoFs (other
+        // processors are responsible for renumbering the ones that are
+        // on cell interfaces)
+        if (needs_locally_active == true)
+          {
+            // first step: figure out which DoF indices to eliminate
+            IndexSet active_but_not_owned_dofs = locally_active_dofs;
+            active_but_not_owned_dofs.subtract_set(locally_owned_dofs);
+
+            std::set<types::global_dof_index> erase_these_indices;
+            for (const auto &p : active_but_not_owned_dofs)
+              {
+                const auto index = index_set_to_use.index_within_set(p);
+                Assert (index < index_set_to_use.n_elements(), ExcInternalError());
+                erase_these_indices.insert (my_new_indices[index]);
+                my_new_indices[index] = numbers::invalid_dof_index;
+              }
+            Assert (erase_these_indices.size() == active_but_not_owned_dofs.n_elements(),
+                    ExcInternalError());
+            Assert (std::count (my_new_indices.begin(),
+                                my_new_indices.end(),
+                                numbers::invalid_dof_index) ==
+                    active_but_not_owned_dofs.n_elements(),
+                    ExcInternalError());
+
+            // then compute a renumbering of the remaining ones
+            std::vector<types::global_dof_index> translate_indices (my_new_indices.size());
+            {
+              std::set<types::global_dof_index>::const_iterator
+              next_erased_index = erase_these_indices.begin();
+              types::global_dof_index next_new_index = 0;
+              for (unsigned int i=0; i<translate_indices.size(); ++i)
+                if ((next_erased_index != erase_these_indices.end())
+                    &&
+                    (*next_erased_index == i))
+                  {
+                    translate_indices[i] = numbers::invalid_dof_index;
+                    ++next_erased_index;
+                  }
+                else
+                  {
+                    translate_indices[i] = next_new_index;
+                    ++next_new_index;
+                  }
+              Assert (next_new_index == locally_owned_dofs.n_elements(),
+                      ExcInternalError());
+            }
+
+            // and then do the renumbering of the result of the
+            // Cuthill-McKee algorithm above, right into the output array
+            new_indices.clear();
+            new_indices.reserve(locally_owned_dofs.n_elements());
+            for (const auto &p : my_new_indices)
+              if (p != numbers::invalid_dof_index)
+                {
+                  Assert (translate_indices[p] != numbers::invalid_dof_index,
+                          ExcInternalError());
+                  new_indices.push_back (translate_indices[p]);
+                }
+            Assert (new_indices.size() == locally_owned_dofs.n_elements(),
+                    ExcInternalError());
+          }
+        else
+          new_indices = std::move (my_new_indices);
+
+        // convert indices back to global index space. in both of the branches
+        // above, we ended up with new_indices only containing the local
+        // indices of the locally-owned DoFs. so that's where we get the
+        // indices
         for (std::size_t i=0; i<new_indices.size(); ++i)
           new_indices[i] = locally_owned_dofs.nth_index_in_set(new_indices[i]);
       }
