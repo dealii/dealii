@@ -14,7 +14,9 @@
 // ---------------------------------------------------------------------
 
 
-// Test integrate_difference
+// Test integrate_difference for complex-valued vectors. This test is
+// like integrate_difference_01, but multiplies the real-valued
+// function by (1/sqrt(2)+1/sqrt(2)i) and stores everything using complex data types
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
@@ -30,28 +32,27 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/base/signaling_nan.h>
 
-
 using namespace dealii;
 
 
-// x+y(+z), x^2+y^2 (, z+xy)
-// div = 1+2y (+1)
+// x+y(+z), x^2+y^2 (, z+xy) times (1+i)/sqrt(2)
+// div = (1+2y (+1)) times (1+i)/sqrt(2)
 template <int dim>
-class Ref : public Function<dim>
+class Ref : public Function<dim, std::complex<double> >
 {
 public:
   Ref()
-    :Function<dim>(dim)
+    :Function<dim,std::complex<double> >(dim)
   {}
 
-  double value (const Point<dim> &p, const unsigned int c) const
+  std::complex<double> value (const Point<dim> &p, const unsigned int c) const
   {
     if (c==0)
-      return p[0]+p[1]+((dim==3)?p[2]:0.0);
+      return (p[0]+p[1]+((dim==3)?p[2]:0.0)) * std::complex<double>(1./std::sqrt(2.), 1./std::sqrt(2.));
     if (c==1)
-      return p[0]*p[0]+p[1]*p[1];
+      return (p[0]*p[0]+p[1]*p[1]) * std::complex<double>(1./std::sqrt(2.), 1./std::sqrt(2.));
     if (c==2)
-      return p[2]+p[0]*p[1];
+      return (p[2]+p[0]*p[1]) * std::complex<double>(1./std::sqrt(2.), 1./std::sqrt(2.));
     else
       return numbers::signaling_nan<double>();
   }
@@ -70,7 +71,7 @@ void test(VectorTools::NormType norm, double value)
   DoFHandler<dim> dofh(tria);
   dofh.distribute_dofs(fe);
 
-  Vector<double> solution (dofh.n_dofs ());
+  Vector<std::complex<double> > solution (dofh.n_dofs ());
   VectorTools::interpolate(dofh, Ref<dim>(), solution);
 
   Vector<double> cellwise_errors (tria.n_active_cells());
