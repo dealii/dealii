@@ -1,0 +1,8 @@
+
+DEAL::Hdiv_seminorm:
+DEAL::computed: 2.08167 expected: 2.08167 difference: 4.44089e-16
+DEAL::L2_norm:
+DEAL::computed: 1.33749 expected: 1.33749 difference: 2.22045e-16
+DEAL::H1_seminorm:
+DEAL::computed: 2.16025 expected: 2.16025 difference: 4.44089e-16
+DEAL::OK
