@@ -72,7 +72,7 @@ for (S1 : COMPLEX_SCALARS)
 }
 
 
-for (Vec : SERIAL_VECTORS)
+for (Vec : VECTOR_TYPES)
 {
     template void ConstraintMatrix::distribute<Vec>(Vec &) const;
 }

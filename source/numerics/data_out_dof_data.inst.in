@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-for (VEC : SERIAL_VECTORS; DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
+for (VEC : VECTOR_TYPES; DH : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS)
 {
     template void
     DataOut_DoFData<DH<deal_II_dimension,deal_II_dimension>,deal_II_dimension,deal_II_dimension>::

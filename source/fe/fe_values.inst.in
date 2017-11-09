@@ -61,7 +61,7 @@ for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS; deal_II
 
 
 
-for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
 {
 #if deal_II_dimension <= deal_II_space_dimension
     template
@@ -239,7 +239,7 @@ for (VEC : GENERAL_CONTAINER_TYPES;
 }
 
 
-for (VEC : SERIAL_VECTORS; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
 {
 #if deal_II_dimension <= deal_II_space_dimension
 

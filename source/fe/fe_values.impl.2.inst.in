@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-for (VEC : SERIAL_VECTORS)
+for (VEC : VECTOR_TYPES)
 {
     template <int dim, int spacedim>
     void

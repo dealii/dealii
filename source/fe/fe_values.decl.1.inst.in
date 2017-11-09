@@ -18,7 +18,7 @@
 // Declarations of member functions of FEValuesBase::CellIteratorBase
 // and derived classes
 
-for (VEC : SERIAL_VECTORS)
+for (VEC : VECTOR_TYPES)
 {
     /// Call
     /// @p get_interpolated_dof_values

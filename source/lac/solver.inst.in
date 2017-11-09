@@ -15,7 +15,7 @@
 
 
 
-for (S : SERIAL_VECTORS)
+for (S : VECTOR_TYPES)
 {
     template class Solver<S>;
 }

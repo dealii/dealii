@@ -58,9 +58,8 @@ MPI_SCALARS     := { int;
 // S=REAL_SCALARS for example
 DEAL_II_VEC_TEMPLATES := { Vector; BlockVector }
 
-// Serial vector types, based on real or complex scalars
-// TODO: why are parallel vectors in here?
-SERIAL_VECTORS := { Vector<double>;
+// All vector types, based on real or complex scalars
+VECTOR_TYPES := {   Vector<double>;
                     Vector<float> ;
 
                     Vector<std::complex<double> >;
@@ -98,9 +97,9 @@ SERIAL_VECTORS := { Vector<double>;
                     @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
                   }
 
-// same as SERIAL_VECTORS but only real-valued vectors (and only with PETSc 
+// same as VECTOR_TYPES but only real-valued vectors (and only with PETSc 
 // vectors if the PETScScalar data type is real-valued)
-REAL_SERIAL_VECTORS := { Vector<double>;
+REAL_VECTOR_TYPES  := {  Vector<double>;
                          Vector<float> ;
 
                          BlockVector<double>;
