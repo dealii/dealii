@@ -1,0 +1,103 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2008 - 2017 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+
+// distibute dofs on a shared triangulation. Tests the change
+// from coin_flip to smallest proc index method of distribution
+// along partition interface
+
+#include "../tests.h"
+#include <deal.II/base/tensor.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgq.h>
+
+
+template <int dim>
+void test()
+{
+  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD,typename Triangulation<dim>::MeshSmoothing
+                                            (Triangulation<dim>::limit_level_difference_at_vertices), true,
+                                            typename parallel::shared::Triangulation<dim>::Settings
+                                            (parallel::shared::Triangulation<dim>::partition_zorder));
+  DoFHandler<dim> dof_handler(tria);
+  GridGenerator::subdivided_hyper_cube(tria,3,-1,1);
+  {
+    typename Triangulation<dim>::active_cell_iterator
+    cell = tria.begin_active(),
+    endc = tria.end();
+    for (; cell!=endc; ++cell)
+      {
+        if (cell->index() == 0 ||
+            cell->index() == 5 ||
+            cell->index() == 6)
+          cell->set_refine_flag();
+      }
+    tria.execute_coarsening_and_refinement();
+  }
+
+  FE_Q<dim> fe (2);
+  dof_handler.distribute_dofs(fe);
+
+  deallog << "Number of locally owned dofs: " << dof_handler.n_locally_owned_dofs() << std::endl;
+
+  std::vector<IndexSet> shared_dofs_per_proc = dof_handler.locally_owned_dofs_per_processor();
+  for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+    shared_dofs_per_proc[i].print(deallog.get_file_stream());
+
+  typename DoFHandler<dim>::active_cell_iterator
+  cell = dof_handler.begin_active(),
+  endc = dof_handler.end();
+  for (; cell!=endc; ++cell)
+    {
+      if (cell->subdomain_id() == numbers::artificial_subdomain_id)
+        continue;
+
+      std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
+      cell->get_dof_indices(local_dof_indices);
+      deallog << "cell" << cell->index() << " has dofs: ";
+      for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
+        deallog << local_dof_indices[i] << " ";
+      deallog << std::endl;
+    }
+}
+
+int main(int argc, char *argv[])
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll all;
+
+  deallog.push("2d");
+  test<2>();
+  deallog.pop();
+  deallog.push("3d");
+  test<3>();
+  deallog.pop();
+
+  deallog << "OK" << std::endl;
+}
+
+

@@ -2371,12 +2371,8 @@ namespace internal
           std::vector<types::global_dof_index> local_dof_indices;
           local_dof_indices.reserve (DoFTools::max_dofs_per_cell(dof_handler));
 
-          // pseudo-randomly assign variables which lie on the interface between
-          // subdomains to each of the two or more
-          bool coin_flip = true;
-
           // loop over all cells and record which subdomain a DoF belongs to.
-          // toss a coin in case it is on an interface
+          // give to the smaller subdomain_id in case it is on an interface
           typename DoFHandlerType::active_cell_iterator
           cell = dof_handler.begin_active(),
           endc = dof_handler.end();
@@ -2391,18 +2387,15 @@ namespace internal
               cell->get_dof_indices (local_dof_indices);
 
               // set subdomain ids. if dofs already have their values set then
-              // they must be on partition interfaces. in that case randomly
-              // assign them to either the previous association or the current
-              // one, where we take "random" to be "once this way once that way"
+              // they must be on partition interfaces. In that case assign them to the
+              // processor with the smaller subdomain id.
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 if (subdomain_association[local_dof_indices[i]] ==
                     numbers::invalid_subdomain_id)
                   subdomain_association[local_dof_indices[i]] = subdomain_id;
-                else
+                else if (subdomain_association[local_dof_indices[i]] > subdomain_id)
                   {
-                    if (coin_flip == true)
-                      subdomain_association[local_dof_indices[i]] = subdomain_id;
-                    coin_flip = !coin_flip;
+                    subdomain_association[local_dof_indices[i]] = subdomain_id;
                   }
             }
 
@@ -2456,8 +2449,8 @@ namespace internal
               cell->get_mg_dof_indices (local_dof_indices);
 
               // set level subdomain ids. if dofs already have their values set then
-              // they must be on partition interfaces. in that case assign them to the
-              // processor wit the smaller subdomain id.
+              // they must be on partition interfaces. In that case assign them to the
+              // processor with the smaller subdomain id.
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 if (level_subdomain_association[local_dof_indices[i]] ==
                     numbers::invalid_subdomain_id)
