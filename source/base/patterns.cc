@@ -48,6 +48,66 @@ DEAL_II_NAMESPACE_OPEN
 namespace Patterns
 {
 
+
+  namespace internal
+  {
+
+
+    std::string escape(const std::string &input, const PatternBase::OutputStyle style)
+    {
+      switch (style)
+        {
+        case PatternBase::Machine:
+        case PatternBase::Text:
+          return input;
+        case PatternBase::LaTeX:
+        {
+          std::string u;
+          u.reserve (input.size());
+          for (auto c : input)
+            {
+              switch (c)
+                {
+                case '#':
+                case '$':
+                case '%':
+                case '&':
+                case '_':
+                case '{':
+                case '}':
+                  // simple escaping:
+                  u.push_back('\\');
+                  u.push_back(c);
+                  break;
+
+                case '\\':
+                  u.append("\\textbackslash{}");
+                  break;
+
+                case '^':
+                  u.append("\\^{}");
+                  break;
+
+                case '~':
+                  u.append("\\~{}");
+                  break;
+
+                default:
+                  // all other chars are just copied:
+                  u.push_back(c);
+                }
+            }
+          return u;
+        }
+        default:
+          Assert(false, ExcNotImplemented());
+        }
+      return "";
+    }
+
+  }
+
+
   namespace
   {
     /**
@@ -72,60 +132,6 @@ namespace Patterns
         }
       return true;
     }
-  }
-
-
-
-  std::string escape(const std::string &input, const PatternBase::OutputStyle style)
-  {
-    switch (style)
-      {
-      case PatternBase::Machine:
-      case PatternBase::Text:
-        return input;
-      case PatternBase::LaTeX:
-      {
-        std::string u;
-        u.reserve (input.size());
-        for (auto c : input)
-          {
-            switch (c)
-              {
-              case '#':
-              case '$':
-              case '%':
-              case '&':
-              case '_':
-              case '{':
-              case '}':
-                // simple escaping:
-                u.push_back('\\');
-                u.push_back(c);
-                break;
-
-              case '\\':
-                u.append("\\textbackslash{}");
-                break;
-
-              case '^':
-                u.append("\\^{}");
-                break;
-
-              case '~':
-                u.append("\\~{}");
-                break;
-
-              default:
-                // all other chars are just copied:
-                u.push_back(c);
-              }
-          }
-        return u;
-      }
-      default:
-        Assert(false, ExcNotImplemented());
-      }
-    return "";
   }
 
 
@@ -571,7 +577,7 @@ namespace Patterns
         std::ostringstream description;
 
         description << "Any one of "
-                    << escape(Utilities::replace_in_string(sequence,"|",", "), style);
+                    << internal::escape(Utilities::replace_in_string(sequence,"|",", "), style);
 
         return description.str();
       }
@@ -711,7 +717,7 @@ namespace Patterns
                     << " elements ";
         if (separator != ",")
           description << "separated by <"
-                      << escape(separator, style)
+                      << internal::escape(separator, style)
                       << "> ";
         description  << "where each element is ["
                      << pattern->description(style)
@@ -884,12 +890,12 @@ namespace Patterns
         std::ostringstream description;
 
         description << "A key"
-                    << escape(key_value_separator, style)
+                    << internal::escape(key_value_separator, style)
                     << "value map of "
                     << min_elements << " to " << max_elements
                     << " elements ";
         if (separator != ",")
-          description << " separated by <" << escape(separator, style) << "> ";
+          description << " separated by <" << internal::escape(separator, style) << "> ";
         description << " where each key is ["
                     << key_pattern->description(style)
                     << "]"
@@ -1091,13 +1097,13 @@ namespace Patterns
                     << patterns.size()
                     << " elements ";
         if (separator != ":")
-          description << " separated by <" << escape(separator, style) << "> ";
+          description << " separated by <" << internal::escape(separator, style) << "> ";
         description << " where each element is ["
                     <<  patterns[0]->description(style)
                     << "]";
         for (unsigned int i=1; i<patterns.size(); ++i)
           {
-            description << escape(separator, style)
+            description << internal::escape(separator, style)
                         << "[" << patterns[i]->description(style) << "]";
 
           }
@@ -1290,7 +1296,7 @@ namespace Patterns
         std::ostringstream description;
 
         description << "A comma-separated list of any of "
-                    << escape(Utilities::replace_in_string(sequence,"|",", "), style);
+                    << internal::escape(Utilities::replace_in_string(sequence,"|",", "), style);
 
         return description.str();
       }

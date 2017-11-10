@@ -1106,7 +1106,7 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
     {
       auto escape = [] (const std::string &input)
       {
-        return Patterns::escape(input, Patterns::PatternBase::LaTeX);
+        return Patterns::internal::escape(input, Patterns::PatternBase::LaTeX);
       };
 
       // if there are any parameters in this section then print them
@@ -1347,7 +1347,7 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
           {
             auto escape = [] (const std::string &input)
             {
-              return Patterns::escape(input, Patterns::PatternBase::LaTeX);
+              return Patterns::internal::escape(input, Patterns::PatternBase::LaTeX);
             };
 
             out << '\n'
@@ -1577,7 +1577,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
     {
       auto escape = [] (const std::string &input)
       {
-        return Patterns::escape(input, Patterns::PatternBase::LaTeX);
+        return Patterns::internal::escape(input, Patterns::PatternBase::LaTeX);
       };
 
       // if there are any parameters in this section then print them
@@ -1796,7 +1796,7 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
               {
                 auto escape = [] (const std::string &input)
                 {
-                  return Patterns::escape(input, Patterns::PatternBase::LaTeX);
+                  return Patterns::internal::escape(input, Patterns::PatternBase::LaTeX);
                 };
 
                 out << std::endl
