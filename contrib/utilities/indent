@@ -63,6 +63,18 @@ find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu
 # use the same process to set file permissions for all source files
 find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print | xargs -n 50 -P 10 chmod 644
 
+# convert dos formatted files to unix file format by stripping out 
+# carriage returns (15=0x0D):
+dos_to_unix()
+{
+    f=$1
+    tr -d '\015' <$f >$f.tmp
+    diff -q $f $f.tmp >/dev/null || mv $f.tmp $f
+    rm -f $f.tmp
+}
+export -f dos_to_unix
+find tests include source examples \( -name '*.cc' -o -name '*.h' -o -name '*.cu' -o -name '*.cuh' \) -print | xargs -n 1 -P 10 -I {} bash -c 'dos_to_unix "$@"' _ {} 
+
 # format .inst.in files. We need to replace \{ and \} because it confuses
 # astyle.
 format_inst()
