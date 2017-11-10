@@ -646,6 +646,15 @@ namespace TrilinosWrappers
     void solve (MPI::Vector &x, const MPI::Vector &b);
 
     /**
+     * Solve the linear system <tt>Ax=b</tt> based on the package set in
+     * intialize() for deal.II's own parallel vectors. Note the matrix is not
+     * refactorized during this call.
+     */
+    void
+    solve (dealii::LinearAlgebra::distributed::Vector<double>       &x,
+           const dealii::LinearAlgebra::distributed::Vector<double> &b);
+
+    /**
      * Solve the linear system <tt>Ax=b</tt>. Creates a factorization of the
      * matrix with the package chosen from the additional data structure and
      * performs the solve. Note that there is no need for a preconditioner
