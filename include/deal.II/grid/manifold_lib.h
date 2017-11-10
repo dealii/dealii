@@ -685,6 +685,10 @@ public:
    * this class is that the input triangulation is uniformly refined and the
    * manifold is later attached to the same triangulation.
    *
+   * Whenever the assignment of manifold ids changes on the level of the
+   * triangulation which this class was initialized with, initialize() must be
+   * called again to update the manifold ids connected to the coarse cells.
+   *
    * @note The triangulation used to construct the manifold must not be
    * destroyed during the usage of this object.
    */
@@ -764,6 +768,11 @@ private:
   /**
    * Pull back operation into the unit coordinates on the given coarse cell.
    *
+   * This method is currently based on a Newton-like iteration to find the
+   * point in the origin. One may speed up the iteration by providing a good
+   * initial guess as the third argument. If no better point is known, use
+   * cell->real_to_unit_cell_affine_approximation(p)
+   *
    * @note This internal function is currently not compatible with the
    * ChartManifold::pull_back() function because the given class represents an
    * atlas of charts, not a single chart. Thus, the pull_back() operation is
@@ -774,7 +783,8 @@ private:
    */
   Point<dim>
   pull_back(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-            const Point<spacedim> &p) const;
+            const Point<spacedim> &p,
+            const Point<dim>      &initial_guess) const;
 
   /**
    * Push forward operation.
