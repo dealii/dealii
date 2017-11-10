@@ -140,7 +140,7 @@ namespace Particles
   typename ParticleHandler<dim,spacedim>::particle_iterator
   ParticleHandler<dim,spacedim>::begin() const
   {
-    return particle_iterator(particles,(const_cast<ParticleHandler<dim,spacedim> *> (this))->particles.begin());
+    return (const_cast<ParticleHandler<dim,spacedim> *> (this))->begin();
   }
 
 
@@ -149,7 +149,7 @@ namespace Particles
   typename ParticleHandler<dim,spacedim>::particle_iterator
   ParticleHandler<dim,spacedim>::begin()
   {
-    return ParticleHandler<dim,spacedim>::particle_iterator(particles,particles.begin());
+    return particle_iterator(particles,particles.begin());
   }
 
 
@@ -167,7 +167,43 @@ namespace Particles
   typename ParticleHandler<dim,spacedim>::particle_iterator
   ParticleHandler<dim,spacedim>::end()
   {
-    return ParticleHandler<dim,spacedim>::particle_iterator(particles,particles.end());
+    return particle_iterator(particles,particles.end());
+  }
+
+
+
+  template <int dim,int spacedim>
+  typename ParticleHandler<dim,spacedim>::particle_iterator
+  ParticleHandler<dim,spacedim>::begin_ghost() const
+  {
+    return (const_cast<ParticleHandler<dim,spacedim> *> (this))->begin_ghost();
+  }
+
+
+
+  template <int dim,int spacedim>
+  typename ParticleHandler<dim,spacedim>::particle_iterator
+  ParticleHandler<dim,spacedim>::begin_ghost()
+  {
+    return particle_iterator(ghost_particles,ghost_particles.begin());
+  }
+
+
+
+  template <int dim,int spacedim>
+  typename ParticleHandler<dim,spacedim>::particle_iterator
+  ParticleHandler<dim,spacedim>::end_ghost() const
+  {
+    return (const_cast<ParticleHandler<dim,spacedim> *> (this))->end_ghost();
+  }
+
+
+
+  template <int dim,int spacedim>
+  typename ParticleHandler<dim,spacedim>::particle_iterator
+  ParticleHandler<dim,spacedim>::end_ghost()
+  {
+    return particle_iterator(ghost_particles,ghost_particles.end());
   }
 
 
@@ -312,23 +348,6 @@ namespace Particles
 
 
 
-  template <int dim, int spacedim>
-  std::map<types::subdomain_id, unsigned int>
-  ParticleHandler<dim,spacedim>::get_subdomain_id_to_neighbor_map() const
-  {
-    std::map<types::subdomain_id, unsigned int> subdomain_id_to_neighbor_map;
-    const std::set<types::subdomain_id> ghost_owners = triangulation->ghost_owners();
-    std::set<types::subdomain_id>::const_iterator ghost_owner = ghost_owners.begin();
-
-    for (unsigned int neighbor_id=0; neighbor_id<ghost_owners.size(); ++neighbor_id,++ghost_owner)
-      {
-        subdomain_id_to_neighbor_map.insert(std::make_pair(*ghost_owner,neighbor_id));
-      }
-    return subdomain_id_to_neighbor_map;
-  }
-
-
-
   namespace
   {
     /**
@@ -402,8 +421,8 @@ namespace Particles
     // collected in the moved_particles_domain vector. Particles that left
     // the mesh completely are ignored and removed.
     std::vector<std::pair<types::LevelInd, Particle<dim,spacedim> > > sorted_particles;
-    std::vector<std::vector<particle_iterator> > moved_particles;
-    std::vector<std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > moved_cells;
+    std::map<types::subdomain_id, std::vector<particle_iterator> > moved_particles;
+    std::map<types::subdomain_id, std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > moved_cells;
 
     // We do not know exactly how many particles are lost, exchanged between
     // domains, or remain on this process. Therefore we pre-allocate approximate
@@ -412,16 +431,13 @@ namespace Particles
     // re-allocation will happen.
     typedef typename std::vector<particle_iterator>::size_type vector_size;
     sorted_particles.reserve(static_cast<vector_size> (particles_out_of_cell.size()*1.25));
-    const std::map<types::subdomain_id, unsigned int> subdomain_to_neighbor_map(get_subdomain_id_to_neighbor_map());
 
-    moved_particles.resize(subdomain_to_neighbor_map.size());
-    moved_cells.resize(subdomain_to_neighbor_map.size());
+    const std::set<types::subdomain_id> ghost_owners = triangulation->ghost_owners();
 
-    for (unsigned int i=0; i<subdomain_to_neighbor_map.size(); ++i)
-      {
-        moved_particles[i].reserve(static_cast<vector_size> (particles_out_of_cell.size()*0.25));
-        moved_cells[i].reserve(static_cast<vector_size> (particles_out_of_cell.size()*0.25));
-      }
+    for (auto ghost_domain_id = ghost_owners.begin(); ghost_domain_id != ghost_owners.end(); ++ghost_domain_id)
+      moved_particles[*ghost_domain_id].reserve(static_cast<vector_size> (particles_out_of_cell.size()*0.25));
+    for (auto ghost_domain_id = ghost_owners.begin(); ghost_domain_id != ghost_owners.end(); ++ghost_domain_id)
+      moved_cells[*ghost_domain_id].reserve(static_cast<vector_size> (particles_out_of_cell.size()*0.25));
 
     {
       // Create a map from vertices to adjacent cells
@@ -526,9 +542,8 @@ namespace Particles
             }
           else
             {
-              const unsigned int neighbor_index = subdomain_to_neighbor_map.find(current_cell->subdomain_id())->second;
-              moved_particles[neighbor_index].push_back(*it);
-              moved_cells[neighbor_index].push_back(current_cell);
+              moved_particles[current_cell->subdomain_id()].push_back(*it);
+              moved_cells[current_cell->subdomain_id()].push_back(current_cell);
             }
         }
     }
@@ -563,9 +578,11 @@ namespace Particles
     // First clear the current ghost_particle information
     ghost_particles.clear();
 
-    const std::map<types::subdomain_id, unsigned int> subdomain_to_neighbor_map(get_subdomain_id_to_neighbor_map());
+    std::map<types::subdomain_id, std::vector<particle_iterator> > ghost_particles_by_domain;
 
-    std::vector<std::vector<particle_iterator> > ghost_particles_by_domain(subdomain_to_neighbor_map.size());
+    const std::set<types::subdomain_id> ghost_owners = triangulation->ghost_owners();
+    for (auto ghost_domain_id = ghost_owners.begin(); ghost_domain_id != ghost_owners.end(); ++ghost_domain_id)
+      ghost_particles_by_domain[*ghost_domain_id].reserve(static_cast<typename std::vector<particle_iterator>::size_type> (particles.size()*0.25));
 
     std::vector<std::set<unsigned int> > vertex_to_neighbor_subdomain(triangulation->n_vertices());
 
@@ -598,10 +615,8 @@ namespace Particles
                 for (std::set<types::subdomain_id>::const_iterator domain=cell_to_neighbor_subdomain.begin();
                      domain != cell_to_neighbor_subdomain.end(); ++domain)
                   {
-                    const unsigned int neighbor_id = subdomain_to_neighbor_map.find(*domain)->second;
-
                     for (typename particle_iterator_range::iterator particle = particle_range.begin(); particle != particle_range.end(); ++particle)
-                      ghost_particles_by_domain[neighbor_id].push_back(particle);
+                      ghost_particles_by_domain[*domain].push_back(particle);
                   }
               }
           }
@@ -615,9 +630,9 @@ namespace Particles
 
   template <int dim, int spacedim>
   void
-  ParticleHandler<dim,spacedim>::send_recv_particles(const std::vector<std::vector<particle_iterator> >      &particles_to_send,
+  ParticleHandler<dim,spacedim>::send_recv_particles(const std::map<types::subdomain_id, std::vector<particle_iterator> > &particles_to_send,
                                                      std::multimap<types::LevelInd,Particle <dim,spacedim> > &received_particles,
-                                                     const std::vector<std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> >         &send_cells)
+                                                     const std::map<types::subdomain_id, std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > &send_cells)
   {
     // Determine the communication pattern
     const std::set<types::subdomain_id> ghost_owners = triangulation->ghost_owners();
@@ -625,15 +640,21 @@ namespace Particles
                                                       ghost_owners.end());
     const unsigned int n_neighbors = neighbors.size();
 
-    Assert(n_neighbors == particles_to_send.size(),
-           ExcMessage("The particles to send to other processes should be sorted into a vector "
-                      "containing as many vectors of particles as there are neighbor processes. This "
-                      "is not the case for an unknown reason. Contact the developers if you encounter "
-                      "this error."));
+    if (send_cells.size() != 0)
+      Assert (particles_to_send.size() == send_cells.size(),ExcInternalError());
+
+    // If we do not know the subdomain this particle needs to be send to, throw an error
+    Assert (particles_to_send.find(numbers::artificial_subdomain_id) == particles_to_send.end(),
+            ExcInternalError());
+
+    // TODO: Implement the shipping of particles to processes that are not ghost owners of the local domain
+    for (auto send_particles = particles_to_send.begin(); send_particles != particles_to_send.end(); ++send_particles)
+      Assert(ghost_owners.find(send_particles->first) != ghost_owners.end(),
+             ExcNotImplemented());
 
     unsigned int n_send_particles = 0;
-    for (unsigned int i=0; i<n_neighbors; ++i)
-      n_send_particles += particles_to_send[i].size();
+    for (auto send_particles = particles_to_send.begin(); send_particles != particles_to_send.end(); ++send_particles)
+      n_send_particles += send_particles->second.size();
 
     const unsigned int cellid_size = sizeof(CellId::binary_type);
 
@@ -654,28 +675,28 @@ namespace Particles
         void *data = static_cast<void *> (&send_data.front());
 
         // Serialize the data sorted by receiving process
-        for (types::subdomain_id neighbor_id = 0; neighbor_id < n_neighbors; ++neighbor_id)
+        for (unsigned int i = 0; i<n_neighbors; ++i)
           {
-            send_offsets[neighbor_id] = reinterpret_cast<std::size_t> (data) - reinterpret_cast<std::size_t> (&send_data.front());
+            send_offsets[i] = reinterpret_cast<std::size_t> (data) - reinterpret_cast<std::size_t> (&send_data.front());
 
-            for (unsigned int i=0; i<particles_to_send[neighbor_id].size(); ++i)
+            for (unsigned int j=0; j<particles_to_send.at(neighbors[i]).size(); ++j)
               {
                 // If no target cells are given, use the iterator information
                 typename Triangulation<dim,spacedim>::active_cell_iterator cell;
                 if (send_cells.size() == 0)
-                  cell = particles_to_send[neighbor_id][i]->get_surrounding_cell(*triangulation);
+                  cell = particles_to_send.at(neighbors[i])[j]->get_surrounding_cell(*triangulation);
                 else
-                  cell = send_cells[neighbor_id][i];
+                  cell = send_cells.at(neighbors[i])[j];
 
                 const CellId::binary_type cellid = cell->id().template to_binary<dim>();
                 memcpy(data, &cellid, cellid_size);
                 data = static_cast<char *>(data) + cellid_size;
 
-                particles_to_send[neighbor_id][i]->write_data(data);
+                particles_to_send.at(neighbors[i])[j]->write_data(data);
                 if (store_callback)
-                  data = store_callback(particles_to_send[neighbor_id][i],data);
+                  data = store_callback(particles_to_send.at(neighbors[i])[j],data);
               }
-            n_send_data[neighbor_id] = reinterpret_cast<std::size_t> (data) - send_offsets[neighbor_id] - reinterpret_cast<std::size_t> (&send_data.front());
+            n_send_data[i] = reinterpret_cast<std::size_t> (data) - send_offsets[i] - reinterpret_cast<std::size_t> (&send_data.front());
           }
       }
 

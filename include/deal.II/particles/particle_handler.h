@@ -38,7 +38,11 @@ namespace Particles
    * This class manages the storage and handling of particles. It provides
    * the data structures necessary to store particles efficiently, accessor
    * functions to iterate over particles and find particles, and algorithms
-   * to distribute particles in parallel domains.
+   * to distribute particles in parallel domains. Note that the class
+   * is designed in a similar way as the triangulation class. In particular,
+   * we call particles in the domain of the local process local particles,
+   * and particles that belong to neighbor processes and live in the ghost cells
+   * around the locally owned domain "ghost particles".
    *
    * @ingroup Particle
    */
@@ -62,10 +66,10 @@ namespace Particles
     ParticleHandler();
 
     /**
-     * Constructor that initializes the particle handler with respect to
-     * a given triangulation and MPI communicator. Pointers to the
-     * triangulation and the communicator are stored inside of the particle
-     *
+     * Constructor that initializes the particle handler with
+     * a given triangulation and mapping. Since particles are stored in
+     * respect to their surrounding cells this information is necessary to
+     * correctly organize the particle collection.
      */
     ParticleHandler(const parallel::distributed::Triangulation<dim,spacedim> &tria,
                     const Mapping<dim,spacedim> &mapping,
@@ -110,7 +114,7 @@ namespace Particles
     /**
      * Return an iterator to the first particle.
      */
-    ParticleHandler<dim,spacedim>::particle_iterator begin() const;
+    particle_iterator begin() const;
 
     /**
      * Return an iterator to the first particle.
@@ -126,6 +130,26 @@ namespace Particles
      * Return an iterator past the end of the particles.
      */
     particle_iterator end();
+
+    /**
+     * Return an iterator to the first particle.
+     */
+    particle_iterator begin_ghost() const;
+
+    /**
+     * Return an iterator to the first particle.
+     */
+    particle_iterator begin_ghost();
+
+    /**
+     * Return an iterator past the end of the particles.
+     */
+    particle_iterator end_ghost() const;
+
+    /**
+     * Return an iterator to the first particle.
+     */
+    particle_iterator end_ghost();
 
     /**
      * Return a pair of particle iterators that mark the begin and end of
@@ -306,15 +330,15 @@ namespace Particles
     SmartPointer<const Mapping<dim,spacedim>,ParticleHandler<dim,spacedim> > mapping;
 
     /**
-     * Set of particles currently in the local domain, organized by
+     * Set of particles currently living in the local domain, organized by
      * the level/index of the cell they are in.
      */
     std::multimap<types::LevelInd, Particle<dim,spacedim> > particles;
 
     /**
-     * Set of particles currently in the ghost cells of the local domain,
+     * Set of particles that currently live in the ghost cells of the local domain,
      * organized by the level/index of the cell they are in. These
-     * particles are marked read-only.
+     * particles are equivalent to the ghost entries in distributed vectors.
      */
     std::multimap<types::LevelInd, Particle<dim,spacedim> > ghost_particles;
 
@@ -414,9 +438,10 @@ namespace Particles
      * outdated (e.g. after particle movement).
      */
     void
-    send_recv_particles(const std::vector<std::vector<particle_iterator> >      &particles_to_send,
+    send_recv_particles(const std::map<types::subdomain_id, std::vector<particle_iterator> > &particles_to_send,
                         std::multimap<types::LevelInd,Particle <dim,spacedim> > &received_particles,
-                        const std::vector<std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > &new_cells_for_particles = std::vector<std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > ());
+                        const std::map<types::subdomain_id, std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > &new_cells_for_particles =
+                          std::map<types::subdomain_id, std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > ());
 
     /**
      * Called by listener functions from Triangulation for every cell
@@ -436,15 +461,6 @@ namespace Particles
     load_particles(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                    const typename Triangulation<dim,spacedim>::CellStatus status,
                    const void *data);
-
-    /**
-     * Get a map between subdomain id and a contiguous
-     * number from 0 to n_neighbors, which is interpreted as the neighbor index.
-     * In other words the returned map answers the question: Given a subdomain id, which
-     * neighbor of the current processor's domain owns this subdomain?
-     */
-    std::map<types::subdomain_id, unsigned int>
-    get_subdomain_id_to_neighbor_map() const;
   };
 
   /* -------------------------- inline and template functions ---------------------- */
