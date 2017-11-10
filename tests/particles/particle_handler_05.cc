@@ -84,34 +84,34 @@ void test ()
     // is possible (in particular that the order of serialization/deserialization is preserved).
     tr.signals.pre_distributed_refinement.connect(std::bind(&Particles::ParticleHandler<dim,spacedim>::register_store_callback_function,
                                                             &particle_handler,
-                                                                   false));
+                                                            false));
 
     tr.signals.post_distributed_refinement.connect(std::bind(&Particles::ParticleHandler<dim,spacedim>::register_load_callback_function,
                                                              &particle_handler,
-                                                                   false));
+                                                             false));
 
     create_regular_particle_distribution(particle_handler,tr);
 
     for (auto particle = particle_handler.begin(); particle != particle_handler.end(); ++particle)
       deallog << "Before refinement particle id " << particle->get_id()
-      << " is in cell " << particle->get_surrounding_cell(tr) << std::endl;
+              << " is in cell " << particle->get_surrounding_cell(tr) << std::endl;
 
     // Check that all particles are moved to children
     tr.refine_global(1);
 
     for (auto particle = particle_handler.begin(); particle != particle_handler.end(); ++particle)
       deallog << "After refinement particle id " << particle->get_id()
-      << " is in cell " << particle->get_surrounding_cell(tr) << std::endl;
+              << " is in cell " << particle->get_surrounding_cell(tr) << std::endl;
 
     // Reverse the refinement and check again
     for (auto cell = tr.begin_active(); cell != tr.end(); ++cell)
-        cell->set_coarsen_flag();
+      cell->set_coarsen_flag();
 
     tr.execute_coarsening_and_refinement();
 
     for (auto particle = particle_handler.begin(); particle != particle_handler.end(); ++particle)
       deallog << "After coarsening particle id " << particle->get_id()
-      << " is in cell " << particle->get_surrounding_cell(tr) << std::endl;
+              << " is in cell " << particle->get_surrounding_cell(tr) << std::endl;
   }
 
   deallog << "OK" << std::endl;

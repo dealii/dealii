@@ -86,8 +86,8 @@ void test ()
   // When doing this, check that transferring a solution and particles during the same refinement
   // is possible (in particular that the order of serialization/deserialization is preserved).
   tr.signals.pre_distributed_save.connect(std::bind(&Particles::ParticleHandler<dim,spacedim>::register_store_callback_function,
-                                                          &particle_handler,
-                                                                 true));
+                                                    &particle_handler,
+                                                    true));
 
   // save data to archive
   std::ostringstream oss;
@@ -119,8 +119,8 @@ void test ()
   // When doing this, check that transferring a solution and particles during the same refinement
   // is possible (in particular that the order of serialization/deserialization is preserved).
   tr.signals.post_distributed_load.connect(std::bind(&Particles::ParticleHandler<dim,spacedim>::register_load_callback_function,
-                                                           &particle_handler,
-                                                                 true));
+                                                     &particle_handler,
+                                                     true));
 
   // verify correctness of the serialization. Note that the deserialization of the
   // particle handler has to happen before the triangulation (otherwise it does not know

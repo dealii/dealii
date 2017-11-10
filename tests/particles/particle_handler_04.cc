@@ -62,7 +62,7 @@ void test ()
           deallog << "Before sort particle id " << particle->get_id()
                   << " is in cell " << particle->get_surrounding_cell(tr)
                   << " on process " << Utilities::MPI::this_mpi_process(tr.get_communicator())
-        << std::flush << std::endl;
+                  << std::flush << std::endl;
       }
 
 
@@ -71,9 +71,9 @@ void test ()
 
     for (auto particle = particle_handler.begin(); particle != particle_handler.end(); ++particle)
       deallog << "After sort particle id " << particle->get_id()
-      << " is in cell " << particle->get_surrounding_cell(tr)
-      << " on process " << Utilities::MPI::this_mpi_process(tr.get_communicator())
-    << std::flush << std::endl;
+              << " is in cell " << particle->get_surrounding_cell(tr)
+              << " on process " << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << std::flush << std::endl;
 
     // Move all points up by 0.5. This will change cell for particle 1, and will
     // move particle 2 out of the domain. Note that we need to change the coordinate
@@ -86,9 +86,9 @@ void test ()
     particle_handler.sort_particles_into_subdomains_and_cells();
     for (auto particle = particle_handler.begin(); particle != particle_handler.end(); ++particle)
       deallog << "After shift particle id " << particle->get_id()
-      << " is in cell " << particle->get_surrounding_cell(tr)
-      << " on process " << Utilities::MPI::this_mpi_process(tr.get_communicator())
-    << std::flush << std::endl;
+              << " is in cell " << particle->get_surrounding_cell(tr)
+              << " on process " << Utilities::MPI::this_mpi_process(tr.get_communicator())
+              << std::flush << std::endl;
 
   }
 
