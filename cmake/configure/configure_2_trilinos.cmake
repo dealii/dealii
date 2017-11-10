@@ -54,6 +54,18 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDIF()
     ENDFOREACH()
 
+    FOREACH(_optional_module
+   	  ROL
+      )
+      ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
+      IF(_module_found)
+        MESSAGE(STATUS "Found ${_optional_module}")
+        SET(DEAL_II_TRILINOS_WITH_${_optional_module} ON)
+      ELSE()
+        MESSAGE(STATUS "Module ${_optional_module} not found!")
+      ENDIF()
+    ENDFOREACH()
+
     IF((TRILINOS_VERSION_MAJOR EQUAL 11 AND
         NOT (TRILINOS_VERSION_MINOR LESS 14))
        OR
