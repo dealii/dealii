@@ -29,12 +29,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace types
 {
-  /**
-   * Typedef of cell level/index pair. TODO: replace this by the
-   * active_cell_index.
-   */
-  typedef std::pair<int, int> LevelInd;
-
   /* Type definitions */
 
 #ifdef DEAL_II_WITH_64BIT_INDICES
@@ -84,6 +78,14 @@ namespace types
  */
 namespace Particles
 {
+  namespace internal
+  {
+    /**
+     * Internal typedef of cell level/index pair.
+     */
+    typedef std::pair<int, int> LevelInd;
+  }
+
   /**
    * Base class of particles - represents a particle with position,
    * an ID number and a variable number of properties. This class

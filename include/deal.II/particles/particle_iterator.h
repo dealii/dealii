@@ -16,12 +16,15 @@
 #ifndef dealii_particles_particle_iterator_h
 #define dealii_particles_particle_iterator_h
 
+#include <deal.II/base/config.h>
 #include <deal.II/particles/particle_accessor.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace Particles
 {
+  template <int, int> class ParticleHandler;
+
   /**
    * A class that is used to iterate over particles. Together with the
    * ParticleAccessor class this is used to hide the internal implementation
@@ -38,10 +41,10 @@ namespace Particles
 
     /**
      * Constructor of the iterator. Takes a reference to the particle
-     * container, and an iterator the the cell-particle pair.
+     * container, and an iterator to the cell-particle pair.
      */
-    ParticleIterator (const std::multimap<types::LevelInd, Particle<dim,spacedim> > &map,
-                      const typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator &particle);
+    ParticleIterator (const std::multimap<internal::LevelInd, Particle<dim,spacedim> > &map,
+                      const typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator &particle);
 
     /**
      * Dereferencing operator, returns a reference to an accessor. Usage is thus

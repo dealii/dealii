@@ -16,6 +16,8 @@
 #include <deal.II/particles/particle_handler.h>
 
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
+
 #include <utility>
 
 DEAL_II_NAMESPACE_OPEN
@@ -221,10 +223,10 @@ namespace Particles
   typename ParticleHandler<dim,spacedim>::particle_iterator_range
   ParticleHandler<dim,spacedim>::particles_in_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell)
   {
-    const types::LevelInd level_index = std::make_pair<int, int> (cell->level(),cell->index());
+    const internal::LevelInd level_index = std::make_pair<int, int> (cell->level(),cell->index());
 
-    std::pair<typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator,
-        typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator> particles_in_cell;
+    std::pair<typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator,
+        typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator> particles_in_cell;
 
     if (!cell->is_ghost())
       particles_in_cell = particles.equal_range(level_index);
@@ -251,8 +253,8 @@ namespace Particles
   ParticleHandler<dim,spacedim>::insert_particle(const Particle<dim,spacedim> &particle,
                                                  const typename Triangulation<dim,spacedim>::active_cell_iterator &cell)
   {
-    typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator it =
-      particles.insert(std::make_pair(types::LevelInd(cell->level(),cell->index()),particle));
+    typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator it =
+      particles.insert(std::make_pair(internal::LevelInd(cell->level(),cell->index()),particle));
 
     particle_iterator particle_it (particles,it);
     particle_it->set_property_pool(*property_pool);
@@ -268,9 +270,62 @@ namespace Particles
 
   template <int dim,int spacedim>
   void
-  ParticleHandler<dim,spacedim>::insert_particles(const std::multimap<types::LevelInd, Particle<dim,spacedim> > &new_particles)
+  ParticleHandler<dim,spacedim>::insert_particles(const std::multimap<typename Triangulation<dim,spacedim>::active_cell_iterator,
+                                                  Particle<dim,spacedim> > &new_particles)
   {
-    particles.insert(new_particles.begin(),new_particles.end());
+    for (auto particle = new_particles.begin(); particle != new_particles.end(); ++particle)
+      particles.insert(particles.end(),
+                       std::make_pair(internal::LevelInd(particle->first->level(),particle->first->index()),
+                                      particle->second));
+
+    update_cached_numbers();
+  }
+
+
+
+  template <int dim,int spacedim>
+  void
+  ParticleHandler<dim,spacedim>::insert_particles(const std::vector<Point<spacedim> > &positions)
+  {
+    update_cached_numbers();
+
+    const types::particle_index local_next_particle_index = get_next_free_particle_index();
+    const types::particle_index particles_to_add_locally = positions.size();
+
+    // Determine the starting particle index of this process, which
+    // is the highest currently existing particle index plus the sum
+    // of the number of newly generated particles of all
+    // processes with a lower rank.
+    types::particle_index local_start_index = 0;
+    MPI_Scan(&particles_to_add_locally, &local_start_index, 1, PARTICLE_INDEX_MPI_TYPE, MPI_SUM, triangulation->get_communicator());
+
+    local_start_index -= particles_to_add_locally;
+    local_start_index += local_next_particle_index;
+
+    GridTools::Cache<dim,spacedim> cache(*triangulation, *mapping);
+    auto point_locations = GridTools::compute_point_locations(cache, positions);
+
+    auto &cells = std::get<0>(point_locations);
+    auto &local_positions = std::get<1>(point_locations);
+    auto &index_map = std::get<2>(point_locations);
+
+    if (cells.size() == 0)
+      return;
+
+    auto hint = particles.find(std::make_pair(cells[0]->level(),cells[0]->index()));
+    for (unsigned int i=0; i<cells.size(); ++i)
+      {
+        internal::LevelInd current_cell(cells[i]->level(),cells[i]->index());
+        for (unsigned int p=0; p<local_positions[i].size(); ++p)
+          {
+            hint = particles.insert(hint,
+                                    std::make_pair(current_cell,
+                                                   Particle<dim,spacedim>(positions[index_map[i][p]],
+                                                       local_positions[i][p],
+                                                       local_start_index+index_map[i][p])));
+          }
+      }
+
     update_cached_numbers();
   }
 
@@ -316,7 +371,7 @@ namespace Particles
   unsigned int
   ParticleHandler<dim,spacedim>::n_particles_in_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell) const
   {
-    const types::LevelInd found_cell = std::make_pair<int, int> (cell->level(),cell->index());
+    const internal::LevelInd found_cell = std::make_pair<int, int> (cell->level(),cell->index());
 
     if (cell->is_locally_owned())
       return particles.count(found_cell);
@@ -420,7 +475,7 @@ namespace Particles
     // sorted_particles vector, particles that moved to another domain are
     // collected in the moved_particles_domain vector. Particles that left
     // the mesh completely are ignored and removed.
-    std::vector<std::pair<types::LevelInd, Particle<dim,spacedim> > > sorted_particles;
+    std::vector<std::pair<internal::LevelInd, Particle<dim,spacedim> > > sorted_particles;
     std::map<types::subdomain_id, std::vector<particle_iterator> > moved_particles;
     std::map<types::subdomain_id, std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > moved_cells;
 
@@ -537,7 +592,7 @@ namespace Particles
           // Mark it for MPI transfer otherwise
           if (current_cell->is_locally_owned())
             {
-              sorted_particles.push_back(std::make_pair(types::LevelInd(current_cell->level(),current_cell->index()),
+              sorted_particles.push_back(std::make_pair(internal::LevelInd(current_cell->level(),current_cell->index()),
                                                         (*it)->particle->second));
             }
           else
@@ -550,7 +605,7 @@ namespace Particles
 
     // Sort the updated particles. This pre-sort speeds up inserting
     // them into particles to O(N) complexity.
-    std::multimap<types::LevelInd,Particle <dim,spacedim> > sorted_particles_map;
+    std::multimap<internal::LevelInd,Particle <dim,spacedim> > sorted_particles_map;
 
     // Exchange particles between processors if we have more than one process
     if (dealii::Utilities::MPI::n_mpi_processes(triangulation->get_communicator()) > 1)
@@ -631,7 +686,7 @@ namespace Particles
   template <int dim, int spacedim>
   void
   ParticleHandler<dim,spacedim>::send_recv_particles(const std::map<types::subdomain_id, std::vector<particle_iterator> > &particles_to_send,
-                                                     std::multimap<types::LevelInd,Particle <dim,spacedim> > &received_particles,
+                                                     std::multimap<internal::LevelInd,Particle <dim,spacedim> > &received_particles,
                                                      const std::map<types::subdomain_id, std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > &send_cells)
   {
     // Determine the communication pattern
@@ -759,8 +814,8 @@ namespace Particles
 
         const typename Triangulation<dim,spacedim>::active_cell_iterator cell = id.to_cell(*triangulation);
 
-        typename std::multimap<types::LevelInd,Particle <dim,spacedim> >::iterator recv_particle =
-          received_particles.insert(std::make_pair(types::LevelInd(cell->level(),cell->index()),
+        typename std::multimap<internal::LevelInd,Particle <dim,spacedim> >::iterator recv_particle =
+          received_particles.insert(std::make_pair(internal::LevelInd(cell->level(),cell->index()),
                                                    Particle<dim,spacedim>(recv_data_it,*property_pool)));
 
         if (load_callback)
@@ -979,7 +1034,7 @@ namespace Particles
     // particle map.
     if (status == parallel::distributed::Triangulation<dim,spacedim>::CELL_PERSIST)
       {
-        typename std::multimap<types::LevelInd,Particle<dim,spacedim> >::iterator position_hint = particles.end();
+        typename std::multimap<internal::LevelInd,Particle<dim,spacedim> >::iterator position_hint = particles.end();
         for (unsigned int i = 0; i < *n_particles_in_cell_ptr; ++i)
           {
             // Use std::multimap::emplace_hint to speed up insertion of
@@ -1001,7 +1056,7 @@ namespace Particles
 
     else if (status == parallel::distributed::Triangulation<dim,spacedim>::CELL_COARSEN)
       {
-        typename std::multimap<types::LevelInd,Particle<dim,spacedim> >::iterator position_hint = particles.end();
+        typename std::multimap<internal::LevelInd,Particle<dim,spacedim> >::iterator position_hint = particles.end();
         for (unsigned int i = 0; i < *n_particles_in_cell_ptr; ++i)
           {
             // Use std::multimap::emplace_hint to speed up insertion of
@@ -1024,7 +1079,7 @@ namespace Particles
       }
     else if (status == parallel::distributed::Triangulation<dim,spacedim>::CELL_REFINE)
       {
-        std::vector<typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator > position_hints(GeometryInfo<dim>::max_children_per_cell);
+        std::vector<typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator > position_hints(GeometryInfo<dim>::max_children_per_cell);
         for (unsigned int child_index=0; child_index<GeometryInfo<dim>::max_children_per_cell; ++child_index)
           {
             const typename Triangulation<dim,spacedim>::cell_iterator child = cell->child(child_index);

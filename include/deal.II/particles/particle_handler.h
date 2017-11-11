@@ -185,12 +185,24 @@ namespace Particles
                     const typename Triangulation<dim,spacedim>::active_cell_iterator &cell);
 
     /**
-     * Insert a number of particle into the collection of particles.
+     * Insert a number of particles into the collection of particles.
      * This function involves a copy of the particles and their properties.
      * Note that this function is of O(n_existing_particles + n_particles) complexity.
      */
     void
-    insert_particles(const std::multimap<types::LevelInd, Particle<dim,spacedim> > &particles);
+    insert_particles(const std::multimap<typename Triangulation<dim,spacedim>::active_cell_iterator,
+                     Particle<dim,spacedim> > &particles);
+
+    /**
+     * Insert a number of particles into the collection of particles.
+     * This function takes a list of positions and creates a set of particles
+     * at these positions, which are then added to the local particle
+     * collection. Note that this function assumes all positions are within
+     * the local part of the triangulation, if one of them is not in the
+     * local domain this function will throw an exception.
+     */
+    void
+    insert_particles(const std::vector<Point<spacedim> > &positions);
 
     /**
      * This function allows to register three additional functions that are
@@ -227,7 +239,7 @@ namespace Particles
 
     /**
      * Return the total number of particles that were managed by this class
-     * the last time the update_n_global_particles() function was called.
+     * the last time the update_cached_numbers() function was called.
      * The actual number of particles may have changed since then if
      * particles have been added or removed.
      *
@@ -237,7 +249,7 @@ namespace Particles
 
     /**
      * Return the maximum number of particles per cell the last
-     * time the update_n_global_particles() function was called.
+     * time the update_cached_numbers() function was called.
      *
      * @return Maximum number of particles in one cell in simulation.
      */
@@ -250,8 +262,9 @@ namespace Particles
     types::particle_index n_locally_owned_particles() const;
 
     /**
-     * Return the number of particles in the local part of the
-     * triangulation.
+     * Return the next free particle index in the global set
+     * of particles the last
+     * time the update_cached_numbers() function was called.
      */
     types::particle_index get_next_free_particle_index() const;
 
@@ -333,18 +346,18 @@ namespace Particles
      * Set of particles currently living in the local domain, organized by
      * the level/index of the cell they are in.
      */
-    std::multimap<types::LevelInd, Particle<dim,spacedim> > particles;
+    std::multimap<internal::LevelInd, Particle<dim,spacedim> > particles;
 
     /**
      * Set of particles that currently live in the ghost cells of the local domain,
      * organized by the level/index of the cell they are in. These
      * particles are equivalent to the ghost entries in distributed vectors.
      */
-    std::multimap<types::LevelInd, Particle<dim,spacedim> > ghost_particles;
+    std::multimap<internal::LevelInd, Particle<dim,spacedim> > ghost_particles;
 
     /**
      * This variable stores how many particles are stored globally. It is
-     * calculated by update_n_global_particles().
+     * calculated by update_cached_numbers().
      */
     types::particle_index global_number_of_particles;
 
@@ -439,7 +452,7 @@ namespace Particles
      */
     void
     send_recv_particles(const std::map<types::subdomain_id, std::vector<particle_iterator> > &particles_to_send,
-                        std::multimap<types::LevelInd,Particle <dim,spacedim> > &received_particles,
+                        std::multimap<internal::LevelInd,Particle <dim,spacedim> > &received_particles,
                         const std::map<types::subdomain_id, std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > &new_cells_for_particles =
                           std::map<types::subdomain_id, std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > ());
 

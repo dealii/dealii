@@ -52,9 +52,9 @@ void test ()
     particle.set_property_pool(pool);
     particle.set_properties(ArrayView<double>(&properties[0],properties.size()));
 
-    std::multimap<types::LevelInd,Particles::Particle<dim> > map;
+    std::multimap<Particles::internal::LevelInd,Particles::Particle<dim> > map;
 
-    types::LevelInd level_index = std::make_pair(0,0);
+    Particles::internal::LevelInd level_index = std::make_pair(0,0);
     map.insert(std::make_pair(level_index,particle));
 
     particle.get_properties()[0] = 0.05;

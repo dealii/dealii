@@ -181,27 +181,28 @@ namespace Particles
      * This constructor is protected so that it can only be accessed by friend
      * classes.
      */
-    ParticleAccessor (const std::multimap<types::LevelInd, Particle<dim,spacedim> > &map,
-                      const typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator &particle);
+    ParticleAccessor (const std::multimap<internal::LevelInd, Particle<dim,spacedim> > &map,
+                      const typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator &particle);
 
   private:
     /**
      * A pointer to the container that stores the particles. Obviously,
      * this accessor is invalidated if the container changes.
      */
-    std::multimap<types::LevelInd, Particle<dim,spacedim> > *map;
+    std::multimap<internal::LevelInd, Particle<dim,spacedim> > *map;
 
     /**
      * An iterator into the container of particles. Obviously,
      * this accessor is invalidated if the container changes.
      */
-    typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator particle;
+    typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator particle;
 
     /**
      * Make ParticleIterator a friend to allow it constructing ParticleAccessors.
      */
     template <int, int> friend class ParticleIterator;
     template <int, int> friend class ParticleHandler;
+
   };
 }
 
