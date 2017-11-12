@@ -126,9 +126,11 @@ DEAL_II_NAMESPACE_OPEN
  * in the manual).
  *
  * @author Luca Heltai, 2009
+ *
+ * @deprecated Use ArrayView instead.
  */
 template <typename Number>
-class VectorView : public Vector<Number>
+class DEAL_II_DEPRECATED VectorView : public Vector<Number>
 {
 public:
 
