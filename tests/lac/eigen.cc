@@ -41,7 +41,7 @@ int main()
    * Compute minimal and maximal
    * eigenvalues of the 5-point
    * stencil matrix
-   * (Hackbusch:Iterative Lösung...,
+   * (Hackbusch:Iterative Loesung...,
    * Satz 4.1.1)
    */
   const double h = 1./size;
