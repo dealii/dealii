@@ -67,6 +67,45 @@ using namespace dealii;
 // ------------------------------ Utility functions used in tests -----------------------
 
 /**
+ * Go through the input stream @p in and filter out binary data for the key @p key .
+ * The filtered stream is returned in @p out.
+ */
+void filter_out_xml_key(std::istream &in, const std::string &key, std::ostream &out)
+{
+  std::string line;
+  bool found = false;
+  const std::string opening = "<" + key;
+  const std::string closing = "</" + key;
+  while (std::getline(in, line))
+    {
+      if (line.find(opening) != std::string::npos &&
+          line.find("binary") != std::string::npos)
+        {
+          found = true;
+          // remove everything after ">" but keep things after "</"
+          const auto pos = line.find(closing);
+          if (pos != std::string::npos)
+            {
+              line = line.substr(0, line.find(">", 0)+1) + line.substr(pos);
+              found = false;
+            }
+          else
+            line = line.substr(0, line.find(">", 0)+1);
+          out << line << std::endl;
+        }
+      else if (line.find(closing) != std::string::npos)
+        {
+          found = false;
+          // remove everything before "<"
+          line = line.substr(line.find("<",0));
+          out << line << std::endl;
+        }
+      else if (!found)
+        out << line << std::endl;
+    }
+}
+
+/**
  * A function to return real part of the number and check that
  * its imaginary part is zero.
  */

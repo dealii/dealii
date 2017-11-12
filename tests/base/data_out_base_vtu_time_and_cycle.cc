@@ -64,10 +64,13 @@ void check_all(std::ostream &log)
 
 int main()
 {
+  std::stringstream ss;
+  check_all<1,1>(ss);
+  check_all<1,2>(ss);
+  check_all<2,2>(ss);
+  check_all<2,3>(ss);
+  check_all<3,3>(ss);
+
   std::ofstream logfile("output");
-  check_all<1,1>(logfile);
-  check_all<1,2>(logfile);
-  check_all<2,2>(logfile);
-  check_all<2,3>(logfile);
-  check_all<3,3>(logfile);
+  filter_out_xml_key(ss, "DataArray",logfile);
 }
