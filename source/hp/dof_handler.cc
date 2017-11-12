@@ -938,7 +938,7 @@ namespace internal
                 active_fe_index);
               };
 
-              parallel::GridTools::exchange_cell_data_to_ghosts<unsigned int, dealii::hp::DoFHandler<dim,spacedim>>
+              GridTools::exchange_cell_data_to_ghosts<unsigned int, dealii::hp::DoFHandler<dim,spacedim>>
                   (dof_handler, pack, unpack);
             }
           else

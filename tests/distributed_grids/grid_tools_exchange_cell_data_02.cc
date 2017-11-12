@@ -49,7 +49,7 @@ void test ()
   typedef typename DoFHandler<dim>::active_cell_iterator cell_iterator;
   typedef short DT;
   short counter = 0;
-  parallel::GridTools::exchange_cell_data_to_ghosts<
+  GridTools::exchange_cell_data_to_ghosts<
   DT,
   DoFHandler<dim> >
   (dofhandler,

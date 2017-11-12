@@ -42,7 +42,7 @@ void test ()
   typedef typename parallel::distributed::Triangulation<dim>::active_cell_iterator cell_iterator;
   typedef double DT;
   DT counter = 0.0;
-  parallel::GridTools::exchange_cell_data_to_ghosts<
+  GridTools::exchange_cell_data_to_ghosts<
   DT,
   parallel::distributed::Triangulation<dim>>
   (tria,

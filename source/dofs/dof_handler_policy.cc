@@ -3615,7 +3615,7 @@ namespace internal
             const_cast<typename DoFHandlerType::active_cell_iterator &>(cell)->set_dof_indices(local_dof_indices);
           };
 
-          parallel::GridTools::exchange_cell_data_to_ghosts<std::vector<types::global_dof_index>, DoFHandlerType>
+          GridTools::exchange_cell_data_to_ghosts<std::vector<types::global_dof_index>, DoFHandlerType>
           (dof_handler, pack, unpack);
 
           // finally update the cell DoF indices caches to make sure
