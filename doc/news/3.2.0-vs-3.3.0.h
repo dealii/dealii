@@ -29,7 +29,7 @@ All entries are signed with the names of the author.
   <li> <p>
        New: Output for 
        <a href="http://www.amtec.org" target="_top">Tecplot</a> has
-       been added. It can be used by choosing output format «tecplot».
+       been added. It can be used by choosing output format Â«tecplotÂ».
        <br>
        (<a href="mailto:benkirk@cfdlab.ae.utexas.edu">Benjamin Shelton Kirk</a> 2002/01/29)
        </p>
@@ -53,7 +53,7 @@ All entries are signed with the names of the author.
   <li> <p>
        New: Output for 
        <a href="http://www.opendx.org" target="_top">OpenDX</a> has
-       been added. It can be used by choosing output format «dx» (not
+       been added. It can be used by choosing output format Â«dxÂ» (not
        yet for grid output). The data format is very basic now, but it
        is planned to improve this to make use of the excellent
        capabilites of OpenDX.
