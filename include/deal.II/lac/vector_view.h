@@ -126,6 +126,8 @@ DEAL_II_NAMESPACE_OPEN
  * in the manual).
  *
  * @author Luca Heltai, 2009
+ *
+ * @deprecated Use ArrayView instead.
  */
 template <typename Number>
 class VectorView : public Vector<Number>
@@ -223,7 +225,7 @@ public:
    * called, and will throw an exception if you try to do so.
    */
   virtual void swap (Vector<Number> &v);
-};
+} DEAL_II_DEPRECATED;
 
 
 
