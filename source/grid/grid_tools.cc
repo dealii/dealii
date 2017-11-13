@@ -5146,6 +5146,7 @@ next_cell:
     (void)local_bboxes;
     (void)mpi_communicator;
     Assert(false, ExcMessage("GridTools::exchange_local_bounding_boxes() requires MPI."));
+    return {};
 #else
     // Step 1: preparing data to be sent
     unsigned int n_bboxes = local_bboxes.size();
