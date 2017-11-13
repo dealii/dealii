@@ -87,6 +87,21 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace VectorTools \{
+    template
+    void interpolate_boundary_values
+    (const hp::MappingCollection<deal_II_dimension,deal_II_space_dimension>    &,
+     const hp::DoFHandler<deal_II_dimension,deal_II_space_dimension> &,
+     const std::map<types::boundary_id, const Function<deal_II_space_dimension,double>*> &,
+     std::map<types::global_dof_index,double>       &,
+     const ComponentMask    &);
+    \}
+#endif
+}
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
     namespace VectorTools \{
 #if deal_II_dimension == deal_II_space_dimension
 
