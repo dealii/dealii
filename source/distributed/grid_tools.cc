@@ -20,8 +20,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_MPI
-
 namespace parallel
 {
   namespace GridTools
@@ -107,5 +105,4 @@ namespace parallel
 // explicit instantiations
 #include "grid_tools.inst"
 
-#endif // DEAL_II_WITH_MPI
 DEAL_II_NAMESPACE_CLOSE
