@@ -1289,6 +1289,34 @@ namespace GridTools
     const unsigned int &refinement_level = 0, const bool &allow_merge = false, const unsigned int &max_boxes = numbers::invalid_unsigned_int);
 
   /**
+   * Given an array of points, use the global bounding box description obtained using
+   * GridTools::compute_mesh_predicate_bounding_box to guess, for each of them,
+   * which process might own it.
+   *
+   * @param[in] global_bboxes Vector of bounding boxes describing the portion of
+   *  mesh with a property for each process.
+   * @param[in] points Array of points to test.
+   *
+   * @param[out] A tuple containing the following information:
+   *  - A vector indicized with ranks of processes. For each rank it contains
+   *   a vector of the indices of points it might own.
+   *  - A map from the index <code>unsigned int</code> of the point in @p points
+   *   to the rank of the owner.
+   *  - A map from the index <code>unsigned int</code> of the point in @p points
+   *   to the ranks of the guessed owners.
+   *
+   * @author Giovanni Alzetta, 2017
+   */
+  template <int spacedim>
+  std::tuple< std::vector< std::vector< unsigned int > >,
+      std::map< unsigned int, unsigned int>,
+      std::map< unsigned int, std::vector< unsigned int > > >
+      guess_point_owner (const std::vector< std::vector< BoundingBox<spacedim> > >
+                         &global_bboxes,
+                         const std::vector< Point<spacedim> >    &points);
+
+
+  /**
    * Return the adjacent cells of all the vertices. If a vertex is also a
    * hanging node, the associated coarse cell is also returned. The vertices
    * are ordered by the vertex index. This is the number returned by the

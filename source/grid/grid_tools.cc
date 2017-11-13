@@ -2339,6 +2339,61 @@ next_cell:
       }
   }
 
+
+
+
+  template <int spacedim>
+  std::tuple< std::vector< std::vector< unsigned int > >,
+      std::map< unsigned int, unsigned int>,
+      std::map< unsigned int, std::vector< unsigned int > > >
+      guess_point_owner (const std::vector< std::vector< BoundingBox<spacedim> > >
+                         &global_bboxes,
+                         const std::vector< Point<spacedim> >    &points)
+  {
+    unsigned int n_procs = global_bboxes.size();
+    std::vector< std::vector< unsigned int > > point_owners(n_procs);
+    std::map< unsigned int, unsigned int> map_owners_found;
+    std::map< unsigned int, std::vector< unsigned int > > map_owners_guessed;
+
+    unsigned int n_points = points.size();
+    for (unsigned int pt=0; pt<n_points; ++pt)
+      {
+        // Keep track of how many processes we guess to own the point
+        std::vector< unsigned int > owners_found;
+        // Check in which other processes the point might be
+        for (unsigned int rk=0; rk<n_procs; ++rk)
+          {
+            for (const BoundingBox<spacedim> &bbox: global_bboxes[rk])
+              if (bbox.point_inside(points[pt]))
+                {
+                  point_owners[rk].emplace_back(pt);
+                  owners_found.emplace_back(rk);
+                  break; // We can check now the next process
+                }
+          }
+        Assert(owners_found.size() > 0,
+               ExcMessage("No owners found for the point " + std::to_string(pt)));
+        if (owners_found.size()==1)
+          map_owners_found[pt] = owners_found[0];
+        else
+          // Multiple owners
+          map_owners_guessed[pt] = owners_found;
+      }
+
+    std::tuple< std::vector< std::vector< unsigned int > >,
+        std::map< unsigned int, unsigned int>,
+        std::map< unsigned int, std::vector< unsigned int > > >
+        output_tuple;
+
+    std::get<0>(output_tuple) = point_owners;
+    std::get<1>(output_tuple) = map_owners_found;
+    std::get<2>(output_tuple) = map_owners_guessed;
+
+    return output_tuple;
+  }
+
+
+
   template <int dim, int spacedim>
   std::vector<std::set<typename Triangulation<dim,spacedim>::active_cell_iterator> >
   vertex_to_cell_map(const Triangulation<dim,spacedim> &triangulation)
