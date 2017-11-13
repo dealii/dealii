@@ -562,11 +562,11 @@ namespace PETScWrappers
 
 
   /**
-   * A class that implements the interface to use the PETSc LU preconditioner.
-   * The LU decomposition is only implemented for single processor machines.
-   * It should provide a convenient interface to another direct solver.
+   * A class that implements the interface to use the PETSc LU preconditioner (@p PCLU).
    *
-   * @note Only works in serial with a PETScWrappers::SparseMatrix.
+   * @note This is not a parallel preconditioner so it only works in serial
+   * with a single processor and only when using a
+   * PETScWrappers::SparseMatrix.
    *
    * @ingroup PETScWrappers
    * @author Oliver Kayser-Herold, 2004
