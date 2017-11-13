@@ -300,8 +300,10 @@ ENDIF()
 #
 # GCC and some other compilers have an attribute of the form
 # __attribute__((deprecated)) that can be used to make the
-# compiler warn whenever a deprecated function is used. See
-# if this attribute is available.
+# compiler warn whenever a deprecated function is used. C++14
+# provides a standardized attribute of the form [[deprecated]
+# with the exact same functionality.
+# See if one of these attribute is available.
 #
 # If it is, set the variable DEAL_II_DEPRECATED to its value. If
 # it isn't, set it to an empty string (actually, to a single
@@ -315,7 +317,18 @@ ENDIF()
 # first see if the compiler accepts the attribute
 CHECK_CXX_SOURCE_COMPILES(
   "
-          int old_fn () __attribute__((deprecated));
+          [[deprecated]] int old_fn ();
+          int old_fn () { return 0; }
+          int (*fn_ptr)() = old_fn;
+
+          int main () {}
+  "
+  DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED
+  )
+
+CHECK_CXX_SOURCE_COMPILES(
+  "
+          __attribute__((deprecated)) int old_fn ();
           int old_fn () { return 0; }
           int (*fn_ptr)() = old_fn;
 
@@ -324,7 +337,9 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
   )
 
-IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
+IF(DEAL_II_COMPILER_HAS_CXX14_ATTRIBUTE_DEPRECATED)
+  SET(DEAL_II_DEPRECATED "[[deprecated]]")
+ELSEIF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
   SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
 ELSE()
   SET(DEAL_II_DEPRECATED " ")
