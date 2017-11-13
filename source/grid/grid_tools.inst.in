@@ -168,6 +168,10 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
     template unsigned int
     GridTools::find_closest_vertex(const std::map<unsigned int,Point<deal_II_space_dimension> >& vertices,
                                    const Point<deal_II_space_dimension>& p);
+
+    template std::vector< std::vector< BoundingBox<deal_II_space_dimension> > >
+    GridTools::exchange_local_bounding_boxes(const std::vector< BoundingBox<deal_II_space_dimension> >&,
+            MPI_Comm);
 }
 
 

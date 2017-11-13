@@ -21,6 +21,7 @@
 #include <deal.II/hp/dof_faces.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler_policy.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_levels.h>
@@ -28,7 +29,6 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/grid_tools.h>
 
 #include <boost/serialization/array.hpp>
 

@@ -20,7 +20,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/mpi.h>
-#include <deal.II/distributed/grid_tools.h>
+#include <deal.II/grid/grid_tools.h>
 
 template <int spacedim>
 void test_exchange_bbox()

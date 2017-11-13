@@ -20,7 +20,6 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/shared_tria.h>
-#include <deal.II/distributed/grid_tools.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>

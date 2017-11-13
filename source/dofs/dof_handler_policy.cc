@@ -20,6 +20,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/partitioner.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -28,7 +29,6 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/grid_tools.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/binary_oarchive.hpp>
