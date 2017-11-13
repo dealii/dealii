@@ -14,13 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-// test parallel::GridTools::exchange_local_bounding_boxes
+// test GridTools::exchange_local_bounding_boxes
 
 #include "../tests.h"
 #include <deal.II/base/point.h>
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/mpi.h>
-#include <deal.II/distributed/grid_tools.h>
+#include <deal.II/grid/grid_tools.h>
 
 template <int spacedim>
 void test_exchange_bbox()
@@ -52,7 +52,7 @@ void test_exchange_bbox()
     }
 
   std::vector< std::vector< BoundingBox<spacedim> > > global_boxes
-    = parallel::GridTools::exchange_local_bounding_boxes(loc_bboxes,mpi_communicator);
+    = GridTools::exchange_local_bounding_boxes(loc_bboxes,mpi_communicator);
 
 
   bool passed = true;
@@ -121,7 +121,7 @@ int main (int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
 
-  deallog << "Test: parallel::GridTools::exchange_local_bounding_boxes " << std::endl;
+  deallog << "Test: GridTools::exchange_local_bounding_boxes " << std::endl;
 
   test_exchange_bbox<1>();
   test_exchange_bbox<2>();

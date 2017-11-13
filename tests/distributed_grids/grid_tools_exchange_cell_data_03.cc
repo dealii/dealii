@@ -20,7 +20,6 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/shared_tria.h>
-#include <deal.II/distributed/grid_tools.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
@@ -47,7 +46,7 @@ void test ()
   typedef typename parallel::shared::Triangulation<dim>::active_cell_iterator cell_iterator;
   typedef double DT;
   DT counter = 0.0;
-  parallel::GridTools::exchange_cell_data_to_ghosts<
+  GridTools::exchange_cell_data_to_ghosts<
   DT, parallel::shared::Triangulation<dim>>
                                          (tria,
                                           [&](const cell_iterator& cell)

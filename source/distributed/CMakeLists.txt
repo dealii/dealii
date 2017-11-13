@@ -16,7 +16,6 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_unity_include_src
-  grid_tools.cc
   grid_refinement.cc
   solution_transfer.cc
   tria.cc
@@ -38,7 +37,6 @@ SETUP_SOURCE_LIST("${_unity_include_src}"
   )
 
 SET(_inst
-  grid_tools.inst.in
   grid_refinement.inst.in
   solution_transfer.inst.in
   tria.inst.in
