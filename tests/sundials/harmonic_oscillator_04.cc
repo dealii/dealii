@@ -101,8 +101,11 @@ int main (int argc, char **argv)
                         const VectorType &sol,
                         const unsigned int step_number) -> int
   {
-    out << t << " "
-    << sol[0] << " " << sol[1] << " " << sol[2] << std::endl;
+    // limit the output to every 10th step and increase the precision to make
+    // the test more robust
+    if (step_number % 10 == 0)
+      out << t << " " << std::setprecision(7)
+      << sol[0] << " " << sol[1] << " " << sol[2] << std::endl;
     return 0;
   };
 
