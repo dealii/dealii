@@ -2738,7 +2738,8 @@ public:
    * @deprecated Use get_normal_vectors() instead, which returns the exact
    * same thing.
    */
-  const std::vector<Tensor<1,spacedim> > &get_all_normal_vectors () const DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  const std::vector<Tensor<1,spacedim> > &get_all_normal_vectors () const;
 
   /**
    * Return the normal vectors at the quadrature points. For a face, these are

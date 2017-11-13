@@ -237,7 +237,8 @@ namespace hp
      *
      * @deprecated Use numbers::invalid_dof_index instead.
      */
-    static const types::global_dof_index invalid_dof_index DEAL_II_DEPRECATED = numbers::invalid_dof_index;
+    DEAL_II_DEPRECATED
+    static const types::global_dof_index invalid_dof_index = numbers::invalid_dof_index;
 
     /**
      * The default index of the finite element to be used on a given cell. For
@@ -648,7 +649,8 @@ namespace hp
      *
      * @deprecated Use get_fe_collection() instead.
      */
-    const hp::FECollection<dim,spacedim> &get_fe () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    const hp::FECollection<dim,spacedim> &get_fe () const;
 
     /**
      * Return a constant reference to the indexth finite element object that is

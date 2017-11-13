@@ -183,9 +183,10 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet arguments instead.
      */
+    DEAL_II_DEPRECATED
     void reinit (const std::vector<Epetra_Map>             &input_maps,
                  const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
-                 const double                               drop_tolerance=1e-13) DEAL_II_DEPRECATED;
+                 const double                               drop_tolerance=1e-13);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -238,7 +239,8 @@ namespace TrilinosWrappers
      * @deprecated Use the methods of the individual matrices based on
      * IndexSet arguments.
      */
-    std::vector<Epetra_Map> domain_partitioner () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    std::vector<Epetra_Map> domain_partitioner () const;
 
     /**
      * Return a vector of the underlying Trilinos Epetra_Map that sets the
@@ -249,7 +251,8 @@ namespace TrilinosWrappers
      * @deprecated Use the methods of the individual matrices based on
      * IndexSet arguments.
      */
-    std::vector<Epetra_Map> range_partitioner () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    std::vector<Epetra_Map> range_partitioner () const;
 
     /**
      * Return the partitioning of the domain space for the individual blocks of

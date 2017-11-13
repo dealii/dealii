@@ -648,8 +648,9 @@ namespace PETScWrappers
      * If any of the <tt>b[i]</tt> is zero, the result is undefined. No
      * attempt is made to catch such situations.
      */
+    DEAL_II_DEPRECATED
     void ratio (const VectorBase &a,
-                const VectorBase &b) DEAL_II_DEPRECATED;
+                const VectorBase &b);
 
     /**
      * Prints the PETSc vector object values using PETSc internal vector

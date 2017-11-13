@@ -148,10 +148,11 @@ template <bool, typename> struct constraint_and_return_value;
  *
  * @author Wolfgang Bangerth, 2003
  */
-template <typename T> struct constraint_and_return_value<true,T>
+template <typename T>
+struct DEAL_II_DEPRECATED constraint_and_return_value<true,T>
 {
   typedef T type;
-} DEAL_II_DEPRECATED;
+};
 
 
 
@@ -324,8 +325,8 @@ namespace internal
    * @author Wolfgang Bangerth, 2006
    */
   template <int N>
-  struct int2type
-  {} DEAL_II_DEPRECATED;
+  struct DEAL_II_DEPRECATED int2type
+  {};
 
 
   /**
@@ -336,8 +337,8 @@ namespace internal
    * @author Wolfgang Bangerth, 2009
    */
   template <bool B>
-  struct bool2type
-  {} DEAL_II_DEPRECATED;
+  struct DEAL_II_DEPRECATED bool2type
+  {};
 }
 
 
@@ -362,8 +363,8 @@ namespace internal
  * instead of this class.
  */
 template <typename T, typename U>
-struct types_are_equal : std::is_same<T,U>
-{} DEAL_II_DEPRECATED;
+struct DEAL_II_DEPRECATED types_are_equal : std::is_same<T,U>
+{};
 
 
 

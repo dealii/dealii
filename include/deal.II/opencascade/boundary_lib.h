@@ -66,7 +66,7 @@ namespace OpenCASCADE
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class NormalProjectionBoundary : public Boundary<dim,spacedim>
+  class DEAL_II_DEPRECATED NormalProjectionBoundary : public Boundary<dim,spacedim>
   {
   public:
 
@@ -107,7 +107,7 @@ namespace OpenCASCADE
      * Relative tolerance used by this class to compute distances.
      */
     const double tolerance;
-  } DEAL_II_DEPRECATED;
+  };
 
   /**
    * A Boundary object based on OpenCASCADE TopoDS_Shape where new points are
@@ -134,7 +134,7 @@ namespace OpenCASCADE
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class DirectionalProjectionBoundary : public Boundary<dim,spacedim>
+  class DEAL_II_DEPRECATED DirectionalProjectionBoundary : public Boundary<dim,spacedim>
   {
   public:
     /**
@@ -176,7 +176,7 @@ namespace OpenCASCADE
      * Relative tolerance used by this class to compute distances.
      */
     const double tolerance;
-  } DEAL_II_DEPRECATED;
+  };
 
 
   /**
@@ -227,7 +227,7 @@ namespace OpenCASCADE
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class NormalToMeshProjectionBoundary : public Boundary<dim,spacedim>
+  class DEAL_II_DEPRECATED NormalToMeshProjectionBoundary : public Boundary<dim,spacedim>
   {
   public:
     /**
@@ -261,7 +261,7 @@ namespace OpenCASCADE
      * Relative tolerance used by this class to compute distances.
      */
     const double tolerance;
-  } DEAL_II_DEPRECATED;
+  };
 
   /**
    * A Boundary object based on OpenCASCADE TopoDS_Shape objects which have

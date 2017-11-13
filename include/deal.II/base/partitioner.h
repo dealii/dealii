@@ -342,7 +342,8 @@ namespace Utilities
       /**
        * Return the MPI communicator underlying the partitioner object.
        */
-      const MPI_Comm &get_communicator() const DEAL_II_DEPRECATED;
+      DEAL_II_DEPRECATED
+      const MPI_Comm &get_communicator() const;
 
       /**
        * Return the MPI communicator underlying the partitioner object.

@@ -333,12 +333,13 @@ public:
    * one provided by DoFHandler::locally_owned_dofs().
    */
   template <typename DoFHandlerType, typename QuadratureType>
+  DEAL_II_DEPRECATED
   void reinit (const Mapping<dim>     &mapping,
                const DoFHandlerType   &dof_handler,
                const ConstraintMatrix &constraint,
                const IndexSet         &locally_owned_dofs,
                const QuadratureType   &quad,
-               const AdditionalData    additional_data = AdditionalData()) DEAL_II_DEPRECATED;
+               const AdditionalData    additional_data = AdditionalData());
 
   /**
    * Extracts the information needed to perform loops over cells. The
@@ -385,12 +386,13 @@ public:
    * one provided by DoFHandler::locally_owned_dofs().
    */
   template <typename DoFHandlerType, typename QuadratureType>
+  DEAL_II_DEPRECATED
   void reinit (const Mapping<dim>                          &mapping,
                const std::vector<const DoFHandlerType *>   &dof_handler,
                const std::vector<const ConstraintMatrix *> &constraint,
                const std::vector<IndexSet>                 &locally_owned_set,
                const std::vector<QuadratureType>           &quad,
-               const AdditionalData                        additional_data = AdditionalData()) DEAL_II_DEPRECATED;
+               const AdditionalData                        additional_data = AdditionalData());
 
   /**
    * Initializes the data structures. Same as before, but now the index set

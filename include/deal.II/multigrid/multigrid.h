@@ -93,6 +93,7 @@ public:
    * The DoFHandler is actually not needed.
    */
   template <int dim>
+  DEAL_II_DEPRECATED
   Multigrid(const DoFHandler<dim>              &mg_dof_handler,
             const MGMatrixBase<VectorType>     &matrix,
             const MGCoarseGridBase<VectorType> &coarse,
@@ -101,7 +102,7 @@ public:
             const MGSmootherBase<VectorType>   &post_smooth,
             const unsigned int                 minlevel = 0,
             const unsigned int                 maxlevel = numbers::invalid_unsigned_int,
-            Cycle                              cycle = v_cycle) DEAL_II_DEPRECATED;
+            Cycle                              cycle = v_cycle);
 
   /**
    * Constructor. <tt>transfer</tt> is an object performing prolongation and

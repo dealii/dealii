@@ -49,9 +49,10 @@ DeclException1 (ExcInvalidTensorContractionIndex,
  * @relates Tensor
  */
 template <int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 Number double_contract (const Tensor<2, dim, Number> &src1,
-                        const Tensor<2, dim, Number> &src2) DEAL_II_DEPRECATED;
+                        const Tensor<2, dim, Number> &src2);
 
 
 /**
@@ -64,10 +65,11 @@ Number double_contract (const Tensor<2, dim, Number> &src1,
  * @relates Tensor
  */
 template <int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 void double_contract (Tensor<2,dim,Number>       &dest,
                       const Tensor<4,dim,Number> &src1,
-                      const Tensor<2,dim,Number> &src2) DEAL_II_DEPRECATED;
+                      const Tensor<2,dim,Number> &src2);
 
 /**
  * Contract a tensor of rank 2 with a tensor of rank 2. The contraction is
@@ -80,12 +82,13 @@ void double_contract (Tensor<2,dim,Number>       &dest,
  * @relates Tensor
  */
 template <int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 void contract (Tensor<2,dim,Number>       &dest,
                const Tensor<2,dim,Number> &src1,
                const unsigned int          index1,
                const Tensor<2,dim,Number> &src2,
-               const unsigned int          index3) DEAL_II_DEPRECATED;
+               const unsigned int          index3);
 
 /**
  * Contract a tensor of rank 3 with a tensor of rank 1. The contraction is
@@ -97,11 +100,12 @@ void contract (Tensor<2,dim,Number>       &dest,
  * @relates Tensor
  */
 template <int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 void contract (Tensor<2,dim,Number>       &dest,
                const Tensor<3,dim,Number> &src1,
                const unsigned int          index1,
-               const Tensor<1,dim,Number> &src2) DEAL_II_DEPRECATED;
+               const Tensor<1,dim,Number> &src2);
 
 /**
  * Contract a tensor of rank 3 with a tensor of rank 2. The contraction is
@@ -114,12 +118,13 @@ void contract (Tensor<2,dim,Number>       &dest,
  * @relates Tensor
  */
 template <int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 void contract (Tensor<3,dim,Number>       &dest,
                const Tensor<3,dim,Number> &src1,
                const unsigned int          index1,
                const Tensor<2,dim,Number> &src2,
-               const unsigned int          index2) DEAL_II_DEPRECATED;
+               const unsigned int          index2);
 
 /**
  * Single contraction for tensors: contract the last index of a tensor @p src1
@@ -130,10 +135,11 @@ void contract (Tensor<3,dim,Number>       &dest,
  * @relates Tensor
  */
 template <int rank_1, int rank_2, int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 void contract (Tensor<rank_1 + rank_2 - 2, dim, Number> &dest,
                const Tensor<rank_1, dim, Number>        &src1,
-               const Tensor<rank_2, dim, Number>        &src2) DEAL_II_DEPRECATED;
+               const Tensor<rank_2, dim, Number>        &src2);
 
 /**
  * Contract a tensor of rank 1 with a tensor of rank 1 and return the result.
@@ -142,10 +148,11 @@ void contract (Tensor<rank_1 + rank_2 - 2, dim, Number> &dest,
  * @relates Tensor
  */
 template <int dim, typename Number, typename OtherNumber>
+DEAL_II_DEPRECATED
 inline
 typename ProductType<Number,OtherNumber>::type
 contract (const Tensor<1,dim,Number> &src1,
-          const Tensor<1,dim,OtherNumber> &src2) DEAL_II_DEPRECATED;
+          const Tensor<1,dim,OtherNumber> &src2);
 
 
 /**
@@ -156,10 +163,11 @@ contract (const Tensor<1,dim,Number> &src1,
  * @relates Tensor
  */
 template <int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 void
 cross_product (Tensor<1,dim,Number>       &dst,
-               const Tensor<1,dim,Number> &src) DEAL_II_DEPRECATED;
+               const Tensor<1,dim,Number> &src);
 
 /**
  * The cross product of 2 vectors in 3d.
@@ -168,11 +176,12 @@ cross_product (Tensor<1,dim,Number>       &dst,
  * @relates Tensor
  */
 template <int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 void
 cross_product (Tensor<1,dim,Number>       &dst,
                const Tensor<1,dim,Number> &src1,
-               const Tensor<1,dim,Number> &src2) DEAL_II_DEPRECATED;
+               const Tensor<1,dim,Number> &src2);
 
 /**
  * Form the outer product of two tensors.
@@ -181,10 +190,11 @@ cross_product (Tensor<1,dim,Number>       &dst,
  * @relates Tensor
  */
 template <int rank_1, int rank_2, int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 void outer_product(Tensor<rank_1 + rank_2, dim, Number> &dst,
                    const Tensor<rank_1, dim, Number>    &src1,
-                   const Tensor<rank_2, dim, Number>    &src2) DEAL_II_DEPRECATED;
+                   const Tensor<rank_2, dim, Number>    &src2);
 
 /**
  * Multiply a Tensor<1,dim,Number> with a Number.
@@ -193,10 +203,11 @@ void outer_product(Tensor<rank_1 + rank_2, dim, Number> &dst,
  * @relates Tensor
  */
 template <int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 void outer_product (Tensor<1,dim,Number>       &dst,
                     const Number                src1,
-                    const Tensor<1,dim,Number> &src2) DEAL_II_DEPRECATED;
+                    const Tensor<1,dim,Number> &src2);
 
 /**
  * Multiply a Tensor<1,dim,Number> with a Number.
@@ -205,18 +216,20 @@ void outer_product (Tensor<1,dim,Number>       &dst,
  * @relates Tensor
  */
 template <int dim, typename Number>
+DEAL_II_DEPRECATED
 inline
 void outer_product (Tensor<1,dim,Number>       &dst,
                     const Tensor<1,dim,Number>  src1,
-                    const Number                src2) DEAL_II_DEPRECATED;
+                    const Number                src2);
 
 /**
  * @deprecated Do not use this function, evaluate the value manually.
  * @relates Tensor
  */
 template <int rank, typename Number>
+DEAL_II_DEPRECATED
 inline
-Number determinant (const Tensor<rank,1,Number> &t) DEAL_II_DEPRECATED;
+Number determinant (const Tensor<rank,1,Number> &t);
 
 
 /**
@@ -224,8 +237,9 @@ Number determinant (const Tensor<rank,1,Number> &t) DEAL_II_DEPRECATED;
  * @relates Tensor
  */
 template <typename Number>
+DEAL_II_DEPRECATED
 inline
-Number determinant (const Tensor<1,1,Number> &t) DEAL_II_DEPRECATED;
+Number determinant (const Tensor<1,1,Number> &t);
 
 //@}
 

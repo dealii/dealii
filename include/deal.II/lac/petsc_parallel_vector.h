@@ -217,9 +217,10 @@ namespace PETScWrappers
        * @deprecated The use of objects that are explicitly of type VectorBase
        * is deprecated: use PETScWrappers::MPI::Vector instead.
        */
+      DEAL_II_DEPRECATED
       explicit Vector (const MPI_Comm     &communicator,
                        const VectorBase   &v,
-                       const size_type     local_size) DEAL_II_DEPRECATED;
+                       const size_type     local_size);
 
       /**
        * Construct a new parallel ghosted PETSc vector from an IndexSet.

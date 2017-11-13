@@ -427,10 +427,11 @@ namespace LocalIntegrators
      * @deprecated Use LocalIntegrators::GradDiv::cell_matrix() instead.
      */
     template <int dim>
+    DEAL_II_DEPRECATED
     void grad_div_matrix (
       FullMatrix<double> &M,
       const FEValuesBase<dim> &fe,
-      const double factor = 1.) DEAL_II_DEPRECATED;
+      const double factor = 1.);
 
     template <int dim>
     void grad_div_matrix (
@@ -445,11 +446,12 @@ namespace LocalIntegrators
      * @deprecated Use LocalIntegrators::GradDiv::cell_residual() instead.
      */
     template <int dim, typename number>
+    DEAL_II_DEPRECATED
     void grad_div_residual (
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &input,
-      const double factor = 1.) DEAL_II_DEPRECATED;
+      const double factor = 1.);
 
     template <int dim, typename number>
     void grad_div_residual (

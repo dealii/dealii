@@ -113,7 +113,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2000-2005, 2010
  */
 template <typename number = double, typename BlockVectorType=BlockVector<number> >
-class BlockMatrixArray : public Subscriptor
+class DEAL_II_DEPRECATED BlockMatrixArray : public Subscriptor
 {
 public:
   /**
@@ -345,7 +345,7 @@ private:
    * number of blocks per row.
    */
   unsigned int block_cols;
-} DEAL_II_DEPRECATED;
+};
 
 /*@}*/
 
@@ -407,7 +407,7 @@ private:
  * @author Guido Kanschat, 2001, 2005
  */
 template <typename number = double, typename BlockVectorType = BlockVector<number> >
-class BlockTrianglePrecondition
+class DEAL_II_DEPRECATED BlockTrianglePrecondition
   : private BlockMatrixArray<number,BlockVectorType>
 {
 public:
@@ -521,7 +521,7 @@ private:
    * Flag for backward insertion.
    */
   bool backward;
-} DEAL_II_DEPRECATED;
+};
 
 
 #ifndef DOXYGEN

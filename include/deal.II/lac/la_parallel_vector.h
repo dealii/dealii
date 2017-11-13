@@ -359,8 +359,9 @@ namespace LinearAlgebra
        * This function is deprecated. Use the interface through
        * ReadWriteVector instead.
        */
+      DEAL_II_DEPRECATED
       Vector<Number> &
-      operator = (const PETScWrappers::MPI::Vector &petsc_vec) DEAL_II_DEPRECATED;
+      operator = (const PETScWrappers::MPI::Vector &petsc_vec);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -375,8 +376,9 @@ namespace LinearAlgebra
        * This function is deprecated. Use the interface through
        * ReadWriteVector instead.
        */
+      DEAL_II_DEPRECATED
       Vector<Number> &
-      operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec) DEAL_II_DEPRECATED;
+      operator = (const TrilinosWrappers::MPI::Vector &trilinos_vec);
 #endif
       //@}
 
@@ -737,19 +739,21 @@ namespace LinearAlgebra
        *
        * This function is deprecated.
        */
+      DEAL_II_DEPRECATED
       void sadd (const Number          s,
                  const Number          a,
                  const Vector<Number> &V,
                  const Number          b,
-                 const Vector<Number> &W) DEAL_II_DEPRECATED;
+                 const Vector<Number> &W);
 
       /**
        * Assignment <tt>*this = a*u + b*v</tt>.
        *
        * This function is deprecated.
        */
+      DEAL_II_DEPRECATED
       void equ (const Number a, const Vector<Number> &u,
-                const Number b, const Vector<Number> &v) DEAL_II_DEPRECATED;
+                const Number b, const Vector<Number> &v);
 
       //@}
 
@@ -772,7 +776,8 @@ namespace LinearAlgebra
        *
        * This function is deprecated.
        */
-      std::pair<size_type, size_type> local_range () const DEAL_II_DEPRECATED;
+      DEAL_II_DEPRECATED
+      std::pair<size_type, size_type> local_range () const;
 
       /**
        * Return true if the given global index is in the local range of this
@@ -780,14 +785,16 @@ namespace LinearAlgebra
        *
        * This function is deprecated.
        */
-      bool in_local_range (const size_type global_index) const DEAL_II_DEPRECATED;
+      DEAL_II_DEPRECATED
+      bool in_local_range (const size_type global_index) const;
 
       /**
        * Return the number of ghost elements present on the vector.
        *
        * This function is deprecated.
        */
-      size_type n_ghost_entries () const DEAL_II_DEPRECATED;
+      DEAL_II_DEPRECATED
+      size_type n_ghost_entries () const;
 
       /**
        * Return an index set that describes which elements of this vector are
@@ -796,7 +803,8 @@ namespace LinearAlgebra
        *
        * This function is deprecated.
        */
-      const IndexSet &ghost_elements() const DEAL_II_DEPRECATED;
+      DEAL_II_DEPRECATED
+      const IndexSet &ghost_elements() const;
 
       /**
        * Return whether the given global index is a ghost index on the
@@ -805,7 +813,8 @@ namespace LinearAlgebra
        *
        * This function is deprecated.
        */
-      bool is_ghost_entry (const types::global_dof_index global_index) const DEAL_II_DEPRECATED;
+      DEAL_II_DEPRECATED
+      bool is_ghost_entry (const types::global_dof_index global_index) const;
 
       /**
        * Make the @p Vector class a bit like the <tt>vector<></tt> class of

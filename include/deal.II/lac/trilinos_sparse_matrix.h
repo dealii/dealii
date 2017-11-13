@@ -666,8 +666,9 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     SparseMatrix (const Epetra_Map  &parallel_partitioning,
-                  const size_type    n_max_entries_per_row = 0) DEAL_II_DEPRECATED;
+                  const size_type    n_max_entries_per_row = 0);
 
     /**
      * Same as before, but now set a value of nonzeros for each matrix row.
@@ -678,8 +679,9 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     SparseMatrix (const Epetra_Map                &parallel_partitioning,
-                  const std::vector<unsigned int> &n_entries_per_row) DEAL_II_DEPRECATED;
+                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -699,9 +701,10 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     SparseMatrix (const Epetra_Map &row_parallel_partitioning,
                   const Epetra_Map &col_parallel_partitioning,
-                  const size_type   n_max_entries_per_row = 0) DEAL_II_DEPRECATED;
+                  const size_type   n_max_entries_per_row = 0);
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -719,9 +722,10 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     SparseMatrix (const Epetra_Map                &row_parallel_partitioning,
                   const Epetra_Map                &col_parallel_partitioning,
-                  const std::vector<unsigned int> &n_entries_per_row) DEAL_II_DEPRECATED;
+                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
      * This function is initializes the Trilinos Epetra matrix according to
@@ -750,9 +754,10 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     template <typename SparsityPatternType>
+    DEAL_II_DEPRECATED
     void reinit (const Epetra_Map          &parallel_partitioning,
                  const SparsityPatternType &sparsity_pattern,
-                 const bool                 exchange_data = false) DEAL_II_DEPRECATED;
+                 const bool                 exchange_data = false);
 
     /**
      * This function is similar to the other initialization function above,
@@ -769,10 +774,11 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     template <typename SparsityPatternType>
+    DEAL_II_DEPRECATED
     void reinit (const Epetra_Map          &row_parallel_partitioning,
                  const Epetra_Map          &col_parallel_partitioning,
                  const SparsityPatternType &sparsity_pattern,
-                 const bool                 exchange_data = false) DEAL_II_DEPRECATED;
+                 const bool                 exchange_data = false);
 
     /**
      * This function initializes the Trilinos matrix using the deal.II sparse
@@ -793,11 +799,12 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     template <typename number>
+    DEAL_II_DEPRECATED
     void reinit (const Epetra_Map                     &parallel_partitioning,
                  const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
                  const double                          drop_tolerance=1e-13,
                  const bool                            copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr) DEAL_II_DEPRECATED;
+                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
 
     /**
      * This function is similar to the other initialization function with
@@ -815,12 +822,13 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     template <typename number>
+    DEAL_II_DEPRECATED
     void reinit (const Epetra_Map                      &row_parallel_partitioning,
                  const Epetra_Map                      &col_parallel_partitioning,
                  const ::dealii::SparseMatrix<number>  &dealii_sparse_matrix,
                  const double                           drop_tolerance=1e-13,
                  const bool                             copy_values=true,
-                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr) DEAL_II_DEPRECATED;
+                 const ::dealii::SparsityPattern      *use_this_sparsity=nullptr);
 //@}
     /**
      * @name Constructors and initialization using an IndexSet description
@@ -1727,7 +1735,8 @@ namespace TrilinosWrappers
      *
      * @deprecated Use locally_owned_domain_indices() instead.
      */
-    const Epetra_Map &domain_partitioner ()  const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    const Epetra_Map &domain_partitioner ()  const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -1737,7 +1746,8 @@ namespace TrilinosWrappers
      *
      * @deprecated Use locally_owned_range_indices() instead.
      */
-    const Epetra_Map &range_partitioner () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    const Epetra_Map &range_partitioner () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -1746,7 +1756,8 @@ namespace TrilinosWrappers
      *
      * @deprecated Use locally_owned_range_indices() instead.
      */
-    const Epetra_Map &row_partitioner () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    const Epetra_Map &row_partitioner () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -1757,7 +1768,8 @@ namespace TrilinosWrappers
      * @deprecated Usually not necessary. If desired, access it via the
      * Epetra_CrsMatrix.
      */
-    const Epetra_Map &col_partitioner () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    const Epetra_Map &col_partitioner () const;
 //@}
 
     /**

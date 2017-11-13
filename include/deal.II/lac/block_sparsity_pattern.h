@@ -633,7 +633,8 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet arguments instead.
      */
-    BlockSparsityPattern (const std::vector<Epetra_Map> &parallel_partitioning) DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    BlockSparsityPattern (const std::vector<Epetra_Map> &parallel_partitioning);
 
     /**
      * Initialize the pattern with an array of index sets that specifies both
@@ -680,7 +681,8 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet arguments instead.
      */
-    void reinit (const std::vector<Epetra_Map> &parallel_partitioning) DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    void reinit (const std::vector<Epetra_Map> &parallel_partitioning);
 
     /**
      * Resize the matrix to a square tensor product of matrices. See the

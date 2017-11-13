@@ -192,7 +192,7 @@ template <class VectorType> class FilteredMatrixBlock;
  * constrained_linear_operator().
  */
 template <typename VectorType>
-class FilteredMatrix : public Subscriptor
+class DEAL_II_DEPRECATED FilteredMatrix : public Subscriptor
 {
 public:
   class const_iterator;
@@ -413,8 +413,9 @@ public:
    * the second parameter to @p true to use a faster algorithm. Note: This
    * method is deprecated as matrix_is_symmetric parameter is no longer used.
    */
+  DEAL_II_DEPRECATED
   void apply_constraints (VectorType &v,
-                          const bool matrix_is_symmetric) const DEAL_II_DEPRECATED;
+                          const bool matrix_is_symmetric) const;
   /**
    * Apply the constraints to a right hand side vector. This needs to be done
    * before starting to solve with the filtered matrix.
@@ -542,7 +543,7 @@ private:
    * FilteredMatrixBlock accesses pre_filter() and post_filter().
    */
   friend class FilteredMatrixBlock<VectorType>;
-} DEAL_II_DEPRECATED;
+};
 
 /*@}*/
 /*---------------------- Inline functions -----------------------------------*/

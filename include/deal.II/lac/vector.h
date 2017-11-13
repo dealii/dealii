@@ -728,8 +728,9 @@ public:
    *
    * @dealiiOperationIsMultithreaded
    */
+  DEAL_II_DEPRECATED
   void ratio (const Vector<Number> &a,
-              const Vector<Number> &b) DEAL_II_DEPRECATED;
+              const Vector<Number> &b);
 
   /**
    * This function does nothing but exists for compatibility with the @p
@@ -749,7 +750,8 @@ public:
    *
    * This function is deprecated.
    */
-  void print (const char *format = nullptr) const DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  void print (const char *format = nullptr) const;
 
   /**
    * Print to a stream. @p precision denotes the desired precision with which
@@ -770,9 +772,10 @@ public:
    *
    * This function is deprecated.
    */
+  DEAL_II_DEPRECATED
   void print (LogStream &out,
               const unsigned int width = 6,
-              const bool across = true) const DEAL_II_DEPRECATED;
+              const bool across = true) const;
 
   /**
    * Write the vector en bloc to a file. This is done in a binary mode, so the
