@@ -25,6 +25,7 @@
 #include "../tests.h"
 
 #include <Sacado.hpp>
+#include <Sacado_trad.hpp>
 
 // The functions to differentiate
 template <typename NumberType>
