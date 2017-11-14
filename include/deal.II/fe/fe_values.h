@@ -4403,7 +4403,7 @@ FEValuesBase<dim,spacedim>::shape_value_component (const unsigned int i,
   Assert (component < fe->n_components(),
           ExcIndexRange(component, 0, fe->n_components()));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
 
   // check whether the shape function
   // is non-zero at all within
@@ -4659,7 +4659,7 @@ FEValuesBase<dim,spacedim>::get_quadrature_points () const
   Assert (this->update_flags & update_quadrature_points,
           ExcAccessToUninitializedField("update_quadrature_points"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.quadrature_points;
 }
 
@@ -4673,7 +4673,7 @@ FEValuesBase<dim,spacedim>::get_JxW_values () const
   Assert (this->update_flags & update_JxW_values,
           ExcAccessToUninitializedField("update_JxW_values"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.JxW_values;
 }
 
@@ -4687,7 +4687,7 @@ FEValuesBase<dim,spacedim>::get_jacobians () const
   Assert (this->update_flags & update_jacobians,
           ExcAccessToUninitializedField("update_jacobians"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobians;
 }
 
@@ -4701,7 +4701,7 @@ FEValuesBase<dim,spacedim>::get_jacobian_grads () const
   Assert (this->update_flags & update_jacobian_grads,
           ExcAccessToUninitializedField("update_jacobians_grads"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_grads;
 }
 
@@ -4715,7 +4715,7 @@ FEValuesBase<dim,spacedim>::jacobian_pushed_forward_grad (const unsigned int i) 
   Assert (this->update_flags & update_jacobian_pushed_forward_grads,
           ExcAccessToUninitializedField("update_jacobian_pushed_forward_grads"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_pushed_forward_grads[i];
 }
 
@@ -4729,7 +4729,7 @@ FEValuesBase<dim,spacedim>::get_jacobian_pushed_forward_grads () const
   Assert (this->update_flags & update_jacobian_pushed_forward_grads,
           ExcAccessToUninitializedField("update_jacobian_pushed_forward_grads"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_pushed_forward_grads;
 }
 
@@ -4743,7 +4743,7 @@ FEValuesBase<dim,spacedim>::jacobian_2nd_derivative (const unsigned int i) const
   Assert (this->update_flags & update_jacobian_2nd_derivatives,
           ExcAccessToUninitializedField("update_jacobian_2nd_derivatives"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_2nd_derivatives[i];
 }
 
@@ -4757,7 +4757,7 @@ FEValuesBase<dim,spacedim>::get_jacobian_2nd_derivatives () const
   Assert (this->update_flags & update_jacobian_2nd_derivatives,
           ExcAccessToUninitializedField("update_jacobian_2nd_derivatives"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_2nd_derivatives;
 }
 
@@ -4771,7 +4771,7 @@ FEValuesBase<dim,spacedim>::jacobian_pushed_forward_2nd_derivative (const unsign
   Assert (this->update_flags & update_jacobian_pushed_forward_2nd_derivatives,
           ExcAccessToUninitializedField("update_jacobian_pushed_forward_2nd_derivatives"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_pushed_forward_2nd_derivatives[i];
 }
 
@@ -4785,7 +4785,7 @@ FEValuesBase<dim,spacedim>::get_jacobian_pushed_forward_2nd_derivatives () const
   Assert (this->update_flags & update_jacobian_pushed_forward_2nd_derivatives,
           ExcAccessToUninitializedField("update_jacobian_pushed_forward_2nd_derivatives"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_pushed_forward_2nd_derivatives;
 }
 
@@ -4799,7 +4799,7 @@ FEValuesBase<dim,spacedim>::jacobian_3rd_derivative (const unsigned int i) const
   Assert (this->update_flags & update_jacobian_3rd_derivatives,
           ExcAccessToUninitializedField("update_jacobian_3rd_derivatives"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_3rd_derivatives[i];
 }
 
@@ -4813,7 +4813,7 @@ FEValuesBase<dim,spacedim>::get_jacobian_3rd_derivatives () const
   Assert (this->update_flags & update_jacobian_3rd_derivatives,
           ExcAccessToUninitializedField("update_jacobian_3rd_derivatives"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_3rd_derivatives;
 }
 
@@ -4827,7 +4827,7 @@ FEValuesBase<dim,spacedim>::jacobian_pushed_forward_3rd_derivative (const unsign
   Assert (this->update_flags & update_jacobian_pushed_forward_3rd_derivatives,
           ExcAccessToUninitializedField("update_jacobian_pushed_forward_3rd_derivatives"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_pushed_forward_3rd_derivatives[i];
 }
 
@@ -4841,7 +4841,7 @@ FEValuesBase<dim,spacedim>::get_jacobian_pushed_forward_3rd_derivatives () const
   Assert (this->update_flags & update_jacobian_pushed_forward_3rd_derivatives,
           ExcAccessToUninitializedField("update_jacobian_pushed_forward_3rd_derivatives"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.jacobian_pushed_forward_3rd_derivatives;
 }
 
@@ -4854,7 +4854,7 @@ FEValuesBase<dim,spacedim>::get_inverse_jacobians () const
   Assert (this->update_flags & update_inverse_jacobians,
           ExcAccessToUninitializedField("update_inverse_jacobians"));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
   return this->mapping_output.inverse_jacobians;
 }
 
@@ -4870,7 +4870,7 @@ FEValuesBase<dim,spacedim>::quadrature_point (const unsigned int i) const
   Assert (i<this->mapping_output.quadrature_points.size(),
           ExcIndexRange(i, 0, this->mapping_output.quadrature_points.size()));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
 
   return this->mapping_output.quadrature_points[i];
 }
@@ -4888,7 +4888,7 @@ FEValuesBase<dim,spacedim>::JxW (const unsigned int i) const
   Assert (i<this->mapping_output.JxW_values.size(),
           ExcIndexRange(i, 0, this->mapping_output.JxW_values.size()));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
 
   return this->mapping_output.JxW_values[i];
 }
@@ -4905,7 +4905,7 @@ FEValuesBase<dim,spacedim>::jacobian (const unsigned int i) const
   Assert (i<this->mapping_output.jacobians.size(),
           ExcIndexRange(i, 0, this->mapping_output.jacobians.size()));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
 
   return this->mapping_output.jacobians[i];
 }
@@ -4922,7 +4922,7 @@ FEValuesBase<dim,spacedim>::jacobian_grad (const unsigned int i) const
   Assert (i<this->mapping_output.jacobian_grads.size(),
           ExcIndexRange(i, 0, this->mapping_output.jacobian_grads.size()));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
 
   return this->mapping_output.jacobian_grads[i];
 }
@@ -4939,7 +4939,7 @@ FEValuesBase<dim,spacedim>::inverse_jacobian (const unsigned int i) const
   Assert (i<this->mapping_output.inverse_jacobians.size(),
           ExcIndexRange(i, 0, this->mapping_output.inverse_jacobians.size()));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
 
   return this->mapping_output.inverse_jacobians[i];
 }
@@ -4955,7 +4955,7 @@ FEValuesBase<dim,spacedim>::normal_vector (const unsigned int i) const
   Assert (i<this->mapping_output.normal_vectors.size(),
           ExcIndexRange(i, 0, this->mapping_output.normal_vectors.size()));
   Assert (present_cell.get() != 0,
-          ExcMessage ("FEValues object is not reinit'ed to any cell"));  
+          ExcMessage ("FEValues object is not reinit'ed to any cell"));
 
   return this->mapping_output.normal_vectors[i];
 }
