@@ -146,7 +146,7 @@ extern "C" {
  * @author Denis Davydov, 2015, 2017
  */
 template <typename VectorType>
-class PArpackSolver : public Subscriptor
+class  DEAL_II_DEPRECATED PArpackSolver : public Subscriptor
 {
 public:
   /**
@@ -256,7 +256,7 @@ public:
     const MatrixType &B;
     const double sigma;
 
-  } DEAL_II_DEPRECATED;
+  };
 
   /**
    * Standardized data struct to pipe additional data to the solver, should it

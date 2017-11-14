@@ -345,19 +345,21 @@ namespace LinearAlgebra
        *
        * This function is deprecated.
        */
+      DEAL_II_DEPRECATED
       void equ (const Number a, const BlockVector<Number> &u,
-                const Number b, const BlockVector<Number> &v) DEAL_II_DEPRECATED;
+                const Number b, const BlockVector<Number> &v);
 
       /**
        * Scaling and multiple addition.
        *
        * This function is deprecated.
        */
+      DEAL_II_DEPRECATED
       void sadd (const Number               s,
                  const Number               a,
                  const BlockVector<Number> &V,
                  const Number               b,
-                 const BlockVector<Number> &W) DEAL_II_DEPRECATED;
+                 const BlockVector<Number> &W);
 
       /**
        * Return whether the vector contains only elements with value zero.

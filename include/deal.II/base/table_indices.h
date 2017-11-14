@@ -123,6 +123,7 @@ public:
    * @deprecated Use the constructor with the appropriate number of arguments
    *   to initialize the @p N indices instead.
    */
+  DEAL_II_DEPRECATED
   TableIndices (const unsigned int index0,
                 const unsigned int index1,
                 const unsigned int index2,
@@ -131,7 +132,7 @@ public:
                 const unsigned int index5,
                 const unsigned int index6 = numbers::invalid_unsigned_int,
                 const unsigned int index7 = numbers::invalid_unsigned_int,
-                const unsigned int index8 = numbers::invalid_unsigned_int) DEAL_II_DEPRECATED;
+                const unsigned int index8 = numbers::invalid_unsigned_int);
 
   /**
    * Read-only access the value of the <tt>i</tt>th index.

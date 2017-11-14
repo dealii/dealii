@@ -419,8 +419,9 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     SparsityPattern (const Epetra_Map &parallel_partitioning,
-                     const size_type   n_entries_per_row = 0) DEAL_II_DEPRECATED;
+                     const size_type   n_entries_per_row = 0);
 
     /**
      * Same as before, but now use the exact number of nonzeros in each m row.
@@ -434,8 +435,9 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     SparsityPattern (const Epetra_Map             &parallel_partitioning,
-                     const std::vector<size_type> &n_entries_per_row) DEAL_II_DEPRECATED;
+                     const std::vector<size_type> &n_entries_per_row);
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -455,9 +457,10 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     SparsityPattern (const Epetra_Map   &row_parallel_partitioning,
                      const Epetra_Map   &col_parallel_partitioning,
-                     const size_type     n_entries_per_row = 0) DEAL_II_DEPRECATED;
+                     const size_type     n_entries_per_row = 0);
 
     /**
      * This constructor is similar to the one above, but it now takes two
@@ -472,9 +475,10 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     SparsityPattern (const Epetra_Map             &row_parallel_partitioning,
                      const Epetra_Map             &col_parallel_partitioning,
-                     const std::vector<size_type> &n_entries_per_row) DEAL_II_DEPRECATED;
+                     const std::vector<size_type> &n_entries_per_row);
 
     /**
      * Reinitialization function for generating a square sparsity pattern
@@ -492,9 +496,10 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     void
     reinit (const Epetra_Map &parallel_partitioning,
-            const size_type   n_entries_per_row = 0) DEAL_II_DEPRECATED;
+            const size_type   n_entries_per_row = 0);
 
     /**
      * Same as before, but now use the exact number of nonzeros in each m row.
@@ -508,9 +513,10 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     void
     reinit (const Epetra_Map             &parallel_partitioning,
-            const std::vector<size_type> &n_entries_per_row) DEAL_II_DEPRECATED;
+            const std::vector<size_type> &n_entries_per_row);
 
     /**
      * This reinit function is similar to the one above, but it now takes two
@@ -530,10 +536,11 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     void
     reinit (const Epetra_Map   &row_parallel_partitioning,
             const Epetra_Map   &col_parallel_partitioning,
-            const size_type     n_entries_per_row = 0) DEAL_II_DEPRECATED;
+            const size_type     n_entries_per_row = 0);
 
     /**
      * This reinit function is similar to the one above, but it now takes two
@@ -548,10 +555,11 @@ namespace TrilinosWrappers
      *
      * @deprecated Use the respective method with IndexSet argument instead.
      */
+    DEAL_II_DEPRECATED
     void
     reinit (const Epetra_Map             &row_parallel_partitioning,
             const Epetra_Map             &col_parallel_partitioning,
-            const std::vector<size_type> &n_entries_per_row) DEAL_II_DEPRECATED;
+            const std::vector<size_type> &n_entries_per_row);
 
     /**
      * Reinit function. Takes one of the deal.II sparsity patterns and a
@@ -564,11 +572,12 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     template <typename SparsityPatternType>
+    DEAL_II_DEPRECATED
     void
     reinit (const Epetra_Map          &row_parallel_partitioning,
             const Epetra_Map          &col_parallel_partitioning,
             const SparsityPatternType &nontrilinos_sparsity_pattern,
-            const bool                 exchange_data = false) DEAL_II_DEPRECATED;
+            const bool                 exchange_data = false);
 
     /**
      * Reinit function. Takes one of the deal.II sparsity patterns and a
@@ -581,10 +590,11 @@ namespace TrilinosWrappers
      * @deprecated Use the respective method with IndexSet argument instead.
      */
     template <typename SparsityPatternType>
+    DEAL_II_DEPRECATED
     void
     reinit (const Epetra_Map          &parallel_partitioning,
             const SparsityPatternType &nontrilinos_sparsity_pattern,
-            const bool                 exchange_data = false) DEAL_II_DEPRECATED;
+            const bool                 exchange_data = false);
 //@}
     /**
      * @name Constructors and initialization using an IndexSet description
@@ -949,7 +959,8 @@ namespace TrilinosWrappers
      *
      * @deprecated Use locally_owned_domain_indices() instead.
      */
-    const Epetra_Map &domain_partitioner () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    const Epetra_Map &domain_partitioner () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -959,7 +970,8 @@ namespace TrilinosWrappers
      *
      * @deprecated Use locally_owned_range_indices() instead.
      */
-    const Epetra_Map &range_partitioner () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    const Epetra_Map &range_partitioner () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -968,7 +980,8 @@ namespace TrilinosWrappers
      *
      * @deprecated Use locally_owned_range_indices() instead.
      */
-    const Epetra_Map &row_partitioner () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    const Epetra_Map &row_partitioner () const;
 
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
@@ -979,14 +992,16 @@ namespace TrilinosWrappers
      * @deprecated Usually not necessary. If desired, access via the
      * Epetra_FECrsGraph.
      */
-    const Epetra_Map &col_partitioner () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    const Epetra_Map &col_partitioner () const;
 
     /**
      * Return a const reference to the communicator used for this object.
      *
      * @deprecated Use get_mpi_communicator instead.
      */
-    const Epetra_Comm &trilinos_communicator () const DEAL_II_DEPRECATED;
+    DEAL_II_DEPRECATED
+    const Epetra_Comm &trilinos_communicator () const;
 
     /**
      * Return the MPI communicator object in use with this matrix.

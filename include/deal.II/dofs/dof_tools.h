@@ -277,8 +277,9 @@ namespace DoFTools
    * @relates DoFHandler
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   unsigned int
-  max_dofs_per_cell (const DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
+  max_dofs_per_cell (const DoFHandler<dim,spacedim> &dh);
 
   /**
    * Maximal number of degrees of freedom on a cell.
@@ -288,8 +289,9 @@ namespace DoFTools
    * @relates hp::DoFHandler
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   unsigned int
-  max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
+  max_dofs_per_cell (const hp::DoFHandler<dim,spacedim> &dh);
 
 
   /**
@@ -303,8 +305,9 @@ namespace DoFTools
    * @relates DoFHandler
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   unsigned int
-  max_dofs_per_face (const DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
+  max_dofs_per_face (const DoFHandler<dim,spacedim> &dh);
 
   /**
    * Maximal number of degrees of freedom on a face.
@@ -317,8 +320,9 @@ namespace DoFTools
    * @relates hp::DoFHandler
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   unsigned int
-  max_dofs_per_face (const hp::DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
+  max_dofs_per_face (const hp::DoFHandler<dim,spacedim> &dh);
 
   /**
    * Maximal number of degrees of freedom on a vertex.
@@ -331,8 +335,9 @@ namespace DoFTools
    * @relates DoFHandler
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   unsigned int
-  max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
+  max_dofs_per_vertex (const DoFHandler<dim,spacedim> &dh);
 
   /**
    * Maximal number of degrees of freedom on a vertex.
@@ -345,8 +350,9 @@ namespace DoFTools
    * @relates hp::DoFHandler
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   unsigned int
-  max_dofs_per_vertex (const hp::DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
+  max_dofs_per_vertex (const hp::DoFHandler<dim,spacedim> &dh);
 
   /**
    * Number of vector components in the finite element object used by this
@@ -360,8 +366,9 @@ namespace DoFTools
    * @relates DoFHandler
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   unsigned int
-  n_components (const DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
+  n_components (const DoFHandler<dim,spacedim> &dh);
 
   /**
    * Number of vector components in the finite element object used by this
@@ -375,8 +382,9 @@ namespace DoFTools
    * @relates hp::DoFHandler
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   unsigned int
-  n_components (const hp::DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
+  n_components (const hp::DoFHandler<dim,spacedim> &dh);
 
   /**
    * Find out whether the first FiniteElement used by this DoFHandler is
@@ -390,8 +398,9 @@ namespace DoFTools
    * @relates DoFHandler
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   bool
-  fe_is_primitive (const DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
+  fe_is_primitive (const DoFHandler<dim,spacedim> &dh);
 
   /**
    * Find out whether the first FiniteElement used by this DoFHandler is primitive
@@ -405,8 +414,9 @@ namespace DoFTools
    * @relates hp::DoFHandler
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   bool
-  fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh) DEAL_II_DEPRECATED;
+  fe_is_primitive (const hp::DoFHandler<dim,spacedim> &dh);
 
   /**
    * @}
@@ -1559,9 +1569,10 @@ namespace DoFTools
    * function.
    */
   template <typename DoFHandlerType>
+  DEAL_II_DEPRECATED
   void
   extract_locally_owned_dofs (const DoFHandlerType &dof_handler,
-                              IndexSet             &dof_set) DEAL_II_DEPRECATED;
+                              IndexSet             &dof_set);
 
 
   /**

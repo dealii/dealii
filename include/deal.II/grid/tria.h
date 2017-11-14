@@ -1262,7 +1262,8 @@ public:
    * @deprecated This member variable has been deprecated in favor of creating
    * an independent FlatManifold.
    */
-  static const StraightBoundary<dim,spacedim> straight_boundary DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  static const StraightBoundary<dim,spacedim> straight_boundary;
 
   /**
    * Declare some symbolic names for mesh smoothing algorithms. The meaning of
@@ -1722,8 +1723,9 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
+  DEAL_II_DEPRECATED
   void set_boundary (const types::manifold_id   number,
-                     const Boundary<dim,spacedim> &boundary_object) DEAL_II_DEPRECATED;
+                     const Boundary<dim,spacedim> &boundary_object);
 
 
   /**
@@ -1740,7 +1742,8 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  void set_boundary (const types::manifold_id number) DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  void set_boundary (const types::manifold_id number);
 
   /**
    * Assign a manifold object to a certain part of the triangulation. If
@@ -1828,7 +1831,8 @@ public:
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
-  const Boundary<dim,spacedim> &get_boundary (const types::manifold_id number) const DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  const Boundary<dim,spacedim> &get_boundary (const types::manifold_id number) const;
 
   /**
    * Return a constant reference to a Manifold object used for this

@@ -76,8 +76,9 @@ public:
    *
    * @deprecated @p constraints is unused.
    */
+  DEAL_II_DEPRECATED
   MGTransferBlockBase (const ConstraintMatrix &constraints,
-                       const MGConstrainedDoFs &mg_constrained_dofs) DEAL_II_DEPRECATED;
+                       const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Memory used by this object.
@@ -319,8 +320,9 @@ public:
    *
    * @deprecated @p constraints is unused.
    */
+  DEAL_II_DEPRECATED
   MGTransferBlockSelect (const ConstraintMatrix &constraints,
-                         const MGConstrainedDoFs &mg_constrained_dofs) DEAL_II_DEPRECATED;
+                         const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Destructor.

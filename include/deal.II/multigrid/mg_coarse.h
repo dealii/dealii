@@ -87,7 +87,7 @@ private:
  * @author Guido Kanschat, 1999, Ralf Hartmann, 2002.
  */
 template <typename SolverType, class VectorType = Vector<double> >
-class MGCoarseGridLACIteration :  public MGCoarseGridBase<VectorType>
+class DEAL_II_DEPRECATED MGCoarseGridLACIteration :  public MGCoarseGridBase<VectorType>
 {
 public:
   /**
@@ -153,7 +153,7 @@ private:
    */
   LinearOperator<VectorType> precondition;
 
-} DEAL_II_DEPRECATED;
+};
 
 
 

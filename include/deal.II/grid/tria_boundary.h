@@ -81,7 +81,7 @@ DEAL_II_NAMESPACE_OPEN
  * Luca Heltai, 2014
  */
 template <int dim, int spacedim=dim>
-class Boundary : public FlatManifold<dim, spacedim>
+class DEAL_II_DEPRECATED Boundary : public FlatManifold<dim, spacedim>
 {
 public:
 
@@ -219,7 +219,7 @@ private:
    * Mutex for protecting the points array.
    */
   mutable Threads::Mutex mutex;
-} DEAL_II_DEPRECATED;
+};
 
 
 
@@ -241,7 +241,7 @@ private:
  * @author Wolfgang Bangerth, 1998, 2001, Ralf Hartmann, 2001
  */
 template <int dim, int spacedim=dim>
-class StraightBoundary : public Boundary<dim,spacedim>
+class DEAL_II_DEPRECATED StraightBoundary : public Boundary<dim,spacedim>
 {
 public:
   /**
@@ -367,7 +367,7 @@ public:
   Point<spacedim>
   project_to_surface (const typename Triangulation<dim,spacedim>::hex_iterator &hex,
                       const Point<spacedim> &candidate) const;
-} DEAL_II_DEPRECATED;
+};
 
 
 

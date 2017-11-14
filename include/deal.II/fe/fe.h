@@ -2066,8 +2066,9 @@ public:
    * subset of generalized support points describing degrees of freedom for
    * a given face. Don't use this function
    */
+  DEAL_II_DEPRECATED
   const std::vector<Point<dim-1> > &
-  get_generalized_face_support_points () const DEAL_II_DEPRECATED;
+  get_generalized_face_support_points () const;
 
   /**
    * Return whether a finite element has defined generalized support points on
@@ -2081,8 +2082,9 @@ public:
    * subset of generalized support points describing degrees of freedom for
    * a given face. Don't use this function
    */
+  DEAL_II_DEPRECATED
   bool
-  has_generalized_face_support_points () const DEAL_II_DEPRECATED;
+  has_generalized_face_support_points () const;
 
   /**
    * For a given degree of freedom, return whether it is logically associated

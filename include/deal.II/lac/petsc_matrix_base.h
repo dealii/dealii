@@ -708,8 +708,9 @@ namespace PETScWrappers
      * matrix.
      * @deprecated Use the function with order of arguments reversed instead.
      */
+    DEAL_II_DEPRECATED
     MatrixBase &add (const MatrixBase &other,
-                     const PetscScalar factor) DEAL_II_DEPRECATED;
+                     const PetscScalar factor);
 
     /**
      * Matrix-vector multiplication: let <i>dst = M*src</i> with <i>M</i>

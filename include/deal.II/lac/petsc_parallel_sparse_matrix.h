@@ -175,6 +175,7 @@ namespace PETScWrappers
        * @deprecated This constructor is deprecated: please use the
        * constructor with a sparsity pattern argument instead.
        */
+      DEAL_II_DEPRECATED
       SparseMatrix (const MPI_Comm  &communicator,
                     const size_type  m,
                     const size_type  n,
@@ -182,7 +183,7 @@ namespace PETScWrappers
                     const size_type  local_columns,
                     const size_type  n_nonzero_per_row,
                     const bool       is_symmetric = false,
-                    const size_type  n_offdiag_nonzero_per_row = 0) DEAL_II_DEPRECATED;
+                    const size_type  n_offdiag_nonzero_per_row = 0);
 
       /**
        * Initialize a rectangular matrix with @p m rows and @p n columns. The
@@ -207,6 +208,7 @@ namespace PETScWrappers
        * @deprecated This constructor is deprecated: please use the
        * constructor with a sparsity pattern argument instead.
        */
+      DEAL_II_DEPRECATED
       SparseMatrix (const MPI_Comm               &communicator,
                     const size_type               m,
                     const size_type               n,
@@ -214,7 +216,7 @@ namespace PETScWrappers
                     const size_type               local_columns,
                     const std::vector<size_type> &row_lengths,
                     const bool                    is_symmetric = false,
-                    const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>()) DEAL_II_DEPRECATED;
+                    const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Initialize using the given sparsity pattern with communication
@@ -272,6 +274,7 @@ namespace PETScWrappers
        * @deprecated This overload of <code>reinit</code> is deprecated:
        * please use the overload with a sparsity pattern argument instead.
        */
+      DEAL_II_DEPRECATED
       void reinit (const MPI_Comm     &communicator,
                    const size_type m,
                    const size_type n,
@@ -279,7 +282,7 @@ namespace PETScWrappers
                    const size_type local_columns,
                    const size_type n_nonzero_per_row,
                    const bool      is_symmetric = false,
-                   const size_type n_offdiag_nonzero_per_row = 0) DEAL_II_DEPRECATED;
+                   const size_type n_offdiag_nonzero_per_row = 0);
 
       /**
        * Throw away the present matrix and generate one that has the same
@@ -289,6 +292,7 @@ namespace PETScWrappers
        * @deprecated This overload of <code>reinit</code> is deprecated:
        * please use the overload with a sparsity pattern argument instead.
        */
+      DEAL_II_DEPRECATED
       void reinit (const MPI_Comm               &communicator,
                    const size_type               m,
                    const size_type               n,
@@ -296,7 +300,7 @@ namespace PETScWrappers
                    const size_type               local_columns,
                    const std::vector<size_type> &row_lengths,
                    const bool                    is_symmetric = false,
-                   const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>()) DEAL_II_DEPRECATED;
+                   const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Initialize using the given sparsity pattern with communication
@@ -419,13 +423,14 @@ namespace PETScWrappers
        * @deprecated This overload of <code>do_reinit</code> is deprecated:
        * please use the overload with a sparsity pattern argument instead.
        */
+      DEAL_II_DEPRECATED
       void do_reinit (const size_type m,
                       const size_type n,
                       const size_type local_rows,
                       const size_type local_columns,
                       const size_type n_nonzero_per_row,
                       const bool      is_symmetric = false,
-                      const size_type n_offdiag_nonzero_per_row = 0) DEAL_II_DEPRECATED;
+                      const size_type n_offdiag_nonzero_per_row = 0);
 
       /**
        * Same as previous function.
@@ -433,13 +438,14 @@ namespace PETScWrappers
        * @deprecated This overload of <code>do_reinit</code> is deprecated:
        * please use the overload with a sparsity pattern argument instead.
        */
+      DEAL_II_DEPRECATED
       void do_reinit (const size_type               m,
                       const size_type               n,
                       const size_type               local_rows,
                       const size_type               local_columns,
                       const std::vector<size_type> &row_lengths,
                       const bool                    is_symmetric = false,
-                      const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>()) DEAL_II_DEPRECATED;
+                      const std::vector<size_type> &offdiag_row_lengths = std::vector<size_type>());
 
       /**
        * Same as previous functions.

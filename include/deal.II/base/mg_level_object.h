@@ -114,7 +114,8 @@ public:
    *
    * @deprecated Use clear_elements () instead
    */
-  void clear() DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  void clear();
 
   /**
    * Call @p clear on all objects stored by this object. This function

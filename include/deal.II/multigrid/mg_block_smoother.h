@@ -54,12 +54,13 @@ public:
    *
    * Constructor. Sets memory and smoothing parameters.
    */
+  DEAL_II_DEPRECATED
   MGSmootherBlock (VectorMemory<BlockVector<number> > &mem,
                    const unsigned int                   steps     = 1,
                    const bool                           variable  = false,
                    const bool                           symmetric = false,
                    const bool                           transpose = false,
-                   const bool                           reverse   = false) DEAL_II_DEPRECATED;
+                   const bool                           reverse   = false);
 
   /**
    * Constructor.

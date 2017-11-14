@@ -50,7 +50,7 @@ template <typename number, typename BlockVectorType> class BlockMatrixArray;
  * @author Guido Kanschat, 2000, 2001, 2002
  */
 template <typename VectorType>
-class PointerMatrixBase : public Subscriptor
+class DEAL_II_DEPRECATED PointerMatrixBase : public Subscriptor
 {
 public:
   /**
@@ -98,7 +98,7 @@ public:
    */
   virtual void Tvmult_add (VectorType       &dst,
                            const VectorType &src) const = 0;
-} DEAL_II_DEPRECATED;
+};
 
 
 /**
@@ -114,7 +114,7 @@ public:
  * @author Guido Kanschat 2000, 2001, 2002
  */
 template <typename MatrixType, typename VectorType>
-class PointerMatrix : public PointerMatrixBase<VectorType>
+class DEAL_II_DEPRECATED PointerMatrix : public PointerMatrixBase<VectorType>
 {
 public:
   /**
@@ -196,7 +196,7 @@ private:
    * The pointer to the actual matrix.
    */
   SmartPointer<const MatrixType,PointerMatrix<MatrixType,VectorType> > m;
-} DEAL_II_DEPRECATED;
+};
 
 
 /**
@@ -216,7 +216,7 @@ private:
  * @author Guido Kanschat 2006
  */
 template <typename MatrixType, typename VectorType>
-class PointerMatrixAux : public PointerMatrixBase<VectorType>
+class DEAL_II_DEPRECATED PointerMatrixAux : public PointerMatrixBase<VectorType>
 {
 public:
   /**
@@ -318,7 +318,7 @@ private:
    * The pointer to the actual matrix.
    */
   SmartPointer<const MatrixType,PointerMatrixAux<MatrixType,VectorType> > m;
-} DEAL_II_DEPRECATED;
+};
 
 
 
@@ -335,7 +335,7 @@ private:
  * @author Guido Kanschat, 2006
  */
 template <typename number>
-class PointerMatrixVector : public PointerMatrixBase<Vector<number> >
+class DEAL_II_DEPRECATED PointerMatrixVector : public PointerMatrixBase<Vector<number> >
 {
 public:
   /**
@@ -431,7 +431,7 @@ private:
    * The pointer to the actual matrix.
    */
   SmartPointer<const Vector<number>,PointerMatrixVector<number> > m;
-} DEAL_II_DEPRECATED;
+};
 
 
 

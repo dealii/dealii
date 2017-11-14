@@ -145,7 +145,8 @@ namespace numbers
    * @deprecated This function has been deprecated in favor of the C++11
    * function <code>std::isnan</code>.
    */
-  bool is_nan (const double x) DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  bool is_nan (const double x);
 
   /**
    * Return @p true if the given value is a finite floating point number, i.e.

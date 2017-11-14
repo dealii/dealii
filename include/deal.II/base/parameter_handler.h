@@ -1282,10 +1282,11 @@ public:
    * @deprecated This function is deprecated because, even though it only
    *   outputs information, it is not a <code>const</code> function.
    */
+  DEAL_II_DEPRECATED
   void print_parameters_section (std::ostream       &out,
                                  const OutputStyle   style,
                                  const unsigned int  indent_level,
-                                 const bool          include_top_level_elements = false) DEAL_II_DEPRECATED;
+                                 const bool          include_top_level_elements = false);
 
   /**
    * Print parameters to a logstream. This function allows to print all

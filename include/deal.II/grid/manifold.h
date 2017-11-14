@@ -100,9 +100,10 @@ namespace Manifolds
    *   <code>cell-@>face(f)</code> or <code>cell-@>line(l)</code>.
    */
   template <typename MeshIteratorType>
+  DEAL_II_DEPRECATED
   Quadrature<MeshIteratorType::AccessorType::space_dimension>
   get_default_quadrature(const MeshIteratorType &iterator,
-                         const bool              with_laplace = false) DEAL_II_DEPRECATED;
+                         const bool              with_laplace = false);
 
   /**
    * Given a general mesh iterator, construct arrays of quadrature points and

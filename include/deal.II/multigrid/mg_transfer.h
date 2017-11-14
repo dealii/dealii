@@ -528,8 +528,9 @@ public:
    *
    * @deprecated @p constraints is unused.
    */
+  DEAL_II_DEPRECATED
   MGTransferPrebuilt (const ConstraintMatrix &constraints,
-                      const MGConstrainedDoFs &mg_constrained_dofs) DEAL_II_DEPRECATED;
+                      const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Destructor.
@@ -546,8 +547,9 @@ public:
    *
    * @deprecated @p constraints is unused.
    */
+  DEAL_II_DEPRECATED
   void initialize_constraints (const ConstraintMatrix &constraints,
-                               const MGConstrainedDoFs &mg_constrained_dofs) DEAL_II_DEPRECATED;
+                               const MGConstrainedDoFs &mg_constrained_dofs);
 
   /**
    * Reset the object to the state it had right after the default constructor.

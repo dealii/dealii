@@ -208,9 +208,10 @@ namespace SLEPcWrappers
     /**
      * Set the initial vector for the solver.
      */
+    DEAL_II_DEPRECATED
     void
     set_initial_vector
-    (const PETScWrappers::VectorBase &this_initial_vector) DEAL_II_DEPRECATED;
+    (const PETScWrappers::VectorBase &this_initial_vector);
 
     /**
      * Set the initial vector space for the solver.

@@ -147,7 +147,8 @@ public:
    * @deprecated Use Timer::get_last_lap_wall_time_data() instead, which
    * returns a reference to the same structure.
    */
-  const Utilities::MPI::MinMaxAvg &get_data() const DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  const Utilities::MPI::MinMaxAvg &get_data() const;
 
   /**
    * Return a reference to the data structure containing basic statistics on
@@ -166,7 +167,8 @@ public:
    * @deprecated Use Timer::get_accumulated_wall_time_data() instead, which
    * returns a reference the same structure.
    */
-  const Utilities::MPI::MinMaxAvg &get_total_data() const DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  const Utilities::MPI::MinMaxAvg &get_total_data() const;
 
   /**
    * Return a reference to the data structure containing basic statistics on
@@ -184,7 +186,8 @@ public:
    * prints the same information.
    */
   template <class StreamType>
-  void print_data(StreamType &stream) const DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  void print_data(StreamType &stream) const;
 
   /**
    * Print the data returned by Timer::get_last_lap_wall_time_data() to the
@@ -201,7 +204,8 @@ public:
    * prints the same information.
    */
   template <class StreamType>
-  void print_total_data(StreamType &stream) const DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  void print_total_data(StreamType &stream) const;
 
   /**
    * Print the data returned by Timer::get_accumulated_wall_time_data() to the
@@ -244,7 +248,8 @@ public:
    *
    * @deprecated Use cpu_time() instead.
    */
-  double operator() () const DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  double operator() () const;
 
   /**
    * Return the current accumulated wall time (including the current lap, if
@@ -279,7 +284,8 @@ public:
    *
    * @deprecated Use last_wall_time() instead.
    */
-  double get_lap_time () const DEAL_II_DEPRECATED;
+  DEAL_II_DEPRECATED
+  double get_lap_time () const;
 
 private:
   /**

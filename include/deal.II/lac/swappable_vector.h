@@ -55,7 +55,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Wolfgang Bangerth, 1999, 2000
  */
 template <typename number>
-class SwappableVector : public Vector<number>
+class DEAL_II_DEPRECATED SwappableVector : public Vector<number>
 {
 public:
   /**
@@ -212,7 +212,7 @@ private:
    * to signal success itself if this is required.
    */
   void reload_vector (const bool set_flag);
-} DEAL_II_DEPRECATED;
+};
 
 /*@}*/
 /*----------------------------   swappable_vector.h     ---------------------------*/

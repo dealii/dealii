@@ -74,9 +74,10 @@ public:
    * @deprecated Use initialize() followed by make_zero_boundary_constraints() instead
    */
   template <int dim, int spacedim>
+  DEAL_II_DEPRECATED
   void initialize(const DoFHandler<dim,spacedim> &dof,
                   const typename FunctionMap<dim>::type &function_map,
-                  const ComponentMask &component_mask = ComponentMask()) DEAL_II_DEPRECATED;
+                  const ComponentMask &component_mask = ComponentMask());
 
   /**
    * Fill the internal data structures with information

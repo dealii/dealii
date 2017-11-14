@@ -1234,8 +1234,9 @@ namespace FETools
    * @deprecated Use get_fe_by_name() with two template parameters instead
    */
   template <int dim>
+  DEAL_II_DEPRECATED
   FiniteElement<dim,dim> *
-  get_fe_from_name (const std::string &name) DEAL_II_DEPRECATED;
+  get_fe_from_name (const std::string &name);
 
 
   /**

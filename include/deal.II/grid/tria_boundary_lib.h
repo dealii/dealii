@@ -50,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2001, Wolfgang Bangerth, 2007
  */
 template <int dim, int spacedim = dim>
-class CylinderBoundary : public StraightBoundary<dim,spacedim>
+class DEAL_II_DEPRECATED CylinderBoundary : public StraightBoundary<dim,spacedim>
 {
 public:
   /**
@@ -159,7 +159,7 @@ private:
    * Given a number for the axis, return a vector that denotes this direction.
    */
   static Point<spacedim> get_axis_vector (const unsigned int axis);
-} DEAL_II_DEPRECATED;
+};
 
 
 
@@ -200,7 +200,7 @@ private:
  * @author Markus B&uuml;rg, 2009
  */
 template <int dim>
-class ConeBoundary : public StraightBoundary<dim>
+class DEAL_II_DEPRECATED ConeBoundary : public StraightBoundary<dim>
 {
 public:
   /**
@@ -315,7 +315,7 @@ private:
   get_intermediate_points_between_points (const Point<dim> &p0,
                                           const Point<dim> &p1,
                                           std::vector<Point<dim> > &points) const;
-} DEAL_II_DEPRECATED;
+};
 
 
 
@@ -341,7 +341,7 @@ private:
  * @author Wolfgang Bangerth, 1998, Ralf Hartmann, 2001
  */
 template <int dim, int spacedim=dim>
-class HyperBallBoundary : public StraightBoundary<dim,spacedim>
+class DEAL_II_DEPRECATED HyperBallBoundary : public StraightBoundary<dim,spacedim>
 {
 public:
   /**
@@ -462,7 +462,7 @@ private:
    */
   void get_intermediate_points_between_points (const Point<spacedim> &p0, const Point<spacedim> &p1,
                                                std::vector<Point<spacedim> > &points) const;
-} DEAL_II_DEPRECATED;
+};
 
 
 
@@ -483,7 +483,7 @@ private:
  * @author Wolfgang Bangerth, 1999, 2001
  */
 template <int dim>
-class HalfHyperBallBoundary : public HyperBallBoundary<dim>
+class DEAL_II_DEPRECATED HalfHyperBallBoundary : public HyperBallBoundary<dim>
 {
 public:
   /**
@@ -533,7 +533,7 @@ public:
   virtual void
   get_normals_at_vertices (const typename Triangulation<dim>::face_iterator &face,
                            typename Boundary<dim>::FaceVertexNormals &face_vertex_normals) const;
-} DEAL_II_DEPRECATED;
+};
 
 
 
@@ -551,7 +551,7 @@ public:
  * @author Wolfgang Bangerth, 1999
  */
 template <int dim>
-class HyperShellBoundary : public HyperBallBoundary<dim>
+class DEAL_II_DEPRECATED HyperShellBoundary : public HyperBallBoundary<dim>
 {
 public:
   /**
@@ -561,7 +561,7 @@ public:
    * radius as argument. This radius will be ignored
    */
   HyperShellBoundary (const Point<dim> &center = Point<dim>());
-} DEAL_II_DEPRECATED;
+};
 
 
 
@@ -582,7 +582,7 @@ public:
  * @author Wolfgang Bangerth, 2000, 2009
  */
 template <int dim>
-class HalfHyperShellBoundary : public HyperShellBoundary<dim>
+class DEAL_II_DEPRECATED HalfHyperShellBoundary : public HyperShellBoundary<dim>
 {
 public:
   /**
@@ -644,7 +644,7 @@ private:
    */
   const double inner_radius;
   const double outer_radius;
-} DEAL_II_DEPRECATED;
+};
 
 
 /**
@@ -659,7 +659,7 @@ private:
  * TorusManifold class.
  */
 template <int dim, int spacedim>
-class TorusBoundary : public Boundary<dim,spacedim>
+class DEAL_II_DEPRECATED TorusBoundary : public Boundary<dim,spacedim>
 {
 public:
   /**
@@ -741,7 +741,7 @@ private:
    */
   const double R;
   const double r;
-} DEAL_II_DEPRECATED;
+};
 
 
 
