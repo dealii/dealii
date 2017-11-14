@@ -70,6 +70,8 @@ namespace Particles
      * a given triangulation and mapping. Since particles are stored in
      * respect to their surrounding cells this information is necessary to
      * correctly organize the particle collection.
+     * This constructor is equivalent to calling the default constructor and
+     * the initialize function.
      */
     ParticleHandler(const parallel::distributed::Triangulation<dim,spacedim> &tria,
                     const Mapping<dim,spacedim> &mapping,
@@ -132,22 +134,22 @@ namespace Particles
     particle_iterator end();
 
     /**
-     * Return an iterator to the first particle.
+     * Return an iterator to the first ghost particle.
      */
     particle_iterator begin_ghost() const;
 
     /**
-     * Return an iterator to the first particle.
+     * Return an iterator to the first ghost particle.
      */
     particle_iterator begin_ghost();
 
     /**
-     * Return an iterator past the end of the particles.
+     * Return an iterator past the end of the ghost particles.
      */
     particle_iterator end_ghost() const;
 
     /**
-     * Return an iterator to the first particle.
+     * Return an iterator past the end of the ghost particles.
      */
     particle_iterator end_ghost();
 
@@ -197,8 +199,9 @@ namespace Particles
      * Insert a number of particles into the collection of particles.
      * This function takes a list of positions and creates a set of particles
      * at these positions, which are then added to the local particle
-     * collection. Note that this function assumes all positions are within
-     * the local part of the triangulation, if one of them is not in the
+     * collection. Note that this function currently uses
+     * GridTools::compute_point_locations, which assumes all positions are within
+     * the local part of the triangulation. If one of them is not in the
      * local domain this function will throw an exception.
      */
     void
@@ -293,9 +296,6 @@ namespace Particles
      * After this function call every particle is either on its current
      * process and in its current cell, or deleted (if it could not find
      * its new process or cell).
-     *
-     * TODO: Extend this to allow keeping particles on other processes
-     * around (with an invalid cell).
      */
     void
     sort_particles_into_subdomains_and_cells();

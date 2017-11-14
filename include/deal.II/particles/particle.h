@@ -24,9 +24,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/**
- * A namespace for all type definitions related to particles.
- */
 namespace types
 {
   /* Type definitions */

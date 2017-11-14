@@ -290,7 +290,7 @@ namespace Particles
     update_cached_numbers();
 
     const types::particle_index local_next_particle_index = get_next_free_particle_index();
-    const types::particle_index particles_to_add_locally = positions.size();
+    types::particle_index particles_to_add_locally = positions.size();
 
     // Determine the starting particle index of this process, which
     // is the highest currently existing particle index plus the sum
@@ -437,6 +437,14 @@ namespace Particles
   void
   ParticleHandler<dim,spacedim>::sort_particles_into_subdomains_and_cells()
   {
+    // TODO: The current algorithm only works for particles that are in
+    // the local domain or in ghost cells, because it only knows the
+    // subdomain_id of ghost cells, but not of artificial cells. This
+    // can be extended using the distributed version of compute point
+    // locations.
+    // TODO: Extend this function to allow keeping particles on other
+    // processes around (with an invalid cell).
+
     std::vector<particle_iterator> particles_out_of_cell;
     particles_out_of_cell.reserve(n_locally_owned_particles());
 
@@ -464,10 +472,6 @@ namespace Particles
             particles_out_of_cell.push_back(it);
           }
       }
-
-    // TODO: The current algorithm only works for CFL numbers <= 1.0,
-    // because it only knows the subdomain_id of ghost cells, but not
-    // of artificial cells.
 
     // There are three reasons why a particle is not in its old cell:
     // It moved to another cell, to another subdomain or it left the mesh.
