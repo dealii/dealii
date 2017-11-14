@@ -1,0 +1,94 @@
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{imakeidx}
+\makeindex[name=prmindex, title=Index of run-time parameter entries]
+\makeindex[name=prmindexfull, title=Index of run-time parameters with section names]
+\usepackage[colorlinks,linkcolor=blue,urlcolor=blue,citecolor=blue,baseurl=../]{hyperref}
+\begin{document}
+
+\subsection{Global parameters}
+\label{parameters:global}
+
+
+
+\subsection{Parameters in section \tt section\_1}
+\label{parameters:section_5f1}
+
+\begin{itemize}
+\item {\it Parameter name:} {\tt some other entry with \{\%\}}
+\phantomsection\label{parameters:section_5f1/some other entry with _7b_25_7d}
+\label{parameters:section_5f1/some_20other_20entry_20with_20_7b_25_7d}
+
+
+\index[prmindex]{some other entry with \{\%\}}
+\index[prmindexfull]{section\_1!some other entry with \{\%\}}
+{\it Value:} 3.1415926
+
+
+{\it Default:} 3.1415926
+
+
+{\it Description:} documentation
+
+
+{\it Possible values:} A floating point number $v$ such that $-\text{MAX\_DOUBLE} \leq v \leq \text{MAX\_DOUBLE}$
+\end{itemize}
+
+
+
+\subsection{Parameters in section \tt section\_1/section\_2\&3}
+\label{parameters:section_5f1/section_5f2_263}
+
+\begin{itemize}
+\item {\it Parameter name:} {\tt int\_hello}
+\phantomsection\label{parameters:section_5f1/section_5f2_263/int_5fhello}
+
+
+\index[prmindex]{int\_hello}
+\index[prmindexfull]{section\_1!section\_2\&3!int\_hello}
+{\it Value:} 1
+
+
+{\it Default:} 1
+
+
+{\it Possible values:} An integer $n$ such that $-2147483648\leq n \leq 2147483647$
+\item {\it Parameter name:} {\tt list}
+\phantomsection\label{parameters:section_5f1/section_5f2_263/list}
+
+
+\index[prmindex]{list}
+\index[prmindexfull]{section\_1!section\_2\&3!list}
+{\it Value:} default\_1
+
+
+{\it Default:} default\_1
+
+
+{\it Description:} docs 1
+
+
+{\it Possible values:} A list of 0 to 4294967295 elements where each element is [Any one of default\_1, b, c, d, e, f, g, h]
+\item {\it Parameter name:} {\tt text}
+\phantomsection\label{parameters:section_5f1/section_5f2_263/text}
+
+
+\index[prmindex]{text}
+\index[prmindexfull]{section\_1!section\_2\&3!text}
+{\it Value:} default text with \_ \~{} \textbackslash{} \# \& \{ \}
+
+
+{\it Default:} default text with \_ \~{} \textbackslash{} \# \& \{ \}
+
+
+{\it Description:} documentation with formulas: $x_3$
+
+
+{\it Possible values:} Any string
+\end{itemize}
+
+
+\printindex[prmindex]
+\printindex[prmindexfull]
+\end{document}

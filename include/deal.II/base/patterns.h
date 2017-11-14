@@ -148,6 +148,17 @@ namespace Patterns
    */
   std::unique_ptr<PatternBase> pattern_factory (const std::string &description);
 
+  namespace internal
+  {
+    /**
+     * Escape the string @p input for the specified @p style so that characters
+     * will appear as intended. For example, characters like _ can not be
+     * written as is in LateX and have to be escaped as \_.
+     */
+    std::string escape(const std::string &input, const PatternBase::OutputStyle style);
+
+  }
+
   /**
    * Test for the string being an integer. If bounds are given to the
    * constructor, then the integer given also needs to be within the interval

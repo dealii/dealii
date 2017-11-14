@@ -1104,6 +1104,11 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
 
     case LaTeX:
     {
+      auto escape = [] (const std::string &input)
+      {
+        return Patterns::internal::escape(input, Patterns::PatternBase::LaTeX);
+      };
+
       // if there are any parameters in this section then print them
       // as an itemized list
       bool parameters_exist_here = false;
@@ -1133,37 +1138,52 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
                 const std::string value = p->second.get<std::string>("value");
 
                 // print name
-                out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n"
-                    << "\\phantomsection\\label{parameters:";
-                for (unsigned int i=0; i<target_subsection_path.size(); ++i)
-                  out << target_subsection_path[i] << "/";
-                out << demangle(p->first);
-                out << "}\n\n"
-                    << '\n';
+                out << "\\item {\\it Parameter name:} {\\tt "
+                    << escape(demangle(p->first)) << "}\n"
+                    << "\\phantomsection";
+                {
+                  // create label: labels are not to be escaped but mangled
+                  std::string label = "parameters:";
+                  for (unsigned int i=0; i<target_subsection_path.size(); ++i)
+                    {
+                      label.append(mangle(target_subsection_path[i]));
+                      label.append("/");
+                    }
+                  label.append(p->first);
+                  // Backwards-compatibility. Output the label with and without
+                  // escaping whitespace:
+                  if (label.find("_20")!=std::string::npos)
+                    out << "\\label{" << Utilities::replace_in_string(label,"_20", " ") << "}\n";
+                  out << "\\label{" << label << "}\n";
+                }
+                out << "\n\n";
 
                 out << "\\index[prmindex]{"
-                    << demangle(p->first)
+                    << escape(demangle(p->first))
                     << "}\n";
                 out << "\\index[prmindexfull]{";
                 for (unsigned int i=0; i<target_subsection_path.size(); ++i)
-                  out << target_subsection_path[i] << "!";
-                out << demangle(p->first)
+                  out << escape(target_subsection_path[i]) << "!";
+                out << escape(demangle(p->first))
                     << "}\n";
 
                 // finally print value and default
-                out << "{\\it Value:} " << value << "\n\n"
+                out << "{\\it Value:} " << escape(value) << "\n\n"
                     << '\n'
                     << "{\\it Default:} "
-                    << p->second.get<std::string>("default_value") << "\n\n"
+                    << escape(p->second.get<std::string>("default_value"))
+                    << "\n\n"
                     << '\n';
 
-                // if there is a documenting string, print it as well
+                // if there is a documenting string, print it as well but
+                // don't escape to allow formatting/formulas
                 if (!p->second.get<std::string>("documentation").empty())
                   out << "{\\it Description:} "
                       << p->second.get<std::string>("documentation") << "\n\n"
                       << '\n';
 
-                // also output possible values
+                // also output possible values, do not escape because the
+                // description internally will use LaTeX formatting
                 const unsigned int pattern_index = p->second.get<unsigned int> ("pattern");
                 const std::string desc_str = patterns[pattern_index]->description (Patterns::PatternBase::LaTeX);
                 out << "{\\it Possible values:} "
@@ -1175,26 +1195,38 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
                 const std::string alias = p->second.get<std::string>("alias");
 
                 // print name
-                out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n"
-                    << "\\phantomsection\\label{parameters:";
-                for (unsigned int i=0; i<target_subsection_path.size(); ++i)
-                  out << target_subsection_path[i] << "/";
-                out << demangle(p->first);
-                out << "}\n\n"
-                    << '\n';
+                out << "\\item {\\it Parameter name:} {\\tt "
+                    << escape(demangle(p->first)) << "}\n"
+                    << "\\phantomsection";
+                {
+                  // create label: labels are not to be escaped but mangled
+                  std::string label = "parameters:";
+                  for (unsigned int i=0; i<target_subsection_path.size(); ++i)
+                    {
+                      label.append(mangle(target_subsection_path[i]));
+                      label.append("/");
+                    }
+                  label.append(p->first);
+                  // Backwards-compatibility. Output the label with and without
+                  // escaping whitespace:
+                  if (label.find("_20")!=std::string::npos)
+                    out << "\\label{" << Utilities::replace_in_string(label,"_20", " ") << "}\n";
+                  out << "\\label{" << label << "}\n";
+                }
+                out << "\n\n";
 
                 out << "\\index[prmindex]{"
-                    << demangle(p->first)
+                    << escape(demangle(p->first))
                     << "}\n";
                 out << "\\index[prmindexfull]{";
                 for (unsigned int i=0; i<target_subsection_path.size(); ++i)
-                  out << target_subsection_path[i] << "!";
-                out << demangle(p->first)
+                  out << escape(target_subsection_path[i]) << "!";
+                out << escape(demangle(p->first))
                     << "}\n";
 
                 // finally print alias and indicate if it is deprecated
                 out << "This parameter is an alias for the parameter ``\\texttt{"
-                    << alias << "}''."
+                    << escape(alias) << "}''."
                     << (p->second.get<std::string>("deprecation_status") == "true"
                         ?
                         " Its use is deprecated."
@@ -1313,14 +1345,19 @@ ParameterHandler::recursively_print_parameters (const std::vector<std::string> &
 
           case LaTeX:
           {
+            auto escape = [] (const std::string &input)
+            {
+              return Patterns::internal::escape(input, Patterns::PatternBase::LaTeX);
+            };
+
             out << '\n'
                 << "\\subsection{Parameters in section \\tt ";
 
             // find the path to the current section so that we can
             // print it in the \subsection{...} heading
             for (unsigned int i=0; i<target_subsection_path.size(); ++i)
-              out << target_subsection_path[i] << "/";
-            out << demangle(p->first);
+              out << escape(target_subsection_path[i]) << "/";
+            out << escape(demangle(p->first));
 
             out << "}" << '\n';
             out << "\\label{parameters:";
@@ -1538,6 +1575,11 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
 
     case LaTeX:
     {
+      auto escape = [] (const std::string &input)
+      {
+        return Patterns::internal::escape(input, Patterns::PatternBase::LaTeX);
+      };
+
       // if there are any parameters in this section then print them
       // as an itemized list
       bool parameters_exist_here = false;
@@ -1567,28 +1609,28 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 const std::string value = p->second.get<std::string>("value");
 
                 // print name
-                out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n"
+                out << "\\item {\\it Parameter name:} {\\tt " << escape(demangle(p->first)) << "}\n"
                     << "\\phantomsection\\label{parameters:";
                 for (unsigned int i=0; i<subsection_path.size(); ++i)
-                  out << subsection_path[i] << "/";
-                out << demangle(p->first);
+                  out << mangle(subsection_path[i]) << "/";
+                out << p->first;
                 out << "}\n\n"
                     << std::endl;
 
                 out << "\\index[prmindex]{"
-                    << demangle(p->first)
+                    << escape(demangle(p->first))
                     << "}\n";
                 out << "\\index[prmindexfull]{";
                 for (unsigned int i=0; i<subsection_path.size(); ++i)
-                  out << subsection_path[i] << "!";
-                out << demangle(p->first)
+                  out << escape(subsection_path[i]) << "!";
+                out << escape(demangle(p->first))
                     << "}\n";
 
                 // finally print value and default
-                out << "{\\it Value:} " << value << "\n\n"
+                out << "{\\it Value:} " << escape(value) << "\n\n"
                     << std::endl
                     << "{\\it Default:} "
-                    << p->second.get<std::string>("default_value") << "\n\n"
+                    << escape(p->second.get<std::string>("default_value")) << "\n\n"
                     << std::endl;
 
                 // if there is a documenting string, print it as well
@@ -1609,26 +1651,26 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 const std::string alias = p->second.get<std::string>("alias");
 
                 // print name
-                out << "\\item {\\it Parameter name:} {\\tt " << demangle(p->first) << "}\n"
+                out << "\\item {\\it Parameter name:} {\\tt " << escape(demangle(p->first)) << "}\n"
                     << "\\phantomsection\\label{parameters:";
                 for (unsigned int i=0; i<subsection_path.size(); ++i)
-                  out << subsection_path[i] << "/";
-                out << demangle(p->first);
+                  out << mangle(subsection_path[i]) << "/";
+                out << p->first;
                 out << "}\n\n"
                     << std::endl;
 
                 out << "\\index[prmindex]{"
-                    << demangle(p->first)
+                    << escape(demangle(p->first))
                     << "}\n";
                 out << "\\index[prmindexfull]{";
                 for (unsigned int i=0; i<subsection_path.size(); ++i)
-                  out << subsection_path[i] << "!";
-                out << demangle(p->first)
+                  out << escape(subsection_path[i]) << "!";
+                out << escape(demangle(p->first))
                     << "}\n";
 
                 // finally print alias and indicate if it is deprecated
                 out << "This parameter is an alias for the parameter ``\\texttt{"
-                    << alias << "}''."
+                    << escape(alias) << "}''."
                     << (p->second.get<std::string>("deprecation_status") == "true"
                         ?
                         " Its use is deprecated."
@@ -1752,14 +1794,19 @@ ParameterHandler::print_parameters_section (std::ostream      &out,
                 break;
               case LaTeX:
               {
+                auto escape = [] (const std::string &input)
+                {
+                  return Patterns::internal::escape(input, Patterns::PatternBase::LaTeX);
+                };
+
                 out << std::endl
                     << "\\subsection{Parameters in section \\tt ";
 
                 // find the path to the current section so that we can
                 // print it in the \subsection{...} heading
                 for (unsigned int i=0; i<subsection_path.size(); ++i)
-                  out << subsection_path[i] << "/";
-                out << demangle(p->first);
+                  out << escape(subsection_path[i]) << "/";
+                out << escape(demangle(p->first));
 
                 out << "}" << std::endl;
                 out << "\\label{parameters:";

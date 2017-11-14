@@ -1227,6 +1227,22 @@ public:
    * parameters. The various sections of parameters are then represented by
    * latex section and subsection commands as well as by nested enumerations.
    *
+   * You can reference specific parameter sections and individual parameters
+   * by the labels that are generated automatically for each entry. The
+   * labels have the format <code>parameters:section1/subsection1</code>
+   * and <code>parameters:section1/subsection1/someentry</code>. Because
+   * special characters can appear in the section and entry names, these
+   * will be "mangled". Here, all characters except <code>[a-zA-Z0-9]</code>
+   * are replaced by <code>_XX</code>, where <code>XX</code> is the two-digit
+   * ascii code of the character in hexadecimal encoding (so a space becomes
+   * <code>_20</code> for example).
+   *
+   * While this function escapes special LaTeX-specific characters (backslash,
+   * underscore, etc.) in most of the output (names, default values, etc.),
+   * the documentation string is passed as-is. This means you can use math
+   * environments and other formatting in the description, but you need
+   * to escape quotes, backslashes, underscores, etc. yourself.
+   *
    * In addition, all parameter names are listed with <code>@\index</code>
    * statements in two indices called <code>prmindex</code> (where the name of
    * each parameter is listed in the index) and <code>prmindexfull</code>
