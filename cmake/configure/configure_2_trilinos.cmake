@@ -66,6 +66,15 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDIF()
     ENDFOREACH()
 
+    IF(${DEAL_II_TRILINOS_WITH_ROL})
+      IF(TRILINOS_VERSION VERSION_LESS 12.6.1)
+        MESSAGE(STATUS "ROL interface is disabled."
+          "deal.II will not support ROL interface if Trilinos version is less "
+          "than 12.6.1. Trilinos version found: \"${TRILINOS_VERSION}\".")
+          SET(DEAL_II_TRILINOS_WITH_ROL OFF)
+      ENDIF()
+    ENDIF()
+
     IF((TRILINOS_VERSION_MAJOR EQUAL 11 AND
         NOT (TRILINOS_VERSION_MINOR LESS 14))
        OR
