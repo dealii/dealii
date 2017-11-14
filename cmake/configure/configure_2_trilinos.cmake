@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2015 by the deal.II authors
+## Copyright (C) 2012 - 2017 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -206,11 +206,12 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
   # Note: Only CMake 3.0 and greater support line continuation with the "\" character
   #       Elements of string lists are naturally separated by a ";"
-  SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES
+  SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_FAD
       "Sacado::Fad::DFad<double>"
       "Sacado::Fad::DFad<float>"
       "Sacado::Fad::DFad<Sacado::Fad::DFad<double>>"
-      "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>"
+      "Sacado::Fad::DFad<Sacado::Fad::DFad<float>>")
+  SET(DEAL_II_EXPAND_TRILINOS_SACADO_TYPES_RAD
       "Sacado::Rad::ADvar<double>"
       "Sacado::Rad::ADvar<float>"
       "Sacado::Rad::ADvar<Sacado::Fad::DFad<double>>"
@@ -218,6 +219,9 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
 
   IF (TRILINOS_WITH_MPI)
     SET(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
+  ENDIF()
+  IF (TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD)
+    SET(DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD ${TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD})
   ENDIF()
 ENDMACRO()
 
