@@ -32,6 +32,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_P4EST
+
 namespace Particles
 {
   /**
@@ -196,7 +198,7 @@ namespace Particles
                      Particle<dim,spacedim> > &particles);
 
     /**
-     * Insert a number of particles into the collection of particles.
+     * Create and insert a number of particles into the collection of particles.
      * This function takes a list of positions and creates a set of particles
      * at these positions, which are then added to the local particle
      * collection. Note that this function currently uses
@@ -299,7 +301,6 @@ namespace Particles
      */
     void
     sort_particles_into_subdomains_and_cells();
-
 
     /**
      * Exchanges all particles that live in cells that are ghost cells to
@@ -429,6 +430,7 @@ namespace Particles
      */
     unsigned int data_offset;
 
+#ifdef DEAL_II_WITH_MPI
     /**
      * Transfer particles that have crossed subdomain boundaries to other
      * processors.
@@ -455,6 +457,7 @@ namespace Particles
                         std::multimap<internal::LevelInd,Particle <dim,spacedim> > &received_particles,
                         const std::map<types::subdomain_id, std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > &new_cells_for_particles =
                           std::map<types::subdomain_id, std::vector<typename Triangulation<dim,spacedim>::active_cell_iterator> > ());
+#endif
 
     /**
      * Called by listener functions from Triangulation for every cell
@@ -492,6 +495,8 @@ namespace Particles
     &next_free_particle_index;
   }
 }
+
+#endif // DEAL_II_WITH_P4EST
 
 DEAL_II_NAMESPACE_CLOSE
 

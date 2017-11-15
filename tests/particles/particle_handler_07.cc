@@ -44,7 +44,7 @@ void test ()
       {
         const double coordinate = static_cast<double> (i)/10.0;
         for (unsigned int j=0; j<spacedim; ++j)
-          points[i][j] = coordinate;
+          points[i][j] = 0.05 + coordinate;
       }
 
     particle_handler.insert_particles(points);

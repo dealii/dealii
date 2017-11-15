@@ -22,6 +22,8 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_P4EST
+
 namespace Particles
 {
   template <int dim,int spacedim>
@@ -289,17 +291,19 @@ namespace Particles
   {
     update_cached_numbers();
 
-    const types::particle_index local_next_particle_index = get_next_free_particle_index();
-    types::particle_index particles_to_add_locally = positions.size();
-
     // Determine the starting particle index of this process, which
     // is the highest currently existing particle index plus the sum
     // of the number of newly generated particles of all
-    // processes with a lower rank.
+    // processes with a lower rank if in a parallel computation.
+    const types::particle_index local_next_particle_index = get_next_free_particle_index();
     types::particle_index local_start_index = 0;
-    MPI_Scan(&particles_to_add_locally, &local_start_index, 1, PARTICLE_INDEX_MPI_TYPE, MPI_SUM, triangulation->get_communicator());
 
+#ifdef DEAL_II_WITH_MPI
+    types::particle_index particles_to_add_locally = positions.size();
+    MPI_Scan(&particles_to_add_locally, &local_start_index, 1, PARTICLE_INDEX_MPI_TYPE, MPI_SUM, triangulation->get_communicator());
     local_start_index -= particles_to_add_locally;
+#endif
+
     local_start_index += local_next_particle_index;
 
     GridTools::Cache<dim,spacedim> cache(*triangulation, *mapping);
@@ -612,8 +616,10 @@ namespace Particles
     std::multimap<internal::LevelInd,Particle <dim,spacedim> > sorted_particles_map;
 
     // Exchange particles between processors if we have more than one process
+#ifdef DEAL_II_WITH_MPI
     if (dealii::Utilities::MPI::n_mpi_processes(triangulation->get_communicator()) > 1)
       send_recv_particles(moved_particles,sorted_particles_map,moved_cells);
+#endif
 
     sorted_particles_map.insert(sorted_particles.begin(),sorted_particles.end());
 
@@ -634,6 +640,7 @@ namespace Particles
     if (dealii::Utilities::MPI::n_mpi_processes(triangulation->get_communicator()) == 1)
       return;
 
+#ifdef DEAL_II_WITH_MPI
     // First clear the current ghost_particle information
     ghost_particles.clear();
 
@@ -683,10 +690,12 @@ namespace Particles
 
     send_recv_particles(ghost_particles_by_domain,
                         ghost_particles);
+#endif
   }
 
 
 
+#ifdef DEAL_II_WITH_MPI
   template <int dim, int spacedim>
   void
   ParticleHandler<dim,spacedim>::send_recv_particles(const std::map<types::subdomain_id, std::vector<particle_iterator> > &particles_to_send,
@@ -831,6 +840,8 @@ namespace Particles
                 ExcMessage("The amount of data that was read into new particles "
                            "does not match the amount of data sent around."));
   }
+#endif
+
 
 
   template <int dim, int spacedim>
@@ -1130,10 +1141,14 @@ namespace Particles
   }
 }
 
+#endif
+
 DEAL_II_NAMESPACE_CLOSE
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_P4EST
 #include "particle_handler.inst"
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
