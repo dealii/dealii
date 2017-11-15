@@ -100,6 +100,19 @@ public:
   typedef unsigned int size_type;
 
   /**
+   * Constructor for a rectangular matrix with @p rows and @p columns, distributed
+   * in a given @p mpi_communicator .
+   *
+   * The choice of the block size @p block_size is a compromize between a large
+   * enough sizes for efficient local BLAS and small enough get
+   * good parallel load balance.
+   */
+  ScaLAPACKMatrix(const size_type rows, const size_type columns,
+                  MPI_Comm mpi_communicator,
+                  const unsigned int block_size_row = 32, const unsigned int block_size_column = 32,
+                  const LAPACKSupport::Property property = LAPACKSupport::Property::general);
+
+  /**
    * Constructor for a square matrix of size @p size, distributed
    * in a given @p mpi_communicator .
    *
@@ -137,6 +150,16 @@ public:
    * building the actual inverse using pXpotri.
    */
   void invert();
+
+  /**
+   * Compute all eigenvalues of real symmetric matrix using pdsyev
+   */
+  void eigenvalues_symmetric (std::vector<NumberType> &eigenvalues);
+
+  /**
+   * Compute all eigenpairs of real symmetric matrix using pdsyev
+   */
+  void eigenpairs_symmetric (std::vector<NumberType> &eigenvalues);
 
   /**
    * Return the number of rows in processes grid.
@@ -242,7 +265,7 @@ private:
    * Additional properties of the matrix which may help to select more
    * efficient ScaLAPACK functions.
    */
-  LAPACKSupport::Properties properties;
+  LAPACKSupport::Property properties;
 
   /**
    * MPI communicator with all processes

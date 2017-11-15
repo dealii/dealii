@@ -13,8 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
+
 #include <deal.II/lac/scalapack.h>
 #include <deal.II/base/mpi.h>
+
+#include <deal.II/base/conditional_ostream.h>
 
 // useful examples:
 // https://stackoverflow.com/questions/14147705/cholesky-decomposition-scalapack-error/14203864
@@ -34,17 +37,65 @@ extern "C"
 {
   /* Basic Linear Algebra Communication Subprograms (BLACS) declarations */
   // https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dinitb.htm#dinitb
+
+  /* You call the BLACS_PINFO routine when you want to determine how many processes are available.
+   * You can use this information as input into other BLACS routines that set up your process grid*/
   void Cblacs_pinfo(int *, int *);
+
+  /*
+   * You call the BLACS_GET routine when you want the values the BLACS are using for internal defaults.
+   * The most common use is in retrieving a default system context for input into BLACS_GRIDINIT or BLACS_GRIDMAP.
+   */
   void Cblacs_get(int icontxt, int what, int *val);
+
+  /*
+   * You call the BLACS_GRIDINIT routine when you want to map the processes sequentially in row-major order
+   * or column-major order into the process grid.
+   * You must specify the same input argument values in the calls to BLACS_GRIDINIT on every process.
+   */
   void Cblacs_gridinit(int *context, const char *order, int grid_height, int grid_width);
+
+  /*
+   * You call the BLACS_GRIDINFO routine to obtain the process row and column index.
+   */
   void Cblacs_gridinfo(int  context, int *grid_height, int *grid_width, int *grid_row, int *grid_col);
+
+  /*
+   * Given the system process number, returns the row and column coordinates in the BLACS' process grid.
+   */
   void Cblacs_pcoord(int, int, int *, int *);
+
+  /*
+   * You call the BLACS_GRIDEXIT routine to release a BLACS context.
+   */
   void Cblacs_gridexit(int context);
+
+  /*
+   * This routines holds up execution of all processes within the indicated scope until they have all called the routine.
+   */
   void Cblacs_barrier(int, const char *);
+
+  /*
+   * Frees all BLACS contexts and releases all allocated memory.
+   */
   void Cblacs_exit(int error_code);
+
+  /*
+   * This routine takes the indicated general rectangular matrix and sends it to the destination process in the process grid.
+   * Return from the routine indicates that the buffer may be reused. The routine is locally-blocking, that is,
+   * it will return even if the corresponding receive is not posted.
+   */
   void Cdgerv2d(int, int, int, double *, int, int, int);
+
+  /*
+   * This routine receives a message from a process into a general rectangular matrix.
+   * This routine is globally-blocking, that is, return from the routine indicates that the message has been received into the matrix.
+   */
   void Cdgesd2d(int, int, int, double *, int, int, int);
 
+  /*
+   *
+   */
   int Csys2blacs_handle(MPI_Comm comm);
 
   /**
@@ -126,6 +177,9 @@ extern "C"
    */
   int iceil_(const int *i1, const int *i2);
 
+  /*
+   * DESCINIT initializes the descriptor vector with the 8 input arguments
+   */
   void descinit_ (int *desc, const int *m, const int *n, const int *mb, const int *nb, const int *irsrc, const int *icsrc, const int *ictxt, const int *lld, int *info);
 
   /**
@@ -155,12 +209,33 @@ extern "C"
                const double *beta,
                double *C, const int *IC, const int *JC, const int *DESCC);
 
+  /*
+   * PDLANGE returns the value of the one norm, or the Frobenius norm, or the infinity norm,
+   * or the element of largest absolute value of a distributed matrix
+   */
   double pdlange_(char const *norm,
                   int const &m, int const &n,
                   double *A, int const &ia, int const &ja, int *desca,
                   double *work);
 
+  /*
+   * INDXG2P computes the process coordinate which posseses the entry of a
+   * distributed matrix specified by a global index
+   */
   int indxg2p_(const int *glob, const int *nb, const int *iproc, const int *isproc, const int *nprocs);
+
+  /*
+   * The pdsyev routine computes all eigenvalues and, optionally, eigenvectors of a real symmetric matrix A
+   * The by calling the recommended sequence of ScaLAPACK routines. In its present form, the routine assumes a homogeneous system
+   * and makes no checks for consistency of the eigenvalues or eigenvectors across the different processes.
+   * Because of this, it is possible that a heterogeneous system may return incorrect results without any error messages.
+   *
+   * http://www.netlib.org/scalapack/explore-html/d0/d1a/pdsyev_8f.html
+   * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lsyev.htm#lsyev
+   */
+  void pdsyev_(const char *jobz, const char *uplo, const int *m, double *A, const int *ia, const int *ja, int *desca, double *w,
+               double *z, const int *iz, const int *jz, int *descz, double *work, const int *lwork, int *info);
+
 
 }
 
@@ -179,7 +254,8 @@ namespace
    * https://github.com/elemental/Elemental/blob/master/src/core/Grid.cpp#L67-L91
    */
   inline
-  void choose_the_processor_grid(int &n_process_rows, int &n_process_columns, const unsigned int size, const unsigned int block_size, const int n_processes)
+  void choose_the_processor_grid(int &n_process_rows, int &n_process_columns, const unsigned int m, const unsigned int n,
+                                 const unsigned int block_size_m, const unsigned int block_size_n, const int n_processes)
   {
     // Few notes from the ScaLAPACK user guide:
     // It is possible to predict the best grid shape given the number of processes available:
@@ -192,17 +268,18 @@ namespace
 
     // Below we always try to create 2D processor grids:
 
-    // Get the total number of cores we can occupy in a square dense matrix
-    // with square blocks when every core owns only a single block:
-    const int n_processes_heuristic = int(std::ceil((1.*size)/block_size))*
-                                      int(std::ceil((1.*size)/block_size));
+    // Get the total number of cores we can occupy in a rectangular dense matrix
+    // with rectangular blocks when every core owns only a single block:
+    const int n_processes_heuristic = int(std::ceil((1.*m)/block_size_m))*
+                                      int(std::ceil((1.*n)/block_size_n));
     const int Np = std::min(n_processes_heuristic, n_processes);
 
     // Now we need to split Np into  Pr x Pc. Assume we know the shape/ratio
     // Pc =: ratio * Pr
     // therefore
     // Np = Pc * Pc / ratio
-    const double ratio = 1.0;
+    // for quadratic matrices the ratio equals 1
+    const double ratio = n/m;
     int Pc = std::sqrt(ratio * Np);
 
     // one could rounds up Pc to the number which has zero remainder from the division of Np
@@ -234,35 +311,42 @@ namespace
 
 
 
+/**
+ *Constructor for a rectangular distributes Matrix
+ */
 template <typename NumberType>
-ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type size,
+ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type rows, const size_type columns,
                                              MPI_Comm mpi_communicator,
-                                             const unsigned int block_size)
+                                             const unsigned int block_size_row, const unsigned int block_size_column,
+                                             const LAPACKSupport::Property property)
   :
   TransposeTable<NumberType> (),
   state (LAPACKSupport::unusable),
-  properties(LAPACKSupport::general),
+  properties(property),
   mpi_communicator(mpi_communicator),
-  n_rows(size),
-  n_columns(size),
-  row_block_size(block_size),
-  column_block_size(block_size),
-  uplo('L'),
+  n_rows(rows),
+  n_columns(columns),
+  row_block_size(block_size_row),
+  column_block_size(block_size_column),
+  uplo('L'), // for non-symmetric matrices this is not needed
   first_process_row(0),
   first_process_column(0),
   submatrix_row(1),
   submatrix_column(1)
 {
-  // NOTE: routines that exploit symmetry (Cholesky pdpotrf), require row_block_size = column_block_size
-  Assert (block_size > 0,
-          ExcMessage("Block size has to be positive."));
-  Assert (block_size <= size,
-          ExcMessage("BLock size can not be greater than the size of the matrix"));
+  Assert (block_size_row > 0,
+          ExcMessage("Row block size has to be positive."));
+  Assert (block_size_column > 0,
+          ExcMessage("Column block size has to be positive."));
+  Assert (block_size_row <= rows,
+          ExcMessage("Row block size can not be greater than the number of rows of the matrix"));
+  Assert (block_size_column <= columns,
+          ExcMessage("Column block size can not be greater than the number of columns of the matrix"));
 
   MPI_Comm_size(mpi_communicator, &n_mpi_processes);
   MPI_Comm_rank(mpi_communicator, &this_mpi_process);
 
-  choose_the_processor_grid(n_process_rows, n_process_columns, size, block_size, n_mpi_processes);
+  choose_the_processor_grid(n_process_rows, n_process_columns, n_rows, n_columns, row_block_size, column_block_size, n_mpi_processes);
 
   // processor grid order
   // FIXME: default to column major
@@ -363,6 +447,17 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type size,
     }
 #endif
 }
+
+
+
+template <typename NumberType>
+ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type size,
+                                             MPI_Comm mpi_communicator,
+                                             const unsigned int block_size)
+  :
+  //delegating constructors only work for C++11
+  ScaLAPACKMatrix<NumberType> (size,size,mpi_communicator,block_size,block_size,LAPACKSupport::Property::symmetric)
+{}
 
 
 
@@ -538,11 +633,153 @@ void ScaLAPACKMatrix<NumberType>::invert()
   if (active)
     {
       int info = 0;
+      /*
+       * matrix Z is not distributed as it will not be referenced by the ScaLapack function call
+       */
+      std::vector<double> Z_loc;
       NumberType *A_loc = &this->values[0];
       pdpotri_ (&uplo,&n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,&info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpotri", info));
     }
   state = LAPACKSupport::inverse_matrix;
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric(std::vector<NumberType> &ev)
+{
+  Assert (state == LAPACKSupport::matrix,
+          ExcMessage("Matrix has to be in Matrix state before calling this function."));
+  Assert (properties == LAPACKSupport::symmetric,
+          ExcMessage("Matrix has to be symmetric for this operation."));
+
+  ScaLAPACKMatrix<NumberType> Z (n_mpi_processes, mpi_communicator, 1);
+  ev.resize (n_rows);
+
+  if (active)
+    {
+      int info = 0;
+
+      char jobz = 'N';
+      NumberType *A_loc = &this->values[0];
+
+      /*
+       * by setting lwork to -1 a workspace query for optimal length of work is performed
+      */
+      int lwork=-1;
+      NumberType *Z_loc = &Z.values[0];
+      work.resize(1);
+
+      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+              Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
+
+      lwork=work[0];
+      work.resize (lwork);
+
+      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+              Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
+
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdsyev", info));
+
+      //Scalapack puts eigenvalues in ascending order --> reversing to obtain descending order
+      std::reverse (ev.begin(),ev.end());
+    }
+  /*
+   * send the eigenvalues to processors not being part of the process grid
+   */
+  MPI_Bcast(&ev.front(),ev.size(),MPI_DOUBLE, 0/*from root*/, mpi_communicator_inactive_with_root);
+
+  /* On exit, the lower triangle (if uplo='L') or the upper triangle (if uplo='U') of A,
+  *  including the diagonal, is destroyed. Therefore, the matrix is unusable
+  */
+  state = LAPACKSupport::unusable;
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(std::vector<NumberType> &ev)
+{
+  Assert (state == LAPACKSupport::matrix,
+          ExcMessage("Matrix has to be in Matrix state before calling this function."));
+  Assert (properties == LAPACKSupport::symmetric,
+          ExcMessage("Matrix has to be symmetric for this operation."));
+
+
+  /*const size_type rows, const size_type columns,
+                                               MPI_Comm mpi_communicator,
+                                               const unsigned int block_size_row, const unsigned int block_size_column,
+                         const LAPACKSupport::Property property*/
+
+  ScaLAPACKMatrix<NumberType> eigenvectors (n_rows, n_columns, mpi_communicator, row_block_size, column_block_size, LAPACKSupport::Property::general);
+  ev.resize (n_rows);
+
+
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
+
+  ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
+
+
+
+  if (active)
+    {
+      int info = 0;
+
+      /*
+       * for jobz = 'V' all eigenpairs of the matrix are computed
+       */
+      char jobz = 'V';
+      NumberType *A_loc = &this->values[0];
+
+      /*
+       * by setting lwork to -1 a workspace query for optimal length of work is performed
+      */
+      int lwork=-1;
+      NumberType *eigenvectors_loc = &eigenvectors.values[0];
+      work.resize(1);
+
+      pcout << "Starting workspace query" << std::endl;
+
+      pcout << "Descriptor A: ";
+      for (unsigned int i=0; i<9; ++i)
+        pcout << "  " << descriptor[i];
+      pcout << std::endl;
+      pcout << "Descriptor Z: ";
+      for (unsigned int i=0; i<9; ++i)
+        pcout << "  " << eigenvectors.descriptor[i];
+      pcout << std::endl;
+
+      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+              eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
+
+      pcout << "info = " << info << std::endl << std::endl;
+
+      lwork=work[0];
+      work.resize (lwork);
+
+      pcout << "Starting computation" << std::endl;
+
+      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+              eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
+
+      pcout << "info = " << info << std::endl << std::endl;
+
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdsyev", info));
+
+      //Scalapack puts eigenvalues in ascending order --> reversing to obtain descending order
+      std::reverse (ev.begin(),ev.end());
+    }
+  /*
+   * send the eigenvalues to processors not being part of the process grid
+   */
+  MPI_Bcast(&ev.front(),ev.size(),MPI_DOUBLE, 0/*from root*/, mpi_communicator_inactive_with_root);
+
+  /* On exit, the lower triangle (if uplo='L') or the upper triangle (if uplo='U') of A,
+  *  including the diagonal, is destroyed. Therefore, the matrix is unusable
+  */
+  state = LAPACKSupport::eigenvalues;
 }
 
 
