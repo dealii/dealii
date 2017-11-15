@@ -941,32 +941,31 @@ namespace
     const std::array<Point<spacedim>, 4> vertices
     {{cell.vertex(0), cell.vertex(1), cell.vertex(2), cell.vertex(3)}};
 
-    // store the components of the linear shape functions because we need them
-    // repeatedly
-    double linear_shapes[4];
-    for (unsigned int d=0; d<2; ++d)
+    // this evaluates all bilinear shape functions because we need them
+    // repeatedly. we will update this values in the complicated case with
+    // curved lines below
+    std::array<double,4> weights_vertices
+    {
       {
-        linear_shapes[2*d]   = 1.-chart_point[d];
-        linear_shapes[2*d+1] = chart_point[d];
+        (1.-chart_point[0]) *(1.-chart_point[1]),
+        chart_point[0] *(1.-chart_point[1]),
+        (1.-chart_point[0]) *chart_point[1],
+        chart_point[0] *chart_point[1]
       }
+    };
 
     Point<spacedim> new_point;
     if (cell_is_flat)
-      for (unsigned int i1=0, v=0; i1<2; ++i1)
-        for (unsigned int i0=0; i0<2; ++i0, ++v)
-          new_point += linear_shapes[2+i1] * linear_shapes[i0] * vertices[v];
+      for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+        new_point += weights_vertices[v] * vertices[v];
     else
       {
-        // We subtract the contribution of the vertices (second line in formula).
-        // If a line applies the same manifold as the cell, we also subtract a
-        // weighted part of the vertex, so accumulate the final weight of the
-        // the vertices while going through the faces (this is a bit artificial
-        // in 2D but it becomes clear in 3D where we avoid looking at the faces'
-        // orientation and other complications).
-        double weights_vertices[GeometryInfo<2>::vertices_per_cell];
-        for (unsigned int i1=0, v=0; i1<2; ++i1)
-          for (unsigned int i0=0; i0<2; ++i0, ++v)
-            weights_vertices[v] = -linear_shapes[2+i1] * linear_shapes[i0];
+        // The second line in the formula tells us to subtract the
+        // contribution of the vertices.  If a line employs the same manifold
+        // as the cell, we can merge the weights of the line with the weights
+        // of the vertex with a negative sign while going through the faces
+        // (this is a bit artificial in 2D but it becomes clear in 3D where we
+        // avoid looking at the faces' orientation and other complications).
 
         // add the contribution from the lines around the cell (first line in
         // formula)
@@ -981,16 +980,18 @@ namespace
             const double my_weight = line%2 ? chart_point[line/2] : 1-chart_point[line/2];
             const double line_point = chart_point[1-line/2];
 
-            // Same manifold or invalid id which will go back to the same class ->
-            // adds to the vertices
+            // Same manifold or invalid id which will go back to the same
+            // class -> contribution should be added for the final point,
+            // which means that we subtract the current weight from the
+            // negative weight applied to the vertex
             const types::manifold_id line_manifold_id = cell.line(line)->manifold_id();
             if (line_manifold_id == my_manifold_id ||
                 line_manifold_id == numbers::invalid_manifold_id)
               {
                 weights_vertices[GeometryInfo<2>::line_to_cell_vertices(line,0)]
-                += my_weight * (1.-line_point);
+                -= my_weight * (1.-line_point);
                 weights_vertices[GeometryInfo<2>::line_to_cell_vertices(line,1)]
-                += my_weight * line_point;
+                -= my_weight * line_point;
               }
             else
               {
@@ -1006,7 +1007,7 @@ namespace
 
         // subtract contribution from the vertices (second line in formula)
         for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
-          new_point += weights_vertices[v] * vertices[v];
+          new_point -= weights_vertices[v] * vertices[v];
       }
 
     return new_point;
@@ -1072,22 +1073,25 @@ namespace
         linear_shapes[2*d+1] = chart_point[d];
       }
 
+    // wrap linear shape functions around for access in face loop
+    for (unsigned int d=6; d<10; ++d)
+      linear_shapes[d] = linear_shapes[d-6];
+
+    std::array<double,8> weights_vertices;
+    for (unsigned int i2=0, v=0; i2<2; ++i2)
+      for (unsigned int i1=0; i1<2; ++i1)
+        for (unsigned int i0=0; i0<2; ++i0, ++v)
+          weights_vertices[v] = (linear_shapes[4+i2] * linear_shapes[2+i1]) *
+                                linear_shapes[i0];
+
     Point<spacedim> new_point;
     if (cell_is_flat)
-      for (unsigned int i2=0, v=0; i2<2; ++i2)
-        for (unsigned int i1=0; i1<2; ++i1)
-          for (unsigned int i0=0; i0<2; ++i0, ++v)
-            new_point += (linear_shapes[4+i2] * linear_shapes[2+i1]) *
-                         linear_shapes[i0] * vertices[v];
+      for (unsigned int v=0; v<8; ++v)
+        new_point += weights_vertices[v] * vertices[v];
     else
       {
-        // identify the weights for the vertices and lines to be accumulated
-        double weights_vertices[GeometryInfo<3>::vertices_per_cell];
-        for (unsigned int i2=0, v=0; i2<2; ++i2)
-          for (unsigned int i1=0; i1<2; ++i1)
-            for (unsigned int i0=0; i0<2; ++i0, ++v)
-              weights_vertices[v] = (linear_shapes[4+i2] * linear_shapes[2+i1]) *
-                                    linear_shapes[i0];
+        // identify the weights for the lines to be accumulated (vertex
+        // weights are set outside and coincide with the flat manifold case)
 
         double weights_lines[GeometryInfo<3>::lines_per_cell];
         for (unsigned int line=0; line<GeometryInfo<3>::lines_per_cell; ++line)
@@ -1099,10 +1103,6 @@ namespace
         // note that the views are immutable, but the arrays are not
         const auto weights_view = make_array_view(weights.begin(), weights.end());
         const auto points_view = make_array_view(points.begin(), points.end());
-
-        // wrap linear shape functions around for access in face loop
-        for (unsigned int d=6; d<10; ++d)
-          linear_shapes[d] = linear_shapes[d-6];
 
         for (unsigned int face=0; face<GeometryInfo<3>::faces_per_cell; ++face)
           {
@@ -1124,6 +1124,10 @@ namespace
                     weights_lines[face_to_cell_lines_3d[face][line]] +=
                       my_weight * line_weight;
                   }
+                // as to the indices inside linear_shapes: we use the index
+                // wrapped around at 2*d, ensuring the correct orientation of
+                // the face's coordinate system with respect to the
+                // lexicographic indices
                 weights_vertices[face_to_cell_vertices_3d[face][0]] -=
                   linear_shapes[face_even+2]*(linear_shapes[face_even+4]*my_weight);
                 weights_vertices[face_to_cell_vertices_3d[face][1]] -=
@@ -1254,7 +1258,7 @@ TransfiniteInterpolationManifold<dim,spacedim>
 {
   Point<dim> outside;
   for (unsigned int d=0; d<dim; ++d)
-    outside[d] = 20;
+    outside[d] = 20.;
 
   // project the user-given input to unit cell
   Point<dim> chart_point = GeometryInfo<dim>::project_to_unit_cell(initial_guess);
@@ -1295,8 +1299,11 @@ TransfiniteInterpolationManifold<dim,spacedim>
       // convergence
       if (i%8 == 0)
         {
-          // if the determinant is zero, the mapping is not invertible and we are
-          // outside the valid chart region
+          // if the determinant is zero or negative, the mapping is either not
+          // invertible or already has inverted and we are outside the valid
+          // chart region. Note that the Jacobian here represents the
+          // derivative of the forward map and should have a positive
+          // determinant since we use properly oriented meshes.
           DerivativeForm<1,dim,spacedim> grad
             = push_forward_gradient(cell, chart_point,
                                     Point<spacedim>(point-residual));
@@ -1481,7 +1488,7 @@ TransfiniteInterpolationManifold<dim, spacedim>
           else if (surrounding_points.size() == 8 && i > 4)
             {
               const Point<dim> guess = chart_points[i-4] +
-                                       Point<dim>(chart_points[4] - chart_points[0]);
+                                       (chart_points[4] - chart_points[0]);
               chart_points[i] = pull_back(cell, surrounding_points[i], guess);
             }
           else

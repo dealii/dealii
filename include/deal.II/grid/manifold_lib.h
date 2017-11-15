@@ -805,11 +805,12 @@ private:
    * Gradient of the push_forward method.
    *
    * @note This internal function is not compatible with the
-   * ChartManifold::pull_back() function because the given class represents an
-   * atlas of charts, not a single chart. Furthermore, this private function
-   * also requires the user to provide the result of the push_forward() call
-   * on the chart point for the use case of this function, namely inside a
-   * Newton iteration where the gradient is computed by finite differences.
+   * ChartManifold::push_forward_gradient() function because the given class
+   * represents an atlas of charts, not a single chart. Furthermore, this
+   * private function also requires the user to provide the result of the
+   * push_forward() call on the chart point for the single use case of this
+   * function, namely inside a Newton iteration where the gradient is computed
+   * by finite differences.
    */
   DerivativeForm<1,dim,spacedim>
   push_forward_gradient(const typename Triangulation<dim,spacedim>::cell_iterator &cell,
