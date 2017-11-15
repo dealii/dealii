@@ -146,7 +146,7 @@ extern "C" {
  * @author Denis Davydov, 2015, 2017
  */
 template <typename VectorType>
-class  DEAL_II_DEPRECATED PArpackSolver : public Subscriptor
+class PArpackSolver : public Subscriptor
 {
 public:
   /**
@@ -215,7 +215,7 @@ public:
    * </code>
    */
   template <typename MatrixType>
-  class Shift : public dealii::Subscriptor
+  class DEAL_II_DEPRECATED Shift : public dealii::Subscriptor
   {
   public:
 
