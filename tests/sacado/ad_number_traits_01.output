@@ -1,0 +1,6 @@
+
+DEAL::Sacado::Fad::DFad OK
+DEAL::Nested Sacado::Fad::DFad OK
+DEAL::Sacado::Rad::ADvar OK
+DEAL::Sacado::Rad::ADvar<Sacado::Fad::DFad> OK
+DEAL::OK

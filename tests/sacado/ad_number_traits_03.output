@@ -1,0 +1,16 @@
+
+DEAL:Native::        r = 4.66102
+DEAL:Native::    dr/da = -4.66102
+DEAL:Native::    dr/db = 1.41421
+DEAL:Native::d^2r/da^2 = 13.9831
+DEAL:Native::d^2r/db^2 = -0.471405
+DEAL:Native::d^2r/dadb = -1.41421
+DEAL:Native::d^2r/dbda = -1.41421
+DEAL:Extracted::        r = 4.66102
+DEAL:Extracted::    dr/da = -4.66102
+DEAL:Extracted::    dr/db = 1.41421
+DEAL:Extracted::d^2r/da^2 = 13.9831
+DEAL:Extracted::d^2r/db^2 = -0.471405
+DEAL:Extracted::d^2r/dadb = -1.41421
+DEAL:Extracted::d^2r/dbda = -1.41421
+DEAL::OK

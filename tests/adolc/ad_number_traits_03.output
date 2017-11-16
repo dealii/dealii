@@ -1,0 +1,18 @@
+
+DEAL:adouble::is_ad_number: 1
+DEAL:adouble::is_adolc_number: 1
+DEAL:adouble::is_taped_ad_number: 1
+DEAL:adouble::is_tapeless_ad_number: 0
+DEAL:std::complex<::adouble>::is_ad_number: 1
+DEAL:std::complex<::adouble>::is_adolc_number: 1
+DEAL:std::complex<::adouble>::is_taped_ad_number: 1
+DEAL:std::complex<::adouble>::is_tapeless_ad_number: 0
+DEAL:adtl::adouble::is_ad_number: 1
+DEAL:adtl::adouble::is_adolc_number: 1
+DEAL:adtl::adouble::is_taped_ad_number: 0
+DEAL:adtl::adouble::is_tapeless_ad_number: 1
+DEAL:std::complex<adtl::adouble>::is_ad_number: 1
+DEAL:std::complex<adtl::adouble>::is_adolc_number: 1
+DEAL:std::complex<adtl::adouble>::is_taped_ad_number: 0
+DEAL:std::complex<adtl::adouble>::is_tapeless_ad_number: 1
+DEAL::OK
