@@ -473,7 +473,7 @@ namespace FEValuesViews
       AssertDimension (values.size(), n_quadrature_points);
 
       std::fill (values.begin(), values.end(),
-                 dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0));
+                 dealii::internal::NumberType<Number>::value(0.0));
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -529,7 +529,7 @@ namespace FEValuesViews
               &shape_derivatives[shape_function_data[shape_function].row_index][0];
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
               derivatives[q_point] += value *
-                                      typename ProductType<Number,dealii::Tensor<order,spacedim> >::type(*shape_derivative_ptr++);
+                                      dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
           }
     }
 
@@ -666,7 +666,7 @@ namespace FEValuesViews
                 &shape_derivatives[snc][0];
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
                 derivatives[q_point][comp] += value *
-                                              typename ProductType<Number,dealii::Tensor<order,spacedim> >::type(*shape_derivative_ptr++);
+                                              dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
             }
           else
             for (unsigned int d=0; d<spacedim; ++d)
@@ -677,7 +677,7 @@ namespace FEValuesViews
                                        row_index[d]][0];
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
                     derivatives[q_point][d] += value *
-                                               typename ProductType<Number,dealii::Tensor<order,spacedim> >::type(*shape_derivative_ptr++);
+                                               dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
                 }
         }
     }
@@ -724,7 +724,7 @@ namespace FEValuesViews
                 &shape_gradients[snc][0];
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
                 symmetric_gradients[q_point] += value *
-                                                typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type (symmetrize_single_row(comp, *shape_gradient_ptr++));
+                                                dealii::SymmetricTensor<2,spacedim> (symmetrize_single_row(comp, *shape_gradient_ptr++));
             }
           else
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
@@ -831,7 +831,6 @@ namespace FEValuesViews
                 continue;
 
               const Number &value = dof_values[shape_function];
-
               // For auto-differentiable numbers, the fact that a DoF value is zero
               // does not imply that its derivatives are zero as well. So we
               // can't filter by value for these number types.
@@ -895,7 +894,6 @@ namespace FEValuesViews
                 continue;
 
               const Number &value = dof_values[shape_function];
-
               // For auto-differentiable numbers, the fact that a DoF value is zero
               // does not imply that its derivatives are zero as well. So we
               // can't filter by value for these number types.
@@ -2731,7 +2729,7 @@ namespace internal
 
     // initialize with zero
     std::fill_n (values.begin(), n_quadrature_points,
-                 dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0));
+                 dealii::internal::NumberType<Number>::value(0.0));
 
     // add up contributions of trial functions. note that here we deal with
     // scalar finite elements, so no need to check for non-primitivity of
@@ -3011,7 +3009,7 @@ namespace internal
 
     // initialize with zero
     std::fill_n (laplacians.begin(), n_quadrature_points,
-                 dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0));
+                 dealii::internal::NumberType<Number>::value(0.0));
 
     // add up contributions of trial functions. note that here we deal with
     // scalar finite elements and also note that the Laplacian is
