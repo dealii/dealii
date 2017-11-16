@@ -59,6 +59,8 @@
  * A summary of the files that implement the interface to the supported auto-differentiable
  * numbers is as follows:
  *
+ * - ad_helpers.h: Provides a set of classes to help perform automatic differentiation in a
+ *   number of different contexts. These are detailed in \ref auto_diff_1_3.
  * - ad_number_types.h: Introduces an enumeration (called a type code) for the
  *   auto-differentiable number combinations that will be supported by the driver classes.
  *   The rationale behind the use of this somewhat restrictive mechanism is discussed below.
@@ -97,5 +99,11 @@
  * @subsubsection auto_diff_1_3 User interface to the automatic differentiation libraries
  *
  * @todo Summarize driver classes 
+ * - %Quadrature point level
+ *   - Scalar mode
+ *   - %Vector mode
+ * - Cell level functions
+ *   - Variational formulations
+ *   - Residual linearisation
  *
  */
