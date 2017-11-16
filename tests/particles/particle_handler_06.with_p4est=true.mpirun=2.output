@@ -1,0 +1,21 @@
+
+DEAL:0:2d/2d::Particle id 0 is local particle on process 0
+DEAL:0:2d/2d::Particle id 1 is ghost particle on process 0
+DEAL:0:2d/2d::OK
+DEAL:0:2d/3d::Particle id 0 is local particle on process 0
+DEAL:0:2d/3d::Particle id 1 is ghost particle on process 0
+DEAL:0:2d/3d::OK
+DEAL:0:3d/3d::Particle id 0 is local particle on process 0
+DEAL:0:3d/3d::Particle id 1 is ghost particle on process 0
+DEAL:0:3d/3d::OK
+
+DEAL:1:2d/2d::Particle id 1 is local particle on process 1
+DEAL:1:2d/2d::Particle id 0 is ghost particle on process 1
+DEAL:1:2d/2d::OK
+DEAL:1:2d/3d::Particle id 1 is local particle on process 1
+DEAL:1:2d/3d::Particle id 0 is ghost particle on process 1
+DEAL:1:2d/3d::OK
+DEAL:1:3d/3d::Particle id 1 is local particle on process 1
+DEAL:1:3d/3d::Particle id 0 is ghost particle on process 1
+DEAL:1:3d/3d::OK
+

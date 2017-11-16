@@ -29,10 +29,10 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  ParticleAccessor<dim,spacedim>::ParticleAccessor (const std::multimap<types::LevelInd, Particle<dim,spacedim> > &map,
-                                                    const typename std::multimap<types::LevelInd, Particle<dim,spacedim> >::iterator &particle)
+  ParticleAccessor<dim,spacedim>::ParticleAccessor (const std::multimap<internal::LevelInd, Particle<dim,spacedim> > &map,
+                                                    const typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator &particle)
     :
-    map (const_cast<std::multimap<types::LevelInd, Particle<dim,spacedim> > *> (&map)),
+    map (const_cast<std::multimap<internal::LevelInd, Particle<dim,spacedim> > *> (&map)),
     particle (particle)
   {}
 
@@ -118,6 +118,18 @@ namespace Particles
            ExcInternalError());
 
     particle->second.set_property_pool(new_property_pool);
+  }
+
+
+
+  template <int dim, int spacedim>
+  bool
+  ParticleAccessor<dim,spacedim>::has_properties () const
+  {
+    Assert(particle != map->end(),
+           ExcInternalError());
+
+    return particle->second.has_properties();
   }
 
 

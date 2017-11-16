@@ -1,0 +1,19 @@
+
+DEAL:2d/2d::Before sort particle id 0 is in cell 1.0
+DEAL:2d/2d::Before sort particle id 1 is in cell 1.0
+DEAL:2d/2d::After sort particle id 0 is in cell 1.0
+DEAL:2d/2d::After sort particle id 1 is in cell 1.3
+DEAL:2d/2d::After shift particle id 0 is in cell 1.2
+DEAL:2d/2d::OK
+DEAL:2d/3d::Before sort particle id 0 is in cell 1.0
+DEAL:2d/3d::Before sort particle id 1 is in cell 1.0
+DEAL:2d/3d::After sort particle id 0 is in cell 1.0
+DEAL:2d/3d::After sort particle id 1 is in cell 1.3
+DEAL:2d/3d::After shift particle id 0 is in cell 1.2
+DEAL:2d/3d::OK
+DEAL:3d/3d::Before sort particle id 0 is in cell 1.0
+DEAL:3d/3d::Before sort particle id 1 is in cell 1.0
+DEAL:3d/3d::After sort particle id 0 is in cell 1.0
+DEAL:3d/3d::After sort particle id 1 is in cell 1.7
+DEAL:3d/3d::After shift particle id 0 is in cell 1.4
+DEAL:3d/3d::OK

@@ -44,7 +44,7 @@ void test ()
     if (dim>1)
       reference_position(1) = 0.4;
 
-    const Particles::types::particle_index index(7);
+    const types::particle_index index(7);
 
     std::vector<double> properties = {0.15,0.45,0.75};
 
@@ -52,9 +52,9 @@ void test ()
     particle.set_property_pool(pool);
     particle.set_properties(ArrayView<double>(&properties[0],properties.size()));
 
-    std::multimap<Particles::types::LevelInd,Particles::Particle<dim> > map;
+    std::multimap<Particles::internal::LevelInd,Particles::Particle<dim> > map;
 
-    Particles::types::LevelInd level_index = std::make_pair(0,0);
+    Particles::internal::LevelInd level_index = std::make_pair(0,0);
     map.insert(std::make_pair(level_index,particle));
 
     particle.get_properties()[0] = 0.05;

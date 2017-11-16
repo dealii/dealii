@@ -37,7 +37,7 @@ void test ()
     reference_position(0) = 0.2;
     reference_position(1) = 0.4;
 
-    const Particles::types::particle_index index(7);
+    const types::particle_index index(7);
 
     std::vector<double> properties = {0.15,0.45,0.75};
 
