@@ -16,8 +16,10 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/signaling_nan.h>
+#include <deal.II/differentiation/ad.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_vector.h>
@@ -40,8 +42,6 @@
 #include <memory>
 #include <type_traits>
 
-#include <deal.II/differentiation/ad/adolc_product_types.h>
-#include <deal.II/differentiation/ad/sacado_product_types.h>
 
 #include <boost/container/small_vector.hpp>
 
@@ -473,15 +473,19 @@ namespace FEValuesViews
       AssertDimension (values.size(), n_quadrature_points);
 
       std::fill (values.begin(), values.end(),
-                 dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0));
+                 dealii::internal::NumberType<Number>::value(0.0));
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
             const Number &value = dof_values[shape_function];
-            if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-              continue;
+            // For auto-differentiable numbers, the fact that a DoF value is zero
+            // does not imply that its derivatives are zero as well. So we
+            // can't filter by value for these number types.
+            if (!Differentiation::AD::is_ad_number<Number>::value)
+              if (value == dealii::internal::NumberType<Number>::value(0.0) )
+                continue;
 
             const double *shape_value_ptr =
               &shape_values(shape_function_data[shape_function].row_index, 0);
@@ -514,14 +518,18 @@ namespace FEValuesViews
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
             const Number &value = dof_values[shape_function];
-            if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-              continue;
+            // For auto-differentiable numbers, the fact that a DoF value is zero
+            // does not imply that its derivatives are zero as well. So we
+            // can't filter by value for these number types.
+            if (!Differentiation::AD::is_ad_number<Number>::value)
+              if (value == dealii::internal::NumberType<Number>::value(0.0) )
+                continue;
 
             const dealii::Tensor<order,spacedim> *shape_derivative_ptr =
               &shape_derivatives[shape_function_data[shape_function].row_index][0];
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
               derivatives[q_point] += value *
-                                      typename ProductType<Number,dealii::Tensor<order,spacedim> >::type(*shape_derivative_ptr++);
+                                      dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
           }
     }
 
@@ -547,8 +555,12 @@ namespace FEValuesViews
         if (shape_function_data[shape_function].is_nonzero_shape_function_component)
           {
             const Number &value = dof_values[shape_function];
-            if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-              continue;
+            // For auto-differentiable numbers, the fact that a DoF value is zero
+            // does not imply that its derivatives are zero as well. So we
+            // can't filter by value for these number types.
+            if (!Differentiation::AD::is_ad_number<Number>::value)
+              if (value == dealii::internal::NumberType<Number>::value(0.0))
+                continue;
 
             const dealii::Tensor<2,spacedim> *shape_hessian_ptr =
               &shape_hessians[shape_function_data[shape_function].row_index][0];
@@ -585,8 +597,12 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (snc != -1)
             {
@@ -635,8 +651,12 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (snc != -1)
             {
@@ -646,7 +666,7 @@ namespace FEValuesViews
                 &shape_derivatives[snc][0];
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
                 derivatives[q_point][comp] += value *
-                                              typename ProductType<Number,dealii::Tensor<order,spacedim> >::type(*shape_derivative_ptr++);
+                                              dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
             }
           else
             for (unsigned int d=0; d<spacedim; ++d)
@@ -657,7 +677,7 @@ namespace FEValuesViews
                                        row_index[d]][0];
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
                     derivatives[q_point][d] += value *
-                                               typename ProductType<Number,dealii::Tensor<order,spacedim> >::type(*shape_derivative_ptr++);
+                                               dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
                 }
         }
     }
@@ -689,8 +709,12 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (snc != -1)
             {
@@ -700,7 +724,7 @@ namespace FEValuesViews
                 &shape_gradients[snc][0];
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
                 symmetric_gradients[q_point] += value *
-                                                typename ProductType<Number,dealii::SymmetricTensor<2,spacedim> >::type (symmetrize_single_row(comp, *shape_gradient_ptr++));
+                                                dealii::SymmetricTensor<2,spacedim> (symmetrize_single_row(comp, *shape_gradient_ptr++));
             }
           else
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
@@ -742,8 +766,12 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (snc != -1)
             {
@@ -803,9 +831,12 @@ namespace FEValuesViews
                 continue;
 
               const Number &value = dof_values[shape_function];
-
-              if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-                continue;
+              // For auto-differentiable numbers, the fact that a DoF value is zero
+              // does not imply that its derivatives are zero as well. So we
+              // can't filter by value for these number types.
+              if (!Differentiation::AD::is_ad_number<Number>::value)
+                if (value == dealii::internal::NumberType<Number>::value(0.0))
+                  continue;
 
               if (snc != -1)
                 {
@@ -863,9 +894,12 @@ namespace FEValuesViews
                 continue;
 
               const Number &value = dof_values[shape_function];
-
-              if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-                continue;
+              // For auto-differentiable numbers, the fact that a DoF value is zero
+              // does not imply that its derivatives are zero as well. So we
+              // can't filter by value for these number types.
+              if (!Differentiation::AD::is_ad_number<Number>::value)
+                if (value == dealii::internal::NumberType<Number>::value(0.0))
+                  continue;
 
               if (snc != -1)
                 {
@@ -986,8 +1020,12 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (snc != -1)
             {
@@ -1040,8 +1078,12 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (snc != -1)
             {
@@ -1094,8 +1136,12 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (snc != -1)
             {
@@ -1182,8 +1228,12 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (snc != -1)
             {
@@ -1238,8 +1288,12 @@ namespace FEValuesViews
             continue;
 
           const Number &value = dof_values[shape_function];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (snc != -1)
             {
@@ -2675,7 +2729,7 @@ namespace internal
 
     // initialize with zero
     std::fill_n (values.begin(), n_quadrature_points,
-                 dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0));
+                 dealii::internal::NumberType<Number>::value(0.0));
 
     // add up contributions of trial functions. note that here we deal with
     // scalar finite elements, so no need to check for non-primitivity of
@@ -2687,8 +2741,12 @@ namespace internal
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
         const Number2 value = dof_values_ptr[shape_func];
-        if (value == Number2())
-          continue;
+        // For auto-differentiable numbers, the fact that a DoF value is zero
+        // does not imply that its derivatives are zero as well. So we
+        // can't filter by value for these number types.
+        if (!Differentiation::AD::is_ad_number<Number2>::value)
+          if (value == dealii::internal::NumberType<Number2>::value(0.0))
+            continue;
 
         const double *shape_value_ptr = &shape_values(shape_func, 0);
         for (unsigned int point=0; point<n_quadrature_points; ++point)
@@ -2744,8 +2802,12 @@ namespace internal
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
           const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (fe.is_primitive(shape_func))
             {
@@ -2819,8 +2881,12 @@ namespace internal
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
         const Number &value = dof_values_ptr[shape_func];
-        if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-          continue;
+        // For auto-differentiable numbers, the fact that a DoF value is zero
+        // does not imply that its derivatives are zero as well. So we
+        // can't filter by value for these number types.
+        if (!Differentiation::AD::is_ad_number<Number>::value)
+          if (value == dealii::internal::NumberType<Number>::value(0.0))
+            continue;
 
         const Tensor<order,spacedim> *shape_derivative_ptr
           = &shape_derivatives[shape_func][0];
@@ -2878,8 +2944,12 @@ namespace internal
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
           const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (fe.is_primitive(shape_func))
             {
@@ -2939,7 +3009,7 @@ namespace internal
 
     // initialize with zero
     std::fill_n (laplacians.begin(), n_quadrature_points,
-                 dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0));
+                 dealii::internal::NumberType<Number>::value(0.0));
 
     // add up contributions of trial functions. note that here we deal with
     // scalar finite elements and also note that the Laplacian is
@@ -2947,8 +3017,12 @@ namespace internal
     for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
       {
         const Number2 value = dof_values_ptr[shape_func];
-        if (value == Number2())
-          continue;
+        // For auto-differentiable numbers, the fact that a DoF value is zero
+        // does not imply that its derivatives are zero as well. So we
+        // can't filter by value for these number types.
+        if (!Differentiation::AD::is_ad_number<Number2>::value)
+          if (value == dealii::internal::NumberType<Number2>::value(0.0))
+            continue;
 
         const Tensor<2,spacedim> *shape_hessian_ptr
           = &shape_hessians[shape_func][0];
@@ -3005,8 +3079,12 @@ namespace internal
       for (unsigned int shape_func=0; shape_func<dofs_per_cell; ++shape_func)
         {
           const Number &value = dof_values_ptr[shape_func+mc*dofs_per_cell];
-          if (value == dealii::internal::NumberType<typename std::decay<Number>::type>::value(0.0))
-            continue;
+          // For auto-differentiable numbers, the fact that a DoF value is zero
+          // does not imply that its derivatives are zero as well. So we
+          // can't filter by value for these number types.
+          if (!Differentiation::AD::is_ad_number<Number>::value)
+            if (value == dealii::internal::NumberType<Number>::value(0.0))
+              continue;
 
           if (fe.is_primitive(shape_func))
             {
