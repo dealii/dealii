@@ -27,6 +27,7 @@
 #include <deal.II/differentiation/ad/adolc_number_types.h>
 #include <deal.II/differentiation/ad/adolc_product_types.h>
 
+#include <deal.II/differentiation/ad/sacado_math.h>
 #include <deal.II/differentiation/ad/sacado_number_types.h>
 #include <deal.II/differentiation/ad/sacado_product_types.h>
 
