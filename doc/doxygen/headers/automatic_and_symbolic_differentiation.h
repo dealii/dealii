@@ -67,6 +67,8 @@
  *   provide a uniform interface to the classes through the NumberTraits and ADNumberTraits
  *   classes which are extensively used throughout of drivers. We also provide some mechanisms
  *   to easily query select properties of these numbers, i.e. some type traits.
+ * - adolc_math.h: Extension of the Adol-C math operations that allow these numbers to be used
+ *   consistently throughout the library.
  * - adolc_number_types.h: Implementation of the internal classes that define how we
  *   use Adol-C numbers.
  * - adolc_product_types.h: Defines some product and scalar types that allow the use of
