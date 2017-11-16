@@ -562,11 +562,15 @@ namespace PETScWrappers
 
 
   /**
-   * A class that implements the interface to use the PETSc LU preconditioner (@p PCLU).
+   * A class that implements the interface to use the PETSc LU preconditioner
+   * (@p PCLU). Unlike classes like PreconditionILU, this class usually
+   * (depending on the settings) performs an exact factorization of the
+   * matrix, so it is not necessary to wrap it in an iterative solver. This
+   * class is typically used with SolverPreOnly to get a direct
+   * solver. Alternatively, you can use PreconditionerBase::vmult() directly.
    *
    * @note This is not a parallel preconditioner so it only works in serial
-   * with a single processor and only when using a
-   * PETScWrappers::SparseMatrix.
+   * computations with a single processor.
    *
    * @ingroup PETScWrappers
    * @author Oliver Kayser-Herold, 2004
