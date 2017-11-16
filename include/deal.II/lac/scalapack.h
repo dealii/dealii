@@ -23,9 +23,116 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/lapack_support.h>
+#include <deal.II/base/mpi.h>
 #include <mpi.h>
 
+#include <memory>
+
 DEAL_II_NAMESPACE_OPEN
+
+
+/**
+ * Forward declaration of class ScaLAPACKMatrix
+ */
+template <typename NumberType> class ScaLAPACKMatrix;
+
+
+/**
+ * A class taking care of setting up the process grid for BLACS
+ * ScaLapack matrices will have shared pointer of this class to perform block-cyclic distribution
+ */
+class ProcessGrid
+{
+public:
+
+	/**
+	 * Declare class ScaLAPACK as friend to provide access to private members, e.g. the MPI Communicator
+	 */
+	template <typename NumberType> friend class ScaLAPACKMatrix;
+
+  /*
+   * Constructor for a process grid for a given @p mpi_communicator
+   * The pair @p grid_dimensions contains the user-defined numbers of process rows and columns
+   */
+  ProcessGrid(MPI_Comm mpi_communicator, const std::pair<int,int> &grid_dimensions);
+
+  /*
+   * Constructor for a process grid for a given @p mpi_communicator
+   * The process grid is built based on the dimension and blockcyclic distribution of a target matrix described by @p matrix_dimensions and @p block_sizes
+   */
+  ProcessGrid(MPI_Comm mpi_communicator,
+              const std::pair<int,int> &matrix_dimensions, const std::pair<int,int> &block_sizes);
+
+  /**
+  * Destructor
+  */
+  virtual ~ProcessGrid();
+
+  /**
+  * Return the number of rows in processes grid.
+  */
+  int get_process_grid_rows() const;
+
+  /**
+  * Return the number of columns in processes grid.
+  */
+  int get_process_grid_columns() const;
+
+private:
+
+  /**
+  * MPI communicator with all processes
+  */
+  MPI_Comm mpi_communicator;
+
+  /**
+  * MPI communicator with inactive processes and the root
+  */
+  MPI_Comm mpi_communicator_inactive_with_root;
+
+  /**
+  * BLACS context
+  */
+  int blacs_context;
+
+  /**
+  * ID of this MPI process
+  */
+  int this_mpi_process;
+
+  /**
+  * Total number of MPI processes
+  */
+  int n_mpi_processes;
+
+  /**
+  * Number of rows in processes grid
+  */
+  int n_process_rows;
+
+  /**
+  * Number of columns in processes grid
+  */
+  int n_process_columns;
+
+  /**
+  * Row of this process in the grid
+  */
+  int this_process_row;
+
+  /**
+  * Column of this process in the grid
+  */
+  int this_process_column;
+
+  /**
+  * A flag which is true for processes within the 2D process grid
+  */
+  bool active;
+
+protected:
+};
+
 
 /**
  * A wrapper class around ScaLAPACK parallel dense linear algebra.
@@ -77,7 +184,6 @@ DEAL_II_NAMESPACE_OPEN
  *      |   .    .    .    .   -4.0  |    .    .    .  -4.0
  * @endcode
  *
- * Currently, only symmetric real matrices are supported.
  *
  * Here is a strong scaling example of ScaLAPACKMatrix::invert()
  * on up to 5 nodes each composed of two Intel Xeon 2660v2 IvyBridge sockets
@@ -103,25 +209,33 @@ public:
    * Constructor for a rectangular matrix with @p rows and @p columns, distributed
    * in a given @p mpi_communicator .
    *
-   * The choice of the block size @p block_size is a compromize between a large
-   * enough sizes for efficient local BLAS and small enough get
+   * The choice of the block size @p block_size is a compromise between a large
+   * enough sizes for efficient local BLAS and small enough to get
    * good parallel load balance.
    */
   ScaLAPACKMatrix(const size_type rows, const size_type columns,
-                  MPI_Comm mpi_communicator,
+                  std::shared_ptr<ProcessGrid> process_grid,
                   const unsigned int block_size_row = 32, const unsigned int block_size_column = 32,
+                  const LAPACKSupport::Property property = LAPACKSupport::Property::general);
+
+  /*
+   * Alternative constructor having the matrix dimensions and block sizes in the std::pairs @p sizes and @p block_sizes
+   */
+  ScaLAPACKMatrix(const std::pair<size_type,size_type> &sizes,
+                  std::shared_ptr<ProcessGrid> process_grid,
+                  const std::pair<size_type,size_type> &block_sizes = std::make_pair(32,32),
                   const LAPACKSupport::Property property = LAPACKSupport::Property::general);
 
   /**
    * Constructor for a square matrix of size @p size, distributed
-   * in a given @p mpi_communicator .
+   * using the process grid in @p process_grid.
    *
    * The choice of the block size @p block_size is a compromize between a large
    * enough sizes for efficient local BLAS and small enough get
    * good parallel load balance.
    */
   ScaLAPACKMatrix(const size_type size,
-                  MPI_Comm mpi_communicator,
+                  std::shared_ptr<ProcessGrid> process_grid,
                   const unsigned int block_size = 32);
 
   /**
@@ -268,14 +382,9 @@ private:
   LAPACKSupport::Property properties;
 
   /**
-   * MPI communicator with all processes
+   * Shared pointer to ProcessGrid object which contains Blacs context and MPI communicator as well as other necessary data structures
    */
-  MPI_Comm mpi_communicator;
-
-  /**
-   * MPI communicator with inactive processes and the root
-   */
-  MPI_Comm mpi_communicator_inactive_with_root;
+  std::shared_ptr<ProcessGrid> grid;
 
   /**
    * Number of rows in the matrix
@@ -296,41 +405,6 @@ private:
    * Column block size
    */
   int column_block_size;
-
-  /**
-   * BLACS context
-   */
-  int blacs_context;
-
-  /**
-   * ID of this MPI process
-   */
-  int this_mpi_process;
-
-  /**
-   * Total number of MPI processes
-   */
-  int n_mpi_processes;
-
-  /**
-   * Number of rows in processes grid
-   */
-  int n_process_rows;
-
-  /**
-   * Number of columns in processes grid
-   */
-  int n_process_columns;
-
-  /**
-   * Row of this process in the grid
-   */
-  int this_process_row;
-
-  /**
-   * Column of this process in the grid
-   */
-  int this_process_column;
 
   /**
    * Number of rows in the matrix owned by the current process
@@ -356,11 +430,6 @@ private:
    * Integer workspace array
    */
   mutable std::vector<int> iwork;
-
-  /**
-   * A flag which is true for processes within the 2D process grid
-   */
-  bool active;
 
   /**
    * A character to define where elements are stored in case
