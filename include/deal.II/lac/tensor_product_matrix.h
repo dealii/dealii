@@ -520,7 +520,7 @@ TensorProductMatrixSymmetricSumBase<dim,Number,size>
   eval(AlignedVector<Number>(), AlignedVector<Number>(),
        AlignedVector<Number>(), mass_matrix[0].n_rows()-1, mass_matrix[0].n_rows());
   Number *t = tmp_array.begin();
-  const Number *src = src_view.begin();
+  const Number *src = src_view.data();
   Number *dst = &(dst_view[0]);
 
   // NOTE: dof_to_quad has to be interpreted as 'dof to eigenvalue index'

@@ -194,6 +194,12 @@ public:
   std::size_t size() const;
 
   /**
+   * Return a pointer to the underlying array serving as element storage.
+   * In case the container is empty a nullptr is returned.
+   */
+  value_type *data() const noexcept;
+
+  /**
    * Return an iterator pointing to the beginning of the array view.
    */
   iterator begin() const;
@@ -256,9 +262,8 @@ ArrayView<ElementType>::ArrayView()
 
 template <typename ElementType>
 inline
-ArrayView<ElementType>::
-ArrayView(value_type        *starting_element,
-          const std::size_t  n_elements)
+ArrayView<ElementType>::ArrayView(value_type        *starting_element,
+                                  const std::size_t  n_elements)
   :
   starting_element (starting_element),
   n_elements(n_elements)
@@ -319,7 +324,7 @@ inline
 bool
 ArrayView<ElementType>::operator == (const ArrayView<const value_type> &other_view) const
 {
-  return (other_view.begin() == starting_element)
+  return (other_view.data() == starting_element)
          && (other_view.size() == n_elements);
 }
 
@@ -331,7 +336,7 @@ bool
 ArrayView<ElementType>::operator ==
 (const ArrayView<typename std::remove_cv<value_type>::type> &other_view) const
 {
-  return (other_view.begin() == starting_element)
+  return (other_view.data() == starting_element)
          && (other_view.size() == n_elements);
 }
 
@@ -343,6 +348,19 @@ bool
 ArrayView<ElementType>::operator != (const ArrayView<const value_type> &other_view) const
 {
   return !(*this == other_view);
+}
+
+
+
+template <typename ElementType>
+inline
+typename ArrayView<ElementType>::value_type *
+ArrayView<ElementType>::data() const noexcept
+{
+  if (n_elements==0)
+    return nullptr;
+  else
+    return starting_element;
 }
 
 
@@ -375,6 +393,7 @@ ArrayView<ElementType>::begin() const
 }
 
 
+
 template <typename ElementType>
 inline
 typename ArrayView<ElementType>::iterator
@@ -382,6 +401,8 @@ ArrayView<ElementType>::end() const
 {
   return starting_element + n_elements;
 }
+
+
 
 template <typename ElementType>
 inline
@@ -392,6 +413,7 @@ ArrayView<ElementType>::cbegin() const
 }
 
 
+
 template <typename ElementType>
 inline
 typename ArrayView<ElementType>::const_iterator
@@ -399,6 +421,7 @@ ArrayView<ElementType>::cend() const
 {
   return starting_element + n_elements;
 }
+
 
 
 template <typename ElementType>

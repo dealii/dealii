@@ -69,9 +69,9 @@ namespace Utilities
       const bool use_larger_set = (n_ghost_indices_in_larger_set > n_ghost_indices() &&
                                    ghost_array.size() == n_ghost_indices_in_larger_set);
       Number *ghost_array_ptr = use_larger_set ?
-                                ghost_array.begin()+
+                                ghost_array.data()+
                                 n_ghost_indices_in_larger_set-n_ghost_indices()
-                                : ghost_array.begin();
+                                : ghost_array.data();
 
       for (unsigned int i=0; i<n_ghost_targets; i++)
         {
@@ -88,7 +88,7 @@ namespace Utilities
           ghost_array_ptr += ghost_targets()[i].second;
         }
 
-      Number *temp_array_ptr = temporary_storage.begin();
+      Number *temp_array_ptr = temporary_storage.data();
       for (unsigned int i=0; i<n_import_targets; i++)
         {
           // copy the data to be sent to the import_data field
@@ -213,7 +213,7 @@ namespace Utilities
       requests.resize (n_import_targets + n_ghost_targets);
 
       // initiate the receive operations
-      Number *temp_array_ptr = temporary_storage.begin();
+      Number *temp_array_ptr = temporary_storage.data();
       for (unsigned int i=0; i<n_import_targets; i++)
         {
           AssertThrow (static_cast<std::size_t>(import_targets_data[i].second)*
@@ -238,7 +238,7 @@ namespace Utilities
       // in case we want to import only from a subset of the ghosts we want to
       // move the data to send to the front of the array
       AssertIndexRange(n_ghost_indices(), n_ghost_indices_in_larger_set+1);
-      Number *ghost_array_ptr = ghost_array.begin();
+      Number *ghost_array_ptr = ghost_array.data();
       for (unsigned int i=0; i<n_ghost_targets; i++)
         {
           // in case we only sent a subset of indices, we now need to move the data
@@ -251,7 +251,7 @@ namespace Utilities
               end_my_ghosts = ghost_indices_subset_data.begin()+ghost_indices_subset_chunks_by_rank_data[i+1];
               unsigned int offset = 0;
               for ( ; my_ghosts != end_my_ghosts; ++my_ghosts)
-                if (ghost_array_ptr + offset != ghost_array.begin() + my_ghosts->first)
+                if (ghost_array_ptr + offset != ghost_array.data() + my_ghosts->first)
                   for (unsigned int j=my_ghosts->first; j<my_ghosts->second; ++j, ++offset)
                     {
                       ghost_array_ptr[offset] = ghost_array[j];
@@ -334,7 +334,7 @@ namespace Utilities
                                   "vector_operation argument was passed to "
                                   "import_from_ghosted_array_start as is passed "
                                   "to import_from_ghosted_array_finish."));
-          std::memset(ghost_array.begin(), 0, sizeof(Number)*ghost_array.size());
+          std::memset(ghost_array.data(), 0, sizeof(Number)*ghost_array.size());
           return;
         }
 #endif
@@ -357,7 +357,7 @@ namespace Utilities
                                         MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
 
-          const Number *read_position = temporary_storage.begin();
+          const Number *read_position = temporary_storage.data();
           std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
           my_imports = import_indices_data.begin();
 
@@ -386,7 +386,7 @@ namespace Utilities
                        typename LinearAlgebra::distributed::Vector<Number>::
                        ExcNonMatchingElements(*read_position, locally_owned_array[j],
                                               my_pid));
-          AssertDimension(read_position-temporary_storage.begin(), n_import_indices());
+          AssertDimension(read_position-temporary_storage.data(), n_import_indices());
         }
 
       // wait for the send operations to complete
@@ -405,7 +405,7 @@ namespace Utilities
       if (ghost_array.size()>0)
         {
           Assert(ghost_array.begin()!=nullptr, ExcInternalError());
-          std::memset(ghost_array.begin(), 0, sizeof(Number)*n_ghost_indices());
+          std::memset(ghost_array.data(), 0, sizeof(Number)*n_ghost_indices());
         }
 
       // clear the compress requests
