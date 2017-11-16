@@ -3013,9 +3013,13 @@ namespace internal
             // know how to serialize itself. consequently, first copy it over
             // to an array of bytes, and then serialize that
             std::vector<char> quadrants_as_chars (sizeof(quadrants[0]) * quadrants.size());
-            std::memcpy(quadrants_as_chars.data(),
-                        quadrants.data(),
-                        quadrants_as_chars.size());
+            if (quadrants_as_chars.size()>0)
+              {
+                Assert(quadrants.data() != nullptr, ExcInternalError());
+                std::memcpy(quadrants_as_chars.data(),
+                            quadrants.data(),
+                            quadrants_as_chars.size());
+              }
 
             // now serialize everything
             ar &quadrants_as_chars
@@ -3037,10 +3041,15 @@ namespace internal
             &tree_indices
             &dof_numbers_and_indices;
 
-            quadrants.resize (quadrants_as_chars.size() / sizeof(quadrants[0]));
-            std::memcpy(quadrants.data(),
-                        quadrants_as_chars.data(),
-                        quadrants_as_chars.size());
+            if (quadrants_as_chars.size()>0)
+              {
+                quadrants.resize (quadrants_as_chars.size() / sizeof(quadrants[0]));
+                std::memcpy(quadrants.data(),
+                            quadrants_as_chars.data(),
+                            quadrants_as_chars.size());
+              }
+            else
+              quadrants.clear();
           }
 
           BOOST_SERIALIZATION_SPLIT_MEMBER()
@@ -4454,12 +4463,20 @@ namespace internal
                 break;
               n_ghosts_on_smaller_ranks += t.second;
             }
-          std::memmove(ghosted_new_numbers.data(),
-                       ghosted_new_numbers.data()+new_numbers.size(),
-                       sizeof(types::global_dof_index)*n_ghosts_on_smaller_ranks);
-          std::memcpy(ghosted_new_numbers.data()+n_ghosts_on_smaller_ranks,
-                      new_numbers.data(),
-                      sizeof(types::global_dof_index)*new_numbers.size());
+          if (n_ghosts_on_smaller_ranks>0)
+            {
+              Assert(ghosted_new_numbers.data()!=nullptr, ExcInternalError());
+              std::memmove(ghosted_new_numbers.data(),
+                           ghosted_new_numbers.data()+new_numbers.size(),
+                           sizeof(types::global_dof_index)*n_ghosts_on_smaller_ranks);
+            }
+          if (new_numbers.size()>0)
+            {
+              Assert (new_numbers.data()!=nullptr, ExcInternalError());
+              std::memcpy(ghosted_new_numbers.data()+n_ghosts_on_smaller_ranks,
+                          new_numbers.data(),
+                          sizeof(types::global_dof_index)*new_numbers.size());
+            }
         }
 
         // in case we do not own any of the given level (but only some remote
