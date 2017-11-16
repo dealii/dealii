@@ -1623,7 +1623,10 @@ next_cell:
             vertex_to_point = p - mesh.get_vertices()[closest_vertex_index];
           }
 
-        vertex_to_point /= vertex_to_point.norm();
+        const double vertex_point_norm = vertex_to_point.norm();
+        if (vertex_point_norm > 0)
+          vertex_to_point /= vertex_point_norm;
+
         const unsigned int n_neighbor_cells = vertex_to_cells[closest_vertex_index].size();
 
         // Create a corresponding map of vectors from vertex to cell center
