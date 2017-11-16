@@ -24,6 +24,39 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
+ * The enumerator NeighborType describes the neighboring relation between
+ * two bounding boxes.
+ */
+enum class NeighborType
+{
+  /**
+   * not neighbours: the intersection is empty
+   */
+  not_neighbors = 0,
+
+  /**
+   * simple neighbors: the boxes intersect with an intersection of dimension at most spacedim - 2
+   */
+  simple_neighbors = 1,
+
+  /**
+   * attached neighbors: neighbors with an intersection of dimension > spacedim - 2
+   */
+  attached_neighbors = 2,
+
+  /**
+   * mergeable neighbors: neighbors which can be expressed with a single Bounding Box, e.g.
+  *  @code
+  *  .--V--W    .-----V
+  *  |  |  | =  |     |
+  *  V--W--.    V-----.
+  *  @endcode
+  *  or one is inside the other
+   */
+  mergeable_neighbors = 3
+};
+
+/**
  * A class that represents a bounding box in a space with arbitrary dimension
  * <tt>spacedim</tt>.
  *
@@ -77,6 +110,14 @@ public:
   const std::pair<Point<spacedim,Number>,Point<spacedim,Number>> &get_boundary_points () const;
 
   /**
+   * Check if the current object and @p other_bbox are neighbors, i.e. if the boxes
+   * have dimension spacedim, check if their intersection is non empty.
+   *
+   * Return an enumerator of type NeighborType.
+   */
+  NeighborType get_neighbor_type (const BoundingBox<spacedim,Number> &other_bbox) const;
+
+  /**
    * Enlarge the current object so that it contains @p other_bbox .
    * If the current object already contains @p other_bbox then it is not changed
    * by this function.
@@ -84,7 +125,7 @@ public:
   void merge_with(const BoundingBox<spacedim,Number> &other_bbox);
 
   /**
-   * Return true if the point is inside the Bounding Box, false otherwise
+   * Return true if the point is inside the Bounding Box, false otherwise.
    */
   bool point_inside (const Point<spacedim, Number> &p) const;
 
