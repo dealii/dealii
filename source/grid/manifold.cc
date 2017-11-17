@@ -571,7 +571,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
 
   // check whether periodicity shifts some of the points. Only do this if
   // necessary to avoid memory allocation
-  const Point<spacedim> *surrounding_points_start = surrounding_points.begin();
+  const Point<spacedim> *surrounding_points_start = surrounding_points.data();
 
   boost::container::small_vector<Point<spacedim>, 200> modified_points;
   bool adjust_periodicity = false;

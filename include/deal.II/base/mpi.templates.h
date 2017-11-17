@@ -127,12 +127,12 @@ namespace Utilities
                               // implementations of MPI-2. It is not needed as
                               // of MPI-3 and we should remove it at some
                               // point in the future.
-                              const_cast<void *>(static_cast<const void *>(values.begin()))
+                              const_cast<void *>(static_cast<const void *>(values.data()))
                               :
                               MPI_IN_PLACE,
-                              static_cast<void *>(output.begin()),
+                              static_cast<void *>(output.data()),
                               static_cast<int>(values.size()),
-                              internal::mpi_type_id(values.begin()),
+                              internal::mpi_type_id(values.data()),
                               mpi_op,
                               mpi_communicator);
             AssertThrowMPI(ierr);
@@ -167,10 +167,10 @@ namespace Utilities
                               // implementations of MPI-2. It is not needed as
                               // of MPI-3 and we should remove it at some
                               // point in the future.
-                              const_cast<void *>(static_cast<const void *>(values.begin()))
+                              const_cast<void *>(static_cast<const void *>(values.data()))
                               :
                               MPI_IN_PLACE,
-                              static_cast<void *>(output.begin()),
+                              static_cast<void *>(output.data()),
                               static_cast<int>(values.size()*2),
                               internal::mpi_type_id(static_cast<T *>(nullptr)),
                               mpi_op,
