@@ -88,7 +88,7 @@ NeighborType BoundingBox < spacedim,Number >::get_neighbor_type (const BoundingB
              std::numeric_limits<Number>::epsilon() * (std::abs( intersect_bbox_min[d]) + std::abs(intersect_bbox_max[d] )) )
           --intersect_dim;
 
-      if ( intersect_dim == 0 || intersect_dim == spacedim - 2 )
+      if ( intersect_dim == 0 || intersect_dim + 2 == spacedim )
         return NeighborType::simple_neighbors;
 
       // Checking the two mergeable cases: first if the boxes are aligned so that they can be merged
