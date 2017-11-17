@@ -227,14 +227,14 @@ namespace Particles
   {
     const internal::LevelInd level_index = std::make_pair<int, int> (cell->level(),cell->index());
 
-    std::pair<typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator,
-        typename std::multimap<internal::LevelInd, Particle<dim,spacedim> >::iterator> particles_in_cell;
+    if (cell->is_ghost())
+      {
+        const auto particles_in_cell = ghost_particles.equal_range(level_index);
+        return boost::make_iterator_range(particle_iterator(ghost_particles,particles_in_cell.first),
+                                          particle_iterator(ghost_particles,particles_in_cell.second));
+      }
 
-    if (!cell->is_ghost())
-      particles_in_cell = particles.equal_range(level_index);
-    else
-      particles_in_cell = ghost_particles.equal_range(level_index);
-
+    const auto particles_in_cell = particles.equal_range(level_index);
     return boost::make_iterator_range(particle_iterator(particles,particles_in_cell.first),
                                       particle_iterator(particles,particles_in_cell.second));
   }
