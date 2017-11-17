@@ -4522,10 +4522,8 @@ namespace VectorTools
                   // cannot check this.
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                     {
-                      typedef FiniteElement<dim> FEL;
                       AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != nullptr,
-
-                                   typename FEL::ExcInterpolationNotImplemented ());
+                                   (typename FiniteElement<dim>::ExcInterpolationNotImplemented ()));
                     }
 
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
@@ -4606,10 +4604,8 @@ namespace VectorTools
                   // check this.
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                     {
-                      typedef FiniteElement<dim> FEL;
-
                       AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != nullptr,
-                                   typename FEL::ExcInterpolationNotImplemented ());
+                                   typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
                     }
 
                   for (unsigned int dof = 0; dof < dofs_per_face; ++dof)
@@ -4721,10 +4717,8 @@ namespace VectorTools
                   // element. If the FE is a FESystem we cannot check this.
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                     {
-                      typedef FiniteElement<dim> FEL;
-
                       AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != nullptr,
-                                   typename FEL::ExcInterpolationNotImplemented ());
+                                   typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
                     }
 
                   const unsigned int dofs_per_face = cell->get_fe ().dofs_per_face;
@@ -4798,10 +4792,8 @@ namespace VectorTools
                   // element. If the FE is a FESystem we cannot check this.
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                     {
-                      typedef FiniteElement<dim> FEL;
-
                       AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != nullptr,
-                                   typename FEL::ExcInterpolationNotImplemented ());
+                                   typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
                     }
 
                   const unsigned int superdegree = cell->get_fe ().degree;
@@ -5549,9 +5541,8 @@ namespace VectorTools
                           // If the FE is a FESystem we cannot check this.
                           if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                             {
-                              typedef FiniteElement<dim> FEL;
                               AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != nullptr,
-                                           typename FEL::ExcInterpolationNotImplemented ());
+                                           typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
 
                             }
 
@@ -5646,10 +5637,8 @@ namespace VectorTools
                           // If the FE is a FESystem we cannot check this.
                           if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                             {
-                              typedef FiniteElement<dim> FEL;
-
                               AssertThrow (dynamic_cast<const FE_Nedelec<dim>*> (&cell->get_fe ()) != nullptr,
-                                           typename FEL::ExcInterpolationNotImplemented ());
+                                           typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
                             }
 
                           const unsigned int superdegree = cell->get_fe ().degree;
@@ -6011,10 +6000,8 @@ namespace VectorTools
                   // check this.
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                     {
-                      typedef FiniteElement<dim> FEL;
-
                       AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != nullptr,
-                                   typename FEL::ExcInterpolationNotImplemented ());
+                                   typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
                     }
 
                   fe_values.reinit (cell, face + cell->active_fe_index ()
@@ -6075,10 +6062,8 @@ namespace VectorTools
                   // check this.
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                     {
-                      typedef FiniteElement<dim> FEL;
-
                       AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != nullptr,
-                                   typename FEL::ExcInterpolationNotImplemented ());
+                                   typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
                     }
 
                   fe_values.reinit (cell, face + cell->active_fe_index ()
@@ -6166,10 +6151,8 @@ namespace VectorTools
                   // check this.
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                     {
-                      typedef FiniteElement<dim> FEL;
-
                       AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != nullptr,
-                                   typename FEL::ExcInterpolationNotImplemented ());
+                                   typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
                     }
 
                   fe_values.reinit (cell, face + cell->active_fe_index ()
@@ -6213,10 +6196,8 @@ namespace VectorTools
                   // check this.
                   if (dynamic_cast<const FESystem<dim>*> (&cell->get_fe ()) == nullptr)
                     {
-                      typedef FiniteElement<dim> FEL;
-
                       AssertThrow (dynamic_cast<const FE_RaviartThomas<dim>*> (&cell->get_fe ()) != nullptr,
-                                   typename FEL::ExcInterpolationNotImplemented ());
+                                   typename FiniteElement<dim>::ExcInterpolationNotImplemented ());
                     }
 
                   fe_values.reinit (cell, face + cell->active_fe_index ()

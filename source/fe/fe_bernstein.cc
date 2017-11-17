@@ -53,9 +53,9 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &,
                           FullMatrix<double> &) const
 {
   // no interpolation possible. throw exception, as documentation says
-  typedef FiniteElement<dim,spacedim> FEE;
   AssertThrow (false,
-               typename FEE::ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 }
 
 
@@ -65,9 +65,8 @@ const FullMatrix<double> &
 FE_Bernstein<dim,spacedim>::get_restriction_matrix (const unsigned int,
                                                     const RefinementCase<dim> &) const
 {
-  typedef FiniteElement<dim,spacedim> FEE;
   AssertThrow (false,
-               typename FEE::ExcProjectionVoid());
+               (typename FiniteElement<dim,spacedim>::ExcProjectionVoid()));
   // return dummy, nothing will happen because the base class FE_Q_Base
   // implements lazy evaluation of those matrices
   return this->restriction[0][0];
@@ -80,9 +79,8 @@ const FullMatrix<double> &
 FE_Bernstein<dim,spacedim>::get_prolongation_matrix (const unsigned int,
                                                      const RefinementCase<dim> &) const
 {
-  typedef FiniteElement<dim,spacedim> FEE;
   AssertThrow (false,
-               typename FEE::ExcEmbeddingVoid());
+               (typename FiniteElement<dim,spacedim>::ExcEmbeddingVoid()));
   // return dummy, nothing will happen because the base class FE_Q_Base
   // implements lazy evaluation of those matrices
   return this->prolongation[0][0];

@@ -790,8 +790,8 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
     }
   else
     {
-      typedef FiniteElement<dim,spacedim> FEL;
-      AssertThrow(false,typename FEL::ExcInterpolationNotImplemented());
+      AssertThrow(false, (typename FiniteElement<dim,spacedim>::
+                          ExcInterpolationNotImplemented()));
     }
 }
 
@@ -812,8 +812,8 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
     }
   else
     {
-      typedef FiniteElement<dim,spacedim> FEL;
-      AssertThrow(false,typename FEL::ExcInterpolationNotImplemented());
+      AssertThrow(false,(typename FiniteElement<dim,spacedim>::
+                         ExcInterpolationNotImplemented()));
     }
 }
 

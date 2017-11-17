@@ -849,10 +849,9 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &,
   // by default, no interpolation
   // implemented. so throw exception,
   // as documentation says
-  typedef FiniteElement<dim,spacedim> FEE;
   AssertThrow (false,
-               typename FEE::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 }
 
 
@@ -866,10 +865,9 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &,
   // by default, no interpolation
   // implemented. so throw exception,
   // as documentation says
-  typedef    FiniteElement<dim,spacedim> FEE;
   AssertThrow (false,
-               typename FEE::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 }
 
 
@@ -884,9 +882,9 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &,
   // by default, no interpolation
   // implemented. so throw exception,
   // as documentation says
-  typedef    FiniteElement<dim,spacedim> FEE;
   AssertThrow (false,
-               typename FEE::ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 }
 
 

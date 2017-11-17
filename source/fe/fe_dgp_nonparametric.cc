@@ -431,12 +431,11 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   (void)interpolation_matrix;
-  typedef              FiniteElement<dim,spacedim> FEE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPNonparametric<") == 0)
                ||
                (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&x_source_fe) != nullptr),
-               typename FEE::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 
   Assert (interpolation_matrix.m() == 0,
           ExcDimensionMismatch (interpolation_matrix.m(),
@@ -462,12 +461,10 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
   // is necessarily empty -- i.e. there isn't
   // much we need to do here.
   (void)interpolation_matrix;
-  typedef              FiniteElement<dim,spacedim> FEE;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGPNonparametric<") == 0)
                ||
                (dynamic_cast<const FE_DGPNonparametric<dim,spacedim>*>(&x_source_fe) != nullptr),
-               typename FEE::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented()));
 
   Assert (interpolation_matrix.m() == 0,
           ExcDimensionMismatch (interpolation_matrix.m(),
