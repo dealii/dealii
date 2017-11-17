@@ -1,0 +1,150 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2016 - 2017 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+// TODO: Include complex types
+
+for (deal_II_dimension : DIMENSIONS ; number : REAL_SCALARS)
+{
+  namespace Differentiation
+  \{
+  namespace AD
+  \{
+    // -------------------------- ADHelperBase ----------------------
+
+    template
+    class ADHelperBase<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperBase<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- ADHelperPointLevelFunctionsBase ----------------------
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- ADHelperScalarFunction ----------------------
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- ADHelperVectorFunction ----------------------
+
+    template
+    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- ADHelperCellLevelBase ----------------------
+
+    template
+    class ADHelperCellLevelBase<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperCellLevelBase<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- ADHelperVariationalFormulation ----------------------
+
+    template
+    class ADHelperVariationalFormulation<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperVariationalFormulation<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
+    // -------------------------- ADHelperResidualLinearisation ----------------------
+
+    template
+    class ADHelperResidualLinearisation<deal_II_dimension,NumberTypes::adolc_taped,number>;
+
+    template
+    class ADHelperResidualLinearisation<deal_II_dimension,NumberTypes::adolc_tapeless,number>;
+
+    \}
+    \}
+}
+
+// Instantiations for NumberTraits for which the underlying number type is fixed
+for (deal_II_dimension : DIMENSIONS)
+{
+    namespace Differentiation
+    \{
+    namespace AD
+    \{
+
+    // -------------------------- ADHelperBase ----------------------
+
+    template
+    class ADHelperBase<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperBase<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperPointLevelFunctionsBase ----------------------
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperPointLevelFunctionsBase<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperScalarFunction ----------------------
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperScalarFunction<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperVectorFunction ----------------------
+
+    template
+    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperVectorFunction<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperCellLevelBase ----------------------
+
+    template
+    class ADHelperCellLevelBase<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperCellLevelBase<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperVariationalFormulation ----------------------
+
+    template
+    class ADHelperVariationalFormulation<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperVariationalFormulation<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    // -------------------------- ADHelperResidualLinearisation ----------------------
+
+    template
+    class ADHelperResidualLinearisation<deal_II_dimension,NumberTypes::adolc_taped,typename NumberTraits<double,NumberTypes::adolc_taped>::ad_type>;
+
+    template
+    class ADHelperResidualLinearisation<deal_II_dimension,NumberTypes::adolc_tapeless,typename NumberTraits<double,NumberTypes::adolc_tapeless>::ad_type>;
+
+    \}
+    \}
+}

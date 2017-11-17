@@ -1,0 +1,5 @@
+New: A new collection of classes and functions have been implemented in the
+Differentiation::AD namespace that provide an interface to the Adol-C and
+Sacado (a part of Trilinos) automatic differentiation libraries.
+<br>
+(Jean-Paul Pelteret, 2017/11/16)

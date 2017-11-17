@@ -16,11 +16,14 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(_src
+  ad_helpers.cc
   adolc_number_types.cc
   sacado_number_types.cc
   )
 
 SET(_inst
+  ad_helpers.inst1.in
+  ad_helpers.inst2.in
   adolc_number_types.inst.in
   sacado_number_types.inst1.in
   sacado_number_types.inst2.in
