@@ -102,9 +102,10 @@ namespace Threads
 
       /**
        * Destructor. Unlock the mutex. Since this is a dummy mutex class, this
-       * of course does nothing.
+       * of course does nothing. We still don't declare it as 'default' to avoid
+       * warnings about objects of this class being unused.
        */
-      ~ScopedLock () = default;
+      ~ScopedLock () {};
     };
 
     /**
