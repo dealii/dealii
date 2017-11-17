@@ -210,13 +210,12 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 {
   // this is only implemented, if the source FE is also a Q_DG0 element
   typedef FE_Q_DG0<dim,spacedim> FEQDG0;
-  typedef FiniteElement<dim,spacedim> FEL;
 
   AssertThrow ((x_source_fe.get_name().find ("FE_Q_DG0<") == 0)
                ||
                (dynamic_cast<const FEQDG0 *>(&x_source_fe) != nullptr),
-               typename FEL::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 
   Assert (interpolation_matrix.m() == this->dofs_per_cell,
           ExcDimensionMismatch (interpolation_matrix.m(),

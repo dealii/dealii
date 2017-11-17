@@ -828,12 +828,10 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   // source FE is also a
   // Q_Hierarchical element
   typedef FE_Q_Hierarchical<dim> FEQHierarchical;
-  typedef FiniteElement<dim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_Q_Hierarchical<") == 0)
                ||
                (dynamic_cast<const FEQHierarchical *>(&x_source_fe) != nullptr),
-               typename FEL::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
 
   Assert (interpolation_matrix.n() == this->dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.n(),
@@ -860,8 +858,8 @@ get_face_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   // hp procedures, which use this
   // method.
   Assert (this->dofs_per_face <= source_fe.dofs_per_face,
-          typename FEL::
-          ExcInterpolationNotImplemented ());
+          (typename FiniteElement<dim>::
+           ExcInterpolationNotImplemented ()));
   interpolation_matrix = 0;
 
   switch (dim)
@@ -916,12 +914,10 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   // source FE is also a
   // Q_Hierarchical element
   typedef FE_Q_Hierarchical<dim> FEQHierarchical;
-  typedef FiniteElement<dim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_Q_Hierarchical<") == 0)
                ||
                (dynamic_cast<const FEQHierarchical *>(&x_source_fe) != nullptr),
-               typename FEL::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim>::ExcInterpolationNotImplemented()));
 
   Assert (interpolation_matrix.n() == this->dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.n(),
@@ -947,8 +943,8 @@ get_subface_interpolation_matrix (const FiniteElement<dim> &x_source_fe,
   // hp procedures, which use this
   // method.
   Assert (this->dofs_per_face <= source_fe.dofs_per_face,
-          typename FEL::
-          ExcInterpolationNotImplemented ());
+          (typename FiniteElement<dim>::
+           ExcInterpolationNotImplemented ()));
 
   switch (dim)
     {

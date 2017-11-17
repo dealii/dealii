@@ -171,8 +171,7 @@ FE_PolyTensor<PolynomialType,dim,spacedim>::shape_value
 (const unsigned int, const Point<dim> &) const
 
 {
-  typedef    FiniteElement<dim,spacedim> FEE;
-  Assert(false, typename FEE::ExcFENotPrimitive());
+  Assert(false, (typename FiniteElement<dim,spacedim>::ExcFENotPrimitive()));
   return 0.;
 }
 
@@ -216,8 +215,7 @@ Tensor<1,dim>
 FE_PolyTensor<PolynomialType,dim,spacedim>::shape_grad (const unsigned int,
                                                         const Point<dim> &) const
 {
-  typedef    FiniteElement<dim,spacedim> FEE;
-  Assert(false, typename FEE::ExcFENotPrimitive());
+  Assert(false, (typename FiniteElement<dim,spacedim>::ExcFENotPrimitive()));
   return Tensor<1,dim>();
 }
 
@@ -263,8 +261,7 @@ FE_PolyTensor<PolynomialType,dim,spacedim>::shape_grad_grad
 (const unsigned int,
  const Point<dim> &) const
 {
-  typedef    FiniteElement<dim,spacedim> FEE;
-  Assert(false, typename FEE::ExcFENotPrimitive());
+  Assert(false, (typename FiniteElement<dim,spacedim>::ExcFENotPrimitive()));
   return Tensor<2,dim>();
 }
 

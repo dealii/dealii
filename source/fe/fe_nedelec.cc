@@ -2471,12 +2471,10 @@ const
   // this is only implemented, if the
   // source FE is also a
   // Nedelec element
-  typedef FE_Nedelec<dim> FEN;
-  typedef FiniteElement<dim> FEL;
-
   AssertThrow ((source.get_name ().find ("FE_Nedelec<") == 0) ||
-               (dynamic_cast<const FEN *> (&source) != nullptr),
-               typename FEL::ExcInterpolationNotImplemented());
+               (dynamic_cast<const FE_Nedelec<dim> *> (&source) != nullptr),
+               (typename FiniteElement<dim>::
+                ExcInterpolationNotImplemented()));
   Assert (interpolation_matrix.m () == source.dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.m (),
                                 source.dofs_per_face));
@@ -2501,7 +2499,8 @@ const
   // hp procedures, which use this
   // method.
   Assert (this->dofs_per_face <= source_fe.dofs_per_face,
-          typename FEL::ExcInterpolationNotImplemented ());
+          (typename FiniteElement<dim>::
+           ExcInterpolationNotImplemented ()));
   interpolation_matrix = 0;
 
   // On lines we can just identify
@@ -2579,12 +2578,10 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   // this is only implemented, if the
   // source FE is also a
   // Nedelec element
-  typedef FE_Nedelec<dim> FEN;
-  typedef FiniteElement<dim> FEL;
-
   AssertThrow ((source.get_name ().find ("FE_Nedelec<") == 0) ||
-               (dynamic_cast<const FEN *> (&source) != nullptr),
-               typename FEL::ExcInterpolationNotImplemented ());
+               (dynamic_cast<const FE_Nedelec<dim> *> (&source) != nullptr),
+               typename FiniteElement<dim>::
+               ExcInterpolationNotImplemented ());
   Assert (interpolation_matrix.m () == source.dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.m (),
                                 source.dofs_per_face));
@@ -2609,7 +2606,8 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
   // hp procedures, which use this
   // method.
   Assert (this->dofs_per_face <= source_fe.dofs_per_face,
-          typename FEL::ExcInterpolationNotImplemented ());
+          (typename FiniteElement<dim>::
+           ExcInterpolationNotImplemented ()));
   interpolation_matrix = 0.0;
   // Perform projection-based interpolation
   // as usual.

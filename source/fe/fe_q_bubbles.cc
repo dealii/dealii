@@ -371,14 +371,13 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
   // However, for SolutionTransfer to work we need to provide an implementation
   // for the case that the x_source_fe is identical to this FE
   typedef FE_Q_Bubbles<dim,spacedim> FEQBUBBLES;
-  typedef FiniteElement<dim,spacedim> FEL;
 
   AssertThrow ((x_source_fe.get_name().find ("FE_Q_Bubbles<") == 0)
                ||
                (dynamic_cast<const FEQBUBBLES *>(&x_source_fe) != nullptr)
                ,
-               typename FEL::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
   Assert (interpolation_matrix.m() == this->dofs_per_cell,
           ExcDimensionMismatch (interpolation_matrix.m(),
                                 this->dofs_per_cell));
@@ -392,8 +391,9 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
       interpolation_matrix.set(i,i,1.);
   //else we need to do more...
   else
-    Assert(false, typename FEL::ExcInterpolationNotImplemented())
-  }
+    Assert(false, (typename FiniteElement<dim,spacedim>::
+                   ExcInterpolationNotImplemented()));
+}
 
 
 

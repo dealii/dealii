@@ -615,12 +615,11 @@ FESystem<dim,spacedim>::get_interpolation_matrix (
   //
   // condition 1: the other element must also be a system element
 
-  typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FESystem<") == 0)
                ||
                (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != nullptr),
-               typename FEL::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 
   // ok, source is a system element, so we may be able to do the work
   const FESystem<dim,spacedim> &source_fe
@@ -628,15 +627,15 @@ FESystem<dim,spacedim>::get_interpolation_matrix (
 
   // condition 2: same number of basis elements
   AssertThrow (this->n_base_elements() == source_fe.n_base_elements(),
-               typename FEL::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 
   // condition 3: same number of basis elements
   for (unsigned int i=0; i< this->n_base_elements(); ++i)
     AssertThrow (this->element_multiplicity(i) ==
                  source_fe.element_multiplicity(i),
-                 typename FEL::
-                 ExcInterpolationNotImplemented());
+                 (typename FiniteElement<dim,spacedim>::
+                  ExcInterpolationNotImplemented()));
 
   // ok, so let's try whether it works:
 
@@ -1745,12 +1744,11 @@ FESystem<dim,spacedim>::
 get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                                FullMatrix<double>       &interpolation_matrix) const
 {
-  typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_System<") == 0)
                ||
                (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != nullptr),
-               typename FEL::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 
   Assert (interpolation_matrix.n() == this->dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.n(),
@@ -1856,12 +1854,11 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
                                   const unsigned int        subface,
                                   FullMatrix<double>       &interpolation_matrix) const
 {
-  typedef FiniteElement<dim,spacedim> FEL;
   AssertThrow ((x_source_fe.get_name().find ("FE_System<") == 0)
                ||
                (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != nullptr),
-               typename FEL::
-               ExcInterpolationNotImplemented());
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 
   Assert (interpolation_matrix.n() == this->dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.n(),
@@ -2172,10 +2169,9 @@ FESystem<dim,spacedim>::unit_support_point (const unsigned int index) const
 {
   Assert (index < this->dofs_per_cell,
           ExcIndexRange (index, 0, this->dofs_per_cell));
-  typedef FiniteElement<dim,spacedim> FEL;
   Assert ((this->unit_support_points.size() == this->dofs_per_cell) ||
           (this->unit_support_points.size() == 0),
-          typename FEL::ExcFEHasNoSupportPoints ());
+          (typename FiniteElement<dim,spacedim>::ExcFEHasNoSupportPoints ()));
 
   // let's see whether we have the information pre-computed
   if (this->unit_support_points.size() != 0)
@@ -2195,10 +2191,9 @@ FESystem<dim,spacedim>::unit_face_support_point (const unsigned int index) const
 {
   Assert (index < this->dofs_per_face,
           ExcIndexRange (index, 0, this->dofs_per_face));
-  typedef  FiniteElement<dim,spacedim> FEL;
   Assert ((this->unit_face_support_points.size() == this->dofs_per_face) ||
           (this->unit_face_support_points.size() == 0),
-          typename FEL::ExcFEHasNoSupportPoints ());
+          (typename FiniteElement<dim,spacedim>::ExcFEHasNoSupportPoints ()));
 
   // let's see whether we have the information pre-computed
   if (this->unit_face_support_points.size() != 0)

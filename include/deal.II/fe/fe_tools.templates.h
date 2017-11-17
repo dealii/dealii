@@ -1452,9 +1452,9 @@ namespace FETools
     const std::vector<Point<dim> > &
     fe2_support_points = fe2.get_unit_support_points ();
 
-    typedef FiniteElement<dim,spacedim> FEL;
     Assert(fe2_support_points.size()==fe2.dofs_per_cell,
-           typename FEL::ExcFEHasNoSupportPoints());
+           (typename FiniteElement<dim,spacedim>::
+            ExcFEHasNoSupportPoints()));
 
     for (unsigned int i=0; i<fe2.dofs_per_cell; ++i)
       {
