@@ -23,6 +23,7 @@
 #include <utility>
 #include <functional>
 #include <string>
+#include <tuple>
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Comm.h>
@@ -832,5 +833,44 @@ namespace Utilities
 
 
 DEAL_II_NAMESPACE_CLOSE
+
+#ifndef DOXYGEN
+namespace boost
+{
+  namespace serialization
+  {
+
+    // Provides boost and c++11 with a way to serialize tuples and pairs automatically
+    template<int N>
+    struct Serialize
+    {
+      template<class Archive, typename... Args>
+      static void serialize(Archive &ar, std::tuple<Args...> &t, const unsigned int version)
+      {
+        ar &std::get<N-1>(t);
+        Serialize<N-1>::serialize(ar, t, version);
+      }
+    };
+
+    template<>
+    struct Serialize<0>
+    {
+      template<class Archive, typename... Args>
+      static void serialize(Archive &ar, std::tuple<Args...> &t, const unsigned int version)
+      {
+        (void) ar;
+        (void) t;
+        (void) version;
+      }
+    };
+
+    template<class Archive, typename... Args>
+    void serialize(Archive &ar, std::tuple<Args...> &t, const unsigned int version)
+    {
+      Serialize<sizeof...(Args)>::serialize(ar, t, version);
+    }
+  }
+}
+#endif
 
 #endif
