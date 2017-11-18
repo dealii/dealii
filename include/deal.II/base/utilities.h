@@ -34,6 +34,19 @@
 #  endif
 #endif
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/array.hpp>
+
+#ifdef DEAL_II_WITH_ZLIB
+#  include <boost/iostreams/stream.hpp>
+#  include <boost/iostreams/filtering_stream.hpp>
+#  include <boost/iostreams/device/back_inserter.hpp>
+#  include <boost/iostreams/filter/gzip.hpp>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -376,6 +389,32 @@ namespace Utilities
    */
   std::vector<unsigned long long int>
   invert_permutation (const std::vector<unsigned long long int> &permutation);
+
+  /**
+   * Given an arbitrary object of type T, use boost::serialization utilities
+   * to pack the object into a vector of characters. The object can be unpacked
+   * using the Utilities::unpack function below.
+   *
+   * If the library has been compiled with ZLIB enabled, then the output buffer
+   * is compressed.
+   *
+   * @author Timo Heister, Wolfgang Bangerth, 2017.
+   */
+  template<typename T>
+  std::vector<char> pack(const T &object);
+
+  /**
+   * Given a vector of characters, obtained through a call to the function
+   * Utilities::pack, restore its content in an object of type T.
+   *
+   * This function uses boost::serialization utilities to unpack the object
+   * from a vector of characters, and it is the inverse of the function
+   * Utilities::pack
+   *
+   * @author Timo Heister, Wolfgang Bangerth, 2017.
+   */
+  template<typename T>
+  T unpack(const std::vector<char> &buffer);
 
   /**
    * A namespace for utility functions that probe system properties.
@@ -729,6 +768,65 @@ namespace Utilities
         else
           len = half;
       }
+  }
+
+
+
+  template<typename T>
+  std::vector<char> pack(const T &object)
+  {
+    // set up a buffer and then use it as the target of a compressing
+    // stream into which we serialize the current object
+    std::vector<char> buffer;
+    {
+#ifdef DEAL_II_WITH_ZLIB
+      boost::iostreams::filtering_ostream out;
+      out.push(boost::iostreams::gzip_compressor
+               (boost::iostreams::gzip_params
+                (boost::iostreams::gzip::best_compression)));
+      out.push(boost::iostreams::back_inserter(buffer));
+
+      boost::archive::binary_oarchive archive(out);
+      archive << object;
+      out.flush();
+#else
+      std::ostringstream out;
+      boost::archive::binary_oarchive archive(out);
+      archive << object;
+      const std::string &s = out.str();
+      buffer.reserve(s.size());
+      buffer.assign(s.begin(), s.end());
+#endif
+    }
+    return buffer;
+  }
+
+
+
+  template<typename T>
+  T unpack(const std::vector<char> &buffer)
+  {
+    std::string decompressed_buffer;
+    T object;
+
+    // first decompress the buffer
+    {
+#ifdef DEAL_II_WITH_ZLIB
+      boost::iostreams::filtering_ostream decompressing_stream;
+      decompressing_stream.push(boost::iostreams::gzip_decompressor());
+      decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
+      decompressing_stream.write (buffer.data(), buffer.size());
+#else
+      decompressed_buffer.assign (buffer.begin(), buffer.end());
+#endif
+    }
+
+    // then restore the object from the buffer
+    std::istringstream in(decompressed_buffer);
+    boost::archive::binary_iarchive archive(in);
+
+    archive >> object;
+    return object;
   }
 }
 
