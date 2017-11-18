@@ -408,6 +408,9 @@
  * A summary of the files that implement the interface to the supported auto-differentiable
  * numbers is as follows:
  *
+ * - ad_drivers.h: Provides classes that act as drivers to the interface of internally supported 
+ *   automatic differentiation libraries. These are used internally as an intermediary to the
+ *   helper classes that we provide.
  * - ad_number_types.h: Introduces an enumeration (called a type code) for the
  *   auto-differentiable number combinations that will be supported by the driver classes.
  *   The rationale behind the use of this somewhat restrictive mechanism is discussed below.
