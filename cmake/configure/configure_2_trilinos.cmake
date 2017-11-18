@@ -42,7 +42,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       )
 
     FOREACH(_module
-      Amesos Epetra Ifpack AztecOO Sacado Teuchos ML
+      Amesos Epetra Ifpack AztecOO Sacado Teuchos ML MueLu
       )
       ITEM_MATCHES(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
@@ -66,29 +66,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDIF()
     ENDFOREACH()
 
-    IF(${DEAL_II_TRILINOS_WITH_ROL})
-      IF(TRILINOS_VERSION VERSION_LESS 12.6.1)
-        MESSAGE(STATUS "ROL interface is disabled."
-          "deal.II will not support ROL interface if Trilinos version is less "
-          "than 12.6.1. Trilinos version found: \"${TRILINOS_VERSION}\".")
-          SET(DEAL_II_TRILINOS_WITH_ROL OFF)
-      ENDIF()
-    ENDIF()
-
-    IF((TRILINOS_VERSION_MAJOR EQUAL 11 AND
-        NOT (TRILINOS_VERSION_MINOR LESS 14))
-       OR
-       (NOT (TRILINOS_VERSION_MAJOR LESS 12)))
-        ITEM_MATCHES(_module_found MueLu ${Trilinos_PACKAGE_LIST})
-      IF(_module_found)
-        MESSAGE(STATUS "Found MueLu")
-      ELSE()
-        MESSAGE(STATUS "Module MueLu not found!")
-        SET(_modules_missing "${_modules_missing} MueLu")
-        SET(${var} FALSE)
-      ENDIF()
-    ENDIF()
-
     IF(NOT ${var})
       MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
         "Missing ${_modules_missing}"
@@ -102,18 +79,18 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     #
-    # We require at least Trilinos 11.2
+    # We require at least Trilinos 12.4
     #
-    IF(TRILINOS_VERSION VERSION_LESS 11.2)
+    IF(TRILINOS_VERSION VERSION_LESS 12.4)
 
       MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
-        "deal.II requires at least version 11.2, but version ${TRILINOS_VERSION} was found."
+        "deal.II requires at least version 12.4, but version ${TRILINOS_VERSION} was found."
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "with version ${TRILINOS_VERSION} is too old.\n"
-        "deal.II requires at least version 11.2.\n\n"
+        "deal.II requires at least version 12.4.\n\n"
         )
       SET(${var} FALSE)
     ENDIF()

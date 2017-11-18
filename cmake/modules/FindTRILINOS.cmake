@@ -29,6 +29,7 @@
 #   TRILINOS_WITH_MPI
 #   TRILINOS_SUPPORTS_CPP11
 #   TRILINOS_HAS_C99_TR1_WORKAROUND
+#   TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
 #
 
 SET(TRILINOS_DIR "" CACHE PATH "An optional hint to a Trilinos installation")
@@ -126,7 +127,7 @@ SET(TRILINOS_WITH_MANDATORY_CXX11 FALSE)
 IF(EXISTS ${SACADO_CONFIG_H})
   #
   # Determine whether Trilinos was configured with C++11 support and
-  # enabling C++11 in deal.II is mandatory (Trilinos 12.0.1 and later).
+  # enabling C++11 in deal.II is mandatory.
   #
   FILE(STRINGS "${SACADO_CONFIG_H}" SACADO_CXX11_STRING
     REGEX "#define HAVE_SACADO_CXX11")
