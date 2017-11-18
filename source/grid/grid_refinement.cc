@@ -306,19 +306,29 @@ GridRefinement::refine_and_coarsen_fixed_number (Triangulation<dim,spacedim> &tr
       Vector<typename VectorType::value_type> tmp (criteria);
       if (refine_cells)
         {
-          std::nth_element (tmp.begin(), tmp.begin()+refine_cells,
-                            tmp.end(),
-                            std::greater<double>());
-          refine (tria, criteria, *(tmp.begin() + refine_cells));
+          if (static_cast<size_t>(refine_cells) == criteria.size())
+            refine (tria, criteria, -std::numeric_limits<double>::max());
+          else
+            {
+              std::nth_element (tmp.begin(), tmp.begin()+refine_cells,
+                                tmp.end(),
+                                std::greater<double>());
+              refine (tria, criteria, *(tmp.begin() + refine_cells));
+            }
         }
 
       if (coarsen_cells)
         {
-          std::nth_element (tmp.begin(), tmp.begin()+tmp.size()-coarsen_cells,
-                            tmp.end(),
-                            std::greater<double>());
-          coarsen (tria, criteria,
-                   *(tmp.begin() + tmp.size() - coarsen_cells));
+          if (static_cast<size_t>(coarsen_cells) == criteria.size())
+            coarsen (tria, criteria, std::numeric_limits<double>::max());
+          else
+            {
+              std::nth_element (tmp.begin(), tmp.begin()+tmp.size()-coarsen_cells,
+                                tmp.end(),
+                                std::greater<double>());
+              coarsen (tria, criteria,
+                       *(tmp.begin() + tmp.size() - coarsen_cells));
+            }
         }
     }
 }
