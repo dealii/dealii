@@ -20,6 +20,7 @@
 #include <deal.II/base/array_view.h>
 
 #include <vector>
+#include <map>
 
 #if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_WITH_PETSC)
 // without MPI, we would still like to use
@@ -395,8 +396,6 @@ namespace Utilities
     min_max_avg (const double my_value,
                  const MPI_Comm &mpi_communicator);
 
-
-
     /**
      * A class that is used to initialize the MPI system at the beginning of a
      * program and to shut it down again at the end. It also allows you to
@@ -490,6 +489,49 @@ namespace Utilities
      * job that happens to run under MPI.
      */
     bool job_supports_mpi ();
+
+    /**
+     * Initiate a some-to-some communication, and exchange arbitrary objects
+     * (the class T should be serializable using boost::serialize) between
+     * processors.
+     *
+     * @param[in] comm MPI communicator.
+     *
+     * @param[in] objects_to_send A map from the rank (unsigned int) of the
+     *  process meant to receive the data and the object to send (the type T
+     *  must be serializable for this function to work properly).
+     *
+     * @param[out] A map from the rank (unsigned int) of the process
+     *  which sent the data and object received.
+     *
+     * @author Giovanni Alzetta, Luca Heltai, 2017
+     */
+    template<typename T>
+    std::map<unsigned int, T>
+    some_to_some(const MPI_Comm                                &comm,
+                 const std::map <unsigned int, T>     &objects_to_send);
+
+    /**
+     * A generalization of the classic MPI_Allgather function, that accepts
+     * arbitrary data types T, as long as boost::serialize accepts T as an
+     * argument.
+     *
+     * @param[in] comm MPI communicator.
+     * @param[in] objects_to_send A map of `rank:object`, where the key `rank`
+     *  is the rank of the processor we want to send to, and `object` is the
+     *  object to send
+     *
+     * @param[out] A vector of objects, with size equal to the number of
+     *  processes in the MPI communicator. Each entry contains the object
+     *  received from the processor with the corresponding rank within the
+     *  communicator.
+     *
+     * @author Giovanni Alzetta, Luca Heltai, 2017
+     */
+    template<typename T>
+    std::vector<T>
+    all_gather(const MPI_Comm &comm,
+               const T        &object_to_send);
 
 #ifndef DOXYGEN
     // declaration for an internal function that lives in mpi.templates.h
