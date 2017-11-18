@@ -1,0 +1,3 @@
+New: added two internal functions Utilities::MPI::internal::send_and_receive which allow to easily do a many-to-many or allgatherv communication of objects.
+<br>
+(GiovanniAlzetta, LucaHeltai, 2017/11/17)

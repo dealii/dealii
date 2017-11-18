@@ -20,6 +20,7 @@
 #include <deal.II/base/array_view.h>
 
 #include <vector>
+#include <map>
 
 #if !defined(DEAL_II_WITH_MPI) && !defined(DEAL_II_WITH_PETSC)
 // without MPI, we would still like to use
@@ -500,6 +501,51 @@ namespace Utilities
                        const ArrayView<const T> &values,
                        const MPI_Comm           &mpi_communicator,
                        const ArrayView<T>       &output);
+      /**
+       * This function is intented for internal use in the library and
+       * aims at simplifying a many to many communication.
+       *
+       * @param[in] comm MPI communicator.
+       * @param[in] objects_to_send A map from the rank (unsigned int)
+       *  of the process meant to receive the data and the vector of
+       *  objects to send.
+       *
+       * @param[out] A map from the rank (unsigned int) of the process
+       *  which sent the data and the vector of objects received.
+       *
+       * Notice this is not just a point to point communication as the
+       * function uses an all-to-all communication to understand how
+       * many objects each process shall send, which is much slower.
+       *
+       * @author Giovanni Alzetta, Luca Heltai, 2017
+       */
+      template<typename T>
+      std::map<unsigned int, std::vector<T> >
+      send_and_receive(const MPI_Comm                       &comm,
+                       const std::map
+                       <unsigned int, typename std::vector<T> >
+                       &objects_to_send);
+
+      /**
+       * This function is intented for internal use in the library and
+       * aims at simplifying a collective gather operation with an arbitrary
+       * number of objects.
+       *
+       * @param[in] comm MPI communicator.
+       * @param[in] objects_to_send A vector of objects to sent to all
+       *  processes
+       *
+       * @param[out] A vector of vectors of objects of size number of processes
+       *  in the MPI communicator. Each entry contains
+       *  the vector of objects received from the processor with the corresponding
+       *  rank.
+       *
+       * @author Giovanni Alzetta, Luca Heltai, 2017
+       */
+      template<typename T>
+      std::vector<std::vector<T> >
+      send_and_receive(const MPI_Comm              &comm,
+                       const std::vector<T>        &objects_to_send);
     }
 
     // Since these depend on N they must live in the header file
