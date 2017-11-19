@@ -517,9 +517,7 @@ namespace Utilities
      * argument.
      *
      * @param[in] comm MPI communicator.
-     * @param[in] objects_to_send A map of `rank:object`, where the key `rank`
-     *  is the rank of the processor we want to send to, and `object` is the
-     *  object to send
+     * @param[in] object_to_send A object to send to all other processes
      *
      * @param[out] A vector of objects, with size equal to the number of
      *  processes in the MPI communicator. Each entry contains the object

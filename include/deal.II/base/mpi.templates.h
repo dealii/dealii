@@ -201,8 +201,8 @@ namespace Utilities
       Assert (false, ExcMessage ("The function some_to_some doesn't make"
                                  "any sense if you do not have MPI enabled. "));
 #else
-      auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
-      auto my_proc = dealii::Utilities::MPI::this_mpi_process(comm);
+      const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
+      const auto my_proc = dealii::Utilities::MPI::this_mpi_process(comm);
 
       std::vector<unsigned int> send_to(objects_to_send.size());
       {
@@ -235,11 +235,9 @@ namespace Utilities
       // Receiving buffers
       std::map<unsigned int, T> received_objects;
       {
-        unsigned int i = 0;
         std::vector<char> buffer;
-
         // We do this on a first come/first served basis
-        while (i<receive_from.size())
+        for (unsigned int i = 0; i<receive_from.size(); ++i)
           {
             // Probe what's going on. Take data from the first available sender
             MPI_Status status;
@@ -259,9 +257,9 @@ namespace Utilities
             ierr = MPI_Recv(buffer.data(), len, MPI_CHAR,
                             rank, 21, comm, MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr);
-
+            Assert(received_objects.find(rank) == received_objects.end(),
+                   ExcInternalError("I should not receive again from this rank"));
             received_objects[rank] = Utilities::unpack<T>(buffer);
-            ++i;
           }
       }
 
@@ -284,7 +282,7 @@ namespace Utilities
       Assert (false, ExcMessage ("The function all_gather doesn't make"
                                  "any sense if you do not have MPI enabled. "));
 #else
-      auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
+      const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
 
       std::vector<char> buffer = Utilities::pack(object);
 
