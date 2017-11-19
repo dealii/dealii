@@ -2316,20 +2316,6 @@ namespace GridTools
                const unsigned int version);
 
     BOOST_SERIALIZATION_SPLIT_MEMBER()
-
-    /**
-     * Pack the data that corresponds to this object into a buffer in
-     * the form of a vector of chars and return it.
-     */
-    std::vector<char> pack_data () const;
-
-    /**
-     * Given a buffer in the form of an array of chars, unpack it and
-     * restore the current object to the state that it was when
-     * it was packed into said buffer by the pack_data() function.
-     */
-    void unpack_data (const std::vector<char> &buffer);
-
   };
 
   /**
@@ -3110,66 +3096,6 @@ namespace GridTools
 
 
 
-  template <int dim, typename T>
-  std::vector<char>
-  CellDataTransferBuffer<dim,T>::pack_data () const
-  {
-    // set up a buffer and then use it as the target of a compressing
-    // stream into which we serialize the current object
-    std::vector<char> buffer;
-    {
-#ifdef DEAL_II_WITH_ZLIB
-      boost::iostreams::filtering_ostream out;
-      out.push(boost::iostreams::gzip_compressor
-               (boost::iostreams::gzip_params
-                (boost::iostreams::gzip::best_compression)));
-      out.push(boost::iostreams::back_inserter(buffer));
-
-      boost::archive::binary_oarchive archive(out);
-      archive << *this;
-      out.flush();
-#else
-      std::ostringstream out;
-      boost::archive::binary_oarchive archive(out);
-      archive << *this;
-      const std::string &s = out.str();
-      buffer.reserve(s.size());
-      buffer.assign(s.begin(), s.end());
-#endif
-    }
-
-    return buffer;
-  }
-
-
-
-  template <int dim, typename T>
-  void
-  CellDataTransferBuffer<dim,T>::unpack_data (const std::vector<char> &buffer)
-  {
-    std::string decompressed_buffer;
-
-    // first decompress the buffer
-    {
-#ifdef DEAL_II_WITH_ZLIB
-      boost::iostreams::filtering_ostream decompressing_stream;
-      decompressing_stream.push(boost::iostreams::gzip_decompressor());
-      decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
-      decompressing_stream.write (buffer.data(), buffer.size());
-#else
-      decompressed_buffer.assign (buffer.begin(), buffer.end());
-#endif
-    }
-
-    // then restore the object from the buffer
-    std::istringstream in(decompressed_buffer);
-    boost::archive::binary_iarchive archive(in);
-
-    archive >> *this;
-  }
-
-
-
   template <typename DataType, typename MeshType>
   void
   exchange_cell_data_to_ghosts (const MeshType &mesh,
@@ -3265,7 +3191,7 @@ namespace GridTools
         // pack all the data into the buffer for this recipient and send it.
         // keep data around till we can make sure that the packet has been
         // received
-        sendbuffers[idx] = data.pack_data ();
+        sendbuffers[idx] = Utilities::pack(data);
         const int ierr = MPI_Isend(sendbuffers[idx].data(), sendbuffers[idx].size(),
                                    MPI_BYTE, *it,
                                    786, tria->get_communicator(), &requests[idx]);
@@ -3290,8 +3216,7 @@ namespace GridTools
                         tria->get_communicator(), &status);
         AssertThrowMPI(ierr);
 
-        CellDataTransferBuffer<dim, DataType> cellinfo;
-        cellinfo.unpack_data(receive);
+        auto cellinfo = Utilities::unpack<CellDataTransferBuffer<dim, DataType> >(receive);
 
         DataType *data = cellinfo.data.data();
         for (unsigned int c=0; c<cellinfo.cell_ids.size(); ++c, ++data)
