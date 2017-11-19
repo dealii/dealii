@@ -29,27 +29,27 @@ using namespace dealii;
 template <int dim>
 void test()
 {
-   Triangulation<dim>    triangulation;
-   FE_TraceQ<dim>         fe(2);
-   DoFHandler<dim>       dof_handler(triangulation);
+  Triangulation<dim>    triangulation;
+  FE_TraceQ<dim>         fe(2);
+  DoFHandler<dim>       dof_handler(triangulation);
 
-   GridGenerator::hyper_cube (triangulation, 0, 1);
-   triangulation.refine_global(6);
+  GridGenerator::hyper_cube (triangulation, 0, 1);
+  triangulation.refine_global(6);
 
-   dof_handler.distribute_dofs (fe);
-   Vector<double> solution(dof_handler.n_dofs());
+  dof_handler.distribute_dofs (fe);
+  Vector<double> solution(dof_handler.n_dofs());
 
-   VectorTools::interpolate(dof_handler,
-                            ZeroFunction<dim>(),
-                            solution);
-   deallog << "Success, dim = " << dim << std::endl;
+  VectorTools::interpolate(dof_handler,
+                           ZeroFunction<dim>(),
+                           solution);
+  deallog << "Success, dim = " << dim << std::endl;
 }
 
 int main()
 {
-   initlog();
+  initlog();
 
-   test<2>();
-   test<3>();
-   return 0;
+  test<2>();
+  test<3>();
+  return 0;
 }

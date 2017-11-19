@@ -62,13 +62,13 @@ public:
   std::unique_ptr<FiniteElement<dim,spacedim> >
   clone() const;
 
-   /**
-    * Implementation of the corresponding function in the FiniteElement
-    * class.  Since the current element is interpolatory, the nodal
-    * values are exactly the support point values. Furthermore, since
-    * the current element is scalar, the support point values need to
-    * be vectors of length 1.
-    */
+  /**
+   * Implementation of the corresponding function in the FiniteElement
+   * class.  Since the current element is interpolatory, the nodal
+   * values are exactly the support point values. Furthermore, since
+   * the current element is scalar, the support point values need to
+   * be vectors of length 1.
+   */
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,

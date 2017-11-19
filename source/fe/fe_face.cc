@@ -50,8 +50,8 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
   :
   FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim>
   (TensorProductPolynomials<dim-1>(Polynomials::generate_complete_Lagrange_basis(internal::FE_FaceQ::get_QGaussLobatto_points(degree))),
-   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-   std::vector<bool>(1,true))
+  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+  std::vector<bool>(1,true))
 {
   // initialize unit face support points
   const unsigned int codim = dim-1;
@@ -321,19 +321,19 @@ FE_FaceQ<dim,spacedim>::
 convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
                                                         std::vector<double>                &nodal_values) const
 {
-   AssertDimension (support_point_values.size(),
-                    this->get_unit_support_points().size());
-   AssertDimension (support_point_values.size(),
-                    nodal_values.size());
-   AssertDimension (this->dofs_per_cell,
-                    nodal_values.size());
+  AssertDimension (support_point_values.size(),
+                   this->get_unit_support_points().size());
+  AssertDimension (support_point_values.size(),
+                   nodal_values.size());
+  AssertDimension (this->dofs_per_cell,
+                   nodal_values.size());
 
-   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-   {
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    {
       AssertDimension (support_point_values[i].size(), 1);
 
       nodal_values[i] = support_point_values[i](0);
-   }
+    }
 }
 
 // ----------------------------- FE_FaceQ<1,spacedim> ------------------------
@@ -342,8 +342,8 @@ template <int spacedim>
 FE_FaceQ<1,spacedim>::FE_FaceQ (const unsigned int degree)
   :
   FiniteElement<1,spacedim> (FiniteElementData<1>(get_dpo_vector(degree), 1, degree, FiniteElementData<1>::L2),
-                             std::vector<bool>(1,true),
-                             std::vector<ComponentMask> (1, ComponentMask(1,true)))
+                            std::vector<bool>(1,true),
+                            std::vector<ComponentMask> (1, ComponentMask(1,true)))
 {
   this->unit_face_support_points.resize(1);
 
@@ -547,8 +547,8 @@ FE_FaceP<dim,spacedim>::FE_FaceP (const unsigned int degree)
   :
   FE_PolyFace<PolynomialSpace<dim-1>, dim, spacedim>
   (PolynomialSpace<dim-1>(Polynomials::Legendre::generate_complete_basis(degree)),
-   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-   std::vector<bool>(1,true))
+  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+  std::vector<bool>(1,true))
 {}
 
 

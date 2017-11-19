@@ -36,9 +36,9 @@ template <int dim, int spacedim>
 FE_TraceQ<dim,spacedim>::FE_TraceQ (const unsigned int degree)
   :
   FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spacedim> (
-    TensorProductPolynomials<dim-1>(Polynomials::generate_complete_Lagrange_basis(QGaussLobatto<1>(degree+1).get_points())),
-    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-    std::vector<bool>(1,true)),
+   TensorProductPolynomials<dim-1>(Polynomials::generate_complete_Lagrange_basis(QGaussLobatto<1>(degree+1).get_points())),
+   FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+   std::vector<bool>(1,true)),
   fe_q (degree)
 {
   Assert (degree > 0,
@@ -128,19 +128,19 @@ FE_TraceQ<dim,spacedim>::
 convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
                                                         std::vector<double>                &nodal_values) const
 {
-   AssertDimension (support_point_values.size(),
-                    this->get_unit_support_points().size());
-   AssertDimension (support_point_values.size(),
-                    nodal_values.size());
-   AssertDimension (this->dofs_per_cell,
-                    nodal_values.size());
+  AssertDimension (support_point_values.size(),
+                   this->get_unit_support_points().size());
+  AssertDimension (support_point_values.size(),
+                   nodal_values.size());
+  AssertDimension (this->dofs_per_cell,
+                   nodal_values.size());
 
-   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
-   {
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
+    {
       AssertDimension (support_point_values[i].size(), 1);
 
       nodal_values[i] = support_point_values[i](0);
-   }
+    }
 }
 
 
