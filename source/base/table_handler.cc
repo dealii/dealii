@@ -55,6 +55,14 @@ namespace internal
     catch (...)
       {}
 
+    // ... then with unsigned long long int...
+    try
+      {
+        return boost::get<unsigned long long int>(value);
+      }
+    catch (...)
+      {}
+
     // ...and finally with double precision:
     try
       {
