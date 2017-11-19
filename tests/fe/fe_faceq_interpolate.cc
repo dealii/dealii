@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Call VectorTools::interpolate for a function in FE_TraceQ. The purpose is
+// Call VectorTools::interpolate for a function in FE_FaceQ. The purpose is
 // to check that all functions needed for interpolate to work exist.
 
 #include "../tests.h"
