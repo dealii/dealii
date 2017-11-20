@@ -260,9 +260,9 @@ get_intermediate_point (const Point<spacedim> &p1,
 {
   const double tol = 1e-10;
 
-  if ( p1.distance(p2) < tol || w < tol)
+  if ( (p1-p2).norm_square() < tol*tol || std::abs(w) < tol)
     return p1;
-  else if (w > 1.0 - tol)
+  else if (std::abs(w-1.0) < tol)
     return p2;
 
   // If the points are one dimensional then there is no need for anything but
@@ -281,18 +281,21 @@ get_intermediate_point (const Point<spacedim> &p1,
   const Tensor<1,spacedim> e1 = v1/r1;
   const Tensor<1,spacedim> e2 = v2/r2;
 
-  // Treat points that are collinear with the center special.
-  if ((e1 + e2).norm_square() == 0.)
+  // Find the cosine of the angle gamma described by v1 and v2.
+  const double cosgamma = e1*e2;
+
+  // Points are collinear with the center (allow for 8*eps as a tolerance)
+  if (cosgamma < -1 + 8.*std::numeric_limits<double>::epsilon())
     return center;
 
-  if ((e1 - e2).norm_square() < tol*tol)
+  // Points are along a line, in which case e1 and e2 are essentially the same.
+  if (cosgamma > 1 - 8.*std::numeric_limits<double>::epsilon())
     return Point<spacedim>(center + w*v2 + (1-w)*v1);
 
-  // Find the angle gamma described by v1 and v2:
-  const double gamma = std::acos(e1*e2);
-
-  // Find the angle sigma that corresponds to arclength equal to w
-  const double sigma = w * gamma;
+  // Find the angle sigma that corresponds to arclength equal to w. acos
+  // should never be undefined because we have ruled out the two special cases
+  // above.
+  const double sigma = w * std::acos(cosgamma);
 
   // Normal to v1 in the plane described by v1,v2,and the origin.
   // Since p1 and p2 do not coincide n is not zero and well defined.
