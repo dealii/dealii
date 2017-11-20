@@ -235,6 +235,16 @@ extern "C"
    */
   void pdsyev_(const char *jobz, const char *uplo, const int *m, double *A, const int *ia, const int *ja, int *desca, double *w,
                double *z, const int *iz, const int *jz, int *descz, double *work, const int *lwork, int *info);
+
+  /*
+   * pdlacpy copies all or a part of a distributed matrix A to another
+   * distributed matrix B. No communication is performed, pdlacpy
+   * performs a local copy sub(A) := sub(B), where sub(A) denotes
+   * A(ia:ia+m-1,ja:ja+n-1) and sub(B) denotes B(ib:ib+m-1,jb:jb+n-1)
+   *
+   */
+  void pdlacpy_(const char *uplo, const int *m, const int *n, double *A, const int *ia, const int *ja, int *desca,
+                double *B, const int *ib, const int *jb, int *descb);
 }
 
 
@@ -489,11 +499,11 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type rows, const size_ty
 
 template <typename NumberType>
 ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const std::pair<size_type,size_type> &sizes,
-                							 std::shared_ptr<ProcessGrid> process_grid,
-											 const std::pair<size_type,size_type> &block_sizes,
-											 const LAPACKSupport::Property property)
-:
-ScaLAPACKMatrix<NumberType>(sizes.first,sizes.second,process_grid,block_sizes.first,block_sizes.first,property)
+                                             std::shared_ptr<ProcessGrid> process_grid,
+                                             const std::pair<size_type,size_type> &block_sizes,
+                                             const LAPACKSupport::Property property)
+  :
+  ScaLAPACKMatrix<NumberType>(sizes.first,sizes.second,process_grid,block_sizes.first,block_sizes.first,property)
 {}
 
 
@@ -726,9 +736,6 @@ void ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric(std::vector<NumberType> 
               Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
 
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdsyev", info));
-
-      //Scalapack puts eigenvalues in ascending order --> reversing to obtain descending order
-      std::reverse (ev.begin(),ev.end());
     }
   /*
    * send the eigenvalues to processors not being part of the process grid
@@ -751,8 +758,8 @@ void ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(std::vector<NumberType> &
   Assert (properties == LAPACKSupport::symmetric,
           ExcMessage("Matrix has to be symmetric for this operation."));
 
-  ScaLAPACKMatrix<NumberType> eigenvectors (n_rows, n_columns, grid, row_block_size, column_block_size, LAPACKSupport::Property::general);
-  eigenvectors.descriptor[1]=0;
+  ScaLAPACKMatrix<NumberType> eigenvectors (n_rows, grid, row_block_size);
+  eigenvectors.properties = properties;
   ev.resize (n_rows);
 
   const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(grid->mpi_communicator));
@@ -776,45 +783,30 @@ void ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(std::vector<NumberType> &
       NumberType *eigenvectors_loc = &eigenvectors.values[0];
       work.resize(1);
 
-      pcout << "Starting workspace query" << std::endl;
-
-      pcout << "Descriptor A: ";
-      for (unsigned int i=0; i<9; ++i)
-        pcout << "  " << descriptor[i];
-      pcout << std::endl;
-      pcout << "Descriptor Z: ";
-      for (unsigned int i=0; i<9; ++i)
-        pcout << "  " << eigenvectors.descriptor[i];
-      pcout << std::endl;
-
       pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
               eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
-
-      pcout << "info = " << info << std::endl << std::endl;
 
       lwork=work[0];
       work.resize (lwork);
 
-      pcout << "Starting computation" << std::endl;
-
       pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
               eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
 
-      pcout << "info = " << info << std::endl << std::endl;
-
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdsyev", info));
 
-      //Scalapack puts eigenvalues in ascending order --> reversing to obtain descending order
-      std::reverse (ev.begin(),ev.end());
+      //copy eigenvectors to original matrix
+      //as the temporary matrix eigenvectors has identical dimensions and block-cyclic distribution we simply swap the local array
+      this->values.swap(eigenvectors.values);
     }
   /*
    * send the eigenvalues to processors not being part of the process grid
    */
   MPI_Bcast(&ev.front(),ev.size(),MPI_DOUBLE, 0/*from root*/, grid->mpi_communicator_inactive_with_root);
 
-  /* On exit, the lower triangle (if uplo='L') or the upper triangle (if uplo='U') of A,
-  *  including the diagonal, is destroyed. Therefore, the matrix is unusable
+  /*
+  *  On exit matrix A stores the eigenvectors in the columns
   */
+  properties = LAPACKSupport::Property::general;
   state = LAPACKSupport::eigenvalues;
 }
 

@@ -34,6 +34,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <memory>
 
 extern "C"  //Some Lapack routines
 {
@@ -95,7 +96,7 @@ void test(const unsigned int size, const unsigned int block_size)
   //Lapack as reference
   {
     int info; //Variable containing information about the successfull exit of the lapack routine
-    char jobz = 'N';  //'N': the eigenvalues_Lapack of A are computed
+    char jobz = 'V';  //'V': all eigenpairs of A are computed
     char uplo = 'U';  //storage format of the matrix A; not so important as matrix is symmetric
     int LDA = size;   //leading dimension of the matrix A
     int lwork;      //length of vector/array work
@@ -113,7 +114,9 @@ void test(const unsigned int size, const unsigned int block_size)
   }
   // Scalapack:
   scalapack_A = full_A;
-  scalapack_A.eigenvalues_symmetric(eigenvalues_ScaLapack);
+  scalapack_A.eigenpairs_symmetric(eigenvalues_ScaLapack);
+  FullMatrix<NumberType> p_eigenvectors (size,size);
+  scalapack_A.copy_to(p_eigenvectors);
   unsigned int n_eigenvalues = eigenvalues_ScaLapack.size(), max_n_eigenvalues=5;
 
   pcout << "First " << max_n_eigenvalues << " ScaLapack eigenvalues" << std::endl;
@@ -125,11 +128,30 @@ void test(const unsigned int size, const unsigned int block_size)
 
   for (unsigned int i=0; i<max_n_eigenvalues; ++i)
     pcout << eigenvalues_Lapack[i] << "   ";
+  pcout << std::endl;
+  pcout << std::endl;
 
   for (unsigned int i=0; i<max_n_eigenvalues; ++i)
-    AssertThrow ( std::abs(eigenvalues_ScaLapack[i]-eigenvalues_Lapack[i]) < std::abs(eigenvalues_Lapack[i])*1e-10, dealii::ExcInternalError());
+    AssertThrow ( std::fabs(eigenvalues_ScaLapack[i]-eigenvalues_Lapack[i]) < std::fabs(eigenvalues_Lapack[i])*1e-10, dealii::ExcInternalError());
 
-  pcout << std::endl << std::endl;
+
+  FullMatrix<NumberType> s_eigenvectors (size,size);
+  for (int i=0; i<size; ++i)
+    for (int j=0; j<size; ++j)
+      s_eigenvectors(i,j) = lapack_A[i*size+j];
+
+  //product of eigenvectors computed using Lapack and ScaLapack has to be either 1 or -1
+  for (unsigned int i=0; i<size; ++i)
+    {
+      Vector<double> p_ev(size), s_ev(size);
+      for (unsigned int j=0; j<size; ++j)
+        {
+          p_ev[j] = p_eigenvectors(j,i);
+          s_ev[j] = s_eigenvectors(i,j);
+        }
+      double product = p_ev * s_ev;
+      AssertThrow (std::fabs(std::fabs(product)-1) < 1e-6, dealii::ExcInternalError());
+    }
 }
 
 

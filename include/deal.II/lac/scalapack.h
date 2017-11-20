@@ -40,15 +40,17 @@ template <typename NumberType> class ScaLAPACKMatrix;
 /**
  * A class taking care of setting up the process grid for BLACS
  * ScaLapack matrices will have shared pointer of this class to perform block-cyclic distribution
+ *
+ * @author Benjamin Brands, 2017
  */
 class ProcessGrid
 {
 public:
 
-	/**
-	 * Declare class ScaLAPACK as friend to provide access to private members, e.g. the MPI Communicator
-	 */
-	template <typename NumberType> friend class ScaLAPACKMatrix;
+  /**
+   * Declare class ScaLAPACK as friend to provide access to private members, e.g. the MPI Communicator
+   */
+  template <typename NumberType> friend class ScaLAPACKMatrix;
 
   /*
    * Constructor for a process grid for a given @p mpi_communicator
@@ -193,7 +195,7 @@ protected:
  * @image html scalapack_invert.png
  *
  * @ingroup Matrix1
- * @author Denis Davydov, 2017
+ * @author Denis Davydov, Benjamin Brands, 2017
  */
 template <typename NumberType>
 class ScaLAPACKMatrix : protected TransposeTable<NumberType>
@@ -267,11 +269,14 @@ public:
 
   /**
    * Compute all eigenvalues of real symmetric matrix using pdsyev
+   * After successful computation the eigenvalues are stored in @p eigenvalues in ascending order
    */
   void eigenvalues_symmetric (std::vector<NumberType> &eigenvalues);
 
   /**
    * Compute all eigenpairs of real symmetric matrix using pdsyev
+   * After successful computation the eigenvalues are stored in @p eigenvalues in ascending order
+   * The eigenvectors are stored in the columns of the matrix, therefore overwriting the original content of the matrix
    */
   void eigenpairs_symmetric (std::vector<NumberType> &eigenvalues);
 
