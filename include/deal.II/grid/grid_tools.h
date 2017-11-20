@@ -623,30 +623,32 @@ namespace GridTools
   /*@{*/
 
   /**
-   * Given a @p cache and a list of @p points create the quadrature rules. This
-   * function returns a tuple containing the following elements:
-   * - The first ( get<0>), call it cells, is a vector of a vector cells of the all cells
-   *  that contain at least one of the @p points
-   * - The second a vector qpoints of vector of points, containing in qpoints[i]
-   *  the reference positions of all points that fall within the cell cells[i]
-   * - The third a vector indices of vector of integers, containing the mapping between
-   *  local numbering in qpoints, and global index in points
+   * Given a Triangulation's @p cache and a list of @p points create the quadrature rules.
    *
-   * If points[a] and points[b] are the only two points that fall in cells[c], then
-   * qpoints[c][0] and qpoints[c][1] are the reference positions of points[a] and points[b]
-   * in cells[c], and indices[c][0] = a, indices[c][1] = b. The function
-   * Mapping::tansform_unit_to_real(qpoints[c][0]) returns points[a].
+   * @param[in] cache The triangulation's GridTools::Cache .
+   * @param[in] points The point's vector.
+   *
+   * @param[out] Tuple containing the following information:
+   *  - Cells, is a vector of a vector cells of the all cells
+   *   containing at least one of the @p points .
+   *  - A vector qpoints of vector of points, containing in @p qpoints[i]
+   *   the reference positions of all points that fall within the cell @P cells[i] .
+   *  - A vector indices of vector of integers, containing the mapping between
+   *   local numbering in qpoints, and global index in points
+   *
+   * If @p points[a] and @p points[b] are the only two points that fall in @p cells[c],
+   * then @p qpoints[c][0] and @p qpoints[c][1] are the reference positions of
+   * @p points[a] and @p points[b] in @p cells[c], and @p indices[c][0] = a,
+   * @p indices[c][1] = b. The function Mapping::tansform_unit_to_real(qpoints[c][0])
+   * returns @p points[a].
    *
    * The algorithm assumes it's easier to look for a point in the cell that was used previously.
    * For this reason random points are, computationally speaking, the worst case scenario while
    * points grouped by the cell to which they belong are the best case.
-   * Pre-sorting points, trying to minimize distances, can make the algorithm much faster.
+   * Pre-sorting points, trying to minimize distances between them, might make the function
+   * extremely faster.
    *
-   * Notice: given the center of a cell, points at distance greater then
-   * @p distance_factor * cell.diameter() are considered outside the cell. In some cases, such
-   * as curved meshes, this leads to cell's repetitions in the output tuple.
-   * To avoid this either enlarge @p distance_factor (depending on the regularity of the
-   * triangulation) and/or merge the repetitions contained in the output.
+   * @author Giovanni Alzetta, 2017
    */
   template <int dim, int spacedim>
   std::tuple<
@@ -654,8 +656,7 @@ namespace GridTools
       std::vector< std::vector< Point<dim> > >,
       std::vector< std::vector<unsigned int> > >
       compute_point_locations(const Cache<dim,spacedim>                                         &cache,
-                              const std::vector<Point<spacedim> >                               &points,
-                              const double                                                      &distance_factor=0.5);
+                              const std::vector<Point<spacedim> >                               &points);
 
   /**
    * Return a map of index:Point<spacedim>, containing the used vertices of the

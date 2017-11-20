@@ -5093,8 +5093,7 @@ next_cell:
       std::vector< std::vector< Point<dim> > >,
       std::vector< std::vector<unsigned int> > >
       compute_point_locations(const Cache<dim,spacedim>                &cache,
-                              const std::vector<Point<spacedim> >      &points,
-                              const double                             &distance_factor)
+                              const std::vector<Point<spacedim> >      &points)
   {
     // How many points are here?
     const unsigned int np = points.size();
@@ -5108,134 +5107,77 @@ next_cell:
     // Now the easy case.
     if (np==0) return cell_qpoint_map;
 
-    // If distance_factor is too small we might avoid points which are inside the cell
-    Assert(distance_factor >= 0.5,
-           ExcMessage("distance_factor value must be >= 0.5"));
+    // We begin by finding the cell/transform of the first point
+    std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator, Point<dim> >
+    my_pair  = GridTools::find_active_cell_around_point
+               (cache, points[0]);
 
-    // Keep track of the points we
-    // found
-    std::vector<bool> point_flags(np, false);
-
-    // Classify the first point:
-    // find active cell returns a pair (cell,transformed point)
-    const std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
-          Point<dim> >
-          my_pair  = GridTools::find_active_cell_around_point
-                     (cache, points[0]);
-
-    // Add data about the first point
-    std::get<0>(cell_qpoint_map).push_back(my_pair.first);
+    std::get<0>(cell_qpoint_map).emplace_back(my_pair.first);
     std::get<1>(cell_qpoint_map).emplace_back(1, my_pair.second);
     std::get<2>(cell_qpoint_map).emplace_back(1, 0);
 
-    // Case only one point is now done
-    if (np==1)
-      return cell_qpoint_map;
+    // Now the second easy case.
+    if (np==1) return cell_qpoint_map;
+    // Computing the cell center and diameter
+    Point<spacedim> cell_center = std::get<0>(cell_qpoint_map)[0]->center();
+    double cell_diameter = std::get<0>(cell_qpoint_map)[0]->diameter()*
+                           (0.5 + std::numeric_limits<double>::epsilon() );
 
-    // Compute the information about the current cell
-    Point<spacedim> cell_center = my_pair.first->center();
-    double cell_diameter = my_pair.first->diameter()*
-                           (distance_factor + std::numeric_limits<double>::epsilon() );
-
-    // Set this to true until all
-    // points have been classified
-    bool left_over = true;
-
-    // Flag to signal that a point is not in the current cell
-    bool flag_outside = false;
-
-    // This is the first index of a non processed point
-    unsigned int first_outside = 1;
-
-    // And this is the index of the current cell
-    unsigned int c = 0;
-
-    while (left_over == true)
+    // Cycle over all points left
+    for (unsigned int p=1; p< np; ++p)
       {
-        // Assume this is the last one
-        left_over = false;
-        Assert(first_outside < np,
-               ExcIndexRange(first_outside, 0, np));
+        // Checking if the point is close to the cell center, in which
+        // case calling find active cell with a cell hint
+        if ( cell_center.distance(points[p]) < cell_diameter )
+          my_pair  = GridTools::find_active_cell_around_point
+                     (cache, points[p],std::get<0>(cell_qpoint_map).back());
+        else
+          my_pair  = GridTools::find_active_cell_around_point
+                     (cache, points[p]);
 
-        // If we found one in this cell, keep looking in the same cell
-        for (unsigned int p=first_outside; p<np; ++p)
-          if (point_flags[p] == false)
-            {
-              // Assume the point is in the cell
-              flag_outside = false;
-
-              // If the point is too far from the cell center it can't be inside it
-              if ( cell_center.distance(points[p]) > cell_diameter )
-                flag_outside = true;
-              else
-                {
-                  //The point is close to the cell: try transforming it
-                  try
-                    {
-                      Point<dim> qp =cache.get_mapping().transform_real_to_unit_cell
-                                     (std::get<0>(cell_qpoint_map)[c], points[p]);
-                      if (GeometryInfo<dim>::is_inside_unit_cell(qp))
-                        {
-                          point_flags[p] = true;
-                          std::get<1>(cell_qpoint_map)[c].push_back(qp);
-                          std::get<2>(cell_qpoint_map)[c].push_back(p);
-                        }
-                      else
-                        // The point is outside the cell
-                        flag_outside = true;
-                    }
-                  catch (const typename Mapping<dim>::ExcTransformationFailed &)
-                    {
-                      // transformation failed: assume the point is outside
-                      flag_outside = true;
-                    }
-                }
-
-              if (flag_outside)
-                {
-                  // Set things up for next round
-                  if (left_over == false)
-                    first_outside = p;
-                  left_over = true;
-                }
-            }
-        // If we got here and there is no left over, we are
-        // done. Else we need to find the next cell
-        if (left_over == true)
+        // Assuming the cell is probably the last cell added
+        if ( my_pair.first == std::get<0>(cell_qpoint_map).back() )
           {
-            const std::pair<
-            typename Triangulation<dim, spacedim>::active_cell_iterator, Point<dim> >
-            my_pair
-              = GridTools::find_active_cell_around_point (cache, points[first_outside]);
+            // Found in the last cell: adding the data
+            std::get<1>(cell_qpoint_map).back().emplace_back(my_pair.second);
+            std::get<2>(cell_qpoint_map).back().emplace_back(p);
+          }
+        else
+          {
+            // Check if it is in another cell already found
+            typename std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>::iterator
+            cells_it = std::find(std::get<0>(cell_qpoint_map).begin(),std::get<0>(cell_qpoint_map).end()-1,my_pair.first);
 
-            std::get<0>(cell_qpoint_map).push_back(my_pair.first);
-            std::get<1>(cell_qpoint_map).emplace_back(1, my_pair.second);
-            std::get<2>(cell_qpoint_map).emplace_back(1, first_outside);
-            // Check if we can exit the loop now because only the last point was missing
-            if (first_outside == np-1)
-              left_over = false;
-
-            // Update the information about the current cell
-            cell_center = my_pair.first->center();
-            cell_diameter = my_pair.first->diameter()*
-                            (distance_factor + std::numeric_limits<double>::epsilon() );
-            c++;
-            point_flags[first_outside] = true;
+            if ( cells_it == std::get<0>(cell_qpoint_map).end()-1 )
+              {
+                // Cell not found: adding a new cell
+                std::get<0>(cell_qpoint_map).emplace_back(my_pair.first);
+                std::get<1>(cell_qpoint_map).emplace_back(1, my_pair.second);
+                std::get<2>(cell_qpoint_map).emplace_back(1, p);
+                // Updating center and radius of the cell
+                cell_center = std::get<0>(cell_qpoint_map).back()->center();
+                cell_diameter = std::get<0>(cell_qpoint_map).back()->diameter()*
+                                (0.5 + std::numeric_limits<double>::epsilon() );
+              }
+            else
+              {
+                unsigned int current_cell = cells_it - std::get<0>(cell_qpoint_map).begin();
+                // Cell found: just adding the point index and qpoint to the list
+                std::get<1>(cell_qpoint_map)[current_cell].emplace_back(my_pair.second);
+                std::get<2>(cell_qpoint_map)[current_cell].emplace_back(p);
+              }
           }
       }
 
-    // Augment of one the number of cells
-    ++c;
     // Debug Checking
-    Assert(c == std::get<0>(cell_qpoint_map).size(), ExcInternalError());
+    Assert(std::get<0>(cell_qpoint_map).size() == std::get<2>(cell_qpoint_map).size(),
+           ExcDimensionMismatch(std::get<0>(cell_qpoint_map).size(), std::get<2>(cell_qpoint_map).size()));
 
-    Assert(c == std::get<2>(cell_qpoint_map).size(),
-           ExcDimensionMismatch(c, std::get<2>(cell_qpoint_map).size()));
-
-    Assert(c == std::get<1>(cell_qpoint_map).size(),
-           ExcDimensionMismatch(c, std::get<1>(cell_qpoint_map).size()));
+    Assert(std::get<0>(cell_qpoint_map).size() == std::get<1>(cell_qpoint_map).size(),
+           ExcDimensionMismatch(std::get<0>(cell_qpoint_map).size(), std::get<1>(cell_qpoint_map).size()));
 
 #ifdef DEBUG
+    unsigned int c = std::get<0>(cell_qpoint_map).size();
     unsigned int qps = 0;
     // The number of points in all
     // the cells must be the same as
