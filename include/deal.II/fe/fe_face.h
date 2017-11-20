@@ -71,6 +71,18 @@ public:
   virtual std::string get_name () const;
 
   /**
+   * Implementation of the corresponding function in the FiniteElement
+   * class.  Since the current element is interpolatory, the nodal
+   * values are exactly the support point values. Furthermore, since
+   * the current element is scalar, the support point values need to
+   * be vectors of length 1.
+   */
+  virtual
+  void
+  convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
+                                                          std::vector<double>                &nodal_values) const;
+
+  /**
    * Return the matrix interpolating from a face of of one element to the face
    * of the neighboring element.  The size of the matrix is then
    * <tt>source.dofs_per_face</tt> times <tt>this->dofs_per_face</tt>. This
