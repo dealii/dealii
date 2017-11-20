@@ -190,6 +190,140 @@ namespace Utilities
 
 
 
+    template<typename T>
+    std::map<unsigned int, T>
+    some_to_some(const MPI_Comm &comm,
+                 const std::map<unsigned int, T> &objects_to_send)
+    {
+#ifndef DEAL_II_WITH_MPI
+      (void)comm;
+      Assert(objects_to_send.size() == 0, ExcMessage("Cannot send to more than one processor."));
+      Assert(objects_to_send.find(0) != objects_to_send.end() || objects_to_send.size() == 0,
+             ExcMessage("Can only send to myself or to nobody."));
+      return objects_to_send;
+#else
+      const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
+      const auto my_proc = dealii::Utilities::MPI::this_mpi_process(comm);
+
+      std::vector<unsigned int> send_to(objects_to_send.size());
+      {
+        unsigned int i=0;
+        for (const auto &m: objects_to_send)
+          send_to[i++] = m.first;
+      }
+      AssertDimension(send_to.size(), objects_to_send.size());
+
+      const auto receive_from =
+        Utilities::MPI::compute_point_to_point_communication_pattern(comm, send_to);
+
+      // Sending buffers
+      std::vector<std::vector<char> > buffers_to_send(send_to.size());
+      std::vector<MPI_Request> buffer_send_requests(send_to.size());
+      {
+        unsigned int i = 0;
+        for (const auto &rank_obj : objects_to_send)
+          {
+            const auto &rank = rank_obj.first;
+            buffers_to_send[i] = Utilities::pack(rank_obj.second);
+            const int ierr = MPI_Isend(buffers_to_send[i].data(),
+                                       buffers_to_send[i].size(), MPI_CHAR,
+                                       rank, 21, comm, &buffer_send_requests[i]);
+            AssertThrowMPI(ierr);
+            ++i;
+          }
+      }
+
+      // Receiving buffers
+      std::map<unsigned int, T> received_objects;
+      {
+        std::vector<char> buffer;
+        // We do this on a first come/first served basis
+        for (unsigned int i = 0; i<receive_from.size(); ++i)
+          {
+            // Probe what's going on. Take data from the first available sender
+            MPI_Status status;
+            int ierr = MPI_Probe(MPI_ANY_SOURCE, 21, comm, &status);
+            AssertThrowMPI(ierr);
+
+            // Length of the message
+            int len;
+            ierr = MPI_Get_count(&status, MPI_CHAR, &len);
+            AssertThrowMPI(ierr);
+            buffer.resize(len);
+
+            // Source rank
+            const unsigned int rank = status.MPI_SOURCE;
+
+            // Actually receive the message
+            ierr = MPI_Recv(buffer.data(), len, MPI_CHAR,
+                            rank, 21, comm, MPI_STATUS_IGNORE);
+            AssertThrowMPI(ierr);
+            Assert(received_objects.find(rank) == received_objects.end(),
+                   ExcInternalError("I should not receive again from this rank"));
+            received_objects[rank] = Utilities::unpack<T>(buffer);
+          }
+      }
+
+      // Wait to have sent all objects.
+      MPI_Waitall(send_to.size(), buffer_send_requests.data(),MPI_STATUSES_IGNORE);
+
+      return received_objects;
+#endif // deal.II with MPI
+    }
+
+
+
+    template<typename T>
+    std::vector<T> all_gather(const MPI_Comm       &comm,
+                              const T &object)
+    {
+#ifndef DEAL_II_WITH_MPI
+      (void)comm;
+      std::vector<T> v(1, object);
+      return v;
+#else
+      const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
+
+      std::vector<char> buffer = Utilities::pack(object);
+
+      int n_local_data = buffer.size();
+
+      // Vector to store the size of loc_data_array for every process
+      std::vector<int> size_all_data(n_procs,0);
+
+      // Exchanging the size of each buffer
+      MPI_Allgather(&n_local_data, 1, MPI_INT,
+                    &(size_all_data[0]), 1, MPI_INT,
+                    comm);
+
+      // Now computing the the displacement, relative to recvbuf,
+      // at which to store the incoming buffer
+      std::vector<int> rdispls(n_procs);
+      rdispls[0] = 0;
+      for (unsigned int i=1; i < n_procs; ++i)
+        rdispls[i] = rdispls[i-1] + size_all_data[i-1];
+
+      // Step 3: exchange the buffer:
+      std::vector<char> received_unrolled_buffer(rdispls.back() + size_all_data.back());
+
+      MPI_Allgatherv(buffer.data(), n_local_data, MPI_CHAR,
+                     received_unrolled_buffer.data(), size_all_data.data(),
+                     rdispls.data(), MPI_CHAR, comm);
+
+      std::vector<T> received_objects(n_procs);
+      for (unsigned int i= 0; i < n_procs; ++i)
+        {
+          std::vector<char> local_buffer(received_unrolled_buffer.begin()+rdispls[i],
+                                         received_unrolled_buffer.begin()+rdispls[i]+size_all_data[i]);
+          received_objects[i] = Utilities::unpack<T>(local_buffer);
+        }
+
+      return received_objects;
+#endif
+    }
+
+
+
     template <typename T>
     T sum (const T &t,
            const MPI_Comm &mpi_communicator)
