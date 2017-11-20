@@ -18,7 +18,7 @@
 
 #include <deal.II/base/config.h>
 
-// FIXME: #ifdef DEAL_II_WITH_SCALAPACK (<--- Lapack+MPI+Scalapack)
+#ifdef DEAL_II_WITH_SCALAPACK
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/full_matrix.h>
@@ -491,5 +491,7 @@ ScaLAPACKMatrix<NumberType>::local_el(const int loc_row, const int loc_column)
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif // DEAL_II_WITH_SCALAPACK
 
 #endif

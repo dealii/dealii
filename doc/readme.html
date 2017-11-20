@@ -558,9 +558,9 @@
       <dt><a name="CUDA"></a><a href="https://developer.nvidia.com/cuda-zone">CUDA</a></dt>
       <dd>
   <p>
-    <a href="https://developer.nvidia.com/cuda-zone">CUDA</a> is a parallel 
-    computing platform and API model created by Nvidia. It allows software 
-    developers and software engineers to use CUDA-enabled GPU for general 
+    <a href="https://developer.nvidia.com/cuda-zone">CUDA</a> is a parallel
+    computing platform and API model created by Nvidia. It allows software
+    developers and software engineers to use CUDA-enabled GPU for general
     purpose processing.
 
     Details about compatibility and configuration can be found <a href=external-libs/cuda.html
@@ -711,6 +711,23 @@
 	  automatically finds it, use <code>-DDEAL_II_WITH_PETSC=OFF</code>.
 	  More information on configuring and building PETSc can be
           found <a href="external-libs/petsc.html" target="body">here</a>.
+	</p>
+      </dd>
+
+
+      <dt>
+	<a name="scalapack"></a>
+	<a href="http://www.netlib.org/scalapack/">scalapack</a>
+      </dt>
+      <dd>
+	<p>
+	  <a href="http://www.netlib.org/scalapack/">scalapack</a>
+	  is a library of high-performance linear algebra routines for parallel
+    distributed memory machines. ScaLAPACK solves dense and banded linear
+    systems, least squares problems, eigenvalue problems, and singular value
+    problems. In order to enable this feature, add
+    <code>-DSCALAPACK_DIR=/path/to/scalapack</code> to the argument list for
+    <code>cmake</code>.
 	</p>
       </dd>
 

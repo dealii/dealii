@@ -15,6 +15,9 @@
 
 
 #include <deal.II/lac/scalapack.h>
+
+#ifdef DEAL_II_WITH_SCALAPACK
+
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/base/conditional_ostream.h>
@@ -937,3 +940,5 @@ int ScaLAPACKMatrix<NumberType>::get_process_grid_columns() const
 template class ScaLAPACKMatrix<double>;
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif // DEAL_II_WITH_SCALAPACK
