@@ -17,12 +17,8 @@
 // collective communication
 
 #include "../tests.h"
-#include "../../include/deal.II/base/mpi.templates.h"
-
-#include <deal.II/base/mpi.h>
 #include <deal.II/base/point.h>
-
-#include <mpi.h>
+#include <deal.II/base/mpi.templates.h>
 #include <vector>
 
 int main(int argc, char *argv[])

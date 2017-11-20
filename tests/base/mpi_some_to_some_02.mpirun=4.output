@@ -1,0 +1,15 @@
+
+DEAL:0::Proc 0/4: sharing with  1
+DEAL:0::OK
+
+DEAL:1::Proc 1/4: sharing with  0
+DEAL:1::OK
+
+
+DEAL:2::Proc 2/4: sharing with  0, 1
+DEAL:2::OK
+
+
+DEAL:3::Proc 3/4: sharing with  0, 1
+DEAL:3::OK
+
