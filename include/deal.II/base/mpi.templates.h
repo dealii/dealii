@@ -197,9 +197,10 @@ namespace Utilities
     {
 #ifndef DEAL_II_WITH_MPI
       (void)comm;
-      (void)objects_to_send;
-      Assert (false, ExcMessage ("The function some_to_some doesn't make"
-                                 "any sense if you do not have MPI enabled. "));
+      Assert(objects_to_send.size() == 0, ExcMessage("Cannot send to more than one processor."));
+      Assert(objects_to_send.find(0) != objects_to_send.end() || objects_to_send.size() == 0,
+             ExcMessage("Can only send to myself or to nobody."));
+      return objects_to_send;
 #else
       const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
       const auto my_proc = dealii::Utilities::MPI::this_mpi_process(comm);
@@ -278,9 +279,8 @@ namespace Utilities
     {
 #ifndef DEAL_II_WITH_MPI
       (void)comm;
-      (void)objects_to_send;
-      Assert (false, ExcMessage ("The function all_gather doesn't make"
-                                 "any sense if you do not have MPI enabled. "));
+      std::vector<T> v(1, object);
+      return v;
 #else
       const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
 
