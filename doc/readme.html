@@ -717,17 +717,18 @@
 
       <dt>
 	<a name="scalapack"></a>
-	<a href="http://www.netlib.org/scalapack/">scalapack</a>
+	<a href="http://www.netlib.org/scalapack/">ScaLAPACK</a>
       </dt>
       <dd>
 	<p>
 	  <a href="http://www.netlib.org/scalapack/">scalapack</a>
 	  is a library of high-performance linear algebra routines for parallel
-    distributed memory machines. ScaLAPACK solves dense and banded linear
-    systems, least squares problems, eigenvalue problems, and singular value
-    problems. In order to enable this feature, add
-    <code>-DSCALAPACK_DIR=/path/to/scalapack</code> to the argument list for
-    <code>cmake</code>.
+	  distributed memory machines. ScaLAPACK solves dense and banded linear
+	  systems, least squares problems, eigenvalue problems, and singular value
+	  problems. In order to enable this feature, add
+	  <code>-DSCALAPACK_DIR=/path/to/scalapack</code> to the argument list for
+	  <code>cmake</code>. If ScaLAPACK does not have embedded BLACS, you might
+	  need to pass <code>-DBLACS_DIR=/path/to/blacs</code> as well.
 	</p>
       </dd>
 

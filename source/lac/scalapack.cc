@@ -35,7 +35,6 @@
 // http://www.netlib.org/scalapack/slug/index.html       // User guide
 // http://www.netlib.org/scalapack/slug/node135.html // How to Measure Errors
 
-// FIXME: similar to lapack_templates.h move those to scalapack_template.h
 extern "C"
 {
   /* Basic Linear Algebra Communication Subprograms (BLACS) declarations */
@@ -295,7 +294,7 @@ namespace
     // therefore
     // Np = Pc * Pc / ratio
     // for quadratic matrices the ratio equals 1
-    const double ratio = n/m;
+    const double ratio = double(n)/m;
     int Pc = std::sqrt(ratio * Np);
 
     // one could rounds up Pc to the number which has zero remainder from the division of Np
@@ -329,9 +328,12 @@ namespace
 
 
 
-ProcessGrid::ProcessGrid(MPI_Comm mpi_comm, const std::pair<int,int> &grid_dimensions)
+ProcessGrid::ProcessGrid(MPI_Comm mpi_comm,
+                         const std::pair<unsigned int,unsigned int> &grid_dimensions)
   :
   mpi_communicator(mpi_comm),
+  this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator)),
+  n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator)),
   n_process_rows(grid_dimensions.first),
   n_process_columns(grid_dimensions.second)
 {
@@ -340,14 +342,11 @@ ProcessGrid::ProcessGrid(MPI_Comm mpi_comm, const std::pair<int,int> &grid_dimen
   Assert (grid_dimensions.second > 0,
           ExcMessage("Number of process grid columns has to be positive."));
 
-  MPI_Comm_size(mpi_communicator, &n_mpi_processes);
-  MPI_Comm_rank(mpi_communicator, &this_mpi_process);
-
   Assert (grid_dimensions.first*grid_dimensions.second <= n_mpi_processes,
           ExcMessage("Size of process grid is larger than number of available MPI processes."));
 
-  // processor grid order
-  // FIXME: default to column major
+  // processor grid order.
+  // FIXME: default to column major?
   const bool column_major = false;
 
   // Initialize Cblas context from the provided communicator
@@ -422,7 +421,8 @@ ProcessGrid::ProcessGrid(MPI_Comm mpi_comm, const std::pair<int,int> &grid_dimen
 
 
 ProcessGrid::ProcessGrid(MPI_Comm mpi_comm,
-                         const std::pair<int,int> &matrix_dimensions, const std::pair<int,int> &block_sizes)
+                         const std::pair<unsigned int,unsigned int> &matrix_dimensions,
+                         const std::pair<unsigned int,unsigned int> &block_sizes)
   :
   ProcessGrid(mpi_comm,
               choose_the_processor_grid(mpi_comm, matrix_dimensions.first, matrix_dimensions.second,
@@ -441,36 +441,67 @@ ProcessGrid::~ProcessGrid()
 
 
 
+unsigned int ProcessGrid::get_process_grid_rows() const
+{
+  return n_process_rows;
+}
+
+
+
+unsigned int ProcessGrid::get_process_grid_columns() const
+{
+  return n_process_columns;
+}
+
+
+
+template <typename NumberType>
+void ProcessGrid::send_to_inactive(NumberType *value, const int count) const
+{
+  Assert (count>0, ExcInternalError());
+  if (mpi_communicator_inactive_with_root != MPI_COMM_NULL)
+    {
+      const int ierr =
+        MPI_Bcast(value,count,MPI_DOUBLE,
+                  0/*from root*/,
+                  mpi_communicator_inactive_with_root);
+      AssertThrowMPI(ierr);
+    }
+}
+
+
+
+
 /**
  *Constructor for a rectangular distributed Matrix
  */
 template <typename NumberType>
-ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type rows, const size_type columns,
-                                             std::shared_ptr<ProcessGrid> process_grid,
-                                             const unsigned int block_size_row, const unsigned int block_size_column,
+ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const std::pair<size_type,size_type> &sizes,
+                                             const std::shared_ptr<const ProcessGrid> process_grid,
+                                             const std::pair<size_type,size_type> &block_sizes,
                                              const LAPACKSupport::Property property)
   :
   TransposeTable<NumberType> (),
   state (LAPACKSupport::unusable),
-  properties(property),
+  property(property),
   grid (process_grid),
-  n_rows(rows),
-  n_columns(columns),
-  row_block_size(block_size_row),
-  column_block_size(block_size_column),
+  n_rows(sizes.first),
+  n_columns(sizes.second),
+  row_block_size(block_sizes.first),
+  column_block_size(block_sizes.second),
   uplo('L'), // for non-symmetric matrices this is not needed
   first_process_row(0),
   first_process_column(0),
   submatrix_row(1),
   submatrix_column(1)
 {
-  Assert (block_size_row > 0,
+  Assert (row_block_size > 0,
           ExcMessage("Row block size has to be positive."));
-  Assert (block_size_column > 0,
+  Assert (column_block_size > 0,
           ExcMessage("Column block size has to be positive."));
-  Assert (block_size_row <= rows,
+  Assert (row_block_size <= n_rows,
           ExcMessage("Row block size can not be greater than the number of rows of the matrix"));
-  Assert (block_size_column <= columns,
+  Assert (column_block_size <= n_columns,
           ExcMessage("Column block size can not be greater than the number of columns of the matrix"));
 
   if (grid->active)
@@ -501,23 +532,25 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type rows, const size_ty
 
 
 template <typename NumberType>
-ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const std::pair<size_type,size_type> &sizes,
-                                             std::shared_ptr<ProcessGrid> process_grid,
-                                             const std::pair<size_type,size_type> &block_sizes,
+ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type size,
+                                             const std::shared_ptr<const ProcessGrid> process_grid,
+                                             const size_type block_size,
                                              const LAPACKSupport::Property property)
   :
-  ScaLAPACKMatrix<NumberType>(sizes.first,sizes.second,process_grid,block_sizes.first,block_sizes.first,property)
+  ScaLAPACKMatrix<NumberType>(std::make_pair(size,size),
+                              process_grid,
+                              std::make_pair(block_size,block_size),
+                              property)
 {}
 
 
 
 template <typename NumberType>
-ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type size,
-                                             std::shared_ptr<ProcessGrid> process_grid,
-                                             const unsigned int block_size)
-  :
-  ScaLAPACKMatrix<NumberType>(size,size,process_grid,block_size,block_size,LAPACKSupport::Property::symmetric)
-{}
+void
+ScaLAPACKMatrix<NumberType>::set_property(const LAPACKSupport::Property property_)
+{
+  property = property_;
+}
 
 
 
@@ -533,7 +566,6 @@ ScaLAPACKMatrix<NumberType>::operator = (const FullMatrix<NumberType> &matrix)
   Assert (n_rows == int(matrix.m()), ExcDimensionMismatch(n_rows, matrix.m()));
   Assert (n_columns == int(matrix.n()), ExcDimensionMismatch(n_columns, matrix.n()));
 
-  //if (active)
   if (grid->active)
     {
       for (int i=0; i < n_local_rows; ++i)
@@ -546,8 +578,6 @@ ScaLAPACKMatrix<NumberType>::operator = (const FullMatrix<NumberType> &matrix)
             }
         }
     }
-  // FIXME: move it from operator = to copy_from() with a const bool symmetric flag.
-  properties = LAPACKSupport::symmetric;
   state = LAPACKSupport::matrix;
   return *this;
 }
@@ -555,7 +585,7 @@ ScaLAPACKMatrix<NumberType>::operator = (const FullMatrix<NumberType> &matrix)
 
 
 template <typename NumberType>
-int
+unsigned int
 ScaLAPACKMatrix<NumberType>::m() const
 {
   return n_rows;
@@ -564,7 +594,7 @@ ScaLAPACKMatrix<NumberType>::m() const
 
 
 template <typename NumberType>
-int
+unsigned int
 ScaLAPACKMatrix<NumberType>::n() const
 {
   return n_columns;
@@ -644,11 +674,11 @@ ScaLAPACKMatrix<NumberType>::copy_to (FullMatrix<NumberType> &matrix) const
   // we could move the following lines under the main loop above,
   // but they would be dependent on glob_i and glob_j, which
   // won't make it much prettier
-  if (properties == LAPACKSupport::lower_triangular)
+  if (property == LAPACKSupport::lower_triangular)
     for (unsigned int i = 0; i < matrix.n(); ++i)
       for (unsigned int j = i+1; j < matrix.m(); ++j)
         matrix(i,j) = (state == LAPACKSupport::inverse_matrix ? matrix(j,i) : 0.);
-  else if (properties == LAPACKSupport::upper_triangular)
+  else if (property == LAPACKSupport::upper_triangular)
     for (unsigned int i = 0; i < matrix.n(); ++i)
       for (unsigned int j = 0; j < i; ++j)
         matrix(i,j) = (state == LAPACKSupport::inverse_matrix ? matrix(j,i) : 0.);
@@ -676,7 +706,7 @@ void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
       pdpotrf_(&uplo,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,&info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpotrf", info));
     }
-  properties = (uplo=='L' ? LAPACKSupport::lower_triangular : LAPACKSupport::upper_triangular);
+  property = (uplo=='L' ? LAPACKSupport::lower_triangular : LAPACKSupport::upper_triangular);
   state = LAPACKSupport::cholesky;
 }
 
@@ -692,7 +722,8 @@ void ScaLAPACKMatrix<NumberType>::invert()
     {
       int info = 0;
       /*
-       * matrix Z is not distributed as it will not be referenced by the ScaLapack function call
+       * matrix Z is not distributed as it will not be referenced by the
+       * ScaLapack function call
        */
       std::vector<double> Z_loc;
       NumberType *A_loc = &this->values[0];
@@ -709,7 +740,7 @@ void ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric(std::vector<NumberType> 
 {
   Assert (state == LAPACKSupport::matrix,
           ExcMessage("Matrix has to be in Matrix state before calling this function."));
-  Assert (properties == LAPACKSupport::symmetric,
+  Assert (property == LAPACKSupport::symmetric,
           ExcMessage("Matrix has to be symmetric for this operation."));
 
   ScaLAPACKMatrix<NumberType> Z (grid->n_mpi_processes, grid, 1);
@@ -743,11 +774,12 @@ void ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric(std::vector<NumberType> 
   /*
    * send the eigenvalues to processors not being part of the process grid
    */
-  MPI_Bcast(&ev.front(),ev.size(),MPI_DOUBLE, 0/*from root*/, grid->mpi_communicator_inactive_with_root);
+  grid->send_to_inactive(ev.data(), ev.size());
 
-  /* On exit, the lower triangle (if uplo='L') or the upper triangle (if uplo='U') of A,
-  *  including the diagonal, is destroyed. Therefore, the matrix is unusable
-  */
+  /*
+   * On exit, the lower triangle (if uplo='L') or the upper triangle (if uplo='U') of A,
+   * including the diagonal, is destroyed. Therefore, the matrix is unusable
+   */
   state = LAPACKSupport::unusable;
 }
 
@@ -758,16 +790,12 @@ void ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(std::vector<NumberType> &
 {
   Assert (state == LAPACKSupport::matrix,
           ExcMessage("Matrix has to be in Matrix state before calling this function."));
-  Assert (properties == LAPACKSupport::symmetric,
+  Assert (property == LAPACKSupport::symmetric,
           ExcMessage("Matrix has to be symmetric for this operation."));
 
   ScaLAPACKMatrix<NumberType> eigenvectors (n_rows, grid, row_block_size);
-  eigenvectors.properties = properties;
+  eigenvectors.property = property;
   ev.resize (n_rows);
-
-  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(grid->mpi_communicator));
-
-  ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
 
   if (grid->active)
     {
@@ -781,7 +809,7 @@ void ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(std::vector<NumberType> &
 
       /*
        * by setting lwork to -1 a workspace query for optimal length of work is performed
-      */
+       */
       int lwork=-1;
       NumberType *eigenvectors_loc = &eigenvectors.values[0];
       work.resize(1);
@@ -797,19 +825,20 @@ void ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(std::vector<NumberType> &
 
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdsyev", info));
 
-      //copy eigenvectors to original matrix
-      //as the temporary matrix eigenvectors has identical dimensions and block-cyclic distribution we simply swap the local array
+      // copy eigenvectors to original matrix
+      // as the temporary matrix eigenvectors has identical dimensions and
+      // block-cyclic distribution we simply swap the local array
       this->values.swap(eigenvectors.values);
     }
   /*
    * send the eigenvalues to processors not being part of the process grid
    */
-  MPI_Bcast(&ev.front(),ev.size(),MPI_DOUBLE, 0/*from root*/, grid->mpi_communicator_inactive_with_root);
+  grid->send_to_inactive(ev.data(), ev.size());
 
   /*
-  *  On exit matrix A stores the eigenvectors in the columns
-  */
-  properties = LAPACKSupport::Property::general;
+   *  On exit matrix A stores the eigenvectors in the columns
+   */
+  property = LAPACKSupport::Property::general;
   state = LAPACKSupport::eigenvalues;
 }
 
@@ -834,7 +863,7 @@ NumberType ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(const Number
                &a_norm, &rcond, &work[0], &lwork, &iwork[0], &liwork, &info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpocon", info));
     }
-  send_to_inactive(rcond);
+  grid->send_to_inactive(&rcond);
   return rcond;
 }
 
@@ -901,43 +930,14 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
       const NumberType *A_loc = &this->values[0];
       res = pdlansy_(&type, &uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, &work[0]);
     }
-  send_to_inactive(res);
+  grid->send_to_inactive(&res);
   return res;
 }
 
-
-
-template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::send_to_inactive(NumberType &value) const
-{
-  if (grid->mpi_communicator_inactive_with_root != MPI_COMM_NULL)
-    {
-      MPI_Bcast(&value,1,MPI_DOUBLE,
-                0/*from root*/,
-                grid->mpi_communicator_inactive_with_root);
-    }
-}
-
-
-
-template <typename NumberType>
-int ScaLAPACKMatrix<NumberType>::get_process_grid_rows() const
-{
-  return grid->n_process_rows;
-}
-
-
-
-template <typename NumberType>
-int ScaLAPACKMatrix<NumberType>::get_process_grid_columns() const
-{
-  return grid->n_process_columns;
-}
-
-
-
 // instantiations
 template class ScaLAPACKMatrix<double>;
+template void ProcessGrid::send_to_inactive<double>(double *, const int) const;
+
 
 DEAL_II_NAMESPACE_CLOSE
 

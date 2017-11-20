@@ -14,17 +14,15 @@
 // ---------------------------------------------------------------------
 
 #include "../tests.h"
+#include "../lapack/create_matrix.h"
 
-// test eigenvalues()
+// test eigenpairs_symmetric() and calls set_property()
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/multithread_info.h>
-
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_01.hpp>
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/lapack_full_matrix.h>
@@ -51,10 +49,6 @@ void test(const unsigned int size, const unsigned int block_size)
 
   ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
 
-  // test multiplication with random vectors
-  boost::random::mt19937 gen;
-  boost::random::uniform_01<> dist;
-
   // Create SPD matrices of requested size:
   FullMatrix<NumberType> full_A(size);
   std::vector<NumberType> lapack_A(size*size);
@@ -63,35 +57,15 @@ void test(const unsigned int size, const unsigned int block_size)
   std::shared_ptr<ProcessGrid> grid = std::make_shared<ProcessGrid>(mpi_communicator,sizes,block_sizes);
 
   ScaLAPACKMatrix<NumberType> scalapack_A (sizes.first, grid, block_sizes.first);
+  scalapack_A.set_property(LAPACKSupport::Property::symmetric);
 
-  pcout << size << " " << block_size << " " << scalapack_A.get_process_grid_rows() << " " << scalapack_A.get_process_grid_columns() << std::endl;
-  {
-    full_A = 0.;
-    boost::random::mt19937 gen;
-    boost::random::uniform_01<> dist;
+  pcout << size << " " << block_size << " " << grid->get_process_grid_rows() << " " << grid->get_process_grid_columns() << std::endl;
 
-    for (unsigned int i = 0; i < size; ++i)
-      for (unsigned int j = i; j < size; ++j)
-        {
-          const double val = dist(gen);
-          Assert (val >= 0. && val <= 1.,
-                  ExcInternalError());
-          if (i==j)
-            {
-              // since A(i,j) < 1 and
-              // a symmetric diagonally dominant matrix is SPD
-              full_A(i,j) = val + size;
-              lapack_A[i*size+j] = val+size;
-            }
-          else
-            {
-              full_A(i,j) = val;
-              full_A(j,i) = val;
-              lapack_A[i*size+j] = val;
-              lapack_A[j*size+i] = val;
-            }
-        }
-  }
+  create_spd (full_A);
+  for (unsigned int i = 0; i < size; ++i)
+    for (unsigned int j = 0; j < size; ++j)
+      lapack_A[i*size+j] = full_A(i,j);
+
   std::vector<NumberType> eigenvalues_ScaLapack, eigenvalues_Lapack(size);
   //Lapack as reference
   {
@@ -134,7 +108,6 @@ void test(const unsigned int size, const unsigned int block_size)
   for (unsigned int i=0; i<max_n_eigenvalues; ++i)
     AssertThrow ( std::fabs(eigenvalues_ScaLapack[i]-eigenvalues_Lapack[i]) < std::fabs(eigenvalues_Lapack[i])*1e-10, dealii::ExcInternalError());
 
-
   FullMatrix<NumberType> s_eigenvectors (size,size);
   for (int i=0; i<size; ++i)
     for (int j=0; j<size; ++j)
@@ -159,41 +132,13 @@ void test(const unsigned int size, const unsigned int block_size)
 int main (int argc,char **argv)
 {
 
-  try
-    {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
-      const std::vector<unsigned int> sizes = {{32,64,120,320,640}};
-      const std::vector<unsigned int> blocks = {{32,64}};
+  const std::vector<unsigned int> sizes = {{32,64,120,320,640}};
+  const std::vector<unsigned int> blocks = {{32,64}};
 
-      for (const auto &s : sizes)
-        for (const auto &b : blocks)
-          if (b <= s)
-            test<double>(s,b);
-
-    }
-  catch (std::exception &exc)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Exception on processing: " << std::endl
-                << exc.what() << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-
-      return 1;
-    }
-  catch (...)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Unknown exception!" << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
-    };
+  for (const auto &s : sizes)
+    for (const auto &b : blocks)
+      if (b <= s)
+        test<double>(s,b);
 }

@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include "../tests.h"
+#include "../lapack/create_matrix.h"
 
 // test Cholesky decomposition in ScaLAPACK vs FullMatrix
 
@@ -22,9 +23,6 @@
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/multithread_info.h>
-
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_01.hpp>
 
 #include <deal.II/lac/vector.h>
 
@@ -43,45 +41,18 @@ void test(const unsigned int size, const unsigned int block_size)
 
   ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
 
-  // test multiplication with random vectors
-  boost::random::mt19937 gen;
-  boost::random::uniform_01<> dist;
-
   // Create SPD matrices of requested size:
   FullMatrix<NumberType> full_in(size), inverse(size), full_out(size), diff(size);
 
   std::pair<int,int> sizes = std::make_pair(size,size), block_sizes = std::make_pair(block_size,block_size);
   std::shared_ptr<ProcessGrid> grid = std::make_shared<ProcessGrid>(mpi_communicator,sizes,block_sizes);
 
-  ScaLAPACKMatrix<NumberType> scalapack_matrix (sizes.first, grid, block_sizes.first);
-  /*ScaLAPACKMatrix<NumberType> scalapack_matrix(size,
-                                               mpi_communicator,
-                                               block_size);*/
+  ScaLAPACKMatrix<NumberType> scalapack_matrix (sizes.first, grid, block_sizes.first,
+                                                LAPACKSupport::Property::symmetric);
 
-  pcout << size << " " << block_size << " " << scalapack_matrix.get_process_grid_rows() << " " << scalapack_matrix.get_process_grid_columns() << std::endl;
+  pcout << size << " " << block_size << " " << grid->get_process_grid_rows() << " " << grid->get_process_grid_columns() << std::endl;
 
-  {
-    full_in = 0.;
-    boost::random::mt19937 gen;
-    boost::random::uniform_01<> dist;
-
-    for (unsigned int i = 0; i < size; ++i)
-      for (unsigned int j = i; j < size; ++j)
-        {
-          const double val = dist(gen);
-          Assert (val >= 0. && val <= 1.,
-                  ExcInternalError());
-          if (i==j)
-            // since A(i,j) < 1 and
-            // a symmetric diagonally dominant matrix is SPD
-            full_in(i,j) = val + size;
-          else
-            {
-              full_in(i,j) = val;
-              full_in(j,i) = val;
-            }
-        }
-  }
+  create_spd (full_in);
 
   // invert via Lapack
   inverse.cholesky(full_in);
@@ -116,42 +87,13 @@ void test(const unsigned int size, const unsigned int block_size)
 
 int main (int argc,char **argv)
 {
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
-  try
-    {
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+  const std::vector<unsigned int> sizes = {{32,64,120,320,640}};
+  const std::vector<unsigned int> blocks = {{32,64}};
 
-      const std::vector<unsigned int> sizes = {{32,64,120,320,640}};
-      const std::vector<unsigned int> blocks = {{32,64}};
-
-      for (const auto &s : sizes)
-        for (const auto &b : blocks)
-          if (b <= s)
-            test<double>(s,b);
-
-    }
-  catch (std::exception &exc)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Exception on processing: " << std::endl
-                << exc.what() << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-
-      return 1;
-    }
-  catch (...)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Unknown exception!" << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
-    };
+  for (const auto &s : sizes)
+    for (const auto &b : blocks)
+      if (b <= s)
+        test<double>(s,b);
 }
