@@ -1,0 +1,46 @@
+
+DEAL::Test for GridTools::guess_point_owner 
+DEAL::
+DEAL::Test for dimension 1
+DEAL::Simulating 1 processes
+DEAL::TEST PASSED
+DEAL::Simulating 2 processes
+DEAL::TEST PASSED
+DEAL::Simulating 3 processes
+DEAL::TEST PASSED
+DEAL::
+DEAL::Test for dimension 2
+DEAL::Simulating 2 processes
+DEAL::TEST PASSED
+DEAL::Simulating 3 processes
+DEAL::TEST PASSED
+DEAL::Simulating 4 processes
+DEAL::TEST PASSED
+DEAL::Simulating 5 processes
+DEAL::TEST PASSED
+DEAL::Simulating 6 processes
+DEAL::TEST PASSED
+DEAL::Simulating 7 processes
+DEAL::TEST PASSED
+DEAL::Simulating 8 processes
+DEAL::TEST PASSED
+DEAL::Simulating 9 processes
+DEAL::TEST PASSED
+DEAL::
+DEAL::Test for dimension 3
+DEAL::Simulating 1 processes
+DEAL::TEST PASSED
+DEAL::Simulating 3 processes
+DEAL::TEST PASSED
+DEAL::Simulating 5 processes
+DEAL::TEST PASSED
+DEAL::Simulating 7 processes
+DEAL::TEST PASSED
+DEAL::Simulating 9 processes
+DEAL::TEST PASSED
+DEAL::Simulating 11 processes
+DEAL::TEST PASSED
+DEAL::Simulating 13 processes
+DEAL::TEST PASSED
+DEAL::Simulating 15 processes
+DEAL::TEST PASSED
