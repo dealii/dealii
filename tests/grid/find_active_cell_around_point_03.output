@@ -1,0 +1,13 @@
+
+DEAL::Testing 1, 1
+DEAL::Standard find active cell around point: OK 
+DEAL::Cache find active cell around point: OK 
+DEAL::Test: OK 
+DEAL::Testing 2, 2
+DEAL::Standard find active cell around point: OK 
+DEAL::Cache find active cell around point: OK 
+DEAL::Test: OK 
+DEAL::Testing 3, 3
+DEAL::Standard find active cell around point: OK 
+DEAL::Cache find active cell around point: OK 
+DEAL::Test: OK 
