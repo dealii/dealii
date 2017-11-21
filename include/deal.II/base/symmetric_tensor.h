@@ -3673,7 +3673,7 @@ typename ProductType<Number, OtherNumber>::type
 scalar_product (const SymmetricTensor<2,dim,Number> &t1,
                 const Tensor<2,dim,OtherNumber>     &t2)
 {
-  Number s = 0;
+  typename ProductType<Number, OtherNumber>::type s = internal::NumberType<typename ProductType<Number, OtherNumber>::type>::value(0.0);
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       s += t1[i][j] * t2[i][j];
