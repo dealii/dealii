@@ -29,7 +29,7 @@ void test ()
   // as in symmetric_tensor_10
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
-      t[i][j] = 1. * Testing::rand() / RAND_MAX;
+      t[i][j] = random_value<double>();
 
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)

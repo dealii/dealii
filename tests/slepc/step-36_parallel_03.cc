@@ -145,7 +145,7 @@ void test (std::string solver_name,
     {
       eigenfunctions[i].reinit (locally_owned_dofs, mpi_communicator);//without ghost dofs
       for (unsigned int j=0; j<locally_owned_dofs.n_elements(); ++j)
-        eigenfunctions[i][locally_owned_dofs.nth_index_in_set(j)] = static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX);
+        eigenfunctions[i][locally_owned_dofs.nth_index_in_set(j)] = random_value<double>();
 
       eigenfunctions[i].compress(dealii::VectorOperation::insert);
     }

@@ -45,16 +45,16 @@ void test (const unsigned int n, const unsigned int m)
   for (unsigned int i=0; i<n; ++i)
     {
       for (unsigned int j=0; j<n; ++j)
-        A(i,j) = Testing::rand()/(1.0*RAND_MAX);
+        A(i,j) = random_value<double>();
       for (unsigned int j=0; j<m; ++j)
         {
-          B(i,j) = Bt(j,i) = Testing::rand()/(1.0*RAND_MAX);
-          D(j,i) = Dt(i,j) = Testing::rand()/(1.0*RAND_MAX);
+          B(i,j) = Bt(j,i) = random_value<double>();
+          D(j,i) = Dt(i,j) = random_value<double>();
         }
     }
   for (unsigned int i=0; i<m; ++i)
     for (unsigned int j=0; j<m; ++j)
-      C(i,j) = Testing::rand()/(1.0*RAND_MAX);
+      C(i,j) = random_value<double>();
 
   // Compare first Schur complement
   // with mmult.

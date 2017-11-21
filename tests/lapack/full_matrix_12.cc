@@ -30,12 +30,12 @@ void test()
   LAPACKFullMatrix<double> A(n,n);
   for (unsigned int i=0; i<n; ++i)
     for (unsigned int j=0; j<n; ++j)
-      A(i,j) = (double)rand()/RAND_MAX;
+      A(i,j) = random_value<double>();
   A.compute_lu_factorization();
   LAPACKFullMatrix<double> rhs_orig(n, 3);
   for (unsigned int i=0; i<3; ++i)
     for (unsigned int j=0; j<n; ++j)
-      rhs_orig(j,i) = 2.32 * rand() / RAND_MAX - 0.9923;
+      rhs_orig(j,i) =random_value<double>(-0.9923,1.3277);
 
   for (unsigned int transpose=0; transpose < 2; ++transpose)
     {

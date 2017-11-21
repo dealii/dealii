@@ -97,7 +97,7 @@ int main()
           for (unsigned int i=0; i<3; ++i)
             {
               for (unsigned int j=0; j<dim; ++j)
-                v(j) = 1. * Testing::rand()/RAND_MAX;
+                v(j) = random_value<double>();
 
               A.Tvmult (tmp1, v);
               ilu.Tvmult (tmp2, tmp1);

@@ -180,8 +180,8 @@ void test ()
     {
       if (constraints.is_constrained(dof.locally_owned_dofs().index_within_set(i)))
         continue;
-      in.block(0).local_element(i) = (double)Testing::rand()/RAND_MAX;
-      in.block(1).local_element(i) = (double)Testing::rand()/RAND_MAX;
+      in.block(0).local_element(i) = random_value<double>();
+      in.block(1).local_element(i) = random_value<double>();
     }
 
   mf.vmult (out, in);

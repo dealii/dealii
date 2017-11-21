@@ -30,7 +30,7 @@ void test()
   LAPACKFullMatrix<double> A(m,n);
   for (unsigned int i=0; i<m; ++i)
     for (unsigned int j=0; j<n; ++j)
-      A(i,j) = (double)rand()/RAND_MAX;
+      A(i,j) = random_value<double>();
 
   LAPACKFullMatrix<double> A_check(A);
 

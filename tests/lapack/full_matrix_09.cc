@@ -34,10 +34,10 @@ void test()
   LAPACKFullMatrix<double> AL(k,m), BL(k, n), CL(m, n);
   for (unsigned int i=0; i<m; ++i)
     for (unsigned int j=0; j<k; ++j)
-      A(j,i) = AL(j,i) = (double)rand()/RAND_MAX;
+      A(j,i) = AL(j,i) = random_value<double>();
   for (unsigned int i=0; i<k; ++i)
     for (unsigned int j=0; j<n; ++j)
-      B(i,j) = BL(i,j) = (double)rand()/RAND_MAX;
+      B(i,j) = BL(i,j) = random_value<double>();
 
   A.Tmmult(C, B);
   AL.Tmmult(CL, BL);

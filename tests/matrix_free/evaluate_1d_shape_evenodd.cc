@@ -35,7 +35,7 @@ void test()
   for (unsigned int i=0; i<(M+1)/2; ++i)
     for (unsigned int j=0; j<N; ++j)
       {
-        shape[i][j] = -1. + 2. * (double)Testing::rand()/RAND_MAX;
+        shape[i][j] = -1. + 2. * random_value<double>();
         if (type == 1)
           shape[M-1-i][N-1-j] = -shape[i][j];
         else
@@ -65,7 +65,7 @@ void test()
 
   double x[N], x_ref[N], y[M], y_ref[M];
   for (unsigned int i=0; i<N; ++i)
-    x[i] = (double)Testing::rand()/RAND_MAX;
+    x[i] = random_value<double>();
 
   // compute reference
   for (unsigned int i=0; i<M; ++i)
@@ -93,7 +93,7 @@ void test()
 
 
   for (unsigned int i=0; i<M; ++i)
-    y[i] = (double)Testing::rand()/RAND_MAX;
+    y[i] = random_value<double>();
 
   // compute reference
   for (unsigned int i=0; i<N; ++i)

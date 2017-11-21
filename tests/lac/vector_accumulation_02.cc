@@ -36,8 +36,8 @@ void check_norms ()
       Vector<number> larger1 (size+8), larger2(size+8), in1(size), in2(size);
       for (unsigned int i=0; i<size; ++i)
         {
-          in1(i) = static_cast<number>(Testing::rand())/static_cast<number>(RAND_MAX);
-          in2(i) = static_cast<number>(Testing::rand())/static_cast<number>(RAND_MAX);
+          in1(i) = random_value<number>();
+          in2(i) = random_value<number>();
         }
 
       const number inner_product = in1 * in2;

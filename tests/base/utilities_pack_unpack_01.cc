@@ -27,8 +27,7 @@ void test(const unsigned int &size)
   std::vector<Point<dim> > points(size);
 
   for (auto &p : points)
-    for (unsigned int i=0; i<dim; ++i)
-      p[i] = Testing::rand()/double(RAND_MAX);
+    p = random_point<dim>();
 
   auto buffer = Utilities::pack(points);
 

@@ -47,14 +47,7 @@ void test(unsigned int n_ref, unsigned int n_points)
 
   deallog << "Points in study: " << n_points << std::endl;
   for (size_t i=0; i<n_points; ++i)
-    {
-      //We need points in the square [0,1]x[0,1]: this is achieved normalizing with RAND_MAX
-      //RAND_MAX for the used algorithm is 2147483647
-      Point<spacedim> p;
-      for (unsigned int d=0; d<spacedim; ++d)
-        p[d] = double(Testing::rand())/RAND_MAX; //Normalizing the value
-      points.push_back(p);
-    }
+    points.push_back(random_point<spacedim>());
 
   auto &mapping = StaticMappingQ1<dim,spacedim>::mapping;
 

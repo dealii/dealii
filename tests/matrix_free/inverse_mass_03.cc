@@ -150,7 +150,7 @@ void do_test (const DoFHandler<dim> &dof)
 
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      const double entry = Testing::rand()/(double)RAND_MAX;
+      const double entry = random_value<double>();
       in(i) = entry;
     }
 

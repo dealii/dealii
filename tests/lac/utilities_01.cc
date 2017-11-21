@@ -54,7 +54,7 @@ int main(int argc, char **argv)
     PETScWrappers::MPI::Vector y(MPI_COMM_WORLD, dim, dim);
     PETScWrappers::MPI::Vector x(MPI_COMM_WORLD, dim, dim);
     for (unsigned int j=0; j<v0.size(); ++j)
-      v0[j] = static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX);
+      v0[j] = random_value<double>();
 
     v0.compress(VectorOperation::insert);
     GrowingVectorMemory<PETScWrappers::MPI::Vector> vector_memory;

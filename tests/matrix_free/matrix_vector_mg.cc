@@ -184,7 +184,7 @@ void test ()
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
       if (constraints.is_constrained(i) == false)
-        src(i) = (double)Testing::rand()/RAND_MAX;
+        src(i) = random_value<double>();
     }
 
   // now perform matrix-vector product and check
@@ -205,7 +205,7 @@ void test ()
       for (unsigned int i=0; i<dof.n_dofs(level); ++i)
         {
           if (mg_constraints[level].is_constrained(i) == false)
-            src(i) = (double)Testing::rand()/RAND_MAX;
+            src(i) = random_value<double>();
         }
 
       // now perform matrix-vector product and check

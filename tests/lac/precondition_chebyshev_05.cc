@@ -71,7 +71,7 @@ int main(int argc, char **argv)
       for (unsigned int i=0; i<3; ++i)
         {
           for (unsigned int j=0; j<dim; ++j)
-            v(j) = 1. * Testing::rand()/RAND_MAX;
+            v(j) = random_value<double>();
 
           AA.vmult (tmp1, v);
           cheby_data.preconditioner->vmult (tmp2, tmp1);

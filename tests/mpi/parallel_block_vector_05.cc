@@ -116,7 +116,7 @@ void test (const unsigned int n_blocks = 5)
             owned_set.nth_index_in_set (i);
           if (constraints.is_constrained(glob_index))
             continue;
-          right.block(b).local_element(i) = (double)Testing::rand()/RAND_MAX;
+          right.block(b).local_element(i) = random_value<double>();
         }
 
       mf.vmult (left.block(b), right.block(b));
@@ -153,7 +153,7 @@ void test (const unsigned int n_blocks = 5)
               owned_set.nth_index_in_set (i);
             if (constraints.is_constrained(glob_index))
               continue;
-            left2.block(b).local_element(i) = (double)Testing::rand()/RAND_MAX;
+            left2.block(b).local_element(i) = random_value<double>();
           }
       }
 

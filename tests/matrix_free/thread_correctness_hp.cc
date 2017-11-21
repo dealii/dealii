@@ -183,7 +183,7 @@ void do_test (const unsigned int parallel_option)
       for (unsigned int i=0; i<dof.n_dofs(); ++i)
         {
           if (constraints.is_constrained(i) == false)
-            src(i) = (double)Testing::rand()/RAND_MAX;
+            src(i) = random_value<double>();
         }
 
       // now perform 30 matrix-vector products in

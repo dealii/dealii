@@ -85,7 +85,7 @@ void test ()
   mf_data_0->initialize_dof_vector (in);
 
   for (unsigned int i=0; i<in.local_size(); ++i)
-    in.local_element(i) = (double)Testing::rand()/RAND_MAX;
+    in.local_element(i) = random_value<double>();
 
   mf_c0.initialize_dof_vector(out);
   mf_c0.initialize_dof_vector(ref);

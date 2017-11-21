@@ -37,8 +37,8 @@ void check (Triangulation<2> &tria)
 
   // generate some random points bounded by [0., 0.2)^2 in R^2 space
   // any point in this domain should be inside one of the cells
-  Point<2> p( static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX),
-              static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX)/8. );
+  Point<2> p( random_value<double>(),
+              random_value<double>()/8. );
 
   try
     {
