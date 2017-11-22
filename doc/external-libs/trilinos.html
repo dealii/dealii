@@ -15,18 +15,18 @@
     <p>
       <a href="https://trilinos.org/" target="_top">Trilinos</a> is a
       software package that provides lots of functionality for linear
-      algebra, among other things. For example, it includes implementations of a variety of
-      linear solvers, as well as various different sparse and dense matrix and
-      vector formats. Trilinos also has many subpackages that deal with
-      problems that go far beyond linear algebra, for example nonlinear
+      algebra, among other things. For example, it includes implementations of
+      a variety of linear solvers, as well as various different sparse and dense
+      matrix and vector formats. Trilinos also has many subpackages that deal
+      with problems that go far beyond linear algebra, for example nonlinear
       solvers, automatic differentiation packages, uncertainty propagation
       engines, etc. Of particular interest to deal.II is their ability to
       provide this functionality both on sequential and parallel (using MPI)
-      computers. Compared to <a href="http://www.mcs.anl.gov/petsc/"
-				target="_top">PETSc</a>, which is written in C, Trilinos is written in
-      C++ and can be
-      considered to be a more modern version of PETSc though both packages are
-      under continuing development at their respective national laboratories.
+      computers.
+      Compared to <a href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a>,
+      which is written in C, Trilinos is written in C++ and can be considered to
+      be a more modern version of PETSc though both packages are under
+      continuing development at their respective national laboratories.
     </p>
 
     <p>
@@ -49,29 +49,28 @@
     <h5>Installing Trilinos</h5>
 
     <p style="color: red">
-      Note: The current version of deal.II requires at least Trilinos 11.2.
-      Deal.II is known to work with Trilinos up to 11.14 and 12.4. Others versions of
+      Note: The current version of deal.II requires at least Trilinos 12.4.
+      Deal.II is known to work with Trilinos up to 12.12. Other versions of
       Trilinos should work too but we do not do regression tests with them. 
     </p>
 
     <p>
-      deal.II uses the following libraries from Trilinos and will fail to
-      compile with Trilinos if they are not present:
+      deal.II uses the following libraries from Trilinos:
       <ul>
         <li> Amesos,
         <li> AztecOO,
         <li> Epetra,
         <li> Ifpack,
         <li> ML,
-        <li> MueLu (if using Trilinos 11.14 or newer),
-        <li> ROL,
+        <li> MueLu,
+        <li> ROL (optional),
         <li> Sacado, and
         <li> Teuchos.
       </ul>
 
       Trilinos uses <a href="http://cmake.org/">cmake</a> to configure and
       build. The following slightly longish set of commands will set up a
-      reasonable configuration (we require MueLu starting from 12.0):
+      reasonable configuration:
       <pre>
 
     cd trilinos-12.4.2
