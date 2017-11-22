@@ -1,0 +1,21 @@
+
+DEAL:0::Testing GridTools::Cache for spacedim = 2 and dimension 2
+DEAL:0::Computed Bounding Boxes:
+DEAL:0::0.00000 0.00000
+DEAL:0::1.00000 0.500000
+DEAL:0::
+DEAL:0::0.00000 0.500000
+DEAL:0::1.00000 1.00000
+DEAL:0::
+DEAL:0::Test finished
+
+DEAL:1::Testing GridTools::Cache for spacedim = 2 and dimension 2
+DEAL:1::Computed Bounding Boxes:
+DEAL:1::0.00000 0.00000
+DEAL:1::1.00000 0.500000
+DEAL:1::
+DEAL:1::0.00000 0.500000
+DEAL:1::1.00000 1.00000
+DEAL:1::
+DEAL:1::Test finished
+
