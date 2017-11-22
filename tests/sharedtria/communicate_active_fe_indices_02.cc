@@ -38,7 +38,10 @@ template <int dim>
 void test()
 {
   parallel::shared::Triangulation<dim>
-  triangulation (MPI_COMM_WORLD, dealii::Triangulation<dim>::none, true);
+  triangulation (MPI_COMM_WORLD,
+                 ::Triangulation<dim>::none,
+                 true,
+                 parallel::shared::Triangulation<dim>::partition_zorder);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global (3);
