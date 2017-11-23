@@ -15,6 +15,8 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi.templates.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
@@ -59,7 +61,8 @@
 #include <list>
 #include <set>
 #include <tuple>
-
+#include <unordered_map>
+#include <iostream>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1067,6 +1070,479 @@ namespace GridTools
                     }
                 }
       }
+  }
+
+
+
+  template <int dim, template <int, int> class MeshType, int spacedim>
+  unsigned int
+  find_closest_vertex (const MeshType<dim,spacedim> &mesh,
+                       const Point<spacedim>        &p,
+                       const std::vector<bool>      &marked_vertices)
+  {
+    // first get the underlying
+    // triangulation from the
+    // mesh and determine vertices
+    // and used vertices
+    const Triangulation<dim, spacedim> &tria = mesh.get_triangulation();
+
+    const std::vector< Point<spacedim> > &vertices = tria.get_vertices();
+
+    Assert ( tria.get_vertices().size() == marked_vertices.size() || marked_vertices.size() ==0,
+             ExcDimensionMismatch(tria.get_vertices().size(), marked_vertices.size()));
+
+    // If p is an element of marked_vertices,
+    // and q is that of used_Vertices,
+    // the vector marked_vertices does NOT
+    // contain unused vertices if p implies q.
+    // I.e., if p is true q must be true
+    // (if p is false, q could be false or true).
+    // p implies q logic is encapsulated in ~p|q.
+    Assert( marked_vertices.size()==0
+            ||
+            std::equal( marked_vertices.begin(),
+                        marked_vertices.end(),
+                        tria.get_used_vertices().begin(),
+                        [](bool p, bool q)
+    {
+      return !p || q;
+    }),
+    ExcMessage("marked_vertices should be a subset of used vertices in the triangulation "
+               "but marked_vertices contains one or more vertices that are not used vertices!") );
+
+    // In addition, if a vector bools
+    // is specified (marked_vertices)
+    // marking all the vertices which
+    // could be the potentially closest
+    // vertex to the point, use it instead
+    // of used vertices
+    const std::vector<bool> &used     =
+      (marked_vertices.size()==0) ? tria.get_used_vertices() : marked_vertices;
+
+    // At the beginning, the first
+    // used vertex is the closest one
+    std::vector<bool>::const_iterator first =
+      std::find(used.begin(), used.end(), true);
+
+    // Assert that at least one vertex
+    // is actually used
+    Assert(first != used.end(), ExcInternalError());
+
+    unsigned int best_vertex = std::distance(used.begin(), first);
+    double       best_dist   = (p - vertices[best_vertex]).norm_square();
+
+    // For all remaining vertices, test
+    // whether they are any closer
+    for (unsigned int j = best_vertex+1; j < vertices.size(); j++)
+      if (used[j])
+        {
+          double dist = (p - vertices[j]).norm_square();
+          if (dist < best_dist)
+            {
+              best_vertex = j;
+              best_dist   = dist;
+            }
+        }
+
+    return best_vertex;
+  }
+
+
+
+  template <int dim, template <int, int> class MeshType, int spacedim>
+  unsigned int
+  find_closest_vertex (const Mapping<dim,spacedim>  &mapping,
+                       const MeshType<dim,spacedim> &mesh,
+                       const Point<spacedim>        &p,
+                       const std::vector<bool>      &marked_vertices)
+  {
+    // Take a shortcut in the simple case.
+    if (mapping.preserves_vertex_locations() == true)
+      return find_closest_vertex(mesh, p, marked_vertices);
+
+    // first get the underlying
+    // triangulation from the
+    // mesh and determine vertices
+    // and used vertices
+    const Triangulation<dim, spacedim> &tria = mesh.get_triangulation();
+
+    auto vertices = extract_used_vertices(tria, mapping);
+
+    Assert ( tria.get_vertices().size() == marked_vertices.size() || marked_vertices.size() ==0,
+             ExcDimensionMismatch(tria.get_vertices().size(), marked_vertices.size()));
+
+    // If p is an element of marked_vertices,
+    // and q is that of used_Vertices,
+    // the vector marked_vertices does NOT
+    // contain unused vertices if p implies q.
+    // I.e., if p is true q must be true
+    // (if p is false, q could be false or true).
+    // p implies q logic is encapsulated in ~p|q.
+    Assert( marked_vertices.size()==0
+            ||
+            std::equal( marked_vertices.begin(),
+                        marked_vertices.end(),
+                        tria.get_used_vertices().begin(),
+                        [](bool p, bool q)
+    {
+      return !p || q;
+    }),
+    ExcMessage("marked_vertices should be a subset of used vertices in the triangulation "
+               "but marked_vertices contains one or more vertices that are not used vertices!") );
+
+    // Remove from the map unwanted elements.
+    if (marked_vertices.size())
+      for (auto it = vertices.begin(); it != vertices.end(); )
+        {
+          if (marked_vertices[it->first] == false)
+            {
+              vertices.erase(it++);
+            }
+          else
+            {
+              ++it;
+            }
+        }
+
+    return find_closest_vertex(vertices, p);
+  }
+
+
+
+  template <int dim, template <int, int> class MeshType, int spacedim>
+#ifndef _MSC_VER
+  std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
+#else
+  std::vector<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type>
+#endif
+  find_cells_adjacent_to_vertex(const MeshType<dim,spacedim> &mesh,
+                                const unsigned int            vertex)
+  {
+    // make sure that the given vertex is
+    // an active vertex of the underlying
+    // triangulation
+    Assert(vertex < mesh.get_triangulation().n_vertices(),
+           ExcIndexRange(0,mesh.get_triangulation().n_vertices(),vertex));
+    Assert(mesh.get_triangulation().get_used_vertices()[vertex],
+           ExcVertexNotUsed(vertex));
+
+    // use a set instead of a vector
+    // to ensure that cells are inserted only
+    // once
+    std::set<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type> adjacent_cells;
+
+    typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type
+    cell = mesh.begin_active(),
+    endc = mesh.end();
+
+    // go through all active cells and look if the vertex is part of that cell
+    //
+    // in 1d, this is all we need to care about. in 2d/3d we also need to worry
+    // that the vertex might be a hanging node on a face or edge of a cell; in
+    // this case, we would want to add those cells as well on whose faces the
+    // vertex is located but for which it is not a vertex itself.
+    //
+    // getting this right is a lot simpler in 2d than in 3d. in 2d, a hanging
+    // node can only be in the middle of a face and we can query the neighboring
+    // cell from the current cell. on the other hand, in 3d a hanging node
+    // vertex can also be on an edge but there can be many other cells on
+    // this edge and we can not access them from the cell we are currently
+    // on.
+    //
+    // so, in the 3d case, if we run the algorithm as in 2d, we catch all
+    // those cells for which the vertex we seek is on a *subface*, but we
+    // miss the case of cells for which the vertex we seek is on a
+    // sub-edge for which there is no corresponding sub-face (because the
+    // immediate neighbor behind this face is not refined), see for example
+    // the bits/find_cells_adjacent_to_vertex_6 testcase. thus, if we
+    // haven't yet found the vertex for the current cell we also need to
+    // look at the mid-points of edges
+    //
+    // as a final note, deciding whether a neighbor is actually coarser is
+    // simple in the case of isotropic refinement (we just need to look at
+    // the level of the current and the neighboring cell). however, this
+    // isn't so simple if we have used anisotropic refinement since then
+    // the level of a cell is not indicative of whether it is coarser or
+    // not than the current cell. ultimately, we want to add all cells on
+    // which the vertex is, independent of whether they are coarser or
+    // finer and so in the 2d case below we simply add *any* *active* neighbor.
+    // in the worst case, we add cells multiple times to the adjacent_cells
+    // list, but std::set throws out those cells already entered
+    for (; cell != endc; ++cell)
+      {
+        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; v++)
+          if (cell->vertex_index(v) == vertex)
+            {
+              // OK, we found a cell that contains
+              // the given vertex. We add it
+              // to the list.
+              adjacent_cells.insert(cell);
+
+              // as explained above, in 2+d we need to check whether
+              // this vertex is on a face behind which there is a
+              // (possibly) coarser neighbor. if this is the case,
+              // then we need to also add this neighbor
+              if (dim >= 2)
+                for (unsigned int vface = 0; vface < dim; vface++)
+                  {
+                    const unsigned int face =
+                      GeometryInfo<dim>::vertex_to_face[v][vface];
+
+                    if (!cell->at_boundary(face)
+                        &&
+                        cell->neighbor(face)->active())
+                      {
+                        // there is a (possibly) coarser cell behind a
+                        // face to which the vertex belongs. the
+                        // vertex we are looking at is then either a
+                        // vertex of that coarser neighbor, or it is a
+                        // hanging node on one of the faces of that
+                        // cell. in either case, it is adjacent to the
+                        // vertex, so add it to the list as well (if
+                        // the cell was already in the list then the
+                        // std::set makes sure that we get it only
+                        // once)
+                        adjacent_cells.insert (cell->neighbor(face));
+                      }
+                  }
+
+              // in any case, we have found a cell, so go to the next cell
+              goto next_cell;
+            }
+
+        // in 3d also loop over the edges
+        if (dim >= 3)
+          {
+            for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_cell; ++e)
+              if (cell->line(e)->has_children())
+                // the only place where this vertex could have been
+                // hiding is on the mid-edge point of the edge we
+                // are looking at
+                if (cell->line(e)->child(0)->vertex_index(1) == vertex)
+                  {
+                    adjacent_cells.insert(cell);
+
+                    // jump out of this tangle of nested loops
+                    goto next_cell;
+                  }
+          }
+
+        // in more than 3d we would probably have to do the same as
+        // above also for even lower-dimensional objects
+        Assert (dim <= 3, ExcNotImplemented());
+
+        // move on to the next cell if we have found the
+        // vertex on the current one
+next_cell:
+        ;
+      }
+
+    // if this was an active vertex then there needs to have been
+    // at least one cell to which it is adjacent!
+    Assert (adjacent_cells.size() > 0, ExcInternalError());
+
+    // return the result as a vector, rather than the set we built above
+    return
+      std::vector<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type>
+      (adjacent_cells.begin(), adjacent_cells.end());
+  }
+
+
+
+  namespace
+  {
+    template <int dim, template <int, int> class MeshType, int spacedim>
+    void find_active_cell_around_point_internal
+    (const MeshType<dim,spacedim> &mesh,
+#ifndef _MSC_VER
+     std::set<typename MeshType<dim, spacedim>::active_cell_iterator> &searched_cells,
+     std::set<typename MeshType<dim, spacedim>::active_cell_iterator> &adjacent_cells)
+#else
+     std::set<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type> &searched_cells,
+     std::set<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type> &adjacent_cells)
+#endif
+    {
+#ifndef _MSC_VER
+      typedef typename MeshType<dim, spacedim>::active_cell_iterator cell_iterator;
+#else
+      typedef typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type cell_iterator;
+#endif
+
+      // update the searched cells
+      searched_cells.insert(adjacent_cells.begin(), adjacent_cells.end());
+      // now we to collect all neighbors
+      // of the cells in adjacent_cells we
+      // have not yet searched.
+      std::set<cell_iterator> adjacent_cells_new;
+
+      typename std::set<cell_iterator>::const_iterator
+      cell = adjacent_cells.begin(),
+      endc = adjacent_cells.end();
+      for (; cell != endc; ++cell)
+        {
+          std::vector<cell_iterator> active_neighbors;
+          get_active_neighbors<MeshType<dim, spacedim> >(*cell, active_neighbors);
+          for (unsigned int i=0; i<active_neighbors.size(); ++i)
+            if (searched_cells.find(active_neighbors[i]) == searched_cells.end())
+              adjacent_cells_new.insert(active_neighbors[i]);
+        }
+      adjacent_cells.clear();
+      adjacent_cells.insert(adjacent_cells_new.begin(), adjacent_cells_new.end());
+      if (adjacent_cells.size() == 0)
+        {
+          // we haven't found any other cell that would be a
+          // neighbor of a previously found cell, but we know
+          // that we haven't checked all cells yet. that means
+          // that the domain is disconnected. in that case,
+          // choose the first previously untouched cell we
+          // can find
+          cell_iterator it = mesh.begin_active();
+          for ( ; it!=mesh.end(); ++it)
+            if (searched_cells.find(it) == searched_cells.end())
+              {
+                adjacent_cells.insert(it);
+                break;
+              }
+        }
+    }
+  }
+
+  template <int dim, template <int, int> class MeshType, int spacedim>
+#ifndef _MSC_VER
+  typename MeshType<dim, spacedim>::active_cell_iterator
+#else
+  typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type
+#endif
+  find_active_cell_around_point (const MeshType<dim,spacedim> &mesh,
+                                 const Point<spacedim>        &p,
+                                 const std::vector<bool>      &marked_vertices)
+  {
+    return
+      find_active_cell_around_point<dim,MeshType,spacedim>
+      (StaticMappingQ1<dim,spacedim>::mapping,
+       mesh, p, marked_vertices).first;
+  }
+
+
+  template <int dim, template <int, int> class MeshType, int spacedim>
+#ifndef _MSC_VER
+  std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim> >
+#else
+  std::pair<typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type, Point<dim> >
+#endif
+  find_active_cell_around_point (const Mapping<dim,spacedim>  &mapping,
+                                 const MeshType<dim,spacedim> &mesh,
+                                 const Point<spacedim>        &p,
+                                 const std::vector<bool>      &marked_vertices)
+  {
+    typedef typename dealii::internal::ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim> >::type active_cell_iterator;
+
+    // The best distance is set to the
+    // maximum allowable distance from
+    // the unit cell; we assume a
+    // max. deviation of 1e-10
+    double best_distance = 1e-10;
+    int    best_level = -1;
+    std::pair<active_cell_iterator, Point<dim> > best_cell;
+
+    // Find closest vertex and determine
+    // all adjacent cells
+    std::vector<active_cell_iterator> adjacent_cells_tmp
+      = find_cells_adjacent_to_vertex(mesh,
+                                      find_closest_vertex(mapping, mesh, p, marked_vertices));
+
+    // Make sure that we have found
+    // at least one cell adjacent to vertex.
+    Assert(adjacent_cells_tmp.size()>0, ExcInternalError());
+
+    // Copy all the cells into a std::set
+    std::set<active_cell_iterator> adjacent_cells (adjacent_cells_tmp.begin(),
+                                                   adjacent_cells_tmp.end());
+    std::set<active_cell_iterator> searched_cells;
+
+    // Determine the maximal number of cells
+    // in the grid.
+    // As long as we have not found
+    // the cell and have not searched
+    // every cell in the triangulation,
+    // we keep on looking.
+    const unsigned int n_active_cells = mesh.get_triangulation().n_active_cells();
+    bool found = false;
+    unsigned int cells_searched = 0;
+    while (!found && cells_searched < n_active_cells)
+      {
+        typename std::set<active_cell_iterator>::const_iterator
+        cell = adjacent_cells.begin(),
+        endc = adjacent_cells.end();
+        for (; cell != endc; ++cell)
+          {
+            try
+              {
+                const Point<dim> p_cell = mapping.transform_real_to_unit_cell(*cell, p);
+
+                // calculate the infinity norm of
+                // the distance vector to the unit cell.
+                const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_cell);
+
+                // We compare if the point is inside the
+                // unit cell (or at least not too far
+                // outside). If it is, it is also checked
+                // that the cell has a more refined state
+                if ((dist < best_distance)
+                    ||
+                    ((dist == best_distance)
+                     &&
+                     ((*cell)->level() > best_level)))
+                  {
+                    found         = true;
+                    best_distance = dist;
+                    best_level    = (*cell)->level();
+                    best_cell     = std::make_pair(*cell, p_cell);
+                  }
+              }
+            catch (typename MappingQGeneric<dim,spacedim>::ExcTransformationFailed &)
+              {
+                // ok, the transformation
+                // failed presumably
+                // because the point we
+                // are looking for lies
+                // outside the current
+                // cell. this means that
+                // the current cell can't
+                // be the cell around the
+                // point, so just ignore
+                // this cell and move on
+                // to the next
+              }
+          }
+
+        // update the number of cells searched
+        cells_searched += adjacent_cells.size();
+
+        // if the user provided a custom mask for vertices,
+        // terminate the search without trying to expand the search
+        // to all cells of the triangulation, as done below.
+        if (marked_vertices.size() > 0)
+          cells_searched = n_active_cells;
+
+        // if we have not found the cell in
+        // question and have not yet searched every
+        // cell, we expand our search to
+        // all the not already searched neighbors of
+        // the cells in adjacent_cells. This is
+        // what find_active_cell_around_point_internal
+        // is for.
+        if (!found && cells_searched < n_active_cells)
+          {
+            find_active_cell_around_point_internal<dim,MeshType,spacedim>
+            (mesh, searched_cells, adjacent_cells);
+          }
+      }
+
+    AssertThrow (best_cell.first.state() == IteratorState::valid,
+                 ExcPointNotFound<spacedim>(p));
+
+    return best_cell;
   }
 
 
@@ -3315,6 +3791,580 @@ namespace GridTools
 
 
 
+  namespace internal
+  {
+    // Functions are needed for distributed compute point locations
+    namespace distributed_cptloc
+    {
+      // Hash function for cells; needed for unordered maps/multimaps
+      template < int dim, int spacedim>
+      struct cell_hash
+      {
+        std::size_t operator()(const typename Triangulation<dim, spacedim>::active_cell_iterator &k) const
+        {
+          // Return active cell index, which is faster than CellId to compute
+          return k->active_cell_index();
+        }
+      };
+
+
+
+      // Compute point locations; internal version which returns an unordered map
+      // The algorithm is the same as GridTools::compute_point_locations
+      template <int dim, int spacedim>
+      std::unordered_map< typename Triangulation<dim, spacedim>::active_cell_iterator,
+          std::pair<std::vector<Point<dim> >,std::vector<unsigned int> >, cell_hash<dim,spacedim> >
+          compute_point_locations_unmap(const GridTools::Cache<dim,spacedim>     &cache,
+                                        const std::vector<Point<spacedim> >      &points)
+      {
+        // How many points are here?
+        const unsigned int np = points.size();
+        // Creating the output tuple
+        std::unordered_map< typename Triangulation<dim, spacedim>::active_cell_iterator,
+            std::pair<std::vector<Point<dim> >,std::vector<unsigned int> >, cell_hash<dim,spacedim> >
+            cell_qpoint_map;
+
+        // Now the easy case.
+        if (np==0) return cell_qpoint_map;
+        // We begin by finding the cell/transform of the first point
+        auto my_pair  = GridTools::find_active_cell_around_point
+                        (cache, points[0]);
+
+        auto last_cell = cell_qpoint_map.emplace(
+                           std::make_pair(my_pair.first, std::make_pair(
+                                            std::vector<Point<dim> > {my_pair.second},
+                                            std::vector<unsigned int> {0})));
+        // Now the second easy case.
+        if (np==1) return cell_qpoint_map;
+        // Computing the cell center and diameter
+        Point<spacedim> cell_center = my_pair.first->center();
+        double cell_diameter = my_pair.first->diameter()*
+                               (0.5 + std::numeric_limits<double>::epsilon() );
+
+        // Cycle over all points left
+        for (unsigned int p=1; p< np; ++p)
+          {
+            // Checking if the point is close to the cell center, in which
+            // case calling find active cell with a cell hint
+            if ( cell_center.distance(points[p]) < cell_diameter )
+              my_pair  = GridTools::find_active_cell_around_point
+                         (cache, points[p],last_cell.first->first);
+            else
+              my_pair  = GridTools::find_active_cell_around_point
+                         (cache, points[p]);
+
+            if ( last_cell.first->first == my_pair.first)
+              {
+                last_cell.first->second.first.emplace_back(my_pair.second);
+                last_cell.first->second.second.emplace_back(p);
+              }
+            else
+              {
+                // Check if it is in another cell already found
+                last_cell = cell_qpoint_map.emplace(std::make_pair(my_pair.first, std::make_pair(
+                                                                     std::vector<Point<dim> > {my_pair.second},
+                                                                     std::vector<unsigned int> {p})));
+
+                if ( last_cell.second == false )
+                  {
+                    // Cell already present: adding the new point
+                    last_cell.first->second.first.emplace_back(my_pair.second);
+                    last_cell.first->second.second.emplace_back(p);
+                  }
+                else
+                  {
+                    // New cell was added, updating center and diameter
+                    cell_center = my_pair.first->center();
+                    cell_diameter = my_pair.first->diameter()*
+                                    (0.5 + std::numeric_limits<double>::epsilon() );
+                  }
+              }
+          }
+
+#ifdef DEBUG
+        unsigned int qps = 0;
+        // The number of points in all
+        // the cells must be the same as
+        // the number of points we
+        // started off from.
+        for (const auto &m: cell_qpoint_map)
+          {
+            Assert(m.second.second.size() ==
+                   m.second.first.size(),
+                   ExcDimensionMismatch(m.second.second.size(),
+                                        m.second.first.size()));
+            qps += m.second.second.size();
+          }
+        Assert(qps == np,
+               ExcDimensionMismatch(qps, np));
+#endif
+        return cell_qpoint_map;
+      }
+
+
+
+      // Merging the output means to add data to a previous output, here contained
+      // in output unmap:
+      // if the cell is already present: add information about new points
+      // if the cell is not present: add the cell with all information
+      //
+      // Notice we call "information" the data associated with a point of the sort:
+      // cell containing it, transformed point on reference cell, index,
+      // rank of the owner etc.
+      template <int dim, int spacedim>
+      void
+      merge_cptloc_outputs(
+        std::unordered_map< typename Triangulation<dim, spacedim>::active_cell_iterator,
+        std::tuple<
+        std::vector< Point<dim> >,
+        std::vector< unsigned int >,
+        std::vector< Point<spacedim> >,
+        std::vector< unsigned int >
+        >,
+        cell_hash<dim,spacedim>>                                                        &output_unmap,
+        const std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator > &in_cells,
+        const std::vector< std::vector< Point<dim> > >                                  &in_qpoints,
+        const std::vector< std::vector<unsigned int> >                                  &in_maps,
+        const std::vector< std::vector< Point<spacedim> > >                             &in_points,
+        const unsigned int                                                               in_rank
+      )
+      {
+        // Adding cells, one by one
+        for (unsigned int c=0; c< in_cells.size(); ++c)
+          {
+            // Attempt to add a new cell with its relative data
+            auto current_c = output_unmap.emplace(
+                               std::make_pair(in_cells[c],
+                                              std::make_tuple(in_qpoints[c],
+                                                              in_maps[c],
+                                                              in_points[c],
+                                                              std::vector<unsigned int>
+                                                              (in_points[c].size(),in_rank))));
+            // If the flag is false no new cell was added:
+            if ( current_c.second == false )
+              {
+                // Cell in output map at current_c.first:
+                // Adding the information to it
+                auto &cell_qpts = std::get<0>(current_c.first->second);
+                auto &cell_maps = std::get<1>(current_c.first->second);
+                auto &cell_pts = std::get<2>(current_c.first->second);
+                auto &cell_ranks = std::get<3>(current_c.first->second);
+                cell_qpts.insert(cell_qpts.end(),
+                                 in_qpoints[c].begin(),
+                                 in_qpoints[c].end());
+                cell_maps.insert(cell_maps.end(),
+                                 in_maps[c].begin(),
+                                 in_maps[c].end());
+                cell_pts.insert(cell_pts.end(),
+                                in_points[c].begin(),
+                                in_points[c].end());
+                std::vector< unsigned int > ranks_tmp(in_points[c].size(),in_rank);
+                cell_ranks.insert(cell_ranks.end(),
+                                  ranks_tmp.begin(),
+                                  ranks_tmp.end());
+              }
+          }
+      }
+
+
+
+      // This function initializes the output by calling compute point locations
+      // on local points; vector containing points which are probably local.
+      // Its output is then sorted in the following manner:
+      // - output unmap: points, with relative information, inside locally onwed cells,
+      // - ghost loc pts: points, with relative information, inside ghost cells,
+      // - classified pts: vector of all points returned in output map and ghost loc pts
+      //   (these are stored as indices)
+      template <int dim, int spacedim>
+      void
+      compute_and_classify_points(
+        const GridTools::Cache<dim,spacedim>                              &cache,
+        const std::vector<Point<spacedim> >                               &local_points,
+        const std::vector< unsigned int >                                 &local_points_idx,
+        std::unordered_map<
+        typename Triangulation<dim, spacedim>::active_cell_iterator,
+        std::tuple<
+        std::vector< Point<dim> >,
+        std::vector< unsigned int >,
+        std::vector< Point<spacedim> >,
+        std::vector< unsigned int >
+        >,
+        cell_hash<dim,spacedim>>                                          &output_unmap,
+        std::map< unsigned int,
+        std::tuple<
+        std::vector< CellId >,
+        std::vector< std::vector< Point<dim> > >,
+        std::vector< std::vector< unsigned int > >,
+        std::vector< std::vector< Point<spacedim> > >
+        > >                                                               &ghost_loc_pts,
+        std::vector< unsigned int >                                       &classified_pts
+      )
+      {
+        auto cpt_loc_pts = compute_point_locations_unmap(cache,local_points);
+
+        // Alayzing the output discarding artificial cell
+        // and storing in the proper container locally owned and ghost cells
+        for (auto const &cell_tuples : cpt_loc_pts)
+          {
+            auto &cell_loc = cell_tuples.first;
+            auto &q_loc = std::get<0>(cell_tuples.second);
+            auto &indices_loc = std::get<1>(cell_tuples.second);
+            if (cell_loc->is_locally_owned() )
+              {
+                // Point inside locally owned cell: storing all its data
+                std::vector < Point<spacedim> > cell_points(indices_loc.size());
+                for (unsigned int i=0; i< indices_loc.size(); ++i)
+                  {
+                    // Adding the point to the cell points
+                    cell_points[i] = local_points[indices_loc[i]];
+                    // Storing the index: notice indices loc refer to the local points
+                    // vector, but we need to return the index with respect of
+                    // the points owned by the current process
+                    classified_pts.emplace_back(local_points_idx[indices_loc[i]]);
+                  }
+                output_unmap.emplace(std::make_pair(cell_loc,
+                                                    std::make_tuple(q_loc,
+                                                                    indices_loc,
+                                                                    cell_points,
+                                                                    std::vector<unsigned int>
+                                                                    (indices_loc.size(),cell_loc->subdomain_id()))));
+              }
+            else if ( cell_loc->is_ghost() )
+              {
+                // Point inside ghost cell: storing all its information and preparing
+                // it to be sent
+                std::vector < Point<spacedim> > cell_points(indices_loc.size());
+                for (unsigned int i=0; i< indices_loc.size(); ++i)
+                  {
+                    cell_points[i] = local_points[indices_loc[i]];
+                    classified_pts.emplace_back(local_points_idx[indices_loc[i]]);
+                  }
+                // Each key of the following map represent a process,
+                // each mapped value is a tuple containing the information to be sent:
+                // preparing the output for the owner, which has rank subdomain id
+                auto &map_tuple_owner = ghost_loc_pts[cell_loc->subdomain_id()];
+                // To identify the cell on the other process we use the cell id
+                std::get<0>(map_tuple_owner).emplace_back(cell_loc->id());
+                std::get<1>(map_tuple_owner).emplace_back(q_loc);
+                std::get<2>(map_tuple_owner).emplace_back(indices_loc);
+                std::get<3>(map_tuple_owner).emplace_back(cell_points);
+              }
+            // else: the cell is artificial, nothing to do
+          }
+      }
+
+
+
+      // Given the map obtained from a communication, where the key is rank and the mapped
+      // value is a pair of (points,indices), calls compute point locations; its output
+      // is then merged with output tuple
+      // if check_owned is set to true only points
+      // lying inside locally onwed cells shall be merged, otherwise all points shall be merged.
+      template <int dim, int spacedim>
+      void
+      compute_and_merge_from_map(
+        const GridTools::Cache<dim,spacedim>                                         &cache,
+        const   std::map< unsigned int,
+        std::pair<
+        std::vector < Point<spacedim> >,
+        std::vector < unsigned int > >
+        >                                                                            &map_pts,
+        std::unordered_map< typename Triangulation<dim, spacedim>::active_cell_iterator,
+        std::tuple<
+        std::vector< Point<dim> >,
+        std::vector< unsigned int >,
+        std::vector< Point<spacedim> >,
+        std::vector< unsigned int >
+        >,
+        cell_hash<dim,spacedim>>                                                     &output_unmap,
+        const bool                                                                   &check_owned
+      )
+      {
+        bool no_check = !check_owned;
+
+        // rank and points is a pair: first rank, then a pair of vectors (points, indices)
+        for (auto const &rank_and_points : map_pts)
+          {
+            // Rewriting the contents of the map in human readable format
+            const auto &received_process = rank_and_points.first;
+            const auto &received_points = rank_and_points.second.first;
+            const auto &received_ranks = rank_and_points.second.second;
+
+            // Initializing the vectors needed to store the result of compute point location
+            std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator > in_cell;
+            std::vector< std::vector< Point<dim> > > in_qpoints;
+            std::vector< std::vector< unsigned int > > in_maps;
+            std::vector< std::vector< Point<spacedim> > > in_points;
+
+            auto cpt_loc_pts = compute_point_locations_unmap(cache,rank_and_points.second.first);
+            for (const auto &map_c_pt_idx: cpt_loc_pts)
+              {
+                // Human-readable variables:
+                const auto &proc_cell = map_c_pt_idx.first;
+                const auto &proc_qpoints = map_c_pt_idx.second.first;
+                const auto &proc_maps = map_c_pt_idx.second.second;
+
+                // This is stored either if we're not checking if the cell is owned or
+                // if the cell is locally owned
+                if ( no_check || proc_cell->is_locally_owned() )
+                  {
+                    in_cell.emplace_back(proc_cell);
+                    in_qpoints.emplace_back(proc_qpoints);
+                    // The other two vectors need to be built
+                    unsigned int loc_size = proc_qpoints.size();
+                    std::vector< unsigned int > cell_maps(loc_size);
+                    std::vector< Point<spacedim> > cell_points(loc_size);
+                    for (unsigned int pt=0; pt<loc_size; ++pt)
+                      {
+                        cell_maps[pt] = received_ranks[proc_maps[pt]];
+                        cell_points[pt] = received_points[proc_maps[pt]];
+                      }
+                    in_maps.emplace_back(cell_maps);
+                    in_points.emplace_back(cell_points);
+                  }
+              }
+
+            // Merge everything from the current process
+            internal::distributed_cptloc::merge_cptloc_outputs(output_unmap,
+                                                               in_cell,
+                                                               in_qpoints,
+                                                               in_maps,
+                                                               in_points,
+                                                               received_process);
+          }
+      }
+    } // namespace distributed_cptloc
+  } // namespace internal
+
+
+
+  template <int dim, int spacedim>
+  std::tuple<
+  std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
+      std::vector< std::vector< Point<dim> > >,
+      std::vector< std::vector< unsigned int > >,
+      std::vector< std::vector< Point<spacedim> > >,
+      std::vector< std::vector< unsigned int > >
+      >
+      distributed_compute_point_locations
+      (const GridTools::Cache<dim,spacedim>                &cache,
+       const std::vector<Point<spacedim> >                 &local_points,
+       const std::vector< BoundingBox<spacedim> >          &local_bbox)
+  {
+#ifndef DEAL_II_WITH_MPI
+    (void)cache;
+    (void)local_points;
+    (void)local_bbox;
+    Assert(false, ExcMessage("GridTools::distributed_compute_point_locations() requires MPI."));
+    std::tuple<
+    std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
+        std::vector< std::vector< Point<dim> > >,
+        std::vector< std::vector< unsigned int > >,
+        std::vector< std::vector< Point<spacedim> > >,
+        std::vector< std::vector< unsigned int > >
+        > tup;
+    return tup;
+#else
+    // Recovering the mpi communicator used to create the triangulation
+    const auto &tria_mpi =
+      dynamic_cast< const parallel::Triangulation< dim, spacedim >*>(&cache.get_triangulation());
+    // If the dynamic cast failed we can't recover the mpi communicator: throwing an assertion error
+    Assert(tria_mpi, ExcMessage("GridTools::distributed_compute_point_locations() requires a parallel triangulation."));
+    auto mpi_communicator = tria_mpi->get_communicator();
+    // Preparing the output tuple
+    std::tuple<
+    std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
+        std::vector< std::vector< Point<dim> > >,
+        std::vector< std::vector< unsigned int > >,
+        std::vector< std::vector< Point<spacedim> > >,
+        std::vector< std::vector< unsigned int > >
+        >                                                           output_tuple;
+
+    // Preparing the temporary unordered map
+    std::unordered_map< typename Triangulation<dim, spacedim>::active_cell_iterator,
+        std::tuple<
+        std::vector< Point<dim> >,
+        std::vector< unsigned int >,
+        std::vector< Point<spacedim> >,
+        std::vector< unsigned int >
+        >,
+        internal::distributed_cptloc::cell_hash<dim,spacedim> >
+        temporary_unmap;
+
+    // Obtaining the global mesh description through an all to all communication
+    std::vector< std::vector< BoundingBox<spacedim> > > global_bounding_boxes;
+    global_bounding_boxes = Utilities::MPI::all_gather(mpi_communicator,local_bbox);
+
+    // Step 1 (part 1): Using the bounding boxes to guess the owner of each points
+    // in local_points
+    unsigned int my_rank = Utilities::MPI::this_mpi_process(mpi_communicator);
+
+    // Using global bounding boxes to guess/find owner/s of each point
+    std::tuple< std::vector< std::vector< unsigned int > >, std::map< unsigned int, unsigned int >,
+        std::map< unsigned int, std::vector< unsigned int > > > guessed_points;
+    guessed_points =
+      GridTools::guess_point_owner(global_bounding_boxes, local_points);
+
+    // Preparing to call compute point locations on points which are/might be
+    // local
+    const auto &guess_loc_idx = std::get<0>(guessed_points)[my_rank];
+    const unsigned int n_local_guess = guess_loc_idx.size();
+    // Vector containing points which are probably local
+    std::vector< Point<spacedim> > guess_local_pts(n_local_guess);
+    for (unsigned int i=0; i<n_local_guess; ++i)
+      guess_local_pts[i] = local_points[ guess_loc_idx[i] ];
+
+    // Preparing the map with data on points lying on locally owned cells
+    std::map< unsigned int,
+        std::tuple<
+        std::vector< CellId >,
+        std::vector< std::vector< Point<dim> > >,
+        std::vector< std::vector< unsigned int > >,
+        std::vector< std::vector< Point<spacedim> > > > >  ghost_loc_pts;
+    // Vector containing indices of points lying either on locally owned
+    // cells or ghost cells, to avoid computing them more than once
+    std::vector< unsigned int >                          classified_pts;
+
+    // Thread used to call compute point locations on guess local pts
+    Threads::Task<void>
+    cpt_loc_tsk
+      = Threads::new_task (
+          &internal::distributed_cptloc::compute_and_classify_points<dim,spacedim>,
+          cache,
+          guess_local_pts,
+          guess_loc_idx,
+          temporary_unmap,
+          ghost_loc_pts,
+          classified_pts);
+
+    // Step 1 (part 2): communicate point which are owned by a certain process
+    // Preparing the map with points whose owner is known with certainty:
+    const auto &other_owned_idx = std::get<1>(guessed_points);
+    std::map<
+    unsigned int,
+             std::pair< std::vector<Point<spacedim>> , std::vector<unsigned int > > >
+             other_owned_pts;
+
+    for (const auto &indices: other_owned_idx)
+      if (indices.second != my_rank)
+        {
+          // Finding/adding in the map the current process
+          auto &current_pts = other_owned_pts[indices.second];
+          current_pts.first.emplace_back(local_points[indices.first]);
+          current_pts.second.emplace_back(indices.first);
+        }
+
+    // Communicating the points whose owner is sure
+    auto owned_rank_pts = Utilities::MPI::some_to_some(mpi_communicator,other_owned_pts);
+    // Waiting for part 1 to finish to avoid concurrency problems
+    cpt_loc_tsk.join();
+
+    // Step 2 (part 1): compute received points which are owned
+    Threads::Task<void>
+    owned_pts_tsk
+      = Threads::new_task (&internal::distributed_cptloc::compute_and_merge_from_map<dim,spacedim>,
+                           cache,
+                           owned_rank_pts,
+                           temporary_unmap,
+                           false);
+
+    // Step 2 (part 2): communicate info on points lying on ghost cells
+    auto cpt_ghost = Utilities::MPI::some_to_some(mpi_communicator,ghost_loc_pts);
+
+    // Step 3: construct vectors containing uncertain points i.e. those whose owner
+    // is known among few guesses
+    std::map<
+    unsigned int,
+             std::pair< std::vector < Point<spacedim> >,
+             std::vector<unsigned int > > >
+             other_check_pts;
+
+    const auto &other_check_idx = std::get<2>(guessed_points);
+
+    // Points in classified pts need not to be communicated;
+    // sorting the array classified pts in order to use
+    // binary search when checking if the points needs to be
+    // communicated
+    // Notice classified pts is a vector of integer indexes
+    std::sort (classified_pts.begin(), classified_pts.end());
+
+    for (const auto &pt_to_guesses: other_check_idx)
+      {
+        if ( !std::binary_search(
+               classified_pts.begin(), classified_pts.end(),pt_to_guesses.first) )
+          // The point wasn't found in ghost or locally owned cells: adding it to the map
+          for (unsigned int rank=0; rank<pt_to_guesses.second.size(); ++rank)
+            if (pt_to_guesses.second[rank] != my_rank)
+              {
+                auto &current_pts = other_check_pts[pt_to_guesses.second[rank]];
+                current_pts.first.emplace_back(local_points[pt_to_guesses.first]);
+                current_pts.second.emplace_back(pt_to_guesses.second[rank]);
+              }
+      }
+
+    // Step 4: send around uncertain points
+    auto check_pts = Utilities::MPI::some_to_some(mpi_communicator,other_check_pts);
+    // Before proceeding, merging threads to avoid concurrency problems
+    owned_pts_tsk.join();
+
+    // Step 5: add the received ghost cell data to output
+    for ( const auto &rank_vals: cpt_ghost)
+      {
+        // Transforming CellsIds into Tria iterators
+        const auto &cell_ids = std::get<0>(rank_vals.second);
+        unsigned int n_cells = cell_ids.size();
+        std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >
+        cell_iter(n_cells);
+        for (unsigned int c=0; c<n_cells; ++c)
+          cell_iter[c] = cell_ids[c].to_cell(cache.get_triangulation());
+
+        internal::distributed_cptloc::merge_cptloc_outputs(temporary_unmap,
+                                                           cell_iter,
+                                                           std::get<1>(rank_vals.second),
+                                                           std::get<2>(rank_vals.second),
+                                                           std::get<3>(rank_vals.second),
+                                                           rank_vals.first);
+      }
+
+    // Step 6: use compute point locations on the uncertain points and
+    // merge output
+    internal::distributed_cptloc::compute_and_merge_from_map(
+      cache,
+      check_pts,
+      temporary_unmap,
+      true);
+
+    // Copying data from the unordered map to the tuple
+    // and returning output
+    unsigned int size_output = temporary_unmap.size();
+    auto &out_cells   = std::get<0>(output_tuple);
+    auto &out_qpoints = std::get<1>(output_tuple);
+    auto &out_maps    = std::get<2>(output_tuple);
+    auto &out_points  = std::get<3>(output_tuple);
+    auto &out_ranks   = std::get<4>(output_tuple);
+
+    out_cells.resize(size_output);
+    out_qpoints.resize(size_output);
+    out_maps.resize(size_output);
+    out_points.resize(size_output);
+    out_ranks.resize(size_output);
+
+    unsigned int c = 0;
+    for (const auto &rank_and_tuple: temporary_unmap)
+      {
+        out_cells[c]   = rank_and_tuple.first;
+        out_qpoints[c] = std::get<0>(rank_and_tuple.second);
+        out_maps[c]    = std::get<1>(rank_and_tuple.second);
+        out_points[c]  = std::get<2>(rank_and_tuple.second);
+        out_ranks[c]   = std::get<3>(rank_and_tuple.second);
+        ++c;
+      }
+
+    return output_tuple;
+#endif
+  }
+
+
   template<int dim, int spacedim>
   std::map<unsigned int, Point<spacedim> >
   extract_used_vertices(const Triangulation<dim, spacedim> &container,
@@ -3332,6 +4382,7 @@ namespace GridTools
     return result;
   }
 
+
   template<int spacedim>
   unsigned int
   find_closest_vertex(const std::map<unsigned int,Point<spacedim> > &vertices,
@@ -3346,6 +4397,7 @@ namespace GridTools
                                     );
     return id_and_v->first;
   }
+
 
   template<int dim, int spacedim>
   std::pair<typename Triangulation<dim,spacedim>::active_cell_iterator, Point<dim> >
@@ -3442,6 +4494,7 @@ namespace GridTools
     return global_bboxes;
 #endif // DEAL_II_WITH_MPI
   }
+
 
 } /* namespace GridTools */
 

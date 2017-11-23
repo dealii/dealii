@@ -1,0 +1,10 @@
+
+DEAL:0::Deal.II distributed_compute_point_locations:
+DEAL:0::Testing for dim = 2
+DEAL:0::Testing on: 100 points.
+DEAL:0::Points found in 81 cells
+DEAL:0::Test finished
+DEAL:0::Testing for dim = 3
+DEAL:0::Testing on: 200 points.
+DEAL:0::Points found in 170 cells
+DEAL:0::Test finished

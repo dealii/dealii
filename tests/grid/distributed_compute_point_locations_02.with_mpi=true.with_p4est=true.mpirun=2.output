@@ -1,0 +1,37 @@
+
+DEAL:0::Deal.II distributed_compute_point_locations:
+DEAL:0::Test on parallel setting 2D:
+DEAL:0::Testing for dim = 2 on 2 processes
+DEAL:0::Cube refinements: 3
+DEAL:0::Sphere refinements:3
+DEAL:0::Sphere center:0.470000 0.420000
+DEAL:0::Sphere radius:0.300000
+DEAL:0::Comparing results
+DEAL:0::Test passed
+DEAL:0::Test on parallel setting 3D:
+DEAL:0::Testing for dim = 3 on 2 processes
+DEAL:0::Cube refinements: 3
+DEAL:0::Sphere refinements:2
+DEAL:0::Sphere center:0.470000 0.420000 0.370000
+DEAL:0::Sphere radius:0.250000
+DEAL:0::Comparing results
+DEAL:0::Test passed
+
+DEAL:1::Deal.II distributed_compute_point_locations:
+DEAL:1::Test on parallel setting 2D:
+DEAL:1::Testing for dim = 2 on 2 processes
+DEAL:1::Cube refinements: 3
+DEAL:1::Sphere refinements:3
+DEAL:1::Sphere center:0.470000 0.420000
+DEAL:1::Sphere radius:0.300000
+DEAL:1::Comparing results
+DEAL:1::Test passed
+DEAL:1::Test on parallel setting 3D:
+DEAL:1::Testing for dim = 3 on 2 processes
+DEAL:1::Cube refinements: 3
+DEAL:1::Sphere refinements:2
+DEAL:1::Sphere center:0.470000 0.420000 0.370000
+DEAL:1::Sphere radius:0.250000
+DEAL:1::Comparing results
+DEAL:1::Test passed
+
