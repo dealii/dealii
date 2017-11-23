@@ -27,7 +27,12 @@
 template<int dim>
 void test()
 {
-  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim>
+  tria(MPI_COMM_WORLD,
+       ::Triangulation<dim>::none,
+       false,
+       parallel::shared::Triangulation<dim>::partition_zorder);
+
   GridGenerator::hyper_cube(tria);
   tria.refine_global(3);
 
