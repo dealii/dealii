@@ -191,9 +191,10 @@ namespace Testing
 
 // Get a uniformly distributed random value between min and max
 template<typename T=double>
-T random_value(const T &min=0, const T &max=1)
+T random_value(const T &min=static_cast<T>(0),
+               const T &max=static_cast<T>(1))
 {
-  return min+(max-min)*(Testing::rand()/static_cast<T>(RAND_MAX));
+  return min+(max-min)*(static_cast<T>(Testing::rand())/static_cast<T>(RAND_MAX));
 }
 
 
