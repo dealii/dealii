@@ -836,7 +836,7 @@ namespace Differentiation
        * The number of directional derivatives that can be
        * taken with this auto-differentiable number
        */
-      static const unsigned int         n_supported_derivative_levels
+      static constexpr unsigned int     n_supported_derivative_levels
       = internal::ADNumberInfoFromEnum<
         typename internal::RemoveComplexWrapper<ScalarType>::type, ADNumberTypeCode
       >::n_supported_derivative_levels;
