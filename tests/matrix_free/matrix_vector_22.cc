@@ -186,8 +186,8 @@ void test ()
         owned_set.nth_index_in_set (i);
       if (constraints.is_constrained(glob_index))
         continue;
-      in[0].local_element(i) = (double)Testing::rand()/RAND_MAX;
-      in[1].local_element(i) = (double)Testing::rand()/RAND_MAX;
+      in[0].local_element(i) = random_value<double>();
+      in[1].local_element(i) = random_value<double>();
     }
 
   std::vector<LinearAlgebra::distributed::Vector<number> *> in_ptr(2), out_ptr(2);

@@ -143,7 +143,7 @@ void test ()
   matrix_free->initialize_dof_vector(dst4);
 
   for (unsigned int i = 0; i < src.local_size(); ++i)
-    src.local_element(i) = (NumberType)Testing::rand()/RAND_MAX;
+    src.local_element(i) = random_value<NumberType>();
 
   MatrixFreeOperators::MassOperator<dim,fe_degree, n_q_points, 1, LinearAlgebra::distributed::Vector<NumberType>> mf_mass;
   MatrixFreeOperators::LaplaceOperator<dim,fe_degree, n_q_points, 1, LinearAlgebra::distributed::Vector<NumberType>> mf_laplace;

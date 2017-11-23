@@ -95,7 +95,7 @@ void sub_test()
         {
           if (constraints.is_constrained(i))
             continue;
-          const double entry = Testing::rand()/(double)RAND_MAX;
+          const double entry = random_value<double>();
           in_dist(i) = entry;
         }
 

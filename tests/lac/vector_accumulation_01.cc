@@ -32,7 +32,7 @@ void check_norms ()
       const unsigned int size = Testing::rand() % 100000;
       Vector<number> vec (size);
       for (unsigned int i=0; i<size; ++i)
-        vec(i) = static_cast<number>(Testing::rand())/static_cast<number>(RAND_MAX);
+        vec(i) = random_value<number>();
       const typename Vector<number>::real_type norm = vec.l2_norm();
       for (unsigned int i=0; i<30; ++i)
         AssertThrow (vec.l2_norm() == norm, ExcInternalError());

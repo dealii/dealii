@@ -49,7 +49,7 @@ void test (const unsigned int chunk_size)
       // the entries in extract_row_copy and compare it with the exact value
       Vector<double> src(m.n()), dst(m.m()), dst_ref(m.m());
       for (unsigned int i=0; i<src.size(); ++i)
-        src(i) = (double)Testing::rand()/RAND_MAX;
+        src(i) = random_value<double>();
       std::vector<types::global_dof_index> indices(sp.max_entries_per_row());
       std::vector<double> values(sp.max_entries_per_row());
       for (unsigned int i=0; i<m.m(); ++i)

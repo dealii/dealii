@@ -71,7 +71,7 @@ check()
 
   Vector<double> in (size), out(size), ref(size), zero(size);
   for (unsigned int i=0; i<size; ++i)
-    in(i) = (double)Testing::rand()/RAND_MAX;
+    in(i) = random_value<double>();
 
   PreconditionChebyshev<FullMatrix<double>,Vector<double>,DiagonalMatrixManual> prec;
   PreconditionChebyshev<FullMatrix<double>,Vector<double>,DiagonalMatrixManual>::AdditionalData

@@ -32,7 +32,7 @@ void test (const unsigned int degree)
 
   std::vector<double> dof_values (fe.dofs_per_cell);
   for (unsigned int i=0; i<dof_values.size(); ++i)
-    dof_values[i] = 1. + 2.*(double)Testing::rand()/double(RAND_MAX);
+    dof_values[i] = 1. + 2.*random_value<double>();
 
   const std::vector<Point<dim> > &generalized_support_points = fe.get_generalized_support_points();
   std::vector<Vector<double> > real_values (generalized_support_points.size(), Vector<double>(dim));

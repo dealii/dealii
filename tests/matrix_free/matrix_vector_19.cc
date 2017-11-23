@@ -116,7 +116,7 @@ void test ()
         owned_set.nth_index_in_set (i);
       if (constraints.is_constrained(glob_index))
         continue;
-      in.local_element(i) = (double)Testing::rand()/RAND_MAX;
+      in.local_element(i) = random_value<double>();
     }
 
   mf.vmult (out, in);

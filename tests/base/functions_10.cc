@@ -76,8 +76,8 @@ void check ()
       Point<dim> p;
       for (unsigned int d=0; d<dim; ++d)
         p[d] = coordinates[d][0] +
-               (1. * Testing::rand() / RAND_MAX) * (coordinates[d].back() -
-                                                    coordinates[d][0]);
+               (random_value<double>()) * (coordinates[d].back() -
+                                           coordinates[d][0]);
 
       double exact_value = 1;
       for (unsigned int d=0; d<dim; ++d)

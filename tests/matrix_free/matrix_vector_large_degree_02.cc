@@ -98,7 +98,7 @@ void test ()
     {
       if (constraints.is_constrained(i))
         continue;
-      in(i) = (double)Testing::rand()/RAND_MAX;
+      in(i) = random_value<double>();
     }
 
   mf.vmult (out, in);

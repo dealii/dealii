@@ -49,7 +49,7 @@ void test (const unsigned int chunk_size)
       // the iterator and compare it with the exact value
       Vector<double> src(m.n()), dst(m.m()), dst_ref(m.m());
       for (unsigned int i=0; i<src.size(); ++i)
-        src(i) = (double)Testing::rand()/RAND_MAX;
+        src(i) = random_value<double>();
       for (unsigned int i=0; i<m.m(); ++i)
         {
           double sum = 0;

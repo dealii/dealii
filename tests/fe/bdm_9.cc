@@ -75,7 +75,7 @@ test (const unsigned int degree)
 
   Vector<double> tmp1(dofs_per_cell), tmp2(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
-    tmp1(i) = 1.*Testing::rand()/RAND_MAX;
+    tmp1(i) = random_value<double>();
 
   deallog << "solving degree = " << degree << std::endl;
   check_solver_within_range(

@@ -154,7 +154,7 @@ int main ()
   // values between 0 and 1.
   Vector<double> solution(dof_handler.n_dofs ());
   for (unsigned int i = 0; i < dof_handler.n_dofs (); ++i)
-    solution(i) = (double) Testing::rand() / (double) RAND_MAX;
+    solution(i) = random_value<double>();
 
   // Now check if the function is
   // continuous in normal direction

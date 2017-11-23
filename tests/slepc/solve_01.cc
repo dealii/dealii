@@ -48,7 +48,7 @@ check_solve( SolverType &solver,
       // to avoid dependency on SLEPc random numbers:
       for (unsigned int i = 0; i < u.size(); i++)
         for (unsigned int j=0; j<u[i].size(); ++j)
-          u[i][j] = static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX);
+          u[i][j] = random_value<double>();
 
       for (auto &vector : u)
         vector.compress(VectorOperation::insert);

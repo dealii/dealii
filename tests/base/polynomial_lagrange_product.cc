@@ -41,7 +41,7 @@ void check_derivatives (const std::vector<Polynomial<double> > &p,
   Monomial<double> zero (0,0);
   for (unsigned int j=0; j<p.size(); ++j)
     {
-      double x = (double)Testing::rand()/RAND_MAX;
+      double x = random_value<double>();
       p[j].value (x, values);
       Polynomial<double> q = p[j];
       q += zero;

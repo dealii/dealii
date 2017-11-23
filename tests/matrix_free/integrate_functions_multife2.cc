@@ -124,9 +124,9 @@ operator () (const MatrixFree<dim,Number> &data,
           // and their gradients
           for (unsigned int q=0; q<n_q_points0; ++q)
             {
-              values0[q][j] = Testing::rand()/(double)RAND_MAX;
+              values0[q][j] = random_value<double>();
               for (unsigned int d=0; d<dim; ++d)
-                gradients0[q*dim+d][j] = -1. + 2. * (Testing::rand()/(double)RAND_MAX);
+                gradients0[q*dim+d][j] = -1. + 2. * (random_value<double>());
             }
           fe_val0.reinit (data.get_cell_iterator(cell,j,0));
           data.get_cell_iterator(cell,j,0)->get_dof_indices(dof_indices0);
@@ -150,9 +150,9 @@ operator () (const MatrixFree<dim,Number> &data,
 
           for (unsigned int q=0; q<n_q_points1; ++q)
             {
-              values1[q][j] = Testing::rand()/(double)RAND_MAX;
+              values1[q][j] = random_value<double>();
               for (unsigned int d=0; d<dim; ++d)
-                gradients1[q*dim+d][j] = -1. + 2. * (Testing::rand()/(double)RAND_MAX);
+                gradients1[q*dim+d][j] = -1. + 2. * (random_value<double>());
             }
           for (unsigned int i=0; i<dofs_per_cell1; ++i)
             {

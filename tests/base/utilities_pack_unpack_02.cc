@@ -31,8 +31,7 @@ void test(const unsigned int &size)
   auto a_pair = std::make_pair(1, 3.14);
 
   for (auto &p : points)
-    for (unsigned int i=0; i<dim; ++i)
-      p[i] = Testing::rand()/double(RAND_MAX);
+    p = random_point<dim>();
 
   auto a_tuple = std::make_tuple(a_pair, points);
 

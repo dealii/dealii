@@ -28,10 +28,10 @@ void test()
   FullMatrix<Number> A(2, 76), B(3, 76), C(2, 3), D(2, 3);
   for (unsigned int i=0; i<A.m(); ++i)
     for (unsigned int j=0; j<A.n(); ++j)
-      A(i,j) = (double)Testing::rand()/RAND_MAX;
+      A(i,j) = random_value<double>();
   for (unsigned int i=0; i<B.m(); ++i)
     for (unsigned int j=0; j<B.n(); ++j)
-      B(i,j) = (double)Testing::rand()/RAND_MAX;
+      B(i,j) = random_value<double>();
 
   A.mTmult(C, B); // C = A * B^T
 

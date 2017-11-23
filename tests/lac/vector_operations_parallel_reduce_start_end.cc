@@ -37,7 +37,7 @@ void check ()
       Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*size);
 
       for (unsigned int i = 0; i < size; ++i)
-        val[i] = (double)rand()/RAND_MAX;
+        val[i] = random_value<double>();
 
 
       internal::VectorOperations::MeanValue<Number> mean(val);

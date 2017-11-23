@@ -56,12 +56,7 @@ void test_compute_pt_loc(unsigned int n_points)
   std::vector<Point<dim>> points;
 
   for (size_t i=0; i<n_points; ++i)
-    {
-      Point<dim> p;
-      for (unsigned int d=0; d<dim; ++d)
-        p[d] = double(Testing::rand())/RAND_MAX; //Normalizing the value
-      points.push_back(p);
-    }
+    points.push_back(random_point<dim>());
 
   // Initializing the cache
   GridTools::Cache<dim,dim> cache(tria);

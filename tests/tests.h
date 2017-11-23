@@ -26,6 +26,8 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/patterns.h>
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
@@ -183,6 +185,31 @@ namespace Testing
   {
     rand(true, seed);
   }
+}
+
+
+
+// Get a uniformly distributed random value between min and max
+template<typename T=double>
+T random_value(const T &min=static_cast<T>(0),
+               const T &max=static_cast<T>(1))
+{
+  return min+(max-min)*(static_cast<T>(Testing::rand())/static_cast<T>(RAND_MAX));
+}
+
+
+
+// Construct a uniformly distributed random point, with each coordinate
+// between min and max
+template<int dim>
+inline Point<dim> random_point(const double &min=0.0,
+                               const double &max=1.0)
+{
+  Assert(max >= min, ExcMessage("Make sure max>=min"));
+  Point<dim> p;
+  for (unsigned int i=0; i<dim; ++i)
+    p[i] = random_value(min, max);
+  return p;
 }
 
 

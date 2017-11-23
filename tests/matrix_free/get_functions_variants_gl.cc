@@ -162,7 +162,7 @@ void test ()
   // create vector with random entries
   for (unsigned int i=0; i<dof.n_dofs(); ++i)
     {
-      const double entry = Testing::rand()/(double)RAND_MAX;
+      const double entry = random_value<double>();
       solution_dist(i) = entry;
     }
 

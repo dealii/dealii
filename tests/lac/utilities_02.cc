@@ -153,7 +153,7 @@ void test ()
   LinearAlgebra::distributed::Vector<double> init_vector;
   mf_data->initialize_dof_vector(init_vector);
   for (auto it = init_vector.begin(); it != init_vector.end(); ++it)
-    *it = static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX);
+    *it = random_value<double>();
 
   constraints.set_zero(init_vector);
 
@@ -197,7 +197,7 @@ void test ()
       LinearAlgebra::distributed::Vector<double> init_vector;
       mf_data->initialize_dof_vector(init_vector);
       for (auto it = init_vector.begin(); it != init_vector.end(); ++it)
-        *it = static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX);
+        *it = random_value<double>();
 
       constraints.set_zero(init_vector);
       eigensolver.set_initial_vector(init_vector);

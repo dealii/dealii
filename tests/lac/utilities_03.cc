@@ -108,7 +108,7 @@ check(const int degree, const bool scale = false, const double a_L = -0.1, const
           n_in++;
         else
           n_out++;
-        x(i) = static_cast<double>(Testing::rand())/static_cast<double>(RAND_MAX);
+        x(i) = random_value<double>();
       }
 
   deallog << " Modes inside/outside: " << n_in << " " << n_out << std::endl;
