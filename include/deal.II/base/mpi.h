@@ -501,12 +501,12 @@ namespace Utilities
      *  process meant to receive the data and the object to send (the type T
      *  must be serializable for this function to work properly).
      *
-     * @param[out] A map from the rank (unsigned int) of the process
+     * @return A map from the rank (unsigned int) of the process
      *  which sent the data and object received.
      *
      * @author Giovanni Alzetta, Luca Heltai, 2017
      */
-    template<typename T>
+    template <typename T>
     std::map<unsigned int, T>
     some_to_some(const MPI_Comm                                &comm,
                  const std::map <unsigned int, T>     &objects_to_send);
@@ -517,19 +517,20 @@ namespace Utilities
      * argument.
      *
      * @param[in] comm MPI communicator.
-     * @param[in] object_to_send A object to send to all other processes
+     * @param[in] object_to_send An object to send to all other processes
      *
-     * @param[out] A vector of objects, with size equal to the number of
+     * @return A vector of objects, with size equal to the number of
      *  processes in the MPI communicator. Each entry contains the object
      *  received from the processor with the corresponding rank within the
      *  communicator.
      *
      * @author Giovanni Alzetta, Luca Heltai, 2017
      */
-    template<typename T>
+    template <typename T>
     std::vector<T>
     all_gather(const MPI_Comm &comm,
                const T        &object_to_send);
+
 
 #ifndef DOXYGEN
     // declaration for an internal function that lives in mpi.templates.h
