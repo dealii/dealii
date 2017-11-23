@@ -1,3 +1,3 @@
-New: add LAPACKFullMatrix<number>::add (const number a, const LAPACKFullMatrix<number> &A)
+New: Add LAPACKFullMatrix<number>::add (const number a, const LAPACKFullMatrix<number> &A)
 <br>
 (Denis Davydov, 2017/10/25)
