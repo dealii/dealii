@@ -62,6 +62,12 @@ namespace GridTools
     update_used_vertices = 0x08,
 
     /**
+     * Update the global bounding boxes describing the locally owned part, for each
+     * process, of the mesh
+     */
+    update_global_bounding_boxes = 0x10,
+
+    /**
      * Update all objects.
      */
     update_all = 0xFF,
@@ -83,6 +89,9 @@ namespace GridTools
     if (u & update_vertex_to_cell_centers_directions)  s << "|vertex_to_cells_centers_directions";
 #ifdef DEAL_II_WITH_NANOFLANN
     if (u & update_vertex_kdtree)                      s << "|vertex_kdtree";
+#endif
+#ifdef DEAL_II_WITH_MPI
+    if (u & update_global_bounding_boxes)              s << "|global_bounding_boxes";
 #endif
     return s;
   }

@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/bounding_box.h>
+#include <deal.II/base/utilities.h>
 #include <deal.II/grid/grid_tools_cache.h>
 #include <deal.II/grid/grid_tools.h>
 
@@ -20,14 +22,29 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace GridTools
 {
-
   template<int dim, int spacedim>
-  Cache<dim,spacedim>::Cache(
-    const Triangulation<dim, spacedim> &tria,
-    const Mapping<dim, spacedim> &mapping) :
+  Cache<dim,spacedim>::Cache(const Triangulation<dim, spacedim> &tria,
+                             const Mapping<dim, spacedim> &mapping
+#ifdef DEAL_II_WITH_MPI
+                             ,
+                             MPI_Comm mpi_comm,
+                             const bool use_bounding_boxes,
+                             const unsigned int refinement_level,
+                             const bool allow_merge,
+                             const unsigned int max_boxes
+#endif
+                            ) :
     update_flags(update_all),
     tria(&tria),
     mapping(&mapping)
+#ifdef DEAL_II_WITH_MPI
+    ,
+    mpi_comm(mpi_comm),
+    use_bounding_boxes(use_bounding_boxes),
+    refinement_level(refinement_level),
+    allow_merge(allow_merge),
+    max_boxes(max_boxes)
+#endif
   {
     tria_signal = tria.signals.any_change.connect([&]()
     {
@@ -107,6 +124,27 @@ namespace GridTools
         update_flags  = update_flags & ~update_vertex_kdtree;
       }
     return vertex_kdtree;
+  }
+#endif
+
+#ifdef DEAL_II_WITH_MPI
+  /**
+   * Return a reference to the cached global_bounding_boxes object.
+   */
+  template<int dim, int spacedim>
+  const std::vector< std::vector< BoundingBox<spacedim> > >
+  &Cache<dim,spacedim>::get_global_bounding_boxes() const
+  {
+    if ( use_bounding_boxes &&
+         (update_flags & update_global_bounding_boxes) )
+      {
+        auto predicate = GridTools::internal::pred_locally_owned<dim,spacedim>;
+        auto local_bbox = GridTools::compute_mesh_predicate_bounding_box
+                          (*tria, predicate, refinement_level, allow_merge, max_boxes);
+        global_bounding_boxes = Utilities::MPI::all_gather(mpi_comm, local_bbox);
+        update_flags  = update_flags & ~update_global_bounding_boxes;
+      }
+    return global_bounding_boxes;
   }
 #endif
 
