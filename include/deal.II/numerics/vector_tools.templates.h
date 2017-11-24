@@ -442,6 +442,23 @@ namespace VectorTools
 
               if (selected)
                 {
+#ifdef DEBUG
+                  // make sure that all selected base elements are indeed
+                  // interpolatory
+
+                  if (const auto fe_system =
+                        dynamic_cast<const FESystem<dim> *>(&fe[fe_index]))
+                    {
+                      const auto index =
+                        fe_system->system_to_base_index(i).first.first;
+                      Assert(fe_system->base_element(index)
+                             .has_generalized_support_points(),
+                             ExcMessage("The component mask supplied to "
+                                        "VectorTools::interpolate selects a "
+                                        "non-interpolatory element."));
+                    }
+#endif
+
                   // Add local values to the global vectors
                   ::dealii::internal::ElementAccess<VectorType>::add(dof_values[i],
                                                                      dofs_on_cell[i],
