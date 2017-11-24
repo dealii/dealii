@@ -501,19 +501,8 @@ namespace VectorTools
     VectorType &vec,
     const ComponentMask &component_mask)
   {
-    Assert(component_mask.represents_n_components(dof_handler.get_fe().n_components()),
-           ExcMessage("The number of components in the mask has to be either "
-                      "zero or equal to the number of components in the finite "
-                      "element."));
-
-    Assert (vec.size() == dof_handler.n_dofs(),
-            ExcDimensionMismatch (vec.size(), dof_handler.n_dofs()));
-
     Assert (dof_handler.get_fe().n_components() == function.n_components,
             ExcDimensionMismatch(dof_handler.get_fe().n_components(), function.n_components));
-
-    Assert (component_mask.n_selected_components(dof_handler.get_fe().n_components()) > 0,
-            ComponentMask::ExcNoComponentSelected());
 
     // Create a small lambda capture wrapping function and call the
     // internal implementation
@@ -615,17 +604,6 @@ namespace VectorTools
    VectorType                         &vec,
    const ComponentMask                &component_mask)
   {
-    Assert(component_mask.represents_n_components(dof_handler.get_fe().n_components()),
-           ExcMessage("The number of components in the mask has to be either "
-                      "zero or equal to the number of components in the finite "
-                      "element."));
-
-    Assert (vec.size() == dof_handler.n_dofs(),
-            ExcDimensionMismatch (vec.size(), dof_handler.n_dofs()));
-
-    Assert (component_mask.n_selected_components(dof_handler.get_fe().n_components()) > 0,
-            ComponentMask::ExcNoComponentSelected());
-
     // Create a small lambda capture wrapping the function map and call the
     // internal implementation
     const auto function_map = [&functions](
