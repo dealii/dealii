@@ -2,24 +2,24 @@
 DEAL::Testing with PolarManifold dim=2, spacedim=2
 DEAL::80   cells, degree=1: 3.06146745892 
 DEAL::80   cells, degree=2: 3.14143771670 
-DEAL::80   cells, degree=3: 3.14159250173 
-DEAL::80   cells, degree=4: 3.14159265349 
+DEAL::80   cells, degree=3: 3.14159250174 
+DEAL::80   cells, degree=4: 3.14159265350 
 DEAL::
 DEAL::Testing with SphericalManifold dim=2, spacedim=2
 DEAL::80   cells, degree=1: 3.06146745892 
 DEAL::80   cells, degree=2: 3.14143771670 
-DEAL::80   cells, degree=3: 3.14159250173 
+DEAL::80   cells, degree=3: 3.14159250174 
 DEAL::80   cells, degree=4: 3.14159265350 
 DEAL::
 DEAL::Testing with SphericalManifold dim=3, spacedim=3
 DEAL::56   cells, degree=1: 3.21034343105 
-DEAL::56   cells, degree=2: 4.18001126295 
+DEAL::56   cells, degree=2: 4.18001126296 
 DEAL::56   cells, degree=3: 4.18863487067 
 DEAL::56   cells, degree=4: 4.18878933389 
 DEAL::
 DEAL::Testing with CylindricalManifold in 3d
 DEAL::80   cells, degree=1: 5.65685424949 
 DEAL::80   cells, degree=2: 6.27829514062 
-DEAL::80   cells, degree=3: 6.28316607872 
+DEAL::80   cells, degree=3: 6.28316607871 
 DEAL::80   cells, degree=4: 6.28318526295 
 DEAL::
