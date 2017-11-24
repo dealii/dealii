@@ -169,9 +169,9 @@ namespace internal
        * Some more references to input data to the
        * KellyErrorEstimator::estimate() function.
        */
-      const typename FunctionMap<spacedim>::type *neumann_bc;
-      const ComponentMask                component_mask;
-      const Function<spacedim>                   *coefficients;
+      const typename FunctionMap<spacedim,number>::type *neumann_bc;
+      const ComponentMask                                component_mask;
+      const Function<spacedim>                          *coefficients;
 
       /**
        * Constructor.
@@ -184,7 +184,7 @@ namespace internal
                     const unsigned int n_solution_vectors,
                     const types::subdomain_id subdomain_id,
                     const types::material_id material_id,
-                    const typename FunctionMap<spacedim>::type *neumann_bc,
+                    const typename FunctionMap<spacedim,number>::type *neumann_bc,
                     const ComponentMask                &component_mask,
                     const Function<spacedim>                   *coefficients);
 
@@ -208,7 +208,7 @@ namespace internal
      const unsigned int                                  n_solution_vectors,
      const types::subdomain_id                           subdomain_id,
      const types::material_id                            material_id,
-     const typename FunctionMap<spacedim>::type         *neumann_bc,
+     const typename FunctionMap<spacedim,number>::type         *neumann_bc,
      const ComponentMask                                 &component_mask,
      const Function<spacedim>                           *coefficients)
       :
@@ -420,7 +420,7 @@ namespace internal
           // get the values of the boundary function at the quadrature points
           if (n_components == 1)
             {
-              std::vector<double> g(n_q_points);
+              std::vector<number> g(n_q_points);
               parallel_data.neumann_bc->find(boundary_id)->second
               ->value_list (fe_face_values_cell.get_present_fe_values()
                             .get_quadrature_points(), g);
@@ -431,8 +431,8 @@ namespace internal
             }
           else
             {
-              std::vector<dealii::Vector<double> >
-              g(n_q_points, dealii::Vector<double>(n_components));
+              std::vector<dealii::Vector<number> >
+              g(n_q_points, dealii::Vector<number>(n_components));
               parallel_data.neumann_bc->find(boundary_id)->second
               ->vector_value_list (fe_face_values_cell.get_present_fe_values()
                                    .get_quadrature_points(),
@@ -971,7 +971,7 @@ KellyErrorEstimator<dim, spacedim>::
 estimate (const Mapping<dim, spacedim>               &mapping,
           const DoFHandlerType                       &dof_handler,
           const Quadrature<dim-1>                    &quadrature,
-          const typename FunctionMap<spacedim>::type &neumann_bc,
+          const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
           const InputVector                          &solution,
           Vector<float>                              &error,
           const ComponentMask                        &component_mask,
@@ -995,7 +995,7 @@ void
 KellyErrorEstimator<dim,spacedim>::
 estimate (const DoFHandlerType                       &dof_handler,
           const Quadrature<dim-1>                    &quadrature,
-          const typename FunctionMap<spacedim>::type &neumann_bc,
+          const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
           const InputVector                          &solution,
           Vector<float>                              &error,
           const ComponentMask                        &component_mask,
@@ -1018,7 +1018,7 @@ KellyErrorEstimator<dim, spacedim>::
 estimate (const Mapping<dim, spacedim>               &mapping,
           const DoFHandlerType                       &dof_handler,
           const hp::QCollection<dim-1>               &quadrature,
-          const typename FunctionMap<spacedim>::type &neumann_bc,
+          const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
           const InputVector                          &solution,
           Vector<float>                              &error,
           const ComponentMask                        &component_mask,
@@ -1042,7 +1042,7 @@ void
 KellyErrorEstimator<dim, spacedim>::
 estimate (const DoFHandlerType                       &dof_handler,
           const hp::QCollection<dim-1>               &quadrature,
-          const typename FunctionMap<spacedim>::type &neumann_bc,
+          const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
           const InputVector                          &solution,
           Vector<float>                              &error,
           const ComponentMask                        &component_mask,
@@ -1067,7 +1067,7 @@ KellyErrorEstimator<dim, spacedim>::
 estimate (const Mapping<dim, spacedim>               &mapping,
           const DoFHandlerType                       &dof_handler,
           const hp::QCollection<dim-1>               &face_quadratures,
-          const typename FunctionMap<spacedim>::type &neumann_bc,
+          const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
           const std::vector<const InputVector *>     &solutions,
           std::vector<Vector<float>*>                &errors,
           const ComponentMask                        &component_mask,
@@ -1113,7 +1113,7 @@ estimate (const Mapping<dim, spacedim>               &mapping,
   Assert (solutions.size() == errors.size(),
           ExcIncompatibleNumberOfElements(solutions.size(), errors.size()));
 
-  for (typename FunctionMap<spacedim>::type::const_iterator i=neumann_bc.begin();
+  for (typename FunctionMap<spacedim,typename InputVector::value_type>::type::const_iterator i=neumann_bc.begin();
        i!=neumann_bc.end(); ++i)
     Assert (i->second->n_components == n_components,
             ExcInvalidBoundaryFunction(i->first,
@@ -1231,7 +1231,7 @@ KellyErrorEstimator<dim, spacedim>::
 estimate (const Mapping<dim, spacedim>               &mapping,
           const DoFHandlerType                       &dof_handler,
           const Quadrature<dim-1>                    &quadrature,
-          const typename FunctionMap<spacedim>::type &neumann_bc,
+          const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
           const std::vector<const InputVector *>     &solutions,
           std::vector<Vector<float>*>                &errors,
           const ComponentMask                        &component_mask,
@@ -1255,7 +1255,7 @@ template <typename InputVector, typename DoFHandlerType>
 void KellyErrorEstimator<dim, spacedim>::estimate
 (const DoFHandlerType                       &dof_handler,
  const Quadrature<dim-1>                    &quadrature,
- const typename FunctionMap<spacedim>::type &neumann_bc,
+ const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
  const std::vector<const InputVector *>     &solutions,
  std::vector<Vector<float>*>                &errors,
  const ComponentMask                        &component_mask,
@@ -1277,7 +1277,7 @@ template <typename InputVector, typename DoFHandlerType>
 void KellyErrorEstimator<dim, spacedim>::estimate
 (const DoFHandlerType                       &dof_handler,
  const hp::QCollection<dim-1>               &quadrature,
- const typename FunctionMap<spacedim>::type &neumann_bc,
+ const typename FunctionMap<spacedim,typename InputVector::value_type>::type &neumann_bc,
  const std::vector<const InputVector *>     &solutions,
  std::vector<Vector<float>*>                &errors,
  const ComponentMask                        &component_mask,
