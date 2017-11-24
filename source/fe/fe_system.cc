@@ -1607,18 +1607,6 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
   // Initialize generalized support points and an (internal) index table
   init_tasks += Threads::new_task ([&]()
   {
-    // If one of the base elements has no generalized support points, then
-    // it makes no sense to define generalized support points for the
-    // composed element, so return an empty array to demonstrate that fact.
-    // Note that we ignore FE_Nothing in this logic.
-    for (unsigned int base_el=0; base_el < this->n_base_elements(); ++base_el)
-      if (!base_element(base_el).has_generalized_support_points() &&
-          base_element(base_el).dofs_per_cell != 0)
-        {
-          this->generalized_support_points.resize(0);
-          return;
-        }
-
     // Iterate over all base elements, extract a representative set of
     // _unique_ generalized support points and store the information how
     // generalized support points of base elements are mapped to this list
@@ -1629,6 +1617,18 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
 
     for (unsigned int base = 0; base < this->n_base_elements(); ++base)
       {
+        // If the current base element does not have generalized support
+        // points, ignore it. Note that
+        // * FESystem::convert_generalized_support_point_values_to_dof_values
+        //   will simply skip such non-interpolatory base elements by
+        //   assigning NaN to all dofs.
+        // * If this routine does not pick up any generalized support
+        //   points the corresponding vector will be empty and
+        //   FiniteElement::has_generalized_support_points will return
+        //   false.
+        if (!base_element(base).has_generalized_support_points())
+          continue;
+
         for (const auto &point :
              base_element(base).get_generalized_support_points())
           {
@@ -1658,6 +1658,9 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
     // check generalized_support_points_index_table for consistency
     for (unsigned int i = 0; i < base_elements.size(); ++i)
       {
+        if (!base_element(i).has_generalized_support_points())
+          continue;
+
         const auto &points =
           base_elements[i].first->get_generalized_support_points();
         for (unsigned int j = 0; j < points.size(); ++j)
@@ -2289,8 +2292,6 @@ convert_generalized_support_point_values_to_dof_values (const std::vector<Vector
       const auto &base_element = this->base_element(base);
       const unsigned int multiplicity = this->element_multiplicity(base);
       const unsigned int n_base_dofs = base_element.dofs_per_cell;
-      const unsigned int n_base_points =
-        base_element.get_generalized_support_points().size();
       const unsigned int n_base_components = base_element.n_components();
 
       // If the number of base degrees of freedom is zero, there is nothing
@@ -2302,44 +2303,70 @@ convert_generalized_support_point_values_to_dof_values (const std::vector<Vector
           continue;
         }
 
-      base_dof_values.resize(n_base_dofs);
-      base_point_values.resize(n_base_points);
-
-      for (unsigned int m = 0; m < multiplicity;
-           ++m, current_vector_component += n_base_components)
+      if (base_element.has_generalized_support_points())
         {
-          // populate base_point_values for a recursive call to
-          // convert_generalized_support_point_values_to_dof_values
-          for (unsigned int j = 0; j < base_point_values.size(); ++j)
+          const unsigned int n_base_points =
+            base_element.get_generalized_support_points().size();
+
+          base_dof_values.resize(n_base_dofs);
+          base_point_values.resize(n_base_points);
+
+          for (unsigned int m = 0; m < multiplicity;
+               ++m, current_vector_component += n_base_components)
             {
-              base_point_values[j].reinit(n_base_components, false);
+              // populate base_point_values for a recursive call to
+              // convert_generalized_support_point_values_to_dof_values
+              for (unsigned int j = 0; j < base_point_values.size(); ++j)
+                {
+                  base_point_values[j].reinit(n_base_components, false);
 
-              const auto n = generalized_support_points_index_table[base][j];
+                  const auto n =
+                    generalized_support_points_index_table[base][j];
 
-              // we have to extract the correct slice out of the global
-              // vector of values:
-              const auto begin =
-                std::begin(point_values[n]) + current_vector_component;
-              const auto end = begin + n_base_components;
-              std::copy(begin, end, std::begin(base_point_values[j]));
-            }
+                  // we have to extract the correct slice out of the global
+                  // vector of values:
+                  const auto begin =
+                    std::begin(point_values[n]) + current_vector_component;
+                  const auto end = begin + n_base_components;
+                  std::copy(begin, end, std::begin(base_point_values[j]));
+                }
 
-          base_element.convert_generalized_support_point_values_to_dof_values(
-            base_point_values, base_dof_values);
+              base_element
+              .convert_generalized_support_point_values_to_dof_values(
+                base_point_values, base_dof_values);
 
-          // Finally put these dof values back into global dof values
-          // vector.
+              // Finally put these dof values back into global dof values
+              // vector.
+
+              // To do this, we could really use a base_to_system_index()
+              // function, but that doesn't exist -- just do it by using the
+              // reverse table -- the amount of work done here is not worth
+              // trying to optimizing this.
+              for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+                if (this->system_to_base_index(i).first ==
+                    std::make_pair(base, m))
+                  dof_values[i] =
+                    base_dof_values[this->system_to_base_index(i).second];
+            } /*for*/
+        }
+      else
+        {
+          // If the base element is non-interpolatory, assign NaN to all
+          // DoFs associated to it.
 
           // To do this, we could really use a base_to_system_index()
           // function, but that doesn't exist -- just do it by using the
           // reverse table -- the amount of work done here is not worth
           // trying to optimizing this.
-          for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
-            if (this->system_to_base_index(i).first == std::make_pair(base, m))
-              dof_values[i] =
-                base_dof_values[this->system_to_base_index(i).second];
+          for (unsigned int m = 0; m < multiplicity; ++m)
+            for (unsigned int i = 0; i < this->dofs_per_cell; ++i)
+              if (this->system_to_base_index(i).first ==
+                  std::make_pair(base, m))
+                dof_values[i] = std::numeric_limits<double>::signaling_NaN();
+
+          current_vector_component += multiplicity * n_base_components;
         }
-    }
+    } /*for*/
 }
 
 
