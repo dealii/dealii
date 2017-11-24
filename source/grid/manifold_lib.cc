@@ -436,6 +436,7 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
     // direction, we return it. Otherwise, the Hessian would be singular.
     boost::container::small_vector<Tensor<1, 3>, 100> directions;
     boost::container::small_vector<double, 100> merged_weights;
+    double max_distance = 0.;
     for (unsigned int i=0; i<n_points; ++i)
       {
         Tensor<1,spacedim> direction(vertices[i]-center);
@@ -444,8 +445,10 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
                ExcMessage("One of the vertices coincides with the center. "
                           "This is not allowed!"));
         direction /= norm;
-        if ((candidate - direction).norm_square() < tolerance*tolerance)
+        const double squared_distance = (candidate - direction).norm_square();
+        if (squared_distance < tolerance*tolerance)
           return center + rho * candidate;
+        max_distance = std::max(max_distance, squared_distance);
 
         // append direction. check if the normalized candidate direction is
         // the same as a previous direction (to a tighter tolerance (1e-14)^2
@@ -471,6 +474,13 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
             merged_weights.push_back(weights[i]);
           }
       }
+
+    // If all the points are close to the candidate, we expect the candidate to
+    // be good enough. This tolerance was chosen such that the first iteration
+    // for a at least three time refined HyperShell mesh with radii .5 and 1.
+    // doesn't already succeed.
+    if (max_distance < 1.e-2)
+      return center + rho * candidate;
 
     const unsigned int n_merged_points = directions.size();
 
