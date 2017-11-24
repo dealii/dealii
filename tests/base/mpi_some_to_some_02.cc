@@ -33,17 +33,6 @@ inline unsigned int random_index(const unsigned int &max_index)
   return Testing::rand()*(max_index-1)/RAND_MAX;
 }
 
-template<int dim>
-inline Point<dim> random_point(const double &min=0.0,
-                               const double &max=1.0)
-{
-  Assert(max >= min, ExcMessage("Make sure max>=min"));
-  Point<dim> p;
-  for (unsigned int i=0; i<dim; ++i)
-    p[i] = min+(Testing::rand()*(max-min))/((double)RAND_MAX);
-  return p;
-}
-
 template<typename T>
 std::string to_string(const T &object)
 {
