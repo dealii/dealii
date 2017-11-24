@@ -1,0 +1,3 @@
+New: Added BoundingBox::serialize function and a test for it using pack/unpack functions
+<br>
+(Giovanni Alzetta, 2017/11/24)
