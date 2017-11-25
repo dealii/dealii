@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/utilities.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -86,6 +87,7 @@ enum class NeighborType
  * @endcode
  * Notice the sides are always parallel to the respective axis.
  *
+ * @author Giovanni Alzetta, 2017.
  */
 template <int spacedim, typename Number=double>
 class BoundingBox
@@ -134,8 +136,14 @@ public:
    */
   double volume() const;
 
+  /**
+   * Boost serialization function
+   */
+  template<class Archive>
+  void serialize(Archive &ar, const unsigned int version );
+
 private:
-  std::pair<Point<spacedim, Number>,Point<spacedim,Number>> boundary_points;
+  std::pair<Point<spacedim,Number>,Point<spacedim,Number>> boundary_points;
 };
 
 /*------------------------------- Inline functions: BoundingBox ---------------------------*/
@@ -153,6 +161,14 @@ BoundingBox<spacedim, Number>::BoundingBox (const std::pair<Point<spacedim,Numbe
             ExcMessage ("Bounding Box can't be created: the point's order should be bottom left, top right!"));
 
   this->boundary_points = boundary_points;
+}
+
+
+template <int spacedim, typename Number>
+template<class Archive>
+void BoundingBox<spacedim, Number>::serialize(Archive &ar, const unsigned int /*version*/)
+{
+  ar &boundary_points;
 }
 
 #endif // DOXYGEN
