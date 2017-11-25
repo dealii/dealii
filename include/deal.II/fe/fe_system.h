@@ -932,14 +932,21 @@ public:
   /**
    * Implementation of the
    * FiniteElement::convert_generalized_support_point_values_to_dof_values()
-   * function. The current function simply takes the input argument apart,
-   * passes the pieces to the base elements, and then re-assembles everything
-   * into the output argument.
+   * function.
+   *
+   * This function simply calls
+   * FiniteElement::convert_generalized_support_point_values_to_dof_values
+   * of the base elements and re-assembles everything into the output
+   * argument. If a base element is non-interpolatory the corresponding dof
+   * values are filled with "signaling" NaNs instead.
+   *
+   * The function fails if none of the base elements of the FESystem are
+   * interpolatory.
    */
   virtual
   void
   convert_generalized_support_point_values_to_dof_values (const std::vector<Vector<double> > &support_point_values,
-                                                          std::vector<double>                &nodal_values) const;
+                                                          std::vector<double>                &dof_values) const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
