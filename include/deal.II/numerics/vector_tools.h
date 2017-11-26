@@ -2984,16 +2984,6 @@ namespace VectorTools
   /**
    * Exception
    */
-  DeclExceptionMsg (ExcNonInterpolatingFE,
-                    "You are attempting an operation that requires the "
-                    "finite element involved to be 'interpolating', i.e., "
-                    "it needs to have support points. The finite element "
-                    "you are using here does not appear to have those for "
-                    "the required components.");
-
-  /**
-   * Exception
-   */
   DeclExceptionMsg (ExcPointNotAvailableHere,
                     "The given point is inside a cell of a "
                     "parallel::distributed::Triangulation that is not "

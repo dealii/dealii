@@ -249,232 +249,11 @@ namespace VectorTools
     }
 
 
-    /**
-     * Older version of the function directly below that does the same thing. This
-     * version also works for FESystems that contain non-interpolatory elements
-     * (as long as their components are not selected in the component mask).
-     * TODO: Remove this function when the other function is fixed to also work
-     * for the mentioned case.
-     */
-    template <int dim, int spacedim, typename VectorType,
-              template <int, int> class DoFHandlerType, typename T>
-    void interpolate_selected_components (const Mapping<dim,spacedim>           &mapping,
-                                          const DoFHandlerType<dim,spacedim>                        &dof,
-                                          const T                                                   &function,
-                                          VectorType                                                &vec,
-                                          const ComponentMask                                       &component_mask)
-    {
-      typedef typename VectorType::value_type number;
-      Assert (component_mask.represents_n_components(dof.get_fe(0).n_components()),
-              ExcMessage("The number of components in the mask has to be either "
-                         "zero or equal to the number of components in the finite "
-                         "element.") );
-
-      Assert (vec.size() == dof.n_dofs(),
-              ExcDimensionMismatch (vec.size(), dof.n_dofs()));
-      Assert (component_mask.n_selected_components(dof.get_fe(0).n_components()) > 0,
-              ComponentMask::ExcNoComponentSelected());
-
-      const hp::FECollection<dim,spacedim> &fe = dof.get_fe_collection();
-      const unsigned int          n_components = fe.n_components();
-      const bool                  fe_is_system = (n_components != 1);
-
-      typename DoFHandlerType<dim,spacedim>::active_cell_iterator
-      cell = dof.begin_active(),
-      endc = dof.end();
-
-      // For FESystems many of the
-      // unit_support_points will appear
-      // multiple times, as a point may be
-      // unit_support_point for several of the
-      // components of the system.  The following
-      // is rather complicated, but at least
-      // attempts to avoid evaluating the
-      // vectorfunction multiple times at the
-      // same point on a cell.
-      //
-      // First check that the desired components are interpolating.
-      for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
-        {
-          for (unsigned int component_index = 0; component_index < n_components; ++component_index)
-            {
-              if (component_mask[component_index] == true)
-                {
-                  Assert ((fe[fe_index].base_element(fe[fe_index].component_to_base_index
-                                                     (component_index).first).has_support_points()) ||
-                          (fe[fe_index].base_element(fe[fe_index].component_to_base_index
-                                                     (component_index).first).dofs_per_cell == 0),
-                          ExcNonInterpolatingFE());
-                }
-            }
-        }
-
-      // Find the support points on a cell that are mentioned multiple times, and
-      // only add each once.  Each multiple point gets to know the dof index of
-      // its representative point by the dof_to_rep_dof_table.
-
-      // the following vector collects all unit support points p[i],
-      // 0<=i<fe.dofs_per_cell, for which unit_support_point(i) is unique
-      // (representative). The position of a support point within this vector is
-      // called the rep index.
-      std::vector<std::vector<Point<dim> > > rep_unit_support_points (fe.size());
-      // the following table converts a dof i
-      // to the rep index.
-      std::vector<std::vector<types::global_dof_index> > dof_to_rep_index_table(fe.size());
-
-      std::vector<unsigned int> n_rep_points (fe.size(), 0);
-
-      for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
-        {
-          for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
-            {
-              const unsigned int component
-                = fe[fe_index].system_to_component_index(i).first;
-              if (component_mask[component] == true)
-                {
-                  const Point<dim> dof_support_point = fe[fe_index].unit_support_point(i);
-
-                  bool representative=true;
-                  // the following loop is looped
-                  // the other way round to get
-                  // the minimal effort of
-                  // O(fe.dofs_per_cell) for multiple
-                  // support points that are placed
-                  // one after the other.
-                  for (unsigned int j=rep_unit_support_points[fe_index].size(); j>0; --j)
-                    if (dof_support_point
-                        == rep_unit_support_points[fe_index][j-1])
-                      {
-                        dof_to_rep_index_table[fe_index].push_back(j-1);
-                        representative=false;
-                        break;
-                      }
-
-                  if (representative)
-                    {
-                      dof_to_rep_index_table[fe_index].push_back
-                      (rep_unit_support_points[fe_index].size());
-                      rep_unit_support_points[fe_index].push_back(dof_support_point);
-                      ++n_rep_points[fe_index];
-                    }
-                }
-              else
-                {
-                  // If correct component not to be interpolated, append invalid index to in table
-                  dof_to_rep_index_table[fe_index].push_back(numbers::invalid_dof_index);
-                }
-            }
-
-          Assert(rep_unit_support_points[fe_index].size()==n_rep_points[fe_index],
-                 ExcInternalError());
-          Assert(dof_to_rep_index_table[fe_index].size()==fe[fe_index].dofs_per_cell,
-                 ExcInternalError());
-        }
-
-      std::vector<types::global_dof_index> dofs_on_cell (fe.max_dofs_per_cell());
-
-      // get space for the values of the
-      // function at the rep support points.
-      //
-      // have two versions, one for system fe
-      // and one for scalar ones, to take the
-      // more efficient one respectively
-      std::vector<std::vector<number> >         function_values_scalar(fe.size());
-      std::vector<std::vector<Vector<number> > > function_values_system(fe.size());
-
-      // Make a quadrature rule from support points
-      // to feed it into FEValues
-      hp::QCollection<dim> support_quadrature;
-      for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
-        support_quadrature.push_back (Quadrature<dim>(rep_unit_support_points[fe_index]));
-
-      // Transformed support points are computed by
-      // FEValues
-      hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
-
-      hp::FEValues<dim,spacedim> fe_values (mapping_collection,
-                                            fe, support_quadrature, update_quadrature_points);
-
-      for (; cell!=endc; ++cell)
-        if (cell->is_locally_owned())
-          {
-            const unsigned int fe_index = cell->active_fe_index();
-            if (fe[fe_index].dofs_per_cell != 0)
-              {
-                // for each cell:
-                // get location of finite element
-                // support_points
-                fe_values.reinit(cell);
-                const std::vector<Point<spacedim> > &rep_support_points =
-                  fe_values.get_present_fe_values().get_quadrature_points();
-
-                // get indices of the dofs on this cell
-                dofs_on_cell.resize (fe[fe_index].dofs_per_cell);
-                cell->get_dof_indices (dofs_on_cell);
-
-
-                if (fe_is_system)
-                  {
-                    // get function values at
-                    // these points. Here: get
-                    // all components
-                    function_values_system[fe_index]
-                    .resize (n_rep_points[fe_index],
-                             Vector<number> (fe[fe_index].n_components()));
-
-                    Assert (dof.get_fe(fe_index).n_components() == function(cell)->n_components,
-                            ExcDimensionMismatch(dof.get_fe(0).n_components(),
-                                                 function(cell)->n_components));
-
-                    function(cell)->vector_value_list (rep_support_points,
-                                                       function_values_system[fe_index]);
-                    // distribute the function
-                    // values to the global
-                    // vector
-                    for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
-                      {
-                        const unsigned int component
-                          = fe[fe_index].system_to_component_index(i).first;
-                        if (component_mask[component] == true)
-                          {
-                            const unsigned int rep_dof=dof_to_rep_index_table[fe_index][i];
-                            ::dealii::internal::ElementAccess<VectorType>::set(
-                              function_values_system[fe_index][rep_dof](component),
-                              dofs_on_cell[i], vec);
-                          }
-                      }
-                  }
-                else
-                  {
-                    // get first component only,
-                    // which is the only component
-                    // in the function anyway
-                    function_values_scalar[fe_index].resize (n_rep_points[fe_index]);
-                    function(cell)->value_list (rep_support_points,
-                                                function_values_scalar[fe_index],
-                                                0);
-                    // distribute the function
-                    // values to the global
-                    // vector
-                    for (unsigned int i=0; i<fe[fe_index].dofs_per_cell; ++i)
-                      ::dealii::internal::ElementAccess<VectorType>::set(
-                        function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]],
-                        dofs_on_cell[i], vec);
-                  }
-              }
-          }
-      vec.compress(VectorOperation::insert);
-    }
-
-
     // Internal implementation of interpolate that takes a generic functor
     // function such that function(cell) is of type
     // Function<spacedim, typename VectorType::value_type>*
     //
     // A given cell is skipped if function(cell) == nullptr
-    // TODO: Make this function also work for FESystems that
-    // contain elements without generalized support points, as
-    // long as their components are not selected for interpolation.
     template <int dim,
               int spacedim,
               typename VectorType,
@@ -534,21 +313,6 @@ namespace VectorTools
       typedef typename VectorType::value_type number;
 
       const hp::FECollection<dim, spacedim> &fe(dof_handler.get_fe_collection());
-
-      // Check if the element has generalized support points
-      bool has_generalized_support_points = true;
-      for (unsigned int fe_index=0; fe_index<fe.size(); ++fe_index)
-        {
-          has_generalized_support_points = has_generalized_support_points && fe[fe_index].has_generalized_support_points();
-        }
-
-      // If the element has no generalized support points the algorithm in this
-      // function does not work. Fall back to an earlier version.
-      if (!has_generalized_support_points)
-        {
-          interpolate_selected_components(mapping,dof_handler,function,vec,component_mask);
-          return;
-        }
 
       std::vector<types::global_dof_index> dofs_on_cell(fe.max_dofs_per_cell());
 
@@ -678,6 +442,23 @@ namespace VectorTools
 
               if (selected)
                 {
+#ifdef DEBUG
+                  // make sure that all selected base elements are indeed
+                  // interpolatory
+
+                  if (const auto fe_system =
+                        dynamic_cast<const FESystem<dim> *>(&fe[fe_index]))
+                    {
+                      const auto index =
+                        fe_system->system_to_base_index(i).first.first;
+                      Assert(fe_system->base_element(index)
+                             .has_generalized_support_points(),
+                             ExcMessage("The component mask supplied to "
+                                        "VectorTools::interpolate selects a "
+                                        "non-interpolatory element."));
+                    }
+#endif
+
                   // Add local values to the global vectors
                   ::dealii::internal::ElementAccess<VectorType>::add(dof_values[i],
                                                                      dofs_on_cell[i],
@@ -737,19 +518,8 @@ namespace VectorTools
     VectorType &vec,
     const ComponentMask &component_mask)
   {
-    Assert(component_mask.represents_n_components(dof_handler.get_fe().n_components()),
-           ExcMessage("The number of components in the mask has to be either "
-                      "zero or equal to the number of components in the finite "
-                      "element."));
-
-    Assert (vec.size() == dof_handler.n_dofs(),
-            ExcDimensionMismatch (vec.size(), dof_handler.n_dofs()));
-
     Assert (dof_handler.get_fe().n_components() == function.n_components,
             ExcDimensionMismatch(dof_handler.get_fe().n_components(), function.n_components));
-
-    Assert (component_mask.n_selected_components(dof_handler.get_fe().n_components()) > 0,
-            ComponentMask::ExcNoComponentSelected());
 
     // Create a small lambda capture wrapping function and call the
     // internal implementation
@@ -851,17 +621,6 @@ namespace VectorTools
    VectorType                         &vec,
    const ComponentMask                &component_mask)
   {
-    Assert(component_mask.represents_n_components(dof_handler.get_fe().n_components()),
-           ExcMessage("The number of components in the mask has to be either "
-                      "zero or equal to the number of components in the finite "
-                      "element."));
-
-    Assert (vec.size() == dof_handler.n_dofs(),
-            ExcDimensionMismatch (vec.size(), dof_handler.n_dofs()));
-
-    Assert (component_mask.n_selected_components(dof_handler.get_fe().n_components()) > 0,
-            ComponentMask::ExcNoComponentSelected());
-
     // Create a small lambda capture wrapping the function map and call the
     // internal implementation
     const auto function_map = [&functions](
