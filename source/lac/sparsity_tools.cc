@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <functional>
 #include <set>
+#include <deal.II/base/std_cxx14/memory.h>
 
 #ifdef DEAL_II_WITH_MPI
 #include <deal.II/base/utilities.h>
@@ -39,15 +40,265 @@ extern "C"
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+#include <zoltan_cpp.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+#endif
+
+#include <string>
+
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace SparsityTools
 {
 
+  namespace
+  {
+    void partition_metis (const SparsityPattern     &sparsity_pattern,
+                          const unsigned int         n_partitions,
+                          std::vector<unsigned int> &partition_indices)
+    {
+      // Make sure that METIS is actually
+      // installed and detected
+#ifndef DEAL_II_WITH_METIS
+      (void)sparsity_pattern;
+      AssertThrow (false, ExcMETISNotInstalled());
+#else
+
+      // generate the data structures for
+      // METIS. Note that this is particularly
+      // simple, since METIS wants exactly our
+      // compressed row storage format. we only
+      // have to set up a few auxiliary arrays
+      idx_t
+      n       = static_cast<signed int>(sparsity_pattern.n_rows()),
+      ncon    = 1,                              // number of balancing constraints (should be >0)
+      nparts  = static_cast<int>(n_partitions), // number of subdomains to create
+      dummy;                                    // the numbers of edges cut by the
+      // resulting partition
+
+      // We can not partition n items into more than n parts. METIS will
+      // generate non-sensical output (everything is owned by a single process)
+      // and complain with a message (but won't return an error code!):
+      // ***Cannot bisect a graph with 0 vertices!
+      // ***You are trying to partition a graph into too many parts!
+      nparts = std::min(n, nparts);
+
+      // use default options for METIS
+      idx_t options[METIS_NOPTIONS];
+      METIS_SetDefaultOptions (options);
+
+      // one more nuisance: we have to copy our own data to arrays that store
+      // signed integers :-(
+      std::vector<idx_t> int_rowstart(1);
+      int_rowstart.reserve(sparsity_pattern.n_rows()+1);
+      std::vector<idx_t> int_colnums;
+      int_colnums.reserve(sparsity_pattern.n_nonzero_elements());
+      for (SparsityPattern::size_type row=0; row<sparsity_pattern.n_rows(); ++row)
+        {
+          for (SparsityPattern::iterator col=sparsity_pattern.begin(row);
+               col < sparsity_pattern.end(row); ++col)
+            int_colnums.push_back(col->column());
+          int_rowstart.push_back(int_colnums.size());
+        }
+
+      std::vector<idx_t> int_partition_indices (sparsity_pattern.n_rows());
+
+      // Make use of METIS' error code.
+      int ierr;
+
+      // Select which type of partitioning to create
+
+      // Use recursive if the number of partitions is less than or equal to 8
+      if (nparts <= 8)
+        ierr = METIS_PartGraphRecursive(&n, &ncon, int_rowstart.data(), int_colnums.data(),
+                                        nullptr, nullptr, nullptr,
+                                        &nparts,nullptr,nullptr,options,
+                                        &dummy,int_partition_indices.data());
+
+      // Otherwise use kway
+      else
+        ierr = METIS_PartGraphKway(&n, &ncon, int_rowstart.data(), int_colnums.data(),
+                                   nullptr, nullptr, nullptr,
+                                   &nparts,nullptr,nullptr,options,
+                                   &dummy,int_partition_indices.data());
+
+      // If metis returns normally, an error code METIS_OK=1 is returned from
+      // the above functions (see metish.h)
+      AssertThrow (ierr == 1, ExcMETISError (ierr));
+
+      // now copy back generated indices into the output array
+      std::copy (int_partition_indices.begin(),
+                 int_partition_indices.end(),
+                 partition_indices.begin());
+#endif
+    }
+
+
+//Query functions unused if zoltan is not installed
+#ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+    //Query functions for partition_zoltan
+    int get_number_of_objects(void *data, int *ierr)
+    {
+      SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
+
+      *ierr = ZOLTAN_OK;
+
+      return graph->n_rows();
+    }
+
+
+    void get_object_list(void *data, int sizeGID, int sizeLID,
+                         ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
+                         int wgt_dim, float *obj_wgts, int *ierr)
+    {
+      SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
+      *ierr = ZOLTAN_OK;
+
+      Assert( globalID != nullptr , ExcInternalError() );
+      Assert( localID != nullptr , ExcInternalError() );
+
+      //set global degrees of freedom
+      auto n_dofs = graph->n_rows();
+
+      for (unsigned int i=0; i < n_dofs; i++)
+        {
+          globalID[i] = i;    //global ids run from 0 to n_dofs-1
+          localID[i] = i;     //same as global ids
+        }
+    }
+
+
+    void get_num_edges_list(void *data, int sizeGID, int sizeLID,
+                            int num_obj,
+                            ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
+                            int *numEdges, int *ierr)
+    {
+      SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
+
+      *ierr = ZOLTAN_OK;
+
+      Assert ( numEdges != nullptr , ExcInternalError() );
+
+      for (unsigned int i=0; i<num_obj; ++i)
+        numEdges[i] = graph->row_length(globalID[i])-1;
+    }
+
+
+
+    void get_edge_list(void *data, int sizeGID, int sizeLID,
+                       int num_obj, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
+                       int *num_edges,
+                       ZOLTAN_ID_PTR nborGID, int *nborProc,
+                       int wgt_dim, float *ewgts, int *ierr)
+    {
+      SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
+      *ierr = ZOLTAN_OK;
+
+      ZOLTAN_ID_PTR nextNborGID = nborGID;
+      int *nextNborProc = nborProc;
+
+      Assert( nextNborGID != nullptr , ExcInternalError() );
+      Assert( nextNborProc != nullptr , ExcInternalError() );
+
+      //Loop through rows corresponding to indices in globalID implicitly
+      for (SparsityPattern::size_type i=0; i < static_cast<SparsityPattern::size_type>(num_obj); ++i)
+        {
+          //Loop through each column to find neighbours
+          for ( SparsityPattern::iterator col=graph->begin(i);
+                col < graph->end(i); ++col )
+            //Ignore diagonal entries. Not needed for partitioning.
+            if ( i != col->column() )
+              {
+                *nextNborGID++ = col->column();
+                *nextNborProc++ = 0;    //All the vertices on processor 0
+              }
+        }
+    }
+#endif
+
+
+    void partition_zoltan (const SparsityPattern     &sparsity_pattern,
+                           const unsigned int         n_partitions,
+                           std::vector<unsigned int> &partition_indices)
+    {
+      // Make sure that ZOLTAN is actually
+      // installed and detected
+#ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
+      (void)sparsity_pattern;
+      AssertThrow (false, ExcZOLTANNotInstalled());
+#else
+
+      //MPI environment must have been initialized by this point.
+      std::unique_ptr<Zoltan> zz = std_cxx14::make_unique<Zoltan>(MPI_COMM_SELF);
+
+      //General parameters
+      zz->Set_Param( "LB_METHOD", "GRAPH" );  //graph based partition method (LB-load balancing)
+      zz->Set_Param( "DEBUG_LEVEL", "0" );   //set level of debug info
+      zz->Set_Param( "NUM_LOCAL_PARTS", std::to_string(n_partitions) ); //set number of partitions
+
+      //Need a non-const object equal to sparsity_pattern
+      SparsityPattern graph;
+      graph.copy_from(sparsity_pattern);
+
+      //Set query functions
+      zz->Set_Num_Obj_Fn(get_number_of_objects, &graph);
+      zz->Set_Obj_List_Fn(get_object_list, &graph);
+      zz->Set_Num_Edges_Multi_Fn(get_num_edges_list, &graph);
+      zz->Set_Edge_List_Multi_Fn(get_edge_list, &graph);
+
+      //Variables needed by partition function
+      int changes=0;
+      int num_gid_entries=1;
+      int num_lid_entries=1;
+      int num_import=0;
+      ZOLTAN_ID_PTR import_global_ids=nullptr;
+      ZOLTAN_ID_PTR import_local_ids=nullptr;
+      int *import_procs=nullptr;
+      int *import_to_part=nullptr;
+      int num_export=0;
+      ZOLTAN_ID_PTR export_global_ids=nullptr;
+      ZOLTAN_ID_PTR export_local_ids=nullptr;
+      int *export_procs=nullptr;
+      int *export_to_part=nullptr;
+
+      //call partitioner
+      int rc = zz->LB_Partition (changes,
+                                 num_gid_entries,
+                                 num_lid_entries,
+                                 num_import,
+                                 import_global_ids,
+                                 import_local_ids,
+                                 import_procs,
+                                 import_to_part,
+                                 num_export,
+                                 export_global_ids,
+                                 export_local_ids,
+                                 export_procs,
+                                 export_to_part);
+
+      //check for error code in partitioner
+      Assert( rc == ZOLTAN_OK , ExcInternalError() );
+
+      //By default, all indices belong to part 0. After zoltan partition
+      //some are migrated to different part ID, which is stored in export_to_part array.
+      std::fill(partition_indices.begin(), partition_indices.end(), 0);
+
+      //copy from export_to_part to partition_indices, whose part_ids != 0.
+      for (int i=0; i < num_export; i++)
+        partition_indices[export_local_ids[i]] = export_to_part[i];
+#endif
+    }
+  }
+
+
   void partition (const SparsityPattern     &sparsity_pattern,
                   const unsigned int         n_partitions,
-                  std::vector<unsigned int> &partition_indices)
+                  std::vector<unsigned int> &partition_indices,
+                  const Partitioner partitioner
+                 )
   {
     Assert (sparsity_pattern.n_rows()==sparsity_pattern.n_cols(),
             ExcNotQuadratic());
@@ -66,80 +317,12 @@ namespace SparsityTools
         return;
       }
 
-    // Make sure that METIS is actually
-    // installed and detected
-#ifndef DEAL_II_WITH_METIS
-    (void)sparsity_pattern;
-    AssertThrow (false, ExcMETISNotInstalled());
-#else
-
-    // generate the data structures for
-    // METIS. Note that this is particularly
-    // simple, since METIS wants exactly our
-    // compressed row storage format. we only
-    // have to set up a few auxiliary arrays
-    idx_t
-    n       = static_cast<signed int>(sparsity_pattern.n_rows()),
-    ncon    = 1,                              // number of balancing constraints (should be >0)
-    nparts  = static_cast<int>(n_partitions), // number of subdomains to create
-    dummy;                                    // the numbers of edges cut by the
-    // resulting partition
-
-    // We can not partition n items into more than n parts. METIS will
-    // generate non-sensical output (everything is owned by a single process)
-    // and complain with a message (but won't return an error code!):
-    // ***Cannot bisect a graph with 0 vertices!
-    // ***You are trying to partition a graph into too many parts!
-    nparts = std::min(n, nparts);
-
-    // use default options for METIS
-    idx_t options[METIS_NOPTIONS];
-    METIS_SetDefaultOptions (options);
-
-    // one more nuisance: we have to copy our own data to arrays that store
-    // signed integers :-(
-    std::vector<idx_t> int_rowstart(1);
-    int_rowstart.reserve(sparsity_pattern.n_rows()+1);
-    std::vector<idx_t> int_colnums;
-    int_colnums.reserve(sparsity_pattern.n_nonzero_elements());
-    for (SparsityPattern::size_type row=0; row<sparsity_pattern.n_rows(); ++row)
-      {
-        for (SparsityPattern::iterator col=sparsity_pattern.begin(row);
-             col < sparsity_pattern.end(row); ++col)
-          int_colnums.push_back(col->column());
-        int_rowstart.push_back(int_colnums.size());
-      }
-
-    std::vector<idx_t> int_partition_indices (sparsity_pattern.n_rows());
-
-    // Make use of METIS' error code.
-    int ierr;
-
-    // Select which type of partitioning to create
-
-    // Use recursive if the number of partitions is less than or equal to 8
-    if (nparts <= 8)
-      ierr = METIS_PartGraphRecursive(&n, &ncon, int_rowstart.data(), int_colnums.data(),
-                                      nullptr, nullptr, nullptr,
-                                      &nparts,nullptr,nullptr,options,
-                                      &dummy,int_partition_indices.data());
-
-    // Otherwise use kway
+    if (partitioner == Partitioner::metis)
+      partition_metis(sparsity_pattern, n_partitions, partition_indices);
+    else if (partitioner == Partitioner::zoltan)
+      partition_zoltan(sparsity_pattern, n_partitions, partition_indices);
     else
-      ierr = METIS_PartGraphKway(&n, &ncon, int_rowstart.data(), int_colnums.data(),
-                                 nullptr, nullptr, nullptr,
-                                 &nparts,nullptr,nullptr,options,
-                                 &dummy,int_partition_indices.data());
-
-    // If metis returns normally, an error code METIS_OK=1 is returned from
-    // the above functions (see metish.h)
-    AssertThrow (ierr == 1, ExcMETISError (ierr));
-
-    // now copy back generated indices into the output array
-    std::copy (int_partition_indices.begin(),
-               int_partition_indices.end(),
-               partition_indices.begin());
-#endif
+      AssertThrow(false, ExcInternalError());
   }
 
 
