@@ -15,7 +15,6 @@
 
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/utilities.h>
-#include <deal.II/base/revision.h>
 #include <deal.II/base/path_search.h>
 #include <boost/core/demangle.hpp>
 #include <fstream>
@@ -103,8 +102,7 @@ ParameterAcceptor::initialize(const std::string &filename,
       if ( extension == "prm")
         {
           outfile << "# Parameter file generated with " << std::endl
-                  << "# DEAL_II_GIT_BRANCH=   " << DEAL_II_GIT_BRANCH  << std::endl
-                  << "# DEAL_II_GIT_SHORTREV= " << DEAL_II_GIT_SHORTREV << std::endl;
+                  << "# DEAL_II_PACKAGE_VERSION = " << DEAL_II_PACKAGE_VERSION  << std::endl;
           Assert(output_style_for_prm_format == ParameterHandler::Text ||
                  output_style_for_prm_format == ParameterHandler::ShortText,
                  ExcMessage("Only Text or ShortText can be specified in output_style_for_prm_format."))
