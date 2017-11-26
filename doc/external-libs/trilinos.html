@@ -64,16 +64,19 @@
         <li> ML,
         <li> MueLu,
         <li> ROL (optional),
-        <li> Sacado, and
-        <li> Teuchos.
+        <li> Sacado,
+        <li> Teuchos,
+        <li> Zoltan (optional).
       </ul>
 
       Trilinos uses <a href="http://cmake.org/">cmake</a> to configure and
       build. The following slightly longish set of commands will set up a
-      reasonable configuration:
+      reasonable configuration (<code>trilinos-x.y.z</code> is the
+      version-specific path into which the
+      Trilinos <code>.tar.gz</code> will unpack):
       <pre>
 
-    cd trilinos-12.4.2
+    cd trilinos-x.y.z
     mkdir build
     cd build
 
@@ -87,6 +90,7 @@
     -DTrilinos_ENABLE_MueLu=ON                       \
     -DTrilinos_ENABLE_ML=ON                          \
     -DTrilinos_ENABLE_ROL=ON                         \
+    -DTrilinos_ENABLE_Zoltan=ON                      \
     -DTrilinos_VERBOSE_CONFIGURE=OFF                 \
     -DTPL_ENABLE_MPI=ON                              \
     -DBUILD_SHARED_LIBS=ON                           \
