@@ -46,6 +46,7 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/lac/sparsity_tools.h>
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
@@ -2823,7 +2824,9 @@ next_cell:
   template <int dim, int spacedim>
   void
   partition_triangulation (const unsigned int           n_partitions,
-                           Triangulation<dim,spacedim> &triangulation)
+                           Triangulation<dim,spacedim> &triangulation,
+                           const SparsityTools::Partitioner  partitioner
+                          )
   {
     Assert ((dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (&triangulation)
@@ -2856,7 +2859,9 @@ next_cell:
     sp_cell_connectivity.copy_from(cell_connectivity);
     partition_triangulation (n_partitions,
                              sp_cell_connectivity,
-                             triangulation);
+                             triangulation,
+                             partitioner
+                            );
   }
 
 
@@ -2865,7 +2870,9 @@ next_cell:
   void
   partition_triangulation (const unsigned int           n_partitions,
                            const SparsityPattern        &cell_connection_graph,
-                           Triangulation<dim,spacedim>  &triangulation)
+                           Triangulation<dim,spacedim>  &triangulation,
+                           const SparsityTools::Partitioner  partitioner
+                          )
   {
     Assert ((dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (&triangulation)
@@ -2894,7 +2901,7 @@ next_cell:
     // of freedom (which is associated with a
     // cell)
     std::vector<unsigned int> partition_indices (triangulation.n_active_cells());
-    SparsityTools::partition (cell_connection_graph, n_partitions,  partition_indices);
+    SparsityTools::partition (cell_connection_graph, n_partitions,  partition_indices, partitioner);
 
     // finally loop over all cells and set the
     // subdomain ids

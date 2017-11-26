@@ -49,6 +49,10 @@
 #   include <p4est_bits.h>
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+#   include <zoltan_cpp.h>
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -349,6 +353,12 @@ namespace Utilities
       // Disable PETSc exception handling. This just prints a large wall
       // of text that is not particularly helpful for what we do:
       PetscPopSignalHandler();
+#endif
+
+      //Initialize zoltan
+#ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+      float version;
+      Zoltan_Initialize(argc, argv, &version);
 #endif
 
 #ifdef DEAL_II_WITH_P4EST

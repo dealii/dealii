@@ -54,18 +54,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       ENDIF()
     ENDFOREACH()
 
-    FOREACH(_optional_module
-   	  ROL
-      )
-      ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
-      IF(_module_found)
-        MESSAGE(STATUS "Found ${_optional_module}")
-        SET(DEAL_II_TRILINOS_WITH_${_optional_module} ON)
-      ELSE()
-        MESSAGE(STATUS "Module ${_optional_module} not found!")
-      ENDIF()
-    ENDFOREACH()
-
     IF(NOT ${var})
       MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
         "Missing ${_modules_missing}"
@@ -181,6 +169,19 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDIF()
 
     CHECK_MPI_INTERFACE(TRILINOS ${var})
+
+    IF (${var})
+      FOREACH(_optional_module ROL Zoltan)
+      ITEM_MATCHES(_module_found ${_optional_module} ${Trilinos_PACKAGE_LIST})
+      IF(_module_found)
+          MESSAGE(STATUS "Found ${_optional_module}")
+          STRING(TOUPPER "${_optional_module}" _optional_module_upper)
+          SET(DEAL_II_TRILINOS_WITH_${_optional_module_upper} ON)
+      ELSE()
+          MESSAGE(STATUS "Module ${_optional_module} not found!")
+      ENDIF()
+      ENDFOREACH()
+    ENDIF()
   ENDIF()
 ENDMACRO()
 

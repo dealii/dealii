@@ -156,6 +156,7 @@
 /* cmake/configure/configure_2_trilinos.cmake */
 #cmakedefine DEAL_II_TRILINOS_CXX_SUPPORTS_SACADO_COMPLEX_RAD
 #cmakedefine DEAL_II_TRILINOS_WITH_ROL
+#cmakedefine DEAL_II_TRILINOS_WITH_ZOLTAN
 
 /*
  * Depending on the use of threads, we will have to make some variables
