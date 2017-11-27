@@ -560,14 +560,14 @@ private:
   std::vector <std::vector <double> > independent_values;
 
   /**
-   * Saves a vector listing component names associated with a
+   * Save a vector listing component names associated with a
    * independent_values. This will be an empty vector if the user does not
    * supplies names.
    */
   std::vector<std::string> indep_names;
 
   /**
-   * Saves data for each mnemonic entry. data_store: mnemonic ->
+   * Save data for each mnemonic entry. data_store: mnemonic ->
    * [point_0_components point_1_components ... point_n-1_components][key]
    * This format facilitates scalar mnemonics in a vector space, because
    * scalar mnemonics will only have one component per point. Vector
@@ -576,19 +576,19 @@ private:
   std::map <std::string, std::vector <std::vector <double> > > data_store;
 
   /**
-   * Saves a component mask for each mnemonic.
+   * Save a component mask for each mnemonic.
    */
   std::map <std::string, ComponentMask> component_mask;
 
 
   /**
-   * Saves a vector listing component names associated with a mnemonic. This
+   * Save a vector listing component names associated with a mnemonic. This
    * will be an empty vector if the user does not supplies names.
    */
   std::map <std::string, std::vector<std::string> > component_names_map;
 
   /**
-   * Saves the location and other mesh info about support points.
+   * Save the location and other mesh info about support points.
    */
   std::vector <internal::PointValueHistory::PointGeometryData <dim> >
   point_geometry_data;

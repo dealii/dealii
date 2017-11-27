@@ -759,7 +759,7 @@ private:
    * chart_points with the pullbacks of the surrounding points. This method
    * internally calls @p get_possible_cells_around_points().
    *
-   * Returns an iterator to the cell on which the chart is defined.
+   * Return an iterator to the cell on which the chart is defined.
    */
   typename Triangulation<dim,spacedim>::cell_iterator
   compute_chart_points(const ArrayView<const Point<spacedim>> &surrounding_points,

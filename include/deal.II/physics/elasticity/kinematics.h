@@ -52,7 +52,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the deformation gradient tensor,
+       * Return the deformation gradient tensor,
        * as constructed from the material displacement gradient
        * tensor @p Grad_u.
        * The result is expressed as
@@ -74,7 +74,7 @@ namespace Physics
       F (const Tensor<2, dim, Number> &Grad_u);
 
       /**
-       * Returns the isochoric counterpart of the deformation gradient
+       * Return the isochoric counterpart of the deformation gradient
        * tensor @p F .
        * The result is expressed as
        * @f[
@@ -90,7 +90,7 @@ namespace Physics
       F_iso (const Tensor<2, dim, Number> &F);
 
       /**
-       * Returns the volumetric counterpart of the deformation gradient
+       * Return the volumetric counterpart of the deformation gradient
        * tensor @p F .
        * The result is expressed as
        * @f[
@@ -106,7 +106,7 @@ namespace Physics
       F_vol (const Tensor<2, dim, Number> &F);
 
       /**
-       * Returns the symmetric right Cauchy-Green deformation tensor,
+       * Return the symmetric right Cauchy-Green deformation tensor,
        * as constructed from the deformation gradient tensor @p F.
        * The result is expressed as
        * @f[
@@ -121,7 +121,7 @@ namespace Physics
       C (const Tensor<2, dim, Number> &F);
 
       /**
-       * Returns the symmetric left Cauchy-Green deformation tensor,
+       * Return the symmetric left Cauchy-Green deformation tensor,
        * as constructed from the deformation gradient tensor @p F.
        * The result is expressed as
        * @f[
@@ -143,7 +143,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the symmetric Green-Lagrange strain tensor,
+       * Return the symmetric Green-Lagrange strain tensor,
        * as constructed from the deformation gradient tensor @p F.
        * The result is expressed as
        * @f[
@@ -158,7 +158,7 @@ namespace Physics
       E (const Tensor<2, dim, Number> &F);
 
       /**
-       * Returns the symmetric small strain tensor,
+       * Return the symmetric small strain tensor,
        * as constructed from the displacement gradient tensor @p Grad_u.
        * The result is expressed as
        * @f[
@@ -177,7 +177,7 @@ namespace Physics
       epsilon (const Tensor<2, dim, Number> &Grad_u);
 
       /**
-       * Returns the symmetric Almansi strain tensor,
+       * Return the symmetric Almansi strain tensor,
        * as constructed from the deformation gradient tensor @p F.
        * The result is expressed as
        * @f[
@@ -200,7 +200,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the spatial velocity gradient tensor,
+       * Return the spatial velocity gradient tensor,
        * as constructed from the deformation gradient tensor @p F
        * and its material time derivative @p dF_dt (the material velocity
        * gradient).
@@ -218,7 +218,7 @@ namespace Physics
          const Tensor<2, dim, Number> &dF_dt);
 
       /**
-       * Returns the rate of deformation tensor (also known as the rate of strain
+       * Return the rate of deformation tensor (also known as the rate of strain
        * tensor), as constructed from the deformation gradient tensor @p F
        * and its material time derivative @p dF_dt (the material velocity
        * gradient).
@@ -241,7 +241,7 @@ namespace Physics
          const Tensor<2, dim, Number> &dF_dt);
 
       /**
-       * Returns the rate of rotation tensor (also known as the vorticity
+       * Return the rate of rotation tensor (also known as the vorticity
        * tensor), as constructed from the deformation gradient tensor @p F
        * and its material time derivative @p dF_dt (the material velocity
        * gradient).

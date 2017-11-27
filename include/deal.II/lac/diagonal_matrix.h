@@ -69,7 +69,7 @@ public:
   void compress (VectorOperation::values operation);
 
   /**
-   * Returns a reference to the underlying vector for manipulation of the
+   * Return a reference to the underlying vector for manipulation of the
    * entries on the matrix diagonal.
    */
   VectorType &get_vector();
@@ -80,7 +80,7 @@ public:
   void clear();
 
   /**
-   * Returns a read-only reference to the underlying vector.
+   * Return a read-only reference to the underlying vector.
    */
   const VectorType &get_vector() const;
 

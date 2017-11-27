@@ -316,7 +316,7 @@ namespace MatrixFreeOperators
                      const VectorType &src) const;
 
     /**
-     * Returns the value of the matrix entry (row,col). In matrix-free context
+     * Return the value of the matrix entry (row,col). In matrix-free context
      * this function is valid only for row==col when diagonal is initialized.
      */
     value_type el (const unsigned int row,

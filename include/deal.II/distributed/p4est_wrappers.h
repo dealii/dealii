@@ -535,7 +535,7 @@ namespace internal
 
 
     /**
-     * Returns whether q1 and q2 are equal
+     * Return whether q1 and q2 are equal
      */
     template <int dim>
     bool
@@ -545,7 +545,7 @@ namespace internal
 
 
     /**
-     * Returns whether q1 is an ancestor of q2
+     * Return whether q1 is an ancestor of q2
      */
     template <int dim>
     bool
@@ -555,7 +555,7 @@ namespace internal
 
 
     /**
-     * Returns whether the children of a coarse cell are stored locally
+     * Return whether the children of a coarse cell are stored locally
      */
     template <int dim>
     bool

@@ -1330,7 +1330,7 @@ namespace GridTools
   vertex_to_cell_map(const Triangulation<dim,spacedim> &triangulation);
 
   /**
-   * Returns a vector of normalized tensors for each vertex-cell combination of
+   * Return a vector of normalized tensors for each vertex-cell combination of
    * the output of GridTools::vertex_to_cell_map() (which is expected as input
    * parameter for this function). Each tensor represents a geometric vector
    * from the vertex to the respective cell center.
@@ -1350,7 +1350,7 @@ namespace GridTools
 
 
   /**
-   * Returns the local vertex index of cell @p cell that is closest to
+   * Return the local vertex index of cell @p cell that is closest to
    * the given location @p position.
    *
    * @author Rene Gassmoeller, Luca Heltai, 2017.

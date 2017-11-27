@@ -2205,22 +2205,22 @@ namespace TrilinosWrappers
         virtual ~TrilinosPayload() = default;
 
         /**
-         * Returns a payload configured for identity operations
+         * Return a payload configured for identity operations
          */
         TrilinosPayload identity_payload () const;
 
         /**
-         * Returns a payload configured for null operations
+         * Return a payload configured for null operations
          */
         TrilinosPayload null_payload () const;
 
         /**
-         * Returns a payload configured for transpose operations
+         * Return a payload configured for transpose operations
          */
         TrilinosPayload transpose_payload () const;
 
         /**
-         * Returns a payload configured for inverse operations
+         * Return a payload configured for inverse operations
          *
          * Invoking this factory function will configure two additional functions,
          * namely <tt>inv_vmult</tt> and <tt>inv_Tvmult</tt>, both of which wrap
@@ -2243,7 +2243,7 @@ namespace TrilinosWrappers
             inverse_payload (Solver &, const Preconditioner &) const;
 
         /**
-         * Returns a payload configured for inverse operations
+         * Return a payload configured for inverse operations
          *
          * Invoking this factory function will configure two additional functions,
          * namely <tt>inv_vmult</tt> and <tt>inv_Tvmult</tt>, both of which
@@ -2273,7 +2273,7 @@ namespace TrilinosWrappers
 //@{
 
         /**
-         * Returns an IndexSet that defines the partitioning of the domain space
+         * Return an IndexSet that defines the partitioning of the domain space
          * of this matrix, i.e., the partitioning of the vectors this matrix has
          * to be multiplied with / operate on.
          */
@@ -2281,7 +2281,7 @@ namespace TrilinosWrappers
         locally_owned_domain_indices () const;
 
         /**
-         * Returns an IndexSet that defines the partitioning of the range space
+         * Return an IndexSet that defines the partitioning of the range space
          * of this matrix, i.e., the partitioning of the vectors that result
          * from matrix-vector products.
          */
@@ -2416,7 +2416,7 @@ namespace TrilinosWrappers
 //@{
 
         /**
-         * Returns a label to describe this class.
+         * Return a label to describe this class.
          *
          * This overloads the same function from the Trilinos class
          * Epetra_Operator.
@@ -2425,7 +2425,7 @@ namespace TrilinosWrappers
         Label () const;
 
         /**
-         * Returns a reference to the underlying MPI communicator for
+         * Return a reference to the underlying MPI communicator for
          * this object.
          *
          * This overloads the same function from the Trilinos class
@@ -2487,7 +2487,7 @@ namespace TrilinosWrappers
         Epetra_Map range_map;
 
         /**
-         * Returns a flag that describes whether this operator can return the
+         * Return a flag that describes whether this operator can return the
          * computation of the infinity norm. Since in general this is not the
          * case, this always returns a negetive result.
          *
@@ -2498,7 +2498,7 @@ namespace TrilinosWrappers
         HasNormInf () const;
 
         /**
-         * Returns the infinity norm of this operator.
+         * Return the infinity norm of this operator.
          * Throws an error since, in general, we cannot compute this value.
          *
          * This overloads the same function from the Trilinos class
@@ -2509,14 +2509,14 @@ namespace TrilinosWrappers
       };
 
       /**
-       * Returns an operator that returns a payload configured to support the
+       * Return an operator that returns a payload configured to support the
        * addition of two LinearOperators
        */
       TrilinosPayload operator+(const TrilinosPayload &first_op,
                                 const TrilinosPayload &second_op);
 
       /**
-       * Returns an operator that returns a payload configured to support the
+       * Return an operator that returns a payload configured to support the
        * multiplication of two LinearOperators
        */
       TrilinosPayload operator*(const TrilinosPayload &first_op,

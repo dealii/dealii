@@ -149,7 +149,7 @@ namespace Physics
       static const SymmetricTensor<4, dim> dev_P;
 
       /**
-       * Returns the fourth-order referential deviatoric tensor, as constructed from
+       * Return the fourth-order referential deviatoric tensor, as constructed from
        * the deformation gradient tensor @p F.
        * Also known as the deviatoric operator, this tensor projects a second-order
        * symmetric tensor onto a deviatoric space (for which the hydrostatic
@@ -208,7 +208,7 @@ namespace Physics
       Dev_P (const Tensor<2, dim, Number> &F);
 
       /**
-       * Returns the transpose of the fourth-order referential deviatoric tensor,
+       * Return the transpose of the fourth-order referential deviatoric tensor,
        * as constructed from the deformation gradient tensor @p F.
        * The result performs the following operation:
        * @f[
@@ -228,7 +228,7 @@ namespace Physics
        */
 //@{
       /**
-       * Returns the derivative of the volumetric Jacobian
+       * Return the derivative of the volumetric Jacobian
        * $J = \text{det} \mathbf{F}$ with respect to the right Cauchy-Green
        * tensor, as constructed from the deformation gradient tensor @p F.
        * The computed result is
@@ -256,7 +256,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the derivative of the inverse of the right Cauchy-Green
+       * Return the derivative of the inverse of the right Cauchy-Green
        * tensor with respect to the right Cauchy-Green tensor itself,
        * as constructed from the deformation gradient tensor @p F.
        * The result, accounting for symmetry, is defined in index notation as

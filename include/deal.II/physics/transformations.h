@@ -43,7 +43,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the rotation matrix for 2-d Euclidean space, namely
+       * Return the rotation matrix for 2-d Euclidean space, namely
        * @f[
        *  \mathbf{R} := \left[ \begin{array}{cc}
        *  cos(\theta) & sin(\theta) \\
@@ -63,7 +63,7 @@ namespace Physics
 
 
       /**
-       * Returns the rotation matrix for 3-d Euclidean space. Most concisely
+       * Return the rotation matrix for 3-d Euclidean space. Most concisely
        * stated using the Rodrigues' rotation formula, this function returns
        * the equivalent of
        * @f[
@@ -126,7 +126,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the result of the push forward transformation on a
+       * Return the result of the push forward transformation on a
        * contravariant vector, i.e.
        * @f[
        *  \chi\left(\bullet\right)^{\sharp}
@@ -144,7 +144,7 @@ namespace Physics
                     const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-2
+       * Return the result of the push forward transformation on a rank-2
        * contravariant tensor, i.e.
        * @f[
        *  \chi\left(\bullet\right)^{\sharp}
@@ -162,7 +162,7 @@ namespace Physics
                     const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-2
+       * Return the result of the push forward transformation on a rank-2
        * contravariant symmetric tensor, i.e.
        * @f[
        *  \chi\left(\bullet\right)^{\sharp}
@@ -181,7 +181,7 @@ namespace Physics
                     const Tensor<2,dim,Number>          &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-4
+       * Return the result of the push forward transformation on a rank-4
        * contravariant tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
@@ -199,7 +199,7 @@ namespace Physics
                     const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-4
+       * Return the result of the push forward transformation on a rank-4
        * contravariant symmetric tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
@@ -225,7 +225,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the result of the pull back transformation on a contravariant
+       * Return the result of the pull back transformation on a contravariant
        * vector, i.e.
        * @f[
        *  \chi^{-1}\left(\bullet\right)^{\sharp}
@@ -243,7 +243,7 @@ namespace Physics
                  const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-2
+       * Return the result of the pull back transformation on a rank-2
        * contravariant tensor, i.e.
        * @f[
        *  \chi^{-1}\left(\bullet\right)^{\sharp}
@@ -261,7 +261,7 @@ namespace Physics
                  const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-2
+       * Return the result of the pull back transformation on a rank-2
        * contravariant symmetric tensor, i.e.
        * @f[
        *  \chi^{-1}\left(\bullet\right)^{\sharp}
@@ -279,7 +279,7 @@ namespace Physics
                  const Tensor<2,dim,Number>          &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-4
+       * Return the result of the pull back transformation on a rank-4
        * contravariant tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
@@ -297,7 +297,7 @@ namespace Physics
                  const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-4
+       * Return the result of the pull back transformation on a rank-4
        * contravariant symmetric tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
@@ -345,7 +345,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the result of the push forward transformation on a covariant
+       * Return the result of the push forward transformation on a covariant
        * vector, i.e.
        * @f[
        *  \chi\left(\bullet\right)^{\flat}
@@ -363,7 +363,7 @@ namespace Physics
                     const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-2
+       * Return the result of the push forward transformation on a rank-2
        * covariant tensor, i.e.
        * @f[
        *  \chi\left(\bullet\right)^{\flat}
@@ -381,7 +381,7 @@ namespace Physics
                     const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-2
+       * Return the result of the push forward transformation on a rank-2
        * covariant symmetric tensor, i.e.
        * @f[
        *  \chi\left(\bullet\right)^{\flat}
@@ -400,7 +400,7 @@ namespace Physics
                     const Tensor<2,dim,Number>          &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-4
+       * Return the result of the push forward transformation on a rank-4
        * covariant tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi\left(\bullet\right)^{\flat} \right]_{ijkl}
@@ -418,7 +418,7 @@ namespace Physics
                     const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-4
+       * Return the result of the push forward transformation on a rank-4
        * covariant symmetric tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi\left(\bullet\right)^{\flat} \right]_{ijkl}
@@ -444,7 +444,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the result of the pull back transformation on a covariant
+       * Return the result of the pull back transformation on a covariant
        * vector, i.e.
        * @f[
        *  \chi^{-1}\left(\bullet\right)^{\flat}
@@ -462,7 +462,7 @@ namespace Physics
                  const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-2
+       * Return the result of the pull back transformation on a rank-2
        * covariant tensor, i.e.
        * @f[
        *  \chi^{-1}\left(\bullet\right)^{\flat}
@@ -480,7 +480,7 @@ namespace Physics
                  const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-2
+       * Return the result of the pull back transformation on a rank-2
        * covariant symmetric tensor, i.e.
        * @f[
        *  \chi^{-1}\left(\bullet\right)^{\flat}
@@ -498,7 +498,7 @@ namespace Physics
                  const Tensor<2,dim,Number>          &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-4
+       * Return the result of the pull back transformation on a rank-4
        * contravariant tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\flat} \right]_{IJKL}
@@ -516,7 +516,7 @@ namespace Physics
                  const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-4
+       * Return the result of the pull back transformation on a rank-4
        * contravariant symmetric tensor, i.e. (in index notation)
        * @f[
        *  \left[ \chi^{-1}\left(\bullet\right)^{\flat} \right]_{IJKL}
@@ -552,7 +552,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the result of the push forward transformation on a
+       * Return the result of the push forward transformation on a
        * contravariant vector, i.e.
        * @f[
        *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
@@ -571,7 +571,7 @@ namespace Physics
                     const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-2
+       * Return the result of the push forward transformation on a rank-2
        * contravariant tensor, i.e.
        * @f[
        *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
@@ -590,7 +590,7 @@ namespace Physics
                     const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-2
+       * Return the result of the push forward transformation on a rank-2
        * contravariant symmetric tensor, i.e.
        * @f[
        *  \textrm{det} \mathbf{F}^{-1} \; \chi\left(\bullet\right)^{\sharp}
@@ -610,7 +610,7 @@ namespace Physics
                     const Tensor<2,dim,Number>          &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-4
+       * Return the result of the push forward transformation on a rank-4
        * contravariant tensor, i.e. (in index notation)
        * @f[
        *  \textrm{det} \mathbf{F}^{-1} \; \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
@@ -629,7 +629,7 @@ namespace Physics
                     const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the push forward transformation on a rank-4
+       * Return the result of the push forward transformation on a rank-4
        * contravariant symmetric tensor, i.e. (in index notation)
        * @f[
        *  \textrm{det} \mathbf{F}^{-1} \; \left[ \chi\left(\bullet\right)^{\sharp} \right]_{ijkl}
@@ -656,7 +656,7 @@ namespace Physics
 //@{
 
       /**
-       * Returns the result of the pull back transformation on a contravariant
+       * Return the result of the pull back transformation on a contravariant
        * vector, i.e.
        * @f[
        *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
@@ -675,7 +675,7 @@ namespace Physics
                  const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-2
+       * Return the result of the pull back transformation on a rank-2
        * contravariant tensor, i.e.
        * @f[
        *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
@@ -694,7 +694,7 @@ namespace Physics
                  const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-2
+       * Return the result of the pull back transformation on a rank-2
        * contravariant symmetric tensor, i.e.
        * @f[
        *  \textrm{det} \mathbf{F} \; \chi^{-1}\left(\bullet\right)^{\sharp}
@@ -713,7 +713,7 @@ namespace Physics
                  const Tensor<2,dim,Number>          &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-4
+       * Return the result of the pull back transformation on a rank-4
        * contravariant tensor, i.e. (in index notation)
        * @f[
        *  \textrm{det} \mathbf{F} \; \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
@@ -732,7 +732,7 @@ namespace Physics
                  const Tensor<2,dim,Number> &F);
 
       /**
-       * Returns the result of the pull back transformation on a rank-4
+       * Return the result of the pull back transformation on a rank-4
        * contravariant symmetric tensor, i.e. (in index notation)
        * @f[
        *  \textrm{det} \mathbf{F} \; \left[ \chi^{-1}\left(\bullet\right)^{\sharp} \right]_{IJKL}
@@ -759,7 +759,7 @@ namespace Physics
 //@{
 
     /**
-     * Returns the result of applying Nanson's formula for the transformation
+     * Return the result of applying Nanson's formula for the transformation
      * of the material surface area element $d\mathbf{A}$ to the current
      * surfaces area element $d\mathbf{a}$ under the nonlinear transformation
      * map $\mathbf{x} = \boldsymbol{\varphi} \left( \mathbf{X} \right)$.

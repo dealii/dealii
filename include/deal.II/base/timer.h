@@ -227,7 +227,7 @@ public:
    * synchronized over all processors in the communicator (i.e., the lap times
    * are set to the maximum lap time).
    *
-   * Returns the accumulated CPU time in seconds.
+   * Return the accumulated CPU time in seconds.
    */
   double stop ();
 
@@ -280,7 +280,7 @@ public:
   double last_cpu_time() const;
 
   /**
-   * Returns the wall time taken between the last start()/stop() call.
+   * Return the wall time taken between the last start()/stop() call.
    *
    * @deprecated Use last_wall_time() instead.
    */

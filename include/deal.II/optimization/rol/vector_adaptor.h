@@ -150,13 +150,13 @@ namespace Rol
     VectorAdaptor (const Teuchos::RCP<VectorType> &vector_ptr);
 
     /**
-     * Returns the Teuchos smart reference counting pointer to
+     * Return the Teuchos smart reference counting pointer to
      * the wrapper vector, #vector_ptr.
      */
     Teuchos::RCP<VectorType> getVector ();
 
     /**
-     * Returns the Teuchos smart reference counting pointer to const vector.
+     * Return the Teuchos smart reference counting pointer to const vector.
      */
     Teuchos::RCP<const VectorType> getVector () const;
 

@@ -594,7 +594,7 @@ public:
   get_internal_dof_numbering() const;
 
   /**
-   * Returns an ArrayView to internal memory for temporary use. Note that some
+   * Return an ArrayView to internal memory for temporary use. Note that some
    * of this memory is overwritten during evaluate() and integrate() calls so
    * do not assume it to be stable over those calls. The maximum size you can
    * write into is 3*dofs_per_cell+2*n_q_points.
