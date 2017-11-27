@@ -158,19 +158,20 @@ public:
 
 
   /**
-   * Gives the default stream (<tt>std_out</tt>).
+   * Return the default stream (<tt>std_out</tt>).
    */
   std::ostream &get_console ();
 
 
   /**
-   * Gives the file stream.
+   * Return the file stream.
    */
   std::ostream &get_file_stream ();
 
 
   /**
-   * @return true, if file stream has already been attached.
+   * Return @p true if file stream has already been attached,
+   * @p false otherwise.
    */
   bool has_file () const;
 

@@ -473,14 +473,14 @@ protected:
     InternalData ( std::unique_ptr<typename FESystem<dim,spacedim>::InternalData> fesystem_data);
 
     /**
-     * Gives read-access to the pointer to a @p InternalData of the @p
+     * Give read-access to the pointer to a @p InternalData of the @p
      * <code>base_no</code>th base element of FESystem's data.
      */
     typename FiniteElement<dim,spacedim>::InternalDataBase &
     get_fe_data (const unsigned int base_no) const;
 
     /**
-     * Gives read-access to the pointer to an object into which the
+     * Give read-access to the pointer to an object into which the
      * <code>base_no</code>th base element will write its output when calling
      * FiniteElement::fill_fe_values() and similar functions.
      */

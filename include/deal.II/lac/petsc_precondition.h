@@ -79,7 +79,7 @@ namespace PETScWrappers
 
 
     /**
-     * Gives access to the underlying PETSc object.
+     * Give access to the underlying PETSc object.
      */
     const PC &get_pc () const;
 

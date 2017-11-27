@@ -689,7 +689,7 @@ namespace VectorTools
    const ComponentMask                &component_mask = ComponentMask());
 
   /**
-   * Gives the interpolation of a @p dof1-function @p u1 to a @p dof2-function
+   * Compute the interpolation of a @p dof1-function @p u1 to a @p dof2-function
    * @p u2, where @p dof1 and @p dof2 represent different triangulations with
    * a common coarse grid.
    *
@@ -721,7 +721,7 @@ namespace VectorTools
                                  VectorType                          &u2);
 
   /**
-   * Gives the interpolation of a @p dof1-function @p u1 to a @p dof2-function
+   * Compute the interpolation of a @p dof1-function @p u1 to a @p dof2-function
    * @p u2, where @p dof1 and @p dof2 represent different triangulations with
    * a common coarse grid.
    *
