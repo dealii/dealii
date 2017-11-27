@@ -1,0 +1,571 @@
+
+DEAL:0:2d::Before:
+DEAL:0:2d::locally owned cell: 2.0
+DEAL:0:2d::       dof indices: 0 1 2 3 
+DEAL:0:2d::locally owned cell: 2.1
+DEAL:0:2d::       dof indices: 1 4 3 5 
+DEAL:0:2d::locally owned cell: 2.2
+DEAL:0:2d::       dof indices: 2 3 6 7 
+DEAL:0:2d::locally owned cell: 2.3
+DEAL:0:2d::       dof indices: 3 5 7 8 
+DEAL:0:2d::locally owned cell: 2.4
+DEAL:0:2d::       dof indices: 4 9 5 10 
+DEAL:0:2d::locally owned cell: 2.5
+DEAL:0:2d::       dof indices: 9 11 10 12 
+DEAL:0:2d::locally owned cell: 2.6
+DEAL:0:2d::       dof indices: 5 10 8 13 
+DEAL:0:2d::locally owned cell: 2.7
+DEAL:0:2d::       dof indices: 10 12 13 14 
+DEAL:0:2d::After:
+DEAL:0:2d::locally owned cell: 2.0
+DEAL:0:2d::       dof indices: 10 12 5 7 
+DEAL:0:2d::locally owned cell: 2.1
+DEAL:0:2d::       dof indices: 12 13 7 8 
+DEAL:0:2d::locally owned cell: 2.2
+DEAL:0:2d::       dof indices: 5 7 0 1 
+DEAL:0:2d::locally owned cell: 2.3
+DEAL:0:2d::       dof indices: 7 8 1 2 
+DEAL:0:2d::locally owned cell: 2.4
+DEAL:0:2d::       dof indices: 13 14 8 9 
+DEAL:0:2d::locally owned cell: 2.5
+DEAL:0:2d::       dof indices: 14 11 9 6 
+DEAL:0:2d::locally owned cell: 2.6
+DEAL:0:2d::       dof indices: 8 9 2 3 
+DEAL:0:2d::locally owned cell: 2.7
+DEAL:0:2d::       dof indices: 9 6 3 4 
+-1.00000 -1.00000 "10"
+-1.00000 -0.500000 "5"
+-1.00000 0.00000 "0"
+-1.00000 0.500000 "15"
+-0.500000 -1.00000 "12"
+-0.500000 -0.500000 "7"
+-0.500000 0.00000 "1"
+-0.500000 0.500000 "17"
+0.00000 -1.00000 "13"
+0.00000 -0.500000 "8"
+0.00000 0.00000 "2"
+0.00000 0.500000 "18"
+0.500000 -1.00000 "14"
+0.500000 -0.500000 "9"
+0.500000 0.00000 "3"
+0.500000 0.500000 "19"
+1.00000 -1.00000 "11"
+1.00000 -0.500000 "6"
+1.00000 0.00000 "4"
+1.00000 0.500000 "16"
+DEAL:0:3d::Before:
+DEAL:0:3d::locally owned cell: 2.0
+DEAL:0:3d::       dof indices: 0 1 2 3 4 5 6 7 
+DEAL:0:3d::locally owned cell: 2.1
+DEAL:0:3d::       dof indices: 1 8 3 9 5 10 7 11 
+DEAL:0:3d::locally owned cell: 2.2
+DEAL:0:3d::       dof indices: 2 3 12 13 6 7 14 15 
+DEAL:0:3d::locally owned cell: 2.3
+DEAL:0:3d::       dof indices: 3 9 13 16 7 11 15 17 
+DEAL:0:3d::locally owned cell: 2.4
+DEAL:0:3d::       dof indices: 4 5 6 7 18 19 20 21 
+DEAL:0:3d::locally owned cell: 2.5
+DEAL:0:3d::       dof indices: 5 10 7 11 19 22 21 23 
+DEAL:0:3d::locally owned cell: 2.6
+DEAL:0:3d::       dof indices: 6 7 14 15 20 21 24 25 
+DEAL:0:3d::locally owned cell: 2.7
+DEAL:0:3d::       dof indices: 7 11 15 17 21 23 25 26 
+DEAL:0:3d::locally owned cell: 2.8
+DEAL:0:3d::       dof indices: 8 27 9 28 10 29 11 30 
+DEAL:0:3d::locally owned cell: 2.9
+DEAL:0:3d::       dof indices: 27 31 28 32 29 33 30 34 
+DEAL:0:3d::locally owned cell: 2.10
+DEAL:0:3d::       dof indices: 9 28 16 35 11 30 17 36 
+DEAL:0:3d::locally owned cell: 2.11
+DEAL:0:3d::       dof indices: 28 32 35 37 30 34 36 38 
+DEAL:0:3d::locally owned cell: 2.12
+DEAL:0:3d::       dof indices: 10 29 11 30 22 39 23 40 
+DEAL:0:3d::locally owned cell: 2.13
+DEAL:0:3d::       dof indices: 29 33 30 34 39 41 40 42 
+DEAL:0:3d::locally owned cell: 2.14
+DEAL:0:3d::       dof indices: 11 30 17 36 23 40 26 43 
+DEAL:0:3d::locally owned cell: 2.15
+DEAL:0:3d::       dof indices: 30 34 36 38 40 42 43 44 
+DEAL:0:3d::locally owned cell: 2.16
+DEAL:0:3d::       dof indices: 12 13 45 46 14 15 47 48 
+DEAL:0:3d::locally owned cell: 2.17
+DEAL:0:3d::       dof indices: 13 16 46 49 15 17 48 50 
+DEAL:0:3d::locally owned cell: 2.18
+DEAL:0:3d::       dof indices: 45 46 51 52 47 48 53 54 
+DEAL:0:3d::locally owned cell: 2.19
+DEAL:0:3d::       dof indices: 46 49 52 55 48 50 54 56 
+DEAL:0:3d::locally owned cell: 2.20
+DEAL:0:3d::       dof indices: 14 15 47 48 24 25 57 58 
+DEAL:0:3d::locally owned cell: 2.21
+DEAL:0:3d::       dof indices: 15 17 48 50 25 26 58 59 
+DEAL:0:3d::locally owned cell: 2.22
+DEAL:0:3d::       dof indices: 47 48 53 54 57 58 60 61 
+DEAL:0:3d::locally owned cell: 2.23
+DEAL:0:3d::       dof indices: 48 50 54 56 58 59 61 62 
+DEAL:0:3d::locally owned cell: 2.24
+DEAL:0:3d::       dof indices: 16 35 49 63 17 36 50 64 
+DEAL:0:3d::locally owned cell: 2.25
+DEAL:0:3d::       dof indices: 35 37 63 65 36 38 64 66 
+DEAL:0:3d::locally owned cell: 2.26
+DEAL:0:3d::       dof indices: 49 63 55 67 50 64 56 68 
+DEAL:0:3d::locally owned cell: 2.27
+DEAL:0:3d::       dof indices: 63 65 67 69 64 66 68 70 
+DEAL:0:3d::locally owned cell: 2.28
+DEAL:0:3d::       dof indices: 17 36 50 64 26 43 59 71 
+DEAL:0:3d::locally owned cell: 2.29
+DEAL:0:3d::       dof indices: 36 38 64 66 43 44 71 72 
+DEAL:0:3d::locally owned cell: 2.30
+DEAL:0:3d::       dof indices: 50 64 56 68 59 71 62 73 
+DEAL:0:3d::locally owned cell: 2.31
+DEAL:0:3d::       dof indices: 64 66 68 70 71 72 73 74 
+DEAL:0:3d::After:
+DEAL:0:3d::locally owned cell: 2.0
+DEAL:0:3d::       dof indices: 50 54 55 66 25 29 30 41 
+DEAL:0:3d::locally owned cell: 2.1
+DEAL:0:3d::       dof indices: 54 56 66 67 29 31 41 42 
+DEAL:0:3d::locally owned cell: 2.2
+DEAL:0:3d::       dof indices: 55 66 57 68 30 41 32 43 
+DEAL:0:3d::locally owned cell: 2.3
+DEAL:0:3d::       dof indices: 66 67 68 69 41 42 43 44 
+DEAL:0:3d::locally owned cell: 2.4
+DEAL:0:3d::       dof indices: 25 29 30 41 0 1 2 3 
+DEAL:0:3d::locally owned cell: 2.5
+DEAL:0:3d::       dof indices: 29 31 41 42 1 4 3 5 
+DEAL:0:3d::locally owned cell: 2.6
+DEAL:0:3d::       dof indices: 30 41 32 43 2 3 6 7 
+DEAL:0:3d::locally owned cell: 2.7
+DEAL:0:3d::       dof indices: 41 42 43 44 3 5 7 8 
+DEAL:0:3d::locally owned cell: 2.8
+DEAL:0:3d::       dof indices: 56 58 67 70 31 33 42 45 
+DEAL:0:3d::locally owned cell: 2.9
+DEAL:0:3d::       dof indices: 58 51 70 59 33 26 45 34 
+DEAL:0:3d::locally owned cell: 2.10
+DEAL:0:3d::       dof indices: 67 70 69 71 42 45 44 46 
+DEAL:0:3d::locally owned cell: 2.11
+DEAL:0:3d::       dof indices: 70 59 71 60 45 34 46 35 
+DEAL:0:3d::locally owned cell: 2.12
+DEAL:0:3d::       dof indices: 31 33 42 45 4 9 5 10 
+DEAL:0:3d::locally owned cell: 2.13
+DEAL:0:3d::       dof indices: 33 26 45 34 9 11 10 12 
+DEAL:0:3d::locally owned cell: 2.14
+DEAL:0:3d::       dof indices: 42 45 44 46 5 10 8 13 
+DEAL:0:3d::locally owned cell: 2.15
+DEAL:0:3d::       dof indices: 45 34 46 35 10 12 13 14 
+DEAL:0:3d::locally owned cell: 2.16
+DEAL:0:3d::       dof indices: 57 68 61 72 32 43 36 47 
+DEAL:0:3d::locally owned cell: 2.17
+DEAL:0:3d::       dof indices: 68 69 72 73 43 44 47 48 
+DEAL:0:3d::locally owned cell: 2.18
+DEAL:0:3d::       dof indices: 61 72 52 62 36 47 27 37 
+DEAL:0:3d::locally owned cell: 2.19
+DEAL:0:3d::       dof indices: 72 73 62 63 47 48 37 38 
+DEAL:0:3d::locally owned cell: 2.20
+DEAL:0:3d::       dof indices: 32 43 36 47 6 7 15 16 
+DEAL:0:3d::locally owned cell: 2.21
+DEAL:0:3d::       dof indices: 43 44 47 48 7 8 16 17 
+DEAL:0:3d::locally owned cell: 2.22
+DEAL:0:3d::       dof indices: 36 47 27 37 15 16 18 19 
+DEAL:0:3d::locally owned cell: 2.23
+DEAL:0:3d::       dof indices: 47 48 37 38 16 17 19 20 
+DEAL:0:3d::locally owned cell: 2.24
+DEAL:0:3d::       dof indices: 69 71 73 74 44 46 48 49 
+DEAL:0:3d::locally owned cell: 2.25
+DEAL:0:3d::       dof indices: 71 60 74 64 46 35 49 39 
+DEAL:0:3d::locally owned cell: 2.26
+DEAL:0:3d::       dof indices: 73 74 63 65 48 49 38 40 
+DEAL:0:3d::locally owned cell: 2.27
+DEAL:0:3d::       dof indices: 74 64 65 53 49 39 40 28 
+DEAL:0:3d::locally owned cell: 2.28
+DEAL:0:3d::       dof indices: 44 46 48 49 8 13 17 21 
+DEAL:0:3d::locally owned cell: 2.29
+DEAL:0:3d::       dof indices: 46 35 49 39 13 14 21 22 
+DEAL:0:3d::locally owned cell: 2.30
+DEAL:0:3d::       dof indices: 48 49 38 40 17 21 20 23 
+DEAL:0:3d::locally owned cell: 2.31
+DEAL:0:3d::       dof indices: 49 39 40 28 21 22 23 24 
+-1.00000 -1.00000 -1.00000 "50"
+-1.00000 -1.00000 -0.500000 "25"
+-1.00000 -1.00000 0.00000 "0"
+-1.00000 -1.00000 0.500000 "75"
+-1.00000 -0.500000 -1.00000 "55"
+-1.00000 -0.500000 -0.500000 "30"
+-1.00000 -0.500000 0.00000 "2"
+-1.00000 -0.500000 0.500000 "80"
+-1.00000 0.00000 -1.00000 "57"
+-1.00000 0.00000 -0.500000 "32"
+-1.00000 0.00000 0.00000 "6"
+-1.00000 0.00000 0.500000 "82"
+-1.00000 0.500000 -1.00000 "61"
+-1.00000 0.500000 -0.500000 "36"
+-1.00000 0.500000 0.00000 "15"
+-1.00000 0.500000 0.500000 "86"
+-1.00000 1.00000 -1.00000 "52"
+-1.00000 1.00000 -0.500000 "27"
+-1.00000 1.00000 0.00000 "18"
+-1.00000 1.00000 0.500000 "77"
+-0.500000 -1.00000 -1.00000 "54"
+-0.500000 -1.00000 -0.500000 "29"
+-0.500000 -1.00000 0.00000 "1"
+-0.500000 -1.00000 0.500000 "79"
+-0.500000 -0.500000 -0.500000 "41"
+-0.500000 -0.500000 0.500000 "91"
+-0.500000 -0.500000 -1.00000 "66"
+-0.500000 -0.500000 3.46945e-18 "3"
+-0.500000 0.00000 -1.00000 "68"
+-0.500000 0.00000 -0.500000 "43"
+-0.500000 0.00000 6.93889e-18 "7"
+-0.500000 0.00000 0.500000 "93"
+-0.500000 0.500000 -1.00000 "72"
+-0.500000 0.500000 3.46945e-18 "16"
+-0.500000 0.500000 -0.500000 "47"
+-0.500000 0.500000 0.500000 "97"
+-0.500000 1.00000 -1.00000 "62"
+-0.500000 1.00000 -0.500000 "37"
+-0.500000 1.00000 0.00000 "19"
+-0.500000 1.00000 0.500000 "87"
+0.00000 -1.00000 -1.00000 "56"
+0.00000 -1.00000 -0.500000 "31"
+0.00000 -1.00000 0.00000 "4"
+0.00000 -1.00000 0.500000 "81"
+0.00000 -0.500000 -1.00000 "67"
+0.00000 -0.500000 -0.500000 "42"
+0.00000 -0.500000 6.93889e-18 "5"
+0.00000 -0.500000 0.500000 "92"
+0.00000 0.00000 -1.00000 "69"
+0.00000 0.00000 -0.500000 "44"
+0.00000 0.00000 1.38778e-17 "8"
+0.00000 0.00000 0.500000 "94"
+0.00000 0.500000 -1.00000 "73"
+0.00000 0.500000 -0.500000 "48"
+0.00000 0.500000 6.93889e-18 "17"
+0.00000 0.500000 0.500000 "98"
+0.00000 1.00000 -1.00000 "63"
+0.00000 1.00000 -0.500000 "38"
+0.00000 1.00000 0.00000 "20"
+0.00000 1.00000 0.500000 "88"
+0.500000 -1.00000 -1.00000 "58"
+0.500000 -1.00000 -0.500000 "33"
+0.500000 -1.00000 0.00000 "9"
+0.500000 -1.00000 0.500000 "83"
+0.500000 -0.500000 -0.500000 "45"
+0.500000 -0.500000 0.500000 "95"
+0.500000 -0.500000 -1.00000 "70"
+0.500000 -0.500000 3.46945e-18 "10"
+0.500000 0.00000 -1.00000 "71"
+0.500000 0.00000 -0.500000 "46"
+0.500000 0.00000 6.93889e-18 "13"
+0.500000 0.00000 0.500000 "96"
+0.500000 0.500000 -1.00000 "74"
+0.500000 0.500000 3.46945e-18 "21"
+0.500000 0.500000 -0.500000 "49"
+0.500000 0.500000 0.500000 "99"
+0.500000 1.00000 -1.00000 "65"
+0.500000 1.00000 -0.500000 "40"
+0.500000 1.00000 0.00000 "23"
+0.500000 1.00000 0.500000 "90"
+1.00000 -1.00000 -1.00000 "51"
+1.00000 -1.00000 -0.500000 "26"
+1.00000 -1.00000 0.00000 "11"
+1.00000 -1.00000 0.500000 "76"
+1.00000 -0.500000 -1.00000 "59"
+1.00000 -0.500000 -0.500000 "34"
+1.00000 -0.500000 0.00000 "12"
+1.00000 -0.500000 0.500000 "84"
+1.00000 0.00000 -1.00000 "60"
+1.00000 0.00000 -0.500000 "35"
+1.00000 0.00000 0.00000 "14"
+1.00000 0.00000 0.500000 "85"
+1.00000 0.500000 -1.00000 "64"
+1.00000 0.500000 -0.500000 "39"
+1.00000 0.500000 0.00000 "22"
+1.00000 0.500000 0.500000 "89"
+1.00000 1.00000 -1.00000 "53"
+1.00000 1.00000 -0.500000 "28"
+1.00000 1.00000 0.00000 "24"
+1.00000 1.00000 0.500000 "78"
+
+DEAL:1:2d::Before:
+DEAL:1:2d::locally owned cell: 2.8
+DEAL:1:2d::       dof indices: 6 7 15 16 
+DEAL:1:2d::locally owned cell: 2.9
+DEAL:1:2d::       dof indices: 7 8 16 17 
+DEAL:1:2d::locally owned cell: 2.10
+DEAL:1:2d::       dof indices: 15 16 18 19 
+DEAL:1:2d::locally owned cell: 2.11
+DEAL:1:2d::       dof indices: 16 17 19 20 
+DEAL:1:2d::locally owned cell: 2.12
+DEAL:1:2d::       dof indices: 8 13 17 21 
+DEAL:1:2d::locally owned cell: 2.13
+DEAL:1:2d::       dof indices: 13 14 21 22 
+DEAL:1:2d::locally owned cell: 2.14
+DEAL:1:2d::       dof indices: 17 21 20 23 
+DEAL:1:2d::locally owned cell: 2.15
+DEAL:1:2d::       dof indices: 21 22 23 24 
+DEAL:1:2d::After:
+DEAL:1:2d::locally owned cell: 2.8
+DEAL:1:2d::       dof indices: 0 1 15 17 
+DEAL:1:2d::locally owned cell: 2.9
+DEAL:1:2d::       dof indices: 1 2 17 18 
+DEAL:1:2d::locally owned cell: 2.10
+DEAL:1:2d::       dof indices: 15 17 20 22 
+DEAL:1:2d::locally owned cell: 2.11
+DEAL:1:2d::       dof indices: 17 18 22 23 
+DEAL:1:2d::locally owned cell: 2.12
+DEAL:1:2d::       dof indices: 2 3 18 19 
+DEAL:1:2d::locally owned cell: 2.13
+DEAL:1:2d::       dof indices: 3 4 19 16 
+DEAL:1:2d::locally owned cell: 2.14
+DEAL:1:2d::       dof indices: 18 19 23 24 
+DEAL:1:2d::locally owned cell: 2.15
+DEAL:1:2d::       dof indices: 19 16 24 21 
+-1.00000 -0.500000 "5"
+-1.00000 0.00000 "0"
+-1.00000 0.500000 "15"
+-1.00000 1.00000 "20"
+-0.500000 -0.500000 "7"
+-0.500000 0.00000 "1"
+-0.500000 0.500000 "17"
+-0.500000 1.00000 "22"
+0.00000 -0.500000 "8"
+0.00000 0.00000 "2"
+0.00000 0.500000 "18"
+0.00000 1.00000 "23"
+0.500000 -0.500000 "9"
+0.500000 0.00000 "3"
+0.500000 0.500000 "19"
+0.500000 1.00000 "24"
+1.00000 -0.500000 "6"
+1.00000 0.00000 "4"
+1.00000 0.500000 "16"
+1.00000 1.00000 "21"
+DEAL:1:3d::Before:
+DEAL:1:3d::locally owned cell: 2.32
+DEAL:1:3d::       dof indices: 18 19 20 21 75 76 77 78 
+DEAL:1:3d::locally owned cell: 2.33
+DEAL:1:3d::       dof indices: 19 22 21 23 76 79 78 80 
+DEAL:1:3d::locally owned cell: 2.34
+DEAL:1:3d::       dof indices: 20 21 24 25 77 78 81 82 
+DEAL:1:3d::locally owned cell: 2.35
+DEAL:1:3d::       dof indices: 21 23 25 26 78 80 82 83 
+DEAL:1:3d::locally owned cell: 2.36
+DEAL:1:3d::       dof indices: 75 76 77 78 84 85 86 87 
+DEAL:1:3d::locally owned cell: 2.37
+DEAL:1:3d::       dof indices: 76 79 78 80 85 88 87 89 
+DEAL:1:3d::locally owned cell: 2.38
+DEAL:1:3d::       dof indices: 77 78 81 82 86 87 90 91 
+DEAL:1:3d::locally owned cell: 2.39
+DEAL:1:3d::       dof indices: 78 80 82 83 87 89 91 92 
+DEAL:1:3d::locally owned cell: 2.40
+DEAL:1:3d::       dof indices: 22 39 23 40 79 93 80 94 
+DEAL:1:3d::locally owned cell: 2.41
+DEAL:1:3d::       dof indices: 39 41 40 42 93 95 94 96 
+DEAL:1:3d::locally owned cell: 2.42
+DEAL:1:3d::       dof indices: 23 40 26 43 80 94 83 97 
+DEAL:1:3d::locally owned cell: 2.43
+DEAL:1:3d::       dof indices: 40 42 43 44 94 96 97 98 
+DEAL:1:3d::locally owned cell: 2.44
+DEAL:1:3d::       dof indices: 79 93 80 94 88 99 89 100 
+DEAL:1:3d::locally owned cell: 2.45
+DEAL:1:3d::       dof indices: 93 95 94 96 99 101 100 102 
+DEAL:1:3d::locally owned cell: 2.46
+DEAL:1:3d::       dof indices: 80 94 83 97 89 100 92 103 
+DEAL:1:3d::locally owned cell: 2.47
+DEAL:1:3d::       dof indices: 94 96 97 98 100 102 103 104 
+DEAL:1:3d::locally owned cell: 2.48
+DEAL:1:3d::       dof indices: 24 25 57 58 81 82 105 106 
+DEAL:1:3d::locally owned cell: 2.49
+DEAL:1:3d::       dof indices: 25 26 58 59 82 83 106 107 
+DEAL:1:3d::locally owned cell: 2.50
+DEAL:1:3d::       dof indices: 57 58 60 61 105 106 108 109 
+DEAL:1:3d::locally owned cell: 2.51
+DEAL:1:3d::       dof indices: 58 59 61 62 106 107 109 110 
+DEAL:1:3d::locally owned cell: 2.52
+DEAL:1:3d::       dof indices: 81 82 105 106 90 91 111 112 
+DEAL:1:3d::locally owned cell: 2.53
+DEAL:1:3d::       dof indices: 82 83 106 107 91 92 112 113 
+DEAL:1:3d::locally owned cell: 2.54
+DEAL:1:3d::       dof indices: 105 106 108 109 111 112 114 115 
+DEAL:1:3d::locally owned cell: 2.55
+DEAL:1:3d::       dof indices: 106 107 109 110 112 113 115 116 
+DEAL:1:3d::locally owned cell: 2.56
+DEAL:1:3d::       dof indices: 26 43 59 71 83 97 107 117 
+DEAL:1:3d::locally owned cell: 2.57
+DEAL:1:3d::       dof indices: 43 44 71 72 97 98 117 118 
+DEAL:1:3d::locally owned cell: 2.58
+DEAL:1:3d::       dof indices: 59 71 62 73 107 117 110 119 
+DEAL:1:3d::locally owned cell: 2.59
+DEAL:1:3d::       dof indices: 71 72 73 74 117 118 119 120 
+DEAL:1:3d::locally owned cell: 2.60
+DEAL:1:3d::       dof indices: 83 97 107 117 92 103 113 121 
+DEAL:1:3d::locally owned cell: 2.61
+DEAL:1:3d::       dof indices: 97 98 117 118 103 104 121 122 
+DEAL:1:3d::locally owned cell: 2.62
+DEAL:1:3d::       dof indices: 107 117 110 119 113 121 116 123 
+DEAL:1:3d::locally owned cell: 2.63
+DEAL:1:3d::       dof indices: 117 118 119 120 121 122 123 124 
+DEAL:1:3d::After:
+DEAL:1:3d::locally owned cell: 2.32
+DEAL:1:3d::       dof indices: 0 1 2 3 75 79 80 91 
+DEAL:1:3d::locally owned cell: 2.33
+DEAL:1:3d::       dof indices: 1 4 3 5 79 81 91 92 
+DEAL:1:3d::locally owned cell: 2.34
+DEAL:1:3d::       dof indices: 2 3 6 7 80 91 82 93 
+DEAL:1:3d::locally owned cell: 2.35
+DEAL:1:3d::       dof indices: 3 5 7 8 91 92 93 94 
+DEAL:1:3d::locally owned cell: 2.36
+DEAL:1:3d::       dof indices: 75 79 80 91 100 104 105 116 
+DEAL:1:3d::locally owned cell: 2.37
+DEAL:1:3d::       dof indices: 79 81 91 92 104 106 116 117 
+DEAL:1:3d::locally owned cell: 2.38
+DEAL:1:3d::       dof indices: 80 91 82 93 105 116 107 118 
+DEAL:1:3d::locally owned cell: 2.39
+DEAL:1:3d::       dof indices: 91 92 93 94 116 117 118 119 
+DEAL:1:3d::locally owned cell: 2.40
+DEAL:1:3d::       dof indices: 4 9 5 10 81 83 92 95 
+DEAL:1:3d::locally owned cell: 2.41
+DEAL:1:3d::       dof indices: 9 11 10 12 83 76 95 84 
+DEAL:1:3d::locally owned cell: 2.42
+DEAL:1:3d::       dof indices: 5 10 8 13 92 95 94 96 
+DEAL:1:3d::locally owned cell: 2.43
+DEAL:1:3d::       dof indices: 10 12 13 14 95 84 96 85 
+DEAL:1:3d::locally owned cell: 2.44
+DEAL:1:3d::       dof indices: 81 83 92 95 106 108 117 120 
+DEAL:1:3d::locally owned cell: 2.45
+DEAL:1:3d::       dof indices: 83 76 95 84 108 101 120 109 
+DEAL:1:3d::locally owned cell: 2.46
+DEAL:1:3d::       dof indices: 92 95 94 96 117 120 119 121 
+DEAL:1:3d::locally owned cell: 2.47
+DEAL:1:3d::       dof indices: 95 84 96 85 120 109 121 110 
+DEAL:1:3d::locally owned cell: 2.48
+DEAL:1:3d::       dof indices: 6 7 15 16 82 93 86 97 
+DEAL:1:3d::locally owned cell: 2.49
+DEAL:1:3d::       dof indices: 7 8 16 17 93 94 97 98 
+DEAL:1:3d::locally owned cell: 2.50
+DEAL:1:3d::       dof indices: 15 16 18 19 86 97 77 87 
+DEAL:1:3d::locally owned cell: 2.51
+DEAL:1:3d::       dof indices: 16 17 19 20 97 98 87 88 
+DEAL:1:3d::locally owned cell: 2.52
+DEAL:1:3d::       dof indices: 82 93 86 97 107 118 111 122 
+DEAL:1:3d::locally owned cell: 2.53
+DEAL:1:3d::       dof indices: 93 94 97 98 118 119 122 123 
+DEAL:1:3d::locally owned cell: 2.54
+DEAL:1:3d::       dof indices: 86 97 77 87 111 122 102 112 
+DEAL:1:3d::locally owned cell: 2.55
+DEAL:1:3d::       dof indices: 97 98 87 88 122 123 112 113 
+DEAL:1:3d::locally owned cell: 2.56
+DEAL:1:3d::       dof indices: 8 13 17 21 94 96 98 99 
+DEAL:1:3d::locally owned cell: 2.57
+DEAL:1:3d::       dof indices: 13 14 21 22 96 85 99 89 
+DEAL:1:3d::locally owned cell: 2.58
+DEAL:1:3d::       dof indices: 17 21 20 23 98 99 88 90 
+DEAL:1:3d::locally owned cell: 2.59
+DEAL:1:3d::       dof indices: 21 22 23 24 99 89 90 78 
+DEAL:1:3d::locally owned cell: 2.60
+DEAL:1:3d::       dof indices: 94 96 98 99 119 121 123 124 
+DEAL:1:3d::locally owned cell: 2.61
+DEAL:1:3d::       dof indices: 96 85 99 89 121 110 124 114 
+DEAL:1:3d::locally owned cell: 2.62
+DEAL:1:3d::       dof indices: 98 99 88 90 123 124 113 115 
+DEAL:1:3d::locally owned cell: 2.63
+DEAL:1:3d::       dof indices: 99 89 90 78 124 114 115 103 
+-1.00000 -1.00000 -0.500000 "25"
+-1.00000 -1.00000 0.00000 "0"
+-1.00000 -1.00000 0.500000 "75"
+-1.00000 -1.00000 1.00000 "100"
+-1.00000 -0.500000 -0.500000 "30"
+-1.00000 -0.500000 0.00000 "2"
+-1.00000 -0.500000 0.500000 "80"
+-1.00000 -0.500000 1.00000 "105"
+-1.00000 0.00000 -0.500000 "32"
+-1.00000 0.00000 0.00000 "6"
+-1.00000 0.00000 0.500000 "82"
+-1.00000 0.00000 1.00000 "107"
+-1.00000 0.500000 -0.500000 "36"
+-1.00000 0.500000 0.00000 "15"
+-1.00000 0.500000 0.500000 "86"
+-1.00000 0.500000 1.00000 "111"
+-1.00000 1.00000 -0.500000 "27"
+-1.00000 1.00000 0.00000 "18"
+-1.00000 1.00000 0.500000 "77"
+-1.00000 1.00000 1.00000 "102"
+-0.500000 -1.00000 -0.500000 "29"
+-0.500000 -1.00000 0.00000 "1"
+-0.500000 -1.00000 0.500000 "79"
+-0.500000 -1.00000 1.00000 "104"
+-0.500000 -0.500000 -0.500000 "41"
+-0.500000 -0.500000 0.500000 "91"
+-0.500000 -0.500000 3.46945e-18 "3"
+-0.500000 -0.500000 1.00000 "116"
+-0.500000 0.00000 -0.500000 "43"
+-0.500000 0.00000 6.93889e-18 "7"
+-0.500000 0.00000 0.500000 "93"
+-0.500000 0.00000 1.00000 "118"
+-0.500000 0.500000 3.46945e-18 "16"
+-0.500000 0.500000 1.00000 "122"
+-0.500000 0.500000 -0.500000 "47"
+-0.500000 0.500000 0.500000 "97"
+-0.500000 1.00000 -0.500000 "37"
+-0.500000 1.00000 0.00000 "19"
+-0.500000 1.00000 0.500000 "87"
+-0.500000 1.00000 1.00000 "112"
+0.00000 -1.00000 -0.500000 "31"
+0.00000 -1.00000 0.00000 "4"
+0.00000 -1.00000 0.500000 "81"
+0.00000 -1.00000 1.00000 "106"
+0.00000 -0.500000 -0.500000 "42"
+0.00000 -0.500000 6.93889e-18 "5"
+0.00000 -0.500000 0.500000 "92"
+0.00000 -0.500000 1.00000 "117"
+0.00000 0.00000 -0.500000 "44"
+0.00000 0.00000 1.38778e-17 "8"
+0.00000 0.00000 0.500000 "94"
+0.00000 0.00000 1.00000 "119"
+0.00000 0.500000 -0.500000 "48"
+0.00000 0.500000 6.93889e-18 "17"
+0.00000 0.500000 0.500000 "98"
+0.00000 0.500000 1.00000 "123"
+0.00000 1.00000 -0.500000 "38"
+0.00000 1.00000 0.00000 "20"
+0.00000 1.00000 0.500000 "88"
+0.00000 1.00000 1.00000 "113"
+0.500000 -1.00000 -0.500000 "33"
+0.500000 -1.00000 0.00000 "9"
+0.500000 -1.00000 0.500000 "83"
+0.500000 -1.00000 1.00000 "108"
+0.500000 -0.500000 -0.500000 "45"
+0.500000 -0.500000 0.500000 "95"
+0.500000 -0.500000 3.46945e-18 "10"
+0.500000 -0.500000 1.00000 "120"
+0.500000 0.00000 -0.500000 "46"
+0.500000 0.00000 6.93889e-18 "13"
+0.500000 0.00000 0.500000 "96"
+0.500000 0.00000 1.00000 "121"
+0.500000 0.500000 3.46945e-18 "21"
+0.500000 0.500000 1.00000 "124"
+0.500000 0.500000 -0.500000 "49"
+0.500000 0.500000 0.500000 "99"
+0.500000 1.00000 -0.500000 "40"
+0.500000 1.00000 0.00000 "23"
+0.500000 1.00000 0.500000 "90"
+0.500000 1.00000 1.00000 "115"
+1.00000 -1.00000 -0.500000 "26"
+1.00000 -1.00000 0.00000 "11"
+1.00000 -1.00000 0.500000 "76"
+1.00000 -1.00000 1.00000 "101"
+1.00000 -0.500000 -0.500000 "34"
+1.00000 -0.500000 0.00000 "12"
+1.00000 -0.500000 0.500000 "84"
+1.00000 -0.500000 1.00000 "109"
+1.00000 0.00000 -0.500000 "35"
+1.00000 0.00000 0.00000 "14"
+1.00000 0.00000 0.500000 "85"
+1.00000 0.00000 1.00000 "110"
+1.00000 0.500000 -0.500000 "39"
+1.00000 0.500000 0.00000 "22"
+1.00000 0.500000 0.500000 "89"
+1.00000 0.500000 1.00000 "114"
+1.00000 1.00000 -0.500000 "28"
+1.00000 1.00000 0.00000 "24"
+1.00000 1.00000 0.500000 "78"
+1.00000 1.00000 1.00000 "103"
+
