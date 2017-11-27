@@ -1602,8 +1602,11 @@ next_cell:
                                  const std::vector<bool>                                                         &marked_vertices)
   {
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim> > cell_and_position;
+    // To handle points at the border we keep track of points which are close to the unit cell:
+    std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim> > cell_and_position_approx;
 
     bool found_cell = false;
+    bool approx_cell = false;
 
     unsigned int closest_vertex_index = 0;
     Tensor<1,spacedim> vertex_to_point;
@@ -1645,6 +1648,11 @@ next_cell:
         std::sort(neighbor_permutation.begin(),
                   neighbor_permutation.end(),
                   comp);
+        // It is possible the vertex is close
+        // to an edge, thus we add a tolerance
+        // setting it initially to 1e-10
+        // to keep also the "best" cell
+        double best_distance = 1e-10;
 
         // Search all of the cells adjacent to the closest vertex of the cell hint
         // Most likely we will find the point in them.
@@ -1660,7 +1668,19 @@ next_cell:
                     cell_and_position.first = *cell;
                     cell_and_position.second = p_unit;
                     found_cell = true;
+                    approx_cell = false;
                     break;
+                  }
+                // The point is not inside this cell: checking how far outside it is
+                // and whether we want to use this cell as a backup if we can't find
+                // a cell within which the point lies.
+                const double dist = GeometryInfo<dim>::distance_to_unit_cell(p_unit);
+                if (dist < best_distance)
+                  {
+                    best_distance = dist;
+                    cell_and_position_approx.first = *cell;
+                    cell_and_position_approx.second = p_unit;
+                    approx_cell = true;
                   }
               }
             catch (typename Mapping<dim>::ExcTransformationFailed &)
@@ -1669,6 +1689,8 @@ next_cell:
 
         if (found_cell == true)
           return cell_and_position;
+        else if (approx_cell == true)
+          return cell_and_position_approx;
 
         // The first time around, we check for vertices in the hint_cell. If that
         // does not work, we set the cell iterator to an invalid one, and look
