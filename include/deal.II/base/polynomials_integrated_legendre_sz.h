@@ -54,7 +54,7 @@ public:
   IntegratedLegendreSZ (const unsigned int p);
 
   /**
-   * Returns the complete set of Integrated Legendre polynomials up to the
+   * Return the complete set of Integrated Legendre polynomials up to the
    * given degree.
    */
   static std::vector<Polynomials::Polynomial<double>> generate_complete_basis (const unsigned int degree);

@@ -68,14 +68,14 @@ class TensorProductMatrixSymmetricSumBase
 {
 public:
   /**
-   * Returns the number of rows of the tensor product matrix
+   * Return the number of rows of the tensor product matrix
    * resulting from the Kronecker product of 1D matrices, which is described
    * in the main documentation of TensorProductMatrixSymmetricSum.
    */
   unsigned int m () const;
 
   /**
-   * Returns the number of columns of the tensor product matrix
+   * Return the number of columns of the tensor product matrix
    * resulting from the Kronecker product of 1D matrices, which is described
    * in the main documentation of TensorProductMatrixSymmetricSum.
    */

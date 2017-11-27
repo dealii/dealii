@@ -937,7 +937,7 @@ namespace internal
 
 
       /**
-       * Returns a payload configured for identity operations
+       * Return a payload configured for identity operations
        */
       EmptyPayload
       identity_payload () const
@@ -947,7 +947,7 @@ namespace internal
 
 
       /**
-       * Returns a payload configured for null operations
+       * Return a payload configured for null operations
        */
       EmptyPayload
       null_payload () const
@@ -957,7 +957,7 @@ namespace internal
 
 
       /**
-       * Returns a payload configured for transpose operations
+       * Return a payload configured for transpose operations
        */
       EmptyPayload
       transpose_payload () const
@@ -967,7 +967,7 @@ namespace internal
 
 
       /**
-       * Returns a payload configured for inverse operations
+       * Return a payload configured for inverse operations
        */
       template <typename Solver, typename Preconditioner>
       EmptyPayload

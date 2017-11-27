@@ -239,7 +239,7 @@ namespace Particles
     set_property_pool(PropertyPool &property_pool);
 
     /**
-      * Returns whether this particle has a valid property pool and a valid
+      * Return whether this particle has a valid property pool and a valid
       * handle to properties.
       */
     bool
@@ -271,7 +271,7 @@ namespace Particles
     get_properties () const;
 
     /**
-     * Returns the size in bytes this particle occupies if all of its data is
+     * Return the size in bytes this particle occupies if all of its data is
      * serialized (i.e. the number of bytes that is written by the write_data
      * function of this class).
      */

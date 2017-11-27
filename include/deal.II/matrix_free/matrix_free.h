@@ -619,7 +619,7 @@ public:
    */
   //@{
   /**
-   * Returns whether a given FiniteElement @p fe is supported by this class.
+   * Return whether a given FiniteElement @p fe is supported by this class.
    */
   template <int spacedim>
   static

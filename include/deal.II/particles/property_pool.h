@@ -59,7 +59,7 @@ namespace Particles
     PropertyPool (const unsigned int n_properties_per_slot=1);
 
     /**
-     * Returns a new handle that allows accessing the reserved block
+     * Return a new handle that allows accessing the reserved block
      * of memory.
      */
     Handle allocate_properties_array ();
@@ -84,7 +84,7 @@ namespace Particles
     void reserve(const std::size_t size);
 
     /**
-     * Returns how many properties are stored per slot in the pool.
+     * Return how many properties are stored per slot in the pool.
      */
     unsigned int n_properties_per_slot() const;
 
