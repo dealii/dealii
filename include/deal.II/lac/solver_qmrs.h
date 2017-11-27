@@ -31,15 +31,40 @@ DEAL_II_NAMESPACE_OPEN
 /*@{*/
 
 /**
- * Quasi-minimal residual method for symmetric matrices.
+ * <h3>Quasi-minimal method for symmetric matrices (SQMR)</h3>
  *
- * The QMRS method is supposed to solve symmetric indefinite linear systems
+ * The SQMR method is supposed to solve symmetric indefinite linear systems
  * with symmetric, not necessarily definite preconditioners. This version of
- * QMRS is adapted from Freund/Nachtigal: Software for simplified Lanczos and
- * QMR algorithms, Appl. Num. Math. 19 (1995), pp. 319-341
+ * SQMR is adapted from the respective symmetric QMR-from-BiCG algorithm
+ * given by both Freund/Nachtigal: A new Krylov-subspace method for symmetric
+ * indefinite linear systems, NASA STI/Recon Technical Report N, 95 (1994) and
+ * Freund/Nachtigal: Software for simplified Lanczos and QMR algorithms,
+ * Appl. Num. Math. 19 (1995), pp. 319-341 and provides both right and left
+ * but not split preconditioning.
  *
- * This version is for right preconditioning only, since then only the
- * preconditioner is used: left preconditioning seems to require the inverse.
+ *
+ * <h3>Trade off of stability to simplicity</h3>
+ *
+ * Note, that the QMR implementation the given algorithm is based on, is
+ * derived from classical BiCG. It can be shown (Freund/Szeto: A transpose-free
+ * quasi-minimal residual squared algorithm for non-Hermitian linear systems,
+ * Advances in Computer Methods for Partial Differential Equations VII
+ * (IMACS, New Brunswick, NJ, 1992) pp. 258-264), that the QMR iterates can
+ * be generated from the BiCG iteration through one additional vector and
+ * some scalar updates. Possible breakdowns (or precisely, divisions by
+ * zero) of BiCG therefore obviously transfer to this simple no-look-ahead algorithm.
+ *
+ * In return the algorithm is cheap compared to classical QMR or BiCGStab
+ * using only one matrix-vector-product with the system matrix and
+ * one application of the preconditioner per iteration respectively.
+ *
+ * The residual used for measuring convergence is only approximately calculated
+ * by an upper bound. If this value comes below a threshold given by the
+ * AdditionalData struct, then the exact residual of the current
+ * QMR iterate will be calculated using another multiplication with the system
+ * matrix. By experience (according to Freund and Nachtigal) this technique
+ * is useful for a threshold that is ten times the solving tolerance and in
+ * that case will be only used in the last one or two steps of the complete iteration.
  *
  * For the requirements on matrices and vectors in order to work with this
  * class, see the documentation of the Solver base class.
@@ -52,11 +77,6 @@ DEAL_II_NAMESPACE_OPEN
  * classes much easier and guarantees that these will continue to work even if
  * number or type of the additional parameters for a certain solver changes.
  *
- * However, since the QMRS method does not need additional data, the
- * respective structure is empty and does not offer any functionality. The
- * constructor has a default argument, so you may call it without the
- * additional parameter.
- *
  *
  * <h3>Observing the progress of linear solver iterations</h3>
  *
@@ -65,7 +85,7 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  *
  *
- * @author Guido Kanschat, 1999
+ * @author Guido Kanschat, Ingo Kligge 1999, 2017
  */
 template <typename VectorType = Vector<double> >
 class SolverQMRS : public Solver<VectorType>
@@ -74,86 +94,101 @@ public:
   /**
    * Standardized data struct to pipe additional data to the solver.
    *
-   * There are two possibilities to compute the residual: one is an estimate
-   * using the computed value @p tau. The other is exact computation using
-   * another matrix vector multiplication.
+   * The user is able to switch between right and left preconditioning, that means
+   * solving the systems <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i> respectively,
+   * using the corresponding parameter. Note, that left preconditioning means to
+   * employ the preconditioned (BiCG-)residual and otherwise the unpreconditioned one.
+   * The default is the application from the right side.
    *
-   * QMRS, is susceptible to breakdowns, so we need a parameter telling us,
+   * The solver_tolerance threshold is used to define the said bound below which the residual
+   * is computed exactly. See class documentation for more information. The default value is 1e-9,
+   * that is the default solving precision multiplied by ten.
+   *
+   * SQMR is susceptible to breakdowns (divisions by zero), so we need a parameter telling us,
    * which numbers are considered zero. The proper breakdown criterion is very
-   * unclear, so experiments may be necessary here.
+   * unclear, so experiments may be necessary here. It is even possible to achieve convergence
+   * despite of dividing through small numbers. There are even cases, in which it is advantageous to
+   * accept such divisions because the cheap iteration cost makes the algorithm the fastest of all
+   * available indefinit solvers. Nonetheless, the default breakdown threshold value is 1e-16.
    */
   struct AdditionalData
   {
     /**
      * Constructor.
      *
-     * The default is no exact residual computation and breakdown parameter
+     * The default is right preconditioning and breakdown parameter
      * 1e-16.
      */
     explicit
-    AdditionalData(const bool   exact_residual = false,
-                   const double breakdown      = 1.e-16) :
-      exact_residual(exact_residual),
-      breakdown(breakdown)
-    {}
+    AdditionalData (const bool left_preconditioning = false,
+                    const double solver_tolerance = 1.e-9,
+                    const bool breakdown_testing = true,
+                    const double breakdown_threshold = 1.e-16)
+      :
+      left_preconditioning (left_preconditioning),
+      solver_tolerance (solver_tolerance),
+      breakdown_testing (breakdown_testing),
+      breakdown_threshold (breakdown_threshold)
+    {
+    }
 
     /**
-     * Flag for exact computation of residual.
+     * Flag for using a left-preconditioned version.
      */
-    bool exact_residual;
+    bool left_preconditioning;
 
     /**
-     * Breakdown threshold.
+     * Representing the threshold below which the current residual is computed exactly.
      */
-    double breakdown;
+    double solver_tolerance;
+
+    /**
+     * Flag for breakdown testing.
+     */
+    bool breakdown_testing;
+
+    /**
+     * Breakdown threshold. Scalars measured to this bound are used for divisions.
+     */
+    double breakdown_threshold;
   };
 
   /**
    * Constructor.
    */
-  SolverQMRS (SolverControl            &cn,
+  SolverQMRS (SolverControl &cn,
               VectorMemory<VectorType> &mem,
-              const AdditionalData     &data=AdditionalData());
+              const AdditionalData &data = AdditionalData ());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  SolverQMRS (SolverControl        &cn,
-              const AdditionalData &data=AdditionalData());
+  SolverQMRS (SolverControl &cn,
+              const AdditionalData &data = AdditionalData ());
 
   /**
    * Solve the linear system $Ax=b$ for x.
    */
   template <typename MatrixType, typename PreconditionerType>
   void
-  solve (const MatrixType         &A,
-         VectorType               &x,
-         const VectorType         &b,
+  solve (const MatrixType &A,
+         VectorType &x,
+         const VectorType &b,
          const PreconditionerType &preconditioner);
 
   /**
    * Interface for derived class. This function gets the current iteration
    * vector, the residual and the update vector in each step. It can be used
-   * for graphical output of the convergence history.
+   * for a graphical output of the convergence history.
    */
-  virtual void print_vectors (const unsigned int step,
-                              const VectorType   &x,
-                              const VectorType   &r,
-                              const VectorType   &d) const;
-protected:
-  /**
-   * Implementation of the computation of the norm of the residual.
-   */
-  virtual double criterion();
+  virtual void
+  print_vectors (const unsigned int step,
+                 const VectorType &x,
+                 const VectorType &r,
+                 const VectorType &d) const;
 
-  /**
-   * Within the iteration loop, the square of the residual vector is stored in
-   * this variable. The function @p criterion uses this variable to compute
-   * the convergence value, which in this class is the norm of the residual
-   * vector and thus the square root of the @p res2 value.
-   */
-  double res2;
+protected:
 
   /**
    * Additional parameters.
@@ -169,12 +204,11 @@ private:
   struct IterationResult
   {
     SolverControl::State state;
-    double               last_residual;
+    double last_residual;
 
     IterationResult (const SolverControl::State state,
-                     const double               last_residual);
+                     const double last_residual);
   };
-
 
   /**
    * The iteration loop itself. The function returns a structure indicating
@@ -182,12 +216,12 @@ private:
    */
   template <typename MatrixType, typename PreconditionerType>
   IterationResult
-  iterate (const MatrixType         &A,
+  iterate (const MatrixType &A,
            VectorType &x,
            const VectorType &b,
            const PreconditionerType &preconditioner,
-           VectorType &v,
-           VectorType &p,
+           VectorType &r,
+           VectorType &u,
            VectorType &q,
            VectorType &t,
            VectorType &d);
@@ -205,67 +239,56 @@ private:
 
 template <class VectorType>
 SolverQMRS<VectorType>::IterationResult::IterationResult (const SolverControl::State state,
-                                                          const double               last_residual)
+                                                          const double last_residual)
   :
   state (state),
   last_residual (last_residual)
-{}
-
-
-template <class VectorType>
-SolverQMRS<VectorType>::SolverQMRS (SolverControl            &cn,
-                                    VectorMemory<VectorType> &mem,
-                                    const AdditionalData     &data)
-  :
-  Solver<VectorType>(cn,mem),
-  additional_data(data)
-{}
-
-
-
-template <class VectorType>
-SolverQMRS<VectorType>::SolverQMRS(SolverControl        &cn,
-                                   const AdditionalData &data)
-  :
-  Solver<VectorType>(cn),
-  additional_data(data)
-{}
-
-
-
-template <class VectorType>
-double
-SolverQMRS<VectorType>::criterion()
 {
-  return std::sqrt(res2);
 }
 
+template <class VectorType>
+SolverQMRS<VectorType>::SolverQMRS (SolverControl &cn,
+                                    VectorMemory<VectorType> &mem,
+                                    const AdditionalData &data)
+  :
+  Solver<VectorType> (cn, mem),
+  additional_data (data)
+{
+}
 
+template <class VectorType>
+SolverQMRS<VectorType>::SolverQMRS (SolverControl &cn,
+                                    const AdditionalData &data)
+  :
+  Solver<VectorType> (cn),
+  additional_data (data)
+{
+}
 
 template <class VectorType>
 void
-SolverQMRS<VectorType>::print_vectors(const unsigned int,
-                                      const VectorType &,
-                                      const VectorType &,
-                                      const VectorType &) const
-{}
-
-
+SolverQMRS<VectorType>::print_vectors (const unsigned int,
+                                       const VectorType &,
+                                       const VectorType &,
+                                       const VectorType &) const
+{
+}
 
 template <class VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
-SolverQMRS<VectorType>::solve (const MatrixType         &A,
-                               VectorType               &x,
-                               const VectorType         &b,
+SolverQMRS<VectorType>::solve (const MatrixType &A,
+                               VectorType &x,
+                               const VectorType &b,
                                const PreconditionerType &preconditioner)
 {
-  LogStream::Prefix prefix("QMRS");
+  LogStream::Prefix prefix("SQMR");
 
-  // temporary vectors, allocated through the @p VectorMemory object at the
-  // start of the actual solution process and deallocated at the end.
-  typename VectorMemory<VectorType>::Pointer Vv(this->memory);
-  typename VectorMemory<VectorType>::Pointer Vp(this->memory);
+
+// temporary vectors, allocated trough the @p VectorMemory object at the
+// start of the actual solution process and deallocated at the end.
+  typename VectorMemory<VectorType>::Pointer Vr(this->memory);
+  typename VectorMemory<VectorType>::Pointer Vu(this->memory);
   typename VectorMemory<VectorType>::Pointer Vq(this->memory);
   typename VectorMemory<VectorType>::Pointer Vt(this->memory);
   typename VectorMemory<VectorType>::Pointer Vd(this->memory);
@@ -274,129 +297,167 @@ SolverQMRS<VectorType>::solve (const MatrixType         &A,
   // resize the vectors, but do not set
   // the values since they'd be overwritten
   // soon anyway.
-  Vv->reinit(x, true);
-  Vp->reinit(x, true);
-  Vq->reinit(x, true);
-  Vt->reinit(x, true);
+  Vr->reinit (x, true);
+  Vu->reinit (x, true);
+  Vq->reinit (x, true);
+  Vt->reinit (x, true);
+  Vd->reinit (x, true);
 
   step = 0;
 
-  IterationResult state (SolverControl::failure,0);
+  IterationResult state (SolverControl::failure, 0);
 
   do
     {
       if (step > 0)
         deallog << "Restart step " << step << std::endl;
-      state = iterate(A, x, b, preconditioner, *Vv, *Vp, *Vq, *Vt, *Vd);
+      state = iterate (A, x, b, preconditioner, *Vr, *Vu, *Vq, *Vt, *Vd);
     }
   while (state.state == SolverControl::iterate);
 
+
   // in case of failure: throw exception
   AssertThrow(state.state == SolverControl::success,
-              SolverControl::NoConvergence (step,
-                                            state.last_residual));
+              SolverControl::NoConvergence (step, state.last_residual));
   // otherwise exit as normal
 }
-
-
 
 template <class VectorType>
 template <typename MatrixType, typename PreconditionerType>
 typename SolverQMRS<VectorType>::IterationResult
-SolverQMRS<VectorType>::iterate(const MatrixType         &A,
-                                VectorType &x,
-                                const VectorType &b,
-                                const PreconditionerType &preconditioner,
-                                VectorType &v,
-                                VectorType &p,
-                                VectorType &q,
-                                VectorType &t,
-                                VectorType &d)
+SolverQMRS<VectorType>::iterate (const MatrixType &A,
+                                 VectorType &x,
+                                 const VectorType &b,
+                                 const PreconditionerType &preconditioner,
+                                 VectorType &r,
+                                 VectorType &u,
+                                 VectorType &q,
+                                 VectorType &t,
+                                 VectorType &d)
 {
-  /* Remark: the matrix A in the article is the preconditioned matrix.
-   * Therefore, we have to precondition x before we compute the first residual.
-   * In step 1 we replace p by q to avoid one preconditioning step.
-   * There are still two steps left, making this algorithm expensive.
-   */
 
   SolverControl::State state = SolverControl::iterate;
 
-  int  it=0;
+  int it = 0;
 
-  double tau, rho, theta=0;
+  double tau, rho, theta = 0;
   double res;
 
-  d.reinit(x);
+  // Compute the start residual
+  A.vmult (r, x);
+  r.sadd (-1., 1., b);
 
-  // Apply right preconditioning to x
-  preconditioner.vmult(q,x);
-  // Preconditioned residual
-  A.vmult(v,q);
-  v.sadd(-1.,1.,b);
-  res = v.l2_norm();
+  // Doing the initial preconditioning
+  if (additional_data.left_preconditioning)
+    {
+      // Left preconditioning
+      preconditioner.vmult (t, r);
+      q = t;
+    }
+  else
+    {
+      // Right preconditioning
+      t = r;
+      preconditioner.vmult (q, t);
+    }
 
-  if (this->iteration_status(step, res, x) == SolverControl::success)
-    return IterationResult(SolverControl::success, res);
+  tau = t.norm_sqr ();
+  res = std::sqrt (tau);
 
-  p = v;
+  if (this->iteration_status (step, res, x) == SolverControl::success)
+    return IterationResult (SolverControl::success, res);
 
-  preconditioner.vmult(q,p);
-
-  tau = v.norm_sqr();
-  rho = q*v;
+  rho = q * r;
 
   while (state == SolverControl::iterate)
     {
       step++;
       it++;
-      // Step 1
-      A.vmult(t,q);
-      // Step 2
-      const double sigma = q*t;
+      //--------------------------------------------------------------
+      // Step 1: apply the system matrix and compute one inner product
+      //--------------------------------------------------------------
+      A.vmult (t, q);
+      const double sigma = q * t;
 
-//TODO:[?] Find a really good breakdown criterion. The absolute one detects breakdown instead of convergence
-      if (std::fabs(sigma/rho) < additional_data.breakdown)
-        return IterationResult(SolverControl::iterate, std::fabs(sigma/rho));
-      // Step 3
-      const double alpha = rho/sigma;
+      // Check the breakdown criterion
+      if (additional_data.breakdown_testing == true
+          && std::fabs (sigma) < additional_data.breakdown_threshold)
+        return IterationResult (SolverControl::iterate,
+                                res);
+      // Update the residual
+      const double alpha = rho / sigma;
+      r.add (-alpha, t);
 
-      v.add(-alpha,t);
-      // Step 4
+      //--------------------------------------------------------------
+      // Step 2: update the solution vector
+      //--------------------------------------------------------------
       const double theta_old = theta;
-      theta = v*v/tau;
-      const double psi = 1./(1.+theta);
-      tau *= theta*psi;
 
-      d.sadd(psi*theta_old, psi*alpha, p);
-      x += d;
-
-      print_vectors(step,x,v,d);
-      // Step 5
-      if (additional_data.exact_residual)
+      // Apply the preconditioner
+      if (additional_data.left_preconditioning)
         {
-          A.vmult(q,x);
-          q.sadd(-1.,1.,b);
-          res = q.l2_norm();
+          // Left Preconditioning
+          preconditioner.vmult (t, r);
         }
       else
-        res = std::sqrt((it+1)*tau);
-      state = this->iteration_status(step,res,x);
+        {
+          // Right Preconditioning
+          t = r;
+        }
+
+      // Double updates
+      theta = t * t / tau;
+      const double psi = 1. / (1. + theta);
+      tau *= theta * psi;
+
+      // Actual update of the solution vector
+      d.sadd (psi * theta_old, psi * alpha, q);
+      x += d;
+
+      print_vectors (step, x, r, d);
+
+      // Check for convergence
+      // Compute a simple and cheap upper bound of the norm of the residual vector b-Ax
+      res = std::sqrt ((it + 1) * tau);
+      // If res lies close enough, within the desired tolerance, calculate the exact residual
+      if (res < additional_data.solver_tolerance)
+        {
+          A.vmult (u, x);
+          u.sadd (-1., 1., b);
+          res = u.l2_norm ();
+        }
+      state = this->iteration_status (step, res, x);
       if ((state == SolverControl::success)
           || (state == SolverControl::failure))
-        return IterationResult(state, res);
-      // Step 6
-      if (std::fabs(rho) < additional_data.breakdown)
-        return IterationResult(SolverControl::iterate, std::fabs(rho));
-      // Step 7
-      const double rho_old = rho;
-      preconditioner.vmult(q,v);
-      rho = q*v;
+        return IterationResult (state, res);
 
-      const double beta = rho/rho_old;
-      p.sadd(beta,v);
-      preconditioner.vmult(q,p);
+      //--------------------------------------------------------------
+      // Step 3: check breakdown criterion and update the vectors
+      //--------------------------------------------------------------
+      if (additional_data.breakdown_testing == true
+          && std::fabs (sigma) < additional_data.breakdown_threshold)
+        return IterationResult (SolverControl::iterate, res);
+
+      const double rho_old = rho;
+
+      // Applying the preconditioner
+      if (additional_data.left_preconditioning)
+        {
+          // Left preconditioning
+          u = t;
+        }
+      else
+        {
+          // Right preconditioning
+          preconditioner.vmult (u, t);
+        }
+
+      // Double and vector updates
+      rho = u * r;
+      const double beta = rho / rho_old;
+      q.sadd (beta, u);
     }
-  return IterationResult(SolverControl::success, std::fabs(rho));
+  return IterationResult (SolverControl::success, res);
 }
 
 #endif // DOXYGEN
