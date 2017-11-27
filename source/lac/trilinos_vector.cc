@@ -547,6 +547,15 @@ namespace TrilinosWrappers
           else if (given_last_action==::dealii::VectorOperation::insert)
             mode = Insert;
         }
+      else
+        {
+          Assert(
+            ((last_action == Add) && (given_last_action==::dealii::VectorOperation::add))
+            ||
+            ((last_action == Insert) && (given_last_action==::dealii::VectorOperation::insert)),
+            ExcMessage("The last operation on the Vector and the given last action in the compress() call do not agree!"));
+        }
+
 
 #ifdef DEBUG
 #  ifdef DEAL_II_WITH_MPI
