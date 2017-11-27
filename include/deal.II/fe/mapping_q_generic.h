@@ -683,7 +683,7 @@ protected:
   compute_mapping_support_points (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
   /**
-   * Transforms the point @p p on the real cell to the corresponding point on
+   * Transform the point @p p on the real cell to the corresponding point on
    * the unit cell @p cell by a Newton iteration.
    */
   Point<dim>

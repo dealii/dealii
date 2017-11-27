@@ -392,7 +392,7 @@ public:
                                const Point<spacedim>                                     &p) const = 0;
 
   /**
-   * Transforms the point @p p on the real @p cell to the corresponding point
+   * Transform the point @p p on the real @p cell to the corresponding point
    * on the unit cell, and then projects it to a dim-1  point on the face with
    * the given face number @p face_no. Ideally the point @p p is near the face
    * @p face_no, but any point in the cell can technically be projected.

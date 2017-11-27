@@ -233,7 +233,7 @@ namespace Polynomials
                           const number factor);
 
     /**
-     * Transforms polynomial form of product of linear factors into standard
+     * Transform polynomial form of product of linear factors into standard
      * form, $\sum_i a_i x^i$. Deletes all data structures related to the
      * product form.
      */
