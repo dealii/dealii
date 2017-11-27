@@ -511,7 +511,7 @@ private:
 
 private:
   /**
-   * Transforms a point @p p on the unit cell to the point @p p_real on the
+   * Transform a point @p p on the unit cell to the point @p p_real on the
    * real cell @p cell and returns @p p_real.
    *
    * This function is called by @p transform_unit_to_real_cell and multiple
@@ -530,7 +530,7 @@ private:
 
 
   /**
-   * Transforms the point @p p on the real cell to the corresponding point on
+   * Transform the point @p p on the real cell to the corresponding point on
    * the unit cell @p cell by a Newton iteration.
    *
    * Takes a reference to an @p InternalData that is assumed to be previously
