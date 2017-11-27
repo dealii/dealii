@@ -182,7 +182,7 @@ namespace SparsityTools
 
       Assert ( numEdges != nullptr , ExcInternalError() );
 
-      for (unsigned int i=0; i<num_obj; ++i)
+      for (int i=0; i<num_obj; ++i)
         numEdges[i] = graph->row_length(globalID[i])-1;
     }
 
