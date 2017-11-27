@@ -52,10 +52,8 @@ void test(const unsigned int size, const unsigned int block_size)
   FullMatrix<NumberType> full_A(size);
   std::vector<NumberType> lapack_A(size*size);
 
-  std::pair<int,int> sizes = std::make_pair(size,size), block_sizes = std::make_pair(block_size,block_size);
-  std::shared_ptr<ProcessGrid> grid = std::make_shared<ProcessGrid>(mpi_communicator,sizes,block_sizes);
-
-  ScaLAPACKMatrix<NumberType> scalapack_A (sizes.first, grid, block_sizes.first,
+  std::shared_ptr<ProcessGrid> grid = std::make_shared<ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
+  ScaLAPACKMatrix<NumberType> scalapack_A (size, grid, block_size,
                                            LAPACKSupport::Property::symmetric);
 
   pcout << size << " " << block_size << " " << grid->get_process_grid_rows() << " " << grid->get_process_grid_columns() << std::endl;
@@ -87,7 +85,7 @@ void test(const unsigned int size, const unsigned int block_size)
   }
   // Scalapack:
   scalapack_A = full_A;
-  scalapack_A.eigenvalues_symmetric(eigenvalues_ScaLapack);
+  eigenvalues_ScaLapack = scalapack_A.eigenvalues_symmetric();
   unsigned int n_eigenvalues = eigenvalues_ScaLapack.size(), max_n_eigenvalues=5;
 
   pcout << "First " << max_n_eigenvalues << " ScaLapack eigenvalues" << std::endl;

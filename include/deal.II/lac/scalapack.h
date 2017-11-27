@@ -24,6 +24,7 @@
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/lapack_support.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/thread_management.h>
 #include <mpi.h>
 
 #include <memory>
@@ -38,7 +39,7 @@ template <typename NumberType> class ScaLAPACKMatrix;
 /**
  * A class taking care of setting up a two-dimensional processor grid.
  * For example an MPI communicator with 5 processes can be arranged into a
- * 2x2 grid with 5-th processor being inactive:
+ * 2x2 grid with the 5-th processor being inactive:
  * @code
  *      |   0     |   1
  * -----| ------- |-----
@@ -54,6 +55,9 @@ template <typename NumberType> class ScaLAPACKMatrix;
  * Note that this class allows to setup a process grid which has fewer
  * MPI cores than the total number of cores in the communicator.
  *
+ * Currently the only place where one would use a ProcessGrid object is
+ * in connection with a ScaLAPACKMatrix object.
+ *
  * @author Benjamin Brands, 2017
  */
 class ProcessGrid
@@ -61,39 +65,45 @@ class ProcessGrid
 public:
 
   /**
-   * Declare class ScaLAPACK as friend to provide access to private members, e.g. the MPI Communicator
+   * Declare class ScaLAPACK as friend to provide access to private members.
    */
   template <typename NumberType> friend class ScaLAPACKMatrix;
 
   /**
-   * Constructor for a process grid for a given @p mpi_communicator .
-   * The pair @p grid_dimensions contains the user-defined numbers of process rows and columns.
-   * Their product should be less or equal to the total number of cores
+   * Constructor for a process grid with @p n_rows and @p n_columns for a given @p mpi_communicator.
+   * The product of rows and columns should be less or equal to the total number of cores
    * in the @p mpi_communicator.
    */
   ProcessGrid(MPI_Comm mpi_communicator,
-              const std::pair<unsigned int,unsigned int> &grid_dimensions);
+              const unsigned int n_rows,
+              const unsigned int n_columns);
 
   /**
    * Constructor for a process grid for a given @p mpi_communicator.
    * In this case the process grid is heuristically chosen based on the
    * dimensions and block-cyclic distribution of a target matrix provided
-   * in @p matrix_dimensions and @p block_sizes.
+   * in @p n_rows_matrix, @p n_columns_matrix, @p row_block_size and @p column_block_size.
    *
    * The maximum number of MPI cores one can utilize is $\min\{\frac{M}{MB}\frac{N}{NB}, Np\}$, where $M,N$
    * are the matrix dimension and $MB,NB$ are the block sizes and $Np$ is the number of
    * processes in the @p mpi_communicator. This function then creates a 2D processor grid
    * assuming the ratio between number of process row $p$ and columns $q$ to be
    * equal the ratio between matrix dimensions $M$ and $N$.
+   *
+   * For example, a square matrix $640x640$ with the block size $32$
+   * and the @p mpi_communicator with 11 cores will result in the $3x3$
+   * process grid.
    */
   ProcessGrid(MPI_Comm mpi_communicator,
-              const std::pair<unsigned int,unsigned int> &matrix_dimensions,
-              const std::pair<unsigned int,unsigned int> &block_sizes);
+              const unsigned int n_rows_matrix,
+              const unsigned int n_columns_matrix,
+              const unsigned int row_block_size,
+              const unsigned int column_block_size);
 
   /**
   * Destructor.
   */
-  virtual ~ProcessGrid();
+  ~ProcessGrid();
 
   /**
   * Return the number of rows in the processes grid.
@@ -105,8 +115,6 @@ public:
   */
   unsigned int get_process_grid_columns() const;
 
-private:
-
   /**
    * Send @p count values stored consequently starting at @p value from
    * the process with rank zero to processes which
@@ -116,7 +124,20 @@ private:
   void send_to_inactive(NumberType *value, const int count=1) const;
 
   /**
-  * An MPI communicator with all processes.
+   * Return <code>true</code> if the process is active within the grid.
+   */
+  bool is_process_active() const;
+
+private:
+
+  /**
+   * A private constructor which takes grid dimensions as an <code>std::pair</code>.
+   */
+  ProcessGrid(MPI_Comm mpi_communicator,
+              const std::pair<unsigned int,unsigned int> &grid_dimensions);
+
+  /**
+  * An MPI communicator with all processes (active and inactive).
   */
   MPI_Comm mpi_communicator;
 
@@ -153,19 +174,22 @@ private:
 
   /**
   * Row of this process in the grid.
+  *
+  * It's negative for in-active processes.
   */
   int this_process_row;
 
   /**
   * Column of this process in the grid.
+  *
+  * It's negative for in-active processes.
   */
   int this_process_column;
 
   /**
   * A flag which is true for processes within the 2D process grid.
   */
-  bool active;
-
+  bool mpi_process_is_active;
 };
 
 
@@ -175,9 +199,10 @@ private:
  * ScaLAPACK assumes that matrices are distributed according to the
  * block-cyclic decomposition scheme. An $M$ by $N$ matrix is first decomposed
  * into $MB$ by $NB$ blocks which are then uniformly distributed across
- * the 2D process grid $p*q \le Np$.
+ * the 2D process grid $p*q \le Np$, where $p,q$ are grid dimensions and
+ * $Np$ is the total number of processes.
  *
- * For example, a global real symmetric matrix of order 9 is stored in
+ * For example, a global real symmetric matrix of size $9\times 9$ is stored in
  * upper storage mode with block sizes 4 × 4:
  * @code
  *                0                       1                2
@@ -219,9 +244,12 @@ private:
  *  1   |   .    .    .    .    0.0  |    .    .  -4.0  0.0
  *      |   .    .    .    .   -4.0  |    .    .    .  -4.0
  * @endcode
+ * Note how processes $(0,0)$ and $(1,0)$ of the process grid store an
+ * extra column to represent the last column of the original matrix that
+ * did not fit the decomposition into $4\times 4$ sub-blocks.
  *
  * The choice of the block size is a compromise between a sufficiently large
- * sizes for efficient local/serial BLAS, but one that is also small enough to achieve
+ * size for efficient local/serial BLAS, but one that is also small enough to achieve
  * good parallel load balance.
  *
  * Below we show a strong scaling example of ScaLAPACKMatrix::invert()
@@ -245,12 +273,14 @@ public:
   typedef unsigned int size_type;
 
   /**
-   * Constructor for a rectangular matrix with rows and columns provided in
-   * @p sizes, and distributed using the grid @p process_grid.
+   * Constructor for a rectangular matrix with @p n_rows and @p n_cols
+   * and distributed using the grid @p process_grid.
    */
-  ScaLAPACKMatrix(const std::pair<size_type,size_type> &sizes,
+  ScaLAPACKMatrix(const size_type n_rows,
+                  const size_type n_columns,
                   const std::shared_ptr<const ProcessGrid> process_grid,
-                  const std::pair<size_type,size_type> &block_sizes = std::make_pair(32,32),
+                  const size_type row_block_size = 32,
+                  const size_type column_block_size = 32,
                   const LAPACKSupport::Property property = LAPACKSupport::Property::general);
 
   /**
@@ -265,7 +295,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~ScaLAPACKMatrix();
+  ~ScaLAPACKMatrix() = default;
 
   /**
    * Assign @p property to this matrix.
@@ -291,12 +321,12 @@ public:
 
   /**
    * Compute the Cholesky factorization of the matrix using ScaLAPACK
-   * function <code>pXpotrf</code>. The result of factorization is stored in this object.
+   * function <code>pXpotrf</code>. The result of the factorization is stored in this object.
    */
   void compute_cholesky_factorization ();
 
   /**
-   * Invert the matrix by first computing Cholesky factorization and then
+   * Invert the matrix by first computing a Cholesky factorization and then
    * building the actual inverse using <code>pXpotri</code>. The inverse is stored
    * in this object.
    */
@@ -304,17 +334,19 @@ public:
 
   /**
    * Compute all eigenvalues of a real symmetric matrix using <code>pXsyev</code>.
-   * If successful, the computed @p eigenvalues are arranged in ascending order.
+   * If successful, the computed eigenvalues are arranged in ascending order.
+   * After this function is called, the content of the matrix is overwritten
+   * making it unusable.
    */
-  void eigenvalues_symmetric (std::vector<NumberType> &eigenvalues);
+  std::vector<NumberType> eigenvalues_symmetric();
 
   /**
    * Compute all eigenpairs of a real symmetric matrix using <code>pXsyev</code>.
-   * If successful, the computed @p eigenvalues are arranged in ascending order.
+   * If successful, the computed eigenvalues are arranged in ascending order.
    * The eigenvectors are stored in the columns of the matrix, thereby
    * overwriting the original content of the matrix.
    */
-  void eigenpairs_symmetric (std::vector<NumberType> &eigenvalues);
+  std::vector<NumberType> eigenpairs_symmetric ();
 
   /**
    * Estimate the the condition number of a SPD matrix in the $l_1$-norm.
@@ -324,10 +356,10 @@ public:
    * overflow when the condition number is very large.
    *
    * @p a_norm must contain the $l_1$-norm of the matrix prior to calling
-   * Cholesky factorization.
+   * Cholesky factorization (see l1_norm()).
    *
    * @note An alternative is to compute the inverse of the matrix
-   * explicitly and manually constructor $k_1 = ||A||_1 ||A^{-1}||_1$.
+   * explicitly and manually construct $k_1 = ||A||_1 ||A^{-1}||_1$.
    */
   NumberType reciprocal_condition_number(const NumberType a_norm) const;
 
@@ -355,8 +387,6 @@ public:
    * Number of columns of the $M \times N$ matrix.
    */
   size_type n() const;
-
-private:
 
   /**
    * Number of local rows on this MPI processes.
@@ -387,6 +417,8 @@ private:
    * Write access to local element.
    */
   NumberType &local_el(const int loc_row, const int loc_column);
+
+private:
 
   /**
    * Calculate the norm of a distributed dense matrix using ScaLAPACK's
@@ -487,6 +519,10 @@ private:
    */
   const int submatrix_column;
 
+  /**
+   * Thread mutex.
+   */
+  mutable Threads::Mutex mutex;
 };
 
 // ----------------------- inline functions ----------------------------

@@ -19,6 +19,7 @@
 #ifdef DEAL_II_WITH_SCALAPACK
 
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi.templates.h>
 
 #include <deal.II/base/conditional_ostream.h>
 
@@ -40,78 +41,95 @@ extern "C"
   /* Basic Linear Algebra Communication Subprograms (BLACS) declarations */
   // https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dinitb.htm#dinitb
 
-  /* You call the BLACS_PINFO routine when you want to determine how many processes are available.
-   * You can use this information as input into other BLACS routines that set up your process grid*/
-  void Cblacs_pinfo(int *, int *);
+  /**
+   * Determine how many processes are available and the current process rank.
+   *
+   * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbpnf.htm
+   */
+  void Cblacs_pinfo(int *rank, int *nprocs);
 
-  /*
-   * You call the BLACS_GET routine when you want the values the BLACS are using for internal defaults.
-   * The most common use is in retrieving a default system context for input into BLACS_GRIDINIT or BLACS_GRIDMAP.
+  /**
+   * Return internal BLACS value in @p val based on the input @p what and @p icontxt.
+   * The most common use is in retrieving a default system context (@p what = 0, @p icontxt is ignored)
+   * to be used in BLACS_GRIDINIT or BLACS_GRIDMAP.
+   *
+   * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbget.htm
    */
   void Cblacs_get(int icontxt, int what, int *val);
 
-  /*
-   * You call the BLACS_GRIDINIT routine when you want to map the processes sequentially in row-major order
-   * or column-major order into the process grid.
-   * You must specify the same input argument values in the calls to BLACS_GRIDINIT on every process.
+  /**
+   * Map the processes sequentially in row-major or column-major order
+   * into the process grid. Input arguments must be the same on every process.
+   *
+   * On return, @p context is the integer handle to the BLACS context,
+   * whereas on entry it is a system context to be used in creating the
+   * BLACS context.
+   *
+   * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbint.htm
    */
   void Cblacs_gridinit(int *context, const char *order, int grid_height, int grid_width);
 
-  /*
-   * You call the BLACS_GRIDINFO routine to obtain the process row and column index.
+  /**
+   * Return the process row and column index.
+   *
+   * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbinfo.htm
    */
-  void Cblacs_gridinfo(int  context, int *grid_height, int *grid_width, int *grid_row, int *grid_col);
+  void Cblacs_gridinfo(int context, int *grid_height, int *grid_width, int *grid_row, int *grid_col);
 
-  /*
-   * Given the system process number, returns the row and column coordinates in the BLACS' process grid.
+  /**
+   * Given the system process number, return the row and column coordinates in the BLACS' process grid.
    */
-  void Cblacs_pcoord(int, int, int *, int *);
+  void Cblacs_pcoord(int ictxt, int pnum, int *prow, int *pcol);
 
-  /*
-   * You call the BLACS_GRIDEXIT routine to release a BLACS context.
+  /**
+   * Release a BLACS context.
    */
   void Cblacs_gridexit(int context);
 
-  /*
-   * This routines holds up execution of all processes within the indicated scope until they have all called the routine.
+  /**
+   * This routines holds up execution of all processes within the indicated
+   * scope until they have all called the routine.
    */
   void Cblacs_barrier(int, const char *);
 
-  /*
-   * Frees all BLACS contexts and releases all allocated memory.
+  /**
+   * Free all BLACS contexts and releases all allocated memory.
    */
   void Cblacs_exit(int error_code);
 
-  /*
-   * This routine takes the indicated general rectangular matrix and sends it to the destination process in the process grid.
-   * Return from the routine indicates that the buffer may be reused. The routine is locally-blocking, that is,
-   * it will return even if the corresponding receive is not posted.
-   */
-  void Cdgerv2d(int, int, int, double *, int, int, int);
-
-  /*
-   * This routine receives a message from a process into a general rectangular matrix.
-   * This routine is globally-blocking, that is, return from the routine indicates that the message has been received into the matrix.
-   */
-  void Cdgesd2d(int, int, int, double *, int, int, int);
-
-  /*
+  /**
+   * Receives a message from a process @prsrc, @p csrc into a general rectangular matrix.
    *
+   * https://software.intel.com/en-us/mkl-developer-reference-c-gerv2d
+   */
+  void Cdgerv2d(int context, int M, int N, double *A, int lda, int rsrc, int csrc);
+
+  /**
+   * Sends the general rectangular matrix A to the destination
+   * process @p rdest @p cdest in the process grid.
+   *
+   * https://software.intel.com/en-us/mkl-developer-reference-c-2018-beta-gesd2d
+   */
+  void Cdgesd2d(int context , int M, int N, double *A, int lda, int rdest, int cdest);
+
+  /**
+   * Get BLACS context from MPI @p comm.
    */
   int Csys2blacs_handle(MPI_Comm comm);
 
   /**
-   * NUMber of Rows Or Columns) -- computes how many rows and columns each process owns.
+   * Compute how many rows and columns each process owns (NUMber of Rows Or Columns).
    *
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dnumy.htm
    */
   int numroc_ (const int *n, const int *nb, const int *iproc, const int *isproc, const int *nprocs);
 
   /**
-   * Computes the Cholesky factorization of an N-by-N real
-   *  symmetric positive definite distributed matrix sub( A ) denoting
-   *  A(IA:IA+N-1, JA:JA+N-1).
-   * see http://www.netlib.org/scalapack/explore-html/d5/d9e/pdpotrf_8f_source.html
+   * Compute the Cholesky factorization of an N-by-N real
+   * symmetric positive definite distributed matrix sub( A ) denoting
+   * A(IA:IA+N-1, JA:JA+N-1).
+   *
+   * http://www.netlib.org/scalapack/explore-html/d5/d9e/pdpotrf_8f_source.html
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lpotrf.htm
    */
   void pdpotrf_(const char *UPLO,
@@ -120,12 +138,12 @@ extern "C"
                 int *INFO);
 
   /**
-   *  Computes the inverse of a real symmetric positive definite
-   *  distributed matrix sub( A ) = A(IA:IA+N-1,JA:JA+N-1) using the
-   *  Cholesky factorization sub( A ) = U**T*U or L*L**T computed by
-   *  PDPOTRF.
+   * Compute the inverse of a real symmetric positive definite
+   * distributed matrix sub( A ) = A(IA:IA+N-1,JA:JA+N-1) using the
+   * Cholesky factorization sub( A ) = U**T*U or L*L**T computed by
+   * PDPOTRF.
    *
-   * see http://www.netlib.org/scalapack/explore-html/d2/d44/pdpotri_8f_source.html
+   * http://www.netlib.org/scalapack/explore-html/d2/d44/pdpotri_8f_source.html
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lpotri.htm
    * https://software.intel.com/en-us/mkl-developer-reference-c-p-potri
    */
@@ -135,13 +153,13 @@ extern "C"
                 int *INFO);
 
   /**
-   *  Estimates the reciprocal of the condition number (in the
-   *  1-norm) of a real symmetric positive definite distributed matrix
-   *  using the Cholesky factorization.
+   * Estimate the reciprocal of the condition number (in the
+   * l1-norm) of a real symmetric positive definite distributed matrix
+   * using the Cholesky factorization.
    *
-   *  https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lpocon.htm#lpocon
-   *  http://www.netlib.org/scalapack/explore-html/d4/df7/pdpocon_8f.html
-   *  https://software.intel.com/en-us/mkl-developer-reference-fortran-pocon
+   * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lpocon.htm#lpocon
+   * http://www.netlib.org/scalapack/explore-html/d4/df7/pdpocon_8f.html
+   * https://software.intel.com/en-us/mkl-developer-reference-fortran-pocon
    */
   void pdpocon_(const char *uplo,
                 const int *N,
@@ -164,28 +182,31 @@ extern "C"
                   double *work);
 
   /**
-   *  Computes the Least Common Multiple (LCM) of two positive integers @p M and @p N.
-   *  In fact the routine computes the greatest common divisor (GCD) and
-   *  use the fact that M*N = GCD*LCM.
+   * Compute the Least Common Multiple (LCM) of two positive integers @p M and @p N.
+   * In fact the routine Compute the greatest common divisor (GCD) and
+   * use the fact that M*N = GCD*LCM.
    *
-   *  http://www.netlib.org/scalapack/explore-html/d0/d9b/ilcm_8f_source.html
+   * http://www.netlib.org/scalapack/explore-html/d0/d9b/ilcm_8f_source.html
    */
   int ilcm_(const int *M, const int *N);
 
   /**
-   * returns the ceiling of the division of two integers.
+   * Return the ceiling of the division of two integers.
    *
    * http://www.netlib.org/scalapack/explore-html/df/d07/iceil_8f_source.html
    */
   int iceil_(const int *i1, const int *i2);
 
-  /*
-   * DESCINIT initializes the descriptor vector with the 8 input arguments
+  /**
+   * Initialize the descriptor vector with the 8 input arguments
    */
-  void descinit_ (int *desc, const int *m, const int *n, const int *mb, const int *nb, const int *irsrc, const int *icsrc, const int *ictxt, const int *lld, int *info);
+  void descinit_ (int *desc,
+                  const int *m, const int *n, const int *mb, const int *nb,
+                  const int *irsrc, const int *icsrc,
+                  const int *ictxt, const int *lld, int *info);
 
   /**
-   * computes the global index of a distributed matrix entry
+   * Compute the global index of a distributed matrix entry
    * pointed to by the local index @p indxloc of the process indicated by
    * @p iproc.
    *
@@ -197,12 +218,22 @@ extern "C"
    */
   int indxl2g_ (const int *indxloc, const int *nb, const int *iproc, const int *isrcproc, const int *nprocs);
 
+  /**
+   * Compute the solution to a real system of linear equations
+   */
   void pdgesv_(const int *n, const int *nrhs,
                double *A, const int *ia, const int *ja, const int *desca,
                int *ipiv,
                double *B, const int *ib, const int *jb, const int *descb,
                int *info);
 
+  /**
+   * Perform one of the matrix-matrix operations:
+   * sub( C ) := alpha*op( sub( A ) )*op( sub( B ) ) + beta*sub( C ),
+   * where
+   * sub( C ) denotes C(IC:IC+M-1,JC:JC+N-1),  and, op( X )  is one  of
+   * op( X ) = X   or   op( X ) = X'.
+   */
   void pdgemm_(const char *transa, const char *transb,
                const int *m, const int *n, const int *k,
                const double *alpha,
@@ -211,8 +242,8 @@ extern "C"
                const double *beta,
                double *C, const int *IC, const int *JC, const int *DESCC);
 
-  /*
-   * PDLANGE returns the value of the one norm, or the Frobenius norm, or the infinity norm,
+  /**
+   * Return the value of the one norm, or the Frobenius norm, or the infinity norm,
    * or the element of largest absolute value of a distributed matrix
    */
   double pdlange_(char const *norm,
@@ -220,32 +251,35 @@ extern "C"
                   double *A, int const &ia, int const &ja, int *desca,
                   double *work);
 
-  /*
-   * INDXG2P computes the process coordinate which posseses the entry of a
+  /**
+   * Compute the process coordinate which possesses the entry of a
    * distributed matrix specified by a global index
    */
   int indxg2p_(const int *glob, const int *nb, const int *iproc, const int *isproc, const int *nprocs);
 
-  /*
-   * The pdsyev routine computes all eigenvalues and, optionally, eigenvectors of a real symmetric matrix A
-   * The by calling the recommended sequence of ScaLAPACK routines. In its present form, the routine assumes a homogeneous system
+  /**
+   * Compute all eigenvalues and, optionally, eigenvectors of a real symmetric matrix A
+   * by calling the recommended sequence of ScaLAPACK routines. In its present form, the routine assumes a homogeneous system
    * and makes no checks for consistency of the eigenvalues or eigenvectors across the different processes.
    * Because of this, it is possible that a heterogeneous system may return incorrect results without any error messages.
    *
    * http://www.netlib.org/scalapack/explore-html/d0/d1a/pdsyev_8f.html
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lsyev.htm#lsyev
    */
-  void pdsyev_(const char *jobz, const char *uplo, const int *m, double *A, const int *ia, const int *ja, int *desca, double *w,
-               double *z, const int *iz, const int *jz, int *descz, double *work, const int *lwork, int *info);
+  void pdsyev_(const char *jobz, const char *uplo,
+               const int *m, double *A, const int *ia, const int *ja, int *desca,
+               double *w,
+               double *z, const int *iz, const int *jz, int *descz,
+               double *work, const int *lwork, int *info);
 
-  /*
-   * pdlacpy copies all or a part of a distributed matrix A to another
+  /**
+   * Copy all or a part of a distributed matrix A to another
    * distributed matrix B. No communication is performed, pdlacpy
    * performs a local copy sub(A) := sub(B), where sub(A) denotes
    * A(ia:ia+m-1,ja:ja+n-1) and sub(B) denotes B(ib:ib+m-1,jb:jb+n-1)
-   *
    */
-  void pdlacpy_(const char *uplo, const int *m, const int *n, double *A, const int *ia, const int *ja, int *desca,
+  void pdlacpy_(const char *uplo,
+                const int *m, const int *n, double *A, const int *ia, const int *ja, int *desca,
                 double *B, const int *ib, const int *jb, int *descb);
 }
 
@@ -266,8 +300,8 @@ namespace
    * https://github.com/elemental/Elemental/blob/master/src/core/Grid.cpp#L67-L91
    */
   inline
-  std::pair<int,int> choose_the_processor_grid(MPI_Comm mpi_comm, const unsigned int m, const unsigned int n,
-                                               const unsigned int block_size_m, const unsigned int block_size_n)
+  std::pair<int,int> compute_processor_grid_sizes(MPI_Comm mpi_comm, const unsigned int m, const unsigned int n,
+                                                  const unsigned int block_size_m, const unsigned int block_size_n)
   {
     // Few notes from the ScaLAPACK user guide:
     // It is possible to predict the best grid shape given the number of processes available:
@@ -295,7 +329,7 @@ namespace
     // Np = Pc * Pc / ratio
     // for quadratic matrices the ratio equals 1
     const double ratio = double(n)/m;
-    int Pc = std::sqrt(ratio * Np);
+    int Pc = std::floor(std::sqrt(ratio * Np));
 
     // one could rounds up Pc to the number which has zero remainder from the division of Np
     // while ( Np % Pc != 0 )
@@ -346,7 +380,6 @@ ProcessGrid::ProcessGrid(MPI_Comm mpi_comm,
           ExcMessage("Size of process grid is larger than number of available MPI processes."));
 
   // processor grid order.
-  // FIXME: default to column major?
   const bool column_major = false;
 
   // Initialize Cblas context from the provided communicator
@@ -362,18 +395,18 @@ ProcessGrid::ProcessGrid(MPI_Comm mpi_comm,
   int proccols_ = n_process_columns;
   Cblacs_gridinfo( blacs_context, &procrows_, &proccols_, &this_process_row, &this_process_column );
 
-  // If this MPI core is not on the grid, flag is as inactive and
+  // If this MPI core is not on the grid, flag it as inactive and
   // skip all jobs
   // FIXME: different condition is used here
   // https://stackoverflow.com/questions/18516915/calling-blacs-with-more-processes-than-used
   if (this_process_row < 0 || this_process_column < 0)
-    active = false;
+    mpi_process_is_active = false;
   else
-    active = true;
+    mpi_process_is_active = true;
 
   // Create an auxiliary communicator which has root and all inactive cores
   // Assume that inactive cores start with id=n_process_rows*n_process_columns
-  Assert (active || this_mpi_process >= n_process_rows*n_process_columns,
+  Assert (mpi_process_is_active || this_mpi_process >= n_process_rows*n_process_columns,
           ExcInternalError());
 
   std::vector<int> inactive_with_root_ranks;
@@ -391,7 +424,7 @@ ProcessGrid::ProcessGrid(MPI_Comm mpi_comm,
   MPI_Group inactive_with_root_group;
   const int n = inactive_with_root_ranks.size();
   ierr = MPI_Group_incl(all_group,
-                        n, &inactive_with_root_ranks[0],
+                        n, inactive_with_root_ranks.data(),
                         &inactive_with_root_group);
   AssertThrowMPI(ierr);
 
@@ -407,33 +440,41 @@ ProcessGrid::ProcessGrid(MPI_Comm mpi_comm,
 
   // Double check that the process with rank 0 in subgroup is active:
 #ifdef DEBUG
-  if (mpi_communicator_inactive_with_root != MPI_COMM_NULL)
-    {
-      int subgroup_rank = -1, subgroup_size = -1;
-      MPI_Comm_rank(mpi_communicator_inactive_with_root, &subgroup_rank);
-      MPI_Comm_size(mpi_communicator_inactive_with_root, &subgroup_size);
-      if (subgroup_rank == 0)
-        Assert (active, ExcInternalError());
-    }
+  if (mpi_communicator_inactive_with_root != MPI_COMM_NULL &&
+      Utilities::MPI::this_mpi_process(mpi_communicator_inactive_with_root) == 0)
+    Assert (mpi_process_is_active, ExcInternalError());
 #endif
 }
 
 
 
 ProcessGrid::ProcessGrid(MPI_Comm mpi_comm,
-                         const std::pair<unsigned int,unsigned int> &matrix_dimensions,
-                         const std::pair<unsigned int,unsigned int> &block_sizes)
+                         const unsigned int n_rows_matrix,
+                         const unsigned int n_columns_matrix,
+                         const unsigned int row_block_size,
+                         const unsigned int column_block_size)
   :
   ProcessGrid(mpi_comm,
-              choose_the_processor_grid(mpi_comm, matrix_dimensions.first, matrix_dimensions.second,
-                                        block_sizes.first, block_sizes.second) )
+              compute_processor_grid_sizes(mpi_comm, n_rows_matrix, n_columns_matrix,
+                                           row_block_size, column_block_size) )
 {}
+
+
+
+ProcessGrid::ProcessGrid(MPI_Comm mpi_comm,
+                         const unsigned int n_rows,
+                         const unsigned int n_columns)
+  :
+  ProcessGrid(mpi_comm,
+              std::make_pair(n_rows,n_columns))
+{}
+
 
 
 
 ProcessGrid::~ProcessGrid()
 {
-  if (active)
+  if (mpi_process_is_active)
     Cblacs_gridexit(blacs_context);
 
   MPI_Comm_free(&mpi_communicator_inactive_with_root);
@@ -455,6 +496,13 @@ unsigned int ProcessGrid::get_process_grid_columns() const
 
 
 
+bool ProcessGrid::is_process_active() const
+{
+  return mpi_process_is_active;
+}
+
+
+
 template <typename NumberType>
 void ProcessGrid::send_to_inactive(NumberType *value, const int count) const
 {
@@ -462,7 +510,8 @@ void ProcessGrid::send_to_inactive(NumberType *value, const int count) const
   if (mpi_communicator_inactive_with_root != MPI_COMM_NULL)
     {
       const int ierr =
-        MPI_Bcast(value,count,MPI_DOUBLE,
+        MPI_Bcast(value,count,
+                  Utilities::MPI::internal::mpi_type_id (value),
                   0/*from root*/,
                   mpi_communicator_inactive_with_root);
       AssertThrowMPI(ierr);
@@ -471,24 +520,22 @@ void ProcessGrid::send_to_inactive(NumberType *value, const int count) const
 
 
 
-
-/**
- *Constructor for a rectangular distributed Matrix
- */
 template <typename NumberType>
-ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const std::pair<size_type,size_type> &sizes,
+ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type n_rows_,
+                                             const size_type n_columns_,
                                              const std::shared_ptr<const ProcessGrid> process_grid,
-                                             const std::pair<size_type,size_type> &block_sizes,
+                                             const size_type row_block_size_,
+                                             const size_type column_block_size_,
                                              const LAPACKSupport::Property property)
   :
   TransposeTable<NumberType> (),
   state (LAPACKSupport::unusable),
   property(property),
   grid (process_grid),
-  n_rows(sizes.first),
-  n_columns(sizes.second),
-  row_block_size(block_sizes.first),
-  column_block_size(block_sizes.second),
+  n_rows(n_rows_),
+  n_columns(n_columns_),
+  row_block_size(row_block_size_),
+  column_block_size(column_block_size_),
   uplo('L'), // for non-symmetric matrices this is not needed
   first_process_row(0),
   first_process_column(0),
@@ -504,7 +551,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const std::pair<size_type,size_type
   Assert (column_block_size <= n_columns,
           ExcMessage("Column block size can not be greater than the number of columns of the matrix"));
 
-  if (grid->active)
+  if (grid->mpi_process_is_active)
     {
       // Get local sizes:
       n_local_rows = numroc_(&n_rows, &row_block_size, &(grid->this_process_row), &first_process_row, &(grid->n_process_rows));
@@ -514,7 +561,10 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const std::pair<size_type,size_type
       int lda = std::max(1,n_local_rows);
 
       int info=0;
-      descinit_(descriptor, &n_rows, &n_columns, &row_block_size, &column_block_size,&first_process_row,&first_process_column,&(grid->blacs_context), &lda, &info);
+      descinit_(descriptor, &n_rows, &n_columns,
+                &row_block_size, &column_block_size,
+                &first_process_row, &first_process_column,
+                &(grid->blacs_context), &lda, &info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("descinit_", info));
 
       this->reinit(n_local_rows, n_local_columns);
@@ -537,9 +587,11 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type size,
                                              const size_type block_size,
                                              const LAPACKSupport::Property property)
   :
-  ScaLAPACKMatrix<NumberType>(std::make_pair(size,size),
+  ScaLAPACKMatrix<NumberType>(size,
+                              size,
                               process_grid,
-                              std::make_pair(block_size,block_size),
+                              block_size,
+                              block_size,
                               property)
 {}
 
@@ -559,14 +611,14 @@ ScaLAPACKMatrix<NumberType> &
 ScaLAPACKMatrix<NumberType>::operator = (const FullMatrix<NumberType> &matrix)
 {
   // FIXME: another way to copy is to use pdgeadd_ PBLAS routine.
-  // This routine computes sum of two matrices B:=a*A+b*B.
-  // Matrices can have different distribution,in particular matrixA can
+  // This routine computes the sum of two matrices B:=a*A+b*B.
+  // Matrices can have different distribution,in particular matrix A can
   // be owned by only one process, so we can set a=1 and b=0 to copy
   // non-distributed matrix A into distributed matrix B.
   Assert (n_rows == int(matrix.m()), ExcDimensionMismatch(n_rows, matrix.m()));
   Assert (n_columns == int(matrix.n()), ExcDimensionMismatch(n_columns, matrix.n()));
 
-  if (grid->active)
+  if (grid->mpi_process_is_active)
     {
       for (int i=0; i < n_local_rows; ++i)
         {
@@ -655,8 +707,7 @@ ScaLAPACKMatrix<NumberType>::copy_to (FullMatrix<NumberType> &matrix) const
   Assert (n_rows == int(matrix.m()), ExcDimensionMismatch(n_rows, matrix.m()));
   Assert (n_columns == int(matrix.n()), ExcDimensionMismatch(n_columns, matrix.n()));
 
-  //if (active)
-  if (grid->active)
+  if (grid->mpi_process_is_active)
     {
       matrix = 0.;
       for (int i=0; i < n_local_rows; ++i)
@@ -687,19 +738,12 @@ ScaLAPACKMatrix<NumberType>::copy_to (FullMatrix<NumberType> &matrix) const
 
 
 template <typename NumberType>
-ScaLAPACKMatrix<NumberType>::~ScaLAPACKMatrix()
-{
-}
-
-
-
-template <typename NumberType>
 void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
 {
   Assert (n_columns == n_rows,
           ExcMessage("Cholesky factorization can be applied to SPD matrices only."));
 
-  if (grid->active)
+  if (grid->mpi_process_is_active)
     {
       int info = 0;
       NumberType *A_loc = &this->values[0];
@@ -718,14 +762,9 @@ void ScaLAPACKMatrix<NumberType>::invert()
   if (state == LAPACKSupport::matrix)
     compute_cholesky_factorization();
 
-  if (grid->active)
+  if (grid->mpi_process_is_active)
     {
       int info = 0;
-      /*
-       * matrix Z is not distributed as it will not be referenced by the
-       * ScaLapack function call
-       */
-      std::vector<double> Z_loc;
       NumberType *A_loc = &this->values[0];
       pdpotri_ (&uplo,&n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,&info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpotri", info));
@@ -736,17 +775,18 @@ void ScaLAPACKMatrix<NumberType>::invert()
 
 
 template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric(std::vector<NumberType> &ev)
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric()
 {
   Assert (state == LAPACKSupport::matrix,
           ExcMessage("Matrix has to be in Matrix state before calling this function."));
   Assert (property == LAPACKSupport::symmetric,
           ExcMessage("Matrix has to be symmetric for this operation."));
+  Threads::Mutex::ScopedLock lock (mutex);
 
   ScaLAPACKMatrix<NumberType> Z (grid->n_mpi_processes, grid, 1);
-  ev.resize (n_rows);
+  std::vector<NumberType> ev (n_rows);
 
-  if (grid->active)
+  if (grid->mpi_process_is_active)
     {
       int info = 0;
 
@@ -781,23 +821,27 @@ void ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric(std::vector<NumberType> 
    * including the diagonal, is destroyed. Therefore, the matrix is unusable
    */
   state = LAPACKSupport::unusable;
+
+  return ev;
 }
 
 
 
 template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(std::vector<NumberType> &ev)
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric()
 {
   Assert (state == LAPACKSupport::matrix,
           ExcMessage("Matrix has to be in Matrix state before calling this function."));
   Assert (property == LAPACKSupport::symmetric,
           ExcMessage("Matrix has to be symmetric for this operation."));
 
+  Threads::Mutex::ScopedLock lock (mutex);
+
   ScaLAPACKMatrix<NumberType> eigenvectors (n_rows, grid, row_block_size);
   eigenvectors.property = property;
-  ev.resize (n_rows);
+  std::vector<NumberType> ev(n_rows);
 
-  if (grid->active)
+  if (grid->mpi_process_is_active)
     {
       int info = 0;
 
@@ -840,6 +884,8 @@ void ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(std::vector<NumberType> &
    */
   property = LAPACKSupport::Property::general;
   state = LAPACKSupport::eigenvalues;
+
+  return ev;
 }
 
 
@@ -849,9 +895,10 @@ NumberType ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(const Number
 {
   Assert (state == LAPACKSupport::cholesky,
           ExcMessage("Matrix has to be in Cholesky state before calling this function."));
+  Threads::Mutex::ScopedLock lock (mutex);
   NumberType rcond = 0.;
 
-  if (grid->active)
+  if (grid->mpi_process_is_active)
     {
       int lwork = 2 * n_local_rows + 3 * n_local_columns + column_block_size;
       int liwork = n_local_rows;
@@ -902,11 +949,10 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
   Assert (state == LAPACKSupport::matrix ||
           state == LAPACKSupport::inverse_matrix,
           ExcMessage("norms can be called in matrix state only."));
-
+  Threads::Mutex::ScopedLock lock (mutex);
   NumberType res = 0.;
 
-  //if (active)
-  if (grid->active)
+  if (grid->mpi_process_is_active)
     {
       //int IROFFA = MOD( IA-1, MB_A )
       //int ICOFFA = MOD( JA-1, NB_A )
