@@ -506,10 +506,10 @@ namespace DoFRenumbering
               }
             Assert (erase_these_indices.size() == active_but_not_owned_dofs.n_elements(),
                     ExcInternalError());
-            Assert (std::count (my_new_indices.begin(),
-                                my_new_indices.end(),
-                                numbers::invalid_dof_index) ==
-                    active_but_not_owned_dofs.n_elements(),
+            Assert (static_cast<unsigned int>(std::count (my_new_indices.begin(),
+                                                          my_new_indices.end(),
+                                                          numbers::invalid_dof_index))
+                    == active_but_not_owned_dofs.n_elements(),
                     ExcInternalError());
 
             // then compute a renumbering of the remaining ones
