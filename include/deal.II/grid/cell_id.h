@@ -141,6 +141,12 @@ public:
    */
   bool operator<(const CellId &other) const;
 
+  /**
+   * Boost serialization function
+   */
+  template<class Archive>
+  void serialize(Archive &ar, const unsigned int version );
+
 private:
   /**
    * The number of the coarse cell within whose tree the cell
@@ -194,6 +200,17 @@ std::ostream &operator<< (std::ostream &os,
 }
 
 
+
+/**
+ * Serialization function
+ */
+template<class Archive>
+void CellId::serialize(Archive &ar, const unsigned int /*version*/)
+{
+  ar &coarse_cell_id;
+  ar &n_child_indices;
+  ar &child_indices;
+}
 
 /**
  * Read a CellId object from a stream.
