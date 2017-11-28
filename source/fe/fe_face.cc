@@ -286,8 +286,10 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_FaceQ<dim, spacedim>::
 hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 {
+  Assert (dim >= 2, ExcInternalError());
+
   // this element is continuous only for the highest dimensional bounding object
-  if (dim !=2)
+  if (dim > 2)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
@@ -353,8 +355,10 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_FaceQ<dim, spacedim>::
 hp_quad_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
 {
+  Assert (dim >= 3, ExcInternalError());
+
   // this element is continuous only for the highest dimensional bounding object
-  if (dim !=3)
+  if (dim > 3)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
   else
