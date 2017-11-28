@@ -87,12 +87,6 @@ public:
   typedef const ElementType *const_iterator;
 
   /**
-   * Default constructor. Creates an invalid view that does not point to
-   * anything at all.
-   */
-  ArrayView ();
-
-  /**
    * Constructor.
    *
    * @param[in] starting_element A pointer to the first element of the array
@@ -248,15 +242,6 @@ private:
 
 
 //---------------------------------------------------------------------------
-
-
-template <typename ElementType>
-inline
-ArrayView<ElementType>::ArrayView()
-  :
-  starting_element (nullptr),
-  n_elements(0)
-{}
 
 
 
