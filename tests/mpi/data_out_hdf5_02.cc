@@ -31,7 +31,7 @@ double cell_coordinates [3][8] =
 };
 
 
-// This function is a copy from tests/base/patches.h, included here
+// This function is a copy from tests/data_out/patches.h, included here
 // to not introduce dependencies between different test targets
 template <int dim, int spacedim>
 void
