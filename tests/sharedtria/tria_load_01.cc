@@ -44,7 +44,11 @@ void test()
     tr1.save(oa, 0);
   }
 
-  parallel::shared::Triangulation<dim> tr2(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim>
+  tr2 (MPI_COMM_WORLD,
+       ::Triangulation<dim>::none,
+       false,
+       parallel::shared::Triangulation<dim>::partition_metis);
   {
     std::istringstream iss(oss.str());
     boost::archive::text_iarchive ia(iss, boost::archive::no_header);

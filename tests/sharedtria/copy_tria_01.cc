@@ -33,7 +33,10 @@ void test()
       << " n_active_cells: " << tr1.n_active_cells() << "\n"
       << std::endl;
 
-  parallel::shared::Triangulation<dim> tr2(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tr2(MPI_COMM_WORLD,
+                                           ::Triangulation<dim>::none,
+                                           false,
+                                           parallel::shared::Triangulation<dim>::partition_metis);
   tr2.copy_triangulation(tr1);
 
   deallog
@@ -43,7 +46,10 @@ void test()
       << " n_global_active_cells: " << tr2.n_global_active_cells() << "\n"
       << std::endl;
 
-  parallel::shared::Triangulation<dim> tr3(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tr3(MPI_COMM_WORLD,
+                                           ::Triangulation<dim>::none,
+                                           false,
+                                           parallel::shared::Triangulation<dim>::partition_metis);
   tr3.copy_triangulation(tr2);
 
   deallog

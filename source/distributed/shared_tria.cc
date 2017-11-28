@@ -21,6 +21,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
@@ -42,10 +43,15 @@ namespace parallel
       settings (settings),
       allow_artificial_cells(allow_artificial_cells)
     {
-      Assert((settings & (partition_metis | partition_zorder | partition_custom_signal)) == partition_metis ||
-             (settings & (partition_metis | partition_zorder | partition_custom_signal)) == partition_zorder ||
-             (settings & (partition_metis | partition_zorder | partition_custom_signal)) == partition_custom_signal,
-             ExcMessage ("Settings must contain exactly one type of active cell partitioning scheme."))
+      const auto partition_settings
+        = (partition_zoltan | partition_metis |
+           partition_zorder | partition_custom_signal) & settings;
+      Assert(partition_settings == partition_auto ||
+             partition_settings == partition_metis ||
+             partition_settings == partition_zoltan ||
+             partition_settings == partition_zorder ||
+             partition_settings == partition_custom_signal,
+             ExcMessage ("Settings must contain exactly one type of the active cell partitioning scheme."))
 
       if (settings & construct_multigrid_hierarchy)
         Assert(allow_artificial_cells,
@@ -68,16 +74,51 @@ namespace parallel
                         "agree on the number of active cells."))
 #endif
 
+      auto partition_settings
+        = (partition_zoltan | partition_metis |
+           partition_zorder | partition_custom_signal) & settings;
+      if (partition_settings == partition_auto)
+#ifdef DEAL_II_WITH_ZOLTAN
+        partition_settings = partition_zoltan;
+#elif defined DEAL_II_WITH_METIS
+        partition_settings = partition_metis;
+#else
+        partition_settings = partition_zorder;
+#endif
 
-      if (settings & partition_metis)
+      if (partition_settings == partition_zoltan)
         {
-          dealii::GridTools::partition_triangulation (this->n_subdomains, *this);
+#ifndef DEAL_II_WITH_ZOLTAN
+          AssertThrow (false,
+                       ExcMessage("Choosing 'partition_zoltan' requires the library "
+                                  "to be compiled with support for Zoltan! "
+                                  "Instead, you might use 'partition_auto' to select "
+                                  "a partitioning algorithm that is supported "
+                                  "by your current configuration."));
+#else
+          GridTools::partition_triangulation (this->n_subdomains, *this,
+                                              SparsityTools::Partitioner::zoltan);
+#endif
         }
-      else if (settings & partition_zorder)
+      else if (partition_settings == partition_metis)
         {
-          dealii::GridTools::partition_triangulation_zorder (this->n_subdomains, *this);
+#ifndef DEAL_II_WITH_METIS
+          AssertThrow (false,
+                       ExcMessage("Choosing 'partition_metis' requires the library "
+                                  "to be compiled with support for METIS! "
+                                  "Instead, you might use 'partition_auto' to select "
+                                  "a partitioning algorithm that is supported "
+                                  "by your current configuration."));
+#else
+          GridTools::partition_triangulation (this->n_subdomains, *this,
+                                              SparsityTools::Partitioner::metis);
+#endif
         }
-      else if (settings & partition_custom_signal)
+      else if (partition_settings == partition_zorder)
+        {
+          GridTools::partition_triangulation_zorder (this->n_subdomains, *this);
+        }
+      else if (partition_settings == partition_custom_signal)
         {
           // User partitions mesh manually
         }

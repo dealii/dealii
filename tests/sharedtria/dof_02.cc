@@ -38,7 +38,10 @@ template <int dim>
 void test()
 {
   parallel::shared::Triangulation<dim>
-  triangulation (MPI_COMM_WORLD);
+  triangulation (MPI_COMM_WORLD,
+                 ::Triangulation<dim>::none,
+                 false,
+                 parallel::shared::Triangulation<dim>::partition_metis);
 
   FESystem<dim> fe (FE_Q<dim>(3),2,
                     FE_DGQ<dim>(1),1);
