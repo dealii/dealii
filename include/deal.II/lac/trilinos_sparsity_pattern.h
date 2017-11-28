@@ -840,7 +840,7 @@ namespace TrilinosWrappers
     bool is_compressed () const;
 
     /**
-     * Gives the maximum number of entries per row on the current processor.
+     * Return the maximum number of entries per row on the current processor.
      */
     unsigned int max_entries_per_row () const;
 

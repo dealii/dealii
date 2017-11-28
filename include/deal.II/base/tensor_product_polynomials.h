@@ -91,12 +91,12 @@ public:
   void set_numbering(const std::vector<unsigned int> &renumber);
 
   /**
-   * Gives read access to the renumber vector.
+   * Give read access to the renumber vector.
    */
   const std::vector<unsigned int> &get_numbering() const;
 
   /**
-   * Gives read access to the inverse renumber vector.
+   * Give read access to the inverse renumber vector.
    */
   const std::vector<unsigned int> &get_numbering_inverse() const;
 

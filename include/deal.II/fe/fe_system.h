@@ -1112,21 +1112,21 @@ private:
     ~InternalData();
 
     /**
-     * Gives write-access to the pointer to a @p InternalData of the @p
+     * Give write-access to the pointer to a @p InternalData of the @p
      * base_noth base element.
      */
     void set_fe_data(const unsigned int                        base_no,
                      typename FiniteElement<dim,spacedim>::InternalDataBase *);
 
     /**
-     * Gives read-access to the pointer to a @p InternalData of the @p
+     * Give read-access to the pointer to a @p InternalData of the @p
      * base_noth base element.
      */
     typename FiniteElement<dim,spacedim>::InternalDataBase &
     get_fe_data (const unsigned int base_no) const;
 
     /**
-     * Gives read-access to the pointer to an object to which into which the
+     * Give read-access to the pointer to an object to which into which the
      * <code>base_no</code>th base element will write its output when calling
      * FiniteElement::fill_fe_values() and similar functions.
      */

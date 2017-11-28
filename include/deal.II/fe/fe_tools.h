@@ -176,7 +176,7 @@ namespace FETools
    * @{
    */
   /**
-   * Gives the interpolation matrix that interpolates a @p fe1- function to a
+   * Compute the interpolation matrix that interpolates a @p fe1-function to a
    * @p fe2-function on each cell. The interpolation_matrix needs to be of
    * size <tt>(fe2.dofs_per_cell, fe1.dofs_per_cell)</tt>.
    *
@@ -191,7 +191,7 @@ namespace FETools
                            FullMatrix<number> &interpolation_matrix);
 
   /**
-   * Gives the interpolation matrix that interpolates a @p fe1- function to a
+   * Compute the interpolation matrix that interpolates a @p fe1-function to a
    * @p fe2-function, and interpolates this to a second @p fe1-function on
    * each cell. The interpolation_matrix needs to be of size
    * <tt>(fe1.dofs_per_cell, fe1.dofs_per_cell)</tt>.
@@ -208,11 +208,11 @@ namespace FETools
                                 FullMatrix<number> &interpolation_matrix);
 
   /**
-   * Gives the unit matrix minus the back interpolation matrix.  The @p
+   * Compute the identity matrix minus the back interpolation matrix.  The @p
    * difference_matrix needs to be of size <tt>(fe1.dofs_per_cell,
    * fe1.dofs_per_cell)</tt>.
    *
-   * This function gives the matrix that transforms a @p fe1 function $z$ to
+   * This function computes the matrix that transforms a @p fe1 function $z$ to
    * $z-I_hz$ where $I_h$ denotes the interpolation operator from the @p fe1
    * space to the @p fe2 space. This matrix hence is useful to evaluate error-
    * representations where $z$ denotes the dual solution.
@@ -596,7 +596,7 @@ namespace FETools
    */
   //@{
   /**
-   * Gives the interpolation of a the @p dof1-function @p u1 to a @p
+   * Compute the interpolation of a the @p dof1-function @p u1 to a @p
    * dof2-function @p u2. @p dof1 and @p dof2 need to be DoFHandlers based on
    * the same triangulation.
    *
@@ -634,7 +634,7 @@ namespace FETools
                OutVector                           &u2);
 
   /**
-   * Gives the interpolation of a the @p dof1-function @p u1 to a @p
+   * Compute the interpolation of a the @p dof1-function @p u1 to a @p
    * dof2-function @p u2. @p dof1 and @p dof2 need to be DoFHandlers (or
    * hp::DoFHandlers) based on the same triangulation.  @p constraints is a
    * hanging node constraints object corresponding to @p dof2. This object is
@@ -660,7 +660,7 @@ namespace FETools
                     OutVector                           &u2);
 
   /**
-   * Gives the interpolation of the @p fe1-function @p u1 to a @p
+   * Compute the interpolation of the @p fe1-function @p u1 to a @p
    * fe2-function, and interpolates this to a second @p fe1-function named @p
    * u1_interpolated.
    *
@@ -683,7 +683,7 @@ namespace FETools
                          OutVector                          &u1_interpolated);
 
   /**
-   * Gives the interpolation of the @p dof1-function @p u1 to a @p
+   * Compute the interpolation of the @p dof1-function @p u1 to a @p
    * dof2-function, and interpolates this to a second @p dof1-function named
    * @p u1_interpolated.  @p constraints1 and @p constraints2 are the hanging
    * node constraints corresponding to @p dof1 and @p dof2, respectively.
@@ -703,7 +703,7 @@ namespace FETools
                          OutVector                      &u1_interpolated);
 
   /**
-   * Gives $(Id-I_h)z_1$ for a given @p dof1-function $z_1$, where $I_h$ is
+   * Compute $(Id-I_h)z_1$ for a given @p dof1-function $z_1$, where $I_h$ is
    * the interpolation from @p fe1 to @p fe2. The result $(Id-I_h)z_1$ is
    * written into @p z1_difference.
    *
@@ -718,7 +718,7 @@ namespace FETools
                                 OutVector                         &z1_difference);
 
   /**
-   * Gives $(Id-I_h)z_1$ for a given @p dof1-function $z_1$, where $I_h$ is
+   * Compute $(Id-I_h)z_1$ for a given @p dof1-function $z_1$, where $I_h$ is
    * the interpolation from @p fe1 to @p fe2. The result $(Id-I_h)z_1$ is
    * written into @p z1_difference.  @p constraints1 and @p constraints2 are
    * the hanging node constraints corresponding to @p dof1 and @p dof2,
@@ -754,7 +754,7 @@ namespace FETools
                    OutVector                      &u2);
 
   /**
-   * Gives the patchwise extrapolation of a @p dof1 function @p z1 to a @p
+   * Compute the patchwise extrapolation of a @p dof1 function @p z1 to a @p
    * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler objects
    * based on the same triangulation. This function is used, for example, for
    * extrapolating patchwise a piecewise linear solution to a piecewise
@@ -819,7 +819,7 @@ namespace FETools
                     OutVector                      &z2);
 
   /**
-   * Gives the patchwise extrapolation of a @p dof1 function @p z1 to a @p
+   * Compute the patchwise extrapolation of a @p dof1 function @p z1 to a @p
    * dof2 function @p z2.  @p dof1 and @p dof2 need to be DoFHandler objects
    * based on the same triangulation.  @p constraints is a hanging node
    * constraints object corresponding to @p dof2. This object is necessary

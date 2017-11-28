@@ -271,7 +271,7 @@ public:
   get_new_point_on_quad (const typename Triangulation<dim,spacedim>::quad_iterator &quad) const;
 
   /**
-   * Gives <tt>n=points.size()</tt> points that splits the StraightBoundary
+   * Return <tt>n=points.size()</tt> points that split the StraightBoundary
    * line into $n+1$ partitions of equal lengths.
    *
    * Refer to the general documentation of this class and the documentation of
@@ -283,7 +283,7 @@ public:
                                    std::vector<Point<spacedim> > &points) const;
 
   /**
-   * Gives <tt>n=points.size()=m*m</tt> points that splits the
+   * Return <tt>n=points.size()=m*m</tt> points that splits the
    * StraightBoundary quad into $(m+1)(m+1)$ subquads of equal size.
    *
    * Refer to the general documentation of this class and the documentation of
