@@ -270,6 +270,158 @@ FE_FaceQ<dim,spacedim>::hp_constraints_are_implemented () const
 
 
 template <int dim, int spacedim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_FaceQ<dim, spacedim>::
+hp_vertex_dof_identities (const FiniteElement<dim, spacedim> &/*fe_other*/) const
+{
+  // this element is always discontinuous at vertices
+  return
+    std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
+
+
+template <int dim, int spacedim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_FaceQ<dim, spacedim>::
+hp_line_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
+{
+  // this element is continuous only for the highest dimensional bounding object
+  if (dim !=2)
+    return
+      std::vector<std::pair<unsigned int, unsigned int> > ();
+  else
+    {
+      // this is similar to the FE_Q_Base class
+      if (const FE_FaceQ<dim,spacedim> *fe_q_other
+          = dynamic_cast<const FE_FaceQ<dim,spacedim>*>(&fe_other))
+        {
+          // dofs are located along lines, so two dofs are identical if they are
+          // located at identical positions.
+          // Therefore, read the points in unit_support_points for the
+          // first coordinate direction. We take the lexicographic ordering of the
+          // points in the second direction (i.e., y-direction) since we know
+          // that the first p+1 dofs are located at the left (x=0) face.
+          const unsigned int p = this->degree;
+          const unsigned int q = fe_q_other->degree;
+
+          std::vector<std::pair<unsigned int, unsigned int> > identities;
+
+          const std::vector<unsigned int> &index_map_inverse=
+            this->poly_space.get_numbering_inverse();
+          const std::vector<unsigned int> &index_map_inverse_other=
+            fe_q_other->poly_space.get_numbering_inverse();
+
+          for (unsigned int i=0; i<p+1; ++i)
+            for (unsigned int j=0; j<q+1; ++j)
+              if (std::fabs(this->unit_support_points[index_map_inverse[i]][dim-1]-
+                            fe_q_other->unit_support_points[index_map_inverse_other[j]][dim-1])
+                  < 1e-14)
+                identities.emplace_back (i, j);
+
+          return identities;
+        }
+      else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
+        {
+          // the FE_Nothing has no degrees of freedom, so there are no
+          // equivalencies to be recorded
+          return std::vector<std::pair<unsigned int, unsigned int> > ();
+        }
+      else if (fe_other.dofs_per_face == 0)
+        {
+          // if the other element has no elements on faces at all,
+          // then it would be impossible to enforce any kind of
+          // continuity even if we knew exactly what kind of element
+          // we have -- simply because the other element declares
+          // that it is discontinuous because it has no DoFs on
+          // its faces. in that case, just state that we have no
+          // constraints to declare
+          return std::vector<std::pair<unsigned int, unsigned int> > ();
+        }
+      else
+        {
+          Assert (false, ExcNotImplemented());
+          return std::vector<std::pair<unsigned int, unsigned int> > ();
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_FaceQ<dim, spacedim>::
+hp_quad_dof_identities (const FiniteElement<dim, spacedim> &fe_other) const
+{
+  // this element is continuous only for the highest dimensional bounding object
+  if (dim !=3)
+    return
+      std::vector<std::pair<unsigned int, unsigned int> > ();
+  else
+    {
+      // this is similar to the FE_Q_Base class
+      if (const FE_FaceQ<dim,spacedim> *fe_q_other
+          = dynamic_cast<const FE_FaceQ<dim,spacedim>*>(&fe_other))
+        {
+          // this works exactly like the line case above, except that now we have
+          // to have two indices i1, i2 and j1, j2 to characterize the dofs on the
+          // face of each of the finite elements. since they are ordered
+          // lexicographically along the first line and we have a tensor product,
+          // the rest is rather straightforward
+          const unsigned int p = this->degree;
+          const unsigned int q = fe_q_other->degree;
+
+          std::vector<std::pair<unsigned int, unsigned int> > identities;
+
+          const std::vector<unsigned int> &index_map_inverse=
+            this->poly_space.get_numbering_inverse();
+          const std::vector<unsigned int> &index_map_inverse_other=
+            fe_q_other->poly_space.get_numbering_inverse();
+
+          std::vector<std::pair<unsigned int, unsigned int> > identities_1d;
+
+          for (unsigned int i=0; i<p+1; ++i)
+            for (unsigned int j=0; j<q+1; ++j)
+              if (std::fabs(this->unit_support_points[index_map_inverse[i]][dim-2]-
+                            fe_q_other->unit_support_points[index_map_inverse_other[j]][dim-2])
+                  < 1e-14)
+                identities_1d.emplace_back (i, j);
+
+          for (unsigned int n1=0; n1<identities_1d.size(); ++n1)
+            for (unsigned int n2=0; n2<identities_1d.size(); ++n2)
+              identities.emplace_back (identities_1d[n1].first*(p+1)+identities_1d[n2].first,
+                                       identities_1d[n1].second*(q+1)+identities_1d[n2].second);
+
+          return identities;
+        }
+      else if (dynamic_cast<const FE_Nothing<dim>*>(&fe_other) != nullptr)
+        {
+          // the FE_Nothing has no degrees of freedom, so there are no
+          // equivalencies to be recorded
+          return std::vector<std::pair<unsigned int, unsigned int> > ();
+        }
+      else if (fe_other.dofs_per_face == 0)
+        {
+          // if the other element has no elements on faces at all,
+          // then it would be impossible to enforce any kind of
+          // continuity even if we knew exactly what kind of element
+          // we have -- simply because the other element declares
+          // that it is discontinuous because it has no DoFs on
+          // its faces. in that case, just state that we have no
+          // constraints to declare
+          return std::vector<std::pair<unsigned int, unsigned int> > ();
+        }
+      else
+        {
+          Assert (false, ExcNotImplemented());
+          return std::vector<std::pair<unsigned int, unsigned int> > ();
+        }
+    }
+}
+
+
+
+template <int dim, int spacedim>
 FiniteElementDomination::Domination
 FE_FaceQ<dim,spacedim>::
 compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
@@ -442,6 +594,40 @@ FE_FaceQ<1,spacedim>::hp_constraints_are_implemented () const
   return true;
 }
 
+template <int spacedim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_FaceQ<1, spacedim>::
+hp_vertex_dof_identities (const FiniteElement<1, spacedim> &/*fe_other*/) const
+{
+  // this element is always discontinuous at vertices
+  return
+    std::vector<std::pair<unsigned int, unsigned int> > (1,std::make_pair(0U,0U));
+}
+
+
+
+template <int spacedim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_FaceQ<1, spacedim>::
+hp_line_dof_identities (const FiniteElement<1, spacedim> &fe_other) const
+{
+  // this element is continuous only for the highest dimensional bounding object
+  return
+    std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
+
+
+template <int spacedim>
+std::vector<std::pair<unsigned int, unsigned int> >
+FE_FaceQ<1, spacedim>::
+hp_quad_dof_identities (const FiniteElement<1, spacedim> &fe_other) const
+{
+  // this element is continuous only for the highest dimensional bounding object
+  return
+    std::vector<std::pair<unsigned int, unsigned int> > ();
+}
+
 
 
 template <int spacedim>
@@ -603,7 +789,6 @@ FE_FaceP<dim,spacedim>::get_dpo_vector (const unsigned int deg)
     }
   return dpo;
 }
-
 
 
 
