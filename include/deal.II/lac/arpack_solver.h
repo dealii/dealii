@@ -160,18 +160,36 @@ public:
   };
 
   /**
-   * Standardized data struct to pipe additional data to the solver, should it
-   * be needed.
+   * Standardized data struct to pipe additional data to the solver.
    */
   struct AdditionalData
   {
-    const unsigned int number_of_arnoldi_vectors;
-    const WhichEigenvalues eigenvalue_of_interest;
-    const bool symmetric;
-    AdditionalData(
+    /**
+     * Constructor. By default, set the number of Arnoldi vectors (Lanczos
+     * vectors if the problem is symmetric) to 15. Set the solver to find the
+     * eigenvalues of largest magnitude for a non-symmetric problem).
+     */
+    explicit AdditionalData(
       const unsigned int number_of_arnoldi_vectors = 15,
       const WhichEigenvalues eigenvalue_of_interest = largest_magnitude,
       const bool symmetric = false);
+
+    /**
+     * Number of Arnoldi/Lanczos vectors. This number should be less than the
+     * size of the problem but greater than 2 times the number of eigenvalues
+     * (or n_eigenvalues if it is set) plus one.
+     */
+    const unsigned int number_of_arnoldi_vectors;
+
+    /**
+     * Specify the eigenvalues of interest.
+     */
+    const WhichEigenvalues eigenvalue_of_interest;
+
+    /**
+     * Specify if the problem is symmetric or not.
+     */
+    const bool symmetric;
   };
 
   /**
