@@ -110,5 +110,14 @@ int main(int argc, char **argv)
       check_solve (solver_control, A,u,f, preconditioner, false);
     }
     deallog.pop();
+    deallog.push("Avg reduction");
+    {
+      // Expects success
+      ReductionControl solver_control(2000, 1.e-3, 1e-9);
+      solver_control.enable_history_data();
+      check_solve (solver_control, A,u,f, preconditioner, true);
+      deallog << solver_control.average_reduction() << std::endl;
+    }
+    deallog.pop();
   }
 }
