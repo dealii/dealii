@@ -282,7 +282,7 @@ ReductionControl::check (const unsigned int step,
       lcheck = success;
 
       if (history_data_enabled)
-        history_data.push_back(check_value);   
+        history_data.push_back(check_value);
 
       return success;
     }
