@@ -2030,7 +2030,7 @@ namespace GridTools
   orthogonal_equality (const FaceIterator &face1,
                        const FaceIterator &face2,
                        const int          direction,
-                       const Tensor<2,FaceIterator::AccessorType::space_dimension> &offset
+                       const Tensor<1,FaceIterator::AccessorType::space_dimension> &offset
                        = Tensor<1,FaceIterator::AccessorType::space_dimension>(),
                        const FullMatrix<double> &matrix = FullMatrix<double>());
 
