@@ -279,8 +279,11 @@ ReductionControl::check (const unsigned int step,
                 << " value " << check_value << std::endl;
       lstep  = step;
       lvalue = check_value;
-
       lcheck = success;
+
+      if (history_data_enabled)
+        history_data.push_back(check_value);   
+
       return success;
     }
   else
