@@ -42,7 +42,7 @@ void test(const unsigned int size, const unsigned int block_size)
   // Create SPD matrices of requested size:
   FullMatrix<NumberType> full_in(size), full_out(size), diff(size);
 
-  std::shared_ptr<ProcessGrid> grid = std::make_shared<ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
   ScaLAPACKMatrix<NumberType> scalapack_matrix (size, grid, block_size);
 
   pcout << size << " " << block_size << " " << grid->get_process_grid_rows() << " " << grid->get_process_grid_columns() << std::endl;

@@ -52,7 +52,7 @@ void test(const unsigned int size, const unsigned int block_size)
   FullMatrix<NumberType> full_A(size);
   std::vector<NumberType> lapack_A(size*size);
 
-  std::shared_ptr<ProcessGrid> grid = std::make_shared<ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
   ScaLAPACKMatrix<NumberType> scalapack_A (size, grid, block_size,
                                            LAPACKSupport::Property::symmetric);
 
