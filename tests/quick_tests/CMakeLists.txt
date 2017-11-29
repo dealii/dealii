@@ -175,7 +175,7 @@ ENDIF()
 
 # Test ScaLAPACK
 IF (DEAL_II_WITH_SCALAPACK)
-  make_quicktest("scalapack" ${_mybuild} 4)
+  make_quicktest("scalapack" ${_mybuild} 5)
 ENDIF()
 
 
