@@ -78,7 +78,7 @@ namespace Particles
     ArrayView<double> get_properties (const Handle handle);
 
     /**
-     * Reserves the dynamic memory needed for storing the properties of
+     * Reserve the dynamic memory needed for storing the properties of
      * @p size particles.
      */
     void reserve(const std::size_t size);

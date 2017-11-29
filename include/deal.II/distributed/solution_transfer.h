@@ -31,7 +31,7 @@ namespace parallel
   namespace distributed
   {
     /**
-     * Transfers a discrete FE function (like a solution vector) by
+     * Transfer a discrete FE function (like a solution vector) by
      * interpolation while refining and/or coarsening a distributed grid and
      * handles the necessary communication.
      *
@@ -134,7 +134,7 @@ namespace parallel
       ~SolutionTransfer() = default;
 
       /**
-       * Prepares the @p SolutionTransfer for coarsening and refinement. It
+       * Prepare the current object for coarsening and refinement. It
        * stores the dof indices of each cell and stores the dof values of the
        * vectors in @p all_in in each cell that'll be coarsened. @p all_in
        * includes all vectors that are to be interpolated onto the new
@@ -143,7 +143,7 @@ namespace parallel
       void prepare_for_coarsening_and_refinement (const std::vector<const VectorType *> &all_in);
 
       /**
-       * Same as previous function but for only one discrete function to be
+       * Same as the previous function but for only one discrete function to be
        * interpolated.
        */
       void prepare_for_coarsening_and_refinement (const VectorType &in);
