@@ -455,26 +455,20 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
           ArpackExcSmallNumberofArnoldiVectors(
             additional_data.number_of_arnoldi_vectors, nev));
 
-  /* ARPACK mode for dsaupd/dnaupd, here only mode 3,
-   * i.e. shift-invert mode
-   */
+  // ARPACK mode for dsaupd/dnaupd, here only mode 3, i.e. shift-invert mode
   int mode = 3;
 
   // reverse communication parameter
   int ido = 0;
 
-  /**
-   * 'G' generalized eigenvalue problem 'I' standard eigenvalue problem
-   */
+  // 'G' generalized eigenvalue problem 'I' standard eigenvalue problem
   char bmat[2] = "G";
 
-  /**
-   * Specify the eigenvalues of interest, possible parameters "LA"
-   * algebraically largest "SA" algebraically smallest "LM" largest magnitude
-   * "SM" smallest magnitude "LR" largest real part "SR" smallest real part
-   * "LI" largest imaginary part "SI" smallest imaginary part "BE" both ends
-   * of spectrum simultaneous
-   */
+  // Specify the eigenvalues of interest, possible parameters "LA" algebraically
+  // largest "SA" algebraically smallest "LM" largest magnitude "SM" smallest
+  // magnitude "LR" largest real part "SR" smallest real part "LI" largest
+  // imaginary part "SI" smallest imaginary part "BE" both ends of spectrum
+  // simultaneous.
   char which[3];
   switch (additional_data.eigenvalue_of_interest)
     {
@@ -652,9 +646,7 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
     }
   else
     {
-      /**
-       * 1 - compute eigenvectors, 0 - only eigenvalues
-       */
+      // 1 - compute eigenvectors, 0 - only eigenvalues
       int rvec = 1;
 
       // which eigenvectors
