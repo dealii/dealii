@@ -122,8 +122,8 @@ namespace Utilities
       // Initialize Cblas context from the provided communicator
       blacs_context = Csys2blacs_handle(mpi_communicator);
       const char *order = ( column_major ? "Col" : "Row" );
-      // FIXME: blacs_context can be modified below. Thus Cblacs2sys_handle
-      // may not return the same MPI communicator
+      // Note that blacs_context can be modified below. Thus Cblacs2sys_handle
+      // may not return the same MPI communicator.
       Cblacs_gridinit(&blacs_context, order, n_process_rows, n_process_columns);
 
       // Blacs may modify the grid size on processes which are not used
@@ -134,14 +134,14 @@ namespace Utilities
 
       // If this MPI core is not on the grid, flag it as inactive and
       // skip all jobs
-      // FIXME: different condition is used here
+      // Note that a different condition is used in FORTRAN code here
       // https://stackoverflow.com/questions/18516915/calling-blacs-with-more-processes-than-used
       if (this_process_row < 0 || this_process_column < 0)
         mpi_process_is_active = false;
       else
         mpi_process_is_active = true;
 
-      // Create an auxiliary communicator which has root and all inactive cores
+      // Create an auxiliary communicator which has root and all inactive cores.
       // Assume that inactive cores start with id=n_process_rows*n_process_columns
       Assert (mpi_process_is_active || this_mpi_process >= n_process_rows*n_process_columns,
               ExcInternalError());
@@ -166,7 +166,7 @@ namespace Utilities
       AssertThrowMPI(ierr);
 
       // Create the communicator based on the group
-      // Note that, on most cores the communicator will be MPI_COMM_NULL
+      // Note that on most cores the communicator will be MPI_COMM_NULL.
       // FIXME: switch to MPI_Comm_create_group for MPI-3 so that only processes within the to-be subgroup call this
       ierr = MPI_Comm_create(mpi_communicator, inactive_with_root_group,
                              &mpi_communicator_inactive_with_root);

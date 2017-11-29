@@ -230,32 +230,32 @@ public:
   /**
    * Number of local rows on this MPI processes.
    */
-  int local_m() const;
+  unsigned int local_m() const;
 
   /**
    * Number of local columns on this MPI process.
    */
-  int local_n() const;
+  unsigned int local_n() const;
 
   /**
    * Return the global row number for the given local row @p loc_row .
    */
-  int global_row(const int loc_row) const;
+  unsigned int global_row(const unsigned int loc_row) const;
 
   /**
    * Return the global column number for the given local column @p loc_column.
    */
-  int global_column(const int loc_column) const;
+  unsigned int global_column(const unsigned int loc_column) const;
 
   /**
    * Read access to local element.
    */
-  NumberType local_el(const int loc_row, const int loc_column) const;
+  NumberType local_el(const unsigned int loc_row, const unsigned int loc_column) const;
 
   /**
    * Write access to local element.
    */
-  NumberType &local_el(const int loc_row, const int loc_column);
+  NumberType &local_el(const unsigned int loc_row, const unsigned int loc_column);
 
 private:
 
@@ -371,7 +371,7 @@ private:
 template <typename NumberType>
 inline
 NumberType
-ScaLAPACKMatrix<NumberType>::local_el(const int loc_row, const int loc_column) const
+ScaLAPACKMatrix<NumberType>::local_el(const unsigned int loc_row, const unsigned int loc_column) const
 {
   return (*this)(loc_row,loc_column);
 }
@@ -381,10 +381,48 @@ ScaLAPACKMatrix<NumberType>::local_el(const int loc_row, const int loc_column) c
 template <typename NumberType>
 inline
 NumberType &
-ScaLAPACKMatrix<NumberType>::local_el(const int loc_row, const int loc_column)
+ScaLAPACKMatrix<NumberType>::local_el(const unsigned int loc_row, const unsigned int loc_column)
 {
   return (*this)(loc_row,loc_column);
 }
+
+
+template <typename NumberType>
+inline
+unsigned int
+ScaLAPACKMatrix<NumberType>::m() const
+{
+  return n_rows;
+}
+
+
+
+template <typename NumberType>
+inline
+unsigned int
+ScaLAPACKMatrix<NumberType>::n() const
+{
+  return n_columns;
+}
+
+
+
+template <typename NumberType>
+unsigned int
+ScaLAPACKMatrix<NumberType>::local_m() const
+{
+  return n_local_rows;
+}
+
+
+
+template <typename NumberType>
+unsigned int
+ScaLAPACKMatrix<NumberType>::local_n() const
+{
+  return n_local_columns;
+}
+
 
 #endif // DOXYGEN
 

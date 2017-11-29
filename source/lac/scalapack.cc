@@ -142,43 +142,7 @@ ScaLAPACKMatrix<NumberType>::operator = (const FullMatrix<NumberType> &matrix)
 
 template <typename NumberType>
 unsigned int
-ScaLAPACKMatrix<NumberType>::m() const
-{
-  return n_rows;
-}
-
-
-
-template <typename NumberType>
-unsigned int
-ScaLAPACKMatrix<NumberType>::n() const
-{
-  return n_columns;
-}
-
-
-
-template <typename NumberType>
-int
-ScaLAPACKMatrix<NumberType>::local_m() const
-{
-  return n_local_rows;
-}
-
-
-
-template <typename NumberType>
-int
-ScaLAPACKMatrix<NumberType>::local_n() const
-{
-  return n_local_columns;
-}
-
-
-
-template <typename NumberType>
-int
-ScaLAPACKMatrix<NumberType>::global_row(const int loc_row) const
+ScaLAPACKMatrix<NumberType>::global_row(const unsigned int loc_row) const
 {
   Assert (loc_row >= 0 && loc_row < n_local_rows,
           ExcIndexRange(loc_row,0,n_local_rows));
@@ -189,8 +153,8 @@ ScaLAPACKMatrix<NumberType>::global_row(const int loc_row) const
 
 
 template <typename NumberType>
-int
-ScaLAPACKMatrix<NumberType>::global_column(const int loc_column) const
+unsigned int
+ScaLAPACKMatrix<NumberType>::global_column(const unsigned int loc_column) const
 {
   Assert (loc_column >= 0 && loc_column < n_local_columns,
           ExcIndexRange(loc_column,0,n_local_columns));
