@@ -505,7 +505,8 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
           if (std::abs(merged_weights[i])>1.e-15)
             {
               vPerp = internal::projected_direction(directions[i], xVec);
-              const double sintheta = vPerp.norm();
+              const double sinthetaSq = vPerp.norm_square();
+              const double sintheta = sqrt(sinthetaSq);
               if (sintheta<tolerance)
                 {
                   Hessian[0][0] += merged_weights[i];
@@ -515,24 +516,24 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
                 {
                   const double costheta = (directions[i])*xVec;
                   const double theta = atan2(sintheta, costheta);
-                  const double sinthetaInv = 1.0/sintheta;
+                  const double sincthetaInv = theta/sintheta;
 
-                  vPerp *= sinthetaInv;
                   const double cosphi = vPerp*Clocalx;
                   const double sinphi = vPerp*Clocaly;
 
                   gradlocal[0] = cosphi;
                   gradlocal[1] = sinphi;
-                  gradient += (merged_weights[i]*theta)*gradlocal;
+                  gradient += (merged_weights[i]*sincthetaInv)*gradlocal;
 
+                  const double wt = merged_weights[i]/sinthetaSq;
                   const double sinphiSq = sinphi*sinphi;
                   const double cosphiSq = cosphi*cosphi;
-                  const double tt = (theta*sinthetaInv)*costheta;
-                  const double offdiag = cosphi*sinphi*merged_weights[i]*(1.0-tt);
-                  Hessian[0][0] += merged_weights[i]*(cosphiSq+tt*sinphiSq);
+                  const double tt = sincthetaInv*costheta;
+                  const double offdiag = cosphi*sinphi*wt*(1.0-tt);
+                  Hessian[0][0] += wt*(cosphiSq+tt*sinphiSq);
                   Hessian[0][1] += offdiag;
                   Hessian[1][0] += offdiag;
-                  Hessian[1][1] += merged_weights[i]*(sinphiSq+tt*cosphiSq);
+                  Hessian[1][1] += wt*(sinphiSq+tt*cosphiSq);
                 }
             }
 
