@@ -106,7 +106,7 @@ namespace Particles
     void clear_particles();
 
     /**
-     * Updates all internally cached numbers. Note that all functions that
+     * Update all internally cached numbers. Note that all functions that
      * modify internal data structures and act on multiple particles will
      * call this function automatically (e.g. insert_particles), while
      * functions that act on single particles will not call this function
@@ -292,7 +292,7 @@ namespace Particles
     n_particles_in_cell(const typename Triangulation<dim,spacedim>::active_cell_iterator &cell) const;
 
     /**
-     * Finds the cells containing each particle for all locally owned
+     * Find and update the cells containing each particle for all locally owned
      * particles. If particles moved out of the local subdomain
      * they will be sent to their new process and inserted there.
      * After this function call every particle is either on its current
@@ -303,7 +303,7 @@ namespace Particles
     sort_particles_into_subdomains_and_cells();
 
     /**
-     * Exchanges all particles that live in cells that are ghost cells to
+     * Exchange all particles that live in cells that are ghost cells to
      * other processes. Clears and re-populates the ghost_neighbors
      * member variable.
      */
@@ -311,17 +311,17 @@ namespace Particles
     exchange_ghost_particles();
 
     /**
-     * Callback function that should be called before every
-     * refinement and when writing checkpoints.
-     * Allows registering store_particles() in the triangulation.
+     * Callback function that should be called before every refinement
+     * and when writing checkpoints.  This function is used to
+     * register store_particles() with the triangulation.
      */
     void
     register_store_callback_function(const bool serialization);
 
     /**
-     * Callback function that should be called after every
-     * refinement and after resuming from a checkpoint.
-     * Allows registering load_particles() in the triangulation.
+     * Callback function that should be called after every refinement
+     * and after resuming from a checkpoint.  This function is used to
+     * register load_particles() with the triangulation.
      */
     void
     register_load_callback_function(const bool serialization);
