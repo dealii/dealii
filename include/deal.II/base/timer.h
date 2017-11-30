@@ -1003,16 +1003,7 @@ TimerOutput::Scope::Scope(dealii::TimerOutput &timer_,
   timer.enter_section(section_name);
 }
 
-inline
-TimerOutput::Scope::~Scope()
-{
-  try
-    {
-      stop();
-    }
-  catch (...)
-    {}
-}
+
 
 inline
 void
