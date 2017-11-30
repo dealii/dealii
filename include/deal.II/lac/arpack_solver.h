@@ -541,10 +541,8 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
   // maximum number of iterations
   iparam[2] = control().max_steps();
 
-  /**
-   * Set the mode of dsaupd. 1 is exact shifting, 2 is user-supplied shifts,
-   * 3 is shift-invert mode, 4 is buckling mode, 5 is Cayley mode.
-   */
+  // Set the mode of dsaupd. 1 is exact shifting, 2 is user-supplied shifts,
+  // 3 is shift-invert mode, 4 is buckling mode, 5 is Cayley mode.
 
   iparam[6] = mode;
   std::vector<int> ipntr (14, 0);
