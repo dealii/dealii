@@ -281,15 +281,18 @@ namespace Step18
   template <int dim>
   TopLevel<dim>::TopLevel ()
     :
-    triangulation(MPI_COMM_WORLD),
-    fe (FE_Q<dim>(1), dim),
-    dof_handler (triangulation),
-    quadrature_formula (2),
-    mpi_communicator (MPI_COMM_WORLD),
-    n_mpi_processes (Utilities::MPI::n_mpi_processes(mpi_communicator)),
-    this_mpi_process (Utilities::MPI::this_mpi_process(mpi_communicator)),
-    pcout (std::cout, this_mpi_process == 0),
-    monitored_vertex_first_dof(0)
+    triangulation((MPI_COMM_WORLD,
+                   ::Triangulation<dim>::none,
+                   false,
+                   parallel::shared::Triangulation<dim>::partition_metis),
+                  fe (FE_Q<dim>(1), dim),
+                  dof_handler (triangulation),
+                  quadrature_formula (2),
+                  mpi_communicator (MPI_COMM_WORLD),
+                  n_mpi_processes (Utilities::MPI::n_mpi_processes(mpi_communicator)),
+                  this_mpi_process (Utilities::MPI::this_mpi_process(mpi_communicator)),
+                  pcout (std::cout, this_mpi_process == 0),
+                  monitored_vertex_first_dof(0)
   {}
   template <int dim>
   TopLevel<dim>::~TopLevel ()
