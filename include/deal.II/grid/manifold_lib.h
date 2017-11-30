@@ -236,6 +236,26 @@ public:
                       const Point<spacedim> &x2) const override;
 
   /**
+   * Compute a new set of points that interpolate between the given points @p
+   * surrounding_points. @p weights is a table with as many columns as @p
+   * surrounding_points.size(). The number of rows in @p weights must match
+   * the length of @p new_points.
+   *
+   * This function is optimized to perform on a collection
+   * of new points, by collecting operations that are not dependent on the
+   * weights outside of the loop over all new points.
+   *
+   * The implementation does not allow for @p surrounding_points and
+   * @p new_points to point to the same array, so make sure to pass different
+   * objects into the function.
+   */
+  virtual
+  void
+  get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+                  const Table<2,double>                  &weights,
+                  ArrayView<Point<spacedim>>              new_points) const;
+
+  /**
    * Return a point on the spherical manifold which is intermediate
    * with respect to the surrounding points.
    */
@@ -250,6 +270,36 @@ public:
   const Point<spacedim> center;
 
 private:
+  /**
+   * Return a point on the spherical manifold which is intermediate
+   * with respect to the surrounding points. This function uses a linear
+   * average of the directions to find an estimated point. It returns a pair
+   * of radius and direction from the center point to the candidate point.
+   */
+  std::pair<double, Tensor<1,spacedim> >
+  guess_new_point(const ArrayView<const Tensor<1,spacedim>> &directions,
+                  const ArrayView<const double> &distances,
+                  const ArrayView<const double> &weights) const;
+
+  /**
+   * Return a point on the spherical manifold which is intermediate
+   * with respect to the surrounding points. This function uses a candidate point
+   * as guess, and performs a Newton-style iteration to compute the correct point.
+   *
+   * The main part of the implementation uses the ideas in the publication
+   *
+   * Buss, Samuel R., and Jay P. Fillmore.
+   * "Spherical averages and applications to spherical splines and interpolation."
+   * ACM Transactions on Graphics (TOG) 20.2 (2001): 95-126.
+   *
+   * and in particular the implementation provided at
+   * http://math.ucsd.edu/~sbuss/ResearchWeb/spheremean/
+   */
+  Point<spacedim>
+  get_new_point (const ArrayView<const Tensor<1,spacedim>> &directions,
+                 const ArrayView<const double> &distances,
+                 const ArrayView<const double> &weights,
+                 const Point<spacedim> candidate_point) const;
 
   /**
    * A manifold description to be used for get_new_point in 2D.
