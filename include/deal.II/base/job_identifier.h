@@ -49,10 +49,11 @@ public:
   static const char *program_id();
 
   /**
-   * Obtain the base name of the file currently being compiled. That is, if
-   * the file is <tt>mypath/file.cc</tt> return just <tt>file</tt>. Typically,
-   * this can be called from a program with the argument <tt>__FILE__</tt> and
-   * is used in the deal.II test suite.
+   * Obtain the base name of the filename passed as argument. That is,
+   * if the file is <tt>mypath/file.cc</tt> return just
+   * <tt>file</tt>. For example, this function can be called from a
+   * user program with argument <tt>__FILE__</tt> to create an
+   * identifier for the program being run.
    */
   static std::string base_name(const char *filename);
 
