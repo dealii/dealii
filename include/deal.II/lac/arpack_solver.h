@@ -160,18 +160,36 @@ public:
   };
 
   /**
-   * Standardized data struct to pipe additional data to the solver, should it
-   * be needed.
+   * Standardized data struct to pipe additional data to the solver.
    */
   struct AdditionalData
   {
-    const unsigned int number_of_arnoldi_vectors;
-    const WhichEigenvalues eigenvalue_of_interest;
-    const bool symmetric;
-    AdditionalData(
+    /**
+     * Constructor. By default, set the number of Arnoldi vectors (Lanczos
+     * vectors if the problem is symmetric) to 15. Set the solver to find the
+     * eigenvalues of largest magnitude for a non-symmetric problem).
+     */
+    explicit AdditionalData(
       const unsigned int number_of_arnoldi_vectors = 15,
       const WhichEigenvalues eigenvalue_of_interest = largest_magnitude,
       const bool symmetric = false);
+
+    /**
+     * Number of Arnoldi/Lanczos vectors. This number should be less than the
+     * size of the problem but greater than 2 times the number of eigenvalues
+     * (or n_eigenvalues if it is set) plus one.
+     */
+    const unsigned int number_of_arnoldi_vectors;
+
+    /**
+     * Specify the eigenvalues of interest.
+     */
+    const WhichEigenvalues eigenvalue_of_interest;
+
+    /**
+     * Specify if the problem is symmetric or not.
+     */
+    const bool symmetric;
   };
 
   /**
@@ -455,26 +473,20 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
           ArpackExcSmallNumberofArnoldiVectors(
             additional_data.number_of_arnoldi_vectors, nev));
 
-  /* ARPACK mode for dsaupd/dnaupd, here only mode 3,
-   * i.e. shift-invert mode
-   */
+  // ARPACK mode for dsaupd/dnaupd, here only mode 3, i.e. shift-invert mode
   int mode = 3;
 
   // reverse communication parameter
   int ido = 0;
 
-  /**
-   * 'G' generalized eigenvalue problem 'I' standard eigenvalue problem
-   */
+  // 'G' generalized eigenvalue problem 'I' standard eigenvalue problem
   char bmat[2] = "G";
 
-  /**
-   * Specify the eigenvalues of interest, possible parameters "LA"
-   * algebraically largest "SA" algebraically smallest "LM" largest magnitude
-   * "SM" smallest magnitude "LR" largest real part "SR" smallest real part
-   * "LI" largest imaginary part "SI" smallest imaginary part "BE" both ends
-   * of spectrum simultaneous
-   */
+  // Specify the eigenvalues of interest, possible parameters "LA" algebraically
+  // largest "SA" algebraically smallest "LM" largest magnitude "SM" smallest
+  // magnitude "LR" largest real part "SR" smallest real part "LI" largest
+  // imaginary part "SI" smallest imaginary part "BE" both ends of spectrum
+  // simultaneous.
   char which[3];
   switch (additional_data.eigenvalue_of_interest)
     {
@@ -652,9 +664,7 @@ void ArpackSolver::solve (const MatrixType1                  &/*system_matrix*/,
     }
   else
     {
-      /**
-       * 1 - compute eigenvectors, 0 - only eigenvalues
-       */
+      // 1 - compute eigenvectors, 0 - only eigenvalues
       int rvec = 1;
 
       // which eigenvectors
