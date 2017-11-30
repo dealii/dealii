@@ -19,6 +19,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_accessor.templates.h>
 #include <deal.II/grid/tria_iterator.templates.h>
+#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/grid/grid_tools.h>
@@ -1046,7 +1047,10 @@ namespace
   Point<spacedim> get_new_point_on_object(const TriaAccessor<structdim, dim, spacedim> &obj,
                                           const bool use_laplace)
   {
-    if (use_laplace == false)
+    // if we should not do mesh smoothing or if the object is of the old
+    // Boundary type, do only use the old points
+    if (use_laplace == false ||
+        dynamic_cast<const Boundary<dim,spacedim> *>(&obj.get_manifold()) != nullptr)
       return get_new_point_on_object(obj);
     else
       {

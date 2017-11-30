@@ -5814,6 +5814,7 @@ namespace internal
                     triangulation.vertices[next_unused_vertex] =
                       quad->center(true, true);
                     triangulation.vertices_used[next_unused_vertex] = true;
+
                     // now that we created the right point, make up
                     // the four lines interior to the quad (++ takes
                     // care of the end of the vector)
