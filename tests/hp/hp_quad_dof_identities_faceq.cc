@@ -65,7 +65,6 @@ int main ()
 {
   initlog();
 
-  test<2> ();
   test<3> ();
 
   deallog << "OK" << std::endl;
