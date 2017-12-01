@@ -1,0 +1,54 @@
+32 32 1 1
+First 5 ScaLapack eigenvalues
+29.4327   29.6255   29.7881   30.092   30.3062   
+First 5 Lapack eigenvalues
+29.4327   29.6255   29.7881   30.092   30.3062   
+
+64 32 2 2
+First 5 ScaLapack eigenvalues
+59.5716   59.9842   60.1172   60.3363   60.4051   
+First 5 Lapack eigenvalues
+59.5716   59.9842   60.1172   60.3363   60.4051   
+
+64 64 1 1
+First 5 ScaLapack eigenvalues
+59.7161   59.8977   60.3065   60.5131   60.6934   
+First 5 Lapack eigenvalues
+59.7161   59.8977   60.3065   60.5131   60.6934   
+
+120 32 3 3
+First 5 ScaLapack eigenvalues
+114.098   114.163   114.52   114.662   114.877   
+First 5 Lapack eigenvalues
+114.098   114.163   114.52   114.662   114.877   
+
+120 64 2 2
+First 5 ScaLapack eigenvalues
+113.953   114.207   114.496   114.525   114.8   
+First 5 Lapack eigenvalues
+113.953   114.207   114.496   114.525   114.8   
+
+320 32 3 3
+First 5 ScaLapack eigenvalues
+309.886   310.093   310.385   310.648   310.719   
+First 5 Lapack eigenvalues
+309.886   310.093   310.385   310.648   310.719   
+
+320 64 3 3
+First 5 ScaLapack eigenvalues
+309.771   310.096   310.171   310.37   310.471   
+First 5 Lapack eigenvalues
+309.771   310.096   310.171   310.37   310.471   
+
+640 32 3 3
+First 5 ScaLapack eigenvalues
+625.62   625.745   625.974   625.996   626.13   
+First 5 Lapack eigenvalues
+625.62   625.745   625.974   625.996   626.13   
+
+640 64 3 3
+First 5 ScaLapack eigenvalues
+625.381   625.696   625.855   625.983   626.074   
+First 5 Lapack eigenvalues
+625.381   625.696   625.855   625.983   626.074   
+

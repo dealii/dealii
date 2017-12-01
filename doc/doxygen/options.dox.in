@@ -187,6 +187,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_OPENCASCADE=1 \
                          DEAL_II_WITH_P4EST=1 \
                          DEAL_II_WITH_PETSC=1 \
+                         DEAL_II_WITH_SCALAPACK=1 \
                          DEAL_II_WITH_SLEPC=1 \
                          DEAL_II_WITH_SUNDIALS=1 \
                          DEAL_II_WITH_THREADS=1 \

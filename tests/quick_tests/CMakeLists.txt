@@ -173,6 +173,11 @@ IF (DEAL_II_WITH_CUDA)
   make_quicktest("cuda" ${_mybuild} "")
 ENDIF()
 
+# Test ScaLAPACK
+IF (DEAL_II_WITH_SCALAPACK)
+  make_quicktest("scalapack" ${_mybuild} 5)
+ENDIF()
+
 
 # A custom test target:
 ADD_CUSTOM_TARGET(test
