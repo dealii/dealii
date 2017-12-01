@@ -76,7 +76,7 @@ DEAL::trial point distance from origin: 2.19658
 DEAL::projected point distance from origin: 2.00000
 DEAL::projected point:    -1.12083 -1.12083 -1.21963
 DEAL::true line midpoint: -1.12083 -1.12083 -1.21963
-DEAL::distance: 7.11530e-08
+DEAL::distance: 7.09251e-08
 DEAL::
 DEAL::Check that projecting with spacedim == structdim is the identity map:
 DEAL::
@@ -105,13 +105,13 @@ DEAL::Project a weighed face point onto the same face in 3D:
 DEAL::
 DEAL::trial point distance from origin:     2.00000
 DEAL::projected point distance from origin: 2.00000
-DEAL::Error:                                1.37322e-11
+DEAL::Error:                                1.33629e-11
 DEAL::
 DEAL::Project a point offset from the face onto the face in 3D:
 DEAL::
 DEAL::trial point distance from origin:     2.20000
 DEAL::projected point distance from origin: 2.00000
-DEAL::Error (vs. going along the normal):   4.14146e-07
+DEAL::Error (vs. going along the normal):   9.37207e-07
 DEAL::
 DEAL::Project a weighed line point onto the same line in 3D:
 DEAL::
@@ -132,7 +132,7 @@ DEAL::trial point distance from origin: 2.19917
 DEAL::projected point distance from origin: 2.00000
 DEAL::projected point:    -1.13839 -1.13839 -1.18665
 DEAL::true line midpoint: -1.13839 -1.13839 -1.18666
-DEAL::distance: 2.34143e-06
+DEAL::distance: 2.36340e-06
 DEAL::
 DEAL::Check that projecting with spacedim == structdim is the identity map:
 DEAL::
@@ -167,7 +167,7 @@ DEAL::Project a point offset from the face onto the face in 3D:
 DEAL::
 DEAL::trial point distance from origin:     2.20000
 DEAL::projected point distance from origin: 2.00000
-DEAL::Error (vs. going along the normal):   3.61157e-05
+DEAL::Error (vs. going along the normal):   2.99326e-05
 DEAL::
 DEAL::Project a weighed line point onto the same line in 3D:
 DEAL::

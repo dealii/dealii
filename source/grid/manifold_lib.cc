@@ -395,7 +395,7 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
         if (std::abs(1-weights[i])<tolerance)
           return vertices[i];
         const Tensor<1, spacedim> direction(vertices[i] - center);
-        rho += direction.norm() * weights[i];
+        rho += direction.norm_square() * weights[i];
         candidate += direction * weights[i];
         total_weights += weights[i];
       }
@@ -405,6 +405,7 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
       return center;
     candidate /= norm;
     rho /= total_weights;
+    rho /= sqrt(rho);
   }
 
   // If not in 3D, just use the implementation from PolarManifold
