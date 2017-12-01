@@ -37,9 +37,9 @@ int main (int argc, char *argv[])
   {
     parallel::shared::Triangulation<1>
     tria (MPI_COMM_WORLD,
-          ::Triangulation<dim>::none,
+          ::Triangulation<1>::none,
           false,
-          parallel::shared::Triangulation<dim>::partition_metis);
+          parallel::shared::Triangulation<1>::partition_metis);
 
     deallog << tria.locally_owned_subdomain() << std::endl;
   }
