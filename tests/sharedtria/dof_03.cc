@@ -38,8 +38,9 @@ void test()
 {
   parallel::shared::Triangulation<dim>
   triangulation (MPI_COMM_WORLD,
-                 Triangulation<dim>::none,
-                 /*artificial*/true);
+                 ::Triangulation<dim>::none,
+                 /*artificial*/true,
+                 parallel::shared::Triangulation<dim>::partition_metis);
 
   FESystem<dim> fe (FE_Q<dim>(3),2,
                     FE_DGQ<dim>(1),1);

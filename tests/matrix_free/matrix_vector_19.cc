@@ -46,7 +46,11 @@ void test ()
 {
   typedef double number;
 
-  parallel::shared::Triangulation<dim> tria (MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim>
+  triangulation (MPI_COMM_WORLD,
+                 ::Triangulation<dim>::none,
+                 false,
+                 parallel::shared::Triangulation<dim>::partition_metis);
   GridGenerator::hyper_cube (tria);
   tria.refine_global(1);
   typename Triangulation<dim>::active_cell_iterator

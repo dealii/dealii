@@ -65,7 +65,10 @@ void test()
   if (myid == 0)
     deallog << "hyper_cube" << std::endl;
 
-  parallel::shared::Triangulation<dim> tr(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tr(MPI_COMM_WORLD,
+                                          ::Triangulation<dim>::none,
+                                          false,
+                                          parallel::shared::Triangulation<dim>::partition_metis);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(1);
   typename Triangulation<dim>::active_cell_iterator

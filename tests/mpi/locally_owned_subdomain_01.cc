@@ -35,7 +35,12 @@ int main (int argc, char *argv[])
   MPILogInitAll all;
 
   {
-    parallel::shared::Triangulation<1> tria(MPI_COMM_WORLD);
+    parallel::shared::Triangulation<1>
+    tria (MPI_COMM_WORLD,
+          ::Triangulation<dim>::none,
+          false,
+          parallel::shared::Triangulation<dim>::partition_metis);
+
     deallog << tria.locally_owned_subdomain() << std::endl;
   }
 }

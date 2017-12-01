@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// distibute dofs on a shared triangulation. Tests the change
+// distribute dofs on a shared triangulation. Tests the change
 // from coin_flip to smallest proc index method of distribution
 // along partition interface
 

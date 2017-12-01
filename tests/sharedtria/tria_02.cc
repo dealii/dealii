@@ -55,9 +55,11 @@ void write_mesh (const parallel::shared::Triangulation<dim,spacedim> &tria,
 template <int dim>
 void test()
 {
-  parallel::shared::Triangulation<dim> tr(MPI_COMM_WORLD,
-                                          Triangulation<dim>::none,
-                                          /*artificial*/true);
+  parallel::shared::Triangulation<dim>
+  tr (MPI_COMM_WORLD,
+      ::Triangulation<dim>::none,
+      /*artificial*/true,
+      parallel::shared::Triangulation<dim>::partition_metis);
 
   AssertThrow( tr.with_artificial_cells() == true,
                ExcInternalError());

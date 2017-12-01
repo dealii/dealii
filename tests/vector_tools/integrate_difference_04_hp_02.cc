@@ -71,7 +71,10 @@ public:
 template <int dim>
 void test(VectorTools::NormType norm, double value, double exp = 2.0)
 {
-  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD);
+  parallel::shared::Triangulation<dim> tria(MPI_COMM_WORLD,
+                                            ::Triangulation<dim>::none,
+                                            false,
+                                            parallel::shared::Triangulation<dim>::partition_metis);
   GridGenerator::hyper_cube(tria);
   tria.refine_global(3);
 

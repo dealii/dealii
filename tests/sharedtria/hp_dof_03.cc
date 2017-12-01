@@ -42,8 +42,9 @@ void test()
 {
   parallel::shared::Triangulation<dim>
   triangulation (MPI_COMM_WORLD,
-                 Triangulation<dim>::none,
-                 /*artificial*/true);
+                 ::Triangulation<dim>::none,
+                 /*artificial*/true,
+                 parallel::shared::Triangulation<dim>::partition_zorder);
 
   hp::FECollection<dim> fe;
   fe.push_back(FESystem<dim> (FE_Q<dim>(3),2,

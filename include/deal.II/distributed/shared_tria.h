@@ -108,16 +108,27 @@ namespace parallel
        * Configuration flags for distributed Triangulations to be set in the
        * constructor. Settings can be combined using bitwise OR.
        *
-       * The constructor requires that exactly one of <code>partition_metis</code>,
-       * <code>partition_zorder</code>, and <code>partition_custom_signal</code> be set.
-       * If no setting is given to the constructor, it will set <code>partition_metis</code>
-       * by default.
+       * The constructor requires that exactly one of
+       * <code>partition_auto</code>, <code>partition_metis</code>,
+       * <code>partition_zorder</code>, <code>partition_zoltan> and
+       * <code>partition_custom_signal</code> is set. If
+       * <code>partition_auto</code> is chosen, it will use
+       * <code>partition_zoltan</code> (if available), then
+       * <code>partition_metis</code> (if available) and finally
+       * <code>partition_zorder>.
        */
       enum Settings
       {
         /**
-         * Use METIS partitioner to partition active cells. This is the
-         * default partioning method.
+         * Choose the partitioner depending on the enabled dependencies.
+         * If Zoltan is available, partition_zoltan is used. If METIS is
+         * supported partition_metis is chosen afterwards, else
+         * partition_zorder is taken as partitioning strategy.
+         */
+        partition_auto = 0x0,
+
+        /**
+         * Use METIS partitioner to partition active cells.
          */
         partition_metis = 0x1,
 
@@ -126,6 +137,11 @@ namespace parallel
          * p4est library.
          */
         partition_zorder = 0x2,
+
+        /**
+         * Use Zoltan to partition active cells.
+         */
+        partition_zoltan = 0x3,
 
         /**
          * Partition cells using a custom, user defined function. This is
@@ -202,7 +218,7 @@ namespace parallel
                      const typename dealii::Triangulation<dim,spacedim>::MeshSmoothing =
                        (dealii::Triangulation<dim,spacedim>::none),
                      const bool allow_artificial_cells = false,
-                     const Settings settings = partition_metis);
+                     const Settings settings = partition_auto);
 
       /**
        * Destructor.

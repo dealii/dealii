@@ -36,7 +36,10 @@ int main (int argc, char **argv)
     {
       Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
       {
-        parallel::shared::Triangulation<dim> triangulation(MPI_COMM_WORLD);
+        parallel::shared::Triangulation<dim> triangulation(MPI_COMM_WORLD,
+                                                           ::Triangulation<dim>::none,
+                                                           false,
+                                                           parallel::shared::Triangulation<dim>::partition_metis);
         FE_Q<dim> fe(1);
         DoFHandler<dim> dof_handler (triangulation);
 
