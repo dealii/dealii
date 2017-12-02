@@ -323,40 +323,50 @@ SphericalManifold<dim,spacedim>::
 get_tangent_vector (const Point<spacedim> &p1,
                     const Point<spacedim> &p2) const
 {
+  const double tol = 1e-10;
+  (void)tol;
+
   Assert(p1 != p2,
          ExcMessage("p1 and p2 should not concide."));
 
-  const double r1 = (p1 - center).norm();
-  const double r2 = (p2 - center).norm();
+  const Tensor<1,spacedim> v1 = p1 - center;
+  const Tensor<1,spacedim> v2 = p2 - center;
+  const double r1 = v1.norm();
+  const double r2 = v2.norm();
 
-  const double tolerance = 1e-10;
-
-  Assert(r1 > tolerance,
+  Assert(r1 > tol,
          ExcMessage("p1 cannot coincide with the center."));
 
-  Assert(r2 > tolerance,
+  Assert(r2 > tol,
          ExcMessage("p2 cannot coincide with the center."));
 
-  const Tensor<1,spacedim> e1 = (p1 - center)/r1;
-  const Tensor<1,spacedim> e2 = (p2 - center)/r2;
+  const Tensor<1,spacedim> e1 = v1/r1;
+  const Tensor<1,spacedim> e2 = v2/r2;
 
-  Assert(e1*e2 + 1.0 > tolerance,
+  // Find the cosine of the angle gamma described by v1 and v2.
+  const double cosgamma = e1*e2;
+
+  Assert(cosgamma > -1 + 8.*std::numeric_limits<double>::epsilon(),
          ExcMessage("p1 and p2 cannot lie on the same diameter and be opposite "
                     "respect to the center."));
 
-  // Tangent vector to the unit sphere along the geodesic given by e1 and e2.
-  Tensor<1,spacedim> tg = (e2-(e2*e1)*e1);
+  if (cosgamma > 1 - 8.*std::numeric_limits<double>::epsilon())
+    return v2 - v1;
 
-  // There is a special case if e2*e1==1.0, in which case tg==0
-  const double tg_norm = tg.norm();
-  if (tg_norm < tolerance)
-    return p2-p1;
-  else
-    tg /= tg_norm;
+  // Normal to v1 in the plane described by v1,v2,and the origin.
+  // Since p1 and p2 do not coincide n is not zero and well defined.
+  Tensor<1,spacedim> n = v2 - (v2*e1)*e1;
+  const double n_norm = n.norm();
+  Assert( n_norm > 0,
+          ExcInternalError("n should be different from the null vector. "
+                           "Probably, this means v1==v2 or v2==0."));
 
-  const double gamma = std::acos(e1*e2);
+  n /= n_norm;
 
-  return (r1-r2)*e1 + r1*gamma*tg;
+  // this is the derivative of the geodesic in get_intermediate_point
+  // derived with respect to w and inserting w=0.
+  const double gamma = std::acos(cosgamma);
+  return (r2-r1)*e1 + r1*gamma*n;
 }
 
 
