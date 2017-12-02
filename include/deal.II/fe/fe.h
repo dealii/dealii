@@ -2007,7 +2007,7 @@ public:
    * If the finite element defines support points, then their number equals
    * the number of degrees of freedom on the face (#dofs_per_face). The order
    * of points in the array matches that returned by the
-   * <tt>cell->get_dof_indices</tt> function.
+   * <tt>cell->face(face)->get_dof_indices</tt> function.
    *
    * See the class documentation for details on support points.
    */
