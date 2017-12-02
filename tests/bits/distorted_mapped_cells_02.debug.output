@@ -1,3 +1,0 @@
-
-DEAL::(typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), det, point))
-DEAL::Integral = 0

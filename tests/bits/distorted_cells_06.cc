@@ -80,7 +80,8 @@ void check ()
   coarse_grid.set_boundary (99, my_boundary);
 
   // now try to refine this one
-  // cell. we should get an exception
+  // cell. we should not get an exception, but keep it to make sure the
+  // program still runs
   try
     {
       coarse_grid.refine_global(1);
