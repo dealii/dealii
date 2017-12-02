@@ -266,8 +266,8 @@ void test (const int test_case)
 
 int main ()
 {
-  deallog << std::setprecision(2);
-  logfile << std::setprecision(2);
+  deallog << std::setprecision(8);
+  logfile << std::setprecision(8);
   deallog.attach(logfile);
 
   for (unsigned int i=1; i<=3; ++i)
