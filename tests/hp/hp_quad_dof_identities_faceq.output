@@ -1,29 +1,4 @@
 
-DEAL::Identities for FE_FaceQ<2>(1) and FE_FaceQ<2>(1): 0
-DEAL::Identities for FE_FaceQ<2>(1) and FE_FaceQ<2>(2): 0
-DEAL::Identities for FE_FaceQ<2>(1) and FE_FaceQ<2>(3): 0
-DEAL::Identities for FE_FaceQ<2>(1) and FE_FaceQ<2>(4): 0
-DEAL::Identities for FE_FaceQ<2>(1) and FE_FaceQ<2>(5): 0
-DEAL::Identities for FE_FaceQ<2>(2) and FE_FaceQ<2>(1): 0
-DEAL::Identities for FE_FaceQ<2>(2) and FE_FaceQ<2>(2): 0
-DEAL::Identities for FE_FaceQ<2>(2) and FE_FaceQ<2>(3): 0
-DEAL::Identities for FE_FaceQ<2>(2) and FE_FaceQ<2>(4): 0
-DEAL::Identities for FE_FaceQ<2>(2) and FE_FaceQ<2>(5): 0
-DEAL::Identities for FE_FaceQ<2>(3) and FE_FaceQ<2>(1): 0
-DEAL::Identities for FE_FaceQ<2>(3) and FE_FaceQ<2>(2): 0
-DEAL::Identities for FE_FaceQ<2>(3) and FE_FaceQ<2>(3): 0
-DEAL::Identities for FE_FaceQ<2>(3) and FE_FaceQ<2>(4): 0
-DEAL::Identities for FE_FaceQ<2>(3) and FE_FaceQ<2>(5): 0
-DEAL::Identities for FE_FaceQ<2>(4) and FE_FaceQ<2>(1): 0
-DEAL::Identities for FE_FaceQ<2>(4) and FE_FaceQ<2>(2): 0
-DEAL::Identities for FE_FaceQ<2>(4) and FE_FaceQ<2>(3): 0
-DEAL::Identities for FE_FaceQ<2>(4) and FE_FaceQ<2>(4): 0
-DEAL::Identities for FE_FaceQ<2>(4) and FE_FaceQ<2>(5): 0
-DEAL::Identities for FE_FaceQ<2>(5) and FE_FaceQ<2>(1): 0
-DEAL::Identities for FE_FaceQ<2>(5) and FE_FaceQ<2>(2): 0
-DEAL::Identities for FE_FaceQ<2>(5) and FE_FaceQ<2>(3): 0
-DEAL::Identities for FE_FaceQ<2>(5) and FE_FaceQ<2>(4): 0
-DEAL::Identities for FE_FaceQ<2>(5) and FE_FaceQ<2>(5): 0
 DEAL::Identities for FE_FaceQ<3>(1) and FE_FaceQ<3>(1): 4
 DEAL::0 0
 DEAL::1 1
