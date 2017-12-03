@@ -21,6 +21,8 @@
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 
+#include <deal.II/fe/mapping_q_generic.h>
+
 #include <array>
 #include <cmath>
 
@@ -211,19 +213,20 @@ int main()
             << std::endl
             << "minimizers. The output here has been eyeballed as decent."
             << std::endl;
+
+    MappingQGeneric<2, 3> mapping(6);
     for (auto cell : triangulation.active_cell_iterators())
       {
         const Point<3> projected_point = GridTools::project_to_object(cell,
                                          trial_point);
-        deallog << projected_point[0]
-                << ", "
-                << projected_point[1]
-                << ", "
-                << projected_point[2]
-                << std::endl;
 
+        // Ensure that the point we found is both on the manifold and (up to
+        // error in the polynomial approximation of the mapping) on the cell.
         Assert((torus_manifold.push_forward(torus_manifold.pull_back(projected_point)) -
                 projected_point).norm() < 1e-14, ExcInternalError());
+        const Point<2> unit_point = mapping.transform_real_to_unit_cell(cell, projected_point);
+        Assert(GeometryInfo<2>::is_inside_unit_cell(unit_point, 1.0e-5),
+               ExcInternalError());
       }
   }
 
