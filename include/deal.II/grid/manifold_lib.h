@@ -253,7 +253,7 @@ public:
   void
   get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                   const Table<2,double>                  &weights,
-                  ArrayView<Point<spacedim>>              new_points) const;
+                  ArrayView<Point<spacedim>>              new_points) const override;
 
   /**
    * Return a point on the spherical manifold which is intermediate
@@ -306,8 +306,6 @@ private:
    **/
   const PolarManifold<spacedim> polar_manifold;
 };
-
-
 
 /**
  * Cylindrical Manifold description.  In three dimensions, points are

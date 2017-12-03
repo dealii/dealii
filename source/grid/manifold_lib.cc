@@ -413,7 +413,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
 
   // Step 1: Check for some special cases, create simple linear guesses otherwise.
   const double tolerance = 1e-10;
-  std::vector<bool> accurate_point_was_found(new_points.size(),false);
+  boost::container::small_vector<bool,100> accurate_point_was_found(new_points.size(),false);
   const ArrayView<const Tensor<1,spacedim>> array_directions = make_array_view(directions.begin(),directions.end());
   const ArrayView<const double> array_distances = make_array_view(distances.begin(),distances.end());
   for (unsigned int row=0; row<weights.size(0); ++row)
@@ -455,7 +455,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
 
   // Search for duplicate directions and merge them to minimize the cost of
   // the get_new_point function call below.
-  Table<2,double> merged_weights(weights);
+  boost::container::small_vector<double, 1000>             merged_weights(weights.size(0)*weights.size(1));
   boost::container::small_vector<Tensor<1, spacedim>, 100> merged_directions(surrounding_points.size(),Point<spacedim>());
   boost::container::small_vector<double, 100>              merged_distances(surrounding_points.size(),0.0);
 
@@ -464,7 +464,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
     {
       bool found_duplicate = false;
 
-      // This inner loop if of N^2 complexity, but surrounding_points.size()
+      // This inner loop is of $O(N^2)$ complexity, but surrounding_points.size()
       // is usually at most 8 points large.
       for (unsigned int j = 0; j < n_unique_directions; ++j)
         {
@@ -473,7 +473,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
             {
               found_duplicate = true;
               for (unsigned int row = 0; row < weights.size(0); ++row)
-                merged_weights[row][j] += weights[row][i];
+                merged_weights[row*weights.size(1) + j] += weights[row][i];
             }
         }
 
@@ -482,7 +482,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
           merged_directions[n_unique_directions] = directions[i];
           merged_distances[n_unique_directions] = distances[i];
           for (unsigned int row = 0; row < weights.size(0); ++row)
-            merged_weights[row][n_unique_directions] = weights[row][i];
+            merged_weights[row*weights.size(1) + n_unique_directions] = weights[row][i];
 
           ++n_unique_directions;
         }
@@ -497,7 +497,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
   for (unsigned int row=0; row<weights.size(0); ++row)
     if (!accurate_point_was_found[row])
       {
-        const ArrayView<const double> array_merged_weights (merged_weights[row].begin(),n_unique_directions);
+        const ArrayView<const double> array_merged_weights (&merged_weights[row*weights.size(1)],n_unique_directions);
         new_points[row] = get_new_point(array_merged_directions,
                                         array_merged_distances,
                                         array_merged_weights,
@@ -560,6 +560,141 @@ guess_new_point(const ArrayView<const Tensor<1,spacedim>> &directions,
 }
 
 
+namespace
+{
+  template <int spacedim>
+  Point<spacedim>
+  do_get_new_point(const ArrayView<const Tensor<1,spacedim>> &directions,
+                   const ArrayView<const double> &distances,
+                   const ArrayView<const double> &weights,
+                   const Point<spacedim> candidate_point,
+                   const Point<spacedim> center)
+  {
+    Assert(false,ExcNotImplemented());
+  }
+
+  template <>
+  Point<3>
+  do_get_new_point(const ArrayView<const Tensor<1,3>> &directions,
+                   const ArrayView<const double> &distances,
+                   const ArrayView<const double> &weights,
+                   const Point<3> candidate_point,
+                   const Point<3> center)
+  {
+    AssertDimension(directions.size(), distances.size());
+    AssertDimension(directions.size(), weights.size());
+
+    const unsigned int n_merged_points = directions.size();
+    const double tolerance = 1e-10;
+    const int max_iterations = 10;
+
+    // Recover radius and normalized direction from candidate point
+    Tensor <1,3> candidate = candidate_point - center;
+    const double rho = candidate.norm();
+    candidate /= rho;
+
+    {
+      // If the candidate happens to coincide with a normalized
+      // direction, we return it. Otherwise, the Hessian would be singular.
+      for (unsigned int i=0; i<n_merged_points; ++i)
+        {
+          const double squared_distance = (candidate - directions[i]).norm_square();
+          if (squared_distance < tolerance*tolerance)
+            return center + rho * candidate;
+        }
+
+      // check if we only have two points now, in which case we can use the
+      // get_intermediate_point function
+      if (n_merged_points == 2)
+        {
+          SphericalManifold<3,3> unit_manifold;
+          Assert(std::abs(weights[0] + weights[1] - 1.0) < 1e-13,
+                 ExcMessage("Weights do not sum up to 1"));
+          Point<3> intermediate = unit_manifold.get_intermediate_point
+                                  (Point<3>(directions[0]), Point<3>(directions[1]), weights[1]);
+          return center + rho * intermediate;
+        }
+
+      Tensor<1,3> vPerp;
+      Tensor<2,2> Hessian;
+      Tensor<1,2> gradient;
+      Tensor<1,2> gradlocal;
+
+      // On success we exit the loop early.
+      // Otherwise, we just take the result after max_iterations steps.
+      for (unsigned int i=0; i<max_iterations; ++i)
+        {
+          // Step 2a: Find new descent direction
+
+          // Get local basis for the estimate candidate
+          const Tensor<1,3> Clocalx = internal::compute_normal(candidate);
+          const Tensor<1,3> Clocaly = cross_product_3d(candidate, Clocalx);
+
+          // For each vertices vector, compute the tangent vector from candidate
+          // towards the vertices vector -- its length is the spherical length
+          // from candidate to the vertices vector.
+          // Then compute its contribution to the Hessian.
+          gradient = 0.;
+          Hessian = 0.;
+          for (unsigned int i=0; i<n_merged_points; ++i)
+            if (std::abs(weights[i])>1.e-15)
+              {
+                vPerp = internal::projected_direction(directions[i], candidate);
+                const double sintheta = vPerp.norm();
+                if (sintheta<tolerance)
+                  {
+                    Hessian[0][0] += weights[i];
+                    Hessian[1][1] += weights[i];
+                  }
+                else
+                  {
+                    const double costheta = (directions[i])*candidate;
+                    const double theta = atan2(sintheta, costheta);
+                    const double sinthetaInv = 1.0/sintheta;
+
+                    vPerp *= sinthetaInv;
+                    const double cosphi = vPerp*Clocalx;
+                    const double sinphi = vPerp*Clocaly;
+
+                    gradlocal[0] = cosphi;
+                    gradlocal[1] = sinphi;
+                    gradient += (weights[i]*theta)*gradlocal;
+
+                    const double sinphiSq = sinphi*sinphi;
+                    const double cosphiSq = cosphi*cosphi;
+                    const double tt = (theta*sinthetaInv)*costheta;
+                    const double offdiag = cosphi*sinphi*weights[i]*(1.0-tt);
+                    Hessian[0][0] += weights[i]*(cosphiSq+tt*sinphiSq);
+                    Hessian[0][1] += offdiag;
+                    Hessian[1][0] += offdiag;
+                    Hessian[1][1] += weights[i]*(sinphiSq+tt*cosphiSq);
+                  }
+              }
+
+          Assert(determinant(Hessian)>tolerance, ExcInternalError());
+
+          const Tensor<2,2> inverse_Hessian = invert(Hessian);
+
+          const Tensor<1,2> xDisplocal = inverse_Hessian*gradient;
+          const Tensor<1,3> xDisp = xDisplocal[0]*Clocalx + xDisplocal[1]*Clocaly;
+
+          // Step 2b: rotate candidate in direction xDisp for a new candidate.
+          const Tensor<1,3> candidateOld = candidate;
+          candidate = internal::apply_exponential_map(candidate, xDisp);
+
+          // Step 3c: return the new candidate if we didn't move
+          if ((candidate-candidateOld).norm_square() < tolerance*tolerance)
+            break;
+        }
+
+      Assert (std::abs(candidate[2]) < tolerance,
+              ExcInternalError());
+    }
+    return center + rho*candidate;
+  }
+}
+
+
 
 template <int dim, int spacedim>
 Point<spacedim>
@@ -569,142 +704,47 @@ get_new_point (const ArrayView<const Tensor<1,spacedim>> &directions,
                const ArrayView<const double> &weights,
                const Point<spacedim> candidate_point) const
 {
-  AssertDimension(directions.size(), distances.size());
-  AssertDimension(directions.size(), weights.size());
+  Assert (false, ExcNotImplemented());
+  return Point<spacedim>();
+}
 
-  const unsigned int n_merged_points = directions.size();
-  const double tolerance = 1e-10;
-  const int max_iterations = 10;
 
-  // Recover radius and normalized direction from candidate point
-  Tensor <1,spacedim> candidate = candidate_point - center;
-  const double rho = candidate.norm();
-  candidate /= rho;
 
-  // In this step, we consider all points and directions to be embedded
-  // in a three-dimensional space. The case spacedim < 2 was handled in get_new_points()
-  {
-    Tensor<1, 3> xVec;
-    for (unsigned int c=0; c<spacedim; ++c)
-      xVec[c]=candidate[c];
+template <>
+Point<3>
+SphericalManifold<1,3>::
+get_new_point (const ArrayView<const Tensor<1,3>> &directions,
+               const ArrayView<const double> &distances,
+               const ArrayView<const double> &weights,
+               const Point<3> candidate_point) const
+{
+  return do_get_new_point(directions,distances,weights,candidate_point,center);
+}
 
-    // If the candidate happens to coincide with a normalized
-    // direction, we return it. Otherwise, the Hessian would be singular.
-    boost::container::small_vector<Tensor<1, 3>, 100> directions_3d(directions.size());
-    for (unsigned int i=0; i<n_merged_points; ++i)
-      {
-        const Tensor<1,spacedim> normalized_direction = directions[i] / distances[i];
-        const double squared_distance = (candidate - normalized_direction).norm_square();
-        if (squared_distance < tolerance*tolerance)
-          return center + rho * candidate;
 
-        // append direction. check if the normalized candidate direction is
-        // the same as a previous direction (to a tighter tolerance (1e-14)^2
-        // than the outer ones to really not miss anything) -> in that case we
-        // can simply add the weights. Since the trigonometric functions used
-        // below are quite expensive, it makes sense to merge the points here,
-        // even if this search loop is of quadratic complexity loop (but we
-        // rarely have more than 9 points)
-        Tensor<1,3> direction_3d;
-        for (unsigned int c=0; c<spacedim; ++c)
-          directions_3d[i][c] = directions[i][c] / distances[i];
-      }
 
-    // check if we only have two points now, in which case we can use the
-    // get_intermediate_point function
-    if (n_merged_points == 2)
-      {
-        SphericalManifold<3,3> unit_manifold;
-        Assert(std::abs(weights[0] + weights[1] - 1.0) < 1e-13,
-               ExcMessage("Weights do not sum up to 1"));
-        Point<3> intermediate = unit_manifold.get_intermediate_point
-                                (Point<3>(directions_3d[0]), Point<3>(directions_3d[1]), weights[1]);
-        // copy back to spacedim-point
-        Point<spacedim> p;
-        for (unsigned int d=0; d<spacedim; ++d)
-          p[d] = intermediate[d];
-        return center + rho * p;
-      }
+template <>
+Point<3>
+SphericalManifold<2,3>::
+get_new_point (const ArrayView<const Tensor<1,3>> &directions,
+               const ArrayView<const double> &distances,
+               const ArrayView<const double> &weights,
+               const Point<3> candidate_point) const
+{
+  return do_get_new_point(directions,distances,weights,candidate_point,center);
+}
 
-    Tensor<1,3> vPerp;
-    Tensor<2,2> Hessian;
-    Tensor<1,2> gradient;
-    Tensor<1,2> gradlocal;
 
-    // On success we exit the loop early.
-    // Otherwise, we just take the result after max_iterations steps.
-    for (unsigned int i=0; i<max_iterations; ++i)
-      {
-        // Step 2a: Find new descent direction
 
-        // Get local basis for the estimate xVec
-        const Tensor<1,3> Clocalx = internal::compute_normal(xVec);
-        const Tensor<1,3> Clocaly = cross_product_3d(xVec, Clocalx);
-
-        // For each vertices vector, compute the tangent vector from xVec
-        // towards the vertices vector -- its length is the spherical length
-        // from xVec to the vertices vector.
-        // Then compute its contribution to the Hessian.
-        gradient = 0.;
-        Hessian = 0.;
-        for (unsigned int i=0; i<n_merged_points; ++i)
-          if (std::abs(weights[i])>1.e-15)
-            {
-              vPerp = internal::projected_direction(directions_3d[i], xVec);
-              const double sintheta = vPerp.norm();
-              if (sintheta<tolerance)
-                {
-                  Hessian[0][0] += weights[i];
-                  Hessian[1][1] += weights[i];
-                }
-              else
-                {
-                  const double costheta = (directions_3d[i])*xVec;
-                  const double theta = atan2(sintheta, costheta);
-                  const double sinthetaInv = 1.0/sintheta;
-
-                  vPerp *= sinthetaInv;
-                  const double cosphi = vPerp*Clocalx;
-                  const double sinphi = vPerp*Clocaly;
-
-                  gradlocal[0] = cosphi;
-                  gradlocal[1] = sinphi;
-                  gradient += (weights[i]*theta)*gradlocal;
-
-                  const double sinphiSq = sinphi*sinphi;
-                  const double cosphiSq = cosphi*cosphi;
-                  const double tt = (theta*sinthetaInv)*costheta;
-                  const double offdiag = cosphi*sinphi*weights[i]*(1.0-tt);
-                  Hessian[0][0] += weights[i]*(cosphiSq+tt*sinphiSq);
-                  Hessian[0][1] += offdiag;
-                  Hessian[1][0] += offdiag;
-                  Hessian[1][1] += weights[i]*(sinphiSq+tt*cosphiSq);
-                }
-            }
-
-        Assert(determinant(Hessian)>tolerance, ExcInternalError());
-
-        const Tensor<2,2> inverse_Hessian = invert(Hessian);
-
-        const Tensor<1,2> xDisplocal = inverse_Hessian*gradient;
-        const Tensor<1,3> xDisp = xDisplocal[0]*Clocalx + xDisplocal[1]*Clocaly;
-
-        // Step 2b: rotate xVec in direction xDisp for a new candidate.
-        const Tensor<1,3> xVecOld = xVec;
-        xVec = internal::apply_exponential_map(xVec, xDisp);
-
-        // Step 3c: return the new candidate if we didn't move
-        if ((xVec-xVecOld).norm_square() < tolerance*tolerance)
-          break;
-      }
-
-    for (unsigned int c=0; c<spacedim; ++c)
-      candidate[c] = xVec[c];
-
-    Assert (spacedim == 3 || std::abs(xVec[2]) < tolerance,
-            ExcInternalError());
-  }
-  return center + rho*candidate;
+template <>
+Point<3>
+SphericalManifold<3,3>::
+get_new_point (const ArrayView<const Tensor<1,3>> &directions,
+               const ArrayView<const double> &distances,
+               const ArrayView<const double> &weights,
+               const Point<3> candidate_point) const
+{
+  return do_get_new_point(directions,distances,weights,candidate_point,center);
 }
 
 
