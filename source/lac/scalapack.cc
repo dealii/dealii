@@ -144,7 +144,7 @@ template <typename NumberType>
 unsigned int
 ScaLAPACKMatrix<NumberType>::global_row(const unsigned int loc_row) const
 {
-  Assert (loc_row >= 0 && loc_row < n_local_rows,
+  Assert (n_local_rows >= 0 && loc_row < static_cast<unsigned int>(n_local_rows),
           ExcIndexRange(loc_row,0,n_local_rows));
   const int i = loc_row+1;
   return indxl2g_ (&i, &row_block_size, &(grid->this_process_row), &first_process_row, &(grid->n_process_rows)) - 1;
@@ -156,7 +156,7 @@ template <typename NumberType>
 unsigned int
 ScaLAPACKMatrix<NumberType>::global_column(const unsigned int loc_column) const
 {
-  Assert (loc_column >= 0 && loc_column < n_local_columns,
+  Assert (n_local_columns >= 0 && loc_column < static_cast<unsigned int>(n_local_columns),
           ExcIndexRange(loc_column,0,n_local_columns));
   const int j = loc_column+1;
   return indxl2g_ (&j, &column_block_size, &(grid->this_process_column), &first_process_column, &(grid->n_process_columns)) - 1;
