@@ -1,0 +1,23 @@
+
+DEAL:0:1d::n_dofs: 9
+DEAL:0:1d::n_locally_owned_dofs: 3
+DEAL:0:2d::n_dofs: 81
+DEAL:0:2d::n_locally_owned_dofs: 36
+DEAL:0:3d::n_dofs: 729
+DEAL:0:3d::n_locally_owned_dofs: 290
+
+DEAL:1:1d::n_dofs: 9
+DEAL:1:1d::n_locally_owned_dofs: 3
+DEAL:1:2d::n_dofs: 81
+DEAL:1:2d::n_locally_owned_dofs: 26
+DEAL:1:3d::n_dofs: 729
+DEAL:1:3d::n_locally_owned_dofs: 216
+
+
+DEAL:2:1d::n_dofs: 9
+DEAL:2:1d::n_locally_owned_dofs: 3
+DEAL:2:2d::n_dofs: 81
+DEAL:2:2d::n_locally_owned_dofs: 19
+DEAL:2:3d::n_dofs: 729
+DEAL:2:3d::n_locally_owned_dofs: 223
+

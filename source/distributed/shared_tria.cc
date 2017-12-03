@@ -78,7 +78,7 @@ namespace parallel
         = (partition_zoltan | partition_metis |
            partition_zorder | partition_custom_signal) & settings;
       if (partition_settings == partition_auto)
-#ifdef DEAL_II_WITH_ZOLTAN
+#ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
         partition_settings = partition_zoltan;
 #elif defined DEAL_II_WITH_METIS
         partition_settings = partition_metis;
@@ -88,7 +88,7 @@ namespace parallel
 
       if (partition_settings == partition_zoltan)
         {
-#ifndef DEAL_II_WITH_ZOLTAN
+#ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
           AssertThrow (false,
                        ExcMessage("Choosing 'partition_zoltan' requires the library "
                                   "to be compiled with support for Zoltan! "
