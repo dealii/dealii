@@ -299,7 +299,7 @@ private:
   get_new_point (const ArrayView<const Tensor<1,spacedim>> &directions,
                  const ArrayView<const double> &distances,
                  const ArrayView<const double> &weights,
-                 const Point<spacedim> candidate_point) const;
+                 const Point<spacedim> &candidate_point) const;
 
   /**
    * A manifold description to be used for get_new_point in 2D.

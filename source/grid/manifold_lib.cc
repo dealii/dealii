@@ -378,6 +378,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                 const Table<2,double>                  &weights,
                 ArrayView<Point<spacedim>>              new_points) const
 {
+  AssertDimension(new_points.size(), weights.size(0));
   AssertDimension(surrounding_points.size(), weights.size(1));
 
   if (surrounding_points.size() == 2)
@@ -387,6 +388,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
       return;
     }
 
+  boost::container::small_vector<std::pair<double,Tensor<1, spacedim>>, 100> new_candidates(new_points.size());
   boost::container::small_vector<Tensor<1, spacedim>, 100> directions(surrounding_points.size(),Point<spacedim>());
   boost::container::small_vector<double, 100>              distances(surrounding_points.size(),0.0);
   double max_distance = 0.;
@@ -418,13 +420,13 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
   const ArrayView<const double> array_distances = make_array_view(distances.begin(),distances.end());
   for (unsigned int row=0; row<weights.size(0); ++row)
     {
-      const std::pair<double, Tensor<1,spacedim>> candidate = guess_new_point(array_directions,
-                                                              array_distances,
-                                                              make_array_view(weights,row));
+      new_candidates[row] = guess_new_point(array_directions,
+                                            array_distances,
+                                            make_array_view(weights,row));
 
       // If the candidate is the center, mark it as found to avoid entering
       // the Newton iteration in step 2, which would crash.
-      if (candidate.first == 0.0)
+      if (new_candidates[row].first == 0.0)
         {
           new_points[row] = center;
           accurate_point_was_found[row] = true;
@@ -440,15 +442,19 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
           continue;
         }
 
-      new_points[row] = center + candidate.first * candidate.second;
     }
 
   // If all the points are close to each other, we expect the estimate to
   // be good enough. This tolerance was chosen such that the first iteration
   // for a at least three time refined HyperShell mesh with radii .5 and 1.
   // doesn't already succeed.
-  if (max_distance < 1e-2 || spacedim<3)
-    return;
+  if (max_distance < 2e-2 || spacedim<3)
+    {
+      for (unsigned int row=0; row<weights.size(0); ++row)
+        new_points[row] = center + new_candidates[row].first * new_candidates[row].second;
+
+      return;
+    }
 
   // Step 2:
   // Do more expensive Newton-style iterations to improve the estimate.
@@ -488,6 +494,33 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
         }
     }
 
+  // Search for duplicate weight rows and merge them to minimize the cost of
+  // the get_new_point function call below.
+  boost::container::small_vector<unsigned int, 100> merged_weights_index(new_points.size(),numbers::invalid_unsigned_int);
+  unsigned int unique_weight_rows = 0;
+  for (unsigned int row = 0; row < new_points.size(); ++row)
+    {
+      bool found_identical_row = false;
+      for (unsigned int existing_row = 0; existing_row < row; ++existing_row)
+        {
+          bool identical_weights = true;
+
+          for (unsigned int weight_index = 0; weight_index < n_unique_directions; ++weight_index)
+            if (merged_weights[row*weights.size(1) + weight_index] != merged_weights[existing_row*weights.size(1) + weight_index])
+              {
+                identical_weights = false;
+                break;
+              }
+
+          if (identical_weights)
+            {
+              found_identical_row = true;
+              merged_weights_index[row] = existing_row;
+              break;
+            }
+        }
+    }
+
   // Note that we only use the n_unique_directions first entries in the ArrayView
   const ArrayView<const Tensor<1,spacedim>> array_merged_directions = make_array_view(merged_directions.begin(),
                                          merged_directions.begin()+n_unique_directions);
@@ -497,11 +530,18 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
   for (unsigned int row=0; row<weights.size(0); ++row)
     if (!accurate_point_was_found[row])
       {
-        const ArrayView<const double> array_merged_weights (&merged_weights[row*weights.size(1)],n_unique_directions);
-        new_points[row] = get_new_point(array_merged_directions,
-                                        array_merged_distances,
-                                        array_merged_weights,
-                                        new_points[row]);
+        if (merged_weights_index[row] == numbers::invalid_unsigned_int)
+          {
+            const ArrayView<const double> array_merged_weights (&merged_weights[row*weights.size(1)],n_unique_directions);
+            new_candidates[row].second = get_new_point(array_merged_directions,
+                                                       array_merged_distances,
+                                                       array_merged_weights,
+                                                       Point<spacedim>(new_candidates[row].second));
+          }
+        else
+          new_candidates[row].second = new_candidates[merged_weights_index[row]].second;
+
+        new_points[row] = center + new_candidates[row].first * new_candidates[row].second;
       }
 }
 
@@ -567,10 +607,11 @@ namespace
   do_get_new_point(const ArrayView<const Tensor<1,spacedim>> &directions,
                    const ArrayView<const double> &distances,
                    const ArrayView<const double> &weights,
-                   const Point<spacedim> candidate_point,
-                   const Point<spacedim> center)
+                   const Point<spacedim> &candidate_point,
+                   const Point<spacedim> &center)
   {
     Assert(false,ExcNotImplemented());
+    return Point<spacedim>();
   }
 
   template <>
@@ -578,20 +619,16 @@ namespace
   do_get_new_point(const ArrayView<const Tensor<1,3>> &directions,
                    const ArrayView<const double> &distances,
                    const ArrayView<const double> &weights,
-                   const Point<3> candidate_point,
-                   const Point<3> center)
+                   const Point<3> &candidate_point,
+                   const Point<3> &center)
   {
     AssertDimension(directions.size(), distances.size());
     AssertDimension(directions.size(), weights.size());
 
+    Point<3> candidate = candidate_point;
     const unsigned int n_merged_points = directions.size();
     const double tolerance = 1e-10;
     const int max_iterations = 10;
-
-    // Recover radius and normalized direction from candidate point
-    Tensor <1,3> candidate = candidate_point - center;
-    const double rho = candidate.norm();
-    candidate /= rho;
 
     {
       // If the candidate happens to coincide with a normalized
@@ -600,7 +637,7 @@ namespace
         {
           const double squared_distance = (candidate - directions[i]).norm_square();
           if (squared_distance < tolerance*tolerance)
-            return center + rho * candidate;
+            return candidate;
         }
 
       // check if we only have two points now, in which case we can use the
@@ -612,7 +649,7 @@ namespace
                  ExcMessage("Weights do not sum up to 1"));
           Point<3> intermediate = unit_manifold.get_intermediate_point
                                   (Point<3>(directions[0]), Point<3>(directions[1]), weights[1]);
-          return center + rho * intermediate;
+          return intermediate;
         }
 
       Tensor<1,3> vPerp;
@@ -679,18 +716,15 @@ namespace
           const Tensor<1,3> xDisp = xDisplocal[0]*Clocalx + xDisplocal[1]*Clocaly;
 
           // Step 2b: rotate candidate in direction xDisp for a new candidate.
-          const Tensor<1,3> candidateOld = candidate;
-          candidate = internal::apply_exponential_map(candidate, xDisp);
+          const Point<3> candidateOld = candidate;
+          candidate = Point<3>(internal::apply_exponential_map(candidate, xDisp));
 
-          // Step 3c: return the new candidate if we didn't move
+          // Step 2c: return the new candidate if we didn't move
           if ((candidate-candidateOld).norm_square() < tolerance*tolerance)
             break;
         }
-
-      Assert (std::abs(candidate[2]) < tolerance,
-              ExcInternalError());
     }
-    return center + rho*candidate;
+    return candidate;
   }
 }
 
@@ -702,7 +736,7 @@ SphericalManifold<dim,spacedim>::
 get_new_point (const ArrayView<const Tensor<1,spacedim>> &directions,
                const ArrayView<const double> &distances,
                const ArrayView<const double> &weights,
-               const Point<spacedim> candidate_point) const
+               const Point<spacedim> &candidate_point) const
 {
   Assert (false, ExcNotImplemented());
   return Point<spacedim>();
@@ -716,7 +750,7 @@ SphericalManifold<1,3>::
 get_new_point (const ArrayView<const Tensor<1,3>> &directions,
                const ArrayView<const double> &distances,
                const ArrayView<const double> &weights,
-               const Point<3> candidate_point) const
+               const Point<3> &candidate_point) const
 {
   return do_get_new_point(directions,distances,weights,candidate_point,center);
 }
@@ -729,7 +763,7 @@ SphericalManifold<2,3>::
 get_new_point (const ArrayView<const Tensor<1,3>> &directions,
                const ArrayView<const double> &distances,
                const ArrayView<const double> &weights,
-               const Point<3> candidate_point) const
+               const Point<3> &candidate_point) const
 {
   return do_get_new_point(directions,distances,weights,candidate_point,center);
 }
@@ -742,7 +776,7 @@ SphericalManifold<3,3>::
 get_new_point (const ArrayView<const Tensor<1,3>> &directions,
                const ArrayView<const double> &distances,
                const ArrayView<const double> &weights,
-               const Point<3> candidate_point) const
+               const Point<3> &candidate_point) const
 {
   return do_get_new_point(directions,distances,weights,candidate_point,center);
 }
