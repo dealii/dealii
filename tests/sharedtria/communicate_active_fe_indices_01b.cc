@@ -18,6 +18,8 @@
 // check that processors correctly communicate active_fe_index
 // information from their own locally owned cells to the ghosts on
 // other processors
+// This is the same as communicate_active_fe_indices_01 but using
+// METIS as partitioner.
 
 
 #include "../tests.h"
@@ -43,7 +45,7 @@ void test()
   triangulation (MPI_COMM_WORLD,
                  ::Triangulation<dim>::none,
                  false,
-                 parallel::shared::Triangulation<dim>::partition_zorder);
+                 parallel::shared::Triangulation<dim>::partition_metis);
 
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global (3);
