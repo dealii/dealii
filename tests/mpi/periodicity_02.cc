@@ -18,7 +18,7 @@
 // check solution for periodicity. The used test case is based on step-22.
 // We consider a 2D quarter hyper shell and require periodicity with respect to
 // the left and lower boundary.
-// We refine two times adaptively using the Kelly error estimator.
+// We refine two times adaptively using the Kelly error estimator. Note that
 //
 
 #define PERIODIC
@@ -696,10 +696,11 @@ namespace Step22
                                         estimated_error_per_cell,
                                         fe.component_mask(pressure));
 
+    // Note: this test does
     parallel::distributed::GridRefinement::
     refine_and_coarsen_fixed_number (triangulation,
                                      estimated_error_per_cell,
-                                     0.3, 0.0);
+                                     0.32, 0.0);
     triangulation.execute_coarsening_and_refinement ();
   }
 
