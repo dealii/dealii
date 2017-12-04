@@ -925,8 +925,8 @@ namespace internal
        * This function is needed by the constructor of
        * <tt>MappingQ<dim,spacedim></tt> for <tt>dim=</tt> 2 and 3.
        *
-       * For the definition of the @p support_point_weights_on_quad please refer to
-       * equation (8) of the `mapping' report.
+       * For the definition of the @p support_point_weights_on_quad please
+       * refer to the description of TransfiniteInterpolationManifold.
        */
       dealii::Table<2,double>
       compute_support_point_weights_on_quad(const unsigned int polynomial_degree)
@@ -974,8 +974,8 @@ namespace internal
       /**
        * This function is needed by the constructor of <tt>MappingQ<3></tt>.
        *
-       * For the definition of the @p support_point_weights_on_hex please refer to
-       * equation (8) of the `mapping' report.
+       * For the definition of the @p support_point_weights_on_quad please
+       * refer to the description of TransfiniteInterpolationManifold.
        */
       dealii::Table<2,double>
       compute_support_point_weights_on_hex(const unsigned int polynomial_degree)

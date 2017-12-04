@@ -71,12 +71,13 @@ namespace Manifolds
    *   are the vertices, the line mid-points, and the face mid-points.
    *   This results in a quadrature object with 26 (8+12+6) points.
    *
-   * The quadrature weights for these points are either chosen identically
-   * and equal to one over the number of quadrature points (if @p with_laplace
-   * is @p false), or in a way that gives points closer to the cell center
-   * (measured on the reference cell) a higher weight. These weights correspond
-   * to solving a Laplace equation and evaluating the solution at the quadrature
-   * points (if @p with_laplace is @p true).
+   * The quadrature weights for these points are either chosen identically and
+   * equal to one over the number of quadrature points (if @p
+   * with_interpolation is @p false), or in a way that gives points closer to
+   * the cell center (measured on the reference cell) a higher weight. These
+   * weights correspond to the weights applied to lines and vertices in
+   * transfinite interpolation (see TransfiniteInterpolationManifold for a
+   * more thorough description) if @p with_interpolation is @p true.
    *
    * The function is primarily used to construct the input argument
    * for the Manifold::get_new_point() function, which computes a new
@@ -91,8 +92,8 @@ namespace Manifolds
    *
    * @param[in] iterator A mesh iterator that points to either a line, quad,
    *   or hex.
-   * @param[in] with_laplace Whether or not to compute the quadrature weights
-   *   by solving a Laplace equation, as discussed above.
+   * @param[in] with_interpolation Whether or not to compute the quadrature weights
+   *   from transfinite interpolation, as discussed above.
    * @tparam MeshIteratorType An iterator type that corresponds to either
    *   Triangulation::cell_iterator (or variants such as
    *   Triangulation::active_cell_iterator or DoFHandler::cell_iterator) or
@@ -103,7 +104,7 @@ namespace Manifolds
   DEAL_II_DEPRECATED
   Quadrature<MeshIteratorType::AccessorType::space_dimension>
   get_default_quadrature(const MeshIteratorType &iterator,
-                         const bool              with_laplace = false);
+                         const bool              with_interpolation = false);
 
   /**
    * Given a general mesh iterator, construct arrays of quadrature points and
@@ -118,12 +119,13 @@ namespace Manifolds
    *   are the vertices, the line mid-points, and the face mid-points.
    *   This results in a points vector with 26 (8+12+6) points.
    *
-   * The quadrature weights for these points are either chosen identically
-   * and equal to one over the number of quadrature points (if @p with_laplace
-   * is @p false), or in a way that gives points closer to the cell center
-   * (measured on the reference cell) a higher weight. These weights correspond
-   * to solving a Laplace equation and evaluating the solution at the quadrature
-   * points (if @p with_laplace is @p true).
+   * The quadrature weights for these points are either chosen identically and
+   * equal to one over the number of quadrature points (if @p
+   * with_interpolation is @p false), or in a way that gives points closer to
+   * the cell center (measured on the reference cell) a higher weight. These
+   * weights correspond to the weights applied to lines and vertices in
+   * transfinite interpolation (see TransfiniteInterpolationManifold for a
+   * more thorough description) if @p with_interpolation is @p true.
    *
    * The function is primarily used to construct the input argument
    * for the Manifold::get_new_point() function, which computes a new
@@ -138,8 +140,8 @@ namespace Manifolds
    *
    * @param[in] iterator A mesh iterator that points to either a line, quad,
    *   or hex.
-   * @param[in] with_laplace Whether or not to compute the quadrature weights
-   *   by solving a Laplace equation, as discussed above.
+   * @param[in] with_interpolation Whether or not to compute the quadrature weights
+   *   from transfinite interpolation, as discussed above.
    * @tparam MeshIteratorType An iterator type that corresponds to either
    *   Triangulation::cell_iterator (or variants such as
    *   Triangulation::active_cell_iterator or DoFHandler::cell_iterator) or
@@ -151,7 +153,7 @@ namespace Manifolds
       n_default_points_per_cell<MeshIteratorType>()>,
       std::array<double, n_default_points_per_cell<MeshIteratorType>()> >
       get_default_points_and_weights(const MeshIteratorType &iterator,
-                                     const bool              with_laplace = false);
+                                     const bool              with_interpolation = false);
 }
 
 /**
@@ -1139,9 +1141,9 @@ namespace Manifolds
   template <typename MeshIteratorType>
   Quadrature<MeshIteratorType::AccessorType::space_dimension>
   get_default_quadrature(const MeshIteratorType &iterator,
-                         const bool              with_laplace)
+                         const bool              with_interpolation)
   {
-    const auto points_and_weights = get_default_points_and_weights(iterator, with_laplace);
+    const auto points_and_weights = get_default_points_and_weights(iterator, with_interpolation);
     static const int spacedim = MeshIteratorType::AccessorType::space_dimension;
     return Quadrature<spacedim>
            (std::vector<Point<spacedim>>(points_and_weights.first.begin(),
@@ -1157,7 +1159,7 @@ namespace Manifolds
       n_default_points_per_cell<MeshIteratorType>()>,
       std::array<double, n_default_points_per_cell<MeshIteratorType>()> >
       get_default_points_and_weights(const MeshIteratorType &iterator,
-                                     const bool              with_laplace)
+                                     const bool              with_interpolation)
   {
     const int dim = MeshIteratorType::AccessorType::structure_dimension;
     const int spacedim = MeshIteratorType::AccessorType::space_dimension;
@@ -1170,7 +1172,7 @@ namespace Manifolds
     // note that the exact weights are chosen such as to minimize the
     // distortion of the four new quads from the optimal shape; their
     // derivation and values is copied over from the
-    // @p{MappingQ::set_laplace_on_vector} function
+    // interpolation function in the mapping
     switch (dim)
       {
       case 1:
@@ -1193,7 +1195,7 @@ namespace Manifolds
                                           iterator->line(i)->get_manifold().get_new_point_on_line(iterator->line(i)) );
           }
 
-        if (with_laplace)
+        if (with_interpolation)
           {
             std::fill(points_weights.second.begin(), points_weights.second.begin()+4, -0.25);
             std::fill(points_weights.second.begin()+4, points_weights.second.end(), 0.5);
@@ -1217,9 +1219,10 @@ namespace Manifolds
         unsigned int j=0;
 
         // note that the exact weights are chosen such as to minimize the
-        // distortion of the eight new hexes from the optimal shape; their
-        // derivation and values is copied over from the
-        // @p{MappingQ::set_laplace_on_vector} function
+        // distortion of the eight new hexes from the optimal shape through
+        // transfinite interpolation from the faces and vertices, see
+        // TransfiniteInterpolationManifold for a deeper explanation of the
+        // mechanisms
         for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i, ++j)
           {
             (*sp3)[j] = hex->vertex(i);
@@ -1240,8 +1243,8 @@ namespace Manifolds
             points_weights.second[j] = 1.0/2.0;
           }
         // Overwrite the weights with 1/np if we don't want to use
-        // laplace vectors.
-        if (with_laplace == false)
+        // interpolation.
+        if (with_interpolation == false)
           std::fill(points_weights.second.begin(), points_weights.second.end(), 1.0/np);
       }
       break;

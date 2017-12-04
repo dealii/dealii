@@ -1394,19 +1394,29 @@ public:
    * point to the physical space again; the resulting point is guaranteed to
    * lie within the manifold, even if the manifold is curved.
    *
-   * When the geometry of a TriaAccessor is not flat, or when part of the
-   * bounding objects of this TriaAccessor are not flat, the result given by
-   * the TriaAccessor::center() function may not be accurate enough, even when
-   * parameter @p respect_manifold is set to true. If you find this to be
-   * case, than you can further refine the computation of the center by
-   * setting to true the second additional parameter
-   * @p use_laplace_transformation, which will force this function to compute
-   * the location of the center by solving a linear elasticity problem with
-   * Dirichlet boundary conditions set to the location of the bounding
-   * vertices and the centers of the bounding lines and quads.
+   * When the object uses a different manifold description as its surrounding,
+   * like when part of the bounding objects of this TriaAccessor use a
+   * non-flat manifold description but the object itself is flat, the result
+   * given by the TriaAccessor::center() function may not be accurate enough,
+   * even when parameter @p respect_manifold is set to true. If you find this
+   * to be case, than you can further refine the computation of the center by
+   * setting to true the second additional parameter @p
+   * interpolate_from_surrounding. This computes the location of the center by
+   * a so-called transfinite interpolation from the center of all the bounding
+   * objects. For a 2D object, it puts a weight of <code>1/2</code> on each of
+   * the four surrounding lines and a weight <code>-1/4</code> on the four
+   * vertices. This corresponds to a linear interpolation between the
+   * descriptions of the four faces, subtracting the contribution of the
+   * vertices that is added twice when coming through both lines adjacent to
+   * the vertex. In 3D, the weights for faces are <code>1/2</code>, the
+   * weights for lines are <code>-1/4</code>, and the weights for vertices are
+   * <code>1/8</code>. For further information, also confer to the
+   * TransfiniteInterpolationManifold class that is able to not only apply
+   * this beneficial description to a single cell but all children of a coarse
+   * cell.
    */
   Point<spacedim> center (const bool respect_manifold=false,
-                          const bool use_laplace_transformation=false) const;
+                          const bool interpolate_from_surrounding=false) const;
 
   /**
    * Return the barycenter (also called centroid)
@@ -1793,12 +1803,12 @@ public:
   /**
    * Return the center of this object, which of course coincides with the
    * location of the vertex this object refers to. The parameters @p
-   * respect_manifold and @p use_laplace_transformation are not used. They are
-   * there to provide the same interface as
+   * respect_manifold and @p interpolate_from_surrounding are not used. They
+   * are there to provide the same interface as
    * <code>TriaAccessor<structdim,dim,spacedim></code>.
    */
   Point<spacedim> center (const bool respect_manifold=false,
-                          const bool use_laplace_transformation=false) const;
+                          const bool interpolate_from_surrounding=false) const;
 
   /**
    * Compute the dim-dimensional measure of the object. For a dim-dimensional

@@ -4002,17 +4002,13 @@ namespace internal
 
                 // if the user_flag is set, i.e. if the cell is at the
                 // boundary, use a different calculation of the middle vertex
-                // here. this is of advantage, if the boundary is strongly
-                // curved and the cell has a high aspect ratio. this can
-                // happen for example, if it was refined anisotropically
-                // before.
+                // here. this is of advantage if the boundary is strongly
+                // curved (whereas the cell is not) and the cell has a high
+                // aspect ratio.
                 if (cell->user_flag_set())
                   {
-                    // first reset the user_flag
+                    // first reset the user_flag and then refine
                     cell->clear_user_flag();
-
-                    // the user flag indicates: at least one face is at the
-                    // boundary.
                     triangulation.vertices[next_unused_vertex]
                       =cell->center(true, true);
                   }
@@ -5793,7 +5789,7 @@ namespace internal
                     // isotropic refinement
                     Assert(quad_ref_case==RefinementCase<dim-1>::no_refinement, ExcInternalError());
 
-                    // set the middle vertex appropriately it might be that
+                    // set the middle vertex appropriately: it might be that
                     // the quad itself is not at the boundary, but that one of
                     // its lines actually is. in this case, the newly created
                     // vertices at the centers of the lines are not
@@ -5808,9 +5804,9 @@ namespace internal
                     //
                     // note that the exact weights are chosen such as to
                     // minimize the distortion of the four new quads from the
-                    // optimal shape; their derivation and values is copied
-                    // over from the @p{MappingQ::set_laplace_on_vector}
-                    // function
+                    // optimal shape. their description uses the formulas
+                    // underlying the TransfiniteInterpolationManifold
+                    // implementation
                     triangulation.vertices[next_unused_vertex] =
                       quad->center(true, true);
                     triangulation.vertices_used[next_unused_vertex] = true;
