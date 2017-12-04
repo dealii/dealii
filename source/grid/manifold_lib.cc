@@ -395,7 +395,7 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
         if (std::abs(1-weights[i])<tolerance)
           return vertices[i];
         const Tensor<1, spacedim> direction(vertices[i] - center);
-        rho += direction.norm() * weights[i];
+        rho += direction.norm_square() * weights[i];
         candidate += direction * weights[i];
         total_weights += weights[i];
       }
@@ -405,6 +405,7 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
       return center;
     candidate /= norm;
     rho /= total_weights;
+    rho /= sqrt(rho);
   }
 
   // If not in 3D, just use the implementation from PolarManifold
@@ -424,8 +425,7 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
 
     // If the candidate happens to coincide with a normalized
     // direction, we return it. Otherwise, the Hessian would be singular.
-    boost::container::small_vector<Tensor<1, 3>, 100> directions;
-    boost::container::small_vector<double, 100> merged_weights;
+    double max_distance = 0.;
     for (unsigned int i=0; i<n_points; ++i)
       {
         Tensor<1,spacedim> direction(vertices[i]-center);
@@ -434,19 +434,37 @@ get_new_point (const ArrayView<const Point<spacedim>> &vertices,
                ExcMessage("One of the vertices coincides with the center. "
                           "This is not allowed!"));
         direction /= norm;
-        if ((candidate - direction).norm_square() < tolerance*tolerance)
+        const double squared_distance = (candidate - direction).norm_square();
+        if (squared_distance < tolerance*tolerance)
           return center + rho * candidate;
+        max_distance = std::max(max_distance, squared_distance);
+      }
 
-        // append direction. check if the normalized candidate direction is
-        // the same as a previous direction (to a tighter tolerance (1e-14)^2
-        // than the outer ones to really not miss anything) -> in that case we
-        // can simply add the weights. Since the trigonometric functions used
-        // below are quite expensive, it makes sense to merge the points here,
-        // even if this search loop is of quadratic complexity loop (but we
-        // rarely have more than 9 points)
+    // If all the points are close to the candidate, we expect the candidate to
+    // be good enough. This tolerance was chosen such that the first iteration
+    // for a at least three time refined HyperShell mesh with radii .5 and 1.
+    // doesn't already succeed.
+    // max_distance is the distance between points on the unit sphere,
+    // so an absolute tolerance is adequate.
+    if (max_distance < 1.e-2)
+      return center + rho * candidate;
+
+    // check if the normalized candidate direction is
+    // the same as a previous direction (to a tighter tolerance (1e-14)^2
+    // than the outer ones to really not miss anything) -> in that case we
+    // can simply add the weights. Since the trigonometric functions used
+    // below are quite expensive, it makes sense to merge the points here,
+    // even if this search loop is of quadratic complexity loop (but we
+    // rarely have more than 9 points)
+    boost::container::small_vector<Tensor<1, 3>, 100> directions;
+    boost::container::small_vector<double, 100> merged_weights;
+    for (unsigned int i=0; i<n_points; ++i)
+      {
+        Tensor<1,spacedim> direction(vertices[i]-center);
         Tensor<1,3> direction_3d;
         for (unsigned int c=0; c<spacedim; ++c)
           direction_3d[c] = direction[c];
+
         bool found = false;
         for (unsigned int j=0; j<directions.size(); ++j)
           if ((directions[j]-direction_3d).norm_square() < 1e-28)
