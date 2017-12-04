@@ -4528,6 +4528,7 @@ namespace GridGenerator
 
                   c_data.vertices[j] = map_vert_index[v_index];
                   c_data.material_id = static_cast<types::material_id>(face->boundary_id());
+                  c_data.manifold_id = face->manifold_id();
                 }
 
               // if we start from a 3d mesh, then we have copied the

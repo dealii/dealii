@@ -9419,20 +9419,21 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
                           ++j;
                         }
 
-                      if ( (correct(i,j) && !(*cell)->direction_flag())
-                           ||
-                           (!correct(i,j) && (*cell)->direction_flag()) )
-                        {
-                          if (neighbor->user_flag_set() == false)
-                            {
-                              neighbor->set_direction_flag (false);
-                              neighbor->set_user_flag ();
-                              next_round.push_back (neighbor);
-                            }
-                          else
-                            Assert (neighbor->direction_flag() == false,
-                                    ExcNonOrientableTriangulation());
 
+                      // If we already saw this guy, check that everything is fine
+                      if (neighbor->user_flag_set())
+                        {
+                          // If we have visited this guy, then the ordering and the orientation should
+                          // agree
+                          Assert(!(correct(i,j) ^ (neighbor->direction_flag() == (*cell)->direction_flag() )),
+                                 ExcNonOrientableTriangulation());
+                        }
+                      else
+                        {
+                          next_round.push_back (neighbor);
+                          neighbor->set_user_flag ();
+                          if ( (correct(i,j) ^ ( neighbor->direction_flag() == (*cell)->direction_flag() ) ) )
+                            neighbor->set_direction_flag(!neighbor->direction_flag());
                         }
                     }
                 }
