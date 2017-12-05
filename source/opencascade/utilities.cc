@@ -462,6 +462,112 @@ namespace OpenCASCADE
     return out_shape;
   }
 
+
+
+  template<int spacedim>
+  std::vector<TopoDS_Edge> create_curves_from_triangulation_boundary
+  (const Triangulation<2, spacedim> &triangulation,
+   const Mapping<2, spacedim> &mapping)
+
+  {
+    // store maps from global vertex index to pairs of global face   indices
+    //        and from global face   index to pairs of global vertex indices
+    std::map<unsigned int, std::pair<unsigned int,unsigned int> > vert_to_faces;
+    std::map<unsigned int, std::pair<unsigned int,unsigned int> > face_to_verts;
+    std::map<unsigned int, bool>                                  visited_faces;
+    std::map<unsigned int, Point<spacedim> >                      vert_to_point;
+
+    unsigned int face_index;
+
+    for (auto cell: triangulation.active_cell_iterators())
+      for (unsigned int f=0; f<GeometryInfo<2>::faces_per_cell; ++f)
+        if (cell->face(f)->at_boundary())
+          {
+            // get global face and vertex indices
+            face_index = cell->face(f)->index();
+            unsigned int v0 = cell->face(f)->vertex_index(0);
+            unsigned int v1 = cell->face(f)->vertex_index(1);
+            face_to_verts[face_index].first  = v0;
+            face_to_verts[face_index].second = v1;
+            visited_faces[face_index] = false;
+
+            // extract mapped vertex locations
+            std::array<Point<spacedim>,GeometryInfo<2>::vertices_per_cell> verts = mapping.get_vertices(cell);
+            vert_to_point[v0]=verts[GeometryInfo<2>::face_to_cell_vertices(f,0,true,false,false)];
+            vert_to_point[v1]=verts[GeometryInfo<2>::face_to_cell_vertices(f,1,true,false,false)];
+
+            // distribute indices into maps
+            if (vert_to_faces.find(v0) == vert_to_faces.end())
+              {
+                vert_to_faces[v0].first  = face_index;
+              }
+            else
+              {
+                vert_to_faces[v0].second = face_index;
+              }
+            if (vert_to_faces.find(v1) == vert_to_faces.end())
+              {
+                vert_to_faces[v1].first  = face_index;
+              }
+            else
+              {
+                vert_to_faces[v1].second = face_index;
+              }
+          }
+
+    // run through maps in an orderly fashion, i.e., through the
+    // boundary in one cycle and add points to pointlist.
+    std::vector<TopoDS_Edge> interpolation_curves;
+    bool finished = (face_to_verts.size() == 0);
+    face_index = finished ? 0 : face_to_verts.begin()->first;
+
+    while (finished == false)
+      {
+        const unsigned int start_point_index = face_to_verts[face_index].first;
+        unsigned int point_index             = start_point_index;
+
+        // point_index and face_index always run together
+        std::vector<Point<3> > pointlist;
+        do
+          {
+            visited_faces[face_index]            = true;
+            auto current_point = vert_to_point[point_index];
+            if (spacedim==2)
+              pointlist.push_back(Point<3>(current_point[0],current_point[1],0));
+            else
+              pointlist.push_back(Point<3>(current_point[0],current_point[1],current_point[2]));
+
+            // Get next point
+            if (face_to_verts[face_index].first != point_index )
+              point_index = face_to_verts[face_index].first;
+            else
+              point_index = face_to_verts[face_index].second;
+
+            // Get next face
+            if (vert_to_faces[point_index].first != face_index)
+              face_index = vert_to_faces[point_index].first;
+            else
+              face_index = vert_to_faces[point_index].second;
+          }
+        while (point_index != start_point_index);
+
+        interpolation_curves.push_back(interpolation_curve(pointlist, Tensor<1,3>(), true));
+        pointlist.clear();
+
+        finished = true;
+        for (const auto &f : visited_faces)
+          if (f.second == false)
+            {
+              face_index = f.first;
+              finished = false;
+              break;
+            }
+      }
+    return interpolation_curves;
+  }
+
+
+
   std::tuple<Point<3>, TopoDS_Shape, double, double>
   project_point_and_pull_back(const TopoDS_Shape &in_shape,
                               const Point<3> &origin,
