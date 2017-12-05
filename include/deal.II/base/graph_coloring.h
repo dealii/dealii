@@ -22,6 +22,7 @@
 #include <deal.II/base/thread_management.h>
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
+#include <deal.II/lac/sparsity_tools.h>
 
 #include <functional>
 #include <set>
@@ -541,6 +542,15 @@ namespace GraphColoring
     // Gather the colors together.
     return internal::gather_colors(partition_coloring);
   }
+
+  /**
+   * GraphColoring::color_sparsity_pattern, a wrapper function for
+   * SparsityTools::color_sparsity_pattern, is an alternate method for
+   * coloring using graph connections represented by SparsityPattern.
+   * For further details, refer to SparsityTools::color_sparsity_pattern.
+   */
+  unsigned int color_sparsity_pattern (const SparsityPattern     &sparsity_pattern,
+                                       std::vector<unsigned int> &color_indices);
 
 } // End graph_coloring namespace
 

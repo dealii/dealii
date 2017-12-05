@@ -112,19 +112,22 @@ namespace SparsityTools
    * an edge between two nodes. The goal is to assign each node a color index
    * such that no two directly connected nodes have the same color.
    * The assigned colors are listed in @p color_indices indexed from one and
-   * the function returns total number of colors used. Note that this function
-   * requires that SparsityPattern be symmetric (and hence square) i.e an
-   * undirected graph representation. We do not check for symmetry of the
-   * sparsity pattern, since this is an expensive operation, but rather leave
-   * this as the responsibility of caller of this function.
+   * the function returns total number of colors used. ZOLTAN coloring
+   * algorithm is run in serial by each processor. Hence all processors have
+   * coloring information of all the nodes. A wrapper function to this
+   * function is available in GraphColoring namespace as well.
    *
-   * ZOLTAN coloring algorithm is run in serial by each processor. Hence all
-   * processors have coloring information of all the nodes.
+   * Note that this function requires that SparsityPattern be symmetric
+   * (and hence square) i.e an undirected graph representation. We do not
+   * check for symmetry of the sparsity pattern, since this is an expensive
+   * operation, but rather leave this as the responsibility of caller of
+   * this function.
    *
    * @image html color_undirected_graph.png
-   * For example, the above image shows 5 nodes numbered from 0 to 4.
-   * The connections shown are bidirectional. After coloring, no two connected
-   * nodes have the same color.
+   * The usage of the function is illustrated by the image above, showing five
+   * nodes numbered from 0 to 4. The connections shown are bidirectional.
+   * After coloring, it is clear that no two directly connected nodes are
+   * assigned the same color.
    *
    * If deal.II was not installed with package ZOLTAN, this function will
    * generate an error.

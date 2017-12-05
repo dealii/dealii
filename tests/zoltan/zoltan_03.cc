@@ -14,11 +14,12 @@
 // ---------------------------------------------------------------------
 
 
-// check GridTools::color_sparsity_pattern
+// check wrapper function GraphColoring::color_sparsity_pattern
 
 
 #include "../tests.h"
-#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/base/graph_coloring.h>
+
 
 void fill_graph (DynamicSparsityPattern &graph)
 {
@@ -68,7 +69,7 @@ int main (int argc, char **argv)
   unsigned int num_colors;
 
   color_indices.resize(num_indices);
-  num_colors = SparsityTools::color_sparsity_pattern (sp_graph, color_indices);
+  num_colors = GraphColoring::color_sparsity_pattern (sp_graph, color_indices);
 
   //color
   deallog << "Coloring" << std::endl;

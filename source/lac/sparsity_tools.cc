@@ -381,9 +381,14 @@ namespace SparsityTools
                         color_exp.data());
 
     //Check for error code
-    Assert (rc == ZOLTAN_OK , ExcInternalError());
+    Assert (rc == ZOLTAN_OK ,
+            ExcInternalError());
 
-    //Allocate and assign color
+    //Allocate and assign color indices
+    color_indices.resize(num_objects);
+    Assert (color_exp.size() == color_indices.size(),
+            ExcDimensionMismatch (color_exp.size(),color_indices.size()));
+
     std::copy (color_exp.begin(), color_exp.end(), color_indices.begin());
 
     unsigned int n_colors = *(std::max_element (color_indices.begin(),
