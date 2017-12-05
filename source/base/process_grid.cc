@@ -143,12 +143,14 @@ namespace Utilities
 
       // Create an auxiliary communicator which has root and all inactive cores.
       // Assume that inactive cores start with id=n_process_rows*n_process_columns
-      Assert (mpi_process_is_active || this_mpi_process >= n_process_rows*n_process_columns,
+      const unsigned int n_active_mpi_processes = n_process_rows*n_process_columns;
+      Assert (mpi_process_is_active ||
+              this_mpi_process >= n_active_mpi_processes,
               ExcInternalError());
 
       std::vector<int> inactive_with_root_ranks;
       inactive_with_root_ranks.push_back(0);
-      for (int i = n_process_rows*n_process_columns; i < n_mpi_processes; ++i)
+      for (unsigned int i = n_active_mpi_processes; i < n_mpi_processes; ++i)
         inactive_with_root_ranks.push_back(i);
 
       // Get the group of processes in mpi_communicator
