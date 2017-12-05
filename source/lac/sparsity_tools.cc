@@ -165,8 +165,8 @@ namespace SparsityTools
 
       for (unsigned int i=0; i < n_dofs; i++)
         {
-          globalID[i] = i;    //global ids run from 0 to n_dofs-1
-          localID[i] = i;     //same as global ids
+          globalID[i] = i;
+          localID[i] = i;     //Same as global ids.
         }
     }
 
@@ -183,7 +183,12 @@ namespace SparsityTools
       Assert ( numEdges != nullptr , ExcInternalError() );
 
       for (int i=0; i<num_obj; ++i)
-        numEdges[i] = graph->row_length(globalID[i])-1;
+        {
+          if ( graph->exists(i,i) )     //Check if diagonal element is present
+            numEdges[i] = graph->row_length(globalID[i])-1;
+          else
+            numEdges[i] = graph->row_length(globalID[i]);
+        }
     }
 
 
@@ -323,6 +328,68 @@ namespace SparsityTools
       partition_zoltan(sparsity_pattern, n_partitions, partition_indices);
     else
       AssertThrow(false, ExcInternalError());
+  }
+
+
+  unsigned int color_sparsity_pattern (const SparsityPattern     &sparsity_pattern,
+                                       std::vector<unsigned int> &color_indices)
+  {
+    // Make sure that ZOLTAN is actually
+    // installed and detected
+#ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
+    (void)sparsity_pattern;
+    AssertThrow (false, ExcZOLTANNotInstalled());
+    return 0;
+#else
+    //coloring algorithm is run in serial by each processor.
+    std::unique_ptr<Zoltan> zz = std_cxx14::make_unique<Zoltan> (MPI_COMM_SELF);
+
+    //Coloring parameters
+    zz->Set_Param ("COLORING_PROBLEM", "DISTANCE-1");  //Standard coloring
+    zz->Set_Param ("NUM_GID_ENTRIES", "1");  // 1 entry represents global ID
+    zz->Set_Param ("NUM_LID_ENTRIES", "1");  // 1 entry represents local ID
+    zz->Set_Param ("OBJ_WEIGHT_DIM", "0");   // object weights not used
+    zz->Set_Param ("RECOLORING_NUM_OF_ITERATIONS", "0");
+    zz->Set_Param ("DEBUG_LEVEL", "0" );     //level of debug info
+
+    //Zoltan::Color function requires a non-const SparsityPattern object
+    SparsityPattern graph;
+    graph.copy_from (sparsity_pattern);
+
+    //Set query functions required by coloring function
+    zz->Set_Num_Obj_Fn (get_number_of_objects, &graph);
+    zz->Set_Obj_List_Fn (get_object_list, &graph);
+    zz->Set_Num_Edges_Multi_Fn (get_num_edges_list, &graph);
+    zz->Set_Edge_List_Multi_Fn (get_edge_list, &graph);
+
+    //Variables needed by coloring function
+    int num_gid_entries=1;
+    const int num_objects = graph.n_rows();
+
+    //Preallocate input variables. Element type fixed by ZOLTAN.
+    std::vector<ZOLTAN_ID_TYPE> global_ids (num_objects);
+    std::vector<int> color_exp (num_objects);
+
+    //Set ids for which coloring needs to be done
+    for (int i=0; i < num_objects; i++)
+      global_ids[i] = i;
+
+    //Call ZOLTAN coloring algorithm
+    int rc = zz->Color (num_gid_entries,
+                        num_objects,
+                        global_ids.data(),
+                        color_exp.data());
+
+    //Check for error code
+    Assert (rc == ZOLTAN_OK , ExcInternalError());
+
+    //Allocate and assign color
+    std::copy (color_exp.begin(), color_exp.end(), color_indices.begin());
+
+    unsigned int n_colors = *(std::max_element (color_indices.begin(),
+                                                color_indices.end()));
+    return n_colors;
+#endif
   }
 
 
