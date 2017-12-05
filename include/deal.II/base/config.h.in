@@ -41,6 +41,7 @@
 #cmakedefine DEAL_II_WITH_CUDA
 #cmakedefine DEAL_II_WITH_CXX14
 #cmakedefine DEAL_II_WITH_GSL
+#cmakedefine DEAL_II_WITH_GMSH
 #cmakedefine DEAL_II_WITH_HDF5
 #cmakedefine DEAL_II_WITH_LAPACK
 #cmakedefine DEAL_II_WITH_METIS
@@ -191,6 +192,14 @@
      DEAL_II_VERSION_SUBMINOR) \
     >=  \
     (major)*10000 + (minor)*100 + (subminor))
+
+
+/*
+ * gmsh:
+ */
+#ifdef DEAL_II_WITH_GMSH
+#  define GMSH_EXECUTABLE @GMSH_EXECUTABLE@
+#endif
 
 /*
  * p4est:
