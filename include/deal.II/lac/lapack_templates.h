@@ -37,6 +37,12 @@ extern "C"
                const float *alpha, const float *A, const int *lda,
                const float *x, const int *incx,
                const float *b, float *y, const int *incy);
+  void dtrmv_ (const char *uplo, const char *trans, const char *diag,
+               const int *N, const double *A, const int *lda,
+               double *x, const int *incx);
+  void strmv_ (const char *uplo, const char *trans, const char *diag,
+               const int *N, const float *A, const int *lda,
+               float *x, const int *incx);
 // Matrix matrix product
   void dgemm_ (const char *transa, const char *transb,
                const int *m, const int *n, const int *k,
@@ -352,6 +358,56 @@ gemv (const char *, const int *, const int *, const float *, const float *, cons
   Assert (false, LAPACKSupport::ExcMissing("sgemv"));
 }
 #endif
+
+
+
+/// Template wrapper for LAPACK functions dtrmv and strmv
+template <typename number>
+inline void
+trmv (const char *uplo, const char *trans, const char *diag,
+      const int *N, const number *A, const int *lda,
+      number *x, const int *incx)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+trmv (const char *uplo, const char *trans, const char *diag,
+      const int *N, const double *A, const int *lda,
+      double *x, const int *incx)
+{
+  dtrmv_ (uplo, trans, diag, N, A, lda, x, incx);
+}
+#else
+inline void
+trmv (const char *uplo, const char *trans, const char *diag,
+      const int *N, const double *A, const int *lda,
+      double *x, const int *incx)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dtrmv"));
+}
+#endif
+
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+trmv (const char *uplo, const char *trans, const char *diag,
+      const int *N, const float *A, const int *lda,
+      float *x, const int *incx)
+{
+  strmv_ (uplo, trans, diag, N, A, lda, x, incx);
+}
+#else
+inline void
+trmv (const char *uplo, const char *trans, const char *diag,
+      const int *N, const float *A, const int *lda,
+      float *x, const int *incx)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dtrmv"));
+}
+#endif
+
 
 
 /// Template wrapper for LAPACK functions dgemm and sgemm
