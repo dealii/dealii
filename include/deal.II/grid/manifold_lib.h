@@ -302,6 +302,25 @@ private:
                  const Point<spacedim> &candidate_point) const;
 
   /**
+   * Compute a new set of points that interpolate between the given points @p
+   * surrounding_points. @p weights is an array view with as many entries as @p
+   * surrounding_points.size() times @p new_points.size().
+   *
+   * This function is optimized to perform on a collection
+   * of new points, by collecting operations that are not dependent on the
+   * weights outside of the loop over all new points.
+   *
+   * The implementation does not allow for @p surrounding_points and
+   * @p new_points to point to the same array, so make sure to pass different
+   * objects into the function.
+   */
+  virtual
+  void
+  get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+                  const ArrayView<const double>          &weights,
+                  ArrayView<Point<spacedim>>              new_points) const;
+
+  /**
    * A manifold description to be used for get_new_point in 2D.
    **/
   const PolarManifold<spacedim> polar_manifold;

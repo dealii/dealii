@@ -615,6 +615,54 @@ make_array_view (Table<2,ElementType>                           &table,
 
 
 /**
+ * Create a view to an entire Table<2> object. This is equivalent to
+ * initializing an ArrayView object with a pointer to the first element of the
+ * given table, and the number of table entries as the length of the view.
+ *
+ * This function is used for non-@p const references to objects of Table type.
+ * Such objects contain elements that can be written to. Consequently, the
+ * return type of this function is a view to a set of writable objects.
+ *
+ * @param[in] table The Table for which we want to have an array view object.
+ * The array view corresponds to the <em>entire</em> table.
+ *
+ * @relates ArrayView
+ */
+template <typename ElementType>
+inline
+ArrayView<ElementType>
+make_array_view (Table<2,ElementType> &table)
+{
+  return ArrayView<ElementType> (&table[0][0], table.n_elements());
+}
+
+
+
+/**
+ * Create a view to an entire Table<2> object. This is equivalent to
+ * initializing an ArrayView object with a pointer to the first element of the
+ * given table, and the number of table entries as the length of the view.
+ *
+ * This function is used for @p const references to objects of Table type
+ * because they contain immutable elements. Consequently, the return type of
+ * this function is a view to a set of @p const objects.
+ *
+ * @param[in] table The Table for which we want to have an array view object.
+ * The array view corresponds to the <em>entire</em> table.
+ *
+ * @relates ArrayView
+ */
+template <typename ElementType>
+inline
+ArrayView<const ElementType>
+make_array_view (const Table<2,ElementType> &table)
+{
+  return ArrayView<const ElementType> (&table[0][0], table.n_elements());
+}
+
+
+
+/**
  * Create a view to an entire row of a Table<2> object. This is equivalent to
  * initializing an ArrayView object with a pointer to the first element of the
  * given row, and the length of the row as the length of the view.

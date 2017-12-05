@@ -376,15 +376,53 @@ void
 SphericalManifold<dim, spacedim>::
 get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
                 const Table<2,double>                  &weights,
-                ArrayView<Point<spacedim>>              new_points) const
+                ArrayView<Point<spacedim>>             new_points) const
 {
   AssertDimension(new_points.size(), weights.size(0));
   AssertDimension(surrounding_points.size(), weights.size(1));
 
+  get_new_points(surrounding_points,
+                 make_array_view(weights),
+                 new_points);
+
+  return;
+}
+
+
+
+template <int dim, int spacedim>
+Point<spacedim>
+SphericalManifold<dim,spacedim>::
+get_new_point (const ArrayView<const Point<spacedim>> &vertices,
+               const ArrayView<const double>          &weights) const
+{
+  // To avoid duplicating all of the logic in get_new_points, simply call it
+  // for one position.
+  Point<spacedim> new_point;
+  get_new_points(vertices,
+                 weights,
+                 make_array_view(&new_point,&new_point+1));
+
+  return new_point;
+}
+
+
+
+template <int dim, int spacedim>
+void
+SphericalManifold<dim,spacedim>::
+get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
+                const ArrayView<const double>          &weights,
+                ArrayView<Point<spacedim>>              new_points) const
+{
+  AssertDimension(weights.size(), new_points.size() * surrounding_points.size());
+  const unsigned int weight_rows = new_points.size();
+  const unsigned int weight_columns = surrounding_points.size();
+
   if (surrounding_points.size() == 2)
     {
-      for (unsigned int row=0; row<weights.size(0); ++row)
-        new_points[row] = get_intermediate_point(surrounding_points[0], surrounding_points[1], weights[row][1]);
+      for (unsigned int row=0; row<weight_rows; ++row)
+        new_points[row] = get_intermediate_point(surrounding_points[0], surrounding_points[1], weights[row * weight_columns + 1]);
       return;
     }
 
@@ -418,11 +456,11 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
   boost::container::small_vector<bool,100> accurate_point_was_found(new_points.size(),false);
   const ArrayView<const Tensor<1,spacedim>> array_directions = make_array_view(directions.begin(),directions.end());
   const ArrayView<const double> array_distances = make_array_view(distances.begin(),distances.end());
-  for (unsigned int row=0; row<weights.size(0); ++row)
+  for (unsigned int row=0; row<weight_rows; ++row)
     {
       new_candidates[row] = guess_new_point(array_directions,
                                             array_distances,
-                                            make_array_view(weights,row));
+                                            ArrayView<const double>(&weights[row*weight_columns],weight_columns));
 
       // If the candidate is the center, mark it as found to avoid entering
       // the Newton iteration in step 2, which would crash.
@@ -437,7 +475,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
       // after we verified that the candidate is not the center.
       if (spacedim<3)
         {
-          new_points[row] = polar_manifold.get_new_point(surrounding_points, make_array_view(weights,row));
+          new_points[row] = polar_manifold.get_new_point(surrounding_points, ArrayView<const double>(&weights[row*weight_columns],weight_columns));
           accurate_point_was_found[row] = true;
           continue;
         }
@@ -450,7 +488,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
   // doesn't already succeed.
   if (max_distance < 2e-2 || spacedim<3)
     {
-      for (unsigned int row=0; row<weights.size(0); ++row)
+      for (unsigned int row=0; row<weight_rows; ++row)
         new_points[row] = center + new_candidates[row].first * new_candidates[row].second;
 
       return;
@@ -461,7 +499,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
 
   // Search for duplicate directions and merge them to minimize the cost of
   // the get_new_point function call below.
-  boost::container::small_vector<double, 1000>             merged_weights(weights.size(0)*weights.size(1));
+  boost::container::small_vector<double, 1000>             merged_weights(weights.size());
   boost::container::small_vector<Tensor<1, spacedim>, 100> merged_directions(surrounding_points.size(),Point<spacedim>());
   boost::container::small_vector<double, 100>              merged_distances(surrounding_points.size(),0.0);
 
@@ -478,8 +516,8 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
           if (!found_duplicate && squared_distance < 1e-28)
             {
               found_duplicate = true;
-              for (unsigned int row = 0; row < weights.size(0); ++row)
-                merged_weights[row*weights.size(1) + j] += weights[row][i];
+              for (unsigned int row = 0; row < weight_rows; ++row)
+                merged_weights[row*weight_columns + j] += weights[row*weight_columns + i];
             }
         }
 
@@ -487,8 +525,8 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
         {
           merged_directions[n_unique_directions] = directions[i];
           merged_distances[n_unique_directions] = distances[i];
-          for (unsigned int row = 0; row < weights.size(0); ++row)
-            merged_weights[row*weights.size(1) + n_unique_directions] = weights[row][i];
+          for (unsigned int row = 0; row < weight_rows; ++row)
+            merged_weights[row*weight_columns + n_unique_directions] = weights[row*weight_columns + i];
 
           ++n_unique_directions;
         }
@@ -498,7 +536,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
   // the get_new_point function call below.
   boost::container::small_vector<unsigned int, 100> merged_weights_index(new_points.size(),numbers::invalid_unsigned_int);
   unsigned int unique_weight_rows = 0;
-  for (unsigned int row = 0; row < new_points.size(); ++row)
+  for (unsigned int row = 0; row < weight_rows; ++row)
     {
       bool found_identical_row = false;
       for (unsigned int existing_row = 0; existing_row < row; ++existing_row)
@@ -506,7 +544,7 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
           bool identical_weights = true;
 
           for (unsigned int weight_index = 0; weight_index < n_unique_directions; ++weight_index)
-            if (merged_weights[row*weights.size(1) + weight_index] != merged_weights[existing_row*weights.size(1) + weight_index])
+            if (std::abs(merged_weights[row*weight_columns + weight_index] - merged_weights[existing_row*weight_columns + weight_index]) > tolerance)
               {
                 identical_weights = false;
                 break;
@@ -527,12 +565,12 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
   const ArrayView<const double> array_merged_distances = make_array_view(merged_distances.begin(),
                                                          merged_distances.begin()+n_unique_directions);
 
-  for (unsigned int row=0; row<weights.size(0); ++row)
+  for (unsigned int row=0; row<weight_rows; ++row)
     if (!accurate_point_was_found[row])
       {
         if (merged_weights_index[row] == numbers::invalid_unsigned_int)
           {
-            const ArrayView<const double> array_merged_weights (&merged_weights[row*weights.size(1)],n_unique_directions);
+            const ArrayView<const double> array_merged_weights (&merged_weights[row*weight_columns],n_unique_directions);
             new_candidates[row].second = get_new_point(array_merged_directions,
                                                        array_merged_distances,
                                                        array_merged_weights,
@@ -543,24 +581,6 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
 
         new_points[row] = center + new_candidates[row].first * new_candidates[row].second;
       }
-}
-
-
-
-template <int dim, int spacedim>
-Point<spacedim>
-SphericalManifold<dim,spacedim>::
-get_new_point (const ArrayView<const Point<spacedim>> &vertices,
-               const ArrayView<const double>          &weights) const
-{
-  // To avoid duplicating all of the logic in get_new_points, simply call it
-  // for one position.
-  const Table<2,double> table_weights(1,weights.size(),weights.begin());
-  Point<spacedim> new_point;
-  ArrayView<Point<spacedim>> new_points(&new_point,1);
-
-  get_new_points(vertices,table_weights,new_points);
-  return new_points[0];
 }
 
 
