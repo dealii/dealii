@@ -485,8 +485,8 @@ namespace OpenCASCADE
           {
             // get global face and vertex indices
             face_index = cell->face(f)->index();
-            unsigned int v0 = cell->face(f)->vertex_index(0);
-            unsigned int v1 = cell->face(f)->vertex_index(1);
+            const unsigned int v0 = cell->face(f)->vertex_index(0);
+            const unsigned int v1 = cell->face(f)->vertex_index(1);
             face_to_verts[face_index].first  = v0;
             face_to_verts[face_index].second = v1;
             visited_faces[face_index] = false;
@@ -552,7 +552,6 @@ namespace OpenCASCADE
         while (point_index != start_point_index);
 
         interpolation_curves.push_back(interpolation_curve(pointlist, Tensor<1,3>(), true));
-        pointlist.clear();
 
         finished = true;
         for (const auto &f : visited_faces)

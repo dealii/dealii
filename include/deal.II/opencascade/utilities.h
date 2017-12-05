@@ -226,14 +226,18 @@ namespace OpenCASCADE
   /**
    * Given a Triangulation and an optional Mapping, create a vector of smooth
    * curves that interpolate the connected parts of the boundary vertices of
-   * the Triangulation and return them as a vector of TopoDS_Edge.
+   * the Triangulation and return them as a vector of TopoDS_Edge objects.
+   *
+   * This function constructs closed Bspline curve objects passing through all
+   * vertices of the boundary of the triangulation, with $C^2$ Continuity on
+   * each vertex except the first, where only $C^1$ continuity is guaranteed.
    *
    * The returned curves are ordered with respect to the indices of the faces
    * that make up the triangulation boundary, i.e., the first curve is the one
    * extracted starting from the face with the lowest index, and so on.
    *
-   * @param[input] triangulation Input triangulation
-   * @param[input] mapping Optional input mapping
+   * @param[in] triangulation Input triangulation
+   * @param[in] mapping Optional input mapping
    * @return An std::vector of TopoDS_Edge objects representing the smooth
    *  interpolation of the boundary of the `triangulation`
    *
