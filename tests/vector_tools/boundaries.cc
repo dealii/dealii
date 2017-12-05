@@ -15,7 +15,6 @@
 
 
 
-/* Author: Wolfgang Bangerth, University of Heidelberg, 2001 */
 /* Purpose: check interpolation and projection of boundary values. */
 
 
@@ -149,8 +148,8 @@ check ()
           VectorTools::project_boundary_values (mapping, dof, function_map,
                                                 boundary_q(dof), projected_bv);
           write_map (projected_bv);
-        };
-    };
+        }
+    }
 
 
   // delete objects now no more needed
@@ -158,7 +157,7 @@ check ()
     {
       delete fe_list[i];
       delete function_list[i];
-    };
+    }
 }
 
 
