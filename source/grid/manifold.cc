@@ -157,61 +157,58 @@ normal_vector (const Triangulation<3, 3>::face_iterator &face,
 {
   const int spacedim=3;
 
-  // Compute distances from p to vertices
-  std::array<std::pair<double,unsigned int>, GeometryInfo<3>::vertices_per_face> distances;
-  for (unsigned int i=0; i<GeometryInfo<3>::vertices_per_face; ++i)
-    distances[i] = std::make_pair((p-face->vertex(i)).norm_square(),i);
+  const std::array<Point<spacedim>, 4> vertices
+  {{face->vertex(0), face->vertex(1), face->vertex(2), face->vertex(3)}};
+  const std::array<double, 4> distances
+  {{vertices[0].distance(p), vertices[1].distance(p), vertices[2].distance(p), vertices[3].distance(p)}};
+  const double max_distance = std::max(std::max(distances[0], distances[1]),
+                                       std::max(distances[2], distances[3]));
 
-  // Sort the distances and figure out, which vertices to use
-  std::sort(distances.begin(),distances.end());
-  unsigned int first_index, second_index, fallback_index;
-
-  const double center_distance = (p-face->center()).norm_square();
-
-  // If we are closer to the center than any vertex, use closest vertices
-  if (center_distance < distances[0].first)
-    {
-      first_index = distances[0].second;
-      second_index = distances[1].second;
-      fallback_index = distances[2].second;
-    }
-  // Otherwise use vertices further away
-  else
-    {
-      first_index = distances[1].second;
-      second_index = distances[2].second;
-
-      // If we are very close to a vertex use the farthest vertex as fallback,
-      // otherwise use closest vertex.
-      if (distances[0].first < 1e4 * std::numeric_limits<double>::epsilon() * distances[1].first)
-        fallback_index = distances[3].second;
-      else
-        fallback_index = distances[0].second;
-    }
+  // We need to find two tangential vectors to the given point p, but we do
+  // not know how the point is oriented against the face. We guess the two
+  // directions by assuming a flat topology and take the two directions that
+  // indicate the angle closest to a perpendicular one (i.e., cos(theta) close
+  // to zero). We start with an invalid value but the loops should always find
+  // a value.
+  double abs_cos_angle = std::numeric_limits<double>::max();
+  unsigned int first_index = numbers::invalid_unsigned_int,
+               second_index = numbers::invalid_unsigned_int;
+  for (unsigned int i=0; i<3; ++i)
+    if (distances[i] > 1e-8*max_distance)
+      for (unsigned int j=i+1; j<4; ++j)
+        if (distances[j] > 1e-8*max_distance)
+          {
+            const double new_angle = (p-vertices[i]) * (p-vertices[j]) /
+                                     (distances[i]*distances[j]);
+            // multiply by factor 0.999 to bias the search in a way that
+            // avoids trouble with roundoff
+            if (std::abs(new_angle) < 0.999 * abs_cos_angle)
+              {
+                abs_cos_angle = std::abs(new_angle);
+                first_index = i;
+                second_index = j;
+              }
+          }
+  Assert(first_index != numbers::invalid_unsigned_int,
+         ExcMessage("The search for possible directions did not succeed."));
 
   // Compute tangents and normal for selected vertices
-  Tensor<1,spacedim> t1 = get_tangent_vector(p, face->vertex(first_index));
-  Tensor<1,spacedim> t2 = get_tangent_vector(p, face->vertex(second_index));
+  Tensor<1,spacedim> t1 = get_tangent_vector(p, vertices[first_index]);
+  Tensor<1,spacedim> t2 = get_tangent_vector(p, vertices[second_index]);
   Tensor<1,spacedim> normal = cross_product_3d(t1,t2);
-
-  // If the tangents are linearly dependent fall back to another tangent
-  if (normal.norm_square() <= 1e4 * std::numeric_limits<double>::epsilon() *
-      t1.norm_square() * t2.norm_square())
-    {
-      t2 = get_tangent_vector(p, face->vertex(fallback_index));
-      normal = cross_product_3d(t1,t2);
-    }
 
   Assert(normal.norm_square() > 1e4 * std::numeric_limits<double>::epsilon() *
          t1.norm_square() * t2.norm_square(),
          ExcMessage("Manifold::normal_vector was unable to find a suitable combination "
-                    "of vertices to compute a normal on this face. Check for distorted "
-                    "faces in your triangulation."));
+                    "of vertices to compute a normal on this face. We chose the secants "
+                    "that are as orthogonal as possible, but tangents appear to be "
+                    "linearly dependent. Check for distorted faces in your triangulation."));
 
-  // Now figure out if we need to flip the direction, we do this by comparing to a reference
-  // normal that would be the correct result if all vertices would lie in a plane
-  const Tensor<1,spacedim> rt1 = face->vertex(3) - face->vertex(0);
-  const Tensor<1,spacedim> rt2 = face->vertex(2) - face->vertex(1);
+  // Now figure out if we need to flip the direction, we do this by comparing
+  // to a reference normal that would be the correct result if all vertices
+  // would lie in a plane
+  const Tensor<1,spacedim> rt1 = vertices[3] - vertices[0];
+  const Tensor<1,spacedim> rt2 = vertices[2] - vertices[1];
   const Tensor<1,spacedim> reference_normal = cross_product_3d(rt1,rt2);
 
   if (reference_normal * normal < 0.0)

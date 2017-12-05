@@ -1,0 +1,193 @@
+
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): -1.11e-16 -1.11e-16
+DEAL::Inner normal correctness (should be 0): 0.00 -1.11e-16
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): -2.22e-16 -2.22e-16
+DEAL::Outer normal correctness (should be 0): 0.00 -2.22e-16
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Inner normal correctness (should be 0): -1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 2.22e-16 0.00
+DEAL::Outer normal correctness (should be 0): -2.22e-16 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): -1.11e-16 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): -2.22e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): -1.11e-16 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): -2.22e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 5.55e-17
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 1.11e-16
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): -1.11e-16 -1.11e-16
+DEAL::Inner normal correctness (should be 0): 0.00 -1.11e-16
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): -2.22e-16 -2.22e-16
+DEAL::Outer normal correctness (should be 0): 0.00 -2.22e-16
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Inner normal correctness (should be 0): -1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 2.22e-16 0.00
+DEAL::Outer normal correctness (should be 0): -2.22e-16 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): -1.11e-16 -1.11e-16
+DEAL::Inner normal correctness (should be 0): 5.55e-17 -1.11e-16
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): -2.22e-16 -2.22e-16
+DEAL::Outer normal correctness (should be 0): 1.11e-16 -2.22e-16
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): -1.11e-16 -1.11e-16
+DEAL::Inner normal correctness (should be 0): 5.55e-17 -1.11e-16
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): -2.22e-16 -2.22e-16
+DEAL::Outer normal correctness (should be 0): 1.11e-16 -2.22e-16
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Inner normal correctness (should be 0): 5.55e-17 0.00
+DEAL::Inner normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Outer normal correctness (should be 0): 1.11e-16 0.00
+DEAL::Outer normal correctness (should be 0): 0.00 0.00
+DEAL::Approximate normal in -0.170 -0.435 0.00:  -0.519 -0.833 -0.193, adjusted: -0.363 -0.932 -2.53e-17
+DEAL::Approximate normal in -0.312 -0.312 0.153:  -0.801 -0.592 0.0902, adjusted: -0.668 -0.668 0.328
+DEAL::Approximate normal in -0.312 -0.312 -0.153:  -0.801 -0.592 -0.0902, adjusted: -0.668 -0.668 -0.328
+DEAL::Approximate normal in -0.435 -0.170 0.00:  -0.833 -0.519 -0.193, adjusted: -0.932 -0.363 -1.58e-16
+DEAL::Approximate normal in -0.339 -0.871 0.00:  -0.519 -0.833 -0.193, adjusted: -0.363 -0.932 -2.53e-17
+DEAL::Approximate normal in -0.624 -0.624 0.307:  -0.801 -0.592 0.0902, adjusted: -0.668 -0.668 0.328
+DEAL::Approximate normal in -0.624 -0.624 -0.307:  -0.801 -0.592 -0.0902, adjusted: -0.668 -0.668 -0.328
+DEAL::Approximate normal in -0.871 -0.339 0.00:  -0.833 -0.519 -0.193, adjusted: -0.932 -0.363 -1.58e-16
+DEAL::Approximate normal in -0.312 -0.153 0.312:  -0.801 -0.0902 0.592, adjusted: -0.668 -0.328 0.668
+DEAL::Approximate normal in -0.170 -6.94e-18 0.435:  -0.519 0.193 0.833, adjusted: -0.363 -1.87e-16 0.932
+DEAL::Approximate normal in -0.435 -6.94e-18 0.170:  -0.833 0.193 0.519, adjusted: -0.932 1.58e-16 0.363
+DEAL::Approximate normal in -0.312 0.153 0.312:  -0.801 0.0902 0.592, adjusted: -0.668 0.328 0.668
+DEAL::Approximate normal in -0.624 -0.307 0.624:  -0.801 -0.0902 0.592, adjusted: -0.668 -0.328 0.668
+DEAL::Approximate normal in -0.339 -1.39e-17 0.871:  -0.519 0.193 0.833, adjusted: -0.363 -1.87e-16 0.932
+DEAL::Approximate normal in -0.871 -1.39e-17 0.339:  -0.833 0.193 0.519, adjusted: -0.932 1.58e-16 0.363
+DEAL::Approximate normal in -0.624 0.307 0.624:  -0.801 0.0902 0.592, adjusted: -0.668 0.328 0.668
+DEAL::Approximate normal in 0.00 -0.435 0.170:  -0.193 -0.833 0.519, adjusted: -2.53e-17 -0.932 0.363
+DEAL::Approximate normal in 0.153 -0.312 0.312:  0.0902 -0.592 0.801, adjusted: 0.328 -0.668 0.668
+DEAL::Approximate normal in -0.153 -0.312 0.312:  -0.0902 -0.592 0.801, adjusted: -0.328 -0.668 0.668
+DEAL::Approximate normal in 0.00 -0.170 0.435:  -0.193 -0.519 0.833, adjusted: -1.58e-16 -0.363 0.932
+DEAL::Approximate normal in 0.00 -0.871 0.339:  -0.193 -0.833 0.519, adjusted: -2.53e-17 -0.932 0.363
+DEAL::Approximate normal in 0.307 -0.624 0.624:  0.0902 -0.592 0.801, adjusted: 0.328 -0.668 0.668
+DEAL::Approximate normal in -0.307 -0.624 0.624:  -0.0902 -0.592 0.801, adjusted: -0.328 -0.668 0.668
+DEAL::Approximate normal in 0.00 -0.339 0.871:  -0.193 -0.519 0.833, adjusted: -1.58e-16 -0.363 0.932
+DEAL::Approximate normal in 0.312 -0.312 -0.153:  0.592 -0.801 -0.0902, adjusted: 0.668 -0.668 -0.328
+DEAL::Approximate normal in 0.435 -0.170 -6.94e-18:  0.833 -0.519 0.193, adjusted: 0.932 -0.363 -1.87e-16
+DEAL::Approximate normal in 0.170 -0.435 -6.94e-18:  0.519 -0.833 0.193, adjusted: 0.363 -0.932 1.58e-16
+DEAL::Approximate normal in 0.312 -0.312 0.153:  0.592 -0.801 0.0902, adjusted: 0.668 -0.668 0.328
+DEAL::Approximate normal in 0.624 -0.624 -0.307:  0.592 -0.801 -0.0902, adjusted: 0.668 -0.668 -0.328
+DEAL::Approximate normal in 0.871 -0.339 -1.39e-17:  0.833 -0.519 0.193, adjusted: 0.932 -0.363 -1.87e-16
+DEAL::Approximate normal in 0.339 -0.871 -1.39e-17:  0.519 -0.833 0.193, adjusted: 0.363 -0.932 1.58e-16
+DEAL::Approximate normal in 0.624 -0.624 0.307:  0.592 -0.801 0.0902, adjusted: 0.668 -0.668 0.328
+DEAL::Approximate normal in 0.435 0.00 0.170:  0.833 -0.193 0.519, adjusted: 0.932 -2.53e-17 0.363
+DEAL::Approximate normal in 0.312 0.153 0.312:  0.592 0.0902 0.801, adjusted: 0.668 0.328 0.668
+DEAL::Approximate normal in 0.312 -0.153 0.312:  0.592 -0.0902 0.801, adjusted: 0.668 -0.328 0.668
+DEAL::Approximate normal in 0.170 0.00 0.435:  0.519 -0.193 0.833, adjusted: 0.363 -1.58e-16 0.932
+DEAL::Approximate normal in 0.871 0.00 0.339:  0.833 -0.193 0.519, adjusted: 0.932 -2.53e-17 0.363
+DEAL::Approximate normal in 0.624 0.307 0.624:  0.592 0.0902 0.801, adjusted: 0.668 0.328 0.668
+DEAL::Approximate normal in 0.624 -0.307 0.624:  0.592 -0.0902 0.801, adjusted: 0.668 -0.328 0.668
+DEAL::Approximate normal in 0.339 0.00 0.871:  0.519 -0.193 0.833, adjusted: 0.363 -1.58e-16 0.932
+DEAL::Approximate normal in 0.153 0.312 0.312:  0.0902 0.592 0.801, adjusted: 0.328 0.668 0.668
+DEAL::Approximate normal in 6.94e-18 0.435 0.170:  -0.193 0.833 0.519, adjusted: 1.87e-16 0.932 0.363
+DEAL::Approximate normal in 6.94e-18 0.170 0.435:  -0.193 0.519 0.833, adjusted: -1.58e-16 0.363 0.932
+DEAL::Approximate normal in -0.153 0.312 0.312:  -0.0902 0.592 0.801, adjusted: -0.328 0.668 0.668
+DEAL::Approximate normal in 0.307 0.624 0.624:  0.0902 0.592 0.801, adjusted: 0.328 0.668 0.668
+DEAL::Approximate normal in 1.39e-17 0.871 0.339:  -0.193 0.833 0.519, adjusted: 1.87e-16 0.932 0.363
+DEAL::Approximate normal in 1.39e-17 0.339 0.871:  -0.193 0.519 0.833, adjusted: -1.58e-16 0.363 0.932
+DEAL::Approximate normal in -0.307 0.624 0.624:  -0.0902 0.592 0.801, adjusted: -0.328 0.668 0.668
+DEAL::Approximate normal in 0.435 0.170 0.00:  0.833 0.519 0.193, adjusted: 0.932 0.363 2.53e-17
+DEAL::Approximate normal in 0.312 0.312 -0.153:  0.592 0.801 -0.0902, adjusted: 0.668 0.668 -0.328
+DEAL::Approximate normal in 0.312 0.312 0.153:  0.592 0.801 0.0902, adjusted: 0.668 0.668 0.328
+DEAL::Approximate normal in 0.170 0.435 0.00:  0.519 0.833 0.193, adjusted: 0.363 0.932 1.58e-16
+DEAL::Approximate normal in 0.871 0.339 0.00:  0.833 0.519 0.193, adjusted: 0.932 0.363 2.53e-17
+DEAL::Approximate normal in 0.624 0.624 -0.307:  0.592 0.801 -0.0902, adjusted: 0.668 0.668 -0.328
+DEAL::Approximate normal in 0.624 0.624 0.307:  0.592 0.801 0.0902, adjusted: 0.668 0.668 0.328
+DEAL::Approximate normal in 0.339 0.871 0.00:  0.519 0.833 0.193, adjusted: 0.363 0.932 1.58e-16
+DEAL::Approximate normal in 0.312 -0.153 -0.312:  0.801 -0.0902 -0.592, adjusted: 0.668 -0.328 -0.668
+DEAL::Approximate normal in 0.170 -6.94e-18 -0.435:  0.519 0.193 -0.833, adjusted: 0.363 -1.87e-16 -0.932
+DEAL::Approximate normal in 0.435 -6.94e-18 -0.170:  0.833 0.193 -0.519, adjusted: 0.932 1.58e-16 -0.363
+DEAL::Approximate normal in 0.312 0.153 -0.312:  0.801 0.0902 -0.592, adjusted: 0.668 0.328 -0.668
+DEAL::Approximate normal in 0.624 -0.307 -0.624:  0.801 -0.0902 -0.592, adjusted: 0.668 -0.328 -0.668
+DEAL::Approximate normal in 0.339 -1.39e-17 -0.871:  0.519 0.193 -0.833, adjusted: 0.363 -1.87e-16 -0.932
+DEAL::Approximate normal in 0.871 -1.39e-17 -0.339:  0.833 0.193 -0.519, adjusted: 0.932 1.58e-16 -0.363
+DEAL::Approximate normal in 0.624 0.307 -0.624:  0.801 0.0902 -0.592, adjusted: 0.668 0.328 -0.668
+DEAL::Approximate normal in 0.00 0.170 -0.435:  0.193 0.519 -0.833, adjusted: 4.18e-16 0.363 -0.932
+DEAL::Approximate normal in -0.153 0.312 -0.312:  -0.0902 0.801 -0.592, adjusted: -0.328 0.668 -0.668
+DEAL::Approximate normal in 0.153 0.312 -0.312:  0.0902 0.801 -0.592, adjusted: 0.328 0.668 -0.668
+DEAL::Approximate normal in 0.00 0.435 -0.170:  0.193 0.833 -0.519, adjusted: 1.58e-16 0.932 -0.363
+DEAL::Approximate normal in 0.00 0.339 -0.871:  0.193 0.519 -0.833, adjusted: 4.18e-16 0.363 -0.932
+DEAL::Approximate normal in -0.307 0.624 -0.624:  -0.0902 0.801 -0.592, adjusted: -0.328 0.668 -0.668
+DEAL::Approximate normal in 0.307 0.624 -0.624:  0.0902 0.801 -0.592, adjusted: 0.328 0.668 -0.668
+DEAL::Approximate normal in 0.00 0.871 -0.339:  0.193 0.833 -0.519, adjusted: 1.58e-16 0.932 -0.363
+DEAL::Approximate normal in -0.312 0.312 -0.153:  -0.592 0.801 -0.0902, adjusted: -0.668 0.668 -0.328
+DEAL::Approximate normal in -0.435 0.170 -6.94e-18:  -0.833 0.519 0.193, adjusted: -0.932 0.363 -1.87e-16
+DEAL::Approximate normal in -0.170 0.435 -6.94e-18:  -0.519 0.833 0.193, adjusted: -0.363 0.932 1.58e-16
+DEAL::Approximate normal in -0.312 0.312 0.153:  -0.592 0.801 0.0902, adjusted: -0.668 0.668 0.328
+DEAL::Approximate normal in -0.624 0.624 -0.307:  -0.592 0.801 -0.0902, adjusted: -0.668 0.668 -0.328
+DEAL::Approximate normal in -0.871 0.339 -1.39e-17:  -0.833 0.519 0.193, adjusted: -0.932 0.363 -1.87e-16
+DEAL::Approximate normal in -0.339 0.871 -1.39e-17:  -0.519 0.833 0.193, adjusted: -0.363 0.932 1.58e-16
+DEAL::Approximate normal in -0.624 0.624 0.307:  -0.592 0.801 0.0902, adjusted: -0.668 0.668 0.328
+DEAL::Approximate normal in -0.170 0.00 -0.435:  -0.519 0.193 -0.833, adjusted: -0.363 4.18e-16 -0.932
+DEAL::Approximate normal in -0.312 -0.153 -0.312:  -0.801 -0.0902 -0.592, adjusted: -0.668 -0.328 -0.668
+DEAL::Approximate normal in -0.312 0.153 -0.312:  -0.801 0.0902 -0.592, adjusted: -0.668 0.328 -0.668
+DEAL::Approximate normal in -0.435 0.00 -0.170:  -0.833 0.193 -0.519, adjusted: -0.932 1.58e-16 -0.363
+DEAL::Approximate normal in -0.339 0.00 -0.871:  -0.519 0.193 -0.833, adjusted: -0.363 4.18e-16 -0.932
+DEAL::Approximate normal in -0.624 -0.307 -0.624:  -0.801 -0.0902 -0.592, adjusted: -0.668 -0.328 -0.668
+DEAL::Approximate normal in -0.624 0.307 -0.624:  -0.801 0.0902 -0.592, adjusted: -0.668 0.328 -0.668
+DEAL::Approximate normal in -0.871 0.00 -0.339:  -0.833 0.193 -0.519, adjusted: -0.932 1.58e-16 -0.363
+DEAL::Approximate normal in 0.153 -0.312 -0.312:  0.0902 -0.592 -0.801, adjusted: 0.328 -0.668 -0.668
+DEAL::Approximate normal in 6.94e-18 -0.435 -0.170:  -0.193 -0.833 -0.519, adjusted: 1.87e-16 -0.932 -0.363
+DEAL::Approximate normal in 6.94e-18 -0.170 -0.435:  -0.193 -0.519 -0.833, adjusted: -1.58e-16 -0.363 -0.932
+DEAL::Approximate normal in -0.153 -0.312 -0.312:  -0.0902 -0.592 -0.801, adjusted: -0.328 -0.668 -0.668
+DEAL::Approximate normal in 0.307 -0.624 -0.624:  0.0902 -0.592 -0.801, adjusted: 0.328 -0.668 -0.668
+DEAL::Approximate normal in 1.39e-17 -0.871 -0.339:  -0.193 -0.833 -0.519, adjusted: 1.87e-16 -0.932 -0.363
+DEAL::Approximate normal in 1.39e-17 -0.339 -0.871:  -0.193 -0.519 -0.833, adjusted: -1.58e-16 -0.363 -0.932
+DEAL::Approximate normal in -0.307 -0.624 -0.624:  -0.0902 -0.592 -0.801, adjusted: -0.328 -0.668 -0.668
