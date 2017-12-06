@@ -770,6 +770,23 @@ namespace OpenCASCADE
     tria.create_triangulation(vertices, cells, t);
   }
 
+
+
+  // Explicit instantiations
+  template
+  std::vector<TopoDS_Edge> create_curves_from_triangulation_boundary
+  (const Triangulation<2, 2> &triangulation,
+   const Mapping<2, 2> &mapping);
+
+
+
+  template
+  std::vector<TopoDS_Edge> create_curves_from_triangulation_boundary
+  (const Triangulation<2, 3> &triangulation,
+   const Mapping<2, 3> &mapping);
+
+
+
 } // end namespace
 
 DEAL_II_NAMESPACE_CLOSE
