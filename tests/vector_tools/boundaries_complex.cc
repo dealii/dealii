@@ -141,17 +141,17 @@ check ()
                                                 interpolated_bv, std::vector<bool>());
       write_map (interpolated_bv);
 
-      // // project boundary values
-      // // presently this is not
-      // // implemented for 3d
-      // if (dim != 3)
-      //   {
-      //     deallog << "Projected boundary values" << std::endl;
-      //     std::map<types::global_dof_index,double> projected_bv;
-      //     VectorTools::project_boundary_values (mapping, dof, function_map,
-      //                                           boundary_q(dof), projected_bv);
-      //     write_map (projected_bv);
-      //   }
+      // project boundary values
+      // presently this is not
+      // implemented for 3d
+      if (dim != 3)
+        {
+          deallog << "Projected boundary values" << std::endl;
+          std::map<types::global_dof_index,std::complex<double>> projected_bv;
+          VectorTools::project_boundary_values (mapping, dof, function_map,
+                                                boundary_q(dof), projected_bv);
+          write_map (projected_bv);
+        }
     }
 
 
