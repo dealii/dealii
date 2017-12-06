@@ -884,7 +884,7 @@ SparsityPattern::print_svg (std::ostream &out) const
       "    ]]>\n"
       "  </style>\n\n"
       "   <rect width=\"" << n+2 << "\" height=\"" << m+2 << "\" fill=\"rgb(128, 128, 128)\"/>\n"
-      "   <rect x=\"1\" y=\"1\" width=\"" << n << "\" height=\"" << m
+      "   <rect x=\"1\" y=\"1\" width=\"" << n+0.1 << "\" height=\"" << m+0.1
       << "\" fill=\"rgb(255, 255, 255)\"/>\n\n";
 
   SparsityPattern::iterator
