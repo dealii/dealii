@@ -206,6 +206,35 @@ LAPACKFullMatrix<number>::vmult (
   const number beta = (adding ? 1. : 0.);
   const number null = 0.;
 
+  // use trmv for triangular matrices
+  if ((property == upper_triangular ||
+       property == lower_triangular) &&
+      (mm==nn) &&
+      state == matrix)
+    {
+      Assert (adding == false,
+              ExcNotImplemented());
+
+      AssertDimension(v.size(), this->n_cols());
+      AssertDimension(w.size(), this->n_rows());
+
+      const char diag = 'N';
+      const char trans = 'N';
+      const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+
+      w = v;
+
+      const int N = mm;
+      const int lda = N;
+      const int incx = 1;
+
+      trmv (&uplo, &trans, &diag,
+            &N, &this->values[0], &lda,
+            &w[0], &incx);
+
+      return;
+    }
+
   switch (state)
     {
     case matrix:
@@ -265,6 +294,36 @@ LAPACKFullMatrix<number>::Tvmult (
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
   const number null = 0.;
+
+  // use trmv for triangular matrices
+  if ((property == upper_triangular ||
+       property == lower_triangular) &&
+      (mm==nn) &&
+      state == matrix)
+    {
+      Assert (adding == false,
+              ExcNotImplemented());
+
+      AssertDimension(v.size(), this->n_cols());
+      AssertDimension(w.size(), this->n_rows());
+
+      const char diag = 'N';
+      const char trans = 'T';
+      const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+
+      w = v;
+
+      const int N = mm;
+      const int lda = N;
+      const int incx = 1;
+
+      trmv (&uplo, &trans, &diag,
+            &N, &this->values[0], &lda,
+            &w[0], &incx);
+
+      return;
+    }
+
 
   switch (state)
     {
