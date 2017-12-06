@@ -83,6 +83,16 @@ extern "C"
   void spocon_ (const char *uplo, const int *n, const float *A,
                 const int *lda, const float *anorm, float *rcond,
                 float *work, int *iwork, int *info);
+// Estimate the reciprocal of the condition number of triangular matrices
+// http://www.netlib.org/lapack/explore-html/da/dba/group__double_o_t_h_e_rcomputational_gaff914510b1673e90752c095f5b9dcedf.html#gaff914510b1673e90752c095f5b9dcedf
+  void dtrcon_ (const char *norm, const char *uplo, const char *diag,
+                const int *n, const double *A, const int *lda,
+                double *rcond,
+                double *work, int *iwork, int *info);
+  void strcon_ (const char *norm, const char *uplo, const char *diag,
+                const int *n, const float *A, const int *lda,
+                float *rcond,
+                float *work, int *iwork, int *info);
 // Computes the inverse from Cholesky
   void dpotri_ (const char *uplo, const int *n, double *A,
                 const int *lda, int *info);
@@ -486,6 +496,67 @@ potrf (const char *uplo, const int *n, float *A, const int *lda, int *info)
   (void) info;
 
   Assert (false, LAPACKSupport::ExcMissing("spotrf"));
+#endif
+}
+
+
+
+/// Tempalte wrapper for trcon
+template <typename number>
+inline void
+trcon(const char *norm, const char *uplo, const char *diag,
+      const int *n, const number *A, const int *lda,
+      number *rcond,
+      number *work, int *iwork, int *info)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+inline void
+trcon  (const char *norm, const char *uplo, const char *diag,
+        const int *n, const double *A, const int *lda,
+        double *rcond,
+        double *work, int *iwork, int *info)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  dtrcon_ (norm, uplo, diag, n, A, lda, rcond, work, iwork, info);
+#else
+  (void) norm;
+  (void) uplo;
+  (void) diag;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) rcond;
+  (void) work;
+  (void) iwork;
+  (void) info;
+
+  Assert (false, LAPACKSupport::ExcMissing("dtrcon"));
+#endif
+}
+
+inline void
+trcon  (const char *norm, const char *uplo, const char *diag,
+        const int *n, const float *A, const int *lda,
+        float *rcond,
+        float *work, int *iwork, int *info)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  strcon_ (norm, uplo, diag, n, A, lda, rcond, work, iwork, info);
+#else
+  (void) norm;
+  (void) uplo;
+  (void) diag;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) rcond;
+  (void) work;
+  (void) iwork;
+  (void) info;
+
+  Assert (false, LAPACKSupport::ExcMissing("dtrcon"));
 #endif
 }
 

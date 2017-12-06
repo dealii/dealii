@@ -690,6 +690,38 @@ LAPACKFullMatrix<number>::reciprocal_condition_number(const number a_norm) const
 
 
 template <typename number>
+number
+LAPACKFullMatrix<number>::reciprocal_condition_number() const
+{
+  Threads::Mutex::ScopedLock lock (mutex);
+  Assert(property == upper_triangular ||
+         property == lower_triangular,
+         ExcProperty(property));
+  number rcond = 0.;
+
+  const int N = this->n_rows();
+  const number *values = &this->values[0];
+  int info = 0;
+  const int lda = std::max(1,N);
+  work.resize(3*N);
+  iwork.resize(N);
+
+  const char norm = '1';
+  const char diag = 'N';
+  const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+  trcon(&norm, &uplo, &diag,
+        &N, values, &lda,
+        &rcond,
+        work.data(), iwork.data(), &info);
+
+  Assert(info >= 0, ExcInternalError());
+
+  return rcond;
+}
+
+
+
+template <typename number>
 void
 LAPACKFullMatrix<number>::compute_svd()
 {

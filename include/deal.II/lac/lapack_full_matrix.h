@@ -445,6 +445,12 @@ public:
   number reciprocal_condition_number(const number l1_norm) const;
 
   /**
+   * Same as above but for triangular matrices. The matrix has to have
+   * the LAPACKSupport::Property set, see set_property().
+   */
+  number reciprocal_condition_number() const;
+
+  /**
    * Compute the determinant of a matrix. As it requires the LU factorization of
    * the matrix, this function can only be called after
    * compute_lu_factorization() has been called.
