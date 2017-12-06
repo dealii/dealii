@@ -37,6 +37,12 @@ extern "C"
                const float *alpha, const float *A, const int *lda,
                const float *x, const int *incx,
                const float *b, float *y, const int *incy);
+  void dtrmv_ (const char *uplo, const char *trans, const char *diag,
+               const int *N, const double *A, const int *lda,
+               double *x, const int *incx);
+  void strmv_ (const char *uplo, const char *trans, const char *diag,
+               const int *N, const float *A, const int *lda,
+               float *x, const int *incx);
 // Matrix matrix product
   void dgemm_ (const char *transa, const char *transb,
                const int *m, const int *n, const int *k,
@@ -70,12 +76,31 @@ extern "C"
                 const int *lda, int *info);
   void spotrf_ (const char *uplo, const int *n, float *A,
                 const int *lda, int *info);
+// Apply forward/backward substitution to Cholesky factorization
+  void dpotrs_ (const char *uplo, const int *n, const int *nrhs,
+                const double *A, const int *lda,
+                double *B, const int *ldb,
+                int *info);
+  void spotrs_ (const char *uplo, const int *n, const int *nrhs,
+                const float *A, const int *lda,
+                float *B, const int *ldb,
+                int *info);
 // Estimate the reciprocal of the condition number in 1-norm from Cholesky
   void dpocon_ (const char *uplo, const int *n, const double *A,
                 const int *lda, const double *anorm, double *rcond,
                 double *work, int *iwork, int *info);
   void spocon_ (const char *uplo, const int *n, const float *A,
                 const int *lda, const float *anorm, float *rcond,
+                float *work, int *iwork, int *info);
+// Estimate the reciprocal of the condition number of triangular matrices
+// http://www.netlib.org/lapack/explore-html/da/dba/group__double_o_t_h_e_rcomputational_gaff914510b1673e90752c095f5b9dcedf.html#gaff914510b1673e90752c095f5b9dcedf
+  void dtrcon_ (const char *norm, const char *uplo, const char *diag,
+                const int *n, const double *A, const int *lda,
+                double *rcond,
+                double *work, int *iwork, int *info);
+  void strcon_ (const char *norm, const char *uplo, const char *diag,
+                const int *n, const float *A, const int *lda,
+                float *rcond,
                 float *work, int *iwork, int *info);
 // Computes the inverse from Cholesky
   void dpotri_ (const char *uplo, const int *n, double *A,
@@ -354,6 +379,56 @@ gemv (const char *, const int *, const int *, const float *, const float *, cons
 #endif
 
 
+
+/// Template wrapper for LAPACK functions dtrmv and strmv
+template <typename number>
+inline void
+trmv (const char *uplo, const char *trans, const char *diag,
+      const int *N, const number *A, const int *lda,
+      number *x, const int *incx)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+trmv (const char *uplo, const char *trans, const char *diag,
+      const int *N, const double *A, const int *lda,
+      double *x, const int *incx)
+{
+  dtrmv_ (uplo, trans, diag, N, A, lda, x, incx);
+}
+#else
+inline void
+trmv (const char *uplo, const char *trans, const char *diag,
+      const int *N, const double *A, const int *lda,
+      double *x, const int *incx)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dtrmv"));
+}
+#endif
+
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+trmv (const char *uplo, const char *trans, const char *diag,
+      const int *N, const float *A, const int *lda,
+      float *x, const int *incx)
+{
+  strmv_ (uplo, trans, diag, N, A, lda, x, incx);
+}
+#else
+inline void
+trmv (const char *uplo, const char *trans, const char *diag,
+      const int *N, const float *A, const int *lda,
+      float *x, const int *incx)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dtrmv"));
+}
+#endif
+
+
+
 /// Template wrapper for LAPACK functions dgemm and sgemm
 template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
@@ -430,6 +505,67 @@ potrf (const char *uplo, const int *n, float *A, const int *lda, int *info)
   (void) info;
 
   Assert (false, LAPACKSupport::ExcMissing("spotrf"));
+#endif
+}
+
+
+
+/// Tempalte wrapper for trcon
+template <typename number>
+inline void
+trcon(const char *norm, const char *uplo, const char *diag,
+      const int *n, const number *A, const int *lda,
+      number *rcond,
+      number *work, int *iwork, int *info)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+inline void
+trcon  (const char *norm, const char *uplo, const char *diag,
+        const int *n, const double *A, const int *lda,
+        double *rcond,
+        double *work, int *iwork, int *info)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  dtrcon_ (norm, uplo, diag, n, A, lda, rcond, work, iwork, info);
+#else
+  (void) norm;
+  (void) uplo;
+  (void) diag;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) rcond;
+  (void) work;
+  (void) iwork;
+  (void) info;
+
+  Assert (false, LAPACKSupport::ExcMissing("dtrcon"));
+#endif
+}
+
+inline void
+trcon  (const char *norm, const char *uplo, const char *diag,
+        const int *n, const float *A, const int *lda,
+        float *rcond,
+        float *work, int *iwork, int *info)
+{
+#ifdef DEAL_II_WITH_LAPACK
+  strcon_ (norm, uplo, diag, n, A, lda, rcond, work, iwork, info);
+#else
+  (void) norm;
+  (void) uplo;
+  (void) diag;
+  (void) n;
+  (void) A;
+  (void) lda;
+  (void) rcond;
+  (void) work;
+  (void) iwork;
+  (void) info;
+
+  Assert (false, LAPACKSupport::ExcMissing("dtrcon"));
 #endif
 }
 
@@ -690,6 +826,57 @@ getrs (const char *, const int *, const int *, const float *, const int *, const
   Assert (false, LAPACKSupport::ExcMissing("sgetrs"));
 }
 #endif
+
+
+
+///  Template wrapper for LAPACK functions dpotrs and spotrs
+template <typename number>
+inline void
+potrs (const char *, const int *, const int *,
+       const number *, const int *,
+       number *, const int *,
+       int *)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+potrs (const char *uplo, const int *n, const int *nrhs,
+       const double *A, const int *lda,
+       double *B, const int *ldb,
+       int *info)
+{
+  dpotrs_(uplo,n,nrhs,A,lda,B,ldb,info);
+}
+inline void
+potrs (const char *uplo, const int *n, const int *nrhs,
+       const float *A, const int *lda,
+       float *B, const int *ldb,
+       int *info)
+{
+  spotrs_(uplo,n,nrhs,A,lda,B,ldb,info);
+}
+#else
+inline void
+potrs (const char *, const int *, const int *,
+       const double *, const int *,
+       double *, const int *,
+       int *)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dpotrs"));
+}
+inline void
+potrs (const char *, const int *, const int *,
+       const float *, const int *,
+       flaot *, const int *,
+       int *)
+{
+  Assert (false, LAPACKSupport::ExcMissing("spotrs"));
+}
+#endif
+
+
 
 
 /// Template wrapper for LAPACK functions dgetri and sgetri

@@ -206,6 +206,35 @@ LAPACKFullMatrix<number>::vmult (
   const number beta = (adding ? 1. : 0.);
   const number null = 0.;
 
+  // use trmv for triangular matrices
+  if ((property == upper_triangular ||
+       property == lower_triangular) &&
+      (mm==nn) &&
+      state == matrix)
+    {
+      Assert (adding == false,
+              ExcNotImplemented());
+
+      AssertDimension(v.size(), this->n_cols());
+      AssertDimension(w.size(), this->n_rows());
+
+      const char diag = 'N';
+      const char trans = 'N';
+      const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+
+      w = v;
+
+      const int N = mm;
+      const int lda = N;
+      const int incx = 1;
+
+      trmv (&uplo, &trans, &diag,
+            &N, &this->values[0], &lda,
+            &w[0], &incx);
+
+      return;
+    }
+
   switch (state)
     {
     case matrix:
@@ -265,6 +294,36 @@ LAPACKFullMatrix<number>::Tvmult (
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
   const number null = 0.;
+
+  // use trmv for triangular matrices
+  if ((property == upper_triangular ||
+       property == lower_triangular) &&
+      (mm==nn) &&
+      state == matrix)
+    {
+      Assert (adding == false,
+              ExcNotImplemented());
+
+      AssertDimension(v.size(), this->n_cols());
+      AssertDimension(w.size(), this->n_rows());
+
+      const char diag = 'N';
+      const char trans = 'T';
+      const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+
+      w = v;
+
+      const int N = mm;
+      const int lda = N;
+      const int incx = 1;
+
+      trmv (&uplo, &trans, &diag,
+            &N, &this->values[0], &lda,
+            &w[0], &incx);
+
+      return;
+    }
+
 
   switch (state)
     {
@@ -690,6 +749,38 @@ LAPACKFullMatrix<number>::reciprocal_condition_number(const number a_norm) const
 
 
 template <typename number>
+number
+LAPACKFullMatrix<number>::reciprocal_condition_number() const
+{
+  Threads::Mutex::ScopedLock lock (mutex);
+  Assert(property == upper_triangular ||
+         property == lower_triangular,
+         ExcProperty(property));
+  number rcond = 0.;
+
+  const int N = this->n_rows();
+  const number *values = &this->values[0];
+  int info = 0;
+  const int lda = std::max(1,N);
+  work.resize(3*N);
+  iwork.resize(N);
+
+  const char norm = '1';
+  const char diag = 'N';
+  const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+  trcon(&norm, &uplo, &diag,
+        &N, values, &lda,
+        &rcond,
+        work.data(), iwork.data(), &info);
+
+  Assert(info >= 0, ExcInternalError());
+
+  return rcond;
+}
+
+
+
+template <typename number>
 void
 LAPACKFullMatrix<number>::compute_svd()
 {
@@ -797,26 +888,111 @@ LAPACKFullMatrix<number>::invert()
 }
 
 
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::solve(Vector<number> &v,
+                                const bool transposed) const
+{
+  Assert(this->n_rows() == this->n_cols(),
+         LACExceptions::ExcNotQuadratic());
+  AssertDimension(this->n_rows(), v.size());
+  const char *trans = transposed ? &T : &N;
+  const int nn = this->n_cols();
+  const number *values = &this->values[0];
+  const int n_rhs = 1;
+  int info = 0;
+
+  if (state == lu)
+    {
+      getrs(trans, &nn, &n_rhs, values, &nn, ipiv.data(),
+            v.begin(), &nn, &info);
+    }
+  else if (state == cholesky)
+    {
+      potrs(&LAPACKSupport::L, &nn, &n_rhs,
+            values, &nn, v.begin(), &nn, &info);
+    }
+  else if (property == upper_triangular ||
+           property == lower_triangular)
+    {
+      const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+
+      const int lda = nn;
+      const int ldb = nn;
+      trtrs (&uplo, trans, "N",
+             &nn, &n_rhs,
+             values, &lda,
+             v.begin(), &ldb, &info);
+    }
+  else
+    {
+      Assert(false,
+             ExcMessage("The matrix has to be either factorized or triangular."));
+    }
+
+  Assert(info == 0, ExcInternalError());
+}
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::solve(LAPACKFullMatrix<number> &B,
+                                const bool transposed) const
+{
+  Assert(B.state == matrix, ExcState(B.state));
+
+  Assert(this->n_rows() == this->n_cols(),
+         LACExceptions::ExcNotQuadratic());
+  AssertDimension(this->n_rows(), B.n_rows());
+  const char *trans = transposed ? &T : &N;
+  const int nn = this->n_cols();
+  const number *values = &this->values[0];
+  const int n_rhs = B.n_cols();
+  int info = 0;
+
+  if (state == lu)
+    {
+      getrs(trans, &nn, &n_rhs, values, &nn, ipiv.data(),
+            &B.values[0], &nn, &info);
+    }
+  else if (state == cholesky)
+    {
+      potrs(&LAPACKSupport::L, &nn, &n_rhs,
+            values, &nn, &B.values[0], &nn, &info);
+    }
+  else if (property == upper_triangular ||
+           property == lower_triangular)
+    {
+      const char uplo = (property == upper_triangular ? LAPACKSupport::U : LAPACKSupport::L);
+
+      const int lda = nn;
+      const int ldb = nn;
+      trtrs (&uplo, trans, "N",
+             &nn, &n_rhs,
+             values, &lda,
+             &B.values[0], &ldb, &info);
+    }
+  else
+    {
+      Assert(false,
+             ExcMessage("The matrix has to be either factorized or triangular."));
+    }
+
+  Assert(info == 0, ExcInternalError());
+}
+
+
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
                                                  const bool transposed) const
 {
-  Assert(state == lu, ExcState(state));
-  Assert(this->n_rows() == this->n_cols(),
-         LACExceptions::ExcNotQuadratic());
-  AssertDimension(this->n_rows(), v.size());
-
-  const char *trans = transposed ? &T : &N;
-  const int nn = this->n_cols();
-  const number *values = &this->values[0];
-  int info = 0;
-
-  getrs(trans, &nn, &one, values, &nn, ipiv.data(),
-        v.begin(), &nn, &info);
-
-  Assert(info == 0, ExcInternalError());
+  solve(v,transposed);
 }
+
 
 
 template <typename number>
@@ -824,21 +1000,9 @@ void
 LAPACKFullMatrix<number>::apply_lu_factorization(LAPACKFullMatrix<number> &B,
                                                  const bool transposed) const
 {
-  Assert(state == lu, ExcState(state));
-  Assert(B.state == matrix, ExcState(state));
-  Assert(this->n_rows() == this->n_cols(), LACExceptions::ExcNotQuadratic());
-  AssertDimension(this->n_rows(), B.n_rows());
-
-  const char *trans = transposed ? &T : &N;
-  const int nn = this->n_cols();
-  const int kk = B.n_cols();
-  const number *values = &this->values[0];
-  int info = 0;
-
-  getrs(trans, &nn, &kk, values, &nn, ipiv.data(), &B.values[0], &nn, &info);
-
-  Assert(info == 0, ExcInternalError());
+  solve(B,transposed);
 }
+
 
 
 template <typename number>
