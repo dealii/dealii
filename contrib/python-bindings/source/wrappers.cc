@@ -15,8 +15,6 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
-
 #include <boost/python.hpp>
 
 DEAL_II_NAMESPACE_OPEN
@@ -70,7 +68,5 @@ BOOST_PYTHON_MODULE(Release)
   dealii::python::export_point();
   dealii::python::export_triangulation();
 }
-
-#endif
 
 #endif

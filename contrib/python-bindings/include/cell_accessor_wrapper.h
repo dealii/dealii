@@ -18,8 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
-
 #include <deal.II/grid/tria_accessor.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -138,7 +136,5 @@ namespace python
 }
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif

@@ -17,8 +17,6 @@
 #include <triangulation_wrapper.h>
 #include <boost/python.hpp>
 
-#ifdef DEAL_II_WITH_CXX11
-
 DEAL_II_NAMESPACE_OPEN
 
 namespace python
@@ -109,5 +107,3 @@ namespace python
 }
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif

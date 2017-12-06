@@ -17,9 +17,6 @@
 #define dealii_point_wrapper_h
 
 #include <deal.II/base/config.h>
-
-#ifdef DEAL_II_WITH_CXX11
-
 #include <deal.II/base/point.h>
 
 #include <boost/python.hpp>
@@ -238,7 +235,5 @@ namespace python
 }
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif
