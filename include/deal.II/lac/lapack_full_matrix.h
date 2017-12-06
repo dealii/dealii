@@ -445,8 +445,10 @@ public:
   number reciprocal_condition_number(const number l1_norm) const;
 
   /**
-   * Same as above but for triangular matrices. The matrix has to have
-   * the LAPACKSupport::Property set, see set_property().
+   * Estimate the reciprocal of the condition number $1/k(A)$ in $L_1$ norm
+   * for triangular matrices. The matrix has to have
+   * the LAPACKSupport::Property set to either LAPACKSupport::Property::upper_triangular
+   * or LAPACKSupport::Property::lower_triangular, see set_property().
    */
   number reciprocal_condition_number() const;
 
@@ -485,21 +487,22 @@ public:
   void invert ();
 
   /**
-   * Solve the linear system with right hand side. The matrix should
-   * be either triangular or LU factorization should be previously computed.
+   * Solve the linear system with right hand side @p v and put the solution
+   * back to @p v. The matrix should be either triangular or LU/Cholesky
+   * factorization should be previously computed.
    *
    * The flag transposed indicates whether the solution of the transposed
    * system is to be performed.
    */
   void solve(Vector<number> &v,
-             const bool transposed) const;
+             const bool transposed = false) const;
 
   /**
    * Same as above but for multiple right hand sides (as many as there
    * are columns in the matrix @p B).
    */
   void solve(LAPACKFullMatrix<number> &B,
-             const bool transposed) const;
+             const bool transposed = false) const;
 
   /**
    * Solve the linear system with right hand side given by applying
