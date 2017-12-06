@@ -1464,13 +1464,13 @@ private:
   /**
    * Internal helper function for distribute_local_to_global function.
    */
-  template <typename LocalType>
-  LocalType
+  template <typename MatrixScalar, typename VectorScalar>
+  typename ProductType<VectorScalar,MatrixScalar>::type
   resolve_vector_entry (const size_type                       i,
                         const internals::GlobalRowsFromLocal &global_rows,
-                        const Vector<LocalType>              &local_vector,
+                        const Vector<VectorScalar>           &local_vector,
                         const std::vector<size_type>         &local_dof_indices,
-                        const FullMatrix<LocalType>          &local_matrix) const;
+                        const FullMatrix<MatrixScalar>       &local_matrix) const;
 };
 
 

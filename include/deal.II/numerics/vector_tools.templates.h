@@ -22,6 +22,7 @@
 #include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/distributed/tria_base.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
@@ -37,6 +38,7 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -922,7 +924,7 @@ namespace VectorTools
     }
 
     template <typename number>
-    void invert_mass_matrix(const SparseMatrix<std::complex<number> > &/*mass_matrix*/,
+    void invert_mass_matrix(const SparseMatrix<number> &/*mass_matrix*/,
                             const Vector<std::complex<number> > &/*rhs*/,
                             Vector<std::complex<number> > &/*solution*/)
     {
@@ -2855,8 +2857,24 @@ namespace VectorTools
     }
 
     template <typename number1, typename number2>
+    bool real_part_bigger_than(const number1               a,
+                               const std::complex<number2> b)
+    {
+      Assert(std::abs(b.imag()) <= 1e-15*std::abs(b), ExcInternalError());
+      return a > b.real();
+    }
+
+    template <typename number1, typename number2>
     bool real_part_bigger_than(const std::complex<number1> a,
-                               const std::complex<number2> &b)
+                               const number2               b)
+    {
+      Assert(std::abs(a.imag()) <= 1e-15*std::abs(a), ExcInternalError());
+      return a.real() > b;
+    }
+
+    template <typename number1, typename number2>
+    bool real_part_bigger_than(const std::complex<number1> a,
+                               const std::complex<number2> b)
     {
       Assert(std::abs(a.imag()) <= 1e-15*std::abs(a), ExcInternalError());
       Assert(std::abs(b.imag()) <= 1e-15*std::abs(b), ExcInternalError());
@@ -2906,13 +2924,13 @@ namespace VectorTools
 
     template <typename number>
     void invert_mass_matrix
-    (const SparseMatrix<std::complex<number> > &/*mass_matrix*/,
-     const FilteredMatrix<Vector<std::complex<number> > > &/*filtered_mass_matrix*/,
-     FilteredMatrix<Vector<std::complex<number> > > &/*filtered_preconditioner*/,
-     const Vector<std::complex<number> > &/*rhs*/,
-     Vector<std::complex<number> > &/*boundary_projection*/)
+    (const SparseMatrix<number> &mass_matrix,
+     const FilteredMatrix<Vector<std::complex<number> > > &filtered_mass_matrix,
+     FilteredMatrix<Vector<std::complex<number> > > &filtered_preconditioner,
+     const Vector<std::complex<number> > &rhs,
+     Vector<std::complex<number> > &boundary_projection)
     {
-      Assert(false, ExcNotImplemented());
+      Assert (false, ExcInternalError());
     }
 
 
@@ -3026,14 +3044,14 @@ namespace VectorTools
 
 
       // make mass matrix and right hand side
-      SparseMatrix<number> mass_matrix(sparsity);
+      SparseMatrix<typename numbers::NumberTraits<number>::real_type> mass_matrix(sparsity);
       Vector<number>       rhs(sparsity.n_rows());
 
 
       MatrixCreator::create_boundary_mass_matrix (mapping, dof, q,
                                                   mass_matrix, boundary_functions,
                                                   rhs, dof_to_boundary_mapping,
-                                                  (const Function<spacedim,number> *) nullptr,
+                                                  (const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *) nullptr,
                                                   component_mapping);
 
       // For certain weird elements,
