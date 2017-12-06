@@ -23,6 +23,7 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/base/point.h>
+#include <deal.II/fe/mapping_q1.h>
 
 #include <string>
 
@@ -88,8 +89,10 @@ DEAL_II_NAMESPACE_OPEN
  * TopoDS_Shapes of one type or another, and provide interfaces to common
  * deal.II objects, like Triangulation, Manifold, and so on.
  *
- * Notice that these tools are only useful when spacedim is equal to three,
- * since OpenCASCADE only operates in three-dimensional mode.
+ * Notice that most of these tools are only useful when spacedim is equal to
+ * three, since OpenCASCADE only operates in three-dimensional mode. In some
+ * cases they can be used in two dimensions as well, and the third dimension
+ * will be set to zero.
  *
  * @author Luca Heltai, Andrea Mola, 2011--2014.
  */
@@ -218,6 +221,32 @@ namespace OpenCASCADE
    */
   void create_triangulation(const TopoDS_Face &face,
                             Triangulation<2,3> &tria);
+
+
+  /**
+   * Given a Triangulation and an optional Mapping, create a vector of smooth
+   * curves that interpolate the connected parts of the boundary vertices of
+   * the Triangulation and return them as a vector of TopoDS_Edge objects.
+   *
+   * This function constructs closed Bspline curve objects passing through all
+   * vertices of the boundary of the triangulation, with $C^2$ Continuity on
+   * each vertex except the first, where only $C^1$ continuity is guaranteed.
+   *
+   * The returned curves are ordered with respect to the indices of the faces
+   * that make up the triangulation boundary, i.e., the first curve is the one
+   * extracted starting from the face with the lowest index, and so on.
+   *
+   * @param[in] triangulation Input triangulation
+   * @param[in] mapping Optional input mapping
+   * @return An std::vector of TopoDS_Edge objects representing the smooth
+   *  interpolation of the boundary of the `triangulation`
+   *
+   * @author Dirk Peschka, Luca Heltai, 2017.
+   */
+  template <int spacedim>
+  std::vector<TopoDS_Edge> create_curves_from_triangulation_boundary
+  (const Triangulation<2,spacedim> &triangulation,
+   const Mapping<2,spacedim> &mapping=StaticMappingQ1<2,spacedim>::mapping);
 
   /**
    * Extract all compound shapes from a TopoDS_Shape, and store the results
