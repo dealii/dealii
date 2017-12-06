@@ -71,21 +71,22 @@ namespace SparsityTools
    * an edge between two nodes in the connection graph. The goal is then to
    * decompose this graph into groups of nodes so that a minimal number of
    * edges are cut by the boundaries between node groups. This partitioning is
-   * done by METIS or ZOLTAN, depending upon which partitioner is chosen in the fourth argument.
-   * The default is METIS. Note that METIS and ZOLTAN can only partition symmetric sparsity
-   * patterns, and that of course the sparsity pattern has to be square. We do
-   * not check for symmetry of the sparsity pattern, since this is an
-   * expensive operation, but rather leave this as the responsibility of
-   * caller of this function.
+   * done by METIS or ZOLTAN, depending upon which partitioner is chosen
+   * in the fourth argument. The default is METIS. Note that METIS and
+   * ZOLTAN can only partition symmetric sparsity patterns, and that of
+   * course the sparsity pattern has to be square. We do not check for
+   * symmetry of the sparsity pattern, since this is an expensive operation,
+   * but rather leave this as the responsibility of caller of this function.
    *
    * After calling this function, the output array will have values between
    * zero and @p n_partitions-1 for each node (i.e. row or column of the
    * matrix).
    *
-   * If deal.II was not installed with packages ZOLTAN or METIS, this function will generate an error
-   * when corresponding partition method is chosen, unless @p n_partitions is one.
-   * I.e., you can write a program so that it runs in the single-processor single-partition
-   * case without the packages installed, and only requires them installed when
+   * If deal.II was not installed with packages ZOLTAN or METIS, this
+   * function will generate an error when corresponding partition method
+   * is chosen, unless @p n_partitions is one. I.e., you can write a program
+   * so that it runs in the single-processor single-partition case without
+   * the packages installed, and only requires them installed when
    * multiple partitions are required.
    *
    * Note that the sparsity pattern itself is not changed by calling this
@@ -102,6 +103,41 @@ namespace SparsityTools
                   std::vector<unsigned int> &partition_indices,
                   const Partitioner partitioner = Partitioner::metis
                  );
+
+  /**
+   * Using a coloring algorithm provided by ZOLTAN to color nodes whose
+   * connections are represented using a SparsityPattern object. In effect,
+   * we view this sparsity pattern as a graph of connections between nodes,
+   * where each nonzero entry in the @p sparsity_pattern corresponds to
+   * an edge between two nodes. The goal is to assign each node a color index
+   * such that no two directly connected nodes have the same color.
+   * The assigned colors are listed in @p color_indices indexed from one and
+   * the function returns total number of colors used. ZOLTAN coloring
+   * algorithm is run in serial by each processor. Hence all processors have
+   * coloring information of all the nodes. A wrapper function to this
+   * function is available in GraphColoring namespace as well.
+   *
+   * Note that this function requires that SparsityPattern be symmetric
+   * (and hence square) i.e an undirected graph representation. We do not
+   * check for symmetry of the sparsity pattern, since this is an expensive
+   * operation, but rather leave this as the responsibility of caller of
+   * this function.
+   *
+   * @image html color_undirected_graph.png
+   * The usage of the function is illustrated by the image above, showing five
+   * nodes numbered from 0 to 4. The connections shown are bidirectional.
+   * After coloring, it is clear that no two directly connected nodes are
+   * assigned the same color.
+   *
+   * If deal.II was not installed with package ZOLTAN, this function will
+   * generate an error.
+   *
+   * @note The current function is an alternative to
+   * GraphColoring::make_graph_coloring() which is tailored to graph
+   * coloring arising in shared-memory parallel assembly of matrices.
+   */
+  unsigned int color_sparsity_pattern (const SparsityPattern     &sparsity_pattern,
+                                       std::vector<unsigned int> &color_indices);
 
   /**
    * For a given sparsity pattern, compute a re-enumeration of row/column

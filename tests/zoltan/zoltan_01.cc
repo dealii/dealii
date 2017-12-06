@@ -47,10 +47,9 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  initlog();
-
   //Initialize MPI and Zoltan
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
+  MPILogInitAll all;
 
   //tests
   test<1> ();

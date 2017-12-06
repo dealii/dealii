@@ -39,6 +39,7 @@ SET(_unity_include_src
   function_time.cc
   geometry_info.cc
   geometric_utilities.cc
+  graph_coloring.cc
   index_set.cc
   job_identifier.cc
   logstream.cc
