@@ -14,9 +14,6 @@
 
 #include "../tests.h"
 
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-
 int main ()
 {
   initlog();
@@ -39,7 +36,7 @@ int main ()
 
   geo.close();
 
-  std::system(TOSTRING(GMSH_EXECUTABLE) " -2 file.geo 1>file.log 2>file_warn.log");
+  std::system(DEAL_II_GMSH_EXECUTABLE_PATH " -2 file.geo 1>file.log 2>file_warn.log");
 
   cat_file("file.msh");
 
