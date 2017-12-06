@@ -9,7 +9,7 @@
   </style>
 
    <rect width="5" height="4" fill="rgb(128, 128, 128)"/>
-   <rect x="1" y="1" width="3" height="2" fill="rgb(255, 255, 255)"/>
+   <rect x="1" y="1" width="3.10000" height="2.10000" fill="rgb(255, 255, 255)"/>
 
   <rect class="pixel" x="2" y="1" width=".9" height=".9"/>
   <rect class="pixel" x="3" y="1" width=".9" height=".9"/>
