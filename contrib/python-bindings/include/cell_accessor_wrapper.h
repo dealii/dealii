@@ -115,7 +115,7 @@ namespace python
     DeclException2(ExcVertexDoesNotExist,
                    int, int,
                    << "Requested vertex number " << arg1
-                   << "does not exist. The largest vertex number "
+                   << " does not exist. The largest vertex number "
                    << "acceptable is "<< arg2-1);
 
   private:
