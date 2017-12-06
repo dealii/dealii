@@ -76,6 +76,15 @@ extern "C"
                 const int *lda, int *info);
   void spotrf_ (const char *uplo, const int *n, float *A,
                 const int *lda, int *info);
+// Apply forward/backward substitution to Cholesky factorization
+  void dpotrs_ (const char *uplo, const int *n, const int *nrhs,
+                const double *A, const int *lda,
+                double *B, const int *ldb,
+                int *info);
+  void spotrs_ (const char *uplo, const int *n, const int *nrhs,
+                const float *A, const int *lda,
+                float *B, const int *ldb,
+                int *info);
 // Estimate the reciprocal of the condition number in 1-norm from Cholesky
   void dpocon_ (const char *uplo, const int *n, const double *A,
                 const int *lda, const double *anorm, double *rcond,
@@ -817,6 +826,57 @@ getrs (const char *, const int *, const int *, const float *, const int *, const
   Assert (false, LAPACKSupport::ExcMissing("sgetrs"));
 }
 #endif
+
+
+
+///  Template wrapper for LAPACK functions dpotrs and spotrs
+template <typename number>
+inline void
+potrs (const char *, const int *, const int *,
+       const number *, const int *,
+       number *, const int *,
+       int *)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+potrs (const char *uplo, const int *n, const int *nrhs,
+       const double *A, const int *lda,
+       double *B, const int *ldb,
+       int *info)
+{
+  dpotrs_(uplo,n,nrhs,A,lda,B,ldb,info);
+}
+inline void
+potrs (const char *uplo, const int *n, const int *nrhs,
+       const float *A, const int *lda,
+       float *B, const int *ldb,
+       int *info)
+{
+  spotrs_(uplo,n,nrhs,A,lda,B,ldb,info);
+}
+#else
+inline void
+potrs (const char *, const int *, const int *,
+       const double *, const int *,
+       double *, const int *,
+       int *)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dpotrs"));
+}
+inline void
+potrs (const char *, const int *, const int *,
+       const float *, const int *,
+       flaot *, const int *,
+       int *)
+{
+  Assert (false, LAPACKSupport::ExcMissing("spotrs"));
+}
+#endif
+
+
 
 
 /// Template wrapper for LAPACK functions dgetri and sgetri

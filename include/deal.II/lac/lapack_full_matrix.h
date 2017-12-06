@@ -485,13 +485,33 @@ public:
   void invert ();
 
   /**
+   * Solve the linear system with right hand side. The matrix should
+   * be either triangular or LU factorization should be previously computed.
+   *
+   * The flag transposed indicates whether the solution of the transposed
+   * system is to be performed.
+   */
+  void solve(Vector<number> &v,
+             const bool transposed) const;
+
+  /**
+   * Same as above but for multiple right hand sides (as many as there
+   * are columns in the matrix @p B).
+   */
+  void solve(LAPACKFullMatrix<number> &B,
+             const bool transposed) const;
+
+  /**
    * Solve the linear system with right hand side given by applying
    * forward/backward substitution to the previously computed LU
    * factorization. Uses LAPACK function Xgetrs.
    *
    * The flag transposed indicates whether the solution of the transposed
    * system is to be performed.
+   *
+   * @deprecated use solve() instead.
    */
+  DEAL_II_DEPRECATED
   void apply_lu_factorization (Vector<number> &v,
                                const bool      transposed) const;
 
@@ -503,7 +523,10 @@ public:
    *
    * The flag transposed indicates whether the solution of the transposed
    * system is to be performed.
+   *
+   * @deprecated use solve() instead.
    */
+  DEAL_II_DEPRECATED
   void apply_lu_factorization (LAPACKFullMatrix<number> &B,
                                const bool                transposed) const;
 
