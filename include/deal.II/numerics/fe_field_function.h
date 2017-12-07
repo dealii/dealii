@@ -397,15 +397,22 @@ namespace Functions
                            std::vector<Vector<typename VectorType::value_type> >   &values) const;
 
     /**
-     * Create quadrature rules. This function groups the points into blocks
-     * that live in the same cell, and fills up three vectors: @p cells, @p
-     * qpoints and @p maps. The first is a list of the cells that contain the
-     * points, the second is a list of quadrature points matching each cell of
-     * the first list, and the third contains the index of the given
-     * quadrature points, i.e., @p points[maps[3][4]] ends up as the 5th
-     * quadrature point in the 4th cell. This is where optimization would
-     * help. This function returns the number of cells that contain the given
-     * set of points.
+     * Given a set of points located in the domain (or, in the case of
+     * a parallel Triangulation, in the locally owned part of the domain
+     * or on the ghost cells for the current processor), sort these
+     * points into buckets for each of the cells on which at least
+     * one of the points is located.
+     *
+     * This function fills three output vectors: @p cells, @p qpoints
+     * and @p maps. The first is a list of the cells that contain the
+     * points, the second is a list of quadrature points matching each
+     * cell of the first list, and the third contains the index of the
+     * given quadrature points, i.e., @p points[maps[3][4]] ends up as
+     * the 5th quadrature point in the 4th cell.
+     *
+     * @return This function returns the number of cells that
+     *   collectively contain the set of points give as @p
+     *   points. This also equals the lengths of the output arrays.
      */
     unsigned int
     compute_point_locations
