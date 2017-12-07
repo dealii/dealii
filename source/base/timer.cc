@@ -349,17 +349,48 @@ TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
 
 TimerOutput::~TimerOutput()
 {
-  try
-    {
-      while (active_sections.size() > 0)
-        leave_subsection();
-    }
-  catch (...)
-    {}
+  auto do_exit = [this]()
+  {
+    try
+      {
+        while (active_sections.size() > 0)
+          leave_subsection();
+      }
+    catch (...)
+      {}
 
-  if ( (output_frequency == summary || output_frequency == every_call_and_summary)
-       && output_is_enabled == true)
-    print_summary();
+    if ( (output_frequency == summary || output_frequency == every_call_and_summary)
+         && output_is_enabled == true)
+      print_summary();
+  };
+
+  // avoid communicating with other processes if there is an uncaught
+  // exception
+#ifdef DEAL_II_WITH_MPI
+  if (std::uncaught_exception() && mpi_communicator != MPI_COMM_SELF)
+    {
+      std::cerr << "---------------------------------------------------------"
+                << std::endl
+                << "TimerOutput objects finalize timed values printed to the"
+                << std::endl
+                << "screen by communicating over MPI in their destructors."
+                << std::endl
+                << "Since an exception is currently uncaught, this"
+                << std::endl
+                << "synchronization (and subsequent output) will be skipped to"
+                << std::endl
+                << "avoid a possible deadlock."
+                << std::endl
+                << "---------------------------------------------------------"
+                << std::endl;
+    }
+  else
+    {
+      do_exit();
+    }
+#else
+  do_exit();
+#endif
 }
 
 
@@ -684,6 +715,16 @@ TimerOutput::reset ()
   sections.clear();
   active_sections.clear();
   timer_all.restart();
+}
+
+TimerOutput::Scope::~Scope()
+{
+  try
+    {
+      stop();
+    }
+  catch (...)
+    {}
 }
 
 
