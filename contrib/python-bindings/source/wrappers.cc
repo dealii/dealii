@@ -14,8 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/config.h>
-
-#ifdef DEAL_II_WITH_CXX11
+#include <deal.II/base/exceptions.h>
 
 #include <boost/python.hpp>
 
@@ -50,6 +49,11 @@ BOOST_PYTHON_MODULE(Debug)
   doc_options.enable_py_signatures();
   doc_options.disable_cpp_signatures();
 
+  // Switch off call to std::abort when an exception is created using Assert.
+  // If the code aborts, the kernel of a Jupyter Notebook is killed and no
+  // message is printed.
+  dealii::deal_II_exceptions::disable_abort_on_exception();
+
   dealii::python::export_cell_accessor();
   dealii::python::export_point();
   dealii::python::export_triangulation();
@@ -70,7 +74,5 @@ BOOST_PYTHON_MODULE(Release)
   dealii::python::export_point();
   dealii::python::export_triangulation();
 }
-
-#endif
 
 #endif

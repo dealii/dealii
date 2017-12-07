@@ -14,9 +14,6 @@
 // ---------------------------------------------------------------------
 
 #include <triangulation_wrapper.h>
-
-#ifdef DEAL_II_WITH_CXX11
-
 #include <cell_accessor_wrapper.h>
 #include <boost/python.hpp>
 
@@ -246,7 +243,7 @@ namespace python
 
 
   const char shift_docstring [] =
-    "Shift every vertex of the Triangulation by the gien shift vector       \n"
+    "Shift every vertex of the Triangulation by the given shift vector      \n"
     ;
 
 
@@ -274,7 +271,7 @@ namespace python
     "faces of the triangulation to the faces of out_tria. If you need to    \n"
     "specify manifold ids on interior faces, they have to be specified      \n"
     "manually after the triangulation is created. This function will fail   \n"
-    "the input Triangulation contains hanging nodes.                        \n"
+    "if the input Triangulation contains hanging nodes.                     \n"
     ;
 
 
@@ -470,5 +467,3 @@ namespace python
 }
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif

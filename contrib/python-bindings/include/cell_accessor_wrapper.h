@@ -18,8 +18,6 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CXX11
-
 #include <deal.II/grid/tria_accessor.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -115,7 +113,7 @@ namespace python
     DeclException2(ExcVertexDoesNotExist,
                    int, int,
                    << "Requested vertex number " << arg1
-                   << "does not exist. The largest vertex number "
+                   << " does not exist. The largest vertex number "
                    << "acceptable is "<< arg2-1);
 
   private:
@@ -138,7 +136,5 @@ namespace python
 }
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif

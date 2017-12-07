@@ -14,9 +14,6 @@
 // ---------------------------------------------------------------------
 
 #include <triangulation_wrapper.h>
-
-#ifdef DEAL_II_WITH_CXX11
-
 #include <cell_accessor_wrapper.h>
 #include <deal.II/base/types.h>
 #include <deal.II/grid/tria.h>
@@ -1112,5 +1109,3 @@ namespace python
 }
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
