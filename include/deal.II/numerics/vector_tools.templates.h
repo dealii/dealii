@@ -2898,6 +2898,7 @@ namespace VectorTools
     }
 
 
+
     template <typename number>
     void invert_mass_matrix(const SparseMatrix<number>            &mass_matrix,
                             const FilteredMatrix<Vector<number> > &filtered_mass_matrix,
@@ -2922,15 +2923,44 @@ namespace VectorTools
       filtered_preconditioner.clear();
     }
 
+
+
     template <typename number>
     void invert_mass_matrix
     (const SparseMatrix<number> &mass_matrix,
-     const FilteredMatrix<Vector<std::complex<number> > > &filtered_mass_matrix,
-     FilteredMatrix<Vector<std::complex<number> > > &filtered_preconditioner,
+     const FilteredMatrix<Vector<number> > &filtered_mass_matrix,
+     FilteredMatrix<Vector<number> > &filtered_preconditioner,
      const Vector<std::complex<number> > &rhs,
      Vector<std::complex<number> > &boundary_projection)
     {
-      Assert (false, ExcInternalError());
+      auto solve_for_one_component
+        = [&](const bool real_part)
+      {
+        // copy the real or imaginary part out of the rhs vector
+        Vector<number> rhs_part (rhs.size());
+        for (unsigned int i=0; i<rhs.size(); ++i)
+          rhs_part(i) = (real_part ? rhs(i).real() : rhs(i).imag());
+
+        // then solve the linear system for this part
+        Vector<number> boundary_projection_part (boundary_projection.size());
+        invert_mass_matrix (mass_matrix,
+                            filtered_mass_matrix,
+                            filtered_preconditioner,
+                            rhs_part,
+                            boundary_projection_part);
+
+        // finally copy the real or imaginary part of the
+        // solution back into the global solution vector
+        for (unsigned int i=0; i<boundary_projection.size(); ++i)
+          if (real_part == true)
+            boundary_projection(i).real(boundary_projection_part(i));
+          else
+            boundary_projection(i).imag(boundary_projection_part(i));
+      };
+
+      // solve for real and imaginary parts of the solution separately
+      solve_for_one_component (true);
+      solve_for_one_component (false);
     }
 
 
@@ -3066,8 +3096,8 @@ namespace VectorTools
 
 //TODO: Maybe we should figure out if the element really needs this
 
-      FilteredMatrix<Vector<number> > filtered_mass_matrix(mass_matrix, true);
-      FilteredMatrix<Vector<number> > filtered_precondition;
+      FilteredMatrix<Vector<typename numbers::NumberTraits<number>::real_type> > filtered_mass_matrix(mass_matrix, true);
+      FilteredMatrix<Vector<typename numbers::NumberTraits<number>::real_type> > filtered_precondition;
       std::vector<bool> excluded_dofs(mass_matrix.m(), false);
 
       // we assemble mass matrix with unit weight,
