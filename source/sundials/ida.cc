@@ -142,7 +142,9 @@ namespace SUNDIALS
                        const MPI_Comm mpi_comm) :
     data(data),
     ida_mem(nullptr),
-    communicator(Utilities::MPI::duplicate_communicator(mpi_comm))
+    communicator(is_serial_vector<VectorType>::value ?
+                 MPI_COMM_SELF :
+                 Utilities::MPI::duplicate_communicator(mpi_comm))
   {
     set_functions_to_trigger_an_assert();
   }
@@ -153,7 +155,11 @@ namespace SUNDIALS
     if (ida_mem)
       IDAFree(&ida_mem);
 #ifdef DEAL_II_WITH_MPI
-    MPI_Comm_free(&communicator);
+    if (is_serial_vector<VectorType>::value == false)
+      {
+        const int ierr = MPI_Comm_free(&communicator);
+        AssertThrowMPI(ierr);
+      }
 #endif
   }
 
