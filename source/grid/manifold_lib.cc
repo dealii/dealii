@@ -697,7 +697,8 @@ namespace
             if (std::abs(weights[i])>1.e-15)
               {
                 vPerp = internal::projected_direction(directions[i], candidate);
-                const double sintheta = vPerp.norm();
+                const double sinthetaSq = vPerp.norm_square();
+                const double sintheta = std::sqrt(sinthetaSq);
                 if (sintheta<tolerance)
                   {
                     Hessian[0][0] += weights[i];
@@ -707,24 +708,24 @@ namespace
                   {
                     const double costheta = (directions[i])*candidate;
                     const double theta = atan2(sintheta, costheta);
-                    const double sinthetaInv = 1.0/sintheta;
+                    const double sincthetaInv = theta/sintheta;
 
-                    vPerp *= sinthetaInv;
                     const double cosphi = vPerp*Clocalx;
                     const double sinphi = vPerp*Clocaly;
 
                     gradlocal[0] = cosphi;
                     gradlocal[1] = sinphi;
-                    gradient += (weights[i]*theta)*gradlocal;
+                    gradient += (weights[i]*sincthetaInv)*gradlocal;
 
+                    const double wt = weights[i]/sinthetaSq;
                     const double sinphiSq = sinphi*sinphi;
                     const double cosphiSq = cosphi*cosphi;
-                    const double tt = (theta*sinthetaInv)*costheta;
-                    const double offdiag = cosphi*sinphi*weights[i]*(1.0-tt);
-                    Hessian[0][0] += weights[i]*(cosphiSq+tt*sinphiSq);
+                    const double tt = sincthetaInv*costheta;
+                    const double offdiag = cosphi*sinphi*wt*(1.0-tt);
+                    Hessian[0][0] += wt*(cosphiSq+tt*sinphiSq);
                     Hessian[0][1] += offdiag;
                     Hessian[1][0] += offdiag;
-                    Hessian[1][1] += weights[i]*(sinphiSq+tt*cosphiSq);
+                    Hessian[1][1] += wt*(sinphiSq+tt*cosphiSq);
                   }
               }
 
