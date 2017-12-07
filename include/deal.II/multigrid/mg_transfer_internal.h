@@ -59,40 +59,39 @@ namespace internal
                                   const unsigned int fe_degree);
 
     /**
-     * Stores data related to the finite element contained in the
+     * A structure that stores data related to the finite element contained in the
      * DoFHandler. Used only for the initialization using
      * <tt>setup_transfer</tt>.
      */
     template <typename Number>
     struct ElementInfo
     {
-
       /**
-       * Stores the degree of the finite element. The selection of the
+       * A variable storing the degree of the finite element. The selection of the
        * computational kernel is based on this number.
        */
       unsigned int fe_degree;
 
       /**
-       * Stores whether the element is continuous and there is a joint degree of
+       * A variable storing whether the element is continuous and there is a joint degree of
        * freedom in the center of the 1D line.
        */
       bool element_is_continuous;
 
       /**
-       * Stores the number of components in the finite element.
+       * A variable storing the number of components in the finite element.
        */
       unsigned int n_components;
 
       /**
-       * Stores the number of degrees of freedom on all child cells. It is
+       * A variable storing the number of degrees of freedom on all child cells. It is
        * <tt>2<sup>dim</sup>*fe.dofs_per_cell</tt> for DG elements and somewhat
        * less for continuous elements.
        */
       unsigned int n_child_cell_dofs;
 
       /**
-       * Holds the numbering between the numbering of degrees of freedom in
+       * An array that holds the numbering between the numbering of degrees of freedom in
        * the finite element and the lexicographic numbering needed for the
        * tensor product application.
        */
@@ -107,7 +106,7 @@ namespace internal
     };
 
     /**
-     * Sets up most of the internal data structures of MGTransferMatrixFree
+     * Set up most of the internal data structures of MGTransferMatrixFree
      */
     template <int dim, typename Number>
     void setup_transfer(const dealii::DoFHandler<dim>                                       &mg_dof,

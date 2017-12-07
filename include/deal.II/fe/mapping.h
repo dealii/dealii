@@ -343,7 +343,7 @@ public:
    */
 
   /**
-   * Maps the point @p p on the unit cell to the corresponding point on the
+   * Map the point @p p on the unit cell to the corresponding point on the
    * real cell @p cell.
    *
    * @param cell Iterator to the cell that will be used to define the mapping.
@@ -359,7 +359,7 @@ public:
                                const Point<dim>                                          &p) const = 0;
 
   /**
-   * Maps the point @p p on the real @p cell to the corresponding point on the
+   * Map the point @p p on the real @p cell to the corresponding point on the
    * unit cell, and return its coordinates. This function provides the inverse
    * of the mapping provided by transform_unit_to_real_cell().
    *

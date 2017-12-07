@@ -129,7 +129,7 @@ public:
   Mapping<dim,spacedim> *clone () const;
 
   /**
-   * Always returns @p false because MappingQEulerian does not in general
+   * Always return @p false because MappingQEulerian does not in general
    * preserve vertex locations (unless the translation vector happens to
    * provide zero displacements at vertex locations).
    */
@@ -212,7 +212,7 @@ private:
     compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
 
     /**
-     * Always returns @p false because MappingQEulerianGeneric does not in general
+     * Always return @p false because MappingQEulerianGeneric does not in general
      * preserve vertex locations (unless the translation vector happens to
      * provide for zero displacements at vertex locations).
      */

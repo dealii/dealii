@@ -75,7 +75,7 @@ public:
    * this element from defining an interpolation matrix. An exception will be
    * thrown.
    *
-   * Overrides the implementation from FE_Q_Base.
+   * This function overrides the implementation from FE_Q_Base.
    */
   virtual void
   get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
@@ -86,7 +86,7 @@ public:
    * this element from defining a restriction matrix. An exception will be
    * thrown.
    *
-   * Overrides the implementation from FE_Q_Base.
+   * This function overrides the implementation from FE_Q_Base.
    */
   virtual const FullMatrix<double> &
   get_restriction_matrix (const unsigned int child,
@@ -97,7 +97,7 @@ public:
    * this element from defining a prolongation matrix. An exception will be
    * thrown.
    *
-   * Overrides the implementation from FE_Q_Base.
+   * This function overrides the implementation from FE_Q_Base.
    */
   virtual const FullMatrix<double> &
   get_prolongation_matrix (const unsigned int child,

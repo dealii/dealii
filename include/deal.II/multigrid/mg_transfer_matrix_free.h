@@ -152,26 +152,26 @@ public:
 private:
 
   /**
-   * Stores the degree of the finite element contained in the DoFHandler
+   * A variable storing the degree of the finite element contained in the DoFHandler
    * passed to build(). The selection of the computational kernel is based on
    * this number.
    */
   unsigned int fe_degree;
 
   /**
-   * Stores whether the element is continuous and there is a joint degree of
+   * A variable storing whether the element is continuous and there is a joint degree of
    * freedom in the center of the 1D line.
    */
   bool element_is_continuous;
 
   /**
-   * Stores the number of components in the finite element contained in the
+   * A variable storing the number of components in the finite element contained in the
    * DoFHandler passed to build().
    */
   unsigned int n_components;
 
   /**
-   * Stores the number of degrees of freedom on all child cells. It is
+   * A variable storing the number of degrees of freedom on all child cells. It is
    * <tt>2<sup>dim</sup>*fe.dofs_per_cell</tt> for DG elements and somewhat
    * less for continuous elements.
    */
@@ -190,12 +190,12 @@ private:
   std::vector<std::vector<unsigned int> > level_dof_indices;
 
   /**
-   * Stores the connectivity from parent to child cell numbers for each level.
+   * A variable storing the connectivity from parent to child cell numbers for each level.
    */
   std::vector<std::vector<std::pair<unsigned int,unsigned int> > > parent_child_connect;
 
   /**
-   * Stores the number of cells owned on a given process (sets the bounds for
+   * A variable storing the number of cells owned on a given process (sets the bounds for
    * the worker loops) for each level.
    */
   std::vector<unsigned int> n_owned_level_cells;
@@ -225,14 +225,14 @@ private:
   std::vector<AlignedVector<VectorizedArray<Number> > > weights_on_refined;
 
   /**
-   * Stores the local indices of Dirichlet boundary conditions on cells for
+   * A variable storing the local indices of Dirichlet boundary conditions on cells for
    * all levels (outer index), the cells within the levels (second index), and
    * the indices on the cell (inner index).
    */
   std::vector<std::vector<std::vector<unsigned short> > > dirichlet_indices;
 
   /**
-   * Performs templated prolongation operation
+   * Perform the prolongation operation.
    */
   template <int degree>
   void do_prolongate_add(const unsigned int                           to_level,
@@ -240,7 +240,7 @@ private:
                          const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
-   * Performs templated restriction operation
+   * Performs the restriction operation.
    */
   template <int degree>
   void do_restrict_add(const unsigned int                           from_level,

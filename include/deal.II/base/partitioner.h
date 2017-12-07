@@ -165,7 +165,7 @@ namespace Utilities
       void set_owned_indices (const IndexSet &locally_owned_indices);
 
       /**
-       * Allows to set the ghost indices after the constructor has been
+       * Set the ghost indices after the constructor has been
        * called.
        *
        * The optional parameter @p larger_ghost_index_set allows defining an
@@ -359,7 +359,7 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_MPI
       /**
-       * Starts the exports of the data in a locally owned array to the range
+       * Start the exports of the data in a locally owned array to the range
        * described by the ghost indices of this class.
        *
        * @param communication_channel Sets an offset to the MPI_Isend and
@@ -423,7 +423,7 @@ namespace Utilities
                                      std::vector<MPI_Request> &requests) const;
 
       /**
-       * Starts importing the data on an array indexed by the ghost indices of
+       * Start importing the data on an array indexed by the ghost indices of
        * this class that is later accumulated into a locally owned array with
        * import_from_ghosted_array_finish().
        *
@@ -467,7 +467,7 @@ namespace Utilities
                                       std::vector<MPI_Request>     &requests) const;
 
       /**
-       * Finishes importing the data from an array indexed by the ghost
+       * Finish importing the data from an array indexed by the ghost
        * indices of this class into a specified locally owned array, combining
        * the results according to the given input @p vector_operation.
        *
@@ -561,13 +561,13 @@ namespace Utilities
       IndexSet ghost_indices_data;
 
       /**
-       * Caches the number of ghost indices. It would be expensive to use @p
+       * A variable caching the number of ghost indices. It would be expensive to use @p
        * ghost_indices.n_elements() to compute this.
        */
       unsigned int n_ghost_indices_data;
 
       /**
-       * Contains information which processors my ghost indices belong to and
+       * An array that contains information which processors my ghost indices belong to and
        * how many those indices are
        */
       std::vector<std::pair<unsigned int, unsigned int> > ghost_targets_data;
@@ -581,7 +581,7 @@ namespace Utilities
       std::vector<std::pair<unsigned int, unsigned int> > import_indices_data;
 
       /**
-       * Caches the number of ghost indices. It would be expensive to compute
+       * A variable caching the number of ghost indices. It would be expensive to compute
        * it by iterating over the import indices and accumulate them.
        */
       unsigned int n_import_indices_data;
@@ -593,19 +593,19 @@ namespace Utilities
       std::vector<std::pair<unsigned int, unsigned int> > import_targets_data;
 
       /**
-       * Caches the number of chunks in the import indices per MPI rank. The
+       * An array that caches the number of chunks in the import indices per MPI rank. The
        * length is import_indices_data.size()+1.
        */
       std::vector<unsigned int> import_indices_chunks_by_rank_data;
 
       /**
-       * Caches the number of ghost indices in a larger set of indices given by
+       * A variable caching the number of ghost indices in a larger set of indices given by
        * the optional argument to set_ghost_indices().
        */
       unsigned int n_ghost_indices_in_larger_set;
 
       /**
-       * Caches the number of chunks in the import indices per MPI rank. The
+       * An array that caches the number of chunks in the import indices per MPI rank. The
        * length is ghost_indices_subset_data.size()+1.
        */
       std::vector<unsigned int> ghost_indices_subset_chunks_by_rank_data;
@@ -633,7 +633,7 @@ namespace Utilities
       MPI_Comm communicator;
 
       /**
-       * Stores whether the ghost indices have been explicitly set.
+       * A variable storing whether the ghost indices have been explicitly set.
        */
       bool have_ghost_indices;
     };

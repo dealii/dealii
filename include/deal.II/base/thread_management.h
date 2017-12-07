@@ -1857,7 +1857,7 @@ namespace Threads
 
 
   /**
-   * Overloads of the non-const new_task function.
+   * Overload of the non-const new_task function.
    *
    * @ingroup threads
    */
@@ -1876,7 +1876,7 @@ namespace Threads
 
 #ifndef DEAL_II_CONST_MEMBER_DEDUCTION_BUG
   /**
-   * Overloads of the new_task function.
+   * Overload of the new_task function.
    *
    * @ingroup threads
    */

@@ -128,7 +128,9 @@ public:
 
 
   /**
-   * Always returns @p false.
+   * See the documentation of Mapping::preserves_vertex_locations()
+   * for the purpose of this function. The implementation in this
+   * class always returns @p false.
    */
   virtual
   bool preserves_vertex_locations () const;

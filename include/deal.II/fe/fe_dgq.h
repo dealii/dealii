@@ -349,9 +349,10 @@ private:
   /**
    * Compute renumbering for rotation of degrees of freedom.
    *
-   * Rotates a tensor product numbering of degrees of freedom by 90 degrees.
-   * It is used to compute the transfer matrices of the children by using only
-   * the matrix for the first child.
+   * This function rotates a tensor product numbering of degrees of
+   * freedom by 90 degrees.  It is used to compute the transfer
+   * matrices of the children by using only the matrix for the first
+   * child.
    *
    * The direction parameter determines the type of rotation. It is one
    * character of @p xXyYzZ. The character determines the axis of rotation,
@@ -375,7 +376,7 @@ private:
   template <int dim1, int spacedim1> friend class FE_DGQ;
 
   /**
-   * Allows @p MappingQ class to access to build_renumbering function.
+   * Allow @p MappingQ class to access to build_renumbering function.
    */
   template <int dim1, int spacedim1> friend class MappingQ;
 };

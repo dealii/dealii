@@ -88,7 +88,7 @@ public:
   };
 
   /**
-   * Evaluates the convergence rates of the data column
+   * Evaluate the convergence rates of the data column
    * <tt>data_column_key</tt> due to the #RateMode in relation to the
    * reference column <tt>reference_column_key</tt>. Be sure that the value
    * types of the table entries of the data column and the reference data
@@ -137,7 +137,7 @@ public:
 
 
   /**
-   * Evaluates the convergence rates of the data column
+   * Evaluate the convergence rates of the data column
    * <tt>data_column_key</tt> due to the #RateMode.  Be sure that the value
    * types of the table entries of the data column is a number, i.e. double,
    * float, (unsigned) int, and so on.
@@ -167,7 +167,7 @@ public:
   omit_column_from_convergence_rate_evaluation(const std::string &key);
 
   /**
-   * Evaluates convergence rates due to the <tt>rate_mode</tt> in relation to
+   * Evaluate convergence rates due to the <tt>rate_mode</tt> in relation to
    * the reference column <tt>reference_column_key</tt>. This function
    * evaluates the rates of ALL columns except of the columns that are to be
    * omitted (see previous function) and except of the columns that are
@@ -185,7 +185,7 @@ public:
                                  const RateMode     rate_mode);
 
   /**
-   * Evaluates convergence rates due to the <tt>rate_mode</tt>. This function
+   * Evaluate convergence rates due to the <tt>rate_mode</tt>. This function
    * evaluates the rates of ALL columns except of the columns that are to be
    * omitted (see previous function) and except of the columns that are
    * previously evaluated rate columns.  This function allows to evaluate the
