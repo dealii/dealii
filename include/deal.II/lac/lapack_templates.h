@@ -869,7 +869,7 @@ potrs (const char *, const int *, const int *,
 inline void
 potrs (const char *, const int *, const int *,
        const float *, const int *,
-       flaot *, const int *,
+       float *, const int *,
        int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("spotrs"));
