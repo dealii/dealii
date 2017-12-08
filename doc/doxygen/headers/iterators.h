@@ -349,11 +349,13 @@ stated in the
   internal::Triangulation::Iterators<3,spacedim> classes for Triangulation
   iterators,
 
-- internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim> >,
-  internal::DoFHandler::Iterators<DoFHandlerType<2,spacedim> >, and
-  internal::DoFHandler::Iterators<DoFHandlerType<3,spacedim> > classes for DoFHandler
-  and hp::DoFHandler iterators,
-
+- <a class="el"
+href="structinternal_1_1DoFHandler_1_1Iterators_3_01DoFHandlerType_3_011_00_01spacedim_01_4_00_01lda_01_4.html">internal::DoFHandler::Iterators&lt;DoFHandlerType&lt;1,spacedim&gt;,
+lda&gt;</a>, <a class="el"
+href="structinternal_1_1Triangulation_1_1Iterators_3_012_00_01spacedim_01_4.html">internal::DoFHandler::Iterators&lt;DoFHandlerType&lt;1,spacedim&gt;,
+lda&gt;</a>, and <a class="el"
+href="structinternal_1_1Triangulation_1_1Iterators_3_013_00_01spacedim_01_4.html">internal::DoFHandler::Iterators&lt;DoFHandlerType&lt;1,spacedim&gt;,
+lda&gt;</a> classes for DoFHandler and hp::DoFHandler iterators.
 
 @section IteratorAccessorInternals Iterator and accessor internals
 
