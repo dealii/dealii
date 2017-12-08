@@ -67,7 +67,7 @@ public:
   Mapping<dim, spacedim> *clone () const;
 
   /**
-   * Always returns @p true because MappingCartesian preserves vertex
+   * Return @p true because MappingCartesian preserves vertex
    * locations.
    */
   bool preserves_vertex_locations () const;

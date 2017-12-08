@@ -288,7 +288,7 @@ protected:
   static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
 
   /**
-   * Performs the initialization of the element based on 1D support points,
+   * Perform the initialization of the element based on 1D support points,
    * i.e., sets renumbering, initializes unit support points, initializes
    * constraints as well as restriction and prolongation matrices.
    */

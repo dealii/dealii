@@ -80,7 +80,7 @@ public:
   TensorProductPolynomials (const std::vector<Pol> &pols);
 
   /**
-   * Prints the list of the indices to <tt>out</tt>.
+   * Print the list of the indices to <tt>out</tt>.
    */
   void output_indices(std::ostream &out) const;
 

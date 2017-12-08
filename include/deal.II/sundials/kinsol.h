@@ -378,7 +378,7 @@ namespace SUNDIALS
       unsigned int maximum_non_linear_iterations;
 
       /**
-       * Specifies the scalar used as a stopping tolerance on the scaled
+       * A scalar used as a stopping tolerance on the scaled
        * maximum norm of the system function $F(u)$ or $G(u)$.
        *
        * If set to zero, default values provided by KINSOL will be used.
@@ -386,7 +386,7 @@ namespace SUNDIALS
       double function_tolerance;
 
       /**
-       * Specifies the scalar used as a stopping tolerance on the minimum
+       * A scalar used as a stopping tolerance on the minimum
        * scaled step length.
        *
        * If set to zero, default values provided by KINSOL will be used.
@@ -394,7 +394,7 @@ namespace SUNDIALS
       double step_tolerance;
 
       /**
-       * Specifies whether an initial call to the preconditioner or Jacobian
+       * Whether an initial call to the preconditioner or Jacobian
        * setup function should be made or not.
        *
        * A call to this function is useful when solving a sequence of problems,
@@ -404,7 +404,7 @@ namespace SUNDIALS
       bool no_init_setup;
 
       /**
-       * Specifies the maximum number of nonlinear iterations that can be
+       * The maximum number of nonlinear iterations that can be
        * performed between calls to the setup_jacobian() function.
        *
        * If set to zero, default values provided by KINSOL will be used.
@@ -412,14 +412,14 @@ namespace SUNDIALS
       unsigned int maximum_setup_calls;
 
       /**
-       * Specifies the maximum allowable scaled length of the Newton step.
+       * The maximum allowable scaled length of the Newton step.
        *
        * If set to zero, default values provided by KINSOL will be used.
        */
       double maximum_newton_step;
 
       /**
-       * Specifies the relative error in computing $F(u)$, which is used in the
+       * The relative error in computing $F(u)$, which is used in the
        * difference quotient approximation to the Jacobian matrix when the user
        * does not supply a solve_jacobian_system_matrix() function.
        *
@@ -428,14 +428,14 @@ namespace SUNDIALS
       double dq_relative_error;
 
       /**
-       * Specifies the maximum number of beta-condition failures in the
+       * The maximum number of beta-condition failures in the
        * linesearch algorithm. Only used if
        * strategy==SolutionStrategy::linesearch.
        */
       unsigned int maximum_beta_failures;
 
       /**
-       * Specifies the size of the subspace used with Anderson acceleration
+       * The size of the subspace used with Anderson acceleration
        * in conjunction with Picard or fixed-point iteration.
        *
        * If you set this to 0, no acceleration is used.

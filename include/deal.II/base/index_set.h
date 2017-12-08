@@ -314,26 +314,26 @@ public:
                      const size_type end) const;
 
   /**
-   * Removes all elements contained in @p other from this set. In other words,
+   * Remove all elements contained in @p other from this set. In other words,
    * if $x$ is the current object and $o$ the argument, then we compute $x
    * \leftarrow x \backslash o$.
    */
   void subtract_set (const IndexSet &other);
 
   /**
-   * Removes and returns the last element of the last range.
-   * Throws an exception if the IndexSet is empty.
+   * Remove and return the last element of the last range.
+   * This function throws an exception if the IndexSet is empty.
    */
   size_type pop_back ();
 
   /**
-   * Removes and returns the first element of the first range.
-   * Throws an exception if the IndexSet is empty.
+   * Remove and return the first element of the first range.
+   * This function throws an exception if the IndexSet is empty.
    */
   size_type pop_front ();
 
   /**
-   * Fills the given vector with all indices contained in this IndexSet.
+   * Fill the given vector with all indices contained in this IndexSet.
    */
   void fill_index_vector(std::vector<size_type> &indices) const;
 
@@ -353,7 +353,7 @@ public:
   void fill_binary_vector (VectorType &vector) const;
 
   /**
-   * Outputs a text representation of this IndexSet to the given stream. Used
+   * Output a text representation of this IndexSet to the given stream. Used
    * for testing.
    */
   template <class StreamType>

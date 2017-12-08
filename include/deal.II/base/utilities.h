@@ -463,7 +463,7 @@ namespace Utilities
 
 
     /**
-     * Fills the @p stats structure with information about the memory
+     * Fill the @p stats structure with information about the memory
      * consumption of this process. This is only implemented on Linux.
      */
     void get_memory_stats (MemoryStats &stats);

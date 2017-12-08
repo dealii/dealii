@@ -223,7 +223,7 @@ namespace Patterns
     virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
-     * Creates new object if the start of description matches
+     * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
@@ -391,7 +391,7 @@ namespace Patterns
     std::size_t memory_consumption () const;
 
     /**
-     * Creates new object if the start of description matches
+     * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
@@ -477,7 +477,7 @@ namespace Patterns
     virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
-     * Creates new object if the start of description matches
+     * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
@@ -594,7 +594,7 @@ namespace Patterns
     virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
-     * Creates new object if the start of description matches
+     * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
@@ -801,7 +801,7 @@ namespace Patterns
     virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
-     * Creates new object if the start of description matches
+     * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
@@ -880,7 +880,7 @@ namespace Patterns
     virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
-     * Creates new object if the start of description matches
+     * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
@@ -944,7 +944,7 @@ namespace Patterns
     virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
-     * Creates new object if the start of description matches
+     * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
@@ -989,7 +989,7 @@ namespace Patterns
     virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
-     * Creates new object if the start of description matches
+     * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
@@ -1067,7 +1067,7 @@ namespace Patterns
     FileType  file_type;
 
     /**
-     * Creates new object if the start of description matches
+     * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */
@@ -1121,7 +1121,7 @@ namespace Patterns
     virtual std::unique_ptr<PatternBase> clone () const;
 
     /**
-     * Creates new object if the start of description matches
+     * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
      */

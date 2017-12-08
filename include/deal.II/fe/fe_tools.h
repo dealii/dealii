@@ -409,7 +409,7 @@ namespace FETools
     const bool isotropic_only = false);
 
   /**
-   * Projects scalar data defined in quadrature points to a finite element
+   * Project scalar data defined in quadrature points to a finite element
    * space on a single cell.
    *
    * What this function does is the following: assume that there is scalar

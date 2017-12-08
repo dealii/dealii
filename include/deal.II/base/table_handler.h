@@ -679,14 +679,14 @@ protected:
   unsigned int n_rows() const;
 
   /**
-   * Stores the column and supercolumn keys in the order desired by the user.
+   * A variable storing the column and supercolumn keys in the order desired by the user.
    * By default this is the order of adding the columns. This order may be
    * changed by set_column_order().
    */
   std::vector<std::string> column_order;
 
   /**
-   * Maps the column keys to the columns (not supercolumns).
+   * A map from the column keys to the columns (not supercolumns).
    *
    * The field is declared mutable so that the write_text() and write_tex()
    * functions can be const, even though they may pad columns below if
@@ -695,7 +695,7 @@ protected:
   mutable std::map<std::string,Column> columns;
 
   /**
-   * Maps each supercolumn key to the keys of its subcolumns in the right
+   * A map from each supercolumn key to the keys of its subcolumns in the right
    * order.  It is allowed that a supercolumn has got the same key as a
    * column.
    *
@@ -705,7 +705,7 @@ protected:
   std::map<std::string, std::vector<std::string> > supercolumns;
 
   /**
-   * Maps the supercolumn keys to the captions of the supercolumns that are
+   * A map from the supercolumn keys to the captions of the supercolumns that are
    * used in tex output.
    *
    * By default these are just the supercolumn keys but they may be changed by
