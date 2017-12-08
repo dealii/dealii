@@ -474,13 +474,13 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
       // If not in 3D, just use the implementation from PolarManifold
       // after we verified that the candidate is not the center.
       if (spacedim<3)
-        {
-          new_points[row] = polar_manifold.get_new_point(surrounding_points, ArrayView<const double>(&weights[row*weight_columns],weight_columns));
-          accurate_point_was_found[row] = true;
-          continue;
-        }
-
+        new_points[row] = polar_manifold.get_new_point(surrounding_points, ArrayView<const double>(&weights[row*weight_columns],weight_columns));
     }
+
+  // In this case, we treated the case that the candidate is the center and obtained
+  // the new locations from the PolarManifold object otherwise.
+  if (spacedim<3)
+    return;
 
   // If all the points are close to each other, we expect the estimate to
   // be good enough. This tolerance was chosen such that the first iteration
