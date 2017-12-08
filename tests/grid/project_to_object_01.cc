@@ -25,6 +25,7 @@
 
 #include <array>
 #include <cmath>
+#include <numeric>
 
 #include "../tests.h"
 
@@ -64,14 +65,33 @@ int main()
         deallog << "testing cross derivative "
                 << cross_derivative_n
                 << std::endl;
+        std::vector<double> steps;
+        std::vector<double> errors;
         for (unsigned int step_n = 5; step_n < 10; ++step_n)
           {
-            deallog << cross_stencil<structdim>(cross_derivatives[cross_derivative_n],
+            const double current_step = std::pow(0.5, double(step_n));
+            steps.push_back(std::log(current_step));
+            errors.push_back(std::log(std::abs(cross_stencil<structdim>
+                                               (cross_derivatives[cross_derivative_n],
                                                 c0,
-                                                std::pow(0.5, double(step_n)),
-                                                objective) - exact[cross_derivative_n]
-                    << std::endl;
+                                                current_step,
+                                                objective)
+                                               - exact[cross_derivative_n])));
           }
+
+        const double mean_step = std::accumulate(steps.begin(), steps.end(), 0.0)/steps.size();
+        const double mean_error = std::accumulate(errors.begin(), errors.end(), 0.0)/errors.size();
+
+        double numerator = 0.0;
+        double denominator = 0.0;
+        for (std::size_t i = 0; i < steps.size(); ++i)
+          {
+            numerator += (steps[i] - mean_step)*(errors[i] - mean_error);
+            denominator += Utilities::fixed_power<2>(steps[i] - mean_step);
+          }
+        deallog << "slope is nearly 3: "
+                << (std::abs(numerator/denominator - 3.0) < 0.05)
+                << std::endl;
       }
   }
 

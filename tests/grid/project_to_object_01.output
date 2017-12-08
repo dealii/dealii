@@ -1,22 +1,10 @@
 
 DEAL::testing cross derivative 0
-DEAL::2.08262e-05
-DEAL::2.61032e-06
-DEAL::3.26714e-07
-DEAL::4.08654e-08
-DEAL::5.10984e-09
+DEAL::slope is nearly 3: 1
 DEAL::testing cross derivative 1
-DEAL::2.10357e-05
-DEAL::2.62342e-06
-DEAL::3.27533e-07
-DEAL::4.09167e-08
-DEAL::5.11266e-09
+DEAL::slope is nearly 3: 1
 DEAL::testing cross derivative 2
-DEAL::5.75514e-06
-DEAL::7.19207e-07
-DEAL::8.98876e-08
-DEAL::1.12350e-08
-DEAL::1.40439e-09
+DEAL::slope is nearly 3: 1
 DEAL::
 DEAL::Project the arithmetic mean of two vertices on a circular
 DEAL::arc. The result should be the geodesic midpoint:
