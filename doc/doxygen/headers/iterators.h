@@ -246,7 +246,7 @@ of accessor classes:
 
 - The TriaAccessor class provides you with data that identifies the geometric
   properties of cells, faces, lines, quads, and hexes that make up a
-  triangulation, as well as mother-child relationships.
+  triangulation, as well as parent-child relationships.
 
 - The CellAccessor class is derived from the TriaAccessor class for cases
   where an object has full dimension, i.e. is a cell rather than for example a
