@@ -94,7 +94,11 @@ DEAL_II_NAMESPACE_OPEN
  * cases they can be used in two dimensions as well, and the third dimension
  * will be set to zero.
  *
- * @author Luca Heltai, Andrea Mola, 2011--2014.
+ * If you whish to use these tools when the dimension of the space is two, then
+ * make sure your cad files are actually flat and that all z coordinates are equal
+ * to zero, as otherwise you will get many exceptions.
+ *
+ * @author Luca Heltai, Andrea Mola, 2011--2017.
  */
 namespace OpenCASCADE
 {
@@ -196,8 +200,8 @@ namespace OpenCASCADE
    * is thrown.
    */
   template<int dim>
-  TopoDS_Edge interpolation_curve(std::vector<Point<dim> >& curve_points,
-                                  const Tensor<1, dim>& direction=Tensor<1,dim>(),
+  TopoDS_Edge interpolation_curve(std::vector<Point<dim> > &curve_points,
+                                  const Tensor<1, dim> &direction=Tensor<1,dim>(),
                                   const bool closed=false,
                                   const double tolerance=1e-7);
 
@@ -212,16 +216,20 @@ namespace OpenCASCADE
                                   std::vector<TopoDS_Vertex> &vertices);
 
   /**
-   * Create a triangulation from a single face. This class extract the first u
-   * and v parameter of the parametric surface making up this face, and
-   * creates a Triangulation<2,3> containing a single coarse cell reflecting
+   * Create a triangulation from a single face. This class extracts the first u
+   * and v parameter of the parametric surface making up this face, and creates
+   * a Triangulation<2,spacedim> containing a single coarse cell reflecting
    * this face. If the surface is not a trimmed surface, the vertices of this
    * cell will coincide with the TopoDS_Vertex vertices of the original
    * TopoDS_Face. This, however, is often not the case, and the user should be
    * careful on how this mesh is used.
+   *
+   * If you call this function with a Triangulation<2,2>, make sure that the
+   * input face has all z coordinates set to zero, or you'll get an exception.
    */
+  template <int spacedim>
   void create_triangulation(const TopoDS_Face &face,
-                            Triangulation<2,3> &tria);
+                            Triangulation<2,spacedim> &tria);
 
 
   /**
@@ -275,9 +283,10 @@ namespace OpenCASCADE
    * the u coordinate and the v coordinate (which is different from zero only
    * if the resulting shape is a face).
    */
-  std::tuple<Point<3>, TopoDS_Shape, double, double>
+  template <int dim>
+  std::tuple<Point<dim>, TopoDS_Shape, double, double>
   project_point_and_pull_back(const TopoDS_Shape &in_shape,
-                              const Point<3> &origin,
+                              const Point<dim> &origin,
                               const double tolerance=1e-7);
 
   /**
@@ -286,9 +295,10 @@ namespace OpenCASCADE
    * are iterated, faces first, then edges, and the returned point is the
    * closest one to the @p in_shape, regardless of its type.
    */
-  Point<3> closest_point(const TopoDS_Shape &in_shape,
-                         const Point<3> &origin,
-                         const double tolerance=1e-7);
+  template <int dim>
+  Point<dim> closest_point(const TopoDS_Shape &in_shape,
+                           const Point<dim> &origin,
+                           const double tolerance=1e-7);
 
   /**
    * Given an elementary shape @p in_shape and the reference coordinates
@@ -368,9 +378,9 @@ namespace OpenCASCADE
    * objects.
    */
   template <int dim>
-  bool point_compare(const Point<dim>& p1,
-                     const Point<dim>& p2,
-                     const Tensor<1,dim>& direction = Tensor<1,dim>(),
+  bool point_compare(const Point<dim> &p1,
+                     const Point<dim> &p2,
+                     const Tensor<1,dim> &direction = Tensor<1,dim>(),
                      const double       tolerance = 1e-10);
 
 

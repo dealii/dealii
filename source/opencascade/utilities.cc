@@ -166,9 +166,10 @@ namespace OpenCASCADE
   }
 
   template <int spacedim>
-  gp_Pnt point(const Point<spacedim>& p)
+  gp_Pnt point(const Point<spacedim> &p)
   {
-    switch (spacedim) {
+    switch (spacedim)
+      {
       case 1:
         return gp_Pnt(p[0], 0, 0);
       case 2:
@@ -182,7 +183,8 @@ namespace OpenCASCADE
   Point<spacedim> point(const gp_Pnt &p, const double &tolerance)
   {
     (void) tolerance;
-    switch (spacedim) {
+    switch (spacedim)
+      {
       case 1:
         Assert(std::abs(p.Y()) <= tolerance,
                ExcMessage("Cannot convert OpenCASCADE point to 1d if p.Y() != 0."));
@@ -412,8 +414,8 @@ namespace OpenCASCADE
 
   template <int dim>
   Point<dim> line_intersection(const TopoDS_Shape &in_shape,
-                               const Point<dim>& origin,
-                               const Tensor<1,dim>& direction,
+                               const Point<dim> &origin,
+                               const Tensor<1,dim> &direction,
                                const double tolerance)
   {
     // translating original Point<dim> to gp point
@@ -587,11 +589,10 @@ namespace OpenCASCADE
   }
 
 
-
-  std::tuple<Point<3>, TopoDS_Shape, double, double>
-  project_point_and_pull_back(const TopoDS_Shape &in_shape,
-                              const Point<3> &origin,
-                              const double tolerance)
+  template<int dim>
+  std::tuple<Point<dim>, TopoDS_Shape, double, double> project_point_and_pull_back(const TopoDS_Shape &in_shape,
+      const Point<dim> &origin,
+      const double tolerance)
   {
     TopExp_Explorer exp;
     gp_Pnt Pproj = point(origin);
@@ -619,7 +620,7 @@ namespace OpenCASCADE
 
         SurfToProj->D0(proj_params.X(),proj_params.Y(),tmp_proj);
 
-        double distance = point<3>(tmp_proj).distance(origin);
+        double distance = point<dim>(tmp_proj).distance(origin);
         if (distance < minDistance)
           {
             minDistance = distance;
@@ -664,16 +665,17 @@ namespace OpenCASCADE
         }
 
     Assert(counter > 0, ExcMessage("Could not find projection points."));
-    return std::tuple<Point<3>, TopoDS_Shape, double, double>
-           (point<3>(Pproj),out_shape, u, v);
+    return std::tuple<Point<dim>, TopoDS_Shape, double, double>
+           (point<dim>(Pproj),out_shape, u, v);
   }
 
 
-  Point<3> closest_point(const TopoDS_Shape &in_shape,
-                         const Point<3> &origin,
-                         const double tolerance)
+  template<int dim>
+  Point<dim> closest_point(const TopoDS_Shape &in_shape,
+                           const Point<dim> &origin,
+                           const double tolerance)
   {
-    std::tuple<Point<3>, TopoDS_Shape, double, double>
+    std::tuple<Point<dim>, TopoDS_Shape, double, double>
     ref = project_point_and_pull_back(in_shape, origin, tolerance);
     return std::get<0>(ref);
   }
@@ -766,8 +768,9 @@ namespace OpenCASCADE
 
 
 
+  template<int spacedim>
   void create_triangulation(const TopoDS_Face &face,
-                            Triangulation<2,3> &tria)
+                            Triangulation<2,spacedim> &tria)
   {
     BRepAdaptor_Surface surf(face);
     const double u0 = surf.FirstUParameter();
@@ -776,13 +779,13 @@ namespace OpenCASCADE
     const double v1 = surf.LastVParameter();
 
     std::vector<CellData<2> > cells;
-    std::vector<Point<3> > vertices;
+    std::vector<Point<spacedim> > vertices;
     SubCellData t;
 
-    vertices.push_back(point<3>(surf.Value(u0,v0)));
-    vertices.push_back(point<3>(surf.Value(u1,v0)));
-    vertices.push_back(point<3>(surf.Value(u0,v1)));
-    vertices.push_back(point<3>(surf.Value(u1,v1)));
+    vertices.push_back(point<spacedim>(surf.Value(u0,v0)));
+    vertices.push_back(point<spacedim>(surf.Value(u1,v0)));
+    vertices.push_back(point<spacedim>(surf.Value(u0,v1)));
+    vertices.push_back(point<spacedim>(surf.Value(u1,v1)));
 
     CellData<2> cell;
     for (unsigned int i=0; i<4; ++i)
