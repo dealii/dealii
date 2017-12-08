@@ -179,9 +179,9 @@ namespace OpenCASCADE
                          const double tolerance=1e-7);
 
   /**
-   * Creates a 3D smooth BSpline curve passing through the points in the
-   * assigned vector, and store it in the returned TopoDS_Shape (which is of
-   * type TopoDS_Edge). The points are reordered internally according to their
+   * Creates a smooth BSpline curve passing through the points in the assigned
+   * vector, and store it in the returned TopoDS_Shape (which is of type
+   * TopoDS_Edge). The points are reordered internally according to their
    * scalar product with the direction, if direction is different from zero,
    * otherwise they are used as passed. Notice that this function changes the
    * input points if required by the algorithm.
@@ -195,8 +195,9 @@ namespace OpenCASCADE
    * points. If the algorithm fails in generating such a curve, an exception
    * is thrown.
    */
-  TopoDS_Edge interpolation_curve(std::vector<Point<3> >  &curve_points,
-                                  const Tensor<1,3> &direction=Tensor<1,3>(),
+  template<int dim>
+  TopoDS_Edge interpolation_curve(std::vector<Point<dim> >& curve_points,
+                                  const Tensor<1, dim>& direction=Tensor<1,dim>(),
                                   const bool closed=false,
                                   const double tolerance=1e-7);
 
@@ -297,9 +298,10 @@ namespace OpenCASCADE
    * used as input to this function. If this is not the case, an Exception is
    * thrown.
    */
-  Point<3> push_forward(const TopoDS_Shape &in_shape,
-                        const double u,
-                        const double v);
+  template <int dim>
+  Point<dim> push_forward(const TopoDS_Shape &in_shape,
+                          const double u,
+                          const double v);
 
 
   /**
@@ -334,22 +336,29 @@ namespace OpenCASCADE
    *
    * The optional @p tolerance parameter is used to compute distances.
    */
-  Point<3> line_intersection(const TopoDS_Shape &in_shape,
-                             const Point<3> &origin,
-                             const Tensor<1,3> &direction,
-                             const double tolerance=1e-7);
+  template <int dim>
+  Point<dim> line_intersection(const TopoDS_Shape &in_shape,
+                               const Point<dim> &origin,
+                               const Tensor<1,dim> &direction,
+                               const double tolerance=1e-7);
 
 
   /**
-   * Convert OpenCASCADE point into a Point<3>.
+   * Convert OpenCASCADE point into a Point<spacedim>.
+   *
+   * The tolerance argument is used to check if the non used components of the
+   * OpenCASCADE point are close to zero. If this is not the case, an assertion
+   * is thrown in debug mode.
    */
-  Point<3> point(const gp_Pnt &p);
+  template <int spacedim>
+  Point<spacedim> point(const gp_Pnt &p, const double &tolerance=1e-10);
 
 
   /**
    * Convert Point<3> into OpenCASCADE point.
    */
-  gp_Pnt point(const Point<3> &p);
+  template <int spacedim>
+  gp_Pnt point(const Point<spacedim> &p);
 
 
   /**
@@ -358,9 +367,10 @@ namespace OpenCASCADE
    * optional parameter is used as a relative tolerance when comparing
    * objects.
    */
-  bool point_compare(const Point<3>    &p1,
-                     const Point<3>    &p2,
-                     const Tensor<1,3> &direction = Tensor<1,3>(),
+  template <int dim>
+  bool point_compare(const Point<dim>& p1,
+                     const Point<dim>& p2,
+                     const Tensor<1,dim>& direction = Tensor<1,dim>(),
                      const double       tolerance = 1e-10);
 
 
@@ -368,16 +378,18 @@ namespace OpenCASCADE
    * Exception thrown when the point specified as argument does not lie
    * between @p tolerance from the given TopoDS_Shape.
    */
+  template <int dim>
   DeclException1 (ExcPointNotOnManifold,
-                  Point<3>,
+                  Point<dim>,
                   <<"The point [ "<<arg1<<" ] is not on the manifold.");
 
   /**
    * Exception thrown when the point specified as argument cannot be projected
    * to the manifold.
    */
+  template <int dim>
   DeclException1 (ExcProjectionFailed,
-                  Point<3>,
+                  Point<dim>,
                   <<"Projection of point [ "<< arg1
                   << " ] failed.");
 

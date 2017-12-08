@@ -99,7 +99,7 @@ namespace OpenCASCADE
       Assert(closest_point(sh, surrounding_points[i], tolerance)
              .distance(surrounding_points[i]) <
              std::max(tolerance*surrounding_points[i].norm(), tolerance),
-             ExcPointNotOnManifold(surrounding_points[i]));
+             ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
 #endif
     return closest_point(sh, candidate,tolerance);
   }
@@ -129,7 +129,7 @@ namespace OpenCASCADE
       Assert(closest_point(sh, surrounding_points[i],tolerance)
              .distance(surrounding_points[i]) <
              std::max(tolerance*surrounding_points[i].norm(), tolerance),
-             ExcPointNotOnManifold(surrounding_points[i]));
+             ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
 #endif
     return line_intersection(sh, candidate, direction, tolerance);
   }
@@ -162,7 +162,7 @@ namespace OpenCASCADE
         Assert(closest_point(sh, surrounding_points[i], tolerance)
                .distance(surrounding_points[i]) <
                std::max(tolerance*surrounding_points[i].norm(), tolerance),
-               ExcPointNotOnManifold(surrounding_points[i]));
+               ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
       }
 #endif
 
@@ -248,9 +248,7 @@ namespace OpenCASCADE
     curve(curve_adaptor(sh)),
     tolerance(tolerance),
     length(shape_length(sh))
-  {
-    Assert(spacedim == 3, ExcNotImplemented());
-  }
+  {}
 
 
   template <int dim, int spacedim>
@@ -261,7 +259,7 @@ namespace OpenCASCADE
     ShapeAnalysis_Curve curve_analysis;
     gp_Pnt proj;
     const double dist = curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true);
-    Assert(dist < tolerance*length, ExcPointNotOnManifold(space_point));
+    Assert(dist < tolerance*length, ExcPointNotOnManifold<spacedim>(space_point));
     (void)dist; // Silence compiler warning in Release mode.
     return Point<1>(GCPnts_AbscissaPoint::Length(curve->GetCurve(),curve->GetCurve().FirstParameter(),t));
   }
@@ -274,7 +272,7 @@ namespace OpenCASCADE
   {
     GCPnts_AbscissaPoint AP(curve->GetCurve(), chart_point[0], curve->GetCurve().FirstParameter());
     gp_Pnt P = curve->GetCurve().Value(AP.Parameter());
-    return point(P);
+    return point<spacedim>(P);
   }
 
   template <int dim, int spacedim>

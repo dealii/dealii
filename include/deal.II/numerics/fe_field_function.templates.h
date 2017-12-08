@@ -258,12 +258,12 @@ namespace Functions
     std::vector<std::vector<Point<dim> > > qpoints;
     std::vector<std::vector<unsigned int> > maps;
 
-    unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
+    const unsigned int n_cells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
     const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
-    for (unsigned int i=0; i<ncells; ++i)
+    for (unsigned int i=0; i<n_cells; ++i)
       {
         // Number of quadrature points on this cell
         unsigned int nq = qpoints[i].size();
@@ -276,7 +276,7 @@ namespace Functions
     hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
                            update_values);
     // Now gather all the informations we need
-    for (unsigned int i=0; i<ncells; ++i)
+    for (unsigned int i=0; i<n_cells; ++i)
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
@@ -319,12 +319,12 @@ namespace Functions
     std::vector<std::vector<Point<dim> > > qpoints;
     std::vector<std::vector<unsigned int> > maps;
 
-    unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
+    const unsigned int n_cells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
     const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
-    for (unsigned int i=0; i<ncells; ++i)
+    for (unsigned int i=0; i<n_cells; ++i)
       {
         // Number of quadrature points on this cell
         unsigned int nq = qpoints[i].size();
@@ -337,7 +337,7 @@ namespace Functions
     hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
                            update_gradients);
     // Now gather all the informations we need
-    for (unsigned int i=0; i<ncells; ++i)
+    for (unsigned int i=0; i<n_cells; ++i)
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
@@ -384,12 +384,12 @@ namespace Functions
     std::vector<std::vector<Point<dim> > > qpoints;
     std::vector<std::vector<unsigned int> > maps;
 
-    unsigned int ncells = compute_point_locations(points, cells, qpoints, maps);
+    const unsigned int n_cells = compute_point_locations(points, cells, qpoints, maps);
     hp::MappingCollection<dim> mapping_collection (mapping);
     const hp::FECollection<dim> &fe_collection = dh->get_fe_collection();
     hp::QCollection<dim> quadrature_collection;
     // Create quadrature collection
-    for (unsigned int i=0; i<ncells; ++i)
+    for (unsigned int i=0; i<n_cells; ++i)
       {
         // Number of quadrature points on this cell
         unsigned int nq = qpoints[i].size();
@@ -402,7 +402,7 @@ namespace Functions
     hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
                            update_hessians);
     // Now gather all the informations we need
-    for (unsigned int i=0; i<ncells; ++i)
+    for (unsigned int i=0; i<n_cells; ++i)
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
@@ -431,12 +431,12 @@ namespace Functions
 
 
   template <int dim, typename DoFHandlerType, typename VectorType>
-  unsigned int FEFieldFunction<dim, DoFHandlerType, VectorType>::
-  compute_point_locations
-  (const std::vector<Point<dim> >                              &points,
-   std::vector<typename DoFHandlerType::active_cell_iterator > &cells,
-   std::vector<std::vector<Point<dim> > >                      &qpoints,
-   std::vector<std::vector<unsigned int> >                     &maps) const
+  unsigned int
+  FEFieldFunction<dim, DoFHandlerType, VectorType>::
+  compute_point_locations (const std::vector<Point<dim> >                              &points,
+                           std::vector<typename DoFHandlerType::active_cell_iterator > &cells,
+                           std::vector<std::vector<Point<dim> > >                      &qpoints,
+                           std::vector<std::vector<unsigned int> >                     &maps) const
   {
     // How many points are here?
     const unsigned int np = points.size();
@@ -449,12 +449,10 @@ namespace Functions
     // Now the easy case.
     if (np==0) return 0;
 
-    // Keep track of the points we
-    // found
+    // Keep track of the points we found
     std::vector<bool> point_flags(np, false);
 
-    // Set this to true until all
-    // points have been classified
+    // Set this to true until all points have been classified
     bool left_over = true;
 
     // Current quadrature point
@@ -463,20 +461,10 @@ namespace Functions
       cell = dh->begin_active();
 
     {
-      // see if the point is
-      // inside the
-      // cell. there are two
-      // ways that
-      // transform_real_to_unit_cell
-      // can indicate that a
-      // point is outside: by
-      // returning
-      // coordinates that lie
-      // outside the
-      // reference cell, or
-      // by throwing an
-      // exception. handle
-      // both
+      // see if the point is inside the cell. there are two ways that
+      // transform_real_to_unit_cell can indicate that a point is
+      // outside: by returning coordinates that lie outside the
+      // reference cell, or by throwing an exception. handle both
       boost::optional<Point<dim> >
       qp = get_reference_coordinates (cell, points[0]);
       if (!qp)
