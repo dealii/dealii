@@ -298,35 +298,11 @@ as the function that generate such objects:
   </tr>
 </table>
 
+The Triangulation class supports iterating across cell faces with <tt>typename
+Triangulation::face_iterator</tt>, which is the type returned by
+Triangulation::begin_face().
 
-<table border=1>
-  <tr>
-    <th>Class</th>
-    <th>face_iterator type</th>
-    <th>function call</th>
-  </tr>
-
-  <tr>
-    <th>Triangulation</th>
-    <td>typename Triangulation::face_iterator</td>
-    <td>triangulation.begin_face()</td>
-  </tr>
-
-  <tr>
-    <th>DoFHandler</th>
-    <td>typename DoFHandler::face_iterator</td>
-    <td>dof_handler.begin_face()</td>
-  </tr>
-
-  <tr>
-    <th>hp::DoFHandler</th>
-    <td>typename hp::DoFHandler::face_iterator</td>
-    <td>hp_dof_handler.begin_face()</td>
-  </tr>
-</table>
-
-
-Likewise, active iterators have the following properties:
+Active iterators have the following properties:
 
 <table border=1>
   <tr>
@@ -354,33 +330,9 @@ Likewise, active iterators have the following properties:
   </tr>
 </table>
 
-
-<table border=1>
-  <tr>
-    <th>Class</th>
-    <th>face_iterator type</th>
-    <th>function call</th>
-  </tr>
-
-  <tr>
-    <th>Triangulation</th>
-    <td>typename Triangulation::active_face_iterator</td>
-    <td>triangulation.begin_active_face()</td>
-  </tr>
-
-  <tr>
-    <th>DoFHandler</th>
-    <td>typename DoFHandler::active_face_iterator</td>
-    <td>dof_handler.begin_active_face()</td>
-  </tr>
-
-  <tr>
-    <th>hp::DoFHandler</th>
-    <td>typename hp::DoFHandler::active_face_iterator</td>
-    <td>hp_dof_handler.begin_active_face()</td>
-  </tr>
-</table>
-
+The Triangulation class also supports iterating across active cell faces with
+<tt>typename Triangulation::active_face_iterator</tt>, which is the type returned by
+Triangulation::begin_active_face().
 
 In addition to these types and calls that act on cells and faces (logical
 concepts that depend on the dimension: a cell is a quadrilateral in 2d, but
