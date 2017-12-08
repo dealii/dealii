@@ -1324,13 +1324,13 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
                                                       VectorType                      &, \
                                                       bool                             , \
                                                       std::integral_constant<bool, false>) const
-#define MATRIX_FUNCTIONS(MatrixType) \
+#define MATRIX_FUNCTIONS(MatrixType,VectorScalar) \
   template void ConstraintMatrix:: \
-  distribute_local_to_global<MatrixType,Vector<MatrixType::value_type> > (const FullMatrix<MatrixType::value_type>        &, \
-      const Vector<MatrixType::value_type>            &, \
+  distribute_local_to_global<MatrixType,Vector<VectorScalar> > (const FullMatrix<MatrixType::value_type>        &, \
+      const Vector<VectorScalar>            &, \
       const std::vector<ConstraintMatrix::size_type> &, \
       MatrixType                      &, \
-      Vector<MatrixType::value_type>                  &, \
+      Vector<VectorScalar>                  &, \
       bool                             , \
       std::integral_constant<bool, false>) const
 #define BLOCK_MATRIX_VECTOR_FUNCTIONS(MatrixType, VectorType)   \
@@ -1352,37 +1352,42 @@ PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
       bool                             , \
       std::integral_constant<bool, true>) const
 
-MATRIX_FUNCTIONS(SparseMatrix<double>);
-MATRIX_FUNCTIONS(SparseMatrix<float>);
-MATRIX_FUNCTIONS(FullMatrix<double>);
-MATRIX_FUNCTIONS(FullMatrix<float>);
-MATRIX_FUNCTIONS(FullMatrix<std::complex<double> >);
-MATRIX_FUNCTIONS(SparseMatrix<std::complex<double> >);
-MATRIX_FUNCTIONS(SparseMatrix<std::complex<float> >);
+MATRIX_FUNCTIONS(FullMatrix<double>,double);
+MATRIX_FUNCTIONS(FullMatrix<float>,float);
+MATRIX_FUNCTIONS(FullMatrix<double>,std::complex<double>);
+MATRIX_FUNCTIONS(FullMatrix<std::complex<double> >,std::complex<double>);
+
+MATRIX_FUNCTIONS(SparseMatrix<double>,double);
+MATRIX_FUNCTIONS(SparseMatrix<float>,float);
+MATRIX_FUNCTIONS(SparseMatrix<double>,std::complex<double>);
+MATRIX_FUNCTIONS(SparseMatrix<float>,std::complex<float>);
+MATRIX_FUNCTIONS(SparseMatrix<std::complex<double> >,std::complex<double>);
+MATRIX_FUNCTIONS(SparseMatrix<std::complex<float> >,std::complex<float>);
+
+MATRIX_FUNCTIONS(SparseMatrixEZ<double>,double);
+MATRIX_FUNCTIONS(SparseMatrixEZ<float>,float);
+MATRIX_FUNCTIONS(ChunkSparseMatrix<double>,double);
+MATRIX_FUNCTIONS(ChunkSparseMatrix<float>,float);
+
 
 BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
 BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<double>, BlockVector<double>);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<float>);
 
-MATRIX_FUNCTIONS(SparseMatrixEZ<double>);
-MATRIX_FUNCTIONS(SparseMatrixEZ<float>);
-MATRIX_FUNCTIONS(ChunkSparseMatrix<double>);
-MATRIX_FUNCTIONS(ChunkSparseMatrix<float>);
-
 // BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrixEZ<double>);
 // BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrixEZ<float>,  Vector<float>);
 
 #ifdef DEAL_II_WITH_PETSC
-MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
-MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
+MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix,PetscScalar);
+MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix,PetscScalar);
 BLOCK_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::SparseMatrix, PETScWrappers::MPI::Vector);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix,PETScWrappers::MPI::BlockVector);
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
-MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix);
+MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix,double);
 BLOCK_MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix);
 MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::MPI::Vector);
 BLOCK_MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix, TrilinosWrappers::MPI::BlockVector);
@@ -1468,15 +1473,17 @@ ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix);
 // constructor of scratch_data (it won't allow one to be constructed in place).
 namespace internals
 {
-#define SCRATCH_INITIALIZER(Number,Name)                                \
-  ConstraintMatrixData<Number>::ScratchData scratch_data_initializer_##Name; \
-  template <> Threads::ThreadLocalStorage<ConstraintMatrixData<Number>::ScratchData> \
-  ConstraintMatrixData<Number>::scratch_data(scratch_data_initializer_##Name)
+#define SCRATCH_INITIALIZER(MatrixScalar,VectorScalar,Name)                  \
+  ConstraintMatrixData<MatrixScalar,VectorScalar>::ScratchData scratch_data_initializer_##Name; \
+  template <> Threads::ThreadLocalStorage<ConstraintMatrixData<MatrixScalar,VectorScalar>::ScratchData> \
+  ConstraintMatrixData<MatrixScalar,VectorScalar>::scratch_data(scratch_data_initializer_##Name)
 
-  SCRATCH_INITIALIZER(double,double);
-  SCRATCH_INITIALIZER(float,float);
-  SCRATCH_INITIALIZER(std::complex<double>,cdouble);
-  SCRATCH_INITIALIZER(std::complex<float>,cfloat);
+  SCRATCH_INITIALIZER(double,double,dd);
+  SCRATCH_INITIALIZER(float,float,ff);
+  SCRATCH_INITIALIZER(std::complex<double>,std::complex<double>,zz);
+  SCRATCH_INITIALIZER(std::complex<float>,std::complex<float>,cc);
+  SCRATCH_INITIALIZER(double,std::complex<double>,dz);
+  SCRATCH_INITIALIZER(float,std::complex<float>,fc);
 #undef SCRATCH_INITIALIZER
 }
 

@@ -277,10 +277,10 @@ namespace MatrixCreator
   void create_mass_matrix (const Mapping<dim, spacedim>   &mapping,
                            const DoFHandler<dim,spacedim> &dof,
                            const Quadrature<dim>    &q,
-                           SparseMatrix<number>     &matrix,
+                           SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim,number> *const a = nullptr,
+                           const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -290,10 +290,10 @@ namespace MatrixCreator
   template <int dim, int spacedim, typename number>
   void create_mass_matrix (const DoFHandler<dim,spacedim> &dof,
                            const Quadrature<dim>    &q,
-                           SparseMatrix<number>     &matrix,
+                           SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim,number> *const a = nullptr,
+                           const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -324,10 +324,10 @@ namespace MatrixCreator
   void create_mass_matrix (const hp::MappingCollection<dim,spacedim> &mapping,
                            const hp::DoFHandler<dim,spacedim> &dof,
                            const hp::QCollection<dim> &q,
-                           SparseMatrix<number>     &matrix,
+                           SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim,number> *const a = nullptr,
+                           const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
   /**
@@ -336,10 +336,10 @@ namespace MatrixCreator
   template <int dim, int spacedim, typename number>
   void create_mass_matrix (const hp::DoFHandler<dim,spacedim> &dof,
                            const hp::QCollection<dim> &q,
-                           SparseMatrix<number>     &matrix,
+                           SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
                            const Function<spacedim,number> &rhs,
                            Vector<number>           &rhs_vector,
-                           const Function<spacedim,number> *const a = nullptr,
+                           const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
                            const ConstraintMatrix   &constraints = ConstraintMatrix());
 
 
@@ -372,11 +372,11 @@ namespace MatrixCreator
   void create_boundary_mass_matrix (const Mapping<dim, spacedim>       &mapping,
                                     const DoFHandler<dim,spacedim>    &dof,
                                     const Quadrature<dim-1>  &q,
-                                    SparseMatrix<number>     &matrix,
+                                    SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,number> *const weight = 0,
+                                    const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const weight = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
 
@@ -387,11 +387,11 @@ namespace MatrixCreator
   template <int dim, int spacedim, typename number>
   void create_boundary_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                                     const Quadrature<dim-1>  &q,
-                                    SparseMatrix<number>     &matrix,
+                                    SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,number> *const a = nullptr,
+                                    const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -401,11 +401,11 @@ namespace MatrixCreator
   void create_boundary_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
                                     const hp::DoFHandler<dim,spacedim>    &dof,
                                     const hp::QCollection<dim-1>  &q,
-                                    SparseMatrix<number>     &matrix,
+                                    SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,number> *const a = nullptr,
+                                    const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -414,11 +414,11 @@ namespace MatrixCreator
   template <int dim, int spacedim, typename number>
   void create_boundary_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                                     const hp::QCollection<dim-1>  &q,
-                                    SparseMatrix<number>     &matrix,
+                                    SparseMatrix<typename numbers::NumberTraits<number>::real_type>     &matrix,
                                     const std::map<types::boundary_id, const Function<spacedim,number>*> &boundary_functions,
                                     Vector<number>           &rhs_vector,
                                     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-                                    const Function<spacedim,number> *const a = nullptr,
+                                    const Function<spacedim,typename numbers::NumberTraits<number>::real_type> *const a = nullptr,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**

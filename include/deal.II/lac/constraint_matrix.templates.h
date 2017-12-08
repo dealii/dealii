@@ -1399,7 +1399,7 @@ namespace internals
    * Access to the scratch data is only through the accessor class which
    * handles the access as well as marking the data as used.
    */
-  template <typename Number>
+  template <typename MatrixScalar, typename VectorScalar = MatrixScalar>
   class ConstraintMatrixData
   {
   public:
@@ -1434,7 +1434,7 @@ namespace internals
       /**
        * Temporary array for column values
        */
-      std::vector<Number>    values;
+      std::vector<MatrixScalar>    values;
 
       /**
        * Temporary array for block start indices
@@ -1449,7 +1449,7 @@ namespace internals
       /**
        * Temporary array for vector values
        */
-      std::vector<Number> vector_values;
+      std::vector<VectorScalar> vector_values;
 
       /**
        * Data array for reorder row/column indices.
@@ -2187,19 +2187,19 @@ make_sorted_row_list (const std::vector<size_type> &local_dof_indices,
 
 
 // Resolve the constraints from the vector and apply inhomogeneities.
-template < typename LocalType>
+template <typename MatrixScalar, typename VectorScalar>
 inline
-LocalType
+typename ProductType<VectorScalar,MatrixScalar>::type
 ConstraintMatrix::
 resolve_vector_entry (const size_type                       i,
                       const internals::GlobalRowsFromLocal &global_rows,
-                      const Vector<LocalType>              &local_vector,
+                      const Vector<VectorScalar>           &local_vector,
                       const std::vector<size_type>         &local_dof_indices,
-                      const FullMatrix<LocalType>          &local_matrix) const
+                      const FullMatrix<MatrixScalar>       &local_matrix) const
 {
   const size_type loc_row = global_rows.local_row(i);
   const size_type n_inhomogeneous_rows = global_rows.n_inhomogeneities();
-  LocalType val = 0;
+  typename ProductType<VectorScalar,MatrixScalar>::type val = 0;
   // has a direct contribution from some local entry. If we have inhomogeneous
   // constraints, compute the contribution of the inhomogeneity in the current
   // row.
@@ -2217,7 +2217,7 @@ resolve_vector_entry (const size_type                       i,
   for (size_type q=0; q<global_rows.size(i); ++q)
     {
       const size_type loc_row_q = global_rows.local_row(i,q);
-      LocalType add_this = local_vector (loc_row_q);
+      typename ProductType<VectorScalar,MatrixScalar>::type add_this = local_vector (loc_row_q);
       for (size_type k=0; k<n_inhomogeneous_rows; ++k)
         add_this -= (local_matrix(loc_row_q,global_rows.constraint_origin(k)) *
                      lines[lines_cache[calculate_line_index
@@ -2263,7 +2263,7 @@ ConstraintMatrix::distribute_local_to_global (
 
   const size_type n_local_dofs = local_dof_indices.size();
 
-  typename internals::ConstraintMatrixData<number>::ScratchDataAccessor
+  typename internals::ConstraintMatrixData<typename MatrixType::value_type,typename VectorType::value_type>::ScratchDataAccessor
   scratch_data;
 
   internals::GlobalRowsFromLocal &global_rows = scratch_data->global_rows;
@@ -2282,7 +2282,7 @@ ConstraintMatrix::distribute_local_to_global (
   std::vector<number>    &vals           = scratch_data->values;
   // create arrays for writing into the vector as well
   std::vector<size_type> &vector_indices = scratch_data->vector_indices;
-  std::vector<number>    &vector_values  = scratch_data->vector_values;
+  std::vector<typename VectorType::value_type> &vector_values  = scratch_data->vector_values;
   vector_indices.resize(n_actual_dofs);
   vector_values.resize(n_actual_dofs);
   SparseMatrix<number> *sparse_matrix
@@ -2328,13 +2328,14 @@ ConstraintMatrix::distribute_local_to_global (
       // hand side.
       if (use_vectors == true)
         {
-          const number val = resolve_vector_entry (i, global_rows,
-                                                   local_vector,
-                                                   local_dof_indices,
-                                                   local_matrix);
+          const typename VectorType::value_type
+          val = resolve_vector_entry (i, global_rows,
+                                      local_vector,
+                                      local_dof_indices,
+                                      local_matrix);
           AssertIsFinite(val);
 
-          if (val != number ())
+          if (val != typename VectorType::value_type ())
             {
               vector_indices[local_row_n] = row;
               vector_values[local_row_n] = val;
@@ -2406,7 +2407,7 @@ distribute_local_to_global (
     }
   Assert (sorted == true, ExcMatrixNotClosed());
 
-  typename internals::ConstraintMatrixData<number>::ScratchDataAccessor
+  typename internals::ConstraintMatrixData<typename MatrixType::value_type,typename VectorType::value_type>::ScratchDataAccessor
   scratch_data;
 
   const size_type n_local_dofs = local_dof_indices.size();
@@ -2528,7 +2529,7 @@ ConstraintMatrix::distribute_local_to_global (
   const size_type n_local_row_dofs = row_indices.size();
   const size_type n_local_col_dofs = col_indices.size();
 
-  typename internals::ConstraintMatrixData<number>::ScratchDataAccessor
+  typename internals::ConstraintMatrixData<typename MatrixType::value_type>::ScratchDataAccessor
   scratch_data;
   internals::GlobalRowsFromLocal &global_rows = scratch_data->global_rows;
   global_rows.reinit(n_local_row_dofs);

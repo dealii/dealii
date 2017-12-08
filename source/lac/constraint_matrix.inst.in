@@ -29,21 +29,57 @@ for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
 {
     template void ConstraintMatrix::condense<LinearAlgebra::distributed::T<S> >(const LinearAlgebra::distributed::T<S> &, LinearAlgebra::distributed::T<S> &) const;
     template void ConstraintMatrix::condense<LinearAlgebra::distributed::T<S> >(LinearAlgebra::distributed::T<S> &vec) const;
-    template void ConstraintMatrix::distribute_local_to_global<LinearAlgebra::distributed::T<S> > (
-        const Vector<S>&, const std::vector<types::global_dof_index> &, LinearAlgebra::distributed::T<S> &, const FullMatrix<S>&) const;
-    template void ConstraintMatrix::distribute_local_to_global<LinearAlgebra::distributed::T<S> > (
-        const Vector<S>&, const std::vector<types::global_dof_index> &, const std::vector<types::global_dof_index> &, LinearAlgebra::distributed::T<S> &, const FullMatrix<S>&, bool) const;
-    template void ConstraintMatrix::set_zero<LinearAlgebra::distributed::T<S> >(LinearAlgebra::distributed::T<S> &) const;
-    template void ConstraintMatrix::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> > > (
-        const FullMatrix<S> &, const std::vector< size_type > &, DiagonalMatrix<LinearAlgebra::distributed::T<S> > &) const;
-    template void ConstraintMatrix::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> >, LinearAlgebra::distributed::T<S> > (
-        const FullMatrix<S> &, const Vector<S>&, const std::vector< size_type > &,
-        DiagonalMatrix<LinearAlgebra::distributed::T<S> > &, LinearAlgebra::distributed::T<S>&,
-        bool, std::integral_constant<bool, false>) const;
-    template void ConstraintMatrix::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> >, T<S> > (
-        const FullMatrix<S> &, const Vector<S>&, const std::vector< size_type > &,
-        DiagonalMatrix<LinearAlgebra::distributed::T<S> > &, T<S>&,
-        bool, std::integral_constant<bool, false>) const;
+
+    template
+    void
+    ConstraintMatrix::distribute_local_to_global<LinearAlgebra::distributed::T<S> >
+    (const Vector<S>&,
+     const std::vector<types::global_dof_index> &,
+     LinearAlgebra::distributed::T<S> &,
+     const FullMatrix<S>&) const;
+
+    template
+    void
+    ConstraintMatrix::distribute_local_to_global<LinearAlgebra::distributed::T<S> >
+    (const Vector<S>&,
+     const std::vector<types::global_dof_index> &,
+     const std::vector<types::global_dof_index> &,
+     LinearAlgebra::distributed::T<S> &,
+     const FullMatrix<S>&,
+     bool) const;
+
+    template
+    void
+    ConstraintMatrix::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> > >
+    (const FullMatrix<S> &,
+     const std::vector< size_type > &,
+     DiagonalMatrix<LinearAlgebra::distributed::T<S> > &) const;
+
+    template
+    void
+    ConstraintMatrix::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> >, LinearAlgebra::distributed::T<S> >
+    (const FullMatrix<S> &,
+     const Vector<S>&,
+     const std::vector< size_type > &,
+     DiagonalMatrix<LinearAlgebra::distributed::T<S> > &,
+     LinearAlgebra::distributed::T<S>&,
+     bool,
+     std::integral_constant<bool, false>) const;
+
+    template
+    void
+    ConstraintMatrix::distribute_local_to_global<DiagonalMatrix<LinearAlgebra::distributed::T<S> >, T<S> >
+    (const FullMatrix<S> &,
+     const Vector<S>&,
+     const std::vector< size_type > &,
+     DiagonalMatrix<LinearAlgebra::distributed::T<S> > &,
+     T<S>&,
+     bool,
+     std::integral_constant<bool, false>) const;
+
+    template
+    void
+    ConstraintMatrix::set_zero<LinearAlgebra::distributed::T<S> >(LinearAlgebra::distributed::T<S> &) const;
 }
 
 
