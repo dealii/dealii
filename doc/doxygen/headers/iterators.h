@@ -282,19 +282,19 @@ as the function that generate such objects:
   <tr>
     <th>Triangulation</th>
     <td>typename Triangulation::cell_iterator</td>
-    <td>triangulation.begin()</td>
+    <td>Triangulation::begin()</td>
   </tr>
 
   <tr>
     <th>DoFHandler</th>
     <td>typename DoFHandler::cell_iterator</td>
-    <td>dof_handler.begin()</td>
+    <td>DoFHandler::begin()</td>
   </tr>
 
   <tr>
     <th>hp::DoFHandler</th>
     <td>typename hp::DoFHandler::cell_iterator</td>
-    <td>hp_dof_handler.begin()</td>
+    <td>hp::DoFHandler::begin()</td>
   </tr>
 </table>
 
@@ -314,19 +314,19 @@ Active iterators have the following properties:
   <tr>
     <th>Triangulation</th>
     <td>typename Triangulation::active_cell_iterator</td>
-    <td>triangulation.begin_active()</td>
+    <td>Triangulation::begin_active()</td>
   </tr>
 
   <tr>
     <th>DoFHandler</th>
     <td>typename DoFHandler::active_cell_iterator</td>
-    <td>dof_handler.begin_active()</td>
+    <td>DoFHandler::begin_active()</td>
   </tr>
 
   <tr>
     <th>hp::DoFHandler</th>
     <td>typename hp::DoFHandler::active_cell_iterator</td>
-    <td>hp_dof_handler.begin_active()</td>
+    <td>hp::DoFHandler::begin_active()</td>
   </tr>
 </table>
 
