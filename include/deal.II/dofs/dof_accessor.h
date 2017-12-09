@@ -552,7 +552,8 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcInvalidObject);
+  DeclExceptionMsg (ExcInvalidObject, "This accessor object has not been "
+                    "associated with any DoFHandler object.");
   /**
    * Exception
    *
@@ -1018,7 +1019,8 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0 (ExcInvalidObject);
+  DeclExceptionMsg (ExcInvalidObject, "This accessor object has not been "
+                    "associated with any DoFHandler object.");
   /**
    * Exception
    *
