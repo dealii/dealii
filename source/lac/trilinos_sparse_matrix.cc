@@ -1624,6 +1624,7 @@ namespace TrilinosWrappers
         ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_columns,
                                                              col_value_ptr,
                                                              col_index_ptr);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
     else if (nonlocal_matrix.get() != nullptr)
       {
@@ -1638,6 +1639,7 @@ namespace TrilinosWrappers
         ierr = nonlocal_matrix->SumIntoGlobalValues(row, n_columns,
                                                     col_value_ptr,
                                                     col_index_ptr);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
     else
       {
@@ -1654,6 +1656,7 @@ namespace TrilinosWrappers
                                             col_index_ptr,
                                             &col_value_ptr,
                                             Epetra_FECrsMatrix::ROW_MAJOR);
+        AssertThrow (ierr == 0, ExcTrilinosError(ierr));
       }
 
 #ifdef DEBUG
