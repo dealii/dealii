@@ -311,7 +311,6 @@ namespace TrilinosWrappers
         }
 
       TrilinosScalar *entries = (*actual_vec)[0];
-      block_offset = 0;
       for (size_type block=0; block<v.n_blocks(); ++block)
         {
           v.block(block).trilinos_vector().ExtractCopy (entries, 0);
