@@ -39,11 +39,12 @@ void random_matrix(FullMatrix<double> &A)
 int
 main ()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::fixed;
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
   Testing::srand(3391466);
+
+  std::ostream &logfile = deallog.get_file_stream();
 
   FullMatrix<double> T(3,3,entries);
   T.print_formatted(logfile, 0, false);
@@ -176,5 +177,3 @@ main ()
         }
     }
 }
-
-

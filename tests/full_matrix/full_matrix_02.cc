@@ -31,10 +31,9 @@ const double entries_Z[9] = { 0,0,0,0,0,0,0,0,0 };
 int
 main ()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::fixed;
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
   Testing::srand(3391466);
 
   FullMatrix<double> A(3,3,entries_A);

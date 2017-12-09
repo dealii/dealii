@@ -24,9 +24,6 @@
 
 #include <iostream>
 
-std::ofstream logfile("output");
-
-
 template <int dim>
 void check_rect1 (unsigned int n, bool color, bool log)
 {
@@ -47,14 +44,14 @@ void check_rect1 (unsigned int n, bool color, bool log)
   if (dim == 2)
     {
       if (log)
-        grid_out.write_xfig (tria, logfile);
+        grid_out.write_xfig (tria, deallog.get_file_stream());
       else
         grid_out.write_xfig (tria, std::cout);
     }
   else
     {
       if (log)
-        grid_out.write_dx (tria, logfile);
+        grid_out.write_dx (tria, deallog.get_file_stream());
       else
         grid_out.write_dx (tria, std::cout);
     }
@@ -63,6 +60,8 @@ void check_rect1 (unsigned int n, bool color, bool log)
 
 int main()
 {
+  initlog();
+
   check_rect1<2> (1, true, true);
   check_rect1<2> (3, true, true);
   check_rect1<3> (1, true, true);

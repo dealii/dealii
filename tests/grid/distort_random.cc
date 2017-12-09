@@ -24,10 +24,6 @@
 #include <deal.II/grid/grid_out.h>
 
 
-std::ofstream logfile("output");
-
-
-
 template <int dim>
 void test1 (const bool keep_boundary)
 {
@@ -37,6 +33,7 @@ void test1 (const bool keep_boundary)
 
   GridTools::distort_random (0.1, tria, keep_boundary);
 
+  std::ostream &logfile = deallog.get_file_stream();
   deallog << "dim=" << dim << ", keep_boundary=" << keep_boundary << std::endl;
   GridOut().write_gnuplot (tria, logfile);
 }
@@ -45,9 +42,8 @@ void test1 (const bool keep_boundary)
 
 int main ()
 {
-  deallog << std::setprecision(4);
-  logfile << std::setprecision(4);
-  deallog.attach(logfile);
+  initlog();
+  deallog.get_file_stream() << std::setprecision(4);
 
   test1<1> (true);
   test1<1> (false);
@@ -58,4 +54,3 @@ int main ()
 
   return 0;
 }
-

@@ -28,9 +28,6 @@
 #include <numeric>
 
 
-std::ofstream logfile("output");
-
-
 DeclException2 (ExcNumberMismatch,
                 int, int,
                 << "The numbers " << arg1 << " and " << arg2
@@ -83,6 +80,7 @@ void test ()
       cell->set_subdomain_id (subdomain);
     };
 
+  std::ostream &logfile = deallog.get_file_stream();
 
   // check 1: count number of cells
   // on some level
@@ -218,11 +216,9 @@ void test ()
 
 int main ()
 {
-  deallog << std::setprecision(4);
-  deallog.attach(logfile);
-
+  initlog ();
+  deallog.get_file_stream() << std::setprecision(4);
   test ();
 
   return 0;
 }
-

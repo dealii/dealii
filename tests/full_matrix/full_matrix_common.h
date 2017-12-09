@@ -156,9 +156,8 @@ main()
 {
   try
     {
-      std::ofstream logfile("output");
       deallog << std::setprecision (2);
-      deallog.attach(logfile);
+      initlog();
       deallog.depth_console(0);
 
       check<double> ();
