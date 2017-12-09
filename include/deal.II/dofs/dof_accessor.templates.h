@@ -1410,7 +1410,7 @@ namespace internal
         Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
                  ExcMessage ("You need to specify a FE index when working "
                              "with hp DoFHandlers"));
-        Assert (dof_handler.finite_elements != 0,
+        Assert (dof_handler.finite_elements != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
         Assert (fe_index < dof_handler.finite_elements->size(),
@@ -2543,7 +2543,7 @@ void
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::copy_from
 (const TriaAccessorBase<0,1,spacedim> &da)
 {
-  Assert (this->dof_handler != 0, ExcInvalidObject());
+  Assert (this->dof_handler != nullptr, ExcInvalidObject());
   BaseClass::copy_from(da);
 }
 
@@ -3061,7 +3061,7 @@ namespace internal
                                   ForwardIterator local_source_end,
                                   OutputVector   &global_destination)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
@@ -3091,7 +3091,7 @@ namespace internal
                                   ForwardIterator         local_source_end,
                                   OutputVector           &global_destination)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
@@ -3122,7 +3122,7 @@ namespace internal
                                   ForwardIterator         local_source_end,
                                   OutputVector           &global_destination)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
@@ -3185,7 +3185,7 @@ namespace internal
                                   const dealii::FullMatrix<number> &local_source,
                                   OutputMatrix                     &global_destination)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
@@ -3220,7 +3220,7 @@ namespace internal
                                   OutputMatrix                     &global_matrix,
                                   OutputVector                     &global_vector)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
@@ -3262,7 +3262,7 @@ namespace internal
                                   OutputMatrix                     &global_matrix,
                                   OutputVector                     &global_vector)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
