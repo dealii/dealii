@@ -124,6 +124,7 @@ inline
 const DoFHandlerType &
 DoFAccessor<structdim,DoFHandlerType,level_dof_access>::get_dof_handler () const
 {
+  Assert (this->dof_handler != nullptr, ExcInvalidObject());
   return *this->dof_handler;
 }
 
@@ -3527,6 +3528,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::get_dof_values
           ExcMessage ("Can't ask for DoF indices on artificial cells."));
   Assert (!this->has_children(),
           ExcMessage ("Cell must be active."));
+  Assert (this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
 
   Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
           == this->get_fe().dofs_per_cell,
@@ -3595,6 +3597,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::set_dof_values
           typename DoFCellAccessor::ExcVectorDoesNotMatch());
 
 
+  Assert (this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
   const types::global_dof_index *cache
     = this->dof_handler->levels[this->present_level]
       ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
@@ -3618,6 +3621,8 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::get_fe () const
           ExcMessage ("In hp::DoFHandler objects, finite elements are only associated "
                       "with active cells. Consequently, you can not ask for the "
                       "active finite element on cells with children."));
+  Assert (this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
+
   return this->dof_handler->get_fe(active_fe_index());
 }
 
