@@ -22,6 +22,7 @@ SET(_src
 
 SET(_inst
   boundary_lib.inst.in
+  utilities.inst.in
   )
 
 FILE(GLOB _header
