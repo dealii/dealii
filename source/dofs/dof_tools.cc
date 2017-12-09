@@ -898,23 +898,23 @@ namespace DoFTools
 
         // this function is similar to the make_sparsity_pattern function,
         // see there for more information
-        typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
-        for (; cell!=endc; ++cell)
-          for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-            if (cell->face(face)->has_children())
-              {
-                const typename dealii::DoFHandler<dim,spacedim>::line_iterator
-                line = cell->face(face);
+        for (auto cell : dof_handler.active_cell_iterators())
+          if (cell->is_locally_owned())
+            {
+              for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
+                if (cell->face(face)->has_children())
+                  {
+                    const typename dealii::DoFHandler<dim,spacedim>::line_iterator
+                    line = cell->face(face);
 
-                for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                  selected_dofs[line->child(0)->vertex_dof_index(1,dof)] = true;
+                    for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
+                      selected_dofs[line->child(0)->vertex_dof_index(1,dof)] = true;
 
-                for (unsigned int child=0; child<2; ++child)
-                  for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-                    selected_dofs[line->child(child)->dof_index(dof)] = true;
-              }
+                    for (unsigned int child=0; child<2; ++child)
+                      for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
+                        selected_dofs[line->child(child)->dof_index(dof)] = true;
+                  }
+            }
       }
 
 
@@ -933,49 +933,46 @@ namespace DoFTools
 
         // this function is similar to the make_sparsity_pattern function,
         // see there for more information
+        for (auto cell : dof_handler.active_cell_iterators())
+          if (cell->is_locally_owned())
+            for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
+              if (cell->face(f)->has_children())
+                {
+                  const typename dealii::DoFHandler<dim,spacedim>::face_iterator
+                  face = cell->face(f);
 
-        typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
-        for (; cell!=endc; ++cell)
-          for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-            if (cell->face(f)->has_children())
-              {
-                const typename dealii::DoFHandler<dim,spacedim>::face_iterator
-                face = cell->face(f);
-
-                for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                  selected_dofs[face->child(0)->vertex_dof_index(2,dof)] = true;
-
-                // dof numbers on the centers of the lines bounding this
-                // face
-                for (unsigned int line=0; line<4; ++line)
                   for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                    selected_dofs[face->line(line)->child(0)->vertex_dof_index(1,dof)] = true;
+                    selected_dofs[face->child(0)->vertex_dof_index(2,dof)] = true;
 
-                // next the dofs on the lines interior to the face; the
-                // order of these lines is laid down in the FiniteElement
-                // class documentation
-                for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                  selected_dofs[face->child(0)->line(1)->dof_index(dof)] = true;
-                for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                  selected_dofs[face->child(1)->line(2)->dof_index(dof)] = true;
-                for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                  selected_dofs[face->child(2)->line(3)->dof_index(dof)] = true;
-                for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                  selected_dofs[face->child(3)->line(0)->dof_index(dof)] = true;
+                  // dof numbers on the centers of the lines bounding this
+                  // face
+                  for (unsigned int line=0; line<4; ++line)
+                    for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
+                      selected_dofs[face->line(line)->child(0)->vertex_dof_index(1,dof)] = true;
 
-                // dofs on the bordering lines
-                for (unsigned int line=0; line<4; ++line)
-                  for (unsigned int child=0; child<2; ++child)
-                    for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-                      selected_dofs[face->line(line)->child(child)->dof_index(dof)] = true;
+                  // next the dofs on the lines interior to the face; the
+                  // order of these lines is laid down in the FiniteElement
+                  // class documentation
+                  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+                    selected_dofs[face->child(0)->line(1)->dof_index(dof)] = true;
+                  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+                    selected_dofs[face->child(1)->line(2)->dof_index(dof)] = true;
+                  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+                    selected_dofs[face->child(2)->line(3)->dof_index(dof)] = true;
+                  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
+                    selected_dofs[face->child(3)->line(0)->dof_index(dof)] = true;
 
-                // finally, for the dofs interior to the four child faces
-                for (unsigned int child=0; child<4; ++child)
-                  for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
-                    selected_dofs[face->child(child)->dof_index(dof)] = true;
-              }
+                  // dofs on the bordering lines
+                  for (unsigned int line=0; line<4; ++line)
+                    for (unsigned int child=0; child<2; ++child)
+                      for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
+                        selected_dofs[face->line(line)->child(child)->dof_index(dof)] = true;
+
+                  // finally, for the dofs interior to the four child faces
+                  for (unsigned int child=0; child<4; ++child)
+                    for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
+                      selected_dofs[face->child(child)->dof_index(dof)] = true;
+                }
       }
     }
   }

@@ -1248,6 +1248,10 @@ namespace DoFTools
    *
    * The size of @p selected_dofs shall equal <tt>dof_handler.n_dofs()</tt>.
    * Previous contents of this array or overwritten.
+   *
+   * In case of a parallel::shared::Triangualtion or a
+   * parallel::distributed::Triangulation only dofs belonging to locally owned
+   * cells are reported.
    */
   template <int dim, int spacedim>
   void
