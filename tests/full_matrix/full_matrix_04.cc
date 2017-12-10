@@ -112,9 +112,7 @@ void test (const unsigned int n, const unsigned int m)
 int
 main ()
 {
-  const std::string logname = "output";
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
+  initlog();
 
   test(3,4);
   test(4,7);

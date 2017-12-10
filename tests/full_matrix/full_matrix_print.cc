@@ -26,11 +26,10 @@ const double entries[9] = { 11.1,12.2,13.3,21.456,22.12345678901,23,31,32,33 };
 int
 main ()
 {
-  std::ofstream logfile("output");
+  initlog();
+  std::ostream &logfile = deallog.get_file_stream();
   deallog << std::fixed;
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
-
   logfile << numbers::PI << std::endl;
 
   FullMatrix<double> T(3,3,entries);
@@ -47,5 +46,3 @@ main ()
 
   logfile << numbers::PI << std::endl;
 }
-
-

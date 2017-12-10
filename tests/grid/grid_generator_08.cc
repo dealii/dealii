@@ -81,16 +81,15 @@ void test(std::ostream &out)
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
   deallog.push("1-2");
-  test<1,2>(logfile);
+  test<1,2>(deallog.get_file_stream());
   deallog.pop();
   deallog.push("1-3");
-  test<1,3>(logfile);
+  test<1,3>(deallog.get_file_stream());
   deallog.pop();
   deallog.push("2-3");
-  test<2,3>(logfile);
+  test<2,3>(deallog.get_file_stream());
   deallog.pop();
 }

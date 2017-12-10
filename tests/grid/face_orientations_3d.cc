@@ -31,9 +31,6 @@
 
 
 
-std::ofstream logfile("output");
-
-
 void test (const char *filename)
 {
   Triangulation<3> tria;
@@ -72,7 +69,7 @@ void test (const char *filename)
 int main ()
 {
   deallog << std::setprecision (2);
-  deallog.attach(logfile);
+  initlog();
 
   test (SOURCE_DIR "/grid_in_3d/1.in");
   test (SOURCE_DIR "/grid_in_3d/2.in");
@@ -82,4 +79,3 @@ int main ()
   test (SOURCE_DIR "/grid_in_3d/evil_0.in");
   test (SOURCE_DIR "/grid_in_3d/evil_4.in");
 }
-

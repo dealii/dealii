@@ -26,10 +26,9 @@ const double compare[9] = { 66,78,90,78,93,108,90,108,126 };
 int
 main ()
 {
-  std::ofstream logfile("output");
+  initlog();
   deallog << std::fixed;
   deallog << std::setprecision(3);
-  deallog.attach(logfile);
 
   FullMatrix<double> A(3,3,entries_A);
   FullMatrix<double> C(3,3);

@@ -69,8 +69,7 @@ void test(std::ostream &out)
 
 int main()
 {
-  std::ofstream logfile("output");
-  deallog.attach(logfile);
+  initlog();
 
-  test(logfile);
+  test(deallog.get_file_stream());
 }
