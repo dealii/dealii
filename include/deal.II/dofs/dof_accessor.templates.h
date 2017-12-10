@@ -124,6 +124,7 @@ inline
 const DoFHandlerType &
 DoFAccessor<structdim,DoFHandlerType,level_dof_access>::get_dof_handler () const
 {
+  Assert (this->dof_handler != nullptr, ExcInvalidObject());
   return *this->dof_handler;
 }
 
@@ -1409,7 +1410,7 @@ namespace internal
         Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
                  ExcMessage ("You need to specify a FE index when working "
                              "with hp DoFHandlers"));
-        Assert (dof_handler.finite_elements != 0,
+        Assert (dof_handler.finite_elements != nullptr,
                 ExcMessage ("No finite element collection is associated with "
                             "this DoFHandler"));
         Assert (fe_index < dof_handler.finite_elements->size(),
@@ -2011,9 +2012,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::get_dof_indices
 (std::vector<types::global_dof_index> &dof_indices,
  const unsigned int                    fe_index) const
 {
-  Assert (this->dof_handler != nullptr,
-          ExcMessage("This accessor object has not been associated "
-                     "with any DoFHandler object."));
+  Assert (this->dof_handler != nullptr, ExcInvalidObject());
   Assert (static_cast<unsigned int>(this->level()) < this->dof_handler->levels.size(),
           ExcMessage ("The DoFHandler to which this accessor points has not "
                       "been initialized, i.e., it doesn't appear that DoF indices "
@@ -2544,7 +2543,7 @@ void
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::copy_from
 (const TriaAccessorBase<0,1,spacedim> &da)
 {
-  Assert (this->dof_handler != 0, ExcInvalidObject());
+  Assert (this->dof_handler != nullptr, ExcInvalidObject());
   BaseClass::copy_from(da);
 }
 
@@ -3062,7 +3061,7 @@ namespace internal
                                   ForwardIterator local_source_end,
                                   OutputVector   &global_destination)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
@@ -3092,7 +3091,7 @@ namespace internal
                                   ForwardIterator         local_source_end,
                                   OutputVector           &global_destination)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
@@ -3123,7 +3122,7 @@ namespace internal
                                   ForwardIterator         local_source_end,
                                   OutputVector           &global_destination)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source_end-local_source_begin == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcVectorDoesNotMatch()));
@@ -3186,7 +3185,7 @@ namespace internal
                                   const dealii::FullMatrix<number> &local_source,
                                   OutputMatrix                     &global_destination)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_source.m() == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
@@ -3221,7 +3220,7 @@ namespace internal
                                   OutputMatrix                     &global_matrix,
                                   OutputVector                     &global_vector)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
@@ -3263,7 +3262,7 @@ namespace internal
                                   OutputMatrix                     &global_matrix,
                                   OutputVector                     &global_vector)
       {
-        Assert (accessor.dof_handler != 0,
+        Assert (accessor.dof_handler != nullptr,
                 (typename std::decay<decltype(accessor)>::type::ExcInvalidObject()));
         Assert (local_matrix.m() == accessor.get_fe().dofs_per_cell,
                 (typename std::decay<decltype(accessor)>::type::ExcMatrixDoesNotMatch()));
@@ -3529,6 +3528,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::get_dof_values
           ExcMessage ("Can't ask for DoF indices on artificial cells."));
   Assert (!this->has_children(),
           ExcMessage ("Cell must be active."));
+  Assert (this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
 
   Assert (static_cast<unsigned int>(local_values_end-local_values_begin)
           == this->get_fe().dofs_per_cell,
@@ -3597,6 +3597,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::set_dof_values
           typename DoFCellAccessor::ExcVectorDoesNotMatch());
 
 
+  Assert (this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
   const types::global_dof_index *cache
     = this->dof_handler->levels[this->present_level]
       ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
@@ -3620,6 +3621,8 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::get_fe () const
           ExcMessage ("In hp::DoFHandler objects, finite elements are only associated "
                       "with active cells. Consequently, you can not ask for the "
                       "active finite element on cells with children."));
+  Assert (this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
+
   return this->dof_handler->get_fe(active_fe_index());
 }
 

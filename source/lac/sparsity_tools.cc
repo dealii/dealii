@@ -270,19 +270,20 @@ namespace SparsityTools
       int *export_to_part=nullptr;
 
       //call partitioner
-      int rc = zz->LB_Partition (changes,
-                                 num_gid_entries,
-                                 num_lid_entries,
-                                 num_import,
-                                 import_global_ids,
-                                 import_local_ids,
-                                 import_procs,
-                                 import_to_part,
-                                 num_export,
-                                 export_global_ids,
-                                 export_local_ids,
-                                 export_procs,
-                                 export_to_part);
+      const int rc = zz->LB_Partition (changes,
+                                       num_gid_entries,
+                                       num_lid_entries,
+                                       num_import,
+                                       import_global_ids,
+                                       import_local_ids,
+                                       import_procs,
+                                       import_to_part,
+                                       num_export,
+                                       export_global_ids,
+                                       export_local_ids,
+                                       export_procs,
+                                       export_to_part);
+      (void)rc;
 
       //check for error code in partitioner
       Assert( rc == ZOLTAN_OK , ExcInternalError() );

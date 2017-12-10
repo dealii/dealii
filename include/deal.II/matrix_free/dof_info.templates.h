@@ -1347,7 +1347,6 @@ not_connect:
         task_info.partition_color_blocks_row_index.resize(partition+1,0);
         task_info.partition_color_blocks_data.resize(1,0);
 
-        start_up = 0;
         counter = 0;
         unsigned int missing_macros;
         for (unsigned int part=0; part<partition; ++part)
