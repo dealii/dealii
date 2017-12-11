@@ -31,7 +31,7 @@ template<int dim>
 void test()
 {
   const unsigned int this_mpi_process =
-      Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+    Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   FESystem<dim> fe(FE_Q<dim>(1), 2);
 
@@ -47,25 +47,24 @@ void test()
     DoFRenumbering::block_wise(dh);
 
     const std::vector<IndexSet> locally_owned_dofs_per_subdomain =
-        DoFTools::locally_owned_dofs_per_subdomain(dh);
+      DoFTools::locally_owned_dofs_per_subdomain(dh);
 
     const types::global_dof_index dofs_per_block = dh.n_dofs() / 2;
     std::vector<IndexSet> locally_owned_dofs_per_block(2);
     locally_owned_dofs_per_block[0] =
-        locally_owned_dofs_per_subdomain[this_mpi_process].get_view(0, dofs_per_block);
+      locally_owned_dofs_per_subdomain[this_mpi_process].get_view(0, dofs_per_block);
     locally_owned_dofs_per_block[1] =
-        locally_owned_dofs_per_subdomain[this_mpi_process].get_view(dofs_per_block, dh.n_dofs());
+      locally_owned_dofs_per_subdomain[this_mpi_process].get_view(dofs_per_block, dh.n_dofs());
 
-    // This assertion fails
-    Assert((locally_owned_dofs_per_block[0] == locally_owned_dofs_per_block[1]),
-        ExcMessage("Locally owned dofs differ across blocks."));
-  }
+    if (locally_owned_dofs_per_block[0] != locally_owned_dofs_per_block[1]))
+      ExcMessage("Locally owned dofs differ across blocks."));
+    }
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK for " << dim << "d" << std::endl;
 }
 
-int main (int argc, char* argv[])
+int main (int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
   MPILogInitAll log;
