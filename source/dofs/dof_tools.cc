@@ -1460,7 +1460,7 @@ namespace DoFTools
     local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
 
     // loop over all cells and record which subdomain a DoF belongs to.
-    // toss a coin in case it is on an interface
+    // give to the smaller subdomain_id in case it is on an interface
     typename DoFHandlerType::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();

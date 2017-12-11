@@ -1668,13 +1668,13 @@ namespace DoFTools
    *
    * Note that degrees of freedom associated with faces, edges, and vertices
    * may be associated with multiple subdomains if they are sitting on
-   * partition boundaries. In these cases, we put them into one of the
-   * associated partitions in an undefined way. This may sometimes lead to
-   * different numbers of degrees of freedom in partitions, even if the number
-   * of cells is perfectly equidistributed. While this is regrettable, it is
-   * not a problem in practice since the number of degrees of freedom on
-   * partition boundaries is asymptotically vanishing as we refine the mesh as
-   * long as the number of partitions is kept constant.
+   * partition boundaries. In these cases, we assign them to the process with
+   * the smaller subdomain id. This may lead to different numbers of degrees
+   * of freedom in partitions, even if the number of cells is perfectly
+   * equidistributed. While this is regrettable, it is not a problem in
+   * practice since the number of degrees of freedom on partition boundaries
+   * is asymptotically vanishing as we refine the mesh as long as the number
+   * of partitions is kept constant.
    *
    * This function returns the association of each DoF with one subdomain. If
    * you are looking for the association of each @em cell with a subdomain,
