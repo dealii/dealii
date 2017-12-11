@@ -74,9 +74,11 @@
 #include <fstream>
 #include <iostream>
 
-// This final include file provides the <code>mkdir</code> function
-// that we will use to create a directory for output files, if necessary:
+// Finally, we include two system headers that let us create a directory for
+// output files. The first header provides the <code>mkdir</code> function and
+// the second lets us determine what happened if <code>mkdir</code> fails.
 #include <sys/stat.h>
+#include <errno.h>
 
 namespace Step42
 {
@@ -876,8 +878,13 @@ namespace Step42
     output_dir = prm.get("output directory");
     if (output_dir != "" && *(output_dir.rbegin()) != '/')
       output_dir += "/";
-    const int ierr = mkdir(output_dir.c_str(), 0777);
-    AssertThrow(ierr == 0, ExcIO());
+
+    // If necessary, create a new directory for the output.
+    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+      {
+        const int ierr = mkdir(output_dir.c_str(), 0777);
+        AssertThrow(ierr == 0 || errno == EEXIST, ExcIO());
+      }
 
     pcout << "    Using output directory '" << output_dir << "'" << std::endl;
     pcout << "    FE degree " << fe_degree << std::endl;
