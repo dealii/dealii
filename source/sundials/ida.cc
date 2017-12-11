@@ -32,9 +32,16 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/sundials/copy.h>
 
+#ifdef DEAL_II_WITH_SUNDIALS_IDAS
+#pragma message "compiling with idas"
+#include <idas/idas_impl.h>
+#else
+#pragma message "compiling with ida"
+#include <ida/ida_impl.h>
+#endif
+
 #include <iostream>
 #include <iomanip>
-#include <ida/ida_impl.h>
 
 DEAL_II_NAMESPACE_OPEN
 
