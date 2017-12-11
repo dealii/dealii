@@ -32,7 +32,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/sundials/copy.h>
 
-#ifdef DEAL_II_WITH_SUNDIALS_IDAS
+#ifdef DEAL_II_SUNDIALS_WITH_IDAS
 #include <idas/idas_impl.h>
 #else
 #include <ida/ida_impl.h>
@@ -524,4 +524,4 @@ namespace SUNDIALS
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
+#endif // DEAL_II_WITH_SUNDIALS

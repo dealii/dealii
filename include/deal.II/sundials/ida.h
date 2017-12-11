@@ -32,7 +32,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
 
-#ifdef DEAL_II_WITH_SUNDIALS_IDAS
+#ifdef DEAL_II_SUNDIALS_WITH_IDAS
 #include <idas/idas.h>
 #else
 #include <ida/ida.h>
@@ -827,9 +827,8 @@ namespace SUNDIALS
 
 }
 
-
 DEAL_II_NAMESPACE_CLOSE
-#endif
 
+#endif // DEAL_II_WITH_SUNDIALS
 
 #endif
