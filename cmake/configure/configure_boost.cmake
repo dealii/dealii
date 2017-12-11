@@ -136,7 +136,7 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
       RESET_CMAKE_REQUIRED()
     ENDIF()
 
-    IF(${var})
+    IF(${var} AND DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
       # We want to pass the libraries to the CMake project that tests for the
       # BOOST Serialization bug. If we don't change the separator, only the
       # first one is passed. This change in the separator is reverted in
