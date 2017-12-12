@@ -657,7 +657,9 @@ namespace GridTools
       std::vector< std::vector< Point<dim> > >,
       std::vector< std::vector<unsigned int> > >
       compute_point_locations(const Cache<dim,spacedim>                                         &cache,
-                              const std::vector<Point<spacedim> >                               &points);
+                              const std::vector<Point<spacedim> >                               &points,
+                              const typename Triangulation<dim, spacedim>::active_cell_iterator &cell_hint
+                              = typename Triangulation<dim, spacedim>::active_cell_iterator());
 
   /**
    * Return a map of index:Point<spacedim>, containing the used vertices of the

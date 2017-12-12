@@ -5176,8 +5176,9 @@ next_cell:
   std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator >,
       std::vector< std::vector< Point<dim> > >,
       std::vector< std::vector<unsigned int> > >
-      compute_point_locations(const Cache<dim,spacedim>                &cache,
-                              const std::vector<Point<spacedim> >      &points)
+      compute_point_locations(const Cache<dim,spacedim>                 &cache,
+                              const std::vector<Point<spacedim> >       &points,
+                              const typename Triangulation<dim, spacedim>::active_cell_iterator &cell_hint)
   {
     // How many points are here?
     const unsigned int np = points.size();
@@ -5193,8 +5194,13 @@ next_cell:
 
     // We begin by finding the cell/transform of the first point
     std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator, Point<dim> >
-    my_pair  = GridTools::find_active_cell_around_point
-               (cache, points[0]);
+    my_pair;
+    if (cell_hint.state() == IteratorState::valid)
+      my_pair = GridTools::find_active_cell_around_point
+                (cache, points[0],cell_hint);
+    else
+      my_pair = GridTools::find_active_cell_around_point
+                (cache, points[0]);
 
     std::get<0>(cell_qpoint_map).emplace_back(my_pair.first);
     std::get<1>(cell_qpoint_map).emplace_back(1, my_pair.second);

@@ -24,6 +24,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/thread_local_storage.h>
+#include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/lac/vector.h>
 
@@ -413,6 +414,10 @@ namespace Functions
      * @return This function returns the number of cells that
      *   collectively contain the set of points give as @p
      *   points. This also equals the lengths of the output arrays.
+     *
+     * This function simply calls GridTools::compute_point_locations :
+     * using the original function avoids computing a
+     * new Cache at every function call.
      */
     unsigned int
     compute_point_locations
@@ -443,6 +448,11 @@ namespace Functions
      * A reference to the mapping being used.
      */
     const Mapping<dim> &mapping;
+
+    /**
+     * The Cache object
+     */
+    GridTools::Cache<dim,DoFHandlerType::space_dimension> cache;
 
     /**
      * The latest cell hint.

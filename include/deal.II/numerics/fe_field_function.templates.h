@@ -20,6 +20,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
@@ -27,6 +28,9 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/fe_field_function.h>
 #include <deal.II/numerics/vector_tools.h>
+
+#include <tuple>
+
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -44,6 +48,7 @@ namespace Functions
     dh(&mydh, "FEFieldFunction"),
     data_vector(myv),
     mapping(mymapping),
+    cache(dh->get_triangulation(),mymapping),
     cell_hint(dh->end())
   {
   }
@@ -438,150 +443,16 @@ namespace Functions
                            std::vector<std::vector<Point<dim> > >                      &qpoints,
                            std::vector<std::vector<unsigned int> >                     &maps) const
   {
-    // How many points are here?
-    const unsigned int np = points.size();
-
-    // Reset output maps.
-    cells.clear();
-    qpoints.clear();
-    maps.clear();
-
-    // Now the easy case.
-    if (np==0) return 0;
-
-    // Keep track of the points we found
-    std::vector<bool> point_flags(np, false);
-
-    // Set this to true until all points have been classified
-    bool left_over = true;
-
-    // Current quadrature point
-    typename DoFHandlerType::active_cell_iterator cell = cell_hint.get();
-    if (cell == dh->end())
-      cell = dh->begin_active();
-
-    {
-      // see if the point is inside the cell. there are two ways that
-      // transform_real_to_unit_cell can indicate that a point is
-      // outside: by returning coordinates that lie outside the
-      // reference cell, or by throwing an exception. handle both
-      boost::optional<Point<dim> >
-      qp = get_reference_coordinates (cell, points[0]);
-      if (!qp)
-        {
-          const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> >
-          my_pair  = GridTools::find_active_cell_around_point
-                     (mapping, *dh, points[0]);
-          AssertThrow (!my_pair.first->is_artificial(),
-                       VectorTools::ExcPointNotAvailableHere());
-
-          cell = my_pair.first;
-          qp = my_pair.second;
-          point_flags[0] = true;
-        }
-
-      // check that the cell is available:
-      AssertThrow (!cell->is_artificial(),
-                   VectorTools::ExcPointNotAvailableHere());
-
-      // Put in the first point.
-      cells.push_back(cell);
-      qpoints.emplace_back(1, qp.get());
-      maps.emplace_back(1, 0);
-    }
-
-
-    // Check if we need to do anything else
-    if (points.size() > 1)
-      left_over = true;
-    else
-      left_over = false;
-
-
-    // This is the first index of a non processed point
-    unsigned int first_outside = 1;
-
-    // And this is the index of the current cell
-    unsigned int c = 0;
-
-    while (left_over == true)
-      {
-        // Assume this is the last one
-        left_over = false;
-        Assert(first_outside < np,
-               ExcIndexRange(first_outside, 0, np));
-
-        // If we found one in this cell, keep looking in the same cell
-        for (unsigned int p=first_outside; p<np; ++p)
-          if (point_flags[p] == false)
-            {
-              // same logic as above
-              const boost::optional<Point<dim> >
-              qp = get_reference_coordinates (cells[c], points[p]);
-              if (qp)
-                {
-                  point_flags[p] = true;
-                  qpoints[c].push_back(qp.get());
-                  maps[c].push_back(p);
-                }
-              else
-                {
-                  // Set things up for next round
-                  if (left_over == false)
-                    first_outside = p;
-                  left_over = true;
-                }
-            }
-        // If we got here and there is
-        // no left over, we are
-        // done. Else we need to find
-        // the next cell
-        if (left_over == true)
-          {
-            const std::pair<typename dealii::internal::ActiveCellIterator<dim, dim, DoFHandlerType>::type, Point<dim> > my_pair
-              = GridTools::find_active_cell_around_point (mapping, *dh, points[first_outside]);
-            AssertThrow (!my_pair.first->is_artificial(),
-                         VectorTools::ExcPointNotAvailableHere());
-
-            cells.push_back(my_pair.first);
-            qpoints.emplace_back(1, my_pair.second);
-            maps.emplace_back(1, first_outside);
-            c++;
-            point_flags[first_outside] = true;
-            // And check if we can exit the loop now
-            if (first_outside == np-1)
-              left_over = false;
-          }
-      }
-
-    // Augment of one the number of cells
-    ++c;
-    // Debug Checking
-    Assert(c == cells.size(), ExcInternalError());
-
-    Assert(c == maps.size(),
-           ExcDimensionMismatch(c, maps.size()));
-
-    Assert(c == qpoints.size(),
-           ExcDimensionMismatch(c, qpoints.size()));
-
-#ifdef DEBUG
-    unsigned int qps = 0;
-    // The number of points in all
-    // the cells must be the same as
-    // the number of points we
-    // started off from.
-    for (unsigned int n=0; n<c; ++n)
-      {
-        Assert(qpoints[n].size() == maps[n].size(),
-               ExcDimensionMismatch(qpoints[n].size(), maps[n].size()));
-        qps += qpoints[n].size();
-      }
-    Assert(qps == np,
-           ExcDimensionMismatch(qps, np));
-#endif
-
-    return c;
+    // Calling the GridTools routine and preparing output
+    auto cell_qpoint_map = GridTools::compute_point_locations(cache,points,cell_hint.get());
+    const auto &tria_cells = std::get<0>(cell_qpoint_map);
+    cells.resize(tria_cells.size());
+    unsigned int i = 0;
+    for (const auto &c: tria_cells)
+      cells[i++] = typename DoFHandlerType::cell_iterator(*c,dh);
+    qpoints = std::get<1>(cell_qpoint_map);
+    maps = std::get<2>(cell_qpoint_map);
+    return cells.size();
   }
 
 
