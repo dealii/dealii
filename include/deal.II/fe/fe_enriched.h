@@ -140,13 +140,19 @@ DEAL_II_NAMESPACE_OPEN
  *
  * When using this class, please cite
  * @code{.bib}
- * @Article{Davydov2016,
- *   Title                    = {On the h-adaptive PUM and hp-adaptive FEM approaches applied to PDEs in quantum mechanics.},
- *   Author                   = {Davydov, D and Gerasimov, T and Pelteret, J.-P. and Steinmann, P.},
- *   eprinttype               = {arXiv},
- *   eprint                   = {1612.02305},
- *   eprintclass              = {physics.comp-ph},
- *   Year                     = {2016},
+ * @Article{Davydov2017,
+ *  author    = {Denis Davydov and Tymofiy Gerasimov and Jean-Paul Pelteret and Paul Steinmann},
+ *  title     = {Convergence study of the h-adaptive PUM and the hp-adaptive FEM applied to eigenvalue problems in quantum mechanics},
+ *  journal   = {Advanced Modeling and Simulation in Engineering Sciences},
+ *  year      = {2017},
+ *  volume    = {4},
+ *  number    = {1},
+ *  pages     = {7},
+ *  month     = {Dec},
+ *  issn      = {2213-7467},
+ *  day       = {12},
+ *  doi       = {10.1186/s40323-017-0093-0},
+ *  url       = {https://doi.org/10.1186/s40323-017-0093-0},
  * }
  * @endcode
  * The PUM was introduced in
