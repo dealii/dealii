@@ -3064,23 +3064,14 @@ namespace parallel
       }
 #endif
 
-      std::map<unsigned int, std::set<dealii::types::subdomain_id> >
-      vertices_with_ghost_neighbors;
-
       // First find out which process should receive which vertices.
-      // these are specifically the ones that sit on ghost cells and,
-      // among these, the ones that we own locally
-      for (typename Triangulation<dim,spacedim>::active_cell_iterator
-           cell=this->begin_active(); cell!=this->end();
-           ++cell)
-        if (cell->is_ghost())
-          for (unsigned int vertex_no=0;
-               vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
-            {
-              const unsigned int process_local_vertex_no = cell->vertex_index(vertex_no);
-              vertices_with_ghost_neighbors[process_local_vertex_no].insert
-              (cell->subdomain_id());
-            }
+      // These are specifically the ones that are located on cells at the
+      // boundary of the subdomain this process owns and the receiving
+      // process taking periodic faces into account.
+      // Here, it is sufficient to collect all vertices that are located
+      // at that boundary.
+      const std::map<unsigned int, std::set<dealii::types::subdomain_id> >
+      vertices_with_ghost_neighbors = compute_vertices_with_ghost_neighbors ();
 
       // now collect cells and their vertices
       // for the interested neighbors

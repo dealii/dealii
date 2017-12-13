@@ -1,0 +1,4 @@
+Fixed: parallel::distributed::Triangulation::communicate_locally_moved_vertices
+treats periodic faces correctly now.
+<br>
+(Daniel Arndt, Sambit Das, 2017/12/11)
