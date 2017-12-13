@@ -133,7 +133,8 @@
  *  GridGenerator::hyper_shell (triangulation,
  *                              center, inner_radius, outer_radius,
  *                              10);
- *  const HyperShellBoundary<2> boundary_description(center);
+ *  const SphericalManifold<2> boundary_description(center);
+ *  triangulation.set_all_manifold_ids_on_boundary(0);
  *  triangulation.set_boundary (0, boundary_description);
  *
  *  triangulation.refine_global (3);
@@ -144,12 +145,15 @@
  *
  * The mesh looks better in that it faithfully reproduces the circular inner
  * and outer boundaries of the domain. However, it is still possible to
- * identify the original 10 cells by the kinks in the tangential lines. They
- * result from the fact that every time a cell is refined, new vertices on
- * interior lines are just placed into the middle of the existing line (the
- * boundary lines are handled differently because we have attached boundary
- * objects). In other words, they end up in places that may be in the geometric
- * middle of a straight line, but not on a circle around the center.
+ * identify 20 kinks in the tangential lines. They result from the fact that
+ * every time a cell is refined, new vertices on interior lines are just
+ * placed into the middle of the existing line (the boundary lines are handled
+ * differently because we have attached a manifold object). In the first
+ * refinement with 10 cells, we got improved points because both outer
+ * boundaries have provided a curved description according to the description
+ * on blending different manifolds below. In other words, the new points after
+ * the first refinement end up in places that may be in the geometric middle
+ * of a straight line, but not on a circle around the center.
  *
  * This can be remedied by assigning a manifold description not only to
  * the lines along the boundary, but also to the radial lines and cells (which,
@@ -165,6 +169,7 @@
  *                              center, inner_radius, outer_radius,
  *                              10);
  *  const SphericalManifold<2> boundary_description(center);
+ *  triangulation.set_all_manifold_ids_on_boundary(0);
  *  triangulation.set_manifold (0, boundary_description);
  *
  *  Triangulation<2>::active_cell_iterator
@@ -202,26 +207,50 @@
  *               outer_radius = 1.0;
  *  GridGenerator::hyper_shell (triangulation,
  *                              center, inner_radius, outer_radius,
- *                              4);    // four circumferential cells
+ *                              3);    // three circumferential cells
  *  const HyperShellBoundary<2> boundary_description(center);
- *  triangulation.set_boundary (0, boundary_description);
+ *  triangulation.set_all_manifold_ids_on_boundary(0);
+ *  triangulation.set_manifold (0, boundary_description);
  *
  *  triangulation.refine_global (3);
  * @endcode
  *
- * @image html hypershell-boundary-only-4.png ""
- *
- * Here, we create only four circumferential cells in the beginning,
- * and refining them leads to the mesh shown. Clearly, here we have
- * cells with bad aspect ratios.
- *
- * If we drive this further and start with a coarse mesh of only
- * three cells (which may be inappropriate here, since we know that it
- * is not sufficient, but may also be impossible to avoid for complex
- * geometries generated in mesh generators), then we obtain the following
- * mesh:
- *
  * @image html hypershell-boundary-only-3.png ""
+ *
+ * Here, we create only three circumferential cells in the beginning, and
+ * refining them leads to the mesh shown. Clearly, here we have cells with bad
+ * aspect ratios, despite the first refinement that puts the new point into
+ * the middle.
+ *
+ * If we drive this further and start with a coarse mesh of a much thinner rim
+ * between the radii 0.8 and 1.0 and still start with only three cells (which
+ * may be inappropriate here, since we know that it is not sufficient, but may
+ * also be impossible to avoid for complex geometries generated in mesh
+ * generators), we observe the following:
+ *
+ * @code
+ *  Triangulation<2> triangulation;
+ *
+ *  const Point<2> center (1,0);
+ *  const double inner_radius = 0.8,
+ *               outer_radius = 1.0;
+ *  GridGenerator::hyper_shell (triangulation,
+ *                              center, inner_radius, outer_radius,
+ *                              3);    // three circumferential cells
+ *  const SphericalManifold<2> boundary_description(center);
+ *  triangulation.set_all_manifold_ids(0);
+ *  triangulation.set_manifold (0, boundary_description);
+ *
+ *  Triangulation<2>::active_cell_iterator
+ *    cell = triangulation.begin_active(),
+ *    endc = triangulation.end();
+ *  for (; cell!=endc; ++cell)
+ *    cell->set_all_manifold_ids (0);
+ *
+ *  triangulation.refine_global (3);
+ * @endcode
+ *
+ * @image html hypershell-boundary-thin-3.png ""
  *
  * This mesh neither has the correct geometry after refinement, nor do
  * all cells have positive area as is necessary for the finite element
@@ -233,12 +262,13 @@
  *  Triangulation<2> triangulation;
  *
  *  const Point<2> center (1,0);
- *  const double inner_radius = 0.5,
+ *  const double inner_radius = 0.8,
  *               outer_radius = 1.0;
  *  GridGenerator::hyper_shell (triangulation,
  *                              center, inner_radius, outer_radius,
  *                              3);    // three circumferential cells
  *  const SphericalManifold<2> boundary_description(center);
+ *  triangulation.set_all_manifold_ids(0);
  *  triangulation.set_manifold (0, boundary_description);
  *
  *  Triangulation<2>::active_cell_iterator
@@ -269,6 +299,93 @@
  *
  * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
  *
+ * <h3>Computing the weights for combining different manifold descriptions</h3>
+ *
+ * In a realistic application, it happens regularly that different manifold
+ * descriptions need to be combined. The simplest case is when a curved
+ * description is only available for the boundary but not for the interior of
+ * the computational domain. The manifold description for a ball also falls
+ * into this category, as it needs to combine a spherical manifold at the
+ * circular part with a straight-sided description in the center of the domain
+ * where the spherical manifold is not valid.
+ *
+ * In general, the process of blending in deal.II is achieved by the so-called
+ * transfinite interpolation. Its formula 2D is, for example, described on
+ * <a href="https://en.wikipedia.org/wiki/Transfinite_interpolation">
+ * Wikipedia</a>.  Given a point $(u,v)$ on the chart, the image of this point
+ * in real space is given by
+ * @f{align*}{
+ * \mathbf S(u,v) &= (1-v)\mathbf c_0(u)+v \mathbf c_1(u) + (1-u)\mathbf c_2(v) + u \mathbf c_3(v) \\
+ * &\quad - \left[(1-u)(1-v) \mathbf x_0 + u(1-v) \mathbf x_1 + (1-u)v \mathbf x_2 + uv \mathbf x_3 \right]
+ * @f}
+ * where $\bf x_0, \bf x_1, \bf x_2, \bf x_3$ denote the four bounding vertices
+ * bounding the image space and $\bf c_0, \bf c_1, \bf c_2, \bf c_3$ are the
+ * four curves describing the lines of the cell.
+ *
+ * If we want to find the center of the cell according to the manifold (that
+ * is also used when the grid is refined), we want to evaluate this formula in
+ * the point $(u,v) = (0.5, 0.5)$. In that case, $\mathbf c_2(0.5)$ is the
+ * position of the midpoint of the lower face (indexed by 2 in deal.II's
+ * ordering) that is derived from its own manifold, $\mathbf c_1(0.5)$ is the
+ * position of the midpoint of the upper face (indexed by 3 in deal.II),
+ * $\mathbf c_2(0.5)$ is the midpoint of the face on the left (indexed by 0),
+ * and $\mathbf c_3(0.5)$ is the midpoint of the right face. In this formula,
+ * the weights equate to $\frac{\displaystyle 1}{\displaystyle 2}$ for the
+ * four midpoints in the faces and to $-\frac{\displaystyle 1}{\displaystyle
+ * 4}$ for the four vertices. These weights look weird at first sight because
+ * the vertices enter with negative weight but the mechanism does what we
+ * want: In case of a cell with curved description on two opposite faces but
+ * straight lines on the other two faces, the negative weights of -1/4 in the
+ * vertices balance with the center of the two straight lines in radial
+ * direction that get weight 1/2. Thus, the average is taken over the two
+ * center points in curved direction, exactly placing the new point in the
+ * middle.
+ *
+ * In three spatial dimensions, the weights are +1/2 for the face midpoints,
+ * -1/4 for the line mid points, and +1/8 for the vertices, again balancing
+ * the different entities. In case all the surrounding of a cell is straight,
+ * the formula again reduces to weight 1/8 on the eight vertices.
+ *
+ * In the MappingQGeneric class, a generalization of this concept to the
+ * support points of the polynomial grid representation, the nodes of the
+ * Gauss-Lobatto quadrature, is implemented by evaluating the boundary curves
+ * in the respective points $(u_i,v_i)$ of the Gauss-Lobatto points. The
+ * weights have been verified to yield optimal convergence rates $\mathcal
+ * O(h^{k+1})$ also for very high polynomial degrees, say $k=10$.
+ *
+ * In literature, also other boundary descriptions are used. Indeed, before
+ * version 9.0 deal.II used something called Laplace smoothing where the
+ * weights that are applied to the nodes on the circumference to get the
+ * position of the interior nodes are determined by solving a Laplace equation
+ * on the unit element. However, this did lead to boundary layers close to the
+ * curved description, i.e., singularities in the higher derivatives of the
+ * mapping from unit to real cell.
+ *
+ * For example, the above case with only 3 circumferential cells leads to the
+ * following mesh with Laplace smoothing rather than the interpolation from
+ * the boundary (which may be inappropriate here, since we know that it is not
+ * sufficient, but may also be impossible to avoid for complex geometries
+ * generated in mesh generators):
+ *
+ * @image html hypershell-boundary-only-3-old.png ""
+ *
+ * To use a more practical example, consider the refinement of a ball with a
+ * SphericalManifold attached to the spherical surface. The Laplace smoothing
+ * gives the following rather poor mesh:
+ *
+ * @image html hyperball-mesh-smoothing-laplace.png ""
+ *
+ * If we, instead, use the weights derived from transfinite interpolation, the
+ * situation is considerably improved:
+ *
+ * @image html hyperball-mesh-smoothing-interpolate.png ""
+ *
+ * Of course, one could get even better meshes by applying the
+ * TransfiniteInterpolationManifold to the whole domain except the boundary
+ * where SphericalManifold is attached, as shown by the figures in that class,
+ * but in principle, the mesh smoothing implemented in deal.II is as good as
+ * it can get from a boundary description alone.
+ *
  * @ingroup grid
- * @author Luca Heltai, 2013
+ * @author Luca Heltai, 2013, Martin Kronbichler, 2017
  */

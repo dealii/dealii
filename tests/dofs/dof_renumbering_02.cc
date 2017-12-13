@@ -115,7 +115,7 @@ check_renumbering(DoFHandler<dim> &mgdof)
 
   Tensor<1,dim> direction;
   for (unsigned int i=0; i<dim; ++i)
-    direction[i] = -5.0001+i;
+    direction[i] = -5.0001+1.13*i;
 
   deallog << std::endl << "Downstream numbering cell-wise" << std::endl;
   DoFRenumbering::downstream(dof, direction);
@@ -160,17 +160,17 @@ check ()
   FESystem<dim> system (q2, 2, dgq1, 1);
 
   mgdof.distribute_dofs(q2);
-  mgdof.distribute_mg_dofs(q2);
+  mgdof.distribute_mg_dofs();
   check_renumbering(mgdof);
   mgdof.clear();
 
   mgdof.distribute_dofs(dgq1);
-  mgdof.distribute_mg_dofs(dgq1);
+  mgdof.distribute_mg_dofs();
   check_renumbering(mgdof);
   mgdof.clear();
 
   mgdof.distribute_dofs(system);
-  mgdof.distribute_mg_dofs(system);
+  mgdof.distribute_mg_dofs();
   check_renumbering(mgdof);
   mgdof.clear();
 }

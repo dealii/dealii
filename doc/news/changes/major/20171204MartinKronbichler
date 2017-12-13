@@ -1,0 +1,11 @@
+Improved: The mesh smoothing algorithms applied in the Triangulation class and
+MappingQGeneric have been changed from the old Laplace-style smoothing to a
+transfinite interpolation that linearly blends between the descriptions on the
+faces around a cell. The old transformation introduced boundary layers inside
+cells that prevented convergence rates to exceed 3.5 in the global L2 errors
+on typical settings, whereas all derivatives in the mapping from unit to real
+cell are bounded by the derivatives of the manifold description. This change
+also considerably improves mesh quality on settings where curved descriptions
+were only applied to the boundary rather than the whole volume.
+<br>
+(Martin Kronbichler, 2017/12/04)

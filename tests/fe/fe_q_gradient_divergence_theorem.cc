@@ -154,7 +154,7 @@ void test_hyper_ball(const double tolerance)
 int main()
 {
   std::ofstream logfile ("output");
-  deallog << std::setprecision (3);
+  deallog << std::setprecision (8);
 
   deallog.attach(logfile);
 

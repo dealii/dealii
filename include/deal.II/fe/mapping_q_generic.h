@@ -99,9 +99,10 @@ template <int,int> class MappingQ;
  * transformation from the reference cell to such a cell would in general
  * contain inverted regions close to the boundary.
  *
- * In order to avoid this situation, this class applies a smoothing on cells
- * adjacent to the boundary by using so-called Laplace smoothing by
- * default. In the algorithm that computes additional points, the
+ * In order to avoid this situation, this class applies an algorithm for
+ * making this transition smooth using a so-called transfinite interpolation
+ * that is essentially a linear blend between the descriptions along the
+ * surrounding entities. In the algorithm that computes additional points, the
  * compute_mapping_support_points() method, all the entities of the cells are
  * passed through hierarchically, starting from the lines to the quads and
  * finally hexes. Points on objects higher up in the hierarchy are obtained
@@ -113,24 +114,13 @@ template <int,int> class MappingQ;
  * account when interpolating the position of the additional points inside the
  * quad and thus always result in a well-defined transformation.
  *
- * While the smoothing approach works well for filling holes or avoiding
- * inversions with low and medium convergence orders up to approximately three
- * to four, there is nonetheless an inherent shortcoming when switching from a
- * curved manifold to a flat manifold over a face (and the associated
- * smoothing). The finite element theory (see e.g. Strang and Fix, 1973,
- * Sections 2.2 and 3.3 and in particular Theorem 3.6) requires the
- * transformation to be globally C^0 continuous also over several elements and
- * to be uniform as the mesh is refined. Even though the Laplace smoothing
- * fixes the discontinuity within one layer of cells, it cannot provide
- * uniformity as the change is always within one layer of elements only. For
- * example, the convergence rates for solving the Laplacian on a circle where
- * only the boundary is deformed and the above mesh smoothing algorithm is
- * applied will typically not exceed 3.5 (or 3 in the elements adjacent to the
- * boundary), even for fourth or fifth degree polynomials. In such a case, the
- * curved manifold needs to be switched to a flat manifold in a smooth way
- * that does not depend on the mesh size and eventually covers a region of
- * cells instead of only those that are immediately adjacent to the circular
- * boundary.
+ * The interpolation scheme used in this class makes sure that curved
+ * descriptions can go over to flat descriptions within a single layer of
+ * elements, maintaining the overall optimal convergence rates of the finite
+ * element interpolation. However, one does often get better solution
+ * qualities if the transition between curved boundaries and flat interior
+ * domains is spread over a larger range as the mesh is refined. This is
+ * provided by the special manifold TransfiniteInterpolationManifold.
  *
  * @author Wolfgang Bangerth, 2015, Martin Kronbichler, 2017
  */
@@ -664,19 +654,20 @@ protected:
    * The default implementation of this function is appropriate for most
    * cases. It takes the locations of support points on the boundary of the
    * cell from the underlying manifold. Interior support points (ie. support
-   * points in quads for 2d, in hexes for 3d) are then computed using the
-   * solution of a Laplace equation with the position of the outer support
-   * points as boundary values, in order to make the transformation as smooth
-   * as possible.
+   * points in quads for 2d, in hexes for 3d) are then computed using an
+   * interpolation from the lower-dimensional entities (lines, quads) in order
+   * to make the transformation as smooth as possible without introducing
+   * additional boundary layers within the cells due to the placement of
+   * support points.
    *
    * The function works its way from the vertices (which it takes from the
    * given cell) via the support points on the line (for which it calls the
    * add_line_support_points() function) and the support points on the quad
    * faces (in 3d, for which it calls the add_quad_support_points() function).
    * It then adds interior support points that are either computed by
-   * interpolation from the surrounding points using weights computed by
-   * solving a Laplace equation, or if dim<spacedim, it asks the underlying
-   * manifold for the locations of interior points.
+   * interpolation from the surrounding points using weights for transfinite
+   * interpolation, or if dim<spacedim, it asks the underlying manifold for
+   * the locations of interior points.
    */
   virtual
   std::vector<Point<spacedim> >

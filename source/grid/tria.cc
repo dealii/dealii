@@ -4000,65 +4000,17 @@ namespace internal
                 // triangulation.vertices[next_unused_vertex] = new_point;
                 triangulation.vertices[next_unused_vertex] = cell->center(true);
 
-                // if the user_flag is set, i.e. if the
-                // cell is at the boundary, use a
-                // different calculation of the middle
-                // vertex here. this is of advantage, if
-                // the boundary is strongly curved and
-                // the cell has a high aspect ratio. this
-                // can happen for example, if it was
-                // refined anisotropically before.
+                // if the user_flag is set, i.e. if the cell is at the
+                // boundary, use a different calculation of the middle vertex
+                // here. this is of advantage if the boundary is strongly
+                // curved (whereas the cell is not) and the cell has a high
+                // aspect ratio.
                 if (cell->user_flag_set())
                   {
-                    // first reset the user_flag
+                    // first reset the user_flag and then refine
                     cell->clear_user_flag();
-                    // the user flag indicates: at least
-                    // one face is at the boundary. if it
-                    // is only one, set the new middle
-                    // vertex in a different way to avoid
-                    // some mis-shaped elements if the
-                    // new point on the boundary is not
-                    // where we expect it, especially if
-                    // it is to far inside the current
-                    // cell
-                    unsigned int boundary_face=GeometryInfo<dim>::faces_per_cell;
-                    for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-                      if (cell->face(face)->at_boundary())
-                        {
-                          if (boundary_face == GeometryInfo<dim>::faces_per_cell)
-                            // no boundary face found so
-                            // far, so set it now
-                            boundary_face=face;
-                          else
-                            // there is another boundary
-                            // face, so reset boundary_face to
-                            // invalid value as a flag to
-                            // do nothing in the following
-                            boundary_face=GeometryInfo<dim>::faces_per_cell+1;
-                        }
-
-                    if (boundary_face<GeometryInfo<dim>::faces_per_cell)
-                      // reset the cell's middle vertex to the middle
-                      // of the straight connection between the new
-                      // points on this face and on the opposite face,
-                      // as returned by the underlying manifold
-                      // object.
-                      {
-                        const std::array<Point<spacedim>, 2> ps
-                        {
-                          {
-                            cell->face(boundary_face)->child(0)->vertex(1),
-                            cell->face(GeometryInfo<dim>::opposite_face[boundary_face])
-                            ->child(0)->vertex(1)
-                          }
-                        };
-                        const std::array<double, 2> ws {{0.5, 0.5}};
-                        triangulation.vertices[next_unused_vertex]
-                          = cell->get_manifold().get_new_point(make_array_view(ps.begin(),
-                                                                               ps.end()),
-                                                               make_array_view(ws.begin(),
-                                                                               ws.end()));
-                      }
+                    triangulation.vertices[next_unused_vertex]
+                      =cell->center(true, true);
                   }
               }
             else
@@ -5837,39 +5789,28 @@ namespace internal
                     // isotropic refinement
                     Assert(quad_ref_case==RefinementCase<dim-1>::no_refinement, ExcInternalError());
 
-                    // set the middle vertex
-                    // appropriately
-                    if (quad->at_boundary() ||
-                        (quad->manifold_id() != numbers::invalid_manifold_id) )
-                      triangulation.vertices[next_unused_vertex]
-                        = quad->center(true);
-                    else
-                      {
-                        // it might be that the quad itself is not at
-                        // the boundary, but that one of its lines
-                        // actually is. in this case, the newly
-                        // created vertices at the centers of the
-                        // lines are not necessarily the mean values
-                        // of the adjacent vertices, so do not compute
-                        // the new vertex as the mean value of the 4
-                        // vertices of the face, but rather as a
-                        // weighted mean value of the 8 vertices which
-                        // we already have (the four old ones, and the
-                        // four ones inserted as middle points for the
-                        // four lines). summing up some more points is
-                        // generally cheaper than first asking whether
-                        // one of the lines is at the boundary
-                        //
-                        // note that the exact weights are chosen such
-                        // as to minimize the distortion of the four
-                        // new quads from the optimal shape; their
-                        // derivation and values is copied over from
-                        // the @p{MappingQ::set_laplace_on_vector}
-                        // function
-                        triangulation.vertices[next_unused_vertex] =
-                          quad->center(true, true);
-                      }
+                    // set the middle vertex appropriately: it might be that
+                    // the quad itself is not at the boundary, but that one of
+                    // its lines actually is. in this case, the newly created
+                    // vertices at the centers of the lines are not
+                    // necessarily the mean values of the adjacent vertices,
+                    // so do not compute the new vertex as the mean value of
+                    // the 4 vertices of the face, but rather as a weighted
+                    // mean value of the 8 vertices which we already have (the
+                    // four old ones, and the four ones inserted as middle
+                    // points for the four lines). summing up some more points
+                    // is generally cheaper than first asking whether one of
+                    // the lines is at the boundary
+                    //
+                    // note that the exact weights are chosen such as to
+                    // minimize the distortion of the four new quads from the
+                    // optimal shape. their description uses the formulas
+                    // underlying the TransfiniteInterpolationManifold
+                    // implementation
+                    triangulation.vertices[next_unused_vertex] =
+                      quad->center(true, true);
                     triangulation.vertices_used[next_unused_vertex] = true;
+
                     // now that we created the right point, make up
                     // the four lines interior to the quad (++ takes
                     // care of the end of the vector)

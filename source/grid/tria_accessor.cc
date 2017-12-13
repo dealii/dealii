@@ -19,6 +19,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_accessor.templates.h>
 #include <deal.II/grid/tria_iterator.templates.h>
+#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/grid/grid_tools.h>
@@ -1044,14 +1045,18 @@ namespace
 
   template <int structdim, int dim, int spacedim>
   Point<spacedim> get_new_point_on_object(const TriaAccessor<structdim, dim, spacedim> &obj,
-                                          const bool use_laplace)
+                                          const bool use_interpolation)
   {
-    if (use_laplace == false)
+    // if we should not interpolate from the surroundings of the current
+    // object or if the object is of the old Boundary type, only use the
+    // vertices points
+    if (use_interpolation == false ||
+        dynamic_cast<const Boundary<dim,spacedim> *>(&obj.get_manifold()) != nullptr)
       return get_new_point_on_object(obj);
     else
       {
         TriaRawIterator<TriaAccessor<structdim, dim, spacedim> > it(obj);
-        const auto points_and_weights = Manifolds::get_default_points_and_weights(it, use_laplace);
+        const auto points_and_weights = Manifolds::get_default_points_and_weights(it, use_interpolation);
         return obj.get_manifold().get_new_point(make_array_view(points_and_weights.first.begin(),
                                                                 points_and_weights.first.end()),
                                                 make_array_view(points_and_weights.second.begin(),
@@ -1389,18 +1394,18 @@ TriaAccessor<structdim, dim, spacedim>
 template <int structdim, int dim, int spacedim>
 Point<spacedim>
 TriaAccessor<structdim, dim, spacedim>::center (const bool respect_manifold,
-                                                const bool use_laplace) const
+                                                const bool use_interpolation) const
 {
   if (respect_manifold == false)
     {
-      Assert(use_laplace == false, ExcNotImplemented());
+      Assert(use_interpolation == false, ExcNotImplemented());
       Point<spacedim> p;
       for (unsigned int v=0; v<GeometryInfo<structdim>::vertices_per_cell; ++v)
         p += vertex(v);
       return p/GeometryInfo<structdim>::vertices_per_cell;
     }
   else
-    return get_new_point_on_object(*this, use_laplace);
+    return get_new_point_on_object(*this, use_interpolation);
 }
 
 

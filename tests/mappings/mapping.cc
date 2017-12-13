@@ -35,7 +35,7 @@
 #include <string>
 #include <sstream>
 
-#define PRECISION 2
+#define PRECISION 9
 
 
 template <int dim>
