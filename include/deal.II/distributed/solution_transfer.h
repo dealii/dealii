@@ -46,7 +46,8 @@ namespace parallel
      * so that all locally_active elements can be read. On the other hand,
      * ghosted vectors are generally not writable, so for calls to
      * interpolate() or deserialize() you need to supply distributed vectors
-     * without ghost elements.
+     * without ghost elements. More precisely, during interpolation the
+     * current algorithm writes into all locally active degrees of freedom.
      *
      * <h3>Transferring a solution</h3> Here VectorType is your favorite
      * vector type, e.g. PETScWrappers::MPI::Vector,
@@ -72,6 +73,15 @@ namespace parallel
      * VectorType interpolated_solution;
      * //create VectorType in the right size here
      * soltrans.interpolate(interpolated_solution);
+     * @endcode
+     *
+     * Different from PETSc and Trilinos vectors, LinearAlgebra::distributed::Vector
+     * allows writing into ghost elements. For a ghosted vector the
+     * interpolation step can be accomplished via
+     * @code
+     * interpolated_solution.zero_out_ghosts();
+     * soltrans.interpolate(interpolated_solution);
+     * interpolated_solution.update_ghost_values();
      * @endcode
      *
      * <h3>Use for Serialization</h3>
