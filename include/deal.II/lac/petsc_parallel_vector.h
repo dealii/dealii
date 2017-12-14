@@ -231,15 +231,16 @@ namespace PETScWrappers
        * from a DoFHandler with several finite element components if they are
        * not reordered by component (use a PETScWrappers::BlockVector
        * otherwise).  The global size of the vector is determined by
-       * local.size().  The global indices in @p ghost are supplied as ghost
-       * indices that can also be read locally.
+       * local.size(). The global indices in @p ghost are supplied as ghost
+       * indices so that they can be read locally.
        *
        * Note that the @p ghost IndexSet may be empty and that any indices
        * already contained in @p local are ignored during construction. That
        * way, the ghost parameter can equal the set of locally relevant
        * degrees of freedom, see step-32.
        *
-       * @note This operation always creates a ghosted vector.
+       * @note This operation always creates a ghosted vector, which is considered
+       * read-only.
        *
        * @see
        * @ref GlossGhostedVector "vectors with ghost elements"
