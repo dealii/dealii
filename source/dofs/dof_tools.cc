@@ -60,9 +60,13 @@ namespace DoFTools
      * std::map.
      *
      * Comparison is done through an artificial downstream direction that
-     * tells directions apart through a factor of 1e-5. The final comparison
-     * is done without an epsilon, so points need to have identical floating
-     * point components to be considered equal.
+     * tells directions apart through a factor of 1e-5. Once we got the
+     * direction, we check for its value. In case the distance is exactly zero
+     * (without an epsilon), we might still have the case that two points
+     * combine in a particular way, e.g. the points (1.0, 1.0) and (1.0+1e-5,
+     * 0.0). Thus, compare the points component by component in the second
+     * step. Thus, points need to have identical floating point components to
+     * be considered equal.
      */
     template <int dim,typename Number=double>
     struct ComparisonHelper
@@ -79,10 +83,23 @@ namespace DoFTools
         double weight = 1.;
         for (unsigned int d=0; d<dim; ++d)
           {
-            downstream_size += (lhs[d] - rhs[d]) * weight;
+            downstream_size += (rhs[d] - lhs[d]) * weight;
             weight *= 1e-5;
           }
-        return downstream_size < 0;
+        if (downstream_size < 0)
+          return false;
+        else if (downstream_size > 0)
+          return true;
+        else
+          {
+            for (unsigned int d=0; d<dim; ++d)
+              {
+                if (lhs[d] == rhs[d])
+                  continue;
+                return lhs[d]<rhs[d];
+              }
+            return false;
+          }
       }
 
     };
