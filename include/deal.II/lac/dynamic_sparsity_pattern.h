@@ -421,6 +421,14 @@ public:
   void symmetrize ();
 
   /**
+   * Construct and store in this object the sparsity pattern corresponding to
+   * the product of @p left and @p right sparsity pattern.
+   */
+  template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
+  void compute_mmult_pattern(const SparsityPatternTypeLeft &left,
+                             const SparsityPatternTypeRight &right);
+
+  /**
    * Print the sparsity pattern. The output consists of one line per row of
    * the format <tt>[i,j1,j2,j3,...]</tt>. <i>i</i> is the row number and
    * <i>jn</i> are the allocated columns in this row.

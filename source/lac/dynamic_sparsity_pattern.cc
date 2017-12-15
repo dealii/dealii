@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/base/memory_consumption.h>
 
 #include <algorithm>
@@ -407,6 +408,37 @@ DynamicSparsityPattern::symmetrize ()
 
 
 
+template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
+void
+DynamicSparsityPattern::compute_mmult_pattern (
+  const SparsityPatternTypeLeft &left,
+  const SparsityPatternTypeRight &right)
+{
+  Assert (left.n_cols() == right.n_rows(),
+          ExcDimensionMismatch(left.n_cols(), right.n_rows()));
+
+  this->reinit(left.n_rows(),right.n_cols());
+
+  typename SparsityPatternTypeLeft::iterator
+  it_left = left.begin(),
+  end_left = left.end();
+  for (; it_left!=end_left; ++it_left)
+    {
+      const unsigned int j = it_left->column();
+
+      // We are sitting on entry (i,j) of the left sparsity pattern. We then need
+      // to add all entries (i,k) to the final sparsity pattern where (j,k) exists
+      // in the right sparsity pattern -- i.e., we need to iterate over row j.
+      typename SparsityPatternTypeRight::iterator
+      it_right = right.begin(j),
+      end_right = right.end(j);
+      for (; it_right!=end_right; ++it_right)
+        this->add(it_left->row(),it_right->column());
+    }
+}
+
+
+
 void
 DynamicSparsityPattern::print (std::ostream &out) const
 {
@@ -518,5 +550,18 @@ add_entries(std::vector<size_type>::iterator,
             std::vector<size_type>::iterator,
             const bool);
 #endif
+
+template void DynamicSparsityPattern::compute_mmult_pattern(
+  const DynamicSparsityPattern &,
+  const DynamicSparsityPattern &);
+template void DynamicSparsityPattern::compute_mmult_pattern(
+  const DynamicSparsityPattern &,
+  const SparsityPattern &);
+template void DynamicSparsityPattern::compute_mmult_pattern(
+  const SparsityPattern &,
+  const DynamicSparsityPattern &);
+template void DynamicSparsityPattern::compute_mmult_pattern(
+  const SparsityPattern &,
+  const SparsityPattern &);
 
 DEAL_II_NAMESPACE_CLOSE
