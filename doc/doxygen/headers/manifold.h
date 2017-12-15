@@ -350,13 +350,27 @@
  * version 9.0 deal.II used something called Laplace smoothing where the
  * weights that are applied to the nodes on the circumference to get the
  * position of the interior nodes are determined by solving a Laplace equation
- * on the unit element. However, this did lead to boundary layers close to the
+ * on the unit element. However, this lead to boundary layers close to the
  * curved description, i.e., singularities in the higher derivatives of the
  * mapping from unit to real cell.
  *
- * For example, the above case with only 3 circumferential cells leads to the
- * following mesh with Laplace smoothing rather than the interpolation from
- * the boundary:
+ * If the transition from a curved boundary description to a straight
+ * description in the interior is done wrong, it is typically impossible to
+ * achieve high order convergence rates. For example, the Laplace smoothing
+ * inside a single layer lead to a singularity in the fourth derivative of the
+ * mapping from the reference to the real cell, limiting the convergence rate
+ * to 3 in the cells at the boundary (and 3.5 if global L2 errors were
+ * measured in 2D). Other more crude strategies, like completely ignoring the
+ * manifold for the additional points of a high-order mapping, could lead to
+ * even worse convergence rates. The current implementation in deal.II, on the
+ * other hand, has been extensively verified in this respect and should behave
+ * optimally.
+ *
+ * A bad strategy for blending a curved boundary representation with flat
+ * interior representations obviously also reflects mesh quality. For example,
+ * the above case with only 3 circumferential cells leads to the following
+ * mesh with Laplace smoothing rather than the interpolation from the
+ * boundary:
  *
  * @image html hypershell-boundary-only-3-old.png ""
  *
