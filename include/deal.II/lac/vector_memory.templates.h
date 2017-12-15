@@ -17,8 +17,10 @@
 #define dealii_vector_memory_templates_h
 
 
-#include <deal.II/lac/vector_memory.h>
 #include <deal.II/base/std_cxx14/memory.h>
+#include <deal.II/base/memory_consumption.h>
+
+#include <deal.II/lac/vector_memory.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -181,7 +183,7 @@ GrowingVectorMemory<VectorType>::memory_consumption () const
   end = pool.data->end();
   for (typename std::vector<entry_type>::const_iterator
        i = pool.data->begin(); i != end ; ++i)
-    result += sizeof (*i) + i->second->memory_consumption();
+    result += sizeof (*i) + MemoryConsumption::memory_consumption(i->second);
 
   return result;
 }
