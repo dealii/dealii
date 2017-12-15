@@ -290,6 +290,43 @@ void Vector<Number>::reinit (const size_type n,
 
 
 template <typename Number>
+inline
+void Vector<Number>::reinit_preserve (const size_type n)
+{
+  if (n==0)
+    {
+      values.reset();
+      max_vec_size = vec_size = 0;
+      thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
+      return;
+    }
+
+  const size_type s = std::min(vec_size,n);
+  if (n>max_vec_size)
+    {
+      max_vec_size = n;
+      allocate(s);
+    }
+
+  if (vec_size != n)
+    {
+      vec_size = n;
+
+      // only reset the partitioner if we actually expect a significant vector
+      // size
+      if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size)
+        thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
+    }
+
+  // pad with zeroes
+  for (size_type i = s; i < vec_size; ++i)
+    values[i] = Number();
+
+}
+
+
+
+template <typename Number>
 template <typename Number2>
 void Vector<Number>::reinit (const Vector<Number2> &v,
                              const bool omit_zeroing_entries)
@@ -986,11 +1023,14 @@ Vector<Number>::memory_consumption () const
 
 template <typename Number>
 void
-Vector<Number>::allocate()
+Vector<Number>::allocate(const size_type copy_n_el)
 {
   // allocate memory with the proper alignment requirements of 64 bytes
   Number *new_values;
   Utilities::System::posix_memalign ((void **)&new_values, 64, sizeof(Number)*max_vec_size);
+  // copy:
+  for (size_type i = 0; i < copy_n_el; ++i)
+    new_values[i] = values[i];
   values.reset (new_values);
 }
 

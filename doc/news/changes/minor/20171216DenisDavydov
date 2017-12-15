@@ -1,0 +1,4 @@
+New: Add Vector::reinit_preserve() and LAPACKFullMatrix::reinit_preserve()
+to (partly) keep the previous values upon resizing.
+<br>
+(Denis Davydov, 2017/12/16)

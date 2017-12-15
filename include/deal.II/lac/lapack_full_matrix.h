@@ -158,6 +158,33 @@ public:
   void reinit (const size_type size);
 
   /**
+   * Same as above but will preserve the values of matrix upon resizing.
+   * The original values
+   * of the matrix are kept on increasing the size
+   * \f[
+   * \mathbf A \rightarrow
+   * \left(
+   * \begin{array}{cc}
+   * \mathbf A & \mathbf 0 \\
+   * \mathbf 0 & \mathbf 0
+   * \end{array}
+   * \right)
+   * \f]
+   * Whereas if the new size is smaller, the matrix will contain the upper left block
+   * of the original one
+   * \f[
+   * \mathbf A_{11} \leftarrow
+   * \left(
+   * \begin{array}{cc}
+   * \mathbf A_{11} & \mathbf A_{12} \\
+   * \mathbf A_{21} & \mathbf A_{22}
+   * \end{array}
+   * \right)
+   * \f]
+   */
+  void reinit_preserve (const size_type size);
+
+  /**
    * Regenerate the current matrix by one that has the same properties as if
    * it were created by the constructor of this class with the same argument
    * list as this present function.

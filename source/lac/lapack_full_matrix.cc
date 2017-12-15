@@ -68,6 +68,7 @@ LAPACKFullMatrix<number>::operator = (const LAPACKFullMatrix<number> &M)
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::reinit (const size_type n)
@@ -75,6 +76,23 @@ LAPACKFullMatrix<number>::reinit (const size_type n)
   this->TransposeTable<number>::reinit (n, n);
   state = LAPACKSupport::matrix;
 }
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::reinit_preserve (const size_type n)
+{
+  TransposeTable<number> copy(*this);
+  const size_type s = std::min(std::min(this->m(), n), this->n());
+  this->TransposeTable<number>::reinit (n, n);
+  for (unsigned int i = 0; i < s; ++i)
+    for (unsigned int j = 0; j < s; ++j)
+      (*this)(i,j) = copy(i,j);
+
+  state = LAPACKSupport::matrix;
+}
+
 
 
 template <typename number>
