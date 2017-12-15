@@ -197,6 +197,12 @@ public:
     Pointer() = default;
 
     /**
+     * Move constructor. This operator steals the pointer to the vector
+     * represented by this object from the one give as argument.
+     */
+    Pointer(Pointer &&) = default;
+
+    /**
      * Move operator. This operator steals the pointer to the vector
      * represented by this object from the one give as argument.
      */
