@@ -31,7 +31,7 @@ void test ()
   triangulation (MPI_COMM_WORLD,
                  ::Triangulation<dim>::none,
                  false,
-                 parallel::shared::Triangulation<dim>::partition_metis);
+                 parallel::shared::Triangulation<dim>::partition_zorder);
   GridGenerator::hyper_cube(triangulation, -1.0, 1.0);
 
   FE_Q<dim> fe(1);

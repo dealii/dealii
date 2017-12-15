@@ -311,7 +311,7 @@ namespace Step18
     triangulation(MPI_COMM_WORLD,
                   ::Triangulation<dim>::none,
                   false,
-                  parallel::shared::Triangulation<dim>::partition_metis),
+                  parallel::shared::Triangulation<dim>::partition_zorder),
     fe (FE_Q<dim>(1), dim),
     dof_handler (triangulation),
     quadrature_formula (2),

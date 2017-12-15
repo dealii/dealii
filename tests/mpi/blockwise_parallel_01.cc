@@ -56,9 +56,9 @@ void test()
     locally_owned_dofs_per_block[1] =
       locally_owned_dofs_per_subdomain[this_mpi_process].get_view(dofs_per_block, dh.n_dofs());
 
-    if (locally_owned_dofs_per_block[0] != locally_owned_dofs_per_block[1]))
-      ExcMessage("Locally owned dofs differ across blocks."));
-    }
+    if (locally_owned_dofs_per_block[0] != locally_owned_dofs_per_block[1])
+      AssertThrow(false, ExcMessage("Locally owned dofs differ across blocks."));
+  }
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK for " << dim << "d" << std::endl;
