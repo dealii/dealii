@@ -283,6 +283,8 @@ namespace Functions
     // Now gather all the informations we need
     for (unsigned int i=0; i<n_cells; ++i)
       {
+        AssertThrow (!cells[i]->is_artificial(),
+                     VectorTools::ExcPointNotAvailableHere());
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
         std::vector< Vector<typename VectorType::value_type> > vvalues (nq, Vector<typename VectorType::value_type>(this->n_components));
@@ -344,6 +346,8 @@ namespace Functions
     // Now gather all the informations we need
     for (unsigned int i=0; i<n_cells; ++i)
       {
+        AssertThrow (!cells[i]->is_artificial(),
+                     VectorTools::ExcPointNotAvailableHere());
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
         std::vector< std::vector<Tensor<1,dim,typename VectorType::value_type> > >
@@ -409,6 +413,8 @@ namespace Functions
     // Now gather all the informations we need
     for (unsigned int i=0; i<n_cells; ++i)
       {
+        AssertThrow (!cells[i]->is_artificial(),
+                     VectorTools::ExcPointNotAvailableHere());
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
         std::vector< Vector<typename VectorType::value_type> > vvalues (nq, Vector<typename VectorType::value_type>(this->n_components));
