@@ -86,7 +86,7 @@ template <int,int> class MappingQ;
  *
  * As described above, one often only knows a manifold description of a
  * surface but not the interior of the computational domain. In such a case, a
- * StraightBoundary object will be assigned to the interior entities that
+ * FlatManifold object will be assigned to the interior entities that
  * describes a usual planar coordinate system where the additional points for
  * the higher order mapping are placed exactly according to a bi-/trilinear
  * mapping. When combined with a non-flat manifold on the boundary, for

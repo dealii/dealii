@@ -218,12 +218,12 @@
  * @image html hypershell-boundary-only-3.png ""
  *
  * Here, we create only three circumferential cells in the beginning, and
- * refining them leads to the mesh shown. Clearly, here we have cells with bad
+ * refining them leads to the mesh shown. Clearly, we have cells with bad
  * aspect ratios, despite the first refinement that puts the new point into
  * the middle.
  *
  * If we drive this further and start with a coarse mesh of a much thinner rim
- * between the radii 0.8 and 1.0 and still start with only three cells (which
+ * between the radii 0.8 and 1.0 and only three cells (which
  * may be inappropriate here, since we know that it is not sufficient, but may
  * also be impossible to avoid for complex geometries generated in mesh
  * generators), we observe the following:
@@ -238,7 +238,7 @@
  *                              center, inner_radius, outer_radius,
  *                              3);    // three circumferential cells
  *  const SphericalManifold<2> boundary_description(center);
- *  triangulation.set_all_manifold_ids(0);
+ *  triangulation.set_all_manifold_ids_on_boundary(0);
  *  triangulation.set_manifold (0, boundary_description);
  *
  *  Triangulation<2>::active_cell_iterator
@@ -254,7 +254,7 @@
  *
  * This mesh neither has the correct geometry after refinement, nor do
  * all cells have positive area as is necessary for the finite element
- * method to work. However, even when starting with such in inopportune
+ * method to work. However, even when starting with such an inopportune
  * mesh, we can make things work by attaching a suitable geometry description
  * not only to the boundary but also to interior cells and edges, using
  * the same code as above:
@@ -289,14 +289,6 @@
  * (see the documentation of this function). It is also germane to the
  * cases discussed in the @ref GlossDistorted "glossary entry on distorted cells".
  *
- * Another example where the manifold description not just at the boundary but
- * also in the interior of the domain matters is for high-order methods. When
- * using cubic or even higher degrees of the polynomials, full convergence is
- * typically only obtained if a curved description at a boundary transitions
- * into a straight description inside the domain (for example when meshing a
- * ball including the origin) over a layer of finite thickness. This is
- * realized by the class TransfiniteInterpolationManifold.
- *
  * @see @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
  *
  * <h3>Computing the weights for combining different manifold descriptions</h3>
@@ -312,13 +304,13 @@
  * In general, the process of blending in deal.II is achieved by the so-called
  * transfinite interpolation. Its formula 2D is, for example, described on
  * <a href="https://en.wikipedia.org/wiki/Transfinite_interpolation">
- * Wikipedia</a>.  Given a point $(u,v)$ on the chart, the image of this point
+ * Wikipedia</a>.  Given a point $(u,v)$ on a chart, the image of this point
  * in real space is given by
  * @f{align*}{
  * \mathbf S(u,v) &= (1-v)\mathbf c_0(u)+v \mathbf c_1(u) + (1-u)\mathbf c_2(v) + u \mathbf c_3(v) \\
  * &\quad - \left[(1-u)(1-v) \mathbf x_0 + u(1-v) \mathbf x_1 + (1-u)v \mathbf x_2 + uv \mathbf x_3 \right]
  * @f}
- * where $\bf x_0, \bf x_1, \bf x_2, \bf x_3$ denote the four bounding vertices
+ * where $\bf x_0, \bf x_1, \bf x_2, \bf x_3$ denote the four vertices
  * bounding the image space and $\bf c_0, \bf c_1, \bf c_2, \bf c_3$ are the
  * four curves describing the lines of the cell.
  *
@@ -344,7 +336,8 @@
  * In three spatial dimensions, the weights are +1/2 for the face midpoints,
  * -1/4 for the line mid points, and +1/8 for the vertices, again balancing
  * the different entities. In case all the surrounding of a cell is straight,
- * the formula again reduces to weight 1/8 on the eight vertices.
+ * the formula reduces to the obvious weight 1/8 on each of the eight
+ * vertices.
  *
  * In the MappingQGeneric class, a generalization of this concept to the
  * support points of the polynomial grid representation, the nodes of the
@@ -353,7 +346,7 @@
  * weights have been verified to yield optimal convergence rates $\mathcal
  * O(h^{k+1})$ also for very high polynomial degrees, say $k=10$.
  *
- * In literature, also other boundary descriptions are used. Indeed, before
+ * In literature, also other boundary descriptions are used. Before
  * version 9.0 deal.II used something called Laplace smoothing where the
  * weights that are applied to the nodes on the circumference to get the
  * position of the interior nodes are determined by solving a Laplace equation
@@ -363,14 +356,12 @@
  *
  * For example, the above case with only 3 circumferential cells leads to the
  * following mesh with Laplace smoothing rather than the interpolation from
- * the boundary (which may be inappropriate here, since we know that it is not
- * sufficient, but may also be impossible to avoid for complex geometries
- * generated in mesh generators):
+ * the boundary:
  *
  * @image html hypershell-boundary-only-3-old.png ""
  *
  * To use a more practical example, consider the refinement of a ball with a
- * SphericalManifold attached to the spherical surface. The Laplace smoothing
+ * SphericalManifold attached to the spherical surface. The Laplace-type smoothing
  * gives the following rather poor mesh:
  *
  * @image html hyperball-mesh-smoothing-laplace.png ""
