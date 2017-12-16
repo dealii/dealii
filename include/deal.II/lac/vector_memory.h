@@ -197,10 +197,16 @@ public:
     Pointer() = default;
 
     /**
-     * Move operator. This operator steals the pointer to the vector
-     * represented by this object from the one give as argument.
+     * Move constructor: this creates a new Pointer by stealing the internal
+     * data owned by @p p.
      */
-    Pointer &operator = (Pointer &&) = default;
+    Pointer(Pointer &&p) = default;
+
+    /**
+     * Move operator: this releases the vector owned by the current Pointer
+     * and then steals the internal data owned by @p p.
+     */
+    Pointer &operator = (Pointer &&p) = default;
 
     /**
      * Constructor. This constructor automatically allocates a vector from
