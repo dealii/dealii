@@ -79,7 +79,7 @@ check_this (const DoFHandler<dim> &dof_handler)
       displs[0] = 0;
       totlen += recvcounts[0];
 
-      for (int i=1; i<n_processes; i++)
+      for (unsigned int i=1; i<n_processes; i++)
         {
           totlen += recvcounts[i];
           displs[i] = displs[i-1] + recvcounts[i-1];

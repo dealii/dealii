@@ -1259,6 +1259,14 @@ namespace DoFTools
                              std::vector<bool>              &selected_dofs);
 
   /**
+   * Same as above but return the selected DoFs as IndexSet. In particular,
+   * for parallel::Triangulation objects this function should be preferred.
+   */
+  template <int dim, int spacedim>
+  IndexSet
+  extract_hanging_node_dofs (const DoFHandler<dim, spacedim> &dof_handler);
+
+  /**
    * Extract the indices of the degrees of freedom belonging to certain vector
    * components of a vector-valued finite element. The @p component_mask
    * defines which components or blocks of an FESystem are to be extracted

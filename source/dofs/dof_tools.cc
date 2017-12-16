@@ -871,28 +871,19 @@ namespace DoFTools
     namespace
     {
       template <int spacedim>
-      void extract_hanging_node_dofs (const dealii::DoFHandler<1,spacedim> &dof_handler,
-                                      std::vector<bool>           &selected_dofs)
+      IndexSet extract_hanging_node_dofs (const dealii::DoFHandler<1,spacedim> &dof_handler)
       {
-        Assert(selected_dofs.size() == dof_handler.n_dofs(),
-               ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
-        // preset all values by false
-        std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
-
         // there are no hanging nodes in 1d
+        return IndexSet(dof_handler.n_dofs());
       }
 
 
       template <int spacedim>
-      void extract_hanging_node_dofs (const dealii::DoFHandler<2,spacedim> &dof_handler,
-                                      std::vector<bool>           &selected_dofs)
+      IndexSet extract_hanging_node_dofs (const dealii::DoFHandler<2,spacedim> &dof_handler)
       {
         const unsigned int dim = 2;
 
-        Assert(selected_dofs.size() == dof_handler.n_dofs(),
-               ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
-        // preset all values by false
-        std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+        IndexSet selected_dofs(dof_handler.n_dofs());
 
         const FiniteElement<dim,spacedim> &fe = dof_handler.get_fe();
 
@@ -908,26 +899,25 @@ namespace DoFTools
                     line = cell->face(face);
 
                     for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                      selected_dofs[line->child(0)->vertex_dof_index(1,dof)] = true;
+                      selected_dofs.add_index(line->child(0)->vertex_dof_index(1,dof));
 
                     for (unsigned int child=0; child<2; ++child)
                       for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-                        selected_dofs[line->child(child)->dof_index(dof)] = true;
+                        selected_dofs.add_index(line->child(child)->dof_index(dof));
                   }
             }
+
+        selected_dofs.compress();
+        return selected_dofs;
       }
 
 
       template <int spacedim>
-      void extract_hanging_node_dofs (const dealii::DoFHandler<3,spacedim> &dof_handler,
-                                      std::vector<bool>           &selected_dofs)
+      IndexSet extract_hanging_node_dofs (const dealii::DoFHandler<3,spacedim> &dof_handler)
       {
         const unsigned int dim = 3;
 
-        Assert(selected_dofs.size() == dof_handler.n_dofs(),
-               ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
-        // preset all values by false
-        std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
+        IndexSet selected_dofs (dof_handler.n_dofs());
 
         const FiniteElement<dim,spacedim> &fe = dof_handler.get_fe();
 
@@ -942,37 +932,39 @@ namespace DoFTools
                   face = cell->face(f);
 
                   for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                    selected_dofs[face->child(0)->vertex_dof_index(2,dof)] = true;
+                    selected_dofs.add_index(face->child(0)->vertex_dof_index(2,dof));
 
                   // dof numbers on the centers of the lines bounding this
                   // face
                   for (unsigned int line=0; line<4; ++line)
                     for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                      selected_dofs[face->line(line)->child(0)->vertex_dof_index(1,dof)] = true;
+                      selected_dofs.add_index(face->line(line)->child(0)->vertex_dof_index(1,dof));
 
                   // next the dofs on the lines interior to the face; the
                   // order of these lines is laid down in the FiniteElement
                   // class documentation
                   for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                    selected_dofs[face->child(0)->line(1)->dof_index(dof)] = true;
+                    selected_dofs.add_index(face->child(0)->line(1)->dof_index(dof));
                   for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                    selected_dofs[face->child(1)->line(2)->dof_index(dof)] = true;
+                    selected_dofs.add_index(face->child(1)->line(2)->dof_index(dof));
                   for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                    selected_dofs[face->child(2)->line(3)->dof_index(dof)] = true;
+                    selected_dofs.add_index(face->child(2)->line(3)->dof_index(dof));
                   for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                    selected_dofs[face->child(3)->line(0)->dof_index(dof)] = true;
+                    selected_dofs.add_index(face->child(3)->line(0)->dof_index(dof));
 
                   // dofs on the bordering lines
                   for (unsigned int line=0; line<4; ++line)
                     for (unsigned int child=0; child<2; ++child)
                       for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-                        selected_dofs[face->line(line)->child(child)->dof_index(dof)] = true;
+                        selected_dofs.add_index(face->line(line)->child(child)->dof_index(dof));
 
                   // finally, for the dofs interior to the four child faces
                   for (unsigned int child=0; child<4; ++child)
                     for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
-                      selected_dofs[face->child(child)->dof_index(dof)] = true;
+                      selected_dofs.add_index(face->child(child)->dof_index(dof));
                 }
+        selected_dofs.compress();
+        return selected_dofs;
       }
     }
   }
@@ -981,12 +973,25 @@ namespace DoFTools
 
   template <int dim, int spacedim>
   void
-
   extract_hanging_node_dofs (const DoFHandler<dim,spacedim> &dof_handler,
                              std::vector<bool>              &selected_dofs)
   {
-    internal::extract_hanging_node_dofs (dof_handler,
-                                         selected_dofs);
+    const IndexSet selected_dofs_as_index_set = extract_hanging_node_dofs(dof_handler);
+    Assert(selected_dofs.size() == dof_handler.n_dofs(),
+           ExcDimensionMismatch(selected_dofs.size(), dof_handler.n_dofs()));
+    // preset all values by false
+    std::fill (selected_dofs.begin(), selected_dofs.end(), false);
+    for (const auto &index: selected_dofs_as_index_set)
+      selected_dofs[index] = true;
+  }
+
+
+
+  template <int dim, int spacedim>
+  IndexSet
+  extract_hanging_node_dofs (const DoFHandler<dim,  spacedim> &dof_handler)
+  {
+    return internal::extract_hanging_node_dofs (dof_handler);
   }
 
 
