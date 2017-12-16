@@ -346,18 +346,18 @@
  * weights have been verified to yield optimal convergence rates $\mathcal
  * O(h^{k+1})$ also for very high polynomial degrees, say $k=10$.
  *
- * In literature, also other boundary descriptions are used. Before
+ * In the literature, other boundary descriptions are also used. Before
  * version 9.0 deal.II used something called Laplace smoothing where the
  * weights that are applied to the nodes on the circumference to get the
  * position of the interior nodes are determined by solving a Laplace equation
- * on the unit element. However, this lead to boundary layers close to the
+ * on the unit element. However, this led to boundary layers close to the
  * curved description, i.e., singularities in the higher derivatives of the
  * mapping from unit to real cell.
  *
  * If the transition from a curved boundary description to a straight
  * description in the interior is done wrong, it is typically impossible to
  * achieve high order convergence rates. For example, the Laplace smoothing
- * inside a single layer lead to a singularity in the fourth derivative of the
+ * inside a single layer leads to a singularity in the fourth derivative of the
  * mapping from the reference to the real cell, limiting the convergence rate
  * to 3 in the cells at the boundary (and 3.5 if global L2 errors were
  * measured in 2D). Other more crude strategies, like completely ignoring the
