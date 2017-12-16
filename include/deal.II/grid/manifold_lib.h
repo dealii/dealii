@@ -568,16 +568,18 @@ private:
  * This manifold is usually attached to a coarse mesh and then places new
  * points as a combination of the descriptions on the boundaries, weighted
  * appropriately according to the position of the point in the original chart
- * coordinates $(u,v)$. Whenever possible, this manifold should be preferred over
- * setting only a curved manifold on the boundary of a mesh, since the latter
- * will need to switch from a curved description to a straight description in a
- * single layer of elements, which causes an error order on cells close to the
- * boundary that does not exceed 3 no matter how high the degree of the
- * polynomial mapping and the finite element space. Using this class instead,
- * the curved nature of the manifold that is originally contained in one
- * <i>coarse</i> mesh layer will be applied to more than one <i>fine</i> mesh
- * layer once the mesh gets refined, restoring the optimal convergence rates of
- * the underlying finite element and mapping as appropriate.
+ * coordinates $(u,v)$. This manifold should be preferred over setting only a
+ * curved manifold on the boundary of a mesh in most situations as it yields
+ * more uniform mesh distributions as the mesh is refined because it switches
+ * from a curved description to a straight description over all children of
+ * the initial coarse cell this manifold was attached to. This way, the curved
+ * nature of the manifold that is originally contained in one <i>coarse</i>
+ * mesh layer will be applied to more than one <i>fine</i> mesh layer once the
+ * mesh gets refined. Note that the mechanisms of
+ * TransfiniteInterpolationManifold are also built into the MappingQGeneric
+ * class when only a surface of a cell is subject to a curved description,
+ * ensuring that even the default case without this manifold gets optimal
+ * convergence rates when applying curved boundary descriptions.
  *
  * If no curved boundaries surround a coarse cell, this class reduces to a flat
  * manifold description.
