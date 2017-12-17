@@ -568,6 +568,22 @@ namespace TrilinosWrappers
     SparseMatrix (const SparsityPattern &InputSparsityPattern);
 
     /**
+     * Move constructor. Create a new sparse matrix by stealing the internal
+     * data.
+     */
+    SparseMatrix (SparseMatrix  &&other);
+
+    /**
+     * Copy constructor is deleted.
+     */
+    SparseMatrix (const SparseMatrix &) = delete;
+
+    /**
+     * operator= is deleted.
+     */
+    SparseMatrix &operator = (const SparseMatrix &) = delete;
+
+    /**
      * Destructor. Made virtual so that one can use pointers to this class.
      */
     virtual ~SparseMatrix () = default;
@@ -1990,15 +2006,6 @@ namespace TrilinosWrappers
 
 
   private:
-    /**
-     * Copy constructor is disabled.
-     */
-    SparseMatrix (const SparseMatrix &);
-    /**
-     * operator= is disabled.
-     */
-    SparseMatrix &operator = (const SparseMatrix &);
-
     /**
      * Pointer to the user-supplied Epetra Trilinos mapping of the matrix
      * columns that assigns parts of the matrix to the individual processes.
