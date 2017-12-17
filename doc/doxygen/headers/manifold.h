@@ -301,10 +301,11 @@
  * circular part with a straight-sided description in the center of the domain
  * where the spherical manifold is not valid.
  *
- * In general, the process of blending in deal.II is achieved by the so-called
- * transfinite interpolation. Its formula 2D is, for example, described on
- * <a href="https://en.wikipedia.org/wiki/Transfinite_interpolation">
- * Wikipedia</a>.  Given a point $(u,v)$ on a chart, the image of this point
+ * In general, the process of blending different manifold descriptions in
+ * deal.II is achieved by the so-called transfinite interpolation. Its formula
+ * in 2D is, for example, described on <a
+ * href="https://en.wikipedia.org/wiki/Transfinite_interpolation">
+ * Wikipedia</a>. Given a point $(u,v)$ on a chart, the image of this point
  * in real space is given by
  * @f{align*}{
  * \mathbf S(u,v) &= (1-v)\mathbf c_0(u)+v \mathbf c_1(u) + (1-u)\mathbf c_2(v) + u \mathbf c_3(v) \\
@@ -315,36 +316,40 @@
  * four curves describing the lines of the cell.
  *
  * If we want to find the center of the cell according to the manifold (that
- * is also used when the grid is refined), we want to evaluate this formula in
- * the point $(u,v) = (0.5, 0.5)$. In that case, $\mathbf c_2(0.5)$ is the
- * position of the midpoint of the lower face (indexed by 2 in deal.II's
- * ordering) that is derived from its own manifold, $\mathbf c_1(0.5)$ is the
- * position of the midpoint of the upper face (indexed by 3 in deal.II),
- * $\mathbf c_2(0.5)$ is the midpoint of the face on the left (indexed by 0),
- * and $\mathbf c_3(0.5)$ is the midpoint of the right face. In this formula,
- * the weights equate to $\frac{\displaystyle 1}{\displaystyle 2}$ for the
- * four midpoints in the faces and to $-\frac{\displaystyle 1}{\displaystyle
- * 4}$ for the four vertices. These weights look weird at first sight because
- * the vertices enter with negative weight but the mechanism does what we
- * want: In case of a cell with curved description on two opposite faces but
- * straight lines on the other two faces, the negative weights of -1/4 in the
- * vertices balance with the center of the two straight lines in radial
- * direction that get weight 1/2. Thus, the average is taken over the two
- * center points in curved direction, exactly placing the new point in the
- * middle.
+ * is also used when the grid is refined), the chart is the unit cell
+ * $(0,1)^2$ and we want to evaluate this formula in the point $(u,v) = (0.5,
+ * 0.5)$. In that case, $\mathbf c_0(0.5)$ is the position of the midpoint of
+ * the lower face (indexed by 2 in deal.II's ordering) that is derived from
+ * its own manifold, $\mathbf c_1(0.5)$ is the position of the midpoint of the
+ * upper face (indexed by 3 in deal.II), $\mathbf c_2(0.5)$ is the midpoint of
+ * the face on the left (indexed by 0), and $\mathbf c_3(0.5)$ is the midpoint
+ * of the right face. In this formula, the weights equate to
+ * $\frac{\displaystyle 1}{\displaystyle 2}$ for the four midpoints in the
+ * faces and to $-\frac{\displaystyle 1}{\displaystyle 4}$ for the four
+ * vertices. These weights look weird at first sight because the vertices
+ * enter with negative weight but the mechanism does what we want: In case of
+ * a cell with curved description on two opposite faces but straight lines on
+ * the other two faces, the negative weights of $-\frac{\displaystyle
+ * 1}{\displaystyle 4}$ in the vertices balance with the center of the two
+ * straight lines in radial direction that get weight $\frac{\displaystyle
+ * 1}{\displaystyle 2}$. Thus, the average is taken over the two center points
+ * in curved direction, exactly placing the new point in the middle.
  *
- * In three spatial dimensions, the weights are +1/2 for the face midpoints,
- * -1/4 for the line mid points, and +1/8 for the vertices, again balancing
- * the different entities. In case all the surrounding of a cell is straight,
- * the formula reduces to the obvious weight 1/8 on each of the eight
- * vertices.
+ * In three spatial dimensions, the weights are $+\frac{\displaystyle
+ * 1}{\displaystyle 2}$ for the face midpoints, $-\frac{\displaystyle
+ * 1}{\displaystyle 4}$ for the line mid points, and $\frac{\displaystyle
+ * 1}{\displaystyle 8}$ for the vertices, again balancing the different
+ * entities. In case all the surrounding of a cell is straight, the formula
+ * reduces to the obvious weight $\frac{\displaystyle 1}{\displaystyle 8}$ on
+ * each of the eight vertices.
  *
  * In the MappingQGeneric class, a generalization of this concept to the
- * support points of the polynomial grid representation, the nodes of the
- * Gauss-Lobatto quadrature, is implemented by evaluating the boundary curves
- * in the respective points $(u_i,v_i)$ of the Gauss-Lobatto points. The
- * weights have been verified to yield optimal convergence rates $\mathcal
- * O(h^{k+1})$ also for very high polynomial degrees, say $k=10$.
+ * support points of a polynomial representation of curved cells, the nodes of
+ * the Gauss-Lobatto quadrature, is implemented by evaluating the boundary
+ * curves in the respective Gauss-Lobatto points $(u_i,v_i)$ and combining
+ * them with the above formula. The weights have been verified to yield
+ * optimal convergence rates $\mathcal O(h^{k+1})$ also for very high
+ * polynomial degrees, say $k=10$.
  *
  * In the literature, other boundary descriptions are also used. Before
  * version 9.0 deal.II used something called Laplace smoothing where the
@@ -357,20 +362,21 @@
  * If the transition from a curved boundary description to a straight
  * description in the interior is done wrong, it is typically impossible to
  * achieve high order convergence rates. For example, the Laplace smoothing
- * inside a single layer leads to a singularity in the fourth derivative of the
+ * inside a single cell leads to a singularity in the fourth derivative of the
  * mapping from the reference to the real cell, limiting the convergence rate
  * to 3 in the cells at the boundary (and 3.5 if global L2 errors were
  * measured in 2D). Other more crude strategies, like completely ignoring the
- * manifold for the additional points of a high-order mapping, could lead to
- * even worse convergence rates. The current implementation in deal.II, on the
- * other hand, has been extensively verified in this respect and should behave
- * optimally.
+ * presence of two different manifolds and simply computing the additional
+ * points of a high-order mapping in a straight coordinate system, could lead
+ * to even worse convergence rates. The current implementation in deal.II, on
+ * the other hand, has been extensively verified in this respect and should
+ * behave optimally.
  *
  * A bad strategy for blending a curved boundary representation with flat
  * interior representations obviously also reflects mesh quality. For example,
  * the above case with only 3 circumferential cells leads to the following
- * mesh with Laplace smoothing rather than the interpolation from the
- * boundary:
+ * mesh with Laplace manifold smoothing rather than the interpolation from the
+ * boundary as is implemented in deal.II:
  *
  * @image html hypershell-boundary-only-3-old.png ""
  *
