@@ -248,7 +248,9 @@ namespace OpenCASCADE
     curve(curve_adaptor(sh)),
     tolerance(tolerance),
     length(shape_length(sh))
-  {}
+  {
+    Assert(spacedim >= 2, ExcImpossibleInDimSpacedim(dim, spacedim));
+  }
 
 
   template <int dim, int spacedim>
