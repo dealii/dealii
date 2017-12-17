@@ -142,6 +142,13 @@ public:
             const LAPACKFullMatrix<number> &A);
 
   /**
+   * Perform a rank-1 update of a symmetric matrix
+   * $ A \leftarrow A + a \, \rm v \rm v^T $.
+   */
+  void add(const number a,
+           const Vector<number> &v);
+
+  /**
    * Assignment from different matrix classes, performing the usual conversion
    * to the transposed format expected by LAPACK. This assignment operator
    * uses iterators of the typename MatrixType. Therefore, sparse matrices are

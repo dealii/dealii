@@ -297,10 +297,50 @@ extern "C"
                float *d, float *e, float *z,
                const int *ldz, float *work,
                int *info);
+// Rank-1 update for symmetric matrices
+  void dsyr_ (const char *uplo, const int *n,
+              const double *alpha, const double *x,
+              const int *incx,
+              double *A, const int *lda);
+  void ssyr_ (const char *uplo, const int *n,
+              const float *alpha, const float *x,
+              const int *incx,
+              float *A, const int *lda);
 
 }
 
 DEAL_II_NAMESPACE_OPEN
+
+/// Template wrapper for LAPACK functions dsyr and ssyr
+template <typename number>
+inline void
+syr(const char *, const int *,
+    const number *, const number *,
+    const int *,
+    number *, const int *)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+syr(const char *uplo, const int *n,
+    const double *alpha, const double *x,
+    const int *incx,
+    double *A, const int *lda)
+{
+  dsyr_(uplo,n,alpha,x,incx,A,lda);
+}
+inline void
+syr(const char *uplo, const int *n,
+    const float *alpha, const float *x,
+    const int *incx,
+    float *A, const int *lda)
+{
+  ssyr_(uplo,n,alpha,x,incx,A,lda);
+}
+#endif
+
 
 
 /// Template wrapper for LAPACK functions daxpy and saxpy

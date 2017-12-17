@@ -213,6 +213,39 @@ LAPACKFullMatrix<number>::add (const number              a,
 
 template <typename number>
 void
+LAPACKFullMatrix<number>::add(const number a,
+                              const Vector<number> &v)
+{
+  Assert(state == LAPACKSupport::matrix,
+         ExcState(state));
+  Assert(property == LAPACKSupport::symmetric,
+         ExcProperty(property));
+
+  Assert (n() == m(), ExcInternalError());
+  Assert (m() == v.size(), ExcDimensionMismatch(m(), v.size()));
+
+  AssertIsFinite(a);
+
+  const int N = this->n_rows();
+  const char uplo = LAPACKSupport::U;
+  const int lda = N;
+  const int incx=1;
+
+  syr(&uplo, &N, &a, v.begin(), &incx, this->values.begin(), &lda);
+
+  // FIXME: we should really only update upper or lower triangular parts
+  // of symmetric matrices and make sure the interface is consistent,
+  // for example operator(i,j) gives correct results regardless of storage.
+  for (unsigned int i = 0; i < N; ++i)
+    for (unsigned int j = 0; j < i; ++j)
+      (*this)(i,j) = (*this)(j,i);
+}
+
+
+
+
+template <typename number>
+void
 LAPACKFullMatrix<number>::vmult (
   Vector<number>       &w,
   const Vector<number> &v,
