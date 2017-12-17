@@ -625,6 +625,8 @@ namespace PETScWrappers
   SparseDirectMUMPS::SolverDataMUMPS::~SolverDataMUMPS ()
   {
     destroy_krylov_solver (ksp);
+    // the 'pc' object is owned by the 'ksp' object, and consequently
+    // does not have to be destroyed explicitly here
   }
 
 
