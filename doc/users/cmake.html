@@ -433,15 +433,12 @@ library        - builds and installs the 'library' component
       checking which language version flags work with the detected compiler. For
       example: if <code>CMake</code> detects <code>GCC 5.1</code> or <code>Clang
       3.6</code>, <acronym>deal.II</acronym> will be compiled
-      in <code>C++14</code> mode unless either <code>C++14</code>
-      or <code>C++11</code> is explicitly disabled. Another example:
-      if <code>DEAL_II_WITH_CXX11=ON</code> is passed to <code>CMake</code>,
-      then <acronym>deal.II</acronym> will check if the compiler supports enough
-      parts of the <code>C++11</code> <em>and</em>
-      <code>C++14</code> language standards. <code>CMake</code> will not fail in
-      this example just because the compiler does not support
-      <code>C++14</code>, but <code>CMake</code> <em>will</em> fail if the
-      compiler does not support enough of <code>C++11</code>.
+      in <code>C++14</code> mode unless <code>C++14</code> support is explicitly
+      disabled. Another example: if <code>DEAL_II_WITH_CXX14=ON</code> is passed
+      to <code>CMake</code>, then <acronym>deal.II</acronym> will check if the
+      compiler supports enough of the <code>C++14</code> standard to enable
+      the <code>C++14</code>-specific parts of the library. The configuration
+      process will fail if a feature flag is passed in that cannot be supported.
 
       The remaining flags are set to <code>ON</code> if an external package is
       found or to <code>OFF</code> otherwise. By explicitly setting it to off
