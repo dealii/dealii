@@ -20,13 +20,8 @@
  *
  * <h3>Linear Operator</h3>
  *
- * If deal.II is configured with C++11 support (i.e.,
- * <code>DEAL_II_WITH_CXX11=ON</code> or <code>DEAL_II_WITH_CXX14=ON</code>
- * during configuration) a versatile mechanism for storing the concept of a
- * linear operator is available. (For questions about C++11, see
- * @ref CPP11 .)
- *
- * This is done with a LinearOperator class that, like
+ * deal.II includes support for describing linear transformations in a very
+ * general way. This is done with a LinearOperator class that, like
  * @ref ConceptMatrixType "the MatrixType concept",
  * defines a minimal interface for <i>applying</i> a linear operation on a
  * vector.

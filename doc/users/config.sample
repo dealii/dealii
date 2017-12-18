@@ -567,18 +567,6 @@
 ###########################################################################
 
 #
-# C++11 support:
-#
-# SET(DEAL_II_WITH_CXX11 ON CACHE BOOL
-#   "deal.II using C++11 language standard"
-#   )
-#
-# A custom C++11 flag can be set by setting
-#
-#   SET(DEAL_II_CXX_VERSION_FLAG "-std=c++0x" CACHE STRING "")
-#
-
-#
 # C++14 support:
 #
 # SET(DEAL_II_WITH_CXX14 ON CACHE BOOL
