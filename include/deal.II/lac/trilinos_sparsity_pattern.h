@@ -317,6 +317,12 @@ namespace TrilinosWrappers
                      const std::vector<size_type> &n_entries_per_row);
 
     /**
+     * Move constructor. Create a new sparse matrix by stealing the internal
+     * data.
+     */
+    SparsityPattern (SparsityPattern &&other);
+
+    /**
      * Copy constructor. Sets the calling sparsity pattern to be the same as
      * the input sparsity pattern.
      */

@@ -145,6 +145,16 @@ namespace TrilinosWrappers
   }
 
 
+
+  SparsityPattern::SparsityPattern (SparsityPattern &&other)
+    :
+    Subscriptor(std::move(other)),
+    column_space_map(std::move(other.column_space_map)),
+    graph(std::move(other.graph)),
+    nonlocal_graph(std::move(other.nonlocal_graph))
+  {}
+
+
   // Copy function only works if the
   // sparsity pattern is empty.
   SparsityPattern::SparsityPattern (const SparsityPattern &input_sparsity)
