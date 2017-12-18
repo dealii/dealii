@@ -22,6 +22,8 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 
+#include <deal.II/lac/utilities.h>
+
 #include <iostream>
 #include <iomanip>
 
@@ -211,13 +213,69 @@ LAPACKFullMatrix<number>::add (const number              a,
 
 
 
+namespace
+{
+  template <typename number>
+  void cholesky_rank1(LAPACKFullMatrix<number> &A,
+                      const number a,
+                      const Vector<number> &v)
+  {
+    const unsigned int N = A.n();
+    Vector<number> z(v);
+    // Cholesky update / downdate, see
+    // 6.5.4 Cholesky Updating and Downdating, Golub 2013 Matrix computations
+    // Note that potrf() is called with LAPACKSupport::L , so the
+    // factorization is stored in lower triangular part.
+    if (a > 0.)
+      {
+        // simple update via a sequence of Givens rotations.
+        // Observe that
+        //
+        //       | L^T |T  | L^T |
+        // A <-- |     |   |     | = L L^T + z z^T
+        //       | z^T |   | z^T |
+        //
+        // so we can get updated factor by doing a sequence of Givens
+        // rotations to make the matrix lower-triangular
+        // Also see LINPACK's dchud http://www.netlib.org/linpack/dchud.f
+        z *= std::sqrt(a);
+        for (unsigned int k = 0; k < N; ++k)
+          {
+            const std::array<number,3> csr = Utilities::LinearAlgebra::Givens_rotation(A(k,k),z(k));
+            A(k,k) = csr[2];
+            for (unsigned int i = k+1; i < N; ++i)
+              {
+                const number t = A(i,k);
+                A(i,k) =  csr[0] * A(i,k) + csr[1] * z(i);
+                z(i)   = -csr[1] * t      + csr[0] * z(i);
+
+                //A(i,k) = (           t   + csr[1] * z(i)) / csr[0];
+                //z(i)   =  - csr[1] * t   + csr[0] * z(i)          ;
+              }
+          }
+      }
+    else
+      {
+        AssertThrow(false, ExcNotImplemented());
+      }
+  }
+
+
+  template <typename number>
+  void cholesky_rank1(LAPACKFullMatrix<std::complex<number>> &A,
+                      const std::complex<number> a,
+                      const Vector<std::complex<number>> &v)
+  {
+    AssertThrow(false, ExcNotImplemented());
+  }
+}
+
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::add(const number a,
                               const Vector<number> &v)
 {
-  Assert(state == LAPACKSupport::matrix,
-         ExcState(state));
   Assert(property == LAPACKSupport::symmetric,
          ExcProperty(property));
 
@@ -226,19 +284,28 @@ LAPACKFullMatrix<number>::add(const number a,
 
   AssertIsFinite(a);
 
-  const int N = this->n_rows();
-  const char uplo = LAPACKSupport::U;
-  const int lda = N;
-  const int incx=1;
+  if (state == LAPACKSupport::matrix)
+    {
+      const int N = this->n_rows();
+      const char uplo = LAPACKSupport::U;
+      const int lda = N;
+      const int incx=1;
 
-  syr(&uplo, &N, &a, v.begin(), &incx, this->values.begin(), &lda);
+      syr(&uplo, &N, &a, v.begin(), &incx, this->values.begin(), &lda);
 
-  // FIXME: we should really only update upper or lower triangular parts
-  // of symmetric matrices and make sure the interface is consistent,
-  // for example operator(i,j) gives correct results regardless of storage.
-  for (unsigned int i = 0; i < N; ++i)
-    for (unsigned int j = 0; j < i; ++j)
-      (*this)(i,j) = (*this)(j,i);
+      // FIXME: we should really only update upper or lower triangular parts
+      // of symmetric matrices and make sure the interface is consistent,
+      // for example operator(i,j) gives correct results regardless of storage.
+      for (unsigned int i = 0; i < N; ++i)
+        for (unsigned int j = 0; j < i; ++j)
+          (*this)(i,j) = (*this)(j,i);
+    }
+  else if (state == LAPACKSupport::cholesky)
+    {
+      cholesky_rank1(*this, a, v);
+    }
+  else
+    AssertThrow(false, ExcState(state));
 }
 
 
@@ -1143,7 +1210,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
   if (info != 0)
     std::cerr << "LAPACK error in geev" << std::endl;
 
-  state = LAPACKSupport::State(eigenvalues | unusable);
+  state = LAPACKSupport::State(LAPACKSupport::eigenvalues | unusable);
 }
 
 
@@ -1396,7 +1463,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
           eigenvectors[i](j) = values_A[col_begin+j];
         }
     }
-  state = LAPACKSupport::State(eigenvalues | unusable);
+  state = LAPACKSupport::State(LAPACKSupport::eigenvalues | unusable);
 }
 
 
