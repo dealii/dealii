@@ -226,6 +226,7 @@ namespace
     // 6.5.4 Cholesky Updating and Downdating, Golub 2013 Matrix computations
     // Note that potrf() is called with LAPACKSupport::L , so the
     // factorization is stored in lower triangular part.
+    // Also see discussion here http://icl.cs.utk.edu/lapack-forum/viewtopic.php?f=2&t=2646
     if (a > 0.)
       {
         // simple update via a sequence of Givens rotations.
