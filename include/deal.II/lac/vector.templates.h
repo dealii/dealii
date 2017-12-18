@@ -216,7 +216,6 @@ Vector<Number>::operator= (const Vector<Number> &v)
 
 
 
-#ifdef DEAL_II_WITH_CXX11
 template <typename Number>
 inline
 Vector<Number> &
@@ -234,7 +233,6 @@ Vector<Number>::operator= (Vector<Number> &&v)
 
   return *this;
 }
-#endif
 
 
 

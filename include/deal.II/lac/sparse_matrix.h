@@ -590,13 +590,11 @@ public:
    */
   SparseMatrix<number> &operator = (const SparseMatrix<number> &);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move assignment operator. This operator replaces the present matrix with
    * @p m by transferring the internal data of @p m.
    */
   SparseMatrix<number> &operator = (SparseMatrix<number> &&m);
-#endif
 
   /**
    * Copy operator: initialize the matrix with the identity matrix. This

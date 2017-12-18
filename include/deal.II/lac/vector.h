@@ -308,14 +308,12 @@ public:
    */
   Vector<Number> &operator= (const Vector<Number> &v);
 
-#ifdef DEAL_II_WITH_CXX11
   /**
    * Move the given vector. This operator replaces the present vector with
    * the internal data of the vector @p v and resets @p v to the state it would
    * have after being newly default-constructed.
    */
   Vector<Number> &operator= (Vector<Number> &&v);
-#endif
 
   /**
    * Copy the given vector. Resize the present vector if necessary.
