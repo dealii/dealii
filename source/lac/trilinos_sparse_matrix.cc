@@ -356,6 +356,21 @@ namespace TrilinosWrappers
 
 
 
+  SparseMatrix::SparseMatrix (SparseMatrix &&other)
+    :
+    column_space_map(std::move(other.column_space_map)),
+    matrix(std::move(other.matrix)),
+    nonlocal_matrix(std::move(other.nonlocal_matrix)),
+    nonlocal_matrix_exporter(std::move(other.nonlocal_matrix_exporter)),
+    last_action(other.last_action),
+    compressed(other.compressed)
+  {
+    other.last_action = Zero;
+    other.compressed = false;
+  }
+
+
+
   void
   SparseMatrix::copy_from (const SparseMatrix &rhs)
   {
