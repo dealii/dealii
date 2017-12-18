@@ -137,20 +137,14 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
     ENDIF()
 
     IF(${var} AND DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-      # We want to pass the libraries to the CMake project that tests for the
-      # BOOST Serialization bug. If we don't change the separator, only the
-      # first one is passed. This change in the separator is reverted in
-      # TestBoostBug/CMakeLists.txt
-      STRING (REPLACE ";" "|" BOOST_LIBRARIES_SEPARATED "${BOOST_LIBRARIES}")
-
       FILE(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug)
       FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug)
       EXECUTE_PROCESS(
         COMMAND ${CMAKE_COMMAND}
                   -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                   -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                  -DBOOST_INCLUDE_DIRS=${BOOST_INCLUDE_DIRS}
-                  -DBOOST_LIBRARIES=${BOOST_LIBRARIES_SEPARATED}
+                  "-DBOOST_INCLUDE_DIRS=${BOOST_INCLUDE_DIRS}"
+                  "-DBOOST_LIBRARIES=${BOOST_LIBRARIES}"
                   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure/TestBoostBug
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug
         RESULT_VARIABLE _boost_serialization_usuable
