@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2015 by the deal.II authors
+// Copyright (C) 2017 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test LAPACKFullMatrix::add() for rank1 update of a matrix
+// test LAPACKFullMatrix::rank1_update() for rank1 update of a matrix
 
 #include "../tests.h"
 #include "create_matrix.h"
@@ -50,7 +50,7 @@ test(const unsigned int size)
   LAPACKFullMatrix<NumberType> B(size);
   B = A;
 
-  B.add(a, v);
+  B.rank1_update(a, v);
 
   for (unsigned int i = 0; i < size; ++i)
     for (unsigned int j = 0; j < size; ++j)
@@ -60,7 +60,7 @@ test(const unsigned int size)
                     ExcMessage("diff="+ std::to_string(diff)));
       }
 
-  deallog << "Ok" << std::endl;
+  deallog << "OK" << std::endl;
 }
 
 

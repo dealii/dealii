@@ -291,7 +291,7 @@ void Vector<Number>::reinit (const size_type n,
 
 template <typename Number>
 inline
-void Vector<Number>::reinit_preserve (const size_type n)
+void Vector<Number>::grow_or_shrink (const size_type n)
 {
   if (n==0)
     {

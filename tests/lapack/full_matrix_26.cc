@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Tests reinitialization of square and rectangle LAPACKFullMatrix
+// Tests grow_or_shrink() of square and rectangle LAPACKFullMatrix
 
 #include "../tests.h"
 #include <deal.II/lac/lapack_full_matrix.h>
@@ -38,13 +38,13 @@ void test (const unsigned int size)
 
   LAPACKFullMatrix<double> M1(M), M2(M);
 
-  M1.reinit_preserve(smaller);
+  M1.grow_or_shrink(smaller);
   for (unsigned int i = 0; i < smaller; ++i)
     for (unsigned int j = 0; j < smaller; ++j)
       AssertThrow(M1(i,j) == M(i,j),
                   ExcInternalError());
 
-  M2.reinit_preserve(larger);
+  M2.grow_or_shrink(larger);
   for (unsigned int i = 0; i < larger; ++i)
     for (unsigned int j = 0; j < larger; ++j)
       {

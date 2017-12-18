@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// test LAPACKFullMatrix::add() for rank1 downdate of a Cholesky factorization
+// test LAPACKFullMatrix::rank1_update() for rank1 downdate of a Cholesky factorization
 
 /* MWE in Octave:
 A = pascal(4)
@@ -103,14 +103,14 @@ test()
   deallog << "Cholesky:" << std::endl;
   A.print_formatted(deallog.get_file_stream(),5);
 
-  A.add(a,v);
+  A.rank1_update(a,v);
 
   deallog << "Cholesky updated:" << std::endl;
   A.print_formatted(deallog.get_file_stream(),5);
 
   v /= 2.;
 
-  A.add(-1.,v);
+  A.rank1_update(-1.,v);
 
   deallog << "Cholesky downdated:" << std::endl;
   A.print_formatted(deallog.get_file_stream(),5);

@@ -145,13 +145,16 @@ public:
    * Perform a rank-1 update of a symmetric matrix
    * $ A \leftarrow A + a \, \rm v \rm v^T $.
    *
-   * This function also works for Cholesky factorization. Updating ($a>0$) is
+   * This function also works for Cholesky factorization.
+   * In that case, updating ($a>0$) is
    * performed via Givens rotations, whereas downdating ($a<0$) via hyperbolic
-   * rotations. Note that the later case might lead to a negative definite
-   * matrix in which case the error will be thrown.
+   * rotations. Note that the latter case might lead to a negative definite
+   * matrix in which case the error will be thrown (because Cholesky
+   * factorizations are only valid for symmetric and positive definite
+   * matrices).
    */
-  void add(const number a,
-           const Vector<number> &v);
+  void rank1_update(const number a,
+                    const Vector<number> &v);
 
   /**
    * Assignment from different matrix classes, performing the usual conversion
@@ -185,16 +188,16 @@ public:
    * Whereas if the new size is smaller, the matrix will contain the upper left block
    * of the original one
    * \f[
-   * \mathbf A_{11} \leftarrow
    * \left(
    * \begin{array}{cc}
    * \mathbf A_{11} & \mathbf A_{12} \\
    * \mathbf A_{21} & \mathbf A_{22}
    * \end{array}
+   * \rightarrow \mathbf A_{11}
    * \right)
    * \f]
    */
-  void reinit_preserve (const size_type size);
+  void grow_or_shrink (const size_type size);
 
   /**
    * Regenerate the current matrix by one that has the same properties as if

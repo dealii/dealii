@@ -83,7 +83,7 @@ LAPACKFullMatrix<number>::reinit (const size_type n)
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::reinit_preserve (const size_type n)
+LAPACKFullMatrix<number>::grow_or_shrink (const size_type n)
 {
   TransposeTable<number> copy(*this);
   const size_type s = std::min(std::min(this->m(), n), this->n());
@@ -91,8 +91,6 @@ LAPACKFullMatrix<number>::reinit_preserve (const size_type n)
   for (unsigned int i = 0; i < s; ++i)
     for (unsigned int j = 0; j < s; ++j)
       (*this)(i,j) = copy(i,j);
-
-  state = LAPACKSupport::matrix;
 }
 
 
@@ -305,10 +303,11 @@ namespace
 }
 
 
+
 template <typename number>
 void
-LAPACKFullMatrix<number>::add(const number a,
-                              const Vector<number> &v)
+LAPACKFullMatrix<number>::rank1_update(const number a,
+                                       const Vector<number> &v)
 {
   Assert(property == LAPACKSupport::symmetric,
          ExcProperty(property));
@@ -341,7 +340,6 @@ LAPACKFullMatrix<number>::add(const number a,
   else
     AssertThrow(false, ExcState(state));
 }
-
 
 
 

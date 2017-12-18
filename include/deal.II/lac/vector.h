@@ -272,17 +272,16 @@ public:
    * \f]
    * whereas if the desired size is smaller, then
    * \f[
-   * \mathbf V_1 \leftarrow
    * \left(
    * \begin{array}{c}
    * \mathbf V_1   \\
    * \mathbf V_2
    * \end{array}
    * \right)
+   * \rightarrow \mathbf V_1
    * \f]
    */
-  void reinit_preserve (const size_type N);
-
+  void grow_or_shrink (const size_type N);
 
   /**
    * Change the dimension to that of the vector @p V. The same applies as for

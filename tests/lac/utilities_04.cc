@@ -46,7 +46,7 @@ void test (const NumberType a, const NumberType b)
   const double norm = res.l2_norm();
   deallog << norm << std::endl;
 
-  if (norm > 1e-12)
+  if (norm > 1e-12 || csr[2] < 0.)
     {
       deallog << "x:" << std::endl;
       x.print(deallog.get_file_stream());
@@ -67,10 +67,21 @@ int main()
   deallog << std::setprecision(6);
   deallog.attach(logfile);
 
-  test<double>(1., 0.);
-  test<double>(0., 1.);
-  test<double>(1., -2.);
-  test<double>(-1., 2.);
-  test<double>(-15.,3.);
-  test<double>(15.,-3.);
+  deallog << "Residuals:"<< std::endl;
+  // g==0
+  test<double>( 3.,  0.);
+  test<double>(-2.,  0.);
+  // f==0
+  test<double>( 0.,  2.);
+  test<double>( 0., -5.);
+  // |f| > |g|
+  test<double>( 15., 3.);
+  test<double>( 15.,-4.);
+  test<double>(-17., 2.);
+  test<double>(-18.,-5.);
+  // |f| < |g|
+  test<double>( 2., -4.);
+  test<double>(-2.,  3.);
+  test<double>(-3., -7.);
+  test<double>( 5.,  9.);
 }

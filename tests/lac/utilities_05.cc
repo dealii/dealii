@@ -46,7 +46,7 @@ void test (const NumberType a, const NumberType b)
   const NumberType norm = res.l2_norm();
   deallog << norm << std::endl;
 
-  if (norm > 1e-12)
+  if (norm > 1e-12 || csr[2] < 0.)
     {
       deallog << "x:" << std::endl;
       x.print(deallog.get_file_stream());
@@ -67,9 +67,10 @@ int main()
   deallog << std::setprecision(6);
   deallog.attach(logfile);
 
-  // check all combinations with real solutions:
-  test<double>( 1.,  0.);  // g == 0
-  test<double>( 2.,  1.);  // both positive
+  deallog << "Residuals:"<< std::endl;
+  // check all combinations with real solutions: |f| > |g|
+  test<double>( 3.,  0.);  // g == 0
+  test<double>( 2.,  1.5); // both positive
   test<double>( 3., -0.5); // g negative
   test<double>(-4., -2.4); // both negative
   test<double>(-5.,  2);   // f negative

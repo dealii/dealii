@@ -47,7 +47,7 @@ void test (const std::vector<unsigned int> &size_sequence)
       else
         {
           const unsigned int check_s = (s > v.size() ? v.size() : s);
-          v.reinit_preserve(s);
+          v.grow_or_shrink(s);
           for (unsigned int i = 0; i < check_s; ++i)
             AssertThrow(v(i) == v_old(i),
                         ExcMessage("s=" + std::to_string(s) + " i=" + std::to_string(i) + " " +

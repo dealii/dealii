@@ -37,7 +37,8 @@ namespace Utilities
   {
 
     /**
-     * Return elements of continuous Givens rotation matrix and norm of the input vector.
+     * Return the elements of a continuous Givens rotation matrix and
+     * the norm of the input vector.
      *
      * That is for a given
      * pair @p x and @p y, return $c$ , $s$ and $\sqrt{x^2+y^2}$ such that
@@ -66,7 +67,7 @@ namespace Utilities
                                              const NumberType &y);
 
     /**
-     * Return elements of hyperbolic rotation matrix.
+     * Return the elements of a hyperbolic rotation matrix.
      *
      * That is for a given
      * pair @p x and @p y, return $c$ , $s$ and $r$ such that
@@ -210,6 +211,17 @@ namespace Utilities
   {
 
     template<typename NumberType>
+    std::array<std::complex<NumberType>,3> hyperbolic_rotation(const std::complex<NumberType> &f,
+                                                               const std::complex<NumberType> &g)
+    {
+      AssertThrow(false, ExcNotImplemented());
+      std::array<NumberType,3> res;
+      return res;
+    }
+
+
+
+    template<typename NumberType>
     std::array<NumberType,3> hyperbolic_rotation(const NumberType &f,
                                                  const NumberType &g)
     {
@@ -229,14 +241,6 @@ namespace Utilities
       return csr;
     }
 
-    template<typename NumberType>
-    std::array<std::complex<NumberType>,3> hyperbolic_rotation(const std::complex<NumberType> &f,
-                                                               const std::complex<NumberType> &g)
-    {
-      AssertThrow(false, ExcNotImplemented());
-      std::array<NumberType,3> res;
-      return res;
-    }
 
 
     template<typename NumberType>
@@ -248,19 +252,24 @@ namespace Utilities
       return res;
     }
 
+
+
     template<typename NumberType>
     std::array<NumberType,3> Givens_rotation(const NumberType &f,
                                              const NumberType &g)
     {
       std::array<NumberType,3> res;
-      // naieve calculation for "r" may overflow or underflow:
+      // naive calculation for "r" may overflow or underflow:
       // c =  x / \sqrt{x^2+y^2}
       // s = -y / \sqrt{x^2+y^2}
 
       // See Golub 2013, Matrix computations, Chapter 5.1.8
       // Algorithm 5.1.3
       // and
-      // Anderson (2000), Discontinuous Plane Rotations and the Symmetric Eigenvalue Problem. LAPACK Working Note 150, University of Tennessee, UT-CS-00-454, December 4, 2000.
+      // Anderson (2000),
+      // Discontinuous Plane Rotations and the Symmetric Eigenvalue Problem.
+      // LAPACK Working Note 150, University of Tennessee, UT-CS-00-454,
+      // December 4, 2000.
       // Algorithm 4
       // We implement the latter below:
       if (g == NumberType())

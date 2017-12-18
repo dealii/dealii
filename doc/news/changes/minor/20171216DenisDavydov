@@ -1,4 +1,4 @@
-New: Add Vector::reinit_preserve() and LAPACKFullMatrix::reinit_preserve()
+New: Add Vector::grow_or_shrink() and LAPACKFullMatrix::grow_or_shrink()
 to (partly) keep the previous values upon resizing.
 <br>
 (Denis Davydov, 2017/12/16)
