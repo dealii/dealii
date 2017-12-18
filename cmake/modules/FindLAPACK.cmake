@@ -87,5 +87,5 @@ DEAL_II_PACKAGE_HANDLE(LAPACK
     eigen_blas_LIBRARY f77blas_LIBRARY gslcblas_LIBRARY lapack_LIBRARY
     m_LIBRARY ptf77blas_LIBRARY ptlapack_LIBRARY refblas_LIBRARY
     reflapack_LIBRARY BLAS_LIBRARIES ${_additional_libraries}
-    LAPACK_SYMBOL_CHECK # Cleanup check in configure_1_lapack.cmake
+    LAPACK_SYMBOL_CHECK # clean up check in configure_1_lapack.cmake
   )
