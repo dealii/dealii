@@ -1440,7 +1440,9 @@ LAPACKFullMatrix<number>::print_formatted (
 
   for (size_type i=0; i<this->n_rows(); ++i)
     {
-      for (size_type j=0; j<this->n_cols(); ++j)
+      // Cholesky is stored in lower triangular, so just output this part:
+      const size_type nc = state == LAPACKSupport::cholesky ? i+1 : this->n_cols();
+      for (size_type j=0; j<nc; ++j)
         // we might have complex numbers, so use abs also to check for nan
         // since there is no isnan on complex numbers
         if (std::isnan(std::abs((*this)(i,j))))
