@@ -92,7 +92,7 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
 
     IF(DEAL_II_WITH_ZLIB)
       #
-      # Test that Boost.Iostreams is usuable.
+      # Test that Boost.Iostreams is usable.
       #
       RESET_CMAKE_REQUIRED()
       PUSH_CMAKE_REQUIRED("${DEAL_II_CXX_VERSION_FLAG}")
@@ -117,73 +117,78 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
           decompressing_stream.write (test, 1);
         }
         "
-        _boost_iostreams_usuable
+        BOOST_IOSTREAMS_USABLE
         )
-      IF(${_boost_iostreams_usuable})
-        MESSAGE(STATUS "Boost.Iostreams is usuable.")
-      ELSE()
+      IF(NOT ${BOOST_IOSTREAMS_USABLE})
         MESSAGE(STATUS
-                "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
-                "with zlib support but a simple test failed! "
-                "Therefore, the bundled boost package is used."
-               )
+          "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
+          "with zlib support but a simple test failed! "
+          "Therefore, the bundled boost package is used."
+          )
         SET(BOOST_ADDITIONAL_ERROR_STRING
-            "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
-            "with zlib support but a simple test failed! "
-           )
+          "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
+          "with zlib support but a simple test failed! "
+          )
         SET(${var} FALSE)
       ENDIF()
       RESET_CMAKE_REQUIRED()
-    ENDIF()
+    ENDIF() # DEAL_II_WITH_ZLIB
 
-    IF(${var} AND DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-      # We want to pass the libraries to the CMake project that tests for the
-      # BOOST Serialization bug. If we don't change the separator, only the
-      # first one is passed. This change in the separator is reverted in
-      # TestBoostBug/CMakeLists.txt
-      STRING (REPLACE ";" "|" BOOST_LIBRARIES_SEPARATED "${BOOST_LIBRARIES}")
+    IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+      #
+      # Test that Boost.Serialization is usable.
+      #
+      IF(NOT DEFINED BOOST_SERIALIZATION_USABLE OR NOT ${BOOST_SERIALIZATION_USABLE})
+        # Only run this check if it hasn't successfully run previously.
+        MESSAGE(STATUS "Performing Test BOOST_SERIALIZATION_USABLE")
 
-      FILE(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug)
-      FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug)
-      EXECUTE_PROCESS(
-        COMMAND ${CMAKE_COMMAND}
-                  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-                  -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                  -DBOOST_INCLUDE_DIRS=${BOOST_INCLUDE_DIRS}
-                  -DBOOST_LIBRARIES=${BOOST_LIBRARIES_SEPARATED}
-                  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure/TestBoostBug
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug
-        RESULT_VARIABLE _boost_serialization_usuable
-        OUTPUT_QUIET
-        ERROR_QUIET
-      )
-      IF(${_boost_serialization_usuable} EQUAL 0)
+        FILE(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug)
+        FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug)
         EXECUTE_PROCESS(
-          COMMAND ${CMAKE_COMMAND} --build . --target run
+          COMMAND ${CMAKE_COMMAND}
+            -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+            -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+            "-DBOOST_INCLUDE_DIRS=${BOOST_INCLUDE_DIRS}"
+            "-DBOOST_LIBRARIES=${BOOST_LIBRARIES}"
+            ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure/TestBoostBug
           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug
-          RESULT_VARIABLE _boost_serialization_usuable
+          RESULT_VARIABLE _result
           OUTPUT_QUIET
           ERROR_QUIET
-        )
+          )
+        IF(${_result} EQUAL 0)
+          EXECUTE_PROCESS(
+            COMMAND ${CMAKE_COMMAND} --build . --target run
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug
+            RESULT_VARIABLE _result
+            OUTPUT_QUIET
+            ERROR_QUIET
+            )
+        ENDIF()
+        IF(${_result} EQUAL 0)
+          MESSAGE(STATUS "Performing Test BOOST_SERIALIZATION_USABLE - Success")
+          SET(BOOST_SERIALIZATION_USABLE TRUE CACHE INTERNAL "")
+        ELSE()
+          MESSAGE(STATUS "Performing Test BOOST_SERIALIZATION_USABLE - Failed")
+          SET(BOOST_SERIALIZATION_USABLE FALSE)
+        ENDIF()
       ENDIF()
 
-      IF(${_boost_serialization_usuable} EQUAL 0)
-        MESSAGE(STATUS "Boost.Serialization is usuable.")
-      ELSE()
+      IF(NOT ${BOOST_SERIALIZATION_USABLE})
         MESSAGE(STATUS
-                "The externally provided Boost.Serialization library "
-                "failed to pass a crucial test. \n"
-                "Therefore, the bundled boost package is used. \n"
-                "The configured testing project can be found at "
-                "${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug"
-               )
+          "The externally provided Boost.Serialization library "
+          "failed to pass a crucial test. \n"
+          "Therefore, the bundled boost package is used. \n"
+          "The configured testing project can be found at "
+          "${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug"
+          )
         SET(BOOST_ADDITIONAL_ERROR_STRING
-            "The externally provided Boost.Serialization library "
-            "failed to pass a crucial test."
-           )
+          "The externally provided Boost.Serialization library "
+          "failed to pass a crucial test."
+          )
         SET(${var} FALSE)
       ENDIF()
-    ENDIF()
+    ENDIF() # DEAL_II_ALLOW_PLATFORM_INTROSPECTION
   ENDIF()
 ENDMACRO()
 

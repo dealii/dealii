@@ -103,4 +103,6 @@ DEAL_II_PACKAGE_HANDLE(BOOST
     Boost_LIBRARY_DIR_DEBUG Boost_LIBRARY_DIR_RELEASE
     _Boost_COMPONENTS_SEARCHED _Boost_INCLUDE_DIR_LAST
     _Boost_LIBRARY_DIR_LAST _Boost_USE_MULTITHREADED_LAST
+    BOOST_IOSTREAMS_USABLE # clean up check in configure_boost.cmake
+    BOOST_SERIALIZATION_USABLE # clean up check in configure_boost.cmake
   )
