@@ -23,6 +23,9 @@
 #include <deal.II/lac/lapack_support.h>
 #include <deal.II/lac/vector_memory.h>
 
+#include <array>
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Utilities
@@ -32,6 +35,33 @@ namespace Utilities
    */
   namespace LinearAlgebra
   {
+
+    /**
+     * Return elements of continuous Givens rotation matrix and norm of the input vector.
+     *
+     * That is for a given
+     * pair @p x and @p y, return $c$ , $s$ and $\sqrt{x^2+y^2}$ such that
+     * \f[
+     * \begin{bmatrix}
+     * c  & s \\
+     * -s & c
+     * \end{bmatrix}
+     * \begin{bmatrix}
+     * x \\
+     * y
+     * \end{bmatrix}
+     * =
+     * \begin{bmatrix}
+     * \sqrt{x^2+y^2} \\
+     * 0
+     * \end{bmatrix}
+     * \f]
+     *
+     * @note The function is implemented for real valued numbers only.
+     */
+    template<typename NumberType>
+    std::array<NumberType,3> Givens_rotation(const NumberType &x,
+                                             const NumberType &y);
 
     /**
      * Estimate an upper bound for the largest eigenvalue of @p H by a @p k -step
@@ -144,6 +174,63 @@ namespace Utilities
 {
   namespace LinearAlgebra
   {
+
+    template<typename NumberType>
+    std::array<std::complex<NumberType>,3> Givens_rotation(const std::complex<NumberType> &f,
+                                                           const std::complex<NumberType> &g)
+    {
+      AssertThrow(false, ExcNotImplemented());
+    }
+
+    template<typename NumberType>
+    std::array<NumberType,3> Givens_rotation(const NumberType &f,
+                                             const NumberType &g)
+    {
+      std::array<NumberType,3> res;
+      // naieve calculation for "r" may overflow or underflow:
+      // c =  x / \sqrt{x^2+y^2}
+      // s = -y / \sqrt{x^2+y^2}
+
+      // See Golub 2013, Matrix computations, Chapter 5.1.8
+      // Algorithm 5.1.3
+      // and
+      // Anderson (2000), Discontinuous Plane Rotations and the Symmetric Eigenvalue Problem. LAPACK Working Note 150, University of Tennessee, UT-CS-00-454, December 4, 2000.
+      // Algorithm 4
+      // We implement the latter below:
+      if (g == NumberType())
+        {
+          res[0] = std::copysign(1., f);
+          res[1] = NumberType();
+          res[2] = std::abs(f);
+        }
+      else if (f == NumberType())
+        {
+          res[0] = NumberType();
+          res[1] = std::copysign(1., g);
+          res[2] = std::abs(g);
+        }
+      else if (std::abs(f) > std::abs(g))
+        {
+          const NumberType tau  = g/f;
+          const NumberType u    = std::copysign(std::sqrt(1.+tau*tau), f);
+          res[0] = 1./u;          // c
+          res[1] = res[0] * tau;  // s
+          res[2] = f * u;         // r
+        }
+      else
+        {
+          const NumberType tau  = f/g;
+          const NumberType u    = std::copysign(std::sqrt(1.+tau*tau), g);
+          res[1] = 1./u;          // s
+          res[0] = res[1] * tau;  // c
+          res[2] = g * u;         // r
+        }
+
+      return res;
+    }
+
+
+
     template <typename OperatorType, typename VectorType>
     double Lanczos_largest_eigenvalue(const OperatorType &H,
                                       const VectorType &v0_,
