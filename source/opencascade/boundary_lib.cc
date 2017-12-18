@@ -99,7 +99,7 @@ namespace OpenCASCADE
       Assert(closest_point(sh, surrounding_points[i], tolerance)
              .distance(surrounding_points[i]) <
              std::max(tolerance*surrounding_points[i].norm(), tolerance),
-             ExcPointNotOnManifold(surrounding_points[i]));
+             ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
 #endif
     return closest_point(sh, candidate,tolerance);
   }
@@ -129,7 +129,7 @@ namespace OpenCASCADE
       Assert(closest_point(sh, surrounding_points[i],tolerance)
              .distance(surrounding_points[i]) <
              std::max(tolerance*surrounding_points[i].norm(), tolerance),
-             ExcPointNotOnManifold(surrounding_points[i]));
+             ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
 #endif
     return line_intersection(sh, candidate, direction, tolerance);
   }
@@ -162,7 +162,7 @@ namespace OpenCASCADE
         Assert(closest_point(sh, surrounding_points[i], tolerance)
                .distance(surrounding_points[i]) <
                std::max(tolerance*surrounding_points[i].norm(), tolerance),
-               ExcPointNotOnManifold(surrounding_points[i]));
+               ExcPointNotOnManifold<spacedim>(surrounding_points[i]));
       }
 #endif
 
@@ -249,7 +249,7 @@ namespace OpenCASCADE
     tolerance(tolerance),
     length(shape_length(sh))
   {
-    Assert(spacedim == 3, ExcNotImplemented());
+    Assert(spacedim >= 2, ExcImpossibleInDimSpacedim(dim, spacedim));
   }
 
 
@@ -261,7 +261,7 @@ namespace OpenCASCADE
     ShapeAnalysis_Curve curve_analysis;
     gp_Pnt proj;
     const double dist = curve_analysis.Project(curve->GetCurve(), point(space_point), tolerance, proj, t, true);
-    Assert(dist < tolerance*length, ExcPointNotOnManifold(space_point));
+    Assert(dist < tolerance*length, ExcPointNotOnManifold<spacedim>(space_point));
     (void)dist; // Silence compiler warning in Release mode.
     return Point<1>(GCPnts_AbscissaPoint::Length(curve->GetCurve(),curve->GetCurve().FirstParameter(),t));
   }
@@ -274,7 +274,7 @@ namespace OpenCASCADE
   {
     GCPnts_AbscissaPoint AP(curve->GetCurve(), chart_point[0], curve->GetCurve().FirstParameter());
     gp_Pnt P = curve->GetCurve().Value(AP.Parameter());
-    return point(P);
+    return point<spacedim>(P);
   }
 
   template <int dim, int spacedim>
@@ -286,10 +286,9 @@ namespace OpenCASCADE
     tolerance(tolerance)
   {}
 
-  template <>
-  Point<2>
-  NURBSPatchManifold<2, 3>::
-  pull_back(const Point<3> &space_point) const
+  template <int dim, int spacedim>  Point<2>
+  NURBSPatchManifold<dim, spacedim>::
+  pull_back(const Point<spacedim> &space_point) const
   {
     Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
 
@@ -302,20 +301,20 @@ namespace OpenCASCADE
     return Point<2>(u,v);
   }
 
-  template <>
-  Point<3>
-  NURBSPatchManifold<2, 3>::
+  template <int dim, int spacedim>
+  Point<spacedim>
+  NURBSPatchManifold<dim, spacedim>::
   push_forward(const Point<2> &chart_point) const
   {
-    return ::dealii::OpenCASCADE::push_forward(face, chart_point[0], chart_point[1]);
+    return ::dealii::OpenCASCADE::push_forward<spacedim>(face, chart_point[0], chart_point[1]);
   }
 
-  template <>
-  DerivativeForm<1,2,3>
-  NURBSPatchManifold<2, 3>::
+  template <int dim, int spacedim>
+  DerivativeForm<1,2,spacedim>
+  NURBSPatchManifold<dim,spacedim>::
   push_forward_gradient(const Point<2> &chart_point) const
   {
-    DerivativeForm<1,2,3> DX;
+    DerivativeForm<1,2,spacedim> DX;
     Handle(Geom_Surface) surf = BRep_Tool::Surface(face);
 
     gp_Pnt q;
@@ -324,17 +323,24 @@ namespace OpenCASCADE
 
     DX[0][0] = Du.X();
     DX[1][0] = Du.Y();
-    DX[2][0] = Du.Z();
+    if (spacedim>2)
+      DX[2][0] = Du.Z();
+    else
+      Assert(std::abs(Du.Z()) < tolerance,
+             ExcMessage("Expecting derivative along Z to be zero! Bailing out."));
     DX[0][1] = Dv.X();
     DX[1][1] = Dv.Y();
-    DX[2][1] = Dv.Z();
-
+    if (spacedim>2)
+      DX[2][1] = Dv.Z();
+    else
+      Assert(std::abs(Dv.Z()) < tolerance,
+             ExcMessage("Expecting derivative along Z to be zero! Bailing out."));
     return DX;
   }
 
-  template <>
+  template <int dim, int spacedim>
   std::tuple<double, double, double, double>
-  NURBSPatchManifold<2, 3>::
+  NURBSPatchManifold<dim,spacedim>::
   get_uv_bounds() const
   {
     Standard_Real umin, umax, vmin, vmax;
@@ -343,7 +349,6 @@ namespace OpenCASCADE
   }
 
 // Explicit instantiations
-  template class NURBSPatchManifold<2, 3 >;
 #include "boundary_lib.inst"
 
 } // end namespace OpenCASCADE
