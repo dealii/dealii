@@ -281,24 +281,15 @@ namespace
         z *= std::sqrt(-a);
         for (unsigned int k = 0; k < N; ++k)
           {
-            // we have Cholesky factor of SPD matrix
-            Assert (A(k,k) != 0, ExcInternalError());
-            const number tau = z(k)/A(k,k);
-            AssertThrow (std::abs(tau) < 1.,
-                         ExcMessage("Cholesky downdating led to negative definite matrix"));
-            const number u = sqrt((1.-tau)*(1.+tau)); // <-- more stable than std::sqrt(1.-tau*tau)
-            const number c = 1./u;
-            const number s = c * tau;
-            const number r = u * std::abs(A(k,k));
-            A(k,k) = r;
+            const std::array<number,3> csr = Utilities::LinearAlgebra::hyperbolic_rotation(A(k,k),z(k));
+            A(k,k) = csr[2];
             for (unsigned int i = k+1; i < N; ++i)
               {
                 const number t = A(i,k);
-                A(i,k) =  c * A(i,k) - s * z(i);
-                z(i)   = -s * t      + c * z(i);
+                A(i,k) =  csr[0] * A(i,k) - csr[1] * z(i);
+                z(i)   = -csr[1] * t      + csr[0] * z(i);
               }
           }
-
       }
   }
 

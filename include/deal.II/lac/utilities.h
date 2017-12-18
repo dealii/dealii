@@ -58,10 +58,44 @@ namespace Utilities
      * \f]
      *
      * @note The function is implemented for real valued numbers only.
+     *
+     * @author Denis Davydov, 2017
      */
     template<typename NumberType>
     std::array<NumberType,3> Givens_rotation(const NumberType &x,
                                              const NumberType &y);
+
+    /**
+     * Return elements of hyperbolic rotation matrix.
+     *
+     * That is for a given
+     * pair @p x and @p y, return $c$ , $s$ and $r$ such that
+     * \f[
+     * \begin{bmatrix}
+     * c  & -s \\
+     * -s & c
+     * \end{bmatrix}
+     * \begin{bmatrix}
+     * x \\
+     * y
+     * \end{bmatrix}
+     * =
+     * \begin{bmatrix}
+     * r \\
+     * 0
+     * \end{bmatrix}
+     * \f]
+     *
+     * Real valued solution only exists if $|x|>|g|$, the function will
+     * throw an error otherwise.
+     *
+     * @note The function is implemented for real valued numbers only.
+     *
+     * @author Denis Davydov, 2017
+     */
+    template<typename NumberType>
+    std::array<NumberType,3> hyperbolic_rotation(const NumberType &x,
+                                                 const NumberType &y);
 
     /**
      * Estimate an upper bound for the largest eigenvalue of @p H by a @p k -step
@@ -176,10 +210,42 @@ namespace Utilities
   {
 
     template<typename NumberType>
+    std::array<NumberType,3> hyperbolic_rotation(const NumberType &f,
+                                                 const NumberType &g)
+    {
+      Assert (f != 0, ExcDivideByZero());
+      const NumberType tau = g/f;
+      AssertThrow (std::abs(tau) < 1.,
+                   ExcMessage("real-valued Hyperbolic rotation does not exist for ("+
+                              std::to_string(f) +
+                              "," +
+                              std::to_string(g)+
+                              ")"));
+      const NumberType u = std::copysign(sqrt((1.-tau)*(1.+tau)), f); // <-- more stable than std::sqrt(1.-tau*tau)
+      std::array<NumberType,3> csr;
+      csr[0] = 1./u;          // c
+      csr[1] = csr[0] * tau;  // s
+      csr[2] = f *u;          // r
+      return csr;
+    }
+
+    template<typename NumberType>
+    std::array<std::complex<NumberType>,3> hyperbolic_rotation(const std::complex<NumberType> &f,
+                                                               const std::complex<NumberType> &g)
+    {
+      AssertThrow(false, ExcNotImplemented());
+      std::array<NumberType,3> res;
+      return res;
+    }
+
+
+    template<typename NumberType>
     std::array<std::complex<NumberType>,3> Givens_rotation(const std::complex<NumberType> &f,
                                                            const std::complex<NumberType> &g)
     {
       AssertThrow(false, ExcNotImplemented());
+      std::array<NumberType,3> res;
+      return res;
     }
 
     template<typename NumberType>
