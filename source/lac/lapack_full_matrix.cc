@@ -248,15 +248,57 @@ namespace
                 const number t = A(i,k);
                 A(i,k) =  csr[0] * A(i,k) + csr[1] * z(i);
                 z(i)   = -csr[1] * t      + csr[0] * z(i);
-
-                //A(i,k) = (           t   + csr[1] * z(i)) / csr[0];
-                //z(i)   =  - csr[1] * t   + csr[0] * z(i)          ;
               }
           }
       }
     else
       {
-        AssertThrow(false, ExcNotImplemented());
+        // downdating is not always possible as we may end up with
+        // negative definite matrix. If it's possible, then it boils
+        // down to application of hyperbolic rotations.
+        // Observe that
+        //
+        //       | L^T |T      | L^T |
+        // A <-- |     |   S   |     | = L L^T - z z^T
+        //       | z^T |       | z^T |
+        //
+        //       |In  0 |
+        // S :=  |      |
+        //       |0  -1 |
+        //
+        // We are looking for H which is S-orthogonal (HSH^T=S) and
+        // can restore upper-triangular factor of the factorization of A above.
+        // We will use Hyperbolic rotations to do the job
+        //
+        // | c  -s |   | x1 |   | r |
+        // |       | = |    | = |   |,   c^2 - s^2 = 1
+        // |-s   c |   | x2 |   | 0 |
+        //
+        // which have real solution only if x2 <= x1.
+        // See also Linpack's http://www.netlib.org/linpack/dchdd.f and
+        // https://infoscience.epfl.ch/record/161468/files/cholupdate.pdf and
+        // "Analysis of a recursive Least Squares Hyperbolic Rotation Algorithm for Signal Processing", Alexander, Pan, Plemmons, 1988.
+        z *= std::sqrt(-a);
+        for (unsigned int k = 0; k < N; ++k)
+          {
+            // we have Cholesky factor of SPD matrix
+            Assert (A(k,k) != 0, ExcInternalError());
+            const number tau = z(k)/A(k,k);
+            AssertThrow (std::abs(tau) < 1.,
+                         ExcMessage("Cholesky downdating led to negative definite matrix"));
+            const number u = sqrt((1.-tau)*(1.+tau)); // <-- more stable than std::sqrt(1.-tau*tau)
+            const number c = 1./u;
+            const number s = c * tau;
+            const number r = u * std::abs(A(k,k));
+            A(k,k) = r;
+            for (unsigned int i = k+1; i < N; ++i)
+              {
+                const number t = A(i,k);
+                A(i,k) =  c * A(i,k) - s * z(i);
+                z(i)   = -s * t      + c * z(i);
+              }
+          }
+
       }
   }
 

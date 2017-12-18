@@ -144,6 +144,11 @@ public:
   /**
    * Perform a rank-1 update of a symmetric matrix
    * $ A \leftarrow A + a \, \rm v \rm v^T $.
+   *
+   * This function also works for Cholesky factorization. Updating ($a>0$) is
+   * performed via Givens rotations, whereas downdating ($a<0$) via hyperbolic
+   * rotations. Note that the later case might lead to a negative definite
+   * matrix in which case the error will be thrown.
    */
   void add(const number a,
            const Vector<number> &v);
