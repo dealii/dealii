@@ -121,14 +121,14 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
         )
       IF(NOT ${BOOST_IOSTREAMS_USABLE})
         MESSAGE(STATUS
-                "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
-                "with zlib support but a simple test failed! "
-                "Therefore, the bundled boost package is used."
-               )
+          "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
+          "with zlib support but a simple test failed! "
+          "Therefore, the bundled boost package is used."
+          )
         SET(BOOST_ADDITIONAL_ERROR_STRING
-            "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
-            "with zlib support but a simple test failed! "
-           )
+          "DEAL_II_WITH_ZLIB=ON requires Boost.Iostreams to be compiled "
+          "with zlib support but a simple test failed! "
+          )
         SET(${var} FALSE)
       ENDIF()
       RESET_CMAKE_REQUIRED()
@@ -146,16 +146,16 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
           FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug)
           EXECUTE_PROCESS(
             COMMAND ${CMAKE_COMMAND}
-                      -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-                      -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                      "-DBOOST_INCLUDE_DIRS=${BOOST_INCLUDE_DIRS}"
-                      "-DBOOST_LIBRARIES=${BOOST_LIBRARIES}"
-                      ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure/TestBoostBug
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug
+              -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+              -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+              "-DBOOST_INCLUDE_DIRS=${BOOST_INCLUDE_DIRS}"
+              "-DBOOST_LIBRARIES=${BOOST_LIBRARIES}"
+              ${CMAKE_CURRENT_SOURCE_DIR}/cmake/configure/TestBoostBug
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug
             RESULT_VARIABLE _result
             OUTPUT_QUIET
             ERROR_QUIET
-          )
+            )
           IF(${_result} EQUAL 0)
             EXECUTE_PROCESS(
               COMMAND ${CMAKE_COMMAND} --build . --target run
@@ -163,7 +163,7 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
               RESULT_VARIABLE _result
               OUTPUT_QUIET
               ERROR_QUIET
-            )
+              )
           ENDIF()
         ENDIF()
         IF(${_result} EQUAL 0)
@@ -177,16 +177,16 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
 
       IF(NOT ${BOOST_SERIALIZATION_USABLE})
         MESSAGE(STATUS
-                "The externally provided Boost.Serialization library "
-                "failed to pass a crucial test. \n"
-                "Therefore, the bundled boost package is used. \n"
-                "The configured testing project can be found at "
-                "${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug"
-               )
+          "The externally provided Boost.Serialization library "
+          "failed to pass a crucial test. \n"
+          "Therefore, the bundled boost package is used. \n"
+          "The configured testing project can be found at "
+          "${CMAKE_CURRENT_BINARY_DIR}/cmake/configure/TestBoostBug"
+          )
         SET(BOOST_ADDITIONAL_ERROR_STRING
-            "The externally provided Boost.Serialization library "
-            "failed to pass a crucial test."
-           )
+          "The externally provided Boost.Serialization library "
+          "failed to pass a crucial test."
+          )
         SET(${var} FALSE)
       ENDIF()
     ENDIF() # DEAL_II_ALLOW_PLATFORM_INTROSPECTION
