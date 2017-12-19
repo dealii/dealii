@@ -14,6 +14,9 @@
 // ---------------------------------------------------------------------
 
 
+// Test the move constructor of the sparsity pattern and check the sparsity
+// pattern whose data have been stolen can be reinitialized
+
 #include "../tests.h"
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 #include <deal.II/base/utilities.h>
@@ -33,17 +36,35 @@ int main (int argc, char **argv)
   A.add(2,1);
   A.compress();
 
+  // Check the move constructor
   TrilinosWrappers::SparsityPattern B(std::move(A));
   for (unsigned int i=0; i<3; ++i)
     for (unsigned int j=0; j<3; ++j)
       {
         if ((i == 2) && (j == 1))
           {
-            AssertThrow(B.exist(i,j) == true, ExcInternalError());
+            AssertThrow(B.exists(i,j) == true, ExcInternalError());
           }
         else
           {
-            AssertThrow(B.exist(i,j) == false, ExcInternalError());
+            AssertThrow(B.exists(i,j) == false, ExcInternalError());
+          }
+      }
+
+  // Check that A can be reinitialized
+  A.reinit(partitioning);
+  A.add(1,2);
+  A.compress();
+  for (unsigned int i=0; i<3; ++i)
+    for (unsigned int j=0; j<3; ++j)
+      {
+        if ((i == 1) && (j == 2))
+          {
+            AssertThrow(A.exists(i,j) == true, ExcInternalError());
+          }
+        else
+          {
+            AssertThrow(A.exists(i,j) == false, ExcInternalError());
           }
       }
 
