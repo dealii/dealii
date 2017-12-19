@@ -14,23 +14,17 @@
 ## ---------------------------------------------------------------------
 
 #
-# Try to find the GMSH library
-#
-# This module exports
-#
-#   GMSH_EXECUTABLE
+# A small wrapper around FIND_PROGRAM to be a bit more verbose
 #
 
-SET(GMSH_DIR "" CACHE PATH "An optional hint to a GMSH installation containing the gmsh executable")
-SET_IF_EMPTY(GMSH_DIR "$ENV{GMSH_DIR}")
+MACRO(DEAL_II_FIND_PROGRAM _file_name)
+  FIND_PROGRAM(${_file_name} ${ARGN})
 
-DEAL_II_FIND_PROGRAM(GMSH_EXE gmsh${CMAKE_EXECUTABLE_SUFFIX}
-  HINTS ${GMSH_DIR}
-  PATH_SUFFIXES bin
-  )
-
-DEAL_II_PACKAGE_HANDLE(GMSH
-  EXECUTABLE REQUIRED GMSH_EXE
-  CLEAR
-    GMSH_EXE
-  )
+  IF(${_file_name} MATCHES "-NOTFOUND")
+    MESSAGE(STATUS "${_file_name} not found! Call:")
+    TO_STRING(_str ${ARGN})
+    MESSAGE(STATUS "    FIND_PROGRAM(${_file_name} ${_str})")
+  ELSE()
+    MESSAGE(STATUS "Found ${_file_name}")
+  ENDIF()
+ENDMACRO()
