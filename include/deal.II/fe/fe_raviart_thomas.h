@@ -93,7 +93,7 @@ DEAL_II_NAMESPACE_OPEN
  * quadrature rules themselves. The generalized support points are a set of
  * points such that this quadrature can be performed with sufficient accuracy.
  * The points needed are those of QGauss<sub>k+1</sub> on each face as well as
- * QGauss<sub>k</sub> in the interior of the cell (or none for
+ * QGauss<sub>k+1</sub> in the interior of the cell (or none for
  * RT<sub>0</sub>).
  *
  *

@@ -920,8 +920,8 @@ public:
    * cell is also represented by a vector field, but again transforms
    * differently, namely by the Piola transform
    * @f[
-   *  \mathbf u(\mathbf x) = \frac{1}{\text{det}\;J(\mathbf x)}
-   * J(\mathbf x) \hat{\mathbf  u}(\mathbf x).
+   *  \mathbf u(\mathbf x) = \frac{1}{\text{det}\;J(\hat{\mathbf x})}
+   * J(\hat{\mathbf x}) \hat{\mathbf  u}(\hat{\mathbf x}).
    * @f]
    * </ul>
    *
@@ -1021,11 +1021,10 @@ public:
    * J(\hat{\mathbf  x})^{-1}.
    * @f]
    * <li> @p mapping_piola_gradient: it assumes $\mathbf u(\mathbf x) =
-   * \frac{1}{\text{det}\;J(\mathbf x)} J(\mathbf x) \hat{\mathbf  u}(\mathbf
-   * x)$ so that
+   * \frac{1}{\text{det}\;J(\hat{\mathbf x})} J(\hat{\mathbf x}) \hat{\mathbf  u}(\hat{\mathbf x})$ so that
    * @f[
    * \mathbf T(\mathbf x) =
-   * \frac{1}{\text{det}\;J(\mathbf x)}
+   * \frac{1}{\text{det}\;J(\hat{\mathbf x})}
    * J(\hat{\mathbf  x}) \hat{\mathbf  T}(\hat{\mathbf  x})
    * J(\hat{\mathbf  x})^{-1}.
    * @f]
@@ -1128,11 +1127,11 @@ public:
    * J_{jJ}(\hat{\mathbf  x})^{-1} J_{kK}(\hat{\mathbf  x})^{-1}.
    * @f]
    * <li> @p mapping_piola_hessian: it assumes $\mathbf u_i(\mathbf x) =
-   * \frac{1}{\text{det}\;J(\mathbf x)} J_{iI}(\mathbf x) \hat{\mathbf
-   * u}(\mathbf x)$ so that
+   * \frac{1}{\text{det}\;J(\hat{\mathbf x})} J_{iI}(\hat{\mathbf x}) \hat{\mathbf
+   * u}(\hat{\mathbf x})$ so that
    * @f[
    * \mathbf T_{ijk}(\mathbf x) =
-   * \frac{1}{\text{det}\;J(\mathbf x)}
+   * \frac{1}{\text{det}\;J(\hat{\mathbf x})}
    * J_{iI}(\hat{\mathbf  x}) \hat{\mathbf  T}_{IJK}(\hat{\mathbf  x})
    * J_{jJ}(\hat{\mathbf  x})^{-1} J_{kK}(\hat{\mathbf  x})^{-1}.
    * @f]
