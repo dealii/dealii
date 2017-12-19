@@ -22,6 +22,8 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 
+#include <deal.II/lac/utilities.h>
+
 #include <iostream>
 #include <iomanip>
 
@@ -68,6 +70,7 @@ LAPACKFullMatrix<number>::operator = (const LAPACKFullMatrix<number> &M)
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::reinit (const size_type n)
@@ -75,6 +78,21 @@ LAPACKFullMatrix<number>::reinit (const size_type n)
   this->TransposeTable<number>::reinit (n, n);
   state = LAPACKSupport::matrix;
 }
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::grow_or_shrink (const size_type n)
+{
+  TransposeTable<number> copy(*this);
+  const size_type s = std::min(std::min(this->m(), n), this->n());
+  this->TransposeTable<number>::reinit (n, n);
+  for (unsigned int i = 0; i < s; ++i)
+    for (unsigned int j = 0; j < s; ++j)
+      (*this)(i,j) = copy(i,j);
+}
+
 
 
 template <typename number>
@@ -189,6 +207,138 @@ LAPACKFullMatrix<number>::add (const number              a,
   for (size_type i=0; i<m(); ++i)
     for (size_type j=0; j<n(); ++j)
       (*this)(i,j) += a * A(i,j);
+}
+
+
+
+namespace
+{
+  template <typename number>
+  void cholesky_rank1(LAPACKFullMatrix<number> &A,
+                      const number a,
+                      const Vector<number> &v)
+  {
+    const unsigned int N = A.n();
+    Vector<number> z(v);
+    // Cholesky update / downdate, see
+    // 6.5.4 Cholesky Updating and Downdating, Golub 2013 Matrix computations
+    // Note that potrf() is called with LAPACKSupport::L , so the
+    // factorization is stored in lower triangular part.
+    // Also see discussion here http://icl.cs.utk.edu/lapack-forum/viewtopic.php?f=2&t=2646
+    if (a > 0.)
+      {
+        // simple update via a sequence of Givens rotations.
+        // Observe that
+        //
+        //       | L^T |T  | L^T |
+        // A <-- |     |   |     | = L L^T + z z^T
+        //       | z^T |   | z^T |
+        //
+        // so we can get updated factor by doing a sequence of Givens
+        // rotations to make the matrix lower-triangular
+        // Also see LINPACK's dchud http://www.netlib.org/linpack/dchud.f
+        z *= std::sqrt(a);
+        for (unsigned int k = 0; k < N; ++k)
+          {
+            const std::array<number,3> csr = Utilities::LinearAlgebra::givens_rotation(A(k,k),z(k));
+            A(k,k) = csr[2];
+            for (unsigned int i = k+1; i < N; ++i)
+              {
+                const number t = A(i,k);
+                A(i,k) =  csr[0] * A(i,k) + csr[1] * z(i);
+                z(i)   = -csr[1] * t      + csr[0] * z(i);
+              }
+          }
+      }
+    else
+      {
+        // downdating is not always possible as we may end up with
+        // negative definite matrix. If it's possible, then it boils
+        // down to application of hyperbolic rotations.
+        // Observe that
+        //
+        //       | L^T |T      | L^T |
+        // A <-- |     |   S   |     | = L L^T - z z^T
+        //       | z^T |       | z^T |
+        //
+        //       |In  0 |
+        // S :=  |      |
+        //       |0  -1 |
+        //
+        // We are looking for H which is S-orthogonal (HSH^T=S) and
+        // can restore upper-triangular factor of the factorization of A above.
+        // We will use Hyperbolic rotations to do the job
+        //
+        // | c  -s |   | x1 |   | r |
+        // |       | = |    | = |   |,   c^2 - s^2 = 1
+        // |-s   c |   | x2 |   | 0 |
+        //
+        // which have real solution only if x2 <= x1.
+        // See also Linpack's http://www.netlib.org/linpack/dchdd.f and
+        // https://infoscience.epfl.ch/record/161468/files/cholupdate.pdf and
+        // "Analysis of a recursive Least Squares Hyperbolic Rotation Algorithm for Signal Processing", Alexander, Pan, Plemmons, 1988.
+        z *= std::sqrt(-a);
+        for (unsigned int k = 0; k < N; ++k)
+          {
+            const std::array<number,3> csr = Utilities::LinearAlgebra::hyperbolic_rotation(A(k,k),z(k));
+            A(k,k) = csr[2];
+            for (unsigned int i = k+1; i < N; ++i)
+              {
+                const number t = A(i,k);
+                A(i,k) =  csr[0] * A(i,k) - csr[1] * z(i);
+                z(i)   = -csr[1] * t      + csr[0] * z(i);
+              }
+          }
+      }
+  }
+
+
+  template <typename number>
+  void cholesky_rank1(LAPACKFullMatrix<std::complex<number>> &A,
+                      const std::complex<number> a,
+                      const Vector<std::complex<number>> &v)
+  {
+    AssertThrow(false, ExcNotImplemented());
+  }
+}
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::rank1_update(const number a,
+                                       const Vector<number> &v)
+{
+  Assert(property == LAPACKSupport::symmetric,
+         ExcProperty(property));
+
+  Assert (n() == m(), ExcInternalError());
+  Assert (m() == v.size(), ExcDimensionMismatch(m(), v.size()));
+
+  AssertIsFinite(a);
+
+  if (state == LAPACKSupport::matrix)
+    {
+      const int N = this->n_rows();
+      const char uplo = LAPACKSupport::U;
+      const int lda = N;
+      const int incx=1;
+
+      syr(&uplo, &N, &a, v.begin(), &incx, this->values.begin(), &lda);
+
+      // FIXME: we should really only update upper or lower triangular parts
+      // of symmetric matrices and make sure the interface is consistent,
+      // for example operator(i,j) gives correct results regardless of storage.
+      for (unsigned int i = 0; i < N; ++i)
+        for (unsigned int j = 0; j < i; ++j)
+          (*this)(i,j) = (*this)(j,i);
+    }
+  else if (state == LAPACKSupport::cholesky)
+    {
+      cholesky_rank1(*this, a, v);
+    }
+  else
+    AssertThrow(false, ExcState(state));
 }
 
 
@@ -1092,7 +1242,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
   if (info != 0)
     std::cerr << "LAPACK error in geev" << std::endl;
 
-  state = LAPACKSupport::State(eigenvalues | unusable);
+  state = LAPACKSupport::State(LAPACKSupport::eigenvalues | unusable);
 }
 
 
@@ -1345,7 +1495,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
           eigenvectors[i](j) = values_A[col_begin+j];
         }
     }
-  state = LAPACKSupport::State(eigenvalues | unusable);
+  state = LAPACKSupport::State(LAPACKSupport::eigenvalues | unusable);
 }
 
 
@@ -1389,7 +1539,9 @@ LAPACKFullMatrix<number>::print_formatted (
 
   for (size_type i=0; i<this->n_rows(); ++i)
     {
-      for (size_type j=0; j<this->n_cols(); ++j)
+      // Cholesky is stored in lower triangular, so just output this part:
+      const size_type nc = state == LAPACKSupport::cholesky ? i+1 : this->n_cols();
+      for (size_type j=0; j<nc; ++j)
         // we might have complex numbers, so use abs also to check for nan
         // since there is no isnan on complex numbers
         if (std::isnan(std::abs((*this)(i,j))))

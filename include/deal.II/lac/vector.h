@@ -259,6 +259,31 @@ public:
                        const bool      omit_zeroing_entries=false);
 
   /**
+   * Same as above, but will preserve the values of vector upon resizing.
+   * If we new size is bigger, we will have
+   * \f[
+   * \mathbf V \rightarrow
+   * \left(
+   * \begin{array}{c}
+   * \mathbf V   \\
+   * \mathbf 0
+   * \end{array}
+   * \right)
+   * \f]
+   * whereas if the desired size is smaller, then
+   * \f[
+   * \left(
+   * \begin{array}{c}
+   * \mathbf V_1   \\
+   * \mathbf V_2
+   * \end{array}
+   * \right)
+   * \rightarrow \mathbf V_1
+   * \f]
+   */
+  void grow_or_shrink (const size_type N);
+
+  /**
    * Change the dimension to that of the vector @p V. The same applies as for
    * the other @p reinit function.
    *
@@ -924,9 +949,10 @@ private:
 
   /**
    * Allocate and align @p values along 64-byte boundaries. The size of the
-   * allocated memory is determined by @p max_vec_size .
+   * allocated memory is determined by @p max_vec_size . Copy first
+   * @p copy_n_el from the old values.
    */
-  void allocate();
+  void allocate(const size_type copy_n_el = 0);
 };
 
 /*@}*/

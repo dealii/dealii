@@ -23,6 +23,9 @@
 #include <deal.II/lac/lapack_support.h>
 #include <deal.II/lac/vector_memory.h>
 
+#include <array>
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Utilities
@@ -32,6 +35,68 @@ namespace Utilities
    */
   namespace LinearAlgebra
   {
+
+    /**
+     * Return the elements of a continuous Givens rotation matrix and
+     * the norm of the input vector.
+     *
+     * That is for a given
+     * pair @p x and @p y, return $c$ , $s$ and $\sqrt{x^2+y^2}$ such that
+     * \f[
+     * \begin{bmatrix}
+     * c  & s \\
+     * -s & c
+     * \end{bmatrix}
+     * \begin{bmatrix}
+     * x \\
+     * y
+     * \end{bmatrix}
+     * =
+     * \begin{bmatrix}
+     * \sqrt{x^2+y^2} \\
+     * 0
+     * \end{bmatrix}
+     * \f]
+     *
+     * @note The function is implemented for real valued numbers only.
+     *
+     * @author Denis Davydov, 2017
+     */
+    template<typename NumberType>
+    std::array<NumberType,3> givens_rotation(const NumberType &x,
+                                             const NumberType &y);
+
+    /**
+     * Return the elements of a hyperbolic rotation matrix.
+     *
+     * That is for a given
+     * pair @p x and @p y, return $c$ , $s$ and $r$ such that
+     * \f[
+     * \begin{bmatrix}
+     * c  & -s \\
+     * -s & c
+     * \end{bmatrix}
+     * \begin{bmatrix}
+     * x \\
+     * y
+     * \end{bmatrix}
+     * =
+     * \begin{bmatrix}
+     * r \\
+     * 0
+     * \end{bmatrix}
+     * \f]
+     *
+     * Real valued solution only exists if $|x|>|g|$, the function will
+     * throw an error otherwise.
+     *
+     * @note The function is implemented for real valued numbers only.
+     *
+     * @author Denis Davydov, 2017
+     */
+    template<typename NumberType>
+    std::array<NumberType,3> hyperbolic_rotation(const NumberType &x,
+                                                 const NumberType &y);
 
     /**
      * Estimate an upper bound for the largest eigenvalue of @p H by a @p k -step
@@ -68,7 +133,7 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template <typename OperatorType, typename VectorType>
-    double Lanczos_largest_eigenvalue(const OperatorType &H,
+    double lanczos_largest_eigenvalue(const OperatorType &H,
                                       const VectorType &v0,
                                       const unsigned int k,
                                       VectorMemory<VectorType> &vector_memory,
@@ -124,7 +189,7 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template <typename OperatorType, typename VectorType>
-    void Chebyshev_filter(VectorType &x,
+    void chebyshev_filter(VectorType &x,
                           const OperatorType &H,
                           const unsigned int n,
                           const std::pair<double,double> unwanted_spectrum,
@@ -144,8 +209,105 @@ namespace Utilities
 {
   namespace LinearAlgebra
   {
+
+    template<typename NumberType>
+    std::array<std::complex<NumberType>,3> hyperbolic_rotation(const std::complex<NumberType> &f,
+                                                               const std::complex<NumberType> &g)
+    {
+      AssertThrow(false, ExcNotImplemented());
+      std::array<NumberType,3> res;
+      return res;
+    }
+
+
+
+    template<typename NumberType>
+    std::array<NumberType,3> hyperbolic_rotation(const NumberType &f,
+                                                 const NumberType &g)
+    {
+      Assert (f != 0, ExcDivideByZero());
+      const NumberType tau = g/f;
+      AssertThrow (std::abs(tau) < 1.,
+                   ExcMessage("real-valued Hyperbolic rotation does not exist for ("+
+                              std::to_string(f) +
+                              "," +
+                              std::to_string(g)+
+                              ")"));
+      const NumberType u = std::copysign(sqrt((1.-tau)*(1.+tau)), f); // <-- more stable than std::sqrt(1.-tau*tau)
+      std::array<NumberType,3> csr;
+      csr[0] = 1./u;          // c
+      csr[1] = csr[0] * tau;  // s
+      csr[2] = f *u;          // r
+      return csr;
+    }
+
+
+
+    template<typename NumberType>
+    std::array<std::complex<NumberType>,3> givens_rotation(const std::complex<NumberType> &f,
+                                                           const std::complex<NumberType> &g)
+    {
+      AssertThrow(false, ExcNotImplemented());
+      std::array<NumberType,3> res;
+      return res;
+    }
+
+
+
+    template<typename NumberType>
+    std::array<NumberType,3> givens_rotation(const NumberType &f,
+                                             const NumberType &g)
+    {
+      std::array<NumberType,3> res;
+      // naive calculation for "r" may overflow or underflow:
+      // c =  x / \sqrt{x^2+y^2}
+      // s = -y / \sqrt{x^2+y^2}
+
+      // See Golub 2013, Matrix computations, Chapter 5.1.8
+      // Algorithm 5.1.3
+      // and
+      // Anderson (2000),
+      // Discontinuous Plane Rotations and the Symmetric Eigenvalue Problem.
+      // LAPACK Working Note 150, University of Tennessee, UT-CS-00-454,
+      // December 4, 2000.
+      // Algorithm 4
+      // We implement the latter below:
+      if (g == NumberType())
+        {
+          res[0] = std::copysign(1., f);
+          res[1] = NumberType();
+          res[2] = std::abs(f);
+        }
+      else if (f == NumberType())
+        {
+          res[0] = NumberType();
+          res[1] = std::copysign(1., g);
+          res[2] = std::abs(g);
+        }
+      else if (std::abs(f) > std::abs(g))
+        {
+          const NumberType tau  = g/f;
+          const NumberType u    = std::copysign(std::sqrt(1.+tau*tau), f);
+          res[0] = 1./u;          // c
+          res[1] = res[0] * tau;  // s
+          res[2] = f * u;         // r
+        }
+      else
+        {
+          const NumberType tau  = f/g;
+          const NumberType u    = std::copysign(std::sqrt(1.+tau*tau), g);
+          res[1] = 1./u;          // s
+          res[0] = res[1] * tau;  // c
+          res[2] = g * u;         // r
+        }
+
+      return res;
+    }
+
+
+
     template <typename OperatorType, typename VectorType>
-    double Lanczos_largest_eigenvalue(const OperatorType &H,
+    double lanczos_largest_eigenvalue(const OperatorType &H,
                                       const VectorType &v0_,
                                       const unsigned int k,
                                       VectorMemory<VectorType> &vector_memory,
@@ -238,7 +400,7 @@ namespace Utilities
 
 
     template <typename OperatorType, typename VectorType>
-    void Chebyshev_filter(VectorType &x,
+    void chebyshev_filter(VectorType &x,
                           const OperatorType &op,
                           const unsigned int degree,
                           const std::pair<double,double> unwanted_spectrum,
@@ -272,7 +434,7 @@ namespace Utilities
       // Algorithm 3.2 in Zhou et al, Journal of Computational Physics 274 (2014) 770-782
       // with **a bugfix for sigma1**. Here is the original algorithm verbatim:
       //
-      // [Y]=Chebyshev_filter_scaled(X, m, a, b, aL).
+      // [Y]=chebyshev_filter_scaled(X, m, a, b, aL).
       // e=(b−a)/2; c=(a+b)/2; σ=e/(c−aL); τ=2/σ;
       // Y=(H∗X−c∗X)∗(σ/e);
       // for i=2 to m do

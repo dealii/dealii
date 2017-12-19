@@ -160,7 +160,7 @@ void test ()
   GrowingVectorMemory<LinearAlgebra::distributed::Vector<double>> vector_memory;
   for (unsigned int k = 4; k < 10; ++k)
     {
-      const double est = Utilities::LinearAlgebra::Lanczos_largest_eigenvalue(OP,init_vector,k,vector_memory);
+      const double est = Utilities::LinearAlgebra::lanczos_largest_eigenvalue(OP,init_vector,k,vector_memory);
       deallog << k << " " << est << std::endl;
     }
 

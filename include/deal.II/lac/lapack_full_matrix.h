@@ -142,6 +142,21 @@ public:
             const LAPACKFullMatrix<number> &A);
 
   /**
+   * Perform a rank-1 update of a symmetric matrix
+   * $ A \leftarrow A + a \, \rm v \rm v^T $.
+   *
+   * This function also works for Cholesky factorization.
+   * In that case, updating ($a>0$) is
+   * performed via Givens rotations, whereas downdating ($a<0$) via hyperbolic
+   * rotations. Note that the latter case might lead to a negative definite
+   * matrix in which case the error will be thrown (because Cholesky
+   * factorizations are only valid for symmetric and positive definite
+   * matrices).
+   */
+  void rank1_update(const number a,
+                    const Vector<number> &v);
+
+  /**
    * Assignment from different matrix classes, performing the usual conversion
    * to the transposed format expected by LAPACK. This assignment operator
    * uses iterators of the typename MatrixType. Therefore, sparse matrices are
@@ -156,6 +171,33 @@ public:
    * list as this present function.
    */
   void reinit (const size_type size);
+
+  /**
+   * Same as above but will preserve the values of matrix upon resizing.
+   * The original values
+   * of the matrix are kept on increasing the size
+   * \f[
+   * \mathbf A \rightarrow
+   * \left(
+   * \begin{array}{cc}
+   * \mathbf A & \mathbf 0 \\
+   * \mathbf 0 & \mathbf 0
+   * \end{array}
+   * \right)
+   * \f]
+   * Whereas if the new size is smaller, the matrix will contain the upper left block
+   * of the original one
+   * \f[
+   * \left(
+   * \begin{array}{cc}
+   * \mathbf A_{11} & \mathbf A_{12} \\
+   * \mathbf A_{21} & \mathbf A_{22}
+   * \end{array}
+   * \rightarrow \mathbf A_{11}
+   * \right)
+   * \f]
+   */
+  void grow_or_shrink (const size_type size);
 
   /**
    * Regenerate the current matrix by one that has the same properties as if

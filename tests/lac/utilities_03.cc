@@ -132,7 +132,7 @@ check(const int degree, const bool scale = false, const double a_L = -0.1, const
 
   const double g_ = (scale ? a_L :  std::numeric_limits<double>::infinity() );
   y = x;
-  Utilities::LinearAlgebra::Chebyshev_filter(y, mat, degree, std::make_pair(a, b), g_, vector_memory);
+  Utilities::LinearAlgebra::chebyshev_filter(y, mat, degree, std::make_pair(a, b), g_, vector_memory);
   diff = y;
   diff -=exact;
 
