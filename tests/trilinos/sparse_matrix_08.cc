@@ -14,7 +14,8 @@
 // ---------------------------------------------------------------------
 
 
-// Test move constructor
+// Test move constructor of sparse matrix and check that the matrix that has
+// been move can be reinitialized
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
@@ -41,8 +42,8 @@ int main (int argc,char **argv)
   A.add (2, 1, 2.0);
   A.compress(VectorOperation::add);
 
+  // Check that the B stole the data of A
   TrilinosWrappers::SparseMatrix B(std::move(A));
-
   for (unsigned int i=0; i<3; ++i)
     for (unsigned int j=0; j<3; ++j)
       {
@@ -53,6 +54,26 @@ int main (int argc,char **argv)
         else
           {
             AssertThrow(B.el(i,j) == 0, ExcInternalError());
+          }
+      }
+
+  // Check that A can be reinitialized
+  TrilinosWrappers::SparsityPattern sp_2 (partitioning);
+  sp_2.add (1,2);
+  sp_2.compress();
+  A.reinit(sp_2);
+  A.add(1, 2, 2.0);
+  A.compress(VectorOperation::add);
+  for (unsigned int i=0; i<3; ++i)
+    for (unsigned int j=0; j<3; ++j)
+      {
+        if ((i == 1) && (j == 2))
+          {
+            AssertThrow(A.el(i,j) == 2, ExcInternalError());
+          }
+        else
+          {
+            AssertThrow(A.el(i,j) == 0, ExcInternalError());
           }
       }
 
