@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 
     for (unsigned int k = 4; k < 10; ++k)
       {
-        const double est = Utilities::LinearAlgebra::Lanczos_largest_eigenvalue(A,v0,k,vector_memory);
+        const double est = Utilities::LinearAlgebra::lanczos_largest_eigenvalue(A,v0,k,vector_memory);
         Assert (est > 3.98974, ExcInternalError());
         deallog << k << std::endl
                 << "Lanczos " << est << std::endl;

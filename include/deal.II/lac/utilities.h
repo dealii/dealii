@@ -63,7 +63,7 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template<typename NumberType>
-    std::array<NumberType,3> Givens_rotation(const NumberType &x,
+    std::array<NumberType,3> givens_rotation(const NumberType &x,
                                              const NumberType &y);
 
     /**
@@ -133,7 +133,7 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template <typename OperatorType, typename VectorType>
-    double Lanczos_largest_eigenvalue(const OperatorType &H,
+    double lanczos_largest_eigenvalue(const OperatorType &H,
                                       const VectorType &v0,
                                       const unsigned int k,
                                       VectorMemory<VectorType> &vector_memory,
@@ -189,7 +189,7 @@ namespace Utilities
      * @author Denis Davydov, 2017
      */
     template <typename OperatorType, typename VectorType>
-    void Chebyshev_filter(VectorType &x,
+    void chebyshev_filter(VectorType &x,
                           const OperatorType &H,
                           const unsigned int n,
                           const std::pair<double,double> unwanted_spectrum,
@@ -244,7 +244,7 @@ namespace Utilities
 
 
     template<typename NumberType>
-    std::array<std::complex<NumberType>,3> Givens_rotation(const std::complex<NumberType> &f,
+    std::array<std::complex<NumberType>,3> givens_rotation(const std::complex<NumberType> &f,
                                                            const std::complex<NumberType> &g)
     {
       AssertThrow(false, ExcNotImplemented());
@@ -255,7 +255,7 @@ namespace Utilities
 
 
     template<typename NumberType>
-    std::array<NumberType,3> Givens_rotation(const NumberType &f,
+    std::array<NumberType,3> givens_rotation(const NumberType &f,
                                              const NumberType &g)
     {
       std::array<NumberType,3> res;
@@ -307,7 +307,7 @@ namespace Utilities
 
 
     template <typename OperatorType, typename VectorType>
-    double Lanczos_largest_eigenvalue(const OperatorType &H,
+    double lanczos_largest_eigenvalue(const OperatorType &H,
                                       const VectorType &v0_,
                                       const unsigned int k,
                                       VectorMemory<VectorType> &vector_memory,
@@ -400,7 +400,7 @@ namespace Utilities
 
 
     template <typename OperatorType, typename VectorType>
-    void Chebyshev_filter(VectorType &x,
+    void chebyshev_filter(VectorType &x,
                           const OperatorType &op,
                           const unsigned int degree,
                           const std::pair<double,double> unwanted_spectrum,
@@ -434,7 +434,7 @@ namespace Utilities
       // Algorithm 3.2 in Zhou et al, Journal of Computational Physics 274 (2014) 770-782
       // with **a bugfix for sigma1**. Here is the original algorithm verbatim:
       //
-      // [Y]=Chebyshev_filter_scaled(X, m, a, b, aL).
+      // [Y]=chebyshev_filter_scaled(X, m, a, b, aL).
       // e=(b−a)/2; c=(a+b)/2; σ=e/(c−aL); τ=2/σ;
       // Y=(H∗X−c∗X)∗(σ/e);
       // for i=2 to m do

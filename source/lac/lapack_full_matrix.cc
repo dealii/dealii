@@ -240,7 +240,7 @@ namespace
         z *= std::sqrt(a);
         for (unsigned int k = 0; k < N; ++k)
           {
-            const std::array<number,3> csr = Utilities::LinearAlgebra::Givens_rotation(A(k,k),z(k));
+            const std::array<number,3> csr = Utilities::LinearAlgebra::givens_rotation(A(k,k),z(k));
             A(k,k) = csr[2];
             for (unsigned int i = k+1; i < N; ++i)
               {
