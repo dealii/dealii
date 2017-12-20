@@ -85,12 +85,38 @@ template <typename number>
 void
 LAPACKFullMatrix<number>::grow_or_shrink (const size_type n)
 {
-  TransposeTable<number> copy(*this);
   const size_type s = std::min(std::min(this->m(), n), this->n());
+  TransposeTable<number> copy(std::move(*this));
   this->TransposeTable<number>::reinit (n, n);
-  for (unsigned int i = 0; i < s; ++i)
-    for (unsigned int j = 0; j < s; ++j)
+  for (size_type i = 0; i < s; ++i)
+    for (size_type j = 0; j < s; ++j)
       (*this)(i,j) = copy(i,j);
+}
+
+
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::remove_row_and_column (const size_type row, const size_type col)
+{
+  Assert (row<this->n_rows(), ExcIndexRange(row,0,this->n_rows()));
+  Assert (col<this->n_cols(), ExcIndexRange(col,0,this->n_cols()));
+
+  const size_type nrows = this->n_rows()-1;
+  const size_type ncols = this->n_cols()-1;
+
+  TransposeTable<number> copy(std::move(*this));
+  this->TransposeTable<number>::reinit (nrows, ncols);
+
+  for (size_type j = 0; j < ncols; ++j)
+    {
+      const size_type jj = ( j < col ? j : j+1);
+      for (size_type i = 0; i < nrows; ++i)
+        {
+          const size_type ii = ( i < row ? i : i+1);
+          (*this)(i,j) = copy(ii,jj);
+        }
+    }
 }
 
 

@@ -200,6 +200,27 @@ public:
   void grow_or_shrink (const size_type size);
 
   /**
+   * Remove row @p row and column @p col from the matrix.
+   * \f[
+   * \left(
+   * \begin{array}{ccc}
+   * \mathbf A_{11}   & \mathbf a_{12} & \mathbf A_{13}   \\
+   * \mathbf a_{21}^T & a_{22}         & \mathbf a_{23}^T \\
+   * \mathbf A_{31}   & \mathbf a_{32} & \mathbf A_{33}
+   * \end{array}
+   * \right)
+   * \rightarrow
+   * \left(
+   * \begin{array}{cc}
+   * \mathbf A_{11} & \mathbf A_{13} \\
+   * \mathbf A_{31} & \mathbf A_{33}
+   * \end{array}
+   * \right)
+   * \f]
+   */
+  void remove_row_and_column (const size_type row, const size_type col);
+
+  /**
    * Regenerate the current matrix by one that has the same properties as if
    * it were created by the constructor of this class with the same argument
    * list as this present function.
