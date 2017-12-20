@@ -88,8 +88,8 @@ LAPACKFullMatrix<number>::grow_or_shrink (const size_type n)
   TransposeTable<number> copy(*this);
   const size_type s = std::min(std::min(this->m(), n), this->n());
   this->TransposeTable<number>::reinit (n, n);
-  for (unsigned int i = 0; i < s; ++i)
-    for (unsigned int j = 0; j < s; ++j)
+  for (size_type i = 0; i < s; ++i)
+    for (size_type j = 0; j < s; ++j)
       (*this)(i,j) = copy(i,j);
 }
 
@@ -162,8 +162,8 @@ LAPACKFullMatrix<number>::operator*= (const number factor)
          state == LAPACKSupport::inverse_matrix,
          ExcState(state));
 
-  for (unsigned int column = 0; column<this->n(); ++column)
-    for (unsigned int row = 0; row<this->m(); ++row)
+  for (size_type column = 0; column<this->n(); ++column)
+    for (size_type row = 0; row<this->m(); ++row)
       (*this)(row,column) *= factor;
 
   return *this;
@@ -181,8 +181,8 @@ LAPACKFullMatrix<number>::operator/= (const number factor)
   AssertIsFinite(factor);
   Assert (factor != number(0.), ExcZero() );
 
-  for (unsigned int column = 0; column<this->n(); ++column)
-    for (unsigned int row = 0; row<this->m(); ++row)
+  for (size_type column = 0; column<this->n(); ++column)
+    for (size_type row = 0; row<this->m(); ++row)
       (*this)(row,column) /= factor;
 
   return *this;
@@ -218,7 +218,7 @@ namespace
                       const number a,
                       const Vector<number> &v)
   {
-    const unsigned int N = A.n();
+    const typename LAPACKFullMatrix<number>::size_type N = A.n();
     Vector<number> z(v);
     // Cholesky update / downdate, see
     // 6.5.4 Cholesky Updating and Downdating, Golub 2013 Matrix computations
@@ -238,11 +238,11 @@ namespace
         // rotations to make the matrix lower-triangular
         // Also see LINPACK's dchud http://www.netlib.org/linpack/dchud.f
         z *= std::sqrt(a);
-        for (unsigned int k = 0; k < N; ++k)
+        for (typename LAPACKFullMatrix<number>::size_type k = 0; k < N; ++k)
           {
             const std::array<number,3> csr = Utilities::LinearAlgebra::givens_rotation(A(k,k),z(k));
             A(k,k) = csr[2];
-            for (unsigned int i = k+1; i < N; ++i)
+            for (typename LAPACKFullMatrix<number>::size_type i = k+1; i < N; ++i)
               {
                 const number t = A(i,k);
                 A(i,k) =  csr[0] * A(i,k) + csr[1] * z(i);
@@ -278,11 +278,11 @@ namespace
         // https://infoscience.epfl.ch/record/161468/files/cholupdate.pdf and
         // "Analysis of a recursive Least Squares Hyperbolic Rotation Algorithm for Signal Processing", Alexander, Pan, Plemmons, 1988.
         z *= std::sqrt(-a);
-        for (unsigned int k = 0; k < N; ++k)
+        for (typename LAPACKFullMatrix<number>::size_type k = 0; k < N; ++k)
           {
             const std::array<number,3> csr = Utilities::LinearAlgebra::hyperbolic_rotation(A(k,k),z(k));
             A(k,k) = csr[2];
-            for (unsigned int i = k+1; i < N; ++i)
+            for (typename LAPACKFullMatrix<number>::size_type i = k+1; i < N; ++i)
               {
                 const number t = A(i,k);
                 A(i,k) =  csr[0] * A(i,k) - csr[1] * z(i);
@@ -319,18 +319,21 @@ LAPACKFullMatrix<number>::rank1_update(const number a,
 
   if (state == LAPACKSupport::matrix)
     {
-      const int N = this->n_rows();
-      const char uplo = LAPACKSupport::U;
-      const int lda = N;
-      const int incx=1;
+      {
+        const int N = this->n_rows();
+        const char uplo = LAPACKSupport::U;
+        const int lda = N;
+        const int incx=1;
 
-      syr(&uplo, &N, &a, v.begin(), &incx, this->values.begin(), &lda);
+        syr(&uplo, &N, &a, v.begin(), &incx, this->values.begin(), &lda);
+      }
 
+      const size_type N = this->n_rows();
       // FIXME: we should really only update upper or lower triangular parts
       // of symmetric matrices and make sure the interface is consistent,
       // for example operator(i,j) gives correct results regardless of storage.
-      for (unsigned int i = 0; i < N; ++i)
-        for (unsigned int j = 0; j < i; ++j)
+      for (size_type i = 0; i < N; ++i)
+        for (size_type j = 0; j < i; ++j)
           (*this)(i,j) = (*this)(j,i);
     }
   else if (state == LAPACKSupport::cholesky)
