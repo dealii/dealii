@@ -26,6 +26,7 @@
 #  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/petsc_compatibility.h>
 #  include <deal.II/lac/vector_operation.h>
+#  include <deal.II/lac/petsc_vector_base.h>
 
 #  include <petscmat.h>
 
@@ -41,7 +42,6 @@ template <typename Matrix> class BlockMatrixBase;
 namespace PETScWrappers
 {
   // forward declarations
-  class VectorBase;
   class MatrixBase;
 
   namespace MatrixIterators
@@ -784,7 +784,6 @@ namespace PETScWrappers
     void Tvmult_add (VectorBase       &dst,
                      const VectorBase &src) const;
 
-
     /**
      * Compute the residual of an equation <i>Mx=b</i>, where the residual is
      * defined to be <i>r=b-Mx</i>. Write the residual into @p dst. The
@@ -839,6 +838,13 @@ namespace PETScWrappers
      * matrix.
      */
     operator Mat () const;
+
+    /**
+     * Return a reference to the underlying PETSc type. It can be used to
+     * modify the underlying data, so use it only when you know what you
+     * are doing.
+     */
+    Mat &petsc_matrix ();
 
     /**
      * Make an in-place transpose of a matrix.
@@ -952,7 +958,44 @@ namespace PETScWrappers
      */
     void prepare_set();
 
+    /**
+     * Base function to perform the matrix-matrix multiplication $C = AB$,
+     * or, if a vector $V$ whose size is compatible with B is given,
+     * $C = A \text{diag}(V) B$, where $\text{diag}(V)$ defines a
+     * diagonal matrix with the vector entries.
+     *
+     * This function assumes that the calling matrix $A$ and $B$
+     * have compatible sizes. The size of $C$ will be set within this
+     * function.
+     *
+     * The content as well as the sparsity pattern of the matrix $C$ will be
+     * reset by this function, so make sure that the sparsity pattern is not
+     * used somewhere else in your program. This is an expensive operation, so
+     * think twice before you use this function.
+     */
+    void mmult (MatrixBase       &C,
+                const MatrixBase &B,
+                const VectorBase &V = VectorBase()) const;
 
+    /**
+     * Base function to perform the matrix-matrix multiplication with
+     * the transpose of <tt>this</tt>, i.e., $C = A^T B$, or,
+     * if an optional vector $V$ whose size is compatible with $B$ is given,
+     * $C = A^T \text{diag}(V) B$, where $\text{diag}(V)$ defines a
+     * diagonal matrix with the vector entries.
+     *
+     * This function assumes that the calling matrix $A$ and $B$
+     * have compatible sizes. The size of $C$ will be set within this
+     * function.
+     *
+     * The content as well as the sparsity pattern of the matrix $C$ will be
+     * changed by this function, so make sure that the sparsity pattern is not
+     * used somewhere else in your program. This is an expensive operation, so
+     * think twice before you use this function.
+     */
+    void Tmmult (MatrixBase       &C,
+                 const MatrixBase &B,
+                 const VectorBase &V = VectorBase()) const;
 
   private:
 
