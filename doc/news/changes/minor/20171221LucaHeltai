@@ -1,0 +1,3 @@
+New: Added QSimplex class to perform quadratures on reference simplices, and on their affine transformations. 
+<br> 
+(Luca Heltai, 2017/12/21)

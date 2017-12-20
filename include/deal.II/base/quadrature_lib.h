@@ -647,6 +647,43 @@ private:
 
 };
 
+/**
+ * Given an arbitrary quadrature formula, return one that chops the quadrature
+ * points above the principal diagonals.
+ *
+ * In general the resulting quadrature is not very useful, unless the
+ * quadrature you started from has been constructed specifically to integrate
+ * over triangles or tetrahedra. This class ensures that the resulting
+ * quadrature formula only has quadrature points in the reference simplex.
+ *
+ * @author Luca Heltai, 2017.
+ */
+template <int dim>
+class QSimplex : public Quadrature<dim>
+{
+public:
+  /**
+   * Construct a quadrature that only contains the points that are in the lower
+   * left reference simplex.
+   *
+   * @param[in] quad The input quadrature.
+   */
+  QSimplex(const Quadrature<dim> &quad);
+
+  /**
+   * Return an affine transformation of this quadrature, that can be used to integrate
+   * on the simplex identified by `vertices`.
+   *
+   * Both the quadrature point locations and the weights are transformed, so that you
+   * can effectively use the resulting quadrature to integrate on the simplex.
+   *
+   * @param[in] vertices The vertices of the simplex you wish to integrate on
+   * @return A quadrature object that can be used to integrate on the simplex
+   */
+  Quadrature<dim> affine_transformation(const std::array<Point<dim>, dim+1> &vertices);
+
+};
+
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */

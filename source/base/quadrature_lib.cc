@@ -1345,6 +1345,54 @@ QGaussLobattoChebyshev<dim>::QGaussLobattoChebyshev (const unsigned int n)
   Quadrature<dim> (QGaussLobattoChebyshev<1>(n))
 {}
 
+
+
+template<int dim>
+QSimplex<dim>::QSimplex(const Quadrature<dim> &quad)
+{
+  std::vector<Point<dim> > qpoints;
+  std::vector<double > weights;
+
+  for (unsigned int i=0; i<quad.size(); ++i)
+    {
+      double r=0;
+      for (unsigned int d=0; d<dim; ++d)
+        r += quad.point(i)[d];
+      if ((r-1) <= 0)
+        {
+          this->quadrature_points.push_back(quad.point(i));
+          this->weights.push_back(quad.weight(i));
+        }
+    }
+}
+
+
+
+template<int dim>
+Quadrature<dim>
+QSimplex<dim>::affine_transformation(const std::array<Point<dim>, dim+1>& vertices)
+{
+  std::vector<Point<dim> > qp(this->size());
+  std::vector<double> w(this->size());
+
+  unsigned int i=0;
+  Tensor<2,dim> B;
+  for (unsigned int d=0; d<dim; ++d)
+    B[d] = vertices[d+1]-vertices[0];
+
+  B = transpose(B);
+  auto J = determinant(B);
+
+  for (unsigned int i=0; i<this->size(); ++i)
+    {
+      qp[i] = Point<dim>(vertices[0]+B*this->point(i));
+      w[i] = J*this->weight(i);
+    }
+  return Quadrature<dim>(qp, w);
+}
+
+
+
 // explicit specialization
 // note that 1d formulae are specialized by implementation above
 template class QGauss<2>;
@@ -1382,5 +1430,9 @@ template class QGaussRadauChebyshev<3>;
 template class QGaussLobattoChebyshev<1>;
 template class QGaussLobattoChebyshev<2>;
 template class QGaussLobattoChebyshev<3>;
+
+template class QSimplex<1>;
+template class QSimplex<2>;
+template class QSimplex<3>;
 
 DEAL_II_NAMESPACE_CLOSE
