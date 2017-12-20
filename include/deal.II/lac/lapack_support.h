@@ -22,6 +22,20 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+namespace types
+{
+#ifdef LAPACK_WITH_64BIT_BLAS_INDICES
+  /**
+   * Integer type in BLAS.
+   */
+  typedef long long blas_int;
+#else
+  /**
+   * Integer type in BLAS.
+   */
+  typedef int blas_int;
+#endif
+}
 
 /**
  * A namespace containing constants, exceptions, enumerations, and other
@@ -157,16 +171,16 @@ namespace LAPACKSupport
   /**
    * Integer constant.
    */
-  static const int zero = 0;
+  static const types::blas_int zero = 0;
   /**
    * Integer constant.
    */
-  static const int one = 1;
+  static const types::blas_int one = 1;
 
   /**
    * A LAPACK function returned an error code.
    */
-  DeclException2(ExcErrorCode, char *, int,
+  DeclException2(ExcErrorCode, char *, types::blas_int,
                  << "The function " << arg1 << " returned with an error code " << arg2);
 
   /**

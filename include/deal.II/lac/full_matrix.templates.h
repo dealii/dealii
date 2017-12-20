@@ -546,9 +546,9 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
         // transpose matrices, and read the result as if it were row-wise
         // again. In other words, we calculate (B^T A^T)^T, which is AB.
 
-        const int m = src.n();
-        const int n = this->m();
-        const int k = this->n();
+        const types::blas_int m = src.n();
+        const types::blas_int n = this->m();
+        const types::blas_int k = this->n();
         const char *notrans = "n";
 
         const number alpha = 1.;
@@ -616,9 +616,9 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
         // transpose matrices, and read the result as if it were row-wise
         // again. In other words, we calculate (B^T A)^T, which is A^T B.
 
-        const int m = src.n();
-        const int n = this->n();
-        const int k = this->m();
+        const types::blas_int m = src.n();
+        const types::blas_int n = this->n();
+        const types::blas_int k = this->m();
         const char *trans = "t";
         const char *notrans = "n";
 
@@ -706,9 +706,9 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
         // transpose matrices, and read the result as if it were row-wise
         // again. In other words, we calculate (B A^T)^T, which is AB^T.
 
-        const int m = src.m();
-        const int n = this->m();
-        const int k = this->n();
+        const types::blas_int m = src.m();
+        const types::blas_int n = this->m();
+        const types::blas_int k = this->n();
         const char *notrans = "n";
         const char *trans = "t";
 
@@ -794,9 +794,9 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
         // transpose matrices, and read the result as if it were row-wise
         // again. In other words, we calculate (B A)^T, which is A^T B^T.
 
-        const int m = src.m();
-        const int n = this->n();
-        const int k = this->m();
+        const types::blas_int m = src.m();
+        const types::blas_int n = this->n();
+        const types::blas_int k = this->m();
         const char *trans = "t";
 
         const number alpha = 1.;
@@ -1786,11 +1786,11 @@ FullMatrix<number>::gauss_jordan ()
         // we just got ((A^T)^{-1})^T, which is
         // A^{-1}.
 
-        const int nn = this->n();
+        const types::blas_int nn = this->n();
 
         // workspace for permutations
-        std::vector<int> ipiv(nn);
-        int info;
+        std::vector<types::blas_int> ipiv(nn);
+        types::blas_int info;
 
         // Use the LAPACK function getrf for
         // calculating the LU factorization.

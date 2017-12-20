@@ -31,6 +31,12 @@
 # We have to use a trick with CMAKE_PREFIX_PATH to make LAPACK_DIR and
 # BLAS_DIR work...
 #
+OPTION(LAPACK_WITH_64BIT_BLAS_INDICES
+  "BLAS has 64 bit integers."
+  OFF
+  )
+MARK_AS_ADVANCED(LAPACK_WITH_64BIT_BLAS_INDICES)
+
 SET(LAPACK_DIR "" CACHE PATH "An optional hint to a LAPACK installation")
 SET(BLAS_DIR "" CACHE PATH "An optional hint to a BLAS installation")
 SET_IF_EMPTY(BLAS_DIR "$ENV{BLAS_DIR}")

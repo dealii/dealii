@@ -371,11 +371,11 @@ namespace Utilities
 
       // Use Lapack dstev to get ||T||_2 norm, i.e. the largest eigenvalue
       // of T
-      const int n = k;
+      const types::blas_int n = k;
       std::vector<double> Z;    // unused for eigenvalues-only ("N") job
-      const int ldz = 1;        // ^^   (>=1)
+      const types::blas_int ldz = 1; // ^^   (>=1)
       std::vector<double> work; // ^^
-      int info;
+      types::blas_int info;
       // call lapack_templates.h wrapper:
       stev ("N", &n,
             diagonal.data(), subdiagonal.data(),
