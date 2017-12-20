@@ -193,8 +193,8 @@ public:
    * \mathbf A_{11} & \mathbf A_{12} \\
    * \mathbf A_{21} & \mathbf A_{22}
    * \end{array}
-   * \rightarrow \mathbf A_{11}
    * \right)
+   * \rightarrow \mathbf A_{11}
    * \f]
    */
   void grow_or_shrink (const size_type size);
