@@ -57,7 +57,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef types::global_dof_index size_type;
+  typedef unsigned int size_type;
 
   /**
    * Constructor. Initialize the matrix as a square matrix with dimension
@@ -238,14 +238,14 @@ public:
    *
    * @note The matrix is of dimension $m \times n$.
    */
-  unsigned int m () const;
+  size_type m () const;
 
   /**
    * Return the dimension of the domain space.
    *
    * @note The matrix is of dimension $m \times n$.
    */
-  unsigned int n () const;
+  size_type n () const;
 
   /**
    * Fill rectangular block.
@@ -880,7 +880,7 @@ private:
 
 template <typename number>
 inline
-unsigned int
+typename LAPACKFullMatrix<number>::size_type
 LAPACKFullMatrix<number>::m () const
 {
   return this->n_rows ();
@@ -888,7 +888,7 @@ LAPACKFullMatrix<number>::m () const
 
 template <typename number>
 inline
-unsigned int
+typename LAPACKFullMatrix<number>::size_type
 LAPACKFullMatrix<number>::n () const
 {
   return this->n_cols ();
