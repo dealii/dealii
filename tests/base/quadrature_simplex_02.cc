@@ -13,17 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-// construct a simplex simplex quadrature, and check that we can
-// get an affine transformation out of it.
+// construct a simplex quadrature, and check that we can get an affine
+// transformation out of it.
 
 
 #include "../tests.h"
-
 #include <deal.II/base/quadrature_lib.h>
-
 #include <numeric>
-
-using namespace dealii;
+#include "simplex.h"
 
 void test(int n)
 {
@@ -38,14 +35,7 @@ void test(int n)
                                                         quad.get_weights().end(),
                                                         0.0) << std::endl << std::endl;
 
-  std::array<Point<dim>, dim+1> v = {{
-      Point<2>(2,0),
-      Point<2>(5,4),
-      Point<2>(0,2)
-    }
-  };
-
-  auto quad2 = quad.affine_transformation(v);
+  auto quad2 = quad.compute_affine_transformation(get_simplex<dim>());
 
   for (auto p:quad2.get_points())
     deallog << p << std::endl;

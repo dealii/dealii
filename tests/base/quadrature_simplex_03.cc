@@ -13,20 +13,20 @@
 //
 // ---------------------------------------------------------------------
 
-// construct a simplex quadrature, and check that we can get an affine
-// transformation out of it.
+// construct an anisotropic simplex quadrature, and check that we can
+// get an affine transformation out of it.
+
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <numeric>
 #include "simplex.h"
 
-template<int dim>
 void test(int n)
 {
-  QSimplex<dim> quad(QIterated<dim>(QTrapez<1>(), n));
+  const unsigned int dim = 2;
 
-  deallog << "# dim = " << dim << std::endl;
+  QTrianglePolar quad(QGauss<1>(10), QGauss<1>(5));
 
   for (auto p:quad.get_points())
     deallog << p << std::endl;
@@ -35,7 +35,7 @@ void test(int n)
                                                         quad.get_weights().end(),
                                                         0.0) << std::endl << std::endl;
 
-  auto quad2 = quad.compute_affine_transformation(get_simplex<dim>());
+  auto quad2 = quad.compute_affine_transformation(get_simplex<2>());
 
   for (auto p:quad2.get_points())
     deallog << p << std::endl;
@@ -51,8 +51,5 @@ void test(int n)
 int main()
 {
   initlog();
-
-  test<1>(10);
-  test<2>(10);
-  test<3>(10);
+  test(10);
 }

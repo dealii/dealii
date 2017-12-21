@@ -649,12 +649,20 @@ private:
 
 /**
  * Given an arbitrary quadrature formula, return one that chops the quadrature
- * points above the principal diagonals.
+ * points above the hyper-plane defined by $\sum_i x_i = 1$). In other words,
+ * it extracts those quadrature points from the base formula that satisfy
+ * $\sum_i (\mathbf x_q)_i \le 1$."
  *
  * In general the resulting quadrature is not very useful, unless the
  * quadrature you started from has been constructed specifically to integrate
  * over triangles or tetrahedra. This class ensures that the resulting
- * quadrature formula only has quadrature points in the reference simplex.
+ * quadrature formula only has quadrature points in the reference simplex or on
+ * its boundary.
+ *
+ * No transformation is applied to the weights. The weights referring to points
+ * that live outside the reference simplex are simply discarded. If you chop a
+ * quadrature formula that is good for both the lower and upper triangles
+ * separately, then the weights should add up to 1/2.
  *
  * @author Luca Heltai, 2017.
  */
@@ -677,10 +685,22 @@ public:
    * Both the quadrature point locations and the weights are transformed, so that you
    * can effectively use the resulting quadrature to integrate on the simplex.
    *
+   * The transformation is defined as
+   * \f[
+   * x = v_0 + B \hat x
+   * \f]
+   * where the matrix $B$ is given by $B_{ij} = v[j][i]-v[0][i]$.
+   *
+   * The weights are scaled with the determinant of $B$. An assertion is thrown
+   * if the ordering of the vertices is such that the determinant of $B$ is
+   * negative (this means you attempted to construct a simplex with a negative
+   * area).
+   *
    * @param[in] vertices The vertices of the simplex you wish to integrate on
    * @return A quadrature object that can be used to integrate on the simplex
    */
-  Quadrature<dim> affine_transformation(const std::array<Point<dim>, dim+1> &vertices);
+  Quadrature<dim>
+  compute_affine_transformation(const std::array<Point<dim>, dim+1> &vertices) const;
 
 };
 

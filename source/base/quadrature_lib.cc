@@ -1358,7 +1358,7 @@ QSimplex<dim>::QSimplex(const Quadrature<dim> &quad)
       double r=0;
       for (unsigned int d=0; d<dim; ++d)
         r += quad.point(i)[d];
-      if ((r-1) <= 0)
+      if (r <= 1)
         {
           this->quadrature_points.push_back(quad.point(i));
           this->weights.push_back(quad.weight(i));
@@ -1370,7 +1370,7 @@ QSimplex<dim>::QSimplex(const Quadrature<dim> &quad)
 
 template<int dim>
 Quadrature<dim>
-QSimplex<dim>::affine_transformation(const std::array<Point<dim>, dim+1>& vertices)
+QSimplex<dim>::compute_affine_transformation(const std::array<Point<dim>, dim+1>& vertices) const
 {
   std::vector<Point<dim> > qp(this->size());
   std::vector<double> w(this->size());
@@ -1384,13 +1384,14 @@ QSimplex<dim>::affine_transformation(const std::array<Point<dim>, dim+1>& vertic
   auto J = determinant(B);
 
   AssertThrow(J>0, ExcMessage("The provided vertices generate an inverted Simplex."
-                              " Make sure the vertices are oriented lexicographically."))
+                              " Make sure the vertices are oriented correctly."))
 
   for (unsigned int i=0; i<this->size(); ++i)
     {
       qp[i] = Point<dim>(vertices[0]+B*this->point(i));
       w[i] = J*this->weight(i);
     }
+
   return Quadrature<dim>(qp, w);
 }
 
