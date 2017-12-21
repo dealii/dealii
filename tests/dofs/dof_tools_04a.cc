@@ -14,11 +14,11 @@
 // ---------------------------------------------------------------------
 
 
-// The same as dof_tools_04 but for a parallel::distributed::parallel::distributed::Triangulation
-// instead of a parallel::distributed::Triangulation:
+// Similar to dof_tools_04 but for a parallel::distributed::Triangulation
+// instead of a (serial) Triangulation:
 // check
 //   DoFTools::extract_hanging_node_constraints
-// uses a slightly different refinement and less different FiniteElements
+// using a slightly different refinement and less different FiniteElements
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -44,72 +44,27 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-  types::global_dof_index n_dofs = dof_handler.n_dofs();
+  const types::global_dof_index n_dofs = dof_handler.n_dofs();
+
+  IndexSet locally_relevant_dofs;
+  DoFTools::extract_locally_relevant_dofs (dof_handler, locally_relevant_dofs);
 
   std::vector<bool> is_hanging_node_constrained (n_dofs);
   DoFTools::extract_hanging_node_dofs (dof_handler,
                                        is_hanging_node_constrained);
 
-  MappingQGeneric<dim> mapping(1);
-  std::map< types::global_dof_index, Point< dim > > support_point_of_dof;
-  DoFTools::map_dofs_to_support_points (mapping, dof_handler, support_point_of_dof);
+  ConstraintMatrix constraints (locally_relevant_dofs);
+  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+  constraints.close();
 
-  std::vector<Point<dim>> constrained_points;
+  for (const auto &dof : locally_relevant_dofs)
+    if (is_hanging_node_constrained[dof])
+      AssertThrow(constraints.is_constrained(dof), ExcInternalError());
 
-  for (const auto &pair : support_point_of_dof)
-    if (is_hanging_node_constrained[pair.first])
-      constrained_points.push_back(pair.second);
+  AssertThrow (std::count(is_hanging_node_constrained.begin(), is_hanging_node_constrained.end(), true)
+               == constraints.n_constraints(), ExcInternalError());
 
-  const int root = 0;
-  const int mylen = constrained_points.size()*dim;
-  const unsigned int n_processes = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-  const unsigned int my_id = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-  std::vector<int> recvcounts (n_processes);
-
-  MPI_Gather(&mylen, 1, MPI_INT, recvcounts.data(), 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-  int totlen = 0;
-  std::vector<int> displs;
-  std::vector<Point<dim>> all_points;
-
-  if (my_id==0)
-    {
-      displs.resize(n_processes);
-
-      displs[0] = 0;
-      totlen += recvcounts[0];
-
-      for (unsigned int i=1; i<n_processes; i++)
-        {
-          totlen += recvcounts[i];
-          displs[i] = displs[i-1] + recvcounts[i-1];
-        }
-
-      all_points.resize(totlen/dim);
-    }
-
-  MPI_Gatherv(constrained_points.data(), mylen, MPI_DOUBLE,
-              all_points.data(), recvcounts.data(), displs.data(), MPI_DOUBLE,
-              0, MPI_COMM_WORLD);
-
-  std::sort(all_points.begin(), all_points.end(),
-            [](const Point<dim> &a, const Point<dim> &b)
-  {
-    for (unsigned int i=0; i<dim; ++i)
-      {
-        if (a(i) < b(i))
-          return true;
-        if (a(i) > b(i))
-          return false;
-      }
-    return false;
-  });
-  all_points.erase(std::unique(all_points.begin(), all_points.end()), all_points.end());
-
-  deallog << all_points.size() << std::endl;
-  for (const auto &point: all_points)
-    deallog << point << std::endl;
-  deallog << std::endl;
+  deallog << "OK" << std::endl;
 }
 
 
@@ -137,6 +92,7 @@ check (const FiniteElement<dim> &fe,
           cell->set_refine_flag();
       tria.execute_coarsening_and_refinement ();
     }
+
   DoFHandler<dim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
 
@@ -157,6 +113,7 @@ int main (int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   mpi_initlog();
   CHECK_ALL(Q,1);
+
   CHECK_ALL(Q,2);
 
   return 0;

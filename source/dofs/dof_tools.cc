@@ -890,7 +890,7 @@ namespace DoFTools
         // this function is similar to the make_sparsity_pattern function,
         // see there for more information
         for (auto cell : dof_handler.active_cell_iterators())
-          if (cell->is_locally_owned())
+          if (!cell->is_artificial())
             {
               for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
                 if (cell->face(face)->has_children())
@@ -902,8 +902,12 @@ namespace DoFTools
                       selected_dofs.add_index(line->child(0)->vertex_dof_index(1,dof));
 
                     for (unsigned int child=0; child<2; ++child)
-                      for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-                        selected_dofs.add_index(line->child(child)->dof_index(dof));
+                      {
+                        if (cell->neighbor_child_on_subface (face, child)->is_artificial())
+                          continue;
+                        for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
+                          selected_dofs.add_index(line->child(child)->dof_index(dof));
+                      }
                   }
             }
 
@@ -918,52 +922,35 @@ namespace DoFTools
         const unsigned int dim = 3;
 
         IndexSet selected_dofs (dof_handler.n_dofs());
+        IndexSet unconstrained_dofs (dof_handler.n_dofs());
 
         const FiniteElement<dim,spacedim> &fe = dof_handler.get_fe();
 
-        // this function is similar to the make_sparsity_pattern function,
-        // see there for more information
         for (auto cell : dof_handler.active_cell_iterators())
-          if (cell->is_locally_owned())
+          if (!cell->is_artificial())
             for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
-              if (cell->face(f)->has_children())
-                {
-                  const typename dealii::DoFHandler<dim,spacedim>::face_iterator
-                  face = cell->face(f);
+              {
+                const typename dealii::DoFHandler<dim,spacedim>::face_iterator
+                face = cell->face(f);
+                if (cell->face(f)->has_children())
+                  {
+                    for (unsigned int child=0; child<4; ++child)
+                      if (!cell->neighbor_child_on_subface (f, child)->is_artificial())
+                        {
+                          // simply take all DoFs that live on this subface
+                          std::vector<types::global_dof_index> ldi(fe.dofs_per_face);
+                          face->child(child)->get_dof_indices(ldi);
+                          selected_dofs.add_indices(ldi.begin(), ldi.end());
+                        }
 
-                  for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                    selected_dofs.add_index(face->child(0)->vertex_dof_index(2,dof));
-
-                  // dof numbers on the centers of the lines bounding this
-                  // face
-                  for (unsigned int line=0; line<4; ++line)
-                    for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
-                      selected_dofs.add_index(face->line(line)->child(0)->vertex_dof_index(1,dof));
-
-                  // next the dofs on the lines interior to the face; the
-                  // order of these lines is laid down in the FiniteElement
-                  // class documentation
-                  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                    selected_dofs.add_index(face->child(0)->line(1)->dof_index(dof));
-                  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                    selected_dofs.add_index(face->child(1)->line(2)->dof_index(dof));
-                  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                    selected_dofs.add_index(face->child(2)->line(3)->dof_index(dof));
-                  for (unsigned int dof=0; dof<fe.dofs_per_line; ++dof)
-                    selected_dofs.add_index(face->child(3)->line(0)->dof_index(dof));
-
-                  // dofs on the bordering lines
-                  for (unsigned int line=0; line<4; ++line)
-                    for (unsigned int child=0; child<2; ++child)
-                      for (unsigned int dof=0; dof!=fe.dofs_per_line; ++dof)
-                        selected_dofs.add_index(face->line(line)->child(child)->dof_index(dof));
-
-                  // finally, for the dofs interior to the four child faces
-                  for (unsigned int child=0; child<4; ++child)
-                    for (unsigned int dof=0; dof!=fe.dofs_per_quad; ++dof)
-                      selected_dofs.add_index(face->child(child)->dof_index(dof));
-                }
-        selected_dofs.compress();
+                    // and subtract (in the end) all the indices which a shared
+                    // between this face and its subfaces
+                    for (unsigned int vertex=0; vertex<4; ++vertex)
+                      for (unsigned int dof=0; dof!=fe.dofs_per_vertex; ++dof)
+                        unconstrained_dofs.add_index(face->vertex_dof_index(vertex,dof));
+                  }
+              }
+        selected_dofs.subtract_set(unconstrained_dofs);
         return selected_dofs;
       }
     }

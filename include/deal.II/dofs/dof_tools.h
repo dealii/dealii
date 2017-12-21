@@ -1249,9 +1249,13 @@ namespace DoFTools
    * The size of @p selected_dofs shall equal <tt>dof_handler.n_dofs()</tt>.
    * Previous contents of this array or overwritten.
    *
-   * In case of a parallel::shared::Triangualtion or a
-   * parallel::distributed::Triangulation only dofs belonging to locally owned
-   * cells are reported.
+   * In case of a parallel::shared::Triangulation or a
+   * parallel::distributed::Triangulation only locally relevant dofs are
+   * considered. Note that the vector returned through the second argument still
+   * has size <tt>dof_handler.n_dofs()</tt>. Consequently, it can be very large
+   * for large parallel computations -- in fact, it may be too large to store on
+   * each processor. In that case, you may want to choose the variant of this
+   * function that returns an IndexSet object.
    */
   template <int dim, int spacedim>
   void
