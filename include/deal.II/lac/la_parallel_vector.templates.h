@@ -1218,14 +1218,23 @@ namespace LinearAlgebra
 
     template <typename Number>
     typename Vector<Number>::real_type
-    Vector<Number>::l2_norm () const
+    Vector<Number>::norm_sqr () const
     {
       real_type local_result = norm_sqr_local();
       if (partitioner->n_mpi_processes() > 1)
-        return std::sqrt(Utilities::MPI::sum(local_result,
-                                             partitioner->get_mpi_communicator()));
+        return Utilities::MPI::sum(local_result,
+                                   partitioner->get_mpi_communicator());
       else
-        return std::sqrt(local_result);
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    typename Vector<Number>::real_type
+    Vector<Number>::l2_norm () const
+    {
+      return std::sqrt(norm_sqr());
     }
 
 

@@ -617,7 +617,7 @@ namespace LinearAlgebra
     template <typename Number>
     inline
     typename BlockVector<Number>::real_type
-    BlockVector<Number>::l2_norm () const
+    BlockVector<Number>::norm_sqr () const
     {
       Assert (this->n_blocks() > 0, ExcEmptyObject());
 
@@ -626,10 +626,20 @@ namespace LinearAlgebra
         local_result += this->block(i).norm_sqr_local();
 
       if (this->block(0).partitioner->n_mpi_processes() > 1)
-        return std::sqrt(Utilities::MPI::sum (local_result,
-                                              this->block(0).partitioner->get_communicator()));
+        return Utilities::MPI::sum (local_result,
+                                    this->block(0).partitioner->get_communicator());
       else
-        return std::sqrt(local_result);
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename BlockVector<Number>::real_type
+    BlockVector<Number>::l2_norm () const
+    {
+      return std::sqrt(norm_sqr());
     }
 
 

@@ -524,6 +524,11 @@ namespace LinearAlgebra
       virtual real_type l2_norm() const override;
 
       /**
+       * Return square of the l<sub>2</sub> norm of the vector.
+       */
+      real_type norm_sqr() const;
+
+      /**
        * Return the maximum norm of the vector (i.e., the maximum absolute value
        * among all entries and among all processors).
        */
