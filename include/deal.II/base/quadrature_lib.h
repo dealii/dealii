@@ -691,10 +691,11 @@ public:
    * \f]
    * where the matrix $B$ is given by $B_{ij} = v[j][i]-v[0][i]$.
    *
-   * The weights are scaled with the determinant of $B$. An assertion is thrown
-   * if the ordering of the vertices is such that the determinant of $B$ is
-   * negative (this means you attempted to construct a simplex with a negative
-   * area).
+   * The weights are scaled with the absolute value of the determinant of $B$,
+   * that is $J := |\text{det}(B)|$. If $J$ is zero, an empty quadrature is
+   * returned. This may happen, in two dimensions, if the three vertices are
+   * aligned, or in three dimensions if the four vertices are on the same
+   * plane.
    *
    * @param[in] vertices The vertices of the simplex you wish to integrate on
    * @return A quadrature object that can be used to integrate on the simplex

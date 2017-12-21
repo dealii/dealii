@@ -1372,19 +1372,20 @@ template<int dim>
 Quadrature<dim>
 QSimplex<dim>::compute_affine_transformation(const std::array<Point<dim>, dim+1>& vertices) const
 {
-  std::vector<Point<dim> > qp(this->size());
-  std::vector<double> w(this->size());
-
   unsigned int i=0;
   Tensor<2,dim> B;
   for (unsigned int d=0; d<dim; ++d)
     B[d] = vertices[d+1]-vertices[0];
 
   B = transpose(B);
-  auto J = determinant(B);
+  auto J = std::abs(determinant(B));
 
-  AssertThrow(J>0, ExcMessage("The provided vertices generate an inverted Simplex."
-                              " Make sure the vertices are oriented correctly."))
+  // if the determinant is zero, we return an empty quadrature
+  if (J < 1e-12)
+    return Quadrature<dim>();
+
+  std::vector<Point<dim> > qp(this->size());
+  std::vector<double> w(this->size());
 
   for (unsigned int i=0; i<this->size(); ++i)
     {
