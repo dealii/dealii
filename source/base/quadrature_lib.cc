@@ -1434,6 +1434,46 @@ QTrianglePolar::QTrianglePolar(const unsigned int &n)
 
 
 
+template<int dim>
+QSplit<dim>::QSplit(const QSimplex<dim> &base,
+                    const Point<dim> &split_point)
+{
+
+  std::array<Point<dim>, dim+1> vertices;
+  vertices[0] = split_point;
+  switch (dim)
+    {
+    case 3:
+      Assert(false, ExcNotImplemented());
+      break;
+    default:
+    {
+      for (unsigned int f=0; f< GeometryInfo<dim>::faces_per_cell; ++f)
+        {
+          for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
+            vertices[i+1] =
+              GeometryInfo<dim>::unit_cell_vertex(
+                GeometryInfo<dim>::face_to_cell_vertices(f, i)
+              );
+          auto quad = base.compute_affine_transformation(vertices);
+          if (quad.size())
+            {
+              this->quadrature_points.insert(
+                this->quadrature_points.end(),
+                quad.get_points().begin(),
+                quad.get_points().end());
+              this->weights.insert(
+                this->weights.end(),
+                quad.get_weights().begin(),
+                quad.get_weights().end());
+            }
+        }
+    }
+    }
+}
+
+
+
 // explicit specialization
 // note that 1d formulae are specialized by implementation above
 template class QGauss<2>;
@@ -1475,5 +1515,9 @@ template class QGaussLobattoChebyshev<3>;
 template class QSimplex<1>;
 template class QSimplex<2>;
 template class QSimplex<3>;
+
+template class QSplit<1>;
+template class QSplit<2>;
+template class QSplit<3>;
 
 DEAL_II_NAMESPACE_CLOSE

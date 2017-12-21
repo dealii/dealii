@@ -746,6 +746,43 @@ public:
   QTrianglePolar(const unsigned int &n);
 };
 
+/**
+ * A quadrature to use when the cell should be split in subregions to integrate
+ * using one or more base quadratures.
+ *
+ * @author Luca Heltai, 2017.
+ */
+template<int dim>
+class QSplit : public Quadrature<dim>
+{
+public:
+  /**
+   * Construct a quadrature formula by splitting the reference hyper cube into
+   * the minimum number of simplices that have vertex zero coinciding with
+   * `split_point`, and patch together affine transformations of the `base`
+   * quadrature.
+   *
+   * The resulting quadrature can be used, for example, to integrate functions
+   * with integrable singularities at the split point, provided that you select
+   * as base quadrature one that can integrate singular points on vertex zero
+   * of the reference simplex.
+   *
+   * An example usage in dimension two is given by:
+   * @code
+   * const unsigned int order = 5;
+   * QSplit<2> quad(QTrianglePolar(order), Point<2>(.3,.4));
+   * @endcode
+   *
+   * The resulting quadrature will look like the following:
+   * @image html split_quadrature.png ""
+   *
+   * @param base Base QSimplex quadrature to use
+   * @param split_point Where to split the hyper cube
+   */
+  QSplit(const QSimplex<dim> &base,
+         const Point<dim> &split_point);
+};
+
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
