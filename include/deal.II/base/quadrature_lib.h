@@ -649,7 +649,7 @@ private:
 
 /**
  * Given an arbitrary quadrature formula, return one that chops the quadrature
- * points above the hyper-plane defined by $\sum_i x_i = 1$). In other words,
+ * points above the hyper-plane defined by $\sum_i x_i = 1$. In other words,
  * it extracts those quadrature points from the base formula that satisfy
  * $\sum_i (\mathbf x_q)_i \le 1$."
  *

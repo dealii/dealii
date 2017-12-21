@@ -1438,38 +1438,34 @@ template<int dim>
 QSplit<dim>::QSplit(const QSimplex<dim> &base,
                     const Point<dim> &split_point)
 {
-
   std::array<Point<dim>, dim+1> vertices;
   vertices[0] = split_point;
-  switch (dim)
-    {
-    case 3:
-      Assert(false, ExcNotImplemented());
-      break;
-    default:
-    {
-      for (unsigned int f=0; f< GeometryInfo<dim>::faces_per_cell; ++f)
-        {
-          for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_face; ++i)
-            vertices[i+1] =
-              GeometryInfo<dim>::unit_cell_vertex(
-                GeometryInfo<dim>::face_to_cell_vertices(f, i)
-              );
-          auto quad = base.compute_affine_transformation(vertices);
-          if (quad.size())
-            {
-              this->quadrature_points.insert(
-                this->quadrature_points.end(),
-                quad.get_points().begin(),
-                quad.get_points().end());
-              this->weights.insert(
-                this->weights.end(),
-                quad.get_weights().begin(),
-                quad.get_weights().end());
-            }
-        }
-    }
-    }
+
+  // Make a simplex from the split_point and the first dim vertices of each
+  // face. In dimension three, we need to split the face in two triangles, so
+  // we use once the first dim vertices of each face, and the second time the
+  // the dim vertices of each face starting from 1.
+  for (unsigned int f=0; f< GeometryInfo<dim>::faces_per_cell; ++f)
+    for (unsigned int start=0; start < (dim >2 ? 2 : 1); ++start)
+      {
+        for (unsigned int i=0; i<dim; ++i)
+          vertices[i+1] =
+            GeometryInfo<dim>::unit_cell_vertex(
+              GeometryInfo<dim>::face_to_cell_vertices(f, i+start)
+            );
+        auto quad = base.compute_affine_transformation(vertices);
+        if (quad.size())
+          {
+            this->quadrature_points.insert(
+              this->quadrature_points.end(),
+              quad.get_points().begin(),
+              quad.get_points().end());
+            this->weights.insert(
+              this->weights.end(),
+              quad.get_weights().begin(),
+              quad.get_weights().end());
+          }
+      }
 }
 
 
