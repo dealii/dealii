@@ -427,7 +427,7 @@ public:
   Number operator * (const Vector<Number2> &V) const;
 
   /**
-   * Return square of the $l_2$-norm.
+   * Return the square of the $l_2$-norm.
    *
    * @dealiiOperationIsMultithreaded The algorithm uses pairwise summation
    * with the same order of summation in every run, which gives fully
