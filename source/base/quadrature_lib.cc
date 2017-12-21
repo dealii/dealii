@@ -1383,6 +1383,9 @@ QSimplex<dim>::affine_transformation(const std::array<Point<dim>, dim+1>& vertic
   B = transpose(B);
   auto J = determinant(B);
 
+  AssertThrow(J>0, ExcMessage("The provided vertices generate an inverted Simplex."
+                              " Make sure the vertices are oriented lexicographically."))
+
   for (unsigned int i=0; i<this->size(); ++i)
     {
       qp[i] = Point<dim>(vertices[0]+B*this->point(i));
@@ -1390,6 +1393,42 @@ QSimplex<dim>::affine_transformation(const std::array<Point<dim>, dim+1>& vertic
     }
   return Quadrature<dim>(qp, w);
 }
+
+
+
+QTrianglePolar::QTrianglePolar(const Quadrature<1> &radial_quadrature,
+                               const Quadrature<1> &angular_quadrature) :
+  QSimplex<2>(Quadrature<2>())
+{
+  QAnisotropic<2> base(radial_quadrature, angular_quadrature);
+  this->quadrature_points.resize(base.size());
+  this->weights.resize(base.size());
+  for (unsigned int i=0; i<base.size(); ++i)
+    {
+      const auto &q = base.point(i);
+      const auto &w = base.weight(i);
+
+      const auto &xhat = q[0];
+      const auto &yhat = q[1];
+
+      const double t = numbers::PI_2*yhat;
+      const double &pi = numbers::PI;
+      const double st = std::sin(t);
+      const double ct = std::cos(t);
+      const double r = xhat/(st+ct);
+
+      const double J = pi*xhat/(2*(std::sin(pi*yhat) + 1));
+
+      this->quadrature_points[i] = Point<2>(r*ct, r*st);
+      this->weights[i] = w*J;
+    }
+}
+
+
+
+QTrianglePolar::QTrianglePolar(const unsigned int &n)
+  :QTrianglePolar(QGauss<1>(n),QGauss<1>(n))
+{}
 
 
 

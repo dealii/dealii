@@ -684,6 +684,47 @@ public:
 
 };
 
+/**
+ * A two dimensional simplex quadrature with zero Jacobian on vertex zero. The
+ * quadrature is obtained through the following polar transformation:
+ *
+ * \f[
+ *  \begin{pmatrix}
+ *  x \\
+ *  y
+ *  \end{pmatrix}
+ *  =
+ * \begin{pmatrix}
+ *  \frac{\hat x}{\sin(\theta)+\cos(\theta)} cos(\theta) \\
+ *  \frac{\hat x}{\sin(\theta)+\cos(\theta)} sin(\theta)
+ *  \end{pmatrix}
+ *  \qquad \theta := \frac\pi 2 \hat y
+ * \f]
+ *
+ * @author Luca Heltai, 2017
+ */
+class  QTrianglePolar: public QSimplex<2>
+{
+public:
+  /**
+   * Construct a QTrianglePolar quadrature, with different formulas in the
+   * radial and angular directions.
+   *
+   * @param radial_quadrature Radial quadrature
+   * @param angular_quadrature Angular quadrature
+   */
+  QTrianglePolar(const Quadrature<1> &radial_quadrature,
+                 const Quadrature<1> &angular_quadrature);
+
+  /**
+   * Call the other constructor, with QGauss<1>(n) for both radial and
+   * angular quadrature.
+   *
+   * @param n Order of QGauss quadrature
+   */
+  QTrianglePolar(const unsigned int &n);
+};
+
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */
