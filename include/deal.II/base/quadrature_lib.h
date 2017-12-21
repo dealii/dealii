@@ -747,6 +747,65 @@ public:
 };
 
 /**
+ * A quadrature that implements the Duffy transformation from a square to a
+ * triangle to integrate singularities in the origin of the reference
+ * simplex.
+ *
+ * The Duffy transformation is defined as
+ * \f[
+ * \begin{pmatrix}
+ * x\\
+ * y
+ * \end{pmatrix}
+ * =
+ * \begin{pmatrix}
+ * \hat x^\beta (1-\hat y)\\
+ * \hat x^\beta \hat y
+ * end{pmatrix}
+ * \f]
+ * with determinant of the Jacobian equal to $J= \beta \hat \x^{2\beta-1}$.
+ * Such transformation maps the reference square \$[0,1]\times[0,1]$ to the
+ * reference simplex, by collapsing the left \side of the square and
+ * squeezing quadrature points towards the orgin, and then shearing the
+ * resulting triangle to the reference one. This transformation, allows
+ * one to integrate singularities of order $1/R$ in the origin when $\beta =
+ * 1$, and higher when $1 < \beta \leq 2$.
+ *
+ * When $\beta = 1$, this transformation is also known as the Lachat-Watson
+ * transformation.
+ *
+ * @author Luca Heltai, Nicola Giuliani, 2017.
+ */
+class  QDuffy: public QSimplex<2>
+{
+public:
+  /**
+   * Constructor that allows the specificatino of different quadrature rules
+   * along the "radial" and "angular" directions.
+   *
+   * Since this quadrature is not based on a Polar change of coordinates, it
+   * is not fully proper to talk about radial and angular directions. However,
+   * the effect of the Duffy transformation is similar to a polar change
+   * of coordinates, since the resulting quadrature points are aligned radially
+   * with respect to the singularity.
+   *
+   * @param radial_quadrature Base quadrature to use in the radial direction
+   * @param angular_quadrature Base quadrature to use in the angular direction
+   */
+  QDuffy(const Quadrature<1> &radial_quadrature,
+         const Quadrature<1> &angular_quadrature,
+         const double &beta = 1.0);
+
+  /**
+   * Calls the above constructor with QGauss<1>(n) quadrature formulas for
+   * both the radial and angular quadratures.
+   *
+   * @param n
+   */
+  QDuffy(const unsigned int &n, const double &beta);
+};
+
+/**
  * A quadrature to use when the cell should be split in subregions to integrate
  * using one or more base quadratures.
  *

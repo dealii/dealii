@@ -1,0 +1,222 @@
+
+DEAL::
+DEAL::Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]
+DEAL::for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being
+DEAL::the distance from (x,y) to [0.5,0.5].
+DEAL::
+DEAL::======= f(x,y) = x^0 y^0
+DEAL::Order[1], QTrianglePolar error = -0.383902       QLachatWatson error  = 0.474506
+DEAL::Order[2], QTrianglePolar error = -0.0307244      QLachatWatson error  = -0.0613927
+DEAL::Order[3], QTrianglePolar error = -0.00229163     QLachatWatson error  = 0.00910435
+DEAL::Order[4], QTrianglePolar error = -0.000167737    QLachatWatson error  = -0.00138599
+DEAL::Order[5], QTrianglePolar error = -1.21893e-05    QLachatWatson error  = 0.000216242
+DEAL::======= f(x,y) = x^0 y^1
+DEAL::Order[1], QTrianglePolar error = -0.191951       QLachatWatson error  = 0.237253
+DEAL::Order[2], QTrianglePolar error = -0.0153622      QLachatWatson error  = -0.0306964
+DEAL::Order[3], QTrianglePolar error = -0.00114581     QLachatWatson error  = 0.00455218
+DEAL::Order[4], QTrianglePolar error = -8.38636e-05    QLachatWatson error  = -0.000692990
+DEAL::Order[5], QTrianglePolar error = -6.08965e-06    QLachatWatson error  = 0.000108126
+DEAL::======= f(x,y) = x^0 y^2
+DEAL::Order[1], QTrianglePolar error = -0.189100       QLachatWatson error  = 0.0523275
+DEAL::Order[2], QTrianglePolar error = -0.0187842      QLachatWatson error  = -0.0141970
+DEAL::Order[3], QTrianglePolar error = -0.00208103     QLachatWatson error  = 0.00217262
+DEAL::Order[4], QTrianglePolar error = -0.000217194    QLachatWatson error  = -0.000335146
+DEAL::Order[5], QTrianglePolar error = -2.15931e-05    QLachatWatson error  = 5.26723e-05
+DEAL::======= f(x,y) = x^0 y^3
+DEAL::Order[1], QTrianglePolar error = -0.187674       QLachatWatson error  = -0.0401352
+DEAL::Order[2], QTrianglePolar error = -0.0204952      QLachatWatson error  = -0.00594735
+DEAL::Order[3], QTrianglePolar error = -0.00254864     QLachatWatson error  = 0.000982854
+DEAL::Order[4], QTrianglePolar error = -0.000283851    QLachatWatson error  = -0.000156216
+DEAL::Order[5], QTrianglePolar error = -2.93368e-05    QLachatWatson error  = 2.49534e-05
+DEAL::======= f(x,y) = x^0 y^4
+DEAL::Order[1], QTrianglePolar error = -0.183422       QLachatWatson error  = -0.0878571
+DEAL::Order[2], QTrianglePolar error = -0.0220195      QLachatWatson error  = -0.00460007
+DEAL::Order[3], QTrianglePolar error = -0.00313498     QLachatWatson error  = 0.000580121
+DEAL::Order[4], QTrianglePolar error = -0.000409087    QLachatWatson error  = -9.17447e-05
+DEAL::Order[5], QTrianglePolar error = -4.93578e-05    QLachatWatson error  = 1.46809e-05
+DEAL::======= f(x,y) = x^0 y^5
+DEAL::Order[1], QTrianglePolar error = 0.236233        QLachatWatson error  = 0.300781
+DEAL::Order[2], QTrianglePolar error = 0.390539        QLachatWatson error  = 0.407286
+DEAL::Order[3], QTrianglePolar error = 0.410209        QLachatWatson error  = 0.414561
+DEAL::Order[4], QTrianglePolar error = 0.413426        QLachatWatson error  = 0.413905
+DEAL::Order[5], QTrianglePolar error = 0.413914        QLachatWatson error  = 0.414003
+DEAL::======= f(x,y) = x^1 y^0
+DEAL::Order[1], QTrianglePolar error = -0.191951       QLachatWatson error  = 0.237253
+DEAL::Order[2], QTrianglePolar error = -0.0153622      QLachatWatson error  = -0.0306964
+DEAL::Order[3], QTrianglePolar error = -0.00114581     QLachatWatson error  = 0.00455218
+DEAL::Order[4], QTrianglePolar error = -8.38636e-05    QLachatWatson error  = -0.000692990
+DEAL::Order[5], QTrianglePolar error = -6.08965e-06    QLachatWatson error  = 0.000108126
+DEAL::======= f(x,y) = x^1 y^1
+DEAL::Order[1], QTrianglePolar error = -0.0959754      QLachatWatson error  = 0.118626
+DEAL::Order[2], QTrianglePolar error = -0.00768110     QLachatWatson error  = -0.0153482
+DEAL::Order[3], QTrianglePolar error = -0.000572906    QLachatWatson error  = 0.00227609
+DEAL::Order[4], QTrianglePolar error = -4.19338e-05    QLachatWatson error  = -0.000346497
+DEAL::Order[5], QTrianglePolar error = -3.04683e-06    QLachatWatson error  = 5.40610e-05
+DEAL::======= f(x,y) = x^1 y^2
+DEAL::Order[1], QTrianglePolar error = -0.0945498      QLachatWatson error  = 0.0261637
+DEAL::Order[2], QTrianglePolar error = -0.00939208     QLachatWatson error  = -0.00709851
+DEAL::Order[3], QTrianglePolar error = -0.00104052     QLachatWatson error  = 0.00108631
+DEAL::Order[4], QTrianglePolar error = -0.000108595    QLachatWatson error  = -0.000167571
+DEAL::Order[5], QTrianglePolar error = -1.07945e-05    QLachatWatson error  = 2.63381e-05
+DEAL::======= f(x,y) = x^1 y^3
+DEAL::Order[1], QTrianglePolar error = -0.0938370      QLachatWatson error  = -0.0200676
+DEAL::Order[2], QTrianglePolar error = -0.0102476      QLachatWatson error  = -0.00297368
+DEAL::Order[3], QTrianglePolar error = -0.00127432     QLachatWatson error  = 0.000491426
+DEAL::Order[4], QTrianglePolar error = -0.000141926    QLachatWatson error  = -7.81084e-05
+DEAL::Order[5], QTrianglePolar error = -1.46689e-05    QLachatWatson error  = 1.24762e-05
+DEAL::======= f(x,y) = x^1 y^4
+DEAL::Order[1], QTrianglePolar error = -0.0917110      QLachatWatson error  = -0.0439285
+DEAL::Order[2], QTrianglePolar error = -0.0110098      QLachatWatson error  = -0.00230004
+DEAL::Order[3], QTrianglePolar error = -0.00156749     QLachatWatson error  = 0.000290061
+DEAL::Order[4], QTrianglePolar error = -0.000204544    QLachatWatson error  = -4.58724e-05
+DEAL::Order[5], QTrianglePolar error = -2.46789e-05    QLachatWatson error  = 7.34044e-06
+DEAL::======= f(x,y) = x^1 y^5
+DEAL::Order[1], QTrianglePolar error = 0.118117        QLachatWatson error  = 0.150391
+DEAL::Order[2], QTrianglePolar error = 0.195270        QLachatWatson error  = 0.203643
+DEAL::Order[3], QTrianglePolar error = 0.205105        QLachatWatson error  = 0.207280
+DEAL::Order[4], QTrianglePolar error = 0.206713        QLachatWatson error  = 0.206953
+DEAL::Order[5], QTrianglePolar error = 0.206957        QLachatWatson error  = 0.207001
+DEAL::======= f(x,y) = x^2 y^0
+DEAL::Order[1], QTrianglePolar error = -0.189100       QLachatWatson error  = 0.0523275
+DEAL::Order[2], QTrianglePolar error = -0.0187842      QLachatWatson error  = -0.0141970
+DEAL::Order[3], QTrianglePolar error = -0.00208103     QLachatWatson error  = 0.00217262
+DEAL::Order[4], QTrianglePolar error = -0.000217194    QLachatWatson error  = -0.000335146
+DEAL::Order[5], QTrianglePolar error = -2.15931e-05    QLachatWatson error  = 5.26723e-05
+DEAL::======= f(x,y) = x^2 y^1
+DEAL::Order[1], QTrianglePolar error = -0.0945498      QLachatWatson error  = 0.0261637
+DEAL::Order[2], QTrianglePolar error = -0.00939208     QLachatWatson error  = -0.00709851
+DEAL::Order[3], QTrianglePolar error = -0.00104052     QLachatWatson error  = 0.00108631
+DEAL::Order[4], QTrianglePolar error = -0.000108595    QLachatWatson error  = -0.000167571
+DEAL::Order[5], QTrianglePolar error = -1.07945e-05    QLachatWatson error  = 2.63381e-05
+DEAL::======= f(x,y) = x^2 y^2
+DEAL::Order[1], QTrianglePolar error = -0.0838769      QLachatWatson error  = -0.0168139
+DEAL::Order[2], QTrianglePolar error = -0.0107068      QLachatWatson error  = -0.00254965
+DEAL::Order[3], QTrianglePolar error = -0.00132108     QLachatWatson error  = 0.000372449
+DEAL::Order[4], QTrianglePolar error = -0.000148592    QLachatWatson error  = -6.02157e-05
+DEAL::Order[5], QTrianglePolar error = -1.54436e-05    QLachatWatson error  = 9.70402e-06
+DEAL::======= f(x,y) = x^2 y^3
+DEAL::Order[1], QTrianglePolar error = -0.0785405      QLachatWatson error  = -0.0383027
+DEAL::Order[2], QTrianglePolar error = -0.0113642      QLachatWatson error  = -0.000275213
+DEAL::Order[3], QTrianglePolar error = -0.00146136     QLachatWatson error  = 1.55172e-05
+DEAL::Order[4], QTrianglePolar error = -0.000168590    QLachatWatson error  = -6.53766e-06
+DEAL::Order[5], QTrianglePolar error = -1.77676e-05    QLachatWatson error  = 1.38746e-06
+DEAL::======= f(x,y) = x^2 y^4
+DEAL::Order[1], QTrianglePolar error = -0.0735330      QLachatWatson error  = -0.0479652
+DEAL::Order[2], QTrianglePolar error = -0.0119613      QLachatWatson error  = -0.000438218
+DEAL::Order[3], QTrianglePolar error = -0.00168353     QLachatWatson error  = -7.68047e-05
+DEAL::Order[4], QTrianglePolar error = -0.000217502    QLachatWatson error  = 8.31218e-06
+DEAL::Order[5], QTrianglePolar error = -2.57948e-05    QLachatWatson error  = -1.03507e-06
+DEAL::======= f(x,y) = x^2 y^5
+DEAL::Order[1], QTrianglePolar error = 0.0621262       QLachatWatson error  = 0.0791016
+DEAL::Order[2], QTrianglePolar error = 0.118288        QLachatWatson error  = 0.128996
+DEAL::Order[3], QTrianglePolar error = 0.128869        QLachatWatson error  = 0.130779
+DEAL::Order[4], QTrianglePolar error = 0.130535        QLachatWatson error  = 0.130820
+DEAL::Order[5], QTrianglePolar error = 0.130779        QLachatWatson error  = 0.130816
+DEAL::======= f(x,y) = x^3 y^0
+DEAL::Order[1], QTrianglePolar error = -0.187674       QLachatWatson error  = -0.0401352
+DEAL::Order[2], QTrianglePolar error = -0.0204952      QLachatWatson error  = -0.00594735
+DEAL::Order[3], QTrianglePolar error = -0.00254864     QLachatWatson error  = 0.000982854
+DEAL::Order[4], QTrianglePolar error = -0.000283851    QLachatWatson error  = -0.000156216
+DEAL::Order[5], QTrianglePolar error = -2.93368e-05    QLachatWatson error  = 2.49534e-05
+DEAL::======= f(x,y) = x^3 y^1
+DEAL::Order[1], QTrianglePolar error = -0.0938370      QLachatWatson error  = -0.0200676
+DEAL::Order[2], QTrianglePolar error = -0.0102476      QLachatWatson error  = -0.00297368
+DEAL::Order[3], QTrianglePolar error = -0.00127432     QLachatWatson error  = 0.000491426
+DEAL::Order[4], QTrianglePolar error = -0.000141926    QLachatWatson error  = -7.81084e-05
+DEAL::Order[5], QTrianglePolar error = -1.46689e-05    QLachatWatson error  = 1.24762e-05
+DEAL::======= f(x,y) = x^3 y^2
+DEAL::Order[1], QTrianglePolar error = -0.0785405      QLachatWatson error  = -0.0383027
+DEAL::Order[2], QTrianglePolar error = -0.0113642      QLachatWatson error  = -0.000275213
+DEAL::Order[3], QTrianglePolar error = -0.00146136     QLachatWatson error  = 1.55172e-05
+DEAL::Order[4], QTrianglePolar error = -0.000168590    QLachatWatson error  = -6.53766e-06
+DEAL::Order[5], QTrianglePolar error = -1.77676e-05    QLachatWatson error  = 1.38746e-06
+DEAL::======= f(x,y) = x^3 y^3
+DEAL::Order[1], QTrianglePolar error = -0.0708923      QLachatWatson error  = -0.0474202
+DEAL::Order[2], QTrianglePolar error = -0.0119226      QLachatWatson error  = 0.00107402
+DEAL::Order[3], QTrianglePolar error = -0.00155489     QLachatWatson error  = -0.000222437
+DEAL::Order[4], QTrianglePolar error = -0.000181922    QLachatWatson error  = 2.92477e-05
+DEAL::Order[5], QTrianglePolar error = -1.93169e-05    QLachatWatson error  = -4.15692e-06
+DEAL::======= f(x,y) = x^3 y^4
+DEAL::Order[1], QTrianglePolar error = -0.0644439      QLachatWatson error  = -0.0499835
+DEAL::Order[2], QTrianglePolar error = -0.0124370      QLachatWatson error  = 0.000492691
+DEAL::Order[3], QTrianglePolar error = -0.00174155     QLachatWatson error  = -0.000260237
+DEAL::Order[4], QTrianglePolar error = -0.000223980    QLachatWatson error  = 3.54045e-05
+DEAL::Order[5], QTrianglePolar error = -2.63528e-05    QLachatWatson error  = -5.22282e-06
+DEAL::======= f(x,y) = x^3 y^5
+DEAL::Order[1], QTrianglePolar error = 0.0341311       QLachatWatson error  = 0.0434570
+DEAL::Order[2], QTrianglePolar error = 0.0797970       QLachatWatson error  = 0.0916727
+DEAL::Order[3], QTrianglePolar error = 0.0907519       QLachatWatson error  = 0.0925287
+DEAL::Order[4], QTrianglePolar error = 0.0924462       QLachatWatson error  = 0.0927534
+DEAL::Order[5], QTrianglePolar error = 0.0926905       QLachatWatson error  = 0.0927226
+DEAL::======= f(x,y) = x^4 y^0
+DEAL::Order[1], QTrianglePolar error = -0.183422       QLachatWatson error  = -0.0878571
+DEAL::Order[2], QTrianglePolar error = -0.0220195      QLachatWatson error  = -0.00460007
+DEAL::Order[3], QTrianglePolar error = -0.00313498     QLachatWatson error  = 0.000580121
+DEAL::Order[4], QTrianglePolar error = -0.000409087    QLachatWatson error  = -9.17447e-05
+DEAL::Order[5], QTrianglePolar error = -4.93578e-05    QLachatWatson error  = 1.46809e-05
+DEAL::======= f(x,y) = x^4 y^1
+DEAL::Order[1], QTrianglePolar error = -0.0917110      QLachatWatson error  = -0.0439285
+DEAL::Order[2], QTrianglePolar error = -0.0110098      QLachatWatson error  = -0.00230004
+DEAL::Order[3], QTrianglePolar error = -0.00156749     QLachatWatson error  = 0.000290061
+DEAL::Order[4], QTrianglePolar error = -0.000204544    QLachatWatson error  = -4.58724e-05
+DEAL::Order[5], QTrianglePolar error = -2.46789e-05    QLachatWatson error  = 7.34044e-06
+DEAL::======= f(x,y) = x^4 y^2
+DEAL::Order[1], QTrianglePolar error = -0.0735330      QLachatWatson error  = -0.0479652
+DEAL::Order[2], QTrianglePolar error = -0.0119613      QLachatWatson error  = -0.000438218
+DEAL::Order[3], QTrianglePolar error = -0.00168353     QLachatWatson error  = -7.68047e-05
+DEAL::Order[4], QTrianglePolar error = -0.000217502    QLachatWatson error  = 8.31218e-06
+DEAL::Order[5], QTrianglePolar error = -2.57948e-05    QLachatWatson error  = -1.03507e-06
+DEAL::======= f(x,y) = x^4 y^3
+DEAL::Order[1], QTrianglePolar error = -0.0644439      QLachatWatson error  = -0.0499835
+DEAL::Order[2], QTrianglePolar error = -0.0124370      QLachatWatson error  = 0.000492691
+DEAL::Order[3], QTrianglePolar error = -0.00174155     QLachatWatson error  = -0.000260237
+DEAL::Order[4], QTrianglePolar error = -0.000223980    QLachatWatson error  = 3.54045e-05
+DEAL::Order[5], QTrianglePolar error = -2.63528e-05    QLachatWatson error  = -5.22282e-06
+DEAL::======= f(x,y) = x^4 y^4
+DEAL::Order[1], QTrianglePolar error = -0.0572944      QLachatWatson error  = -0.0487020
+DEAL::Order[2], QTrianglePolar error = -0.0128503      QLachatWatson error  = -0.000171604
+DEAL::Order[3], QTrianglePolar error = -0.00190082     QLachatWatson error  = -0.000282216
+DEAL::Order[4], QTrianglePolar error = -0.000259133    QLachatWatson error  = 3.79262e-05
+DEAL::Order[5], QTrianglePolar error = -3.22754e-05    QLachatWatson error  = -5.71706e-06
+DEAL::======= f(x,y) = x^4 y^5
+DEAL::Order[1], QTrianglePolar error = 0.0195583       QLachatWatson error  = 0.0249023
+DEAL::Order[2], QTrianglePolar error = 0.0574407       QLachatWatson error  = 0.0690394
+DEAL::Order[3], QTrianglePolar error = 0.0685621       QLachatWatson error  = 0.0704494
+DEAL::Order[4], QTrianglePolar error = 0.0703642       QLachatWatson error  = 0.0707010
+DEAL::Order[5], QTrianglePolar error = 0.0706320       QLachatWatson error  = 0.0706685
+DEAL::======= f(x,y) = x^5 y^0
+DEAL::Order[1], QTrianglePolar error = 0.236233        QLachatWatson error  = 0.300781
+DEAL::Order[2], QTrianglePolar error = 0.390539        QLachatWatson error  = 0.407286
+DEAL::Order[3], QTrianglePolar error = 0.410209        QLachatWatson error  = 0.414561
+DEAL::Order[4], QTrianglePolar error = 0.413426        QLachatWatson error  = 0.413905
+DEAL::Order[5], QTrianglePolar error = 0.413914        QLachatWatson error  = 0.414003
+DEAL::======= f(x,y) = x^5 y^1
+DEAL::Order[1], QTrianglePolar error = 0.118117        QLachatWatson error  = 0.150391
+DEAL::Order[2], QTrianglePolar error = 0.195270        QLachatWatson error  = 0.203643
+DEAL::Order[3], QTrianglePolar error = 0.205105        QLachatWatson error  = 0.207280
+DEAL::Order[4], QTrianglePolar error = 0.206713        QLachatWatson error  = 0.206953
+DEAL::Order[5], QTrianglePolar error = 0.206957        QLachatWatson error  = 0.207001
+DEAL::======= f(x,y) = x^5 y^2
+DEAL::Order[1], QTrianglePolar error = 0.0621262       QLachatWatson error  = 0.0791016
+DEAL::Order[2], QTrianglePolar error = 0.118288        QLachatWatson error  = 0.128996
+DEAL::Order[3], QTrianglePolar error = 0.128869        QLachatWatson error  = 0.130779
+DEAL::Order[4], QTrianglePolar error = 0.130535        QLachatWatson error  = 0.130820
+DEAL::Order[5], QTrianglePolar error = 0.130779        QLachatWatson error  = 0.130816
+DEAL::======= f(x,y) = x^5 y^3
+DEAL::Order[1], QTrianglePolar error = 0.0341311       QLachatWatson error  = 0.0434570
+DEAL::Order[2], QTrianglePolar error = 0.0797970       QLachatWatson error  = 0.0916727
+DEAL::Order[3], QTrianglePolar error = 0.0907519       QLachatWatson error  = 0.0925287
+DEAL::Order[4], QTrianglePolar error = 0.0924462       QLachatWatson error  = 0.0927534
+DEAL::Order[5], QTrianglePolar error = 0.0926905       QLachatWatson error  = 0.0927226
+DEAL::======= f(x,y) = x^5 y^4
+DEAL::Order[1], QTrianglePolar error = 0.0195583       QLachatWatson error  = 0.0249023
+DEAL::Order[2], QTrianglePolar error = 0.0574407       QLachatWatson error  = 0.0690394
+DEAL::Order[3], QTrianglePolar error = 0.0685621       QLachatWatson error  = 0.0704494
+DEAL::Order[4], QTrianglePolar error = 0.0703642       QLachatWatson error  = 0.0707010
+DEAL::Order[5], QTrianglePolar error = 0.0706320       QLachatWatson error  = 0.0706685
+DEAL::======= f(x,y) = x^5 y^5
+DEAL::Order[1], QTrianglePolar error = 0.0116966       QLachatWatson error  = 0.0148926
+DEAL::Order[2], QTrianglePolar error = 0.0431516       QLachatWatson error  = 0.0537510
+DEAL::Order[3], QTrianglePolar error = 0.0543363       QLachatWatson error  = 0.0564557
+DEAL::Order[4], QTrianglePolar error = 0.0562857       QLachatWatson error  = 0.0566557
+DEAL::Order[5], QTrianglePolar error = 0.0565886       QLachatWatson error  = 0.0566338
