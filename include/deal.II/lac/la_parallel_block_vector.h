@@ -518,13 +518,13 @@ namespace LinearAlgebra
       virtual real_type l1_norm() const override;
 
       /**
-       * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
+       * Return the $l_2$ norm of the vector (i.e., the square root of
        * the sum of the square of all entries among all processors).
        */
       virtual real_type l2_norm() const override;
 
       /**
-       * Return square of the l<sub>2</sub> norm of the vector.
+       * Return the square of the $l_2$ norm of the vector.
        */
       real_type norm_sqr() const;
 

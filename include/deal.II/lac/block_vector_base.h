@@ -780,7 +780,7 @@ public:
   value_type operator* (const BlockVectorBase &V) const;
 
   /**
-   * Return square of the $l_2$-norm.
+   * Return the square of the $l_2$-norm.
    */
   real_type norm_sqr () const;
 
