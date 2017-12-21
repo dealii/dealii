@@ -638,7 +638,14 @@ namespace LinearAlgebra
        * the sum of the square of all entries among all processors).
        */
       virtual real_type l2_norm() const override;
-
+      /**
+       * Return square of the $l_2$-norm.
+       *
+       */
+      real_type norm_sqr () const {
+    	  real_type  l2=this->l2_norm();
+    	  return l2*l2;
+      }
       /**
        * Return the maximum norm of the vector (i.e., the maximum absolute value
        * among all entries and among all processors).
