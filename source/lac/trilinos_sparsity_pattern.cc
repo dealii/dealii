@@ -659,6 +659,20 @@ namespace TrilinosWrappers
 
 
 
+  void
+  SparsityPattern::copy_from (const SparsityPattern &sp)
+  {
+    column_space_map.reset (new Epetra_Map (*sp.column_space_map));
+    graph.reset (new Epetra_FECrsGraph(*sp.graph));
+
+    if (sp.nonlocal_graph.get()!=nullptr)
+      nonlocal_graph.reset(new Epetra_CrsGraph(*sp.nonlocal_graph));
+    else
+      nonlocal_graph.reset();
+  }
+
+
+
   template <typename SparsityPatternType>
   void
   SparsityPattern::copy_from (const SparsityPatternType &sp)
