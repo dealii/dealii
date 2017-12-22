@@ -763,13 +763,17 @@ public:
  * \hat x^\beta \hat y
  * end{pmatrix}
  * \f]
+ *
  * with determinant of the Jacobian equal to $J= \beta \hat \x^{2\beta-1}$.
  * Such transformation maps the reference square \$[0,1]\times[0,1]$ to the
- * reference simplex, by collapsing the left \side of the square and
- * squeezing quadrature points towards the orgin, and then shearing the
- * resulting triangle to the reference one. This transformation, allows
- * one to integrate singularities of order $1/R$ in the origin when $\beta =
- * 1$, and higher when $1 < \beta \leq 2$.
+ * reference simplex, by collapsing the left \side of the square and squeezing
+ * quadrature points towards the orgin, and then shearing the resulting
+ * triangle to the reference one. This transformation shows good convergence
+ * properties when $\beta = 1$ with singularities of order $1/R$ in the origin,
+ * but different $\beta$ values can be selected to increase convergence and/or
+ * accuracy when higher order Gauss rules are used (see "Generalized Duffy
+ * transformation for integrating vertex singularities", S. E. Mousavi, N.
+ * Sukumar, Computational Mechanics 2009).
  *
  * When $\beta = 1$, this transformation is also known as the Lachat-Watson
  * transformation.
