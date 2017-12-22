@@ -243,8 +243,8 @@ TridiagonalMatrix<number>::compute_eigenvalues()
   Assert(state == matrix, ExcState(state));
   Assert(is_symmetric, ExcNotImplemented());
 
-  const int nn = n();
-  int info;
+  const types::blas_int nn = n();
+  types::blas_int info;
   stev (&N, &nn, diagonal.data(), right.data(), nullptr, &one, nullptr, &info);
   Assert(info == 0, ExcInternalError());
 

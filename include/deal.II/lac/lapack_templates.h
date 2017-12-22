@@ -23,289 +23,289 @@
 extern "C"
 {
 // vector update of the form y += alpha*x with a scalar, x,y vectors
-  void daxpy_ (const int *n, const double *alpha, const double *x,
-               const int *incx, double *y, const int *incy);
-  void saxpy_ (const int *n, const float *alpha, const float *x,
-               const int *incx, float *y, const int *incy);
+  void daxpy_ (const dealii::types::blas_int *n, const double *alpha, const double *x,
+               const dealii::types::blas_int *incx, double *y, const dealii::types::blas_int *incy);
+  void saxpy_ (const dealii::types::blas_int *n, const float *alpha, const float *x,
+               const dealii::types::blas_int *incx, float *y, const dealii::types::blas_int *incy);
 // General Matrix
 // Matrix vector product
-  void dgemv_ (const char *trans, const int *m, const int *n,
-               const double *alpha, const double *A, const int *lda,
-               const double *x, const int *incx,
-               const double *b, double *y, const int *incy);
-  void sgemv_ (const char *trans, const int *m, const int *n,
-               const float *alpha, const float *A, const int *lda,
-               const float *x, const int *incx,
-               const float *b, float *y, const int *incy);
+  void dgemv_ (const char *trans, const dealii::types::blas_int *m, const dealii::types::blas_int *n,
+               const double *alpha, const double *A, const dealii::types::blas_int *lda,
+               const double *x, const dealii::types::blas_int *incx,
+               const double *b, double *y, const dealii::types::blas_int *incy);
+  void sgemv_ (const char *trans, const dealii::types::blas_int *m, const dealii::types::blas_int *n,
+               const float *alpha, const float *A, const dealii::types::blas_int *lda,
+               const float *x, const dealii::types::blas_int *incx,
+               const float *b, float *y, const dealii::types::blas_int *incy);
   void dtrmv_ (const char *uplo, const char *trans, const char *diag,
-               const int *N, const double *A, const int *lda,
-               double *x, const int *incx);
+               const dealii::types::blas_int *N, const double *A, const dealii::types::blas_int *lda,
+               double *x, const dealii::types::blas_int *incx);
   void strmv_ (const char *uplo, const char *trans, const char *diag,
-               const int *N, const float *A, const int *lda,
-               float *x, const int *incx);
+               const dealii::types::blas_int *N, const float *A, const dealii::types::blas_int *lda,
+               float *x, const dealii::types::blas_int *incx);
 // Matrix matrix product
   void dgemm_ (const char *transa, const char *transb,
-               const int *m, const int *n, const int *k,
-               const double *alpha, const double *A, const int *lda,
-               const double *B, const int *ldb,
-               const double *beta, double *C, const int *ldc);
+               const dealii::types::blas_int *m, const dealii::types::blas_int *n, const dealii::types::blas_int *k,
+               const double *alpha, const double *A, const dealii::types::blas_int *lda,
+               const double *B, const dealii::types::blas_int *ldb,
+               const double *beta, double *C, const dealii::types::blas_int *ldc);
   void sgemm_ (const char *transa, const char *transb,
-               const int *m, const int *n, const int *k,
-               const float *alpha, const float *A, const int *lda,
-               const float *B, const int *ldb,
-               const float *beta, float *C, const int *ldc);
+               const dealii::types::blas_int *m, const dealii::types::blas_int *n, const dealii::types::blas_int *k,
+               const float *alpha, const float *A, const dealii::types::blas_int *lda,
+               const float *B, const dealii::types::blas_int *ldb,
+               const float *beta, float *C, const dealii::types::blas_int *ldc);
 // Compute LU factorization
-  void dgetrf_ (const int *m, const int *n, double *A,
-                const int *lda, int *ipiv, int *info);
-  void sgetrf_ (const int *m, const int *n, float *A,
-                const int *lda, int *ipiv, int *info);
+  void dgetrf_ (const dealii::types::blas_int *m, const dealii::types::blas_int *n, double *A,
+                const dealii::types::blas_int *lda, dealii::types::blas_int *ipiv, dealii::types::blas_int *info);
+  void sgetrf_ (const dealii::types::blas_int *m, const dealii::types::blas_int *n, float *A,
+                const dealii::types::blas_int *lda, dealii::types::blas_int *ipiv, dealii::types::blas_int *info);
 // Apply forward/backward substitution to LU factorization
-  void dgetrs_ (const char *trans, const int *n, const int *nrhs,
-                const double *A, const int *lda, const int *ipiv,
-                double *b, const int *ldb, int *info);
-  void sgetrs_ (const char *trans, const int *n, const int *nrhs,
-                const float *A, const int *lda, const int *ipiv,
-                float *b, const int *ldb, int *info);
+  void dgetrs_ (const char *trans, const dealii::types::blas_int *n, const dealii::types::blas_int *nrhs,
+                const double *A, const dealii::types::blas_int *lda, const dealii::types::blas_int *ipiv,
+                double *b, const dealii::types::blas_int *ldb, dealii::types::blas_int *info);
+  void sgetrs_ (const char *trans, const dealii::types::blas_int *n, const dealii::types::blas_int *nrhs,
+                const float *A, const dealii::types::blas_int *lda, const dealii::types::blas_int *ipiv,
+                float *b, const dealii::types::blas_int *ldb, dealii::types::blas_int *info);
 // Invert matrix from LU factorization
-  void dgetri_ (const int *n, double *A, const int *lda,
-                int *ipiv, double *inv_work, const int *lwork, int *info);
-  void sgetri_ (const int *n, float *A, const int *lda,
-                int *ipiv, float *inv_work, const int *lwork, int *info);
+  void dgetri_ (const dealii::types::blas_int *n, double *A, const dealii::types::blas_int *lda,
+                dealii::types::blas_int *ipiv, double *inv_work, const dealii::types::blas_int *lwork, dealii::types::blas_int *info);
+  void sgetri_ (const dealii::types::blas_int *n, float *A, const dealii::types::blas_int *lda,
+                dealii::types::blas_int *ipiv, float *inv_work, const dealii::types::blas_int *lwork, dealii::types::blas_int *info);
 // Compute Cholesky factorization of SPD
-  void dpotrf_ (const char *uplo, const int *n, double *A,
-                const int *lda, int *info);
-  void spotrf_ (const char *uplo, const int *n, float *A,
-                const int *lda, int *info);
+  void dpotrf_ (const char *uplo, const dealii::types::blas_int *n, double *A,
+                const dealii::types::blas_int *lda, dealii::types::blas_int *info);
+  void spotrf_ (const char *uplo, const dealii::types::blas_int *n, float *A,
+                const dealii::types::blas_int *lda, dealii::types::blas_int *info);
 // Apply forward/backward substitution to Cholesky factorization
-  void dpotrs_ (const char *uplo, const int *n, const int *nrhs,
-                const double *A, const int *lda,
-                double *B, const int *ldb,
-                int *info);
-  void spotrs_ (const char *uplo, const int *n, const int *nrhs,
-                const float *A, const int *lda,
-                float *B, const int *ldb,
-                int *info);
+  void dpotrs_ (const char *uplo, const dealii::types::blas_int *n, const dealii::types::blas_int *nrhs,
+                const double *A, const dealii::types::blas_int *lda,
+                double *B, const dealii::types::blas_int *ldb,
+                dealii::types::blas_int *info);
+  void spotrs_ (const char *uplo, const dealii::types::blas_int *n, const dealii::types::blas_int *nrhs,
+                const float *A, const dealii::types::blas_int *lda,
+                float *B, const dealii::types::blas_int *ldb,
+                dealii::types::blas_int *info);
 // Estimate the reciprocal of the condition number in 1-norm from Cholesky
-  void dpocon_ (const char *uplo, const int *n, const double *A,
-                const int *lda, const double *anorm, double *rcond,
-                double *work, int *iwork, int *info);
-  void spocon_ (const char *uplo, const int *n, const float *A,
-                const int *lda, const float *anorm, float *rcond,
-                float *work, int *iwork, int *info);
+  void dpocon_ (const char *uplo, const dealii::types::blas_int *n, const double *A,
+                const dealii::types::blas_int *lda, const double *anorm, double *rcond,
+                double *work, dealii::types::blas_int *iwork, dealii::types::blas_int *info);
+  void spocon_ (const char *uplo, const dealii::types::blas_int *n, const float *A,
+                const dealii::types::blas_int *lda, const float *anorm, float *rcond,
+                float *work, dealii::types::blas_int *iwork, dealii::types::blas_int *info);
 // Estimate the reciprocal of the condition number of triangular matrices
 // http://www.netlib.org/lapack/explore-html/da/dba/group__double_o_t_h_e_rcomputational_gaff914510b1673e90752c095f5b9dcedf.html#gaff914510b1673e90752c095f5b9dcedf
   void dtrcon_ (const char *norm, const char *uplo, const char *diag,
-                const int *n, const double *A, const int *lda,
+                const dealii::types::blas_int *n, const double *A, const dealii::types::blas_int *lda,
                 double *rcond,
-                double *work, int *iwork, int *info);
+                double *work, dealii::types::blas_int *iwork, dealii::types::blas_int *info);
   void strcon_ (const char *norm, const char *uplo, const char *diag,
-                const int *n, const float *A, const int *lda,
+                const dealii::types::blas_int *n, const float *A, const dealii::types::blas_int *lda,
                 float *rcond,
-                float *work, int *iwork, int *info);
+                float *work, dealii::types::blas_int *iwork, dealii::types::blas_int *info);
 // Computes the inverse from Cholesky
-  void dpotri_ (const char *uplo, const int *n, double *A,
-                const int *lda, int *info);
-  void spotri_ (const char *uplo, const int *n, float *A,
-                const int *lda, int *info);
+  void dpotri_ (const char *uplo, const dealii::types::blas_int *n, double *A,
+                const dealii::types::blas_int *lda, dealii::types::blas_int *info);
+  void spotri_ (const char *uplo, const dealii::types::blas_int *n, float *A,
+                const dealii::types::blas_int *lda, dealii::types::blas_int *info);
 // Norms
-  double dlansy_ (const char *norm, const char *uplo, const int *n, const double *A,
-                  const int *lda, double *work);
-  float  slansy_ (const char *norm, const char *uplo, const int *n, const float *A,
-                  const int *lda, float *work);
-  double dlange_ (const char *norm, const int *m, const int *n, const double *A,
-                  const int *lda, double *work);
-  float slange_ (const char *norm, const int *m, const int *n, const float *A,
-                 const int *lda, float *work);
+  double dlansy_ (const char *norm, const char *uplo, const dealii::types::blas_int *n, const double *A,
+                  const dealii::types::blas_int *lda, double *work);
+  float  slansy_ (const char *norm, const char *uplo, const dealii::types::blas_int *n, const float *A,
+                  const dealii::types::blas_int *lda, float *work);
+  double dlange_ (const char *norm, const dealii::types::blas_int *m, const dealii::types::blas_int *n, const double *A,
+                  const dealii::types::blas_int *lda, double *work);
+  float slange_ (const char *norm, const dealii::types::blas_int *m, const dealii::types::blas_int *n, const float *A,
+                 const dealii::types::blas_int *lda, float *work);
 
 // Compute QR factorization (Householder)
-  void dgeqrf_ (const int *m, const int *n, double *A,
-                const int *lda, double *tau, double *work,
-                const int *lwork, int *info);
-  void sgeqrf_ (const int *m, const int *n, float *A,
-                const int *lda, float *tau, float *work,
-                const int *lwork, int *info);
+  void dgeqrf_ (const dealii::types::blas_int *m, const dealii::types::blas_int *n, double *A,
+                const dealii::types::blas_int *lda, double *tau, double *work,
+                const dealii::types::blas_int *lwork, dealii::types::blas_int *info);
+  void sgeqrf_ (const dealii::types::blas_int *m, const dealii::types::blas_int *n, float *A,
+                const dealii::types::blas_int *lda, float *tau, float *work,
+                const dealii::types::blas_int *lwork, dealii::types::blas_int *info);
 // Compute vector Q^T B, where Q is the result from dgeqrf_
-  void dormqr_ (const char *side, const char *trans, const int *m,
-                const int *n, const int *k, const double *A, const int *lda,
-                const double *tau, double *B, const int *ldb,
-                double *work, const int *lwork, int *info);
-  void sormqr_ (const char *side, const char *trans, const int *m,
-                const int *n, const int *k, const float *A, const int *lda,
-                const float *tau, float *B, const int *ldb,
-                float *work, const int *lwork, int *info);
+  void dormqr_ (const char *side, const char *trans, const dealii::types::blas_int *m,
+                const dealii::types::blas_int *n, const dealii::types::blas_int *k, const double *A, const dealii::types::blas_int *lda,
+                const double *tau, double *B, const dealii::types::blas_int *ldb,
+                double *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *info);
+  void sormqr_ (const char *side, const char *trans, const dealii::types::blas_int *m,
+                const dealii::types::blas_int *n, const dealii::types::blas_int *k, const float *A, const dealii::types::blas_int *lda,
+                const float *tau, float *B, const dealii::types::blas_int *ldb,
+                float *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *info);
 // Compute matrix Q from the result of dgeqrf_
-  void dorgqr_ (const int *m, const int *n, const int *k, const double *A,
-                const int *lda, const double *tau, double *work, const int *lwork,
-                int *info);
-  void sorgqr_ (const int *m, const int *n, const int *k, const float *A,
-                const int *lda, const float *tau, float *work, const int *lwork,
-                int *info);
+  void dorgqr_ (const dealii::types::blas_int *m, const dealii::types::blas_int *n, const dealii::types::blas_int *k, const double *A,
+                const dealii::types::blas_int *lda, const double *tau, double *work, const dealii::types::blas_int *lwork,
+                dealii::types::blas_int *info);
+  void sorgqr_ (const dealii::types::blas_int *m, const dealii::types::blas_int *n, const dealii::types::blas_int *k, const float *A,
+                const dealii::types::blas_int *lda, const float *tau, float *work, const dealii::types::blas_int *lwork,
+                dealii::types::blas_int *info);
 // Compute Rx = b
   void dtrtrs_ (const char *uplo, const char *trans,
-                const char *diag, const int *n, const int *n_rhs,
-                const double *A, const int *lda, double *B, const int *ldb,
-                int *info);
+                const char *diag, const dealii::types::blas_int *n, const dealii::types::blas_int *n_rhs,
+                const double *A, const dealii::types::blas_int *lda, double *B, const dealii::types::blas_int *ldb,
+                dealii::types::blas_int *info);
   void strtrs_ (const char *uplo, const char *trans,
-                const char *diag, const int *n, const int *n_rhs,
-                const float *A, const int *lda, float *B, const int *ldb,
-                int *info);
+                const char *diag, const dealii::types::blas_int *n, const dealii::types::blas_int *n_rhs,
+                const float *A, const dealii::types::blas_int *lda, float *B, const dealii::types::blas_int *ldb,
+                dealii::types::blas_int *info);
 // Compute eigenvalues and vectors
   void dgeev_ (const char *jobvl, const char *jobvr,
-               const int *n, double *A, const int *lda,
+               const dealii::types::blas_int *n, double *A, const dealii::types::blas_int *lda,
                double *lambda_re, double *lambda_im,
-               double *vl, const int *ldvl,
-               double *vr, const int *ldva,
-               double *work, const int *lwork,
-               int *info);
+               double *vl, const dealii::types::blas_int *ldvl,
+               double *vr, const dealii::types::blas_int *ldva,
+               double *work, const dealii::types::blas_int *lwork,
+               dealii::types::blas_int *info);
   void sgeev_ (const char *jobvl, const char *jobvr,
-               const int *n, float *A, const int *lda,
+               const dealii::types::blas_int *n, float *A, const dealii::types::blas_int *lda,
                float *lambda_re, float *lambda_im,
-               float *vl, const int *ldvl,
-               float *vr, const int *ldva,
-               float *work, const int *lwork,
-               int *info);
+               float *vl, const dealii::types::blas_int *ldvl,
+               float *vr, const dealii::types::blas_int *ldva,
+               float *work, const dealii::types::blas_int *lwork,
+               dealii::types::blas_int *info);
 // Compute eigenvalues and vectors (expert)
   void dgeevx_ (const char *balanc, const char *jobvl, const char *jobvr,
                 const char *sense,
-                const int *n, double *A, const int *lda,
+                const dealii::types::blas_int *n, double *A, const dealii::types::blas_int *lda,
                 double *lambda_re, double *lambda_im,
-                double *vl, const int *ldvl,
-                double *vr, const int *ldvr,
-                int *ilo, int *ihi,
+                double *vl, const dealii::types::blas_int *ldvl,
+                double *vr, const dealii::types::blas_int *ldvr,
+                dealii::types::blas_int *ilo, dealii::types::blas_int *ihi,
                 double *scale, double *abnrm,
                 double *rconde, double *rcondv,
-                double *work, const int *lwork,
-                int *iwork, int *info);
+                double *work, const dealii::types::blas_int *lwork,
+                dealii::types::blas_int *iwork, dealii::types::blas_int *info);
   void sgeevx_ (const char *balanc, const char *jobvl, const char *jobvr,
                 const char *sense,
-                const int *n, float *A, const int *lda,
+                const dealii::types::blas_int *n, float *A, const dealii::types::blas_int *lda,
                 float *lambda_re, float *lambda_im,
-                float *vl, const int *ldvl,
-                float *vr, const int *ldvr,
-                int *ilo, int *ihi,
+                float *vl, const dealii::types::blas_int *ldvl,
+                float *vr, const dealii::types::blas_int *ldvr,
+                dealii::types::blas_int *ilo, dealii::types::blas_int *ihi,
                 float *scale, float *abnrm,
                 float *rconde, float *rcondv,
-                float *work, const int *lwork,
-                int *iwork, int *info);
+                float *work, const dealii::types::blas_int *lwork,
+                dealii::types::blas_int *iwork, dealii::types::blas_int *info);
 // Eigenvalues for a symmetric matrix
-  void dsyev_ (const char *jobz, const char *uplo, const int *n,
-               double *A, const int *lda, double *w,
-               double *work, const int *lwork, int *info);
-  void ssyev_ (const char *jobz, const char *uplo, const int *n,
-               float *A, const int *lda, float *w,
-               float *work, const int *lwork, int *info);
+  void dsyev_ (const char *jobz, const char *uplo, const dealii::types::blas_int *n,
+               double *A, const dealii::types::blas_int *lda, double *w,
+               double *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *info);
+  void ssyev_ (const char *jobz, const char *uplo, const dealii::types::blas_int *n,
+               float *A, const dealii::types::blas_int *lda, float *w,
+               float *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *info);
 // Same functionality as dsyev_ but with more options: E.g.
-// Compute only eigenvalues in a specific interval,
+// Compute only eigenvalues in a specific dealii::types::blas_interval,
 // Compute only eigenvalues with a specific index,
 // Set tolerance for eigenvalue computation
   void dsyevx_ (const char *jobz, const char *range,
-                const char *uplo, const int *n, double *A, const int *lda,
+                const char *uplo, const dealii::types::blas_int *n, double *A, const dealii::types::blas_int *lda,
                 const double *vl, const double *vu,
-                const int *il, const int *iu, const double *abstol,
-                int *m, double *w, double *z,
-                const int *ldz, double *work, const int *lwork, int *iwork,
-                int *ifail, int *info);
+                const dealii::types::blas_int *il, const dealii::types::blas_int *iu, const double *abstol,
+                dealii::types::blas_int *m, double *w, double *z,
+                const dealii::types::blas_int *ldz, double *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *iwork,
+                dealii::types::blas_int *ifail, dealii::types::blas_int *info);
   void ssyevx_ (const char *jobz, const char *range,
-                const char *uplo, const int *n, float *A, const int *lda,
+                const char *uplo, const dealii::types::blas_int *n, float *A, const dealii::types::blas_int *lda,
                 const float *vl, const float *vu,
-                const int *il, const int *iu, const float *abstol,
-                int *m, float *w, float *z,
-                const int *ldz, float *work, const int *lwork, int *iwork,
-                int *ifail, int *info);
+                const dealii::types::blas_int *il, const dealii::types::blas_int *iu, const float *abstol,
+                dealii::types::blas_int *m, float *w, float *z,
+                const dealii::types::blas_int *ldz, float *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *iwork,
+                dealii::types::blas_int *ifail, dealii::types::blas_int *info);
 // Generalized eigenvalues and eigenvectors of
 // 1: A*x = lambda*B*x; 2: A*B*x = lambda*x; 3: B*A*x = lambda*x
 // A and B are symmetric and B is definite
-  void dsygv_ (const int *itype, const char *jobz, const char *uplo,
-               const int *n, double *A, const int *lda, double *B,
-               const int *ldb, double *w, double *work,
-               const int *lwork, int *info);
-  void ssygv_ (const int *itype, const char *jobz, const char *uplo,
-               const int *n, float *A, const int *lda, float *B,
-               const int *ldb, float *w, float *work,
-               const int *lwork, int *info);
+  void dsygv_ (const dealii::types::blas_int *itype, const char *jobz, const char *uplo,
+               const dealii::types::blas_int *n, double *A, const dealii::types::blas_int *lda, double *B,
+               const dealii::types::blas_int *ldb, double *w, double *work,
+               const dealii::types::blas_int *lwork, dealii::types::blas_int *info);
+  void ssygv_ (const dealii::types::blas_int *itype, const char *jobz, const char *uplo,
+               const dealii::types::blas_int *n, float *A, const dealii::types::blas_int *lda, float *B,
+               const dealii::types::blas_int *ldb, float *w, float *work,
+               const dealii::types::blas_int *lwork, dealii::types::blas_int *info);
 // Same functionality as dsygv_ but with more options: E.g.
-// Compute only eigenvalues in a specific interval,
+// Compute only eigenvalues in a specific dealii::types::blas_interval,
 // Compute only eigenvalues with a specific index,
 // Set tolerance for eigenvalue computation
-  void dsygvx_ (const int *itype, const char *jobz, const char *range,
-                const char *uplo, const int *n, double *A, const int *lda,
-                double *B, const int *ldb, const double *vl, const double *vu,
-                const int *il, const int *iu, const double *abstol,
-                int *m, double *w, double *z,
-                const int *ldz, double *work, const int *lwork, int *iwork,
-                int *ifail, int *info);
-  void ssygvx_ (const int *itype, const char *jobz, const char *range,
-                const char *uplo, const int *n, float *A, const int *lda,
-                float *B, const int *ldb, const float *vl, const float *vu,
-                const int *il, const int *iu, const float *abstol,
-                int *m, float *w, float *z,
-                const int *ldz, float *work, const int *lwork, int *iwork,
-                int *ifail, int *info);
+  void dsygvx_ (const dealii::types::blas_int *itype, const char *jobz, const char *range,
+                const char *uplo, const dealii::types::blas_int *n, double *A, const dealii::types::blas_int *lda,
+                double *B, const dealii::types::blas_int *ldb, const double *vl, const double *vu,
+                const dealii::types::blas_int *il, const dealii::types::blas_int *iu, const double *abstol,
+                dealii::types::blas_int *m, double *w, double *z,
+                const dealii::types::blas_int *ldz, double *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *iwork,
+                dealii::types::blas_int *ifail, dealii::types::blas_int *info);
+  void ssygvx_ (const dealii::types::blas_int *itype, const char *jobz, const char *range,
+                const char *uplo, const dealii::types::blas_int *n, float *A, const dealii::types::blas_int *lda,
+                float *B, const dealii::types::blas_int *ldb, const float *vl, const float *vu,
+                const dealii::types::blas_int *il, const dealii::types::blas_int *iu, const float *abstol,
+                dealii::types::blas_int *m, float *w, float *z,
+                const dealii::types::blas_int *ldz, float *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *iwork,
+                dealii::types::blas_int *ifail, dealii::types::blas_int *info);
 // Compute singular value decomposition using divide and conquer
   void dgesdd_ (const char *jobz,
-                const int *m, const int *n, double *A, const int *lda,
+                const dealii::types::blas_int *m, const dealii::types::blas_int *n, double *A, const dealii::types::blas_int *lda,
                 double *s,
-                double *u, const int *ldu,
-                double *vt, const int *ldvt,
-                double *work, const int *lwork,
-                int *iwork,
-                int *info);
+                double *u, const dealii::types::blas_int *ldu,
+                double *vt, const dealii::types::blas_int *ldvt,
+                double *work, const dealii::types::blas_int *lwork,
+                dealii::types::blas_int *iwork,
+                dealii::types::blas_int *info);
   void sgesdd_ (const char *jobz,
-                const int *m, const int *n, float *A, const int *lda,
+                const dealii::types::blas_int *m, const dealii::types::blas_int *n, float *A, const dealii::types::blas_int *lda,
                 float *s,
-                float *u, const int *ldu,
-                float *vt, const int *ldvt,
-                float *work, const int *lwork,
-                int *iwork,
-                int *info);
+                float *u, const dealii::types::blas_int *ldu,
+                float *vt, const dealii::types::blas_int *ldvt,
+                float *work, const dealii::types::blas_int *lwork,
+                dealii::types::blas_int *iwork,
+                dealii::types::blas_int *info);
 // Compute singular value decomposition
-  void dgesvd_ (int *jobu, int *jobvt,
-                const int *n, const int *m, double *A, const int *lda,
+  void dgesvd_ (dealii::types::blas_int *jobu, dealii::types::blas_int *jobvt,
+                const dealii::types::blas_int *n, const dealii::types::blas_int *m, double *A, const dealii::types::blas_int *lda,
                 double *s,
-                double *u, const int *ldu,
-                double *vt, const int *ldvt,
-                double *work, const int *lwork,
-                int *info);
-  void sgesvd_ (int *jobu, int *jobvt,
-                const int *n, const int *m, float *A, const int *lda,
+                double *u, const dealii::types::blas_int *ldu,
+                double *vt, const dealii::types::blas_int *ldvt,
+                double *work, const dealii::types::blas_int *lwork,
+                dealii::types::blas_int *info);
+  void sgesvd_ (dealii::types::blas_int *jobu, dealii::types::blas_int *jobvt,
+                const dealii::types::blas_int *n, const dealii::types::blas_int *m, float *A, const dealii::types::blas_int *lda,
                 float *s,
-                float *u, const int *ldu,
-                float *vt, const int *ldvt,
-                float *work, const int *lwork,
-                int *info);
+                float *u, const dealii::types::blas_int *ldu,
+                float *vt, const dealii::types::blas_int *ldvt,
+                float *work, const dealii::types::blas_int *lwork,
+                dealii::types::blas_int *info);
 // Solve a least squares problem using SVD
-  void dgelsd_ (const int *m, const int *n, const int *nrhs,
-                const double *A, const int *lda,
-                double *B, const int *ldb,
+  void dgelsd_ (const dealii::types::blas_int *m, const dealii::types::blas_int *n, const dealii::types::blas_int *nrhs,
+                const double *A, const dealii::types::blas_int *lda,
+                double *B, const dealii::types::blas_int *ldb,
                 double *s, const double *rcond,
-                int *rank,
-                double *work, const int *lwork, int *iwork,
-                int *info);
-  void sgelsd_ (const int *m, const int *n, const int *nrhs,
-                const float *A, const int *lda,
-                float *B, const int *ldb,
+                dealii::types::blas_int *rank,
+                double *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *iwork,
+                dealii::types::blas_int *info);
+  void sgelsd_ (const dealii::types::blas_int *m, const dealii::types::blas_int *n, const dealii::types::blas_int *nrhs,
+                const float *A, const dealii::types::blas_int *lda,
+                float *B, const dealii::types::blas_int *ldb,
                 float *s, const float *rcond,
-                int *rank,
-                float *work, const int *lwork, int *iwork,
-                int *info);
+                dealii::types::blas_int *rank,
+                float *work, const dealii::types::blas_int *lwork, dealii::types::blas_int *iwork,
+                dealii::types::blas_int *info);
 // Symmetric tridiagonal matrix
-  void dstev_ (const char *jobz, const int *n,
+  void dstev_ (const char *jobz, const dealii::types::blas_int *n,
                double *d, double *e, double *z,
-               const int *ldz, double *work,
-               int *info);
-  void sstev_ (const char *jobz, const int *n,
+               const dealii::types::blas_int *ldz, double *work,
+               dealii::types::blas_int *info);
+  void sstev_ (const char *jobz, const dealii::types::blas_int *n,
                float *d, float *e, float *z,
-               const int *ldz, float *work,
-               int *info);
+               const dealii::types::blas_int *ldz, float *work,
+               dealii::types::blas_int *info);
 // Rank-1 update for symmetric matrices
-  void dsyr_ (const char *uplo, const int *n,
+  void dsyr_ (const char *uplo, const dealii::types::blas_int *n,
               const double *alpha, const double *x,
-              const int *incx,
-              double *A, const int *lda);
-  void ssyr_ (const char *uplo, const int *n,
+              const dealii::types::blas_int *incx,
+              double *A, const dealii::types::blas_int *lda);
+  void ssyr_ (const char *uplo, const dealii::types::blas_int *n,
               const float *alpha, const float *x,
-              const int *incx,
-              float *A, const int *lda);
+              const dealii::types::blas_int *incx,
+              float *A, const dealii::types::blas_int *lda);
 
 }
 
@@ -314,28 +314,28 @@ DEAL_II_NAMESPACE_OPEN
 /// Template wrapper for LAPACK functions dsyr and ssyr
 template <typename number>
 inline void
-syr(const char *, const int *,
+syr(const char *, const types::blas_int *,
     const number *, const number *,
-    const int *,
-    number *, const int *)
+    const types::blas_int *,
+    number *, const types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-syr(const char *uplo, const int *n,
+syr(const char *uplo, const types::blas_int *n,
     const double *alpha, const double *x,
-    const int *incx,
-    double *A, const int *lda)
+    const types::blas_int *incx,
+    double *A, const types::blas_int *lda)
 {
   dsyr_(uplo,n,alpha,x,incx,A,lda);
 }
 inline void
-syr(const char *uplo, const int *n,
+syr(const char *uplo, const types::blas_int *n,
     const float *alpha, const float *x,
-    const int *incx,
-    float *A, const int *lda)
+    const types::blas_int *incx,
+    float *A, const types::blas_int *lda)
 {
   ssyr_(uplo,n,alpha,x,incx,A,lda);
 }
@@ -346,20 +346,20 @@ syr(const char *uplo, const int *n,
 /// Template wrapper for LAPACK functions daxpy and saxpy
 template <typename number1, typename number2, typename number3>
 inline void
-axpy (const int *, const number1 *, const number2 *, const int *, number3 *, const int *)
+axpy (const types::blas_int *, const number1 *, const number2 *, const types::blas_int *, number3 *, const types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-axpy (const int *n, const double *alpha, const double *x, const int *incx, double *y, const int *incy)
+axpy (const types::blas_int *n, const double *alpha, const double *x, const types::blas_int *incx, double *y, const types::blas_int *incy)
 {
   daxpy_ (n,alpha,x,incx,y,incy);
 }
 #else
 inline void
-axpy (const int *, const double *, const double *, const int *, double *, const int *)
+axpy (const types::blas_int *, const double *, const double *, const types::blas_int *, double *, const types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("daxpy"));
 }
@@ -368,13 +368,13 @@ axpy (const int *, const double *, const double *, const int *, double *, const 
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-axpy (const int *n, const float *alpha, const float *x, const int *incx, float *y, const int *incy)
+axpy (const types::blas_int *n, const float *alpha, const float *x, const types::blas_int *incx, float *y, const types::blas_int *incy)
 {
   saxpy_ (n,alpha,x,incx,y,incy);
 }
 #else
 inline void
-axpy (const int *, const float *, const float *, const int *, float *, const int *)
+axpy (const types::blas_int *, const float *, const float *, const types::blas_int *, float *, const types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("saxpy"));
 }
@@ -384,20 +384,20 @@ axpy (const int *, const float *, const float *, const int *, float *, const int
 /// Template wrapper for LAPACK functions dgemv and sgemv
 template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
-gemv (const char *, const int *, const int *, const number1 *, const number2 *, const int *, const number3 *, const int *, const number4 *, number5 *, const int *)
+gemv (const char *, const types::blas_int *, const types::blas_int *, const number1 *, const number2 *, const types::blas_int *, const number3 *, const types::blas_int *, const number4 *, number5 *, const types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-gemv (const char *trans, const int *m, const int *n, const double *alpha, const double *A, const int *lda, const double *x, const int *incx, const double *b, double *y, const int *incy)
+gemv (const char *trans, const types::blas_int *m, const types::blas_int *n, const double *alpha, const double *A, const types::blas_int *lda, const double *x, const types::blas_int *incx, const double *b, double *y, const types::blas_int *incy)
 {
   dgemv_ (trans,m,n,alpha,A,lda,x,incx,b,y,incy);
 }
 #else
 inline void
-gemv (const char *, const int *, const int *, const double *, const double *, const int *, const double *, const int *, const double *, double *, const int *)
+gemv (const char *, const types::blas_int *, const types::blas_int *, const double *, const double *, const types::blas_int *, const double *, const types::blas_int *, const double *, double *, const types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgemv"));
 }
@@ -406,13 +406,13 @@ gemv (const char *, const int *, const int *, const double *, const double *, co
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-gemv (const char *trans, const int *m, const int *n, const float *alpha, const float *A, const int *lda, const float *x, const int *incx, const float *b, float *y, const int *incy)
+gemv (const char *trans, const types::blas_int *m, const types::blas_int *n, const float *alpha, const float *A, const types::blas_int *lda, const float *x, const types::blas_int *incx, const float *b, float *y, const types::blas_int *incy)
 {
   sgemv_ (trans,m,n,alpha,A,lda,x,incx,b,y,incy);
 }
 #else
 inline void
-gemv (const char *, const int *, const int *, const float *, const float *, const int *, const float *, const int *, const float *, float *, const int *)
+gemv (const char *, const types::blas_int *, const types::blas_int *, const float *, const float *, const types::blas_int *, const float *, const types::blas_int *, const float *, float *, const types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgemv"));
 }
@@ -424,8 +424,8 @@ gemv (const char *, const int *, const int *, const float *, const float *, cons
 template <typename number>
 inline void
 trmv (const char *uplo, const char *trans, const char *diag,
-      const int *N, const number *A, const int *lda,
-      number *x, const int *incx)
+      const types::blas_int *N, const number *A, const types::blas_int *lda,
+      number *x, const types::blas_int *incx)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -433,16 +433,16 @@ trmv (const char *uplo, const char *trans, const char *diag,
 #ifdef DEAL_II_WITH_LAPACK
 inline void
 trmv (const char *uplo, const char *trans, const char *diag,
-      const int *N, const double *A, const int *lda,
-      double *x, const int *incx)
+      const types::blas_int *N, const double *A, const types::blas_int *lda,
+      double *x, const types::blas_int *incx)
 {
   dtrmv_ (uplo, trans, diag, N, A, lda, x, incx);
 }
 #else
 inline void
 trmv (const char *uplo, const char *trans, const char *diag,
-      const int *N, const double *A, const int *lda,
-      double *x, const int *incx)
+      const types::blas_int *N, const double *A, const types::blas_int *lda,
+      double *x, const types::blas_int *incx)
 {
   Assert (false, LAPACKSupport::ExcMissing("dtrmv"));
 }
@@ -452,16 +452,16 @@ trmv (const char *uplo, const char *trans, const char *diag,
 #ifdef DEAL_II_WITH_LAPACK
 inline void
 trmv (const char *uplo, const char *trans, const char *diag,
-      const int *N, const float *A, const int *lda,
-      float *x, const int *incx)
+      const types::blas_int *N, const float *A, const types::blas_int *lda,
+      float *x, const types::blas_int *incx)
 {
   strmv_ (uplo, trans, diag, N, A, lda, x, incx);
 }
 #else
 inline void
 trmv (const char *uplo, const char *trans, const char *diag,
-      const int *N, const float *A, const int *lda,
-      float *x, const int *incx)
+      const types::blas_int *N, const float *A, const types::blas_int *lda,
+      float *x, const types::blas_int *incx)
 {
   Assert (false, LAPACKSupport::ExcMissing("dtrmv"));
 }
@@ -472,20 +472,20 @@ trmv (const char *uplo, const char *trans, const char *diag,
 /// Template wrapper for LAPACK functions dgemm and sgemm
 template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
-gemm (const char *, const char *, const int *, const int *, const int *, const number1 *, const number2 *, const int *, const number3 *, const int *, const number4 *, number5 *, const int *)
+gemm (const char *, const char *, const types::blas_int *, const types::blas_int *, const types::blas_int *, const number1 *, const number2 *, const types::blas_int *, const number3 *, const types::blas_int *, const number4 *, number5 *, const types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-gemm (const char *transa, const char *transb, const int *m, const int *n, const int *k, const double *alpha, const double *A, const int *lda, const double *B, const int *ldb, const double *beta, double *C, const int *ldc)
+gemm (const char *transa, const char *transb, const types::blas_int *m, const types::blas_int *n, const types::blas_int *k, const double *alpha, const double *A, const types::blas_int *lda, const double *B, const types::blas_int *ldb, const double *beta, double *C, const types::blas_int *ldc)
 {
   dgemm_ (transa,transb,m,n,k,alpha,A,lda,B,ldb,beta,C,ldc);
 }
 #else
 inline void
-gemm (const char *, const char *, const int *, const int *, const int *, const double *, const double *, const int *, const double *, const int *, const double *, double *, const int *)
+gemm (const char *, const char *, const types::blas_int *, const types::blas_int *, const types::blas_int *, const double *, const double *, const types::blas_int *, const double *, const types::blas_int *, const double *, double *, const types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgemm"));
 }
@@ -494,13 +494,13 @@ gemm (const char *, const char *, const int *, const int *, const int *, const d
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-gemm (const char *transa, const char *transb, const int *m, const int *n, const int *k, const float *alpha, const float *A, const int *lda, const float *B, const int *ldb, const float *beta, float *C, const int *ldc)
+gemm (const char *transa, const char *transb, const types::blas_int *m, const types::blas_int *n, const types::blas_int *k, const float *alpha, const float *A, const types::blas_int *lda, const float *B, const types::blas_int *ldb, const float *beta, float *C, const types::blas_int *ldc)
 {
   sgemm_ (transa,transb,m,n,k,alpha,A,lda,B,ldb,beta,C,ldc);
 }
 #else
 inline void
-gemm (const char *, const char *, const int *, const int *, const int *, const float *, const float *, const int *, const float *, const int *, const float *, float *, const int *)
+gemm (const char *, const char *, const types::blas_int *, const types::blas_int *, const types::blas_int *, const float *, const float *, const types::blas_int *, const float *, const types::blas_int *, const float *, float *, const types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgemm"));
 }
@@ -511,13 +511,13 @@ gemm (const char *, const char *, const int *, const int *, const int *, const f
 /// Template wrapper for potrf
 template <typename number1>
 inline void
-potrf (const char *, const int *, number1 *, const int *, int *)
+potrf (const char *, const types::blas_int *, number1 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 inline void
-potrf (const char *uplo, const int *n, double *A, const int *lda, int *info)
+potrf (const char *uplo, const types::blas_int *n, double *A, const types::blas_int *lda, types::blas_int *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   dpotrf_ (uplo,n,A,lda,info);
@@ -533,7 +533,7 @@ potrf (const char *uplo, const int *n, double *A, const int *lda, int *info)
 }
 
 inline void
-potrf (const char *uplo, const int *n, float *A, const int *lda, int *info)
+potrf (const char *uplo, const types::blas_int *n, float *A, const types::blas_int *lda, types::blas_int *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   spotrf_ (uplo,n,A,lda,info);
@@ -554,18 +554,18 @@ potrf (const char *uplo, const int *n, float *A, const int *lda, int *info)
 template <typename number>
 inline void
 trcon(const char *norm, const char *uplo, const char *diag,
-      const int *n, const number *A, const int *lda,
+      const types::blas_int *n, const number *A, const types::blas_int *lda,
       number *rcond,
-      number *work, int *iwork, int *info)
+      number *work, types::blas_int *iwork, types::blas_int *info)
 {
   Assert (false, ExcNotImplemented());
 }
 
 inline void
 trcon  (const char *norm, const char *uplo, const char *diag,
-        const int *n, const double *A, const int *lda,
+        const types::blas_int *n, const double *A, const types::blas_int *lda,
         double *rcond,
-        double *work, int *iwork, int *info)
+        double *work, types::blas_int *iwork, types::blas_int *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   dtrcon_ (norm, uplo, diag, n, A, lda, rcond, work, iwork, info);
@@ -587,9 +587,9 @@ trcon  (const char *norm, const char *uplo, const char *diag,
 
 inline void
 trcon  (const char *norm, const char *uplo, const char *diag,
-        const int *n, const float *A, const int *lda,
+        const types::blas_int *n, const float *A, const types::blas_int *lda,
         float *rcond,
-        float *work, int *iwork, int *info)
+        float *work, types::blas_int *iwork, types::blas_int *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   strcon_ (norm, uplo, diag, n, A, lda, rcond, work, iwork, info);
@@ -614,13 +614,13 @@ trcon  (const char *norm, const char *uplo, const char *diag,
 /// Template wrapper for pocon
 template <typename number1>
 inline void
-pocon (const char *, const int *, const number1 *, const int *, const number1 *, number1 *, number1 *, int *, int *)
+pocon (const char *, const types::blas_int *, const number1 *, const types::blas_int *, const number1 *, number1 *, number1 *, types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 inline void
-pocon (const char *uplo, const int *n, const double *A, const int *lda, const double *anorm, double *rcond, double *work, int *iwork, int *info)
+pocon (const char *uplo, const types::blas_int *n, const double *A, const types::blas_int *lda, const double *anorm, double *rcond, double *work, types::blas_int *iwork, types::blas_int *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   dpocon_ (uplo,n,A,lda,anorm,rcond,work,iwork,info);
@@ -640,7 +640,7 @@ pocon (const char *uplo, const int *n, const double *A, const int *lda, const do
 }
 
 inline void
-pocon (const char *uplo, const int *n, const float *A, const int *lda, const float *anorm, float *rcond, float *work, int *iwork, int *info)
+pocon (const char *uplo, const types::blas_int *n, const float *A, const types::blas_int *lda, const float *anorm, float *rcond, float *work, types::blas_int *iwork, types::blas_int *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   spocon_ (uplo,n,A,lda,anorm,rcond,work,iwork,info);
@@ -662,13 +662,13 @@ pocon (const char *uplo, const int *n, const float *A, const int *lda, const flo
 /// Template wrapper for potri
 template <typename number1>
 inline void
-potri(const char *, const int *, number1 *, const int *, int *)
+potri(const char *, const types::blas_int *, number1 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 inline void
-potri(const char *uplo, const int *n, double *A, const int *lda, int *info)
+potri(const char *uplo, const types::blas_int *n, double *A, const types::blas_int *lda, types::blas_int *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   dpotri_(uplo,n,A,lda,info);
@@ -684,7 +684,7 @@ potri(const char *uplo, const int *n, double *A, const int *lda, int *info)
 }
 
 inline void
-potri(const char *uplo, const int *n, float *A, const int *lda, int *info)
+potri(const char *uplo, const types::blas_int *n, float *A, const types::blas_int *lda, types::blas_int *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   spotri_(uplo,n,A,lda,info);
@@ -703,14 +703,14 @@ potri(const char *uplo, const int *n, float *A, const int *lda, int *info)
 /// Template wrapper for lansy
 template <typename number>
 inline
-number lansy (const char *, const char *, const int *, const number *, const int *, number *)
+number lansy (const char *, const char *, const types::blas_int *, const number *, const types::blas_int *, number *)
 {
   Assert (false, ExcNotImplemented());
   return number();
 }
 
 inline
-double lansy (const char *norm, const char *uplo, const int *n, const double *A, const int *lda, double *work)
+double lansy (const char *norm, const char *uplo, const types::blas_int *n, const double *A, const types::blas_int *lda, double *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return dlansy_(norm,uplo,n,A,lda,work);
@@ -728,7 +728,7 @@ double lansy (const char *norm, const char *uplo, const int *n, const double *A,
 }
 
 inline
-float lansy (const char *norm, const char *uplo, const int *n, const float *A, const int *lda, float *work)
+float lansy (const char *norm, const char *uplo, const types::blas_int *n, const float *A, const types::blas_int *lda, float *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return slansy_(norm,uplo,n,A,lda,work);
@@ -750,14 +750,14 @@ float lansy (const char *norm, const char *uplo, const int *n, const float *A, c
 /// Template wrapper for lange
 template <typename number>
 inline
-number lange (const char *, const int *, const int *, const number *, const int *, number *)
+number lange (const char *, const types::blas_int *, const types::blas_int *, const number *, const types::blas_int *, number *)
 {
   Assert (false, ExcNotImplemented());
   return number();
 }
 
 inline
-double lange (const char *norm, const int *m, const int *n, const double *A, const int *lda, double *work)
+double lange (const char *norm, const types::blas_int *m, const types::blas_int *n, const double *A, const types::blas_int *lda, double *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return dlange_(norm,m,n,A,lda,work);
@@ -775,7 +775,7 @@ double lange (const char *norm, const int *m, const int *n, const double *A, con
 }
 
 inline
-float lange (const char *norm, const int *m, const int *n, const float *A, const int *lda, float *work)
+float lange (const char *norm, const types::blas_int *m, const types::blas_int *n, const float *A, const types::blas_int *lda, float *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return slange_(norm,m,n,A,lda,work);
@@ -795,20 +795,20 @@ float lange (const char *norm, const int *m, const int *n, const float *A, const
 /// Template wrapper for LAPACK functions dgetrf and sgetrf
 template <typename number1>
 inline void
-getrf (const int *, const int *, number1 *, const int *, int *, int *)
+getrf (const types::blas_int *, const types::blas_int *, number1 *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-getrf (const int *m, const int *n, double *A, const int *lda, int *ipiv, int *info)
+getrf (const types::blas_int *m, const types::blas_int *n, double *A, const types::blas_int *lda, types::blas_int *ipiv, types::blas_int *info)
 {
   dgetrf_ (m,n,A,lda,ipiv,info);
 }
 #else
 inline void
-getrf (const int *, const int *, double *, const int *, int *, int *)
+getrf (const types::blas_int *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgetrf"));
 }
@@ -817,13 +817,13 @@ getrf (const int *, const int *, double *, const int *, int *, int *)
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-getrf (const int *m, const int *n, float *A, const int *lda, int *ipiv, int *info)
+getrf (const types::blas_int *m, const types::blas_int *n, float *A, const types::blas_int *lda, types::blas_int *ipiv, types::blas_int *info)
 {
   sgetrf_ (m,n,A,lda,ipiv,info);
 }
 #else
 inline void
-getrf (const int *, const int *, float *, const int *, int *, int *)
+getrf (const types::blas_int *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgetrf"));
 }
@@ -833,20 +833,20 @@ getrf (const int *, const int *, float *, const int *, int *, int *)
 /// Template wrapper for LAPACK functions dgetrs and sgetrs
 template <typename number1, typename number2>
 inline void
-getrs (const char *, const int *, const int *, const number1 *, const int *, const int *, number2 *, const int *, int *)
+getrs (const char *, const types::blas_int *, const types::blas_int *, const number1 *, const types::blas_int *, const types::blas_int *, number2 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-getrs (const char *trans, const int *n, const int *nrhs, const double *A, const int *lda, const int *ipiv, double *b, const int *ldb, int *info)
+getrs (const char *trans, const types::blas_int *n, const types::blas_int *nrhs, const double *A, const types::blas_int *lda, const types::blas_int *ipiv, double *b, const types::blas_int *ldb, types::blas_int *info)
 {
   dgetrs_ (trans,n,nrhs,A,lda,ipiv,b,ldb,info);
 }
 #else
 inline void
-getrs (const char *, const int *, const int *, const double *, const int *, const int *, double *, const int *, int *)
+getrs (const char *, const types::blas_int *, const types::blas_int *, const double *, const types::blas_int *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgetrs"));
 }
@@ -855,13 +855,13 @@ getrs (const char *, const int *, const int *, const double *, const int *, cons
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-getrs (const char *trans, const int *n, const int *nrhs, const float *A, const int *lda, const int *ipiv, float *b, const int *ldb, int *info)
+getrs (const char *trans, const types::blas_int *n, const types::blas_int *nrhs, const float *A, const types::blas_int *lda, const types::blas_int *ipiv, float *b, const types::blas_int *ldb, types::blas_int *info)
 {
   sgetrs_ (trans,n,nrhs,A,lda,ipiv,b,ldb,info);
 }
 #else
 inline void
-getrs (const char *, const int *, const int *, const float *, const int *, const int *, float *, const int *, int *)
+getrs (const char *, const types::blas_int *, const types::blas_int *, const float *, const types::blas_int *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgetrs"));
 }
@@ -872,45 +872,45 @@ getrs (const char *, const int *, const int *, const float *, const int *, const
 ///  Template wrapper for LAPACK functions dpotrs and spotrs
 template <typename number>
 inline void
-potrs (const char *, const int *, const int *,
-       const number *, const int *,
-       number *, const int *,
-       int *)
+potrs (const char *, const types::blas_int *, const types::blas_int *,
+       const number *, const types::blas_int *,
+       number *, const types::blas_int *,
+       types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-potrs (const char *uplo, const int *n, const int *nrhs,
-       const double *A, const int *lda,
-       double *B, const int *ldb,
-       int *info)
+potrs (const char *uplo, const types::blas_int *n, const types::blas_int *nrhs,
+       const double *A, const types::blas_int *lda,
+       double *B, const types::blas_int *ldb,
+       types::blas_int *info)
 {
   dpotrs_(uplo,n,nrhs,A,lda,B,ldb,info);
 }
 inline void
-potrs (const char *uplo, const int *n, const int *nrhs,
-       const float *A, const int *lda,
-       float *B, const int *ldb,
-       int *info)
+potrs (const char *uplo, const types::blas_int *n, const types::blas_int *nrhs,
+       const float *A, const types::blas_int *lda,
+       float *B, const types::blas_int *ldb,
+       types::blas_int *info)
 {
   spotrs_(uplo,n,nrhs,A,lda,B,ldb,info);
 }
 #else
 inline void
-potrs (const char *, const int *, const int *,
-       const double *, const int *,
-       double *, const int *,
-       int *)
+potrs (const char *, const types::blas_int *, const types::blas_int *,
+       const double *, const types::blas_int *,
+       double *, const types::blas_int *,
+       types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dpotrs"));
 }
 inline void
-potrs (const char *, const int *, const int *,
-       const float *, const int *,
-       float *, const int *,
-       int *)
+potrs (const char *, const types::blas_int *, const types::blas_int *,
+       const float *, const types::blas_int *,
+       float *, const types::blas_int *,
+       types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("spotrs"));
 }
@@ -922,20 +922,20 @@ potrs (const char *, const int *, const int *,
 /// Template wrapper for LAPACK functions dgetri and sgetri
 template <typename number1, typename number2>
 inline void
-getri (const int *, number1 *, const int *, int *, number2 *, const int *, int *)
+getri (const types::blas_int *, number1 *, const types::blas_int *, types::blas_int *, number2 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-getri (const int *n, double *A, const int *lda, int *ipiv, double *inv_work, const int *lwork, int *info)
+getri (const types::blas_int *n, double *A, const types::blas_int *lda, types::blas_int *ipiv, double *inv_work, const types::blas_int *lwork, types::blas_int *info)
 {
   dgetri_ (n,A,lda,ipiv,inv_work,lwork,info);
 }
 #else
 inline void
-getri (const int *, double *, const int *, int *, double *, const int *, int *)
+getri (const types::blas_int *, double *, const types::blas_int *, types::blas_int *, double *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgetri"));
 }
@@ -944,13 +944,13 @@ getri (const int *, double *, const int *, int *, double *, const int *, int *)
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-getri (const int *n, float *A, const int *lda, int *ipiv, float *inv_work, const int *lwork, int *info)
+getri (const types::blas_int *n, float *A, const types::blas_int *lda, types::blas_int *ipiv, float *inv_work, const types::blas_int *lwork, types::blas_int *info)
 {
   sgetri_ (n,A,lda,ipiv,inv_work,lwork,info);
 }
 #else
 inline void
-getri (const int *, float *, const int *, int *, float *, const int *, int *)
+getri (const types::blas_int *, float *, const types::blas_int *, types::blas_int *, float *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgetri"));
 }
@@ -960,20 +960,20 @@ getri (const int *, float *, const int *, int *, float *, const int *, int *)
 /// Template wrapper for LAPACK functions dgeqrf and sgeqrf
 template <typename number1, typename number2, typename number3>
 inline void
-geqrf (const int *, const int *, number1 *, const int *, number2 *, number3 *, const int *, int *)
+geqrf (const types::blas_int *, const types::blas_int *, number1 *, const types::blas_int *, number2 *, number3 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-geqrf (const int *m, const int *n, double *A, const int *lda, double *tau, double *work, const int *lwork, int *info)
+geqrf (const types::blas_int *m, const types::blas_int *n, double *A, const types::blas_int *lda, double *tau, double *work, const types::blas_int *lwork, types::blas_int *info)
 {
   dgeqrf_ (m,n,A,lda,tau,work,lwork,info);
 }
 #else
 inline void
-geqrf (const int *, const int *, double *, const int *, double *, double *, const int *, int *)
+geqrf (const types::blas_int *, const types::blas_int *, double *, const types::blas_int *, double *, double *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgeqrf"));
 }
@@ -982,13 +982,13 @@ geqrf (const int *, const int *, double *, const int *, double *, double *, cons
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-geqrf (const int *m, const int *n, float *A, const int *lda, float *tau, float *work, const int *lwork, int *info)
+geqrf (const types::blas_int *m, const types::blas_int *n, float *A, const types::blas_int *lda, float *tau, float *work, const types::blas_int *lwork, types::blas_int *info)
 {
   sgeqrf_ (m,n,A,lda,tau,work,lwork,info);
 }
 #else
 inline void
-geqrf (const int *, const int *, float *, const int *, float *, float *, const int *, int *)
+geqrf (const types::blas_int *, const types::blas_int *, float *, const types::blas_int *, float *, float *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgeqrf"));
 }
@@ -998,20 +998,20 @@ geqrf (const int *, const int *, float *, const int *, float *, float *, const i
 /// Template wrapper for LAPACK functions dormqr and sormqr
 template <typename number1, typename number2, typename number3, typename number4>
 inline void
-ormqr (const char *, const char *, const int *, const int *, const int *, const number1 *, const int *, const number2 *, number3 *, const int *, number4 *, const int *, int *)
+ormqr (const char *, const char *, const types::blas_int *, const types::blas_int *, const types::blas_int *, const number1 *, const types::blas_int *, const number2 *, number3 *, const types::blas_int *, number4 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-ormqr (const char *side, const char *trans, const int *m, const int *n, const int *k, const double *A, const int *lda, const double *tau, double *B, const int *ldb, double *work, const int *lwork, int *info)
+ormqr (const char *side, const char *trans, const types::blas_int *m, const types::blas_int *n, const types::blas_int *k, const double *A, const types::blas_int *lda, const double *tau, double *B, const types::blas_int *ldb, double *work, const types::blas_int *lwork, types::blas_int *info)
 {
   dormqr_ (side,trans,m,n,k,A,lda,tau,B,ldb,work,lwork,info);
 }
 #else
 inline void
-ormqr (const char *, const char *, const int *, const int *, const int *, const double *, const int *, const double *, double *, const int *, double *, const int *, int *)
+ormqr (const char *, const char *, const types::blas_int *, const types::blas_int *, const types::blas_int *, const double *, const types::blas_int *, const double *, double *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dormqr"));
 }
@@ -1020,13 +1020,13 @@ ormqr (const char *, const char *, const int *, const int *, const int *, const 
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-ormqr (const char *side, const char *trans, const int *m, const int *n, const int *k, const float *A, const int *lda, const float *tau, float *B, const int *ldb, float *work, const int *lwork, int *info)
+ormqr (const char *side, const char *trans, const types::blas_int *m, const types::blas_int *n, const types::blas_int *k, const float *A, const types::blas_int *lda, const float *tau, float *B, const types::blas_int *ldb, float *work, const types::blas_int *lwork, types::blas_int *info)
 {
   sormqr_ (side,trans,m,n,k,A,lda,tau,B,ldb,work,lwork,info);
 }
 #else
 inline void
-ormqr (const char *, const char *, const int *, const int *, const int *, const float *, const int *, const float *, float *, const int *, float *, const int *, int *)
+ormqr (const char *, const char *, const types::blas_int *, const types::blas_int *, const types::blas_int *, const float *, const types::blas_int *, const float *, float *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sormqr"));
 }
@@ -1036,20 +1036,20 @@ ormqr (const char *, const char *, const int *, const int *, const int *, const 
 /// Template wrapper for LAPACK functions dorgqr and sorgqr
 template <typename number1, typename number2, typename number3>
 inline void
-orgqr (const int *, const int *, const int *, const number1 *, const int *, const number2 *, number3 *, const int *, int *)
+orgqr (const types::blas_int *, const types::blas_int *, const types::blas_int *, const number1 *, const types::blas_int *, const number2 *, number3 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-orgqr (const int *m, const int *n, const int *k, const double *A, const int *lda, const double *tau, double *work, const int *lwork, int *info)
+orgqr (const types::blas_int *m, const types::blas_int *n, const types::blas_int *k, const double *A, const types::blas_int *lda, const double *tau, double *work, const types::blas_int *lwork, types::blas_int *info)
 {
   dorgqr_ (m,n,k,A,lda,tau,work,lwork,info);
 }
 #else
 inline void
-orgqr (const int *, const int *, const int *, const double *, const int *, const double *, double *, const int *, int *)
+orgqr (const types::blas_int *, const types::blas_int *, const types::blas_int *, const double *, const types::blas_int *, const double *, double *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dorgqr"));
 }
@@ -1058,13 +1058,13 @@ orgqr (const int *, const int *, const int *, const double *, const int *, const
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-orgqr (const int *m, const int *n, const int *k, const float *A, const int *lda, const float *tau, float *work, const int *lwork, int *info)
+orgqr (const types::blas_int *m, const types::blas_int *n, const types::blas_int *k, const float *A, const types::blas_int *lda, const float *tau, float *work, const types::blas_int *lwork, types::blas_int *info)
 {
   sorgqr_ (m,n,k,A,lda,tau,work,lwork,info);
 }
 #else
 inline void
-orgqr (const int *, const int *, const int *, const float *, const int *, const float *, float *, const int *, int *)
+orgqr (const types::blas_int *, const types::blas_int *, const types::blas_int *, const float *, const types::blas_int *, const float *, float *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sorgqr"));
 }
@@ -1074,20 +1074,20 @@ orgqr (const int *, const int *, const int *, const float *, const int *, const 
 /// Template wrapper for LAPACK functions dtrtrs and strtrs
 template <typename number1, typename number2>
 inline void
-trtrs (const char *, const char *, const char *, const int *, const int *, const number1 *, const int *, number2 *, const int *, int *)
+trtrs (const char *, const char *, const char *, const types::blas_int *, const types::blas_int *, const number1 *, const types::blas_int *, number2 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-trtrs (const char *uplo, const char *trans, const char *diag, const int *n, const int *n_rhs, const double *A, const int *lda, double *B, const int *ldb, int *info)
+trtrs (const char *uplo, const char *trans, const char *diag, const types::blas_int *n, const types::blas_int *n_rhs, const double *A, const types::blas_int *lda, double *B, const types::blas_int *ldb, types::blas_int *info)
 {
   dtrtrs_ (uplo,trans,diag,n,n_rhs,A,lda,B,ldb,info);
 }
 #else
 inline void
-trtrs (const char *, const char *, const char *, const int *, const int *, const double *, const int *, double *, const int *, int *)
+trtrs (const char *, const char *, const char *, const types::blas_int *, const types::blas_int *, const double *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dtrtrs"));
 }
@@ -1096,13 +1096,13 @@ trtrs (const char *, const char *, const char *, const int *, const int *, const
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-trtrs (const char *uplo, const char *trans, const char *diag, const int *n, const int *n_rhs, const float *A, const int *lda, float *B, const int *ldb, int *info)
+trtrs (const char *uplo, const char *trans, const char *diag, const types::blas_int *n, const types::blas_int *n_rhs, const float *A, const types::blas_int *lda, float *B, const types::blas_int *ldb, types::blas_int *info)
 {
   strtrs_ (uplo,trans,diag,n,n_rhs,A,lda,B,ldb,info);
 }
 #else
 inline void
-trtrs (const char *, const char *, const char *, const int *, const int *, const float *, const int *, float *, const int *, int *)
+trtrs (const char *, const char *, const char *, const types::blas_int *, const types::blas_int *, const float *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("strtrs"));
 }
@@ -1112,20 +1112,20 @@ trtrs (const char *, const char *, const char *, const int *, const int *, const
 /// Template wrapper for LAPACK functions dgeev and sgeev
 template <typename number1, typename number2, typename number3, typename number4, typename number5, typename number6>
 inline void
-geev (const char *, const char *, const int *, number1 *, const int *, number2 *, number3 *, number4 *, const int *, number5 *, const int *, number6 *, const int *, int *)
+geev (const char *, const char *, const types::blas_int *, number1 *, const types::blas_int *, number2 *, number3 *, number4 *, const types::blas_int *, number5 *, const types::blas_int *, number6 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-geev (const char *jobvl, const char *jobvr, const int *n, double *A, const int *lda, double *lambda_re, double *lambda_im, double *vl, const int *ldvl, double *vr, const int *ldva, double *work, const int *lwork, int *info)
+geev (const char *jobvl, const char *jobvr, const types::blas_int *n, double *A, const types::blas_int *lda, double *lambda_re, double *lambda_im, double *vl, const types::blas_int *ldvl, double *vr, const types::blas_int *ldva, double *work, const types::blas_int *lwork, types::blas_int *info)
 {
   dgeev_ (jobvl,jobvr,n,A,lda,lambda_re,lambda_im,vl,ldvl,vr,ldva,work,lwork,info);
 }
 #else
 inline void
-geev (const char *, const char *, const int *, double *, const int *, double *, double *, double *, const int *, double *, const int *, double *, const int *, int *)
+geev (const char *, const char *, const types::blas_int *, double *, const types::blas_int *, double *, double *, double *, const types::blas_int *, double *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgeev"));
 }
@@ -1134,13 +1134,13 @@ geev (const char *, const char *, const int *, double *, const int *, double *, 
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-geev (const char *jobvl, const char *jobvr, const int *n, float *A, const int *lda, float *lambda_re, float *lambda_im, float *vl, const int *ldvl, float *vr, const int *ldva, float *work, const int *lwork, int *info)
+geev (const char *jobvl, const char *jobvr, const types::blas_int *n, float *A, const types::blas_int *lda, float *lambda_re, float *lambda_im, float *vl, const types::blas_int *ldvl, float *vr, const types::blas_int *ldva, float *work, const types::blas_int *lwork, types::blas_int *info)
 {
   sgeev_ (jobvl,jobvr,n,A,lda,lambda_re,lambda_im,vl,ldvl,vr,ldva,work,lwork,info);
 }
 #else
 inline void
-geev (const char *, const char *, const int *, float *, const int *, float *, float *, float *, const int *, float *, const int *, float *, const int *, int *)
+geev (const char *, const char *, const types::blas_int *, float *, const types::blas_int *, float *, float *, float *, const types::blas_int *, float *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgeev"));
 }
@@ -1150,20 +1150,20 @@ geev (const char *, const char *, const int *, float *, const int *, float *, fl
 /// Template wrapper for LAPACK functions dgeevx and sgeevx
 template <typename number1, typename number2, typename number3, typename number4, typename number5, typename number6, typename number7, typename number8, typename number9, typename number10>
 inline void
-geevx (const char *, const char *, const char *, const char *, const int *, number1 *, const int *, number2 *, number3 *, number4 *, const int *, number5 *, const int *, int *, int *, number6 *, number7 *, number8 *, number9 *, number10 *, const int *, int *, int *)
+geevx (const char *, const char *, const char *, const char *, const types::blas_int *, number1 *, const types::blas_int *, number2 *, number3 *, number4 *, const types::blas_int *, number5 *, const types::blas_int *, types::blas_int *, types::blas_int *, number6 *, number7 *, number8 *, number9 *, number10 *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-geevx (const char *balanc, const char *jobvl, const char *jobvr, const char *sense, const int *n, double *A, const int *lda, double *lambda_re, double *lambda_im, double *vl, const int *ldvl, double *vr, const int *ldvr, int *ilo, int *ihi, double *scale, double *abnrm, double *rconde, double *rcondv, double *work, const int *lwork, int *iwork, int *info)
+geevx (const char *balanc, const char *jobvl, const char *jobvr, const char *sense, const types::blas_int *n, double *A, const types::blas_int *lda, double *lambda_re, double *lambda_im, double *vl, const types::blas_int *ldvl, double *vr, const types::blas_int *ldvr, types::blas_int *ilo, types::blas_int *ihi, double *scale, double *abnrm, double *rconde, double *rcondv, double *work, const types::blas_int *lwork, types::blas_int *iwork, types::blas_int *info)
 {
   dgeevx_ (balanc,jobvl,jobvr,sense,n,A,lda,lambda_re,lambda_im,vl,ldvl,vr,ldvr,ilo,ihi,scale,abnrm,rconde,rcondv,work,lwork,iwork,info);
 }
 #else
 inline void
-geevx (const char *, const char *, const char *, const char *, const int *, double *, const int *, double *, double *, double *, const int *, double *, const int *, int *, int *, double *, double *, double *, double *, double *, const int *, int *, int *)
+geevx (const char *, const char *, const char *, const char *, const types::blas_int *, double *, const types::blas_int *, double *, double *, double *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *, types::blas_int *, double *, double *, double *, double *, double *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgeevx"));
 }
@@ -1172,13 +1172,13 @@ geevx (const char *, const char *, const char *, const char *, const int *, doub
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-geevx (const char *balanc, const char *jobvl, const char *jobvr, const char *sense, const int *n, float *A, const int *lda, float *lambda_re, float *lambda_im, float *vl, const int *ldvl, float *vr, const int *ldvr, int *ilo, int *ihi, float *scale, float *abnrm, float *rconde, float *rcondv, float *work, const int *lwork, int *iwork, int *info)
+geevx (const char *balanc, const char *jobvl, const char *jobvr, const char *sense, const types::blas_int *n, float *A, const types::blas_int *lda, float *lambda_re, float *lambda_im, float *vl, const types::blas_int *ldvl, float *vr, const types::blas_int *ldvr, types::blas_int *ilo, types::blas_int *ihi, float *scale, float *abnrm, float *rconde, float *rcondv, float *work, const types::blas_int *lwork, types::blas_int *iwork, types::blas_int *info)
 {
   sgeevx_ (balanc,jobvl,jobvr,sense,n,A,lda,lambda_re,lambda_im,vl,ldvl,vr,ldvr,ilo,ihi,scale,abnrm,rconde,rcondv,work,lwork,iwork,info);
 }
 #else
 inline void
-geevx (const char *, const char *, const char *, const char *, const int *, float *, const int *, float *, float *, float *, const int *, float *, const int *, int *, int *, float *, float *, float *, float *, float *, const int *, int *, int *)
+geevx (const char *, const char *, const char *, const char *, const types::blas_int *, float *, const types::blas_int *, float *, float *, float *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *, types::blas_int *, float *, float *, float *, float *, float *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgeevx"));
 }
@@ -1188,20 +1188,20 @@ geevx (const char *, const char *, const char *, const char *, const int *, floa
 /// Template wrapper for LAPACK functions dsyev and ssyev
 template <typename number1, typename number2, typename number3>
 inline void
-syev (const char *, const char *, const int *, number1 *, const int *, number2 *, number3 *, const int *, int *)
+syev (const char *, const char *, const types::blas_int *, number1 *, const types::blas_int *, number2 *, number3 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-syev (const char *jobz, const char *uplo, const int *n, double *A, const int *lda, double *w, double *work, const int *lwork, int *info)
+syev (const char *jobz, const char *uplo, const types::blas_int *n, double *A, const types::blas_int *lda, double *w, double *work, const types::blas_int *lwork, types::blas_int *info)
 {
   dsyev_ (jobz,uplo,n,A,lda,w,work,lwork,info);
 }
 #else
 inline void
-syev (const char *, const char *, const int *, double *, const int *, double *, double *, const int *, int *)
+syev (const char *, const char *, const types::blas_int *, double *, const types::blas_int *, double *, double *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dsyev"));
 }
@@ -1210,13 +1210,13 @@ syev (const char *, const char *, const int *, double *, const int *, double *, 
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-syev (const char *jobz, const char *uplo, const int *n, float *A, const int *lda, float *w, float *work, const int *lwork, int *info)
+syev (const char *jobz, const char *uplo, const types::blas_int *n, float *A, const types::blas_int *lda, float *w, float *work, const types::blas_int *lwork, types::blas_int *info)
 {
   ssyev_ (jobz,uplo,n,A,lda,w,work,lwork,info);
 }
 #else
 inline void
-syev (const char *, const char *, const int *, float *, const int *, float *, float *, const int *, int *)
+syev (const char *, const char *, const types::blas_int *, float *, const types::blas_int *, float *, float *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("ssyev"));
 }
@@ -1226,20 +1226,20 @@ syev (const char *, const char *, const int *, float *, const int *, float *, fl
 /// Template wrapper for LAPACK functions dsyevx and ssyevx
 template <typename number1, typename number2, typename number3, typename number4, typename number5, typename number6, typename number7>
 inline void
-syevx (const char *, const char *, const char *, const int *, number1 *, const int *, const number2 *, const number3 *, const int *, const int *, const number4 *, int *, number5 *, number6 *, const int *, number7 *, const int *, int *, int *, int *)
+syevx (const char *, const char *, const char *, const types::blas_int *, number1 *, const types::blas_int *, const number2 *, const number3 *, const types::blas_int *, const types::blas_int *, const number4 *, types::blas_int *, number5 *, number6 *, const types::blas_int *, number7 *, const types::blas_int *, types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-syevx (const char *jobz, const char *range, const char *uplo, const int *n, double *A, const int *lda, const double *vl, const double *vu, const int *il, const int *iu, const double *abstol, int *m, double *w, double *z, const int *ldz, double *work, const int *lwork, int *iwork, int *ifail, int *info)
+syevx (const char *jobz, const char *range, const char *uplo, const types::blas_int *n, double *A, const types::blas_int *lda, const double *vl, const double *vu, const types::blas_int *il, const types::blas_int *iu, const double *abstol, types::blas_int *m, double *w, double *z, const types::blas_int *ldz, double *work, const types::blas_int *lwork, types::blas_int *iwork, types::blas_int *ifail, types::blas_int *info)
 {
   dsyevx_ (jobz,range,uplo,n,A,lda,vl,vu,il,iu,abstol,m,w,z,ldz,work,lwork,iwork,ifail,info);
 }
 #else
 inline void
-syevx (const char *, const char *, const char *, const int *, double *, const int *, const double *, const double *, const int *, const int *, const double *, int *, double *, double *, const int *, double *, const int *, int *, int *, int *)
+syevx (const char *, const char *, const char *, const types::blas_int *, double *, const types::blas_int *, const double *, const double *, const types::blas_int *, const types::blas_int *, const double *, types::blas_int *, double *, double *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dsyevx"));
 }
@@ -1248,13 +1248,13 @@ syevx (const char *, const char *, const char *, const int *, double *, const in
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-syevx (const char *jobz, const char *range, const char *uplo, const int *n, float *A, const int *lda, const float *vl, const float *vu, const int *il, const int *iu, const float *abstol, int *m, float *w, float *z, const int *ldz, float *work, const int *lwork, int *iwork, int *ifail, int *info)
+syevx (const char *jobz, const char *range, const char *uplo, const types::blas_int *n, float *A, const types::blas_int *lda, const float *vl, const float *vu, const types::blas_int *il, const types::blas_int *iu, const float *abstol, types::blas_int *m, float *w, float *z, const types::blas_int *ldz, float *work, const types::blas_int *lwork, types::blas_int *iwork, types::blas_int *ifail, types::blas_int *info)
 {
   ssyevx_ (jobz,range,uplo,n,A,lda,vl,vu,il,iu,abstol,m,w,z,ldz,work,lwork,iwork,ifail,info);
 }
 #else
 inline void
-syevx (const char *, const char *, const char *, const int *, float *, const int *, const float *, const float *, const int *, const int *, const float *, int *, float *, float *, const int *, float *, const int *, int *, int *, int *)
+syevx (const char *, const char *, const char *, const types::blas_int *, float *, const types::blas_int *, const float *, const float *, const types::blas_int *, const types::blas_int *, const float *, types::blas_int *, float *, float *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("ssyevx"));
 }
@@ -1264,20 +1264,20 @@ syevx (const char *, const char *, const char *, const int *, float *, const int
 /// Template wrapper for LAPACK functions dsygv and ssygv
 template <typename number1, typename number2, typename number3, typename number4>
 inline void
-sygv (const int *, const char *, const char *, const int *, number1 *, const int *, number2 *, const int *, number3 *, number4 *, const int *, int *)
+sygv (const types::blas_int *, const char *, const char *, const types::blas_int *, number1 *, const types::blas_int *, number2 *, const types::blas_int *, number3 *, number4 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-sygv (const int *itype, const char *jobz, const char *uplo, const int *n, double *A, const int *lda, double *B, const int *ldb, double *w, double *work, const int *lwork, int *info)
+sygv (const types::blas_int *itype, const char *jobz, const char *uplo, const types::blas_int *n, double *A, const types::blas_int *lda, double *B, const types::blas_int *ldb, double *w, double *work, const types::blas_int *lwork, types::blas_int *info)
 {
   dsygv_ (itype,jobz,uplo,n,A,lda,B,ldb,w,work,lwork,info);
 }
 #else
 inline void
-sygv (const int *, const char *, const char *, const int *, double *, const int *, double *, const int *, double *, double *, const int *, int *)
+sygv (const types::blas_int *, const char *, const char *, const types::blas_int *, double *, const types::blas_int *, double *, const types::blas_int *, double *, double *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dsygv"));
 }
@@ -1286,13 +1286,13 @@ sygv (const int *, const char *, const char *, const int *, double *, const int 
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-sygv (const int *itype, const char *jobz, const char *uplo, const int *n, float *A, const int *lda, float *B, const int *ldb, float *w, float *work, const int *lwork, int *info)
+sygv (const types::blas_int *itype, const char *jobz, const char *uplo, const types::blas_int *n, float *A, const types::blas_int *lda, float *B, const types::blas_int *ldb, float *w, float *work, const types::blas_int *lwork, types::blas_int *info)
 {
   ssygv_ (itype,jobz,uplo,n,A,lda,B,ldb,w,work,lwork,info);
 }
 #else
 inline void
-sygv (const int *, const char *, const char *, const int *, float *, const int *, float *, const int *, float *, float *, const int *, int *)
+sygv (const types::blas_int *, const char *, const char *, const types::blas_int *, float *, const types::blas_int *, float *, const types::blas_int *, float *, float *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("ssygv"));
 }
@@ -1302,20 +1302,20 @@ sygv (const int *, const char *, const char *, const int *, float *, const int *
 /// Template wrapper for LAPACK functions dsygvx and ssygvx
 template <typename number1, typename number2, typename number3, typename number4, typename number5, typename number6, typename number7, typename number8>
 inline void
-sygvx (const int *, const char *, const char *, const char *, const int *, number1 *, const int *, number2 *, const int *, const number3 *, const number4 *, const int *, const int *, const number5 *, int *, number6 *, number7 *, const int *, number8 *, const int *, int *, int *, int *)
+sygvx (const types::blas_int *, const char *, const char *, const char *, const types::blas_int *, number1 *, const types::blas_int *, number2 *, const types::blas_int *, const number3 *, const number4 *, const types::blas_int *, const types::blas_int *, const number5 *, types::blas_int *, number6 *, number7 *, const types::blas_int *, number8 *, const types::blas_int *, types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-sygvx (const int *itype, const char *jobz, const char *range, const char *uplo, const int *n, double *A, const int *lda, double *B, const int *ldb, const double *vl, const double *vu, const int *il, const int *iu, const double *abstol, int *m, double *w, double *z, const int *ldz, double *work, const int *lwork, int *iwork, int *ifail, int *info)
+sygvx (const types::blas_int *itype, const char *jobz, const char *range, const char *uplo, const types::blas_int *n, double *A, const types::blas_int *lda, double *B, const types::blas_int *ldb, const double *vl, const double *vu, const types::blas_int *il, const types::blas_int *iu, const double *abstol, types::blas_int *m, double *w, double *z, const types::blas_int *ldz, double *work, const types::blas_int *lwork, types::blas_int *iwork, types::blas_int *ifail, types::blas_int *info)
 {
   dsygvx_ (itype,jobz,range,uplo,n,A,lda,B,ldb,vl,vu,il,iu,abstol,m,w,z,ldz,work,lwork,iwork,ifail,info);
 }
 #else
 inline void
-sygvx (const int *, const char *, const char *, const char *, const int *, double *, const int *, double *, const int *, const double *, const double *, const int *, const int *, const double *, int *, double *, double *, const int *, double *, const int *, int *, int *, int *)
+sygvx (const types::blas_int *, const char *, const char *, const char *, const types::blas_int *, double *, const types::blas_int *, double *, const types::blas_int *, const double *, const double *, const types::blas_int *, const types::blas_int *, const double *, types::blas_int *, double *, double *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dsygvx"));
 }
@@ -1324,13 +1324,13 @@ sygvx (const int *, const char *, const char *, const char *, const int *, doubl
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-sygvx (const int *itype, const char *jobz, const char *range, const char *uplo, const int *n, float *A, const int *lda, float *B, const int *ldb, const float *vl, const float *vu, const int *il, const int *iu, const float *abstol, int *m, float *w, float *z, const int *ldz, float *work, const int *lwork, int *iwork, int *ifail, int *info)
+sygvx (const types::blas_int *itype, const char *jobz, const char *range, const char *uplo, const types::blas_int *n, float *A, const types::blas_int *lda, float *B, const types::blas_int *ldb, const float *vl, const float *vu, const types::blas_int *il, const types::blas_int *iu, const float *abstol, types::blas_int *m, float *w, float *z, const types::blas_int *ldz, float *work, const types::blas_int *lwork, types::blas_int *iwork, types::blas_int *ifail, types::blas_int *info)
 {
   ssygvx_ (itype,jobz,range,uplo,n,A,lda,B,ldb,vl,vu,il,iu,abstol,m,w,z,ldz,work,lwork,iwork,ifail,info);
 }
 #else
 inline void
-sygvx (const int *, const char *, const char *, const char *, const int *, float *, const int *, float *, const int *, const float *, const float *, const int *, const int *, const float *, int *, float *, float *, const int *, float *, const int *, int *, int *, int *)
+sygvx (const types::blas_int *, const char *, const char *, const char *, const types::blas_int *, float *, const types::blas_int *, float *, const types::blas_int *, const float *, const float *, const types::blas_int *, const types::blas_int *, const float *, types::blas_int *, float *, float *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("ssygvx"));
 }
@@ -1340,20 +1340,20 @@ sygvx (const int *, const char *, const char *, const char *, const int *, float
 /// Template wrapper for LAPACK functions dgesdd and sgesdd
 template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
-gesdd (const char *, const int *, const int *, number1 *, const int *, number2 *, number3 *, const int *, number4 *, const int *, number5 *, const int *, int *, int *)
+gesdd (const char *, const types::blas_int *, const types::blas_int *, number1 *, const types::blas_int *, number2 *, number3 *, const types::blas_int *, number4 *, const types::blas_int *, number5 *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-gesdd (const char *jobz, const int *m, const int *n, double *A, const int *lda, double *s, double *u, const int *ldu, double *vt, const int *ldvt, double *work, const int *lwork, int *iwork, int *info)
+gesdd (const char *jobz, const types::blas_int *m, const types::blas_int *n, double *A, const types::blas_int *lda, double *s, double *u, const types::blas_int *ldu, double *vt, const types::blas_int *ldvt, double *work, const types::blas_int *lwork, types::blas_int *iwork, types::blas_int *info)
 {
   dgesdd_ (jobz,m,n,A,lda,s,u,ldu,vt,ldvt,work,lwork,iwork,info);
 }
 #else
 inline void
-gesdd (const char *, const int *, const int *, double *, const int *, double *, double *, const int *, double *, const int *, double *, const int *, int *, int *)
+gesdd (const char *, const types::blas_int *, const types::blas_int *, double *, const types::blas_int *, double *, double *, const types::blas_int *, double *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgesdd"));
 }
@@ -1362,13 +1362,13 @@ gesdd (const char *, const int *, const int *, double *, const int *, double *, 
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-gesdd (const char *jobz, const int *m, const int *n, float *A, const int *lda, float *s, float *u, const int *ldu, float *vt, const int *ldvt, float *work, const int *lwork, int *iwork, int *info)
+gesdd (const char *jobz, const types::blas_int *m, const types::blas_int *n, float *A, const types::blas_int *lda, float *s, float *u, const types::blas_int *ldu, float *vt, const types::blas_int *ldvt, float *work, const types::blas_int *lwork, types::blas_int *iwork, types::blas_int *info)
 {
   sgesdd_ (jobz,m,n,A,lda,s,u,ldu,vt,ldvt,work,lwork,iwork,info);
 }
 #else
 inline void
-gesdd (const char *, const int *, const int *, float *, const int *, float *, float *, const int *, float *, const int *, float *, const int *, int *, int *)
+gesdd (const char *, const types::blas_int *, const types::blas_int *, float *, const types::blas_int *, float *, float *, const types::blas_int *, float *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgesdd"));
 }
@@ -1378,20 +1378,20 @@ gesdd (const char *, const int *, const int *, float *, const int *, float *, fl
 /// Template wrapper for LAPACK functions dgesvd and sgesvd
 template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
-gesvd (int *, int *, const int *, const int *, number1 *, const int *, number2 *, number3 *, const int *, number4 *, const int *, number5 *, const int *, int *)
+gesvd (types::blas_int *, types::blas_int *, const types::blas_int *, const types::blas_int *, number1 *, const types::blas_int *, number2 *, number3 *, const types::blas_int *, number4 *, const types::blas_int *, number5 *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-gesvd (int *jobu, int *jobvt, const int *n, const int *m, double *A, const int *lda, double *s, double *u, const int *ldu, double *vt, const int *ldvt, double *work, const int *lwork, int *info)
+gesvd (types::blas_int *jobu, types::blas_int *jobvt, const types::blas_int *n, const types::blas_int *m, double *A, const types::blas_int *lda, double *s, double *u, const types::blas_int *ldu, double *vt, const types::blas_int *ldvt, double *work, const types::blas_int *lwork, types::blas_int *info)
 {
   dgesvd_ (jobu,jobvt,n,m,A,lda,s,u,ldu,vt,ldvt,work,lwork,info);
 }
 #else
 inline void
-gesvd (int *, int *, const int *, const int *, double *, const int *, double *, double *, const int *, double *, const int *, double *, const int *, int *)
+gesvd (types::blas_int *, types::blas_int *, const types::blas_int *, const types::blas_int *, double *, const types::blas_int *, double *, double *, const types::blas_int *, double *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgesvd"));
 }
@@ -1400,13 +1400,13 @@ gesvd (int *, int *, const int *, const int *, double *, const int *, double *, 
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-gesvd (int *jobu, int *jobvt, const int *n, const int *m, float *A, const int *lda, float *s, float *u, const int *ldu, float *vt, const int *ldvt, float *work, const int *lwork, int *info)
+gesvd (types::blas_int *jobu, types::blas_int *jobvt, const types::blas_int *n, const types::blas_int *m, float *A, const types::blas_int *lda, float *s, float *u, const types::blas_int *ldu, float *vt, const types::blas_int *ldvt, float *work, const types::blas_int *lwork, types::blas_int *info)
 {
   sgesvd_ (jobu,jobvt,n,m,A,lda,s,u,ldu,vt,ldvt,work,lwork,info);
 }
 #else
 inline void
-gesvd (int *, int *, const int *, const int *, float *, const int *, float *, float *, const int *, float *, const int *, float *, const int *, int *)
+gesvd (types::blas_int *, types::blas_int *, const types::blas_int *, const types::blas_int *, float *, const types::blas_int *, float *, float *, const types::blas_int *, float *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgesvd"));
 }
@@ -1416,20 +1416,20 @@ gesvd (int *, int *, const int *, const int *, float *, const int *, float *, fl
 /// Template wrapper for LAPACK functions dgelsd and sgelsd
 template <typename number1, typename number2, typename number3, typename number4, typename number5>
 inline void
-gelsd (const int *, const int *, const int *, const number1 *, const int *, number2 *, const int *, number3 *, const number4 *, int *, number5 *, const int *, int *, int *)
+gelsd (const types::blas_int *, const types::blas_int *, const types::blas_int *, const number1 *, const types::blas_int *, number2 *, const types::blas_int *, number3 *, const number4 *, types::blas_int *, number5 *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-gelsd (const int *m, const int *n, const int *nrhs, const double *A, const int *lda, double *B, const int *ldb, double *s, const double *rcond, int *rank, double *work, const int *lwork, int *iwork, int *info)
+gelsd (const types::blas_int *m, const types::blas_int *n, const types::blas_int *nrhs, const double *A, const types::blas_int *lda, double *B, const types::blas_int *ldb, double *s, const double *rcond, types::blas_int *rank, double *work, const types::blas_int *lwork, types::blas_int *iwork, types::blas_int *info)
 {
   dgelsd_ (m,n,nrhs,A,lda,B,ldb,s,rcond,rank,work,lwork,iwork,info);
 }
 #else
 inline void
-gelsd (const int *, const int *, const int *, const double *, const int *, double *, const int *, double *, const double *, int *, double *, const int *, int *, int *)
+gelsd (const types::blas_int *, const types::blas_int *, const types::blas_int *, const double *, const types::blas_int *, double *, const types::blas_int *, double *, const double *, types::blas_int *, double *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dgelsd"));
 }
@@ -1438,13 +1438,13 @@ gelsd (const int *, const int *, const int *, const double *, const int *, doubl
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-gelsd (const int *m, const int *n, const int *nrhs, const float *A, const int *lda, float *B, const int *ldb, float *s, const float *rcond, int *rank, float *work, const int *lwork, int *iwork, int *info)
+gelsd (const types::blas_int *m, const types::blas_int *n, const types::blas_int *nrhs, const float *A, const types::blas_int *lda, float *B, const types::blas_int *ldb, float *s, const float *rcond, types::blas_int *rank, float *work, const types::blas_int *lwork, types::blas_int *iwork, types::blas_int *info)
 {
   sgelsd_ (m,n,nrhs,A,lda,B,ldb,s,rcond,rank,work,lwork,iwork,info);
 }
 #else
 inline void
-gelsd (const int *, const int *, const int *, const float *, const int *, float *, const int *, float *, const float *, int *, float *, const int *, int *, int *)
+gelsd (const types::blas_int *, const types::blas_int *, const types::blas_int *, const float *, const types::blas_int *, float *, const types::blas_int *, float *, const float *, types::blas_int *, float *, const types::blas_int *, types::blas_int *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sgelsd"));
 }
@@ -1454,20 +1454,20 @@ gelsd (const int *, const int *, const int *, const float *, const int *, float 
 /// Template wrapper for LAPACK functions dstev and sstev
 template <typename number1, typename number2, typename number3, typename number4>
 inline void
-stev (const char *, const int *, number1 *, number2 *, number3 *, const int *, number4 *, int *)
+stev (const char *, const types::blas_int *, number1 *, number2 *, number3 *, const types::blas_int *, number4 *, types::blas_int *)
 {
   Assert (false, ExcNotImplemented());
 }
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-stev (const char *jobz, const int *n, double *d, double *e, double *z, const int *ldz, double *work, int *info)
+stev (const char *jobz, const types::blas_int *n, double *d, double *e, double *z, const types::blas_int *ldz, double *work, types::blas_int *info)
 {
   dstev_ (jobz,n,d,e,z,ldz,work,info);
 }
 #else
 inline void
-stev (const char *, const int *, double *, double *, double *, const int *, double *, int *)
+stev (const char *, const types::blas_int *, double *, double *, double *, const types::blas_int *, double *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("dstev"));
 }
@@ -1476,13 +1476,13 @@ stev (const char *, const int *, double *, double *, double *, const int *, doub
 
 #ifdef DEAL_II_WITH_LAPACK
 inline void
-stev (const char *jobz, const int *n, float *d, float *e, float *z, const int *ldz, float *work, int *info)
+stev (const char *jobz, const types::blas_int *n, float *d, float *e, float *z, const types::blas_int *ldz, float *work, types::blas_int *info)
 {
   sstev_ (jobz,n,d,e,z,ldz,work,info);
 }
 #else
 inline void
-stev (const char *, const int *, float *, float *, float *, const int *, float *, int *)
+stev (const char *, const types::blas_int *, float *, float *, float *, const types::blas_int *, float *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sstev"));
 }

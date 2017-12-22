@@ -668,7 +668,7 @@ public:
                                                   const number                  abs_accuracy,
                                                   Vector<number>               &eigenvalues,
                                                   std::vector<Vector<number> > &eigenvectors,
-                                                  const int                     itype = 1);
+                                                  const types::blas_int             itype = 1);
 
   /**
    * Same as the other compute_generalized_eigenvalues_symmetric function
@@ -688,7 +688,7 @@ public:
    */
   void compute_generalized_eigenvalues_symmetric (LAPACKFullMatrix<number>     &B,
                                                   std::vector<Vector<number> > &eigenvectors,
-                                                  const int                     itype = 1);
+                                                  const types::blas_int             itype = 1);
 
   /**
    * Compute the singular value decomposition of the matrix using LAPACK
@@ -794,7 +794,7 @@ private:
   /**
    * Integer working array used for some LAPACK functions.
    */
-  mutable std::vector<int> iwork;
+  mutable std::vector<types::blas_int> iwork;
 
   /**
    * The vector storing the permutations applied for pivoting in the LU-
@@ -802,7 +802,7 @@ private:
    *
    * Also used as the scratch array IWORK for LAPACK functions needing it.
    */
-  std::vector<int> ipiv;
+  std::vector<types::blas_int> ipiv;
 
   /**
    * Workspace for calculating the inverse matrix from an LU factorization.
