@@ -290,6 +290,20 @@ namespace PETScWrappers
     MatrixBase ();
 
     /**
+     * Copy constructor. It is deleted as copying this base class
+     * without knowing the concrete kind of matrix stored may both
+     * miss important details and be expensive if the matrix is large.
+     */
+    MatrixBase(const MatrixBase &) = delete;
+
+    /**
+     * Copy operator. It is deleted as copying this base class
+     * without knowing the concrete kind of matrix stored may both
+     * miss important details and be expensive if the matrix is large.
+     */
+    MatrixBase &operator=(const MatrixBase &) = delete;
+
+    /**
      * Destructor. Made virtual so that one can use pointers to this class.
      */
     virtual ~MatrixBase ();
@@ -941,15 +955,6 @@ namespace PETScWrappers
 
 
   private:
-
-    /**
-     * purposefully not implemented
-     */
-    MatrixBase(const MatrixBase &) = delete;
-    /**
-     * purposefully not implemented
-     */
-    MatrixBase &operator=(const MatrixBase &) = delete;
 
     /**
      * An internal array of integer values that is used to store the column
