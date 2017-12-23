@@ -177,6 +177,8 @@ namespace OpenCASCADE
       case 3:
         return gp_Pnt(p[0], p[1], p[2]);
       }
+    AssertThrow (false, ExcNotImplemented());
+    return {};
   }
 
   template <int spacedim>
@@ -198,6 +200,8 @@ namespace OpenCASCADE
       case 3:
         return Point<spacedim>(p.X(), p.Y(), p.Z());
       }
+    AssertThrow (false, ExcNotImplemented());
+    return {};
   }
 
   template<int dim>

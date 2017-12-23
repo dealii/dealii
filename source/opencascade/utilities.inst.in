@@ -33,7 +33,7 @@ for (deal_II_dimension : DIMENSIONS)
 
     template
     TopoDS_Edge interpolation_curve(std::vector<Point<deal_II_dimension> >& curve_points,
-                                    const Tensor<1, deal_II_dimension>& direction=Tensor<1,deal_II_dimension>(),
+                                    const Tensor<1, deal_II_dimension>& direction,
                                     const bool closed,
                                     const double tolerance);
 
