@@ -1248,11 +1248,27 @@ namespace DoFTools
    *
    * The size of @p selected_dofs shall equal <tt>dof_handler.n_dofs()</tt>.
    * Previous contents of this array or overwritten.
+   *
+   * In case of a parallel::shared::Triangulation or a
+   * parallel::distributed::Triangulation only locally relevant dofs are
+   * considered. Note that the vector returned through the second argument still
+   * has size <tt>dof_handler.n_dofs()</tt>. Consequently, it can be very large
+   * for large parallel computations -- in fact, it may be too large to store on
+   * each processor. In that case, you may want to choose the variant of this
+   * function that returns an IndexSet object.
    */
   template <int dim, int spacedim>
   void
   extract_hanging_node_dofs (const DoFHandler<dim,spacedim> &dof_handler,
                              std::vector<bool>              &selected_dofs);
+
+  /**
+   * Same as above but return the selected DoFs as IndexSet. In particular,
+   * for parallel::Triangulation objects this function should be preferred.
+   */
+  template <int dim, int spacedim>
+  IndexSet
+  extract_hanging_node_dofs (const DoFHandler<dim, spacedim> &dof_handler);
 
   /**
    * Extract the indices of the degrees of freedom belonging to certain vector
