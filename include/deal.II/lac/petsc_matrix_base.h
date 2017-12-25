@@ -960,15 +960,27 @@ namespace PETScWrappers
      * An internal array of integer values that is used to store the column
      * indices when adding/inserting local data into the (large) sparse
      * matrix.
+     *
+     * This variable does not store any "state" of the matrix
+     * object. Rather, it is only used as a temporary buffer by some
+     * of the member functions of this class. As with all @p mutable
+     * member variables, the use of this variable is not thread-safe
+     * unless guarded by a mutex. However, since PETSc matrix
+     * operations are not thread-safe anyway, there is no need to
+     * attempt to make things thread-safe, and so there is no mutex
+     * associated with this variable.
      */
-    std::vector<PetscInt> column_indices;
+    mutable std::vector<PetscInt> column_indices;
 
     /**
      * An internal array of double values that is used to store the column
      * indices when adding/inserting local data into the (large) sparse
      * matrix.
+     *
+     * The same comment as for the @p column_indices variable above
+     * applies.
      */
-    std::vector<PetscScalar> column_values;
+    mutable std::vector<PetscScalar> column_values;
 
 
     /**
