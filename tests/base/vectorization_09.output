@@ -1,0 +1,5 @@
+
+DEAL:double::streaming store OK
+DEAL:float::streaming store OK
+DEAL:long double::streaming store OK
+DEAL:unsigned int::streaming store OK
