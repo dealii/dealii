@@ -263,6 +263,56 @@ public:
   }
 
   /**
+   * Write the content of the calling class into memory in form of
+   * @p n_array_elements to the given address using non-temporal stores that
+   * bypass the processor's caches, using @p _mm_stream_pd store intrinsics on
+   * supported CPUs. The destination of the store @p ptr must be aligned by
+   * the amount of bytes in the vectorized array.
+   *
+   * This store operation can be faster than usual store operations in case
+   * the store is streaming because it avoids the read-for-ownership transfer
+   * typically invoked in standard stores. This approximately works as follows
+   * (see the literature on computer architecture for details): When an
+   * algorithm stores some results to a memory address, a processor typically
+   * wants to move it into some of its caches as it expects the data to be
+   * re-used again at some point. Since caches are organized in lines of sizes
+   * either 64 byte or 128 byte but writes are usually smaller, a processor
+   * must first load in the destination cache line upon a write because only
+   * part of the cache line is overwritten initially. If a series of stores
+   * write data in a chunk bigger than any of its caches could handle, the
+   * data finally has to be moved out from the caches to main memory. But
+   * since all addressed have first been read, this doubles the load on main
+   * memory, which can incur a performance penalty. Furthermore, the
+   * organization of caches in a multicore context also requires reading an
+   * address before something can be written to cache to that address, see
+   * e.g. the <a href="https://en.wikipedia.org/wiki/MESI_protocol">Wikipedia
+   * article on the MESI protocol</a> for details. The instruction underlying
+   * this function call signals to the processor that these two prerequisites
+   * on a store are relaxed: Firstly, one expects the whole cache line to be
+   * overwritten (that the memory subsystem then handles appropriately), so no
+   * need to first read the "remainder" of the cache line. Secondly, the data
+   * behind that particular memory will not be subject to cache coherency
+   * protocol as it will be in main memory both when the same processor wants
+   * to access it again as well as any other processors in a multicore
+   * chip. Due to this particular setup, any subsequent access to the data
+   * written by this function will need to query main memory, which is slower
+   * than an access from a cache both latency-wise and throughput-wise. Thus,
+   * this command should only be used for large stores that will collectively
+   * not fit into caches, as performance will be degraded otherwise. For a
+   * typical use case, see also <a
+   * href="https://blogs.fau.de/hager/archives/2103">this blog article</a>.
+   *
+   * Note that streaming stores are only available in the specialized SSE/AVX
+   * classes of VectorizedArray of type @p double or @p float, not in the
+   * generic base class.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void streaming_store (Number *ptr) const
+  {
+    *ptr = data;
+  }
+
+  /**
    * Load @p n_array_elements from memory into the calling class, starting at
    * the given address and with given offsets, each entry from the offset
    * providing one element of the vectorized array.
@@ -626,6 +676,16 @@ public:
   void store (double *ptr) const
   {
     _mm512_storeu_pd (ptr, data);
+  }
+
+  /** @copydoc VectorizedArray<Number>::streaming_store()
+   * @note Memory must be aligned by 64 bytes.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void streaming_store (double *ptr) const
+  {
+    Assert(reinterpret_cast<std::size_t>(ptr)%64==0, ExcMessage("Memory not aligned"));
+    _mm512_stream_pd(ptr,data);
   }
 
   /**
@@ -1006,6 +1066,16 @@ public:
   void store (float *ptr) const
   {
     _mm512_storeu_ps (ptr, data);
+  }
+
+  /** @copydoc VectorizedArray<Number>::streaming_store()
+   * @note Memory must be aligned by 64 bytes.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void streaming_store (float *ptr) const
+  {
+    Assert(reinterpret_cast<std::size_t>(ptr)%64==0, ExcMessage("Memory not aligned"));
+    _mm512_stream_ps(ptr,data);
   }
 
   /**
@@ -1414,6 +1484,16 @@ public:
     _mm256_storeu_pd (ptr, data);
   }
 
+  /** @copydoc VectorizedArray<Number>::streaming_store()
+   * @note Memory must be aligned by 32 bytes.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void streaming_store (double *ptr) const
+  {
+    Assert(reinterpret_cast<std::size_t>(ptr)%32==0, ExcMessage("Memory not aligned"));
+    _mm256_stream_pd(ptr,data);
+  }
+
   /**
    * Load @p n_array_elements from memory into the calling class, starting at
    * the given address and with given offsets, each entry from the offset
@@ -1777,6 +1857,16 @@ public:
   void store (float *ptr) const
   {
     _mm256_storeu_ps (ptr, data);
+  }
+
+  /** @copydoc VectorizedArray<Number>::streaming_store()
+   * @note Memory must be aligned by 32 bytes.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void streaming_store (float *ptr) const
+  {
+    Assert(reinterpret_cast<std::size_t>(ptr)%32==0, ExcMessage("Memory not aligned"));
+    _mm256_stream_ps(ptr,data);
   }
 
   /**
@@ -2172,6 +2262,16 @@ public:
     _mm_storeu_pd (ptr, data);
   }
 
+  /** @copydoc VectorizedArray<Number>::streaming_store()
+   * @note Memory must be aligned by 16 bytes.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void streaming_store (double *ptr) const
+  {
+    Assert(reinterpret_cast<std::size_t>(ptr)%16==0, ExcMessage("Memory not aligned"));
+    _mm_stream_pd(ptr,data);
+  }
+
   /**
    * Load @p n_array_elements from memory into the calling class, starting at
    * the given address and with given offsets, each entry from the offset
@@ -2490,6 +2590,16 @@ public:
   void store (float *ptr) const
   {
     _mm_storeu_ps (ptr, data);
+  }
+
+  /** @copydoc VectorizedArray<Number>::streaming_store()
+   * @note Memory must be aligned by 16 bytes.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void streaming_store (float *ptr) const
+  {
+    Assert(reinterpret_cast<std::size_t>(ptr)%16==0, ExcMessage("Memory not aligned"));
+    _mm_stream_ps(ptr,data);
   }
 
   /**
