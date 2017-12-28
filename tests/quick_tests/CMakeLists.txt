@@ -183,6 +183,11 @@ IF (DEAL_II_WITH_ZLIB)
   make_quicktest("boost_zlib" ${_mybuild} "")
 ENDIF()
 
+# Test GMSH
+IF (DEAL_II_WITH_GMSH)
+  make_quicktest("gmsh" ${_mybuild} "")
+ENDIF()
+
 # A custom test target:
 ADD_CUSTOM_TARGET(test
   COMMAND ${CMAKE_COMMAND} -D ALL_TESTS="${ALL_TESTS}" -P ${CMAKE_CURRENT_SOURCE_DIR}/run.cmake
