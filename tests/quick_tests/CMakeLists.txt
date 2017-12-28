@@ -178,6 +178,10 @@ IF (DEAL_II_WITH_SCALAPACK)
   make_quicktest("scalapack" ${_mybuild} 5)
 ENDIF()
 
+# Test Zlib and Boost
+IF (DEAL_II_WITH_ZLIB)
+make_quicktest("boost_zlib" ${_mybuild} "")
+ENDIF()
 
 # A custom test target:
 ADD_CUSTOM_TARGET(test
