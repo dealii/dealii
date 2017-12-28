@@ -180,7 +180,7 @@ ENDIF()
 
 # Test Zlib and Boost
 IF (DEAL_II_WITH_ZLIB)
-make_quicktest("boost_zlib" ${_mybuild} "")
+  make_quicktest("boost_zlib" ${_mybuild} "")
 ENDIF()
 
 # A custom test target:
