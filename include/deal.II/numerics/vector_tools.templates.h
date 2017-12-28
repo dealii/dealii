@@ -7173,14 +7173,22 @@ namespace VectorTools
         case Hdiv_seminorm:
           for (unsigned int q=0; q<n_q_points; ++q)
             {
-              Assert (n_components >= dim,
+              unsigned int idx = 0;
+              if (weight!=nullptr)
+                for (; idx<n_components; ++idx)
+                  if (data.weight_vectors[0](idx) > 0)
+                    break;
+
+              Assert (n_components >= idx+dim,
                       ExcMessage ("You can only ask for the Hdiv norm for a finite element "
                                   "with at least 'dim' components. In that case, this function "
-                                  "will take the divergence of the first 'dim' components."));
+                                  "will find the index of the first non-zero weight and take "
+                                  "the divergence of the 'dim' components that follow it."));
+
               Number sum = 0;
               // take the trace of the derivatives scaled by the weight and square it
-              for (unsigned int k=0; k<dim; ++k)
-                sum += data.psi_grads[q][k][k] * std::sqrt(data.weight_vectors[q](k));
+              for (unsigned int k=idx; k<idx+dim; ++k)
+                sum += data.psi_grads[q][k][k-idx] * std::sqrt(data.weight_vectors[q](k));
               diff += numbers::NumberTraits<Number>::abs_square(sum) * fe_values.JxW(q);
             }
           diff = std::sqrt(diff);
