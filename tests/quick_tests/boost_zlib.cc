@@ -20,6 +20,8 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/point.h>
 
+#include <iostream>
+
 using namespace dealii;
 
 template <int dim>
