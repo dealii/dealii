@@ -9,36 +9,16 @@
 //
 //-----------------------------------------------------------
 
-// Read a file in iges format, and write it out again in the same
-// format.
+// Test that the GMSH executable actually works.
+// This is a reduced version of gmsh/create_tria_01.
 
-#include "../tests.h"
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/tria.h>
 
-template <int dim>
-void gmsh_grid (const char *name)
-{
-  Triangulation<dim> tria;
-  GridIn<dim> grid_in;
-  grid_in.attach_triangulation (tria);
-  std::ifstream input_file(name);
-  grid_in.read_msh(input_file);
-
-  deallog << "  " << tria.n_active_cells() << " active cells" << std::endl;
-
-  int hash = 0;
-  int index = 0;
-  for (typename Triangulation<dim>::active_cell_iterator c=tria.begin_active();
-       c!=tria.end(); ++c, ++index)
-    for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
-      hash += (index * i * c->vertex_index(i)) % (tria.n_active_cells()+1);
-  deallog << "  hash=" << hash << std::endl;
-}
+#include <fstream>
 
 int main ()
 {
-  initlog();
   std::ofstream geo("file.geo");
 
   geo << "Lx = 25.0;" << std::endl
@@ -55,15 +35,13 @@ int main ()
       << "Plane Surface(0) = {5};" << std::endl
       << "Transfinite Surface{0} = {5};" << std::endl
       << "Recombine Surface {0};" << std::endl;
-
   geo.close();
 
   const int ierr = std::system(DEAL_II_GMSH_EXECUTABLE_PATH " -2 file.geo 1>file.log 2>file_warn.log");
-  Assert(ierr==0, ExcInternalError());
-  gmsh_grid<2>("file.msh");
-  cat_file("file.msh");
-  std::remove("file.log");
-  std::remove("file_warn.log");
+  Assert(ierr==0, dealii::ExcInternalError());
 
+  std::remove ("file.geo");
+  std::remove ("file.log");
+  std::remove ("file_warn.log");
   return 0;
 }
