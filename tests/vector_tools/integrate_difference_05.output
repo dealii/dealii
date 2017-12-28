@@ -1,0 +1,9 @@
+
+DEAL::2 dimensions, Hdiv_seminorm:
+DEAL::computed: 2.16025 expected: 2.16025 difference: 4.44089e-16
+DEAL::computed: 4.32049 expected: 4.32049 difference: 8.88178e-16
+DEAL::OK
+DEAL::3 dimensions, Hdiv_seminorm:
+DEAL::computed: 3.10913 expected: 3.10913 difference: 1.77636e-15
+DEAL::computed: 6.21825 expected: 6.21825 difference: 3.55271e-15
+DEAL::OK
