@@ -18,12 +18,9 @@
 #
 # This module exports
 #
-#   SUNDIALS_LIB_IDA
-#   SUNDIALS_LIB_ARKODE
-#   SUNDIALS_LIB_KINSOL
-#   SUNDIALS_LIB_PAR
-#   SUNDIALS_LIB_SER
+#   SUNDIALS_LIBRARIES
 #   SUNDIALS_INCLUDE_DIR
+#   SUNDIALS_WITH_IDAS
 #
 # Note that sundials headers are typically installed in several directories,
 # e.g.,
@@ -37,6 +34,11 @@
 
 SET(SUNDIALS_DIR "" CACHE PATH "An optional hint to a SUNDIALS_DIR installation")
 SET_IF_EMPTY(SUNDIALS_DIR "$ENV{SUNDIALS_DIR}")
+
+DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_IDAS NAMES sundials_idas
+  HINTS ${SUNDIALS_DIR}
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
+  )
 
 DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_IDA NAMES sundials_ida
   HINTS ${SUNDIALS_DIR}
@@ -58,48 +60,42 @@ DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_SER NAMES sundials_nvecserial
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
-#
-# only define the extra hint if ${SUNDIALS_DIR} is nonempty so that we do not
-# try to search through the top-level '/include/' directory, should it happen to
-# exist
-#
-STRING(COMPARE EQUAL "${SUNDIALS_DIR}" "" _sundials_dir_is_empty)
-IF(NOT ${_sundials_dir_is_empty})
-  SET(_sundials_include_hint_dir "${SUNDIALS_DIR}/include/")
-ENDIF()
-
 DEAL_II_FIND_PATH(SUNDIALS_INCLUDE_DIR sundials/sundials_nvector.h
-  HINTS ${SUNDIALS_DIR} "${_sundials_include_hint_dir}"
+  HINTS ${SUNDIALS_DIR}
+  PATH_SUFFIXES include
 )
 
-SET(_sundials_additional_libs)
+SET(_sundials_lib_par)
 IF(DEAL_II_WITH_MPI)
   DEAL_II_FIND_LIBRARY(SUNDIALS_LIB_PAR NAMES sundials_nvecparallel
     HINTS ${SUNDIALS_DIR}
     PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
     )
-  SET(_sundials_additional_libs SUNDIALS_LIB_PAR)
-DEAL_II_PACKAGE_HANDLE(SUNDIALS
-  LIBRARIES REQUIRED
-    SUNDIALS_LIB_IDA SUNDIALS_LIB_ARKODE SUNDIALS_LIB_KINSOL SUNDIALS_LIB_SER SUNDIALS_LIB_PAR
-    ${_sundials_additional_libs}
-  INCLUDE_DIRS REQUIRED SUNDIALS_INCLUDE_DIR
-  USER_INCLUDE_DIRS REQUIRED SUNDIALS_INCLUDE_DIR
-  CLEAR
-    SUNDIALS_LIB_IDA SUNDIALS_LIB_ARKODE SUNDIALS_LIB_KINSOL 
-    SUNDIALS_LIB_SER SUNDIALS_LIB_PAR
-  )
-ELSE()
-DEAL_II_PACKAGE_HANDLE(SUNDIALS
-  LIBRARIES REQUIRED
-    SUNDIALS_LIB_IDA SUNDIALS_LIB_ARKODE SUNDIALS_LIB_KINSOL SUNDIALS_LIB_SER
-    ${_sundials_additional_libs}
-  INCLUDE_DIRS REQUIRED SUNDIALS_INCLUDE_DIR
-  USER_INCLUDE_DIRS REQUIRED SUNDIALS_INCLUDE_DIR
-  CLEAR
-    SUNDIALS_LIB_IDA SUNDIALS_LIB_ARKODE SUNDIALS_LIB_KINSOL 
-    SUNDIALS_LIB_SER
-  )
-
+  SET(_sundials_lib_par "SUNDIALS_LIB_PAR")
 ENDIF()
 
+#
+# If IDAS is available, we prefer said library over IDA. We have to make
+# sure to only link one of the two library variants:
+#
+IF(NOT SUNDIALS_LIB_IDAS MATCHES "-NOTFOUND")
+  SET(_sundials_lib_ida "SUNDIALS_LIB_IDAS")
+  SET(SUNDIALS_WITH_IDAS TRUE)
+ELSE()
+  SET(_sundials_lib_ida "SUNDIALS_LIB_IDA")
+  SET(SUNDIALS_WITH_IDAS FALSE)
+ENDIF()
+
+
+DEAL_II_PACKAGE_HANDLE(SUNDIALS
+  LIBRARIES REQUIRED
+    ${_sundials_lib_ida} SUNDIALS_LIB_ARKODE
+    SUNDIALS_LIB_KINSOL SUNDIALS_LIB_SER ${_sundials_lib_par}
+  INCLUDE_DIRS REQUIRED
+    SUNDIALS_INCLUDE_DIR
+  USER_INCLUDE_DIRS REQUIRED
+    SUNDIALS_INCLUDE_DIR
+  CLEAR
+    SUNDIALS_LIB_IDA SUNDIALS_LIB_IDAS SUNDIALS_LIB_ARKODE
+    SUNDIALS_LIB_KINSOL SUNDIALS_LIB_SER ${_sundials_lib_par}
+  )

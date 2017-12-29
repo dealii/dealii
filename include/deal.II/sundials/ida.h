@@ -32,9 +32,12 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
 
-
+#ifdef DEAL_II_SUNDIALS_WITH_IDAS
+#include <idas/idas.h>
+#else
 #include <ida/ida.h>
-#include <ida/ida_spils.h>
+#endif
+
 #include <sundials/sundials_config.h>
 #if DEAL_II_SUNDIALS_VERSION_LT(3,0,0)
 #  include <ida/ida_spgmr.h>
@@ -824,9 +827,8 @@ namespace SUNDIALS
 
 }
 
-
 DEAL_II_NAMESPACE_CLOSE
-#endif
 
+#endif // DEAL_II_WITH_SUNDIALS
 
 #endif
