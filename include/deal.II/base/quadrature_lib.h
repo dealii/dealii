@@ -662,7 +662,8 @@ private:
  * No transformation is applied to the weights. The weights referring to points
  * that live outside the reference simplex are simply discarded. If you chop a
  * quadrature formula that is good for both the lower and upper triangles
- * separately, then the weights should add up to 1/2.
+ * separately, then the weights should add up to 1/2 for each of the two
+ * formulas.
  *
  * @author Luca Heltai, 2017.
  */
