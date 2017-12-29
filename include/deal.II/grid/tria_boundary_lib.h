@@ -44,6 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * @deprecated The boundary classes have been deprecated in favor of the more
  * general Manifold classes. For this class CylindricalManifold is an appropriate
  * replacement which is expected to produce better results under mesh refinement.
+ * For a two-dimensional cylinder use FlatManifold instead.
  *
  * @ingroup boundary
  *

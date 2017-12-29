@@ -25,6 +25,9 @@
 // resorting to manifold_ids. this testcase in essence just ensures
 // that we continue to get this "undesirable" behavior until someone
 // comes up with a better idea
+//
+// In particular, it doesn't make sense to replace CylinderBoundary
+// by CylindricalManifold here as the problem then doesn't appear anymore.
 
 #include "../tests.h"
 
