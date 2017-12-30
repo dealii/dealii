@@ -1190,51 +1190,70 @@ namespace DoFRenumbering
 
   namespace
   {
-    // helper function for hierarchical()
-
-// Note that this function only works for active dofs.
-    template <int dim, class iterator>
+    // Helper function for DoFRenumbering::hierarchical(). this function recurses into
+    // the given cell or, if that should be an active (terminal) cell, renumbers DoF
+    // indices on it. The function starts renumbering with 'next_free_dof_index' and
+    // returns the first still unused DoF index at the end of its operation.
+    template <int dim, class CellIteratorType>
     types::global_dof_index
-    compute_hierarchical_recursive (
-      types::global_dof_index next_free,
-      std::vector<types::global_dof_index> &new_indices,
-      const iterator &cell,
-      const IndexSet &locally_owned)
+    compute_hierarchical_recursive (const types::global_dof_index         next_free_dof_index,
+                                    std::vector<types::global_dof_index> &new_indices,
+                                    const CellIteratorType               &cell,
+                                    const IndexSet                       &locally_owned_dof_indices)
     {
+      types::global_dof_index current_next_free_dof_index = next_free_dof_index;
+
       if (cell->has_children())
         {
-          //recursion
+          // recursion
           for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
-            next_free = compute_hierarchical_recursive<dim> (
-                          next_free,
-                          new_indices,
-                          cell->child (c),
-                          locally_owned);
+            current_next_free_dof_index
+              = compute_hierarchical_recursive<dim> (current_next_free_dof_index,
+                                                     new_indices,
+                                                     cell->child (c),
+                                                     locally_owned_dof_indices);
         }
       else
         {
           if (cell->is_locally_owned())
             {
+              // first get the existing DoF indices
               const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
               std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
               cell->get_dof_indices (local_dof_indices);
 
+              // then loop over the existing DoF indices on this cell
+              // and see whether it has already been re-numbered (it
+              // may have been on a face or vertex to a neighboring
+              // cell that we have encountered before). if not,
+              // give it a new number and store that number in the
+              // output array (new_indices)
+              //
+              // if this is a parallel triangulation and a DoF index is
+              // not locally owned, then don't touch it. since
+              // we don't actually *change* DoF indices (just record new
+              // numbers in an array), we don't need to worry about
+              // the decision whether a DoF is locally owned or not changing
+              // as we progress in renumbering DoFs -- all adjacent cells
+              // will always agree that a DoF is locally owned or not.
+              // that said, the first cell to encounter a locally owned DoF
+              // gets to number it, so the order in which we traverse cells
+              // matters
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
-                {
-                  if (locally_owned.is_element (local_dof_indices[i]))
-                    {
-                      // this is a locally owned DoF, assign new number if not assigned a number yet
-                      unsigned int idx = locally_owned.index_within_set (local_dof_indices[i]);
-                      if (new_indices[idx] == numbers::invalid_dof_index)
-                        {
-                          new_indices[idx] = locally_owned.nth_index_in_set (next_free);
-                          next_free++;
-                        }
-                    }
-                }
+                if (locally_owned_dof_indices.is_element (local_dof_indices[i]))
+                  {
+                    // this is a locally owned DoF, assign new number if not assigned a number yet
+                    const unsigned int idx = locally_owned_dof_indices.index_within_set (local_dof_indices[i]);
+                    if (new_indices[idx] == numbers::invalid_dof_index)
+                      {
+                        new_indices[idx] = locally_owned_dof_indices.nth_index_in_set (current_next_free_dof_index);
+                        ++current_next_free_dof_index;
+                      }
+                  }
             }
         }
-      return next_free;
+
+      return current_next_free_dof_index;
     }
   }
 
@@ -1247,20 +1266,18 @@ namespace DoFRenumbering
     std::vector<types::global_dof_index> renumbering (dof_handler.n_locally_owned_dofs(),
                                                       numbers::invalid_dof_index);
 
-    typename DoFHandler<dim>::level_cell_iterator cell;
-
     types::global_dof_index next_free = 0;
     const IndexSet locally_owned = dof_handler.locally_owned_dofs();
 
-    const parallel::distributed::Triangulation<dim> *tria
-      = dynamic_cast<const parallel::distributed::Triangulation<dim>*>
-        (&dof_handler.get_triangulation());
-
-    if (tria)
+    if (const parallel::distributed::Triangulation<dim> *tria
+        = dynamic_cast<const parallel::distributed::Triangulation<dim>*>
+          (&dof_handler.get_triangulation()))
       {
 #ifdef DEAL_II_WITH_P4EST
         // this is a distributed Triangulation. We need to traverse the coarse
-        // cells in the order p4est does
+        // cells in the order p4est does to match the z-order actually used
+        // by p4est. this requires using the renumbering of coarse cells
+        // we do before we hand things off to p4est
         for (unsigned int c = 0; c < tria->n_cells (0); ++c)
           {
             const unsigned int coarse_cell_index =
@@ -1280,21 +1297,19 @@ namespace DoFRenumbering
       }
     else
       {
-        //this is not a distributed Triangulation. Traverse coarse cells in the
-        //normal order
-        for (cell = dof_handler.begin (0); cell != dof_handler.end (0); ++cell)
+        // this is not a distributed Triangulation. Traverse coarse cells in the
+        // normal order
+        for (typename DoFHandler<dim>::level_cell_iterator cell = dof_handler.begin (0);
+             cell != dof_handler.end (0); ++cell)
           next_free = compute_hierarchical_recursive<dim> (next_free,
                                                            renumbering,
                                                            cell,
                                                            locally_owned);
       }
 
-    // verify that the last numbered
-    // degree of freedom is either
-    // equal to the number of degrees
-    // of freedom in total (the
-    // sequential case) or in the
-    // distributed case at least
+    // verify that the last numbered degree of freedom is either
+    // equal to the number of degrees of freedom in total (the
+    // sequential case) or in the distributed case at least
     // makes sense
     Assert ((next_free == dof_handler.n_locally_owned_dofs())
             ||
