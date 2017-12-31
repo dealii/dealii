@@ -1299,7 +1299,7 @@ namespace DoFRenumbering
       {
         // this is not a distributed Triangulation. Traverse coarse cells in the
         // normal order
-        for (typename DoFHandler<dim>::level_cell_iterator cell = dof_handler.begin (0);
+        for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin (0);
              cell != dof_handler.end (0); ++cell)
           next_free = compute_hierarchical_recursive<dim> (next_free,
                                                            renumbering,
