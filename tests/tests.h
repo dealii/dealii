@@ -437,7 +437,7 @@ initlog(bool console=false)
 
 inline
 void
-mpi_initlog(bool console=false)
+mpi_initlog(const bool console=false)
 {
 #ifdef DEAL_II_WITH_MPI
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
