@@ -1215,6 +1215,14 @@ namespace DoFRenumbering
         }
       else
         {
+          // this is a terminal cell. we need to renumber its DoF indices. there
+          // are now three cases to decide:
+          // - this is a sequential triangulation: we can just go ahead and number
+          //   the DoFs in the order in which we encounter cells. in this case,
+          //   all cells are actually locally owned
+          // - if this is a parallel::distributed::Triangulation, then we only
+          //   need to work on the locally owned cells since they contain
+          //   all locally owned DoFs.
           if (cell->is_locally_owned())
             {
               // first get the existing DoF indices
