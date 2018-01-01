@@ -4203,17 +4203,17 @@ namespace internal
         // efficient if the set of indices is already sorted because
         // it can then insert ranges instead of individual elements.
         // consequently, pre-sort the array of new indices
-        IndexSet my_locally_owned_dofs (dof_handler->n_dofs());
+        IndexSet my_locally_owned_new_dof_indices (dof_handler->n_dofs());
         if (dof_handler->n_locally_owned_dofs() > 0)
           {
             std::vector<dealii::types::global_dof_index> new_numbers_sorted = new_numbers;
             std::sort(new_numbers_sorted.begin(), new_numbers_sorted.end());
 
-            my_locally_owned_dofs.add_indices (new_numbers_sorted.begin(),
-                                               new_numbers_sorted.end());
-            my_locally_owned_dofs.compress();
+            my_locally_owned_new_dof_indices.add_indices (new_numbers_sorted.begin(),
+                                                          new_numbers_sorted.end());
+            my_locally_owned_new_dof_indices.compress();
 
-            Assert (my_locally_owned_dofs.n_elements() == new_numbers.size(),
+            Assert (my_locally_owned_new_dof_indices.n_elements() == new_numbers.size(),
                     ExcInternalError());
           }
 
@@ -4325,12 +4325,12 @@ namespace internal
 
             boost::archive::binary_oarchive archive(out);
 
-            archive << my_locally_owned_dofs;
+            archive << my_locally_owned_new_dof_indices;
             out.flush();
 #else
             std::ostringstream out;
             boost::archive::binary_oarchive archive(out);
-            archive << my_locally_owned_dofs;
+            archive << my_locally_owned_new_dof_indices;
             const std::string &s = out.str();
             my_data.reserve(s.size());
             my_data.assign(s.begin(), s.end());
@@ -4354,7 +4354,7 @@ namespace internal
 
           for (unsigned int i=0; i<n_cpus; ++i)
             if (i == Utilities::MPI::this_mpi_process (triangulation->get_communicator()))
-              locally_owned_dofs_per_processor[i] = my_locally_owned_dofs;
+              locally_owned_dofs_per_processor[i] = my_locally_owned_new_dof_indices;
             else
               {
                 // copy the data previously received into a stringstream
