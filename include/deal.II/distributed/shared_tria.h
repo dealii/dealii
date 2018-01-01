@@ -120,10 +120,13 @@ namespace parallel
       enum Settings
       {
         /**
-         * Choose the partitioner depending on the enabled dependencies.
-         * If Zoltan is available, partition_zoltan is used. If METIS is
-         * supported partition_metis is chosen afterwards, else
-         * partition_zorder is taken as partitioning strategy.
+         * Choose the partitioner depending on the enabled
+         * dependencies that were found when configuring deal.II.  In
+         * particular, if the Trilinos package Zoltan was found, then
+         * use the @p partition_zoltan strategy. If Zoltan was not
+         * found but the METIS package was found, then use the
+         * partition_metis strategy. If neither of these were found,
+         * then use the partition_zorder partitioning strategy.
          */
         partition_auto = 0x0,
 
@@ -135,6 +138,16 @@ namespace parallel
         /**
          * Partition active cells with the same scheme used in the
          * p4est library.
+         *
+         * The term "Z-order" originates in the fact that cells are
+         * sorted using a space filling curve which in 2d connects the
+         * four children of a cell in the order bottom left, bottom
+         * right, top left, top right (i.e., with a curve that looks
+         * like a reverse "Z"), and does so recursively on all levels
+         * of a triangulation. This is also the order in which
+         * children are enumerated by the GeometryInfo class. The
+         * "Z-order" is also sometimes called "Morton ordering", see
+         * https://en.wikipedia.org/wiki/Z-order_curve .
          */
         partition_zorder = 0x2,
 
