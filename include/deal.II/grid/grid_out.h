@@ -750,7 +750,7 @@ namespace GridOutFlags
 
   /**
    * Flags for grid output in Vtu format. These flags are the same as those
-   * declared in DataOutBase::VtuFlags.
+   * declared in DataOutBase::VtkFlags.
    *
    * @ingroup output
    */
