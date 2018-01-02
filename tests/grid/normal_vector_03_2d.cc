@@ -66,8 +66,8 @@ int main ()
   FE_Q<2> linear_interpolator(1);
 
   Triangulation<2> tria;
-  StraightBoundary<2> boundary;
-  Boundary<2>::FaceVertexNormals normals;
+  FlatManifold<2> boundary;
+  Manifold<2>::FaceVertexNormals normals;
   for (unsigned int case_no=0; case_no<2; ++case_no)
     {
       deallog << "Case" << case_no << std::endl;

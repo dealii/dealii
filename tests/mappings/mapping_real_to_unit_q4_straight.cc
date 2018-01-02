@@ -21,7 +21,7 @@
 // we had in the beginning.
 //
 // this test is like the _q1 test but uses a Q4 mapping. however,
-// since we use StraightBoundary objects to describe the boundary, we
+// since we use FlatManifold objects to describe the boundary, we
 // should really get nothing different since the mapping is, in
 // reality, still (bi-/tri-)linear
 

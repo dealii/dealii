@@ -20,7 +20,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -41,13 +41,13 @@ std::ofstream logfile("output");
 template <int dim>
 class Ball
   :
-  public StraightBoundary<dim>
+  public FlatManifold<dim>
 {
 public:
   virtual Point<dim>
   get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
   {
-    Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line(line);
+    Point<dim> middle = FlatManifold<dim>::get_new_point_on_line(line);
 
     for (int i=0; i<dim; ++i)
       middle(i) -= .5;
@@ -62,7 +62,7 @@ public:
   virtual Point<dim>
   get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
   {
-    Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad(quad);
+    Point<dim> middle = FlatManifold<dim>::get_new_point_on_quad(quad);
 
     for (int i=0; i<dim; ++i)
       middle(i) -= .5;
@@ -78,7 +78,7 @@ public:
 template <int dim>
 class CurvedLine
   :
-  public StraightBoundary<dim>
+  public FlatManifold<dim>
 {
 public:
   virtual Point<dim>
@@ -93,7 +93,7 @@ template <int dim>
 Point<dim>
 CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
 {
-  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
+  Point<dim> middle = FlatManifold<dim>::get_new_point_on_line (line);
 
   // if the line is at the top of bottom
   // face: do a special treatment on
@@ -142,7 +142,7 @@ template <int dim>
 Point<dim>
 CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
 {
-  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
+  Point<dim> middle = FlatManifold<dim>::get_new_point_on_quad (quad);
 
   // if the face is at the top of bottom
   // face: do not move the midpoint in
@@ -261,13 +261,13 @@ void TestCases<dim>::run (const unsigned int test_case)
     {
       if (dim==3)
         {
-          tria->begin_active()->face(4)->set_boundary_id(1);
-          tria->begin_active()->face(5)->set_boundary_id(1);
+          tria->begin_active()->face(4)->set_manifold_id(1);
+          tria->begin_active()->face(5)->set_manifold_id(1);
         };
 
       // set the boundary function
-      tria->set_boundary(1, (test_case==2)
-                         ? ((Boundary<dim> &)ball) : ((Boundary<dim> &)curved_line));
+      tria->set_manifold(1, (test_case==2)
+                         ? ((Manifold<dim> &)ball) : ((Manifold<dim> &)curved_line));
 
       // refine once
       tria->begin_active()->set_refine_flag();
