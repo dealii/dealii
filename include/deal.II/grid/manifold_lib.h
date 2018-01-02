@@ -920,6 +920,92 @@ private:
   FlatManifold<dim> chart_manifold;
 };
 
+#ifndef DOXYGEN
+/**
+ * Specialization for the only properly implemented spacedim parameter.
+ */
+template <int dim>
+class CylindricalManifold<dim,3> : public ChartManifold<dim,3,3>
+{
+public:
+  /**
+   * Constructor. Using default values for the constructor arguments yields a
+   * cylinder along the x-axis (<tt>axis=0</tt>). Choose <tt>axis=1</tt> or
+   * <tt>axis=2</tt> for a tube along the y- or z-axis, respectively. The
+   * tolerance value is used to determine if a point is on the axis.
+   */
+  CylindricalManifold (const unsigned int axis = 0,
+                       const double       tolerance = 1e-10);
+
+  /**
+   * Constructor. If constructed with this constructor, the manifold described
+   * is a cylinder with an axis that points in direction #direction and goes
+   * through the given #point_on_axis. The direction may be arbitrarily
+   * scaled, and the given point may be any point on the axis. The tolerance
+   * value is used to determine if a point is on the axis.
+   */
+  CylindricalManifold (const Point<3> &direction,
+                       const Point<3> &point_on_axis,
+                       const double    tolerance = 1e-10);
+
+  /**
+   * Compute the Cartesian coordinates for a point given in cylindrical
+   * coordinates.
+   */
+  virtual Point<3>
+  pull_back(const Point<3> &space_point) const override;
+
+  /**
+   * Compute the cylindrical coordinates $(r, \phi, \lambda)$ for the given
+   * point where $r$ denotes the distance from the axis,
+   * $\phi$ the angle between the given point and the computed normal
+   * direction and $\lambda$ the axial position.
+   */
+  virtual Point<3>
+  push_forward(const Point<3> &chart_point) const override;
+
+  /**
+   * Compute the derivatives of the mapping from cylindrical coordinates
+   * $(r, \phi, \lambda)$ to cartesian coordinates where $r$ denotes the
+   * distance from the axis, $\phi$ the angle between the given point and the
+   * computed normal direction and $\lambda$ the axial position.
+   */
+  virtual DerivativeForm<1, 3, 3>
+  push_forward_gradient(const Point<3> &chart_point) const override;
+
+  /**
+   * Compute new points on the CylindricalManifold. See the documentation of
+   * the base class for a detailed description of what this function does.
+   */
+  virtual Point<3>
+  get_new_point (const ArrayView<const Point<3>> &surrounding_points,
+                 const ArrayView<const double>   &weights) const override;
+
+protected:
+  /**
+   * A vector orthogonal to the normal direction.
+   */
+  const Tensor<1,3> normal_direction;
+
+  /**
+   * The direction vector of the axis.
+   */
+
+  const Tensor<1,3> direction;
+  /**
+   * An arbitrary point on the axis.
+   */
+  const Point<3> point_on_axis;
+
+private:
+  /**
+   * Relative tolerance to measure zero distances.
+   */
+  double tolerance;
+
+};
+#endif //DOXYGEN
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

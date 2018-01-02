@@ -813,9 +813,19 @@ get_new_point (const ArrayView<const Tensor<1,3>> &directions,
 template <int dim, int spacedim>
 CylindricalManifold<dim, spacedim>::CylindricalManifold(const unsigned int axis,
                                                         const double tolerance) :
-  CylindricalManifold<dim, spacedim>(Point<3>::unit_vector(axis),
-                                     Point<3>(),
+  CylindricalManifold<dim, spacedim>(Point<spacedim>::unit_vector(axis),
+                                     Point<spacedim>(),
                                      tolerance)
+{}
+
+
+
+template <int dim>
+CylindricalManifold<dim, 3>::CylindricalManifold(const unsigned int axis,
+                                                 const double tolerance) :
+  CylindricalManifold<dim, 3>(Point<3>::unit_vector(axis),
+                              Point<3>(),
+                              tolerance)
 {}
 
 
@@ -824,8 +834,8 @@ template <int dim, int spacedim>
 CylindricalManifold<dim, spacedim>::CylindricalManifold(const Point<spacedim> &direction_,
                                                         const Point<spacedim> &point_on_axis_,
                                                         const double tolerance) :
-  ChartManifold<dim,3,3>(Tensor<1,3>({0,2.*numbers::PI,0})),
-              normal_direction(internal::compute_normal(direction_, true)),
+  ChartManifold<dim,spacedim,3>(Tensor<1,3>({0,2.*numbers::PI,0})),
+              normal_direction(Tensor<1, spacedim>()),
               direction (direction_/direction_.norm()),
               point_on_axis (point_on_axis_),
               tolerance(tolerance)
@@ -838,14 +848,40 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const Point<spacedim> &d
 
 
 
+template <int dim>
+CylindricalManifold<dim, 3>::CylindricalManifold(const Point<3> &direction_,
+                                                 const Point<3> &point_on_axis_,
+                                                 const double tolerance) :
+  ChartManifold<dim,3,3>(Tensor<1,3>({0,2.*numbers::PI,0})),
+              normal_direction(internal::compute_normal(direction_, true)),
+              direction (direction_/direction_.norm()),
+              point_on_axis (point_on_axis_),
+              tolerance(tolerance)
+{}
+
+
+
 template <int dim, int spacedim>
 Point<spacedim>
 CylindricalManifold<dim,spacedim>::
 get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
                const ArrayView<const double>          &weights) const
 {
+  Assert (spacedim==3,
+          ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  return Point<spacedim>();
+}
+
+
+
+template <int dim>
+Point<3>
+CylindricalManifold<dim,3>::
+get_new_point (const ArrayView<const Point<3>> &surrounding_points,
+               const ArrayView<const double>          &weights) const
+{
   // First check if the average in space lies on the axis.
-  Point<spacedim> middle;
+  Point<3> middle;
   double average_length = 0.;
   for (unsigned int i=0; i<surrounding_points.size(); ++i)
     {
@@ -856,10 +892,10 @@ get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
   const double lambda = middle*direction;
 
   if ((middle-direction*lambda).square() < tolerance*average_length)
-    return Point<spacedim>()+direction*lambda;
+    return Point<3>()+direction*lambda;
   else // If not, using the ChartManifold should yield valid results.
-    return ChartManifold<dim, spacedim, 3>::get_new_point(surrounding_points,
-                                                          weights);
+    return ChartManifold<dim, 3, 3>::get_new_point(surrounding_points,
+                                                   weights);
 }
 
 
@@ -867,6 +903,17 @@ get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
 template <int dim, int spacedim>
 Point<3>
 CylindricalManifold<dim, spacedim>::pull_back(const Point<spacedim> &space_point) const
+{
+  Assert (spacedim==3,
+          ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  return Point<3>();
+}
+
+
+
+template <int dim>
+Point<3>
+CylindricalManifold<dim, 3>::pull_back(const Point<3> &space_point) const
 {
   // First find the projection of the given point to the axis.
   const Tensor<1,3> normalized_point = space_point-point_on_axis;
@@ -890,6 +937,17 @@ template <int dim, int spacedim>
 Point<spacedim>
 CylindricalManifold<dim, spacedim>::push_forward(const Point<3> &chart_point) const
 {
+  Assert (spacedim==3,
+          ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+  return Point<spacedim>();
+}
+
+
+
+template<int dim>
+Point<3>
+CylindricalManifold<dim, 3>::push_forward(const Point<3> &chart_point) const
+{
   // Rotate the orthogonal direction by the given angle.
   // Formula from Section 5.2 in
   // http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
@@ -909,6 +967,18 @@ CylindricalManifold<dim, spacedim>::push_forward(const Point<3> &chart_point) co
 template<int dim, int spacedim>
 DerivativeForm<1, 3, spacedim>
 CylindricalManifold<dim, spacedim>::push_forward_gradient(const Point<3> &chart_point) const
+{
+  Assert (spacedim==3,
+          ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
+
+  return DerivativeForm<1,3,spacedim>();
+}
+
+
+
+template<int dim>
+DerivativeForm<1, 3, 3>
+CylindricalManifold<dim, 3>::push_forward_gradient(const Point<3> &chart_point) const
 {
   Tensor<2, 3> derivatives;
 
