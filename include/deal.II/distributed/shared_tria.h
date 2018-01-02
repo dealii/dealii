@@ -148,6 +148,8 @@ namespace parallel
          * children are enumerated by the GeometryInfo class. The
          * "Z-order" is also sometimes called "Morton ordering", see
          * https://en.wikipedia.org/wiki/Z-order_curve .
+         *
+         * @see This @ref GlossZOrder "glossary entry".
          */
         partition_zorder = 0x2,
 
