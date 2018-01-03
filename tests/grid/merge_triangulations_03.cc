@@ -26,7 +26,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_refinement.h>
@@ -131,12 +131,11 @@ void test ()
   GridGenerator::hyper_shell(shell, center, 0.5, 1, 8, true); //colorize flag set to true so outer bnd is 1 and inner is 0
 
   // set boundaries
-  static const HyperBallBoundary<2> inner_bnd(center, 0.5);
-  static const HyperBallBoundary<2> outer_bnd(center, 1);
+  static const SphericalManifold<2> boundary(center);
 
-  ball.set_boundary(0, inner_bnd);
-  shell.set_boundary(0, inner_bnd);
-  shell.set_boundary(1, outer_bnd);
+  ball.set_manifold(0, boundary);
+  shell.set_manifold(0, boundary);
+  shell.set_manifold(1, boundary);
 
   // first we need to refine the ball once to get the right
   // nodes to merge the meshes

@@ -15,14 +15,14 @@
 
 
 
-// Test if refining a quarter_hyper_shell using HyperBallBoundary yields
+// Test if refining a quarter_hyper_shell using SphericalManifold yields
 // correct results in 2d and 3d.
 
 #include "../tests.h"
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 
 
@@ -33,7 +33,7 @@ void test(std::ostream &out)
   Point<dim> p1;
   p1[0] = 2.;
 
-  HyperBallBoundary<dim> boundary_description (p1, 3);
+  SphericalManifold<dim> boundary_description (p1);
   GridOut go;
   GridOut::OutputFormat format = GridOut::gnuplot;
 
@@ -41,7 +41,7 @@ void test(std::ostream &out)
     deallog << "quarter_hyper_ball" << std::endl;
     Triangulation<dim> tr;
     GridGenerator::quarter_hyper_ball(tr, p1, 3.);
-    tr.set_boundary (0, boundary_description);
+    tr.set_manifold (0, boundary_description);
 
     tr.refine_global (2);
     go.write(tr, out, format);

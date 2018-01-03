@@ -26,7 +26,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/fe/fe_q.h>
@@ -63,8 +63,8 @@ void test_hyper_sphere()
   Triangulation<dim> tr;
   GridGenerator::hyper_ball(tr);
 
-  static const HyperBallBoundary<dim> boundary;
-  tr.set_boundary (0, boundary);
+  static const SphericalManifold<dim> boundary;
+  tr.set_manifold (0, boundary);
 
   tr.refine_global(2);
 

@@ -37,7 +37,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
@@ -122,14 +122,14 @@ BEM<spacedim>::run()
       read_grid(SOURCE_DIR "/grids/circle_R10.inp");
 
       Point<spacedim> p;
-      HyperBallBoundary<spacedim-1, spacedim> boundary(p,10.);
-      tria.set_boundary(1, boundary);
+      SphericalManifold<spacedim-1, spacedim> boundary(p);
+      tria.set_manifold(1, boundary);
 
       // works up to cycle<9, but for testin purpose, we stop at 4
       for (unsigned int cycle=0; cycle<4; ++cycle)
         {
 
-          tria.set_boundary(1, boundary);
+          tria.set_manifold(1, boundary);
           tria.refine_global(1);
 
           double side_length  =
@@ -145,7 +145,7 @@ BEM<spacedim>::run()
           solve();
           output_results();
 
-          tria.set_boundary(1);
+          tria.set_manifold(1);
 
           for (unsigned int i=0; i<dof_handler_q.n_dofs(); ++i)
             global_error +=

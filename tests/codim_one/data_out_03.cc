@@ -22,7 +22,7 @@
 #include <deal.II/base/function.h>
 
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -75,17 +75,17 @@ int main ()
   std::map< Triangulation<2,3>::cell_iterator,
       Triangulation<3,3>::face_iterator> surface_to_volume_mapping;
 
-  HyperBallBoundary<3> boundary_description;
+  SphericalManifold<3> boundary_description;
   Triangulation<3> volume_mesh;
   GridGenerator::half_hyper_ball(volume_mesh);
 
 
-  volume_mesh.set_boundary (1, boundary_description);
-  volume_mesh.set_boundary (0, boundary_description);
+  volume_mesh.set_manifold (1, boundary_description);
+  volume_mesh.set_manifold (0, boundary_description);
 
-  static HyperBallBoundary<2,3> surface_description;
-  tria.set_boundary (1, surface_description);
-  tria.set_boundary (0, surface_description);
+  static SphericalManifold<2,3> surface_description;
+  tria.set_manifold (1, surface_description);
+  tria.set_manifold (0, surface_description);
 
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
@@ -122,7 +122,7 @@ int main ()
 
 
   dh_test.clear();
-  tria.set_boundary(0);
+  tria.set_manifold(0);
 
   return 0;
 }

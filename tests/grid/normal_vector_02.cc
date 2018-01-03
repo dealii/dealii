@@ -19,7 +19,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_boundary.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
@@ -35,7 +35,7 @@ int main ()
   deallog << std::fixed;
   deallog.attach(logfile);
 
-  HyperBallBoundary<3> boundary (Point<3>(1,0,0));
+  SphericalManifold<3> boundary (Point<3>(1,0,0));
 
   Triangulation<3> tria;
   Boundary<3>::FaceVertexNormals normals;
@@ -51,13 +51,17 @@ int main ()
           Triangulation<3>::face_iterator face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
           for (unsigned int v=0; v<GeometryInfo<3>::vertices_per_face; ++v)
-            AssertThrow ((boundary.normal_vector (face,
-                                                  face->vertex(v))
-                          -
-                          normals[v] / normals[v].norm()).norm()
-                         <
-                         1e-12,
-                         ExcInternalError());
+            {
+              AssertThrow ((boundary.normal_vector (face,
+                                                    face->vertex(v))
+                            -
+                            normals[v] / normals[v].norm()).norm()
+                           <
+                           1e-12,
+                           ExcInternalError());
+              deallog << face->vertex(v) << ": "
+                      << boundary.normal_vector (face, face->vertex(v)) << std::endl;
+            }
         }
 
   deallog << "OK" << std::endl;

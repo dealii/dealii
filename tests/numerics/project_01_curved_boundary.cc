@@ -24,7 +24,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -63,14 +63,14 @@ public:
 template <int dim>
 void test()
 {
-  HyperBallBoundary<dim> boundary;
+  SphericalManifold<dim> boundary;
 
   // create 2 triangulations with the
   // same coarse grid, and refine
   // them differently
   Triangulation<dim> tria;
   GridGenerator::hyper_ball (tria);
-  tria.set_boundary (0, boundary);
+  tria.set_manifold (0, boundary);
 
 
   FE_Q<dim> fe(1);

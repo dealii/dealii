@@ -261,8 +261,8 @@ void TestCases<dim>::run (const unsigned int test_case)
     {
       if (dim==3)
         {
-          tria->begin_active()->face(4)->set_manifold_id(1);
-          tria->begin_active()->face(5)->set_manifold_id(1);
+          tria->begin_active()->face(4)->set_boundary_id(1);
+          tria->begin_active()->face(5)->set_boundary_id(1);
         };
 
       // set the boundary function

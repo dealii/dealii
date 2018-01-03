@@ -22,7 +22,7 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 
 
@@ -43,7 +43,7 @@ void test(std::ostream &out)
   if (dim>1) p3[1] = 1.;
   if (dim>2) p3[2] = 4.;
 
-  HalfHyperBallBoundary<dim> boundary_description (p1, 3);
+  SphericalManifold<dim> boundary_description (p1);
   GridOut go;
   GridOut::OutputFormat format = GridOut::gnuplot;
 
@@ -51,7 +51,7 @@ void test(std::ostream &out)
     deallog << "half_hyper_ball" << std::endl;
     Triangulation<dim> tr;
     GridGenerator::half_hyper_ball(tr, p1, 3.);
-    tr.set_boundary (0, boundary_description);
+    tr.set_manifold (0, boundary_description);
 
     tr.refine_global (2);
     go.write(tr, out, format);

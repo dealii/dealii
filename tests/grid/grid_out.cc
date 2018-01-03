@@ -19,7 +19,7 @@
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_boundary.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_generator.h>
 
@@ -32,10 +32,10 @@ template <int dim>
 void test ()
 {
   Triangulation<dim> tria;
-  static const HyperBallBoundary<dim> x;
+  static const SphericalManifold<dim> x;
   if (dim == 2)
     {
-      tria.set_boundary (0, x);
+      tria.set_manifold (0, x);
       GridGenerator::hyper_ball (tria);
     }
   else

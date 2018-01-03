@@ -24,7 +24,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/fe/mapping_q.h>
 
 
@@ -35,7 +35,7 @@ void test_real_to_unit_cell()
   // define a spherical cap boundary
   // to be used for one of the faces
   const double radius = Point<dim>(1.43757e-10, 4.48023e+06, 4.48023e+06).norm();
-  HyperBallBoundary<dim> boundary (Point<dim>(), radius);
+  SphericalManifold<dim> boundary;
 
   // create the mesh: a single cell
   // with the following coordinates:
@@ -68,7 +68,7 @@ void test_real_to_unit_cell()
   // set the boundary indicator for
   // one face and adjacent edges of
   // the single cell
-  triangulation.set_boundary (1, boundary);
+  triangulation.set_manifold (1, boundary);
   triangulation.begin_active()->face(5)->set_all_boundary_ids (1);
 
   // now see if the point is inside

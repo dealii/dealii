@@ -21,7 +21,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 
 // Helper function
@@ -37,8 +37,8 @@ void test(unsigned int ref=1)
   for (unsigned int i=0; i<dim; ++i)
     center[i] = .25;
 
-  // const HyperBallBoundary<dim,spacedim> boundary(center,center.norm());
-  // triangulation.set_boundary (0, boundary_description);
+  // const SphericalManifold<dim,spacedim> boundary(center,center.norm());
+  // triangulation.set_manifold (0, boundary_description);
 
   typename Triangulation<dim,spacedim>::active_cell_iterator cell;
 

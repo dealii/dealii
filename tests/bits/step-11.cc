@@ -31,7 +31,7 @@ std::ofstream logfile("output");
 #include <deal.II/lac/precondition.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -190,8 +190,8 @@ template <int dim>
 void LaplaceProblem<dim>::run ()
 {
   GridGenerator::hyper_ball (triangulation);
-  static const HyperBallBoundary<dim> boundary;
-  triangulation.set_boundary (0, boundary);
+  static const SphericalManifold<dim> boundary;
+  triangulation.set_manifold (0, boundary);
 
   for (unsigned int cycle=0; cycle<6; ++cycle, triangulation.refine_global(1))
     {

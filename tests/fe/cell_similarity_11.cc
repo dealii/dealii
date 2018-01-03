@@ -33,7 +33,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -112,8 +112,8 @@ void test()
           std::abs(cell->face(f)->center()[1]) < 1e-12)
         cell->face(f)->set_boundary_id(1);
 
-  static const HyperBallBoundary<dim> boundary(Point<dim>(), std::sqrt(1./9.+1.));
-  tr.set_boundary (1, boundary);
+  static const SphericalManifold<dim> boundary;
+  tr.set_manifold (1, boundary);
 
   test<dim>(tr);
 }

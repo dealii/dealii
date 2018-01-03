@@ -31,7 +31,7 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 
@@ -57,10 +57,10 @@ int main ()
     const int dim = 3;
     deallog << "Testing hyper_cube in dim: " << dim << "..."<< endl;
 
-    const HyperBallBoundary<dim> boundary_description;
+    const SphericalManifold<dim> boundary_description;
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);
-    volume_mesh.set_boundary (0, boundary_description);
+    volume_mesh.set_manifold (0, boundary_description);
 
     // exclude one of the 6 faces
     // from the surface mesh
@@ -81,9 +81,9 @@ int main ()
           break;
       }
 
-    const HyperBallBoundary<dim-1,dim> surface_description;
+    const SphericalManifold<dim-1,dim> surface_description;
     Triangulation<dim-1,dim> boundary_mesh;
-    boundary_mesh.set_boundary (0, surface_description);
+    boundary_mesh.set_manifold (0, surface_description);
 
     // now extract a mesh of the 5
     // surface faces

@@ -27,7 +27,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/fe/fe_values.h>
@@ -43,9 +43,9 @@ void test ()
   Triangulation<dim> volume_mesh;
   GridGenerator::hyper_ball(volume_mesh);
 
-  const HyperBallBoundary<dim-1,dim> surface_description;
+  const SphericalManifold<dim-1,dim> surface_description;
   Triangulation<dim-1,dim> boundary_mesh;
-  boundary_mesh.set_boundary (0, surface_description);
+  boundary_mesh.set_manifold (0, surface_description);
 
   GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);
 

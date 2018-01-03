@@ -19,7 +19,7 @@
 
 #include "../tests.h"
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
@@ -56,8 +56,8 @@ void test1 ()
       Triangulation<dim> tria;
       GridGenerator::hyper_ball(tria, Point<dim>(), 1);
 
-      static const HyperBallBoundary<dim> boundary;
-      tria.set_boundary (0, boundary);
+      static const SphericalManifold<dim> boundary;
+      tria.set_manifold (0, boundary);
 
       for (unsigned int i=0; i<4; ++i)
         {
