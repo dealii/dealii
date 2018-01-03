@@ -318,19 +318,12 @@ Point<dim,Number>::Point (const Number x,
                       "that takes two arguments. Point<dim> objects with dim!=2 "
                       "require initialization with the constructor that takes 'dim' "
                       "arguments."));
-  // we can only get here if we pass the assertion. use the switch anyway so
-  // as to avoid compiler warnings about uninitialized elements or writing
+  // we can only get here if we pass the assertion. use the indirection anyway
+  // so as to avoid compiler warnings about uninitialized elements or writing
   // beyond the end of the 'values' array
-  switch (dim)
-    {
-    case 2:
-      this->values[0] = x;
-      this->values[1] = y;
-      break;
-
-    default:
-      ;
-    }
+  constexpr unsigned int y_index = (dim<2)?0:1;
+  this->values[0] = x;
+  this->values[y_index] = y;
 }
 
 
@@ -347,20 +340,14 @@ Point<dim,Number>::Point (const Number x,
                       "require initialization with the constructor that takes 'dim' "
                       "arguments."));
 
-  // we can only get here if we pass the assertion. use the switch anyway so
-  // as to avoid compiler warnings about uninitialized elements or writing
+  // we can only get here if we pass the assertion. use the indirection anyway
+  // so as to avoid compiler warnings about uninitialized elements or writing
   // beyond the end of the 'values' array
-  switch (dim)
-    {
-    case 3:
-      this->values[0] = x;
-      this->values[1] = y;
-      this->values[2] = z;
-      break;
-
-    default:
-      ;
-    }
+  constexpr unsigned int y_index = (dim<2)?0:1;
+  constexpr unsigned int z_index = (dim<3)?0:2;
+  this->values[0] = x;
+  this->values[y_index] = y;
+  this->values[z_index] = z;
 }
 
 
