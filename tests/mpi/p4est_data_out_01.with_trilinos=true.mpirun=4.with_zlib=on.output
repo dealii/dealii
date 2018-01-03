@@ -16,7 +16,7 @@ DEAL:0:2d::9
 <DataArray type="UInt8" Name="types"></DataArray>
 </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="x"></DataArray>
+    <DataArray type="Float32" Name="x"></DataArray>
   </PointData>
 </Piece>
  </UnstructuredGrid>

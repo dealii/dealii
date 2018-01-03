@@ -456,7 +456,6 @@ namespace DataOutBase
 
 
 
-
   DataOutFilter::DataOutFilter()
     :
     flags(false, true),
