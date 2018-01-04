@@ -1791,5 +1791,115 @@
  * It is available from <a href="http://www.math.colostate.edu/~bangerth/publications.html">http://www.math.colostate.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
  * </dd>
  *
+ *
+ * <dt class="glossary">@anchor GlossZOrder <b>Z order</b></dt>
+ * <dd>
+ *  The "Z order" of cells describes an order in which cells are traversed.
+ *
+ *  By default, if you write a loop over all cells in deal.II, the cells
+ *  will be traversed in an order where coarser cells (i.e., cells that were
+ *  obtained from coarse mesh cells with fewer refinement steps) come before
+ *  cells that are finer (i.e., cells that were obtained with more refinement
+ *  steps). Within each refinement level, cells are traversed in an order
+ *  that has something to do with the order in which they were created;
+ *  in essence, however, this order is best of thought of as "unspecified":
+ *  you will visit each cell on a given refinement level exactly once, in
+ *  some order, but you should not make any assumptions about this order.
+ *
+ *  Because the order in which cells are created factors into the order
+ *  of cells, it can happen that the order in which you traverse cells is
+ *  different for two identical meshes. For example, think of a 1d (coarse)
+ *  mesh with two cells: If you first refine the first of these cells and then
+ *  the other, then you will traverse the four cells on refinement level 1
+ *  in a different order than if you had first refined the second coarse
+ *  cell and then the first coarse cell.
+ *
+ *  This order is entirely practical for almost all applications because
+ *  in most cases, it does not actually matter in which order one traverses
+ *  cells. Furthermore, it allows using data structures that lead to
+ *  particularly low cache miss frequencies and are therefore efficient
+ *  for high performance computing applications.
+ *
+ *  On the other hand, there are cases where one would want to traverse
+ *  cells in a particular, specified and reproducible order that only
+ *  depends on the mesh itself, not its creation history or any other
+ *  seemingly arbitrary design decisions. The "Z order" is one way
+ *  to achieve this goal.
+ *
+ *  To explain the concept of the Z order, consider the following sequence
+ *  of meshes (with each cell numbered using the "level.index" notation,
+ *  where "level" is the number of refinements necessary to get from a
+ *  coarse mesh cell to a particular cell, and "index" the index of this
+ *  cell within a particular refinement level):
+ *
+ *  @image html simple-mesh-0.png "A coarse mesh"
+ *  @image html simple-mesh-1.png "The mesh after one refinement cycle"
+ *  @image html simple-mesh-2.png "The mesh after two refinement cycles"
+ *  @image html simple-mesh-3.png "The mesh after three refinement cycles"
+ *
+ *  Note how the cells on level 2 are ordered in the order in which they
+ *  were created. (Which is not always the case: if cells had been removed
+ *  in between, then newly created cells would have filled in the holes
+ *  so created.)
+ *
+ *  The "natural" order in which deal.II traverses cells would then be
+ *  0.0 -> 1.0 -> 1.1 -> 1.2 -> 1.3 -> 2.0 -> 2.1 -> 2.2 -> 2.3 -> 2.4 ->
+ *  2.5 -> 2.6 -> 2.7. (If you want to traverse only over the
+ *  @ref GlossActive "active cells", then omit all cells from this
+ *  list that have children.)
+ *  This can be thought of as the "lexicographic"
+ *  order on the pairs of numbers "level.index", but because the index
+ *  within each level is not well defined, this is not a particularly useful
+ *  notion. Alternatively, one can also think of it as one possible breadth-first
+ *  traversal of the tree that corresponds to this mesh and that represents
+ *  the parent-child relationship between cells:
+ *
+ *  @image html simple-mesh-tree.png "The tree that corresponds to the mesh after three refinement cycles"
+ *
+ *  On the other hand, the Z order corresponds to a particular
+ *  depth-first traversal of the tree. Namely: start with a cell, and if it
+ *  has children then iterate over these cell's children; this rule is
+ *  recursively applied as long as a child has childen.
+ *
+ *  For the given mesh above, this yields the following order: 0.0 -> 1.0 -> 2.4
+ *  -> 2.5 -> 2.6 -> 2.7 -> 1.1 -> 1.2 -> 1.3 -> 1.4 -> 2.0 -> 2.1 -> 2.2 -> 2.3.
+ *  (Again, if you only care about active cells, then remove 0.0, 1.0, and 1.3
+ *  from this list.) Because the order of children of a cell is well defined
+ *  (as opposed to the order of cells within each level), this "hierarchical"
+ *  traversal makes sense and is, in particular, independent of the history
+ *  of a triangulation.
+ *
+ *  In practice, it is easily implemented using a recursive function:
+ *  @code
+ *    template <int dim>
+ *    void visit_cells_hierarchically (const typename Triangulation<dim>::cell_iterator &cell)
+ *    {
+ *      if (cell->has_children())
+ *        for (unsigned int c=0; c<cell->n_children(); ++c)
+ *          visit_cells_hierarchically (cell->child(c));
+ *      else
+ *        {
+ *          ... do whatever you wanted to do on each cell ...;
+ *        }
+ *    }
+ *  @endcode
+ *  This function is then called as follows:
+ *  @code
+ *    // loop over all coarse mesh cells
+ *    for (typename Triangulation<dim>::cell_iterator cell = triangulation.begin(0);
+ *         cell != triangulation.end(); ++cell)
+ *      visit_cells_hierarchically (cell);
+ *  @endcode
+ *
+ *  Finally, as an explanation of the term "Z" order: if you draw a line through
+ *  all cells in the order in which they appear in this hierarchical fashion,
+ *  then it will look like a left-right inverted Z on each refined cell. Indeed,
+ *  the curve so defined can be thought of a space-filling curve and is also
+ *  sometimes called "Morton ordering", see
+ *  https://en.wikipedia.org/wiki/Z-order_curve .
+ * </dd>
+ *
+ *
+ *
  * </dl>
  */
