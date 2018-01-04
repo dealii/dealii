@@ -821,6 +821,19 @@ normal_vector (const Triangulation<1,3>::face_iterator &,
 
 
 
+template <>
+Tensor<1,2>
+FlatManifold<2,2>::
+normal_vector (const Triangulation<2,2>::face_iterator &face,
+               const Point<2> &p) const
+{
+  // In 2d, a face is just a straight line and
+  // we can use the 'standard' implementation.
+  return Manifold<2,2>::normal_vector(face, p);
+}
+
+
+
 template <int dim, int spacedim>
 Tensor<1, spacedim>
 FlatManifold< dim, spacedim >::
