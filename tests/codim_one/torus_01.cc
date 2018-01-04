@@ -24,29 +24,26 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <string>
-
-std::ofstream logfile("output");
-
 
 int main ()
 {
   const int dim = 2;
   const int spacedim = 3;
 
-  deallog.attach(logfile);
+  initlog();
 
-  TorusBoundary<dim, spacedim> boundary (1.5, .5);
+  TorusManifold<dim> boundary (1.5, .5);
   Triangulation<dim, spacedim> tria;
-  tria.set_boundary (0, boundary);
+  tria.set_manifold (0, boundary);
 
   GridGenerator::torus (tria, 1.5, .5);
   tria.refine_global(2);
 
   GridOut grid_out;
-  grid_out.write_gnuplot (tria, logfile);
+  grid_out.write_gnuplot (tria, deallog.get_file_stream());
 
   return 0;
 }

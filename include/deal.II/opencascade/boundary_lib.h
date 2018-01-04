@@ -42,10 +42,10 @@ DEAL_II_NAMESPACE_OPEN
 namespace OpenCASCADE
 {
   /**
-   * A Boundary object based on OpenCASCADE TopoDS_Shape where where new
-   * points are first computed by averaging the surrounding points in the same
-   * way as FlatManifold does, and are then projected in the normal direction
-   * using OpenCASCADE utilities.
+   * A Manifold object based on OpenCASCADE TopoDS_Shape where new points are
+   * first computed by averaging the surrounding points in the same way as
+   * FlatManifold does, and are then projected in the normal direction using
+   * OpenCASCADE utilities.
    *
    * This class makes no assumptions on the shape you pass to it, and the
    * topological dimension of the Manifold is inferred from the TopoDS_Shape
@@ -60,13 +60,10 @@ namespace OpenCASCADE
    * face would be collapsed to the edge, and your surrounding points would
    * not be lying on the given shape, raising an exception.
    *
-   * @deprecated This class has been deprecated in favor of the equivalent
-   * Manifold class.
-   *
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class DEAL_II_DEPRECATED NormalProjectionBoundary : public Boundary<dim,spacedim>
+  class NormalProjectionBoundary : public FlatManifold<dim,spacedim>
   {
   public:
 
@@ -110,7 +107,7 @@ namespace OpenCASCADE
   };
 
   /**
-   * A Boundary object based on OpenCASCADE TopoDS_Shape where new points are
+   * A Manifold object based on OpenCASCADE TopoDS_Shape where new points are
    * first computed by averaging the surrounding points in the same way as
    * FlatManifold does, and then projecting them onto the manifold along the
    * direction specified at construction time using OpenCASCADE utilities.
@@ -123,22 +120,19 @@ namespace OpenCASCADE
    * points leaves them untouched. If this is not the case, an
    * ExcPointNotOnManifold is thrown.
    *
-   * Notice that this type of Boundary descriptor may fail to give results if
+   * Notice that this type of Manifold descriptor may fail to give results if
    * the triangulation to be refined is close to the boundary of the given
    * TopoDS_Shape, or when the direction you use at construction time does not
    * intersect the shape. An exception is thrown when this happens.
    *
-   * @deprecated This class has been deprecated in favor of the equivalent
-   * Manifold class.
-   *
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class DEAL_II_DEPRECATED DirectionalProjectionBoundary : public Boundary<dim,spacedim>
+  class DirectionalProjectionBoundary : public FlatManifold<dim,spacedim>
   {
   public:
     /**
-     * Construct a Boundary object which will project points on the
+     * Construct a Manifold object which will project points on the
      * TopoDS_Shape @p sh, along the given @p direction.
      */
     DirectionalProjectionBoundary(const TopoDS_Shape &sh,
@@ -180,7 +174,7 @@ namespace OpenCASCADE
 
 
   /**
-   * A Boundary object based on OpenCASCADE TopoDS_Shape where new points are
+   * A Manifold object based on OpenCASCADE TopoDS_Shape where new points are
    * first computed by averaging the surrounding points in the same way as
    * FlatManifold does, and then projecting them using OpenCASCADE utilities
    * onto the manifold along a direction which is an estimation of the
@@ -215,23 +209,20 @@ namespace OpenCASCADE
    * ExcPointNotOnManifold is thrown.
    *
    *
-   * Notice that this type of Boundary descriptor may fail to give results if
+   * Notice that this type of Manifold descriptor may fail to give results if
    * the triangulation to be refined is close to the boundary of the given
    * TopoDS_Shape, or when the normal direction estimated from the surrounding
    * points does not intersect the shape.  An exception is thrown when this
    * happens.
    *
-   * @deprecated This class has been deprecated in favor of the equivalent
-   * Manifold class.
-   *
    * @author Luca Heltai, Andrea Mola, 2011--2014.
    */
   template <int dim, int spacedim>
-  class DEAL_II_DEPRECATED NormalToMeshProjectionBoundary : public Boundary<dim,spacedim>
+  class NormalToMeshProjectionBoundary : public FlatManifold<dim,spacedim>
   {
   public:
     /**
-     * Construct a Boundary object which will project points on the
+     * Construct a Manifold object which will project points on the
      * TopoDS_Shape @p sh, along a direction which is approximately normal to
      * the mesh cell.
      */
@@ -264,7 +255,7 @@ namespace OpenCASCADE
   };
 
   /**
-   * A Boundary object based on OpenCASCADE TopoDS_Shape objects which have
+   * A Manifold object based on OpenCASCADE TopoDS_Shape objects which have
    * topological dimension equal to one (TopoDS_Edge or TopoDS_Wire) where new
    * points are located at the arclength average of the surrounding points. If
    * the given TopoDS_Shape can be casted to a periodic (closed) curve, then
