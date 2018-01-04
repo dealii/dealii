@@ -906,6 +906,42 @@ CylindricalManifold<dim, spacedim>::push_forward(const Point<3> &chart_point) co
 
 
 
+template<int dim, int spacedim>
+DerivativeForm<1, 3, spacedim>
+CylindricalManifold<dim, spacedim>::push_forward_gradient(const Point<3> &chart_point) const
+{
+  Tensor<2, 3> derivatives;
+
+  // Rotate the orthogonal direction by the given angle.
+  // Formula from Section 5.2 in
+  // http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
+  // simplified assuming normal_direction and direction are orthogonal
+  // and unit vectors.
+  const double sine = std::sin(chart_point(1));
+  const double cosine = std::cos(chart_point(1));
+  const Tensor<1,3> dxn = cross_product_3d(direction, normal_direction);
+  const Tensor<1,3> intermediate = normal_direction*cosine+dxn*sine;
+
+  // derivative w.r.t the radius
+  derivatives[0][0] = intermediate[0];
+  derivatives[1][0] = intermediate[1];
+  derivatives[2][0] = intermediate[2];
+
+  // derivatives w.r.t the angle
+  derivatives[0][1] = -normal_direction[0]*sine + dxn[0]*cosine;
+  derivatives[1][1] = -normal_direction[1]*sine + dxn[1]*cosine;
+  derivatives[2][1] = -normal_direction[2]*sine + dxn[2]*cosine;
+
+  // derivatives w.r.t the direction of the axis
+  derivatives[0][2] = direction[0];
+  derivatives[1][2] = direction[1];
+  derivatives[2][2] = direction[2];
+
+  return derivatives;
+}
+
+
+
 // ============================================================
 // FunctionManifold
 // ============================================================
