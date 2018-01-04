@@ -8,8 +8,8 @@
 <UnstructuredGrid>
 <Piece NumberOfPoints="48" NumberOfCells="24" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAIAEAACABAAARwAAAA==eNpjYMAHHtiTJv6BTHF08wiJfyBS/AGJ4uT6g9RwIgRoHS7o4ujhQUicWJpUcwdLPFM7PxBrP6n++GBPn3imXT4GAB9TYe0=
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
+AQAAAEACAABAAgAAPgAAAA==eNpjYEAB9tjZDfjY9tjZDVjYDLjYeOzA5SZ0QKpb4Gx77GxsGJdaaviZ2HjAqh+HHQ32pPuZtDgGACPZMq0=
     </DataArray>
   </Points>
 
@@ -25,16 +25,16 @@ AQAAABgAAAAYAAAACwAAAA==eNpjZsYOAAOcAEk=
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="level" format="binary">
-AQAAAIABAACAAQAAEgAAAA==eNpjYACBD/YMo/SA0AAihjjR    </DataArray>
-    <DataArray type="Float64" Name="manifold" format="binary">
-AQAAAIABAACAAQAAEgAAAA==eNpjYACBD/sZRukBoQHbhVDR    </DataArray>
-    <DataArray type="Float64" Name="material" format="binary">
-AQAAAIABAACAAQAADQAAAA==eNpjYBgFAwkAAYAAAQ==    </DataArray>
-    <DataArray type="Float64" Name="subdomain" format="binary">
-AQAAAIABAACAAQAADQAAAA==eNpjYBgFAwkAAYAAAQ==    </DataArray>
-    <DataArray type="Float64" Name="level_subdomain" format="binary">
-AQAAAIABAACAAQAADQAAAA==eNpjYBgFAwkAAYAAAQ==    </DataArray>
+    <DataArray type="Float32" Name="level" format="binary">
+AQAAAMAAAADAAAAADwAAAA==eNpjYGiwZxjCGABjsyPR    </DataArray>
+    <DataArray type="Float32" Name="manifold" format="binary">
+AQAAAMAAAADAAAAADwAAAA==eNpjYGjYzzCEMQBMOjvR    </DataArray>
+    <DataArray type="Float32" Name="material" format="binary">
+AQAAAMAAAADAAAAADAAAAA==eNpjYBjaAAAAwAAB    </DataArray>
+    <DataArray type="Float32" Name="subdomain" format="binary">
+AQAAAMAAAADAAAAADAAAAA==eNpjYBjaAAAAwAAB    </DataArray>
+    <DataArray type="Float32" Name="level_subdomain" format="binary">
+AQAAAMAAAADAAAAADAAAAA==eNpjYBjaAAAAwAAB    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>

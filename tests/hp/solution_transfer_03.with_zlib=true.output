@@ -8,8 +8,8 @@
 <UnstructuredGrid>
 <Piece NumberOfPoints="16" NumberOfCells="4" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAIABAACAAQAAMwAAAA==eNpjYMAHHtgzkCQP4+MSRwcf7PGbi67vgz1+84h1Dy77Yeo+2FPmHlzmfMAQBwBtNxtp
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
+AQAAAMAAAADAAAAAKgAAAA==eNpjYEAB9gzY+fZobChosEdTa48kbk/AHGT99qhsrOYgqWmAswG5Lgnp
     </DataArray>
   </Points>
 
@@ -25,8 +25,8 @@ AQAAAAQAAAAEAAAADAAAAA==eNrj5OTkBAAAXgAl
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="Solution" format="binary">
-AQAAAIAAAACAAAAAEAAAAA==eNpjYKAG+GBPLg0AGqcJeQ==    </DataArray>
+    <DataArray type="Float32" Name="Solution" format="binary">
+AQAAAEAAAABAAAAADwAAAA==eNpjYCAEGuzxYQBdyAX5    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>
@@ -40,8 +40,8 @@ AQAAAIAAAACAAAAAEAAAAA==eNpjYKAG+GBPLg0AGqcJeQ==    </DataArray>
 <UnstructuredGrid>
 <Piece NumberOfPoints="16" NumberOfCells="4" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAIABAACAAQAAMwAAAA==eNpjYMAHHtgzkCQP4+MSRwcf7PGbi67vgz1+84h1Dy77Yeo+2FPmHlzmfMAQBwBtNxtp
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
+AQAAAMAAAADAAAAAKgAAAA==eNpjYEAB9gzY+fZobChosEdTa48kbk/AHGT99qhsrOYgqWmAswG5Lgnp
     </DataArray>
   </Points>
 
@@ -57,8 +57,8 @@ AQAAAAQAAAAEAAAADAAAAA==eNrj5OTkBAAAXgAl
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="Solution" format="binary">
-AQAAAIAAAACAAAAAEwAAAA==eNpjYMAGPtij0oTkyacBsOIONQ==    </DataArray>
+    <DataArray type="Float32" Name="Solution" format="binary">
+AQAAAEAAAABAAAAAEgAAAA==eNpjYICBBnsIRufjxwDgHAj1    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>

@@ -400,10 +400,10 @@ namespace DataOutBase
      * Note that because of the similarity of the formats, this function
      * is also used by the Vtk and Tecplot output functions.
      */
-    template <int dim, int spacedim>
+    template <int dim, int spacedim, typename Number=double>
     void
     write_gmv_reorder_data_vectors (const std::vector<Patch<dim,spacedim> > &patches,
-                                    Table<2,double>                         &data_vectors)
+                                    Table<2,Number>                         &data_vectors)
     {
       // unlike in the main function, we
       // don't have here the data_names
@@ -1160,10 +1160,10 @@ namespace
      * arrays needs to match what
      * we print in the XML-preamble
      * to the respective parts of
-     * VTU files (e.g. Float64 and
+     * VTU files (e.g. Float32 and
      * Int32)
      */
-    std::vector<double>  vertices;
+    std::vector<float>  vertices;
     std::vector<int32_t> cells;
   };
 
@@ -5266,7 +5266,7 @@ namespace DataOutBase
             // component names with double
             // underscores unless a vector
             // name has been specified
-            out << "    <DataArray type=\"Float64\" Name=\"";
+            out << "    <DataArray type=\"Float32\" Name=\"";
 
             if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
               out << std::get<2>(vector_data_ranges[n_th_vector]);
@@ -5285,7 +5285,7 @@ namespace DataOutBase
         for (unsigned int data_set=0; data_set<data_names.size(); ++data_set)
           if (data_set_written[data_set] == false)
             {
-              out << "    <DataArray type=\"Float64\" Name=\""
+              out << "    <DataArray type=\"Float32\" Name=\""
                   << data_names[data_set]
                   << "\"></DataArray>\n";
             }
@@ -5379,11 +5379,11 @@ namespace DataOutBase
     // separate task and when wanting
     // to write out the data, we wait
     // for that task to finish
-    Table<2,double> data_vectors (n_data_sets, n_nodes);
+    Table<2,float> data_vectors (n_data_sets, n_nodes);
 
     void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &,
-                     Table<2,double> &)
-      = &write_gmv_reorder_data_vectors<dim,spacedim>;
+                     Table<2,float> &)
+      = &write_gmv_reorder_data_vectors<dim,spacedim,float>;
     Threads::Task<> reorder_task = Threads::new_task (fun_ptr, patches,
                                                       data_vectors);
 
@@ -5398,7 +5398,7 @@ namespace DataOutBase
     out << "<Piece NumberOfPoints=\"" << n_nodes
         <<"\" NumberOfCells=\"" << n_cells << "\" >\n";
     out << "  <Points>\n";
-    out << "    <DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\""
+    out << "    <DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\""
         << ascii_or_binary << "\">\n";
     write_nodes(patches, vtu_out);
     out << "    </DataArray>\n";
@@ -5497,7 +5497,7 @@ namespace DataOutBase
         // component names with double
         // underscores unless a vector
         // name has been specified
-        out << "    <DataArray type=\"Float64\" Name=\"";
+        out << "    <DataArray type=\"Float32\" Name=\"";
 
         if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
           out << std::get<2>(vector_data_ranges[n_th_vector]);
@@ -5516,7 +5516,7 @@ namespace DataOutBase
         // now write data. pad all
         // vectors to have three
         // components
-        std::vector<double> data;
+        std::vector<float> data;
         data.reserve (n_nodes*dim);
 
         for (unsigned int n=0; n<n_nodes; ++n)
@@ -5559,13 +5559,13 @@ namespace DataOutBase
     for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
       if (data_set_written[data_set] == false)
         {
-          out << "    <DataArray type=\"Float64\" Name=\""
+          out << "    <DataArray type=\"Float32\" Name=\""
               << data_names[data_set]
               << "\" format=\""
               << ascii_or_binary << "\">\n";
 
-          std::vector<double> data (data_vectors[data_set].begin(),
-                                    data_vectors[data_set].end());
+          std::vector<float> data (data_vectors[data_set].begin(),
+                                   data_vectors[data_set].end());
           vtu_out << data;
           out << "    </DataArray>\n";
         }
@@ -5636,7 +5636,7 @@ namespace DataOutBase
         // component names with double
         // underscores unless a vector
         // name has been specified
-        out << "    <PDataArray type=\"Float64\" Name=\"";
+        out << "    <PDataArray type=\"Float32\" Name=\"";
 
         if (std::get<2>(vector_data_ranges[n_th_vector]) != "")
           out << std::get<2>(vector_data_ranges[n_th_vector]);
@@ -5655,7 +5655,7 @@ namespace DataOutBase
     for (unsigned int data_set=0; data_set<n_data_sets; ++data_set)
       if (data_set_written[data_set] == false)
         {
-          out << "    <PDataArray type=\"Float64\" Name=\""
+          out << "    <PDataArray type=\"Float32\" Name=\""
               << data_names[data_set]
               << "\" format=\"ascii\"/>\n";
         }
@@ -5663,7 +5663,7 @@ namespace DataOutBase
     out << "    </PPointData>\n";
 
     out << "    <PPoints>\n";
-    out << "      <PDataArray type=\"Float64\" NumberOfComponents=\"3\"/>\n";
+    out << "      <PDataArray type=\"Float32\" NumberOfComponents=\"3\"/>\n";
     out << "    </PPoints>\n";
 
     for (unsigned int i=0; i<piece_names.size(); ++i)

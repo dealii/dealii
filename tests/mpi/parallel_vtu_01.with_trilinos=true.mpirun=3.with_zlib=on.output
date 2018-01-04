@@ -12,7 +12,7 @@ DEAL:0::hyper_cube
 <DataArray type="UInt8" Name="types"></DataArray>
 </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="x"></DataArray>
+    <DataArray type="Float32" Name="x"></DataArray>
   </PointData>
 </Piece>
 <Piece NumberOfPoints="0" NumberOfCells="0" >
@@ -20,13 +20,13 @@ DEAL:0::hyper_cube
 <DataArray type="UInt8" Name="types"></DataArray>
 </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="x"></DataArray>
+    <DataArray type="Float32" Name="x"></DataArray>
   </PointData>
 </Piece>
 <Piece NumberOfPoints="4" NumberOfCells="1" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAGAAAABgAAAAFAAAAA==eNpjYMAHPtgzkCQP4yPEAZbkBL0=
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
+AQAAADAAAAAwAAAAFAAAAA==eNpjYEAGDfYMWPkgGsIGADHwAv0=
     </DataArray>
   </Points>
 
@@ -42,8 +42,8 @@ AQAAAAEAAAABAAAACQAAAA==eNrjBAAACgAK
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="x" format="binary">
-AQAAACAAAAAgAAAADwAAAA==eNpjYAADBwYcNAANIAEB    </DataArray>
+    <DataArray type="Float32" Name="x" format="binary">
+AQAAABAAAAAQAAAADgAAAA==eNpjYGBwYEDCAAcQAQE=    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>
@@ -56,10 +56,10 @@ AQAAACAAAAAgAAAADwAAAA==eNpjYAADBwYcNAANIAEB    </DataArray>
 <VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
   <PUnstructuredGrid GhostLevel="0">
     <PPointData Scalars="scalars">
-    <PDataArray type="Float64" Name="x" format="ascii"/>
+    <PDataArray type="Float32" Name="x" format="ascii"/>
     </PPointData>
     <PPoints>
-      <PDataArray type="Float64" NumberOfComponents="3"/>
+      <PDataArray type="Float32" NumberOfComponents="3"/>
     </PPoints>
     <Piece Source="output.vtu"/>
   </PUnstructuredGrid>

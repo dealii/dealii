@@ -10,7 +10,7 @@
 <UnstructuredGrid>
 <Piece NumberOfPoints="14" NumberOfCells="10" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
 </DataArray>
   </Points>
 
@@ -23,15 +23,15 @@
 </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="x1" format="binary">
+    <DataArray type="Float32" Name="x1" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x2" format="binary">
+    <DataArray type="Float32" Name="x2" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x3" format="binary">
+    <DataArray type="Float32" Name="x3" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x4" format="binary">
+    <DataArray type="Float32" Name="x4" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="i" format="binary">
+    <DataArray type="Float32" Name="i" format="binary">
 </DataArray>
   </PointData>
  </Piece>
@@ -49,7 +49,7 @@
 <UnstructuredGrid>
 <Piece NumberOfPoints="14" NumberOfCells="10" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
 </DataArray>
   </Points>
 
@@ -62,15 +62,15 @@
 </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="x1" format="binary">
+    <DataArray type="Float32" Name="x1" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x2" format="binary">
+    <DataArray type="Float32" Name="x2" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x3" format="binary">
+    <DataArray type="Float32" Name="x3" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x4" format="binary">
+    <DataArray type="Float32" Name="x4" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="i" format="binary">
+    <DataArray type="Float32" Name="i" format="binary">
 </DataArray>
   </PointData>
  </Piece>
@@ -88,7 +88,7 @@
 <UnstructuredGrid>
 <Piece NumberOfPoints="54" NumberOfCells="30" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
 </DataArray>
   </Points>
 
@@ -101,15 +101,15 @@
 </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="x1" format="binary">
+    <DataArray type="Float32" Name="x1" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x2" format="binary">
+    <DataArray type="Float32" Name="x2" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x3" format="binary">
+    <DataArray type="Float32" Name="x3" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x4" format="binary">
+    <DataArray type="Float32" Name="x4" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="i" format="binary">
+    <DataArray type="Float32" Name="i" format="binary">
 </DataArray>
   </PointData>
  </Piece>
@@ -127,7 +127,7 @@
 <UnstructuredGrid>
 <Piece NumberOfPoints="54" NumberOfCells="30" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
 </DataArray>
   </Points>
 
@@ -140,15 +140,15 @@
 </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="x1" format="binary">
+    <DataArray type="Float32" Name="x1" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x2" format="binary">
+    <DataArray type="Float32" Name="x2" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x3" format="binary">
+    <DataArray type="Float32" Name="x3" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x4" format="binary">
+    <DataArray type="Float32" Name="x4" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="i" format="binary">
+    <DataArray type="Float32" Name="i" format="binary">
 </DataArray>
   </PointData>
  </Piece>
@@ -166,7 +166,7 @@
 <UnstructuredGrid>
 <Piece NumberOfPoints="224" NumberOfCells="100" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
 </DataArray>
   </Points>
 
@@ -179,15 +179,15 @@
 </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="x1" format="binary">
+    <DataArray type="Float32" Name="x1" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x2" format="binary">
+    <DataArray type="Float32" Name="x2" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x3" format="binary">
+    <DataArray type="Float32" Name="x3" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="x4" format="binary">
+    <DataArray type="Float32" Name="x4" format="binary">
 </DataArray>
-    <DataArray type="Float64" Name="i" format="binary">
+    <DataArray type="Float32" Name="i" format="binary">
 </DataArray>
   </PointData>
  </Piece>
