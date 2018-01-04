@@ -15,12 +15,12 @@
 
 
 
-// check ConeBoundary and GridGenerator::truncated_cone
+// check CylindricalManifold and GridGenerator::truncated_cone
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
@@ -36,13 +36,30 @@
 template <int dim>
 void check ()
 {
+  AssertThrow(false, ExcNotImplemented());
+}
+
+template <>
+void check<2> ()
+{
+  constexpr int dim = 2;
   Triangulation<dim> triangulation;
   GridGenerator::truncated_cone (triangulation);
-  Point<dim> p1, p2;
-  p1[0] = -1;
-  p2[0] = 1;
-  static const ConeBoundary<dim> boundary (1, 0.5, p1, p2);
-  triangulation.set_boundary (0, boundary);
+
+  triangulation.refine_global (2);
+
+  GridOut().write_gnuplot (triangulation,
+                           deallog.get_file_stream());
+}
+
+template <>
+void check<3> ()
+{
+  constexpr int dim = 3;
+  Triangulation<dim> triangulation;
+  GridGenerator::truncated_cone (triangulation);
+  static const CylindricalManifold<dim> boundary;
+  triangulation.set_manifold (0, boundary);
 
   triangulation.refine_global (2);
 

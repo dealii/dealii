@@ -21,7 +21,7 @@
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
@@ -32,21 +32,39 @@
 #include <deal.II/fe/mapping_c1.h>
 
 
-
-
 template <int dim>
 void check ()
 {
+  AssertThrow(false, ExcNotImplemented());
+}
+
+template <>
+void check<2> ()
+{
+  constexpr int dim = 2;
   deallog << "dim=" << dim << std::endl;
 
   Triangulation<dim> triangulation;
-  double r1 = 0.5, r2 = 1.0, halfl = 0.25;
+  const double r1 = 0.5, r2 = 1.0, halfl = 0.25;
   GridGenerator::truncated_cone (triangulation, r1, r2, halfl);
-  Point<dim> p1, p2;
-  p1[0] = -halfl;
-  p2[0] = halfl;
-  static const ConeBoundary<dim> boundary (r1, r2, p1, p2);
-  triangulation.set_boundary (0, boundary);
+
+  triangulation.refine_global (2);
+
+  GridOut().write_gnuplot (triangulation,
+                           deallog.get_file_stream());
+}
+
+template <>
+void check<3> ()
+{
+  constexpr int dim = 3;
+  deallog << "dim=" << dim << std::endl;
+
+  Triangulation<dim> triangulation;
+  const double r1 = 0.5, r2 = 1.0, halfl = 0.25;
+  GridGenerator::truncated_cone (triangulation, r1, r2, halfl);
+  static const CylindricalManifold<dim> boundary;
+  triangulation.set_manifold (0, boundary);
 
   triangulation.refine_global (2);
 
