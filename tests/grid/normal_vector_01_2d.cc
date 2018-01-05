@@ -15,15 +15,15 @@
 
 
 
-// test that at the vertices, Boundary::normal_vector returns the same as
-// Boundary::get_normals_at_vertices once the latter vectors are normalized
+// test that at the vertices, Manifold::normal_vector returns the same as
+// Manifold::get_normals_at_vertices once the latter vectors are normalized
 
 
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
@@ -63,8 +63,8 @@ int main ()
   deallog.attach(logfile);
 
   Triangulation<2> tria;
-  StraightBoundary<2> boundary;
-  Boundary<2>::FaceVertexNormals normals;
+  FlatManifold<2> boundary;
+  Manifold<2>::FaceVertexNormals normals;
   for (unsigned int case_no=0; case_no<2; ++case_no)
     {
       deallog << "Case" << case_no << std::endl;

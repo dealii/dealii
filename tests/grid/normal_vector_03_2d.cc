@@ -63,11 +63,11 @@ int main ()
   deallog << std::fixed;
   deallog.attach(logfile);
 
-  FE_Q<2> linear_interpolator(1);
+  FE_Q<1> linear_interpolator(1);
 
   Triangulation<2> tria;
-  StraightBoundary<2> boundary;
-  Boundary<2>::FaceVertexNormals normals;
+  FlatManifold<2> boundary;
+  Manifold<2>::FaceVertexNormals normals;
   for (unsigned int case_no=0; case_no<2; ++case_no)
     {
       deallog << "Case" << case_no << std::endl;
@@ -80,30 +80,29 @@ int main ()
           boundary.get_normals_at_vertices(face, normals);
 
           for (double xi=0; xi<=1; xi+=0.234)
-            for (double eta=0; eta<=1; eta+=0.234)
-              {
-                Point<2> p;
-                Tensor<1,2> normal;
+            {
+              Point<2> p;
+              Tensor<1,2> normal;
 
-                for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_face; ++v)
-                  {
-                    p += face->vertex(v) * linear_interpolator.shape_value(v,Point<2>(xi,eta));
-                    normal += normals[v] *
-                              linear_interpolator.shape_value(v,Point<2>(xi,eta));
-                  }
-                normal /= normal.norm();
+              for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_face; ++v)
+                {
+                  p += face->vertex(v) * linear_interpolator.shape_value(v,Point<1>(xi));
+                  normal += normals[v] *
+                            linear_interpolator.shape_value(v,Point<1>(xi));
+                }
+              normal /= normal.norm();
 
-                deallog << "p=" << p
-                        << ", n=" << boundary.normal_vector (face, p)
-                        << std::endl;
+              deallog << "p=" << p
+                      << ", n=" << boundary.normal_vector (face, p)
+                      << std::endl;
 
-                Assert ((boundary.normal_vector (face, p)
-                         -
-                         normal).norm()
-                        <
-                        1e-10,
-                        ExcInternalError());
-              }
+              Assert ((boundary.normal_vector (face, p)
+                       -
+                       normal).norm()
+                      <
+                      1e-10,
+                      ExcInternalError());
+            }
         }
 
       tria.clear();

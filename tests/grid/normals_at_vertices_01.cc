@@ -22,7 +22,7 @@
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
@@ -62,8 +62,8 @@ int main ()
   deallog.attach(logfile);
 
   Triangulation<3> tria;
-  StraightBoundary<3> boundary;
-  Boundary<3>::FaceVertexNormals normals;
+  FlatManifold<3> boundary;
+  Manifold<3>::FaceVertexNormals normals;
   for (unsigned int case_no=0; case_no<2; ++case_no)
     {
       deallog << "Case" << case_no << std::endl;

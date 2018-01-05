@@ -16,7 +16,7 @@
 
 
 #include "../tests.h"
-#include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria.h>
@@ -33,28 +33,14 @@ std::ofstream logfile("output");
 
 template <int dim>
 class Ball :
-  public StraightBoundary<dim>
+  public FlatManifold<dim>
 {
 public:
   virtual Point<dim>
-  get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
+  get_new_point (const ArrayView<const Point<dim>> &surrounding_points,
+                 const ArrayView<const double>     &weights) const
   {
-    Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line(line);
-
-    for (int i=0; i<dim; ++i)
-      middle(i) -= .5;
-    middle *= std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square())*2);
-    for (int i=0; i<dim; ++i)
-      middle(i) += .5;
-
-    return middle;
-  }
-
-
-  virtual Point<dim>
-  get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
-  {
-    Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad(quad);
+    Point<dim> middle = FlatManifold<dim>::get_new_point(surrounding_points, weights);
 
     for (int i=0; i<dim; ++i)
       middle(i) -= .5;
@@ -69,7 +55,7 @@ public:
 
 template <int dim>
 class CurvedLine :
-  public StraightBoundary<dim>
+  public FlatManifold<dim>
 {
 public:
   virtual Point<dim>
@@ -84,7 +70,7 @@ template <int dim>
 Point<dim>
 CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
 {
-  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_line (line);
+  Point<dim> middle = FlatManifold<dim>::get_new_point_on_line (line);
 
   // if the line is at the top of bottom
   // face: do a special treatment on
@@ -106,7 +92,7 @@ CurvedLine<dim>::get_new_point_on_line (const typename Triangulation<dim>::line_
         // id was invented after the above was
         // written, so we are not very strict
         // here with using these flags
-        && (line->boundary_id() == 1))
+        && (line->manifold_id() == 1))
       return middle;
 
 
@@ -132,7 +118,7 @@ template <int dim>
 Point<dim>
 CurvedLine<dim>::get_new_point_on_quad (const typename Triangulation<dim>::quad_iterator &quad) const
 {
-  Point<dim> middle = StraightBoundary<dim>::get_new_point_on_quad (quad);
+  Point<dim> middle = FlatManifold<dim>::get_new_point_on_quad (quad);
 
   // if the face is at the top of bottom
   // face: do not move the midpoint in
@@ -215,18 +201,18 @@ void test (const int test_case)
     {
       if (dim==3)
         {
-          tria.begin_active()->face(4)->set_boundary_id(1);
-          tria.begin_active()->face(5)->set_boundary_id(1);
+          tria.begin_active()->face(4)->set_manifold_id(1);
+          tria.begin_active()->face(5)->set_manifold_id(1);
         };
 
 
-// set the boundary function
+      // set the manifold function
       Ball<dim>       ball;
       CurvedLine<dim> curved_line;
       if (test_case==2)
-        tria.set_boundary (1, ball);
+        tria.set_manifold (1, ball);
       else
-        tria.set_boundary (1, curved_line);
+        tria.set_manifold (1, curved_line);
 
       // refine once
       tria.begin_active()->set_refine_flag();
@@ -248,7 +234,7 @@ void test (const int test_case)
           tria.execute_coarsening_and_refinement();
         };
 
-      tria.set_boundary (1);
+      tria.set_manifold (1);
       break;
     }
     }

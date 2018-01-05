@@ -392,21 +392,6 @@ void
 Boundary<1,3>::
 get_intermediate_points_on_face (const Triangulation<1,3>::face_iterator &,
                                  std::vector<Point<3> > &) const;
-template <>
-void
-StraightBoundary<1,1>::
-get_normals_at_vertices (const Triangulation<1,1>::face_iterator &,
-                         Boundary<1,1>::FaceVertexNormals &) const;
-template <>
-void
-StraightBoundary<2,2>::
-get_normals_at_vertices (const Triangulation<2,2>::face_iterator &face,
-                         Boundary<2,2>::FaceVertexNormals &face_vertex_normals) const;
-template <>
-void
-StraightBoundary<3,3>::
-get_normals_at_vertices (const Triangulation<3,3>::face_iterator &face,
-                         Boundary<3,3>::FaceVertexNormals &face_vertex_normals) const;
 
 template <>
 Point<3>

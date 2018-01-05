@@ -774,6 +774,31 @@ public:
                       const Point<spacedim> &x2) const override;
 
   /**
+   * Return the normal vector to the given face at point p taking into account
+   * that quadrilateral faces of hexahedral cells in 3d may not be planar.
+   * In those cases, the face is assumed to have a geometry described by a
+   * bilinear function, and the normal vector is computed by embedding this
+   * bilinear form into a Cartesian space with a flat metric.
+   */
+  virtual
+  Tensor<1,spacedim>
+  normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
+                 const Point<spacedim> &p) const override;
+
+  /**
+   * Compute the normal vectors to the boundary at each vertex of the
+   * given face taking into account that quadrilateral faces of hexahedral
+   * cells in 3d may not be planar. In those cases, the face is assumed to
+   * have a geometry described by a bilinear function, and the normal vector
+   * is computed by embedding this bilinear form into a Cartesian space with
+   * a flat metric.
+   */
+  virtual
+  void
+  get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
+                           typename Manifold<dim, spacedim>::FaceVertexNormals &face_vertex_normals) const override;
+
+  /**
    * Return the periodicity of this Manifold.
    */
   const Tensor<1,spacedim> &get_periodicity() const;

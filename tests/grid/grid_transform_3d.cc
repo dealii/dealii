@@ -62,6 +62,14 @@ int main ()
       cell->set_coarsen_flag ();
   tria.execute_coarsening_and_refinement();
 
+  {
+    GridOut grid_out;
+    std::ofstream out("output_before.vtk");
+    out.precision (5);
+    out << std::fixed;
+    grid_out.write_vtk(tria, out);
+  }
+
 
   Triangulation<dim>::face_iterator face;
   for (cell=tria.begin_active(); cell!=endc; ++cell)
@@ -83,6 +91,14 @@ int main ()
               new_points[face->vertex_index(vertex_no)] = new_vertex;
             }
       }
+
+  {
+    GridOut grid_out;
+    std::ofstream out("output_after.vtk");
+    out.precision (5);
+    out << std::fixed;
+    grid_out.write_vtk(tria, out);
+  }
 
   GridTools::laplace_transform<dim> (new_points, tria, nullptr, true);
 
