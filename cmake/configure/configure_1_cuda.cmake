@@ -115,6 +115,12 @@ MACRO(FEATURE_CUDA_CONFIGURE_EXTERNAL)
   #
   ADD_FLAGS(DEAL_II_CUDA_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
 
+  # We cannot use -pedantic as compiler flags. nvcc generates code that
+  # produces a lot of warnings when pedantic is enabled. So filter out the
+  # flag:
+  #
+  STRING(REPLACE "-pedantic" "" DEAL_II_CXX_FLAGS "${DEAL_II_CXX_FLAGS}")
+
   #
   # Export definitions:
   #
