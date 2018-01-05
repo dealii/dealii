@@ -1244,10 +1244,8 @@ namespace StandardExceptions
  * @ingroup Exceptions
  * @author Bruno Turcksin, 2016
  */
-// For now use AssertThrow instead of Assert because macros are not passed
-// correctly to nvcc.
-#define AssertCuda(error_code) AssertThrow(error_code == cudaSuccess, \
-                                           dealii::ExcCudaError(cudaGetErrorString(error_code)))
+#define AssertCuda(error_code) Assert(error_code == cudaSuccess, \
+                                      dealii::ExcCudaError(cudaGetErrorString(error_code)))
 #endif
 
 using namespace StandardExceptions;
