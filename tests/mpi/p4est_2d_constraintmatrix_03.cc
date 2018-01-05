@@ -35,7 +35,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/trilinos_vector.h>
@@ -64,13 +63,9 @@ void test()
                               12,
                               true);
 
-  static HyperShellBoundary<dim> boundary;
-  tr.set_boundary (0, boundary);
-  tr.set_boundary (1, boundary);
-
-/*  static SphericalManifold<dim> boundary;
+  static SphericalManifold<dim> boundary;
   tr.set_manifold (0, boundary);
-  tr.set_manifold (1, boundary);*/
+  tr.set_manifold (1, boundary);
 
   tr.refine_global (1);
   for (unsigned int step=0; step<20; ++step)
@@ -136,9 +131,9 @@ void test()
   TrilinosWrappers::MPI::Vector x_dub;
   x_dub.reinit(complete_index_set(dof_set.size()));
   x_dub.reinit(x_rel, false, true);
-  
+
   if (myid==0)
-     x_dub.print(deallog.get_file_stream(), 8, true, false);
+    x_dub.print(deallog.get_file_stream(), 8, true, false);
 
   tr.set_manifold (0);
   tr.set_manifold (1);
