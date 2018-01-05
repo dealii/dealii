@@ -229,8 +229,8 @@ namespace Rol
      * Apply binary function @p f along with ROL::Vector @p rol_vector to all
      * the elements of the wrapped vector.
      */
-    void applyBinary (const ROL::Elementwise::UnaryFunction<value_type> &f,
-                      const ROL::Vector<value_type>                     &rol_vector);
+    void applyBinary (const ROL::Elementwise::BinaryFunction<value_type> &f,
+                      const ROL::Vector<value_type>                      &rol_vector);
 
     /**
      * Return the accumulated value on applying reduction operation @p r on
@@ -420,8 +420,8 @@ namespace Rol
   template<typename VectorType>
   void
   VectorAdaptor<VectorType>::
-  applyBinary (const ROL::Elementwise::UnaryFunction<value_type> &f,
-               const ROL::Vector<value_type>                     &rol_vector)
+  applyBinary (const ROL::Elementwise::BinaryFunction<value_type> &f,
+               const ROL::Vector<value_type>                      &rol_vector)
   {
     Assert (this->dimension() == rol_vector.dimension(),
             ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));
@@ -431,14 +431,13 @@ namespace Rol
 
     const VectorType &given_rol_vector = *(vector_adaptor.getVector());
 
-    const typename VectorType::iterator
-    vend   = vector_ptr->end(),
-    rolend = given_rol_vector.end();
+    const typename VectorType::iterator       vend   = vector_ptr->end();
+    const typename VectorType::const_iterator rolend = given_rol_vector.end();
 
-    for (typename VectorType::iterator
-         l_iterator  = vector_ptr->begin(), r_iterator  = given_rol_vector.begin();
-         l_iterator != vend              && r_iterator != rolend;
-         l_iterator++,                      r_iterator++)
+    typename VectorType::const_iterator r_iterator = given_rol_vector.begin();
+    for (typename VectorType::iterator  l_iterator = vector_ptr->begin();
+         l_iterator != vend && r_iterator != rolend;
+         l_iterator++,         r_iterator++)
       *l_iterator = f.apply(*l_iterator, *r_iterator);
 
     vector_ptr->compress (VectorOperation::insert);
