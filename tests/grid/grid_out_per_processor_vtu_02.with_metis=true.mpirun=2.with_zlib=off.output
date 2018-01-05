@@ -7,11 +7,11 @@ DEAL:0:2d::hyper_cube
 <VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
   <PUnstructuredGrid GhostLevel="0">
     <PPointData Scalars="scalars">
-    <PDataArray type="Float64" Name="subdomain" format="ascii"/>
-    <PDataArray type="Float64" Name="proc_writing" format="ascii"/>
+    <PDataArray type="Float32" Name="subdomain" format="ascii"/>
+    <PDataArray type="Float32" Name="proc_writing" format="ascii"/>
     </PPointData>
     <PPoints>
-      <PDataArray type="Float64" NumberOfComponents="3"/>
+      <PDataArray type="Float32" NumberOfComponents="3"/>
     </PPoints>
     <Piece Source="file1.proc0000.vtu"/>
     <Piece Source="file1.proc0001.vtu"/>
@@ -27,7 +27,7 @@ DEAL:0:2d::hyper_cube
 <UnstructuredGrid>
 <Piece NumberOfPoints="16" NumberOfCells="4" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="ascii">
+    <DataArray type="Float32" NumberOfComponents="3" format="ascii">
 0 0 0
 1 0 0
 0 1 0
@@ -62,13 +62,13 @@ DEAL:0:2d::hyper_cube
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="level" format="ascii">
+    <DataArray type="Float32" Name="level" format="ascii">
 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1     </DataArray>
-    <DataArray type="Float64" Name="subdomain" format="ascii">
+    <DataArray type="Float32" Name="subdomain" format="ascii">
 -1 -1 -1 -1 0 0 0 0 1 1 1 1 -2 -2 -2 -2     </DataArray>
-    <DataArray type="Float64" Name="level_subdomain" format="ascii">
+    <DataArray type="Float32" Name="level_subdomain" format="ascii">
 0 0 0 0 -2 -2 -2 -2 0 0 0 0 1 1 1 1     </DataArray>
-    <DataArray type="Float64" Name="proc_writing" format="ascii">
+    <DataArray type="Float32" Name="proc_writing" format="ascii">
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0     </DataArray>
   </PointData>
  </Piece>
@@ -85,7 +85,7 @@ DEAL:0:2d::hyper_cube
 <UnstructuredGrid>
 <Piece NumberOfPoints="16" NumberOfCells="4" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="ascii">
+    <DataArray type="Float32" NumberOfComponents="3" format="ascii">
 0 0 0
 1 0 0
 0 1 0
@@ -120,13 +120,13 @@ DEAL:0:2d::hyper_cube
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="level" format="ascii">
+    <DataArray type="Float32" Name="level" format="ascii">
 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1     </DataArray>
-    <DataArray type="Float64" Name="subdomain" format="ascii">
+    <DataArray type="Float32" Name="subdomain" format="ascii">
 -1 -1 -1 -1 0 0 0 0 1 1 1 1 -2 -2 -2 -2     </DataArray>
-    <DataArray type="Float64" Name="level_subdomain" format="ascii">
+    <DataArray type="Float32" Name="level_subdomain" format="ascii">
 0 0 0 0 -2 -2 -2 -2 0 0 0 0 1 1 1 1     </DataArray>
-    <DataArray type="Float64" Name="proc_writing" format="ascii">
+    <DataArray type="Float32" Name="proc_writing" format="ascii">
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1     </DataArray>
   </PointData>
  </Piece>

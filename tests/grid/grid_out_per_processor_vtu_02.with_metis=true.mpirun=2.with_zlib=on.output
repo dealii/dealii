@@ -7,11 +7,11 @@ DEAL:0:2d::hyper_cube
 <VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
   <PUnstructuredGrid GhostLevel="0">
     <PPointData Scalars="scalars">
-    <PDataArray type="Float64" Name="subdomain" format="ascii"/>
-    <PDataArray type="Float64" Name="proc_writing" format="ascii"/>
+    <PDataArray type="Float32" Name="subdomain" format="ascii"/>
+    <PDataArray type="Float32" Name="proc_writing" format="ascii"/>
     </PPointData>
     <PPoints>
-      <PDataArray type="Float64" NumberOfComponents="3"/>
+      <PDataArray type="Float32" NumberOfComponents="3"/>
     </PPoints>
     <Piece Source="file1.proc0000.vtu"/>
     <Piece Source="file1.proc0001.vtu"/>
@@ -27,8 +27,8 @@ DEAL:0:2d::hyper_cube
 <UnstructuredGrid>
 <Piece NumberOfPoints="16" NumberOfCells="4" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAIABAACAAQAALQAAAA==eNpjYMAHPtgzkCQP4xPSBwMP7EmTh/FxiRPrflzmfLAnzV5C6gmHDwBXYxlL
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
+AQAAAMAAAADAAAAAKAAAAA==eNpjYEAGDfYMWPkgGl0ODOxx8O3R2NjMR1LTYI9dL7o4pnsATsMKaw==
     </DataArray>
   </Points>
 
@@ -44,14 +44,14 @@ AQAAAAQAAAAEAAAADAAAAA==eNrj5OTkBAAAXgAl
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="level" format="binary">
-AQAAAIAAAACAAAAAEAAAAA==eNpjYCAGfLCnFQ0AiwIONQ==    </DataArray>
-    <DataArray type="Float64" Name="subdomain" format="binary">
-AQAAAIAAAACAAAAAGgAAAA==eNpjYACBD/sZ8NKEwAd7/DTDAVw0AOJFDnk=    </DataArray>
-    <DataArray type="Float64" Name="level_subdomain" format="binary">
-AQAAAIAAAACAAAAAFAAAAA==eNpjYCAKHCBAEwAf7HHRACjbB70=    </DataArray>
-    <DataArray type="Float64" Name="proc_writing" format="binary">
-AQAAAIAAAACAAAAADAAAAA==eNpjYBhYAAAAgAAB    </DataArray>
+    <DataArray type="Float32" Name="level" format="binary">
+AQAAAEAAAABAAAAADwAAAA==eNpjYEAHDfakYADULAj1    </DataArray>
+    <DataArray type="Float32" Name="subdomain" format="binary">
+AQAAAEAAAABAAAAAFwAAAA==eNpjYGjYz4CC0UGDPSpmOICMAXAXCvk=    </DataArray>
+    <DataArray type="Float32" Name="level_subdomain" format="binary">
+AQAAAEAAAABAAAAAEwAAAA==eNpjYMAAB9AwGmiwR8YAjCQF/Q==    </DataArray>
+    <DataArray type="Float32" Name="proc_writing" format="binary">
+AQAAAEAAAABAAAAADAAAAA==eNpjYKAMAAAAQAAB    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>
@@ -67,8 +67,8 @@ AQAAAIAAAACAAAAADAAAAA==eNpjYBhYAAAAgAAB    </DataArray>
 <UnstructuredGrid>
 <Piece NumberOfPoints="16" NumberOfCells="4" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="binary">
-AQAAAIABAACAAQAALQAAAA==eNpjYMAHPtgzkCQP4xPSBwMP7EmTh/FxiRPrflzmfLAnzV5C6gmHDwBXYxlL
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
+AQAAAMAAAADAAAAAKAAAAA==eNpjYEAGDfYMWPkgGl0ODOxx8O3R2NjMR1LTYI9dL7o4pnsATsMKaw==
     </DataArray>
   </Points>
 
@@ -84,14 +84,14 @@ AQAAAAQAAAAEAAAADAAAAA==eNrj5OTkBAAAXgAl
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="level" format="binary">
-AQAAAIAAAACAAAAAEAAAAA==eNpjYCAGfLCnFQ0AiwIONQ==    </DataArray>
-    <DataArray type="Float64" Name="subdomain" format="binary">
-AQAAAIAAAACAAAAAGgAAAA==eNpjYACBD/sZ8NKEwAd7/DTDAVw0AOJFDnk=    </DataArray>
-    <DataArray type="Float64" Name="level_subdomain" format="binary">
-AQAAAIAAAACAAAAAFAAAAA==eNpjYCAKHCBAEwAf7HHRACjbB70=    </DataArray>
-    <DataArray type="Float64" Name="proc_writing" format="binary">
-AQAAAIAAAACAAAAAEQAAAA==eNpjYACBD/YMA0QDAJLsEvE=    </DataArray>
+    <DataArray type="Float32" Name="level" format="binary">
+AQAAAEAAAABAAAAADwAAAA==eNpjYEAHDfakYADULAj1    </DataArray>
+    <DataArray type="Float32" Name="subdomain" format="binary">
+AQAAAEAAAABAAAAAFwAAAA==eNpjYGjYz4CC0UGDPSpmOICMAXAXCvk=    </DataArray>
+    <DataArray type="Float32" Name="level_subdomain" format="binary">
+AQAAAEAAAABAAAAAEwAAAA==eNpjYMAAB9AwGmiwR8YAjCQF/Q==    </DataArray>
+    <DataArray type="Float32" Name="proc_writing" format="binary">
+AQAAAEAAAABAAAAADwAAAA==eNpjYGiwZ6AAAwB6Xwvx    </DataArray>
   </PointData>
  </Piece>
  </UnstructuredGrid>
