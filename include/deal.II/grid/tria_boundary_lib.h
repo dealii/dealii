@@ -545,7 +545,7 @@ public:
  * @ingroup boundary
  *
  * @deprecated The boundary classes have been deprecated in favor of the more
- * general Manifold classes. For this class CylindricalManifold is an appropriate
+ * general Manifold classes. For this class SphericalManifold is an appropriate
  * replacement which is expected to produce better results under mesh refinement.
  *
  * @author Wolfgang Bangerth, 1999

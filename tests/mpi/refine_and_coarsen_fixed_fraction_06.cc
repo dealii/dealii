@@ -25,7 +25,7 @@
 #include <deal.II/distributed/grid_refinement.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
@@ -53,9 +53,9 @@ void test()
                               EquationData::R1,
                               12,
                               true);
-  static HyperShellBoundary<2> boundary;
-  tr.set_boundary (0, boundary);
-  tr.set_boundary (1, boundary);
+  static SphericalManifold<2> boundary;
+  tr.set_manifold (0, boundary);
+  tr.set_manifold (1, boundary);
 
   tr.refine_global (initial_refinement);
 

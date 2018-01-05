@@ -35,7 +35,7 @@ void dim_2(std::ostream &os)
   Triangulation<d> tr;
 
   GridGenerator::hyper_cube_with_cylindrical_hole(tr,inner,outer,outer,true);
-  static HyperShellBoundary<d> boundary;
+  static SphericalManifold<d> boundary;
   tr.set_all_manifold_ids_on_boundary(1,1);
   tr.set_manifold(1,boundary);
 

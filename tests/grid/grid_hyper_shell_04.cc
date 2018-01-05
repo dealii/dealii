@@ -18,7 +18,7 @@
 // this series test the other possibilities for the number of cells
 
 #include "../tests.h"
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria.h>
@@ -37,8 +37,8 @@ void check (double r1, double r2, unsigned int n)
   Point<dim> center;
   Triangulation<dim> tria (Triangulation<dim>::none);
   GridGenerator::hyper_shell (tria, center, r1, r2, n);
-  static const HyperShellBoundary<dim> boundary(center);
-  tria.set_boundary(0, boundary);
+  static const SphericalManifold<dim> boundary(center);
+  tria.set_manifold(0, boundary);
 
   GridOut grid_out;
   grid_out.write_gnuplot (tria, logfile);

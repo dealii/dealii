@@ -22,7 +22,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/hp/dof_handler.h>
 
@@ -45,8 +45,8 @@ void make_grid (Triangulation<2> &triangulation)
                               center, inner_radius, outer_radius,
                               10);
 
-  static const HyperShellBoundary<2> boundary_description(center);
-  triangulation.set_boundary (0, boundary_description);
+  static const SphericalManifold<2> boundary_description(center);
+  triangulation.set_manifold (0, boundary_description);
 
   for (unsigned int step=0; step<5; ++step)
     {

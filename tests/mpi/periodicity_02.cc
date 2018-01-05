@@ -38,7 +38,7 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/dofs/dof_renumbering.h>
@@ -76,7 +76,7 @@ namespace Step22
 
     MPI_Comm                                    mpi_communicator;
 
-    HyperShellBoundary<dim>                     boundary;
+    SphericalManifold<dim>                      boundary;
     parallel::distributed::Triangulation<dim>   triangulation;
     FESystem<dim>                               fe;
     DoFHandler<dim>                             dof_handler;
@@ -738,8 +738,8 @@ namespace Step22
 #endif
 
 
-    triangulation.set_boundary(0, boundary);
-    triangulation.set_boundary(1, boundary);
+    triangulation.set_manifold(0, boundary);
+    triangulation.set_manifold(1, boundary);
 
     triangulation.refine_global (4-dim);
 

@@ -22,6 +22,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
@@ -33,10 +34,10 @@ int main ()
 {
   const unsigned int dim=2;
   Point<dim> origin;
-  HyperShellBoundary<dim> boundary(origin);
+  SphericalManifold<dim> boundary(origin);
   MappingQ<dim> mapping(2);
   Triangulation<dim> tria;
-  tria.set_boundary(0, boundary);
+  tria.set_manifold(0, boundary);
   const double inner_radius=1.;
   const double outer_radius=5.;
   GridGenerator::hyper_shell(tria, origin, inner_radius, outer_radius, 8);

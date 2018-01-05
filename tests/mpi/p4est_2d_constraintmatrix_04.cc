@@ -36,7 +36,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/trilinos_vector.h>
 
@@ -143,9 +143,9 @@ void test()
                               R1,
                               12,
                               true);
-  static HyperShellBoundary<dim> boundary;
-//  tr.set_boundary (0, boundary);
-// tr.set_boundary (1, boundary);
+  static SphericalManifold<dim> boundary;
+//  tr.set_manifold (0, boundary);
+// tr.set_manifold (1, boundary);
 
   tr.refine_global (3);
   if (1)
@@ -307,8 +307,8 @@ void test()
   std::ofstream output (filename.c_str());
   data_out.write_deal_II_intermediate (output);
 
-  tr.set_boundary (0);
-  tr.set_boundary (1);
+  tr.set_manifold (0);
+  tr.set_manifold (1);
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "OK" << std::endl;
 }
