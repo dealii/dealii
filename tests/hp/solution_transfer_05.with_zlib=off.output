@@ -8,7 +8,7 @@
 <UnstructuredGrid>
 <Piece NumberOfPoints="16" NumberOfCells="4" >
   <Points>
-    <DataArray type="Float64" NumberOfComponents="3" format="ascii">
+    <DataArray type="Float32" NumberOfComponents="3" format="ascii">
 0.00000 0.00000 0
 0.500000 0.00000 0
 0.00000 0.500000 0
@@ -43,9 +43,9 @@
     </DataArray>
   </Cells>
   <PointData Scalars="scalars">
-    <DataArray type="Float64" Name="Solution_0" format="ascii">
+    <DataArray type="Float32" Name="Solution_0" format="ascii">
 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 1.00000 1.00000 1.00000 1.00000 1.00000 1.00000 1.00000 1.00000     </DataArray>
-    <DataArray type="Float64" Name="Solution_1" format="ascii">
+    <DataArray type="Float32" Name="Solution_1" format="ascii">
 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00000 1.00000 1.00000 1.00000 1.00000 1.00000 1.00000 1.00000 1.00000     </DataArray>
   </PointData>
  </Piece>
