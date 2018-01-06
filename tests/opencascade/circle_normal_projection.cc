@@ -68,7 +68,7 @@ int main ()
   GridGenerator::hyper_cube(tria);
 
   // Set the exterior boundary
-  tria.set_boundary(0, boundary_line);
+  tria.set_manifold(0, boundary_line);
 
   // This is here to ignore the
   // points created in the interior
