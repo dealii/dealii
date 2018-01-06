@@ -22,7 +22,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 
 
@@ -37,13 +37,13 @@ void test()
   // faces
   GridTools::copy_boundary_to_manifold_id (triangulation);
 
-  static const CylinderBoundary<dim> outer_cylinder (100,0);
+  static const CylindricalManifold<dim> outer_cylinder (0);
   triangulation.set_manifold(0,outer_cylinder);
 
   // now extract the surface mesh
   Triangulation<dim-1,dim> triangulation_surface;
 
-  static const CylinderBoundary<dim-1,dim> surface_cyl(100,0);
+  static const CylindricalManifold<dim-1,dim> surface_cyl(0);
   triangulation_surface.set_manifold(0,surface_cyl);
 
   GridGenerator::extract_boundary_mesh(triangulation,triangulation_surface);

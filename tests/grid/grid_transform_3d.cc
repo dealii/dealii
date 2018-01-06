@@ -21,7 +21,7 @@
 #include "../tests.h"
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
@@ -32,10 +32,10 @@ int main ()
 {
   const unsigned int dim=3;
   Point<dim> origin;
-  CylinderBoundary<dim> boundary;
+  CylindricalManifold<dim> boundary;
   Triangulation<dim> tria;
-  tria.set_boundary(0, boundary);
   GridGenerator::cylinder(tria, 1, .7);
+  tria.set_manifold(0, boundary);
   tria.refine_global(2);
 
   // build up a map of vertex indices
