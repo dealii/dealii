@@ -29,7 +29,6 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/grid/grid_out.h>
@@ -85,9 +84,9 @@ void test()
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids (numbers::invalid_manifold_id);
-  //  static const HyperShellBoundary<dim> boundary_shell;
-  //  tr.set_boundary (0, boundary_shell);
-  //  tr.set_boundary (1, boundary_shell);
+  //  static const SphericalManifold<dim> boundary_shell;
+  //  tr.set_manifold (0, boundary_shell);
+  //  tr.set_manifold (1, boundary_shell);
 
   tr.refine_global ((dim==2)?3:1);
 

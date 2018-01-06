@@ -19,7 +19,7 @@
 // refinement
 
 #include "../tests.h"
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria.h>
@@ -52,8 +52,8 @@ void check (double r1, double r2, unsigned int n)
           for (unsigned int e=0; e<GeometryInfo<dim>::lines_per_face; ++e)
             c->face(f)->line(e)->set_boundary_id(0);
 
-  static const HyperShellBoundary<dim> boundary(center);
-  tria.set_boundary(0, boundary);
+  static const SphericalManifold<dim> boundary(center);
+  tria.set_manifold(0, boundary);
 
   for (unsigned int i=0; i<2; ++i)
     {

@@ -33,7 +33,7 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_system.h>
@@ -170,8 +170,8 @@ void run()
                          0.5,
                          1.0);
 
-  static HyperShellBoundary<dim> boundary((Point<dim>()));
-  triangulation.set_boundary (0, boundary);
+  static SphericalManifold<dim> boundary((Point<dim>()));
+  triangulation.set_manifold (0, boundary);
 
   // write out the mesh. may not be
   // strictly necessary here, but is

@@ -16,7 +16,7 @@
 
 
 // check ConstraintMatrix.distribute() for a distributed mesh
-// with Trilinos; manual check of the graphical output...
+// with Trilinos
 // Mesh: shell with random refinement
 
 #include "../tests.h"
@@ -35,7 +35,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/trilinos_vector.h>
 
@@ -43,51 +43,6 @@
 #include <deal.II/fe/fe_system.h>
 
 #include <sstream>
-
-
-template <int dim>
-class FilteredDataOut : public DataOut<dim>
-{
-public:
-  FilteredDataOut (const unsigned int subdomain_id)
-    :
-    subdomain_id (subdomain_id)
-  {}
-
-  virtual typename DataOut<dim>::cell_iterator
-  first_cell ()
-  {
-    typename DataOut<dim>::active_cell_iterator
-    cell = this->triangulation->begin_active();
-    while ((cell != this->triangulation->end()) &&
-           (cell->subdomain_id() != subdomain_id))
-      ++cell;
-
-    return cell;
-  }
-
-  virtual typename DataOut<dim>::cell_iterator
-  next_cell (const typename DataOut<dim>::cell_iterator &old_cell)
-  {
-    if (old_cell != this->triangulation->end())
-      {
-        const IteratorFilters::SubdomainEqualTo
-        predicate(subdomain_id);
-
-        return
-          ++(FilteredIterator
-             <typename DataOut<dim>::active_cell_iterator>
-             (predicate,old_cell));
-      }
-    else
-      return old_cell;
-  }
-
-private:
-  const unsigned int subdomain_id;
-};
-
-
 
 
 template <int dim>
@@ -107,9 +62,10 @@ void test()
                               R1,
                               12,
                               true);
-  static HyperShellBoundary<dim> boundary;
-  tr.set_boundary (0, boundary);
-  tr.set_boundary (1, boundary);
+
+  static SphericalManifold<dim> boundary;
+  tr.set_manifold (0, boundary);
+  tr.set_manifold (1, boundary);
 
   tr.refine_global (1);
   for (unsigned int step=0; step<20; ++step)
@@ -172,50 +128,15 @@ void test()
   cm.distribute(x);
   x_rel = x;
 
-  std::vector<std::string> joint_solution_names (dim, "vel");
-  joint_solution_names.push_back ("p");
-
-  FilteredDataOut<dim> data_out (tr.locally_owned_subdomain());
-  data_out.attach_dof_handler (dofh);
-
-  std::vector<DataComponentInterpretation::DataComponentInterpretation>
-  data_component_interpretation
-  (dim+1, DataComponentInterpretation::component_is_scalar);
-  for (unsigned int i=0; i<dim; ++i)
-    data_component_interpretation[i]
-      = DataComponentInterpretation::component_is_part_of_vector;
-
-  data_out.add_data_vector(x_rel, joint_solution_names,
-                           DataOut<dim>::type_dof_data,
-                           data_component_interpretation);
-  data_out.build_patches (4);
-  const std::string filename = ("solution." +
-                                Utilities::int_to_string
-                                (tr.locally_owned_subdomain(), 4) +
-                                ".d2");
-  std::ofstream output (filename.c_str());
-  data_out.write_deal_II_intermediate (output);
-
   TrilinosWrappers::MPI::Vector x_dub;
   x_dub.reinit(complete_index_set(dof_set.size()));
   x_dub.reinit(x_rel, false, true);
 
   if (myid==0)
-    {
-      std::ofstream file((std::string("dat.") + Utilities::int_to_string(myid)).c_str());
-      file << "**** proc " << myid << std::endl;
-      x_dub.print(file);
-    }
+    x_dub.print(deallog.get_file_stream(), 8, true, false);
 
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  if (myid==0)
-    {
-      cat_file((std::string("dat.") + Utilities::int_to_string(0)).c_str());
-    }
-
-  tr.set_boundary (0);
-  tr.set_boundary (1);
+  tr.set_manifold (0);
+  tr.set_manifold (1);
 }
 
 
@@ -223,20 +144,6 @@ int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
-
-  deallog.push(Utilities::int_to_string(myid));
-
-  if (myid == 0)
-    {
-      initlog();
-
-      deallog.push("2d");
-      test<2>();
-      deallog.pop();
-    }
-  else
-    test<2>();
-
+  mpi_initlog();
+  test<2>();
 }
