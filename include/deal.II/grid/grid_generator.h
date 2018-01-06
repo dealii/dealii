@@ -559,7 +559,7 @@ namespace GridGenerator
    * <tt>x=-half_length</tt> to <tt>x=half_length</tt> and its projection into
    * the @p yz-plane is a circle of radius @p radius_0 at
    * <tt>x=-half_length</tt> and a circle of radius @p radius_1 at
-   * <tt>x=+half_length</tt>.  In between the radius is linearly decreasing.
+   * <tt>x=+half_length</tt>. In between the radius is linearly decreasing.
    *
    * In two dimensions, the cone is a trapezoid from <tt>x=-half_length</tt>
    * to <tt>x=+half_length</tt> and from <tt>y=-radius_0</tt> to
@@ -570,9 +570,10 @@ namespace GridGenerator
    * The boundaries are colored according to the following scheme: 0 for the
    * hull of the cone, 1 for the left hand face and 2 for the right hand face.
    *
-   * An example of use can be found in the documentation of the ConeBoundary
-   * class, with which you probably want to associate boundary indicator 0
-   * (the hull of the cone).
+   * In three dimensions, the CylindricalManifold class is an appropriate choice
+   * for the description of the hull, with which you probably want to associate
+   * boundary indicator 0.
+   * In two dimensions the default FlatManifold is sufficient.
    *
    * @note The triangulation needs to be void upon calling this function.
    *

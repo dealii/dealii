@@ -382,6 +382,15 @@ public:
   push_forward(const Point<3> &chart_point) const override;
 
   /**
+   * Compute the derivatives of the mapping from cylindrical coordinates
+   * $(r, \phi, \lambda)$ to cartesian coordinates where $r$ denotes the
+   * distance from the axis, $\phi$ the angle between the given point and the
+   * computed normal direction and $\lambda$ the axial position.
+   */
+  virtual DerivativeForm<1, 3, spacedim>
+  push_forward_gradient(const Point<3> &chart_point) const override;
+
+  /**
    * Compute new points on the CylindricalManifold. See the documentation of
    * the base class for a detailed description of what this function does.
    */

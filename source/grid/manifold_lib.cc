@@ -62,7 +62,7 @@ namespace internal
 
   // helper function to compute a vector orthogonal to a given one.
   Point<3>
-  compute_normal(const Tensor<1,3> &vector)
+  compute_normal(const Tensor<1,3> &vector, bool normalize=false)
   {
     Assert(vector.norm_square() != 0.,
            ExcMessage("The direction parameter must not be zero!"));
@@ -87,6 +87,8 @@ namespace internal
         normal[1]=-1.;
         normal[2]=(vector[0]+vector[1])/vector[2];
       }
+    if (normalize)
+      normal /= normal.norm();
     return normal;
   }
 }
@@ -823,7 +825,7 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const Point<spacedim> &d
                                                         const Point<spacedim> &point_on_axis_,
                                                         const double tolerance) :
   ChartManifold<dim,3,3>(Tensor<1,3>({0,2.*numbers::PI,0})),
-              normal_direction(internal::compute_normal(direction_)),
+              normal_direction(internal::compute_normal(direction_, true)),
               direction (direction_/direction_.norm()),
               point_on_axis (point_on_axis_),
               tolerance(tolerance)
@@ -891,25 +893,51 @@ CylindricalManifold<dim, spacedim>::push_forward(const Point<3> &chart_point) co
   // Rotate the orthogonal direction by the given angle.
   // Formula from Section 5.2 in
   // http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
-  // simplified assuming normal_direction and direction are orthogonal.
-  const double sine = std::sin(chart_point(1));
-  const double cosine = std::cos(chart_point(1));
-  const double x = normal_direction[0]*cosine
-                   -sine*(direction[2]*normal_direction[1]
-                          -direction[1]*normal_direction[2]);
-  const double y = normal_direction[1]*cosine
-                   -sine*(direction[0]*normal_direction[2]
-                          -direction[2]*normal_direction[0]);
-  const double z = normal_direction[2]*cosine
-                   -sine*(direction[1]*normal_direction[0]
-                          -direction[0]*normal_direction[1]);
-
-  // Rescale according to the given distance from the axis.
-  Point<3> intermediate (x,y,z);
-  intermediate *= chart_point(0)/std::sqrt(intermediate.square());
+  // simplified assuming normal_direction and direction are orthogonal
+  // and unit vectors.
+  const double sine_r = std::sin(chart_point(1))*chart_point(0);
+  const double cosine_r = std::cos(chart_point(1))*chart_point(0);
+  const Tensor<1,3> dxn = cross_product_3d(direction, normal_direction);
+  const Tensor<1,3> intermediate = normal_direction*cosine_r+dxn*sine_r;
 
   // Finally, put everything together.
-  return intermediate+point_on_axis+direction*chart_point(2);
+  return point_on_axis+direction*chart_point(2)+intermediate;
+}
+
+
+
+template<int dim, int spacedim>
+DerivativeForm<1, 3, spacedim>
+CylindricalManifold<dim, spacedim>::push_forward_gradient(const Point<3> &chart_point) const
+{
+  Tensor<2, 3> derivatives;
+
+  // Rotate the orthogonal direction by the given angle.
+  // Formula from Section 5.2 in
+  // http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
+  // simplified assuming normal_direction and direction are orthogonal
+  // and unit vectors.
+  const double sine = std::sin(chart_point(1));
+  const double cosine = std::cos(chart_point(1));
+  const Tensor<1,3> dxn = cross_product_3d(direction, normal_direction);
+  const Tensor<1,3> intermediate = normal_direction*cosine+dxn*sine;
+
+  // derivative w.r.t the radius
+  derivatives[0][0] = intermediate[0];
+  derivatives[1][0] = intermediate[1];
+  derivatives[2][0] = intermediate[2];
+
+  // derivatives w.r.t the angle
+  derivatives[0][1] = -normal_direction[0]*sine + dxn[0]*cosine;
+  derivatives[1][1] = -normal_direction[1]*sine + dxn[1]*cosine;
+  derivatives[2][1] = -normal_direction[2]*sine + dxn[2]*cosine;
+
+  // derivatives w.r.t the direction of the axis
+  derivatives[0][2] = direction[0];
+  derivatives[1][2] = direction[1];
+  derivatives[2][2] = direction[2];
+
+  return derivatives;
 }
 
 
