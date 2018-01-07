@@ -838,10 +838,7 @@ namespace internal
  * by child cells from their parent upon mesh refinement.
  *
  * Boundary indicators on lower dimensional objects (these have no material
- * id) indicate the number of a boundary component. These are used for two
- * purposes: First, they specify a boundary curve. When a cell is refined, a
- * function can be used to place new vertices on this curve. See the section
- * on boundary approximation below. Furthermore, the weak formulation of the
+ * id) indicate the number of a boundary component. The weak formulation of the
  * partial differential equation may have different boundary conditions on
  * different parts of the boundary. The boundary indicator can be used in
  * creating the matrix or the right hand side vector to indicate these
@@ -953,12 +950,12 @@ namespace internal
  *
  * <h3>%Boundary approximation</h3>
  *
- * You can specify a boundary function for each boundary component. If a new
- * vertex is created on a side or face at the boundary, this function is used
- * to compute where it will be placed. The boundary indicator of the face will
- * be used to determine the proper component. See Boundary for the details.
+ * You can specify a class describing the boundary for each boundary component.
+ * If a new vertex is created on a side or face at the boundary, this class is
+ * used to compute where it will be placed. The manifold indicator of the face
+ * will be used to determine the proper component. See Manifold for the details.
  * Usage with the Triangulation object is then like this (let @p Ball be a
- * class derived from Boundary<tt><2></tt>):
+ * class derived from Manifold<tt><2></tt>):
  *
  *   @code
  *     int main ()
@@ -968,7 +965,7 @@ namespace internal
  *                                        // for all boundaries with
  *                                        // boundary indicator 0
  *       Ball ball;
- *       tria.set_boundary (0, ball);
+ *       tria.set_manifold (0, ball);
  *
  *   // read some coarse grid
  *
@@ -1137,7 +1134,7 @@ namespace internal
  * indicators, subdomain ids, material ids, etc. On the other hand, the
  * following information is not stored:
  *   - signals
- *   - pointers to boundary objects previously set using Triangulation::set_boundary
+ *   - pointers to Manifold objects previously set using Triangulation::set_manifold
  * On the other hand, since these are objects that are usually set in user code,
  * they can typically easily be set again in that part of your code in which you
  * re-load triangulations.
@@ -1878,10 +1875,9 @@ public:
    * of triangulations if you can assign them values later on.
    *
    * Keep in mind that this function also copies the pointer to the boundary
-   * descriptor previously set by the @p set_boundary function and to the
-   * Manifold object previously set by the set_manifold() function. You must
-   * therefore also guarantee that the boundary and manifold objects have a
-   * lifetime at least as long as the copied triangulation.
+   * descriptor previously set by the @p set_manifold function. You must
+   * therefore also guarantee that the Manifold objects describing the boundary
+   * have a lifetime at least as long as the copied triangulation.
    *
    * This triangulation must be empty beforehand.
    *
@@ -3604,7 +3600,7 @@ private:
    * fields of this class that can be modified by the TriaAccessor hierarchy
    * are pointers, and so these accessor classes store a const pointer to the
    * triangulation. We could no longer do so for TriaAccessor<0,1,spacedim> if
-   * this field (that can be modified by TriaAccessor::set_boundary_id) were
+   * this field (that can be modified by TriaAccessor::set_manifold_id) were
    * not a pointer.
    */
   std::unique_ptr<std::map<unsigned int, types::manifold_id> > vertex_to_manifold_id_map_1d;
