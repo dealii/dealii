@@ -651,19 +651,31 @@ private:
  * Given an arbitrary quadrature formula, return one that chops the quadrature
  * points above the hyper-plane defined by $\sum_i x_i = 1$. In other words,
  * it extracts those quadrature points from the base formula that satisfy
- * $\sum_i (\mathbf x_q)_i \le 1$."
+ * $\sum_i (\mathbf x_q)_i \le 1+10^{-12}$."
  *
  * In general the resulting quadrature is not very useful, unless the
  * quadrature you started from has been constructed specifically to integrate
- * over triangles or tetrahedra. This class ensures that the resulting
+ * over triangles or tetrahedra. This class only ensures that the resulting
  * quadrature formula only has quadrature points in the reference simplex or on
  * its boundary.
  *
- * No transformation is applied to the weights. The weights referring to points
- * that live outside the reference simplex are simply discarded. If you chop a
- * quadrature formula that is good for both the lower and upper triangles
- * separately, then the weights should add up to 1/2 for each of the two
- * formulas.
+ * No transformation is applied to the weights, and the weights referring to points
+ * that live outside the reference simplex are simply discarded.
+ *
+ * The main use of this quadrature formula is not to chop tensor product
+ * quadratures. Ideally you should pass to this class a quadrature formula
+ * constructed directly using points and weights in the reference simplex,
+ * capable of integrating on triangles or tetrahedra.
+ *
+ * For finite elements based on quadrilaterals and hexahedra, a QSimplex
+ * quadrature formula is not very useful on its own. This class is typically
+ * used in conjuction with other classes, like QSplit, to patch the reference
+ * element using several QSimplex quadrature formulas.
+ *
+ * Such quadrature formulas are useful to integrate functions with
+ * singularities at certain points, or functions that present jumps along a
+ * co-dimension one surface inside the reference element, like in the extended
+ * finite element method.
  *
  * @author Luca Heltai, 2017.
  */
@@ -707,8 +719,9 @@ public:
 };
 
 /**
- * A two dimensional simplex quadrature with zero Jacobian on vertex zero. The
- * quadrature is obtained through the following polar transformation:
+ * A quadrature that implements a polar transformation from a square to a
+ * triangle to integrate singularities in the origin of the reference simplex.
+ * The quadrature is obtained through the following polar transformation:
  *
  * \f[
  *  \begin{pmatrix}
@@ -767,7 +780,7 @@ public:
  *
  * with determinant of the Jacobian equal to $J= \beta \hat \x^{2\beta-1}$.
  * Such transformation maps the reference square \$[0,1]\times[0,1]$ to the
- * reference simplex, by collapsing the left \side of the square and squeezing
+ * reference simplex, by collapsing the left side of the square and squeezing
  * quadrature points towards the orgin, and then shearing the resulting
  * triangle to the reference one. This transformation shows good convergence
  * properties when $\beta = 1$ with singularities of order $1/R$ in the origin,
@@ -799,20 +812,21 @@ public:
    */
   QDuffy(const Quadrature<1> &radial_quadrature,
          const Quadrature<1> &angular_quadrature,
-         const double &beta = 1.0);
+         const double beta = 1.0);
 
   /**
-   * Calls the above constructor with QGauss<1>(n) quadrature formulas for
+   * Call the above constructor with QGauss<1>(n) quadrature formulas for
    * both the radial and angular quadratures.
    *
    * @param n
    */
-  QDuffy(const unsigned int &n, const double &beta);
+  QDuffy(const unsigned int n,
+         const double beta);
 };
 
 /**
- * A quadrature to use when the cell should be split in subregions to integrate
- * using one or more base quadratures.
+ * A quadrature to use when the cell should be split into subregions to
+ * integrate using one or more base quadratures.
  *
  * @author Luca Heltai, 2017.
  */
@@ -824,7 +838,18 @@ public:
    * Construct a quadrature formula by splitting the reference hyper cube into
    * the minimum number of simplices that have vertex zero coinciding with
    * `split_point`, and patch together affine transformations of the `base`
-   * quadrature.
+   * quadrature. The point `split_point` should be in the reference element,
+   * and an exception is thrown if this is not the case.
+   *
+   * In two dimensions, the resulting quadrature formula will be composed of
+   * two, three, or four triangular quadrature formulas if `split_point`
+   * coincides with one of the vertices, if it lies on one of the edges, or if
+   * it is internal to the reference element respectively.
+   *
+   * The same is true for the three dimensional case, with six, eight, ten, or
+   * twelve tetrahedral quadrature formulas if `split_point` coincides with one
+   * of the vertices, if it lies on one of the edges, on one of the faces, or
+   * if it is internal to the reference element respectively.
    *
    * The resulting quadrature can be used, for example, to integrate functions
    * with integrable singularities at the split point, provided that you select

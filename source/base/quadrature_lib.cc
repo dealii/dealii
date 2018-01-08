@@ -1358,7 +1358,7 @@ QSimplex<dim>::QSimplex(const Quadrature<dim> &quad)
       double r=0;
       for (unsigned int d=0; d<dim; ++d)
         r += quad.point(i)[d];
-      if (r <= 1)
+      if (r <= 1+1e-10)
         {
           this->quadrature_points.push_back(quad.point(i));
           this->weights.push_back(quad.weight(i));
@@ -1378,7 +1378,7 @@ QSimplex<dim>::compute_affine_transformation(const std::array<Point<dim>, dim+1>
     B[d] = vertices[d+1]-vertices[0];
 
   B = transpose(B);
-  auto J = std::abs(determinant(B));
+  const double J = std::abs(determinant(B));
 
   // if the determinant is zero, we return an empty quadrature
   if (J < 1e-12)
@@ -1402,19 +1402,19 @@ QTrianglePolar::QTrianglePolar(const Quadrature<1> &radial_quadrature,
                                const Quadrature<1> &angular_quadrature) :
   QSimplex<2>(Quadrature<2>())
 {
-  QAnisotropic<2> base(radial_quadrature, angular_quadrature);
+  const QAnisotropic<2> base(radial_quadrature, angular_quadrature);
   this->quadrature_points.resize(base.size());
   this->weights.resize(base.size());
   for (unsigned int i=0; i<base.size(); ++i)
     {
-      const auto &q = base.point(i);
-      const auto &w = base.weight(i);
+      const auto q = base.point(i);
+      const auto w = base.weight(i);
 
-      const auto &xhat = q[0];
-      const auto &yhat = q[1];
+      const auto xhat = q[0];
+      const auto yhat = q[1];
 
       const double t = numbers::PI_2*yhat;
-      const double &pi = numbers::PI;
+      const double pi = numbers::PI;
       const double st = std::sin(t);
       const double ct = std::cos(t);
       const double r = xhat/(st+ct);
@@ -1436,19 +1436,19 @@ QTrianglePolar::QTrianglePolar(const unsigned int &n)
 
 QDuffy::QDuffy(const Quadrature<1> &radial_quadrature,
                const Quadrature<1> &angular_quadrature,
-               const double &beta) :
+               const double beta) :
   QSimplex<2>(Quadrature<2>())
 {
-  QAnisotropic<2> base(radial_quadrature, angular_quadrature);
+  const QAnisotropic<2> base(radial_quadrature, angular_quadrature);
   this->quadrature_points.resize(base.size());
   this->weights.resize(base.size());
   for (unsigned int i=0; i<base.size(); ++i)
     {
-      const auto &q = base.point(i);
-      const auto &w = base.weight(i);
+      const auto q = base.point(i);
+      const auto w = base.weight(i);
 
-      const auto &xhat = q[0];
-      const auto &yhat = q[1];
+      const auto xhat = q[0];
+      const auto yhat = q[1];
 
       const double x = std::pow(xhat, beta)*(1-yhat);
       const double y = std::pow(xhat, beta)*yhat;
@@ -1462,7 +1462,7 @@ QDuffy::QDuffy(const Quadrature<1> &radial_quadrature,
 
 
 
-QDuffy::QDuffy(const unsigned int &n, const double &beta)
+QDuffy::QDuffy(const unsigned int n, const double beta)
   :QDuffy(QGauss<1>(n), QGauss<1>(n), beta)
 {}
 
@@ -1472,6 +1472,9 @@ template<int dim>
 QSplit<dim>::QSplit(const QSimplex<dim> &base,
                     const Point<dim> &split_point)
 {
+  AssertThrow(GeometryInfo<dim>::is_inside_unit_cell(split_point, 1e-12),
+              ExcMessage("The split point should be inside the unit reference cell."));
+
   std::array<Point<dim>, dim+1> vertices;
   vertices[0] = split_point;
 
@@ -1487,7 +1490,7 @@ QSplit<dim>::QSplit(const QSimplex<dim> &base,
             GeometryInfo<dim>::unit_cell_vertex(
               GeometryInfo<dim>::face_to_cell_vertices(f, i+start)
             );
-        auto quad = base.compute_affine_transformation(vertices);
+        const auto quad = base.compute_affine_transformation(vertices);
         if (quad.size())
           {
             this->quadrature_points.insert(
