@@ -489,6 +489,89 @@ namespace PETScWrappers
   }
 
 
+  namespace internals
+  {
+    void perform_mmult (const MatrixBase &inputleft,
+                        const MatrixBase &inputright,
+                        MatrixBase       &result,
+                        const VectorBase &V,
+                        const bool        transpose_left)
+    {
+      const bool use_vector = (V.size() == inputright.m() ? true : false);
+      if (transpose_left == false)
+        {
+          Assert (inputleft.n() == inputright.m(),
+                  ExcDimensionMismatch(inputleft.n(), inputright.m()));
+        }
+      else
+        {
+          Assert (inputleft.m() == inputright.m(),
+                  ExcDimensionMismatch(inputleft.m(), inputright.m()));
+        }
+
+      result.clear();
+
+      PetscErrorCode ierr;
+
+      if (use_vector == false)
+        {
+          if (transpose_left)
+            {
+              ierr = MatTransposeMatMult (inputleft,
+                                          inputright,
+                                          MAT_INITIAL_MATRIX,
+                                          PETSC_DEFAULT,
+                                          &result.petsc_matrix());
+              AssertThrow (ierr == 0, ExcPETScError(ierr));
+            }
+          else
+            {
+              ierr = MatMatMult (inputleft,
+                                 inputright,
+                                 MAT_INITIAL_MATRIX,
+                                 PETSC_DEFAULT,
+                                 &result.petsc_matrix());
+              AssertThrow (ierr == 0, ExcPETScError(ierr));
+            }
+        }
+      else
+        {
+          Mat tmp;
+          ierr = MatDuplicate (inputleft, MAT_COPY_VALUES, &tmp);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          if (transpose_left)
+            {
+              ierr = MatTranspose(tmp, MAT_REUSE_MATRIX, &tmp);
+              AssertThrow (ierr == 0, ExcPETScError(ierr));
+            }
+          ierr = MatDiagonalScale (tmp, NULL, V);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = MatMatMult (tmp,
+                             inputright,
+                             MAT_INITIAL_MATRIX,
+                             PETSC_DEFAULT,
+                             &result.petsc_matrix());
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        }
+    }
+  }
+
+  void
+  MatrixBase::mmult (MatrixBase       &C,
+                     const MatrixBase &B,
+                     const VectorBase &V) const
+  {
+    internals::perform_mmult (*this, B, C, V, false);
+  }
+
+  void
+  MatrixBase::Tmmult (MatrixBase       &C,
+                      const MatrixBase &B,
+                      const VectorBase &V) const
+  {
+    internals::perform_mmult (*this, B, C, V, true);
+  }
+
   PetscScalar
   MatrixBase::residual (VectorBase       &dst,
                         const VectorBase &x,
@@ -507,6 +590,11 @@ namespace PETScWrappers
 
 
   MatrixBase::operator Mat () const
+  {
+    return matrix;
+  }
+
+  Mat &MatrixBase::petsc_matrix ()
   {
     return matrix;
   }
