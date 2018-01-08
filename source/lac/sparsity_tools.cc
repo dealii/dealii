@@ -240,8 +240,9 @@ namespace SparsityTools
       std::unique_ptr<Zoltan> zz = std_cxx14::make_unique<Zoltan>(MPI_COMM_SELF);
 
       //General parameters
-      zz->Set_Param( "LB_METHOD", "GRAPH" );  //graph based partition method (LB-load balancing)
+      // DEBUG_LEVEL call must precede the call to LB_METHOD
       zz->Set_Param( "DEBUG_LEVEL", "0" );   //set level of debug info
+      zz->Set_Param( "LB_METHOD", "GRAPH" );  //graph based partition method (LB-load balancing)
       zz->Set_Param( "NUM_LOCAL_PARTS", std::to_string(n_partitions) ); //set number of partitions
 
       //Need a non-const object equal to sparsity_pattern
@@ -346,12 +347,13 @@ namespace SparsityTools
     std::unique_ptr<Zoltan> zz = std_cxx14::make_unique<Zoltan> (MPI_COMM_SELF);
 
     //Coloring parameters
+    // DEBUG_LEVEL must precede all other calls
+    zz->Set_Param ("DEBUG_LEVEL", "0" );     //level of debug info
     zz->Set_Param ("COLORING_PROBLEM", "DISTANCE-1");  //Standard coloring
     zz->Set_Param ("NUM_GID_ENTRIES", "1");  // 1 entry represents global ID
     zz->Set_Param ("NUM_LID_ENTRIES", "1");  // 1 entry represents local ID
     zz->Set_Param ("OBJ_WEIGHT_DIM", "0");   // object weights not used
     zz->Set_Param ("RECOLORING_NUM_OF_ITERATIONS", "0");
-    zz->Set_Param ("DEBUG_LEVEL", "0" );     //level of debug info
 
     //Zoltan::Color function requires a non-const SparsityPattern object
     SparsityPattern graph;
