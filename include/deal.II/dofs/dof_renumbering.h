@@ -752,10 +752,35 @@ namespace DoFRenumbering
    */
 
   /**
-   * Renumber the degrees cell by cell in hierarchical order (also known as
-   * z-order). The main usage is that this guarantees the same ordering
-   * independent of the number of processors involved in a parallel
-   * distributed computation.
+   * Renumber the degrees cell by cell by traversing the cells in
+   * @ref GlossZOrder "Z order".
+   *
+   * There are two reasons to use this function:
+   * - It produces a predictable ordering of degrees of freedom
+   *   that is independent of how exactly you arrived at a mesh.
+   *   In particular, in general the order of cells of a mesh
+   *   depends on the order in which cells were marked for
+   *   refinement and coarsening during the refinement cycles
+   *   the mesh has undergone. On the other hand, the z-order
+   *   of cells is independent of the mesh's history, and so yields a
+   *   predictable DoF numbering.
+   * - For meshes described by parallel::distributed::Triangulation,
+   *   the @ref GlossLocallyOwnedCell "locally owned cells" of
+   *   each MPI process are contiguous in Z order. That means that
+   *   numbering degrees of freedom by visiting cells in Z order yields
+   *   @ref GlossLocallyOwnedDof "locally owned DoF indices" that consist
+   *   of contiguous ranges for each process. This is also true for the
+   *   default ordering of DoFs on such triangulations, but the default
+   *   ordering creates an enumeration that also depends on how many
+   *   processors participate in the mesh, whereas the one generated
+   *   by this function enumerates the degrees of freedom on a particular
+   *   cell with indices that will be the same regardless of how many
+   *   processes the mesh is split up between.
+   *
+   * This function generates an ordering that is independent of the previous
+   * numbering of degrees of freedom. In other words, any information that may
+   * have been produced by a previous call to a renumbering function is
+   * ignored.
    */
   template <int dim>
   void
