@@ -120,3 +120,99 @@ current context we at least know what the right hand side is), and we should
 allow for more than one refinement level. Of course, all of this can be done
 using deal.II, it just requires a bit of algorithmic thinking in how to make
 this work!
+
+
+<h4>Positivity preservation</h4>
+
+To increase the accuracy and resolution of your simulation in time, one
+typically decreases the time step size $k_n$. If you start playing around
+with the time step in this particular example, you will notice that the
+solution becomes partly negative, if $k_n$ is below a certain threshold.
+This is not what we would expect to happen (in nature).
+
+To get an idea of this behavior mathematically, let us consider a general,
+fully discrete problem:
+@f{align*}
+  A u^{n} = B u^{n-1}.
+@f}
+The general form of the $i$th equation then reads:
+@f{align*}
+  a_{ii} u^{n}_i &= b_{ii} u^{n-1}_i +
+  \sum\limits_{j \in S_i} \left( b_{ij} u^{n-1}_j - a_{ij} u^{n}_j \right),
+@f}
+where $S_i$ is the set of degrees of freedom that DoF $i$ couples with (i.e.,
+for which either the matrix $A$ or matrix $B$ has a nonzero entry at position
+$(i,j)$). If all coefficients
+fulfill the following conditions:
+@f{align*}
+  a_{ii} &> 0, & b_{ii} &\leq 0, & a_{ij} &\leq 0, & b_{ij} &\geq 0,
+  &
+  \forall j &\in S_i,
+@f}
+all solutions $u^{n}$ keep their sign from the previous ones $u^{n-1}$, and
+consequently from the initial values $u^0$. See e.g.
+<a href="http://bookstore.siam.org/cs14/">Kuzmin, H&auml;m&auml;l&auml;inen</a>
+for more information on positivity preservation.
+
+Depending on the PDE to solve and the time integration scheme used, one is
+able to deduce conditions for the time step $k_n$. For the heat equation with
+the Crank-Nicolson scheme,
+<a href="https://doi.org/10.2478/cmam-2010-0025">Schatz et. al.</a> have
+translated it to the following ones:
+@f{align*}
+  (1 - \theta) k a_{ii} &\leq m_{ii},\qquad \forall i,
+  &
+  \theta k \left| a_{ij} \right| &\geq m_{ij},\qquad j \neq i,
+@f}
+where $M = m_{ij}$ denotes the mass matrix and $A = a_{ij}$ the stiffness
+matrix with $a_{ij} \leq 0$ for $j \neq i$, respectively. With
+$a_{ij} \leq 0$, we can formulate bounds for the global time step $k$ as
+follows:
+@f{align*}
+  k_{\text{max}} &= \frac{ 1 }{ 1 - \theta }
+  \min\left( \frac{ m_{ii} }{ a_{ii} } \right),~ \forall i,
+  &
+  k_{\text{min}} &= \frac{ 1 }{ \theta  }
+  \max\left( \frac{ m_{ij} }{ \left|a_{ij}\right| } \right),~ j \neq i.
+@f}
+In other words, the time step is constrained by <i>both a lower
+and upper bound</i> in case of a Crank-Nicolson scheme. These bounds should be
+considered along with the CFL condition to ensure significance of the performed
+simulations.
+
+Being unable to make the time step as small as we want to get more
+accuracy without losing the positivity property is annoying. It raises
+the question of whether we can at least <i>compute</i> the minimal time step
+we can choose  to ensure positivity preservation in this particular tutorial.
+Indeed, we can use
+the SparseMatrix objects for both mass and stiffness that are created via
+the MatrixCreator functions. Iterating through each entry via SparseMatrixIterators
+lets us check for diagonal and off-diagonal entries to set a proper time step
+dynamically. For quadratic matrices, the diagonal element is stored as the
+first member of a row (see SparseMatrix documentation). An exemplary code
+snippet on how to grab the entries of interest from the <code>mass_matrix</code>
+is shown below.
+
+@code
+Assert (mass_matrix.m() == mass_matrix.n(), ExcNotQuadratic());
+const unsigned int num_rows = mass_matrix.m();
+double mass_matrix_min_diag    = std::numeric_limits<double>::max(),
+       mass_matrix_max_offdiag = 0.;
+
+SparseMatrixIterators::Iterator<double,true> row_it (&mass_matrix, 0);
+
+for(unsigned int m = 0; m<num_rows; ++m) 
+{
+  // check the diagonal element
+  row_it = mass_matrix.begin(m);
+  mass_matrix_min_diag = std::min(row_it->value(), mass_matrix_min_diag);
+  ++row_it;
+  
+  // check the off-diagonal elements
+  for(; row_it != mass_matrix.end(m); ++row_it)
+    mass_matrix_max_offdiag = std::max(row_it->value(), mass_matrix_max_offdiag);
+}
+@endcode
+
+Using the information so computed, we can bound the time step via the formulas
+above.
