@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2016 by the deal.II authors
+// Copyright (C) 2008 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -244,6 +244,21 @@ namespace SparsityTools
       zz->Set_Param( "DEBUG_LEVEL", "0" );   //set level of debug info
       zz->Set_Param( "LB_METHOD", "GRAPH" );  //graph based partition method (LB-load balancing)
       zz->Set_Param( "NUM_LOCAL_PARTS", std::to_string(n_partitions) ); //set number of partitions
+
+      // The PHG partitioner is a hypergraph partitioner that Zoltan could use
+      // for graph partitioning.
+      // If number of vertices in hyperedge divided by total vertices in
+      // hypergraph exceeds PHG_EDGE_SIZE_THRESHOLD,
+      // then the hyperedge will be omitted as such (dense) edges will likely
+      // incur high communication costs regardless of the partition.
+      // PHG_EDGE_SIZE_THRESHOLD value is raised to 0.5 from the default
+      // value of 0.25 so that the PHG partitioner doesn't throw warning saying
+      // "PHG_EDGE_SIZE_THRESHOLD is low ..." after removing all dense edges.
+      // For instance, in two dimensions if the triangulation being partitioned
+      // is two quadrilaterals sharing an edge and if PHG_EDGE_SIZE_THRESHOLD
+      // value is set to 0.25, PHG will remove all the edges throwing the
+      // above warning.
+      zz->Set_Param( "PHG_EDGE_SIZE_THRESHOLD", "0.5" );
 
       //Need a non-const object equal to sparsity_pattern
       SparsityPattern graph;
