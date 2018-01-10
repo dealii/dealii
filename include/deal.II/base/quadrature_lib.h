@@ -647,6 +647,231 @@ private:
 
 };
 
+/**
+ * Given an arbitrary quadrature formula, return one that chops the quadrature
+ * points above the hyper-plane defined by $\sum_i x_i = 1$. In other words,
+ * it extracts those quadrature points from the base formula that satisfy
+ * $\sum_i (\mathbf x_q)_i \le 1+10^{-12}$."
+ *
+ * In general the resulting quadrature is not very useful, unless the
+ * quadrature you started from has been constructed specifically to integrate
+ * over triangles or tetrahedra. This class only ensures that the resulting
+ * quadrature formula only has quadrature points in the reference simplex or on
+ * its boundary.
+ *
+ * No transformation is applied to the weights, and the weights referring to points
+ * that live outside the reference simplex are simply discarded.
+ *
+ * The main use of this quadrature formula is not to chop tensor product
+ * quadratures. Ideally you should pass to this class a quadrature formula
+ * constructed directly using points and weights in the reference simplex,
+ * capable of integrating on triangles or tetrahedra.
+ *
+ * For finite elements based on quadrilaterals and hexahedra, a QSimplex
+ * quadrature formula is not very useful on its own. This class is typically
+ * used in conjuction with other classes, like QSplit, to patch the reference
+ * element using several QSimplex quadrature formulas.
+ *
+ * Such quadrature formulas are useful to integrate functions with
+ * singularities at certain points, or functions that present jumps along a
+ * co-dimension one surface inside the reference element, like in the extended
+ * finite element method (XFEM).
+ *
+ * @author Luca Heltai, 2017.
+ */
+template <int dim>
+class QSimplex : public Quadrature<dim>
+{
+public:
+  /**
+   * Construct a quadrature that only contains the points that are in the lower
+   * left reference simplex.
+   *
+   * @param[in] quad The input quadrature.
+   */
+  QSimplex(const Quadrature<dim> &quad);
+
+  /**
+   * Return an affine transformation of this quadrature, that can be used to integrate
+   * on the simplex identified by `vertices`.
+   *
+   * Both the quadrature point locations and the weights are transformed, so that you
+   * can effectively use the resulting quadrature to integrate on the simplex.
+   *
+   * The transformation is defined as
+   * \f[
+   * x = v_0 + B \hat x
+   * \f]
+   * where the matrix $B$ is given by $B_{ij} = v[j][i]-v[0][i]$.
+   *
+   * The weights are scaled with the absolute value of the determinant of $B$,
+   * that is $J := |\text{det}(B)|$. If $J$ is zero, an empty quadrature is
+   * returned. This may happen, in two dimensions, if the three vertices are
+   * aligned, or in three dimensions if the four vertices are on the same
+   * plane.
+   *
+   * @param[in] vertices The vertices of the simplex you wish to integrate on
+   * @return A quadrature object that can be used to integrate on the simplex
+   */
+  Quadrature<dim>
+  compute_affine_transformation(const std::array<Point<dim>, dim+1> &vertices) const;
+
+};
+
+/**
+ * A quadrature that implements a polar transformation from a square to a
+ * triangle to integrate singularities in the origin of the reference simplex.
+ * The quadrature is obtained through the following polar transformation:
+ *
+ * \f[
+ *  \begin{pmatrix}
+ *  x \\
+ *  y
+ *  \end{pmatrix}
+ *  =
+ * \begin{pmatrix}
+ *  \frac{\hat x}{\sin(\theta)+\cos(\theta)} cos(\theta) \\
+ *  \frac{\hat x}{\sin(\theta)+\cos(\theta)} sin(\theta)
+ *  \end{pmatrix}
+ *  \qquad \theta := \frac\pi 2 \hat y
+ * \f]
+ *
+ * @author Luca Heltai, 2017
+ */
+class  QTrianglePolar: public QSimplex<2>
+{
+public:
+  /**
+   * Construct a QTrianglePolar quadrature, with different formulas in the
+   * radial and angular directions.
+   *
+   * @param radial_quadrature Radial quadrature
+   * @param angular_quadrature Angular quadrature
+   */
+  QTrianglePolar(const Quadrature<1> &radial_quadrature,
+                 const Quadrature<1> &angular_quadrature);
+
+  /**
+   * Call the other constructor, with QGauss<1>(n) for both radial and
+   * angular quadrature.
+   *
+   * @param n Order of QGauss quadrature
+   */
+  QTrianglePolar(const unsigned int &n);
+};
+
+/**
+ * A quadrature that implements the Duffy transformation from a square to a
+ * triangle to integrate singularities in the origin of the reference
+ * simplex.
+ *
+ * The Duffy transformation is defined as
+ * \f[
+ * \begin{pmatrix}
+ * x\\
+ * y
+ * \end{pmatrix}
+ * =
+ * \begin{pmatrix}
+ * \hat x^\beta (1-\hat y)\\
+ * \hat x^\beta \hat y
+ * end{pmatrix}
+ * \f]
+ *
+ * with determinant of the Jacobian equal to $J= \beta \hat \x^{2\beta-1}$.
+ * Such transformation maps the reference square \$[0,1]\times[0,1]$ to the
+ * reference simplex, by collapsing the left side of the square and squeezing
+ * quadrature points towards the orgin, and then shearing the resulting
+ * triangle to the reference one. This transformation shows good convergence
+ * properties when $\beta = 1$ with singularities of order $1/R$ in the origin,
+ * but different $\beta$ values can be selected to increase convergence and/or
+ * accuracy when higher order Gauss rules are used (see "Generalized Duffy
+ * transformation for integrating vertex singularities", S. E. Mousavi, N.
+ * Sukumar, Computational Mechanics 2009).
+ *
+ * When $\beta = 1$, this transformation is also known as the Lachat-Watson
+ * transformation.
+ *
+ * @author Luca Heltai, Nicola Giuliani, 2017.
+ */
+class  QDuffy: public QSimplex<2>
+{
+public:
+  /**
+   * Constructor that allows the specification of different quadrature rules
+   * along the "radial" and "angular" directions.
+   *
+   * Since this quadrature is not based on a Polar change of coordinates, it
+   * is not fully proper to talk about radial and angular directions. However,
+   * the effect of the Duffy transformation is similar to a polar change
+   * of coordinates, since the resulting quadrature points are aligned radially
+   * with respect to the singularity.
+   *
+   * @param radial_quadrature Base quadrature to use in the radial direction
+   * @param angular_quadrature Base quadrature to use in the angular direction
+   */
+  QDuffy(const Quadrature<1> &radial_quadrature,
+         const Quadrature<1> &angular_quadrature,
+         const double beta = 1.0);
+
+  /**
+   * Call the above constructor with QGauss<1>(n) quadrature formulas for
+   * both the radial and angular quadratures.
+   *
+   * @param n
+   */
+  QDuffy(const unsigned int n,
+         const double beta);
+};
+
+/**
+ * A quadrature to use when the cell should be split into subregions to
+ * integrate using one or more base quadratures.
+ *
+ * @author Luca Heltai, 2017.
+ */
+template<int dim>
+class QSplit : public Quadrature<dim>
+{
+public:
+  /**
+   * Construct a quadrature formula by splitting the reference hyper cube into
+   * the minimum number of simplices that have vertex zero coinciding with
+   * @p split_point, and patch together affine transformations of the @p base
+   * quadrature. The point @p split_point should be in the reference element,
+   * and an exception is thrown if this is not the case.
+   *
+   * In two dimensions, the resulting quadrature formula will be composed of
+   * two, three, or four triangular quadrature formulas if @p split_point
+   * coincides with one of the vertices, if it lies on one of the edges, or if
+   * it is internal to the reference element respectively.
+   *
+   * The same is true for the three dimensional case, with six, eight, ten, or
+   * twelve tetrahedral quadrature formulas if @p split_point coincides with one
+   * of the vertices, if it lies on one of the edges, on one of the faces, or
+   * if it is internal to the reference element respectively.
+   *
+   * The resulting quadrature can be used, for example, to integrate functions
+   * with integrable singularities at the split point, provided that you select
+   * as base quadrature one that can integrate singular points on vertex zero
+   * of the reference simplex.
+   *
+   * An example usage in dimension two is given by:
+   * @code
+   * const unsigned int order = 5;
+   * QSplit<2> quad(QTrianglePolar(order), Point<2>(.3,.4));
+   * @endcode
+   *
+   * The resulting quadrature will look like the following:
+   * @image html split_quadrature.png ""
+   *
+   * @param base Base QSimplex quadrature to use
+   * @param split_point Where to split the hyper cube
+   */
+  QSplit(const QSimplex<dim> &base,
+         const Point<dim> &split_point);
+};
+
 /*@}*/
 
 /* -------------- declaration of explicit specializations ------------- */

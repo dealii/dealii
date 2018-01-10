@@ -1,0 +1,1018 @@
+
+DEAL::
+DEAL::Calculation of the integral of f(x,y)*1/R on [0,1]x[0,1]
+DEAL::for f(x,y) = x^i y^j, with i,j ranging from 0 to 5, and R being
+DEAL::the distance from (x,y) to four vertices of the square.
+DEAL::
+DEAL:: ===============Vertex Index: 0 ==============================
+DEAL::======= f(x,y) = x^0 y^0
+DEAL::Order[1], error = -0.357784
+DEAL::Order[2], error = -0.0413770
+DEAL::Order[3], error = -0.00349564
+DEAL::Order[4], error = -0.000233484
+DEAL::Order[5], error = -1.19260e-05
+DEAL::Order[6], error = -3.91498e-07
+DEAL::======= f(x,y) = x^0 y^1
+DEAL::Order[1], error = -0.120932
+DEAL::Order[2], error = -0.0121220
+DEAL::Order[3], error = -0.000828723
+DEAL::Order[4], error = -3.88017e-05
+DEAL::Order[5], error = -7.85203e-07
+DEAL::Order[6], error = 4.39204e-08
+DEAL::======= f(x,y) = x^0 y^2
+DEAL::Order[1], error = -0.163072
+DEAL::Order[2], error = -0.0135078
+DEAL::Order[3], error = -0.00165252
+DEAL::Order[4], error = -0.000183000
+DEAL::Order[5], error = -1.90192e-05
+DEAL::Order[6], error = -1.88270e-06
+DEAL::======= f(x,y) = x^0 y^3
+DEAL::Order[1], error = -0.170372
+DEAL::Order[2], error = -0.0119124
+DEAL::Order[3], error = -0.00151573
+DEAL::Order[4], error = -0.000165201
+DEAL::Order[5], error = -1.62581e-05
+DEAL::Order[6], error = -1.49708e-06
+DEAL::======= f(x,y) = x^0 y^4
+DEAL::Order[1], error = -0.160373
+DEAL::Order[2], error = -0.0160819
+DEAL::Order[3], error = -0.00157738
+DEAL::Order[4], error = -0.000211312
+DEAL::Order[5], error = -2.67349e-05
+DEAL::Order[6], error = -3.25021e-06
+DEAL::======= f(x,y) = x^0 y^5
+DEAL::Order[1], error = -0.145363
+DEAL::Order[2], error = -0.0228780
+DEAL::Order[3], error = -0.00168236
+DEAL::Order[4], error = -0.000261625
+DEAL::Order[5], error = -3.71252e-05
+DEAL::Order[6], error = -4.86539e-06
+DEAL::======= f(x,y) = x^1 y^0
+DEAL::Order[1], error = -0.120932
+DEAL::Order[2], error = -0.0121220
+DEAL::Order[3], error = -0.000828723
+DEAL::Order[4], error = -3.88017e-05
+DEAL::Order[5], error = -7.85203e-07
+DEAL::Order[6], error = 4.39204e-08
+DEAL::======= f(x,y) = x^1 y^1
+DEAL::Order[1], error = -0.100522
+DEAL::Order[2], error = -0.00237035
+DEAL::Order[3], error = 6.02499e-05
+DEAL::Order[4], error = 2.60924e-05
+DEAL::Order[5], error = 2.92841e-06
+DEAL::Order[6], error = 1.89060e-07
+DEAL::======= f(x,y) = x^1 y^2
+DEAL::Order[1], error = -0.104301
+DEAL::Order[2], error = -0.00584758
+DEAL::Order[3], error = -0.000779842
+DEAL::Order[4], error = -9.82802e-05
+DEAL::Order[5], error = -1.16755e-05
+DEAL::Order[6], error = -1.29219e-06
+DEAL::======= f(x,y) = x^1 y^3
+DEAL::Order[1], error = -0.0944545
+DEAL::Order[2], error = -0.00931973
+DEAL::Order[3], error = -0.000844945
+DEAL::Order[4], error = -0.000100985
+DEAL::Order[5], error = -1.09354e-05
+DEAL::Order[6], error = -1.10179e-06
+DEAL::======= f(x,y) = x^1 y^4
+DEAL::Order[1], error = -0.0823104
+DEAL::Order[2], error = -0.0133881
+DEAL::Order[3], error = -0.00100812
+DEAL::Order[4], error = -0.000150114
+DEAL::Order[5], error = -2.05532e-05
+DEAL::Order[6], error = -2.62862e-06
+DEAL::======= f(x,y) = x^1 y^5
+DEAL::Order[1], error = -0.0714326
+DEAL::Order[2], error = -0.0170943
+DEAL::Order[3], error = -0.00136963
+DEAL::Order[4], error = -0.000201982
+DEAL::Order[5], error = -3.03423e-05
+DEAL::Order[6], error = -4.10185e-06
+DEAL::======= f(x,y) = x^2 y^0
+DEAL::Order[1], error = -0.163072
+DEAL::Order[2], error = -0.0135078
+DEAL::Order[3], error = -0.00165252
+DEAL::Order[4], error = -0.000183000
+DEAL::Order[5], error = -1.90192e-05
+DEAL::Order[6], error = -1.88270e-06
+DEAL::======= f(x,y) = x^2 y^1
+DEAL::Order[1], error = -0.104301
+DEAL::Order[2], error = -0.00584758
+DEAL::Order[3], error = -0.000779842
+DEAL::Order[4], error = -9.82802e-05
+DEAL::Order[5], error = -1.16755e-05
+DEAL::Order[6], error = -1.29219e-06
+DEAL::======= f(x,y) = x^2 y^2
+DEAL::Order[1], error = -0.0846154
+DEAL::Order[2], error = -0.0106738
+DEAL::Order[3], error = -0.00128390
+DEAL::Order[4], error = -0.000172904
+DEAL::Order[5], error = -2.04379e-05
+DEAL::Order[6], error = -2.18094e-06
+DEAL::======= f(x,y) = x^2 y^3
+DEAL::Order[1], error = -0.0687148
+DEAL::Order[2], error = -0.0135616
+DEAL::Order[3], error = -0.00125414
+DEAL::Order[4], error = -0.000162720
+DEAL::Order[5], error = -1.83607e-05
+DEAL::Order[6], error = -1.87415e-06
+DEAL::======= f(x,y) = x^2 y^4
+DEAL::Order[1], error = -0.0565925
+DEAL::Order[2], error = -0.0157408
+DEAL::Order[3], error = -0.00148226
+DEAL::Order[4], error = -0.000196011
+DEAL::Order[5], error = -2.55438e-05
+DEAL::Order[6], error = -3.07252e-06
+DEAL::======= f(x,y) = x^2 y^5
+DEAL::Order[1], error = -0.0475881
+DEAL::Order[2], error = -0.0172621
+DEAL::Order[3], error = -0.00192138
+DEAL::Order[4], error = -0.000235659
+DEAL::Order[5], error = -3.34854e-05
+DEAL::Order[6], error = -4.30612e-06
+DEAL::======= f(x,y) = x^3 y^0
+DEAL::Order[1], error = -0.170372
+DEAL::Order[2], error = -0.0119124
+DEAL::Order[3], error = -0.00151573
+DEAL::Order[4], error = -0.000165201
+DEAL::Order[5], error = -1.62581e-05
+DEAL::Order[6], error = -1.49708e-06
+DEAL::======= f(x,y) = x^3 y^1
+DEAL::Order[1], error = -0.0944545
+DEAL::Order[2], error = -0.00931973
+DEAL::Order[3], error = -0.000844945
+DEAL::Order[4], error = -0.000100985
+DEAL::Order[5], error = -1.09354e-05
+DEAL::Order[6], error = -1.10179e-06
+DEAL::======= f(x,y) = x^3 y^2
+DEAL::Order[1], error = -0.0687148
+DEAL::Order[2], error = -0.0135616
+DEAL::Order[3], error = -0.00125414
+DEAL::Order[4], error = -0.000162720
+DEAL::Order[5], error = -1.83607e-05
+DEAL::Order[6], error = -1.87415e-06
+DEAL::======= f(x,y) = x^3 y^3
+DEAL::Order[1], error = -0.0530451
+DEAL::Order[2], error = -0.0152722
+DEAL::Order[3], error = -0.00136928
+DEAL::Order[4], error = -0.000155446
+DEAL::Order[5], error = -1.68770e-05
+DEAL::Order[6], error = -1.65502e-06
+DEAL::======= f(x,y) = x^3 y^4
+DEAL::Order[1], error = -0.0425960
+DEAL::Order[2], error = -0.0161403
+DEAL::Order[3], error = -0.00172995
+DEAL::Order[4], error = -0.000185485
+DEAL::Order[5], error = -2.33477e-05
+DEAL::Order[6], error = -2.73098e-06
+DEAL::======= f(x,y) = x^3 y^5
+DEAL::Order[1], error = -0.0353374
+DEAL::Order[2], error = -0.0164924
+DEAL::Order[3], error = -0.00222715
+DEAL::Order[4], error = -0.000229151
+DEAL::Order[5], error = -3.06509e-05
+DEAL::Order[6], error = -3.86546e-06
+DEAL::======= f(x,y) = x^4 y^0
+DEAL::Order[1], error = -0.160373
+DEAL::Order[2], error = -0.0160819
+DEAL::Order[3], error = -0.00157738
+DEAL::Order[4], error = -0.000211312
+DEAL::Order[5], error = -2.67349e-05
+DEAL::Order[6], error = -3.25021e-06
+DEAL::======= f(x,y) = x^4 y^1
+DEAL::Order[1], error = -0.0823104
+DEAL::Order[2], error = -0.0133881
+DEAL::Order[3], error = -0.00100812
+DEAL::Order[4], error = -0.000150114
+DEAL::Order[5], error = -2.05532e-05
+DEAL::Order[6], error = -2.62862e-06
+DEAL::======= f(x,y) = x^4 y^2
+DEAL::Order[1], error = -0.0565925
+DEAL::Order[2], error = -0.0157408
+DEAL::Order[3], error = -0.00148226
+DEAL::Order[4], error = -0.000196011
+DEAL::Order[5], error = -2.55438e-05
+DEAL::Order[6], error = -3.07252e-06
+DEAL::======= f(x,y) = x^4 y^3
+DEAL::Order[1], error = -0.0425960
+DEAL::Order[2], error = -0.0161403
+DEAL::Order[3], error = -0.00172995
+DEAL::Order[4], error = -0.000185485
+DEAL::Order[5], error = -2.33477e-05
+DEAL::Order[6], error = -2.73098e-06
+DEAL::======= f(x,y) = x^4 y^4
+DEAL::Order[1], error = -0.0338211
+DEAL::Order[2], error = -0.0160073
+DEAL::Order[3], error = -0.00214733
+DEAL::Order[4], error = -0.000215779
+DEAL::Order[5], error = -2.83804e-05
+DEAL::Order[6], error = -3.56784e-06
+DEAL::======= f(x,y) = x^4 y^5
+DEAL::Order[1], error = -0.0279085
+DEAL::Order[2], error = -0.0156115
+DEAL::Order[3], error = -0.00262841
+DEAL::Order[4], error = -0.000267648
+DEAL::Order[5], error = -3.44500e-05
+DEAL::Order[6], error = -4.50519e-06
+DEAL::======= f(x,y) = x^5 y^0
+DEAL::Order[1], error = -0.145363
+DEAL::Order[2], error = -0.0228780
+DEAL::Order[3], error = -0.00168236
+DEAL::Order[4], error = -0.000261625
+DEAL::Order[5], error = -3.71252e-05
+DEAL::Order[6], error = -4.86539e-06
+DEAL::======= f(x,y) = x^5 y^1
+DEAL::Order[1], error = -0.0714326
+DEAL::Order[2], error = -0.0170943
+DEAL::Order[3], error = -0.00136963
+DEAL::Order[4], error = -0.000201982
+DEAL::Order[5], error = -3.03423e-05
+DEAL::Order[6], error = -4.10185e-06
+DEAL::======= f(x,y) = x^5 y^2
+DEAL::Order[1], error = -0.0475881
+DEAL::Order[2], error = -0.0172621
+DEAL::Order[3], error = -0.00192138
+DEAL::Order[4], error = -0.000235659
+DEAL::Order[5], error = -3.34854e-05
+DEAL::Order[6], error = -4.30612e-06
+DEAL::======= f(x,y) = x^5 y^3
+DEAL::Order[1], error = -0.0353374
+DEAL::Order[2], error = -0.0164924
+DEAL::Order[3], error = -0.00222715
+DEAL::Order[4], error = -0.000229151
+DEAL::Order[5], error = -3.06509e-05
+DEAL::Order[6], error = -3.86546e-06
+DEAL::======= f(x,y) = x^5 y^4
+DEAL::Order[1], error = -0.0279085
+DEAL::Order[2], error = -0.0156115
+DEAL::Order[3], error = -0.00262841
+DEAL::Order[4], error = -0.000267648
+DEAL::Order[5], error = -3.44500e-05
+DEAL::Order[6], error = -4.50519e-06
+DEAL::======= f(x,y) = x^5 y^5
+DEAL::Order[1], error = -0.0229813
+DEAL::Order[2], error = -0.0147180
+DEAL::Order[3], error = -0.00304408
+DEAL::Order[4], error = -0.000331203
+DEAL::Order[5], error = -3.97780e-05
+DEAL::Order[6], error = -5.27210e-06
+DEAL:: ===============Vertex Index: 1 ==============================
+DEAL::======= f(x,y) = x^0 y^0
+DEAL::Order[1], error = -0.357784
+DEAL::Order[2], error = -0.0413770
+DEAL::Order[3], error = -0.00349564
+DEAL::Order[4], error = -0.000233484
+DEAL::Order[5], error = -1.19260e-05
+DEAL::Order[6], error = -3.91498e-07
+DEAL::======= f(x,y) = x^0 y^1
+DEAL::Order[1], error = -0.120932
+DEAL::Order[2], error = -0.0121220
+DEAL::Order[3], error = -0.000828723
+DEAL::Order[4], error = -3.88017e-05
+DEAL::Order[5], error = -7.85203e-07
+DEAL::Order[6], error = 4.39204e-08
+DEAL::======= f(x,y) = x^0 y^2
+DEAL::Order[1], error = -0.163072
+DEAL::Order[2], error = -0.0135078
+DEAL::Order[3], error = -0.00165252
+DEAL::Order[4], error = -0.000183000
+DEAL::Order[5], error = -1.90192e-05
+DEAL::Order[6], error = -1.88270e-06
+DEAL::======= f(x,y) = x^0 y^3
+DEAL::Order[1], error = -0.170372
+DEAL::Order[2], error = -0.0119124
+DEAL::Order[3], error = -0.00151573
+DEAL::Order[4], error = -0.000165201
+DEAL::Order[5], error = -1.62581e-05
+DEAL::Order[6], error = -1.49708e-06
+DEAL::======= f(x,y) = x^0 y^4
+DEAL::Order[1], error = -0.160373
+DEAL::Order[2], error = -0.0160819
+DEAL::Order[3], error = -0.00157738
+DEAL::Order[4], error = -0.000211312
+DEAL::Order[5], error = -2.67349e-05
+DEAL::Order[6], error = -3.25021e-06
+DEAL::======= f(x,y) = x^0 y^5
+DEAL::Order[1], error = -0.145363
+DEAL::Order[2], error = -0.0228780
+DEAL::Order[3], error = -0.00168236
+DEAL::Order[4], error = -0.000261625
+DEAL::Order[5], error = -3.71252e-05
+DEAL::Order[6], error = -4.86539e-06
+DEAL::======= f(x,y) = x^1 y^0
+DEAL::Order[1], error = -0.236852
+DEAL::Order[2], error = -0.0292550
+DEAL::Order[3], error = -0.00266692
+DEAL::Order[4], error = -0.000194682
+DEAL::Order[5], error = -1.11408e-05
+DEAL::Order[6], error = -4.35418e-07
+DEAL::======= f(x,y) = x^1 y^1
+DEAL::Order[1], error = -0.0204105
+DEAL::Order[2], error = -0.00975165
+DEAL::Order[3], error = -0.000888973
+DEAL::Order[4], error = -6.48941e-05
+DEAL::Order[5], error = -3.71361e-06
+DEAL::Order[6], error = -1.45139e-07
+DEAL::======= f(x,y) = x^1 y^2
+DEAL::Order[1], error = -0.0587716
+DEAL::Order[2], error = -0.00766018
+DEAL::Order[3], error = -0.000872679
+DEAL::Order[4], error = -8.47202e-05
+DEAL::Order[5], error = -7.34372e-06
+DEAL::Order[6], error = -5.90510e-07
+DEAL::======= f(x,y) = x^1 y^3
+DEAL::Order[1], error = -0.0759180
+DEAL::Order[2], error = -0.00259262
+DEAL::Order[3], error = -0.000670785
+DEAL::Order[4], error = -6.42163e-05
+DEAL::Order[5], error = -5.32276e-06
+DEAL::Order[6], error = -3.95283e-07
+DEAL::======= f(x,y) = x^1 y^4
+DEAL::Order[1], error = -0.0780629
+DEAL::Order[2], error = -0.00269378
+DEAL::Order[3], error = -0.000569262
+DEAL::Order[4], error = -6.11988e-05
+DEAL::Order[5], error = -6.18176e-06
+DEAL::Order[6], error = -6.21591e-07
+DEAL::======= f(x,y) = x^1 y^5
+DEAL::Order[1], error = -0.0739299
+DEAL::Order[2], error = -0.00578370
+DEAL::Order[3], error = -0.000312725
+DEAL::Order[4], error = -5.96437e-05
+DEAL::Order[5], error = -6.78298e-06
+DEAL::Order[6], error = -7.63532e-07
+DEAL::======= f(x,y) = x^2 y^0
+DEAL::Order[1], error = -0.278992
+DEAL::Order[2], error = -0.0306407
+DEAL::Order[3], error = -0.00349072
+DEAL::Order[4], error = -0.000338881
+DEAL::Order[5], error = -2.93749e-05
+DEAL::Order[6], error = -2.36204e-06
+DEAL::======= f(x,y) = x^2 y^1
+DEAL::Order[1], error = -0.0241892
+DEAL::Order[2], error = -0.0132289
+DEAL::Order[3], error = -0.00172906
+DEAL::Order[4], error = -0.000189267
+DEAL::Order[5], error = -1.83175e-05
+DEAL::Order[6], error = -1.62639e-06
+DEAL::======= f(x,y) = x^2 y^2
+DEAL::Order[1], error = -0.0390863
+DEAL::Order[2], error = -0.0124864
+DEAL::Order[3], error = -0.00137673
+DEAL::Order[4], error = -0.000159344
+DEAL::Order[5], error = -1.61061e-05
+DEAL::Order[6], error = -1.47926e-06
+DEAL::======= f(x,y) = x^2 y^3
+DEAL::Order[1], error = -0.0501784
+DEAL::Order[2], error = -0.00683449
+DEAL::Order[3], error = -0.00107998
+DEAL::Order[4], error = -0.000125952
+DEAL::Order[5], error = -1.27481e-05
+DEAL::Order[6], error = -1.16764e-06
+DEAL::======= f(x,y) = x^2 y^4
+DEAL::Order[1], error = -0.0523451
+DEAL::Order[2], error = -0.00504646
+DEAL::Order[3], error = -0.00104341
+DEAL::Order[4], error = -0.000107097
+DEAL::Order[5], error = -1.11724e-05
+DEAL::Order[6], error = -1.06550e-06
+DEAL::======= f(x,y) = x^2 y^5
+DEAL::Order[1], error = -0.0500853
+DEAL::Order[2], error = -0.00595141
+DEAL::Order[3], error = -0.000864472
+DEAL::Order[4], error = -9.33207e-05
+DEAL::Order[5], error = -9.92611e-06
+DEAL::Order[6], error = -9.67794e-07
+DEAL::======= f(x,y) = x^3 y^0
+DEAL::Order[1], error = -0.313832
+DEAL::Order[2], error = -0.0336219
+DEAL::Order[3], error = -0.00445131
+DEAL::Order[4], error = -0.000500879
+DEAL::Order[5], error = -5.03700e-05
+DEAL::Order[6], error = -4.67429e-06
+DEAL::======= f(x,y) = x^3 y^1
+DEAL::Order[1], error = -0.0378142
+DEAL::Order[2], error = -0.0132340
+DEAL::Order[3], error = -0.00250405
+DEAL::Order[4], error = -0.000310935
+DEAL::Order[5], error = -3.36616e-05
+DEAL::Order[6], error = -3.29804e-06
+DEAL::======= f(x,y) = x^3 y^2
+DEAL::Order[1], error = -0.0353017
+DEAL::Order[2], error = -0.0144247
+DEAL::Order[3], error = -0.00191055
+DEAL::Order[4], error = -0.000244151
+DEAL::Order[5], error = -2.69456e-05
+DEAL::Order[6], error = -2.67480e-06
+DEAL::======= f(x,y) = x^3 y^3
+DEAL::Order[1], error = -0.0401084
+DEAL::Order[2], error = -0.00936574
+DEAL::Order[3], error = -0.00137404
+DEAL::Order[4], error = -0.000194961
+DEAL::Order[5], error = -2.16571e-05
+DEAL::Order[6], error = -2.15914e-06
+DEAL::======= f(x,y) = x^3 y^4
+DEAL::Order[1], error = -0.0406238
+DEAL::Order[2], error = -0.00699967
+DEAL::Order[3], error = -0.00126986
+DEAL::Order[4], error = -0.000163520
+DEAL::Order[5], error = -1.83590e-05
+DEAL::Order[6], error = -1.85094e-06
+DEAL::======= f(x,y) = x^3 y^5
+DEAL::Order[1], error = -0.0384915
+DEAL::Order[2], error = -0.00688875
+DEAL::Order[3], error = -0.00111045
+DEAL::Order[4], error = -0.000133506
+DEAL::Order[5], error = -1.59037e-05
+DEAL::Order[6], error = -1.61271e-06
+DEAL::======= f(x,y) = x^4 y^0
+DEAL::Order[1], error = -0.331372
+DEAL::Order[2], error = -0.0423680
+DEAL::Order[3], error = -0.00561033
+DEAL::Order[4], error = -0.000726788
+DEAL::Order[5], error = -8.46030e-05
+DEAL::Order[6], error = -9.12530e-06
+DEAL::======= f(x,y) = x^4 y^1
+DEAL::Order[1], error = -0.0491415
+DEAL::Order[2], error = -0.0138353
+DEAL::Order[3], error = -0.00337711
+DEAL::Order[4], error = -0.000479027
+DEAL::Order[5], error = -5.93636e-05
+DEAL::Order[6], error = -6.68691e-06
+DEAL::======= f(x,y) = x^4 y^2
+DEAL::Order[1], error = -0.0352954
+DEAL::Order[2], error = -0.0156544
+DEAL::Order[3], error = -0.00270223
+DEAL::Order[4], error = -0.000372433
+DEAL::Order[5], error = -4.70453e-05
+DEAL::Order[6], error = -5.37550e-06
+DEAL::======= f(x,y) = x^4 y^3
+DEAL::Order[1], error = -0.0352591
+DEAL::Order[2], error = -0.0110544
+DEAL::Order[3], error = -0.00191364
+DEAL::Order[4], error = -0.000301284
+DEAL::Order[5], error = -3.85204e-05
+DEAL::Order[6], error = -4.44573e-06
+DEAL::======= f(x,y) = x^4 y^4
+DEAL::Order[1], error = -0.0341240
+DEAL::Order[2], error = -0.00842045
+DEAL::Order[3], error = -0.00166600
+DEAL::Order[4], error = -0.000260764
+DEAL::Order[5], error = -3.27746e-05
+DEAL::Order[6], error = -3.81479e-06
+DEAL::======= f(x,y) = x^4 y^5
+DEAL::Order[1], error = -0.0317195
+DEAL::Order[2], error = -0.00771472
+DEAL::Order[3], error = -0.00145190
+DEAL::Order[4], error = -0.000218696
+DEAL::Order[5], error = -2.85150e-05
+DEAL::Order[6], error = -3.33802e-06
+DEAL::======= f(x,y) = x^5 y^0
+DEAL::Order[1], error = -0.336625
+DEAL::Order[2], error = -0.0542525
+DEAL::Order[3], error = -0.00692446
+DEAL::Order[4], error = -0.00101241
+DEAL::Order[5], error = -0.000132160
+DEAL::Order[6], error = -1.58530e-05
+DEAL::======= f(x,y) = x^5 y^1
+DEAL::Order[1], error = -0.0569045
+DEAL::Order[2], error = -0.0153951
+DEAL::Order[3], error = -0.00414988
+DEAL::Order[4], error = -0.000690805
+DEAL::Order[5], error = -9.52522e-05
+DEAL::Order[6], error = -1.18466e-05
+DEAL::======= f(x,y) = x^5 y^2
+DEAL::Order[1], error = -0.0359496
+DEAL::Order[2], error = -0.0168334
+DEAL::Order[3], error = -0.00354081
+DEAL::Order[4], error = -0.000537833
+DEAL::Order[5], error = -7.56468e-05
+DEAL::Order[6], error = -9.54614e-06
+DEAL::======= f(x,y) = x^5 y^3
+DEAL::Order[1], error = -0.0324400
+DEAL::Order[2], error = -0.0124164
+DEAL::Order[3], error = -0.00256226
+DEAL::Order[4], error = -0.000431293
+DEAL::Order[5], error = -6.25055e-05
+DEAL::Order[6], error = -7.96891e-06
+DEAL::======= f(x,y) = x^5 y^4
+DEAL::Order[1], error = -0.0299833
+DEAL::Order[2], error = -0.00957177
+DEAL::Order[3], error = -0.00216814
+DEAL::Order[4], error = -0.000377250
+DEAL::Order[5], error = -5.33820e-05
+DEAL::Order[6], error = -6.85655e-06
+DEAL::======= f(x,y) = x^5 y^5
+DEAL::Order[1], error = -0.0272677
+DEAL::Order[2], error = -0.00844182
+DEAL::Order[3], error = -0.00187441
+DEAL::Order[4], error = -0.000323834
+DEAL::Order[5], error = -4.62310e-05
+DEAL::Order[6], error = -6.01651e-06
+DEAL:: ===============Vertex Index: 2 ==============================
+DEAL::======= f(x,y) = x^0 y^0
+DEAL::Order[1], error = -0.357784
+DEAL::Order[2], error = -0.0413770
+DEAL::Order[3], error = -0.00349564
+DEAL::Order[4], error = -0.000233484
+DEAL::Order[5], error = -1.19260e-05
+DEAL::Order[6], error = -3.91498e-07
+DEAL::======= f(x,y) = x^0 y^1
+DEAL::Order[1], error = -0.236852
+DEAL::Order[2], error = -0.0292550
+DEAL::Order[3], error = -0.00266692
+DEAL::Order[4], error = -0.000194682
+DEAL::Order[5], error = -1.11408e-05
+DEAL::Order[6], error = -4.35418e-07
+DEAL::======= f(x,y) = x^0 y^2
+DEAL::Order[1], error = -0.278992
+DEAL::Order[2], error = -0.0306407
+DEAL::Order[3], error = -0.00349072
+DEAL::Order[4], error = -0.000338881
+DEAL::Order[5], error = -2.93749e-05
+DEAL::Order[6], error = -2.36204e-06
+DEAL::======= f(x,y) = x^0 y^3
+DEAL::Order[1], error = -0.313832
+DEAL::Order[2], error = -0.0336219
+DEAL::Order[3], error = -0.00445131
+DEAL::Order[4], error = -0.000500879
+DEAL::Order[5], error = -5.03700e-05
+DEAL::Order[6], error = -4.67429e-06
+DEAL::======= f(x,y) = x^0 y^4
+DEAL::Order[1], error = -0.331372
+DEAL::Order[2], error = -0.0423680
+DEAL::Order[3], error = -0.00561033
+DEAL::Order[4], error = -0.000726788
+DEAL::Order[5], error = -8.46030e-05
+DEAL::Order[6], error = -9.12530e-06
+DEAL::======= f(x,y) = x^0 y^5
+DEAL::Order[1], error = -0.336625
+DEAL::Order[2], error = -0.0542525
+DEAL::Order[3], error = -0.00692446
+DEAL::Order[4], error = -0.00101241
+DEAL::Order[5], error = -0.000132160
+DEAL::Order[6], error = -1.58530e-05
+DEAL::======= f(x,y) = x^1 y^0
+DEAL::Order[1], error = -0.120932
+DEAL::Order[2], error = -0.0121220
+DEAL::Order[3], error = -0.000828723
+DEAL::Order[4], error = -3.88017e-05
+DEAL::Order[5], error = -7.85203e-07
+DEAL::Order[6], error = 4.39204e-08
+DEAL::======= f(x,y) = x^1 y^1
+DEAL::Order[1], error = -0.0204105
+DEAL::Order[2], error = -0.00975165
+DEAL::Order[3], error = -0.000888973
+DEAL::Order[4], error = -6.48941e-05
+DEAL::Order[5], error = -3.71361e-06
+DEAL::Order[6], error = -1.45139e-07
+DEAL::======= f(x,y) = x^1 y^2
+DEAL::Order[1], error = -0.0241892
+DEAL::Order[2], error = -0.0132289
+DEAL::Order[3], error = -0.00172906
+DEAL::Order[4], error = -0.000189267
+DEAL::Order[5], error = -1.83175e-05
+DEAL::Order[6], error = -1.62639e-06
+DEAL::======= f(x,y) = x^1 y^3
+DEAL::Order[1], error = -0.0378142
+DEAL::Order[2], error = -0.0132340
+DEAL::Order[3], error = -0.00250405
+DEAL::Order[4], error = -0.000310935
+DEAL::Order[5], error = -3.36616e-05
+DEAL::Order[6], error = -3.29804e-06
+DEAL::======= f(x,y) = x^1 y^4
+DEAL::Order[1], error = -0.0491415
+DEAL::Order[2], error = -0.0138353
+DEAL::Order[3], error = -0.00337711
+DEAL::Order[4], error = -0.000479027
+DEAL::Order[5], error = -5.93636e-05
+DEAL::Order[6], error = -6.68691e-06
+DEAL::======= f(x,y) = x^1 y^5
+DEAL::Order[1], error = -0.0569045
+DEAL::Order[2], error = -0.0153951
+DEAL::Order[3], error = -0.00414988
+DEAL::Order[4], error = -0.000690805
+DEAL::Order[5], error = -9.52522e-05
+DEAL::Order[6], error = -1.18466e-05
+DEAL::======= f(x,y) = x^2 y^0
+DEAL::Order[1], error = -0.163072
+DEAL::Order[2], error = -0.0135078
+DEAL::Order[3], error = -0.00165252
+DEAL::Order[4], error = -0.000183000
+DEAL::Order[5], error = -1.90192e-05
+DEAL::Order[6], error = -1.88270e-06
+DEAL::======= f(x,y) = x^2 y^1
+DEAL::Order[1], error = -0.0587716
+DEAL::Order[2], error = -0.00766018
+DEAL::Order[3], error = -0.000872679
+DEAL::Order[4], error = -8.47202e-05
+DEAL::Order[5], error = -7.34372e-06
+DEAL::Order[6], error = -5.90510e-07
+DEAL::======= f(x,y) = x^2 y^2
+DEAL::Order[1], error = -0.0390863
+DEAL::Order[2], error = -0.0124864
+DEAL::Order[3], error = -0.00137673
+DEAL::Order[4], error = -0.000159344
+DEAL::Order[5], error = -1.61061e-05
+DEAL::Order[6], error = -1.47926e-06
+DEAL::======= f(x,y) = x^2 y^3
+DEAL::Order[1], error = -0.0353017
+DEAL::Order[2], error = -0.0144247
+DEAL::Order[3], error = -0.00191055
+DEAL::Order[4], error = -0.000244151
+DEAL::Order[5], error = -2.69456e-05
+DEAL::Order[6], error = -2.67480e-06
+DEAL::======= f(x,y) = x^2 y^4
+DEAL::Order[1], error = -0.0352954
+DEAL::Order[2], error = -0.0156544
+DEAL::Order[3], error = -0.00270223
+DEAL::Order[4], error = -0.000372433
+DEAL::Order[5], error = -4.70453e-05
+DEAL::Order[6], error = -5.37550e-06
+DEAL::======= f(x,y) = x^2 y^5
+DEAL::Order[1], error = -0.0359496
+DEAL::Order[2], error = -0.0168334
+DEAL::Order[3], error = -0.00354081
+DEAL::Order[4], error = -0.000537833
+DEAL::Order[5], error = -7.56468e-05
+DEAL::Order[6], error = -9.54614e-06
+DEAL::======= f(x,y) = x^3 y^0
+DEAL::Order[1], error = -0.170372
+DEAL::Order[2], error = -0.0119124
+DEAL::Order[3], error = -0.00151573
+DEAL::Order[4], error = -0.000165201
+DEAL::Order[5], error = -1.62581e-05
+DEAL::Order[6], error = -1.49708e-06
+DEAL::======= f(x,y) = x^3 y^1
+DEAL::Order[1], error = -0.0759180
+DEAL::Order[2], error = -0.00259262
+DEAL::Order[3], error = -0.000670785
+DEAL::Order[4], error = -6.42163e-05
+DEAL::Order[5], error = -5.32276e-06
+DEAL::Order[6], error = -3.95283e-07
+DEAL::======= f(x,y) = x^3 y^2
+DEAL::Order[1], error = -0.0501784
+DEAL::Order[2], error = -0.00683449
+DEAL::Order[3], error = -0.00107998
+DEAL::Order[4], error = -0.000125952
+DEAL::Order[5], error = -1.27481e-05
+DEAL::Order[6], error = -1.16764e-06
+DEAL::======= f(x,y) = x^3 y^3
+DEAL::Order[1], error = -0.0401084
+DEAL::Order[2], error = -0.00936574
+DEAL::Order[3], error = -0.00137404
+DEAL::Order[4], error = -0.000194961
+DEAL::Order[5], error = -2.16571e-05
+DEAL::Order[6], error = -2.15914e-06
+DEAL::======= f(x,y) = x^3 y^4
+DEAL::Order[1], error = -0.0352591
+DEAL::Order[2], error = -0.0110544
+DEAL::Order[3], error = -0.00191364
+DEAL::Order[4], error = -0.000301284
+DEAL::Order[5], error = -3.85204e-05
+DEAL::Order[6], error = -4.44573e-06
+DEAL::======= f(x,y) = x^3 y^5
+DEAL::Order[1], error = -0.0324400
+DEAL::Order[2], error = -0.0124164
+DEAL::Order[3], error = -0.00256226
+DEAL::Order[4], error = -0.000431293
+DEAL::Order[5], error = -6.25055e-05
+DEAL::Order[6], error = -7.96891e-06
+DEAL::======= f(x,y) = x^4 y^0
+DEAL::Order[1], error = -0.160373
+DEAL::Order[2], error = -0.0160819
+DEAL::Order[3], error = -0.00157738
+DEAL::Order[4], error = -0.000211312
+DEAL::Order[5], error = -2.67349e-05
+DEAL::Order[6], error = -3.25021e-06
+DEAL::======= f(x,y) = x^4 y^1
+DEAL::Order[1], error = -0.0780629
+DEAL::Order[2], error = -0.00269378
+DEAL::Order[3], error = -0.000569262
+DEAL::Order[4], error = -6.11988e-05
+DEAL::Order[5], error = -6.18176e-06
+DEAL::Order[6], error = -6.21591e-07
+DEAL::======= f(x,y) = x^4 y^2
+DEAL::Order[1], error = -0.0523451
+DEAL::Order[2], error = -0.00504646
+DEAL::Order[3], error = -0.00104341
+DEAL::Order[4], error = -0.000107097
+DEAL::Order[5], error = -1.11724e-05
+DEAL::Order[6], error = -1.06550e-06
+DEAL::======= f(x,y) = x^4 y^3
+DEAL::Order[1], error = -0.0406238
+DEAL::Order[2], error = -0.00699967
+DEAL::Order[3], error = -0.00126986
+DEAL::Order[4], error = -0.000163520
+DEAL::Order[5], error = -1.83590e-05
+DEAL::Order[6], error = -1.85094e-06
+DEAL::======= f(x,y) = x^4 y^4
+DEAL::Order[1], error = -0.0341240
+DEAL::Order[2], error = -0.00842045
+DEAL::Order[3], error = -0.00166600
+DEAL::Order[4], error = -0.000260764
+DEAL::Order[5], error = -3.27746e-05
+DEAL::Order[6], error = -3.81479e-06
+DEAL::======= f(x,y) = x^4 y^5
+DEAL::Order[1], error = -0.0299833
+DEAL::Order[2], error = -0.00957177
+DEAL::Order[3], error = -0.00216814
+DEAL::Order[4], error = -0.000377250
+DEAL::Order[5], error = -5.33820e-05
+DEAL::Order[6], error = -6.85655e-06
+DEAL::======= f(x,y) = x^5 y^0
+DEAL::Order[1], error = -0.145363
+DEAL::Order[2], error = -0.0228780
+DEAL::Order[3], error = -0.00168236
+DEAL::Order[4], error = -0.000261625
+DEAL::Order[5], error = -3.71252e-05
+DEAL::Order[6], error = -4.86539e-06
+DEAL::======= f(x,y) = x^5 y^1
+DEAL::Order[1], error = -0.0739299
+DEAL::Order[2], error = -0.00578370
+DEAL::Order[3], error = -0.000312725
+DEAL::Order[4], error = -5.96437e-05
+DEAL::Order[5], error = -6.78298e-06
+DEAL::Order[6], error = -7.63532e-07
+DEAL::======= f(x,y) = x^5 y^2
+DEAL::Order[1], error = -0.0500853
+DEAL::Order[2], error = -0.00595141
+DEAL::Order[3], error = -0.000864472
+DEAL::Order[4], error = -9.33207e-05
+DEAL::Order[5], error = -9.92611e-06
+DEAL::Order[6], error = -9.67794e-07
+DEAL::======= f(x,y) = x^5 y^3
+DEAL::Order[1], error = -0.0384915
+DEAL::Order[2], error = -0.00688875
+DEAL::Order[3], error = -0.00111045
+DEAL::Order[4], error = -0.000133506
+DEAL::Order[5], error = -1.59037e-05
+DEAL::Order[6], error = -1.61271e-06
+DEAL::======= f(x,y) = x^5 y^4
+DEAL::Order[1], error = -0.0317195
+DEAL::Order[2], error = -0.00771472
+DEAL::Order[3], error = -0.00145190
+DEAL::Order[4], error = -0.000218696
+DEAL::Order[5], error = -2.85150e-05
+DEAL::Order[6], error = -3.33802e-06
+DEAL::======= f(x,y) = x^5 y^5
+DEAL::Order[1], error = -0.0272677
+DEAL::Order[2], error = -0.00844182
+DEAL::Order[3], error = -0.00187441
+DEAL::Order[4], error = -0.000323834
+DEAL::Order[5], error = -4.62310e-05
+DEAL::Order[6], error = -6.01651e-06
+DEAL:: ===============Vertex Index: 3 ==============================
+DEAL::======= f(x,y) = x^0 y^0
+DEAL::Order[1], error = -0.357784
+DEAL::Order[2], error = -0.0413770
+DEAL::Order[3], error = -0.00349564
+DEAL::Order[4], error = -0.000233484
+DEAL::Order[5], error = -1.19260e-05
+DEAL::Order[6], error = -3.91498e-07
+DEAL::======= f(x,y) = x^0 y^1
+DEAL::Order[1], error = -0.236852
+DEAL::Order[2], error = -0.0292550
+DEAL::Order[3], error = -0.00266692
+DEAL::Order[4], error = -0.000194682
+DEAL::Order[5], error = -1.11408e-05
+DEAL::Order[6], error = -4.35418e-07
+DEAL::======= f(x,y) = x^0 y^2
+DEAL::Order[1], error = -0.278992
+DEAL::Order[2], error = -0.0306407
+DEAL::Order[3], error = -0.00349072
+DEAL::Order[4], error = -0.000338881
+DEAL::Order[5], error = -2.93749e-05
+DEAL::Order[6], error = -2.36204e-06
+DEAL::======= f(x,y) = x^0 y^3
+DEAL::Order[1], error = -0.313832
+DEAL::Order[2], error = -0.0336219
+DEAL::Order[3], error = -0.00445131
+DEAL::Order[4], error = -0.000500879
+DEAL::Order[5], error = -5.03700e-05
+DEAL::Order[6], error = -4.67429e-06
+DEAL::======= f(x,y) = x^0 y^4
+DEAL::Order[1], error = -0.331372
+DEAL::Order[2], error = -0.0423680
+DEAL::Order[3], error = -0.00561033
+DEAL::Order[4], error = -0.000726788
+DEAL::Order[5], error = -8.46030e-05
+DEAL::Order[6], error = -9.12530e-06
+DEAL::======= f(x,y) = x^0 y^5
+DEAL::Order[1], error = -0.336625
+DEAL::Order[2], error = -0.0542525
+DEAL::Order[3], error = -0.00692446
+DEAL::Order[4], error = -0.00101241
+DEAL::Order[5], error = -0.000132160
+DEAL::Order[6], error = -1.58530e-05
+DEAL::======= f(x,y) = x^1 y^0
+DEAL::Order[1], error = -0.236852
+DEAL::Order[2], error = -0.0292550
+DEAL::Order[3], error = -0.00266692
+DEAL::Order[4], error = -0.000194682
+DEAL::Order[5], error = -1.11408e-05
+DEAL::Order[6], error = -4.35418e-07
+DEAL::======= f(x,y) = x^1 y^1
+DEAL::Order[1], error = -0.216441
+DEAL::Order[2], error = -0.0195033
+DEAL::Order[3], error = -0.00177795
+DEAL::Order[4], error = -0.000129788
+DEAL::Order[5], error = -7.42723e-06
+DEAL::Order[6], error = -2.90279e-07
+DEAL::======= f(x,y) = x^1 y^2
+DEAL::Order[1], error = -0.254802
+DEAL::Order[2], error = -0.0174118
+DEAL::Order[3], error = -0.00176165
+DEAL::Order[4], error = -0.000149614
+DEAL::Order[5], error = -1.10573e-05
+DEAL::Order[6], error = -7.35650e-07
+DEAL::======= f(x,y) = x^1 y^3
+DEAL::Order[1], error = -0.276017
+DEAL::Order[2], error = -0.0203879
+DEAL::Order[3], error = -0.00194725
+DEAL::Order[4], error = -0.000189944
+DEAL::Order[5], error = -1.67084e-05
+DEAL::Order[6], error = -1.37625e-06
+DEAL::======= f(x,y) = x^1 y^4
+DEAL::Order[1], error = -0.282231
+DEAL::Order[2], error = -0.0285327
+DEAL::Order[3], error = -0.00223322
+DEAL::Order[4], error = -0.000247761
+DEAL::Order[5], error = -2.52394e-05
+DEAL::Order[6], error = -2.43838e-06
+DEAL::======= f(x,y) = x^1 y^5
+DEAL::Order[1], error = -0.279720
+DEAL::Order[2], error = -0.0388575
+DEAL::Order[3], error = -0.00277458
+DEAL::Order[4], error = -0.000321602
+DEAL::Order[5], error = -3.69082e-05
+DEAL::Order[6], error = -4.00642e-06
+DEAL::======= f(x,y) = x^2 y^0
+DEAL::Order[1], error = -0.278992
+DEAL::Order[2], error = -0.0306407
+DEAL::Order[3], error = -0.00349072
+DEAL::Order[4], error = -0.000338881
+DEAL::Order[5], error = -2.93749e-05
+DEAL::Order[6], error = -2.36204e-06
+DEAL::======= f(x,y) = x^2 y^1
+DEAL::Order[1], error = -0.254802
+DEAL::Order[2], error = -0.0174118
+DEAL::Order[3], error = -0.00176165
+DEAL::Order[4], error = -0.000149614
+DEAL::Order[5], error = -1.10573e-05
+DEAL::Order[6], error = -7.35650e-07
+DEAL::======= f(x,y) = x^2 y^2
+DEAL::Order[1], error = -0.269700
+DEAL::Order[2], error = -0.0166693
+DEAL::Order[3], error = -0.00140932
+DEAL::Order[4], error = -0.000119691
+DEAL::Order[5], error = -8.84587e-06
+DEAL::Order[6], error = -5.88520e-07
+DEAL::======= f(x,y) = x^2 y^3
+DEAL::Order[1], error = -0.273505
+DEAL::Order[2], error = -0.0215786
+DEAL::Order[3], error = -0.00135375
+DEAL::Order[4], error = -0.000123161
+DEAL::Order[5], error = -9.99240e-06
+DEAL::Order[6], error = -7.53009e-07
+DEAL::======= f(x,y) = x^2 y^4
+DEAL::Order[1], error = -0.268385
+DEAL::Order[2], error = -0.0303518
+DEAL::Order[3], error = -0.00155835
+DEAL::Order[4], error = -0.000141166
+DEAL::Order[5], error = -1.29212e-05
+DEAL::Order[6], error = -1.12697e-06
+DEAL::======= f(x,y) = x^2 y^5
+DEAL::Order[1], error = -0.258765
+DEAL::Order[2], error = -0.0402958
+DEAL::Order[3], error = -0.00216550
+DEAL::Order[4], error = -0.000168629
+DEAL::Order[5], error = -1.73028e-05
+DEAL::Order[6], error = -1.70596e-06
+DEAL::======= f(x,y) = x^3 y^0
+DEAL::Order[1], error = -0.313832
+DEAL::Order[2], error = -0.0336219
+DEAL::Order[3], error = -0.00445131
+DEAL::Order[4], error = -0.000500879
+DEAL::Order[5], error = -5.03700e-05
+DEAL::Order[6], error = -4.67429e-06
+DEAL::======= f(x,y) = x^3 y^1
+DEAL::Order[1], error = -0.276017
+DEAL::Order[2], error = -0.0203879
+DEAL::Order[3], error = -0.00194725
+DEAL::Order[4], error = -0.000189944
+DEAL::Order[5], error = -1.67084e-05
+DEAL::Order[6], error = -1.37625e-06
+DEAL::======= f(x,y) = x^3 y^2
+DEAL::Order[1], error = -0.273505
+DEAL::Order[2], error = -0.0215786
+DEAL::Order[3], error = -0.00135375
+DEAL::Order[4], error = -0.000123161
+DEAL::Order[5], error = -9.99240e-06
+DEAL::Order[6], error = -7.53009e-07
+DEAL::======= f(x,y) = x^3 y^3
+DEAL::Order[1], error = -0.266185
+DEAL::Order[2], error = -0.0278283
+DEAL::Order[3], error = -0.00129674
+DEAL::Order[4], error = -0.000105566
+DEAL::Order[5], error = -8.56491e-06
+DEAL::Order[6], error = -6.45437e-07
+DEAL::======= f(x,y) = x^3 y^4
+DEAL::Order[1], error = -0.254575
+DEAL::Order[2], error = -0.0367709
+DEAL::Order[3], error = -0.00167207
+DEAL::Order[4], error = -0.000105720
+DEAL::Order[5], error = -9.12791e-06
+DEAL::Order[6], error = -7.45333e-07
+DEAL::======= f(x,y) = x^3 y^5
+DEAL::Order[1], error = -0.241320
+DEAL::Order[2], error = -0.0461511
+DEAL::Order[3], error = -0.00253497
+DEAL::Order[4], error = -0.000122197
+DEAL::Order[5], error = -1.08387e-05
+DEAL::Order[6], error = -9.82727e-07
+DEAL::======= f(x,y) = x^4 y^0
+DEAL::Order[1], error = -0.331372
+DEAL::Order[2], error = -0.0423680
+DEAL::Order[3], error = -0.00561033
+DEAL::Order[4], error = -0.000726788
+DEAL::Order[5], error = -8.46030e-05
+DEAL::Order[6], error = -9.12530e-06
+DEAL::======= f(x,y) = x^4 y^1
+DEAL::Order[1], error = -0.282231
+DEAL::Order[2], error = -0.0285327
+DEAL::Order[3], error = -0.00223322
+DEAL::Order[4], error = -0.000247761
+DEAL::Order[5], error = -2.52394e-05
+DEAL::Order[6], error = -2.43838e-06
+DEAL::======= f(x,y) = x^4 y^2
+DEAL::Order[1], error = -0.268385
+DEAL::Order[2], error = -0.0303518
+DEAL::Order[3], error = -0.00155835
+DEAL::Order[4], error = -0.000141166
+DEAL::Order[5], error = -1.29212e-05
+DEAL::Order[6], error = -1.12697e-06
+DEAL::======= f(x,y) = x^4 y^3
+DEAL::Order[1], error = -0.254575
+DEAL::Order[2], error = -0.0367709
+DEAL::Order[3], error = -0.00167207
+DEAL::Order[4], error = -0.000105720
+DEAL::Order[5], error = -9.12791e-06
+DEAL::Order[6], error = -7.45333e-07
+DEAL::======= f(x,y) = x^4 y^4
+DEAL::Order[1], error = -0.239666
+DEAL::Order[2], error = -0.0451559
+DEAL::Order[3], error = -0.00232675
+DEAL::Order[4], error = -0.000100903
+DEAL::Order[5], error = -8.11370e-06
+DEAL::Order[6], error = -6.62518e-07
+DEAL::======= f(x,y) = x^4 y^5
+DEAL::Order[1], error = -0.224928
+DEAL::Order[2], error = -0.0535787
+DEAL::Order[3], error = -0.00348887
+DEAL::Order[4], error = -0.000128263
+DEAL::Order[5], error = -8.39231e-06
+DEAL::Order[6], error = -7.24350e-07
+DEAL::======= f(x,y) = x^5 y^0
+DEAL::Order[1], error = -0.336625
+DEAL::Order[2], error = -0.0542525
+DEAL::Order[3], error = -0.00692446
+DEAL::Order[4], error = -0.00101241
+DEAL::Order[5], error = -0.000132160
+DEAL::Order[6], error = -1.58530e-05
+DEAL::======= f(x,y) = x^5 y^1
+DEAL::Order[1], error = -0.279720
+DEAL::Order[2], error = -0.0388575
+DEAL::Order[3], error = -0.00277458
+DEAL::Order[4], error = -0.000321602
+DEAL::Order[5], error = -3.69082e-05
+DEAL::Order[6], error = -4.00642e-06
+DEAL::======= f(x,y) = x^5 y^2
+DEAL::Order[1], error = -0.258765
+DEAL::Order[2], error = -0.0402958
+DEAL::Order[3], error = -0.00216550
+DEAL::Order[4], error = -0.000168629
+DEAL::Order[5], error = -1.73028e-05
+DEAL::Order[6], error = -1.70596e-06
+DEAL::======= f(x,y) = x^5 y^3
+DEAL::Order[1], error = -0.241320
+DEAL::Order[2], error = -0.0461511
+DEAL::Order[3], error = -0.00253497
+DEAL::Order[4], error = -0.000122197
+DEAL::Order[5], error = -1.08387e-05
+DEAL::Order[6], error = -9.82727e-07
+DEAL::======= f(x,y) = x^5 y^4
+DEAL::Order[1], error = -0.224928
+DEAL::Order[2], error = -0.0535787
+DEAL::Order[3], error = -0.00348887
+DEAL::Order[4], error = -0.000128263
+DEAL::Order[5], error = -8.39231e-06
+DEAL::Order[6], error = -7.24350e-07
+DEAL::======= f(x,y) = x^5 y^5
+DEAL::Order[1], error = -0.209847
+DEAL::Order[2], error = -0.0608639
+DEAL::Order[3], error = -0.00492680
+DEAL::Order[4], error = -0.000186200
+DEAL::Order[5], error = -7.99132e-06
+DEAL::Order[6], error = -6.58500e-07
