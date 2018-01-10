@@ -675,7 +675,7 @@ private:
  * Such quadrature formulas are useful to integrate functions with
  * singularities at certain points, or functions that present jumps along a
  * co-dimension one surface inside the reference element, like in the extended
- * finite element method.
+ * finite element method (XFEM).
  *
  * @author Luca Heltai, 2017.
  */
@@ -798,7 +798,7 @@ class  QDuffy: public QSimplex<2>
 {
 public:
   /**
-   * Constructor that allows the specificatino of different quadrature rules
+   * Constructor that allows the specification of different quadrature rules
    * along the "radial" and "angular" directions.
    *
    * Since this quadrature is not based on a Polar change of coordinates, it
@@ -837,17 +837,17 @@ public:
   /**
    * Construct a quadrature formula by splitting the reference hyper cube into
    * the minimum number of simplices that have vertex zero coinciding with
-   * `split_point`, and patch together affine transformations of the `base`
-   * quadrature. The point `split_point` should be in the reference element,
+   * @p split_point, and patch together affine transformations of the @p base
+   * quadrature. The point @p split_point should be in the reference element,
    * and an exception is thrown if this is not the case.
    *
    * In two dimensions, the resulting quadrature formula will be composed of
-   * two, three, or four triangular quadrature formulas if `split_point`
+   * two, three, or four triangular quadrature formulas if @p split_point
    * coincides with one of the vertices, if it lies on one of the edges, or if
    * it is internal to the reference element respectively.
    *
    * The same is true for the three dimensional case, with six, eight, ten, or
-   * twelve tetrahedral quadrature formulas if `split_point` coincides with one
+   * twelve tetrahedral quadrature formulas if @p split_point coincides with one
    * of the vertices, if it lies on one of the edges, on one of the faces, or
    * if it is internal to the reference element respectively.
    *
