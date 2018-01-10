@@ -526,8 +526,81 @@ extern "C"
                  const int *jb,
                  const int *descb,
                  const int *ictxt);
-}
 
+  /**
+   * helper routines determining machine precision
+   */
+  double pdlamch_(const int *ictxt,
+                  const char *cmach);
+  float  pslamch_(const int *ictxt,
+                  const char *cmach);
+
+
+  /**
+   *  psyevx computes selected eigenvalues and, optionally, eigenvectors
+   *  of a real symmetric matrix A. Eigenvalues/vectors can be selected by
+   *  specifying a range of values or a range of indices for the desired
+   *  eigenvalues.
+   */
+  void pdsyevx_(const char *jobz,
+                const char *range,
+                const char *uplo,
+                const int *n,
+                double *A,
+                const int *ia,
+                const int *ja,
+                const int *desca,
+                const double *VL,
+                const double *VU,
+                const int *il,
+                const int *iu,
+                const double *abstol,
+                const int *m,
+                const int *nz,
+                double *w,
+                double *orfac,
+                double *Z,
+                const int *iz,
+                const int *jz,
+                const int *descz,
+                double *work,
+                int *lwork,
+                int *iwork,
+                int *liwork,
+                int *ifail,
+                int *iclustr,
+                double *gap,
+                int *info);
+  void pssyevx_(const char *jobz,
+                const char *range,
+                const char *uplo,
+                const int *n,
+                float *A,
+                const int *ia,
+                const int *ja,
+                const int *desca,
+                const float *VL,
+                const float *VU,
+                const int *il,
+                const int *iu,
+                const float *abstol,
+                const int *m,
+                const int *nz,
+                float *w,
+                float *orfac,
+                float *Z,
+                const int *iz,
+                const int *jz,
+                const int *descz,
+                float *work,
+                int *lwork,
+                int *iwork,
+                int *liwork,
+                int *ifail,
+                int *iclustr,
+                float *gap,
+                int *info);
+}
 
 /*
  * In the following we have template wrappers for the ScaLAPACK routines
@@ -1072,6 +1145,130 @@ inline void pgemr2d(const int *m,
                     const int *ictxt)
 {
   psgemr2d_(m,n,A,ia,ja,desca,B,ib,jb,descb,ictxt);
+}
+
+
+template <typename number>
+inline void plamch(const int *ictxt,
+                   const char *cmach,
+                   number &val)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void plamch(const int *ictxt,
+                   const char *cmach,
+                   double &val)
+{
+  val = pdlamch_(ictxt,cmach);
+}
+
+inline void plamch(const int *ictxt,
+                   const char *cmach,
+                   float &val)
+{
+  val = pslamch_(ictxt,cmach);
+}
+
+
+template <typename number>
+inline void psyevx(const char *jobz,
+                   const char *range,
+                   const char *uplo,
+                   const int *n,
+                   number *A,
+                   const int *ia,
+                   const int *ja,
+                   const int *desca,
+                   number *VL,
+                   number *VU,
+                   const int *il,
+                   const int *iu,
+                   number *abstol,
+                   const int *m,
+                   const int *nz,
+                   number *w,
+                   number *orfac,
+                   number *Z,
+                   const int *iz,
+                   const int *jz,
+                   const int *descz,
+                   number *work,
+                   int *lwork,
+                   int *iwork,
+                   int *liwork,
+                   int *ifail,
+                   int *iclustr,
+                   number *gap,
+                   int *info)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void psyevx(const char *jobz,
+                   const char *range,
+                   const char *uplo,
+                   const int *n,
+                   double *A,
+                   const int *ia,
+                   const int *ja,
+                   const int *desca,
+                   double *VL,
+                   double *VU,
+                   const int *il,
+                   const int *iu,
+                   double *abstol,
+                   const int *m,
+                   const int *nz,
+                   double *w,
+                   double *orfac,
+                   double *Z,
+                   const int *iz,
+                   const int *jz,
+                   const int *descz,
+                   double *work,
+                   int *lwork,
+                   int *iwork,
+                   int *liwork,
+                   int *ifail,
+                   int *iclustr,
+                   double *gap,
+                   int *info)
+{
+  pdsyevx_(jobz,range,uplo,n,A,ia,ja,desca,VL,VU,il,iu,abstol,m,nz,w,orfac,Z,iz,jz,descz,work,lwork,iwork,liwork,ifail,iclustr,gap,info);
+}
+
+inline void psyevx(const char *jobz,
+                   const char *range,
+                   const char *uplo,
+                   const int *n,
+                   float *A,
+                   const int *ia,
+                   const int *ja,
+                   const int *desca,
+                   float *VL,
+                   float *VU,
+                   const int *il,
+                   const int *iu,
+                   float *abstol,
+                   const int *m,
+                   const int *nz,
+                   float *w,
+                   float *orfac,
+                   float *Z,
+                   const int *iz,
+                   const int *jz,
+                   const int *descz,
+                   float *work,
+                   int *lwork,
+                   int *iwork,
+                   int *liwork,
+                   int *ifail,
+                   int *iclustr,
+                   float *gap,
+                   int *info)
+{
+  pssyevx_(jobz,range,uplo,n,A,ia,ja,desca,VL,VU,il,iu,abstol,m,nz,w,orfac,Z,iz,jz,descz,work,lwork,iwork,liwork,ifail,iclustr,gap,info);
 }
 
 

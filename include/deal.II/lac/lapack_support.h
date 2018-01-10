@@ -214,6 +214,7 @@ namespace LAPACKSupport
                  << "file for information on how to ensure that deal.II "
                  << "picks up an existing BLAS and LAPACK installation at "
                  << "configuration time.");
+
 }
 
 

@@ -180,21 +180,22 @@ public:
    */
   void invert();
 
-  /**
-   * Compute all eigenvalues of a real symmetric matrix using <code>pXsyev</code>.
-   * If successful, the computed eigenvalues are arranged in ascending order.
-   * After this function is called, the content of the matrix is overwritten
-   * making it unusable.
-   */
-  std::vector<NumberType> eigenvalues_symmetric();
+
 
   /**
-   * Compute all eigenpairs of a real symmetric matrix using <code>pXsyev</code>.
+   * Function to compute selected eigenvalues and, optionally, the eigenvectors.
+   * If the function is called with the default arguments all eigenvalues are computed but no eigenvectors.
+   * The eigenvalues/eigenvectors are selected by either prescribing a range of indices @p index_limits
+   * or a range of values @p value_limits for the eigenvalues. The funtion will throw an exception
+   * if both ranges are prescribed (meaning that both ranges differ from the default value)
+   * as this ambiguity is prohibited.
    * If successful, the computed eigenvalues are arranged in ascending order.
    * The eigenvectors are stored in the columns of the matrix, thereby
    * overwriting the original content of the matrix.
    */
-  std::vector<NumberType> eigenpairs_symmetric ();
+  std::vector<NumberType> eigenpairs_symmetric(const bool compute_eigenvectors=false,
+                                               const std::pair<int,int> &index_limits = std::make_pair(-1,-1),
+                                               const std::pair<NumberType,NumberType> &value_limits = std::make_pair(-1,-1));
 
   /**
    * Estimate the the condition number of a SPD matrix in the $l_1$-norm.
