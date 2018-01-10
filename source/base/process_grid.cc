@@ -217,7 +217,8 @@ namespace Utilities
       if (mpi_process_is_active)
         Cblacs_gridexit(blacs_context);
 
-      MPI_Comm_free(&mpi_communicator_inactive_with_root);
+      if (mpi_communicator_inactive_with_root != MPI_COMM_NULL)
+        MPI_Comm_free(&mpi_communicator_inactive_with_root);
     }
 
 
