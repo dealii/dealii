@@ -21,7 +21,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/fe/mapping_cartesian.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q.h>

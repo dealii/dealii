@@ -31,7 +31,7 @@
 
 
 #include <deal.II/grid/grid_in.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 
 template <int dim>
