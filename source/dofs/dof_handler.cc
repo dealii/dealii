@@ -997,7 +997,10 @@ void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim
   Assert (tria->n_levels() > 0,
           ExcMessage("The Triangulation you are using is empty!"));
 
-  fe_collection = std_cxx14::make_unique<hp::FECollection<dim, spacedim>>(ff);
+  // Only recreate the FECollection if we don't already store
+  // the exact same FiniteElement object.
+  if (fe_collection == nullptr || &((*fe_collection)[0]) != &ff)
+    fe_collection = std_cxx14::make_unique<hp::FECollection<dim, spacedim>>(ff);
 
   // delete all levels and set them
   // up newly. note that we still
