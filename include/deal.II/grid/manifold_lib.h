@@ -236,6 +236,22 @@ public:
                       const Point<spacedim> &x2) const override;
 
   /**
+   * Return the (normalized) normal vector at the point @p p.
+   */
+  virtual
+  Tensor<1,spacedim>
+  normal_vector (const typename Triangulation<dim,spacedim>::face_iterator &face,
+                 const Point<spacedim>                                     &p) const override;
+
+  /**
+   * Compute the normal vectors to the boundary at each vertex.
+   */
+  virtual
+  void
+  get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterator &face,
+                           typename Manifold<dim, spacedim>::FaceVertexNormals       &face_vertex_normals) const override;
+
+  /**
    * Compute a new set of points that interpolate between the given points @p
    * surrounding_points. @p weights is a table with as many columns as @p
    * surrounding_points.size(). The number of rows in @p weights must match
