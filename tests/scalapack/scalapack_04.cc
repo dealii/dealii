@@ -32,7 +32,7 @@
 #include <iostream>
 
 template <typename NumberType>
-void test(const unsigned int size, const unsigned int block_size)
+void test(const unsigned int size, const unsigned int block_size, const NumberType tol)
 {
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
@@ -51,28 +51,28 @@ void test(const unsigned int size, const unsigned int block_size)
 
   create_spd (full_A);
 
-  const double l1 = full_A.l1_norm();
-  const double linfty = full_A.linfty_norm();
-  const double frobenius = full_A.frobenius_norm();
+  const NumberType l1 = full_A.l1_norm();
+  const NumberType linfty = full_A.linfty_norm();
+  const NumberType frobenius = full_A.frobenius_norm();
 
   scalapack_A = full_A;
   // local result on this core:
-  const double s_l1 = scalapack_A.l1_norm();
-  const double s_linfty = scalapack_A.linfty_norm();
-  const double s_frobenius = scalapack_A.frobenius_norm();
+  const NumberType s_l1 = scalapack_A.l1_norm();
+  const NumberType s_linfty = scalapack_A.linfty_norm();
+  const NumberType s_frobenius = scalapack_A.frobenius_norm();
 
   // make sure we have the same result on all cores, do average:
-  const double as_l1 = dealii::Utilities::MPI::sum(s_l1, mpi_communicator)/n_mpi_processes;
-  const double as_linfty = dealii::Utilities::MPI::sum(s_linfty, mpi_communicator)/n_mpi_processes;
-  const double as_frobenius = dealii::Utilities::MPI::sum(s_frobenius, mpi_communicator)/n_mpi_processes;
+  const NumberType as_l1 = dealii::Utilities::MPI::sum(s_l1, mpi_communicator)/n_mpi_processes;
+  const NumberType as_linfty = dealii::Utilities::MPI::sum(s_linfty, mpi_communicator)/n_mpi_processes;
+  const NumberType as_frobenius = dealii::Utilities::MPI::sum(s_frobenius, mpi_communicator)/n_mpi_processes;
 
   pcout << l1 << " " << s_l1 << " " << as_l1 << std::endl
         << linfty << " " << s_linfty << " " << as_linfty << std::endl
         << frobenius << " " << s_frobenius << " " << as_frobenius << std::endl;
 
-  AssertThrow (std::abs(l1 -as_l1) < 1e-10*std::abs(l1), dealii::ExcInternalError());
-  AssertThrow (std::abs(linfty -as_linfty) < 1e-10*std::abs(linfty), dealii::ExcInternalError());
-  AssertThrow (std::abs(frobenius -as_frobenius) < 1e-10*std::abs(frobenius), dealii::ExcInternalError());
+  AssertThrow (std::abs(l1 -as_l1) < tol*std::abs(l1), dealii::ExcInternalError());
+  AssertThrow (std::abs(linfty -as_linfty) < tol*std::abs(linfty), dealii::ExcInternalError());
+  AssertThrow (std::abs(frobenius -as_frobenius) < tol*std::abs(frobenius), dealii::ExcInternalError());
 }
 
 
@@ -85,9 +85,16 @@ int main (int argc,char **argv)
   const std::vector<unsigned int> sizes = {{32,64,120,320,640}};
   const std::vector<unsigned int> blocks = {{32,64}};
 
+  const double tol_double = 1e-10;
+  const float tol_float = 1e-5;
+
+  /*for (const auto &s : sizes)
+    for (const auto &b : blocks)
+      if (b <= s)
+        test<float>(s,b,tol_float);*/
+
   for (const auto &s : sizes)
     for (const auto &b : blocks)
       if (b <= s)
-        test<double>(s,b);
-
+        test<double>(s,b,tol_double);
 }

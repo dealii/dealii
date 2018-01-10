@@ -215,8 +215,9 @@ void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
     {
       int info = 0;
       NumberType *A_loc = &this->values[0];
-      pdpotrf_(&uplo,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,&info);
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpotrf", info));
+      //pdpotrf_(&uplo,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,&info);
+      ppotrf(&uplo,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("ppotrf", info));
     }
   property = (uplo=='L' ? LAPACKSupport::lower_triangular : LAPACKSupport::upper_triangular);
   state = LAPACKSupport::cholesky;
@@ -234,8 +235,8 @@ void ScaLAPACKMatrix<NumberType>::invert()
     {
       int info = 0;
       NumberType *A_loc = &this->values[0];
-      pdpotri_ (&uplo,&n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,&info);
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpotri", info));
+      ppotri (&uplo,&n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("ppotri", info));
     }
   state = LAPACKSupport::inverse_matrix;
 }
@@ -268,16 +269,16 @@ std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric()
       NumberType *Z_loc = &Z.values[0];
       work.resize(1);
 
-      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-              Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
+      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+            Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
 
       lwork=work[0];
       work.resize (lwork);
 
-      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-              Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
+      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+            Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
 
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdsyev", info));
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyev", info));
     }
   /*
    * send the eigenvalues to processors not being part of the process grid
@@ -326,16 +327,16 @@ std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric()
       NumberType *eigenvectors_loc = &eigenvectors.values[0];
       work.resize(1);
 
-      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-              eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
+      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+            eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
 
       lwork=work[0];
       work.resize (lwork);
 
-      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-              eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
+      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+            eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
 
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdsyev", info));
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyev", info));
 
       // copy eigenvectors to original matrix
       // as the temporary matrix eigenvectors has identical dimensions and
@@ -374,8 +375,8 @@ NumberType ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(const Number
       iwork.resize(liwork);
       int info = 0;
       const NumberType *A_loc = &this->values[0];
-      pdpocon_(&uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,
-               &a_norm, &rcond, &work[0], &lwork, &iwork[0], &liwork, &info);
+      ppocon(&uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,
+             &a_norm, &rcond, &work[0], &lwork, &iwork[0], &liwork, &info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpocon", info));
     }
   grid->send_to_inactive(&rcond);
@@ -442,7 +443,7 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
                         2*Nq0+Np0+ldw;
       work.resize(lwork);
       const NumberType *A_loc = &this->values[0];
-      res = pdlansy_(&type, &uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, &work[0]);
+      res = plansy(&type, &uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, &work[0]);
     }
   grid->send_to_inactive(&res);
   return res;
@@ -450,6 +451,7 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
 
 // instantiations
 template class ScaLAPACKMatrix<double>;
+template class ScaLAPACKMatrix<float>;
 
 
 DEAL_II_NAMESPACE_CLOSE
