@@ -323,21 +323,56 @@ namespace hp
     virtual void clear ();
 
     /**
-     * Renumber degrees of freedom based on a list of new dof numbers for all
-     * the dofs.
+     * Renumber degrees of freedom based on a list of new DoF indices for each
+     * of the degrees of freedom.
      *
-     * @p new_numbers is an array of integers with size equal to the number of
-     * dofs on the present grid. It stores the new indices after renumbering
-     * in the order of the old indices.
+     * This function is called by the functions in DoFRenumbering function after
+     * computing a new ordering of the degree of freedom indices. However, it
+     * can of course also be called from user code.
      *
-     * This function is called by the functions in DoFRenumbering function
-     * after computing the ordering of the degrees of freedom. However, you
-     * can call this function yourself, which is necessary if a user wants to
-     * implement an ordering scheme herself, for example downwind numbering.
+     * @arg new_number This array must have a size equal to the number of
+     * degrees of freedom owned by the current processor, i.e. the size must be
+     * equal to what n_locally_owned_dofs() returns. If only one processor
+     * participates in storing the current mesh, then this equals the total
+     * number of degrees of freedom, i.e. the result of n_dofs(). The contents
+     * of this array are the new global indices for each freedom listed in the
+     * IndexSet returned by locally_owned_dofs(). In the case of a sequential
+     * mesh this means that the array is a list of new indices for each of the
+     * degrees of freedom on the current mesh. In the case that we have a
+     * parallel::shared::Triangulation or
+     * parallel::distributed::Triangulation underlying this DoFHandler object,
+     * the array is a list of new indices for all the locally owned degrees of
+     * freedom, enumerated in the same order as the currently locally owned
+     * DoFs. In other words, assume that degree of freedom <code>i</code> is
+     * currently locally owned, then
+     * <code>new_numbers[locally_owned_dofs().index_within_set(i)]</code>
+     * returns the new global DoF index of <code>i</code>. Since the IndexSet of
+     * locally_owned_dofs() is complete in the sequential case, the latter
+     * convention for the content of the array reduces to the former in the case
+     * that only one processor participates in the mesh.
      *
-     * The @p new_number array must have a size equal to the number of degrees
-     * of freedom. Each entry must state the new global DoF number of the
-     * degree of freedom referenced.
+     * @note While it follows from the above, it may be surprising to know that
+     *   the <i>number</i> of locally owned degrees of freedom in a parallel
+     *   computation is an invariant
+     *   under renumbering, even if the <i>indices</i> associated with these
+     *   locally owned degrees of freedom are not. At a fundamental level,
+     *   this invariant exists because the <i>decision</i> whether a degree of
+     *   freedom is locally owned or not has nothing to do with that
+     *   degree of freedom's (old or new) index. Indeed, degrees of freedom
+     *   are locally owned if they are on a locally owned cell and not on
+     *   an interface between cells where the neighboring cell has a lower
+     *   @ref GlossSubdomainId "subdomain id". Since both of these conditions
+     *   are independent of the index associated with the DoF, a locally
+     *   owned degree of freedom will also be locally owned after renumbering.
+     *   On the other hand, properties such as whether the set of indices
+     *   of locally owned DoFs forms a contiguous range or not
+     *   (i.e., whether the locally_owned_dofs() returns an IndexSet object
+     *   for which IndexSet::is_contiguous() returns @p true) are of
+     *   course affected by the exact renumbering performed here. For example,
+     *   while the initial numbering of DoF indices done in distribute_dofs()
+     *   yields a contiguous numbering, the renumbering performed by
+     *   DoFRenumbering::component_wise() will, in general, not yield
+     *   contiguous locally owned DoF indices.
      */
     void renumber_dofs (const std::vector<types::global_dof_index> &new_numbers);
 
