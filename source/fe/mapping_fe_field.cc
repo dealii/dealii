@@ -207,10 +207,9 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
  const ComponentMask  &mask)
   :
   euler_vector(&euler_vector),
-  fe(&euler_dof_handler.get_fe()),
   euler_dof_handler(&euler_dof_handler),
   fe_mask(mask.size() ? mask :
-          ComponentMask(fe->get_nonzero_components(0).size(), true)),
+          ComponentMask(euler_dof_handler.get_fe().get_nonzero_components(0).size(), true)),
   fe_to_real(fe_mask.size(), numbers::invalid_unsigned_int)
 {
   unsigned int size = 0;
@@ -228,7 +227,6 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::MappingFEField
 (const MappingFEField<dim,spacedim,VectorType,DoFHandlerType> &mapping)
   :
   euler_vector(mapping.euler_vector),
-  fe(mapping.fe),
   euler_dof_handler(mapping.euler_dof_handler),
   fe_mask(mapping.fe_mask),
   fe_to_real(mapping.fe_to_real)
@@ -266,6 +264,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::
 compute_shapes_virtual (const std::vector<Point<dim> >                    &unit_points,
                         typename MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData &data) const
 {
+  const auto fe = &euler_dof_handler->get_fe();
   const unsigned int n_points=unit_points.size();
 
   for (unsigned int point=0; point<n_points; ++point)
@@ -480,7 +479,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData *
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_data (const UpdateFlags      update_flags,
     const Quadrature<dim> &quadrature) const
 {
-  InternalData *data = new InternalData(*fe, fe_mask);
+  InternalData *data = new InternalData(euler_dof_handler->get_fe(), fe_mask);
   this->compute_data (update_flags, quadrature,
                       quadrature.size(), *data);
   return data;
@@ -494,7 +493,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_face_data
 (const UpdateFlags        update_flags,
  const Quadrature<dim-1> &quadrature) const
 {
-  InternalData *data = new InternalData(*fe, fe_mask);
+  InternalData *data = new InternalData(euler_dof_handler->get_fe(), fe_mask);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_faces(quadrature));
   this->compute_face_data (update_flags, q,
                            quadrature.size(), *data);
@@ -509,7 +508,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_subface_data
 (const UpdateFlags        update_flags,
  const Quadrature<dim-1> &quadrature) const
 {
-  InternalData *data = new InternalData(*fe, fe_mask);
+  InternalData *data = new InternalData(euler_dof_handler->get_fe(), fe_mask);
   const Quadrature<dim> q (QProjector<dim>::project_to_all_subfaces(quadrature));
   this->compute_face_data (update_flags, q,
                            quadrature.size(), *data);
@@ -1324,13 +1323,13 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
   internal::MappingFEField::maybe_compute_q_points<dim,spacedim,VectorType,DoFHandlerType>
   (QProjector<dim>::DataSetDescriptor::cell (),
-   data, *fe, fe_mask, fe_to_real,
+   data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.quadrature_points);
 
   internal::MappingFEField::maybe_update_Jacobians<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell (),
-   data, *fe, fe_mask, fe_to_real);
+   data, euler_dof_handler->get_fe(), fe_mask, fe_to_real);
 
   const UpdateFlags update_flags = data.update_each;
   const std::vector<double> &weights=quadrature.get_weights();
@@ -1434,35 +1433,35 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   internal::MappingFEField::maybe_update_jacobian_grads<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
-   data, *fe, fe_mask, fe_to_real,
+   data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.jacobian_grads);
 
   // calculate derivatives of the Jacobians pushed forward to real cell coordinates
   internal::MappingFEField::maybe_update_jacobian_pushed_forward_grads<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
-   data, *fe, fe_mask, fe_to_real,
+   data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.jacobian_pushed_forward_grads);
 
   // calculate hessians of the Jacobians
   internal::MappingFEField::maybe_update_jacobian_2nd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
-   data, *fe, fe_mask, fe_to_real,
+   data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.jacobian_2nd_derivatives);
 
   // calculate hessians of the Jacobians pushed forward to real cell coordinates
   internal::MappingFEField::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
-   data, *fe, fe_mask, fe_to_real,
+   data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.jacobian_pushed_forward_2nd_derivatives);
 
   // calculate gradients of the hessians of the Jacobians
   internal::MappingFEField::maybe_update_jacobian_3rd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
-   data, *fe, fe_mask, fe_to_real,
+   data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.jacobian_3rd_derivatives);
 
   // calculate gradients of the hessians of the Jacobians pushed forward to real
@@ -1470,7 +1469,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   internal::MappingFEField::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
-   data, *fe, fe_mask, fe_to_real,
+   data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.jacobian_pushed_forward_3rd_derivatives);
 
   return updated_cell_similarity;
@@ -1506,7 +1505,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
          quadrature.size()),
    quadrature,
    data,
-   *fe, fe_mask, fe_to_real,
+   euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data);
 }
 
@@ -1541,7 +1540,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
             cell->subface_case(face_no)),
    quadrature,
    data,
-   *fe, fe_mask, fe_to_real,
+   euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data);
 }
 
@@ -1797,7 +1796,7 @@ do_transform_unit_to_real_cell (const InternalData &data) const
 
   for (unsigned int i=0; i<data.n_shape_functions; ++i)
     {
-      unsigned int comp_i = fe->system_to_component_index(i).first;
+      unsigned int comp_i = euler_dof_handler->get_fe().system_to_component_index(i).first;
       if (fe_mask[comp_i])
         p_real[fe_to_real[comp_i]] += data.local_dof_values[i] * data.shape(0,i);
     }
@@ -1890,7 +1889,7 @@ do_transform_real_to_unit_cell
       for (unsigned int k=0; k<mdata.n_shape_functions; ++k)
         {
           const Tensor<1,dim> &grad_k = mdata.derivative(0,k);
-          unsigned int comp_k = fe->system_to_component_index(k).first;
+          unsigned int comp_k = euler_dof_handler->get_fe().system_to_component_index(k).first;
           if (fe_mask[comp_k])
             for (unsigned int j=0; j<dim; ++j)
               DF[j][fe_to_real[comp_k]] += mdata.local_dof_values[k] * grad_k[j];
@@ -1962,7 +1961,7 @@ template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
 unsigned int
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_degree() const
 {
-  return fe->degree;
+  return euler_dof_handler->get_fe().degree;
 }
 
 
