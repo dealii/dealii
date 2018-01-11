@@ -497,16 +497,6 @@ private:
   SmartPointer<const VectorType, MappingFEField<dim,spacedim,VectorType,DoFHandlerType> > euler_vector;
 
   /**
-   * A FiniteElement object which is only needed in 3D, since it knows how to
-   * reorder shape functions/DoFs on non-standard faces. This is used to
-   * reorder support points in the same way. We could make this a pointer to
-   * prevent construction in 1D and 2D, but since memory and time requirements
-   * are not particularly high this seems unnecessary at the moment.
-   */
-  SmartPointer<const FiniteElement<dim,spacedim>, MappingFEField<dim,spacedim,VectorType,DoFHandlerType> > fe;
-
-
-  /**
    * Pointer to the DoFHandler to which the mapping vector is associated.
    */
   SmartPointer<const DoFHandlerType,MappingFEField<dim,spacedim,VectorType,DoFHandlerType> > euler_dof_handler;
