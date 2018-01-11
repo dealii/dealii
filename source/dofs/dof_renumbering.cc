@@ -1218,13 +1218,14 @@ namespace DoFRenumbering
       else
         {
           // this is a terminal cell. we need to renumber its DoF indices. there
-          // are now two cases to decide:
+          // are now three cases to decide:
           // - this is a sequential triangulation: we can just go ahead and number
           //   the DoFs in the order in which we encounter cells. in this case,
           //   all cells are actually locally owned
           // - if this is a parallel::distributed::Triangulation, then we only
           //   need to work on the locally owned cells since they contain
           //   all locally owned DoFs.
+          // - if this is a parallel::shared::Triangulation, then the same applies
           //
           // in all cases, each processor starts new indices so that we get
           // a consecutive numbering on each processor, and disjoint ownership
@@ -1283,6 +1284,31 @@ namespace DoFRenumbering
     types::global_dof_index next_free_dof_offset = 0;
     const IndexSet locally_owned = dof_handler.locally_owned_dofs();
 
+    // in the function we call recursively, we want to number DoFs so
+    // that global cell zero starts with DoF zero, regardless of how
+    // DoFs were previously numbered. to this end, we need to figure
+    // out which DoF index the current processor should start with.
+    //
+    // if this is a sequential triangulation, then obviously the starting
+    // index is zero. otherwise, make sure we get contiguous, successive
+    // ranges on each processor. note that since the number of locally owned
+    // DoFs is an invariant under renumbering, we can easily compute this
+    // starting index by just accumulating over the number of locally owned
+    // DoFs for all previous processes
+    types::global_dof_index my_starting_index = 0;
+
+    if (const parallel::Triangulation<dim> *tria
+        = dynamic_cast<const parallel::Triangulation<dim>*>
+          (&dof_handler.get_triangulation()))
+      {
+        const std::vector<types::global_dof_index>
+        n_locally_owned_dofs_per_processor = dof_handler.n_locally_owned_dofs_per_processor();
+        my_starting_index = std::accumulate (n_locally_owned_dofs_per_processor.begin(),
+                                             n_locally_owned_dofs_per_processor.begin()
+                                             + tria->locally_owned_subdomain(),
+                                             types::global_dof_index(0));
+      }
+
     if (const parallel::distributed::Triangulation<dim> *tria
         = dynamic_cast<const parallel::distributed::Triangulation<dim>*>
           (&dof_handler.get_triangulation()))
@@ -1292,20 +1318,6 @@ namespace DoFRenumbering
         // cells in the order p4est does to match the z-order actually used
         // by p4est. this requires using the renumbering of coarse cells
         // we do before we hand things off to p4est
-
-        // in the function we call recursively, we want to number DoFs so
-        // that global cell zero starts with DoF zero, regardless of how
-        // DoFs were previously numbered. to this end, we need to figure
-        // out which DoF index the current processor should start with.
-        // since the number of locally owned DoFs is an invariant under
-        // renumbering, we can easily compute this
-        const std::vector<types::global_dof_index>
-        n_locally_owned_dofs_per_processor = dof_handler.n_locally_owned_dofs_per_processor();
-        const types::global_dof_index my_starting_index
-          = std::accumulate (n_locally_owned_dofs_per_processor.begin(),
-                             n_locally_owned_dofs_per_processor.begin()
-                             + tria->locally_owned_subdomain(),
-                             types::global_dof_index(0));
         for (unsigned int c = 0; c < tria->n_cells (0); ++c)
           {
             const unsigned int coarse_cell_index =
@@ -1326,12 +1338,12 @@ namespace DoFRenumbering
       }
     else
       {
-        // this is not a distributed Triangulation. Traverse coarse cells in the
-        // normal order
+        // this is not a distributed Triangulation, so we can traverse coarse
+        // cells in the normal order
         for (typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin (0);
              cell != dof_handler.end (0); ++cell)
           next_free_dof_offset = compute_hierarchical_recursive<dim> (next_free_dof_offset,
-                                                                      0,
+                                                                      my_starting_index,
                                                                       cell,
                                                                       locally_owned,
                                                                       renumbering);
