@@ -180,18 +180,27 @@ FE_RaviartThomasNodal<dim>::initialize_support_points (const unsigned int deg)
 
   for (unsigned int d=0; d<dim; ++d)
     {
-      QAnisotropic<dim> *quadrature;
-      if (dim == 1) quadrature = new QAnisotropic<dim>(high);
-      if (dim == 2) quadrature = new QAnisotropic<dim>(((d==0) ? low : high),
-                                                         ((d==1) ? low : high));
-      if (dim == 3) quadrature = new QAnisotropic<dim>(((d==0) ? low : high),
-                                                         ((d==1) ? low : high),
-                                                         ((d==2) ? low : high));
-      Assert(dim<=3, ExcNotImplemented());
+      std::unique_ptr<QAnisotropic<dim>> quadrature;
+      switch (dim)
+        {
+        case 1:
+          quadrature = std_cxx14::make_unique<QAnisotropic<dim>>(high);
+          break;
+        case 2:
+          quadrature = std_cxx14::make_unique<QAnisotropic<dim>>(((d==0) ? low : high),
+                                                                 ((d==1) ? low : high));
+          break;
+        case 3:
+          quadrature = std_cxx14::make_unique<QAnisotropic<dim>>(((d==0) ? low : high),
+                                                                 ((d==1) ? low : high),
+                                                                 ((d==2) ? low : high));
+          break;
+        default:
+          Assert(false, ExcNotImplemented());
+        }
 
       for (unsigned int k=0; k<quadrature->size(); ++k)
         this->generalized_support_points[current++] = quadrature->point(k);
-      delete quadrature;
     }
   Assert (current == this->dofs_per_cell, ExcInternalError());
 }
