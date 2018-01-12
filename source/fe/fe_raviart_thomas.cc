@@ -193,9 +193,8 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
 
   if (deg==0) return;
 
-  // Create Legendre basis for the
-  // space D_xi Q_k
-  std::vector<AnisotropicPolynomials<dim>* > polynomials(dim);
+  // Create Legendre basis for the space D_xi Q_k
+  std::unique_ptr<AnisotropicPolynomials<dim>> polynomials[dim];
   for (unsigned int dd=0; dd<dim; ++dd)
     {
       std::vector<std::vector<Polynomials::Polynomial<double> > > poly(dim);
@@ -203,7 +202,7 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
         poly[d] = Polynomials::Legendre::generate_complete_basis(deg);
       poly[dd] = Polynomials::Legendre::generate_complete_basis(deg-1);
 
-      polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
+      polynomials[dd] = std_cxx14::make_unique<AnisotropicPolynomials<dim>>(poly);
     }
 
   interior_weights.reinit(TableIndices<3>(n_interior_points, polynomials[0]->n(), dim));
@@ -216,9 +215,6 @@ FE_RaviartThomas<dim>::initialize_support_points (const unsigned int deg)
           interior_weights(k,i,d) = cell_quadrature.weight(k)
                                     * polynomials[d]->compute_value(i,cell_quadrature.point(k));
     }
-
-  for (unsigned int d=0; d<dim; ++d)
-    delete polynomials[d];
 
   Assert (current == this->generalized_support_points.size(),
           ExcInternalError());
@@ -323,10 +319,9 @@ FE_RaviartThomas<dim>::initialize_restriction()
 
   if (this->degree == 1) return;
 
-  // Create Legendre basis for the
-  // space D_xi Q_k. Here, we cannot
+  // Create Legendre basis for the space D_xi Q_k. Here, we cannot
   // use the shape functions
-  std::vector<AnisotropicPolynomials<dim>* > polynomials(dim);
+  std::unique_ptr<AnisotropicPolynomials<dim>> polynomials[dim];
   for (unsigned int dd=0; dd<dim; ++dd)
     {
       std::vector<std::vector<Polynomials::Polynomial<double> > > poly(dim);
@@ -334,7 +329,7 @@ FE_RaviartThomas<dim>::initialize_restriction()
         poly[d] = Polynomials::Legendre::generate_complete_basis(this->degree-1);
       poly[dd] = Polynomials::Legendre::generate_complete_basis(this->degree-2);
 
-      polynomials[dd] = new AnisotropicPolynomials<dim>(poly);
+      polynomials[dd] = std_cxx14::make_unique<AnisotropicPolynomials<dim>>(poly);
     }
 
   QGauss<dim> q_cell(this->degree);
@@ -366,9 +361,6 @@ FE_RaviartThomas<dim>::initialize_restriction()
                    * polynomials[d]->compute_value(i_weight, q_sub.point(k));
               }
     }
-
-  for (unsigned int d=0; d<dim; ++d)
-    delete polynomials[d];
 }
 
 
