@@ -779,7 +779,7 @@ public:
  * \f]
  *
  * with determinant of the Jacobian equal to $J= \beta \hat \x^{2\beta-1}$.
- * Such transformation maps the reference square \$[0,1]\times[0,1]$ to the
+ * Such transformation maps the reference square $[0,1]\times[0,1]$ to the
  * reference simplex, by collapsing the left side of the square and squeezing
  * quadrature points towards the orgin, and then shearing the resulting
  * triangle to the reference one. This transformation shows good convergence
