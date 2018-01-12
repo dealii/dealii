@@ -55,9 +55,9 @@ namespace Functions
         break;
       }
     prm.declare_entry("Variable names", vnames, Patterns::Anything(),
-                      "The name of the variables as they will be used in the "
+                      "The names of the variables as they will be used in the "
                       "function, separated by commas. By default, the names of variables "
-                      "at which the function will be evaluated is `x' (in 1d), `x,y' (in 2d) or "
+                      "at which the function will be evaluated are `x' (in 1d), `x,y' (in 2d) or "
                       "`x,y,z' (in 3d) for spatial coordinates and `t' for time. You can then "
                       "use these variable names in your function expression and they will be "
                       "replaced by the values of these variables at which the function is "
