@@ -25,7 +25,7 @@ namespace Particles
     location (),
     reference_location(),
     id (0),
-    property_pool(NULL),
+    property_pool(nullptr),
     properties(PropertyPool::invalid_handle)
   {
   }
@@ -40,7 +40,7 @@ namespace Particles
     location (location),
     reference_location (reference_location),
     id (id),
-    property_pool(NULL),
+    property_pool(nullptr),
     properties (PropertyPool::invalid_handle)
   {
   }
@@ -292,7 +292,7 @@ namespace Particles
   const ArrayView<const double>
   Particle<dim,spacedim>::get_properties () const
   {
-    Assert(property_pool != NULL,
+    Assert(property_pool != nullptr,
            ExcInternalError());
 
     return property_pool->get_properties(properties);
@@ -304,7 +304,7 @@ namespace Particles
   const ArrayView<double>
   Particle<dim,spacedim>::get_properties ()
   {
-    Assert(property_pool != NULL,
+    Assert(property_pool != nullptr,
            ExcInternalError());
 
     return property_pool->get_properties(properties);
@@ -316,7 +316,7 @@ namespace Particles
   bool
   Particle<dim,spacedim>::has_properties () const
   {
-    return (property_pool != NULL)
+    return (property_pool != nullptr)
            && (properties != PropertyPool::invalid_handle);
   }
 }

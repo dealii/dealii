@@ -544,7 +544,7 @@ namespace PETScWrappers
               ierr = MatTranspose(tmp, MAT_REUSE_MATRIX, &tmp);
               AssertThrow (ierr == 0, ExcPETScError(ierr));
             }
-          ierr = MatDiagonalScale (tmp, NULL, V);
+          ierr = MatDiagonalScale (tmp, nullptr, V);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
           ierr = MatMatMult (tmp,
                              inputright,
