@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2017 by the deal.II authors
+// Copyright (C) 2000 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,6 +46,7 @@
 #include <deal.II/fe/fe_bdm.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_rannacher_turek.h>
+#include <deal.II/fe/fe_rt_bubbles.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
@@ -1086,6 +1087,8 @@ namespace
       = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
     result["FE_RaviartThomasNodal"]
       = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomasNodal<dim> >);
+    result["FE_RT_Bubbles"]
+      = FEFactoryPointer(new FETools::FEFactory<FE_RT_Bubbles<dim> >);
     result["FE_Nedelec"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Nedelec<dim> >);
     result["FE_DGPNonparametric"]
