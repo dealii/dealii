@@ -33,7 +33,7 @@
 
 
 template <typename NumberType>
-void test(const unsigned int size, const unsigned int block_size)
+void test(const unsigned int size, const unsigned int block_size, const NumberType tol)
 {
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
@@ -64,9 +64,9 @@ void test(const unsigned int size, const unsigned int block_size)
   diff.add( 1., inverse);
   diff.add(-1., full_out);
 
-  const double error = diff.frobenius_norm();
+  const NumberType error = diff.frobenius_norm() / inverse.frobenius_norm();
 
-  if (error > 1e-10 && this_mpi_process == 0)
+  if (error > tol && this_mpi_process == 0)
     {
       std::cout << "Error!" << std::endl
                 << "expected to have:" << std::endl;
@@ -90,8 +90,16 @@ int main (int argc,char **argv)
   const std::vector<unsigned int> sizes = {{32,64,120,320,640}};
   const std::vector<unsigned int> blocks = {{32,64}};
 
+  const double tol_double = 1e-10;
+  const float tol_float = 1e-5;
+
   for (const auto &s : sizes)
     for (const auto &b : blocks)
       if (b <= s)
-        test<double>(s,b);
+        test<float>(s,b, tol_float);
+
+  for (const auto &s : sizes)
+    for (const auto &b : blocks)
+      if (b <= s)
+        test<double>(s,b,tol_double);
 }

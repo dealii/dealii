@@ -34,7 +34,8 @@ namespace
    * https://github.com/elemental/Elemental/blob/master/src/core/Grid.cpp#L67-L91
    */
   inline
-  std::pair<int,int> compute_processor_grid_sizes(MPI_Comm mpi_comm, const unsigned int m, const unsigned int n,
+  std::pair<int,int> compute_processor_grid_sizes(MPI_Comm mpi_comm,
+                                                  const unsigned int m, const unsigned int n,
                                                   const unsigned int block_size_m, const unsigned int block_size_n)
   {
     // Few notes from the ScaLAPACK user guide:
@@ -216,7 +217,8 @@ namespace Utilities
       if (mpi_process_is_active)
         Cblacs_gridexit(blacs_context);
 
-      MPI_Comm_free(&mpi_communicator_inactive_with_root);
+      if (mpi_communicator_inactive_with_root != MPI_COMM_NULL)
+        MPI_Comm_free(&mpi_communicator_inactive_with_root);
     }
 
 
@@ -242,6 +244,7 @@ namespace Utilities
 // instantiations
 
 template void Utilities::MPI::ProcessGrid::send_to_inactive<double>(double *, const int) const;
+template void Utilities::MPI::ProcessGrid::send_to_inactive<float>(float *, const int) const;
 
 DEAL_II_NAMESPACE_CLOSE
 

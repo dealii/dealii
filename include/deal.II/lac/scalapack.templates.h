@@ -47,7 +47,8 @@ extern "C"
    *
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbpnf.htm
    */
-  void Cblacs_pinfo(int *rank, int *nprocs);
+  void Cblacs_pinfo(int *rank,
+                    int *nprocs);
 
   /**
    * Return internal BLACS value in @p val based on the input @p what and @p icontxt.
@@ -56,7 +57,9 @@ extern "C"
    *
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbget.htm
    */
-  void Cblacs_get(int icontxt, int what, int *val);
+  void Cblacs_get(int icontxt,
+                  int what,
+                  int *val);
 
   /**
    * Map the processes sequentially in row-major or column-major order
@@ -68,19 +71,29 @@ extern "C"
    *
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbint.htm
    */
-  void Cblacs_gridinit(int *context, const char *order, int grid_height, int grid_width);
+  void Cblacs_gridinit(int *context,
+                       const char *order,
+                       int grid_height,
+                       int grid_width);
 
   /**
    * Return the process row and column index.
    *
    * https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dbinfo.htm
    */
-  void Cblacs_gridinfo(int context, int *grid_height, int *grid_width, int *grid_row, int *grid_col);
+  void Cblacs_gridinfo(int context,
+                       int *grid_height,
+                       int *grid_width,
+                       int *grid_row,
+                       int *grid_col);
 
   /**
    * Given the system process number, return the row and column coordinates in the BLACS' process grid.
    */
-  void Cblacs_pcoord(int ictxt, int pnum, int *prow, int *pcol);
+  void Cblacs_pcoord(int ictxt,
+                     int pnum,
+                     int *prow,
+                     int *pcol);
 
   /**
    * Release a BLACS context.
@@ -91,7 +104,8 @@ extern "C"
    * This routines holds up execution of all processes within the indicated
    * scope until they have all called the routine.
    */
-  void Cblacs_barrier(int, const char *);
+  void Cblacs_barrier(int,
+                      const char *);
 
   /**
    * Free all BLACS contexts and releases all allocated memory.
@@ -103,7 +117,20 @@ extern "C"
    *
    * https://software.intel.com/en-us/mkl-developer-reference-c-gerv2d
    */
-  void Cdgerv2d(int context, int M, int N, double *A, int lda, int rsrc, int csrc);
+  void Cdgerv2d(int context,
+                int M,
+                int N,
+                double *A,
+                int lda,
+                int rsrc,
+                int csrc);
+  void Csgerv2d(int context,
+                int M,
+                int N,
+                float *A,
+                int lda,
+                int rsrc,
+                int csrc);
 
   /**
    * Sends the general rectangular matrix A to the destination
@@ -111,7 +138,20 @@ extern "C"
    *
    * https://software.intel.com/en-us/mkl-developer-reference-c-2018-beta-gesd2d
    */
-  void Cdgesd2d(int context , int M, int N, double *A, int lda, int rdest, int cdest);
+  void Cdgesd2d(int context,
+                int M,
+                int N,
+                double *A,
+                int lda,
+                int rdest,
+                int cdest);
+  void Csgesd2d(int context,
+                int M,
+                int N,
+                float *A,
+                int lda,
+                int rdest,
+                int cdest);
 
   /**
    * Get BLACS context from MPI @p comm.
@@ -123,7 +163,11 @@ extern "C"
    *
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_dnumy.htm
    */
-  int numroc_ (const int *n, const int *nb, const int *iproc, const int *isproc, const int *nprocs);
+  int numroc_ (const int *n,
+               const int *nb,
+               const int *iproc,
+               const int *isproc,
+               const int *nprocs);
 
   /**
    * Compute the Cholesky factorization of an N-by-N real
@@ -135,8 +179,19 @@ extern "C"
    */
   void pdpotrf_(const char *UPLO,
                 const int *N,
-                double *A, const int *IA, const int *JA, const int *DESCA,
+                double *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
                 int *INFO);
+  void pspotrf_(const char *UPLO,
+                const int *N,
+                float *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                int *INFO);
+
 
   /**
    * Compute the inverse of a real symmetric positive definite
@@ -150,7 +205,17 @@ extern "C"
    */
   void pdpotri_(const char *UPLO,
                 const int *N,
-                double *A, const int *IA, const int *JA, const int *DESCA,
+                double *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                int *INFO);
+  void pspotri_(const char *UPLO,
+                const int *N,
+                float *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
                 int *INFO);
 
   /**
@@ -164,10 +229,27 @@ extern "C"
    */
   void pdpocon_(const char *uplo,
                 const int *N,
-                const double *A, const int *IA, const int *JA, const int *DESCA,
+                const double *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
                 const double *ANORM, double *RCOND,
-                double *WORK, const int *LWORK,
-                int *IWORK, const int *LIWORK,
+                double *WORK,
+                const int *LWORK,
+                int *IWORK,
+                const int *LIWORK,
+                int *INFO);
+  void pspocon_(const char *uplo,
+                const int *N,
+                const float *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                const float *ANORM, float *RCOND,
+                float *WORK,
+                const int *LWORK,
+                int *IWORK,
+                const int *LIWORK,
                 int *INFO);
 
   /**
@@ -179,8 +261,19 @@ extern "C"
   double pdlansy_(const char *norm,
                   const char *uplo,
                   const int *N,
-                  const double *A, const int *IA, const int *JA, const int *DESCA,
+                  const double *A,
+                  const int *IA,
+                  const int *JA,
+                  const int *DESCA,
                   double *work);
+  float pslansy_(const char *norm,
+                 const char *uplo,
+                 const int *N,
+                 const float *A,
+                 const int *IA,
+                 const int *JA,
+                 const int *DESCA,
+                 float *work);
 
   /**
    * Compute the Least Common Multiple (LCM) of two positive integers @p M and @p N.
@@ -189,22 +282,30 @@ extern "C"
    *
    * http://www.netlib.org/scalapack/explore-html/d0/d9b/ilcm_8f_source.html
    */
-  int ilcm_(const int *M, const int *N);
+  int ilcm_(const int *M,
+            const int *N);
 
   /**
    * Return the ceiling of the division of two integers.
    *
    * http://www.netlib.org/scalapack/explore-html/df/d07/iceil_8f_source.html
    */
-  int iceil_(const int *i1, const int *i2);
+  int iceil_(const int *i1,
+             const int *i2);
 
   /**
    * Initialize the descriptor vector with the 8 input arguments
    */
   void descinit_ (int *desc,
-                  const int *m, const int *n, const int *mb, const int *nb,
-                  const int *irsrc, const int *icsrc,
-                  const int *ictxt, const int *lld, int *info);
+                  const int *m,
+                  const int *n,
+                  const int *mb,
+                  const int *nb,
+                  const int *irsrc,
+                  const int *icsrc,
+                  const int *ictxt,
+                  const int *lld,
+                  int *info);
 
   /**
    * Compute the global index of a distributed matrix entry
@@ -217,15 +318,38 @@ extern "C"
    * @param isrcproc  The coordinate of the process that possesses the first row/column of the distributed matrix
    * @param nprocs The total number processes over which the distributed matrix is distributed
    */
-  int indxl2g_ (const int *indxloc, const int *nb, const int *iproc, const int *isrcproc, const int *nprocs);
+  int indxl2g_ (const int *indxloc,
+                const int *nb,
+                const int *iproc,
+                const int *isrcproc,
+                const int *nprocs);
 
   /**
    * Compute the solution to a real system of linear equations
    */
-  void pdgesv_(const int *n, const int *nrhs,
-               double *A, const int *ia, const int *ja, const int *desca,
+  void pdgesv_(const int *n,
+               const int *nrhs,
+               double *A,
+               const int *ia,
+               const int *ja,
+               const int *desca,
                int *ipiv,
-               double *B, const int *ib, const int *jb, const int *descb,
+               double *B,
+               const int *ib,
+               const int *jb,
+               const int *descb,
+               int *info);
+  void psgesv_(const int *n,
+               const int *nrhs,
+               float *A,
+               const int *ia,
+               const int *ja,
+               const int *desca,
+               int *ipiv,
+               float *B,
+               const int *ib,
+               const int *jb,
+               const int *descb,
                int *info);
 
   /**
@@ -235,28 +359,75 @@ extern "C"
    * sub( C ) denotes C(IC:IC+M-1,JC:JC+N-1),  and, op( X )  is one  of
    * op( X ) = X   or   op( X ) = X'.
    */
-  void pdgemm_(const char *transa, const char *transb,
-               const int *m, const int *n, const int *k,
+  void pdgemm_(const char *transa,
+               const char *transb,
+               const int *m,
+               const int *n,
+               const int *k,
                const double *alpha,
-               double *A, const int *IA, const int *JA, const int *DESCA,
-               double *B, const int *IB, const int *JB, const int *DESCB,
+               double *A,
+               const int *IA,
+               const int *JA,
+               const int *DESCA,
+               double *B,
+               const int *IB,
+               const int *JB,
+               const int *DESCB,
                const double *beta,
-               double *C, const int *IC, const int *JC, const int *DESCC);
+               double *C,
+               const int *IC,
+               const int *JC,
+               const int *DESCC);
+  void psgemm_(const char *transa,
+               const char *transb,
+               const int *m,
+               const int *n,
+               const int *k,
+               const float *alpha,
+               float *A,
+               const int *IA,
+               const int *JA,
+               const int *DESCA,
+               float *B,
+               const int *IB,
+               const int *JB,
+               const int *DESCB,
+               const float *beta,
+               float *C,
+               const int *IC,
+               const int *JC,
+               const int *DESCC);
 
   /**
    * Return the value of the one norm, or the Frobenius norm, or the infinity norm,
    * or the element of largest absolute value of a distributed matrix
    */
   double pdlange_(char const *norm,
-                  int const &m, int const &n,
-                  double *A, int const &ia, int const &ja, int *desca,
+                  int const &m,
+                  int const &n,
+                  double *A,
+                  int const &ia,
+                  int const &ja,
+                  int *desca,
                   double *work);
+  double pslange_(char const *norm,
+                  int const &m,
+                  int const &n,
+                  float *A,
+                  int const &ia,
+                  int const &ja,
+                  int *desca,
+                  float *work);
 
   /**
    * Compute the process coordinate which possesses the entry of a
    * distributed matrix specified by a global index
    */
-  int indxg2p_(const int *glob, const int *nb, const int *iproc, const int *isproc, const int *nprocs);
+  int indxg2p_(const int *glob,
+               const int *nb,
+               const int *iproc,
+               const int *isproc,
+               const int *nprocs);
 
   /**
    * Compute all eigenvalues and, optionally, eigenvectors of a real symmetric matrix A
@@ -267,11 +438,36 @@ extern "C"
    * http://www.netlib.org/scalapack/explore-html/d0/d1a/pdsyev_8f.html
    * https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lsyev.htm#lsyev
    */
-  void pdsyev_(const char *jobz, const char *uplo,
-               const int *m, double *A, const int *ia, const int *ja, int *desca,
+  void pdsyev_(const char *jobz,
+               const char *uplo,
+               const int *m,
+               double *A,
+               const int *ia,
+               const int *ja,
+               int *desca,
                double *w,
-               double *z, const int *iz, const int *jz, int *descz,
-               double *work, const int *lwork, int *info);
+               double *z,
+               const int *iz,
+               const int *jz,
+               int *descz,
+               double *work,
+               const int *lwork,
+               int *info);
+  void pssyev_(const char *jobz,
+               const char *uplo,
+               const int *m,
+               float *A,
+               const int *ia,
+               const int *ja,
+               int *desca,
+               float *w,
+               float *z,
+               const int *iz,
+               const int *jz,
+               int *descz,
+               float *work,
+               const int *lwork,
+               int *info);
 
   /**
    * Copy all or a part of a distributed matrix A to another
@@ -280,9 +476,604 @@ extern "C"
    * A(ia:ia+m-1,ja:ja+n-1) and sub(B) denotes B(ib:ib+m-1,jb:jb+n-1)
    */
   void pdlacpy_(const char *uplo,
-                const int *m, const int *n, double *A, const int *ia, const int *ja, int *desca,
-                double *B, const int *ib, const int *jb, int *descb);
+                const int *m,
+                const int *n,
+                double *A,
+                const int *ia,
+                const int *ja,
+                int *desca,
+                double *B,
+                const int *ib,
+                const int *jb,
+                int *descb);
+  void pslacpy_(const char *uplo,
+                const int *m,
+                const int *n,
+                float *A,
+                const int *ia,
+                const int *ja,
+                int *desca,
+                float *B,
+                const int *ib,
+                const int *jb,
+                int *descb);
+
+  /**
+   * Copies the content of a general rectangular distributed matrix @p A to another distributed matrix @p B
+   * It is not required that the matrices A and B have the same process grid or block size, e.g. copying a
+   * matrix from a one-dimensional to a two-dimensional process grid
+   * @p ictxt is a context which is at least a union of all processes in context A and B
+   */
+  void pdgemr2d_(const int *m,
+                 const int *n,
+                 const double *A,
+                 const int *ia,
+                 const int *ja,
+                 const int *desca,
+                 double *B,
+                 const int *ib,
+                 const int *jb,
+                 const int *descb,
+                 const int *ictxt);
+  void psgemr2d_(const int *m,
+                 const int *n,
+                 const float *A,
+                 const int *ia,
+                 const int *ja,
+                 const int *desca,
+                 float *B,
+                 const int *ib,
+                 const int *jb,
+                 const int *descb,
+                 const int *ictxt);
 }
+
+
+/*
+ * In the following we have template wrappers for the ScaLAPACK routines
+ * wrappers for other numeric types can be added in the future
+ */
+template <typename number>
+inline void Cgerv2d(int context,
+                    int M,
+                    int N,
+                    number *A,
+                    int lda,
+                    int rsrc,
+                    int csrc)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void Cgerv2d(int context,
+                    int M,
+                    int N,
+                    double *A,
+                    int lda,
+                    int rsrc,
+                    int csrc)
+{
+  Cdgerv2d (context, M, N, A, lda, rsrc, csrc);
+}
+
+inline void Cgerv2d(int context,
+                    int M,
+                    int N,
+                    float *A,
+                    int lda,
+                    int rsrc,
+                    int csrc)
+{
+  Csgerv2d (context, M, N, A, lda, rsrc, csrc);
+}
+
+
+template <typename number>
+inline void Cgesd2d(int context,
+                    int M,
+                    int N,
+                    number *A,
+                    int lda,
+                    int rdest,
+                    int cdest)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void Cgesd2d (int context,
+                     int M,
+                     int N,
+                     double *A,
+                     int lda,
+                     int rdest,
+                     int cdest)
+{
+  Cdgesd2d (context, M, N, A, lda, rdest, cdest);
+}
+
+inline void Cgesd2d (int context,
+                     int M,
+                     int N,
+                     float *A,
+                     int lda,
+                     int rdest,
+                     int cdest)
+{
+  Csgesd2d (context, M, N, A, lda, rdest, cdest);
+}
+
+
+template <typename number>
+inline void ppotrf(const char *UPLO,
+                   const int *N,
+                   number *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   int *INFO)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void ppotrf(const char *UPLO,
+                   const int *N,
+                   double *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   int *INFO)
+{
+  pdpotrf_(UPLO, N, A, IA, JA, DESCA, INFO);
+}
+
+inline void ppotrf(const char *UPLO,
+                   const int *N,
+                   float *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   int *INFO)
+{
+  pspotrf_(UPLO, N, A, IA, JA, DESCA, INFO);
+}
+
+
+template <typename number>
+inline void ppotri(const char *UPLO,
+                   const int *N,
+                   number *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   int *INFO)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void ppotri(const char *UPLO,
+                   const int *N,
+                   double *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   int *INFO)
+{
+  pdpotri_(UPLO, N, A, IA, JA, DESCA, INFO);
+}
+
+inline void ppotri(const char *UPLO,
+                   const int *N,
+                   float *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   int *INFO)
+{
+  pspotri_(UPLO, N, A, IA, JA, DESCA, INFO);
+}
+
+
+template <typename number>
+inline void ppocon(const char *uplo,
+                   const int *N,
+                   const number *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   const number *ANORM,
+                   number *RCOND,
+                   number *WORK,
+                   const int *LWORK,
+                   int *IWORK,
+                   const int *LIWORK,
+                   int *INFO)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void ppocon(const char *uplo,
+                   const int *N,
+                   const double *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   const double *ANORM,
+                   double *RCOND,
+                   double *WORK,
+                   const int *LWORK,
+                   int *IWORK,
+                   const int *LIWORK,
+                   int *INFO)
+{
+  pdpocon_(uplo, N, A, IA, JA, DESCA, ANORM, RCOND, WORK, LWORK, IWORK, LIWORK, INFO);
+}
+
+inline void ppocon(const char *uplo,
+                   const int *N,
+                   const float *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   const float *ANORM,
+                   float *RCOND,
+                   float *WORK,
+                   const int *LWORK,
+                   int *IWORK,
+                   const int *LIWORK,
+                   int *INFO)
+{
+  pspocon_(uplo, N, A, IA, JA, DESCA, ANORM, RCOND, WORK, LWORK, IWORK, LIWORK, INFO);
+}
+
+
+template <typename number>
+inline number plansy(const char *norm,
+                     const char *uplo,
+                     const int *N,
+                     const number *A,
+                     const int *IA,
+                     const int *JA,
+                     const int *DESCA,
+                     number *work)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline double plansy(const char *norm,
+                     const char *uplo,
+                     const int *N,
+                     const double *A,
+                     const int *IA,
+                     const int *JA,
+                     const int *DESCA,
+                     double *work)
+{
+  return pdlansy_(norm, uplo, N, A, IA, JA, DESCA, work);
+}
+
+inline float plansy(const char *norm,
+                    const char *uplo,
+                    const int *N,
+                    const float *A,
+                    const int *IA,
+                    const int *JA,
+                    const int *DESCA,
+                    float *work)
+{
+  return pslansy_(norm, uplo, N, A, IA, JA, DESCA, work);
+}
+
+
+template <typename number>
+inline void pgesv(const int *n,
+                  const int *nrhs,
+                  number *A,
+                  const int *ia,
+                  const int *ja,
+                  const int *desca,
+                  int *ipiv,
+                  number *B,
+                  const int *ib,
+                  const int *jb,
+                  const int *descb,
+                  int *info)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void pgesv(const int *n,
+                  const int *nrhs,
+                  double *A,
+                  const int *ia,
+                  const int *ja,
+                  const int *desca,
+                  int *ipiv,
+                  double *B,
+                  const int *ib,
+                  const int *jb,
+                  const int *descb,
+                  int *info)
+{
+  pdgesv_(n, nrhs, A, ia, ja, desca, ipiv, B, ib, jb, descb, info);
+}
+
+inline void pgesv(const int *n,
+                  const int *nrhs,
+                  float *A,
+                  const int *ia,
+                  const int *ja,
+                  const int *desca,
+                  int *ipiv,
+                  float *B,
+                  const int *ib,
+                  const int *jb,
+                  const int *descb,
+                  int *info)
+{
+  psgesv_(n, nrhs, A, ia, ja, desca, ipiv, B, ib, jb, descb, info);
+}
+
+
+template <typename number>
+inline void pgemm(const char *transa,
+                  const char *transb,
+                  const int *m,
+                  const int *n,
+                  const int *k,
+                  const number *alpha,
+                  number *A,
+                  const int *IA,
+                  const int *JA,
+                  const int *DESCA,
+                  number *B,
+                  const int *IB,
+                  const int *JB,
+                  const int *DESCB,
+                  const number *beta,
+                  number *C,
+                  const int *IC,
+                  const int *JC,
+                  const int *DESCC)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void pgemm(const char *transa,
+                  const char *transb,
+                  const int *m,
+                  const int *n,
+                  const int *k,
+                  const double *alpha,
+                  double *A,
+                  const int *IA,
+                  const int *JA,
+                  const int *DESCA,
+                  double *B,
+                  const int *IB,
+                  const int *JB,
+                  const int *DESCB,
+                  const double *beta,
+                  double *C,
+                  const int *IC,
+                  const int *JC,
+                  const int *DESCC)
+{
+  pdgemm_(transa, transb, m, n, k, alpha, A, IA, JA, DESCA, B, IB, JB, DESCB, beta, C, IC, JC, DESCC);
+}
+
+inline void pgemm(const char *transa,
+                  const char *transb,
+                  const int *m,
+                  const int *n,
+                  const int *k,
+                  const float *alpha,
+                  float *A,
+                  const int *IA,
+                  const int *JA,
+                  const int *DESCA,
+                  float *B,
+                  const int *IB,
+                  const int *JB,
+                  const int *DESCB,
+                  const float *beta,
+                  float *C,
+                  const int *IC,
+                  const int *JC,
+                  const int *DESCC)
+{
+  psgemm_(transa, transb, m, n, k, alpha, A, IA, JA, DESCA, B, IB, JB, DESCB, beta, C, IC, JC, DESCC);
+}
+
+
+template <typename number>
+inline number plange(char const *norm,
+                     int const &m,
+                     int const &n,
+                     number *A,
+                     int const &ia,
+                     int const &ja,
+                     int *desca,
+                     number *work)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline double plange(char const *norm,
+                     int const &m,
+                     int const &n,
+                     double *A,
+                     int const &ia,
+                     int const &ja,
+                     int *desca,
+                     double *work)
+{
+  return pdlange_(norm, m, n, A, ia, ja,desca, work);
+}
+
+inline float plange(char const *norm,
+                    int const &m,
+                    int const &n,
+                    float *A,
+                    int const &ia,
+                    int const &ja,
+                    int *desca,
+                    float *work)
+{
+  return pslange_(norm, m, n, A, ia, ja,desca, work);
+}
+
+
+template <typename number>
+inline void psyev(const char *jobz,
+                  const char *uplo,
+                  const int *m,
+                  number *A,
+                  const int *ia,
+                  const int *ja,
+                  int *desca,
+                  number *w,
+                  number *z,
+                  const int *iz,
+                  const int *jz,
+                  int *descz,
+                  number *work,
+                  const int *lwork,
+                  int *info)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void psyev(const char *jobz,
+                  const char *uplo,
+                  const int *m,
+                  double *A,
+                  const int *ia,
+                  const int *ja,
+                  int *desca,
+                  double *w,
+                  double *z,
+                  const int *iz,
+                  const int *jz,
+                  int *descz,
+                  double *work,
+                  const int *lwork,
+                  int *info)
+{
+  pdsyev_(jobz, uplo, m, A, ia, ja, desca, w, z, iz, jz, descz, work, lwork, info);
+}
+
+inline void psyev(const char *jobz,
+                  const char *uplo,
+                  const int *m,
+                  float *A,
+                  const int *ia,
+                  const int *ja,
+                  int *desca,
+                  float *w,
+                  float *z,
+                  const int *iz,
+                  const int *jz,
+                  int *descz,
+                  float *work,
+                  const int *lwork,
+                  int *info)
+{
+  pssyev_(jobz, uplo, m, A, ia, ja, desca, w, z, iz, jz, descz, work, lwork, info);
+}
+
+
+template <typename number>
+inline void placpy(const char *uplo,
+                   const int *m,
+                   const int *n,
+                   number *A,
+                   const int *ia,
+                   const int *ja,
+                   int *desca,
+                   number *B,
+                   const int *ib,
+                   const int *jb,
+                   int *descb)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void placpy(const char *uplo,
+                   const int *m,
+                   const int *n,
+                   double *A,
+                   const int *ia,
+                   const int *ja,
+                   int *desca, double *B,
+                   const int *ib,
+                   const int *jb,
+                   int *descb)
+{
+  pdlacpy_(uplo, m, n, A, ia, ja, desca, B, ib, jb, descb);
+}
+
+inline void placpy(const char *uplo,
+                   const int *m,
+                   const int *n,
+                   float *A,
+                   const int *ia,
+                   const int *ja,
+                   int *desca,
+                   float *B,
+                   const int *ib,
+                   const int *jb,
+                   int *descb)
+{
+  pslacpy_(uplo, m, n, A, ia, ja, desca, B, ib, jb, descb);
+}
+
+
+template <typename number>
+inline void pgemr2d(const int *m,
+                    const int *n,
+                    const number *A,
+                    const int *ia,
+                    const int *ja,
+                    const int *desca,
+                    number *B,
+                    const int *ib,
+                    const int *jb,
+                    const int *descb,
+                    const int *ictxt)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void pgemr2d(const int *m,
+                    const int *n,
+                    const double *A,
+                    const int *ia,
+                    const int *ja,
+                    const int *desca,
+                    double *B,
+                    const int *ib,
+                    const int *jb,
+                    const int *descb,
+                    const int *ictxt)
+{
+  pdgemr2d_(m,n,A,ia,ja,desca,B,ib,jb,descb,ictxt);
+}
+
+inline void pgemr2d(const int *m,
+                    const int *n,
+                    const float *A,
+                    const int *ia,
+                    const int *ja,
+                    const int *desca,
+                    float *B,
+                    const int *ib,
+                    const int *jb,
+                    const int *descb,
+                    const int *ictxt)
+{
+  psgemr2d_(m,n,A,ia,ja,desca,B,ib,jb,descb,ictxt);
+}
+
 
 #endif // DEAL_II_WITH_SCALAPACK
 

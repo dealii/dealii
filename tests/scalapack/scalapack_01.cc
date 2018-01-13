@@ -61,7 +61,7 @@ void test(const unsigned int size, const unsigned int block_size)
   diff.add( 1., full_in);
   diff.add(-1., full_out);
 
-  const double error = diff.frobenius_norm();
+  const NumberType error = diff.frobenius_norm();
 
   if (error > 1e-10 && this_mpi_process == 0)
     {
@@ -84,6 +84,10 @@ int main (int argc,char **argv)
 
   const std::vector<unsigned int> sizes = {{64,120,320,640}};
   const std::vector<unsigned int> blocks = {{32,64}};
+
+  for (const auto &s : sizes)
+    for (const auto &b : blocks)
+      test<float>(s,b);
 
   for (const auto &s : sizes)
     for (const auto &b : blocks)

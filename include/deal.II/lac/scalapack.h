@@ -158,6 +158,15 @@ public:
    */
   void copy_to (FullMatrix<NumberType> &matrix) const;
 
+
+  /**
+   * Copy the contents of the distributed matrix into a differently distributed matrix @p dest.
+   * The function also works for matrices with different process grids
+   * or block-cyclic distributions.
+   */
+  void copy_to (ScaLAPACKMatrix<NumberType> &dest) const;
+
+
   /**
    * Compute the Cholesky factorization of the matrix using ScaLAPACK
    * function <code>pXpotrf</code>. The result of the factorization is stored in this object.

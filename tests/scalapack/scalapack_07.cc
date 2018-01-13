@@ -23,10 +23,11 @@
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/process_grid.h>
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/lapack_full_matrix.h>
-
+#include <deal.II/lac/lapack_templates.h>
 #include <deal.II/lac/scalapack.h>
 
 #include <fstream>
@@ -34,14 +35,9 @@
 #include <algorithm>
 #include <memory>
 
-extern "C"  //Some Lapack routines
-{
-  void dsyev_(char *jobz, char *uplo, int *n, double *A, int *lda, double *w, double *work, int *lwork, int *info);
-  void ssyev_(char *jobz, char *uplo, int *n, float *A, int *lda, float *w, float *work, int *lwork, int *info);
-}
 
 template <typename NumberType>
-void test(const unsigned int size, const unsigned int block_size)
+void test(const unsigned int size, const unsigned int block_size, const NumberType tol)
 {
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
@@ -73,15 +69,15 @@ void test(const unsigned int size, const unsigned int block_size)
     char uplo = 'U';  //storage format of the matrix A; not so important as matrix is symmetric
     int LDA = size;   //leading dimension of the matrix A
     int lwork;      //length of vector/array work
-    std::vector<double> work (1);
+    std::vector<NumberType> work (1);
 
     //by setting lwork to -1 a workspace query for work is done
     //as matrix is symmetric: LDA == size of matrix
     lwork = -1;
-    dsyev_(&jobz, &uplo, &LDA, & *lapack_A.begin(), &LDA, & *eigenvalues_Lapack.begin(), & *work.begin(), &lwork, &info);
+    syev(&jobz, &uplo, &LDA, & *lapack_A.begin(), &LDA, & *eigenvalues_Lapack.begin(), & *work.begin(), &lwork, &info);
     lwork=work[0];
     work.resize (lwork);
-    dsyev_(&jobz, &uplo, &LDA, & *lapack_A.begin(), &LDA, & *eigenvalues_Lapack.begin(), & *work.begin(), &lwork, &info);
+    syev(&jobz, &uplo, &LDA, & *lapack_A.begin(), &LDA, & *eigenvalues_Lapack.begin(), & *work.begin(), &lwork, &info);
 
     AssertThrow (info==0, LAPACKSupport::ExcErrorCode("syev", info));
   }
@@ -92,38 +88,36 @@ void test(const unsigned int size, const unsigned int block_size)
   scalapack_A.copy_to(p_eigenvectors);
   unsigned int n_eigenvalues = eigenvalues_ScaLapack.size(), max_n_eigenvalues=5;
 
-  pcout << "First " << max_n_eigenvalues << " ScaLapack eigenvalues" << std::endl;
-
+  pcout << "comparing " << max_n_eigenvalues << " eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:" << std::endl;
   for (unsigned int i=0; i<max_n_eigenvalues; ++i)
-    pcout << eigenvalues_ScaLapack[i] << "   ";
-
-  pcout << std::endl << "First " << max_n_eigenvalues << " Lapack eigenvalues" << std::endl;
-
-  for (unsigned int i=0; i<max_n_eigenvalues; ++i)
-    pcout << eigenvalues_Lapack[i] << "   ";
-  pcout << std::endl;
-  pcout << std::endl;
-
-  for (unsigned int i=0; i<max_n_eigenvalues; ++i)
-    AssertThrow ( std::fabs(eigenvalues_ScaLapack[i]-eigenvalues_Lapack[i]) < std::fabs(eigenvalues_Lapack[i])*1e-10, dealii::ExcInternalError());
+    AssertThrow ( std::abs(eigenvalues_ScaLapack[n_eigenvalues-i-1]-eigenvalues_Lapack[n_eigenvalues-i-1]) / std::abs(eigenvalues_Lapack[n_eigenvalues-i-1]) < tol, dealii::ExcInternalError());
+  pcout << "   with respect to the given tolerance the eigenvalues coincide" << std::endl;
 
   FullMatrix<NumberType> s_eigenvectors (size,size);
   for (int i=0; i<size; ++i)
     for (int j=0; j<size; ++j)
       s_eigenvectors(i,j) = lapack_A[i*size+j];
 
+  std::vector<Vector<NumberType>> s_eigenvectors_ (max_n_eigenvalues,Vector<NumberType>(size));
+  for (int i=0; i<max_n_eigenvalues; ++i)
+    for (int j=0; j<size; ++j)
+      s_eigenvectors_[i][j] = lapack_A[i*size+j];
+
+  std::vector<Vector<NumberType>> p_eigenvectors_ (max_n_eigenvalues,Vector<NumberType>(size));
+  for (unsigned int i=0; i<max_n_eigenvalues; ++i)
+    for (unsigned int j=0; j<size; ++j)
+      p_eigenvectors_[i][j] = p_eigenvectors(j,i);
+
+
   //product of eigenvectors computed using Lapack and ScaLapack has to be either 1 or -1
-  for (unsigned int i=0; i<size; ++i)
+  for (unsigned int i=0; i<max_n_eigenvalues; ++i)
     {
-      Vector<double> p_ev(size), s_ev(size);
-      for (unsigned int j=0; j<size; ++j)
-        {
-          p_ev[j] = p_eigenvectors(j,i);
-          s_ev[j] = s_eigenvectors(i,j);
-        }
-      double product = p_ev * s_ev;
-      AssertThrow (std::fabs(std::fabs(product)-1) < 1e-6, dealii::ExcInternalError());
+      NumberType product = p_eigenvectors_[i] * s_eigenvectors_[i];
+
+      //the requirement for alignment of the eigenvectors has to be released (primarily for floats)
+      AssertThrow (std::abs(std::abs(product)-1) < tol*10, dealii::ExcInternalError());
     }
+  pcout << "   with respect to the given tolerance also the eigenvectors coincide" << std::endl << std::endl;
 }
 
 
@@ -136,8 +130,16 @@ int main (int argc,char **argv)
   const std::vector<unsigned int> sizes = {{32,64,120,320,640}};
   const std::vector<unsigned int> blocks = {{32,64}};
 
+  const double tol_double = 1e-10;
+  const float tol_float = 1e-5;
+
   for (const auto &s : sizes)
     for (const auto &b : blocks)
       if (b <= s)
-        test<double>(s,b);
+        test<float>(s,b,tol_float);
+
+  for (const auto &s : sizes)
+    for (const auto &b : blocks)
+      if (b <= s)
+        test<double>(s,b,tol_double);
 }

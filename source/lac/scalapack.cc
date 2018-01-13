@@ -206,6 +206,85 @@ ScaLAPACKMatrix<NumberType>::copy_to (FullMatrix<NumberType> &matrix) const
 
 
 template <typename NumberType>
+void
+ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
+{
+  Assert (n_rows == dest.n_rows, ExcDimensionMismatch(n_rows, dest.n_rows));
+  Assert (n_columns == dest.n_columns, ExcDimensionMismatch(n_columns, dest.n_columns));
+
+  if (this->grid->mpi_process_is_active)
+    AssertThrow (this->descriptor[0]==1,ExcMessage("Copying of ScaLAPACK matrices only implemented for dense matrices"));
+  if (dest.grid->mpi_process_is_active)
+    AssertThrow (dest.descriptor[0]==1,ExcMessage("Copying of ScaLAPACK matrices only implemented for dense matrices"));
+
+  /*
+   * just in case of different process grids or block-cyclic distributions
+   * inter-process communication is necessary
+   * if distributed matrices have the same process grid and block sizes, local copying is enough
+   */
+  if ( (this->grid != dest.grid) || (row_block_size != dest.row_block_size) || (column_block_size != dest.column_block_size) )
+    {
+      /*
+       * get the MPI communicator, which is the union of the source and destination MPI communicator
+       */
+      int ierr = 0;
+      MPI_Group group_source, group_dest, group_union;
+      ierr = MPI_Comm_group(this->grid->mpi_communicator, &group_source);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Comm_group(dest.grid->mpi_communicator, &group_dest);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Group_union(group_source, group_dest, &group_union);
+      AssertThrowMPI(ierr);
+      MPI_Comm mpi_communicator_union;
+      // to create a communicator representing the union of the source and destination MPI communicator
+      // we need a communicator containing all  desired processes --> use MPI_COMM_WORLD
+      ierr = MPI_Comm_create_group(MPI_COMM_WORLD, group_union, 5, &mpi_communicator_union);
+      AssertThrowMPI(ierr);
+
+      /*
+       * The routine pgemr2d requires a BLACS context resembling at least the union of process grids
+       * described by the BLACS contexts of the source and destination matrix
+       */
+      int union_blacs_context = Csys2blacs_handle(mpi_communicator_union);
+      const char *order = "Col";
+      int union_n_process_rows = Utilities::MPI::n_mpi_processes(mpi_communicator_union);
+      int union_n_process_columns = 1;
+      Cblacs_gridinit(&union_blacs_context, order, union_n_process_rows, union_n_process_columns);
+
+      const NumberType *loc_vals_source = NULL;
+      NumberType *loc_vals_dest = NULL;
+
+      if (this->grid->mpi_process_is_active && (this->values.size()>0))
+        {
+          AssertThrow(this->values.size()>0,dealii::ExcMessage("source: process is active but local matrix empty"));
+          loc_vals_source = &this->values[0];
+        }
+      if (dest.grid->mpi_process_is_active && (dest.values.size()>0))
+        {
+          AssertThrow(dest.values.size()>0,dealii::ExcMessage("destination: process is active but local matrix empty"));
+          loc_vals_dest = &dest.values[0];
+        }
+      pgemr2d(&n_rows, &n_columns, loc_vals_source, &submatrix_row, &submatrix_column, descriptor,
+              loc_vals_dest, &dest.submatrix_row, &dest.submatrix_column, dest.descriptor,
+              &union_blacs_context);
+
+      Cblacs_gridexit(union_blacs_context);
+
+      if (mpi_communicator_union != MPI_COMM_NULL)
+        MPI_Comm_free(&mpi_communicator_union);
+      MPI_Group_free(&group_source);
+      MPI_Group_free(&group_dest);
+      MPI_Group_free(&group_union);
+    }
+  else
+    //process is active in the process grid
+    if (this->grid->mpi_process_is_active)
+      dest.values = this->values;
+}
+
+
+
+template <typename NumberType>
 void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
 {
   Assert (n_columns == n_rows,
@@ -215,8 +294,9 @@ void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
     {
       int info = 0;
       NumberType *A_loc = &this->values[0];
-      pdpotrf_(&uplo,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,&info);
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpotrf", info));
+      //pdpotrf_(&uplo,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,&info);
+      ppotrf(&uplo,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("ppotrf", info));
     }
   property = (uplo=='L' ? LAPACKSupport::lower_triangular : LAPACKSupport::upper_triangular);
   state = LAPACKSupport::cholesky;
@@ -234,8 +314,8 @@ void ScaLAPACKMatrix<NumberType>::invert()
     {
       int info = 0;
       NumberType *A_loc = &this->values[0];
-      pdpotri_ (&uplo,&n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,&info);
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpotri", info));
+      ppotri (&uplo,&n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("ppotri", info));
     }
   state = LAPACKSupport::inverse_matrix;
 }
@@ -268,16 +348,16 @@ std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric()
       NumberType *Z_loc = &Z.values[0];
       work.resize(1);
 
-      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-              Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
+      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+            Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
 
       lwork=work[0];
       work.resize (lwork);
 
-      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-              Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
+      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+            Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
 
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdsyev", info));
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyev", info));
     }
   /*
    * send the eigenvalues to processors not being part of the process grid
@@ -326,16 +406,16 @@ std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric()
       NumberType *eigenvectors_loc = &eigenvectors.values[0];
       work.resize(1);
 
-      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-              eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
+      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+            eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
 
       lwork=work[0];
       work.resize (lwork);
 
-      pdsyev_(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-              eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
+      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+            eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
 
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdsyev", info));
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyev", info));
 
       // copy eigenvectors to original matrix
       // as the temporary matrix eigenvectors has identical dimensions and
@@ -374,8 +454,8 @@ NumberType ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(const Number
       iwork.resize(liwork);
       int info = 0;
       const NumberType *A_loc = &this->values[0];
-      pdpocon_(&uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,
-               &a_norm, &rcond, &work[0], &lwork, &iwork[0], &liwork, &info);
+      ppocon(&uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,
+             &a_norm, &rcond, &work[0], &lwork, &iwork[0], &liwork, &info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpocon", info));
     }
   grid->send_to_inactive(&rcond);
@@ -442,7 +522,7 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
                         2*Nq0+Np0+ldw;
       work.resize(lwork);
       const NumberType *A_loc = &this->values[0];
-      res = pdlansy_(&type, &uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, &work[0]);
+      res = plansy(&type, &uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, &work[0]);
     }
   grid->send_to_inactive(&res);
   return res;
@@ -450,6 +530,7 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
 
 // instantiations
 template class ScaLAPACKMatrix<double>;
+template class ScaLAPACKMatrix<float>;
 
 
 DEAL_II_NAMESPACE_CLOSE

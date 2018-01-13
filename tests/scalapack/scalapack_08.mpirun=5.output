@@ -1,0 +1,72 @@
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=2x2
+1D grid matrix: 500x500;  blocks=16x16;  grid=5x1
+single process matrix: 500x500;  blocks=16x16;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=2x2
+1D grid matrix: 500x500;  blocks=32x32;  grid=5x1
+single process matrix: 500x500;  blocks=16x32;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=2x2
+1D grid matrix: 500x500;  blocks=64x64;  grid=5x1
+single process matrix: 500x500;  blocks=16x64;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=2x2
+1D grid matrix: 500x500;  blocks=16x16;  grid=5x1
+single process matrix: 500x500;  blocks=32x16;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=2x2
+1D grid matrix: 500x500;  blocks=32x32;  grid=5x1
+single process matrix: 500x500;  blocks=32x32;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=2x2
+1D grid matrix: 500x500;  blocks=64x64;  grid=5x1
+single process matrix: 500x500;  blocks=32x64;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=2x2
+1D grid matrix: 500x500;  blocks=16x16;  grid=5x1
+single process matrix: 500x500;  blocks=64x16;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=2x2
+1D grid matrix: 500x500;  blocks=32x32;  grid=5x1
+single process matrix: 500x500;  blocks=64x32;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=2x2
+1D grid matrix: 500x500;  blocks=64x64;  grid=5x1
+single process matrix: 500x500;  blocks=64x64;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=2x2
+1D grid matrix: 500x500;  blocks=16x16;  grid=5x1
+single process matrix: 500x500;  blocks=16x16;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=2x2
+1D grid matrix: 500x500;  blocks=32x32;  grid=5x1
+single process matrix: 500x500;  blocks=16x32;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=2x2
+1D grid matrix: 500x500;  blocks=64x64;  grid=5x1
+single process matrix: 500x500;  blocks=16x64;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=2x2
+1D grid matrix: 500x500;  blocks=16x16;  grid=5x1
+single process matrix: 500x500;  blocks=32x16;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=2x2
+1D grid matrix: 500x500;  blocks=32x32;  grid=5x1
+single process matrix: 500x500;  blocks=32x32;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=2x2
+1D grid matrix: 500x500;  blocks=64x64;  grid=5x1
+single process matrix: 500x500;  blocks=32x64;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=2x2
+1D grid matrix: 500x500;  blocks=16x16;  grid=5x1
+single process matrix: 500x500;  blocks=64x16;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=2x2
+1D grid matrix: 500x500;  blocks=32x32;  grid=5x1
+single process matrix: 500x500;  blocks=64x32;  grid=1x1
+
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=2x2
+1D grid matrix: 500x500;  blocks=64x64;  grid=5x1
+single process matrix: 500x500;  blocks=64x64;  grid=1x1
+

@@ -52,14 +52,14 @@ void test(const unsigned int size, const unsigned int block_size)
   create_spd (full_A);
   inv_A.invert(full_A);
 
-  const double l1 = full_A.l1_norm();
-  const double inv_l1 = inv_A.l1_norm();
+  const NumberType l1 = full_A.l1_norm();
+  const NumberType inv_l1 = inv_A.l1_norm();
 
   // Scalapack:
   scalapack_A = full_A;
-  const double scalapack_l1 = scalapack_A.l1_norm();
+  const NumberType scalapack_l1 = scalapack_A.l1_norm();
   scalapack_A.compute_cholesky_factorization();
-  const double rcond = scalapack_A.reciprocal_condition_number(scalapack_l1);
+  const NumberType rcond = scalapack_A.reciprocal_condition_number(scalapack_l1);
 
 
   pcout << 1./(l1*inv_l1) << " " << rcond << std::endl;
@@ -77,6 +77,11 @@ int main (int argc,char **argv)
   for (const auto &s : sizes)
     for (const auto &b : blocks)
       if (b <= s)
-        test<double>(s,b);
+        test<float>(s,b);
 
+
+  for (const auto &s : sizes)
+    for (const auto &b : blocks)
+      if (b <= s)
+        test<double>(s,b);
 }
