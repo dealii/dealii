@@ -35,10 +35,7 @@
 #include <vector>
 #include <string>
 
-#define PRECISION 5
 
-
-std::ofstream logfile ("output");
 
 template<int dim>
 void
@@ -82,9 +79,8 @@ test (const unsigned int degree)
 int
 main()
 {
-  deallog << std::setprecision(PRECISION);
+  initlog();
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   for (unsigned int i=1; i<4; ++i)
     {
