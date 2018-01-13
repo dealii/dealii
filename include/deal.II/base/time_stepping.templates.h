@@ -55,7 +55,7 @@ namespace TimeStepping
   template <typename VectorType>
   ExplicitRungeKutta<VectorType>::ExplicitRungeKutta(const runge_kutta_method method)
   {
-    initialize(method);
+    ExplicitRungeKutta<VectorType>::initialize(method);
   }
 
 
@@ -211,7 +211,7 @@ namespace TimeStepping
     max_it(max_it),
     tolerance(tolerance)
   {
-    initialize(method);
+    ImplicitRungeKutta<VectorType>::initialize(method);
   }
 
 
@@ -417,7 +417,7 @@ namespace TimeStepping
     last_same_as_first(false),
     last_stage(nullptr)
   {
-    initialize(method);
+    EmbeddedExplicitRungeKutta<VectorType>::initialize(method);
   }
 
 

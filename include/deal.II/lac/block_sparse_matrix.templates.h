@@ -27,7 +27,7 @@ template <typename number>
 BlockSparseMatrix<number>::
 BlockSparseMatrix (const BlockSparsityPattern &sparsity)
 {
-  reinit (sparsity);
+  BlockSparseMatrix<number>::reinit (sparsity);
 }
 
 

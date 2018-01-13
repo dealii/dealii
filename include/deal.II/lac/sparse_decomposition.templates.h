@@ -40,7 +40,7 @@ SparseLUDecomposition<number>::SparseLUDecomposition()
 template <typename number>
 SparseLUDecomposition<number>::~SparseLUDecomposition()
 {
-  clear();
+  SparseLUDecomposition<number>::clear();
 }
 
 

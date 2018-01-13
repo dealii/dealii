@@ -36,7 +36,7 @@ SparseMIC<number>::SparseMIC ()
 template <typename number>
 SparseMIC<number>::~SparseMIC()
 {
-  clear();
+  SparseMIC<number>::clear();
 }
 
 

@@ -673,7 +673,7 @@ namespace LinearAlgebra
     :
     val(nullptr)
   {
-    reinit(0, true);
+    ReadWriteVector<Number>::reinit(0, true);
   }
 
 
@@ -696,7 +696,7 @@ namespace LinearAlgebra
     :
     val(nullptr)
   {
-    reinit (size, false);
+    ReadWriteVector<Number>::reinit (size, false);
   }
 
 
@@ -707,7 +707,7 @@ namespace LinearAlgebra
     :
     val(nullptr)
   {
-    reinit (locally_stored_indices);
+    ReadWriteVector<Number>::reinit (locally_stored_indices);
   }
 
 

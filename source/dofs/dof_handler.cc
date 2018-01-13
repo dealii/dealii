@@ -683,7 +683,7 @@ template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::~DoFHandler ()
 {
   // release allocated memory
-  clear ();
+  DoFHandler<dim, spacedim>::clear ();
 
   // also release the policy. this needs to happen before the
   // current object disappears because the policy objects

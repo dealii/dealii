@@ -37,7 +37,7 @@ namespace LinearAlgebra
                                                const IndexSet &read_write_vector_index_set,
                                                const MPI_Comm &communicator)
     {
-      reinit(vector_space_vector_index_set, read_write_vector_index_set, communicator);
+      CommunicationPattern::reinit(vector_space_vector_index_set, read_write_vector_index_set, communicator);
     }
 
 

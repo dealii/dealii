@@ -897,7 +897,7 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::DataOut_DoFData ()
 template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
 DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::~DataOut_DoFData ()
 {
-  clear ();
+  DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::clear ();
 }
 
 

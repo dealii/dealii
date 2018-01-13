@@ -1304,7 +1304,7 @@ namespace parallel
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::~Triangulation ()
     {
-      clear ();
+      Triangulation<dim, spacedim>::clear ();
 
       Assert (triangulation_has_content == false,
               ExcInternalError());

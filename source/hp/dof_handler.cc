@@ -1009,7 +1009,7 @@ namespace hp
     tria_listeners.clear ();
 
     // ...and release allocated memory
-    clear ();
+    DoFHandler<dim, spacedim>::clear ();
   }
 
 

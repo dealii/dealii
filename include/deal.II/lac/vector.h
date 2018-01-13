@@ -978,7 +978,7 @@ Vector<Number>::Vector ()
   max_vec_size(0),
   values(nullptr, &free)
 {
-  reinit(0);
+  Vector<Number>::reinit(0);
 }
 
 
@@ -1007,7 +1007,7 @@ Vector<Number>::Vector (const size_type n)
   max_vec_size(0),
   values(nullptr, &free)
 {
-  reinit (n, false);
+  Vector<Number>::reinit (n, false);
 }
 
 

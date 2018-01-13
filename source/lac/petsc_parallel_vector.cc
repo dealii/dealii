@@ -31,7 +31,7 @@ namespace PETScWrappers
     Vector::Vector ()
       : communicator (MPI_COMM_SELF)
     {
-      create_vector(0, 0);
+      Vector::create_vector(0, 0);
     }
 
 

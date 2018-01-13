@@ -126,7 +126,7 @@ SparseMatrix<number>::SparseMatrix (const SparsityPattern &c)
   val(nullptr),
   max_len(0)
 {
-  reinit (c);
+  SparseMatrix<number>::reinit (c);
 }
 
 
@@ -143,7 +143,7 @@ SparseMatrix<number>::SparseMatrix (const SparsityPattern &c,
   Assert (c.n_rows() == id.m(), ExcDimensionMismatch (c.n_rows(), id.m()));
   Assert (c.n_cols() == id.n(), ExcDimensionMismatch (c.n_cols(), id.n()));
 
-  reinit (c);
+  SparseMatrix<number>::reinit (c);
   for (size_type i=0; i<n(); ++i)
     this->set(i,i,1.);
 }
