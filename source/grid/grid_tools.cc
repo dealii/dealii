@@ -2279,7 +2279,7 @@ next_cell:
         }
 
     // Creating a Bounding Box for all cells on the chosen refinement_level
-    for (typename MeshType::cell_iterator cell: mesh.cell_iterators_on_level(refinement_level))
+    for (const typename MeshType::cell_iterator &cell: mesh.cell_iterators_on_level(refinement_level))
       {
         bool has_predicate = false;
         BoundingBox < spacedim > bbox;
