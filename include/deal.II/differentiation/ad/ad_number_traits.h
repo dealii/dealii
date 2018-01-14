@@ -621,7 +621,7 @@ namespace Differentiation
         value (const F &f,
                typename std::enable_if<
                !is_ad_number<F>::value
-               >::type * = 0)
+               >::type * = nullptr)
         -> decltype (dealii::internal::NumberType<T>::value(f))
         {
           // We call the other function defined in the numbers
