@@ -541,7 +541,11 @@ namespace PETScWrappers
           AssertThrow (ierr == 0, ExcPETScError(ierr));
           if (transpose_left)
             {
+#if DEAL_II_PETSC_VERSION_LT(3,8,0)
               ierr = MatTranspose(tmp, MAT_REUSE_MATRIX, &tmp);
+#else
+              ierr = MatTranspose(tmp, MAT_INPLACE_MATRIX, &tmp);
+#endif
               AssertThrow (ierr == 0, ExcPETScError(ierr));
             }
           ierr = MatDiagonalScale (tmp, nullptr, V);

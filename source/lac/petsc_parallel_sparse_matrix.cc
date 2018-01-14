@@ -707,6 +707,28 @@ namespace PETScWrappers
       return indices;
     }
 
+    void
+    SparseMatrix::mmult (SparseMatrix       &C,
+                         const SparseMatrix &B,
+                         const MPI::Vector  &V) const
+    {
+      // Simply forward to the protected member function of the base class
+      // that takes abstract matrix and vector arguments (to which the compiler
+      // automatically casts the arguments).
+      MatrixBase::mmult (C, B, V);
+    }
+
+    void
+    SparseMatrix::Tmmult (SparseMatrix       &C,
+                          const SparseMatrix &B,
+                          const MPI::Vector  &V) const
+    {
+      // Simply forward to the protected member function of the base class
+      // that takes abstract matrix and vector arguments (to which the compiler
+      // automatically casts the arguments).
+      MatrixBase::Tmmult (C, B, V);
+    }
+
   }
 }
 

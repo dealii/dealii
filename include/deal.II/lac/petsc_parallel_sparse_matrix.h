@@ -408,6 +408,26 @@ namespace PETScWrappers
        */
       IndexSet locally_owned_range_indices() const;
 
+      /**
+       * Perform the matrix-matrix multiplication $C = AB$, or,
+       * $C = A \text{diag}(V) B$ given a compatible vector $V$.
+       *
+       * This function calls MatrixBase::mmult() to do the actual work.
+       */
+      void mmult (SparseMatrix       &C,
+                  const SparseMatrix &B,
+                  const MPI::Vector  &V = MPI::Vector()) const;
+
+      /**
+       * Perform the matrix-matrix multiplication with the transpose of
+       * <tt>this</tt>, i.e., $C = A^T B$, or,
+       * $C = A^T \text{diag}(V) B$ given a compatible vector $V$.
+       *
+       * This function calls MatrixBase::Tmmult() to do the actual work.
+       */
+      void Tmmult (SparseMatrix       &C,
+                   const SparseMatrix &B,
+                   const MPI::Vector       &V = MPI::Vector()) const;
     private:
 
       /**
