@@ -1315,7 +1315,7 @@ FullMatrix<number>::invert (const FullMatrix<number2> &M)
     {
       // avoid overwriting source
       // by destination matrix:
-      FullMatrix<number2> M2 = M;
+      const FullMatrix<number2> M2 = M;
       invert(M2);
     }
   else
@@ -1486,7 +1486,7 @@ FullMatrix<number>::cholesky (const FullMatrix<number2> &A)
     {
       // avoid overwriting source
       // by destination matrix:
-      FullMatrix<number2> A2 = A;
+      const FullMatrix<number2> A2 = A;
       cholesky(A2);
     }
   else

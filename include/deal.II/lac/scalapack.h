@@ -117,7 +117,7 @@ public:
    */
   ScaLAPACKMatrix(const size_type n_rows,
                   const size_type n_columns,
-                  const std::shared_ptr<const Utilities::MPI::ProcessGrid> process_grid,
+                  const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
                   const size_type row_block_size = 32,
                   const size_type column_block_size = 32,
                   const LAPACKSupport::Property property = LAPACKSupport::Property::general);
