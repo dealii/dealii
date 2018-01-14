@@ -31,6 +31,9 @@ namespace PETScWrappers
     Vector::Vector ()
       : communicator (MPI_COMM_SELF)
     {
+      // virtual functions called in constructors and destructors never use the
+      // override in a derived class
+      // for clarity be explicit on which function is called
       Vector::create_vector(0, 0);
     }
 

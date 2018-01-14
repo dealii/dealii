@@ -37,6 +37,9 @@ namespace LinearAlgebra
                                                const IndexSet &read_write_vector_index_set,
                                                const MPI_Comm &communicator)
     {
+      // virtual functions called in constructors and destructors never use the
+      // override in a derived class
+      // for clarity be explicit on which function is called
       CommunicationPattern::reinit(vector_space_vector_index_set, read_write_vector_index_set, communicator);
     }
 

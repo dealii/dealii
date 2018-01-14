@@ -897,6 +897,9 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::DataOut_DoFData ()
 template <typename DoFHandlerType, int patch_dim, int patch_space_dim>
 DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::~DataOut_DoFData ()
 {
+  // virtual functions called in constructors and destructors never use the
+  // override in a derived class
+  // for clarity be explicit on which function is called
   DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::clear ();
 }
 
