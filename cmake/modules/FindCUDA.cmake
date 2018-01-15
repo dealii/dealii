@@ -43,7 +43,7 @@ IF(CUDA_FOUND)
   MESSAGE(STATUS "Configured to use CUDA installation at ${CUDA_TOOLKIT_ROOT_DIR}")
 ENDIF()
 
-SET(_cuda_libraries ${CUDA_LIBRARIES})
+SET(_cuda_libraries ${CUDA_LIBRARIES} ${CUDA_cusparse_LIBRARY})
 SET(_cuda_include_dirs ${CUDA_INCLUDE_DIRS})
 DEAL_II_PACKAGE_HANDLE(CUDA
   LIBRARIES REQUIRED _cuda_libraries
@@ -58,7 +58,6 @@ DEAL_II_PACKAGE_HANDLE(CUDA
     CUDA_cupti_LIBRARY
     CUDA_curand_LIBRARY
     CUDA_cusolver_LIBRARY
-    CUDA_cusparse_LIBRARY
     CUDA_HOST_COMPILER
     CUDA_nppc_LIBRARY
     CUDA_nppi_LIBRARY
