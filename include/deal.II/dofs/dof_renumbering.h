@@ -29,7 +29,11 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Implementation of a number of renumbering algorithms for the degrees of
- * freedom on a triangulation.
+ * freedom on a triangulation. The functions in this namespace compute
+ * new indices for each degree of freedom of a DoFHandler or
+ * hp::DoFHandler object, and then call DoFHandler::renumber_dofs() or
+ * hp::DoFHandler::renumber_dofs().
+ *
  *
  * <h3>Cuthill-McKee like algorithms</h3>
  *
