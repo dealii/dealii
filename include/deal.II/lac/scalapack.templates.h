@@ -410,14 +410,14 @@ extern "C"
                   int const &ja,
                   int *desca,
                   double *work);
-  double pslange_(char const *norm,
-                  int const &m,
-                  int const &n,
-                  float *A,
-                  int const &ia,
-                  int const &ja,
-                  int *desca,
-                  float *work);
+  float pslange_(char const *norm,
+                 int const &m,
+                 int const &n,
+                 float *A,
+                 int const &ia,
+                 int const &ja,
+                 int *desca,
+                 float *work);
 
   /**
    * Compute the process coordinate which possesses the entry of a
