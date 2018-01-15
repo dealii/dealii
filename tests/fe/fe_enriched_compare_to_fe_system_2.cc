@@ -215,10 +215,12 @@ void test(const FiniteElement<dim> &fe_base,
   p2[0] = 10.0;
   p3[0] = 5.0;
   EnrichmentFunction<dim> fun1(p1), fun2(p2),fun3(p3);
-  std::vector<const FiniteElement<dim> *> fe_enrichements(2);
+  std::vector<const FiniteElement<dim> *> fe_enrichements(3);
   fe_enrichements[0] = &fe_en1;
   fe_enrichements[1] = &fe_en2;
-  std::vector<std::vector<std::function<const Function<dim> *(const typename Triangulation<dim, dim>::cell_iterator &) > > > functions(2);
+  FE_Nothing<dim> fe_nothing(1,true);
+  fe_enrichements[2] = &fe_nothing; //should be ignored
+  std::vector<std::vector<std::function<const Function<dim> *(const typename Triangulation<dim, dim>::cell_iterator &) > > > functions(3);
   functions[0].resize(1);
   functions[0][0] = [&](const typename Triangulation<dim, dim>::cell_iterator &)
   {
@@ -232,6 +234,12 @@ void test(const FiniteElement<dim> &fe_base,
   functions[1][1] = [&](const typename Triangulation<dim, dim>::cell_iterator &)
   {
     return &fun3;
+  };
+  functions[2].resize(1);
+  functions[2][0] = [&](const typename Triangulation<dim, dim>::cell_iterator &)
+  {
+    AssertThrow(false, ExcMessage("Called enrichment function for FE_Nothing"));
+    return nullptr;
   };
 
   FE_Enriched<dim> fe_enriched(&fe_base,
