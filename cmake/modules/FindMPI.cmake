@@ -38,34 +38,12 @@ IF(MPI_CXX_FOUND)
 ENDIF()
 
 #
-# If CMAKE_CXX_COMPILER is already an MPI wrapper, use it to determine
-# the mpi implementation. If MPI_CXX_COMPILER is defined use the value
-# directly.
-#
-SET_IF_EMPTY(MPI_CXX_COMPILER ${CMAKE_CXX_COMPILER})
-IF(CMAKE_C_COMPILER_WORKS)
-  SET_IF_EMPTY(MPI_C_COMPILER ${CMAKE_C_COMPILER}) # for good measure
-ELSE()
-  MESSAGE(STATUS
-    "No suitable C compiler was found! MPI C interface can not be "
-    "autodetected"
-    )
-ENDIF()
-IF(CMAKE_Fortran_COMPILER_WORKS)
-  SET_IF_EMPTY(MPI_Fortran_COMPILER ${CMAKE_Fortran_COMPILER}) # for good measure
-ELSE()
-  MESSAGE(STATUS
-    "No suitable Fortran compiler was found! MPI Fortran interface can "
-    "not be autodetected"
-    )
-ENDIF()
-
-#
 # Call the system FindMPI.cmake module:
 #
 
-# in case MPIEXEC is specified first call find_program() so that in case of success 
-# its subsequent runs inside FIND_PACKAGE(MPI) do not alter the desired result.
+# in case MPIEXEC is specified first call find_program() so that in case of
+# success its subsequent runs inside FIND_PACKAGE(MPI) do not alter the
+# desired result.
 IF(DEFINED ENV{MPIEXEC})
   FIND_PROGRAM(MPIEXEC $ENV{MPIEXEC})
 ENDIF()
@@ -73,27 +51,6 @@ ENDIF()
 # temporarily disable ${CMAKE_SOURCE_DIR}/cmake/modules for module lookup
 LIST(REMOVE_ITEM CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 FIND_PACKAGE(MPI)
-
-IF(NOT MPI_CXX_FOUND AND DEAL_II_WITH_MPI)
-  #
-  # CMAKE_CXX_COMPILER is apparently not an mpi wrapper.
-  # So, let's be a bit more aggressive in finding MPI (and if
-  # DEAL_II_WITH_MPI is set).
-  #
-  MESSAGE(STATUS
-    "MPI not found but DEAL_II_WITH_MPI is set to TRUE."
-    " Try again with more aggressive search paths:"
-    )
-  # Clear variables so that FIND_PACKAGE runs again:
-  SET(MPI_FOUND)
-  SET(MPI_CXX_COMPILER)
-  SET(MPI_C_COMPILER)
-  SET(MPI_Fortran_COMPILER)
-  UNSET(MPI_CXX_COMPILER CACHE)
-  UNSET(MPI_C_COMPILER CACHE)
-  UNSET(MPI_Fortran_COMPILER CACHE)
-  FIND_PACKAGE(MPI)
-ENDIF()
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
@@ -173,14 +130,11 @@ ENDIF()
 
 DEAL_II_PACKAGE_HANDLE(MPI
   LIBRARIES
-    REQUIRED MPI_CXX_LIBRARIES
-    OPTIONAL MPI_Fortran_LIBRARIES MPI_C_LIBRARIES
+    OPTIONAL MPI_CXX_LIBRARIES MPI_Fortran_LIBRARIES MPI_C_LIBRARIES
   INCLUDE_DIRS
-    REQUIRED MPI_CXX_INCLUDE_PATH
-    OPTIONAL MPI_C_INCLUDE_PATH
+    OPTIONAL MPI_CXX_INCLUDE_PATH MPI_C_INCLUDE_PATH
   USER_INCLUDE_DIRS
-    REQUIRED MPI_CXX_INCLUDE_PATH
-    OPTIONAL MPI_C_INCLUDE_PATH
+    OPTIONAL MPI_CXX_INCLUDE_PATH MPI_C_INCLUDE_PATH
   CXX_FLAGS OPTIONAL MPI_CXX_COMPILE_FLAGS
   LINKER_FLAGS OPTIONAL MPI_CXX_LINK_FLAGS
   CLEAR

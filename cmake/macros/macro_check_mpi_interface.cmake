@@ -27,7 +27,7 @@ MACRO(CHECK_MPI_INTERFACE _feature _var)
     SET(_nope FALSE)
 
     FOREACH(_library ${${_feature}_LIBRARIES})
-      IF( _library MATCHES "/libmpi(|_cxx)\\.(a|so)[^/]*$")
+      IF( _library MATCHES "/libmpi\\.(a|so)[^/]*$")
 
         GET_FILENAME_COMPONENT(_file1 ${_library} REALPATH)
 

@@ -51,7 +51,14 @@ MACRO(DEAL_II_PACKAGE_HANDLE _feature _var)
     MESSAGE(STATUS "  ${_feature}_VERSION: ${${_feature}_VERSION}")
   ENDIF()
 
-  SET(${_feature}_FOUND TRUE)
+  #
+  # Respect a possible ${_feature}_FOUND variable that is set to a truth
+  # value. We need this for modern™ MPI detection where CMake's
+  # FindMPI.cmake might only set MPI_FOUND to true and nothing else.
+  #
+  IF(NOT DEFINED ${_feature}_FOUND)
+    SET(${_feature}_FOUND TRUE)
+  ENDIF()
 
   SET(_variable ${_var})
   SET(${_feature}_${_variable} "")

@@ -14,6 +14,13 @@
 ## ---------------------------------------------------------------------
 
 #
+# Never autodetect MPI support. This forces the user to explicitly enable
+# MPI support with -DWITH_MPI=ON (or -DDEAL_II_WITH_MPI=ON) on the command
+# line.
+#
+SET(DEAL_II_WITH_MPI OFF CACHE BOOL "")
+
+#
 # Configuration for mpi support:
 #
 
