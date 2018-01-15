@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/matrix_free/cuda_matrix_free.templates.cuh>
+#include <deal.II/matrix_free/cuda_matrix_free.templates.h>
 
 #ifdef DEAL_II_WITH_CUDA
 

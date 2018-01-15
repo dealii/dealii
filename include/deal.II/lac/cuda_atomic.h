@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_cuda_atomic_cuh
-#define dealii_cuda_atomic_cuh
+#ifndef dealii_cuda_atomic_h
+#define dealii_cuda_atomic_h
 
 #include <deal.II/base/config.h>
 

@@ -20,7 +20,7 @@
 
 #include "../tests.h"
 
-#include "matrix_vector_mf.cuh"
+#include "matrix_vector_mf.h"
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
