@@ -572,6 +572,54 @@ std::vector<NumberType> ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix
 
 
 template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
+                                                const bool transpose)
+{
+  Assert(grid==B.grid,ExcMessage("The matrices A and B need to have the same process grid"));
+  Assert (state == LAPACKSupport::matrix,
+          ExcMessage("Matrix has to be in Matrix state before calling this function."));
+  Assert (B.state == LAPACKSupport::matrix,
+          ExcMessage("Matrix B has to be in Matrix state before calling this function."));
+
+  transpose ?
+  (Assert(n_columns==B.n_rows,ExcDimensionMismatch(n_columns,B.n_rows))) :
+  (Assert(n_rows==B.n_rows,ExcDimensionMismatch(n_rows,B.n_rows)));
+
+  //see https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgels.htm
+  Assert(row_block_size==column_block_size,ExcMessage("Use identical block sizes for rows and columns of matrix A"));
+  Assert(B.row_block_size==B.column_block_size,ExcMessage("Use identical block sizes for rows and columns of matrix B"));
+  Assert(row_block_size==B.row_block_size,ExcMessage("Use identical block-cyclic distribution for matrices A and B"));
+
+  Threads::Mutex::ScopedLock lock (mutex);
+
+  if (grid->mpi_process_is_active)
+    {
+      char trans = transpose ? 'T' : 'N';
+      NumberType *A_loc = & this->values[0];
+      NumberType *B_loc = & B.values[0];
+      int info = 0;
+      /*
+       * by setting lwork to -1 a workspace query for optimal length of work is performed
+       */
+      int lwork=-1;
+      work.resize(1);
+
+      pgels(&trans,&n_rows,&n_columns,&B.n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,
+            B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,&work[0],&lwork,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgels", info));
+
+      lwork=work[0];
+      work.resize(lwork);
+
+      pgels(&trans,&n_rows,&n_columns,&B.n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,
+            B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,&work[0],&lwork,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgels", info));
+    }
+}
+
+
+
+template <typename NumberType>
 NumberType ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(const NumberType a_norm) const
 {
   Assert (state == LAPACKSupport::cholesky,

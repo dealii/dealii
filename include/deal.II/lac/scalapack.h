@@ -215,11 +215,49 @@ public:
   * have to be constructed with the same process grid and block cyclic distribution.
   * If right singular vectors are required matrices A and VT
   * have to be constructed with the same process grid  and block cyclic distribution.
-   */
+  */
   std::vector<NumberType> compute_SVD(ScaLAPACKMatrix<NumberType> &U,
                                       ScaLAPACKMatrix<NumberType> &VT,
                                       const bool left_singluar_vectors=false,
                                       const bool right_singluar_vectors=false);
+
+
+  /**
+  * Function solves overdetermined or underdetermined real linear
+  * systems involving an M-by-N matrix A, or its transpose, using a QR or LQ factorization of A.
+  *
+  * It is assumed that A has full rank: \f$rank(A) = \min(M,N)\f$.
+  * Upon exit the columns of B contain the solutions and
+  * the following options are supported:
+  * - 1. If transpose==false and \f$M \geq N\f$: least squares solution of overdetermined system
+  *      \f$\min \Vert B - A X\Vert\f$.
+  *
+  *      Upon exit the rows 0 to N-1 contain the least square solution vectors. The residual sum of squares
+  *      for each column is given by the sum of squares of elements N to M-1 in that column
+  *
+  * - 2. If transpose==false and \f$M < N\f$: find minimum norm solutions of underdetermined systems
+  *      \f$A X = B\f$.
+  *
+  *      Upon exit the columns of B contain the minimum norm solution vectors
+  *
+  * - 3. If transpose==true and and \f$M \geq N\f$: find minimum norm solutions of underdetermined system
+  *      \f$ A^\top X = B\f$
+  *
+  *      Upon exit the columns of B contain the minimum norm solution vectors
+  *
+  * - 4. If transpose==true and \f$M < N\f$: least squares solution of overdetermined system
+  *      \f$\min \Vert B - A^\top X\Vert\f$.
+  *
+  *      Upon exit the rows 0 to M-1 contain the least square solution vectors. The residual sum of squares
+  *      for each column is given by the sum of squares of elements M to N-1 in that column
+  * .
+  * If transpose==false B is M x NRHS matrix, otherwise it is NxNRHS.
+  * The matrices A and B must have an identical block cyclic distribution for rows and columns
+  */
+  void least_squares(ScaLAPACKMatrix<NumberType> &B,
+                     const bool transpose=false);
+
+
 
   /**
    * Estimate the the condition number of a SPD matrix in the $l_1$-norm.

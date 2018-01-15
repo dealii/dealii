@@ -647,6 +647,42 @@ extern "C"
                 float *work,
                 int *lwork,
                 int *info);
+
+  /*
+   * P_GELS solves overdetermined or underdetermined real linear
+   * systems involving an M-by-N matrix A, or its transpose,
+   * using a QR or LQ factorization of A.  It is assumed that A has full rank.
+   */
+  void pdgels_(const char *trans,
+               const int *m,
+               const int *n,
+               const int *nrhs,
+               double *A,
+               const int *ia,
+               const int *ja,
+               const int *desca,
+               double *B,
+               const int *ib,
+               const int *jb,
+               const int *descb,
+               double *work,
+               int *lwork,
+               int *info);
+  void psgels_(const char *trans,
+               const int *m,
+               const int *n,
+               const int *nrhs,
+               float *A,
+               const int *ia,
+               const int *ja,
+               const int *desca,
+               float *B,
+               const int *ib,
+               const int *jb,
+               const int *descb,
+               float *work,
+               int *lwork,
+               int *info);
 }
 
 
@@ -1392,6 +1428,65 @@ inline void pgesvd(const char *jobu,
                    int *info)
 {
   psgesvd_(jobu,jobvt,m,n,A,ia,ja,desca,S,U,iu,ju,descu,VT,ivt,jvt,descvt,work,lwork,info);
+}
+
+
+template <typename number>
+inline void pgels(const char *trans,
+                  const int *m,
+                  const int *n,
+                  const int *nrhs,
+                  number *A,
+                  const int *ia,
+                  const int *ja,
+                  const int *desca,
+                  number *B,
+                  const int *ib,
+                  const int *jb,
+                  const int *descb,
+                  number *work,
+                  int *lwork,
+                  int *info)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void pgels(const char *trans,
+                  const int *m,
+                  const int *n,
+                  const int *nrhs,
+                  double *A,
+                  const int *ia,
+                  const int *ja,
+                  const int *desca,
+                  double *B,
+                  const int *ib,
+                  const int *jb,
+                  const int *descb,
+                  double *work,
+                  int *lwork,
+                  int *info)
+{
+  pdgels_(trans,m,n,nrhs,A,ia,ja,desca,B,ib,jb,descb,work,lwork,info);
+}
+
+inline void pgels(const char *trans,
+                  const int *m,
+                  const int *n,
+                  const int *nrhs,
+                  float *A,
+                  const int *ia,
+                  const int *ja,
+                  const int *desca,
+                  float *B,
+                  const int *ib,
+                  const int *jb,
+                  const int *descb,
+                  float *work,
+                  int *lwork,
+                  int *info)
+{
+  psgels_(trans,m,n,nrhs,A,ia,ja,desca,B,ib,jb,descb,work,lwork,info);
 }
 
 #endif // DEAL_II_WITH_SCALAPACK
