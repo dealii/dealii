@@ -197,6 +197,30 @@ public:
                                                const std::pair<int,int> &index_limits = std::make_pair(-1,-1),
                                                const std::pair<NumberType,NumberType> &value_limits = std::make_pair(-1,-1));
 
+
+
+  /**
+  * Funcion to compute the singular value decomposition (SVD) of an
+  * M-by-N matrix A, optionally computing the left and/or right
+  * singular vectors. The SVD is written as A = U * SIGMA * transpose(V)
+  * where SIGMA is an M-by-N diagonal matrix, @p U is an M-by-M orthogonal matrix,
+  * and @p V is an N-by-N orthogonal matrix. The diagonal elements of SIGMA
+  * are the singular values of A and the columns of U and V are the
+  * corresponding left and right singular vectors, respectively. The
+  * singular values are returned in decreasing order and only the first min(M,N)
+  * columns of U and rows of VT = transpose(V) are computed.
+  * Upon return the content of the matrix is unusable.
+  * The matrix A must have identical block cyclic distribution for the rows and column
+  * If left singular vectors are required matrices A and U
+  * have to be constructed with the same process grid and block cyclic distribution.
+  * If right singular vectors are required matrices A and VT
+  * have to be constructed with the same process grid  and block cyclic distribution.
+   */
+  std::vector<NumberType> compute_SVD(ScaLAPACKMatrix<NumberType> &U,
+                                      ScaLAPACKMatrix<NumberType> &VT,
+                                      const bool left_singluar_vectors=false,
+                                      const bool right_singluar_vectors=false);
+
   /**
    * Estimate the the condition number of a SPD matrix in the $l_1$-norm.
    * The matrix has to be in the Cholesky state (see compute_cholesky_factorization()).

@@ -32,7 +32,7 @@ void create_spd (FullMatrix &A)
         if (i==j)
           // since A(i,j) < 1 and
           // a symmetric diagonally dominant matrix is SPD
-          A(i,j) = val + size + i*i/size;
+          A(i,j) = val + size;
         else
           {
             A(i,j) = val;

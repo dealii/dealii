@@ -328,9 +328,6 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
                                                   const std::pair<int,int> &eigenvalue_idx,
                                                   const std::pair<NumberType,NumberType> &eigenvalue_limits)
 {
-	//Assert(Utilities::MPI::n_mpi_processes(gird->mpi_communicator_inactive_with_root)<=1,
-	//		ExcMessage("For the computation of eigenpairs do not use a number of MPI processes that do not fit in a 2D process grid"));
-
   Assert (state == LAPACKSupport::matrix,
           ExcMessage("Matrix has to be in Matrix state before calling this function."));
   Assert (property == LAPACKSupport::symmetric,
@@ -347,6 +344,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
 
   //ScaLAPACKMatrix<NumberType> eigenvectors (n_rows, grid, row_block_size);
   eigenvectors->property = property;
+  // number of eigenvalues to be returned; upon successful exit ev contains the m seclected eigenvalues in ascending order
+  int m = n_rows;
   std::vector<NumberType> ev(n_rows);
 
   if (grid->mpi_process_is_active)
@@ -361,8 +360,6 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
       bool all_eigenpairs=true;
       NumberType vl,vu;
       int il,iu;
-      // number of eigenvalues to be returned; upon successful exit ev contains the m seclected eigenvalues in ascending order
-      int m = n_rows;
       // number of eigenvectors to be returned;
       // upon successful exit the first m=nz columns contain the selected eigenvectors (only if jobz=='V')
       int nz;
@@ -476,6 +473,16 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
         ev.pop_back();
     }
   /*
+   * send number of computed eigenvalues to inactive processes
+   */
+  grid->send_to_inactive(&m, 1);
+
+  /*
+   * inactive processes have to resize array of eigenvalues
+   */
+  if (! grid->mpi_process_is_active)
+    ev.resize (m);
+  /*
    * send the eigenvalues to processors not being part of the process grid
    */
   grid->send_to_inactive(ev.data(), ev.size());
@@ -488,6 +495,78 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
   state = LAPACKSupport::eigenvalues;
 
   return ev;
+}
+
+
+template <typename NumberType>
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> &U,
+    ScaLAPACKMatrix<NumberType> &VT,
+    const bool left_singluar_vectors,
+    const bool right_singluar_vectors)
+{
+  Assert (state == LAPACKSupport::matrix,
+          ExcMessage("Matrix has to be in Matrix state before calling this function."));
+  Assert(row_block_size==column_block_size,ExcDimensionMismatch(n_rows,U.n_rows));
+
+  if (left_singluar_vectors)
+    {
+      Assert(n_rows==U.n_rows,ExcDimensionMismatch(n_rows,U.n_rows));
+      Assert(U.n_rows==U.n_columns,ExcDimensionMismatch(U.n_rows,U.n_columns));
+      Assert(row_block_size==U.row_block_size,ExcDimensionMismatch(row_block_size,U.row_block_size));
+      Assert(column_block_size==U.column_block_size,ExcDimensionMismatch(column_block_size,U.column_block_size));
+      Assert(grid->blacs_context==U.grid->blacs_context,ExcDimensionMismatch(grid->blacs_context,U.grid->blacs_context));
+    }
+  if (right_singluar_vectors)
+    {
+      Assert(n_columns==VT.n_rows,ExcDimensionMismatch(n_columns,VT.n_rows));
+      Assert(VT.n_rows==VT.n_columns,ExcDimensionMismatch(VT.n_rows,VT.n_columns));
+      Assert(row_block_size==VT.row_block_size,ExcDimensionMismatch(row_block_size,VT.row_block_size));
+      Assert(column_block_size==VT.column_block_size,ExcDimensionMismatch(column_block_size,VT.column_block_size));
+      Assert(grid->blacs_context==VT.grid->blacs_context,ExcDimensionMismatch(grid->blacs_context,VT.grid->blacs_context));
+    }
+  Threads::Mutex::ScopedLock lock (mutex);
+
+  std::vector<NumberType> sv(std::min(n_rows,n_columns));
+
+  if (grid->mpi_process_is_active)
+    {
+      char jobu = left_singluar_vectors ? 'V' : 'N';
+      char jobvt = right_singluar_vectors ? 'V' : 'N';
+      NumberType *A_loc = &this->values[0];
+      NumberType *U_loc = left_singluar_vectors ? &(U.values[0]) : NULL;
+      NumberType *VT_loc = right_singluar_vectors ? &(VT.values[0]) : NULL;
+      int info = 0;
+      /*
+       * by setting lwork to -1 a workspace query for optimal length of work is performed
+       */
+      int lwork=-1;
+      work.resize(1);
+
+      pgesvd(&jobu,&jobvt,&n_rows,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,
+             & *sv.begin(),U_loc,&U.submatrix_row,&U.submatrix_column,U.descriptor,
+             VT_loc,&VT.submatrix_row,&VT.submatrix_column,VT.descriptor,
+             &work[0],&lwork,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgesvd", info));
+
+      lwork=work[0];
+      work.resize(lwork);
+
+      pgesvd(&jobu,&jobvt,&n_rows,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,
+             & *sv.begin(),U_loc,&U.submatrix_row,&U.submatrix_column,U.descriptor,
+             VT_loc,&VT.submatrix_row,&VT.submatrix_column,VT.descriptor,
+             &work[0],&lwork,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgesvd", info));
+    }
+
+  /*
+   * send the singular values to processors not being part of the process grid
+   */
+  grid->send_to_inactive(sv.data(), sv.size());
+
+  property = LAPACKSupport::Property::general;
+  state = LAPACKSupport::State::unusable;
+
+  return sv;
 }
 
 

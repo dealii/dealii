@@ -16,23 +16,28 @@
 #include "../tests.h"
 #include "../lapack/create_matrix.h"
 
-// test copying of distributed ScaLAPACKMatrices using ScaLAPACK routine  p_gemr2d
+// test compute_SVD(ScaLAPACKMatrix<NumberType>&,ScaLAPACKMatrix<NumberType>&,const bool,const bool)
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/process_grid.h>
 
-
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/lapack_full_matrix.h>
+#include <deal.II/lac/lapack_templates.h>
 #include <deal.II/lac/scalapack.h>
 
 #include <fstream>
 #include <iostream>
+#include <algorithm>
+#include <memory>
 
 
 template <typename NumberType>
-void test(const unsigned int block_size_i, const unsigned int block_size_j)
+void test(const unsigned int size, const unsigned int block_size, const NumberType tol)
 {
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
@@ -40,71 +45,72 @@ void test(const unsigned int block_size_i, const unsigned int block_size_j)
 
   ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
 
-  const unsigned int size = 500;
-  //create FullMatrix and fill it
-  FullMatrix<NumberType> full(size);
-  unsigned int count=0;
-  for (unsigned int i=0; i<size; ++i)
-    for (unsigned int j=0; j<size; ++j, ++count)
-      full(i,j) = count;
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid_2d = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
 
-  //create 2d process grid
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid_2d = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,size,size,block_size_i,block_size_i);
-  //create 1d process grid
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid_1d = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,n_mpi_processes,1);
-  //create process grid containing one process
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid_single = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,1,1);
+  pcout << size << " " << block_size << std::endl;
 
-  ScaLAPACKMatrix<NumberType> scalapack_matrix_2d (size, size, grid_2d, block_size_i, block_size_i);
-  ScaLAPACKMatrix<NumberType> scalapack_matrix_1d (size, size, grid_1d, block_size_j, block_size_j);
-  ScaLAPACKMatrix<NumberType> scalapack_matrix_single (size, size, grid_single, block_size_i, block_size_j);
-  ScaLAPACKMatrix<NumberType> scalapack_matrix_source (size, size, grid_single, block_size_j, block_size_i);
+  // Create s.p.d matrices of requested size:
+  FullMatrix<NumberType> full_A(size);
+  create_spd (full_A);
 
-  pcout << "2D grid matrix: dim=" << scalapack_matrix_2d.m() << "x" << scalapack_matrix_2d.n()
-        << ";  blocks=" << block_size_i << "x" << block_size_i
-        << ";  grid=" << grid_2d->get_process_grid_rows() << "x" << grid_2d->get_process_grid_columns() << std::endl;
+  //compute eigenpairs of s.p.d matrix
+  ScaLAPACKMatrix<NumberType> scalapack_A_ev (size, grid_2d, block_size);
+  scalapack_A_ev.set_property(LAPACKSupport::Property::symmetric);
+  scalapack_A_ev = full_A;
+  std::vector<NumberType> eigenvalues = scalapack_A_ev.eigenpairs_symmetric(true);
+  FullMatrix<NumberType> eigenvectors (size,size);
+  scalapack_A_ev.copy_to(eigenvectors);
 
-  pcout << "1D grid matrix: " << scalapack_matrix_1d.m() << "x" << scalapack_matrix_1d.n()
-        << ";  blocks=" << block_size_j << "x" << block_size_j
-        << ";  grid=" << grid_1d->get_process_grid_rows() << "x" << grid_1d->get_process_grid_columns() << std::endl;
+  //compute SVD of s.p.d matrix A = U * SIGMA * VT
+  ScaLAPACKMatrix<NumberType> scalapack_A_sv (size, grid_2d, block_size);
+  ScaLAPACKMatrix<NumberType> scalapack_U (size, grid_2d, block_size);
+  ScaLAPACKMatrix<NumberType> scalapack_VT (size, grid_2d, block_size);
+  scalapack_A_sv.set_property(LAPACKSupport::Property::symmetric);
+  scalapack_A_sv = full_A;
+  std::vector<NumberType> singular_values = scalapack_A_sv.compute_SVD(scalapack_U,scalapack_VT,true,true);
+  FullMatrix<NumberType> l_singular_vectors (size,size);
+  FullMatrix<NumberType> r_singular_vectors (size,size);
+  scalapack_U.copy_to(l_singular_vectors);
+  scalapack_VT.copy_to(r_singular_vectors);
 
-  pcout << "single process matrix: " << scalapack_matrix_single.m() << "x" << scalapack_matrix_single.n()
-        << ";  blocks=" << block_size_i << "x" << block_size_j
-        << ";  grid=" << grid_single->get_process_grid_rows() << "x" << grid_single->get_process_grid_columns() << std::endl << std::endl;
+  const unsigned int max_num_values=5;
+  pcout << "comparing the SVD and Eigendecomposition of a s.p.d matrix" << std::endl;
+  for (unsigned i=0; i<max_num_values; ++i)
+    AssertThrow(std::abs(eigenvalues[size-1-i]-singular_values[i])<tol,ExcMessage("singular and eigenvalues do not match"));
+  pcout << "   with respect to the given tolerance the singular and eigenvalues coincide" << std::endl;
 
-  scalapack_matrix_source = full;
-
-  scalapack_matrix_source.copy_to(scalapack_matrix_2d);
-  scalapack_matrix_source.copy_to(scalapack_matrix_1d);
-  scalapack_matrix_source.copy_to(scalapack_matrix_single);
-
-  FullMatrix<NumberType> test_2d(size), test_1d(size), test_one(size);
-  scalapack_matrix_2d.copy_to(test_2d);
-  scalapack_matrix_1d.copy_to(test_1d);
-  scalapack_matrix_single.copy_to(test_one);
-  test_2d.add (-1,full);
-  test_1d.add (-1,full);
-  test_one.add (-1,full);
-
-  AssertThrow(test_2d.frobenius_norm() < 1e-12,ExcInternalError());
-  AssertThrow(test_1d.frobenius_norm() < 1e-12,ExcInternalError());
-  AssertThrow(test_one.frobenius_norm() < 1e-12,ExcInternalError());
+  Vector<NumberType> eigenvector(size), l_singular_vector(size), r_singular_vector(size);
+  for (unsigned int i=0; i<max_num_values; ++i)
+    {
+      for (unsigned int j=0; j<size; ++j)
+        {
+          eigenvector[j] = eigenvectors(j,size-1-i);
+          l_singular_vector[j] = l_singular_vectors(j,i);
+          r_singular_vector[j] = r_singular_vectors(i,j);
+        }
+      NumberType product_1 = eigenvector*l_singular_vector;
+      NumberType product_2 = eigenvector*r_singular_vector;
+      //the tolerance is reduced for the singular vectors
+      AssertThrow((std::abs(product_1)-1)<tol*10,ExcMessage("left singular vectors and eigenvectors do not coincide"));
+      AssertThrow((std::abs(product_2)-1)<tol*10,ExcMessage("right singular vectors and eigenvectors do not coincide"));
+    }
+  pcout << "   with respect to the given tolerance the right and left singular vectors coincide with the eigenvectors" << std::endl;
+  pcout << std::endl;
 }
 
 
 
 int main (int argc,char **argv)
 {
+
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
-  const std::vector<unsigned int> blocks_i = {{16,32,64}};
-  const std::vector<unsigned int> blocks_j = {{16,32,64}};
+  const std::vector<unsigned int> sizes = {{200,400,600}};
+  const std::vector<unsigned int> blocks = {{32,64}};
+  const double tol_double = 1e-10;
 
-  for (const auto &s : blocks_i)
-    for (const auto &b : blocks_j)
-      test<float>(s,b);
-
-  for (const auto &s : blocks_i)
-    for (const auto &b : blocks_j)
-      test<double>(s,b);
+  for (const auto &s : sizes)
+    for (const auto &b : blocks)
+      if (b <= s)
+        test<double>(s,b,tol_double);
 }

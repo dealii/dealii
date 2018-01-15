@@ -600,7 +600,56 @@ extern "C"
                 int *iclustr,
                 float *gap,
                 int *info);
+
+  /*
+   * PDGESVD computes the singular value decomposition (SVD) of an
+   * M-by-N matrix A, optionally computing the left and/or right
+   * singular vectors
+   */
+  //FIXME
+  void pdgesvd_(const char *jobu,
+                const char *jobvt,
+                const int *m,
+                const int *n,
+                double *A,
+                const int *ia,
+                const int *ja,
+                const int *desca,
+                double *S,
+                double *U,
+                const int *iu,
+                const int *ju,
+                const int *descu,
+                double *VT,
+                const int *ivt,
+                const int *jvt,
+                const int *descvt,
+                double *work,
+                int *lwork,
+                int *info);
+  void psgesvd_(const char *jobu,
+                const char *jobvt,
+                const int *m,
+                const int *n,
+                float *A,
+                const int *ia,
+                const int *ja,
+                const int *desca,
+                float *S,
+                float *U,
+                const int *iu,
+                const int *ju,
+                const int *descu,
+                float *VT,
+                const int *ivt,
+                const int *jvt,
+                const int *descvt,
+                float *work,
+                int *lwork,
+                int *info);
 }
+
+
 
 /*
  * In the following we have template wrappers for the ScaLAPACK routines
@@ -1271,6 +1320,79 @@ inline void psyevx(const char *jobz,
   pssyevx_(jobz,range,uplo,n,A,ia,ja,desca,VL,VU,il,iu,abstol,m,nz,w,orfac,Z,iz,jz,descz,work,lwork,iwork,liwork,ifail,iclustr,gap,info);
 }
 
+
+template <typename number>
+inline void pgesvd(const char *jobu,
+                   const char *jobvt,
+                   const int *m,
+                   const int *n,
+                   number *A,
+                   const int *ia,
+                   const int *ja,
+                   const int *desca,
+                   number *S,
+                   number *U,
+                   const int *iu,
+                   const int *ju,
+                   const int *descu,
+                   number *VT,
+                   const int *ivt,
+                   const int *jvt,
+                   const int *descvt,
+                   number *work,
+                   int *lwork,
+                   int *info)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void pgesvd(const char *jobu,
+                   const char *jobvt,
+                   const int *m,
+                   const int *n,
+                   double *A,
+                   const int *ia,
+                   const int *ja,
+                   const int *desca,
+                   double *S,
+                   double *U,
+                   const int *iu,
+                   const int *ju,
+                   const int *descu,
+                   double *VT,
+                   const int *ivt,
+                   const int *jvt,
+                   const int *descvt,
+                   double *work,
+                   int *lwork,
+                   int *info)
+{
+  pdgesvd_(jobu,jobvt,m,n,A,ia,ja,desca,S,U,iu,ju,descu,VT,ivt,jvt,descvt,work,lwork,info);
+}
+
+inline void pgesvd(const char *jobu,
+                   const char *jobvt,
+                   const  int *m,
+                   const int *n,
+                   float *A,
+                   const int *ia,
+                   const int *ja,
+                   const int *desca,
+                   float *S,
+                   float *U,
+                   const int *iu,
+                   const int *ju,
+                   const int *descu,
+                   float *VT,
+                   const  int *ivt,
+                   const  int *jvt,
+                   const int *descvt,
+                   float *work,
+                   int *lwork,
+                   int *info)
+{
+  psgesvd_(jobu,jobvt,m,n,A,ia,ja,desca,S,U,iu,ju,descu,VT,ivt,jvt,descvt,work,lwork,info);
+}
 
 #endif // DEAL_II_WITH_SCALAPACK
 

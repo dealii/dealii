@@ -1,90 +1,72 @@
-32 32 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=1x1
+1D grid matrix: 500x500;  blocks=16x16;  grid=1x1
+single process matrix: 500x500;  blocks=16x16;  grid=1x1
 
-64 32 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=1x1
+1D grid matrix: 500x500;  blocks=32x32;  grid=1x1
+single process matrix: 500x500;  blocks=16x32;  grid=1x1
 
-64 64 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=1x1
+1D grid matrix: 500x500;  blocks=64x64;  grid=1x1
+single process matrix: 500x500;  blocks=16x64;  grid=1x1
 
-120 32 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=1x1
+1D grid matrix: 500x500;  blocks=16x16;  grid=1x1
+single process matrix: 500x500;  blocks=32x16;  grid=1x1
 
-120 64 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=1x1
+1D grid matrix: 500x500;  blocks=32x32;  grid=1x1
+single process matrix: 500x500;  blocks=32x32;  grid=1x1
 
-320 32 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=1x1
+1D grid matrix: 500x500;  blocks=64x64;  grid=1x1
+single process matrix: 500x500;  blocks=32x64;  grid=1x1
 
-320 64 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=1x1
+1D grid matrix: 500x500;  blocks=16x16;  grid=1x1
+single process matrix: 500x500;  blocks=64x16;  grid=1x1
 
-640 32 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=1x1
+1D grid matrix: 500x500;  blocks=32x32;  grid=1x1
+single process matrix: 500x500;  blocks=64x32;  grid=1x1
 
-640 64 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=1x1
+1D grid matrix: 500x500;  blocks=64x64;  grid=1x1
+single process matrix: 500x500;  blocks=64x64;  grid=1x1
 
-32 32 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=1x1
+1D grid matrix: 500x500;  blocks=16x16;  grid=1x1
+single process matrix: 500x500;  blocks=16x16;  grid=1x1
 
-64 32 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=1x1
+1D grid matrix: 500x500;  blocks=32x32;  grid=1x1
+single process matrix: 500x500;  blocks=16x32;  grid=1x1
 
-64 64 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=16x16;  grid=1x1
+1D grid matrix: 500x500;  blocks=64x64;  grid=1x1
+single process matrix: 500x500;  blocks=16x64;  grid=1x1
 
-120 32 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=1x1
+1D grid matrix: 500x500;  blocks=16x16;  grid=1x1
+single process matrix: 500x500;  blocks=32x16;  grid=1x1
 
-120 64 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=1x1
+1D grid matrix: 500x500;  blocks=32x32;  grid=1x1
+single process matrix: 500x500;  blocks=32x32;  grid=1x1
 
-320 32 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=32x32;  grid=1x1
+1D grid matrix: 500x500;  blocks=64x64;  grid=1x1
+single process matrix: 500x500;  blocks=32x64;  grid=1x1
 
-320 64 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=1x1
+1D grid matrix: 500x500;  blocks=16x16;  grid=1x1
+single process matrix: 500x500;  blocks=64x16;  grid=1x1
 
-640 32 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=1x1
+1D grid matrix: 500x500;  blocks=32x32;  grid=1x1
+single process matrix: 500x500;  blocks=64x32;  grid=1x1
 
-640 64 1 1
-comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:
-   with respect to the given tolerance the eigenvalues coincide
-   with respect to the given tolerance also the eigenvectors coincide
+2D grid matrix: dim=500x500;  blocks=64x64;  grid=1x1
+1D grid matrix: 500x500;  blocks=64x64;  grid=1x1
+single process matrix: 500x500;  blocks=64x64;  grid=1x1
 

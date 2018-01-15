@@ -16,28 +16,23 @@
 #include "../tests.h"
 #include "../lapack/create_matrix.h"
 
-// test eigenpairs_symmetric() and calls set_property()
+// test copying of distributed ScaLAPACKMatrices using ScaLAPACK routine  p_gemr2d
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/multithread_info.h>
-#include <deal.II/base/process_grid.h>
 
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/lapack_full_matrix.h>
-#include <deal.II/lac/lapack_templates.h>
+
 #include <deal.II/lac/scalapack.h>
 
 #include <fstream>
 #include <iostream>
-#include <algorithm>
-#include <memory>
 
 
 template <typename NumberType>
-void test(const unsigned int size, const unsigned int block_size, const NumberType tol)
+void test(const unsigned int block_size_i, const unsigned int block_size_j)
 {
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
@@ -45,100 +40,71 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
 
   ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
 
-  // Create SPD matrices of requested size:
-  FullMatrix<NumberType> full_A(size);
-  std::vector<NumberType> lapack_A(size*size);
+  const unsigned int size = 500;
+  //create FullMatrix and fill it
+  FullMatrix<NumberType> full(size);
+  unsigned int count=0;
+  for (unsigned int i=0; i<size; ++i)
+    for (unsigned int j=0; j<size; ++j, ++count)
+      full(i,j) = count;
 
-  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
-  ScaLAPACKMatrix<NumberType> scalapack_A (size, grid, block_size);
-  scalapack_A.set_property(LAPACKSupport::Property::symmetric);
+  //create 2d process grid
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid_2d = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,size,size,block_size_i,block_size_i);
+  //create 1d process grid
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid_1d = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,n_mpi_processes,1);
+  //create process grid containing one process
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid_single = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,1,1);
 
-  pcout << size << " " << block_size << " " << grid->get_process_grid_rows() << " " << grid->get_process_grid_columns() << std::endl;
+  ScaLAPACKMatrix<NumberType> scalapack_matrix_2d (size, size, grid_2d, block_size_i, block_size_i);
+  ScaLAPACKMatrix<NumberType> scalapack_matrix_1d (size, size, grid_1d, block_size_j, block_size_j);
+  ScaLAPACKMatrix<NumberType> scalapack_matrix_single (size, size, grid_single, block_size_i, block_size_j);
+  ScaLAPACKMatrix<NumberType> scalapack_matrix_source (size, size, grid_single, block_size_j, block_size_i);
 
-  create_spd (full_A);
-  for (unsigned int i = 0; i < size; ++i)
-    for (unsigned int j = 0; j < size; ++j)
-      lapack_A[i*size+j] = full_A(i,j);
+  pcout << "2D grid matrix: dim=" << scalapack_matrix_2d.m() << "x" << scalapack_matrix_2d.n()
+        << ";  blocks=" << block_size_i << "x" << block_size_i
+        << ";  grid=" << grid_2d->get_process_grid_rows() << "x" << grid_2d->get_process_grid_columns() << std::endl;
 
-  std::vector<NumberType> eigenvalues_ScaLapack, eigenvalues_Lapack(size);
-  //Lapack as reference
-  {
-    int info; //Variable containing information about the successfull exit of the lapack routine
-    char jobz = 'V';  //'V': all eigenpairs of A are computed
-    char uplo = 'U';  //storage format of the matrix A; not so important as matrix is symmetric
-    int LDA = size;   //leading dimension of the matrix A
-    int lwork;      //length of vector/array work
-    std::vector<NumberType> work (1);
+  pcout << "1D grid matrix: " << scalapack_matrix_1d.m() << "x" << scalapack_matrix_1d.n()
+        << ";  blocks=" << block_size_j << "x" << block_size_j
+        << ";  grid=" << grid_1d->get_process_grid_rows() << "x" << grid_1d->get_process_grid_columns() << std::endl;
 
-    //by setting lwork to -1 a workspace query for work is done
-    //as matrix is symmetric: LDA == size of matrix
-    lwork = -1;
-    syev(&jobz, &uplo, &LDA, & *lapack_A.begin(), &LDA, & *eigenvalues_Lapack.begin(), & *work.begin(), &lwork, &info);
-    lwork=work[0];
-    work.resize (lwork);
-    syev(&jobz, &uplo, &LDA, & *lapack_A.begin(), &LDA, & *eigenvalues_Lapack.begin(), & *work.begin(), &lwork, &info);
+  pcout << "single process matrix: " << scalapack_matrix_single.m() << "x" << scalapack_matrix_single.n()
+        << ";  blocks=" << block_size_i << "x" << block_size_j
+        << ";  grid=" << grid_single->get_process_grid_rows() << "x" << grid_single->get_process_grid_columns() << std::endl << std::endl;
 
-    AssertThrow (info==0, LAPACKSupport::ExcErrorCode("syev", info));
-  }
-  // Scalapack:
-  scalapack_A = full_A;
-  eigenvalues_ScaLapack = scalapack_A.eigenpairs_symmetric();
-  FullMatrix<NumberType> p_eigenvectors (size,size);
-  scalapack_A.copy_to(p_eigenvectors);
-  unsigned int n_eigenvalues = eigenvalues_ScaLapack.size(), max_n_eigenvalues=5;
+  scalapack_matrix_source = full;
 
-  pcout << "comparing " << max_n_eigenvalues << " eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK:" << std::endl;
-  for (unsigned int i=0; i<max_n_eigenvalues; ++i)
-    AssertThrow ( std::abs(eigenvalues_ScaLapack[n_eigenvalues-i-1]-eigenvalues_Lapack[n_eigenvalues-i-1]) / std::abs(eigenvalues_Lapack[n_eigenvalues-i-1]) < tol, dealii::ExcInternalError());
-  pcout << "   with respect to the given tolerance the eigenvalues coincide" << std::endl;
+  scalapack_matrix_source.copy_to(scalapack_matrix_2d);
+  scalapack_matrix_source.copy_to(scalapack_matrix_1d);
+  scalapack_matrix_source.copy_to(scalapack_matrix_single);
 
-  FullMatrix<NumberType> s_eigenvectors (size,size);
-  for (int i=0; i<size; ++i)
-    for (int j=0; j<size; ++j)
-      s_eigenvectors(i,j) = lapack_A[i*size+j];
+  FullMatrix<NumberType> test_2d(size), test_1d(size), test_one(size);
+  scalapack_matrix_2d.copy_to(test_2d);
+  scalapack_matrix_1d.copy_to(test_1d);
+  scalapack_matrix_single.copy_to(test_one);
+  test_2d.add (-1,full);
+  test_1d.add (-1,full);
+  test_one.add (-1,full);
 
-  std::vector<Vector<NumberType>> s_eigenvectors_ (max_n_eigenvalues,Vector<NumberType>(size));
-  for (int i=0; i<max_n_eigenvalues; ++i)
-    for (int j=0; j<size; ++j)
-      s_eigenvectors_[i][j] = lapack_A[i*size+j];
-
-  std::vector<Vector<NumberType>> p_eigenvectors_ (max_n_eigenvalues,Vector<NumberType>(size));
-  for (unsigned int i=0; i<max_n_eigenvalues; ++i)
-    for (unsigned int j=0; j<size; ++j)
-      p_eigenvectors_[i][j] = p_eigenvectors(j,i);
-
-
-  //product of eigenvectors computed using Lapack and ScaLapack has to be either 1 or -1
-  for (unsigned int i=0; i<max_n_eigenvalues; ++i)
-    {
-      NumberType product = p_eigenvectors_[i] * s_eigenvectors_[i];
-
-      //the requirement for alignment of the eigenvectors has to be released (primarily for floats)
-      AssertThrow (std::abs(std::abs(product)-1) < tol*10, dealii::ExcInternalError());
-    }
-  pcout << "   with respect to the given tolerance also the eigenvectors coincide" << std::endl << std::endl;
+  AssertThrow(test_2d.frobenius_norm() < 1e-12,ExcInternalError());
+  AssertThrow(test_1d.frobenius_norm() < 1e-12,ExcInternalError());
+  AssertThrow(test_one.frobenius_norm() < 1e-12,ExcInternalError());
 }
 
 
 
 int main (int argc,char **argv)
 {
-
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
-  const std::vector<unsigned int> sizes = {{32,64,120,320,640}};
-  const std::vector<unsigned int> blocks = {{32,64}};
+  const std::vector<unsigned int> blocks_i = {{16,32,64}};
+  const std::vector<unsigned int> blocks_j = {{16,32,64}};
 
-  const double tol_double = 1e-10;
-  const float tol_float = 1e-5;
+  for (const auto &s : blocks_i)
+    for (const auto &b : blocks_j)
+      test<float>(s,b);
 
-  for (const auto &s : sizes)
-    for (const auto &b : blocks)
-      if (b <= s)
-        test<float>(s,b,tol_float);
-
-  for (const auto &s : sizes)
-    for (const auto &b : blocks)
-      if (b <= s)
-        test<double>(s,b,tol_double);
+  for (const auto &s : blocks_i)
+    for (const auto &b : blocks_j)
+      test<double>(s,b);
 }
