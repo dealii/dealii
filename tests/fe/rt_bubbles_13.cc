@@ -35,10 +35,7 @@
 #include <vector>
 #include <string>
 
-#define PRECISION 2
 
-
-std::ofstream logfile ("output");
 
 template<int dim>
 void
@@ -69,7 +66,8 @@ test (const unsigned int degree)
             {
               deallog << '[';
               for (unsigned int c=0; c<fe_rt_bubbles.n_components(); ++c)
-                deallog << fe_values.shape_grad_component(i,q,c) << ' ';
+                for (unsigned int d=0; d<dim; ++d)
+                  deallog << filter_out_small_numbers(fe_values.shape_grad_component(i,q,c)[d], 5.e-6) << ' ';
               deallog << ']';
             }
           deallog << std::endl;
@@ -82,9 +80,8 @@ test (const unsigned int degree)
 int
 main()
 {
-  deallog << std::setprecision(PRECISION);
+  initlog();
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   for (unsigned int i=1; i<4; ++i)
     {

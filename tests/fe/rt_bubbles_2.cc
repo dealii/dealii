@@ -33,7 +33,6 @@
 #include <vector>
 #include <string>
 
-#define PRECISION 3
 
 
 Point<2> stretch_coordinates (const Point<2> p)
@@ -158,10 +157,8 @@ plot_shape_functions(const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile ("output");
-  deallog << std::setprecision(PRECISION);
+  initlog();
   deallog << std::fixed;
-  deallog.attach(logfile);
 
   for (unsigned int degree=1; degree<4; ++degree)
     plot_shape_functions<2>(degree);
