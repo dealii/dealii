@@ -282,7 +282,7 @@ namespace hp
     /**
      * Go through the triangulation and "distribute" the degrees of freedoms
      * needed for the given finite element. "Distributing" degrees of freedom
-     * involved allocating memory to store the information that describes it
+     * involves allocating memory to store the information that describes it
      * (e.g., whether it is located on a vertex, edge, face, etc) and to
      * sequentially enumerate all degrees of freedom. In other words, while
      * the mesh and the finite element object by themselves simply define a
