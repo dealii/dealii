@@ -4022,12 +4022,6 @@ namespace internal
                 // user flag is set or not
                 cell->clear_user_flag();
 
-                // An assert to make sure that the static_cast in the
-                // next line has the chance to give reasonable
-                // results.
-                Assert(cell->material_id()<= std::numeric_limits<types::material_id>::max(),
-                       ExcIndexRange(cell->material_id(),0,std::numeric_limits<types::material_id>::max()));
-
                 // new vertex is placed on the surface according to
                 // the information stored in the boundary class
                 triangulation.vertices[next_unused_vertex] =
@@ -8896,17 +8890,17 @@ Triangulation<dim, spacedim>::~Triangulation ()
   // 1d. double check this here, as destruction is a good place to
   // ensure that what we've done over the course of the lifetime of
   // this object makes sense
-  Assert ((dim == 1)
-          ||
-          (vertex_to_boundary_id_map_1d == nullptr),
-          ExcInternalError());
+  AssertNothrow ((dim == 1)
+                 ||
+                 (vertex_to_boundary_id_map_1d == nullptr),
+                 ExcInternalError());
 
   // the vertex_to_manifold_id_map_1d field should be also unused
   // except in 1d. check this as well
-  Assert ((dim == 1)
-          ||
-          (vertex_to_manifold_id_map_1d == nullptr),
-          ExcInternalError());
+  AssertNothrow ((dim == 1)
+                 ||
+                 (vertex_to_manifold_id_map_1d == nullptr),
+                 ExcInternalError());
 }
 
 
