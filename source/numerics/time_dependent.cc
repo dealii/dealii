@@ -444,7 +444,7 @@ TimeStepBase_Tria<dim>::~TimeStepBase_Tria ()
       delete t;
     }
   else
-    Assert (tria==nullptr, ExcInternalError());
+    AssertNothrow (tria==nullptr, ExcInternalError());
 
   coarse_grid = nullptr;
 }

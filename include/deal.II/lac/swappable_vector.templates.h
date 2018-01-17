@@ -54,7 +54,14 @@ SwappableVector<number>::~SwappableVector ()
   // itself
 
   if (filename != "")
-    kill_file ();
+    {
+      try
+        {
+          kill_file ();
+        }
+      catch (...)
+        {}
+    }
 }
 
 

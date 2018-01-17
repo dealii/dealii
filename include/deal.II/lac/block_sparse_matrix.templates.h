@@ -37,7 +37,12 @@ BlockSparseMatrix<number>::~BlockSparseMatrix ()
 {
   // delete previous content of
   // the subobjects array
-  clear ();
+  try
+    {
+      clear ();
+    }
+  catch (...)
+    {}
   sparsity_pattern = nullptr;
 }
 
