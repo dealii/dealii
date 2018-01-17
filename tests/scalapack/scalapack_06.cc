@@ -16,7 +16,7 @@
 #include "../tests.h"
 #include "../lapack/create_matrix.h"
 
-// test eigenpairs_symmetric(const bool, const std::pair<int,int>&, const std::pair<NumberType,NumberType>&)
+// test eigenpairs_symmetric_by_index(const std::pair<unsigned int,unsigned int> &, const bool)
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -47,7 +47,7 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
 
   std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,size,size,block_size,block_size);
 
-  pcout << size << " " << block_size << std::endl;
+  pcout << size << " " << block_size << " " << grid->get_process_grid_rows() << " " << grid->get_process_grid_columns() << std::endl;
 
   // Create SPD matrices of requested size:
   FullMatrix<NumberType> full_A(size);
@@ -90,7 +90,7 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
   ScaLAPACKMatrix<NumberType> scalapack_syev (size, grid, block_size);
   scalapack_syev.set_property(LAPACKSupport::Property::symmetric);
   scalapack_syev = full_A;
-  eigenvalues_psyev = scalapack_syev.eigenpairs_symmetric(true);
+  eigenvalues_psyev = scalapack_syev.eigenpairs_symmetric_by_index(std::make_pair(0,size-1),true);
   FullMatrix<NumberType> p_eigenvectors (size,size);
   scalapack_syev.copy_to(p_eigenvectors);
   for (unsigned int i=0; i<max_n_eigenvalues; ++i)
@@ -120,7 +120,7 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
   ScaLAPACKMatrix<NumberType> scalapack_syevx_partial (size, grid, block_size);
   scalapack_syevx_partial.set_property(LAPACKSupport::Property::symmetric);
   scalapack_syevx_partial = full_A;
-  eigenvalues_psyevx_partial = scalapack_syevx_partial.eigenpairs_symmetric(true, std::make_pair(size-max_n_eigenvalues+1,size));
+  eigenvalues_psyevx_partial = scalapack_syevx_partial.eigenpairs_symmetric_by_index(std::make_pair(size-max_n_eigenvalues,size-1),true);
   scalapack_syevx_partial.copy_to(p_eigenvectors);
   for (unsigned int i=eigenvalues_psyevx_partial.size()-1; i>0; --i)
     {

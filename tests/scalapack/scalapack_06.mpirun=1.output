@@ -1,4 +1,4 @@
-200 32
+200 32 1 1
 comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pdsyev:
    with respect to the given tolerance the eigenvalues coincide
    with respect to the given tolerance also the eigenvectors coincide
@@ -8,7 +8,7 @@ comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pds
    with respect to the given tolerance also the eigenvectors coincide
 
 
-200 64
+200 64 1 1
 comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pdsyev:
    with respect to the given tolerance the eigenvalues coincide
    with respect to the given tolerance also the eigenvectors coincide
@@ -18,7 +18,7 @@ comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pds
    with respect to the given tolerance also the eigenvectors coincide
 
 
-400 32
+400 32 1 1
 comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pdsyev:
    with respect to the given tolerance the eigenvalues coincide
    with respect to the given tolerance also the eigenvectors coincide
@@ -28,7 +28,7 @@ comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pds
    with respect to the given tolerance also the eigenvectors coincide
 
 
-400 64
+400 64 1 1
 comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pdsyev:
    with respect to the given tolerance the eigenvalues coincide
    with respect to the given tolerance also the eigenvectors coincide
@@ -38,7 +38,7 @@ comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pds
    with respect to the given tolerance also the eigenvectors coincide
 
 
-600 32
+600 32 1 1
 comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pdsyev:
    with respect to the given tolerance the eigenvalues coincide
    with respect to the given tolerance also the eigenvectors coincide
@@ -48,7 +48,7 @@ comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pds
    with respect to the given tolerance also the eigenvectors coincide
 
 
-600 64
+600 64 1 1
 comparing 5 eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pdsyev:
    with respect to the given tolerance the eigenvalues coincide
    with respect to the given tolerance also the eigenvectors coincide

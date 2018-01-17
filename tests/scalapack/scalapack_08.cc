@@ -16,7 +16,7 @@
 #include "../tests.h"
 #include "../lapack/create_matrix.h"
 
-// test compute_SVD(ScaLAPACKMatrix<NumberType>&,ScaLAPACKMatrix<NumberType>&,const bool,const bool)
+// test compute_SVD(ScaLAPACKMatrix<NumberType>*,ScaLAPACKMatrix<NumberType>*)
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -57,7 +57,7 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
   ScaLAPACKMatrix<NumberType> scalapack_A_ev (size, grid_2d, block_size);
   scalapack_A_ev.set_property(LAPACKSupport::Property::symmetric);
   scalapack_A_ev = full_A;
-  std::vector<NumberType> eigenvalues = scalapack_A_ev.eigenpairs_symmetric(true);
+  std::vector<NumberType> eigenvalues = scalapack_A_ev.eigenpairs_symmetric_by_index(std::make_pair(0,size-1),true);
   FullMatrix<NumberType> eigenvectors (size,size);
   scalapack_A_ev.copy_to(eigenvectors);
 
@@ -67,7 +67,7 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
   ScaLAPACKMatrix<NumberType> scalapack_VT (size, grid_2d, block_size);
   scalapack_A_sv.set_property(LAPACKSupport::Property::symmetric);
   scalapack_A_sv = full_A;
-  std::vector<NumberType> singular_values = scalapack_A_sv.compute_SVD(scalapack_U,scalapack_VT,true,true);
+  std::vector<NumberType> singular_values = scalapack_A_sv.compute_SVD(&scalapack_U,&scalapack_VT);
   FullMatrix<NumberType> l_singular_vectors (size,size);
   FullMatrix<NumberType> r_singular_vectors (size,size);
   scalapack_U.copy_to(l_singular_vectors);

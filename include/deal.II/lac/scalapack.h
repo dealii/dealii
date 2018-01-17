@@ -158,14 +158,12 @@ public:
    */
   void copy_to (FullMatrix<NumberType> &matrix) const;
 
-
   /**
    * Copy the contents of the distributed matrix into a differently distributed matrix @p dest.
    * The function also works for matrices with different process grids
    * or block-cyclic distributions.
    */
   void copy_to (ScaLAPACKMatrix<NumberType> &dest) const;
-
 
   /**
    * Compute the Cholesky factorization of the matrix using ScaLAPACK
@@ -180,84 +178,96 @@ public:
    */
   void invert();
 
-
+  /**
+   * Computing selected eigenvalues and, optionally, the eigenvectors of the real symmetric
+   * matrix $A \in \mathbb{R}^{M \times M}$.
+   *
+   * The eigenvalues/eigenvectors are selected by prescribing a range of indices @p index_limits.
+   *
+   * If successful, the computed eigenvalues are arranged in ascending order.
+   * The eigenvectors are stored in the columns of the matrix, thereby
+   * overwriting the original content of the matrix.
+   *
+   * If all eigenvalues/eigenvectors have to be computed, pass the closed interval $ \left[ 0, M-1 \right] $ in @p index_limits.
+   *
+   * Pass the closed interval $ \left[ M-r, M-1 \right] $ if the $r$ largest eigenvalues/eigenvectors are desired.
+   */
+  std::vector<NumberType> eigenpairs_symmetric_by_index(const std::pair<unsigned int,unsigned int> &index_limits,
+                                                        const bool compute_eigenvectors);
 
   /**
-   * Function to compute selected eigenvalues and, optionally, the eigenvectors.
-   * If the function is called with the default arguments all eigenvalues are computed but no eigenvectors.
-   * The eigenvalues/eigenvectors are selected by either prescribing a range of indices @p index_limits
-   * or a range of values @p value_limits for the eigenvalues. The funtion will throw an exception
-   * if both ranges are prescribed (meaning that both ranges differ from the default value)
-   * as this ambiguity is prohibited.
+   * Computing selected eigenvalues and, optionally, the eigenvectors.
+   * The eigenvalues/eigenvectors are selected by prescribing a range of values @p value_limits for the eigenvalues.
+   *
    * If successful, the computed eigenvalues are arranged in ascending order.
    * The eigenvectors are stored in the columns of the matrix, thereby
    * overwriting the original content of the matrix.
    */
-  std::vector<NumberType> eigenpairs_symmetric(const bool compute_eigenvectors=false,
-                                               const std::pair<int,int> &index_limits = std::make_pair(-1,-1),
-                                               const std::pair<NumberType,NumberType> &value_limits = std::make_pair(-1,-1));
-
-
+  std::vector<NumberType> eigenpairs_symmetric_by_value(const std::pair<NumberType,NumberType> &value_limits,
+                                                        const bool compute_eigenvectors);
 
   /**
-  * Funcion to compute the singular value decomposition (SVD) of an
-  * M-by-N matrix A, optionally computing the left and/or right
-  * singular vectors. The SVD is written as A = U * SIGMA * transpose(V)
-  * where SIGMA is an M-by-N diagonal matrix, @p U is an M-by-M orthogonal matrix,
-  * and @p V is an N-by-N orthogonal matrix. The diagonal elements of SIGMA
-  * are the singular values of A and the columns of U and V are the
+  * Computing the singular value decomposition (SVD) of a
+  * matrix $A \in \mathbb{R}^{M \times N}$, optionally computing the left and/or right
+  * singular vectors. The SVD is written as $A = U * \Sigma * V^T$
+  * with $\Sigma \in \mathbb{R}^{M \times N}$ as a diagonal matrix,
+  * $U \in \mathbb{R}^{M \times M}$ and $U \in \mathbb{R}^{M \times M}$
+  * as orthogonal matrices. The diagonal elements of $\Sigma$
+  * are the singular values of $A$ and the columns of $U$ and $V$ are the
   * corresponding left and right singular vectors, respectively. The
-  * singular values are returned in decreasing order and only the first min(M,N)
-  * columns of U and rows of VT = transpose(V) are computed.
+  * singular values are returned in decreasing order and only the first $\min(M,N)$
+  * columns of $U$ and rows of VT = $V^T$ are computed.
+  *
   * Upon return the content of the matrix is unusable.
-  * The matrix A must have identical block cyclic distribution for the rows and column
-  * If left singular vectors are required matrices A and U
+  * The matrix A must have identical block cyclic distribution for the rows and column.
+  *
+  * If left singular vectors are required matrices $A$ and $U$
   * have to be constructed with the same process grid and block cyclic distribution.
-  * If right singular vectors are required matrices A and VT
+  * If right singular vectors are required matrices $A$ and $V^T$
   * have to be constructed with the same process grid  and block cyclic distribution.
+  *
+  * To avoid computing the left and/or right singular vectors the function accepts <code>nullptr</code>
+  * for @p U and/or @p VT.
   */
-  std::vector<NumberType> compute_SVD(ScaLAPACKMatrix<NumberType> &U,
-                                      ScaLAPACKMatrix<NumberType> &VT,
-                                      const bool left_singluar_vectors=false,
-                                      const bool right_singluar_vectors=false);
-
+  std::vector<NumberType> compute_SVD(ScaLAPACKMatrix<NumberType> *U = nullptr,
+                                      ScaLAPACKMatrix<NumberType> *VT = nullptr);
 
   /**
-  * Function solves overdetermined or underdetermined real linear
-  * systems involving an M-by-N matrix A, or its transpose, using a QR or LQ factorization of A.
+  * Solving overdetermined or underdetermined real linear
+  * systems involving matrix $A \in \mathbb{R}^{M \times N}$, or its transpose $A^T$,
+  * using a QR or LQ factorization of $A$ for $N_{\rm RHS}$ RHS vectors in the columns of matrix $B$
   *
-  * It is assumed that A has full rank: \f$rank(A) = \min(M,N)\f$.
-  * Upon exit the columns of B contain the solutions and
-  * the following options are supported:
-  * - 1. If transpose==false and \f$M \geq N\f$: least squares solution of overdetermined system
-  *      \f$\min \Vert B - A X\Vert\f$.
+  * It is assumed that $A$ has full rank: $rank(A) = \min(M,N)$.
   *
-  *      Upon exit the rows 0 to N-1 contain the least square solution vectors. The residual sum of squares
+  * The following options are supported:
+  * - 1. If <code>transpose==false</code> and $M \geq N$: least squares solution of overdetermined system
+  *      $\min \Vert B - A*X\Vert$.
+  *
+  *      Upon exit the rows 0 to N-1 of $B$ contain the least square solution vectors. The residual sum of squares
   *      for each column is given by the sum of squares of elements N to M-1 in that column
   *
-  * - 2. If transpose==false and \f$M < N\f$: find minimum norm solutions of underdetermined systems
-  *      \f$A X = B\f$.
+  * - 2. If <code>transpose==false</code> and $M < N$: find minimum norm solutions of underdetermined systems
+  *      $A * X = B$.
   *
-  *      Upon exit the columns of B contain the minimum norm solution vectors
+  *      Upon exit the columns of $B$ contain the minimum norm solution vectors
   *
-  * - 3. If transpose==true and and \f$M \geq N\f$: find minimum norm solutions of underdetermined system
-  *      \f$ A^\top X = B\f$
+  * - 3. If <code>transpose==true</code> and $M \geq N$: find minimum norm solutions of underdetermined system
+  *      $ A^\top X = B$.
   *
-  *      Upon exit the columns of B contain the minimum norm solution vectors
+  *      Upon exit the columns of $B$ contain the minimum norm solution vectors.
   *
-  * - 4. If transpose==true and \f$M < N\f$: least squares solution of overdetermined system
-  *      \f$\min \Vert B - A^\top X\Vert\f$.
+  * - 4. If <code>transpose==true</code> and $M < N$: least squares solution of overdetermined system
+  *      $\min \Vert B - A^\top X\Vert$.
   *
   *      Upon exit the rows 0 to M-1 contain the least square solution vectors. The residual sum of squares
   *      for each column is given by the sum of squares of elements M to N-1 in that column
   * .
-  * If transpose==false B is M x NRHS matrix, otherwise it is NxNRHS.
-  * The matrices A and B must have an identical block cyclic distribution for rows and columns
+  * If <code>transpose==false</code> then $B \in \mathbb{R}^{M \times N_{\rm RHS}}$,
+  * otherwise $B \in \mathbb{R}^{N \times N_{\rm RHS}}}$.
+  * The matrices $A$ and $B$ must have an identical block cyclic distribution for rows and columns.
   */
   void least_squares(ScaLAPACKMatrix<NumberType> &B,
                      const bool transpose=false);
-
-
 
   /**
    * Estimate the the condition number of a SPD matrix in the $l_1$-norm.
@@ -336,6 +346,22 @@ private:
    * internal function.
    */
   NumberType norm(const char type) const;
+
+  /**
+   * Computing selected eigenvalues and, optionally, the eigenvectors.
+   * The eigenvalues/eigenvectors are selected by either prescribing a range of indices @p index_limits
+   * or a range of values @p value_limits for the eigenvalues. The funtion will throw an exception
+   * if both ranges are prescribed (meaning that both ranges differ from the default value)
+   * as this ambiguity is prohibited.
+   * If successful, the computed eigenvalues are arranged in ascending order.
+   * The eigenvectors are stored in the columns of the matrix, thereby
+   * overwriting the original content of the matrix.
+   */
+  std::vector<NumberType> eigenpairs_symmetric(const bool compute_eigenvectors,
+                                               const std::pair<unsigned int,unsigned int> &index_limits=
+                                                 std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int),
+                                               const std::pair<NumberType,NumberType> &value_limits=
+                                                 std::make_pair(std::numeric_limits<NumberType>::quiet_NaN(),std::numeric_limits<NumberType>::quiet_NaN()));
 
   /**
    * Since ScaLAPACK operations notoriously change the meaning of the matrix

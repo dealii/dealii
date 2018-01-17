@@ -606,7 +606,6 @@ extern "C"
    * M-by-N matrix A, optionally computing the left and/or right
    * singular vectors
    */
-  //FIXME
   void pdgesvd_(const char *jobu,
                 const char *jobvt,
                 const int *m,

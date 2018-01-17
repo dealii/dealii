@@ -280,6 +280,9 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
     //process is active in the process grid
     if (this->grid->mpi_process_is_active)
       dest.values = this->values;
+
+  dest.state = state;
+  dest.property = property;
 }
 
 
@@ -323,9 +326,43 @@ void ScaLAPACKMatrix<NumberType>::invert()
 
 
 template <typename NumberType>
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_index(const std::pair<unsigned int,unsigned int> &index_limits,
+    const bool compute_eigenvectors)
+{
+  // check validity of index limits
+  Assert (index_limits.first < (unsigned int)n_rows,ExcIndexRange(index_limits.first,0,n_rows));
+  Assert (index_limits.second < (unsigned int)n_rows,ExcIndexRange(index_limits.second,0,n_rows));
+
+  std::pair<unsigned int,unsigned int> idx = std::make_pair(std::min(index_limits.first,index_limits.second),
+                                                            std::max(index_limits.first,index_limits.second));
+
+  // compute all eigenvalues/eigenvectors
+  if (idx.first==0 && idx.second==(unsigned int)n_rows-1)
+    return eigenpairs_symmetric(compute_eigenvectors);
+  else
+    return eigenpairs_symmetric(compute_eigenvectors,idx);
+}
+
+
+
+template <typename NumberType>
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_value(const std::pair<NumberType,NumberType> &value_limits,
+    const bool compute_eigenvectors)
+{
+  Assert (!std::isnan(value_limits.first),ExcMessage("value_limits.first is NaN"));
+  Assert (!std::isnan(value_limits.second),ExcMessage("value_limits.second is NaN"));
+
+  std::pair<unsigned int,unsigned int> indices = std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int);
+
+  return eigenpairs_symmetric(compute_eigenvectors,indices,value_limits);
+}
+
+
+
+template <typename NumberType>
 std::vector<NumberType>
 ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvectors,
-                                                  const std::pair<int,int> &eigenvalue_idx,
+                                                  const std::pair<unsigned int, unsigned int> &eigenvalue_idx,
                                                   const std::pair<NumberType,NumberType> &eigenvalue_limits)
 {
   Assert (state == LAPACKSupport::matrix,
@@ -335,14 +372,16 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
 
   Threads::Mutex::ScopedLock lock (mutex);
 
+  const bool use_values = (std::isnan(eigenvalue_limits.first) || std::isnan(eigenvalue_limits.second)) ? false : true;
+  const bool use_indices = ((eigenvalue_idx.first==numbers::invalid_unsigned_int) || (eigenvalue_idx.second==numbers::invalid_unsigned_int)) ? false : true;
+
+  Assert(!(use_values && use_indices),ExcMessage("Prescribing both the index and value range for the eigenvalues is ambiguous"));
+
   // if computation of eigenvectors is not required use a sufficiently small distributed matrix
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors = compute_eigenvectors ?
-                                                              std::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows, grid, row_block_size)
-                                                              :
-                                                              std::make_unique<ScaLAPACKMatrix<NumberType>>(grid->n_process_rows, grid->n_process_columns,
-                                                                  grid,1,1);
+                                                              std::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,grid,row_block_size) :
+                                                              std::make_unique<ScaLAPACKMatrix<NumberType>>(grid->n_process_rows,grid->n_process_columns,grid,1,1);
 
-  //ScaLAPACKMatrix<NumberType> eigenvectors (n_rows, grid, row_block_size);
   eigenvectors->property = property;
   // number of eigenvalues to be returned; upon successful exit ev contains the m seclected eigenvalues in ascending order
   int m = n_rows;
@@ -383,10 +422,10 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
       std::vector<NumberType> gap(n_local_rows * n_local_columns);
 
       // index range for eigenvalues is not specified
-      if (eigenvalue_idx.first==-1 && eigenvalue_idx.second==-1)
+      if (!use_indices)
         {
           // interval for eigenvalues is not specified and consequently all eigenvalues/eigenpairs will be computed
-          if (std::abs(eigenvalue_limits.first-eigenvalue_limits.second)<1e-12 && std::abs(eigenvalue_limits.first+1)<1e-12)
+          if (!use_values)
             {
               range = 'A';
               all_eigenpairs = true;
@@ -401,13 +440,11 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
         }
       else
         {
-          Assert(std::abs(eigenvalue_limits.first-eigenvalue_limits.second)<1e-12 && std::abs(eigenvalue_limits.first+1)<1e-12,
-                 ExcMessage("Prescribing both the index and value range for the eigenvalues is ambiguous"));
-
           range = 'I';
           all_eigenpairs = false;
-          il = std::min(eigenvalue_idx.first,eigenvalue_idx.second);
-          iu = std::max(eigenvalue_idx.first,eigenvalue_idx.second);
+          //as Fortran starts counting/indexing from 1 unlike C/C++, where it starts from 0
+          il = std::min(eigenvalue_idx.first,eigenvalue_idx.second) + 1;
+          iu = std::max(eigenvalue_idx.first,eigenvalue_idx.second) + 1;
         }
       NumberType *A_loc = &this->values[0];
       /*
@@ -415,7 +452,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
        */
       int lwork=-1;
       int liwork=-1;
-      NumberType *eigenvectors_loc = (compute_eigenvectors ? &eigenvectors->values[0] : NULL);
+      NumberType *eigenvectors_loc = (compute_eigenvectors ? &eigenvectors->values[0] : nullptr);
       work.resize(1);
       iwork.resize (1);
 
@@ -491,38 +528,45 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
    * if only eigenvalues are queried the content of the matrix will be destroyed
    * if the eigenpairs are queried matrix A on exit stores the eigenvectors in the columns
    */
-  property = LAPACKSupport::Property::general;
-  state = LAPACKSupport::eigenvalues;
+  if (compute_eigenvectors)
+    {
+      property = LAPACKSupport::Property::general;
+      state = LAPACKSupport::eigenvalues;
+    }
+  else
+    state = LAPACKSupport::unusable;
 
   return ev;
 }
 
 
+
 template <typename NumberType>
-std::vector<NumberType> ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> &U,
-    ScaLAPACKMatrix<NumberType> &VT,
-    const bool left_singluar_vectors,
-    const bool right_singluar_vectors)
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
+    ScaLAPACKMatrix<NumberType> *VT)
 {
   Assert (state == LAPACKSupport::matrix,
           ExcMessage("Matrix has to be in Matrix state before calling this function."));
-  Assert(row_block_size==column_block_size,ExcDimensionMismatch(n_rows,U.n_rows));
+  Assert(row_block_size==column_block_size,ExcDimensionMismatch(row_block_size,column_block_size));
+
+  const bool left_singluar_vectors = (U != nullptr) ? true : false;
+  const bool right_singluar_vectors = (VT != nullptr) ? true : false;
 
   if (left_singluar_vectors)
     {
-      Assert(n_rows==U.n_rows,ExcDimensionMismatch(n_rows,U.n_rows));
-      Assert(U.n_rows==U.n_columns,ExcDimensionMismatch(U.n_rows,U.n_columns));
-      Assert(row_block_size==U.row_block_size,ExcDimensionMismatch(row_block_size,U.row_block_size));
-      Assert(column_block_size==U.column_block_size,ExcDimensionMismatch(column_block_size,U.column_block_size));
-      Assert(grid->blacs_context==U.grid->blacs_context,ExcDimensionMismatch(grid->blacs_context,U.grid->blacs_context));
+      Assert(n_rows==U->n_rows,ExcDimensionMismatch(n_rows,U->n_rows));
+      Assert(U->n_rows==U->n_columns,ExcDimensionMismatch(U->n_rows,U->n_columns));
+      Assert(row_block_size==U->row_block_size,ExcDimensionMismatch(row_block_size,U->row_block_size));
+      Assert(column_block_size==U->column_block_size,ExcDimensionMismatch(column_block_size,U->column_block_size));
+      Assert(grid->blacs_context==U->grid->blacs_context,ExcDimensionMismatch(grid->blacs_context,U->grid->blacs_context));
     }
   if (right_singluar_vectors)
     {
-      Assert(n_columns==VT.n_rows,ExcDimensionMismatch(n_columns,VT.n_rows));
-      Assert(VT.n_rows==VT.n_columns,ExcDimensionMismatch(VT.n_rows,VT.n_columns));
-      Assert(row_block_size==VT.row_block_size,ExcDimensionMismatch(row_block_size,VT.row_block_size));
-      Assert(column_block_size==VT.column_block_size,ExcDimensionMismatch(column_block_size,VT.column_block_size));
-      Assert(grid->blacs_context==VT.grid->blacs_context,ExcDimensionMismatch(grid->blacs_context,VT.grid->blacs_context));
+      Assert(n_columns==VT->n_rows,ExcDimensionMismatch(n_columns,VT->n_rows));
+      Assert(VT->n_rows==VT->n_columns,ExcDimensionMismatch(VT->n_rows,VT->n_columns));
+      Assert(row_block_size==VT->row_block_size,ExcDimensionMismatch(row_block_size,VT->row_block_size));
+      Assert(column_block_size==VT->column_block_size,ExcDimensionMismatch(column_block_size,VT->column_block_size));
+      Assert(grid->blacs_context==VT->grid->blacs_context,ExcDimensionMismatch(grid->blacs_context,VT->grid->blacs_context));
     }
   Threads::Mutex::ScopedLock lock (mutex);
 
@@ -533,8 +577,8 @@ std::vector<NumberType> ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix
       char jobu = left_singluar_vectors ? 'V' : 'N';
       char jobvt = right_singluar_vectors ? 'V' : 'N';
       NumberType *A_loc = &this->values[0];
-      NumberType *U_loc = left_singluar_vectors ? &(U.values[0]) : NULL;
-      NumberType *VT_loc = right_singluar_vectors ? &(VT.values[0]) : NULL;
+      NumberType *U_loc = left_singluar_vectors ? &(U->values[0]) : nullptr;
+      NumberType *VT_loc = right_singluar_vectors ? &(VT->values[0]) : nullptr;
       int info = 0;
       /*
        * by setting lwork to -1 a workspace query for optimal length of work is performed
@@ -543,8 +587,8 @@ std::vector<NumberType> ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix
       work.resize(1);
 
       pgesvd(&jobu,&jobvt,&n_rows,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,
-             & *sv.begin(),U_loc,&U.submatrix_row,&U.submatrix_column,U.descriptor,
-             VT_loc,&VT.submatrix_row,&VT.submatrix_column,VT.descriptor,
+             & *sv.begin(),U_loc,&U->submatrix_row,&U->submatrix_column,U->descriptor,
+             VT_loc,&VT->submatrix_row,&VT->submatrix_column,VT->descriptor,
              &work[0],&lwork,&info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgesvd", info));
 
@@ -552,8 +596,8 @@ std::vector<NumberType> ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix
       work.resize(lwork);
 
       pgesvd(&jobu,&jobvt,&n_rows,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,
-             & *sv.begin(),U_loc,&U.submatrix_row,&U.submatrix_column,U.descriptor,
-             VT_loc,&VT.submatrix_row,&VT.submatrix_column,VT.descriptor,
+             & *sv.begin(),U_loc,&U->submatrix_row,&U->submatrix_column,U->descriptor,
+             VT_loc,&VT->submatrix_row,&VT->submatrix_column,VT->descriptor,
              &work[0],&lwork,&info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgesvd", info));
     }
@@ -615,6 +659,7 @@ void ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
             B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,&work[0],&lwork,&info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgels", info));
     }
+  state = LAPACKSupport::State::unusable;
 }
 
 
