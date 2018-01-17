@@ -280,25 +280,36 @@ namespace hp
     DoFHandler &operator = (const DoFHandler &) = delete;
 
     /**
-     * Go through the triangulation and "distribute" the degrees of freedoms
-     * needed for the given finite element. "Distributing" degrees of freedom
-     * involves allocating memory to store the information that describes it
-     * (e.g., whether it is located on a vertex, edge, face, etc) and to
-     * sequentially enumerate all degrees of freedom. In other words, while
-     * the mesh and the finite element object by themselves simply define a
-     * finite element space $V_h$, the process of distributing degrees of
-     * freedom makes sure that there is a basis for this space and that the
-     * shape functions of this basis are enumerated in an indexable,
+     * Go through the triangulation and "distribute" the degrees of
+     * freedoms needed for the given finite element. "Distributing"
+     * degrees of freedom involves allocating memory to store the
+     * indices on all entities on which degrees of freedom can be
+     * located (e.g., vertices, edges, faces, etc.) and to then enumerate
+     * all degrees of freedom. In other words, while the mesh and the
+     * finite element object by themselves simply define a finite
+     * element space $V_h$, the process of distributing degrees of
+     * freedom makes sure that there is a basis for this space and that
+     * the shape functions of this basis are enumerated in an indexable,
      * predictable way.
      *
-     * The purpose of this function is first discussed in the introduction to
-     * the step-2 tutorial program.
+     * The exact order in which degrees of freedom on a mesh are
+     * ordered, i.e., the order in which basis functions of the finite
+     * element space are enumerated, is something that deal.II treats as
+     * an implementation detail. By and large, degrees of freedom are
+     * enumerated in the same order in which we traverse cells, but you
+     * should not rely on any specific numbering. In contrast, if you
+     * want a particular ordering, use the functions in namespace
+     * DoFRenumbering.
      *
-     * @note A pointer of the finite element given as argument is stored.
-     * Therefore, the lifetime of the finite element object shall be longer
-     * than that of this object. If you don't want this behavior, you may want
-     * to call the @p clear member function which also releases the lock of
-     * this object to the finite element.
+     * @note In contrast to the dealii::DoFHandler::distribute_dofs()
+     * function, this function does not make a copy of the object
+     * given as argument. Rather, it stores a reference to the given
+     * object, and it is the responsibility of user code to ensure
+     * that the hp::FECollection given as argument lives at least as
+     * long as the hp::DoFHandler object. If you want to break this
+     * dependence by asking the hp::DoFHandler to release the
+     * reference to the hp::FECollection object, call the
+     * hp::DoFHandler::clear() function.
      */
     virtual void distribute_dofs (const hp::FECollection<dim,spacedim> &fe);
 

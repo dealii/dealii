@@ -370,20 +370,42 @@ public:
                   const FiniteElement<dim,spacedim> &fe);
 
   /**
-   * Go through the triangulation and "distribute" the degrees of freedoms
-   * needed for the given finite element. "Distributing" degrees of freedom
-   * involves allocating memory to store the information that describes it
-   * (e.g., whether it is located on a vertex, edge, face, etc) and to
-   * sequentially enumerate all degrees of freedom. In other words, while the
-   * mesh and the finite element object by themselves simply define a finite
-   * element space $V_h$, the process of distributing degrees of freedom makes
-   * sure that there is a basis for this space and that the shape functions of
-   * this basis are enumerated in an indexable, predictable way.
+   * Go through the triangulation and "distribute" the degrees of
+   * freedoms needed for the given finite element. "Distributing"
+   * degrees of freedom involves allocating memory to store the
+   * indices on all entities on which degrees of freedom can be
+   * located (e.g., vertices, edges, faces, etc.) and to then enumerate
+   * all degrees of freedom. In other words, while the mesh and the
+   * finite element object by themselves simply define a finite
+   * element space $V_h$, the process of distributing degrees of
+   * freedom makes sure that there is a basis for this space and that
+   * the shape functions of this basis are enumerated in an indexable,
+   * predictable way.
    *
-   * The purpose of this function is first discussed in the introduction to
-   * the step-2 tutorial program.
+   * The exact order in which degrees of freedom on a mesh are
+   * ordered, i.e., the order in which basis functions of the finite
+   * element space are enumerated, is something that deal.II treats as
+   * an implementation detail. By and large, degrees of freedom are
+   * enumerated in the same order in which we traverse cells, but you
+   * should not rely on any specific numbering. In contrast, if you
+   * want a particular ordering, use the functions in namespace
+   * DoFRenumbering.
    *
-   * @note A copy of the finite element given as argument is stored.
+   * This function is first discussed in the introduction to the
+   * step-2 tutorial program.
+   *
+   * @note This function makes a copy of the finite element given as
+   * argument, and stores it as a member variable. Consequently, it is
+   * possible to write code such as
+   * @code
+   *   dof_handler.distribute_dofs (FE_Q<dim>(2));
+   * @endcode
+   * You can then access the finite element later on by calling
+   * DoFHandler::get_fe().  However, it is often more convenient to
+   * keep a named finite element object as a member variable in your
+   * main class and refer to it directly whenever you need to access
+   * properties of the finite element (such as FiniteElement::dofs_per_cell).
+   * This is what all tutorial programs do.
    */
   virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe);
 
