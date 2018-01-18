@@ -28,6 +28,12 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
+  // The pull_back function fails regularly in the compute_chart_points
+  // method, and, instead of throwing an exception, returns a point outside
+  // the unit cell. The individual coordinates of that point are given by the
+  // value below.
+  static constexpr double invalid_pull_back_coordinate = 20.0;
+
   // Rotate a given unit vector u around the axis dir
   // where the angle is given by the length of dir.
   // This is the exponential map for a sphere.
@@ -1600,7 +1606,7 @@ TransfiniteInterpolationManifold<dim,spacedim>
 {
   Point<dim> outside;
   for (unsigned int d=0; d<dim; ++d)
-    outside[d] = 20.;
+    outside[d] = internal::invalid_pull_back_coordinate;
 
   // project the user-given input to unit cell
   Point<dim> chart_point = GeometryInfo<dim>::project_to_unit_cell(initial_guess);
@@ -1887,7 +1893,15 @@ TransfiniteInterpolationManifold<dim, spacedim>
                   Assert(false, ExcInternalError());
                 }
 
+              // This guess should be pretty good, but if the pull_back fails
+              // then try again with affine approximation (which is more
+              // expensive)
               chart_points[i] = pull_back(cell, surrounding_points[i], guess);
+              if (chart_points[i][0] == internal::invalid_pull_back_coordinate)
+                {
+                  chart_points[i] = pull_back(cell, surrounding_points[i],
+                                              cell->real_to_unit_cell_affine_approximation(surrounding_points[i]));
+                }
             }
           else
             chart_points[i] = pull_back(cell, surrounding_points[i],
