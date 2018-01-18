@@ -38,6 +38,8 @@ namespace LinearAlgebra
      * This class implements a vector using CUDA for use on Nvidia GPUs. This
      * class is derived from the LinearAlgebra::VectorSpaceVector class.
      *
+     * @note Only float and double are supported.
+     *
      * @ingroup CUDAWrappers
      * @ingroup Vectors
      * @author Karl Ljungkvist, Bruno Turcksin, 2016
@@ -215,8 +217,8 @@ namespace LinearAlgebra
        * twice. Since most vector operations are memory transfer limited, this
        * reduces the time by 25\% (or 50\% if @p W equals @p this).
        *
-       * For complex-valued vectors, the scalar product in the second step is implemented as
-       * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
+       * For complex-valued vectors, the scalar product in the second step is
+       * implemented as $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
       virtual Number add_and_dot(const Number                     a,
                                  const VectorSpaceVector<Number> &V,

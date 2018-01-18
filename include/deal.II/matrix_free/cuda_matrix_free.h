@@ -65,6 +65,8 @@ namespace CUDAWrappers
    * This class traverse the cells in a different order than the usual
    * Triangulation class in deal.II.
    *
+   * @note Only float and double are supported.
+   *
    * @ingroup CUDAWrappers
    */
   template <int dim, typename Number=double>
