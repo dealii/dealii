@@ -33,37 +33,38 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * <h3>Quasi-minimal method for symmetric matrices (SQMR)</h3>
  *
- * The SQMR method is supposed to solve symmetric indefinite linear systems
- * with symmetric, not necessarily definite preconditioners. This version of
- * SQMR is adapted from the respective symmetric QMR-from-BiCG algorithm
- * given by both Freund/Nachtigal: A new Krylov-subspace method for symmetric
- * indefinite linear systems, NASA STI/Recon Technical Report N, 95 (1994) and
- * Freund/Nachtigal: Software for simplified Lanczos and QMR algorithms,
- * Appl. Num. Math. 19 (1995), pp. 319-341 and provides both right and left
- * but not split preconditioning.
+ * The SQMR (symmetric quasi-minimal residual) method is supposed to solve symmetric
+ * indefinite linear systems with symmetric, not necessarily definite preconditioners.
+ * It is a variant of the original quasi-minimal residual method (QMR) and produces
+ * the same iterative solution. This version of SQMR is adapted from the respective
+ * symmetric QMR-from-BiCG algorithm given by both Freund/Nachtigal: A new
+ * Krylov-subspace method for symmetric indefinite linear systems, NASA STI/Recon
+ * Technical Report N, 95 (1994) and Freund/Nachtigal: Software for simplified
+ * Lanczos and QMR algorithms, Appl. Num. Math. 19 (1995), pp. 319-341 and provides
+ * both right and left (but not split) preconditioning.
  *
  *
  * <h3>Trade off of stability to simplicity</h3>
  *
- * Note, that the QMR implementation the given algorithm is based on, is
+ * Note, that the QMR implementation that the given algorithm is based on is
  * derived from classical BiCG. It can be shown (Freund/Szeto: A transpose-free
  * quasi-minimal residual squared algorithm for non-Hermitian linear systems,
  * Advances in Computer Methods for Partial Differential Equations VII
- * (IMACS, New Brunswick, NJ, 1992) pp. 258-264), that the QMR iterates can
+ * (IMACS, New Brunswick, NJ, 1992) pp. 258-264) that the QMR iterates can
  * be generated from the BiCG iteration through one additional vector and
  * some scalar updates. Possible breakdowns (or precisely, divisions by
  * zero) of BiCG therefore obviously transfer to this simple no-look-ahead algorithm.
  *
- * In return the algorithm is cheap compared to classical QMR or BiCGStab
- * using only one matrix-vector-product with the system matrix and
+ * In return the algorithm is cheap compared to classical QMR or BiCGStab,
+ * using only one matrix-vector product with the system matrix and
  * one application of the preconditioner per iteration respectively.
  *
  * The residual used for measuring convergence is only approximately calculated
- * by an upper bound. If this value comes below a threshold given by the
+ * by an upper bound. If this value comes below a threshold prescribed within the
  * AdditionalData struct, then the exact residual of the current
  * QMR iterate will be calculated using another multiplication with the system
  * matrix. By experience (according to Freund and Nachtigal) this technique
- * is useful for a threshold that is ten times the solving tolerance and in
+ * is useful for a threshold that is ten times the solving tolerance, and in
  * that case will be only used in the last one or two steps of the complete iteration.
  *
  * For the requirements on matrices and vectors in order to work with this
@@ -85,7 +86,7 @@ DEAL_II_NAMESPACE_OPEN
  * to observe the progress of the iteration.
  *
  *
- * @author Guido Kanschat, Ingo Kligge 1999, 2017
+ * @author Guido Kanschat, 1999; Ingo Kligge 2017
  */
 template <typename VectorType = Vector<double> >
 class SolverQMRS : public Solver<VectorType>
@@ -96,28 +97,27 @@ public:
    *
    * The user is able to switch between right and left preconditioning, that means
    * solving the systems <i>P<sup>-1</sup>A</i> and <i>AP<sup>-1</sup></i> respectively,
-   * using the corresponding parameter. Note, that left preconditioning means to
+   * using the corresponding parameter. Note that left preconditioning means to
    * employ the preconditioned (BiCG-)residual and otherwise the unpreconditioned one.
    * The default is the application from the right side.
    *
-   * The solver_tolerance threshold is used to define the said bound below which the residual
-   * is computed exactly. See class documentation for more information. The default value is 1e-9,
+   * The @p solver_tolerance threshold is used to define the said bound below which the residual
+   * is computed exactly. See the class documentation for more information. The default value is 1e-9,
    * that is the default solving precision multiplied by ten.
    *
-   * SQMR is susceptible to breakdowns (divisions by zero), so we need a parameter telling us,
+   * SQMR is susceptible to breakdowns (divisions by zero), so we need a parameter telling us
    * which numbers are considered zero. The proper breakdown criterion is very
    * unclear, so experiments may be necessary here. It is even possible to achieve convergence
-   * despite of dividing through small numbers. There are even cases, in which it is advantageous to
+   * despite of dividing through by small numbers. There are even cases in which it is advantageous to
    * accept such divisions because the cheap iteration cost makes the algorithm the fastest of all
-   * available indefinit solvers. Nonetheless, the default breakdown threshold value is 1e-16.
+   * available indefinite iterative solvers. Nonetheless, the default breakdown threshold value is 1e-16.
    */
   struct AdditionalData
   {
     /**
      * Constructor.
      *
-     * The default is right preconditioning and breakdown parameter
-     * 1e-16.
+     * The default is right preconditioning, with the @p solver_tolerance chosen to be 1e-9 and the @p breakdown_threshold set at 1e-16.
      */
     explicit
     AdditionalData (const bool left_preconditioning = false,
@@ -138,7 +138,7 @@ public:
     bool left_preconditioning;
 
     /**
-     * Representing the threshold below which the current residual is computed exactly.
+     * The threshold below which the current residual is computed exactly.
      */
     double solver_tolerance;
 
