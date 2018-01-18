@@ -38,8 +38,11 @@ void check ()
       check = v1;
       const number factor = 0.01432;
 
+      // do things by hand once
       v1.add(factor, v2);
       const number prod = v1 * v3;
+
+      // then do it a second time with the add_and_dot function
       const number prod_check = check.add_and_dot(factor, v2, v3);
       if (test == 0 && std::is_same<number,double>::value)
         {
