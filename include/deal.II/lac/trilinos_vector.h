@@ -839,6 +839,9 @@ namespace TrilinosWrappers
        * transfer. However, for Trilinos vectors such a combined operation is
        * not natively supported and thus the cost is completely equivalent as
        * calling the two methods separately.
+       *
+       * For complex-valued vectors, the scalar product in the second step is implemented as
+       * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
       TrilinosScalar add_and_dot (const TrilinosScalar a,
                                   const Vector    &V,

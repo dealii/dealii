@@ -334,10 +334,13 @@ namespace PETScWrappers
 
     PetscScalar result;
 
-    //For complex vectors, VecDot() computes
+    // For complex vectors, VecDot() computes
     //    val = (x,y) = y^H x,
-    //where y^H denotes the conjugate transpose of y.
-    //Note that this corresponds to the usual "mathematicians" complex inner product where the SECOND argument gets the complex conjugate.
+    // where y^H denotes the conjugate transpose of y.
+    // Note that this corresponds to the usual "mathematicians'"
+    // complex inner product where the SECOND argument gets the
+    // complex conjugate, which is also how we document this
+    // operation.
     const PetscErrorCode ierr = VecDot (vec.vector, vector, &result);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 

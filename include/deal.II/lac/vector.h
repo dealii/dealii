@@ -494,13 +494,17 @@ public:
    * most vector operations are memory transfer limited, this reduces the time
    * by 25\% (or 50\% if @p W equals @p this).
    *
+   * For complex-valued vectors, the scalar product in the second step is implemented as
+   * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
+   *
    * @dealiiOperationIsMultithreaded The algorithm uses pairwise summation
    * with the same order of summation in every run, which gives fully
    * repeatable results from one run to another.
    */
-  Number add_and_dot (const Number          a,
-                      const Vector<Number> &V,
-                      const Vector<Number> &W);
+  Number
+  add_and_dot (const Number          a,
+               const Vector<Number> &V,
+               const Vector<Number> &W);
 
   //@}
 
