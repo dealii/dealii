@@ -355,14 +355,15 @@ namespace internal
      * The elements from the source array are simply copied via the placement
      * new copy constructor.
      */
-    AlignedVectorCopy (T *source_begin,
-                       T *source_end,
-                       T *destination)
+    AlignedVectorCopy (const T *const source_begin,
+                       const T *const source_end,
+                       T *const destination)
       :
       source_ (source_begin),
       destination_ (destination)
     {
       Assert (source_end >= source_begin, ExcInternalError());
+      Assert (source_end == source_begin || destination != nullptr, ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
         apply_to_subrange (0, size);
@@ -393,8 +394,8 @@ namespace internal
     }
 
   private:
-    T *source_;
-    T *destination_;
+    const T *const source_;
+    T *const destination_;
   };
 
 
@@ -417,14 +418,15 @@ namespace internal
      * The data is moved between the two arrays by invoking the destructor on
      * the source range (preparing for a subsequent call to free).
      */
-    AlignedVectorMove (T *source_begin,
-                       T *source_end,
-                       T *destination)
+    AlignedVectorMove (T *const source_begin,
+                       T *const source_end,
+                       T *const destination)
       :
       source_ (source_begin),
       destination_ (destination)
     {
       Assert (source_end >= source_begin, ExcInternalError());
+      Assert (source_end == source_begin || destination != nullptr, ExcInternalError());
       const std::size_t size = source_end - source_begin;
       if (size < minimum_parallel_grain_size)
         apply_to_subrange (0, size);
@@ -460,8 +462,8 @@ namespace internal
     }
 
   private:
-    T *source_;
-    T *destination_;
+    T *const source_;
+    T *const destination_;
   };
 
 
@@ -487,7 +489,7 @@ namespace internal
      */
     AlignedVectorSet (const std::size_t size,
                       const T &element,
-                      T *destination)
+                      T *const destination)
       :
       element_ (element),
       destination_ (destination),
@@ -495,6 +497,7 @@ namespace internal
     {
       if (size == 0)
         return;
+      Assert (destination != nullptr, ExcInternalError());
 
       // do not use memcmp for long double because on some systems it does not
       // completely fill its memory and may lead to false positives in
@@ -579,12 +582,13 @@ namespace internal
      * elements, otherwise work in serial.
      */
     AlignedVectorDefaultInitialize (const std::size_t size,
-                                    T *destination)
+                                    T *const destination)
       :
       destination_ (destination)
     {
       if (size == 0)
         return;
+      Assert (destination != nullptr, ExcInternalError());
 
       if (size < minimum_parallel_grain_size)
         apply_to_subrange (0, size);
