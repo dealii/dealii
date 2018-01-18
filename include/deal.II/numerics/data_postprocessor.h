@@ -905,7 +905,7 @@ private:
  *                            (Tensor<2,dim>::n_independent_components));
  *           for (unsigned int d=0; d<dim; ++d)
  *             for (unsigned int e=0; e<dim; ++e)
- *               computed_quantities[p][Tensor<2,dim>::component_to_unrolled_index(TableIndices<2>(d,e)]
+ *               computed_quantities[p][Tensor<2,dim>::component_to_unrolled_index(TableIndices<2>(d,e))]
  *                 = input_data.solution_gradients[p][d][e];
  *         }
  *     }
