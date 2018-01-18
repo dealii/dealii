@@ -1825,12 +1825,68 @@ TransfiniteInterpolationManifold<dim, spacedim>
               chart_points[i] = pull_back(cell, surrounding_points[i], p3);
             }
           // 8 points usually form either a cube or a rectangle with vertices
-          // and line mid points. assume a cube here which gives us some new
-          // initial guesses
-          else if (surrounding_points.size() == 8 && i > 4)
+          // and line mid points. Get the initial guess with line segment
+          // midpoints in 2D and assuming a cube for 3D.
+          else if (surrounding_points.size() == 8 &&
+                   ((dim == 3 && i > 4) || (dim == 2 && i > 3)))
             {
-              const Point<dim> guess = chart_points[i-4] +
-                                       (chart_points[4] - chart_points[0]);
+              Point<dim> guess;
+              switch (dim)
+                {
+                case 2:
+                  // inline the standard numbering
+                  //
+                  // 2 - 7 - 3
+                  // |       |
+                  // 4       5
+                  // |       |
+                  // 0 - 6 - 1
+                  //
+                  // to calculate guesses based on averaging already computed
+                  // chart points.
+                  switch (i)
+                    {
+                    case 4:
+                      guess = 0.5*(chart_points[0] + chart_points[2]);
+                      break;
+                    case 5:
+                      guess = 0.5*(chart_points[1] + chart_points[3]);
+                      break;
+                    case 6:
+                      guess = 0.5*(chart_points[0] + chart_points[1]);
+                      break;
+                    case 7:
+                      guess = 0.5*(chart_points[2] + chart_points[3]);
+                      break;
+                    default:
+                      Assert(false, ExcInternalError());
+                    }
+                  break;
+                case 3:
+                  // Assuming that we are in 3D and have the points around a
+                  // cube numbered as
+                  //
+                  //         6-------7
+                  //        /|      /|
+                  //       /       / |
+                  //      /  |    /  |
+                  //     4-------5   |
+                  //     |   2- -|- -3
+                  //     |  /    |  /
+                  //     |       | /
+                  //     |/      |/
+                  //     0-------1
+                  //
+                  // (where vertex 2 is the back left vertex) we can estimate
+                  // where chart points 5 - 7 are by computing the height (in
+                  // chart coordinates) as c4 - c0 and then adding that onto the
+                  // appropriate bottom vertex.
+                  guess = chart_points[i - 4] + (chart_points[4] - chart_points[0]);
+                  break;
+                default:
+                  Assert(false, ExcInternalError());
+                }
+
               chart_points[i] = pull_back(cell, surrounding_points[i], guess);
             }
           else
