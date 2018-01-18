@@ -27,205 +27,49 @@ GeometryInfo<0>::n_children(const RefinementCase<0> &)
 
 
 
-template <int dim> const unsigned int GeometryInfo<dim>::max_children_per_cell;
-template <int dim> const unsigned int GeometryInfo<dim>::faces_per_cell;
-template <int dim> const unsigned int GeometryInfo<dim>::max_children_per_face;
-template <int dim> const unsigned int GeometryInfo<dim>::vertices_per_cell;
-template <int dim> const unsigned int GeometryInfo<dim>::vertices_per_face;
-template <int dim> const unsigned int GeometryInfo<dim>::lines_per_face;
-template <int dim> const unsigned int GeometryInfo<dim>::quads_per_face;
-template <int dim> const unsigned int GeometryInfo<dim>::lines_per_cell;
-template <int dim> const unsigned int GeometryInfo<dim>::quads_per_cell;
-template <int dim> const unsigned int GeometryInfo<dim>::hexes_per_cell;
+template <int dim> constexpr unsigned int GeometryInfo<dim>::max_children_per_cell;
+template <int dim> constexpr unsigned int GeometryInfo<dim>::faces_per_cell;
+template <int dim> constexpr unsigned int GeometryInfo<dim>::max_children_per_face;
+template <int dim> constexpr unsigned int GeometryInfo<dim>::vertices_per_cell;
+template <int dim> constexpr unsigned int GeometryInfo<dim>::vertices_per_face;
+template <int dim> constexpr unsigned int GeometryInfo<dim>::lines_per_face;
+template <int dim> constexpr unsigned int GeometryInfo<dim>::quads_per_face;
+template <int dim> constexpr unsigned int GeometryInfo<dim>::lines_per_cell;
+template <int dim> constexpr unsigned int GeometryInfo<dim>::quads_per_cell;
+template <int dim> constexpr unsigned int GeometryInfo<dim>::hexes_per_cell;
+
+template <int dim>
+constexpr std::array<int, GeometryInfo<dim>::faces_per_cell>
+GeometryInfo<dim>::unit_normal_orientation;
+
+template <int dim>
+constexpr std::array<std::array<unsigned int, dim>, GeometryInfo<dim>::vertices_per_cell>
+GeometryInfo<dim>::vertex_to_face;
+
+template <int dim>
+constexpr std::array<unsigned int, GeometryInfo<dim>::faces_per_cell>
+GeometryInfo<dim>::unit_normal_direction;
+
+template <int dim>
+constexpr std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>
+GeometryInfo<dim>::dx_to_deal;
+
+template <int dim>
+constexpr std::array<unsigned int, GeometryInfo<dim>::faces_per_cell>
+GeometryInfo<dim>::opposite_face;
+
+template <int dim>
+constexpr std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>
+GeometryInfo<dim>::ucd_to_deal;
+
+constexpr std::array<unsigned int, GeometryInfo<0>::vertices_per_cell>
+GeometryInfo<0>::ucd_to_deal;
+
+constexpr std::array<unsigned int, GeometryInfo<0>::vertices_per_cell>
+GeometryInfo<0>::dx_to_deal;
 
 
 using namespace numbers;
-
-template <>
-const unsigned int
-GeometryInfo<1>::unit_normal_direction[faces_per_cell]
-  = { 0, 0 };
-
-template <>
-const unsigned int
-GeometryInfo<2>::unit_normal_direction[faces_per_cell]
-  = { 0, 0, 1, 1 };
-
-template <>
-const unsigned int
-GeometryInfo<3>::unit_normal_direction[faces_per_cell]
-  = { 0, 0, 1, 1, 2, 2 };
-
-template <>
-const unsigned int
-GeometryInfo<4>::unit_normal_direction[faces_per_cell]
-  = { 0, 0, 1, 1, 2, 2, 3, 3 };
-
-
-
-template <>
-const int
-GeometryInfo<1>::unit_normal_orientation[faces_per_cell]
-  = { -1, 1 };
-
-template <>
-const int
-GeometryInfo<2>::unit_normal_orientation[faces_per_cell]
-  = { -1, 1, -1, 1 };
-
-template <>
-const int
-GeometryInfo<3>::unit_normal_orientation[faces_per_cell]
-  = { -1, 1, -1, 1, -1, 1 };
-
-template <>
-const int
-GeometryInfo<4>::unit_normal_orientation[faces_per_cell]
-  = { -1, 1, -1, 1, -1, 1, -1, 1 };
-
-
-
-template <>
-const unsigned int
-GeometryInfo<1>::opposite_face[faces_per_cell]
-  = { 1, 0 };
-
-template <>
-const unsigned int
-GeometryInfo<2>::opposite_face[faces_per_cell]
-  = { 1, 0, 3, 2 };
-
-template <>
-const unsigned int
-GeometryInfo<3>::opposite_face[faces_per_cell]
-  = { 1, 0, 3, 2, 5, 4 };
-
-template <>
-const unsigned int
-GeometryInfo<4>::opposite_face[faces_per_cell]
-  = { 1, 0, 3, 2, 5, 4, 7, 6 };
-
-
-const unsigned int GeometryInfo<0>::ucd_to_deal[GeometryInfo<0>::vertices_per_cell]
-  = {0};
-
-template <>
-const unsigned int GeometryInfo<1>::ucd_to_deal[GeometryInfo<1>::vertices_per_cell]
-  = { 0, 1};
-
-template <>
-const unsigned int GeometryInfo<2>::ucd_to_deal[GeometryInfo<2>::vertices_per_cell]
-  = { 0, 1, 3, 2};
-
-template <>
-const unsigned int GeometryInfo<3>::ucd_to_deal[GeometryInfo<3>::vertices_per_cell]
-  = { 0, 1, 5, 4, 2, 3, 7, 6};
-
-template <>
-const unsigned int GeometryInfo<4>::ucd_to_deal[GeometryInfo<4>::vertices_per_cell]
-  = {  invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int
-    };
-
-
-const unsigned int GeometryInfo<0>::dx_to_deal[GeometryInfo<0>::vertices_per_cell]
-  = {0};
-
-template <>
-const unsigned int GeometryInfo<1>::dx_to_deal[GeometryInfo<1>::vertices_per_cell]
-  = { 0, 1};
-
-template <>
-const unsigned int GeometryInfo<2>::dx_to_deal[GeometryInfo<2>::vertices_per_cell]
-  = { 0, 2, 1, 3};
-
-template <>
-const unsigned int GeometryInfo<3>::dx_to_deal[GeometryInfo<3>::vertices_per_cell]
-  = { 0, 4, 2, 6, 1, 5, 3, 7};
-
-template <>
-const unsigned int GeometryInfo<4>::dx_to_deal[GeometryInfo<4>::vertices_per_cell]
-  = {  invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int,
-       invalid_unsigned_int
-    };
-
-template <>
-const unsigned int GeometryInfo<1>::vertex_to_face
-[GeometryInfo<1>::vertices_per_cell][1]
-= { { 0 },
-  { 1 }
-};
-
-template <>
-const unsigned int GeometryInfo<2>::vertex_to_face
-[GeometryInfo<2>::vertices_per_cell][2]
-= { { 0, 2 },
-  { 1, 2 },
-  { 0, 3 },
-  { 1, 3 }
-};
-
-template <>
-const unsigned int GeometryInfo<3>::vertex_to_face
-[GeometryInfo<3>::vertices_per_cell][3]
-= { { 0, 2, 4 },
-  { 1, 2, 4 },
-  { 0, 3, 4 },
-  { 1, 3, 4 },
-  { 0, 2, 5 },
-  { 1, 2, 5 },
-  { 0, 3, 5 },
-  { 1, 3, 5 }
-};
-
-template <>
-const unsigned int GeometryInfo<4>::vertex_to_face
-[GeometryInfo<4>::vertices_per_cell][4]
-= { { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int },
-  { invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int, invalid_unsigned_int }
-};
 
 
 template <int dim>

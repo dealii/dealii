@@ -23,6 +23,182 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
+namespace internal
+{
+  namespace GeometryInfoHelper
+  {
+    // A struct that holds the values for all the arrays we want to initialize in GeometryInfo
+    template <int dim>
+    struct Initializers;
+
+    template<>
+    struct Initializers<1>
+    {
+      static constexpr std::array<unsigned int, 2>                ucd_to_deal
+      {{0, 1}};
+
+      static constexpr std::array<unsigned int, 2>                unit_normal_direction
+      {{ 0, 0 }};
+
+      static constexpr std::array<int, 2>                         unit_normal_orientation
+      {{ -1, 1 }};
+
+      static constexpr std::array<unsigned int, 2>                opposite_face
+      {{ 1, 0 }};
+
+      static constexpr std::array<unsigned int, 2>                dx_to_deal
+      {{ 0, 1}};
+
+      static constexpr std::array<std::array<unsigned int, 1>, 2> vertex_to_face
+      {
+        { {{ 0 }},
+          {{ 1 }}
+        }
+      };
+    };
+
+    template<>
+    struct Initializers<2>
+    {
+      static constexpr std::array<unsigned int, 4>                ucd_to_deal
+      {{ 0, 1, 3, 2}};
+
+      static constexpr std::array<unsigned int, 4>                unit_normal_direction
+      {{ 0, 0, 1, 1 }};
+
+      static constexpr std::array<int, 4>                         unit_normal_orientation
+      {{-1, 1, -1, 1}};
+
+      static constexpr std::array<unsigned int, 4>                opposite_face
+      {{1,0,3,2}};
+
+      static constexpr std::array<unsigned int, 4>                dx_to_deal
+      {{ 0, 2, 1, 3}};
+
+      static constexpr std::array<std::array<unsigned int, 2>, 4> vertex_to_face
+      {
+        { {{ 0, 2 }},
+          {{ 1, 2 }},
+          {{ 0, 3 }},
+          {{ 1, 3 }}
+        }
+      };
+    };
+
+    template<>
+    struct Initializers<3>
+    {
+      static constexpr std::array<unsigned int, 8>                ucd_to_deal
+      {{ 0, 1, 5, 4, 2, 3, 7, 6}};
+
+      static constexpr std::array<unsigned int, 6>                unit_normal_direction
+      {{ 0, 0, 1, 1, 2, 2 }};
+
+      static constexpr std::array<int, 6>                         unit_normal_orientation
+      {{ -1, 1, -1, 1, -1, 1 }};
+
+      static constexpr std::array<unsigned int, 6>                opposite_face
+      {{ 1, 0, 3, 2, 5, 4 }};
+
+      static constexpr std::array<unsigned int, 8>                dx_to_deal
+      {{ 0, 4, 2, 6, 1, 5, 3, 7}};
+
+      static constexpr std::array<std::array<unsigned int, 3>, 8> vertex_to_face
+      {
+        { {{ 0, 2, 4 }},
+          {{ 1, 2, 4 }},
+          {{ 0, 3, 4 }},
+          {{ 1, 3, 4 }},
+          {{ 0, 2, 5 }},
+          {{ 1, 2, 5 }},
+          {{ 0, 3, 5 }},
+          {{ 1, 3, 5 }}
+        }
+      };
+    };
+
+    template<>
+    struct Initializers<4>
+    {
+      static constexpr std::array<unsigned int, 16>                ucd_to_deal
+      {
+        {
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int
+        }
+      };
+
+      static constexpr std::array<unsigned int, 8>                 unit_normal_direction
+      {{ 0, 0, 1, 1, 2, 2, 3, 3 }};
+
+      static constexpr std::array<int, 8>                          unit_normal_orientation
+      {{ -1, 1, -1, 1, -1, 1, -1, 1 }};
+
+      static constexpr std::array<unsigned int, 8>                 opposite_face
+      {{ 1, 0, 3, 2, 5, 4, 7, 6 }};
+
+      static constexpr std::array<unsigned int, 16>                dx_to_deal
+      {
+        {
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int,
+          numbers::invalid_unsigned_int
+        }
+      };
+
+      static constexpr std::array<std::array<unsigned int, 4>, 16> vertex_to_face
+      {
+        { {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}},
+          {{numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}}
+        }
+      };
+    };
+  } // GeometryInfoHelper
+} // internal
+#endif //DOXYGEN
+
 
 /**
  * A class that can represent the kinds of objects a triangulation is made up
@@ -868,12 +1044,12 @@ struct GeometryInfo<0>
    * If a cell is refined anisotropically, the actual number of children may
    * be less than the value given here.
    */
-  static const unsigned int max_children_per_cell = 1;
+  static constexpr unsigned int max_children_per_cell = 1;
 
   /**
    * Number of faces a cell has.
    */
-  static const unsigned int faces_per_cell    = 0;
+  static constexpr unsigned int faces_per_cell    = 0;
 
   /**
    * Maximum number of children of a refined face, i.e. the number of children
@@ -882,7 +1058,7 @@ struct GeometryInfo<0>
    * If a cell is refined anisotropically, the actual number of children may
    * be less than the value given here.
    */
-  static const unsigned int max_children_per_face = 0;
+  static constexpr unsigned int max_children_per_face = 0;
 
   /**
    * Return the number of children of a cell (or face) refined with
@@ -894,7 +1070,7 @@ struct GeometryInfo<0>
   /**
    * Number of vertices a cell has.
    */
-  static const unsigned int vertices_per_cell = 1;
+  static constexpr unsigned int vertices_per_cell = 1;
 
   /**
    * Number of vertices each face has. Since this is not useful in one
@@ -902,32 +1078,32 @@ struct GeometryInfo<0>
    * warn when it sees constructs like <tt>for (i=0; i<vertices_per_face;
    * ++i)</tt>, at least if @p i is an <tt>unsigned int</tt>.
    */
-  static const unsigned int vertices_per_face = 0;
+  static constexpr unsigned int vertices_per_face = 0;
 
   /**
    * Number of lines each face has.
    */
-  static const unsigned int lines_per_face    = 0;
+  static constexpr unsigned int lines_per_face    = 0;
 
   /**
    * Number of quads on each face.
    */
-  static const unsigned int quads_per_face    = 0;
+  static constexpr unsigned int quads_per_face    = 0;
 
   /**
    * Number of lines of a cell.
    */
-  static const unsigned int lines_per_cell    = 0;
+  static constexpr unsigned int lines_per_cell    = 0;
 
   /**
    * Number of quadrilaterals of a cell.
    */
-  static const unsigned int quads_per_cell    = 0;
+  static constexpr unsigned int quads_per_cell    = 0;
 
   /**
    * Number of hexahedra of a cell.
    */
-  static const unsigned int hexes_per_cell    = 0;
+  static constexpr unsigned int hexes_per_cell    = 0;
 
   /**
    * Rearrange vertices for UCD output.  For a cell being written in UCD
@@ -946,7 +1122,7 @@ struct GeometryInfo<0>
    * with the UCD numbering, this field can also be used like a
    * old_to_lexicographic mapping.
    */
-  static const unsigned int ucd_to_deal[vertices_per_cell];
+  static constexpr std::array<unsigned int, vertices_per_cell> ucd_to_deal {{0}};
 
   /**
    * Rearrange vertices for OpenDX output.  For a cell being written in OpenDX
@@ -961,7 +1137,7 @@ struct GeometryInfo<0>
    *   out << cell->vertex(dx_to_deal[i]);
    * @endcode
    */
-  static const unsigned int dx_to_deal[vertices_per_cell];
+  static constexpr std::array<unsigned int, vertices_per_cell> dx_to_deal {{0}};
 };
 
 
@@ -1503,12 +1679,12 @@ struct GeometryInfo
    * If a cell is refined anisotropically, the actual number of children may
    * be less than the value given here.
    */
-  static const unsigned int max_children_per_cell = 1 << dim;
+  static constexpr unsigned int max_children_per_cell = 1 << dim;
 
   /**
    * Number of faces of a cell.
    */
-  static const unsigned int faces_per_cell = 2 * dim;
+  static constexpr unsigned int faces_per_cell = 2 * dim;
 
   /**
    * Maximum number of children of a refined face, i.e. the number of children
@@ -1517,28 +1693,28 @@ struct GeometryInfo
    * If a cell is refined anisotropically, the actual number of children may
    * be less than the value given here.
    */
-  static const unsigned int max_children_per_face = GeometryInfo<dim-1>::max_children_per_cell;
+  static constexpr unsigned int max_children_per_face = GeometryInfo<dim-1>::max_children_per_cell;
 
   /**
    * Number of vertices of a cell.
    */
-  static const unsigned int vertices_per_cell = 1 << dim;
+  static constexpr unsigned int vertices_per_cell = 1 << dim;
 
   /**
    * Number of vertices on each face.
    */
-  static const unsigned int vertices_per_face = GeometryInfo<dim-1>::vertices_per_cell;
+  static constexpr unsigned int vertices_per_face = GeometryInfo<dim-1>::vertices_per_cell;
 
   /**
    * Number of lines on each face.
    */
-  static const unsigned int lines_per_face
+  static constexpr unsigned int lines_per_face
     = GeometryInfo<dim-1>::lines_per_cell;
 
   /**
    * Number of quads on each face.
    */
-  static const unsigned int quads_per_face
+  static constexpr unsigned int quads_per_face
     = GeometryInfo<dim-1>::quads_per_cell;
 
   /**
@@ -1550,7 +1726,7 @@ struct GeometryInfo
    * between each vertex of the old object and the corresponding one in the
    * copy.
    */
-  static const unsigned int lines_per_cell
+  static constexpr unsigned int lines_per_cell
     = (2*GeometryInfo<dim-1>::lines_per_cell +
        GeometryInfo<dim-1>::vertices_per_cell);
 
@@ -1561,14 +1737,14 @@ struct GeometryInfo
    * exception that new quads result from connecting an original line and its
    * copy.
    */
-  static const unsigned int quads_per_cell
+  static constexpr unsigned int quads_per_cell
     = (2*GeometryInfo<dim-1>::quads_per_cell +
        GeometryInfo<dim-1>::lines_per_cell);
 
   /**
    * Number of hexahedra of a cell.
    */
-  static const unsigned int hexes_per_cell
+  static constexpr unsigned int hexes_per_cell
     = (2*GeometryInfo<dim-1>::hexes_per_cell +
        GeometryInfo<dim-1>::quads_per_cell);
 
@@ -1589,7 +1765,8 @@ struct GeometryInfo
    * with the UCD numbering, this field can also be used like a
    * old_to_lexicographic mapping.
    */
-  static const unsigned int ucd_to_deal[vertices_per_cell];
+  static constexpr std::array<unsigned int, vertices_per_cell> ucd_to_deal
+    = internal::GeometryInfoHelper::Initializers<dim>::ucd_to_deal;
 
   /**
    * Rearrange vertices for OpenDX output.  For a cell being written in OpenDX
@@ -1604,7 +1781,8 @@ struct GeometryInfo
    *   out << cell->vertex(dx_to_deal[i]);
    * @endcode
    */
-  static const unsigned int dx_to_deal[vertices_per_cell];
+  static constexpr std::array<unsigned int, vertices_per_cell> dx_to_deal
+    = internal::GeometryInfoHelper::Initializers<dim>::dx_to_deal;
 
   /**
    * This field stores for each vertex to which faces it belongs. In any given
@@ -1616,7 +1794,8 @@ struct GeometryInfo
    * bounds the reference cell in <i>x</i> direction, the second in <i>y</i>
    * direction, and so on.
    */
-  static const unsigned int vertex_to_face[vertices_per_cell][dim];
+  static constexpr std::array<std::array<unsigned int, dim>, vertices_per_cell> vertex_to_face
+    = internal::GeometryInfoHelper::Initializers<dim>::vertex_to_face;
 
   /**
    * Return the number of children of a cell (or face) refined with
@@ -2056,7 +2235,8 @@ struct GeometryInfo
    * normal vector is obtained by multiplying the unit vector in this
    * direction with #unit_normal_orientation.
    */
-  static const unsigned int unit_normal_direction[faces_per_cell];
+  static constexpr std::array<unsigned int, faces_per_cell> unit_normal_direction
+    = internal::GeometryInfoHelper::Initializers<dim>::unit_normal_direction;
 
   /**
    * Orientation of the unit normal vector of a face of the reference cell. In
@@ -2074,14 +2254,16 @@ struct GeometryInfo
    * @ref GlossFaceOrientation "glossary"
    * entry on face orientation.
    */
-  static const int unit_normal_orientation[faces_per_cell];
+  static constexpr std::array<int, faces_per_cell> unit_normal_orientation
+    = internal::GeometryInfoHelper::Initializers<dim>::unit_normal_orientation;
 
   /**
    * List of numbers which denotes which face is opposite to a given face. Its
    * entries are the first <tt>2*dim</tt> entries of <tt>{ 1, 0, 3, 2, 5, 4,
    * 7, 6}</tt>.
    */
-  static const unsigned int opposite_face[faces_per_cell];
+  static constexpr std::array<unsigned int, faces_per_cell> opposite_face
+    = internal::GeometryInfoHelper::Initializers<dim>::opposite_face;
 
 
   /**
@@ -2108,35 +2290,6 @@ struct GeometryInfo
 
 
 /* -------------- declaration of explicit specializations ------------- */
-
-#ifndef DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
-template <>
-const unsigned int GeometryInfo<1>::unit_normal_direction[faces_per_cell];
-template <>
-const unsigned int GeometryInfo<2>::unit_normal_direction[faces_per_cell];
-template <>
-const unsigned int GeometryInfo<3>::unit_normal_direction[faces_per_cell];
-template <>
-const unsigned int GeometryInfo<4>::unit_normal_direction[faces_per_cell];
-
-template <>
-const int GeometryInfo<1>::unit_normal_orientation[faces_per_cell];
-template <>
-const int GeometryInfo<2>::unit_normal_orientation[faces_per_cell];
-template <>
-const int GeometryInfo<3>::unit_normal_orientation[faces_per_cell];
-template <>
-const int GeometryInfo<4>::unit_normal_orientation[faces_per_cell];
-
-template <>
-const unsigned int GeometryInfo<1>::opposite_face[faces_per_cell];
-template <>
-const unsigned int GeometryInfo<2>::opposite_face[faces_per_cell];
-template <>
-const unsigned int GeometryInfo<3>::opposite_face[faces_per_cell];
-template <>
-const unsigned int GeometryInfo<4>::opposite_face[faces_per_cell];
-#endif
 
 
 template <>
@@ -2859,7 +3012,7 @@ unsigned int
 GeometryInfo<2>::line_to_cell_vertices (const unsigned int line,
                                         const unsigned int vertex)
 {
-  static const unsigned int cell_vertices[4][2] = {{0,2},{1,3},{0,1},{2,3}};
+  constexpr unsigned int cell_vertices[4][2] = {{0,2},{1,3},{0,1},{2,3}};
   return cell_vertices[line][vertex];
 }
 
@@ -2874,7 +3027,7 @@ GeometryInfo<3>::line_to_cell_vertices (const unsigned int line,
   Assert (line<lines_per_cell, ExcIndexRange(line, 0, lines_per_cell));
   Assert (vertex<2, ExcIndexRange(vertex, 0, 2));
 
-  static const unsigned
+  constexpr unsigned
   vertices[lines_per_cell][2] = {{0, 2},  // bottom face
     {1, 3},
     {0, 1},
