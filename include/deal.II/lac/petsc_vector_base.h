@@ -547,6 +547,9 @@ namespace PETScWrappers
      * transfer. However, for PETSc vectors such a combined operation is not
      * natively supported and thus the cost is completely equivalent as
      * calling the two methods separately.
+     *
+     * For complex-valued vectors, the scalar product in the second step is implemented as
+     * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
      */
     PetscScalar add_and_dot (const PetscScalar a,
                              const VectorBase &V,

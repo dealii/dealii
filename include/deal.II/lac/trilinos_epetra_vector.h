@@ -229,6 +229,9 @@ namespace LinearAlgebra
        * reduces the time by 25\% (or 50\% if @p W equals @p this).
        *
        * The vectors need to have the same layout.
+       *
+       * For complex-valued vectors, the scalar product in the second step is implemented as
+       * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
       virtual double add_and_dot(const double a,
                                  const VectorSpaceVector<double> &V,
