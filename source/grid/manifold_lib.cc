@@ -1859,7 +1859,7 @@ TransfiniteInterpolationManifold<dim, spacedim>
           // generate additional information to help debugging why we did not
           // get a point
           std::ostringstream message;
-          for (unsigned int b=0; b<c; ++b)
+          for (unsigned int b=0; b<=c; ++b)
             {
               typename Triangulation<dim,spacedim>::cell_iterator cell(triangulation,
                                                                        level_coarse,
