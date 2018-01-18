@@ -1,0 +1,6 @@
+Fixed: In some situations,
+DoFTools::locally_owned_dofs_per_subdomain() returned a vector of the
+wrong size. Specifically, this happened if the processor with the
+highest subdomain id owned no degrees of freedom. This is now fixed.
+<br>
+(Jean-Paul Pelteret, Wolfgang Bangerth, 2018/01/18)
