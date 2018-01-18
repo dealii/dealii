@@ -21,7 +21,7 @@
 #include "../tests.h"
 
 #include <deal.II/matrix_free/cuda_matrix_free.h>
-#include <deal.II/matrix_free/cuda_fe_evaluation.cuh>
+#include <deal.II/matrix_free/cuda_fe_evaluation.h>
 
 #include <deal.II/lac/cuda_vector.h>
 

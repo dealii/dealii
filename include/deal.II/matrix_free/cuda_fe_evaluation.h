@@ -13,15 +13,15 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_cuda_fe_evaluation_cuh
-#define dealii_cuda_fe_evaluation_cuh
+#ifndef dealii_cuda_fe_evaluation_h
+#define dealii_cuda_fe_evaluation_h
 
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/cuda_vector.h>
 #include <deal.II/matrix_free/cuda_matrix_free.h>
-#include <deal.II/matrix_free/cuda_matrix_free.templates.cuh>
-#include <deal.II/matrix_free/cuda_tensor_product_kernels.cuh>
+#include <deal.II/matrix_free/cuda_matrix_free.templates.h>
+#include <deal.II/matrix_free/cuda_tensor_product_kernels.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -26,7 +26,7 @@
 
 #include <deal.II/lac/cuda_vector.h>
 #include <deal.II/lac/read_write_vector.h>
-#include <deal.II/matrix_free/cuda_fe_evaluation.cuh>
+#include <deal.II/matrix_free/cuda_fe_evaluation.h>
 
 namespace CUDA = LinearAlgebra::CUDAWrappers;
 

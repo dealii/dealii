@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/lac/cuda_vector.h>
-#include <deal.II/lac/cuda_atomic.cuh>
+#include <deal.II/lac/cuda_atomic.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <cmath>
