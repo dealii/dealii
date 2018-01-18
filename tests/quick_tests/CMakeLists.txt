@@ -143,6 +143,11 @@ IF (DEAL_II_WITH_GSL)
   make_quicktest("gsl" ${_mybuild} "")
 ENDIF()
 
+# Test HDF5
+IF (DEAL_II_WITH_HDF5)
+  make_quicktest("hdf5" ${_mybuild} "")
+ENDIF()
+
 # Test Nanoflann
 IF (DEAL_II_WITH_NANOFLANN)
   make_quicktest("nanoflann" ${_mybuild} "")
