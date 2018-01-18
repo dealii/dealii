@@ -719,6 +719,17 @@ namespace internal
         VectorizedArray<Number> x, y;
         x.load(X+i);
         y.load(Y+i);
+
+        // the following operation in VectorizedArray does an element-wise
+        // scalar product without taking into account complex values and
+        // the need to take the complex-conjugate of one argument. this
+        // may be a bug, but because all VectorizedArray classes only
+        // work on real scalars, it doesn't really matter very much.
+        // in any case, assert that we really don't get here for
+        // complex-valued objects
+        static_assert (numbers::NumberTraits<Number>::is_complex == false,
+                       "This operation is not correctly implemented for "
+                       "complex-valued objects.");
         return x * y;
       }
 
@@ -867,6 +878,17 @@ namespace internal
         // may only load from W after storing in X because the pointers might
         // point to the same memory
         w.load(W+i);
+
+        // the following operation in VectorizedArray does an element-wise
+        // scalar product without taking into account complex values and
+        // the need to take the complex-conjugate of one argument. this
+        // may be a bug, but because all VectorizedArray classes only
+        // work on real scalars, it doesn't really matter very much.
+        // in any case, assert that we really don't get here for
+        // complex-valued objects
+        static_assert (numbers::NumberTraits<Number>::is_complex == false,
+                       "This operation is not correctly implemented for "
+                       "complex-valued objects.");
         return x * w;
       }
 
