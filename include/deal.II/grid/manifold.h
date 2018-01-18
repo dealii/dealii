@@ -1248,28 +1248,31 @@ namespace Manifolds
         // transfinite interpolation from the faces and vertices, see
         // TransfiniteInterpolationManifold for a deeper explanation of the
         // mechanisms
-        for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i, ++j)
+        if (with_interpolation)
           {
-            (*sp3)[j] = hex->vertex(i);
-            points_weights.second[j] = 1.0/8.0;
+            for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i, ++j)
+              {
+                (*sp3)[j] = hex->vertex(i);
+                points_weights.second[j] = 1.0/8.0;
+              }
+            for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i, ++j)
+              {
+                (*sp3)[j] = (hex->line(i)->has_children() ?
+                             hex->line(i)->child(0)->vertex(1) :
+                             hex->line(i)->get_manifold().get_new_point_on_line(hex->line(i)));
+                points_weights.second[j] = -1.0/4.0;
+              }
+            for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i, ++j)
+              {
+                (*sp3)[j] = (hex->quad(i)->has_children() ?
+                             hex->quad(i)->isotropic_child(0)->vertex(3) :
+                             hex->quad(i)->get_manifold().get_new_point_on_quad(hex->quad(i)));
+                points_weights.second[j] = 1.0/2.0;
+              }
           }
-        for (unsigned int i=0; i<GeometryInfo<dim>::lines_per_cell; ++i, ++j)
-          {
-            (*sp3)[j] = (hex->line(i)->has_children() ?
-                         hex->line(i)->child(0)->vertex(1) :
-                         hex->line(i)->get_manifold().get_new_point_on_line(hex->line(i)));
-            points_weights.second[j] = -1.0/4.0;
-          }
-        for (unsigned int i=0; i<GeometryInfo<dim>::faces_per_cell; ++i, ++j)
-          {
-            (*sp3)[j] = (hex->quad(i)->has_children() ?
-                         hex->quad(i)->isotropic_child(0)->vertex(3) :
-                         hex->quad(i)->get_manifold().get_new_point_on_quad(hex->quad(i)));
-            points_weights.second[j] = 1.0/2.0;
-          }
-        // Overwrite the weights with 1/np if we don't want to use
-        // interpolation.
-        if (with_interpolation == false)
+        else
+          // Overwrite the weights with 1/np if we don't want to use
+          // interpolation.
           std::fill(points_weights.second.begin(), points_weights.second.end(), 1.0/np);
       }
       break;
