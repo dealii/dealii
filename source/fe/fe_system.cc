@@ -1747,12 +1747,6 @@ FESystem<dim,spacedim>::
 get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                                FullMatrix<double>       &interpolation_matrix) const
 {
-  AssertThrow ((x_source_fe.get_name().find ("FE_System<") == 0)
-               ||
-               (dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != nullptr),
-               (typename FiniteElement<dim,spacedim>::
-                ExcInterpolationNotImplemented()));
-
   Assert (interpolation_matrix.n() == this->dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.n(),
                                 this->dofs_per_face));
@@ -1770,81 +1764,88 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
   // FESystem(FE_Q(p),1,FE_Q(q),2) vs FESystem(FE_Q(r),2,FE_Q(s),1), but not
   // FESystem(FE_Q(p),1,FE_Q(q),2) vs
   // FESystem(FESystem(FE_Q(r),2),1,FE_Q(s),1)
-  const FESystem<dim,spacedim> *fe_other_system
-    = dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe);
-
-  // clear matrix, since we will not get to set all elements
-  interpolation_matrix = 0;
-
-  // loop over all the base elements of this and the other element, counting
-  // their multiplicities
-  unsigned int base_index       = 0,
-               base_index_other = 0;
-  unsigned int multiplicity       = 0,
-               multiplicity_other = 0;
-
-  FullMatrix<double> base_to_base_interpolation;
-
-  while (true)
+  if (const auto *fe_other_system = dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe))
     {
-      const FiniteElement<dim,spacedim>
-      &base       = base_element(base_index),
-       &base_other = fe_other_system->base_element(base_index_other);
+      // clear matrix, since we will not get to set all elements
+      interpolation_matrix = 0;
 
-      Assert (base.n_components() == base_other.n_components(),
-              ExcNotImplemented());
+      // loop over all the base elements of this and the other element, counting
+      // their multiplicities
+      unsigned int base_index = 0,
+                   base_index_other = 0;
+      unsigned int multiplicity = 0,
+                   multiplicity_other = 0;
 
-      // get the interpolation from the bases
-      base_to_base_interpolation.reinit (base_other.dofs_per_face,
-                                         base.dofs_per_face);
-      base.get_face_interpolation_matrix (base_other,
-                                          base_to_base_interpolation);
+      FullMatrix<double> base_to_base_interpolation;
 
-      // now translate entries. we'd like to have something like
-      // face_base_to_system_index, but that doesn't exist. rather, all we
-      // have is the reverse. well, use that then
-      for (unsigned int i=0; i<this->dofs_per_face; ++i)
-        if (this->face_system_to_base_index(i).first
-            ==
-            std::make_pair (base_index, multiplicity))
-          for (unsigned int j=0; j<fe_other_system->dofs_per_face; ++j)
-            if (fe_other_system->face_system_to_base_index(j).first
+      while (true)
+        {
+          const FiniteElement<dim,spacedim>
+          &base       = base_element(base_index),
+           &base_other = fe_other_system->base_element(base_index_other);
+
+          Assert (base.n_components() == base_other.n_components(),
+                  ExcNotImplemented());
+
+          // get the interpolation from the bases
+          base_to_base_interpolation.reinit (base_other.dofs_per_face,
+                                             base.dofs_per_face);
+          base.get_face_interpolation_matrix (base_other,
+                                              base_to_base_interpolation);
+
+          // now translate entries. we'd like to have something like
+          // face_base_to_system_index, but that doesn't exist. rather, all we
+          // have is the reverse. well, use that then
+          for (unsigned int i=0; i<this->dofs_per_face; ++i)
+            if (this->face_system_to_base_index(i).first
                 ==
-                std::make_pair (base_index_other, multiplicity_other))
-              interpolation_matrix(j, i)
-                = base_to_base_interpolation(fe_other_system->face_system_to_base_index(j).second,
-                                             this->face_system_to_base_index(i).second);
+                std::make_pair (base_index, multiplicity))
+              for (unsigned int j=0; j<fe_other_system->dofs_per_face; ++j)
+                if (fe_other_system->face_system_to_base_index(j).first
+                    ==
+                    std::make_pair (base_index_other, multiplicity_other))
+                  interpolation_matrix(j, i)
+                    = base_to_base_interpolation(fe_other_system->face_system_to_base_index(j).second,
+                                                 this->face_system_to_base_index(i).second);
 
-      // advance to the next base element for this and the other fe_system;
-      // see if we can simply advance the multiplicity by one, or if have to
-      // move on to the next base element
-      ++multiplicity;
-      if (multiplicity == this->element_multiplicity(base_index))
-        {
-          multiplicity = 0;
-          ++base_index;
-        }
-      ++multiplicity_other;
-      if (multiplicity_other ==
-          fe_other_system->element_multiplicity(base_index_other))
-        {
-          multiplicity_other = 0;
-          ++base_index_other;
-        }
+          // advance to the next base element for this and the other fe_system;
+          // see if we can simply advance the multiplicity by one, or if have to
+          // move on to the next base element
+          ++multiplicity;
+          if (multiplicity == this->element_multiplicity(base_index))
+            {
+              multiplicity = 0;
+              ++base_index;
+            }
+          ++multiplicity_other;
+          if (multiplicity_other ==
+              fe_other_system->element_multiplicity(base_index_other))
+            {
+              multiplicity_other = 0;
+              ++base_index_other;
+            }
 
-      // see if we have reached the end of the present element. if so, we
-      // should have reached the end of the other one as well
-      if (base_index == this->n_base_elements())
-        {
-          Assert (base_index_other == fe_other_system->n_base_elements(),
+          // see if we have reached the end of the present element. if so, we
+          // should have reached the end of the other one as well
+          if (base_index == this->n_base_elements())
+            {
+              Assert (base_index_other == fe_other_system->n_base_elements(),
+                      ExcInternalError());
+              break;
+            }
+
+          // if we haven't reached the end of this element, we shouldn't have
+          // reached the end of the other one either
+          Assert (base_index_other != fe_other_system->n_base_elements(),
                   ExcInternalError());
-          break;
         }
-
-      // if we haven't reached the end of this element, we shouldn't have
-      // reached the end of the other one either
-      Assert (base_index_other != fe_other_system->n_base_elements(),
-              ExcInternalError());
+    }
+  else
+    {
+      // repeat the cast to make the exception message more useful
+      AssertThrow ((dynamic_cast<const FESystem<dim,spacedim>*>(&x_source_fe) != nullptr),
+                   (typename FiniteElement<dim,spacedim>::
+                    ExcInterpolationNotImplemented()));
     }
 }
 
