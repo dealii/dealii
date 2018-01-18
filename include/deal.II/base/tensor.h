@@ -675,7 +675,10 @@ template <int dim, typename Number>
 inline
 DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::operator Number &()
 {
+  // We cannot use Assert inside a CUDA kernel
+#ifndef DEAL_II_WITH_CUDA
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+#endif
   return value;
 }
 
@@ -684,7 +687,10 @@ template <int dim, typename Number>
 inline
 DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::operator const Number &() const
 {
+  // We cannot use Assert inside a CUDA kernel
+#ifndef DEAL_II_WITH_CUDA
   Assert(dim != 0, ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
+#endif
   return value;
 }
 
@@ -882,7 +888,10 @@ namespace internal
                const unsigned int i,
                std::integral_constant<int, dim>)
     {
+      // We cannot use Assert in a CUDA kernel
+#ifndef DEAL_II_WITH_CUDA
       Assert (i<dim, ExcIndexRange(i, 0, dim));
+#endif
       return values[i];
     }
 
@@ -894,7 +903,10 @@ namespace internal
                const unsigned int,
                std::integral_constant<int, 0>)
     {
+      // We cannot use Assert in a CUDA kernel
+#ifndef DEAL_II_WITH_CUDA
       Assert(false, ExcMessage("Cannot access elements of an object of type Tensor<rank,0,Number>."));
+#endif
       static ArrayElementType t;
       return t;
     }
