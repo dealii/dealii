@@ -1810,6 +1810,119 @@ TransfiniteInterpolationManifold<dim, spacedim>
   std::array<unsigned int,20> nearby_cells =
     get_possible_cells_around_points(surrounding_points);
 
+  // This function is nearly always called to place new points on a cell or
+  // cell face. In this case, the general structure of the surrounding points
+  // is known (i.e., if there are eight surrounding points, then they will
+  // almost surely be either eight points around a quadrilateral or the eight
+  // vertices of a cube). Hence, making this assumption, we use two
+  // optimizations (one for structdim == 2 and one for structdim == 3) that
+  // guess the locations of some of the chart points more efficiently than the
+  // affine map approximation. The affine map approximation is used whenever
+  // we don't have a cheaper guess available.
+
+  // Function that can guess the location of a chart point by assuming that
+  // the eight surrounding points are points on a two-dimensional object
+  // (either a cell in 2D or the face of a hexahedron in 3D), arranged like
+  //
+  //     2 - 7 - 3
+  //     |       |
+  //     4       5
+  //     |       |
+  //     0 - 6 - 1
+  //
+  // This function assumes that the first three chart points have been
+  // computed since there is no effective way to guess them.
+  auto guess_chart_point_structdim_2 = [&](const unsigned int i) -> Point<dim>
+  {
+    Assert(surrounding_points.size() == 8 && 2 < i && i < 8,
+    ExcMessage("This function assumes that there are eight surrounding "
+    "points around a two-dimensional object. It also assumes "
+    "that the first three chart points have already been "
+    "computed."));
+    switch (i)
+      {
+      case 0:
+      case 1:
+      case 2:
+        Assert(false, ExcInternalError());
+        break;
+      case 3:
+        return chart_points[1] + (chart_points[2] - chart_points[0]);
+      case 4:
+        return 0.5*(chart_points[0] + chart_points[2]);
+      case 5:
+        return 0.5*(chart_points[1] + chart_points[3]);
+      case 6:
+        return 0.5*(chart_points[0] + chart_points[1]);
+      case 7:
+        return 0.5*(chart_points[2] + chart_points[3]);
+      default:
+        Assert(false, ExcInternalError());
+      }
+
+    return Point<dim>();
+  };
+
+  // Function that can guess the location of a chart point by assuming that
+  // the eight surrounding points form the vertices of a hexahedron, arranged
+  // like
+  //
+  //         6-------7
+  //        /|      /|
+  //       /       / |
+  //      /  |    /  |
+  //     4-------5   |
+  //     |   2- -|- -3
+  //     |  /    |  /
+  //     |       | /
+  //     |/      |/
+  //     0-------1
+  //
+  // (where vertex 2 is the back left vertex) we can estimate where chart
+  // points 5 - 7 are by computing the height (in chart coordinates) as c4 -
+  // c0 and then adding that onto the appropriate bottom vertex.
+  //
+  // This function assumes that the first five chart points have been computed
+  // since there is no effective way to guess them.
+  auto guess_chart_point_structdim_3 = [&](const unsigned int i) -> Point<dim>
+  {
+    Assert(surrounding_points.size() == 8 && 4 < i && i < 8,
+    ExcMessage("This function assumes that there are eight surrounding "
+    "points around a three-dimensional object. It also "
+    "assumes that the first five chart points have already "
+    "been computed."));
+    return chart_points[i - 4] + (chart_points[4] - chart_points[0]);
+  };
+
+  // Check if we can use the two chart point shortcuts above before we start:
+  bool use_structdim_2_guesses = false;
+  bool use_structdim_3_guesses = false;
+  // note that in the structdim 2 case: 0 - 6 and 2 - 7 should be roughly
+  // parallel, while in the structdim 3 case, 0 - 6 and 2 - 7 shoud be roughly
+  // orthogonal. Use the angle between these two vectors to figure out if we
+  // should turn on either structdim optimization.
+  if (surrounding_points.size() == 8)
+    {
+      const Tensor<1,spacedim> v06 = surrounding_points[6] - surrounding_points[0];
+      const Tensor<1,spacedim> v27 = surrounding_points[7] - surrounding_points[2];
+
+      // note that we can save a call to sqrt() by rearranging
+      const double cosine = scalar_product(v06, v27)
+                            /std::sqrt(v06.norm_square()*v27.norm_square());
+      if (0.707 < cosine)
+        // the angle is less than pi/4, so these vectors are roughly parallel:
+        // enable the structdim 2 optimization
+        use_structdim_2_guesses = true;
+      else if (spacedim == 3)
+        // otherwise these vectors are roughly orthogonal are roughly
+        // orthogonal: enable the structdim 3 optimization if we are in 3D
+        use_structdim_3_guesses = true;
+    }
+  // we should enable at most one of the optimizations
+  Assert((!use_structdim_2_guesses && !use_structdim_3_guesses)
+         || (use_structdim_2_guesses ^ use_structdim_3_guesses),
+         ExcInternalError());
+
   // check whether all points are inside the unit cell of the current chart
   for (unsigned int c=0; c<nearby_cells.size(); ++c)
     {
@@ -1819,93 +1932,36 @@ TransfiniteInterpolationManifold<dim, spacedim>
       bool inside_unit_cell = true;
       for (unsigned int i=0; i<surrounding_points.size(); ++i)
         {
-          // some initial guesses - assuming that the chart points end up in a
-          // regular (cube-like) pattern which they often do).
-
+          Point<dim> guess;
+          // an optimization: keep track of whether or not we used the affine
+          // approximation so that we don't call pull_back with the same
+          // initial guess twice (i.e., if pull_back fails the first time,
+          // don't try again with the same function arguments).
+          bool used_affine_approximation = false;
           // if we have already computed three points, we can guess the fourth
           // to be the missing corner point of a rectangle
-          if (i == 3)
-            {
-              const Point<dim> p3 = chart_points[1] +
-                                    Point<dim>(chart_points[2]-chart_points[0]);
-              chart_points[i] = pull_back(cell, surrounding_points[i], p3);
-            }
-          // 8 points usually form either a cube or a rectangle with vertices
-          // and line mid points. Get the initial guess with line segment
-          // midpoints in 2D and assuming a cube for 3D.
-          else if (surrounding_points.size() == 8 &&
-                   ((dim == 3 && i > 4) || (dim == 2 && i > 3)))
-            {
-              Point<dim> guess;
-              switch (dim)
-                {
-                case 2:
-                  // inline the standard numbering
-                  //
-                  // 2 - 7 - 3
-                  // |       |
-                  // 4       5
-                  // |       |
-                  // 0 - 6 - 1
-                  //
-                  // to calculate guesses based on averaging already computed
-                  // chart points.
-                  switch (i)
-                    {
-                    case 4:
-                      guess = 0.5*(chart_points[0] + chart_points[2]);
-                      break;
-                    case 5:
-                      guess = 0.5*(chart_points[1] + chart_points[3]);
-                      break;
-                    case 6:
-                      guess = 0.5*(chart_points[0] + chart_points[1]);
-                      break;
-                    case 7:
-                      guess = 0.5*(chart_points[2] + chart_points[3]);
-                      break;
-                    default:
-                      Assert(false, ExcInternalError());
-                    }
-                  break;
-                case 3:
-                  // Assuming that we are in 3D and have the points around a
-                  // cube numbered as
-                  //
-                  //         6-------7
-                  //        /|      /|
-                  //       /       / |
-                  //      /  |    /  |
-                  //     4-------5   |
-                  //     |   2- -|- -3
-                  //     |  /    |  /
-                  //     |       | /
-                  //     |/      |/
-                  //     0-------1
-                  //
-                  // (where vertex 2 is the back left vertex) we can estimate
-                  // where chart points 5 - 7 are by computing the height (in
-                  // chart coordinates) as c4 - c0 and then adding that onto the
-                  // appropriate bottom vertex.
-                  guess = chart_points[i - 4] + (chart_points[4] - chart_points[0]);
-                  break;
-                default:
-                  Assert(false, ExcInternalError());
-                }
-
-              // This guess should be pretty good, but if the pull_back fails
-              // then try again with affine approximation (which is more
-              // expensive)
-              chart_points[i] = pull_back(cell, surrounding_points[i], guess);
-              if (chart_points[i][0] == internal::invalid_pull_back_coordinate)
-                {
-                  chart_points[i] = pull_back(cell, surrounding_points[i],
-                                              cell->real_to_unit_cell_affine_approximation(surrounding_points[i]));
-                }
-            }
+          if (i == 3 && surrounding_points.size() == 8)
+            guess = chart_points[1] + (chart_points[2] - chart_points[0]);
+          else if (use_structdim_2_guesses && 3 < i)
+            guess = guess_chart_point_structdim_2(i);
+          else if (use_structdim_3_guesses && 4 < i)
+            guess = guess_chart_point_structdim_3(i);
           else
-            chart_points[i] = pull_back(cell, surrounding_points[i],
-                                        cell->real_to_unit_cell_affine_approximation(surrounding_points[i]));
+            {
+              guess = cell->real_to_unit_cell_affine_approximation(surrounding_points[i]);
+              used_affine_approximation = true;
+            }
+          chart_points[i] = pull_back(cell, surrounding_points[i], guess);
+
+          // the initial guess may not have been good enough: if applicable,
+          // try again with the affine approximation (which is more accurate
+          // than the cheap methods used above)
+          if (chart_points[i][0] == internal::invalid_pull_back_coordinate &&
+              !used_affine_approximation)
+            {
+              guess = cell->real_to_unit_cell_affine_approximation(surrounding_points[i]);
+              chart_points[i] = pull_back(cell, surrounding_points[i], guess);
+            }
 
           // Tolerance 1e-6 chosen that the method also works with
           // SphericalManifold
