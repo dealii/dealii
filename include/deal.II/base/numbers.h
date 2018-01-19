@@ -215,6 +215,7 @@ namespace numbers
      * function simply returns the given number.
      */
     static
+    DEAL_II_CUDA_HOST_DEV
     const number &conjugate (const number &x);
 
     /**
@@ -329,6 +330,7 @@ namespace numbers
 
 
   template <typename number>
+  DEAL_II_CUDA_HOST_DEV
   const number &
   NumberTraits<number>::conjugate (const number &x)
   {

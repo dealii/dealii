@@ -451,7 +451,7 @@ namespace LinearAlgebra
         if (global_idx < N)
           {
             v1[global_idx] += a*v2[global_idx];
-            res_buf[local_idx] = v1[global_idx]*v3[global_idx];
+            res_buf[local_idx] = v1[global_idx] * Number(numbers::NumberTraits<Number>::conjugate(v3[global_idx]));
           }
         else
           res_buf[local_idx] = 0.;
