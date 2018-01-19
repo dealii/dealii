@@ -1292,21 +1292,32 @@ namespace DoFTools
     std::vector< dealii::types::subdomain_id > subdomain_association (dof_handler.n_dofs ());
     dealii::DoFTools::get_subdomain_association (dof_handler, subdomain_association);
 
-    // We have no MPI communicator with a serial computation and the subdomains
-    // can be set to arbitrary values. In case of a parallel Triangulation,
-    // we can check that we don't have more subdomains than processors.
-    // Note that max_element is well-defined because subdomain_association
-    // is non-empty (n_dofs()>0).
+    // Figure out how many subdomain ids there are.
+    //
+    // if this is a parallel triangulation, then we can just ask the triangulation
+    // for this. if this is a sequential triangulation, we loop over all cells and
+    // take the largest subdomain_id value we find; the number of subdomains is
+    // then the largest found value plus one. (we here assume that all subdomain
+    // ids up to the largest are actually used; this may not be true for a
+    // sequential triangulation where these values have been set by hand and not
+    // in accordance with some MPI communicator; but the function returns an
+    // array indexed starting at zero, so we need to collect information for
+    // each subdomain index anyway, not just for the used one.)
     const unsigned int n_subdomains
       = (dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
          (&dof_handler.get_triangulation()) == nullptr
          ?
-         (1+*std::max_element (subdomain_association.begin (),
-                               subdomain_association.end ()))
-         :
-         Utilities::MPI::n_mpi_processes
-         (dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
-          (&dof_handler.get_triangulation())->get_communicator()));
+         [&dof_handler]()
+    {
+      unsigned int max_subdomain_id = 0;
+      for (auto cell : dof_handler.active_cell_iterators())
+        max_subdomain_id = std::max (max_subdomain_id, cell->subdomain_id());
+      return max_subdomain_id + 1;
+    } ()
+    :
+    Utilities::MPI::n_mpi_processes
+    (dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *>
+     (&dof_handler.get_triangulation())->get_communicator()));
     Assert (n_subdomains >
             *std::max_element (subdomain_association.begin (),
                                subdomain_association.end ()),
