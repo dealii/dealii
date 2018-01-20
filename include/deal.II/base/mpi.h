@@ -154,16 +154,16 @@ namespace Utilities
 
     /**
      * Like the previous function, but take the sums over the elements of an
-     * array of length N. In other words, the i-th element of the results
+     * array of type T. In other words, the i-th element of the results
      * array is the sum over the i-th entries of the input arrays from each
-     * processor.
+     * processor. T and U must decay to the same type.
      *
      * Input and output arrays may be the same.
      */
-    template <typename T, unsigned int N>
-    void sum (const T (&values)[N],
+    template <typename T, typename U>
+    void sum (const T        &values,
               const MPI_Comm &mpi_communicator,
-              T (&sums)[N]);
+              U              &sums);
 
     /**
      * Like the previous function, but take the sums over the elements of an
@@ -178,48 +178,6 @@ namespace Utilities
     void sum (const ArrayView<const T> &values,
               const MPI_Comm           &mpi_communicator,
               const ArrayView<T>       &sums);
-
-    /**
-     * Like the previous function, but take the sums over the elements of a
-     * std::vector. In other words, the i-th element of the results array is
-     * the sum over the i-th entries of the input arrays from each processor.
-     *
-     * Input and output vectors may be the same.
-     */
-    template <typename T>
-    void sum (const std::vector<T> &values,
-              const MPI_Comm &mpi_communicator,
-              std::vector<T> &sums);
-
-    /**
-     * Like the previous function, but take the sums over the elements of a
-     * Vector<T>.
-     *
-     * Input and output vectors may be the same.
-     */
-    template <typename T>
-    void sum (const Vector<T> &values,
-              const MPI_Comm &mpi_communicator,
-              Vector<T> &sums);
-
-    /**
-     * Like the previous function, but take the sums over the elements of a
-     * FullMatrix<T>.
-     *
-     * Input and output matrices may be the same.
-     */
-    template <typename T>
-    void sum (const FullMatrix<T> &values,
-              const MPI_Comm &mpi_communicator,
-              FullMatrix<T> &sums);
-
-    /**
-     * Same as above but for LAPACKFullMatrix.
-     */
-    template <typename T>
-    void sum (const LAPACKFullMatrix<T> &values,
-              const MPI_Comm &mpi_communicator,
-              LAPACKFullMatrix<T> &sums);
 
     /**
      * Perform an MPI sum of the entries of a symmetric tensor.
@@ -265,30 +223,31 @@ namespace Utilities
            const MPI_Comm &mpi_communicator);
 
     /**
-     * Like the previous function, but take the maxima over the elements of an
-     * array of length N. In other words, the i-th element of the results
-     * array is the maximum of the i-th entries of the input arrays from each
+     * Like the previous function, but take the maximum over the elements of an
+     * array of type T. In other words, the i-th element of the results array is
+     * the maximum over the i-th entries of the input arrays from each
+     * processor. T and U must decay to the same type.
+     *
+     * Input and output vectors may be the same.
+     */
+    template <typename T, typename U>
+    void max (const T        &values,
+              const MPI_Comm &mpi_communicator,
+              U              &maxima);
+
+    /**
+     * Like the previous function, but take the maximum over the elements of an
+     * array as specified by the ArrayView arguments.
+     * In other words, the i-th element of the results
+     * array is the maximum over the i-th entries of the input arrays from each
      * processor.
      *
      * Input and output arrays may be the same.
      */
-    template <typename T, unsigned int N>
-    void max (const T (&values)[N],
-              const MPI_Comm &mpi_communicator,
-              T (&maxima)[N]);
-
-    /**
-     * Like the previous function, but take the maximum over the elements of a
-     * std::vector. In other words, the i-th element of the results array is
-     * the maximum over the i-th entries of the input arrays from each
-     * processor.
-     *
-     * Input and output vectors may be the same.
-     */
     template <typename T>
-    void max (const std::vector<T> &values,
-              const MPI_Comm &mpi_communicator,
-              std::vector<T> &maxima);
+    void max (const ArrayView<const T> &values,
+              const MPI_Comm           &mpi_communicator,
+              const ArrayView<T>       &maxima);
 
     /**
      * Return the minimum over all processors of the value @p t. This function
@@ -315,30 +274,30 @@ namespace Utilities
 
     /**
      * Like the previous function, but take the minima over the elements of an
-     * array of length N. In other words, the i-th element of the results
+     * array of type T. In other words, the i-th element of the results
      * array is the minimum of the i-th entries of the input arrays from each
+     * processor. T and U must decay to the same type.
+     *
+     * Input and output arrays may be the same.
+     */
+    template <typename T, typename U>
+    void min (const T        &values,
+              const MPI_Comm &mpi_communicator,
+              U              &minima);
+
+    /**
+     * Like the previous function, but take the minimum over the elements of an
+     * array as specified by the ArrayView arguments.
+     * In other words, the i-th element of the results
+     * array is the minimum over the i-th entries of the input arrays from each
      * processor.
      *
      * Input and output arrays may be the same.
      */
-    template <typename T, unsigned int N>
-    void min (const T (&values)[N],
-              const MPI_Comm &mpi_communicator,
-              T (&minima)[N]);
-
-    /**
-     * Like the previous function, but take the minimum over the elements of a
-     * std::vector. In other words, the i-th element of the results array is
-     * the minimum over the i-th entries of the input arrays from each
-     * processor.
-     *
-     * Input and output vectors may be the same.
-     */
     template <typename T>
-    void min (const std::vector<T> &values,
-              const MPI_Comm &mpi_communicator,
-              std::vector<T> &minima);
-
+    void min (const ArrayView<const T> &values,
+              const MPI_Comm           &mpi_communicator,
+              const ArrayView<T>       &minima);
 
     /**
      * A data structure to store the result of the min_max_avg() function.

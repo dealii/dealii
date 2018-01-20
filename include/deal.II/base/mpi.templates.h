@@ -336,13 +336,19 @@ namespace Utilities
 
 
 
-    template <typename T>
-    void sum (const std::vector<T> &values,
-              const MPI_Comm       &mpi_communicator,
-              std::vector<T>       &sums)
+    template <typename T, typename U>
+    void sum (const T        &values,
+              const MPI_Comm &mpi_communicator,
+              U              &sums)
     {
-      internal::all_reduce(MPI_SUM, ArrayView<const T>(values),
-                           mpi_communicator, ArrayView<T>(sums));
+      static_assert(std::is_same<typename std::decay<T>::type,
+                    typename std::decay<U>::type>::value,
+                    "Input and output arguments must have the same type!");
+      const auto array_view_values = make_array_view(values);
+      using const_type = ArrayView<const typename decltype(array_view_values)::value_type>;
+      sum(static_cast<const_type> (array_view_values),
+          mpi_communicator,
+          make_array_view(sums));
     }
 
 
@@ -353,44 +359,6 @@ namespace Utilities
               const ArrayView<T>       &sums)
     {
       internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
-    }
-
-
-
-    template <typename T>
-    void sum (const Vector<T> &values,
-              const MPI_Comm &mpi_communicator,
-              Vector<T> &sums)
-    {
-      const auto &size = values.size();
-      internal::all_reduce(MPI_SUM, ArrayView<const T>(values.begin(), size),
-                           mpi_communicator, ArrayView<T>(sums.begin(), size));
-    }
-
-
-
-    template <typename T>
-    void sum (const FullMatrix<T> &values,
-              const MPI_Comm &mpi_communicator,
-              FullMatrix<T> &sums)
-    {
-      const auto size_values = values.n()*values.m();
-      const auto size_sums = sums.n()*sums.m();
-      internal::all_reduce(MPI_SUM, ArrayView<const T>(&values[0][0], size_values),
-                           mpi_communicator, ArrayView<T>(&sums[0][0], size_sums));
-    }
-
-
-
-    template <typename T>
-    void sum (const LAPACKFullMatrix<T> &values,
-              const MPI_Comm &mpi_communicator,
-              LAPACKFullMatrix<T> &sums)
-    {
-      const auto size_values = values.n()*values.m();
-      const auto size_sums = sums.n()*sums.m();
-      internal::all_reduce(MPI_SUM, ArrayView<const T>(&values(0,0), size_values),
-                           mpi_communicator, ArrayView<T>(&sums(0,0), size_sums));
     }
 
 
@@ -453,13 +421,29 @@ namespace Utilities
 
 
 
-    template <typename T>
-    void max (const std::vector<T> &values,
-              const MPI_Comm       &mpi_communicator,
-              std::vector<T>       &maxima)
+    template <typename T, typename U>
+    void max (const T         &values,
+              const MPI_Comm  &mpi_communicator,
+              U               &maxima)
     {
-      internal::all_reduce(MPI_MAX, ArrayView<const T>(values),
-                           mpi_communicator, ArrayView<T> (maxima));
+      static_assert(std::is_same<typename std::decay<T>::type,
+                    typename std::decay<U>::type>::value,
+                    "Input and output arguments must have the same type!");
+      const auto array_view_values = make_array_view(values);
+      using const_type = ArrayView<const typename decltype(array_view_values)::value_type>;
+      max(static_cast<const_type> (array_view_values),
+          mpi_communicator,
+          make_array_view(maxima));
+    }
+
+
+
+    template <typename T>
+    void max (const ArrayView<const T> &values,
+              const MPI_Comm           &mpi_communicator,
+              const ArrayView<T>       &maxima)
+    {
+      internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
     }
 
 
@@ -476,13 +460,29 @@ namespace Utilities
 
 
 
-    template <typename T>
-    void min (const std::vector<T> &values,
-              const MPI_Comm       &mpi_communicator,
-              std::vector<T>       &minima)
+    template <typename T, typename U>
+    void min (const T        &values,
+              const MPI_Comm &mpi_communicator,
+              U              &minima)
     {
-      internal::all_reduce(MPI_MIN, ArrayView<const T>(values),
-                           mpi_communicator, ArrayView<T> (minima));
+      static_assert(std::is_same<typename std::decay<T>::type,
+                    typename std::decay<U>::type>::value,
+                    "Input and output arguments must have the same type!");
+      const auto array_view_values = make_array_view(values);
+      using const_type = ArrayView<const typename decltype(array_view_values)::value_type>;
+      min(static_cast<const_type> (array_view_values),
+          mpi_communicator,
+          make_array_view(minima));
+    }
+
+
+
+    template <typename T>
+    void min (const ArrayView<const T> &values,
+              const MPI_Comm           &mpi_communicator,
+              const ArrayView<T>       &minima)
+    {
+      internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
     }
   } // end of namespace MPI
 } // end of namespace Utilities
