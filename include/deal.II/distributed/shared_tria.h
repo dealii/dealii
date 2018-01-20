@@ -84,14 +84,17 @@ namespace parallel
      * implementing overly complicated schemes to transfer information about
      * adjacent cells from processor to processor.
      *
-     * By default, the partitioning of cells between processors is done
-     * automatically by calling the METIS library. By passing appropriate
-     * flags to the constructor of this class (see the Triangulation::Settings
-     * enum), it is possible to select other modes of partitioning the mesh,
+     * The partitioning of cells between processors is done internally
+     * based on a number of different possibilities. By passing appropriate
+     * flags to the constructor of this class (see the
+     * parallel::shared::Triangulation::Settings
+     * enum), it is possible to select different ways of partitioning the mesh,
      * including ways that are dictated by the application and not by the
      * desire to minimize the length of the interface between subdomains owned
-     * by processors. Both the DoFHandler and hp::DoFHandler classes know how
-     * to enumerate degrees of freedom in ways appropriate for the partitioned mesh.
+     * by processors (as is done by the METIS and Zoltan packages, both of
+     * which are options for partitioning). Both the DoFHandler and
+     * hp::DoFHandler classes know how to enumerate degrees of freedom in ways
+     * appropriate for the partitioned mesh.
      *
      * @author Denis Davydov, 2015
      * @ingroup distributed
