@@ -185,9 +185,15 @@ namespace PETScWrappers
 
   /**
    * A class that implements the interface to use the PETSc Block Jacobi
-   * preconditioner. The blocking structure of the matrix is determined by the
-   * association of degrees of freedom to the individual processors in an MPI-
-   * parallel job. If you use this preconditioner on a sequential job (or an
+   * preconditioner. PETSc defines the term "block Jacobi" as a preconditioner
+   * in which it looks at a number of diagonal blocks of the matrix and then
+   * defines a preconditioner in which the preconditioner matrix has the same
+   * block structure as only these diagonal blocks, and each diagonal block
+   * of the preconditioner is an approximation of the inverse of the
+   * corresponding block of the original matrix.
+   * The blocking structure of the matrix is determined by the
+   * association of degrees of freedom to the individual processors in an
+   * MPI-parallel job. If you use this preconditioner on a sequential job (or an
    * MPI job with only one process) then the entire matrix is the only block.
    *
    * By default, PETSc uses an ILU(0) decomposition of each diagonal block of
