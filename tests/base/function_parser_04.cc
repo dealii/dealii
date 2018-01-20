@@ -48,10 +48,10 @@ void assemble(const std::vector<int>::iterator &it,
 {
   double s = *it;
   double value = fp.value(Point<2>(s, 2.5));
-  Assert(abs(1.0+s*2.5 - value) < 1e-10, ExcMessage("wrong value"));
+  Assert(std::abs(1.0+s*2.5 - value) < 1e-10, ExcMessage("wrong value"));
   std::cout << data.value  << std::endl;
 
-  data.value = (abs(1.0+s*2.5 - value) < 1e-10)?1:0;
+  data.value = (std::abs(1.0+s*2.5 - value) < 1e-10)?1:0;
 }
 
 void copy(int &value, const copy_data &data)
@@ -90,7 +90,3 @@ int main ()
 
   test2();
 }
-
-
-
-

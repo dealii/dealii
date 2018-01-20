@@ -95,7 +95,7 @@ int main()
                     {
                       double qpow = pow(quad.point(q)[0], (double) power);
                       approx_integral += qpow  * quad.weight(q);
-                      double factor = log(abs( (factored_quad.point(q)-origins[nos])[0] )/alphas[nas] );
+                      double factor = log(std::abs( (factored_quad.point(q)-origins[nos])[0] )/alphas[nas] );
                       // This code cannot work if factor is equal to
                       // zero. In this case, just pass the other
                       // quadrature formula, which should be valid anyway.
@@ -112,9 +112,9 @@ int main()
 
                   deallog << "   Error(n=" << quad.size()
                           << ") = " << (approx_integral - exact_integral);
-                  if ( abs(approx_integral - approx_integral_factored) > eps )
+                  if ( std::abs(approx_integral - approx_integral_factored) > eps )
                     deallog << ", difference between factored and unfactored: "
-                            << abs(approx_integral - approx_integral_factored);
+                            << std::abs(approx_integral - approx_integral_factored);
                   deallog << endl;
                 }
             }
