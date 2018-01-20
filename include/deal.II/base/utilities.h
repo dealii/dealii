@@ -596,7 +596,10 @@ namespace Utilities
 
     /**
      * Return the number of MPI processes there exist in the given
-     * communicator object. If this is a sequential job, it returns 1.
+     * communicator object. If this is a sequential job (i.e., the program
+     * is not using MPI at all, or is using MPI but has been started with
+     * only one MPI process), then the communicator necessarily involves
+     * only one process and the function returns 1.
      */
     unsigned int get_n_mpi_processes (const Epetra_Comm &mpi_communicator);
 
