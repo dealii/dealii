@@ -153,7 +153,7 @@ void check_fe(FiniteElement<dim> &fe)
     for (unsigned int i=0; i<dofh.locally_owned_dofs().n_elements(); ++i)
       {
         unsigned int index = dofh.locally_owned_dofs().nth_index_in_set(i);
-        if (abs(v[index] - 1.0)>1e-5)
+        if (std::abs(v[index] - 1.0)>1e-5)
           deallog << "ERROR: index=" << index << " is equal to " << v[index] << std::endl;
       }
   }

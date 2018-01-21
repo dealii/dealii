@@ -66,7 +66,7 @@ void test()
   for (; cell!=endc; ++cell)
     {
       Point<2> cell_center = cell->center();
-      if (abs(cell_center(0) - 1500) < 550)
+      if (std::abs(cell_center(0) - 1500) < 550)
         {
           cell->set_refine_flag ();
         }
