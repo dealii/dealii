@@ -850,9 +850,15 @@ public:
   /**
    * Return the number of degrees of freedom that belong to this process.
    *
-   * If this is a sequential job, then the result equals that produced by
-   * n_dofs(). On the other hand, if we are operating on a
-   * parallel::distributed::Triangulation, then it includes only the degrees
+   * If this is a sequential DoFHandler, then the result equals that produced by
+   * n_dofs(). (Here, "sequential" means that either
+   * the whole program does not use MPI, or that it uses MPI
+   * but only uses a single MPI process, or that there are multiple MPI
+   * processes but the Triangulation on which this DoFHandler builds
+   * works only on one MPI process.)
+   * On the other hand, if we are operating on a
+   * parallel::distributed::Triangulation or parallel::shared::Triangulation,
+   * then it includes only the degrees
    * of freedom that the current processor owns. Note that in this case this
    * does not include all degrees of freedom that have been distributed on the
    * current processor's image of the mesh: in particular, some of the degrees
@@ -880,8 +886,13 @@ public:
    * you are only interested in the number of elements each processor owns
    * then n_locally_owned_dofs_per_processor() is a better choice.
    *
-   * If this is a sequential job, then the vector has a single element that
+   * If this is a sequential DoFHandler, then the vector has a single element that
    * equals the IndexSet representing the entire range [0,n_dofs()].
+   * (Here, "sequential" means that either
+   * the whole program does not use MPI, or that it uses MPI
+   * but only uses a single MPI process, or that there are multiple MPI
+   * processes but the Triangulation on which this DoFHandler builds
+   * works only on one MPI process.)
    */
   const std::vector<IndexSet> &
   locally_owned_dofs_per_processor () const;
@@ -895,8 +906,12 @@ public:
    * Each element of the vector returned by this function equals the number of
    * elements of the corresponding sets returned by global_dof_indices().
    *
-   * If this is a sequential job, then the vector has a single element equal
-   * to n_dofs().
+   * If this is a sequential DoFHandler, then the vector has a single element equal
+   * to n_dofs(). (Here, "sequential" means that either
+   * the whole program does not use MPI, or that it uses MPI
+   * but only uses a single MPI process, or that there are multiple MPI
+   * processes but the Triangulation on which this DoFHandler builds
+   * works only on one MPI process.)
    */
   const std::vector<types::global_dof_index> &
   n_locally_owned_dofs_per_processor () const;
@@ -905,8 +920,13 @@ public:
    * Return a vector that stores the locally owned DoFs of each processor on
    * the given level @p level.
    *
-   * If this is a sequential job, then the vector has a single element that
+   * If this is a sequential DoFHandler, then the vector has a single element that
    * equals the IndexSet representing the entire range [0,n_dofs()].
+   * (Here, "sequential" means that either
+   * the whole program does not use MPI, or that it uses MPI
+   * but only uses a single MPI process, or that there are multiple MPI
+   * processes but the Triangulation on which this DoFHandler builds
+   * works only on one MPI process.)
    */
   const std::vector<IndexSet> &
   locally_owned_mg_dofs_per_processor (const unsigned int level) const;

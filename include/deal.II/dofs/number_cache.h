@@ -54,7 +54,11 @@ namespace internal
       /**
        * Create a NumberCache object that corresponds to a sequential
        * DoFHandler object in which a single processor stores all
-       * degrees of freedom.
+       * degrees of freedom. (Here, "sequential" means that either
+       * the whole program does not use MPI, or that it uses MPI
+       * but only uses a single MPI process, or that there are multiple MPI
+       * processes but the Triangulation on which this DoFHandler builds
+       * works only on one MPI process.)
        */
       NumberCache (const types::global_dof_index n_global_dofs);
 
@@ -106,28 +110,44 @@ namespace internal
 
       /**
        * Number of dofs owned by this MPI process. If this is a sequential
-       * computation, then this equals n_global_dofs.
+       * computation, then this equals n_global_dofs. (Here, "sequential" means that either
+       * the whole program does not use MPI, or that it uses MPI
+       * but only uses a single MPI process, or that there are multiple MPI
+       * processes but the Triangulation on which this DoFHandler builds
+       * works only on one MPI process.)
        */
       types::global_dof_index n_locally_owned_dofs;
 
       /**
        * An index set denoting the set of locally owned dofs. If this is a
        * sequential computation, then it contains the entire range
-       * [0,n_global_dofs).
+       * [0,n_global_dofs). (Here, "sequential" means that either
+       * the whole program does not use MPI, or that it uses MPI
+       * but only uses a single MPI process, or that there are multiple MPI
+       * processes but the Triangulation on which this DoFHandler builds
+       * works only on one MPI process.)
        */
       IndexSet locally_owned_dofs;
 
       /**
        * The number of dofs owned by each of the various MPI processes. If
-       * this is a sequential job, then the vector contains a single element
-       * equal to n_global_dofs.
+       * this is a sequential computation, then the vector contains a single element
+       * equal to n_global_dofs. (Here, "sequential" means that either
+       * the whole program does not use MPI, or that it uses MPI
+       * but only uses a single MPI process, or that there are multiple MPI
+       * processes but the Triangulation on which this DoFHandler builds
+       * works only on one MPI process.)
        */
       std::vector<types::global_dof_index> n_locally_owned_dofs_per_processor;
 
       /**
        * The dofs owned by each of the various MPI processes. If this is a
-       * sequential job, then the vector has a single element equal to
-       * locally_owned_dofs.
+       * sequential DoFHandler, then the vector has a single element equal to
+       * locally_owned_dofs. (Here, "sequential" means that either
+       * the whole program does not use MPI, or that it uses MPI
+       * but only uses a single MPI process, or that there are multiple MPI
+       * processes but the Triangulation on which this DoFHandler builds
+       * works only on one MPI process.)
        */
       std::vector<IndexSet> locally_owned_dofs_per_processor;
 
