@@ -683,7 +683,10 @@ template <int dim, int spacedim>
 DoFHandler<dim,spacedim>::~DoFHandler ()
 {
   // release allocated memory
-  clear ();
+  // virtual functions called in constructors and destructors never use the
+  // override in a derived class
+  // for clarity be explicit on which function is called
+  DoFHandler<dim, spacedim>::clear ();
 
   // also release the policy. this needs to happen before the
   // current object disappears because the policy objects

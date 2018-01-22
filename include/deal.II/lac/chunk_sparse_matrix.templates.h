@@ -332,7 +332,10 @@ ChunkSparseMatrix<number>::ChunkSparseMatrix (const ChunkSparsityPattern &c)
   val(nullptr),
   max_len(0)
 {
-  reinit (c);
+  // virtual functions called in constructors and destructors never use the
+  // override in a derived class
+  // for clarity be explicit on which function is called
+  ChunkSparseMatrix<number>::reinit (c);
 }
 
 
@@ -349,7 +352,10 @@ ChunkSparseMatrix<number>::ChunkSparseMatrix (const ChunkSparsityPattern &c,
   Assert (c.n_rows() == id.m(), ExcDimensionMismatch (c.n_rows(), id.m()));
   Assert (c.n_cols() == id.n(), ExcDimensionMismatch (c.n_cols(), id.n()));
 
-  reinit (c);
+  // virtual functions called in constructors and destructors never use the
+  // override in a derived class
+  // for clarity be explicit on which function is called
+  ChunkSparseMatrix<number>::reinit (c);
   for (size_type i=0; i<n(); ++i)
     this->set(i,i,1.);
 }

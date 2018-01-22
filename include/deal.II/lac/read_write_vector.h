@@ -673,7 +673,10 @@ namespace LinearAlgebra
     :
     val(nullptr)
   {
-    reinit(0, true);
+    // virtual functions called in constructors and destructors never use the
+    // override in a derived class
+    // for clarity be explicit on which function is called
+    ReadWriteVector<Number>::reinit(0, true);
   }
 
 
@@ -696,7 +699,10 @@ namespace LinearAlgebra
     :
     val(nullptr)
   {
-    reinit (size, false);
+    // virtual functions called in constructors and destructors never use the
+    // override in a derived class
+    // for clarity be explicit on which function is called
+    ReadWriteVector<Number>::reinit (size, false);
   }
 
 
@@ -707,7 +713,10 @@ namespace LinearAlgebra
     :
     val(nullptr)
   {
-    reinit (locally_stored_indices);
+    // virtual functions called in constructors and destructors never use the
+    // override in a derived class
+    // for clarity be explicit on which function is called
+    ReadWriteVector<Number>::reinit (locally_stored_indices);
   }
 
 

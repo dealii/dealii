@@ -55,7 +55,10 @@ namespace TimeStepping
   template <typename VectorType>
   ExplicitRungeKutta<VectorType>::ExplicitRungeKutta(const runge_kutta_method method)
   {
-    initialize(method);
+    // virtual functions called in constructors and destructors never use the
+    // override in a derived class
+    // for clarity be explicit on which function is called
+    ExplicitRungeKutta<VectorType>::initialize(method);
   }
 
 
@@ -211,7 +214,10 @@ namespace TimeStepping
     max_it(max_it),
     tolerance(tolerance)
   {
-    initialize(method);
+    // virtual functions called in constructors and destructors never use the
+    // override in a derived class
+    // for clarity be explicit on which function is called
+    ImplicitRungeKutta<VectorType>::initialize(method);
   }
 
 
@@ -417,7 +423,10 @@ namespace TimeStepping
     last_same_as_first(false),
     last_stage(nullptr)
   {
-    initialize(method);
+    // virtual functions called in constructors and destructors never use the
+    // override in a derived class
+    // for clarity be explicit on which function is called
+    EmbeddedExplicitRungeKutta<VectorType>::initialize(method);
   }
 
 
