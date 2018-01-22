@@ -18,6 +18,8 @@
 
 #ifdef DEAL_II_WITH_SCALAPACK
 
+#include <deal.II/base/std_cxx14/memory.h>
+
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/lac/scalapack.templates.h>
@@ -379,8 +381,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
 
   // if computation of eigenvectors is not required use a sufficiently small distributed matrix
   std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors = compute_eigenvectors ?
-                                                              std::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,grid,row_block_size) :
-                                                              std::make_unique<ScaLAPACKMatrix<NumberType>>(grid->n_process_rows,grid->n_process_columns,grid,1,1);
+                                                              std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,grid,row_block_size) :
+                                                              std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(grid->n_process_rows,grid->n_process_columns,grid,1,1);
 
   eigenvectors->property = property;
   // number of eigenvalues to be returned; upon successful exit ev contains the m seclected eigenvalues in ascending order
