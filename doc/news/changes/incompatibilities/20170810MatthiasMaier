@@ -8,7 +8,7 @@ Removed: Some old functionality has been removed from LogStream:
   <li>The timing mechanism has been removed. This includes
     <code>timestamp()</code>, <code>log_execution_time()</code> and
     <code>log_time_differences()</code>. Use the Timer, TimerOutput and
-    TimerOutpu::Scope classes instead.</li>
+    TimerOutput::Scope classes instead.</li>
   <li>LogStream now defaults to write to std::cout instead of
     std::cerr</li>
 </ul>
