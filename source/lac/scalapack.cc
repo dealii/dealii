@@ -280,6 +280,9 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
     //process is active in the process grid
     if (this->grid->mpi_process_is_active)
       dest.values = this->values;
+
+  dest.state = state;
+  dest.property = property;
 }
 
 
@@ -323,52 +326,215 @@ void ScaLAPACKMatrix<NumberType>::invert()
 
 
 template <typename NumberType>
-std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric()
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_index(const std::pair<unsigned int,unsigned int> &index_limits,
+    const bool compute_eigenvectors)
+{
+  // check validity of index limits
+  Assert (index_limits.first < (unsigned int)n_rows,ExcIndexRange(index_limits.first,0,n_rows));
+  Assert (index_limits.second < (unsigned int)n_rows,ExcIndexRange(index_limits.second,0,n_rows));
+
+  std::pair<unsigned int,unsigned int> idx = std::make_pair(std::min(index_limits.first,index_limits.second),
+                                                            std::max(index_limits.first,index_limits.second));
+
+  // compute all eigenvalues/eigenvectors
+  if (idx.first==0 && idx.second==(unsigned int)n_rows-1)
+    return eigenpairs_symmetric(compute_eigenvectors);
+  else
+    return eigenpairs_symmetric(compute_eigenvectors,idx);
+}
+
+
+
+template <typename NumberType>
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_by_value(const std::pair<NumberType,NumberType> &value_limits,
+    const bool compute_eigenvectors)
+{
+  Assert (!std::isnan(value_limits.first),ExcMessage("value_limits.first is NaN"));
+  Assert (!std::isnan(value_limits.second),ExcMessage("value_limits.second is NaN"));
+
+  std::pair<unsigned int,unsigned int> indices = std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int);
+
+  return eigenpairs_symmetric(compute_eigenvectors,indices,value_limits);
+}
+
+
+
+template <typename NumberType>
+std::vector<NumberType>
+ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvectors,
+                                                  const std::pair<unsigned int, unsigned int> &eigenvalue_idx,
+                                                  const std::pair<NumberType,NumberType> &eigenvalue_limits)
 {
   Assert (state == LAPACKSupport::matrix,
           ExcMessage("Matrix has to be in Matrix state before calling this function."));
   Assert (property == LAPACKSupport::symmetric,
           ExcMessage("Matrix has to be symmetric for this operation."));
+
   Threads::Mutex::ScopedLock lock (mutex);
 
-  ScaLAPACKMatrix<NumberType> Z (grid->n_mpi_processes, grid, 1);
-  std::vector<NumberType> ev (n_rows);
+  const bool use_values = (std::isnan(eigenvalue_limits.first) || std::isnan(eigenvalue_limits.second)) ? false : true;
+  const bool use_indices = ((eigenvalue_idx.first==numbers::invalid_unsigned_int) || (eigenvalue_idx.second==numbers::invalid_unsigned_int)) ? false : true;
+
+  Assert(!(use_values && use_indices),ExcMessage("Prescribing both the index and value range for the eigenvalues is ambiguous"));
+
+  // if computation of eigenvectors is not required use a sufficiently small distributed matrix
+  std::unique_ptr<ScaLAPACKMatrix<NumberType>> eigenvectors = compute_eigenvectors ?
+                                                              std::make_unique<ScaLAPACKMatrix<NumberType>>(n_rows,grid,row_block_size) :
+                                                              std::make_unique<ScaLAPACKMatrix<NumberType>>(grid->n_process_rows,grid->n_process_columns,grid,1,1);
+
+  eigenvectors->property = property;
+  // number of eigenvalues to be returned; upon successful exit ev contains the m seclected eigenvalues in ascending order
+  int m = n_rows;
+  std::vector<NumberType> ev(n_rows);
 
   if (grid->mpi_process_is_active)
     {
       int info = 0;
+      /*
+       * for jobz==N only eigenvalues are computed, for jobz='V' also the eigenvectors of the matrix are computed
+       */
+      char jobz = compute_eigenvectors ? 'V' : 'N';
+      char range;
+      // default value is to compute all eigenvalues and optionally eigenvectors
+      bool all_eigenpairs=true;
+      NumberType vl,vu;
+      int il,iu;
+      // number of eigenvectors to be returned;
+      // upon successful exit the first m=nz columns contain the selected eigenvectors (only if jobz=='V')
+      int nz;
+      NumberType abstol;
+      char cmach = compute_eigenvectors ? 'U' : 'S';
 
-      char jobz = 'N';
+      // orfac decides which eigenvectors should be reorthogonalized
+      // see http://www.netlib.org/scalapack/explore-html/df/d1a/pdsyevx_8f_source.html for explanation
+      // to keeps simple no reorthogonalized will be done by setting orfac to 0
+      NumberType orfac = 0;
+      //contains the indices of eigenvectors that failed to converge
+      std::vector<int> ifail;
+      // This array contains indices of eigenvectors corresponding to
+      // a cluster of eigenvalues that could not be reorthogonalized
+      // due to insufficient workspace
+      // see http://www.netlib.org/scalapack/explore-html/df/d1a/pdsyevx_8f_source.html for explanation
+      std::vector<int> iclustr;
+      // This array contains the gap between eigenvalues whose
+      // eigenvectors could not be reorthogonalized.
+      // see http://www.netlib.org/scalapack/explore-html/df/d1a/pdsyevx_8f_source.html for explanation
+      std::vector<NumberType> gap(n_local_rows * n_local_columns);
+
+      // index range for eigenvalues is not specified
+      if (!use_indices)
+        {
+          // interval for eigenvalues is not specified and consequently all eigenvalues/eigenpairs will be computed
+          if (!use_values)
+            {
+              range = 'A';
+              all_eigenpairs = true;
+            }
+          else
+            {
+              range = 'V';
+              all_eigenpairs = false;
+              vl = std::min(eigenvalue_limits.first,eigenvalue_limits.second);
+              vu = std::max(eigenvalue_limits.first,eigenvalue_limits.second);
+            }
+        }
+      else
+        {
+          range = 'I';
+          all_eigenpairs = false;
+          //as Fortran starts counting/indexing from 1 unlike C/C++, where it starts from 0
+          il = std::min(eigenvalue_idx.first,eigenvalue_idx.second) + 1;
+          iu = std::max(eigenvalue_idx.first,eigenvalue_idx.second) + 1;
+        }
       NumberType *A_loc = &this->values[0];
-
       /*
        * by setting lwork to -1 a workspace query for optimal length of work is performed
-      */
+       */
       int lwork=-1;
-      NumberType *Z_loc = &Z.values[0];
+      int liwork=-1;
+      NumberType *eigenvectors_loc = (compute_eigenvectors ? &eigenvectors->values[0] : nullptr);
       work.resize(1);
+      iwork.resize (1);
 
-      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-            Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
+      if (all_eigenpairs)
+        {
+          psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+                eigenvectors_loc, &eigenvectors->submatrix_row, &eigenvectors->submatrix_column, eigenvectors->descriptor,
+                &work[0], &lwork, &info);
+        }
+      else
+        {
+          plamch( &(this->grid->blacs_context), &cmach, abstol);
+          abstol *= 2;
+          ifail.resize(n_rows);
+          iclustr.resize(n_local_rows * n_local_columns);
+          gap.resize(n_local_rows * n_local_columns);
 
+          psyevx(&jobz, &range, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor,
+                 &vl, &vu, &il, &iu, &abstol, &m, &nz, &ev[0], &orfac,
+                 eigenvectors_loc, &eigenvectors->submatrix_row, &eigenvectors->submatrix_column, eigenvectors->descriptor,
+                 &work[0], &lwork, &iwork[0], &liwork, &ifail[0], &iclustr[0], &gap[0], &info);
+        }
       lwork=work[0];
       work.resize (lwork);
 
-      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-            Z_loc, &Z.submatrix_row, &Z.submatrix_column, Z.descriptor, &work[0], &lwork, &info);
+      if (all_eigenpairs)
+        {
+          psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
+                eigenvectors_loc, &eigenvectors->submatrix_row, &eigenvectors->submatrix_column, eigenvectors->descriptor,
+                &work[0], &lwork, &info);
 
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyev", info));
+          AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyev", info));
+        }
+      else
+        {
+          liwork = iwork[0];
+          AssertThrow(liwork>0,ExcInternalError());
+          iwork.resize(liwork);
+
+          psyevx(&jobz, &range, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor,
+                 &vl, &vu, &il, &iu, &abstol, &m, &nz, &ev[0], &orfac,
+                 eigenvectors_loc, &eigenvectors->submatrix_row, &eigenvectors->submatrix_column, eigenvectors->descriptor,
+                 &work[0], &lwork, &iwork[0], &liwork, &ifail[0], &iclustr[0], &gap[0], &info);
+
+          AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyevx", info));
+        }
+      // if eigenvectors are queried copy eigenvectors to original matrix
+      // as the temporary matrix eigenvectors has identical dimensions and
+      // block-cyclic distribution we simply swap the local array
+      if (compute_eigenvectors)
+        this->values.swap(eigenvectors->values);
+
+      //adapt the size of ev to fit m upon return
+      while ((int)ev.size() > m)
+        ev.pop_back();
     }
+  /*
+   * send number of computed eigenvalues to inactive processes
+   */
+  grid->send_to_inactive(&m, 1);
+
+  /*
+   * inactive processes have to resize array of eigenvalues
+   */
+  if (! grid->mpi_process_is_active)
+    ev.resize (m);
   /*
    * send the eigenvalues to processors not being part of the process grid
    */
   grid->send_to_inactive(ev.data(), ev.size());
 
   /*
-   * On exit, the lower triangle (if uplo='L') or the upper triangle (if uplo='U') of A,
-   * including the diagonal, is destroyed. Therefore, the matrix is unusable
+   * if only eigenvalues are queried the content of the matrix will be destroyed
+   * if the eigenpairs are queried matrix A on exit stores the eigenvectors in the columns
    */
-  state = LAPACKSupport::unusable;
+  if (compute_eigenvectors)
+    {
+      property = LAPACKSupport::Property::general;
+      state = LAPACKSupport::eigenvalues;
+    }
+  else
+    state = LAPACKSupport::unusable;
 
   return ev;
 }
@@ -376,64 +542,124 @@ std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenvalues_symmetric()
 
 
 template <typename NumberType>
-std::vector<NumberType> ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric()
+std::vector<NumberType> ScaLAPACKMatrix<NumberType>::compute_SVD(ScaLAPACKMatrix<NumberType> *U,
+    ScaLAPACKMatrix<NumberType> *VT)
 {
   Assert (state == LAPACKSupport::matrix,
           ExcMessage("Matrix has to be in Matrix state before calling this function."));
-  Assert (property == LAPACKSupport::symmetric,
-          ExcMessage("Matrix has to be symmetric for this operation."));
+  Assert(row_block_size==column_block_size,ExcDimensionMismatch(row_block_size,column_block_size));
 
+  const bool left_singluar_vectors = (U != nullptr) ? true : false;
+  const bool right_singluar_vectors = (VT != nullptr) ? true : false;
+
+  if (left_singluar_vectors)
+    {
+      Assert(n_rows==U->n_rows,ExcDimensionMismatch(n_rows,U->n_rows));
+      Assert(U->n_rows==U->n_columns,ExcDimensionMismatch(U->n_rows,U->n_columns));
+      Assert(row_block_size==U->row_block_size,ExcDimensionMismatch(row_block_size,U->row_block_size));
+      Assert(column_block_size==U->column_block_size,ExcDimensionMismatch(column_block_size,U->column_block_size));
+      Assert(grid->blacs_context==U->grid->blacs_context,ExcDimensionMismatch(grid->blacs_context,U->grid->blacs_context));
+    }
+  if (right_singluar_vectors)
+    {
+      Assert(n_columns==VT->n_rows,ExcDimensionMismatch(n_columns,VT->n_rows));
+      Assert(VT->n_rows==VT->n_columns,ExcDimensionMismatch(VT->n_rows,VT->n_columns));
+      Assert(row_block_size==VT->row_block_size,ExcDimensionMismatch(row_block_size,VT->row_block_size));
+      Assert(column_block_size==VT->column_block_size,ExcDimensionMismatch(column_block_size,VT->column_block_size));
+      Assert(grid->blacs_context==VT->grid->blacs_context,ExcDimensionMismatch(grid->blacs_context,VT->grid->blacs_context));
+    }
   Threads::Mutex::ScopedLock lock (mutex);
 
-  ScaLAPACKMatrix<NumberType> eigenvectors (n_rows, grid, row_block_size);
-  eigenvectors.property = property;
-  std::vector<NumberType> ev(n_rows);
+  std::vector<NumberType> sv(std::min(n_rows,n_columns));
 
   if (grid->mpi_process_is_active)
     {
-      int info = 0;
-
-      /*
-       * for jobz = 'V' all eigenpairs of the matrix are computed
-       */
-      char jobz = 'V';
+      char jobu = left_singluar_vectors ? 'V' : 'N';
+      char jobvt = right_singluar_vectors ? 'V' : 'N';
       NumberType *A_loc = &this->values[0];
-
+      NumberType *U_loc = left_singluar_vectors ? &(U->values[0]) : nullptr;
+      NumberType *VT_loc = right_singluar_vectors ? &(VT->values[0]) : nullptr;
+      int info = 0;
       /*
        * by setting lwork to -1 a workspace query for optimal length of work is performed
        */
       int lwork=-1;
-      NumberType *eigenvectors_loc = &eigenvectors.values[0];
       work.resize(1);
 
-      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-            eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
+      pgesvd(&jobu,&jobvt,&n_rows,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,
+             & *sv.begin(),U_loc,&U->submatrix_row,&U->submatrix_column,U->descriptor,
+             VT_loc,&VT->submatrix_row,&VT->submatrix_column,VT->descriptor,
+             &work[0],&lwork,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgesvd", info));
 
       lwork=work[0];
-      work.resize (lwork);
+      work.resize(lwork);
 
-      psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
-            eigenvectors_loc, &eigenvectors.submatrix_row, &eigenvectors.submatrix_column, eigenvectors.descriptor, &work[0], &lwork, &info);
-
-      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyev", info));
-
-      // copy eigenvectors to original matrix
-      // as the temporary matrix eigenvectors has identical dimensions and
-      // block-cyclic distribution we simply swap the local array
-      this->values.swap(eigenvectors.values);
+      pgesvd(&jobu,&jobvt,&n_rows,&n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,
+             & *sv.begin(),U_loc,&U->submatrix_row,&U->submatrix_column,U->descriptor,
+             VT_loc,&VT->submatrix_row,&VT->submatrix_column,VT->descriptor,
+             &work[0],&lwork,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgesvd", info));
     }
-  /*
-   * send the eigenvalues to processors not being part of the process grid
-   */
-  grid->send_to_inactive(ev.data(), ev.size());
 
   /*
-   *  On exit matrix A stores the eigenvectors in the columns
+   * send the singular values to processors not being part of the process grid
    */
+  grid->send_to_inactive(sv.data(), sv.size());
+
   property = LAPACKSupport::Property::general;
-  state = LAPACKSupport::eigenvalues;
+  state = LAPACKSupport::State::unusable;
 
-  return ev;
+  return sv;
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
+                                                const bool transpose)
+{
+  Assert(grid==B.grid,ExcMessage("The matrices A and B need to have the same process grid"));
+  Assert (state == LAPACKSupport::matrix,
+          ExcMessage("Matrix has to be in Matrix state before calling this function."));
+  Assert (B.state == LAPACKSupport::matrix,
+          ExcMessage("Matrix B has to be in Matrix state before calling this function."));
+
+  transpose ?
+  (Assert(n_columns==B.n_rows,ExcDimensionMismatch(n_columns,B.n_rows))) :
+  (Assert(n_rows==B.n_rows,ExcDimensionMismatch(n_rows,B.n_rows)));
+
+  //see https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgels.htm
+  Assert(row_block_size==column_block_size,ExcMessage("Use identical block sizes for rows and columns of matrix A"));
+  Assert(B.row_block_size==B.column_block_size,ExcMessage("Use identical block sizes for rows and columns of matrix B"));
+  Assert(row_block_size==B.row_block_size,ExcMessage("Use identical block-cyclic distribution for matrices A and B"));
+
+  Threads::Mutex::ScopedLock lock (mutex);
+
+  if (grid->mpi_process_is_active)
+    {
+      char trans = transpose ? 'T' : 'N';
+      NumberType *A_loc = & this->values[0];
+      NumberType *B_loc = & B.values[0];
+      int info = 0;
+      /*
+       * by setting lwork to -1 a workspace query for optimal length of work is performed
+       */
+      int lwork=-1;
+      work.resize(1);
+
+      pgels(&trans,&n_rows,&n_columns,&B.n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,
+            B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,&work[0],&lwork,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgels", info));
+
+      lwork=work[0];
+      work.resize(lwork);
+
+      pgels(&trans,&n_rows,&n_columns,&B.n_columns,A_loc,&submatrix_row,&submatrix_column,descriptor,
+            B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,&work[0],&lwork,&info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pgels", info));
+    }
+  state = LAPACKSupport::State::unusable;
 }
 
 

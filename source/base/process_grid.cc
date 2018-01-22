@@ -245,6 +245,7 @@ namespace Utilities
 
 template void Utilities::MPI::ProcessGrid::send_to_inactive<double>(double *, const int) const;
 template void Utilities::MPI::ProcessGrid::send_to_inactive<float>(float *, const int) const;
+template void Utilities::MPI::ProcessGrid::send_to_inactive<int>(int *, const int) const;
 
 DEAL_II_NAMESPACE_CLOSE
 
