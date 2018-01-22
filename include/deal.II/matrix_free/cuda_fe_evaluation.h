@@ -59,8 +59,8 @@ namespace CUDAWrappers
    * a vector Laplace equation), they can be applied simultaneously with one call
    * (and often more efficiently). Defaults to 1
    *
-   * @tparam Number Number format, usually @p double or @p float. Defaults to @p
-   * double
+   * @tparam Number Number format, @p double or @p float. Defaults to @p
+   * double.
    *
    * @ingroup CUDAWrappers
    *
