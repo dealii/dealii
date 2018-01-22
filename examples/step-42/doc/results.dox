@@ -14,21 +14,20 @@ Cycle 0:
    Number of active cells: 512
    Number of degrees of freedom: 2187
  
-   Newton iteration 1
+  Newton iteration 1
       Updating active set...
          Size of active set: 1
       Assembling system... 
       Solving system... 
-         Error: 173.076 -> 3.06875e-07 in 8 Bicgstab iterations.
-      Accepting Newton solution with residual: 3.06875e-07
-      Active set did not change!
+         Error: 173.076 -> 1.64265e-06 in 7 Bicgstab iterations.
+      Accepting Newton solution with residual: 1.64265e-06
  
    Newton iteration 2
       Updating active set...
          Size of active set: 1
       Assembling system... 
       Solving system... 
-         Error: 57.3622 -> 2.46266e-07 in 8 Bicgstab iterations.
+         Error: 57.3622 -> 3.23721e-07 in 8 Bicgstab iterations.
       Accepting Newton solution with residual: 24.9028
       Active set did not change!
  
@@ -37,7 +36,7 @@ Cycle 0:
          Size of active set: 1
       Assembling system... 
       Solving system... 
-         Error: 24.9028 -> 1.83021e-07 in 7 Bicgstab iterations.
+         Error: 24.9028 -> 9.94326e-08 in 7 Bicgstab iterations.
       Residual of the non-contact part of the system: 1.63333
          with a damping parameter alpha = 1
       Active set did not change!
@@ -49,11 +48,11 @@ Cycle 0:
          Size of active set: 1
       Assembling system... 
       Solving system... 
-         Error: 1.43188e-07 -> 4.61326e-16 in 8 Bicgstab iterations.
-      Residual of the non-contact part of the system: 5.67016e-14
+         Error: 1.43188e-07 -> 3.56218e-16 in 8 Bicgstab iterations.
+      Residual of the non-contact part of the system: 4.298e-14
          with a damping parameter alpha = 1
       Active set did not change!
-      Writing graphical output... p1adaptive/solution-00.pvtu
+      Writing graphical output... p1_adaptive/solution-00.pvtu
 
 
 +---------------------------------------------+------------+------------+
@@ -89,22 +88,21 @@ Cycle 3:
          Size of active set: 145
       Assembling system... 
       Solving system... 
-         Error: 296.309 -> 2.45532e-06 in 9 Bicgstab iterations.
-      Accepting Newton solution with residual: 2.45532e-06
-      Active set did not change!
+         Error: 296.309 -> 2.72484e-06 in 10 Bicgstab iterations.
+      Accepting Newton solution with residual: 2.72484e-06
  
 ...
 
-  Newton iteration 10
+   Newton iteration 10
       Updating active set...
          Size of active set: 145
       Assembling system... 
       Solving system... 
-         Error: 2.71542e-07 -> 2.69366e-15 in 21 Bicgstab iterations.
-      Residual of the non-contact part of the system: 1.73713e-13
+         Error: 2.71541e-07 -> 1.5428e-15 in 27 Bicgstab iterations.
+      Residual of the non-contact part of the system: 1.89261e-13
          with a damping parameter alpha = 1
       Active set did not change!
-      Writing graphical output... p1adaptive/solution-03.pvtu
+      Writing graphical output... p1_adaptive/solution-03.pvtu
 
 
 +---------------------------------------------+------------+------------+
@@ -134,6 +132,8 @@ Contact force = 56.794
 @endcode
 
 The tables at the end of each cycle show information about computing time
+(these numbers are of course specific to the machine on which this output
+was produced)
 and the number of calls of different parts of the program like assembly or
 calculating the residual, for the most recent mesh refinement cycle. Some of
 the numbers above can be improved by transferring the solution from one mesh to

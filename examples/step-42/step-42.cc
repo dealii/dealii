@@ -1853,7 +1853,6 @@ namespace Step42
             old_solution = solution;
           }
 
-        old_active_set = active_set;
         previous_residual_norm = residual_norm;
 
 
@@ -1868,6 +1867,8 @@ namespace Step42
             if (residual_norm < 1e-10)
               break;
           }
+
+        old_active_set = active_set;
       }
   }
 
