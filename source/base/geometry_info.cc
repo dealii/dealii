@@ -54,12 +54,11 @@ template <int dim>
 constexpr std::array<unsigned int, GeometryInfo<dim>::vertices_per_cell>
 GeometryInfo<dim>::ucd_to_deal;
 
-constexpr std::array<unsigned int, GeometryInfo<0>::vertices_per_cell>
-GeometryInfo<0>::ucd_to_deal;
+const std::array<unsigned int, GeometryInfo<0>::vertices_per_cell>
+GeometryInfo<0>::ucd_to_deal = {{0}};
 
-constexpr std::array<unsigned int, GeometryInfo<0>::vertices_per_cell>
-GeometryInfo<0>::dx_to_deal;
-
+const std::array<unsigned int, GeometryInfo<0>::vertices_per_cell>
+GeometryInfo<0>::dx_to_deal = {{0}};
 
 template struct GeometryInfo<1>;
 template struct GeometryInfo<2>;
