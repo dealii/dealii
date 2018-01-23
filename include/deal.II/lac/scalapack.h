@@ -177,6 +177,9 @@ public:
    * - The dimension of the submatrix to be copied is given by @p submatrix_size
    *   with number of rows=<code>submatrix_size.first</code> and number of columns=<code>submatrix_size.second</code>
    * .
+   *
+   * If it is necessary to copy complete matrices with an identical block-cyclic distribution,
+   * use copy_to(ScaLAPACKMatrix<NumberType> &dest) with only one argument to avoid communication
    */
   void copy_to(ScaLAPACKMatrix<NumberType> &B,
                const std::pair<unsigned int,unsigned int> &offset_A,
@@ -185,13 +188,23 @@ public:
 
   /**
    * Stores the distributed matrix in @p filename using HDF5
+   *
+   * If HDF5 was build with MPI, parallel I/O is used to save the matrix.
+   * Otherwise, just one process will do the output.
    */
   void save(const char *filename) const;
 
   /**
-   * Loads the distributed matrix from file @p filename using HDF5
+   * Loads the distributed matrix from file @p filename using HDF5.
+   *
+   * The matrix must have the same dimensions as the matrix in stored in the file.
+   *
+   * If HDF5 was build with MPI, parallel I/O is used to load the matrix.
+   * Otherwise, just one process will load the matrix from storage
+   * and distribute the content to the other processes subsequently.
    */
   void load(const char *filename);
+
   /**
    * Compute the Cholesky factorization of the matrix using ScaLAPACK
    * function <code>pXpotrf</code>. The result of the factorization is stored in this object.
