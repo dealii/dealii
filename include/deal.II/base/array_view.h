@@ -474,9 +474,9 @@ make_array_view (std::vector<ElementType> &vector)
  * initializing an ArrayView object with a pointer to the first element and
  * the size of the given argument.
  *
- * This function is used for @p const references to objects of Vector type
- * because they contain immutable elements. Consequently, the return type of
- * this function is a view to a set of @p const objects.
+ * This function is used for non-@p const references to objects of Vector
+ * type. Such objects contain elements that can be written to. Consequently,
+ * the return type of this function is a view to a set of writable objects.
  *
  * @param[in] vector The Vector for which we want to have an array view
  * object. The array view corresponds to the <em>entire</em> Vector.
@@ -696,7 +696,9 @@ make_array_view (Table<2,ElementType>                           &table,
  * return type of this function is a view to a set of writable objects.
  *
  * @param[in] table The Table for which we want to have an array view object.
- * The array view corresponds to the <em>entire</em> table.
+ * The array view corresponds to the <em>entire</em> table but the order in
+ * which the entries are presented in the array is undefined and can not be
+ * relied upon.
  *
  * @relates ArrayView
  */
@@ -715,13 +717,14 @@ make_array_view (Table<2,ElementType> &table)
  * initializing an ArrayView object with a pointer to the first element of the
  * given table, and the number of table entries as the length of the view.
  *
- * This function is used for non-@p const references to objects of
- * LAPACKFullMatrix type. Such objects contain elements that can be
- * written to. Consequently, the return type of this function is a
- * view to a set of writable objects.
+ * This function is used for @p const references to objects of Table type
+ * because they contain immutable elements. Consequently, the return type of
+ * this function is a view to a set of @p const objects.
  *
  * @param[in] table The Table for which we want to have an array view object.
- * The array view corresponds to the <em>entire</em> table.
+ * The array view corresponds to the <em>entire</em> table but the order in
+ * which the entries are presented in the array is undefined and can not be
+ * relied upon.
  *
  * @relates ArrayView
  */
@@ -739,12 +742,15 @@ make_array_view (const Table<2,ElementType> &table)
  * initializing an ArrayView object with a pointer to the first element of the
  * given object, and the number entries as the length of the view.
  *
- * This function is used for @p non-const references to objects of Table type
- * because they contain immutable elements. Consequently, the return type of
- * this function is a view to a set of @p non-const objects.
+ * This function is used for @p non-const references to objects of
+ * LAPACKFullMatrix type. Such objects contain elements that can be written to.
+ * Consequently, the return type of this function is a view to a set of
+ * @p non-const objects.
  *
  * @param[in] table The LAPACKFullMatrix for which we want to have an array view
- * object. The array view corresponds to the <em>entire</em> object.
+ * object. The array view corresponds to the <em>entire</em> object but the
+ * order in which the entries are presented in the array is undefined and can
+ * not be relied upon.
  *
  * @relates ArrayView
  */
@@ -767,7 +773,9 @@ make_array_view (LAPACKFullMatrix<ElementType> &matrix)
  * of this function is a view to a set of @p const objects.
  *
  * @param[in] table The LAPACKFullMatrix for which we want to have an array view
- * object. The array view corresponds to the <em>entire</em> object.
+ * object. The array view corresponds to the <em>entire</em> object but the
+ * order in which the entries are presented in the array is undefined and can
+ * not be relied upon.
  *
  * @relates ArrayView
  */

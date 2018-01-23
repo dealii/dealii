@@ -53,13 +53,6 @@ DEAL_II_NAMESPACE_OPEN
 template <int rank, int dim, typename Number> class Tensor;
 template <int rank, int dim, typename Number> class SymmetricTensor;
 
-//Forward type declaration to allow MPI sums over Vector<number> type
-template <typename Number> class Vector;
-//Forward type declaration to allow MPI sums over FullMatrix<number> type
-template <typename Number> class FullMatrix;
-//Forward type declaration to allow MPI sums over LAPACKFullMatrix<number> type
-template <typename Number> class LAPACKFullMatrix;
-
 
 namespace Utilities
 {
@@ -156,7 +149,8 @@ namespace Utilities
      * Like the previous function, but take the sums over the elements of an
      * array of type T. In other words, the i-th element of the results
      * array is the sum over the i-th entries of the input arrays from each
-     * processor. T and U must decay to the same type.
+     * processor. T and U must decay to the same type, e.g. they just differ by
+     * one of them having a const type qualifier and the other not.
      *
      * Input and output arrays may be the same.
      */
@@ -226,7 +220,8 @@ namespace Utilities
      * Like the previous function, but take the maximum over the elements of an
      * array of type T. In other words, the i-th element of the results array is
      * the maximum over the i-th entries of the input arrays from each
-     * processor. T and U must decay to the same type.
+     * processor. T and U must decay to the same type, e.g. they just differ by
+     * one of them having a const type qualifier and the other not.
      *
      * Input and output vectors may be the same.
      */
@@ -276,7 +271,8 @@ namespace Utilities
      * Like the previous function, but take the minima over the elements of an
      * array of type T. In other words, the i-th element of the results
      * array is the minimum of the i-th entries of the input arrays from each
-     * processor. T and U must decay to the same type.
+     * processor. T and U must decay to the same type, e.g. they just differ by
+     * one of them having a const type qualifier and the other not.
      *
      * Input and output arrays may be the same.
      */
