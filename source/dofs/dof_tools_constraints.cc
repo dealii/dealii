@@ -1891,8 +1891,8 @@ namespace DoFTools
                 bool is_identity_constrained = true;
                 const double eps = 1.e-13;
                 for (unsigned int jj=0; jj<dofs_per_face; ++jj)
-                  if (((std::abs(transformation(i,jj)) < eps) ||
-                       (std::abs(transformation(i,jj)-1) < eps)) == false)
+                  if (std::abs(transformation(i,jj)) > eps &&
+                      std::abs(transformation(i,jj)-1.) > eps)
                     {
                       is_identity_constrained = false;
                       break;
@@ -1922,8 +1922,8 @@ namespace DoFTools
                 unsigned int inverse_constraint_target = numbers::invalid_unsigned_int;
                 if (is_inverse_constrained)
                   for (unsigned int jj=0; jj<dofs_per_face; ++jj)
-                    if (((std::abs(transformation(i,jj)) < eps) ||
-                         (std::abs(transformation(i,jj)+1) < eps)) == false)
+                    if (std::abs(transformation(i,jj)) > eps &&
+                        std::abs(transformation(i,jj)+1.) > eps)
                       {
                         is_inverse_constrained = false;
                         break;
@@ -1970,7 +1970,7 @@ namespace DoFTools
                   {
                     // now treat constraints, either as an equality constraint or
                     // as a sequence of constraints
-                    if (is_identity_constrained == true || is_inverse_constrained == true)
+                    if (is_identity_constrained || is_inverse_constrained)
                       {
                         // Query the correct face_index on face_1 respecting the given
                         // orientation:

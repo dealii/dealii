@@ -72,14 +72,14 @@ ConstraintMatrix make_constraint_matrix(const DoFHandler<3> &dof_handler, int ve
   DoFTools::make_periodicity_constraints<DoFHandler<dim> >(periodicity_vectorDof, constraints);
 
   constraints.close();
-  /*std::map<types::global_dof_index, Point<dim> > support_points;
+  std::map<types::global_dof_index, Point<dim> > support_points;
   DoFTools::map_dofs_to_support_points (MappingQ<dim,dim>(1), dof_handler, support_points);
   for (const auto &line: constraints.get_lines())
     for (const auto &entry: line.entries)
-      std::cout << "DoF " << line.index << " at " << support_points[line.index]
-                << " is constrained to " << " DoF " << entry.first << " at "
-                << support_points[entry.first]
-                << " with value " << entry.second << std::endl;*/
+      deallog << "DoF " << line.index << " at " << support_points[line.index]
+              << " is constrained to " << " DoF " << entry.first << " at "
+              << support_points[entry.first]
+              << " with value " << entry.second << std::endl;
   return constraints;
 }
 
