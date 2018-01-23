@@ -768,7 +768,7 @@ namespace DoFRenumbering
    *   the mesh has undergone. On the other hand, the z-order
    *   of cells is independent of the mesh's history, and so yields a
    *   predictable DoF numbering.
-   * - For meshes described by parallel::distributed::Triangulation,
+   * - For meshes based on parallel::distributed::Triangulation,
    *   the @ref GlossLocallyOwnedCell "locally owned cells" of
    *   each MPI process are contiguous in Z order. That means that
    *   numbering degrees of freedom by visiting cells in Z order yields
@@ -781,7 +781,43 @@ namespace DoFRenumbering
    *   cell with indices that will be the same regardless of how many
    *   processes the mesh is split up between.
    *
-   * This function generates an ordering that is independent of the previous
+   * For meshes based on parallel::shared::Triangulation, the situation is
+   * more complex. Here, the set of locally owned cells is determined by
+   * a partitioning algorithm (selected by passing an object of type
+   * parallel::shared::Triangulation::Settings to the constructor of the
+   * triangulation), and in general these partitioning algorithms may
+   * assign cells to @ref GlossSubdomainId "subdomains" based on
+   * decisions that may have nothing to do with the Z order. (Though it
+   * is possible to select these flags in a way so that partitioning
+   * uses the Z order.) As a consequence, the cells of one subdomain
+   * are not contiguous in Z order, and if one renumbered degrees of freedom
+   * based on the Z order of cells, one would generally end up with DoF
+   * indices that on each processor do not form a contiguous range.
+   * This is often inconvenient (for example, because PETSc cannot store
+   * vectors and matrices for which the locally owned set of indices
+   * is not contiguous), and consequently this function uses the following
+   * algorithm for parallel::shared::Triangulation objects:
+   * - It determines how many degrees of freedom each processor owns.
+   *   This is an invariant under renumbering, and consequently we can
+   *   use how many DoFs each processor owns at the beginning of the current
+   *   function. Let us call this number $n_P$ for processor $P$.
+   * - It determines for each processor a contiguous range of new
+   *   DoF indices $[b_P,e_P)$ so that $e_P-b_P=n_P$, $b_0=0$, and
+   *   $b_P=e_{P-1}$.
+   * - It traverses the <i>locally owned cells</i> in Z order and
+   *   renumbers the locally owned degrees of freedom on these cells
+   *   so that the new numbers fit within the interval $[b_P,e_P)$.
+   * In other words, the <i>locally owned degrees of freedom</i> on each
+   * processor are sorted according to the Z order of the locally
+   * owned cells they are on, but this property may not hold globally,
+   * across cells. This is because the partitioning algorithm may have
+   * decided that, for example, processor 0 owns a cell that comes
+   * <i>later</i> in Z order than one of the cells assigned to processor 1.
+   * On the other hand, the algorithm described above assigns the
+   * degrees of freedom on this cell <i>earlier</i> indices than
+   * all of the indices owned by processor 1.
+   *
+   * @note This function generates an ordering that is independent of the previous
    * numbering of degrees of freedom. In other words, any information that may
    * have been produced by a previous call to a renumbering function is
    * ignored.
