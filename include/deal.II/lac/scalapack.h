@@ -166,6 +166,17 @@ public:
   void copy_to (ScaLAPACKMatrix<NumberType> &dest) const;
 
   /**
+
+  /**
+   * Stores the distributed matrix in @p filename using HDF5
+   */
+  void save(const char *filename) const;
+
+  /**
+   * Loads the distributed matrix from file @p filename using HDF5
+   */
+  void load(const char *filename);
+  /**
    * Compute the Cholesky factorization of the matrix using ScaLAPACK
    * function <code>pXpotrf</code>. The result of the factorization is stored in this object.
    */
@@ -362,6 +373,30 @@ private:
                                                  std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int),
                                                const std::pair<NumberType,NumberType> &value_limits=
                                                  std::make_pair(std::numeric_limits<NumberType>::quiet_NaN(),std::numeric_limits<NumberType>::quiet_NaN()));
+
+  /*
+   * Stores the distributed matrix in @p filename
+   * using serial routines
+   */
+  void save_serial(const char *filename) const;
+
+  /*
+   * Loads the distributed matrix from file @p filename
+   * using serial routines
+   */
+  void load_serial(const char *filename);
+
+  /*
+   * Stores the distributed matrix in @p filename
+   * using parallel routines
+   */
+  void save_parallel(const char *filename) const;
+
+  /*
+   * Loads the distributed matrix from file @p filename
+   * using parallel routines
+   */
+  void load_parallel(const char *filename);
 
   /**
    * Since ScaLAPACK operations notoriously change the meaning of the matrix

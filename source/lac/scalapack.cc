@@ -23,6 +23,13 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/lac/scalapack.templates.h>
+#include <deal.II/base/conditional_ostream.h>
+
+#include <array>
+
+#  ifdef DEAL_II_WITH_HDF5
+#include <hdf5.h>
+#  endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -760,6 +767,412 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
   grid->send_to_inactive(&res);
   return res;
 }
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::save(const char *filename) const
+{
+#ifndef DEAL_II_WITH_HDF5
+  (void)filename;
+  AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
+#else
+#  ifdef H5_HAVE_PARALLEL
+  //implementation for configurations equipped with a parallel file system
+  save_parallel(filename);
+
+#  else
+  //implementation for configurations with no parallel file system
+  save_serial(filename);
+
+#  endif
+#endif
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
+{
+#  ifndef DEAL_II_WITH_HDF5
+  (void)filename;
+  AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
+#  else
+
+  /*
+   * The content of the distributed matrix is copied to a matrix using a 1x1 process grid.
+   * Therefore, one process has all the data and can write it to a file.
+   */
+  //create a 1x1 column grid with P being the number of MPI processes
+  std::shared_ptr<Utilities::MPI::ProcessGrid> column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,1);
+
+  const int MB=n_rows, NB=n_columns;
+  ScaLAPACKMatrix<NumberType> tmp(n_rows,n_columns,column_grid,MB,NB);
+  copy_to(tmp);
+
+  // the 1x1 grid has only one process and this one writes
+  // the content of the matrix to the HDF5 file
+  if (tmp.grid->mpi_process_is_active)
+    {
+      herr_t status;
+
+      // create a new file using default properties
+      hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+
+      // create the data space for the dataset
+      hsize_t dims[2];
+      //change order of rows and columns as ScaLAPACKMatrix uses column major ordering
+      dims[0] = n_columns;
+      dims[1] = n_rows;
+      hid_t dataspace_id = H5Screate_simple(2, dims, nullptr);
+
+      // create the dataset
+      hid_t type_id = hdf5_type_id(&tmp.values[0]);
+      hid_t dataset_id = H5Dcreate2(file_id, "/matrix",
+    		  	  	  	  	  	  	type_id, dataspace_id,
+                                    H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+      // write the dataset
+      status = H5Dwrite(dataset_id, type_id,
+                        H5S_ALL, H5S_ALL, H5P_DEFAULT,
+                        &tmp.values[0]);
+      AssertThrow(status >= 0, ExcIO());
+
+      // end access to the dataset and release resources used by it
+      status = H5Dclose(dataset_id);
+      AssertThrow(status >= 0, ExcIO());
+
+      // terminate access to the data space
+      status = H5Sclose(dataspace_id);
+      AssertThrow(status >= 0, ExcIO());
+
+      // close the file.
+      status = H5Fclose(file_id);
+      AssertThrow(status >= 0, ExcIO());
+    }
+#  endif
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename) const
+{
+#  ifndef DEAL_II_WITH_HDF5
+  (void)filename;
+  AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
+#  else
+
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(this->grid->mpi_communicator));
+  MPI_Info info = MPI_INFO_NULL;
+  /*
+   * The content of the distributed matrix is copied to a matrix using a 1xn_processes process grid.
+   * Therefore, the processes hold contiguous chunks of the matrix, which they can write to the file
+   */
+  //create a 1xP column grid with P being the number of MPI processes
+  std::shared_ptr<Utilities::MPI::ProcessGrid> column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,n_mpi_processes);
+
+  const int MB=n_rows, NB=std::ceil(n_columns/n_mpi_processes);
+  ScaLAPACKMatrix<NumberType> tmp(n_rows,n_columns,column_grid,MB,NB);
+  copy_to(tmp);
+
+  // get pointer to data held by the process
+  NumberType* data = (tmp.values.size()>0) ? &tmp.values[0] : nullptr;
+
+  herr_t status;
+  // dataset dimensions
+  hsize_t dims[2];
+
+  // set up file access property list with parallel I/O access
+  hid_t	plist_id = H5Pcreate(H5P_FILE_ACCESS);
+  status = H5Pset_fapl_mpio(plist_id, tmp.grid->mpi_communicator, info);
+  AssertThrow(status >= 0, ExcIO());
+
+  // create a new file collectively and release property list identifier
+  hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+  status = H5Pclose(plist_id);
+  AssertThrow(status >= 0, ExcIO());
+
+  // As ScaLAPACK, and therefore the class ScaLAPACKMatrix, uses column-major ordering
+  // but HDF5 row-major ordering, we have to reverse entries related
+  // to columns and rows in the following.
+  // create the dataspace for the dataset
+  dims[0] = tmp.n_columns;
+  dims[1] = tmp.n_rows;
+
+  hid_t filespace = H5Screate_simple(2, dims, nullptr);
+
+  // create the dataset with default properties and close filespace
+  hid_t type_id = hdf5_type_id(data);
+  hid_t dset_id = H5Dcreate2(file_id, "/matrix", type_id,
+		  	  	  	  	     filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  status = H5Sclose(filespace);
+  AssertThrow(status >= 0, ExcIO());
+
+  // gather the number of local rows and columns from all processes
+  std::vector<int> proc_n_local_rows(n_mpi_processes), proc_n_local_columns(n_mpi_processes);
+  MPI_Allgather(&tmp.n_local_rows,1,MPI_INT,proc_n_local_rows.data(),1,MPI_INT,tmp.grid->mpi_communicator);
+  MPI_Allgather(&tmp.n_local_columns,1,MPI_INT,proc_n_local_columns.data(),1,MPI_INT,tmp.grid->mpi_communicator);
+
+  const unsigned int my_rank(Utilities::MPI::this_mpi_process(tmp.grid->mpi_communicator));
+
+  // hyperslab selection parameters
+  // each process defines dataset in memory and writes it to the hyperslab in the file
+  hsize_t count[2];
+  count[0] = tmp.n_local_columns;
+  count[1] = tmp.n_rows;
+  hid_t memspace = H5Screate_simple(2, count, nullptr);
+
+  hsize_t offset[2] = {0};
+  for (unsigned int i=0; i<my_rank; ++i)
+	  offset[0] += proc_n_local_columns[i];
+
+  // select hyperslab in the file.
+  filespace = H5Dget_space(dset_id);
+  status = H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, nullptr, count, nullptr);
+  AssertThrow(status >= 0, ExcIO());
+
+  // create property list for independent dataset write
+  plist_id = H5Pcreate(H5P_DATASET_XFER);
+  status = H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_INDEPENDENT);
+  AssertThrow(status >= 0, ExcIO());
+
+  // process with no data will not participate in writing to the file
+  if (tmp.values.size()>0)
+  {
+	  status = H5Dwrite(dset_id, type_id, memspace, filespace,
+		      	  		plist_id, data);
+	  AssertThrow(status >= 0, ExcIO());
+  }
+
+  // close/release sources
+  status = H5Dclose(dset_id);
+  AssertThrow(status >= 0, ExcIO());
+  status = H5Sclose(filespace);
+  AssertThrow(status >= 0, ExcIO());
+  status = H5Sclose(memspace);
+  AssertThrow(status >= 0, ExcIO());
+  status = H5Pclose(plist_id);
+  AssertThrow(status >= 0, ExcIO());
+  status = H5Fclose(file_id);
+  AssertThrow(status >= 0, ExcIO());
+
+#  endif
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::load(const char *filename)
+{
+#ifndef DEAL_II_WITH_HDF5
+  (void)filename;
+  AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
+#else
+#  ifdef H5_HAVE_PARALLEL
+  //implementation for configurations equipped with a parallel file system
+  load_parallel(filename);
+#  else
+  //implementation for configurations with no parallel file system
+  load_serial(filename);
+#  endif
+#endif
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::load_serial(const char *filename)
+{
+#  ifndef DEAL_II_WITH_HDF5
+  (void)filename;
+  AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
+#  else
+
+  /*
+   * The content of the distributed matrix is copied to a matrix using a 1x1 process grid.
+   * Therefore, one process has all the data and can write it to a file
+   */
+  //create a 1xP column grid with P being the number of MPI processes
+  std::shared_ptr<Utilities::MPI::ProcessGrid> one_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,1);
+
+  const int MB=n_rows, NB=n_columns;
+  ScaLAPACKMatrix<NumberType> tmp(n_rows,n_columns,one_grid,MB,NB);
+
+  // the 1x1 grid has only one process and this one reads
+  // the content of the matrix from the HDF5 file
+  if (tmp.grid->mpi_process_is_active)
+    {
+      herr_t status;
+
+      // open the file in read-only mode
+      hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+
+      // open the dataset in the file
+      hid_t dataset_id = H5Dopen2(file_id, "/matrix", H5P_DEFAULT);
+
+      // check the datatype of the data in the file
+      // datatype of source and destination must have the same class
+      // see HDF User's Guide: 6.10. Data Transfer: Datatype Conversion and Selection
+      hid_t datatype  = H5Dget_type(dataset_id);
+      H5T_class_t t_class_in = H5Tget_class(datatype);
+      H5T_class_t t_class = H5Tget_class(hdf5_type_id(&tmp.values[0]));
+      AssertThrow(t_class_in == t_class,
+                  ExcMessage("The data type of the matrix to be read does not match the archive"));
+
+      // get dataspace handle
+      hid_t dataspace_id = H5Dget_space(dataset_id);
+      // get number of dimensions
+      const int ndims = H5Sget_simple_extent_ndims(dataspace_id);
+      AssertThrow(ndims==2, ExcIO());
+      // get every dimension
+      hsize_t dims[2];
+      H5Sget_simple_extent_dims(dataspace_id, dims, nullptr);
+      AssertThrow((int)dims[0]==n_columns,
+                  ExcMessage("The number of columns of the matrix does not match the content of the archive"));
+      AssertThrow((int)dims[1]==n_rows,
+                  ExcMessage("The number of rows of the matrix does not match the content of the archive"));
+
+      // read data
+      status = H5Dread(dataset_id, hdf5_type_id(&tmp.values[0]), H5S_ALL, H5S_ALL,
+                       H5P_DEFAULT, &tmp.values[0]);
+      AssertThrow(status >= 0, ExcIO());
+
+      // terminate access to the data space
+      status = H5Sclose(dataspace_id);
+      AssertThrow(status >= 0, ExcIO());
+
+      // release data type handle
+      status = H5Tclose(datatype);
+      AssertThrow(status >= 0, ExcIO());
+
+      // end access to the dataset and release resources used by it
+      status = H5Dclose(dataset_id);
+      AssertThrow(status >= 0, ExcIO());
+
+      // close the file.
+      status = H5Fclose(file_id);
+      AssertThrow(status >= 0, ExcIO());
+    }
+  tmp.copy_to(*this);
+
+#  endif // DEAL_II_WITH_HDF5
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
+{
+#  ifndef DEAL_II_WITH_HDF5
+  (void)filename;
+  AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
+#  else
+#    ifndef H5_HAVE_PARALLEL
+  AssertThrow(false, ExcMessage ("HDF5 was not built with MPI."));
+#    else
+
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(this->grid->mpi_communicator));
+  MPI_Info info = MPI_INFO_NULL;
+  /*
+   * The content of the distributed matrix is copied to a matrix using a 1xn_processes process grid.
+   * Therefore, the processes hold contiguous chunks of the matrix, which they can write to the file
+   */
+  //create a 1xP column grid with P being the number of MPI processes
+  std::shared_ptr<Utilities::MPI::ProcessGrid> column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,n_mpi_processes);
+
+  const int MB=n_rows, NB=std::ceil(n_columns/n_mpi_processes);
+  ScaLAPACKMatrix<NumberType> tmp(n_rows,n_columns,column_grid,MB,NB);
+
+  // get pointer to data held by the process
+  NumberType* data = (tmp.values.size()>0) ? &tmp.values[0] : nullptr;
+
+  herr_t status;
+
+   // set up file access property list with parallel I/O access
+   hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
+   status = H5Pset_fapl_mpio(plist_id, tmp.grid->mpi_communicator, info);
+   AssertThrow(status >= 0, ExcIO());
+
+   // open file collectively in read-only mode and release property list identifier
+   hid_t file_id = H5Fopen(filename, H5F_ACC_RDONLY, plist_id);
+   status = H5Pclose(plist_id);
+   AssertThrow(status >= 0, ExcIO());
+
+   // open the dataset in the file collectively
+   hid_t dataset_id = H5Dopen2(file_id, "/matrix", H5P_DEFAULT);
+
+   // check the datatype of the dataset in the file
+   // if the classes of type of the dataset and the matrix do not match abort
+   // see HDF User's Guide: 6.10. Data Transfer: Datatype Conversion and Selection
+   hid_t datatype = hdf5_type_id(data);
+   hid_t datatype_inp  = H5Dget_type(dataset_id);
+   H5T_class_t t_class_inp = H5Tget_class(datatype_inp);
+   H5T_class_t t_class = H5Tget_class(datatype);
+   AssertThrow(t_class_inp == t_class,
+               ExcMessage("The data type of the matrix to be read does not match the archive"));
+
+   // get the dimensions of the matrix stored in the file
+   // get dataspace handle
+   hid_t dataspace_id = H5Dget_space(dataset_id);
+   // get number of dimensions
+   const int ndims = H5Sget_simple_extent_ndims(dataspace_id);
+   AssertThrow(ndims==2, ExcIO());
+   // get every dimension
+   hsize_t dims[2];
+   status = H5Sget_simple_extent_dims(dataspace_id, dims, nullptr);
+   AssertThrow(status >= 0, ExcIO());
+   AssertThrow((int)dims[0]==n_columns,
+               ExcMessage("The number of columns of the matrix does not match the content of the archive"));
+   AssertThrow((int)dims[1]==n_rows,
+               ExcMessage("The number of rows of the matrix does not match the content of the archive"));
+
+   // gather the number of local rows and columns from all processes
+   std::vector<int> proc_n_local_rows(n_mpi_processes), proc_n_local_columns(n_mpi_processes);
+   MPI_Allgather(&tmp.n_local_rows,1,MPI_INT,proc_n_local_rows.data(),1,MPI_INT,tmp.grid->mpi_communicator);
+   MPI_Allgather(&tmp.n_local_columns,1,MPI_INT,proc_n_local_columns.data(),1,MPI_INT,tmp.grid->mpi_communicator);
+
+   const unsigned int my_rank(Utilities::MPI::this_mpi_process(tmp.grid->mpi_communicator));
+
+   // hyperslab selection parameters
+   // each process defines dataset in memory and writes it to the hyperslab in the file
+   hsize_t count[2];
+   count[0] = tmp.n_local_columns;
+   count[1] = tmp.n_local_rows;
+
+   hsize_t offset[2] = {0};
+   for (unsigned int i=0; i<my_rank; ++i)
+ 	  offset[0] += proc_n_local_columns[i];
+
+   // select hyperslab in the file
+   status = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, offset, nullptr, count, nullptr);
+   AssertThrow(status >= 0, ExcIO());
+
+   // create a memory dataspace independently
+   hid_t memspace = H5Screate_simple(2, count, nullptr);
+
+   // read data independently
+   status = H5Dread(dataset_id, datatype, memspace, dataspace_id, H5P_DEFAULT, data);
+   AssertThrow(status >= 0, ExcIO());
+
+   // close/release sources
+   status = H5Sclose(memspace);
+   AssertThrow(status >= 0, ExcIO());
+   status = H5Dclose(dataset_id);
+   AssertThrow(status >= 0, ExcIO());
+   status = H5Sclose(dataspace_id);
+   AssertThrow(status >= 0, ExcIO());
+   status = H5Fclose(file_id);
+   AssertThrow(status >= 0, ExcIO());
+
+   // copying the distributed matrices
+   tmp.copy_to(*this);
+
+#    endif // H5_HAVE_PARALLEL
+#  endif // DEAL_II_WITH_HDF5
+}
+
+
 
 // instantiations
 template class ScaLAPACKMatrix<double>;
