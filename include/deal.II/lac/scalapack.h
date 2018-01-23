@@ -166,6 +166,22 @@ public:
   void copy_to (ScaLAPACKMatrix<NumberType> &dest) const;
 
   /**
+   * Copy a submatrix (subset) of the distributed matrix A to a submatrix of the distributed matrix @p B.
+   *
+   * - The global row and column index of the first element of the submatrix A is provided by @p offset_A
+   *   with row index=<code>offset_A.first</code> and column index=<code>offset_A.second</code>
+   *
+   * - The global row and column index of the first element of the submatrix B is provided by @p offset_B.
+   *   with row index=<code>offset_B.first</code> and column index=<code>offset_B.second</code>
+   *
+   * - The dimension of the submatrix to be copied is given by @p submatrix_size
+   *   with number of rows=<code>submatrix_size.first</code> and number of columns=<code>submatrix_size.second</code>
+   * .
+   */
+  void copy_to(ScaLAPACKMatrix<NumberType> &B,
+               const std::pair<unsigned int,unsigned int> &offset_A,
+               const std::pair<unsigned int,unsigned int> &offset_B,
+               const std::pair<unsigned int,unsigned int> &submatrix_size) const;
 
   /**
    * Stores the distributed matrix in @p filename using HDF5

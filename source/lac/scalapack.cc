@@ -216,6 +216,112 @@ ScaLAPACKMatrix<NumberType>::copy_to (FullMatrix<NumberType> &matrix) const
 
 template <typename NumberType>
 void
+ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &B,
+                                     const std::pair<unsigned int,unsigned int> &offset_A,
+                                     const std::pair<unsigned int,unsigned int> &offset_B,
+                                     const std::pair<unsigned int,unsigned int> &submatrix_size) const
+{
+  //submatrix is empty
+  if (submatrix_size.first == 0 || submatrix_size.second == 0)
+    return;
+
+  //range checking for matrix A
+  Assert (offset_A.first<(unsigned int)(n_rows-submatrix_size.first+1),
+          ExcIndexRange(offset_A.first,0,n_rows-submatrix_size.first+1));
+  Assert (offset_A.second<(unsigned int)(n_columns-submatrix_size.second+1),
+          ExcIndexRange(offset_A.second,0,n_columns-submatrix_size.second+1));
+
+  //range checking for matrix B
+  Assert (offset_B.first<(unsigned int)(B.n_rows-submatrix_size.first+1),
+          ExcIndexRange(offset_B.first,0,B.n_rows-submatrix_size.first+1));
+  Assert (offset_B.second<(unsigned int)(B.n_columns-submatrix_size.second+1),
+          ExcIndexRange(offset_B.second,0,B.n_columns-submatrix_size.second+1));
+
+  //Currently, copying of matrices will only be supported if A and B share the same MPI communicator
+  int ierr, comparison;
+  ierr = MPI_Comm_compare(grid->mpi_communicator,B.grid->mpi_communicator,&comparison);
+  Assert (comparison == MPI_IDENT,ExcMessage("Matrix A and B must have a common MPI Communicator"));
+
+  /*
+   * The routine pgemr2d requires a BLACS context resembling at least the union of process grids
+   * described by the BLACS contexts of matrix A and B
+   */
+  int union_blacs_context = Csys2blacs_handle(this->grid->mpi_communicator);
+  const char *order = "Col";
+  int union_n_process_rows = Utilities::MPI::n_mpi_processes(this->grid->mpi_communicator);
+  int union_n_process_columns = 1;
+  Cblacs_gridinit(&union_blacs_context, order, union_n_process_rows, union_n_process_columns);
+
+
+  int n_grid_rows_A,n_grid_columns_A,my_row_A,my_column_A;
+  Cblacs_gridinfo(this->grid->blacs_context,&n_grid_rows_A,&n_grid_columns_A,&my_row_A,&my_column_A);
+
+  //check whether process is in the BLACS context of matrix A
+  const bool in_context_A = (my_row_A>=0 && my_row_A<n_grid_rows_A) &&
+                            (my_column_A>=0 && my_column_A<n_grid_columns_A);
+
+
+  int n_grid_rows_B,n_grid_columns_B,my_row_B,my_column_B;
+  Cblacs_gridinfo(B.grid->blacs_context,&n_grid_rows_B,&n_grid_columns_B,&my_row_B,&my_column_B);
+
+  //check whether process is in the BLACS context of matrix B
+  const bool in_context_B = (my_row_B>=0 && my_row_B<n_grid_rows_B) &&
+                            (my_column_B>=0 && my_column_B<n_grid_columns_B);
+
+  const int n_rows_submatrix = submatrix_size.first;
+  const int n_columns_submatrix =  submatrix_size.second;
+
+  // due to Fortran indexing one has to be added
+  int ia = offset_A.first+1, ja = offset_A.second+1;
+  int ib = offset_B.first+1, jb = offset_B.second+1;
+
+  std::array<int,9> desc_A, desc_B;
+
+  const NumberType *loc_vals_A = nullptr;
+  NumberType *loc_vals_B = nullptr;
+
+  // Note: the function pgemr2d has to be called for all processes in the union BLACS context
+  // If the calling process is not part of the BLACS context of A, desc_A[1] has to be -1
+  // and all other parameters do not have to be set
+  // If the calling process is not part of the BLACS context of B, desc_B[1] has to be -1
+  // and all other parameters do not have to be set
+  if (in_context_A)
+    {
+      if (this->values.size() != 0)
+        loc_vals_A = & this->values[0];
+
+      for (unsigned int i=0; i<desc_A.size(); ++i)
+        desc_A[i] = this->descriptor[i];
+    }
+  else
+    desc_A[1] =-1;
+
+  if (in_context_B)
+    {
+      if (B.values.size() != 0)
+        loc_vals_B = & B.values[0];
+
+      for (unsigned int i=0; i<desc_B.size(); ++i)
+        desc_B[i] = B.descriptor[i];
+    }
+  else
+    desc_B[1]=-1;
+
+  pgemr2d(&n_rows_submatrix, &n_columns_submatrix,
+          loc_vals_A, &ia, &ja, desc_A.data(),
+          loc_vals_B, &ib, &jb, desc_B.data(),
+          &union_blacs_context);
+
+  B.state = LAPACKSupport::matrix;
+
+  //releasing the union BLACS context
+  Cblacs_gridexit(union_blacs_context);
+}
+
+
+
+template <typename NumberType>
+void
 ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
 {
   Assert (n_rows == dest.n_rows, ExcDimensionMismatch(n_rows, dest.n_rows));
@@ -252,7 +358,7 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
 
       /*
        * The routine pgemr2d requires a BLACS context resembling at least the union of process grids
-       * described by the BLACS contexts of the source and destination matrix
+       * described by the BLACS contexts of matrix A and B
        */
       int union_blacs_context = Csys2blacs_handle(mpi_communicator_union);
       const char *order = "Col";
