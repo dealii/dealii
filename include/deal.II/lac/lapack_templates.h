@@ -423,9 +423,9 @@ gemv (const char *, const types::blas_int *, const types::blas_int *, const floa
 /// Template wrapper for LAPACK functions dtrmv and strmv
 template <typename number>
 inline void
-trmv (const char *uplo, const char *trans, const char *diag,
-      const types::blas_int *N, const number *A, const types::blas_int *lda,
-      number *x, const types::blas_int *incx)
+trmv (const char * /*uplo*/, const char * /*trans*/, const char * /*diag*/,
+      const types::blas_int * /*N*/, const number * /*A*/, const types::blas_int * /*lda*/,
+      number * /*x*/, const types::blas_int * /*incx*/)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -553,10 +553,10 @@ potrf (const char *uplo, const types::blas_int *n, float *A, const types::blas_i
 /// Tempalte wrapper for trcon
 template <typename number>
 inline void
-trcon(const char *norm, const char *uplo, const char *diag,
-      const types::blas_int *n, const number *A, const types::blas_int *lda,
-      number *rcond,
-      number *work, types::blas_int *iwork, types::blas_int *info)
+trcon(const char * /*norm*/, const char * /*uplo*/, const char * /*diag*/,
+      const types::blas_int * /*n*/, const number * /*A*/, const types::blas_int * /*lda*/,
+      number * /*rcond*/,
+      number * /*work*/, types::blas_int * /*iwork*/, types::blas_int * /*info*/)
 {
   Assert (false, ExcNotImplemented());
 }

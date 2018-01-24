@@ -320,9 +320,9 @@ namespace
 
 
   template <typename number>
-  void cholesky_rank1(LAPACKFullMatrix<std::complex<number>> &A,
-                      const std::complex<number> a,
-                      const Vector<std::complex<number>> &v)
+  void cholesky_rank1(LAPACKFullMatrix<std::complex<number> > &/*A*/,
+                      const std::complex<number> /*a*/,
+                      const Vector<std::complex<number> > &/*v*/)
   {
     AssertThrow(false, ExcNotImplemented());
   }

@@ -150,9 +150,9 @@ namespace SparsityTools
     }
 
 
-    void get_object_list(void *data, int sizeGID, int sizeLID,
+    void get_object_list(void *data, int /*sizeGID*/, int /*sizeLID*/,
                          ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
-                         int wgt_dim, float *obj_wgts, int *ierr)
+                         int /*wgt_dim*/, float * /*obj_wgts*/, int *ierr)
     {
       SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
       *ierr = ZOLTAN_OK;
@@ -171,9 +171,9 @@ namespace SparsityTools
     }
 
 
-    void get_num_edges_list(void *data, int sizeGID, int sizeLID,
+    void get_num_edges_list(void *data, int /*sizeGID*/, int /*sizeLID*/,
                             int num_obj,
-                            ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
+                            ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR /*localID*/,
                             int *numEdges, int *ierr)
     {
       SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
@@ -193,11 +193,11 @@ namespace SparsityTools
 
 
 
-    void get_edge_list(void *data, int sizeGID, int sizeLID,
-                       int num_obj, ZOLTAN_ID_PTR globalID, ZOLTAN_ID_PTR localID,
-                       int *num_edges,
+    void get_edge_list(void *data, int /*sizeGID*/, int /*sizeLID*/,
+                       int num_obj, ZOLTAN_ID_PTR /*globalID*/, ZOLTAN_ID_PTR /*localID*/,
+                       int * /*num_edges*/,
                        ZOLTAN_ID_PTR nborGID, int *nborProc,
-                       int wgt_dim, float *ewgts, int *ierr)
+                       int /*wgt_dim*/, float * /*ewgts*/, int *ierr)
     {
       SparsityPattern *graph = reinterpret_cast<SparsityPattern *>(data);
       *ierr = ZOLTAN_OK;
@@ -232,7 +232,9 @@ namespace SparsityTools
       // Make sure that ZOLTAN is actually
       // installed and detected
 #ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
-      (void)sparsity_pattern;
+      (void) sparsity_pattern;
+      (void) n_partitions;
+      (void) partition_indices;
       AssertThrow (false, ExcZOLTANNotInstalled());
 #else
 
@@ -354,7 +356,8 @@ namespace SparsityTools
     // Make sure that ZOLTAN is actually
     // installed and detected
 #ifndef DEAL_II_TRILINOS_WITH_ZOLTAN
-    (void)sparsity_pattern;
+    (void) sparsity_pattern;
+    (void) color_indices;
     AssertThrow (false, ExcZOLTANNotInstalled());
     return 0;
 #else
@@ -398,6 +401,7 @@ namespace SparsityTools
                         global_ids.data(),
                         color_exp.data());
 
+    (void) rc;
     //Check for error code
     Assert (rc == ZOLTAN_OK ,
             ExcInternalError());
