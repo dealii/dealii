@@ -17,13 +17,13 @@
 for (S : MPI_SCALARS)
 {
     template
-    void sum<S> (const LAPACKFullMatrix<S> &, const MPI_Comm &, LAPACKFullMatrix<S> &);
+    void sum<LAPACKFullMatrix<S> > (const LAPACKFullMatrix<S> &, const MPI_Comm &, LAPACKFullMatrix<S> &);
 
     template
-    void sum<S> (const Vector<S> &, const MPI_Comm &, Vector<S> &);
+    void sum<Vector<S> > (const Vector<S> &, const MPI_Comm &, Vector<S> &);
 
     template
-    void sum<S> (const FullMatrix<S> &, const MPI_Comm &, FullMatrix<S> &);
+    void sum<FullMatrix<S> > (const FullMatrix<S> &, const MPI_Comm &, FullMatrix<S> &);
 
     template
     void sum<S> (const ArrayView<const S> &, const MPI_Comm &, const ArrayView<S> &);
@@ -32,19 +32,19 @@ for (S : MPI_SCALARS)
     S sum<S> (const S &, const MPI_Comm &);
 
     template
-    void sum<S> (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+    void sum<std::vector<S> > (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
 
     template
     S max<S> (const S &, const MPI_Comm &);
 
     template
-    void max<S> (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+    void max<std::vector<S> > (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
 
     template
     S min<S> (const S &, const MPI_Comm &);
 
     template
-    void min<S> (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
+    void min<std::vector<S> > (const std::vector<S> &, const MPI_Comm &, std::vector<S> &);
 
     // The fixed-length array (i.e., things declared like T(&values)[N])
     // versions of the functions above live in the header file mpi.h since the
