@@ -22,6 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 // instantiate for integers:
 template class Vector<int>;
 template Vector<double> &Vector<double>::operator=<int> (const dealii::Vector<int> &);
+template bool Vector<int>::operator==<int> (dealii::Vector<int> const &) const;
 
 template
 void Vector<int>::reinit<double>(const Vector<double> &, const bool);
