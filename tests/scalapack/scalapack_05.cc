@@ -39,6 +39,7 @@ void test(const unsigned int size, const unsigned int block_size)
   const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
 
   ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
+  pcout << std::setprecision(7);
 
   // Create SPD matrices of requested size:
   FullMatrix<NumberType> full_A(size), inv_A(size);
