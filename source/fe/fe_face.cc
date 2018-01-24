@@ -613,7 +613,7 @@ hp_vertex_dof_identities (const FiniteElement<1, spacedim> &/*fe_other*/) const
 template <int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_FaceQ<1, spacedim>::
-hp_line_dof_identities (const FiniteElement<1, spacedim> &fe_other) const
+hp_line_dof_identities (const FiniteElement<1, spacedim> &) const
 {
   // this element is continuous only for the highest dimensional bounding object
   return
@@ -625,7 +625,7 @@ hp_line_dof_identities (const FiniteElement<1, spacedim> &fe_other) const
 template <int spacedim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_FaceQ<1, spacedim>::
-hp_quad_dof_identities (const FiniteElement<1, spacedim> &fe_other) const
+hp_quad_dof_identities (const FiniteElement<1, spacedim> &) const
 {
   // this element is continuous only for the highest dimensional bounding object
   return
