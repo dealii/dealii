@@ -117,7 +117,8 @@ public:
     /**
      * Constructor.
      *
-     * The default is right preconditioning, with the @p solver_tolerance chosen to be 1e-9 and the @p breakdown_threshold set at 1e-16.
+     * The default is right preconditioning, with the @p solver_tolerance chosen to be 1e-9 and 
+     * the @p breakdown_threshold set at 1e-16.
      */
     explicit
     AdditionalData (const bool left_preconditioning = false,
