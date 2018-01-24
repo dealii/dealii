@@ -94,15 +94,15 @@ void test(const unsigned int block_size_i, const unsigned int block_size_j)
   //copying submatrices
   unsigned int sub_size=100;
   std::pair<unsigned int,unsigned int> offset_A = std::make_pair(49,99);
-  std::pair<unsigned int,unsigned int> offset_B = std::make_pair(0,0);
+  std::pair<unsigned int,unsigned int> offset_B = std::make_pair(4,7);
   std::pair<unsigned int,unsigned int> submatrix_size = std::make_pair(sub_size,sub_size);
-  ScaLAPACKMatrix<NumberType> scalapack_matrix_dest(sub_size,sub_size,grid_2d,block_size_j,block_size_i);
+  ScaLAPACKMatrix<NumberType> scalapack_matrix_dest(sub_size+offset_B.first,sub_size+offset_B.second,grid_2d,block_size_j,block_size_i);
   scalapack_matrix_2d.copy_to(scalapack_matrix_dest,offset_A,offset_B,submatrix_size);
-  FullMatrix<NumberType> dest (sub_size,sub_size);
+  FullMatrix<NumberType> dest (sub_size+offset_B.first,sub_size+offset_B.second);
   scalapack_matrix_dest.copy_to(dest);
-  for (unsigned int i=0; i<dest.m(); ++i)
-    for (unsigned int j=0; j<dest.n(); ++j)
-      dest(i,j) -= full(offset_A.first+i,offset_A.second+j);
+  for (unsigned int i=0; i<sub_size; ++i)
+    for (unsigned int j=0; j<sub_size; ++j)
+      dest(i+offset_B.first,j+offset_B.second) -= full(offset_A.first+i,offset_A.second+j);
   AssertThrow(dest.frobenius_norm() < 1e-12,ExcInternalError());
 }
 

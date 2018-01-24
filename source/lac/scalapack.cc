@@ -24,11 +24,49 @@
 #include <deal.II/base/mpi.templates.h>
 #include <deal.II/lac/scalapack.templates.h>
 
-#  ifdef DEAL_II_WITH_HDF5
+#ifdef DEAL_II_WITH_HDF5
 #include <hdf5.h>
-#  endif
+#endif
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_HDF5
+
+template<typename number>
+inline hid_t hdf5_type_id (const number *)
+{
+  Assert (false, dealii::ExcNotImplemented());
+  //don't know what to put here; it does not matter
+  return -1;
+}
+
+inline hid_t hdf5_type_id (const double *)
+{
+  return H5T_NATIVE_DOUBLE;
+}
+
+inline hid_t hdf5_type_id (const float *)
+{
+  return H5T_NATIVE_FLOAT;
+}
+
+inline hid_t hdf5_type_id (const int *)
+{
+  return H5T_NATIVE_INT;
+}
+
+inline hid_t hdf5_type_id (const unsigned int *)
+{
+  return H5T_NATIVE_UINT;
+}
+
+inline hid_t hdf5_type_id (const char *)
+{
+  return H5T_NATIVE_CHAR;
+}
+#endif // DEAL_II_WITH_HDF5
+
+
 
 template <typename NumberType>
 ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(const size_type n_rows_,
@@ -237,18 +275,20 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &B,
   //Currently, copying of matrices will only be supported if A and B share the same MPI communicator
   int ierr, comparison;
   ierr = MPI_Comm_compare(grid->mpi_communicator,B.grid->mpi_communicator,&comparison);
+  AssertThrowMPI(ierr);
   Assert (comparison == MPI_IDENT,ExcMessage("Matrix A and B must have a common MPI Communicator"));
 
   /*
    * The routine pgemr2d requires a BLACS context resembling at least the union of process grids
-   * described by the BLACS contexts of matrix A and B
+   * described by the BLACS contexts held by the ProcessGrids of matrix A and B.
+   * As A and B share the same MPI communicator, there is no need to create a union MPI
+   * communicator to initialise the BLACS context
    */
   int union_blacs_context = Csys2blacs_handle(this->grid->mpi_communicator);
   const char *order = "Col";
   int union_n_process_rows = Utilities::MPI::n_mpi_processes(this->grid->mpi_communicator);
   int union_n_process_columns = 1;
   Cblacs_gridinit(&union_blacs_context, order, union_n_process_rows, union_n_process_columns);
-
 
   int n_grid_rows_A,n_grid_columns_A,my_row_A,my_column_A;
   Cblacs_gridinfo(this->grid->blacs_context,&n_grid_rows_A,&n_grid_columns_A,&my_row_A,&my_column_A);
@@ -899,14 +939,16 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
-  AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
+  Assert(false,ExcInternalError());
 #  else
 
   /*
    * The content of the distributed matrix is copied to a matrix using a 1x1 process grid.
    * Therefore, one process has all the data and can write it to a file.
+   *
+   * Create a 1x1 column grid which will be used to initialize
+   * an effectively serial ScaLAPACK matrix to gather the contents from the current object
    */
-  //create a 1x1 column grid with P being the number of MPI processes
   std::shared_ptr<Utilities::MPI::ProcessGrid> column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,1);
 
   const int MB=n_rows, NB=n_columns;
@@ -963,7 +1005,7 @@ void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename) const
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
-  AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
+  Assert(false,ExcInternalError());
 #  else
 
   const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(this->grid->mpi_communicator));
@@ -971,8 +1013,9 @@ void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename) const
   /*
    * The content of the distributed matrix is copied to a matrix using a 1xn_processes process grid.
    * Therefore, the processes hold contiguous chunks of the matrix, which they can write to the file
-   */
-  //create a 1xP column grid with P being the number of MPI processes
+   *
+   * Create a 1xn_processes column grid
+  */
   std::shared_ptr<Utilities::MPI::ProcessGrid> column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,n_mpi_processes);
 
   const int MB=n_rows, NB=std::ceil(n_columns/n_mpi_processes);
@@ -1089,7 +1132,7 @@ void ScaLAPACKMatrix<NumberType>::load_serial(const char *filename)
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
-  AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
+  Assert(false,ExcInternalError());
 #  else
 
   /*
@@ -1169,10 +1212,10 @@ void ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
-  AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
+  Assert(false,ExcInternalError());
 #  else
 #    ifndef H5_HAVE_PARALLEL
-  AssertThrow(false, ExcMessage ("HDF5 was not built with MPI."));
+  Assert(false,ExcInternalError());
 #    else
 
   const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(this->grid->mpi_communicator));

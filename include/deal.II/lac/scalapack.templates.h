@@ -24,10 +24,6 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
 
-#  ifdef DEAL_II_WITH_HDF5
-#include <hdf5.h>
-#  endif
-
 // useful examples:
 // https://stackoverflow.com/questions/14147705/cholesky-decomposition-scalapack-error/14203864
 // http://icl.cs.utk.edu/lapack-forum/viewtopic.php?t=139   // second post by Julien Langou
@@ -1491,44 +1487,6 @@ inline void pgels(const char *trans,
 {
   psgels_(trans,m,n,nrhs,A,ia,ja,desca,B,ib,jb,descb,work,lwork,info);
 }
-
-
-#  ifdef DEAL_II_WITH_HDF5
-
-template<typename number>
-inline hid_t hdf5_type_id (const number *)
-{
-  Assert (false, dealii::ExcNotImplemented());
-  //don't know what to put here; it does not matter
-  return -1;
-}
-
-inline hid_t hdf5_type_id (const double *)
-{
-  return H5T_NATIVE_DOUBLE;
-}
-
-inline hid_t hdf5_type_id (const float *)
-{
-  return H5T_NATIVE_FLOAT;
-}
-
-inline hid_t hdf5_type_id (const int *)
-{
-  return H5T_NATIVE_INT;
-}
-
-inline hid_t hdf5_type_id (const unsigned int *)
-{
-  return H5T_NATIVE_UINT;
-}
-
-inline hid_t hdf5_type_id (const char *)
-{
-  return H5T_NATIVE_CHAR;
-}
-
-#  endif // DEAL_II_WITH_HDF5
 
 #endif // DEAL_II_WITH_SCALAPACK
 

@@ -179,7 +179,10 @@ public:
    * .
    *
    * If it is necessary to copy complete matrices with an identical block-cyclic distribution,
-   * use copy_to(ScaLAPACKMatrix<NumberType> &dest) with only one argument to avoid communication
+   * use copy_to(ScaLAPACKMatrix<NumberType> &dest) with only one argument to avoid communication.
+   *
+   * The underlying process grids of the matrices @p A and @p B must have been built
+   * with the same MPI communicator.
    */
   void copy_to(ScaLAPACKMatrix<NumberType> &B,
                const std::pair<unsigned int,unsigned int> &offset_A,
@@ -187,17 +190,20 @@ public:
                const std::pair<unsigned int,unsigned int> &submatrix_size) const;
 
   /**
-   * Stores the distributed matrix in @p filename using HDF5
+   * Stores the distributed matrix in @p filename using HDF5.
    *
    * If HDF5 was build with MPI, parallel I/O is used to save the matrix.
-   * Otherwise, just one process will do the output.
+   * Otherwise, just one process will do the output. This means that
+   * internally the distributed matrix is copied to one process, which
+   * does the output. Therefore, the matrix has to fit into the memory
+   * of one process.
    */
   void save(const char *filename) const;
 
   /**
    * Loads the distributed matrix from file @p filename using HDF5.
    *
-   * The matrix must have the same dimensions as the matrix in stored in the file.
+   * The matrix must have the same dimensions as the matrix stored in the file.
    *
    * If HDF5 was build with MPI, parallel I/O is used to load the matrix.
    * Otherwise, just one process will load the matrix from storage
