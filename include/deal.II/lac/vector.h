@@ -190,11 +190,14 @@ public:
    * This copy constructor is only available if Trilinos was detected during
    * configuration time.
    *
-   * Note that due to the communication model used in MPI, this operation can
-   * only succeed if all processes do it at the same time. This means that it
-   * is not possible for only one process to obtain a copy of a parallel
-   * vector while the other jobs do something else. This call will rather
-   * result in a copy of the vector on all processors.
+   * @note Due to the communication model used in MPI, this operation can
+   * only succeed if all processes that have knowledge of @p v
+   * (i.e. those given by <code>v.get_mpi_communicator()</code>) do it at
+   * the same time. This means that unless you use a split MPI communicator
+   * then it is not normally possible for only one or a subset of processes
+   * to obtain a copy of a parallel vector while the other jobs do something
+   * else. This call will therefore result in a copy of the vector on all
+   * processors that share @p v.
    */
   explicit Vector (const TrilinosWrappers::MPI::Vector &v);
 #endif
@@ -377,10 +380,14 @@ public:
    * operator is only available if Trilinos was detected during configuration
    * time.
    *
-   * Note that due to the communication model used in MPI, this operation can
-   * only succeed if all processes do it at the same time. I.e., it is not
-   * possible for only one process to obtain a copy of a parallel vector while
-   * the other jobs do something else.
+   * @note Due to the communication model used in MPI, this operation can
+   * only succeed if all processes that have knowledge of @p v
+   * (i.e. those given by <code>v.get_mpi_communicator()</code>) do it at
+   * the same time. This means that unless you use a split MPI communicator
+   * then it is not normally possible for only one or a subset of processes
+   * to obtain a copy of a parallel vector while the other jobs do something
+   * else. This call will therefore result in a copy of the vector on all
+   * processors that share @p v.
    */
   Vector<Number> &
   operator= (const TrilinosWrappers::MPI::Vector &v);

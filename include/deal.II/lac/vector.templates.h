@@ -170,13 +170,14 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
       allocate();
 
       // Copy the distributed vector to
-      // a local one at all
-      // processors. TODO: There could
+      // a local one at all processors
+      // that know about the original vector.
+      // TODO: There could
       // be a better solution than
       // this, but it has not yet been
       // found.
       TrilinosWrappers::MPI::Vector localized_vector;
-      localized_vector.reinit(complete_index_set(vec_size));
+      localized_vector.reinit(complete_index_set(vec_size), v.get_mpi_communicator());
       localized_vector.reinit (v, false, true);
 
       // get a representation of the vector
@@ -829,7 +830,7 @@ Vector<Number>::operator= (const TrilinosWrappers::MPI::Vector &v)
   // then call the other =
   // operator.
   TrilinosWrappers::MPI::Vector localized_vector;
-  localized_vector.reinit(complete_index_set(v.size()));
+  localized_vector.reinit(complete_index_set(v.size()), v.get_mpi_communicator());
   localized_vector.reinit(v, false, true);
 
   if (v.size() != vec_size)
