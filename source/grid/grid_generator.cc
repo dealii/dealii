@@ -3060,11 +3060,13 @@ namespace GridGenerator
       SubCellData());       // no boundary information
   }
 
-  template <int dim, int spacedim>
+
+
+  template <int spacedim>
   void
-  hyper_sphere (Triangulation<dim,spacedim> &tria,
-                const Point<spacedim>   &p,
-                const double      radius)
+  hyper_sphere (Triangulation<spacedim-1,spacedim> &tria,
+                const Point<spacedim>              &p,
+                const double                        radius)
   {
     Triangulation<spacedim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh,p,radius);
@@ -4646,18 +4648,6 @@ namespace GridGenerator
 }
 
 // explicit instantiations
-namespace GridGenerator
-{
-
-  template void
-  hyper_sphere< 1,  2 > (Triangulation< 1,   2> &,
-                         const Point<2>   &center,
-                         const double        radius);
-  template void
-  hyper_sphere< 2,  3 > (Triangulation< 2,   3> &,
-                         const Point<3>   &center,
-                         const double        radius);
-}
 #include "grid_generator.inst"
 
 DEAL_II_NAMESPACE_CLOSE

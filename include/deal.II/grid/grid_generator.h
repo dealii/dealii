@@ -461,7 +461,7 @@ namespace GridGenerator
   /**
    * Creates a hyper sphere, i.e., a surface of a ball in @p spacedim
    * dimensions. This function only exists for dim+1=spacedim in 2 and 3 space
-   * dimensions.
+   * dimensions. (To create a mesh of a ball, use GridGenerator::hyper_ball().)
    *
    * You should attach a SphericalManifold to the cells and faces for correct
    * placement of vertices upon refinement and to be able to use higher order
@@ -490,10 +490,10 @@ namespace GridGenerator
    * @note The triangulation needs to be void upon calling this function.
    */
 
-  template <int dim, int spacedim>
-  void hyper_sphere (Triangulation<dim,spacedim> &tria,
-                     const Point<spacedim>   &center = Point<spacedim>(),
-                     const double        radius = 1.);
+  template <int spacedim>
+  void hyper_sphere (Triangulation<spacedim-1,spacedim> &tria,
+                     const Point<spacedim>              &center = Point<spacedim>(),
+                     const double                        radius = 1.);
 
   /**
    * This class produces a hyper-ball intersected with the positive orthant
