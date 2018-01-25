@@ -24,6 +24,7 @@
 #include <functional>
 #include <string>
 #include <tuple>
+#include <type_traits>
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Comm.h>
@@ -781,30 +782,53 @@ namespace Utilities
   template<typename T>
   std::vector<char> pack(const T &object)
   {
-    // set up a buffer and then use it as the target of a compressing
-    // stream into which we serialize the current object
-    std::vector<char> buffer;
-    {
-#ifdef DEAL_II_WITH_ZLIB
-      boost::iostreams::filtering_ostream out;
-      out.push(boost::iostreams::gzip_compressor
-               (boost::iostreams::gzip_params
-                (boost::iostreams::gzip::best_compression)));
-      out.push(boost::iostreams::back_inserter(buffer));
-
-      boost::archive::binary_oarchive archive(out);
-      archive << object;
-      out.flush();
+    // see if the object is small and copyable via memcpy. if so, use
+    // this fast path. otherwise, we have to go through the BOOST
+    // serialization machinery
+    //
+    // we have to work around the fact that GCC 4.8.x claims to be C++
+    // conforming, but is not actually as it does not implement
+    // std::is_trivially_copyable.
+    if (
+#if __GNUG__ && __GNUC__ < 5
+      __has_trivial_copy(T)
 #else
-      std::ostringstream out;
-      boost::archive::binary_oarchive archive(out);
-      archive << object;
-      const std::string &s = out.str();
-      buffer.reserve(s.size());
-      buffer.assign(s.begin(), s.end());
+      std::is_trivially_copyable<T>()
 #endif
-    }
-    return buffer;
+      &&
+      sizeof(T)<256)
+      {
+        std::vector<char> buffer (sizeof(T));
+        std::memcpy (buffer.data(), &object, sizeof(T));
+        return buffer;
+      }
+    else
+      {
+        // set up a buffer and then use it as the target of a compressing
+        // stream into which we serialize the current object
+        std::vector<char> buffer;
+        {
+#ifdef DEAL_II_WITH_ZLIB
+          boost::iostreams::filtering_ostream out;
+          out.push(boost::iostreams::gzip_compressor
+                   (boost::iostreams::gzip_params
+                    (boost::iostreams::gzip::best_compression)));
+          out.push(boost::iostreams::back_inserter(buffer));
+
+          boost::archive::binary_oarchive archive(out);
+          archive << object;
+          out.flush();
+#else
+          std::ostringstream out;
+          boost::archive::binary_oarchive archive(out);
+          archive << object;
+          const std::string &s = out.str();
+          buffer.reserve(s.size());
+          buffer.assign(s.begin(), s.end());
+#endif
+        }
+        return buffer;
+      }
   }
 
 
@@ -812,27 +836,51 @@ namespace Utilities
   template<typename T>
   T unpack(const std::vector<char> &buffer)
   {
-    std::string decompressed_buffer;
-    T object;
-
-    // first decompress the buffer
-    {
-#ifdef DEAL_II_WITH_ZLIB
-      boost::iostreams::filtering_ostream decompressing_stream;
-      decompressing_stream.push(boost::iostreams::gzip_decompressor());
-      decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
-      decompressing_stream.write (buffer.data(), buffer.size());
+    // see if the object is small and copyable via memcpy. if so, use
+    // this fast path. otherwise, we have to go through the BOOST
+    // serialization machinery
+    //
+    // we have to work around the fact that GCC 4.8.x claims to be C++
+    // conforming, but is not actually as it does not implement
+    // std::is_trivially_copyable.
+    if (
+#if __GNUG__ && __GNUC__ < 5
+      __has_trivial_copy(T)
 #else
-      decompressed_buffer.assign (buffer.begin(), buffer.end());
+      std::is_trivially_copyable<T>()
 #endif
-    }
+      &&
+      sizeof(T)<256)
+      {
+        Assert (buffer.size() == sizeof(T), ExcInternalError());
+        T object;
+        std::memcpy (&object, buffer.data(), sizeof(T));
+        return object;
+      }
+    else
+      {
+        std::string decompressed_buffer;
+        T object;
 
-    // then restore the object from the buffer
-    std::istringstream in(decompressed_buffer);
-    boost::archive::binary_iarchive archive(in);
+        // first decompress the buffer
+        {
+#ifdef DEAL_II_WITH_ZLIB
+          boost::iostreams::filtering_ostream decompressing_stream;
+          decompressing_stream.push(boost::iostreams::gzip_decompressor());
+          decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
+          decompressing_stream.write (buffer.data(), buffer.size());
+#else
+          decompressed_buffer.assign (buffer.begin(), buffer.end());
+#endif
+        }
 
-    archive >> object;
-    return object;
+        // then restore the object from the buffer
+        std::istringstream in(decompressed_buffer);
+        boost::archive::binary_iarchive archive(in);
+
+        archive >> object;
+        return object;
+      }
   }
 }
 
