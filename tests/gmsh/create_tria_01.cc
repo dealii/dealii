@@ -51,10 +51,15 @@ int main ()
       << "Line(2) = {2, 3};" << std::endl
       << "Line(3) = {3, 4};" << std::endl
       << "Line(4) = {4, 1};" << std::endl
+      << "Transfinite Line {1} = 2 Using Progression 1;" << std::endl
+      << "Transfinite Line {2} = 2 Using Progression 1;" << std::endl
+      << "Transfinite Line {3} = 2 Using Progression 1;" << std::endl
+      << "Transfinite Line {4} = 2 Using Progression 1;" << std::endl
       << "Line Loop(5) = {3, 4, 1, 2};" << std::endl
-      << "Plane Surface(0) = {5};" << std::endl
-      << "Transfinite Surface{0} = {5};" << std::endl
-      << "Recombine Surface {0};" << std::endl;
+      << "Plane Surface(6) = {5};" << std::endl
+      << "Transfinite Surface {6};" << std::endl
+      << "Recombine Surface {6};" << std::endl
+      << "Physical Surface(\"dealii_surface\") = {6};" << std::endl;
 
   geo.close();
 
