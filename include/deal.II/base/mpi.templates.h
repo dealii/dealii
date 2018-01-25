@@ -202,8 +202,6 @@ namespace Utilities
              ExcMessage("Can only send to myself or to nobody."));
       return objects_to_send;
 #else
-      const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
-      const auto my_proc = dealii::Utilities::MPI::this_mpi_process(comm);
 
       std::vector<unsigned int> send_to(objects_to_send.size());
       {
