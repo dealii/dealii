@@ -1372,7 +1372,6 @@ template<int dim>
 Quadrature<dim>
 QSimplex<dim>::compute_affine_transformation(const std::array<Point<dim>, dim+1>& vertices) const
 {
-  unsigned int i=0;
   Tensor<2,dim> B;
   for (unsigned int d=0; d<dim; ++d)
     B[d] = vertices[d+1]-vertices[0];
