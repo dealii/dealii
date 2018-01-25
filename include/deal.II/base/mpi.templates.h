@@ -366,20 +366,9 @@ namespace Utilities
     sum (const Tensor<rank,dim,Number> &local,
          const MPI_Comm &mpi_communicator)
     {
-      const unsigned int n_entries = Tensor<rank,dim,Number>::n_independent_components;
-      Number entries[ Tensor<rank,dim,Number>::n_independent_components ];
-
-      for (unsigned int i=0; i< n_entries; ++i)
-        entries[i] = local[ local.unrolled_to_component_indices(i) ];
-
-      Number global_entries[ Tensor<rank,dim,Number>::n_independent_components ];
-      dealii::Utilities::MPI::sum( entries, mpi_communicator, global_entries );
-
-      Tensor<rank,dim,Number> global;
-      for (unsigned int i=0; i< n_entries; ++i)
-        global[ global.unrolled_to_component_indices(i) ] = global_entries[i];
-
-      return global;
+      Tensor<rank, dim, Number> sums;
+      dealii::Utilities::MPI::sum(local, mpi_communicator, sums);
+      return sums;
     }
 
 
