@@ -1,0 +1,8 @@
+
+DEAL::Testing std::deque<int>(2)
+DEAL::Testing std::deque<int>(4000)
+DEAL::ExcMessage("The provided range isn't contiguous in memory!")
+DEAL::Testing int c[3]{1,2,3}
+DEAL::Testing std::array<int, 3> {{ 1,2,3}}
+DEAL::Testing std::string {"Hello world!"}
+DEAL::Testing std::vector<int>{1,2,3}
