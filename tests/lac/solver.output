@@ -4,13 +4,13 @@ DEAL::SOR-diff:0.000
 DEAL:no-fail:cg::Starting value 3.000
 DEAL:no-fail:cg::Convergence step 3 value 4.807e-17
 DEAL:no-fail:Bicgstab::Starting value 3.000
-DEAL:no-fail:Bicgstab::Convergence step 3 value 5.998e-18
+DEAL:no-fail:Bicgstab::Convergence step 3 value 1.104e-17
 DEAL:no-fail:GMRES::Starting value 3.000
-DEAL:no-fail:GMRES::Convergence step 3 value 1.110e-16
+DEAL:no-fail:GMRES::Convergence step 3 value 4.551e-16
 DEAL:no-fail:GMRES::Starting value 3.000
-DEAL:no-fail:GMRES::Convergence step 3 value 1.110e-16
-DEAL:no-fail:QMRS::Starting value 3.000
-DEAL:no-fail:QMRS::Convergence step 3 value 9.615e-17
+DEAL:no-fail:GMRES::Convergence step 3 value 4.551e-16
+DEAL:no-fail:SQMR::Starting value 3.000
+DEAL:no-fail:SQMR::Convergence step 3 value 1.280e-15
 DEAL:no-fail:FIRE::Starting value 9.000
 DEAL:no-fail:FIRE::Convergence step 38 value 0.0002184
 DEAL:no:Richardson::Starting value 3.000
@@ -18,27 +18,27 @@ DEAL:no:Richardson::Convergence step 24 value 0.0007118
 DEAL:no:cg::Starting value 3.000
 DEAL:no:cg::Convergence step 3 value 4.807e-17
 DEAL:no:Bicgstab::Starting value 3.000
-DEAL:no:Bicgstab::Convergence step 3 value 5.998e-18
+DEAL:no:Bicgstab::Convergence step 3 value 1.104e-17
 DEAL:no:GMRES::Starting value 3.000
-DEAL:no:GMRES::Convergence step 3 value 1.110e-16
+DEAL:no:GMRES::Convergence step 3 value 4.551e-16
 DEAL:no:GMRES::Starting value 3.000
-DEAL:no:GMRES::Convergence step 3 value 1.110e-16
-DEAL:no:QMRS::Starting value 3.000
-DEAL:no:QMRS::Convergence step 3 value 9.615e-17
+DEAL:no:GMRES::Convergence step 3 value 4.551e-16
+DEAL:no:SQMR::Starting value 3.000
+DEAL:no:SQMR::Convergence step 3 value 1.280e-15
 DEAL:no:FIRE::Starting value 9.000
 DEAL:no:FIRE::Convergence step 38 value 0.0002184
 DEAL:rich:Richardson::Starting value 3.000
 DEAL:rich:Richardson::Convergence step 42 value 0.0008696
 DEAL:rich:cg::Starting value 3.000
-DEAL:rich:cg::Convergence step 3 value 3.102e-16
+DEAL:rich:cg::Convergence step 3 value 2.871e-16
 DEAL:rich:Bicgstab::Starting value 3.000
-DEAL:rich:Bicgstab::Convergence step 3 value 7.254e-18
+DEAL:rich:Bicgstab::Convergence step 3 value 3.238e-18
 DEAL:rich:GMRES::Starting value 1.800
-DEAL:rich:GMRES::Convergence step 3 value 6.029e-16
+DEAL:rich:GMRES::Convergence step 3 value 3.294e-16
 DEAL:rich:GMRES::Starting value 3.000
-DEAL:rich:GMRES::Convergence step 3 value 1.078e-15
-DEAL:rich:QMRS::Starting value 3.000
-DEAL:rich:QMRS::Convergence step 3 value 7.195e-16
+DEAL:rich:GMRES::Convergence step 3 value 7.148e-16
+DEAL:rich:SQMR::Starting value 3.000
+DEAL:rich:SQMR::Convergence step 3 value 1.422e-15
 DEAL:rich:FIRE::Starting value 9.000
 DEAL:rich:FIRE::Convergence step 32 value 0.0009708
 DEAL:ssor:RichardsonT::Starting value 3.000
@@ -53,8 +53,8 @@ DEAL:ssor:GMRES::Starting value 1.920
 DEAL:ssor:GMRES::Convergence step 3 value 0.0003574
 DEAL:ssor:GMRES::Starting value 3.000
 DEAL:ssor:GMRES::Convergence step 4 value 5.994e-05
-DEAL:ssor:QMRS::Starting value 3.000
-DEAL:ssor:QMRS::Convergence step 4 value 0.0001345
+DEAL:ssor:SQMR::Starting value 3.000
+DEAL:ssor:SQMR::Convergence step 4 value 0.0001345
 DEAL:ssor:FIRE::Starting value 9.000
 DEAL:ssor:FIRE::Convergence step 38 value 0.0008314
 DEAL:sor:RichardsonT::Starting value 3.000
@@ -65,11 +65,11 @@ DEAL:sor:cg::Starting value 3.000
 DEAL:sor:cg::Failure step 100 value 0.2585
 DEAL:sor::Exception: SolverControl::NoConvergence (it, res)
 DEAL:sor:Bicgstab::Starting value 3.000
-DEAL:sor:Bicgstab::Convergence step 5 value 6.247e-18
+DEAL:sor:Bicgstab::Convergence step 5 value 4.331e-18
 DEAL:sor:GMRES::Starting value 1.462
-DEAL:sor:GMRES::Convergence step 5 value 7.914e-19
+DEAL:sor:GMRES::Convergence step 5 value 9.441e-19
 DEAL:sor:GMRES::Starting value 3.000
-DEAL:sor:GMRES::Convergence step 5 value 6.144e-18
+DEAL:sor:GMRES::Convergence step 5 value 1.393e-17
 DEAL:sor:FIRE::Starting value 9.000
 DEAL:sor:FIRE::Convergence step 51 value 0.0004993
 DEAL:psor:RichardsonT::Starting value 3.000
@@ -102,8 +102,8 @@ DEAL:no-fail::Exception: SolverControl::NoConvergence (accumulated_iterations, l
 DEAL:no-fail:GMRES::Starting value 11.00
 DEAL:no-fail:GMRES::Failure step 10 value 0.8414
 DEAL:no-fail::Exception: SolverControl::NoConvergence (accumulated_iterations, last_res)
-DEAL:no-fail:QMRS::Starting value 11.00
-DEAL:no-fail:QMRS::Failure step 10 value 0.4215
+DEAL:no-fail:SQMR::Starting value 11.00
+DEAL:no-fail:SQMR::Failure step 10 value 0.4215
 DEAL:no-fail::Exception: SolverControl::NoConvergence (step, state.last_residual)
 DEAL:no-fail:FIRE::Starting value 121.0
 DEAL:no-fail:FIRE::Failure step 50 value 2.971
@@ -119,8 +119,8 @@ DEAL:no:GMRES::Starting value 11.00
 DEAL:no:GMRES::Convergence step 43 value 0.0009788
 DEAL:no:GMRES::Starting value 11.00
 DEAL:no:GMRES::Convergence step 43 value 0.0009788
-DEAL:no:QMRS::Starting value 11.00
-DEAL:no:QMRS::Convergence step 16 value 0.0002583
+DEAL:no:SQMR::Starting value 11.00
+DEAL:no:SQMR::Convergence step 16 value 0.0002583
 DEAL:no:FIRE::Starting value 121.0
 DEAL:no:FIRE::Failure step 100 value 0.003317
 DEAL:no::Exception: SolverControl::NoConvergence (iter, gradients * gradients)
@@ -135,8 +135,8 @@ DEAL:rich:GMRES::Starting value 6.600
 DEAL:rich:GMRES::Convergence step 42 value 0.0007803
 DEAL:rich:GMRES::Starting value 11.00
 DEAL:rich:GMRES::Convergence step 43 value 0.0009788
-DEAL:rich:QMRS::Starting value 11.00
-DEAL:rich:QMRS::Convergence step 16 value 0.0002583
+DEAL:rich:SQMR::Starting value 11.00
+DEAL:rich:SQMR::Convergence step 16 value 0.0002583
 DEAL:rich:FIRE::Starting value 121.0
 DEAL:rich:FIRE::Convergence step 98 value 0.0009234
 DEAL:ssor:RichardsonT::Starting value 11.00
@@ -151,8 +151,8 @@ DEAL:ssor:GMRES::Starting value 13.27
 DEAL:ssor:GMRES::Convergence step 7 value 0.0008206
 DEAL:ssor:GMRES::Starting value 11.00
 DEAL:ssor:GMRES::Convergence step 8 value 0.0004929
-DEAL:ssor:QMRS::Starting value 11.00
-DEAL:ssor:QMRS::Convergence step 9 value 0.0004140
+DEAL:ssor:SQMR::Starting value 11.00
+DEAL:ssor:SQMR::Convergence step 9 value 0.0004140
 DEAL:ssor:FIRE::Starting value 121.0
 DEAL:ssor:FIRE::Convergence step 65 value 0.0006547
 DEAL:sor:RichardsonT::Starting value 11.00
