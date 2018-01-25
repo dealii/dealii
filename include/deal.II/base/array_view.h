@@ -20,6 +20,8 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table.h>
 #include <deal.II/lac/lapack_full_matrix.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/symmetric_tensor.h>
 
 #include <type_traits>
 #include <vector>
@@ -422,6 +424,187 @@ ArrayView<ElementType>::operator[](const std::size_t i) const
 
 
 
+#ifndef DOXYGEN
+namespace internal
+{
+  namespace ArrayViewHelper
+  {
+    template<class Iterator>
+    bool is_contiguous(const Iterator &first, const Iterator &last)
+    {
+      const auto n = std::distance(first, last);
+      for (typename std::decay<decltype(n)>::type i = 0; i < n; ++i)
+        if (*(std::next(first, i)) != *(std::next(std::addressof(*first), i)))
+          return false;
+      return true;
+    }
+  }
+}
+#endif
+
+
+
+
+/**
+ * Create an ArrayView that takes a pair of iterators as arguments. The type
+ * of the ArrayView is inferred from the value type of the iterator (e.g., the
+ * view created from two const iterators will have a const type).
+ *
+ * @warning The iterators @p begin and @p end must bound (in the usual half-open
+ * way) a contiguous in memory range of values. This function is intended for
+ * use with iterators into containers like
+ * <code>boost::container::small_vector</code> or <code>std::vector</code> and
+ * will not work correctly with, e.g.,
+ * <code>boost::container::stable_vector</code> or <code>std::deque</code>.
+ * In debug mode, we check that the provided iterators represent contiguous
+ * memory indeed.
+ *
+ * @relates ArrayView
+ */
+template <typename Iterator>
+ArrayView<typename std::remove_reference<typename std::iterator_traits<Iterator>::reference>::type>
+make_array_view (const Iterator begin, const Iterator end)
+{
+  static_assert(std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
+                typename std::random_access_iterator_tag>::value,
+                "The provided iterator should be a random access iterator.");
+  Assert(begin <= end,
+         ExcMessage("The beginning of the array view should be before the end."));
+  Assert(internal::ArrayViewHelper::is_contiguous(begin, end),
+         ExcMessage("The provided range isn't contiguous in memory!"));
+  // the reference type, not the value type, knows the constness of the iterator
+  return ArrayView<typename std::remove_reference
+         <typename std::iterator_traits<Iterator>::reference>::type>
+         (std::addressof(*begin), end - begin);
+}
+
+
+
+/**
+ * Create a view from a pair of pointers. <code>ElementType</code> may be
+ * const-qualified.
+ *
+ * @warning The pointers @p begin and @p end must bound (in the usual
+ * half-open way) a contiguous in memory range of values.
+ *
+ * @relates ArrayView
+ */
+template <typename ElementType>
+ArrayView<ElementType>
+make_array_view (ElementType *const begin, ElementType *const end)
+{
+  Assert(begin <= end,
+         ExcMessage("The beginning of the array view should be before the end."));
+  return ArrayView<ElementType>(begin, end - begin);
+}
+
+
+
+/**
+ * Create a view to an entire Tensor object. This is equivalent to initializing
+ * an ArrayView object with a pointer to the first element and the size of the
+ * given argument.
+ *
+ * This function is used for @p const references to objects of Tensor type
+ * because they contain immutable elements. Consequently, the return type of
+ * this function is a view to a set of @p const objects.
+ *
+ * @param[in] vector The Tensor for which we want to have an array view
+ * object. The array view corresponds to the <em>entire</em> object but the
+ * order in which the entries are presented in the array is undefined and can
+ * not be relied upon.
+ *
+ * @relates ArrayView
+ */
+template <int rank, int dim, typename Number>
+inline
+ArrayView<const Number>
+make_array_view (const Tensor<rank, dim, Number> &tensor)
+{
+  return make_array_view (tensor.begin_raw(), tensor.end_raw());
+}
+
+
+
+/**
+ * Create a view to an entire Tensor object. This is equivalent to initializing
+ * an ArrayView object with a pointer to the first element and the size of the
+ * given argument.
+ *
+ * This function is used for non-@p const references to objects of Tensor type.
+ * Such objects contain elements that can be written to. Consequently,
+ * the return type of this function is a view to a set of writable objects.
+ *
+ * @param[in] vector The Tensor for which we want to have an array view
+ * object. The array view corresponds to the <em>entire</em> object but the
+ * order in which the entries are presented in the array is undefined and can
+ * not be relied upon.
+ *
+ * @relates ArrayView
+ */
+template <int rank, int dim, typename Number>
+inline
+ArrayView<Number>
+make_array_view (Tensor<rank, dim, Number> &tensor)
+{
+  return make_array_view (tensor.begin_raw(), tensor.end_raw());
+}
+
+
+
+/**
+ * Create a view to an entire SymmetricTensor object. This is equivalent to
+ * initializing an ArrayView object with a pointer to the first element and the
+ * size of the given argument.
+ *
+ * This function is used for @p const references to objects of SymmetricTensor
+ * type because they contain immutable elements. Consequently, the return type
+ * of this function is a view to a set of @p const objects.
+ *
+ * @param[in] vector The SymmetricTensor for which we want to have an array
+ * view object. The array view corresponds to the <em>entire</em> object but
+ * the order in which the entries are presented in the array is undefined and
+ * can not be relied upon.
+ *
+ * @relates ArrayView
+ */
+template <int rank, int dim, typename Number>
+inline
+ArrayView<const Number>
+make_array_view (const SymmetricTensor<rank, dim, Number> &tensor)
+{
+  return make_array_view (tensor.begin_raw(), tensor.end_raw());
+}
+
+
+
+/**
+ * Create a view to an entire SymmetricTensor object. This is equivalent to
+ * initializing an ArrayView object with a pointer to the first element and the
+ * size of the given argument.
+ *
+ * This function is used for non-@p const references to objects of
+ * SymmetricTensor type. Such objects contain elements that can be written to.
+ * Consequently, the return type of this function is a view to a set of writable
+ * objects.
+ *
+ * @param[in] vector The SymmetricTensor for which we want to have an array view
+ * object. The array view corresponds to the <em>entire</em> object but the
+ * order in which the entries are presented in the array is undefined and can
+ * not be relied upon.
+ *
+ * @relates ArrayView
+ */
+template <int rank, int dim, typename Number>
+inline
+ArrayView<Number>
+make_array_view (SymmetricTensor<rank, dim, Number> &tensor)
+{
+  return make_array_view (tensor.begin_raw(), tensor.end_raw());
+}
+
+
+
 /**
  * Create a view to an entire C-style array. This is equivalent to
  * initializing an ArrayView object with a pointer to the first element and
@@ -441,30 +624,6 @@ ArrayView<ElementType>
 make_array_view (ElementType (&array)[N])
 {
   return ArrayView<ElementType> (array, N);
-}
-
-
-
-/**
- * Create a view to an entire std::vector object. This is equivalent to
- * initializing an ArrayView object with a pointer to the first element and
- * the size of the given argument.
- *
- * This function is used for non-@p const references to objects of vector
- * type. Such objects contain elements that can be written to. Consequently,
- * the return type of this function is a view to a set of writable objects.
- *
- * @param[in] vector The vector for which we want to have an array view
- * object. The array view corresponds to the <em>entire</em> vector.
- *
- * @relates ArrayView
- */
-template <typename ElementType>
-inline
-ArrayView<ElementType>
-make_array_view (std::vector<ElementType> &vector)
-{
-  return ArrayView<ElementType> (vector.data(), vector.size());
 }
 
 
@@ -492,6 +651,7 @@ make_array_view (Vector<ElementType> &vector)
 }
 
 
+
 /**
  * Create a view to an entire Vector object. This is equivalent to
  * initializing an ArrayView object with a pointer to the first element and
@@ -512,6 +672,30 @@ ArrayView<const ElementType>
 make_array_view (const Vector<ElementType> &vector)
 {
   return ArrayView<const ElementType> (vector.begin(), vector.size());
+}
+
+
+
+/**
+ * Create a view to an entire std::vector object. This is equivalent to
+ * initializing an ArrayView object with a pointer to the first element and
+ * the size of the given argument.
+ *
+ * This function is used for non-@p const references to objects of vector
+ * type. Such objects contain elements that can be written to. Consequently,
+ * the return type of this function is a view to a set of writable objects.
+ *
+ * @param[in] vector The vector for which we want to have an array view
+ * object. The array view corresponds to the <em>entire</em> vector.
+ *
+ * @relates ArrayView
+ */
+template <typename ElementType>
+inline
+ArrayView<ElementType>
+make_array_view (std::vector<ElementType> &vector)
+{
+  return ArrayView<ElementType> (vector.data(), vector.size());
 }
 
 
@@ -571,76 +755,6 @@ make_array_view (std::vector<ElementType> &vector,
                       "create would lead to a view that extends beyond the end "
                       "of the given vector."));
   return ArrayView<ElementType> (&vector[starting_index], size_of_view);
-}
-
-#ifndef DOXYGEN
-namespace internal
-{
-  namespace ArrayViewHelper
-  {
-    template<class Iterator>
-    bool is_contiguous(const Iterator &first, const Iterator &last)
-    {
-      const auto n = std::distance(first, last);
-      for (typename std::decay<decltype(n)>::type i = 0; i < n; ++i)
-        if (*(std::next(first, i)) != *(std::next(std::addressof(*first), i)))
-          return false;
-      return true;
-    }
-  }
-}
-#endif
-
-
-/**
- * Create an ArrayView that takes a pair of iterators as arguments. The type
- * of the ArrayView is inferred from the value type of the iterator (e.g., the
- * view created from two const iterators will have a const type).
- *
- * @warning The iterators @p begin and @p end must bound (in the usual half-open
- * way) a contiguous in memory range of values. This function is intended for
- * use with iterators into containers like
- * <code>boost::container::small_vector</code> or <code>std::vector</code> and
- * will not work correctly with, e.g.,
- * <code>boost::container::stable_vector</code> or <code>std::deque</code>.
- * In debug mode, we check that the provided iterators represent contiguous
- * memory indeed.
- *
- * @relates ArrayView
- */
-template <typename Iterator>
-ArrayView<typename std::remove_reference<typename std::iterator_traits<Iterator>::reference>::type>
-make_array_view (const Iterator begin, const Iterator end)
-{
-  static_assert(std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
-                typename std::random_access_iterator_tag>::value,
-                "The provided iterator should be a random access iterator.");
-  Assert(begin <= end,
-         ExcMessage("The beginning of the array view should be before the end."));
-  Assert(internal::ArrayViewHelper::is_contiguous(begin, end),
-         ExcMessage("The provided range isn't contiguous in memory!"));
-  // the reference type, not the value type, knows the constness of the iterator
-  return ArrayView<typename std::remove_reference
-         <typename std::iterator_traits<Iterator>::reference>::type>
-         (&*begin, end - begin);
-}
-
-/**
- * Create a view from a pair of pointers. <code>ElementType</code> may be
- * const-qualified.
- *
- * @warning The pointers @p begin and @p end must bound (in the usual
- * half-open way) a contiguous in memory range of values.
- *
- * @relates ArrayView
- */
-template <typename ElementType>
-ArrayView<ElementType>
-make_array_view (ElementType *const begin, ElementType *const end)
-{
-  Assert(begin <= end,
-         ExcMessage("The beginning of the array view should be before the end."));
-  return ArrayView<ElementType>(begin, end - begin);
 }
 
 
@@ -785,6 +899,7 @@ make_array_view (LAPACKFullMatrix<ElementType> &matrix)
 }
 
 
+
 /**
  * Create a view to an entire LAPACKFullMatrix object. This is equivalent to
  * initializing an ArrayView object with a pointer to the first element of the
@@ -808,6 +923,7 @@ make_array_view (const LAPACKFullMatrix<ElementType> &matrix)
 {
   return ArrayView<const ElementType> (&matrix(0,0), matrix.n_elements());
 }
+
 
 
 /**
