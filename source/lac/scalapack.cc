@@ -627,9 +627,14 @@ void ScaLAPACKMatrix<NumberType>::least_squares(ScaLAPACKMatrix<NumberType> &B,
   Assert (B.state == LAPACKSupport::matrix,
           ExcMessage("Matrix B has to be in Matrix state before calling this function."));
 
-  transpose ?
-  (Assert(n_columns==B.n_rows,ExcDimensionMismatch(n_columns,B.n_rows))) :
-  (Assert(n_rows==B.n_rows,ExcDimensionMismatch(n_rows,B.n_rows)));
+  if (transpose)
+    {
+      Assert(n_columns==B.n_rows,ExcDimensionMismatch(n_columns,B.n_rows));
+    }
+  else
+    {
+      Assert(n_rows==B.n_rows,ExcDimensionMismatch(n_rows,B.n_rows));
+    }
 
   //see https://www.ibm.com/support/knowledgecenter/en/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgels.htm
   Assert(row_block_size==column_block_size,ExcMessage("Use identical block sizes for rows and columns of matrix A"));
