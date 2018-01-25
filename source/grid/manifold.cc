@@ -480,15 +480,6 @@ namespace internal
 {
   namespace
   {
-    Tensor<1,2>
-    normalized_alternating_product (const Tensor<1,2> (&basis_vectors)[1])
-    {
-      Tensor<1,2> tmp = cross_product_2d (basis_vectors[0]);
-      return tmp/tmp.norm();
-    }
-
-
-
     Tensor<1,3>
     normalized_alternating_product (const Tensor<1,3> ( &)[1])
     {
@@ -748,8 +739,8 @@ get_normals_at_vertices (const Triangulation<2>::face_iterator &face,
 template <>
 void
 FlatManifold<2,3>::
-get_normals_at_vertices (const Triangulation<2,3>::face_iterator &face,
-                         Manifold<2,3>::FaceVertexNormals &face_vertex_normals) const
+get_normals_at_vertices (const Triangulation<2,3>::face_iterator &/*face*/,
+                         Manifold<2,3>::FaceVertexNormals &/*face_vertex_normals*/) const
 {
   Assert(false, ExcNotImplemented());
 }

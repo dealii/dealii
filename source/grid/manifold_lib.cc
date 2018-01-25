@@ -543,10 +543,8 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
   // Search for duplicate weight rows and merge them to minimize the cost of
   // the get_new_point function call below.
   boost::container::small_vector<unsigned int, 100> merged_weights_index(new_points.size(),numbers::invalid_unsigned_int);
-  unsigned int unique_weight_rows = 0;
   for (unsigned int row = 0; row < weight_rows; ++row)
     {
-      bool found_identical_row = false;
       for (unsigned int existing_row = 0; existing_row < row; ++existing_row)
         {
           bool identical_weights = true;
@@ -560,7 +558,6 @@ get_new_points (const ArrayView<const Point<spacedim>> &surrounding_points,
 
           if (identical_weights)
             {
-              found_identical_row = true;
               merged_weights_index[row] = existing_row;
               break;
             }
@@ -632,11 +629,10 @@ namespace
 {
   template <int spacedim>
   Point<spacedim>
-  do_get_new_point(const ArrayView<const Tensor<1,spacedim>> &directions,
-                   const ArrayView<const double> &distances,
-                   const ArrayView<const double> &weights,
-                   const Point<spacedim> &candidate_point,
-                   const Point<spacedim> &center)
+  do_get_new_point(const ArrayView<const Tensor<1,spacedim>> &/*directions*/,
+                   const ArrayView<const double> &/*distances*/,
+                   const ArrayView<const double> &/*weights*/,
+                   const Point<spacedim> &/*candidate_point*/)
   {
     Assert(false,ExcNotImplemented());
     return Point<spacedim>();
@@ -647,9 +643,10 @@ namespace
   do_get_new_point(const ArrayView<const Tensor<1,3>> &directions,
                    const ArrayView<const double> &distances,
                    const ArrayView<const double> &weights,
-                   const Point<3> &candidate_point,
-                   const Point<3> &center)
+                   const Point<3> &candidate_point)
   {
+    (void) distances;
+
     AssertDimension(directions.size(), distances.size());
     AssertDimension(directions.size(), weights.size());
 
@@ -762,10 +759,10 @@ namespace
 template <int dim, int spacedim>
 Point<spacedim>
 SphericalManifold<dim,spacedim>::
-get_new_point (const ArrayView<const Tensor<1,spacedim>> &directions,
-               const ArrayView<const double> &distances,
-               const ArrayView<const double> &weights,
-               const Point<spacedim> &candidate_point) const
+get_new_point (const ArrayView<const Tensor<1,spacedim>> &,
+               const ArrayView<const double> &,
+               const ArrayView<const double> &,
+               const Point<spacedim> &) const
 {
   Assert (false, ExcNotImplemented());
   return Point<spacedim>();
@@ -781,7 +778,7 @@ get_new_point (const ArrayView<const Tensor<1,3>> &directions,
                const ArrayView<const double> &weights,
                const Point<3> &candidate_point) const
 {
-  return do_get_new_point(directions,distances,weights,candidate_point,center);
+  return do_get_new_point(directions,distances,weights,candidate_point);
 }
 
 
@@ -794,7 +791,7 @@ get_new_point (const ArrayView<const Tensor<1,3>> &directions,
                const ArrayView<const double> &weights,
                const Point<3> &candidate_point) const
 {
-  return do_get_new_point(directions,distances,weights,candidate_point,center);
+  return do_get_new_point(directions,distances,weights,candidate_point);
 }
 
 
@@ -807,7 +804,7 @@ get_new_point (const ArrayView<const Tensor<1,3>> &directions,
                const ArrayView<const double> &weights,
                const Point<3> &candidate_point) const
 {
-  return do_get_new_point(directions,distances,weights,candidate_point,center);
+  return do_get_new_point(directions,distances,weights,candidate_point);
 }
 
 
@@ -870,8 +867,8 @@ CylindricalManifold<dim, 3>::CylindricalManifold(const Point<3> &direction_,
 template <int dim, int spacedim>
 Point<spacedim>
 CylindricalManifold<dim,spacedim>::
-get_new_point (const ArrayView<const Point<spacedim>> &surrounding_points,
-               const ArrayView<const double>          &weights) const
+get_new_point (const ArrayView<const Point<spacedim>> &/*surrounding_points*/,
+               const ArrayView<const double>          &/*weights*/) const
 {
   Assert (spacedim==3,
           ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
@@ -908,7 +905,7 @@ get_new_point (const ArrayView<const Point<3>> &surrounding_points,
 
 template <int dim, int spacedim>
 Point<3>
-CylindricalManifold<dim, spacedim>::pull_back(const Point<spacedim> &space_point) const
+CylindricalManifold<dim, spacedim>::pull_back(const Point<spacedim> &/*space_point*/) const
 {
   Assert (spacedim==3,
           ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
@@ -941,7 +938,7 @@ CylindricalManifold<dim, 3>::pull_back(const Point<3> &space_point) const
 
 template <int dim, int spacedim>
 Point<spacedim>
-CylindricalManifold<dim, spacedim>::push_forward(const Point<3> &chart_point) const
+CylindricalManifold<dim, spacedim>::push_forward(const Point<3> &/*chart_point*/) const
 {
   Assert (spacedim==3,
           ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
@@ -972,7 +969,7 @@ CylindricalManifold<dim, 3>::push_forward(const Point<3> &chart_point) const
 
 template<int dim, int spacedim>
 DerivativeForm<1, 3, spacedim>
-CylindricalManifold<dim, spacedim>::push_forward_gradient(const Point<3> &chart_point) const
+CylindricalManifold<dim, spacedim>::push_forward_gradient(const Point<3> &/*chart_point*/) const
 {
   Assert (spacedim==3,
           ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
