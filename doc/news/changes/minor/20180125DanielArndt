@@ -1,0 +1,5 @@
+New: Tensor::begin_raw, Tensor::end_raw, SymmetricTensor::begin_raw
+and SymmetricTensor::end_raw provide access to the underlying storage for Tensor
+and SymmetricTensor.
+<br>
+(Daniel Arndt, 2018/01/25)

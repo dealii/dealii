@@ -604,6 +604,31 @@ public:
   SymmetricTensor (const SymmetricTensor<rank_,dim,OtherNumber> &initializer);
 
   /**
+   * Return a pointer to the first element of the underlying storage.
+   */
+  Number *
+  begin_raw();
+
+  /**
+   * Return a const pointer to the first element of the underlying storage.
+   */
+  const Number *
+  begin_raw() const;
+
+  /**
+   * Return a pointer to the element past the end of the underlying storage.
+   */
+  Number *
+  end_raw();
+
+  /**
+   * Return a const pointer to the element past the end of the underlying
+   * storage.
+   */
+  const Number *
+  end_raw() const;
+
+  /**
    * Assignment operator from symmetric tensors with different underlying scalar type.
    * This obviously requires that the @p OtherNumber type is convertible to
    * @p Number.
@@ -707,9 +732,9 @@ public:
   Number &operator() (const TableIndices<rank_> &indices);
 
   /**
-   * Return an element by value.
+   * Return a @p const reference to the value referred to by the argument.
    */
-  Number operator() (const TableIndices<rank_> &indices) const;
+  const Number &operator() (const TableIndices<rank_> &indices) const;
 
   /**
    * Access the elements of a row of this symmetric tensor. This function is
@@ -726,11 +751,11 @@ public:
   operator [] (const unsigned int row);
 
   /**
-   * Return an element by value.
+   * Return a @p const reference to the value referred to by the argument.
    *
    * Exactly the same as operator().
    */
-  Number
+  const Number &
   operator [] (const TableIndices<rank_> &indices) const;
 
   /**
@@ -746,7 +771,7 @@ public:
    * <tt>s.access_raw_entry(unrolled_index)</tt> does the same as
    * <tt>s[s.unrolled_to_component_indices(i)]</tt>, but more efficiently.
    */
-  Number
+  const Number &
   access_raw_entry (const unsigned int unrolled_index) const;
 
   /**
@@ -1684,7 +1709,7 @@ namespace internal
 
   template <int dim, typename Number>
   inline
-  Number
+  const Number &
   symmetric_tensor_access (const TableIndices<2> &indices,
                            const typename SymmetricTensorAccessors::StorageType<2,dim,Number>::base_tensor_type &data)
   {
@@ -1833,7 +1858,7 @@ namespace internal
 
   template <int dim, typename Number>
   inline
-  Number
+  const Number &
   symmetric_tensor_access (const TableIndices<4> &indices,
                            const typename SymmetricTensorAccessors::StorageType<4,dim,Number>::base_tensor_type &data)
   {
@@ -1952,7 +1977,7 @@ SymmetricTensor<rank_,dim,Number>::operator () (const TableIndices<rank_> &indic
 
 template <int rank_, int dim, typename Number>
 inline
-Number
+const Number &
 SymmetricTensor<rank_,dim,Number>::operator ()
 (const TableIndices<rank_> &indices) const
 {
@@ -2021,7 +2046,7 @@ SymmetricTensor<rank_,dim,Number>::operator [] (const unsigned int row)
 
 template <int rank_, int dim, typename Number>
 inline
-Number
+const Number &
 SymmetricTensor<rank_,dim,Number>::operator [] (const TableIndices<rank_> &indices) const
 {
   return operator()(indices);
@@ -2037,6 +2062,45 @@ SymmetricTensor<rank_,dim,Number>::operator [] (const TableIndices<rank_> &indic
   return operator()(indices);
 }
 
+
+
+template <int rank_, int dim, typename Number>
+inline
+Number *
+SymmetricTensor<rank_,dim,Number>::begin_raw()
+{
+  return std::addressof(this->access_raw_entry(0));
+}
+
+
+
+template <int rank_, int dim, typename Number>
+inline
+const Number *
+SymmetricTensor<rank_,dim,Number>::begin_raw() const
+{
+  return std::addressof(this->access_raw_entry(0));
+}
+
+
+
+template <int rank_, int dim, typename Number>
+inline
+Number *
+SymmetricTensor<rank_,dim,Number>::end_raw()
+{
+  return begin_raw()+n_independent_components;
+}
+
+
+
+template <int rank_, int dim, typename Number>
+inline
+const Number *
+SymmetricTensor<rank_,dim,Number>::end_raw() const
+{
+  return begin_raw()+n_independent_components;
+}
 
 
 
@@ -2070,7 +2134,7 @@ namespace internal
 
 template <int rank_, int dim, typename Number>
 inline
-Number
+const Number &
 SymmetricTensor<rank_,dim,Number>::access_raw_entry (const unsigned int index) const
 {
   AssertIndexRange (index, n_independent_components);

@@ -152,6 +152,31 @@ public:
   Tensor (const OtherNumber &initializer);
 
   /**
+   * Return a pointer to the first element of the underlying storage.
+   */
+  Number *
+  begin_raw();
+
+  /**
+   * Return a const pointer to the first element of the underlying storage.
+   */
+  const Number *
+  begin_raw() const;
+
+  /**
+   * Return a pointer to the element past the end of the underlying storage.
+   */
+  Number *
+  end_raw();
+
+  /**
+   * Return a const pointer to the element past the end of the underlying
+   * storage.
+   */
+  const Number *
+  end_raw() const;
+
+  /**
    * Return a reference to the encapsulated Number object. Since rank-0
    * tensors are scalars, this is a natural operation.
    *
@@ -426,6 +451,30 @@ public:
   Number &operator [] (const TableIndices<rank_> &indices);
 
   /**
+   * Return a pointer to the first element of the underlying storage.
+   */
+  Number *
+  begin_raw();
+
+  /**
+   * Return a const pointer to the first element of the underlying storage.
+   */
+  const Number *
+  begin_raw() const;
+
+  /**
+   * Return a pointer to the element past the end of the underlying storage.
+   */
+  Number *
+  end_raw();
+
+  /**
+   * Return a pointer to the element past the end of the underlying storage.
+   */
+  const Number *
+  end_raw() const;
+
+  /**
    * Assignment operator from tensors with different underlying scalar type.
    * This obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
@@ -653,6 +702,7 @@ DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number>::Tensor ()
 }
 
 
+
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
@@ -662,6 +712,7 @@ Tensor<0,dim,Number>::Tensor (const OtherNumber &initializer)
 }
 
 
+
 template <int dim, typename Number>
 template <typename OtherNumber>
 inline
@@ -669,6 +720,47 @@ Tensor<0,dim,Number>::Tensor (const Tensor<0,dim,OtherNumber> &p)
 {
   value = p.value;
 }
+
+
+
+template <int dim, typename Number>
+inline
+Number *
+Tensor<0,dim,Number>::begin_raw()
+{
+  return std::addressof(value);
+}
+
+
+
+template <int dim, typename Number>
+inline
+const Number *
+Tensor<0,dim,Number>::begin_raw() const
+{
+  return std::addressof(value);
+}
+
+
+
+template <int dim, typename Number>
+inline
+Number *
+Tensor<0,dim,Number>::end_raw()
+{
+  return begin_raw()+n_independent_components;
+}
+
+
+
+template <int dim, typename Number>
+inline
+const Number *
+Tensor<0,dim,Number>::end_raw() const
+{
+  return begin_raw()+n_independent_components;
+}
+
 
 
 template <int dim, typename Number>
@@ -945,6 +1037,7 @@ Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices) const
 }
 
 
+
 template <int rank_, int dim, typename Number>
 inline
 Number &
@@ -954,6 +1047,47 @@ Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> &indices)
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
+
+
+
+template <int rank_, int dim, typename Number>
+inline
+Number *
+Tensor<rank_,dim,Number>::begin_raw()
+{
+  return std::addressof(this->operator[](this->unrolled_to_component_indices(0)));
+}
+
+
+
+template <int rank_, int dim, typename Number>
+inline
+const Number *
+Tensor<rank_,dim,Number>::begin_raw() const
+{
+  return std::addressof(this->operator[](this->unrolled_to_component_indices(0)));
+}
+
+
+
+template <int rank_, int dim, typename Number>
+inline
+Number *
+Tensor<rank_,dim,Number>::end_raw()
+{
+  return begin_raw()+n_independent_components;
+}
+
+
+
+template <int rank_, int dim, typename Number>
+inline
+const Number *
+Tensor<rank_,dim,Number>::end_raw() const
+{
+  return begin_raw()+n_independent_components;
+}
+
 
 
 template <int rank_, int dim, typename Number>
