@@ -1,0 +1,4 @@
+New: There are new overloads of make_array_view for Tensor, SymmetricTensor,
+LAPACKFullMatrix, C-style array and Vector.
+<br>
+(Daniel Arndt, 2018/01/25)
