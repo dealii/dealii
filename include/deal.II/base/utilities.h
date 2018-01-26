@@ -403,8 +403,8 @@ namespace Utilities
    *
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
-  template<typename T>
-  std::vector<char> pack(const T &object);
+  template <typename T>
+  std::vector<char> pack (const T &object);
 
   /**
    * Given a vector of characters, obtained through a call to the function
@@ -412,12 +412,64 @@ namespace Utilities
    *
    * This function uses boost::serialization utilities to unpack the object
    * from a vector of characters, and it is the inverse of the function
-   * Utilities::pack
+   * Utilities::pack().
+   *
+   * @note Since no arguments to this function depend on the template type
+   *  @p T, you must manually specify the template argument when calling
+   *  this function.
+   *
+   * @note If you want to pack() or unpack() arrays of objects, then the
+   *  following works:
+   *  @code
+   *    double array[3] = {1,2,3};
+   *    std::vector<char> buffer = Utilities::pack(array);
+   *  @endcode
+   *  However, the converse does not:
+   *  @code
+   *    array = Utilities::unpack<double[3]>(buffer);
+   *  @code
+   *  This is because C++ does not allow functions to return arrays.
+   *  Consequently, there is a separate unpack() function for arrays, see
+   *  below.
    *
    * @author Timo Heister, Wolfgang Bangerth, 2017.
    */
-  template<typename T>
-  T unpack(const std::vector<char> &buffer);
+  template <typename T>
+  T unpack (const std::vector<char> &buffer);
+
+  /**
+   * Given a vector of characters, obtained through a call to the function
+   * Utilities::pack, restore its content in an array of type T.
+   *
+   * This function uses boost::serialization utilities to unpack the object
+   * from a vector of characters, and it is the inverse of the function
+   * Utilities::pack().
+   *
+   * @note This function exists due to a quirk of C++. Specifically,
+   *  if you want to pack() or unpack() arrays of objects, then the
+   *  following works:
+   *  @code
+   *    double array[3] = {1,2,3};
+   *    std::vector<char> buffer = Utilities::pack(array);
+   *  @endcode
+   *  However, the converse does not:
+   *  @code
+   *    array = Utilities::unpack<double[3]>(buffer);
+   *  @code
+   *  This is because C++ does not allow functions to return arrays.
+   *  The current function therefore allows to write
+   *  @code
+   *    Utilities::unpack(buffer, array);
+   *  @code
+   *  Note that unlike the other unpack() function, it is not necessary
+   *  to explicitly specify the template arguments since they can be
+   *  deduced from the second argument.
+   *
+   * @author Timo Heister, Wolfgang Bangerth, 2017.
+   */
+  template <typename T, int N>
+  void unpack (const std::vector<char> &buffer,
+               T (&unpacked_object)[N]);
 
   /**
    * A namespace for utility functions that probe system properties.
@@ -779,7 +831,7 @@ namespace Utilities
 
 
 
-  template<typename T>
+  template <typename T>
   std::vector<char> pack(const T &object)
   {
     // see if the object is small and copyable via memcpy. if so, use
@@ -832,8 +884,7 @@ namespace Utilities
   }
 
 
-
-  template<typename T>
+  template <typename T>
   T unpack(const std::vector<char> &buffer)
   {
     // see if the object is small and copyable via memcpy. if so, use
@@ -882,6 +933,56 @@ namespace Utilities
         return object;
       }
   }
+
+
+
+  template <typename T, int N>
+  void unpack (const std::vector<char> &buffer,
+               T (&unpacked_object)[N])
+  {
+    // see if the object is small and copyable via memcpy. if so, use
+    // this fast path. otherwise, we have to go through the BOOST
+    // serialization machinery
+    //
+    // we have to work around the fact that GCC 4.8.x claims to be C++
+    // conforming, but is not actually as it does not implement
+    // std::is_trivially_copyable.
+    if (
+#if __GNUG__ && __GNUC__ < 5
+      __has_trivial_copy(T)
+#else
+      std::is_trivially_copyable<T>()
+#endif
+      &&
+      sizeof(T)*N<256)
+      {
+        Assert (buffer.size() == sizeof(T)*N, ExcInternalError());
+        std::memcpy (unpacked_object, buffer.data(), sizeof(T)*N);
+      }
+    else
+      {
+        std::string decompressed_buffer;
+
+        // first decompress the buffer
+        {
+#ifdef DEAL_II_WITH_ZLIB
+          boost::iostreams::filtering_ostream decompressing_stream;
+          decompressing_stream.push(boost::iostreams::gzip_decompressor());
+          decompressing_stream.push(boost::iostreams::back_inserter(decompressed_buffer));
+          decompressing_stream.write (buffer.data(), buffer.size());
+#else
+          decompressed_buffer.assign (buffer.begin(), buffer.end());
+#endif
+        }
+
+        // then restore the object from the buffer
+        std::istringstream in(decompressed_buffer);
+        boost::archive::binary_iarchive archive(in);
+
+        archive >> unpacked_object;
+      }
+  }
+
 }
 
 
