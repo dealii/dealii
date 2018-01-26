@@ -167,6 +167,20 @@ for (deal_II_dimension : DIMENSIONS)
 }
 
 
+
+for (deal_II_space_dimension : DIMENSIONS)
+{
+    namespace GridGenerator \{
+
+#if deal_II_space_dimension >= 2
+    template void
+    hyper_sphere<deal_II_space_dimension> (
+        Triangulation<deal_II_space_dimension-1, deal_II_space_dimension> &, const Point<deal_II_space_dimension> &, double);
+#endif
+
+    \}
+}
+
 for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS; deal_II_space_dimension_2 : SPACE_DIMENSIONS)
 {
     namespace GridGenerator \{
