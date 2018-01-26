@@ -440,9 +440,10 @@ trmv (const char *uplo, const char *trans, const char *diag,
 }
 #else
 inline void
-trmv (const char *uplo, const char *trans, const char *diag,
-      const types::blas_int *N, const double *A, const types::blas_int *lda,
-      double *x, const types::blas_int *incx)
+trmv (const char * /*uplo*/, const char * /*trans*/, const char * /*diag*/,
+      const types::blas_int * /*N*/, const double * /*A*/,
+      const types::blas_int * /*lda*/,
+      double * /*x*/, const types::blas_int * /*incx*/)
 {
   Assert (false, LAPACKSupport::ExcMissing("dtrmv"));
 }
@@ -459,9 +460,10 @@ trmv (const char *uplo, const char *trans, const char *diag,
 }
 #else
 inline void
-trmv (const char *uplo, const char *trans, const char *diag,
-      const types::blas_int *N, const float *A, const types::blas_int *lda,
-      float *x, const types::blas_int *incx)
+trmv (const char * /*uplo*/, const char * /*trans*/, const char * /*diag*/,
+      const types::blas_int * /*N*/, const float * /*A*/,
+      const types::blas_int * /*lda*/, float * /*x*/,
+      const types::blas_int * /*incx*/)
 {
   Assert (false, LAPACKSupport::ExcMissing("dtrmv"));
 }
