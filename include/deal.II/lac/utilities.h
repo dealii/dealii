@@ -328,12 +328,9 @@ namespace Utilities
       std::vector<double> diagonal;
       std::vector<double> subdiagonal;
 
-      // scalars to store norms and inner products
-      double a = 0, b = 0;
-
       // 1. Normalize input vector
       (*v) = v0_;
-      a = v->l2_norm();
+      double a = v->l2_norm();
       Assert (a!=0, ExcDivideByZero());
       (*v) *= 1./a;
 
@@ -347,7 +344,7 @@ namespace Utilities
       for (unsigned int i = 1; i < k; ++i)
         {
           // 4. L2 norm of f
-          b = f->l2_norm();
+          const double b = f->l2_norm();
           Assert (b!=0, ExcDivideByZero());
           // 5. v0 <- v; v <- f/b
           *v0 = *v;
