@@ -2683,7 +2683,6 @@ public:
    *   for (auto cell : triangulation.active_cell_iterators())
    *     cell->set_user_flag();
    * @endcode
-   * To use this feature, you need a compiler that supports C++11.
    *
    * @return The half open range <code>[this->begin_active(),
    * this->end())</code>

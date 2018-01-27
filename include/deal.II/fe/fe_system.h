@@ -295,8 +295,7 @@ public:
    *
    * This code has a problem: it creates four memory leaks because the first
    * vector above is created with pointers to elements that are allocated with
-   * <code>new</code> but never destroyed. Without C++11, you would have another
-   * problem: brace-initializer don't exist in earlier C++ standards.
+   * <code>new</code> but never destroyed.
    *
    * The solution to the second of these problems is to create two static
    * member functions that can create vectors. Here is an example:

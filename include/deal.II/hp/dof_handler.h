@@ -513,7 +513,6 @@ namespace hp
      *       ...do the local integration on 'cell'...;
      *     }
      * @endcode
-     * To use this feature, you need a compiler that supports C++11.
      *
      * @return The half open range <code>[this->begin_active(),
      * this->end())</code>
