@@ -254,7 +254,6 @@ int main()
   // drops proportionally as the grid is refined
   for (unsigned int n_refinements = 4; n_refinements < 7; ++ n_refinements)
     {
-
       deallog << "====================================================="
               << std::endl
               << "Number of global refinements: " << n_refinements
@@ -310,8 +309,8 @@ int main()
                 << "true line midpoint: "
                 << true_midpoint
                 << std::endl
-                << "distance: "
-                << projected_point.distance(true_midpoint)
+                << "distance less than 5.0e-6: "
+                << (projected_point.distance(true_midpoint) < 5.0e-6)
                 << std::endl;
       }
 
@@ -418,8 +417,8 @@ int main()
                 << "projected point distance from origin: "
                 << projected_point.distance(Point<3>())
                 << std::endl
-                << "Error:                                "
-                << projected_point.distance(trial_point)
+                << "Error is less than 1.0e-3:           "
+                << (projected_point.distance(trial_point) < 1.0e-3)
                 << std::endl;
 
       }
@@ -448,8 +447,8 @@ int main()
                 << "projected point distance from origin: "
                 << projected_point.distance(Point<3>())
                 << std::endl
-                << "Error (vs. going along the normal):   "
-                << projected_point.distance(trial_point - normal_vector)
+                << "Error (vs. going along the normal) less than 0.01: "
+                << (projected_point.distance(trial_point - normal_vector) < 0.01)
                 << std::endl;
       }
 
@@ -480,8 +479,8 @@ int main()
                 << "projected point distance from origin: "
                 << projected_point.distance(Point<3>())
                 << std::endl
-                << "Error:                                "
-                << projected_point.distance(trial_point)
+                << "Error less than 1.0e-7:               "
+                << (projected_point.distance(trial_point) < 1.0e-7)
                 << std::endl;
       }
     }
