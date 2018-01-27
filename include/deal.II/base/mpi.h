@@ -489,6 +489,28 @@ namespace Utilities
     all_gather(const MPI_Comm &comm,
                const T        &object_to_send);
 
+    /**
+     * A generalization of the classic MPI_Gather function, that accepts
+     * arbitrary data types T, as long as boost::serialize accepts T as an
+     * argument.
+     *
+     * @param[in] comm MPI communicator.
+     * @param[in] object_to_send an object to send to the root process
+     * @param[in] root_process The process, which receives the objects from all processes.
+     *  By default the process with rank 0 is the root process.
+     *
+     * @return The @p root_process receives a vector of objects, with size equal to the number of
+     *  processes in the MPI communicator. Each entry contains the object
+     *  received from the processor with the corresponding rank within the
+     *  communicator. All other processes receive an empty vector.
+     *
+     * @author Benjamin Brands, 2017
+     */
+    template <typename T>
+    std::vector<T>
+    gather(const MPI_Comm &comm,
+           const T &object_to_send,
+           const unsigned int root_process=0);
 
 #ifndef DOXYGEN
     // declaration for an internal function that lives in mpi.templates.h
@@ -528,6 +550,76 @@ namespace Utilities
       internal::all_reduce(MPI_MIN, ArrayView<const T>(values, N),
                            mpi_communicator, ArrayView<T>(minima, N));
     }
+
+    template <typename T>
+    std::vector<T>
+    gather(const MPI_Comm &comm,
+           const T &object_to_send,
+           const unsigned int root_process)
+    {
+#ifndef DEAL_II_WITH_MPI
+      (void)comm;
+      (void)root_process;
+      std::vector<T> v(1, object_to_send);
+      return v;
+#else
+      const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
+      const auto my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
+
+      Assert(root_process < n_procs, ExcIndexRange(root_process,0,n_procs));
+
+      std::vector<char> buffer = Utilities::pack(object_to_send);
+      int n_local_data = buffer.size();
+
+      // Vector to store the size of loc_data_array for every process
+      // only the root process needs to allocate memory for that purpose
+      std::vector<int> size_all_data;
+      if (my_rank==root_process)
+        size_all_data.resize(n_procs,0);
+
+      // Exchanging the size of each buffer
+      int ierr = MPI_Gather(&n_local_data, 1, MPI_INT,
+                            size_all_data.data(), 1, MPI_INT,
+                            root_process, comm);
+      AssertThrowMPI(ierr);
+
+      // Now computing the displacement, relative to recvbuf,
+      // at which to store the incoming buffer; only for root
+      std::vector<int> rdispls;
+      if (my_rank==root_process)
+        {
+          rdispls.resize(n_procs,0);
+          for (unsigned int i=1; i<n_procs; ++i)
+            rdispls[i] = rdispls[i-1] + size_all_data[i-1];
+        }
+      // exchange the buffer:
+      std::vector<char> received_unrolled_buffer;
+      if (my_rank==root_process)
+        received_unrolled_buffer.resize(rdispls.back() + size_all_data.back());
+
+      ierr = MPI_Gatherv(buffer.data(), n_local_data, MPI_CHAR,
+                         received_unrolled_buffer.data(), size_all_data.data(),
+                         rdispls.data(), MPI_CHAR,
+                         root_process, comm);
+      AssertThrowMPI(ierr);
+
+      std::vector<T> received_objects;
+
+      if (my_rank==root_process)
+        {
+          received_objects.resize(n_procs);
+
+          for (unsigned int i=0; i<n_procs; ++i)
+            {
+              const std::vector<char> local_buffer(received_unrolled_buffer.begin()+rdispls[i],
+                                                   received_unrolled_buffer.begin()+rdispls[i]+size_all_data[i]);
+              received_objects[i] = Utilities::unpack<T>(local_buffer);
+            }
+        }
+      return received_objects;
+#endif
+    }
+
 #endif
   } // end of namespace MPI
 } // end of namespace Utilities
