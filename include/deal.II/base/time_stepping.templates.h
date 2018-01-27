@@ -421,7 +421,8 @@ namespace TimeStepping
     refine_tol(refine_tol),
     coarsen_tol(coarsen_tol),
     last_same_as_first(false),
-    last_stage(nullptr)
+    last_stage(nullptr),
+    status {}
   {
     // virtual functions called in constructors and destructors never use the
     // override in a derived class
