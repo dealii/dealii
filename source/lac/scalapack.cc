@@ -253,8 +253,8 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
       int union_n_process_columns = 1;
       Cblacs_gridinit(&union_blacs_context, order, union_n_process_rows, union_n_process_columns);
 
-      const NumberType *loc_vals_source = NULL;
-      NumberType *loc_vals_dest = NULL;
+      const NumberType *loc_vals_source = nullptr;
+      NumberType *loc_vals_dest = nullptr;
 
       if (this->grid->mpi_process_is_active && (this->values.size()>0))
         {

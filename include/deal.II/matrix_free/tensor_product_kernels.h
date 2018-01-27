@@ -77,9 +77,9 @@ namespace internal
      */
     EvaluatorTensorProduct ()
       :
-      shape_values (0),
-      shape_gradients (0),
-      shape_hessians (0)
+      shape_values (nullptr),
+      shape_gradients (nullptr),
+      shape_hessians (nullptr)
     {}
 
     /**
@@ -316,9 +316,9 @@ namespace internal
      */
     EvaluatorTensorProduct ()
       :
-      shape_values (0),
-      shape_gradients (0),
-      shape_hessians (0),
+      shape_values (nullptr),
+      shape_gradients (nullptr),
+      shape_hessians (nullptr),
       fe_degree (numbers::invalid_unsigned_int),
       n_q_points_1d (numbers::invalid_unsigned_int)
     {}
