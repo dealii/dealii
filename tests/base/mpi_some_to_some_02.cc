@@ -20,7 +20,7 @@
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/mpi.templates.h>
-
+#include <deal.II/base/mpi.h>
 #include <vector>
 #include <tuple>
 

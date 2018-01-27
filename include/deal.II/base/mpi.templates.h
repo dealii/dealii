@@ -271,57 +271,6 @@ namespace Utilities
 
 
 
-    template<typename T>
-    std::vector<T> all_gather(const MPI_Comm       &comm,
-                              const T &object)
-    {
-#ifndef DEAL_II_WITH_MPI
-      (void)comm;
-      std::vector<T> v(1, object);
-      return v;
-#else
-      const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
-
-      std::vector<char> buffer = Utilities::pack(object);
-
-      int n_local_data = buffer.size();
-
-      // Vector to store the size of loc_data_array for every process
-      std::vector<int> size_all_data(n_procs,0);
-
-      // Exchanging the size of each buffer
-      MPI_Allgather(&n_local_data, 1, MPI_INT,
-                    &(size_all_data[0]), 1, MPI_INT,
-                    comm);
-
-      // Now computing the the displacement, relative to recvbuf,
-      // at which to store the incoming buffer
-      std::vector<int> rdispls(n_procs);
-      rdispls[0] = 0;
-      for (unsigned int i=1; i < n_procs; ++i)
-        rdispls[i] = rdispls[i-1] + size_all_data[i-1];
-
-      // Step 3: exchange the buffer:
-      std::vector<char> received_unrolled_buffer(rdispls.back() + size_all_data.back());
-
-      MPI_Allgatherv(buffer.data(), n_local_data, MPI_CHAR,
-                     received_unrolled_buffer.data(), size_all_data.data(),
-                     rdispls.data(), MPI_CHAR, comm);
-
-      std::vector<T> received_objects(n_procs);
-      for (unsigned int i= 0; i < n_procs; ++i)
-        {
-          std::vector<char> local_buffer(received_unrolled_buffer.begin()+rdispls[i],
-                                         received_unrolled_buffer.begin()+rdispls[i]+size_all_data[i]);
-          received_objects[i] = Utilities::unpack<T>(local_buffer);
-        }
-
-      return received_objects;
-#endif
-    }
-
-
-
     template <typename T>
     T sum (const T &t,
            const MPI_Comm &mpi_communicator)
