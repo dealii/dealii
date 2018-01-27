@@ -1733,7 +1733,7 @@ TransfiniteInterpolationManifold<dim,spacedim>
                     "active cells on a lower level. Coarsening the mesh is " +
                     "currently not supported"));
 
-  // This computes the distance of the surrouding points transformed to the unit
+  // This computes the distance of the surrounding points transformed to the unit
   // cell from the unit cell.
   typename Triangulation<dim,spacedim>::cell_iterator
   cell = triangulation->begin(level_coarse),
@@ -1895,7 +1895,7 @@ TransfiniteInterpolationManifold<dim, spacedim>
   bool use_structdim_2_guesses = false;
   bool use_structdim_3_guesses = false;
   // note that in the structdim 2 case: 0 - 6 and 2 - 7 should be roughly
-  // parallel, while in the structdim 3 case, 0 - 6 and 2 - 7 shoud be roughly
+  // parallel, while in the structdim 3 case, 0 - 6 and 2 - 7 should be roughly
   // orthogonal. Use the angle between these two vectors to figure out if we
   // should turn on either structdim optimization.
   if (surrounding_points.size() == 8)
@@ -1911,8 +1911,8 @@ TransfiniteInterpolationManifold<dim, spacedim>
         // enable the structdim 2 optimization
         use_structdim_2_guesses = true;
       else if (spacedim == 3)
-        // otherwise these vectors are roughly orthogonal are roughly
-        // orthogonal: enable the structdim 3 optimization if we are in 3D
+        // otherwise these vectors are roughly orthogonal: enable the
+        // structdim 3 optimization if we are in 3D
         use_structdim_3_guesses = true;
     }
   // we should enable at most one of the optimizations

@@ -227,7 +227,7 @@ namespace LinearAlgebra
     virtual void equ(const Number a, const VectorSpaceVector<Number> &V) override;
 
     /**
-     * Return wether the vector contains only elements with value zero.
+     * Return whether the vector contains only elements with value zero.
      */
     virtual bool all_zero() const override;
 
@@ -286,7 +286,7 @@ namespace LinearAlgebra
     /**
      * Return an index set that describes which elements of this vector are
      * owned by the current processor. As a consequence, the index sets
-     * returned on different procesors if this is a distributed vector will
+     * returned on different processors if this is a distributed vector will
      * form disjoint sets that add up to the complete index set. Obviously, if
      * a vector is created on only one processor, then the result would
      * satisfy

@@ -174,7 +174,7 @@ namespace LinearAlgebra
       virtual void equ(const Number a, const VectorSpaceVector<Number> &V) override;
 
       /**
-       * Return wether the vector contains only elements with value zero.
+       * Return whether the vector contains only elements with value zero.
        */
       virtual bool all_zero() const override;
 

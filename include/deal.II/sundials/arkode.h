@@ -404,7 +404,7 @@ namespace SUNDIALS
        * whenever the content of `prm` is updated.
        *
        * Make sure that this class lives longer than `prm`. Undefined behaviour
-       * will occurr if you destroy this class, and then parse a parameter file
+       * will occur if you destroy this class, and then parse a parameter file
        * using `prm`.
        */
       void add_parameters(ParameterHandler &prm)
@@ -587,7 +587,7 @@ namespace SUNDIALS
      * is assumed to also perform the setup internally.
      *
      * The setup_jacobian() function may call a user-supplied function to
-     * compute needed data related to the Jacobian matrix. Alterntively, it may
+     * compute needed data related to the Jacobian matrix. Alternatively, it may
      * choose to retrieve and use stored values of this data. In either case,
      * setup_jacobian() may also preprocess that data as needed for
      * solve_jacobian_system(), which may involve calling a generic function
@@ -671,7 +671,7 @@ namespace SUNDIALS
      * amount of times. If convergence can be achieved without updating the
      * Jacobian, then ARKode does not call setup_jacobian() again. If, on the
      * contrary, internal ARKode convergence tests fail, then ARKode calls
-     * again setup_jacobian() with updated vectors and coefficents so that
+     * again setup_jacobian() with updated vectors and coefficients so that
      * successive calls to solve_jacobian_systems() lead to better convergence
      * in the Newton process.
      *
@@ -686,7 +686,7 @@ namespace SUNDIALS
      * evaluated at `t`, `ycur`. `fcur` is $f_I(t,ycur)$.
      *
      * A call to this function should store in `dst` the result of $J^{-1}$
-     * applied to `src`, i.e., `J*dst = src`. It is the users responsability to
+     * applied to `src`, i.e., `J*dst = src`. It is the users responsibility to
      * set up proper solvers and preconditioners inside this function.
      *
      *
@@ -757,7 +757,7 @@ namespace SUNDIALS
      * amount of times.
      *
      * A call to this function should store in `dst` the result of $M^{-1}$
-     * applied to `src`, i.e., `M*dst = src`. It is the users responsability to
+     * applied to `src`, i.e., `M*dst = src`. It is the users responsibility to
      * set up proper solvers and preconditioners inside this function.
      *
      * This function should return:
@@ -789,7 +789,7 @@ namespace SUNDIALS
 
     /**
      * A function object that users may supply and that is intended to evaluate
-     * wether the solver should be restarted (for example because the number of
+     * whether the solver should be restarted (for example because the number of
      * degrees of freedom has changed).
      *
      * This function is supposed to perform all operations that are necessary

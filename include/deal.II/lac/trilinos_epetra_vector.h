@@ -174,18 +174,18 @@ namespace LinearAlgebra
       /**
        * Scale each element of this vector by the corresponding element in the
        * argument. This function is mostly meant to simulate multiplication
-       * (and immediate re-assignement) by a diagonal scaling matrix. The
+       * (and immediate re-assignment) by a diagonal scaling matrix. The
        * vectors need to have the same layout.
        */
       virtual void scale(const VectorSpaceVector<double> &scaling_factors) override;
 
       /**
-       * Assignement <tt>*this = a*V</tt>.
+       * Assignment <tt>*this = a*V</tt>.
        */
       virtual void equ(const double a, const VectorSpaceVector<double> &V) override;
 
       /**
-       * Return wether the vector contains only elements with value zero.
+       * Return whether the vector contains only elements with value zero.
        */
       virtual bool all_zero() const override;
 
@@ -256,7 +256,7 @@ namespace LinearAlgebra
       /**
        * Return an index set that describes which elements of this vector are
        * owned by the current processor. As a consequence, the index sets returned
-       * on different procesors if this is a distributed vector will form disjoint
+       * on different processors if this is a distributed vector will form disjoint
        * sets that add up to the complete index set. Obviously, if a vector is
        * created on only one processor, then the result would satisfy
        * @code

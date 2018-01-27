@@ -537,7 +537,7 @@ namespace Patterns
    * have to be entered in the form <code>key: value</code>. In other words, a
    * map is described in the form <code>key1: value1, key2: value2, key3:
    * value3, ...</code>. Two constructor arguments allow to choose a delimiter
-   * between pairs other than the comma, and a delimeter between key and value
+   * between pairs other than the comma, and a delimiter between key and value
    * other than colon.
    *
    * With two additional parameters, the number of elements this list has to
@@ -1217,7 +1217,7 @@ namespace Patterns
     /**
     * Converter class. This class is used to generate strings and Patterns
     * associated to the given type, and to convert from a string to the given
-    * type and viceversa.
+    * type and vice versa.
     *
     * The second template parameter is used internally to allow for advanced
     * SFINAE (substitution failure is not an error) tricks used to specialise
@@ -1336,7 +1336,7 @@ namespace Patterns
        * A class has Rank equal to the number of different separators
        * that are required to uniquely identify its element(s) in a string.
        *
-       * This class is used to detect wether the class T is compatible
+       * This class is used to detect whether the class T is compatible
        * with a Patterns::List pattern or with a Patterns::Map pattern.
        *
        * Objects like Point() or std::complex<double> are vector-likes, and
@@ -1420,7 +1420,7 @@ namespace Patterns
             else
               is >> value;
 
-            // If someone passes "123 abc" to the function, the method yelds an
+            // If someone passes "123 abc" to the function, the method yields an
             // integer 123 alright, but the space terminates the read from the string
             // although there is more to come. This case, however, is checked for in
             // the call p->match(s) at the beginning of this function, and would

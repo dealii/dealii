@@ -135,7 +135,7 @@ namespace SUNDIALS
    *  \alpha \dfrac{\partial F}{\partial \dot y}\, ,
    * \f]
    *
-   * and $\alpha = \alpha_{n,0}/h_n$. It is worth metioning that the
+   * and $\alpha = \alpha_{n,0}/h_n$. It is worth mentioning that the
    * scalar $\alpha$ changes whenever the step size or method order
    * changes.
    *
@@ -371,7 +371,7 @@ namespace SUNDIALS
        * whenever the content of `prm` is updated.
        *
        * Make sure that this class lives longer than `prm`. Undefined behaviour
-       * will occurr if you destroy this class, and then parse a parameter file
+       * will occur if you destroy this class, and then parse a parameter file
        * using `prm`.
        */
       void add_parameters(ParameterHandler &prm)
@@ -499,7 +499,7 @@ namespace SUNDIALS
        * construction time.
        *
        * Notice that you could in principle use this capabilities to solve for
-       * stady state problems by setting y_dot to zero, and asking to compute
+       * steady state problems by setting y_dot to zero, and asking to compute
        * $y(0)$ that satisfies $F(0, y(0), 0) = 0$, however the nonlinear solver
        * used inside IDA may not be robust enough for complex problems with
        * several millions unknowns.
@@ -638,7 +638,7 @@ namespace SUNDIALS
      * \f]
      *
      * If the user uses a matrix based computation of the Jacobian, than this
-     * is the right place where an assembly routine shoulde be called to
+     * is the right place where an assembly routine should be called to
      * assemble both a matrix and a preconditioner for the Jacobian system.
      * Subsequent calls (possibly more than one) to solve_jacobian_system() can
      * assume that this function has been called at least once.
@@ -667,7 +667,7 @@ namespace SUNDIALS
      * amount of times. If convergence can be achieved without updating the
      * Jacobian, then IDA does not call setup_jacobian() again. If, on the
      * contrary, internal IDA convergence tests fail, then IDA calls again
-     * setup_jacobian() with updated vectors and coefficents so that successive
+     * setup_jacobian() with updated vectors and coefficients so that successive
      * calls to solve_jacobian_systems() lead to better convergence in the
      * Newton process.
      *
@@ -678,8 +678,8 @@ namespace SUNDIALS
      * \f]
      *
      * A call to this function should store in `dst` the result of $J^{-1}$
-     * applied to `src`, i.e., `J*dst = src`. It is the users responsability to
-     * set up proper solvers and preconditioners inside this function.
+     * applied to `src`, i.e., `J*dst = src`. It is the users responsibility
+     * to set up proper solvers and preconditioners inside this function.
      *
      * This function should return:
      * - 0: Success
@@ -710,7 +710,7 @@ namespace SUNDIALS
                         const unsigned int step_number)> output_step;
 
     /**
-     * Evaluate wether the solver should be restarted (for example because the
+     * Evaluate whether the solver should be restarted (for example because the
      * number of degrees of freedom has changed).
      *
      * This function is supposed to perform all operations that are necessary in
@@ -733,7 +733,7 @@ namespace SUNDIALS
      * Return an index set containing the differential components.
      * Implementation of this function is optional. The default is to return a
      * complete index set. If your equation is also algebraic (i.e., it
-     * contains algebraic constraints, or lagrange multipliers), you should
+     * contains algebraic constraints, or Lagrange multipliers), you should
      * overwrite this function in order to return only the differential
      * components of your system.
      */

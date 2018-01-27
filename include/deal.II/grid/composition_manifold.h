@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  * the embedding space of the second ChartManifold. If the first
  * ChartManifold is periodic, so is the resulting ChartManifold, with
  * the same periodicity. Periodicity on the second ChartManifold is not
- * allowed, and the constructor will throw an axception if the second
+ * allowed, and the constructor will throw an exception if the second
  * Manifold is periodic.
  *
  * This class only works for dim <= chartdim <= intermediate_spacedim
@@ -88,7 +88,7 @@ public:
   /**
    * Push forward the chartdim dimensional point to a spacedim
    * Euclidean point. The function calls first the push_forward() of
-   * F, and then the push_foward() of G.
+   * F, and then the push_forward() of G.
    */
   virtual
   Point<spacedim>

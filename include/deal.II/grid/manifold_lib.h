@@ -144,7 +144,7 @@ private:
  * with a straight line in polar coordinates would take the long road
  * around the globe, without passing through the north pole.
  *
- * These two points would be connented (using a PolarManifold) by the curve
+ * These two points would be connected (using a PolarManifold) by the curve
  * @f{align*}{
  *   s: [0,1]  & \rightarrow &  \mathbb S^3 \\
  *           t & \mapsto     &  (1,\pi/3,0) + (0,0,t\pi)

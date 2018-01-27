@@ -446,7 +446,7 @@ namespace IteratorFilters
  * Since one often only has some iterator and wants to set a filtered iterator
  * to the first one that satisfies a predicate (for example, the first one for
  * which the user flag is set, or the first one with a given subdomain id),
- * there are assignement functions #set_to_next_positive and
+ * there are assignment functions #set_to_next_positive and
  * #set_to_previous_positive that assign the next or last previous iterator
  * that satisfies the predicate, i.e. they follow the list of iterators in
  * either direction until they find a matching one (or the past-the-end
@@ -518,7 +518,7 @@ public:
 
   /**
    * Constructor. Set the iterator to the default state and use the given
-   * predicate for filtering subsequent assignement and iteration.
+   * predicate for filtering subsequent assignment and iteration.
    */
   template <typename Predicate>
   FilteredIterator (Predicate p);
@@ -777,7 +777,7 @@ namespace internal
 {
   namespace FilteredIterator
   {
-    // The following classes create a nested sequencee of
+    // The following classes create a nested sequence of
     // FilteredIterator<FilteredIterator<...<BaseIterator>...>> with as many
     // levels of FilteredIterator classes as there are elements in the TypeList
     // if the latter is given as a std::tuple<Args...>.

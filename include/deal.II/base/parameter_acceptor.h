@@ -367,7 +367,7 @@ public:
    * selected using the extensions of the files themselves. This can be either
    * `prm` or `xml` for input, and `prm`, `xml`, or `tex/latex` for output. If
    * the output format is `prm`, then `output_style_for_prm_format` is used to
-   * decide wether we write the full documentation as well, or only the
+   * decide whether we write the full documentation as well, or only the
    * parameters.
    *
    * If the input file does not exist, a default one with the same name is created
@@ -534,4 +534,3 @@ void ParameterAcceptor::add_parameter(const std::string &entry,
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

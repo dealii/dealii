@@ -444,7 +444,7 @@ namespace parallel
       unsigned int offset;
 
       /**
-       * A pointer to the CellDataStorage class whose data will be transfered.
+       * A pointer to the CellDataStorage class whose data will be transferred.
        */
       CellDataStorage<CellIteratorType,DataType> *data_storage;
 
@@ -578,7 +578,7 @@ CellDataStorage<CellIteratorType,DataType>::get_data(const CellIteratorType &cel
   Assert(it != map.end(), ExcMessage("Could not find QP data for the cell"));
 
   // Cast base class to the desired class. This has to be done irrespectively of
-  // T==DataType as we need to return shapred_ptr<const T> to make sure the user
+  // T==DataType as we need to return shared_ptr<const T> to make sure the user
   // does not modify the content of QP objects
   std::vector<std::shared_ptr<const T>> res (it->second.size());
   for (unsigned int q = 0; q < res.size(); q++)

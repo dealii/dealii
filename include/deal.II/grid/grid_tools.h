@@ -640,7 +640,7 @@ namespace GridTools
    * If @p points[a] and @p points[b] are the only two points that fall in @p cells[c],
    * then @p qpoints[c][0] and @p qpoints[c][1] are the reference positions of
    * @p points[a] and @p points[b] in @p cells[c], and @p indices[c][0] = a,
-   * @p indices[c][1] = b. The function Mapping::tansform_unit_to_real(qpoints[c][0])
+   * @p indices[c][1] = b. The function Mapping::transform_unit_to_real(qpoints[c][0])
    * returns @p points[a].
    *
    * The algorithm assumes it's easier to look for a point in the cell that was used previously.
@@ -853,7 +853,7 @@ namespace GridTools
    * GridTools::find_cells_adjacent_to_vertex(). Lastly, for each of these cells, the
    * function tests whether the point is inside. This check is performed using
    * the given @p mapping argument to determine whether cells have straight
-   * or curved boundarys, and if the latter then how exactly they are curved.
+   * or curved boundaries, and if the latter then how exactly they are curved.
    *
    * If a point lies on the boundary of two or more cells, then the algorithm
    * tries to identify the cell that is of highest refinement level.
@@ -1174,7 +1174,7 @@ namespace GridTools
    * If the minimal distance between the enclosing sphere of the an
    * active cell and the enclosing sphere of any of the cells for which
    * the @p predicate returns @p true is less than @p layer_thickness,
-   * then the active cell is an \a active_cell_wthin_distance.
+   * then the active cell is an \a active_cell_within_distance.
    * @return A list of active cells within a given geometric distance
    * @p layer_thickness from the set of active cells for which the @p predicate
    * returns @p true.
@@ -1937,7 +1937,7 @@ namespace GridTools
      * valued DoFs of the first face should be modified prior to constraining
      * to the DoFs of the second face.
      *
-     * The rotation matrix is used in DoFTools::make_periodicity_constriants()
+     * The rotation matrix is used in DoFTools::make_periodicity_constraints()
      * by applying the rotation to all vector valued blocks listed in the
      * parameter @p first_vector_components of the finite element space. For
      * more details see DoFTools::make_periodicity_constraints() and the
@@ -2055,7 +2055,7 @@ namespace GridTools
    * see the documentation of orthogonal_equality() for further details.
    *
    * The @p direction refers to the space direction in which periodicity is
-   * enforced. When maching periodic faces this vector component is ignored.
+   * enforced. When matching periodic faces this vector component is ignored.
    *
    * The @p offset is a vector tangential to the faces that is added to the
    * location of vertices of the 'first' boundary when attempting to match
@@ -2286,7 +2286,7 @@ namespace GridTools
    * DoFAccessor::set_active_fe_index() on ghost cells. Rather, the
    * @p unpack function directly accesses internal data structures. But
    * you get the idea -- the code could, just as well, have exchanged
-   * material ids, user indices, boundary indictors, or any kind of other
+   * material ids, user indices, boundary indicators, or any kind of other
    * data with similar calls as the ones above.)
    */
   template <typename DataType, typename MeshType>

@@ -4126,7 +4126,7 @@ namespace VectorTools
             }
 
           // Create the system matrix by multiplying the assembling matrix
-          // with its transposed and the right hand side vector by mutliplying
+          // with its transposed and the right hand side vector by multiplying
           // the assembling matrix with the assembling vector.  Invert the
           // system matrix.
           assembling_matrix.mTmult (cell_matrix, assembling_matrix);
@@ -5172,7 +5172,7 @@ namespace VectorTools
           // Project the boundary function onto the shape functions for this face
           // and set up a linear system of equations to get the values for the DoFs
           // associated with this face. We also must include the residuals from the
-          // shape funcations associated with edges.
+          // shape functions associated with edges.
           Tensor<1, dim> tmp;
           Tensor<1, dim> cross_product_i;
           Tensor<1, dim> cross_product_j;
@@ -5578,7 +5578,7 @@ namespace VectorTools
      const std::vector<DerivativeForm<1,2,2> > &jacobians,
      ConstraintMatrix                          &constraints)
     {
-      // Compute the intergral over the product of the normal components of
+      // Compute the integral over the product of the normal components of
       // the boundary function times the normal components of the shape
       // functions supported on the boundary.
       const FEValuesExtractors::Vector vec (first_vector_component);
@@ -6944,7 +6944,7 @@ namespace VectorTools
       double mean_to_double(const std::complex<number> &mean_value)
       {
         // we need to return double as a norm, but mean value is a complex
-        // number. Panick and return real-part while warning the user that
+        // number. Panic and return real-part while warning the user that
         // he shall never do that.
         Assert ( false, ExcMessage("Mean value norm is not implemented for complex-valued vectors") );
         return mean_value.real();
