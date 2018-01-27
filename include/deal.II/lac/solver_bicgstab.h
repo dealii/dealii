@@ -30,6 +30,54 @@ DEAL_II_NAMESPACE_OPEN
 /*!@addtogroup Solvers */
 /*@{*/
 
+namespace internal
+{
+  /**
+   * Class containing the non-parameter non-template values used by the
+   * SolverBicgstab class.
+   */
+  class SolverBicgstabData
+  {
+  protected:
+    /**
+     * Auxiliary value.
+     */
+    double alpha;
+    /**
+     * Auxiliary value.
+     */
+    double beta;
+    /**
+     * Auxiliary value.
+     */
+    double omega;
+    /**
+     * Auxiliary value.
+     */
+    double rho;
+    /**
+     * Auxiliary value.
+     */
+    double rhobar;
+
+    /**
+     * Current iteration step.
+     */
+    unsigned int step;
+
+    /**
+     * Residual.
+     */
+    double res;
+
+    /**
+     * Default constructor. This is protected so that only SolverBicgstab can
+     * create instances.
+     */
+    SolverBicgstabData();
+  };
+}
+
 /**
  * Bicgstab algorithm by van der Vorst.
  *
@@ -70,7 +118,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  */
 template <typename VectorType = Vector<double> >
-class SolverBicgstab : public Solver<VectorType>
+class SolverBicgstab : public Solver<VectorType>,
+  protected internal::SolverBicgstabData
 {
 public:
   /**
@@ -138,6 +187,51 @@ public:
 
 protected:
   /**
+   * Auxiliary vector.
+   */
+  VectorType *Vx;
+
+  /**
+   * Auxiliary vector.
+   */
+  typename VectorMemory<VectorType>::Pointer Vr;
+
+  /**
+   * Auxiliary vector.
+   */
+  typename VectorMemory<VectorType>::Pointer Vrbar;
+
+  /**
+   * Auxiliary vector.
+   */
+  typename VectorMemory<VectorType>::Pointer Vp;
+
+  /**
+   * Auxiliary vector.
+   */
+  typename VectorMemory<VectorType>::Pointer Vy;
+
+  /**
+   * Auxiliary vector.
+   */
+  typename VectorMemory<VectorType>::Pointer Vz;
+
+  /**
+   * Auxiliary vector.
+   */
+  typename VectorMemory<VectorType>::Pointer Vt;
+
+  /**
+   * Auxiliary vector.
+   */
+  typename VectorMemory<VectorType>::Pointer Vv;
+
+  /**
+   * Right hand side vector.
+   */
+  const VectorType *Vb;
+
+  /**
    * Computation of the stopping criterion.
    */
   template <typename MatrixType>
@@ -152,74 +246,6 @@ protected:
                              const VectorType   &x,
                              const VectorType   &r,
                              const VectorType   &d) const;
-
-  /**
-   * Auxiliary vector.
-   */
-  VectorType *Vx;
-  /**
-   * Auxiliary vector.
-   */
-  typename VectorMemory<VectorType>::Pointer Vr;
-  /**
-   * Auxiliary vector.
-   */
-  typename VectorMemory<VectorType>::Pointer Vrbar;
-  /**
-   * Auxiliary vector.
-   */
-  typename VectorMemory<VectorType>::Pointer Vp;
-  /**
-   * Auxiliary vector.
-   */
-  typename VectorMemory<VectorType>::Pointer Vy;
-  /**
-   * Auxiliary vector.
-   */
-  typename VectorMemory<VectorType>::Pointer Vz;
-  /**
-   * Auxiliary vector.
-   */
-  typename VectorMemory<VectorType>::Pointer Vt;
-  /**
-   * Auxiliary vector.
-   */
-  typename VectorMemory<VectorType>::Pointer Vv;
-  /**
-   * Right hand side vector.
-   */
-  const VectorType *Vb;
-
-  /**
-   * Auxiliary value.
-   */
-  double alpha;
-  /**
-   * Auxiliary value.
-   */
-  double beta;
-  /**
-   * Auxiliary value.
-   */
-  double omega;
-  /**
-   * Auxiliary value.
-   */
-  double rho;
-  /**
-   * Auxiliary value.
-   */
-  double rhobar;
-
-  /**
-   * Current iteration step.
-   */
-  unsigned int step;
-
-  /**
-   * Residual.
-   */
-  double res;
 
   /**
    * Additional parameters.
@@ -280,12 +306,28 @@ SolverBicgstab<VectorType>::IterationResult::IterationResult
 {}
 
 
+
+internal::SolverBicgstabData::SolverBicgstabData ()
+  :
+  alpha(0.),
+  beta(0.),
+  omega(0.),
+  rho(0.),
+  rhobar(0.),
+  step(numbers::invalid_unsigned_int),
+  res(numbers::signaling_nan<double>())
+{}
+
+
+
 template <typename VectorType>
 SolverBicgstab<VectorType>::SolverBicgstab (SolverControl            &cn,
                                             VectorMemory<VectorType> &mem,
                                             const AdditionalData     &data)
   :
   Solver<VectorType>(cn,mem),
+  Vx (nullptr),
+  Vb (nullptr),
   additional_data(data)
 {}
 
@@ -296,13 +338,8 @@ SolverBicgstab<VectorType>::SolverBicgstab (SolverControl        &cn,
                                             const AdditionalData &data)
   :
   Solver<VectorType>(cn),
-  alpha(0.),
-  beta(0.),
-  omega(0.),
-  rho(0.),
-  rhobar(0.),
-  step(numbers::invalid_unsigned_int),
-  res(numbers::signaling_nan<double>()),
+  Vx (nullptr),
+  Vb (nullptr),
   additional_data(data)
 {}
 

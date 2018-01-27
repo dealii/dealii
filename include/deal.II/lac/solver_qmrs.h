@@ -197,7 +197,6 @@ protected:
   AdditionalData additional_data;
 
 private:
-
   /**
    * A structure returned by the iterate() function representing what it found
    * is happening during the iteration.
@@ -238,31 +237,35 @@ private:
 
 #ifndef DOXYGEN
 
+
 template <class VectorType>
 SolverQMRS<VectorType>::IterationResult::IterationResult (const SolverControl::State state,
                                                           const double last_residual)
   :
   state (state),
   last_residual (last_residual)
-{
-}
+{}
+
+
 
 template <class VectorType>
-SolverQMRS<VectorType>::SolverQMRS (SolverControl &cn,
+SolverQMRS<VectorType>::SolverQMRS (SolverControl            &cn,
                                     VectorMemory<VectorType> &mem,
-                                    const AdditionalData &data)
+                                    const AdditionalData     &data)
   :
   Solver<VectorType> (cn, mem),
-  additional_data (data)
+  additional_data (data),
+  step (0)
 {
 }
 
 template <class VectorType>
-SolverQMRS<VectorType>::SolverQMRS (SolverControl &cn,
+SolverQMRS<VectorType>::SolverQMRS (SolverControl        &cn,
                                     const AdditionalData &data)
   :
   Solver<VectorType> (cn),
-  additional_data (data)
+  additional_data (data),
+  step (0)
 {
 }
 
