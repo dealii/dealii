@@ -1625,7 +1625,7 @@ public:
   static const unsigned int space_dimension = spacedim;
 
   /**
-   * Dimensionality of the object that the thing represented by this accessopr
+   * Dimensionality of the object that the thing represented by this accessor
    * is part of. For example, if this accessor represents a line that is part
    * of a hexahedron, then this value will be three.
    */
@@ -1770,7 +1770,7 @@ public:
   quad (const unsigned int i);
 
   /**
-   * Quad index of the @p ith quad bounding this object. Throws an excption.
+   * Quad index of the @p ith quad bounding this object. Throws an exception.
    */
   static unsigned int quad_index (const unsigned int i);
 
@@ -2326,7 +2326,7 @@ public:
    * <tt>boundary_id()</tt> function.
    *
    * @warning You should never set the boundary indicator of an interior face
-   * (a face not at the boundary of the domain), or set set the boundary
+   * (a face not at the boundary of the domain), or set the boundary
    * indicator of an exterior face to numbers::internal_face_boundary_id (this
    * value is reserved for another purpose). Algorithms may not work or
    * produce very confusing results if boundary cells have a boundary

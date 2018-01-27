@@ -95,7 +95,7 @@ namespace hp
     FECollection (FECollection<dim,spacedim> &&fe_collection) = default;
 
     /**
-     * Move assignement operator.
+     * Move assignment operator.
      */
     FECollection<dim, spacedim> &
     operator= (FECollection<dim,spacedim> &&fe_collection) = default;

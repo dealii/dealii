@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
  * thesis of Sabine Zaglmayr.
  *
  * This class was written based upon the existing deal.II Legendre class as a
- * base, but with the coefficents adjusted so that the recursive formula is for
+ * base, but with the coefficients adjusted so that the recursive formula is for
  * the integrated Legendre polynomials described in the PhD thesis of Sabine
  * Zaglmayr. The polynomials can be generated recursively from:
  *

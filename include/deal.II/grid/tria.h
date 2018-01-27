@@ -876,7 +876,7 @@ namespace internal
  * load_refine_flags functions. Normally, the code will look like this:
  *   @code
  *     // open output file
- *     ofstream history("mesh.history");
+ *     std::ofstream history("mesh.history");
  *     // do 10 refinement steps
  *     for (unsigned int step=0; step<10; ++step)
  *       {
@@ -891,7 +891,7 @@ namespace internal
  * If you want to re-create the grid from the stored information, you write:
  *   @code
  *     // open input file
- *     ifstream history("mesh.history");
+ *     std::ifstream history("mesh.history");
  *     // do 10 refinement steps
  *     for (unsigned int step=0; step<10; ++step)
  *       {

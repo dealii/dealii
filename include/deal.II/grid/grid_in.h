@@ -474,7 +474,7 @@ public:
    * duplicated vertices will be removed if their distance is lower
    * than @p tol.
    *
-   * Only the elements compatible with the given dimension and spacedimension
+   * Only the elements compatible with the given dimension and space dimension
    * will be extracted from the mesh, and only those elements that are
    * compatible with deal.II are supported. If you set
    * `ignore_unsupported_element_types`, all the other element types are simply
@@ -483,7 +483,7 @@ public:
    * extracted. The resulting mesh (as represented in the Triangulation object)
    * may not make any sense if you are mixing compatible and incompatible
    * element types. If `ignore_unsupported_element_types` is set to `false`,
-   * then an exception is thrown when an unsupporte type is encountered.
+   * then an exception is thrown when an unsupported type is encountered.
    *
    * @param filename The file to read from
    * @param mesh_index Index of the mesh within the file

@@ -196,7 +196,7 @@ namespace Utilities
 
 
   /**
-   * Specializatin of split_string_list() for the case where the delimiter
+   * Specialization of split_string_list() for the case where the delimiter
    * is a single char.
    */
   std::vector<std::string>

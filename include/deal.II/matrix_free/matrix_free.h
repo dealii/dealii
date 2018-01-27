@@ -535,7 +535,7 @@ public:
    * @ref GlossLocallyRelevantDof "locally relevant DoFs".
    * The selection of DoFs is such that one can read all degrees of freedom on all
    * locally relevant elements (locally active) plus the degrees of freedom
-   * that contraints expand into from the locally owned cells. However, not
+   * that constraints expand into from the locally owned cells. However, not
    * all locally relevant DoFs are stored because most of them would never be
    * accessed in matrix-vector products and result in too much data sent
    * around which impacts the performance.
@@ -559,7 +559,7 @@ public:
    * @ref GlossLocallyRelevantDof "locally relevant DoFs".
    * The selection of DoFs is such that one can read all degrees of freedom on all
    * locally relevant elements (locally active) plus the degrees of freedom
-   * that contraints expand into from the locally owned cells. However, not
+   * that constraints expand into from the locally owned cells. However, not
    * all locally relevant DoFs are stored because most of them would never be
    * accessed in matrix-vector products and result in too much data sent
    * around which impacts the performance.

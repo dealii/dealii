@@ -171,7 +171,7 @@ namespace SUNDIALS
    *
    * Specifying residual() allows the user to use Newton strategies (i.e.,
    * $F(u)=0$ will be solved), while specifying iteration_function(), fixed
-   * point iteration or Pircard iteration will be used (i.e., $G(u)=u$ will be
+   * point iteration or Picard iteration will be used (i.e., $G(u)=u$ will be
    * solved).
    *
    * If the use of a Newton method is desired, then the user should also supply
@@ -555,7 +555,7 @@ namespace SUNDIALS
      * amount of times. If convergence can be achieved without updating the
      * Jacobian, then KINSOL does not call setup_jacobian() again. If, on the
      * contrary, internal KINSOL convergence tests fail, then KINSOL calls
-     * again setup_jacobian() with updated vectors and coefficents so that
+     * again setup_jacobian() with updated vectors and coefficients so that
      * successive calls to solve_jacobian_systems() lead to better convergence
      * in the Newton process.
      *
@@ -564,8 +564,8 @@ namespace SUNDIALS
      * converge, or may converge very slowly.
      *
      * A call to this function should store in `dst` the result of $J^{-1}$
-     * applied to `src`, i.e., `J*dst = src`. It is the users responsability to
-     * set up proper solvers and preconditioners inside this function.
+     * applied to `src`, i.e., `J*dst = src`. It is the users responsibility
+     * to set up proper solvers and preconditioners inside this function.
      *
      *
      * Arguments to the function are

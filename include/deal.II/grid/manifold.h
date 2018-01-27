@@ -204,7 +204,7 @@ namespace Manifolds
  * intermediate points. Internally the
  * Manifold::get_intermediate_point() calls the
  * Manifold::project_to_manifold() function after computing the convex
- * conbination of the given points.  This allows derived classes to
+ * combination of the given points.  This allows derived classes to
  * only overload Manifold::project_to_manifold() for simple
  * situations. This is often useful when describing manifolds that are
  * embedded in higher dimensional space, e.g., the surface of a
@@ -286,7 +286,7 @@ namespace Manifolds
  * and $\mathbf x_2$, with weights $w_1$ and $w_2=1-w_1$, simply
  * requires computing the point $\mathbf s(w_1)$. Computing a new
  * point as a weighted average of more than two points can be done
- * by considering pairwise geodetics, finding suitable points on
+ * by considering pairwise geodesics, finding suitable points on
  * the geodetic between the first two points, then on the geodetic
  * between this new point and the third given point, etc.
  *
@@ -555,7 +555,7 @@ public:
    * $\mathbf s'(0) \approx \frac{\mathbf s(\epsilon)-\mathbf x_1}{\epsilon}$
    * for a small value of $\epsilon$, and the evaluation of $\mathbf s(\epsilon)$
    * is done by calling get_new_point(). If possible, derived classes should
-   * override this function by an implemention of the exact derivative.
+   * override this function by an implementation of the exact derivative.
    *
    * @param x1 The first point that describes the geodesic, and the one
    *   at which the "direction" is to be evaluated.

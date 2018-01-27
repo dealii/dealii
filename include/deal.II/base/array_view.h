@@ -177,7 +177,7 @@ public:
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
    * equal if they have the same size and the same starting pointer.
-   * This version always comapres with the non-const value_type.
+   * This version always compares with the non-const value_type.
    */
   bool operator !=
   (const ArrayView<typename std::remove_cv<value_type>::type> &other_view) const;

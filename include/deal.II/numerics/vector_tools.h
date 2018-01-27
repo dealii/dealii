@@ -1473,7 +1473,7 @@ namespace VectorTools
    * 3D this is done in two stages, edges first and then faces.
    *
    * For each cell, each edge, $e$, is projected by solving the linear system
-   * $Ax=b$ where $x$ is the vector of contraints on degrees of freedom on the
+   * $Ax=b$ where $x$ is the vector of constraints on degrees of freedom on the
    * edge and
    *
    * $A_{ij} = \int_{e} (\vec{s}_{i}\cdot\vec{t})(\vec{s}_{j}\cdot\vec{t}) dS$
