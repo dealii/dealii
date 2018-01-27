@@ -1138,9 +1138,13 @@ namespace DoFRenumbering
    * Renumber the degrees of freedom such that they are associated with the
    * subdomain id of the cells they are living on, i.e. first all degrees of
    * freedom that belong to cells with subdomain zero, then all with subdomain
-   * one, etc. This is useful when doing parallel computations after assigning
-   * subdomain ids using a partitioner (see the
-   * GridTools::partition_triangulation function for this).
+   * one, etc. This is useful when doing parallel computations with a standard
+   * Triangulation after assigning subdomain ids using a partitioner (see the
+   * GridTools::partition_triangulation function for this). Calling this
+   * function is unnecessary when using a parallel::shared::Triangulation or
+   * parallel::distributed::Triangulation, as the degrees of freedom are
+   * already enumerated according to the MPI process id. Therefore, if the
+   * underlying triangulation is of this type then an error will be thrown.
    *
    * Note that degrees of freedom associated with faces, edges, and vertices
    * may be associated with multiple subdomains if they are sitting on
