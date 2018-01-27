@@ -56,11 +56,6 @@ struct SynchronousIterators
   SynchronousIterators (const Iterators &i);
 
   /**
-   * Copy constructor.
-   */
-  SynchronousIterators (const SynchronousIterators &i);
-
-  /**
    * Dereference const operator. Returns a const reference to the iterators
    * represented by the current class.
    */
@@ -87,15 +82,6 @@ SynchronousIterators<Iterators>::
 SynchronousIterators (const Iterators &i)
   :
   iterators (i)
-{}
-
-
-template <typename Iterators>
-inline
-SynchronousIterators<Iterators>::
-SynchronousIterators (const SynchronousIterators &i)
-  :
-  iterators (i.iterators)
 {}
 
 
