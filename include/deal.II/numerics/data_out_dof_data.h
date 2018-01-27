@@ -1016,7 +1016,7 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
 merge_patches (const DataOut_DoFData<DoFHandlerType2,patch_dim,patch_space_dim> &source,
                const Point<patch_space_dim> &shift)
 {
-  const std::vector<Patch> source_patches = source.get_patches ();
+  const std::vector<Patch> &source_patches = source.get_patches ();
   Assert ((patches.size () != 0) &&
           (source_patches.size () != 0),
           ExcMessage ("When calling this function, both the current "
