@@ -2031,6 +2031,9 @@ namespace DoFRenumbering
   void
   subdomain_wise (DoFHandlerType &dof_handler)
   {
+    Assert((!dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*> (&dof_handler.get_triangulation())),
+           ExcMessage("Parallel triangulations are already enumerated according to their MPI process id."));
+
     std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(),
                                                      numbers::invalid_dof_index);
     compute_subdomain_wise(renumbering, dof_handler);
