@@ -63,7 +63,9 @@ namespace SparsityTools
       // Make sure that METIS is actually
       // installed and detected
 #ifndef DEAL_II_WITH_METIS
-      (void)sparsity_pattern;
+      (void) sparsity_pattern;
+      (void) n_partitions;
+      (void) partition_indices;
       AssertThrow (false, ExcMETISNotInstalled());
 #else
 
