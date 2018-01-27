@@ -429,13 +429,37 @@ namespace internal
 {
   namespace ArrayViewHelper
   {
-    template<class Iterator>
+    /**
+     * Return whether the objects one gets by dereferencing the
+     * iterators within the given iterator range form a contiguous
+     * range in memory.
+     */
+    template <class Iterator>
     bool is_contiguous(const Iterator &first, const Iterator &last)
     {
       const auto n = std::distance(first, last);
       for (typename std::decay<decltype(n)>::type i = 0; i < n; ++i)
         if (*(std::next(first, i)) != *(std::next(std::addressof(*first), i)))
           return false;
+      return true;
+    }
+
+
+    /**
+     * Return whether the objects one gets by dereferencing the
+     * iterators within the given iterator range form a contiguous
+     * range in memory.
+     *
+     * This specialization for (@p const or non-@p const) pointers
+     * returns @p true unconditionally since the fact that objects
+     * pointed to by pointers are contiguous is embedded in the memory
+     * model of C++.
+     */
+    template <class T>
+    constexpr
+    bool is_contiguous(T *,
+                       T *)
+    {
       return true;
     }
   }
