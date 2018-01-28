@@ -61,11 +61,6 @@ namespace hp
     explicit QCollection (const Quadrature<dim> &quadrature);
 
     /**
-     * Copy constructor.
-     */
-    QCollection (const QCollection<dim> &q_collection);
-
-    /**
      * Adds a new quadrature rule to the QCollection. In most cases, you will
      * want to add quadrature rules in the same order as the elements were
      * added to the hp::FECollection for which this quadrature rule collection is
@@ -183,28 +178,6 @@ namespace hp
     quadratures
     .push_back (std::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(quadrature)));
   }
-
-
-
-  template <int dim>
-  inline
-  QCollection<dim>::
-  QCollection (const QCollection<dim> &q_collection)
-    :
-    Subscriptor (),
-    // copy the array
-    // of shared
-    // pointers. nothing
-    // bad should
-    // happen -- they
-    // simply all point
-    // to the same
-    // objects, and the
-    // last one to die
-    // will delete the
-    // mappings
-    quadratures (q_collection.quadratures)
-  {}
 
 
 

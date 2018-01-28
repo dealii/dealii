@@ -152,7 +152,8 @@ SolverMinRes<VectorType>::SolverMinRes (SolverControl            &cn,
                                         VectorMemory<VectorType> &mem,
                                         const AdditionalData &)
   :
-  Solver<VectorType>(cn,mem)
+  Solver<VectorType>(cn,mem),
+  res2(numbers::signaling_nan<double>())
 {}
 
 

@@ -268,7 +268,6 @@ compute_quadrature_weights(const std::vector<long double> &x,
 {
   const unsigned int q = x.size();
   std::vector<long double> w(q);
-  long double s = 0.L;
 
   const long double factor = std::pow(2., alpha+beta+1) *
                              gamma(alpha+q) *
@@ -276,7 +275,7 @@ compute_quadrature_weights(const std::vector<long double> &x,
                              ((q-1)*gamma(q)*gamma(alpha+beta+q+1));
   for (unsigned int i=0; i<q; ++i)
     {
-      s = JacobiP(x[i], alpha, beta, q-1);
+      const long double s = JacobiP(x[i], alpha, beta, q-1);
       w[i] = factor/(s*s);
     }
   w[0]   *= (beta + 1);

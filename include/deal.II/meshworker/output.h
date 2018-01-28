@@ -159,6 +159,8 @@ namespace MeshWorker
     inline
     GnuplotPatch::GnuplotPatch()
       :
+      n_vectors(numbers::invalid_unsigned_int),
+      n_points(numbers::invalid_unsigned_int),
       os(nullptr)
     {}
 

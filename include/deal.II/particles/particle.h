@@ -347,7 +347,7 @@ namespace Particles
   void Particle<dim,spacedim>::save (Archive &ar, const unsigned int) const
   {
     unsigned int n_properties = 0;
-    if ((property_pool != NULL) && (properties != PropertyPool::invalid_handle))
+    if ((property_pool != nullptr) && (properties != PropertyPool::invalid_handle))
       n_properties = get_properties().size();
 
     ar &location
