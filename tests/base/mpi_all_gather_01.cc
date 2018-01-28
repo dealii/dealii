@@ -18,7 +18,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/point.h>
-#include <deal.II/base/mpi.templates.h>
+#include <deal.II/base/mpi.h>
 #include <vector>
 
 int main(int argc, char *argv[])
