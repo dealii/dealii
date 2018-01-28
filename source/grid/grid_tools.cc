@@ -128,10 +128,11 @@ namespace GridTools
           const Mapping<dim,spacedim> &mapping)
   {
     // get the degree of the mapping if possible. if not, just assume 1
-    const unsigned int mapping_degree
-      = (dynamic_cast<const MappingQ<dim,spacedim>*>(&mapping) != nullptr ?
-         dynamic_cast<const MappingQ<dim,spacedim>*>(&mapping)->get_degree() :
-         1);
+    unsigned int mapping_degree = 1;
+    if (const auto *p = dynamic_cast<const MappingQGeneric<dim,spacedim>*>(&mapping))
+      mapping_degree = p->get_degree();
+    else if (const auto *p = dynamic_cast<const MappingQ<dim,spacedim>*>(&mapping))
+      mapping_degree = p->get_degree();
 
     // then initialize an appropriate quadrature formula
     const QGauss<dim> quadrature_formula (mapping_degree + 1);
