@@ -24,8 +24,7 @@
 #include <deal.II/base/point.h>
 #include <boost/serialization/utility.hpp>
 
-#include <tuple>
-#include <cstring>
+#include <array>
 
 struct X
 {
@@ -33,9 +32,9 @@ struct X
   int k;
   double d;
 
-  bool operator == (const X &x) const
+  bool operator != (const X &x) const
   {
-    return i==x.i && k==x.k && d==x.d;
+    return i!=x.i || k!=x.k || d!=x.d;
   }
 
   template <class Archive>
@@ -51,22 +50,34 @@ template <typename T>
 void check (const T &object)
 {
   const std::vector<char> buffer = Utilities::pack (object);
-  if (!(buffer.size() == sizeof(object))
-      ||
-      !(std::memcmp(buffer.data(), &object, buffer.size()) == 0)
-      ||
-      !(Utilities::unpack<T>(buffer) == object))
-    deallog << "Fail!" << std::endl;
+  if (buffer.size() != sizeof(object))
+    deallog << buffer.size() << " should be "
+            << sizeof(object) << "!" << std::endl;
+  else
+    deallog << "same size!" << std::endl;
+
+  if (std::memcmp(buffer.data(), &object, buffer.size()) != 0)
+    deallog << "std::memcmp failed!" << std::endl;
+  else
+    deallog << "std::memcmp passed!" << std::endl;
+
+  if (Utilities::unpack<T>(buffer) != object)
+    deallog << "Comparing the objects failed!" << std::endl;
+  else
+    deallog << "Comparing the objects passed!" << std::endl;
+
+  deallog << std::endl;
 }
 
 
 void test()
 {
-  check (std::make_pair(1, 3.14));
+  deallog << "std::array:" << std::endl;
+  check (std::array<int,3> {{1,2,3}});
+  deallog << "struct X:" << std::endl;
   check (X { 1, 2, 3.1415926 });
-  check (std::tuple<int,double,char> {1,1,1});
-
-  deallog << "OK!" << std::endl;
+  deallog << "double:" << std::endl;
+  check (1.);
 }
 
 int main()

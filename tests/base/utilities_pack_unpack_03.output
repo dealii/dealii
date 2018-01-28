@@ -1,2 +1,16 @@
 
-DEAL::OK!
+DEAL::std::array:
+DEAL::same size!
+DEAL::std::memcmp passed!
+DEAL::Comparing the objects passed!
+DEAL::
+DEAL::struct X:
+DEAL::same size!
+DEAL::std::memcmp passed!
+DEAL::Comparing the objects passed!
+DEAL::
+DEAL::double:
+DEAL::same size!
+DEAL::std::memcmp passed!
+DEAL::Comparing the objects passed!
+DEAL::
