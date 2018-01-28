@@ -15,37 +15,40 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector_memory.h>
+
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/shared_tria.h>
+
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping_q_generic.h>
+
+#include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
+#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/manifold.h>
+
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/filtered_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_tools.h>
-#include <deal.II/grid/filtered_iterator.h>
-#include <deal.II/grid/tria.h>
-#include <deal.II/distributed/tria.h>
-#include <deal.II/distributed/shared_tria.h>
-#include <deal.II/distributed/tria_base.h>
-#include <deal.II/grid/tria_accessor.h>
-#include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary.h>
-#include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_tools_cache.h>
-#include <deal.II/grid/grid_reordering.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/fe_nothing.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/fe/mapping_q.h>
-#include <deal.II/fe/fe_values.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/vector_memory.h>
+
 #include <deal.II/numerics/matrix_tools.h>
-#include <deal.II/lac/sparsity_tools.h>
 
 #include <boost/random/uniform_real_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
