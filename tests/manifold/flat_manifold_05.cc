@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//    Copyright (C) 2016 by the deal.II authors.
+//    Copyright (C) 2016 - 2017 by the deal.II authors.
 //
 //    This file is subject to LGPL and may not be  distributed
 //    without copyright and license information. Please refer
