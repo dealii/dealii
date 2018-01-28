@@ -1,0 +1,242 @@
+
+for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools \{
+
+    template
+    unsigned int
+    find_closest_vertex (const X &,
+                         const Point<deal_II_space_dimension> &,
+                         const std::vector<bool> &);
+
+    template
+    unsigned int
+    find_closest_vertex (const Mapping<deal_II_dimension, deal_II_space_dimension>&,
+                         const X &,
+                         const Point<deal_II_space_dimension> &,
+                         const std::vector<bool> &);
+
+    template
+    std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
+    find_cells_adjacent_to_vertex(const X &,
+                                  const unsigned int);
+
+    template
+    dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type
+    find_active_cell_around_point (const X &,
+                                   const Point<deal_II_space_dimension> &,
+                                   const std::vector<bool> &);
+
+    template
+    std::pair<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type, Point<deal_II_dimension> >
+    find_active_cell_around_point (const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+                                   const X &,
+                                   const Point<deal_II_space_dimension> &,
+                                   const std::vector<bool> &);
+
+    template
+    std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
+    compute_active_cell_halo_layer (const X &,
+                                    const std::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type&)> &);
+
+    template
+    std::vector<X::cell_iterator>
+    compute_cell_halo_layer_on_level (const X &,
+                                      const std::function<bool (const X::cell_iterator&)> &,
+                                      const unsigned int);
+
+    template
+    std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
+    compute_ghost_cell_halo_layer (const X &);
+
+
+    template
+    std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
+    compute_active_cell_layer_within_distance (const X &,
+            const std::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type&)> &,
+            const double);
+
+
+    template
+    std::vector<dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type>
+    compute_ghost_cell_layer_within_distance (const X &, const double);
+
+
+    template
+    std::pair< Point<X::space_dimension>, Point<X::space_dimension> >
+    compute_bounding_box (const X &,
+                          const std::function<bool (const dealii::internal::ActiveCellIterator<deal_II_dimension, deal_II_space_dimension, X>::type&)> &);
+
+
+    template
+    std::list<std::pair<X::cell_iterator, X::cell_iterator> >
+    get_finest_common_cells (const X &mesh_1,
+                             const X &mesh_2);
+
+
+    template
+    bool
+    have_same_coarse_mesh (const X &mesh_1,
+                           const X &mesh_2);
+    \}
+
+#endif
+}
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools \{
+
+        template
+        std::pair<hp::DoFHandler<deal_II_dimension, deal_II_space_dimension>::active_cell_iterator,
+                  Point<deal_II_dimension> >
+        find_active_cell_around_point
+        (const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension> &,
+         const hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+         const Point<deal_II_space_dimension> &);
+
+                       \}
+#endif
+}
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; Container : TRIANGULATION_AND_DOFHANDLER_TEMPLATES)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools \{
+
+    template
+    std::vector<Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator>
+    get_patch_around_cell<Container<deal_II_dimension,deal_II_space_dimension> >
+    (const Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator &cell);
+
+    template
+    std::vector< Container<deal_II_dimension,deal_II_space_dimension>::cell_iterator>
+    get_cells_at_coarsest_common_level <Container<deal_II_dimension,deal_II_space_dimension> > (
+        const std::vector< Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> & patch_cells);
+
+    template
+    void build_triangulation_from_patch <Container<deal_II_dimension,deal_II_space_dimension> > (
+        const std::vector<Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator>  &patch,
+        Triangulation<Container<deal_II_dimension,deal_II_space_dimension>::dimension,Container<deal_II_dimension,deal_II_space_dimension>::space_dimension> &local_triangulation,
+        std::map<Triangulation<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator,
+        Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator > &patch_to_global_tria_map);
+
+    \}
+#endif
+}
+
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; Container : DOFHANDLER_TEMPLATES)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools \{
+
+    template
+    std::map< types::global_dof_index,std::vector<Container<deal_II_dimension,deal_II_space_dimension>::active_cell_iterator> >
+    get_dof_to_support_patch_map<Container<deal_II_dimension,deal_II_space_dimension> >
+    (Container<deal_II_dimension,deal_II_space_dimension> &dof_handler);
+
+    \}
+#endif
+}
+
+
+
+// instantiate the following functions only for the "sequential" containers. this
+// is a misnomer here, however: the point is simply that we only instantiate
+// these functions for certain *iterator* types, and the iterator types are
+// the same for sequential and parallel containers; consequently, we get duplicate
+// instantiation errors if we instantiate for *all* container types, rather than
+// only the sequential ones
+for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools \{
+
+    template
+    bool orthogonal_equality<X::active_face_iterator> (std::bitset<3> &,
+            const X::active_face_iterator&,
+            const X::active_face_iterator&,
+            const int,
+            const Tensor<1,deal_II_space_dimension> &,
+            const FullMatrix<double> &);
+
+    template
+    bool orthogonal_equality<X::face_iterator> (std::bitset<3> &,
+            const X::face_iterator&,
+            const X::face_iterator&,
+            const int,
+            const Tensor<1,deal_II_space_dimension> &,
+            const FullMatrix<double> &);
+
+    template
+    bool orthogonal_equality<X::active_face_iterator> (const X::active_face_iterator&,
+            const X::active_face_iterator&,
+            const int,
+            const Tensor<1,deal_II_space_dimension> &,
+            const FullMatrix<double> &);
+
+    template
+    bool orthogonal_equality<X::face_iterator> (const X::face_iterator&,
+            const X::face_iterator&,
+            const int,
+            const Tensor<1,deal_II_space_dimension> &,
+            const FullMatrix<double> &);
+
+    template
+    void collect_periodic_faces<X> (const X &,
+                                    const types::boundary_id,
+                                    const types::boundary_id,
+                                    const int,
+                                    std::vector<PeriodicFacePair<X::cell_iterator> > &,
+                                    const Tensor<1,X::space_dimension> &,
+                                    const FullMatrix<double> &);
+
+    template
+    void collect_periodic_faces<X> (const X &,
+                                    const types::boundary_id,
+                                    const int,
+                                    std::vector<PeriodicFacePair<X::cell_iterator> > &,
+                                    const Tensor<1,X::space_dimension> &,
+                                    const FullMatrix<double> &);
+
+    \}
+#endif
+}
+
+// TODO the text above the last instantiation block implies that this should not be necessary... is it?
+for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
+{
+#if deal_II_dimension <= deal_II_space_dimension
+#if deal_II_dimension >= 2
+
+    namespace GridTools \{
+    template
+    void
+    collect_periodic_faces<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> >
+    (const parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+     const types::boundary_id,
+     const types::boundary_id,
+     const int,
+     std::vector<PeriodicFacePair<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator> > &,
+     const Tensor<1,parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::space_dimension> &,
+     const FullMatrix<double> &);
+
+    template
+    void
+    collect_periodic_faces<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> >
+    (const parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+     const types::boundary_id,
+     const int,
+     std::vector<PeriodicFacePair<parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::cell_iterator> > &,
+     const Tensor<1,parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>::space_dimension> &,
+     const FullMatrix<double> &);
+    \}
+#endif
+#endif
+}
