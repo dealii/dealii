@@ -63,6 +63,10 @@ SET(_unity_include_src
 SET(_separate_src
   fe_values.cc
   fe_values_inst2.cc
+  fe_values_inst3.cc
+  fe_values_inst4.cc
+  fe_values_inst5.cc
+  fe_values_inst6.cc
   mapping_fe_field.cc
   mapping_fe_field_inst2.cc
   fe_tools_interpolate.cc
