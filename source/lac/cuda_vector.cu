@@ -503,11 +503,10 @@ namespace LinearAlgebra
     template <typename Number>
     Vector<Number>::Vector(const size_type n)
       :
-      n_elements(n)
+      val(nullptr),
+      n_elements(0)
     {
-      // Allocate the memory
-      cudaError_t error_code = cudaMalloc(&val, n_elements*sizeof(Number));
-      AssertCuda(error_code);
+      reinit(n, false);
     }
 
 
@@ -542,7 +541,7 @@ namespace LinearAlgebra
         }
       else
         {
-          if (n_elements != n)
+          if ((n_elements != n) && (val != nullptr))
             {
               cudaError_t error_code = cudaFree(val);
               AssertCuda(error_code);
