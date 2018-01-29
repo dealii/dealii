@@ -22,6 +22,11 @@
 #include <string>
 #include <ostream>
 
+#ifdef DEAL_II_WITH_CUDA
+#include <cusparse.h>
+#endif
+
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -314,6 +319,13 @@ namespace deal_II_exceptions
                               const char       *cond,
                               const char       *exc_name,
                               ExceptionBase     e) noexcept;
+#ifdef DEAL_II_WITH_CUDA
+    /**
+     * Return a string given an error code. This is similar to the cudaGetErrorString
+     * function but there is no equivalent function for cuSPARSE.
+     */
+    std::string get_cusparse_error_string(const cusparseStatus_t error_code);
+#endif
   } /*namespace internals*/
 
 } /*namespace deal_II_exceptions*/
@@ -1131,6 +1143,13 @@ namespace StandardExceptions
   DeclException1 (ExcCudaError,
                   char *,
                   << arg1);
+  /**
+   * This exception is raised if an error happened in a cuSPARSE function.
+   */
+  DeclException1 (ExcCusparseError,
+                  std::string,
+                  << "There was an error in a cuSPARSE function: "
+                  << arg1);
 #endif
 //@}
 
@@ -1246,6 +1265,18 @@ namespace StandardExceptions
  */
 #define AssertCuda(error_code) Assert(error_code == cudaSuccess, \
                                       dealii::ExcCudaError(cudaGetErrorString(error_code)))
+
+/**
+ * An assertion that checks that the error code produced by calling a cuSPARSE
+ * routine is equal to CUSPARSE_STATUS_SUCCESS.
+ *
+ * @ingroup Exceptions
+ * @author Bruno Turcksin, 2018
+ */
+#define AssertCusparse(error_code) Assert(error_code == CUSPARSE_STATUS_SUCCESS, \
+                                          dealii::ExcCusparseError( \
+                                              dealii::deal_II_exceptions::internals:: \
+                                              get_cusparse_error_string(error_code)))
 #endif
 
 using namespace StandardExceptions;
