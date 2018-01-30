@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2017 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,10 +14,11 @@
 // ---------------------------------------------------------------------
 
 
-// Check MGTransferMatrixFree for high polynomial degrees beyond 10 by
-// checking a linear function that gets prolongated between the mesh
-// levels. Since the function is linear, it should be exactly represented on
-// the finest level. Then also look into the result of restriction
+// Similar to transfer_matrix_free_08 but using a system of equations: high
+// polynomial degrees beyond 10 that are compared against a linear function
+// that gets prolongated between the mesh levels. Since the function is
+// linear, it should be exactly represented on the finest level. Then also
+// look into the result of restriction
 
 #include "../tests.h"
 #include <deal.II/base/function_lib.h>
@@ -26,14 +27,16 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/numerics/vector_tools.h>
 
 
 template <int dim, typename Number>
-void check(const FiniteElement<dim> &fe)
+void check(const FiniteElement<dim> &fe_scalar)
 {
+  FESystem<dim> fe(fe_scalar, dim);
   deallog << "FE: " << fe.get_name() << std::endl;
 
   // run a few different sizes...
@@ -51,7 +54,7 @@ void check(const FiniteElement<dim> &fe)
     exponents_monomial[d] = 1;
   LinearAlgebra::distributed::Vector<double> vrefcoarse;
   vrefcoarse.reinit(dofcoarse.n_dofs());
-  VectorTools::interpolate(dofcoarse, Functions::Monomial<dim>(exponents_monomial), vrefcoarse);
+  VectorTools::interpolate(dofcoarse, Functions::Monomial<dim>(exponents_monomial, dim), vrefcoarse);
 
   deallog << "no. cells: " << tr.n_global_active_cells() << std::endl;
 
@@ -67,7 +70,7 @@ void check(const FiniteElement<dim> &fe)
   LinearAlgebra::distributed::Vector<Number> vref;
   AssertDimension(mgdof.n_dofs(tr.n_global_levels()-1), mgdof.n_dofs());
   vrefdouble.reinit(mgdof.n_dofs());
-  VectorTools::interpolate(mgdof, Functions::Monomial<dim>(exponents_monomial), vrefdouble);
+  VectorTools::interpolate(mgdof, Functions::Monomial<dim>(exponents_monomial, dim), vrefdouble);
 
   vref.reinit(mgdof.n_dofs());
   vref = vrefdouble;
