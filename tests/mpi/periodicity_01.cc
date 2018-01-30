@@ -147,6 +147,7 @@ namespace Step40
     //Periodic Conditions
     constraints.clear ();
     constraints.reinit (locally_relevant_dofs);
+    DoFTools::make_hanging_node_constraints (dof_handler, constraints);
     for (int i=1; i<dim; ++i)
       DoFTools::make_periodicity_constraints(dof_handler,
                                              /*b_id1*/ 2*i,
@@ -158,7 +159,6 @@ namespace Step40
                                               0,
                                               Functions::ZeroFunction<dim>(),
                                               constraints);
-    DoFTools::make_hanging_node_constraints (dof_handler, constraints);
     constraints.close ();
 
     DynamicSparsityPattern csp (dof_handler.n_dofs(),
