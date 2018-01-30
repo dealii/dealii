@@ -274,12 +274,16 @@ namespace
   template <int dim, typename Eval, typename Number, bool prolongate>
   void
   perform_tensorized_op(const Eval &evaluator,
+                        const unsigned int n_points_in,
                         const unsigned int n_child_cell_dofs,
                         const unsigned int n_components,
                         AlignedVector<VectorizedArray<Number> > &evaluation_data)
   {
     if (Eval::n_q_points != numbers::invalid_unsigned_int)
       AssertDimension(n_components * Eval::n_q_points, n_child_cell_dofs);
+    if (Eval::dofs_per_cell != numbers::invalid_unsigned_int)
+      AssertDimension(Eval::dofs_per_cell, n_points_in);
+    const unsigned int n_points_out = n_child_cell_dofs / n_components;
     VectorizedArray<Number> *t0 = &evaluation_data[0];
     VectorizedArray<Number> *t1 = &evaluation_data[n_child_cell_dofs];
     VectorizedArray<Number> *t2 = &evaluation_data[2*n_child_cell_dofs];
@@ -305,13 +309,13 @@ namespace
           Assert(false, ExcNotImplemented());
         if (prolongate)
           {
-            t0 += Eval::dofs_per_cell;
-            t2 += Eval::n_q_points;
+            t0 += n_points_in;
+            t2 += n_points_out;
           }
         else
           {
-            t0 += Eval::n_q_points;
-            t2 += Eval::dofs_per_cell;
+            t0 += n_points_out;
+            t2 += n_points_in;
           }
       }
   }
@@ -402,6 +406,7 @@ void MGTransferMatrixFree<dim,Number>
                               fe_degree,
                               2*fe_degree+1);
           perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
+                                                           Utilities::fixed_power<dim>(fe_degree+1),
                                                            n_child_cell_dofs,
                                                            n_components,
                                                            evaluation_data);
@@ -418,6 +423,7 @@ void MGTransferMatrixFree<dim,Number>
                               fe_degree,
                               2*(fe_degree+1));
           perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
+                                                           Utilities::fixed_power<dim>(fe_degree+1),
                                                            n_child_cell_dofs,
                                                            n_components,
                                                            evaluation_data);
@@ -483,6 +489,7 @@ void MGTransferMatrixFree<dim,Number>
                                                   n_components, fe_degree,
                                                   &evaluation_data[0]);
           perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
+                                                            Utilities::fixed_power<dim>(fe_degree+1),
                                                             n_child_cell_dofs,
                                                             n_components,
                                                             evaluation_data);
@@ -496,6 +503,7 @@ void MGTransferMatrixFree<dim,Number>
                               fe_degree,
                               2*(fe_degree+1));
           perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
+                                                            Utilities::fixed_power<dim>(fe_degree+1),
                                                             n_child_cell_dofs,
                                                             n_components,
                                                             evaluation_data);
