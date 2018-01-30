@@ -55,7 +55,7 @@ main()
 
         // all points should coincide to an accuracy of at least 1e-8 (note
         // that we use a 4-th degree mapping, so its accuracy on the 96 cell
-        // version of the sphere should but be enough)
+        // version of the sphere should be enough)
         const double tolerance = 1e-8;
         for (unsigned int q=0; q<quadrature.size(); ++q)
           {

@@ -42,7 +42,7 @@ main()
     for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
       if (cell->at_boundary(f))
         {
-          if (std::abs(cell->face(f)->vertex(1).norm()-1.) < 1e-12)
+          if (std::abs(cell->face(f)->vertex(1).norm()-1.) < 1e-1)
             {
               // at outer boundary, the normal should point outwards and be
               // aligned with the point down to roundoff. Check this for the
@@ -55,7 +55,7 @@ main()
                           spherical.normal_vector(cell->face(f),  cell->face(f)->center(true)))
                       << std::endl;
             }
-          else if (std::abs(cell->face(f)->vertex(1).norm()-0.5) < 1e-12)
+          else if (std::abs(cell->face(f)->vertex(1).norm()-0.5) < 1e-1)
             {
               // at inner boundary, the normal should point inwards and be
               // aligned with the point down to roundoff. Check this for the
