@@ -1,0 +1,41 @@
+
+DEAL::FE: FESystem<2>[FE_DGQ<2>(3)^2]
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0.00000
+DEAL::Norm after restriction: 48.2543
+DEAL::FE: FESystem<2>[FE_DGQ<2>(8)^2]
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0.00000
+DEAL::Norm after restriction: 101.354
+DEAL::FE: FESystem<2>[FE_DGQ<2>(16)^2]
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0.00000
+DEAL::Norm after restriction: 214.405
+DEAL::FE: FESystem<2>[FE_Q<2>(16)^2]
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0.00000
+DEAL::Norm after restriction: 189.129
+DEAL::FE: FESystem<3>[FE_DGQ<3>(11)^3]
+DEAL::no. cells: 64
+DEAL::Error after prolongation: 0.00000
+DEAL::Norm after restriction: 1340.82
+DEAL::FE: FESystem<2>[FE_DGQ<2>(3)^2]
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0.00000
+DEAL::Norm after restriction: 48.2544
+DEAL::FE: FESystem<2>[FE_DGQ<2>(8)^2]
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0.00000
+DEAL::Norm after restriction: 101.354
+DEAL::FE: FESystem<2>[FE_DGQ<2>(16)^2]
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0.00000
+DEAL::Norm after restriction: 214.405
+DEAL::FE: FESystem<2>[FE_Q<2>(16)^2]
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0.00000
+DEAL::Norm after restriction: 189.129
+DEAL::FE: FESystem<3>[FE_DGQ<3>(11)^3]
+DEAL::no. cells: 64
+DEAL::Error after prolongation: 0.00000
+DEAL::Norm after restriction: 1340.82
