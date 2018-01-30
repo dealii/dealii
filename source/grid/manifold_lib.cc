@@ -462,10 +462,12 @@ get_normals_at_vertices (const typename Triangulation<dim,spacedim>::face_iterat
                                                              distances_to_first_vertex.end());
 
   if (*minmax_distance.second-*minmax_distance.first<1.e-10 * *min_distance_to_first_vertex)
-    for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
-      face_vertex_normals[vertex] = face->vertex(vertex)-center;
-
-  Manifold<dim, spacedim>::get_normals_at_vertices(face, face_vertex_normals);
+    {
+      for (unsigned int vertex=0; vertex<n_vertices; ++vertex)
+        face_vertex_normals[vertex] = face->vertex(vertex)-center;
+    }
+  else
+    Manifold<dim, spacedim>::get_normals_at_vertices(face, face_vertex_normals);
 }
 
 
