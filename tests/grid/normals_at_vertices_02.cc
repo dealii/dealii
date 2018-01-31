@@ -19,7 +19,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_boundary.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/grid_generator.h>
@@ -35,7 +35,7 @@ int main ()
   deallog << std::fixed;
   deallog.attach(logfile);
 
-  HyperBallBoundary<3> boundary (Point<3>(1,0,0));
+  SphericalManifold<3> boundary (Point<3>(1,0,0));
 
   Triangulation<3> tria;
   Boundary<3>::FaceVertexNormals normals;

@@ -27,7 +27,7 @@ std::ofstream logfile("output");
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/hp/dof_handler.h>
@@ -50,8 +50,8 @@ void gnuplot_output()
 
   Triangulation<dim> triangulation;
   GridGenerator::hyper_ball (triangulation);
-  static const HyperBallBoundary<dim> boundary;
-  triangulation.set_boundary (0, boundary);
+  static const SphericalManifold<dim> boundary;
+  triangulation.set_manifold (0, boundary);
 
   for (unsigned int refinement=0; refinement<2;
        ++refinement, triangulation.refine_global(1))
@@ -93,8 +93,8 @@ void compute_pi_by_area ()
       Triangulation<dim> triangulation;
       GridGenerator::hyper_ball (triangulation);
 
-      static const HyperBallBoundary<dim> boundary;
-      triangulation.set_boundary (0, boundary);
+      static const SphericalManifold<dim> boundary;
+      triangulation.set_manifold (0, boundary);
 
       MappingQ<dim> mapping(degree);
 
@@ -156,8 +156,8 @@ void compute_pi_by_perimeter ()
       Triangulation<dim> triangulation;
       GridGenerator::hyper_ball (triangulation);
 
-      static const HyperBallBoundary<dim> boundary;
-      triangulation.set_boundary (0, boundary);
+      static const SphericalManifold<dim> boundary;
+      triangulation.set_manifold (0, boundary);
 
       const MappingQ<dim> mapping (degree);
       const FE_Q<dim>     fe (1);

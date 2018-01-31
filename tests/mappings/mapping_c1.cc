@@ -17,7 +17,7 @@
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
@@ -40,11 +40,10 @@ int main ()
   // but since we are not interested
   // in the quality of the mesh, this
   // is ok
-  Point<2> center;
-  HyperBallBoundary<2> circle(center, std::sqrt(2.0));
+  SphericalManifold<2> circle;
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria, -1, 1);
-  tria.set_boundary (0, circle);
+  tria.set_manifold (0, circle);
 
 
   // refine it more or less

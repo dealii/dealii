@@ -33,7 +33,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/numerics/vector_tools.h>
 
 using namespace dealii;
@@ -47,15 +47,14 @@ void test_real_to_unit_cell()
   // define a boundary that fits the
   // the vertices of the hyper cube
   // we're going to create below
-  HyperBallBoundary<dim,spacedim> boundary (Point<spacedim>(),
-                                            std::sqrt(1.*dim));
+  SphericalManifold<dim,spacedim> boundary;
 
   Triangulation<dim, spacedim>   triangulation;
   GridGenerator::hyper_cube (triangulation, -1, 1);
 
   // set the boundary indicator for
   // one face of the single cell
-  triangulation.set_boundary (1, boundary);
+  triangulation.set_manifold (1, boundary);
   triangulation.begin_active()->face(0)->set_boundary_id (1);
 
 

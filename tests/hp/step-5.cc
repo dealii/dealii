@@ -41,7 +41,7 @@
 
 #include <deal.II/grid/grid_in.h>
 
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <sstream>
 
@@ -297,8 +297,8 @@ void LaplaceProblem<dim>::run ()
 
           grid_in.read_ucd (input_file);
 
-          static const HyperBallBoundary<dim> boundary;
-          triangulation.set_boundary (0, boundary);
+          static const SphericalManifold<dim> boundary;
+          triangulation.set_manifold (0, boundary);
         }
 
       deallog << "   Number of active cells: "

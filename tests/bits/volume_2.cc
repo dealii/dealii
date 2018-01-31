@@ -28,7 +28,7 @@
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
@@ -94,13 +94,15 @@ void check (const Triangulation<dim> &tria,
             }
     }
 
-  Assert (std::fabs(v1-v2)/v1 < 4e-4, ExcInternalError());
   deallog << " face integration: "
           << v1 / dim
           << std::endl;
   deallog << " subface integration: "
           << v2 / dim
           << std::endl;
+  const double relative_error = std::fabs(v1-v2)/v1;
+  deallog << " relative error: " << relative_error << std::endl;
+  Assert (relative_error < 5e-4, ExcInternalError());
 }
 
 
@@ -111,8 +113,8 @@ int main ()
   {
     Triangulation<2> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
-    static const HyperBallBoundary<2> boundary;
-    coarse_grid.set_boundary (0, boundary);
+    static const SphericalManifold<2> boundary;
+    coarse_grid.set_manifold (0, boundary);
     check (coarse_grid, 1);
     check (coarse_grid, 2);
     check (coarse_grid, 4);
@@ -121,8 +123,8 @@ int main ()
   {
     Triangulation<3> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
-    static const HyperBallBoundary<3> boundary;
-    coarse_grid.set_boundary (0, boundary);
+    static const SphericalManifold<3> boundary;
+    coarse_grid.set_manifold (0, boundary);
     check (coarse_grid, 1);
     check (coarse_grid, 2);
     check (coarse_grid, 3);

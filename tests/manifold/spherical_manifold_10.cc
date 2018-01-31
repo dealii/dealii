@@ -44,6 +44,7 @@ main()
 
   MappingQGeneric<dim> mapping(4);
   QGaussLobatto<dim-1> quadrature(4);
+
   FE_Nothing<dim> dummy;
   FEFaceValues<dim> fe_values(mapping, dummy, quadrature,
                               update_normal_vectors | update_quadrature_points);

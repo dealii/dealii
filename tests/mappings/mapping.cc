@@ -24,7 +24,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/fe/mapping_cartesian.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/mapping_q.h>
@@ -209,7 +209,7 @@ compute_area(Mapping<dim> &mapping,
 
 template <int dim>
 void create_triangulations(std::vector<Triangulation<dim> *> &,
-                           std::vector<Boundary<dim> *> &,
+                           std::vector<Manifold<dim> *> &,
                            std::vector<double> &)
 {
   Assert(false, ExcNotImplemented());
@@ -223,7 +223,7 @@ unsigned int mapping_size;
 
 template <>
 void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
-                           std::vector<Boundary<1> *> &,
+                           std::vector<Manifold<1> *> &,
                            std::vector<double> &exact_areas)
 {
   show.resize(1, std::vector<unsigned int> (mapping_size,0));
@@ -240,7 +240,7 @@ void create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
 
 template <>
 void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
-                           std::vector<Boundary<2> *> &boundary_ptr,
+                           std::vector<Manifold<2> *> &boundary_ptr,
                            std::vector<double> &exact_areas)
 {
   Triangulation<2> *tria;
@@ -289,8 +289,8 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
   // tria2: crazy cell
   if (2)
     {
-      Boundary<2> *boundary1=new HyperBallBoundary<2>(Point<2>(3,1), 2);
-      Boundary<2> *boundary2=new HyperBallBoundary<2>(Point<2>(2,5), std::sqrt(5.));
+      Manifold<2> *boundary1=new SphericalManifold<2>(Point<2>(3,1));
+      Manifold<2> *boundary2=new SphericalManifold<2>(Point<2>(2,5));
       boundary_ptr.push_back(boundary1);
       boundary_ptr.push_back(boundary2);
       tria=new Triangulation<2>();
@@ -302,8 +302,8 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       v2(1) = 3.;
       v3(0) = 3.;
       v3(1) = 3.;
-      tria->set_boundary(1,*boundary1);
-      tria->set_boundary(2,*boundary2);
+      tria->set_manifold(1,*boundary1);
+      tria->set_manifold(2,*boundary2);
       tria->begin_active()->face(1)->set_boundary_id(1);
       tria->begin_active()->face(3)->set_boundary_id(2);
       double pi=std::acos(-1.);
@@ -330,8 +330,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
 
   if (4 && false)
     {
-      Boundary<2> *boundary1=new HyperBallBoundary<2>(Point<2>(2.5,-0.5),
-                                                      std::sqrt(1.5*1.5+0.5*0.5));
+      Manifold<2> *boundary1=new SphericalManifold<2>(Point<2>(2.5,-0.5));
       boundary_ptr.push_back(boundary1);
       tria=new Triangulation<2>();
       tria_ptr.push_back(tria);
@@ -342,7 +341,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       v2(1) = 1.;
       v3(0) = 0.5;
       v3(1) = 1.5;
-      tria->set_boundary(1,*boundary1);
+      tria->set_manifold(1,*boundary1);
       tria->begin_active()->face(1)->set_boundary_id(1);
       exact_areas.push_back(0.);
       for (unsigned int i=0; i<=4; ++i)
@@ -354,7 +353,7 @@ void create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
 
 template <>
 void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
-                           std::vector<Boundary<3> *> &boundary_ptr,
+                           std::vector<Manifold<3> *> &boundary_ptr,
                            std::vector<double> &exact_areas)
 {
   Triangulation<3> *tria;
@@ -391,13 +390,13 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       double r=std::sqrt((m-v).norm_square()),
              h=r-1.5,
              pi=std::acos(-1.);
-      Boundary<3> *boundary1=new HyperBallBoundary<3>(m, r);
+      Manifold<3> *boundary1=new SphericalManifold<3>(m);
       boundary_ptr.push_back(boundary1);
 
       tria=new Triangulation<3>();
       tria_ptr.push_back(tria);
       GridGenerator::hyper_cube(*tria, 1., 3.);
-      tria->set_boundary(1,*boundary1);
+      tria->set_manifold(1,*boundary1);
       tria->begin_active()->face(1)->set_boundary_id(1);
       exact_areas.push_back(8.+pi/3*h*h*(3*r-h));
     }
@@ -455,7 +454,7 @@ void mapping_test()
   mapping_size=mapping_ptr.size();
 
   std::vector<Triangulation<dim> *> tria_ptr;
-  std::vector<Boundary<dim> *> boundary_ptr;
+  std::vector<Manifold<dim> *> boundary_ptr;
   std::vector<double> exact_areas;
 
   create_triangulations(tria_ptr, boundary_ptr, exact_areas);

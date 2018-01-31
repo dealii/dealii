@@ -30,7 +30,7 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 
@@ -65,7 +65,7 @@ void test_vertices_orientation(const Triangulation<s_dim,spacedim> &boundary_mes
         {
           Point<spacedim> diff(face->vertex(k));
           diff -= cell->vertex(k);
-          AssertThrow (diff.square() == 0, ExcInternalError());
+          AssertThrow (diff.square() < 1.e-15*face->vertex(k).square(), ExcInternalError());
         }
     }
 }
@@ -94,15 +94,15 @@ int main ()
     map< Triangulation<dim-1,dim>::cell_iterator,
          Triangulation<dim,dim>::face_iterator>
          surface_to_volume_mapping;
-    const HyperBallBoundary<dim> boundary_description;
+    const SphericalManifold<dim> boundary_description;
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);
-    volume_mesh.set_boundary (0, boundary_description);
+    volume_mesh.set_manifold (0, boundary_description);
     volume_mesh.refine_global (1);
 
-    const HyperBallBoundary<dim-1,dim> surface_description;
+    const SphericalManifold<dim-1,dim> surface_description;
     Triangulation<dim-1,dim> boundary_mesh;
-    boundary_mesh.set_boundary (0, surface_description);
+    boundary_mesh.set_manifold (0, surface_description);
 
     surface_to_volume_mapping
       = GridGenerator::extract_boundary_mesh (volume_mesh, boundary_mesh);

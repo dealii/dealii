@@ -38,7 +38,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_accessor.h>    //these two to loop over cells/faces
 #include <deal.II/grid/tria_iterator.h>    // ^
-#include <deal.II/grid/tria_boundary_lib.h>//to use not straightline boundaries
+#include <deal.II/grid/manifold_lib.h>//to use not straightline boundaries
 #include <deal.II/dofs/dof_handler.h>      //associate DoF to cells/vertices/lines
 #include <deal.II/dofs/dof_accessor.h>     //provides information about the degrees of freedom local to a cell
 #include <deal.II/dofs/dof_tools.h>        //needed for the creation of sparsity patterns of sparse matrices

@@ -47,13 +47,13 @@ void test()
   GridGenerator::cylinder(triangulation, 100, 200);
 
   static const CylinderBoundary<dim> outer_cylinder (100,0);
-  triangulation.set_boundary(0,outer_cylinder);
+  triangulation.set_manifold(0,outer_cylinder);
 
   // now extract the surface mesh
   Triangulation<dim-1,dim> triangulation_surface;
 
   static const CylinderBoundary<dim-1,dim> surface_cyl(100,0);
-  triangulation_surface.set_boundary(0,surface_cyl);
+  triangulation_surface.set_manifold(0,surface_cyl);
 
   GridGenerator::extract_boundary_mesh(triangulation,triangulation_surface);
 

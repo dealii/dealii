@@ -26,7 +26,7 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -110,10 +110,10 @@ check ()
     }
   else
     GridGenerator::hyper_cube(tr, -1./std::sqrt(static_cast<double>(dim)),1./std::sqrt(static_cast<double>(dim)));
-  static const HyperBallBoundary<dim> boundary;
+  static const SphericalManifold<dim> boundary;
   if (dim != 1)
     {
-      tr.set_boundary (0, boundary);
+      tr.set_manifold (0, boundary);
     }
   tr.refine_global (1);
 

@@ -77,7 +77,7 @@ void check ()
         if (coarse_grid.begin_active()->face(f)->line(e)->center()[1] == 0.5)
           if (coarse_grid.begin_active()->face(f)->line(e)->center()[2] == 0)
             coarse_grid.begin_active()->face(f)->line(e)->set_boundary_id (99);
-  coarse_grid.set_boundary (99, my_boundary);
+  coarse_grid.set_manifold (99, my_boundary);
 
   // now try to refine this one
   // cell. we should not get an exception, but keep it to make sure the

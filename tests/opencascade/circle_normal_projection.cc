@@ -21,7 +21,7 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <gp_Pnt.hxx>
 #include <gp_Dir.hxx>
@@ -58,8 +58,7 @@ int main ()
   // This one is for checking: This
   // is what deal.II would do for a
   // circle.
-  HyperBallBoundary<2,3> boundary_line_deal (Point<3>(.5,.5,0),
-                                             std::sqrt(2.)/2.);
+  SphericalManifold<2,3> boundary_line_deal (Point<3>(.5,.5,0));
 
 
 

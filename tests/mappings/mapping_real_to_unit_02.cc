@@ -25,7 +25,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/numerics/fe_field_function.h>
 
@@ -36,11 +36,11 @@
 template <int dim>
 void test2()
 {
-  const HyperBallBoundary<dim> boundary_description;
+  const SphericalManifold<dim> boundary_description;
 
   Triangulation<dim>   triangulation;
   GridGenerator::hyper_ball (triangulation);
-  triangulation.set_boundary (0, boundary_description);
+  triangulation.set_manifold (0, boundary_description);
   triangulation.refine_global (1);
   MappingQGeneric<dim> mapping(1);
 
@@ -69,7 +69,7 @@ void test2()
   points[95]=p;
   fe_function.value_list (points, m); // <<<< this fails at point[95] but only if the other points are filled in?!
 
-  triangulation.set_boundary (0);
+  triangulation.set_manifold (0);
 
   deallog << "OK" << std::endl;
 }

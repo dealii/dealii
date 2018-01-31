@@ -33,7 +33,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgp_monomial.h>
@@ -149,8 +149,8 @@ void test()
   subdivisions[0] = 2;
   GridGenerator::subdivided_hyper_rectangle(tr, subdivisions, p1, p2);
 
-  static const HyperBallBoundary<dim> boundary(tr.begin_active()->center());
-  tr.set_boundary (1, boundary);
+  static const SphericalManifold<dim> boundary(tr.begin_active()->center());
+  tr.set_manifold (1, boundary);
 
   // set boundary id on cell 1
   for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)

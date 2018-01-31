@@ -25,7 +25,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/fe/mapping_q.h>
 
@@ -69,8 +69,8 @@ int main ()
   {
     Triangulation<2> coarse_grid;
     GridGenerator::hyper_ball (coarse_grid);
-    static const HyperBallBoundary<2> boundary;
-    coarse_grid.set_boundary (0, boundary);
+    static const SphericalManifold<2> boundary;
+    coarse_grid.set_manifold (0, boundary);
     coarse_grid.refine_global (2);
     check (coarse_grid);
   }

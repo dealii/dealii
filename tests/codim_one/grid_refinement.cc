@@ -24,7 +24,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <string>
 
@@ -33,9 +33,9 @@ std::ofstream logfile("output");
 template <int dim, int spacedim>
 void test(std::string filename)
 {
-  HyperBallBoundary<dim, spacedim> boundary;
+  SphericalManifold<dim, spacedim> boundary;
   Triangulation<dim, spacedim> tria;
-  tria.set_boundary(1, boundary);
+  tria.set_manifold(1, boundary);
   GridIn<dim, spacedim> gi;
   gi.attach_triangulation (tria);
   std::ifstream in (filename.c_str());

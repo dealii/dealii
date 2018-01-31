@@ -26,7 +26,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/mapping_q1.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/numerics/fe_field_function.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -47,11 +47,11 @@ public:
 template <int dim>
 void test()
 {
-  const HyperBallBoundary<dim> boundary_description;
+  const SphericalManifold<dim> boundary_description;
 
   Triangulation<dim>   triangulation;
   GridGenerator::hyper_ball (triangulation);
-  triangulation.set_boundary (0, boundary_description);
+  triangulation.set_manifold (0, boundary_description);
   triangulation.refine_global (1);
 
   FE_Q<dim> fe(2);

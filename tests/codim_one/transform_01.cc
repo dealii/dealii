@@ -23,7 +23,7 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
+#include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
 
@@ -57,22 +57,22 @@ int main ()
 
   Triangulation<2,3> triangulation;
 
-  HyperBallBoundary<3> boundary_description;
+  SphericalManifold<3> boundary_description;
   Triangulation<3> volume_mesh;
   GridGenerator::half_hyper_ball(volume_mesh);
 
-  volume_mesh.set_boundary (0, boundary_description);
+  volume_mesh.set_manifold (0, boundary_description);
   volume_mesh.refine_global (3);
 
-  static HyperBallBoundary<3-1,3> surface_description;
-  triangulation.set_boundary (0, surface_description);
+  static SphericalManifold<3-1,3> surface_description;
+  triangulation.set_manifold (0, surface_description);
 
   std::set<types::boundary_id> boundary_ids;
   boundary_ids.insert(0);
 
   GridGenerator::extract_boundary_mesh (volume_mesh, triangulation,
                                         boundary_ids);
-  triangulation.set_boundary (0);
+  triangulation.set_manifold (0);
   GridTools::transform (&warp<3>, triangulation);
 
   deallog << "Surface mesh has " << triangulation.n_active_cells()
