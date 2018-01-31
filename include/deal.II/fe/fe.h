@@ -467,7 +467,7 @@ template <int dim, int spacedim> class FESystem;
  * VectorSlice argument. (See the
  * @ref GlossGeneralizedSupport "glossary entry on generalized support points"
  * for more information.) With this, one can then use the following piece of
- * code in the constructor of a class derived from FinitElement to compute the
+ * code in the constructor of a class derived from FiniteElement to compute the
  * $M$ matrix:
  * @code
  * FullMatrix<double> M(this->dofs_per_cell, this->dofs_per_cell);
@@ -2640,7 +2640,7 @@ protected:
    * compute part of this information as discussed above. Elements may want to
    * store these update flags (or a subset of these flags) in
    * InternalDataBase::update_each so they know at the time when
-   * FinitElement::fill_fe_values() is called what they are supposed to
+   * FiniteElement::fill_fe_values() is called what they are supposed to
    * compute
    * @param[in] mapping A reference to the mapping used for computing values
    * and derivatives of shape functions.
@@ -2688,7 +2688,7 @@ protected:
    * compute part of this information as discussed above. Elements may want to
    * store these update flags (or a subset of these flags) in
    * InternalDataBase::update_each so they know at the time when
-   * FinitElement::fill_fe_face_values() is called what they are supposed to
+   * FiniteElement::fill_fe_face_values() is called what they are supposed to
    * compute
    * @param[in] mapping A reference to the mapping used for computing values
    * and derivatives of shape functions.
@@ -2736,7 +2736,7 @@ protected:
    * compute part of this information as discussed above. Elements may want to
    * store these update flags (or a subset of these flags) in
    * InternalDataBase::update_each so they know at the time when
-   * FinitElement::fill_fe_subface_values() is called what they are supposed
+   * FiniteElement::fill_fe_subface_values() is called what they are supposed
    * to compute
    * @param[in] mapping A reference to the mapping used for computing values
    * and derivatives of shape functions.
