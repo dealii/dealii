@@ -599,12 +599,10 @@ namespace internal
         {
           const unsigned int dim = 1;
 
-          typedef DoFHandler<dim,spacedim> BaseClass;
-
           Assert (dof_handler.finite_elements != nullptr,
-                  typename BaseClass::ExcNoFESelected());
+                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.finite_elements->size() > 0,
-                  typename BaseClass::ExcNoFESelected());
+                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.tria->n_levels() > 0,
                   ExcMessage("The current Triangulation must not be empty."));
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
@@ -625,12 +623,10 @@ namespace internal
         {
           const unsigned int dim = 2;
 
-          typedef DoFHandler<dim,spacedim> BaseClass;
-
           Assert (dof_handler.finite_elements != nullptr,
-                  typename BaseClass::ExcNoFESelected());
+                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.finite_elements->size() > 0,
-                  typename BaseClass::ExcNoFESelected());
+                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.tria->n_levels() > 0,
                   ExcMessage("The current Triangulation must not be empty."));
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
@@ -655,12 +651,10 @@ namespace internal
         {
           const unsigned int dim = 3;
 
-          typedef DoFHandler<dim,spacedim> BaseClass;
-
           Assert (dof_handler.finite_elements != nullptr,
-                  typename BaseClass::ExcNoFESelected());
+                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.finite_elements->size() > 0,
-                  typename BaseClass::ExcNoFESelected());
+                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.tria->n_levels() > 0,
                   ExcMessage("The current Triangulation must not be empty."));
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
