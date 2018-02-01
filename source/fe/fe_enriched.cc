@@ -171,7 +171,7 @@ FE_Enriched<dim,spacedim>::FE_Enriched (const std::vector< const FiniteElement< 
                                FETools::Compositing::compute_nonzero_components(fes,multiplicities,false)),
   enrichments(functions),
   is_enriched(internal::FE_Enriched::check_if_enriched(fes)),
-  fe_system(fes,multiplicities)
+  fe_system(std_cxx14::make_unique<FESystem<dim, spacedim> >(fes,multiplicities))
 {
   // descriptive error are thrown within the function.
   Assert(internal::FE_Enriched::consistency_check(fes,multiplicities,functions),
@@ -239,7 +239,7 @@ FE_Enriched<dim,spacedim>::shape_value(const unsigned int   i,
                                        const Point< dim > &p) const
 {
   Assert(!is_enriched, ExcMessage("For enriched finite elements shape_value() can not be defined on the reference element."));
-  return fe_system.shape_value(i,p);
+  return fe_system->shape_value(i,p);
 }
 
 
@@ -266,7 +266,7 @@ template <int dim, int spacedim>
 UpdateFlags
 FE_Enriched<dim,spacedim>::requires_update_flags (const UpdateFlags flags) const
 {
-  UpdateFlags out = fe_system.requires_update_flags(flags);
+  UpdateFlags out = fe_system->requires_update_flags(flags);
 
   if (is_enriched)
     {
@@ -337,7 +337,7 @@ FE_Enriched<dim,spacedim>::get_face_data (const UpdateFlags      update_flags,
                                           const Quadrature<dim-1> &quadrature,
                                           internal::FEValues::FiniteElementRelatedData< dim, spacedim >        &output_data) const
 {
-  return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system.get_face_data(update_flags,mapping,quadrature,output_data)),
+  return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system->get_face_data(update_flags,mapping,quadrature,output_data)),
                     update_flags,
                     quadrature);
 }
@@ -350,7 +350,7 @@ FE_Enriched<dim,spacedim>::get_subface_data (const UpdateFlags      update_flags
                                              const Quadrature<dim-1> &quadrature,
                                              dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
-  return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system.get_subface_data(update_flags,mapping,quadrature,output_data)),
+  return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system->get_subface_data(update_flags,mapping,quadrature,output_data)),
                     update_flags,
                     quadrature);
 }
@@ -363,7 +363,7 @@ FE_Enriched<dim,spacedim>::get_data (const UpdateFlags      flags,
                                      const Quadrature<dim> &quadrature,
                                      internal::FEValues::FiniteElementRelatedData< dim, spacedim >   &output_data) const
 {
-  return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system.get_data(flags,mapping,quadrature,output_data)),
+  return setup_data(std::unique_ptr<typename FiniteElement<dim,spacedim>::InternalDataBase>(fe_system->get_data(flags,mapping,quadrature,output_data)),
                     flags,
                     quadrature);
 }
@@ -405,7 +405,7 @@ void FE_Enriched<dim,spacedim>::initialize (const std::vector<const FiniteElemen
 
   // now set up the interface constraints for h-refinement.
   // take them from fe_system:
-  this->interface_constraints = fe_system.interface_constraints;
+  this->interface_constraints = fe_system->interface_constraints;
 
   // if we just wrap another FE (i.e. use FE_Nothing as a second FE)
   // then it makes sense to have support points.
@@ -414,13 +414,13 @@ void FE_Enriched<dim,spacedim>::initialize (const std::vector<const FiniteElemen
   // this FE sits on the boundary or not. Thus for moment just copy support
   // points from fe system:
   {
-    this->unit_support_points      = fe_system.unit_support_points;
-    this->unit_face_support_points = fe_system.unit_face_support_points;
+    this->unit_support_points      = fe_system->unit_support_points;
+    this->unit_face_support_points = fe_system->unit_face_support_points;
   }
 
   // take adjust_quad_dof_index_for_face_orientation_table from FESystem:
   {
-    this->adjust_line_dof_index_for_line_orientation_table = fe_system.adjust_line_dof_index_for_line_orientation_table;
+    this->adjust_line_dof_index_for_line_orientation_table = fe_system->adjust_line_dof_index_for_line_orientation_table;
   }
 }
 
@@ -452,7 +452,7 @@ template <int dim, int spacedim>
 const FiniteElement<dim,spacedim> &
 FE_Enriched<dim,spacedim>::base_element (const unsigned int index) const
 {
-  return fe_system.base_element(index);
+  return fe_system->base_element(index);
 }
 
 
@@ -473,14 +473,14 @@ FE_Enriched<dim,spacedim>::fill_fe_values (const typename Triangulation< dim, sp
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // call FESystem's method to fill everything without enrichment function
-  fe_system.fill_fe_values(cell,
-                           cell_similarity,
-                           quadrature,
-                           mapping,
-                           mapping_internal,
-                           mapping_data,
-                           *fe_data.fesystem_data,
-                           output_data);
+  fe_system->fill_fe_values(cell,
+                            cell_similarity,
+                            quadrature,
+                            mapping,
+                            mapping_internal,
+                            mapping_data,
+                            *fe_data.fesystem_data,
+                            output_data);
 
   if (is_enriched)
     multiply_by_enrichment(quadrature,
@@ -509,14 +509,14 @@ FE_Enriched<dim,spacedim>::fill_fe_face_values
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // call FESystem's method to fill everything without enrichment function
-  fe_system.fill_fe_face_values(cell,
-                                face_no,
-                                quadrature,
-                                mapping,
-                                mapping_internal,
-                                mapping_data,
-                                *fe_data.fesystem_data,
-                                output_data);
+  fe_system->fill_fe_face_values(cell,
+                                 face_no,
+                                 quadrature,
+                                 mapping,
+                                 mapping_internal,
+                                 mapping_data,
+                                 *fe_data.fesystem_data,
+                                 output_data);
 
   if (is_enriched)
     multiply_by_enrichment(quadrature,
@@ -546,15 +546,15 @@ FE_Enriched<dim,spacedim>::fill_fe_subface_values
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);
 
   // call FESystem's method to fill everything without enrichment function
-  fe_system.fill_fe_subface_values(cell,
-                                   face_no,
-                                   sub_no,
-                                   quadrature,
-                                   mapping,
-                                   mapping_internal,
-                                   mapping_data,
-                                   *fe_data.fesystem_data,
-                                   output_data);
+  fe_system->fill_fe_subface_values(cell,
+                                    face_no,
+                                    sub_no,
+                                    quadrature,
+                                    mapping,
+                                    mapping_internal,
+                                    mapping_data,
+                                    *fe_data.fesystem_data,
+                                    output_data);
 
   if (is_enriched)
     multiply_by_enrichment(quadrature,
@@ -768,7 +768,7 @@ const FESystem<dim,spacedim> &
 FE_Enriched<dim,spacedim>::
 get_fe_system() const
 {
-  return fe_system;
+  return *fe_system;
 }
 
 
@@ -790,8 +790,8 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
   if (const FE_Enriched<dim,spacedim> *fe_enr_other
       = dynamic_cast<const FE_Enriched<dim,spacedim>*>(&source))
     {
-      fe_system.get_face_interpolation_matrix(fe_enr_other->get_fe_system(),
-                                              matrix);
+      fe_system->get_face_interpolation_matrix(fe_enr_other->get_fe_system(),
+                                               matrix);
     }
   else
     {
@@ -811,9 +811,9 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
   if (const FE_Enriched<dim,spacedim> *fe_enr_other
       = dynamic_cast<const FE_Enriched<dim,spacedim>*>(&source))
     {
-      fe_system.get_subface_interpolation_matrix(fe_enr_other->get_fe_system(),
-                                                 subface,
-                                                 matrix);
+      fe_system->get_subface_interpolation_matrix(fe_enr_other->get_fe_system(),
+                                                  subface,
+                                                  matrix);
     }
   else
     {
@@ -831,7 +831,7 @@ hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
   if (const FE_Enriched<dim,spacedim> *fe_enr_other
       = dynamic_cast<const FE_Enriched<dim,spacedim>*>(&fe_other))
     {
-      return fe_system.hp_vertex_dof_identities(fe_enr_other->get_fe_system());
+      return fe_system->hp_vertex_dof_identities(fe_enr_other->get_fe_system());
     }
   else
     {
@@ -849,7 +849,7 @@ hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
   if (const FE_Enriched<dim,spacedim> *fe_enr_other
       = dynamic_cast<const FE_Enriched<dim,spacedim>*>(&fe_other))
     {
-      return fe_system.hp_line_dof_identities(fe_enr_other->get_fe_system());
+      return fe_system->hp_line_dof_identities(fe_enr_other->get_fe_system());
     }
   else
     {
@@ -867,7 +867,7 @@ hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
   if (const FE_Enriched<dim,spacedim> *fe_enr_other
       = dynamic_cast<const FE_Enriched<dim,spacedim>*>(&fe_other))
     {
-      return fe_system.hp_quad_dof_identities(fe_enr_other->get_fe_system());
+      return fe_system->hp_quad_dof_identities(fe_enr_other->get_fe_system());
     }
   else
     {
@@ -895,7 +895,7 @@ compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
   if (const FE_Enriched<dim,spacedim> *fe_enr_other
       = dynamic_cast<const FE_Enriched<dim,spacedim>*>(&fe_other))
     {
-      return fe_system.compare_for_face_domination(fe_enr_other->get_fe_system());
+      return fe_system->compare_for_face_domination(fe_enr_other->get_fe_system());
     }
   else
     {
@@ -909,7 +909,7 @@ const FullMatrix<double> &
 FE_Enriched<dim,spacedim>::get_prolongation_matrix (const unsigned int child,
                                                     const RefinementCase<dim> &refinement_case) const
 {
-  return fe_system.get_prolongation_matrix(child, refinement_case);
+  return fe_system->get_prolongation_matrix(child, refinement_case);
 }
 
 
@@ -918,7 +918,7 @@ const FullMatrix<double> &
 FE_Enriched<dim,spacedim>::get_restriction_matrix (const unsigned int child,
                                                    const RefinementCase<dim> &refinement_case) const
 {
-  return fe_system.get_restriction_matrix(child, refinement_case);
+  return fe_system->get_restriction_matrix(child, refinement_case);
 }
 
 

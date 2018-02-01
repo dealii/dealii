@@ -628,7 +628,7 @@ private:
   /**
    * The underlying FESystem object.
    */
-  FESystem<dim,spacedim> fe_system;
+  const std::unique_ptr<const FESystem<dim,spacedim> > fe_system;
 
   /**
    * After calling fill_fe_(face/subface_)values this function
