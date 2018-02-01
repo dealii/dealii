@@ -873,9 +873,7 @@ namespace TrilinosWrappers
        *
        * When using a vector distributed with MPI, this operation only makes
        * sense for elements that are actually present on the calling processor.
-       * Otherwise, an exception is thrown. This is different from the
-       * <code>el()</code> function below that always succeeds (but returns zero
-       * on non-local elements).
+       * Otherwise, an exception is thrown.
        */
       reference
       operator() (const size_type index);
@@ -885,9 +883,7 @@ namespace TrilinosWrappers
        *
        * When using a vector distributed with MPI, this operation only makes
        * sense for elements that are actually present on the calling processor.
-       * Otherwise, an exception is thrown. This is different from the
-       * <code>el()</code> function below that always succeeds (but returns zero
-       * on non-local elements).
+       * Otherwise, an exception is thrown.
        */
       TrilinosScalar
       operator() (const size_type index) const;
