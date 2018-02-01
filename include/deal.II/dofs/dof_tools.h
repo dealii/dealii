@@ -831,7 +831,11 @@ namespace DoFTools
    * order to allow adding constraints from different sources to the same
    * object. You therefore need to make sure it contains only constraints you
    * still want; otherwise call the ConstraintMatrix::clear() function.
-   * Likewise, this function does not close the object since you may want to
+   * Since this function does not check if it would add cycles in
+   * @p constraints, it is recommended to call this function prior to other
+   * functions that constrain DoFs with respect to others such as
+   * make_periodicity_constraints().
+   * This function does not close the object since you may want to
    * enter other constraints later on yourself.
    *
    * In the hp-case, i.e. when the argument is of type hp::DoFHandler, we
@@ -1105,6 +1109,9 @@ namespace DoFTools
    * blocks listed in @p first_vector_components of the FESystem. If @p
    * first_vector_components is empty the matrix is interpreted as an
    * interpolation matrix with size no_face_dofs $\times$ no_face_dofs.
+   *
+   * This function makes sure that identity constraints don't create cycles
+   * in @p constraint_matrix.
    *
    * Detailed information can be found in the see
    * @ref GlossPeriodicConstraints "Glossary entry on periodic boundary conditions".
