@@ -29,10 +29,15 @@ while (my $line = <GALLERY>)
   print $line;
 }
 
-# print the list of code gallery programs as a descriptor/description
-# list
-print "<dl>\n";
-foreach my $gallery (sort @ARGV)
+# create a list of code gallery program descriptions. we will later
+# output this as a descriptor/description list, but for the moment
+# we will simply create each entry as a string, and insert it in
+# a map keyed by the entry's name so that we can later output them
+# in a way that looks sorted on the screen, rather than is sorted
+# by the directory name (which looks pretty random to the human
+# reader)
+my %descriptions;
+foreach my $gallery (@ARGV)
 {
     my $gallery_underscore = $gallery;
 
@@ -57,14 +62,26 @@ foreach my $gallery (sort @ARGV)
     $authors =~ s/,$//;
 
     $gallery_underscore    =~ s/-/_/;
-    print "  <dt><b>\@ref code_gallery_${gallery_underscore} \"$entryname\"</b> (by $authors)</dt>\n";
-    print "    <dd>\n";
+
+    my $description;
+    $description = "  <dt><b>\@ref code_gallery_${gallery_underscore} \"$entryname\"</b> (by $authors)</dt>\n";
+    $description = $description . "    <dd>\n";
     open TOOLTIP, "<$gallery_dir/$gallery/doc/tooltip";
     while (my $line = <TOOLTIP>) {
-        print "      $line";
+        $description = $description . "      $line";
     }
-    print "    </dd>\n";
-    print "\n";
+    $description = $description . "    </dd>\n";
+    $description = $description . "\n";
+
+    # now insert this description into the map mentioned above
+    $descriptions{$entryname} = $description;
+}
+
+# now print the entries generated above sorted by their keys
+print "<dl>\n";
+foreach my $key (sort keys %descriptions)
+{
+    print $descriptions{$key};
 }
 print "</dl>\n";
 
