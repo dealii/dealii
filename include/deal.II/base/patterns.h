@@ -1452,10 +1452,14 @@ namespace Patterns
       template <typename... Args> struct is_list_compatible<std::unordered_multiset<Args...>> : std::true_type {};
 
       template <typename T>       struct is_map_compatible : std::false_type {};
-      template <typename... Args> struct is_map_compatible<std::map               <Args...>> : std::true_type {};
-      template <typename... Args> struct is_map_compatible<std::multimap          <Args...>> : std::true_type {};
-      template <typename... Args> struct is_map_compatible<std::unordered_map     <Args...>> : std::true_type {};
-      template <typename... Args> struct is_map_compatible<std::unordered_multimap<Args...>> : std::true_type {};
+      template <class Key, class T, class Compare, class Allocator>
+      struct is_map_compatible<std::map<Key,T,Compare,Allocator>> : std::true_type {};
+      template <class Key, class T, class Compare, class Allocator>
+      struct is_map_compatible<std::multimap<Key,T,Compare,Allocator>> : std::true_type {};
+      template <class Key, class T, class Hash, class KeyEqual, class Allocator>
+      struct is_map_compatible<std::unordered_map<Key,T,Hash,KeyEqual,Allocator>> : std::true_type {};
+      template <class Key, class T, class Hash, class KeyEqual, class Allocator>
+      struct is_map_compatible<std::unordered_multimap<Key,T,Hash,KeyEqual,Allocator>> : std::true_type {};
     }
 
     // type trait to use the implementation type traits as well as decay the type
