@@ -71,7 +71,7 @@ namespace GridGenerator
    * cells. See hyper_rectangle(), if different lengths in different ordinate
    * directions are required.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim, int spacedim>
   void hyper_cube (Triangulation<dim,spacedim>  &tria,
@@ -118,7 +118,7 @@ namespace GridGenerator
    * dimensional space with the remaining entries set to zero. For example, a
    * <tt>Triangulation@<2,3@></tt> will be a square in the xy plane with z=0.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim, int spacedim>
   void subdivided_hyper_cube (Triangulation<dim,spacedim>  &tria,
@@ -157,7 +157,7 @@ namespace GridGenerator
    * <tt>Triangulation@<2,3@></tt> will be a rectangle in the xy plane with
    * z=0, defined by the two opposing corners @p p1 and @p p2.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim, int spacedim>
   void hyper_rectangle (Triangulation<dim,spacedim> &tria,
@@ -321,7 +321,7 @@ namespace GridGenerator
    *
    * @note This function is implemented in 2d only.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -341,7 +341,7 @@ namespace GridGenerator
    * vertices in the array of <code>corners</code> will no longer refer to the
    * same triangulation.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -357,7 +357,7 @@ namespace GridGenerator
    * of subdivisions in each of the @p dim directions. Colorizing is done
    * according to hyper_rectangle().
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -371,7 +371,7 @@ namespace GridGenerator
    * number of subdivisions in each of the @p dim directions may vary.
    * Colorizing is done according to hyper_rectangle().
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void
@@ -426,7 +426,7 @@ namespace GridGenerator
    *
    * Presently only available in 2d and 3d.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void enclosed_hyper_cube (Triangulation<dim> &tria,
@@ -451,7 +451,7 @@ namespace GridGenerator
    * placement of vertices upon refinement and to be able to use higher order
    * mappings.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void hyper_ball (Triangulation<dim> &tria,
@@ -487,7 +487,7 @@ namespace GridGenerator
    * @image html sphere.png
    * @image html sphere_section.png
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
 
   template <int spacedim>
@@ -504,7 +504,7 @@ namespace GridGenerator
    *
    * The appropriate boundary class is HyperBallBoundary.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void quarter_hyper_ball (Triangulation<dim> &tria,
@@ -522,7 +522,7 @@ namespace GridGenerator
    * The appropriate boundary class is HalfHyperBallBoundary, or
    * HyperBallBoundary.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void half_hyper_ball (Triangulation<dim> &tria,
@@ -547,7 +547,7 @@ namespace GridGenerator
    * the GridTools::transform() function using a rotation operator as
    * argument.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void cylinder (Triangulation<dim> &tria,
@@ -575,7 +575,7 @@ namespace GridGenerator
    * boundary indicator 0.
    * In two dimensions the default FlatManifold is sufficient.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    *
    * @author Markus B&uuml;rg, 2009
    */
@@ -649,7 +649,7 @@ namespace GridGenerator
    * This function exists for triangulations of all space
    * dimensions, but throws an error if called in 1d.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void hyper_L (Triangulation<dim> &tria,
@@ -672,7 +672,7 @@ namespace GridGenerator
    * If @p colorize is set to @p true, the faces forming the slit are marked
    * with boundary id 1 and 2, respectively.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void hyper_cube_slit (Triangulation<dim> &tria,
@@ -742,7 +742,7 @@ namespace GridGenerator
    * @note This function is declared to exist for triangulations of all space
    * dimensions, but throws an error if called in 1d.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void hyper_shell (Triangulation<dim> &tria,
@@ -771,7 +771,7 @@ namespace GridGenerator
    * boundary where $x=0$, get indicator 0, 1, and 2, respectively. Otherwise
    * all indicators are set to 0.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void half_hyper_shell (Triangulation<dim> &tria,
@@ -800,7 +800,7 @@ namespace GridGenerator
    * indicators are set to 0. In 3d indicator 2 is at the face x=0, 3 at y=0,
    * 4 at z=0.
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void quarter_hyper_shell (Triangulation<dim> &tria,
@@ -824,7 +824,7 @@ namespace GridGenerator
    * sense in 1D and 2D. Also keep in mind that this object is rotated
    * and positioned differently than the one created by cylinder().
    *
-   * @note The triangulation needs to be void upon calling this function.
+   * @note The triangulation passed as argument needs to be empty when calling this function.
    */
   template <int dim>
   void cylinder_shell (Triangulation<dim> &tria,
