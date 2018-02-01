@@ -33,6 +33,7 @@
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE
 #   DEAL_II_DEPRECATED
 #   DEAL_II_ALWAYS_INLINE
+#   DEAL_II_RESTRICT
 #   DEAL_II_COMPILER_HAS_DIAGNOSTIC_PRAGMA
 #   DEAL_II_COMPILER_HAS_FUSE_LD_GOLD
 #
@@ -361,6 +362,23 @@ IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_ALWAYS_INLINE)
   SET(DEAL_II_ALWAYS_INLINE "__attribute__((always_inline))")
 ELSE()
   SET(DEAL_II_ALWAYS_INLINE " ")
+ENDIF()
+
+#
+# Check whether the compiler understands the __restrict keyword.
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+          void fn (double *__restrict a, double *__restrict b) { a[0] = b[0]; a[1] = b[0]; }
+          int main() { }
+  "
+  DEAL_II_COMPILER_HAS_RESTRICT_KEYWORD
+  )
+
+IF(DEAL_II_COMPILER_HAS_RESTRICT_KEYWORD)
+  SET(DEAL_II_RESTRICT "__restrict")
+ELSE()
+  SET(DEAL_II_RESTRICT " ")
 ENDIF()
 
 
