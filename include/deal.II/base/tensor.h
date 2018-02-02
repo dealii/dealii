@@ -206,6 +206,13 @@ public:
   Tensor<0,dim,Number> &operator = (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
+   * This operator assigns a scalar to a tensor. This obviously requires
+   * that the @p OtherNumber type is convertible to @p Number.
+   */
+  template <typename OtherNumber>
+  Tensor<0,dim,Number> &operator = (const OtherNumber &d);
+
+  /**
    * Test for equality of two tensors.
    */
   template <typename OtherNumber>
@@ -793,6 +800,16 @@ inline
 Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,OtherNumber> &p)
 {
   value = p.value;
+  return *this;
+}
+
+
+template <int dim, typename Number>
+template <typename OtherNumber>
+inline
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const OtherNumber &d)
+{
+  value = internal::NumberType<Number>::value(d);
   return *this;
 }
 
