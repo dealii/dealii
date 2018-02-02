@@ -510,8 +510,8 @@ namespace FEValuesViews
                                                shape_derivatives[0].size() : derivatives.size();
       AssertDimension (derivatives.size(), n_quadrature_points);
 
-      std::fill (derivatives.begin(), derivatives.end(),
-                 typename ProductType<Number,dealii::Tensor<order,spacedim> >::type());
+      typedef typename ProductType<Number,dealii::Tensor<order,spacedim> >::type ProductTensorType;
+      std::fill (derivatives.begin(), derivatives.end(), ProductTensorType());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -528,8 +528,7 @@ namespace FEValuesViews
             const dealii::Tensor<order,spacedim> *shape_derivative_ptr =
               &shape_derivatives[shape_function_data[shape_function].row_index][0];
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-              derivatives[q_point] += value *
-                                      dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
+              derivatives[q_point] += value * ProductTensorType(*shape_derivative_ptr++);
           }
     }
 
@@ -638,8 +637,8 @@ namespace FEValuesViews
                                                shape_derivatives[0].size() : derivatives.size();
       AssertDimension (derivatives.size(), n_quadrature_points);
 
-      std::fill (derivatives.begin(), derivatives.end(),
-                 typename ProductType<Number,dealii::Tensor<order+1,spacedim> >::type());
+      typedef typename ProductType<Number,dealii::Tensor<order+1,spacedim> >::type ProductTensorType;
+      std::fill (derivatives.begin(), derivatives.end(), ProductTensorType());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -658,6 +657,7 @@ namespace FEValuesViews
             if (value == dealii::internal::NumberType<Number>::value(0.0))
               continue;
 
+          typedef typename ProductType<Number,dealii::Tensor<order,spacedim> >::type ProductSubTensorType;
           if (snc != -1)
             {
               const unsigned int comp =
@@ -665,8 +665,7 @@ namespace FEValuesViews
               const dealii::Tensor<order,spacedim> *shape_derivative_ptr =
                 &shape_derivatives[snc][0];
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                derivatives[q_point][comp] += value *
-                                              dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
+                derivatives[q_point][comp] += value * ProductSubTensorType(*shape_derivative_ptr++);
             }
           else
             for (unsigned int d=0; d<spacedim; ++d)
@@ -676,8 +675,7 @@ namespace FEValuesViews
                     &shape_derivatives[shape_function_data[shape_function].
                                        row_index[d]][0];
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    derivatives[q_point][d] += value *
-                                               dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
+                    derivatives[q_point][d] += value * ProductSubTensorType(*shape_derivative_ptr++);
                 }
         }
     }
