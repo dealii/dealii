@@ -57,7 +57,7 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from one.
    */
-  explicit TableIndices (const unsigned int index0);
+  explicit TableIndices (const std::size_t index0);
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -67,8 +67,8 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from two.
    */
-  TableIndices (const unsigned int index0,
-                const unsigned int index1);
+  TableIndices (const std::size_t index0,
+                const std::size_t index1);
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -78,9 +78,9 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from three.
    */
-  TableIndices (const unsigned int index0,
-                const unsigned int index1,
-                const unsigned int index2);
+  TableIndices (const std::size_t index0,
+                const std::size_t index1,
+                const std::size_t index2);
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -90,10 +90,10 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from four.
    */
-  TableIndices (const unsigned int index0,
-                const unsigned int index1,
-                const unsigned int index2,
-                const unsigned int index3);
+  TableIndices (const std::size_t index0,
+                const std::size_t index1,
+                const std::size_t index2,
+                const std::size_t index3);
 
   /**
    * Constructor. This is the appropriate constructor for an
@@ -103,11 +103,11 @@ public:
    * This constructor will result in a compiler error if
    * the template argument @p N is different from five.
    */
-  TableIndices (const unsigned int index0,
-                const unsigned int index1,
-                const unsigned int index2,
-                const unsigned int index3,
-                const unsigned int index4);
+  TableIndices (const std::size_t index0,
+                const std::size_t index1,
+                const std::size_t index2,
+                const std::size_t index3,
+                const std::size_t index4);
 
   /**
    * Convenience constructor that takes up to 9 arguments. It can be used to
@@ -124,25 +124,25 @@ public:
    *   to initialize the @p N indices instead.
    */
   DEAL_II_DEPRECATED
-  TableIndices (const unsigned int index0,
-                const unsigned int index1,
-                const unsigned int index2,
-                const unsigned int index3,
-                const unsigned int index4,
-                const unsigned int index5,
-                const unsigned int index6 = numbers::invalid_unsigned_int,
-                const unsigned int index7 = numbers::invalid_unsigned_int,
-                const unsigned int index8 = numbers::invalid_unsigned_int);
+  TableIndices (const std::size_t index0,
+                const std::size_t index1,
+                const std::size_t index2,
+                const std::size_t index3,
+                const std::size_t index4,
+                const std::size_t index5,
+                const std::size_t index6 = numbers::invalid_unsigned_int,
+                const std::size_t index7 = numbers::invalid_unsigned_int,
+                const std::size_t index8 = numbers::invalid_unsigned_int);
 
   /**
    * Read-only access the value of the <tt>i</tt>th index.
    */
-  unsigned int operator[] (const unsigned int i) const;
+  std::size_t operator[] (const unsigned int i) const;
 
   /**
    * Write access the value of the <tt>i</tt>th index.
    */
-  unsigned int &operator[] (const unsigned int i);
+  std::size_t &operator[] (const unsigned int i);
 
   /**
    * Compare two index fields for equality.
@@ -171,7 +171,7 @@ protected:
   /**
    * Store the indices in an array.
    */
-  unsigned int indices[N];
+  std::size_t indices[N];
 };
 
 
@@ -191,7 +191,7 @@ TableIndices<N>::TableIndices()
 
 
 template <int N>
-TableIndices<N>::TableIndices(const unsigned int index0)
+TableIndices<N>::TableIndices(const std::size_t index0)
 {
   static_assert (N==1,
                  "This constructor is only available for TableIndices<1> objects.");
@@ -201,8 +201,8 @@ TableIndices<N>::TableIndices(const unsigned int index0)
 
 
 template <int N>
-TableIndices<N>::TableIndices(const unsigned int index0,
-                              const unsigned int index1)
+TableIndices<N>::TableIndices(const std::size_t index0,
+                              const std::size_t index1)
 {
   static_assert (N==2,
                  "This constructor is only available for TableIndices<2> objects.");
@@ -213,9 +213,9 @@ TableIndices<N>::TableIndices(const unsigned int index0,
 
 
 template <int N>
-TableIndices<N>::TableIndices(const unsigned int index0,
-                              const unsigned int index1,
-                              const unsigned int index2)
+TableIndices<N>::TableIndices(const std::size_t index0,
+                              const std::size_t index1,
+                              const std::size_t index2)
 {
   static_assert (N==3,
                  "This constructor is only available for TableIndices<3> objects.");
@@ -227,10 +227,10 @@ TableIndices<N>::TableIndices(const unsigned int index0,
 
 
 template <int N>
-TableIndices<N>::TableIndices(const unsigned int index0,
-                              const unsigned int index1,
-                              const unsigned int index2,
-                              const unsigned int index3)
+TableIndices<N>::TableIndices(const std::size_t index0,
+                              const std::size_t index1,
+                              const std::size_t index2,
+                              const std::size_t index3)
 {
   static_assert (N==4,
                  "This constructor is only available for TableIndices<4> objects.");
@@ -243,11 +243,11 @@ TableIndices<N>::TableIndices(const unsigned int index0,
 
 
 template <int N>
-TableIndices<N>::TableIndices(const unsigned int index0,
-                              const unsigned int index1,
-                              const unsigned int index2,
-                              const unsigned int index3,
-                              const unsigned int index4)
+TableIndices<N>::TableIndices(const std::size_t index0,
+                              const std::size_t index1,
+                              const std::size_t index2,
+                              const std::size_t index3,
+                              const std::size_t index4)
 {
   static_assert (N==5,
                  "This constructor is only available for TableIndices<5> objects.");
@@ -261,15 +261,15 @@ TableIndices<N>::TableIndices(const unsigned int index0,
 
 
 template <int N>
-TableIndices<N>::TableIndices(const unsigned int index0,
-                              const unsigned int index1,
-                              const unsigned int index2,
-                              const unsigned int index3,
-                              const unsigned int index4,
-                              const unsigned int index5,
-                              const unsigned int index6,
-                              const unsigned int index7,
-                              const unsigned int index8)
+TableIndices<N>::TableIndices(const std::size_t index0,
+                              const std::size_t index1,
+                              const std::size_t index2,
+                              const std::size_t index3,
+                              const std::size_t index4,
+                              const std::size_t index5,
+                              const std::size_t index6,
+                              const std::size_t index7,
+                              const std::size_t index8)
 {
   Assert (N > 0, ExcMessage("Cannot create a TableIndices object of size 0"));
 
@@ -346,20 +346,20 @@ TableIndices<N>::TableIndices(const unsigned int index0,
 
 template <int N>
 inline
-unsigned int
+std::size_t
 TableIndices<N>::operator [] (const unsigned int i) const
 {
-  Assert (i < N, ExcIndexRange (i, 0, N));
+  AssertIndexRange (i, N);
   return indices[i];
 }
 
 
 template <int N>
 inline
-unsigned int &
+std::size_t &
 TableIndices<N>::operator [] (const unsigned int i)
 {
-  Assert (i < N, ExcIndexRange (i, 0, N));
+  AssertIndexRange (i, N);
   return indices[i];
 }
 
