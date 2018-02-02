@@ -597,12 +597,10 @@ namespace internal
         void
         reserve_space (DoFHandler<1,spacedim> &dof_handler)
         {
-          const unsigned int dim = 1;
-
           Assert (dof_handler.finite_elements != nullptr,
-                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
+                  (typename DoFHandler<1,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.finite_elements->size() > 0,
-                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
+                  (typename DoFHandler<1,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.tria->n_levels() > 0,
                   ExcMessage("The current Triangulation must not be empty."));
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
@@ -621,12 +619,10 @@ namespace internal
         void
         reserve_space (DoFHandler<2,spacedim> &dof_handler)
         {
-          const unsigned int dim = 2;
-
           Assert (dof_handler.finite_elements != nullptr,
-                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
+                  (typename DoFHandler<2,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.finite_elements->size() > 0,
-                  (typename DoFHandler<dim,spacedim>::ExcNoFESelected()));
+                  (typename DoFHandler<2,spacedim>::ExcNoFESelected()));
           Assert (dof_handler.tria->n_levels() > 0,
                   ExcMessage("The current Triangulation must not be empty."));
           Assert (dof_handler.tria->n_levels() == dof_handler.levels.size (),
