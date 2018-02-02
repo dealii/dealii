@@ -385,6 +385,27 @@ namespace numbers
 
 }
 
+
+// Forward declarations
+namespace Differentiation
+{
+  namespace AD
+  {
+
+    namespace internal
+    {
+      // Defined in differentiation/ad/ad_number_traits.h
+      template <typename T>
+      struct NumberType;
+    }
+
+    // Defined in differentiation/ad/ad_number_traits.h
+    template <typename NumberType>
+    struct is_ad_number;
+  }
+}
+
+
 namespace internal
 {
   /**
@@ -462,10 +483,28 @@ namespace internal
            !std::is_same<typename std::decay<T>::type,typename std::decay<F>::type>::value &&
            !std::is_constructible<T,F>::value &&
            is_explicitly_convertible<const F,T>::value
-           >::type * = 0)
+           >::type * = nullptr)
     {
       return static_cast<T>(f);
     }
+
+    // Sacado doesn't provide any conversion operators, so we have
+    // to extract the value and perform further conversions from there.
+    // To be safe, we extend this to other possible AD numbers that
+    // might fall into the same category.
+    template<typename F>
+    static T
+    value (const F &f,
+           typename std::enable_if<
+           !std::is_same<typename std::decay<T>::type,typename std::decay<F>::type>::value &&
+           !std::is_constructible<T,F>::value &&
+           !is_explicitly_convertible<const F,T>::value &&
+           Differentiation::AD::is_ad_number<F>::value
+           >::type * = nullptr)
+    {
+      return Differentiation::AD::internal::NumberType<T>::value(f);
+    }
+
   };
 
   template <typename T>
