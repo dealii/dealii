@@ -483,7 +483,7 @@ namespace internal
            !std::is_same<typename std::decay<T>::type,typename std::decay<F>::type>::value &&
            !std::is_constructible<T,F>::value &&
            is_explicitly_convertible<const F,T>::value
-           >::type * = 0)
+           >::type * = nullptr)
     {
       return static_cast<T>(f);
     }
