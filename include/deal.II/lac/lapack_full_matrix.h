@@ -883,7 +883,7 @@ inline
 typename LAPACKFullMatrix<number>::size_type
 LAPACKFullMatrix<number>::m () const
 {
-  return this->n_rows ();
+  return static_cast<size_type>(this->n_rows ());
 }
 
 template <typename number>
@@ -891,7 +891,7 @@ inline
 typename LAPACKFullMatrix<number>::size_type
 LAPACKFullMatrix<number>::n () const
 {
-  return this->n_cols ();
+  return static_cast<size_type>(this->n_cols ());
 }
 
 template <typename number>
