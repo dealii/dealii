@@ -1,0 +1,14 @@
+
+DEAL:0:2d::Max possible level for coarse mesh: 1
+DEAL:0:3d::Max possible level for coarse mesh: 1
+DEAL:0::OK
+
+DEAL:1:2d::Max possible level for coarse mesh: 1
+DEAL:1:3d::Max possible level for coarse mesh: 1
+DEAL:1::OK
+
+
+DEAL:2:2d::Max possible level for coarse mesh: 1
+DEAL:2:3d::Max possible level for coarse mesh: 1
+DEAL:2::OK
+
