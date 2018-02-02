@@ -127,7 +127,14 @@ private:
  * spherical surface embedded in a higher dimensional space, or as a
  * co-dimension zero manifold descriptor for a body with positive
  * volume, provided that the center of the spherical space is excluded
- * from the domain.
+ * from the domain. An example for the use of this function would be
+ * in the description of a hyper-shell or hyper-ball geometry, for
+ * example after creating a coarse mesh using GridGenerator::hyper_ball().
+ * (However, it is worth mentioning that generating a good mesh for
+ * a disk or ball is complicated and requires addition steps. See the
+ * "Possibilities for extensions" section of step-6 for an extensive
+ * discussion of how one would construct such meshes and what one
+ * needs to do for it.)
  *
  * The two template arguments match the meaning of the two template arguments
  * in Triangulation<dim, spacedim>, however this Manifold can be used to

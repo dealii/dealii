@@ -436,11 +436,16 @@ namespace GridGenerator
                             const bool          colorize = false);
 
   /**
-   * Initialize the given triangulation with a hyperball, i.e. a circle or a
+   * Initialize the given triangulation with several coarse mesh cells
+   * that cover a hyperball, i.e. a circle or a
    * ball around @p center with given @p radius.
    *
    * In order to avoid degenerate cells at the boundaries, the circle is
-   * triangulated by five cells, the ball by seven cells. The diameter of the
+   * triangulated by five cells, the ball by seven cells. Specifically, these
+   * cells are one cell in the center plus one "cap" cell on each of the faces
+   * of this center cell. This ensures that under repeated refinement, none
+   * of the cells at the outer boundary will degenerate to have an interior
+   * angle approaching 180 degrees. The diameter of the
    * center cell is chosen so that the aspect ratio of the boundary cells
    * after one refinement is optimized.
    *
@@ -449,7 +454,11 @@ namespace GridGenerator
    *
    * You should attach a SphericalManifold to the cells and faces for correct
    * placement of vertices upon refinement and to be able to use higher order
-   * mappings.
+   * mappings. However, it turns out that creating a mesh for a hyperball is
+   * not entirely trivial since the central cell has to be treated
+   * differently than the "cap" cells. The "Possibilities for extensions"
+   * section of step-6 has an extensive discussion of how one would construct
+   * such meshes and what one needs to do for it.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */

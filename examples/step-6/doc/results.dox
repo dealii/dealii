@@ -292,7 +292,7 @@ vertices at the edge midpoints and the cell midpoint be located so that the
 child cells better represent the desired geometry than the parent cell.
 
 In the code above, we already do this for faces that sit at the boundary:
-we use the code
+There, we use the code
 @code
           static const SphericalManifold<dim> boundary;
           triangulation.set_all_manifold_ids_on_boundary(0);
