@@ -99,8 +99,8 @@ template <typename number>
 void
 LAPACKFullMatrix<number>::remove_row_and_column (const size_type row, const size_type col)
 {
-  Assert (row<this->n_rows(), ExcIndexRange(row,0,this->n_rows()));
-  Assert (col<this->n_cols(), ExcIndexRange(col,0,this->n_cols()));
+  AssertIndexRange (row,this->n_rows());
+  AssertIndexRange (col,this->n_cols());
 
   const size_type nrows = this->n_rows()-1;
   const size_type ncols = this->n_cols()-1;
@@ -1551,7 +1551,7 @@ LAPACKFullMatrix<number>::print_formatted (
   // set output format, but store old
   // state
   std::ios::fmtflags old_flags = out.flags();
-  unsigned int old_precision = out.precision (precision);
+  std::streamsize old_precision = out.precision (precision);
 
   if (scientific)
     {
