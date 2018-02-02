@@ -16,7 +16,7 @@
 #include "../tests.h"
 #include "../lapack/create_matrix.h"
 
-// test copying of distributed ScaLAPACKMatrices using ScaLAPACK routine  p_gemr2d
+// test copying of distributed ScaLAPACKMatrices using ScaLAPACK routine p_gemr2d
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>

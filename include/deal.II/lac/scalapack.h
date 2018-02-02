@@ -166,6 +166,56 @@ public:
   void copy_to (ScaLAPACKMatrix<NumberType> &dest) const;
 
   /**
+   * Copy a submatrix (subset) of the distributed matrix A to a submatrix of the distributed matrix @p B.
+   *
+   * - The global row and column index of the first element of the submatrix A is provided by @p offset_A
+   *   with row index=<code>offset_A.first</code> and column index=<code>offset_A.second</code>.
+   *
+   * - The global row and column index of the first element of the submatrix B is provided by @p offset_B
+   *   with row index=<code>offset_B.first</code> and column index=<code>offset_B.second</code>.
+   *
+   * - The dimension of the submatrix to be copied is given by @p submatrix_size
+   *   with number of rows=<code>submatrix_size.first</code> and number of columns=<code>submatrix_size.second</code>.
+   *
+   *
+   * If it is necessary to copy complete matrices with an identical block-cyclic distribution,
+   * use copy_to(ScaLAPACKMatrix<NumberType> &dest) with only one argument to avoid communication.
+   *
+   * The underlying process grids of the matrices @p A and @p B must have been built
+   * with the same MPI communicator.
+   */
+  void copy_to(ScaLAPACKMatrix<NumberType> &B,
+               const std::pair<unsigned int,unsigned int> &offset_A,
+               const std::pair<unsigned int,unsigned int> &offset_B,
+               const std::pair<unsigned int,unsigned int> &submatrix_size) const;
+
+  /**
+   * Stores the distributed matrix in @p filename using HDF5.
+   * In case that deal.II was built without HDF5
+   * a call to this function will cause an exception to be thrown.
+   *
+   * If HDF5 was built with MPI, parallel I/O is used to save the matrix.
+   * Otherwise, just one process will do the output. This means that
+   * internally the distributed matrix is copied to one process, which
+   * does the output. Therefore, the matrix has to fit into the memory
+   * of one process.
+   */
+  void save(const char *filename) const;
+
+  /**
+   * Loads the distributed matrix from file @p filename using HDF5.
+   * In case that deal.II was built without HDF5
+   * a call to this function will cause an exception to be thrown.
+   *
+   * The matrix must have the same dimensions as the matrix stored in the file.
+   *
+   * If HDF5 was build with MPI, parallel I/O is used to load the matrix.
+   * Otherwise, just one process will load the matrix from storage
+   * and distribute the content to the other processes subsequently.
+   */
+  void load(const char *filename);
+
+  /**
    * Compute the Cholesky factorization of the matrix using ScaLAPACK
    * function <code>pXpotrf</code>. The result of the factorization is stored in this object.
    */
@@ -244,12 +294,12 @@ public:
   *      $\min \Vert B - A*X\Vert$.
   *
   *      Upon exit the rows 0 to N-1 of $B$ contain the least square solution vectors. The residual sum of squares
-  *      for each column is given by the sum of squares of elements N to M-1 in that column
+  *      for each column is given by the sum of squares of elements N to M-1 in that column.
   *
   * - 2. If <code>transpose==false</code> and $M < N$: find minimum norm solutions of underdetermined systems
   *      $A * X = B$.
   *
-  *      Upon exit the columns of $B$ contain the minimum norm solution vectors
+  *      Upon exit the columns of $B$ contain the minimum norm solution vectors.
   *
   * - 3. If <code>transpose==true</code> and $M \geq N$: find minimum norm solutions of underdetermined system
   *      $ A^\top X = B$.
@@ -260,8 +310,8 @@ public:
   *      $\min \Vert B - A^\top X\Vert$.
   *
   *      Upon exit the rows 0 to M-1 contain the least square solution vectors. The residual sum of squares
-  *      for each column is given by the sum of squares of elements M to N-1 in that column
-  * .
+  *      for each column is given by the sum of squares of elements M to N-1 in that column.
+  *
   * If <code>transpose==false</code> then $B \in \mathbb{R}^{M \times N_{\rm RHS}}$,
   * otherwise $B \in \mathbb{R}^{N \times N_{\rm RHS}}}$.
   * The matrices $A$ and $B$ must have an identical block cyclic distribution for rows and columns.
@@ -362,6 +412,30 @@ private:
                                                  std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int),
                                                const std::pair<NumberType,NumberType> &value_limits=
                                                  std::make_pair(std::numeric_limits<NumberType>::quiet_NaN(),std::numeric_limits<NumberType>::quiet_NaN()));
+
+  /*
+   * Stores the distributed matrix in @p filename
+   * using serial routines
+   */
+  void save_serial(const char *filename) const;
+
+  /*
+   * Loads the distributed matrix from file @p filename
+   * using serial routines
+   */
+  void load_serial(const char *filename);
+
+  /*
+   * Stores the distributed matrix in @p filename
+   * using parallel routines
+   */
+  void save_parallel(const char *filename) const;
+
+  /*
+   * Loads the distributed matrix from file @p filename
+   * using parallel routines
+   */
+  void load_parallel(const char *filename);
 
   /**
    * Since ScaLAPACK operations notoriously change the meaning of the matrix
