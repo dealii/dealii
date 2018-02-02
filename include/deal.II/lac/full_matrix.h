@@ -65,12 +65,9 @@ class FullMatrix : public Table<2,number>
 {
 public:
   /**
-   * A type of used to index into this container. Because we can not expect to
-   * store matrices bigger than what can be indexed by a regular unsigned
-   * integer, <code>unsigned int</code> is completely sufficient as an index
-   * type.
+   * A type of used to index into this container.
    */
-  typedef unsigned int size_type;
+  typedef std::size_t size_type;
 
   /**
    * Type of matrix entries. This typedef is analogous to <tt>value_type</tt>
@@ -317,10 +314,10 @@ public:
   template <int dim>
   void
   copy_from (const Tensor<2,dim> &T,
-             const size_type src_r_i=0,
-             const size_type src_r_j=dim-1,
-             const size_type src_c_i=0,
-             const size_type src_c_j=dim-1,
+             const unsigned int src_r_i=0,
+             const unsigned int src_r_j=dim-1,
+             const unsigned int src_c_i=0,
+             const unsigned int src_c_j=dim-1,
              const size_type dst_r=0,
              const size_type dst_c=0);
 
@@ -338,8 +335,8 @@ public:
           const size_type src_r_j=dim-1,
           const size_type src_c_i=0,
           const size_type src_c_j=dim-1,
-          const size_type dst_r=0,
-          const size_type dst_c=0) const;
+          const unsigned int dst_r=0,
+          const unsigned int dst_c=0) const;
 
   /**
    * Copy a subset of the rows and columns of another matrix into the current
@@ -731,7 +728,7 @@ public:
    */
   template <typename number2, typename index_type>
   void add (const size_type     row,
-            const unsigned int  n_cols,
+            const size_type     n_cols,
             const index_type   *col_indices,
             const number2      *values,
             const bool          elide_zero_values = true,
@@ -1475,7 +1472,7 @@ inline
 typename FullMatrix<number>::const_iterator
 FullMatrix<number>::begin (const size_type r) const
 {
-  Assert (r<m(), ExcIndexRange(r,0,m()));
+  AssertIndexRange(r,m());
   return const_iterator(this, r, 0);
 }
 
@@ -1486,7 +1483,7 @@ inline
 typename FullMatrix<number>::const_iterator
 FullMatrix<number>::end (const size_type r) const
 {
-  Assert (r<m(), ExcIndexRange(r,0,m()));
+  AssertIndexRange(r,m());
   return const_iterator(this, r+1, 0);
 }
 
@@ -1509,10 +1506,10 @@ template <typename number>
 template <typename number2, typename index_type>
 inline
 void
-FullMatrix<number>::add (const size_type    row,
-                         const unsigned int n_cols,
-                         const index_type  *col_indices,
-                         const number2     *values,
+FullMatrix<number>::add (const size_type   row,
+                         const size_type   n_cols,
+                         const index_type *col_indices,
+                         const number2    *values,
                          const bool,
                          const bool)
 {
@@ -1536,8 +1533,8 @@ FullMatrix<number>::print (StreamType         &s,
   Assert (!this->empty(), ExcEmptyMatrix());
 
   // save the state of out stream
-  const unsigned int old_precision = s.precision (p);
-  const unsigned int old_width = s.width (w);
+  const std::streamsize old_precision = s.precision (p);
+  const std::streamsize old_width = s.width (w);
 
   for (size_type i=0; i<this->m(); ++i)
     {

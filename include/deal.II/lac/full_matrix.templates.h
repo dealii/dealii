@@ -301,7 +301,7 @@ void FullMatrix<number>::backward (Vector<number2>       &dst,
 
   size_type j;
   size_type nu = (m()<n() ? m() : n());
-  for (int i=nu-1; i>=0; --i)
+  for (std::make_signed<size_type>::type i=nu-1; i>=0; --i)
     {
       typename ProductType<number,number2>::type s = src(i);
       for (j=i+1; j<nu; ++j)
@@ -321,14 +321,10 @@ void FullMatrix<number>::fill (const FullMatrix<number2> &src,
                                const size_type src_offset_i,
                                const size_type src_offset_j)
 {
-  Assert (dst_offset_i < m(),
-          ExcIndexRange (dst_offset_i, 0, m()));
-  Assert (dst_offset_j < n(),
-          ExcIndexRange (dst_offset_j, 0, n()));
-  Assert (src_offset_i < src.m(),
-          ExcIndexRange (src_offset_i, 0, src.m()));
-  Assert (src_offset_j < src.n(),
-          ExcIndexRange (src_offset_j, 0, src.n()));
+  AssertIndexRange (dst_offset_i, m());
+  AssertIndexRange (dst_offset_j, n());
+  AssertIndexRange (src_offset_i, src.m());
+  AssertIndexRange (src_offset_j, src.n());
 
   // Compute maximal size of copied block
   const size_type rows = std::min (m() - dst_offset_i,
@@ -1085,14 +1081,10 @@ void FullMatrix<number>::add (const FullMatrix<number2> &src,
                               const size_type src_offset_i,
                               const size_type src_offset_j)
 {
-  Assert (dst_offset_i < m(),
-          ExcIndexRange (dst_offset_i, 0, m()));
-  Assert (dst_offset_j < n(),
-          ExcIndexRange (dst_offset_j, 0, n()));
-  Assert (src_offset_i < src.m(),
-          ExcIndexRange (src_offset_i, 0, src.m()));
-  Assert (src_offset_j < src.n(),
-          ExcIndexRange (src_offset_j, 0, src.n()));
+  AssertIndexRange (dst_offset_i, m());
+  AssertIndexRange (dst_offset_j, n());
+  AssertIndexRange (src_offset_i, src.m());
+  AssertIndexRange (src_offset_j, src.n());
 
   // Compute maximal size of copied block
   const size_type rows = std::min (m() - dst_offset_i, src.m() - src_offset_i);
@@ -1115,14 +1107,10 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
                                const size_type src_offset_i,
                                const size_type src_offset_j)
 {
-  Assert (dst_offset_i < m(),
-          ExcIndexRange (dst_offset_i, 0, m()));
-  Assert (dst_offset_j < n(),
-          ExcIndexRange (dst_offset_j, 0, n()));
-  Assert (src_offset_i < src.n(),
-          ExcIndexRange (src_offset_i, 0, src.n()));
-  Assert (src_offset_j < src.m(),
-          ExcIndexRange (src_offset_j, 0, src.m()));
+  AssertIndexRange (dst_offset_i, m());
+  AssertIndexRange (dst_offset_j, n());
+  AssertIndexRange (src_offset_i, src.n());
+  AssertIndexRange (src_offset_j, src.m());
 
   // Compute maximal size of copied block
   const size_type rows = std::min (m() - dst_offset_i, src.n() - src_offset_j);
@@ -1193,7 +1181,11 @@ namespace internal
 #ifdef DEAL_II_WITH_LAPACK
       static number value (const FullMatrix<number> &A)
       {
-        LAPACKFullMatrix<number> lp_A (A.m(), A.n());
+        using s_type = typename LAPACKFullMatrix<number>::size_type;
+        AssertIndexRange (A.m(), std::numeric_limits<s_type>::max()+1);
+        AssertIndexRange (A.n(), std::numeric_limits<s_type>::max()+1);
+        LAPACKFullMatrix<number> lp_A (static_cast<s_type>(A.m()),
+                                       static_cast<s_type>(A.n()));
         lp_A = A;
         lp_A.compute_lu_factorization();
         return lp_A.determinant();
@@ -1618,27 +1610,28 @@ template <typename number>
 template <int dim>
 void
 FullMatrix<number>::copy_from (const Tensor<2,dim> &T,
-                               const size_type src_r_i,
-                               const size_type src_r_j,
-                               const size_type src_c_i,
-                               const size_type src_c_j,
+                               const unsigned int src_r_i,
+                               const unsigned int src_r_j,
+                               const unsigned int src_c_i,
+                               const unsigned int src_c_j,
                                const size_type dst_r,
                                const size_type dst_c)
 {
-
   Assert (!this->empty(), ExcEmptyMatrix());
-  Assert(this->m()-dst_r>src_r_j-src_r_i,
-         ExcIndexRange(this->m()-dst_r,0,src_r_j-src_r_i));
-  Assert(this->n()-dst_c>src_c_j-src_c_i,
-         ExcIndexRange(this->n()-dst_c,0,src_c_j-src_c_i));
-  Assert(dim>src_r_j, ExcIndexRange(dim,0,src_r_j));
-  Assert(dim>src_c_j, ExcIndexRange(dim,0,src_r_j));
-  Assert(src_r_j>=src_r_i, ExcIndexRange(src_r_j,0,src_r_i));
-  Assert(src_c_j>=src_c_i, ExcIndexRange(src_r_j,0,src_r_i));
+  AssertIndexRange(src_r_j-src_r_i, this->m()-dst_r);
+  AssertIndexRange(src_c_j-src_c_i, this->n()-dst_c);
+  AssertIndexRange(src_r_j,dim);
+  AssertIndexRange(src_c_j,dim);
+  AssertIndexRange(src_r_i,src_r_j+1);
+  AssertIndexRange(src_c_i,src_c_j+1);
 
   for (size_type i=0; i<src_r_j-src_r_i+1; i++)
     for (size_type j=0; j<src_c_j-src_c_i+1; j++)
-      (*this)(i+dst_r,j+dst_c) = number(T[i+src_r_i][j+src_c_i]);
+      {
+        const unsigned int src_r_index = static_cast<unsigned int>(i+src_r_i);
+        const unsigned int src_c_index = static_cast<unsigned int>(j+src_c_i);
+        (*this)(i+dst_r,j+dst_c) = number(T[src_r_index][src_c_index]);
+      }
 
 }
 
@@ -1651,23 +1644,24 @@ FullMatrix<number>::copy_to (Tensor<2,dim> &T,
                              const size_type src_r_j,
                              const size_type src_c_i,
                              const size_type src_c_j,
-                             const size_type dst_r,
-                             const size_type dst_c) const
+                             const unsigned int dst_r,
+                             const unsigned int dst_c) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
-  Assert(dim-dst_r>src_r_j-src_r_i,
-         ExcIndexRange(dim-dst_r,0,src_r_j-src_r_i));
-  Assert(dim-dst_c>src_c_j-src_c_i,
-         ExcIndexRange(dim-dst_c,0,src_c_j-src_c_i));
-  Assert(this->m()>src_r_j, ExcIndexRange(dim,0,src_r_j));
-  Assert(this->n()>src_c_j, ExcIndexRange(dim,0,src_r_j));
-  Assert(src_r_j>=src_r_i, ExcIndexRange(src_r_j,0,src_r_i));
-  Assert(src_c_j>=src_c_i, ExcIndexRange(src_r_j,0,src_r_i));
-
+  AssertIndexRange(src_r_j-src_r_i,dim-dst_r);
+  AssertIndexRange(src_c_j-src_c_i,dim-dst_c);
+  AssertIndexRange(src_r_j,this->m());
+  AssertIndexRange(src_r_j,this->n());
+  AssertIndexRange(src_r_i,src_r_j+1);
+  AssertIndexRange(src_c_j,src_c_j+1);
 
   for (size_type i=0; i<src_r_j-src_r_i+1; i++)
     for (size_type j=0; j<src_c_j-src_c_i+1; j++)
-      T[i+dst_r][j+dst_c] = double ((*this)(i+src_r_i,j+src_c_i));
+      {
+        const unsigned int dst_r_index = static_cast<unsigned int>(i+dst_r);
+        const unsigned int dst_c_index = static_cast<unsigned int>(j+dst_c);
+        T[dst_r_index][dst_c_index] = double ((*this)(i+src_r_i,j+src_c_i));
+      }
 }
 
 
@@ -1712,7 +1706,7 @@ FullMatrix<number>::print_formatted (
   // set output format, but store old
   // state
   std::ios::fmtflags old_flags = out.flags();
-  unsigned int old_precision = out.precision (precision);
+  std::streamsize old_precision = out.precision (precision);
 
   if (scientific)
     {
