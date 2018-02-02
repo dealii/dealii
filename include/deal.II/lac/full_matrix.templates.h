@@ -528,7 +528,10 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
        std::is_same<number,float>::value)
       &&
       std::is_same<number,number2>::value)
-    if (this->n()*this->m()*src.n() > 300)
+    if (this->n()*this->m()*src.n() > 300 &&
+        src.n() <= std::numeric_limits<types::blas_int>::max() &&
+        this->m() <= std::numeric_limits<types::blas_int>::max() &&
+        this->n() <= std::numeric_limits<types::blas_int>::max())
       {
         // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
@@ -542,9 +545,9 @@ void FullMatrix<number>::mmult (FullMatrix<number2>       &dst,
         // transpose matrices, and read the result as if it were row-wise
         // again. In other words, we calculate (B^T A^T)^T, which is AB.
 
-        const types::blas_int m = src.n();
-        const types::blas_int n = this->m();
-        const types::blas_int k = this->n();
+        const types::blas_int m = static_cast<types::blas_int>(src.n());
+        const types::blas_int n = static_cast<types::blas_int>(this->m());
+        const types::blas_int k = static_cast<types::blas_int>(this->n());
         const char *notrans = "n";
 
         const number alpha = 1.;
@@ -598,7 +601,10 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
        std::is_same<number,float>::value)
       &&
       std::is_same<number,number2>::value)
-    if (this->n()*this->m()*src.n() > 300)
+    if (this->n()*this->m()*src.n() > 300 &&
+        src.n() <= std::numeric_limits<types::blas_int>::max() &&
+        this->n() <= std::numeric_limits<types::blas_int>::max() &&
+        this->m() <= std::numeric_limits<types::blas_int>::max())
       {
         // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
@@ -612,9 +618,9 @@ void FullMatrix<number>::Tmmult (FullMatrix<number2>       &dst,
         // transpose matrices, and read the result as if it were row-wise
         // again. In other words, we calculate (B^T A)^T, which is A^T B.
 
-        const types::blas_int m = src.n();
-        const types::blas_int n = this->n();
-        const types::blas_int k = this->m();
+        const types::blas_int m = static_cast<types::blas_int>(src.n());
+        const types::blas_int n = static_cast<types::blas_int>(this->n());
+        const types::blas_int k = static_cast<types::blas_int>(this->m());
         const char *trans = "t";
         const char *notrans = "n";
 
@@ -688,7 +694,10 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
        std::is_same<number,float>::value)
       &&
       std::is_same<number,number2>::value)
-    if (this->n()*this->m()*src.m() > 300)
+    if (this->n()*this->m()*src.m() > 300 &&
+        src.m() <= std::numeric_limits<types::blas_int>::max() &&
+        this->n() <= std::numeric_limits<types::blas_int>::max() &&
+        this->m() <= std::numeric_limits<types::blas_int>::max())
       {
         // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
@@ -702,9 +711,9 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
         // transpose matrices, and read the result as if it were row-wise
         // again. In other words, we calculate (B A^T)^T, which is AB^T.
 
-        const types::blas_int m = src.m();
-        const types::blas_int n = this->m();
-        const types::blas_int k = this->n();
+        const types::blas_int m = static_cast<types::blas_int>(src.m());
+        const types::blas_int n = static_cast<types::blas_int>(this->m());
+        const types::blas_int k = static_cast<types::blas_int>(this->n());
         const char *notrans = "n";
         const char *trans = "t";
 
@@ -776,7 +785,10 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
        std::is_same<number,float>::value)
       &&
       std::is_same<number,number2>::value)
-    if (this->n()*this->m()*src.m() > 300)
+    if (this->n()*this->m()*src.m() > 300 &&
+        src.m() <= std::numeric_limits<types::blas_int>::max() &&
+        this->n() <= std::numeric_limits<types::blas_int>::max() &&
+        this->m() <= std::numeric_limits<types::blas_int>::max())
       {
         // In case we have the BLAS function gemm detected by CMake, we
         // use that algorithm for matrix-matrix multiplication since it
@@ -790,9 +802,9 @@ void FullMatrix<number>::TmTmult (FullMatrix<number2>       &dst,
         // transpose matrices, and read the result as if it were row-wise
         // again. In other words, we calculate (B A)^T, which is A^T B^T.
 
-        const types::blas_int m = src.m();
-        const types::blas_int n = this->n();
-        const types::blas_int k = this->m();
+        const types::blas_int m = static_cast<types::blas_int>(src.m());
+        const types::blas_int n = static_cast<types::blas_int>(this->n());
+        const types::blas_int k = static_cast<types::blas_int>(this->m());
         const char *trans = "t";
 
         const number alpha = 1.;
@@ -1182,8 +1194,8 @@ namespace internal
       static number value (const FullMatrix<number> &A)
       {
         using s_type = typename LAPACKFullMatrix<number>::size_type;
-        AssertIndexRange (A.m(), std::numeric_limits<s_type>::max()+1);
-        AssertIndexRange (A.n(), std::numeric_limits<s_type>::max()+1);
+        AssertIndexRange (A.m()-1, std::numeric_limits<s_type>::max());
+        AssertIndexRange (A.n()-1, std::numeric_limits<s_type>::max());
         LAPACKFullMatrix<number> lp_A (static_cast<s_type>(A.m()),
                                        static_cast<s_type>(A.n()));
         lp_A = A;
@@ -1759,7 +1771,8 @@ FullMatrix<number>::gauss_jordan ()
   if (std::is_same<number,double>::value
       ||
       std::is_same<number,float>::value)
-    if (this->n_cols() > 15)
+    if (this->n_cols() > 15 &&
+        this->n_cols() <= std::numeric_limits<types::blas_int>::max())
       {
         // In case we have the LAPACK functions
         // getrf and getri detected by CMake,
@@ -1780,7 +1793,7 @@ FullMatrix<number>::gauss_jordan ()
         // we just got ((A^T)^{-1})^T, which is
         // A^{-1}.
 
-        const types::blas_int nn = this->n();
+        const types::blas_int nn = static_cast<types::blas_int>(this->n());
 
         // workspace for permutations
         std::vector<types::blas_int> ipiv(nn);
