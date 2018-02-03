@@ -23,7 +23,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/cell_id.h>
 
