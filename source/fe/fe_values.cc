@@ -2892,7 +2892,7 @@ namespace internal
           = &shape_derivatives[shape_func][0];
         for (unsigned int point=0; point<n_quadrature_points; ++point)
           derivatives[point] += value *
-                                dealii::Tensor<order,spacedim,Number>(*shape_derivative_ptr++);
+                                dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
       }
   }
 
@@ -2965,11 +2965,11 @@ namespace internal
               if (quadrature_points_fastest)
                 for (unsigned int point=0; point<n_quadrature_points; ++point)
                   derivatives[comp][point] += value *
-                                              dealii::Tensor<order,spacedim,Number>(*shape_derivative_ptr++);
+                                              dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
               else
                 for (unsigned int point=0; point<n_quadrature_points; ++point)
                   derivatives[point][comp] += value *
-                                              dealii::Tensor<order,spacedim,Number>(*shape_derivative_ptr++);
+                                              dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
             }
           else
             for (unsigned int c=0; c<n_components; ++c)
@@ -2987,11 +2987,11 @@ namespace internal
                 if (quadrature_points_fastest)
                   for (unsigned int point=0; point<n_quadrature_points; ++point)
                     derivatives[comp][point] += value *
-                                                dealii::Tensor<order,spacedim,Number>(*shape_derivative_ptr++);
+                                                dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
                 else
                   for (unsigned int point=0; point<n_quadrature_points; ++point)
                     derivatives[point][comp] += value *
-                                                dealii::Tensor<order,spacedim,Number>(*shape_derivative_ptr++);
+                                                dealii::Tensor<order,spacedim>(*shape_derivative_ptr++);
               }
         }
   }
