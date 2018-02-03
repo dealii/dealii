@@ -34,7 +34,7 @@
 template <typename NumberType>
 void test(const unsigned int size, const unsigned int block_size)
 {
-  const std::string filename = std::string(SOURCE_DIR) + "/test.h5";
+  const std::string filename ("scalapck_10_test.h5");
 
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
