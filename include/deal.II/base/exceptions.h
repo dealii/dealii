@@ -1213,6 +1213,17 @@ namespace StandardExceptions
 #define AssertVectorVectorDimension(vec,dim1,dim2) AssertDimension((vec).size(), (dim1)) \
   for (unsigned int i=0;i<dim1;++i) { AssertDimension((vec)[i].size(), (dim2)); }
 
+namespace internal
+{
+  // Workaround to allow for commas in template parameter lists
+  // in preprocessor macros as found in
+  // https://stackoverflow.com/questions/13842468/comma-in-c-c-macro
+  template<typename T> struct argument_type;
+  template<typename T, typename U> struct argument_type<T(U)>
+  {
+    typedef U type;
+  };
+}
 
 /**
  * An assertion that tests that a given index is within the half-open
@@ -1223,8 +1234,12 @@ namespace StandardExceptions
  * @ingroup Exceptions
  * @author Guido Kanschat 2007
  */
-#define AssertIndexRange(index,range) Assert((index) < (range), \
-                                             dealii::ExcIndexRange((index),0,(range)))
+#define AssertIndexRange(index,range) \
+  Assert((index) < (range), \
+         dealii::ExcIndexRangeType< \
+         typename ::dealii::internal::argument_type< \
+         void(typename std::common_type<decltype(index), \
+              decltype(range)>::type)>::type>((index),0,(range)))
 
 /**
  * An assertion that checks whether a number is finite or not. We explicitly

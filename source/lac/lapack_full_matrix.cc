@@ -99,11 +99,11 @@ template <typename number>
 void
 LAPACKFullMatrix<number>::remove_row_and_column (const size_type row, const size_type col)
 {
-  Assert (row<this->n_rows(), ExcIndexRange(row,0,this->n_rows()));
-  Assert (col<this->n_cols(), ExcIndexRange(col,0,this->n_cols()));
+  AssertIndexRange (row,this->m());
+  AssertIndexRange (col,this->n());
 
-  const size_type nrows = this->n_rows()-1;
-  const size_type ncols = this->n_cols()-1;
+  const size_type nrows = this->m()-1;
+  const size_type ncols = this->n()-1;
 
   TransposeTable<number> copy(std::move(*this));
   this->TransposeTable<number>::reinit (nrows, ncols);
@@ -136,10 +136,10 @@ template <typename number2>
 LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator = (const FullMatrix<number2> &M)
 {
-  Assert (this->n_rows() == M.n_rows(), ExcDimensionMismatch(this->n_rows(), M.n_rows()));
-  Assert (this->n_cols() == M.n(), ExcDimensionMismatch(this->n_cols(), M.n()));
-  for (size_type i=0; i<this->n_rows(); ++i)
-    for (size_type j=0; j<this->n_cols(); ++j)
+  Assert (this->m() == M.m(), ExcDimensionMismatch(this->m(), M.m()));
+  Assert (this->n() == M.n(), ExcDimensionMismatch(this->n(), M.n()));
+  for (size_type i=0; i<this->m(); ++i)
+    for (size_type j=0; j<this->n(); ++j)
       (*this)(i,j) = M(i,j);
 
   state = LAPACKSupport::matrix;
@@ -153,10 +153,10 @@ template <typename number2>
 LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator = (const SparseMatrix<number2> &M)
 {
-  Assert (this->n_rows() == M.n(), ExcDimensionMismatch(this->n_rows(), M.n()));
-  Assert (this->n_cols() == M.m(), ExcDimensionMismatch(this->n_cols(), M.m()));
-  for (size_type i=0; i<this->n_rows(); ++i)
-    for (size_type j=0; j<this->n_cols(); ++j)
+  Assert (this->m() == M.n(), ExcDimensionMismatch(this->m(), M.n()));
+  Assert (this->n() == M.m(), ExcDimensionMismatch(this->n(), M.m()));
+  for (size_type i=0; i<this->m(); ++i)
+    for (size_type j=0; j<this->n(); ++j)
       (*this)(i,j) = M.el(i,j);
 
   state = LAPACKSupport::matrix;
@@ -346,7 +346,7 @@ LAPACKFullMatrix<number>::rank1_update(const number a,
   if (state == LAPACKSupport::matrix)
     {
       {
-        const types::blas_int N = this->n_rows();
+        const types::blas_int N = this->m();
         const char uplo = LAPACKSupport::U;
         const types::blas_int lda = N;
         const types::blas_int incx=1;
@@ -354,7 +354,7 @@ LAPACKFullMatrix<number>::rank1_update(const number a,
         syr(&uplo, &N, &a, v.begin(), &incx, this->values.begin(), &lda);
       }
 
-      const size_type N = this->n_rows();
+      const size_type N = this->m();
       // FIXME: we should really only update upper or lower triangular parts
       // of symmetric matrices and make sure the interface is consistent,
       // for example operator(i,j) gives correct results regardless of storage.
@@ -379,8 +379,8 @@ LAPACKFullMatrix<number>::vmult (
   const Vector<number> &v,
   const bool            adding) const
 {
-  const types::blas_int mm = this->n_rows();
-  const types::blas_int nn = this->n_cols();
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = this->n();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
   const number null = 0.;
@@ -394,8 +394,8 @@ LAPACKFullMatrix<number>::vmult (
       Assert (adding == false,
               ExcNotImplemented());
 
-      AssertDimension(v.size(), this->n_cols());
-      AssertDimension(w.size(), this->n_rows());
+      AssertDimension(v.size(), this->n());
+      AssertDimension(w.size(), this->m());
 
       const char diag = 'N';
       const char trans = 'N';
@@ -419,8 +419,8 @@ LAPACKFullMatrix<number>::vmult (
     case matrix:
     case inverse_matrix:
     {
-      AssertDimension(v.size(), this->n_cols());
-      AssertDimension(w.size(), this->n_rows());
+      AssertDimension(v.size(), this->n());
+      AssertDimension(w.size(), this->m());
 
       gemv("N", &mm, &nn, &alpha, &this->values[0], &mm, v.values.get(), &one, &beta, w.values.get(), &one);
       break;
@@ -428,8 +428,8 @@ LAPACKFullMatrix<number>::vmult (
     case svd:
     {
       Threads::Mutex::ScopedLock lock (mutex);
-      AssertDimension(v.size(), this->n_cols());
-      AssertDimension(w.size(), this->n_rows());
+      AssertDimension(v.size(), this->n());
+      AssertDimension(w.size(), this->m());
       // Compute V^T v
       work.resize(std::max(mm,nn));
       gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.values.get(), &one, &null, work.data(), &one);
@@ -443,8 +443,8 @@ LAPACKFullMatrix<number>::vmult (
     case inverse_svd:
     {
       Threads::Mutex::ScopedLock lock (mutex);
-      AssertDimension(w.size(), this->n_cols());
-      AssertDimension(v.size(), this->n_rows());
+      AssertDimension(w.size(), this->n());
+      AssertDimension(v.size(), this->m());
       // Compute U^T v
       work.resize(std::max(mm,nn));
       gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.values.get(), &one, &null, work.data(), &one);
@@ -468,8 +468,8 @@ LAPACKFullMatrix<number>::Tvmult (
   const Vector<number> &v,
   const bool            adding) const
 {
-  const types::blas_int mm = this->n_rows();
-  const types::blas_int nn = this->n_cols();
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = this->n();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
   const number null = 0.;
@@ -483,8 +483,8 @@ LAPACKFullMatrix<number>::Tvmult (
       Assert (adding == false,
               ExcNotImplemented());
 
-      AssertDimension(v.size(), this->n_cols());
-      AssertDimension(w.size(), this->n_rows());
+      AssertDimension(v.size(), this->n());
+      AssertDimension(w.size(), this->m());
 
       const char diag = 'N';
       const char trans = 'T';
@@ -509,8 +509,8 @@ LAPACKFullMatrix<number>::Tvmult (
     case matrix:
     case inverse_matrix:
     {
-      AssertDimension(w.size(), this->n_cols());
-      AssertDimension(v.size(), this->n_rows());
+      AssertDimension(w.size(), this->n());
+      AssertDimension(v.size(), this->m());
 
       gemv("T", &mm, &nn, &alpha, &this->values[0], &mm, v.values.get(), &one, &beta, w.values.get(), &one);
       break;
@@ -518,8 +518,8 @@ LAPACKFullMatrix<number>::Tvmult (
     case svd:
     {
       Threads::Mutex::ScopedLock lock (mutex);
-      AssertDimension(w.size(), this->n_cols());
-      AssertDimension(v.size(), this->n_rows());
+      AssertDimension(w.size(), this->n());
+      AssertDimension(v.size(), this->m());
 
       // Compute U^T v
       work.resize(std::max(mm,nn));
@@ -534,8 +534,8 @@ LAPACKFullMatrix<number>::Tvmult (
     case inverse_svd:
     {
       Threads::Mutex::ScopedLock lock (mutex);
-      AssertDimension(v.size(), this->n_cols());
-      AssertDimension(w.size(), this->n_rows());
+      AssertDimension(v.size(), this->n());
+      AssertDimension(w.size(), this->m());
 
       // Compute V^T v
       work.resize(std::max(mm,nn));
@@ -580,12 +580,12 @@ LAPACKFullMatrix<number>::mmult(LAPACKFullMatrix<number>       &C,
   Assert(state == matrix || state == inverse_matrix, ExcState(state));
   Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
   Assert(C.state == matrix || C.state == inverse_matrix, ExcState(state));
-  Assert (this->n_cols() == B.n_rows(), ExcDimensionMismatch(this->n_cols(), B.n_rows()));
-  Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
-  Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
-  const types::blas_int mm = this->n_rows();
-  const types::blas_int nn = B.n_cols();
-  const types::blas_int kk = this->n_cols();
+  Assert (this->n() == B.m(), ExcDimensionMismatch(this->n(), B.m()));
+  Assert (C.n() == B.n(), ExcDimensionMismatch(C.n(), B.n()));
+  Assert (C.m() == this->m(), ExcDimensionMismatch(this->m(), C.m()));
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = B.n();
+  const types::blas_int kk = this->n();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
 
@@ -602,12 +602,12 @@ LAPACKFullMatrix<number>::mmult(FullMatrix<number>             &C,
 {
   Assert(state == matrix || state == inverse_matrix, ExcState(state));
   Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
-  Assert (this->n_cols() == B.n_rows(), ExcDimensionMismatch(this->n_cols(), B.n_rows()));
-  Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
-  Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
-  const types::blas_int mm = this->n_rows();
-  const types::blas_int nn = B.n_cols();
-  const types::blas_int kk = this->n_cols();
+  Assert (this->n() == B.m(), ExcDimensionMismatch(this->n(), B.m()));
+  Assert (C.n() == B.n(), ExcDimensionMismatch(C.n(), B.n()));
+  Assert (C.m() == this->m(), ExcDimensionMismatch(this->m(), C.m()));
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = B.n();
+  const types::blas_int kk = this->n();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
 
@@ -628,12 +628,12 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number>       &C,
   Assert(state == matrix || state == inverse_matrix, ExcState(state));
   Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
   Assert(C.state == matrix || C.state == inverse_matrix, ExcState(state));
-  Assert (this->n_rows() == B.n_rows(), ExcDimensionMismatch(this->n_rows(), B.n_rows()));
-  Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
-  Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
-  const types::blas_int mm = this->n_cols();
-  const types::blas_int nn = B.n_cols();
-  const types::blas_int kk = B.n_rows();
+  Assert (this->m() == B.m(), ExcDimensionMismatch(this->m(), B.m()));
+  Assert (C.n() == B.n(), ExcDimensionMismatch(C.n(), B.n()));
+  Assert (C.m() == this->n(), ExcDimensionMismatch(this->n(), C.m()));
+  const types::blas_int mm = this->n();
+  const types::blas_int nn = B.n();
+  const types::blas_int kk = B.m();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
 
@@ -650,12 +650,12 @@ LAPACKFullMatrix<number>::Tmmult(FullMatrix<number>             &C,
 {
   Assert(state == matrix || state == inverse_matrix, ExcState(state));
   Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
-  Assert (this->n_rows() == B.n_rows(), ExcDimensionMismatch(this->n_rows(), B.n_rows()));
-  Assert (C.n_cols() == B.n_cols(), ExcDimensionMismatch(C.n_cols(), B.n_cols()));
-  Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
-  const types::blas_int mm = this->n_cols();
-  const types::blas_int nn = B.n_cols();
-  const types::blas_int kk = B.n_rows();
+  Assert (this->m() == B.m(), ExcDimensionMismatch(this->m(), B.m()));
+  Assert (C.n() == B.n(), ExcDimensionMismatch(C.n(), B.n()));
+  Assert (C.m() == this->n(), ExcDimensionMismatch(this->n(), C.m()));
+  const types::blas_int mm = this->n();
+  const types::blas_int nn = B.n();
+  const types::blas_int kk = B.m();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
 
@@ -675,12 +675,12 @@ LAPACKFullMatrix<number>::mTmult(LAPACKFullMatrix<number>       &C,
   Assert(state == matrix || state == inverse_matrix, ExcState(state));
   Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
   Assert(C.state == matrix || C.state == inverse_matrix, ExcState(state));
-  Assert (this->n_cols() == B.n_cols(), ExcDimensionMismatch(this->n_cols(), B.n_cols()));
-  Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
-  Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
-  const types::blas_int mm = this->n_rows();
-  const types::blas_int nn = B.n_rows();
-  const types::blas_int kk = B.n_cols();
+  Assert (this->n() == B.n(), ExcDimensionMismatch(this->n(), B.n()));
+  Assert (C.n() == B.m(), ExcDimensionMismatch(C.n(), B.m()));
+  Assert (C.m() == this->m(), ExcDimensionMismatch(this->m(), C.m()));
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = B.m();
+  const types::blas_int kk = B.n();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
 
@@ -698,12 +698,12 @@ LAPACKFullMatrix<number>::mTmult(FullMatrix<number>             &C,
 {
   Assert(state == matrix || state == inverse_matrix, ExcState(state));
   Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
-  Assert (this->n_cols() == B.n_cols(), ExcDimensionMismatch(this->n_cols(), B.n_cols()));
-  Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
-  Assert (C.n_rows() == this->n_rows(), ExcDimensionMismatch(this->n_rows(), C.n_rows()));
-  const types::blas_int mm = this->n_rows();
-  const types::blas_int nn = B.n_rows();
-  const types::blas_int kk = B.n_cols();
+  Assert (this->n() == B.n(), ExcDimensionMismatch(this->n(), B.n()));
+  Assert (C.n() == B.m(), ExcDimensionMismatch(C.n(), B.m()));
+  Assert (C.m() == this->m(), ExcDimensionMismatch(this->m(), C.m()));
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = B.m();
+  const types::blas_int kk = B.n();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
 
@@ -723,12 +723,12 @@ LAPACKFullMatrix<number>::TmTmult(LAPACKFullMatrix<number>       &C,
   Assert(state == matrix || state == inverse_matrix, ExcState(state));
   Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
   Assert(C.state == matrix || C.state == inverse_matrix, ExcState(state));
-  Assert (this->n_rows() == B.n_cols(), ExcDimensionMismatch(this->n_rows(), B.n_cols()));
-  Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
-  Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
-  const types::blas_int mm = this->n_cols();
-  const types::blas_int nn = B.n_rows();
-  const types::blas_int kk = B.n_cols();
+  Assert (this->m() == B.n(), ExcDimensionMismatch(this->m(), B.n()));
+  Assert (C.n() == B.m(), ExcDimensionMismatch(C.n(), B.m()));
+  Assert (C.m() == this->n(), ExcDimensionMismatch(this->n(), C.m()));
+  const types::blas_int mm = this->n();
+  const types::blas_int nn = B.m();
+  const types::blas_int kk = B.n();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
 
@@ -745,12 +745,12 @@ LAPACKFullMatrix<number>::TmTmult(FullMatrix<number>             &C,
 {
   Assert(state == matrix || state == inverse_matrix, ExcState(state));
   Assert(B.state == matrix || B.state == inverse_matrix, ExcState(state));
-  Assert (this->n_rows() == B.n_cols(), ExcDimensionMismatch(this->n_rows(), B.n_cols()));
-  Assert (C.n_cols() == B.n_rows(), ExcDimensionMismatch(C.n_cols(), B.n_rows()));
-  Assert (C.n_rows() == this->n_cols(), ExcDimensionMismatch(this->n_cols(), C.n_rows()));
-  const types::blas_int mm = this->n_cols();
-  const types::blas_int nn = B.n_rows();
-  const types::blas_int kk = B.n_cols();
+  Assert (this->m() == B.n(), ExcDimensionMismatch(this->m(), B.n()));
+  Assert (C.n() == B.m(), ExcDimensionMismatch(C.n(), B.m()));
+  Assert (C.m() == this->n(), ExcDimensionMismatch(this->n(), C.m()));
+  const types::blas_int mm = this->n();
+  const types::blas_int nn = B.m();
+  const types::blas_int kk = B.n();
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
 
@@ -768,9 +768,9 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
   Assert(state == matrix, ExcState(state));
   state = LAPACKSupport::unusable;
 
-  const types::blas_int mm = this->n_rows();
-  const types::blas_int nn = this->n_cols();
-  number *values = const_cast<number *> (&this->values[0]);
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = this->n();
+  number *const values = &this->values[0];
   ipiv.resize(mm);
   types::blas_int info = 0;
   getrf(&mm, &nn, values, &mm, ipiv.data(), &info);
@@ -830,9 +830,9 @@ number LAPACKFullMatrix<number>::norm(const char type) const
           state == LAPACKSupport::inverse_matrix,
           ExcMessage("norms can be called in matrix state only."));
 
-  const types::blas_int N = this->n_cols();
-  const types::blas_int M = this->n_rows();
-  const number *values = &this->values[0];
+  const types::blas_int N = this->n();
+  const types::blas_int M = this->m();
+  const number *const values = &this->values[0];
   if (property == symmetric)
     {
       const types::blas_int lda = std::max<types::blas_int>(1,N);
@@ -861,11 +861,11 @@ number LAPACKFullMatrix<number>::trace() const
   Assert (state == LAPACKSupport::matrix ||
           state == LAPACKSupport::inverse_matrix,
           ExcMessage("Trace can be called in matrix state only."));
-  Assert (this->n_cols() == this->n_rows(),
-          ExcDimensionMismatch(this->n_cols(), this->n_rows()));
+  Assert (this->n() == this->m(),
+          ExcDimensionMismatch(this->n(), this->m()));
 
   number tr = 0;
-  for (size_type i=0; i<this->n_rows(); ++i)
+  for (size_type i=0; i<this->m(); ++i)
     tr += (*this)(i,i);
 
   return tr;
@@ -881,12 +881,12 @@ LAPACKFullMatrix<number>::compute_cholesky_factorization()
   Assert(property == symmetric, ExcProperty(property));
   state = LAPACKSupport::unusable;
 
-  const types::blas_int mm = this->n_rows();
-  const types::blas_int nn = this->n_cols();
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = this->n();
   (void) mm;
   Assert (mm == nn, ExcDimensionMismatch(mm,nn));
 
-  number *values = &this->values[0];
+  number *const values = &this->values[0];
   types::blas_int info = 0;
   const types::blas_int lda = std::max<types::blas_int>(1,nn);
   potrf (&LAPACKSupport::L, &nn, values, &lda, &info);
@@ -908,7 +908,7 @@ LAPACKFullMatrix<number>::reciprocal_condition_number(const number a_norm) const
   Assert(state == cholesky, ExcState(state));
   number rcond = 0.;
 
-  const types::blas_int N = this->n_rows();
+  const types::blas_int N = this->m();
   const number *values = &this->values[0];
   types::blas_int info = 0;
   const types::blas_int lda = std::max<types::blas_int>(1,N);
@@ -937,8 +937,8 @@ LAPACKFullMatrix<number>::reciprocal_condition_number() const
          ExcProperty(property));
   number rcond = 0.;
 
-  const types::blas_int N = this->n_rows();
-  const number *values = &this->values[0];
+  const types::blas_int N = this->m();
+  const number *const values = &this->values[0];
   types::blas_int info = 0;
   const types::blas_int lda = std::max<types::blas_int>(1,N);
   work.resize(3*N);
@@ -966,17 +966,17 @@ LAPACKFullMatrix<number>::compute_svd()
   Assert(state == matrix, ExcState(state));
   state = LAPACKSupport::unusable;
 
-  const types::blas_int mm = this->n_rows();
-  const types::blas_int nn = this->n_cols();
-  number *values = const_cast<number *> (&this->values[0]);
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = this->n();
+  number *const values = &this->values[0];
   wr.resize(std::max(mm,nn));
   std::fill(wr.begin(), wr.end(), 0.);
   ipiv.resize(8*mm);
 
   svd_u.reset (new LAPACKFullMatrix<number>(mm,mm));
   svd_vt.reset (new LAPACKFullMatrix<number>(nn,nn));
-  number *mu  = const_cast<number *> (&svd_u->values[0]);
-  number *mvt = const_cast<number *> (&svd_vt->values[0]);
+  number *const mu  = &svd_u->values[0];
+  number *const mvt = &svd_vt->values[0];
   types::blas_int info = 0;
 
   // First determine optimal workspace size
@@ -1031,11 +1031,11 @@ LAPACKFullMatrix<number>::invert()
 {
   Assert(state == matrix || state == lu || state == cholesky,
          ExcState(state));
-  const types::blas_int mm = this->n_rows();
-  const types::blas_int nn = this->n_cols();
+  const types::blas_int mm = this->m();
+  const types::blas_int nn = this->n();
   Assert (nn == mm, ExcNotQuadratic());
 
-  number *values = const_cast<number *> (&this->values[0]);
+  number *const values = &this->values[0];
   types::blas_int info = 0;
 
   if (property != symmetric)
@@ -1073,12 +1073,12 @@ void
 LAPACKFullMatrix<number>::solve(Vector<number> &v,
                                 const bool transposed) const
 {
-  Assert(this->n_rows() == this->n_cols(),
+  Assert(this->m() == this->n(),
          LACExceptions::ExcNotQuadratic());
-  AssertDimension(this->n_rows(), v.size());
+  AssertDimension(this->m(), v.size());
   const char *trans = transposed ? &T : &N;
-  const types::blas_int nn = this->n_cols();
-  const number *values = &this->values[0];
+  const types::blas_int nn = this->n();
+  const number *const values = &this->values[0];
   const types::blas_int n_rhs = 1;
   types::blas_int info = 0;
 
@@ -1122,13 +1122,13 @@ LAPACKFullMatrix<number>::solve(LAPACKFullMatrix<number> &B,
 {
   Assert(B.state == matrix, ExcState(B.state));
 
-  Assert(this->n_rows() == this->n_cols(),
+  Assert(this->m() == this->n(),
          LACExceptions::ExcNotQuadratic());
-  AssertDimension(this->n_rows(), B.n_rows());
+  AssertDimension(this->m(), B.m());
   const char *trans = transposed ? &T : &N;
-  const types::blas_int nn = this->n_cols();
-  const number *values = &this->values[0];
-  const types::blas_int n_rhs = B.n_cols();
+  const types::blas_int nn = this->n();
+  const number *const values = &this->values[0];
+  const types::blas_int n_rhs = B.n();
   types::blas_int info = 0;
 
   if (state == lu)
@@ -1188,7 +1188,7 @@ template <typename number>
 number
 LAPACKFullMatrix<number>::determinant() const
 {
-  Assert(this->n_rows() == this->n_cols(), LACExceptions::ExcNotQuadratic());
+  Assert(this->m() == this->n(), LACExceptions::ExcNotQuadratic());
 
   // LAPACK doesn't offer a function to compute a matrix determinant.
   // This is due to the difficulty in maintaining numerical accuracy, as the
@@ -1206,9 +1206,9 @@ LAPACKFullMatrix<number>::determinant() const
   // http://icl.cs.utk.edu/lapack-forum/viewtopic.php?p=341&#p336
   // for further information.
   Assert(state == lu, ExcState(state));
-  Assert(ipiv.size() == this->n_rows(), ExcInternalError());
+  Assert(ipiv.size() == this->m(), ExcInternalError());
   number det = 1.0;
-  for (size_type i=0; i<this->n_rows(); ++i)
+  for (size_type i=0; i<this->m(); ++i)
     det *= ( ipiv[i] == types::blas_int(i+1) ? this->el(i,i) : -this->el(i,i) );
   return det;
 }
@@ -1220,13 +1220,13 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right,
                                               const bool left)
 {
   Assert(state == matrix, ExcState(state));
-  const types::blas_int nn = this->n_cols();
+  const types::blas_int nn = this->n();
   wr.resize(nn);
   wi.resize(nn);
   if (right) vr.resize(nn*nn);
   if (left)  vl.resize(nn*nn);
 
-  number *values = const_cast<number *> (&this->values[0]);
+  number *const values = &this->values[0];
 
   types::blas_int info  = 0;
   types::blas_int lwork = 1;
@@ -1284,14 +1284,14 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(const number        lowe
                                                         FullMatrix<number> &eigenvectors)
 {
   Assert(state == matrix, ExcState(state));
-  const types::blas_int nn = (this->n_cols() > 0 ? this->n_cols() : 1);
-  Assert(static_cast<size_type>(nn) == this->n_rows(), ExcNotQuadratic());
+  const types::blas_int nn = (this->n() > 0 ? this->n() : 1);
+  Assert(static_cast<size_type>(nn) == this->m(), ExcNotQuadratic());
 
   wr.resize(nn);
   LAPACKFullMatrix<number> matrix_eigenvectors(nn, nn);
 
-  number *values_A = const_cast<number *> (&this->values[0]);
-  number *values_eigenvectors = const_cast<number *> (&matrix_eigenvectors.values[0]);
+  number *const values_A = &this->values[0];
+  number *const values_eigenvectors = &matrix_eigenvectors.values[0];
 
   types::blas_int info(0),
         lwork(-1),
@@ -1373,18 +1373,18 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   const types::blas_int itype)
 {
   Assert(state == matrix, ExcState(state));
-  const types::blas_int nn = (this->n_cols() > 0 ? this->n_cols() : 1);
-  Assert(static_cast<size_type>(nn) == this->n_rows(), ExcNotQuadratic());
-  Assert(B.n_rows() == B.n_cols(), ExcNotQuadratic());
-  Assert(static_cast<size_type>(nn) == B.n_cols(),
-         ExcDimensionMismatch (nn, B.n_cols()));
+  const types::blas_int nn = (this->n() > 0 ? this->n() : 1);
+  Assert(static_cast<size_type>(nn) == this->m(), ExcNotQuadratic());
+  Assert(B.m() == B.n(), ExcNotQuadratic());
+  Assert(static_cast<size_type>(nn) == B.n(),
+         ExcDimensionMismatch (nn, B.n()));
 
   wr.resize(nn);
   LAPACKFullMatrix<number> matrix_eigenvectors(nn, nn);
 
-  number *values_A = const_cast<number *> (&this->values[0]);
-  number *values_B = const_cast<number *> (&B.values[0]);
-  number *values_eigenvectors = const_cast<number *> (&matrix_eigenvectors.values[0]);
+  number *const values_A = &this->values[0];
+  number *const values_B = &B.values[0];
+  number *const values_eigenvectors = &matrix_eigenvectors.values[0];
 
   types::blas_int info(0),
         lwork(-1),
@@ -1461,20 +1461,20 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   const types::blas_int itype)
 {
   Assert(state == matrix, ExcState(state));
-  const types::blas_int nn = this->n_cols();
-  Assert(static_cast<size_type>(nn) == this->n_rows(), ExcNotQuadratic());
-  Assert(B.n_rows() == B.n_cols(), ExcNotQuadratic());
-  Assert(static_cast<size_type>(nn) == B.n_cols(),
-         ExcDimensionMismatch (nn, B.n_cols()));
+  const types::blas_int nn = this->n();
+  Assert(static_cast<size_type>(nn) == this->m(), ExcNotQuadratic());
+  Assert(B.m() == B.n(), ExcNotQuadratic());
+  Assert(static_cast<size_type>(nn) == B.n(),
+         ExcDimensionMismatch (nn, B.n()));
   Assert(eigenvectors.size() <= static_cast<size_type>(nn),
-         ExcMessage ("eigenvectors.size() > matrix.n_cols()"));
+         ExcMessage ("eigenvectors.size() > matrix.n()"));
 
   wr.resize(nn);
   wi.resize(nn); //This is set purely for consistency reasons with the
   //eigenvalues() function.
 
-  number *values_A = const_cast<number *> (&this->values[0]);
-  number *values_B = const_cast<number *> (&B.values[0]);
+  number *const values_A = &this->values[0];
+  number *const values_B = &B.values[0];
 
   types::blas_int info  = 0;
   types::blas_int lwork = -1;
@@ -1541,7 +1541,7 @@ LAPACKFullMatrix<number>::print_formatted (
 {
   unsigned int width = width_;
 
-  Assert ((!this->empty()) || (this->n_cols()+this->n_rows()==0),
+  Assert ((!this->empty()) || (this->n()+this->m()==0),
           ExcInternalError());
   Assert (state == LAPACKSupport::matrix ||
           state == LAPACKSupport::inverse_matrix ||
@@ -1551,7 +1551,7 @@ LAPACKFullMatrix<number>::print_formatted (
   // set output format, but store old
   // state
   std::ios::fmtflags old_flags = out.flags();
-  unsigned int old_precision = out.precision (precision);
+  std::streamsize old_precision = out.precision (precision);
 
   if (scientific)
     {
@@ -1566,10 +1566,10 @@ LAPACKFullMatrix<number>::print_formatted (
         width = precision+2;
     }
 
-  for (size_type i=0; i<this->n_rows(); ++i)
+  for (size_type i=0; i<this->m(); ++i)
     {
       // Cholesky is stored in lower triangular, so just output this part:
-      const size_type nc = state == LAPACKSupport::cholesky ? i+1 : this->n_cols();
+      const size_type nc = state == LAPACKSupport::cholesky ? i+1 : this->n();
       for (size_type j=0; j<nc; ++j)
         // we might have complex numbers, so use abs also to check for nan
         // since there is no isnan on complex numbers

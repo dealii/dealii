@@ -114,7 +114,7 @@ namespace internal
      * or not (i.e. write access is only allowed if the value is false).
      *
      * Since with <tt>N</tt> indices, the effect of applying
-     * <tt>operator[]</tt> is getting access to something we <tt>N-1</tt>
+     * <tt>operator[]</tt> is getting access to something with <tt>N-1</tt>
      * indices, we have to implement these accessor classes recursively, with
      * stopping when we have only one index left. For the latter case, a
      * specialization of this class is declared below, where calling
@@ -135,7 +135,7 @@ namespace internal
      * elements, and to know which subset we need to know the dimensions of
      * the table and the present index, which is indicated by <tt>P</tt>.
      *
-     * As stated for the entire namespace, you will not usually have to do
+     * As stated for the entire namespace, you will not usually have to deal
      * with these classes directly, and should not try to use their interface
      * directly as it may change without notice. In fact, since the
      * constructors are made private, you will not even be able to generate
@@ -184,13 +184,13 @@ namespace internal
       /**
        * Index operator. Performs a range check.
        */
-      Accessor<N,T,C,P-1> operator [] (const unsigned int i) const;
+      Accessor<N,T,C,P-1> operator [] (const size_type i) const;
 
       /**
        * Exception for range check. Do not use global exception since this way
        * we can output which index is the wrong one.
        */
-      DeclException3 (ExcIndexRange, int, int, int,
+      DeclException3 (ExcIndexRange, size_type, size_type, size_type,
                       << "Index " << N-P+1 << "has a value of "
                       << arg1 << " but needs to be in the range ["
                       << arg2 << "," << arg3 << "[.");
@@ -287,13 +287,13 @@ namespace internal
       /**
        * Index operator. Performs a range check.
        */
-      reference operator [] (const unsigned int) const;
+      reference operator [] (const size_type) const;
 
       /**
        * Return the length of one row, i.e. the number of elements
        * corresponding to the last index of the table object.
        */
-      unsigned int size () const;
+      size_type size () const;
 
       /**
        * Return an iterator to the first element of this row.
@@ -505,7 +505,7 @@ public:
   /**
    * Size of the table in direction <tt>i</tt>.
    */
-  unsigned int size (const unsigned int i) const;
+  size_type size (const unsigned int i) const;
 
   /**
    * Return the sizes of this object in each direction.
@@ -705,7 +705,7 @@ public:
   /**
    * Constructor. Pass down the given dimension to the base class.
    */
-  Table (const unsigned int size);
+  Table (const size_type size);
 
   /**
    * Constructor. Create a table with a given size and initialize it from a
@@ -745,7 +745,7 @@ public:
    * input range. If false, change the first index fastest.
    */
   template <typename InputIterator>
-  Table (const unsigned int size,
+  Table (const size_type size,
          InputIterator entries,
          const bool      C_style_indexing = true);
 
@@ -754,28 +754,28 @@ public:
    * accesses the requested data element. Returns a read-only reference.
    */
   typename AlignedVector<T>::const_reference
-  operator [] (const unsigned int i) const;
+  operator [] (const size_type i) const;
 
   /**
    * Access operator. Since this is a one-dimensional object, this simply
    * accesses the requested data element. Returns a read-write reference.
    */
   typename AlignedVector<T>::reference
-  operator [] (const unsigned int i);
+  operator [] (const size_type i);
 
   /**
    * Access operator. Since this is a one-dimensional object, this simply
    * accesses the requested data element. Returns a read-only reference.
    */
   typename AlignedVector<T>::const_reference
-  operator () (const unsigned int i) const;
+  operator () (const size_type i) const;
 
   /**
    * Access operator. Since this is a one-dimensional object, this simply
    * accesses the requested data element. Returns a read-write reference.
    */
   typename AlignedVector<T>::reference
-  operator () (const unsigned int i);
+  operator () (const size_type i);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -824,8 +824,8 @@ public:
   /**
    * Constructor. Pass down the given dimensions to the base class.
    */
-  Table (const unsigned int size1,
-         const unsigned int size2);
+  Table (const size_type size1,
+         const size_type size2);
 
   /**
    * Constructor. Create a table with a given size and initialize it from a
@@ -866,8 +866,8 @@ public:
    * input range. If false, change the first index fastest.
    */
   template <typename InputIterator>
-  Table (const unsigned int size1,
-         const unsigned int size2,
+  Table (const size_type size1,
+         const size_type size2,
          InputIterator entries,
          const bool      C_style_indexing = true);
 
@@ -876,8 +876,8 @@ public:
    * with the earlier <tt>vector2d</tt> class. Passes down to the base class
    * by converting the arguments to the data type requested by the base class.
    */
-  void reinit (const unsigned int size1,
-               const unsigned int size2,
+  void reinit (const size_type size1,
+               const size_type size2,
                const bool         omit_default_initialization = false);
 
   using TableBase<2,T>::reinit;
@@ -889,7 +889,7 @@ public:
    * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<2,T,true,1>
-  operator [] (const unsigned int i) const;
+  operator [] (const size_type i) const;
 
   /**
    * Access operator. Generate an object that accesses the requested row of
@@ -898,7 +898,7 @@ public:
    * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<2,T,false,1>
-  operator [] (const unsigned int i);
+  operator [] (const size_type i);
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -907,8 +907,8 @@ public:
    * This version of the function only allows read access.
    */
   typename AlignedVector<T>::const_reference
-  operator () (const unsigned int i,
-               const unsigned int j) const;
+  operator () (const size_type i,
+               const size_type j) const;
 
 
   /**
@@ -918,8 +918,8 @@ public:
    * This version of the function allows read-write access.
    */
   typename AlignedVector<T>::reference
-  operator () (const unsigned int i,
-               const unsigned int j);
+  operator () (const size_type i,
+               const size_type j);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -940,13 +940,13 @@ public:
    * Number of rows. This function really makes only sense since we have a
    * two-dimensional object here.
    */
-  unsigned int n_rows () const;
+  size_type n_rows () const;
 
   /**
    * Number of columns. This function really makes only sense since we have a
    * two-dimensional object here.
    */
-  unsigned int n_cols () const;
+  size_type n_cols () const;
 
 protected:
   /**
@@ -959,8 +959,8 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  typename AlignedVector<T>::reference el (const unsigned int i,
-                                           const unsigned int j);
+  typename AlignedVector<T>::reference el (const size_type i,
+                                           const size_type j);
 
   /**
    * Return the value of the element <tt>(i,j)</tt> as a read-only reference.
@@ -976,8 +976,8 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  typename AlignedVector<T>::const_reference el (const unsigned int i,
-                                                 const unsigned int j) const;
+  typename AlignedVector<T>::const_reference el (const size_type i,
+                                                 const size_type j) const;
 };
 
 
@@ -1009,9 +1009,9 @@ public:
   /**
    * Constructor. Pass down the given dimensions to the base class.
    */
-  Table (const unsigned int size1,
-         const unsigned int size2,
-         const unsigned int size3);
+  Table (const size_type size1,
+         const size_type size2,
+         const size_type size3);
 
   /**
    * Constructor. Create a table with a given size and initialize it from a
@@ -1054,9 +1054,9 @@ public:
    * input range. If false, change the first index fastest.
    */
   template <typename InputIterator>
-  Table (const unsigned int size1,
-         const unsigned int size2,
-         const unsigned int size3,
+  Table (const size_type size1,
+         const size_type size2,
+         const size_type size3,
          InputIterator entries,
          const bool      C_style_indexing = true);
 
@@ -1068,7 +1068,7 @@ public:
    * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<3,T,true,2>
-  operator [] (const unsigned int i) const;
+  operator [] (const size_type i) const;
 
   /**
    * Access operator. Generate an object that accesses the requested two-
@@ -1078,7 +1078,7 @@ public:
    * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<3,T,false,2>
-  operator [] (const unsigned int i);
+  operator [] (const size_type i);
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1086,9 +1086,9 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
-                                                          const unsigned int j,
-                                                          const unsigned int k) const;
+  typename AlignedVector<T>::const_reference operator () (const size_type i,
+                                                          const size_type j,
+                                                          const size_type k) const;
 
 
   /**
@@ -1097,9 +1097,9 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const unsigned int i,
-                                                    const unsigned int j,
-                                                    const unsigned int k);
+  typename AlignedVector<T>::reference operator () (const size_type i,
+                                                    const size_type j,
+                                                    const size_type k);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -1143,10 +1143,10 @@ public:
   /**
    * Constructor. Pass down the given dimensions to the base class.
    */
-  Table (const unsigned int size1,
-         const unsigned int size2,
-         const unsigned int size3,
-         const unsigned int size4);
+  Table (const size_type size1,
+         const size_type size2,
+         const size_type size3,
+         const size_type size4);
 
   /**
    * Access operator. Generate an object that accesses the requested three-
@@ -1156,7 +1156,7 @@ public:
    * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<4,T,true,3>
-  operator [] (const unsigned int i) const;
+  operator [] (const size_type i) const;
 
   /**
    * Access operator. Generate an object that accesses the requested three-
@@ -1166,7 +1166,7 @@ public:
    * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<4,T,false,3>
-  operator [] (const unsigned int i);
+  operator [] (const size_type i);
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1174,10 +1174,10 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
-                                                          const unsigned int j,
-                                                          const unsigned int k,
-                                                          const unsigned int l) const;
+  typename AlignedVector<T>::const_reference operator () (const size_type i,
+                                                          const size_type j,
+                                                          const size_type k,
+                                                          const size_type l) const;
 
 
   /**
@@ -1186,10 +1186,10 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const unsigned int i,
-                                                    const unsigned int j,
-                                                    const unsigned int k,
-                                                    const unsigned int l);
+  typename AlignedVector<T>::reference operator () (const size_type i,
+                                                    const size_type j,
+                                                    const size_type k,
+                                                    const size_type l);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -1236,11 +1236,11 @@ public:
   /**
    * Constructor. Pass down the given dimensions to the base class.
    */
-  Table (const unsigned int size1,
-         const unsigned int size2,
-         const unsigned int size3,
-         const unsigned int size4,
-         const unsigned int size5);
+  Table (const size_type size1,
+         const size_type size2,
+         const size_type size3,
+         const size_type size4,
+         const size_type size5);
 
   /**
    * Access operator. Generate an object that accesses the requested four-
@@ -1250,7 +1250,7 @@ public:
    * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<5,T,true,4>
-  operator [] (const unsigned int i) const;
+  operator [] (const size_type i) const;
 
   /**
    * Access operator. Generate an object that accesses the requested four-
@@ -1260,7 +1260,7 @@ public:
    * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<5,T,false,4>
-  operator [] (const unsigned int i);
+  operator [] (const size_type i);
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1268,11 +1268,11 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
-                                                          const unsigned int j,
-                                                          const unsigned int k,
-                                                          const unsigned int l,
-                                                          const unsigned int m) const;
+  typename AlignedVector<T>::const_reference operator () (const size_type i,
+                                                          const size_type j,
+                                                          const size_type k,
+                                                          const size_type l,
+                                                          const size_type m) const;
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1280,11 +1280,11 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const unsigned int i,
-                                                    const unsigned int j,
-                                                    const unsigned int k,
-                                                    const unsigned int l,
-                                                    const unsigned int m);
+  typename AlignedVector<T>::reference operator () (const size_type i,
+                                                    const size_type j,
+                                                    const size_type k,
+                                                    const size_type l,
+                                                    const size_type m);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -1330,12 +1330,12 @@ public:
   /**
    * Constructor. Pass down the given dimensions to the base class.
    */
-  Table (const unsigned int size1,
-         const unsigned int size2,
-         const unsigned int size3,
-         const unsigned int size4,
-         const unsigned int size5,
-         const unsigned int size6);
+  Table (const size_type size1,
+         const size_type size2,
+         const size_type size3,
+         const size_type size4,
+         const size_type size5,
+         const size_type size6);
 
   /**
    * Access operator. Generate an object that accesses the requested five-
@@ -1345,7 +1345,7 @@ public:
    * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<6,T,true,5>
-  operator [] (const unsigned int i) const;
+  operator [] (const size_type i) const;
 
   /**
    * Access operator. Generate an object that accesses the requested five-
@@ -1355,7 +1355,7 @@ public:
    * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<6,T,false,5>
-  operator [] (const unsigned int i);
+  operator [] (const size_type i);
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1363,12 +1363,12 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
-                                                          const unsigned int j,
-                                                          const unsigned int k,
-                                                          const unsigned int l,
-                                                          const unsigned int m,
-                                                          const unsigned int n) const;
+  typename AlignedVector<T>::const_reference operator () (const size_type i,
+                                                          const size_type j,
+                                                          const size_type k,
+                                                          const size_type l,
+                                                          const size_type m,
+                                                          const size_type n) const;
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1376,12 +1376,12 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const unsigned int i,
-                                                    const unsigned int j,
-                                                    const unsigned int k,
-                                                    const unsigned int l,
-                                                    const unsigned int m,
-                                                    const unsigned int n);
+  typename AlignedVector<T>::reference operator () (const size_type i,
+                                                    const size_type j,
+                                                    const size_type k,
+                                                    const size_type l,
+                                                    const size_type m,
+                                                    const size_type n);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -1426,13 +1426,13 @@ public:
   /**
    * Constructor. Pass down the given dimensions to the base class.
    */
-  Table (const unsigned int size1,
-         const unsigned int size2,
-         const unsigned int size3,
-         const unsigned int size4,
-         const unsigned int size5,
-         const unsigned int size6,
-         const unsigned int size7);
+  Table (const size_type size1,
+         const size_type size2,
+         const size_type size3,
+         const size_type size4,
+         const size_type size5,
+         const size_type size6,
+         const size_type size7);
 
   /**
    * Access operator. Generate an object that accesses the requested six-
@@ -1442,7 +1442,7 @@ public:
    * This version of the function only allows read access.
    */
   dealii::internal::TableBaseAccessors::Accessor<7,T,true,6>
-  operator [] (const unsigned int i) const;
+  operator [] (const size_type i) const;
 
   /**
    * Access operator. Generate an object that accesses the requested six-
@@ -1452,7 +1452,7 @@ public:
    * This version of the function allows read-write access.
    */
   dealii::internal::TableBaseAccessors::Accessor<7,T,false,6>
-  operator [] (const unsigned int i);
+  operator [] (const size_type i);
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1460,13 +1460,13 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
-                                                          const unsigned int j,
-                                                          const unsigned int k,
-                                                          const unsigned int l,
-                                                          const unsigned int m,
-                                                          const unsigned int n,
-                                                          const unsigned int o) const;
+  typename AlignedVector<T>::const_reference operator () (const size_type i,
+                                                          const size_type j,
+                                                          const size_type k,
+                                                          const size_type l,
+                                                          const size_type m,
+                                                          const size_type n,
+                                                          const size_type o) const;
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1474,13 +1474,13 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const unsigned int i,
-                                                    const unsigned int j,
-                                                    const unsigned int k,
-                                                    const unsigned int l,
-                                                    const unsigned int m,
-                                                    const unsigned int n,
-                                                    const unsigned int o);
+  typename AlignedVector<T>::reference operator () (const size_type i,
+                                                    const size_type j,
+                                                    const size_type k,
+                                                    const size_type l,
+                                                    const size_type m,
+                                                    const size_type n,
+                                                    const size_type o);
 
   /**
    * Make the corresponding operator () from the TableBase base class
@@ -1529,16 +1529,16 @@ public:
   /**
    * Constructor. Pass down the given dimensions to the base class.
    */
-  TransposeTable (const unsigned int size1,
-                  const unsigned int size2);
+  TransposeTable (const size_type size1,
+                  const size_type size2);
 
   /**
    * Reinitialize the object. This function is mostly here for compatibility
    * with the earlier <tt>vector2d</tt> class. Passes down to the base class
    * by converting the arguments to the data type requested by the base class.
    */
-  void reinit (const unsigned int size1,
-               const unsigned int size2,
+  void reinit (const size_type size1,
+               const size_type size2,
                const bool         omit_default_initialization = false);
 
   /**
@@ -1547,8 +1547,8 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const unsigned int i,
-                                                          const unsigned int j) const;
+  typename AlignedVector<T>::const_reference operator () (const size_type i,
+                                                          const size_type j) const;
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1556,20 +1556,20 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const unsigned int i,
-                                                    const unsigned int j);
+  typename AlignedVector<T>::reference operator () (const size_type i,
+                                                    const size_type j);
 
   /**
    * Number of rows. This function really makes only sense since we have a
    * two-dimensional object here.
    */
-  unsigned int n_rows () const;
+  size_type n_rows () const;
 
   /**
    * Number of columns. This function really makes only sense since we have a
    * two-dimensional object here.
    */
-  unsigned int n_cols () const;
+  size_type n_cols () const;
 
 protected:
   /**
@@ -1582,8 +1582,8 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  typename AlignedVector<T>::reference el (const unsigned int i,
-                                           const unsigned int j);
+  typename AlignedVector<T>::reference el (const size_type i,
+                                           const size_type j);
 
   /**
    * Return the value of the element <tt>(i,j)</tt> as a read-only reference.
@@ -1599,8 +1599,8 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  typename AlignedVector<T>::const_reference el (const unsigned int i,
-                                                 const unsigned int j) const;
+  typename AlignedVector<T>::const_reference el (const size_type i,
+                                                 const size_type j) const;
 };
 
 
@@ -1707,7 +1707,7 @@ namespace internal
     template <int N, typename T, bool C, unsigned int P>
     inline
     Accessor<N,T,C,P-1>
-    Accessor<N,T,C,P>::operator [] (const unsigned int i) const
+    Accessor<N,T,C,P>::operator [] (const size_type i) const
     {
       Assert (i < table.size()[N-P],
               ExcIndexRange (i, 0, table.size()[N-P]));
@@ -1756,10 +1756,9 @@ namespace internal
     template <int N, typename T, bool C>
     inline
     typename Accessor<N,T,C,1>::reference
-    Accessor<N,T,C,1>::operator [] (const unsigned int i) const
+    Accessor<N,T,C,1>::operator [] (const size_type i) const
     {
-      Assert (i < table.size()[N-1],
-              ExcIndexRange (i, 0, table.size()[N-1]));
+      AssertIndexRange (i, table.size()[N-1]);
       return *(data+i);
     }
 
@@ -1767,7 +1766,7 @@ namespace internal
 
     template <int N, typename T, bool C>
     inline
-    unsigned int
+    typename Accessor<N,T,C,1>::size_type
     Accessor<N,T,C,1>::size () const
     {
       return table.size()[N-1];
@@ -1933,7 +1932,7 @@ TableBase<N,T>::size () const
 
 template <int N, typename T>
 inline
-unsigned int
+typename TableBase<N,T>::size_type
 TableBase<N,T>::size (const unsigned int i) const
 {
   Assert (i<N, ExcIndexRange(i,0,N));
@@ -1973,7 +1972,8 @@ namespace internal
     void fill_Fortran_style (InputIterator  entries,
                              TableBase<1,T>  &table)
     {
-      for (unsigned int i=0; i<table.size()[0]; ++i)
+      using size_type = typename TableBase<1,T>::size_type;
+      for (size_type i=0; i<table.size()[0]; ++i)
         table(TableIndices<1>(i)) = *entries++;
     }
 
@@ -1982,8 +1982,9 @@ namespace internal
     void fill_Fortran_style (InputIterator  entries,
                              TableBase<2,T>  &table)
     {
-      for (unsigned int j=0; j<table.size()[1]; ++j)
-        for (unsigned int i=0; i<table.size()[0]; ++i)
+      using size_type = typename TableBase<2,T>::size_type;
+      for (size_type j=0; j<table.size()[1]; ++j)
+        for (size_type i=0; i<table.size()[0]; ++i)
           table(TableIndices<2>(i,j)) = *entries++;
     }
 
@@ -1992,9 +1993,10 @@ namespace internal
     void fill_Fortran_style (InputIterator  entries,
                              TableBase<3,T>  &table)
     {
-      for (unsigned int k=0; k<table.size()[2]; ++k)
-        for (unsigned int j=0; j<table.size()[1]; ++j)
-          for (unsigned int i=0; i<table.size()[0]; ++i)
+      using size_type = typename TableBase<3,T>::size_type;
+      for (size_type k=0; k<table.size()[2]; ++k)
+        for (size_type j=0; j<table.size()[1]; ++j)
+          for (size_type i=0; i<table.size()[0]; ++i)
             table(TableIndices<3>(i,j,k)) = *entries++;
     }
 
@@ -2071,7 +2073,7 @@ TableBase<N,T>::position (const TableIndices<N> &indices) const
               + indices[2]);
     default:
     {
-      size_type s = indices[0];
+      unsigned int s = indices[0];
       for (unsigned int n=1; n<N; ++n)
         s = s*table_size[n] + indices[n];
       return s;
@@ -2087,8 +2089,7 @@ typename AlignedVector<T>::const_reference
 TableBase<N,T>::operator () (const TableIndices<N> &indices) const
 {
   for (unsigned int n=0; n<N; ++n)
-    Assert (indices[n] < table_size[n],
-            ExcIndexRange (indices[n], 0, table_size[n]));
+    AssertIndexRange (indices[n], table_size[n]);
   return el(indices);
 }
 
@@ -2100,8 +2101,7 @@ typename AlignedVector<T>::reference
 TableBase<N,T>::operator () (const TableIndices<N> &indices)
 {
   for (unsigned int n=0; n<N; ++n)
-    Assert (indices[n] < table_size[n],
-            ExcIndexRange (indices[n], 0, table_size[n]));
+    AssertIndexRange (indices[n], table_size[n]);
   return el(indices);
 }
 
@@ -2122,8 +2122,7 @@ inline
 typename AlignedVector<T>::reference
 TableBase<N,T>::el (const TableIndices<N> &indices)
 {
-  Assert (position(indices) < values.size(),
-          ExcIndexRange (position(indices), 0, values.size()));
+  AssertIndexRange (position(indices), values.size());
   return values[position(indices)];
 }
 
@@ -2131,7 +2130,7 @@ TableBase<N,T>::el (const TableIndices<N> &indices)
 
 template <typename T>
 inline
-Table<1,T>::Table (const unsigned int size)
+Table<1,T>::Table (const size_type size)
   :
   TableBase<1,T> (TableIndices<1> (size))
 {}
@@ -2141,7 +2140,7 @@ Table<1,T>::Table (const unsigned int size)
 template <typename T>
 template <typename InputIterator>
 inline
-Table<1,T>::Table (const unsigned int size,
+Table<1,T>::Table (const size_type size,
                    InputIterator entries,
                    const bool C_style_indexing)
   :
@@ -2155,10 +2154,9 @@ Table<1,T>::Table (const unsigned int size,
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-Table<1,T>::operator [] (const unsigned int i) const
+Table<1,T>::operator [] (const size_type i) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   return this->values[i];
 }
 
@@ -2167,10 +2165,9 @@ Table<1,T>::operator [] (const unsigned int i) const
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-Table<1,T>::operator [] (const unsigned int i)
+Table<1,T>::operator [] (const size_type i)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   return this->values[i];
 }
 
@@ -2179,10 +2176,9 @@ Table<1,T>::operator [] (const unsigned int i)
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-Table<1,T>::operator () (const unsigned int i) const
+Table<1,T>::operator () (const size_type i) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   return this->values[i];
 }
 
@@ -2191,10 +2187,9 @@ Table<1,T>::operator () (const unsigned int i) const
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-Table<1,T>::operator () (const unsigned int i)
+Table<1,T>::operator () (const size_type i)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   return this->values[i];
 }
 
@@ -2225,8 +2220,8 @@ Table<1,T>::operator () (const TableIndices<1> &indices)
 
 template <typename T>
 inline
-Table<2,T>::Table (const unsigned int size1,
-                   const unsigned int size2)
+Table<2,T>::Table (const size_type size1,
+                   const size_type size2)
   :
   TableBase<2,T> (TableIndices<2> (size1, size2))
 {}
@@ -2236,8 +2231,8 @@ Table<2,T>::Table (const unsigned int size1,
 template <typename T>
 template <typename InputIterator>
 inline
-Table<2,T>::Table (const unsigned int size1,
-                   const unsigned int size2,
+Table<2,T>::Table (const size_type size1,
+                   const size_type size2,
                    InputIterator entries,
                    const bool C_style_indexing)
   :
@@ -2251,8 +2246,8 @@ Table<2,T>::Table (const unsigned int size1,
 template <typename T>
 inline
 void
-Table<2,T>::reinit (const unsigned int size1,
-                    const unsigned int size2,
+Table<2,T>::reinit (const size_type size1,
+                    const size_type size2,
                     const bool         omit_default_initialization)
 {
   this->TableBase<2,T>::reinit (TableIndices<2> (size1, size2),omit_default_initialization);
@@ -2263,10 +2258,9 @@ Table<2,T>::reinit (const unsigned int size1,
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<2,T,true,1>
-Table<2,T>::operator [] (const unsigned int i) const
+Table<2,T>::operator [] (const size_type i) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   return dealii::internal::TableBaseAccessors::Accessor<2,T,true,1>(*this,
          this->values.begin()+size_type(i)*n_cols());
 }
@@ -2276,10 +2270,9 @@ Table<2,T>::operator [] (const unsigned int i) const
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<2,T,false,1>
-Table<2,T>::operator [] (const unsigned int i)
+Table<2,T>::operator [] (const size_type i)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   return dealii::internal::TableBaseAccessors::Accessor<2,T,false,1>(*this,
          this->values.begin()+size_type(i)*n_cols());
 }
@@ -2289,13 +2282,11 @@ Table<2,T>::operator [] (const unsigned int i)
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-Table<2,T>::operator () (const unsigned int i,
-                         const unsigned int j) const
+Table<2,T>::operator () (const size_type i,
+                         const size_type j) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
   return this->values[size_type(i)*this->table_size[1]+j];
 }
 
@@ -2304,13 +2295,11 @@ Table<2,T>::operator () (const unsigned int i,
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-Table<2,T>::operator () (const unsigned int i,
-                         const unsigned int j)
+Table<2,T>::operator () (const size_type i,
+                         const size_type j)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
   return this->values[size_type(i)*this->table_size[1]+j];
 }
 
@@ -2339,8 +2328,8 @@ Table<2,T>::operator () (const TableIndices<2> &indices)
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-Table<2,T>::el (const unsigned int i,
-                const unsigned int j) const
+Table<2,T>::el (const size_type i,
+                const size_type j) const
 {
   return this->values[size_type(i)*this->table_size[1]+j];
 }
@@ -2350,8 +2339,8 @@ Table<2,T>::el (const unsigned int i,
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-Table<2,T>::el (const unsigned int i,
-                const unsigned int j)
+Table<2,T>::el (const size_type i,
+                const size_type j)
 {
   return this->values[size_type(i)*this->table_size[1]+j];
 }
@@ -2360,7 +2349,7 @@ Table<2,T>::el (const unsigned int i,
 
 template <typename T>
 inline
-unsigned int
+typename Table<2,T>::size_type
 Table<2,T>::n_rows () const
 {
   return this->table_size[0];
@@ -2370,7 +2359,7 @@ Table<2,T>::n_rows () const
 
 template <typename T>
 inline
-unsigned int
+typename Table<2,T>::size_type
 Table<2,T>::n_cols () const
 {
   return this->table_size[1];
@@ -2381,8 +2370,8 @@ Table<2,T>::n_cols () const
 //---------------------------------------------------------------------------
 template <typename T>
 inline
-TransposeTable<T>::TransposeTable (const unsigned int size1,
-                                   const unsigned int size2)
+TransposeTable<T>::TransposeTable (const size_type size1,
+                                   const size_type size2)
   :
   TableBase<2,T> (TableIndices<2> (size2, size1))
 {}
@@ -2392,9 +2381,9 @@ TransposeTable<T>::TransposeTable (const unsigned int size1,
 template <typename T>
 inline
 void
-TransposeTable<T>::reinit (const unsigned int size1,
-                           const unsigned int size2,
-                           const bool         omit_default_initialization)
+TransposeTable<T>::reinit (const size_type size1,
+                           const size_type size2,
+                           const bool      omit_default_initialization)
 {
   this->TableBase<2,T>::reinit (TableIndices<2> (size2, size1), omit_default_initialization);
 }
@@ -2404,13 +2393,11 @@ TransposeTable<T>::reinit (const unsigned int size1,
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-TransposeTable<T>::operator () (const unsigned int i,
-                                const unsigned int j) const
+TransposeTable<T>::operator () (const size_type i,
+                                const size_type j) const
 {
-  Assert (i < this->table_size[1],
-          ExcIndexRange (i, 0, this->table_size[1]));
-  Assert (j < this->table_size[0],
-          ExcIndexRange (j, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[1]);
+  AssertIndexRange (j, this->table_size[0]);
   return this->values[size_type(j)*this->table_size[1]+i];
 }
 
@@ -2419,13 +2406,11 @@ TransposeTable<T>::operator () (const unsigned int i,
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-TransposeTable<T>::operator () (const unsigned int i,
-                                const unsigned int j)
+TransposeTable<T>::operator () (const size_type i,
+                                const size_type j)
 {
-  Assert (i < this->table_size[1],
-          ExcIndexRange (i, 0, this->table_size[1]));
-  Assert (j < this->table_size[0],
-          ExcIndexRange (j, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[1]);
+  AssertIndexRange (j, this->table_size[0]);
   return this->values[size_type(j)*this->table_size[1]+i];
 }
 
@@ -2434,8 +2419,8 @@ TransposeTable<T>::operator () (const unsigned int i,
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-TransposeTable<T>::el (const unsigned int i,
-                       const unsigned int j) const
+TransposeTable<T>::el (const size_type i,
+                       const size_type j) const
 {
   return this->values[size_type(j)*this->table_size[1]+i];
 }
@@ -2445,8 +2430,8 @@ TransposeTable<T>::el (const unsigned int i,
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-TransposeTable<T>::el (const unsigned int i,
-                       const unsigned int j)
+TransposeTable<T>::el (const size_type i,
+                       const size_type j)
 {
   return this->values[size_type(j)*this->table_size[1]+i];
 }
@@ -2455,7 +2440,7 @@ TransposeTable<T>::el (const unsigned int i,
 
 template <typename T>
 inline
-unsigned int
+typename TransposeTable<T>::size_type
 TransposeTable<T>::n_rows () const
 {
   return this->table_size[1];
@@ -2465,7 +2450,7 @@ TransposeTable<T>::n_rows () const
 
 template <typename T>
 inline
-unsigned int
+typename TransposeTable<T>::size_type
 TransposeTable<T>::n_cols () const
 {
   return this->table_size[0];
@@ -2479,9 +2464,9 @@ TransposeTable<T>::n_cols () const
 
 template <typename T>
 inline
-Table<3,T>::Table (const unsigned int size1,
-                   const unsigned int size2,
-                   const unsigned int size3)
+Table<3,T>::Table (const size_type size1,
+                   const size_type size2,
+                   const size_type size3)
   :
   TableBase<3,T> (TableIndices<3> (size1, size2, size3))
 {}
@@ -2491,9 +2476,9 @@ Table<3,T>::Table (const unsigned int size1,
 template <typename T>
 template <typename InputIterator>
 inline
-Table<3,T>::Table (const unsigned int size1,
-                   const unsigned int size2,
-                   const unsigned int size3,
+Table<3,T>::Table (const size_type size1,
+                   const size_type size2,
+                   const size_type size3,
                    InputIterator entries,
                    const bool C_style_indexing)
   :
@@ -2507,10 +2492,9 @@ Table<3,T>::Table (const unsigned int size1,
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<3,T,true,2>
-Table<3,T>::operator [] (const unsigned int i) const
+Table<3,T>::operator [] (const size_type i) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
                                    this->table_size[2];
   return (dealii::internal::TableBaseAccessors::Accessor<3,T,true,2>
@@ -2523,10 +2507,9 @@ Table<3,T>::operator [] (const unsigned int i) const
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<3,T,false,2>
-Table<3,T>::operator [] (const unsigned int i)
+Table<3,T>::operator [] (const size_type i)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
                                    this->table_size[2];
   return (dealii::internal::TableBaseAccessors::Accessor<3,T,false,2>
@@ -2539,16 +2522,13 @@ Table<3,T>::operator [] (const unsigned int i)
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-Table<3,T>::operator () (const unsigned int i,
-                         const unsigned int j,
-                         const unsigned int k) const
+Table<3,T>::operator () (const size_type i,
+                         const size_type j,
+                         const size_type k) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
-  Assert (k < this->table_size[2],
-          ExcIndexRange (k, 0, this->table_size[2]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
+  AssertIndexRange (k, this->table_size[2]);
   return this->values[(size_type(i)*this->table_size[1]+j)
                       *this->table_size[2] + k];
 }
@@ -2558,16 +2538,13 @@ Table<3,T>::operator () (const unsigned int i,
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-Table<3,T>::operator () (const unsigned int i,
-                         const unsigned int j,
-                         const unsigned int k)
+Table<3,T>::operator () (const size_type i,
+                         const size_type j,
+                         const size_type k)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
-  Assert (k < this->table_size[2],
-          ExcIndexRange (k, 0, this->table_size[2]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
+  AssertIndexRange (k, this->table_size[2]);
   return this->values[(size_type(i)*this->table_size[1]+j)
                       *this->table_size[2] + k];
 }
@@ -2596,10 +2573,10 @@ Table<3,T>::operator () (const TableIndices<3> &indices)
 
 template <typename T>
 inline
-Table<4,T>::Table (const unsigned int size1,
-                   const unsigned int size2,
-                   const unsigned int size3,
-                   const unsigned int size4)
+Table<4,T>::Table (const size_type size1,
+                   const size_type size2,
+                   const size_type size3,
+                   const size_type size4)
   :
   TableBase<4,T> (TableIndices<4> (size1, size2, size3, size4))
 {}
@@ -2609,10 +2586,9 @@ Table<4,T>::Table (const unsigned int size1,
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<4,T,true,3>
-Table<4,T>::operator [] (const unsigned int i) const
+Table<4,T>::operator [] (const size_type i) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
                                    this->table_size[2] *
                                    this->table_size[3];
@@ -2626,10 +2602,9 @@ Table<4,T>::operator [] (const unsigned int i) const
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<4,T,false,3>
-Table<4,T>::operator [] (const unsigned int i)
+Table<4,T>::operator [] (const size_type i)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
                                    this->table_size[2] *
                                    this->table_size[3];
@@ -2643,19 +2618,15 @@ Table<4,T>::operator [] (const unsigned int i)
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-Table<4,T>::operator () (const unsigned int i,
-                         const unsigned int j,
-                         const unsigned int k,
-                         const unsigned int l) const
+Table<4,T>::operator () (const size_type i,
+                         const size_type j,
+                         const size_type k,
+                         const size_type l) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
-  Assert (k < this->table_size[2],
-          ExcIndexRange (k, 0, this->table_size[2]));
-  Assert (l < this->table_size[3],
-          ExcIndexRange (l, 0, this->table_size[3]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
+  AssertIndexRange (k, this->table_size[2]);
+  AssertIndexRange (l, this->table_size[3]);
   return this->values[((size_type(i)*this->table_size[1]+j)
                        *this->table_size[2] + k)
                       *this->table_size[3] + l];
@@ -2666,19 +2637,15 @@ Table<4,T>::operator () (const unsigned int i,
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-Table<4,T>::operator () (const unsigned int i,
-                         const unsigned int j,
-                         const unsigned int k,
-                         const unsigned int l)
+Table<4,T>::operator () (const size_type i,
+                         const size_type j,
+                         const size_type k,
+                         const size_type l)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
-  Assert (k < this->table_size[2],
-          ExcIndexRange (k, 0, this->table_size[2]));
-  Assert (l < this->table_size[3],
-          ExcIndexRange (l, 0, this->table_size[3]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
+  AssertIndexRange (k, this->table_size[2]);
+  AssertIndexRange (l, this->table_size[3]);
   return this->values[((size_type(i)*this->table_size[1]+j)
                        *this->table_size[2] + k)
                       *this->table_size[3] + l];
@@ -2708,11 +2675,11 @@ Table<4,T>::operator () (const TableIndices<4> &indices)
 
 template <typename T>
 inline
-Table<5,T>::Table (const unsigned int size1,
-                   const unsigned int size2,
-                   const unsigned int size3,
-                   const unsigned int size4,
-                   const unsigned int size5)
+Table<5,T>::Table (const size_type size1,
+                   const size_type size2,
+                   const size_type size3,
+                   const size_type size4,
+                   const size_type size5)
   :
   TableBase<5,T> (TableIndices<5> (size1, size2, size3, size4, size5))
 {}
@@ -2722,10 +2689,9 @@ Table<5,T>::Table (const unsigned int size1,
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<5,T,true,4>
-Table<5,T>::operator [] (const unsigned int i) const
+Table<5,T>::operator [] (const size_type i) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
                                    this->table_size[2] *
                                    this->table_size[3] *
@@ -2740,10 +2706,9 @@ Table<5,T>::operator [] (const unsigned int i) const
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<5,T,false,4>
-Table<5,T>::operator [] (const unsigned int i)
+Table<5,T>::operator [] (const size_type i)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
                                    this->table_size[2] *
                                    this->table_size[3] *
@@ -2758,22 +2723,17 @@ Table<5,T>::operator [] (const unsigned int i)
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-Table<5,T>::operator () (const unsigned int i,
-                         const unsigned int j,
-                         const unsigned int k,
-                         const unsigned int l,
-                         const unsigned int m) const
+Table<5,T>::operator () (const size_type i,
+                         const size_type j,
+                         const size_type k,
+                         const size_type l,
+                         const size_type m) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
-  Assert (k < this->table_size[2],
-          ExcIndexRange (k, 0, this->table_size[2]));
-  Assert (l < this->table_size[3],
-          ExcIndexRange (l, 0, this->table_size[3]));
-  Assert (m < this->table_size[4],
-          ExcIndexRange (m, 0, this->table_size[4]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
+  AssertIndexRange (k, this->table_size[2]);
+  AssertIndexRange (l, this->table_size[3]);
+  AssertIndexRange (m, this->table_size[4]);
   return this->values[(((size_type(i)*this->table_size[1]+j)
                         *this->table_size[2] + k)
                        *this->table_size[3] + l)
@@ -2785,22 +2745,17 @@ Table<5,T>::operator () (const unsigned int i,
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-Table<5,T>::operator () (const unsigned int i,
-                         const unsigned int j,
-                         const unsigned int k,
-                         const unsigned int l,
-                         const unsigned int m)
+Table<5,T>::operator () (const size_type i,
+                         const size_type j,
+                         const size_type k,
+                         const size_type l,
+                         const size_type m)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
-  Assert (k < this->table_size[2],
-          ExcIndexRange (k, 0, this->table_size[2]));
-  Assert (l < this->table_size[3],
-          ExcIndexRange (l, 0, this->table_size[3]));
-  Assert (m < this->table_size[4],
-          ExcIndexRange (m, 0, this->table_size[4]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
+  AssertIndexRange (k, this->table_size[2]);
+  AssertIndexRange (l, this->table_size[3]);
+  AssertIndexRange (m, this->table_size[4]);
   return this->values[(((size_type(i)*this->table_size[1]+j)
                         *this->table_size[2] + k)
                        *this->table_size[3] + l)
@@ -2831,12 +2786,12 @@ Table<5,T>::operator () (const TableIndices<5> &indices)
 
 template <typename T>
 inline
-Table<6,T>::Table (const unsigned int size1,
-                   const unsigned int size2,
-                   const unsigned int size3,
-                   const unsigned int size4,
-                   const unsigned int size5,
-                   const unsigned int size6)
+Table<6,T>::Table (const size_type size1,
+                   const size_type size2,
+                   const size_type size3,
+                   const size_type size4,
+                   const size_type size5,
+                   const size_type size6)
   :
   TableBase<6,T> ()
 {
@@ -2856,10 +2811,9 @@ Table<6,T>::Table (const unsigned int size1,
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<6,T,true,5>
-Table<6,T>::operator [] (const unsigned int i) const
+Table<6,T>::operator [] (const size_type i) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
                                    this->table_size[2] *
                                    this->table_size[3] *
@@ -2875,10 +2829,9 @@ Table<6,T>::operator [] (const unsigned int i) const
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<6,T,false,5>
-Table<6,T>::operator [] (const unsigned int i)
+Table<6,T>::operator [] (const size_type i)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
                                    this->table_size[2] *
                                    this->table_size[3] *
@@ -2894,25 +2847,19 @@ Table<6,T>::operator [] (const unsigned int i)
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-Table<6,T>::operator () (const unsigned int i,
-                         const unsigned int j,
-                         const unsigned int k,
-                         const unsigned int l,
-                         const unsigned int m,
-                         const unsigned int n) const
+Table<6,T>::operator () (const size_type i,
+                         const size_type j,
+                         const size_type k,
+                         const size_type l,
+                         const size_type m,
+                         const size_type n) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
-  Assert (k < this->table_size[2],
-          ExcIndexRange (k, 0, this->table_size[2]));
-  Assert (l < this->table_size[3],
-          ExcIndexRange (l, 0, this->table_size[3]));
-  Assert (m < this->table_size[4],
-          ExcIndexRange (m, 0, this->table_size[4]));
-  Assert (n < this->table_size[5],
-          ExcIndexRange (n, 0, this->table_size[5]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
+  AssertIndexRange (k, this->table_size[2]);
+  AssertIndexRange (l, this->table_size[3]);
+  AssertIndexRange (m, this->table_size[4]);
+  AssertIndexRange (n, this->table_size[5]);
   return this->values[((((size_type(i)*this->table_size[1]+j)
                          *this->table_size[2] + k)
                         *this->table_size[3] + l)
@@ -2925,25 +2872,19 @@ Table<6,T>::operator () (const unsigned int i,
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-Table<6,T>::operator () (const unsigned int i,
-                         const unsigned int j,
-                         const unsigned int k,
-                         const unsigned int l,
-                         const unsigned int m,
-                         const unsigned int n)
+Table<6,T>::operator () (const size_type i,
+                         const size_type j,
+                         const size_type k,
+                         const size_type l,
+                         const size_type m,
+                         const size_type n)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
-  Assert (k < this->table_size[2],
-          ExcIndexRange (k, 0, this->table_size[2]));
-  Assert (l < this->table_size[3],
-          ExcIndexRange (l, 0, this->table_size[3]));
-  Assert (m < this->table_size[4],
-          ExcIndexRange (m, 0, this->table_size[4]));
-  Assert (n < this->table_size[5],
-          ExcIndexRange (n, 0, this->table_size[5]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
+  AssertIndexRange (k, this->table_size[2]);
+  AssertIndexRange (l, this->table_size[3]);
+  AssertIndexRange (m, this->table_size[4]);
+  AssertIndexRange (n, this->table_size[5]);
   return this->values[((((size_type(i)*this->table_size[1]+j)
                          *this->table_size[2] + k)
                         *this->table_size[3] + l)
@@ -2975,13 +2916,13 @@ Table<6,T>::operator () (const TableIndices<6> &indices)
 
 template <typename T>
 inline
-Table<7,T>::Table (const unsigned int size1,
-                   const unsigned int size2,
-                   const unsigned int size3,
-                   const unsigned int size4,
-                   const unsigned int size5,
-                   const unsigned int size6,
-                   const unsigned int size7)
+Table<7,T>::Table (const size_type size1,
+                   const size_type size2,
+                   const size_type size3,
+                   const size_type size4,
+                   const size_type size5,
+                   const size_type size6,
+                   const size_type size7)
   :
   TableBase<7,T> ()
 {
@@ -3002,10 +2943,9 @@ Table<7,T>::Table (const unsigned int size1,
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<7,T,true,6>
-Table<7,T>::operator [] (const unsigned int i) const
+Table<7,T>::operator [] (const size_type i) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
                                    this->table_size[2] *
                                    this->table_size[3] *
@@ -3022,10 +2962,9 @@ Table<7,T>::operator [] (const unsigned int i) const
 template <typename T>
 inline
 dealii::internal::TableBaseAccessors::Accessor<7,T,false,6>
-Table<7,T>::operator [] (const unsigned int i)
+Table<7,T>::operator [] (const size_type i)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
+  AssertIndexRange (i, this->table_size[0]);
   const size_type subobject_size = size_type(this->table_size[1]) *
                                    this->table_size[2] *
                                    this->table_size[3] *
@@ -3042,28 +2981,21 @@ Table<7,T>::operator [] (const unsigned int i)
 template <typename T>
 inline
 typename AlignedVector<T>::const_reference
-Table<7,T>::operator () (const unsigned int i,
-                         const unsigned int j,
-                         const unsigned int k,
-                         const unsigned int l,
-                         const unsigned int m,
-                         const unsigned int n,
-                         const unsigned int o) const
+Table<7,T>::operator () (const size_type i,
+                         const size_type j,
+                         const size_type k,
+                         const size_type l,
+                         const size_type m,
+                         const size_type n,
+                         const size_type o) const
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
-  Assert (k < this->table_size[2],
-          ExcIndexRange (k, 0, this->table_size[2]));
-  Assert (l < this->table_size[3],
-          ExcIndexRange (l, 0, this->table_size[3]));
-  Assert (m < this->table_size[4],
-          ExcIndexRange (m, 0, this->table_size[4]));
-  Assert (n < this->table_size[5],
-          ExcIndexRange (n, 0, this->table_size[5]));
-  Assert (o < this->table_size[6],
-          ExcIndexRange (o, 0, this->table_size[6]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
+  AssertIndexRange (k, this->table_size[2]);
+  AssertIndexRange (l, this->table_size[3]);
+  AssertIndexRange (m, this->table_size[4]);
+  AssertIndexRange (n, this->table_size[5]);
+  AssertIndexRange (o, this->table_size[6]);
   return this->values[(((((size_type(i)*this->table_size[1]+j)
                           *this->table_size[2] + k)
                          *this->table_size[3] + l)
@@ -3077,28 +3009,21 @@ Table<7,T>::operator () (const unsigned int i,
 template <typename T>
 inline
 typename AlignedVector<T>::reference
-Table<7,T>::operator () (const unsigned int i,
-                         const unsigned int j,
-                         const unsigned int k,
-                         const unsigned int l,
-                         const unsigned int m,
-                         const unsigned int n,
-                         const unsigned int o)
+Table<7,T>::operator () (const size_type i,
+                         const size_type j,
+                         const size_type k,
+                         const size_type l,
+                         const size_type m,
+                         const size_type n,
+                         const size_type o)
 {
-  Assert (i < this->table_size[0],
-          ExcIndexRange (i, 0, this->table_size[0]));
-  Assert (j < this->table_size[1],
-          ExcIndexRange (j, 0, this->table_size[1]));
-  Assert (k < this->table_size[2],
-          ExcIndexRange (k, 0, this->table_size[2]));
-  Assert (l < this->table_size[3],
-          ExcIndexRange (l, 0, this->table_size[3]));
-  Assert (m < this->table_size[4],
-          ExcIndexRange (m, 0, this->table_size[4]));
-  Assert (n < this->table_size[5],
-          ExcIndexRange (n, 0, this->table_size[5]));
-  Assert (o < this->table_size[5],
-          ExcIndexRange (o, 0, this->table_size[6]));
+  AssertIndexRange (i, this->table_size[0]);
+  AssertIndexRange (j, this->table_size[1]);
+  AssertIndexRange (k, this->table_size[2]);
+  AssertIndexRange (l, this->table_size[3]);
+  AssertIndexRange (m, this->table_size[4]);
+  AssertIndexRange (n, this->table_size[5]);
+  AssertIndexRange (o, this->table_size[6]);
   return this->values[(((((size_type(i)*this->table_size[1]+j)
                           *this->table_size[2] + k)
                          *this->table_size[3] + l)

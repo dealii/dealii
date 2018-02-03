@@ -57,7 +57,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef unsigned int size_type;
+  typedef std::make_unsigned<types::blas_int>::type size_type;
 
   /**
    * Constructor. Initialize the matrix as a square matrix with dimension
@@ -883,7 +883,7 @@ inline
 typename LAPACKFullMatrix<number>::size_type
 LAPACKFullMatrix<number>::m () const
 {
-  return this->n_rows ();
+  return static_cast<size_type>(this->n_rows ());
 }
 
 template <typename number>
@@ -891,7 +891,7 @@ inline
 typename LAPACKFullMatrix<number>::size_type
 LAPACKFullMatrix<number>::n () const
 {
-  return this->n_cols ();
+  return static_cast<size_type>(this->n_cols ());
 }
 
 template <typename number>
@@ -1007,7 +1007,7 @@ LAPACKFullMatrix<number>::eigenvalue (const size_type i) const
   Assert (state & LAPACKSupport::eigenvalues, ExcInvalidState());
   Assert (wr.size() == this->n_rows(), ExcInternalError());
   Assert (wi.size() == this->n_rows(), ExcInternalError());
-  Assert (i<this->n_rows(), ExcIndexRange(i,0,this->n_rows()));
+  AssertIndexRange (i,this->n_rows());
 
   return std::complex<number>(wr[i], wi[i]);
 }
