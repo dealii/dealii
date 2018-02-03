@@ -203,14 +203,14 @@ public:
    * Number.
    */
   template <typename OtherNumber>
-  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,OtherNumber> &rhs);
+  Tensor &operator = (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
    * This operator assigns a scalar to a tensor. This obviously requires
    * that the @p OtherNumber type is convertible to @p Number.
    */
   template <typename OtherNumber>
-  Tensor<0,dim,Number> &operator = (const OtherNumber &d);
+  Tensor &operator = (const OtherNumber &d);
 
   /**
    * Test for equality of two tensors.
@@ -228,13 +228,13 @@ public:
    * Add another scalar
    */
   template <typename OtherNumber>
-  Tensor<0,dim,Number> &operator += (const Tensor<0,dim,OtherNumber> &rhs);
+  Tensor &operator += (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
    * Subtract another scalar.
    */
   template <typename OtherNumber>
-  Tensor<0,dim,Number> &operator -= (const Tensor<0,dim,OtherNumber> &rhs);
+  Tensor &operator -= (const Tensor<0,dim,OtherNumber> &rhs);
 
   /**
    * Multiply the scalar with a <tt>factor</tt>.
@@ -242,18 +242,18 @@ public:
    * @ingroup CUDAWrappers
    */
   template <typename OtherNumber>
-  DEAL_II_CUDA_HOST_DEV Tensor<0,dim,Number> &operator *= (const OtherNumber &factor);
+  DEAL_II_CUDA_HOST_DEV Tensor &operator *= (const OtherNumber &factor);
 
   /**
    * Divide the scalar by <tt>factor</tt>.
    */
   template <typename OtherNumber>
-  Tensor<0,dim,Number> &operator /= (const OtherNumber &factor);
+  Tensor &operator /= (const OtherNumber &factor);
 
   /**
    * Tensor with inverted entries.
    */
-  Tensor<0,dim,Number>   operator - () const;
+  Tensor  operator - () const;
 
   /**
    * Reset all values to zero.
@@ -495,7 +495,7 @@ public:
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
    */
-  Tensor<rank_,dim,Number> &operator = (const Number &d);
+  Tensor &operator = (const Number &d);
 
   /**
    * Test for equality of two tensors.
@@ -513,13 +513,13 @@ public:
    * Add another tensor.
    */
   template <typename OtherNumber>
-  Tensor<rank_,dim,Number> &operator += (const Tensor<rank_,dim,OtherNumber> &);
+  Tensor &operator += (const Tensor<rank_,dim,OtherNumber> &);
 
   /**
    * Subtract another tensor.
    */
   template <typename OtherNumber>
-  Tensor<rank_,dim,Number> &operator -= (const Tensor<rank_,dim,OtherNumber> &);
+  Tensor &operator -= (const Tensor<rank_,dim,OtherNumber> &);
 
   /**
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
@@ -528,18 +528,18 @@ public:
    * @ingroup CUDAWrappers
    */
   template <typename OtherNumber>
-  DEAL_II_CUDA_HOST_DEV Tensor<rank_,dim,Number> &operator *= (const OtherNumber &factor);
+  DEAL_II_CUDA_HOST_DEV Tensor &operator *= (const OtherNumber &factor);
 
   /**
    * Scale the vector by <tt>1/factor</tt>.
    */
   template <typename OtherNumber>
-  Tensor<rank_,dim,Number> &operator /= (const OtherNumber &factor);
+  Tensor &operator /= (const OtherNumber &factor);
 
   /**
    * Unary minus operator. Negate all entries of a tensor.
    */
-  Tensor<rank_,dim,Number>   operator - () const;
+  Tensor  operator - () const;
 
   /**
    * Reset all values to zero.
