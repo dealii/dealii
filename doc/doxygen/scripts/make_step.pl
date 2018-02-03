@@ -27,7 +27,26 @@ $cmake_source_dir=$ARGV[1];
 print
 "/**
   * \@page $step_underscore The $step tutorial program
-\@htmlonly
+";
+
+open BF, "$cmake_source_dir/examples/$step/doc/builds-on"
+    or die "Can't open builds-on file $cmake_source_dir/examples/$step/doc/builds-on";
+my $buildson = <BF>;
+close BF;
+chop $buildson;
+
+# At the very top, print which other programs this one builds on. The
+# filter script will replace occurrences of step-XX by the appropriate
+# links.
+if ($buildson ne "")
+{
+    $buildson =~ s/ /, /g;
+    print "This tutorial depends on $buildson.\n\n";
+}
+
+# then show the table of contents
+print
+"\@htmlonly
 <table class=\"tutorial\" width=\"50%\">
 <tr><th colspan=\"2\"><b><small>Table of contents</small></b></th></tr>
 <tr><td width=\"50%\" valign=\"top\">
