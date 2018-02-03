@@ -1307,12 +1307,17 @@ namespace parallel
       // virtual functions called in constructors and destructors never use the
       // override in a derived class
       // for clarity be explicit on which function is called
-      Triangulation<dim, spacedim>::clear ();
+      try
+        {
+          Triangulation<dim, spacedim>::clear ();
+        }
+      catch (...)
+        {}
 
-      Assert (triangulation_has_content == false,
-              ExcInternalError());
-      Assert (connectivity == nullptr,    ExcInternalError());
-      Assert (parallel_forest == nullptr, ExcInternalError());
+      AssertNothrow (triangulation_has_content == false,
+                     ExcInternalError());
+      AssertNothrow (connectivity == nullptr,    ExcInternalError());
+      AssertNothrow (parallel_forest == nullptr, ExcInternalError());
     }
 
 
@@ -3741,7 +3746,7 @@ namespace parallel
     template <int spacedim>
     Triangulation<1,spacedim>::~Triangulation ()
     {
-      Assert (false, ExcNotImplemented());
+      AssertNothrow (false, ExcNotImplemented());
     }
 
 

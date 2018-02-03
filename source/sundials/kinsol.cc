@@ -148,6 +148,9 @@ namespace SUNDIALS
   KINSOL<VectorType>::KINSOL(const AdditionalData &data, const MPI_Comm mpi_comm) :
     data(data),
     kinsol_mem(nullptr),
+    solution(nullptr),
+    u_scale(nullptr),
+    f_scale(nullptr),
     communicator(is_serial_vector<VectorType>::value ?
                  MPI_COMM_SELF :
                  Utilities::MPI::duplicate_communicator(mpi_comm))
@@ -166,7 +169,7 @@ namespace SUNDIALS
     if (is_serial_vector<VectorType>::value == false)
       {
         const int ierr = MPI_Comm_free(&communicator);
-        AssertThrowMPI(ierr);
+        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
       }
 #endif
   }

@@ -968,12 +968,12 @@ namespace Step50
 // in step-6:
 int main (int argc, char *argv[])
 {
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-
   try
     {
       using namespace dealii;
       using namespace Step50;
+
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
       LaplaceProblem<2> laplace_problem(1/*degree*/);
       laplace_problem.run ();
