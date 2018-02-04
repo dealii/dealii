@@ -1367,6 +1367,46 @@ void ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
 
 
 
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::scale_columns(std::vector<NumberType> &factors)
+{
+  Assert(n_columns==(int)factors.size(),ExcDimensionMismatch(n_columns,factors.size()));
+
+  if (this->grid->mpi_process_is_active)
+    {
+      for (int i=0; i<n_local_rows; ++i)
+        {
+          for (int j=0; j<n_local_columns; ++j)
+            {
+              const int glob_j = global_column(j);
+              local_el(i,j) *= factors[glob_j];
+            }
+        }
+    }
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::scale_rows(std::vector<NumberType> &factors)
+{
+  Assert(n_rows==(int)factors.size(),ExcDimensionMismatch(n_rows,factors.size()));
+
+  if (this->grid->mpi_process_is_active)
+    {
+      for (int i=0; i<n_local_rows; ++i)
+        {
+          const int glob_i = global_row(i);
+          for (int j=0; j<n_local_columns; ++j)
+            {
+              local_el(i,j) *= factors[glob_i];
+            }
+        }
+    }
+}
+
+
+
 // instantiations
 template class ScaLAPACKMatrix<double>;
 template class ScaLAPACKMatrix<float>;

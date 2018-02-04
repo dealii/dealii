@@ -389,6 +389,16 @@ public:
    */
   NumberType &local_el(const unsigned int loc_row, const unsigned int loc_column);
 
+  /**
+   * scaling the columns of the distributed matrix by scalars in array @p factors
+   */
+  void scale_columns(std::vector<NumberType> &factors);
+
+  /**
+   * scaling the rows of the distributed matrix by scalars in array @p factors
+   */
+  void scale_rows(std::vector<NumberType> &factors);
+
 private:
 
   /**
