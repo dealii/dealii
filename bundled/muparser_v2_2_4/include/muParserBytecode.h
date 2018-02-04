@@ -71,7 +71,7 @@ namespace mu
         value_type *ptr;
         int offset;
       } Oprt;
-    };
+    } u;
   };
   
   
