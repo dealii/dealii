@@ -52,6 +52,9 @@ DEAL_II_NAMESPACE_OPEN
 // Shorthand notation for ARKODE error codes.
 #define AssertARKode(code) Assert(code >= 0, ExcARKodeError(code))
 
+/**
+ * A namespace for dealing with ODE solvers through the SUNDIALS package.
+ */
 namespace SUNDIALS
 {
   /**
