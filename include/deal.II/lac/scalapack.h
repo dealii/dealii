@@ -246,6 +246,107 @@ public:
 		    const ScaLAPACKMatrix<NumberType> &B);
 
   /**
+   * Matrix-matrix-multiplication:
+   *
+   * The operations based on the input parameters and the alignment conditions are summarized in the following table:
+   *
+   * | transpose_A | transpose_B |                   Block Sizes                 |                     Operation                    |
+   * | :---------: | :---------: | :-------------------------------------------: | :----------------------------------------------: |
+   * | false       |   false     | MB_A = MB_C <br> NB_A = MB_B <br> NB_B = NB_C |             <i>C = a A * B + b C</i>             |
+   * | false       |   true      | MB_A = MB_C <br> NB_A = NB_B <br> MB_B = NB_C |      <i>C = a A * B<sup>T</sup> + b C</i>        |
+   * | true        |   false     | MB_A = MB_B <br> NB_A = MB_C <br> NB_B = NB_C |        <i>C = a A<sup>T</sup> * B + b C</i>      |
+   * | true        |   true      | MB_A = NB_B <br> NB_A = MB_C <br> MB_B = NB_C | <i>C = a A<sup>T</sup> * B<sup>T</sup> + b C</i> |
+   *
+   * It is assumed that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
+   * <tt>C</tt> already has the right size.
+   *
+   * The matrices <tt>A</tt>, <tt>B</tt> and <tt>C</tt> must have the same process grid.
+   */
+  void mult(ScaLAPACKMatrix<NumberType> &C,
+            const ScaLAPACKMatrix<NumberType> &B,
+            const NumberType a=1,
+            const NumberType b=0,
+            const bool transpose_A=false,
+            const bool transpose_B=false) const;
+
+  /**
+   * Matrix-matrix-multiplication.
+   *
+   * The optional parameter <tt>adding</tt> determines, whether the result is
+   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   *
+   * if (adding) <i>C += A*B</i>
+   *
+   * else <i>C = A*B</i>
+   *
+   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
+   * <tt>C</tt> already has the right size.
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = MB_C, NB_A = MB_B and NB_B = NB_C
+   */
+  void mmult(ScaLAPACKMatrix<NumberType> &C,
+             const ScaLAPACKMatrix<NumberType> &B,
+             const bool adding=false) const;
+
+  /**
+   * Matrix-matrix-multiplication using transpose of <tt>this</tt>.
+   *
+   * The optional parameter <tt>adding</tt> determines, whether the result is
+   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   *
+   * if (adding) <i>C += A<sup>T</sup>*B</i>
+   *
+   * else <i>C = A<sup>T</sup>*B</i>
+   *
+   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
+   * <tt>C</tt> already has the right size.
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = MB_B, NB_A = MB_C and NB_B = NB_C
+   */
+  void Tmmult (ScaLAPACKMatrix<NumberType> &C,
+               const ScaLAPACKMatrix<NumberType> &B,
+               const bool adding=false) const;
+
+  /**
+   * Matrix-matrix-multiplication using transpose of <tt>B</tt>.
+   *
+   * The optional parameter <tt>adding</tt> determines, whether the result is
+   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   *
+   * if (adding) <i>C += A*B<sup>T</sup></i>
+   *
+   * else <i>C = A*B<sup>T</sup></i>
+   *
+   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
+   * <tt>C</tt> already has the right size.
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = MB_C, NB_A = NB_B and MB_B = NB_C
+   */
+  void mTmult (ScaLAPACKMatrix<NumberType> &C,
+               const ScaLAPACKMatrix<NumberType> &B,
+               const bool adding=false) const;
+
+  /**
+   * Matrix-matrix-multiplication using transpose of <tt>this</tt> and
+   * <tt>B</tt>.
+   *
+   * The optional parameter <tt>adding</tt> determines, whether the result is
+   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   *
+   * if (adding) <i>C += A<sup>T</sup>*B<sup>T</sup></i>
+   *
+   * else <i>C = A<sup>T</sup>*B<sup>T</sup></i>
+   *
+   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
+   * <tt>C</tt> already has the right size.
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = NB_B, NB_A = MB_C and MB_B = NB_C
+   */
+  void TmTmult (ScaLAPACKMatrix<NumberType> &C,
+                const ScaLAPACKMatrix<NumberType> &B,
+                const bool adding=false) const;
+
+  /**
    * Stores the distributed matrix in @p filename using HDF5.
    * In case that deal.II was built without HDF5
    * a call to this function will cause an exception to be thrown.
