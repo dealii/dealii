@@ -931,14 +931,14 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const unsigned int axis,
 
 
 template <int dim, int spacedim>
-CylindricalManifold<dim, spacedim>::CylindricalManifold(const Tensor<1, spacedim> &direction_,
-                                                        const Point<spacedim> &point_on_axis_,
+CylindricalManifold<dim, spacedim>::CylindricalManifold(const Tensor<1, spacedim> &direction,
+                                                        const Point<spacedim> &point_on_axis,
                                                         const double tolerance) :
   ChartManifold<dim,spacedim,3>(Tensor<1,3>({0,2.*numbers::PI,0})),
-              normal_direction(internal::compute_normal(direction_, true)),
-              direction (direction_/direction_.norm()),
-              point_on_axis (point_on_axis_),
-              tolerance(tolerance)
+              normal_direction(internal::compute_normal(direction, true)),
+              direction (direction/direction.norm()),
+              point_on_axis (point_on_axis),
+              tolerance (tolerance)
 {
   // do not use static_assert to make dimension-independent programming
   // easier.
