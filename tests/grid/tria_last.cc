@@ -20,7 +20,6 @@
 // case
 
 #include "../tests.h"
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria.h>

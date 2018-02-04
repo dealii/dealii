@@ -18,7 +18,6 @@
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -38,7 +37,7 @@ int main ()
   SphericalManifold<3> boundary (Point<3>(1,0,0));
 
   Triangulation<3> tria;
-  Boundary<3>::FaceVertexNormals normals;
+  Manifold<3>::FaceVertexNormals normals;
 
   GridGenerator::hyper_ball (tria, Point<3>(1,0,0), 3);
 

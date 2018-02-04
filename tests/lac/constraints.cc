@@ -22,7 +22,6 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/lac/sparse_matrix.h>
