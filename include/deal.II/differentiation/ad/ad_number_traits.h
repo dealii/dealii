@@ -1022,8 +1022,8 @@ namespace Differentiation
       >::type>
     {
       static ScalarType
-      get_directional_derivative(const ScalarType      &x,
-                                 const unsigned int  direction)
+      get_directional_derivative(const ScalarType   &/*x*/,
+                                 const unsigned int  /*direction*/)
       {
         // If the AD drivers are correctly implemented then we should not get here.
         // This is essentially a dummy for when the ADNumberTypeCode for the original

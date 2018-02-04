@@ -211,8 +211,8 @@ namespace Utilities
   {
 
     template<typename NumberType>
-    std::array<std::complex<NumberType>,3> hyperbolic_rotation(const std::complex<NumberType> &f,
-                                                               const std::complex<NumberType> &g)
+    std::array<std::complex<NumberType>,3> hyperbolic_rotation(const std::complex<NumberType> &/*f*/,
+                                                               const std::complex<NumberType> &/*g*/)
     {
       AssertThrow(false, ExcNotImplemented());
       std::array<NumberType,3> res;
@@ -244,8 +244,8 @@ namespace Utilities
 
 
     template<typename NumberType>
-    std::array<std::complex<NumberType>,3> givens_rotation(const std::complex<NumberType> &f,
-                                                           const std::complex<NumberType> &g)
+    std::array<std::complex<NumberType>,3> givens_rotation(const std::complex<NumberType> &/*f*/,
+                                                           const std::complex<NumberType> &/*g*/)
     {
       AssertThrow(false, ExcNotImplemented());
       std::array<NumberType,3> res;

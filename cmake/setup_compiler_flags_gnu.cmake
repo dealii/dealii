@@ -93,8 +93,6 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unsupported-friend")
 
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS "-Wno-unused-parameter")
-
   #
   # Disable a diagnostic that warns about potentially uninstantiated static
   # members. This leads to a ton of false positives.
