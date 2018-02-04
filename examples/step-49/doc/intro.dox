@@ -1,5 +1,5 @@
 <i>This program was contributed by Timo Heister. Parts of the results section
-were contributed by Yuhan Zhou and Wolfgang Bangerth.</i>
+were contributed by Yuhan Zhou, Wolfgang Bangerth, and David Wells.</i>
 
 <a name="Intro"></a>
 <h1> Introduction </h1>
@@ -45,7 +45,7 @@ GridGenerator, as already discussed in step-1.  There are many different
 helper functions
 available, including GridGenerator::hyper_cube(),
 GridGenerator::hyper_shell(), GridGenerator::hyper_ball(),
-GridGenerator::hyper_cube_with_cylindrical_hole(), ...
+and GridGenerator::hyper_cube_with_cylindrical_hole().
 
 
 <h4>Constructing your own mesh programmatically</h4>
@@ -73,8 +73,8 @@ href="http://geuz.org/gmsh/" target="_top">gmsh</a>, <a
 href="https://lagrit.lanl.gov/" target="_top">lagrit</a> and <a
 href="http://cubit.sandia.gov/" target="_top">cubit</a>. See the
 documentation of GridIn for more information. The problem is that deal.II
-needs meshes that only consist of quads and hexas -- tetrahedral meshes won't
-work (this means tools like tetgen can not be used directly).
+needs meshes that only consist of quadrilaterals and hexahedra -- tetrahedral
+meshes won't work (this means tools like tetgen can not be used directly).
 
 We will describe a possible workflow using Gmsh. Gmsh is the smallest and
 most quickly set up open source tool we are aware of. It can generate
@@ -82,18 +82,18 @@ unstructured 2d quad meshes, but in 3d it can only extrude 2d meshes to
 get hexahedral meshes. 3D meshing of unstructured geometry into hexahedra is not
 supported at the time of writing this tutorial (early 2013).
 
-In gmsh, a mesh is described in a text based <code>.geo</code> file, that can
+In Gmsh, a mesh is described in a text based <code>.geo</code> file, that can
 contain computations, loops, variables, etc. It is very flexible. The mesh is
 generated from a surface representation, which is build from a list of line
 loops, which is build from a list of lines, which are in turn built from
 points. The <code>.geo</code> script can be written and edited by hand or it
-can be generated automatically by creating objects graphically inside gmsh. In
+can be generated automatically by creating objects graphically inside Gmsh. In
 many cases it is best to combine both approaches. The file can be easily
 reloaded by pressing "reload" under the "Geometry" tab.
 
 This tutorial contains an example <code>.geo</code> file, that describes a box
 with two objects cut out in the interior. This is how
-<code>untitled.geo</code> looks like in gmsh (displaying the boundary
+<code>untitled.geo</code> looks like in Gmsh (displaying the boundary
 indicators as well as the mesh discussed further down below):
 
 <img src="https://www.dealii.org/images/steps/developer/step-49.gmsh_picture.png" alt="">
@@ -112,7 +112,7 @@ in deal.II. Without these physical entities, nothing will be imported into
 deal.II.
 
 deal.II's GridIn class can read the <code>.msh</code> format written by
-gmsh and that contains a mesh created for the geometry described by the
+Gmsh and that contains a mesh created for the geometry described by the
 <code>.geo</code> file. You generate the <code>.msh</code> from the
 <code>.geo</code> by running the commands
 
@@ -254,7 +254,7 @@ GridGenerator::extrude_triangulation(). See the <code>grid_4()</code> function
 in this tutorial for an example. Note that for this particular case, the given
 result could also be achieved using the 3d version of
 GridGenerator::hyper_cube_with_cylindrical_hole(). The main usage is a 2d
-mesh, generated for example with gmsh, that is read in from a
+mesh, generated for example with Gmsh, that is read in from a
 <code>.msh</code> file as described above. This is the output from grid_4():
 
 <TABLE WIDTH="60%" ALIGN="center">

@@ -168,7 +168,7 @@ void grid_2 ()
 // more than once. It works here because we select the vertices we want to use
 // based on their geometric location, and a vertex moved once will fail this
 // test in the future. A more general approach to this problem would have been
-// to keep a std::set of of those vertex indices that we have already moved
+// to keep a std::set of those vertex indices that we have already moved
 // (which we can obtain using <code>cell-@>vertex_index(i)</code> and only
 // move those vertices whose index isn't in the set yet.
 void grid_3 ()
