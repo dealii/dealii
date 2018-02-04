@@ -221,6 +221,8 @@ namespace SUNDIALS
                              const MPI_Comm mpi_comm) :
     data(data),
     arkode_mem(nullptr),
+    yy(nullptr),
+    abs_tolls(nullptr),
     communicator(is_serial_vector<VectorType>::value ?
                  MPI_COMM_SELF :
                  Utilities::MPI::duplicate_communicator(mpi_comm))
@@ -237,7 +239,7 @@ namespace SUNDIALS
     if (is_serial_vector<VectorType>::value == false)
       {
         const int ierr = MPI_Comm_free(&communicator);
-        AssertThrowMPI(ierr);
+        AssertNothrow(ierr == MPI_SUCCESS, ExcMPI(ierr));
       }
 #endif
   }

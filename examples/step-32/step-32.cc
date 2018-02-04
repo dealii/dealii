@@ -3726,14 +3726,14 @@ start_time_iteration:
 // by changing the constant dimension below to 3.
 int main (int argc, char *argv[])
 {
-  using namespace Step32;
-  using namespace dealii;
-
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv,
-                                                      numbers::invalid_unsigned_int);
-
   try
     {
+      using namespace Step32;
+      using namespace dealii;
+
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv,
+                                                          numbers::invalid_unsigned_int);
+
       std::string parameter_filename;
       if (argc>=2)
         parameter_filename = argv[1];

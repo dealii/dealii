@@ -3638,11 +3638,17 @@ namespace internal
           // different tags for phase 1 and 2, but the cost of a
           // barrier is negligible compared to everything else we do
           // here
-          const parallel::distributed::Triangulation< dim, spacedim > *triangulation
-            = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
-               (&dof_handler.get_triangulation()));
-          const int ierr = MPI_Barrier(triangulation->get_communicator());
-          AssertThrowMPI(ierr);
+          if (const auto *triangulation =
+                dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&dof_handler.get_triangulation()))
+            {
+              const int ierr = MPI_Barrier(triangulation->get_communicator());
+              AssertThrowMPI(ierr);
+            }
+          else
+            {
+              Assert(false, ExcMessage("The function communicate_dof_indices_on_marked_cells() "
+                                       "only works with parallel distributed triangulations."));
+            }
 #endif
         }
 

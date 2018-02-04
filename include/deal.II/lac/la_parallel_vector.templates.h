@@ -290,7 +290,12 @@ namespace LinearAlgebra
     inline
     Vector<Number>::~Vector ()
     {
-      clear_mpi_requests();
+      try
+        {
+          clear_mpi_requests();
+        }
+      catch (...)
+        {}
     }
 
 
