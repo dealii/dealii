@@ -420,6 +420,35 @@ extern "C"
                  float *work);
 
   /**
+   * Routine to transpose a matrix:
+   * C = beta C + alpha A^T
+   */
+  void pdtran_(const int *m,
+               const int *n,
+               const double *alpha,
+               const double *A,
+               const int *IA,
+               const int *JA,
+               const int *DESCA,
+               const double *beta,
+               double *C,
+               const int *IC,
+               const int *JC,
+               const int *DESCC);
+  void pstran_(const int *m,
+               const int *n,
+               const float *alpha,
+               const float *A,
+               const int *IA,
+               const int *JA,
+               const int *DESCA,
+               const float *beta,
+               float *C,
+               const int *IC,
+               const int *JC,
+               const int *DESCC);
+
+  /**
    * Compute the process coordinate which possesses the entry of a
    * distributed matrix specified by a global index
    */
@@ -1077,6 +1106,56 @@ inline float plange(char const *norm,
                     float *work)
 {
   return pslange_(norm, m, n, A, ia, ja,desca, work);
+}
+
+
+template <typename number>
+inline void ptran(const int *m,
+                  const int *n,
+                  const number *alpha,
+                  const number *A,
+                  const int *IA,
+                  const int *JA,
+                  const int *DESCA,
+                  const number *beta,
+                  number *C,
+                  const int *IC,
+                  const int *JC,
+                  const int *DESCC)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void ptran(const int *m,
+                  const int *n,
+                  const double *alpha,
+                  const double *A,
+                  const int *IA,
+                  const int *JA,
+                  const int *DESCA,
+                  const double *beta,
+                  double *C,
+                  const int *IC,
+                  const int *JC,
+                  const int *DESCC)
+{
+  pdtran_(m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
+}
+
+inline void ptran(const int *m,
+                  const int *n,
+                  const float *alpha,
+                  const float *A,
+                  const int *IA,
+                  const int *JA,
+                  const int *DESCA,
+                  const float *beta,
+                  float *C,
+                  const int *IC,
+                  const int *JC,
+                  const int *DESCC)
+{
+  pstran_(m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
 }
 
 

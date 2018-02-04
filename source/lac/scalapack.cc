@@ -440,6 +440,14 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
 
 
 template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::copy_transposed(const ScaLAPACKMatrix<NumberType> &B)
+{
+  add(B,0,1,true);
+}
+
+
+
+template <typename NumberType>
 void ScaLAPACKMatrix<NumberType>::add(const ScaLAPACKMatrix<NumberType> &B,
                                       const NumberType alpha,
                                       const NumberType beta,

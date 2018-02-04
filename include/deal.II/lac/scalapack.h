@@ -190,6 +190,15 @@ public:
                const std::pair<unsigned int,unsigned int> &submatrix_size) const;
 
   /**
+   * Transposing assignment: <i>A = B<sup>T</sup></i>
+   *
+   * The matrices <tt>A</tt> and <tt>B</tt> must have the same process grid
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = NB_B and NB_A = MB_B
+   */
+  void copy_transposed(const ScaLAPACKMatrix<NumberType> &B);
+
+  /**
    * Matrix-addition:
    *
    * <i>A = a A + b op(B)</i>
