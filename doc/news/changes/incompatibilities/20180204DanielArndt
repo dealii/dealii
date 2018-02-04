@@ -1,0 +1,4 @@
+Changed: The GridRefinement functions only allow Vector objects
+to be passed in as criteria.
+<br>
+(Daniel Arndt, 2018/02/04)
