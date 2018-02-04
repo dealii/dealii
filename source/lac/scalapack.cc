@@ -440,6 +440,60 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
 
 
 template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::add(const ScaLAPACKMatrix<NumberType> &B,
+                                      const NumberType alpha,
+                                      const NumberType beta,
+                                      const bool transpose_B)
+{
+  if (transpose_B)
+    {
+      Assert (n_rows == B.n_columns, ExcDimensionMismatch(n_rows,B.n_columns));
+      Assert (n_columns == B.n_rows, ExcDimensionMismatch(n_columns,B.n_rows));
+      Assert(column_block_size==B.row_block_size,ExcDimensionMismatch(column_block_size,B.row_block_size));
+      Assert(row_block_size==B.column_block_size,ExcDimensionMismatch(row_block_size,B.column_block_size));
+    }
+  else
+    {
+      Assert (n_rows == B.n_rows, ExcDimensionMismatch(n_rows,B.n_rows));
+      Assert (n_columns == B.n_columns, ExcDimensionMismatch(n_columns,B.n_columns));
+      Assert(column_block_size==B.column_block_size,ExcDimensionMismatch(column_block_size,B.column_block_size));
+      Assert(row_block_size==B.row_block_size,ExcDimensionMismatch(row_block_size,B.row_block_size));
+    }
+  Assert(this->grid==B.grid,ExcMessage("The matrices A and B need to have the same process grid"));
+
+  if (this->grid->mpi_process_is_active)
+    {
+      char trans_b = transpose_B ? 'T' : 'N';
+      NumberType *A_loc = (this->values.size()>0) ? &this->values[0] : nullptr;
+      const NumberType *B_loc = (B.values.size()>0) ? &B.values[0] : nullptr;
+
+      pgeadd(&trans_b,&n_rows,&n_columns,
+             &beta,B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,
+             &alpha,A_loc,&submatrix_row,&submatrix_column,descriptor);
+    }
+}
+
+
+
+template <typename NumberType>
+void add(const NumberType a,
+		 const ScaLAPACKMatrix<NumberType> &B)
+{
+	add(B,1,a,false);
+}
+
+
+
+template <typename NumberType>
+void Tadd(const NumberType a,
+		  const ScaLAPACKMatrix<NumberType> &B)
+{
+	add(B,1,a,true);
+}
+
+
+
+template <typename NumberType>
 void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
 {
   Assert (n_columns == n_rows,
