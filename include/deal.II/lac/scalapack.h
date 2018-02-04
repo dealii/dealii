@@ -231,7 +231,7 @@ public:
    * Following alignment conditions have to be fulfilled: MB_A = MB_B and NB_A = NB_B
    */
   void add(const NumberType b,
-		   const ScaLAPACKMatrix<NumberType> &B);
+           const ScaLAPACKMatrix<NumberType> &B);
 
   /**
    * Matrix-addition:
@@ -243,7 +243,7 @@ public:
    * Following alignment conditions have to be fulfilled: MB_A = NB_B and NB_A = MB_B
    */
   void Tadd(const NumberType b,
-		    const ScaLAPACKMatrix<NumberType> &B);
+            const ScaLAPACKMatrix<NumberType> &B);
 
   /**
    * Matrix-matrix-multiplication:
@@ -348,6 +348,7 @@ public:
 
   /**
    * Stores the distributed matrix in @p filename using HDF5.
+   *
    * In case that deal.II was built without HDF5
    * a call to this function will cause an exception to be thrown.
    *
@@ -356,8 +357,12 @@ public:
    * internally the distributed matrix is copied to one process, which
    * does the output. Therefore, the matrix has to fit into the memory
    * of one process.
+   *
+   * To tweak the I/O performance, especially for parallel I/O, the user may define the optional parameter @p chunk_size.
+   * The matrix is written in chunks to the file, therefore the properties of the system define the optimal chunk size.
    */
-  void save(const char *filename) const;
+  void save(const char *filename,
+            const std::pair<unsigned int,unsigned int> &chunk_size=std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int)) const;
 
   /**
    * Loads the distributed matrix from file @p filename using HDF5.
@@ -586,7 +591,8 @@ private:
    * Stores the distributed matrix in @p filename
    * using serial routines
    */
-  void save_serial(const char *filename) const;
+  void save_serial(const char *filename,
+                   const std::pair<unsigned int,unsigned int> &chunk_size) const;
 
   /*
    * Loads the distributed matrix from file @p filename
@@ -598,7 +604,8 @@ private:
    * Stores the distributed matrix in @p filename
    * using parallel routines
    */
-  void save_parallel(const char *filename) const;
+  void save_parallel(const char *filename,
+                     const std::pair<unsigned int,unsigned int> &chunk_size) const;
 
   /*
    * Loads the distributed matrix from file @p filename
