@@ -851,7 +851,11 @@ template <typename NumberType>
 NumberType ScaLAPACKMatrix<NumberType>::l1_norm() const
 {
   const char type('O');
-  return norm(type);
+
+  if (property == LAPACKSupport::symmetric)
+    return norm_symmetric(type);
+  else
+    return norm_general(type);
 }
 
 
@@ -860,7 +864,11 @@ template <typename NumberType>
 NumberType ScaLAPACKMatrix<NumberType>::linfty_norm() const
 {
   const char type('I');
-  return norm(type);
+
+  if (property == LAPACKSupport::symmetric)
+    return norm_symmetric(type);
+  else
+    return norm_general(type);
 }
 
 
@@ -869,13 +877,52 @@ template <typename NumberType>
 NumberType ScaLAPACKMatrix<NumberType>::frobenius_norm() const
 {
   const char type('F');
-  return norm(type);
+
+  if (property == LAPACKSupport::symmetric)
+    return norm_symmetric(type);
+  else
+    return norm_general(type);
 }
 
 
 
 template <typename NumberType>
-NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
+NumberType ScaLAPACKMatrix<NumberType>::norm_general(const char type) const
+{
+  Assert (state == LAPACKSupport::matrix ||
+          state == LAPACKSupport::inverse_matrix,
+          ExcMessage("norms can be called in matrix state only."));
+  Threads::Mutex::ScopedLock lock (mutex);
+  NumberType res = 0.;
+
+  if (grid->mpi_process_is_active)
+    {
+      const int iarow = indxg2p_(&submatrix_row, &row_block_size, &(grid->this_process_row), &first_process_row, &(grid->n_process_rows));
+      const int iacol = indxg2p_(&submatrix_column, &column_block_size, &(grid->this_process_column), &first_process_column, &(grid->n_process_columns));
+      const int mp0   = numroc_(&n_rows, &row_block_size, &(grid->this_process_row), &iarow, &(grid->n_process_rows));
+      const int nq0   = numroc_(&n_columns, &column_block_size, &(grid->this_process_column), &iacol, &(grid->n_process_columns));
+
+      // type='M': compute largest absolute value
+      // type='F' || type='E': compute Frobenius norm
+      // type='0' || type='1': compute infinity norm
+      int lwork=0; // for type == 'M' || type == 'F' || type == 'E'
+      if (type=='O' || type=='1')
+        lwork = nq0;
+      else if (type=='I')
+        lwork = mp0;
+
+      work.resize(lwork);
+      const NumberType *A_loc = (this->values.size()>0) ? &this->values[0] : nullptr;
+      res = plange(&type, &n_rows, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, work.data());
+    }
+  grid->send_to_inactive(&res);
+  return res;
+}
+
+
+
+template <typename NumberType>
+NumberType ScaLAPACKMatrix<NumberType>::norm_symmetric(const char type) const
 {
   Assert (state == LAPACKSupport::matrix ||
           state == LAPACKSupport::inverse_matrix,
@@ -904,8 +951,8 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
                         0 :
                         2*Nq0+Np0+ldw;
       work.resize(lwork);
-      const NumberType *A_loc = &this->values[0];
-      res = plansy(&type, &uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, &work[0]);
+      const NumberType *A_loc = (this->values.size()>0) ? &this->values[0] : nullptr;
+      res = plansy(&type, &uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, work.data());
     }
   grid->send_to_inactive(&res);
   return res;
