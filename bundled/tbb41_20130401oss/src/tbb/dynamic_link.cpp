@@ -419,6 +419,7 @@ OPEN_INTERNAL_NAMESPACE
     #endif /* _WIN32 */
 
     static dynamic_link_handle global_symbols_link( const char* library, const dynamic_link_descriptor descriptors[], size_t required ) {
+      (void)library; // Suppress an unused variable warning with clang
     #if _WIN32
         dynamic_link_handle library_handle;
         if ( GetModuleHandleEx( 0, library, &library_handle ) ) {

@@ -691,13 +691,13 @@ extern "C"
  * wrappers for other numeric types can be added in the future
  */
 template <typename number>
-inline void Cgerv2d(int context,
-                    int M,
-                    int N,
-                    number *A,
-                    int lda,
-                    int rsrc,
-                    int csrc)
+inline void Cgerv2d(int /*context*/,
+                    int /*M*/,
+                    int /*N*/,
+                    number * /*A*/,
+                    int /*lda*/,
+                    int /*rsrc*/,
+                    int /*csrc*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -726,13 +726,13 @@ inline void Cgerv2d(int context,
 
 
 template <typename number>
-inline void Cgesd2d(int context,
-                    int M,
-                    int N,
-                    number *A,
-                    int lda,
-                    int rdest,
-                    int cdest)
+inline void Cgesd2d(int /*context*/,
+                    int /*M*/,
+                    int /*N*/,
+                    number * /*A*/,
+                    int /*lda*/,
+                    int /*rdest*/,
+                    int /*cdest*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -761,13 +761,13 @@ inline void Cgesd2d (int context,
 
 
 template <typename number>
-inline void ppotrf(const char *UPLO,
-                   const int *N,
-                   number *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   int *INFO)
+inline void ppotrf(const char * /*UPLO*/,
+                   const int * /*N*/,
+                   number * /*A*/,
+                   const int * /*IA*/,
+                   const int * /*JA*/,
+                   const int * /*DESCA*/,
+                   int * /*INFO*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -796,13 +796,13 @@ inline void ppotrf(const char *UPLO,
 
 
 template <typename number>
-inline void ppotri(const char *UPLO,
-                   const int *N,
-                   number *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   int *INFO)
+inline void ppotri(const char * /*UPLO*/,
+                   const int * /*N*/,
+                   number * /*A*/,
+                   const int * /*IA*/,
+                   const int * /*JA*/,
+                   const int * /*DESCA*/,
+                   int * /*INFO*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -831,19 +831,19 @@ inline void ppotri(const char *UPLO,
 
 
 template <typename number>
-inline void ppocon(const char *uplo,
-                   const int *N,
-                   const number *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   const number *ANORM,
-                   number *RCOND,
-                   number *WORK,
-                   const int *LWORK,
-                   int *IWORK,
-                   const int *LIWORK,
-                   int *INFO)
+inline void ppocon(const char * /*uplo*/,
+                   const int * /*N*/,
+                   const number * /*A*/,
+                   const int * /*IA*/,
+                   const int * /*JA*/,
+                   const int * /*DESCA*/,
+                   const number * /*ANORM*/,
+                   number * /*RCOND*/,
+                   number * /*WORK*/,
+                   const int * /*LWORK*/,
+                   int * /*IWORK*/,
+                   const int * /*LIWORK*/,
+                   int * /*INFO*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -884,14 +884,14 @@ inline void ppocon(const char *uplo,
 
 
 template <typename number>
-inline number plansy(const char *norm,
-                     const char *uplo,
-                     const int *N,
-                     const number *A,
-                     const int *IA,
-                     const int *JA,
-                     const int *DESCA,
-                     number *work)
+inline number plansy(const char * /*norm*/,
+                     const char * /*uplo*/,
+                     const int * /*N*/,
+                     const number * /*A*/,
+                     const int * /*IA*/,
+                     const int * /*JA*/,
+                     const int * /*DESCA*/,
+                     number * /*work*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -922,18 +922,18 @@ inline float plansy(const char *norm,
 
 
 template <typename number>
-inline void pgesv(const int *n,
-                  const int *nrhs,
-                  number *A,
-                  const int *ia,
-                  const int *ja,
-                  const int *desca,
-                  int *ipiv,
-                  number *B,
-                  const int *ib,
-                  const int *jb,
-                  const int *descb,
-                  int *info)
+inline void pgesv(const int * /*n*/,
+                  const int * /*nrhs*/,
+                  number * /*A*/,
+                  const int * /*ia*/,
+                  const int * /*ja*/,
+                  const int * /*desca*/,
+                  int * /*ipiv*/,
+                  number * /*B*/,
+                  const int * /*ib*/,
+                  const int * /*jb*/,
+                  const int * /*descb*/,
+                  int * /*info*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -972,25 +972,25 @@ inline void pgesv(const int *n,
 
 
 template <typename number>
-inline void pgemm(const char *transa,
-                  const char *transb,
-                  const int *m,
-                  const int *n,
-                  const int *k,
-                  const number *alpha,
-                  number *A,
-                  const int *IA,
-                  const int *JA,
-                  const int *DESCA,
-                  number *B,
-                  const int *IB,
-                  const int *JB,
-                  const int *DESCB,
-                  const number *beta,
-                  number *C,
-                  const int *IC,
-                  const int *JC,
-                  const int *DESCC)
+inline void pgemm(const char * /*transa*/,
+                  const char * /*transb*/,
+                  const int * /*m*/,
+                  const int * /*n*/,
+                  const int * /*k*/,
+                  const number * /*alpha*/,
+                  number * /*A*/,
+                  const int * /*IA*/,
+                  const int * /*JA*/,
+                  const int * /*DESCA*/,
+                  number * /*B*/,
+                  const int * /*IB*/,
+                  const int * /*JB*/,
+                  const int * /*DESCB*/,
+                  const number * /*beta*/,
+                  number * /*C*/,
+                  const int * /*IC*/,
+                  const int * /*JC*/,
+                  const int * /*DESCC*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -1043,14 +1043,14 @@ inline void pgemm(const char *transa,
 
 
 template <typename number>
-inline number plange(char const *norm,
-                     int const &m,
-                     int const &n,
-                     number *A,
-                     int const &ia,
-                     int const &ja,
-                     int *desca,
-                     number *work)
+inline number plange(char const * /*norm*/,
+                     int const &/*m*/,
+                     int const &/*n*/,
+                     number * /*A*/,
+                     int const &/*ia*/,
+                     int const &/*ja*/,
+                     int * /*desca*/,
+                     number * /*work*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -1081,21 +1081,21 @@ inline float plange(char const *norm,
 
 
 template <typename number>
-inline void psyev(const char *jobz,
-                  const char *uplo,
-                  const int *m,
-                  number *A,
-                  const int *ia,
-                  const int *ja,
-                  int *desca,
-                  number *w,
-                  number *z,
-                  const int *iz,
-                  const int *jz,
-                  int *descz,
-                  number *work,
-                  const int *lwork,
-                  int *info)
+inline void psyev(const char * /*jobz*/,
+                  const char * /*uplo*/,
+                  const int * /*m*/,
+                  number * /*A*/,
+                  const int * /*ia*/,
+                  const int * /*ja*/,
+                  int * /*desca*/,
+                  number * /*w*/,
+                  number * /*z*/,
+                  const int * /*iz*/,
+                  const int * /*jz*/,
+                  int * /*descz*/,
+                  number * /*work*/,
+                  const int * /*lwork*/,
+                  int * /*info*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -1140,17 +1140,17 @@ inline void psyev(const char *jobz,
 
 
 template <typename number>
-inline void placpy(const char *uplo,
-                   const int *m,
-                   const int *n,
-                   number *A,
-                   const int *ia,
-                   const int *ja,
-                   int *desca,
-                   number *B,
-                   const int *ib,
-                   const int *jb,
-                   int *descb)
+inline void placpy(const char * /*uplo*/,
+                   const int * /*m*/,
+                   const int * /*n*/,
+                   number * /*A*/,
+                   const int * /*ia*/,
+                   const int * /*ja*/,
+                   int * /*desca*/,
+                   number * /*B*/,
+                   const int * /*ib*/,
+                   const int * /*jb*/,
+                   int * /*descb*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -1186,17 +1186,17 @@ inline void placpy(const char *uplo,
 
 
 template <typename number>
-inline void pgemr2d(const int *m,
-                    const int *n,
-                    const number *A,
-                    const int *ia,
-                    const int *ja,
-                    const int *desca,
-                    number *B,
-                    const int *ib,
-                    const int *jb,
-                    const int *descb,
-                    const int *ictxt)
+inline void pgemr2d(const int * /*m*/,
+                    const int * /*n*/,
+                    const number * /*A*/,
+                    const int * /*ia*/,
+                    const int * /*ja*/,
+                    const int * /*desca*/,
+                    number * /*B*/,
+                    const int * /*ib*/,
+                    const int * /*jb*/,
+                    const int * /*descb*/,
+                    const int * /*ictxt*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -1233,9 +1233,9 @@ inline void pgemr2d(const int *m,
 
 
 template <typename number>
-inline void plamch(const int *ictxt,
-                   const char *cmach,
-                   number &val)
+inline void plamch(const int * /*ictxt*/,
+                   const char * /*cmach*/,
+                   number &/*val*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -1256,35 +1256,35 @@ inline void plamch(const int *ictxt,
 
 
 template <typename number>
-inline void psyevx(const char *jobz,
-                   const char *range,
-                   const char *uplo,
-                   const int *n,
-                   number *A,
-                   const int *ia,
-                   const int *ja,
-                   const int *desca,
-                   number *VL,
-                   number *VU,
-                   const int *il,
-                   const int *iu,
-                   number *abstol,
-                   const int *m,
-                   const int *nz,
-                   number *w,
-                   number *orfac,
-                   number *Z,
-                   const int *iz,
-                   const int *jz,
-                   const int *descz,
-                   number *work,
-                   int *lwork,
-                   int *iwork,
-                   int *liwork,
-                   int *ifail,
-                   int *iclustr,
-                   number *gap,
-                   int *info)
+inline void psyevx(const char * /*jobz*/,
+                   const char * /*range*/,
+                   const char * /*uplo*/,
+                   const int * /*n*/,
+                   number * /*A*/,
+                   const int * /*ia*/,
+                   const int * /*ja*/,
+                   const int * /*desca*/,
+                   number * /*VL*/,
+                   number * /*VU*/,
+                   const int * /*il*/,
+                   const int * /*iu*/,
+                   number * /*abstol*/,
+                   const int * /*m*/,
+                   const int * /*nz*/,
+                   number * /*w*/,
+                   number * /*orfac*/,
+                   number * /*Z*/,
+                   const int * /*iz*/,
+                   const int * /*jz*/,
+                   const int * /*descz*/,
+                   number * /*work*/,
+                   int * /*lwork*/,
+                   int * /*iwork*/,
+                   int * /*liwork*/,
+                   int * /*ifail*/,
+                   int * /*iclustr*/,
+                   number * /*gap*/,
+                   int * /*info*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -1357,26 +1357,26 @@ inline void psyevx(const char *jobz,
 
 
 template <typename number>
-inline void pgesvd(const char *jobu,
-                   const char *jobvt,
-                   const int *m,
-                   const int *n,
-                   number *A,
-                   const int *ia,
-                   const int *ja,
-                   const int *desca,
-                   number *S,
-                   number *U,
-                   const int *iu,
-                   const int *ju,
-                   const int *descu,
-                   number *VT,
-                   const int *ivt,
-                   const int *jvt,
-                   const int *descvt,
-                   number *work,
-                   int *lwork,
-                   int *info)
+inline void pgesvd(const char * /*jobu*/,
+                   const char * /*jobvt*/,
+                   const int * /*m*/,
+                   const int * /*n*/,
+                   number * /*A*/,
+                   const int * /*ia*/,
+                   const int * /*ja*/,
+                   const int * /*desca*/,
+                   number * /*S*/,
+                   number * /*U*/,
+                   const int * /*iu*/,
+                   const int * /*ju*/,
+                   const int * /*descu*/,
+                   number * /*VT*/,
+                   const int * /*ivt*/,
+                   const int * /*jvt*/,
+                   const int * /*descvt*/,
+                   number * /*work*/,
+                   int * /*lwork*/,
+                   int * /*info*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -1431,21 +1431,21 @@ inline void pgesvd(const char *jobu,
 
 
 template <typename number>
-inline void pgels(const char *trans,
-                  const int *m,
-                  const int *n,
-                  const int *nrhs,
-                  number *A,
-                  const int *ia,
-                  const int *ja,
-                  const int *desca,
-                  number *B,
-                  const int *ib,
-                  const int *jb,
-                  const int *descb,
-                  number *work,
-                  int *lwork,
-                  int *info)
+inline void pgels(const char * /*trans*/,
+                  const int * /*m*/,
+                  const int * /*n*/,
+                  const int * /*nrhs*/,
+                  number * /*A*/,
+                  const int * /*ia*/,
+                  const int * /*ja*/,
+                  const int * /*desca*/,
+                  number * /*B*/,
+                  const int * /*ib*/,
+                  const int * /*jb*/,
+                  const int * /*descb*/,
+                  number * /*work*/,
+                  int * /*lwork*/,
+                  int * /*info*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }

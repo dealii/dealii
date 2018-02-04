@@ -23,6 +23,7 @@ PRIVATE void print_value
 )
 {
     Entry xi ;
+    (void)Xz; /* Suppress an unused variable warning with clang */
     /* if Xz is null, then X is in "merged" format (compatible with Entry, */
     /* and ANSI C99 double _Complex type). */
     PRINTF (("    " ID " :", INDEX (i))) ;
