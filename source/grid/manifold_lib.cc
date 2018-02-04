@@ -931,7 +931,7 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const unsigned int axis,
 
 
 template <int dim, int spacedim>
-CylindricalManifold<dim, spacedim>::CylindricalManifold(const Point<spacedim> &direction_,
+CylindricalManifold<dim, spacedim>::CylindricalManifold(const Tensor<1, spacedim> &direction_,
                                                         const Point<spacedim> &point_on_axis_,
                                                         const double tolerance) :
   ChartManifold<dim,spacedim,3>(Tensor<1,3>({0,2.*numbers::PI,0})),

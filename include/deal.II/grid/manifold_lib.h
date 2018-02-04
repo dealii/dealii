@@ -384,7 +384,7 @@ public:
    * scaled, and the given point may be any point on the axis. The tolerance
    * value is used to determine if a point is on the axis.
    */
-  CylindricalManifold (const Point<spacedim> &direction,
+  CylindricalManifold (const Tensor<1, spacedim> &direction,
                        const Point<spacedim> &point_on_axis,
                        const double tolerance = 1e-10);
 
