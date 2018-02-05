@@ -34,29 +34,77 @@ DEAL_II_NAMESPACE_OPEN
 /*!@addtogroup mg */
 /*@{*/
 
+
 /**
- * Implementation of the multigrid method. The implementation supports both
- * continuous and discontinuous elements and follows the procedure described in
- * the @ref mg_paper "multigrid paper by Janssen and Kanschat".
- *
- * The function which starts a multigrid cycle on the finest level is cycle().
- * Depending on the cycle type chosen with the constructor (see enum Cycle),
- * this function triggers one of the cycles level_v_step() or level_step(),
- * where the latter one can do different types of cycles.
- *
- * Using this class, it is expected that the right hand side has been
- * converted from a vector living on the locally finest level to a multilevel
- * vector. This is a nontrivial operation, usually initiated automatically by
- * the class PreconditionMG and performed by the classes derived from
- * MGTransferBase.
- *
- * @note The interface of this class is still very clumsy. In particular, you
- * will have to set up quite a few auxiliary objects before you can use it.
- * Unfortunately, it seems that this can be avoided only be restricting the
- * flexibility of this class in an unacceptable way.
- *
- * @author Guido Kanschat, 1999 - 2005
- */
+  */
+struct Event
+{
+  enum type_t {start, end, single};
+  enum event_name_t {transfer_to_mg, transfer_to_global, coarse_solve, transfer_down_to, transfer_up_to, smoother_step};
+  type_t type;
+  event_name_t name;
+  unsigned int level;
+};
+
+inline const char *to_string(const Event::type_t t)
+{
+  switch (t)
+    {
+    case Event::start:
+      return "start";
+    case Event::end:
+      return "end";
+    case Event::single:
+      return "single";
+    }
+  Assert(false, ExcNotImplemented());
+  return "";
+}
+
+inline const char *to_string(const Event::event_name_t n)
+{
+  switch (n)
+    {
+    case Event::transfer_to_mg:
+      return "transfer_to_mg";
+    case Event::transfer_to_global:
+      return "transfer_to_global";
+    case Event::coarse_solve:
+      return "coarse_solve";
+    case Event::transfer_down_to:
+      return "transfer_down_to";
+    case Event::transfer_up_to:
+      return "transfer_up_to";
+    case Event::smoother_step:
+      return "smoother_step";
+    }
+  Assert(false, ExcNotImplemented());
+  return "";
+}
+
+/**
+* Implementation of the multigrid method. The implementation supports both
+* continuous and discontinuous elements and follows the procedure described in
+* the @ref mg_paper "multigrid paper by Janssen and Kanschat".
+*
+* The function which starts a multigrid cycle on the finest level is cycle().
+* Depending on the cycle type chosen with the constructor (see enum Cycle),
+* this function triggers one of the cycles level_v_step() or level_step(),
+* where the latter one can do different types of cycles.
+*
+* Using this class, it is expected that the right hand side has been
+* converted from a vector living on the locally finest level to a multilevel
+* vector. This is a nontrivial operation, usually initiated automatically by
+* the class PreconditionMG and performed by the classes derived from
+* MGTransferBase.
+*
+* @note The interface of this class is still very clumsy. In particular, you
+* will have to set up quite a few auxiliary objects before you can use it.
+* Unfortunately, it seems that this can be avoided only be restricting the
+* flexibility of this class in an unacceptable way.
+*
+* @author Guido Kanschat, 1999 - 2005
+*/
 template <typename VectorType>
 class Multigrid : public Subscriptor
 {
@@ -268,6 +316,11 @@ public:
    */
   MGLevelObject<VectorType> solution;
 
+  /**
+    */
+  boost::signals2::connection
+  connect_notification_signal(const std::function<void (const Event &)> &slot);
+
 private:
   /**
    * Auxiliary vector.
@@ -338,6 +391,11 @@ private:
    * Level for debug output. Defaults to zero and can be set by set_debug().
    */
   unsigned int debug;
+
+  /**
+   * Signal used to notify the caller of events.
+   */
+  boost::signals2::signal<void (const Event &)> signal_notification;
 
   template <int dim, class OtherVectorType, class TRANSFER> friend class PreconditionMG;
 };
@@ -441,6 +499,11 @@ public:
    */
   MPI_Comm get_mpi_communicator() const;
 
+  /**
+    */
+  boost::signals2::connection
+  connect_notification_signal(const std::function<void (const Event &)> &slot);
+
 private:
   /**
    * Associated @p DoFHandler.
@@ -468,6 +531,11 @@ private:
    * or with one for each block.
    */
   const bool uses_dof_handler_vector;
+
+  /**
+   * Signal used to notify the caller of events.
+   */
+  boost::signals2::signal<void (const Event &)> signal_notification;
 };
 
 /*@}*/
@@ -575,8 +643,12 @@ namespace internal
           const TRANSFER &transfer,
           OtherVectorType       &dst,
           const OtherVectorType &src,
-          const bool uses_dof_handler_vector, int)
+          const bool uses_dof_handler_vector, int,
+          const boost::signals2::signal<void (const Event &)> &signal)
     {
+      if (!signal.empty())
+        signal(Event({Event::start, Event::transfer_to_mg, 0}));
+
       if (uses_dof_handler_vector)
         transfer.copy_to_mg(dof_handler_vector,
                             multigrid.defect,
@@ -585,8 +657,13 @@ namespace internal
         transfer.copy_to_mg(*dof_handler_vector[0],
                             multigrid.defect,
                             src);
+      if (!signal.empty())
+        signal(Event({Event::end, Event::transfer_to_mg, 0}));
 
       multigrid.cycle();
+
+      if (!signal.empty())
+        signal(Event({Event::start, Event::transfer_to_global, 0}));
       if (uses_dof_handler_vector)
         transfer.copy_from_mg(dof_handler_vector,
                               dst,
@@ -595,6 +672,8 @@ namespace internal
         transfer.copy_from_mg(*dof_handler_vector[0],
                               dst,
                               multigrid.solution);
+      if (!signal.empty())
+        signal(Event({Event::end, Event::transfer_to_global, 0}));
     }
 
     template <int dim, typename VectorType, class TRANSFER, typename OtherVectorType>
@@ -604,17 +683,28 @@ namespace internal
           const TRANSFER &transfer,
           OtherVectorType       &dst,
           const OtherVectorType &src,
-          const bool uses_dof_handler_vector,...)
+          const bool uses_dof_handler_vector, int,
+          const boost::signals2::signal<void (const Event &)> &signal)
     {
       (void) uses_dof_handler_vector;
       Assert (!uses_dof_handler_vector, ExcInternalError());
+
+      if (!signal.empty())
+        signal(Event({Event::start, Event::transfer_to_mg, 0}));
       transfer.copy_to_mg(*dof_handler_vector[0],
                           multigrid.defect,
                           src);
+      if (!signal.empty())
+        signal(Event({Event::end, Event::transfer_to_mg, 0}));
+
       multigrid.cycle();
+      if (!signal.empty())
+        signal(Event({Event::start, Event::transfer_to_global, 0}));
       transfer.copy_from_mg(*dof_handler_vector[0],
                             dst,
                             multigrid.solution);
+      if (!signal.empty())
+        signal(Event({Event::end, Event::transfer_to_global, 0}));
     }
 
     template <int dim, typename VectorType, class TRANSFER, typename OtherVectorType>
@@ -624,8 +714,11 @@ namespace internal
               const TRANSFER &transfer,
               OtherVectorType       &dst,
               const OtherVectorType &src,
-              const bool uses_dof_handler_vector, int)
+              const bool uses_dof_handler_vector, int,
+              boost::signals2::signal<void (const Event &)> &signal)
     {
+      if (!signal.empty())
+        signal(Event({Event::start, Event::transfer_to_mg, 0}));
       if (uses_dof_handler_vector)
         transfer.copy_to_mg(dof_handler_vector,
                             multigrid.defect,
@@ -634,8 +727,13 @@ namespace internal
         transfer.copy_to_mg(*dof_handler_vector[0],
                             multigrid.defect,
                             src);
+      if (!signal.empty())
+        signal(Event({Event::end, Event::transfer_to_mg, 0}));
 
       multigrid.cycle();
+
+      if (!signal.empty())
+        signal(Event({Event::start, Event::transfer_to_global, 0}));
       if (uses_dof_handler_vector)
         transfer.copy_from_mg_add(dof_handler_vector,
                                   dst,
@@ -644,6 +742,8 @@ namespace internal
         transfer.copy_from_mg_add(*dof_handler_vector[0],
                                   dst,
                                   multigrid.solution);
+      if (!signal.empty())
+        signal(Event({Event::end, Event::transfer_to_global, 0}));
     }
 
     template <int dim, typename VectorType, class TRANSFER, typename OtherVectorType>
@@ -653,17 +753,30 @@ namespace internal
               const TRANSFER &transfer,
               OtherVectorType       &dst,
               const OtherVectorType &src,
-              const bool uses_dof_handler_vector,...)
+              const bool uses_dof_handler_vector,
+              int,
+              boost::signals2::signal<void (const Event &)> &signal)
     {
       (void) uses_dof_handler_vector;
       Assert (!uses_dof_handler_vector, ExcInternalError());
+
+      if (!signal.empty())
+        signal(Event({Event::start, Event::transfer_to_mg, 0}));
       transfer.copy_to_mg(*dof_handler_vector[0],
                           multigrid.defect,
                           src);
+      if (!signal.empty())
+        signal(Event({Event::end, Event::transfer_to_mg, 0}));
+
       multigrid.cycle();
+
+      if (!signal.empty())
+        signal(Event({Event::start, Event::transfer_to_global, 0}));
       transfer.copy_from_mg_add(*dof_handler_vector[0],
                                 dst,
                                 multigrid.solution);
+      if (!signal.empty())
+        signal(Event({Event::end, Event::transfer_to_global, 0}));
     }
   }
 }
@@ -715,7 +828,8 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult
  const OtherVectorType &src) const
 {
   internal::PreconditionMG::vmult(dof_handler_vector_raw,*multigrid,*transfer,
-                                  dst,src,uses_dof_handler_vector,0);
+                                  dst,src,uses_dof_handler_vector, 0,
+                                  this->signal_notification);
 }
 
 
@@ -751,6 +865,15 @@ PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
 
 
 template <int dim, typename VectorType, class TRANSFER>
+boost::signals2::connection
+PreconditionMG<dim, VectorType, TRANSFER>::
+connect_notification_signal(const std::function<void (const Event &)> &slot)
+{
+  return this->signal_notification.connect(slot);
+}
+
+
+template <int dim, typename VectorType, class TRANSFER>
 template <class OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::vmult_add
@@ -758,7 +881,8 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult_add
  const OtherVectorType &src) const
 {
   internal::PreconditionMG::vmult_add(dof_handler_vector_raw,*multigrid,*transfer,
-                                      dst,src,uses_dof_handler_vector,0);
+                                      dst,src,uses_dof_handler_vector,0,
+                                      this->signal_notification);
 }
 
 
