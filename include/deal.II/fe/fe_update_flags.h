@@ -99,7 +99,18 @@ enum UpdateFlags
   update_boundary_forms = 0x0010,
   //! Transformed quadrature points
   /**
-   * Compute the quadrature points transformed into real cell coordinates.
+   * Compute the quadrature points location in real cell coordinates.
+   *
+   * FEValues objects take the quadrature point locations on the
+   * reference cell as an argument of the constructor (via the
+   * Quadrature object). For most finite elements, knowing the
+   * location of quadrature points on the reference cell is all that
+   * is necessary to evaluate shape functions, evaluate the mapping,
+   * and other things. On the other hand, if you want to evaluate a
+   * right hand side function $f(\mathbf x_q)$ at quadrature point
+   * locations $\mathbf x_q$ on the real cell, you need to pass this
+   * flag to the FEValues constructor to make sure you can later
+   * access them.
    */
   update_quadrature_points = 0x0020,
   //! Transformed quadrature weights
