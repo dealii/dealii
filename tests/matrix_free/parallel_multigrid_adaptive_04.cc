@@ -283,8 +283,8 @@ void test ()
       for (typename Triangulation<dim>::active_cell_iterator cell=tria.begin_active();
            cell != tria.end(); ++cell)
         if (cell->is_locally_owned() &&
-            (cell->center().norm() < 0.5 && (cell->level() < 5 ||
-                                             cell->center().norm() > 0.45)
+            ((cell->center().norm() < 0.5 && (cell->level() < 5 ||
+                                              cell->center().norm() > 0.45))
              ||
              (dim == 2 && cell->center().norm() > 1.2)))
           cell->set_refine_flag();

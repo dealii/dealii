@@ -45,9 +45,9 @@ void check(const FiniteElement<dim> &fe)
       for (typename Triangulation<dim>::active_cell_iterator cell=tr.begin_active();
            cell != tr.end(); ++cell)
         if ((cell->center().norm() < 0.5 && (cell->level() < 5 ||
-                                             cell->center().norm() > 0.45)
-             ||
-             (dim == 2 && cell->center().norm() > 1.2)))
+                                             cell->center().norm() > 0.45))
+            ||
+            (dim == 2 && cell->center().norm() > 1.2))
           cell->set_refine_flag();
       tr.execute_coarsening_and_refinement ();
 

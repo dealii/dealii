@@ -1,0 +1,11 @@
+New: Multigrid obtained the new signals
+Multigrid::Signals::transfer_to_mg,
+Multigrid::Signals::transfer_to_global,
+Multigrid::Signals::coarse_solve,
+Multigrid::Signals::transfer_down_to,
+Multigrid::Signals::transfer_up_to,
+Multigrid::Signals::pre_smoother_step,
+Multigrid::Signals::post_smoother_step
+that functions can be connected to.
+<br>
+(Daniel Arndt, Timo Heister, 2018/03/31)

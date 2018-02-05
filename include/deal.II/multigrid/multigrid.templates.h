@@ -116,16 +116,21 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
 
   if (level == minlevel)
     {
+      this->signals.coarse_solve(true, level);
       if (debug>0)
         deallog << "Coarse level           " << level << std::endl;
       (*coarse)(level, solution[level], defect[level]);
+      this->signals.coarse_solve(false, level);
       return;
     }
 
   // smoothing of the residual
   if (debug>1)
     deallog << "Smoothing on     level " << level << std::endl;
+
+  this->signals.pre_smoother_step(true, level);
   pre_smooth->apply(level, solution[level], defect[level]);
+  this->signals.pre_smoother_step(false, level);
 
   if (debug>2)
     deallog << "Solution norm          " << solution[level].l2_norm()
@@ -154,13 +159,19 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
       edge_down->vmult(level, t[level-1], solution[level]);
       defect[level-1] -= t[level-1];
     }
+
+  this->signals.transfer_down_to(true, level);
   transfer->restrict_and_add(level, defect[level-1], t[level]);
+  this->signals.transfer_down_to(false, level);
 
   // do recursion
   level_v_step(level-1);
 
   // do coarse grid correction
+  this->signals.transfer_up_to(true, level);
   transfer->prolongate(level, t[level], solution[level-1]);
+  this->signals.transfer_up_to(false, level);
+
   if (debug>2)
     deallog << "Prolongate norm        " << t[level].l2_norm() << std::endl;
   solution[level] += t[level];
@@ -184,7 +195,9 @@ Multigrid<VectorType>::level_v_step (const unsigned int level)
   // post-smoothing
   if (debug>1)
     deallog << "Smoothing on     level " << level << std::endl;
+  this->signals.post_smoother_step(true, level);
   post_smooth->smooth(level, solution[level], defect[level]);
+  this->signals.post_smoother_step(false, level);
 
   if (debug>2)
     deallog << "Solution norm          " << solution[level].l2_norm()
@@ -364,6 +377,56 @@ Multigrid<VectorType>::vcycle()
       t[level].reinit(defect[level], level>minlevel);
     }
   level_v_step (maxlevel);
+}
+
+
+
+template <typename VectorType>
+boost::signals2::connection
+Multigrid<VectorType>::
+connect_coarse_solve(const std::function<void (const bool, const unsigned int)> &slot)
+{
+  return this->signals.coarse_solve.connect(slot);
+}
+
+
+
+template <typename VectorType>
+boost::signals2::connection
+Multigrid<VectorType>::
+connect_transfer_down_to(const std::function<void (const bool, const unsigned int)> &slot)
+{
+  return this->signals.transfer_down_to.connect(slot);
+}
+
+
+
+template <typename VectorType>
+boost::signals2::connection
+Multigrid<VectorType>::
+connect_transfer_up_to(const std::function<void (const bool, const unsigned int)> &slot)
+{
+  return this->signals.transfer_up_to.connect(slot);
+}
+
+
+
+template <typename VectorType>
+boost::signals2::connection
+Multigrid<VectorType>::
+connect_pre_smoother_step(const std::function<void (const bool, const unsigned int)> &slot)
+{
+  return this->signals.pre_smoother_step.connect(slot);
+}
+
+
+
+template <typename VectorType>
+boost::signals2::connection
+Multigrid<VectorType>::
+connect_post_smoother_step(const std::function<void (const bool, const unsigned int)> &slot)
+{
+  return this->signals.post_smoother_step.connect(slot);
 }
 
 
