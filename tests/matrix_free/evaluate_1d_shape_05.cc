@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2017 by the deal.II authors
+// Copyright (C) 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,19 +15,16 @@
 
 
 
-// this function tests the correctness of the 1d evaluation functions used in
-// FEEvaluation. These functions are marked 'internal' but it is much easier
-// to check their correctness directly rather than from the results in
-// dependent functions. this function tests the even-odd path of the
-// evaluation functions
+// check the correctness of the 1d evaluation functions used in FEEvaluation,
+// path evaluate_evenodd, when using same array for in and out
 
 #include "../tests.h"
 #include <iostream>
 
-#include <deal.II/matrix_free/fe_evaluation.h>
+#include <deal.II/matrix_free/tensor_product_kernels.h>
 
 
-template <int M, int N, int type, bool add>
+template <int M, int N, int type>
 void test()
 {
   deallog << "Test " << M << " x " << N << std::endl;
@@ -50,6 +47,7 @@ void test()
   if (type == 1 && M%2 == 1 && N%2 == 1)
     shape[M/2][N/2] = 0.;
 
+
   // create symmetrized shape array exactly as expected by the evenodd
   // function
   AlignedVector<double> shape_sym(M*((N+1)/2));
@@ -63,54 +61,51 @@ void test()
     for (unsigned int q=0; q<(N+1)/2; ++q)
       shape_sym[(M-1)/2*((N+1)/2)+q] = shape[(M-1)/2][q];
 
-  double x[N], x_ref[N], y[M], y_ref[M];
+  double x[N+M], x_ref[N], y_ref[M];
   for (unsigned int i=0; i<N; ++i)
     x[i] = random_value<double>();
 
   // compute reference
   for (unsigned int i=0; i<M; ++i)
     {
-      y[i] = 1.;
-      y_ref[i] = add ? y[i] : 0.;
+      y_ref[i] = 0.;
       for (unsigned int j=0; j<N; ++j)
         y_ref[i] += shape[i][j] * x[j];
     }
 
   // apply function for tensor product
-  internal::EvaluatorTensorProduct<internal::evaluate_evenodd,1,M-1,N,double> evaluator(shape_sym, shape_sym, shape_sym);
+  internal::EvaluatorTensorProduct<internal::evaluate_evenodd,1,M,N,double> evaluator(shape_sym, shape_sym, shape_sym);
   if (type == 0)
-    evaluator.template values<0,false,add> (x,y);
+    evaluator.template values<0,false,false> (x,x);
   if (type == 1)
-    evaluator.template gradients<0,false,add> (x,y);
+    evaluator.template gradients<0,false,false> (x,x);
   if (type == 2)
-    evaluator.template hessians<0,false,add> (x,y);
-
+    evaluator.template hessians<0,false,false> (x,x);
 
   deallog << "Errors no transpose: ";
   for (unsigned int i=0; i<M; ++i)
-    deallog << y[i] - y_ref[i] << " ";
+    deallog << x[i] - y_ref[i] << " ";
   deallog << std::endl;
 
 
   for (unsigned int i=0; i<M; ++i)
-    y[i] = random_value<double>();
+    x[i] = random_value<double>();
 
   // compute reference
   for (unsigned int i=0; i<N; ++i)
     {
-      x[i] = 2.;
-      x_ref[i] = add ? x[i] : 0.;
+      x_ref[i] = 0.;
       for (unsigned int j=0; j<M; ++j)
-        x_ref[i] += shape[j][i] * y[j];
+        x_ref[i] += shape[j][i] * x[j];
     }
 
   // apply function for tensor product
   if (type == 0)
-    evaluator.template values<0,true,add> (y,x);
+    evaluator.template values<0,true,false> (x,x);
   if (type == 1)
-    evaluator.template gradients<0,true,add> (y,x);
+    evaluator.template gradients<0,true,false> (x,x);
   if (type == 2)
-    evaluator.template hessians<0,true,add> (y,x);
+    evaluator.template hessians<0,true,false> (x,x);
 
   deallog << "Errors transpose:    ";
   for (unsigned int i=0; i<N; ++i)
@@ -123,57 +118,28 @@ int main ()
   initlog();
 
   deallog.push("values");
-  test<4,4,0,false>();
-  test<3,3,0,false>();
-  test<4,3,0,false>();
-  test<3,4,0,false>();
-  test<3,5,0,false>();
+  test<4,4,0>();
+  test<3,3,0>();
+  test<4,3,0>();
+  test<3,4,0>();
+  test<3,5,0>();
   deallog.pop();
 
   deallog.push("gradients");
-  test<4,4,1,false>();
-  test<3,3,1,false>();
-  test<4,3,1,false>();
-  test<3,4,1,false>();
-  test<3,5,1,false>();
+  test<4,4,1>();
+  test<3,3,1>();
+  test<4,3,1>();
+  test<3,4,1>();
+  test<3,5,1>();
   deallog.pop();
 
   deallog.push("hessians");
-  test<4,4,2,false>();
-  test<3,3,2,false>();
-  test<4,3,2,false>();
-  test<3,4,2,false>();
-  test<3,5,2,false>();
-  deallog.pop();
-
-  deallog.push("add");
-
-  deallog.push("values");
-  test<4,4,0,true>();
-  test<3,3,0,true>();
-  test<4,3,0,true>();
-  test<3,4,0,true>();
-  test<3,5,0,true>();
-  deallog.pop();
-
-  deallog.push("gradients");
-  test<4,4,1,true>();
-  test<3,3,1,true>();
-  test<4,3,1,true>();
-  test<3,4,1,true>();
-  test<3,5,1,true>();
-  deallog.pop();
-
-  deallog.push("hessians");
-  test<4,4,2,true>();
-  test<3,3,2,true>();
-  test<4,3,2,true>();
-  test<3,4,2,true>();
-  test<3,5,2,true>();
-  deallog.pop();
-
+  test<4,4,2>();
+  test<3,3,2>();
+  test<4,3,2>();
+  test<3,4,2>();
+  test<3,5,2>();
   deallog.pop();
 
   return 0;
 }
-

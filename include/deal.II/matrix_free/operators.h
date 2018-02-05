@@ -892,7 +892,7 @@ namespace MatrixFreeOperators
 
     Assert(dim == 2 || dim == 3, ExcNotImplemented());
 
-    internal::EvaluatorTensorProduct<internal::evaluate_evenodd,dim,fe_degree,
+    internal::EvaluatorTensorProduct<internal::evaluate_evenodd,dim,fe_degree+1,
              fe_degree+1, VectorizedArray<Number> >
              evaluator(inverse_shape, inverse_shape, inverse_shape);
 

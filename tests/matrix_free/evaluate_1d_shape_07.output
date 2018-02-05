@@ -1,0 +1,91 @@
+
+DEAL:values::Test 4 x 4
+DEAL:values::Errors no transpose: 1.11022e-16 2.77556e-17 5.55112e-17 1.11022e-16 
+DEAL:values::Errors transpose:    2.22045e-16 0.00000 0.00000 2.22045e-16 
+DEAL:values::Test 3 x 3
+DEAL:values::Errors no transpose: 0.00000 0.00000 0.00000 
+DEAL:values::Errors transpose:    0.00000 0.00000 0.00000 
+DEAL:values::Test 4 x 3
+DEAL:values::Errors no transpose: 5.55112e-17 0.00000 0.00000 0.00000 
+DEAL:values::Errors transpose:    0.00000 0.00000 -1.11022e-16 
+DEAL:values::Test 3 x 4
+DEAL:values::Errors no transpose: 0.00000 -1.11022e-16 1.38778e-17 
+DEAL:values::Errors transpose:    0.00000 0.00000 -2.22045e-16 0.00000 
+DEAL:values::Test 3 x 5
+DEAL:values::Errors no transpose: 0.00000 5.55112e-17 0.00000 
+DEAL:values::Errors transpose:    -5.55112e-17 0.00000 0.00000 0.00000 1.11022e-16 
+DEAL:gradients::Test 4 x 4
+DEAL:gradients::Errors no transpose: 0.00000 0.00000 0.00000 0.00000 
+DEAL:gradients::Errors transpose:    0.00000 2.77556e-17 -2.77556e-17 0.00000 
+DEAL:gradients::Test 3 x 3
+DEAL:gradients::Errors no transpose: 0.00000 -2.77556e-17 0.00000 
+DEAL:gradients::Errors transpose:    -5.55112e-17 1.38778e-17 0.00000 
+DEAL:gradients::Test 4 x 3
+DEAL:gradients::Errors no transpose: -2.77556e-17 0.00000 1.11022e-16 0.00000 
+DEAL:gradients::Errors transpose:    0.00000 -5.55112e-17 0.00000 
+DEAL:gradients::Test 3 x 4
+DEAL:gradients::Errors no transpose: 0.00000 -7.63278e-17 0.00000 
+DEAL:gradients::Errors transpose:    -1.38778e-17 0.00000 1.11022e-16 -1.38778e-17 
+DEAL:gradients::Test 3 x 5
+DEAL:gradients::Errors no transpose: -1.11022e-16 0.00000 0.00000 
+DEAL:gradients::Errors transpose:    0.00000 0.00000 0.00000 0.00000 0.00000 
+DEAL:hessians::Test 4 x 4
+DEAL:hessians::Errors no transpose: -1.11022e-16 0.00000 0.00000 0.00000 
+DEAL:hessians::Errors transpose:    0.00000 -1.38778e-17 -5.55112e-17 0.00000 
+DEAL:hessians::Test 3 x 3
+DEAL:hessians::Errors no transpose: 0.00000 0.00000 0.00000 
+DEAL:hessians::Errors transpose:    0.00000 -1.38778e-17 0.00000 
+DEAL:hessians::Test 4 x 3
+DEAL:hessians::Errors no transpose: 0.00000 5.55112e-17 0.00000 0.00000 
+DEAL:hessians::Errors transpose:    -1.11022e-16 0.00000 0.00000 
+DEAL:hessians::Test 3 x 4
+DEAL:hessians::Errors no transpose: -4.44089e-16 0.00000 0.00000 
+DEAL:hessians::Errors transpose:    0.00000 0.00000 0.00000 2.22045e-16 
+DEAL:hessians::Test 3 x 5
+DEAL:hessians::Errors no transpose: 5.55112e-17 -5.55112e-17 0.00000 
+DEAL:hessians::Errors transpose:    0.00000 0.00000 -1.11022e-16 0.00000 -1.11022e-16 
+DEAL:add:values::Test 4 x 4
+DEAL:add:values::Errors no transpose: 2.22045e-16 0.00000 0.00000 0.00000 
+DEAL:add:values::Errors transpose:    4.44089e-16 0.00000 0.00000 0.00000 
+DEAL:add:values::Test 3 x 3
+DEAL:add:values::Errors no transpose: 0.00000 0.00000 0.00000 
+DEAL:add:values::Errors transpose:    0.00000 0.00000 4.44089e-16 
+DEAL:add:values::Test 4 x 3
+DEAL:add:values::Errors no transpose: 2.22045e-16 0.00000 -1.11022e-16 0.00000 
+DEAL:add:values::Errors transpose:    0.00000 0.00000 -2.22045e-16 
+DEAL:add:values::Test 3 x 4
+DEAL:add:values::Errors no transpose: 1.66533e-16 2.22045e-16 -1.11022e-16 
+DEAL:add:values::Errors transpose:    0.00000 4.44089e-16 0.00000 0.00000 
+DEAL:add:values::Test 3 x 5
+DEAL:add:values::Errors no transpose: 1.66533e-16 4.44089e-16 0.00000 
+DEAL:add:values::Errors transpose:    0.00000 0.00000 0.00000 0.00000 0.00000 
+DEAL:add:gradients::Test 4 x 4
+DEAL:add:gradients::Errors no transpose: 2.22045e-16 0.00000 -5.55112e-17 0.00000 
+DEAL:add:gradients::Errors transpose:    0.00000 2.22045e-16 0.00000 -4.44089e-16 
+DEAL:add:gradients::Test 3 x 3
+DEAL:add:gradients::Errors no transpose: 0.00000 1.11022e-16 -2.22045e-16 
+DEAL:add:gradients::Errors transpose:    0.00000 -2.22045e-16 0.00000 
+DEAL:add:gradients::Test 4 x 3
+DEAL:add:gradients::Errors no transpose: 0.00000 -2.22045e-16 0.00000 -4.44089e-16 
+DEAL:add:gradients::Errors transpose:    0.00000 0.00000 0.00000 
+DEAL:add:gradients::Test 3 x 4
+DEAL:add:gradients::Errors no transpose: -2.22045e-16 1.11022e-16 2.22045e-16 
+DEAL:add:gradients::Errors transpose:    0.00000 -4.44089e-16 0.00000 0.00000 
+DEAL:add:gradients::Test 3 x 5
+DEAL:add:gradients::Errors no transpose: 2.22045e-16 -2.22045e-16 -5.55112e-17 
+DEAL:add:gradients::Errors transpose:    -4.44089e-16 4.44089e-16 -2.22045e-16 0.00000 0.00000 
+DEAL:add:hessians::Test 4 x 4
+DEAL:add:hessians::Errors no transpose: 0.00000 -2.22045e-16 1.11022e-16 0.00000 
+DEAL:add:hessians::Errors transpose:    0.00000 0.00000 -2.22045e-16 1.11022e-16 
+DEAL:add:hessians::Test 3 x 3
+DEAL:add:hessians::Errors no transpose: -2.22045e-16 0.00000 0.00000 
+DEAL:add:hessians::Errors transpose:    0.00000 2.22045e-16 0.00000 
+DEAL:add:hessians::Test 4 x 3
+DEAL:add:hessians::Errors no transpose: 0.00000 0.00000 2.22045e-16 -1.11022e-16 
+DEAL:add:hessians::Errors transpose:    0.00000 2.22045e-16 0.00000 
+DEAL:add:hessians::Test 3 x 4
+DEAL:add:hessians::Errors no transpose: 1.11022e-16 0.00000 0.00000 
+DEAL:add:hessians::Errors transpose:    -2.22045e-16 2.22045e-16 0.00000 -4.44089e-16 
+DEAL:add:hessians::Test 3 x 5
+DEAL:add:hessians::Errors no transpose: 1.11022e-16 0.00000 0.00000 
+DEAL:add:hessians::Errors transpose:    0.00000 0.00000 0.00000 0.00000 2.22045e-16 

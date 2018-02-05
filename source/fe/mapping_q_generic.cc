@@ -1451,11 +1451,6 @@ namespace internal
         const unsigned int n_comp = 1+ (spacedim-1)/vec_length;
         const unsigned int n_hessians = (dim*(dim+1))/2;
 
-        VectorizedArray<double> *values_dofs_ptr[n_comp];
-        VectorizedArray<double> *values_quad_ptr[n_comp];
-        VectorizedArray<double> *gradients_quad_ptr[n_comp][dim];
-        VectorizedArray<double> *hessians_quad_ptr[n_comp][n_hessians];
-
         const bool evaluate_values = update_flags & update_quadrature_points;
         const bool evaluate_gradients= (cell_similarity != CellSimilarity::translation)
                                        &&(update_flags & update_contravariant_transformation);
@@ -1478,6 +1473,9 @@ namespace internal
             data.values_quad.resize(n_comp*n_q_points);
             data.gradients_quad.resize (n_comp*n_q_points*dim);
 
+            if (evaluate_hessians)
+              data.hessians_quad.resize(n_comp*n_q_points*n_hessians);
+
             const std::vector<unsigned int> &renumber_to_lexicographic
               = data.shape_info.lexicographic_numbering;
             for (unsigned int i=0; i<n_shape_values; ++i)
@@ -1489,26 +1487,10 @@ namespace internal
                     = data.mapping_support_points[renumber_to_lexicographic[i]][d];
                 }
 
-            for (unsigned int c=0; c<n_comp; ++c)
-              {
-                values_dofs_ptr[c] = &(data.values_dofs[c*n_shape_values]);
-                values_quad_ptr[c] = &(data.values_quad[c*n_q_points]);
-                for (unsigned int j=0; j<dim; ++j)
-                  gradients_quad_ptr[c][j] = &(data.gradients_quad[(c*dim+j)*n_q_points]);
-              }
-
-            if (evaluate_hessians)
-              {
-                data.hessians_quad.resize(n_comp*n_q_points*n_hessians);
-                for (unsigned int c=0; c<n_comp; ++c)
-                  for (unsigned int j=0; j<n_hessians; ++j)
-                    hessians_quad_ptr[c][j] = &(data.hessians_quad[(c*n_hessians+j)*n_q_points]);
-              }
-
             // do the actual tensorized evaluation
-            SelectEvaluator<dim, -1, 0, n_comp, double>::evaluate
-            (data.shape_info, &(values_dofs_ptr[0]), &(values_quad_ptr[0]),
-             &(gradients_quad_ptr[0]), &(hessians_quad_ptr[0]), &(data.scratch[0]),
+            SelectEvaluator<dim, -1, 0, n_comp, VectorizedArray<double> >::evaluate
+            (data.shape_info, data.values_dofs.begin(), data.values_quad.begin(),
+             data.gradients_quad.begin(), data.hessians_quad.begin(), data.scratch.begin(),
              evaluate_values, evaluate_gradients, evaluate_hessians);
           }
 

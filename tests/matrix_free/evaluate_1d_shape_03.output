@@ -1,0 +1,91 @@
+
+DEAL:values::Test 4 x 4
+DEAL:values::Errors no transpose: 0 0 0 0 
+DEAL:values::Errors transpose:    0 0 0 0 
+DEAL:values::Test 3 x 3
+DEAL:values::Errors no transpose: 0 0 0 
+DEAL:values::Errors transpose:    0 0 0 
+DEAL:values::Test 4 x 3
+DEAL:values::Errors no transpose: 0 0 0 0 
+DEAL:values::Errors transpose:    0 0 0 
+DEAL:values::Test 3 x 4
+DEAL:values::Errors no transpose: 0 0 0 
+DEAL:values::Errors transpose:    0 0 0 0 
+DEAL:values::Test 3 x 5
+DEAL:values::Errors no transpose: 0 0 0 
+DEAL:values::Errors transpose:    0 0 0 0 0 
+DEAL:gradients::Test 4 x 4
+DEAL:gradients::Errors no transpose: 0 0 0 0 
+DEAL:gradients::Errors transpose:    0 0 0 0 
+DEAL:gradients::Test 3 x 3
+DEAL:gradients::Errors no transpose: 0 0 0 
+DEAL:gradients::Errors transpose:    0 0 0 
+DEAL:gradients::Test 4 x 3
+DEAL:gradients::Errors no transpose: 0 0 0 0 
+DEAL:gradients::Errors transpose:    0 0 0 
+DEAL:gradients::Test 3 x 4
+DEAL:gradients::Errors no transpose: 0 0 0 
+DEAL:gradients::Errors transpose:    0 0 0 0 
+DEAL:gradients::Test 3 x 5
+DEAL:gradients::Errors no transpose: 0 0 0 
+DEAL:gradients::Errors transpose:    0 0 0 0 0 
+DEAL:hessians::Test 4 x 4
+DEAL:hessians::Errors no transpose: 0 0 0 0 
+DEAL:hessians::Errors transpose:    0 0 0 0 
+DEAL:hessians::Test 3 x 3
+DEAL:hessians::Errors no transpose: 0 0 0 
+DEAL:hessians::Errors transpose:    0 0 0 
+DEAL:hessians::Test 4 x 3
+DEAL:hessians::Errors no transpose: 0 0 0 0 
+DEAL:hessians::Errors transpose:    0 0 0 
+DEAL:hessians::Test 3 x 4
+DEAL:hessians::Errors no transpose: 0 0 0 
+DEAL:hessians::Errors transpose:    0 0 0 0 
+DEAL:hessians::Test 3 x 5
+DEAL:hessians::Errors no transpose: 0 0 0 
+DEAL:hessians::Errors transpose:    0 0 0 0 0 
+DEAL:add:values::Test 4 x 4
+DEAL:add:values::Errors no transpose: 0 0 0 0 
+DEAL:add:values::Errors transpose:    0 0 0 0 
+DEAL:add:values::Test 3 x 3
+DEAL:add:values::Errors no transpose: 0 0 0 
+DEAL:add:values::Errors transpose:    0 0 0 
+DEAL:add:values::Test 4 x 3
+DEAL:add:values::Errors no transpose: 0 0 0 0 
+DEAL:add:values::Errors transpose:    0 0 0 
+DEAL:add:values::Test 3 x 4
+DEAL:add:values::Errors no transpose: 0 0 0 
+DEAL:add:values::Errors transpose:    0 0 0 0 
+DEAL:add:values::Test 3 x 5
+DEAL:add:values::Errors no transpose: 0 0 0 
+DEAL:add:values::Errors transpose:    0 0 0 0 0 
+DEAL:add:gradients::Test 4 x 4
+DEAL:add:gradients::Errors no transpose: 0 0 0 0 
+DEAL:add:gradients::Errors transpose:    0 0 0 0 
+DEAL:add:gradients::Test 3 x 3
+DEAL:add:gradients::Errors no transpose: 0 0 0 
+DEAL:add:gradients::Errors transpose:    0 0 0 
+DEAL:add:gradients::Test 4 x 3
+DEAL:add:gradients::Errors no transpose: 0 0 0 0 
+DEAL:add:gradients::Errors transpose:    0 0 0 
+DEAL:add:gradients::Test 3 x 4
+DEAL:add:gradients::Errors no transpose: 0 0 0 
+DEAL:add:gradients::Errors transpose:    0 0 0 0 
+DEAL:add:gradients::Test 3 x 5
+DEAL:add:gradients::Errors no transpose: 0 0 0 
+DEAL:add:gradients::Errors transpose:    0 0 0 0 0 
+DEAL:add:hessians::Test 4 x 4
+DEAL:add:hessians::Errors no transpose: 0 0 0 0 
+DEAL:add:hessians::Errors transpose:    0 0 0 0 
+DEAL:add:hessians::Test 3 x 3
+DEAL:add:hessians::Errors no transpose: 0 0 0 
+DEAL:add:hessians::Errors transpose:    0 0 0 
+DEAL:add:hessians::Test 4 x 3
+DEAL:add:hessians::Errors no transpose: 0 0 0 0 
+DEAL:add:hessians::Errors transpose:    0 0 0 
+DEAL:add:hessians::Test 3 x 4
+DEAL:add:hessians::Errors no transpose: 0 0 0 
+DEAL:add:hessians::Errors transpose:    0 0 0 0 
+DEAL:add:hessians::Test 3 x 5
+DEAL:add:hessians::Errors no transpose: 0 0 0 
+DEAL:add:hessians::Errors transpose:    0 0 0 0 0 

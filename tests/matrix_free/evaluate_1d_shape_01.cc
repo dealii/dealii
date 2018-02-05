@@ -15,10 +15,8 @@
 
 
 
-// this function tests the correctness of the 1d evaluation functions used in
-// FEEvaluation. These functions are marked 'internal' but it is much easier
-// to check their correctness directly rather than from the results in
-// dependent functions
+// check the correctness of the 1d evaluation functions used in FEEvaluation,
+// path evaluate_symmetric
 
 #include "../tests.h"
 #include <iostream>
@@ -63,7 +61,7 @@ void test()
     }
 
   // apply function for tensor product
-  internal::EvaluatorTensorProduct<internal::evaluate_symmetric,1,M-1,N,double> evaluator(shape, shape, shape);
+  internal::EvaluatorTensorProduct<internal::evaluate_symmetric,1,M,N,double> evaluator(shape, shape, shape);
   if (type == 0)
     evaluator.template values<0,false,add> (x,y);
   if (type == 1)
@@ -161,4 +159,3 @@ int main ()
 
   return 0;
 }
-

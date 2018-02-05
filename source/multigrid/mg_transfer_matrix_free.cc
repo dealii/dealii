@@ -27,7 +27,7 @@
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/mg_transfer_internal.h>
 
-#include <deal.II/matrix_free/tensor_product_kernels.h>
+#include <deal.II/matrix_free/evaluation_kernels.h>
 
 #include <algorithm>
 
@@ -138,7 +138,7 @@ void MGTransferMatrixFree<dim,Number>::build
         }
     }
 
-  evaluation_data.resize(3*n_child_cell_dofs);
+  evaluation_data.resize(n_child_cell_dofs);
 }
 
 
@@ -271,55 +271,6 @@ void MGTransferMatrixFree<dim,Number>
 
 namespace
 {
-  template <int dim, typename Eval, typename Number, bool prolongate>
-  void
-  perform_tensorized_op(const Eval &evaluator,
-                        const unsigned int n_points_in,
-                        const unsigned int n_child_cell_dofs,
-                        const unsigned int n_components,
-                        AlignedVector<VectorizedArray<Number> > &evaluation_data)
-  {
-    if (Eval::n_q_points != numbers::invalid_unsigned_int)
-      AssertDimension(n_components * Eval::n_q_points, n_child_cell_dofs);
-    if (Eval::dofs_per_cell != numbers::invalid_unsigned_int)
-      AssertDimension(Eval::dofs_per_cell, n_points_in);
-    const unsigned int n_points_out = n_child_cell_dofs / n_components;
-    VectorizedArray<Number> *t0 = &evaluation_data[0];
-    VectorizedArray<Number> *t1 = &evaluation_data[n_child_cell_dofs];
-    VectorizedArray<Number> *t2 = &evaluation_data[2*n_child_cell_dofs];
-
-    for (unsigned int c=0; c<n_components; ++c)
-      {
-        // for the prolongate case, we go from dofs (living on the parent cell) to
-        // quads (living on all children) in the FEEvaluation terminology
-        if (dim == 1)
-          evaluator.template values<0,prolongate,false>(t0, t2);
-        else if (dim == 2)
-          {
-            evaluator.template values<0,prolongate,false>(t0, t1);
-            evaluator.template values<1,prolongate,false>(t1, t2);
-          }
-        else if (dim == 3)
-          {
-            evaluator.template values<0,prolongate,false>(t0, t2);
-            evaluator.template values<1,prolongate,false>(t2, t1);
-            evaluator.template values<2,prolongate,false>(t1, t2);
-          }
-        else
-          Assert(false, ExcNotImplemented());
-        if (prolongate)
-          {
-            t0 += n_points_in;
-            t2 += n_points_out;
-          }
-        else
-          {
-            t0 += n_points_out;
-            t2 += n_points_in;
-          }
-      }
-  }
-
   template <int dim, int degree, typename Number>
   void weight_dofs_on_child (const VectorizedArray<Number> *weights,
                              const unsigned int n_components,
@@ -368,11 +319,11 @@ void MGTransferMatrixFree<dim,Number>
   for (unsigned int cell=0; cell < n_owned_level_cells[to_level-1];
        cell += vec_size)
     {
-      const unsigned int n_chunks = cell+vec_size > n_owned_level_cells[to_level-1] ?
-                                    n_owned_level_cells[to_level-1] - cell : vec_size;
+      const unsigned int n_lanes = cell+vec_size > n_owned_level_cells[to_level-1] ?
+                                   n_owned_level_cells[to_level-1] - cell : vec_size;
 
       // read from source vector
-      for (unsigned int v=0; v<n_chunks; ++v)
+      for (unsigned int v=0; v<n_lanes; ++v)
         {
           const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
                                      (parent_child_connect[to_level-1][cell+v].second,
@@ -399,43 +350,37 @@ void MGTransferMatrixFree<dim,Number>
       // perform tensorized operation
       if (element_is_continuous)
         {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*fe_degree+1);
-          perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
-                                                           Utilities::fixed_power<dim>(fe_degree+1),
-                                                           n_child_cell_dofs,
-                                                           n_components,
-                                                           evaluation_data);
+          // must go through the components backwards because we want to write
+          // the output to the same array as the input
+          for (int c=n_components-1; c>=0; --c)
+            internal::FEEvaluationImplBasisChange<internal::evaluate_general,dim,degree+1,2*degree+1,
+                     1,VectorizedArray<Number>, VectorizedArray<Number> >
+                     ::do_forward(prolongation_matrix_1d,
+                                  evaluation_data.begin()+ c*Utilities::fixed_power<dim>(degree_size),
+                                  evaluation_data.begin()+ c*n_scalar_cell_dofs,
+                                  fe_degree+1, 2*fe_degree+1);
           weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[to_level-1][(cell/vec_size)*three_to_dim],
                                                   n_components, fe_degree,
-                                                  &evaluation_data[2*n_child_cell_dofs]);
+                                                  evaluation_data.begin());
         }
       else
         {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*(fe_degree+1));
-          perform_tensorized_op<dim,Evaluator,Number,true>(evaluator,
-                                                           Utilities::fixed_power<dim>(fe_degree+1),
-                                                           n_child_cell_dofs,
-                                                           n_components,
-                                                           evaluation_data);
+          for (int c=n_components-1; c>=0; --c)
+            internal::FEEvaluationImplBasisChange<internal::evaluate_general,dim,degree+1,2*degree+2,
+                     1,VectorizedArray<Number>, VectorizedArray<Number> >
+                     ::do_forward(prolongation_matrix_1d,
+                                  evaluation_data.begin() + c*Utilities::fixed_power<dim>(degree_size),
+                                  evaluation_data.begin() + c*n_scalar_cell_dofs,
+                                  fe_degree+1, 2*fe_degree+2);
         }
 
       // write into dst vector
       const unsigned int *indices = &level_dof_indices[to_level][cell*
                                                                  n_child_cell_dofs];
-      for (unsigned int v=0; v<n_chunks; ++v)
+      for (unsigned int v=0; v<n_lanes; ++v)
         {
           for (unsigned int i=0; i<n_child_cell_dofs; ++i)
-            dst.local_element(indices[i]) += evaluation_data[2*n_child_cell_dofs+i][v];
+            dst.local_element(indices[i]) += evaluation_data[i][v];
           indices += n_child_cell_dofs;
         }
     }
@@ -459,14 +404,14 @@ void MGTransferMatrixFree<dim,Number>
   for (unsigned int cell=0; cell < n_owned_level_cells[from_level-1];
        cell += vec_size)
     {
-      const unsigned int n_chunks = cell+vec_size > n_owned_level_cells[from_level-1] ?
-                                    n_owned_level_cells[from_level-1] - cell : vec_size;
+      const unsigned int n_lanes = cell+vec_size > n_owned_level_cells[from_level-1] ?
+                                   n_owned_level_cells[from_level-1] - cell : vec_size;
 
       // read from source vector
       {
         const unsigned int *indices = &level_dof_indices[from_level][cell*
                                       n_child_cell_dofs];
-        for (unsigned int v=0; v<n_chunks; ++v)
+        for (unsigned int v=0; v<n_lanes; ++v)
           {
             for (unsigned int i=0; i<n_child_cell_dofs; ++i)
               evaluation_data[i][v] = src.local_element(indices[i]);
@@ -479,38 +424,30 @@ void MGTransferMatrixFree<dim,Number>
       // perform tensorized operation
       if (element_is_continuous)
         {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,degree!=-1 ? 2*degree+1 : 0,VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*fe_degree+1);
           weight_dofs_on_child<dim,degree,Number>(&weights_on_refined[from_level-1][(cell/vec_size)*three_to_dim],
                                                   n_components, fe_degree,
                                                   &evaluation_data[0]);
-          perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
-                                                            Utilities::fixed_power<dim>(fe_degree+1),
-                                                            n_child_cell_dofs,
-                                                            n_components,
-                                                            evaluation_data);
+          for (unsigned int c=0; c<n_components; ++c)
+            internal::FEEvaluationImplBasisChange<internal::evaluate_general,dim,degree+1,2*degree+1,
+                     1,VectorizedArray<Number>,VectorizedArray<Number> >
+                     ::do_backward(prolongation_matrix_1d, false,
+                                   evaluation_data.begin() + c*n_scalar_cell_dofs,
+                                   evaluation_data.begin() + c*Utilities::fixed_power<dim>(degree_size),
+                                   fe_degree+1, 2*fe_degree+1);
         }
       else
         {
-          typedef internal::EvaluatorTensorProduct<internal::evaluate_general,dim,degree,2*(degree+1),VectorizedArray<Number> > Evaluator;
-          Evaluator evaluator(prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              prolongation_matrix_1d,
-                              fe_degree,
-                              2*(fe_degree+1));
-          perform_tensorized_op<dim,Evaluator,Number,false>(evaluator,
-                                                            Utilities::fixed_power<dim>(fe_degree+1),
-                                                            n_child_cell_dofs,
-                                                            n_components,
-                                                            evaluation_data);
+          for (unsigned int c=0; c<n_components; ++c)
+            internal::FEEvaluationImplBasisChange<internal::evaluate_general,dim,degree+1,2*degree+2,
+                     1,VectorizedArray<Number>,VectorizedArray<Number> >
+                     ::do_backward(prolongation_matrix_1d, false,
+                                   evaluation_data.begin() + c*n_scalar_cell_dofs,
+                                   evaluation_data.begin() + c*Utilities::fixed_power<dim>(degree_size),
+                                   fe_degree+1, 2*fe_degree+2);
         }
 
       // write into dst vector
-      for (unsigned int v=0; v<n_chunks; ++v)
+      for (unsigned int v=0; v<n_lanes; ++v)
         {
           const unsigned int shift = internal::MGTransfer::compute_shift_within_children<dim>
                                      (parent_child_connect[from_level-1][cell+v].second,
@@ -523,7 +460,7 @@ void MGTransferMatrixFree<dim,Number>
             {
               // apply Dirichlet boundary conditions on parent cell
               for (std::vector<unsigned short>::const_iterator i=dirichlet_indices[from_level-1][cell+v].begin(); i!=dirichlet_indices[from_level-1][cell+v].end(); ++i)
-                evaluation_data[2*n_child_cell_dofs+(*i)][v] = 0.;
+                evaluation_data[*i][v] = 0.;
 
               for (unsigned int k=0; k<(dim>2 ? degree_size : 1); ++k)
                 for (unsigned int j=0; j<(dim>1 ? degree_size : 1); ++j)
@@ -531,7 +468,7 @@ void MGTransferMatrixFree<dim,Number>
                     dst.local_element(indices[c*n_scalar_cell_dofs +
                                               k*n_child_dofs_1d*n_child_dofs_1d+
                                               j*n_child_dofs_1d+i])
-                    += evaluation_data[2*n_child_cell_dofs+m][v];
+                    += evaluation_data[m][v];
             }
         }
     }
