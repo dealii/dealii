@@ -1,0 +1,210 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2017 - 2018 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+#include "../tests.h"
+#include "../lapack/create_matrix.h"
+
+// test multiplication of distributed ScaLAPACKMatrices
+
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/utilities.h>
+#include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/timer.h>
+#include <deal.II/base/multithread_info.h>
+
+#include <deal.II/lac/scalapack.h>
+
+#include <fstream>
+#include <iostream>
+#include <typeinfo>
+
+
+template <typename NumberType>
+void test()
+{
+  MPI_Comm mpi_communicator(MPI_COMM_WORLD);
+  const unsigned int n_mpi_processes(Utilities::MPI::n_mpi_processes(mpi_communicator));
+  const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
+
+  std::cout << std::setprecision(10);
+  ConditionalOStream pcout (std::cout, (this_mpi_process ==0));
+
+  const unsigned int proc_rows = std::floor(std::sqrt(n_mpi_processes));
+  const unsigned int proc_columns = std::floor(n_mpi_processes/proc_rows);
+  //create 2d process grid
+  std::shared_ptr<Utilities::MPI::ProcessGrid> grid = std::make_shared<Utilities::MPI::ProcessGrid>(mpi_communicator,proc_rows,proc_columns);
+  pcout << "2D process grid: " << grid->get_process_grid_rows() << "x" << grid->get_process_grid_columns() << std::endl << std::endl;
+
+  const std::vector<unsigned int> sizes = {{300,400,500}};
+
+  // test C = alpha A*B + beta C
+  {
+    FullMatrix<NumberType> full_A(sizes[0],sizes[2]);
+    FullMatrix<NumberType> full_B(sizes[2],sizes[1]);
+    FullMatrix<NumberType> full_C(sizes[0],sizes[1]);
+    create_random(full_A);
+    create_random(full_B);
+    create_random(full_C);
+
+    // conditions for block sizes: mb_A=mb_C, nb_B=nb_C, nb_A=mb_B
+    const unsigned int mb_A=32, nb_A=64, nb_B=16;
+    const unsigned int mb_C=mb_A, mb_B=nb_A;
+    const unsigned int nb_C=nb_B;
+
+    ScaLAPACKMatrix<NumberType> scalapack_A (full_A.m(),full_A.n(),grid,mb_A,nb_A);
+    ScaLAPACKMatrix<NumberType> scalapack_B (full_B.m(),full_B.n(),grid,mb_B,nb_B);
+    ScaLAPACKMatrix<NumberType> scalapack_C (full_C.m(),full_C.n(),grid,mb_C,nb_C);
+    scalapack_A = full_A;
+    scalapack_B = full_B;
+    scalapack_C = full_C;
+
+    const NumberType alpha = 1.4, beta = 0.1;
+
+    full_A *= alpha;
+    full_C *= beta;
+    full_A.mmult(full_C,full_B,true);
+
+    scalapack_A.mult(scalapack_C,scalapack_B,alpha,beta,false,false);
+
+    pcout << "   computing C = alpha A * B + beta C with"
+          << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << "),"
+          << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ") and"
+          << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")" << std::endl;
+    pcout << "   norms: " << scalapack_C.frobenius_norm()<< " & "
+          << full_C.frobenius_norm() << "  for "
+          << typeid(NumberType).name() << std::endl << std::endl;
+  }
+  // test C = alpha A^T*B + beta C
+  {
+    FullMatrix<NumberType> full_A(sizes[2],sizes[0]);
+    FullMatrix<NumberType> full_B(sizes[2],sizes[1]);
+    FullMatrix<NumberType> full_C(sizes[0],sizes[1]);
+    create_random(full_A);
+    create_random(full_B);
+    create_random(full_C);
+
+    // conditions for block sizes: nb_A=mb_C, nb_B=nb_C, mb_A=mb_B
+    const unsigned int mb_A=32, nb_A=64, nb_B=16;
+    const unsigned int mb_B=mb_A, mb_C=nb_A;
+    const unsigned int nb_C=nb_B;
+
+    ScaLAPACKMatrix<NumberType> scalapack_A (full_A.m(),full_A.n(),grid,mb_A,nb_A);
+    ScaLAPACKMatrix<NumberType> scalapack_B (full_B.m(),full_B.n(),grid,mb_B,nb_B);
+    ScaLAPACKMatrix<NumberType> scalapack_C (full_C.m(),full_C.n(),grid,mb_C,nb_C);
+    scalapack_A = full_A;
+    scalapack_B = full_B;
+    scalapack_C = full_C;
+
+    const NumberType alpha = 1.4, beta = 0.1;
+
+    full_A *= alpha;
+    full_C *= beta;
+    full_A.Tmmult(full_C,full_B,true);
+
+    scalapack_A.mult(scalapack_C,scalapack_B,alpha,beta,true,false);
+
+    pcout << "   computing C = alpha A^T * B + beta C with"
+          << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << "),"
+          << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ") and"
+          << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")" << std::endl;
+    pcout << "   norms: " << scalapack_C.frobenius_norm()<< " & "
+          << full_C.frobenius_norm() << "  for "
+          << typeid(NumberType).name() << std::endl << std::endl;
+  }
+  // test C = alpha A * B^T + beta C
+  {
+    FullMatrix<NumberType> full_A(sizes[0],sizes[2]);
+    FullMatrix<NumberType> full_B(sizes[1],sizes[2]);
+    FullMatrix<NumberType> full_C(sizes[0],sizes[1]);
+    create_random(full_A);
+    create_random(full_B);
+    create_random(full_C);
+
+    // conditions for block sizes: mb_A=mb_C, mb_B=nb_C, nb_A=nb_B
+    const unsigned int mb_A=32, nb_A=64, mb_B=16;
+    const unsigned int nb_B=nb_A, mb_C=mb_A;
+    const unsigned int nb_C=mb_B;
+
+    ScaLAPACKMatrix<NumberType> scalapack_A (full_A.m(),full_A.n(),grid,mb_A,nb_A);
+    ScaLAPACKMatrix<NumberType> scalapack_B (full_B.m(),full_B.n(),grid,mb_B,nb_B);
+    ScaLAPACKMatrix<NumberType> scalapack_C (full_C.m(),full_C.n(),grid,mb_C,nb_C);
+    scalapack_A = full_A;
+    scalapack_B = full_B;
+    scalapack_C = full_C;
+
+    const NumberType alpha = 1.4, beta = 0.1;
+
+    full_A *= alpha;
+    full_C *= beta;
+    full_A.mTmult(full_C,full_B,true);
+
+    scalapack_A.mult(scalapack_C,scalapack_B,alpha,beta,false,true);
+
+    pcout << "   computing C = alpha A * B^T + beta C with"
+          << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << "),"
+          << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ") and"
+          << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")" << std::endl;
+    pcout << "   norms: " << scalapack_C.frobenius_norm()<< " & "
+          << full_C.frobenius_norm() << "  for "
+          << typeid(NumberType).name() << std::endl << std::endl;
+  }
+  // test C = alpha A^T * B^T + beta C
+  {
+    FullMatrix<NumberType> full_A(sizes[2],sizes[0]);
+    FullMatrix<NumberType> full_B(sizes[1],sizes[2]);
+    FullMatrix<NumberType> full_C(sizes[0],sizes[1]);
+    create_random(full_A);
+    create_random(full_B);
+    create_random(full_C);
+
+    // conditions for block sizes: nb_A=mb_C, mb_B=nb_C, mb_A=nb_B
+    const unsigned int mb_A=32, nb_A=64, mb_B=16;
+    const unsigned int nb_B=mb_A, mb_C=nb_A;
+    const unsigned int nb_C=mb_B;
+
+    ScaLAPACKMatrix<NumberType> scalapack_A (full_A.m(),full_A.n(),grid,mb_A,nb_A);
+    ScaLAPACKMatrix<NumberType> scalapack_B (full_B.m(),full_B.n(),grid,mb_B,nb_B);
+    ScaLAPACKMatrix<NumberType> scalapack_C (full_C.m(),full_C.n(),grid,mb_C,nb_C);
+    scalapack_A = full_A;
+    scalapack_B = full_B;
+    scalapack_C = full_C;
+
+    const NumberType alpha = 1.4, beta = 0.1;
+
+    full_A *= alpha;
+    full_C *= beta;
+    full_A.TmTmult(full_C,full_B,true);
+
+    scalapack_A.mult(scalapack_C,scalapack_B,alpha,beta,true,true);
+
+    pcout << "   computing C = alpha A^T * B^T + beta C with"
+          << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << "),"
+          << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ") and"
+          << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")" << std::endl;
+    pcout << "   norms: " << scalapack_C.frobenius_norm()<< " & "
+          << full_C.frobenius_norm() << "  for "
+          << typeid(NumberType).name() << std::endl << std::endl;
+  }
+  pcout << std::endl;
+}
+
+
+
+int main (int argc,char **argv)
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
+
+  test<double>();
+}

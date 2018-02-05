@@ -440,6 +440,193 @@ ScaLAPACKMatrix<NumberType>::copy_to (ScaLAPACKMatrix<NumberType> &dest) const
 
 
 template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::copy_transposed(const ScaLAPACKMatrix<NumberType> &B)
+{
+  add(B,0,1,true);
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::add(const ScaLAPACKMatrix<NumberType> &B,
+                                      const NumberType alpha,
+                                      const NumberType beta,
+                                      const bool transpose_B)
+{
+  if (transpose_B)
+    {
+      Assert (n_rows == B.n_columns, ExcDimensionMismatch(n_rows,B.n_columns));
+      Assert (n_columns == B.n_rows, ExcDimensionMismatch(n_columns,B.n_rows));
+      Assert(column_block_size==B.row_block_size,ExcDimensionMismatch(column_block_size,B.row_block_size));
+      Assert(row_block_size==B.column_block_size,ExcDimensionMismatch(row_block_size,B.column_block_size));
+    }
+  else
+    {
+      Assert (n_rows == B.n_rows, ExcDimensionMismatch(n_rows,B.n_rows));
+      Assert (n_columns == B.n_columns, ExcDimensionMismatch(n_columns,B.n_columns));
+      Assert(column_block_size==B.column_block_size,ExcDimensionMismatch(column_block_size,B.column_block_size));
+      Assert(row_block_size==B.row_block_size,ExcDimensionMismatch(row_block_size,B.row_block_size));
+    }
+  Assert(this->grid==B.grid,ExcMessage("The matrices A and B need to have the same process grid"));
+
+  if (this->grid->mpi_process_is_active)
+    {
+      char trans_b = transpose_B ? 'T' : 'N';
+      NumberType *A_loc = (this->values.size()>0) ? &this->values[0] : nullptr;
+      const NumberType *B_loc = (B.values.size()>0) ? &B.values[0] : nullptr;
+
+      pgeadd(&trans_b,&n_rows,&n_columns,
+             &beta,B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,
+             &alpha,A_loc,&submatrix_row,&submatrix_column,descriptor);
+    }
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::add(const NumberType a,
+                                      const ScaLAPACKMatrix<NumberType> &B)
+{
+  add(B,1,a,false);
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::Tadd(const NumberType a,
+                                       const ScaLAPACKMatrix<NumberType> &B)
+{
+  add(B,1,a,true);
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::mult(ScaLAPACKMatrix<NumberType> &C,
+                                       const ScaLAPACKMatrix<NumberType> &B,
+                                       const NumberType alpha,
+                                       const NumberType beta,
+                                       const bool transpose_A,
+                                       const bool transpose_B) const
+{
+  Assert(this->grid==B.grid,ExcMessage("The matrices A and B need to have the same process grid"));
+  Assert(C.grid==B.grid,ExcMessage("The matrices B and C need to have the same process grid"));
+
+  // see for further info:
+  // https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgemm.htm
+  if (!transpose_A && !transpose_B)
+    {
+      Assert(this->n_columns==B.n_rows,ExcDimensionMismatch(this->n_columns,B.n_rows));
+      Assert(this->n_rows==C.n_rows,ExcDimensionMismatch(this->n_rows,C.n_rows));
+      Assert(B.n_columns==C.n_columns,ExcDimensionMismatch(B.n_columns,C.n_columns));
+      Assert(this->row_block_size==C.row_block_size,ExcDimensionMismatch(this->row_block_size,C.row_block_size));
+      Assert(this->column_block_size==B.row_block_size,ExcDimensionMismatch(this->column_block_size,B.row_block_size));
+      Assert(B.column_block_size==C.column_block_size,ExcDimensionMismatch(B.column_block_size,C.column_block_size));
+    }
+  else if (transpose_A && !transpose_B)
+    {
+      Assert(this->n_rows==B.n_rows,ExcDimensionMismatch(this->n_rows,B.n_rows));
+      Assert(this->n_columns==C.n_rows,ExcDimensionMismatch(this->n_columns,C.n_rows));
+      Assert(B.n_columns==C.n_columns,ExcDimensionMismatch(B.n_columns,C.n_columns));
+      Assert(this->column_block_size==C.row_block_size,ExcDimensionMismatch(this->column_block_size,C.row_block_size));
+      Assert(this->row_block_size==B.row_block_size,ExcDimensionMismatch(this->row_block_size,B.row_block_size));
+      Assert(B.column_block_size==C.column_block_size,ExcDimensionMismatch(B.column_block_size,C.column_block_size));
+    }
+  else if (!transpose_A && transpose_B)
+    {
+      Assert(this->n_columns==B.n_columns,ExcDimensionMismatch(this->n_columns,B.n_columns));
+      Assert(this->n_rows==C.n_rows,ExcDimensionMismatch(this->n_rows,C.n_rows));
+      Assert(B.n_rows==C.n_columns,ExcDimensionMismatch(B.n_rows,C.n_columns));
+      Assert(this->row_block_size==C.row_block_size,ExcDimensionMismatch(this->row_block_size,C.row_block_size));
+      Assert(this->column_block_size==B.column_block_size,ExcDimensionMismatch(this->column_block_size,B.column_block_size));
+      Assert(B.row_block_size==C.column_block_size,ExcDimensionMismatch(B.row_block_size,C.column_block_size));
+    }
+  else // if (transpose_A && transpose_B)
+    {
+      Assert(this->n_rows==B.n_columns,ExcDimensionMismatch(this->n_rows,B.n_columns));
+      Assert(this->n_columns==C.n_rows,ExcDimensionMismatch(this->n_columns,C.n_rows));
+      Assert(B.n_rows==C.n_columns,ExcDimensionMismatch(B.n_rows,C.n_columns));
+
+      Assert(this->column_block_size==C.row_block_size,ExcDimensionMismatch(this->row_block_size,C.row_block_size));
+      Assert(this->row_block_size==B.column_block_size,ExcDimensionMismatch(this->column_block_size,B.row_block_size));
+      Assert(B.row_block_size==C.column_block_size,ExcDimensionMismatch(B.column_block_size,C.column_block_size));
+    }
+  Threads::Mutex::ScopedLock lock (mutex);
+
+  if (this->grid->mpi_process_is_active)
+    {
+      char trans_a = transpose_A ? 'T' : 'N';
+      char trans_b = transpose_B ? 'T' : 'N';
+
+      const NumberType *A_loc = (this->values.size()>0) ? (&(this->values[0])) : nullptr;
+      const NumberType *B_loc = (B.values.size()>0) ? (&(B.values[0])) : nullptr;
+      NumberType *C_loc = (C.values.size()>0) ? (&(C.values[0])) : nullptr;
+      int m = C.n_rows;
+      int n = C.n_columns;
+      int k = transpose_A ? this->n_rows : this->n_columns;
+
+      pgemm(&trans_a,&trans_b,&m,&n,&k,
+            &alpha,A_loc,&(this->submatrix_row),&(this->submatrix_column),this->descriptor,
+            B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,
+            &beta,C_loc,&C.submatrix_row,&C.submatrix_column,C.descriptor);
+    }
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::mmult(ScaLAPACKMatrix<NumberType> &C,
+                                        const ScaLAPACKMatrix<NumberType> &B,
+                                        const bool adding) const
+{
+  if (adding)
+    mult(C,B,1.,1.,false,false);
+  else
+    mult(C,B,1.,0.,false,false);
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::Tmmult(ScaLAPACKMatrix<NumberType> &C,
+                                         const ScaLAPACKMatrix<NumberType> &B,
+                                         const bool adding) const
+{
+  if (adding)
+    mult(C,B,1.,1.,true,false);
+  else
+    mult(C,B,1.,0.,true,false);
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::mTmult(ScaLAPACKMatrix<NumberType> &C,
+                                         const ScaLAPACKMatrix<NumberType> &B,
+                                         const bool adding) const
+{
+  if (adding)
+    mult(C,B,1.,1.,false,true);
+  else
+    mult(C,B,1.,0.,false,true);
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::TmTmult(ScaLAPACKMatrix<NumberType> &C,
+                                          const ScaLAPACKMatrix<NumberType> &B,
+                                          const bool adding) const
+{
+  if (adding)
+    mult(C,B,1.,1.,true,true);
+  else
+    mult(C,B,1.,0.,true,true);
+}
+
+
+
+template <typename NumberType>
 void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
 {
   Assert (n_columns == n_rows,
@@ -851,7 +1038,11 @@ template <typename NumberType>
 NumberType ScaLAPACKMatrix<NumberType>::l1_norm() const
 {
   const char type('O');
-  return norm(type);
+
+  if (property == LAPACKSupport::symmetric)
+    return norm_symmetric(type);
+  else
+    return norm_general(type);
 }
 
 
@@ -860,7 +1051,11 @@ template <typename NumberType>
 NumberType ScaLAPACKMatrix<NumberType>::linfty_norm() const
 {
   const char type('I');
-  return norm(type);
+
+  if (property == LAPACKSupport::symmetric)
+    return norm_symmetric(type);
+  else
+    return norm_general(type);
 }
 
 
@@ -869,13 +1064,52 @@ template <typename NumberType>
 NumberType ScaLAPACKMatrix<NumberType>::frobenius_norm() const
 {
   const char type('F');
-  return norm(type);
+
+  if (property == LAPACKSupport::symmetric)
+    return norm_symmetric(type);
+  else
+    return norm_general(type);
 }
 
 
 
 template <typename NumberType>
-NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
+NumberType ScaLAPACKMatrix<NumberType>::norm_general(const char type) const
+{
+  Assert (state == LAPACKSupport::matrix ||
+          state == LAPACKSupport::inverse_matrix,
+          ExcMessage("norms can be called in matrix state only."));
+  Threads::Mutex::ScopedLock lock (mutex);
+  NumberType res = 0.;
+
+  if (grid->mpi_process_is_active)
+    {
+      const int iarow = indxg2p_(&submatrix_row, &row_block_size, &(grid->this_process_row), &first_process_row, &(grid->n_process_rows));
+      const int iacol = indxg2p_(&submatrix_column, &column_block_size, &(grid->this_process_column), &first_process_column, &(grid->n_process_columns));
+      const int mp0   = numroc_(&n_rows, &row_block_size, &(grid->this_process_row), &iarow, &(grid->n_process_rows));
+      const int nq0   = numroc_(&n_columns, &column_block_size, &(grid->this_process_column), &iacol, &(grid->n_process_columns));
+
+      // type='M': compute largest absolute value
+      // type='F' || type='E': compute Frobenius norm
+      // type='0' || type='1': compute infinity norm
+      int lwork=0; // for type == 'M' || type == 'F' || type == 'E'
+      if (type=='O' || type=='1')
+        lwork = nq0;
+      else if (type=='I')
+        lwork = mp0;
+
+      work.resize(lwork);
+      const NumberType *A_loc = (this->values.size()>0) ? &this->values[0] : nullptr;
+      res = plange(&type, &n_rows, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, work.data());
+    }
+  grid->send_to_inactive(&res);
+  return res;
+}
+
+
+
+template <typename NumberType>
+NumberType ScaLAPACKMatrix<NumberType>::norm_symmetric(const char type) const
 {
   Assert (state == LAPACKSupport::matrix ||
           state == LAPACKSupport::inverse_matrix,
@@ -904,8 +1138,8 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
                         0 :
                         2*Nq0+Np0+ldw;
       work.resize(lwork);
-      const NumberType *A_loc = &this->values[0];
-      res = plansy(&type, &uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, &work[0]);
+      const NumberType *A_loc = (this->values.size()>0) ? &this->values[0] : nullptr;
+      res = plansy(&type, &uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor, work.data());
     }
   grid->send_to_inactive(&res);
   return res;
@@ -914,19 +1148,31 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
 
 
 template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::save(const char *filename) const
+void ScaLAPACKMatrix<NumberType>::save(const char *filename,
+                                       const std::pair<unsigned int,unsigned int> &chunk_size) const
 {
 #ifndef DEAL_II_WITH_HDF5
   (void)filename;
+  (void)chunk_size;
   AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
 #else
+
+  std::pair<unsigned int,unsigned int> chunks_size_ = chunk_size;
+  if (chunks_size_.first==numbers::invalid_unsigned_int || chunks_size_.second==numbers::invalid_unsigned_int)
+    {
+      //HDF5, which uses row-major ordering, sees matrix actually in transposed format due to column-major ordering in ScaLAPACK
+      //Consequently, a chunk is a column of the matrix
+      chunks_size_.first = 1;
+      chunks_size_.second = n_rows;
+    }
+
 #  ifdef H5_HAVE_PARALLEL
   //implementation for configurations equipped with a parallel file system
-  save_parallel(filename);
+  save_parallel(filename,chunks_size_);
 
 #  else
   //implementation for configurations with no parallel file system
-  save_serial(filename);
+  save_serial(filename,chunks_size_);
 
 #  endif
 #endif
@@ -935,10 +1181,12 @@ void ScaLAPACKMatrix<NumberType>::save(const char *filename) const
 
 
 template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
+void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename,
+                                              const std::pair<unsigned int,unsigned int> &chunk_size) const
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
+  (void)chunk_size;
   Assert(false,ExcInternalError());
 #  else
 
@@ -964,6 +1212,14 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
       // create a new file using default properties
       hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
+      // modify dataset creation properties, i.e. enable chunking
+      hsize_t chunk_dims[2];
+      chunk_dims[0] = chunk_size.first;
+      chunk_dims[1] = chunk_size.second;
+      hid_t property = H5Pcreate (H5P_DATASET_CREATE);
+      status = H5Pset_chunk (property, 2, chunk_dims);
+      AssertThrow(status >= 0, ExcIO());
+
       // create the data space for the dataset
       hsize_t dims[2];
       //change order of rows and columns as ScaLAPACKMatrix uses column major ordering
@@ -971,11 +1227,11 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
       dims[1] = n_rows;
       hid_t dataspace_id = H5Screate_simple(2, dims, nullptr);
 
-      // create the dataset
+      // create the dataset within the file using chunk creation properties
       hid_t type_id = hdf5_type_id(&tmp.values[0]);
       hid_t dataset_id = H5Dcreate2(file_id, "/matrix",
                                     type_id, dataspace_id,
-                                    H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+                                    H5P_DEFAULT, property, H5P_DEFAULT);
 
       // write the dataset
       status = H5Dwrite(dataset_id, type_id,
@@ -991,6 +1247,10 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
       status = H5Sclose(dataspace_id);
       AssertThrow(status >= 0, ExcIO());
 
+      // release the creation property
+      status = H5Pclose (property);
+      AssertThrow(status >= 0, ExcIO());
+
       // close the file.
       status = H5Fclose(file_id);
       AssertThrow(status >= 0, ExcIO());
@@ -1001,10 +1261,12 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
 
 
 template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename) const
+void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename,
+                                                const std::pair<unsigned int,unsigned int> &chunk_size) const
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
+  (void)chunk_size;
   Assert(false,ExcInternalError());
 #  else
 
@@ -1048,11 +1310,18 @@ void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename) const
 
   hid_t filespace = H5Screate_simple(2, dims, nullptr);
 
-  // create the dataset with default properties and close filespace
+  // create the chunked dataset with default properties and close filespace
+  hsize_t chunk_dims[2];
+  chunk_dims[0] = chunk_size.first;
+  chunk_dims[1] = chunk_size.second;
+  plist_id = H5Pcreate(H5P_DATASET_CREATE);
+  H5Pset_chunk(plist_id, 2, chunk_dims);
   hid_t type_id = hdf5_type_id(data);
   hid_t dset_id = H5Dcreate2(file_id, "/matrix", type_id,
-                             filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+                             filespace, H5P_DEFAULT, plist_id, H5P_DEFAULT);
   status = H5Sclose(filespace);
+  AssertThrow(status >= 0, ExcIO());
+  status = H5Pclose(plist_id);
   AssertThrow(status >= 0, ExcIO());
 
   // gather the number of local rows and columns from all processes
@@ -1316,6 +1585,46 @@ void ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
 
 #    endif // H5_HAVE_PARALLEL
 #  endif // DEAL_II_WITH_HDF5
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::scale_columns(std::vector<NumberType> &factors)
+{
+  Assert(n_columns==(int)factors.size(),ExcDimensionMismatch(n_columns,factors.size()));
+
+  if (this->grid->mpi_process_is_active)
+    {
+      for (int i=0; i<n_local_rows; ++i)
+        {
+          for (int j=0; j<n_local_columns; ++j)
+            {
+              const int glob_j = global_column(j);
+              local_el(i,j) *= factors[glob_j];
+            }
+        }
+    }
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::scale_rows(std::vector<NumberType> &factors)
+{
+  Assert(n_rows==(int)factors.size(),ExcDimensionMismatch(n_rows,factors.size()));
+
+  if (this->grid->mpi_process_is_active)
+    {
+      for (int i=0; i<n_local_rows; ++i)
+        {
+          const int glob_i = global_row(i);
+          for (int j=0; j<n_local_columns; ++j)
+            {
+              local_el(i,j) *= factors[glob_i];
+            }
+        }
+    }
 }
 
 

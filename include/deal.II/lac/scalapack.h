@@ -190,7 +190,165 @@ public:
                const std::pair<unsigned int,unsigned int> &submatrix_size) const;
 
   /**
+   * Transposing assignment: <i>A = B<sup>T</sup></i>
+   *
+   * The matrices <tt>A</tt> and <tt>B</tt> must have the same process grid
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = NB_B and NB_A = MB_B
+   */
+  void copy_transposed(const ScaLAPACKMatrix<NumberType> &B);
+
+  /**
+   * Matrix-addition:
+   *
+   * <i>A = a A + b op(B)</i>
+   *
+   * if(transpose_B)  <i>op(B) = B<sup>T</sup></i>
+   *
+   * else  <i>op(B) = B</i>
+   *
+   * The matrices <tt>A</tt> and <tt>B</tt> must have the same process grid
+   *
+   * Following alignment conditions have to be fulfilled:
+   *
+   * | transpose_B |          Block Sizes         |
+   * | :---------: | :--------------------------: |
+   * |   false     | MB_A = MB_B <br> NB_A = NB_B |
+   * |   true      | MB_A = NB_B <br> NB_A = MB_B |
+   */
+  void add(const ScaLAPACKMatrix<NumberType> &B,
+           const NumberType a=0.,
+           const NumberType b=1.,
+           const bool transpose_B=false);
+
+  /**
+   * Matrix-addition:
+   *
+   * <i>A += b B</i>
+   *
+   * The matrices <tt>A</tt> and <tt>B</tt> must have the same process grid
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = MB_B and NB_A = NB_B
+   */
+  void add(const NumberType b,
+           const ScaLAPACKMatrix<NumberType> &B);
+
+  /**
+   * Matrix-addition:
+   *
+   * <i>A += b B<sup>T</sup></i>
+   *
+   * The matrices <tt>A</tt> and <tt>B</tt> must have the same process grid
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = NB_B and NB_A = MB_B
+   */
+  void Tadd(const NumberType b,
+            const ScaLAPACKMatrix<NumberType> &B);
+
+  /**
+   * Matrix-matrix-multiplication:
+   *
+   * The operations based on the input parameters and the alignment conditions are summarized in the following table:
+   *
+   * | transpose_A | transpose_B |                   Block Sizes                 |                     Operation                    |
+   * | :---------: | :---------: | :-------------------------------------------: | :----------------------------------------------: |
+   * | false       |   false     | MB_A = MB_C <br> NB_A = MB_B <br> NB_B = NB_C |             <i>C = a A * B + b C</i>             |
+   * | false       |   true      | MB_A = MB_C <br> NB_A = NB_B <br> MB_B = NB_C |      <i>C = a A * B<sup>T</sup> + b C</i>        |
+   * | true        |   false     | MB_A = MB_B <br> NB_A = MB_C <br> NB_B = NB_C |        <i>C = a A<sup>T</sup> * B + b C</i>      |
+   * | true        |   true      | MB_A = NB_B <br> NB_A = MB_C <br> MB_B = NB_C | <i>C = a A<sup>T</sup> * B<sup>T</sup> + b C</i> |
+   *
+   * It is assumed that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
+   * <tt>C</tt> already has the right size.
+   *
+   * The matrices <tt>A</tt>, <tt>B</tt> and <tt>C</tt> must have the same process grid.
+   */
+  void mult(ScaLAPACKMatrix<NumberType> &C,
+            const ScaLAPACKMatrix<NumberType> &B,
+            const NumberType a=1,
+            const NumberType b=0,
+            const bool transpose_A=false,
+            const bool transpose_B=false) const;
+
+  /**
+   * Matrix-matrix-multiplication.
+   *
+   * The optional parameter <tt>adding</tt> determines, whether the result is
+   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   *
+   * if (adding) <i>C += A*B</i>
+   *
+   * else <i>C = A*B</i>
+   *
+   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
+   * <tt>C</tt> already has the right size.
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = MB_C, NB_A = MB_B and NB_B = NB_C
+   */
+  void mmult(ScaLAPACKMatrix<NumberType> &C,
+             const ScaLAPACKMatrix<NumberType> &B,
+             const bool adding=false) const;
+
+  /**
+   * Matrix-matrix-multiplication using transpose of <tt>this</tt>.
+   *
+   * The optional parameter <tt>adding</tt> determines, whether the result is
+   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   *
+   * if (adding) <i>C += A<sup>T</sup>*B</i>
+   *
+   * else <i>C = A<sup>T</sup>*B</i>
+   *
+   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
+   * <tt>C</tt> already has the right size.
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = MB_B, NB_A = MB_C and NB_B = NB_C
+   */
+  void Tmmult (ScaLAPACKMatrix<NumberType> &C,
+               const ScaLAPACKMatrix<NumberType> &B,
+               const bool adding=false) const;
+
+  /**
+   * Matrix-matrix-multiplication using transpose of <tt>B</tt>.
+   *
+   * The optional parameter <tt>adding</tt> determines, whether the result is
+   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   *
+   * if (adding) <i>C += A*B<sup>T</sup></i>
+   *
+   * else <i>C = A*B<sup>T</sup></i>
+   *
+   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
+   * <tt>C</tt> already has the right size.
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = MB_C, NB_A = NB_B and MB_B = NB_C
+   */
+  void mTmult (ScaLAPACKMatrix<NumberType> &C,
+               const ScaLAPACKMatrix<NumberType> &B,
+               const bool adding=false) const;
+
+  /**
+   * Matrix-matrix-multiplication using transpose of <tt>this</tt> and
+   * <tt>B</tt>.
+   *
+   * The optional parameter <tt>adding</tt> determines, whether the result is
+   * stored in <tt>C</tt> or added to <tt>C</tt>.
+   *
+   * if (adding) <i>C += A<sup>T</sup>*B<sup>T</sup></i>
+   *
+   * else <i>C = A<sup>T</sup>*B<sup>T</sup></i>
+   *
+   * Assumes that <tt>A</tt> and <tt>B</tt> have compatible sizes and that
+   * <tt>C</tt> already has the right size.
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = NB_B, NB_A = MB_C and MB_B = NB_C
+   */
+  void TmTmult (ScaLAPACKMatrix<NumberType> &C,
+                const ScaLAPACKMatrix<NumberType> &B,
+                const bool adding=false) const;
+
+  /**
    * Stores the distributed matrix in @p filename using HDF5.
+   *
    * In case that deal.II was built without HDF5
    * a call to this function will cause an exception to be thrown.
    *
@@ -199,8 +357,12 @@ public:
    * internally the distributed matrix is copied to one process, which
    * does the output. Therefore, the matrix has to fit into the memory
    * of one process.
+   *
+   * To tweak the I/O performance, especially for parallel I/O, the user may define the optional parameter @p chunk_size.
+   * The matrix is written in chunks to the file, therefore the properties of the system define the optimal chunk size.
    */
-  void save(const char *filename) const;
+  void save(const char *filename,
+            const std::pair<unsigned int,unsigned int> &chunk_size=std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int)) const;
 
   /**
    * Loads the distributed matrix from file @p filename using HDF5.
@@ -290,29 +452,25 @@ public:
   * It is assumed that $A$ has full rank: $rank(A) = \min(M,N)$.
   *
   * The following options are supported:
-  * - 1. If <code>transpose==false</code> and $M \geq N$: least squares solution of overdetermined system
-  *      $\min \Vert B - A*X\Vert$.
+  * -# If(!transpose) and $M \geq N$: least squares solution of overdetermined system
+  *    $\min \Vert B - A*X\Vert$.\n
+  *    Upon exit the rows 0 to N-1 of $B$ contain the least square solution vectors. The residual sum of squares
+  *    for each column is given by the sum of squares of elements N to M-1 in that column.
   *
-  *      Upon exit the rows 0 to N-1 of $B$ contain the least square solution vectors. The residual sum of squares
-  *      for each column is given by the sum of squares of elements N to M-1 in that column.
+  * -# If(!transpose) and $M < N$: find minimum norm solutions of underdetermined systems
+  *    $A * X = B$.\n
+  *    Upon exit the columns of $B$ contain the minimum norm solution vectors.
   *
-  * - 2. If <code>transpose==false</code> and $M < N$: find minimum norm solutions of underdetermined systems
-  *      $A * X = B$.
+  * -# If(transpose) and $M \geq N$: find minimum norm solutions of underdetermined system
+  *    $ A^\top X = B$.\n
+  *    Upon exit the columns of $B$ contain the minimum norm solution vectors.
   *
-  *      Upon exit the columns of $B$ contain the minimum norm solution vectors.
+  * -# If(transpose) and $M < N$: least squares solution of overdetermined system
+  *    $\min \Vert B - A^\top X\Vert$.\n
+  *    Upon exit the rows 0 to M-1 contain the least square solution vectors. The residual sum of squares
+  *    for each column is given by the sum of squares of elements M to N-1 in that column.
   *
-  * - 3. If <code>transpose==true</code> and $M \geq N$: find minimum norm solutions of underdetermined system
-  *      $ A^\top X = B$.
-  *
-  *      Upon exit the columns of $B$ contain the minimum norm solution vectors.
-  *
-  * - 4. If <code>transpose==true</code> and $M < N$: least squares solution of overdetermined system
-  *      $\min \Vert B - A^\top X\Vert$.
-  *
-  *      Upon exit the rows 0 to M-1 contain the least square solution vectors. The residual sum of squares
-  *      for each column is given by the sum of squares of elements M to N-1 in that column.
-  *
-  * If <code>transpose==false</code> then $B \in \mathbb{R}^{M \times N_{\rm RHS}}$,
+  * If(!tranpose) then $B \in \mathbb{R}^{M \times N_{\rm RHS}}$,
   * otherwise $B \in \mathbb{R}^{N \times N_{\rm RHS}}}$.
   * The matrices $A$ and $B$ must have an identical block cyclic distribution for rows and columns.
   */
@@ -389,13 +547,29 @@ public:
    */
   NumberType &local_el(const unsigned int loc_row, const unsigned int loc_column);
 
+  /**
+   * scaling the columns of the distributed matrix by scalars in array @p factors
+   */
+  void scale_columns(std::vector<NumberType> &factors);
+
+  /**
+   * scaling the rows of the distributed matrix by scalars in array @p factors
+   */
+  void scale_rows(std::vector<NumberType> &factors);
+
 private:
+
+  /**
+   * Calculate the norm of a distributed symmetric dense matrix using ScaLAPACK's
+   * internal function.
+   */
+  NumberType norm_symmetric(const char type) const;
 
   /**
    * Calculate the norm of a distributed dense matrix using ScaLAPACK's
    * internal function.
    */
-  NumberType norm(const char type) const;
+  NumberType norm_general(const char type) const;
 
   /**
    * Computing selected eigenvalues and, optionally, the eigenvectors.
@@ -417,7 +591,8 @@ private:
    * Stores the distributed matrix in @p filename
    * using serial routines
    */
-  void save_serial(const char *filename) const;
+  void save_serial(const char *filename,
+                   const std::pair<unsigned int,unsigned int> &chunk_size) const;
 
   /*
    * Loads the distributed matrix from file @p filename
@@ -429,7 +604,8 @@ private:
    * Stores the distributed matrix in @p filename
    * using parallel routines
    */
-  void save_parallel(const char *filename) const;
+  void save_parallel(const char *filename,
+                     const std::pair<unsigned int,unsigned int> &chunk_size) const;
 
   /*
    * Loads the distributed matrix from file @p filename
