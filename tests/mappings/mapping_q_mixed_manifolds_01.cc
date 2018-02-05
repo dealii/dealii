@@ -36,13 +36,13 @@
 template <int dim>
 struct ManifoldWrapper
 {
-  Manifold<dim> *operator()(const Point<dim> &direction,
+  Manifold<dim> *operator()(const Tensor<1, dim> &direction,
                             const Point<dim> &center ) const;
 };
 
 template <>
 Manifold<2> *
-ManifoldWrapper<2>::operator()(const Point<2> &/*direction*/,
+ManifoldWrapper<2>::operator()(const Tensor<1, 2> &/*direction*/,
                                const Point<2> &center ) const
 {
   return new SphericalManifold<2>(center);
@@ -50,7 +50,7 @@ ManifoldWrapper<2>::operator()(const Point<2> &/*direction*/,
 
 template <>
 Manifold<3> *
-ManifoldWrapper<3>::operator()(const Point<3> &direction,
+ManifoldWrapper<3>::operator()(const Tensor<1, 3> &direction,
                                const Point<3> &center ) const
 {
   return new CylindricalManifold<3>(direction, center);
@@ -59,7 +59,7 @@ ManifoldWrapper<3>::operator()(const Point<3> &direction,
 template <int dim>
 void test()
 {
-  Point<dim> direction;
+  Tensor<1, dim> direction;
   direction[dim-1] = 1.;
 
   std::shared_ptr<Manifold<dim> > cylinder_manifold

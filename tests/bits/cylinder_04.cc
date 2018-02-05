@@ -52,8 +52,8 @@ void check ()
 
   GridTools::transform ((Point<dim> ( *)(const Point<dim> &))&rotate_by_xy_angle<dim>, triangulation);
 
-  static const CylindricalManifold<dim> boundary (Point<dim>(std::cos(xy_angle), std::sin(xy_angle), 0),
-                                                  Point<dim>());
+  const Tensor<1, dim> direction {{std::cos(xy_angle), std::sin(xy_angle), 0}};
+  static const CylindricalManifold<dim> boundary (direction, /*center=*/Point<dim>());
   triangulation.set_manifold (0, boundary);
   triangulation.refine_global (2);
 
@@ -71,6 +71,3 @@ int main ()
 
   check<3> ();
 }
-
-
-
