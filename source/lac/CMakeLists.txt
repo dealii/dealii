@@ -149,7 +149,7 @@ IF(DEAL_II_WITH_CUDA)
 ENDIF()
 
 # determined by profiling
-SET(_n_includes_per_unity_file 30)
+SET(_n_includes_per_unity_file 20)
 
 IF(DEAL_II_UNITY_BUILD)
   # sort files so that the petsc and trilinos files are not together

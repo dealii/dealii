@@ -48,10 +48,11 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-namespace
+namespace internal
 {
   template <class VectorType>
   typename VectorType::value_type
+  inline
   get_vector_element (const VectorType &vector,
                       const types::global_dof_index cell_number)
   {
@@ -59,17 +60,17 @@ namespace
   }
 
 
+
   IndexSet::value_type
+  inline
   get_vector_element (const IndexSet &is,
                       const types::global_dof_index cell_number)
   {
     return (is.is_element(cell_number) ? 1 : 0);
   }
-}
 
 
-namespace
-{
+
   template <int dim, int spacedim>
   inline
   std::vector<unsigned int>
@@ -118,7 +119,7 @@ namespace FEValuesViews
 // variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-      = make_shape_function_to_row_table (fe);
+      = internal::make_shape_function_to_row_table (fe);
 
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
       {
@@ -179,7 +180,7 @@ namespace FEValuesViews
 // variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-      = make_shape_function_to_row_table (fe);
+      = internal::make_shape_function_to_row_table (fe);
 
     for (unsigned int d=0; d<spacedim; ++d)
       {
@@ -277,7 +278,7 @@ namespace FEValuesViews
 // variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-      = make_shape_function_to_row_table (fe);
+      = internal::make_shape_function_to_row_table (fe);
 
     for (unsigned int d = 0; d < dealii::SymmetricTensor<2,dim>::n_independent_components; ++d)
       {
@@ -376,7 +377,7 @@ namespace FEValuesViews
 // variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-      = make_shape_function_to_row_table (fe);
+      = internal::make_shape_function_to_row_table (fe);
 
     for (unsigned int d = 0; d < dim*dim; ++d)
       {
@@ -2611,7 +2612,7 @@ namespace internal
       // the rows in the tables storing the data by shape function and
       // nonzero component
       this->shape_function_to_row_table
-        = make_shape_function_to_row_table (fe);
+        = internal::make_shape_function_to_row_table (fe);
 
       // count the total number of non-zero components accumulated
       // over all shape functions
@@ -3175,7 +3176,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_values(dof_values.data(), this->finite_element_output.shape_values, values);
 }
 
@@ -3224,7 +3225,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_values(dof_values.data(),
                                this->finite_element_output.shape_values,
                                *fe,
@@ -3255,7 +3256,7 @@ void FEValuesBase<dim,spacedim>::get_function_values (
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
   for (unsigned int i=0; i<indices.size(); ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_values(dof_values.data(),
                                this->finite_element_output.shape_values,
                                *fe,
@@ -3306,7 +3307,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_gradients,
                                     gradients);
 }
@@ -3358,7 +3359,7 @@ void FEValuesBase<dim,spacedim>::get_function_gradients (
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
   for (unsigned int i=0; i<indices.size(); ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_derivatives(dof_values.data(),
                                     this->finite_element_output.shape_gradients,
                                     *fe,
@@ -3409,7 +3410,7 @@ void FEValuesBase<dim,spacedim>::get_function_hessians (
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_hessians,
                                     hessians);
 }
@@ -3461,7 +3462,7 @@ void FEValuesBase<dim, spacedim>::get_function_hessians (
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
   for (unsigned int i=0; i<indices.size(); ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_derivatives(dof_values.data(),
                                     this->finite_element_output.shape_hessians,
                                     *fe,
@@ -3511,7 +3512,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_laplacians(dof_values.data(), this->finite_element_output.shape_hessians,
                                    laplacians);
 }
@@ -3558,7 +3559,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
   for (unsigned int i=0; i<indices.size(); ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_laplacians(dof_values.data(), this->finite_element_output.shape_hessians,
                                    *fe, this->finite_element_output.shape_function_to_row_table,
                                    laplacians, false,
@@ -3583,7 +3584,7 @@ void FEValuesBase<dim,spacedim>::get_function_laplacians (
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
   for (unsigned int i=0; i<indices.size(); ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_laplacians(dof_values.data(), this->finite_element_output.shape_hessians,
                                    *fe, this->finite_element_output.shape_function_to_row_table,
                                    laplacians, quadrature_points_fastest,
@@ -3631,7 +3632,7 @@ void FEValuesBase<dim,spacedim>::get_function_third_derivatives (
 
   boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
   for (unsigned int i=0; i<dofs_per_cell; ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_derivatives(dof_values.data(), this->finite_element_output.shape_3rd_derivatives,
                                     third_derivatives);
 }
@@ -3683,7 +3684,7 @@ void FEValuesBase<dim, spacedim>::get_function_third_derivatives (
 
   boost::container::small_vector<Number, 200> dof_values(indices.size());
   for (unsigned int i=0; i<indices.size(); ++i)
-    dof_values[i] = get_vector_element (fe_function, indices[i]);
+    dof_values[i] = internal::get_vector_element (fe_function, indices[i]);
   internal::do_function_derivatives(dof_values.data(),
                                     this->finite_element_output.shape_3rd_derivatives,
                                     *fe,
@@ -4579,7 +4580,7 @@ void FESubfaceValues<dim,spacedim>::do_reinit (const unsigned int face_no,
 
 
 /*------------------------------- Explicit Instantiations -------------*/
-#define SPLIT_INSTANTIATIONS_COUNT 2
+#define SPLIT_INSTANTIATIONS_COUNT 6
 #ifndef SPLIT_INSTANTIATIONS_INDEX
 #define SPLIT_INSTANTIATIONS_INDEX 0
 #endif

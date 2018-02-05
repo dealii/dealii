@@ -36,6 +36,7 @@ SET(_unity_include_src
 
 SET(_separate_src
   data_out_dof_data.cc
+  data_out_dof_data_inst2.cc
   data_out_dof_data_codim.cc
   derivative_approximation.cc
   error_estimator_1d.cc

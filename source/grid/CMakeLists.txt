@@ -37,6 +37,7 @@ SET(_unity_include_src
 SET(_separate_src
   grid_reordering.cc
   grid_tools.cc
+  grid_tools_dof_handlers.cc
   tria.cc
   )
 
@@ -56,6 +57,7 @@ SET(_inst
   grid_out.inst.in
   grid_refinement.inst.in
   grid_tools.inst.in
+  grid_tools_dof_handlers.inst.in
   grid_tools_cache.inst.in
   intergrid_map.inst.in
   manifold.inst.in
