@@ -2809,6 +2809,33 @@ namespace GridTools
 
 
 
+  namespace internal
+  {
+    // We hit an internal compiler error in ICC 15 if we define this as a lambda
+    // inside the project_to_object function below.
+    template <int structdim>
+    inline
+    bool weights_are_ok (const Tensor<1, GeometryInfo<structdim>::vertices_per_cell> &v)
+    {
+      // clang has trouble figuring out structdim here, so define it
+      // again:
+      static const std::size_t n_vertices_per_cell
+        = Tensor<1, GeometryInfo<structdim>::vertices_per_cell>::n_independent_components;
+      std::array<double, n_vertices_per_cell> copied_weights;
+      for (unsigned int i = 0; i < n_vertices_per_cell; ++i)
+        {
+          copied_weights[i] = v[i];
+          if (v[i] < 0.0 || v[i] > 1.0)
+            return false;
+        }
+
+      // check the sum: try to avoid some roundoff errors by summing in order
+      std::sort(copied_weights.begin(), copied_weights.end());
+      const double sum = std::accumulate(copied_weights.begin(), copied_weights.end(), 0.0);
+      return std::abs(sum - 1.0) < 1e-10; // same tolerance used in manifold.cc
+    }
+  }
+
   template <typename Iterator>
   Point<Iterator::AccessorType::space_dimension>
   project_to_object(const Iterator &object,
@@ -2878,28 +2905,7 @@ namespace GridTools
             // could rewrite the projection as a 1D optimization problem), but
             // to reduce the potential for bugs we use the same code in both
             // cases.
-            auto weights_are_ok = [](const Tensor<1, GeometryInfo<structdim>::vertices_per_cell> &v)
-                                  -> bool
-            {
-              // clang has trouble figuring out structdim here, so define it
-              // again:
-              static const std::size_t n_vertices_per_cell
-              = Tensor<1, GeometryInfo<structdim>::vertices_per_cell>::n_independent_components;
-              std::array<double, n_vertices_per_cell> copied_weights;
-              for (unsigned int i = 0; i < n_vertices_per_cell; ++i)
-                {
-                  copied_weights[i] = v[i];
-                  if (v[i] < 0.0 || v[i] > 1.0)
-                    return false;
-                }
-
-              // check the sum: try to avoid some roundoff errors by summing in order
-              std::sort(copied_weights.begin(), copied_weights.end());
-              const double sum = std::accumulate(copied_weights.begin(), copied_weights.end(), 0.0);
-              return std::abs(sum - 1.0) < 1e-10; // same tolerance used in manifold.cc
-            };
             const double step_size = object->diameter()/64.0;
-
 
             std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell> vertices;
             for (unsigned int vertex_n = 0; vertex_n < GeometryInfo<structdim>::vertices_per_cell;
@@ -2938,7 +2944,7 @@ namespace GridTools
                   }
               }
             guess_weights /= guess_weights_sum;
-            Assert(weights_are_ok(guess_weights), ExcInternalError());
+            Assert(internal::weights_are_ok<structdim>(guess_weights), ExcInternalError());
 
             // The optimization algorithm consists of two parts:
             //
@@ -3023,7 +3029,7 @@ namespace GridTools
                 double new_gradient_weight = gradient_weight;
                 for (unsigned int iteration_count = 0; iteration_count < 40; ++iteration_count)
                   {
-                    if (weights_are_ok(tentative_weights))
+                    if (internal::weights_are_ok<structdim>(tentative_weights))
                       break;
 
                     for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; ++i)
@@ -3043,7 +3049,7 @@ namespace GridTools
 
                 // the update might still send us outside the valid region, so
                 // check again and quit if the update is still not valid
-                if (!weights_are_ok(tentative_weights))
+                if (!internal::weights_are_ok<structdim>(tentative_weights))
                   break;
 
                 // if we cannot get closer by traveling in the gradient direction then quit
@@ -3052,9 +3058,9 @@ namespace GridTools
                   guess_weights = tentative_weights;
                 else
                   break;
-                Assert(weights_are_ok(guess_weights), ExcInternalError());
+                Assert(internal::weights_are_ok<structdim>(guess_weights), ExcInternalError());
               }
-            Assert(weights_are_ok(guess_weights), ExcInternalError());
+            Assert(internal::weights_are_ok<structdim>(guess_weights), ExcInternalError());
             projected_point =  get_point_from_weights(guess_weights);
           }
 
