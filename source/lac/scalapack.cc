@@ -503,10 +503,10 @@ void ScaLAPACKMatrix<NumberType>::Tadd(const NumberType a,
 
 
 template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::mult(ScaLAPACKMatrix<NumberType> &C,
+void ScaLAPACKMatrix<NumberType>::mult(const NumberType b,
                                        const ScaLAPACKMatrix<NumberType> &B,
-                                       const NumberType alpha,
-                                       const NumberType beta,
+                                       const NumberType c,
+                                       ScaLAPACKMatrix<NumberType> &C,
                                        const bool transpose_A,
                                        const bool transpose_B) const
 {
@@ -547,12 +547,10 @@ void ScaLAPACKMatrix<NumberType>::mult(ScaLAPACKMatrix<NumberType> &C,
       Assert(this->n_rows==B.n_columns,ExcDimensionMismatch(this->n_rows,B.n_columns));
       Assert(this->n_columns==C.n_rows,ExcDimensionMismatch(this->n_columns,C.n_rows));
       Assert(B.n_rows==C.n_columns,ExcDimensionMismatch(B.n_rows,C.n_columns));
-
       Assert(this->column_block_size==C.row_block_size,ExcDimensionMismatch(this->row_block_size,C.row_block_size));
       Assert(this->row_block_size==B.column_block_size,ExcDimensionMismatch(this->column_block_size,B.row_block_size));
       Assert(B.row_block_size==C.column_block_size,ExcDimensionMismatch(B.column_block_size,C.column_block_size));
     }
-  Threads::Mutex::ScopedLock lock (mutex);
 
   if (this->grid->mpi_process_is_active)
     {
@@ -567,9 +565,9 @@ void ScaLAPACKMatrix<NumberType>::mult(ScaLAPACKMatrix<NumberType> &C,
       int k = transpose_A ? this->n_rows : this->n_columns;
 
       pgemm(&trans_a,&trans_b,&m,&n,&k,
-            &alpha,A_loc,&(this->submatrix_row),&(this->submatrix_column),this->descriptor,
+            &b,A_loc,&(this->submatrix_row),&(this->submatrix_column),this->descriptor,
             B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,
-            &beta,C_loc,&C.submatrix_row,&C.submatrix_column,C.descriptor);
+            &c,C_loc,&C.submatrix_row,&C.submatrix_column,C.descriptor);
     }
 }
 
@@ -581,9 +579,9 @@ void ScaLAPACKMatrix<NumberType>::mmult(ScaLAPACKMatrix<NumberType> &C,
                                         const bool adding) const
 {
   if (adding)
-    mult(C,B,1.,1.,false,false);
+    mult(1.,B,1.,C,false,false);
   else
-    mult(C,B,1.,0.,false,false);
+    mult(1.,B,0,C,false,false);
 }
 
 
@@ -594,9 +592,9 @@ void ScaLAPACKMatrix<NumberType>::Tmmult(ScaLAPACKMatrix<NumberType> &C,
                                          const bool adding) const
 {
   if (adding)
-    mult(C,B,1.,1.,true,false);
+    mult(1.,B,1.,C,true,false);
   else
-    mult(C,B,1.,0.,true,false);
+    mult(1.,B,0,C,true,false);
 }
 
 
@@ -607,9 +605,9 @@ void ScaLAPACKMatrix<NumberType>::mTmult(ScaLAPACKMatrix<NumberType> &C,
                                          const bool adding) const
 {
   if (adding)
-    mult(C,B,1.,1.,false,true);
+    mult(1.,B,1.,C,false,true);
   else
-    mult(C,B,1.,0.,false,true);
+    mult(1.,B,0,C,false,true);
 }
 
 
@@ -620,9 +618,9 @@ void ScaLAPACKMatrix<NumberType>::TmTmult(ScaLAPACKMatrix<NumberType> &C,
                                           const bool adding) const
 {
   if (adding)
-    mult(C,B,1.,1.,true,true);
+    mult(1.,B,1.,C,true,true);
   else
-    mult(C,B,1.,0.,true,true);
+    mult(1.,B,0,C,true,true);
 }
 
 
@@ -1514,16 +1512,13 @@ void ScaLAPACKMatrix<NumberType>::scale_columns(const ArrayView<const NumberType
   Assert(n_columns==(int)factors.size(),ExcDimensionMismatch(n_columns,factors.size()));
 
   if (this->grid->mpi_process_is_active)
-    {
-      for (int i=0; i<n_local_rows; ++i)
-        {
-          for (int j=0; j<n_local_columns; ++j)
-            {
-              const int glob_j = global_column(j);
-              local_el(i,j) *= factors[glob_j];
-            }
-        }
-    }
+    for (int i=0; i<n_local_columns; ++i)
+      {
+        const NumberType s = factors[global_column(i)];
+
+        for (int j=0; j<n_local_rows; ++j)
+          local_el(j,i) *= s;
+      }
 }
 
 
@@ -1534,16 +1529,13 @@ void ScaLAPACKMatrix<NumberType>::scale_rows(const ArrayView<const NumberType> &
   Assert(n_rows==(int)factors.size(),ExcDimensionMismatch(n_rows,factors.size()));
 
   if (this->grid->mpi_process_is_active)
-    {
-      for (int i=0; i<n_local_rows; ++i)
-        {
-          const int glob_i = global_row(i);
-          for (int j=0; j<n_local_columns; ++j)
-            {
-              local_el(i,j) *= factors[glob_i];
-            }
-        }
-    }
+    for (int i=0; i<n_local_rows; ++i)
+      {
+        const NumberType s = factors[global_row(i)];
+
+        for (int j=0; j<n_local_columns; ++j)
+          local_el(i,j) *= s;
+      }
 }
 
 

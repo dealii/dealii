@@ -1551,19 +1551,19 @@ inline void pgels(const char *trans,
 
 
 template <typename number>
-inline void pgeadd(const char *transa,
-                   const int *m,
-                   const int *n,
-                   const number *alpha,
-                   const number *A,
-                   const int *IA,
-                   const int *JA,
-                   const int *DESCA,
-                   const number *beta,
-                   number *C,
-                   const int *IC,
-                   const int *JC,
-                   const int *DESCC)
+inline void pgeadd(const char * /*transa*/,
+                   const int * /*m*/,
+                   const int * /*n*/,
+                   const number * /*alpha*/,
+                   const number * /*A*/,
+                   const int * /*IA*/,
+                   const int * /*JA*/,
+                   const int * /*DESCA*/,
+                   const number * /*beta*/,
+                   number * /*C*/,
+                   const int * /*IC*/,
+                   const int * /*JC*/,
+                   const int * /*DESCC*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
@@ -1604,18 +1604,18 @@ inline void pgeadd(const char *transa,
 
 
 template <typename number>
-inline void ptran(const int *m,
-                  const int *n,
-                  const number *alpha,
-                  const number *A,
-                  const int *IA,
-                  const int *JA,
-                  const int *DESCA,
-                  const number *beta,
-                  number *C,
-                  const int *IC,
-                  const int *JC,
-                  const int *DESCC)
+inline void ptran(const int * /*m*/,
+                  const int * /*n*/,
+                  const number * /*alpha*/,
+                  const number * /*A*/,
+                  const int * /*IA*/,
+                  const int * /*JA*/,
+                  const int * /*DESCA*/,
+                  const number * /*beta*/,
+                  number * /*C*/,
+                  const int * /*IC*/,
+                  const int * /*JC*/,
+                  const int * /*DESCC*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }

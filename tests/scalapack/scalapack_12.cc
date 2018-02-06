@@ -49,7 +49,7 @@ void test()
 
   const std::vector<unsigned int> sizes = {{300,400,500}};
 
-  // test C = alpha A*B + beta C
+  // test C = b A*B + c C
   {
     FullMatrix<NumberType> full_A(sizes[0],sizes[2]);
     FullMatrix<NumberType> full_B(sizes[2],sizes[1]);
@@ -70,17 +70,17 @@ void test()
     scalapack_B = full_B;
     scalapack_C = full_C;
 
-    const NumberType alpha = 1.4, beta = 0.1;
+    const NumberType b=1.4, c=0.1;
 
-    full_A *= alpha;
-    full_C *= beta;
+    full_A *= b;
+    full_C *= c;
     full_A.mmult(full_C,full_B,true);
 
-    scalapack_A.mult(scalapack_C,scalapack_B,alpha,beta,false,false);
+    scalapack_A.mult(b,scalapack_B,c,scalapack_C,false,false);
     FullMatrix<NumberType> tmp_full_C(full_C.m(),full_C.n());
     scalapack_C.copy_to(tmp_full_C);
 
-    pcout << "   computing C = alpha A * B + beta C with"
+    pcout << "   computing C = b A * B + c C with"
           << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << "),"
           << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ") and"
           << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")" << std::endl;
@@ -109,17 +109,17 @@ void test()
     scalapack_B = full_B;
     scalapack_C = full_C;
 
-    const NumberType alpha = 1.4, beta = 0.1;
+    const NumberType b=1.4, c=0.1;
 
-    full_A *= alpha;
-    full_C *= beta;
+    full_A *= b;
+    full_C *= c;
     full_A.Tmmult(full_C,full_B,true);
 
-    scalapack_A.mult(scalapack_C,scalapack_B,alpha,beta,true,false);
+    scalapack_A.mult(b,scalapack_B,c,scalapack_C,true,false);
     FullMatrix<NumberType> tmp_full_C(full_C.m(),full_C.n());
     scalapack_C.copy_to(tmp_full_C);
 
-    pcout << "   computing C = alpha A^T * B + beta C with"
+    pcout << "   computing C = b A^T * B + c C with"
           << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << "),"
           << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ") and"
           << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")" << std::endl;
@@ -148,17 +148,17 @@ void test()
     scalapack_B = full_B;
     scalapack_C = full_C;
 
-    const NumberType alpha = 1.4, beta = 0.1;
+    const NumberType b=1.4, c=0.1;
 
-    full_A *= alpha;
-    full_C *= beta;
+    full_A *= b;
+    full_C *= c;
     full_A.mTmult(full_C,full_B,true);
 
-    scalapack_A.mult(scalapack_C,scalapack_B,alpha,beta,false,true);
+    scalapack_A.mult(b,scalapack_B,c,scalapack_C,false,true);
     FullMatrix<NumberType> tmp_full_C(full_C.m(),full_C.n());
     scalapack_C.copy_to(tmp_full_C);
 
-    pcout << "   computing C = alpha A * B^T + beta C with"
+    pcout << "   computing C = b A * B^T + c C with"
           << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << "),"
           << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ") and"
           << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")" << std::endl;
@@ -187,17 +187,17 @@ void test()
     scalapack_B = full_B;
     scalapack_C = full_C;
 
-    const NumberType alpha = 1.4, beta = 0.1;
+    const NumberType b=1.4, c=0.1;
 
-    full_A *= alpha;
-    full_C *= beta;
+    full_A *= b;
+    full_C *= c;
     full_A.TmTmult(full_C,full_B,true);
 
-    scalapack_A.mult(scalapack_C,scalapack_B,alpha,beta,true,true);
+    scalapack_A.mult(b,scalapack_B,c,scalapack_C,true,true);
     FullMatrix<NumberType> tmp_full_C(full_C.m(),full_C.n());
     scalapack_C.copy_to(tmp_full_C);
 
-    pcout << "   computing C = alpha A^T * B^T + beta C with"
+    pcout << "   computing C = b A^T * B^T + c C with"
           << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << "),"
           << " B in R^(" << scalapack_B.m() << "x" << scalapack_B.n() << ") and"
           << " C in R^(" << scalapack_C.m() << "x" << scalapack_C.n() << ")" << std::endl;
