@@ -191,6 +191,7 @@ public:
 
   /**
    * Stores the distributed matrix in @p filename using HDF5.
+   *
    * In case that deal.II was built without HDF5
    * a call to this function will cause an exception to be thrown.
    *
@@ -199,8 +200,15 @@ public:
    * internally the distributed matrix is copied to one process, which
    * does the output. Therefore, the matrix has to fit into the memory
    * of one process.
+   *
+   * To tweak the I/O performance, especially for parallel I/O, the user may define the optional parameter @p chunk_size.
+   * All MPI processes need to call the function with the same value.
+   * The matrix is written in chunks to the file, therefore the properties of the system define the optimal chunk size.
+   * Internally, HDF5 splits the matrix into <tt>chunk_size.first</tt> x <tt>chunk_size.second</tt> sized blocks,
+   * with <tt>chunk_size.first</tt> being the number of rows of a chunk and <tt>chunk_size.second</tt> the number of columns.
    */
-  void save(const char *filename) const;
+  void save(const char *filename,
+            const std::pair<unsigned int,unsigned int> &chunk_size=std::make_pair(numbers::invalid_unsigned_int,numbers::invalid_unsigned_int)) const;
 
   /**
    * Loads the distributed matrix from file @p filename using HDF5.
@@ -417,7 +425,8 @@ private:
    * Stores the distributed matrix in @p filename
    * using serial routines
    */
-  void save_serial(const char *filename) const;
+  void save_serial(const char *filename,
+                   const std::pair<unsigned int,unsigned int> &chunk_size) const;
 
   /*
    * Loads the distributed matrix from file @p filename
@@ -429,7 +438,8 @@ private:
    * Stores the distributed matrix in @p filename
    * using parallel routines
    */
-  void save_parallel(const char *filename) const;
+  void save_parallel(const char *filename,
+                     const std::pair<unsigned int,unsigned int> &chunk_size) const;
 
   /*
    * Loads the distributed matrix from file @p filename

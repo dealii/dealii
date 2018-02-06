@@ -914,19 +914,34 @@ NumberType ScaLAPACKMatrix<NumberType>::norm(const char type) const
 
 
 template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::save(const char *filename) const
+void ScaLAPACKMatrix<NumberType>::save(const char *filename,
+                                       const std::pair<unsigned int,unsigned int> &chunk_size) const
 {
 #ifndef DEAL_II_WITH_HDF5
   (void)filename;
+  (void)chunk_size;
   AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
 #else
+
+  Assert((chunk_size.first <= (unsigned int)n_rows) && (chunk_size.first>0),ExcIndexRange(chunk_size.first,1,n_rows+1));
+  Assert((chunk_size.second <= (unsigned int)n_columns) && (chunk_size.second>0),ExcIndexRange(chunk_size.second,1,n_columns+1));
+
+  std::pair<unsigned int,unsigned int> chunks_size_ = chunk_size;
+
+  if (chunks_size_.first==numbers::invalid_unsigned_int || chunks_size_.second==numbers::invalid_unsigned_int)
+    {
+      // default: store the matrix in chunks of columns
+      chunks_size_.first = n_rows;
+      chunks_size_.second = 1;
+    }
+
 #  ifdef H5_HAVE_PARALLEL
   //implementation for configurations equipped with a parallel file system
-  save_parallel(filename);
+  save_parallel(filename,chunks_size_);
 
 #  else
   //implementation for configurations with no parallel file system
-  save_serial(filename);
+  save_serial(filename,chunks_size_);
 
 #  endif
 #endif
@@ -935,10 +950,12 @@ void ScaLAPACKMatrix<NumberType>::save(const char *filename) const
 
 
 template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
+void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename,
+                                              const std::pair<unsigned int,unsigned int> &chunk_size) const
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
+  (void)chunk_size;
   Assert(false,ExcInternalError());
 #  else
 
@@ -964,6 +981,15 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
       // create a new file using default properties
       hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
+      // modify dataset creation properties, i.e. enable chunking
+      hsize_t chunk_dims[2];
+      //revert order of rows and columns as ScaLAPACK uses column-major ordering
+      chunk_dims[0] = chunk_size.second;
+      chunk_dims[1] = chunk_size.first;
+      hid_t property = H5Pcreate (H5P_DATASET_CREATE);
+      status = H5Pset_chunk (property, 2, chunk_dims);
+      AssertThrow(status >= 0, ExcIO());
+
       // create the data space for the dataset
       hsize_t dims[2];
       //change order of rows and columns as ScaLAPACKMatrix uses column major ordering
@@ -971,11 +997,11 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
       dims[1] = n_rows;
       hid_t dataspace_id = H5Screate_simple(2, dims, nullptr);
 
-      // create the dataset
+      // create the dataset within the file using chunk creation properties
       hid_t type_id = hdf5_type_id(&tmp.values[0]);
       hid_t dataset_id = H5Dcreate2(file_id, "/matrix",
                                     type_id, dataspace_id,
-                                    H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+                                    H5P_DEFAULT, property, H5P_DEFAULT);
 
       // write the dataset
       status = H5Dwrite(dataset_id, type_id,
@@ -991,6 +1017,10 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
       status = H5Sclose(dataspace_id);
       AssertThrow(status >= 0, ExcIO());
 
+      // release the creation property
+      status = H5Pclose (property);
+      AssertThrow(status >= 0, ExcIO());
+
       // close the file.
       status = H5Fclose(file_id);
       AssertThrow(status >= 0, ExcIO());
@@ -1001,10 +1031,12 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename) const
 
 
 template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename) const
+void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename,
+                                                const std::pair<unsigned int,unsigned int> &chunk_size) const
 {
 #  ifndef DEAL_II_WITH_HDF5
   (void)filename;
+  (void)chunk_size;
   Assert(false,ExcInternalError());
 #  else
 
@@ -1048,11 +1080,19 @@ void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename) const
 
   hid_t filespace = H5Screate_simple(2, dims, nullptr);
 
-  // create the dataset with default properties and close filespace
+  // create the chunked dataset with default properties and close filespace
+  hsize_t chunk_dims[2];
+  //revert order of rows and columns as ScaLAPACK uses column-major ordering
+  chunk_dims[0] = chunk_size.second;
+  chunk_dims[1] = chunk_size.first;
+  plist_id = H5Pcreate(H5P_DATASET_CREATE);
+  H5Pset_chunk(plist_id, 2, chunk_dims);
   hid_t type_id = hdf5_type_id(data);
   hid_t dset_id = H5Dcreate2(file_id, "/matrix", type_id,
-                             filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+                             filespace, H5P_DEFAULT, plist_id, H5P_DEFAULT);
   status = H5Sclose(filespace);
+  AssertThrow(status >= 0, ExcIO());
+  status = H5Pclose(plist_id);
   AssertThrow(status >= 0, ExcIO());
 
   // gather the number of local rows and columns from all processes
