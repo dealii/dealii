@@ -22,6 +22,7 @@
 
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi.templates.h>
+#include <deal.II/base/array_view.h>
 #include <deal.II/lac/scalapack.templates.h>
 
 #ifdef DEAL_II_WITH_HDF5
@@ -1316,6 +1317,46 @@ void ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
 
 #    endif // H5_HAVE_PARALLEL
 #  endif // DEAL_II_WITH_HDF5
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::scale_columns(const ArrayView<const NumberType> &factors)
+{
+  Assert(n_columns==(int)factors.size(),ExcDimensionMismatch(n_columns,factors.size()));
+
+  if (this->grid->mpi_process_is_active)
+    {
+      for (int i=0; i<n_local_rows; ++i)
+        {
+          for (int j=0; j<n_local_columns; ++j)
+            {
+              const int glob_j = global_column(j);
+              local_el(i,j) *= factors[glob_j];
+            }
+        }
+    }
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::scale_rows(const ArrayView<const NumberType> &factors)
+{
+  Assert(n_rows==(int)factors.size(),ExcDimensionMismatch(n_rows,factors.size()));
+
+  if (this->grid->mpi_process_is_active)
+    {
+      for (int i=0; i<n_local_rows; ++i)
+        {
+          const int glob_i = global_row(i);
+          for (int j=0; j<n_local_columns; ++j)
+            {
+              local_el(i,j) *= factors[glob_i];
+            }
+        }
+    }
 }
 
 

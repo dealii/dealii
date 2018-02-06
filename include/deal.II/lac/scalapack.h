@@ -26,6 +26,7 @@
 #include <deal.II/lac/lapack_support.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/array_view.h>
 #include <mpi.h>
 
 #include <memory>
@@ -388,6 +389,16 @@ public:
    * Write access to local element.
    */
   NumberType &local_el(const unsigned int loc_row, const unsigned int loc_column);
+
+  /**
+   * scaling the columns of the distributed matrix by scalars in array @p factors
+   */
+  void scale_columns(const ArrayView<const NumberType> &factors);
+
+  /**
+   * scaling the rows of the distributed matrix by scalars in array @p factors
+   */
+  void scale_rows(const ArrayView<const NumberType> &factors);
 
 private:
 
