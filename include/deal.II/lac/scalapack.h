@@ -191,6 +191,53 @@ public:
                const std::pair<unsigned int,unsigned int> &submatrix_size) const;
 
   /**
+  /**
+   * Matrix-addition:
+   *
+   * <i>A = a A + b op(B)</i>
+   *
+   * if(transpose_B)  <i>op(B) = B<sup>T</sup></i>
+   *
+   * else  <i>op(B) = B</i>
+   *
+   * The matrices <tt>A</tt> and <tt>B</tt> must have the same process grid
+   *
+   * Following alignment conditions have to be fulfilled:
+   *
+   * | transpose_B |          Block Sizes         |
+   * | :---------: | :--------------------------: |
+   * |   false     | MB_A = MB_B <br> NB_A = NB_B |
+   * |   true      | MB_A = NB_B <br> NB_A = MB_B |
+   */
+  void add(const ScaLAPACKMatrix<NumberType> &B,
+           const NumberType a=0.,
+           const NumberType b=1.,
+           const bool transpose_B=false);
+
+  /**
+   * Matrix-addition:
+   *
+   * <i>A += b B</i>
+   *
+   * The matrices <tt>A</tt> and <tt>B</tt> must have the same process grid
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = MB_B and NB_A = NB_B
+   */
+  void add(const NumberType b,
+           const ScaLAPACKMatrix<NumberType> &B);
+
+  /**
+   * Matrix-addition:
+   *
+   * <i>A += b B<sup>T</sup></i>
+   *
+   * The matrices <tt>A</tt> and <tt>B</tt> must have the same process grid
+   *
+   * Following alignment conditions have to be fulfilled: MB_A = NB_B and NB_A = MB_B
+   */
+  void Tadd(const NumberType b,
+            const ScaLAPACKMatrix<NumberType> &B);
+
    * Stores the distributed matrix in @p filename using HDF5.
    * In case that deal.II was built without HDF5
    * a call to this function will cause an exception to be thrown.

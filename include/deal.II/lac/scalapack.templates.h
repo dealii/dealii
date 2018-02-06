@@ -682,6 +682,67 @@ extern "C"
                float *work,
                int *lwork,
                int *info);
+
+  /*
+   * Perform matrix sum:
+   * C := beta*C + alpha*op(A),
+   * where op(A) denotes either op(A)=A or op(A)=A^T
+   */
+  void pdgeadd_(const char *transa,
+                const int *m,
+                const int *n,
+                const double *alpha,
+                const double *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                const double *beta,
+                double *C,
+                const int *IC,
+                const int *JC,
+                const int *DESCC);
+  void psgeadd_(const char *transa,
+                const int *m,
+                const int *n,
+                const float *alpha,
+                const float *A,
+                const int *IA,
+                const int *JA,
+                const int *DESCA,
+                const float *beta,
+                float *C,
+                const int *IC,
+                const int *JC,
+                const int *DESCC);
+
+  /**
+   * Routine to transpose a matrix:
+   * C = beta C + alpha A^T
+   */
+  void pdtran_(const int *m,
+               const int *n,
+               const double *alpha,
+               const double *A,
+               const int *IA,
+               const int *JA,
+               const int *DESCA,
+               const double *beta,
+               double *C,
+               const int *IC,
+               const int *JC,
+               const int *DESCC);
+  void pstran_(const int *m,
+               const int *n,
+               const float *alpha,
+               const float *A,
+               const int *IA,
+               const int *JA,
+               const int *DESCA,
+               const float *beta,
+               float *C,
+               const int *IC,
+               const int *JC,
+               const int *DESCC);
 }
 
 
@@ -1486,6 +1547,109 @@ inline void pgels(const char *trans,
                   int *info)
 {
   psgels_(trans,m,n,nrhs,A,ia,ja,desca,B,ib,jb,descb,work,lwork,info);
+}
+
+
+template <typename number>
+inline void pgeadd(const char *transa,
+                   const int *m,
+                   const int *n,
+                   const number *alpha,
+                   const number *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   const number *beta,
+                   number *C,
+                   const int *IC,
+                   const int *JC,
+                   const int *DESCC)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void pgeadd(const char *transa,
+                   const int *m,
+                   const int *n,
+                   const double *alpha,
+                   const double *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   const double *beta,
+                   double *C,
+                   const int *IC,
+                   const int *JC,
+                   const int *DESCC)
+{
+  pdgeadd_(transa,m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
+}
+
+inline void pgeadd(const char *transa,
+                   const int *m,
+                   const int *n,
+                   const float *alpha,
+                   const float *A,
+                   const int *IA,
+                   const int *JA,
+                   const int *DESCA,
+                   const float *beta,
+                   float *C,
+                   const int *IC,
+                   const int *JC,
+                   const int *DESCC)
+{
+  psgeadd_(transa,m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
+}
+
+
+template <typename number>
+inline void ptran(const int *m,
+                  const int *n,
+                  const number *alpha,
+                  const number *A,
+                  const int *IA,
+                  const int *JA,
+                  const int *DESCA,
+                  const number *beta,
+                  number *C,
+                  const int *IC,
+                  const int *JC,
+                  const int *DESCC)
+{
+  Assert (false, dealii::ExcNotImplemented());
+}
+
+inline void ptran(const int *m,
+                  const int *n,
+                  const double *alpha,
+                  const double *A,
+                  const int *IA,
+                  const int *JA,
+                  const int *DESCA,
+                  const double *beta,
+                  double *C,
+                  const int *IC,
+                  const int *JC,
+                  const int *DESCC)
+{
+  pdtran_(m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
+}
+
+inline void ptran(const int *m,
+                  const int *n,
+                  const float *alpha,
+                  const float *A,
+                  const int *IA,
+                  const int *JA,
+                  const int *DESCA,
+                  const float *beta,
+                  float *C,
+                  const int *IC,
+                  const int *JC,
+                  const int *DESCC)
+{
+  pstran_(m,n,alpha,A,IA,JA,DESCA,beta,C,IC,JC,DESCC);
 }
 
 #endif // DEAL_II_WITH_SCALAPACK
