@@ -290,29 +290,25 @@ public:
   * It is assumed that $A$ has full rank: $rank(A) = \min(M,N)$.
   *
   * The following options are supported:
-  * - 1. If <code>transpose==false</code> and $M \geq N$: least squares solution of overdetermined system
-  *      $\min \Vert B - A*X\Vert$.
+  * -# If(!transpose) and $M \geq N$: least squares solution of overdetermined system
+  *    $\min \Vert B - A*X\Vert$.\n
+  *    Upon exit the rows $0$ to $N-1$ of $B$ contain the least square solution vectors. The residual sum of squares
+  *    for each column is given by the sum of squares of elements $N$ to $M-1$ in that column.
   *
-  *      Upon exit the rows 0 to N-1 of $B$ contain the least square solution vectors. The residual sum of squares
-  *      for each column is given by the sum of squares of elements N to M-1 in that column.
+  * -# If(!transpose) and $M < N$: find minimum norm solutions of underdetermined systems
+  *    $A * X = B$.\n
+  *    Upon exit the columns of $B$ contain the minimum norm solution vectors.
   *
-  * - 2. If <code>transpose==false</code> and $M < N$: find minimum norm solutions of underdetermined systems
-  *      $A * X = B$.
+  * -# If(transpose) and $M \geq N$: find minimum norm solutions of underdetermined system
+  *    $ A^\top X = B$.\n
+  *    Upon exit the columns of $B$ contain the minimum norm solution vectors.
   *
-  *      Upon exit the columns of $B$ contain the minimum norm solution vectors.
+  * -# If(transpose) and $M < N$: least squares solution of overdetermined system
+  *    $\min \Vert B - A^\top X\Vert$.\n
+  *    Upon exit the rows $0$ to $M-1$ contain the least square solution vectors. The residual sum of squares
+  *    for each column is given by the sum of squares of elements $M$ to $N-1$ in that column.
   *
-  * - 3. If <code>transpose==true</code> and $M \geq N$: find minimum norm solutions of underdetermined system
-  *      $ A^\top X = B$.
-  *
-  *      Upon exit the columns of $B$ contain the minimum norm solution vectors.
-  *
-  * - 4. If <code>transpose==true</code> and $M < N$: least squares solution of overdetermined system
-  *      $\min \Vert B - A^\top X\Vert$.
-  *
-  *      Upon exit the rows 0 to M-1 contain the least square solution vectors. The residual sum of squares
-  *      for each column is given by the sum of squares of elements M to N-1 in that column.
-  *
-  * If <code>transpose==false</code> then $B \in \mathbb{R}^{M \times N_{\rm RHS}}$,
+  * If(!tranpose) then $B \in \mathbb{R}^{M \times N_{\rm RHS}}$,
   * otherwise $B \in \mathbb{R}^{N \times N_{\rm RHS}}}$.
   * The matrices $A$ and $B$ must have an identical block cyclic distribution for rows and columns.
   */
