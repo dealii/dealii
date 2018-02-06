@@ -499,6 +499,135 @@ void ScaLAPACKMatrix<NumberType>::Tadd(const NumberType a,
 {
   add(B,1,a,true);
 }
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::mult(ScaLAPACKMatrix<NumberType> &C,
+                                       const ScaLAPACKMatrix<NumberType> &B,
+                                       const NumberType alpha,
+                                       const NumberType beta,
+                                       const bool transpose_A,
+                                       const bool transpose_B) const
+{
+  Assert(this->grid==B.grid,ExcMessage("The matrices A and B need to have the same process grid"));
+  Assert(C.grid==B.grid,ExcMessage("The matrices B and C need to have the same process grid"));
+
+  // see for further info:
+  // https://www.ibm.com/support/knowledgecenter/SSNR5K_4.2.0/com.ibm.cluster.pessl.v4r2.pssl100.doc/am6gr_lgemm.htm
+  if (!transpose_A && !transpose_B)
+    {
+      Assert(this->n_columns==B.n_rows,ExcDimensionMismatch(this->n_columns,B.n_rows));
+      Assert(this->n_rows==C.n_rows,ExcDimensionMismatch(this->n_rows,C.n_rows));
+      Assert(B.n_columns==C.n_columns,ExcDimensionMismatch(B.n_columns,C.n_columns));
+      Assert(this->row_block_size==C.row_block_size,ExcDimensionMismatch(this->row_block_size,C.row_block_size));
+      Assert(this->column_block_size==B.row_block_size,ExcDimensionMismatch(this->column_block_size,B.row_block_size));
+      Assert(B.column_block_size==C.column_block_size,ExcDimensionMismatch(B.column_block_size,C.column_block_size));
+    }
+  else if (transpose_A && !transpose_B)
+    {
+      Assert(this->n_rows==B.n_rows,ExcDimensionMismatch(this->n_rows,B.n_rows));
+      Assert(this->n_columns==C.n_rows,ExcDimensionMismatch(this->n_columns,C.n_rows));
+      Assert(B.n_columns==C.n_columns,ExcDimensionMismatch(B.n_columns,C.n_columns));
+      Assert(this->column_block_size==C.row_block_size,ExcDimensionMismatch(this->column_block_size,C.row_block_size));
+      Assert(this->row_block_size==B.row_block_size,ExcDimensionMismatch(this->row_block_size,B.row_block_size));
+      Assert(B.column_block_size==C.column_block_size,ExcDimensionMismatch(B.column_block_size,C.column_block_size));
+    }
+  else if (!transpose_A && transpose_B)
+    {
+      Assert(this->n_columns==B.n_columns,ExcDimensionMismatch(this->n_columns,B.n_columns));
+      Assert(this->n_rows==C.n_rows,ExcDimensionMismatch(this->n_rows,C.n_rows));
+      Assert(B.n_rows==C.n_columns,ExcDimensionMismatch(B.n_rows,C.n_columns));
+      Assert(this->row_block_size==C.row_block_size,ExcDimensionMismatch(this->row_block_size,C.row_block_size));
+      Assert(this->column_block_size==B.column_block_size,ExcDimensionMismatch(this->column_block_size,B.column_block_size));
+      Assert(B.row_block_size==C.column_block_size,ExcDimensionMismatch(B.row_block_size,C.column_block_size));
+    }
+  else // if (transpose_A && transpose_B)
+    {
+      Assert(this->n_rows==B.n_columns,ExcDimensionMismatch(this->n_rows,B.n_columns));
+      Assert(this->n_columns==C.n_rows,ExcDimensionMismatch(this->n_columns,C.n_rows));
+      Assert(B.n_rows==C.n_columns,ExcDimensionMismatch(B.n_rows,C.n_columns));
+
+      Assert(this->column_block_size==C.row_block_size,ExcDimensionMismatch(this->row_block_size,C.row_block_size));
+      Assert(this->row_block_size==B.column_block_size,ExcDimensionMismatch(this->column_block_size,B.row_block_size));
+      Assert(B.row_block_size==C.column_block_size,ExcDimensionMismatch(B.column_block_size,C.column_block_size));
+    }
+  Threads::Mutex::ScopedLock lock (mutex);
+
+  if (this->grid->mpi_process_is_active)
+    {
+      char trans_a = transpose_A ? 'T' : 'N';
+      char trans_b = transpose_B ? 'T' : 'N';
+
+      const NumberType *A_loc = (this->values.size()>0) ? (&(this->values[0])) : nullptr;
+      const NumberType *B_loc = (B.values.size()>0) ? (&(B.values[0])) : nullptr;
+      NumberType *C_loc = (C.values.size()>0) ? (&(C.values[0])) : nullptr;
+      int m = C.n_rows;
+      int n = C.n_columns;
+      int k = transpose_A ? this->n_rows : this->n_columns;
+
+      pgemm(&trans_a,&trans_b,&m,&n,&k,
+            &alpha,A_loc,&(this->submatrix_row),&(this->submatrix_column),this->descriptor,
+            B_loc,&B.submatrix_row,&B.submatrix_column,B.descriptor,
+            &beta,C_loc,&C.submatrix_row,&C.submatrix_column,C.descriptor);
+    }
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::mmult(ScaLAPACKMatrix<NumberType> &C,
+                                        const ScaLAPACKMatrix<NumberType> &B,
+                                        const bool adding) const
+{
+  if (adding)
+    mult(C,B,1.,1.,false,false);
+  else
+    mult(C,B,1.,0.,false,false);
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::Tmmult(ScaLAPACKMatrix<NumberType> &C,
+                                         const ScaLAPACKMatrix<NumberType> &B,
+                                         const bool adding) const
+{
+  if (adding)
+    mult(C,B,1.,1.,true,false);
+  else
+    mult(C,B,1.,0.,true,false);
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::mTmult(ScaLAPACKMatrix<NumberType> &C,
+                                         const ScaLAPACKMatrix<NumberType> &B,
+                                         const bool adding) const
+{
+  if (adding)
+    mult(C,B,1.,1.,false,true);
+  else
+    mult(C,B,1.,0.,false,true);
+}
+
+
+
+template <typename NumberType>
+void ScaLAPACKMatrix<NumberType>::TmTmult(ScaLAPACKMatrix<NumberType> &C,
+                                          const ScaLAPACKMatrix<NumberType> &B,
+                                          const bool adding) const
+{
+  if (adding)
+    mult(C,B,1.,1.,true,true);
+  else
+    mult(C,B,1.,0.,true,true);
+}
+
+
+
+template <typename NumberType>
 void ScaLAPACKMatrix<NumberType>::compute_cholesky_factorization()
 {
   Assert (n_columns == n_rows,
