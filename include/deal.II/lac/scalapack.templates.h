@@ -403,20 +403,20 @@ extern "C"
    * or the element of largest absolute value of a distributed matrix
    */
   double pdlange_(char const *norm,
-                  int const &m,
-                  int const &n,
-                  double *A,
-                  int const &ia,
-                  int const &ja,
-                  int *desca,
+                  const int *m,
+                  const int *n,
+                  const double *A,
+                  const int *ia,
+                  const int *ja,
+                  const int *desca,
                   double *work);
-  float pslange_(char const *norm,
-                 int const &m,
-                 int const &n,
-                 float *A,
-                 int const &ia,
-                 int const &ja,
-                 int *desca,
+  float pslange_(const char *norm,
+                 const int *m,
+                 const int *n,
+                 const float *A,
+                 const int *ia,
+                 const int *ja,
+                 const int *desca,
                  float *work);
 
   /**
@@ -1043,37 +1043,37 @@ inline void pgemm(const char *transa,
 
 
 template <typename number>
-inline number plange(char const * /*norm*/,
-                     int const &/*m*/,
-                     int const &/*n*/,
-                     number * /*A*/,
-                     int const &/*ia*/,
-                     int const &/*ja*/,
-                     int * /*desca*/,
+inline number plange(const char * /*norm*/,
+                     const int * /*m*/,
+                     const int * /*n*/,
+                     const number * /*A*/,
+                     const int * /*ia*/,
+                     const int * /*ja*/,
+                     const int * /*desca*/,
                      number * /*work*/)
 {
   Assert (false, dealii::ExcNotImplemented());
 }
 
-inline double plange(char const *norm,
-                     int const &m,
-                     int const &n,
-                     double *A,
-                     int const &ia,
-                     int const &ja,
-                     int *desca,
+inline double plange(const char *norm,
+                     const int *m,
+                     const int *n,
+                     const double *A,
+                     const int *ia,
+                     const int *ja,
+                     const int *desca,
                      double *work)
 {
   return pdlange_(norm, m, n, A, ia, ja,desca, work);
 }
 
-inline float plange(char const *norm,
-                    int const &m,
-                    int const &n,
-                    float *A,
-                    int const &ia,
-                    int const &ja,
-                    int *desca,
+inline float plange(const char *norm,
+                    const int *m,
+                    const int *n,
+                    const float *A,
+                    const int *ia,
+                    const int *ja,
+                    const int *desca,
                     float *work)
 {
   return pslange_(norm, m, n, A, ia, ja,desca, work);
