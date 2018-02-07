@@ -126,6 +126,7 @@ for (deal_II_dimension : DIMENSIONS)
     extract_non_interface_dofs (const DoFHandler<deal_II_dimension> & mg_dof_handler,
                                 std::vector<std::set<types::global_dof_index> > &non_interface_dofs);
 
+
 #if deal_II_dimension < 3
     template void count_dofs_per_block (
         const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
@@ -140,3 +141,15 @@ for (deal_II_dimension : DIMENSIONS)
     \}
 }
 
+for (deal_II_dimension : DIMENSIONS;
+        deal_II_space_dimension: SPACE_DIMENSIONS)
+{
+    namespace MGTools
+    \{
+#if deal_II_dimension <= deal_II_space_dimension
+    template
+    unsigned int
+    max_level_for_coarse_mesh (const Triangulation<deal_II_dimension, deal_II_space_dimension> & tria);
+#endif
+    \}
+}

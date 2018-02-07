@@ -1547,6 +1547,40 @@ namespace MGTools
       }
 
   }
+
+
+
+  template <int dim, int spacedim>
+  unsigned int
+  max_level_for_coarse_mesh (const Triangulation<dim,spacedim> &tria)
+  {
+    // Find minimum level for an active cell in
+    // this locally owned subdomain
+    // Note: with the way active cells are traversed,
+    // the first locally owned cell we find will have
+    // the lowest level in the particular subdomain.
+    unsigned int min_level = tria.n_global_levels();
+    typename Triangulation<dim,spacedim>::active_cell_iterator cell = tria.begin_active(),
+                                                               endc = tria.end();
+    for (; cell!=endc; ++cell)
+      if (cell->is_locally_owned())
+        {
+          min_level = cell->level();
+          break;
+        }
+
+    unsigned int global_min = min_level;
+    // If necessary, communicate to find minimum
+    // level for an active cell over all subdomains
+    if (const parallel::Triangulation<dim,spacedim> *tr
+        = dynamic_cast<const parallel::Triangulation<dim,spacedim> *>
+        (&tria))
+      global_min = Utilities::MPI::min(min_level, tr->get_communicator());
+
+    AssertIndexRange(global_min, tria.n_global_levels());
+
+    return global_min;
+  }
 }
 
 

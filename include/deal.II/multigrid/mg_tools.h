@@ -247,6 +247,18 @@ namespace MGTools
   void
   extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                               std::vector<std::set<types::global_dof_index> > &non_interface_dofs);
+
+  /**
+   * Return the highest possible level that can be used as the coarsest level in
+   * a Multigrid computation, that is, the highest level in the hierarchy whose mesh
+   * covers the entire domain. This corresponds to the minimum level of a cell on
+   * the active mesh. Since each processor only has a local view of the mesh, each
+   * processor must call this function. Note that this is a global minimum over the
+   * entire mesh and therefore each processor will return the same value.
+   */
+  template <int dim, int spacedim>
+  unsigned int
+  max_level_for_coarse_mesh (const Triangulation<dim,spacedim> &tria);
 }
 
 /* @} */
