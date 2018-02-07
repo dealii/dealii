@@ -1386,9 +1386,10 @@ namespace VectorTools
     void project_parallel (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                            const ConstraintMatrix &constraints,
                            const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> &func,
-                           VectorType &vec_result)
+                           VectorType &vec_result,
+                           const unsigned int fe_component)
     {
-      const DoFHandler<dim,spacedim> &dof = matrix_free->get_dof_handler();
+      const DoFHandler<dim,spacedim> &dof = matrix_free->get_dof_handler(fe_component);
 
       typedef typename VectorType::value_type Number;
       Assert (dof.get_fe(0).n_components() == 1,
@@ -1402,20 +1403,20 @@ namespace VectorTools
 
       typedef MatrixFreeOperators::MassOperator<dim, fe_degree, n_q_points_1d, 1, LinearAlgebra::distributed::Vector<Number> > MatrixType;
       MatrixType mass_matrix;
-      mass_matrix.initialize(matrix_free);
+      mass_matrix.initialize(matrix_free, {{fe_component}});
       mass_matrix.compute_diagonal();
 
       typedef LinearAlgebra::distributed::Vector<Number> LocalVectorType;
       LocalVectorType vec, rhs, inhomogeneities;
-      matrix_free->initialize_dof_vector(vec);
-      matrix_free->initialize_dof_vector(rhs);
-      matrix_free->initialize_dof_vector(inhomogeneities);
+      matrix_free->initialize_dof_vector(vec,fe_component);
+      matrix_free->initialize_dof_vector(rhs,fe_component);
+      matrix_free->initialize_dof_vector(inhomogeneities,fe_component);
       constraints.distribute(inhomogeneities);
       inhomogeneities*=-1.;
 
       // assemble right hand side:
       {
-        FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval(*matrix_free);
+        FEEvaluation<dim,fe_degree,n_q_points_1d,1,Number> fe_eval(*matrix_free, fe_component);
         const unsigned int n_cells = matrix_free->n_macro_cells();
         const unsigned int n_q_points = fe_eval.n_q_points;
 
@@ -1489,28 +1490,28 @@ namespace VectorTools
                 const ConstraintMatrix &constraints,
                 const unsigned int n_q_points_1d,
                 const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> &func,
-                VectorType &vec_result)
+                VectorType &vec_result,
+                const unsigned int fe_component)
   {
-    (void) n_q_points_1d;
-    const unsigned int fe_degree = matrix_free->get_dof_handler().get_fe().degree;
+    const unsigned int fe_degree = matrix_free->get_dof_handler(fe_component).get_fe().degree;
 
-    Assert (fe_degree+1 == n_q_points_1d,
-            ExcNotImplemented());
-
-    switch (fe_degree)
-      {
-      case 1:
-        project_parallel<dim,VectorType,dim,1,2> (matrix_free,constraints,func,vec_result);
-        break;
-      case 2:
-        project_parallel<dim,VectorType,dim,2,3> (matrix_free,constraints,func,vec_result);
-        break;
-      case 3:
-        project_parallel<dim,VectorType,dim,3,4> (matrix_free,constraints,func,vec_result);
-        break;
-      default:
-        project_parallel<dim,VectorType,dim,-1,0> (matrix_free,constraints,func,vec_result);
-      }
+    if (fe_degree+1 == n_q_points_1d)
+      switch (fe_degree)
+        {
+        case 1:
+          project_parallel<dim,VectorType,dim,1,2> (matrix_free,constraints,func,vec_result,fe_component);
+          break;
+        case 2:
+          project_parallel<dim,VectorType,dim,2,3> (matrix_free,constraints,func,vec_result,fe_component);
+          break;
+        case 3:
+          project_parallel<dim,VectorType,dim,3,4> (matrix_free,constraints,func,vec_result,fe_component);
+          break;
+        default:
+          project_parallel<dim,VectorType,dim,-1,0> (matrix_free,constraints,func,vec_result,fe_component);
+        }
+    else
+      project_parallel<dim,VectorType,dim,-1,0> (matrix_free,constraints,func,vec_result,fe_component);
   }
 
 
@@ -1519,13 +1520,15 @@ namespace VectorTools
   void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > matrix_free,
                 const ConstraintMatrix &constraints,
                 const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> &func,
-                VectorType &vec_result)
+                VectorType &vec_result,
+                const unsigned int fe_component)
   {
     project (matrix_free,
              constraints,
-             matrix_free->get_dof_handler().get_fe().degree+1,
+             matrix_free->get_dof_handler(fe_component).get_fe().degree+1,
              func,
-             vec_result);
+             vec_result,
+             fe_component);
   }
 
 

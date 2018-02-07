@@ -919,13 +919,18 @@ namespace VectorTools
    * @endcode
    * where <code>qp_data</code> is a an object of type Table<2, VectorizedArray<double> >,
    * which stores quadrature point data.
+   *
+   * @p fe_component allow to additionally specify which component of @p data
+   * to use in case it was constructed with an <code>std::vector<const DoFHandler<dim>*></code>
+   * in will be internally used in constructor of FEEvaluation object.
    */
   template <int dim, typename VectorType>
   void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
                 const ConstraintMatrix &constraints,
                 const unsigned int n_q_points_1d,
                 const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> &func,
-                VectorType &vec_result);
+                VectorType &vec_result,
+                const unsigned int fe_component = 0);
 
   /**
    * Same as above but for <code>n_q_points_1d = matrix_free.get_dof_handler().get_fe().degree+1</code>.
@@ -934,7 +939,8 @@ namespace VectorTools
   void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
                 const ConstraintMatrix &constraints,
                 const std::function< VectorizedArray<typename VectorType::value_type> (const unsigned int, const unsigned int)> &func,
-                VectorType &vec_result);
+                VectorType &vec_result,
+                const unsigned int fe_component = 0);
 
   /**
    * Compute Dirichlet boundary conditions.  This function makes up a map of
