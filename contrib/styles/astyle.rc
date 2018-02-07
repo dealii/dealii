@@ -21,6 +21,7 @@
 --indent-preprocessor
 --indent=spaces=2
 --indent-namespaces
+--keep-one-line-blocks
 --min-conditional-indent=0
 --pad-header
 
