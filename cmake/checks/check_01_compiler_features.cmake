@@ -408,11 +408,21 @@ RESET_CMAKE_REQUIRED()
 # Use the 'gold' linker if possible, given that it's substantially faster.
 #
 # We have to try to link a full executable with -fuse-ld=gold to check
-# whether "ld.gold" is actually available. gcc has the bad habit of
-# accepting the flag without emitting an error.
+# whether "ld.gold" is actually available.
 #
-# Wolfgang Bangerth, Matthias Maier, 2015
+# Clang always reports "argument unused during compilation"
+# if "-fuse-ld=" is used, but fails at link time for an unsupported linker.
 #
+# ICC also emits a warning but passes for unsupported linkers
+# unless we turn diagnostic warnings into errors.
+#
+# Wolfgang Bangerth, Matthias Maier, Daniel Arndt, 2015, 2018
+#
+IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  PUSH_CMAKE_REQUIRED("-Wno-unused-command-line-argument")
+ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+  PUSH_CMAKE_REQUIRED("-diag-error warn")
+ENDIF()
 PUSH_CMAKE_REQUIRED("-Werror")
 PUSH_CMAKE_REQUIRED("-fuse-ld=gold")
 CHECK_CXX_SOURCE_COMPILES(
