@@ -26,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 
 // forward declarations
 template <int dim, int spacedim> class Triangulation;
-
+template <typename Number> class Vector;
 
 /**
  * This namespace provides a collection of functions that aid in refinement
@@ -150,11 +150,11 @@ namespace GridRefinement
    * this number is only an indicator. The default value of this argument is
    * to impose no limit on the number of cells.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename Number, int spacedim>
   void
   refine_and_coarsen_fixed_number
   (Triangulation<dim,spacedim> &triangulation,
-   const VectorType            &criteria,
+   const Vector<Number>        &criteria,
    const double                top_fraction_of_cells,
    const double                bottom_fraction_of_cells,
    const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
@@ -215,11 +215,11 @@ namespace GridRefinement
    * this number is only an indicator. The default value of this argument is
    * to impose no limit on the number of cells.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename Number, int spacedim>
   void
   refine_and_coarsen_fixed_fraction
   (Triangulation<dim,spacedim> &tria,
-   const VectorType            &criteria,
+   const Vector<Number>        &criteria,
    const double                top_fraction,
    const double                bottom_fraction,
    const unsigned int          max_n_cells = std::numeric_limits<unsigned int>::max());
@@ -299,10 +299,10 @@ namespace GridRefinement
    * thesis, University of Heidelberg, 2005. See in particular Section 4.3,
    * pp. 42-43.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename Number, int spacedim>
   void
   refine_and_coarsen_optimize (Triangulation<dim,spacedim> &tria,
-                               const VectorType            &criteria,
+                               const Vector<Number>        &criteria,
                                const unsigned int          order=2);
 
   /**
@@ -319,9 +319,9 @@ namespace GridRefinement
    * This function does not implement a refinement strategy, it is more a
    * helper function for the actual strategies.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename Number, int spacedim>
   void refine (Triangulation<dim,spacedim> &tria,
-               const VectorType            &criteria,
+               const Vector<Number>        &criteria,
                const double                threshold,
                const unsigned int          max_to_mark = numbers::invalid_unsigned_int);
 
@@ -339,9 +339,9 @@ namespace GridRefinement
    * This function does not implement a refinement strategy, it is more a
    * helper function for the actual strategies.
    */
-  template <int dim, class VectorType, int spacedim>
+  template <int dim, typename Number, int spacedim>
   void coarsen (Triangulation<dim,spacedim> &tria,
-                const VectorType            &criteria,
+                const Vector<Number>        &criteria,
                 const double                threshold);
 
   /**

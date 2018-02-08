@@ -69,11 +69,11 @@ namespace parallel
        *
        * The same is true for the fraction of cells that is coarsened.
        */
-      template <int dim, class VectorType, int spacedim>
+      template <int dim, typename Number, int spacedim>
       void
       refine_and_coarsen_fixed_number
       (parallel::distributed::Triangulation<dim,spacedim> &tria,
-       const VectorType                                   &criteria,
+       const dealii::Vector<Number>                       &criteria,
        const double                                       top_fraction_of_cells,
        const double                                       bottom_fraction_of_cells,
        const unsigned int                                 max_n_cells = std::numeric_limits<unsigned int>::max());
@@ -100,11 +100,11 @@ namespace parallel
        *
        * The same is true for the fraction of cells that is coarsened.
        */
-      template <int dim, class VectorType, int spacedim>
+      template <int dim, typename Number, int spacedim>
       void
       refine_and_coarsen_fixed_fraction
       (parallel::distributed::Triangulation<dim,spacedim> &tria,
-       const VectorType                                   &criteria,
+       const dealii::Vector<Number>                       &criteria,
        const double                                       top_fraction_of_error,
        const double                                       bottom_fraction_of_error);
     }
