@@ -48,6 +48,9 @@
 #include <fstream>
 #include <vector>
 
+/**
+ * A function of polynomial degree @p q with n_components.
+ */
 template <int dim>
 class F :  public Function<dim>
 {
@@ -90,27 +93,44 @@ private:
 };
 
 
+/**
+ * A general function to perform projection of polynomial function of degrees [0,p]
+ * onto the FE space given by @p fe and @p triangulation .
+ */
 template <int fe_degree, int n_q_points_1d, int dim>
 void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
-                 const FiniteElement<dim> &fe,
-                 const unsigned int        p)
+                 const std::vector<const FiniteElement<dim>*> &fes,
+                 const unsigned int        p,
+                 const unsigned int        fe_index = 0)
 {
-  AssertThrow(fe.n_components() ==1,
+  // we only project scalar value function
+  AssertThrow(fes[fe_index]->n_components() ==1,
               ExcNotImplemented());
-  DoFHandler<dim>        dof_handler(triangulation);
-  dof_handler.distribute_dofs (fe);
 
   deallog << "n_cells=" << triangulation.n_global_active_cells() << std::endl;
-  deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs (dof_handler,
-                                           locally_relevant_dofs);
+  std::vector<std::shared_ptr<DoFHandler<dim>>> dof_handlers(fes.size());
+  std::vector<IndexSet> locally_relevant_dofs(fes.size());
+  std::vector<ConstraintMatrix> constraints(fes.size());
 
-  ConstraintMatrix constraints;
-  constraints.reinit (locally_relevant_dofs);
-  DoFTools::make_hanging_node_constraints (dof_handler, constraints);
-  constraints.close ();
+  std::vector<const DoFHandler<dim>*> dof_handlers_mf(fes.size());
+  std::vector<const ConstraintMatrix *> constraints_mf(fes.size());
+  for (unsigned int i = 0; i < fes.size(); ++i)
+    {
+      dof_handlers[i] = std::make_shared<DoFHandler<dim>>(triangulation);
+      dof_handlers[i]->distribute_dofs (*fes[i]);
+      deallog << "n_dofs=" << dof_handlers[i]->n_dofs() << std::endl;
+
+      DoFTools::extract_locally_relevant_dofs (*dof_handlers[i],
+                                               locally_relevant_dofs[i]);
+
+      constraints[i].reinit (locally_relevant_dofs[i]);
+      DoFTools::make_hanging_node_constraints (*dof_handlers[i], constraints[i]);
+      constraints[i].close ();
+
+      dof_handlers_mf[i] = dof_handlers[i].get();
+      constraints_mf[i]  = &constraints[i];
+    }
 
   QGauss<1> quadrature_formula_1d(n_q_points_1d);
 
@@ -120,16 +140,16 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
   additional_data.tasks_parallel_scheme = MatrixFree<dim,double>::AdditionalData::partition_color;
   additional_data.mapping_update_flags = update_values | update_JxW_values | update_quadrature_points;
   std::shared_ptr<MatrixFree<dim,double> >  data(new MatrixFree<dim,double> ());
-  data->reinit (dof_handler, constraints, quadrature_formula_1d, additional_data);
+  data->reinit (dof_handlers_mf, constraints_mf, quadrature_formula_1d, additional_data);
 
   for (unsigned int q=0; q<=p; ++q)
     {
       // setup quadrature data:
-      F<dim> function(q, fe.n_components());
+      F<dim> function(q, fes[fe_index]->n_components());
 
       // initialize a quadrature data
       {
-        FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(*data);
+        FEEvaluation<dim,fe_degree,n_q_points_1d,1,double> fe_eval(*data,fe_index);
         const unsigned int n_cells = data->n_macro_cells();
         const unsigned int n_q_points = fe_eval.n_q_points;
 
@@ -143,13 +163,14 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
       }
 
       LinearAlgebra::distributed::Vector<double> field;
-      data->initialize_dof_vector(field);
+      data->initialize_dof_vector(field,fe_index);
       VectorTools::project<dim,LinearAlgebra::distributed::Vector<double> >
       (data,
-       constraints,
+       constraints[fe_index],
        n_q_points_1d,
        [=] (const unsigned int cell, const unsigned int q) -> VectorizedArray<double> { return qp_data(cell,q); },
-       field);
+       field,
+       fe_index);
 
       field.update_ghost_values();
 
@@ -159,16 +180,16 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
       double L2_norm = 0.;
       {
         QGauss<dim> quadrature_formula_error(std::max(p,q)+1);
-        FEValues<dim> fe_values (fe, quadrature_formula_error,
+        FEValues<dim> fe_values (*fes[fe_index], quadrature_formula_error,
                                  update_values  | update_quadrature_points | update_JxW_values);
 
-        const unsigned int   dofs_per_cell = fe.dofs_per_cell;
+        const unsigned int   dofs_per_cell = fes[fe_index]->dofs_per_cell;
         const unsigned int   n_q_points    = quadrature_formula_error.size();
         std::vector<double>  values (n_q_points);
 
         typename DoFHandler<dim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
+        cell = dof_handlers[fe_index]->begin_active(),
+        endc = dof_handlers[fe_index]->end();
         for (; cell!=endc; ++cell)
           if (cell->is_locally_owned())
             {
@@ -186,7 +207,7 @@ void do_project (const parallel::distributed::Triangulation<dim> &triangulation,
       L2_norm = Utilities::MPI::sum(L2_norm, MPI_COMM_WORLD);
       L2_norm = std::sqrt(L2_norm);
 
-      deallog << fe.get_name() << ", P_" << q
+      deallog << fes[fe_index]->get_name() << ", P_" << q
               << ", rel. error=" << L2_norm / field_l2_norm
               << std::endl;
 
@@ -212,7 +233,7 @@ void test_no_hanging_nodes (const FiniteElement<dim> &fe,
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (3);
 
-  do_project<fe_degree, n_q_points_1d, dim> (triangulation, fe, p);
+  do_project<fe_degree, n_q_points_1d, dim> (triangulation, {{&fe}}, p);
 }
 
 
@@ -230,6 +251,23 @@ void test_with_hanging_nodes (const FiniteElement<dim> &fe,
   triangulation.execute_coarsening_and_refinement ();
   triangulation.refine_global (1);
 
-  do_project<fe_degree, n_q_points_1d, dim> (triangulation, fe, p);
+  do_project<fe_degree, n_q_points_1d, dim> (triangulation, {{&fe}}, p);
 }
 
+
+// same as above but for multiple fes
+template <int fe_degree, int n_q_points_1d, int dim>
+void test_with_hanging_nodes (const std::vector<const FiniteElement<dim>*> &fes,
+                              const unsigned int        p,
+                              const unsigned int fe_index)
+{
+  parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (2);
+  if (triangulation.begin_active()->is_locally_owned())
+    triangulation.begin_active()->set_refine_flag();
+  triangulation.execute_coarsening_and_refinement ();
+  triangulation.refine_global (1);
+
+  do_project<fe_degree, n_q_points_1d, dim> (triangulation, fes, p, fe_index);
+}
