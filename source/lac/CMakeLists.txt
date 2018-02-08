@@ -39,6 +39,7 @@ SET(_unity_include_src
   relaxation_block.cc
   read_write_vector.cc
   solver.cc
+  solver_bicgstab.cc
   solver_control.cc
   sparse_decomposition.cc
   sparse_direct.cc

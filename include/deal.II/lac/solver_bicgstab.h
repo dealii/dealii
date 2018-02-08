@@ -307,19 +307,6 @@ SolverBicgstab<VectorType>::IterationResult::IterationResult
 
 
 
-internal::SolverBicgstabData::SolverBicgstabData ()
-  :
-  alpha(0.),
-  beta(0.),
-  omega(0.),
-  rho(0.),
-  rhobar(0.),
-  step(numbers::invalid_unsigned_int),
-  res(numbers::signaling_nan<double>())
-{}
-
-
-
 template <typename VectorType>
 SolverBicgstab<VectorType>::SolverBicgstab (SolverControl            &cn,
                                             VectorMemory<VectorType> &mem,
