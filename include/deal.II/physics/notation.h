@@ -608,7 +608,7 @@ namespace Physics
       to_tensor (const FullMatrix<Number> &vec);
 //@}
 
-    };
+    }
 
   }
 }
