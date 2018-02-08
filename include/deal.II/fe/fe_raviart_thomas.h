@@ -97,7 +97,7 @@ DEAL_II_NAMESPACE_OPEN
  * RT<sub>0</sub>).
  *
  *
- * @author Guido Kanschat, 2005, based on previous Work by Wolfgang Bangerth
+ * @author Guido Kanschat, 2005, based on previous work by Wolfgang Bangerth.
  */
 template <int dim>
 class FE_RaviartThomas
