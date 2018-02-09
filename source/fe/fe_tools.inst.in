@@ -130,7 +130,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
      const FiniteElement<deal_II_dimension,deal_II_space_dimension> &,
      FullMatrix<double> &);
 
-    template FiniteElement<deal_II_dimension,deal_II_space_dimension> *
+    template std::unique_ptr<FiniteElement<deal_II_dimension,deal_II_space_dimension> >
     get_fe_by_name<deal_II_dimension,deal_II_space_dimension> (const std::string &);
 
     template

@@ -35,13 +35,11 @@ public:
   {
     std::string name = myname;
 
-    FiniteElement<dim, spacedim> *fe = FETools::get_fe_by_name<dim, spacedim>(name);
+    std::unique_ptr<FiniteElement<dim, spacedim> >fe = FETools::get_fe_by_name<dim, spacedim>(name);
 
     deallog << "Read " << name << std::endl;
     deallog << "Generated :" << std::endl;
     deallog << fe->get_name()  << std::endl;
-
-    delete fe;
   }
 
 

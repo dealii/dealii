@@ -24,6 +24,7 @@
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/lac/parallel_vector.h>
@@ -83,7 +84,7 @@ namespace FETools
     /**
      * Create a FiniteElement and return a pointer to it.
      */
-    virtual FiniteElement<dim,spacedim> *
+    virtual std::unique_ptr<FiniteElement<dim,spacedim> >
     get (const unsigned int degree) const = 0;
 
     /**
@@ -91,8 +92,9 @@ namespace FETools
      * implemented for FE_Q) and return a pointer to it.
      */
 
-    virtual FiniteElement<dim,spacedim> *
+    virtual std::unique_ptr<FiniteElement<dim,spacedim> >
     get (const Quadrature<1> &quad) const = 0;
+
     /**
      * Virtual destructor doing nothing but making the compiler happy.
      */
@@ -117,14 +119,14 @@ namespace FETools
     /**
      * Create a FiniteElement and return a pointer to it.
      */
-    virtual FiniteElement<FE::dimension,FE::space_dimension> *
+    virtual std::unique_ptr<FiniteElement<FE::dimension,FE::space_dimension> >
     get (const unsigned int degree) const;
 
     /**
      * Create a FiniteElement from a quadrature formula (currently only
      * implemented for FE_Q) and return a pointer to it.
      */
-    virtual FiniteElement<FE::dimension,FE::space_dimension> *
+    virtual std::unique_ptr<FiniteElement<FE::dimension,FE::space_dimension> >
     get (const Quadrature<1> &quad) const;
   };
 
@@ -1211,9 +1213,8 @@ namespace FETools
    * If no finite element can be reconstructed from this string, an exception
    * of type @p FETools::ExcInvalidFEName is thrown.
    *
-   * The function returns a pointer to a newly create finite element. It is in
-   * the caller's responsibility to destroy the object pointed to at an
-   * appropriate later time.
+   * The function returns a std::unique_ptr to a newly created finite element
+   * meaning the caller obtains ownership over the returned object.
    *
    * Since the value of the template argument can't be deduced from the
    * (string) argument given to this function, you have to explicitly specify
@@ -1226,7 +1227,7 @@ namespace FETools
    * one wants to get a codimension 1 finite element.
    */
   template <int dim, int spacedim = dim>
-  FiniteElement<dim, spacedim> *
+  std::unique_ptr<FiniteElement<dim, spacedim> >
   get_fe_by_name (const std::string &name);
 
 
@@ -1391,10 +1392,10 @@ namespace FETools
 namespace FETools
 {
   template <class FE>
-  FiniteElement<FE::dimension, FE::space_dimension> *
+  std::unique_ptr<FiniteElement<FE::dimension, FE::space_dimension> >
   FEFactory<FE>::get (const unsigned int degree) const
   {
-    return new FE(degree);
+    return std_cxx14::make_unique<FE>(degree);
   }
 
   namespace Compositing
