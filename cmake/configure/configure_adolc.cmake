@@ -48,6 +48,21 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
       }"
       ADOLC_DOUBLE_CAST_CHECK)
 
+    CHECK_CXX_SOURCE_COMPILES("
+      #include <adolc/adouble.h>
+      #include <adolc/adtl.h>
+      #include <sstream>
+      int main (int argc, char *argv[])
+      {
+        const adouble val_taped = 1.0;
+        const adtl::adouble val_tapeless = 1.0;
+        
+        std::ostringstream ss;
+        ss << val_taped;
+        ss << val_tapeless;
+      }"
+      ADOLC_ADOUBLE_OSTREAM_CHECK)
+
     IF(NOT ADOLC_DOUBLE_CAST_CHECK)
       MESSAGE(STATUS
         "Could not find a sufficient ADOL-C installation: "
@@ -57,6 +72,20 @@ MACRO(FEATURE_ADOLC_FIND_EXTERNAL var)
         ${ADOLC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient ADOL-C installation:\n"
         "ADOL-C cast check failed.\n"
+        "deal.II needs ADOL-C version 2.6.4 or newer."
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
+    IF(NOT ADOLC_ADOUBLE_OSTREAM_CHECK)
+      MESSAGE(STATUS
+        "Could not find a sufficient ADOL-C installation: "
+        "deal.II needs ADOL-C version 2.6.4 or newer."
+        )
+      SET(ADOLC_ADDITIONAL_ERROR_STRING
+        ${ADOLC_ADDITIONAL_ERROR_STRING}
+        "Could not find a sufficient ADOL-C installation:\n"
+        "ADOL-C stream output check failed.\n"
         "deal.II needs ADOL-C version 2.6.4 or newer."
         )
       SET(${var} FALSE)
