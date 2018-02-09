@@ -481,16 +481,20 @@ public:
 
 /**
  * Implementation of scalar, discontinuous tensor product elements based on
- * Hermite polynomials, described by the polynomial space
- * Polynomials::HermiteInterpolation. As opposed to the basic FE_DGQ element,
+ * Hermite-like polynomials, described by the polynomial space
+ * Polynomials::HermiteLikeInterpolation. As opposed to the basic FE_DGQ element,
  * these elements are not interpolatory and no support points are defined.
  *
- * This element is only a Hermite polynomials for degrees larger or equal to
- * three. For degrees zero to two, a usual Lagrange basis is selected.
+ * Note that Hermite polynomials are only available for degrees larger or
+ * equal to three, and thus the beneficial properties of
+ * Polynomials::HermiteLikeInterpolation with only two basis functions having
+ * a non-trivial value or derivative on a face per dimension is only present
+ * for higher degrees. To facilitate usage also for degrees zero to two, a
+ * usual Lagrange basis is constructed by this class.
  *
  * See the base class documentation in FE_DGQ for details.
  *
- * @author Martin Kronbichler, 2017
+ * @author Martin Kronbichler, 2017, 2018
  */
 template <int dim,int spacedim=dim>
 class FE_DGQHermite : public FE_DGQ<dim,spacedim>
@@ -498,15 +502,16 @@ class FE_DGQHermite : public FE_DGQ<dim,spacedim>
 public:
   /**
    * Constructor for tensor product polynomials based on
-   * Polynomials::HermiteInterpolation.
+   * Polynomials::HermiteLikeInterpolation.
    */
   FE_DGQHermite (const unsigned int degree);
 
   /**
-   * Return a list of constant modes of the element. For the Hermite basis of
-   * degree three and larger, it returns one row where the first two elements
-   * (corresponding to the value left and the value at the right) are set to
-   * true and all other elements are set to false.
+   * Return a list of constant modes of the element. Due to the special
+   * construction of the Hermite basis, there is no simple representation of
+   * the constant value 1 in terms of a 0/1 selection, so get_constant_modes()
+   * throws an exception in case it is called for degrees larger or equal to
+   * three.
    */
   virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
   get_constant_modes () const;
