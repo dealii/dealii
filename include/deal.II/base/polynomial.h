@@ -538,6 +538,7 @@ namespace Polynomials
   };
 
 
+
   /**
    * Polynomials for Hermite interpolation condition.
    *
@@ -584,6 +585,122 @@ namespace Polynomials
      */
     static std::vector<Polynomial<double> >
     generate_complete_basis (const unsigned int p);
+  };
+
+
+
+  /**
+   * Polynomials for a variant of Hermite polynomials with better condition
+   * number in the interpolation than the basis from
+   * HermiteInterpolation. This class is only implemented for degree at least
+   * three, $n\geq 3$.
+   *
+   * In analogy to the actual Hermite polynomials this basis evaluates the
+   * first polynomial $p_0$ to 1 at $x=0$ and has both a zero value and zero
+   * derivative at $x=1$. Likewise, the last polynomial $p_n$ evaluates to 1
+   * at $x=1$ but has zero value and zero derivative at $x=0$. The second
+   * polynomial $p_1$ and the second to last polynomial $p_{n-1}$ represent
+   * the derivative degree of freedom at $x=0$ and $x=1$, respectively. As
+   * such, they are zero at both the end points $x=0, x=1$ and have zero
+   * derivative at the opposite end, $p_1'(1)=0$ and $p_{n-1}'(0)=0$. As
+   * opposed to the original Hermite polynomials, $p_0$ does not have zero
+   * derivative at $x=0$. The additional degree of freedom is used to make
+   * $p_0$ and $p_1$ orthogonal, which for $n=3$ results in a root at
+   * $x=\frac{2}{7}$ for $p_0$ and at $x=\frac{5}{7}$ for $p_n$,
+   * respectively. Furthermore, the extension of these polynomials to higher
+   * degrees $n>3$ is constructed by adding additional nodes inside the unit
+   * interval, again ensuring better conditioning. The nodes are computed as
+   * the roots of the Jacobi polynomials for $\alpha=\beta=2$ which are
+   * orthogonal against the generating function $x^2(1-x)^2$ with the Hermite
+   * property. Then, these polynomials are constructed in the usual way as
+   * Lagrange polynomials with double roots at $x=0$ and $x=1$. For example at
+   * $n=4$, all of $p_0, p_1, p_3, p_4$ get an additional root at $x=0.5$
+   * through the factor $(x-0.5)$.
+
+   * These two relaxations improve the condition number of the mass matrix
+   * (i.e., interpolation) significantly, as can be seen from the following
+   * table:
+   *
+   * <table align="center" border="1">
+   *   <tr>
+   *    <th>&nbsp;</th>
+   *    <th colspan="2">Condition number mass matrix</th>
+   *   </tr>
+   *   <tr>
+   *    <th>degree</th>
+   *    <th>HermiteInterpolation</th>
+   *    <th>HermiteLikeInterpolation</th>
+   *   </tr>
+   *   <tr>
+   *    <th>n=3</th>
+   *    <th>1057</th>
+   *    <th>21.40</th>
+   *   </tr>
+   *   <tr>
+   *    <th>n=4</th>
+   *    <th>6580</th>
+   *    <th>15.52</th>
+   *   </tr>
+   *   <tr>
+   *    <th>n=5</th>
+   *    <th>1.875e+04</th>
+   *    <th>18.52</th>
+   *   </tr>
+   *   <tr>
+   *    <th>n=6</th>
+   *    <th>6.033e+04</th>
+   *    <th>19.42</th>
+   *   </tr>
+   *   <tr>
+   *    <th>n=10</th>
+   *    <th>9.756e+05</th>
+   *    <th>27.85</th>
+   *   </tr>
+   *   <tr>
+   *    <th>n=15</th>
+   *    <th>9.431e+06</th>
+   *    <th>40.48</th>
+   *   </tr>
+   *   <tr>
+   *    <th>n=25</th>
+   *    <th>2.220e+08</th>
+   *    <th>68.30</th>
+   *   </tr>
+   *   <tr>
+   *    <th>n=35</th>
+   *    <th>2.109e+09</th>
+   *    <th>98.06</th>
+   *   </tr>
+   * </table>
+   *
+   * This polynomial inherits the advantageous property of Hermite polynomials
+   * where only two functions have value and/or derivative nonzero on a face
+   * but gives better condition numbers of interpolation, which improves the
+   * performance of some iterative schemes like conjugate gradients with
+   * point-Jacobi.
+   *
+   * @note This class requires LAPACK support.
+   *
+   * @author Martin Kronbichler
+   * @date 2018
+   */
+  class HermiteLikeInterpolation : public Polynomial<double>
+  {
+  public:
+    /**
+     * Constructor for the polynomial with index <tt>index</tt> within the set
+     * up polynomials of degree @p degree.
+     */
+    HermiteLikeInterpolation (const unsigned int degree,
+                              const unsigned int index);
+
+    /**
+     * Return the polynomials with index <tt>0</tt> up to <tt>degree+1</tt> in
+     * a space of degree up to <tt>degree</tt>. Here, <tt>degree</tt> has to
+     * be at least 3.
+     */
+    static std::vector<Polynomial<double> >
+    generate_complete_basis (const unsigned int degree);
   };
 }
 
