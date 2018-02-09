@@ -135,9 +135,15 @@ namespace parallel
 #endif
     public:
       /**
-       * Constructor, takes the current DoFHandler as argument.
+       * Constructor.
+       *
+       * @param[in] dof The DoFHandler or hp::DoFHandler on which all
+       *   operations will happen. At the time when this constructor
+       *   is called, the DoFHandler still points to the triangulation
+       *   before the refinement in question happens.
        */
       SolutionTransfer(const DoFHandlerType &dof);
+
       /**
        * Destructor.
        */
