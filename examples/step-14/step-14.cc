@@ -22,6 +22,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
@@ -54,7 +55,6 @@
 #include <algorithm>
 #include <numeric>
 #include <sstream>
-#include <memory>
 
 // The last step is as in all previous programs:
 namespace Step14
@@ -2894,52 +2894,52 @@ namespace Step14
       {
       case ProblemDescription::dual_weighted_error_estimator:
       {
-        solver.reset
-        (new LaplaceSolver::WeightedResidual<dim> (triangulation,
-                                                   primal_fe,
-                                                   dual_fe,
-                                                   quadrature,
-                                                   face_quadrature,
-                                                   descriptor.data->get_right_hand_side(),
-                                                   descriptor.data->get_boundary_values(),
-                                                   *descriptor.dual_functional));
+        solver = std_cxx14::make_unique<LaplaceSolver::WeightedResidual<dim>>
+                 (triangulation,
+                  primal_fe,
+                  dual_fe,
+                  quadrature,
+                  face_quadrature,
+                  descriptor.data->get_right_hand_side(),
+                  descriptor.data->get_boundary_values(),
+                  *descriptor.dual_functional);
         break;
       }
 
       case ProblemDescription::global_refinement:
       {
-        solver.reset
-        (new LaplaceSolver::RefinementGlobal<dim> (triangulation,
-                                                   primal_fe,
-                                                   quadrature,
-                                                   face_quadrature,
-                                                   descriptor.data->get_right_hand_side(),
-                                                   descriptor.data->get_boundary_values()));
+        solver = std_cxx14::make_unique<LaplaceSolver::RefinementGlobal<dim>>
+                 (triangulation,
+                  primal_fe,
+                  quadrature,
+                  face_quadrature,
+                  descriptor.data->get_right_hand_side(),
+                  descriptor.data->get_boundary_values());
         break;
       }
 
       case ProblemDescription::kelly_indicator:
       {
-        solver.reset
-        (new LaplaceSolver::RefinementKelly<dim> (triangulation,
-                                                  primal_fe,
-                                                  quadrature,
-                                                  face_quadrature,
-                                                  descriptor.data->get_right_hand_side(),
-                                                  descriptor.data->get_boundary_values()));
+        solver = std_cxx14::make_unique<LaplaceSolver::RefinementKelly<dim>>
+                 (triangulation,
+                  primal_fe,
+                  quadrature,
+                  face_quadrature,
+                  descriptor.data->get_right_hand_side(),
+                  descriptor.data->get_boundary_values());
         break;
       }
 
       case ProblemDescription::weighted_kelly_indicator:
       {
-        solver.reset
-        (new LaplaceSolver::RefinementWeightedKelly<dim> (triangulation,
-                                                          primal_fe,
-                                                          quadrature,
-                                                          face_quadrature,
-                                                          descriptor.data->get_right_hand_side(),
-                                                          descriptor.data->get_boundary_values(),
-                                                          *descriptor.kelly_weight));
+        solver = std_cxx14::make_unique<LaplaceSolver::RefinementWeightedKelly<dim>>
+                 (triangulation,
+                  primal_fe,
+                  quadrature,
+                  face_quadrature,
+                  descriptor.data->get_right_hand_side(),
+                  descriptor.data->get_boundary_values(),
+                  *descriptor.kelly_weight);
         break;
       }
 
@@ -3025,7 +3025,7 @@ int main ()
       // values, and right hand side. These are prepackaged in classes. We
       // take here the description of <code>Exercise_2_3</code>, but you can
       // also use <code>CurvedRidges@<dim@></code>:
-      descriptor.data.reset(new Data::SetUp<Data::Exercise_2_3<dim>,dim> ());
+      descriptor.data = std_cxx14::make_unique<Data::SetUp<Data::Exercise_2_3<dim>,dim>>();
 
       // Next set first a dual functional, then a list of evaluation
       // objects. We choose as default the evaluation of the value at an
@@ -3041,8 +3041,8 @@ int main ()
       // each step.  One such additional evaluation is to output the grid in
       // each step.
       const Point<dim> evaluation_point (0.75, 0.75);
-      descriptor.dual_functional.reset
-      (new DualFunctional::PointValueEvaluation<dim> (evaluation_point));
+      descriptor.dual_functional = std_cxx14::make_unique<DualFunctional::PointValueEvaluation<dim>>
+                                   (evaluation_point);
 
       Evaluation::PointValueEvaluation<dim>
       postprocessor1 (evaluation_point);

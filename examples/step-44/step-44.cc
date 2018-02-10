@@ -710,8 +710,8 @@ namespace Step44
     // dilation $\widetilde{J}$ field values.
     void setup_lqp (const Parameters::AllParameters &parameters)
     {
-      material.reset(new Material_Compressible_Neo_Hook_Three_Field<dim>(parameters.mu,
-                     parameters.nu));
+      material = std::make_shared<Material_Compressible_Neo_Hook_Three_Field<dim>>
+                 (parameters.mu, parameters.nu);
       update_values(Tensor<2, dim>(), 0.0, 1.0);
     }
 

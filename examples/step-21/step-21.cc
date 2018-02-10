@@ -487,7 +487,7 @@ namespace Step21
   void InverseMatrix<MatrixType>::vmult (Vector<double>       &dst,
                                          const Vector<double> &src) const
   {
-    SolverControl solver_control (std::max(src.size(), static_cast<std::size_t> (200)),
+    SolverControl solver_control (std::max<unsigned int>(src.size(), 200),
                                   1e-8*src.l2_norm());
     SolverCG<>    cg (solver_control);
 

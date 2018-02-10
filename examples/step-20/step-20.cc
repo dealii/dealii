@@ -598,7 +598,7 @@ namespace Step20
     // efficient choice because SolverCG instances allocate memory whenever
     // they are created; this is just a tutorial so such inefficiencies are
     // acceptable for the sake of exposition.
-    SolverControl solver_control (std::max(src.size(), static_cast<std::size_t> (200)),
+    SolverControl solver_control (std::max<unsigned int>(src.size(), 200),
                                   1e-8*src.l2_norm());
     SolverCG<>    cg (solver_control);
 

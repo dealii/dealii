@@ -2328,8 +2328,8 @@ namespace Step32
                                       stokes_fe.component_mask(velocity_components),
                                       constant_modes);
 
-    Mp_preconditioner.reset  (new TrilinosWrappers::PreconditionJacobi());
-    Amg_preconditioner.reset (new TrilinosWrappers::PreconditionAMG());
+    Mp_preconditioner = std::make_shared<TrilinosWrappers::PreconditionJacobi>();
+    Amg_preconditioner = std::make_shared<TrilinosWrappers::PreconditionAMG>();
 
     TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
     Amg_data.constant_modes = constant_modes;
@@ -2854,7 +2854,7 @@ namespace Step32
 
     if (rebuild_temperature_preconditioner == true)
       {
-        T_preconditioner.reset (new TrilinosWrappers::PreconditionJacobi());
+        T_preconditioner = std::make_shared<TrilinosWrappers::PreconditionJacobi>();
         T_preconditioner->initialize (temperature_matrix);
         rebuild_temperature_preconditioner = false;
       }

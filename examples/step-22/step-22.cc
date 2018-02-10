@@ -66,6 +66,7 @@
 // This is C++:
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <sstream>
 
 // As in all programs, the namespace dealii is included:
@@ -715,7 +716,7 @@ namespace Step22
     std::cout << "   Computing preconditioner..." << std::endl << std::flush;
 
     A_preconditioner
-      = std::shared_ptr<typename InnerPreconditioner<dim>::type>(new typename InnerPreconditioner<dim>::type());
+      = std::make_shared<typename InnerPreconditioner<dim>::type>();
     A_preconditioner->initialize (system_matrix.block(0,0),
                                   typename InnerPreconditioner<dim>::type::AdditionalData());
 
