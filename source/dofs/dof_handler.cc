@@ -319,7 +319,7 @@ namespace internal
                      numbers::invalid_dof_index);
           }
 
-        dof_handler.faces.reset (new internal::DoFHandler::DoFFaces<2>);
+        dof_handler.faces = std_cxx14::make_unique<internal::DoFHandler::DoFFaces<2>> ();
         // avoid access to n_raw_lines when there are no cells
         if (dof_handler.tria->n_cells() > 0)
           {
@@ -354,7 +354,7 @@ namespace internal
                      dof_handler.get_fe().dofs_per_cell,
                      numbers::invalid_dof_index);
           }
-        dof_handler.faces.reset (new internal::DoFHandler::DoFFaces<3>);
+        dof_handler.faces = std_cxx14::make_unique<internal::DoFHandler::DoFFaces<3>> ();
 
         // avoid access to n_raw_lines when there are no cells
         if (dof_handler.tria->n_cells() > 0)
@@ -439,11 +439,11 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<2>);
+            dof_handler.mg_levels.emplace_back (std_cxx14::make_unique<internal::DoFHandler::DoFLevel<2>> ());
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads (i) * fe.dofs_per_quad, numbers::invalid_dof_index);
           }
 
-        dof_handler.mg_faces.reset (new internal::DoFHandler::DoFFaces<2>);
+        dof_handler.mg_faces = std_cxx14::make_unique<internal::DoFHandler::DoFFaces<2>> ();
         dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, numbers::invalid_dof_index);
 
         const unsigned int &n_vertices = tria.n_vertices ();
@@ -498,11 +498,11 @@ namespace internal
 
         for (unsigned int i = 0; i < n_levels; ++i)
           {
-            dof_handler.mg_levels.emplace_back (new internal::DoFHandler::DoFLevel<3>);
+            dof_handler.mg_levels.emplace_back (std_cxx14::make_unique<internal::DoFHandler::DoFLevel<3>> ());
             dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_hexs (i) * fe.dofs_per_hex, numbers::invalid_dof_index);
           }
 
-        dof_handler.mg_faces.reset (new internal::DoFHandler::DoFFaces<3>);
+        dof_handler.mg_faces = std_cxx14::make_unique<internal::DoFHandler::DoFFaces<3>> ();
         dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, numbers::invalid_dof_index);
         dof_handler.mg_faces->quads.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads () * fe.dofs_per_quad, numbers::invalid_dof_index);
 
@@ -661,13 +661,13 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*>
       (&tria)
       != nullptr)
-    policy.reset (new internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >(*this));
+    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*>
            (&tria)
            == nullptr)
-    policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
+    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
   else
-    policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >(*this));
+    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
 }
 
 
@@ -707,11 +707,11 @@ initialize(const Triangulation<dim,spacedim> &t,
 
   // decide whether we need a sequential or a parallel distributed policy
   if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&t) != nullptr)
-    policy.reset (new internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >(*this));
+    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
   else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&t) != nullptr)
-    policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >(*this));
+    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
   else
-    policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
+    policy = std_cxx14::make_unique<internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
 
   distribute_dofs(fe);
 }
@@ -1308,7 +1308,7 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl,
       const unsigned int n_levels = finest_level - coarsest_level + 1;
       const unsigned int n_indices = n_levels * dofs_per_vertex;
 
-      indices.reset (new types::global_dof_index[n_indices]);
+      indices = std_cxx14::make_unique<types::global_dof_index[]> (n_indices);
       std::fill (indices.get(), indices.get()+n_indices,
                  numbers::invalid_dof_index);
     }
