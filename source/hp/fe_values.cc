@@ -94,11 +94,11 @@ namespace internal
       if (fe_values_table(present_fe_values_index).get() == nullptr)
         fe_values_table(present_fe_values_index)
           =
-            std::shared_ptr<FEValuesType>
-            (new FEValuesType ((*mapping_collection)[mapping_index],
-                               (*fe_collection)[fe_index],
-                               q_collection[q_index],
-                               update_flags));
+            std::make_shared<FEValuesType>
+            ((*mapping_collection)[mapping_index],
+             (*fe_collection)[fe_index],
+             q_collection[q_index],
+             update_flags);
 
       // now there definitely is one!
       return *fe_values_table(present_fe_values_index);
