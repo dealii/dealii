@@ -557,7 +557,7 @@ namespace MeshWorker
     :
     fevalv(0),
     multigrid(false),
-    global_data(std::shared_ptr<VectorDataBase<dim, sdim> >(new VectorDataBase<dim, sdim>)),
+    global_data(std::make_shared<VectorDataBase<dim, sdim> >()),
     n_components(numbers::invalid_unsigned_int)
   {}
 
@@ -583,15 +583,15 @@ namespace MeshWorker
         const FESubfaceValues<dim,sdim> *ps = dynamic_cast<const FESubfaceValues<dim,sdim>*>(&p);
 
         if (pc != nullptr)
-          fevalv[i] = std::shared_ptr<FEValuesBase<dim,sdim> > (
-                        new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
-                                                pc->get_quadrature(), pc->get_update_flags()));
+          fevalv[i] = std::make_shared<FEValues<dim,sdim> >
+                      (pc->get_mapping(), pc->get_fe(),
+                       pc->get_quadrature(), pc->get_update_flags());
         else if (pf != nullptr)
-          fevalv[i] = std::shared_ptr<FEValuesBase<dim,sdim> > (
-                        new FEFaceValues<dim,sdim> (pf->get_mapping(), pf->get_fe(), pf->get_quadrature(), pf->get_update_flags()));
+          fevalv[i] = std::make_shared<FEFaceValues<dim,sdim> >
+                      (pf->get_mapping(), pf->get_fe(), pf->get_quadrature(), pf->get_update_flags());
         else if (ps != nullptr)
-          fevalv[i] = std::shared_ptr<FEValuesBase<dim,sdim> > (
-                        new FESubfaceValues<dim,sdim> (ps->get_mapping(), ps->get_fe(), ps->get_quadrature(), ps->get_update_flags()));
+          fevalv[i] = std::make_shared<FESubfaceValues<dim,sdim> >
+                      (ps->get_mapping(), ps->get_fe(), ps->get_quadrature(), ps->get_update_flags());
         else
           Assert(false, ExcInternalError());
       }
@@ -613,17 +613,13 @@ namespace MeshWorker
     if (block_info == nullptr || block_info->local().size() == 0)
       {
         fevalv.resize(1);
-        fevalv[0] = std::shared_ptr<FEValuesBase<dim,sdim> > (
-                      new FEVALUES (mapping, el, quadrature, flags));
+        fevalv[0] = std::make_shared<FEVALUES>(mapping, el, quadrature, flags);
       }
     else
       {
         fevalv.resize(el.n_base_elements());
         for (unsigned int i=0; i<fevalv.size(); ++i)
-          {
-            fevalv[i] = std::shared_ptr<FEValuesBase<dim,sdim> > (
-                          new FEVALUES (mapping, el.base_element(i), quadrature, flags));
-          }
+          fevalv[i] = std::make_shared<FEVALUES> (mapping, el.base_element(i), quadrature, flags);
       }
     n_components = el.n_components();
   }
@@ -788,7 +784,7 @@ namespace MeshWorker
     std::shared_ptr<VectorData<VectorType, dim, sdim> > p;
     VectorDataBase<dim,sdim> *pp;
 
-    p = std::shared_ptr<VectorData<VectorType, dim, sdim> >(new VectorData<VectorType, dim, sdim> (cell_selector));
+    p = std::make_shared<VectorData<VectorType, dim, sdim> > (cell_selector);
     // Public member function of parent class was not found without
     // explicit cast
     pp = &*p;
@@ -796,13 +792,13 @@ namespace MeshWorker
     cell_data = p;
     cell.initialize_data(p);
 
-    p = std::shared_ptr<VectorData<VectorType, dim, sdim> >(new VectorData<VectorType, dim, sdim> (boundary_selector));
+    p = std::make_shared<VectorData<VectorType, dim, sdim> > (boundary_selector);
     pp = &*p;
     pp->initialize(data);
     boundary_data = p;
     boundary.initialize_data(p);
 
-    p = std::shared_ptr<VectorData<VectorType, dim, sdim> >(new VectorData<VectorType, dim, sdim> (face_selector));
+    p = std::make_shared<VectorData<VectorType, dim, sdim> > (face_selector);
     pp = &*p;
     pp->initialize(data);
     face_data = p;
@@ -825,7 +821,7 @@ namespace MeshWorker
     std::shared_ptr<MGVectorData<VectorType, dim, sdim> > p;
     VectorDataBase<dim,sdim> *pp;
 
-    p = std::shared_ptr<MGVectorData<VectorType, dim, sdim> >(new MGVectorData<VectorType, dim, sdim> (cell_selector));
+    p = std::make_shared<MGVectorData<VectorType, dim, sdim> > (cell_selector);
     // Public member function of parent class was not found without
     // explicit cast
     pp = &*p;
@@ -833,13 +829,13 @@ namespace MeshWorker
     cell_data = p;
     cell.initialize_data(p);
 
-    p = std::shared_ptr<MGVectorData<VectorType, dim, sdim> >(new MGVectorData<VectorType, dim, sdim> (boundary_selector));
+    p = std::make_shared<MGVectorData<VectorType, dim, sdim> > (boundary_selector);
     pp = &*p;
     pp->initialize(data);
     boundary_data = p;
     boundary.initialize_data(p);
 
-    p = std::shared_ptr<MGVectorData<VectorType, dim, sdim> >(new MGVectorData<VectorType, dim, sdim> (face_selector));
+    p = std::make_shared<MGVectorData<VectorType, dim, sdim> > (face_selector);
     pp = &*p;
     pp->initialize(data);
     face_data = p;
