@@ -30,15 +30,39 @@ namespace std_cxx14
 #ifdef DEAL_II_WITH_CXX14
   using std::make_unique;
 #else
+  namespace internal
+  {
+    template <typename T>
+    struct is_bounded_array
+    {
+      static constexpr bool value = false;
+    };
+
+    template <typename T, std::size_t N>
+    struct is_bounded_array<T[N]>
+    {
+      static constexpr bool value = true;
+    };
+  }
+
   template <typename T, typename... Args>
   inline
-  std::unique_ptr<T>
+  typename std::enable_if<!std::is_array<T>::value, std::unique_ptr<T> >::type
   make_unique(Args &&... constructor_arguments)
   {
-    static_assert(!std::is_array<T>::value,
-                  "This function is not implemented for array types.");
     return std::unique_ptr<T>(new T(std::forward<Args>(constructor_arguments)...));
   }
+
+  template <typename T>
+  inline
+  typename std::enable_if<std::is_array<T>::value, std::unique_ptr<T> >::type
+  make_unique(std::size_t n)
+  {
+    static_assert(!internal::is_bounded_array<T>::value,
+                  "This function is not implemented for bounded array types.");
+    return std::unique_ptr<T>(new typename std::remove_extent<T>::type [n]);
+  }
+
 #endif
 }
 DEAL_II_NAMESPACE_CLOSE
