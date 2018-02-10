@@ -531,10 +531,10 @@ namespace Polynomials
      * polynomial, we keep one pointer to the list of coefficients; we do so
      * rather than keeping a vector of vectors in order to simplify
      * programming multithread-safe. In order to avoid memory leak, we use a
-     * shared_ptr in order to correctly free the memory of the vectors when
+     * unique_ptr in order to correctly free the memory of the vectors when
      * the global destructor is called.
      */
-    static std::vector<std::shared_ptr<const std::vector<double> > > recursive_coefficients;
+    static std::vector<std::unique_ptr<const std::vector<double> > > recursive_coefficients;
   };
 
 

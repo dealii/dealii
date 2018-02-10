@@ -13,14 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/base/polynomial.h>
-#include <deal.II/base/point.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/thread_management.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx14/memory.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/lapack_full_matrix.h>
-
 
 #include <cmath>
 #include <algorithm>
@@ -373,11 +373,11 @@ namespace Polynomials
     // need to transform p into standard form as
     // well if necessary. copy the polynomial to
     // do this
-    std::shared_ptr<Polynomial<number> > q_data;
+    std::unique_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
-        q_data.reset (new Polynomial<number>(p));
+        q_data = std_cxx14::make_unique<Polynomial<number>>(p);
         q_data->transform_into_standard_form();
         q = q_data.get();
       }
@@ -417,11 +417,11 @@ namespace Polynomials
     // need to transform p into standard form as
     // well if necessary. copy the polynomial to
     // do this
-    std::shared_ptr<Polynomial<number> > q_data;
+    std::unique_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
-        q_data.reset (new Polynomial<number>(p));
+        q_data = std_cxx14::make_unique<Polynomial<number>>(p);
         q_data->transform_into_standard_form();
         q = q_data.get();
       }
@@ -453,11 +453,11 @@ namespace Polynomials
     // need to transform p into standard form as
     // well if necessary. copy the polynomial to
     // do this
-    std::shared_ptr<Polynomial<number> > q_data;
+    std::unique_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
-        q_data.reset (new Polynomial<number>(p));
+        q_data = std_cxx14::make_unique<Polynomial<number>>(p);
         q_data->transform_into_standard_form();
         q = q_data.get();
       }
@@ -600,11 +600,11 @@ namespace Polynomials
     if (degree() == 0)
       return Monomial<number>(0, 0.);
 
-    std::shared_ptr<Polynomial<number> > q_data;
+    std::unique_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = nullptr;
     if (in_lagrange_product_form == true)
       {
-        q_data.reset (new Polynomial<number>(*this));
+        q_data = std_cxx14::make_unique<Polynomial<number>>(*this);
         q_data->transform_into_standard_form();
         q = q_data.get();
       }
@@ -626,11 +626,11 @@ namespace Polynomials
   {
     // no simple form possible for Lagrange
     // polynomial on product form
-    std::shared_ptr<Polynomial<number> > q_data;
+    std::unique_ptr<Polynomial<number> > q_data;
     const Polynomial<number> *q = nullptr;
     if (in_lagrange_product_form == true)
       {
-        q_data.reset (new Polynomial<number>(*this));
+        q_data = std_cxx14::make_unique<Polynomial<number>>(*this);
         q_data->transform_into_standard_form();
         q = q_data.get();
       }
@@ -976,7 +976,7 @@ namespace Polynomials
 
 // Reserve space for polynomials up to degree 19. Should be sufficient
 // for the start.
-  std::vector<std::shared_ptr<const std::vector<double> > >
+  std::vector<std::unique_ptr<const std::vector<double> > >
   Hierarchical::recursive_coefficients(20);
 
 
@@ -1053,9 +1053,9 @@ namespace Polynomials
             // now make these arrays
             // const
             recursive_coefficients[0] =
-              std::shared_ptr<const std::vector<double> >(c0);
+              std::unique_ptr<const std::vector<double> >(c0);
             recursive_coefficients[1] =
-              std::shared_ptr<const std::vector<double> >(c1);
+              std::unique_ptr<const std::vector<double> >(c1);
           }
         else if (k==2)
           {
@@ -1072,7 +1072,7 @@ namespace Polynomials
             (*c2)[2] =   4.*a;
 
             recursive_coefficients[2] =
-              std::shared_ptr<const std::vector<double> >(c2);
+              std::unique_ptr<const std::vector<double> >(c2);
           }
         else
           {
@@ -1116,7 +1116,7 @@ namespace Polynomials
             // const pointer in the
             // coefficients array
             recursive_coefficients[k] =
-              std::shared_ptr<const std::vector<double> >(ck);
+              std::unique_ptr<const std::vector<double> >(ck);
           };
       };
   }

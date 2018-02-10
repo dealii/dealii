@@ -706,7 +706,7 @@ namespace parallel
       TBBPartitioner()
 #ifdef DEAL_II_WITH_THREADS
         :
-        my_partitioner(new tbb::affinity_partitioner()),
+        my_partitioner(std::make_shared<tbb::affinity_partitioner>()),
         in_use(false)
 #endif
       {}
@@ -734,7 +734,7 @@ namespace parallel
       {
         dealii::Threads::Mutex::ScopedLock lock(mutex);
         if (in_use)
-          return std::shared_ptr<tbb::affinity_partitioner>(new tbb::affinity_partitioner());
+          return std::make_shared<tbb::affinity_partitioner>();
 
         in_use = true;
         return my_partitioner;

@@ -253,7 +253,7 @@ LogStream::get_stream()
   // there can only be one access at a time
   if (outstreams.get().get() == nullptr)
     {
-      outstreams.get().reset (new std::ostringstream);
+      outstreams.get() = std::make_shared<std::ostringstream>();
       outstreams.get()->setf(std::ios::showpoint | std::ios::left);
     }
 
