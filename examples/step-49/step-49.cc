@@ -71,11 +71,8 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
   // and default initialized -- to zero, in the current case -- before
   // we then increment it):
   {
-    std::map<unsigned int, unsigned int> boundary_count;
-    typename Triangulation<dim>::active_cell_iterator
-    cell = triangulation.begin_active(),
-    endc = triangulation.end();
-    for (; cell!=endc; ++cell)
+    std::map<types::boundary_id, unsigned int> boundary_count;
+    for (auto cell : triangulation.active_cell_iterators())
       {
         for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           {
@@ -85,18 +82,16 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
       }
 
     std::cout << " boundary indicators: ";
-    for (std::map<unsigned int, unsigned int>::iterator it=boundary_count.begin();
-         it!=boundary_count.end();
-         ++it)
+    for (const std::pair<types::boundary_id, unsigned int> &pair : boundary_count)
       {
-        std::cout << it->first << "(" << it->second << " times) ";
+        std::cout << pair.first << "(" << pair.second << " times) ";
       }
     std::cout << std::endl;
   }
 
   // Finally, produce a graphical representation of the mesh to an output
   // file:
-  std::ofstream out (filename.c_str());
+  std::ofstream out (filename);
   GridOut grid_out;
   grid_out.write_eps (triangulation, out);
   std::cout << " written to " << filename
@@ -136,7 +131,7 @@ void grid_2 ()
   GridGenerator::hyper_cube_with_cylindrical_hole (tria1, 0.25, 1.0);
 
   Triangulation<2> tria2;
-  std::vector< unsigned int > repetitions(2);
+  std::vector<unsigned int> repetitions(2);
   repetitions[0]=3;
   repetitions[1]=2;
   GridGenerator::subdivided_hyper_rectangle (tria2, repetitions,
@@ -168,7 +163,7 @@ void grid_2 ()
 // more than once. It works here because we select the vertices we want to use
 // based on their geometric location, and a vertex moved once will fail this
 // test in the future. A more general approach to this problem would have been
-// to keep a std::set of of those vertex indices that we have already moved
+// to keep a std::set of those vertex indices that we have already moved
 // (which we can obtain using <code>cell-@>vertex_index(i)</code> and only
 // move those vertices whose index isn't in the set yet.
 void grid_3 ()
@@ -176,10 +171,7 @@ void grid_3 ()
   Triangulation<2> triangulation;
   GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
 
-  Triangulation<2>::active_cell_iterator
-  cell = triangulation.begin_active(),
-  endc = triangulation.end();
-  for (; cell!=endc; ++cell)
+  for (const auto cell : triangulation.active_cell_iterators())
     {
       for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
         {
@@ -254,17 +246,11 @@ void grid_4()
 //
 // GridTools::transform takes a triangulation and any kind of object that can
 // be called like a function as arguments. This function-like argument can be
-// simply the address of a function as in the current case, or an object that
-// has an <code>operator()</code> as in the next example, or for example a
-// <code>std::function@<Point@<2@>(const Point@<2@>)@></code> object one can get
-// via <code>std::bind</code> in more complex cases.
-Point<2> grid_5_transform (const Point<2> &in)
-{
-  return Point<2>(in(0),
-                  in(1) + std::sin(in(0)/5.0*3.14159));
-}
-
-
+// the address of a function that takes a point and returns a point, an object
+// that has an <code>operator()</code> like the code below, or for example, a
+// <code>std::function@<Point@<2@>(const Point@<2@>)@></code> object one can
+// get via <code>std::bind</code> in more complex cases. Here we have a simple
+// transformation and use the simplest method: a lambda function.
 void grid_5()
 {
   Triangulation<2> triangulation;
@@ -276,7 +262,11 @@ void grid_5()
                                              Point<2>(0.0,0.0),
                                              Point<2>(10.0,1.0));
 
-  GridTools::transform (&grid_5_transform, triangulation);
+  GridTools::transform([](const Point<2> &in) -> Point<2>
+  {
+    return {in[0], in[1] + std::sin(in[0]/5.0*numbers::PI)};
+  },
+  triangulation);
   print_mesh_info (triangulation, "grid-5.eps");
 }
 
@@ -310,7 +300,7 @@ struct Grid6Func
 void grid_6()
 {
   Triangulation<2> triangulation;
-  std::vector< unsigned int > repetitions(2);
+  std::vector<unsigned int> repetitions(2);
   repetitions[0] = repetitions[1] = 40;
   GridGenerator::subdivided_hyper_rectangle (triangulation,
                                              repetitions,
