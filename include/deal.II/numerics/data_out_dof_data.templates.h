@@ -93,11 +93,11 @@ namespace internal
                     break;
                   }
               if (x_fe_values[i].get() == nullptr)
-                x_fe_values[i].reset(new dealii::hp::FEValues<dim,spacedim>
-                                     (this->mapping_collection,
-                                      *this->finite_elements[i],
-                                      quadrature,
-                                      this->update_flags));
+                x_fe_values[i] = std::make_shared<dealii::hp::FEValues<dim,spacedim>>
+                                 (this->mapping_collection,
+                                  *this->finite_elements[i],
+                                  quadrature,
+                                  this->update_flags);
             }
         }
       else
@@ -118,11 +118,11 @@ namespace internal
                     break;
                   }
               if (x_fe_face_values[i].get() == nullptr)
-                x_fe_face_values[i].reset(new dealii::hp::FEFaceValues<dim,spacedim>
-                                          (this->mapping_collection,
-                                           *this->finite_elements[i],
-                                           quadrature,
-                                           this->update_flags));
+                x_fe_face_values[i] = std::make_shared<dealii::hp::FEFaceValues<dim,spacedim>>
+                                      (this->mapping_collection,
+                                       *this->finite_elements[i],
+                                       quadrature,
+                                       this->update_flags);
             }
         }
 
@@ -177,11 +177,11 @@ namespace internal
                     break;
                   }
               if (x_fe_values[i].get() == nullptr)
-                x_fe_values[i].reset(new dealii::hp::FEValues<dim,spacedim>
-                                     (this->mapping_collection,
-                                      *this->finite_elements[i],
-                                      quadrature,
-                                      this->update_flags));
+                x_fe_values[i] = std::make_shared<dealii::hp::FEValues<dim,spacedim>>
+                                 (this->mapping_collection,
+                                  *this->finite_elements[i],
+                                  quadrature,
+                                  this->update_flags);
             }
         }
       else
@@ -201,11 +201,11 @@ namespace internal
                     break;
                   }
               if (x_fe_face_values[i].get() == nullptr)
-                x_fe_face_values[i].reset(new dealii::hp::FEFaceValues<dim,spacedim>
-                                          (this->mapping_collection,
-                                           *this->finite_elements[i],
-                                           quadrature,
-                                           this->update_flags));
+                x_fe_face_values[i] = std::make_shared<dealii::hp::FEFaceValues<dim,spacedim>>
+                                      (this->mapping_collection,
+                                       *this->finite_elements[i],
+                                       quadrature,
+                                       this->update_flags);
             }
         }
     }
@@ -1327,14 +1327,14 @@ std::vector<std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
             duplicate = true;
           }
       if (duplicate == false)
-        finite_elements[i].reset(new dealii::hp::FECollection<dhdim,dhspacedim>
-                                 (this->dof_data[i]->dof_handler->get_fe_collection()));
+        finite_elements[i] = std::make_shared<dealii::hp::FECollection<dhdim,dhspacedim>>
+                             (this->dof_data[i]->dof_handler->get_fe_collection());
     }
   if (this->dof_data.empty())
     {
       finite_elements.resize(1);
-      finite_elements[0].reset(new dealii::hp::FECollection<dhdim,dhspacedim>
-                               (FE_DGQ<dhdim,dhspacedim>(0)));
+      finite_elements[0] = std::make_shared<dealii::hp::FECollection<dhdim,dhspacedim>>
+                           (FE_DGQ<dhdim,dhspacedim>(0));
     }
   return finite_elements;
 }
