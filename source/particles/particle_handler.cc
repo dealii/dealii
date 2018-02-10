@@ -15,6 +15,7 @@
 
 #include <deal.II/particles/particle_handler.h>
 
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
@@ -81,7 +82,7 @@ namespace Particles
     mapping = &mapp;
 
     // Create the memory pool that will store all particle properties
-    property_pool.reset(new PropertyPool(n_properties));
+    property_pool = std_cxx14::make_unique<PropertyPool>(n_properties);
   }
 
 
