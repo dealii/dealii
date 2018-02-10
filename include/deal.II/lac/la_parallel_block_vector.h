@@ -470,6 +470,39 @@ namespace LinearAlgebra
                                      const bool symmetric = false) const;
 
       /**
+       * Calculate the scalar product between each block of this vector and @p V
+       * using a metric tensor @p matrix. This function
+       * computes the result of $ \sum_{ij} A^{ij} U_i \cdot V_j$ where $U_i$
+       * and $V_j$ indicate the $i$th block (not element) of $U$ and the
+       * $j$th block of $V$, respectively. If @p symmetric is
+       * <code>true</code>, it is assumed that $U_i \cdot V_j$ and $A^{ij}$ are
+       * symmetric matrices and almost half of the scalar products can be avoided.
+       *
+       * Obviously, this function can only be used if all blocks of both vectors
+       * are of the same size.
+       *
+       * @note Internally, a single global reduction will be called to
+       * accumulate the scalar product between locally owned degrees of freedom.
+       */
+      template <typename FullMatrixType>
+      Number multivector_inner_product_with_metric(const FullMatrixType &matrix,
+                                                   const BlockVector<Number> &V,
+                                                   const bool symmetric = false) const;
+
+      /**
+       * Set each block of this vector as follows:
+       * $U^i = \sum_{j} V_j A^{ji}$ where $U^i$
+       * and $V_j$ indicate the $i$th block (not element) of $U$ and the
+       * $j$th block of $V$, respectively.
+       *
+       * Obviously, this function can only be used if all blocks of both vectors
+       * are of the same size.
+       */
+      template <typename FullMatrixType>
+      void mmult(const BlockVector<Number> &V,
+                 const FullMatrixType &matrix);
+
+      /**
        * Add @p a to all components. Note that @p a is a scalar not a vector.
        */
       virtual void add(const Number a) override;

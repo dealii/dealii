@@ -28,6 +28,18 @@ for (SCALAR : REAL_AND_COMPLEX_SCALARS)
     template
     void
     BlockVector<SCALAR>::multivector_inner_product(LAPACKFullMatrix<SCALAR> &, const BlockVector<SCALAR> &V, const bool) const;
+    template
+    SCALAR
+    BlockVector<SCALAR>::multivector_inner_product_with_metric(const FullMatrix<SCALAR> &, const BlockVector<SCALAR> &V, const bool) const;
+    template
+    SCALAR
+    BlockVector<SCALAR>::multivector_inner_product_with_metric(const LAPACKFullMatrix<SCALAR> &, const BlockVector<SCALAR> &V, const bool) const;
+    template
+    void
+    BlockVector<SCALAR>::mmult(const BlockVector<SCALAR> &V,const FullMatrix<SCALAR> &);
+    template
+    void
+    BlockVector<SCALAR>::mmult(const BlockVector<SCALAR> &V,const LAPACKFullMatrix<SCALAR> &);
     \}
     \}
 }
