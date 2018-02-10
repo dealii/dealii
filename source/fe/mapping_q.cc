@@ -72,13 +72,13 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
                               (dim != spacedim)),
   // create a Q1 mapping for use on interior cells (if necessary)
   // or to create a good initial guess in transform_real_to_unit_cell()
-  q1_mapping (new MappingQGeneric<dim,spacedim>(1)),
+  q1_mapping (std::make_shared<MappingQGeneric<dim,spacedim> >(1)),
 
   // create a Q_p mapping; if p=1, simply share the Q_1 mapping already
   // created via the shared_ptr objects
   qp_mapping (this->polynomial_degree>1
               ?
-              std::make_shared<const MappingQGeneric<dim,spacedim>>(degree)
+              std::make_shared<const MappingQGeneric<dim,spacedim> >(degree)
               :
               q1_mapping)
 {}

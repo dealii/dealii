@@ -61,20 +61,20 @@ namespace internal
           {
           case 1:
             if (spacedim==1)
-              q_fine.reset(new QGauss<dim> (degree+1));
+              q_fine = std_cxx14::make_unique<QGauss<dim>>(degree+1);
             else if (spacedim==2)
-              q_fine.reset(new QAnisotropic<dim>(QGauss<1>(degree+1), q_dummy));
+              q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(QGauss<1>(degree+1), q_dummy);
             else
-              q_fine.reset(new QAnisotropic<dim>(QGauss<1>(degree+1), q_dummy, q_dummy));
+              q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(QGauss<1>(degree+1), q_dummy, q_dummy);
             break;
           case 2:
             if (spacedim==2)
-              q_fine.reset(new QGauss<dim> (degree+1));
+              q_fine = std_cxx14::make_unique<QGauss<dim>>(degree+1);
             else
-              q_fine.reset(new QAnisotropic<dim>(QGauss<1>(degree+1), QGauss<1>(degree+1), q_dummy));
+              q_fine = std_cxx14::make_unique<QAnisotropic<dim>>(QGauss<1>(degree+1), QGauss<1>(degree+1), q_dummy);
             break;
           case 3:
-            q_fine.reset(new QGauss<dim> (degree+1));
+            q_fine = std_cxx14::make_unique<QGauss<dim>>(degree+1);
             break;
           default:
             Assert(false, ExcInternalError());

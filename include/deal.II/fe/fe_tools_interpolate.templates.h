@@ -19,6 +19,7 @@
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
@@ -110,12 +111,12 @@ namespace FETools
     Vector<typename OutVector::value_type> u1_local(DoFTools::max_dofs_per_cell(dof1));
     Vector<typename OutVector::value_type> u2_local(DoFTools::max_dofs_per_cell(dof2));
 
-    // have a map for interpolation
-    // matrices. shared_ptr make sure
-    // that memory is released again
+    // have a map for interpolation matrices.
+    // Using a unique_ptr makes sure that the
+    // memory is released again automatically.
     std::map<const FiniteElement<dim,spacedim> *,
         std::map<const FiniteElement<dim,spacedim> *,
-        std::shared_ptr<FullMatrix<double> > > >
+        std::unique_ptr<FullMatrix<double> > > >
         interpolation_matrices;
 
     typename DoFHandlerType1<dim,spacedim>::active_cell_iterator cell1 = dof1.begin_active(),
@@ -176,15 +177,15 @@ namespace FETools
           // there
           if (interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()].get() == nullptr)
             {
-              std::shared_ptr<FullMatrix<double> >
-              interpolation_matrix (new FullMatrix<double> (dofs_per_cell2,
-                                                            dofs_per_cell1));
-              interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
-                = interpolation_matrix;
+              auto interpolation_matrix = std_cxx14::make_unique<FullMatrix<double> >
+                                          (dofs_per_cell2, dofs_per_cell1);
 
               get_interpolation_matrix(cell1->get_fe(),
                                        cell2->get_fe(),
                                        *interpolation_matrix);
+
+              interpolation_matrices[&cell1->get_fe()][&cell2->get_fe()]
+                = std::move(interpolation_matrix);
             }
 
           cell1->get_dof_values(u1, u1_local);
@@ -291,7 +292,7 @@ namespace FETools
     // dof1 to the back_interpolation
     // matrices
     std::map<const FiniteElement<dim> *,
-        std::shared_ptr<FullMatrix<double> > > interpolation_matrices;
+        std::unique_ptr<FullMatrix<double> > > interpolation_matrices;
 
     for (; cell!=endc; ++cell)
       if ((cell->subdomain_id() == subdomain_id)
@@ -320,9 +321,8 @@ namespace FETools
           // matrix is available
           if (interpolation_matrices[&cell->get_fe()] == nullptr)
             {
-              interpolation_matrices[&cell->get_fe()] =
-                std::shared_ptr<FullMatrix<double> >
-                (new FullMatrix<double>(dofs_per_cell1, dofs_per_cell1));
+              interpolation_matrices[&cell->get_fe()] = std_cxx14::make_unique<FullMatrix<double> >
+                                                        (dofs_per_cell1, dofs_per_cell1);
               get_back_interpolation_matrix(cell->get_fe(), fe2,
                                             *interpolation_matrices[&cell->get_fe()]);
             }
