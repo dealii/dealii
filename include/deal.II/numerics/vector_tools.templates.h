@@ -1403,7 +1403,7 @@ namespace VectorTools
 
       typedef MatrixFreeOperators::MassOperator<dim, fe_degree, n_q_points_1d, 1, LinearAlgebra::distributed::Vector<Number> > MatrixType;
       MatrixType mass_matrix;
-      mass_matrix.initialize(matrix_free, {{fe_component}});
+      mass_matrix.initialize(matrix_free, {fe_component});
       mass_matrix.compute_diagonal();
 
       typedef LinearAlgebra::distributed::Vector<Number> LocalVectorType;
