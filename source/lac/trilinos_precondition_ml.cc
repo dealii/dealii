@@ -220,8 +220,8 @@ namespace TrilinosWrappers
                                const Teuchos::ParameterList &ml_parameters)
   {
     preconditioner.reset ();
-    preconditioner.reset (new ML_Epetra::MultiLevelPreconditioner
-                          (matrix, ml_parameters));
+    preconditioner = std::make_shared<ML_Epetra::MultiLevelPreconditioner>
+                     (matrix, ml_parameters);
   }
 
 
@@ -241,11 +241,12 @@ namespace TrilinosWrappers
     // equidistributed map; avoid
     // storing the nonzero
     // elements.
-    vector_distributor.reset (new Epetra_Map(static_cast<TrilinosWrappers::types::int_type>(n_rows),
-                                             0, communicator));
+    vector_distributor = std::make_shared<Epetra_Map>
+                         (static_cast<TrilinosWrappers::types::int_type>(n_rows),
+                          0, communicator);
 
     if (trilinos_matrix.get() == nullptr)
-      trilinos_matrix.reset (new SparseMatrix());
+      trilinos_matrix = std::make_shared<SparseMatrix>();
 
     trilinos_matrix->reinit (*vector_distributor, *vector_distributor,
                              deal_ii_sparse_matrix, drop_tolerance, true,

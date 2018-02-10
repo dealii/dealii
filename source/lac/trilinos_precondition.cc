@@ -671,7 +671,7 @@ namespace TrilinosWrappers
                                      const AdditionalData &additional_data)
   {
     preconditioner.reset ();
-    preconditioner.reset (new Ifpack_Chebyshev (&matrix.trilinos_matrix()));
+    preconditioner = std::make_shared<Ifpack_Chebyshev> (&matrix.trilinos_matrix());
 
     Ifpack_Chebyshev *ifpack = static_cast<Ifpack_Chebyshev *>
                                (preconditioner.get());

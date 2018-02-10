@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/subscriptor.h>
 
 // boost::serialization::make_array used to be in array.hpp, but was
@@ -31,7 +32,6 @@
 #endif
 #include <boost/serialization/split_member.hpp>
 
-#include <memory>
 #include <vector>
 #include <iostream>
 #include <algorithm>
@@ -1442,8 +1442,8 @@ SparsityPattern::load (Archive &ar, const unsigned int)
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed &store_diagonal_first_in_row;
 
-  rowstart.reset (new std::size_t[max_dim + 1]);
-  colnums.reset (new size_type[max_vec_len]);
+  rowstart = std_cxx14::make_unique<std::size_t[]>(max_dim + 1);
+  colnums = std_cxx14::make_unique<size_type[]>(max_vec_len);
 
   ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
   ar &boost::serialization::make_array(colnums.get(), max_vec_len);

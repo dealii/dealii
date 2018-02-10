@@ -883,7 +883,7 @@ public:
   /**
    * Return dimension of the vector.
    */
-  std::size_t size () const;
+  size_type size () const;
 
   /**
    * Return whether the vector contains only elements with value zero. This
@@ -1031,7 +1031,8 @@ Vector<Number>::Vector (const size_type n)
 
 template <typename Number>
 inline
-std::size_t Vector<Number>::size () const
+typename Vector<Number>::size_type
+Vector<Number>::size () const
 {
   return vec_size;
 }

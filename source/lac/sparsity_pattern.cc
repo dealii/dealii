@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/vector_slice.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/sparsity_pattern.h>
@@ -294,7 +295,7 @@ SparsityPattern::reinit (const size_type m,
     {
       vec_len = 1;
       max_vec_len = vec_len;
-      colnums.reset (new size_type[max_vec_len]);
+      colnums = std_cxx14::make_unique<size_type[]> (max_vec_len);
     }
 
   max_row_length = (row_lengths.size() == 0 ?
@@ -315,14 +316,14 @@ SparsityPattern::reinit (const size_type m,
   if (rows > max_dim)
     {
       max_dim = rows;
-      rowstart.reset (new std::size_t[max_dim+1]);
+      rowstart = std_cxx14::make_unique<std::size_t[]> (max_dim+1);
     }
 
   // allocate memory for the column numbers if necessary
   if (vec_len > max_vec_len)
     {
       max_vec_len = vec_len;
-      colnums.reset (new size_type[max_vec_len]);
+      colnums = std_cxx14::make_unique<size_type[]> (max_vec_len);
     }
 
   // set the rowstart array
@@ -974,8 +975,8 @@ SparsityPattern::block_read (std::istream &in)
   AssertThrow (c == '[', ExcIO());
 
   // reallocate space
-  rowstart.reset (new std::size_t[max_dim+1]);
-  colnums.reset (new size_type[max_vec_len]);
+  rowstart = std_cxx14::make_unique<std::size_t[]> (max_dim+1);
+  colnums = std_cxx14::make_unique<size_type[]> (max_vec_len);
 
   // then read data
   in.read (reinterpret_cast<char *>(rowstart.get()),

@@ -323,7 +323,7 @@ namespace LinearAlgebra
       /**
        * Pointer to the actual Epetra vector object.
        */
-      std::shared_ptr<Epetra_FEVector> vector;
+      std::unique_ptr<Epetra_FEVector> vector;
 
       /**
        * IndexSet of the elements of the last imported vector.

@@ -321,13 +321,13 @@ namespace TrilinosWrappers
      * side vector and the solution vector, which is passed down to the
      * Trilinos solver.
      */
-    std::shared_ptr<Epetra_LinearProblem> linear_problem;
+    std::unique_ptr<Epetra_LinearProblem> linear_problem;
 
     /**
      * A structure that contains a Trilinos object that can query the linear
      * solver and determine whether the convergence criterion have been met.
      */
-    std::shared_ptr<AztecOO_StatusTest> status_test;
+    std::unique_ptr<AztecOO_StatusTest> status_test;
 
     /**
      * A structure that contains the Trilinos solver and preconditioner
@@ -719,13 +719,13 @@ namespace TrilinosWrappers
      * side vector and the solution vector, which is passed down to the
      * Trilinos solver.
      */
-    std::shared_ptr<Epetra_LinearProblem> linear_problem;
+    std::unique_ptr<Epetra_LinearProblem> linear_problem;
 
     /**
      * A structure that contains the Trilinos solver and preconditioner
      * objects.
      */
-    std::shared_ptr<Amesos_BaseSolver> solver;
+    std::unique_ptr<Amesos_BaseSolver> solver;
 
     /**
      * Store a copy of the flags for this particular solver.

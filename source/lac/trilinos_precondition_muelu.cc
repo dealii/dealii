@@ -230,7 +230,7 @@ namespace TrilinosWrappers
 
     // MueLu::EpetraOperator is just a wrapper around a "standard"
     // Epetra_Operator.
-    preconditioner.reset(new MueLu::EpetraOperator(hierarchy));
+    preconditioner = std::make_shared<MueLu::EpetraOperator>(hierarchy);
   }
 
 
@@ -250,11 +250,12 @@ namespace TrilinosWrappers
     // equidistributed map; avoid
     // storing the nonzero
     // elements.
-    vector_distributor.reset (new Epetra_Map(static_cast<TrilinosWrappers::types::int_type>(n_rows),
-                                             0, communicator));
+    vector_distributor = std::make_shared<Epetra_Map>
+                         (static_cast<TrilinosWrappers::types::int_type>(n_rows),
+                          0, communicator);
 
     if (trilinos_matrix.get() == nullptr)
-      trilinos_matrix.reset (new SparseMatrix());
+      trilinos_matrix = std::make_shared<SparseMatrix>();
 
     trilinos_matrix->reinit (*vector_distributor, *vector_distributor,
                              deal_ii_sparse_matrix, drop_tolerance, true,

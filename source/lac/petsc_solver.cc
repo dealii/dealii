@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/lac/petsc_solver.h>
 
 #ifdef DEAL_II_WITH_PETSC
@@ -66,7 +67,7 @@ namespace PETScWrappers
     // is necessary
     if (solver_data.get() == nullptr)
       {
-        solver_data.reset (new SolverData());
+        solver_data = std_cxx14::make_unique<SolverData>();
 
         PetscErrorCode ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -202,7 +203,7 @@ namespace PETScWrappers
   {
     PetscErrorCode ierr;
 
-    solver_data.reset (new SolverData());
+    solver_data = std_cxx14::make_unique<SolverData>();
 
     ierr = KSPCreate (mpi_communicator, &solver_data->ksp);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -698,7 +699,7 @@ namespace PETScWrappers
      */
     if (solver_data.get() == 0)
       {
-        solver_data.reset (new SolverDataMUMPS ());
+        solver_data = std_cxx14::make_unique<SolverDataMUMPS >();
 
         /**
          * creates the default KSP context and puts it in the location

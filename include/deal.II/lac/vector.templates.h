@@ -264,7 +264,7 @@ void Vector<Number>::reinit (const size_type n,
     {
       values.reset();
       max_vec_size = vec_size = 0;
-      thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
+      thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
       return;
     }
 
@@ -281,7 +281,7 @@ void Vector<Number>::reinit (const size_type n,
       // only reset the partitioner if we actually expect a significant vector
       // size
       if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size)
-        thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
+        thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
     }
 
   if (omit_zeroing_entries == false)
@@ -298,7 +298,7 @@ void Vector<Number>::grow_or_shrink (const size_type n)
     {
       values.reset();
       max_vec_size = vec_size = 0;
-      thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
+      thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
       return;
     }
 
@@ -316,7 +316,7 @@ void Vector<Number>::grow_or_shrink (const size_type n)
       // only reset the partitioner if we actually expect a significant vector
       // size
       if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size)
-        thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
+        thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
     }
 
   // pad with zeroes

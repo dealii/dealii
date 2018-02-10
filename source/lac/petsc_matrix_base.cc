@@ -62,8 +62,8 @@ namespace PETScWrappers
       // iterator for an empty line (what
       // would it point to?)
       Assert (ncols != 0, ExcInternalError());
-      colnum_cache.reset (new std::vector<size_type> (colnums, colnums+ncols));
-      value_cache.reset (new std::vector<PetscScalar> (values, values+ncols));
+      colnum_cache = std::make_shared<std::vector<size_type>> (colnums, colnums+ncols);
+      value_cache = std::make_shared<std::vector<PetscScalar>> (values, values+ncols);
 
       // and finally restore the matrix
       ierr = MatRestoreRow(*matrix, this->a_row, &ncols, &colnums, &values);

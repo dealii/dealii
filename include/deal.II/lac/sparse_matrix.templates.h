@@ -253,7 +253,7 @@ SparseMatrix<number>::reinit (const SparsityPattern &sparsity)
   const std::size_t N = cols->n_nonzero_elements();
   if (N > max_len || max_len == 0)
     {
-      val.reset (new number[N]);
+      val = std_cxx14::make_unique<number[]>(N);
       max_len = N;
     }
 
@@ -1982,7 +1982,7 @@ SparseMatrix<number>::block_read (std::istream &in)
   AssertThrow (c == '[', ExcIO());
 
   // reallocate space
-  val.reset (new number[max_len]);
+  val = std_cxx14::make_unique<number[]> (max_len);
 
   // then read data
   in.read (reinterpret_cast<char *>(val.get()),
