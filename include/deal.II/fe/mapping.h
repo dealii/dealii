@@ -24,6 +24,7 @@
 
 #include <array>
 #include <cmath>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -303,7 +304,7 @@ public:
    * This function is mainly used by the hp::MappingCollection class.
    */
   virtual
-  Mapping<dim,spacedim> *clone () const = 0;
+  std::unique_ptr<Mapping<dim,spacedim>> clone () const = 0;
 
   /**
    * Return the mapped vertices of a cell.

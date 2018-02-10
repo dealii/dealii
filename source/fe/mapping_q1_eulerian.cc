@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/std_cxx14/memory.h>
+
 #include <deal.II/fe/mapping_q1_eulerian.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
@@ -116,10 +118,10 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
 
 
 template <int dim, class VectorType, int spacedim>
-MappingQ1Eulerian<dim,VectorType,spacedim> *
+std::unique_ptr<Mapping<dim,spacedim> >
 MappingQ1Eulerian<dim, VectorType, spacedim>::clone () const
 {
-  return new MappingQ1Eulerian<dim,VectorType,spacedim>(*this);
+  return std_cxx14::make_unique<MappingQ1Eulerian<dim,VectorType,spacedim>>(*this);
 }
 
 

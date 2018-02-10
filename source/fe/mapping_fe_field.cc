@@ -20,6 +20,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -1974,10 +1975,10 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_component_mask() con
 
 
 template <int dim, int spacedim, typename VectorType, typename DoFHandlerType>
-Mapping<dim,spacedim> *
+std::unique_ptr<Mapping<dim,spacedim> >
 MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::clone () const
 {
-  return new MappingFEField<dim,spacedim,VectorType,DoFHandlerType>(*this);
+  return std_cxx14::make_unique<MappingFEField<dim,spacedim,VectorType,DoFHandlerType>>(*this);
 }
 
 

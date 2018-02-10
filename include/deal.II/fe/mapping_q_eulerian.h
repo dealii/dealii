@@ -126,7 +126,7 @@ public:
    * then assumes ownership of it.
    */
   virtual
-  Mapping<dim,spacedim> *clone () const;
+  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
 
   /**
    * Always return @p false because MappingQEulerian does not in general

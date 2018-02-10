@@ -123,7 +123,7 @@ public:
    * then assumes ownership of it.
    */
   virtual
-  MappingQ1Eulerian<dim,VectorType,spacedim> *clone () const;
+  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
 
   /**
    * Always returns @p false because MappingQ1Eulerian does not in general

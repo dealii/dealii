@@ -22,6 +22,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/tensor_product_matrix.h>
 #include <deal.II/grid/tria.h>
@@ -2154,10 +2155,10 @@ MappingQGeneric<dim,spacedim>::MappingQGeneric (const MappingQGeneric<dim,spaced
 
 
 template <int dim, int spacedim>
-Mapping<dim,spacedim> *
+std::unique_ptr<Mapping<dim,spacedim> >
 MappingQGeneric<dim,spacedim>::clone () const
 {
-  return new MappingQGeneric<dim,spacedim>(*this);
+  return std_cxx14::make_unique<MappingQGeneric<dim,spacedim>>(*this);
 }
 
 

@@ -64,7 +64,7 @@ public:
 
   // for documentation, see the Mapping base class
   virtual
-  Mapping<dim, spacedim> *clone () const;
+  std::unique_ptr<Mapping<dim, spacedim>> clone () const override;
 
   /**
    * Return @p true because MappingCartesian preserves vertex

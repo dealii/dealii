@@ -18,6 +18,7 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/full_matrix.h>
@@ -77,7 +78,7 @@ MappingQ<dim,spacedim>::MappingQ (const unsigned int degree,
   // created via the shared_ptr objects
   qp_mapping (this->polynomial_degree>1
               ?
-              std::shared_ptr<const MappingQGeneric<dim,spacedim> >(new MappingQGeneric<dim,spacedim>(degree))
+              std::make_shared<const MappingQGeneric<dim,spacedim>>(degree)
               :
               q1_mapping)
 {}
@@ -88,18 +89,27 @@ template <int dim, int spacedim>
 MappingQ<dim,spacedim>::MappingQ (const MappingQ<dim,spacedim> &mapping)
   :
   polynomial_degree (mapping.polynomial_degree),
-  use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells),
-  // clone the Q1 mapping for use on interior cells (if necessary)
-  // or to create a good initial guess in transform_real_to_unit_cell()
-  q1_mapping (dynamic_cast<MappingQGeneric<dim,spacedim>*>(mapping.q1_mapping->clone())),
-  // create a Q_p mapping; if p=1, simply share the Q_1 mapping already
-  // created via the shared_ptr objects
-  qp_mapping (this->polynomial_degree>1
-              ?
-              std::shared_ptr<const MappingQGeneric<dim,spacedim> >(dynamic_cast<MappingQGeneric<dim,spacedim>*>(mapping.qp_mapping->clone()))
-              :
-              q1_mapping)
-{}
+  use_mapping_q_on_all_cells (mapping.use_mapping_q_on_all_cells)
+{
+  // Note that we really do have to use clone() here, since mapping.q1_mapping
+  // may be MappingQ1Eulerian and mapping.qp_mapping may be MappingQEulerian.
+  std::shared_ptr<const Mapping<dim,spacedim>> other_q1_map = mapping.q1_mapping->clone();
+  q1_mapping = std::dynamic_pointer_cast<const MappingQGeneric<dim,spacedim>>(other_q1_map);
+  Assert(q1_mapping != nullptr, ExcInternalError());
+  Assert(q1_mapping->get_degree() == 1, ExcInternalError());
+
+  // Same as the other constructor: if possible reuse the Q1 mapping
+  if (this->polynomial_degree == 1)
+    {
+      qp_mapping = q1_mapping;
+    }
+  else
+    {
+      std::shared_ptr<const Mapping<dim,spacedim>> other_qp_map = mapping.qp_mapping->clone();
+      qp_mapping = std::dynamic_pointer_cast<const MappingQGeneric<dim,spacedim>>(other_qp_map);
+      Assert(qp_mapping != nullptr, ExcInternalError());
+    }
+}
 
 
 
@@ -502,11 +512,11 @@ transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_it
 
 
 template <int dim, int spacedim>
-Mapping<dim,spacedim> *
+std::unique_ptr<Mapping<dim,spacedim> >
 MappingQ<dim,spacedim>::clone () const
 {
-  return new MappingQ<dim,spacedim>(this->polynomial_degree,
-                                    this->use_mapping_q_on_all_cells);
+  return std_cxx14::make_unique<MappingQ<dim,spacedim>>(this->polynomial_degree,
+                                                        this->use_mapping_q_on_all_cells);
 }
 
 

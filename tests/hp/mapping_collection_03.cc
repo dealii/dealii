@@ -31,9 +31,9 @@ void test ()
 {
   MappingQ<dim> mapping(2);
   deallog << "Cloning..." << std::endl;
-  Mapping<dim> *copy = mapping.clone();
+  std::unique_ptr<Mapping<dim>> copy = mapping.clone();
   deallog << "Deleting clone..." << std::endl;
-  delete copy;
+  copy.reset();
   deallog << "Destroying original..." << std::endl;
 }
 
