@@ -20,13 +20,11 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/utilities.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
 #include <boost/io/ios_state.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <fstream>
 #include <iostream>

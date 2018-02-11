@@ -25,7 +25,6 @@
 #include <iostream>
 #include <set>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 #include <IGESControl_Controller.hxx>
 #include <IGESControl_Reader.hxx>
@@ -78,7 +77,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <GCPnts_AbscissaPoint.hxx>
 #include <ShapeAnalysis_Surface.hxx>
 
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <vector>
 #include <algorithm>

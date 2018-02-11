@@ -21,15 +21,11 @@
 #include <cmath>
 #include <map>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random.hpp>
 #include <boost/math/special_functions/erf.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #ifdef DEAL_II_WITH_MUPARSER
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <muParser.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #else
 
 

@@ -35,9 +35,7 @@
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/trilinos_epetra_vector.h>
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Import.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 #ifdef DEAL_II_WITH_CUDA

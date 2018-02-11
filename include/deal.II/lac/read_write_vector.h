@@ -33,9 +33,7 @@
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #  include <deal.II/lac/trilinos_epetra_vector.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_MultiVector.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #endif
 

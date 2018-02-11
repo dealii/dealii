@@ -35,11 +35,9 @@
 #endif
 
 #ifdef DEAL_II_WITH_ASSIMP
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 

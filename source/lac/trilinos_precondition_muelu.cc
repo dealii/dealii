@@ -24,7 +24,6 @@
 #  include <deal.II/lac/trilinos_index_access.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Teuchos_ParameterList.hpp>
 #  include <Teuchos_RCP.hpp>
 #  include <Epetra_MultiVector.h>
@@ -34,7 +33,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <MueLu.hpp>
 #  include <MueLu_EpetraOperator.hpp>
 #  include <MueLu_MLParameterListInterpreter.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

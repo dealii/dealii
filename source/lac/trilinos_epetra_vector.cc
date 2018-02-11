@@ -25,11 +25,9 @@
 
 #include <deal.II/lac/read_write_vector.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Import.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_MpiComm.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 DEAL_II_NAMESPACE_OPEN

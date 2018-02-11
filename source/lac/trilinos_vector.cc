@@ -22,13 +22,11 @@
 #  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #  include <deal.II/lac/trilinos_index_access.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Import.h>
 #  include <Epetra_Export.h>
 #  include <Epetra_Vector.h>
 
 #  include <boost/io/ios_state.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <cmath>
 

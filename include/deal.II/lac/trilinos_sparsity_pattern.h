@@ -30,7 +30,6 @@
 #  include <memory>
 
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FECrsGraph.h>
 #  include <Epetra_Map.h>
 #  ifdef DEAL_II_WITH_MPI
@@ -39,7 +38,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  else
 #    include <Epetra_SerialComm.h>
 #  endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 DEAL_II_NAMESPACE_OPEN

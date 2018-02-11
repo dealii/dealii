@@ -36,7 +36,6 @@
 #  endif
 #endif
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
@@ -48,7 +47,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <boost/iostreams/device/back_inserter.hpp>
 #  include <boost/iostreams/filter/gzip.hpp>
 #endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

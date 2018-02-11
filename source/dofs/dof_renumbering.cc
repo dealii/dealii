@@ -48,10 +48,8 @@
 #include <boost/graph/minimum_degree_ordering.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/graph/bandwidth.hpp>
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <vector>
 #include <map>

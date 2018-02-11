@@ -25,9 +25,7 @@
 #  include <deal.II/lac/sparsity_pattern.h>
 #  include <deal.II/lac/trilinos_index_access.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Export.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
