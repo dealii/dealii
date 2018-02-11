@@ -119,7 +119,7 @@ public:
    */
   virtual
   std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const override;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -134,7 +134,7 @@ public:
    * provide zero displacements at vertex locations).
    */
   virtual
-  bool preserves_vertex_locations () const;
+  bool preserves_vertex_locations () const override;
 
   /**
    * Exception which is thrown when the mapping is being evaluated at
@@ -157,7 +157,7 @@ protected:
                   const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const override;
 
   /**
    * Reference to the vector of shifts.
@@ -200,7 +200,7 @@ private:
      */
     virtual
     std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-    get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+    get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const override;
 
     /**
      * Compute the positions of the support points in the current
@@ -209,7 +209,7 @@ private:
      */
     virtual
     std::vector<Point<spacedim> >
-    compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+    compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const override;
 
     /**
      * Always return @p false because MappingQEulerianGeneric does not in general
@@ -217,7 +217,7 @@ private:
      * provide for zero displacements at vertex locations).
      */
     virtual
-    bool preserves_vertex_locations () const;
+    bool preserves_vertex_locations () const override;
 
   private:
     /**
