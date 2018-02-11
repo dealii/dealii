@@ -26,7 +26,7 @@ void create_spd (FullMatrix &A)
   for (unsigned int i = 0; i < size; ++i)
     for (unsigned int j = i; j < size; ++j)
       {
-        const double val = random_value<double>();
+        const double val = random_value<typename FullMatrix::value_type>();
         Assert (val >= 0. && val <= 1.,
                 ExcInternalError());
         if (i==j)
@@ -48,5 +48,5 @@ void create_random (FullMatrix &A)
 {
   for (unsigned int i = 0; i < A.m(); ++i)
     for (unsigned int j = 0; j < A.n(); ++j)
-      A(i,j) = random_value<double>();
+      A(i,j) = random_value<typename FullMatrix::value_type>();
 }

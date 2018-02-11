@@ -388,10 +388,16 @@ public:
 private:
 
   /**
+   * Calculate the norm of a distributed symmetric dense matrix using ScaLAPACK's
+   * internal function.
+   */
+  NumberType norm_symmetric(const char type) const;
+
+  /**
    * Calculate the norm of a distributed dense matrix using ScaLAPACK's
    * internal function.
    */
-  NumberType norm(const char type) const;
+  NumberType norm_general(const char type) const;
 
   /**
    * Computing selected eigenvalues and, optionally, the eigenvectors.
