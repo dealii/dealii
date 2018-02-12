@@ -972,9 +972,6 @@ void ScaLAPACKMatrix<NumberType>::save(const char *filename,
   AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
 #else
 
-  Assert((chunk_size.first <= (unsigned int)n_rows) && (chunk_size.first>0),ExcIndexRange(chunk_size.first,1,n_rows+1));
-  Assert((chunk_size.second <= (unsigned int)n_columns) && (chunk_size.second>0),ExcIndexRange(chunk_size.second,1,n_columns+1));
-
   std::pair<unsigned int,unsigned int> chunks_size_ = chunk_size;
 
   if (chunks_size_.first==numbers::invalid_unsigned_int || chunks_size_.second==numbers::invalid_unsigned_int)
@@ -983,6 +980,8 @@ void ScaLAPACKMatrix<NumberType>::save(const char *filename,
       chunks_size_.first = n_rows;
       chunks_size_.second = 1;
     }
+  Assert((chunks_size_.first <= (unsigned int)n_rows) && (chunks_size_.first>0),ExcIndexRange(chunks_size_.first,1,n_rows+1));
+  Assert((chunks_size_.second <= (unsigned int)n_columns) && (chunks_size_.second>0),ExcIndexRange(chunks_size_.second,1,n_columns+1));
 
 #  ifdef H5_HAVE_PARALLEL
   //implementation for configurations equipped with a parallel file system
