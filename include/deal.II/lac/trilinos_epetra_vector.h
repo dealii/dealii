@@ -29,10 +29,8 @@
 #include <deal.II/lac/vector_type_traits.h>
 #include <memory>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
 #  include <Epetra_FEVector.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

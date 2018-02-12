@@ -21,9 +21,7 @@
 
 #include <deal.II/base/index_set.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_Map.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <memory>
 

@@ -39,16 +39,12 @@
 // the Functions::InterpolatedUniformGridData class that is declared in the
 // first of the following header files. Because the data is large, the file we
 // read from is stored as gzip compressed data and we make use of some
-// BOOST-provided functionality to read directly from gzipped data. We wrap
-// the BOOST includes with a preprocessor macro that disables certain annoying
-// compiler warnings.
+// BOOST-provided functionality to read directly from gzipped data.
 #include <deal.II/base/function_lib.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <iostream>
 #include <fstream>

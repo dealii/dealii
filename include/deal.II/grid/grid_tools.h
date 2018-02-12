@@ -31,7 +31,6 @@
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/lac/sparsity_tools.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/optional.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
@@ -45,7 +44,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <boost/iostreams/filter/gzip.hpp>
 #endif
 
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <bitset>
 #include <list>

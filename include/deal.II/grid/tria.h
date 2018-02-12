@@ -26,13 +26,11 @@
 #include <deal.II/grid/tria_iterator_selector.h>
 
 // Ignore deprecation warnings for auto_ptr.
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/signals2.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/split_member.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <vector>
 #include <list>

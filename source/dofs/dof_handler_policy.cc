@@ -30,7 +30,6 @@
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #ifdef DEAL_II_WITH_ZLIB
@@ -40,7 +39,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/serialization/array.hpp>
 #endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <set>
 #include <algorithm>

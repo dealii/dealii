@@ -33,7 +33,6 @@
 #  include <utility>
 #  include <memory>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_ConfigDefs.h>
 #  ifdef DEAL_II_WITH_MPI // only if MPI is installed
 #    include <mpi.h>
@@ -44,7 +43,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Epetra_FEVector.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_LocalMap.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

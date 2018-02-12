@@ -20,13 +20,11 @@
 
 #ifdef DEAL_II_WITH_ADOLC
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <adolc/internal/adolc_settings.h>
 #include <adolc/internal/adubfunc.h> // Taped double math functions
 
 #include <adolc/adouble.h> // Taped double
 #include <adolc/adtl.h>    // Tapeless double
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/exceptions.h>

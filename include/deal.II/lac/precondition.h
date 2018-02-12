@@ -908,7 +908,6 @@ public:
   typedef types::global_dof_index size_type;
 
   // avoid warning about use of deprecated variables
-  DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
   /**
    * Standardized data struct to pipe additional parameters to the
@@ -999,7 +998,6 @@ public:
     std::shared_ptr<PreconditionerType> preconditioner;
   };
 
-  DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
   PreconditionChebyshev ();
 
@@ -1960,7 +1958,6 @@ namespace internal
 
 
 // avoid warning about deprecated variable nonzero_starting
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 template <typename MatrixType, class VectorType, typename PreconditionerType>
 inline
@@ -1980,7 +1977,6 @@ AdditionalData (const unsigned int degree,
   max_eigenvalue (max_eigenvalue)
 {}
 
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
@@ -1998,7 +1994,6 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::PreconditionChe
 
 
 // avoid warning about deprecated variable AdditionalData::matrix_diagonal_inverse
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 inline
@@ -2035,7 +2030,6 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::clear ()
   data.preconditioner.reset();
 }
 
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 

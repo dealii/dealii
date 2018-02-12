@@ -32,18 +32,14 @@
 #endif
 
 #ifdef DEAL_II_WITH_METIS
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 extern "C"
 {
 #include <metis.h>
 }
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 #ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <zoltan_cpp.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 #include <string>

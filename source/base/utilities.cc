@@ -27,11 +27,9 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/thread_local_storage.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/math/special_functions/erf.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <cctype>
@@ -55,7 +53,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
@@ -66,7 +63,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Teuchos_RCP.hpp>
 #  include <Epetra_SerialComm.h>
 #endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 

@@ -28,7 +28,6 @@
 
 #  include <memory>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  else
@@ -39,7 +38,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Teuchos_ParameterList.hpp>
 #  include <Epetra_RowMatrix.h>
 #  include <Epetra_Vector.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 // forward declarations
 class Ifpack_Preconditioner;
