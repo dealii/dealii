@@ -1,0 +1,5 @@
+New: add parallel::distributed::BlockVector::mmult(const BlockVector &, const FullMatrixType &)
+and parallel::distributed::BlockVector::multivector_inner_product_with_metric(const FullMatrixType &, const BlockVector &V, const bool) const
+to operate on multivectors with a metric tensor.
+<br>
+(Denis Davydov, 2018/02/10)
