@@ -19,6 +19,7 @@
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/lac/full_matrix.h>
@@ -176,10 +177,10 @@ MappingManifold<dim,spacedim>::MappingManifold (const MappingManifold<dim,spaced
 
 
 template <int dim, int spacedim>
-Mapping<dim,spacedim> *
+std::unique_ptr<Mapping<dim,spacedim> >
 MappingManifold<dim,spacedim>::clone () const
 {
-  return new MappingManifold<dim,spacedim>(*this);
+  return std_cxx14::make_unique<MappingManifold<dim,spacedim>>(*this);
 }
 
 

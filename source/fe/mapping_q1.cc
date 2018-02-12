@@ -20,6 +20,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -49,10 +50,10 @@ MappingQ1<dim,spacedim>::MappingQ1 ()
 
 
 template <int dim, int spacedim>
-MappingQ1<dim,spacedim> *
+std::unique_ptr<Mapping<dim,spacedim> >
 MappingQ1<dim,spacedim>::clone () const
 {
-  return new MappingQ1<dim,spacedim>(*this);
+  return std_cxx14::make_unique<MappingQ1<dim,spacedim>>(*this);
 }
 
 //---------------------------------------------------------------------------

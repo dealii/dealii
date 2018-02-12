@@ -116,21 +116,22 @@ public:
    */
   virtual
   std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+  get_vertices (const typename Triangulation<dim,spacedim>::cell_iterator &cell) const override;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
    * then assumes ownership of it.
    */
   virtual
-  MappingQ1Eulerian<dim,VectorType,spacedim> *clone () const;
+  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
 
   /**
    * Always returns @p false because MappingQ1Eulerian does not in general
    * preserve vertex locations (unless the translation vector happens to
    * provide for zero displacements at vertex locations).
    */
-  bool preserves_vertex_locations () const;
+  virtual
+  bool preserves_vertex_locations () const override;
 
   /**
    * Exception.
@@ -154,7 +155,7 @@ protected:
                   const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const override;
 
   /**
    * Compute the support points of the mapping. For the current class, these
@@ -164,7 +165,7 @@ protected:
    */
   virtual
   std::vector<Point<spacedim> >
-  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const;
+  compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_iterator &cell) const override;
 
   /**
    * Reference to the vector of shifts.

@@ -50,7 +50,7 @@ public:
    * then assumes ownership of it.
    */
   virtual
-  Mapping<dim,spacedim> *clone () const;
+  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
 
 protected:
 
@@ -77,7 +77,8 @@ protected:
      * interpolating the boundary (as does the base class), but rather such
      * that the resulting cubic mapping is a continuous one.
      */
-    virtual void
+    virtual
+    void
     add_line_support_points (const typename Triangulation<dim>::cell_iterator &cell,
                              std::vector<Point<dim> > &a) const override;
 
@@ -90,7 +91,8 @@ protected:
      * interpolating the boundary (as does the base class), but rather such
      * that the resulting cubic mapping is a continuous one.
      */
-    virtual void
+    virtual
+    void
     add_quad_support_points(const typename Triangulation<dim>::cell_iterator &cell,
                             std::vector<Point<dim> > &a) const override;
   };

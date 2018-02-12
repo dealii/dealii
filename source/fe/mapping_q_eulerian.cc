@@ -15,6 +15,7 @@
 
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_vector.h>
@@ -79,12 +80,11 @@ MappingQEulerian (const unsigned int              degree,
 
 
 template <int dim, class VectorType, int spacedim>
-Mapping<dim,spacedim> *
+std::unique_ptr<Mapping<dim,spacedim> >
 MappingQEulerian<dim, VectorType, spacedim>::clone () const
 {
-  return new MappingQEulerian<dim,VectorType,spacedim>(this->get_degree(),
-                                                       *euler_dof_handler,
-                                                       *euler_vector);
+  return std_cxx14::make_unique<MappingQEulerian<dim,VectorType,spacedim>>
+         (this->get_degree(), *euler_dof_handler, *euler_vector);
 }
 
 

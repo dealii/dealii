@@ -24,6 +24,7 @@
 
 #include <array>
 #include <cmath>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -291,7 +292,8 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~Mapping () = default;
+  virtual
+  ~Mapping () override = default;
 
   /**
    * Return a pointer to a copy of the present object. The caller of this copy
@@ -303,7 +305,7 @@ public:
    * This function is mainly used by the hp::MappingCollection class.
    */
   virtual
-  Mapping<dim,spacedim> *clone () const = 0;
+  std::unique_ptr<Mapping<dim,spacedim>> clone () const = 0;
 
   /**
    * Return the mapped vertices of a cell.
@@ -540,7 +542,8 @@ public:
     /**
      * Virtual destructor for derived classes
      */
-    virtual ~InternalDataBase () = default;
+    virtual
+    ~InternalDataBase () = default;
 
     /**
      * A set of update flags specifying the kind of information that an
@@ -561,7 +564,8 @@ public:
     /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
-    virtual std::size_t memory_consumption () const;
+    virtual
+    std::size_t memory_consumption () const;
   };
 
 
@@ -826,7 +830,8 @@ protected:
    * filled; which ones need to be filled is determined by the update flags
    * stored inside the @p internal_data object.
    */
-  virtual void
+  virtual
+  void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator    &cell,
                        const unsigned int                                            face_no,
                        const Quadrature<dim-1>                                      &quadrature,
@@ -859,7 +864,8 @@ protected:
    * filled; which ones need to be filled is determined by the update flags
    * stored inside the @p internal_data object.
    */
-  virtual void
+  virtual
+  void
   fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator     &cell,
                           const unsigned int                                             face_no,
                           const unsigned int                                             subface_no,

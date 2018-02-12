@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/quadrature.h>
@@ -1064,10 +1064,10 @@ MappingCartesian<dim, spacedim>::transform_real_to_unit_cell (
 
 
 template <int dim, int spacedim>
-Mapping<dim, spacedim> *
+std::unique_ptr<Mapping<dim, spacedim> >
 MappingCartesian<dim, spacedim>::clone () const
 {
-  return new MappingCartesian<dim, spacedim>(*this);
+  return std_cxx14::make_unique<MappingCartesian<dim,spacedim>>(*this);
 }
 
 

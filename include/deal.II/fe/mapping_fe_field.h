@@ -123,7 +123,7 @@ public:
    * then assumes ownership of it.
    */
   virtual
-  Mapping<dim,spacedim> *clone () const;
+  std::unique_ptr<Mapping<dim,spacedim>> clone () const override;
 
 
 
@@ -133,7 +133,7 @@ public:
    * class always returns @p false.
    */
   virtual
-  bool preserves_vertex_locations () const;
+  bool preserves_vertex_locations () const override;
 
 
   /**
@@ -145,13 +145,13 @@ public:
   virtual
   Point<spacedim>
   transform_unit_to_real_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               const Point<dim>                                 &p) const;
+                               const Point<dim>                                 &p) const override;
 
   // for documentation, see the Mapping base class
   virtual
   Point<dim>
   transform_real_to_unit_cell (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                               const Point<spacedim>                            &p) const;
+                               const Point<spacedim>                            &p) const override;
 
   /**
    * @}
@@ -168,7 +168,7 @@ public:
   transform (const ArrayView<const Tensor<1,dim> >                  &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const ArrayView<Tensor<1,spacedim> >                   &output) const;
+             const ArrayView<Tensor<1,spacedim> >                   &output) const override;
 
   // for documentation, see the Mapping base class
   virtual
@@ -176,7 +176,7 @@ public:
   transform (const ArrayView<const DerivativeForm<1, dim, spacedim> > &input,
              const MappingType                                         type,
              const typename Mapping<dim,spacedim>::InternalDataBase   &internal,
-             const ArrayView<Tensor<2,spacedim> >                     &output) const;
+             const ArrayView<Tensor<2,spacedim> >                     &output) const override;
 
   // for documentation, see the Mapping base class
   virtual
@@ -184,7 +184,7 @@ public:
   transform (const ArrayView<const Tensor<2, dim> >                 &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const ArrayView<Tensor<2,spacedim> >                   &output) const;
+             const ArrayView<Tensor<2,spacedim> >                   &output) const override;
 
   // for documentation, see the Mapping base class
   virtual
@@ -192,7 +192,7 @@ public:
   transform (const ArrayView<const DerivativeForm<2, dim, spacedim> > &input,
              const MappingType                                         type,
              const typename Mapping<dim,spacedim>::InternalDataBase   &internal,
-             const ArrayView<Tensor<3,spacedim> >                     &output) const;
+             const ArrayView<Tensor<3,spacedim> >                     &output) const override;
 
   // for documentation, see the Mapping base class
   virtual
@@ -200,7 +200,7 @@ public:
   transform (const ArrayView<const Tensor<3, dim> >                 &input,
              const MappingType                                       type,
              const typename Mapping<dim,spacedim>::InternalDataBase &internal,
-             const ArrayView<Tensor<3,spacedim> >                   &output) const;
+             const ArrayView<Tensor<3,spacedim> >                   &output) const override;
 
   /**
    * @}
@@ -234,7 +234,7 @@ private:
   // documentation can be found in Mapping::requires_update_flags()
   virtual
   UpdateFlags
-  requires_update_flags (const UpdateFlags update_flags) const;
+  requires_update_flags (const UpdateFlags update_flags) const override;
 
 public:
   /**
@@ -321,7 +321,8 @@ public:
     /**
      * Return an estimate (in bytes) or the memory consumption of this object.
      */
-    virtual std::size_t memory_consumption () const;
+    virtual
+    std::size_t memory_consumption () const override;
 
     /**
      * Values of shape functions. Access by function @p shape.
@@ -446,19 +447,19 @@ private:
   virtual
   InternalData *
   get_data (const UpdateFlags,
-            const Quadrature<dim> &quadrature) const;
+            const Quadrature<dim> &quadrature) const override;
 
   // documentation can be found in Mapping::get_face_data()
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags flags,
-                 const Quadrature<dim-1>& quadrature) const;
+                 const Quadrature<dim-1>& quadrature) const override;
 
   // documentation can be found in Mapping::get_subface_data()
   virtual
   typename Mapping<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags flags,
-                    const Quadrature<dim-1>& quadrature) const;
+                    const Quadrature<dim-1>& quadrature) const override;
 
   // documentation can be found in Mapping::fill_fe_values()
   virtual
@@ -467,24 +468,26 @@ private:
                   const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const override;
 
   // documentation can be found in Mapping::fill_fe_face_values()
-  virtual void
+  virtual
+  void
   fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                        const unsigned int                                         face_no,
                        const Quadrature<dim-1>                                   &quadrature,
                        const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+                       internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const override;
 
   // documentation can be found in Mapping::fill_fe_subface_values()
-  virtual void
+  virtual
+  void
   fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                           const unsigned int                                         face_no,
                           const unsigned int                                         subface_no,
                           const Quadrature<dim-1>                                   &quadrature,
                           const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const;
+                          internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const override;
 
   /**
    * @}
@@ -550,7 +553,8 @@ private:
   /**
    * See the documentation of the base class for detailed information.
    */
-  virtual void
+  virtual
+  void
   compute_shapes_virtual (const std::vector<Point<dim> > &unit_points,
                           typename MappingFEField<dim, spacedim, VectorType, DoFHandlerType>::InternalData &data) const;
 

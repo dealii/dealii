@@ -13,10 +13,14 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/std_cxx14/memory.h>
+
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary.h>
+
 #include <deal.II/fe/mapping_c1.h>
+
 #include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
@@ -208,10 +212,10 @@ MappingC1<dim,spacedim>::MappingC1Generic::add_quad_support_points (const typena
 
 
 template <int dim, int spacedim>
-Mapping<dim, spacedim> *
+std::unique_ptr<Mapping<dim,spacedim> >
 MappingC1<dim,spacedim>::clone () const
 {
-  return new MappingC1<dim,spacedim>();
+  return std_cxx14::make_unique<MappingC1<dim,spacedim>>();
 }
 
 
