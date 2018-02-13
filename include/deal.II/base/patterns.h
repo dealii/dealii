@@ -1390,7 +1390,7 @@ namespace Patterns
                                    &p = Convert<T>::to_pattern())
       {
         std::string str;
-        if (std::is_same<T, unsigned char>() || std::is_same<T, char>())
+        if (std::is_same<T, unsigned char>() || std::is_same<T, signed char>())
           str = std::to_string((int)value);
         else  if (std::is_same<T,bool>::value)
           str = value ? "true" : "false";
@@ -1411,7 +1411,7 @@ namespace Patterns
         else
           {
             std::istringstream is(s);
-            if (std::is_same<T, unsigned char>::value || std::is_same<T, char>::value)
+            if (std::is_same<T, unsigned char>::value || std::is_same<T, signed char>::value)
               {
                 int i;
                 is >> i;
