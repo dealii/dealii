@@ -25,6 +25,8 @@
 
 #include <boost/serialization/utility.hpp>
 
+#include <cstdint>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace internal
@@ -62,7 +64,7 @@ namespace internal
        * equals the length of the @p lines vector, in two dimensions that of
        * the @p quads vector, etc.
        */
-      std::vector<unsigned char> refine_flags;
+      std::vector<std::uint8_t> refine_flags;
 
       /**
        * Same meaning as the one above, but specifies whether a cell must be
@@ -216,7 +218,7 @@ namespace internal
     class TriaLevel<3>
     {
     public:
-      std::vector<unsigned char> refine_flags;
+      std::vector<std::uint8_t> refine_flags;
       std::vector<bool> coarsen_flags;
       std::vector<unsigned int> active_cell_indices;
       std::vector<std::pair<int,int> > neighbors;
