@@ -849,6 +849,10 @@ namespace LinearAlgebra
       AssertIsFinite(a);
       AssertDimension (local_size(), v.local_size());
 
+      // nothing to do if a is zero
+      if (a == Number(0.))
+        return;
+
       internal::VectorOperations::Vectorization_add_av<Number> vector_add(values.get(), v.values.get(), a);
       internal::VectorOperations::parallel_for(vector_add, 0, partitioner->local_size(),
                                                thread_loop_partitioner);
