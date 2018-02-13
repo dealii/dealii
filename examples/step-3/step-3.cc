@@ -623,32 +623,56 @@ void Step3::run ()
 
 // @sect3{The <code>main</code> function}
 
-// This is the main function of the program. Since the concept of a main
-// function is mostly a remnant from the pre-object era in C/C++ programming,
-// it often does not much more than creating an object of the top-level class
-// and calling its principle function.
+// This is the main function of the program. Since the concept of a
+// main function is mostly a remnant from the pre-object oriented era
+// before C++ programming, it often does not do much more than
+// creating an object of the top-level class and calling its principle
+// function.
 //
-// Finally, the first line of the function is used to enable output of the
-// deal.II logstream to the screen.  The deallog (which stands for deal-log,
-// not de-allog) variable represents a stream to which some parts of the
-// library write output. For example, iterative solvers will generate
-// diagnostics (starting residual, number of solver steps, final residual) as
-// can be seen when running this tutorial program.
+// Finally, the first line of the function is used to enable output of
+// some diagnostics that deal.II can generate.  The @p deallog
+// variable (which stands for deal-log, not de-allog) represents a
+// stream to which some parts of the library write output. For
+// example, iterative solvers will generate diagnostics (starting
+// residual, number of solver steps, final residual) as can be seen
+// when running this tutorial program.
 //
-// The output of deallog can be redirected to the console, to a file, or
-// both. But both are disabled by default. The output is nested in a way so
-// that each function can use a prefix string (separated by colons) for each
-// line of output; if it calls another function, that may also use its prefix
-// which is then printed after the one of the calling function. By running
-// this example (or looking at the "Results" section), you will see the solver
-// statistics prefixed with "DEAL:CG", which is two prefixes.  Since output
-// from functions which are nested deep below is usually not as important as
-// top-level output, you can give the deallog variable a maximal depth of
-// nested output for output to console and file. A depth of 0 (the default)
-// will disable output to the screen, while a value of 2 or higher will cause
-// the solver info in this example to be printed. Imagine that different
-// solvers can be nested, which we will see in step-22 for example, and you
-// might not want to see all this information.
+// The output of @p deallog can be written to the console, to a file,
+// or both. Both are disabled by default since over the years we have
+// learned that a program should only generate output when a user
+// explicitly asks for it. But this can be changed, and to explain how
+// this can be done, we need to explain how @p deallog works: When
+// individual parts of the library want to log output, they open a
+// "context" or "section" into which this output will be placed. At
+// the end of the part that wants to write output, one exits this
+// section again. Since a function may call another one from within
+// the scope where this output section is open, output may in fact be
+// nested hierarchically into these sections. The LogStream class of
+// which @p deallog is a variable calls each of these sections a
+// "prefix" because all output is printed with this prefix at the left
+// end of the line, with prefixes separated by colons. There is always
+// a default prefix called "DEAL" (a hint at deal.II's history as the
+// successor of a previous library called "DEAL" and from which the
+// LogStream class is one of the few pieces of code that were taken
+// into deal.II).
+//
+// By default, @p logstream only outputs lines with zero prefixes --
+// i.e., all output is disabled because the default "DEAL" prefix is
+// always there. But one can set a different maximal number of
+// prefixes for lines that should be output to something larger, and
+// indeed here we set it to two by calling
+// LogStream::depth_console(). This means that for all screen output,
+// a context that has pushed one additional prefix beyond the default
+// "DEAL" is allowed to print its output to the screen ("console"),
+// whereas all further nested sections that would have three or more
+// prefixes active would write to @p deallog, but @p deallog does not
+// forward this output to the screen. Thus, running this example (or
+// looking at the "Results" section), you will see the solver
+// statistics prefixed with "DEAL:CG", which is two prefixes. This is
+// sufficient for the context of the current program, but you will see
+// examples later on (e.g., in step-22) where solvers are nested more
+// deeply and where you may get useful information by setting the
+// depth even higher.
 int main ()
 {
   deallog.depth_console (2);
