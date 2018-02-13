@@ -21,6 +21,10 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 
+#include <cstdint>
+
+
+
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN
@@ -335,7 +339,7 @@ struct RefinementPossibilities
     /**
      * Perform isotropic refinement.
      */
-    isotropic_refinement = static_cast<unsigned char>(-1)
+    isotropic_refinement = static_cast<std::uint8_t>(-1)
   };
 };
 
@@ -606,20 +610,20 @@ public:
    * a bit field. To avoid implicit conversions to and from integral values,
    * this constructor is marked as explicit.
    */
-  explicit RefinementCase (const unsigned char refinement_case);
+  explicit RefinementCase (const std::uint8_t refinement_case);
 
   /**
    * Return the numeric value stored by this class. While the presence of this
    * operator might seem dangerous, it is useful in cases where one would like
    * to have code like <tt>switch (refinement_flag)... case
    * RefinementCase<dim>::cut_x: ... </tt>, which can be written as
-   * <code>switch (static_cast@<unsigned char@>(refinement_flag)</code>.
+   * <code>switch (static_cast@<std::uint8_t@>(refinement_flag)</code>.
    * Another application is to use an object of the current type as an index
    * into an array; however, this use is deprecated as it assumes a certain
    * mapping from the symbolic flags defined in the RefinementPossibilities
    * base class to actual numerical values (the array indices).
    */
-  operator unsigned char () const;
+  operator std::uint8_t () const;
 
   /**
    * Return the union of the refinement flags represented by the current
@@ -677,7 +681,7 @@ private:
    * Store the refinement case as a bit field with as many bits as are
    * necessary in any given dimension.
    */
-unsigned char value :
+std::uint8_t value :
   (dim > 0 ? dim : 1);
 };
 
@@ -721,7 +725,7 @@ namespace internal
       /**
        * Refine isotropically.
        */
-      case_isotropic = static_cast<unsigned char>(-1)
+      case_isotropic = static_cast<std::uint8_t>(-1)
     };
   };
 
@@ -976,13 +980,13 @@ namespace internal
      * this operator might seem dangerous, it is useful in cases where one
      * would like to have code like <code>switch (subface_case)... case
      * SubfaceCase::case_x: ... </code>, which can be written as <code>switch
-     * (static_cast@<unsigned char@>(subface_case)</code>. Another application
+     * (static_cast@<std::uint8_t@>(subface_case)</code>. Another application
      * is to use an object of the current type as an index into an array;
      * however, this use is deprecated as it assumes a certain mapping from
      * the symbolic flags defined in the SubfacePossibilities base class to
      * actual numerical values (the array indices).
      */
-    operator unsigned char () const;
+    operator std::uint8_t () const;
 
     /**
      * Return the amount of memory occupied by an object of this type.
@@ -1002,7 +1006,7 @@ namespace internal
      * Store the refinement case as a bit field with as many bits as are
      * necessary in any given dimension.
      */
-  unsigned char value :
+  std::uint8_t value :
     (dim == 3 ? 4 : 1);
   };
 
@@ -2349,7 +2353,7 @@ namespace internal
 
   template <int dim>
   inline
-  SubfaceCase<dim>::operator unsigned char () const
+  SubfaceCase<dim>::operator std::uint8_t () const
   {
     return value;
   }
@@ -2364,7 +2368,7 @@ RefinementCase<dim>
 RefinementCase<dim>::cut_axis (const unsigned int)
 {
   Assert (false, ExcInternalError());
-  return static_cast<unsigned char>(-1);
+  return static_cast<std::uint8_t>(-1);
 }
 
 
@@ -2441,7 +2445,7 @@ RefinementCase (const typename RefinementPossibilities<dim>::Possibilities refin
 
 template <int dim>
 inline
-RefinementCase<dim>::RefinementCase (const unsigned char refinement_case)
+RefinementCase<dim>::RefinementCase (const std::uint8_t refinement_case)
   :
   value (refinement_case)
 {
@@ -2458,7 +2462,7 @@ RefinementCase<dim>::RefinementCase (const unsigned char refinement_case)
 
 template <int dim>
 inline
-RefinementCase<dim>::operator unsigned char () const
+RefinementCase<dim>::operator std::uint8_t () const
 {
   return value;
 }
@@ -2470,7 +2474,7 @@ inline
 RefinementCase<dim>
 RefinementCase<dim>::operator | (const RefinementCase<dim> &r) const
 {
-  return RefinementCase<dim>(static_cast<unsigned char> (value | r.value));
+  return RefinementCase<dim>(static_cast<std::uint8_t> (value | r.value));
 }
 
 
@@ -2480,7 +2484,7 @@ inline
 RefinementCase<dim>
 RefinementCase<dim>::operator & (const RefinementCase<dim> &r) const
 {
-  return RefinementCase<dim>(static_cast<unsigned char> (value & r.value));
+  return RefinementCase<dim>(static_cast<std::uint8_t> (value & r.value));
 }
 
 
@@ -2490,7 +2494,7 @@ inline
 RefinementCase<dim>
 RefinementCase<dim>::operator ~ () const
 {
-  return RefinementCase<dim>(static_cast<unsigned char> (
+  return RefinementCase<dim>(static_cast<std::uint8_t> (
                                (~value) & RefinementPossibilities<dim>::isotropic_refinement));
 }
 
@@ -2514,8 +2518,8 @@ void RefinementCase<dim>::serialize (Archive &ar,
                                      const unsigned int)
 {
   // serialization can't deal with bitfields, so copy from/to a full sized
-  // unsigned char
-  unsigned char uchar_value = value;
+  // std::uint8_t
+  std::uint8_t uchar_value = value;
   ar &uchar_value;
   value = uchar_value;
 }
