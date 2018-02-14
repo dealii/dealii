@@ -22,6 +22,7 @@
 #include <array>
 #include <vector>
 #include <iostream>
+#include <cstdint>
 
 #ifdef DEAL_II_WITH_P4EST
 #include <deal.II/distributed/p4est_wrappers.h>
@@ -76,10 +77,11 @@ public:
    * each entry denotes which child to pick from one refinement level to the
    * next, starting with the coarse cell, until we get to the cell represented
    * by the current object. Therefore, each entry should be a number between 0
-   * and the number of children of a cell in the current space dimension.
+   * and the number of children of a cell in the current space dimension (i.e.,
+   * GeometryInfo<dim>::max_children_per_cell).
    */
   CellId(const unsigned int coarse_cell_id,
-         const std::vector<unsigned char> &child_indices);
+         const std::vector<std::uint8_t> &child_indices);
 
   /**
    * Construct a CellId object with a given @p coarse_cell_id and array of
@@ -88,12 +90,13 @@ public:
    * each entry denotes which child to pick from one refinement level to the
    * next, starting with the coarse cell, until we get to the cell represented
    * by the current object. Therefore, each entry should be a number between 0
-   * and the number of children of a cell in the current space dimension.
-   * @p child_indices shall have at least @p n_child_indices valid entries.
+   * and the number of children of a cell in the current space dimension (i.e.,
+   * GeometryInfo<dim>::max_children_per_cell). The array
+   * @p child_indices must have at least @p n_child_indices valid entries.
    */
-  CellId(const unsigned int coarse_cell_id,
-         const unsigned int n_child_indices,
-         const unsigned char *child_indices);
+  CellId(const unsigned int  coarse_cell_id,
+         const unsigned int  n_child_indices,
+         const std::uint8_t *child_indices);
 
   /**
    * Construct a CellId object with a given binary representation that was
@@ -170,9 +173,9 @@ private:
    * the array can be extended.
    */
 #ifdef DEAL_II_WITH_P4EST
-  std::array<char,internal::p4est::functions<2>::max_level> child_indices;
+  std::array<std::uint8_t,internal::p4est::functions<2>::max_level> child_indices;
 #else
-  std::array<char,30> child_indices;
+  std::array<std::uint8_t,30> child_indices;
 #endif
 
   friend std::istream &operator>> (std::istream &is, CellId &cid);
@@ -192,10 +195,10 @@ std::ostream &operator<< (std::ostream &os,
   os << cid.coarse_cell_id << '_' << cid.n_child_indices << ':';
   for (unsigned int i=0; i<cid.n_child_indices; ++i)
     // write the child indices. because they are between 0 and 2^dim-1, they all
-    // just have one digit, so we could write them as integers. it's
-    // probably clearer to write them as one-digit characters starting
-    // at '0'
-    os << static_cast<unsigned char>(cid.child_indices[i] + '0');
+    // just have one digit, so we could write them as one character
+    // objects. it's probably clearer to write them as one-digit characters
+    // starting at '0'
+    os << static_cast<unsigned char>('0' + cid.child_indices[i]);
   return os;
 }
 
@@ -232,11 +235,11 @@ std::istream &operator>> (std::istream &is,
   is >> dummy;
   Assert(dummy==':', ExcMessage("invalid CellId"));
 
-  char value;
+  unsigned char value;
   for (unsigned int i=0; i<cid.n_child_indices; ++i)
     {
       // read the one-digit child index (as an integer number) and
-      // convert it back into unsigned char
+      // convert it back into unsigned integer type
       is >> value;
       cid.child_indices[i] = value-'0';
     }
