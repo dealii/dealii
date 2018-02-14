@@ -50,7 +50,6 @@ void test()
   print_constant_modes(FE_DGQ<dim>(1));
   print_constant_modes(FE_DGQLegendre<dim>(2));
   print_constant_modes(FE_DGQHermite<dim>(2));
-  print_constant_modes(FE_DGQHermite<dim>(3));
   print_constant_modes(FE_DGP<dim>(2));
   print_constant_modes(FE_Q_Hierarchical<dim>(1));
   print_constant_modes(FE_Q_Hierarchical<dim>(2));

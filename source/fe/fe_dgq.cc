@@ -882,7 +882,7 @@ FE_DGQHermite<dim,spacedim>::FE_DGQHermite (const unsigned int degree)
                          Polynomials::generate_complete_Lagrange_basis
                          (internal::FE_DGQ::get_QGaussLobatto_points(degree))
                          :
-                         Polynomials::HermiteInterpolation::generate_complete_basis(degree))
+                         Polynomials::HermiteLikeInterpolation::generate_complete_basis(degree))
 {}
 
 
@@ -895,17 +895,11 @@ FE_DGQHermite<dim,spacedim>::get_constant_modes () const
     return this->FE_DGQ<dim,spacedim>::get_constant_modes();
   else
     {
-      // The first two basis functions in the Hermite polynomials represent
-      // the value 1 in the left and right end point of the element. Expand
-      // them into the tensor product.
-      AssertThrow(dim<=3, ExcNotImplemented());
-      Table<2,bool> constant_modes(1, this->dofs_per_cell);
-      for (unsigned int i=0; i<(dim>2?2:1); ++i)
-        for (unsigned int j=0; j<(dim>1?2:1); ++j)
-          for (unsigned int k=0; k<2; ++k)
-            constant_modes(0,i*(this->degree+1)*(this->degree+1)+j*(this->degree+1)+k) = true;
+      AssertThrow(false,
+                  ExcMessage("Constant mode cannot be represented by 0/1 vector"));
       return std::pair<Table<2,bool>, std::vector<unsigned int> >
-             (constant_modes, std::vector<unsigned int>(1, 0));
+             (Table<2,bool>(1, this->dofs_per_cell),
+              std::vector<unsigned int>(1, 0));
     }
 }
 

@@ -18,6 +18,9 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/lapack_full_matrix.h>
+
 
 #include <cmath>
 #include <algorithm>
@@ -1220,10 +1223,247 @@ namespace Polynomials
   std::vector<Polynomial<double> >
   HermiteInterpolation::generate_complete_basis (const unsigned int n)
   {
+    Assert(n>=3,
+           ExcNotImplemented("Hermite interpolation makes no sense for "
+                             "degrees less than three"));
     std::vector<Polynomial<double> > basis (n + 1);
 
     for (unsigned int i = 0; i <= n; ++i)
       basis[i] = HermiteInterpolation (i);
+
+    return basis;
+  }
+
+
+// ------------------ HermiteLikeInterpolation --------------- //
+  namespace
+  {
+    // Finds the zero position x_star such that the mass matrix entry (0,1)
+    // with the Hermite polynomials evaluates to zero. The function has
+    // originally been derived by a secant method for the integral entry
+    // l_0(x) * l_1(x) but we only need to do one iteration because the zero
+    // x_star is linear in the integral value.
+    double find_support_point_x_star (const Vector<double> &jacobi_roots)
+    {
+      // Initial guess for the support point position values: The zero turns
+      // out to be between zero and the first root of the Jacobi polynomial,
+      // but the algorithm is agnostic about that, so simply choose two points
+      // that are sufficiently far apart.
+      double guess_left = 0;
+      double guess_right = 0.5;
+      const unsigned int degree = jacobi_roots.size() + 3;
+
+      // Compute two integrals of the product of l_0(x) * l_1(x)
+      // l_0(x) = (x-y)*(x-jacobi_roots(0))*...*(x-jacobi_roos(degree-4))*(x-1)*(x-1)
+      // l_1(x) = (x-0)*(x-jacobi_roots(0))*...*(x-jacobi_roots(degree-4))*(x-1)*(x-1)
+      // where y is either guess_left or guess_right for the two integrals.
+      // Note that the polynomials are not yet normalized here, which is not
+      // necessary because we are only looking for the x_star where the matrix
+      // entry is zero, for which the constants do not matter.
+      QGauss<1> gauss(degree + 1);
+      double integral_left = 0, integral_right = 0;
+      for (unsigned int q=0; q<gauss.size(); ++q)
+        {
+          const double x = gauss.point(q)[0];
+          double poly_val_common = x;
+          for (unsigned int j=0; j<degree-3; ++j)
+            poly_val_common *= Utilities::fixed_power<2>(x-jacobi_roots(j));
+          poly_val_common *= Utilities::fixed_power<4>(x - 1.);
+          integral_left += gauss.weight(q)*(poly_val_common*(x - guess_left));
+          integral_right += gauss.weight(q)*(poly_val_common*(x - guess_right));
+        }
+
+      // compute guess by secant method. Due to linearity in the root x_star,
+      // this is the correct position after this single step
+      return guess_right - (guess_right-guess_left)/(integral_right-integral_left)*integral_right;
+    }
+  }
+
+
+
+  HermiteLikeInterpolation::HermiteLikeInterpolation (const unsigned int degree,
+                                                      const unsigned int index)
+    :
+    Polynomial<double>(0)
+  {
+    Assert(degree>=3,
+           ExcNotImplemented("Hermite interpolation makes no sense for "
+                             "degrees less than three"));
+    AssertIndexRange(index, degree+1);
+
+    this->coefficients.clear();
+    this->in_lagrange_product_form = true;
+
+    this->lagrange_support_points.resize(degree);
+
+    // 4 Polynomials with degree 3
+    // entries (1,0) and (3,2) of the mass matrix will be equal to 0
+    //
+    //     | x  0  x  x |
+    //     | 0  x  x  x |
+    // M = | x  x  x  0 |
+    //     | x  x  0  x |
+    //
+    if (degree==3)
+      {
+        if (index==0)
+          {
+            this->lagrange_support_points[0] = 2./7.;
+            this->lagrange_support_points[1] = 1.;
+            this->lagrange_support_points[2] = 1.;
+            this->lagrange_weight = -3.5;
+          }
+        else if (index==1)
+          {
+            this->lagrange_support_points[0] = 0.;
+            this->lagrange_support_points[1] = 1.;
+            this->lagrange_support_points[2] = 1.;
+            this->lagrange_weight = 6.75;
+          }
+        else if (index==2)
+          {
+            this->lagrange_support_points[0] = 0.;
+            this->lagrange_support_points[1] = 0.;
+            this->lagrange_support_points[2] = 1.;
+            this->lagrange_weight = -6.75;
+          }
+        else if (index==3)
+          {
+            this->lagrange_support_points[0] = 0.;
+            this->lagrange_support_points[1] = 0.;
+            this->lagrange_support_points[2] = 5./7.;
+            this->lagrange_weight = 3.5;
+          }
+      }
+
+    // Higher order Polynomials degree>=4: the entries (1,0) and
+    // (degree,degree-1) of the mass matrix will be equal to 0
+    //
+    //     | x  0  x  x         x  x  x |
+    //     | 0  x  x  x  . . .  x  x  x |
+    //     | x  x  x  x         x  x  x |
+    //     | x  x  x  x         x  x  x |
+    //     |     .       .         .    |
+    // M = |     .         .       .    |
+    //     |     .           .     .    |
+    //     | x  x  x  x         x  x  x |
+    //     | x  x  x  x  . . .  x  x  0 |
+    //     | x  x  x  x         x  0  x |
+    //
+    if (degree >= 4)
+      {
+        // We find the inner points as the zeros of the Jacobi polynomials
+        // with alpha = beta = 2 which is the polynomial with the kernel
+        // (1-x)^2 (1+x)^2, the two polynomials achieving zero value and zero
+        // derivative at the boundary. The zeros of the Jacobi polynomials are
+        // given by the eigenvalues to a symmetric tridiagonal matrix with the
+        // entries given below. For degree 4 the eigenvalue is zero, so bypass
+        // the LAPACK logic in that case.
+
+        Vector<double> jacobi_roots(degree-3);
+        if (degree > 4)
+          {
+            LAPACKFullMatrix<double> jacobi_support_points_mat(degree-3,
+                                                               degree-3);
+            for (unsigned int k=1; k<degree-3; k++)
+              {
+                jacobi_support_points_mat(k-1,k) =
+                  std::sqrt(4.*k*(k+2.)*(k+2.)*(k+4.)/((2.*k+3.)*(2.*k+4.)*(2.*k+4.)*(2.*k+5.)));
+                jacobi_support_points_mat(k,k-1) = jacobi_support_points_mat(k-1,k);
+              }
+
+            // calculate the eigenvalues = zero points of the Jacobi polynomials
+            FullMatrix<double> eigenvectors(degree-3,degree-3);
+            jacobi_support_points_mat.compute_eigenvalues_symmetric(-1., 1., 1.e-20,
+                                                                    jacobi_roots,
+                                                                    eigenvectors);
+            AssertDimension(jacobi_roots.size(), degree-3);
+
+            // Note that this algorithm computes the zeros of the Jacobi
+            // polynomial for the interval [-1,1], so we must scale the
+            // eigenvalues to the interval [0,1] before using them
+            for (unsigned int i=0; i<degree-3; ++i)
+              jacobi_roots(i) = 0.5*jacobi_roots(i)+0.5;
+          }
+        else
+          // only a single zero at x=0.5 for degree==4
+          jacobi_roots(0) = 0.5;
+
+        // iteration from variable support point N with secant method
+        // initial values
+
+        this->lagrange_support_points.resize(degree);
+        if (index==0)
+          {
+            const double auxiliary_zero = find_support_point_x_star(jacobi_roots);
+            this->lagrange_support_points[0] = auxiliary_zero;
+            for (unsigned int m=0; m<degree-3; m++)
+              this->lagrange_support_points[m+1] = jacobi_roots(m);
+            this->lagrange_support_points[degree-2] = 1.;
+            this->lagrange_support_points[degree-1] = 1.;
+
+            // ensure that the polynomial evaluates to one at x=0
+            this->lagrange_weight = 1./this->value(0);
+          }
+        else if (index==1)
+          {
+            this->lagrange_support_points[0] = 0.;
+            for (unsigned int m=0; m<degree-3; m++)
+              this->lagrange_support_points[m+1] = jacobi_roots(m);
+            this->lagrange_support_points[degree-2] = 1.;
+            this->lagrange_support_points[degree-1] = 1.;
+
+            // scale close to approximate maximum
+            this->lagrange_weight = 1./this->value(0.4*jacobi_roots(0));
+          }
+        else if (index>=2 && index<degree-1)
+          {
+            this->lagrange_support_points[0] = 0.;
+            this->lagrange_support_points[1] = 0.;
+            for (unsigned int m=0, c=2; m<degree-3; m++)
+              if (m+2 != index)
+                this->lagrange_support_points[c++] = jacobi_roots(m);
+            this->lagrange_support_points[degree-2] = 1.;
+            this->lagrange_support_points[degree-1] = 1.;
+
+            // ensure that the polynomial evaluates to one at the respective
+            // nodal point
+            this->lagrange_weight = 1./this->value(jacobi_roots(index-2));
+          }
+        else if (index==degree-1)
+          {
+            this->lagrange_support_points[0] = 0.;
+            this->lagrange_support_points[1] = 0.;
+            for (unsigned int m=0; m<degree-3; m++)
+              this->lagrange_support_points[m+2] = jacobi_roots(m);
+            this->lagrange_support_points[degree-1] = 1.;
+
+            this->lagrange_weight = 1./this->value(1.0-0.4*jacobi_roots(0));
+          }
+        else if (index==degree)
+          {
+            const double auxiliary_zero = find_support_point_x_star(jacobi_roots);
+            this->lagrange_support_points[0] = 0.;
+            this->lagrange_support_points[1] = 0.;
+            for (unsigned int m=0; m<degree-3; m++)
+              this->lagrange_support_points[m+2] = jacobi_roots(m);
+            this->lagrange_support_points[degree-1] = 1.-auxiliary_zero;
+
+            // ensure that the polynomial evaluates to one at x=1
+            this->lagrange_weight = 1./this->value(1.);
+          }
+      }
+  }
+
+
+
+  std::vector<Polynomial<double> >
+  HermiteLikeInterpolation::generate_complete_basis (const unsigned int degree)
+  {
+    std::vector<Polynomial<double> > basis (degree + 1);
+
+    for (unsigned int i = 0; i <= degree; ++i)
+      basis[i] = HermiteLikeInterpolation (degree, i);
 
     return basis;
   }

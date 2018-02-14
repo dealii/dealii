@@ -9,4 +9,4 @@ because only the final user code knows the properties of hardware and whether
 a particular store pattern is so large that it will not fit into caches and
 thus benefit from this optimization.
 <br>
-(Martin Kronbichler, 2017/12/01)
+(Martin Kronbichler, 2017/12/27)
