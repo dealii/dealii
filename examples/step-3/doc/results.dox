@@ -203,15 +203,15 @@ suggestions:
   the following result:
   <table align="center">
     <tr> <td># of refinements</td> <td>$\int_\Omega u_h(x)\; dx$</td> </tr>
-    <tr> <td>1</td> <td>0.093750</td> </tr>
-    <tr> <td>2</td> <td>0.127902</td> </tr>
-    <tr> <td>3</td> <td>0.139761</td> </tr>
-    <tr> <td>4</td> <td>0.139761</td> </tr>
-    <tr> <td>5</td> <td>0.140373</td> </tr>
-    <tr> <td>6</td> <td>0.140526</td> </tr>
-    <tr> <td>7</td> <td>0.140564</td> </tr>
-    <tr> <td>8</td> <td>0.140574</td> </tr>
-    <tr> <td>9</td> <td>0.140576</td> </tr>
+    <tr> <td>0</td> <td>0.09375000</td> </tr>
+    <tr> <td>1</td> <td>0.12790179</td> </tr>
+    <tr> <td>2</td> <td>0.13733440</td> </tr>
+    <tr> <td>3</td> <td>0.13976069</td> </tr>
+    <tr> <td>4</td> <td>0.14037251</td> </tr>
+    <tr> <td>5</td> <td>0.14052586</td> </tr>
+    <tr> <td>6</td> <td>0.14056422</td> </tr>
+    <tr> <td>7</td> <td>0.14057382</td> </tr>
+    <tr> <td>8</td> <td>0.14057622</td> </tr>
   </table>
   Again, the difference between two adjacent values goes down by about a
   factor of four, indicating convergence as ${\cal O}(h^2)$.
