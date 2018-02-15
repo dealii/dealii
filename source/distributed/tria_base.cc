@@ -297,6 +297,13 @@ namespace parallel
     Assert (false, ExcNotImplemented());
   }
 
+  template <int dim, int spacedim>
+  void
+  Triangulation<dim, spacedim>::fill_level_ghost_owners()
+  {
+    Assert(false, ExcNotImplemented());
+  }
+
 #endif
 
   template <int dim, int spacedim>

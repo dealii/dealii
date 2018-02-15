@@ -72,30 +72,28 @@ namespace internal
   class ActiveCellIterator
   {
   public:
+#ifndef _MSC_VER
     typedef typename MeshType::active_cell_iterator type;
+#else
+    typedef TriaActiveIterator<dealii::CellAccessor<dim, spacedim> > type;
+#endif
   };
 
+#ifdef _MSC_VER
   template <int dim, int spacedim>
   class ActiveCellIterator<dim, spacedim, dealii::DoFHandler<dim, spacedim> >
   {
   public:
-#ifndef _MSC_VER
-    typedef typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator type;
-#else
-    typedef TriaActiveIterator < dealii::DoFCellAccessor < dealii::DoFHandler<dim, spacedim>, false > > type;
-#endif
+    typedef TriaActiveIterator < dealii::DoFCellAccessor < dealii::DoFHandler<dim, spacedim >, false> > type;
   };
 
   template <int dim, int spacedim>
   class ActiveCellIterator<dim, spacedim, dealii::hp::DoFHandler<dim, spacedim> >
   {
   public:
-#ifndef _MSC_VER
-    typedef typename dealii::hp::DoFHandler<dim, spacedim>::active_cell_iterator type;
-#else
-    typedef TriaActiveIterator < dealii::DoFCellAccessor < dealii::hp::DoFHandler<dim, spacedim>, false > > type;
-#endif
+    typedef TriaActiveIterator < dealii::DoFCellAccessor < dealii::hp::DoFHandler<dim, spacedim >, false> > type;
   };
+#endif
 }
 
 /**
@@ -2905,26 +2903,28 @@ namespace GridTools
             // cases.
             const double step_size = object->diameter()/64.0;
 
-            std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell> vertices;
-            for (unsigned int vertex_n = 0; vertex_n < GeometryInfo<structdim>::vertices_per_cell;
+            constexpr unsigned int n_vertices_per_cell = GeometryInfo<structdim>::vertices_per_cell;
+
+            std::array<Point<spacedim>, n_vertices_per_cell> vertices;
+            for (unsigned int vertex_n = 0; vertex_n < n_vertices_per_cell;
                  ++vertex_n)
               vertices[vertex_n] = object->vertex(vertex_n);
 
             auto get_point_from_weights =
-              [&](const Tensor<1, GeometryInfo<structdim>::vertices_per_cell> &weights)
+              [&](const Tensor<1, n_vertices_per_cell> &weights)
               -> Point<spacedim>
             {
               return object->get_manifold().get_new_point
               (make_array_view(vertices.begin(), vertices.end()),
               make_array_view(&weights[0],
-              &weights[GeometryInfo<structdim>::vertices_per_cell - 1] + 1));
+              &weights[n_vertices_per_cell - 1] + 1));
             };
 
             // pick the initial weights as (normalized) inverse distances from
             // the trial point:
-            Tensor<1, GeometryInfo<structdim>::vertices_per_cell> guess_weights;
+            Tensor<1, n_vertices_per_cell> guess_weights;
             double guess_weights_sum = 0.0;
-            for (unsigned int vertex_n = 0; vertex_n < GeometryInfo<structdim>::vertices_per_cell;
+            for (unsigned int vertex_n = 0; vertex_n < n_vertices_per_cell;
                  ++vertex_n)
               {
                 const double distance = vertices[vertex_n].distance(trial_point);
@@ -2952,10 +2952,10 @@ namespace GridTools
             //
             for (unsigned int outer_n = 0; outer_n < 40; ++outer_n)
               {
-                const unsigned int dependent_direction = GeometryInfo<structdim>::vertices_per_cell - 1;
-                Tensor<1, GeometryInfo<structdim>::vertices_per_cell> current_gradient;
+                const unsigned int dependent_direction = n_vertices_per_cell - 1;
+                Tensor<1, n_vertices_per_cell> current_gradient;
                 for (unsigned int row_n = 0;
-                     row_n < GeometryInfo<structdim>::vertices_per_cell;
+                     row_n < n_vertices_per_cell;
                      ++row_n)
                   {
                     if (row_n != dependent_direction)
@@ -3021,7 +3021,7 @@ namespace GridTools
                 // between zero and one. If the update takes us outside of this
                 // region then rescale the update to stay within the region and
                 // try again
-                Tensor<1, GeometryInfo<structdim>::vertices_per_cell> tentative_weights =
+                Tensor<1, n_vertices_per_cell> tentative_weights =
                   guess_weights + gradient_weight*current_gradient;
 
                 double new_gradient_weight = gradient_weight;
@@ -3030,7 +3030,7 @@ namespace GridTools
                     if (internal::weights_are_ok<structdim>(tentative_weights))
                       break;
 
-                    for (unsigned int i = 0; i < GeometryInfo<structdim>::vertices_per_cell; ++i)
+                    for (unsigned int i = 0; i < n_vertices_per_cell; ++i)
                       {
                         if (tentative_weights[i] < 0.0)
                           {

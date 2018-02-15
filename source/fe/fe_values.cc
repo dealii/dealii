@@ -119,7 +119,7 @@ namespace FEValuesViews
 // variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-      = internal::make_shape_function_to_row_table (fe);
+      = dealii::internal::make_shape_function_to_row_table (fe);
 
     for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
       {
@@ -180,7 +180,7 @@ namespace FEValuesViews
 // variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-      = internal::make_shape_function_to_row_table (fe);
+      = dealii::internal::make_shape_function_to_row_table (fe);
 
     for (unsigned int d=0; d<spacedim; ++d)
       {
@@ -278,7 +278,7 @@ namespace FEValuesViews
 // variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-      = internal::make_shape_function_to_row_table (fe);
+      = dealii::internal::make_shape_function_to_row_table (fe);
 
     for (unsigned int d = 0; d < dealii::SymmetricTensor<2,dim>::n_independent_components; ++d)
       {
@@ -377,7 +377,7 @@ namespace FEValuesViews
 // variables from FEValuesBase, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-      = internal::make_shape_function_to_row_table (fe);
+      = dealii::internal::make_shape_function_to_row_table (fe);
 
     for (unsigned int d = 0; d < dim*dim; ++d)
       {
@@ -2609,7 +2609,7 @@ namespace internal
       // the rows in the tables storing the data by shape function and
       // nonzero component
       this->shape_function_to_row_table
-        = internal::make_shape_function_to_row_table (fe);
+        = dealii::internal::make_shape_function_to_row_table (fe);
 
       // count the total number of non-zero components accumulated
       // over all shape functions

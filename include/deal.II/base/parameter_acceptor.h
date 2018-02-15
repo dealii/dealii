@@ -474,7 +474,7 @@ public:
   void add_parameter(const std::string &entry,
                      ParameterType &parameter,
                      const std::string &documentation = std::string(),
-                     ParameterHandler &prm = ParameterAcceptor::prm,
+                     ParameterHandler &prm_ = prm,
                      const Patterns::PatternBase &pattern =
                        *Patterns::Tools::Convert<ParameterType>::to_pattern());
 
