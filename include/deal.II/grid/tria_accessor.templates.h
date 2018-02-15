@@ -1460,7 +1460,7 @@ isotropic_child_index (const unsigned int i) const
     case 2:
     {
       const RefinementCase<2>
-      this_refinement_case (static_cast<unsigned char>(refinement_case()));
+      this_refinement_case (static_cast<std::uint8_t>(refinement_case()));
 
       Assert (this_refinement_case != RefinementCase<2>::no_refinement,
               TriaAccessorExceptions::ExcCellHasNoChildren());
@@ -1513,8 +1513,8 @@ TriaAccessor<structdim, dim, spacedim>::refinement_case() const
                // which this part of
                // the code is dead
                // anyway)
-               static_cast<unsigned char>(RefinementCase<1>::cut_x) :
-               static_cast<unsigned char>(RefinementCase<1>::no_refinement)));
+               static_cast<std::uint8_t>(RefinementCase<1>::cut_x) :
+               static_cast<std::uint8_t>(RefinementCase<1>::no_refinement)));
 
     default:
       Assert (static_cast<unsigned int> (this->present_index) <
@@ -1567,7 +1567,7 @@ isotropic_child (const unsigned int i) const
     case 2:
     {
       const RefinementCase<2>
-      this_refinement_case (static_cast<unsigned char>(refinement_case()));
+      this_refinement_case (static_cast<std::uint8_t>(refinement_case()));
 
       Assert (this_refinement_case != RefinementCase<2>::no_refinement,
               TriaAccessorExceptions::ExcCellHasNoChildren());
@@ -3447,7 +3447,7 @@ CellAccessor<3>::subface_case(const unsigned int face_no) const
   Assert(active(), TriaAccessorExceptions::ExcCellNotActive());
   Assert(face_no<GeometryInfo<3>::faces_per_cell,
          ExcIndexRange(face_no,0,GeometryInfo<3>::faces_per_cell));
-  switch (static_cast<unsigned char> (face(face_no)->refinement_case()))
+  switch (static_cast<std::uint8_t> (face(face_no)->refinement_case()))
     {
     case RefinementCase<3>::no_refinement:
       return dealii::internal::SubfaceCase<3>::case_none;
