@@ -1506,43 +1506,72 @@ void ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
 
 
 
-template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::scale_columns(const ArrayView<const NumberType> &factors)
+namespace internal
 {
-  Assert(n_columns==(int)factors.size(),ExcDimensionMismatch(n_columns,factors.size()));
+  namespace
+  {
 
-  if (this->grid->mpi_process_is_active)
-    for (int i=0; i<n_local_columns; ++i)
-      {
-        const NumberType s = factors[global_column(i)];
+    template <typename NumberType>
+    void scale_columns(ScaLAPACKMatrix<NumberType>       &matrix,
+                       const ArrayView<const NumberType> &factors,
+                       const bool                         grid_mpi_process_is_active)
+    {
+      Assert(matrix.n()==factors.size(),ExcDimensionMismatch(matrix.n(),factors.size()));
 
-        for (int j=0; j<n_local_rows; ++j)
-          local_el(j,i) *= s;
-      }
+      if (grid_mpi_process_is_active)
+        for (unsigned int i=0; i<matrix.local_n(); ++i)
+          {
+            const NumberType s = factors[matrix.global_column(i)];
+
+            for (unsigned int j=0; j<matrix.local_m(); ++j)
+              matrix.local_el(j,i) *= s;
+          }
+    }
+
+    template <typename NumberType>
+    void scale_rows(ScaLAPACKMatrix<NumberType>       &matrix,
+                    const ArrayView<const NumberType> &factors,
+                    const bool                         grid_mpi_process_is_active)
+    {
+      Assert(matrix.m()==factors.size(),ExcDimensionMismatch(matrix.m(),factors.size()));
+
+      if (grid_mpi_process_is_active)
+        for (unsigned int i=0; i<matrix.local_m(); ++i)
+          {
+            const NumberType s = factors[matrix.global_row(i)];
+
+            for (unsigned int j=0; j<matrix.local_n(); ++j)
+              matrix.local_el(i,j) *= s;
+          }
+    }
+
+  }
 }
 
 
 
 template <typename NumberType>
-void ScaLAPACKMatrix<NumberType>::scale_rows(const ArrayView<const NumberType> &factors)
+template <class InputVector>
+void ScaLAPACKMatrix<NumberType>::scale_columns(const InputVector &factors)
 {
-  Assert(n_rows==(int)factors.size(),ExcDimensionMismatch(n_rows,factors.size()));
+  internal::scale_columns(*this, make_array_view(factors),
+                          this->grid->mpi_process_is_active);
+}
 
-  if (this->grid->mpi_process_is_active)
-    for (int i=0; i<n_local_rows; ++i)
-      {
-        const NumberType s = factors[global_row(i)];
 
-        for (int j=0; j<n_local_columns; ++j)
-          local_el(i,j) *= s;
-      }
+
+template <typename NumberType>
+template <class InputVector>
+void ScaLAPACKMatrix<NumberType>::scale_rows(const InputVector &factors)
+{
+  internal::scale_rows(*this, make_array_view(factors),
+                       this->grid->mpi_process_is_active);
 }
 
 
 
 // instantiations
-template class ScaLAPACKMatrix<double>;
-template class ScaLAPACKMatrix<float>;
+#include "scalapack.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE

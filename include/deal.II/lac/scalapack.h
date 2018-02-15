@@ -26,7 +26,6 @@
 #include <deal.II/lac/lapack_support.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/thread_management.h>
-#include <deal.II/base/array_view.h>
 #include <mpi.h>
 
 #include <memory>
@@ -543,8 +542,12 @@ public:
    * The array @p factors must have as many entries as the matrix columns.
    *
    * Copies of @p factors have to be available on all processes of the underlying MPI communicator.
+   *
+   * @note The fundamental prerequisite for the @p InputVector is that it must be possible to
+   * create an ArrayView from it; this is satisfied by the @p std::vector and Vector classes.
    */
-  void scale_columns(const ArrayView<const NumberType> &factors);
+  template <class InputVector>
+  void scale_columns(const InputVector &factors);
 
   /**
    * Scale the rows of the distributed matrix by the scalars provided in the array @p factors.
@@ -552,8 +555,12 @@ public:
    * The array @p factors must have as many entries as the matrix rows.
    *
    * Copies of @p factors have to be available on all processes of the underlying MPI communicator.
+   *
+   * @note The fundamental prerequisite for the @p InputVector is that it must be possible to
+   * create an ArrayView from it; this is satisfied by the @p std::vector and Vector classes.
    */
-  void scale_rows(const ArrayView<const NumberType> &factors);
+  template <class InputVector>
+  void scale_rows(const InputVector &factors);
 
 private:
 

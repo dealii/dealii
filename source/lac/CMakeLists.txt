@@ -73,6 +73,7 @@ SET(_inst
   precondition_block.inst.in
   relaxation_block.inst.in
   read_write_vector.inst.in
+  scalapack.inst.in
   solver.inst.in
   sparse_matrix_ez.inst.in
   sparse_matrix.inst.in
