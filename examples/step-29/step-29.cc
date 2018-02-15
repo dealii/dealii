@@ -143,7 +143,7 @@ namespace Step29
   {
   public:
     ParameterReader(ParameterHandler &);
-    void read_parameters(const std::string);
+    void read_parameters(const std::string &);
 
   private:
     void declare_parameters();
@@ -249,7 +249,7 @@ namespace Step29
   // the input file whose filename is provided by the caller. After the call
   // to this function is complete, the <code>prm</code> object can be used to
   // retrieve the values of the parameters read in from the file:
-  void ParameterReader::read_parameters (const std::string parameter_file)
+  void ParameterReader::read_parameters (const std::string &parameter_file)
   {
     declare_parameters();
 
