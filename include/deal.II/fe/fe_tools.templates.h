@@ -21,6 +21,7 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/constraint_matrix.h>
@@ -938,7 +939,7 @@ namespace FETools
 
   // Not implemented in the general case.
   template <class FE>
-  FiniteElement<FE::dimension, FE::space_dimension> *
+  std::unique_ptr<FiniteElement<FE::dimension, FE::space_dimension> >
   FEFactory<FE>::get (const Quadrature<1> &) const
   {
     Assert(false, ExcNotImplemented());
@@ -947,111 +948,111 @@ namespace FETools
 
   // Specializations for FE_Q.
   template <>
-  FiniteElement<1, 1> *
+  std::unique_ptr<FiniteElement<1, 1> >
   FEFactory<FE_Q<1, 1> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_Q<1>(quad);
+    return std_cxx14::make_unique<FE_Q<1>>(quad);
   }
 
   template <>
-  FiniteElement<2, 2> *
+  std::unique_ptr<FiniteElement<2, 2> >
   FEFactory<FE_Q<2, 2> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_Q<2>(quad);
+    return std_cxx14::make_unique<FE_Q<2>>(quad);
   }
 
   template <>
-  FiniteElement<3, 3> *
+  std::unique_ptr<FiniteElement<3, 3> >
   FEFactory<FE_Q<3, 3> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_Q<3>(quad);
+    return std_cxx14::make_unique<FE_Q<3>>(quad);
   }
 
   // Specializations for FE_Q_DG0.
   template <>
-  FiniteElement<1, 1> *
+  std::unique_ptr<FiniteElement<1, 1> >
   FEFactory<FE_Q_DG0<1, 1> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_Q_DG0<1>(quad);
+    return std_cxx14::make_unique<FE_Q_DG0<1>>(quad);
   }
 
   template <>
-  FiniteElement<2, 2> *
+  std::unique_ptr<FiniteElement<2, 2> >
   FEFactory<FE_Q_DG0<2, 2> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_Q_DG0<2>(quad);
+    return std_cxx14::make_unique<FE_Q_DG0<2>>(quad);
   }
 
   template <>
-  FiniteElement<3, 3> *
+  std::unique_ptr<FiniteElement<3, 3> >
   FEFactory<FE_Q_DG0<3, 3> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_Q_DG0<3>(quad);
+    return std_cxx14::make_unique<FE_Q_DG0<3>>(quad);
   }
 
   // Specializations for FE_Q_Bubbles.
   template <>
-  FiniteElement<1, 1> *
+  std::unique_ptr<FiniteElement<1, 1> >
   FEFactory<FE_Q_Bubbles<1, 1> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_Q_Bubbles<1>(quad);
+    return std_cxx14::make_unique<FE_Q_Bubbles<1>>(quad);
   }
 
   template <>
-  FiniteElement<2, 2> *
+  std::unique_ptr<FiniteElement<2, 2> >
   FEFactory<FE_Q_Bubbles<2, 2> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_Q_Bubbles<2>(quad);
+    return std_cxx14::make_unique<FE_Q_Bubbles<2>>(quad);
   }
 
   template <>
-  FiniteElement<3, 3> *
+  std::unique_ptr<FiniteElement<3, 3> >
   FEFactory<FE_Q_Bubbles<3, 3> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_Q_Bubbles<3>(quad);
+    return std_cxx14::make_unique<FE_Q_Bubbles<3>>(quad);
   }
 
   // Specializations for FE_DGQArbitraryNodes.
   template <>
-  FiniteElement<1, 1> *
+  std::unique_ptr<FiniteElement<1, 1> >
   FEFactory<FE_DGQ<1> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_DGQArbitraryNodes<1>(quad);
+    return std_cxx14::make_unique<FE_DGQArbitraryNodes<1>>(quad);
   }
 
   template <>
-  FiniteElement<1, 2> *
+  std::unique_ptr<FiniteElement<1, 2> >
   FEFactory<FE_DGQ<1, 2> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_DGQArbitraryNodes<1, 2>(quad);
+    return std_cxx14::make_unique<FE_DGQArbitraryNodes<1, 2>>(quad);
   }
 
   template <>
-  FiniteElement<1, 3> *
+  std::unique_ptr<FiniteElement<1, 3> >
   FEFactory<FE_DGQ<1, 3> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_DGQArbitraryNodes<1, 3>(quad);
+    return std_cxx14::make_unique<FE_DGQArbitraryNodes<1, 3>>(quad);
   }
 
   template <>
-  FiniteElement<2, 2> *
+  std::unique_ptr<FiniteElement<2, 2> >
   FEFactory<FE_DGQ<2> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_DGQArbitraryNodes<2>(quad);
+    return std_cxx14::make_unique<FE_DGQArbitraryNodes<2>>(quad);
   }
 
   template <>
-  FiniteElement<2, 3> *
+  std::unique_ptr<FiniteElement<2, 3> >
   FEFactory<FE_DGQ<2, 3> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_DGQArbitraryNodes<2, 3>(quad);
+    return std_cxx14::make_unique<FE_DGQArbitraryNodes<2, 3>>(quad);
   }
 
   template <>
-  FiniteElement<3, 3> *
+  std::unique_ptr<FiniteElement<3, 3> >
   FEFactory<FE_DGQ<3> >::get (const Quadrature<1> &quad) const
   {
-    return new FE_DGQArbitraryNodes<3>(quad);
+    return std_cxx14::make_unique<FE_DGQArbitraryNodes<3>>(quad);
   }
 }
 
@@ -1065,9 +1066,9 @@ namespace
 
   template <int dim>
   void
-  fill_no_codim_fe_names (std::map<std::string,std::shared_ptr<const Subscriptor> > &result)
+  fill_no_codim_fe_names (std::map<std::string,std::unique_ptr<const Subscriptor> > &result)
   {
-    typedef std::shared_ptr<const Subscriptor> FEFactoryPointer;
+    typedef std::unique_ptr<const Subscriptor> FEFactoryPointer;
 
     result["FE_Q_Hierarchical"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<dim> >);
@@ -1130,9 +1131,9 @@ namespace
   // nonzero codimension.
   template <int dim, int spacedim>
   void
-  fill_codim_fe_names (std::map<std::string,std::shared_ptr<const Subscriptor> > &result)
+  fill_codim_fe_names (std::map<std::string,std::unique_ptr<const Subscriptor> > &result)
   {
-    typedef std::shared_ptr<const Subscriptor> FEFactoryPointer;
+    typedef std::unique_ptr<const Subscriptor> FEFactoryPointer;
 
     result["FE_Bernstein"]
       = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim,spacedim> >);
@@ -1166,12 +1167,12 @@ namespace
   // by the functions above.
   std::vector<std::vector<
   std::map<std::string,
-      std::shared_ptr<const Subscriptor> > > >
+      std::unique_ptr<const Subscriptor> > > >
       fill_default_map()
   {
     std::vector<std::vector<
     std::map<std::string,
-        std::shared_ptr<const Subscriptor> > > >
+        std::unique_ptr<const Subscriptor> > > >
         result(4);
 
     for (unsigned int d=0; d<4; ++d)
@@ -1211,7 +1212,7 @@ namespace
   // all entries of this vector are of different type, we store
   // pointers to generic objects and cast them when needed.
 
-  // We use a shared pointer to factory objects, to ensure that they
+  // We use a unique pointer to factory objects, to ensure that they
   // get deleted at the end of the program run and don't end up as
   // apparent memory leaks to programs like valgrind.
 
@@ -1223,7 +1224,7 @@ namespace
   static
   std::vector<std::vector<
   std::map<std::string,
-      std::shared_ptr<const Subscriptor> > > >
+      std::unique_ptr<const Subscriptor> > > >
       fe_name_map = fill_default_map();
 }
 
@@ -2293,7 +2294,7 @@ namespace FETools
     // Insert the normalized name into
     // the map
     fe_name_map[dim][spacedim][name] =
-      std::shared_ptr<const Subscriptor> (factory);
+      std::unique_ptr<const Subscriptor> (factory);
   }
 
 
@@ -2306,10 +2307,10 @@ namespace FETools
       // have a unique interface. could be done
       // smarter?
       template <int dim, int spacedim>
-      FiniteElement<dim,spacedim> *
+      std::unique_ptr<FiniteElement<dim,spacedim> >
       get_fe_by_name_ext (std::string &name,
                           const std::map<std::string,
-                          std::shared_ptr<const Subscriptor> >
+                          std::unique_ptr<const Subscriptor> >
                           &fe_name_map)
       {
         // Extract the name of the
@@ -2338,120 +2339,84 @@ namespace FETools
             // recursive calls if one of
             // these calls should throw
             // an exception
-            std::vector<const FiniteElement<dim,spacedim>*> base_fes;
+            std::vector<std::unique_ptr<const FiniteElement<dim,spacedim> > > base_fes;
             std::vector<unsigned int>        base_multiplicities;
-            try
+
+            // Now, just the [...]
+            // part should be left.
+            if (name.size() == 0 || name[0] != '[')
+              throw (std::string("Invalid first character in ") + name);
+            do
               {
-                // Now, just the [...]
-                // part should be left.
-                if (name.size() == 0 || name[0] != '[')
-                  throw (std::string("Invalid first character in ") + name);
-                do
-                  {
-                    // Erase the
-                    // leading '[' or '-'
-                    name.erase(0,1);
-                    // Now, the name of the
-                    // first base element is
-                    // first... Let's get it
-                    base_fes.push_back (get_fe_by_name_ext<dim,spacedim> (name,
-                                                                          fe_name_map));
-                    // next check whether
-                    // FESystem placed a
-                    // multiplicity after
-                    // the element name
-                    if (name[0] == '^')
-                      {
-                        // yes. Delete the '^'
-                        // and read this
-                        // multiplicity
-                        name.erase(0,1);
-
-                        const std::pair<int,unsigned int> tmp
-                          = Utilities::get_integer_at_position (name, 0);
-                        name.erase(0, tmp.second);
-                        // add to length,
-                        // including the '^'
-                        base_multiplicities.push_back (tmp.first);
-                      }
-                    else
-                      // no, so
-                      // multiplicity is
-                      // 1
-                      base_multiplicities.push_back (1);
-
-                    // so that's it for
-                    // this base
-                    // element. base
-                    // elements are
-                    // separated by '-',
-                    // and the list is
-                    // terminated by ']',
-                    // so loop while the
-                    // next character is
-                    // '-'
-                  }
-                while (name[0] == '-');
-
-                // so we got to the end
-                // of the '-' separated
-                // list. make sure that
-                // we actually had a ']'
-                // there
-                if (name.size() == 0 || name[0] != ']')
-                  throw (std::string("Invalid first character in ") + name);
+                // Erase the
+                // leading '[' or '-'
                 name.erase(0,1);
-                // just one more sanity check
-                Assert ((base_fes.size() == base_multiplicities.size())
-                        &&
-                        (base_fes.size() > 0),
-                        ExcInternalError());
+                // Now, the name of the
+                // first base element is
+                // first... Let's get it
+                base_fes.push_back (get_fe_by_name_ext<dim,spacedim> (name,
+                                                                      fe_name_map));
+                // next check whether
+                // FESystem placed a
+                // multiplicity after
+                // the element name
+                if (name[0] == '^')
+                  {
+                    // yes. Delete the '^'
+                    // and read this
+                    // multiplicity
+                    name.erase(0,1);
 
-                // ok, apparently
-                // everything went ok. so
-                // generate the composed
-                // element
-                FiniteElement<dim,spacedim> *system_element = nullptr;
+                    const std::pair<int,unsigned int> tmp
+                      = Utilities::get_integer_at_position (name, 0);
+                    name.erase(0, tmp.second);
+                    // add to length,
+                    // including the '^'
+                    base_multiplicities.push_back (tmp.first);
+                  }
+                else
+                  // no, so
+                  // multiplicity is
+                  // 1
+                  base_multiplicities.push_back (1);
 
-                // uses new FESystem constructor
-                // which is independent of
-                // the number of FEs in the system
-                system_element = new FESystem<dim,spacedim>(base_fes, base_multiplicities);
-
-                // now we don't need the
-                // list of base elements
-                // any more
-                for (unsigned int i=0; i<base_fes.size(); ++i)
-                  delete base_fes[i];
-
-                // finally return our
-                // findings
-                // Add the closing ']' to
-                // the length
-                return system_element;
-
+                // so that's it for
+                // this base
+                // element. base
+                // elements are
+                // separated by '-',
+                // and the list is
+                // terminated by ']',
+                // so loop while the
+                // next character is
+                // '-'
               }
-            catch (...)
-              {
-                // ups, some exception
-                // was thrown. prevent a
-                // memory leak, and then
-                // pass on the exception
-                // to the caller
-                for (unsigned int i=0; i<base_fes.size(); ++i)
-                  delete base_fes[i];
-                throw;
-              }
+            while (name[0] == '-');
 
-            // this is a place where we
-            // should really never get,
-            // since above we have either
-            // returned from the
-            // try-clause, or have
-            // re-thrown in the catch
-            // clause. check that we
-            // never get here
-            Assert (false, ExcInternalError());
+            // so we got to the end
+            // of the '-' separated
+            // list. make sure that
+            // we actually had a ']'
+            // there
+            if (name.size() == 0 || name[0] != ']')
+              throw (std::string("Invalid first character in ") + name);
+            name.erase(0,1);
+            // just one more sanity check
+            Assert ((base_fes.size() == base_multiplicities.size())
+                    &&
+                    (base_fes.size() > 0),
+                    ExcInternalError());
+
+            // this is a workaround since the constructor for FESystem
+            // only accepts raw pointers.
+            std::vector<const FiniteElement<dim,spacedim> *> raw_base_fes;
+            for (const auto &base_fe: base_fes)
+              raw_base_fes.push_back(base_fe.get());
+
+            // ok, apparently everything went ok. so generate the composed element.
+            // and return it.
+            return std_cxx14::make_unique<FESystem<dim,spacedim> >
+                   (raw_base_fes, base_multiplicities);
           }
         else if (name_part == "FE_Nothing")
           {
@@ -2556,7 +2521,7 @@ namespace FETools
 
 
       template <int dim,int spacedim>
-      FiniteElement<dim,spacedim> *get_fe_by_name (std::string &name)
+      std::unique_ptr<FiniteElement<dim,spacedim> >get_fe_by_name (std::string &name)
       {
         return get_fe_by_name_ext<dim,spacedim> (name, fe_name_map[dim][spacedim]);
       }
@@ -2569,13 +2534,13 @@ namespace FETools
   FiniteElement<dim> *
   get_fe_from_name (const std::string &parameter_name)
   {
-    return get_fe_by_name<dim,dim> (parameter_name);
+    return get_fe_by_name<dim,dim> (parameter_name).release();
   }
 
 
 
   template <int dim, int spacedim>
-  FiniteElement<dim, spacedim> *
+  std::unique_ptr<FiniteElement<dim, spacedim> >
   get_fe_by_name (const std::string &parameter_name)
   {
     std::string name = Utilities::trim(parameter_name);
@@ -2643,7 +2608,7 @@ namespace FETools
 
     try
       {
-        FiniteElement<dim,spacedim> *fe = internal::get_fe_by_name<dim,spacedim> (name);
+        auto fe = internal::get_fe_by_name<dim,spacedim> (name);
 
         // Make sure the auxiliary function
         // ate up all characters of the name.
