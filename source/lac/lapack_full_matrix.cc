@@ -704,8 +704,22 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number>       &C,
   const number alpha = 1.;
   const number beta = (adding ? 1. : 0.);
 
-  gemm("T", "N", &mm, &nn, &kk, &alpha, &this->values[0], &kk, &B.values[0],
-       &kk, &beta, &C.values[0], &mm);
+  if (PointerComparison::equal (this, &B))
+    {
+      syrk(&LAPACKSupport::U,"T",&nn,&kk,&alpha,&this->values[0],&kk,&beta,&C.values[0],&nn);
+
+      // fill-in lower triangular part
+      for (types::blas_int j = 0; j < nn; ++j)
+        for (types::blas_int i = 0; i < j; ++i)
+          C(j,i) = C(i,j);
+
+      C.property = symmetric;
+    }
+  else
+    {
+      gemm("T", "N", &mm, &nn, &kk, &alpha, &this->values[0], &kk, &B.values[0],
+           &kk, &beta, &C.values[0], &mm);
+    }
 }
 
 
