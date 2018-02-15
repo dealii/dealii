@@ -921,8 +921,8 @@ namespace VectorTools
    * which stores quadrature point data.
    *
    * @p fe_component allow to additionally specify which component of @p data
-   * to use in case it was constructed with an <code>std::vector<const DoFHandler<dim>*></code>
-   * in will be internally used in constructor of FEEvaluation object.
+   * to use in case it was constructed with an <code>std::vector<const DoFHandler<dim>*></code>.
+   * It will be used internally in constructor of FEEvaluation object.
    */
   template <int dim, typename VectorType>
   void project (std::shared_ptr<const MatrixFree<dim,typename VectorType::value_type> > data,
