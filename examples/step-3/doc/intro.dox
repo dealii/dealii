@@ -295,7 +295,7 @@ common structure that almost all following tutorial programs will use:
        may want to output it in a format that can be visualized, or you may
        want to compute quantities you are interested in: say, heat fluxes in a
        heat exchanger, air friction coefficients of a wing, maximum bridge
-       loads, or simple the value of the numerical solution at a point. This
+       loads, or simply the value of the numerical solution at a point. This
        function is therefore the place for postprocessing your solution.
 </ul>
 All of this is held together by the single public function (other than the
