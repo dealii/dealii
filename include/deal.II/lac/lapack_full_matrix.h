@@ -421,6 +421,25 @@ public:
                const bool                      adding=false) const;
 
   /**
+   * Matrix-matrix-multiplication using transpose of <tt>this</tt> and a
+   * diagonal vector @p V.
+   *
+   * If the <code>adding=false</code> then the result is stored in the matrix
+   * $C = A^T \rm{diag}(V) B$
+   * otherwise it is added $C \mathrel{+}= A^T \rm{diag}(V) B$.
+   *
+   * @note It is assumed that @p A, @p B and @p V have compatible sizes and that
+   * @p C already has the right size.
+   *
+   * @note This function is not provided by LAPACK. The function first forms $BV$ product and
+   * then uses Xgemm function.
+   */
+  void Tmmult (LAPACKFullMatrix<number>       &C,
+               const LAPACKFullMatrix<number> &B,
+               const Vector<number>           &V,
+               const bool                      adding=false) const;
+
+  /**
    * Matrix-matrix-multiplication using transpose of <tt>B</tt>.
    *
    * The optional parameter <tt>adding</tt> determines, whether the result is
@@ -474,6 +493,12 @@ public:
   void TmTmult (FullMatrix<number>             &C,
                 const LAPACKFullMatrix<number> &B,
                 const bool                      adding=false) const;
+
+  /**
+   * Scale rows of this matrix by @p V . This is equivalent to premultiplication
+   * with a diagonal matrix $A\leftarrow {\rm diag}(V)A$.
+   */
+  void scale_rows(const Vector<number> &V);
 
   /**
    * Compute the LU factorization of the matrix using LAPACK function Xgetrf.
