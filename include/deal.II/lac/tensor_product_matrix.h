@@ -730,25 +730,21 @@ TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
   this->derivative_matrix = derivative_matrix;
 
   constexpr unsigned int macro_size = VectorizedArray<Number>::n_array_elements;
-  const unsigned int nm_flat_size
-    = (size > 0)
-      ? (Utilities::fixed_int_power<size,dim>::value
-         * Utilities::fixed_int_power<size,dim>::value * macro_size)
-      : (Utilities::fixed_power<dim>(mass_matrix[0].n_rows())
-         * Utilities::fixed_power<dim>(mass_matrix[0].n_rows()) * macro_size);
-  const unsigned int n_flat_size
-    = (size > 0)
-      ? Utilities::fixed_int_power<size,dim>::value * macro_size
-      : Utilities::fixed_power<dim>(mass_matrix[0].n_rows()) * macro_size;
+  std::size_t n_rows_max = (size > 0) ? size : 0 ;
+  if (size == -1)
+    for (unsigned int d = 0; d < dim; ++d)
+      n_rows_max = std::max(n_rows_max, mass_matrix[d].n_rows());
+  const std::size_t nm_flat_size_max = n_rows_max * n_rows_max * macro_size;
+  const std::size_t n_flat_size_max  = n_rows_max * macro_size;
 
   std::vector<Number> mass_matrix_flat;
   std::vector<Number> deriv_matrix_flat;
   std::vector<Number> eigenvalues_flat;
   std::vector<Number> eigenvectors_flat;
-  mass_matrix_flat.reserve (nm_flat_size);
-  deriv_matrix_flat.reserve (nm_flat_size);
-  eigenvalues_flat.reserve (n_flat_size);
-  eigenvectors_flat.reserve (nm_flat_size);
+  mass_matrix_flat.resize (nm_flat_size_max);
+  deriv_matrix_flat.resize (nm_flat_size_max);
+  eigenvalues_flat.resize (n_flat_size_max);
+  eigenvectors_flat.resize (nm_flat_size_max);
   std::array<unsigned int,macro_size> offsets_nm;
   std::array<unsigned int,macro_size> offsets_n;
   for (int dir = 0; dir < dim; ++dir)
@@ -763,11 +759,6 @@ TensorProductMatrixSymmetricSum<dim,VectorizedArray<Number>,size>
       const unsigned int n_rows = mass_matrix[dir].n_rows();
       const unsigned int n_cols = mass_matrix[dir].n_cols();
       const unsigned int nm = n_rows * n_cols;
-
-      mass_matrix_flat.resize (macro_size*nm);
-      deriv_matrix_flat.resize (macro_size*nm);
-      eigenvalues_flat.resize (macro_size*n_rows);
-      eigenvectors_flat.resize (macro_size*nm);
       for (unsigned int vv=0; vv<macro_size; ++vv)
         offsets_nm[vv] = nm * vv;
 
