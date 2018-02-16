@@ -36,7 +36,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_accessor.h>
 
-// In this file contains the description of the Lagrange interpolation finite
+// This file contains the description of the Lagrange interpolation finite
 // element:
 #include <deal.II/fe/fe_q.h>
 
@@ -44,7 +44,7 @@
 // matrices, as shown in previous examples:
 #include <deal.II/dofs/dof_tools.h>
 
-// The next two file are needed for assembling the matrix using quadrature on
+// The next two files are needed for assembling the matrix using quadrature on
 // each cell. The classes declared in them will be explained below:
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/base/quadrature_lib.h>
