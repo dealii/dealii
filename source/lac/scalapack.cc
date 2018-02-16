@@ -831,12 +831,22 @@ NumberType ScaLAPACKMatrix<NumberType>::reciprocal_condition_number(const Number
 
   if (grid->mpi_process_is_active)
     {
-      int lwork = 2 * n_local_rows + 3 * n_local_columns + column_block_size;
       int liwork = n_local_rows;
-      work.resize(lwork);
       iwork.resize(liwork);
+
       int info = 0;
       const NumberType *A_loc = &this->values[0];
+
+      // by setting lwork to -1 a workspace query for optimal length of work is performed
+      int lwork = -1;
+      work.resize(1);
+      ppocon(&uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,
+             &a_norm, &rcond, &work[0], &lwork, &iwork[0], &liwork, &info);
+      AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpocon", info));
+      lwork = std::ceil(work[0]);
+      work.resize(lwork);
+
+      // now the actual run:
       ppocon(&uplo, &n_columns, A_loc, &submatrix_row, &submatrix_column, descriptor,
              &a_norm, &rcond, &work[0], &lwork, &iwork[0], &liwork, &info);
       AssertThrow (info==0, LAPACKSupport::ExcErrorCode("pdpocon", info));
