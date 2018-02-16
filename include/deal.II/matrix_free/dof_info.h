@@ -432,7 +432,9 @@ namespace internal
       AssertIndexRange (row, row_starts.size()-1);
       const unsigned int index = row_starts[row][0];
       AssertIndexRange(index, dof_indices.size()+1);
-      return dof_indices.empty() ? nullptr : &dof_indices[index];
+      return dof_indices.empty() ?
+             nullptr :
+             dof_indices.data()+index;
     }
 
 
@@ -444,7 +446,9 @@ namespace internal
       AssertIndexRange (row, row_starts.size()-1);
       const unsigned int index = row_starts[row+1][0];
       AssertIndexRange(index, dof_indices.size()+1);
-      return dof_indices.empty() ? nullptr : &dof_indices[index];
+      return dof_indices.empty() ?
+             nullptr :
+             dof_indices.data()+index;
     }
 
 
@@ -466,7 +470,9 @@ namespace internal
       AssertIndexRange (row, row_starts.size()-1);
       const unsigned int index = row_starts[row][1];
       AssertIndexRange (index, constraint_indicator.size()+1);
-      return constraint_indicator.empty() ? nullptr : &constraint_indicator[index];
+      return constraint_indicator.empty() ?
+             nullptr :
+             constraint_indicator.data()+index;
     }
 
 
@@ -478,7 +484,9 @@ namespace internal
       AssertIndexRange (row, row_starts.size()-1);
       const unsigned int index = row_starts[row+1][1];
       AssertIndexRange (index, constraint_indicator.size()+1);
-      return constraint_indicator.empty() ? nullptr : &constraint_indicator[index];
+      return constraint_indicator.empty() ?
+             nullptr :
+             constraint_indicator.data()+index;
     }
 
 
@@ -509,7 +517,9 @@ namespace internal
           AssertDimension (row_starts.size(), row_starts_plain_indices.size());
           const unsigned int index = row_starts_plain_indices[row];
           AssertIndexRange(index, plain_dof_indices.size()+1);
-          return plain_dof_indices.empty() ? nullptr : &plain_dof_indices[index];
+          return plain_dof_indices.empty() ?
+                 nullptr :
+                 plain_dof_indices.data()+index;
         }
     }
 
