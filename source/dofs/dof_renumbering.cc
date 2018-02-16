@@ -1299,7 +1299,7 @@ namespace DoFRenumbering
         = dynamic_cast<const parallel::Triangulation<dim>*>
           (&dof_handler.get_triangulation()))
       {
-        const std::vector<types::global_dof_index>
+        const std::vector<types::global_dof_index> &
         n_locally_owned_dofs_per_processor = dof_handler.n_locally_owned_dofs_per_processor();
         my_starting_index = std::accumulate (n_locally_owned_dofs_per_processor.begin(),
                                              n_locally_owned_dofs_per_processor.begin()

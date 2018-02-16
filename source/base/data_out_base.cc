@@ -5924,14 +5924,14 @@ namespace DataOutBase
     const float angle_factor = 3.14159265f / 180.f;
 
     // (I) rotate the camera to the chosen polar angle
-    camera_position_temp[1] = cos(angle_factor * flags.polar_angle) * camera_position[1] - sin(angle_factor * flags.polar_angle) * camera_position[2];
-    camera_position_temp[2] = sin(angle_factor * flags.polar_angle) * camera_position[1] + cos(angle_factor * flags.polar_angle) * camera_position[2];
+    camera_position_temp[1] = std::cos(angle_factor * flags.polar_angle) * camera_position[1] - std::sin(angle_factor * flags.polar_angle) * camera_position[2];
+    camera_position_temp[2] = std::sin(angle_factor * flags.polar_angle) * camera_position[1] + std::cos(angle_factor * flags.polar_angle) * camera_position[2];
 
-    camera_direction_temp[1] = cos(angle_factor * flags.polar_angle) * camera_direction[1] - sin(angle_factor * flags.polar_angle) * camera_direction[2];
-    camera_direction_temp[2] = sin(angle_factor * flags.polar_angle) * camera_direction[1] + cos(angle_factor * flags.polar_angle) * camera_direction[2];
+    camera_direction_temp[1] = std::cos(angle_factor * flags.polar_angle) * camera_direction[1] - std::sin(angle_factor * flags.polar_angle) * camera_direction[2];
+    camera_direction_temp[2] = std::sin(angle_factor * flags.polar_angle) * camera_direction[1] + std::cos(angle_factor * flags.polar_angle) * camera_direction[2];
 
-    camera_horizontal_temp[1] = cos(angle_factor * flags.polar_angle) * camera_horizontal[1] - sin(angle_factor * flags.polar_angle) * camera_horizontal[2];
-    camera_horizontal_temp[2] = sin(angle_factor * flags.polar_angle) * camera_horizontal[1] + cos(angle_factor * flags.polar_angle) * camera_horizontal[2];
+    camera_horizontal_temp[1] = std::cos(angle_factor * flags.polar_angle) * camera_horizontal[1] - std::sin(angle_factor * flags.polar_angle) * camera_horizontal[2];
+    camera_horizontal_temp[2] = std::sin(angle_factor * flags.polar_angle) * camera_horizontal[1] + std::cos(angle_factor * flags.polar_angle) * camera_horizontal[2];
 
     camera_position[1] = camera_position_temp[1];
     camera_position[2] = camera_position_temp[2];
@@ -5943,14 +5943,14 @@ namespace DataOutBase
     camera_horizontal[2] = camera_horizontal_temp[2];
 
     // (II) rotate the camera to the chosen azimuth angle
-    camera_position_temp[0] = cos(angle_factor * flags.azimuth_angle) * camera_position[0] - sin(angle_factor * flags.azimuth_angle) * camera_position[1];
-    camera_position_temp[1] = sin(angle_factor * flags.azimuth_angle) * camera_position[0] + cos(angle_factor * flags.azimuth_angle) * camera_position[1];
+    camera_position_temp[0] = std::cos(angle_factor * flags.azimuth_angle) * camera_position[0] - std::sin(angle_factor * flags.azimuth_angle) * camera_position[1];
+    camera_position_temp[1] = std::sin(angle_factor * flags.azimuth_angle) * camera_position[0] + std::cos(angle_factor * flags.azimuth_angle) * camera_position[1];
 
-    camera_direction_temp[0] = cos(angle_factor * flags.azimuth_angle) * camera_direction[0] - sin(angle_factor * flags.azimuth_angle) * camera_direction[1];
-    camera_direction_temp[1] = sin(angle_factor * flags.azimuth_angle) * camera_direction[0] + cos(angle_factor * flags.azimuth_angle) * camera_direction[1];
+    camera_direction_temp[0] = std::cos(angle_factor * flags.azimuth_angle) * camera_direction[0] - std::sin(angle_factor * flags.azimuth_angle) * camera_direction[1];
+    camera_direction_temp[1] = std::sin(angle_factor * flags.azimuth_angle) * camera_direction[0] + std::cos(angle_factor * flags.azimuth_angle) * camera_direction[1];
 
-    camera_horizontal_temp[0] = cos(angle_factor * flags.azimuth_angle) * camera_horizontal[0] - sin(angle_factor * flags.azimuth_angle) * camera_horizontal[1];
-    camera_horizontal_temp[1] = sin(angle_factor * flags.azimuth_angle) * camera_horizontal[0] + cos(angle_factor * flags.azimuth_angle) * camera_horizontal[1];
+    camera_horizontal_temp[0] = std::cos(angle_factor * flags.azimuth_angle) * camera_horizontal[0] - std::sin(angle_factor * flags.azimuth_angle) * camera_horizontal[1];
+    camera_horizontal_temp[1] = std::sin(angle_factor * flags.azimuth_angle) * camera_horizontal[0] + std::cos(angle_factor * flags.azimuth_angle) * camera_horizontal[1];
 
     camera_position[0] = camera_position_temp[0];
     camera_position[1] = camera_position_temp[1];
@@ -5965,8 +5965,8 @@ namespace DataOutBase
     camera_position[0] = x_min + .5 * x_dimension;
     camera_position[1] = y_min + .5 * y_dimension;
 
-    camera_position[0] += (z_min + 2. * z_dimension) * sin(angle_factor * flags.polar_angle) * sin(angle_factor * flags.azimuth_angle);
-    camera_position[1] -= (z_min + 2. * z_dimension) * sin(angle_factor * flags.polar_angle) * cos(angle_factor * flags.azimuth_angle);
+    camera_position[0] += (z_min + 2. * z_dimension) * std::sin(angle_factor * flags.polar_angle) * std::sin(angle_factor * flags.azimuth_angle);
+    camera_position[1] -= (z_min + 2. * z_dimension) * std::sin(angle_factor * flags.polar_angle) * std::cos(angle_factor * flags.azimuth_angle);
 
 
 // determine the bounding box on the projection plane

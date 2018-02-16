@@ -171,7 +171,7 @@ void grid_3 ()
   Triangulation<2> triangulation;
   GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
 
-  for (const auto cell : triangulation.active_cell_iterators())
+  for (const auto &cell : triangulation.active_cell_iterators())
     {
       for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
         {
