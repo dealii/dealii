@@ -197,7 +197,7 @@ public:
   /**
    * Move constructor
    */
-  ConstraintMatrix (ConstraintMatrix &&constraint_matrix) = default;
+  ConstraintMatrix (ConstraintMatrix &&) = default;
 
   /**
    * Copy operator. Like for many other large objects, this operator
@@ -213,7 +213,7 @@ public:
   /**
    * Move assignment operator
    */
-  ConstraintMatrix &operator= (ConstraintMatrix &&constraint_matrix) = default;
+  ConstraintMatrix &operator= (ConstraintMatrix &&) = default;
 
   /**
    * Copy the given object to the current one.
