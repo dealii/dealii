@@ -352,8 +352,8 @@ namespace Functions
    * Harmonic singularity on the L-shaped domain in 2D.
    *
    * The function is given in polar coordinates by $r^{\frac{2}{3}}
-   * sin(\frac{2}{3} \phi)$ with a singularity in the origin and should be
-   * used with GridGenerator::hyper_L.
+   * \sin(\frac{2}{3} \phi)$ with a singularity at the origin and should be
+   * used with GridGenerator::hyper_L().
    *
    * @ingroup functions
    * @author Guido Kanschat
