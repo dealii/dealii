@@ -17,7 +17,8 @@
 #include "../lapack/create_matrix.h"
 
 // test eigenpairs_symmetric_by_index(const std::pair<unsigned int,unsigned int> &, const bool)
-// for all eigenvalues with eigenvectors
+// for all eigenvalues without eigenvectors
+
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -56,9 +57,6 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
   // Create SPD matrices of requested size:
   FullMatrix<NumberType> full_A(size);
   std::vector<NumberType> eigenvalues_Lapack(size);
-  std::vector<Vector<NumberType>> s_eigenvectors_ (max_n_eigenvalues,Vector<NumberType>(size));
-  std::vector<Vector<NumberType>> p_eigenvectors_ (max_n_eigenvalues,Vector<NumberType>(size));
-  FullMatrix<NumberType> p_eigenvectors (size,size);
 
   ScaLAPACKMatrix<NumberType> scalapack_syev (size, grid, block_size);
   scalapack_syev.set_property(LAPACKSupport::Property::symmetric);
@@ -89,36 +87,17 @@ void test(const unsigned int size, const unsigned int block_size, const NumberTy
     syev(&jobz, &uplo, &LDA, & *lapack_A.begin(), &LDA, & *eigenvalues_Lapack.begin(), & *work.begin(), &lwork, &info);
 
     AssertThrow (info==0, LAPACKSupport::ExcErrorCode("syev", info));
-    for (int i=0; i<max_n_eigenvalues; ++i)
-      for (int j=0; j<size; ++j)
-        s_eigenvectors_[i][j] = lapack_A[(size-1-i)*size+j];
-
   }
 
   // the actual test:
 
-  pcout << "comparing " << max_n_eigenvalues << " eigenvalues and eigenvectors computed using LAPACK and ScaLAPACK pdsyev:" << std::endl;
-  const std::vector<NumberType> eigenvalues_psyev = scalapack_syev.eigenpairs_symmetric_by_index(std::make_pair(0,size-1),true);
-  scalapack_syev.copy_to(p_eigenvectors);
+  pcout << "comparing " << max_n_eigenvalues << " eigenvalues computed using LAPACK and ScaLAPACK pdsyev:" << std::endl;
+  const std::vector<NumberType> eigenvalues_psyev = scalapack_syev.eigenpairs_symmetric_by_index(std::make_pair(0,size-1),false);
   for (unsigned int i=0; i<max_n_eigenvalues; ++i)
     AssertThrow ( std::abs(eigenvalues_psyev[n_eigenvalues-i-1]-eigenvalues_Lapack[n_eigenvalues-i-1]) / std::abs(eigenvalues_Lapack[n_eigenvalues-i-1]) < tol,
                   ExcInternalError());
 
   pcout << "   with respect to the given tolerance the eigenvalues coincide" << std::endl;
-
-  for (unsigned int i=0; i<max_n_eigenvalues; ++i)
-    for (unsigned int j=0; j<size; ++j)
-      p_eigenvectors_[i][j] = p_eigenvectors(j,size-1-i);
-
-  //product of eigenvectors computed using Lapack and ScaLapack has to be either 1 or -1
-  for (unsigned int i=0; i<max_n_eigenvalues; ++i)
-    {
-      const NumberType product = p_eigenvectors_[i] * s_eigenvectors_[i];
-      //the requirement for alignment of the eigenvectors has to be released (primarily for floats)
-      AssertThrow (std::abs(std::abs(product)-1) < tol*10,
-                   ExcInternalError());
-    }
-  pcout << "   with respect to the given tolerance also the eigenvectors coincide" << std::endl << std::endl;
 }
 
 
