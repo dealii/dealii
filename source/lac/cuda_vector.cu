@@ -554,7 +554,7 @@ namespace LinearAlgebra
           if (omit_zeroing_entries == false)
             {
               cudaError_t error_code = cudaMemset(val, 0,
-                                                  n_elements*sizeof(Number));
+                                                  n*sizeof(Number));
               AssertCuda(error_code);
             }
         }
