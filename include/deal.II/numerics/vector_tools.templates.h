@@ -1579,8 +1579,14 @@ namespace VectorTools
                 const Quadrature<dim-1>        &q_boundary,
                 const bool                      project_to_boundary_first)
   {
+#ifdef _MSC_VER
+    Assert(false,
+           ExcMessage("Please specify the mapping explicitly "
+                      "when building with MSVC!"));
+#else
     project(StaticMappingQ1<dim,spacedim>::mapping, dof, constraints, quadrature, function, vec,
             enforce_zero_boundary, q_boundary, project_to_boundary_first);
+#endif
   }
 
 

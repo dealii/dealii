@@ -93,7 +93,9 @@ public:
    * The DoFHandler is actually not needed.
    */
   template <int dim>
+#ifndef _MSC_VER
   DEAL_II_DEPRECATED
+#endif
   Multigrid(const DoFHandler<dim>              &mg_dof_handler,
             const MGMatrixBase<VectorType>     &matrix,
             const MGCoarseGridBase<VectorType> &coarse,
