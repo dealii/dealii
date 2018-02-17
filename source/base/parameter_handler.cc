@@ -458,7 +458,7 @@ namespace
   read_xml_recursively (const boost::property_tree::ptree &source,
                         const std::string                 &current_path,
                         const char                         path_separator,
-                        const std::vector<std::shared_ptr<const Patterns::PatternBase> > &
+                        const std::vector<std::unique_ptr<const Patterns::PatternBase> > &
                         patterns,
                         boost::property_tree::ptree       &destination)
   {
@@ -586,7 +586,7 @@ void ParameterHandler::parse_input_from_xml (std::istream &in)
 
 void ParameterHandler::clear ()
 {
-  entries.reset (new boost::property_tree::ptree());
+  entries = std_cxx14::make_unique<boost::property_tree::ptree> ();
 }
 
 

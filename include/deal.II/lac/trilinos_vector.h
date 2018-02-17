@@ -1242,14 +1242,14 @@ namespace TrilinosWrappers
        * that is in fact distributed among multiple processors. The object
        * requires an existing Epetra_Map for storing data when setting it up.
        */
-      std::shared_ptr<Epetra_FEVector> vector;
+      std::unique_ptr<Epetra_FEVector> vector;
 
       /**
        * A vector object in Trilinos to be used for collecting the non-local
        * elements if the vector was constructed with an additional IndexSet
        * describing ghost elements.
        */
-      std::shared_ptr<Epetra_MultiVector> nonlocal_vector;
+      std::unique_ptr<Epetra_MultiVector> nonlocal_vector;
 
       /**
        * An IndexSet storing the indices this vector owns exclusively.

@@ -122,8 +122,7 @@ namespace hp
               ExcMessage ("All elements inside a collection need to have the "
                           "same number of vector components!"));
 
-    finite_elements
-    .push_back (std::shared_ptr<const FiniteElement<dim,spacedim> >(new_fe.clone()));
+    finite_elements.push_back (new_fe.clone());
   }
 
 

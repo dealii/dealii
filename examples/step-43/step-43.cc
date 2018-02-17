@@ -67,6 +67,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <memory>
 
@@ -981,12 +982,10 @@ namespace Step43
   {
     assemble_darcy_preconditioner ();
 
-    Amg_preconditioner = std::shared_ptr<TrilinosWrappers::PreconditionIC>
-                         (new TrilinosWrappers::PreconditionIC());
+    Amg_preconditioner = std::make_shared<TrilinosWrappers::PreconditionIC> ();
     Amg_preconditioner->initialize(darcy_preconditioner_matrix.block(0,0));
 
-    Mp_preconditioner = std::shared_ptr<TrilinosWrappers::PreconditionIC>
-                        (new TrilinosWrappers::PreconditionIC());
+    Mp_preconditioner = std::make_shared<TrilinosWrappers::PreconditionIC> ();
     Mp_preconditioner->initialize(darcy_preconditioner_matrix.block(1,1));
 
   }

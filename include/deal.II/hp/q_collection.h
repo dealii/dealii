@@ -175,8 +175,7 @@ namespace hp
   inline
   QCollection<dim>::QCollection (const Quadrature<dim> &quadrature)
   {
-    quadratures
-    .push_back (std::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(quadrature)));
+    quadratures.push_back (std::make_shared<const Quadrature<dim> >(quadrature));
   }
 
 
@@ -196,8 +195,7 @@ namespace hp
   void
   QCollection<dim>::push_back (const Quadrature<dim> &new_quadrature)
   {
-    quadratures
-    .push_back (std::shared_ptr<const Quadrature<dim> >(new Quadrature<dim>(new_quadrature)));
+    quadratures.push_back (std::make_shared<const Quadrature<dim> >(new_quadrature));
   }
 
 } // namespace hp

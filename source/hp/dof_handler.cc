@@ -15,6 +15,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/dof_level.h>
@@ -104,7 +105,7 @@ namespace internal
               }
 
             if (dim > 1)
-              dof_handler.faces.reset (new internal::hp::DoFIndicesOnFaces<dim>);
+              dof_handler.faces = std_cxx14::make_unique<internal::hp::DoFIndicesOnFaces<dim>> ();
           }
         }
 
@@ -966,11 +967,11 @@ namespace hp
   {
     // decide whether we need a sequential or a parallel shared/distributed policy
     if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&*this->tria) != nullptr)
-      policy.reset (new internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >(*this));
+      policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
     else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&*this->tria) != nullptr)
-      policy.reset (new internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >(*this));
+      policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
     else
-      policy.reset (new internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >(*this));
+      policy = std_cxx14::make_unique<internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
 
     create_active_fe_table ();
 

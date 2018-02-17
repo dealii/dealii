@@ -1024,7 +1024,7 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename,
    * Create a 1x1 column grid which will be used to initialize
    * an effectively serial ScaLAPACK matrix to gather the contents from the current object
    */
-  std::shared_ptr<Utilities::MPI::ProcessGrid> column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,1);
+  const auto column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,1);
 
   const int MB=n_rows, NB=n_columns;
   ScaLAPACKMatrix<NumberType> tmp(n_rows,n_columns,column_grid,MB,NB);
@@ -1106,7 +1106,7 @@ void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename,
    *
    * Create a 1xn_processes column grid
   */
-  std::shared_ptr<Utilities::MPI::ProcessGrid> column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,n_mpi_processes);
+  const auto column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,n_mpi_processes);
 
   const int MB=n_rows, NB=std::ceil(n_columns/n_mpi_processes);
   ScaLAPACKMatrix<NumberType> tmp(n_rows,n_columns,column_grid,MB,NB);
@@ -1238,7 +1238,7 @@ void ScaLAPACKMatrix<NumberType>::load_serial(const char *filename)
    * Therefore, one process has all the data and can write it to a file
    */
   //create a 1xP column grid with P being the number of MPI processes
-  std::shared_ptr<Utilities::MPI::ProcessGrid> one_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,1);
+  const auto one_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,1);
 
   const int MB=n_rows, NB=n_columns;
   ScaLAPACKMatrix<NumberType> tmp(n_rows,n_columns,one_grid,MB,NB);
@@ -1323,7 +1323,7 @@ void ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
    * Therefore, the processes hold contiguous chunks of the matrix, which they can write to the file
    */
   //create a 1xP column grid with P being the number of MPI processes
-  std::shared_ptr<Utilities::MPI::ProcessGrid> column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,n_mpi_processes);
+  const auto column_grid = std::make_shared<Utilities::MPI::ProcessGrid>(this->grid->mpi_communicator,1,n_mpi_processes);
 
   const int MB=n_rows, NB=std::ceil(n_columns/n_mpi_processes);
   ScaLAPACKMatrix<NumberType> tmp(n_rows,n_columns,column_grid,MB,NB);

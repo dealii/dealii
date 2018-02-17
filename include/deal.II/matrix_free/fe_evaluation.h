@@ -2215,9 +2215,9 @@ FEEvaluationBase<dim,n_components_,Number>
       other->mapped_geometry->get_quadrature() == quadrature)
     mapped_geometry = other->mapped_geometry;
   else
-    mapped_geometry.reset(new internal::MatrixFreeFunctions::
-                          MappingDataOnTheFly<dim,Number>(mapping, quadrature,
-                                                          update_flags));
+    mapped_geometry
+      = std::make_shared<internal::MatrixFreeFunctions::MappingDataOnTheFly<dim,Number> >
+        (mapping, quadrature, update_flags);
   jacobian = mapped_geometry->get_inverse_jacobians().begin();
   J_value = mapped_geometry->get_JxW_values().begin();
   quadrature_points = mapped_geometry->get_quadrature_points().begin();

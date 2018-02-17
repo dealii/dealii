@@ -863,7 +863,7 @@ namespace Threads
       void start (const std::function<RT ()> &function)
       {
         thread_is_active = true;
-        ret_val.reset(new return_value<RT>());
+        ret_val = std::make_shared<return_value<RT>>();
         thread = std::thread (thread_entry_point, function, ret_val);
       }
 
@@ -943,7 +943,7 @@ namespace Threads
        */
       void start (const std::function<RT ()> &function)
       {
-        ret_val.reset(new return_value<RT>());
+        ret_val = std::make_shared<return_value<RT>>();
         call (function, *ret_val);
       }
 
@@ -1629,7 +1629,7 @@ namespace Threads
     {
       // create a task descriptor and tell it to queue itself up with
       // the scheduling system
-      task_descriptor.reset (new internal::TaskDescriptor<RT>(function_object));
+      task_descriptor = std::make_shared<internal::TaskDescriptor<RT>>(function_object);
       task_descriptor->queue_task ();
     }
 

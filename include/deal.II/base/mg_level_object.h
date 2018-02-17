@@ -215,7 +215,7 @@ MGLevelObject<Object>::resize (const unsigned int new_minlevel,
 
   minlevel = new_minlevel;
   for (unsigned int i=0; i<new_maxlevel-new_minlevel+1; ++i)
-    objects.push_back(std::shared_ptr<Object> (new Object));
+    objects.push_back(std::make_shared<Object> ());
 }
 
 

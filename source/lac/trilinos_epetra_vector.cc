@@ -13,6 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -22,6 +23,7 @@
 #include <deal.II/base/index_set.h>
 
 #include <boost/io/ios_state.hpp>
+#include <memory>
 
 #include <deal.II/lac/read_write_vector.h>
 
@@ -65,7 +67,7 @@ namespace LinearAlgebra
     {
       Epetra_Map input_map = parallel_partitioner.make_trilinos_map(communicator,false);
       if (vector->Map().SameAs(input_map)==false)
-        vector.reset(new Epetra_FEVector(input_map));
+        vector = std_cxx14::make_unique<Epetra_FEVector>(input_map);
       else if (omit_zeroing_entries==false)
         {
           const int ierr = vector->PutScalar(0.);
@@ -110,7 +112,7 @@ namespace LinearAlgebra
               (void) ierr;
             }
           else
-            vector.reset(new Epetra_FEVector(V.trilinos_vector()));
+            vector = std_cxx14::make_unique<Epetra_FEVector>(V.trilinos_vector());
         }
 
       return *this;
@@ -594,8 +596,8 @@ namespace LinearAlgebra
                                             const MPI_Comm &mpi_comm)
     {
       source_stored_elements = source_index_set;
-      epetra_comm_pattern.reset(new CommunicationPattern(locally_owned_elements(),
-                                                         source_index_set, mpi_comm));
+      epetra_comm_pattern = std::make_shared<CommunicationPattern>
+                            (locally_owned_elements(), source_index_set, mpi_comm);
     }
   }
 }

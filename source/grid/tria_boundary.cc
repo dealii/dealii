@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/grid/tria_boundary.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -166,11 +167,8 @@ get_line_support_points (const unsigned int n_intermediate_points) const
 
       // another thread might have created points in the meantime
       if (points[n_intermediate_points].get() == nullptr)
-        {
-          std::shared_ptr<QGaussLobatto<1> >
-          quadrature (new QGaussLobatto<1>(n_intermediate_points+2));
-          points[n_intermediate_points] = quadrature;
-        }
+        points[n_intermediate_points] = std_cxx14::make_unique<QGaussLobatto<1> >
+                                        (n_intermediate_points+2);
     }
   return points[n_intermediate_points]->get_points();
 }

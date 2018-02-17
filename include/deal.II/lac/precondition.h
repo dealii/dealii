@@ -1878,7 +1878,7 @@ namespace internal
           preconditioner->m() != matrix.m())
         {
           if (preconditioner.get() == nullptr)
-            preconditioner.reset(new DiagonalMatrix<VectorType>());
+            preconditioner = std::make_shared<DiagonalMatrix<VectorType>>();
 
           Assert(preconditioner->m() == 0,
                  ExcMessage("Preconditioner appears to be initialized but not sized correctly"));

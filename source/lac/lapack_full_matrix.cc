@@ -973,8 +973,8 @@ LAPACKFullMatrix<number>::compute_svd()
   std::fill(wr.begin(), wr.end(), 0.);
   ipiv.resize(8*mm);
 
-  svd_u.reset (new LAPACKFullMatrix<number>(mm,mm));
-  svd_vt.reset (new LAPACKFullMatrix<number>(nn,nn));
+  svd_u = std_cxx14::make_unique<LAPACKFullMatrix<number>>(mm,mm);
+  svd_vt = std_cxx14::make_unique<LAPACKFullMatrix<number>>(nn,nn);
   number *const mu  = &svd_u->values[0];
   number *const mvt = &svd_vt->values[0];
   types::blas_int info = 0;

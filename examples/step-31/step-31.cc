@@ -69,6 +69,7 @@
 // the aforelisted header files:
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <limits>
 
@@ -1185,8 +1186,8 @@ namespace Step31
 
     assemble_stokes_preconditioner ();
 
-    Amg_preconditioner = std::shared_ptr<TrilinosWrappers::PreconditionAMG>
-                         (new TrilinosWrappers::PreconditionAMG());
+    Amg_preconditioner = std::make_shared<TrilinosWrappers::PreconditionAMG>
+                         ();
 
     std::vector<std::vector<bool> > constant_modes;
     FEValuesExtractors::Vector velocity_components(0);
@@ -1232,8 +1233,8 @@ namespace Step31
     Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0,0),
                                    amg_data);
 
-    Mp_preconditioner = std::shared_ptr<TrilinosWrappers::PreconditionIC>
-                        (new TrilinosWrappers::PreconditionIC());
+    Mp_preconditioner = std::make_shared<TrilinosWrappers::PreconditionIC>
+                        ();
     Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1,1));
 
     std::cout << std::endl;

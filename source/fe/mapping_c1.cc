@@ -47,7 +47,7 @@ MappingC1<dim,spacedim>::MappingC1 ()
   //
   // we only need to replace the Qp mapping because that's the one that's
   // used on boundary cells where it matters
-  this->qp_mapping.reset (new MappingC1<dim,spacedim>::MappingC1Generic());
+  this->qp_mapping = std::make_shared<MappingC1<dim,spacedim>::MappingC1Generic>();
 }
 
 

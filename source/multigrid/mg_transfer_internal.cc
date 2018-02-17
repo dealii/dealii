@@ -305,8 +305,7 @@ namespace internal
         {
           // shift the local number of the copy indices according to the new
           // partitioner that we are going to use for the vector
-          const std::shared_ptr<const Utilities::MPI::Partitioner> &part
-            = ghosted_level_vector.get_partitioner();
+          const auto &part = ghosted_level_vector.get_partitioner();
           ghosted_dofs.add_indices(part->ghost_indices());
           for (unsigned int i=0; i<copy_indices_global_mine.size(); ++i)
             copy_indices_global_mine[i].second =
@@ -505,11 +504,9 @@ namespace internal
                 ExcInternalError());
         fe_name[template_starts+1] = '1';
       }
-      std::shared_ptr<FiniteElement<1> > fe_1d
-      (FETools::get_fe_by_name<1,1>(fe_name));
-      const FiniteElement<1> &fe = *fe_1d;
+      const std::unique_ptr<FiniteElement<1> > fe (FETools::get_fe_by_name<1,1>(fe_name));
 
-      setup_element_info(elem_info,fe,mg_dof);
+      setup_element_info(elem_info,*fe,mg_dof);
 
 
       // -------------- 2. Extract and match dof indices between child and parent
@@ -595,8 +592,8 @@ namespace internal
                     if (!owned_level_dofs.is_element(local_dof_indices[i]))
                       ghosted_level_dofs.push_back(local_dof_indices[i]);
 
-                  add_child_indices<dim>(c, fe.dofs_per_cell - fe.dofs_per_vertex,
-                                         fe.degree, elem_info.lexicographic_numbering,
+                  add_child_indices<dim>(c, fe->dofs_per_cell - fe->dofs_per_vertex,
+                                         fe->degree, elem_info.lexicographic_numbering,
                                          local_dof_indices,
                                          &next_indices[start_index]);
 
@@ -656,8 +653,8 @@ namespace internal
                   const std::size_t start_index = global_level_dof_indices_l0.size();
                   global_level_dof_indices_l0.resize(start_index+elem_info.n_child_cell_dofs,
                                                      numbers::invalid_dof_index);
-                  add_child_indices<dim>(0, fe.dofs_per_cell - fe.dofs_per_vertex,
-                                         fe.degree, elem_info.lexicographic_numbering,
+                  add_child_indices<dim>(0, fe->dofs_per_cell - fe->dofs_per_vertex,
+                                         fe->degree, elem_info.lexicographic_numbering,
                                          local_dof_indices,
                                          &global_level_dof_indices_l0[start_index]);
 
@@ -726,7 +723,7 @@ namespace internal
 
       // ---------------------- 3. compute weights to make restriction additive
 
-      const unsigned int n_child_dofs_1d = fe.degree + 1 + fe.dofs_per_cell - fe.dofs_per_vertex;
+      const unsigned int n_child_dofs_1d = fe->degree + 1 + fe->dofs_per_cell - fe->dofs_per_vertex;
 
       // get the valence of the individual components and compute the weights as
       // the inverse of the valence

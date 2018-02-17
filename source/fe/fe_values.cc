@@ -19,6 +19,7 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/signaling_nan.h>
+#include <deal.II/base/std_cxx14/memory.h>
 #include <deal.II/differentiation/ad.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
@@ -39,7 +40,6 @@
 #include <deal.II/fe/fe.h>
 
 #include <iomanip>
-#include <memory>
 #include <type_traits>
 
 
@@ -3979,7 +3979,7 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   if (flags & update_mapping)
     this->mapping_data.reset (mapping_get_data.return_value());
   else
-    this->mapping_data.reset (new typename Mapping<dim,spacedim>::InternalDataBase());
+    this->mapping_data = std_cxx14::make_unique<typename Mapping<dim,spacedim>::InternalDataBase> ();
 }
 
 
@@ -4010,7 +4010,7 @@ namespace
       }
     else
       // if the types don't match, there is nothing we can do here
-      present_cell.reset (new Type(new_cell));
+      present_cell = std_cxx14::make_unique<Type> (new_cell);
   }
 }
 
@@ -4229,7 +4229,7 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   if (flags & update_mapping)
     this->mapping_data.reset (mapping_get_data.return_value());
   else
-    this->mapping_data.reset (new typename Mapping<dim,spacedim>::InternalDataBase());
+    this->mapping_data = std_cxx14::make_unique<typename Mapping<dim,spacedim>::InternalDataBase> ();
 }
 
 
@@ -4397,7 +4397,7 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
   if (flags & update_mapping)
     this->mapping_data.reset (mapping_get_data.return_value());
   else
-    this->mapping_data.reset (new typename Mapping<dim,spacedim>::InternalDataBase());
+    this->mapping_data = std_cxx14::make_unique<typename Mapping<dim,spacedim>::InternalDataBase> ();
 }
 
 

@@ -1923,7 +1923,7 @@ namespace internal
 
         // reserve enough space
         triangulation.levels.push_back (std_cxx14::make_unique<internal::Triangulation::TriaLevel<dim>>());
-        triangulation.faces.reset (new internal::Triangulation::TriaFaces<dim>);
+        triangulation.faces = std_cxx14::make_unique<internal::Triangulation::TriaFaces<dim>> ();
         triangulation.levels[0]->reserve_space (cells.size(), dim, spacedim);
         triangulation.faces->lines.reserve_space (0,needed_lines.size());
         triangulation.levels[0]->cells.reserve_space (0,cells.size());
@@ -2291,7 +2291,7 @@ namespace internal
         // for the lines
         // reserve enough space
         triangulation.levels.push_back (std_cxx14::make_unique<internal::Triangulation::TriaLevel<dim>>());
-        triangulation.faces.reset (new internal::Triangulation::TriaFaces<dim>);
+        triangulation.faces = std_cxx14::make_unique<internal::Triangulation::TriaFaces<dim>> ();
         triangulation.levels[0]->reserve_space (cells.size(), dim, spacedim);
         triangulation.faces->lines.reserve_space (0,needed_lines.size());
 
@@ -8814,10 +8814,8 @@ Triangulation (const MeshSmoothing smooth_grid,
 {
   if (dim == 1)
     {
-      vertex_to_boundary_id_map_1d
-      .reset (new std::map<unsigned int, types::boundary_id>());
-      vertex_to_manifold_id_map_1d
-      .reset (new std::map<unsigned int, types::manifold_id>());
+      vertex_to_boundary_id_map_1d = std_cxx14::make_unique<std::map<unsigned int, types::boundary_id>> ();
+      vertex_to_manifold_id_map_1d = std_cxx14::make_unique<std::map<unsigned int, types::manifold_id>> ();
     }
 
   // connect the any_change signal to the other top level signals
@@ -9162,7 +9160,7 @@ copy_triangulation (const Triangulation<dim, spacedim> &other_tria)
   smooth_grid            = other_tria.smooth_grid;
 
   if (dim > 1)
-    faces.reset (new internal::Triangulation::TriaFaces<dim>(*other_tria.faces));
+    faces = std_cxx14::make_unique<internal::Triangulation::TriaFaces<dim>> (*other_tria.faces);
 
   typename std::map<types::manifold_id,
            SmartPointer<const Manifold<dim,spacedim>, Triangulation<dim, spacedim> > >::const_iterator
@@ -9173,19 +9171,18 @@ copy_triangulation (const Triangulation<dim, spacedim> &other_tria)
 
   levels.reserve (other_tria.levels.size());
   for (unsigned int level=0; level<other_tria.levels.size(); ++level)
-    levels.push_back (std_cxx14::make_unique<internal::Triangulation::TriaLevel<dim>>(*other_tria.levels[level]));
+    levels.push_back (std_cxx14::make_unique<internal::Triangulation::TriaLevel<dim>>
+                      (*other_tria.levels[level]));
 
   number_cache = other_tria.number_cache;
 
   if (dim == 1)
     {
-      vertex_to_boundary_id_map_1d
-      .reset(new std::map<unsigned int, types::boundary_id>
-             (*other_tria.vertex_to_boundary_id_map_1d));
+      vertex_to_boundary_id_map_1d = std_cxx14::make_unique<std::map<unsigned int, types::boundary_id>>
+                                     (*other_tria.vertex_to_boundary_id_map_1d);
 
-      vertex_to_manifold_id_map_1d
-      .reset(new std::map<unsigned int, types::manifold_id>
-             (*other_tria.vertex_to_manifold_id_map_1d));
+      vertex_to_manifold_id_map_1d = std_cxx14::make_unique<std::map<unsigned int, types::manifold_id>>
+                                     (*other_tria.vertex_to_manifold_id_map_1d);
     }
 
   // inform those who are listening on other_tria of the copy operation

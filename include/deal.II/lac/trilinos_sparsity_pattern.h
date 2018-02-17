@@ -1164,14 +1164,14 @@ namespace TrilinosWrappers
      * Pointer to the user-supplied Epetra Trilinos mapping of the matrix
      * columns that assigns parts of the matrix to the individual processes.
      */
-    std::shared_ptr<Epetra_Map> column_space_map;
+    std::unique_ptr<Epetra_Map> column_space_map;
 
     /**
      * A sparsity pattern object in Trilinos to be used for finite element
      * based problems which allows for adding non-local elements to the
      * pattern.
      */
-    std::shared_ptr<Epetra_FECrsGraph> graph;
+    std::unique_ptr<Epetra_FECrsGraph> graph;
 
     /**
      * A sparsity pattern object for the non-local part of the sparsity
@@ -1179,7 +1179,7 @@ namespace TrilinosWrappers
      * when the particular constructor or reinit method with writable_rows
      * argument is set
      */
-    std::shared_ptr<Epetra_CrsGraph> nonlocal_graph;
+    std::unique_ptr<Epetra_CrsGraph> nonlocal_graph;
 
     friend class TrilinosWrappers::SparseMatrix;
     friend class SparsityPatternIterators::Accessor;

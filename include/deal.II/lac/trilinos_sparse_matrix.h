@@ -36,6 +36,7 @@
 #  include <memory>
 
 #  include <Epetra_FECrsMatrix.h>
+#  include <Epetra_Export.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_CrsGraph.h>
 #  include <Epetra_MultiVector.h>
@@ -47,8 +48,6 @@
 #  else
 #    include <Epetra_SerialComm.h>
 #  endif
-
-class Epetra_Export;
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -2008,26 +2007,26 @@ namespace TrilinosWrappers
      * Pointer to the user-supplied Epetra Trilinos mapping of the matrix
      * columns that assigns parts of the matrix to the individual processes.
      */
-    std::shared_ptr<Epetra_Map> column_space_map;
+    std::unique_ptr<Epetra_Map> column_space_map;
 
     /**
      * A sparse matrix object in Trilinos to be used for finite element based
      * problems which allows for assembling into non-local elements.  The
      * actual type, a sparse matrix, is set in the constructor.
      */
-    std::shared_ptr<Epetra_FECrsMatrix> matrix;
+    std::unique_ptr<Epetra_FECrsMatrix> matrix;
 
     /**
      * A sparse matrix object in Trilinos to be used for collecting the non-
      * local elements if the matrix was constructed from a Trilinos sparsity
      * pattern with the respective option.
      */
-    std::shared_ptr<Epetra_CrsMatrix> nonlocal_matrix;
+    std::unique_ptr<Epetra_CrsMatrix> nonlocal_matrix;
 
     /**
      * An export object used to communicate the nonlocal matrix.
      */
-    std::shared_ptr<Epetra_Export>    nonlocal_matrix_exporter;
+    std::unique_ptr<Epetra_Export>    nonlocal_matrix_exporter;
 
     /**
      * Trilinos doesn't allow to mix additions to matrix entries and

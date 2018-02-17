@@ -57,7 +57,7 @@ namespace LinearAlgebra
         if (val != nullptr)
           free(val);
         val = nullptr;
-        thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
+        thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
       }
     else
       {
@@ -66,7 +66,7 @@ namespace LinearAlgebra
 
         Utilities::System::posix_memalign ((void **)&val, 64, sizeof(Number)*new_alloc_size);
         if (new_alloc_size >= 4*dealii::internal::Vector::minimum_parallel_grain_size)
-          thread_loop_partitioner.reset(new parallel::internal::TBBPartitioner());
+          thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
       }
   }
 
@@ -241,9 +241,10 @@ namespace LinearAlgebra
     std::shared_ptr<const Utilities::MPI::Partitioner> comm_pattern;
     if (communication_pattern.get() == nullptr)
       {
-        comm_pattern.reset(new Utilities::MPI::Partitioner(vec.locally_owned_elements(),
-                                                           get_stored_elements(),
-                                                           vec.get_mpi_communicator()));
+        comm_pattern = std::make_shared<Utilities::MPI::Partitioner>
+                       (vec.locally_owned_elements(),
+                        get_stored_elements(),
+                        vec.get_mpi_communicator());
       }
     else
       {
@@ -524,8 +525,8 @@ namespace LinearAlgebra
     source_stored_elements = source_index_set;
     EpetraWrappers::CommunicationPattern epetra_comm_pattern(
       source_stored_elements, stored_elements, mpi_comm);
-    comm_pattern.reset(new EpetraWrappers::CommunicationPattern(
-                         source_stored_elements, stored_elements, mpi_comm));
+    comm_pattern = std::make_shared<EpetraWrappers::CommunicationPattern>
+                   (source_stored_elements, stored_elements, mpi_comm);
 
     return epetra_comm_pattern;
   }

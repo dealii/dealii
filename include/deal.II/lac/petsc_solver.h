@@ -240,7 +240,7 @@ namespace PETScWrappers
      * Pointer to an object that stores the solver context. This is recreated
      * in the main solver routine if necessary.
      */
-    std::shared_ptr<SolverData> solver_data;
+    std::unique_ptr<SolverData> solver_data;
 
 #ifdef DEAL_II_WITH_SLEPC
     /**
@@ -984,7 +984,7 @@ namespace PETScWrappers
       PC  pc;
     };
 
-    std::shared_ptr<SolverDataMUMPS> solver_data;
+    std::unique_ptr<SolverDataMUMPS> solver_data;
 
     /**
      * Flag specifies whether matrix being factorized is symmetric or not. It

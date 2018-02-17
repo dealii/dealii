@@ -164,7 +164,7 @@ Quadrature<dim>::Quadrature (const SubQuadrature &q1,
 
   if (is_tensor_product_flag)
     {
-      tensor_basis.reset(new std::array<Quadrature<1>, dim>());
+      tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, dim>> ();
       for (unsigned int i=0; i<dim-1; ++i)
         (*tensor_basis)[i] = q1.get_tensor_basis()[i];
       (*tensor_basis)[dim-1] = q2;
@@ -266,7 +266,7 @@ Subscriptor(),
           ++k;
         }
 
-  tensor_basis.reset (new std::array<Quadrature<1>, dim>());
+  tensor_basis = std_cxx14::make_unique<std::array<Quadrature<1>, dim>> ();
   for (unsigned int i=0; i<dim; ++i)
     (*tensor_basis)[i] = q;
 }
