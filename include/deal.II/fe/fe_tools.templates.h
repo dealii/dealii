@@ -1068,60 +1068,58 @@ namespace
   void
   fill_no_codim_fe_names (std::map<std::string,std::unique_ptr<const Subscriptor> > &result)
   {
-    typedef std::unique_ptr<const Subscriptor> FEFactoryPointer;
-
     result["FE_Q_Hierarchical"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q_Hierarchical<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Q_Hierarchical<dim> > >();
     result["FE_ABF"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_ABF<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_ABF<dim> > >();
     result["FE_Bernstein"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Bernstein<dim> > >();
     result["FE_BDM"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_BDM<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_BDM<dim> > >();
     result["FE_DGBDM"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGBDM<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGBDM<dim> > >();
     result["FE_DGNedelec"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGNedelec<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGNedelec<dim> > >();
     result["FE_DGRaviartThomas"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGRaviartThomas<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGRaviartThomas<dim> > >();
     result["FE_RaviartThomas"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomas<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_RaviartThomas<dim> > >();
     result["FE_RaviartThomasNodal"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_RaviartThomasNodal<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_RaviartThomasNodal<dim> > >();
     result["FE_RT_Bubbles"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_RT_Bubbles<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_RT_Bubbles<dim> > >();
     result["FE_Nedelec"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Nedelec<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Nedelec<dim> > >();
     result["FE_DGPNonparametric"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGPNonparametric<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGPNonparametric<dim> > >();
     result["FE_DGP"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGP<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGP<dim> > >();
     result["FE_DGPMonomial"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGPMonomial<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGPMonomial<dim> > >();
     result["FE_DGQ"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim> > >();
     result["FE_DGQArbitraryNodes"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim> > >();
     result["FE_DGQLegendre"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGQLegendre<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGQLegendre<dim> > >();
     result["FE_DGQHermite"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGQHermite<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGQHermite<dim> > >();
     result["FE_FaceQ"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_FaceQ<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_FaceQ<dim> > >();
     result["FE_FaceP"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_FaceP<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_FaceP<dim> > >();
     result["FE_Q"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Q<dim> > >();
     result["FE_Q_DG0"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q_DG0<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Q_DG0<dim> > >();
     result["FE_Q_Bubbles"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q_Bubbles<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Q_Bubbles<dim> > >();
     result["FE_Q_iso_Q1"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q_iso_Q1<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Q_iso_Q1<dim> > >();
     result["FE_Nothing"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Nothing<dim> > >();
     result["FE_RannacherTurek"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_RannacherTurek<dim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_RannacherTurek<dim> > >();
   }
 
 
@@ -1133,50 +1131,45 @@ namespace
   void
   fill_codim_fe_names (std::map<std::string,std::unique_ptr<const Subscriptor> > &result)
   {
-    typedef std::unique_ptr<const Subscriptor> FEFactoryPointer;
-
     result["FE_Bernstein"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Bernstein<dim,spacedim> > >();
     result["FE_DGP"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGP<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGP<dim,spacedim> > >();
     result["FE_DGQ"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim,spacedim> > >();
     result["FE_Nothing"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Nothing<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Nothing<dim,spacedim> > >();
     result["FE_DGQArbitraryNodes"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGQ<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGQ<dim,spacedim> > >();
     result["FE_DGQLegendre"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGQLegendre<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGQLegendre<dim,spacedim> > >();
     result["FE_DGQHermite"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_DGQHermite<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_DGQHermite<dim,spacedim> > >();
     result["FE_Q_Bubbles"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q_Bubbles<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Q_Bubbles<dim,spacedim> > >();
     result["FE_Q_DG0"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q_DG0<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Q_DG0<dim,spacedim> > >();
     result["FE_Q_iso_Q1"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q_iso_Q1<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Q_iso_Q1<dim,spacedim> > >();
     result["FE_Q"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Q<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Q<dim,spacedim> > >();
     result["FE_Bernstein"]
-      = FEFactoryPointer(new FETools::FEFactory<FE_Bernstein<dim,spacedim> >);
+      = std_cxx14::make_unique<FETools::FEFactory<FE_Bernstein<dim,spacedim> > >();
   }
 
   // The function filling the vector fe_name_map below. It iterates
   // through all legal dimension/spacedimension pairs and fills
   // fe_name_map[dimension][spacedimension] with the maps generated
   // by the functions above.
-  std::vector<std::vector<
+  std::array<std::array<
   std::map<std::string,
-      std::unique_ptr<const Subscriptor> > > >
+      std::unique_ptr<const Subscriptor> >, 4>, 4>
       fill_default_map()
   {
-    std::vector<std::vector<
+    std::array<std::array<
     std::map<std::string,
-        std::unique_ptr<const Subscriptor> > > >
-        result(4);
-
-    for (unsigned int d=0; d<4; ++d)
-      result[d].resize(4);
+        std::unique_ptr<const Subscriptor> >, 4>, 4>
+        result;
 
     fill_no_codim_fe_names<1> (result[1][1]);
     fill_no_codim_fe_names<2> (result[2][2]);
@@ -1222,9 +1215,9 @@ namespace
   // compiled for all dimensions at once, need to create objects for
   // each dimension and then separate between them further down
   static
-  std::vector<std::vector<
+  std::array<std::array<
   std::map<std::string,
-      std::unique_ptr<const Subscriptor> > > >
+      std::unique_ptr<const Subscriptor> >, 4>, 4>
       fe_name_map = fill_default_map();
 }
 
