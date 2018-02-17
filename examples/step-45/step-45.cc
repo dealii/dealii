@@ -48,8 +48,8 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -85,7 +85,7 @@ namespace Step45
 
     MPI_Comm                                    mpi_communicator;
 
-    HyperShellBoundary<dim>                     boundary;
+    SphericalManifold<dim>                      manifold;
     parallel::distributed::Triangulation<dim>   triangulation;
     FESystem<dim>                               fe;
     DoFHandler<dim>                             dof_handler;
@@ -350,8 +350,8 @@ namespace Step45
 // parallel::distributed::Triangulation::add_periodicity.
     triangulation.add_periodicity(periodicity_vector);
 
-    triangulation.set_boundary(0, boundary);
-    triangulation.set_boundary(1, boundary);
+    triangulation.set_all_manifold_ids(1);
+    triangulation.set_manifold(1, manifold);
 
     triangulation.refine_global (4-dim);
   }
