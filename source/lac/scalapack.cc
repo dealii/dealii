@@ -621,8 +621,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
           plamch( &(this->grid->blacs_context), &cmach, abstol);
           abstol *= 2;
           ifail.resize(n_rows);
-          iclustr.resize(n_local_rows * n_local_columns);
-          gap.resize(n_local_rows * n_local_columns);
+          iclustr.resize(2 * grid->n_process_rows * grid->n_process_columns);
+          gap.resize(grid->n_process_rows * grid->n_process_columns);
 
           psyevx(&jobz, &range, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor,
                  &vl, &vu, &il, &iu, &abstol, &m, &nz, &ev[0], &orfac,
