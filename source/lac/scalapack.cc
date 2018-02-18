@@ -535,7 +535,8 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
                                                               std_cxx14::make_unique<ScaLAPACKMatrix<NumberType>>(grid->n_process_rows,grid->n_process_columns,grid,1,1);
 
   eigenvectors->property = property;
-  // number of eigenvalues to be returned; upon successful exit ev contains the m seclected eigenvalues in ascending order
+  // number of eigenvalues to be returned from psyevx; upon successful exit ev contains the m seclected eigenvalues in ascending order
+  // set to all eigenvaleus in case we will be using psyev.
   int m = n_rows;
   std::vector<NumberType> ev(n_rows);
 
@@ -546,16 +547,15 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
        * for jobz==N only eigenvalues are computed, for jobz='V' also the eigenvectors of the matrix are computed
        */
       char jobz = compute_eigenvectors ? 'V' : 'N';
-      char range;
+      char range='A';
       // default value is to compute all eigenvalues and optionally eigenvectors
       bool all_eigenpairs=true;
-      NumberType vl,vu;
-      int il,iu;
+      NumberType vl=NumberType(),vu=NumberType();
+      int il=1,iu=1;
       // number of eigenvectors to be returned;
       // upon successful exit the first m=nz columns contain the selected eigenvectors (only if jobz=='V')
-      int nz;
-      NumberType abstol;
-      char cmach = compute_eigenvectors ? 'U' : 'S';
+      int nz=0;
+      NumberType abstol = NumberType();
 
       // orfac decides which eigenvectors should be reorthogonalized
       // see http://www.netlib.org/scalapack/explore-html/df/d1a/pdsyevx_8f_source.html for explanation
@@ -613,9 +613,11 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
           psyev(&jobz, &uplo, &n_rows, A_loc, &submatrix_row, &submatrix_column, descriptor, &ev[0],
                 eigenvectors_loc, &eigenvectors->submatrix_row, &eigenvectors->submatrix_column, eigenvectors->descriptor,
                 &work[0], &lwork, &info);
+          AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyev", info));
         }
       else
         {
+          char cmach = compute_eigenvectors ? 'U' : 'S';
           plamch( &(this->grid->blacs_context), &cmach, abstol);
           abstol *= 2;
           ifail.resize(n_rows);
@@ -626,6 +628,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(const bool compute_eigenvector
                  &vl, &vu, &il, &iu, &abstol, &m, &nz, &ev[0], &orfac,
                  eigenvectors_loc, &eigenvectors->submatrix_row, &eigenvectors->submatrix_column, eigenvectors->descriptor,
                  &work[0], &lwork, &iwork[0], &liwork, &ifail[0], &iclustr[0], &gap[0], &info);
+          AssertThrow (info==0, LAPACKSupport::ExcErrorCode("psyevx", info));
         }
       lwork=work[0];
       work.resize (lwork);
