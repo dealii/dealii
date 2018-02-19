@@ -30,23 +30,29 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int rank, int dim, typename Number=double> class SymmetricTensor;
 
-template <int dim, typename Number> SymmetricTensor<2,dim,Number>
-unit_symmetric_tensor ();
-template <int dim, typename Number> SymmetricTensor<4,dim,Number>
-deviator_tensor ();
-template <int dim, typename Number> SymmetricTensor<4,dim,Number>
-identity_tensor ();
-template <int dim, typename Number> SymmetricTensor<2,dim,Number>
-invert (const SymmetricTensor<2,dim,Number> &);
-template <int dim, typename Number> SymmetricTensor<4,dim,Number>
-invert (const SymmetricTensor<4,dim,Number> &);
+template <int dim, typename Number>
+SymmetricTensor<2,dim,Number> unit_symmetric_tensor ();
+
+template <int dim, typename Number>
+SymmetricTensor<4,dim,Number> deviator_tensor ();
+
+template <int dim, typename Number>
+SymmetricTensor<4,dim,Number> identity_tensor ();
+
+template <int dim, typename Number>
+SymmetricTensor<2,dim,Number> invert (const SymmetricTensor<2,dim,Number> &);
+
+template <int dim, typename Number>
+SymmetricTensor<4,dim,Number> invert (const SymmetricTensor<4,dim,Number> &);
+
 template <int dim2, typename Number> Number
 trace (const SymmetricTensor<2,dim2,Number> &);
 
-template <int dim, typename Number> SymmetricTensor<2,dim,Number>
-deviator (const SymmetricTensor<2,dim,Number> &);
-template <int dim, typename Number> Number
-determinant (const SymmetricTensor<2,dim,Number> &);
+template <int dim, typename Number>
+SymmetricTensor<2,dim,Number> deviator (const SymmetricTensor<2,dim,Number> &);
+
+template <int dim, typename Number>
+Number determinant (const SymmetricTensor<2,dim,Number> &);
 
 
 
