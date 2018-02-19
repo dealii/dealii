@@ -525,6 +525,46 @@ make_array_view (ElementType *const begin, ElementType *const end)
 
 
 /**
+ * Create a view from an ArrayView itself.
+ *
+ * This function is used for @p const references to objects of ArrayView type.
+ * It only exists for compatibility purposes.
+ *
+ * @param[in] array_view The ArrayView that we wish to make a copy of.
+ *
+ * @relates ArrayView
+ */
+template <typename Number>
+inline
+ArrayView<const Number>
+make_array_view (const ArrayView<Number> &array_view)
+{
+  return make_array_view (array_view.cbegin(), array_view.cend());
+}
+
+
+
+/**
+ * Create a view from an ArrayView itself.
+ *
+ * This function is used for non-@p const references to objects of ArrayView type.
+ * It only exists for compatibility purposes.
+ *
+ * @param[in] array_view The ArrayView that we wish to make a copy of.
+ *
+ * @relates ArrayView
+ */
+template <typename Number>
+inline
+ArrayView<Number>
+make_array_view (ArrayView<Number> &array_view)
+{
+  return make_array_view (array_view.begin(), array_view.end());
+}
+
+
+
+/**
  * Create a view to an entire Tensor object. This is equivalent to initializing
  * an ArrayView object with a pointer to the first element and the size of the
  * given argument.

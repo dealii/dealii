@@ -190,6 +190,153 @@ public:
                const std::pair<unsigned int,unsigned int> &submatrix_size) const;
 
   /**
+   * Transposing assignment: $\mathbf{A} = \mathbf{B}^T$
+   *
+   * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have the same process grid.
+   *
+   * The following alignment conditions have to be fulfilled: $MB_A=NB_B$ and $NB_A=MB_B$.
+   */
+  void copy_transposed(const ScaLAPACKMatrix<NumberType> &B);
+
+  /**
+   * The operations based on the input parameter @p transpose_B and the alignment conditions are summarized in the following table:
+   *
+   * | transpose_B |          Block Sizes         |                    Operation                  |
+   * | :---------: | :--------------------------: | :-------------------------------------------: |
+   * |   false     | $MB_A=MB_B$ <br> $NB_A=NB_B$ |  $\mathbf{A} = a \mathbf{A} + b \mathbf{B}$   |
+   * |   true      | $MB_A=NB_B$ <br> $NB_A=MB_B$ | $\mathbf{A} = a \mathbf{A} + b \mathbf{B}^T$  |
+   *
+   * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have the same process grid.
+   */
+  void add(const ScaLAPACKMatrix<NumberType> &B,
+           const NumberType a=0.,
+           const NumberType b=1.,
+           const bool transpose_B=false);
+
+  /**
+   * Matrix-addition:
+   * $\mathbf{A} = \mathbf{A} + b \mathbf{B}$
+   *
+   * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have the same process grid.
+   *
+   * The following alignment conditions have to be fulfilled: $MB_A=MB_B$ and $NB_A=NB_B$.
+   */
+  void add(const NumberType b,
+           const ScaLAPACKMatrix<NumberType> &B);
+
+  /**
+   * Matrix-addition:
+   * $\mathbf{A} = \mathbf{A} + b \mathbf{B}^T$
+   *
+   * The matrices $\mathbf{A}$ and $\mathbf{B}$ must have the same process grid.
+   *
+   * The following alignment conditions have to be fulfilled: $MB_A=NB_B$ and $NB_A=MB_B$.
+   */
+  void Tadd(const NumberType b,
+            const ScaLAPACKMatrix<NumberType> &B);
+
+  /**
+   * Matrix-matrix-multiplication:
+   *
+   * The operations based on the input parameters and the alignment conditions are summarized in the following table:
+   *
+   * | transpose_A | transpose_B |                  Block Sizes                  |                             Operation                           |
+   * | :---------: | :---------: | :-------------------------------------------: | :-------------------------------------------------------------: |
+   * | false       |   false     | $MB_A=MB_C$ <br> $NB_A=MB_B$ <br> $NB_B=NB_C$ |   $\mathbf{C} = b \mathbf{A} \cdot \mathbf{B} + c \mathbf{C}$   |
+   * | false       |   true      | $MB_A=MB_C$ <br> $NB_A=NB_B$ <br> $MB_B=NB_C$ |  $\mathbf{C} = b \mathbf{A} \cdot \mathbf{B}^T + c \mathbf{C}$  |
+   * | true        |   false     | $MB_A=MB_B$ <br> $NB_A=MB_C$ <br> $NB_B=NB_C$ | $\mathbf{C} = b \mathbf{A}^T \cdot \mathbf{B} + c \mathbf{C}$   |
+   * | true        |   true      | $MB_A=NB_B$ <br> $NB_A=MB_C$ <br> $MB_B=NB_C$ | $\mathbf{C} = b \mathbf{A}^T \cdot \mathbf{B}^T + c \mathbf{C}$ |
+   *
+   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and that
+   * $\mathbf{C}$ already has the right size.
+   *
+   * The matrices $\mathbf{A}$, $\mathbf{B}$ and $\mathbf{C}$ must have the same process grid.
+   */
+  void mult(const NumberType b,
+            const ScaLAPACKMatrix<NumberType> &B,
+            const NumberType c,
+            ScaLAPACKMatrix<NumberType> &C,
+            const bool transpose_A=false,
+            const bool transpose_B=false) const;
+
+  /**
+   * Matrix-matrix-multiplication.
+   *
+   * The optional parameter @p adding determines whether the result is
+   * stored in $\mathbf{C}$ or added to $\mathbf{C}$.
+   *
+   * if (@p adding) $\mathbf{C} = \mathbf{C} + \mathbf{A} \cdot \mathbf{B}$
+   *
+   * else $\mathbf{C} = \mathbf{A} \cdot \mathbf{B}$
+   *
+   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and that
+   * $\mathbf{C}$ already has the right size.
+   *
+   * The following alignment conditions have to be fulfilled: $MB_A=MB_C$, $NB_A=MB_B$ and $NB_B=NB_C$.
+   */
+  void mmult(ScaLAPACKMatrix<NumberType> &C,
+             const ScaLAPACKMatrix<NumberType> &B,
+             const bool adding=false) const;
+
+  /**
+   * Matrix-matrix-multiplication using transpose of $\mathbf{A}$.
+   *
+   * The optional parameter @p adding determines whether the result is
+   * stored in $\mathbf{C}$ or added to $\mathbf{C}$.
+   *
+   * if (@p adding) $\mathbf{C} = \mathbf{C} + \mathbf{A}^T \cdot \mathbf{B}$
+   *
+   * else $\mathbf{C} = \mathbf{A}^T \cdot \mathbf{B}$
+   *
+   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and that
+   * $\mathbf{C}$ already has the right size.
+   *
+   * The following alignment conditions have to be fulfilled: $MB_A=MB_B$, $NB_A=MB_C$ and $NB_B=NB_C$.
+   */
+  void Tmmult (ScaLAPACKMatrix<NumberType> &C,
+               const ScaLAPACKMatrix<NumberType> &B,
+               const bool adding=false) const;
+
+  /**
+   * Matrix-matrix-multiplication using the transpose of $\mathbf{B}$.
+   *
+   * The optional parameter @p adding determines whether the result is
+   * stored in $\mathbf{C}$ or added to $\mathbf{C}$.
+   *
+   * if (@p adding) $\mathbf{C} = \mathbf{C} + \mathbf{A} \cdot \mathbf{B}^T$
+   *
+   * else $\mathbf{C} = \mathbf{A} \cdot \mathbf{B}^T$
+   *
+   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and that
+   * $\mathbf{C}$ already has the right size.
+   *
+   * The following alignment conditions have to be fulfilled: $MB_A=MB_C$, $NB_A=NB_B$ and $MB_B=NB_C$.
+   */
+  void mTmult (ScaLAPACKMatrix<NumberType> &C,
+               const ScaLAPACKMatrix<NumberType> &B,
+               const bool adding=false) const;
+
+  /**
+   * Matrix-matrix-multiplication using transpose of $\mathbf{A}$ and
+   * $\mathbf{B}$.
+   *
+   * The optional parameter @p adding determines whether the result is
+   * stored in $\mathbf{C}$ or added to $\mathbf{C}$.
+   *
+   * if (@p adding) $\mathbf{C} = \mathbf{C} + \mathbf{A}^T \cdot \mathbf{B}^T$
+   *
+   * else $\mathbf{C} = \mathbf{A}^T \cdot \mathbf{B}^T$
+   *
+   * It is assumed that $\mathbf{A}$ and $\mathbf{B}$ have compatible sizes and that
+   * $\mathbf{C}$ already has the right size.
+   *
+   * The following alignment conditions have to be fulfilled: $MB_A=NB_B$, $NB_A=MB_C$ and $MB_B=NB_C$.
+   */
+  void TmTmult (ScaLAPACKMatrix<NumberType> &C,
+                const ScaLAPACKMatrix<NumberType> &B,
+                const bool adding=false) const;
+
+  /**
    * Stores the distributed matrix in @p filename using HDF5.
    *
    * In case that deal.II was built without HDF5
@@ -392,6 +539,32 @@ public:
    * Write access to local element.
    */
   NumberType &local_el(const unsigned int loc_row, const unsigned int loc_column);
+
+  /**
+   * Scale the columns of the distributed matrix by the scalars provided in the array @p factors.
+   *
+   * The array @p factors must have as many entries as the matrix columns.
+   *
+   * Copies of @p factors have to be available on all processes of the underlying MPI communicator.
+   *
+   * @note The fundamental prerequisite for the @p InputVector is that it must be possible to
+   * create an ArrayView from it; this is satisfied by the @p std::vector and Vector classes.
+   */
+  template <class InputVector>
+  void scale_columns(const InputVector &factors);
+
+  /**
+   * Scale the rows of the distributed matrix by the scalars provided in the array @p factors.
+   *
+   * The array @p factors must have as many entries as the matrix rows.
+   *
+   * Copies of @p factors have to be available on all processes of the underlying MPI communicator.
+   *
+   * @note The fundamental prerequisite for the @p InputVector is that it must be possible to
+   * create an ArrayView from it; this is satisfied by the @p std::vector and Vector classes.
+   */
+  template <class InputVector>
+  void scale_rows(const InputVector &factors);
 
 private:
 
