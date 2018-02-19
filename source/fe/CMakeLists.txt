@@ -52,11 +52,8 @@ SET(_unity_include_src
   mapping_c1.cc
   mapping_cartesian.cc
   mapping.cc
-  mapping_q_generic.cc
   mapping_q1.cc
-  mapping_q1_eulerian.cc
   mapping_q.cc
-  mapping_q_eulerian.cc
   mapping_manifold.cc
   )
 
@@ -71,10 +68,13 @@ SET(_separate_src
   mapping_fe_field_inst2.cc
   fe_tools_interpolate.cc
   fe_tools_extrapolate.cc
+  mapping_q_generic.cc
+  mapping_q1_eulerian.cc
+  mapping_q_eulerian.cc
   )
 
 # determined by profiling
-SET(_n_includes_per_unity_file 15)
+SET(_n_includes_per_unity_file 10)
 
 SETUP_SOURCE_LIST("${_unity_include_src}"
   "${_separate_src}"
