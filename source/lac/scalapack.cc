@@ -1513,36 +1513,32 @@ namespace internal
 
     template <typename NumberType>
     void scale_columns(ScaLAPACKMatrix<NumberType>       &matrix,
-                       const ArrayView<const NumberType> &factors,
-                       const bool                         grid_mpi_process_is_active)
+                       const ArrayView<const NumberType> &factors)
     {
       Assert(matrix.n()==factors.size(),ExcDimensionMismatch(matrix.n(),factors.size()));
 
-      if (grid_mpi_process_is_active)
-        for (unsigned int i=0; i<matrix.local_n(); ++i)
-          {
-            const NumberType s = factors[matrix.global_column(i)];
+      for (unsigned int i=0; i<matrix.local_n(); ++i)
+        {
+          const NumberType s = factors[matrix.global_column(i)];
 
-            for (unsigned int j=0; j<matrix.local_m(); ++j)
-              matrix.local_el(j,i) *= s;
-          }
+          for (unsigned int j=0; j<matrix.local_m(); ++j)
+            matrix.local_el(j,i) *= s;
+        }
     }
 
     template <typename NumberType>
     void scale_rows(ScaLAPACKMatrix<NumberType>       &matrix,
-                    const ArrayView<const NumberType> &factors,
-                    const bool                         grid_mpi_process_is_active)
+                    const ArrayView<const NumberType> &factors)
     {
       Assert(matrix.m()==factors.size(),ExcDimensionMismatch(matrix.m(),factors.size()));
 
-      if (grid_mpi_process_is_active)
-        for (unsigned int i=0; i<matrix.local_m(); ++i)
-          {
-            const NumberType s = factors[matrix.global_row(i)];
+      for (unsigned int i=0; i<matrix.local_m(); ++i)
+        {
+          const NumberType s = factors[matrix.global_row(i)];
 
-            for (unsigned int j=0; j<matrix.local_n(); ++j)
-              matrix.local_el(i,j) *= s;
-          }
+          for (unsigned int j=0; j<matrix.local_n(); ++j)
+            matrix.local_el(i,j) *= s;
+        }
     }
 
   }
@@ -1554,8 +1550,8 @@ template <typename NumberType>
 template <class InputVector>
 void ScaLAPACKMatrix<NumberType>::scale_columns(const InputVector &factors)
 {
-  internal::scale_columns(*this, make_array_view(factors),
-                          this->grid->mpi_process_is_active);
+  if (this->grid->mpi_process_is_active)
+    internal::scale_columns(*this, make_array_view(factors));
 }
 
 
@@ -1564,8 +1560,8 @@ template <typename NumberType>
 template <class InputVector>
 void ScaLAPACKMatrix<NumberType>::scale_rows(const InputVector &factors)
 {
-  internal::scale_rows(*this, make_array_view(factors),
-                       this->grid->mpi_process_is_active);
+  if (this->grid->mpi_process_is_active)
+    internal::scale_rows(*this, make_array_view(factors));
 }
 
 

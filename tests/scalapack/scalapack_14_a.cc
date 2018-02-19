@@ -16,7 +16,7 @@
 #include "../tests.h"
 #include "../lapack/create_matrix.h"
 
-// test scaling of rows and columns of distributed ScaLAPACKMatrices
+// test scaling of rows of distributed ScaLAPACKMatrices
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -50,57 +50,29 @@ void test(const unsigned int block_size_i, const unsigned int block_size_j)
   pcout << "2D process grid: " << grid->get_process_grid_rows() << "x" << grid->get_process_grid_columns() << std::endl << std::endl;
 
   // test scaling of rows
-  {
-    FullMatrix<NumberType> full_A(sizes[0],sizes[1]);
-    create_random(full_A);
+  FullMatrix<NumberType> full_A(sizes[0],sizes[1]);
+  create_random(full_A);
 
-    std::vector<NumberType> scaling_factors(full_A.m());
-    for (unsigned int i=0; i<scaling_factors.size(); ++i)
-      scaling_factors[i] = std::sqrt(i+1);
+  std::vector<NumberType> scaling_factors(full_A.m());
+  for (unsigned int i=0; i<scaling_factors.size(); ++i)
+    scaling_factors[i] = std::sqrt(i+1);
 
-    ScaLAPACKMatrix<NumberType> scalapack_A (full_A.m(),full_A.n(),grid,block_size_i,block_size_j);
-    scalapack_A = full_A;
-    const ArrayView<NumberType> view_rows(scaling_factors);
-    scalapack_A.scale_rows(view_rows);
-    FullMatrix<NumberType> tmp_full_A(scalapack_A.m(),scalapack_A.n());
-    scalapack_A.copy_to(tmp_full_A);
+  ScaLAPACKMatrix<NumberType> scalapack_A (full_A.m(),full_A.n(),grid,block_size_i,block_size_j);
+  scalapack_A = full_A;
+  const ArrayView<NumberType> view_rows(scaling_factors);
+  scalapack_A.scale_rows(view_rows);
+  FullMatrix<NumberType> tmp_full_A(scalapack_A.m(),scalapack_A.n());
+  scalapack_A.copy_to(tmp_full_A);
 
-    for (unsigned int i=0; i<full_A.m(); ++i)
-      for (unsigned int j=0; j<full_A.n(); ++j)
-        full_A(i,j) *= scaling_factors[i];
+  for (unsigned int i=0; i<full_A.m(); ++i)
+    for (unsigned int j=0; j<full_A.n(); ++j)
+      full_A(i,j) *= scaling_factors[i];
 
-    pcout << "   Row scaling for"
-          << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << ")" << std::endl;
-    pcout << "   norms: " << tmp_full_A.frobenius_norm()<< " & "
-          << full_A.frobenius_norm() << "  for "
-          << typeid(NumberType).name() << std::endl << std::endl;
-  }
-  // test scaling of columns
-  {
-    FullMatrix<NumberType> full_A(sizes[0],sizes[1]);
-    create_random(full_A);
-
-    std::vector<NumberType> scaling_factors(full_A.n());
-    for (unsigned int i=0; i<scaling_factors.size(); ++i)
-      scaling_factors[i] = std::sqrt(i+1);
-
-    ScaLAPACKMatrix<NumberType> scalapack_A (full_A.m(),full_A.n(),grid,block_size_i,block_size_j);
-    scalapack_A = full_A;
-    const ArrayView<NumberType> view_columns(scaling_factors);
-    scalapack_A.scale_columns(view_columns);
-    FullMatrix<NumberType> tmp_full_A(scalapack_A.m(),scalapack_A.n());
-    scalapack_A.copy_to(tmp_full_A);
-
-    for (unsigned int i=0; i<full_A.m(); ++i)
-      for (unsigned int j=0; j<full_A.n(); ++j)
-        full_A(i,j) *= scaling_factors[j];
-
-    pcout << "   Column scaling for"
-          << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << ")" << std::endl;
-    pcout << "   norms: " << tmp_full_A.frobenius_norm()<< " & "
-          << full_A.frobenius_norm() << "  for "
-          << typeid(NumberType).name() << std::endl << std::endl;
-  }
+  pcout << "   Row scaling for"
+        << " A in R^(" << scalapack_A.m() << "x" << scalapack_A.n() << ")" << std::endl;
+  pcout << "   norms: " << tmp_full_A.frobenius_norm()<< " & "
+        << full_A.frobenius_norm() << "  for "
+        << typeid(NumberType).name() << std::endl << std::endl;
   pcout << std::endl;
 }
 

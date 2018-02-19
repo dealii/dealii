@@ -1,0 +1,6 @@
+2D process grid: 3x3
+
+   computing C = b A * B + c C with A in R^(300x500), B in R^(500x400) and C in R^(300x400)
+   norms: 60787.8449 & 60787.8449  for d
+
+
