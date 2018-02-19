@@ -658,6 +658,62 @@ namespace GridTools
                               = typename Triangulation<dim, spacedim>::active_cell_iterator());
 
   /**
+   * Given a @p cache and a list of
+   * @p local_points for each process, find the points lying on the locally owned
+   * part of the mesh and compute the quadrature rules for them.
+   * Distributed compute point locations is a function similar to
+   * GridTools::compute_point_locations but working for parallel::Triangulation
+   * objects and, unlike its serial version, also for a distributed triangulation
+   * (see parallel::distributed::Triangulation).
+   *
+   * @param[in] cache a GridTools::Cache object
+   * @param[in] local_points the array of points owned by the current process. Every
+   *  process can have a different array of points which can be empty and not
+   *  contained within the locally owned part of the triangulation
+   * @param[in] local_bbox the description of the locally owned part of the mesh made
+   *  with bounding boxes. It can be obtained from
+   *  GridTools::compute_mesh_predicate_bounding_box
+   * @param[out] tuple containing the quadrature information
+   *
+   * The elements of the output tuple are:
+   * - cells : a vector of cells of the all cells containing at
+   *  least a point.
+   * - qpoints : a vector of vector of points; containing in @p qpoints[i]
+   *   the reference positions of all points that fall within the cell @P cells[i] .
+   * - maps : a vector of vector of integers, containing the mapping between
+   *  the numbering in qpoints (previous element of the tuple), and the vector
+   *  of local points of the process owning the points.
+   * - points : a vector of vector of points. @p points[i][j] is the point in the
+   *  real space corresponding.
+   *  to @p qpoints[i][j] . Notice @p points are the points lying on the locally
+   *  owned part of the mesh; thus these can be either copies of @p local_points
+   *  or points received from other processes i.e. local_points for other processes
+   * - owners : a vector of vectors; @p owners[i][j] contains the rank of
+   *  the process owning the point[i][j] (previous element of the tuple).
+   *
+   * The function uses the triangulation's mpi communicator: for this reason it
+   * throws an assert error if the Triangulation is not derived from
+   * parallel::Triangulation .
+   *
+   * In a serial execution the first three elements of the tuple are the same
+   * as in GridTools::compute_point_locations .
+   *
+   * @author Giovanni Alzetta, 2017-2018
+   */
+  template <int dim, int spacedim>
+  std::tuple<
+  std::vector< typename Triangulation<dim, spacedim>::active_cell_iterator >,
+      std::vector< std::vector< Point<dim> > >,
+      std::vector< std::vector< unsigned int > >,
+      std::vector< std::vector< Point<spacedim> > >,
+      std::vector< std::vector< unsigned int > >
+      >
+      distributed_compute_point_locations
+      (const GridTools::Cache<dim,spacedim>                &cache,
+       const std::vector<Point<spacedim> >                 &local_points,
+       const std::vector< BoundingBox<spacedim> >          &local_bbox);
+
+  /**
    * Return a map of index:Point<spacedim>, containing the used vertices of the
    * given `container`. The key of the returned map is the global index in the
    * triangulation. The used vertices are obtained by looping over all cells,

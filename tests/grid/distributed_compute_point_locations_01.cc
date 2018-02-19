@@ -1,0 +1,132 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2017-2018 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+// Test GridTools::distributed_compute_point_locations for the serial case
+
+#include "../tests.h"
+#include <deal.II/base/logstream.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/grid/tria.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
+#include <deal.II/distributed/tria.h>
+#include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/fe/mapping_q.h>
+
+using namespace dealii;
+
+template <int dim>
+void test_compute_pt_loc(unsigned int n_points)
+{
+  MPI_Comm mpi_communicator = MPI_COMM_WORLD;
+  deallog << "Testing for dim = " << dim << std::endl;
+  deallog << "Testing on: " << n_points << " points." << std::endl;
+
+  // Creating a grid in the square [0,1]x[0,1]
+  parallel::distributed::Triangulation<dim> tria(mpi_communicator);
+  GridGenerator::hyper_cube(tria);
+  tria.refine_global(std::max(6-dim,2));
+
+  // Creating the random points
+  std::vector<Point<dim>> points;
+
+  for (size_t i=0; i<n_points; ++i)
+    points.push_back(random_point<dim>());
+
+  // Initializing the cache
+  GridTools::Cache<dim,dim> cache(tria);
+
+  // Computing the description of the locally owned part of the mesh
+  IteratorFilters::LocallyOwnedCell locally_owned_cell_predicate;
+  std::vector< BoundingBox<dim> > local_bbox = GridTools::compute_mesh_predicate_bounding_box
+                                               (cache.get_triangulation(), locally_owned_cell_predicate,
+                                                1, true, 4); // These options should be passed
+  // Using the distributed version of compute point location
+
+  // Using the distributed version
+  auto output_tuple = distributed_compute_point_locations(cache,points,local_bbox);
+  // Testing in serial against the serial version
+  auto cell_qpoint_map = GridTools::compute_point_locations(cache,points);
+
+  auto &serial_cells = std::get<0>(cell_qpoint_map);
+  auto &serial_qpoints = std::get<1>(cell_qpoint_map);
+  size_t n_cells = std::get<0>(output_tuple).size();
+
+  deallog << "Points found in " << n_cells << " cells" << std::endl;
+
+  // testing if the result coincides with
+  // the serial one
+  for (unsigned int c=0; c<n_cells; ++c)
+    {
+      auto &cell = std::get<0>(output_tuple)[c];
+      auto &quad = std::get<1>(output_tuple)[c];
+      auto &local_map = std::get<2>(output_tuple)[c];
+      auto &original_points = std::get<3>(output_tuple)[c];
+      auto &ranks = std::get<4>(output_tuple)[c];
+
+      auto pos_cell = std::find(serial_cells.begin(),serial_cells.end(),cell);
+      for (auto r: ranks)
+        if (r!=0)
+          deallog << "ERROR: rank is not 0 but " << std::to_string(r) << std::endl;
+
+      if (pos_cell == serial_cells.end())
+        deallog << "ERROR: cell not found" << std::endl;
+      else
+        {
+          auto serial_cell_idx = pos_cell - serial_cells.begin();
+          if ( original_points.size() != serial_qpoints[serial_cell_idx].size())
+            deallog << "ERROR: in the number of points for cell" << std::to_string(serial_cell_idx) << std::endl;
+          if ( quad.size() != serial_qpoints[serial_cell_idx].size())
+            deallog << "ERROR: in the number of points for cell" << std::to_string(serial_cell_idx) << std::endl;
+
+          unsigned int pt_num = 0;
+          for (const auto &p_idx: local_map)
+            {
+              auto serial_pt_pos = std::find(local_map.begin(),local_map.end(),p_idx);
+              auto serial_pt_idx = serial_pt_pos-local_map.begin();
+              if ( serial_pt_pos == local_map.end())
+                deallog << "ERROR: point index not found for " << std::to_string(serial_pt_idx) << std::endl;
+              else
+                {
+                  if ( (original_points[pt_num] - points[p_idx]).norm() > 1e-12 )
+                    {
+                      deallog << "ERROR: Point in serial : " << points[p_idx] << " Point in distributed: " << original_points[pt_num] << std::endl;
+                    }
+
+                  if ( (quad[pt_num] - serial_qpoints[serial_cell_idx][serial_pt_idx]).norm() > 1e-10 )
+                    {
+                      deallog << " ERROR: Transformation of qpoint to point is not correct" << std::endl;
+                      deallog << "qpoint in serial : " << quad[pt_num] << " Point in distributed: " << serial_qpoints[serial_cell_idx][serial_pt_idx] << std::endl;
+                    }
+                }
+              ++pt_num;
+            }
+        }
+    }
+
+  deallog << "Test finished" << std::endl;
+}
+
+int main (int argc, char *argv[])
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 1);
+  MPILogInitAll log;
+
+  deallog << "Deal.II distributed_compute_point_locations:" << std::endl;
+  test_compute_pt_loc<2>(100);
+  test_compute_pt_loc<3>(200);
+}
