@@ -703,25 +703,14 @@ namespace parallel
       /**
        * Constructor.
        */
-      TBBPartitioner()
-#ifdef DEAL_II_WITH_THREADS
-        :
-        my_partitioner(std::make_shared<tbb::affinity_partitioner>()),
-        in_use(false)
-#endif
-      {}
+      TBBPartitioner();
 
 #ifdef DEAL_II_WITH_THREADS
       /**
        * Destructor. Check that the object is not in use any more, i.e., all
        * loops have been completed.
        */
-      ~TBBPartitioner()
-      {
-        AssertNothrow(in_use == false,
-                      ExcInternalError("A vector partitioner goes out of scope, but "
-                                       "it appears to be still in use."));
-      }
+      ~TBBPartitioner();
 
       /**
        * Return an affinity partitioner. In case the partitioner owned by the
@@ -730,29 +719,14 @@ namespace parallel
        * again, return it by the release_one_partitioner() call.
        */
       std::shared_ptr<tbb::affinity_partitioner>
-      acquire_one_partitioner()
-      {
-        dealii::Threads::Mutex::ScopedLock lock(mutex);
-        if (in_use)
-          return std::make_shared<tbb::affinity_partitioner>();
-
-        in_use = true;
-        return my_partitioner;
-      }
+      acquire_one_partitioner();
 
       /**
        * After using the partitioner in a tbb loop through
        * acquire_one_partitioner(), this call makes the partitioner available
        * again.
        */
-      void release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner> &p)
-      {
-        if (p.get() == my_partitioner.get())
-          {
-            dealii::Threads::Mutex::ScopedLock lock(mutex);
-            in_use = false;
-          }
-      }
+      void release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner> &p);
 
     private:
       /**

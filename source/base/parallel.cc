@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2016 by the deal.II authors
+// Copyright (C) 2009 - 2018 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,6 +46,56 @@ namespace internal
     // any more for anything but very small matrices that we don't care that
     // much about anyway.
     unsigned int minimum_parallel_grain_size = 256;
+  }
+}
+
+namespace parallel
+{
+  namespace internal
+  {
+#ifdef DEAL_II_WITH_THREADS
+    TBBPartitioner::TBBPartitioner()
+      :
+      my_partitioner(std::make_shared<tbb::affinity_partitioner>()),
+      in_use(false)
+    {}
+
+
+
+    TBBPartitioner::~TBBPartitioner()
+    {
+      AssertNothrow(in_use == false,
+                    ExcInternalError("A vector partitioner goes out of scope, but "
+                                     "it appears to be still in use."));
+    }
+
+
+
+    std::shared_ptr<tbb::affinity_partitioner>
+    TBBPartitioner::acquire_one_partitioner()
+    {
+      dealii::Threads::Mutex::ScopedLock lock(mutex);
+      if (in_use)
+        return std::make_shared<tbb::affinity_partitioner>();
+
+      in_use = true;
+      return my_partitioner;
+    }
+
+
+
+    void
+    TBBPartitioner::release_one_partitioner(std::shared_ptr<tbb::affinity_partitioner> &p)
+    {
+      if (p.get() == my_partitioner.get())
+        {
+          dealii::Threads::Mutex::ScopedLock lock(mutex);
+          in_use = false;
+        }
+    }
+#else
+    TBBPartitioner::TBBPartitioner() = default;
+#endif
   }
 }
 
