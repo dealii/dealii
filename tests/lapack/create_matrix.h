@@ -50,3 +50,12 @@ void create_random (FullMatrix &A)
     for (unsigned int j = 0; j < A.n(); ++j)
       A(i,j) = random_value<typename FullMatrix::value_type>();
 }
+
+
+
+template <typename NumberType>
+void create_random (Vector<NumberType> &V)
+{
+  for (unsigned int i = 0; i < V.size(); ++i)
+    V(i) = random_value<NumberType>();
+}

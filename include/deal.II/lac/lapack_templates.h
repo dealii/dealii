@@ -54,6 +54,15 @@ extern "C"
                const float *alpha, const float *A, const dealii::types::blas_int *lda,
                const float *B, const dealii::types::blas_int *ldb,
                const float *beta, float *C, const dealii::types::blas_int *ldc);
+// Symmetric rank-k update
+  void dsyrk_ (const char *uplo, const char *trans,
+               const dealii::types::blas_int *n, const dealii::types::blas_int *k,
+               const double *alpha, const double *A, const dealii::types::blas_int *lda,
+               const double *beta, double *C, const dealii::types::blas_int *ldc);
+  void ssyrk_ (const char *uplo, const char *trans,
+               const dealii::types::blas_int *n, const dealii::types::blas_int *k,
+               const float *alpha, const float *A, const dealii::types::blas_int *lda,
+               const float *beta, float *C, const dealii::types::blas_int *ldc);
 // Compute LU factorization
   void dgetrf_ (const dealii::types::blas_int *m, const dealii::types::blas_int *n, double *A,
                 const dealii::types::blas_int *lda, dealii::types::blas_int *ipiv, dealii::types::blas_int *info);
@@ -310,6 +319,40 @@ extern "C"
 }
 
 DEAL_II_NAMESPACE_OPEN
+
+
+/// Template wrapper for LAPACK functions dsyrk and ssyrk
+template <typename number>
+inline void
+syrk(const char *, const char *,
+     const types::blas_int *, const types::blas_int *,
+     const number *, const number *, const types::blas_int *,
+     const number *, number *, const types::blas_int *)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+syrk(const char *uplo, const char *trans,
+     const types::blas_int *n, const types::blas_int *k,
+     const double *alpha, const double *A, const types::blas_int *lda,
+     const double *beta, double *C, const types::blas_int *ldc)
+{
+  dsyrk_(uplo,trans,n,k,alpha,A,lda,beta,C,ldc);
+}
+
+inline void
+syrk(const char *uplo, const char *trans,
+     const types::blas_int *n, const types::blas_int *k,
+     const float *alpha, const float *A, const types::blas_int *lda,
+     const float *beta, float *C, const types::blas_int *ldc)
+{
+  ssyrk_(uplo,trans,n,k,alpha,A,lda,beta,C,ldc);
+}
+#endif
+
+
 
 /// Template wrapper for LAPACK functions dsyr and ssyr
 template <typename number>

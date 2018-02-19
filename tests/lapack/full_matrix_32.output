@@ -1,0 +1,33 @@
+
+DEAL:double::3 3 
+DEAL:double::OK
+DEAL:double::7 7 
+DEAL:double::OK
+DEAL:double::51 51 
+DEAL:double::OK
+DEAL:double::320 320 
+DEAL:double::OK
+DEAL:double::3 9 
+DEAL:double::OK
+DEAL:double::9 7 
+DEAL:double::OK
+DEAL:double::5 17 
+DEAL:double::OK
+DEAL:double::320 121 
+DEAL:double::OK
+DEAL:float::3 3 
+DEAL:float::OK
+DEAL:float::7 7 
+DEAL:float::OK
+DEAL:float::51 51 
+DEAL:float::OK
+DEAL:float::320 320 
+DEAL:float::OK
+DEAL:float::3 9 
+DEAL:float::OK
+DEAL:float::9 7 
+DEAL:float::OK
+DEAL:float::5 17 
+DEAL:float::OK
+DEAL:float::320 121 
+DEAL:float::OK
