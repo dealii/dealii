@@ -605,7 +605,7 @@ public:
    * The face iterator gives an indication which face this function is
    * supposed to compute the normal vector for.  This is useful if the
    * boundary of the domain is composed of different nondifferential
-   * pieces (for example when using the StraightBoundary class to
+   * pieces (for example when using the FlatManifold class to
    * approximate a geometry that is completely described by the coarse
    * mesh, with piecewise (bi-)linear components between the vertices,
    * but where the boundary may have a kink at the vertices itself).

@@ -1127,12 +1127,12 @@ namespace GridGenerator
    * mesh. The surface mesh is then refined in the same way as the faces of
    * the volume mesh are. In order to ensure that the surface mesh has the
    * same vertices as the volume mesh, it is therefore important that you
-   * assign appropriate boundary objects through Triangulation::set_boundary()
-   * to the surface mesh object before calling this function. If you don't,
-   * the refinement will happen under the assumption that all faces are
-   * straight (i.e using the StraightBoundary class) rather than any curved
-   * boundary object you may want to use to determine the location of new
-   * vertices.
+   * assign appropriate boundary descriptions through
+   * Triangulation::set_manifold() to the surface mesh object before calling
+   * this function. If you don't, the refinement will happen under the
+   * assumption that all faces are straight (i.e using the FlatManifold class)
+   * rather than utilizing the Manifold object you may want to use to determine
+   * the location of new vertices.
    *
    * @tparam MeshType A type that satisfies the requirements of the
    * @ref ConceptMeshType "MeshType concept".

@@ -629,7 +629,7 @@ the input file which one to use.
 In the program, we will use a spherical shell as domain. This means
 that the inner and outer boundary of the domain are no longer
 "straight" (by which we usually mean that they are bilinear surfaces
-that can be represented by the StraightBoundary class). Rather, they
+that can be represented by the FlatManifold class). Rather, they
 are curved and it seems prudent to use a curved approximation in the
 program if we are already using higher order finite elements for the
 velocity. Consequently, we will introduce a member variable of type

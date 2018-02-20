@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This class works by transforming points to polar coordinates (in
  * both two and three dimensions), taking the average in that
- * coordinate system, and then transforming back the point to
+ * coordinate system, and then transforming the point back to
  * Cartesian coordinates. In order for this manifold to work
  * correctly, it cannot be attached to cells containing the center of
  * the coordinate system or the north and south poles in three
