@@ -73,6 +73,11 @@ MACRO(EXPAND_INSTANTIATIONS _target _inst_in_files)
   ADD_CUSTOM_TARGET(${_target}_inst ALL DEPENDS ${_inst_targets})
 
   #
+  # Provide a way to generate all .inst files with a custom target.
+  #
+  ADD_DEPENDENCIES(expand_all_instantiations ${_target}_inst)
+
+  #
   # Add a dependency to all target.${build_type} so that target.inst is
   # fully generated before target will be processed.
   #
