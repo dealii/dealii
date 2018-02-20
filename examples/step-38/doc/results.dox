@@ -42,7 +42,7 @@ The program also works for 1d curves in 2d, not just 2d surfaces in 3d. You
 can test this by changing the template argument in <code>main()</code> like
 so:
 @code
-      LaplaceBeltramiProblem<2> laplace_beltrami;  
+      LaplaceBeltramiProblem<2> laplace_beltrami;
 @endcode
 The domain is a curve in 2d, and we can visualize the solution by using the
 third dimension (and color) to denote the value of the function $u(x)$. This
@@ -122,7 +122,7 @@ void LaplaceBeltrami<spacedim>::make_grid_and_dofs ()
     volume_mesh.set_boundary (0, boundary_description);
     volume_mesh.refine_global (4);
 
-    std::set<unsigned char> boundary_ids;
+    std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert (0);
 
     GridGenerator::extract_boundary_mesh (volume_mesh, triangulation,
