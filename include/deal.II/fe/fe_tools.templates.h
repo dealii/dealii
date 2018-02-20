@@ -2403,6 +2403,7 @@ namespace FETools
             // this is a workaround since the constructor for FESystem
             // only accepts raw pointers.
             std::vector<const FiniteElement<dim,spacedim> *> raw_base_fes;
+            raw_base_fes.reserve(base_fes.size());
             for (const auto &base_fe: base_fes)
               raw_base_fes.push_back(base_fe.get());
 

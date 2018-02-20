@@ -82,7 +82,7 @@ void print_mesh_info(const Triangulation<dim> &triangulation,
       }
 
     std::cout << " boundary indicators: ";
-    for (const std::pair<types::boundary_id, unsigned int> &pair : boundary_count)
+    for (const std::pair<const types::boundary_id, unsigned int> &pair : boundary_count)
       {
         std::cout << pair.first << "(" << pair.second << " times) ";
       }
