@@ -2026,21 +2026,7 @@ const Manifold<dim,spacedim> &
 TriaAccessor<structdim, dim, spacedim>::get_manifold () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-
-  // Get the default (manifold_id)
-  const types::manifold_id mi = this->objects().manifold_id[this->present_index];
-
-  // In case this is not valid, check
-  // the boundary id, after having
-  // casted it to a manifold id
-  if (mi == numbers::invalid_manifold_id)
-    return this->tria->get_manifold(structdim < dim ?
-                                    this->objects().boundary_or_material_id[this->present_index].boundary_id:
-                                    dim < spacedim ?
-                                    this->objects().boundary_or_material_id[this->present_index].material_id:
-                                    numbers::invalid_manifold_id);
-  else
-    return this->tria->get_manifold(mi);
+  return this->tria->get_manifold(this->manifold_id());
 }
 
 
