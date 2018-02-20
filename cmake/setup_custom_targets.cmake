@@ -174,3 +174,9 @@ FILE(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
 ADD_CUSTOM_TARGET(info
   COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_info.cmake
   )
+
+
+#
+# Provide a target to build all .inst files
+#
+ADD_CUSTOM_TARGET(expand_all_instantiations)
