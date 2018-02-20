@@ -2590,9 +2590,55 @@ void GridOut::write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim>
       patches.push_back(patch);
     }
 
-  const std::string new_file = (filename_without_extension + ".proc" +
-                                Utilities::int_to_string (tria.locally_owned_subdomain(), 4) +
-                                ".vtu");
+  // only create .pvtu file if running in parallel
+  // if not, just create a .vtu file with no reference
+  // to the processor number
+  std::string new_file = filename_without_extension + ".vtu";
+  if (const parallel::Triangulation<dim,spacedim> *tr =
+        dynamic_cast<const parallel::Triangulation<dim,spacedim> *>(&tria))
+    {
+      new_file = filename_without_extension + ".proc" +
+                 Utilities::int_to_string (tr->locally_owned_subdomain(), 4) +
+                 ".vtu";
+
+      // create .pvtu record
+      if (tr->locally_owned_subdomain() == 0)
+        {
+          std::vector<std::string> filenames;
+
+          // .pvtu needs to reference the files without a relative path because it will be written
+          // in the same directory. For this, remove any paths from filename.
+          std::size_t pos = filename_without_extension.find_last_of('/');
+          if (pos == std::string::npos)
+            pos = 0;
+          else
+            pos += 1;
+          const unsigned int n_procs = Utilities::MPI::n_mpi_processes(tr->get_communicator());
+          for (unsigned int i=0; i<n_procs; ++i)
+            filenames.push_back (filename_without_extension.substr(pos) +
+                                 ".proc" + Utilities::int_to_string(i, 4) +
+                                 ".vtu");
+
+          const std::string pvtu_master_filename = (filename_without_extension + ".pvtu");
+          std::ofstream pvtu_master (pvtu_master_filename.c_str());
+
+          DataOut<dim, DoFHandler<dim,spacedim> > data_out;
+          data_out.attach_triangulation (*tr);
+
+          // We need a dummy vector with the names of the data values in the .vtu files
+          // in order that the .pvtu contains reference these values
+          Vector<float> dummy_vector (tr->n_active_cells());
+          data_out.add_data_vector (dummy_vector, "level");
+          data_out.add_data_vector (dummy_vector, "subdomain");
+          data_out.add_data_vector (dummy_vector, "level_subdomain");
+          data_out.add_data_vector (dummy_vector, "proc_writing");
+
+          data_out.build_patches ();
+
+          data_out.write_pvtu_record (pvtu_master, filenames);
+        }
+    }
+
   std::ofstream out(new_file.c_str());
   std::vector<std::tuple<unsigned int, unsigned int, std::string> > vector_data_ranges;
   DataOutBase::VtkFlags flags;
@@ -2601,41 +2647,6 @@ void GridOut::write_mesh_per_processor_as_vtu (const Triangulation<dim,spacedim>
                           vector_data_ranges,
                           flags,
                           out);
-  //create .pvtu record
-  if (tria.locally_owned_subdomain() == 0)
-    {
-      std::vector<std::string> filenames;
-
-      //.pvtu needs to reference the files without a relative path because it will be written
-      //in the same directory. For this, remove any paths from filename.
-      std::size_t pos = filename_without_extension.find_last_of('/');
-      if (pos == std::string::npos)
-        pos = 0;
-      else
-        pos += 1;
-      for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
-        filenames.push_back (filename_without_extension.substr(pos) +
-                             ".proc" + Utilities::int_to_string(i, 4) +
-                             ".vtu");
-
-      const std::string pvtu_master_filename = (filename_without_extension + ".pvtu");
-      std::ofstream pvtu_master (pvtu_master_filename.c_str());
-
-      DataOut<dim, DoFHandler<dim,spacedim> > data_out;
-      data_out.attach_triangulation (tria);
-
-      //We need a dummy vector with the names of the data values in the .vtu files
-      //in order that the .pvtu contains reference these values
-      Vector<float> dummy_vector (tria.n_active_cells());
-      data_out.add_data_vector (dummy_vector, "level");
-      data_out.add_data_vector (dummy_vector, "subdomain");
-      data_out.add_data_vector (dummy_vector, "level_subdomain");
-      data_out.add_data_vector (dummy_vector, "proc_writing");
-
-      data_out.build_patches ();
-
-      data_out.write_pvtu_record (pvtu_master, filenames);
-    }
 }
 
 
