@@ -188,9 +188,20 @@ LAPACKFullMatrix<number>::operator*= (const number factor)
          state == LAPACKSupport::inverse_matrix,
          ExcState(state));
 
-  for (size_type column = 0; column<this->n(); ++column)
-    for (size_type row = 0; row<this->m(); ++row)
-      (*this)(row,column) *= factor;
+  AssertIsFinite(factor);
+  const char type = 'G';
+  const number cfrom = 1.;
+  const types::blas_int m = this->m();
+  const types::blas_int n = this->n();
+  const types::blas_int lda = this->m();
+  types::blas_int info;
+  // kl and ku will not be referenced for type = G (dense matrices)
+  const types::blas_int kl=0;
+  number *values = &this->values[0];
+
+  lascl(&type,&kl,&kl,&cfrom,&factor,&m,&n,values,&lda,&info);
+
+  Assert(info >= 0, ExcInternalError());
 
   return *this;
 }
@@ -207,9 +218,19 @@ LAPACKFullMatrix<number>::operator/= (const number factor)
   AssertIsFinite(factor);
   Assert (factor != number(0.), ExcZero() );
 
-  for (size_type column = 0; column<this->n(); ++column)
-    for (size_type row = 0; row<this->m(); ++row)
-      (*this)(row,column) /= factor;
+  const char type = 'G';
+  const number cto = 1.;
+  const types::blas_int m = this->m();
+  const types::blas_int n = this->n();
+  const types::blas_int lda = this->m();
+  types::blas_int info;
+  // kl and ku will not be referenced for type = G (dense matrices)
+  const types::blas_int kl=0;
+  number *values = &this->values[0];
+
+  lascl(&type,&kl,&kl,&factor,&cto,&m,&n,values,&lda,&info);
+
+  Assert(info >= 0, ExcInternalError());
 
   return *this;
 }

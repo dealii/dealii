@@ -315,7 +315,27 @@ extern "C"
               const float *alpha, const float *x,
               const dealii::types::blas_int *incx,
               float *A, const dealii::types::blas_int *lda);
-
+// Multiply rectangular mxn real matrix by real scalar CTO/CFROM
+  void dlascl_(const char *type,
+               const int *kl,
+               const int *ku,
+               const double *cfrom,
+               const double *cto,
+               const int *m,
+               const int *n,
+               double *A,
+               const int *lda,
+               int *info);
+  void slascl_(const char *type,
+               const int *kl,
+               const int *ku,
+               const float *cfrom,
+               const float *cto,
+               const int *m,
+               const int *n,
+               float *A,
+               const int *lda,
+               int *info);
 }
 
 DEAL_II_NAMESPACE_OPEN
@@ -1530,6 +1550,72 @@ inline void
 stev (const char *, const types::blas_int *, float *, float *, float *, const types::blas_int *, float *, types::blas_int *)
 {
   Assert (false, LAPACKSupport::ExcMissing("sstev"));
+}
+#endif
+
+
+/// Template wrapper for LAPACK functions dlascl and slascl
+template <typename number>
+inline void
+lascl(const char *,
+      const types::blas_int *,
+      const types::blas_int *,
+      const number *,
+      const number *,
+      const types::blas_int *,
+      const types::blas_int *,
+      number *,
+      const types::blas_int *,
+      types::blas_int *)
+{
+  Assert (false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+lascl(const char *type,
+      const types::blas_int *kl,
+      const types::blas_int *ku,
+      const double *cfrom,
+      const double *cto,
+      const types::blas_int *m,
+      const types::blas_int *n,
+      double *A,
+      const types::blas_int *lda,
+      types::blas_int *info)
+{
+  dlascl_(type,kl,ku,cfrom,cto,m,n,A,lda,info);
+}
+#else
+inline void
+lascl(const char *, const types::blas_int *, const types::blas_int *, const double *, const double *,
+      const types::blas_int *, const types::blas_int *, double *, const types::blas_int *, types::blas_int *)
+{
+  Assert (false, LAPACKSupport::ExcMissing("dlascl"));
+}
+#endif
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+lascl(const char *type,
+      const types::blas_int *kl,
+      const types::blas_int *ku,
+      const float *cfrom,
+      const float *cto,
+      const types::blas_int *m,
+      const types::blas_int *n,
+      float *A,
+      const types::blas_int *lda,
+      types::blas_int *info)
+{
+  slascl_(type,kl,ku,cfrom,cto,m,n,A,lda,info);
+}
+#else
+inline void
+lascl(const char *, const types::blas_int *, const types::blas_int *, const float *, const float *,
+      const types::blas_int *, const types::blas_int *, float *, const types::blas_int *, types::blas_int *)
+{
+  Assert (false, LAPACKSupport::ExcMissing("slascl"));
 }
 #endif
 
