@@ -195,12 +195,13 @@ LAPACKFullMatrix<number>::operator*= (const number factor)
   const types::blas_int n = this->n();
   const types::blas_int lda = this->m();
   types::blas_int info;
-  // kl and ku will not be referenced for type = G (dense matrices)
+  // kl and ku will not be referenced for type = G (dense matrices).
   const types::blas_int kl=0;
   number *values = &this->values[0];
 
   lascl(&type,&kl,&kl,&cfrom,&factor,&m,&n,values,&lda,&info);
 
+  // Negative return value implies a wrong argument. This should be internal.
   Assert(info >= 0, ExcInternalError());
 
   return *this;
@@ -224,12 +225,13 @@ LAPACKFullMatrix<number>::operator/= (const number factor)
   const types::blas_int n = this->n();
   const types::blas_int lda = this->m();
   types::blas_int info;
-  // kl and ku will not be referenced for type = G (dense matrices)
+  // kl and ku will not be referenced for type = G (dense matrices).
   const types::blas_int kl=0;
   number *values = &this->values[0];
 
   lascl(&type,&kl,&kl,&factor,&cto,&m,&n,values,&lda,&info);
 
+  // Negative return value implies a wrong argument. This should be internal.
   Assert(info >= 0, ExcInternalError());
 
   return *this;
@@ -239,7 +241,7 @@ LAPACKFullMatrix<number>::operator/= (const number factor)
 
 template <typename number>
 void
-LAPACKFullMatrix<number>::add (const number              a,
+LAPACKFullMatrix<number>::add (const number a,
                                const LAPACKFullMatrix<number> &A)
 {
   Assert(state == LAPACKSupport::matrix ||
@@ -251,9 +253,15 @@ LAPACKFullMatrix<number>::add (const number              a,
 
   AssertIsFinite(a);
 
-  for (size_type i=0; i<m(); ++i)
-    for (size_type j=0; j<n(); ++j)
-      (*this)(i,j) += a * A(i,j);
+  // BLAS does not offer functions to add matrices.
+  // LapackFullMatrix is stored in contiguous array
+  // ==> use BLAS 1 for adding vectors
+  const types::blas_int n = this->m() * this->n();
+  const types::blas_int inc=1;
+  number *values = &this->values[0];
+  const number *values_A = &A.values[0];
+
+  axpy(&n,&a,values_A,&inc,values,&inc);
 }
 
 

@@ -317,25 +317,25 @@ extern "C"
               float *A, const dealii::types::blas_int *lda);
 // Multiply rectangular mxn real matrix by real scalar CTO/CFROM
   void dlascl_(const char *type,
-               const int *kl,
-               const int *ku,
+               const dealii::types::blas_int *kl,
+               const dealii::types::blas_int *ku,
                const double *cfrom,
                const double *cto,
-               const int *m,
-               const int *n,
+               const dealii::types::blas_int *m,
+               const dealii::types::blas_int *n,
                double *A,
-               const int *lda,
-               int *info);
+               const dealii::types::blas_int *lda,
+               dealii::types::blas_int *info);
   void slascl_(const char *type,
-               const int *kl,
-               const int *ku,
+               const dealii::types::blas_int *kl,
+               const dealii::types::blas_int *ku,
                const float *cfrom,
                const float *cto,
-               const int *m,
-               const int *n,
+               const dealii::types::blas_int *m,
+               const dealii::types::blas_int *n,
                float *A,
-               const int *lda,
-               int *info);
+               const dealii::types::blas_int *lda,
+               dealii::types::blas_int *info);
 }
 
 DEAL_II_NAMESPACE_OPEN
