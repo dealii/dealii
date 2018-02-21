@@ -835,9 +835,9 @@ namespace LinearAlgebra
         return;
 
       Assert (matrix.m() == m,
-              dealii::ExcDimensionMismatch(matrix.m(),m));
+              ExcDimensionMismatch(matrix.m(),m));
       Assert (matrix.n() == n,
-              dealii::ExcDimensionMismatch(matrix.n(),n));
+              ExcDimensionMismatch(matrix.n(),n));
 
       // reset the matrix
       matrix = typename FullMatrixType::value_type(0.0);
@@ -846,7 +846,7 @@ namespace LinearAlgebra
       if (symmetric)
         {
           Assert (m == n,
-                  dealii::ExcDimensionMismatch(m,n));
+                  ExcDimensionMismatch(m,n));
 
           for (unsigned int i = 0; i < m; i++)
             for (unsigned int j = i; j < n; j++)
@@ -888,14 +888,14 @@ namespace LinearAlgebra
         return res;
 
       Assert (matrix.m() == m,
-              dealii::ExcDimensionMismatch(matrix.m(),m));
+              ExcDimensionMismatch(matrix.m(),m));
       Assert (matrix.n() == n,
-              dealii::ExcDimensionMismatch(matrix.n(),n));
+              ExcDimensionMismatch(matrix.n(),n));
 
       if (symmetric)
         {
           Assert (m == n,
-                  dealii::ExcDimensionMismatch(m,n));
+                  ExcDimensionMismatch(m,n));
 
           for (unsigned int i = 0; i < m; i++)
             {
@@ -919,11 +919,13 @@ namespace LinearAlgebra
     template <typename Number>
     template <typename FullMatrixType>
     void
-    BlockVector<Number>::mmult(const BlockVector<Number> &V,
-                               const FullMatrixType &matrix)
+    BlockVector<Number>::mmult(BlockVector<Number> &V,
+                               const FullMatrixType &matrix,
+                               const Number s,
+                               const Number b) const
     {
-      const unsigned int n = this->n_blocks();
-      const unsigned int m = V.n_blocks();
+      const unsigned int m = this->n_blocks();
+      const unsigned int n = V.n_blocks();
 
       // in case one vector is empty and the second one is not, the
       // FullMatrix resized to (m,n) will have 0 both in m() and n()
@@ -933,14 +935,21 @@ namespace LinearAlgebra
         return;
 
       Assert (matrix.m() == m,
-              dealii::ExcDimensionMismatch(matrix.m(),m));
+              ExcDimensionMismatch(matrix.m(),m));
       Assert (matrix.n() == n,
-              dealii::ExcDimensionMismatch(matrix.n(),n));
+              ExcDimensionMismatch(matrix.n(),n));
 
-      (*this) = Number();
       for (unsigned int i = 0; i < n; i++)
-        for (unsigned int j = 0; j < m; j++)
-          this->block(i).add (matrix(j,i), V.block(j));
+        {
+          // below we make this work gracefully for identity-like matrices in
+          // which case the two loops over j won't do any work as A(j,i)==0
+          const unsigned int k = std::min(i,m-1);
+          V.block(i).sadd(s,matrix(k,i)*b, this->block(k));
+          for (unsigned int j = 0  ; j < k; j++)
+            V.block(i).add (matrix(j,i)*b, this->block(j));
+          for (unsigned int j = k+1; j < m; j++)
+            V.block(i).add (matrix(j,i)*b, this->block(j));
+        }
     }
 
 

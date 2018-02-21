@@ -15,7 +15,8 @@
 
 
 
-// this BlockVector<Number>::mmult(const BlockVector<Number> &V,const FullMatrixType &matrix).
+// this BlockVector<Number>::mmult(const BlockVector<Number> &V,const FullMatrixType &matrix, s,b)
+// also for vectors of different number of blocks.
 // Triangulation and Mass operator are the same as in matrix_free/mass_operator_01.cc
 
 #include "../tests.h"
@@ -39,7 +40,7 @@
 
 
 template <int dim, int fe_degree>
-void test (const unsigned int n_blocks = 5)
+void test (const unsigned int n = 5, const unsigned int m = 3)
 {
   typedef double number;
 
@@ -104,14 +105,26 @@ void test (const unsigned int n_blocks = 5)
   mf.initialize(mf_data);
   mf.compute_diagonal();
 
-  LinearAlgebra::distributed::BlockVector<number> left(n_blocks), right(n_blocks), left2(n_blocks);
-  for (unsigned int b = 0; b < n_blocks; ++b)
+  LinearAlgebra::distributed::BlockVector<number> left(n), right(m), left2(n);
+  for (unsigned int b = 0; b < n; ++b)
     {
       mf_data->initialize_dof_vector (left.block(b));
       mf_data->initialize_dof_vector (left2.block(b));
-      mf_data->initialize_dof_vector (right.block(b));
       left.block(b) = 0.;
       left2.block(b) = 0.;
+      for (unsigned int i=0; i<left.block(b).local_size(); ++i)
+        {
+          const unsigned int glob_index =
+            owned_set.nth_index_in_set (i);
+          if (constraints.is_constrained(glob_index))
+            continue;
+          left.block(b).local_element(i) = random_value<double>();
+        }
+    }
+
+  for (unsigned int b = 0; b < m; ++b)
+    {
+      mf_data->initialize_dof_vector (right.block(b));
       right.block(b) = 0.;
       for (unsigned int i=0; i<right.block(b).local_size(); ++i)
         {
@@ -120,20 +133,21 @@ void test (const unsigned int n_blocks = 5)
           if (constraints.is_constrained(glob_index))
             continue;
           right.block(b).local_element(i) = random_value<double>();
-          left.block(b).local_element(i) = random_value<double>();
         }
     }
 
-  FullMatrix<number> metric(n_blocks,n_blocks);
-  for (unsigned int i = 0; i < n_blocks; ++i)
-    for (unsigned int j = 0; j < n_blocks; ++j)
+
+  FullMatrix<number> metric(m,n);
+  for (unsigned int i = 0; i < m; ++i)
+    for (unsigned int j = 0; j < n; ++j)
       metric(i,j) = 0.3 + (i*3 + j*7);
 
-  right.mmult(left,metric);
+  right.mmult(left,metric);       // L = RM
+  right.mmult(left,metric,2.,3.); // L = 2L + 3 RM = 5RM
 
-  for (unsigned int i = 0; i < n_blocks; ++i)
-    for (unsigned int j = 0; j < n_blocks; ++j)
-      left2.block(i).add(metric(j,i), right.block(j));
+  for (unsigned int i = 0; i < n; ++i)
+    for (unsigned int j = 0; j < m; ++j)
+      left2.block(i).add(5.*metric(j,i), right.block(j));
 
   left2.add(-1., left);
 
@@ -154,10 +168,14 @@ int main (int argc, char **argv)
       initlog();
       deallog << std::setprecision(4);
 
-      test<2,1>();
+      test<2,1>(5,3);
+      test<2,1>(3,3);
+      test<2,1>(3,5);
     }
   else
     {
-      test<2,1>();
+      test<2,1>(5,3);
+      test<2,1>(3,3);
+      test<2,1>(3,5);
     }
 }
