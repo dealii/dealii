@@ -16,7 +16,7 @@
 #include "../tests.h"
 #include "../lapack/create_matrix.h"
 
-// test serial saving and loading of distributed ScaLAPACKMatrices with prescribed chunk sizes
+// test saving and loading of distributed ScaLAPACKMatrices with prescribed chunk sizes
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -34,7 +34,7 @@
 template <typename NumberType>
 void test(const std::pair<unsigned int,unsigned int> &size, const unsigned int block_size, const std::pair<unsigned int,unsigned int> &chunk_size)
 {
-  const std::string filename ("scalapck_10_b_test.h5");
+  const std::string filename ("scalapack_10_b_test.h5");
 
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));

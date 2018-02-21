@@ -142,6 +142,16 @@ public:
   void set_property(const LAPACKSupport::Property property);
 
   /**
+   * Return current @p property of this matrix
+   */
+  LAPACKSupport::Property get_property() const;
+
+  /**
+   * Return current @p state of this matrix
+   */
+  LAPACKSupport::State get_state() const;
+
+  /**
    * Assignment operator from a regular FullMatrix.
    *
    * @note This function should only be used for relatively small matrix

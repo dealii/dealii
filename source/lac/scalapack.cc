@@ -156,6 +156,24 @@ ScaLAPACKMatrix<NumberType>::set_property(const LAPACKSupport::Property property
 
 
 template <typename NumberType>
+LAPACKSupport::Property
+ScaLAPACKMatrix<NumberType>::get_property() const
+{
+  return property;
+}
+
+
+
+template <typename NumberType>
+LAPACKSupport::State
+ScaLAPACKMatrix<NumberType>::get_state() const
+{
+  return state;
+}
+
+
+
+template <typename NumberType>
 ScaLAPACKMatrix<NumberType> &
 ScaLAPACKMatrix<NumberType>::operator = (const FullMatrix<NumberType> &matrix)
 {
@@ -1158,6 +1176,69 @@ NumberType ScaLAPACKMatrix<NumberType>::norm_symmetric(const char type) const
 
 
 
+namespace internal
+{
+  namespace
+  {
+    void create_HDF5_state_enum_id(hid_t &state_enum_id)
+    {
+      // create HDF5 enum type for LAPACKSupport::State
+      LAPACKSupport::State val;
+      state_enum_id = H5Tcreate (H5T_ENUM, sizeof(LAPACKSupport::State));
+      val = LAPACKSupport::State::cholesky;
+      herr_t status = H5Tenum_insert (state_enum_id, "cholesky", (int *)&val);
+      AssertThrow(status >= 0, ExcInternalError());
+      val = LAPACKSupport::State::eigenvalues;
+      status = H5Tenum_insert (state_enum_id, "eigenvalues", (int *)&val);
+      AssertThrow(status >= 0, ExcInternalError());
+      val = LAPACKSupport::State::inverse_matrix;
+      status = H5Tenum_insert (state_enum_id, "inverse_matrix", (int *)&val);
+      AssertThrow(status >= 0, ExcInternalError());
+      val = LAPACKSupport::State::inverse_svd;
+      status = H5Tenum_insert (state_enum_id, "inverse_svd", (int *)&val);
+      AssertThrow(status >= 0, ExcInternalError());
+      val = LAPACKSupport::State::lu;
+      status = H5Tenum_insert (state_enum_id, "lu", (int *)&val);
+      AssertThrow(status >= 0, ExcInternalError());
+      val = LAPACKSupport::State::matrix;
+      status = H5Tenum_insert (state_enum_id, "matrix", (int *)&val);
+      AssertThrow(status >= 0, ExcInternalError());
+      val = LAPACKSupport::State::svd;
+      status = H5Tenum_insert (state_enum_id, "svd", (int *)&val);
+      AssertThrow(status >= 0, ExcInternalError());
+      val = LAPACKSupport::State::unusable;
+      status = H5Tenum_insert (state_enum_id, "unusable", (int *)&val);
+      AssertThrow(status >= 0, ExcInternalError());
+    }
+
+    void create_HDF5_property_enum_id(hid_t &property_enum_id)
+    {
+      // create HDF5 enum type for LAPACKSupport::Property
+      property_enum_id = H5Tcreate (H5T_ENUM, sizeof(LAPACKSupport::Property));
+      LAPACKSupport::Property prop = LAPACKSupport::Property::diagonal;
+      herr_t status = H5Tenum_insert (property_enum_id, "diagonal", (int *)&prop);
+      AssertThrow(status >= 0, ExcInternalError());
+      prop = LAPACKSupport::Property::general;
+      status = H5Tenum_insert (property_enum_id, "general", (int *)&prop);
+      AssertThrow(status >= 0, ExcInternalError());
+      prop = LAPACKSupport::Property::hessenberg;
+      status = H5Tenum_insert (property_enum_id, "hessenberg", (int *)&prop);
+      AssertThrow(status >= 0, ExcInternalError());
+      prop = LAPACKSupport::Property::lower_triangular;
+      status = H5Tenum_insert (property_enum_id, "lower_triangular", (int *)&prop);
+      AssertThrow(status >= 0, ExcInternalError());
+      prop = LAPACKSupport::Property::symmetric;
+      status = H5Tenum_insert (property_enum_id, "symmetric", (int *)&prop);
+      AssertThrow(status >= 0, ExcInternalError());
+      prop = LAPACKSupport::Property::upper_triangular;
+      status = H5Tenum_insert (property_enum_id, "upper_triangular", (int *)&prop);
+      AssertThrow(status >= 0, ExcInternalError());
+    }
+  }
+}
+
+
+
 template <typename NumberType>
 void ScaLAPACKMatrix<NumberType>::save(const char *filename,
                                        const std::pair<unsigned int,unsigned int> &chunk_size) const
@@ -1230,8 +1311,8 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename,
       //revert order of rows and columns as ScaLAPACK uses column-major ordering
       chunk_dims[0] = chunk_size.second;
       chunk_dims[1] = chunk_size.first;
-      hid_t property = H5Pcreate (H5P_DATASET_CREATE);
-      status = H5Pset_chunk (property, 2, chunk_dims);
+      hid_t data_property = H5Pcreate (H5P_DATASET_CREATE);
+      status = H5Pset_chunk (data_property, 2, chunk_dims);
       AssertThrow(status >= 0, ExcIO());
 
       // create the data space for the dataset
@@ -1245,7 +1326,7 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename,
       hid_t type_id = hdf5_type_id(&tmp.values[0]);
       hid_t dataset_id = H5Dcreate2(file_id, "/matrix",
                                     type_id, dataspace_id,
-                                    H5P_DEFAULT, property, H5P_DEFAULT);
+                                    H5P_DEFAULT, data_property, H5P_DEFAULT);
 
       // write the dataset
       status = H5Dwrite(dataset_id, type_id,
@@ -1253,16 +1334,61 @@ void ScaLAPACKMatrix<NumberType>::save_serial(const char *filename,
                         &tmp.values[0]);
       AssertThrow(status >= 0, ExcIO());
 
-      // end access to the dataset and release resources used by it
-      status = H5Dclose(dataset_id);
+      // create HDF5 enum type for LAPACKSupport::State and LAPACKSupport::Property
+      hid_t state_enum_id, property_enum_id;
+      internal::create_HDF5_state_enum_id(state_enum_id);
+      internal::create_HDF5_property_enum_id(property_enum_id);
+
+      // create the data space for the state enum
+      hsize_t dims_state[1];
+      dims_state[0]=1;
+      hid_t state_enum_dataspace = H5Screate_simple(1, dims_state, nullptr);
+      // create the dataset for the state enum
+      hid_t state_enum_dataset = H5Dcreate2(file_id, "/state", state_enum_id, state_enum_dataspace,
+                                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      // write the dataset for the state enum
+      status = H5Dwrite(state_enum_dataset, state_enum_id,
+                        H5S_ALL, H5S_ALL, H5P_DEFAULT,
+                        &state);
       AssertThrow(status >= 0, ExcIO());
 
-      // terminate access to the data space
+      // create the data space for the property enum
+      hsize_t dims_property[1];
+      dims_property[0]=1;
+      hid_t property_enum_dataspace = H5Screate_simple(1, dims_property, nullptr);
+      // create the dataset for the property enum
+      hid_t property_enum_dataset = H5Dcreate2(file_id, "/property", property_enum_id, property_enum_dataspace,
+                                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      // write the dataset for the property enum
+      status = H5Dwrite(property_enum_dataset, property_enum_id,
+                        H5S_ALL, H5S_ALL, H5P_DEFAULT,
+                        &property);
+      AssertThrow(status >= 0, ExcIO());
+
+      // end access to the datasets and release resources used by them
+      status = H5Dclose(dataset_id);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Dclose(state_enum_dataset);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Dclose(property_enum_dataset);
+      AssertThrow(status >= 0, ExcIO());
+
+      // terminate access to the data spaces
       status = H5Sclose(dataspace_id);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Sclose(state_enum_dataspace);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Sclose(property_enum_dataspace);
+      AssertThrow(status >= 0, ExcIO());
+
+      // release enum data types
+      status = H5Tclose(state_enum_id);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Tclose(property_enum_id);
       AssertThrow(status >= 0, ExcIO());
 
       // release the creation property
-      status = H5Pclose (property);
+      status = H5Pclose (data_property);
       AssertThrow(status >= 0, ExcIO());
 
       // close the file.
@@ -1334,8 +1460,10 @@ void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename,
   hid_t type_id = hdf5_type_id(data);
   hid_t dset_id = H5Dcreate2(file_id, "/matrix", type_id,
                              filespace, H5P_DEFAULT, plist_id, H5P_DEFAULT);
+
   status = H5Sclose(filespace);
   AssertThrow(status >= 0, ExcIO());
+
   status = H5Pclose(plist_id);
   AssertThrow(status >= 0, ExcIO());
 
@@ -1374,7 +1502,6 @@ void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename,
                         plist_id, data);
       AssertThrow(status >= 0, ExcIO());
     }
-
   // close/release sources
   status = H5Dclose(dset_id);
   AssertThrow(status >= 0, ExcIO());
@@ -1386,6 +1513,63 @@ void ScaLAPACKMatrix<NumberType>::save_parallel(const char *filename,
   AssertThrow(status >= 0, ExcIO());
   status = H5Fclose(file_id);
   AssertThrow(status >= 0, ExcIO());
+
+  // before writing the state and property to file wait for
+  // all processes to finish writing the matrix content to the file
+  MPI_Barrier(tmp.grid->mpi_communicator);
+
+  // only root process will write state and property to the file
+  if (tmp.grid->this_mpi_process==0)
+    {
+      // open file using default properties
+      hid_t file_id_reopen = H5Fopen(filename, H5F_ACC_RDWR, H5P_DEFAULT);
+
+      // create HDF5 enum type for LAPACKSupport::State and LAPACKSupport::Property
+      hid_t state_enum_id, property_enum_id;
+      internal::create_HDF5_state_enum_id(state_enum_id);
+      internal::create_HDF5_property_enum_id(property_enum_id);
+
+      // create the data space for the state enum
+      hsize_t dims_state[1];
+      dims_state[0]=1;
+      hid_t state_enum_dataspace = H5Screate_simple(1, dims_state, nullptr);
+      // create the dataset for the state enum
+      hid_t state_enum_dataset = H5Dcreate2(file_id_reopen, "/state", state_enum_id, state_enum_dataspace,
+                                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      // write the dataset for the state enum
+      status = H5Dwrite(state_enum_dataset, state_enum_id,
+                        H5S_ALL, H5S_ALL, H5P_DEFAULT,
+                        &state);
+      AssertThrow(status >= 0, ExcIO());
+
+      // create the data space for the property enum
+      hsize_t dims_property[1];
+      dims_property[0]=1;
+      hid_t property_enum_dataspace = H5Screate_simple(1, dims_property, nullptr);
+      // create the dataset for the property enum
+      hid_t property_enum_dataset = H5Dcreate2(file_id_reopen, "/property", property_enum_id, property_enum_dataspace,
+                                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      // write the dataset for the property enum
+      status = H5Dwrite(property_enum_dataset, property_enum_id,
+                        H5S_ALL, H5S_ALL, H5P_DEFAULT,
+                        &property);
+      AssertThrow(status >= 0, ExcIO());
+
+      status = H5Dclose(state_enum_dataset);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Dclose(property_enum_dataset);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Sclose(state_enum_dataspace);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Sclose(property_enum_dataspace);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Tclose(state_enum_id);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Tclose(property_enum_id);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Fclose(file_id_reopen);
+      AssertThrow(status >= 0, ExcIO());
+    }
 
 #  endif
 }
@@ -1402,6 +1586,7 @@ void ScaLAPACKMatrix<NumberType>::load(const char *filename)
 #  ifdef H5_HAVE_PARALLEL
   //implementation for configurations equipped with a parallel file system
   load_parallel(filename);
+
 #  else
   //implementation for configurations with no parallel file system
   load_serial(filename);
@@ -1428,6 +1613,9 @@ void ScaLAPACKMatrix<NumberType>::load_serial(const char *filename)
 
   const int MB=n_rows, NB=n_columns;
   ScaLAPACKMatrix<NumberType> tmp(n_rows,n_columns,one_grid,MB,NB);
+
+  int state_int = -1;
+  int property_int = -1;
 
   // the 1x1 grid has only one process and this one reads
   // the content of the matrix from the HDF5 file
@@ -1468,22 +1656,91 @@ void ScaLAPACKMatrix<NumberType>::load_serial(const char *filename)
                        H5P_DEFAULT, &tmp.values[0]);
       AssertThrow(status >= 0, ExcIO());
 
-      // terminate access to the data space
+      // create HDF5 enum type for LAPACKSupport::State and LAPACKSupport::Property
+      hid_t state_enum_id, property_enum_id;
+      internal::create_HDF5_state_enum_id(state_enum_id);
+      internal::create_HDF5_property_enum_id(property_enum_id);
+
+      // open the datasets for the state and property enum in the file
+      hid_t dataset_state_id = H5Dopen2(file_id, "/state", H5P_DEFAULT);
+      hid_t datatype_state  = H5Dget_type(dataset_state_id);
+      H5T_class_t t_class_state = H5Tget_class(datatype_state);
+      AssertThrow(t_class_state == H5T_ENUM, ExcIO());
+
+      hid_t dataset_property_id = H5Dopen2(file_id, "/property", H5P_DEFAULT);
+      hid_t datatype_property  = H5Dget_type(dataset_property_id);
+      H5T_class_t t_class_property = H5Tget_class(datatype_property);
+      AssertThrow(t_class_property == H5T_ENUM, ExcIO());
+
+      // get dataspace handles
+      hid_t dataspace_state = H5Dget_space(dataset_state_id);
+      hid_t dataspace_property = H5Dget_space(dataset_property_id);
+      // get number of dimensions
+      const int ndims_state = H5Sget_simple_extent_ndims(dataspace_state);
+      AssertThrow(ndims_state==1, ExcIO());
+      const int ndims_property = H5Sget_simple_extent_ndims(dataspace_property);
+      AssertThrow(ndims_property==1, ExcIO());
+      // get every dimension
+      hsize_t dims_state[1];
+      H5Sget_simple_extent_dims(dataspace_state, dims_state, nullptr);
+      AssertThrow((int)dims_state[0]==1,ExcIO());
+      hsize_t dims_property[1];
+      H5Sget_simple_extent_dims(dataspace_property, dims_property, nullptr);
+      AssertThrow((int)dims_property[0]==1,ExcIO());
+
+      // read data
+      status = H5Dread(dataset_state_id, state_enum_id, H5S_ALL, H5S_ALL,
+                       H5P_DEFAULT, &tmp.state);
+      AssertThrow(status >= 0, ExcIO());
+      // To send the state from the root process to the other processes
+      // the state enum is casted to an integer, that will be broadcasted and
+      // subsequently casted back to the enum type
+      state_int = static_cast<int>(tmp.state);
+
+      status = H5Dread(dataset_property_id, property_enum_id, H5S_ALL, H5S_ALL,
+                       H5P_DEFAULT, &tmp.property);
+      AssertThrow(status >= 0, ExcIO());
+      // To send the property from the root process to the other processes
+      // the state enum is casted to an integer, that will be broadcasted and
+      // subsequently casted back to the enum type
+      property_int = static_cast<int>(tmp.property);
+
+      // terminate access to the data spaces
       status = H5Sclose(dataspace_id);
       AssertThrow(status >= 0, ExcIO());
-
-      // release data type handle
-      status = H5Tclose(datatype);
+      status = H5Sclose(dataspace_state);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Sclose(dataspace_property);
       AssertThrow(status >= 0, ExcIO());
 
-      // end access to the dataset and release resources used by it
+      // release data type handles
+      status = H5Tclose(datatype);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Tclose(state_enum_id);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Tclose(property_enum_id);
+      AssertThrow(status >= 0, ExcIO());
+
+      // end access to the data sets and release resources used by them
+      status = H5Dclose(dataset_state_id);
+      AssertThrow(status >= 0, ExcIO());
       status = H5Dclose(dataset_id);
+      AssertThrow(status >= 0, ExcIO());
+      status = H5Dclose(dataset_property_id);
       AssertThrow(status >= 0, ExcIO());
 
       // close the file.
       status = H5Fclose(file_id);
       AssertThrow(status >= 0, ExcIO());
     }
+  // so far only the root process has the correct state integer --> broadcasting
+  tmp.grid->send_to_inactive(&state_int,1);
+  // so far only the root process has the correct property integer --> broadcasting
+  tmp.grid->send_to_inactive(&property_int,1);
+
+  tmp.state = static_cast<LAPACKSupport::State>(state_int);
+  tmp.property = static_cast<LAPACKSupport::Property>(property_int);
+
   tmp.copy_to(*this);
 
 #  endif // DEAL_II_WITH_HDF5
@@ -1585,12 +1842,67 @@ void ScaLAPACKMatrix<NumberType>::load_parallel(const char *filename)
   status = H5Dread(dataset_id, datatype, memspace, dataspace_id, H5P_DEFAULT, data);
   AssertThrow(status >= 0, ExcIO());
 
+  // create HDF5 enum type for LAPACKSupport::State and LAPACKSupport::Property
+  hid_t state_enum_id, property_enum_id;
+  internal::create_HDF5_state_enum_id(state_enum_id);
+  internal::create_HDF5_property_enum_id(property_enum_id);
+
+  // open the datasets for the state and property enum in the file
+  hid_t dataset_state_id = H5Dopen2(file_id, "/state", H5P_DEFAULT);
+  hid_t datatype_state  = H5Dget_type(dataset_state_id);
+  H5T_class_t t_class_state = H5Tget_class(datatype_state);
+  AssertThrow(t_class_state == H5T_ENUM, ExcIO());
+
+  hid_t dataset_property_id = H5Dopen2(file_id, "/property", H5P_DEFAULT);
+  hid_t datatype_property  = H5Dget_type(dataset_property_id);
+  H5T_class_t t_class_property = H5Tget_class(datatype_property);
+  AssertThrow(t_class_property == H5T_ENUM, ExcIO());
+
+  // get dataspace handles
+  hid_t dataspace_state = H5Dget_space(dataset_state_id);
+  hid_t dataspace_property = H5Dget_space(dataset_property_id);
+  // get number of dimensions
+  const int ndims_state = H5Sget_simple_extent_ndims(dataspace_state);
+  AssertThrow(ndims_state==1, ExcIO());
+  const int ndims_property = H5Sget_simple_extent_ndims(dataspace_property);
+  AssertThrow(ndims_property==1, ExcIO());
+  // get every dimension
+  hsize_t dims_state[1];
+  H5Sget_simple_extent_dims(dataspace_state, dims_state, nullptr);
+  AssertThrow((int)dims_state[0]==1,ExcIO());
+  hsize_t dims_property[1];
+  H5Sget_simple_extent_dims(dataspace_property, dims_property, nullptr);
+  AssertThrow((int)dims_property[0]==1,ExcIO());
+
+  // read data
+  status = H5Dread(dataset_state_id, state_enum_id, H5S_ALL, H5S_ALL,
+                   H5P_DEFAULT, &tmp.state);
+  AssertThrow(status >= 0, ExcIO());
+
+  status = H5Dread(dataset_property_id, property_enum_id, H5S_ALL, H5S_ALL,
+                   H5P_DEFAULT, &tmp.property);
+  AssertThrow(status >= 0, ExcIO());
+
   // close/release sources
   status = H5Sclose(memspace);
   AssertThrow(status >= 0, ExcIO());
   status = H5Dclose(dataset_id);
   AssertThrow(status >= 0, ExcIO());
+  status = H5Dclose(dataset_state_id);
+  AssertThrow(status >= 0, ExcIO());
+  status = H5Dclose(dataset_property_id);
+  AssertThrow(status >= 0, ExcIO());
   status = H5Sclose(dataspace_id);
+  AssertThrow(status >= 0, ExcIO());
+  status = H5Sclose(dataspace_state);
+  AssertThrow(status >= 0, ExcIO());
+  status = H5Sclose(dataspace_property);
+  AssertThrow(status >= 0, ExcIO());
+  //status = H5Tclose(datatype);
+  //AssertThrow(status >= 0, ExcIO());
+  status = H5Tclose(state_enum_id);
+  AssertThrow(status >= 0, ExcIO());
+  status = H5Tclose(property_enum_id);
   AssertThrow(status >= 0, ExcIO());
   status = H5Fclose(file_id);
   AssertThrow(status >= 0, ExcIO());
