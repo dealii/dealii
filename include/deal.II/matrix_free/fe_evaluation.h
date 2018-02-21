@@ -5393,9 +5393,9 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   Assert(this->matrix_info != nullptr ||
          this->mapped_geometry->is_initialized(), ExcNotInitialized());
 
-  SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>
-  ::evaluate (*this->data, &this->values_dofs[0], this->values_quad,
-              this->gradients_quad, this->hessians_quad, this->scratch_data,
+  SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, VectorizedArray<Number> >
+  ::evaluate (*this->data, this->values_dofs[0], this->values_quad[0],
+              this->gradients_quad[0][0], this->hessians_quad[0][0], this->scratch_data,
               evaluate_values, evaluate_gradients, evaluate_hessians);
 
 #ifdef DEBUG
@@ -5427,9 +5427,9 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
   Assert(this->matrix_info != nullptr ||
          this->mapped_geometry->is_initialized(), ExcNotInitialized());
 
-  SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, Number>
-  ::integrate (*this->data, &this->values_dofs[0], this->values_quad,
-               this->gradients_quad, this->scratch_data,
+  SelectEvaluator<dim, fe_degree, n_q_points_1d, n_components, VectorizedArray<Number> >
+  ::integrate (*this->data, this->values_dofs[0], this->values_quad[0],
+               this->gradients_quad[0][0], this->scratch_data,
                integrate_values, integrate_gradients);
 
 #ifdef DEBUG

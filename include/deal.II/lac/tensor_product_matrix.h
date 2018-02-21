@@ -454,10 +454,10 @@ TensorProductMatrixSymmetricSumBase<dim,Number,size>
   Threads::Mutex::ScopedLock lock(this->mutex);
   const unsigned int n = Utilities::fixed_power<dim>(size > 0 ? size : eigenvalues[0].size());
   tmp_array.resize_fast(n*2);
-  constexpr int kernel_size = size > 0 ? size-1 : -1;
-  internal::EvaluatorTensorProduct<internal::evaluate_general,dim,kernel_size,kernel_size+1,Number>
+  constexpr int kernel_size = size > 0 ? size : 0;
+  internal::EvaluatorTensorProduct<internal::evaluate_general,dim,kernel_size,kernel_size,Number>
   eval(AlignedVector<Number> {}, AlignedVector<Number> {},
-       AlignedVector<Number> {}, mass_matrix[0].n_rows()-1, mass_matrix[0].n_rows());
+       AlignedVector<Number> {}, mass_matrix[0].n_rows(), mass_matrix[0].n_rows());
   Number *t = tmp_array.begin();
   const Number *src = src_view.begin();
   Number *dst = &(dst_view[0]);
@@ -515,10 +515,10 @@ TensorProductMatrixSymmetricSumBase<dim,Number,size>
   Threads::Mutex::ScopedLock lock(this->mutex);
   const unsigned int n = size > 0 ? size : eigenvalues[0].size();
   tmp_array.resize_fast (Utilities::fixed_power<dim>(n));
-  constexpr int kernel_size = size > 0 ? size-1 : -1;
-  internal::EvaluatorTensorProduct<internal::evaluate_general,dim,kernel_size,kernel_size+1,Number>
+  constexpr int kernel_size = size > 0 ? size : 0;
+  internal::EvaluatorTensorProduct<internal::evaluate_general,dim,kernel_size,kernel_size,Number>
   eval(AlignedVector<Number>(), AlignedVector<Number>(),
-       AlignedVector<Number>(), mass_matrix[0].n_rows()-1, mass_matrix[0].n_rows());
+       AlignedVector<Number>(), mass_matrix[0].n_rows(), mass_matrix[0].n_rows());
   Number *t = tmp_array.begin();
   const Number *src = src_view.data();
   Number *dst = &(dst_view[0]);
