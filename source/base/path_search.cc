@@ -130,7 +130,8 @@ PathSearch::find (const std::string &filename,
       // the whole filename specified, including (possibly)
       // the suffix
       {
-        real_name = *path + filename;
+        real_name = *path;
+        real_name += filename;
         if (debug > 1)
           deallog << "PathSearch[" << cls << "] trying "
                   << real_name << std::endl;
@@ -149,7 +150,10 @@ PathSearch::find (const std::string &filename,
       // no suffix
       if (suffix != "")
         {
-          real_name = *path + filename + suffix;
+          real_name = *path;
+          real_name += filename;
+          real_name += suffix;
+
           if (debug > 1)
             deallog << "PathSearch[" << cls << "] trying "
                     << real_name << std::endl;
