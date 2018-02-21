@@ -193,14 +193,6 @@ namespace internal
       /**
        * Exception
        */
-      DeclException3 (ExcMemoryWasted,
-                      char *, int, int,
-                      << "The container " << arg1 << " contains "
-                      << arg2 << " elements, but it`s capacity is "
-                      << arg3 << ".");
-      /**
-       * Exception
-       */
       DeclException2 (ExcMemoryInexact,
                       int, int,
                       << "The containers have sizes " << arg1 << " and "
@@ -251,14 +243,6 @@ namespace internal
       void serialize(Archive &ar,
                      const unsigned int version);
 
-      /**
-       * Exception
-       */
-      DeclException3 (ExcMemoryWasted,
-                      char *, int, int,
-                      << "The container " << arg1 << " contains "
-                      << arg2 << " elements, but it`s capacity is "
-                      << arg3 << ".");
       /**
        * Exception
        */

@@ -303,28 +303,12 @@ namespace internal
 
       /**
        * Exception
-       */
-      DeclException3 (ExcMemoryWasted,
-                      char *, int, int,
-                      << "The container " << arg1 << " contains "
-                      << arg2 << " elements, but it`s capacity is "
-                      << arg3 << ".");
-      /**
-       * Exception
        * @ingroup Exceptions
        */
       DeclException2 (ExcMemoryInexact,
                       int, int,
                       << "The containers have sizes " << arg1 << " and "
                       << arg2 << ", which is not as expected.");
-
-      /**
-       * Exception
-       */
-      DeclException2 (ExcWrongIterator,
-                      char *, char *,
-                      << "You asked for the next free " << arg1 << "_iterator, "
-                      "but you can only ask for " << arg2 <<"_iterators.");
 
       /**
        * dealii::Triangulation objects can either access a user pointer or a
