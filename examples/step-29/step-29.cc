@@ -872,8 +872,8 @@ namespace Step29
     // The solution vectors $v$ and $w$ are added to the DataOut object in the
     // usual way:
     std::vector<std::string> solution_names;
-    solution_names.push_back ("Re_u");
-    solution_names.push_back ("Im_u");
+    solution_names.emplace_back("Re_u");
+    solution_names.emplace_back("Im_u");
 
     data_out.add_data_vector (solution, solution_names);
 

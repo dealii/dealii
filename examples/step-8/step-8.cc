@@ -553,16 +553,16 @@ namespace Step8
     switch (dim)
       {
       case 1:
-        solution_names.push_back ("displacement");
+        solution_names.emplace_back("displacement");
         break;
       case 2:
-        solution_names.push_back ("x_displacement");
-        solution_names.push_back ("y_displacement");
+        solution_names.emplace_back("x_displacement");
+        solution_names.emplace_back("y_displacement");
         break;
       case 3:
-        solution_names.push_back ("x_displacement");
-        solution_names.push_back ("y_displacement");
-        solution_names.push_back ("z_displacement");
+        solution_names.emplace_back("x_displacement");
+        solution_names.emplace_back("y_displacement");
+        solution_names.emplace_back("z_displacement");
         break;
       default:
         Assert (false, ExcNotImplemented());

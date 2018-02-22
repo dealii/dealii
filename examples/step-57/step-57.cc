@@ -760,7 +760,7 @@ namespace Step57
   void StationaryNavierStokes<dim>::output_results (const unsigned int output_index)  const
   {
     std::vector<std::string> solution_names (dim, "velocity");
-    solution_names.push_back ("pressure");
+    solution_names.emplace_back("pressure");
 
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation

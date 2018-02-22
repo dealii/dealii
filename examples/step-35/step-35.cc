@@ -1337,8 +1337,8 @@ namespace Step35
             }
       }
     std::vector<std::string> joint_solution_names (dim, "v");
-    joint_solution_names.push_back ("p");
-    joint_solution_names.push_back ("rot_u");
+    joint_solution_names.emplace_back("p");
+    joint_solution_names.emplace_back("rot_u");
     DataOut<dim> data_out;
     data_out.attach_dof_handler (joint_dof_handler);
     std::vector< DataComponentInterpretation::DataComponentInterpretation >

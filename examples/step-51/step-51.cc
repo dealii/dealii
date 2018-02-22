@@ -1212,7 +1212,7 @@ namespace Step51
     // We first define the names and types of the local solution,
     // and add the data to @p data_out.
     std::vector<std::string> names (dim, "gradient");
-    names.push_back ("solution");
+    names.emplace_back("solution");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     component_interpretation
     (dim+1, DataComponentInterpretation::component_is_part_of_vector);

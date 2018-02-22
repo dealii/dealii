@@ -1228,9 +1228,9 @@ namespace Step7
         // Selecting and re-ordering the columns works as follows (note that
         // this includes super columns):
         std::vector<std::string> new_order;
-        new_order.push_back("n cells");
-        new_order.push_back("H1");
-        new_order.push_back("L2");
+        new_order.emplace_back("n cells");
+        new_order.emplace_back("H1");
+        new_order.emplace_back("L2");
         convergence_table.set_column_order (new_order);
 
         // For everything that happened to the ConvergenceTable until this
