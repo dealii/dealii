@@ -236,24 +236,20 @@ namespace parallel
             this->number_cache.level_ghost_owners.insert(cell->level_subdomain_id());
 
 #ifdef DEBUG
-        // Check that level_ghost_owners is symmetric by sending a message
-        // to everyone
+        // Check that level_ghost_owners is symmetric by sending a message to everyone
         {
           int ierr = MPI_Barrier(this->mpi_communicator);
           AssertThrowMPI(ierr);
 
           // important: preallocate to avoid (re)allocation:
           std::vector<MPI_Request> requests (this->number_cache.level_ghost_owners.size());
-          int dummy = 0;
+          unsigned int dummy = 0;
           unsigned int req_counter = 0;
 
           for (std::set<types::subdomain_id>::iterator it = this->number_cache.level_ghost_owners.begin();
                it != this->number_cache.level_ghost_owners.end();
                ++it, ++req_counter)
             {
-              Assert (typeid(types::subdomain_id)
-                      == typeid(unsigned int),
-                      ExcNotImplemented());
               ierr = MPI_Isend(&dummy, 1, MPI_UNSIGNED,
                                *it, 9001, this->mpi_communicator,
                                &requests[req_counter]);
@@ -264,9 +260,6 @@ namespace parallel
                it != this->number_cache.level_ghost_owners.end();
                ++it)
             {
-              Assert (typeid(types::subdomain_id)
-                      == typeid(unsigned int),
-                      ExcNotImplemented());
               unsigned int dummy;
               ierr = MPI_Recv(&dummy, 1, MPI_UNSIGNED,
                               *it, 9001, this->mpi_communicator,
