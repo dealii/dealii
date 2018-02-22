@@ -2365,14 +2365,18 @@ void MultipleParameterLoop::Entry::split_different_values ()
 
   while (multiple.find('|') != std::string::npos)
     {
-      different_values.push_back (prefix +
-                                  std::string(multiple, 0, multiple.find('|'))+
-                                  postfix);
+      std::string different_value = prefix;
+      different_value += std::string(multiple, 0, multiple.find('|'));
+      different_value += postfix;
+      different_values.push_back (std::move(different_value));
       multiple.erase (0, multiple.find('|')+1);
     };
   // make up the last selection ("while" broke
   // because there was no '|' any more
-  different_values.push_back (prefix+multiple+postfix);
+  std::string different_value = prefix;
+  different_value += std::string(multiple, 0, multiple.find('|'));
+  different_value += postfix;
+  different_values.push_back (std::move(different_value));
   // finally check whether this was a variant
   // entry ({...}) or an array ({{...}})
   if ((entry_value.find("{{") != std::string::npos) &&
