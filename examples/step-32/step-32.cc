@@ -75,7 +75,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <limits>
 #include <locale>
 #include <string>
@@ -1040,18 +1039,13 @@ namespace Step32
       {
         parameter_file.close ();
 
-        std::ostringstream message;
-        message << "Input parameter file <"
-                << parameter_filename << "> not found. Creating a"
-                << std::endl
-                << "template file of the same name."
-                << std::endl;
-
         std::ofstream parameter_out (parameter_filename.c_str());
         prm.print_parameters (parameter_out,
                               ParameterHandler::Text);
 
-        AssertThrow (false, ExcMessage (message.str().c_str()));
+        AssertThrow (false, ExcMessage ("Input parameter file <"
+                                        + parameter_filename
+                                        +"> not found. Creating a template file of the same name."));
       }
 
     prm.parse_input (parameter_file);
