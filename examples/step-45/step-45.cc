@@ -676,14 +676,11 @@ namespace Step45
     data_out.add_data_vector (subdomain, "subdomain");
     data_out.build_patches (mapping, degree+1);
 
-    std::ostringstream filename;
-    filename << "solution-"
-             << Utilities::int_to_string (refinement_cycle, 2)
-             << "."
-             << Utilities::int_to_string (triangulation.locally_owned_subdomain(),2)
-             << ".vtu";
-
-    std::ofstream output (filename.str().c_str());
+    std::ofstream output ("solution-"
+                          + Utilities::int_to_string(refinement_cycle, 2)
+                          + "."
+                          + Utilities::int_to_string (triangulation.locally_owned_subdomain(),2)
+                          + ".vtu");
     data_out.write_vtu (output);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

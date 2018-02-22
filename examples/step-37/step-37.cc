@@ -58,7 +58,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <sstream>
 
 
 namespace Step37
@@ -1129,29 +1128,23 @@ namespace Step37
     data_out.add_data_vector (solution, "solution");
     data_out.build_patches ();
 
-    std::ostringstream filename;
-    filename << "solution-"
-             << cycle
-             << "." << Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)
-             << ".vtu";
-
-    std::ofstream output (filename.str().c_str());
+    std::ofstream output ("solution-"
+                          + std::to_string(cycle)
+                          + "."
+                          + std::to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
+                          + ".vtu");
     data_out.write_vtu (output);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       {
         std::vector<std::string> filenames;
         for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
-          {
-            std::ostringstream filename;
-            filename << "solution-"
-                     << cycle
-                     << "."
-                     << i
-                     << ".vtu";
+          filenames.emplace_back("solution-"
+                                 + std::to_string(cycle)
+                                 + "."
+                                 + std::to_string(i)
+                                 + ".vtu");
 
-            filenames.push_back(filename.str().c_str());
-          }
         std::string master_name = "solution-" + Utilities::to_string(cycle) + ".pvtu";
         std::ofstream master_output (master_name.c_str());
         data_out.write_pvtu_record (master_output, filenames);

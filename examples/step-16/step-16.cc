@@ -88,7 +88,6 @@
 // This is C++:
 #include <iostream>
 #include <fstream>
-#include <sstream>
 
 using namespace dealii;
 
@@ -591,12 +590,9 @@ namespace Step16
     data_out.add_data_vector (solution, "solution");
     data_out.build_patches ();
 
-    std::ostringstream filename;
-    filename << "solution-"
-             << cycle
-             << ".vtk";
-
-    std::ofstream output (filename.str().c_str());
+    std::ofstream output ("solution-"
+                          + std::to_string(cycle)
+                          + ".vtk");
     data_out.write_vtk (output);
   }
 

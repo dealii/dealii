@@ -72,8 +72,8 @@
 #include <deal.II/multigrid/mg_smoother.h>
 #include <deal.II/multigrid/mg_matrix.h>
 
+#include <iostream>
 #include <fstream>
-#include <sstream>
 
 namespace Step56
 {
@@ -1047,12 +1047,9 @@ namespace Step56
                               data_component_interpretation);
     data_out.build_patches ();
 
-    std::ostringstream filename;
-    filename << "solution-"
-             << Utilities::int_to_string (refinement_cycle, 2)
-             << ".vtk";
-
-    std::ofstream output (filename.str().c_str());
+    std::ofstream output ("solution-"
+                          + Utilities::int_to_string(refinement_cycle, 2)
+                          + ".vtk");
     data_out.write_vtk (output);
   }
 

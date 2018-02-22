@@ -54,7 +54,6 @@
 #include <list>
 #include <algorithm>
 #include <numeric>
-#include <sstream>
 
 // The last step is as in all previous programs:
 namespace Step14
@@ -344,13 +343,10 @@ namespace Step14
     GridOutput<dim>::operator () (const DoFHandler<dim> &dof_handler,
                                   const Vector<double>  &/*solution*/) const
     {
-      std::ostringstream filename;
-      filename << output_name_base << "-"
-               << this->refinement_cycle
-               << ".eps"
-               << std::ends;
-
-      std::ofstream out (filename.str().c_str());
+      std::ofstream out (output_name_base
+                         + "-"
+                         + std::to_string(this->refinement_cycle)
+                         + ".eps");
       GridOut().write_eps (dof_handler.get_triangulation(), out);
     }
   }
@@ -802,13 +798,9 @@ namespace Step14
       data_out.add_data_vector (this->solution, "solution");
       data_out.build_patches ();
 
-      std::ostringstream filename;
-      filename << "solution-"
-               << this->refinement_cycle
-               << ".gnuplot"
-               << std::ends;
-
-      std::ofstream out (filename.str().c_str());
+      std::ofstream out ("solution-"
+                         + std::to_string(this->refinement_cycle)
+                         + ".gnuplot");
       data_out.write (out, DataOutBase::gnuplot);
     }
 
@@ -2260,13 +2252,9 @@ namespace Step14
 
       data_out.build_patches ();
 
-      std::ostringstream filename;
-      filename << "solution-"
-               << this->refinement_cycle
-               << ".gnuplot"
-               << std::ends;
-
-      std::ofstream out (filename.str().c_str());
+      std::ofstream out ("solution-"
+                         + std::to_string(this->refinement_cycle)
+                         + ".gnuplot");
       data_out.write (out, DataOutBase::gnuplot);
     }
 

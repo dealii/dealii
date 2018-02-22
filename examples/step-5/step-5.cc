@@ -54,9 +54,7 @@
 // This is C++ ...
 #include <fstream>
 #include <iostream>
-// ... and this is too: We will convert integers to strings using the C++
-// stringstream class <code>ostringstream</code>:
-#include <sstream>
+
 
 // Finally, this has been discussed in previous tutorial programs before:
 using namespace dealii;
@@ -344,28 +342,10 @@ void Step5<dim>::output_results (const unsigned int cycle) const
   // Finally, we need the filename to which the results are to be written. We
   // would like to have it of the form <code>solution-N.eps</code>, where N is
   // the number of the refinement cycle. Thus, we have to convert an integer
-  // to a part of a string; this can be done using the <code>sprintf</code>
-  // function, but in C++ there is a more elegant way: write everything into a
-  // special stream (just like writing into a file or to the screen) and
-  // retrieve what you wrote as a string. This applies the usual conversions
-  // from integer to strings, and one could as well use stream modifiers such
-  // as <code>setw</code>, <code>setprecision</code>, and so on. In C++, you
-  // can do this by using the so-called stringstream classes:
-  std::ostringstream filename;
-
-  // In order to now actually generate a filename, we fill the stringstream
-  // variable with the base of the filename, then the number part, and finally
-  // the suffix indicating the file type:
-  filename << "solution-"
-           << cycle
-           << ".eps";
-
-  // We can get whatever we wrote to the stream using the <code>str()</code>
-  // function. The result is a string which we have to convert to a char*
-  // using the <code>c_str()</code> function. Use that as filename for the
-  // output stream and then write the data to the file:
-  std::ofstream output (filename.str().c_str());
-
+  // to a part of a string; this is most easily done using the C++ function
+  // <code>std::to_string</code>. With the so-constructed filename, we can
+  // then open an output stream and write the data to that file:
+  std::ofstream output ("solution-" + std::to_string(cycle) + ".eps");
   data_out.write_eps (output);
 }
 

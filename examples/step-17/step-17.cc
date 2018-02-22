@@ -88,7 +88,6 @@
 // And this is simply C++ again:
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 // The last step is as in all previous programs:
 namespace Step17
@@ -941,17 +940,12 @@ namespace Step17
 
     // This being done, process zero goes ahead with setting up the
     // output file as in step-8, and attaching the (localized)
-    // solution vector to the output object. (The code to generate the
-    // output file name is stolen and slightly modified from step-5,
-    // since we expect that we can do a number of cycles greater than
-    // 10, which is the maximum of what the code in step-8 could
-    // handle.)
+    // solution vector to the output object.
     if (this_mpi_process == 0)
       {
-        std::ostringstream filename;
-        filename << "solution-" << cycle << ".vtk";
-
-        std::ofstream output (filename.str().c_str());
+        std::ofstream output ("solution-"
+                              + std::to_string(cycle)
+                              + ".vtk");
 
         DataOut<dim> data_out;
         data_out.attach_dof_handler (dof_handler);

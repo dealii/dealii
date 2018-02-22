@@ -70,7 +70,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 namespace Step57
 {
@@ -754,7 +753,9 @@ namespace Step57
   }
 
   // @sect4{StationaryNavierStokes::output_results}
-  // This function is the same as in step-22.
+  // This function is the same as in step-22 except that we choose a name
+  // for the output file that also contains the Reynolds number (i.e., the
+  // inverse of the viscosity in the current context).
   template <int dim>
   void StationaryNavierStokes<dim>::output_results (const unsigned int output_index)  const
   {
@@ -773,13 +774,10 @@ namespace Step57
                               data_component_interpretation);
     data_out.build_patches ();
 
-    std::ostringstream filename;
-    filename << 1.0/viscosity
-             << "-solution-"
-             << Utilities::int_to_string (output_index, 4)
-             << ".vtk";
-
-    std::ofstream output (filename.str().c_str());
+    std::ofstream output (std::to_string(1.0/viscosity)
+                          + "-solution-"
+                          + Utilities::int_to_string (output_index, 4)
+                          + ".vtk");
     data_out.write_vtk (output);
   }
 
@@ -790,10 +788,10 @@ namespace Step57
   template <int dim>
   void StationaryNavierStokes<dim>::process_solution(unsigned int refinement)
   {
-    std::ostringstream filename;
-    filename << (1.0/viscosity) << "-line-" << refinement << ".txt";
-
-    std::ofstream f (filename.str().c_str());
+    std::ofstream f (std::to_string(1.0/viscosity)
+                     + "-line-"
+                     + std::to_string(refinement)
+                     + ".txt");
     f << "# y u_x u_y" << std::endl;
 
     Point<dim> p;
