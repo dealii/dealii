@@ -55,7 +55,6 @@
 #include <iostream>
 #include <fstream>
 #include <list>
-#include <sstream>
 
 // The last step is as in all previous programs:
 namespace Step13
@@ -392,13 +391,13 @@ namespace Step13
     {}
 
 
-    // After the description above, the function generating the actual output
+    // Following the description above, the function generating the actual output
     // is now relatively straightforward. The only particularly interesting
     // feature over previous example programs is the use of the
     // DataOutBase::default_suffix function, returning the usual
     // suffix for files of a given format (e.g. ".eps" for encapsulated
     // postscript files, ".gnuplot" for Gnuplot files), and of the generic
-    // <code>DataOut::write</code> function with a second argument, which
+    // DataOut::write() function with a second argument, which internally
     // branches to the actual output functions for the different graphics
     // formats, based on the value of the format descriptor passed as second
     // argument.
@@ -418,12 +417,10 @@ namespace Step13
       data_out.add_data_vector (solution, "solution");
       data_out.build_patches ();
 
-      std::ostringstream filename;
-      filename << output_name_base << "-"
-               << this->refinement_cycle
-               << data_out.default_suffix (output_format)
-               << std::ends;
-      std::ofstream out (filename.str().c_str());
+      std::ofstream out (output_name_base
+                         + "-"
+                         + std::to_string(this->refinement_cycle)
+                         + data_out.default_suffix (output_format));
 
       data_out.write (out, output_format);
     }

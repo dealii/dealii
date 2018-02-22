@@ -3384,10 +3384,11 @@ namespace Step44
     MappingQEulerian<dim> q_mapping(degree, dof_handler_ref, soln);
     data_out.build_patches(q_mapping, degree);
 
-    std::ostringstream filename;
-    filename << "solution-" << dim << "d-" << time.get_timestep() << ".vtk";
-
-    std::ofstream output(filename.str().c_str());
+    std::ofstream output ("solution-"
+                          + std::to_string(dim)
+                          + "d-"
+                          + std::to_string(time.get_timestep())
+                          + ".vtk");
     data_out.write_vtk(output);
   }
 

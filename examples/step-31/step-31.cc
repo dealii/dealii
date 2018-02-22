@@ -70,7 +70,6 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
-#include <sstream>
 #include <limits>
 
 
@@ -1942,8 +1941,8 @@ namespace Step31
   // using the DataComponentInterpretation helper class. Next, we actually
   // attach the data vectors with their DoFHandler objects, build patches
   // according to the degree of freedom, which are (sub-) elements that
-  // describe the data for visualization programs. Finally, we set a file name
-  // (that includes the time step number) and write the vtk file.
+  // describe the data for visualization programs. Finally, we open a file
+  // (that includes the time step number) and write the vtk data into it.
   template <int dim>
   void BoussinesqFlowProblem<dim>::output_results ()  const
   {
@@ -1966,10 +1965,9 @@ namespace Step31
                               "T");
     data_out.build_patches (std::min(stokes_degree, temperature_degree));
 
-    std::ostringstream filename;
-    filename << "solution-" << Utilities::int_to_string(timestep_number, 4) << ".vtk";
-
-    std::ofstream output (filename.str().c_str());
+    std::ofstream output ("solution-"
+                          + Utilities::int_to_string(timestep_number,4)
+                          + ".vtk");
     data_out.write_vtk (output);
   }
 

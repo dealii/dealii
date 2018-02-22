@@ -59,7 +59,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <sstream>
 
 // In this program, we use a tensor-valued coefficient. Since it may have a
 // spatial dependence, we consider it a tensor-valued function. The following
@@ -1086,7 +1085,14 @@ namespace Step21
   // @sect4{TwoPhaseFlowProblem::output_results}
 
   // There is nothing surprising here. Since the program will do a lot of time
-  // steps, we create an output file only every fifth time step.
+  // steps, we create an output file only every fifth time step and skip all
+  // other time steps at the top of the file already.
+  //
+  // When creating file names for output close to the bottom of the function,
+  // we convert the number of the time step to a string representation that
+  // is padded by leading zeros to four digits. We do this because this way
+  // all output file names have the same length, and consequently sort well
+  // when creating a directory listing.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::output_results ()  const
   {
@@ -1122,12 +1128,9 @@ namespace Step21
 
     data_out.build_patches (degree+1);
 
-    std::ostringstream filename;
-    filename << "solution-"
-             << Utilities::int_to_string(timestep_number,4)
-             << ".vtk";
-
-    std::ofstream output (filename.str().c_str());
+    std::ofstream output ("solution-"
+                          + Utilities::int_to_string(timestep_number,4)
+                          + ".vtk");
     data_out.write_vtk (output);
   }
 

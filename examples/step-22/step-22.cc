@@ -67,7 +67,6 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
-#include <sstream>
 
 // As in all programs, the namespace dealii is included:
 namespace Step22
@@ -845,9 +844,9 @@ namespace Step22
   // <code>DataComponentInterpretation</code> namespace: as with the filename,
   // we create a vector in which the first <code>dim</code> components refer
   // to the velocities and are given the tag
-  // <code>DataComponentInterpretation::component_is_part_of_vector</code>; we
+  // DataComponentInterpretation::component_is_part_of_vector; we
   // finally push one tag
-  // <code>DataComponentInterpretation::component_is_scalar</code> to describe
+  // DataComponentInterpretation::component_is_scalar to describe
   // the grouping of the pressure variable.
 
   // The rest of the function is then the same as in step-20.
@@ -871,12 +870,9 @@ namespace Step22
                               data_component_interpretation);
     data_out.build_patches ();
 
-    std::ostringstream filename;
-    filename << "solution-"
-             << Utilities::int_to_string (refinement_cycle, 2)
-             << ".vtk";
-
-    std::ofstream output (filename.str().c_str());
+    std::ofstream output ("solution-"
+                          + Utilities::int_to_string(refinement_cycle, 2)
+                          + ".vtk");
     data_out.write_vtk (output);
   }
 
