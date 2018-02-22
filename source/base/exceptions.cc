@@ -244,6 +244,9 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
       std::string functionname = stacktrace_entry.substr (pos_start+1,
                                                           pos_end-pos_start-1);
 
+      stacktrace_entry = stacktrace_entry.substr(0, pos_start);
+      stacktrace_entry += ": ";
+
       // demangle, and if successful replace old mangled string by
       // unmangled one (skipping address and offset). treat "main"
       // differently, since it is apparently demangled as "unsigned int"
@@ -266,28 +269,16 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
             realname.erase (realname.find (", boost::tuples::null_type>"),
                             std::string (", boost::tuples::null_type").size());
 
-          stacktrace_entry = stacktrace_entry.substr(0, pos_start)
-                             +
-                             ": "
-                             +
-                             realname;
+          stacktrace_entry += realname;
         }
       else
-        stacktrace_entry = stacktrace_entry.substr(0, pos_start)
-                           +
-                           ": "
-                           +
-                           functionname;
+        stacktrace_entry += functionname;
 
       free (p);
 
 #else
 
-      stacktrace_entry = stacktrace_entry.substr(0, pos_start)
-                         +
-                         ": "
-                         +
-                         functionname;
+      stacktrace_entry += functionname;
 #endif
 
       // then output what we have

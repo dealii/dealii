@@ -468,7 +468,7 @@ namespace deal_II_exceptions
 #define DeclException1(Exception1, type1, outsequence)                    \
   class Exception1 : public dealii::ExceptionBase {                       \
   public:                                                                 \
-    Exception1 (const type1 a1) : arg1 (a1) {}                            \
+    Exception1 (const type1 a1) : arg1 (a1) {}    /*NOLINT*/              \
     virtual ~Exception1 () noexcept {}                                    \
     virtual void print_info (std::ostream &out) const {                   \
       out << "    " outsequence << std::endl;                             \
@@ -487,7 +487,7 @@ namespace deal_II_exceptions
 #define DeclException2(Exception2, type1, type2, outsequence)             \
   class Exception2 : public dealii::ExceptionBase {                       \
   public:                                                                 \
-    Exception2 (const type1 a1, const type2 a2) :                         \
+    Exception2 (const type1 a1, const type2 a2) : /*NOLINT*/              \
       arg1 (a1), arg2(a2) {}                                              \
     virtual ~Exception2 () noexcept {}                                    \
     virtual void print_info (std::ostream &out) const {                   \
@@ -508,7 +508,7 @@ namespace deal_II_exceptions
 #define DeclException3(Exception3, type1, type2, type3, outsequence)      \
   class Exception3 : public dealii::ExceptionBase {                       \
   public:                                                                 \
-    Exception3 (const type1 a1, const type2 a2, const type3 a3) :         \
+    Exception3 (const type1 a1, const type2 a2, const type3 a3) : /*NOLINT*/ \
       arg1 (a1), arg2(a2), arg3(a3) {}                                    \
     virtual ~Exception3 () noexcept {}                                    \
     virtual void print_info (std::ostream &out) const {                   \
@@ -530,8 +530,8 @@ namespace deal_II_exceptions
 #define DeclException4(Exception4, type1, type2, type3, type4, outsequence) \
   class Exception4 : public dealii::ExceptionBase {                       \
   public:                                                                 \
-    Exception4 (const type1 a1, const type2 a2,                           \
-                const type3 a3, const type4 a4) :                         \
+    Exception4 (const type1 a1, const type2 a2,   /*NOLINT*/              \
+                const type3 a3, const type4 a4) : /*NOLINT*/              \
       arg1 (a1), arg2(a2), arg3(a3), arg4(a4) {}                          \
     virtual ~Exception4 () noexcept {}                                    \
     virtual void print_info (std::ostream &out) const {                   \
@@ -554,8 +554,8 @@ namespace deal_II_exceptions
 #define DeclException5(Exception5, type1, type2, type3, type4, type5, outsequence) \
   class Exception5 : public dealii::ExceptionBase {                       \
   public:                                                                 \
-    Exception5 (const type1 a1, const type2 a2, const type3 a3,           \
-                const type4 a4, const type5 a5) :                         \
+    Exception5 (const type1 a1, const type2 a2, const type3 a3,/*NOLINT*/ \
+                const type4 a4, const type5 a5) :              /*NOLINT*/ \
       arg1 (a1), arg2(a2), arg3(a3), arg4(a4), arg5(a5) {}                \
     virtual ~Exception5 () noexcept {}                                    \
     virtual void print_info (std::ostream &out) const {                   \
