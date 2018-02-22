@@ -1021,7 +1021,7 @@ namespace WorkStream
       {
         // need to copy the sample since it is marked const
         ScratchData scratch_data = sample_scratch_data;
-        CopyData    copy_data    = sample_copy_data;
+        CopyData    copy_data    = sample_copy_data; // NOLINT
 
         for (Iterator i=begin; i!=end; ++i)
           {
@@ -1127,7 +1127,7 @@ namespace WorkStream
       {
         // need to copy the sample since it is marked const
         ScratchData scratch_data = sample_scratch_data;
-        CopyData    copy_data    = sample_copy_data;
+        CopyData    copy_data    = sample_copy_data; // NOLINT
 
         for (unsigned int color=0; color<colored_iterators.size(); ++color)
           for (typename std::vector<Iterator>::const_iterator p = colored_iterators[color].begin();

@@ -9204,8 +9204,8 @@ create_triangulation_compatibility (const std::vector<Point<spacedim> > &v,
                                     const std::vector<CellData<dim> >   &cells,
                                     const SubCellData                   &subcelldata)
 {
-  std::vector<CellData<dim> > reordered_cells (cells);
-  SubCellData                 reordered_subcelldata (subcelldata);
+  std::vector<CellData<dim> > reordered_cells (cells); // NOLINT
+  SubCellData                 reordered_subcelldata (subcelldata); // NOLINT
 
   // in-place reordering of data
   reorder_compatibility (reordered_cells, reordered_subcelldata);

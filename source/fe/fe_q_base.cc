@@ -909,10 +909,10 @@ void FE_Q_Base<PolynomialType,dim,spacedim>::initialize_unit_support_points
     this->poly_space.get_numbering_inverse();
 
   Quadrature<1> support_1d(points);
-  const Quadrature<dim> support_quadrature(support_1d);
+  const Quadrature<dim> support_quadrature(support_1d); // NOLINT
   this->unit_support_points.resize(support_quadrature.size());
 
-  for (unsigned int k=0; k<support_quadrature.size(); k++)
+  for (unsigned int k=0; k<support_quadrature.size(); ++k)
     this->unit_support_points[index_map_inverse[k]] = support_quadrature.point(k);
 }
 
@@ -933,10 +933,10 @@ void FE_Q_Base<PolynomialType,dim,spacedim>::initialize_unit_face_support_points
   std::vector<unsigned int> face_index_map =
     internal::FE_Q_Base::face_lexicographic_to_hierarchic_numbering<dim>(q_degree);
   Quadrature<1> support_1d(points);
-  const Quadrature<codim> support_quadrature(support_1d);
+  const Quadrature<codim> support_quadrature(support_1d); // NOLINT
   this->unit_face_support_points.resize(support_quadrature.size());
 
-  for (unsigned int k=0; k<support_quadrature.size(); k++)
+  for (unsigned int k=0; k<support_quadrature.size(); ++k)
     this->unit_face_support_points[face_index_map[k]] = support_quadrature.point(k);
 }
 

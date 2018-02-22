@@ -698,8 +698,7 @@ FE_DGQArbitraryNodes<dim,spacedim>::FE_DGQArbitraryNodes (const Quadrature<1> &p
 {
   Assert (points.size() > 0,
           (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints ()));
-  const Quadrature<dim> support_quadrature(points);
-  this->unit_support_points = support_quadrature.get_points();
+  this->unit_support_points = Quadrature<dim>(points).get_points();
 }
 
 
