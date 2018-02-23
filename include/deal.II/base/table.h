@@ -538,16 +538,16 @@ public:
    * in the equivalent of doing
    * @code
    *   Table<2,T> t;
-   *   for (unsigned int i=0; i<t.sizes()[0]; ++i)
-   *     for (unsigned int j=0; j<t.sizes()[1]; ++j)
+   *   for (unsigned int i=0; i<t.size(0); ++i)
+   *     for (unsigned int j=0; j<t.size(1); ++j)
    *       t[i][j] = *entries++;
    * @endcode
    * On the other hand, if the second argument to this function is false, then
    * this would result in code of the following form:
    * @code
    *   Table<2,T> t;
-   *   for (unsigned int j=0; j<t.sizes()[1]; ++j)
-   *     for (unsigned int i=0; i<t.sizes()[0]; ++i)
+   *   for (unsigned int j=0; j<t.size(1); ++j)
+   *     for (unsigned int i=0; i<t.size(0); ++i)
    *       t[i][j] = *entries++;
    * @endcode
    * Note the switched order in which we fill the table elements by traversing
