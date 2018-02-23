@@ -90,7 +90,6 @@ namespace LA
 // This is C++:
 #include <iostream>
 #include <fstream>
-#include <sstream>
 
 // The last step is as in all
 // previous programs:

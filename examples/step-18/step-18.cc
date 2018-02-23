@@ -74,7 +74,6 @@
 // This is then simply C++ again:
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <iomanip>
 
 // The last step is as in all previous programs:

@@ -68,8 +68,6 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
-#include <sstream>
-#include <memory>
 
 
 // At the end of this top-matter, we open a namespace for the current project
