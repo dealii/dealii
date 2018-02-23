@@ -487,8 +487,8 @@ namespace internal
   template <int dim, typename Number, typename Number2>
   struct EvaluatorTensorProduct<evaluate_general,dim,0,0,Number,Number2>
   {
-    static const unsigned int n_rows_of_product = numbers::invalid_unsigned_int;
-    static const unsigned int n_columns_of_product = numbers::invalid_unsigned_int;
+    static constexpr unsigned int n_rows_of_product = numbers::invalid_unsigned_int;
+    static constexpr unsigned int n_columns_of_product = numbers::invalid_unsigned_int;
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
