@@ -1,0 +1,18 @@
+200 32 3 3
+comparing 5 eigenvalues computed using LAPACK and ScaLAPACK pdsyevx:
+   with respect to the given tolerance the eigenvalues coincide
+200 64 3 3
+comparing 5 eigenvalues computed using LAPACK and ScaLAPACK pdsyevx:
+   with respect to the given tolerance the eigenvalues coincide
+400 32 3 3
+comparing 5 eigenvalues computed using LAPACK and ScaLAPACK pdsyevx:
+   with respect to the given tolerance the eigenvalues coincide
+400 64 3 3
+comparing 5 eigenvalues computed using LAPACK and ScaLAPACK pdsyevx:
+   with respect to the given tolerance the eigenvalues coincide
+600 32 3 3
+comparing 5 eigenvalues computed using LAPACK and ScaLAPACK pdsyevx:
+   with respect to the given tolerance the eigenvalues coincide
+600 64 3 3
+comparing 5 eigenvalues computed using LAPACK and ScaLAPACK pdsyevx:
+   with respect to the given tolerance the eigenvalues coincide
