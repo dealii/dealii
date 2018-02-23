@@ -245,7 +245,7 @@ namespace Step19
     // the name of the executable at the zeroth index:
     std::list<std::string> args;
     for (int i=1; i<argc; ++i)
-      args.push_back (argv[i]);
+      args.emplace_back(argv[i]);
 
     // Then process all these parameters. If the parameter is <code>-p</code>,
     // then there must be a parameter file following (which we should then

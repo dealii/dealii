@@ -1103,18 +1103,18 @@ namespace Step21
     switch (dim)
       {
       case 2:
-        solution_names.push_back ("u");
-        solution_names.push_back ("v");
-        solution_names.push_back ("p");
-        solution_names.push_back ("S");
+        solution_names.emplace_back("u");
+        solution_names.emplace_back("v");
+        solution_names.emplace_back("p");
+        solution_names.emplace_back("S");
         break;
 
       case 3:
-        solution_names.push_back ("u");
-        solution_names.push_back ("v");
-        solution_names.push_back ("w");
-        solution_names.push_back ("p");
-        solution_names.push_back ("S");
+        solution_names.emplace_back("u");
+        solution_names.emplace_back("v");
+        solution_names.emplace_back("w");
+        solution_names.emplace_back("p");
+        solution_names.emplace_back("S");
         break;
 
       default:

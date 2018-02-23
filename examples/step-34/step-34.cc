@@ -880,9 +880,9 @@ namespace Step34
     static std::vector<QGaussOneOverR<2> > quadratures;
     if (quadratures.size() == 0)
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
-        quadratures.push_back(QGaussOneOverR<2>(singular_quadrature_order,
-                                                fe.get_unit_support_points()[i],
-                                                true));
+        quadratures.emplace_back(singular_quadrature_order,
+                                 fe.get_unit_support_points()[i],
+                                 true);
     return quadratures[index];
   }
 

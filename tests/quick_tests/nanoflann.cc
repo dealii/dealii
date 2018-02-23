@@ -29,17 +29,17 @@ int main ()
   std::vector<Point<2> > points;
 
   // Add four points
-  points.push_back(Point<2>(0,0));
-  points.push_back(Point<2>(0,1));
-  points.push_back(Point<2>(1,0));
-  points.push_back(Point<2>(1,1));
+  points.emplace_back(0,0);
+  points.emplace_back(0,1);
+  points.emplace_back(1,0);
+  points.emplace_back(1,1);
 
   deallog << "Distance from unit square:" << std::endl;
 
   std::vector<Point<2> > test_points;
-  test_points.push_back(Point<2>(.5, .5));
-  test_points.push_back(Point<2>(2, 0));
-  test_points.push_back(Point<2>(2, 2));
+  test_points.emplace_back(.5, .5);
+  test_points.emplace_back(2, 0);
+  test_points.emplace_back(2, 2);
 
   kdtree.set_points(points);
 

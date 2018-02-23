@@ -867,7 +867,7 @@ namespace Step20
   void MixedLaplaceProblem<dim>::output_results () const
   {
     std::vector<std::string> solution_names(dim, "u");
-    solution_names.push_back ("p");
+    solution_names.emplace_back("p");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     interpretation (dim,
                     DataComponentInterpretation::component_is_part_of_vector);

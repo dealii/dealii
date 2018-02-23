@@ -888,9 +888,9 @@ namespace Step46
   output_results (const unsigned int refinement_cycle)  const
   {
     std::vector<std::string> solution_names (dim, "velocity");
-    solution_names.push_back ("pressure");
+    solution_names.emplace_back("pressure");
     for (unsigned int d=0; d<dim; ++d)
-      solution_names.push_back ("displacement");
+      solution_names.emplace_back("displacement");
 
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation

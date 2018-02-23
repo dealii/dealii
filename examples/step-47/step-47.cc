@@ -924,7 +924,7 @@ namespace Step47
   Postprocessor<dim>::get_names() const
   {
     std::vector<std::string> solution_names (1, "total_solution");
-    solution_names.push_back ("error");
+    solution_names.emplace_back("error");
     return solution_names;
   }
 

@@ -3361,8 +3361,8 @@ namespace Step44
     data_component_interpretation.push_back(DataComponentInterpretation::component_is_scalar);
 
     std::vector<std::string> solution_name(dim, "displacement");
-    solution_name.push_back("pressure");
-    solution_name.push_back("dilatation");
+    solution_name.emplace_back("pressure");
+    solution_name.emplace_back("dilatation");
 
     data_out.attach_dof_handler(dof_handler_ref);
     data_out.add_data_vector(solution_n,

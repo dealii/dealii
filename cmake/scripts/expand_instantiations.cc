@@ -493,8 +493,7 @@ void process_instantiations ()
 
           for (std::list<std::string>::const_iterator
                x = names.begin(); x != names.end(); ++x)
-            substitutions.push_back (std::make_pair (*x,
-                                                     names_and_type.back()));
+            substitutions.emplace_back (*x, names_and_type.back());
         }
 
       // now read the part in {...}
