@@ -76,10 +76,8 @@ namespace CUDAWrappers
     typedef typename MatrixFree<dim, Number>::Data  data_type;
     static const unsigned int dimension    =        dim;
     static const unsigned int n_components =        n_components_;
-    static const unsigned int n_q_points   =
-      Utilities::fixed_int_power<n_q_points_1d,dim>::value;
-    static const unsigned int tensor_dofs_per_cell =
-      Utilities::fixed_int_power<fe_degree+1,dim>::value;
+    static constexpr unsigned int n_q_points      = Utilities::pow(n_q_points_1d, dim);
+    static constexpr unsigned int tensor_dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
 
     /**
      * Constructor.

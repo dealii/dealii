@@ -1912,8 +1912,8 @@ public:
   typedef typename BaseClass::gradient_type gradient_type;
   static constexpr unsigned int dimension     = dim;
   static constexpr unsigned int n_components  = n_components_;
-  static constexpr unsigned int static_n_q_points    = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
-  static constexpr unsigned int static_dofs_per_component = Utilities::fixed_int_power<fe_degree+1,dim>::value;
+  static constexpr unsigned int static_n_q_points    = Utilities::pow(n_q_points_1d, dim);
+  static constexpr unsigned int static_dofs_per_component = Utilities::pow(fe_degree + 1, dim);
   static constexpr unsigned int tensor_dofs_per_cell = static_dofs_per_component *n_components;
   static constexpr unsigned int static_dofs_per_cell = static_dofs_per_component *n_components;
 

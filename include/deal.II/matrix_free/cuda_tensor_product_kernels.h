@@ -64,10 +64,8 @@ namespace CUDAWrappers
     struct EvaluatorTensorProduct<evaluate_general, dim, fe_degree,
       n_q_points_1d, Number>
     {
-      static const unsigned int dofs_per_cell =
-        Utilities::fixed_int_power<fe_degree+1,dim>::value;
-      static const unsigned int n_q_points =
-        Utilities::fixed_int_power<n_q_points_1d,dim>::value;
+      static constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
+      static constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
       __device__ EvaluatorTensorProduct();
 
