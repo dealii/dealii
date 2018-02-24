@@ -88,6 +88,36 @@ extern "C"
          const dealii::types::blas_int *lda,
          float *                        x,
          const dealii::types::blas_int *incx);
+  // Banded matrix
+  // Matrix vector product
+  void
+  dgbmv_(const char *                   trans,
+         const dealii::types::blas_int *m,
+         const dealii::types::blas_int *n,
+         const dealii::types::blas_int *kl,
+         const dealii::types::blas_int *ku,
+         const double *                 alpha,
+         const double *                 A,
+         const dealii::types::blas_int *lda,
+         const double *                 x,
+         const dealii::types::blas_int *incx,
+         const double *                 beta,
+         double *                       y,
+         const dealii::types::blas_int *incy);
+  void
+  sgbmv_(const char *                   trans,
+         const dealii::types::blas_int *m,
+         const dealii::types::blas_int *n,
+         const dealii::types::blas_int *kl,
+         const dealii::types::blas_int *ku,
+         const float *                  alpha,
+         const float *                  A,
+         const dealii::types::blas_int *lda,
+         const float *                  x,
+         const dealii::types::blas_int *incx,
+         const float *                  beta,
+         float *                        y,
+         const dealii::types::blas_int *incy);
   // Matrix matrix product
   void
   dgemm_(const char *                   transa,
@@ -140,6 +170,7 @@ extern "C"
          const float *                  beta,
          float *                        C,
          const dealii::types::blas_int *ldc);
+  // General Matrix
   // Compute LU factorization
   void
   dgetrf_(const dealii::types::blas_int *m,
@@ -155,6 +186,27 @@ extern "C"
           const dealii::types::blas_int *lda,
           dealii::types::blas_int *      ipiv,
           dealii::types::blas_int *      info);
+  // Banded Matrix
+  void
+  dgbtrf_(const dealii::types::blas_int *m,
+          const dealii::types::blas_int *n,
+          const dealii::types::blas_int *kl,
+          const dealii::types::blas_int *ku,
+          double *                       A,
+          const dealii::types::blas_int *lda,
+          dealii::types::blas_int *      ipiv,
+          dealii::types::blas_int *      info);
+  void
+  sgbtrf_(const dealii::types::blas_int *m,
+          const dealii::types::blas_int *n,
+          const dealii::types::blas_int *kl,
+          const dealii::types::blas_int *ku,
+          float *                        A,
+          const dealii::types::blas_int *lda,
+          dealii::types::blas_int *      ipiv,
+          dealii::types::blas_int *      info);
+  // Compute LU factorization
+  // General Matrix
   // Apply forward/backward substitution to LU factorization
   void
   dgetrs_(const char *                   trans,
@@ -193,6 +245,74 @@ extern "C"
           float *                        inv_work,
           const dealii::types::blas_int *lwork,
           dealii::types::blas_int *      info);
+  // Banded Matrix
+  // Apply forward/backward substitution to LU factorization
+  void
+  dgbtrs_(const char *                   trans,
+          const dealii::types::blas_int *n,
+          const dealii::types::blas_int *kl,
+          const dealii::types::blas_int *ku,
+          const dealii::types::blas_int *nrhs,
+          const double *                 AB,
+          const dealii::types::blas_int *ldab,
+          const dealii::types::blas_int *ipiv,
+          double *                       b,
+          const dealii::types::blas_int *ldb,
+          dealii::types::blas_int *      info);
+  void
+  sgbtrs_(const char *                   trans,
+          const dealii::types::blas_int *n,
+          const dealii::types::blas_int *kl,
+          const dealii::types::blas_int *ku,
+          const dealii::types::blas_int *nrhs,
+          const float *                  AB,
+          const dealii::types::blas_int *ldab,
+          const dealii::types::blas_int *ipiv,
+          float *                        b,
+          const dealii::types::blas_int *ldb,
+          dealii::types::blas_int *      info);
+  // Improve the solution to a banded matrix
+  void
+  dgbrfs_(const char *                   trans,
+          const dealii::types::blas_int *n,
+          const dealii::types::blas_int *kl,
+          const dealii::types::blas_int *ku,
+          const dealii::types::blas_int *nrhs,
+          const double *                 AB,
+          const dealii::types::blas_int *ldab,
+          const double *                 AFB,
+          const dealii::types::blas_int *ldafb,
+          const dealii::types::blas_int *ipiv,
+          const double *                 b,
+          const dealii::types::blas_int *ldb,
+          double *                       x,
+          const dealii::types::blas_int *ldx,
+          double *                       ferr,
+          double *                       berr,
+          double *                       work,
+          dealii::types::blas_int *      iwork,
+          dealii::types::blas_int *      info);
+  void
+  sgbrfs_(const char *                   trans,
+          const dealii::types::blas_int *n,
+          const dealii::types::blas_int *kl,
+          const dealii::types::blas_int *ku,
+          const dealii::types::blas_int *nrhs,
+          const float *                  AB,
+          const dealii::types::blas_int *ldab,
+          const float *                  AFB,
+          const dealii::types::blas_int *ldafb,
+          const dealii::types::blas_int *ipiv,
+          const float *                  b,
+          const dealii::types::blas_int *ldb,
+          float *                        x,
+          const dealii::types::blas_int *ldx,
+          float *                        ferr,
+          float *                        berr,
+          float *                        work,
+          dealii::types::blas_int *      iwork,
+          dealii::types::blas_int *      info);
+  // General Matrix
   // Compute Cholesky factorization of SPD
   void
   dpotrf_(const char *                   uplo,
@@ -1090,6 +1210,96 @@ gemv(const char *,
 #endif
 
 
+/// Template wrapper for LAPACK functions dgbmv and sgbmv
+template <typename number1,
+          typename number2,
+          typename number3,
+          typename number4,
+          typename number5>
+inline void
+gbmv()
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+gbmv(const char *                   trans,
+     const dealii::types::blas_int *m,
+     const dealii::types::blas_int *n,
+     const dealii::types::blas_int *kl,
+     const dealii::types::blas_int *ku,
+     const double *                 alpha,
+     const double *                 A,
+     const dealii::types::blas_int *lda,
+     const double *                 x,
+     const dealii::types::blas_int *incx,
+     const double *                 beta,
+     double *                       y,
+     const dealii::types::blas_int *incy)
+{
+  dgbmv_(trans, m, n, kl, ku, alpha, A, lda, x, incx, beta, y, incy);
+}
+#else
+inline void
+gbmv(const char *,
+     const dealii::types::blas_int *,
+     const dealii::types::blas_int *,
+     const dealii::types::blas_int *,
+     const dealii::types::blas_int *,
+     const double *,
+     const double *,
+     const dealii::types::blas_int *,
+     const double *,
+     const dealii::types::blas_int *,
+     const double *,
+     double *,
+     const dealii::types::blas_int *incy)
+{
+  Assert(false, LAPACKSupport::ExcMissing("dgemv"));
+}
+#endif
+
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+gbmv(const char *                   trans,
+     const dealii::types::blas_int *m,
+     const dealii::types::blas_int *n,
+     const dealii::types::blas_int *kl,
+     const dealii::types::blas_int *ku,
+     const float *                  alpha,
+     const float *                  A,
+     const dealii::types::blas_int *lda,
+     const float *                  x,
+     const dealii::types::blas_int *incx,
+     const float *                  beta,
+     float *                        y,
+     const dealii::types::blas_int *incy)
+{
+  sgbmv_(trans, m, n, kl, ku, alpha, A, lda, x, incx, beta, y, incy);
+}
+#else
+inline void
+gemv(const char *,
+     const dealii::types::blas_int *,
+     const dealii::types::blas_int *,
+     const dealii::types::blas_int *,
+     const dealii::types::blas_int *,
+     const float *,
+     const float *,
+     const dealii::types::blas_int *,
+     const float *,
+     const dealii::types::blas_int *,
+     const float *,
+     float *,
+     const dealii::types::blas_int *incy)
+{
+  Assert(false, LAPACKSupport::ExcMissing("sgemv"));
+}
+#endif
+
+
 
 /// Template wrapper for LAPACK functions dtrmv and strmv
 template <typename number>
@@ -1711,6 +1921,79 @@ getrf(const types::blas_int *,
 #endif
 
 
+/// Template wrapper for LAPACK functions dgbtrf and sgbtrf
+template <typename number1>
+inline void
+getrf(const types::blas_int *,
+      const types::blas_int *,
+      const types::blas_int *,
+      const types::blas_int *,
+      number1 *,
+      const types::blas_int *,
+      types::blas_int *,
+      types::blas_int *)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+gbtrf(const types::blas_int *m,
+      const types::blas_int *n,
+      const types::blas_int *kl,
+      const types::blas_int *ku,
+      double *               ab,
+      const types::blas_int *ldab,
+      types::blas_int *      ipiv,
+      types::blas_int *      info)
+{
+  dgbtrf_(m, n, kl, ku, ab, ldab, ipiv, info);
+}
+#else
+inline void
+gbtrf(const types::blas_int *,
+      const types::blas_int *,
+      const types::blas_int *,
+      const types::blas_int *,
+      double *,
+      const types::blas_int *,
+      types::blas_int *,
+      types::blas_int *)
+{
+  Assert(false, LAPACKSupport::ExcMissing("dgbtrf"));
+}
+#endif
+
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+gbtrf(const types::blas_int *m,
+      const types::blas_int *n,
+      const types::blas_int *kl,
+      const types::blas_int *ku,
+      float *                ab,
+      const types::blas_int *ldab,
+      types::blas_int *      ipiv,
+      types::blas_int *      info)
+{
+  sgbtrf_(m, n, kl, ku, ab, ldab, ipiv, info);
+}
+#else
+inline void
+gbtrf(const types::blas_int *,
+      const types::blas_int *,
+      const types::blas_int *,
+      const types::blas_int *,
+      float *,
+      const types::blas_int *,
+      types::blas_int *,
+      types::blas_int *)
+{
+  Assert(false, LAPACKSupport::ExcMissing("sgbtrf"));
+}
+#endif
+
+
 /// Template wrapper for LAPACK functions dgetrs and sgetrs
 template <typename number1, typename number2>
 inline void
@@ -1785,6 +2068,243 @@ getrs(const char *,
       types::blas_int *)
 {
   Assert(false, LAPACKSupport::ExcMissing("sgetrs"));
+}
+#endif
+
+
+/// Template wrapper for LAPACK functions dgbtrs and sgbtrs
+template <typename number1, typename number2>
+inline void
+gbtrs(const char *,
+      const types::blas_int *,
+      const types::blas_int *,
+      const types::blas_int *,
+      const types::blas_int *,
+      const types::blas_int *,
+      const number1 *,
+      const types::blas_int *,
+      const types::blas_int *,
+      number2 *,
+      const types::blas_int *,
+      types::blas_int *)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+gbtrs(const char *                   trans,
+      const dealii::types::blas_int *n,
+      const dealii::types::blas_int *kl,
+      const dealii::types::blas_int *ku,
+      const dealii::types::blas_int *nrhs,
+      const double *                 AB,
+      const dealii::types::blas_int *ldab,
+      const dealii::types::blas_int *ipiv,
+      double *                       b,
+      const dealii::types::blas_int *ldb,
+      dealii::types::blas_int *      info)
+{
+  dgbtrs_(trans, n, kl, ku, nrhs, AB, ldab, ipiv, b, ldb, info);
+}
+#else
+inline void
+gbtrs(const char *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const double *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      double *,
+      const dealii::types::blas_int *,
+      dealii::types::blas_int *)
+{
+  Assert(false, LAPACKSupport::ExcMissing("dgbtrs"));
+}
+#endif
+
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+gbtrs(const char *                   trans,
+      const dealii::types::blas_int *n,
+      const dealii::types::blas_int *kl,
+      const dealii::types::blas_int *ku,
+      const dealii::types::blas_int *nrhs,
+      const float *                  AB,
+      const dealii::types::blas_int *ldab,
+      const dealii::types::blas_int *ipiv,
+      float *                        b,
+      const dealii::types::blas_int *ldb,
+      dealii::types::blas_int *      info)
+{
+  sgbtrs_(trans, n, kl, ku, nrhs, AB, ldab, ipiv, b, ldb, info);
+}
+#else
+inline void
+gbtrs(const char *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const float *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      float *,
+      const dealii::types::blas_int *,
+      dealii::types::blas_int *)
+{
+  Assert(false, LAPACKSupport::ExcMissing("sgbtrs"));
+}
+#endif
+
+
+/// Template wrapper for LAPACK functions dgbrfs and sgbrfs
+template <typename number1, typename number2>
+inline void
+gbrfs(const char *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const number1 *,
+      const dealii::types::blas_int *,
+      const number1 *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const number1 *,
+      const dealii::types::blas_int *,
+      number2 *,
+      const dealii::types::blas_int *,
+      number1 *,
+      number1 *,
+      number1 *,
+      dealii::types::blas_int *,
+      dealii::types::blas_int *)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+gbrfs(const char *                   trans,
+      const dealii::types::blas_int *n,
+      const dealii::types::blas_int *kl,
+      const dealii::types::blas_int *ku,
+      const dealii::types::blas_int *nrhs,
+      const double *                 AB,
+      const dealii::types::blas_int *ldab,
+      const double *                 AFB,
+      const dealii::types::blas_int *ldafb,
+      const dealii::types::blas_int *ipiv,
+      const double *                 b,
+      const dealii::types::blas_int *ldb,
+      double *                       x,
+      const dealii::types::blas_int *ldx,
+      double *                       ferr,
+      double *                       berr,
+      double *                       work,
+      dealii::types::blas_int *      iwork,
+      dealii::types::blas_int *      info)
+{
+  dgbrfs_(trans,
+          n,
+          kl,
+          ku,
+          nrhs,
+          AB,
+          ldab,
+          AFB,
+          ldafb,
+          ipiv,
+          b,
+          ldb,
+          x,
+          ldx,
+          ferr,
+          berr,
+          work,
+          iwork,
+          info);
+}
+#else
+inline void
+gbrfs(const char *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const double *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      double *,
+      const dealii::types::blas_int *,
+      dealii::types::blas_int *)
+{
+  Assert(false, LAPACKSupport::ExcMissing("dgbrfs"));
+}
+#endif
+
+
+#ifdef DEAL_II_WITH_LAPACK
+inline void
+gbrfs(const char *                   trans,
+      const dealii::types::blas_int *n,
+      const dealii::types::blas_int *kl,
+      const dealii::types::blas_int *ku,
+      const dealii::types::blas_int *nrhs,
+      const float *                  AB,
+      const dealii::types::blas_int *ldab,
+      const float *                  AFB,
+      const dealii::types::blas_int *ldafb,
+      const dealii::types::blas_int *ipiv,
+      const float *                  b,
+      const dealii::types::blas_int *ldb,
+      float *                        x,
+      const dealii::types::blas_int *ldx,
+      float *                        ferr,
+      float *                        berr,
+      float *                        work,
+      dealii::types::blas_int *      iwork,
+      dealii::types::blas_int *      info)
+{
+  sgbrfs_(trans,
+          n,
+          kl,
+          ku,
+          nrhs,
+          AB,
+          ldab,
+          AFB,
+          ldafb,
+          ipiv,
+          b,
+          ldb,
+          x,
+          ldx,
+          ferr,
+          berr,
+          work,
+          iwork,
+          info);
+}
+#else
+inline void
+gbrfs(const char *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      const float *,
+      const dealii::types::blas_int *,
+      const dealii::types::blas_int *,
+      float *,
+      const dealii::types::blas_int *,
+      dealii::types::blas_int *)
+{
+  Assert(false, LAPACKSupport::ExcMissing("sgbrfs"));
 }
 #endif
 
