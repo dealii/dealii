@@ -1,5 +1,4 @@
 // ---------------------------------------------------------------------
-// $Id: tria.inst.in 32674 2014-03-20 16:57:24Z denis.davydov $
 //
 // Copyright (C) 2010 - 2016 by the deal.II authors
 //
@@ -30,4 +29,3 @@ for (deal_II_dimension : DIMENSIONS)
     \}
 
 }
-
