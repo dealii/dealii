@@ -569,31 +569,12 @@ void Step6<dim>::refine_grid ()
 // We have already seen in step-1 how this can be achieved. The only thing we
 // have to change is the generation of the file name, since it should contain
 // the number of the present refinement cycle provided to this function as an
-// argument. The most general way is to use the std::stringstream class as
-// shown in step-5, but here's a little hack that makes it simpler if we know
-// that we have less than 10 iterations: assume that the %numbers `0' through
-// `9' are represented consecutively in the character set used on your machine
-// (this is in fact the case in all known character sets), then '0'+cycle
-// gives the character corresponding to the present cycle number. Of course,
-// this will only work if the number of cycles is actually less than 10, and
-// rather than waiting for the disaster to happen, we safeguard our little
-// hack with an explicit assertion at the beginning of the function. If this
-// assertion is triggered, i.e. when <code>cycle</code> is larger than or
-// equal to 10, an exception of type <code>ExcNotImplemented</code> is raised,
-// indicating that some functionality is not implemented for this case -- the
-// functionality that is missing, of course, is the generation of file names
-// for that case. (A longer discussion of what exactly the @p Assert macro
-// does can be found in the @ref Exceptions "exception documentation module".)
+// argument. To this end, we simply append the number of the refinement cycle
+// as a string to the file name.
 template <int dim>
 void Step6<dim>::output_results (const unsigned int cycle) const
 {
-  Assert (cycle < 10, ExcNotImplemented());
-
-  std::string filename = "grid-";
-  filename += ('0' + cycle);
-  filename += ".eps";
-
-  std::ofstream output (filename.c_str());
+  std::ofstream output ("grid-" + std::to_string(cycle) + ".eps");
 
   GridOut grid_out;
   grid_out.write_eps (triangulation, output);
