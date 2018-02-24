@@ -36,7 +36,9 @@ class PreconditionIdentity;
 /*@{*/
 
 /**
- * Preconditioned cg method for symmetric positive definite matrices. This
+ * This class implements the preconditioned Conjugate Gradients (CG)
+ * method that can be used to solve linear systems with a symmetric positive
+ * definite matrix. This
  * class is used first in step-3 and step-4, but is used in many other
  * tutorial programs as well. Like all other solver classes, it can work on
  * any kind of vector and matrix as long as they satisfy certain requirements
