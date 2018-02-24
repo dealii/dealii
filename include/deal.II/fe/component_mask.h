@@ -35,10 +35,23 @@ DEAL_II_NAMESPACE_OPEN
  * components, and one can use <code>operator[]</code> to query whether a
  * particular component has been selected.
  *
+ * @note A "mask" represents a data structure with @p true and @p false
+ *   entries that is generally used to enable or disable an operation
+ *   for a particular vector component. By this definition, disabled
+ *   vector components still exist -- they are simply not touched. As
+ *   a consequence, when you apply a component mask for interpolating
+ *   boundary values (to choose just one example) of a problem with
+ *   $C$ vector components, the input argument that describes the
+ *   boundary values will still have to provide $C$ components even
+ *   if the mask says that we only want to interpolate a subset of
+ *   these components onto the finite element space. In other words,
+ *   a component mask does not represent a <i>reduction</i> operation;
+ *   it represents a <i>selection</i>.
+ *
  * Objects of this kind are used in many places where one wants to restrict
  * operations to a certain subset of components, e.g. in
- * DoFTools::make_zero_boundary_values or
- * VectorTools::interpolate_boundary_values. These objects can either be
+ * DoFTools::make_zero_boundary_values() or
+ * VectorTools::interpolate_boundary_values(). These objects can either be
  * created by hand, or, simpler, by asking the finite element to generate a
  * component mask from certain selected components using code such as this
  * where we create a mask that only denotes the velocity components of a
