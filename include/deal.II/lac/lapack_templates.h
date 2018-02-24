@@ -68,6 +68,8 @@ extern "C"
          const float *                  b,
          float *                        y,
          const dealii::types::blas_int *incy);
+  // Triangular Matrix
+  // Matrix vector product
   void
   dtrmv_(const char *                   uplo,
          const char *                   trans,
