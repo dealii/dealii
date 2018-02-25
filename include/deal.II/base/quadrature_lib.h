@@ -552,14 +552,6 @@ public:
 
 private:
   const EndPoint ep;
-  /// Computes the points of the quadrature formula.
-  static std::vector<double>
-  get_quadrature_points(const unsigned int n, EndPoint ep);
-
-  /// Computes the weights of the quadrature formula.
-  static std::vector<double>
-  get_quadrature_weights(const unsigned int n, EndPoint ep);
-
 };
 
 /**

@@ -1228,65 +1228,68 @@ QGaussChebyshev<dim>::QGaussChebyshev (const unsigned int n)
 {}
 
 
-
-
-
-template <>
-std::vector<double>
-QGaussRadauChebyshev<1>::get_quadrature_points(const unsigned int n,
-                                               EndPoint ep)
+namespace internal
 {
-
-  std::vector<double> points(n);
-  // n point quadrature: index from 0 to n-1
-  for (unsigned short i=0; i<n; ++i)
-    // would be -cos(2i Pi/(2N+1))
-    // put + Pi so we start from the smallest point
-    // then map from [-1,1] to [0,1]
-    switch (ep)
-      {
-      case QGaussRadauChebyshev::left:
-      {
-        points[i] = 1./2.*(1.-std::cos(numbers::PI*(1+2*double(i)/(2*double(n-1)+1.))));
-        break;
-      }
-
-      case QGaussRadauChebyshev::right:
-      {
-        points[i] = 1./2.*(1.-std::cos(numbers::PI*(2*double(n-1-i)/(2*double(n-1)+1.))));
-        break;
-      }
-
-      default:
-        Assert (false, ExcMessage ("This constructor can only be called with either "
-                                   "QGaussRadauChebyshev::left or QGaussRadauChebyshev::right as "
-                                   "second argument."));
-      }
-
-  return points;
-}
-
-
-template <>
-std::vector<double>
-QGaussRadauChebyshev<1>::get_quadrature_weights(const unsigned int n,
-                                                EndPoint ep)
-{
-
-  std::vector<double> weights(n);
-
-  for (unsigned short i=0; i<n; ++i)
+  namespace QGaussRadauChebyshev
+  {
+    // Computes the points of the quadrature formula.
+    std::vector<double>
+    get_quadrature_points(const unsigned int n,
+                          ::dealii::QGaussRadauChebyshev<1>::EndPoint ep)
     {
-      // same weights as on [-1,1]
-      weights[i] = 2.*numbers::PI/double(2*(n-1)+1.);
-      if (ep==left && i==0)
-        weights[i] /= 2.;
-      else if (ep==right && i==(n-1))
-        weights[i] /= 2.;
+
+      std::vector<double> points(n);
+      // n point quadrature: index from 0 to n-1
+      for (unsigned short i=0; i<n; ++i)
+        // would be -cos(2i Pi/(2N+1))
+        // put + Pi so we start from the smallest point
+        // then map from [-1,1] to [0,1]
+        switch (ep)
+          {
+          case ::dealii::QGaussRadauChebyshev<1>::left:
+          {
+            points[i] = 1./2.*(1.-std::cos(numbers::PI*(1+2*double(i)/(2*double(n-1)+1.))));
+            break;
+          }
+
+          case ::dealii::QGaussRadauChebyshev<1>::right:
+          {
+            points[i] = 1./2.*(1.-std::cos(numbers::PI*(2*double(n-1-i)/(2*double(n-1)+1.))));
+            break;
+          }
+
+          default:
+            Assert (false, ExcMessage ("This constructor can only be called with either "
+                                       "QGaussRadauChebyshev::left or QGaussRadauChebyshev::right as "
+                                       "second argument."));
+          }
+
+      return points;
     }
 
-  return weights;
 
+
+    // Computes the weights of the quadrature formula.
+    std::vector<double>
+    get_quadrature_weights(const unsigned int n,
+                           ::dealii::QGaussRadauChebyshev<1>::EndPoint ep)
+    {
+
+      std::vector<double> weights(n);
+
+      for (unsigned short i=0; i<n; ++i)
+        {
+          // same weights as on [-1,1]
+          weights[i] = 2.*numbers::PI/double(2*(n-1)+1.);
+          if (ep==::dealii::QGaussRadauChebyshev<1>::left && i==0)
+            weights[i] /= 2.;
+          else if (ep==::dealii::QGaussRadauChebyshev<1>::right && i==(n-1))
+            weights[i] /= 2.;
+        }
+
+      return weights;
+    }
+  }
 }
 
 
@@ -1299,8 +1302,8 @@ QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n,
 {
 
   Assert(n>0,ExcMessage("Need at least one point for quadrature rules"));
-  std::vector<double> p=get_quadrature_points(n,ep);
-  std::vector<double> w=get_quadrature_weights(n,ep);
+  std::vector<double> p=internal::QGaussRadauChebyshev::get_quadrature_points(n,ep);
+  std::vector<double> w=internal::QGaussRadauChebyshev::get_quadrature_weights(n,ep);
 
   for (unsigned int i=0; i<this->size(); ++i)
     {
