@@ -575,16 +575,6 @@ class QGaussLobattoChebyshev : public Quadrature<dim>
 public:
   /// Generate a formula with <tt>n</tt> quadrature points
   QGaussLobattoChebyshev(const unsigned int n);
-
-private:
-  /// Computes the points of the quadrature formula.
-  static std::vector<double>
-  get_quadrature_points(const unsigned int n);
-
-  /// Computes the weights of the quadrature formula.
-  static std::vector<double>
-  get_quadrature_weights(const unsigned int n);
-
 };
 
 /**

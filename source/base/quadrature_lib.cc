@@ -1322,41 +1322,47 @@ QGaussRadauChebyshev<dim>::QGaussRadauChebyshev (const unsigned int n,
 {}
 
 
-template <>
-std::vector<double>
-QGaussLobattoChebyshev<1>::get_quadrature_points(const unsigned int n)
+
+namespace internal
 {
-
-  std::vector<double> points(n);
-  // n point quadrature: index from 0 to n-1
-  for (unsigned short i=0; i<n; ++i)
-    // would be cos(i Pi/N)
-    // put + Pi so we start from the smallest point
-    // then map from [-1,1] to [0,1]
-    points[i] = 1./2.*(1.+std::cos(numbers::PI*(1+double(i)/double(n-1))));
-
-  return points;
-}
-
-
-template <>
-std::vector<double>
-QGaussLobattoChebyshev<1>::get_quadrature_weights(const unsigned int n)
-{
-
-  std::vector<double> weights(n);
-
-  for (unsigned short i=0; i<n; ++i)
+  namespace QGaussLobattoChebyshev
+  {
+    // Computes the points of the quadrature formula.
+    std::vector<double>
+    get_quadrature_points(const unsigned int n)
     {
-      // same weights as on [-1,1]
-      weights[i] = numbers::PI/double((n-1));
-      if (i==0 || i==(n-1))
-        weights[i] /= 2.;
+
+      std::vector<double> points(n);
+      // n point quadrature: index from 0 to n-1
+      for (unsigned short i=0; i<n; ++i)
+        // would be cos(i Pi/N)
+        // put + Pi so we start from the smallest point
+        // then map from [-1,1] to [0,1]
+        points[i] = 1./2.*(1.+std::cos(numbers::PI*(1+double(i)/double(n-1))));
+
+      return points;
     }
 
-  return weights;
+    // Computes the weights of the quadrature formula.
+    std::vector<double>
+    get_quadrature_weights(const unsigned int n)
+    {
 
+      std::vector<double> weights(n);
+
+      for (unsigned short i=0; i<n; ++i)
+        {
+          // same weights as on [-1,1]
+          weights[i] = numbers::PI/double((n-1));
+          if (i==0 || i==(n-1))
+            weights[i] /= 2.;
+        }
+
+      return weights;
+    }
+  }
 }
+
 
 
 template <>
@@ -1366,8 +1372,8 @@ QGaussLobattoChebyshev<1>::QGaussLobattoChebyshev(const unsigned int n)
 {
 
   Assert(n>1,ExcMessage("Need at least two points for Gauss-Lobatto quadrature rule"));
-  std::vector<double> p=get_quadrature_points(n);
-  std::vector<double> w=get_quadrature_weights(n);
+  std::vector<double> p=internal::QGaussLobattoChebyshev::get_quadrature_points(n);
+  std::vector<double> w=internal::QGaussLobattoChebyshev::get_quadrature_weights(n);
 
   for (unsigned int i=0; i<this->size(); ++i)
     {
