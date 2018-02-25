@@ -1157,40 +1157,49 @@ QTelles<1>::QTelles (
     }
 }
 
-
-
-template <>
-std::vector<double>
-QGaussChebyshev<1>::get_quadrature_points(const unsigned int n)
+namespace internal
 {
-
-  std::vector<double> points(n);
-  // n point quadrature: index from 0 to n-1
-  for (unsigned short i=0; i<n; ++i)
-    // would be cos((2i+1)Pi/(2N+2))
-    // put + Pi so we start from the smallest point
-    // then map from [-1,1] to [0,1]
-    points[i] = 1./2.*(1.+std::cos(numbers::PI*(1.+double(2*i+1)/double(2*(n-1)+2))));
-
-  return points;
-}
-
-
-template <>
-std::vector<double>
-QGaussChebyshev<1>::get_quadrature_weights(const unsigned int n)
-{
-
-  std::vector<double> weights(n);
-
-  for (unsigned short i=0; i<n; ++i)
+  namespace QGaussChebyshev
+  {
+    /**
+     * Computes the points of the quadrature formula.
+     */
+    std::vector<double>
+    get_quadrature_points(const unsigned int n)
     {
-      // same weights as on [-1,1]
-      weights[i] = numbers::PI/double(n);
+
+      std::vector<double> points(n);
+      // n point quadrature: index from 0 to n-1
+      for (unsigned short i=0; i<n; ++i)
+        // would be cos((2i+1)Pi/(2N+2))
+        // put + Pi so we start from the smallest point
+        // then map from [-1,1] to [0,1]
+        points[i] = 1./2.*(1.+std::cos(numbers::PI*(1.+double(2*i+1)/double(2*(n-1)+2))));
+
+      return points;
     }
 
-  return weights;
 
+
+    /**
+    * Computes the weights of the quadrature formula.
+    */
+    std::vector<double>
+    get_quadrature_weights(const unsigned int n)
+    {
+
+      std::vector<double> weights(n);
+
+      for (unsigned short i=0; i<n; ++i)
+        {
+          // same weights as on [-1,1]
+          weights[i] = numbers::PI/double(n);
+        }
+
+      return weights;
+
+    }
+  }
 }
 
 
@@ -1201,8 +1210,8 @@ QGaussChebyshev<1>::QGaussChebyshev(const unsigned int n)
 {
 
   Assert(n>0,ExcMessage("Need at least one point for the quadrature rule"));
-  std::vector<double> p=get_quadrature_points(n);
-  std::vector<double> w=get_quadrature_weights(n);
+  std::vector<double> p=internal::QGaussChebyshev::get_quadrature_points(n);
+  std::vector<double> w=internal::QGaussChebyshev::get_quadrature_weights(n);
 
   for (unsigned int i=0; i<this->size(); ++i)
     {
