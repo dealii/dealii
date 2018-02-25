@@ -1522,6 +1522,21 @@ public:
   typedef typename TableBase<2,T>::size_type size_type;
 
   /**
+   * Typedef for the values in the table.
+   */
+  typedef typename AlignedVector<T>::value_type value_type;
+
+  /**
+   * Typedef for the references in the table.
+   */
+  typedef typename AlignedVector<T>::reference reference;
+
+  /**
+   * Typedef for the constant references in the table.
+   */
+  typedef typename AlignedVector<T>::const_reference const_reference;
+
+  /**
    * Default constructor. Set all dimensions to zero.
    */
   TransposeTable () = default;
@@ -1539,7 +1554,7 @@ public:
    */
   void reinit (const size_type size1,
                const size_type size2,
-               const bool         omit_default_initialization = false);
+               const bool      omit_default_initialization = false);
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1547,8 +1562,8 @@ public:
    *
    * This version of the function only allows read access.
    */
-  typename AlignedVector<T>::const_reference operator () (const size_type i,
-                                                          const size_type j) const;
+  const_reference operator () (const size_type i,
+                               const size_type j) const;
 
   /**
    * Direct access to one element of the table by specifying all indices at
@@ -1556,8 +1571,8 @@ public:
    *
    * This version of the function allows read-write access.
    */
-  typename AlignedVector<T>::reference operator () (const size_type i,
-                                                    const size_type j);
+  reference operator () (const size_type i,
+                         const size_type j);
 
   /**
    * Number of rows. This function really makes only sense since we have a
@@ -1582,8 +1597,8 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  typename AlignedVector<T>::reference el (const size_type i,
-                                           const size_type j);
+  reference el (const size_type i,
+                const size_type j);
 
   /**
    * Return the value of the element <tt>(i,j)</tt> as a read-only reference.
@@ -1599,8 +1614,8 @@ protected:
    * implementation of these table classes for 2d arrays, then called
    * <tt>vector2d</tt>.
    */
-  typename AlignedVector<T>::const_reference el (const size_type i,
-                                                 const size_type j) const;
+  const_reference el (const size_type i,
+                      const size_type j) const;
 };
 
 
@@ -2392,7 +2407,7 @@ TransposeTable<T>::reinit (const size_type size1,
 
 template <typename T>
 inline
-typename AlignedVector<T>::const_reference
+typename TransposeTable<T>::const_reference
 TransposeTable<T>::operator () (const size_type i,
                                 const size_type j) const
 {
@@ -2405,7 +2420,7 @@ TransposeTable<T>::operator () (const size_type i,
 
 template <typename T>
 inline
-typename AlignedVector<T>::reference
+typename TransposeTable<T>::reference
 TransposeTable<T>::operator () (const size_type i,
                                 const size_type j)
 {
@@ -2418,7 +2433,7 @@ TransposeTable<T>::operator () (const size_type i,
 
 template <typename T>
 inline
-typename AlignedVector<T>::const_reference
+typename TransposeTable<T>::const_reference
 TransposeTable<T>::el (const size_type i,
                        const size_type j) const
 {
@@ -2429,7 +2444,7 @@ TransposeTable<T>::el (const size_type i,
 
 template <typename T>
 inline
-typename AlignedVector<T>::reference
+typename TransposeTable<T>::reference
 TransposeTable<T>::el (const size_type i,
                        const size_type j)
 {
