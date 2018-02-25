@@ -851,7 +851,7 @@ namespace MatrixFreeOperators
   CellwiseInverseMassMatrix<dim,fe_degree,n_components,Number>
   ::fill_inverse_JxW_values(AlignedVector<VectorizedArray<Number> > &inverse_jxw) const
   {
-    const unsigned int dofs_per_cell = Utilities::fixed_int_power<fe_degree+1,dim>::value;
+    constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
     Assert(inverse_jxw.size() > 0 &&
            inverse_jxw.size() % dofs_per_cell == 0,
            ExcMessage("Expected diagonal to be a multiple of scalar dof per cells"));
@@ -883,7 +883,7 @@ namespace MatrixFreeOperators
           const VectorizedArray<Number> *in_array,
           VectorizedArray<Number>       *out_array) const
   {
-    const unsigned int dofs_per_cell = Utilities::fixed_int_power<fe_degree+1,dim>::value;
+    constexpr unsigned int dofs_per_cell = Utilities::pow(fe_degree + 1, dim);
     Assert(inverse_coefficients.size() > 0 &&
            inverse_coefficients.size() % dofs_per_cell == 0,
            ExcMessage("Expected diagonal to be a multiple of scalar dof per cells"));

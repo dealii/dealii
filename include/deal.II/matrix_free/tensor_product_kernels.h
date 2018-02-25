@@ -113,8 +113,8 @@ namespace internal
   template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
   struct EvaluatorTensorProduct<evaluate_general,dim,n_rows,n_columns,Number,Number2>
   {
-    static const unsigned int n_rows_of_product = Utilities::fixed_int_power<n_rows,dim>::value;
-    static const unsigned int n_columns_of_product = Utilities::fixed_int_power<n_columns,dim>::value;
+    static constexpr unsigned int n_rows_of_product = Utilities::pow(n_rows, dim);
+    static constexpr unsigned int n_columns_of_product = Utilities::pow(n_columns, dim);
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -298,9 +298,9 @@ namespace internal
     constexpr int mm     = contract_over_rows ? n_rows : n_columns,
                   nn     = contract_over_rows ? n_columns : n_rows;
 
-    constexpr int stride    = Utilities::fixed_int_power<n_columns,direction>::value;
+    constexpr int stride    = Utilities::pow(n_columns, direction);
     constexpr int n_blocks1 = one_line ? 1 : stride;
-    constexpr int n_blocks2 = Utilities::fixed_int_power<n_rows,(direction>=dim)?0:(dim-direction-1)>::value;
+    constexpr int n_blocks2 = Utilities::pow(n_rows, (direction>=dim) ? 0 : (dim-direction-1));
 
     for (int i2=0; i2<n_blocks2; ++i2)
       {
@@ -365,8 +365,8 @@ namespace internal
     constexpr int n_blocks2 = dim > 2 ? n_rows : 1;
 
     AssertIndexRange (face_direction, dim);
-    constexpr int stride = Utilities::fixed_int_power<n_rows,face_direction>::value;
-    constexpr int out_stride = Utilities::fixed_int_power<n_rows,dim-1>::value;
+    constexpr int stride = Utilities::pow(n_rows, face_direction);
+    constexpr int out_stride = Utilities::pow(n_rows, dim-1);
     const Number *DEAL_II_RESTRICT shape_values = this->shape_values;
 
     for (int i2=0; i2<n_blocks2; ++i2)
@@ -487,8 +487,8 @@ namespace internal
   template <int dim, typename Number, typename Number2>
   struct EvaluatorTensorProduct<evaluate_general,dim,0,0,Number,Number2>
   {
-    static const unsigned int n_rows_of_product = numbers::invalid_unsigned_int;
-    static const unsigned int n_columns_of_product = numbers::invalid_unsigned_int;
+    static constexpr unsigned int n_rows_of_product = numbers::invalid_unsigned_int;
+    static constexpr unsigned int n_columns_of_product = numbers::invalid_unsigned_int;
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -816,8 +816,8 @@ namespace internal
   template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
   struct EvaluatorTensorProduct<evaluate_symmetric,dim,n_rows,n_columns,Number,Number2>
   {
-    static const unsigned int n_rows_of_product = Utilities::fixed_int_power<n_rows,dim>::value;
-    static const unsigned int n_columns_of_product = Utilities::fixed_int_power<n_columns,dim>::value;
+    static constexpr unsigned int n_rows_of_product = Utilities::pow(n_rows, dim);
+    static constexpr unsigned int n_columns_of_product = Utilities::pow(n_columns, dim);
 
     /**
      * Constructor, taking the data from ShapeInfo
@@ -900,9 +900,9 @@ namespace internal
     constexpr int n_cols = nn / 2;
     constexpr int mid    = mm / 2;
 
-    constexpr int stride    = Utilities::fixed_int_power<n_columns,direction>::value;
+    constexpr int stride    = Utilities::pow(n_columns, direction);
     constexpr int n_blocks1 = stride;
-    constexpr int n_blocks2 = Utilities::fixed_int_power<n_rows,(direction>=dim)?0:(dim-direction-1)>::value;
+    constexpr int n_blocks2 = Utilities::pow(n_rows, (direction>=dim) ? 0 : (dim-direction-1));
 
     for (int i2=0; i2<n_blocks2; ++i2)
       {
@@ -1078,9 +1078,9 @@ namespace internal
     constexpr int n_cols = nn / 2;
     constexpr int mid    = mm / 2;
 
-    constexpr int stride    = Utilities::fixed_int_power<n_columns,direction>::value;
+    constexpr int stride    = Utilities::pow(n_columns, direction);
     constexpr int n_blocks1 = stride;
-    constexpr int n_blocks2 = Utilities::fixed_int_power<n_rows,(direction>=dim)?0:(dim-direction-1)>::value;
+    constexpr int n_blocks2 = Utilities::pow(n_rows, (direction>=dim) ? 0 : (dim-direction-1));
 
     for (int i2=0; i2<n_blocks2; ++i2)
       {
@@ -1203,9 +1203,9 @@ namespace internal
     constexpr int n_cols = nn / 2;
     constexpr int mid    = mm / 2;
 
-    constexpr int stride    = Utilities::fixed_int_power<n_columns,direction>::value;
+    constexpr int stride    = Utilities::pow(n_columns, direction);
     constexpr int n_blocks1 = stride;
-    constexpr int n_blocks2 = Utilities::fixed_int_power<n_rows,(direction>=dim)?0:(dim-direction-1)>::value;
+    constexpr int n_blocks2 = Utilities::pow(n_rows, (direction>=dim) ? 0 : (dim-direction-1));
 
     for (int i2=0; i2<n_blocks2; ++i2)
       {
@@ -1357,8 +1357,8 @@ namespace internal
   template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
   struct EvaluatorTensorProduct<evaluate_evenodd,dim,n_rows,n_columns,Number,Number2>
   {
-    static const unsigned int n_rows_of_product = Utilities::fixed_int_power<n_rows,dim>::value;
-    static const unsigned int n_columns_of_product = Utilities::fixed_int_power<n_columns,dim>::value;
+    static constexpr unsigned int n_rows_of_product = Utilities::pow(n_rows, dim);
+    static constexpr unsigned int n_columns_of_product = Utilities::pow(n_columns, dim);
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -1531,9 +1531,9 @@ namespace internal
     constexpr int n_cols = nn / 2;
     constexpr int mid    = mm / 2;
 
-    constexpr int stride    = Utilities::fixed_int_power<n_columns,direction>::value;
+    constexpr int stride    = Utilities::pow(n_columns, direction);
     constexpr int n_blocks1 = one_line ? 1 : stride;
-    constexpr int n_blocks2 = Utilities::fixed_int_power<n_rows,(direction>=dim)?0:(dim-direction-1)>::value;
+    constexpr int n_blocks2 = Utilities::pow(n_rows, (direction>=dim) ? 0 : (dim-direction-1));
 
     constexpr int offset = (n_columns+1)/2;
 
@@ -1722,8 +1722,8 @@ namespace internal
   template <int dim, int n_rows, int n_columns, typename Number, typename Number2>
   struct EvaluatorTensorProduct<evaluate_symmetric_hierarchical,dim,n_rows,n_columns,Number,Number2>
   {
-    static const unsigned int n_rows_of_product = Utilities::fixed_int_power<n_rows,dim>::value;
-    static const unsigned int n_columns_of_product = Utilities::fixed_int_power<n_columns,dim>::value;
+    static constexpr unsigned int n_rows_of_product = Utilities::pow(n_rows, dim);
+    static constexpr unsigned int n_columns_of_product = Utilities::pow(n_columns, dim);
 
     /**
      * Empty constructor. Does nothing. Be careful when using 'values' and
@@ -1886,9 +1886,9 @@ namespace internal
     constexpr int n_cols = nn / 2;
     constexpr int mid    = mm / 2;
 
-    constexpr int stride    = Utilities::fixed_int_power<n_columns,direction>::value;
+    constexpr int stride    = Utilities::pow(n_columns, direction);
     constexpr int n_blocks1 = one_line ? 1 : stride;
-    constexpr int n_blocks2 = Utilities::fixed_int_power<n_rows,(direction>=dim)?0:(dim-direction-1)>::value;
+    constexpr int n_blocks2 = Utilities::pow(n_rows, (direction>=dim) ? 0 : (dim-direction-1));
 
     // this code may look very inefficient at first sight due to the many
     // different cases with if's at the innermost loop part, but all of the

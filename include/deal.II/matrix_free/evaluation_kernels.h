@@ -783,12 +783,12 @@ namespace internal
       for (unsigned int q=basis_size_1; q!=0; --q)
         FEEvaluationImplBasisChange<variant,next_dim,basis_size_1,basis_size_2,n_components,Number,Number2>
         ::do_forward(transformation_matrix,
-                     values_in + (q-1)*Utilities::fixed_int_power<basis_size_1,dim-1>::value,
-                     my_scratch + (q-1)*Utilities::fixed_int_power<basis_size_2,dim-1>::value);
+                     values_in + (q-1)*Utilities::pow(basis_size_1, dim-1),
+                     my_scratch + (q-1)*Utilities::pow(basis_size_2, dim-1));
       EvaluatorTensorProduct<variant, dim, basis_size_1, basis_size_2,
                              Number,Number2> eval_val (transformation_matrix);
       const unsigned int n_inner_blocks = (dim > 1 && basis_size_2 < 10) ? basis_size_2 : 1;
-      const unsigned int n_blocks = Utilities::fixed_int_power<basis_size_2,dim-1>::value;
+      const unsigned int n_blocks = Utilities::pow(basis_size_2, dim-1);
       for (unsigned int ii=0; ii<n_blocks; ii+=n_inner_blocks)
         for (unsigned int c=0; c<n_components; ++c)
           {
@@ -803,8 +803,8 @@ namespace internal
       for (unsigned int q=0; q<basis_size_1; ++q)
         FEEvaluationImplBasisChange<variant,next_dim,basis_size_1,basis_size_2,n_components,Number,Number2>
         ::do_backward(transformation_matrix, false,
-                      my_scratch + q*Utilities::fixed_int_power<basis_size_2,dim-1>::value,
-                      values_out + q*Utilities::fixed_int_power<basis_size_1,dim-1>::value);
+                      my_scratch + q*Utilities::pow(basis_size_2, dim-1),
+                      values_out + q*Utilities::pow(basis_size_1, dim-1));
     }
   };
 
@@ -872,7 +872,7 @@ namespace internal
     eval(AlignedVector<Number>(),
          shape_info.shape_gradients_collocation_eo,
          shape_info.shape_hessians_collocation_eo);
-    constexpr unsigned int n_q_points = Utilities::fixed_int_power<fe_degree+1,dim>::value;
+    constexpr unsigned int n_q_points = Utilities::pow(fe_degree+1, dim);
 
     for (unsigned int c=0; c<n_components; c++)
       {
@@ -931,7 +931,7 @@ namespace internal
     eval(AlignedVector<Number>(),
          shape_info.shape_gradients_collocation_eo,
          shape_info.shape_hessians_collocation_eo);
-    constexpr unsigned int n_q_points = Utilities::fixed_int_power<fe_degree+1,dim>::value;
+    constexpr unsigned int n_q_points = Utilities::pow(fe_degree+1, dim);
 
     for (unsigned int c=0; c<n_components; c++)
       {
@@ -1019,7 +1019,7 @@ namespace internal
                       "of lower degree, so the evaluation results would be "
                       "wrong. Thus, this class does not permit the desired "
                       "operation."));
-    constexpr unsigned int n_q_points = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
+    constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
     for (unsigned int c=0; c<n_components; c++)
       {
@@ -1064,7 +1064,7 @@ namespace internal
                       "operation."));
     AssertDimension(shape_info.shape_gradients_collocation_eo.size(),
                     (n_q_points_1d+1)/2*n_q_points_1d);
-    constexpr unsigned int n_q_points = Utilities::fixed_int_power<n_q_points_1d,dim>::value;
+    constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
     for (unsigned int c=0; c<n_components; c++)
       {
@@ -1134,11 +1134,11 @@ namespace internal
                  data.fe_degree+1, data.n_q_points_1d);
 
       const unsigned int size_deg = fe_degree > -1 ?
-                                    Utilities::fixed_int_power<fe_degree+1,dim-1>::value :
+                                    Utilities::pow(fe_degree+1, dim-1) :
                                     (dim > 1 ? Utilities::fixed_power<dim-1>(data.fe_degree+1) : 1);
 
       const unsigned int n_q_points = fe_degree > -1 ?
-                                      Utilities::fixed_int_power<n_q_points_1d,dim-1>::value : data.n_q_points_face;
+                                      Utilities::pow(n_q_points_1d, dim-1) : data.n_q_points_face;
 
       if (evaluate_grad == false)
         for (unsigned int c=0; c<n_components; ++c)
@@ -1254,7 +1254,7 @@ namespace internal
       Eval eval2(val2,grad2,val1,data.fe_degree+1, data.n_q_points_1d);
 
       const unsigned int size_deg = fe_degree > -1 ?
-                                    Utilities::fixed_int_power<fe_degree+1,dim-1>::value :
+                                    Utilities::pow(fe_degree+1, dim-1) :
                                     (dim > 1 ? Utilities::fixed_power<dim-1>(data.fe_degree+1) : 1);
 
       const unsigned int n_q_points = fe_degree > -1 ?
