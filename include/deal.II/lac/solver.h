@@ -36,33 +36,38 @@ template <typename number> class Vector;
  *
  * <h3>Requirements common to derived solver classes</h3>
  *
- * Since iterative solvers do not rely on any special structure of matrices or
- * the format of storage but only require that matrices and vectors define
+ * In general, iterative solvers do not rely on any special structure of matrices or
+ * the format of storage. Rather, they only require that matrices and vectors define
  * certain operations such as matrix-vector products, or scalar products
- * between vectors, this class as well as the derived classes and their member
+ * between vectors. Consequently, this class as well as the derived classes and their member
  * functions implementing concrete linear solvers are templated on the types
  * of matrices and vectors. However, there are some common requirements a
  * matrix or vector type must fulfill to qualify as an acceptable type for the
  * solvers in this hierarchy. These requirements are listed below.
  *
  * The classes we show below are not any concrete class. Rather, they are
- * intended to form a `signature' which a concrete class has to conform to.
+ * intended to form a "signature" which a concrete class has to conform to.
  * Note that the matrix and vector classes within this library of course
  * conform to this interface; therefore, SparseMatrix and Vector are good
  * examples for these classes as they provide the necessary signatures of
- * member functions.
+ * member functions (although they also provide many more interfaces that
+ * solvers do not in fact need -- for example, element access). In addition,
+ * you may want to take a look at step-20, step-22, or a number of classes
+ * in the LinearSolvers namespace for examples of how one can define
+ * matrix-like classes that can serve as linear operators for linear solvers.
  *
+ * Concretely, matrix and vector classes that can be passed to a linear
+ * solver need to provide the following interfaces:
  * @code
  * class Matrix
  * {
  *   public:
- *                        // Application of matrix to vector src.
- *                        // Write result into dst
+ *     // Application of matrix to vector src. Write result into dst.
  *     void vmult (VectorType       &dst,
  *                 const VectorType &src) const;
  *
- *                        // Application of transpose to a vector.
- *                        // Only used by some iterative methods.
+ *     // Application of transpose to a vector. This function is,
+ *     // however, only used by some iterative methods.
  *     void Tvmult (VectorType       &dst,
  *                  const VectorType &src) const;
  * };
@@ -71,48 +76,42 @@ template <typename number> class Vector;
  * class Vector
  * {
  *   public:
- *                        // Resize the current object to have
- *                        // the same size and layout as the model_vector
- *                        // argument provided. The second argument
- *                        // indicates whether to clear the current
- *                        // object after resizing.
- *                        // The second argument must have
- *                        // a default value equal to false
+ *     // Resize the current object to have the same size and layout as
+ *     // the model_vector argument provided. The second argument
+ *     // indicates whether to clear the current object after resizing.
+ *     // The second argument must have a default value equal to false.
  *     void reinit (const Vector &model_vector,
  *                  const bool  leave_elements_uninitialized = false);
  *
- *                        // Inner product between the current object
- *                        // and the argument
+ *     // Inner product between the current object and the argument.
  *     double operator * (const Vector &v) const;
  *
- *                        // Addition of vectors
+ *     // Addition of vectors
  *     void add (const Vector &x);
  *
- *                        // Scaled addition of vectors
+ *     // Scaled addition of vectors
  *     void add (const double  a,
  *               const Vector &x);
  *
- *                        // Scaled addition of vectors
+ *     // Scaled addition of vectors
  *     void sadd (const double  a,
  *                const double  b,
  *                const Vector &x);
  *
- *                        // Scaled assignment of a vector
+ *     // Scaled assignment of a vector
  *     void equ (const double  a,
  *               const Vector &x);
  *
- *                        // Combined scaled addition of vector x into
- *                        // the current object and subsequent inner
- *                        // product of the current object with v
+ *     // Combined scaled addition of vector x into the current object and
+ *     // subsequent inner product of the current object with v.
  *     double add_and_dot (const double  a,
  *                         const Vector &x,
  *                         const Vector &v);
  *
- *                        // Multiply the elements of the current
- *                        // object by a fixed value
+ *     // Multiply the elements of the current object by a fixed value.
  *     Vector & operator *= (const double a);
  *
- *                        // Return the l2 norm of the vector
+ *     // Return the l2 norm of the vector.
  *     double l2_norm () const;
  * };
  * @endcode
@@ -159,18 +158,18 @@ template <typename number> class Vector;
  * without giving the additional structure as an argument as a default @p
  * AdditionalData is set by default.
  *
- * With this, creating a solver looks like
+ * With this, creating a solver looks like one of the following blocks:
  * @code
- *                               // GMRES with restart every 50 iterations
- * SolverGMRES solver_gmres (solver_control, vector_memory,
- *                           SolverGMRES::AdditionalData(50));
+ *   // GMRES with restart every 50 iterations
+ *   SolverGMRES solver_gmres (solver_control, vector_memory,
+ *                             SolverGMRES::AdditionalData(50));
  *
- *                               // Richardson with omega=0.8
- * SolverRichardson solver_richardson (solver_control, vector_memory,
- *                                     SolverGMRES::AdditionalData(0.8));
+ *   // Richardson with omega=0.8
+ *   SolverRichardson solver_richardson (solver_control, vector_memory,
+ *                                       SolverGMRES::AdditionalData(0.8));
  *
- *                               // CG with default AdditionalData
- * SolverCG solver_cg (solver_control, vector_memory);
+ *   // CG with default AdditionalData
+ *   SolverCG solver_cg (solver_control, vector_memory);
  * @endcode
  *
  * Using a unified constructor parameter list for all solvers supports the @p
