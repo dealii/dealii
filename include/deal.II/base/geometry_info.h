@@ -2924,6 +2924,15 @@ GeometryInfo<dim>::child_to_cell_coordinates (const Point<dim>         &/*p*/,
 
 
 
+template <int dim>
+inline
+bool
+GeometryInfo<dim>::is_inside_unit_cell (const Point<dim> &)
+{
+  Assert(false, ExcNotImplemented());
+  return false;
+}
+
 template <>
 inline
 bool
@@ -2953,6 +2962,18 @@ GeometryInfo<3>::is_inside_unit_cell (const Point<3> &p)
   return (p[0] >= 0.) && (p[0] <= 1.) &&
          (p[1] >= 0.) && (p[1] <= 1.) &&
          (p[2] >= 0.) && (p[2] <= 1.);
+}
+
+
+
+template <int dim>
+inline
+bool
+GeometryInfo<dim>::is_inside_unit_cell (const Point<dim> &,
+                                        const double)
+{
+  Assert(false, ExcNotImplemented());
+  return false;
 }
 
 template <>
@@ -3151,6 +3172,16 @@ GeometryInfo<dim>::n_children(const RefinementCase<dim> &ref_case)
 }
 
 
+
+template <int dim>
+inline
+unsigned int
+GeometryInfo<dim>::n_subfaces(const internal::SubfaceCase<dim> &)
+{
+  Assert(false, ExcNotImplemented());
+  return 0;
+}
+
 template <>
 inline
 unsigned int
@@ -3159,8 +3190,6 @@ GeometryInfo<1>::n_subfaces(const internal::SubfaceCase<1> &)
   Assert(false, ExcImpossibleInDim(1));
   return 0;
 }
-
-
 
 template <>
 inline
@@ -3182,6 +3211,17 @@ GeometryInfo<3>::n_subfaces(const internal::SubfaceCase<3> &subface_case)
   return nsubs[subface_case];
 }
 
+
+
+template <int dim>
+inline
+double
+GeometryInfo<dim>::subface_ratio(const internal::SubfaceCase<dim> &,
+                                 const unsigned int)
+{
+  Assert(false, ExcNotImplemented());
+  return 0.;
+}
 
 template <>
 inline
@@ -3292,6 +3332,19 @@ GeometryInfo<3>::subface_ratio(const internal::SubfaceCase<3> &subface_case,
 }
 
 
+
+template <int dim>
+RefinementCase<dim-1>
+inline
+GeometryInfo<dim>::face_refinement_case(const RefinementCase<dim> &,
+                                        const unsigned int,
+                                        const bool,
+                                        const bool,
+                                        const bool)
+{
+  Assert (false, ExcNotImplemented());
+  return RefinementCase<dim-1>::no_refinement;
+}
 
 template <>
 RefinementCase<0>
@@ -3445,6 +3498,16 @@ GeometryInfo<3>::face_refinement_case(const RefinementCase<3> &cell_refinement_c
 
 
 
+template <int dim>
+inline
+RefinementCase<1>
+GeometryInfo<dim>::line_refinement_case(const RefinementCase<dim> &,
+                                        const unsigned int)
+{
+  Assert(false, ExcNotImplemented());
+  return RefinementCase<1>::no_refinement;
+}
+
 template <>
 inline
 RefinementCase<1>
@@ -3510,6 +3573,20 @@ GeometryInfo<3>::line_refinement_case(const RefinementCase<3> &cell_refinement_c
 }
 
 
+
+template <int dim>
+inline
+RefinementCase<dim>
+GeometryInfo<dim>::min_cell_refinement_case_for_face_refinement(const RefinementCase<dim-1> &,
+    const unsigned int,
+    const bool,
+    const bool,
+    const bool)
+{
+  Assert(false, ExcNotImplemented());
+
+  return RefinementCase<dim>::no_refinement;
+}
 
 template <>
 inline
@@ -3616,6 +3693,16 @@ GeometryInfo<3>::min_cell_refinement_case_for_face_refinement(const RefinementCa
 
 
 
+template <int dim>
+inline
+RefinementCase<dim>
+GeometryInfo<dim>::min_cell_refinement_case_for_line_refinement(const unsigned int)
+{
+  Assert(false, ExcNotImplemented());
+
+  return RefinementCase<dim>::no_refinement;
+}
+
 template <>
 inline
 RefinementCase<1>
@@ -3663,10 +3750,6 @@ GeometryInfo<3>::min_cell_refinement_case_for_line_refinement(const unsigned int
 
   return ref_cases[line_no/2];
 }
-
-
-
-
 
 
 
