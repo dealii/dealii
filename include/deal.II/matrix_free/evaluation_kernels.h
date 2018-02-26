@@ -1125,9 +1125,6 @@ namespace internal
       typedef internal::EvaluatorTensorProduct
       <symmetric_evaluate ? internal::evaluate_evenodd :internal::evaluate_general,
       dim-1,fe_degree+1,n_q_points_1d,Number> Eval;
-      typedef internal::EvaluatorTensorProduct
-      <internal::evaluate_general,dim-1,fe_degree+1,n_q_points_1d,
-      Number> EvalGeneric;
       Eval eval1(val1,grad1,AlignedVector<Number>(),
                  data.fe_degree+1, data.n_q_points_1d);
       Eval eval2(val2,grad2,AlignedVector<Number>(),
@@ -1247,9 +1244,6 @@ namespace internal
       typedef internal::EvaluatorTensorProduct
       <symmetric_evaluate ? internal::evaluate_evenodd :internal::evaluate_general,
       dim-1,fe_degree+1,n_q_points_1d,Number> Eval;
-      typedef internal::EvaluatorTensorProduct
-      <internal::evaluate_general,dim-1,fe_degree+1,n_q_points_1d,
-      Number> EvalGeneric;
       Eval eval1(val1,grad1,val1,data.fe_degree+1, data.n_q_points_1d);
       Eval eval2(val2,grad2,val1,data.fe_degree+1, data.n_q_points_1d);
 
