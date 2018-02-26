@@ -133,7 +133,7 @@ public:
     /**
      * Current column number.
      */
-    unsigned short a_col;
+    size_type a_col;
 
     /*
      * Make enclosing class a friend.
