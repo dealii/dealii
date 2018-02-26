@@ -139,7 +139,7 @@ void test (const unsigned int n_blocks = 5)
       }
 
   const double res = left.multivector_inner_product_with_metric(metric, right);
-  left2.mmult(left, metric);
+  left.mmult(left2, metric);
   const double res2 = left2 * right;
 
   const double diff_norm = std::abs(res - res2);

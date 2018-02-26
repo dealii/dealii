@@ -491,16 +491,18 @@ namespace LinearAlgebra
 
       /**
        * Set each block of this vector as follows:
-       * $U^i = \sum_{j} V_j A^{ji}$ where $U^i$
-       * and $V_j$ indicate the $i$th block (not element) of $U$ and the
-       * $j$th block of $V$, respectively.
+       * $V^i = s V^i + b \sum_{j} U_j A^{ji}$ where $V^i$
+       * and $U_j$ indicate the $i$th block (not element) of $V$ and the
+       * $j$th block of $U$, respectively.
        *
        * Obviously, this function can only be used if all blocks of both vectors
        * are of the same size.
        */
       template <typename FullMatrixType>
-      void mmult(const BlockVector<Number> &V,
-                 const FullMatrixType &matrix);
+      void mmult(BlockVector<Number> &V,
+                 const FullMatrixType &matrix,
+                 const Number s = Number(0.),
+                 const Number b = Number(1.)) const;
 
       /**
        * Add @p a to all components. Note that @p a is a scalar not a vector.
