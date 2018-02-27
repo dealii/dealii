@@ -179,7 +179,7 @@ namespace Utilities
     /**
      * Perform an MPI sum of the entries of a symmetric tensor.
      *
-     * @relates SymmetricTensor
+     * @relatesalso SymmetricTensor
      */
     template <int rank, int dim, typename Number>
     SymmetricTensor<rank,dim,Number>
@@ -189,7 +189,7 @@ namespace Utilities
     /**
      * Perform an MPI sum of the entries of a tensor.
      *
-     * @relates Tensor
+     * @relatesalso Tensor
      */
     template <int rank, int dim, typename Number>
     Tensor<rank,dim,Number>
