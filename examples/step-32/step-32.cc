@@ -3185,10 +3185,10 @@ namespace Step32
   BoussinesqFlowProblem<dim>::Postprocessor::get_names() const
   {
     std::vector<std::string> solution_names (dim, "velocity");
-    solution_names.push_back ("p");
-    solution_names.push_back ("T");
-    solution_names.push_back ("friction_heating");
-    solution_names.push_back ("partition");
+    solution_names.emplace_back ("p");
+    solution_names.emplace_back ("T");
+    solution_names.emplace_back ("friction_heating");
+    solution_names.emplace_back ("partition");
 
     return solution_names;
   }

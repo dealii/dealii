@@ -732,7 +732,7 @@ namespace Step55
 
 
     std::vector<std::string> solution_names (dim, "velocity");
-    solution_names.push_back ("pressure");
+    solution_names.emplace_back ("pressure");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation
     (dim, DataComponentInterpretation::component_is_part_of_vector);
@@ -754,7 +754,7 @@ namespace Step55
     interpolated_relevant = interpolated;
     {
       std::vector<std::string> solution_names (dim, "ref_u");
-      solution_names.push_back ("ref_p");
+      solution_names.emplace_back ("ref_p");
       data_out.add_data_vector (interpolated_relevant, solution_names,
                                 DataOut<dim>::type_dof_data,
                                 data_component_interpretation);

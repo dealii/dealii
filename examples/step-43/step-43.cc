@@ -1821,8 +1821,8 @@ namespace Step43
         }
     }
     std::vector<std::string> joint_solution_names (dim, "velocity");
-    joint_solution_names.push_back ("pressure");
-    joint_solution_names.push_back ("saturation");
+    joint_solution_names.emplace_back ("pressure");
+    joint_solution_names.emplace_back ("saturation");
 
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation

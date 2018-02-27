@@ -129,8 +129,8 @@ namespace Step33
     component_names ()
     {
       std::vector<std::string> names (dim, "momentum");
-      names.push_back ("density");
-      names.push_back ("energy_density");
+      names.emplace_back ("density");
+      names.emplace_back ("energy_density");
 
       return names;
     }
@@ -640,11 +640,11 @@ namespace Step33
   {
     std::vector<std::string> names;
     for (unsigned int d=0; d<dim; ++d)
-      names.push_back ("velocity");
-    names.push_back ("pressure");
+      names.emplace_back ("velocity");
+    names.emplace_back ("pressure");
 
     if (do_schlieren_plot == true)
-      names.push_back ("schlieren_plot");
+      names.emplace_back ("schlieren_plot");
 
     return names;
   }
