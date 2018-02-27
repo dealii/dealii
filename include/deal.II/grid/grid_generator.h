@@ -35,9 +35,15 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Some of these functions receive a flag @p colorize. If this is set, parts
  * of the boundary receive different
- * @ref GlossBoundaryIndicator "boundary indicators"),
+ * @ref GlossBoundaryIndicator "boundary indicators", and different
+ * @ref GlossManifoldIndicator "manifold indicators",
  * allowing them to be distinguished for the purpose of attaching geometry
  * objects and evaluating different boundary conditions.
+ *
+ * Notice that while the default boundary indicator is zero, the default
+ * manifold indicator is numbers::flat_manifold_id. When the @p colorize flag
+ * is set to true, all boundary indicators are copied to the manifold
+ * indicators, including the zero boundary indicator.
  *
  * @ingroup grid
  */
@@ -56,9 +62,10 @@ namespace GridGenerator
    * zero and unity, then producing the unit hypercube.
    *
    * If the argument @p colorize is false, all boundary indicators are set to
-   * zero ("not colorized") for 2d and 3d. If it is true, the boundary is
-   * colorized as in hyper_rectangle(). In 1d the indicators are always
-   * colorized, see hyper_rectangle().
+   * zero ("not colorized") for 2d and 3d, and all manifold indicators are set
+   * to numbers::flat_manifold_id. If it is true, the boundary is colorized as
+   * in hyper_rectangle(). In 1d the indicators are always colorized, see
+   * hyper_rectangle().
    *
    * @image html hyper_cubes.png
    *
@@ -130,26 +137,27 @@ namespace GridGenerator
    * Create a coordinate-parallel brick from the two diagonally opposite
    * corner points @p p1 and @p p2.
    *
-   * If the @p colorize flag is @p true, the @p boundary_ids of the boundary
-   * faces are assigned, such that the lower one in @p x-direction is 0, the
-   * upper one is 1. The indicators for the surfaces in @p y-direction are 2
-   * and 3, the ones for @p z are 4 and 5. This corresponds to the numbers of
-   * faces of the unit square of cube as laid out in the documentation of the
-   * GeometryInfo class. Importantly, however, in 3d colorization does not set
-   * @p boundary_ids of <i>edges</i>, but only of <i>faces</i>, because each
+   * If the @p colorize flag is @p true, the @p boundary_ids and the @p
+   * manifold_ids of the boundary faces are assigned, such that the lower one
+   * in @p x-direction is 0, the upper one is 1. The indicators for the
+   * surfaces in @p y-direction are 2 and 3, the ones for @p z are 4 and 5.
+   * This corresponds to the numbers of faces of the unit square of cube as
+   * laid out in the documentation of the GeometryInfo class. Importantly,
+   * however, in 3d colorization does not set @p boundary_ids and
+   * @p manifold_ids of <i>edges</i>, but only of <i>faces</i>, because each
    * boundary edge is shared between two faces and it is not clear how the
-   * boundary id of an edge should be set in that case. This may later on lead
-   * to problems if one wants to assign boundary or manifold objects to parts
-   * of the boundary with certain boundary indicators since then the boundary
-   * object may not apply to the edges bounding the face it is meant to
-   * describe.
+   * boundary or manifold id of an edge should be set in that case. This may
+   * later on lead to problems if one wants to assign boundary or manifold
+   * objects to parts of the boundary with certain boundary indicators since
+   * then the boundary object may not apply to the edges bounding the face it
+   * is meant to describe.
    *
    * Additionally, if @p colorize is @p true, material ids are assigned to the
    * cells according to the octant their center is in: being in the right half
    * space for any coordinate direction <i>x<sub>i</sub></i> adds
    * 2<sup>i</sup>. For instance, a cell with center point (1,-1,1) yields a
    * material id 5, assuming that the center of the hyper rectangle lies at
-   * the origin.
+   * the origin. No manifold id is set for the cells.
    *
    * If @p dim < @p spacedim, this will create a @p dim dimensional object in
    * the first @p dim coordinate directions embedded into the @p spacedim
@@ -175,12 +183,12 @@ namespace GridGenerator
    * coordinate directions. The minimum number of subdivisions in each
    * direction is 1.
    *
-   * If the @p colorize flag is set, the @p boundary_ids of the surfaces are
-   * assigned, such that the lower one in @p x-direction is 0, the upper one
-   * is 1 (the left and the right vertical face). The indicators for the
-   * surfaces in @p y-direction are 2 and 3, the ones for @p z are 4 and 5.
-   * Additionally, material ids are assigned to the cells according to the
-   * octant their center is in: being in the right half plane for any
+   * If the @p colorize flag is set, the @p boundary_ids and @p manifold_ids of
+   * the surfaces are assigned, such that the lower one in @p x-direction is 0,
+   * the upper one is 1 (the left and the right vertical face). The indicators
+   * for the surfaces in @p y-direction are 2 and 3, the ones for @p z are 4
+   * and 5. Additionally, material ids are assigned to the cells according to
+   * the octant their center is in: being in the right half plane for any
    * coordinate direction <i>x<sub>i</sub></i> adds 2<sup>i</sup>. For
    * instance, the center point (1,-1,1) yields a material id 5 (this means
    * that in 2d only material ids 0,1,2,3 are assigned independent from the
@@ -209,8 +217,8 @@ namespace GridGenerator
    *
    * @param p2 Second corner opposite to @p p1.
    *
-   * @param colorize Assign different boundary ids if set to true. The same
-   * comments apply as for the hyper_rectangle() function.
+   * @param colorize Assign different boundary and manifold ids if set to true.
+   * The same comments apply as for the hyper_rectangle() function.
    *
    */
   template <int dim, int spacedim>
@@ -260,7 +268,7 @@ namespace GridGenerator
                               const std::vector< std::vector<double> > &spacing,
                               const Point<dim>                         &p,
                               const Table<dim,types::material_id>      &material_id,
-                              const bool                                colorize=false);
+                              const bool                               colorize=false);
 
   /**
    * \brief Rectangular domain with rectangular pattern of holes
@@ -301,7 +309,8 @@ namespace GridGenerator
    * the volume of the cell is positive.
    *
    * If the argument @p colorize is false, all boundary indicators are set to
-   * zero ("not colorized") for 2d and 3d. If it is true, the boundary is
+   * zero ("not colorized") and all manifold indicators are set to
+   * numbers::flat_manifold_id for 2d and 3d. If it is true, the boundary is
    * colorized as in hyper_rectangle(). In 1d the indicators are always
    * colorized, see hyper_rectangle().
    *
@@ -578,10 +587,11 @@ namespace GridGenerator
    *
    * The boundaries are colored according to the following scheme: 0 for the
    * hull of the cone, 1 for the left hand face and 2 for the right hand face.
+   * Both the boundary indicators and the manifold indicators are set.
    *
    * In three dimensions, the CylindricalManifold class is an appropriate choice
-   * for the description of the hull, with which you probably want to associate
-   * boundary indicator 0.
+   * for the description of the hull, with which you probably want to associate to
+   * manifold indicator 0.
    * In two dimensions the default FlatManifold is sufficient.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
@@ -641,12 +651,12 @@ namespace GridGenerator
    * remain bounded. As a consequence, this domain is often used to
    * test convergence of schemes when the solution lacks regularity.
    *
-   * If the @p colorize flag is set, the @p boundary_ids of the
-   * surfaces are assigned, such that the left boundary is 0, and the
-   * others are set with growing number accordingly to the
-   * counterclockwise. Colorize option works only with 2-dimensional
-   * problem. This function will create the classical L-shape in 2d
-   * and it will look like the following in 3d:
+   * If the @p colorize flag is set, the @p boundary_ids and @p manifold_ids of
+   * the surfaces are assigned, such that the left boundary is 0, and the
+   * others are set with growing number accordingly to the counterclockwise.
+   * Colorize option works only with 2-dimensional problem. This function will
+   * create the classical L-shape in 2d and it will look like the following in
+   * 3d:
    *
    * @image html hyper_l.png
    *
@@ -679,7 +689,7 @@ namespace GridGenerator
    * an error if called in 1d.
    *
    * If @p colorize is set to @p true, the faces forming the slit are marked
-   * with boundary id 1 and 2, respectively.
+   * with boundary and manifold id 1 and 2, respectively.
    *
    * @note The triangulation passed as argument needs to be empty when calling this function.
    */
