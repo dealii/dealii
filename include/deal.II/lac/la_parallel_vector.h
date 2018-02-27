@@ -1523,7 +1523,7 @@ namespace LinearAlgebra
  * C++ standard library which uses a temporary object. The function simply
  * exchanges the data of the two vectors.
  *
- * @relates Vector
+ * @relatesalso Vector
  * @author Katharina Kormann, Martin Kronbichler, 2011
  */
 template <typename Number>

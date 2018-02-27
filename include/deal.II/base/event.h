@@ -285,7 +285,7 @@ namespace Algorithms
   /**
    * Output shift operator for events. Calls Event::print().
    *
-   * @relates Event
+   * @relatesalso Event
    */
   template <class OS>
   OS &operator << (OS &o, const Event &e)

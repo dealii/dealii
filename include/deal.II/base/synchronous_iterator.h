@@ -112,7 +112,7 @@ SynchronousIterators<Iterators>::operator* ()
  * forward all elements at the same time, comparing the first element is
  * sufficient.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
 inline
@@ -130,7 +130,7 @@ operator< (const SynchronousIterators<Iterators> &a,
  * objects compared march forward all elements at the same time, differencing
  * the first element is sufficient.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
 inline
@@ -149,7 +149,7 @@ operator- (const SynchronousIterators<Iterators> &a,
 /**
  * Advance a tuple of iterators by $n$.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename I1, typename I2>
 inline
@@ -163,7 +163,7 @@ void advance (std::tuple<I1,I2> &t,
 /**
  * Advance a tuple of iterators by $n$.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename I1, typename I2, typename I3>
 inline
@@ -178,7 +178,7 @@ void advance (std::tuple<I1,I2,I3> &t,
 /**
  * Advance a tuple of iterators by $n$.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename I1, typename I2,
           typename I3, typename I4>
@@ -197,7 +197,7 @@ void advance (std::tuple<I1,I2,I3, I4> &t,
 /**
  * Advance a tuple of iterators by 1.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename I1, typename I2>
 inline
@@ -210,7 +210,7 @@ void advance_by_one (std::tuple<I1,I2> &t)
 /**
  * Advance a tuple of iterators by 1.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename I1, typename I2, typename I3>
 inline
@@ -224,7 +224,7 @@ void advance_by_one (std::tuple<I1,I2,I3> &t)
 /**
  * Advance a tuple of iterators by 1.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename I1, typename I2,
           typename I3, typename I4>
@@ -242,7 +242,7 @@ void advance_by_one (std::tuple<I1,I2,I3,I4> &t)
 /**
  * Advance the elements of this iterator by $n$.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
 inline
@@ -258,7 +258,7 @@ operator + (const SynchronousIterators<Iterators> &a,
 /**
  * Advance the elements of this iterator by 1.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
 inline
@@ -274,7 +274,7 @@ operator ++ (SynchronousIterators<Iterators> &a)
  * Compare synch iterators for inequality. Since they march in synch,
  * comparing only the first element is sufficient.
  *
- * @relates SynchronousIterators
+ * @relatesalso SynchronousIterators
  */
 template <typename Iterators>
 inline

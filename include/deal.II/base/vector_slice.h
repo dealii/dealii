@@ -134,7 +134,7 @@ private:
  * Helper function for creating temporary objects without typing template
  * arguments.
  *
- * @relates VectorSlice
+ * @relatesalso VectorSlice
  * @author Guido Kanschat, 2004
  */
 template <typename VectorType>
@@ -152,7 +152,7 @@ make_slice (VectorType &v)
  * Helper function for creating temporary objects without typing template
  * arguments.
  *
- * @relates VectorSlice
+ * @relatesalso VectorSlice
  * @author Guido Kanschat, 2004
  */
 template <typename VectorType>

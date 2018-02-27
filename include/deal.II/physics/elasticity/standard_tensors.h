@@ -38,8 +38,8 @@ namespace Physics
      * @note These hold specifically for the codimension 0 case with a
      * Cartesian basis, where the metric tensor is the identity tensor.
      *
-     * @relates Tensor
-     * @relates SymmetricTensor
+     * @relatesalso Tensor
+     * @relatesalso SymmetricTensor
      * @author Jean-Paul Pelteret, Andrew McBride, 2016
      */
     template <int dim>

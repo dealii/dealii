@@ -453,7 +453,7 @@ void BlockVector<Number>::scale (const BlockVector2 &v)
  * standard library which uses a temporary object. The function simply
  * exchanges the data of the two vectors.
  *
- * @relates BlockVector
+ * @relatesalso BlockVector
  * @author Wolfgang Bangerth, 2000
  */
 template <typename Number>

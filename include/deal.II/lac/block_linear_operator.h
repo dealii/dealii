@@ -451,7 +451,7 @@ namespace internal
 //@{
 
 /**
- * @relates BlockLinearOperator
+ * @relatesalso BlockLinearOperator
  *
  * A function that encapsulates a @p block_matrix into a BlockLinearOperator.
  *
@@ -501,7 +501,7 @@ block_operator(const BlockMatrixType &block_matrix)
 
 
 /**
- * @relates BlockLinearOperator
+ * @relatesalso BlockLinearOperator
  *
  * A variant of above function that encapsulates a given collection @p ops of
  * LinearOperators into a block structure. Here, it is assumed that Range and
@@ -563,7 +563,7 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
 
 
 /**
- * @relates BlockLinearOperator
+ * @relatesalso BlockLinearOperator
  *
  * This function extracts the diagonal blocks of @p block_matrix (either a
  * block matrix type or a BlockLinearOperator) and creates a
@@ -620,7 +620,7 @@ block_diagonal_operator(const BlockMatrixType &block_matrix)
 
 
 /**
- * @relates BlockLinearOperator
+ * @relatesalso BlockLinearOperator
  *
  * A variant of above function that builds up a block diagonal linear operator
  * from an array @p ops of diagonal elements (off-diagonal blocks are assumed
@@ -672,7 +672,7 @@ block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockTyp
 
 
 /**
- * @relates BlockLinearOperator
+ * @relatesalso BlockLinearOperator
  *
  * A variant of above function that only takes a single LinearOperator
  * argument @p op and creates a blockdiagonal linear operator with @p m copies
@@ -704,8 +704,8 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
 //@{
 
 /**
- * @relates LinearOperator
- * @relates BlockLinearOperator
+ * @relatesalso LinearOperator
+ * @relatesalso BlockLinearOperator
  *
  * This function implements forward substitution to invert a lower block
  * triangular matrix. As arguments, it takes a BlockLinearOperator @p
@@ -814,8 +814,8 @@ block_forward_substitution(const BlockLinearOperator<Range, Domain, BlockPayload
 
 
 /**
- * @relates LinearOperator
- * @relates BlockLinearOperator
+ * @relatesalso LinearOperator
+ * @relatesalso BlockLinearOperator
  *
  * This function implements back substitution to invert an upper block
  * triangular matrix. As arguments, it takes a BlockLinearOperator @p

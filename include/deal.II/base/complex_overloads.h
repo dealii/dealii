@@ -31,7 +31,7 @@ template <typename T, typename U> struct ProductType;
  * types. Annoyingly, the standard library does not provide such an
  * operator...
  *
- * @relates ProductType
+ * @relatesalso ProductType
  */
 template <typename T, typename U>
 typename ProductType<std::complex<T>, std::complex<U> >::type
@@ -48,8 +48,8 @@ operator*(const std::complex<T> &left, const std::complex<U> &right)
  * floating point type with a different real floating point type. Annoyingly,
  * the standard library does not provide such an operator...
  *
- * @relates EnableIfScalar
- * @relates ProductType
+ * @relatesalso EnableIfScalar
+ * @relatesalso ProductType
  */
 template <typename T, typename U>
 typename ProductType<std::complex<T>, typename EnableIfScalar<U>::type>::type
@@ -66,8 +66,8 @@ operator*(const std::complex<T> &left, const U &right)
  * floating point type with a different complex floating point type.
  * Annoyingly, the standard library does not provide such an operator...
  *
- * @relates EnableIfScalar
- * @relates ProductType
+ * @relatesalso EnableIfScalar
+ * @relatesalso ProductType
  */
 template <typename T, typename U>
 typename ProductType<typename EnableIfScalar<T>::type, std::complex<U> >::type

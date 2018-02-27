@@ -346,7 +346,7 @@ public:
 //@{
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Addition of two linear operators @p first_op and @p second_op given by
  * $(\text{first\_op}+\text{second\_op})x := \text{first\_op}(x) +
@@ -409,7 +409,7 @@ operator+(const LinearOperator<Range, Domain, Payload> &first_op,
 
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Subtraction of two linear operators @p first_op and @p second_op given by
  * $(\text{first\_op}-\text{second\_op})x := \text{first\_op}(x) -
@@ -439,7 +439,7 @@ operator-(const LinearOperator<Range, Domain, Payload> &first_op,
 
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Scalar multiplication of a ScalarOperator object @p op with @p number from
  * the left.
@@ -511,7 +511,7 @@ operator*(typename Range::value_type  number,
 
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Scalar multiplication of a ScalarOperator object from the right.
  *
@@ -546,7 +546,7 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
 //@{
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Composition of two linear operators @p first_op and @p second_op given by
  * $(\text{first\_op}*\text{second\_op})x :=
@@ -623,7 +623,7 @@ operator*(const LinearOperator<Range, Intermediate, Payload> &first_op,
 }
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Return the transpose linear operations of @p op.
  *
@@ -652,7 +652,7 @@ transpose_operator(const LinearOperator<Range, Domain, Payload> &op)
 
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Return an object representing the inverse of the LinearOperator @p op.
  *
@@ -732,7 +732,7 @@ inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
 //@{
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Return a LinearOperator that is the identity of the vector space @p Range.
  *
@@ -777,7 +777,7 @@ identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Return a LinearOperator that is the identity of the vector space @p Range.
  *
@@ -810,7 +810,7 @@ identity_operator(const LinearOperator<Range, Domain, Payload> &op)
 
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Return a nulled variant of the LinearOperator @p op, i.e. with optimized
  * LinearOperator::vmult, LinearOperator::vmult_add, etc. functions and with
@@ -1166,7 +1166,7 @@ namespace
 
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * A function that encapsulates generic @p matrix objects that act on a
  * compatible Vector type into a LinearOperator. The LinearOperator object
@@ -1233,7 +1233,7 @@ linear_operator(const Matrix &matrix)
 
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Variant of above function that takes an operator object @p
  * operator_exemplar as an additional reference. This object is used to
@@ -1285,7 +1285,7 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
 
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Variant of above function that takes a LinearOperator @p
  * operator_exemplar as an additional reference.

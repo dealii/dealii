@@ -483,7 +483,7 @@ namespace internal
  * In debug mode, we check that the provided iterators represent contiguous
  * memory indeed.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename Iterator>
 ArrayView<typename std::remove_reference<typename std::iterator_traits<Iterator>::reference>::type>
@@ -511,7 +511,7 @@ make_array_view (const Iterator begin, const Iterator end)
  * @warning The pointers @p begin and @p end must bound (in the usual
  * half-open way) a contiguous in memory range of values.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 ArrayView<ElementType>
@@ -532,7 +532,7 @@ make_array_view (ElementType *const begin, ElementType *const end)
  *
  * @param[in] array_view The ArrayView that we wish to make a copy of.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename Number>
 inline
@@ -552,7 +552,7 @@ make_array_view (const ArrayView<Number> &array_view)
  *
  * @param[in] array_view The ArrayView that we wish to make a copy of.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename Number>
 inline
@@ -578,7 +578,7 @@ make_array_view (ArrayView<Number> &array_view)
  * order in which the entries are presented in the array is undefined and can
  * not be relied upon.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
 inline
@@ -604,7 +604,7 @@ make_array_view (const Tensor<rank, dim, Number> &tensor)
  * order in which the entries are presented in the array is undefined and can
  * not be relied upon.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
 inline
@@ -630,7 +630,7 @@ make_array_view (Tensor<rank, dim, Number> &tensor)
  * the order in which the entries are presented in the array is undefined and
  * can not be relied upon.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
 inline
@@ -657,7 +657,7 @@ make_array_view (const SymmetricTensor<rank, dim, Number> &tensor)
  * order in which the entries are presented in the array is undefined and can
  * not be relied upon.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <int rank, int dim, typename Number>
 inline
@@ -680,7 +680,7 @@ make_array_view (SymmetricTensor<rank, dim, Number> &tensor)
  * @param[in] array The C-style array for which we want to have an ArrayView
  * object. The ArrayView corresponds to the <em>entire</em> vector.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType, int N>
 inline
@@ -704,7 +704,7 @@ make_array_view (ElementType (&array)[N])
  * @param[in] vector The Vector for which we want to have an array view
  * object. The array view corresponds to the <em>entire</em> Vector.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -728,7 +728,7 @@ make_array_view (Vector<ElementType> &vector)
  * @param[in] vector The Vector for which we want to have an array view
  * object. The array view corresponds to the <em>entire</em> Vector.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -752,7 +752,7 @@ make_array_view (const Vector<ElementType> &vector)
  * @param[in] vector The vector for which we want to have an array view
  * object. The array view corresponds to the <em>entire</em> vector.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -776,7 +776,7 @@ make_array_view (std::vector<ElementType> &vector)
  * @param[in] vector The vector for which we want to have an array view
  * object. The array view corresponds to the <em>entire</em> vector.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -805,7 +805,7 @@ make_array_view (const std::vector<ElementType> &vector)
  *
  * @pre <code>starting_index + size_of_view <= vector.size()</code>
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -840,7 +840,7 @@ make_array_view (std::vector<ElementType> &vector,
  *
  * @pre <code>starting_index + size_of_view <= vector.size()</code>
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -872,7 +872,7 @@ make_array_view (const std::vector<ElementType> &vector,
  * @param[in] row The index of the row into the table to which this view
  * should correspond.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -900,7 +900,7 @@ make_array_view (Table<2,ElementType>                           &table,
  * which the entries are presented in the array is undefined and can not be
  * relied upon.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -926,7 +926,7 @@ make_array_view (Table<2,ElementType> &table)
  * which the entries are presented in the array is undefined and can not be
  * relied upon.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -952,7 +952,7 @@ make_array_view (const Table<2,ElementType> &table)
  * order in which the entries are presented in the array is undefined and can
  * not be relied upon.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -978,7 +978,7 @@ make_array_view (LAPACKFullMatrix<ElementType> &matrix)
  * order in which the entries are presented in the array is undefined and can
  * not be relied upon.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -1004,7 +1004,7 @@ make_array_view (const LAPACKFullMatrix<ElementType> &matrix)
  * @param[in] row The index of the row into the table to which this view
  * should correspond.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -1035,7 +1035,7 @@ make_array_view (const Table<2,ElementType>                     &table,
  * corresponds to the number of columns in the current row to which the view
  * should correspond.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline
@@ -1073,7 +1073,7 @@ make_array_view (Table<2,ElementType>                           &table,
  * corresponds to the number of columns in the current row to which the view
  * should correspond.
  *
- * @relates ArrayView
+ * @relatesalso ArrayView
  */
 template <typename ElementType>
 inline

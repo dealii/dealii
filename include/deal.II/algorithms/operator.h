@@ -155,7 +155,7 @@ namespace Algorithms
   /**
    * Set the step number in OutputOperator by shifting an integer value.
    *
-   * @relates OutputOperator
+   * @relatesalso OutputOperator
    */
   template <typename VectorType>
   inline

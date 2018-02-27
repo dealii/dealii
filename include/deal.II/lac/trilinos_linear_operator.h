@@ -55,7 +55,7 @@ namespace TrilinosWrappers
 
 
   /**
-   * @relates LinearOperator
+   * @relatesalso LinearOperator
    *
    * A function that encapsulates generic @p matrix objects, based on an
    * @p operator_exemplar, that act on a compatible Vector type into a
@@ -81,7 +81,7 @@ namespace TrilinosWrappers
 
 
   /**
-   * @relates LinearOperator
+   * @relatesalso LinearOperator
    *
    * A function that encapsulates generic @p matrix objects that act on a
    * compatible Vector type into a LinearOperator.
@@ -112,7 +112,7 @@ namespace TrilinosWrappers
 
 
   /**
-   * @relates BlockLinearOperator
+   * @relatesalso BlockLinearOperator
    *
    * A function that encapsulates a @p block_matrix into a BlockLinearOperator.
    *
@@ -137,7 +137,7 @@ namespace TrilinosWrappers
 
 
   /**
-   * @relates BlockLinearOperator
+   * @relatesalso BlockLinearOperator
    *
    * A variant of above function that builds up a block diagonal linear operator
    * from an array @p ops of diagonal elements (off-diagonal blocks are assumed
@@ -164,7 +164,7 @@ namespace TrilinosWrappers
 
 
   /**
-   * @relates BlockLinearOperator
+   * @relatesalso BlockLinearOperator
    *
    * This function extracts the diagonal blocks of @p block_matrix (either a
    * block matrix type or a BlockLinearOperator) and creates a
@@ -193,7 +193,7 @@ namespace TrilinosWrappers
 
 
   /**
-   * @relates BlockLinearOperator
+   * @relatesalso BlockLinearOperator
    *
    * A variant of above function that builds up a block diagonal linear operator
    * from an array @p ops of diagonal elements (off-diagonal blocks are assumed

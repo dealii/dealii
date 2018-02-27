@@ -275,7 +275,7 @@ public:
 //@{
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Addition of two PackagedOperation objects @p first_comp and @p second_comp
  * given by vector space addition of the corresponding results.
@@ -310,7 +310,7 @@ operator+(const PackagedOperation<Range> &first_comp,
 }
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Subtraction of two PackagedOperation objects @p first_comp and @p
  * second_comp given by vector space addition of the corresponding results.
@@ -348,7 +348,7 @@ operator-(const PackagedOperation<Range> &first_comp,
 }
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Scalar multiplication of a PackagedOperation objects @p comp with a scalar
  * @p number given by a scaling PackagedOperation result with @p number.
@@ -396,7 +396,7 @@ operator*(const PackagedOperation<Range> &comp,
 }
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Scalar multiplication of a PackagedOperation objects @p comp with a scalar
  * @p number given by a scaling PackagedOperation result with @p number.
@@ -412,7 +412,7 @@ operator*(typename Range::value_type number,
 }
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Add a constant @p offset (of the @p Range space) to the result of a
  * PackagedOperation.
@@ -427,7 +427,7 @@ PackagedOperation<Range> operator+(const PackagedOperation<Range> &comp,
 }
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Add a constant @p offset (of the @p Range space) to the result of a
  * PackagedOperation.
@@ -442,7 +442,7 @@ PackagedOperation<Range> operator+(const Range &offset,
 }
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Subtract a constant @p offset (of the @p Range space) from the result of a
  * PackagedOperation.
@@ -458,7 +458,7 @@ PackagedOperation<Range> operator-(const PackagedOperation<Range> &comp,
 
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Subtract a computational result from a constant @p offset (of the @p Range
  * space). The result is a PackagedOperation object that applies this
@@ -508,7 +508,7 @@ namespace
 
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Create a PackagedOperation object that stores the addition of two vectors.
  *
@@ -552,7 +552,7 @@ PackagedOperation<Range> operator+(const Range &u, const Range &v)
 
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Create a PackagedOperation object that stores the subtraction of two
  * vectors.
@@ -597,7 +597,7 @@ PackagedOperation<Range> operator-(const Range &u, const Range &v)
 
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Create a PackagedOperation object that stores the scaling of a vector with
  * a @p number.
@@ -620,7 +620,7 @@ PackagedOperation<Range> operator*(const Range &u,
 
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Create a PackagedOperation object that stores the scaling of a vector with
  * a @p number.
@@ -643,7 +643,7 @@ PackagedOperation<Range> operator*(typename Range::value_type number,
 
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Create a PackagedOperation object from a LinearOperator and a reference to
  * a vector @p u of the Domain space. The object stores the PackagedOperation
@@ -685,7 +685,7 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
 
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Create a PackagedOperation object from a LinearOperator and a reference to
  * a vector @p u of the Range space. The object stores the PackagedOperation
@@ -727,7 +727,7 @@ operator*(const Range &u,
 
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Composition of a PackagedOperation object with a LinearOperator. The object
  * stores the computation $\text{op} \,comp$ (in matrix notation).
@@ -773,7 +773,7 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
 
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * Composition of a PackagedOperation object with a LinearOperator. The object
  * stores the computation $\text{op}^T \,comp$ (in matrix notation).

@@ -880,7 +880,7 @@ private:
  *     ...
  * @endcode
  *
- * @relates IndexSet
+ * @relatesalso IndexSet
  */
 inline
 IndexSet complete_index_set (const unsigned int N)

@@ -205,7 +205,7 @@ public:
   /**
    * Multiply the current point by a factor.
    *
-   * @relates EnableIfScalar
+   * @relatesalso EnableIfScalar
    */
   template <typename OtherNumber>
   Point<dim,typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::type>
@@ -528,8 +528,8 @@ Point<dim,Number>::serialize(Archive &ar, const unsigned int)
 /**
  * Global operator scaling a point vector by a scalar.
  *
- * @relates Point
- * @relates EnableIfScalar
+ * @relatesalso Point
+ * @relatesalso EnableIfScalar
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -545,7 +545,7 @@ operator * (const OtherNumber        factor,
 /**
  * Output operator for points. Print the elements consecutively, with a space
  * in between.
- * @relates Point
+ * @relatesalso Point
  */
 template <int dim, typename Number>
 inline
@@ -563,7 +563,7 @@ std::ostream &operator << (std::ostream            &out,
 
 /**
  * Input operator for points. Inputs the elements consecutively.
- * @relates Point
+ * @relatesalso Point
  */
 template <int dim, typename Number>
 inline

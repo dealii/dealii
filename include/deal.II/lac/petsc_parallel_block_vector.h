@@ -496,7 +496,7 @@ namespace PETScWrappers
      * standard library which uses a temporary object. The function simply
      * exchanges the data of the two vectors.
      *
-     * @relates PETScWrappers::MPI::BlockVector
+     * @relatesalso PETScWrappers::MPI::BlockVector
      * @author Wolfgang Bangerth, 2000
      */
     inline

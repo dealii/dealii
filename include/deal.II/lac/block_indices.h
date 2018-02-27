@@ -480,7 +480,7 @@ BlockIndices::memory_consumption () const
  * C++ standard library which uses a temporary object. The function simply
  * exchanges the data of the two objects.
  *
- * @relates BlockIndices
+ * @relatesalso BlockIndices
  * @author Wolfgang Bangerth, 2000
  */
 inline

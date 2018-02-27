@@ -321,7 +321,7 @@ private:
  * order to allow for copying and rearranging. Each matrix block can be
  * identified by name.
  *
- * @relates MatrixBlock
+ * @relatesalso MatrixBlock
  * @ingroup vector_valued
  * @author Baerbel Janssen, Guido Kanschat, 2010
  */
@@ -406,7 +406,7 @@ public:
  * pointers, in order to allow for copying and rearranging. Each matrix block
  * can be identified by name.
  *
- * @relates MatrixBlock
+ * @relatesalso MatrixBlock
  * @ingroup vector_valued
  * @author Baerbel Janssen, Guido Kanschat, 2010
  */

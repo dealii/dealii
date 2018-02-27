@@ -274,7 +274,7 @@ namespace DoFTools
    *
    * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_cell()</code>.
    *
-   * @relates DoFHandler
+   * @relatesalso DoFHandler
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
@@ -286,7 +286,7 @@ namespace DoFTools
    *
    * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_cell()</code>.
    *
-   * @relates hp::DoFHandler
+   * @relatesalso hp::DoFHandler
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
@@ -302,7 +302,7 @@ namespace DoFTools
    *
    * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_face()</code>.
    *
-   * @relates DoFHandler
+   * @relatesalso DoFHandler
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
@@ -317,7 +317,7 @@ namespace DoFTools
    *
    * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_face()</code>.
    *
-   * @relates hp::DoFHandler
+   * @relatesalso hp::DoFHandler
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
@@ -332,7 +332,7 @@ namespace DoFTools
    *
    * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_vertex()</code>.
    *
-   * @relates DoFHandler
+   * @relatesalso DoFHandler
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
@@ -347,7 +347,7 @@ namespace DoFTools
    *
    * @deprecated Use <code>dh.get_fe_collection().max_dofs_per_vertex()</code>.
    *
-   * @relates hp::DoFHandler
+   * @relatesalso hp::DoFHandler
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
@@ -363,7 +363,7 @@ namespace DoFTools
    *
    * @deprecated Use <code>dh.get_fe_collection().n_components()</code>.
    *
-   * @relates DoFHandler
+   * @relatesalso DoFHandler
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
@@ -379,7 +379,7 @@ namespace DoFTools
    *
    * @deprecated Use <code>dh.get_fe_collection().n_components()</code>.
    *
-   * @relates hp::DoFHandler
+   * @relatesalso hp::DoFHandler
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
@@ -395,7 +395,7 @@ namespace DoFTools
    *
    * @deprecated Use <code>dh.get_fe(0).is_primitive()</code>.
    *
-   * @relates DoFHandler
+   * @relatesalso DoFHandler
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
@@ -411,7 +411,7 @@ namespace DoFTools
    *
    * @deprecated Use <code>dh.get_fe(0).is_primitive()</code>.
    *
-   * @relates hp::DoFHandler
+   * @relatesalso hp::DoFHandler
    */
   template <int dim, int spacedim>
   DEAL_II_DEPRECATED
@@ -2512,7 +2512,7 @@ namespace DoFTools
   /**
    * Operator computing the maximum coupling out of two.
    *
-   * @relates DoFTools
+   * @relatesalso DoFTools
    */
   inline
   Coupling operator |= (Coupling &c1,
@@ -2529,7 +2529,7 @@ namespace DoFTools
   /**
    * Operator computing the maximum coupling out of two.
    *
-   * @relates DoFTools
+   * @relatesalso DoFTools
    */
   inline
   Coupling operator | (const Coupling c1,
