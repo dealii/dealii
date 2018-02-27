@@ -226,18 +226,27 @@ protected:
 /**
  * Anisotropic tensor product of given polynomials.
  *
- * Given one-dimensional polynomials <tt>Px1</tt>, <tt>Px2</tt>, ... in
- * x-direction, <tt>Py1</tt>, <tt>Py2</tt>, ... in y-direction, and so on,
- * this class generates polynomials of the form  <i>Q<sub>ijk</sub>(x,y,z) =
- * Pxi(x)Pyj(y)Pzk(z)</i>. If the base polynomials are mutually orthogonal on
- * the interval $[-1,1]$ or $[0,d]$, then the tensor product polynomials are
- * orthogonal on $[-1,1]^d$ or $[0,1]^d$, respectively.
+ * Given one-dimensional polynomials $P^x_1(x), P^x_2(x), \ldots$ in
+ * $x$-direction, $P^y_1(y), P^y_2(y), \ldots$ in $y$-direction, and
+ * so on, this class generates polynomials of the form $Q_{ijk}(x,y,z)
+ * = P^x_i(x)P^y_j(y)P^z_k(z)$. (With obvious generalization if @p dim
+ * is in fact only 2. If @p dim is in fact only 1, then the result is
+ * simply the same set of one-dimensional polynomials passed to the
+ * constructor.)
  *
- * Indexing is as follows: the order of dim-dimensional polynomials is
- * x-coordinates running fastest, then y-coordinate, etc. The first few
- * polynomials are thus <tt>Px1(x)Py1(y)</tt>, <tt>Px2(x)Py1(y)</tt>,
- * <tt>Px3(x)Py1(y)</tt>, ..., <tt>Px1(x)Py2(y)</tt>, <tt>Px2(x)Py2(y)</tt>,
- * <tt>Px3(x)Py2(y)</tt>, ..., and likewise in 3d.
+ * If the elements of each set of base polynomials are mutually
+ * orthogonal on the interval $[-1,1]$ or $[0,1]$, then the tensor
+ * product polynomials are orthogonal on $[-1,1]^d$ or $[0,1]^d$,
+ * respectively.
+ *
+ * The resulting @p dim-dimensional tensor product polynomials are
+ * ordered as follows: We iterate over the $x$ coordinates running
+ * fastest, then the $y$ coordinate, etc. For example, for @p dim==2,
+ * the first few polynomials are thus
+ * $P^x_1(x)P^y_1(y)$,
+ * $P^x_2(x)P^y_1(y)$, $P^x_3(x)P^y_1(y)$, ...,
+ * $P^x_1(x)P^y_2(y)$, $P^x_2(x)P^y_2(y)$,
+ * $P^x_3(x)P^y_2(y)$, etc.
  *
  * @author Wolfgang Bangerth 2003
  */
@@ -246,13 +255,18 @@ class AnisotropicPolynomials
 {
 public:
   /**
-   * Constructor. <tt>pols</tt> is a table of one-dimensional polynomials. The
-   * number of rows in this table should be equal to the space dimension, with
-   * the elements of each row giving the polynomials that shall be used in
-   * this particular coordinate direction. These polynomials may vary between
-   * coordinates, as well as their number.
+   * Constructor. @p base_polynomials is a table of one-dimensional
+   * polynomials. The number of rows in this table (the first index
+   * when indexing into @p base_polynomials) needs to be equal to the
+   * space dimension, with the elements of each row (i.e., the second
+   * index) giving the polynomials that shall be used in this
+   * particular coordinate direction.
+   *
+   * Since we want to build <i>anisotropic</i> polynomials, the @p dim
+   * sets of polynomials passed in as arguments may of course be
+   * different, and may also vary in number.
    */
-  AnisotropicPolynomials (const std::vector<std::vector<Polynomials::Polynomial<double> > > &pols);
+  AnisotropicPolynomials (const std::vector<std::vector<Polynomials::Polynomial<double> > > &base_polynomials);
 
   /**
    * Compute the value and the first and second derivatives of each tensor
