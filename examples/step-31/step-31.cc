@@ -1950,7 +1950,7 @@ namespace Step31
       return;
 
     std::vector<std::string> stokes_names (dim, "velocity");
-    stokes_names.push_back ("p");
+    stokes_names.emplace_back ("p");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     stokes_component_interpretation
     (dim+1, DataComponentInterpretation::component_is_scalar);

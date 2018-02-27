@@ -657,7 +657,7 @@ namespace Step45
   StokesProblem<dim>::output_results (const unsigned int refinement_cycle)  const
   {
     std::vector<std::string> solution_names (dim, "velocity");
-    solution_names.push_back ("pressure");
+    solution_names.emplace_back ("pressure");
 
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation

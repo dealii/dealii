@@ -1248,16 +1248,16 @@ namespace Step18
     switch (dim)
       {
       case 1:
-        solution_names.push_back ("delta_x");
+        solution_names.emplace_back ("delta_x");
         break;
       case 2:
-        solution_names.push_back ("delta_x");
-        solution_names.push_back ("delta_y");
+        solution_names.emplace_back ("delta_x");
+        solution_names.emplace_back ("delta_y");
         break;
       case 3:
-        solution_names.push_back ("delta_x");
-        solution_names.push_back ("delta_y");
-        solution_names.push_back ("delta_z");
+        solution_names.emplace_back ("delta_x");
+        solution_names.emplace_back ("delta_y");
+        solution_names.emplace_back ("delta_z");
         break;
       default:
         Assert (false, ExcNotImplemented());
