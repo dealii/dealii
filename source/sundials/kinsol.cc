@@ -350,8 +350,10 @@ namespace SUNDIALS
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
+#ifndef PETSC_USE_COMPLEX
   template class KINSOL<PETScWrappers::MPI::Vector>;
   template class KINSOL<PETScWrappers::MPI::BlockVector>;
+#endif
 #endif
 
 #endif
