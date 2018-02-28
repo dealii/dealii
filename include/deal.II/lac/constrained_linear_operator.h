@@ -56,7 +56,7 @@ DEAL_II_NAMESPACE_OPEN
  * @note Currently, this function may not work correctly for distributed data
  * structures.
  *
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  * @ingroup constraints
  */
 template <typename Range, typename Domain>
@@ -155,7 +155,7 @@ LinearOperator<Range, Domain> distribute_constraints_linear_operator(
  *
  * @author Mauro Bardelloni, Matthias Maier, 2015
  *
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  * @ingroup constraints
  */
 template <typename Range, typename Domain>
@@ -249,7 +249,7 @@ LinearOperator<Range, Domain> project_to_constrained_linear_operator(
  * @note Currently, this function may not work correctly for distributed data
  * structures.
  *
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  * @ingroup constraints
  */
 template <typename Range, typename Domain>
@@ -297,7 +297,7 @@ constrained_linear_operator(const ConstraintMatrix &constraint_matrix,
  * @note Currently, this function may not work correctly for distributed data
  * structures.
  *
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  * @ingroup constraints
  */
 template <typename Range, typename Domain>

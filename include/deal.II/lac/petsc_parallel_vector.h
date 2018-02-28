@@ -417,7 +417,7 @@ namespace PETScWrappers
      * the C++ standard library which uses a temporary object. The function
      * simply exchanges the data of the two vectors.
      *
-     * @relates PETScWrappers::MPI::Vector
+     * @relatesalso PETScWrappers::MPI::Vector
      * @author Wolfgang Bangerth, 2004
      */
     inline

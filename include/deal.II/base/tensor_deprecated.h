@@ -46,7 +46,7 @@ DeclException1 (ExcInvalidTensorContractionIndex,
  *
  * @deprecated Use the double_contract() function that takes indices as
  * template arguments and returns its result instead.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -62,7 +62,7 @@ Number double_contract (const Tensor<2, dim, Number> &src1,
  *
  * @deprecated Use the double_contract() function that takes indices as
  * template arguments and returns its result instead.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -79,7 +79,7 @@ void double_contract (Tensor<2,dim,Number>       &dest,
  *
  * @deprecated Use the contract() function that takes indices as template
  * arguments and returns its result instead.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -97,7 +97,7 @@ void contract (Tensor<2,dim,Number>       &dest,
  *
  * @deprecated Use the contract() function that takes indices as template
  * arguments and returns its result instead.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -115,7 +115,7 @@ void contract (Tensor<2,dim,Number>       &dest,
  *
  * @deprecated Use the contract() function that takes indices as template
  * arguments and returns its result instead.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -132,7 +132,7 @@ void contract (Tensor<3,dim,Number>       &dest,
  * rank_2.
  *
  * @deprecated Use operator* instead. It denotes a single contraction.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int rank_1, int rank_2, int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -145,7 +145,7 @@ void contract (Tensor<rank_1 + rank_2 - 2, dim, Number> &dest,
  * Contract a tensor of rank 1 with a tensor of rank 1 and return the result.
  *
  * @deprecated Use operator* instead. It denotes a single contraction.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_DEPRECATED
@@ -160,7 +160,7 @@ contract (const Tensor<1,dim,Number> &src1,
  * degrees.
  *
  * @deprecated Use the function cross_product_2d() that returns the value.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -173,7 +173,7 @@ cross_product (Tensor<1,dim,Number>       &dst,
  * The cross product of 2 vectors in 3d.
  *
  * @deprecated Use the function cross_product_3d() that returns the value.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -187,7 +187,7 @@ cross_product (Tensor<1,dim,Number>       &dst,
  * Form the outer product of two tensors.
  *
  * @deprecated Use the generic version that returns its result instead.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int rank_1, int rank_2, int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -200,7 +200,7 @@ void outer_product(Tensor<rank_1 + rank_2, dim, Number> &dst,
  * Multiply a Tensor<1,dim,Number> with a Number.
  *
  * @deprecated Use operator* instead.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -213,7 +213,7 @@ void outer_product (Tensor<1,dim,Number>       &dst,
  * Multiply a Tensor<1,dim,Number> with a Number.
  *
  * @deprecated Use operator* instead.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int dim, typename Number>
 DEAL_II_DEPRECATED
@@ -224,7 +224,7 @@ void outer_product (Tensor<1,dim,Number>       &dst,
 
 /**
  * @deprecated Do not use this function, evaluate the value manually.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int rank, typename Number>
 DEAL_II_DEPRECATED
@@ -234,7 +234,7 @@ Number determinant (const Tensor<rank,1,Number> &t);
 
 /**
  * @deprecated Do not use this function, evaluate the value manually.
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <typename Number>
 DEAL_II_DEPRECATED

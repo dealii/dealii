@@ -428,7 +428,7 @@ private:
  * Create a vectorized array that sets all entries in the array to the given
  * scalar.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -465,7 +465,7 @@ make_vectorized_array (const Number &u)
  *
  * This is the inverse operation to vectorized_transpose_and_store().
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline
@@ -518,7 +518,7 @@ vectorized_load_and_transpose(const unsigned int       n_entries,
  *
  * This is the inverse operation to vectorized_load_and_transpose().
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline
@@ -2821,7 +2821,7 @@ vectorized_transpose_and_store(const bool                    add_into,
 /**
  * Relational operator == for VectorizedArray
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -2840,7 +2840,7 @@ operator == (const VectorizedArray<Number> &lhs,
 /**
  * Addition of two vectorized arrays with operator +.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -2855,7 +2855,7 @@ operator + (const VectorizedArray<Number> &u,
 /**
  * Subtraction of two vectorized arrays with operator -.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -2870,7 +2870,7 @@ operator - (const VectorizedArray<Number> &u,
 /**
  * Multiplication of two vectorized arrays with operator *.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -2885,7 +2885,7 @@ operator * (const VectorizedArray<Number> &u,
 /**
  * Division of two vectorized arrays with operator /.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -2901,7 +2901,7 @@ operator / (const VectorizedArray<Number> &u,
  * Addition of a scalar (expanded to a vectorized array with @p
  * n_array_elements equal entries) and a vectorized array.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -2920,7 +2920,7 @@ operator + (const Number                  &u,
  * is a double (needed in order to be able to write simple code with constants
  * that are usually double numbers).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<float>
@@ -2936,7 +2936,7 @@ operator + (const double                 &u,
  * Addition of a vectorized array and a scalar (expanded to a vectorized array
  * with @p n_array_elements equal entries).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -2953,7 +2953,7 @@ operator + (const VectorizedArray<Number> &v,
  * (needed in order to be able to write simple code with constants that are
  * usually double numbers).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<float>
@@ -2967,7 +2967,7 @@ operator + (const VectorizedArray<float> &v,
  * Subtraction of a vectorized array from a scalar (expanded to a vectorized
  * array with @p n_array_elements equal entries).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -2986,7 +2986,7 @@ operator - (const Number                  &u,
  * double (needed in order to be able to write simple code with constants that
  * are usually double numbers).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<float>
@@ -3002,7 +3002,7 @@ operator - (const double                 &u,
  * Subtraction of a scalar (expanded to a vectorized array with @p
  * n_array_elements equal entries) from a vectorized array.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -3021,7 +3021,7 @@ operator - (const VectorizedArray<Number> &v,
  * is a double (needed in order to be able to write simple code with constants
  * that are usually double numbers).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<float>
@@ -3037,7 +3037,7 @@ operator - (const VectorizedArray<float> &v,
  * Multiplication of a scalar (expanded to a vectorized array with @p
  * n_array_elements equal entries) and a vectorized array.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -3056,7 +3056,7 @@ operator * (const Number                  &u,
  * is a double (needed in order to be able to write simple code with constants
  * that are usually double numbers).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<float>
@@ -3072,7 +3072,7 @@ operator * (const double                 &u,
  * Multiplication of a vectorized array and a scalar (expanded to a vectorized
  * array with @p n_array_elements equal entries).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -3089,7 +3089,7 @@ operator * (const VectorizedArray<Number> &v,
  * double (needed in order to be able to write simple code with constants that
  * are usually double numbers).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<float>
@@ -3103,7 +3103,7 @@ operator * (const VectorizedArray<float> &v,
  * Quotient between a scalar (expanded to a vectorized array with @p
  * n_array_elements equal entries) and a vectorized array.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -3122,7 +3122,7 @@ operator / (const Number                  &u,
  * is a double (needed in order to be able to write simple code with constants
  * that are usually double numbers).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<float>
@@ -3138,7 +3138,7 @@ operator / (const double                 &u,
  * Quotient between a vectorized array and a scalar (expanded to a vectorized
  * array with @p n_array_elements equal entries).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -3157,7 +3157,7 @@ operator / (const VectorizedArray<Number> &v,
  * double (needed in order to be able to write simple code with constants that
  * are usually double numbers).
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 inline DEAL_II_ALWAYS_INLINE
 VectorizedArray<float>
@@ -3172,7 +3172,7 @@ operator / (const VectorizedArray<float> &v,
 /**
  * Unary operator + on a vectorized array.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -3185,7 +3185,7 @@ operator + (const VectorizedArray<Number> &u)
 /**
  * Unary operator - on a vectorized array.
  *
- * @relates VectorizedArray
+ * @relatesalso VectorizedArray
  */
 template <typename Number>
 inline DEAL_II_ALWAYS_INLINE
@@ -3214,7 +3214,7 @@ namespace std
    * vectorized array in the form <tt>{sin(x[0]), sin(x[1]), ...,
    * sin(x[n_array_elements-1])}</tt>.
    *
-   * @relates VectorizedArray
+   * @relatesalso VectorizedArray
    */
   template <typename Number>
   inline
@@ -3241,7 +3241,7 @@ namespace std
    * vectorized array in the form <tt>{cos(x[0]), cos(x[1]), ...,
    * cos(x[n_array_elements-1])}</tt>.
    *
-   * @relates VectorizedArray
+   * @relatesalso VectorizedArray
    */
   template <typename Number>
   inline
@@ -3263,7 +3263,7 @@ namespace std
    * as vectorized array in the form <tt>{tan(x[0]), tan(x[1]), ...,
    * tan(x[n_array_elements-1])}</tt>.
    *
-   * @relates VectorizedArray
+   * @relatesalso VectorizedArray
    */
   template <typename Number>
   inline
@@ -3285,7 +3285,7 @@ namespace std
    * returned as vectorized array in the form <tt>{exp(x[0]), exp(x[1]), ...,
    * exp(x[n_array_elements-1])}</tt>.
    *
-   * @relates VectorizedArray
+   * @relatesalso VectorizedArray
    */
   template <typename Number>
   inline
@@ -3307,7 +3307,7 @@ namespace std
    * returned as vectorized array in the form <tt>{log(x[0]), log(x[1]), ...,
    * log(x[n_array_elements-1])}</tt>.
    *
-   * @relates VectorizedArray
+   * @relatesalso VectorizedArray
    */
   template <typename Number>
   inline
@@ -3329,7 +3329,7 @@ namespace std
    * returned as vectorized array in the form <tt>{sqrt(x[0]), sqrt(x[1]),
    * ..., sqrt(x[n_array_elements-1])}</tt>.
    *
-   * @relates VectorizedArray
+   * @relatesalso VectorizedArray
    */
   template <typename Number>
   inline
@@ -3346,7 +3346,7 @@ namespace std
    * field. The result is returned as vectorized array in the form
    * <tt>{pow(x[0],p), pow(x[1],p), ..., pow(x[n_array_elements-1],p)}</tt>.
    *
-   * @relates VectorizedArray
+   * @relatesalso VectorizedArray
    */
   template <typename Number>
   inline
@@ -3369,7 +3369,7 @@ namespace std
    * result is returned as vectorized array in the form <tt>{abs(x[0]),
    * abs(x[1]), ..., abs(x[n_array_elements-1])}</tt>.
    *
-   * @relates VectorizedArray
+   * @relatesalso VectorizedArray
    */
   template <typename Number>
   inline
@@ -3386,7 +3386,7 @@ namespace std
    * result is returned as vectorized array in the form <tt>{max(x[0],y[0]),
    * max(x[1],y[1]), ...}</tt>.
    *
-   * @relates VectorizedArray
+   * @relatesalso VectorizedArray
    */
   template <typename Number>
   inline
@@ -3404,7 +3404,7 @@ namespace std
    * result is returned as vectorized array in the form <tt>{min(x[0],y[0]),
    * min(x[1],y[1]), ...}</tt>.
    *
-   * @relates VectorizedArray
+   * @relatesalso VectorizedArray
    */
   template <typename Number>
   inline

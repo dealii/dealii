@@ -408,7 +408,7 @@ TableIndices<N>::serialize (Archive &ar, const unsigned int)
  * Output operator for TableIndices objects; reports them in a list like this:
  * <code>[i1,i2,...]</code>.
  *
- * @relates TableIndices
+ * @relatesalso TableIndices
  */
 template <int N>
 std::ostream &

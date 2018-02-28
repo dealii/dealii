@@ -2491,7 +2491,7 @@ SymmetricTensor<rank_,dim,Number>::serialize(Archive &ar, const unsigned int)
  * you should use <tt>operator +=</tt> instead since this does not require the
  * creation of a temporary variable.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 inline
@@ -2515,7 +2515,7 @@ operator+(const SymmetricTensor<rank_, dim, Number>      &left,
  * you should use <tt>operator +=</tt> instead since this does not require the
  * creation of a temporary variable.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 inline
@@ -2534,7 +2534,7 @@ operator-(const SymmetricTensor<rank_, dim, Number>      &left,
  * result is a general Tensor that has a number type that is compatible with the
  * operation.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 inline
@@ -2551,7 +2551,7 @@ operator+(const SymmetricTensor<rank_, dim, Number> &left,
  * result is a general Tensor that has a number type that is compatible with the
  * operation.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 inline
@@ -2568,7 +2568,7 @@ operator+(const Tensor<rank_, dim, Number> &left,
  * result is a general Tensor that has a number type that is compatible with the
  * operation.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 inline
@@ -2585,7 +2585,7 @@ operator-(const SymmetricTensor<rank_, dim, Number> &left,
  * result is a general Tensor that has a number type that is compatible with the
  * operation.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 inline
@@ -2608,7 +2608,7 @@ operator-(const Tensor<rank_, dim, Number> &left,
  * For greater notational simplicity, there is also a <tt>third_invariant</tt>
  * function that returns the determinant of a tensor.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
@@ -2647,7 +2647,7 @@ Number determinant (const SymmetricTensor<2,dim,Number> &t)
  * provided for greater notational simplicity (since there are also functions
  * first_invariant() and second_invariant()).
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
@@ -2663,7 +2663,7 @@ Number third_invariant (const SymmetricTensor<2,dim,Number> &t)
  * Compute and return the trace of a tensor of rank 2, i.e. the sum of its
  * diagonal entries. The trace is the first invariant of a rank-2 tensor.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
@@ -2682,7 +2682,7 @@ Number trace (const SymmetricTensor<2,dim,Number> &d)
  * greater notational simplicity (since there are also functions
  * second_invariant() and third_invariant()).
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
@@ -2702,7 +2702,7 @@ Number first_invariant (const SymmetricTensor<2,dim,Number> &t)
  * For the kind of arguments to this function, i.e., a rank-2 tensor of
  * size 1, the result is simply zero.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005, 2010
  */
 template <typename Number>
@@ -2731,7 +2731,7 @@ Number second_invariant (const SymmetricTensor<2,1,Number> &)
  * the second and third invariant are the same; the determinant is the third
  * invariant.)
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005, 2010
  */
 template <typename Number>
@@ -2749,7 +2749,7 @@ Number second_invariant (const SymmetricTensor<2,2,Number> &t)
  * $II(\sigma) = \frac 12 \left[ (\text{trace}\ \sigma)^2
  *                               -\text{trace}\ (\sigma^2) \right]$.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005, 2010
  */
 template <typename Number>
@@ -2767,7 +2767,7 @@ Number second_invariant (const SymmetricTensor<2,3,Number> &t)
  * The (single) entry of the tensor is, of course, equal to the (single)
  * eigenvalue.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Jean-Paul Pelteret, 2017
  */
 template <typename Number>
@@ -2794,7 +2794,7 @@ eigenvalues (const SymmetricTensor<2,1,Number> &T);
  * As an alternative, the eigenvectors() function provides a more robust, but costly,
  * method to compute the eigenvalues of a symmetric tensor.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Jean-Paul Pelteret, 2017
  */
 template <typename Number>
@@ -2819,7 +2819,7 @@ eigenvalues (const SymmetricTensor<2,2,Number> &T);
  * As an alternative, the eigenvectors() function provides a more robust, but costly,
  * method to compute the eigenvalues of a symmetric tensor.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Jean-Paul Pelteret, 2017
  */
 template <typename Number>
@@ -3114,7 +3114,7 @@ enum struct SymmetricTensorEigenvectorMethod
 /**
  * Return the eigenvalues and eigenvectors of a symmetric 1x1 tensor of rank 2.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Jean-Paul Pelteret, 2017
  */
 template <typename Number>
@@ -3151,7 +3151,7 @@ eigenvectors (const SymmetricTensor<2,1,Number>           &T,
  * }
  * @endcode
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Joachim Kopp, Jean-Paul Pelteret, 2017
  */
 template <int dim, typename Number>
@@ -3190,7 +3190,7 @@ eigenvectors (const SymmetricTensor<2,dim,Number>         &T,
  * tensor. This function mainly exists for compatibility with the Tensor
  * class.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int rank_, int dim, typename Number>
@@ -3209,7 +3209,7 @@ transpose (const SymmetricTensor<rank_,dim,Number> &t)
  * quantity equals the original tensor minus its contractive or dilative
  * component and refers to the shear in, for example, elasticity.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
@@ -3233,7 +3233,7 @@ deviator (const SymmetricTensor<2,dim,Number> &t)
  * Return a unit symmetric tensor of rank 2, i.e., the dim-by-dim identity
  * matrix.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
@@ -3269,7 +3269,7 @@ unit_symmetric_tensor ()
  * matrix. This specialization of the function uses <code>double</code> as the
  * data type for the elements.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim>
@@ -3293,7 +3293,7 @@ unit_symmetric_tensor ()
  * sometimes needs to invert operators like <tt>identity_tensor&lt;dim&gt;() +
  * delta_t*deviator_tensor&lt;dim&gt;()</tt> or similar.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
@@ -3334,7 +3334,7 @@ deviator_tensor ()
  * sometimes needs to invert operators like <tt>identity_tensor&lt;dim&gt;() +
  * delta_t*deviator_tensor&lt;dim&gt;()</tt> or similar.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim>
@@ -3366,7 +3366,7 @@ deviator_tensor ()
  *
  * This issue is also explained in the introduction to step-44.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
@@ -3413,7 +3413,7 @@ identity_tensor ()
  * <tt>id_0101=id_0110=1/2</tt>. Similar considerations hold for the three-
  * dimensional case.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim>
@@ -3433,7 +3433,7 @@ identity_tensor ()
  * likely contain the results of a division by zero or a very small number at
  * the very least.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Jean-Paul Pelteret, 2016
  */
 template <int dim, typename Number>
@@ -3454,7 +3454,7 @@ invert (const SymmetricTensor<2,dim,Number> &t)
  * likely contain the results of a division by zero or a very small number at
  * the very least.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
@@ -3478,7 +3478,7 @@ invert (const SymmetricTensor<4,dim,Number> &t)
  * unit_symmetric_tensor<dim,Number>())</tt>, since the (double) contraction
  * with the unit tensor yields the trace of a symmetric tensor.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number>
@@ -3506,7 +3506,7 @@ outer_product (const SymmetricTensor<2,dim,Number> &t1,
  * (t+transpose(t))/2, as a symmetric rank-2 tensor. This is the version for
  * general dimensions.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim,typename Number>
@@ -3530,7 +3530,7 @@ symmetrize (const Tensor<2,dim,Number> &t)
  * right. This version of the operator is used if the scalar has the same data
  * type as is used to store the elements of the symmetric tensor.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number>
 inline
@@ -3550,7 +3550,7 @@ operator * (const SymmetricTensor<rank_,dim,Number> &t,
  * left. This version of the operator is used if the scalar has the same data
  * type as is used to store the elements of the symmetric tensor.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number>
 inline
@@ -3586,8 +3586,8 @@ operator * (const Number                           &factor,
  * the type you would get if you multiplied an individual component of the
  * input tensor by the scalar factor.
  *
- * @relates SymmetricTensor
- * @relates EnableIfScalar
+ * @relatesalso SymmetricTensor
+ * @relatesalso EnableIfScalar
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 inline
@@ -3622,8 +3622,8 @@ operator * (const SymmetricTensor<rank_,dim,Number> &t,
  * See the discussion with the operator with switched arguments for more
  * information about template arguments and the return type.
  *
- * @relates SymmetricTensor
- * @relates EnableIfScalar
+ * @relatesalso SymmetricTensor
+ * @relatesalso EnableIfScalar
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 inline
@@ -3640,7 +3640,7 @@ operator * (const Number                                &factor,
 /**
  * Division of a symmetric tensor of general rank by a scalar.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 inline
@@ -3659,7 +3659,7 @@ operator / (const SymmetricTensor<rank_,dim,Number> &t,
  * Multiplication of a symmetric tensor of general rank with a scalar from the
  * right.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim>
 inline
@@ -3678,7 +3678,7 @@ operator * (const SymmetricTensor<rank_,dim> &t,
  * Multiplication of a symmetric tensor of general rank with a scalar from the
  * left.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim>
 inline
@@ -3696,7 +3696,7 @@ operator * (const double                     factor,
 /**
  * Division of a symmetric tensor of general rank by a scalar.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int rank_, int dim>
 inline
@@ -3716,7 +3716,7 @@ operator / (const SymmetricTensor<rank_,dim> &t,
  * <code>t1*t2</code> which uses the overloaded <code>operator*</code> between
  * two symmetric tensors of rank 2.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -3735,7 +3735,7 @@ scalar_product (const SymmetricTensor<2,dim,Number>      &t1,
  * the contraction over the last index of the first tensor and the first index
  * of the second tensor, for example $(a\cdot b)_{ij}=\sum_k a_{ik}b_{kj}$.
  *
- * @relates Tensor @relates SymmetricTensor
+ * @relatesalso Tensor @relatesalso SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -3758,7 +3758,7 @@ scalar_product (const SymmetricTensor<2,dim,Number> &t1,
  * the contraction over the last index of the first tensor and the first index
  * of the second tensor, for example $(a\cdot b)_{ij}=\sum_k a_{ik}b_{kj}$.
  *
- * @relates Tensor @relates SymmetricTensor
+ * @relatesalso Tensor @relatesalso SymmetricTensor
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -3965,7 +3965,7 @@ double_contract (SymmetricTensor<2,3,typename ProductType<Number, OtherNumber>::
  * Multiply a symmetric rank-2 tensor (i.e., a matrix) by a rank-1 tensor
  * (i.e., a vector). The result is a rank-1 tensor (i.e., a vector).
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number, typename OtherNumber>
@@ -3985,7 +3985,7 @@ operator * (const SymmetricTensor<2,dim,Number> &src1,
  * Multiply a rank-1 tensor (i.e., a vector) by a symmetric rank-2 tensor
  * (i.e., a matrix). The result is a rank-1 tensor (i.e., a vector).
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <int dim, typename Number, typename OtherNumber>
@@ -4016,7 +4016,7 @@ operator * (const Tensor<1,dim,Number>               &src1,
  * multiplication operator for SymmetricTensor, which does the double
  * contraction.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Matthias Maier, Jean-Paul Pelteret, 2017
  */
 template <int rank_1, int rank_2, int dim,
@@ -4050,7 +4050,7 @@ operator * (const Tensor<rank_1, dim, Number>               &src1,
  * multiplication operator for SymmetricTensor, which does the double
  * contraction.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Matthias Maier, Jean-Paul Pelteret, 2017
  */
 template <int rank_1, int rank_2, int dim,
@@ -4074,7 +4074,7 @@ operator * (const SymmetricTensor<rank_1, dim, Number> &src1s,
  * represents the symmetry in the output, for example by outputting only the
  * unique entries.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number>
 inline
@@ -4102,7 +4102,7 @@ std::ostream &operator << (std::ostream &out,
  * represents the symmetry in the output, for example by outputting only the
  * unique entries.
  *
- * @relates SymmetricTensor
+ * @relatesalso SymmetricTensor
  */
 template <int dim, typename Number>
 inline

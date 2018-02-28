@@ -450,7 +450,7 @@ private:
  * <tt>VectorType</tt> argument is a dummy just used to determine the template
  * arguments.
  *
- * @relates PointerMatrixBase @relates PointerMatrixAux
+ * @relatesalso PointerMatrixBase @relatesalso PointerMatrixAux
  */
 template <typename VectorType, typename MatrixType>
 inline
@@ -463,7 +463,7 @@ new_pointer_matrix_base(MatrixType &matrix, const VectorType &, const char *name
 /**
  * Specialized version for IdentityMatrix.
  *
- * @relates PointerMatrixBase @relates PointerMatrix
+ * @relatesalso PointerMatrixBase @relatesalso PointerMatrix
  */
 template <typename numberv>
 PointerMatrixBase<Vector<numberv> > *
@@ -476,7 +476,7 @@ new_pointer_matrix_base(const IdentityMatrix &matrix, const Vector<numberv> &, c
 /**
  * Specialized version for FullMatrix.
  *
- * @relates PointerMatrixBase @relates PointerMatrix
+ * @relatesalso PointerMatrixBase @relatesalso PointerMatrix
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<Vector<numberv> > *
@@ -489,7 +489,7 @@ new_pointer_matrix_base(const FullMatrix<numberm> &matrix, const Vector<numberv>
 /**
  * Specialized version for LAPACKFullMatrix.
  *
- * @relates PointerMatrixBase @relates PointerMatrix
+ * @relatesalso PointerMatrixBase @relatesalso PointerMatrix
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<Vector<numberv> > *
@@ -502,7 +502,7 @@ new_pointer_matrix_base(const LAPACKFullMatrix<numberm> &matrix, const Vector<nu
 /**
  * Specialized version for SparseMatrix.
  *
- * @relates PointerMatrixBase @relates PointerMatrix
+ * @relatesalso PointerMatrixBase @relatesalso PointerMatrix
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<Vector<numberv> > *
@@ -515,7 +515,7 @@ new_pointer_matrix_base(const SparseMatrix<numberm> &matrix, const Vector<number
 /**
  * Specialized version for BlockSparseMatrix.
  *
- * @relates PointerMatrixBase @relates PointerMatrix
+ * @relatesalso PointerMatrixBase @relatesalso PointerMatrix
  */
 template <typename VectorType, typename numberm>
 PointerMatrixBase<VectorType> *
@@ -528,7 +528,7 @@ new_pointer_matrix_base(const BlockSparseMatrix<numberm> &matrix, const VectorTy
 /**
  * Specialized version for SparseMatrixEZ.
  *
- * @relates PointerMatrixBase @relates PointerMatrix
+ * @relatesalso PointerMatrixBase @relatesalso PointerMatrix
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<Vector<numberv> > *
@@ -541,7 +541,7 @@ new_pointer_matrix_base(const SparseMatrixEZ<numberm> &matrix, const Vector<numb
 /**
  * Specialized version for BlockSparseMatrixEZ.
  *
- * @relates PointerMatrixBase @relates PointerMatrix
+ * @relatesalso PointerMatrixBase @relatesalso PointerMatrix
  */
 template <typename VectorType, typename numberm>
 PointerMatrixBase<VectorType> *
@@ -554,7 +554,7 @@ new_pointer_matrix_base(const BlockSparseMatrixEZ<numberm> &matrix, const Vector
 /**
  * Specialized version for BlockMatrixArray.
  *
- * @relates PointerMatrixBase @relates PointerMatrix
+ * @relatesalso PointerMatrixBase @relatesalso PointerMatrix
  */
 template <typename numberv, typename numberm, typename BLOCK_VectorType>
 PointerMatrixBase<BLOCK_VectorType> *
@@ -567,7 +567,7 @@ new_pointer_matrix_base(const BlockMatrixArray<numberm,BLOCK_VectorType> &matrix
 /**
  * Specialized version for TridiagonalMatrix.
  *
- * @relates PointerMatrixBase @relates PointerMatrix
+ * @relatesalso PointerMatrixBase @relatesalso PointerMatrix
  */
 template <typename numberv, typename numberm>
 PointerMatrixBase<Vector<numberv> > *

@@ -1273,7 +1273,7 @@ namespace TrilinosWrappers
      * the C++ standard library which uses a temporary object. The function
      * simply exchanges the data of the two vectors.
      *
-     * @relates TrilinosWrappers::MPI::Vector
+     * @relatesalso TrilinosWrappers::MPI::Vector
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008
      */
     inline

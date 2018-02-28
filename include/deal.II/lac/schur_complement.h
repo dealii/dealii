@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 //@{
 
 /**
- * @relates LinearOperator
+ * @relatesalso LinearOperator
  *
  * Return a LinearOperator that performs the operations associated with the
  * Schur complement. There are two additional helper functions,
@@ -251,7 +251,7 @@ schur_complement(const LinearOperator<Domain_1, Range_1, Payload> &A_inv,
 //@{
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * For the system of equations
  * @f{eqnarray*}{
@@ -289,7 +289,7 @@ condense_schur_rhs (const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
 }
 
 /**
- * @relates PackagedOperation
+ * @relatesalso PackagedOperation
  *
  * For the system of equations
  * @f{eqnarray*}{

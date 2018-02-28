@@ -1372,7 +1372,7 @@ Tensor<rank_,dim,Number>::serialize(Archive &ar, const unsigned int)
  * in between, two spaces between rank 1 subtensors, three between rank 2 and
  * so on.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int rank_, int dim, typename Number>
 inline
@@ -1393,7 +1393,7 @@ std::ostream &operator << (std::ostream &out, const Tensor<rank_,dim,Number> &p)
  * Output operator for tensors of rank 0. Since such tensors are scalars, we
  * simply print this one value.
  *
- * @relates Tensor<0,dim,Number>
+ * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number>
 inline
@@ -1417,7 +1417,7 @@ std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
  *
- * @relates Tensor<0,dim,Number>
+ * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename Other>
 inline
@@ -1436,7 +1436,7 @@ operator * (const Other                &object,
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
  *
- * @relates Tensor<0,dim,Number>
+ * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename Other>
 inline
@@ -1455,7 +1455,7 @@ operator * (const Tensor<0,dim,Number> &t,
  * OtherNumber that are stored within the Tensor and multiplies them. It
  * returns an unwrapped number of product type.
  *
- * @relates Tensor<0,dim,Number>
+ * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1471,7 +1471,7 @@ operator * (const Tensor<0, dim, Number>      &src1,
 /**
  * Division of a tensor of rank 0 by a scalar number.
  *
- * @relates Tensor<0,dim,Number>
+ * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1486,7 +1486,7 @@ operator / (const Tensor<0,dim,Number> &t,
 /**
  * Add two tensors of rank 0.
  *
- * @relates Tensor<0,dim,Number>
+ * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1501,7 +1501,7 @@ operator+ (const Tensor<0,dim,Number>      &p,
 /**
  * Subtract two tensors of rank 0.
  *
- * @relates Tensor<0,dim,Number>
+ * @relatesalso Tensor<0,dim,Number>
  */
 template <int dim, typename Number, typename OtherNumber>
 inline
@@ -1521,7 +1521,7 @@ operator- (const Tensor<0,dim,Number>      &p,
  * number, a complex floating point number, etc.) is allowed, see the
  * documentation of EnableIfScalar for details.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int rank, int dim,
           typename Number,
@@ -1547,7 +1547,7 @@ operator * (const Tensor<rank,dim,Number> &t,
  * number, a complex floating point number, etc.) is allowed, see the
  * documentation of EnableIfScalar for details.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int rank, int dim,
           typename Number,
@@ -1567,7 +1567,7 @@ operator * (const Number                       &factor,
  * discussion on operator*() above for more information about template
  * arguments and the return type.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int rank, int dim,
           typename Number,
@@ -1590,7 +1590,7 @@ operator / (const Tensor<rank,dim,Number> &t,
  *
  * @tparam rank The rank of both tensors.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 inline
@@ -1612,7 +1612,7 @@ operator+ (const Tensor<rank,dim,Number> &p,
  *
  * @tparam rank The rank of both tensors.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 inline
@@ -1656,7 +1656,7 @@ operator- (const Tensor<rank,dim,Number> &p,
  * @note In case the contraction yields a tensor of rank 0 the scalar number
  * is returned as an unwrapped number type.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Matthias Maier, 2015
  */
 template <int rank_1, int rank_2, int dim,
@@ -1702,7 +1702,7 @@ operator * (const Tensor<rank_1, dim, Number> &src1,
  * @note In case the contraction yields a tensor of rank 0 the scalar number
  * is returned as an unwrapped number type.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Matthias Maier, 2015
  */
 template <int index_1, int index_2,
@@ -1764,7 +1764,7 @@ contract (const Tensor<rank_1, dim, Number> &src1,
  * @note In case the contraction yields a tensor of rank 0 the scalar number
  * is returned as an unwrapped number type.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Matthias Maier, 2015
  */
 template <int index_1, int index_2, int index_3, int index_4,
@@ -1828,7 +1828,7 @@ double_contract (const Tensor<rank_1, dim, Number> &src1,
  *   \text{right}_{i_1,\ldots,i_r}
  * @f]
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Matthias Maier, 2015
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
@@ -1858,7 +1858,7 @@ scalar_product (const Tensor<rank, dim, Number> &left,
  * @note Each of the three input tensors can be either a Tensor or
  * SymmetricTensor.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Matthias Maier, 2015, Jean-Paul Pelteret 2017
  */
 template <template <int, int, typename> class TensorT1,
@@ -1886,7 +1886,7 @@ contract3 (const TensorT1<rank_1, dim, T1>          &left,
  *   = \text{left}_{i_1,\ldots,i_{r1}}\,\text{right}_{j_1,\ldots,j_{r2}.}
  * @f]
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Matthias Maier, 2015
  */
 template <int rank_1, int rank_2, int dim,
@@ -1917,7 +1917,7 @@ outer_product(const Tensor<rank_1, dim, Number> &src1,
  * but may only be called if the actual dimension of the arguments is two
  * (e.g. from the <tt>dim==2</tt> case in the switch).
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Guido Kanschat, 2001
  */
 template <int dim, typename Number>
@@ -1943,7 +1943,7 @@ cross_product_2d (const Tensor<1,dim,Number> &src)
  * actual dimension of the arguments is three (e.g. from the <tt>dim==3</tt>
  * case in the switch).
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Guido Kanschat, 2001
  */
 template <int dim, typename Number>
@@ -1974,7 +1974,7 @@ cross_product_3d (const Tensor<1,dim,Number> &src1,
 /**
  * Compute the determinant of a tensor or rank 2.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Wolfgang Bangerth, 2009
  */
 template <int dim, typename Number>
@@ -2003,7 +2003,7 @@ Number determinant (const Tensor<2,dim,Number> &t)
 /**
  * Specialization for dim==1.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  */
 template <typename Number>
 inline
@@ -2017,7 +2017,7 @@ Number determinant (const Tensor<2,1,Number> &t)
  * Compute and return the trace of a tensor of rank 2, i.e. the sum of its
  * diagonal entries.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Wolfgang Bangerth, 2001
  */
 template <int dim, typename Number>
@@ -2036,7 +2036,7 @@ Number trace (const Tensor<2,dim,Number> &d)
  * object is known, it is acceptable to return the result by value, rather
  * than by reference as a parameter.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Wolfgang Bangerth, 2000
  */
 template <int dim, typename Number>
@@ -2125,7 +2125,7 @@ invert (const Tensor<2,3,Number> &t)
 /**
  * Return the transpose of the given tensor.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Wolfgang Bangerth, 2002
  */
 template <int dim, typename Number>
@@ -2157,7 +2157,7 @@ transpose (const Tensor<2,dim,Number> &t)
  *
  * @note This requires that the tensor is invertible.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Jean-Paul Pelteret, 2016
  */
 template <int dim, typename Number>
@@ -2180,7 +2180,7 @@ adjugate (const Tensor<2,dim,Number> &t)
  *
  * @note This requires that the tensor is invertible.
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Jean-Paul Pelteret, 2016
  */
 template <int dim, typename Number>
@@ -2196,7 +2196,7 @@ cofactor (const Tensor<2,dim,Number> &t)
  * Return the $l_1$ norm of the given rank-2 tensor, where $||t||_1 = \max_j
  * \sum_i |t_{ij}|$ (maximum of the sums over columns).
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Wolfgang Bangerth, 2012
  */
 template <int dim, typename Number>
@@ -2223,7 +2223,7 @@ l1_norm (const Tensor<2,dim,Number> &t)
  * Return the $l_\infty$ norm of the given rank-2 tensor, where $||t||_\infty
  * = \max_i \sum_j |t_{ij}|$ (maximum of the sums over rows).
  *
- * @relates Tensor
+ * @relatesalso Tensor
  * @author Wolfgang Bangerth, 2012
  */
 template <int dim, typename Number>

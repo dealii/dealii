@@ -1304,7 +1304,7 @@ Vector<Number>::load (Archive &ar, const unsigned int)
  * C++ standard library which uses a temporary object. The function simply
  * exchanges the data of the two vectors.
  *
- * @relates Vector
+ * @relatesalso Vector
  * @author Wolfgang Bangerth, 2000
  */
 template <typename Number>

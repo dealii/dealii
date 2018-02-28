@@ -404,7 +404,7 @@ namespace TrilinosWrappers
      * standard library which uses a temporary object. The function simply
      * exchanges the data of the two vectors.
      *
-     * @relates TrilinosWrappers::MPI::BlockVector
+     * @relatesalso TrilinosWrappers::MPI::BlockVector
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008
      */
     inline

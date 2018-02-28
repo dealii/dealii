@@ -339,7 +339,7 @@ namespace internal
    * for all possible types, which makes the copy operation much cleaner
    * (thanks to a virtual function, whose cost is negligible in this context).
    *
-   * @relates AlignedVector
+   * @relatesalso AlignedVector
    */
   template <typename T>
   class AlignedVectorCopy : private parallel::ParallelForInteger
@@ -402,7 +402,7 @@ namespace internal
   /**
    * Like AlignedVectorCopy, but use move operations instead of copy operations.
    *
-   * @relates AlignedVector
+   * @relatesalso AlignedVector
    */
   template <typename T>
   class AlignedVectorMove : private parallel::ParallelForInteger
@@ -476,7 +476,7 @@ namespace internal
    * appropriate operation since some classes might define only one of those
    * two operations.
    *
-   * @relates AlignedVector
+   * @relatesalso AlignedVector
    */
   template <typename T, bool initialize_memory>
   class AlignedVectorSet : private parallel::ParallelForInteger
@@ -570,7 +570,7 @@ namespace internal
    * appropriate operation since some classes might define only one of those
    * two operations.
    *
-   * @relates AlignedVector
+   * @relatesalso AlignedVector
    */
   template <typename T, bool initialize_memory>
   class AlignedVectorDefaultInitialize : private parallel::ParallelForInteger
@@ -1112,7 +1112,7 @@ AlignedVector<T>::memory_consumption () const
 /**
  * Relational operator == for AlignedVector
  *
- * @relates AlignedVector
+ * @relatesalso AlignedVector
  */
 template < class T >
 bool operator == (const AlignedVector<T> &lhs,
@@ -1133,7 +1133,7 @@ bool operator == (const AlignedVector<T> &lhs,
 /**
  * Relational operator != for AlignedVector
  *
- * @relates AlignedVector
+ * @relatesalso AlignedVector
  */
 template < class T >
 bool operator != (const AlignedVector<T> &lhs,

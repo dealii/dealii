@@ -778,7 +778,7 @@ namespace PETScWrappers
    * C++ standard library which uses a temporary object. The function simply
    * exchanges the data of the two vectors.
    *
-   * @relates PETScWrappers::VectorBase
+   * @relatesalso PETScWrappers::VectorBase
    * @author Wolfgang Bangerth, 2004
    */
   inline

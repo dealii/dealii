@@ -759,7 +759,7 @@ private:
  * explicitly specify the type of the base iterator by hand -- it is deduced
  * automatically here.
  *
- * @author Wolfgang Bangerth @relates FilteredIterator
+ * @author Wolfgang Bangerth @relatesalso FilteredIterator
  */
 template <typename BaseIterator, typename Predicate>
 FilteredIterator<BaseIterator>
@@ -829,7 +829,7 @@ namespace internal
  * @endcode
  *
  * @author Bruno Turcksin, 2016
- * @relates FilteredIterator
+ * @relatesalso FilteredIterator
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate>
@@ -877,7 +877,7 @@ filter_iterators (IteratorRange<BaseIterator> i,
  * @endcode
  *
  * @author Bruno Turcksin, 2016
- * @relates FilteredIterator
+ * @relatesalso FilteredIterator
  * @ingroup CPP11
  */
 template <typename BaseIterator, typename Predicate, typename... Targs>
