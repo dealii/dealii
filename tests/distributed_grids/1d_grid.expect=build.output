@@ -1,0 +1,106 @@
+
+DEAL:2d::hyper_cube
+DEAL:2d::Checksum: 786433
+<?xml version="1.0"?>
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPoints>
+      <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
+    </PPoints>
+      <PDataArray type="Int32" Name="treeid" format="ascii"/>
+    </PCellData>
+    <PPointData>
+    </PPointData>
+    <Piece Source="1_0000.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="4" NumberOfCells="1">
+      <Points>
+        <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
+            2.50000004e-02   2.50000004e-02   0.00000000e+00
+            9.75000024e-01   2.50000004e-02   0.00000000e+00
+            2.50000004e-02   9.75000024e-01   0.00000000e+00
+            9.75000024e-01   9.75000024e-01   0.00000000e+00
+        </DataArray>
+      </Points>
+      <Cells>
+        <DataArray type="Int32" Name="connectivity" format="ascii">
+          0 1 2 3
+        </DataArray>
+        <DataArray type="Int32" Name="offsets" format="ascii">
+          4
+        </DataArray>
+DEAL:2d::hyper_ball
+DEAL:2d::Checksum: 3932161
+<?xml version="1.0"?>
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPoints>
+      <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
+    </PPoints>
+      <PDataArray type="Int32" Name="treeid" format="ascii"/>
+    </PCellData>
+    <PPointData>
+    </PPointData>
+    <Piece Source="2_0000.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="20" NumberOfCells="5">
+      <Points>
+        <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
+           -1.98574162e+00  -2.09025431e+00   0.00000000e+00
+            1.98574162e+00  -2.09025431e+00   0.00000000e+00
+           -8.64258409e-01  -9.09745693e-01   0.00000000e+00
+            8.64258409e-01  -9.09745693e-01   0.00000000e+00
+           -2.09025431e+00  -1.98574162e+00   0.00000000e+00
+           -9.09745693e-01  -8.64258409e-01   0.00000000e+00
+           -2.09025431e+00   1.98574162e+00   0.00000000e+00
+           -9.09745693e-01   8.64258409e-01   0.00000000e+00
+           -8.34745646e-01  -8.34745646e-01   0.00000000e+00
+            8.34745646e-01  -8.34745646e-01   0.00000000e+00
+           -8.34745646e-01   8.34745646e-01   0.00000000e+00
+            8.34745646e-01   8.34745646e-01   0.00000000e+00
+            2.09025431e+00  -1.98574162e+00   0.00000000e+00
+DEAL:2d::half_hyper_ball
+DEAL:2d::Checksum: 3145729
+<?xml version="1.0"?>
+<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPoints>
+      <PDataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii"/>
+    </PPoints>
+      <PDataArray type="Int32" Name="treeid" format="ascii"/>
+    </PCellData>
+    <PPointData>
+    </PPointData>
+    <Piece Source="3_0000.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="16" NumberOfCells="4">
+      <Points>
+        <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
+            5.22563569e-02  -2.92554927e+00   0.00000000e+00
+            2.03799796e+00  -2.11167216e+00   0.00000000e+00
+            2.27436423e-02  -9.31163490e-01   0.00000000e+00
+            8.87002051e-01  -9.10294831e-01   0.00000000e+00
+            2.19669919e-02  -8.34745646e-01   0.00000000e+00
+            8.56712639e-01  -8.34745646e-01   0.00000000e+00
+            2.19669919e-02   8.34745646e-01   0.00000000e+00
+            8.56712639e-01   8.34745646e-01   0.00000000e+00
+            2.09025431e+00  -1.98574162e+00   0.00000000e+00
+            2.09025431e+00   1.98574162e+00   0.00000000e+00
+            9.09745693e-01  -8.64258409e-01   0.00000000e+00
+            9.09745693e-01   8.64258409e-01   0.00000000e+00
+            5.22563569e-02   2.92554927e+00   0.00000000e+00

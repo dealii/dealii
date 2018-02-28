@@ -49,6 +49,7 @@ namespace parallel
       dof_handler(&dof, typeid(*this).name()),
       offset (numbers::invalid_unsigned_int)
     {
+      Assert (dim > 1, ExcNotImplemented());
       Assert ((dynamic_cast<const parallel::distributed::Triangulation<dim,DoFHandlerType::space_dimension>*>
                (&dof_handler->get_triangulation()) != nullptr),
               ExcMessage("parallel::distributed::SolutionTransfer requires a parallel::distributed::Triangulation object."));

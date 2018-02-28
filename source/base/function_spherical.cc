@@ -345,6 +345,8 @@ namespace Functions
 
 
 // explicit instantiations
+  template class Spherical<1>;
+  template class Spherical<2>;
   template class Spherical<3>;
 
 }
