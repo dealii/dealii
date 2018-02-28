@@ -60,7 +60,8 @@ void test(const std::pair<unsigned int,unsigned int> &size, const unsigned int b
 
   pcout << size.first << "x" << size.second << " & "
         << block_size << " & "
-        << chunk_size.first << "x" << chunk_size.second << std::endl;
+        << chunk_size.first << "x" << chunk_size.second << " & "
+        << grid->get_process_grid_rows() << "x" << grid->get_process_grid_columns() << std::endl;
   AssertThrow(copy.frobenius_norm()<1e-12,ExcInternalError());
   std::remove(filename.c_str());
 }
@@ -72,16 +73,13 @@ int main (int argc,char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, numbers::invalid_unsigned_int);
 
   std::vector<std::pair<unsigned int,unsigned int>> sizes;
-  sizes.push_back(std::make_pair(100,75));
-  sizes.push_back(std::make_pair(200,225));
   sizes.push_back(std::make_pair(300,250));
 
-  const std::vector<unsigned int> block_sizes = {{1,16,32}};
+  const std::vector<unsigned int> block_sizes = {{32,64}};
 
   std::vector<std::pair<unsigned int,unsigned int>> chunk_sizes;
-  chunk_sizes.push_back(std::make_pair(1,1));
-  chunk_sizes.push_back(std::make_pair(10,10));
-  chunk_sizes.push_back(std::make_pair(50,50));
+  chunk_sizes.push_back(std::make_pair(25,25));
+  chunk_sizes.push_back(std::make_pair(75,50));
   chunk_sizes.push_back(std::make_pair(100,75));
 
   for (unsigned int i=0; i<sizes.size(); ++i)
@@ -93,4 +91,5 @@ int main (int argc,char **argv)
     for (unsigned int j=0; j<block_sizes.size(); ++j)
       for (unsigned int k=0; k<chunk_sizes.size(); ++k)
         test<float>(sizes[i],block_sizes[j],chunk_sizes[k]);
+
 }
