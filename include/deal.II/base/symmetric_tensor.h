@@ -3782,7 +3782,7 @@ scalar_product (const Tensor<2,dim,Number>               &t1,
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general tensor class.
  *
- * @related SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
@@ -3809,7 +3809,7 @@ double_contract (SymmetricTensor<2,1,typename ProductType<Number, OtherNumber>::
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general tensor class.
  *
- * @related SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
@@ -3836,7 +3836,7 @@ double_contract (SymmetricTensor<2,1,typename ProductType<Number, OtherNumber>::
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general tensor class.
  *
- * @related SymmetricTensor @author Wolfgang Bangerth, 2005
+ * @relatesalso SymmetricTensor @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
 inline
@@ -3868,7 +3868,7 @@ double_contract (SymmetricTensor<2,2,typename ProductType<Number, OtherNumber>::
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general tensor class.
  *
- * @related SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
@@ -3901,7 +3901,7 @@ double_contract (SymmetricTensor<2,2,typename ProductType<Number, OtherNumber>::
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general tensor class.
  *
- * @related SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
@@ -3937,7 +3937,7 @@ double_contract (SymmetricTensor<2,3,typename ProductType<Number, OtherNumber>::
  * magnitude faster. This function mostly exists for compatibility purposes
  * with the general tensor class.
  *
- * @related SymmetricTensor
+ * @relatesalso SymmetricTensor
  * @author Wolfgang Bangerth, 2005
  */
 template <typename Number, typename OtherNumber>
