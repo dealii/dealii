@@ -3733,10 +3733,12 @@ namespace parallel
 
 
     template <int spacedim>
-    Triangulation<1,spacedim>::Triangulation (MPI_Comm)
+    Triangulation<1,spacedim>::Triangulation (MPI_Comm mpi_communicator,
+                                              const typename dealii::Triangulation<1,spacedim>::MeshSmoothing smooth_grid,
+                                              const Settings /*settings*/)
       :
-      dealii::parallel::Triangulation<1,spacedim>(MPI_COMM_WORLD,
-                                                  typename dealii::Triangulation<1,spacedim>::MeshSmoothing(),
+      dealii::parallel::Triangulation<1,spacedim>(mpi_communicator,
+                                                  smooth_grid,
                                                   false)
     {
       Assert (false, ExcNotImplemented());

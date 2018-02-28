@@ -878,11 +878,25 @@ namespace parallel
     class Triangulation<1,spacedim> : public dealii::parallel::Triangulation<1,spacedim>
     {
     public:
+
+      /**
+       * dummy settings
+       */
+      enum Settings
+      {
+        default_setting = 0x0,
+        mesh_reconstruction_after_repartitioning = 0x1,
+        construct_multigrid_hierarchy = 0x2
+      };
+
       /**
        * Constructor. The argument denotes the MPI communicator to be used for
        * the triangulation.
        */
-      Triangulation (MPI_Comm mpi_communicator);
+      Triangulation (MPI_Comm mpi_communicator,
+                     const typename dealii::Triangulation<1,spacedim>::MeshSmoothing
+                     smooth_grid = (dealii::Triangulation<1,spacedim>::none),
+                     const Settings settings = default_setting);
 
       /**
        * Destructor.
@@ -958,16 +972,6 @@ namespace parallel
        */
       std::vector<types::global_dof_index> coarse_cell_to_p4est_tree_permutation;
       std::vector<types::global_dof_index> p4est_tree_to_coarse_cell_permutation;
-
-      /**
-       * dummy settings
-       */
-      enum Settings
-      {
-        default_setting = 0x0,
-        mesh_reconstruction_after_repartitioning = 0x1,
-        construct_multigrid_hierarchy = 0x2
-      };
 
 
 //TODO: The following variable should really be private, but it is used in dof_handler_policy.cc ...
