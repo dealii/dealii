@@ -3822,6 +3822,24 @@ namespace parallel
       Assert (false, ExcNotImplemented());
       return std::vector<bool>();
     }
+
+
+
+    template <int spacedim>
+    void
+    Triangulation<1,spacedim>::load(const char *,
+                                    const bool)
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
+    template <int spacedim>
+    void
+    Triangulation<1,spacedim>::save(const char *) const
+    {
+      Assert (false, ExcNotImplemented());
+    }
+
   }
 }
 
