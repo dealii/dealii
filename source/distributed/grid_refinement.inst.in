@@ -18,7 +18,6 @@
 
 for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
 {
-#if deal_II_dimension != 1
     namespace parallel
     \{
     namespace distributed
@@ -44,7 +43,6 @@ for (S : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
     \}
     \}
     \}
-#endif
 
 
 #if deal_II_dimension == 3
