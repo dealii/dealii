@@ -102,6 +102,7 @@ SET(_inst
   data_out_base.inst.in
   function.inst.in
   function_time.inst.in
+  geometric_utilities.inst.in
   mpi.inst.in
   partitioner.inst.in
   polynomials_rannacher_turek.inst.in
