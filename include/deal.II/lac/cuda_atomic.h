@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#ifdef DEAL_II_WITH_CUDA
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -113,5 +114,7 @@ namespace LinearAlgebra
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
+#endif
 
 #endif
