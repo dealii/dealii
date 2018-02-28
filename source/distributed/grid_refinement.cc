@@ -423,6 +423,7 @@ namespace parallel
        const double                                        bottom_fraction_of_cells,
        const unsigned int                                  max_n_cells)
       {
+        Assert (dim > 1, ExcNotImplemented());
         Assert (criteria.size() == tria.n_active_cells(),
                 ExcDimensionMismatch (criteria.size(), tria.n_active_cells()));
         Assert ((top_fraction_of_cells>=0) && (top_fraction_of_cells<=1),
@@ -499,6 +500,7 @@ namespace parallel
        const double                                        top_fraction_of_error,
        const double                                        bottom_fraction_of_error)
       {
+        Assert (dim > 1, ExcNotImplemented());
         Assert (criteria.size() == tria.n_active_cells(),
                 ExcDimensionMismatch (criteria.size(), tria.n_active_cells()));
         Assert ((top_fraction_of_error>=0) && (top_fraction_of_error<=1),
