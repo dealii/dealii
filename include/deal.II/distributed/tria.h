@@ -951,6 +951,17 @@ namespace parallel
       /**
        * This function is not implemented, but needs to be present for the compiler.
        */
+      void load(const char *filename,
+                const bool autopartition = true);
+
+      /**
+       * This function is not implemented, but needs to be present for the compiler.
+       */
+      void save(const char *filename) const;
+
+      /**
+       * This function is not implemented, but needs to be present for the compiler.
+       */
       unsigned int
       register_data_attach (const std::size_t size,
                             const std::function<void (const typename dealii::Triangulation<1,spacedim>::cell_iterator &,
