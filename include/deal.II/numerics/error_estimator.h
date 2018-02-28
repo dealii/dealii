@@ -253,7 +253,7 @@ class KellyErrorEstimator
 public:
   /**
    * The enum type given to the class functions to decide on the scaling
-   * factors of the facial integrals.
+   * factors of the face integrals.
    */
   enum Strategy
   {
@@ -550,6 +550,20 @@ class KellyErrorEstimator<1,spacedim>
 {
 public:
   /**
+   * The enum type given to the class functions to decide on the scaling
+   * factors of the face integrals.
+   */
+  enum Strategy
+  {
+    //! Kelly error estimator with the factor $\frac {h_K}{24}$.
+    cell_diameter_over_24 = 0,
+    //! the boundary residual estimator with the factor $\frac {h_F}{2 max(p^+,p^-)}$.
+    face_diameter_over_twice_max_degree,
+    //! Kelly error estimator with the factor $h_K$.
+    cell_diameter
+  };
+
+  /**
    * Implementation of the error estimator described above. You may give a
    * coefficient, but there is a default value which denotes the constant
    * coefficient with value one. The coefficient function may either be a
@@ -583,7 +597,8 @@ public:
    const Function<spacedim>                   *coefficient    = nullptr,
    const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
    const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id);
+   const types::material_id                    material_id    = numbers::invalid_material_id,
+   const Strategy                              strategy       = cell_diameter_over_24);
 
   /**
    * Call the @p estimate function, see above, with
@@ -600,7 +615,8 @@ public:
    const Function<spacedim>                   *coefficients   = nullptr,
    const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
    const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id);
+   const types::material_id                    material_id    = numbers::invalid_material_id,
+   const Strategy                              strategy       = cell_diameter_over_24);
 
   /**
    * Same function as above, but accepts more than one solution vectors and
@@ -627,7 +643,8 @@ public:
    const Function<spacedim>                   *coefficients   = 0,
    const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
    const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id);
+   const types::material_id                    material_id    = numbers::invalid_material_id,
+   const Strategy                              strategy       = cell_diameter_over_24);
 
   /**
    * Call the @p estimate function, see above, with
@@ -644,7 +661,8 @@ public:
    const Function<spacedim>                   *coefficients   = 0,
    const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
    const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id);
+   const types::material_id                    material_id    = numbers::invalid_material_id,
+   const Strategy                              strategy       = cell_diameter_over_24);
 
 
   /**
@@ -663,7 +681,8 @@ public:
    const Function<spacedim>                   *coefficients   = 0,
    const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
    const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id);
+   const types::material_id                    material_id    = numbers::invalid_material_id,
+   const Strategy                              strategy       = cell_diameter_over_24);
 
 
   /**
@@ -681,7 +700,8 @@ public:
    const Function<spacedim>                   *coefficients   = 0,
    const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
    const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id);
+   const types::material_id                    material_id    = numbers::invalid_material_id,
+   const Strategy                              strategy       = cell_diameter_over_24);
 
 
   /**
@@ -700,7 +720,8 @@ public:
    const Function<spacedim>                   *coefficients   = 0,
    const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
    const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id);
+   const types::material_id                    material_id    = numbers::invalid_material_id,
+   const Strategy                              strategy       = cell_diameter_over_24);
 
 
   /**
@@ -718,7 +739,8 @@ public:
    const Function<spacedim>                   *coefficients   = 0,
    const unsigned int                          n_threads      = numbers::invalid_unsigned_int,
    const types::subdomain_id                   subdomain_id   = numbers::invalid_subdomain_id,
-   const types::material_id                    material_id    = numbers::invalid_material_id);
+   const types::material_id                    material_id    = numbers::invalid_material_id,
+   const Strategy                              strategy       = cell_diameter_over_24);
 
   /**
    * Exception

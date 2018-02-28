@@ -65,13 +65,14 @@ estimate (const Mapping<1,spacedim>                  &mapping,
           const Function<spacedim>                   *coefficients,
           const unsigned int                          n_threads,
           const types::subdomain_id                   subdomain_id,
-          const types::material_id                    material_id)
+          const types::material_id                    material_id,
+          const Strategy                              strategy)
 {
   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
   std::vector<Vector<float>*>              errors (1, &error);
   estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
-            component_mask, coefficients, n_threads, subdomain_id, material_id);
+            component_mask, coefficients, n_threads, subdomain_id, material_id,strategy);
 }
 
 
@@ -89,10 +90,11 @@ estimate (const DoFHandlerType                       &dof_handler,
           const Function<spacedim>                   *coefficients,
           const unsigned int                          n_threads,
           const types::subdomain_id                   subdomain_id,
-          const types::material_id                    material_id)
+          const types::material_id                    material_id,
+          const Strategy                              strategy)
 {
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
-           error, component_mask, coefficients, n_threads, subdomain_id, material_id);
+           error, component_mask, coefficients, n_threads, subdomain_id, material_id,strategy);
 }
 
 
@@ -110,10 +112,11 @@ estimate (const DoFHandlerType                       &dof_handler,
           const Function<spacedim>                   *coefficients,
           const unsigned int                          n_threads,
           const types::subdomain_id                   subdomain_id,
-          const types::material_id                    material_id)
+          const types::material_id                    material_id,
+          const Strategy                              strategy)
 {
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
-           errors, component_mask, coefficients, n_threads, subdomain_id, material_id);
+           errors, component_mask, coefficients, n_threads, subdomain_id, material_id,strategy);
 }
 
 
@@ -132,13 +135,14 @@ estimate (const Mapping<1,spacedim>                  &mapping,
           const Function<spacedim>                   *coefficients,
           const unsigned int                          n_threads,
           const types::subdomain_id                   subdomain_id,
-          const types::material_id                    material_id)
+          const types::material_id                    material_id,
+          const Strategy                              strategy)
 {
   // just pass on to the other function
   const std::vector<const InputVector *> solutions (1, &solution);
   std::vector<Vector<float>*>              errors (1, &error);
   estimate (mapping, dof_handler, quadrature, neumann_bc, solutions, errors,
-            component_mask, coefficients, n_threads, subdomain_id, material_id);
+            component_mask, coefficients, n_threads, subdomain_id, material_id, strategy);
 }
 
 
@@ -155,10 +159,11 @@ estimate (const DoFHandlerType                       &dof_handler,
           const Function<spacedim>                   *coefficients,
           const unsigned int                          n_threads,
           const types::subdomain_id                   subdomain_id,
-          const types::material_id                    material_id)
+          const types::material_id                    material_id,
+          const Strategy                              strategy)
 {
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solution,
-           error, component_mask, coefficients, n_threads, subdomain_id, material_id);
+           error, component_mask, coefficients, n_threads, subdomain_id, material_id,strategy);
 }
 
 
@@ -176,10 +181,11 @@ estimate (const DoFHandlerType                       &dof_handler,
           const Function<spacedim>                   *coefficients,
           const unsigned int                          n_threads,
           const types::subdomain_id                   subdomain_id,
-          const types::material_id                    material_id)
+          const types::material_id                    material_id,
+          const Strategy                              strategy)
 {
   estimate(StaticMappingQ1<1,spacedim>::mapping, dof_handler, quadrature, neumann_bc, solutions,
-           errors, component_mask, coefficients, n_threads, subdomain_id, material_id);
+           errors, component_mask, coefficients, n_threads, subdomain_id, material_id,strategy);
 }
 
 
@@ -198,7 +204,8 @@ estimate (const Mapping<1,spacedim>                  & /*mapping*/,
           const Function<spacedim>                   * /*coefficient*/,
           const unsigned int,
           const types::subdomain_id                    /*subdomain_id*/,
-          const types::material_id                     /*material_id*/)
+          const types::material_id                     /*material_id*/,
+          const Strategy                              /*strategy*/)
 {
   Assert (false, ExcInternalError());
 }
@@ -218,8 +225,10 @@ estimate (const Mapping<1,spacedim>                  &mapping,
           const Function<spacedim>                   *coefficient,
           const unsigned int,
           const types::subdomain_id                   subdomain_id_,
-          const types::material_id                    material_id)
+          const types::material_id                    material_id,
+          const Strategy                              strategy)
 {
+  AssertThrow(strategy==cell_diameter_over_24, ExcNotImplemented());
   typedef typename InputVector::value_type number;
 #ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>

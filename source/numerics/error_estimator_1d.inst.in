@@ -31,7 +31,8 @@ for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimensio
             const Function<deal_II_space_dimension>     *,
             const unsigned int,
             const types::subdomain_id,
-            const types::material_id);
+            const types::material_id,
+            const Strategy);
 
     template
     void
@@ -46,7 +47,8 @@ for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimensio
         const Function<deal_II_space_dimension>     *,
         const unsigned int,
         const types::subdomain_id,
-        const types::material_id);
+        const types::material_id,
+        const Strategy);
 
     template
     void
@@ -61,7 +63,8 @@ for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimensio
             const Function<deal_II_space_dimension>     *,
             const unsigned int,
             const types::subdomain_id,
-            const types::material_id);
+            const types::material_id,
+            const Strategy);
 
     template
     void
@@ -76,7 +79,8 @@ for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimensio
         const Function<deal_II_space_dimension>     *,
         const unsigned int,
         const types::subdomain_id,
-        const types::material_id);
+        const types::material_id,
+        const Strategy);
 
     template
     void
@@ -91,7 +95,8 @@ for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimensio
             const Function<deal_II_space_dimension>     *,
             const unsigned int,
             const types::subdomain_id,
-            const types::material_id);
+            const types::material_id,
+            const Strategy);
 
     template
     void
@@ -106,7 +111,8 @@ for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimensio
         const Function<deal_II_space_dimension>     *,
         const unsigned int,
         const types::subdomain_id,
-        const types::material_id);
+        const types::material_id,
+        const Strategy);
 
     template
     void
@@ -121,7 +127,8 @@ for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimensio
             const Function<deal_II_space_dimension>     *,
             const unsigned int,
             const types::subdomain_id,
-            const types::material_id);
+            const types::material_id,
+            const Strategy);
 
     template
     void
@@ -136,7 +143,8 @@ for (VEC : VECTOR_TYPES ; deal_II_dimension : DIMENSIONS; deal_II_space_dimensio
         const Function<deal_II_space_dimension>     *,
         const unsigned int,
         const types::subdomain_id,
-        const types::material_id);
+        const types::material_id,
+        const Strategy);
 
 #endif
 }
