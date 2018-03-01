@@ -553,39 +553,34 @@ namespace Step12
 
 
   // The output of this program consists of eps-files of the adaptively
-  // refined grids and the numerical solutions given in gnuplot format. This
-  // was covered in previous examples and will not be further commented on.
+  // refined grids and the numerical solutions given in gnuplot format.
   template <int dim>
   void AdvectionProblem<dim>::output_results (const unsigned int cycle) const
   {
-    // Write the grid in eps format.
-    std::string filename = "grid-";
-    filename += ('0' + cycle);
-    Assert (cycle < 10, ExcInternalError());
+    // First write the grid in eps format.
+    {
+      const std::string filename = "grid-" + std::to_string(cycle) + ".eps";
+      deallog << "Writing grid to <" << filename << ">" << std::endl;
+      std::ofstream eps_output (filename.c_str());
 
-    filename += ".eps";
-    deallog << "Writing grid to <" << filename << ">" << std::endl;
-    std::ofstream eps_output (filename.c_str());
+      GridOut grid_out;
+      grid_out.write_eps (triangulation, eps_output);
+    }
 
-    GridOut grid_out;
-    grid_out.write_eps (triangulation, eps_output);
+    // Then output the solution in gnuplot format.
+    {
+      const std::string filename = "sol-" + std::to_string(cycle) + ".gnuplot";
+      deallog << "Writing solution to <" << filename << ">" << std::endl;
+      std::ofstream gnuplot_output (filename.c_str());
 
-    // Output of the solution in gnuplot format.
-    filename = "sol-";
-    filename += ('0' + cycle);
-    Assert (cycle < 10, ExcInternalError());
+      DataOut<dim> data_out;
+      data_out.attach_dof_handler (dof_handler);
+      data_out.add_data_vector (solution, "u");
 
-    filename += ".gnuplot";
-    deallog << "Writing solution to <" << filename << ">" << std::endl;
-    std::ofstream gnuplot_output (filename.c_str());
+      data_out.build_patches ();
 
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "u");
-
-    data_out.build_patches ();
-
-    data_out.write_gnuplot(gnuplot_output);
+      data_out.write_gnuplot(gnuplot_output);
+    }
   }
 
 
