@@ -103,11 +103,8 @@ namespace GeometricUtilities
       return ccoord;
     }
 
-
-    template Point<2> from_spherical<2>(const std::array<double,2> &);
-    template Point<3> from_spherical<3>(const std::array<double,3> &);
-    template std::array<double,2> to_spherical<2>(const Point<2> &);
-    template std::array<double,3> to_spherical<3>(const Point<3> &);
+    // explicit instantiations
+#include "geometric_utilities.inst"
 
   }
 }
