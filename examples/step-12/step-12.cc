@@ -321,26 +321,27 @@ namespace Step12
     // First, let us retrieve some of the objects used here from @p info. Note
     // that these objects can handle much more complex structures, thus the
     // access here looks more complicated than might seem necessary.
-    const FEValuesBase<dim> &fe_v = info.fe_values();
+    const FEValuesBase<dim> &fe_values = info.fe_values();
     FullMatrix<double> &local_matrix = dinfo.matrix(0).matrix;
-    const std::vector<double> &JxW = fe_v.get_JxW_values ();
+    const std::vector<double> &JxW = fe_values.get_JxW_values ();
 
     // With these objects, we continue local integration like always. First,
     // we loop over the quadrature points and compute the advection vector in
     // the current point.
-    for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
+    for (unsigned int point=0; point<fe_values.n_quadrature_points; ++point)
       {
         Point<dim> beta;
-        beta(0) = -fe_v.quadrature_point(point)(1);
-        beta(1) = fe_v.quadrature_point(point)(0);
+        beta(0) = -fe_values.quadrature_point(point)(1);
+        beta(1) = fe_values.quadrature_point(point)(0);
         beta /= beta.norm();
 
         // We solve a homogeneous equation, thus no right hand side shows up
         // in the cell term.  What's left is integrating the matrix entries.
-        for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-          for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-            local_matrix(i,j) -= beta*fe_v.shape_grad(i,point)*
-                                 fe_v.shape_value(j,point) *
+        for (unsigned int i=0; i<fe_values.dofs_per_cell; ++i)
+          for (unsigned int j=0; j<fe_values.dofs_per_cell; ++j)
+            local_matrix(i,j) += -beta *
+                                 fe_values.shape_grad(i,point) *
+                                 fe_values.shape_value(j,point) *
                                  JxW[point];
       }
   }
@@ -352,38 +353,38 @@ namespace Step12
   void AdvectionProblem<dim>::integrate_boundary_term (DoFInfo &dinfo,
                                                        CellInfo &info)
   {
-    const FEValuesBase<dim> &fe_v = info.fe_values();
+    const FEValuesBase<dim> &fe_face_values = info.fe_values();
     FullMatrix<double> &local_matrix = dinfo.matrix(0).matrix;
     Vector<double> &local_vector = dinfo.vector(0).block(0);
 
-    const std::vector<double> &JxW = fe_v.get_JxW_values ();
-    const std::vector<Tensor<1,dim> > &normals = fe_v.get_normal_vectors ();
+    const std::vector<double> &JxW = fe_face_values.get_JxW_values ();
+    const std::vector<Tensor<1,dim> > &normals = fe_face_values.get_normal_vectors ();
 
-    std::vector<double> g(fe_v.n_quadrature_points);
+    std::vector<double> g(fe_face_values.n_quadrature_points);
 
     static BoundaryValues<dim> boundary_function;
-    boundary_function.value_list (fe_v.get_quadrature_points(), g);
+    boundary_function.value_list (fe_face_values.get_quadrature_points(), g);
 
-    for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
+    for (unsigned int point=0; point<fe_face_values.n_quadrature_points; ++point)
       {
         Point<dim> beta;
-        beta(0) = -fe_v.quadrature_point(point)(1);
-        beta(1) = fe_v.quadrature_point(point)(0);
+        beta(0) = -fe_face_values.quadrature_point(point)(1);
+        beta(1) = fe_face_values.quadrature_point(point)(0);
         beta /= beta.norm();
 
         const double beta_n=beta * normals[point];
         if (beta_n>0)
-          for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-            for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
+          for (unsigned int i=0; i<fe_face_values.dofs_per_cell; ++i)
+            for (unsigned int j=0; j<fe_face_values.dofs_per_cell; ++j)
               local_matrix(i,j) += beta_n *
-                                   fe_v.shape_value(j,point) *
-                                   fe_v.shape_value(i,point) *
+                                   fe_face_values.shape_value(j,point) *
+                                   fe_face_values.shape_value(i,point) *
                                    JxW[point];
         else
-          for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-            local_vector(i) -= beta_n *
+          for (unsigned int i=0; i<fe_face_values.dofs_per_cell; ++i)
+            local_vector(i) += -beta_n *
                                g[point] *
-                               fe_v.shape_value(i,point) *
+                               fe_face_values.shape_value(i,point) *
                                JxW[point];
       }
   }
@@ -399,11 +400,11 @@ namespace Step12
   {
     // For quadrature points, weights, etc., we use the FEValuesBase object of
     // the first argument.
-    const FEValuesBase<dim> &fe_v = info1.fe_values();
+    const FEValuesBase<dim> &fe_face_values = info1.fe_values();
 
     // For additional shape functions, we have to ask the neighbors
     // FEValuesBase.
-    const FEValuesBase<dim> &fe_v_neighbor = info2.fe_values();
+    const FEValuesBase<dim> &fe_face_values_neighbor = info2.fe_values();
 
     // Then we get references to the four local matrices. The letters u and v
     // refer to trial and test functions, respectively. The %numbers indicate
@@ -420,53 +421,53 @@ namespace Step12
     // hand side vectors. Fortunately, the interface terms only involve the
     // solution and the right hand side does not receive any contributions.
 
-    const std::vector<double> &JxW = fe_v.get_JxW_values ();
-    const std::vector<Tensor<1,dim> > &normals = fe_v.get_normal_vectors ();
+    const std::vector<double> &JxW = fe_face_values.get_JxW_values ();
+    const std::vector<Tensor<1,dim> > &normals = fe_face_values.get_normal_vectors ();
 
-    for (unsigned int point=0; point<fe_v.n_quadrature_points; ++point)
+    for (unsigned int point=0; point<fe_face_values.n_quadrature_points; ++point)
       {
         Point<dim> beta;
-        beta(0) = -fe_v.quadrature_point(point)(1);
-        beta(1) = fe_v.quadrature_point(point)(0);
+        beta(0) = -fe_face_values.quadrature_point(point)(1);
+        beta(1) = fe_face_values.quadrature_point(point)(0);
         beta /= beta.norm();
 
-        const double beta_n=beta * normals[point];
-        if (beta_n>0)
+        const double beta_dot_n = beta * normals[point];
+        if (beta_dot_n>0)
           {
             // This term we've already seen:
-            for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-              for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-                u1_v1_matrix(i,j) += beta_n *
-                                     fe_v.shape_value(j,point) *
-                                     fe_v.shape_value(i,point) *
+            for (unsigned int i=0; i<fe_face_values.dofs_per_cell; ++i)
+              for (unsigned int j=0; j<fe_face_values.dofs_per_cell; ++j)
+                u1_v1_matrix(i,j) += beta_dot_n *
+                                     fe_face_values.shape_value(j,point) *
+                                     fe_face_values.shape_value(i,point) *
                                      JxW[point];
 
             // We additionally assemble the term $(\beta\cdot n u,\hat
             // v)_{\partial \kappa_+}$,
-            for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
-              for (unsigned int j=0; j<fe_v.dofs_per_cell; ++j)
-                u1_v2_matrix(k,j) -= beta_n *
-                                     fe_v.shape_value(j,point) *
-                                     fe_v_neighbor.shape_value(k,point) *
+            for (unsigned int k=0; k<fe_face_values_neighbor.dofs_per_cell; ++k)
+              for (unsigned int j=0; j<fe_face_values.dofs_per_cell; ++j)
+                u1_v2_matrix(k,j) += -beta_dot_n *
+                                     fe_face_values.shape_value(j,point) *
+                                     fe_face_values_neighbor.shape_value(k,point) *
                                      JxW[point];
           }
         else
           {
             // This one we've already seen, too:
-            for (unsigned int i=0; i<fe_v.dofs_per_cell; ++i)
-              for (unsigned int l=0; l<fe_v_neighbor.dofs_per_cell; ++l)
-                u2_v1_matrix(i,l) += beta_n *
-                                     fe_v_neighbor.shape_value(l,point) *
-                                     fe_v.shape_value(i,point) *
+            for (unsigned int i=0; i<fe_face_values.dofs_per_cell; ++i)
+              for (unsigned int l=0; l<fe_face_values_neighbor.dofs_per_cell; ++l)
+                u2_v1_matrix(i,l) += beta_dot_n *
+                                     fe_face_values_neighbor.shape_value(l,point) *
+                                     fe_face_values.shape_value(i,point) *
                                      JxW[point];
 
             // And this is another new one: $(\beta\cdot n \hat u,\hat
             // v)_{\partial \kappa_-}$:
-            for (unsigned int k=0; k<fe_v_neighbor.dofs_per_cell; ++k)
-              for (unsigned int l=0; l<fe_v_neighbor.dofs_per_cell; ++l)
-                u2_v2_matrix(k,l) -= beta_n *
-                                     fe_v_neighbor.shape_value(l,point) *
-                                     fe_v_neighbor.shape_value(k,point) *
+            for (unsigned int k=0; k<fe_face_values_neighbor.dofs_per_cell; ++k)
+              for (unsigned int l=0; l<fe_face_values_neighbor.dofs_per_cell; ++l)
+                u2_v2_matrix(k,l) += -beta_dot_n *
+                                     fe_face_values_neighbor.shape_value(l,point) *
+                                     fe_face_values_neighbor.shape_value(k,point) *
                                      JxW[point];
           }
       }
@@ -520,8 +521,9 @@ namespace Step12
   // to the discussion in step-9, here we consider $h^{1+d/2}|\nabla_h
   // u_h|$. Furthermore we note that we do not consider approximate second
   // derivatives because solutions to the linear advection equation are in
-  // general not in $H^2$ but in $H^1$ (to be more precise, in $H^1_\beta$)
-  // only.
+  // general not in $H^2$ but only in $H^1$ (or, to be more precise: in
+  // $H^1_\beta$, i.e., the space of functions whose derivatives in direction
+  // $\beta$ are square integrable).
   template <int dim>
   void AdvectionProblem<dim>::refine_grid ()
   {
