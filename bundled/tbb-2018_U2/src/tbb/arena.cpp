@@ -981,6 +981,7 @@ public:
 };
 
 void isolate_within_arena( delegate_base& d, intptr_t reserved ) {
+    (void)reserved;
     __TBB_ASSERT( reserved == 0, NULL );
     // TODO: Decide what to do if the scheduler is not initialized. Is there a use case for it?
     generic_scheduler* s = governor::local_scheduler_weak();
