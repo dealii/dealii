@@ -115,6 +115,27 @@ namespace Step12
           values[i]=0.;
       }
   }
+
+
+  // Finally, a function that computes and returns the wind field
+  // $\beta=\beta(\mathbf x)$. As explained in the introduction, we
+  // will use a rotational field around the origin in 2d. In 3d, we
+  // simply leave the $z$-component unset (i.e., at zero), whereas
+  // the function can not be used in 1d in its current implementation:
+  template <int dim>
+  Tensor<1,dim> beta (const Point<dim> &p)
+  {
+    Assert (dim >= 2, ExcNotImplemented());
+
+    Point<dim> wind_field;
+    wind_field(0) = -p(1);
+    wind_field(1) = p(0);
+    wind_field /= wind_field.norm();
+
+    return wind_field;
+  }
+
+
   // @sect3{The AdvectionProblem class}
   //
   // After this preparations, we proceed with the main class of this program,
@@ -367,22 +388,17 @@ namespace Step12
 
     for (unsigned int point=0; point<fe_face_values.n_quadrature_points; ++point)
       {
-        Point<dim> beta;
-        beta(0) = -fe_face_values.quadrature_point(point)(1);
-        beta(1) = fe_face_values.quadrature_point(point)(0);
-        beta /= beta.norm();
-
-        const double beta_n=beta * normals[point];
-        if (beta_n>0)
+        const double beta_dot_n = beta(fe_face_values.quadrature_point(point)) * normals[point];
+        if (beta_dot_n>0)
           for (unsigned int i=0; i<fe_face_values.dofs_per_cell; ++i)
             for (unsigned int j=0; j<fe_face_values.dofs_per_cell; ++j)
-              local_matrix(i,j) += beta_n *
+              local_matrix(i,j) += beta_dot_n *
                                    fe_face_values.shape_value(j,point) *
                                    fe_face_values.shape_value(i,point) *
                                    JxW[point];
         else
           for (unsigned int i=0; i<fe_face_values.dofs_per_cell; ++i)
-            local_vector(i) += -beta_n *
+            local_vector(i) += -beta_dot_n *
                                g[point] *
                                fe_face_values.shape_value(i,point) *
                                JxW[point];
@@ -426,12 +442,7 @@ namespace Step12
 
     for (unsigned int point=0; point<fe_face_values.n_quadrature_points; ++point)
       {
-        Point<dim> beta;
-        beta(0) = -fe_face_values.quadrature_point(point)(1);
-        beta(1) = fe_face_values.quadrature_point(point)(0);
-        beta /= beta.norm();
-
-        const double beta_dot_n = beta * normals[point];
+        const double beta_dot_n = beta(fe_face_values.quadrature_point(point)) * normals[point];
         if (beta_dot_n>0)
           {
             // This term we've already seen:
