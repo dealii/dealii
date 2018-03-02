@@ -622,6 +622,40 @@ namespace Utilities
     double get_cpu_load ();
 
     /**
+     * Return the current level of vectorization as described by DEAL_II_COMPILER_VECTORIZATION_LEVEL
+     * in vectorization.h as a string. The list of possible return values is:
+     *
+     * <table>
+     * <tr>
+     *   <td><tt>VECTORIZATION_LEVEL</tt></td>
+     *   <td>Return Value</td>
+     *   <td>Width in bits</td>
+     * </tr>
+     * <tr>
+     *   <td>0</td>
+     *   <td>disabled</td>
+     *   <td>64</td>
+     * </tr>
+     * <tr>
+     *   <td>1</td>
+     *   <td>SSE2</td>
+     *   <td>128</td>
+     * </tr>
+     * <tr>
+     *   <td>2</td>
+     *   <td>AVX</td>
+     *   <td>256</td>
+     * </tr>
+     * <tr>
+     *   <td>3</td>
+     *   <td>AVX512</td>
+     *   <td>512</td>
+     * </tr>
+     * </table>
+     */
+    const std::string get_current_vectorization_level();
+
+    /**
      * Structure that hold information about memory usage in kB. Used by
      * get_memory_stats(). See man 5 proc entry /status for details.
      */
