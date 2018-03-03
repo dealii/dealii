@@ -105,7 +105,7 @@ int main()
 
   // Create to distinct linear operators:
 
-  typedef dealii::internal::LinearOperator::EmptyPayload Payload;
+  typedef dealii::internal::LinearOperatorImplementation::EmptyPayload Payload;
   LinearOperator<LeftVector, RightVector, Payload> multiply2;
   multiply2.vmult = [](LeftVector &v, const RightVector &u)
   {

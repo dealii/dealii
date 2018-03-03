@@ -343,7 +343,7 @@ protected:
   get_data (const UpdateFlags                                                  /*update_flags*/,
             const Mapping<1,spacedim>                                         &/*mapping*/,
             const Quadrature<1>                                               &/*quadrature*/,
-            dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const
+            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const
   {
     return new typename FiniteElement<1, spacedim>::InternalDataBase;
   }
@@ -352,7 +352,7 @@ protected:
   get_face_data(const UpdateFlags update_flags,
                 const Mapping<1,spacedim> &/*mapping*/,
                 const Quadrature<0> &quadrature,
-                dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &/*output_data*/) const
   {
     // generate a new data object and initialize some fields
     typename FiniteElement<1,spacedim>::InternalDataBase *data =
@@ -376,7 +376,7 @@ protected:
   get_subface_data(const UpdateFlags                                                  update_flags,
                    const Mapping<1,spacedim>                                         &mapping,
                    const Quadrature<0>                                               &quadrature,
-                   dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const
+                   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const
   {
     return get_face_data(update_flags, mapping, quadrature, output_data);
   }
@@ -388,9 +388,9 @@ protected:
                   const Quadrature<1>                                               &quadrature,
                   const Mapping<1,spacedim>                                         &mapping,
                   const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
-                  const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &mapping_data,
+                  const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &mapping_data,
                   const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
-                  dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const;
+                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const;
 
   virtual
   void
@@ -399,9 +399,9 @@ protected:
                        const Quadrature<0>                                               &quadrature,
                        const Mapping<1,spacedim>                                         &mapping,
                        const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
-                       const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &mapping_data,
+                       const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &mapping_data,
                        const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
-                       dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const;
+                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const;
 
   virtual
   void
@@ -411,9 +411,9 @@ protected:
                           const Quadrature<0>                                               &quadrature,
                           const Mapping<1,spacedim>                                         &mapping,
                           const typename Mapping<1,spacedim>::InternalDataBase              &mapping_internal,
-                          const dealii::internal::FEValues::MappingRelatedData<1, spacedim> &mapping_data,
+                          const dealii::internal::FEValuesImplementation::MappingRelatedData<1, spacedim> &mapping_data,
                           const typename FiniteElement<1,spacedim>::InternalDataBase        &fe_internal,
-                          dealii::internal::FEValues::FiniteElementRelatedData<1, spacedim> &output_data) const;
+                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1, spacedim> &output_data) const;
 
 private:
   /**

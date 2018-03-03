@@ -44,7 +44,7 @@ namespace internal
 // the vectorization features of modern processors. to make this happen,
 // we will have to vectorize the functions in the following namespace, either
 // by hand or by using, for example, optimized BLAS versions for them.
-  namespace ChunkSparseMatrix
+  namespace ChunkSparseMatrixImplementation
   {
     /**
      * Declare type for container size.
@@ -372,7 +372,7 @@ ChunkSparseMatrix<number>::~ChunkSparseMatrix ()
 
 namespace internal
 {
-  namespace ChunkSparseMatrix
+  namespace ChunkSparseMatrixImplementation
   {
     template <typename T>
     void zero_subrange (const unsigned int begin,
@@ -407,11 +407,11 @@ ChunkSparseMatrix<number>::operator = (const double d)
   const unsigned int matrix_size = cols->sparsity_pattern.n_nonzero_elements()
                                    * cols->chunk_size * cols->chunk_size;
   const unsigned int grain_size =
-    internal::SparseMatrix::minimum_parallel_grain_size *
+    internal::SparseMatrixImplementation::minimum_parallel_grain_size *
     (matrix_size+m()) / m();
   if (matrix_size>grain_size)
     parallel::apply_to_subranges (0U, matrix_size,
-                                  std::bind(&internal::ChunkSparseMatrix::template
+                                  std::bind(&internal::ChunkSparseMatrixImplementation::template
                                             zero_subrange<number>,
                                             std::placeholders::_1, std::placeholders::_2,
                                             val.get()),
@@ -715,7 +715,7 @@ ChunkSparseMatrix<number>::vmult_add (OutVector &dst,
 
   Assert (!PointerComparison::equal(&src, &dst), ExcSourceEqualsDestination());
   parallel::apply_to_subranges (0U, cols->sparsity_pattern.n_rows(),
-                                std::bind (&internal::ChunkSparseMatrix::vmult_add_on_subrange
+                                std::bind (&internal::ChunkSparseMatrixImplementation::vmult_add_on_subrange
                                            <number,InVector,OutVector>,
                                            std::cref(*cols),
                                            std::placeholders::_1, std::placeholders::_2,
@@ -724,7 +724,7 @@ ChunkSparseMatrix<number>::vmult_add (OutVector &dst,
                                            cols->sparsity_pattern.colnums.get(),
                                            std::cref(src),
                                            std::ref(dst)),
-                                internal::SparseMatrix::minimum_parallel_grain_size/cols->chunk_size+1);
+                                internal::SparseMatrixImplementation::minimum_parallel_grain_size/cols->chunk_size+1);
 
 }
 
@@ -769,7 +769,7 @@ ChunkSparseMatrix<number>::Tvmult_add (OutVector &dst,
           if ((cols_have_padding == false)
               ||
               (*colnum_ptr != cols->sparsity_pattern.n_cols()-1))
-            internal::ChunkSparseMatrix::chunk_Tvmult_add
+            internal::ChunkSparseMatrixImplementation::chunk_Tvmult_add
             (cols->chunk_size,
              val_ptr,
              src.begin() + chunk_row * cols->chunk_size,
@@ -865,7 +865,7 @@ ChunkSparseMatrix<number>::matrix_norm_square (const Vector<somenumber> &v) cons
               ||
               (*colnum_ptr != cols->sparsity_pattern.n_cols()-1))
             result +=
-              internal::ChunkSparseMatrix::
+              internal::ChunkSparseMatrixImplementation::
               chunk_matrix_scalar_product<somenumber>
               (cols->chunk_size,
                val_ptr,
@@ -973,7 +973,7 @@ ChunkSparseMatrix<number>::matrix_scalar_product (const Vector<somenumber> &u,
               ||
               (*colnum_ptr != cols->sparsity_pattern.n_cols()-1))
             result +=
-              internal::ChunkSparseMatrix::
+              internal::ChunkSparseMatrixImplementation::
               chunk_matrix_scalar_product<somenumber>
               (cols->chunk_size,
                val_ptr,
@@ -1174,7 +1174,7 @@ ChunkSparseMatrix<number>::residual (Vector<somenumber>       &dst,
           if ((cols_have_padding == false)
               ||
               (*colnum_ptr != cols->sparsity_pattern.n_cols()-1))
-            internal::ChunkSparseMatrix::chunk_vmult_subtract
+            internal::ChunkSparseMatrixImplementation::chunk_vmult_subtract
             (cols->chunk_size,
              val_ptr,
              u.begin() + *colnum_ptr * cols->chunk_size,

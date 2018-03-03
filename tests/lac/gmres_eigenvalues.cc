@@ -100,7 +100,7 @@ void test (unsigned int variant)
         eigenvalues[i] = matrix.eigenvalue(i);
 
       std::sort(eigenvalues.begin(), eigenvalues.end(),
-                internal::SolverGMRES::complex_less_pred);
+                internal::SolverGMRESImplementation::complex_less_pred);
 
       deallog << "Actual eigenvalues:        ";
       for (unsigned int i=0; i<n; ++i)

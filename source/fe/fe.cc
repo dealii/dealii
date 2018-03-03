@@ -1197,7 +1197,7 @@ typename FiniteElement<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_face_data (const UpdateFlags       flags,
                                             const Mapping<dim,spacedim>      &mapping,
                                             const Quadrature<dim-1> &quadrature,
-                                            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                                            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   return get_data (flags, mapping,
                    QProjector<dim>::project_to_all_faces(quadrature),
@@ -1211,7 +1211,7 @@ typename FiniteElement<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_subface_data (const UpdateFlags        flags,
                                                const Mapping<dim,spacedim>      &mapping,
                                                const Quadrature<dim-1> &quadrature,
-                                               dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                                               dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   return get_data (flags, mapping,
                    QProjector<dim>::project_to_all_subfaces(quadrature),

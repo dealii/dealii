@@ -620,11 +620,11 @@ struct EnableFPE
 
 namespace internal
 {
-  namespace Vector
+  namespace VectorImplementation
   {
     extern unsigned int minimum_parallel_grain_size;
   }
-  namespace SparseMatrix
+  namespace SparseMatrixImplementation
   {
     extern unsigned int minimum_parallel_grain_size;
   }
@@ -634,8 +634,8 @@ struct SetGrainSizes
 {
   SetGrainSizes ()
   {
-    internal::Vector::minimum_parallel_grain_size = 2;
-    internal::SparseMatrix::minimum_parallel_grain_size = 2;
+    internal::VectorImplementation::minimum_parallel_grain_size = 2;
+    internal::SparseMatrixImplementation::minimum_parallel_grain_size = 2;
   }
 } set_grain_sizes;
 

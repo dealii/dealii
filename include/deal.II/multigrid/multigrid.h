@@ -568,7 +568,7 @@ Multigrid<VectorType>::get_minlevel () const
 
 namespace internal
 {
-  namespace PreconditionMG
+  namespace PreconditionMGImplementation
   {
     template <int dim, typename VectorType, class TRANSFER, typename OtherVectorType>
     typename std::enable_if<TRANSFER::supports_dof_handler_vector>::type
@@ -716,8 +716,8 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult
 (OtherVectorType       &dst,
  const OtherVectorType &src) const
 {
-  internal::PreconditionMG::vmult(dof_handler_vector_raw,*multigrid,*transfer,
-                                  dst,src,uses_dof_handler_vector,0);
+  internal::PreconditionMGImplementation::vmult(dof_handler_vector_raw,*multigrid,*transfer,
+                                                dst,src,uses_dof_handler_vector,0);
 }
 
 
@@ -759,8 +759,8 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult_add
 (OtherVectorType       &dst,
  const OtherVectorType &src) const
 {
-  internal::PreconditionMG::vmult_add(dof_handler_vector_raw,*multigrid,*transfer,
-                                      dst,src,uses_dof_handler_vector,0);
+  internal::PreconditionMGImplementation::vmult_add(dof_handler_vector_raw,*multigrid,*transfer,
+                                                    dst,src,uses_dof_handler_vector,0);
 }
 
 

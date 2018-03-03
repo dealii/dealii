@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace Timer
+  namespace TimerImplementation
   {
     namespace
     {
@@ -124,7 +124,7 @@ CPUClock::time_point CPUClock::now() noexcept
 #else
 #  warning "Unsupported platform. Porting not finished."
 #endif
-  return time_point(internal::Timer::from_seconds<duration>(system_cpu_duration));
+  return time_point(internal::TimerImplementation::from_seconds<duration>(system_cpu_duration));
 }
 
 
@@ -196,24 +196,24 @@ double Timer::stop ()
       cpu_times.last_lap_time = cpu_clock_type::now() - cpu_times.current_lap_start_time;
 
       last_lap_wall_time_data = Utilities::MPI::min_max_avg
-                                (internal::Timer::to_seconds(wall_times.last_lap_time),
+                                (internal::TimerImplementation::to_seconds(wall_times.last_lap_time),
                                  mpi_communicator);
       if (sync_lap_times)
         {
-          wall_times.last_lap_time = internal::Timer::from_seconds<decltype(wall_times)::duration_type>
+          wall_times.last_lap_time = internal::TimerImplementation::from_seconds<decltype(wall_times)::duration_type>
                                      (last_lap_wall_time_data.max);
-          cpu_times.last_lap_time = internal::Timer::from_seconds<decltype(cpu_times)::duration_type>
+          cpu_times.last_lap_time = internal::TimerImplementation::from_seconds<decltype(cpu_times)::duration_type>
                                     (Utilities::MPI::min_max_avg
-                                     (internal::Timer::to_seconds(cpu_times.last_lap_time),
+                                     (internal::TimerImplementation::to_seconds(cpu_times.last_lap_time),
                                       mpi_communicator).max);
         }
       wall_times.accumulated_time += wall_times.last_lap_time;
       cpu_times.accumulated_time += cpu_times.last_lap_time;
       accumulated_wall_time_data = Utilities::MPI::min_max_avg
-                                   (internal::Timer::to_seconds(wall_times.accumulated_time),
+                                   (internal::TimerImplementation::to_seconds(wall_times.accumulated_time),
                                     mpi_communicator);
     }
-  return internal::Timer::to_seconds(cpu_times.accumulated_time);
+  return internal::TimerImplementation::to_seconds(cpu_times.accumulated_time);
 }
 
 
@@ -222,7 +222,7 @@ double Timer::cpu_time() const
 {
   if (running)
     {
-      const double running_time = internal::Timer::to_seconds
+      const double running_time = internal::TimerImplementation::to_seconds
                                   (cpu_clock_type::now()
                                    - cpu_times.current_lap_start_time
                                    + cpu_times.accumulated_time);
@@ -230,7 +230,7 @@ double Timer::cpu_time() const
     }
   else
     {
-      return Utilities::MPI::sum (internal::Timer::to_seconds(cpu_times.accumulated_time),
+      return Utilities::MPI::sum (internal::TimerImplementation::to_seconds(cpu_times.accumulated_time),
                                   mpi_communicator);
     }
 }
@@ -239,14 +239,14 @@ double Timer::cpu_time() const
 
 double Timer::last_cpu_time() const
 {
-  return internal::Timer::to_seconds(cpu_times.last_lap_time);
+  return internal::TimerImplementation::to_seconds(cpu_times.last_lap_time);
 }
 
 
 
 double Timer::get_lap_time() const
 {
-  return internal::Timer::to_seconds(wall_times.last_lap_time);
+  return internal::TimerImplementation::to_seconds(wall_times.last_lap_time);
 }
 
 
@@ -268,14 +268,14 @@ double Timer::wall_time () const
   else
     current_elapsed_wall_time = wall_times.accumulated_time;
 
-  return internal::Timer::to_seconds(current_elapsed_wall_time);
+  return internal::TimerImplementation::to_seconds(current_elapsed_wall_time);
 }
 
 
 
 double Timer::last_wall_time () const
 {
-  return internal::Timer::to_seconds(wall_times.last_lap_time);
+  return internal::TimerImplementation::to_seconds(wall_times.last_lap_time);
 }
 
 
@@ -285,8 +285,8 @@ void Timer::reset ()
   wall_times.reset();
   cpu_times.reset();
   running = false;
-  internal::Timer::clear_timing_data(last_lap_wall_time_data);
-  internal::Timer::clear_timing_data(accumulated_wall_time_data);
+  internal::TimerImplementation::clear_timing_data(last_lap_wall_time_data);
+  internal::TimerImplementation::clear_timing_data(accumulated_wall_time_data);
 }
 
 

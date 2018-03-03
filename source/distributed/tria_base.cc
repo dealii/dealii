@@ -76,7 +76,7 @@ namespace parallel
 
         // release unused vector memory because we will have very different
         // vectors now
-        ::dealii::internal::GrowingVectorMemory::release_all_unused_memory();
+        ::dealii::internal::GrowingVectorMemoryImplementation::release_all_unused_memory();
       }
 #endif
   }
@@ -103,7 +103,7 @@ namespace parallel
   {
     // release unused vector memory because the vector layout is going to look
     // very different now
-    ::dealii::internal::GrowingVectorMemory::release_all_unused_memory();
+    ::dealii::internal::GrowingVectorMemoryImplementation::release_all_unused_memory();
   }
 
   template <int dim, int spacedim>

@@ -344,7 +344,7 @@ MappingManifold<dim,spacedim>::get_subface_data (const UpdateFlags update_flags,
 
 namespace internal
 {
-  namespace MappingManifold
+  namespace MappingManifoldImplementation
   {
     namespace
     {
@@ -477,7 +477,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const CellSimilarity::Similarity                           cell_similarity,
                 const Quadrature<dim>                                     &quadrature,
                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+                internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following static_cast is really correct:
   Assert (dynamic_cast<const InternalData *>(&internal_data) != nullptr,
@@ -489,12 +489,12 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
   data.store_vertices(cell);
   data.manifold = &(cell->get_manifold());
 
-  internal::MappingManifold::maybe_compute_q_points<dim,spacedim>
+  internal::MappingManifoldImplementation::maybe_compute_q_points<dim,spacedim>
   (QProjector<dim>::DataSetDescriptor::cell (),
    data,
    output_data.quadrature_points);
 
-  internal::MappingManifold::maybe_update_Jacobians<dim,spacedim>
+  internal::MappingManifoldImplementation::maybe_update_Jacobians<dim,spacedim>
   (QProjector<dim>::DataSetDescriptor::cell (),
    data);
 
@@ -618,7 +618,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
 namespace internal
 {
-  namespace MappingManifold
+  namespace MappingManifoldImplementation
   {
     namespace
     {
@@ -641,7 +641,7 @@ namespace internal
        const unsigned int                                                  n_q_points,
        const std::vector<double>                                          &weights,
        const typename dealii::MappingManifold<dim,spacedim>::InternalData &data,
-       internal::FEValues::MappingRelatedData<dim,spacedim>               &output_data)
+       internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>               &output_data)
       {
         const UpdateFlags update_flags = data.update_each;
 
@@ -793,7 +793,7 @@ namespace internal
        const typename QProjector<dim>::DataSetDescriptor                   data_set,
        const Quadrature<dim-1>                                            &quadrature,
        const typename dealii::MappingManifold<dim,spacedim>::InternalData &data,
-       internal::FEValues::MappingRelatedData<dim,spacedim>               &output_data)
+       internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>               &output_data)
       {
         data.store_vertices(cell);
 
@@ -1139,7 +1139,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      const unsigned int                                         face_no,
                      const Quadrature<dim-1>                                   &quadrature,
                      const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                     internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+                     internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following cast is really correct:
   Assert ((dynamic_cast<const InternalData *>(&internal_data) != nullptr),
@@ -1147,7 +1147,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
   const InternalData &data
     = static_cast<const InternalData &>(internal_data);
 
-  internal::MappingManifold::do_fill_fe_face_values
+  internal::MappingManifoldImplementation::do_fill_fe_face_values
   (*this,
    cell, face_no, numbers::invalid_unsigned_int,
    QProjector<dim>::DataSetDescriptor::face (face_no,
@@ -1170,7 +1170,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const unsigned int                                         subface_no,
                         const Quadrature<dim-1>                                   &quadrature,
                         const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                        internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+                        internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // ensure that the following cast is really correct:
   Assert ((dynamic_cast<const InternalData *>(&internal_data) != nullptr),
@@ -1178,7 +1178,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
   const InternalData &data
     = static_cast<const InternalData &>(internal_data);
 
-  internal::MappingManifold::do_fill_fe_face_values
+  internal::MappingManifoldImplementation::do_fill_fe_face_values
   (*this,
    cell, face_no, subface_no,
    QProjector<dim>::DataSetDescriptor::subface (face_no, subface_no,
@@ -1202,7 +1202,7 @@ transform (const ArrayView<const Tensor<1, dim> >                  &input,
            const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
            const ArrayView<Tensor<1, spacedim> >                   &output) const
 {
-  internal::MappingManifold::transform_fields(input, mapping_type, mapping_data, output);
+  internal::MappingManifoldImplementation::transform_fields(input, mapping_type, mapping_data, output);
 }
 
 
@@ -1215,7 +1215,7 @@ transform (const ArrayView<const DerivativeForm<1, dim,spacedim> >  &input,
            const typename Mapping<dim,spacedim>::InternalDataBase   &mapping_data,
            const ArrayView<Tensor<2, spacedim> >                    &output) const
 {
-  internal::MappingManifold::transform_differential_forms(input, mapping_type, mapping_data, output);
+  internal::MappingManifoldImplementation::transform_differential_forms(input, mapping_type, mapping_data, output);
 }
 
 
@@ -1231,13 +1231,13 @@ transform (const ArrayView<const Tensor<2, dim> >                  &input,
   switch (mapping_type)
     {
     case mapping_contravariant:
-      internal::MappingManifold::transform_fields(input, mapping_type, mapping_data, output);
+      internal::MappingManifoldImplementation::transform_fields(input, mapping_type, mapping_data, output);
       return;
 
     case mapping_piola_gradient:
     case mapping_contravariant_gradient:
     case mapping_covariant_gradient:
-      internal::MappingManifold::transform_gradients(input, mapping_type, mapping_data, output);
+      internal::MappingManifoldImplementation::transform_gradients(input, mapping_type, mapping_data, output);
       return;
     default:
       Assert(false, ExcNotImplemented());
@@ -1308,7 +1308,7 @@ transform (const ArrayView<const  Tensor<3,dim> >                  &input,
     case mapping_piola_hessian:
     case mapping_contravariant_hessian:
     case mapping_covariant_hessian:
-      internal::MappingManifold::transform_hessians(input, mapping_type, mapping_data, output);
+      internal::MappingManifoldImplementation::transform_hessians(input, mapping_type, mapping_data, output);
       return;
     default:
       Assert(false, ExcNotImplemented());

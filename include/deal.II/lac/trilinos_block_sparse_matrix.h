@@ -580,7 +580,7 @@ namespace TrilinosWrappers
 
   namespace internal
   {
-    namespace BlockLinearOperator
+    namespace BlockLinearOperatorImplementation
     {
 
       /**
@@ -619,7 +619,7 @@ namespace TrilinosWrappers
         template <typename... Args>
         TrilinosBlockPayload (const Args &...)
         {
-          static_assert(typeid(PayloadBlockType)==typeid(internal::LinearOperator::TrilinosPayload),
+          static_assert(typeid(PayloadBlockType)==typeid(internal::LinearOperatorImplementation::TrilinosPayload),
                         "TrilinosBlockPayload can only accept a payload of type TrilinosPayload.");
         }
       };

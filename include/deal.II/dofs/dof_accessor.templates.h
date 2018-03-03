@@ -55,7 +55,7 @@ DoFAccessor (const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space
              const int             index,
              const DoFHandlerType *dof_handler)
   :
-  dealii::internal::DoFAccessor::Inheritance<structdim,DoFHandlerType::dimension,
+  dealii::internal::DoFAccessorImplementation::Inheritance<structdim,DoFHandlerType::dimension,
   DoFHandlerType::space_dimension>::BaseClass (tria,
                                                level,
                                                index),
@@ -201,7 +201,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::child (const unsigned in
 
 namespace internal
 {
-  namespace DoFAccessor
+  namespace DoFAccessorImplementation
   {
     /**
      * A class like the one with same name in tria.cc. See there for more
@@ -791,7 +791,7 @@ namespace internal
                  (structdim==1
                   ?
                   typename
-                  internal::Triangulation::Iterators<dim,spacedim>::
+                  internal::TriangulationImplementation::Iterators<dim,spacedim>::
                   raw_line_iterator (&dof_handler.get_triangulation(),
                                      obj_level,
                                      obj_index)->used()
@@ -841,7 +841,7 @@ namespace internal
                  (structdim==1
                   ?
                   typename
-                  internal::Triangulation::Iterators<dim,spacedim>::
+                  internal::TriangulationImplementation::Iterators<dim,spacedim>::
                   raw_line_iterator (&dof_handler.get_triangulation(),
                                      obj_level,
                                      obj_index)->used()
@@ -1599,7 +1599,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::dof_index (const unsigned int 
     const unsigned int fe_index) const
 {
   // access the respective DoF
-  return dealii::internal::DoFAccessor::Implementation::get_dof_index (*this->dof_handler,
+  return dealii::internal::DoFAccessorImplementation::Implementation::get_dof_index (*this->dof_handler,
          this->level(),
          this->present_index,
          fe_index,
@@ -1626,7 +1626,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::set_dof_index (const unsigned 
     const unsigned int fe_index) const
 {
   // access the respective DoF
-  dealii::internal::DoFAccessor::Implementation::set_dof_index (*this->dof_handler,
+  dealii::internal::DoFAccessorImplementation::Implementation::set_dof_index (*this->dof_handler,
       this->level(),
       this->present_index,
       fe_index,
@@ -1644,7 +1644,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::n_active_fe_indices () const
 {
   // access the respective DoF
   return
-    dealii::internal::DoFAccessor::Implementation::
+    dealii::internal::DoFAccessorImplementation::Implementation::
     n_active_fe_indices (*this->dof_handler,
                          this->level(),
                          this->present_index,
@@ -1660,7 +1660,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::nth_active_fe_index (const uns
 {
   // access the respective DoF
   return
-    dealii::internal::DoFAccessor::Implementation::
+    dealii::internal::DoFAccessorImplementation::Implementation::
     nth_active_fe_index (*this->dof_handler,
                          this->level(),
                          this->present_index,
@@ -1677,7 +1677,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::fe_index_is_active (const unsi
 {
   // access the respective DoF
   return
-    dealii::internal::DoFAccessor::Implementation::
+    dealii::internal::DoFAccessorImplementation::Implementation::
     fe_index_is_active (*this->dof_handler,
                         this->level(),
                         this->present_index,
@@ -1696,7 +1696,7 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::vertex_dof_index
  const unsigned int fe_index) const
 {
   return
-    dealii::internal::DoFAccessor::Implementation::get_vertex_dof_index
+    dealii::internal::DoFAccessorImplementation::Implementation::get_vertex_dof_index
     (*this->dof_handler,
      this->vertex_index(vertex),
      fe_index,
@@ -1720,7 +1720,7 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::mg_vertex_dof_index (co
           ExcIndexRange (i, 0, this->dof_handler->get_fe (fe_index).dofs_per_vertex));
 
   return
-    dealii::internal::DoFAccessor::Implementation::mg_vertex_dof_index
+    dealii::internal::DoFAccessorImplementation::Implementation::mg_vertex_dof_index
     (*this->dof_handler,
      level,
      this->vertex_index(vertex),
@@ -1736,7 +1736,7 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_vertex_dof_index (c
     const types::global_dof_index index,
     const unsigned int fe_index) const
 {
-  dealii::internal::DoFAccessor::Implementation::set_vertex_dof_index
+  dealii::internal::DoFAccessorImplementation::Implementation::set_vertex_dof_index
   (*this->dof_handler,
    this->vertex_index(vertex),
    fe_index,
@@ -1763,7 +1763,7 @@ DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_vertex_dof_index
           ExcIndexRange (i, 0, this->dof_handler->get_fe (fe_index).dofs_per_vertex));
 
   return
-    dealii::internal::DoFAccessor::Implementation::set_mg_vertex_dof_index
+    dealii::internal::DoFAccessorImplementation::Implementation::set_mg_vertex_dof_index
     (*this->dof_handler,
      level,
      this->vertex_index(vertex),
@@ -1800,7 +1800,7 @@ DoFAccessor<dim,DoFHandlerType,level_dof_access>::get_fe (const unsigned int fe_
 
 namespace internal
 {
-  namespace DoFAccessor
+  namespace DoFAccessorImplementation
   {
     template <typename DoFHandlerType, bool level_dof_access>
     void get_dof_indices (const dealii::DoFAccessor<1,DoFHandlerType,level_dof_access> &accessor,
@@ -2065,7 +2065,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::get_dof_indices
           ExcInternalError());
 
   // now do the actual work
-  dealii::internal::DoFAccessor::get_dof_indices (*this, dof_indices, fe_index);
+  dealii::internal::DoFAccessorImplementation::get_dof_indices (*this, dof_indices, fe_index);
 }
 
 
@@ -2115,10 +2115,10 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::get_mg_dof_indices
       Assert (false, ExcNotImplemented ());
     }
 
-  internal::DoFAccessor::get_mg_dof_indices (*this,
-                                             level,
-                                             dof_indices,
-                                             fe_index);
+  internal::DoFAccessorImplementation::get_mg_dof_indices (*this,
+                                                           level,
+                                                           dof_indices,
+                                                           fe_index);
 }
 
 
@@ -2167,20 +2167,20 @@ void DoFAccessor<structdim, DoFHandlerType,level_dof_access>::set_mg_dof_indices
       Assert (false, ExcNotImplemented ());
     }
 
-  internal::DoFAccessor::Implementation::set_mg_dof_indices (*this,
-                                                             level,
-                                                             dof_indices,
-                                                             fe_index);
+  internal::DoFAccessorImplementation::Implementation::set_mg_dof_indices (*this,
+      level,
+      dof_indices,
+      fe_index);
 }
 
 
 namespace internal
 {
-  namespace DoFAccessor
+  namespace DoFAccessorImplementation
   {
     template <bool level_dof_access, typename DoFHandlerType>
     inline
-    typename dealii::internal::DoFHandler::Iterators<DoFHandlerType, level_dof_access>::quad_iterator
+    typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType, level_dof_access>::quad_iterator
     get_quad(const dealii::Triangulation<DoFHandlerType::dimension, DoFHandlerType::space_dimension> *,
              unsigned int /*index*/,
              DoFHandlerType *)
@@ -2190,46 +2190,46 @@ namespace internal
 
     template <bool level_dof_access>
     inline
-    typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<2,2>, level_dof_access>::quad_iterator
+    typename dealii::internal::DoFHandlerImplementation::Iterators<dealii::DoFHandler<2,2>, level_dof_access>::quad_iterator
     get_quad(const dealii::Triangulation<2,2> *,
              unsigned int,
              dealii::DoFHandler<2,2> *)
     {
       Assert(false, ExcNotImplemented());
-      return typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<2,2>, level_dof_access>::line_iterator();
+      return typename dealii::internal::DoFHandlerImplementation::Iterators<dealii::DoFHandler<2,2>, level_dof_access>::line_iterator();
     }
 
     template <bool level_dof_access>
     inline
-    typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<2,3>, level_dof_access>::quad_iterator
+    typename dealii::internal::DoFHandlerImplementation::Iterators<dealii::DoFHandler<2,3>, level_dof_access>::quad_iterator
     get_quad(const dealii::Triangulation<2,3> *,
              unsigned int,
              dealii::DoFHandler<2,3> *)
     {
       Assert(false, ExcNotImplemented());
-      return typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<2,3>, level_dof_access>::line_iterator();
+      return typename dealii::internal::DoFHandlerImplementation::Iterators<dealii::DoFHandler<2,3>, level_dof_access>::line_iterator();
     }
 
     template <bool level_dof_access>
     inline
-    typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<2,2>, level_dof_access>::quad_iterator
+    typename dealii::internal::DoFHandlerImplementation::Iterators<dealii::hp::DoFHandler<2,2>, level_dof_access>::quad_iterator
     get_quad(const dealii::Triangulation<2,2> *,
              unsigned int,
              dealii::hp::DoFHandler<2,2> *)
     {
       Assert(false, ExcNotImplemented());
-      return typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<2,2>, level_dof_access>::line_iterator();
+      return typename dealii::internal::DoFHandlerImplementation::Iterators<dealii::hp::DoFHandler<2,2>, level_dof_access>::line_iterator();
     }
 
     template <bool level_dof_access>
     inline
-    typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<2,3>, level_dof_access>::quad_iterator
+    typename dealii::internal::DoFHandlerImplementation::Iterators<dealii::hp::DoFHandler<2,3>, level_dof_access>::quad_iterator
     get_quad(const dealii::Triangulation<2,3> *,
              unsigned int,
              dealii::hp::DoFHandler<2,3> *)
     {
       Assert(false, ExcNotImplemented());
-      return typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<2,3>, level_dof_access>::line_iterator();
+      return typename dealii::internal::DoFHandlerImplementation::Iterators<dealii::hp::DoFHandler<2,3>, level_dof_access>::line_iterator();
     }
   }
 }
@@ -2237,7 +2237,7 @@ namespace internal
 
 template <int structdim, typename DoFHandlerType, bool level_dof_access>
 inline
-typename dealii::internal::DoFHandler::Iterators<DoFHandlerType,level_dof_access>::line_iterator
+typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType,level_dof_access>::line_iterator
 DoFAccessor<structdim,DoFHandlerType,level_dof_access>::line (const unsigned int i) const
 {
   // if we are asking for a particular line and this object refers to
@@ -2248,7 +2248,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::line (const unsigned int
       Assert (i==0, ExcMessage ("You can only ask for line zero if the "
                                 "current object is a line itself."));
       return
-        typename dealii::internal::DoFHandler::Iterators<DoFHandlerType,level_dof_access>::cell_iterator
+        typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType,level_dof_access>::cell_iterator
         (&this->get_triangulation(),
          this->level(),
          this->index(),
@@ -2260,7 +2260,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::line (const unsigned int
   Assert (DoFHandlerType::dimension > 1, ExcImpossibleInDim(DoFHandlerType::dimension));
 
   // checking of 'i' happens in line_index(i)
-  return typename dealii::internal::DoFHandler::Iterators<DoFHandlerType,level_dof_access>::line_iterator
+  return typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType,level_dof_access>::line_iterator
          (this->tria,
           0,  // only sub-objects are allowed, which have no level
           this->line_index(i),
@@ -2270,7 +2270,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::line (const unsigned int
 
 template <int structdim, typename DoFHandlerType, bool level_dof_access>
 inline
-typename dealii::internal::DoFHandler::Iterators<DoFHandlerType,level_dof_access>::quad_iterator
+typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType,level_dof_access>::quad_iterator
 DoFAccessor<structdim,DoFHandlerType,level_dof_access>::quad (const unsigned int i) const
 {
   // if we are asking for a
@@ -2283,7 +2283,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::quad (const unsigned int
       Assert (i==0, ExcMessage ("You can only ask for quad zero if the "
                                 "current object is a quad itself."));
       return
-        typename dealii::internal::DoFHandler::Iterators<DoFHandlerType>::cell_iterator
+        typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType>::cell_iterator
         (&this->get_triangulation(),
          this->level(),
          this->index(),
@@ -2295,7 +2295,7 @@ DoFAccessor<structdim,DoFHandlerType,level_dof_access>::quad (const unsigned int
   Assert (DoFHandlerType::dimension > 2, ExcImpossibleInDim(DoFHandlerType::dimension));
 
   // checking of 'i' happens in quad_index(i)
-  return typename dealii::internal::DoFHandler::Iterators<DoFHandlerType,level_dof_access>::quad_iterator
+  return typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType,level_dof_access>::quad_iterator
          (this->tria,
           0,  // only sub-objects are allowed, which have no level
           this->quad_index(i),
@@ -2425,7 +2425,7 @@ DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::get_dof_indices
 {
   for (unsigned int i=0; i<dof_indices.size(); ++i)
     dof_indices[i]
-      = dealii::internal::DoFAccessor::Implementation::get_vertex_dof_index (
+      = dealii::internal::DoFAccessorImplementation::Implementation::get_vertex_dof_index (
           *dof_handler,
           this->global_vertex_index,
           fe_index,
@@ -2464,7 +2464,7 @@ vertex_dof_index (const unsigned int vertex,
 {
   (void)vertex;
   Assert (vertex == 0, ExcIndexRange (vertex, 0, 1));
-  return dealii::internal::DoFAccessor::Implementation::get_vertex_dof_index (
+  return dealii::internal::DoFAccessorImplementation::Implementation::get_vertex_dof_index (
            *dof_handler,
            this->global_vertex_index,
            fe_index,
@@ -2480,7 +2480,7 @@ DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::
 dof_index (const unsigned int i,
            const unsigned int fe_index) const
 {
-  return dealii::internal::DoFAccessor::Implementation::get_vertex_dof_index
+  return dealii::internal::DoFAccessorImplementation::Implementation::get_vertex_dof_index
          (*this->dof_handler,
           this->vertex_index(0),
           fe_index,
@@ -2574,26 +2574,26 @@ DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::child (const unsign
 
 template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
 inline
-typename dealii::internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::line_iterator
+typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::line_iterator
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::line
 (const unsigned int /*c*/) const
 {
   Assert(false, ExcNotImplemented());
   return typename dealii::internal::
-         DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::line_iterator();
+         DoFHandlerImplementation::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::line_iterator();
 }
 
 
 
 template <template <int, int> class DoFHandlerType, int spacedim, bool level_dof_access>
 inline
-typename dealii::internal::DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::quad_iterator
+typename dealii::internal::DoFHandlerImplementation::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::quad_iterator
 DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::quad
 (const unsigned int /*c*/) const
 {
   Assert(false, ExcNotImplemented());
   return typename dealii::internal::
-         DoFHandler::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::quad_iterator();
+         DoFHandlerImplementation::Iterators<DoFHandlerType<1,spacedim>, level_dof_access>::quad_iterator();
 }
 
 
@@ -2631,7 +2631,7 @@ DoFAccessor<0,DoFHandlerType<1,spacedim>, level_dof_access>::operator !=
 
 namespace internal
 {
-  namespace DoFCellAccessor
+  namespace DoFCellAccessorImplementation
   {
     // make sure we refer to class
     // dealii::DoFCellAccessor, not
@@ -3385,7 +3385,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::parent () const
 
 namespace internal
 {
-  namespace DoFCellAccessor
+  namespace DoFCellAccessorImplementation
   {
     template <typename DoFHandlerType, bool level_dof_access>
     inline
@@ -3443,7 +3443,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::face (const unsigned int i) co
   Assert (i<GeometryInfo<dim>::faces_per_cell, ExcIndexRange (i, 0, GeometryInfo<dim>::faces_per_cell));
 
   const unsigned int dim = DoFHandlerType::dimension;
-  return dealii::internal::DoFCellAccessor::get_face (*this, i, std::integral_constant<int, dim>());
+  return dealii::internal::DoFCellAccessorImplementation::get_face (*this, i, std::integral_constant<int, dim>());
 }
 
 
@@ -3539,7 +3539,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::get_dof_values
   const types::global_dof_index *cache
     = this->dof_handler->levels[this->present_level]
       ->get_cell_cache_start (this->present_index, this->get_fe().dofs_per_cell);
-  dealii::internal::DoFAccessor::Implementation::extract_subvector_to(
+  dealii::internal::DoFAccessorImplementation::Implementation::extract_subvector_to(
     values, cache, cache + this->get_fe().dofs_per_cell, local_values_begin);
 }
 
@@ -3649,7 +3649,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::active_fe_index () const
                       "that are either locally owned or (after distributing "
                       "degrees of freedom) are ghost cells."));
 
-  return dealii::internal::DoFCellAccessor::Implementation::active_fe_index (*this);
+  return dealii::internal::DoFCellAccessorImplementation::Implementation::active_fe_index (*this);
 }
 
 
@@ -3676,7 +3676,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::set_active_fe_index (const uns
                       "will automatically be propagated from the owning process "
                       "of that cell, and there is no information at all on "
                       "artificial cells."));
-  dealii::internal::DoFCellAccessor::Implementation::set_active_fe_index (*this, i);
+  dealii::internal::DoFCellAccessorImplementation::Implementation::set_active_fe_index (*this, i);
 }
 
 
@@ -3690,7 +3690,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::distribute_local_to_global
 (const Vector<number> &local_source,
  OutputVector         &global_destination) const
 {
-  dealii::internal::DoFCellAccessor::Implementation::
+  dealii::internal::DoFCellAccessorImplementation::Implementation::
   distribute_local_to_global (*this, local_source.begin(),
                               local_source.end(), global_destination);
 }
@@ -3706,7 +3706,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::distribute_local_to_global
  ForwardIterator  local_source_end,
  OutputVector    &global_destination) const
 {
-  dealii::internal::DoFCellAccessor::Implementation::
+  dealii::internal::DoFCellAccessorImplementation::Implementation::
   distribute_local_to_global (*this, local_source_begin,
                               local_source_end, global_destination);
 }
@@ -3723,7 +3723,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::distribute_local_to_global
  ForwardIterator         local_source_end,
  OutputVector           &global_destination) const
 {
-  dealii::internal::DoFCellAccessor::Implementation::
+  dealii::internal::DoFCellAccessorImplementation::Implementation::
   distribute_local_to_global (*this, constraints, local_source_begin,
                               local_source_end, global_destination);
 }
@@ -3738,7 +3738,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::distribute_local_to_global
 (const FullMatrix<number> &local_source,
  OutputMatrix             &global_destination) const
 {
-  dealii::internal::DoFCellAccessor::Implementation::
+  dealii::internal::DoFCellAccessorImplementation::Implementation::
   distribute_local_to_global (*this,local_source,global_destination);
 }
 
@@ -3754,7 +3754,7 @@ DoFCellAccessor<DoFHandlerType,level_dof_access>::distribute_local_to_global
  OutputMatrix             &global_matrix,
  OutputVector             &global_vector) const
 {
-  dealii::internal::DoFCellAccessor::Implementation::
+  dealii::internal::DoFCellAccessorImplementation::Implementation::
   distribute_local_to_global (*this,local_matrix,local_vector,
                               global_matrix,global_vector);
 }

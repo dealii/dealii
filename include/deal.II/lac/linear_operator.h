@@ -30,7 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace LinearOperator
+  namespace LinearOperatorImplementation
   {
     class EmptyPayload;
   }
@@ -40,12 +40,12 @@ template <typename Number> class Vector;
 
 template <typename Range = Vector<double>,
           typename Domain = Range,
-          typename Payload = internal::LinearOperator::EmptyPayload>
+          typename Payload = internal::LinearOperatorImplementation::EmptyPayload>
 class LinearOperator;
 
 template <typename Range = Vector<double>,
           typename Domain = Range,
-          typename Payload = internal::LinearOperator::EmptyPayload,
+          typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
           typename OperatorExemplar,
           typename Matrix>
 LinearOperator<Range, Domain, Payload> linear_operator (const OperatorExemplar &,
@@ -53,13 +53,13 @@ LinearOperator<Range, Domain, Payload> linear_operator (const OperatorExemplar &
 
 template <typename Range = Vector<double>,
           typename Domain = Range,
-          typename Payload = internal::LinearOperator::EmptyPayload,
+          typename Payload = internal::LinearOperatorImplementation::EmptyPayload,
           typename Matrix>
 LinearOperator<Range, Domain, Payload> linear_operator (const Matrix &);
 
 template <typename Range = Vector<double>,
           typename Domain = Range,
-          typename Payload = internal::LinearOperator::EmptyPayload>
+          typename Payload = internal::LinearOperatorImplementation::EmptyPayload>
 LinearOperator<Range, Domain, Payload>
 null_operator(const LinearOperator<Range, Domain, Payload> &);
 
@@ -122,7 +122,7 @@ null_operator(const LinearOperator<Range, Domain, Payload> &);
  * For example: LinearOperator instances representing matrix inverses usually
  * require calling some linear solver. These solvers may not have interfaces
  * to the LinearOperator (which, for example, may represent a composite
- * operation). The TrilinosWrappers::internal::LinearOperator::TrilinosPayload
+ * operation). The TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload
  * therefore provides an interface extension to the LinearOperator so that it
  * can be passed to the solver and used by the solver as if it were a Trilinos
  * operator. This implies that all of the necessary functionality of the
@@ -743,7 +743,7 @@ inverse_operator(const LinearOperator<Range, Domain, Payload> &op,
  * @ingroup LAOperators
  */
 template <typename Range,
-          typename Payload = internal::LinearOperator::EmptyPayload>
+          typename Payload = internal::LinearOperatorImplementation::EmptyPayload>
 LinearOperator<Range, Range, Payload>
 identity_operator(const std::function<void(Range &, bool)> &reinit_vector)
 {
@@ -853,7 +853,7 @@ null_operator(const LinearOperator<Range, Domain, Payload> &op)
 
 namespace internal
 {
-  namespace LinearOperator
+  namespace LinearOperatorImplementation
   {
     /**
      * A helper class that is responsible for the initialization of a vector
@@ -1265,12 +1265,12 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
 
   return_op.reinit_range_vector = [&operator_exemplar](Range &v, bool omit_zeroing_entries)
   {
-    internal::LinearOperator::ReinitHelper<Range>::reinit_range_vector(operator_exemplar, v, omit_zeroing_entries);
+    internal::LinearOperatorImplementation::ReinitHelper<Range>::reinit_range_vector(operator_exemplar, v, omit_zeroing_entries);
   };
 
   return_op.reinit_domain_vector = [&operator_exemplar](Domain &v, bool omit_zeroing_entries)
   {
-    internal::LinearOperator::ReinitHelper<Domain>::reinit_domain_vector(operator_exemplar, v, omit_zeroing_entries);
+    internal::LinearOperatorImplementation::ReinitHelper<Domain>::reinit_domain_vector(operator_exemplar, v, omit_zeroing_entries);
   };
 
   typename std::conditional<

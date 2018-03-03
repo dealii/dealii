@@ -54,7 +54,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DoFHandler
+  namespace DoFHandlerImplementation
   {
     namespace Policy
     {
@@ -863,7 +863,7 @@ namespace parallel
       std::vector<bool>
       mark_locally_active_vertices_on_level(const int level) const;
 
-      template <typename> friend class dealii::internal::DoFHandler::Policy::ParallelDistributed;
+      template <typename> friend class dealii::internal::DoFHandlerImplementation::Policy::ParallelDistributed;
 
       template <int,int,class> friend class dealii::FETools::internal::ExtrapolateImplementation;
     };

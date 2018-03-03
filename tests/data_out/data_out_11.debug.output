@@ -1,4 +1,4 @@
 
-DEAL::Exceptions::DataOut::ExcInvalidNumberOfNames (deduced_names.size(), dof_handler->get_fe(0).n_components())
-DEAL::Exceptions::DataOut::ExcInvalidNumberOfNames (deduced_names.size(), dof_handler->get_fe(0).n_components())
+DEAL::Exceptions::DataOutImplementation::ExcInvalidNumberOfNames (deduced_names.size(), dof_handler->get_fe(0).n_components())
+DEAL::Exceptions::DataOutImplementation::ExcInvalidNumberOfNames (deduced_names.size(), dof_handler->get_fe(0).n_components())
 DEAL::OK

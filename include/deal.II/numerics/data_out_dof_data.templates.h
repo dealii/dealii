@@ -55,7 +55,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DataOut
+  namespace DataOutImplementation
   {
     template <int dim, int spacedim>
     ParallelDataBase<dim,spacedim>::
@@ -311,7 +311,7 @@ namespace internal
 
 namespace internal
 {
-  namespace DataOut
+  namespace DataOutImplementation
   {
     /**
      * Extract the specified component of a number. This template is used
@@ -395,10 +395,10 @@ namespace internal
         Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "0123456789_<>()") == std::string::npos,
-                Exceptions::DataOut::ExcInvalidCharacter (names[i],
-                                                          names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                                              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                                              "0123456789_<>()")));
+                Exceptions::DataOutImplementation::ExcInvalidCharacter (names[i],
+                    names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                               "0123456789_<>()")));
     }
 
 
@@ -425,10 +425,10 @@ namespace internal
         Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                            "0123456789_<>()") == std::string::npos,
-                Exceptions::DataOut::ExcInvalidCharacter (names[i],
-                                                          names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                                              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                                              "0123456789_<>()")));
+                Exceptions::DataOutImplementation::ExcInvalidCharacter (names[i],
+                    names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                               "0123456789_<>()")));
     }
 
 
@@ -911,9 +911,9 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
 attach_dof_handler (const DoFHandlerType &d)
 {
   Assert (dof_data.size() == 0,
-          Exceptions::DataOut::ExcOldDataStillPresent());
+          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
   Assert (cell_data.size() == 0,
-          Exceptions::DataOut::ExcOldDataStillPresent());
+          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,
   DoFHandlerType::space_dimension> >
@@ -929,9 +929,9 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::
 attach_triangulation (const Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> &tria)
 {
   Assert (dof_data.size() == 0,
-          Exceptions::DataOut::ExcOldDataStillPresent());
+          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
   Assert (cell_data.size() == 0,
-          Exceptions::DataOut::ExcOldDataStillPresent());
+          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation = SmartPointer<const Triangulation<DoFHandlerType::dimension,
   DoFHandlerType::space_dimension> >
@@ -965,12 +965,12 @@ add_data_vector (const DoFHandlerType                   &dof_handler,
     }
 
   Assert (vec.size() == dof_handler.n_dofs(),
-          Exceptions::DataOut::ExcInvalidVectorSize (vec.size(),
-                                                     dof_handler.n_dofs(),
-                                                     dof_handler.get_triangulation().n_active_cells()));
+          Exceptions::DataOutImplementation::ExcInvalidVectorSize (vec.size(),
+              dof_handler.n_dofs(),
+              dof_handler.get_triangulation().n_active_cells()));
 
 
-  auto new_entry = std_cxx14::make_unique<internal::DataOut::DataEntry<DoFHandlerType,VectorType>>
+  auto new_entry = std_cxx14::make_unique<internal::DataOutImplementation::DataEntry<DoFHandlerType,VectorType>>
                    (&dof_handler, &vec, &data_postprocessor);
   dof_data.emplace_back (std::move(new_entry));
 }
@@ -1058,18 +1058,18 @@ add_data_vector_internal
               ExcDimensionMismatch (data_vector.size(),
                                     triangulation->n_active_cells()));
       Assert (deduced_names.size() == 1,
-              Exceptions::DataOut::ExcInvalidNumberOfNames (deduced_names.size(), 1));
+              Exceptions::DataOutImplementation::ExcInvalidNumberOfNames (deduced_names.size(), 1));
       break;
     case type_dof_data:
       Assert (dof_handler != nullptr,
-              Exceptions::DataOut::ExcNoDoFHandlerSelected ());
+              Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected ());
       Assert (data_vector.size() == dof_handler->n_dofs(),
-              Exceptions::DataOut::ExcInvalidVectorSize (data_vector.size(),
-                                                         dof_handler->n_dofs(),
-                                                         triangulation->n_active_cells()));
+              Exceptions::DataOutImplementation::ExcInvalidVectorSize (data_vector.size(),
+                  dof_handler->n_dofs(),
+                  triangulation->n_active_cells()));
       Assert (deduced_names.size() == dof_handler->get_fe(0).n_components(),
-              Exceptions::DataOut::ExcInvalidNumberOfNames (deduced_names.size(),
-                                                            dof_handler->get_fe(0).n_components()));
+              Exceptions::DataOutImplementation::ExcInvalidNumberOfNames (deduced_names.size(),
+                  dof_handler->get_fe(0).n_components()));
       break;
     default:
       Assert (false, ExcInternalError());
@@ -1084,7 +1084,7 @@ add_data_vector_internal
        (deduced_names.size(), DataComponentInterpretation::component_is_scalar));
 
   // finally, add the data vector:
-  auto new_entry = std_cxx14::make_unique<internal::DataOut::DataEntry<DoFHandlerType,VectorType>>
+  auto new_entry = std_cxx14::make_unique<internal::DataOutImplementation::DataEntry<DoFHandlerType,VectorType>>
                    (dof_handler, &data_vector, deduced_names, data_component_interpretation);
 
   if (actual_type == type_dof_data)
@@ -1173,7 +1173,7 @@ get_dataset_names () const
   // collect the names of dof
   // and cell data
   typedef
-  typename std::vector<std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >::const_iterator
+  typename std::vector<std::shared_ptr<internal::DataOutImplementation::DataEntryBase<DoFHandlerType> > >::const_iterator
   data_iterator;
 
   for (data_iterator  d=dof_data.begin();
@@ -1213,7 +1213,7 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_vector_data_range
 
   // collect the ranges of dof and cell data
   typedef
-  typename std::vector<std::shared_ptr<internal::DataOut::DataEntryBase<DoFHandlerType> > >::const_iterator
+  typename std::vector<std::shared_ptr<internal::DataOutImplementation::DataEntryBase<DoFHandlerType> > >::const_iterator
   data_iterator;
 
   unsigned int output_component = 0;
@@ -1233,14 +1233,14 @@ DataOut_DoFData<DoFHandlerType,patch_dim,patch_space_dim>::get_vector_data_range
           // deal with vectors
           Assert (i+patch_space_dim <=
                   (*d)->n_output_variables,
-                  Exceptions::DataOut::ExcInvalidVectorDeclaration (i,
-                                                                    (*d)->names[i]));
+                  Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration (i,
+                      (*d)->names[i]));
           for (unsigned int dd=1; dd<patch_space_dim; ++dd)
             Assert ((*d)->data_component_interpretation[i+dd]
                     ==
                     DataComponentInterpretation::component_is_part_of_vector,
-                    Exceptions::DataOut::ExcInvalidVectorDeclaration (i,
-                                                                      (*d)->names[i]));
+                    Exceptions::DataOutImplementation::ExcInvalidVectorDeclaration (i,
+                        (*d)->names[i]));
 
           // all seems alright, so figure out
           // whether there is a common name
@@ -1311,7 +1311,7 @@ std::vector<std::shared_ptr<dealii::hp::FECollection<DoFHandlerType::dimension,
   for (unsigned int i=0; i<this->dof_data.size(); ++i)
     {
       Assert (dof_data[i]->dof_handler != nullptr,
-              Exceptions::DataOut::ExcNoDoFHandlerSelected ());
+              Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected ());
 
       // avoid creating too many finite elements and doing a lot of work on
       // initializing FEValues downstream: if two DoFHandlers are the same

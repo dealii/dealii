@@ -963,21 +963,21 @@ protected:
   get_data (const UpdateFlags                                                    update_flags,
             const Mapping<dim,spacedim>                                         &mapping,
             const Quadrature<dim>                                               &quadrature,
-            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_face_data (const UpdateFlags                                                    update_flags,
                  const Mapping<dim,spacedim>                                         &mapping,
                  const Quadrature<dim-1>                                             &quadrature,
-                 dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                 dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   typename FiniteElement<dim,spacedim>::InternalDataBase *
   get_subface_data (const UpdateFlags                                                    update_flags,
                     const Mapping<dim,spacedim>                                         &mapping,
                     const Quadrature<dim-1>                                             &quadrature,
-                    dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                    dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
@@ -986,9 +986,9 @@ protected:
                   const Quadrature<dim>                                               &quadrature,
                   const Mapping<dim,spacedim>                                         &mapping,
                   const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                  const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                   const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
@@ -997,9 +997,9 @@ protected:
                        const Quadrature<dim-1>                                             &quadrature,
                        const Mapping<dim,spacedim>                                         &mapping,
                        const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                       const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                       const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                        const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                       dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
@@ -1009,9 +1009,9 @@ protected:
                           const Quadrature<dim-1>                                             &quadrature,
                           const Mapping<dim,spacedim>                                         &mapping,
                           const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                          const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                          const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                           const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   /**
    * Do the work for the three <tt>fill_fe*_values</tt> functions.
@@ -1032,8 +1032,8 @@ protected:
                      const CellSimilarity::Similarity                   cell_similarity,
                      const typename Mapping<dim,spacedim>::InternalDataBase &mapping_internal,
                      const typename FiniteElement<dim,spacedim>::InternalDataBase &fe_data,
-                     const internal::FEValues::MappingRelatedData<dim,spacedim> &mapping_data,
-                     internal::FEValues::FiniteElementRelatedData<dim,spacedim> &output_data) const;
+                     const internal::FEValuesImplementation::MappingRelatedData<dim,spacedim> &mapping_data,
+                     internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &output_data) const;
 
 private:
 
@@ -1129,7 +1129,7 @@ private:
      * <code>base_no</code>th base element will write its output when calling
      * FiniteElement::fill_fe_values() and similar functions.
      */
-    internal::FEValues::FiniteElementRelatedData<dim,spacedim> &
+    internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> &
     get_fe_output_object (const unsigned int base_no) const;
 
   private:
@@ -1154,7 +1154,7 @@ private:
      * The size of this vector is set to @p n_base_elements by the
      * InternalData constructor.
      */
-    mutable std::vector<internal::FEValues::FiniteElementRelatedData<dim,spacedim> > base_fe_output_objects;
+    mutable std::vector<internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim> > base_fe_output_objects;
   };
 
   /*

@@ -282,7 +282,7 @@ TriaAccessorBase<structdim,dim,spacedim>::operator -- ()
 
 namespace internal
 {
-  namespace TriaAccessorBase
+  namespace TriaAccessorBaseImplementation
   {
     /**
      * Out of a face object, get the sub-objects of dimensionality given by
@@ -290,8 +290,8 @@ namespace internal
      */
     template <int dim>
     inline
-    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<1> > *
-    get_objects (dealii::internal::Triangulation::TriaFaces<dim> *faces,
+    dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<1> > *
+    get_objects (dealii::internal::TriangulationImplementation::TriaFaces<dim> *faces,
                  const std::integral_constant<int, 1>)
     {
       return &faces->lines;
@@ -300,16 +300,16 @@ namespace internal
 
     template <int dim>
     inline
-    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<2> > *
-    get_objects (dealii::internal::Triangulation::TriaFaces<dim> *faces,
+    dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<2> > *
+    get_objects (dealii::internal::TriangulationImplementation::TriaFaces<dim> *faces,
                  const std::integral_constant<int, 2>)
     {
       return &faces->quads;
     }
 
     inline
-    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<1> > *
-    get_objects (dealii::internal::Triangulation::TriaFaces<1> *,
+    dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<1> > *
+    get_objects (dealii::internal::TriangulationImplementation::TriaFaces<1> *,
                  const std::integral_constant<int, 1>)
     {
       Assert (false, ExcInternalError());
@@ -317,8 +317,8 @@ namespace internal
     }
 
     inline
-    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<2> > *
-    get_objects (dealii::internal::Triangulation::TriaFaces<2> *,
+    dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<2> > *
+    get_objects (dealii::internal::TriangulationImplementation::TriaFaces<2> *,
                  const std::integral_constant<int, 2>)
     {
       Assert (false, ExcInternalError());
@@ -326,8 +326,8 @@ namespace internal
     }
 
     inline
-    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<3> > *
-    get_objects (dealii::internal::Triangulation::TriaFaces<3> *,
+    dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<3> > *
+    get_objects (dealii::internal::TriangulationImplementation::TriaFaces<3> *,
                  const std::integral_constant<int, 3>)
     {
       Assert (false, ExcInternalError());
@@ -340,8 +340,8 @@ namespace internal
      */
     template <int dim>
     inline
-    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<3> > *
-    get_objects (dealii::internal::Triangulation::TriaFaces<dim> *,
+    dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<3> > *
+    get_objects (dealii::internal::TriangulationImplementation::TriaFaces<dim> *,
                  const std::integral_constant<int, 3>)
     {
       Assert (false, ExcInternalError());
@@ -353,8 +353,8 @@ namespace internal
      */
     template <int structdim, int dim>
     inline
-    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<structdim> > *
-    get_objects (dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<dim> > *,
+    dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<structdim> > *
+    get_objects (dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<dim> > *,
                  const std::integral_constant<int, structdim>)
     {
       Assert (false, ExcInternalError());
@@ -363,8 +363,8 @@ namespace internal
 
     template <int dim>
     inline
-    dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<dim> > *
-    get_objects (dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<dim> > *cells,
+    dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<dim> > *
+    get_objects (dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<dim> > *cells,
                  const std::integral_constant<int, dim>)
     {
       return cells;
@@ -376,18 +376,18 @@ namespace internal
 
 template <int structdim, int dim, int spacedim>
 inline
-dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<structdim> > &
+dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<structdim> > &
 TriaAccessorBase<structdim,dim,spacedim>::objects() const
 {
   if (structdim != dim)
     // get sub-objects. note that the
     // current class is only used for
     // objects that are *not* cells
-    return *dealii::internal::TriaAccessorBase::get_objects (this->tria->faces.get(),
-                                                             std::integral_constant<int, structdim> ());
+    return *dealii::internal::TriaAccessorBaseImplementation::get_objects (this->tria->faces.get(),
+           std::integral_constant<int, structdim> ());
   else
-    return *dealii::internal::TriaAccessorBase::get_objects (&this->tria->levels[this->present_level]->cells,
-                                                             std::integral_constant<int, structdim> ());
+    return *dealii::internal::TriaAccessorBaseImplementation::get_objects (&this->tria->levels[this->present_level]->cells,
+           std::integral_constant<int, structdim> ());
 }
 
 
@@ -535,24 +535,24 @@ InvalidAccessor<structdim, dim, spacedim>::vertex (const unsigned int) const
 
 template <int structdim, int dim, int spacedim>
 inline
-typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::line_iterator
 InvalidAccessor<structdim, dim, spacedim>::line (const unsigned int) const
 {
   // nothing to do here. we could throw an exception but we can't get here
   // without first creating an object which would have already thrown
-  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator();
+  return typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::line_iterator();
 }
 
 
 
 template <int structdim, int dim, int spacedim>
 inline
-typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::quad_iterator
 InvalidAccessor<structdim, dim, spacedim>::quad (const unsigned int) const
 {
   // nothing to do here. we could throw an exception but we can't get here
   // without first creating an object which would have already thrown
-  return dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator();
+  return dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::quad_iterator();
 }
 
 
@@ -561,7 +561,7 @@ InvalidAccessor<structdim, dim, spacedim>::quad (const unsigned int) const
 
 namespace internal
 {
-  namespace TriaAccessor
+  namespace TriaAccessorImplementation
   {
     // make sure that if in the following we
     // write TriaAccessor
@@ -1242,7 +1242,7 @@ vertex_index (const unsigned int corner) const
   Assert (corner<GeometryInfo<structdim>::vertices_per_cell,
           ExcIndexRange(corner,0,GeometryInfo<structdim>::vertices_per_cell));
 
-  return dealii::internal::TriaAccessor::Implementation::vertex_index (*this, corner);
+  return dealii::internal::TriaAccessorImplementation::Implementation::vertex_index (*this, corner);
 }
 
 
@@ -1259,11 +1259,11 @@ TriaAccessor<structdim, dim, spacedim>::vertex (const unsigned int i) const
 
 template <int structdim, int dim, int spacedim>
 inline
-typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::line_iterator
 TriaAccessor<structdim,dim,spacedim>::line (const unsigned int i) const
 {
   // checks happen in line_index
-  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+  return typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::line_iterator
          (this->tria, 0, line_index (i));
 }
 
@@ -1277,7 +1277,7 @@ TriaAccessor<structdim,dim,spacedim>::line_index (const unsigned int i) const
   Assert (i < GeometryInfo<structdim>::lines_per_cell,
           ExcIndexRange (i, 0, GeometryInfo<structdim>::lines_per_cell));
 
-  return dealii::internal::TriaAccessor::Implementation::line_index (*this, i);
+  return dealii::internal::TriaAccessorImplementation::Implementation::line_index (*this, i);
 }
 
 
@@ -1285,11 +1285,11 @@ TriaAccessor<structdim,dim,spacedim>::line_index (const unsigned int i) const
 
 template <int structdim, int dim, int spacedim>
 inline
-typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::quad_iterator
 TriaAccessor<structdim,dim,spacedim>::quad (const unsigned int i) const
 {
   // checks happen in quad_index
-  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+  return typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::quad_iterator
          (this->tria, 0, quad_index (i));
 }
 
@@ -1300,7 +1300,7 @@ inline
 unsigned int
 TriaAccessor<structdim,dim,spacedim>::quad_index (const unsigned int i) const
 {
-  return dealii::internal::TriaAccessor::Implementation::quad_index (*this, i);
+  return dealii::internal::TriaAccessorImplementation::Implementation::quad_index (*this, i);
 }
 
 
@@ -1312,7 +1312,7 @@ TriaAccessor<structdim,dim,spacedim>::face_orientation (const unsigned int face)
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  return dealii::internal::TriaAccessor::Implementation::face_orientation (*this, face);
+  return dealii::internal::TriaAccessorImplementation::Implementation::face_orientation (*this, face);
 }
 
 
@@ -1324,7 +1324,7 @@ TriaAccessor<structdim,dim,spacedim>::face_flip (const unsigned int face) const
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  return dealii::internal::TriaAccessor::Implementation::face_flip (*this, face);
+  return dealii::internal::TriaAccessorImplementation::Implementation::face_flip (*this, face);
 }
 
 
@@ -1335,7 +1335,7 @@ TriaAccessor<structdim,dim,spacedim>::face_rotation (const unsigned int face) co
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  return dealii::internal::TriaAccessor::Implementation::face_rotation (*this, face);
+  return dealii::internal::TriaAccessorImplementation::Implementation::face_rotation (*this, face);
 }
 
 
@@ -1349,7 +1349,7 @@ TriaAccessor<structdim,dim,spacedim>::line_orientation (const unsigned int line)
   Assert (line<GeometryInfo<structdim>::lines_per_cell,
           ExcIndexRange (line, 0, GeometryInfo<structdim>::lines_per_cell));
 
-  return dealii::internal::TriaAccessor::Implementation::line_orientation (*this, line);
+  return dealii::internal::TriaAccessorImplementation::Implementation::line_orientation (*this, line);
 }
 
 
@@ -1362,7 +1362,7 @@ TriaAccessor<structdim,dim,spacedim>::set_face_orientation (const unsigned int f
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  dealii::internal::TriaAccessor::Implementation::set_face_orientation (*this, face, value);
+  dealii::internal::TriaAccessorImplementation::Implementation::set_face_orientation (*this, face, value);
 }
 
 
@@ -1375,7 +1375,7 @@ TriaAccessor<structdim,dim,spacedim>::set_face_flip (const unsigned int face,
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  dealii::internal::TriaAccessor::Implementation::set_face_flip (*this, face, value);
+  dealii::internal::TriaAccessorImplementation::Implementation::set_face_flip (*this, face, value);
 }
 
 
@@ -1387,7 +1387,7 @@ TriaAccessor<structdim,dim,spacedim>::set_face_rotation (const unsigned int face
 {
   Assert (used(), TriaAccessorExceptions::ExcCellNotUsed());
 
-  dealii::internal::TriaAccessor::Implementation::set_face_rotation (*this, face, value);
+  dealii::internal::TriaAccessorImplementation::Implementation::set_face_rotation (*this, face, value);
 }
 
 
@@ -1402,7 +1402,7 @@ TriaAccessor<structdim,dim,spacedim>::set_line_orientation (const unsigned int l
   Assert (line<GeometryInfo<structdim>::lines_per_cell,
           ExcIndexRange (line, 0, GeometryInfo<structdim>::lines_per_cell));
 
-  dealii::internal::TriaAccessor::Implementation::set_line_orientation (*this, line, value);
+  dealii::internal::TriaAccessorImplementation::Implementation::set_line_orientation (*this, line, value);
 }
 
 
@@ -2493,10 +2493,10 @@ TriaAccessor<0, dim, spacedim>::vertex (const unsigned int) const
 
 template <int dim, int spacedim>
 inline
-typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::line_iterator
 TriaAccessor<0, dim, spacedim>::line (const unsigned int)
 {
-  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator();
+  return typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::line_iterator();
 }
 
 
@@ -2514,10 +2514,10 @@ TriaAccessor<0, dim, spacedim>::line_index (const unsigned int)
 
 template <int dim, int spacedim>
 inline
-typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::quad_iterator
 TriaAccessor<0, dim, spacedim>::quad (const unsigned int)
 {
-  return typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator();
+  return typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::quad_iterator();
 }
 
 
@@ -2898,10 +2898,10 @@ TriaAccessor<0, 1, spacedim>::center () const
 
 template <int spacedim>
 inline
-typename dealii::internal::Triangulation::Iterators<1,spacedim>::line_iterator
+typename dealii::internal::TriangulationImplementation::Iterators<1,spacedim>::line_iterator
 TriaAccessor<0, 1, spacedim>::line (const unsigned int)
 {
-  return typename dealii::internal::Triangulation::Iterators<1,spacedim>::line_iterator();
+  return typename dealii::internal::TriangulationImplementation::Iterators<1,spacedim>::line_iterator();
 }
 
 
@@ -2917,10 +2917,10 @@ TriaAccessor<0, 1, spacedim>::line_index (const unsigned int)
 
 template <int spacedim>
 inline
-typename dealii::internal::Triangulation::Iterators<1,spacedim>::quad_iterator
+typename dealii::internal::TriangulationImplementation::Iterators<1,spacedim>::quad_iterator
 TriaAccessor<0, 1, spacedim>::quad (const unsigned int)
 {
-  return typename dealii::internal::Triangulation::Iterators<1,spacedim>::quad_iterator();
+  return typename dealii::internal::TriangulationImplementation::Iterators<1,spacedim>::quad_iterator();
 }
 
 
@@ -3180,7 +3180,7 @@ CellAccessor<dim,spacedim>::CellAccessor (const TriaAccessor<dim,dim,spacedim> &
 
 namespace internal
 {
-  namespace CellAccessor
+  namespace CellAccessorImplementation
   {
     template <int spacedim>
     inline
@@ -3232,7 +3232,7 @@ inline
 TriaIterator<TriaAccessor<dim-1, dim, spacedim> >
 CellAccessor<dim,spacedim>::face (const unsigned int i) const
 {
-  return dealii::internal::CellAccessor::get_face (*this, i);
+  return dealii::internal::CellAccessorImplementation::get_face (*this, i);
 }
 
 

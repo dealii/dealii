@@ -1671,7 +1671,7 @@ AdditionalData (const double relaxation)
 
 namespace internal
 {
-  namespace PreconditionChebyshev
+  namespace PreconditionChebyshevImplementation
   {
     // for deal.II vectors, perform updates for Chebyshev preconditioner all
     // at once to reduce memory transfer. Here, we select between general
@@ -1796,11 +1796,11 @@ namespace internal
         :
         updater (updater)
       {
-        if (size < internal::Vector::minimum_parallel_grain_size)
+        if (size < internal::VectorImplementation::minimum_parallel_grain_size)
           apply_to_subrange (0, size);
         else
           apply_parallel (0, size,
-                          internal::Vector::minimum_parallel_grain_size);
+                          internal::VectorImplementation::minimum_parallel_grain_size);
       }
 
       ~VectorUpdatesRange() = default;
@@ -2004,9 +2004,9 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::initialize
 {
   matrix_ptr = &matrix;
   data = additional_data;
-  internal::PreconditionChebyshev::initialize_preconditioner(matrix,
-                                                             data.preconditioner,
-                                                             data.matrix_diagonal_inverse);
+  internal::PreconditionChebyshevImplementation::initialize_preconditioner(matrix,
+      data.preconditioner,
+      data.matrix_diagonal_inverse);
   eigenvalues_are_initialized = false;
 }
 
@@ -2059,15 +2059,15 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>::estimate_eigenv
                                 std::sqrt(std::numeric_limits<typename VectorType::value_type>::epsilon()),
                                 1e-10, false, false);
 
-      internal::PreconditionChebyshev::EigenvalueTracker eigenvalue_tracker;
+      internal::PreconditionChebyshevImplementation::EigenvalueTracker eigenvalue_tracker;
       SolverCG<VectorType> solver (control);
-      solver.connect_eigenvalues_slot(std::bind(&internal::PreconditionChebyshev::EigenvalueTracker::slot,
+      solver.connect_eigenvalues_slot(std::bind(&internal::PreconditionChebyshevImplementation::EigenvalueTracker::slot,
                                                 &eigenvalue_tracker,
                                                 std::placeholders::_1));
 
       // set an initial guess which is close to the constant vector but where
       // one entry is different to trigger high frequencies
-      internal::PreconditionChebyshev::set_initial_guess(update2);
+      internal::PreconditionChebyshevImplementation::set_initial_guess(update2);
 
       try
         {
@@ -2149,7 +2149,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
       const double rhokp = 1./(2.*sigma-rhok);
       const double factor1 = rhokp * rhok, factor2 = 2.*rhokp/delta;
       rhok = rhokp;
-      internal::PreconditionChebyshev::vector_updates
+      internal::PreconditionChebyshevImplementation::vector_updates
       (src, *data.preconditioner, false, factor1, factor2, update1, update2, update3, dst);
     }
 }
@@ -2170,7 +2170,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
       const double rhokp = 1./(2.*sigma-rhok);
       const double factor1 = rhokp * rhok, factor2 = 2.*rhokp/delta;
       rhok = rhokp;
-      internal::PreconditionChebyshev::vector_updates
+      internal::PreconditionChebyshevImplementation::vector_updates
       (src, *data.preconditioner, false, factor1, factor2, update1, update2, update3, dst);
     }
 }
@@ -2188,7 +2188,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
   if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(src);
 
-  internal::PreconditionChebyshev::vector_updates
+  internal::PreconditionChebyshevImplementation::vector_updates
   (src, *data.preconditioner, true, 0., 1./theta, update1, update2, update3, dst);
 
   do_chebyshev_loop(dst, src);
@@ -2207,7 +2207,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
   if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(src);
 
-  internal::PreconditionChebyshev::vector_updates
+  internal::PreconditionChebyshevImplementation::vector_updates
   (src, *data.preconditioner, true, 0., 1./theta, update1, update2, update3, dst);
 
   do_transpose_chebyshev_loop(dst, src);
@@ -2227,7 +2227,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
     estimate_eigenvalues(src);
 
   matrix_ptr->vmult (update2, dst);
-  internal::PreconditionChebyshev::vector_updates
+  internal::PreconditionChebyshevImplementation::vector_updates
   (src, *data.preconditioner, false, 0., 1./theta, update1, update2, update3, dst);
 
   do_chebyshev_loop(dst, src);
@@ -2247,7 +2247,7 @@ PreconditionChebyshev<MatrixType,VectorType,PreconditionerType>
     estimate_eigenvalues(src);
 
   matrix_ptr->Tvmult (update2, dst);
-  internal::PreconditionChebyshev::vector_updates
+  internal::PreconditionChebyshevImplementation::vector_updates
   (src, *data.preconditioner, false, 0., 1./theta, update1, update2, update3, dst);
 
   do_transpose_chebyshev_loop(dst, src);

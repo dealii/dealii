@@ -141,7 +141,7 @@ eigenvalues (const SymmetricTensor<2,3,Number> &T)
 
 namespace internal
 {
-  namespace SymmetricTensor
+  namespace SymmetricTensorImplementation
   {
     template <int dim, typename Number>
     void

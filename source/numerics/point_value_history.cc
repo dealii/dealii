@@ -37,7 +37,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace PointValueHistory
+  namespace PointValueHistoryImplementation
   {
 /// Only a constructor needed for this class (a struct really)
     template <int dim>
@@ -298,7 +298,7 @@ void PointValueHistory<dim>
       .push_back (local_dof_indices[current_fe_index [component]]);
     }
 
-  internal::PointValueHistory::PointGeometryData<dim>
+  internal::PointValueHistoryImplementation::PointGeometryData<dim>
   new_point_geometry_data (location, current_points, new_solution_indices);
   point_geometry_data.push_back (new_point_geometry_data);
 
@@ -415,7 +415,7 @@ void PointValueHistory<dim>
           new_solution_indices.push_back (local_dof_indices[current_fe_index[point][component]]);
         }
 
-      internal::PointValueHistory::PointGeometryData<dim> new_point_geometry_data (locations[point], current_points[point], new_solution_indices);
+      internal::PointValueHistoryImplementation::PointGeometryData<dim> new_point_geometry_data (locations[point], current_points[point], new_solution_indices);
 
       point_geometry_data.push_back (new_point_geometry_data);
 
@@ -578,7 +578,7 @@ PointValueHistory<dim>::evaluate_field (const std::string &vector_name,
 
   unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_fe(0).n_components ());
 
-  typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
+  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
     {
       // Look up the components to add
@@ -653,7 +653,7 @@ PointValueHistory<dim>::evaluate_field (const std::vector <std::string> &vector_
                                 Tensor< 2, dim, typename VectorType::value_type >()));
 
   // Loop over points and find correct cell
-  typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
+  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
     {
       // we now have a point to query, need to know what cell it is in
@@ -839,7 +839,7 @@ void PointValueHistory<dim>
 
   unsigned int n_stored = mask->second.n_selected_components(dof_handler->get_fe(0).n_components ());
 
-  typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
+  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   Vector <number> value (dof_handler->get_fe(0).n_components());
   for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
     {
@@ -967,7 +967,7 @@ void PointValueHistory<dim>
       // the number of dofs has changed.
       //AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
 
-      typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
+      typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
       for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
         {
           // for each point, open a file to
@@ -1087,7 +1087,7 @@ Vector<double> PointValueHistory<dim>
 
   Vector<double> dof_vector (dof_handler->n_dofs ());
 
-  typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
+  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   for (; point != point_geometry_data.end (); ++point)
     {
       for (unsigned int component = 0; component < dof_handler->get_fe(0).n_components (); component++)
@@ -1108,7 +1108,7 @@ void PointValueHistory<dim>
   AssertThrow (!triangulation_changed, ExcDoFHandlerChanged ());
 
   std::vector <std::vector <Point <dim> > > actual_points;
-  typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
+  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
 
   for (; point != point_geometry_data.end (); ++point)
     {
@@ -1140,7 +1140,7 @@ void PointValueHistory<dim>
   std::vector<Point<dim> > evaluation_points;
 
   // Loop over points and find correct cell
-  typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
+  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   for (unsigned int data_store_index = 0; point != point_geometry_data.end (); ++point, ++data_store_index)
     {
       // we now have a point to query,
@@ -1178,7 +1178,7 @@ void PointValueHistory<dim>
   out << "Have_dof_handler: " << have_dof_handler << "\n";
   out << "Geometric Data" << "\n";
 
-  typename std::vector <internal::PointValueHistory::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
+  typename std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >::iterator point = point_geometry_data.begin ();
   if (point == point_geometry_data.end ())
     {
       out << "No points stored currently\n";

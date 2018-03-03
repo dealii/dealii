@@ -164,7 +164,7 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<nu
     const std::vector<std::string> &names)
 {
   Assert (dof_handler != nullptr,
-          Exceptions::DataOut::ExcNoDoFHandlerSelected ());
+          Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected ());
   // either cell data and one name,
   // or dof data and n_components names
   Assert (((vec.size() == dof_handler->get_triangulation().n_active_cells()) &&
@@ -172,16 +172,16 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::add_data_vector (const Vector<nu
           ||
           ((vec.size() == dof_handler->n_dofs()) &&
            (names.size() == dof_handler->get_fe(0).n_components())),
-          Exceptions::DataOut::ExcInvalidNumberOfNames (names.size(),
-                                                        dof_handler->get_fe(0).n_components()));
+          Exceptions::DataOutImplementation::ExcInvalidNumberOfNames (names.size(),
+              dof_handler->get_fe(0).n_components()));
   for (unsigned int i=0; i<names.size(); ++i)
     Assert (names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                        "0123456789_<>()") == std::string::npos,
-            Exceptions::DataOut::ExcInvalidCharacter (names[i],
-                                                      names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
-                                                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                                          "0123456789_<>()")));
+            Exceptions::DataOutImplementation::ExcInvalidCharacter (names[i],
+                names[i].find_first_not_of("abcdefghijklmnopqrstuvwxyz"
+                                           "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                           "0123456789_<>()")));
 
   if (vec.size() == dof_handler->n_dofs())
     {
@@ -237,9 +237,9 @@ void DataOutStack<dim,spacedim,DoFHandlerType>::build_patches (const unsigned in
                                 : this->default_subdivisions;
 
   Assert (n_subdivisions >= 1,
-          Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
+          Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(n_subdivisions));
   Assert (dof_handler != nullptr,
-          Exceptions::DataOut::ExcNoDoFHandlerSelected());
+          Exceptions::DataOutImplementation::ExcNoDoFHandlerSelected());
 
   this->validate_dataset_names();
 

@@ -181,7 +181,7 @@ void evaluate_ops (const TrilinosWrappers::BlockSparseMatrix &matrix,
   const double tol = 1e-12;
   typedef dealii::TrilinosWrappers::SparseMatrix MatrixType;
   typedef dealii::TrilinosWrappers::MPI::Vector  VectorType;
-  typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PayloadType;
+  typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload PayloadType;
   typedef typename PayloadType::VectorType       PayloadVectorType;
   typedef dealii::types::global_dof_index        size_type;
 

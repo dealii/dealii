@@ -191,7 +191,7 @@ private:
 
 namespace internal
 {
-  namespace MatrixOut
+  namespace MatrixOutImplementation
   {
     namespace
     {
@@ -287,9 +287,9 @@ MatrixOut::get_gridpoint_value (const Matrix   &matrix,
   if (options.block_size == 1)
     {
       if (options.show_absolute_values == true)
-        return std::fabs(internal::MatrixOut::get_element (matrix, i, j));
+        return std::fabs(internal::MatrixOutImplementation::get_element (matrix, i, j));
       else
-        return internal::MatrixOut::get_element (matrix, i, j);
+        return internal::MatrixOutImplementation::get_element (matrix, i, j);
     }
 
   // if blocksize greater than one,
@@ -303,9 +303,9 @@ MatrixOut::get_gridpoint_value (const Matrix   &matrix,
          col < std::min(size_type(matrix.m()),
                         size_type((j+1)*options.block_size)); ++col, ++n_elements)
       if (options.show_absolute_values == true)
-        average += std::fabs(internal::MatrixOut::get_element (matrix, row, col));
+        average += std::fabs(internal::MatrixOutImplementation::get_element (matrix, row, col));
       else
-        average += internal::MatrixOut::get_element (matrix, row, col);
+        average += internal::MatrixOutImplementation::get_element (matrix, row, col);
   average /= n_elements;
   return average;
 }

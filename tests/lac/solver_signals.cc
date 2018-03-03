@@ -65,7 +65,7 @@ void output_hessenberg_matrix(const FullMatrix<NUMBER> &H,const std::string &tex
 }
 
 template <class NUMBER>
-void output_arnoldi_vectors_norms(const internal::SolverGMRES::TmpVectors<Vector<NUMBER> > &tmp_vector,const std::string &text)
+void output_arnoldi_vectors_norms(const internal::SolverGMRESImplementation::TmpVectors<Vector<NUMBER> > &tmp_vector,const std::string &text)
 {
   deallog << text << std::endl;
   for (unsigned int i=0; i<tmp_vector.size(); ++i)

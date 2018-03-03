@@ -97,7 +97,7 @@ DoFCellAccessor<DoFHandlerType,lda>::update_cell_dof_indices_cache () const
 
   Assert (this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
 
-  internal::DoFCellAccessor::Implementation::
+  internal::DoFCellAccessorImplementation::Implementation::
   update_cell_dof_indices_cache (*this);
 }
 
@@ -112,7 +112,7 @@ DoFCellAccessor<DoFHandlerType,lda>::set_dof_indices (const std::vector<types::g
 
   Assert (this->dof_handler != nullptr, typename BaseClass::ExcInvalidObject());
 
-  internal::DoFCellAccessor::Implementation::
+  internal::DoFCellAccessorImplementation::Implementation::
   set_dof_indices (*this, local_dof_indices);
 }
 

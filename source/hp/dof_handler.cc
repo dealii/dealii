@@ -65,7 +65,7 @@ namespace internal
 {
   namespace hp
   {
-    namespace DoFHandler
+    namespace DoFHandlerImplementation
     {
       // access class dealii::hp::DoFHandler instead of namespace
       // internal::hp::DoFHandler, etc
@@ -967,11 +967,11 @@ namespace hp
   {
     // decide whether we need a sequential or a parallel shared/distributed policy
     if (dynamic_cast<const parallel::shared::Triangulation< dim, spacedim>*> (&*this->tria) != nullptr)
-      policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
+      policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::ParallelShared<DoFHandler<dim,spacedim> >> (*this);
     else if (dynamic_cast<const parallel::distributed::Triangulation< dim, spacedim >*> (&*this->tria) != nullptr)
-      policy = std_cxx14::make_unique<internal::DoFHandler::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
+      policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::ParallelDistributed<DoFHandler<dim,spacedim> >> (*this);
     else
-      policy = std_cxx14::make_unique<internal::DoFHandler::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
+      policy = std_cxx14::make_unique<internal::DoFHandlerImplementation::Policy::Sequential<DoFHandler<dim,spacedim> >> (*this);
 
     create_active_fe_table ();
 
@@ -1284,7 +1284,7 @@ namespace hp
 
     // at the beginning, make sure every processor knows the
     // active_fe_indices on both its own cells and all ghost cells
-    dealii::internal::hp::DoFHandler::Implementation::communicate_active_fe_indices (*this);
+    dealii::internal::hp::DoFHandlerImplementation::Implementation::communicate_active_fe_indices (*this);
 
     // If an underlying shared::Tria allows artificial cells,
     // then save the current set of subdomain ids, and set
@@ -1325,7 +1325,7 @@ namespace hp
 
 
     // then allocate space for all the other tables
-    dealii::internal::hp::DoFHandler::Implementation::reserve_space (*this);
+    dealii::internal::hp::DoFHandlerImplementation::Implementation::reserve_space (*this);
 
 
     // now undo the subdomain modification
@@ -1448,7 +1448,7 @@ namespace hp
   DoFHandler<dim, spacedim>::max_couplings_between_dofs () const
   {
     Assert (finite_elements != nullptr, ExcNoFESelected());
-    return dealii::internal::hp::DoFHandler::Implementation::max_couplings_between_dofs (*this);
+    return dealii::internal::hp::DoFHandlerImplementation::Implementation::max_couplings_between_dofs (*this);
   }
 
 

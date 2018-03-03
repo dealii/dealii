@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
     template <class G>
     void

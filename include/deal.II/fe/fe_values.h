@@ -2985,7 +2985,7 @@ protected:
    * An object into which the Mapping::fill_fe_values() and similar functions
    * place their output.
    */
-  dealii::internal::FEValues::MappingRelatedData<dim, spacedim> mapping_output;
+  dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> mapping_output;
 
 
   /**
@@ -3005,7 +3005,7 @@ protected:
    * An object into which the FiniteElement::fill_fe_values() and similar
    * functions place their output.
    */
-  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> finite_element_output;
+  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> finite_element_output;
 
 
   /**

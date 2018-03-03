@@ -58,7 +58,7 @@ template <int, int, int> class TriaAccessorBase;
 
 namespace internal
 {
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
     template <int dim> class TriaLevel;
     template <int dim> class TriaFaces;
@@ -73,7 +73,7 @@ namespace internal
     struct Implementation;
   }
 
-  namespace TriaAccessor
+  namespace TriaAccessorImplementation
   {
     struct Implementation;
   }
@@ -277,7 +277,7 @@ namespace internal
    * A namespace for classes internal to the triangulation classes and
    * helpers.
    */
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
 
     /**
@@ -497,7 +497,7 @@ namespace internal
  *
  * This class is written to be as independent of the dimension as possible
  * (thus the complex construction of the
- * dealii::internal::Triangulation::TriaLevel classes) to allow code-sharing,
+ * dealii::internal::TriangulationImplementation::TriaLevel classes) to allow code-sharing,
  * to allow reducing the need to mirror changes in the code for one dimension
  * to the code for other dimensions. Nonetheless, some of the functions are
  * dependent of the dimension and there only exist specialized versions for
@@ -1247,7 +1247,7 @@ private:
    * An internal typedef to make the definition of the iterator classes
    * simpler.
    */
-  typedef dealii::internal::Triangulation::Iterators<dim, spacedim> IteratorSelector;
+  typedef dealii::internal::TriangulationImplementation::Iterators<dim, spacedim> IteratorSelector;
 
 public:
   /**
@@ -3514,14 +3514,14 @@ private:
    * Array of pointers pointing to the objects storing the cell data on the
    * different levels.
    */
-  std::vector<std::unique_ptr<dealii::internal::Triangulation::TriaLevel<dim> > > levels;
+  std::vector<std::unique_ptr<dealii::internal::TriangulationImplementation::TriaLevel<dim> > > levels;
 
   /**
    * Pointer to the faces of the triangulation. In 1d this contains nothing,
    * in 2D it contains data concerning lines and in 3D quads and lines.  All
    * of these have no level and are therefore treated separately.
    */
-  std::unique_ptr<dealii::internal::Triangulation::TriaFaces<dim> > faces;
+  std::unique_ptr<dealii::internal::TriangulationImplementation::TriaFaces<dim> > faces;
 
 
   /**
@@ -3562,7 +3562,7 @@ private:
    * and since access to the number of lines etc is a rather frequent
    * operation, this was not an optimal solution.
    */
-  dealii::internal::Triangulation::NumberCache<dim> number_cache;
+  dealii::internal::TriangulationImplementation::NumberCache<dim> number_cache;
 
   /**
    * A map that relates the number of a boundary vertex to the boundary
@@ -3609,14 +3609,14 @@ private:
 
   friend class CellAccessor<dim, spacedim>;
 
-  friend struct dealii::internal::TriaAccessor::Implementation;
+  friend struct dealii::internal::TriaAccessorImplementation::Implementation;
 
   friend class hp::DoFHandler<dim,spacedim>;
 
-  friend struct dealii::internal::Triangulation::Implementation;
+  friend struct dealii::internal::TriangulationImplementation::Implementation;
 
   template <typename>
-  friend class dealii::internal::Triangulation::TriaObjects;
+  friend class dealii::internal::TriangulationImplementation::TriaObjects;
 
   // explicitly check for sensible template arguments, but not on windows
   // because MSVC creates bogus warnings during normal compilation
@@ -3649,7 +3649,7 @@ CellData<structdim>::CellData ()
 
 namespace internal
 {
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
     template <class Archive>
     void NumberCache<1>::serialize (Archive &ar,
@@ -3790,7 +3790,7 @@ Triangulation<dim,spacedim>::load (Archive &ar,
   levels.resize(size);
   for (unsigned int i = 0; i < levels.size(); ++i)
     {
-      std::unique_ptr<internal::Triangulation::TriaLevel<dim>> level;
+      std::unique_ptr<internal::TriangulationImplementation::TriaLevel<dim>> level;
       ar &level;
       levels[i] = std::move(level);
     }

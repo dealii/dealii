@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DataOut
+  namespace DataOutImplementation
   {
     /**
      * A derived class for use in the DataOut class. This is a class for the
@@ -333,7 +333,7 @@ private:
    */
   void build_one_patch
   (const std::pair<cell_iterator, unsigned int>                 *cell_and_index,
-   internal::DataOut::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension>  &scratch_data,
+   internal::DataOutImplementation::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension>  &scratch_data,
    const unsigned int                                            n_subdivisions,
    const CurvedCellRegion                                        curved_cell_region);
 };

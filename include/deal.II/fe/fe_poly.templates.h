@@ -223,9 +223,9 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &,
                 const Quadrature<dim>                                               &quadrature,
                 const Mapping<dim,spacedim>                                         &mapping,
                 const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                 const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -285,9 +285,9 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator  
                      const Quadrature<dim-1>                                             &quadrature,
                      const Mapping<dim,spacedim>                                         &mapping,
                      const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                     const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                     const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                      const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                     dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -364,9 +364,9 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const Quadrature<dim-1>                                             &quadrature,
                         const Mapping<dim,spacedim>                                         &mapping,
                         const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                        const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                        const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                         const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                        dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const
+                        dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -438,8 +438,8 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 template <class PolynomialType, int dim, int spacedim>
 inline void
 FE_Poly<PolynomialType,dim,spacedim>::
-correct_third_derivatives (internal::FEValues::FiniteElementRelatedData<dim,spacedim>       &output_data,
-                           const internal::FEValues::MappingRelatedData<dim,spacedim>       &mapping_data,
+correct_third_derivatives (internal::FEValuesImplementation::FiniteElementRelatedData<dim,spacedim>       &output_data,
+                           const internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>       &mapping_data,
                            const unsigned int                                                n_q_points,
                            const unsigned int                                                dof) const
 {

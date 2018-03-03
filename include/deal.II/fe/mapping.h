@@ -804,7 +804,7 @@ protected:
                   const CellSimilarity::Similarity                              cell_similarity,
                   const Quadrature<dim>                                        &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase       &internal_data,
-                  dealii::internal::FEValues::MappingRelatedData<dim,spacedim> &output_data) const = 0;
+                  dealii::internal::FEValuesImplementation::MappingRelatedData<dim,spacedim> &output_data) const = 0;
 
   /**
    * This function is the equivalent to Mapping::fill_fe_values(), but for
@@ -836,7 +836,7 @@ protected:
                        const unsigned int                                            face_no,
                        const Quadrature<dim-1>                                      &quadrature,
                        const typename Mapping<dim,spacedim>::InternalDataBase       &internal_data,
-                       dealii::internal::FEValues::MappingRelatedData<dim,spacedim> &output_data) const = 0;
+                       dealii::internal::FEValuesImplementation::MappingRelatedData<dim,spacedim> &output_data) const = 0;
 
   /**
    * This function is the equivalent to Mapping::fill_fe_values(), but for
@@ -871,7 +871,7 @@ protected:
                           const unsigned int                                             subface_no,
                           const Quadrature<dim-1>                                       &quadrature,
                           const typename Mapping<dim,spacedim>::InternalDataBase        &internal_data,
-                          dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &output_data) const = 0;
+                          dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &output_data) const = 0;
 
   /**
    * @}

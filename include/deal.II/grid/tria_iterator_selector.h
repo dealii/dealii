@@ -31,7 +31,7 @@ template <typename Accessor> class TriaActiveIterator;
 
 namespace internal
 {
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
     template <int dim, int spacedim>
     struct Iterators;

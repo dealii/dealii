@@ -507,7 +507,7 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 // number of functions to select the right implementation for set_zero().
 namespace internal
 {
-  namespace ConstraintMatrix
+  namespace ConstraintMatrixImplementation
   {
     namespace
     {
@@ -623,7 +623,7 @@ ConstraintMatrix::set_zero (VectorType &vec) const
   std::vector<size_type> constrained_lines(lines.size());
   for (unsigned int i=0; i<lines.size(); ++i)
     constrained_lines[i] = lines[i].index;
-  internal::ConstraintMatrix::set_zero_all(constrained_lines, vec);
+  internal::ConstraintMatrixImplementation::set_zero_all(constrained_lines, vec);
 }
 
 

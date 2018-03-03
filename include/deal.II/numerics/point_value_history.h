@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace PointValueHistory
+  namespace PointValueHistoryImplementation
   {
     /**
      * A class that stores the data needed to reference the support points
@@ -590,7 +590,7 @@ private:
   /**
    * Save the location and other mesh info about support points.
    */
-  std::vector <internal::PointValueHistory::PointGeometryData <dim> >
+  std::vector <internal::PointValueHistoryImplementation::PointGeometryData <dim> >
   point_geometry_data;
 
 

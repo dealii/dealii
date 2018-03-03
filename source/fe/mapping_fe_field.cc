@@ -521,7 +521,7 @@ MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::get_subface_data
 
 namespace internal
 {
-  namespace MappingFEField
+  namespace MappingFEFieldImplementation
   {
     namespace
     {
@@ -1087,7 +1087,7 @@ namespace internal
                                const unsigned int               subface_no,
                                const std::vector<double>        &weights,
                                const typename dealii::MappingFEField<dim,spacedim,VectorType,DoFHandlerType>::InternalData &data,
-                               internal::FEValues::MappingRelatedData<dim,spacedim>         &output_data)
+                               internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>         &output_data)
       {
         const UpdateFlags update_flags = data.update_each;
 
@@ -1229,7 +1229,7 @@ namespace internal
                               const FiniteElement<dim, spacedim>                                &fe,
                               const ComponentMask                                               &fe_mask,
                               const std::vector<unsigned int>                                   &fe_to_real,
-                              internal::FEValues::MappingRelatedData<dim,spacedim>              &output_data)
+                              internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>              &output_data)
       {
         maybe_compute_q_points<dim,spacedim,VectorType,DoFHandlerType>
         (data_set,
@@ -1305,7 +1305,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
                 const CellSimilarity::Similarity                           cell_similarity,
                 const Quadrature<dim>                                     &quadrature,
                 const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+                internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -1322,12 +1322,12 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
   update_internal_dofs(cell, data);
 
-  internal::MappingFEField::maybe_compute_q_points<dim,spacedim,VectorType,DoFHandlerType>
+  internal::MappingFEFieldImplementation::maybe_compute_q_points<dim,spacedim,VectorType,DoFHandlerType>
   (QProjector<dim>::DataSetDescriptor::cell (),
    data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.quadrature_points);
 
-  internal::MappingFEField::maybe_update_Jacobians<dim,spacedim,VectorType,DoFHandlerType>
+  internal::MappingFEFieldImplementation::maybe_update_Jacobians<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell (),
    data, euler_dof_handler->get_fe(), fe_mask, fe_to_real);
@@ -1431,35 +1431,35 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
     }
 
   // calculate derivatives of the Jacobians
-  internal::MappingFEField::maybe_update_jacobian_grads<dim,spacedim,VectorType,DoFHandlerType>
+  internal::MappingFEFieldImplementation::maybe_update_jacobian_grads<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
    data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.jacobian_grads);
 
   // calculate derivatives of the Jacobians pushed forward to real cell coordinates
-  internal::MappingFEField::maybe_update_jacobian_pushed_forward_grads<dim,spacedim,VectorType,DoFHandlerType>
+  internal::MappingFEFieldImplementation::maybe_update_jacobian_pushed_forward_grads<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
    data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.jacobian_pushed_forward_grads);
 
   // calculate hessians of the Jacobians
-  internal::MappingFEField::maybe_update_jacobian_2nd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+  internal::MappingFEFieldImplementation::maybe_update_jacobian_2nd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
    data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.jacobian_2nd_derivatives);
 
   // calculate hessians of the Jacobians pushed forward to real cell coordinates
-  internal::MappingFEField::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+  internal::MappingFEFieldImplementation::maybe_update_jacobian_pushed_forward_2nd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
    data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
    output_data.jacobian_pushed_forward_2nd_derivatives);
 
   // calculate gradients of the hessians of the Jacobians
-  internal::MappingFEField::maybe_update_jacobian_3rd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+  internal::MappingFEFieldImplementation::maybe_update_jacobian_3rd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
    data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
@@ -1467,7 +1467,7 @@ fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
 
   // calculate gradients of the hessians of the Jacobians pushed forward to real
   // cell coordinates
-  internal::MappingFEField::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
+  internal::MappingFEFieldImplementation::maybe_update_jacobian_pushed_forward_3rd_derivatives<dim,spacedim,VectorType,DoFHandlerType>
   (cell_similarity,
    QProjector<dim>::DataSetDescriptor::cell(),
    data, euler_dof_handler->get_fe(), fe_mask, fe_to_real,
@@ -1485,7 +1485,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
                      const unsigned int                                         face_no,
                      const Quadrature<dim-1>                                   &quadrature,
                      const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                     internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+                     internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -1495,7 +1495,7 @@ fill_fe_face_values (const typename Triangulation<dim,spacedim>::cell_iterator &
 
   update_internal_dofs(cell, data);
 
-  internal::MappingFEField::do_fill_fe_face_values<dim,spacedim,VectorType,DoFHandlerType>
+  internal::MappingFEFieldImplementation::do_fill_fe_face_values<dim,spacedim,VectorType,DoFHandlerType>
   (*this,
    cell, face_no, numbers::invalid_unsigned_int,
    QProjector<dim>::DataSetDescriptor::
@@ -1519,7 +1519,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         const unsigned int                                         subface_no,
                         const Quadrature<dim-1>                                   &quadrature,
                         const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                        internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const
+                        internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const
 {
   // convert data object to internal data for this class. fails with an
   // exception if that is not possible
@@ -1529,7 +1529,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
   update_internal_dofs(cell, data);
 
-  internal::MappingFEField::do_fill_fe_face_values<dim,spacedim,VectorType,DoFHandlerType>
+  internal::MappingFEFieldImplementation::do_fill_fe_face_values<dim,spacedim,VectorType,DoFHandlerType>
   (*this,
    cell, face_no, numbers::invalid_unsigned_int,
    QProjector<dim>::DataSetDescriptor::
@@ -1548,7 +1548,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
 
 namespace internal
 {
-  namespace MappingFEField
+  namespace MappingFEFieldImplementation
   {
     namespace
     {
@@ -1662,7 +1662,7 @@ transform (const ArrayView<const Tensor<1,dim> >                  &input,
 {
   AssertDimension (input.size(), output.size());
 
-  internal::MappingFEField::transform_fields<dim,spacedim,1,VectorType,DoFHandlerType>(input, mapping_type, mapping_data, output);
+  internal::MappingFEFieldImplementation::transform_fields<dim,spacedim,1,VectorType,DoFHandlerType>(input, mapping_type, mapping_data, output);
 }
 
 
@@ -1677,7 +1677,7 @@ transform (const ArrayView<const DerivativeForm<1, dim, spacedim> > &input,
 {
   AssertDimension (input.size(), output.size());
 
-  internal::MappingFEField::transform_differential_forms<dim,spacedim,1,VectorType,DoFHandlerType>(input, mapping_type, mapping_data, output);
+  internal::MappingFEFieldImplementation::transform_differential_forms<dim,spacedim,1,VectorType,DoFHandlerType>(input, mapping_type, mapping_data, output);
 }
 
 

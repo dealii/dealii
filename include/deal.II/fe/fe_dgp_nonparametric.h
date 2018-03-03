@@ -512,7 +512,7 @@ protected:
   get_data (const UpdateFlags                                                    update_flags,
             const Mapping<dim,spacedim>                                         &mapping,
             const Quadrature<dim>                                               &quadrature,
-            dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+            dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
@@ -521,9 +521,9 @@ protected:
                   const Quadrature<dim>                                               &quadrature,
                   const Mapping<dim,spacedim>                                         &mapping,
                   const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                  const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                  const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                   const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                  dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                  dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
@@ -532,9 +532,9 @@ protected:
                        const Quadrature<dim-1>                                             &quadrature,
                        const Mapping<dim,spacedim>                                         &mapping,
                        const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                       const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                       const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                        const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                       dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                       dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
   virtual
   void
@@ -544,9 +544,9 @@ protected:
                           const Quadrature<dim-1>                                             &quadrature,
                           const Mapping<dim,spacedim>                                         &mapping,
                           const typename Mapping<dim,spacedim>::InternalDataBase              &mapping_internal,
-                          const dealii::internal::FEValues::MappingRelatedData<dim, spacedim> &mapping_data,
+                          const dealii::internal::FEValuesImplementation::MappingRelatedData<dim, spacedim> &mapping_data,
                           const typename FiniteElement<dim,spacedim>::InternalDataBase        &fe_internal,
-                          dealii::internal::FEValues::FiniteElementRelatedData<dim, spacedim> &output_data) const;
+                          dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim> &output_data) const;
 
 private:
 

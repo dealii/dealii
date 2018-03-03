@@ -42,14 +42,14 @@ template <int dim, int spacedim> class Manifold;
 
 namespace internal
 {
-  namespace Triangulation
+  namespace TriangulationImplementation
   {
     template <int dim> class TriaObject;
     template <typename G> class TriaObjects;
     struct Implementation;
   }
 
-  namespace TriaAccessor
+  namespace TriaAccessorImplementation
   {
     struct Implementation;
 
@@ -387,7 +387,7 @@ protected:
   /**
    * Access to the other objects of a Triangulation with same dimension.
    */
-  dealii::internal::Triangulation::TriaObjects<dealii::internal::Triangulation::TriaObject<structdim> > &
+  dealii::internal::TriangulationImplementation::TriaObjects<dealii::internal::TriangulationImplementation::TriaObject<structdim> > &
   objects () const;
 
 public:
@@ -471,7 +471,7 @@ protected:
    * The level if this is a cell (<tt>structdim==dim</tt>). Else, contains
    * zero.
    */
-  typename dealii::internal::TriaAccessor::PresentLevelType<structdim,dim>::type present_level;
+  typename dealii::internal::TriaAccessorImplementation::PresentLevelType<structdim,dim>::type present_level;
 
   /**
    * Used to store the index of the element presently pointed to on the level
@@ -593,13 +593,13 @@ public:
   /**
    * Dummy function to extract lines. Returns a default-constructed line iterator.
    */
-  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+  typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::line_iterator
   line (const unsigned int i) const;
 
   /**
    * Dummy function to extract quads. Returns a default-constructed quad iterator.
    */
-  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+  typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::quad_iterator
   quad (const unsigned int i) const;
 };
 
@@ -755,7 +755,7 @@ public:
   /**
    * Pointer to the @p ith line bounding this object.
    */
-  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+  typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::line_iterator
   line (const unsigned int i) const;
 
   /**
@@ -769,7 +769,7 @@ public:
   /**
    * Pointer to the @p ith quad bounding this object.
    */
-  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+  typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::quad_iterator
   quad (const unsigned int i) const;
 
   /**
@@ -1496,7 +1496,7 @@ private:
    * Copy the data of the given object into the internal data structures of a
    * triangulation.
    */
-  void set (const dealii::internal::Triangulation::TriaObject<structdim> &o) const;
+  void set (const dealii::internal::TriangulationImplementation::TriaObject<structdim> &o) const;
 
   /**
    * Set the flag indicating, what <code>line_orientation()</code> will
@@ -1586,8 +1586,8 @@ private:
 
   template <int, int> friend class Triangulation;
 
-  friend struct dealii::internal::Triangulation::Implementation;
-  friend struct dealii::internal::TriaAccessor::Implementation;
+  friend struct dealii::internal::TriangulationImplementation::Implementation;
+  friend struct dealii::internal::TriaAccessorImplementation::Implementation;
 };
 
 
@@ -1754,7 +1754,7 @@ public:
    * Pointer to the @p ith line bounding this object. Will point to an invalid
    * object.
    */
-  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::line_iterator
+  typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::line_iterator
   static line (const unsigned int);
 
   /**
@@ -1766,7 +1766,7 @@ public:
    * Pointer to the @p ith quad bounding this object.
    */
   static
-  typename dealii::internal::Triangulation::Iterators<dim,spacedim>::quad_iterator
+  typename dealii::internal::TriangulationImplementation::Iterators<dim,spacedim>::quad_iterator
   quad (const unsigned int i);
 
   /**
@@ -2152,7 +2152,7 @@ public:
    * Pointer to the @p ith line bounding this object. Will point to an invalid
    * object.
    */
-  typename dealii::internal::Triangulation::Iterators<1,spacedim>::line_iterator
+  typename dealii::internal::TriangulationImplementation::Iterators<1,spacedim>::line_iterator
   static line (const unsigned int);
 
   /**
@@ -2167,7 +2167,7 @@ public:
    * Pointer to the @p ith quad bounding this object.
    */
   static
-  typename dealii::internal::Triangulation::Iterators<1,spacedim>::quad_iterator
+  typename dealii::internal::TriangulationImplementation::Iterators<1,spacedim>::quad_iterator
   quad (const unsigned int i);
 
   /**
@@ -3316,7 +3316,7 @@ private:
 
   template <int, int> friend class Triangulation;
 
-  friend struct dealii::internal::Triangulation::Implementation;
+  friend struct dealii::internal::TriangulationImplementation::Implementation;
 };
 
 

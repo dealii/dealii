@@ -454,7 +454,7 @@ private:
 
 namespace internal
 {
-  namespace GrowingVectorMemory
+  namespace GrowingVectorMemoryImplementation
   {
     void release_all_unused_memory();
   }

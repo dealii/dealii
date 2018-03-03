@@ -59,7 +59,7 @@ test_preconditioner (const MATRIX &A,
   const auto lo_A = linear_operator<VECTOR>(A);
   // Note: The above should be equivalent to the following:
   //
-  //  typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PAYLOAD;
+  //  typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload PAYLOAD;
   //  const auto lo_A = linear_operator<VECTOR,VECTOR,PAYLOAD>(A);
 
   PRECONDITIONER preconditioner;
@@ -103,7 +103,7 @@ test_preconditioner (const MATRIX &A,
     const auto lo_A_inv_approx = linear_operator<VECTOR,VECTOR>(A, preconditioner);
     // Note: The above should be equivalent to the following:
     //
-    //    typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PAYLOAD;
+    //    typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload PAYLOAD;
     //    const auto lo_A_inv_approx = linear_operator<VECTOR,VECTOR,PAYLOAD>(A, preconditioner);
 
     // Singular operation
@@ -127,7 +127,7 @@ test_preconditioner (const MATRIX &A,
   {
     // Stand-alone
     deallog.push("S.A.");
-    typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PAYLOAD;
+    typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload PAYLOAD;
     const auto lo_A_inv_approx = linear_operator<VECTOR,VECTOR,PAYLOAD>(preconditioner);
 
     // Singular operation
@@ -159,7 +159,7 @@ test_solver (const MATRIX &A,
   const auto lo_A = linear_operator<VECTOR>(A);
   // Note: The above should be equivalent to the following:
   //
-  //  typedef dealii::TrilinosWrappers::internal::LinearOperator::TrilinosPayload PAYLOAD;
+  //  typedef dealii::TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload PAYLOAD;
   //  const auto lo_A = linear_operator<VECTOR,VECTOR,PAYLOAD>(A);
 
   SolverControl solver_control (100, 1.0e-10, false,false);

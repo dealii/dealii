@@ -128,7 +128,7 @@ FiniteElement<2,2>::InternalDataBase *
 FE_P1NC::get_data (const UpdateFlags update_flags,
                    const Mapping<2,2> &,
                    const Quadrature<2> &quadrature,
-                   dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const
 {
   FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
 
@@ -150,7 +150,7 @@ FiniteElement<2,2>::InternalDataBase *
 FE_P1NC::get_face_data (const UpdateFlags update_flags,
                         const Mapping<2,2> &,
                         const Quadrature<1> &quadrature,
-                        dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                        dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const
 {
   FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
 
@@ -172,7 +172,7 @@ FiniteElement<2,2>::InternalDataBase *
 FE_P1NC::get_subface_data (const UpdateFlags update_flags,
                            const Mapping<2,2> &,
                            const Quadrature<1> &quadrature,
-                           dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                           dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const
 {
   FiniteElement<2,2>::InternalDataBase *data = new FiniteElement<2,2>::InternalDataBase;
 
@@ -196,9 +196,9 @@ FE_P1NC::fill_fe_values (const Triangulation<2,2>::cell_iterator           &cell
                          const Quadrature<2> &,
                          const Mapping<2,2> &,
                          const Mapping<2,2>::InternalDataBase &,
-                         const internal::FEValues::MappingRelatedData<2,2> &mapping_data,
+                         const internal::FEValuesImplementation::MappingRelatedData<2,2> &mapping_data,
                          const FiniteElement<2,2>::InternalDataBase        &fe_internal,
-                         internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                         internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const
 {
   const UpdateFlags flags(fe_internal.update_each);
 
@@ -230,9 +230,9 @@ FE_P1NC::fill_fe_face_values (const Triangulation<2,2>::cell_iterator           
                               const Quadrature<1>                                       &quadrature,
                               const Mapping<2,2>                                        &mapping,
                               const Mapping<2,2>::InternalDataBase &,
-                              const dealii::internal::FEValues::MappingRelatedData<2,2> &,
+                              const dealii::internal::FEValuesImplementation::MappingRelatedData<2,2> &,
                               const InternalDataBase                                    &fe_internal,
-                              dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                              dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const
 {
   const UpdateFlags flags(fe_internal.update_each);
 
@@ -271,9 +271,9 @@ FE_P1NC::fill_fe_subface_values (const Triangulation<2,2>::cell_iterator        
                                  const Quadrature<1>                                       &quadrature,
                                  const Mapping<2,2>                                        &mapping,
                                  const Mapping<2,2>::InternalDataBase &,
-                                 const dealii::internal::FEValues::MappingRelatedData<2,2> &,
+                                 const dealii::internal::FEValuesImplementation::MappingRelatedData<2,2> &,
                                  const InternalDataBase                                    &fe_internal,
-                                 dealii::internal::FEValues::FiniteElementRelatedData<2,2> &output_data) const
+                                 dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,2> &output_data) const
 {
   const UpdateFlags flags(fe_internal.update_each);
 

@@ -62,7 +62,7 @@ namespace internal
    * A namespace for functions and classes that are internal to how the
    * SymmetricTensor class (and its associate functions) works.
    */
-  namespace SymmetricTensor
+  namespace SymmetricTensorImplementation
   {
     /**
      * Compute the inverse of a symmetric tensor of a
@@ -896,9 +896,9 @@ private:
   /**
    * Make a few helper classes friends as well.
    */
-  friend struct internal::SymmetricTensor::Inverse<2,dim,Number>;
+  friend struct internal::SymmetricTensorImplementation::Inverse<2,dim,Number>;
 
-  friend struct internal::SymmetricTensor::Inverse<4,dim,Number>;
+  friend struct internal::SymmetricTensorImplementation::Inverse<4,dim,Number>;
 };
 
 
@@ -1084,7 +1084,7 @@ SymmetricTensor<rank_,dim,Number>::operator = (const Number &d)
 
 namespace internal
 {
-  namespace SymmetricTensor
+  namespace SymmetricTensorImplementation
   {
     template <int dim, typename Number>
     dealii::Tensor<2,dim,Number>
@@ -1403,7 +1403,7 @@ inline
 SymmetricTensor<rank_,dim,Number>::
 operator Tensor<rank_,dim,Number> () const
 {
-  return internal::SymmetricTensor::convert_to_tensor (*this);
+  return internal::SymmetricTensorImplementation::convert_to_tensor (*this);
 }
 
 
@@ -1996,7 +1996,7 @@ SymmetricTensor<rank_,dim,Number>::operator ()
 
 namespace internal
 {
-  namespace SymmetricTensor
+  namespace SymmetricTensorImplementation
   {
     template <int rank_>
     TableIndices<rank_>
@@ -2031,7 +2031,7 @@ SymmetricTensor<rank_,dim,Number>::operator [] (const unsigned int row) const
   return
     internal::SymmetricTensorAccessors::
     Accessor<rank_,dim,true,rank_-1,Number> (*this,
-                                             internal::SymmetricTensor::get_partially_filled_indices<rank_> (row,
+                                             internal::SymmetricTensorImplementation::get_partially_filled_indices<rank_> (row,
                                                  std::integral_constant<int, rank_>()));
 }
 
@@ -2044,7 +2044,7 @@ SymmetricTensor<rank_,dim,Number>::operator [] (const unsigned int row)
   return
     internal::SymmetricTensorAccessors::
     Accessor<rank_,dim,false,rank_-1,Number> (*this,
-                                              internal::SymmetricTensor::get_partially_filled_indices<rank_> (row,
+                                              internal::SymmetricTensorImplementation::get_partially_filled_indices<rank_> (row,
                                                   std::integral_constant<int, rank_>()));
 }
 
@@ -2112,7 +2112,7 @@ SymmetricTensor<rank_,dim,Number>::end_raw() const
 
 namespace internal
 {
-  namespace SymmetricTensor
+  namespace SymmetricTensorImplementation
   {
     template <int dim, typename Number>
     unsigned int
@@ -2144,7 +2144,7 @@ const Number &
 SymmetricTensor<rank_,dim,Number>::access_raw_entry (const unsigned int index) const
 {
   AssertIndexRange (index, n_independent_components);
-  return data[internal::SymmetricTensor::entry_to_indices(*this, index)];
+  return data[internal::SymmetricTensorImplementation::entry_to_indices(*this, index)];
 }
 
 
@@ -2155,7 +2155,7 @@ Number &
 SymmetricTensor<rank_,dim,Number>::access_raw_entry (const unsigned int index)
 {
   AssertIndexRange (index, n_independent_components);
-  return data[internal::SymmetricTensor::entry_to_indices(*this, index)];
+  return data[internal::SymmetricTensorImplementation::entry_to_indices(*this, index)];
 }
 
 
@@ -2253,7 +2253,7 @@ SymmetricTensor<rank_,dim,Number>::norm () const
 
 namespace internal
 {
-  namespace SymmetricTensor
+  namespace SymmetricTensorImplementation
   {
     namespace
     {
@@ -2353,14 +2353,14 @@ unsigned int
 SymmetricTensor<rank_,dim,Number>::component_to_unrolled_index
 (const TableIndices<rank_> &indices)
 {
-  return internal::SymmetricTensor::component_to_unrolled_index<dim> (indices);
+  return internal::SymmetricTensorImplementation::component_to_unrolled_index<dim> (indices);
 }
 
 
 
 namespace internal
 {
-  namespace SymmetricTensor
+  namespace SymmetricTensorImplementation
   {
     namespace
     {
@@ -2460,7 +2460,7 @@ SymmetricTensor<rank_,dim,Number>::unrolled_to_component_indices
 (const unsigned int i)
 {
   return
-    internal::SymmetricTensor::unrolled_to_component_indices<dim> (i,
+    internal::SymmetricTensorImplementation::unrolled_to_component_indices<dim> (i,
         std::integral_constant<int, rank_>());
 }
 
@@ -2830,7 +2830,7 @@ eigenvalues (const SymmetricTensor<2,3,Number> &T);
 
 namespace internal
 {
-  namespace SymmetricTensor
+  namespace SymmetricTensorImplementation
   {
     /**
      * Tridiagonalize a rank-2 symmetric tensor using the Householder method.
@@ -3164,13 +3164,13 @@ eigenvectors (const SymmetricTensor<2,dim,Number>         &T,
   switch (method)
     {
     case SymmetricTensorEigenvectorMethod::hybrid:
-      eig_vals_vecs = internal::SymmetricTensor::hybrid(T);
+      eig_vals_vecs = internal::SymmetricTensorImplementation::hybrid(T);
       break;
     case SymmetricTensorEigenvectorMethod::ql_implicit_shifts:
-      eig_vals_vecs = internal::SymmetricTensor::ql_implicit_shifts(T);
+      eig_vals_vecs = internal::SymmetricTensorImplementation::ql_implicit_shifts(T);
       break;
     case SymmetricTensorEigenvectorMethod::jacobi:
-      eig_vals_vecs = internal::SymmetricTensor::jacobi(T);
+      eig_vals_vecs = internal::SymmetricTensorImplementation::jacobi(T);
       break;
     default:
       AssertThrow(false, ExcNotImplemented());
@@ -3178,7 +3178,7 @@ eigenvectors (const SymmetricTensor<2,dim,Number>         &T,
 
   // Sort in descending order before output.
   std::sort(eig_vals_vecs.begin(), eig_vals_vecs.end(),
-            internal::SymmetricTensor::SortEigenValuesVectors<dim,Number>());
+            internal::SymmetricTensorImplementation::SortEigenValuesVectors<dim,Number>());
   return eig_vals_vecs;
 }
 
@@ -3441,7 +3441,7 @@ inline
 SymmetricTensor<2,dim,Number>
 invert (const SymmetricTensor<2,dim,Number> &t)
 {
-  return internal::SymmetricTensor::Inverse<2,dim,Number>::value(t);
+  return internal::SymmetricTensorImplementation::Inverse<2,dim,Number>::value(t);
 }
 
 
@@ -3462,7 +3462,7 @@ inline
 SymmetricTensor<4,dim,Number>
 invert (const SymmetricTensor<4,dim,Number> &t)
 {
-  return internal::SymmetricTensor::Inverse<4,dim,Number>::value(t);
+  return internal::SymmetricTensorImplementation::Inverse<4,dim,Number>::value(t);
 }
 
 

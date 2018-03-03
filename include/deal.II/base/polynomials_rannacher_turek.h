@@ -94,7 +94,7 @@ public:
 
 namespace internal
 {
-  namespace PolynomialsRannacherTurek
+  namespace PolynomialsRannacherTurekImplementation
   {
     template <int order, int dim>
     inline
@@ -199,7 +199,7 @@ Tensor<order,dim>
 PolynomialsRannacherTurek<dim>::compute_derivative (const unsigned int i,
                                                     const Point<dim> &p) const
 {
-  return internal::PolynomialsRannacherTurek::compute_derivative<order> (i, p);
+  return internal::PolynomialsRannacherTurekImplementation::compute_derivative<order> (i, p);
 }
 
 

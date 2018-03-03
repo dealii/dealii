@@ -28,9 +28,9 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace BlockLinearOperator
+  namespace BlockLinearOperatorImplementation
   {
-    template <typename PayloadBlockType = internal::LinearOperator::EmptyPayload>
+    template <typename PayloadBlockType = internal::LinearOperatorImplementation::EmptyPayload>
     class EmptyBlockPayload;
   }
 }
@@ -39,12 +39,12 @@ template <typename Number> class BlockVector;
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockPayload = internal::BlockLinearOperator::EmptyBlockPayload<> >
+          typename BlockPayload = internal::BlockLinearOperatorImplementation::EmptyBlockPayload<> >
 class BlockLinearOperator;
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockPayload = internal::BlockLinearOperator::EmptyBlockPayload<>,
+          typename BlockPayload = internal::BlockLinearOperatorImplementation::EmptyBlockPayload<>,
           typename BlockMatrixType>
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_operator(const BlockMatrixType &matrix);
@@ -52,21 +52,21 @@ block_operator(const BlockMatrixType &matrix);
 template <size_t m, size_t n,
           typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockPayload = internal::BlockLinearOperator::EmptyBlockPayload<> >
+          typename BlockPayload = internal::BlockLinearOperatorImplementation::EmptyBlockPayload<> >
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_operator(const std::array<std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType, typename BlockPayload::BlockType>, n>, m> &);
 
 template <size_t m,
           typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockPayload = internal::BlockLinearOperator::EmptyBlockPayload<> >
+          typename BlockPayload = internal::BlockLinearOperatorImplementation::EmptyBlockPayload<> >
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_diagonal_operator(const std::array<LinearOperator<typename Range::BlockType, typename Domain::BlockType, typename BlockPayload::BlockType>, m> &);
 
 template <size_t m,
           typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockPayload = internal::BlockLinearOperator::EmptyBlockPayload<> >
+          typename BlockPayload = internal::BlockLinearOperatorImplementation::EmptyBlockPayload<> >
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename Domain::BlockType, typename BlockPayload::BlockType> &op);
 
@@ -79,21 +79,21 @@ block_diagonal_operator(const LinearOperator<typename Range::BlockType, typename
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockPayload = internal::BlockLinearOperator::EmptyBlockPayload<>,
+          typename BlockPayload = internal::BlockLinearOperatorImplementation::EmptyBlockPayload<>,
           typename BlockMatrixType>
 BlockLinearOperator<Range, Domain, BlockPayload>
 block_diagonal_operator(const BlockMatrixType &block_matrix);
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockPayload = internal::BlockLinearOperator::EmptyBlockPayload<> >
+          typename BlockPayload = internal::BlockLinearOperatorImplementation::EmptyBlockPayload<> >
 LinearOperator<Domain, Range, typename BlockPayload::BlockType>
 block_forward_substitution(const BlockLinearOperator<Range, Domain, BlockPayload> &,
                            const BlockLinearOperator<Domain, Range, BlockPayload> &);
 
 template <typename Range = BlockVector<double>,
           typename Domain = Range,
-          typename BlockPayload = internal::BlockLinearOperator::EmptyBlockPayload<> >
+          typename BlockPayload = internal::BlockLinearOperatorImplementation::EmptyBlockPayload<> >
 LinearOperator<Domain, Range, typename BlockPayload::BlockType>
 block_back_substitution(const BlockLinearOperator<Range, Domain, BlockPayload> &,
                         const BlockLinearOperator<Domain, Range, BlockPayload> &);
@@ -312,7 +312,7 @@ public:
 
 namespace internal
 {
-  namespace BlockLinearOperator
+  namespace BlockLinearOperatorImplementation
   {
     // Populate the LinearOperator interfaces with the help of the
     // BlockLinearOperator functions
@@ -494,7 +494,7 @@ block_operator(const BlockMatrixType &block_matrix)
     return BlockType(block_matrix.block(i, j));
   };
 
-  internal::BlockLinearOperator::populate_linear_operator_functions(return_op);
+  internal::BlockLinearOperatorImplementation::populate_linear_operator_functions(return_op);
   return return_op;
 }
 
@@ -556,7 +556,7 @@ block_operator(const std::array<std::array<LinearOperator<typename Range::BlockT
     return ops[i][j];
   };
 
-  internal::BlockLinearOperator::populate_linear_operator_functions(return_op);
+  internal::BlockLinearOperatorImplementation::populate_linear_operator_functions(return_op);
   return return_op;
 }
 
@@ -613,7 +613,7 @@ block_diagonal_operator(const BlockMatrixType &block_matrix)
       return null_operator(BlockType(block_matrix.block(i, j)));
   };
 
-  internal::BlockLinearOperator::populate_linear_operator_functions(return_op);
+  internal::BlockLinearOperatorImplementation::populate_linear_operator_functions(return_op);
   return return_op;
 }
 

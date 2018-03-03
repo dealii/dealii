@@ -36,9 +36,9 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
                 const Quadrature<1>                                       &quadrature,
                 const Mapping<1,2>                                        &mapping,
                 const Mapping<1,2>::InternalDataBase                      &mapping_internal,
-                const dealii::internal::FEValues::MappingRelatedData<1,2> &mapping_data,
+                const dealii::internal::FEValuesImplementation::MappingRelatedData<1,2> &mapping_data,
                 const FiniteElement<1,2>::InternalDataBase                &fe_internal,
-                dealii::internal::FEValues::FiniteElementRelatedData<1,2> &output_data) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1,2> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -96,9 +96,9 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
                 const Quadrature<2>                                       &quadrature,
                 const Mapping<2,3>                                        &mapping,
                 const Mapping<2,3>::InternalDataBase                      &mapping_internal,
-                const dealii::internal::FEValues::MappingRelatedData<2,3> &mapping_data,
+                const dealii::internal::FEValuesImplementation::MappingRelatedData<2,3> &mapping_data,
                 const FiniteElement<2,3>::InternalDataBase                &fe_internal,
-                dealii::internal::FEValues::FiniteElementRelatedData<2,3> &output_data) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,3> &output_data) const
 {
 
   // assert that the following dynamics
@@ -154,9 +154,9 @@ fill_fe_values (const Triangulation<1,2>::cell_iterator &,
                 const Quadrature<1>                                       &quadrature,
                 const Mapping<1,2>                                        &mapping,
                 const Mapping<1,2>::InternalDataBase                      &mapping_internal,
-                const dealii::internal::FEValues::MappingRelatedData<1,2> &mapping_data,
+                const dealii::internal::FEValuesImplementation::MappingRelatedData<1,2> &mapping_data,
                 const FiniteElement<1,2>::InternalDataBase                &fe_internal,
-                dealii::internal::FEValues::FiniteElementRelatedData<1,2> &output_data) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<1,2> &output_data) const
 {
   // convert data object to internal
   // data for this class. fails with
@@ -214,9 +214,9 @@ fill_fe_values (const Triangulation<2,3>::cell_iterator &,
                 const Quadrature<2>                                       &quadrature,
                 const Mapping<2,3>                                        &mapping,
                 const Mapping<2,3>::InternalDataBase                      &mapping_internal,
-                const dealii::internal::FEValues::MappingRelatedData<2,3> &mapping_data,
+                const dealii::internal::FEValuesImplementation::MappingRelatedData<2,3> &mapping_data,
                 const FiniteElement<2,3>::InternalDataBase                &fe_internal,
-                dealii::internal::FEValues::FiniteElementRelatedData<2,3> &output_data) const
+                dealii::internal::FEValuesImplementation::FiniteElementRelatedData<2,3> &output_data) const
 {
   Assert (dynamic_cast<const InternalData *> (&fe_internal) != nullptr, ExcInternalError());
   const InternalData &fe_data = static_cast<const InternalData &> (fe_internal);

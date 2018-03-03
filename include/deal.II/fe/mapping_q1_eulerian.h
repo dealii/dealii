@@ -155,7 +155,7 @@ protected:
                   const CellSimilarity::Similarity                           cell_similarity,
                   const Quadrature<dim>                                     &quadrature,
                   const typename Mapping<dim,spacedim>::InternalDataBase    &internal_data,
-                  internal::FEValues::MappingRelatedData<dim,spacedim>      &output_data) const override;
+                  internal::FEValuesImplementation::MappingRelatedData<dim,spacedim>      &output_data) const override;
 
   /**
    * Compute the support points of the mapping. For the current class, these

@@ -36,12 +36,12 @@ namespace internal
 {
   namespace hp
   {
-    namespace DoFHandler
+    namespace DoFHandlerImplementation
     {
       struct Implementation;
     }
   }
-  namespace DoFCellAccessor
+  namespace DoFCellAccessorImplementation
   {
     struct Implementation;
   }
@@ -318,8 +318,8 @@ namespace internal
        * class that needs to create these data structures.
        */
       template <int, int> friend class dealii::hp::DoFHandler;
-      friend struct dealii::internal::hp::DoFHandler::Implementation;
-      friend struct dealii::internal::DoFCellAccessor::Implementation;
+      friend struct dealii::internal::hp::DoFHandlerImplementation::Implementation;
+      friend struct dealii::internal::DoFCellAccessorImplementation::Implementation;
     };
 
 

@@ -33,7 +33,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DataOut
+  namespace DataOutImplementation
   {
     template <int dim, int spacedim>
     ParallelData<dim,spacedim>::
@@ -64,7 +64,7 @@ void
 DataOut<dim,DoFHandlerType>::
 build_one_patch
 (const std::pair<cell_iterator, unsigned int>                                                *cell_and_index,
- internal::DataOut::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &scratch_data,
+ internal::DataOutImplementation::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension> &scratch_data,
  const unsigned int                                                                           n_subdivisions,
  const CurvedCellRegion                                                                       curved_cell_region)
 {
@@ -156,15 +156,15 @@ build_one_patch
                   // gradient etc.
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                                  internal::DataOut::ComponentExtractor::real_part,
+                                                                  internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                   scratch_data.patch_values_scalar.solution_values);
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
-                                                                     internal::DataOut::ComponentExtractor::real_part,
+                                                                     internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                      scratch_data.patch_values_scalar.solution_gradients);
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
-                                                                    internal::DataOut::ComponentExtractor::real_part,
+                                                                    internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                     scratch_data.patch_values_scalar.solution_hessians);
 
                   if (update_flags & update_quadrature_points)
@@ -188,15 +188,15 @@ build_one_patch
                   // derivative...
                   if (update_flags & update_values)
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                                  internal::DataOut::ComponentExtractor::real_part,
+                                                                  internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                   scratch_data.patch_values_system.solution_values);
                   if (update_flags & update_gradients)
                     this->dof_data[dataset]->get_function_gradients (this_fe_patch_values,
-                                                                     internal::DataOut::ComponentExtractor::real_part,
+                                                                     internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                      scratch_data.patch_values_system.solution_gradients);
                   if (update_flags & update_hessians)
                     this->dof_data[dataset]->get_function_hessians (this_fe_patch_values,
-                                                                    internal::DataOut::ComponentExtractor::real_part,
+                                                                    internal::DataOutImplementation::ComponentExtractor::real_part,
                                                                     scratch_data.patch_values_system.solution_hessians);
 
                   if (update_flags & update_quadrature_points)
@@ -228,7 +228,7 @@ build_one_patch
               {
                 // first output the real part of the solution vector
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                              internal::DataOut::ComponentExtractor::real_part,
+                                                              internal::DataOutImplementation::ComponentExtractor::real_part,
                                                               scratch_data.patch_values_scalar.solution_values);
                 for (unsigned int q=0; q<n_q_points; ++q)
                   patch.data(offset,q) = scratch_data.patch_values_scalar.solution_values[q];
@@ -237,7 +237,7 @@ build_one_patch
                 if (this->dof_data[dataset]->is_complex_valued() == true)
                   {
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                                  internal::DataOut::ComponentExtractor::imaginary_part,
+                                                                  internal::DataOutImplementation::ComponentExtractor::imaginary_part,
                                                                   scratch_data.patch_values_scalar.solution_values);
                     for (unsigned int q=0; q<n_q_points; ++q)
                       patch.data(offset+1,q) = scratch_data.patch_values_scalar.solution_values[q];
@@ -250,7 +250,7 @@ build_one_patch
                 // same as above: first the real part
                 const unsigned int stride = (this->dof_data[dataset]->is_complex_valued() ? 2 : 1);
                 this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                              internal::DataOut::ComponentExtractor::real_part,
+                                                              internal::DataOutImplementation::ComponentExtractor::real_part,
                                                               scratch_data.patch_values_system.solution_values);
                 for (unsigned int component=0; component<n_components;
                      ++component)
@@ -262,7 +262,7 @@ build_one_patch
                 if (this->dof_data[dataset]->is_complex_valued() == true)
                   {
                     this->dof_data[dataset]->get_function_values (this_fe_patch_values,
-                                                                  internal::DataOut::ComponentExtractor::imaginary_part,
+                                                                  internal::DataOutImplementation::ComponentExtractor::imaginary_part,
                                                                   scratch_data.patch_values_system.solution_values);
                     for (unsigned int component=0; component<n_components;
                          ++component)
@@ -290,7 +290,7 @@ build_one_patch
               {
                 const double value
                   = this->cell_data[dataset]->get_cell_data_value (cell_and_index->second,
-                                                                   internal::DataOut::ComponentExtractor::real_part);
+                                                                   internal::DataOutImplementation::ComponentExtractor::real_part);
                 for (unsigned int q=0; q<n_q_points; ++q)
                   patch.data(offset,q) = value;
               }
@@ -300,7 +300,7 @@ build_one_patch
                 {
                   const double value
                     = this->cell_data[dataset]->get_cell_data_value (cell_and_index->second,
-                                                                     internal::DataOut::ComponentExtractor::imaginary_part);
+                                                                     internal::DataOutImplementation::ComponentExtractor::imaginary_part);
                   for (unsigned int q=0; q<n_q_points; ++q)
                     patch.data(offset+1,q) = value;
                 }
@@ -385,13 +385,13 @@ void DataOut<dim,DoFHandlerType>::build_patches
   Assert (dim==DoFHandlerType::dimension, ExcDimensionMismatch(dim, DoFHandlerType::dimension));
 
   Assert (this->triangulation != nullptr,
-          Exceptions::DataOut::ExcNoTriangulationSelected());
+          Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
 
   const unsigned int n_subdivisions = (n_subdivisions_ != 0)
                                       ? n_subdivisions_
                                       : this->default_subdivisions;
   Assert (n_subdivisions >= 1,
-          Exceptions::DataOut::ExcInvalidNumberOfSubdivisions(n_subdivisions));
+          Exceptions::DataOutImplementation::ExcInvalidNumberOfSubdivisions(n_subdivisions));
 
   this->validate_dataset_names();
 
@@ -497,7 +497,7 @@ void DataOut<dim,DoFHandlerType>::build_patches
           ExcMessage("The update of normal vectors may not be requested for evaluation of "
                      "data on cells via DataPostprocessor."));
 
-  internal::DataOut::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
+  internal::DataOutImplementation::ParallelData<DoFHandlerType::dimension, DoFHandlerType::space_dimension>
   thread_data (n_datasets, n_subdivisions,
                n_postprocessor_outputs,
                mapping,

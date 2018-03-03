@@ -126,7 +126,7 @@ namespace internal
       {
         const size_type vec_size = end-start;
         // set chunk size for sub-tasks
-        const unsigned int gs = internal::Vector::minimum_parallel_grain_size;
+        const unsigned int gs = internal::VectorImplementation::minimum_parallel_grain_size;
         n_chunks = std::min(static_cast<size_type>(4*MultithreadInfo::n_threads()),
                             vec_size / gs);
         chunk_size = vec_size / n_chunks;
@@ -167,7 +167,7 @@ namespace internal
       size_type vec_size = end-start;
       // only go to the parallel function in case there are at least 4 parallel
       // items, otherwise the overhead is too large
-      if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size &&
+      if (vec_size >= 4*internal::VectorImplementation::minimum_parallel_grain_size &&
           MultithreadInfo::n_threads() > 1)
         {
           Assert(partitioner.get() != nullptr,
@@ -1211,7 +1211,7 @@ namespace internal
       {
         const size_type vec_size = end-start;
         // set chunk size for sub-tasks
-        const unsigned int gs = internal::Vector::minimum_parallel_grain_size;
+        const unsigned int gs = internal::VectorImplementation::minimum_parallel_grain_size;
         n_chunks = std::min(static_cast<size_type>(4*MultithreadInfo::n_threads()),
                             vec_size / gs);
         chunk_size = vec_size / n_chunks;
@@ -1292,7 +1292,7 @@ namespace internal
       size_type vec_size = end-start;
       // only go to the parallel function in case there are at least 4 parallel
       // items, otherwise the overhead is too large
-      if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size &&
+      if (vec_size >= 4*internal::VectorImplementation::minimum_parallel_grain_size &&
           MultithreadInfo::n_threads() > 1)
         {
           Assert(partitioner.get() != nullptr,

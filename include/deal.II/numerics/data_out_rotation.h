@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace DataOutRotation
+  namespace DataOutRotationImplementation
   {
     /**
      * A derived class for use in the DataOutFaces class. This is a class for
@@ -36,7 +36,7 @@ namespace internal
      * documentation of the WorkStream class.
      */
     template <int dim, int spacedim>
-    struct ParallelData : public internal::DataOut::ParallelDataBase<dim,spacedim>
+    struct ParallelData : public internal::DataOutImplementation::ParallelDataBase<dim,spacedim>
     {
       ParallelData (const unsigned int n_datasets,
                     const unsigned int n_subdivisions,
@@ -199,7 +199,7 @@ private:
    */
   void
   build_one_patch (const cell_iterator *cell,
-                   internal::DataOutRotation::ParallelData<dimension, space_dimension> &data,
+                   internal::DataOutRotationImplementation::ParallelData<dimension, space_dimension> &data,
                    std::vector<DataOutBase::Patch<dimension+1,space_dimension+1> > &my_patches);
 };
 

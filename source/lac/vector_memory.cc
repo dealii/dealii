@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  namespace GrowingVectorMemory
+  namespace GrowingVectorMemoryImplementation
   {
     void release_all_unused_memory()
     {

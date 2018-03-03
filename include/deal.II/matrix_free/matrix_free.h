@@ -1555,7 +1555,7 @@ MatrixFree<dim,Number>::release_scratch_data(const AlignedVector<VectorizedArray
 
 namespace internal
 {
-  namespace MatrixFree
+  namespace MatrixFreeImplementation
   {
     template <typename DoFHandlerType>
     inline
@@ -1610,7 +1610,7 @@ reinit(const DoFHandlerType                                  &dof_handler,
   quads.push_back (quad);
 
   std::vector<IndexSet> locally_owned_sets =
-    internal::MatrixFree::extract_locally_owned_index_sets
+    internal::MatrixFreeImplementation::extract_locally_owned_index_sets
     (dof_handlers, additional_data.level_mg_handler);
 
   std::vector<hp::QCollection<1> > quad_hp;
@@ -1638,7 +1638,7 @@ reinit(const Mapping<dim>                                    &mapping,
   constraints.push_back (&constraints_in);
 
   std::vector<IndexSet> locally_owned_sets =
-    internal::MatrixFree::extract_locally_owned_index_sets
+    internal::MatrixFreeImplementation::extract_locally_owned_index_sets
     (dof_handlers, additional_data.level_mg_handler);
 
   std::vector<hp::QCollection<1> > quad_hp;
@@ -1659,7 +1659,7 @@ reinit(const std::vector<const DoFHandlerType *>   &dof_handler,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
-    internal::MatrixFree::extract_locally_owned_index_sets
+    internal::MatrixFreeImplementation::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
   std::vector<hp::QCollection<1> > quad_hp;
   for (unsigned int q=0; q<quad.size(); ++q)
@@ -1679,7 +1679,7 @@ reinit(const std::vector<const DoFHandlerType *>             &dof_handler,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
-    internal::MatrixFree::extract_locally_owned_index_sets
+    internal::MatrixFreeImplementation::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
   std::vector<hp::QCollection<1> > quad_hp;
   quad_hp.emplace_back (quad);
@@ -1699,7 +1699,7 @@ reinit(const Mapping<dim>                                    &mapping,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
-    internal::MatrixFree::extract_locally_owned_index_sets
+    internal::MatrixFreeImplementation::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
   std::vector<hp::QCollection<1> > quad_hp;
   quad_hp.emplace_back (quad);
@@ -1719,7 +1719,7 @@ reinit(const Mapping<dim>                                   &mapping,
        const typename MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
-    internal::MatrixFree::extract_locally_owned_index_sets
+    internal::MatrixFreeImplementation::extract_locally_owned_index_sets
     (dof_handler, additional_data.level_mg_handler);
   std::vector<hp::QCollection<1> > quad_hp;
   for (unsigned int q=0; q<quad.size(); ++q)

@@ -1887,7 +1887,7 @@ namespace TrilinosWrappers
 
   namespace internal
   {
-    namespace SparseMatrix
+    namespace SparseMatrixImplementation
     {
       template <typename VectorType>
       inline
@@ -1924,7 +1924,7 @@ namespace TrilinosWrappers
     (void)src;
     (void)dst;
 
-    internal::SparseMatrix::check_vector_map_equality(*matrix, src, dst);
+    internal::SparseMatrixImplementation::check_vector_map_equality(*matrix, src, dst);
     const size_type dst_local_size = internal::end(dst) - internal::begin(dst);
     AssertDimension (dst_local_size, static_cast<size_type>(matrix->RangeMap().NumMyPoints()));
     const size_type src_local_size = internal::end(src) - internal::begin(src);
@@ -1951,7 +1951,7 @@ namespace TrilinosWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
 
-    internal::SparseMatrix::check_vector_map_equality(*matrix, dst, src);
+    internal::SparseMatrixImplementation::check_vector_map_equality(*matrix, dst, src);
     const size_type dst_local_size = internal::end(dst) - internal::begin(dst);
     AssertDimension (dst_local_size, static_cast<size_type>(matrix->DomainMap().NumMyPoints()));
     const size_type src_local_size = internal::end(src) - internal::begin(src);
@@ -2411,7 +2411,7 @@ namespace TrilinosWrappers
 #endif
     }
 
-    namespace LinearOperator
+    namespace LinearOperatorImplementation
     {
 
       TrilinosPayload::TrilinosPayload ()

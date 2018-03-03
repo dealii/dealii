@@ -280,7 +280,7 @@ void Vector<Number>::reinit (const size_type n,
 
       // only reset the partitioner if we actually expect a significant vector
       // size
-      if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size)
+      if (vec_size >= 4*internal::VectorImplementation::minimum_parallel_grain_size)
         thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
     }
 
@@ -315,7 +315,7 @@ void Vector<Number>::grow_or_shrink (const size_type n)
 
       // only reset the partitioner if we actually expect a significant vector
       // size
-      if (vec_size >= 4*internal::Vector::minimum_parallel_grain_size)
+      if (vec_size >= 4*internal::VectorImplementation::minimum_parallel_grain_size)
         thread_loop_partitioner = std::make_shared<parallel::internal::TBBPartitioner>();
     }
 
