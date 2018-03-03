@@ -28,6 +28,20 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// forward declarations
+template <typename Number>
+class LAPACKFullMatrix;
+template <typename Number>
+class FullMatrix;
+template <typename Number>
+class SparseMatrix;
+template <typename Number>
+class SparseMatrixEZ;
+template <typename Number>
+class Vector;
+class SparsityPattern;
+
+
 /**
  * Class encapsulating scalars stored by LAPACKBandedMatrix.
  */
@@ -162,6 +176,47 @@ public:
          const size_type n_superdiagonals);
 
   /**
+   * Copy constructor.
+   */
+  explicit LAPACKBandedMatrix(const LAPACKBandedMatrix<Number> &other);
+
+  /**
+   * Copy constructor. Since LAPACKFullMatrix stores all entries, this matrix
+   * computes the number of diagonals by checking which values in @other are
+   * nonzero.
+   */
+  explicit LAPACKBandedMatrix(const LAPACKFullMatrix<Number> &other);
+
+  /**
+   * Copy constructor. Since FullMatrix stores all entries, this matrix
+   * computes the number of diagonals by checking which values in @other are
+   * nonzero.
+   */
+  explicit LAPACKBandedMatrix(const FullMatrix<Number> &other);
+
+  /**
+   * Constructor. Initializes values to zero.
+   *
+   * @note Unlike SparseMatrix, this class does not store a pointer to the
+   * SparsityPattern: instead, this class uses @p sparsity_pattern to set
+   * up its own internal data structures.
+   */
+  explicit LAPACKBandedMatrix(const SparsityPattern &sparsity_pattern);
+
+  /**
+   * Copy constructor.
+   *
+   * @note Unlike SparseMatrix, this class does not store a pointer to the
+   * SparsityPattern owned by @p other.
+   */
+  explicit LAPACKBandedMatrix(const SparseMatrix<Number> &other);
+
+  /**
+   * Copy constructor.
+   */
+  explicit LAPACKBandedMatrix(const SparseMatrixEZ<Number> &other);
+
+  /**
    * Move constructor.
    */
   LAPACKBandedMatrix(LAPACKBandedMatrix<Number> &&) = default;
@@ -243,6 +298,41 @@ public:
   void
   set(const size_type row_n, const size_type col_n, const Number value);
 
+  /**
+   * Matrix-vector multiplication.
+   *
+   * The optional parameter <tt>adding</tt> determines, whether the result is
+   * stored in <tt>w</tt> or added to <tt>w</tt>.
+   */
+  void
+  vmult(Vector<Number> &      w,
+        const Vector<Number> &v,
+        const bool            adding = false) const;
+
+  /**
+   * Adding matrix-vector-multiplication. <i>w += A*v</i>
+   */
+  void
+  vmult_add(Vector<Number> &w, const Vector<Number> &v) const;
+
+  /**
+   * Transpose matrix-vector-multiplication.
+   *
+   * The optional parameter <tt>adding</tt> determines, whether the result is
+   * stored in <tt>w</tt> or added to <tt>w</tt>.
+   */
+  void
+  Tvmult(Vector<Number> &      w,
+         const Vector<Number> &v,
+         const bool            adding = false) const;
+
+  /**
+   * Adding transpose matrix-vector-multiplication. <i>w +=
+   * A<sup>T</sup>*v</i>
+   */
+  void
+  Tvmult_add(Vector<Number> &w, const Vector<Number> &v) const;
+
 protected:
   /**
    * Array containing the actual values of the matrix in column-major
@@ -301,6 +391,15 @@ private:
    */
   std::size_t
   compute_index(const size_type row_n, const size_type col_n) const;
+
+  /**
+   * Internal implementation of vmult and Tvmult.
+   */
+  void
+  do_vmult(Vector<Number> &      w,
+           const Vector<Number> &v,
+           const char            transpose,
+           const bool            adding) const;
 };
 
 
