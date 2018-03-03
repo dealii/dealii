@@ -16,7 +16,7 @@
 #include "../tests.h"
 #include "../lapack/create_matrix.h"
 
-// test serial saving and loading of distributed ScaLAPACKMatrices
+// test saving and loading of distributed ScaLAPACKMatrices
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -34,7 +34,7 @@
 template <typename NumberType>
 void test(const unsigned int size, const unsigned int block_size)
 {
-  const std::string filename ("scalapck_10_test.h5");
+  const std::string filename ("scalapack_10_test.h5");
 
   MPI_Comm mpi_communicator(MPI_COMM_WORLD);
   const unsigned int this_mpi_process(Utilities::MPI::this_mpi_process(mpi_communicator));
@@ -62,6 +62,10 @@ void test(const unsigned int size, const unsigned int block_size)
   copy.add(-1,full);
 
   pcout << size << " " << block_size << std::endl;
+
+  if (copy.frobenius_norm()>1e-12)
+    pcout << "norm of difference: " << copy.frobenius_norm() << std::endl;
+
   AssertThrow(copy.frobenius_norm()<1e-12,ExcInternalError());
   std::remove(filename.c_str());
 }
