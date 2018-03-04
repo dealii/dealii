@@ -580,6 +580,21 @@ void ParameterHandler::parse_input_from_xml (std::istream &in)
 }
 
 
+void ParameterHandler::parse_input_from_json (std::istream &in)
+{
+  AssertThrow(in, ExcIO());
+
+  boost::property_tree::ptree node_tree;
+  // This boost function will raise an exception if this is not a valid JSON
+  // file.
+  read_json (in, node_tree);
+
+  // The xml function is reused to read in the xml into the paramter file.
+  // This means that only mangled files can be read.
+  read_xml_recursively (node_tree, "", path_separator, patterns, *entries);
+}
+
+
 
 void ParameterHandler::clear ()
 {
