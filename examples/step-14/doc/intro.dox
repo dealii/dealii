@@ -71,14 +71,18 @@ and we can, by Galerkin orthogonality, rewrite this as
 @f[
   J(e) = a(e,z-\varphi_h)
 @f]
-for all possible functions $\varphi_h$ from the discrete test space.
+where $\varphi_h$ can be chosen from the discrete test space in
+whatever way we find convenient.
 
 Concretely, for Laplace's equation, the error identity reads
 @f[
   J(e) = (\nabla e, \nabla(z-\varphi_h)).
 @f]
-For reasons that we will not explain, we do not want to use this formula as
-is, but rather split the scalar products into terms on all cells, and
+Because we want to use this formula not only to compute error, but
+also to refine the mesh, we need to rewrite the expression above as a
+sum over cells where each cell's contribution can then be used as an
+error indicator for this cell.
+Thus, we split the scalar products into terms for each cell, and
 integrate by parts on each of them:
 @f{eqnarray*}
   J(e)
@@ -89,13 +93,14 @@ integrate by parts on each of them:
   \sum_K (-\Delta (u-u_h), z-\varphi_h)_K
   + (\partial_n (u-u_h), z-z_h)_{\partial K}.
 @f}
-Next we use that $-\Delta u=f$, and that $\partial_n u$ is a quantity that is
-continuous almost everywhere, so the terms involving $\partial_n u$ on one
+Next we use that $-\Delta u=f$, and that for solutions of the Laplace
+equation, the solution is smooth enough that $\partial_n u$ is
+continuous almost everywhere -- so the terms involving $\partial_n u$ on one
 cell cancels with that on its neighbor, where the normal vector has the
-opposite sign. At the boundary of the domain, where there is no neighbor cell
+opposite sign. (The same is not true for $\partial_n u_h$, though.)
+At the boundary of the domain, where there is no neighbor cell
 with which this term could cancel, the weight $z-\varphi_h$ can be chosen as
-zero, since $z$ has zero boundary values, and $\varphi_h$ can be chosen to
-have the same.
+zero, and the whole term disappears.
 
 Thus, we have
 @f{eqnarray*}
@@ -116,7 +121,7 @@ with the neighbor cell $K'$, to obtain
   - \frac 12 (\partial_n u_h|_K + \partial_{n'} u_h|_{K'},
               z-\varphi_h)_{\partial K\backslash \partial\Omega}.
 @f}
-Using that for the normal vectors $n'=-n$ holds, we define the jump of the
+Using that for the normal vectors on adjacent cells we have $n'=-n$, we define the jump of the
 normal derivative by
 @f[
   [\partial_n u_h] := \partial_n u_h|_K + \partial_{n'} u_h|_{K'}
@@ -172,6 +177,35 @@ efficient methods, again refer to the given literature, in particular
 
 With this, we end the discussion of the mathematical side of this program and
 turn to the actual implementation.
+
+
+@note There are two steps above that do not seem necessary if all you
+care about is computing the error: namely, (i) the subtraction of
+$\phi_h$ from $z$, and (ii) splitting the integral into a sum of cells
+and integrating by parts on each. Indeed, neither of these two steps
+change $J(e)$ at all, as we only ever consider identities above until
+the substitution of $z$ by $\tilde z$. In other words, if you care
+only about <i>estimating the global error</i> $J(e)$, then these steps
+are not necessary. On the other hand, if you want to use the error
+estimate also as a refinement criterion for each cell of the mesh,
+then it is necessary to (i) break the estimate into a sum of cells,
+and (ii) massage the formulas in such a way that each cell's
+contributions have something to do with the local error. (While the
+contortions above do not change the value of the <i>sum</i> $J(e)$,
+they change the values we compute for each cell $K$.) To this end, we
+want to write everything in the form "residual times dual weight"
+where a "residual" is something that goes to zero as the approximation
+becomes $u_h$ better and better. For example, the quantity $\partial_n
+u_h$ is not a residual, since it simply converges to the (normal
+component of) the gradient of the exact solution. On the other hand,
+$[\partial_n u_h]$ is a residual because it converges to $[\partial_n
+u]=0$. All of the steps we have taken above in developing the final
+form of $J(e)$ have indeed had the goal of bringing the final formula
+into a form where each term converges to zero as the discrete solution
+$u_h$ converges to $u$. This then allows considering each cell's
+contribution as an "error indicator" that also converges to zero -- as
+it should as the mesh is refined.
+
 
 
 <h3>The software</h3>
