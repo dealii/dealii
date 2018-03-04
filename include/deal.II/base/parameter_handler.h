@@ -1479,17 +1479,6 @@ private:
   std::vector<std::function<void (const std::string &)> > actions;
 
   /**
-   * Mangle a string so that it doesn't contain any special characters or
-   * spaces.
-   */
-  static std::string mangle (const std::string &s);
-
-  /**
-   * Unmangle a string into its original form.
-   */
-  static std::string demangle (const std::string &s);
-
-  /**
    * Given a list of directories and subdirectories that identify
    * a particular place in the tree, return the string that identifies
    * this place in the way the BOOST property tree libraries likes
