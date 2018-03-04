@@ -81,4 +81,16 @@ for(deal_II_dimension : DIMENSIONS)
     MGLevelGlobalTransfer<TrilinosWrappers::MPI::Vector>::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, TrilinosWrappers::MPI::Vector&,
             const MGLevelObject<TrilinosWrappers::MPI::Vector>&) const;
 #endif
+
+#ifdef DEAL_II_WITH_PETSC
+    template void
+    MGLevelGlobalTransfer<PETScWrappers::MPI::Vector>::copy_to_mg (
+        const DoFHandler<deal_II_dimension>&, MGLevelObject<PETScWrappers::MPI::Vector>&, const PETScWrappers::MPI::Vector&) const;
+    template void
+    MGLevelGlobalTransfer<PETScWrappers::MPI::Vector>::copy_from_mg (const DoFHandler<deal_II_dimension>&, PETScWrappers::MPI::Vector&,
+            const MGLevelObject<PETScWrappers::MPI::Vector>&) const;
+    template void
+    MGLevelGlobalTransfer<PETScWrappers::MPI::Vector>::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, PETScWrappers::MPI::Vector&,
+            const MGLevelObject<PETScWrappers::MPI::Vector>&) const;
+#endif
 }

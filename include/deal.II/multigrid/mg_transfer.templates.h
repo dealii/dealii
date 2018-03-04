@@ -19,6 +19,7 @@
 
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector_view.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -144,6 +145,31 @@ namespace
       (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
        (&mg_dof.get_triangulation()));
     AssertThrow(tria!=nullptr, ExcMessage("multigrid with Trilinos vectors only works with a parallel Triangulation!"));
+
+    for (unsigned int level=v.min_level();
+         level<=v.max_level(); ++level)
+      {
+        v[level].reinit(mg_dof.locally_owned_mg_dofs(level), tria->get_communicator());
+      }
+  }
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+  /**
+   * Adjust vectors on all levels to correct size.  Here, we just count the
+   * numbers of degrees of freedom on each level and @p reinit each level
+   * vector to this length.
+   */
+  template <int dim, int spacedim>
+  void
+  reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
+                 const std::vector<unsigned int> &,
+                 MGLevelObject<PETScWrappers::MPI::Vector> &v)
+  {
+    const dealii::parallel::Triangulation<dim,spacedim> *tria =
+      (dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
+       (&mg_dof.get_triangulation()));
+    AssertThrow(tria!=nullptr, ExcMessage("multigrid with parallel PETSc vectors only works with a parallel Triangulation!"));
 
     for (unsigned int level=v.min_level();
          level<=v.max_level(); ++level)

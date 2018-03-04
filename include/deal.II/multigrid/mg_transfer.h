@@ -24,6 +24,8 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 
 #include <deal.II/lac/vector_memory.h>
 
@@ -47,6 +49,8 @@ namespace internal
     typedef ::dealii::SparsityPattern Sparsity;
     typedef ::dealii::SparseMatrix<typename VectorType::value_type> Matrix;
 
+    static const bool requires_distributed_sparsity_pattern = false;
+
     template <typename SparsityPatternType, typename DoFHandlerType>
     static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const SparsityPatternType &sp, const DoFHandlerType &)
     {
@@ -62,6 +66,8 @@ namespace internal
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+
+    static const bool requires_distributed_sparsity_pattern = false;
 
     template <typename SparsityPatternType, typename DoFHandlerType>
     static void reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
@@ -86,6 +92,8 @@ namespace internal
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
 
+    static const bool requires_distributed_sparsity_pattern = false;
+
     template <typename SparsityPatternType, typename DoFHandlerType>
     static void reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
     {
@@ -108,6 +116,8 @@ namespace internal
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+
+    static const bool requires_distributed_sparsity_pattern = false;
 
     template <typename SparsityPatternType, typename DoFHandlerType>
     static void reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, DoFHandlerType &dh)
@@ -133,6 +143,8 @@ namespace internal
     typedef ::dealii::SparsityPattern Sparsity;
     typedef ::dealii::SparseMatrix<Number> Matrix;
 
+    static const bool requires_distributed_sparsity_pattern = false;
+
     template <typename SparsityPatternType, typename DoFHandlerType>
     static void reinit(Matrix &, Sparsity &, int, const SparsityPatternType &, const DoFHandlerType &)
     {
@@ -142,6 +154,33 @@ namespace internal
     }
   };
 
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+  template <>
+  struct MatrixSelector<dealii::PETScWrappers::MPI::Vector>
+  {
+    typedef ::dealii::DynamicSparsityPattern Sparsity;
+    typedef ::dealii::PETScWrappers::MPI::SparseMatrix Matrix;
+
+    static const bool requires_distributed_sparsity_pattern = true;
+
+    template <typename SparsityPatternType, typename DoFHandlerType>
+    static void reinit(Matrix &matrix, Sparsity &, int level, const SparsityPatternType &sp, const DoFHandlerType &dh)
+    {
+      const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension> *dist_tria =
+        dynamic_cast<const parallel::Triangulation<DoFHandlerType::dimension,DoFHandlerType::space_dimension>*>
+        (&(dh.get_triangulation()));
+      MPI_Comm communicator = dist_tria != nullptr ?
+                              dist_tria->get_communicator() :
+                              MPI_COMM_SELF;
+      // Reinit PETSc matrix
+      matrix.reinit(dh.locally_owned_mg_dofs(level+1),
+                    dh.locally_owned_mg_dofs(level),
+                    sp, communicator);
+    }
+
+  };
 #endif
 }
 

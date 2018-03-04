@@ -27,6 +27,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -235,6 +236,41 @@ void MGTransferPrebuilt<VectorType>::build_matrices
                   }
               }
           }
+
+#ifdef DEAL_II_WITH_MPI
+      if (internal::MatrixSelector<VectorType>::requires_distributed_sparsity_pattern)
+        {
+          // Since PETSc matrices do not offer the functionality to fill up in-
+          // complete sparsity patterns on their own, the sparsity pattern must be
+          // manually distributed.
+
+          // Retrieve communicator from triangulation if it is parallel
+          const parallel::Triangulation<dim,spacedim> *dist_tria =
+            dynamic_cast<const parallel::Triangulation<dim,spacedim>*>
+            (&(mg_dof.get_triangulation()));
+
+          MPI_Comm communicator = dist_tria != nullptr ?
+                                  dist_tria->get_communicator() :
+                                  MPI_COMM_SELF;
+
+          // Compute # of locally owned MG dofs / processor for distribution
+          const std::vector<::dealii::IndexSet> &locally_owned_mg_dofs_per_processor = mg_dof.locally_owned_mg_dofs_per_processor(level+1);
+          std::vector<::dealii::types::global_dof_index> n_locally_owned_mg_dofs_per_processor(locally_owned_mg_dofs_per_processor.size(), 0);
+
+          for (size_t index = 0; index < n_locally_owned_mg_dofs_per_processor.size(); ++index)
+            {
+              n_locally_owned_mg_dofs_per_processor[index] = locally_owned_mg_dofs_per_processor[index].n_elements();
+            }
+
+          // Distribute sparsity pattern
+          ::dealii::SparsityTools::distribute_sparsity_pattern(
+            dsp,
+            n_locally_owned_mg_dofs_per_processor,
+            communicator,
+            dsp.row_index_set()
+          );
+        }
+#endif
 
       internal::MatrixSelector<VectorType>::reinit(*prolongation_matrices[level],
                                                    *prolongation_sparsities[level],
