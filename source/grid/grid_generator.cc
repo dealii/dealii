@@ -181,6 +181,8 @@ namespace GridGenerator
           Assert(cell->face(2)->at_boundary(), ExcInternalError());
           cell->face (2)->set_all_boundary_ids (1);
         }
+
+      GridTools::copy_boundary_to_manifold_id(tria);
     }
 
 
@@ -261,6 +263,8 @@ namespace GridGenerator
         }
       else
         Assert (false, ExcNotImplemented());
+
+      GridTools::copy_boundary_to_manifold_id(tria);
     }
 
 
@@ -3738,6 +3742,8 @@ namespace GridGenerator
                       face->set_all_boundary_ids(1);
                   }
               }
+
+        GridTools::copy_boundary_to_manifold_id(tria);
       }
   }
 
