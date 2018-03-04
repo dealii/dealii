@@ -903,19 +903,25 @@ namespace Step9
 
 
   // Writing output to disk is done in the same way as in the previous
-  // examples...
+  // examples. Indeed, the function is identical to the one in step-6.
   template <int dim>
   void AdvectionProblem<dim>::output_results (const unsigned int cycle) const
   {
-    std::string filename = "grid-";
-    filename += ('0' + cycle);
-    Assert (cycle < 10, ExcInternalError());
+    {
+      GridOut grid_out;
+      std::ofstream output ("grid-" + std::to_string(cycle) + ".eps");
+      grid_out.write_eps (triangulation, output);
+    }
 
-    filename += ".eps";
-    std::ofstream output (filename.c_str());
+    {
+      DataOut<dim> data_out;
+      data_out.attach_dof_handler (dof_handler);
+      data_out.add_data_vector (solution, "solution");
+      data_out.build_patches ();
 
-    GridOut grid_out;
-    grid_out.write_eps (triangulation, output);
+      std::ofstream output ("solution-" + std::to_string(cycle) + ".vtk");
+      data_out.write_vtk (output);
+    }
   }
 
 
@@ -952,14 +958,6 @@ namespace Step9
         solve ();
         output_results (cycle);
       }
-
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (solution, "solution");
-    data_out.build_patches ();
-
-    std::ofstream output ("final-solution.vtk");
-    data_out.write_vtk (output);
   }
 
 

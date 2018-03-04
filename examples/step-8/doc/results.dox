@@ -4,7 +4,7 @@
 There is not much to be said about the results of this program, other than
 that they look nice. All images were made using Visit from the
 output files that the program wrote to disk. The first two pictures show
-the $x$- and $y$-displacements as a scalar components:
+the $x$- and $y$-displacements as scalar components:
 
 <TABLE WIDTH="100%">
 <tr>
@@ -38,7 +38,7 @@ scalars, and Visit then faithfully assumes that this is indeed what it is. In
 other words, once we have written the data as scalars, there is nothing in
 Visit that allows us to paste these two scalar fields back together as a
 vector field. Where we would have to attack this problem is at the root,
-namely in <code>ElasticProblem::output_results</code>. We won't do so here but
+namely in <code>ElasticProblem::output_results()</code>. We won't do so here but
 instead refer the reader to the step-22 program where we show how to do this
 for a more general situation. That said, we couldn't help generating the data
 anyway that would show how this would look if implemented as discussed in
