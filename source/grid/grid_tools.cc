@@ -882,10 +882,14 @@ namespace GridTools
                                         almost_infinite_length);
 
     // also note if a vertex is at the boundary
-    std::vector<bool>   at_boundary (triangulation.n_vertices(), false);
+    std::vector<bool>   at_boundary (keep_boundary ? triangulation.n_vertices() : 0, false);
+    // for parallel::shared::Triangulation we need to work on all vertices,
+    // not just the ones related to loacally owned cells;
+    const bool is_parallel_shared
+      = (dynamic_cast<parallel::shared::Triangulation<dim,spacedim>*> (&triangulation) != nullptr);
     for (typename Triangulation<dim,spacedim>::active_cell_iterator
          cell=triangulation.begin_active(); cell!=triangulation.end(); ++cell)
-      if (cell->is_locally_owned())
+      if (is_parallel_shared || cell->is_locally_owned())
         {
           if (dim>1)
             {
