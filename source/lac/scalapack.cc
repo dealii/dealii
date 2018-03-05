@@ -1179,6 +1179,7 @@ NumberType ScaLAPACKMatrix<NumberType>::norm_symmetric(const char type) const
 
 
 
+#ifdef DEAL_II_WITH_HDF5
 namespace internal
 {
   namespace
@@ -1239,6 +1240,7 @@ namespace internal
     }
   }
 }
+#endif
 
 
 
