@@ -505,110 +505,107 @@ ConstraintMatrix::condense (BlockSparseMatrix<number> &uncondensed,
 //knowledge of the individual types
 
 // number of functions to select the right implementation for set_zero().
-namespace internal
+namespace InternalConstraintMatrix
 {
-  namespace ConstraintMatrix
+  namespace
   {
-    namespace
+    typedef types::global_dof_index size_type;
+
+    template <class VectorType>
+    void set_zero_parallel(const std::vector<size_type> &cm,
+                           VectorType &vec,
+                           size_type shift = 0)
     {
-      typedef types::global_dof_index size_type;
+      Assert(!vec.has_ghost_elements(), ExcInternalError());
+      IndexSet locally_owned = vec.locally_owned_elements();
+      for (typename std::vector<size_type>::const_iterator it = cm.begin();
+           it != cm.end(); ++it)
+        {
+          // If shift>0 then we are working on a part of a BlockVector
+          // so vec(i) is actually the global entry i+shift.
+          // We first make sure the line falls into the range of vec,
+          // then check if is part of the local part of the vector, before
+          // finally setting it to 0.
+          if ((*it)<shift)
+            continue;
+          size_type idx = *it - shift;
+          if (idx<vec.size() && locally_owned.is_element(idx))
+            internal::ElementAccess<VectorType>::set(0., idx, vec);
+        }
+    }
 
-      template <class VectorType>
-      void set_zero_parallel(const std::vector<size_type> &cm,
-                             VectorType &vec,
-                             size_type shift = 0)
-      {
-        Assert(!vec.has_ghost_elements(), ExcInternalError());
-        IndexSet locally_owned = vec.locally_owned_elements();
-        for (typename std::vector<size_type>::const_iterator it = cm.begin();
-             it != cm.end(); ++it)
-          {
-            // If shift>0 then we are working on a part of a BlockVector
-            // so vec(i) is actually the global entry i+shift.
-            // We first make sure the line falls into the range of vec,
-            // then check if is part of the local part of the vector, before
-            // finally setting it to 0.
-            if ((*it)<shift)
-              continue;
-            size_type idx = *it - shift;
-            if (idx<vec.size() && locally_owned.is_element(idx))
-              internal::ElementAccess<VectorType>::set(0., idx, vec);
-          }
-      }
+    template <typename Number>
+    void set_zero_parallel(const std::vector<size_type> &cm, LinearAlgebra::distributed::Vector<Number> &vec, size_type shift = 0)
+    {
+      for (typename std::vector<size_type>::const_iterator it = cm.begin();
+           it != cm.end(); ++it)
+        {
+          // If shift>0 then we are working on a part of a BlockVector
+          // so vec(i) is actually the global entry i+shift.
+          // We first make sure the line falls into the range of vec,
+          // then check if is part of the local part of the vector, before
+          // finally setting it to 0.
+          if ((*it)<shift)
+            continue;
+          size_type idx = *it - shift;
+          if (vec.in_local_range(idx))
+            vec(idx) = 0.;
+        }
+      vec.zero_out_ghosts();
+    }
 
-      template <typename Number>
-      void set_zero_parallel(const std::vector<size_type> &cm, LinearAlgebra::distributed::Vector<Number> &vec, size_type shift = 0)
-      {
-        for (typename std::vector<size_type>::const_iterator it = cm.begin();
-             it != cm.end(); ++it)
-          {
-            // If shift>0 then we are working on a part of a BlockVector
-            // so vec(i) is actually the global entry i+shift.
-            // We first make sure the line falls into the range of vec,
-            // then check if is part of the local part of the vector, before
-            // finally setting it to 0.
-            if ((*it)<shift)
-              continue;
-            size_type idx = *it - shift;
-            if (vec.in_local_range(idx))
-              vec(idx) = 0.;
-          }
-        vec.zero_out_ghosts();
-      }
+    template <class VectorType>
+    void set_zero_in_parallel(const std::vector<size_type> &cm,
+                              VectorType                   &vec,
+                              std::integral_constant<bool, false>)
+    {
+      set_zero_parallel(cm, vec, 0);
+    }
 
-      template <class VectorType>
-      void set_zero_in_parallel(const std::vector<size_type> &cm,
-                                VectorType                   &vec,
-                                std::integral_constant<bool, false>)
-      {
-        set_zero_parallel(cm, vec, 0);
-      }
+    // in parallel for BlockVectors
+    template <class VectorType>
+    void set_zero_in_parallel(const std::vector<size_type> &cm,
+                              VectorType                   &vec,
+                              std::integral_constant<bool, true>)
+    {
+      size_type start_shift = 0;
+      for (size_type j=0; j<vec.n_blocks(); ++j)
+        {
+          set_zero_parallel(cm, vec.block(j), start_shift);
+          start_shift += vec.block(j).size();
+        }
+    }
 
-      // in parallel for BlockVectors
-      template <class VectorType>
-      void set_zero_in_parallel(const std::vector<size_type> &cm,
-                                VectorType                   &vec,
-                                std::integral_constant<bool, true>)
-      {
-        size_type start_shift = 0;
-        for (size_type j=0; j<vec.n_blocks(); ++j)
-          {
-            set_zero_parallel(cm, vec.block(j), start_shift);
-            start_shift += vec.block(j).size();
-          }
-      }
+    template <class VectorType>
+    void set_zero_serial(const std::vector<size_type> &cm,
+                         VectorType                   &vec)
+    {
+      for (typename std::vector<size_type>::const_iterator it = cm.begin();
+           it != cm.end(); ++it)
+        vec(*it) = 0.;
+    }
 
-      template <class VectorType>
-      void set_zero_serial(const std::vector<size_type> &cm,
-                           VectorType                   &vec)
-      {
-        for (typename std::vector<size_type>::const_iterator it = cm.begin();
-             it != cm.end(); ++it)
-          vec(*it) = 0.;
-      }
-
-      template <class VectorType>
-      void set_zero_all(const std::vector<size_type> &cm,
-                        VectorType                   &vec)
-      {
-        set_zero_in_parallel<VectorType>(cm, vec, std::integral_constant<bool, IsBlockVector<VectorType>::value>());
-        vec.compress(VectorOperation::insert);
-      }
+    template <class VectorType>
+    void set_zero_all(const std::vector<size_type> &cm,
+                      VectorType                   &vec)
+    {
+      set_zero_in_parallel<VectorType>(cm, vec, std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+      vec.compress(VectorOperation::insert);
+    }
 
 
-      template <class T>
-      void set_zero_all(const std::vector<size_type> &cm,
-                        dealii::Vector<T>            &vec)
-      {
-        set_zero_serial(cm, vec);
-      }
+    template <class T>
+    void set_zero_all(const std::vector<size_type> &cm,
+                      dealii::Vector<T>            &vec)
+    {
+      set_zero_serial(cm, vec);
+    }
 
-      template <class T>
-      void set_zero_all(const std::vector<size_type> &cm,
-                        dealii::BlockVector<T>       &vec)
-      {
-        set_zero_serial(cm, vec);
-      }
+    template <class T>
+    void set_zero_all(const std::vector<size_type> &cm,
+                      dealii::BlockVector<T>       &vec)
+    {
+      set_zero_serial(cm, vec);
     }
   }
 }
@@ -623,7 +620,7 @@ ConstraintMatrix::set_zero (VectorType &vec) const
   std::vector<size_type> constrained_lines(lines.size());
   for (unsigned int i=0; i<lines.size(); ++i)
     constrained_lines[i] = lines[i].index;
-  internal::ConstraintMatrix::set_zero_all(constrained_lines, vec);
+  InternalConstraintMatrix::set_zero_all(constrained_lines, vec);
 }
 
 
