@@ -1,0 +1,41 @@
+
+DEAL:0::dim=2, keep_boundary=1
+DEAL:0::561638746
+DEAL:0::OK
+DEAL:0::dim=2, keep_boundary=0
+DEAL:0::1946764437
+DEAL:0::OK
+DEAL:0::dim=3, keep_boundary=1
+DEAL:0::3893493253
+DEAL:0::OK
+DEAL:0::dim=3, keep_boundary=0
+DEAL:0::2979128258
+DEAL:0::OK
+
+DEAL:1::dim=2, keep_boundary=1
+DEAL:1::561638746
+DEAL:1::OK
+DEAL:1::dim=2, keep_boundary=0
+DEAL:1::1946764437
+DEAL:1::OK
+DEAL:1::dim=3, keep_boundary=1
+DEAL:1::3893493253
+DEAL:1::OK
+DEAL:1::dim=3, keep_boundary=0
+DEAL:1::2979128258
+DEAL:1::OK
+
+
+DEAL:2::dim=2, keep_boundary=1
+DEAL:2::561638746
+DEAL:2::OK
+DEAL:2::dim=2, keep_boundary=0
+DEAL:2::1946764437
+DEAL:2::OK
+DEAL:2::dim=3, keep_boundary=1
+DEAL:2::3893493253
+DEAL:2::OK
+DEAL:2::dim=3, keep_boundary=0
+DEAL:2::2979128258
+DEAL:2::OK
+
