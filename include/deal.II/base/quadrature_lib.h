@@ -80,48 +80,6 @@ public:
    * direction).
    */
   QGaussLobatto(const unsigned int n);
-
-protected:
-  /**
-   * Compute Legendre-Gauss-Lobatto quadrature points in the interval $[-1,
-   * +1]$. They are equal to the roots of the corresponding Jacobi polynomial
-   * (specified by @p alpha, @p beta).  @p q is the number of points.
-   *
-   * @return Vector containing nodes.
-   */
-  std::vector<long double>
-  compute_quadrature_points (const unsigned int q,
-                             const int alpha,
-                             const int beta) const;
-
-  /**
-   * Compute Legendre-Gauss-Lobatto quadrature weights. The quadrature points
-   * and weights are related to Jacobi polynomial specified by @p alpha, @p
-   * beta. @p x denotes the quadrature points.
-   *
-   * @return Vector containing weights.
-   */
-  std::vector<long double>
-  compute_quadrature_weights (const std::vector<long double> &x,
-                              const int alpha,
-                              const int beta) const;
-
-  /**
-   * Evaluate a Jacobi polynomial $ P^{\alpha, \beta}_n(x) $ specified by the
-   * parameters @p alpha, @p beta, @p n. Note: The Jacobi polynomials are not
-   * orthonormal and defined on the interval $[-1, +1]$. @p x is the point of
-   * evaluation.
-   */
-  long double JacobiP(const long double x,
-                      const int alpha,
-                      const int beta,
-                      const unsigned int n) const;
-
-  /**
-   * Evaluate the Gamma function $ \Gamma(n) = (n-1)! $.
-   * @param n  point of evaluation (integer).
-   */
-  static long double gamma(const unsigned int n);
 };
 
 
@@ -545,16 +503,6 @@ class QGaussChebyshev : public Quadrature<dim>
 public:
   /// Generate a formula with <tt>n</tt> quadrature points
   QGaussChebyshev(const unsigned int n);
-
-private:
-  /// Computes the points of the quadrature formula.
-  static std::vector<double>
-  get_quadrature_points(const unsigned int n);
-
-  /// Computes the weights of the quadrature formula.
-  static std::vector<double>
-  get_quadrature_weights(const unsigned int n);
-
 };
 
 
@@ -604,14 +552,6 @@ public:
 
 private:
   const EndPoint ep;
-  /// Computes the points of the quadrature formula.
-  static std::vector<double>
-  get_quadrature_points(const unsigned int n, EndPoint ep);
-
-  /// Computes the weights of the quadrature formula.
-  static std::vector<double>
-  get_quadrature_weights(const unsigned int n, EndPoint ep);
-
 };
 
 /**
@@ -635,16 +575,6 @@ class QGaussLobattoChebyshev : public Quadrature<dim>
 public:
   /// Generate a formula with <tt>n</tt> quadrature points
   QGaussLobattoChebyshev(const unsigned int n);
-
-private:
-  /// Computes the points of the quadrature formula.
-  static std::vector<double>
-  get_quadrature_points(const unsigned int n);
-
-  /// Computes the weights of the quadrature formula.
-  static std::vector<double>
-  get_quadrature_weights(const unsigned int n);
-
 };
 
 /**
@@ -878,18 +808,6 @@ public:
 
 template <> QGauss<1>::QGauss (const unsigned int n);
 template <> QGaussLobatto<1>::QGaussLobatto (const unsigned int n);
-template <>
-std::vector<long double> QGaussLobatto<1>::
-compute_quadrature_points(const unsigned int, const int, const int) const;
-template <>
-std::vector<long double> QGaussLobatto<1>::
-compute_quadrature_weights(const std::vector<long double> &, const int, const int) const;
-template <>
-long double QGaussLobatto<1>::
-JacobiP(const long double, const int, const int, const unsigned int) const;
-template <>
-long double
-QGaussLobatto<1>::gamma(const unsigned int n);
 
 template <> std::vector<double> QGaussLog<1>::get_quadrature_points(const unsigned int);
 template <> std::vector<double> QGaussLog<1>::get_quadrature_weights(const unsigned int);
