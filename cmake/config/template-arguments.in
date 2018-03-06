@@ -174,9 +174,6 @@ VECTORS_WITH_MATRIX := { Vector<double>;
 SPARSE_MATRICES := { SparseMatrix<double>;
 	             SparseMatrix<float>;
 
-		     SparseMatrixEZ<double>;
-		     SparseMatrixEZ<float>;
-
 	             BlockSparseMatrix<double>;
 	             BlockSparseMatrix<float>;
 	           
