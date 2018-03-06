@@ -747,6 +747,12 @@ public:
   void compute_inverse_svd (const double threshold = 0.);
 
   /**
+   * Same as above but provide the size of the kernel instead of a threshold,
+   * i.e. the @p kernel_size smallest eigenvalues.
+   */
+  void compute_inverse_svd_with_kernel (const unsigned int kernel_size);
+
+  /**
    * Retrieve eigenvalue after compute_eigenvalues() was called.
    */
   std::complex<number>

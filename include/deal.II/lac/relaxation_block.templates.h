@@ -156,7 +156,10 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::block_kernel (const 
         case PreconditionBlockBase<InverseNumberType>::svd:
           this->inverse_svd(block).reinit(bs, bs);
           this->inverse_svd(block) = M_cell;
-          this->inverse_svd(block).compute_inverse_svd(this->additional_data->threshold);
+          if (this->additional_data->kernel_size>0)
+            this->inverse_svd(block).compute_inverse_svd_with_kernel(this->additional_data->kernel_size);
+          else
+            this->inverse_svd(block).compute_inverse_svd(this->additional_data->threshold);
           break;
         default:
           Assert(false, ExcNotImplemented());

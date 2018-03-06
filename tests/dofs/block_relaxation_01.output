@@ -1,0 +1,7 @@
+
+DEAL:1d::PreconditionBlockBase: 1 blocks; dim ker [1:1] sigma [0.0568887:8.09268] kappa [142.255:142.255]
+DEAL:1d::PreconditionBlockBase: 1 blocks; dim ker [1:1] sigma [0.0568887:8.09268] kappa [142.255:142.255]
+DEAL:2d::PreconditionBlockBase: 1 blocks; dim ker [1:1] sigma [0.0870473:121.120] kappa [1391.43:1391.43]
+DEAL:2d::PreconditionBlockBase: 1 blocks; dim ker [1:1] sigma [0.0870473:121.120] kappa [1391.43:1391.43]
+DEAL:3d::PreconditionBlockBase: 1 blocks; dim ker [1:1] sigma [0.137508:1177.71] kappa [8564.70:8564.70]
+DEAL:3d::PreconditionBlockBase: 1 blocks; dim ker [1:1] sigma [0.137508:1177.71] kappa [8564.70:8564.70]

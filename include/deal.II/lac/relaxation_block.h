@@ -131,10 +131,23 @@ public:
      * If #inversion is SVD, we can compute the Penrose-Moore inverse of the
      * blocks. In order to do so, we can specify here the threshold below
      * which a singular value will be considered zero and thus not inverted.
+     * Setting this parameter to a value greater than zero takes precedence over
+     * threshold, i.e. kernel_size must be zero if you want to use threshold.
      * This parameter is used in the call to
      * LAPACKFullMatrix::compute_inverse_svd().
      */
-    double threshold;
+    double threshold = 0.;
+
+    /**
+     * If #inversion is SVD, we can compute the Penrose-Moore inverse of the
+     * blocks. In order to do so, we can specify here the size of the kernel
+     * that will not be inverted but considered zero. Setting this parameter
+     * to a value greater than zero takes precedence over threshold, i.e.
+     * kernel_size must be zero if you want to use threshold.
+     * This parameter is used in the call to
+     * LAPACKFullMatrix::compute_inverse_svd().
+     */
+    unsigned int kernel_size = 0;
 
     /**
      * The order in which blocks should be traversed. This vector can initiate
