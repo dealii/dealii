@@ -1,0 +1,10 @@
+
+DEAL:parameters:Function 1D::Function constants: 
+DEAL:parameters:Function 1D::Function expression: 0
+DEAL:parameters:Function 1D::Variable names: x,t
+DEAL:parameters:Function 2D::Function constants: 
+DEAL:parameters:Function 2D::Function expression: 0
+DEAL:parameters:Function 2D::Variable names: x,y,t
+DEAL:parameters:Function 3D::Function constants: 
+DEAL:parameters:Function 3D::Function expression: 0
+DEAL:parameters:Function 3D::Variable names: x,y,z,t
