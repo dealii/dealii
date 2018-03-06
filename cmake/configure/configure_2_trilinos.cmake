@@ -189,6 +189,9 @@ ENDMACRO()
 MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
   SET(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
+  SET(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES 
+      "TrilinosWrappers::SparseMatrix"
+      "TrilinosWrappers::BlockSparseMatrix")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
   # Note: Only CMake 3.0 and greater support line continuation with the "\" character

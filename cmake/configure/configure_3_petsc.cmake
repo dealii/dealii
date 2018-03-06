@@ -102,6 +102,10 @@ ENDMACRO()
 MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
   SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
+  SET(DEAL_II_EXPAND_PETSC_SPARSE_MATRICES 
+      "PETScWrappers::SparseMatrix"
+      "PETScWrappers::MPI::SparseMatrix"
+      "PETScWrappers::MPI::BlockSparseMatrix")
   #
   # FIXME:
   # temporary variable until deal.II fully support complex-valued PETSc

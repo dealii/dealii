@@ -170,6 +170,20 @@ VECTORS_WITH_MATRIX := { Vector<double>;
                          @DEAL_II_EXPAND_EPETRA_VECTOR@;
                        }
 
+// Matrices
+SPARSE_MATRICES := { SparseMatrix<double>;
+	             SparseMatrix<float>;
+
+		     SparseMatrixEZ<double>;
+		     SparseMatrixEZ<float>;
+
+	             BlockSparseMatrix<double>;
+	             BlockSparseMatrix<float>;
+	           
+	             @DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES@;
+	             @DEAL_II_EXPAND_PETSC_SPARSE_MATRICES@;
+	           }
+
 // General container types
 GENERAL_CONTAINER_TYPES := {std::vector;
                             ArrayView
