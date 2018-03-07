@@ -975,7 +975,7 @@ namespace PETScWrappers
      */
     void mmult (MatrixBase       &C,
                 const MatrixBase &B,
-                const VectorBase &V = VectorBase()) const;
+                const VectorBase &V) const;
 
     /**
      * Base function to perform the matrix-matrix multiplication with
@@ -995,7 +995,7 @@ namespace PETScWrappers
      */
     void Tmmult (MatrixBase       &C,
                  const MatrixBase &B,
-                 const VectorBase &V = VectorBase()) const;
+                 const VectorBase &V) const;
 
   private:
 
