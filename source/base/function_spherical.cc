@@ -179,9 +179,22 @@ namespace Functions
 
   template <int dim>
   Tensor<1,dim>
-  Spherical<dim>::gradient (const Point<dim>   &p_,
-                            const unsigned int component) const
+  Spherical<dim>::gradient (const Point<dim>   &/*p_*/,
+                            const unsigned int /*component*/) const
+
   {
+    Assert(false, ExcNotImplemented());
+    return {};
+  }
+
+
+
+  template <>
+  Tensor<1,3>
+  Spherical<3>::gradient (const Point<3>   &p_,
+                          const unsigned int component) const
+  {
+    constexpr int dim = 3;
     const Point<dim> p = p_ - coordinate_system_offset;
     const std::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
     const std::array<double, dim> sg = sgradient(sp, component);
@@ -225,9 +238,22 @@ namespace Functions
 
   template <int dim>
   SymmetricTensor<2,dim>
-  Spherical<dim>::hessian (const Point<dim> &p_,
-                           const unsigned int component) const
+  Spherical<dim>::hessian (const Point<dim> &/*p*/,
+                           const unsigned int /*component*/) const
   {
+    Assert(false, ExcNotImplemented());
+    return {};
+  }
+
+
+
+  template <>
+  SymmetricTensor<2,3>
+  Spherical<3>::hessian (const Point<3> &p_,
+                         const unsigned int component) const
+
+  {
+    constexpr int dim = 3;
     const Point<dim> p = p_ - coordinate_system_offset;
     const std::array<double, dim> sp = GeometricUtilities::Coordinates::to_spherical(p);
     const std::array<double, dim> sg = sgradient(sp, component);
