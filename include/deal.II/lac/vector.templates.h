@@ -180,6 +180,9 @@ Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
       localized_vector.reinit(complete_index_set(vec_size), v.get_mpi_communicator());
       localized_vector.reinit (v, false, true);
 
+      Assert(localized_vector.size() == vec_size,
+             ExcDimensionMismatch(localized_vector.size(), vec_size));
+
       // get a representation of the vector
       // and copy it
       TrilinosScalar **start_ptr;
@@ -825,22 +828,29 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator= (const TrilinosWrappers::MPI::Vector &v)
 {
-  // Generate a localized version
-  // of the Trilinos vectors and
-  // then call the other =
-  // operator.
-  TrilinosWrappers::MPI::Vector localized_vector;
-  localized_vector.reinit(complete_index_set(v.size()), v.get_mpi_communicator());
-  localized_vector.reinit(v, false, true);
-
   if (v.size() != vec_size)
     reinit (v.size(), true);
   if (vec_size != 0)
     {
+      // Copy the distributed vector to
+      // a local one at all processors
+      // that know about the original vector.
+      // TODO: There could
+      // be a better solution than
+      // this, but it has not yet been
+      // found.
+      TrilinosWrappers::MPI::Vector localized_vector;
+      localized_vector.reinit(complete_index_set(vec_size), v.get_mpi_communicator());
+      localized_vector.reinit (v, false, true);
+
+      Assert(localized_vector.size() == vec_size,
+             ExcDimensionMismatch(localized_vector.size(), vec_size));
+
       // get a representation of the vector
       // and copy it
       TrilinosScalar **start_ptr;
-      int ierr = v.trilinos_vector().ExtractView (&start_ptr);
+
+      int ierr = localized_vector.trilinos_vector().ExtractView (&start_ptr);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
       std::copy (start_ptr[0], start_ptr[0]+vec_size, begin());
