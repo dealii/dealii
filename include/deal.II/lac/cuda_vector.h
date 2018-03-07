@@ -31,6 +31,9 @@ template <typename Number> class ReadWriteVector;
 
 namespace LinearAlgebra
 {
+  /**
+   * A Namespace for the CUDA vectors.
+   */
   namespace CUDAWrappers
   {
     /**
