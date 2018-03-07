@@ -333,6 +333,32 @@ public:
   void
   Tvmult_add(Vector<Number> &w, const Vector<Number> &v) const;
 
+  /**
+   * Compute the LU factorization of the matrix using LAPACK function Xgetrf.
+   */
+  void
+  compute_lu_factorization();
+
+  /**
+   * Solve the linear system with right hand side @p v and put the solution
+   * back to @p v. The function compute_lu_factorization() must have been
+   * called before this function is called.
+   *
+   * The flag @p transposed indicates whether the solution of the transposed
+   * system is to be performed.
+   *
+   * The flag @p postprocess indicates that the computed solution should be
+   * improved by calling the function DGBRFS.
+   *
+   * @return Returns a pair containing either the backward and forward error
+   * (if @p postprocess is <code>true</code>) or two NaNs if @p postprocess is
+   * <code>false</code>.
+   */
+  std::pair<Number, Number>
+  solve(Vector<Number> &v,
+        const bool      transposed  = false,
+        const bool      postprocess = true) const;
+
 protected:
   /**
    * Array containing the actual values of the matrix in column-major

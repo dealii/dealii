@@ -1,0 +1,12 @@
+
+DEAL::banded shape: 100, 100
+DEAL::banded subdiagonals: 1
+DEAL::banded superdiagonals: 1
+DEAL::difference less than 1e-11: 0
+DEAL::backward error less than 1e-14: 1
+DEAL::forward error less than 1e-11: 0
+DEAL::banded shape: 25, 25
+DEAL::banded subdiagonals: 13
+DEAL::banded superdiagonals: 13
+0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+DEAL::difference less than 1e-14: 1

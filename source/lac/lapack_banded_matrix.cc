@@ -61,7 +61,8 @@ LAPACKBandedMatrix<Number>::LAPACKBandedMatrix(
   const size_type n_cols,
   const size_type n_subdiagonals,
   const size_type n_superdiagonals) :
-  LAPACKBandedMatrixData(n_rows, n_cols, n_subdiagonals, n_superdiagonals)
+  LAPACKBandedMatrixData(n_rows, n_cols, n_subdiagonals, n_superdiagonals),
+  state(LAPACKSupport::matrix)
 {
   values.resize(n_allocated_rows * n_cols);
 }
@@ -293,6 +294,7 @@ LAPACKBandedMatrix<Number>::do_vmult(Vector<Number> &      w,
                                      const char            transpose,
                                      const bool            adding) const
 {
+  Assert(state == LAPACKSupport::matrix, LAPACKSupport::ExcState(state));
   const Number alpha = 1.;
   const Number beta  = (adding ? 1. : 0.);
 
@@ -317,6 +319,134 @@ LAPACKBandedMatrix<Number>::do_vmult(Vector<Number> &      w,
   );
 }
 
+// ----------------------------------------------------------------------------
+// matrix factorization
+// ----------------------------------------------------------------------------
+
+template <typename Number>
+void
+LAPACKBandedMatrix<Number>::compute_lu_factorization()
+{
+  Assert(state == LAPACKSupport::matrix, LAPACKSupport::ExcState(state));
+  Assert(original_matrix == nullptr, ExcInternalError());
+  original_matrix = std_cxx14::make_unique<LAPACKBandedMatrix<Number>>(*this);
+
+  state                = LAPACKSupport::unusable;
+  types::blas_int info = 0;
+  pivots.resize(std::min(n_rows, n_cols));
+  gbtrf(&n_rows,           // M
+        &n_cols,           // N
+        &n_subdiagonals,   // KL
+        &n_superdiagonals, // KU
+        values.begin(),    // AB
+        &n_allocated_rows, // LDAB
+        pivots.data(),     // IPIV
+        &info              // INFO
+  );
+
+  Assert(info >= 0, ExcInternalError());
+
+  // if info >= 0, the factorization has been completed
+  state = LAPACKSupport::lu;
+
+  AssertThrow(info == 0, LACExceptions::ExcSingular());
+}
+
+
+
+template <typename Number>
+std::pair<Number, Number>
+LAPACKBandedMatrix<Number>::solve(Vector<Number> &v,
+                                  const bool      transposed,
+                                  const bool      improve_solution) const
+{
+  std::pair<Number, Number> errors(numbers::signaling_nan<Number>(),
+                                   numbers::signaling_nan<Number>());
+  Assert(this->m() == this->n(), LACExceptions::ExcNotQuadratic());
+  AssertDimension(this->m(), v.size());
+  const char *trans = transposed ? &LAPACKSupport::T : &LAPACKSupport::N;
+  const types::blas_int n_rhs = 1;
+  types::blas_int       info  = 0;
+
+  auto call_gbtrs = [&](Vector<Number> &rhs_and_solution) {
+    Assert(state == LAPACKSupport::lu,
+           ExcMessage("This matrix must be factorized before this function "
+                      "is called"));
+    // GCC bug: in this context n_rhs is an lvalue, but GCC thinks
+    // otherwise. Define it again
+    const types::blas_int one = 1;
+    gbtrs(trans,                    // TRANS
+          &n_rows,                  // N
+          &n_subdiagonals,          // KL
+          &n_subdiagonals,          // KU
+          &one,                     // NRHS
+          values.begin(),           // AB
+          &n_allocated_rows,        // LDAB
+          pivots.data(),            // IPIV
+          rhs_and_solution.begin(), // B
+          &n_rows,                  // LDB
+          &info                     // INFO
+    );
+    // TODO improve error reporting
+    Assert(info == 0, ExcInternalError());
+  };
+
+  if (state == LAPACKSupport::lu)
+    {
+      if (improve_solution)
+        {
+          // guard access to the work arrays
+          Threads::Mutex::ScopedLock lock(mutex);
+          temporary_solution = v;
+          work.resize(3 * n_rows);
+          index_work.resize(n_rows);
+
+          call_gbtrs(temporary_solution);
+
+          gbrfs(trans,                                      // TRANS
+                &n_rows,                                    // N
+                &n_subdiagonals,                            // KL
+                &n_superdiagonals,                          // KU
+                &n_rhs,                                     // NRHS
+                &(original_matrix->values[n_subdiagonals]), // AB
+                &(original_matrix->n_allocated_rows),       // LDAB
+                values.begin(),                             // AFB
+                &n_allocated_rows,                          // LDAFB
+                pivots.data(),                              // IPIV
+                v.begin(),                                  // B
+                &n_rows,                                    // LDB
+                temporary_solution.begin(),                 // X
+                &n_rows,                                    // LDX
+                &errors.second,                             // FERR
+                &errors.first,                              // BERR
+                work.data(),                                // WORK
+                index_work.data(),                          // IWORK
+                &info                                       // INFO
+          );
+
+          // TODO use DGBEQU and DGBSVXX to improve the solution through row
+          // and column rescaling.
+
+          Assert(info == 0, ExcInternalError());
+
+          v = temporary_solution;
+        }
+      else
+        {
+          call_gbtrs(v);
+        }
+    }
+  else
+    {
+      Assert(
+        false,
+        ExcMessage("The matrix has to be either factorized or triangular."));
+    }
+
+  Assert(info == 0, ExcInternalError());
+
+  return errors;
+}
 
 
 #include "lapack_banded_matrix.inst"
