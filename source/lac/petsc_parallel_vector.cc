@@ -378,13 +378,18 @@ namespace PETScWrappers
       else
         out.setf (std::ios::fixed, std::ios::floatfield);
 
+      // let each processor produce its output in turn. this requires
+      // synchronizing output between processors using a barrier --
+      // which is clearly slow, but nobody is going to print a whole
+      // matrix this way on a regular basis for production runs, so
+      // the slowness of the barrier doesn't matter
       for ( unsigned int i = 0;
             i < Utilities::MPI::n_mpi_processes(communicator);
             i++)
         {
-          // This is slow, but most likely only used to debug.
           const int mpi_ierr = MPI_Barrier(communicator);
           AssertThrowMPI(mpi_ierr);
+
           if (i == Utilities::MPI::this_mpi_process(communicator))
             {
               if (across)
