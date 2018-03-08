@@ -17,23 +17,15 @@
 #define dealii_non_matching_coupling
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
 #include <deal.II/base/quadrature.h>
-
-#include <deal.II/grid/grid_tools.h>
-#include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe.h>
-#include <deal.II/fe/fe_values.h>
+
 #include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/lac/constraint_matrix.h>
-
-
-
-#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 namespace NonMatching
