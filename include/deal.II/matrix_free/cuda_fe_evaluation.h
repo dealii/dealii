@@ -25,6 +25,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * Namespace for the CUDA wrappers
+ */
 namespace CUDAWrappers
 {
   namespace internal
