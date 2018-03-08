@@ -4114,8 +4114,19 @@ namespace internal
                                      triangulation->coarse_cell_to_p4est_tree_permutation,
                                      triangulation->p4est_tree_to_coarse_cell_permutation);
 
-          // This barrier is crucial so that messages between phases
-          // 1&2 don't mix.
+          // have a barrier so that sends from above and below this
+          // place are not mixed up.
+          //
+          // this is necessary because above we just see if there are
+          // messages and then receive them, without discriminating
+          // where they come from and whether they were sent in phase
+          // 1 or 2 in communicate_mg_ghost_cells() on another
+          // processor. the need for a global communication step like
+          // this barrier could be avoided by receiving messages
+          // specifically from those processors from which we expect
+          // messages, and by using different tags for phase 1 and 2,
+          // but the cost of a barrier is negligible compared to
+          // everything else we do here
           const int ierr = MPI_Barrier(triangulation->get_communicator());
           AssertThrowMPI(ierr);
 
