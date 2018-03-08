@@ -26,8 +26,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace CUDAWrappers
 {
-  using ::dealii::CUDAWrappers::block_size;
-
   namespace internal
   {
     template <typename Number>

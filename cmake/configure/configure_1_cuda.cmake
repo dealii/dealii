@@ -111,6 +111,14 @@ MACRO(FEATURE_CUDA_CONFIGURE_EXTERNAL)
   MARK_AS_ADVANCED(CMAKE_CUDA_HOST_COMPILER)
 
   #
+  # Work around a cmake 3.10 bug, see https://gitlab.kitware.com/cmake/cmake/issues/17797
+  # because make does not support rsp link commands
+  #
+  SET(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_INCLUDES 0)
+  SET(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_LIBRARIES 0)
+  SET(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_OBJECTS 0)
+
+  #
   # Set up cuda flags:
   #
   ADD_FLAGS(DEAL_II_CUDA_FLAGS "${DEAL_II_CXX_VERSION_FLAG}")
