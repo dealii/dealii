@@ -194,7 +194,7 @@ LAPACKFullMatrix<number>::operator*= (const number factor)
   const types::blas_int m = this->m();
   const types::blas_int n = this->n();
   const types::blas_int lda = this->m();
-  types::blas_int info;
+  types::blas_int info = 0;
   // kl and ku will not be referenced for type = G (dense matrices).
   const types::blas_int kl=0;
   number *values = &this->values[0];
@@ -224,7 +224,7 @@ LAPACKFullMatrix<number>::operator/= (const number factor)
   const types::blas_int m = this->m();
   const types::blas_int n = this->n();
   const types::blas_int lda = this->m();
-  types::blas_int info;
+  types::blas_int info = 0;
   // kl and ku will not be referenced for type = G (dense matrices).
   const types::blas_int kl=0;
   number *values = &this->values[0];
