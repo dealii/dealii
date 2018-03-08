@@ -1286,9 +1286,6 @@ namespace Polynomials
     :
     Polynomial<double>(0)
   {
-    Assert(degree>=3,
-           ExcNotImplemented("Hermite interpolation makes no sense for "
-                             "degrees less than three"));
     AssertIndexRange(index, degree+1);
 
     this->coefficients.clear();
@@ -1296,16 +1293,52 @@ namespace Polynomials
 
     this->lagrange_support_points.resize(degree);
 
-    // 4 Polynomials with degree 3
-    // entries (1,0) and (3,2) of the mass matrix will be equal to 0
-    //
-    //     | x  0  x  x |
-    //     | 0  x  x  x |
-    // M = | x  x  x  0 |
-    //     | x  x  0  x |
-    //
-    if (degree==3)
+    if (degree == 0)
+      this->lagrange_weight = 1.;
+    else if (degree == 1)
       {
+        if (index == 0)
+          {
+            this->lagrange_support_points[0] = 1.;
+            this->lagrange_weight = -1.;
+          }
+        else
+          {
+            this->lagrange_support_points[0] = 0.;
+            this->lagrange_weight = 1.;
+          }
+      }
+    else if (degree == 2)
+      {
+        if (index == 0)
+          {
+            this->lagrange_support_points[0] = 1.;
+            this->lagrange_support_points[1] = 1.;
+            this->lagrange_weight = 1.;
+          }
+        else if (index == 1)
+          {
+            this->lagrange_support_points[0] = 0;
+            this->lagrange_support_points[1] = 1;
+            this->lagrange_weight = 4.;
+          }
+        else
+          {
+            this->lagrange_support_points[0] = 0.;
+            this->lagrange_support_points[1] = 0.;
+            this->lagrange_weight = 1.;
+          }
+      }
+    else if (degree==3)
+      {
+        // 4 Polynomials with degree 3
+        // entries (1,0) and (3,2) of the mass matrix will be equal to 0
+        //
+        //     | x  0  x  x |
+        //     | 0  x  x  x |
+        // M = | x  x  x  0 |
+        //     | x  x  0  x |
+        //
         if (index==0)
           {
             this->lagrange_support_points[0] = 2./7.;
@@ -1335,23 +1368,22 @@ namespace Polynomials
             this->lagrange_weight = 3.5;
           }
       }
-
-    // Higher order Polynomials degree>=4: the entries (1,0) and
-    // (degree,degree-1) of the mass matrix will be equal to 0
-    //
-    //     | x  0  x  x         x  x  x |
-    //     | 0  x  x  x  . . .  x  x  x |
-    //     | x  x  x  x         x  x  x |
-    //     | x  x  x  x         x  x  x |
-    //     |     .       .         .    |
-    // M = |     .         .       .    |
-    //     |     .           .     .    |
-    //     | x  x  x  x         x  x  x |
-    //     | x  x  x  x  . . .  x  x  0 |
-    //     | x  x  x  x         x  0  x |
-    //
-    if (degree >= 4)
+    else
       {
+        // Higher order Polynomials degree>=4: the entries (1,0) and
+        // (degree,degree-1) of the mass matrix will be equal to 0
+        //
+        //     | x  0  x  x         x  x  x |
+        //     | 0  x  x  x  . . .  x  x  x |
+        //     | x  x  x  x         x  x  x |
+        //     | x  x  x  x         x  x  x |
+        //     |     .       .         .    |
+        // M = |     .         .       .    |
+        //     |     .           .     .    |
+        //     | x  x  x  x         x  x  x |
+        //     | x  x  x  x  . . .  x  x  0 |
+        //     | x  x  x  x         x  0  x |
+
         // We find the inner points as the zeros of the Jacobi polynomials
         // with alpha = beta = 2 which is the polynomial with the kernel
         // (1-x)^2 (1+x)^2, the two polynomials achieving zero value and zero

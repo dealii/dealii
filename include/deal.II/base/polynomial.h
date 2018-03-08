@@ -591,9 +591,7 @@ namespace Polynomials
 
   /**
    * Polynomials for a variant of Hermite polynomials with better condition
-   * number in the interpolation than the basis from
-   * HermiteInterpolation. This class is only implemented for degree at least
-   * three, $n\geq 3$.
+   * number in the interpolation than the basis from HermiteInterpolation.
    *
    * In analogy to the actual Hermite polynomials this basis evaluates the
    * first polynomial $p_0$ to 1 at $x=0$ and has both a zero value and zero
@@ -616,7 +614,14 @@ namespace Polynomials
    * Lagrange polynomials with double roots at $x=0$ and $x=1$. For example at
    * $n=4$, all of $p_0, p_1, p_3, p_4$ get an additional root at $x=0.5$
    * through the factor $(x-0.5)$.
-
+   *
+   * The basis only contains Hermite information at <code>degree>=3</code>,
+   * but it is also implemented for degrees between 0 and two. For the linear
+   * case, the usual hat functions are implemented, whereas the polynomials
+   * for <code>degree=2</code> are $p_0(x)=(1-x)^2$, $p_1(x)=4x(x-1)$, and
+   * $p_2(x)=x^2$, in accordance with the construction principle for degree 3
+   * that allows a non-zero of $p_0$ and $p_2$.
+   *
    * These two relaxations improve the condition number of the mass matrix
    * (i.e., interpolation) significantly, as can be seen from the following
    * table:
@@ -696,8 +701,7 @@ namespace Polynomials
 
     /**
      * Return the polynomials with index <tt>0</tt> up to <tt>degree+1</tt> in
-     * a space of degree up to <tt>degree</tt>. Here, <tt>degree</tt> has to
-     * be at least 3.
+     * a space of degree up to <tt>degree</tt>.
      */
     static std::vector<Polynomial<double> >
     generate_complete_basis (const unsigned int degree);
