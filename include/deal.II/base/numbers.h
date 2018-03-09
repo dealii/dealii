@@ -223,7 +223,7 @@ namespace numbers
      * general template is chosen for types not equal to std::complex, this
      * function simply returns the square of the given number.
      *
-     * @ingroup CUDAWrappers
+     * @see CUDAWrappers
      */
     static
     DEAL_II_CUDA_HOST_DEV
