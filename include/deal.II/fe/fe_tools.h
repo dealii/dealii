@@ -393,16 +393,20 @@ namespace FETools
    * FiniteElement classes in order to fill the respective
    * FiniteElement::restriction matrices.
    *
-   * @arg fe The finite element class for which we compute the projection
-   * matrices.  @arg matrices A reference to
-   * <tt>RefinementCase<dim>::isotropic_refinement</tt> vectors of FullMatrix
-   * objects. Each vector corresponds to one RefinementCase @p refinement_case
-   * and is of the vector size
-   * <tt>GeometryInfo<dim>::n_children(refinement_case)</tt>. This is the
-   * format used in FiniteElement, where we want to use this function mostly.
+   * @arg[in] fe The finite element class for which we compute the projection
+   *   matrices.
    *
-   * @arg isotropic_only Set to <code>true</code> if you only want to compute
-   * matrices for isotropic refinement.
+   * @arg[out] matrices A reference to a set of
+   *   <tt>RefinementCase<dim>::isotropic_refinement</tt> vectors of FullMatrix
+   *   objects. Each vector corresponds to one RefinementCase @p refinement_case
+   *   and is of the vector size
+   *   <tt>GeometryInfo<dim>::n_children(refinement_case)</tt>. This is the
+   *   format used in FiniteElement, where we want to use this function mostly.
+   *
+   * @arg[in] isotropic_only If set to <code>true</code>, then this
+   *   function only computes data for the isotropic refinement case. The
+   *   other elements of the output vector are left untouched (but still
+   *   exist).
    */
   template <int dim, typename number, int spacedim>
   void compute_projection_matrices(
