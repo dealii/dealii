@@ -42,7 +42,7 @@ namespace LinearAlgebra
      *
      * @note Only float and double are supported.
      *
-     * @ingroup CUDAWrappers
+     * @see CUDAWrappers
      * @ingroup Vectors
      * @author Karl Ljungkvist, Bruno Turcksin, 2016
      */
