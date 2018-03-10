@@ -2348,14 +2348,9 @@ namespace Step14
              ++face_no)
           face_integrals[cell->face(face_no)] = -1e20;
 
-      // Then set up a vector with error indicators and reserve one slot for
-      // each cell and set it to zero. With this, we can then set up the
-      // parallel iterator range just as we did in step-9, and hand it
-      // all off to WorkStream::run to compute the estimators for all
-      // cells in parallel:
-      error_indicators.reinit (DualSolver<dim>::dof_handler
-                               .get_triangulation().n_active_cells());
-
+      // Then set up the parallel iterator range just as we did in
+      // step-9, and hand it all off to WorkStream::run() to compute
+      // the estimators for all cells in parallel:
       typedef
       std::tuple<active_cell_iterator,Vector<float>::iterator>
       IteratorTuple;
