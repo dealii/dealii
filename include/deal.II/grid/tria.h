@@ -1646,12 +1646,12 @@ public:
    * Create a new triangulation by stealing the internal data of another
    * triangulation.
    */
-  Triangulation (Triangulation<dim, spacedim> &&tria);
+  Triangulation (Triangulation<dim, spacedim> &&tria) noexcept;
 
   /**
    * Move assignment operator.
    */
-  Triangulation &operator = (Triangulation<dim, spacedim> &&tria);
+  Triangulation &operator = (Triangulation<dim, spacedim> &&tria) noexcept;
 
   /**
    * Delete the object and all levels of the hierarchy.

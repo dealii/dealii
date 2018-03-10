@@ -92,13 +92,13 @@ namespace hp
     /**
      * Move constructor.
      */
-    FECollection (FECollection<dim,spacedim> &&fe_collection) = default;
+    FECollection (FECollection<dim,spacedim> &&fe_collection) noexcept = default;
 
     /**
      * Move assignment operator.
      */
     FECollection<dim, spacedim> &
-    operator= (FECollection<dim,spacedim> &&fe_collection) = default;
+    operator= (FECollection<dim,spacedim> &&fe_collection) = default; // NOLINT
 
     /**
      * Add a finite element. This function generates a copy of the given

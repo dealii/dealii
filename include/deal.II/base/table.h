@@ -447,7 +447,7 @@ public:
   /**
    * Move constructor. Transfers the contents of another Table.
    */
-  TableBase (TableBase<N,T> &&src);
+  TableBase (TableBase<N,T> &&src) noexcept;
 
   /**
    * Destructor. Free allocated memory.
@@ -478,7 +478,7 @@ public:
    * Move assignment operator. Transfer all elements of <tt>src</tt> into the
    * table.
    */
-  TableBase<N,T> &operator = (TableBase<N,T> &&src);
+  TableBase<N,T> &operator = (TableBase<N,T> &&src) noexcept;
 
   /**
    * Test for equality of two tables.
@@ -1655,11 +1655,11 @@ TableBase<N,T>::TableBase (const TableBase<N,T2> &src)
 
 
 template <int N, typename T>
-TableBase<N,T>::TableBase (TableBase<N,T> &&src)
-  :
-  Subscriptor (std::move(src)),
-  values (std::move(src.values)),
-  table_size (src.table_size)
+TableBase<N,T>::TableBase (TableBase<N,T> &&src) noexcept
+:
+Subscriptor (std::move(src)),
+            values (std::move(src.values)),
+            table_size (src.table_size)
 {
   src.table_size = TableIndices<N>();
 }
@@ -1829,7 +1829,7 @@ TableBase<N,T>::operator = (const TableBase<N,T2> &m)
 template <int N, typename T>
 inline
 TableBase<N,T> &
-TableBase<N,T>::operator = (TableBase<N,T> &&m)
+TableBase<N,T>::operator = (TableBase<N,T> &&m) noexcept
 {
   static_cast<Subscriptor &>(*this) = std::move(m);
   values = std::move(m.values);

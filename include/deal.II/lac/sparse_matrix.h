@@ -547,7 +547,7 @@ public:
    * Move construction allows an object to be returned from a function or
    * packed into a tuple even when the class cannot be copy-constructed.
    */
-  SparseMatrix (SparseMatrix<number> &&m);
+  SparseMatrix (SparseMatrix<number> &&m) noexcept;
 
   /**
    * Constructor. Takes the given matrix sparsity structure to represent the
@@ -594,7 +594,7 @@ public:
    * Move assignment operator. This operator replaces the present matrix with
    * @p m by transferring the internal data of @p m.
    */
-  SparseMatrix<number> &operator = (SparseMatrix<number> &&m);
+  SparseMatrix<number> &operator = (SparseMatrix<number> &&m) noexcept;
 
   /**
    * Copy operator: initialize the matrix with the identity matrix. This

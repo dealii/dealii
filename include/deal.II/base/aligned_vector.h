@@ -103,7 +103,7 @@ public:
    * Move constructor. Create a new aligned vector by stealing the contents of
    * @p vec.
    */
-  AlignedVector (AlignedVector<T> &&vec);
+  AlignedVector (AlignedVector<T> &&vec) noexcept;
 
   /**
    * Assignment to the input vector @p vec.
@@ -117,7 +117,7 @@ public:
    * Move assignment operator.
    */
   AlignedVector &
-  operator = (AlignedVector<T> &&vec);
+  operator = (AlignedVector<T> &&vec) noexcept;
 
   /**
    * Change the size of the vector. It keeps old elements previously available
@@ -694,11 +694,11 @@ AlignedVector<T>::AlignedVector (const AlignedVector<T> &vec)
 
 template < class T >
 inline
-AlignedVector<T>::AlignedVector (AlignedVector<T> &&vec)
-  :
-  _data (vec._data),
-  _end_data (vec._end_data),
-  _end_allocated (vec._end_allocated)
+AlignedVector<T>::AlignedVector (AlignedVector<T> &&vec) noexcept
+:
+_data (vec._data),
+      _end_data (vec._end_data),
+      _end_allocated (vec._end_allocated)
 {
   vec._data = nullptr;
   vec._end_data = nullptr;
@@ -723,7 +723,7 @@ AlignedVector<T>::operator = (const AlignedVector<T> &vec)
 template < class T >
 inline
 AlignedVector<T> &
-AlignedVector<T>::operator = (AlignedVector<T> &&vec)
+AlignedVector<T>::operator = (AlignedVector<T> &&vec) noexcept
 {
   clear();
 

@@ -501,7 +501,7 @@ namespace TrilinosWrappers
        * Move constructor. Creates a new vector by stealing the internal data
        * of the vector @p v.
        */
-      Vector (Vector &&v);
+      Vector (Vector &&v) noexcept;
 
       /**
        * Destructor.
@@ -646,7 +646,7 @@ namespace TrilinosWrappers
        * Move the given vector. This operator replaces the present vector with
        * @p v by efficiently swapping the internal data structures.
        */
-      Vector &operator= (Vector &&v);
+      Vector &operator= (Vector &&v) noexcept;
 
       /**
        * Another copy function. This one takes a deal.II vector and copies it

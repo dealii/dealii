@@ -568,7 +568,7 @@ namespace TrilinosWrappers
      * Move constructor. Create a new sparse matrix by stealing the internal
      * data.
      */
-    SparseMatrix (SparseMatrix  &&other);
+    SparseMatrix (SparseMatrix  &&other) noexcept;
 
     /**
      * Copy constructor is deleted.

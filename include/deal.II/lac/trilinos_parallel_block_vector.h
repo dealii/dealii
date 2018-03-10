@@ -126,7 +126,7 @@ namespace TrilinosWrappers
        * Move constructor. Creates a new vector by stealing the internal data
        * of the vector @p v.
        */
-      BlockVector (BlockVector &&v);
+      BlockVector (BlockVector &&v) noexcept;
 
       /**
        * Creates a block vector consisting of <tt>num_blocks</tt> components,
@@ -155,7 +155,7 @@ namespace TrilinosWrappers
        * Move the given vector. This operator replaces the present vector with
        * @p v by efficiently swapping the internal data structures.
        */
-      BlockVector &operator= (BlockVector &&v);
+      BlockVector &operator= (BlockVector &&v) noexcept;
 
       /**
        * Another copy function. This one takes a deal.II block vector and
@@ -343,7 +343,7 @@ namespace TrilinosWrappers
 
 
     inline
-    BlockVector::BlockVector (BlockVector &&v)
+    BlockVector::BlockVector (BlockVector &&v) noexcept
     {
       // initialize a minimal, valid object and swap
       reinit (0);

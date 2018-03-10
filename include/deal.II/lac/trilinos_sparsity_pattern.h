@@ -318,7 +318,7 @@ namespace TrilinosWrappers
      * Move constructor. Create a new sparse matrix by stealing the internal
      * data.
      */
-    SparsityPattern (SparsityPattern &&other);
+    SparsityPattern (SparsityPattern &&other) noexcept;
 
     /**
      * Copy constructor. Sets the calling sparsity pattern to be the same as

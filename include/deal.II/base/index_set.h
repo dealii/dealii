@@ -122,13 +122,13 @@ public:
    * Move constructor. Create a new IndexSet by transferring the internal data
    * of the input set.
    */
-  IndexSet (IndexSet &&is);
+  IndexSet (IndexSet &&is) noexcept;
 
   /**
    * Move assignment operator. Transfer the internal data of the input set into
    * the current one.
    */
-  IndexSet &operator= (IndexSet &&is);
+  IndexSet &operator= (IndexSet &&is) noexcept;
 
 #ifdef DEAL_II_WITH_TRILINOS
   /**
@@ -1390,12 +1390,12 @@ IndexSet::IndexSet (const size_type size)
 
 
 inline
-IndexSet::IndexSet (IndexSet &&is)
-  :
-  ranges (std::move(is.ranges)),
-  is_compressed (is.is_compressed),
-  index_space_size (is.index_space_size),
-  largest_range (is.largest_range)
+IndexSet::IndexSet (IndexSet &&is) noexcept
+:
+ranges (std::move(is.ranges)),
+       is_compressed (is.is_compressed),
+       index_space_size (is.index_space_size),
+       largest_range (is.largest_range)
 {
   is.ranges.clear ();
   is.is_compressed = true;
@@ -1408,7 +1408,7 @@ IndexSet::IndexSet (IndexSet &&is)
 
 
 inline
-IndexSet &IndexSet::operator= (IndexSet &&is)
+IndexSet &IndexSet::operator= (IndexSet &&is) noexcept
 {
   ranges = std::move (is.ranges);
   is_compressed = is.is_compressed;

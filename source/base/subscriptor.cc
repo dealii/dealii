@@ -46,10 +46,10 @@ Subscriptor::Subscriptor (const Subscriptor &)
 
 
 
-Subscriptor::Subscriptor (Subscriptor &&subscriptor)
-  :
-  counter(0),
-  object_info (subscriptor.object_info)
+Subscriptor::Subscriptor (Subscriptor &&subscriptor) noexcept
+:
+counter(0),
+        object_info (subscriptor.object_info)
 {
   subscriptor.check_no_subscribers();
 }
@@ -135,7 +135,7 @@ Subscriptor &Subscriptor::operator = (const Subscriptor &s)
 
 
 
-Subscriptor &Subscriptor::operator = (Subscriptor &&s)
+Subscriptor &Subscriptor::operator = (Subscriptor &&s) noexcept
 {
   s.check_no_subscribers();
   object_info = s.object_info;

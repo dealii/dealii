@@ -72,12 +72,12 @@ SparseMatrix<number>::SparseMatrix (const SparseMatrix &m)
 
 
 template <typename number>
-SparseMatrix<number>::SparseMatrix (SparseMatrix<number> &&m)
-  :
-  Subscriptor(std::move(m)),
-  cols(m.cols),
-  val(std::move(m.val)),
-  max_len(m.max_len)
+SparseMatrix<number>::SparseMatrix (SparseMatrix<number> &&m) noexcept
+:
+Subscriptor(std::move(m)),
+            cols(m.cols),
+            val(std::move(m.val)),
+            max_len(m.max_len)
 {
   m.cols = nullptr;
   m.val = nullptr;
@@ -104,7 +104,7 @@ SparseMatrix<number>::operator = (const SparseMatrix<number> &m)
 
 template <typename number>
 SparseMatrix<number> &
-SparseMatrix<number>::operator = (SparseMatrix<number> &&m)
+SparseMatrix<number>::operator = (SparseMatrix<number> &&m) noexcept
 {
   cols = m.cols;
   val = std::move(m.val);

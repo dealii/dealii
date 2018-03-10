@@ -137,7 +137,7 @@ public:
    * Move constructor. Construct a new quadrature object by transferring the
    * internal data of another quadrature object.
    */
-  Quadrature (Quadrature<dim> &&) = default;
+  Quadrature (Quadrature<dim> &&) noexcept = default;
 
   /**
    * Construct a quadrature formula from given vectors of quadrature points
@@ -177,7 +177,7 @@ public:
    * Move assignment operator. Moves all data from another quadrature object
    * to this object.
    */
-  Quadrature &operator = (Quadrature<dim> &&) = default;
+  Quadrature &operator = (Quadrature<dim> &&) = default; // NOLINT
 
   /**
    * Test for equality of two quadratures.

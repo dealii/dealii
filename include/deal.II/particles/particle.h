@@ -154,7 +154,7 @@ namespace Particles
      * Move constructor for Particle, creates a particle from an existing
      * one by stealing its state.
      */
-    Particle (Particle<dim,spacedim> &&particle);
+    Particle (Particle<dim,spacedim> &&particle) noexcept;
 
     /**
      * Copy assignment operator.
@@ -164,7 +164,7 @@ namespace Particles
     /**
      * Move assignment operator.
      */
-    Particle<dim,spacedim> &operator=(Particle<dim,spacedim> &&particle);
+    Particle<dim,spacedim> &operator=(Particle<dim,spacedim> &&particle) noexcept;
 
     /**
      * Destructor. Releases the property handle if it is valid, and

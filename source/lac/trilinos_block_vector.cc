@@ -59,7 +59,7 @@ namespace TrilinosWrappers
 
 
     BlockVector &
-    BlockVector::operator= (BlockVector &&v)
+    BlockVector::operator= (BlockVector &&v) noexcept
     {
       swap(v);
       return *this;

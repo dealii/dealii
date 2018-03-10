@@ -113,7 +113,7 @@ public:
    * Move constructor. Creates a new vector by stealing the internal data of
    * the given argument vector.
    */
-  BlockVector (BlockVector<Number> &&/*v*/) = default;
+  BlockVector (BlockVector<Number> &&/*v*/) noexcept = default;
 
   /**
    * Copy constructor taking a BlockVector of another data type. This will
@@ -200,7 +200,7 @@ public:
    * Move the given vector. This operator replaces the present vector with
    * the contents of the given argument vector.
    */
-  BlockVector<Number> &operator= (BlockVector<Number> &&/*v*/) = default;
+  BlockVector<Number> &operator= (BlockVector<Number> &&/*v*/) = default; // NOLINT
 
   /**
    * Copy operator for template arguments of different types. Resize the
