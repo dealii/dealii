@@ -1149,6 +1149,26 @@ LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
 }
 
 
+
+template <typename number>
+void
+LAPACKFullMatrix<number>::compute_inverse_svd_with_kernel(const unsigned int kernel_size)
+{
+  if (state == LAPACKSupport::matrix)
+    compute_svd();
+
+  Assert (state==LAPACKSupport::svd, ExcState(state));
+
+  const unsigned int n_wr = wr.size();
+  for (size_type i=0; i<n_wr-kernel_size; ++i)
+    wr[i] = number(1.)/wr[i];
+  for (size_type i=n_wr-kernel_size; i<n_wr; ++i)
+    wr[i] = 0.;
+  state = LAPACKSupport::inverse_svd;
+}
+
+
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::invert()
