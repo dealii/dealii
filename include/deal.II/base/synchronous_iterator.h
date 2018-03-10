@@ -33,7 +33,8 @@ DEAL_II_NAMESPACE_OPEN
  * we have synchronous iterators marching through the containers
  * <code>a,b</code>. If an object of this type represents the end of a range,
  * only the first element is considered (we only have <code>a.end()</code>,
- * not <code>b.end()</code>)
+ * not <code>b.end()</code>). An example of how this class is used is given
+ * in step-35.
  *
  * The template argument of the current class shall be of type
  * <code>std::tuple</code> with arguments equal to the iterator types.
