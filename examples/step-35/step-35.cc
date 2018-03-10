@@ -517,10 +517,12 @@ namespace Step35
     //
     // To do this in practice, we declare a "synchronous" iterator -- an
     // object that internally consists of several (in our case two) iterators,
-    // and each time the synchronous iteration is moved up one step, each of
-    // the iterators stored internally is moved up one step as well, thereby
+    // and each time the synchronous iteration is moved forward one step, each of
+    // the iterators stored internally is moved forward one step as well, thereby
     // always staying in sync. As it so happens, there is a deal.II class that
-    // facilitates this sort of thing.
+    // facilitates this sort of thing. (What is important here is to know that
+    // two DoFHandler objects built on the same triangulation will walk over
+    // the cells of the triangulation in the same order.)
     typedef std::tuple< typename DoFHandler<dim>::active_cell_iterator,
             typename DoFHandler<dim>::active_cell_iterator
             > IteratorTuple;
