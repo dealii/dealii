@@ -769,7 +769,7 @@ namespace internal
       Assert (mpi_comm != nullptr, ExcInternalError());
       output.reinit (needed_elements, mpi_comm->GetMpiComm());
 #else
-      output.reinit (needed_elements, MPI_COMM_WORLD);
+      output.reinit (needed_elements, MPI_COMM_SELF);
 #endif
       output = vec;
     }
