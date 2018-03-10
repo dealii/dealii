@@ -507,16 +507,6 @@ public:
   FE_DGQHermite (const unsigned int degree);
 
   /**
-   * Return a list of constant modes of the element. Due to the special
-   * construction of the Hermite basis, there is no simple representation of
-   * the constant value 1 in terms of a 0/1 selection, so get_constant_modes()
-   * throws an exception in case it is called for degrees larger or equal to
-   * three.
-   */
-  virtual std::pair<Table<2,bool>, std::vector<unsigned int> >
-  get_constant_modes () const;
-
-  /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_DGQHermite<dim>(degree)</tt>, with <tt>dim</tt> and
    * <tt>degree</tt> replaced by the values given by the template parameter

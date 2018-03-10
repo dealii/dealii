@@ -51,6 +51,20 @@ int main()
 {
   initlog();
 
+  deallog << "degree 1" << std::endl;
+  plot(HermiteLikeInterpolation::generate_complete_basis(1));
+  deallog << std::endl << "degree 2" << std::endl;
+  plot(HermiteLikeInterpolation::generate_complete_basis(2));
+  deallog << std::endl << "degree 3" << std::endl;
+  interpolation_conditions(HermiteLikeInterpolation::generate_complete_basis(3));
+  plot(HermiteLikeInterpolation::generate_complete_basis(3));
+  deallog << std::endl << "degree 4" << std::endl;
+  interpolation_conditions(HermiteLikeInterpolation::generate_complete_basis(4));
+  plot(HermiteLikeInterpolation::generate_complete_basis(4));
+  deallog << std::endl << "degree 6" << std::endl;
   interpolation_conditions(HermiteLikeInterpolation::generate_complete_basis(6));
   plot(HermiteLikeInterpolation::generate_complete_basis(6));
+  deallog << std::endl << "degree 9" << std::endl;
+  interpolation_conditions(HermiteLikeInterpolation::generate_complete_basis(9));
+  plot(HermiteLikeInterpolation::generate_complete_basis(9));
 }

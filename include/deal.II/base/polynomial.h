@@ -613,7 +613,10 @@ namespace Polynomials
    * property. Then, these polynomials are constructed in the usual way as
    * Lagrange polynomials with double roots at $x=0$ and $x=1$. For example at
    * $n=4$, all of $p_0, p_1, p_3, p_4$ get an additional root at $x=0.5$
-   * through the factor $(x-0.5)$.
+   * through the factor $(x-0.5)$. In summary, this basis is dominated by
+   * nodal contributions, but it is not a nodal one because the second and
+   * second to last polynomials that are non-nodal, and due to the presence of
+   * double nodes in $x=0$ and $x=1$.
    *
    * The basis only contains Hermite information at <code>degree>=3</code>,
    * but it is also implemented for degrees between 0 and two. For the linear
@@ -639,42 +642,42 @@ namespace Polynomials
    *   <tr>
    *    <th>n=3</th>
    *    <th>1057</th>
-   *    <th>21.40</th>
+   *    <th>17.18</th>
    *   </tr>
    *   <tr>
    *    <th>n=4</th>
    *    <th>6580</th>
-   *    <th>15.52</th>
+   *    <th>16.83</th>
    *   </tr>
    *   <tr>
    *    <th>n=5</th>
    *    <th>1.875e+04</th>
-   *    <th>18.52</th>
+   *    <th>19.37</th>
    *   </tr>
    *   <tr>
    *    <th>n=6</th>
    *    <th>6.033e+04</th>
-   *    <th>19.42</th>
+   *    <th>18.99</th>
    *   </tr>
    *   <tr>
    *    <th>n=10</th>
    *    <th>9.756e+05</th>
-   *    <th>27.85</th>
+   *    <th>25.65</th>
    *   </tr>
    *   <tr>
    *    <th>n=15</th>
    *    <th>9.431e+06</th>
-   *    <th>40.48</th>
+   *    <th>36.47</th>
    *   </tr>
    *   <tr>
    *    <th>n=25</th>
    *    <th>2.220e+08</th>
-   *    <th>68.30</th>
+   *    <th>62.28</th>
    *   </tr>
    *   <tr>
    *    <th>n=35</th>
    *    <th>2.109e+09</th>
-   *    <th>98.06</th>
+   *    <th>91.50</th>
    *   </tr>
    * </table>
    *

@@ -881,24 +881,6 @@ FE_DGQHermite<dim,spacedim>::FE_DGQHermite (const unsigned int degree)
 
 
 template <int dim, int spacedim>
-std::pair<Table<2,bool>, std::vector<unsigned int> >
-FE_DGQHermite<dim,spacedim>::get_constant_modes () const
-{
-  if (this->degree < 3)
-    return this->FE_DGQ<dim,spacedim>::get_constant_modes();
-  else
-    {
-      AssertThrow(false,
-                  ExcMessage("Constant mode cannot be represented by 0/1 vector"));
-      return std::pair<Table<2,bool>, std::vector<unsigned int> >
-             (Table<2,bool>(1, this->dofs_per_cell),
-              std::vector<unsigned int>(1, 0));
-    }
-}
-
-
-
-template <int dim, int spacedim>
 std::string
 FE_DGQHermite<dim,spacedim>::get_name () const
 {
